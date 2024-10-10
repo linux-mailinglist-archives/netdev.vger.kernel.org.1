@@ -1,289 +1,335 @@
-Return-Path: <netdev+bounces-134065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA500997C16
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 07:00:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3566E997C91
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 07:42:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C8EAB23E2D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:59:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72924B236A7
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 05:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6104619E830;
-	Thu, 10 Oct 2024 04:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="miA3NePx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C2C19E7D0;
+	Thu, 10 Oct 2024 05:42:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011041.outbound.protection.outlook.com [52.101.65.41])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CBD3D6B;
-	Thu, 10 Oct 2024 04:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728536392; cv=fail; b=U+pn57gfgkd883E4lCXP+7h3DIgnJJ/sFh2hcy3DeqG1ceZ2JyN51kVMkTKjkOlbzlqDG99f4WVJUuYrORmxpoDjwMegTjnVcTj9MyRqW18vPTjDwjMRmI8jT/powBli2wHET4Vjm4k9p+PjNeG8wSN3P00Zt0kktOn3CDPz1Rs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728536392; c=relaxed/simple;
-	bh=+J4m7XEd60oQfdOSzbsvVsi5y8GjAm1dUOK0HMN/Cvk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ah2ZK9X6WXmHuyGMveZcSwrRYl60OJVQ7VmXYbMK2k0sSs9KgREx0MXdhNhIUkrzu3/JmCWkOOjYY4oYdxFsmOWMkzWw6HmKWDrN0bmqSF64y8DVhuaFxgkNZPpBhuGAbEw5iTht/fUFaHe5tr5o2e/Hpe+Lgf6iAgzCL+tpYOo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=miA3NePx; arc=fail smtp.client-ip=52.101.65.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O6FdKHFeW4lcFASTqFmdZl5F2ckn9WbTU4dgdpJpb3cUGQoAWSI3hAtIXeOvncEyBs0lbj6WnYIOITBJqpQBCV9ctIfVL4W2NUZLMkcIB4ZNts49V2OCKLCKAf1pf2hLOVr6Wq9O1TbrxK+rB/HcJBLAQ9I2o1vRC3PnwAunBs4vIaEDEC62y+JwCpVyw85N10DV9nzdeSNV/mWNrBEzFrG/4ZTgp45o99jtVUpMGr/N/iJh5pna32uyXpexELzwEbTLc38lGmTAvpPXGzQrn/NTN5Sro/48hCVfqoyH5GK/wfCL7I2xr+0Mjx0c0syuooNoR3r8fYz23J4JsktPXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VVASvSTLOll3Xc+pRzRkO08UgkzPZME1ztNdZxKsQnQ=;
- b=mhs8GTjRyzZmZJemmxBz/Q2bVxpIFSGuyZjWYyN0CGbQNxWJoB4BVdKXZFaPzDV/aFKi3WcRye1jJDa1t57qnPvGVWnfd50tNklP1r4Vyb2Cbxr3xE6zUaqrbRTIBBaOGBHZfGu8x6hG9CZ8fcNA0MF3tXbqeuLp+Iwll7UKd2sBP8QKznK/+5+DYeQdJ/3rpw9oqbwVwI/QxzPoGbLdTqes2A0MybohS2GiMDvmftEf6OqF8s/BUcZQ43XqsnNh/ASiJjN+yNIPckklGebLa/Cad8YRGvX0cXU6KUf6E0pFYMlXWxqX8HWjn4RtVj3NhZ6FZjjB9cvguWxs57pAUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VVASvSTLOll3Xc+pRzRkO08UgkzPZME1ztNdZxKsQnQ=;
- b=miA3NePx6zKeRrcPMhpw97I/T4afscbLpwTA6l9y7HpW8kYP0WZPOCLaUpg88l6Ew9jLmZn+2q8q8evfcJLGpV7hHbACbKOV5qJuJKT9pPSkIaQ33iPtCpoN5MI2a0VT4K4ns2pktmzu1tNCXhnw27CPbKXabG5K33cyfA6draYm4WtToRV4CbitJ5bwvxWl3mCIFnc/INxCPHO9IH/X4jgU7vhp4NzmM1nkeq3BDRT/1grcyq3gJBP06mp3PJVU4SdhgeNBc+ux9SBpMSTMRh0HjWJ4+kMRqHlXpLtb2+7735CrBKXclf9fNDfNuIY4oAfCmp/8nMibBl8BNLGOyw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AM8PR04MB7985.eurprd04.prod.outlook.com (2603:10a6:20b:234::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Thu, 10 Oct
- 2024 04:59:45 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8026.019; Thu, 10 Oct 2024
- 04:59:45 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Frank Li <frank.li@nxp.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu
- Manoil <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "bhelgaas@google.com"
-	<bhelgaas@google.com>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14AC19DF81
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 05:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728538964; cv=none; b=twFJDSmkGG1sbqe1soR9PfaPPE8NP9vtHNBtFsICszF3MOEcZ2adYaRNkaArvMcXGq5ZW/Crp7nOMUEG31VKXLWZWrMfVxLHEU9HsB5euv7WbI3xCAXSMcRPpAI6AQNRvELSQD3RiPTYLXwRCIcmRRACSh+TpsTyZJuE2CldFFY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728538964; c=relaxed/simple;
+	bh=Hd0HjPX4rBzEf/HyP+QvJ/eLnOjFb4VNL05LZZ0LIr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WvQpccagAYjxy/bHYrFXF5Q8BrEAi5PQM5Qg8hCVD7tZSEfD3gdi0a9CuD6f+86qSp2goAVnl8IpwCaPuwpOhuD2OGgFaUz0AzdEc4ph6uTHF3e2VhuaaWsSCqbu/FO7JjJba7DdrrgtHjbfoM4ArIWPQYSVCQ65FdJDObTWxmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sylwR-0002Ks-FN; Thu, 10 Oct 2024 07:42:27 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sylwP-000lnx-70; Thu, 10 Oct 2024 07:42:25 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sylwP-003mPs-0M;
+	Thu, 10 Oct 2024 07:42:25 +0200
+Date: Thu, 10 Oct 2024 07:42:25 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kyle Swenson <kyle.swenson@est.tech>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
-Subject: RE: [PATCH net-next 10/11] net: enetc: add preliminary support for
- i.MX95 ENETC PF
-Thread-Topic: [PATCH net-next 10/11] net: enetc: add preliminary support for
- i.MX95 ENETC PF
-Thread-Index: AQHbGjMCRp6WYylLaEyKPUuJKhwhaLJ+sHIAgAClOHA=
-Date: Thu, 10 Oct 2024 04:59:45 +0000
-Message-ID:
- <PAXPR04MB85100EB2E98527FCC4BAF89B88782@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20241009095116.147412-1-wei.fang@nxp.com>
- <20241009095116.147412-11-wei.fang@nxp.com>
- <ZwbANHg93hecW+7c@lizhi-Precision-Tower-5810>
-In-Reply-To: <ZwbANHg93hecW+7c@lizhi-Precision-Tower-5810>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM8PR04MB7985:EE_
-x-ms-office365-filtering-correlation-id: a9c54c83-4592-494f-38a8-08dce8e85bec
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?wc6WEDo0GCE7dw1sET1BNxCd3gMNRdDY5TTyJcI7PUSi9OoA2cXtcIwWrCHv?=
- =?us-ascii?Q?iLu5WMQ+sca4V+Xp7Uenwi/FMX5By7z1LWVNMq0UVcdqHPIOX0ZaZkKDfU//?=
- =?us-ascii?Q?gbfXmIS8XDI6kDzIxKWaKwlLlhG5WzLJu4jeAWYWeL0TIqANN9fHaio5zJXg?=
- =?us-ascii?Q?+4oCE7Wxn/QCoFT3qDiJNyuZ2jCTJcE6bxZQkmsVRw40q2J1l5r4GOAHszA6?=
- =?us-ascii?Q?K+hTIKSDBPiwPowlfV50nM+vmkz+aFSxFjbxDZ89K2GnZj3nJbDpavozgk22?=
- =?us-ascii?Q?y+LdO+NroC77elv7HKFo1+6v+mlwI3AKVBfhy5jIlYJBeGAmoPFlHfKx2AnD?=
- =?us-ascii?Q?UDSGUQLp2QEqgiu55GoKC1tq2Zu/As4Y73ttedOjXEDZyrz2RLREcnb0w1ON?=
- =?us-ascii?Q?sHFsiQnZLp3eo5nO4+PBZ56P1v45LgKn9OJ+Nv9W1Ej/7sgvpu7MNfi5lZwu?=
- =?us-ascii?Q?vqc7jf9+Zqnd1e1M5EC/Lg49VJTdnUDbDieijq1/Fjd212Kgtq0IgWRnYEsi?=
- =?us-ascii?Q?czgTKG7RkdoY8T7m52nvPRCSelaMuNHhOqHDmFORJJz4y1arikYRoFspFPbk?=
- =?us-ascii?Q?2t1uYJ1LUY5FxJ4I2lYmbxhhkrwSuXQq3b6KU6MU/iPY2bEFwaCoZfGY2vcL?=
- =?us-ascii?Q?A/G2xrlVdSiAYMl6jMZQ6Tpox7F3xHIbm0JMcKQEEHrD5NhfFB7v65Tvr3N+?=
- =?us-ascii?Q?yyFeK3GzJRpw9CqnNsPIWQPvtRe77vSzQ9UlQNRcbZaERyj+bhT88SVdofM+?=
- =?us-ascii?Q?VGsPgwWkSdWwM/0y4Xjh6aWvs2UIwWAriyvB5NxsqXp3OobbDjVscfovLyiQ?=
- =?us-ascii?Q?WL5D2kkqbBa3nL6g4nS4yysrhY+P0PN+PuTkv05g0pvoG8J+O6RLmmtKHZiN?=
- =?us-ascii?Q?sg8FKudMLrgHcntXzod1A2WIRwCklIOeAaSeqA3TQL7mTdiUli6ze3Ayo68A?=
- =?us-ascii?Q?d4kP7e0mT9+B5wYtVCu4vWvNGWbLNX4GlLHCvr/dMCQnQAvuPv2cH1LvSR2x?=
- =?us-ascii?Q?h0DlS/zf9uxb28TkKBjYhcGsx30nHp1ZDnYdopwnt2q/6vhLr+tmhObulYa0?=
- =?us-ascii?Q?JWk16nXEaHgadQNNNvoPWBCFEzZGvU1HM8o7WxEIIXrr+kq+o9XmxFTC+4eh?=
- =?us-ascii?Q?rGHBB2izBQXcJsgIjc/lgVO4ivP6Lc+rCTkFhtkhc7T2I4YzUVDhwvs6FmFA?=
- =?us-ascii?Q?GnjwJsu2pNwwUgKblqndnFjK9Eok9NcCgpi54pGNHESNZrP/Ij6UGOGKLxki?=
- =?us-ascii?Q?bbiAaEgi0H3R2y5jzkU3g9UOz0IIoCiLmHXCDKKIItbGNPtbN+aG+1yQHBjS?=
- =?us-ascii?Q?OBHv7iH6xOe2yc0auyTmq3Mc/ZtFzGQ+fpj70y63IubExA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ZTmjDs3IJPvyEwXwR3a84KbVEZqYSS3CFBKFfYnTNWNo2koiL20pvDrHSOtM?=
- =?us-ascii?Q?3xeWATcMEjzj983+vymEx23f8eNW5qkU+os9P4QBlAWg+GGhFxBPmEayx4Fa?=
- =?us-ascii?Q?dxGIfWwuIfYrPxAR4jleZeKnH4wq8y6nRSNb8GrJO3uSqgG5Fbd+OYqdWnNj?=
- =?us-ascii?Q?zx+7aOfnmTin7J+8ZKpUq1LV5mtiCtcR+0yq5jQ949YQDbCMym/0pV4nEJkK?=
- =?us-ascii?Q?ODvZbXNdbk0RNgmhjMxntYcZbxduxzSSMGZ8CMJL2rjkykcU/EuGuKcNyvwx?=
- =?us-ascii?Q?k0YIMkmHulXf8IJ2CmGodws3zK3oeIt402ScT2g2gdTEqI8CCIF+KYqgMIeV?=
- =?us-ascii?Q?tpIjr3ulVP9aozxG8MdCmKA5ixtBDfPcXoSxFv8Yf51Qu3HD1TwejcsNl71Q?=
- =?us-ascii?Q?mZHl9EAdBbzGCqTuuWUoM9XmMIcuLdlDjh+yhTPDkR7osrg47p6MzPYpOIoE?=
- =?us-ascii?Q?+kx8wjRVNM5Mez4/nwmQm36jZNJBBc/GsZITMPKHz78Y2WHtQH92BAiCqEww?=
- =?us-ascii?Q?KbVo7N2iyS8gs1tcTnb73jrNSAhOb6gqt8WsG01QXhtAxOxVvIikTCIgzkXi?=
- =?us-ascii?Q?QvU1XezCVKvtLF4G1O489OPtFrKBfONfn7fQqe9OnAlnxts2+XqnBhJUjRiD?=
- =?us-ascii?Q?OZp0zZmXX55TScfwdyIsQiYue7QE3ZD/3rUTLXZnmyIBDyTM9RrxWHW7hiIc?=
- =?us-ascii?Q?Pi/jeWpgHZf5W6IEQ6XnFLi8ys2kXKHC9HO6lRUGIo90XHX5xNKCPoi6rADr?=
- =?us-ascii?Q?C+st9d5GijsSx1HRaexJ5C/3ZFqw2jV/KBSIcyR2PBOM6PVVCJ/1uyvJu9/O?=
- =?us-ascii?Q?vludy/I5MQIdTGz93kGc7Wi+EE6C2pOG4CGGi8bRMHVATQMRApfnYUA24AOF?=
- =?us-ascii?Q?DTK/k8Qsw7hXBCX1hEFQu8GgyORxPPH1pdGEVAR42XO+QNdcmwhhVtULhY8I?=
- =?us-ascii?Q?hdJmnexYNEpSoV+5WmVVvmhYgNdutDatjVAloGyjOm62E0wQ6UMPE72evsA3?=
- =?us-ascii?Q?4tXlQbAFAAmuSJlIgn3e0o/SMaKP3/qIuXlveehb9ey08IsQkXNI0uMKOI62?=
- =?us-ascii?Q?3xz7F2xfsx6ZRfllhGmoTMsChVSuIXBmkhLJf7uXsBipWpyLjConh5kiQEC5?=
- =?us-ascii?Q?Vtk7u6bPnLB0TfPW5/782vEwPr8ae2zWAGfLBbEQW0ALBqdDSxKDkkGbxUBx?=
- =?us-ascii?Q?pK6n92F+EweHIFXxpbTvZxMcdu5EFDE8yrpuUCyz801NCY/E1M6s+JBMP4KF?=
- =?us-ascii?Q?ueAAQ9f/uKTJPS1CSVYaS5wplcyfY5gAH+JaEEOUwDeK8BBYXx4Zn4S1ywEe?=
- =?us-ascii?Q?dSLj4cVXVtdZ02euvIfb+S3oSAqug8foaKtqGJOSeCh5R1Yd0teTk7TaUswD?=
- =?us-ascii?Q?4VPGMApxiYGBB7+BAXj+E+EhCgjwsrx+9q6i7VcEcszS2pS2VwjwNXTn2Ll2?=
- =?us-ascii?Q?EWEuNeeMXrYCaxK3qHMoo8RfNgxSuZjZaf5OJke/rrSsvm16lf8jGWluRBRi?=
- =?us-ascii?Q?Sw/0W4oqJ5/2qg53vIx9nkRL2CUqDyL7SviSGx8z1cUSz3lTCdvOdpzFXn1Q?=
- =?us-ascii?Q?9b0MHlytAro7PdPpRzU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: [PATCH net-next 00/12] Add support for PSE port priority
+Message-ID: <ZwdpQRRGst1Z0eQE@pengutronix.de>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+ <ZwaLDW6sKcytVhYX@p620.local.tld>
+ <20241009170400.3988b2ac@kmaincent-XPS-13-7390>
+ <ZwbAYyciOcjt7q3e@est-xps15>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9c54c83-4592-494f-38a8-08dce8e85bec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2024 04:59:45.1622
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FGPPEz9+/6ANqY5YL7D3HL5QEYh0jx6IJdUKoPPGS6kgN+M2iBssvEUKweEb2MYR0l8NNzH4KEOseI1DcZnyzA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7985
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZwbAYyciOcjt7q3e@est-xps15>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> On Wed, Oct 09, 2024 at 05:51:15PM +0800, Wei Fang wrote:
-> > The i.MX95 ENETC has been upgraded to revision 4.1, which is very
-> > different from the LS1028A ENETC (revision 1.0) except for the SI
-> > part. Therefore, the fsl-enetc driver is incompatible with i.MX95
-> > ENETC PF. So we developed the nxp-enetc4 driver for i.MX95 ENETC
->             So add new nxp-enetc4 driver for i.MX95 ENETC PF with
-> major revision 4.
->=20
-> > PF, and this driver will be used to support the ENETC PF with major
-> > revision 4 in the future.
-> >
-> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h
-> b/drivers/net/ethernet/freescale/enetc/enetc.h
-> > index 97524dfa234c..7f1ea11c33a0 100644
-> > --- a/drivers/net/ethernet/freescale/enetc/enetc.h
-> > +++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-> > @@ -14,6 +14,7 @@
-> >  #include <net/xdp.h>
-> >
-> >  #include "enetc_hw.h"
-> > +#include "enetc4_hw.h"
-> >
-> >  #define ENETC_SI_ALIGN	32
-> >
-> > +static inline bool is_enetc_rev1(struct enetc_si *si)
-> > +{
-> > +	return si->pdev->revision =3D=3D ENETC_REV1;
-> > +}
-> > +
-> > +static inline bool is_enetc_rev4(struct enetc_si *si)
-> > +{
-> > +	return si->pdev->revision =3D=3D ENETC_REV4;
-> > +}
-> > +
->=20
-> Actually, I suggest you check features, instead of check version number.
->=20
-This is mainly used to distinguish between ENETC v1 and ENETC v4 in the
-general interfaces. See enetc_ethtool.c.
+Hello Kyle,
 
-> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-> b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-> > new file mode 100644
-> > index 000000000000..e38ade76260b
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-> > @@ -0,0 +1,761 @@
-> > +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-> > +/* Copyright 2024 NXP */
-> > +#include <linux/unaligned.h>
-> > +#include <linux/module.h>
-> > +#include <linux/of_net.h>
-> > +#include <linux/of_platform.h>
-> > +#include <linux/clk.h>
-> > +#include <linux/pinctrl/consumer.h>
-> > +#include <linux/fsl/netc_global.h>
->=20
-> sort headers.
->=20
+On Wed, Oct 09, 2024 at 05:42:30PM +0000, Kyle Swenson wrote:
+> Hello Kory,
+> 
+> On Wed, Oct 09, 2024 at 05:04:00PM +0200, Kory Maincent wrote:
+> > Hello Kyle,
+> > 
+> > On Wed, 9 Oct 2024 13:54:51 +0000
+> > Kyle Swenson <kyle.swenson@est.tech> wrote:
+> > 
+> > > Hello Kory,
+> > > 
+> > > On Wed, Oct 02, 2024 at 06:27:56PM +0200, Kory Maincent wrote:
+> > > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> > > > 
+> > > > This series brings support for port priority in the PSE subsystem.
+> > > > PSE controllers can set priorities to decide which ports should be
+> > > > turned off in case of special events like over-current.  
+> > > 
+> > > First off, great work here.  I've read through the patches in the series and
+> > > have a pretty good idea of what you're trying to achieve- use the PSE
+> > > controller's idea of "port priority" and expose this to userspace via ethtool.
+> > > 
+> > > I think this is probably sufficient but I wanted to share my experience
+> > > supporting a system level PSE power budget with PSE port priorities across
+> > > different PSE controllers through the same userspace interface such that
+> > > userspace doesn't know or care about the underlying PSE controller.
+> > > 
+> > > Out of the three PSE controllers I'm aware of (Microchip's PD692x0, TI's
+> > > TPS2388x, and LTC's LT4266), the PD692x0 definitely has the most advanced
+> > > configuration, supporting concepts like a system (well, manager) level budget
+> > > and powering off lower priority ports in the event that the port power
+> > > consumption is greater than the system budget.
+> > > 
+> > > When we experimented with this feature in our routers, we found it to be using
+> > > the dynamic power consumed by a particular port- literally, the summation of
+> > > port current * port voltage across all the ports.  While this behavior
+> > > technically saves the system from resetting or worse, it causes a bit of a
+> > > problem with lower priority ports getting powered off depending on the
+> > > behavior (power consumption) of unrelated devices.  
+> > > 
+> > > As an example, let's say we've got 4 devices, all powered, and we're close to
+> > > the power budget.  One of the devices starts consuming more power (perhaps
+> > > it's modem just powered on), but not more than it's class limit.  Say this
+> > > device consumes enough power to exceed the configured power budget, causing
+> > > the lowest priority device to be powered off.  This is the documented and
+> > > intended behavior of the PD692x0 chipset, but causes an unpleasant user
+> > > experience because it's not really clear why some device was powered down all
+> > > the sudden. Was it because someone unplugged it? Or because the modem on the
+> > > high priority device turned on?  Or maybe that device had an overcurrent?
+> > > It'd be impossible to tell, and even worse, by the time someone is able to
+> > > physically look at the switch, the low priority device might be back online
+> > > (perhaps the modem on the high priority device powered off).
+> > > 
+> > > This behavior is unique to the PD692x0- I'm much less familiar with the
+> > > TPS2388x's idea of port priority but it is very different from the PD692x0.
+> > > Frankly the behavior of the OSS pin is confusing and since we don't use the
+> > > PSE controllers' idea of port priority, it was safe to ignore it. Finally, the
+> > > LTC4266 has a "masked shutdown" ability where a predetermined set of ports are
+> > > shutdown when a specific pin (MSD) is driven low.  Like the TPS2388x's OSS
+> > > pin, We ignore this feature on the LTC4266.
+> > > 
+> > > If the end-goal here is to have a device-independent idea of "port priority" I
+> > > think we need to add a level of indirection between the port priority concept
+> > > and the actual PSE hardware.  The indirection would enable a system with
+> > > multiple (possibly heterogeneous even) PSE chips to have a unified idea of
+> > > port priority.  The way we've implemented this in our routers is by putting
+> > > the PSE controllers in "semi-auto" mode, where they continually detect and
+> > > classify PDs (powered device), but do not power them until instructed to do
+> > > so.  The mechanism that decides to power a particular port or not (for lack
+> > > of a better term, "budgeting logic") uses the available system power budget
+> > > (configured from userspace), the relative port priorities (also configured
+> > > from userspace) and the class of a detected PD.  The classification result is
+> > > used to determine the _maximum_ power a particular PD might draw, and that is
+> > > the value that is subtracted from the power budget.
+> > > 
+> > > Using the PD's classification and then allocating it the maximum power for
+> > > that class enables a non-technical installer to plug in all the PDs at the
+> > > switch, and observe if all the PDs are powered (or not).  But the important
+> > > part is (unless the port priorities or power budget are changed from
+> > > userspace) the devices that are powered won't change due to dynamic power
+> > > consumption of the other devices.
+> > > 
+> > > I'm not sure what the right path is for the kernel, and I'm not sure how this
+> > > would look with the regulator integration, nor am I sure what the userspace
+> > > API should look like (we used sysfs, but that's probably not ideal for
+> > > upstream). It's also not clear how much of the budgeting logic should be in
+> > > the kernel, if any. Despite that, hopefully sharing our experience is
+> > > insightful and/or helpful.  If not, feel free to ignore it.  In any case,
+> > > you've got my
+> > 
+> > Thanks for your review and for sharing your PSE experience.
+> > It indeed is insightful for further development and update of this series.
+> 
+> Excellent, glad to hear it.
+> 
+> > So you are saying that from a use experience the port priority feature is not
+> > user-friendly as we don't know why a port has been shutdown.
+> > Even if we can report the over-current event of which port caused it, you still
+> > thinks it is not useful?
+> 
+> Well, not quite.  I think the concept of a "port priority" is useful,
+> but I don't know that the PD692xx's concept of "port priority" is what
+> we want.  The issue is the PD692xx's budgeting algorithm is based on
+> dynamic power used (i.e. the total power used at any given time).  Since
+> this is, well, dynamic, it makes it confusing when a lower priority port
+> is powered off due to the runtime behavior of higher-priority ports.
+> It's even more confusing if the implicit or default port priorities are
+> used.
+> 
+> Instead, we found that using the maximum power that is allowed be drawn
+> by a particular PD's class (set by the IEEE standard) is more user
+> friendly, because the set of devices that are powered won't change
+> (unless priorities are changed, or the system budget is changed).
+> For example, if we've got 4 devices plugged in, and the three highest
+> priority devices consume all the power budget, the lowest priority
+> device won't ever be powered.  There isn't a case where the lowest
+> priority device will be shut down because a higher priority device
+> starts consuming more power at some point in the future.
+> 
+> > We could have several cases for over power budget event:
+> > - The power limit exceeded is the one configured for the ports.
+> >   We should shutdown only that port without taking care about priority.
+> >   TPS23881 has this behavior when power exceed Pcut.
+> >   I think the PD692x0 does the same. Need to verify.
+> 
+> These conditions I'd not call "over power budget events".  I'd call them
+> "port overcurrent events" and I agree, those only affect the specific
+> problem port.
+> 
+> > - The power limit exceeded is the global (or manager PD69208M) power budget.
+> >   Here port priority is interesting.
+> >   Is there a way to know which port create this global power limit excess?
+> >   Should we turn off this port even if he don't exceed his own power limit or
+> >   should we turn off low priority ports?
+> 
+> I think it's important to make a distinction between an "overcurrent"
+> condition and the condition where we've exceeded the system power
+> budget.  An "overcurrent" is port-specific, and can happen if the PD
+> consumes more power than the classification of the device allows.  For
+> example, if a Class 3 PD (i.e. 802.3at, also referred to as a Type II
+> PD) consumes more than 15.4 W at the PSE, it will be shutdown
+> immediately.  This support is required by all the IEEE 802.3 standards
+> around PoE (.af, .at. and .bt) and is a safety thing.  The TPS2388x
+> implements this with Pcut, the LTC4266 impliments this with Icut
+> register, and the PD692xx implements it with the port power limit
+> registers.  
+> 
+> The condition where we've exceeded our system-level power
+> budget is a little different, in that it causes a port to be shutdown
+> despite that port not exceeding it's class power limit.  This condition
+> is the case I'm concerned we're solving in this series, and solving it
+> for the PD692xx case only, and it's based off dynamic power consumption.
+> 
+> So I guess I'm suggesting that we take the power budgeting concept out
+> of the PSE drivers, and put it into software (either kernel, userspace)
+> instead of the PSE hardware.  
+> 
+> >   I can't find global power budget concept for the TPS23881. 
+> 
+> This is because this idea doesn't exist on the TPS2388x.  
+> 
+> >   I could't test this case because I don't have enough load. In fact, maybe by
+> >   setting the PD692x0 power bank limit low it could work.
+> 
+> Hopefully this helps clarify.
 
-Sure
 
-> > +static int enetc4_pf_probe(struct pci_dev *pdev,
-> > +			   const struct pci_device_id *ent)
-> > +{
-> > +	struct device *dev =3D &pdev->dev;
-> > +	struct enetc_si *si;
-> > +	struct enetc_pf *pf;
-> > +	int err;
-> > +
-> > +	err =3D enetc_pci_probe(pdev, KBUILD_MODNAME, sizeof(*pf));
-> > +	if (err) {
-> > +		dev_err(dev, "PCIe probing failed\n");
-> > +		return err;
->=20
-> use dev_err_probe()
->=20
+Thank you for your detailed insights. Before we dive deeper into policies and
+implementations, I’d like to clarify an important point to avoid confusion
+later. When comparing different PSE components, it's crucial to note that the
+Microchip PD692x0 operates in two distinct categories:
+1. PoE controller (PD692x0)
+2. PoE manager (PD6920x)
 
-Okay
+Comparing the PoE controller (PD692x0) with TPS2388x or LTC4266 isn't entirely
+fair, as TPS2388x and LTC4266 are more comparable to the PoE manager (PD6920x).
+The functionalities provided by the PoE controller (PD692x0) are things we
+would need to implement ourselves on the software stack (kernel or userspace).
+The budget heuristic that is implemented in the PD692x0's firmware is absent in
+TPS2388x and LTC4266.
 
-> > +	}
-> > +
-> > +	/* si is the private data. */
-> > +	si =3D pci_get_drvdata(pdev);
-> > +	if (!si->hw.port || !si->hw.global) {
-> > +		err =3D -ENODEV;
-> > +		dev_err(dev, "Couldn't map PF only space!\n");
-> > +		goto err_enetc_pci_probe;
-> > +	}
-> > +
-> > +	err =3D enetc4_pf_struct_init(si);
-> > +	if (err)
-> > +		goto err_pf_struct_init;
-> > +
-> > +	pf =3D enetc_si_priv(si);
-> > +	err =3D enetc4_pf_init(pf);
-> > +	if (err)
-> > +		goto err_pf_init;
-> > +
-> > +	pinctrl_pm_select_default_state(dev);
-> > +	enetc_get_si_caps(si);
-> > +	err =3D enetc4_pf_netdev_create(si);
-> > +	if (err)
-> > +		goto err_netdev_create;
-> > +
-> > +	return 0;
-> > +
-> > +err_netdev_create:
-> > +err_pf_init:
-> > +err_pf_struct_init:
-> > +err_enetc_pci_probe:
-> > +	enetc_pci_remove(pdev);
->=20
-> you can use devm_add_action_or_reset() to remove these goto labels.
->=20
-Subsequent patches will have corresponding processing for these labels,
-so I don't want to add too many devm_add_action_or_reset ().
+Policy Variants and Implementation
+
+In cases where we are discussing prioritization, we are fundamentally talking
+about over-provisioning. This typically means that while a device advertises a
+certain maximum per-port power capacity (e.g., 95W), the total system power
+budget (e.g., 300W) is insufficient to supply maximum power to all ports
+simultaneously. This is often due to various system limitations, and if there
+were no power limits, prioritization wouldn't be necessary.
+
+The challenge then becomes how to squeeze more Powered Devices (PDs) onto one
+PSE system. Here are two methods for over-provisioning:
+
+1. Static Method:
+ 
+   This method involves distributing power based on PD classification. It’s
+   straightforward and stable, with the software (probably within the PSE
+   framework) keeping track of the budget and subtracting the power requested by
+   each PD’s class. 
+ 
+   Advantages: Every PD gets its promised power at any time, which guarantees
+   reliability. 
+
+   Disadvantages: PD classification steps are large, meaning devices request
+   much more power than they actually need. As a result, the power supply may
+   only operate at, say, 50% capacity, which is inefficient and wastes money.
+
+2. Dynamic Method:  
+
+   To address the inefficiencies of the static method, vendors like Microchip
+   have introduced dynamic power budgeting, as seen in the PD692x0 firmware.
+   This method monitors the current consumption per port and subtracts it from
+   the available power budget. When the budget is exceeded, lower-priority
+   ports are shut down.  
+
+   Advantages: This method optimizes resource utilization, saving costs.
+
+   Disadvantages: Low-priority devices may experience instability. A possible
+   improvement could involve using LLDP protocols to dynamically configure
+   power limits per port, thus allowing us to reduce power on over-consuming
+   ports rather than shutting them down entirely.
+
+Recommendations for Software Handling
+
+Both methods have their pros and cons. Since the dynamic method is not always
+desirable, and if there's no way to disable it in the PD692x0's firmware, one
+potential workaround could be handling the budget in software and dynamically
+setting per-port limits. For instance, with a total budget of 300W and unused
+ports, we could initially set 95W limits per port. As high-priority PDs (e.g.,
+three 95W devices) are powered, we could dynamically reduce the power limit on
+the remaining ports to 15W, ensuring that no device exceeds that classification
+threshold.
+
+This is just one idea, and there are likely other policy variants we could
+explore. Importantly, I believe these heuristics don’t belong in the kernel
+itself. Instead, the kernel should simply provide the necessary interfaces,
+leaving the policy implementation to userspace management software. At least
+this is a lesson learned from Thermal Management talk at LPC :D
+
+Best regards,  
+Oleksij
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
