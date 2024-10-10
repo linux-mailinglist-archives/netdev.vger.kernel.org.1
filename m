@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-134355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACBC998EA3
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:45:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C0B3998EA5
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B0E5285E29
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:45:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B90228625F
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD01F1CEAD1;
-	Thu, 10 Oct 2024 17:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B231CF29E;
+	Thu, 10 Oct 2024 17:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXGClQcV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHmEZeHC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F511CB309;
-	Thu, 10 Oct 2024 17:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9A81CEAD2;
+	Thu, 10 Oct 2024 17:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728582273; cv=none; b=X2IANYVCgWXXahBptnj9Je6vUt44l1NfIW7Abqpm73bUy7VtWDybFebUmY07Z7nsSJE7Wsi+jA0h2uQlSjHaoHjL0QwDFtk4Pq6TxAcM24UdWTgPM4jO8XceUPSMtGYDAaYo3zBvErrZnvrDVbo6LTI4abzqpk2GSuqt4DCB6Vk=
+	t=1728582275; cv=none; b=CAhIDvFrAQJFQ5Majiz/4SZanWJMvRF4+zhXYkyN4RH8xWI6zubzJCUVGc4WbHG7vVG9AvbLBnRJ/Oxhpg4lTq6eZbxiRVkSz1oF/PpdZGArGDJ1LrDyPqZEYvWOmFSjA0EGVq0hspP495Y6lnjyjUy71VMt2tZZFgoyJWwAd3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728582273; c=relaxed/simple;
-	bh=NisjLQ6AG+ayXJO1Uc/n/ydfucUugy/6A8GMWeGKP0Y=;
+	s=arc-20240116; t=1728582275; c=relaxed/simple;
+	bh=iE480TPIwoPhiXVrh3xXe2lyIM9ZDdeFT+n0VlmBVG0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VTmgRHeHIUWWJ1IMVoeq2h2DYUDUJEb1CyDZAJmBNFcCDFbWavL56qGr1wdjMDeoGdw7eszpUAcnTEE4kvBwgtYN7Tqd/uAwEyKIx6fIH7qUNJvFd4uqtoej1RUqDJxR4AWuuKqiXeG4OvMT2un826Zhx6zk1AvZewuslEmsq9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXGClQcV; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=ByXADMd69x89yiRBOWNaWuYIN+f74ZVCOfJ2K5xQeOAYzafQX3C/gQZzoP5YnaFJWHYy7rgVtrnxCpqNcRs89/x2hbpapcgsYY7qCd7nVYbSW/Lyi3mLt1M0n9Ip/6EnJ509AYn7sbdkKvE/mSZsHsbWkt4tpqxq5SlcT9lJ/UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHmEZeHC; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c71603217so10394175ad.3;
-        Thu, 10 Oct 2024 10:44:32 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20b8be13cb1so12933475ad.1;
+        Thu, 10 Oct 2024 10:44:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728582271; x=1729187071; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728582273; x=1729187073; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1eKq5WBmYRanNBUMYgcDZuAxZpmoeLTNGUJJx7uGfFQ=;
-        b=EXGClQcVugWQqCajUWG35P2K8sxu9QMuYSbouZ1dgp0MWc8gK4fbzNZYapCEWXPnST
-         ivswZmpac0GDhyuPb4b7FA7g+l1c9MIOBSqQbw7/wBfDr1P3BezCtbXMFreslFDv0SxN
-         FrUjxTzOtOwdE5thWzPJIGyjwQOOGYweVTygAuWNyp4jZRHpgb0wxXpnvbqkakMV0SC9
-         WEOIh4RrkCw4qzkFlzBcNKO00044t6y2g6x76ReEYl43LldzWs8Du7qNLB47gKcULafm
-         Ck+aFso8R++Qtor2uInmElwOPLXWUpusQRI/WNBRlPUH10atvvAbp0qjODMTLYdYydkY
-         r6hg==
+        bh=ycsHydRgWHXHWh2o8rVz39zXN41pbx4gmwtA3KWdmo0=;
+        b=MHmEZeHC6QWaZUp5r3v00ucJpV3xvWJWRvGnOsrV8WV4w7T0JlA/FFI4PIpfUw3MbW
+         L8xPkt9078JtPkRbzHWprJ/1GGO5QS2OzMCU/6r0EBrEj2ytG/dTGdXS7ySKYGvdQ1vb
+         0LicM7IO5jy5y/oiK1wLMJgMHml9UrUhP+WhX+h3BuMreVQ8RSMwTnsRnuECNHfnIpOI
+         HiP8yvSR1CIxAOziysDXvCOMHm+0JQmsjGJDmSpWEBGM2YbiDrqBF86hJIeqhkobmDRb
+         TKDZDrNuM3xZZbasSYJUWNt4dgF08SFpf6SircVhVqy27UpeQLIAXKd4dW1SvPqKjST+
+         Y0aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728582271; x=1729187071;
+        d=1e100.net; s=20230601; t=1728582273; x=1729187073;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1eKq5WBmYRanNBUMYgcDZuAxZpmoeLTNGUJJx7uGfFQ=;
-        b=rwBR2gaj6p24tZ4Kw46m228f7UsWdWS5yULYAGoZs9IMKU8BypQ+7ooil7yImu90OM
-         5qcm26Wx80gQrPTZ11XcZab05aiqYmmnAqllAHxztFV4SoDkmwLrcOoutEioB0aTUgyb
-         RsD1UMAib/d1FFR0653XWx5XKWBDuv5SQO7yJA6WBhVKfJWbuJVZ+lp6r//7gUBOuwvh
-         uPWCXJ1NNrYUF+lH+2eHrKGE2qI5FxWILyfBxixoNF7gCoZupzTrXn0rdL2tztultPVC
-         HCMp7lzq09r9yuMUa6ySqZlcQxMwRuXnevhWtMJ5YQgWvWt1lVoKF4Elqz6GX4fK9G6r
-         WNDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1iUN/pRZTfDbLu0u7KOPD5Y4q6Nxp/Blgke5X7uCu2J+EbTKedDcVySSxviY2dWiSSEfIauPrb6OR61Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1tRbOfgU7q2AlCk5MJ/F8tieYrPQNUfuDPPEhNPIEIo0ps1Rr
-	wQm7QBxF7ZwYjhlDmPA/cHuu5baGYQwjWHRQ3FB1ZltKAC45TAnKPwa+8gWT
-X-Google-Smtp-Source: AGHT+IENUzlYT8m3mkT0ObIFRL2AdiWZqp0/Dg3jBFtDxQMmPCeRAwNTvkKl05W961ZIGUPx1uk2cQ==
-X-Received: by 2002:a17:903:41cc:b0:20b:449c:8978 with SMTP id d9443c01a7336-20c9d8c8d00mr4829805ad.31.1728582271359;
-        Thu, 10 Oct 2024 10:44:31 -0700 (PDT)
+        bh=ycsHydRgWHXHWh2o8rVz39zXN41pbx4gmwtA3KWdmo0=;
+        b=IU5XXTydxTdw9rifhNUVeJiCX4NjNlD5D6SZMUKcvTtfHlefnzmiuh+HHdjyYBY8SD
+         vy71xJ9WC2/05KgNAXXyL4BqDAnS8rwqNJiMgXe0PoAT82+FCOYfPDaDB2QS884t7r8t
+         LRINU/RigKtlRV2OtP8CtUJVlaqPftzvEx2HK2txtWEs5vADB9OMizncT2pk5PaeieuT
+         EKuETqhEGr7W2unygRLshYXcthO2nIfsP1oeXZ357f6Fx4UAdeeGKiP5BaNNsyqtYoBM
+         +g0TDdy04BVWUL3jKj+EajCDti7I4IcPfCK2HRJ+9e/DutDmoGRtotdOB0MIiQpn5DHm
+         MlUg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYu5BdkogVwibEkTRwrZNZprtg9nAtZawLcT9ih9TEhiSB5fyX5TZuZ3LSKANg88bIukKKuN76xUiihE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzqwMEkRecI3+7zErzNjFEsATlj7NW8hS7clIRxmuo2AicxJp+
+	jZW05SdljZdtdVKkZGNhGBpBdZnv5rlmfX0UN404wsgpR/qQVOUZkm+stgzJ
+X-Google-Smtp-Source: AGHT+IHgQ6l34uzZjnWuGBrugVxw5AeGVCiNDA0JvfYBarFgBeT5q6OazA2SSH2TfGb8hKLV0sJxJg==
+X-Received: by 2002:a17:903:1cc:b0:205:8407:6321 with SMTP id d9443c01a7336-20c6375b06emr95588175ad.9.1728582272781;
+        Thu, 10 Oct 2024 10:44:32 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c0eb470sm11826495ad.126.2024.10.10.10.44.30
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c0eb470sm11826495ad.126.2024.10.10.10.44.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 10:44:31 -0700 (PDT)
+        Thu, 10 Oct 2024 10:44:32 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -81,9 +81,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jeff Johnson <quic_jjohnson@quicinc.com>,
 	Christian Marangi <ansuelsmth@gmail.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv5 net-next 3/7] net: ibm: emac: use devm_platform_ioremap_resource
-Date: Thu, 10 Oct 2024 10:44:20 -0700
-Message-ID: <20241010174424.7310-4-rosenp@gmail.com>
+Subject: [PATCHv5 net-next 4/7] net: ibm: emac: use platform_get_irq
+Date: Thu, 10 Oct 2024 10:44:21 -0700
+Message-ID: <20241010174424.7310-5-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241010174424.7310-1-rosenp@gmail.com>
 References: <20241010174424.7310-1-rosenp@gmail.com>
@@ -95,33 +95,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-No need to have a struct resource. Gets rid of the TODO.
+No need for irq_of_parse_and_map since we have platform_device.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/core.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 644abd37cfb4..438b08e8e956 100644
+index 438b08e8e956..f8478f0026af 100644
 --- a/drivers/net/ethernet/ibm/emac/core.c
 +++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -3050,12 +3050,10 @@ static int emac_probe(struct platform_device *ofdev)
- 
- 	ndev->irq = dev->emac_irq;
- 
--	/* Map EMAC regs */
--	// TODO : platform_get_resource() and devm_ioremap_resource()
--	dev->emacp = devm_of_iomap(&ofdev->dev, np, 0, NULL);
--	if (!dev->emacp) {
-+	dev->emacp = devm_platform_ioremap_resource(ofdev, 0);
-+	if (IS_ERR(dev->emacp)) {
- 		dev_err(&ofdev->dev, "can't map device registers");
--		err = -ENOMEM;
-+		err = PTR_ERR(dev->emacp);
+@@ -3031,15 +3031,8 @@ static int emac_probe(struct platform_device *ofdev)
+ 	if (err)
  		goto err_gone;
- 	}
  
+-	/* Get interrupts. EMAC irq is mandatory */
+-	dev->emac_irq = irq_of_parse_and_map(np, 0);
+-	if (!dev->emac_irq) {
+-		printk(KERN_ERR "%pOF: Can't map main interrupt\n", np);
+-		err = -ENODEV;
+-		goto err_gone;
+-	}
+-
+ 	/* Setup error IRQ handler */
++	dev->emac_irq = platform_get_irq(ofdev, 0);
+ 	err = devm_request_irq(&ofdev->dev, dev->emac_irq, emac_irq, 0, "EMAC",
+ 			       dev);
+ 	if (err) {
 -- 
 2.46.2
 
