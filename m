@@ -1,103 +1,264 @@
-Return-Path: <netdev+bounces-134314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4912C998B3E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:19:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16179998B40
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:19:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 114382954EC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:19:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2F3D1C21EFE
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059A41CBEB4;
-	Thu, 10 Oct 2024 15:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opgY8dvM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2CC1CC17D;
+	Thu, 10 Oct 2024 15:19:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A4D1CB312;
-	Thu, 10 Oct 2024 15:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFE9B646
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728573568; cv=none; b=Qb0X+cZMGXTcTU4zLzkW7EhAUrcZuQkmwxAPAMgKnR5V7w+mjYGOO9Y3QJw8c9CcLUMBLlgSMrqcuvyCWMfO6SpAoxvqKGrSjaDZMuzkK/p1i9q0ZS+JpwVk3FPIOCfg2AEYOtvcjNrKXjc0OqGj9x7geziUKDVNCvmGdELSbw8=
+	t=1728573570; cv=none; b=tTNLw991+XvP2YQPD1xoYp6G2bT1thqL+Hj8zNTBrmYA4UNIDAH7JYQVmqkbkUf/VqJeIooacY7iOQtwYGuyoKdoPLqr5r23FjOWiv4n/PGUlBZyKYZr64YT9YQGsD+ZelobtPYsWsOSP29ztMDCMZrBKKUNCvuN/yvHhAHGePY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728573568; c=relaxed/simple;
-	bh=0jq1OOUiN4khsOZmhP2/oYIr4K7zJJoz+UgPHvbmbSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SDUMzl8nzHH+kul8zwk2C/020Ve8q8hdPUv6KAi/M//NMUXaSdM4+RyImGpTrdEyOaAJfUzU8maCApExaB7eR12BSVPebaKYGywjGCiPVZpZ+l8XVwsG6ZO1R649ZAPrpOAtCO++uqWUl1k6j+VZk9qilOQLwpZd1aRTYCJx0LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opgY8dvM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB28C4CEC5;
-	Thu, 10 Oct 2024 15:19:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728573565;
-	bh=0jq1OOUiN4khsOZmhP2/oYIr4K7zJJoz+UgPHvbmbSs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=opgY8dvMb9mNGN6kR516XKuPlBjZjyD9K/myeQPzYM1IUHLf+2oq6nH3GucOOzGNl
-	 PGbrH3wr8bEMMZqgjudvaYTw0NQXMPgGS2MLxAtmMab1WYacLzOW0Zt3HLlNpSz/4b
-	 nxEbOlXdZ8MKRPGSyRjCW/qG/9Bg2H5Qv7dncQJMpTQIRmFP9MQMXcChjubQuqwfJJ
-	 7K6JjNz6mTlfz38tEq4/IdqwGBsDiyBZLilaoUhy7bP6SOxQcBv572F4kxHiBU/tRn
-	 Jic+R35GOIWPcPA8uobpK25nufbTTgixtNvKHPnnREDW91PGh66wUJ/Ti9FoVENP9E
-	 TJC5jC5CPhEBg==
-Date: Thu, 10 Oct 2024 08:19:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
- mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
- bjorn@rivosinc.com, amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
- willemdebruijn.kernel@gmail.com, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Mina Almasry
- <almasrymina@google.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next v5 6/9] netdev-genl: Support setting per-NAPI config
- values
-Message-ID: <20241010081923.7714b268@kernel.org>
-In-Reply-To: <CANn89iJ1=xA9WGhXAMcCAeacE3pYgqiWjcBdxiWjGPACP-5n_g@mail.gmail.com>
-References: <20241009005525.13651-1-jdamato@fastly.com>
-	<20241009005525.13651-7-jdamato@fastly.com>
-	<CANn89iJ1=xA9WGhXAMcCAeacE3pYgqiWjcBdxiWjGPACP-5n_g@mail.gmail.com>
+	s=arc-20240116; t=1728573570; c=relaxed/simple;
+	bh=icVtOVPlCKNySRBde5WTDPjnhpZaRDOvLRt2PDOJtDk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XED9i0mEBO7EPcOwELVrqY+lcgavKzsy2Te6+HBYvpYSMLWSRZegFMyxVU2HrxUOYUUJIXuogfn4hItJEzCpTNcZF/VygZYTgWI3keu2xmOt/NfLqy6BiXXxA7TgXdkPOzM0/Qfora+GpRZfEeUWPBxc6BAaUvRZOXsRCGwvK6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a0ce7e621aso9738775ab.1
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:19:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728573568; x=1729178368;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KVWE38OAUYSGYOk+wfJEnOlrpjtGBc3n3tcYLekFef8=;
+        b=srVhDNZuOHF4wpuKvXQDUSuB00QFUs1L0Lifx1pqsI1gBxJsAybDNM+iQFjMqWJ/el
+         trhrjDth/Ut4Jj+34LY2VWM7FpF5I3IZy8chrZJXTqh1pcbY+cu6xyOAKOmA0FKn2MXy
+         b0/tc0WC9FsKdM81xhWRVN/UheF7zO3SQdmSs+nZ2slUvxYNnV3fjAkpg7XYwzye1WTm
+         DeyztzsHd4uJ7+RsnKM3I+Dm5kshy6jMCOTcx06IBe5ZMQLj2vl5dguXhucPVPSjVgOW
+         74vgmWf7Z3+NS8x4JeezBVfwgUEczmVPZt38t+Inv8pzxkfdJkXpSQz2Ewg1DX/FgOH5
+         p2eg==
+X-Forwarded-Encrypted: i=1; AJvYcCXl6OHNAxhhZNgRfowxRKPcSDIDjUtVVSjolwyZ2EfDhQFLIRUUYHchuuQ/T65Nz9eH9R6BhNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWgoCfVjE/GNKMuMRh7wZtai/zPZJXDXMRKbsbz7x3lgu1ugvn
+	XVGBLNn0v69BuITn0RWYFoadNdmznmtNRObbJRRusXF4ASJFtcxej2dMMgIcrHpj9XSh97O0H0X
+	74bccmru8WKZXhEVcfqYKnANVQmw+AQyfrrAIZjOSch7MfHvWqA85rIg=
+X-Google-Smtp-Source: AGHT+IH7yplpLl/l9pSgftA+h+ZA4+mWCnCshYozMHlLsHRio/qaJGSI/qjjNAuxBDx2fnccUFqMMwVppMtQrl5VRPSj+hocCYsz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1caf:b0:3a0:9829:100b with SMTP id
+ e9e14a558f8ab-3a397d17959mr53263075ab.21.1728573567926; Thu, 10 Oct 2024
+ 08:19:27 -0700 (PDT)
+Date: Thu, 10 Oct 2024 08:19:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6707f07f.050a0220.64b99.001b.GAE@google.com>
+Subject: [syzbot] [wireless?] INFO: task hung in cfg80211_event_work (4)
+From: syzbot <syzbot+5506b2556159a1ab6923@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 10 Oct 2024 06:24:54 +0200 Eric Dumazet wrote:
-> > +static const struct netlink_range_validation netdev_a_napi_defer_hard_irqs_range = {
-> > +       .max    = 2147483647ULL,  
-> 
-> Would (u64)INT_MAX  work ?
+Hello,
 
-I sent a codegen change for this. The codegen is a bit of a mess.
+syzbot found the following issue on:
 
-> > +int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)
-> > +{
-> > +       struct napi_struct *napi;
-> > +       unsigned int napi_id;
-> > +       int err;
-> > +
-> > +       if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_ID))
-> > +               return -EINVAL;
-> > +
-> > +       napi_id = nla_get_u32(info->attrs[NETDEV_A_NAPI_ID]);
-> > +
-> > +       rtnl_lock();  
-> 
-> Hmm.... please see my patch there :
-> 
->  https://patchwork.kernel.org/project/netdevbpf/patch/20241009232728.107604-2-edumazet@google.com/
-> 
-> Lets not add another rtnl_lock() :/
+HEAD commit:    2a130b7e1fcd Merge tag 'kbuild-fixes-v6.12' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1206e79f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f38c36a955431c1
+dashboard link: https://syzkaller.appspot.com/bug?extid=5506b2556159a1ab6923
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155b8327980000
 
-It's not as easy since NAPIs can come and go at driver's whim.
-I'm quietly hoping we can convert all netdev-nl NAPI accesses
-to use the netdev->lock protection I strong-armed Paolo into 
-adding in his shaper series. But perhaps we can do that after
-this series? NAPI GET already takes RTNL lock.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-2a130b7e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ea0b899b6053/vmlinux-2a130b7e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4ef0bad329fe/bzImage-2a130b7e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5506b2556159a1ab6923@syzkaller.appspotmail.com
+
+INFO: task kworker/u4:4:5271 blocked for more than 143 seconds.
+      Not tainted 6.12.0-rc1-syzkaller-00381-g2a130b7e1fcd #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u4:4    state:D stack:25712 pid:5271  tgid:5271  ppid:2      flags:0x00004000
+Workqueue: cfg80211 cfg80211_event_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5315 [inline]
+ __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
+ __schedule_loop kernel/sched/core.c:6752 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6767
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
+ wiphy_lock include/net/cfg80211.h:6014 [inline]
+ cfg80211_event_work+0x27/0x40 net/wireless/core.c:334
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/25:
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
+1 lock held by kswapd0/73:
+3 locks held by kworker/0:3/909:
+3 locks held by kworker/u4:9/2509:
+3 locks held by kworker/u4:11/3318:
+1 lock held by dhcpcd/4814:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+2 locks held by getty/4897:
+ #0: ffff88801dda90a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000039b2f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
+3 locks held by kworker/u4:0/5118:
+ #0: ffff88803c425948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88803c425948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90002d1fd00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90002d1fd00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_dad_work+0xd0/0x16f0 net/ipv6/addrconf.c:4196
+3 locks held by kworker/0:2/5170:
+2 locks held by kworker/u4:2/5176:
+3 locks held by kworker/u4:3/5211:
+1 lock held by syz-executor/5254:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b/0x1b0 drivers/net/tun.c:3517
+1 lock held by syz-executor/5255:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b/0x1b0 drivers/net/tun.c:3517
+1 lock held by syz-executor/5258:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b/0x1b0 drivers/net/tun.c:3517
+1 lock held by syz-executor/5264:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b/0x1b0 drivers/net/tun.c:3517
+3 locks held by kworker/u4:4/5271:
+ #0: ffff88801ebdf948 ((wq_completion)cfg80211){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801ebdf948 ((wq_completion)cfg80211){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90002617d00 ((work_completion)(&rdev->event_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90002617d00 ((work_completion)(&rdev->event_work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:6014 [inline]
+ #2: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: cfg80211_event_work+0x27/0x40 net/wireless/core.c:334
+1 lock held by syz-executor/5273:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b/0x1b0 drivers/net/tun.c:3517
+3 locks held by kworker/u4:6/5278:
+4 locks held by kworker/0:6/5390:
+ #0: ffff88801ac75948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801ac75948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90002adfd00 ((reg_check_chans).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90002adfd00 ((reg_check_chans).work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: reg_check_chans_work+0x99/0xfd0 net/wireless/reg.c:2480
+ #3: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:6014 [inline]
+ #3: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: reg_leave_invalid_chans net/wireless/reg.c:2468 [inline]
+ #3: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: reg_check_chans_work+0x164/0xfd0 net/wireless/reg.c:2483
+3 locks held by kworker/0:9/5444:
+3 locks held by kworker/0:10/5446:
+2 locks held by kworker/0:12/5449:
+3 locks held by kworker/0:14/5454:
+2 locks held by kworker/0:15/5455:
+3 locks held by kworker/0:16/5456:
+4 locks held by kworker/u4:10/5469:
+ #0: ffff88801be8b148 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801be8b148 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90002cafd00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90002cafd00 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcc51d0 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:580
+ #3: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: wg_netns_pre_exit+0x1f/0x1e0 drivers/net/wireguard/device.c:414
+2 locks held by kworker/u4:13/5492:
+1 lock held by syz-executor/5502:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5515:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5522:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5526:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5534:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5535:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5550:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5553:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5557:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5562:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5569:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5573:
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 25 Comm: khungtaskd Not tainted 6.12.0-rc1-syzkaller-00381-g2a130b7e1fcd #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
+ watchdog+0xff4/0x1040 kernel/hung_task.c:379
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
