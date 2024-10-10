@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-134240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F359987AF
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:29:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8808B9987A9
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:29:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B040B2824EC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:29:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11AC21F23EB6
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2E21CBE96;
-	Thu, 10 Oct 2024 13:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCAD1CB51B;
+	Thu, 10 Oct 2024 13:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qq26IAdg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGj0Vpcc"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D701C9DF3
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566561C9DE4
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728566886; cv=none; b=qbdmX9vM4MCaiVPQYqZqMxwmHM8awgNG8h7qbvoq0xhYqtHv2YC8ynWxLb4EWQ6rcH2/jR+EVvBOyQL/1xqCjVOukJLp18OTt8cDwFUwZi1Jg/3mD4syBBo07PEOsz/g9HbYQdgmCMO9gLmQLp1ZAWMRrsP6ucfXAYwJjoyP1N8=
+	t=1728566884; cv=none; b=XVKECRh/hUzXPfiY8WZGbmtHT6IPn9LECa0HbdSLhj15MC4z43hYWB1RP7H7NgbFgj0JVWyO6VA3vLZJ+S49HrqZzu0FlF+nL+nTakol38/F/ZnyZDcwyh27RneWSfvst/Zmzptp40IujqMjve7Cj835QMJ3Y/xcmLbeSNIvNxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728566886; c=relaxed/simple;
-	bh=QzXfylZ4JE8G1GBkjM1ir0PcS2nG6lhTP0K5aixrrz0=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hKCbzaMOmHquly+qS/zM0T6AzuwD7pPmSnn8Cwc+FYLS7ZuV7LUVQnNBs7TC9tBY4+SPIzdqZqJPD7Wip39ox1Z+GpqXerOS4MfpECSpIe4SYUQOeC1sfZc8dMIam+DEvUU2WzjttrR0GloQBrlsN8/P+RJLTq497ZPhhENQSJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qq26IAdg; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1728566884; c=relaxed/simple;
+	bh=M0zCY90Fb2hTp6ShOKR2m5jT/6bRMm1u3v6q53MlWnQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=TEjQ7vEZ7/cJrtTQrUdSRrcIkTcnNOXpaSvs8dduZKlBGzWdrdS91DkHcogJXZDY4PPQuJD5Nw77UNMi/KpprCvcEpA7znm34AU/dGkdiPEATA4OyXEWy/UXGCDtfBVD/UbuFA4Z5afJQCHO+c/hWKVNZ8PR00ddelBRBpdAI/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGj0Vpcc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728566883;
+	s=mimecast20190719; t=1728566882;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=anubq11vB/lo7n+tCLWsH5bZuedG/liPgNJBc/f01io=;
-	b=Qq26IAdg2LaeTMon6qG+52PowBADgkb8+y3s/mpOFyL7ndIreLjNpKLels7i1X2qUyEJLF
-	5IaGHEgnRoTCEpr989V6PCjsZZTN0aVU1OVy5BwuWbDJJg0LcduTQ1qf0ynLG9VjWzZjA3
-	FxksY9mFOSAtMMWRB2eBfKrOr0zgLNg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=24xFVhHpUbv0GxX3vB78a7ab9wcPKJu6tPdj/V0Z/DE=;
+	b=QGj0Vpccwxc9KphIlWuIDgJlBTpNdvQsM1r7HpEa7wbwaLfBCLsSg5/qgZ7QLeP9h5pHfi
+	l7MsynCD5WY6jhTUYXBDm7ISxmVQR9tPjvxjkjyIJ667ew9B8lQAZR5z2MpQdxZXdJhNkP
+	AqCTs4k8EsaVJHRHhSna1jHaiJgU3eY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-5-ZaDBo0FHNUeeEtS9O8jpaQ-1; Thu, 10 Oct 2024 09:28:00 -0400
-X-MC-Unique: ZaDBo0FHNUeeEtS9O8jpaQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d4d51b4efso261405f8f.3
+ us-mta-313-THPn8dBfNFO9KJ84VuQqDg-1; Thu, 10 Oct 2024 09:28:01 -0400
+X-MC-Unique: THPn8dBfNFO9KJ84VuQqDg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cb857fc7dso5930895e9.0
         for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 06:28:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728566879; x=1729171679;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=anubq11vB/lo7n+tCLWsH5bZuedG/liPgNJBc/f01io=;
-        b=JGVHLA4sC5yjuZJS4DM+ogcOA+7WVupv6skqtZEf4UUCWMjKS1D0UQ/plv/VyjITKg
-         4QtvwZrKAQVfrshDlTc0rFAOeeemzfd7M+Gd5cixFGom5yHzedkVCEeKEH6Y0niI2W3q
-         es2QpDhpJI99PLXKOCSCcM72KLId4g9+ICSL+BmJc0oVxFFctPpBTQ0lY/hW8dvY2Eu3
-         g7PVHEQn1PQRmvrnLpf5jWp/JPPbUSXExaGzK9/HTQA1hVrrmrSeYezYCoei/ZNSG6L0
-         QP5fHHzYYICK6xZySZQ111SWEzV7pMz/B+3ZwSLyjAi7qXQM0ClIwgy5rPuLhdAymbOp
-         xl9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXdln2FLZCjcnDzbNOJMDXp8FD8Hwh/gcQARzhAkY8qKqTcnHwg31KmHGiRspMD+vXBpx4dr8c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAvEHjMFnoQwp9b+UzRFiZJoNcl91AKkBFO2q8x3sJMsVu5DZB
-	yMdspXY8hx11RGnpkG2XoD+hU/GVXMpHXDl/3sFF1IF7kLvdDC3YtGdrcH7y8r/Ye5lwFTx1kfL
-	AsnHTN9zLbE1Qa1UXOFrHv4a7AMLJq5eIA6eB/9Eap+SAgxQIKkr7YA==
-X-Received: by 2002:a5d:68d2:0:b0:37d:4cef:538e with SMTP id ffacd0b85a97d-37d4cef5431mr1352776f8f.55.1728566879173;
+        d=1e100.net; s=20230601; t=1728566880; x=1729171680;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=24xFVhHpUbv0GxX3vB78a7ab9wcPKJu6tPdj/V0Z/DE=;
+        b=ID51cM2ppFEngVfSSfGOonalD96whs71Su5Sg0W0Yrw+WDAGtSqtRuGldokg6z2aMt
+         DgBMUfYodGqtRhfiDrrH6tiQkXA6KFEsCyPanxcUJNbGwlTRKOSSsdbnxCKtqQnElD6n
+         ujTgOZxXU30pk0+LQhgWZGPpD2KKfc4cdaSO3AguaO7Bnd82t3bcPLFGaij/nkSpJ1ys
+         ESiD5kaNXGYnJ9k5C0/H97mek8f2LgjnKRavgqec09qLiPhCADZXYMyGM3WBJW+kqmNP
+         DyMBTXVbcYPvMPG3vccp/qM95ThEB5UoswYAtKXGqsqM3ANfAthPJvkq/WmG7FULlqYG
+         T5cA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGOJceY0adjAC+e9K7bULGvOzRsxvcEnNXLiXe/B9GTvlDckBpeqXCinfiz4LGlIRU2DOau98=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2pwsiNH5xIkqE21DfY38lSRdha5QCi18gE1iEV61Bx9z/KB95
+	QGfNeF/wqw+Lse43emsqc0WcMcTKC8BF2M5Ut4s0hU9KwwPJD9eSMvQolZtVguy4YZTu6+lujO/
+	56dcmfsZ5hKEq2vLpKdHiOzw1Di8B1fc1OgkCLc3xFsIrzYkw+qDXkg==
+X-Received: by 2002:a05:600c:1c23:b0:430:57f2:baf2 with SMTP id 5b1f17b1804b1-430d59b7873mr53577225e9.22.1728566879856;
         Thu, 10 Oct 2024 06:27:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERkXSpoeTCMCSFJETVvt8b1b5EHViM7IaDu9yOPcwCmke2o5zf0SH75HMtnBh5pbFywAM5xg==
-X-Received: by 2002:a5d:68d2:0:b0:37d:4cef:538e with SMTP id ffacd0b85a97d-37d4cef5431mr1352745f8f.55.1728566878688;
-        Thu, 10 Oct 2024 06:27:58 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b9190f7sm1547399f8f.114.2024.10.10.06.27.57
+X-Google-Smtp-Source: AGHT+IFRcQowUIpMvvFM5df2r+5d4cDIMgcqXOBgEHWpeiYvZjV/0LhU38epcMkm/fXkByH0ybFumw==
+X-Received: by 2002:a05:600c:1c23:b0:430:57f2:baf2 with SMTP id 5b1f17b1804b1-430d59b7873mr53576895e9.22.1728566879373;
+        Thu, 10 Oct 2024 06:27:59 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4311835d8f6sm16592475e9.44.2024.10.10.06.27.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 10 Oct 2024 06:27:58 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 3D11415F3E9F; Thu, 10 Oct 2024 15:27:57 +0200 (CEST)
+	id 3F47515F3EA1; Thu, 10 Oct 2024 15:27:57 +0200 (CEST)
 From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Subject: [PATCH bpf v2 0/3] Fix caching of BTF for kfuncs in the verifier
-Date: Thu, 10 Oct 2024 15:27:06 +0200
-Message-Id: <20241010-fix-kfunc-btf-caching-for-modules-v2-0-745af6c1af98@redhat.com>
+Date: Thu, 10 Oct 2024 15:27:07 +0200
+Subject: [PATCH bpf v2 1/3] bpf: fix kfunc btf caching for modules
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,11 +86,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIACvWB2cC/5WNTQqDMBSEryJv3VeSGMR21XsUF/l7JrQmkqi0i
- Hdv8AZdfjPMfDsUl4MrcG92yG4LJaRYQVwaMF7F0WGwlUEwITljPVL44IvWaFAvhEYZH+KIlDJ
- Oya5vV1B3omOt7CWRhvozZ1dHp+MJeiYYauhDWVL+nt6Nn9Ufio0jQ0uO7E0p2fL+kZ31armaN
- MFwHMcPlBNHC9gAAAA=
-X-Change-ID: 20241008-fix-kfunc-btf-caching-for-modules-b62603484ffb
+Message-Id: <20241010-fix-kfunc-btf-caching-for-modules-v2-1-745af6c1af98@redhat.com>
+References: <20241010-fix-kfunc-btf-caching-for-modules-v2-0-745af6c1af98@redhat.com>
+In-Reply-To: <20241010-fix-kfunc-btf-caching-for-modules-v2-0-745af6c1af98@redhat.com>
 To: Alexei Starovoitov <ast@kernel.org>, 
  Daniel Borkmann <daniel@iogearbox.net>, 
  John Fastabend <john.fastabend@gmail.com>, 
@@ -104,50 +103,72 @@ Cc: Simon Sundberg <simon.sundberg@kau.se>, bpf@vger.kernel.org,
  =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 X-Mailer: b4 0.14.2
 
-When playing around with defining kfuncs in some custom modules, we
-noticed that if a BPF program calls two functions with the same
-signature in two different modules, the function from the wrong module
-may sometimes end up being called. Whether this happens depends on the
-order of the calls in the BPF program, which turns out to be due to the
-use of sort() inside __find_kfunc_desc_btf() in the verifier code.
+The verifier contains a cache for looking up module BTF objects when
+calling kfuncs defined in modules. This cache uses a 'struct
+bpf_kfunc_btf_tab', which contains a sorted list of BTF objects that
+were already seen in the current verifier run, and the BTF objects are
+looked up by the offset stored in the relocated call instruction using
+bsearch().
 
-This series contains a fix for the issue (first patch), and a selftest
-to trigger it (last patch). The middle commit is a small refactor to
-expose the module loading helper functions in testing_helpers.c. See the
-individual patch descriptions for more details.
+The first time a given offset is seen, the module BTF is loaded from the
+file descriptor passed in by libbpf, and stored into the cache. However,
+there's a bug in the code storing the new entry: it stores a pointer to
+the new cache entry, then calls sort() to keep the cache sorted for the
+next lookup using bsearch(), and then returns the entry that was just
+stored through the stored pointer. However, because sort() modifies the
+list of entries in place *by value*, the stored pointer may no longer
+point to the right entry, in which case the wrong BTF object will be
+returned.
 
+The end result of this is an intermittent bug where, if a BPF program
+calls two functions with the same signature in two different modules,
+the function from the wrong module may sometimes end up being called.
+Whether this happens depends on the order of the calls in the BPF
+program (as that affects whether sort() reorders the array of BTF
+objects), making it especially hard to track down. Simon, credited as
+reporter below, spent significant effort analysing and creating a
+reproducer for this issue. The reproducer is added as a selftest in a
+subsequent patch.
+
+The fix is straight forward: simply don't use the stored pointer after
+calling sort(). Since we already have an on-stack pointer to the BTF
+object itself at the point where the function return, just use that, and
+populate it from the cache entry in the branch where the lookup
+succeeds.
+
+Fixes: 2357672c54c3 ("bpf: Introduce BPF support for kernel module function calls")
+Reported-by: Simon Sundberg <simon.sundberg@kau.se>
+Acked-by: Jiri Olsa <jolsa@kernel.org>
+Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
-Changes in v2:
-- Drop patch that refactors module building in selftests (Alexei)
-- Get rid of expect_val function argument in selftest (Jiri)
-- Collect ACKs
-- Link to v1: https://lore.kernel.org/r/20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com
+ kernel/bpf/verifier.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
----
-Simon Sundberg (2):
-      selftests/bpf: Provide a generic [un]load_module helper
-      selftests/bpf: Add test for kfunc module order
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 633fd6da40c2460094b82ca7c2b9305eade05cf6..bf9996ea34fe1d80cef1c1ff3bbdb1030a976710 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -2750,10 +2750,16 @@ static struct btf *__find_kfunc_desc_btf(struct bpf_verifier_env *env,
+ 		b->module = mod;
+ 		b->offset = offset;
+ 
++		/* sort() reorders entries by value, so b may no longer point
++		 * to the right entry after this
++		 */
+ 		sort(tab->descs, tab->nr_descs, sizeof(tab->descs[0]),
+ 		     kfunc_btf_cmp_by_off, NULL);
++	} else {
++		btf = b->btf;
+ 	}
+-	return b->btf;
++
++	return btf;
+ }
+ 
+ void bpf_free_kfunc_btf_tab(struct bpf_kfunc_btf_tab *tab)
 
-Toke Høiland-Jørgensen (1):
-      bpf: fix kfunc btf caching for modules
-
- kernel/bpf/verifier.c                              |  8 +++-
- tools/testing/selftests/bpf/Makefile               | 20 +++++++-
- .../selftests/bpf/bpf_test_modorder_x/Makefile     | 19 ++++++++
- .../bpf/bpf_test_modorder_x/bpf_test_modorder_x.c  | 39 +++++++++++++++
- .../selftests/bpf/bpf_test_modorder_y/Makefile     | 19 ++++++++
- .../bpf/bpf_test_modorder_y/bpf_test_modorder_y.c  | 39 +++++++++++++++
- .../selftests/bpf/prog_tests/kfunc_module_order.c  | 55 ++++++++++++++++++++++
- .../selftests/bpf/progs/kfunc_module_order.c       | 30 ++++++++++++
- tools/testing/selftests/bpf/testing_helpers.c      | 34 ++++++++-----
- tools/testing/selftests/bpf/testing_helpers.h      |  2 +
- 10 files changed, 251 insertions(+), 14 deletions(-)
----
-base-commit: 60f802e2d6e10df609a80962b13558b7455ab32b
-change-id: 20241008-fix-kfunc-btf-caching-for-modules-b62603484ffb
-
-Best regards,
 -- 
-Toke Høiland-Jørgensen <toke@redhat.com>
+2.47.0
 
 
