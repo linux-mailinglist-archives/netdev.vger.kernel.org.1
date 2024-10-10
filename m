@@ -1,176 +1,178 @@
-Return-Path: <netdev+bounces-134182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9E049984D2
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:21:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF4C998501
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C2502838DC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:21:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32D07B22A81
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113711C244F;
-	Thu, 10 Oct 2024 11:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f1HAh1a+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9BD1C2430;
+	Thu, 10 Oct 2024 11:32:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7452A1C2426
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F38183CD9;
+	Thu, 10 Oct 2024 11:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728559316; cv=none; b=UUx9OxpWRIf6rc9k2nURw+17GKBQnCvzA7ozZusgtHI8YWFPpON1a0w4lffvq/m9CxvncxYGFheTOuhU8OnueH3o1MzC9EWh9FJvFB1fbugr55U5gou4IRbTmoTmrAYL4FI1KWxr2ctBFCxGvSZBcynwH/zHXueQinwnhZuZeMw=
+	t=1728559926; cv=none; b=VFNCGCSAME2bK7oUIGaNBKfVROdvb2z3/wm1RAer0CSTtR3JV4oxG/AApCdEAYZRQVnbyNHo5UEm6arE75w/18keq3b1fl20RUEEHUtwgJqJVQVGRBnE9pG2AkupqfgXoOuE4h++aGNqoUqQXnMKh8HSlUErtoBjAIgiAYDdqeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728559316; c=relaxed/simple;
-	bh=IsJhWl5z3Fwrk8/Wuj9EVNVqymfW8XNXnTBnXXkZ2n4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sb453AcXIiFo+coXTFuEKps9rmy2owW/EEAdA5SGTAnU8cHppCYoJ6Exj0T0WSBB7P++BomJU0DBd6bu8NLjPA5UGFABkf/TeFo2wWiXVzQvar40nsoeT8g/kp8uKaWlP+BwfnKky43x6PYbZSwx7oaP/OkSk1oZhPBNLdUlIk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f1HAh1a+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1i7Psxw/WOb7cOeUIIUZsk+qXYRaaQKBmvfbIjVXdcw=; b=f1HAh1a+bfd5VtKBTucadg7hDl
-	ePw4MbOt6wV7+UrnPYijU1W4Z+XCnyJYpU5KSbvX7tMob1kfrl5mMG7p75E6tQdzinssofn4k1yUT
-	1eMtogDeoST4WCD9AkFVj11iRWDawROVCHFIfQyTprVrsdzGZFbo6Xas+e9GUiGjhAa/NL+YGKy8l
-	eWf/wKrXN5RILlotNhdxiXTpF+2J+5YM1m6XfIeAO0AdacwcHn0jUYQ+qHBm9UndFLHa1xph/IPST
-	ioiq1B2RSsGKRh6LyGG0PwA2BB4/4lxO8PGqH3io+1rJ8Nuk5UWiaQs5RsgqVKaQRCQNYCsw1XDZa
-	fsFNOxvA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37790)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1syrEo-0002CN-0T;
-	Thu, 10 Oct 2024 12:21:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1syrEl-0007Fx-0e;
-	Thu, 10 Oct 2024 12:21:43 +0100
-Date: Thu, 10 Oct 2024 12:21:43 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/3] net: phylink: remove "using_mac_select_pcs"
-Message-ID: <Zwe4x0yzPUj6bLV1@shell.armlinux.org.uk>
-References: <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
- <E1syBPE-006Unh-TL@rmk-PC.armlinux.org.uk>
- <20241009122938.qmrq6csapdghwry3@skbuf>
+	s=arc-20240116; t=1728559926; c=relaxed/simple;
+	bh=gPzDUJV3KuHc26ZbDdUjpL4o1pEXg7IvnfbuFERHNoI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VJCY1GI71tYZBZSfOPc8vft4CZZKhBlRnh66AYa1QVTZHeNJpWZnjeUH7AHPyQB+V88FZVydzdFnIv8rwBJ28rde9Mj+EwwYDUmu4y5LyMpiyfy4t9NQJfNXdMkXGkjhR57dqA9m+CGnLHIqdNLGk6ETM1B+x9Cn6w2ZewkjrLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XPSGd2tJSzpWgV;
+	Thu, 10 Oct 2024 19:30:01 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id F39FD18010F;
+	Thu, 10 Oct 2024 19:32:00 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 10 Oct 2024 19:32:00 +0800
+Message-ID: <8bc47d27-b8ea-4573-937a-0056bdd8ea2c@huawei.com>
+Date: Thu, 10 Oct 2024 19:32:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009122938.qmrq6csapdghwry3@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v20 06/14] mm: page_frag: reuse existing space
+ for 'size' and 'pfmemalloc'
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20241008112049.2279307-1-linyunsheng@huawei.com>
+ <20241008112049.2279307-7-linyunsheng@huawei.com>
+ <CAKgT0UdgoyE0BzZoyXzxWYtAakJGWKORSZ25LbO1-=Q_Stiq9w@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAKgT0UdgoyE0BzZoyXzxWYtAakJGWKORSZ25LbO1-=Q_Stiq9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Wed, Oct 09, 2024 at 03:29:38PM +0300, Vladimir Oltean wrote:
-> On Tue, Oct 08, 2024 at 03:41:44PM +0100, Russell King (Oracle) wrote:
-> > With DSA's implementation of the mac_select_pcs() method removed, we
-> > can now remove the detection of mac_select_pcs() implementation.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >  drivers/net/phy/phylink.c | 14 +++-----------
-> >  1 file changed, 3 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > index 4309317de3d1..8f86599d3d78 100644
-> > --- a/drivers/net/phy/phylink.c
-> > +++ b/drivers/net/phy/phylink.c
-> > @@ -79,7 +79,6 @@ struct phylink {
-> >  	unsigned int pcs_state;
-> >  
-> >  	bool mac_link_dropped;
-> > -	bool using_mac_select_pcs;
-> >  
-> >  	struct sfp_bus *sfp_bus;
-> >  	bool sfp_may_have_phy;
-> > @@ -661,12 +660,12 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
-> >  	int ret;
-> >  
-> >  	/* Get the PCS for this interface mode */
-> > -	if (pl->using_mac_select_pcs) {
-> > +	if (pl->mac_ops->mac_select_pcs) {
-> >  		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
-> >  		if (IS_ERR(pcs))
-> >  			return PTR_ERR(pcs);
-> >  	} else {
-> > -		pcs = pl->pcs;
-> > +		pcs = NULL;
-> 
-> The assignment from the "else" branch could have been folded into the
-> variable initialization.
-> 
-> Also, maybe a word in the commit message would be good about why the
-> "pcs = pl->pcs" line became "pcs = NULL". I get the impression that
-> these are 2 logical changes in one patch. This second aspect I'm
-> highlighting seems to be cleaning up the last remnants of phylink_set_pcs().
-> Since all phylink users have been converted to mac_select_pcs(), there's
-> no other possible value for "pl->pcs" than NULL if "using_mac_select_pcs"
-> is true.
+On 2024/10/10 7:50, Alexander Duyck wrote:
 
-Hmm. Looking at this again, we're getting into quite a mess because of
-one of your previous review comments from a number of years back.
-
-You stated that you didn't see the need to support a transition from
-having-a-PCS to having-no-PCS. I don't have a link to that discussion.
-However, it is why we've ended up with phylink_major_config() having
-the extra complexity here, effectively preventing mac_select_pcs()
-from being able to remove a PCS that was previously added:
-
-		pcs_changed = pcs && pl->pcs != pcs;
-
-because if mac_select_pcs() returns NULL, it was decided that any
-in-use PCS would not be removed. It seems (at least to me) to be a
-silly decision now.
-
-However, if mac_select_pcs() in phylink_major_config() returns NULL,
-we don't do any validation of the PCS.
-
-So this, today, before these patches, is already an inconsistent mess.
-
-To fix this, I think:
-
-	struct phylink_pcs *pcs = NULL;
 ...
-        if (pl->mac_ops->mac_select_pcs) {
-                pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
-                if (IS_ERR(pcs))
-                        return PTR_ERR(pcs);
-	}
 
-	if (!pcs)
-		pcs = pl->pcs;
+>> +
+>> +#define PAGE_FRAG_CACHE_PFMEMALLOC_BIT         (PAGE_FRAG_CACHE_ORDER_MASK + 1)
+>> +
+>> +static inline bool page_frag_encoded_page_pfmemalloc(unsigned long encoded_page)
+>> +{
+>> +       return !!(encoded_page & PAGE_FRAG_CACHE_PFMEMALLOC_BIT);
+>> +}
+>> +
+> 
+> Rather than calling this encoded_page_pfmemalloc you might just go
+> with decode_pfmemalloc. Also rather than passing the unsigned long we
+> might just want to pass the page_frag_cache pointer.
+As the page_frag_encoded_page_pfmemalloc() is also called in
+__page_frag_alloc_align(), and __page_frag_alloc_align() uses a
+local variable for 'nc->encoded_page' to avoid fetching from
+page_frag_cache pointer multi-times, so passing an 'unsigned long'
+is perferred here?
 
-is needed to give consistent behaviour.
+I am not sure if decode_pfmemalloc() is simple enough that it
+might be conflicted with naming from other subsystem in the
+future. I thought about adding a '__' prefix to it, but the naming
+seems long enough that some inline helper' naming is over 80 characters.
 
-Alternatively, we could allow mac_select_pcs() to return NULL, which
-would then allow the PCS to be removed.
+> 
+>>  static inline void page_frag_cache_init(struct page_frag_cache *nc)
+>>  {
+>> -       nc->va = NULL;
+>> +       nc->encoded_page = 0;
+>>  }
+>>
+>>  static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
+>>  {
+>> -       return !!nc->pfmemalloc;
+>> +       return page_frag_encoded_page_pfmemalloc(nc->encoded_page);
+>>  }
+>>
+>>  void page_frag_cache_drain(struct page_frag_cache *nc);
+>> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+>> index 4c8e04379cb3..4bff4de58808 100644
+>> --- a/mm/page_frag_cache.c
+>> +++ b/mm/page_frag_cache.c
+>> @@ -12,6 +12,7 @@
+>>   * be used in the "frags" portion of skb_shared_info.
+>>   */
+>>
+>> +#include <linux/build_bug.h>
+>>  #include <linux/export.h>
+>>  #include <linux/gfp_types.h>
+>>  #include <linux/init.h>
+>> @@ -19,9 +20,41 @@
+>>  #include <linux/page_frag_cache.h>
+>>  #include "internal.h"
+>>
+>> +static unsigned long page_frag_encode_page(struct page *page, unsigned int order,
+>> +                                          bool pfmemalloc)
+>> +{
+>> +       BUILD_BUG_ON(PAGE_FRAG_CACHE_MAX_ORDER > PAGE_FRAG_CACHE_ORDER_MASK);
+>> +       BUILD_BUG_ON(PAGE_FRAG_CACHE_PFMEMALLOC_BIT >= PAGE_SIZE);
+>> +
+>> +       return (unsigned long)page_address(page) |
+>> +               (order & PAGE_FRAG_CACHE_ORDER_MASK) |
+>> +               ((unsigned long)pfmemalloc * PAGE_FRAG_CACHE_PFMEMALLOC_BIT);
+>> +}
+>> +
+>> +static unsigned long page_frag_encoded_page_order(unsigned long encoded_page)
+>> +{
+>> +       return encoded_page & PAGE_FRAG_CACHE_ORDER_MASK;
+>> +}
+>> +
+>> +static void *page_frag_encoded_page_address(unsigned long encoded_page)
+>> +{
+>> +       return (void *)(encoded_page & PAGE_MASK);
+>> +}
+>> +
+>> +static struct page *page_frag_encoded_page_ptr(unsigned long encoded_page)
+>> +{
+>> +       return virt_to_page((void *)encoded_page);
+>> +}
+>> +
+> 
+> Same with these. Instead of calling it encoded_page_XXX we could
+> probably just go with decode_page, decode_order, and decode_address.
+> Also instead of passing an unsigned long it would make more sense to
+> be passing the page_frag_cache pointer, especially once you start
+> pulling these out of this block.
 
-Let me know if you've changed your mind on what behaviour we should
-have, because this affects what I do to sort this out.
+For the not passing the page_frag_cache pointer part, it is the same
+as above, it is mainly to avoid fetching from pointer multi-times.
 
-However, it is true that if mac_select_pcs() is NULL, since commit
-a5081bad2eac ("net: phylink: remove phylink_set_pcs()") there is no
-way pl->pcs can be non-NULL, since there is no other way for it to
-be set.
+> 
+> If you are wanting to just work with the raw unsigned long value in
+> the file it might make more sense to drop the "page_frag_" prefix from
+> it and just have functions for handling your "encoded_page_" value. In
+> that case you might rename page_frag_encode_page to
+> "encoded_page_encode" or something like that.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+It am supposing you meant 'encoded_page_decode' here instead of
+"encoded_page_encode"?
+Something like below?
+encoded_page_decode_pfmemalloc()
+encoded_page_decode_order()
+encoded_page_decode_page()
+encoded_page_decode_virt()
+
+> 
+> 
 
