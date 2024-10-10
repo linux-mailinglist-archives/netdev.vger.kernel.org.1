@@ -1,254 +1,280 @@
-Return-Path: <netdev+bounces-134095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F92997F1A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4BA0997F3C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10BB91F21FFF
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:15:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E5911F223D2
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF83F1CBEAB;
-	Thu, 10 Oct 2024 07:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00A51CEEB1;
+	Thu, 10 Oct 2024 07:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hw6Bw/Vp";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uehgxAKY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gcNfwOG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA7C1C1ACB;
-	Thu, 10 Oct 2024 07:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728544105; cv=none; b=YuvfKpPyowow+4gTHv6oLyDgYHO/ZT1IV6DtdLULVM5W6FYuIdPoVAP63B4xyumVscGvs8iPkTleBYrZGlyeGyBAi9AwE1WOgw4aGaz7/bQRIw5c8N7XfXGeJtvRb0OeJVyvbqGXoeSccpxYlzh6aiUTFXwt1nod7MD6OmCgka4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728544105; c=relaxed/simple;
-	bh=nO5tveuS8n4BbqPpvO7KvqpGxY6o+MMol7+g0GDzdTw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XuZisrsAelO5jQFpqgM1gsTplDC7mk8A9608SNojB+OHq+pdkTMIkfWVMgA/5kvsYI8TTFM6HF867j3GK4/nU51pc3k7DfDZu0hp1iksads4vAAxVviGJN1JZlreEXc137xuyR2Dy/B+SjIGSdxdj2p0ET8xNU65gJH3WHt9RQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hw6Bw/Vp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uehgxAKY; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1728544102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IU6+r5lZGAYZvMk+oAC6fxTdFz8i+0mzjN8aBnNbt3M=;
-	b=hw6Bw/VpVdaTyP4PBmtuQiqyNyiYHkDnABR2i0CsyzvWfQR8lbjUGyUVYA22YxziLtLurh
-	bzmp0RUF6lK9knrSbw7CDiCKGBOFj4OqN7MsJZkwO5gUJJvGM3RYd57HHx6NENWeAOz+ED
-	ZCHFxwoSaXMZZAsngUenbF0YOMYwWZ6XFzV5RK35CtJ7xZ2z6NHqLIehT1EciyTRYDubFR
-	gGLfyP2CEfDA87r+H2OqYiLTI970bcxQWGfVIO2C1tSn8w9LrbTLBcZkXGuX/zGJPa/i48
-	BYgr9IRALy0zHcQ4mv18vqSgBoWVL931KUIKujYr5FaOgWFLxWe3Qw82j9hP1Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1728544102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IU6+r5lZGAYZvMk+oAC6fxTdFz8i+0mzjN8aBnNbt3M=;
-	b=uehgxAKYZ234wpzUPC6gpFpkpmQEj/nuRSAJ/ahxtW5AhCw9W75oc9MAWoBWZ33KzS8VFS
-	auwPAKaLdTfNzKBA==
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "moderated list:INTEL
- ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 2/2] igc: Link queues to NAPI instances
-In-Reply-To: <Zwa3sW-4s7oqktX3@LQ3V64L9R2>
-References: <20241003233850.199495-1-jdamato@fastly.com>
- <20241003233850.199495-3-jdamato@fastly.com>
- <87msjg46lw.fsf@kurt.kurt.home> <Zwa3sW-4s7oqktX3@LQ3V64L9R2>
-Date: Thu, 10 Oct 2024 09:08:20 +0200
-Message-ID: <87wmig3063.fsf@kurt.kurt.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF39933E1;
+	Thu, 10 Oct 2024 07:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728544877; cv=fail; b=Jw0zzL5WtV6bsKZUr5/z48uXEzWgRX0NjMCinZrtbY17Zn6TzPelePB3OnPZG9H7gcj+exyNUPIQ9m46RKc2wPiewctEkIt4nHsAdI6zomZ/UKH4dwKT4B33GQhH9X5xQ9ypDDSIYS2t3mtNmeQwvwOQC64qA+bIPcutldea3B8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728544877; c=relaxed/simple;
+	bh=9E0gFUuSK9b70XWQVY9GyTyLgEntgqNG9MR1buxWHJM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dEKgSD7LHYqOPRnMiFRTAK01WRR/5t+f7dUC0+DHCQ1PkEY7JsktLv7aYtvGtp4odYlgS7/nheKyAmuXchvLLWGUkH6HpeuxNLKTjQzyfDD95o5OOs4/9eKz1LCHJ6YSD3c+V9p/1M6+NXK6p0340GeCe1WrWAA0QH0UrXnjN4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gcNfwOG5; arc=fail smtp.client-ip=40.107.244.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yAyqsh9YTDBR6ZcP+oMdSAG9ku8Rl/GBejocvQjCW6Zi6xXypie891ohxqmhzBvqt+r4t0TmvCKlfA13qMckLcBnKTZoB0/cMWH0GjdE1mz6nVtu0uMqA4RkL738FFTkmzzYJ+FflKbrRFmuulhUjUN23WiHz2d2LC1C0IPNKsvpysWLrW75lTvZDjB8mJlteHD/hCWqRFNVqc1wZZ4MlBOUmKbPdFD5E8gTQ+QWi8NKbPgwwP+WinSCUP/6K1PhNn/+KGC/tpkGezcUBiGOTFMbYVClI+Zm/Z8+QIsb0AH9yXYCEj9XTFHb2eZqaGwNT6awVpNgjF8faULAP+ScmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q5gql8I0ZYim7nFHQSGwxiJ3GfafgB16EOhhTpoC0OI=;
+ b=Mh5mVSc07CmOL1qAmVN9EtMSzOH+rZY4cRhn69TWOmjvx9v5+7CpJTlSOQAb5QSUzRGQyj+Qt4F8+CrjJ8WMw+OR3U9OBDXiyHAbzuDdlzos/uF+8SvRhSEN7DZwgpDzA4mcEy7TJ+BxTrhGbU/FK08sU2T+f4XcKdZB3vnGPHbRBvzlEqt1nHz8m4y7qTIHjnNhDkVxBTWcI4IfkbaX4Mi27HS59H10QxEBWQGuFvtM+cLEklOqkSuyGWpUMV2cc/qVglh2nngFNM+2OkvEnTkLfFcgfxPW6wS5KmfuweSYzkBLA0KSG/Ryx+ToOY4AoDdvuRSRia7L2EVe45dX9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q5gql8I0ZYim7nFHQSGwxiJ3GfafgB16EOhhTpoC0OI=;
+ b=gcNfwOG51d/lXjtp85kHgtnAoNZCEzJ2gR7yyrAKOHpP17As6WPgRudiZmDcrJ/4mgDv+6jVCWHfrqDp6AeVMnAQhgwV9CkXXY6gpwdiVo9WwH7j61XfY5X49ZKlHe4vfa1H6BkwbRW3ny3XI9SzEc6VrJfOJwfKfg4Zbj59gWc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
+ by DS7PR12MB6240.namprd12.prod.outlook.com (2603:10b6:8:94::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.22; Thu, 10 Oct
+ 2024 07:21:13 +0000
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::a3dc:7ea1:9cc7:ce0f]) by DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::a3dc:7ea1:9cc7:ce0f%6]) with mapi id 15.20.8048.013; Thu, 10 Oct 2024
+ 07:21:13 +0000
+Message-ID: <8f0de41f-8add-de50-fc59-fceff30b9e38@amd.com>
+Date: Thu, 10 Oct 2024 12:50:48 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [RFC PATCH 12/13] HID: amd_sfh: Use always-managed version of
+ pcim_intx()
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
+ <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
+ <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ Manish Chopra <manishc@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+ Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
+ Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
+ <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
+ Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
+ Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ =?UTF-8?Q?Ilpo_J=c3=a4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Mostafa Saleh <smostafa@google.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
+ Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+ =?UTF-8?Q?Marek_Marczykowski-G=c3=b3recki?=
+ <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+ Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+ Rui Salvaterra <rsalvaterra@gmail.com>, Marc Zyngier <maz@kernel.org>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, linux-staging@lists.linux.dev,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-sound@vger.kernel.org
+References: <20241009083519.10088-1-pstanner@redhat.com>
+ <20241009083519.10088-13-pstanner@redhat.com>
+Content-Language: en-US
+From: Basavaraj Natikar <bnatikar@amd.com>
+In-Reply-To: <20241009083519.10088-13-pstanner@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0185.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:e8::12) To DM4PR12MB5040.namprd12.prod.outlook.com
+ (2603:10b6:5:38b::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|DS7PR12MB6240:EE_
+X-MS-Office365-Filtering-Correlation-Id: 15c72fc0-62d3-409a-6ebe-08dce8fc1eb9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?T0FIdElJSzVXZlM1SDdVcW9xUHNGVEV0KzRSc3d3Q09RRm5LejNyVzFuMWpm?=
+ =?utf-8?B?TyttQ0U3dzVnbzZNVFU4UUZQMzk2K05jZ0NoUW8zdG96NWNlbnBFU0hZQ2lV?=
+ =?utf-8?B?Y1dsZHo5RUFvalUyT3EwUHRnYXpNMEdXS1daRU01YW9FSzdVU1dyMW1ORkpS?=
+ =?utf-8?B?RnBBd2hNZVZsY3JtZjlqQU5XNjcyUHN5cVFyQVR2cEU4TXJJRGY0OWRaL1ly?=
+ =?utf-8?B?K1NPa2hsU1l6azc5V2lyZ1ZKQU1USVVYaVFveTlSWHVPTXltMHBjYkVoai9T?=
+ =?utf-8?B?UzlEeWx4aVNtV0Z0R3l0enRLQVFiUHpnT1haMkwvU3JxN041OGZJUHp0OVVK?=
+ =?utf-8?B?MFhmM3NZRDJMZHpveHFVTTJ4SWQzaHAyTnBPTk1Ydzdjc3V1UjlqZk9VRE9U?=
+ =?utf-8?B?SjdsNFNtQko1MmRBR0hRVDBuWWQ2RXVtOEVoQzlpT3UyQkNwekl5NWVIWE9K?=
+ =?utf-8?B?V1prTTNmT1dpNDJBTXlmSXJGUWtOMjBsUEl0cTBJSFR0WW1mTGF4d2hac2VX?=
+ =?utf-8?B?NFMzMUF4OFNkL2xTRnlNaTdYTm5YeTZxQ0psUkoxN1JsYitpVldyNFVVRnZH?=
+ =?utf-8?B?ZEJZYUVvWDBxY0pCWVF5T0d2Q2ZYMlM0OThaMDkzOS9FMmdFN3dIUTVvMSsz?=
+ =?utf-8?B?WVE4NHd1NThGQW4xSC9QbE5uOHNuUm54cWxwTmp6K3Npb2NuUkFQV3h0R3hW?=
+ =?utf-8?B?NFRQNXhWalJoMVpyYkgwdm1ubmtVSGNoZmJxRm0zelR3VXZod01HaE5rUjJS?=
+ =?utf-8?B?bGUrNUZvNGxPR2loWEhTTXVQQmdIbHpRQksvK2hIT2UwTmlOanliRnF6MDg1?=
+ =?utf-8?B?aVNIdm1IcTk3OEVRV05yQkNlczJiVlRnZG1YM3ZBOFNlSkNGek5LSjVhWll5?=
+ =?utf-8?B?bTRJRmw2OFNjZTMxZlF1ZnplVmZIUnVGU29CUjN1QTFBRTYwcG1LK1l5OUZB?=
+ =?utf-8?B?aVpJTGVzUXAwZU14eEZiK0ZwcndHejh5a3M4T2FuemNCVGhNSkZoVFhwMkt5?=
+ =?utf-8?B?bXpQdlpEMldIaWZVeXlMSVBkRkFHVWZGZExsaXVPR2tPYmNhbWs1T0g0V3JW?=
+ =?utf-8?B?YzNua2V5NXpnWUdtaDVqS0cveUc2SW1pZVNkZWNGUXhrZjB2N050OWMxT0lP?=
+ =?utf-8?B?ckpVN1Y2dkQ5Z1cxQmhjQkxwTVZzdzlHazZrcHB0WnFJVGVNdC92b08wWFpQ?=
+ =?utf-8?B?VDBEeXZxdHplM0NCalhWNlJLVkdLbHpJaXA4S2JzS2xtcUdoMjVjalp6UExh?=
+ =?utf-8?B?R28yUytsempHQjIrdHJmbGc2ZGFLM0ZCenZkdVR0OTN0OHVSY2xVVG1NR3Vi?=
+ =?utf-8?B?TnZiMHRxWWNPTzUzdmhXVnErYlRBQWxOa3Jta0cvbHowU0UxTTZVSk5ScmpY?=
+ =?utf-8?B?UGlOUWd2UEdzb0ZPNHdza1lEcG9KTkZPVjdmbnVSYnFWcENIZmJmMy9KYkhU?=
+ =?utf-8?B?YTdTVlhUTVRPd25JdnovY0lVc1o0RU52ejRjTU9VZ3IyV1ovckZ6NGZjVUw5?=
+ =?utf-8?B?a2hKRk9OUFc0bU03MWxYUTUwc1pHUytxcnEyaVgyNVo3MWNyRnFoR0JidjRG?=
+ =?utf-8?B?K0VERjgxMnRvQ2VsWWpaUG5SMVFTaENXWm80cy9jNW84aUdEb0EzaXhhWGV2?=
+ =?utf-8?B?U2hCSm1ZTlNCYVZDQzBzRFE5TVRDVC91VndsVVVtSzZQTW5EMHhNRWRMbVVl?=
+ =?utf-8?B?WlhKT1F5MUMxTk9qWmJnenN2NU1QSWM4d1E3SmovVmdvS0RUam9Uc2ZRbVoz?=
+ =?utf-8?Q?w96hM57Pd9ZE7qYoOPmR2yJ/T6t1IUhoELZFvY/?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MTBIZkQ4dTArdkhVQjRXazRzSXpZWFR0eTFoZG1XZnRUNWkwRWFUTzRIeVJK?=
+ =?utf-8?B?Q1h1a0JwVmRmaFM4UmZZN01KN2djV05PVWJsM0RnTUVWYjJiVWk2dEFVODM2?=
+ =?utf-8?B?R2FkSGZaRTBBZWZYcWIyeTRJdDhNQ0FlNmErdUtNckU3K2Y3bmJQNmdKeCtF?=
+ =?utf-8?B?cHA3eWNqazJkdmJKZGJaOVFtREVvajVWa0NlYUdvSzhvcWdJWC9hdExvY1o4?=
+ =?utf-8?B?QUk1c0lTUy9PYUxHWmx3cmo4QUUzUVZNNUdRYUl2NGlYYVhhQWpWTVp0MEdm?=
+ =?utf-8?B?dEVUc1paM2ZYcXlmdmFrVVVSY0dBalVabXl5MFNCTldXZElTd0R0QUdRUjlt?=
+ =?utf-8?B?cVNINEVyaWV3b2xnYVlkRitEdW0ydUV3SHVybXZKaGl5Q2Q4UGZSZVJRcTds?=
+ =?utf-8?B?MHVpY2dRTy9YU2RFbWMrYTNVbU5nYTRpUklyaFJJR01OWGxKSnovd250eEVs?=
+ =?utf-8?B?TGJmaTg0MDE4QlQ2SWhELzhQTk9FemcwamErTkdUWjhtZlFDcDQ0cGNTT3Ri?=
+ =?utf-8?B?WkFsdlVURW1DMm81amM2VEdZdVJCTEdxM01mTWs3Vml4SDlFVEhxUmF1Wmtq?=
+ =?utf-8?B?NFVFSVp3WFZiS0ZydXMwOEZ1V0JFS1dDcmRwVjU0VloxVW8xMGZaVUoxOW51?=
+ =?utf-8?B?RmllcjA4NGNHYjlJR2ZONmZRbWN0ODhwcUFUaWIwV2FnWEIwa085aUZ5aDN2?=
+ =?utf-8?B?QzBreEh4VFFOaEFVL2FydmV1Qmg2NDA3ZHVab05qUlVJdWJrWFZQcDlXVnEx?=
+ =?utf-8?B?VklVYlpTZTNLaU81LzNwUHBYQTU0TnpvWVp1QmRqSEU4QStsZEovVkxJczRG?=
+ =?utf-8?B?cVFyb2JKWXdDZ0JPWVdyUjFZZHVOWjM1MEl4MUcyMk9BUVAvdUxid2ZlNDE4?=
+ =?utf-8?B?M1Q3VlJITHp2V0grQ0Y5anl4WFZ2UU9uYkRJc2d2R0JRSERwbkFTODdBdE5u?=
+ =?utf-8?B?RXZtdTJSaitIS20yeHBSOXlQTEczamQxd2xKM0k2Y3lwMmZoTHVyaGhCMk5t?=
+ =?utf-8?B?VVhnNFVZNWcrVDdRbWFNNTVrUlNIL01vUm9iQmFDbXAwUkhYcDA2NDQyMzBQ?=
+ =?utf-8?B?clMrZjFXWTR2OWJhOTVCd1BkMmtpREdZVDJJU0FuS1prUlRWdDBMNXQxenRt?=
+ =?utf-8?B?aWxCY1BiWWV3QnUrZ2lGbVFpZmRWK1VuRXpSN2NiMjZHWUNmRVZ4U21uUGIv?=
+ =?utf-8?B?T25IbWlRRVJXcENFYTVEc1ZDTzdaZ3NPTFpTVTBPMlIwM3FwMlJ5bGVKY25V?=
+ =?utf-8?B?MVB3b1lZQUkrVEZJeTh6TEUyRzA5WW5STzFMNEQ3TkxKejZobWFDVHE3RzdE?=
+ =?utf-8?B?aUQ5d2hHa0R5bUFkSGdhMDVsV0JYTmtmTGFDd0d4RTRyN0REZXJPR0luS1c1?=
+ =?utf-8?B?VVJCNkVoNDJvbGRmaDRJZlN3Tk9XQi9BYjBCb2NKOHhmL0VpZVFKekQxUURR?=
+ =?utf-8?B?N0tIdWp5Z0VIcXBDMXlGdU5GSzNyQnY3TUo1TEhRTWRpOUFRSHJIVVR6Rjlp?=
+ =?utf-8?B?blNSQ3RKRmd4TUJSeGhVTGk1ZWlDT2xoVWdtNEhtRDd3QkhHaVhKZWxTUlRV?=
+ =?utf-8?B?TW1TSUpVYmwrOWpqMklqZDUydHQ1YVhJZnFTc1dxM2IwamtkQ2FvSDgycE1i?=
+ =?utf-8?B?Nitqd3I1eEoySHB4NFYzUVlBSWFDdVdhaXhvR29DNTJnS1hiQzUyQlNZSFQr?=
+ =?utf-8?B?Rk9vMWphSUQvaE85OW4xZHNYay81KzZ5MmRJREYvRzlxVlk3dlRiT1JUSEkv?=
+ =?utf-8?B?WlVGMVgvVk5TQ3JQczIvbmcwYlpIc05PWXBURUpBM2luSG52Mk5xeTFFZ05v?=
+ =?utf-8?B?bmZ1ZXVzbDU5b1Q4ckNoZ0RhQ1Y0WkVpdklraFJVUzZ5QnUyUkowSlYxamZH?=
+ =?utf-8?B?K01LekNxSEVPdUprN29rc1AxbGUzbVhwNUVudXRpQVdyMHptT2ppejJTS2N0?=
+ =?utf-8?B?M1JsQW5JVnNLUHdqK0pFemVuV1pHRm5YUjd3QVlpNitjbithUnpZdUg0SEpp?=
+ =?utf-8?B?NXFnYlJ4MW1NU3lJWVd1c2J3bXFrR285TW5UZ1NXaGp1UUxQNHAwbXdSUGVF?=
+ =?utf-8?B?Y21PSnJVaEJTbkltdUtZY2dKVFZIMGsySFRYMy9wSzJiemtMSTltNFpJMjZF?=
+ =?utf-8?Q?KAjM/sLwRVzi5qSJwfywjdo5u?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15c72fc0-62d3-409a-6ebe-08dce8fc1eb9
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2024 07:21:12.9064
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ClxSJbMypjwSgVNXE+ayKv16uEk8DwlwCohpEbKZJ5sfusyFiE3sCLj3f37cgUNKq4JuxS3ST++tOH1qsE/kgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6240
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
 
-On Wed Oct 09 2024, Joe Damato wrote:
-> On Mon, Oct 07, 2024 at 11:14:51AM +0200, Kurt Kanzenbach wrote:
->> Hi Joe,
->>=20
->> On Thu Oct 03 2024, Joe Damato wrote:
->> > Link queues to NAPI instances via netdev-genl API so that users can
->> > query this information with netlink:
->> >
->> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yam=
-l \
->> >                          --dump queue-get --json=3D'{"ifindex": 2}'
->> >
->> > [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->> >  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->> >  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->> >  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->> >  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->> >  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
->> >  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->> >  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
->> >
->> > Since igc uses only combined queues, you'll note that the same NAPI ID
->> > is present for both rx and tx queues at the same index, for example
->> > index 0:
->> >
->> > {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->> > {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->> >
->> > Signed-off-by: Joe Damato <jdamato@fastly.com>
->> > ---
->> >  drivers/net/ethernet/intel/igc/igc_main.c | 30 ++++++++++++++++++++---
->> >  1 file changed, 26 insertions(+), 4 deletions(-)
->> >
->> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/e=
-thernet/intel/igc/igc_main.c
->> > index 7964bbedb16c..b3bd5bf29fa7 100644
->> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
->> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
->> > @@ -4955,6 +4955,7 @@ static int igc_sw_init(struct igc_adapter *adapt=
-er)
->> >  void igc_up(struct igc_adapter *adapter)
->> >  {
->> >  	struct igc_hw *hw =3D &adapter->hw;
->> > +	struct napi_struct *napi;
->> >  	int i =3D 0;
->> >=20=20
->> >  	/* hardware has been reset, we need to reload some things */
->> > @@ -4962,8 +4963,17 @@ void igc_up(struct igc_adapter *adapter)
->> >=20=20
->> >  	clear_bit(__IGC_DOWN, &adapter->state);
->> >=20=20
->> > -	for (i =3D 0; i < adapter->num_q_vectors; i++)
->> > -		napi_enable(&adapter->q_vector[i]->napi);
->> > +	for (i =3D 0; i < adapter->num_q_vectors; i++) {
->> > +		napi =3D &adapter->q_vector[i]->napi;
->> > +		napi_enable(napi);
->> > +		/* igc only supports combined queues, so link each NAPI to both
->> > +		 * TX and RX
->> > +		 */
->>=20
->> igc has IGC_FLAG_QUEUE_PAIRS. For example there may be 2 queues
->> configured, but 4 vectors active (and 4 IRQs). Is your patch working
->> with that?  Can be tested easily with `ethtool -L <inf> combined 2` or
->> by booting with only 2 CPUs.
+On 10/9/2024 2:05 PM, Philipp Stanner wrote:
+> pci_intx() is a hybrid function which can sometimes be managed through
+> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> port users to either an always-managed or a never-managed version.
 >
-> I tested what you asked, here's what it looks like on my system:
+> All users of amd_mp2_pci_remove(), where pci_intx() is used, call
+> pcim_enable_device(), which is why the driver needs the always-managed
+> version.
+>
+> Replace pci_intx() with pcim_intx().
+>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> ---
+>   drivers/hid/amd-sfh-hid/amd_sfh_pcie.c        | 4 ++--
+>   drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/hid/amd-sfh-hid/amd_sfh_pcie.c b/drivers/hid/amd-sfh-hid/amd_sfh_pcie.c
+> index 0c28ca349bcd..48cfd0c58241 100644
+> --- a/drivers/hid/amd-sfh-hid/amd_sfh_pcie.c
+> +++ b/drivers/hid/amd-sfh-hid/amd_sfh_pcie.c
+> @@ -122,7 +122,7 @@ int amd_sfh_irq_init_v2(struct amd_mp2_dev *privdata)
+>   {
+>   	int rc;
+>   
+> -	pci_intx(privdata->pdev, true);
+> +	pcim_intx(privdata->pdev, true);
+>   
+>   	rc = devm_request_irq(&privdata->pdev->dev, privdata->pdev->irq,
+>   			      amd_sfh_irq_handler, 0, DRIVER_NAME, privdata);
+> @@ -248,7 +248,7 @@ static void amd_mp2_pci_remove(void *privdata)
+>   	struct amd_mp2_dev *mp2 = privdata;
+>   	amd_sfh_hid_client_deinit(privdata);
+>   	mp2->mp2_ops->stop_all(mp2);
+> -	pci_intx(mp2->pdev, false);
+> +	pcim_intx(mp2->pdev, false);
+>   	amd_sfh_clear_intr(mp2);
+>   }
+>   
+> diff --git a/drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c b/drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c
+> index db36d87d5634..ec9feb8e023b 100644
+> --- a/drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c
+> +++ b/drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c
+> @@ -289,7 +289,7 @@ static void amd_mp2_pci_remove(void *privdata)
+>   	sfh_deinit_emp2();
+>   	amd_sfh_hid_client_deinit(privdata);
+>   	mp2->mp2_ops->stop_all(mp2);
+> -	pci_intx(mp2->pdev, false);
+> +	pcim_intx(mp2->pdev, false);
+>   	amd_sfh_clear_intr(mp2);
+>   }
+>   
 
-Thanks.
-
->
-> 16 core Intel(R) Core(TM) i7-1360P
->
-> lspci:
-> Ethernet controller: Intel Corporation Device 125c (rev 04)
->                      Subsystem: Intel Corporation Device 3037
->
-> ethtool -i:
-> firmware-version: 2017:888d
->
-> $ sudo ethtool -L enp86s0 combined 2
-> $ sudo ethtool -l enp86s0
-> Channel parameters for enp86s0:
-> Pre-set maximums:
-> RX:		n/a
-> TX:		n/a
-> Other:		1
-> Combined:	4
-> Current hardware settings:
-> RX:		n/a
-> TX:		n/a
-> Other:		1
-> Combined:	2
->
-> $ cat /proc/interrupts | grep enp86s0 | cut --delimiter=3D":" -f1
->  144
->  145
->  146
->  147
->  148
->
-> Note that IRQ 144 is the "other" IRQ, so if we ignore that one...
-> /proc/interrupts shows 4 IRQs, despite there being only 2 queues.
->
-> Querying netlink to see which IRQs map to which NAPIs:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump napi-get --json=3D'{"ifindex": 2}'
-> [{'id': 8200, 'ifindex': 2, 'irq': 148},
->  {'id': 8199, 'ifindex': 2, 'irq': 147},
->  {'id': 8198, 'ifindex': 2, 'irq': 146},
->  {'id': 8197, 'ifindex': 2, 'irq': 145}]
->
-> This suggests that all 4 IRQs are assigned to a NAPI (this mapping
-> happens due to netif_napi_set_irq in patch 1).
->
-> Now query the queues and which NAPIs they are associated with (which
-> is what patch 2 adds):
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \=
-=20
->                          --dump queue-get --json=3D'{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8198, 'type': 'tx'}]
->
-> As you can see above, since the queues are combined and there are
-> only 2 of them, NAPI IDs 8197 and 8198 (which are triggered via IRQ
-> 145 and 146) are displayed.
-
-Is that really correct? There are four NAPI IDs which are triggered by
-the four IRQs. Let's say we have:
-
- - IRQ: 145 -> NAPI 8197 -> Tx for queue 0
- - IRQ: 146 -> NAPI 8198 -> Rx for queue 0
- - IRQ: 147 -> NAPI 8199 -> Tx for queue 1
- - IRQ: 148 -> NAPI 8200 -> Rx for queue 1
-
-My understanding is that this scheme is used when <=3D 2 queues are
-configured. See IGC_FLAG_QUEUE_PAIRS.
-
-My expectation would be some output like:
-
-[{'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'tx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8199, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8200, 'type': 'rx'}]
+Acked-by: Basavaraj Natikar <Basavaraj.Natikar@amd.com>
 
 Thanks,
-Kurt
+--
+Basavaraj
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcHfWQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgm5kD/wKWSB0Ipa7QUEmYLceiDsnwHr9ptAG
-veIqB7500LItsANplLxHfgqb85Bs6ioag6EQVbnOCyeIncbO/2sPWGTYuen71uNk
-em7EhPF+c73A1NkLZzYMSw2FVnoPrPD3+9wIWzRBgYneix9b3nFwVAwgO1NiDnQg
-Vw+2WmAnJkM2KHziYF4lcuJlDFlwqUS674wJGVG3eQTzF/pAWzgML0BoldNMUQlP
-gQFdXhYK4HQJTaF09aIv7hwZOyI659+vUDmS7zvJd1qk1R9L+FaYiv3hOjuIu7YQ
-dEzWs9PhGH3vk50POY30Y248oiAO8wQZMloB0Y5CufKtgIB1fhx+NQFDAmdfI5If
-y+Vavk+N2/b6DvCQlyQ149SoJAwIRZ3Noa2J/q0vMSceCnncDJCITXYtTbhjmruv
-gq2guTYIZIFbpx4NKorJoWZ9fl0PGJL8uDgqRHO6cotcG40jS90p85Lm5iy1dVp/
-0Z55krETtccNRy/pp2FNT+ljwgUye5Mo9hOtXvKyNsVip50pxM+ng16U8h0uAIOd
-OyXeYASR6Xc9o9Ac5LX39AjoDnONwXj0+lnYyFjnMk6apyV5gNbXN2lCQDv9XZWt
-9P6VVuiCQB97u9oKOs7iO5cQ64frJI0nuLmafxg5eKcVi4Cb7gjhRYNJRdzFEvDM
-pgxnGG2nKU/qmg==
-=yeTM
------END PGP SIGNATURE-----
---=-=-=--
 
