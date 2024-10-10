@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-133978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC97A9979A1
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:33:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBA19979B2
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 814021F22E8D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:33:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A0231F23010
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A228C144;
-	Thu, 10 Oct 2024 00:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299A41EA87;
+	Thu, 10 Oct 2024 00:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGn0J00H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WfrAgK6D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80972A1D2;
-	Thu, 10 Oct 2024 00:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1661DFD1;
+	Thu, 10 Oct 2024 00:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728520375; cv=none; b=DCV+zrALAmDI5lIEkBTjP76AMsJJJRqhosKVFYTUCCnW8Xr4EKrgfyhT8rIBJc5CxJrm/XTgawMnzn6sN7itJo5Ca9LQyzswyjR+TZ0tD2HSgTwpTxZBeYyzGlIjo3NxeoHnBj+4V2CYY+GtTqTtrdQ+Mv45NhUiOrYLd8eRzqQ=
+	t=1728520600; cv=none; b=G6lNFUb+jf8/h49q5ogvj/fF7oA0z4iICaeBEawYqxA54uHBBknghbLzPYErbNMrWU+K3kGGTbOYZLReAE3RekWNOdokrTo2u2MFw4/WFL61pdskjz2npISnNxWRplNjQ5i42O4ct2J7qIbfZgJYl2f84Gv2uzH3kXfIxektCcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728520375; c=relaxed/simple;
-	bh=QarAG9OsS0S7oXws7XJsQIFCQAcnaMCbtsh+DM35Fcw=;
+	s=arc-20240116; t=1728520600; c=relaxed/simple;
+	bh=YpJurxbhtxGVZO4u+qrJ7lm0WHs8FDf1B1nBWm9/pzI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YBwI5hacrjs5G900x33xyknx5XzAPvVsrSu3vTIv1XFAjyn2+bUBNFA9H5Z/ytdM93DnUxeNPUSBKzjF74QhtRXaJIh6RFEJK1tMCkvnaFJNzDOZ/HNy/ouCnf+8rygNH/MlgfmhjOOhFpFORNqc6VlSg9mp5t0mwSjq99MSeG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGn0J00H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6633CC4CEC3;
-	Thu, 10 Oct 2024 00:32:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UFANe24J2BCxnLcF/rA9aqMxrWQwXjFrfKC6elFcCDO3C2yP9JPKxj8pLdbIGw/kPol5t0OXeYypYcVjmGMfpcNQq6Mu1dnSLvzq/G4SSy8hA5uCb+dCb7YRx6yLNufLwNfonHtSD0ZxIV2e9lyZN5sSuO6ZLWnHPB6P5muWIRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WfrAgK6D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02F25C4CEC3;
+	Thu, 10 Oct 2024 00:36:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728520375;
-	bh=QarAG9OsS0S7oXws7XJsQIFCQAcnaMCbtsh+DM35Fcw=;
+	s=k20201202; t=1728520599;
+	bh=YpJurxbhtxGVZO4u+qrJ7lm0WHs8FDf1B1nBWm9/pzI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FGn0J00HfbQ3QOMVUqk1P7sFWmH62grr/Lc9+Ar39iMKi+ib9tL6BLhCpOB1ZxllE
-	 0MRu42N7V/iGB9cBbdJfiOwSrsdTdPn9NwUypq52PfjxzpFXlkEinsT7EEDfvrNRzb
-	 nXmCqlafauZ46G5rrpSPV+rUEZE82Ux0wGJWns13gCl7f/La5N026MaRT4hHcTFvfe
-	 tKxX77Y0gwrEKnMPMJYe6QSgQ1FOHg8/8C1cCfAuBbez7m+eCCrHicLjxZzIrFkuNb
-	 PVKAHtJnkdlmyu1fKMNRcxPyIZ5CmvG2vp3tw9AP0i1TQBMI9i3oJM27PgPVmhYMrT
-	 Km5smAzOMfAcQ==
-Date: Wed, 9 Oct 2024 17:32:53 -0700
+	b=WfrAgK6D+m8cYCORGr9PUrWj8DdnBX/IVFSbQeuwXN1C1dN/xCa5kWVuNjmqDEo+E
+	 sVUMeiXgftrQkizAU0dWsrtIpWp6TbIWT38oS3G2yifvtL66dRveOBNH2Sj1IAuwK4
+	 U6kL76KZpny++IvOcH3ZdbTgNrSnvxhW6zC2swSSd0SYyC571mGLKwZWb5pajbt1U1
+	 Fn/ytsPJkBeWMK08QQNqM0zf6tSJ+vRUEhQsLnCN/0wvlKbC4cUjvBxJD7eon190cu
+	 NFsYeVZIGNesqqDwVhIFGZZSWBMkXIKEutI9M7xExMmB0Pm2wYvhp/WyIxqhF7glsJ
+	 ukheP5+5zVNkA==
+Date: Wed, 9 Oct 2024 17:36:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
- <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
- David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
- <abuehaze@amazon.com>, Paolo Abeni <pabeni@redhat.com>, "Christopher S .
- Hall" <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>,
- John Stultz <jstultz@google.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
- <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier
- <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel Lezcano
- <daniel.lezcano@linaro.org>, Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, qemu-devel
- <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v7] ptp: Add support for the AMZNC10C 'vmclock'
- device
-Message-ID: <20241009173253.5eb545db@kernel.org>
-In-Reply-To: <78969a39b51ec00e85551b752767be65f6794b46.camel@infradead.org>
-References: <78969a39b51ec00e85551b752767be65f6794b46.camel@infradead.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee
+ Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Xu Liang
+ <lxu@maxlinear.com>, Christian Marangi <ansuelsmth@gmail.com>, Bartosz
+ Golaszewski <bartosz.golaszewski@linaro.org>, Robert Marko
+ <robimarko@gmail.com>, Russell King <rmk+kernel@armlinux.org.uk>, Abhishek
+ Chauhan <quic_abchauha@quicinc.com>, Jacek Anaszewski
+ <jacek.anaszewski@gmail.com>, linux-leds@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: leds: add 'active-high'
+ property
+Message-ID: <20241009173638.34edc353@kernel.org>
+In-Reply-To: <ZwaF_VNG3TE33rfb@makrotopia.org>
+References: <e91ca84ac836fc40c94c52733f8fc607bcbed64c.1728145095.git.daniel@makrotopia.org>
+	<4qk3lpdx47b27ru47avpiygijtu5kkax44t3o4wb2wv5m5djoz@uziseiklyq3d>
+	<ZwKK4xMlqq3TyDyt@makrotopia.org>
+	<6d3hvesqhslk7jaszo44orbaqabl7go6duzpu4beye44sa6lpn@b3c56bp6x3ce>
+	<ZwPGbUWImzlbEqb-@makrotopia.org>
+	<ZwaF_VNG3TE33rfb@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,12 +76,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 06 Oct 2024 08:17:58 +0100 David Woodhouse wrote:
-> +config PTP_1588_CLOCK_VMCLOCK
-> +	tristate "Virtual machine PTP clock"
-> +	depends on X86_TSC || ARM_ARCH_TIMER
-> +	depends on PTP_1588_CLOCK && ACPI && ARCH_SUPPORTS_INT128
-> +	default y
+On Wed, 9 Oct 2024 14:32:45 +0100 Daniel Golle wrote:
+> What is the reason for that? 
 
-Why default to enabled? Linus will not be happy..
+No idea.
+
+But we do need an ack from device tree maintainers, I don't see one.
 
