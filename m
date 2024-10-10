@@ -1,98 +1,123 @@
-Return-Path: <netdev+bounces-134422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BE49994FE
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:14:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C12C999500
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE8311F246AC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:14:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8D9C1F238A1
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E301E47BE;
-	Thu, 10 Oct 2024 22:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC721BE86E;
+	Thu, 10 Oct 2024 22:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K449DHqw"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aLOv+ciK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E041E2839
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BA01C6888
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728598476; cv=none; b=ZuUyQWUef/yLI/T+riVQM6Z/n8DNF7IHTf5mUVFizJRjnLdsPQCp/Vqi3xFUPnCxFskV6C7kklVV+4H9crio0pVX2ffPulNOmQZtUEQPcNtSaK+txf4W3HbJxdjsP77PW6UxDDkSgjYguJejTLPHVh566CfBkUDdaVFt8WMOwOM=
+	t=1728598512; cv=none; b=FyFObusEJdRDIJkGzC6HZcohO8Ot/1uzjlFdy+hyUWI/au79gylF+S/SsQG/Ts3rMsKE72K4eby8vN07cRDVrZ0nF9xGHtu/t9+e9LbRZ9tinB54SYlN1toBCh2UZmN+TuzaTGqILBQrN2hU2+EQ0F4BpryXxmBAVg7TDr7MIic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728598476; c=relaxed/simple;
-	bh=ZzNf5A/0J+0V4C19gOFGD0qp2Jch/4Ikij2p/K6SY0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OfwyJd3MYujGkaz045mDx5Edt5qek3h++DuFCBLGxBFwXbi0T6jhK/2/tcz02DdR0LRHSPZCMIc/WilbGf4BFJFd70RusW7RS5hHjpB9XCTBDuxr/sENKpNAAeKAtljGHIoTRusmcsO6I+gJt2ivpZO6XMHS0w4GaGKW7EVdqXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K449DHqw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728598473;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZzNf5A/0J+0V4C19gOFGD0qp2Jch/4Ikij2p/K6SY0o=;
-	b=K449DHqwFQ3s/xPca91CqEgF37Z1Ej3lTJsVzPcA8v978aghnpXX7tMQlfwYNuucxDIQYw
-	UovplHP/QkWiUUyHYks3tOFGh8SbjA6R4htXr4gnNLBF5yGsAPFGqqN4goWN9OsE81eyqr
-	2oEjPHpCW99l0sJ7R6NbBKi/nYADaYk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-zbwRr-A-NbySKkzowDA5ug-1; Thu, 10 Oct 2024 18:14:32 -0400
-X-MC-Unique: zbwRr-A-NbySKkzowDA5ug-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-431177f2bb3so5616385e9.1
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:14:32 -0700 (PDT)
+	s=arc-20240116; t=1728598512; c=relaxed/simple;
+	bh=HOgeh/9hU/kmgs7FcQH6nvlEOYPE06f0qf8QgeXLhTs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hytTx1GM0Re9IBMxxu/k63afjsdvCpLQ7v7m4waGywtBiqPnFFxusi66aq2BqFOF0q6wI2qJF5ql7+X/r3pihE7+A4/Sexqqxjp+GyM3cvnkwW8v7glOOO2/XlP6+YX20paD4sBaNMAfSrBHCsyeTAkbqnao+g0WhMB/HLRzmr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aLOv+ciK; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so1177095a12.3
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1728598510; x=1729203310; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FVC6IZSUMEdR9UAAbPyZAJ9MQ8PXUx9QKz/xSicX6IM=;
+        b=aLOv+ciK8Qcmg5MaHPASbK1sX65gl7Za/1Zqdfvx5HHvUnUgl49ibQ/YMHAprhx2Nl
+         wL9NMZJsyw/A67E/csM/Q7tyhEpYRZc1vtG8bdnFoEN2dD5HjjgmeV2qvXTKoY22IbZT
+         rVzrXMHDxTBZmgjsmwYQmSyj1HezDIGHRnFfc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728598471; x=1729203271;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZzNf5A/0J+0V4C19gOFGD0qp2Jch/4Ikij2p/K6SY0o=;
-        b=jk9H2TSjiZ1DFL5XKk9rWBbqex871wkdKRiSmaC1vf8wflXG+XI2alMI3Scmmh9Mi1
-         CniMIWoBCjvL0ejOqOvpdSO6kSXU9tIrQI9GKY+0b0KIPESQ0PiUdtE+eWXPKBBFEjaq
-         rhb0H1gbTPsttLLGb8YtbWr+E9qT+bI3R7NBJogP6QcoOb2Zv1CkC6cs/wXfJ33gH5zp
-         G2QUpeN/ePHeEPh32f7G/NN2KK0eoSZqYQ3V9wGOKgQJ9qJYaUS+SZoFF3Vpr1OZFu2Q
-         b8MDTXdFQmEkOga8CN1LfLZSVlSfjrVzzHjJ2sonYFgGr/2RQSjGvgu4HuQb9PF7Hhzi
-         23tg==
-X-Gm-Message-State: AOJu0YxmSk/hqJbPRf9Gzs4pBTSata+nu1ARYcf/qEvUl7v0eu/4t2Mz
-	9hxyh6kfSjemiITE+/gypkm8PGxNaj/MVbThfSN0EAMW4b1gDNKYbto9ux1Cer+7jPqMFH+08/C
-	XzI+nZbGOof4e1meF0o/sYZ5KTRpPmNRpp2B1uWjOkHL5kQbmTWq1OivnYT2aZQ==
-X-Received: by 2002:a05:600c:3555:b0:431:11e6:d540 with SMTP id 5b1f17b1804b1-4311deec1e1mr3008005e9.17.1728598471229;
-        Thu, 10 Oct 2024 15:14:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFe+dlrc+n8e11J9bnpoU060KBU8jayDo4stiAbxpX8nGmvzfxufek04W0vfAO6SyiS4psHrQ==
-X-Received: by 2002:a05:600c:3555:b0:431:11e6:d540 with SMTP id 5b1f17b1804b1-4311deec1e1mr3007945e9.17.1728598470869;
-        Thu, 10 Oct 2024 15:14:30 -0700 (PDT)
-Received: from debian (2a01cb058d23d600a14c4a1c8a7913c2.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:a14c:4a1c:8a79:13c2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6bd3e7sm2454475f8f.39.2024.10.10.15.14.28
+        d=1e100.net; s=20230601; t=1728598510; x=1729203310;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FVC6IZSUMEdR9UAAbPyZAJ9MQ8PXUx9QKz/xSicX6IM=;
+        b=QKZ/PnWW5mZpeqa4iy9P2uCAtfzMjHXb7Hn75XsSk50wgDLt4mxrYDeXsYWeoCRP7o
+         ZM/CcwfosAnOZ+1gSlJCAdfqOI5gwA+SmxS7ocfGRDDZ7HPbw//IyMWxFfH2vu7k+35/
+         JNSKC9wzVdTMucnvxs173BmbZB/O8LJS3ebHkoqdxwHyX/hn8wVBUim3KaG0STO2xXXO
+         e67YpqcBVaqO6rjCwSB211CIW+pBG6z9OLZYBi1PrTYqI7bkq855Vfb8ZwMNuab4bfgq
+         /96tFIFwxPYrMWpLDh8YnguaqWphsS07/Quh2Qe7XCWrZCUH83NsU3tMRAfYz2BK8JQX
+         b+9g==
+X-Gm-Message-State: AOJu0Yy9oVbO2DtHm8A/PkMSy0uxzxWPr6lyhmoimM6QqUcg4MSy7z38
+	doxjJgdBmspfquIh+LfqAxTxRQtUDgUE/S2RuYW6uGOvSoWCgnc8PdC76fjHrgm/g2jYAywi4cN
+	jZS9bf1b8wx+VVHDQhfv7G16RoGQ+hkfEkm1Vs00fFtPx6Z1PK2yLSvL7/bz4O3ZdlhRWrGkPPh
+	8zPF7WajVpRw4c4lYojqtktP4gR3tyZ0qDST6sAiCy3nxn
+X-Google-Smtp-Source: AGHT+IGsmwm6s7PF83VYJTWt6HaUcj4TlBwn/SNJXxkSvgvRIxguBVISBaAS5tx04IZfpj6vuFwpeQ==
+X-Received: by 2002:a17:90a:d783:b0:2e2:e4d3:3401 with SMTP id 98e67ed59e1d1-2e2f0b0a6dcmr848031a91.20.1728598510279;
+        Thu, 10 Oct 2024 15:15:10 -0700 (PDT)
+Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a5caa23esm4165452a91.53.2024.10.10.15.15.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 15:14:29 -0700 (PDT)
-Date: Fri, 11 Oct 2024 00:14:27 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
-	petrm@nvidia.com
-Subject: Re: [PATCH iproute2-next 2/2] iprule: Add DSCP support
-Message-ID: <ZwhRw/75XPPfi8Cm@debian>
-References: <20241009062054.526485-1-idosch@nvidia.com>
- <20241009062054.526485-3-idosch@nvidia.com>
+        Thu, 10 Oct 2024 15:15:09 -0700 (PDT)
+From: Justin Chen <justin.chen@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: bcm-kernel-feedback-list@broadcom.com,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	florian.fainelli@broadcom.com,
+	Justin Chen <justin.chen@broadcom.com>
+Subject: [PATCH net-next] net: bcmasp: enable SW timestamping
+Date: Thu, 10 Oct 2024 15:15:06 -0700
+Message-Id: <20241010221506.802730-1-justin.chen@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009062054.526485-3-idosch@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 09, 2024 at 09:20:54AM +0300, Ido Schimmel wrote:
-> Add support for 'dscp' selector in ip-rule.
+Add skb_tx_timestamp() call and enable support for SW
+timestamping.
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c | 1 +
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c    | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
+index ca163c8e3729..67928b5d8a26 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
+@@ -496,4 +496,5 @@ const struct ethtool_ops bcmasp_ethtool_ops = {
+ 	.get_strings		= bcmasp_get_strings,
+ 	.get_ethtool_stats	= bcmasp_get_ethtool_stats,
+ 	.get_sset_count		= bcmasp_get_sset_count,
++	.get_ts_info		= ethtool_op_get_ts_info,
+ };
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+index 82768b0e9026..34f14d6059af 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+@@ -364,6 +364,9 @@ static netdev_tx_t bcmasp_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	intf->tx_spb_index = spb_index;
+ 	intf->tx_spb_dma_valid = valid;
++
++	skb_tx_timestamp(skb);
++
+ 	bcmasp_intf_tx_write(intf, intf->tx_spb_dma_valid);
+ 
+ 	if (tx_spb_ring_full(intf, MAX_SKB_FRAGS + 1))
+-- 
+2.34.1
 
 
