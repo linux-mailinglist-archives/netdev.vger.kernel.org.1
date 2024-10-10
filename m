@@ -1,83 +1,193 @@
-Return-Path: <netdev+bounces-134251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DDF1998868
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:54:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6F999888D
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 16:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E05E1C21DC7
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:54:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD8FC1F269CB
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 14:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941B11C9DCB;
-	Thu, 10 Oct 2024 13:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D6F1C7B6A;
+	Thu, 10 Oct 2024 14:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="BbyEINIG"
 X-Original-To: netdev@vger.kernel.org
-Received: from a3.inai.de (a3.inai.de [144.76.212.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301741C9EAB;
-	Thu, 10 Oct 2024 13:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.212.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951AB1BFDF7
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 14:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728568441; cv=none; b=SOB1FBcVvSYBW7+FFlv/YcMWCc7g2CAwd8Va0Z1orVeGTsf13AExJy0CcYSGuL5xarJLwgCQ6AV3nKa2uMIqZ0iZ3oSV1UoXeKW71yZYOmn4QibrqIErCbrW9O2m0xLkjuUtM5zFh/B6FIriDYXxUFjxAyKF6vJv7eAtF8S/4Oc=
+	t=1728568836; cv=none; b=TQDT1sTyt6ElkSIVx2ZcoGLGD9+dPGDGP6YZOpP4MlBZj9BbXv2+vSlMLBFCXYvyTSHLlwU+EhKCsHo3cPVLppvSPkeN2LMQM15THdiOjnyZ+DTZD7tg5uoQr4FIvLNdCMwuvBnzsrQ1+BvWhzoN3AKDPS+AjRITQ88Q63+Iers=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728568441; c=relaxed/simple;
-	bh=/3g+rKYvTqXXNiQj+qxHRmKbKsjubcdqbQmufXDhlJY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=BFVD76UwzJ+QZssFpcJ+vZDWNsY7iSg+87CLS7GTYNCHMYqQi0Ates1/wbkQ12VAe4hnEHD9JFdgRooHdVwVTdAg2S5RlvGcMYnsM3KG8ywCBmSYERMBZkmL7jAI8gqvaCqK3zxtcYZzSI84/6wqOJUNkaQBZWvEXoe1P32CSYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de; spf=fail smtp.mailfrom=inai.de; arc=none smtp.client-ip=144.76.212.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=inai.de
-Received: by a3.inai.de (Postfix, from userid 25121)
-	id C87A01003C4C01; Thu, 10 Oct 2024 15:53:48 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by a3.inai.de (Postfix) with ESMTP id C676A1100AC240;
-	Thu, 10 Oct 2024 15:53:48 +0200 (CEST)
-Date: Thu, 10 Oct 2024 15:53:48 +0200 (CEST)
-From: Jan Engelhardt <ej@inai.de>
-To: Florian Westphal <fw@strlen.de>
-cc: Richard Weinberger <richard@sigma-star.at>, 
-    Richard Weinberger <richard@nod.at>, upstream@sigma-star.at, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, 
-    kuba@kernel.org, edumazet@google.com, davem@davemloft.net, 
-    kadlec@netfilter.org, pablo@netfilter.org, rgb@redhat.com, 
-    paul@paul-moore.com, upstream+net@sigma-star.at
-Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
-In-Reply-To: <20241010134827.GC30424@breakpoint.cc>
-Message-ID: <612s9310-r348-960q-893n-79nns3o69p38@vanv.qr>
-References: <20241009203218.26329-1-richard@nod.at> <20241009213345.GC3714@breakpoint.cc> <3048359.FXINqZMJnI@somecomputer> <20241010134827.GC30424@breakpoint.cc>
-User-Agent: Alpine 2.26 (LSU 649 2022-06-02)
+	s=arc-20240116; t=1728568836; c=relaxed/simple;
+	bh=gLAM8r7qE6CVz5omgjNonixJXLEHbVuzzGOxsgzhh7I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VBtBQQxNTvE2EZGsdPBzDdeI6Z0tRCgvj8TWzG4NLGRAVIVYqxY0cNEZ7VAZlA1O1EJzCOA3GH3hAAnJjny8mvJBpLZkGNWqm5q9Te+3hBJEuk49wqBlWpPt7OqDd1F8rdyqeXvgTR8+fWZgaJ2OLX/GkWqE8EkH1+xVwjKnYn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=BbyEINIG; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9953bdc341so43467366b.2
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 07:00:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1728568833; x=1729173633; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vccuKvc83Vv38bDulBNrWqwQbq60HXVP3Eb0biFBOnw=;
+        b=BbyEINIGu+fnzmFLEHeLC7f0J4DAFHB85jQTGnAxMdaCdpU9+nFJ2NDGwBl/i7WNeZ
+         GP8rMF+Xafe3x0XfRWS0M4230C8j0SZ/3YMA3AP0H6AhRURuqjvUCHxIibFwi8dAAsuC
+         m4WrgPK8RAKbFewkzrXmJbkypcN2Fx2qK6miKliTzWKUGg4GmCt3g3IKEWoJ2cW1Xsds
+         LJ5dsnl6iXWnYPZLENik/61Nle2aQafr5AzngpNTBz/tjrA6Vh4Ghez5abLhT1a5gi0I
+         WyX5gn7gkL+bl3LR/wcOerN4sJkPErqwh/BVHXSCuohulVJum22B68zHKUhMrtganCb+
+         C9Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728568833; x=1729173633;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vccuKvc83Vv38bDulBNrWqwQbq60HXVP3Eb0biFBOnw=;
+        b=P3i7JeqBqm+BTUHTGYWs0S5pjkT7oJpS8LMufZ/+vrz5CewaxzDcYDCQHv4fpl4i/x
+         C5dtMkvIehWrY1K4KorexQl3Z8LvluVOua+ZAxrCQ7ukyT68fesave/P0Nhd56CoFWOZ
+         YmZuE1ccjhIVjZZ2E4Gi2rxiyLg2T4nU0zrWLf5xBqBcTcrqL8p8lgUEup1pGDE1q41U
+         Vd4+vMnHi356gzBL3awpGsa9g5KWNrKuDBEybKukL9vEw2beFKSlwM7bXwMMxZinM6jr
+         pJCauxNGTdFmURS+CN5CLf9Lx/vUgN/Brh99xyZJQRBv3C2SgiJLTJh+uJbTqMrRYNhy
+         FzXw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/FH5ZfUtay7wZ/Vrop2aBV0Oxnzzx8LrVIx8xIYU+LUp3PM+XqENTk0GC4oTd8MNx8ycIgY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJbdVduDKtXS82qxkdvVV4M+jYAyoqweVmtQGQWhLBfaknQVTJ
+	wjIx3vivJN5JH5qsk4ZjFP/eR47SMM4mj1CQv5OB7JrrVsGz8r/m2slJ+num//hoNbTn16cXbqA
+	f
+X-Google-Smtp-Source: AGHT+IHs66jsGVsDIa6nU/GDZDjyrTOMBCVIgq4sUT8APnQVeWzsXntFRqDIlxWQ12IMQaG/q8PPxw==
+X-Received: by 2002:a17:907:9483:b0:a99:5601:7dc1 with SMTP id a640c23a62f3a-a998d327bb2mr546038066b.49.1728568831155;
+        Thu, 10 Oct 2024 07:00:31 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:506b:2dc::49:1d6])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a80dca54sm91345866b.159.2024.10.10.07.00.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 07:00:30 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  David Ahern
+ <dsahern@kernel.org>,  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
+ <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  netdev@vger.kernel.org,  kernel-team@cloudflare.com,  Ivan Babrou
+ <ivan@cloudflare.com>,  stable@vger.kernel.org
+Subject: Re: [PATCH net] udp: Compute L4 checksum as usual when not
+ segmenting the skb
+In-Reply-To: <6707d74780461_2029212946a@willemb.c.googlers.com.notmuch>
+	(Willem de Bruijn's message of "Thu, 10 Oct 2024 09:31:51 -0400")
+References: <20241010-uso-swcsum-fixup-v1-1-a63fbd0a414c@cloudflare.com>
+	<6707d74780461_2029212946a@willemb.c.googlers.com.notmuch>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Thu, 10 Oct 2024 16:00:28 +0200
+Message-ID: <87ttdkxdkz.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 
-
-On Thursday 2024-10-10 15:48, Florian Westphal wrote:
->Richard Weinberger <richard@sigma-star.at> wrote:
->> Am Mittwoch, 9. Oktober 2024, 23:33:45 CEST schrieb Florian Westphal:
->> > There is no need to follow ->file backpointer anymore, see
->> > 6acc5c2910689fc6ee181bf63085c5efff6a42bd and
->> > 86741ec25462e4c8cdce6df2f41ead05568c7d5e,
->> > "net: core: Add a UID field to struct sock.".
+On Thu, Oct 10, 2024 at 09:31 AM -04, Willem de Bruijn wrote:
+> Jakub Sitnicki wrote:
+>> If:
 >> 
->> Oh, neat!
->>  
->> > I think we could streamline all the existing paths that fetch uid
->> > from sock->file to not do that and use sock_net_uid() instead as well.
->>  
->> Also xt_owner?
+>>   1) the user requested USO, but
+>>   2) there is not enough payload for GSO to kick in, and
+>>   3) the egress device doesn't offer checksum offload, then
+>> 
+>> we want to compute the L4 checksum in software early on.
+>> 
+>> In the case when we taking the GSO path, but it has been requested, the
 >
->sk->sk_uid is already used e.g. for fib lookups so I think it makes
->sense to be consistent, so, yes, xt_owner, nfqueue, nft_meta.c, all can
->be converted.
+> What does it refers to here?
 
-I doubt it. We've been there before... if a process does setuid,
-some uid field doesn't change, and others do, so that's user-visible
-behavior you can't just change.
+That's a typo there. Will fix. It should have said:
+
+  In the case when we *not* taking the GSO path, but it has been
+  requested, ...
+
+Pseudo code-wise something like:
+
+  s.setsockopt(SOL_UDP, UDP_SEGMENT, 1200)
+  s.sendto(b"x", ("192.0.2.1", 9))
+
+
+>> software checksum fallback in skb_segment doesn't get a chance to compute
+>> the full checksum, if the egress device can't do it. As a result we end up
+>> sending UDP datagrams with only a partial checksum filled in, which the
+>> peer will discard.
+>> 
+>> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+>> Reported-by: Ivan Babrou <ivan@cloudflare.com>
+>> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+>> Cc: stable@vger.kernel.org
+>> ---
+>> This shouldn't have fallen through the cracks. I clearly need to extend the
+>> net/udpgso selftests further to cover the whole TX path for software
+>> USO+csum case. I will follow up with that but I wanted to get the fix out
+>> in the meantime. Apologies for the oversight.
+>> ---
+>>  net/ipv4/udp.c | 4 +++-
+>>  net/ipv6/udp.c | 4 +++-
+>>  2 files changed, 6 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+>> index 8accbf4cb295..2849b273b131 100644
+>> --- a/net/ipv4/udp.c
+>> +++ b/net/ipv4/udp.c
+>> @@ -951,8 +951,10 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
+>>  			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
+>>  			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
+>>  								 cork->gso_size);
+>> +
+>> +			/* Don't checksum the payload, skb will get segmented */
+>> +			goto csum_partial;
+>>  		}
+>> -		goto csum_partial;
+>
+> The issue here is that GSO packets with CHECKSUM_NONE will get fixed
+> software checksummed in skb_segment, but no such fallback path is
+> entered for regular packets, right?
+>
+> We could setup CHECKSUM_PARTIAL and rely on validate_xmit_skb. But
+> might as well do the software checksumming right here, as your
+> patch does.
+
+Yes, all correct.
+
+To add to it - I figured that marking the skb with CHECKSUM_PARTIAL,
+when device doesn't offer csum offload, would be more confusing.
+
+>
+> If I follow this all, ACK from me. Just want to make sure.
+
+Thanks. I will carry it in v2.
+
+Will wait a bit before respinning it.
+Maybe Ivan can get a chance to this patch.
+
+>>  	}
+>>  
+>>  	if (is_udplite)  				 /*     UDP-Lite      */
+>> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+>> index 52dfbb2ff1a8..0cef8ae5d1ea 100644
+>> --- a/net/ipv6/udp.c
+>> +++ b/net/ipv6/udp.c
+>> @@ -1266,8 +1266,10 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
+>>  			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
+>>  			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
+>>  								 cork->gso_size);
+>> +
+>> +			/* Don't checksum the payload, skb will get segmented */
+>> +			goto csum_partial;
+>>  		}
+>> -		goto csum_partial;
+>>  	}
+>>  
+>>  	if (is_udplite)
+>> 
 
