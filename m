@@ -1,370 +1,507 @@
-Return-Path: <netdev+bounces-134387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DDD699921B
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:22:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA66F999212
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:21:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45CB5B27A57
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:10:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BBECB2FDAB
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D83F1CF5E2;
-	Thu, 10 Oct 2024 19:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F7C1CF7C3;
+	Thu, 10 Oct 2024 19:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rO6X22gY"
+	dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b="SzrmHG5z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.dolansoft.org (s2.dolansoft.org [212.51.146.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD301CF5CD
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 19:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838931CDFCB;
+	Thu, 10 Oct 2024 19:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.51.146.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728587157; cv=none; b=YXwHQobtLbBYLqWJJaC6L80VymYz6tySriEPz1jVMdCpnhXMR6yDw1Ll0Nyos47Uu58lbpQys/Qs/MlHZSj+Vman6t+n4vLGR1rEm64KmljqWXBgdF3m6tBBuTPlBWMbd2xw9C5kE8mGYObPzXfthdXF8wJ9XoTOMmWKmAmhIZI=
+	t=1728587199; cv=none; b=un7QAyku9gAQWWLZxFU6K0KFTPR6a7brru09z4xgLbFwn85W8q7oLh+00FC6PaeBXtwYK0dhAhVzTvKy5ipQ5QMaZBakATeXmlFAW/1HT7phZidEaEpP1YVPUznD0gRehAxd9jgnuKkrKs8w8RQO31K7nM1VJ1GknWiqRmaWI7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728587157; c=relaxed/simple;
-	bh=5HPzgAdFormJXXqK8h/l25xPeBcHWohJ3hWfo3eavJc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p2k7KNJcDPp2lEC3xLTKqVy3vxFY2AxUAYbZ9IOMnqmQ89UCWV4rzwchAN6+CPKy8lkA5VlhHF84GkmQAHhAxOHVYZQ/RjUT/IlG1ZV9/ZP5tKeEPW5Gn7Y1AHjGQB+MDNBo36S8HgeTFaSkNMISDN21SRAUurcJPMYnr783YfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rO6X22gY; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4601a471aecso45581cf.1
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 12:05:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728587153; x=1729191953; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/SQIULv3PuhYrubi1b4Lzr/jGOZjc/yeQb9Fnkxqp1k=;
-        b=rO6X22gYTxAMr2wmMn8kkKQwEpbmuQB9QIm95VKvMJwjIIzb4XpPgtJLXU2ZLU9EgH
-         w4j+iglDLGhietiKkyeCmokb7UJjWOdftKSN4IT4cA03gdHcGSPpbVN6e9p/n/PvTRip
-         V50jXZGYJJFmbygq0FtHXxbE6jQCjfkOknbnBvccVZc3FF9fqqKJAH436ndS2GxA5ckv
-         kmqLddiMuOqeaAhhn7zmaWuHpKTilOVkxs10iamn607JDG0XCg3xVBsZ93yUvfKsOpR2
-         dulNVEokzfjKFkEG/6qOrh09E6wwGymvpUPEDzLCusfWL6bdziWKD1qvdkq9rBb11/Qt
-         nt/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728587153; x=1729191953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/SQIULv3PuhYrubi1b4Lzr/jGOZjc/yeQb9Fnkxqp1k=;
-        b=iaeNSQcOzRKmUFi8LNAWBYCPCtCX4/BJ9I7kzPOyoGmzFQ8lCGRx3OeUn1bW2VCwdH
-         xemSDlYt4gnDyfBaIthdHMgfSLTSX0fveXIMvgJMg4IhGBkpFneyrgPKmUVNKevzIbXC
-         mz0ylCvGg64XhifO9IgVUhC2UAQxPhoq1c2WKSO+OrkuhOUWH5KI1aY6PCJJ9iu5qiWI
-         dnuZqyihkrkSCZLcSi/vgQDDxXuErNiZ/GbWKyHWH5WNFbJhFb/c6GFqfkjST9N9pxYR
-         474A4Y6Y++aJCXILcIosWaVaK1yatWPdXIMi+bGkNOlZRjdDUX1Ef22g4aUAimSI18NY
-         qlgA==
-X-Gm-Message-State: AOJu0YykDfzb3wlgCI0oEKGPYipjFXdVb0qTRufaQxt8yYzX4z+Xc6FV
-	V7svpHuUTgeQNs4XCc6Y4Xxx+yohyZGZWNYf1Z0fYJAq6aN64UJ1DOn2kzQiKm9jLsMWbkSuLYm
-	ErBRZhpBJqghbkqh80nw7VAoPBwO/RWs30Kf4
-X-Google-Smtp-Source: AGHT+IFXW31rsZ9kFmf+FJMtckOgDblc8qAc7+JIkHyyX3UPQEOm0e8exkrBalRYLEuVTVB8uGfh8R0/wFj2yt5Uk7U=
-X-Received: by 2002:a05:622a:4f8c:b0:45f:5cd:a617 with SMTP id
- d75a77b69052e-4604b127c4cmr368761cf.9.1728587152864; Thu, 10 Oct 2024
- 12:05:52 -0700 (PDT)
+	s=arc-20240116; t=1728587199; c=relaxed/simple;
+	bh=HkHoMTzYglqnY6r9iavZkDufw8TNqGKwte1owVWRiAs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cuvaq4wLN19sndw+CIp2Juz/AAWknnwc76JPNHOw0O1fTePOlRR+N6+QD700tQeIAywPP0y6C1KXf/kCrpOj4WAuYU68XwHw01t2nC0Skwf+jMB+ieRdCWGq95+oqra0kHVLC9ZFpjAnBSifCBwXgVIa1+b4Loj1EAkvgOTnV9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one; spf=pass smtp.mailfrom=brun.one; dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b=SzrmHG5z; arc=none smtp.client-ip=212.51.146.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=brun.one
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=brun.one;
+	s=s1; h=MIME-Version:Message-ID:Date:Subject:Cc:To:From:In-Reply-To:
+	References:From:To:Subject:Date:Message-ID:Reply-To;
+	bh=32ljFa15IOBzAiuqwqjBBBXq9cDj1+EckZPC1IUzpqQ=; b=SzrmHG5zjnxRnrnvAq8XAGk61n
+	vW/j2WuRqUWgkGO5HqMEF0v15In4cd9JxLpbnurtJw/maePX+jaXbRzquB+Qq1Imrv+C+lClcEITI
+	yqK5q5vGVGFHMprjTcmB4vy1LCAaTyZfUn/Ebi9r4q+9dsmgipZmWv1mpnfTTHjHT0NeL94LYmxVK
+	wHrpV1KA0KsPncYwZ08TJ2uut420froeL4h2CfSzYSqDofPtXyZi15pxGWmuQFJLEsB9d1hLC1QLg
+	m5B7fXloGTiP1ZDXucBgAHGDCw78ighcVrlenOhyE1R0xpGndWteCk0q9/Fm3ePiAKudvgdwlVPPI
+	XgF2OXGg==;
+Received: from [212.51.153.89] (helo=localhost.localdomain)
+	by mx.dolansoft.org with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <lorenz@dolansoft.org>)
+	id 1syyUT-000000004qv-1qDm;
+	Thu, 10 Oct 2024 19:06:25 +0000
+From: Lorenz Brun <lorenz@brun.one>
+To: Igor Russkikh <irusskikh@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] net: atlantic: support reading SFP module info
+Date: Thu, 10 Oct 2024 21:06:14 +0200
+Message-ID: <20241010190617.391638-1-lorenz@brun.one>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909054318.1809580-1-almasrymina@google.com>
- <20240909054318.1809580-11-almasrymina@google.com> <Zwe3lWTN36IUaIdd@ly-workstation>
-In-Reply-To: <Zwe3lWTN36IUaIdd@ly-workstation>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 10 Oct 2024 12:05:38 -0700
-Message-ID: <CAHS8izPuEUA20BDXvwq2vW-24ez36YFJFMQok-oBDbgk6bajSA@mail.gmail.com>
-Subject: Re: [PATCH net-next v25 10/13] net: add SO_DEVMEM_DONTNEED setsockopt
- to release RX frags
-To: "Lai, Yi" <yi1.lai@linux.intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, yi1.lai@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Sender: lorenz@dolansoft.org
 
-On Thu, Oct 10, 2024 at 4:17=E2=80=AFAM Lai, Yi <yi1.lai@linux.intel.com> w=
-rote:
->
-> Hi Mina Almasry,
->
-> Greetings!
->
-> I used Syzkaller and found that there is BUG: soft lockup inqt in linux-n=
-ext tree next-20241008
->
-> After bisection and the first bad commit is:
-> "
-> 678f6e28b5f6 net: add SO_DEVMEM_DONTNEED setsockopt to release RX frags
-> "
->
-> All detailed into can be found at:
-> https://github.com/laifryiee/syzkaller_logs/tree/main/241009_103423_do_so=
-ck_setsockopt
-> Syzkaller repro code:
-> https://github.com/laifryiee/syzkaller_logs/tree/main/241009_103423_do_so=
-ck_setsockopt/repro.c
-> Syzkaller repro syscall steps:
-> https://github.com/laifryiee/syzkaller_logs/tree/main/241009_103423_do_so=
-ck_setsockopt/repro.prog
-> Syzkaller report:
-> https://github.com/laifryiee/syzkaller_logs/tree/main/241009_103423_do_so=
-ck_setsockopt/repro.report
-> Kconfig(make olddefconfig):
-> https://github.com/laifryiee/syzkaller_logs/tree/main/241009_103423_do_so=
-ck_setsockopt/kconfig_origin
-> Bisect info:
-> https://github.com/laifryiee/syzkaller_logs/tree/main/241009_103423_do_so=
-ck_setsockopt/bisect_info.log
-> bzImage:
-> https://github.com/laifryiee/syzkaller_logs/raw/refs/heads/main/241009_10=
-3423_do_sock_setsockopt/bzImage_8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
-> Issue dmesg:
-> https://github.com/laifryiee/syzkaller_logs/blob/main/241009_103423_do_so=
-ck_setsockopt/8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b_dmesg.log
->
-> "
-> [   48.825073]  ? __lock_acquire+0x1b0f/0x5c90
-> [   48.825419]  ? __pfx___lock_acquire+0x10/0x10
-> [   48.825774]  sock_setsockopt+0x68/0x90
-> [   48.826117]  do_sock_setsockopt+0x3fb/0x480
-> [   48.826455]  ? __pfx_do_sock_setsockopt+0x10/0x10
-> [   48.826829]  ? lock_release+0x441/0x870
-> [   48.827140]  ? __sanitizer_cov_trace_const_cmp4+0x1a/0x20
-> [   48.827558]  ? fdget+0x188/0x230
-> [   48.827846]  __sys_setsockopt+0x131/0x200
-> [   48.828184]  ? __pfx___sys_setsockopt+0x10/0x10
-> [   48.828551]  ? seqcount_lockdep_reader_access.constprop.0+0xc0/0xd0
-> [   48.829042]  ? __sanitizer_cov_trace_cmp4+0x1a/0x20
-> [   48.829425]  ? ktime_get_coarse_real_ts64+0xbf/0xf0
-> [   48.829817]  __x64_sys_setsockopt+0xc6/0x160
-> [   48.830160]  ? syscall_trace_enter+0x14a/0x230
-> [   48.830520]  x64_sys_call+0x6cf/0x20d0
-> [   48.830825]  do_syscall_64+0x6d/0x140
-> [   48.831124]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [   48.831517] RIP: 0033:0x7f26cdc3ee5d
-> [   48.831804] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 4=
-8 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <=
-48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 93 af 1b 00 f7 d8 64 89 01 48
-> [   48.833180] RSP: 002b:00007fff33f36278 EFLAGS: 00000213 ORIG_RAX: 0000=
-000000000036
-> [   48.833756] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f26c=
-dc3ee5d
-> [   48.834294] RDX: 0000000000000050 RSI: 0000000000000001 RDI: 000000000=
-0000003
-> [   48.834830] RBP: 00007fff33f36290 R08: 0000000000000010 R09: 00007fff3=
-3f36290
-> [   48.835368] R10: 0000000020000080 R11: 0000000000000213 R12: 00007fff3=
-3f363e8
-> [   48.835906] R13: 000000000040178f R14: 0000000000403e08 R15: 00007f26c=
-de51000
-> [   48.836466]  </TASK>
-> [   48.836648] Kernel panic - not syncing: softlockup: hung tasks
-> [   48.837096] CPU: 1 UID: 0 PID: 729 Comm: repro Tainted: G             =
-L     6.12.0-rc2-8cf0b93919e1 #1
-> [   48.837796] Tainted: [L]=3DSOFTLOCKUP
-> [   48.838071] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> [   48.838916] Call Trace:
-> [   48.839113]  <IRQ>
-> [   48.839282]  dump_stack_lvl+0x42/0x150
-> [   48.839584]  dump_stack+0x19/0x20
-> [   48.839846]  panic+0x703/0x790
-> [   48.840100]  ? __pfx_panic+0x10/0x10
-> [   48.840394]  ? watchdog_timer_fn+0x599/0x6b0
-> [   48.840727]  ? watchdog_timer_fn+0x58c/0x6b0
-> [   48.841065]  watchdog_timer_fn+0x5aa/0x6b0
-> [   48.841382]  ? __pfx_watchdog_timer_fn+0x10/0x10
-> [   48.841743]  __hrtimer_run_queues+0x5d6/0xc30
-> [   48.842091]  ? __pfx___hrtimer_run_queues+0x10/0x10
-> [   48.842473]  hrtimer_interrupt+0x324/0x7a0
-> [   48.842802]  __sysvec_apic_timer_interrupt+0x10b/0x410
-> [   48.843198]  ? debug_smp_processor_id+0x20/0x30
-> [   48.843551]  sysvec_apic_timer_interrupt+0xaf/0xd0
-> [   48.843922]  </IRQ>
-> [   48.844101]  <TASK>
-> [   48.844275]  asm_sysvec_apic_timer_interrupt+0x1f/0x30
-> [   48.844711] RIP: 0010:__sanitizer_cov_trace_pc+0x45/0x70
-> [   48.845130] Code: a9 00 01 ff 00 74 1d f6 c4 01 74 43 a9 00 00 0f 00 7=
-5 3c a9 00 00 f0 00 75 35 8b 82 04 1e 00 00 85 c0 74 2b 8b 82 e0 1d 00 00 <=
-83> f8 02 75 20 48 8b 8a e8 1d 00 00 8b 92 e4 1d 00 00 48 8b 01 48
-> [   48.846480] RSP: 0018:ffff8880239cf790 EFLAGS: 00000246
-> [   48.846876] RAX: 0000000000000000 RBX: ffff8880239cf900 RCX: ffffffff8=
-581c19f
-> [   48.847407] RDX: ffff88801a818000 RSI: ffffffff8581c1d5 RDI: 000000000=
-0000007
-> [   48.847933] RBP: ffff8880239cf790 R08: 0000000000000001 R09: ffffed100=
-4739f23
-> [   48.848472] R10: 0000000077cc006e R11: 0000000000000001 R12: 000000000=
-0000000
-> [   48.849002] R13: 0000000077cc006e R14: ffff8880239cf918 R15: 000000000=
-0000000
-> [   48.849536]  ? xas_start+0x11f/0x730
-> [   48.849818]  ? xas_start+0x155/0x730
-> [   48.850101]  xas_start+0x155/0x730
-> [   48.850372]  xas_load+0x2f/0x520
-> [   48.850629]  ? irqentry_exit+0x3e/0xa0
-> [   48.850922]  ? sysvec_apic_timer_interrupt+0x6a/0xd0
-> [   48.851304]  xas_store+0x1165/0x1ad0
-> [   48.851588]  ? __this_cpu_preempt_check+0x21/0x30
-> [   48.851950]  ? irqentry_exit+0x3e/0xa0
-> [   48.852254]  __xa_erase+0xc6/0x180
-> [   48.852524]  ? __pfx___xa_erase+0x10/0x10
-> [   48.852842]  ? __xa_erase+0xf1/0x180
-> [   48.853123]  ? sock_devmem_dontneed+0x42c/0x6d0
-> [   48.853480]  sock_devmem_dontneed+0x3a8/0x6d0
-> [   48.853829]  ? __pfx_sock_devmem_dontneed+0x10/0x10
-> [   48.854205]  ? trace_lock_acquire+0x139/0x1b0
-> [   48.854548]  ? lock_acquire+0x80/0xb0
-> [   48.854833]  ? __might_fault+0xf1/0x1b0
-> [   48.855133]  ? __might_fault+0xf1/0x1b0
-> [   48.855437]  ? __sanitizer_cov_trace_const_cmp8+0x1c/0x30
-> [   48.855849]  sk_setsockopt+0x480/0x3c60
-> [   48.856158]  ? __pfx_sk_setsockopt+0x10/0x10
-> [   48.856491]  ? __kasan_check_read+0x15/0x20
-> [   48.856814]  ? __lock_acquire+0x1b0f/0x5c90
-> [   48.857144]  ? __pfx___lock_acquire+0x10/0x10
-> [   48.857488]  sock_setsockopt+0x68/0x90
-> [   48.857785]  do_sock_setsockopt+0x3fb/0x480
-> [   48.858110]  ? __pfx_do_sock_setsockopt+0x10/0x10
-> [   48.858474]  ? lock_release+0x441/0x870
-> [   48.858776]  ? __sanitizer_cov_trace_const_cmp4+0x1a/0x20
-> [   48.859184]  ? fdget+0x188/0x230
-> [   48.859448]  __sys_setsockopt+0x131/0x200
-> [   48.859764]  ? __pfx___sys_setsockopt+0x10/0x10
-> [   48.860123]  ? seqcount_lockdep_reader_access.constprop.0+0xc0/0xd0
-> [   48.860598]  ? __sanitizer_cov_trace_cmp4+0x1a/0x20
-> [   48.860982]  ? ktime_get_coarse_real_ts64+0xbf/0xf0
-> [   48.861370]  __x64_sys_setsockopt+0xc6/0x160
-> [   48.861710]  ? syscall_trace_enter+0x14a/0x230
-> [   48.862057]  x64_sys_call+0x6cf/0x20d0
-> [   48.862350]  do_syscall_64+0x6d/0x140
-> [   48.862639]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [   48.863023] RIP: 0033:0x7f26cdc3ee5d
-> [   48.863301] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 4=
-8 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <=
-48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 93 af 1b 00 f7 d8 64 89 01 48
-> [   48.864659] RSP: 002b:00007fff33f36278 EFLAGS: 00000213 ORIG_RAX: 0000=
-000000000036
-> [   48.865223] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f26c=
-dc3ee5d
-> "
->
-> I hope you find it useful.
+Add support for reading SFP module info and digital diagnostic
+monitoring data if supported by the module. The only Aquantia
+controller without an integrated PHY is the AQC100 which belongs to
+the B0 revision, that's why it's only implemented there.
 
-Thank you for the report. I think I see the issue and I commented on
-the fix in the code below.
+The register information was extracted from a diagnostic tool made
+publicly available by Dell, but all code was written from scratch by me.
 
-Only issue is that this is unlucky timing for me. I have a flight
-tomorrow for a vacation where I think I may have internet access and
-may not. I will try to follow up here, but in case I can't, what's the
-urgency for this issue? Can this wait 2 weeks when I get back?
+This has been tested to work with a variety of both optical and direct
+attach modules I had lying around and seems to work fine with all of
+them, including the diagnostics if supported by an optical module.
+All tests have been done with an AQC100 on an TL-NT521F card on firmware
+version 3.1.121 (current at the time of this patch).
 
-> > +     if (optlen % sizeof(struct dmabuf_token) ||
-> > +         optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
-> > +             return -EINVAL;
-> > +
-> > +     tokens =3D kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
-> > +     if (!tokens)
-> > +             return -ENOMEM;
-> > +
+Signed-off-by: Lorenz Brun <lorenz@brun.one>
+---
+Changes in v2:
+* Style nits
+* Removed duplicate check for zero-length eeprom request
+* Use min() instead of min_t()
+* Use non-atomic polling, this is not in an atomic context
 
-There is an unrelated bug here. The first argument for kvmalloc_array
-is the number of elements, I think, not the number of bytes. So this
-should be:
+---
+ .../ethernet/aquantia/atlantic/aq_ethtool.c   |  75 ++++++++++
+ .../ethernet/aquantia/atlantic/aq_ethtool.h   |   8 ++
+ .../net/ethernet/aquantia/atlantic/aq_hw.h    |   3 +
+ .../aquantia/atlantic/hw_atl/hw_atl_b0.c      | 130 ++++++++++++++++++
+ .../aquantia/atlantic/hw_atl/hw_atl_llh.c     |  43 ++++++
+ .../aquantia/atlantic/hw_atl/hw_atl_llh.h     |  21 +++
+ .../atlantic/hw_atl/hw_atl_llh_internal.h     |  32 +++++
+ 7 files changed, 312 insertions(+)
 
-num_tokens =3D optlen / sizeof(struct dmabuf_token);
-tokens =3D kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
-if (!tokens)
-   return -ENOMEM;
-
-> > +
-> > +     if (copy_from_sockptr(tokens, optval, optlen)) {
-> > +             kvfree(tokens);
-> > +             return -EFAULT;
-> > +     }
-> > +
-> > +     xa_lock_bh(&sk->sk_user_frags);
-> > +     for (i =3D 0; i < num_tokens; i++) {
-> > +             for (j =3D 0; j < tokens[i].token_count; j++) {
-
-The bug should be here. tokens[i].token_count is a u32 provided by the
-user. The user can specify U32_MAX here, which will make the loop
-below spin for a very long time with the lock held, which should be
-the cause of the soft lockup.
-
-We should add a check that token_count is < MAX_DONTNEED_TOKENS or
-something like that, above this line.
-
-Please let me know of urgency. If this can't wait I'll try very hard
-to repro the issue/fix while I'm out. Untested fix I'm going to try
-out:
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 083d438d8b6f..cb3d8b19de14 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1071,11 +1071,11 @@ sock_devmem_dontneed(struct sock *sk,
-sockptr_t optval, unsigned int optlen)
-            optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
-                return -EINVAL;
-
--       tokens =3D kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
-+       num_tokens =3D optlen / sizeof(struct dmabuf_token);
-+       tokens =3D kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
-        if (!tokens)
-                return -ENOMEM;
-
--       num_tokens =3D optlen / sizeof(struct dmabuf_token);
-        if (copy_from_sockptr(tokens, optval, optlen)) {
-                kvfree(tokens);
-                return -EFAULT;
-@@ -1083,6 +1083,10 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t
-optval, unsigned int optlen)
-
-        xa_lock_bh(&sk->sk_user_frags);
-        for (i =3D 0; i < num_tokens; i++) {
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+index 440ff4616fec..ee809f96e9a4 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+@@ -15,6 +15,7 @@
+ #include "aq_macsec.h"
+ #include "aq_main.h"
+ 
++#include <linux/ethtool.h>
+ #include <linux/linkmode.h>
+ #include <linux/ptp_clock_kernel.h>
+ 
+@@ -977,6 +978,78 @@ static int aq_ethtool_set_phy_tunable(struct net_device *ndev,
+ 	return err;
+ }
+ 
++static int aq_ethtool_get_module_info(struct net_device *ndev,
++				      struct ethtool_modinfo *modinfo)
++{
++	struct aq_nic_s *aq_nic = netdev_priv(ndev);
++	u8 compliance_val, dom_type;
++	int err;
 +
-+               if (tokens[i].token_count > MAX_DONTNEED_TOKENS)
-+                       continue;
++	/* Module EEPROM is only supported for controllers with external PHY */
++	if (aq_nic->aq_nic_cfg.aq_hw_caps->media_type != AQ_HW_MEDIA_TYPE_FIBRE)
++		return -EOPNOTSUPP;
 +
-                for (j =3D 0; j < tokens[i].token_count; j++) {
-                        netmem_ref netmem =3D (__force netmem_ref)__xa_eras=
-e(
-                                &sk->sk_user_frags, tokens[i].token_start +=
- j);
++	if (!aq_nic->aq_hw_ops->hw_read_module_eeprom)
++		return -EOPNOTSUPP;
++
++	err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++		SFF_8472_ID_ADDR, SFF_8472_COMP_ADDR, 1, &compliance_val);
++	if (err)
++		return err;
++
++	err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++		SFF_8472_ID_ADDR, SFF_8472_DOM_TYPE_ADDR, 1, &dom_type);
++	if (err)
++		return err;
++
++	if (dom_type & SFF_8472_ADDRESS_CHANGE_REQ_MASK || compliance_val == 0x00) {
++		modinfo->type = ETH_MODULE_SFF_8079;
++		modinfo->eeprom_len = ETH_MODULE_SFF_8079_LEN;
++	} else {
++		modinfo->type = ETH_MODULE_SFF_8472;
++		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
++	}
++	return 0;
++}
++
++static int aq_ethtool_get_module_eeprom(struct net_device *ndev,
++					struct ethtool_eeprom *ee, unsigned char *data)
++{
++	int err;
++	unsigned int first, last, len;
++	struct aq_nic_s *aq_nic = netdev_priv(ndev);
++
++	if (!aq_nic->aq_hw_ops->hw_read_module_eeprom)
++		return -EOPNOTSUPP;
++
++	first = ee->offset;
++	last = ee->offset + ee->len;
++
++	if (first < ETH_MODULE_SFF_8079_LEN) {
++		len = min(last, ETH_MODULE_SFF_8079_LEN);
++		len -= first;
++
++		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++			SFF_8472_ID_ADDR, first, len, data);
++		if (err)
++			return err;
++
++		first += len;
++		data += len;
++	}
++	if (first < ETH_MODULE_SFF_8472_LEN && last > ETH_MODULE_SFF_8079_LEN) {
++		len = min(last, ETH_MODULE_SFF_8472_LEN);
++		len -= first;
++		first -= ETH_MODULE_SFF_8079_LEN;
++
++		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++			SFF_8472_DIAGNOSTICS_ADDR, first, len, data);
++		if (err)
++			return err;
++	}
++	return 0;
++}
++
+ const struct ethtool_ops aq_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+@@ -1014,4 +1087,6 @@ const struct ethtool_ops aq_ethtool_ops = {
+ 	.get_ts_info         = aq_ethtool_get_ts_info,
+ 	.get_phy_tunable     = aq_ethtool_get_phy_tunable,
+ 	.set_phy_tunable     = aq_ethtool_set_phy_tunable,
++	.get_module_info     = aq_ethtool_get_module_info,
++	.get_module_eeprom   = aq_ethtool_get_module_eeprom,
+ };
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h
+index 6d5be5ebeb13..f26fe1a75539 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h
+@@ -14,4 +14,12 @@
+ extern const struct ethtool_ops aq_ethtool_ops;
+ #define AQ_PRIV_FLAGS_MASK   (AQ_HW_LOOPBACK_MASK)
+ 
++#define SFF_8472_ID_ADDR 0x50
++#define SFF_8472_DIAGNOSTICS_ADDR 0x51
++
++#define SFF_8472_COMP_ADDR	0x5e
++#define SFF_8472_DOM_TYPE_ADDR	0x5c
++
++#define SFF_8472_ADDRESS_CHANGE_REQ_MASK 0x4
++
+ #endif /* AQ_ETHTOOL_H */
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
+index f010bda61c96..42c0efc1b455 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
+@@ -340,6 +340,9 @@ struct aq_hw_ops {
+ 	int (*hw_set_loopback)(struct aq_hw_s *self, u32 mode, bool enable);
+ 
+ 	int (*hw_get_mac_temp)(struct aq_hw_s *self, u32 *temp);
++
++	int (*hw_read_module_eeprom)(struct aq_hw_s *self, u8 dev_addr,
++				     u8 reg_start_addr, int len, u8 *data);
+ };
+ 
+ struct aq_fw_ops {
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c
+index 56c46266bb0a..413d77f5398d 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c
+@@ -1654,6 +1654,135 @@ static int hw_atl_b0_get_mac_temp(struct aq_hw_s *self, u32 *temp)
+ 	return 0;
+ }
+ 
++#define START_TRANSMIT 0x5001
++#define START_READ_TRANSMIT 0x5101
++#define STOP_TRANSMIT 0x3001
++#define REPEAT_TRANSMIT 0x1001
++#define REPEAT_NACK_TRANSMIT 0x1011
++
++static int hw_atl_b0_smb0_wait_result(struct aq_hw_s *self, bool expect_ack)
++{
++	int err;
++	u32 val;
++
++	err = readx_poll_timeout(hw_atl_smb0_byte_transfer_complete_get,
++				 self, val, val == 1, 100U, 10000U);
++	if (err)
++		return err;
++	if (hw_atl_smb0_receive_acknowledged_get(self) != expect_ack)
++		return -EIO;
++	return 0;
++}
++
++// Starts an I2C/SMBUS write to a given address. addr is in 7-bit format,
++// the read/write bit is not part of it.
++static int hw_atl_b0_smb0_start_write(struct aq_hw_s *self, u32 addr)
++{
++	hw_atl_smb0_tx_data_set(self, (addr << 1) | 0);
++	hw_atl_smb0_provisioning2_set(self, START_TRANSMIT);
++	return hw_atl_b0_smb0_wait_result(self, 0);
++}
++
++// Writes a single byte as part of an ongoing write started by start_write.
++static int hw_atl_b0_smb0_write_byte(struct aq_hw_s *self, u32 data)
++{
++	hw_atl_smb0_tx_data_set(self, data);
++	hw_atl_smb0_provisioning2_set(self, REPEAT_TRANSMIT);
++	return hw_atl_b0_smb0_wait_result(self, 0);
++}
++
++// Starts an I2C/SMBUS read to a given address. addr is in 7-bit format,
++// the read/write bit is not part of it.
++static int hw_atl_b0_smb0_start_read(struct aq_hw_s *self, u32 addr)
++{
++	int err;
++
++	hw_atl_smb0_tx_data_set(self, (addr << 1) | 1);
++	hw_atl_smb0_provisioning2_set(self, START_READ_TRANSMIT);
++	err = hw_atl_b0_smb0_wait_result(self, 0);
++	if (err)
++		return err;
++	if (hw_atl_smb0_repeated_start_detect_get(self) == 0)
++		return -EIO;
++	return 0;
++}
++
++// Reads a single byte as part of an ongoing read started by start_read.
++static int hw_atl_b0_smb0_read_byte(struct aq_hw_s *self)
++{
++	int err;
++
++	hw_atl_smb0_provisioning2_set(self, REPEAT_TRANSMIT);
++	err = hw_atl_b0_smb0_wait_result(self, 0);
++	if (err)
++		return err;
++	return hw_atl_smb0_rx_data_get(self);
++}
++
++// Reads the last byte of an ongoing read.
++static int hw_atl_b0_smb0_read_byte_nack(struct aq_hw_s *self)
++{
++	int err;
++
++	hw_atl_smb0_provisioning2_set(self, REPEAT_NACK_TRANSMIT);
++	err = hw_atl_b0_smb0_wait_result(self, 1);
++	if (err)
++		return err;
++	return hw_atl_smb0_rx_data_get(self);
++}
++
++// Sends a stop condition and ends a transfer.
++static void hw_atl_b0_smb0_stop(struct aq_hw_s *self)
++{
++	hw_atl_smb0_provisioning2_set(self, STOP_TRANSMIT);
++}
++
++static int hw_atl_b0_read_module_eeprom(struct aq_hw_s *self, u8 dev_addr,
++					u8 reg_start_addr, int len, u8 *data)
++{
++	int err;
++	int i, b;
++	u32 val;
++
++	/* Wait for SMBUS0 to be idle */
++	err = readx_poll_timeout(hw_atl_smb0_bus_busy_get, self,
++				 val, val == 0, 100U, 10000U);
++	if (err)
++		return err;
++
++	err = hw_atl_b0_smb0_start_write(self, dev_addr);
++	if (err)
++		goto out;
++
++	err = hw_atl_b0_smb0_write_byte(self, reg_start_addr);
++	if (err)
++		goto out;
++
++	err = hw_atl_b0_smb0_start_read(self, dev_addr);
++	if (err)
++		goto out;
++
++	for (i = 0; i < len - 1; i++) {
++		b = hw_atl_b0_smb0_read_byte(self);
++		if (b < 0) {
++			err = b;
++			goto out;
++		}
++		data[i] = (u8)b;
++	}
++
++	b = hw_atl_b0_smb0_read_byte_nack(self);
++	if (b < 0) {
++		err = b;
++		goto out;
++	}
++	data[i] = (u8)b;
++
++out:
++	hw_atl_b0_smb0_stop(self);
++	return err;
++}
++
+ const struct aq_hw_ops hw_atl_ops_b0 = {
+ 	.hw_soft_reset        = hw_atl_utils_soft_reset,
+ 	.hw_prepare           = hw_atl_utils_initfw,
+@@ -1712,4 +1841,5 @@ const struct aq_hw_ops hw_atl_ops_b0 = {
+ 	.hw_set_fc               = hw_atl_b0_set_fc,
+ 
+ 	.hw_get_mac_temp         = hw_atl_b0_get_mac_temp,
++	.hw_read_module_eeprom   = hw_atl_b0_read_module_eeprom,
+ };
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
+index 7b67bdd8a258..d07af1271d59 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
+@@ -57,6 +57,49 @@ u32 hw_atl_ts_data_get(struct aq_hw_s *aq_hw)
+ 				  HW_ATL_TS_DATA_OUT_SHIFT);
+ }
+ 
++u32 hw_atl_smb0_bus_busy_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_BUS_BUSY_ADR,
++				HW_ATL_SMB0_BUS_BUSY_MSK,
++				HW_ATL_SMB0_BUS_BUSY_SHIFT);
++}
++
++u32 hw_atl_smb0_byte_transfer_complete_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_ADR,
++				HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_MSK,
++				HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_SHIFT);
++}
++
++u32 hw_atl_smb0_receive_acknowledged_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_RX_ACKNOWLEDGED_ADR,
++				HW_ATL_SMB0_RX_ACKNOWLEDGED_MSK,
++				HW_ATL_SMB0_RX_ACKNOWLEDGED_SHIFT);
++}
++
++u32 hw_atl_smb0_repeated_start_detect_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_REPEATED_START_DETECT_ADR,
++				HW_ATL_SMB0_REPEATED_START_DETECT_MSK,
++				HW_ATL_SMB0_REPEATED_START_DETECT_SHIFT);
++}
++
++u32 hw_atl_smb0_rx_data_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg(aq_hw, HW_ATL_SMB0_RECEIVED_DATA_ADR);
++}
++
++void hw_atl_smb0_tx_data_set(struct aq_hw_s *aq_hw, u32 data)
++{
++	return aq_hw_write_reg(aq_hw, HW_ATL_SMB0_TRANSMITTED_DATA_ADR, data);
++}
++
++void hw_atl_smb0_provisioning2_set(struct aq_hw_s *aq_hw, u32 data)
++{
++	return aq_hw_write_reg(aq_hw, HW_ATL_SMB0_PROVISIONING2_ADR, data);
++}
++
+ /* global */
+ void hw_atl_reg_glb_cpu_sem_set(struct aq_hw_s *aq_hw, u32 glb_cpu_sem,
+ 				u32 semaphore)
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h
+index 58f5ee0a6214..5fd506acacb5 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h
+@@ -34,6 +34,27 @@ u32 hw_atl_ts_ready_latch_high_get(struct aq_hw_s *aq_hw);
+ /* get temperature sense data */
+ u32 hw_atl_ts_data_get(struct aq_hw_s *aq_hw);
+ 
++/* SMBUS0 bus busy */
++u32 hw_atl_smb0_bus_busy_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 byte transfer complete */
++u32 hw_atl_smb0_byte_transfer_complete_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 receive acknowledged */
++u32 hw_atl_smb0_receive_acknowledged_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 set transmitted data (only leftmost byte of data valid) */
++void hw_atl_smb0_tx_data_set(struct aq_hw_s *aq_hw, u32 data);
++
++/* SMBUS0 provisioning2 command register */
++void hw_atl_smb0_provisioning2_set(struct aq_hw_s *aq_hw, u32 data);
++
++/* SMBUS0 repeated start detect */
++u32 hw_atl_smb0_repeated_start_detect_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 received data register */
++u32 hw_atl_smb0_rx_data_get(struct aq_hw_s *aq_hw);
++
+ /* global */
+ 
+ /* set global microprocessor semaphore */
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h
+index 4a6467031b9e..fce30d90b6cb 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h
+@@ -42,6 +42,38 @@
+ #define HW_ATL_TS_DATA_OUT_SHIFT 0
+ #define HW_ATL_TS_DATA_OUT_WIDTH 12
+ 
++/* SMBUS0 Received Data register */
++#define HW_ATL_SMB0_RECEIVED_DATA_ADR 0x00000748
++/* SMBUS0 Transmitted Data register */
++#define HW_ATL_SMB0_TRANSMITTED_DATA_ADR 0x00000608
++
++/* SMBUS0 Global Provisioning 2 register */
++#define HW_ATL_SMB0_PROVISIONING2_ADR 0x00000604
++
++/* SMBUS0 Bus Busy Bitfield Definitions */
++#define HW_ATL_SMB0_BUS_BUSY_ADR 0x00000744
++#define HW_ATL_SMB0_BUS_BUSY_MSK 0x00000080
++#define HW_ATL_SMB0_BUS_BUSY_SHIFT 7
++#define HW_ATL_SMB0_BUS_BUSY_WIDTH 1
++
++/* SMBUS0 Byte Transfer Complete Bitfield Definitions */
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_ADR 0x00000744
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_MSK 0x00000002
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_SHIFT 1
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_WIDTH 1
++
++/* SMBUS0 Receive Acknowledge Bitfield Definitions */
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_ADR 0x00000744
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_MSK 0x00000100
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_SHIFT 8
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_WIDTH 1
++
++/* SMBUS0 Repeated Start Detect Bitfield Definitions */
++#define HW_ATL_SMB0_REPEATED_START_DETECT_ADR 0x00000744
++#define HW_ATL_SMB0_REPEATED_START_DETECT_MSK 0x00000004
++#define HW_ATL_SMB0_REPEATED_START_DETECT_SHIFT 2
++#define HW_ATL_SMB0_REPEATED_START_DETECT_WIDTH 1
++
+ /* global microprocessor semaphore  definitions
+  * base address: 0x000003a0
+  * parameter: semaphore {s} | stride size 0x4 | range [0, 15]
+-- 
+2.44.1
 
---=20
-Thanks,
-Mina
 
