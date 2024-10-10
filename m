@@ -1,179 +1,149 @@
-Return-Path: <netdev+bounces-134310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C00E998C40
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E15F5998B26
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A4E1B36606
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:14:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6751C24674
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDEC41CC16C;
-	Thu, 10 Oct 2024 15:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394952C6BB;
+	Thu, 10 Oct 2024 15:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0yhkLS5"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="T3Eofcci"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87521CC16A
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAEE1BFDEB
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728573176; cv=none; b=XPWfUn3vR8uSiSZ18XCOBYgEPUAHDaDaUEF0dA6EVQNaEzTy07FiYTVPIAz3cDgYI6dqoNG+/6+VVtPAA6V74bBTZj5PV2gCpL56xJg6nhDnO8r1GCyNWsLVKGoIMYEpBIMf3/VQhIqIZ3aJHz2Pv9FsC9f7uIdkrHGZY0lOrdE=
+	t=1728573336; cv=none; b=GlBQooTU3BnA5QKFsGyNiYzRUXQ6XLJsInRQhW32DV5Jel2C6LNEQKqhq8KAxtuv8TmfImRqXseuwOZk3d/5vPvSTHHIrvv4uURQ8LUeQE1f0KBil1aKwAIfnsrMQ1hp7RidK3JrAGqy9gWVFt0ORkO5ZIt/PgzIkcG+L96gHqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728573176; c=relaxed/simple;
-	bh=b8l3MYI0KQ0pzc1btVYRmPz6q2XTI0LdCDidezpwqcQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jhxjCwvIT8P+HfalkzXZQyPtjGHhZ+2KON8yjWw7oru6iSUDa0l3WVouxRgbytNIevCehEH6UIquqU/BBF9iYUgrNvE1wADlVDIEax2D5vsTdwiHuMSi03L6bX/RoetLRBTZmB96/SA8SvnhKekukSWx3JrCvo7V+U6xH+A5Odc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0yhkLS5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D53C4CEC5;
-	Thu, 10 Oct 2024 15:12:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728573176;
-	bh=b8l3MYI0KQ0pzc1btVYRmPz6q2XTI0LdCDidezpwqcQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=C0yhkLS5L778Ns9rerfGwjZQhdIFm9do4Sb92cXy76ZhIAqUQZjNavIuAymCkHa0A
-	 mBwFvu6otBo8pTvNGLSWUbAqhSos/GdAZBqrZBxuXvl7tzc3G4KHrpct5SStbRvk9B
-	 7AIUaL34ucjHMgFc+f+7OEIg3Q1aN37HY+9P2+x6g1Yunioiclyx0oRFn8AQDaGCSe
-	 q9zlUO8XlN0IqbsHhKsrOnjQ0PX8VQ8kKHBWhGCINwgwAneg2CX/w/dAYEEy1d4YTG
-	 6q7GXJrorZhuH43cyDL7eIVYm88dgpxXTZ/nyVJP+y9YqNnh162R0BUrun4OJzxHh3
-	 nTkSJCYf0l8jg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jdamato@fastly.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] tools: ynl-gen: use names of constants in generated limits
-Date: Thu, 10 Oct 2024 08:12:48 -0700
-Message-ID: <20241010151248.2049755-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1728573336; c=relaxed/simple;
+	bh=dqv56F5p2mdifL8zO+qci9lkhNNOL4e99MU0MjciAkI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mm+YLN1Zfw/a7X3zCPToqyrmXy8Vxlvqe+iiRTJ+O7vp2yZOPDwf2XYd8UJ66GCnyajowAo+roShHirYYHdVcNupASIjhaqPimA6jd19z8OTOWtrL2UxVmqEehZnt3dyN1sm7j+uo8kty/AZqmo/KIyKnG3Skeeys7DK2JY6lO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=T3Eofcci; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a3a03399fbso5928845ab.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:15:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728573333; x=1729178133; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VurnIyQe6BUgz/A+1slxdmxDT8lrNtE5+PtU4B5g+ZQ=;
+        b=T3Eofcci82iRPGCp+cpMwEfTK2wNJXTdwDJITRotwMCdhEz/HbYb79caMVZQctMmOa
+         SO4KW1+Iel5kuMMmNE0BXuapJKOg7e1dWgBr2AxbDWd3Vq+8U0lhgzY42o9hz0H3yAua
+         swv/cgqv6D7HQ4y6UOyWVlVlAYPboNUCeU9baT1dcC50LSFYLeW+JA9GSo4Yq8Kz1XEq
+         VFN2JTbDcnPXsPwvDrqs/mb9AJ9B0DV8xgJ29VeW+MSCe/zndP/eHjZJIthLt6puqTZL
+         wF6GVKiKLW4t6CXAZYjWp1ewbvkmDN9ub19sI33DEEL9DSkewNw095iEGRa6/LmKISR4
+         sRTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728573333; x=1729178133;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VurnIyQe6BUgz/A+1slxdmxDT8lrNtE5+PtU4B5g+ZQ=;
+        b=uOyKFcPJ0cEekdagT44AMzZDeSjgWeuhP1KMoBOzxF6pVV8pRGcxoLodZzajXvVfAC
+         lHPbKRZWyLZCdQGkSafUEYkBYwEC8Tky+KxXUng9uZl5Grs/EbeHGEALM7Lx4dMi2SQy
+         nasq5e3tAdruiVco8osEuXLyetf5zewmj1bnxqRI6SJldooT7Qs1zcoX99CsLmZsZc50
+         twzAREbITILh9mP678UdWfhz8q+ymT6PdzRfcVKTBlxEolbfvrq44GeoOmKJaD8M0tJx
+         RoDJJSyHeCqyPqbfXUhoo5+aURu2pIiT9a86fTD/a005iDMdvpFlXVcSKFenPjDeSsUk
+         cvMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFy6yrurX8hxqbUSw4KUHQmnqQ3UqtvQMKKQgS3puZpqLojraUFUj41kTi2MAe9WuXqHZWd9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxREpypDtBN3etotGtscsqOOwoHFwU2nRwBFxQtmblfGy7Tu34c
+	12wsQe0sITStL+bz4mkan+bmgk1HaTFT4wyoHQCOWEYE16McEa92JOqKZSfUt6U=
+X-Google-Smtp-Source: AGHT+IG4IRz9l2JEioTTHbM8YIFvgA0hLl48difILQmjUmIugOIvdPAFjxjO4kf/1OS5dYC9/nT4FQ==
+X-Received: by 2002:a05:6e02:58a:b0:3a3:a5c5:3915 with SMTP id e9e14a558f8ab-3a3a5c53af9mr33703855ab.16.1728573333169;
+        Thu, 10 Oct 2024 08:15:33 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbada84a35sm279876173.117.2024.10.10.08.15.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Oct 2024 08:15:32 -0700 (PDT)
+Message-ID: <eac28bf4-edf6-4df7-8b74-f9eb9811f141@kernel.dk>
+Date: Thu, 10 Oct 2024 09:15:31 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
+To: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <2e475d9f-8d39-43f4-adc5-501897c951a8@kernel.dk>
+ <93036b67-018a-44fb-8d12-7328c58be3c4@kernel.org>
+ <2144827e-ad7e-4cea-8e38-05fb310a85f5@kernel.dk>
+ <3b2646d6-6d52-4479-b082-eb6264e8d6f7@kernel.org>
+ <57391bd9-e56e-427c-9ff0-04cb49d2c6d8@kernel.dk>
+ <d0ba9ba9-8969-4bf6-a8c7-55628771c406@kernel.dk>
+ <b8fd4a5b-a7eb-45a7-a2f4-fce3b149bd5b@kernel.dk>
+ <7f8c6192-3652-4761-b2e3-8a4bddb71e29@kernel.dk>
+ <8ec09781-5d6b-4d9b-b29d-a0698bcff5fe@kernel.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <8ec09781-5d6b-4d9b-b29d-a0698bcff5fe@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-YNL specs can use string expressions for limits, like s32-min
-or u16-max. We convert all of those into their numeric values
-when generating the code, which isn't always helpful. Try to
-retain the string representations in the output. Any sort of
-calculations still need the integers.
+On 10/10/24 9:03 AM, David Ahern wrote:
+> On 10/10/24 8:21 AM, Jens Axboe wrote:
+>>> which adds zc send. I ran a quick test, and it does reduce cpu
+>>> utilization on the sender from 100% to 95%. I'll keep poking...
+>>
+>> Update on this - did more testing and the 100 -> 95 was a bit of a
+>> fluke, it's still maxed. So I added io_uring send and sendzc support to
+>> kperf, and I still saw the sendzc being maxed out sending at 100G rates
+>> with 100% cpu usage.
+>>
+>> Poked a bit, and the reason is that it's all memcpy() off
+>> skb_orphan_frags_rx() -> skb_copy_ubufs(). At this point I asked Pavel
+>> as that made no sense to me, and turns out the kernel thinks there's a
+>> tap on the device. Maybe there is, haven't looked at that yet, but I
+>> just killed the orphaning and tested again.
+>>
+>> This looks better, now I can get 100G line rate from a single thread
+>> using io_uring sendzc using only 30% of the single cpu/thread (including
+>> irq time). That is good news, as it unlocks being able to test > 100G as
+>> the sender is no longer the bottleneck.
+>>
+>> Tap side still a mystery, but it unblocked testing. I'll figure that
+>> part out separately.
+>>
+> 
+> Thanks for the update. 30% cpu is more inline with my testing.
+> 
+> For the "tap" you need to make sure no packet socket applications are
+> running -- e.g., lldpd is a typical open I have a seen in tests. Check
+> /proc/net/packet
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/core/netdev-genl-gen.c |  4 ++--
- tools/net/ynl/ynl-gen-c.py | 36 +++++++++++++++++++++++-------------
- 2 files changed, 25 insertions(+), 15 deletions(-)
+Here's what I see:
 
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index b28424ae06d5..226a7e2c023c 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -14,12 +14,12 @@
- /* Integer value ranges */
- static const struct netlink_range_validation netdev_a_page_pool_id_range = {
- 	.min	= 1ULL,
--	.max	= 4294967295ULL,
-+	.max	= U32_MAX,
- };
- 
- static const struct netlink_range_validation netdev_a_page_pool_ifindex_range = {
- 	.min	= 1ULL,
--	.max	= 2147483647ULL,
-+	.max	= S32_MAX,
- };
- 
- /* Common nested types */
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 9e8254aad578..d64cb2b49c44 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -80,11 +80,21 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         value = self.checks.get(limit, default)
-         if value is None:
-             return value
--        elif value in self.family.consts:
-+        if isinstance(value, int):
-+            return value
-+        if value in self.family.consts:
-+            raise Exception("Resolving family constants not implemented, yet")
-+        return limit_to_number(value)
-+
-+    def get_limit_str(self, limit, default=None, suffix=''):
-+        value = self.checks.get(limit, default)
-+        if value is None:
-+            return ''
-+        if isinstance(value, int):
-+            return str(value) + suffix
-+        if value in self.family.consts:
-             return c_upper(f"{self.family['name']}-{value}")
--        if not isinstance(value, int):
--            value = limit_to_number(value)
--        return value
-+        return c_upper(value)
- 
-     def resolve(self):
-         if 'name-prefix' in self.attr:
-@@ -358,11 +368,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         elif 'full-range' in self.checks:
-             return f"NLA_POLICY_FULL_RANGE({policy}, &{c_lower(self.enum_name)}_range)"
-         elif 'range' in self.checks:
--            return f"NLA_POLICY_RANGE({policy}, {self.get_limit('min')}, {self.get_limit('max')})"
-+            return f"NLA_POLICY_RANGE({policy}, {self.get_limit_str('min')}, {self.get_limit_str('max')})"
-         elif 'min' in self.checks:
--            return f"NLA_POLICY_MIN({policy}, {self.get_limit('min')})"
-+            return f"NLA_POLICY_MIN({policy}, {self.get_limit_str('min')})"
-         elif 'max' in self.checks:
--            return f"NLA_POLICY_MAX({policy}, {self.get_limit('max')})"
-+            return f"NLA_POLICY_MAX({policy}, {self.get_limit_str('max')})"
-         return super()._attr_policy(policy)
- 
-     def _attr_typol(self):
-@@ -413,11 +423,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
- 
-     def _attr_policy(self, policy):
-         if 'exact-len' in self.checks:
--            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
-+            mem = 'NLA_POLICY_EXACT_LEN(' + self.get_limit_str('exact-len') + ')'
-         else:
-             mem = '{ .type = ' + policy
-             if 'max-len' in self.checks:
--                mem += ', .len = ' + str(self.get_limit('max-len'))
-+                mem += ', .len = ' + self.get_limit_str('max-len')
-             mem += ', }'
-         return mem
- 
-@@ -476,9 +486,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         if len(self.checks) == 0:
-             mem = '{ .type = NLA_BINARY, }'
-         elif 'exact-len' in self.checks:
--            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
-+            mem = 'NLA_POLICY_EXACT_LEN(' + self.get_limit_str('exact-len') + ')'
-         elif 'min-len' in self.checks:
--            mem = '{ .len = ' + str(self.get_limit('min-len')) + ', }'
-+            mem = '{ .len = ' + self.get_limit_str('min-len') + ', }'
- 
-         return mem
- 
-@@ -2166,9 +2176,9 @@ _C_KW = {
-             cw.block_start(line=f'static const struct netlink_range_validation{sign} {c_lower(attr.enum_name)}_range =')
-             members = []
-             if 'min' in attr.checks:
--                members.append(('min', str(attr.get_limit('min')) + suffix))
-+                members.append(('min', attr.get_limit_str('min', suffix=suffix)))
-             if 'max' in attr.checks:
--                members.append(('max', str(attr.get_limit('max')) + suffix))
-+                members.append(('max', attr.get_limit_str('max', suffix=suffix)))
-             cw.write_struct_init(members)
-             cw.block_end(line=';')
-             cw.nl()
+sk               RefCnt Type Proto  Iface R Rmem   User   Inode
+0000000078c66cbc 3      3    0003   2     1 0      0      112645
+00000000558db352 3      3    0003   2     1 0      0      109578
+00000000486837f4 3      3    0003   4     1 0      0      109580
+00000000f7c6edd6 3      3    0003   4     1 0      0      22563 
+000000006ec0363c 3      3    0003   2     1 0      0      22565 
+0000000095e63bff 3      3    0003   5     1 0      0      22567 
+
+was just now poking at what could be causing this. This is a server box,
+nothing really is running on it... The nic in question is ifindex 2.
+
 -- 
-2.46.2
-
+Jens Axboe
 
