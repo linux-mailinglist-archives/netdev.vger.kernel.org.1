@@ -1,120 +1,162 @@
-Return-Path: <netdev+bounces-134094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C49997DE5
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:56:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B860D997F1C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54281C23D72
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 06:56:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72774283869
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30BF1B3724;
-	Thu, 10 Oct 2024 06:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J9qSgYTd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59311CC166;
+	Thu, 10 Oct 2024 07:08:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CE51AF4E9;
-	Thu, 10 Oct 2024 06:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED421CC160;
+	Thu, 10 Oct 2024 07:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728543409; cv=none; b=GinehJCFy2EfM54Encjd2QorFR5D35KcNmwe6WUW6ZUR+P30479iXeOFq6VIh6hS8cH0uorFZS06sNTRCOSCc1Csya8CfyM8W3yJO3pFM+BSYvn+g9zXm8xMh3ZvQt79g/ydE8xEiRYfObEUlSWVyJJlN6/KqGsNpiBzc0/jHxk=
+	t=1728544126; cv=none; b=OGR1+XN7LAud+14X9nUCdEjYtDZaANcKucMpCRsDbDR5VH46ljyqnC60IrF6SpERK5aKY3vSUwWE+wUCWgZd0YCSr2/kut3n8T2nq9NU6b8SjBcv0ULBivHOenkwp5ZbiM30Q0oh1fcPC6PNjpINs74FMToxfL5vNE3KZk1R8P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728543409; c=relaxed/simple;
-	bh=cy3dmLJVjnxYBPUZzXcZckNbRvsLdNJPqrIFM83whYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Hmx3ry5955eBV9NwVBvNcCTRBJTdTFCoKrEKlSKbIMNmJV2+t1HGk38gELushd82saHrKqTwdDnq4rQDenvrdvcptniycnCYLlppKoYQKsrLMdOmHSgJhnbf/wikUlP2OW/A/XnXVYRDGV9AhMi7HpZeF26e121QvHZ8dgjHy1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J9qSgYTd; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A1bRZL011409;
-	Thu, 10 Oct 2024 06:56:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	TNdHe2AX2/Z67IOyFyFTmoORdiXJ9Q0adZPMXwZvNZ4=; b=J9qSgYTdYbyV/Yf0
-	lZHpIrSHtaXdZcST5owlvnSZSPnFYCIaRzDlzQ2gk5c5jvr68pRIXdK3XcW7y6mu
-	rzyd2tKlTL9LaOyknY98pvzdREuxG48Hbn9pAfvjchP+0vKljGExahNzlbsGA+97
-	2dKLc4qQ+Bem94MjjKEU6HmeroSGI1ja5N+gCBO9Lq1cCo8LfcAhq+ont9QO4G7H
-	W38cyx9kCohu67ZH1ZsLR9W+Wkx3Q13whONMeZXaaOQADZG8J1yj48UziWykfGWV
-	SYk2U3sfCCSNHplF54iwm6SHTTsLBwPJUZ88yd5LWQchuhZp0txdE+zhje3gI0g7
-	tHDF5A==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 425xthsgp7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 06:56:44 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49A6uh6Z000703
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 06:56:43 GMT
-Received: from [10.253.78.114] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 9 Oct 2024
- 23:56:38 -0700
-Message-ID: <7636f943-d8a4-46ed-a9a1-f4c839a6fc3f@quicinc.com>
-Date: Thu, 10 Oct 2024 14:56:35 +0800
+	s=arc-20240116; t=1728544126; c=relaxed/simple;
+	bh=0mHBn27Gk9XwRvdcLUXt8GP/u9sorgQCzEHdG/01jro=;
+	h=From:To:CC:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NYiujHvKgbnz0UKQNHtDlqWChJ6BaMrRQZfiYo+w17iKBBPpLSLHkuxH+QdLImf+nkvu5HYttAhqwT3rr5RhXtxNe4au8Qy69F6DaSbLDtarCnEcTNTBXfu1AxGzfIwSqXyzWruLWiy/iJjsNU5/PA7o0sQcfQfPdfYL9O7yIU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XPLRN0BJhz6F95c;
+	Thu, 10 Oct 2024 15:07:12 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id DF73B140519;
+	Thu, 10 Oct 2024 15:08:31 +0800 (CST)
+Received: from GurSIX1 (10.204.104.168) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 10 Oct
+ 2024 09:08:25 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
+References: <67054127bb083_18b21e2943f@willemb.c.googlers.com.notmuch> <20241009065837.354332-1-gur.stavi@huawei.com> <67068a44bff02_1cca3129431@willemb.c.googlers.com.notmuch> <002201db1a75$9a83b420$cf8b1c60$@huawei.com> <67072012c983a_1e805629421@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67072012c983a_1e805629421@willemb.c.googlers.com.notmuch>
+Subject: RE: [PATCH net-next v02 1/2] af_packet: allow fanout_add when socket is not RUNNING
+Date: Thu, 10 Oct 2024 10:08:18 +0300
+Message-ID: <002701db1ae3$368d9b70$a3a8d250$@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] dt-bindings: arm: qcom: add qcs8300-ride Rev 2
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>
-References: <20241010-dts_qcs8300-v1-0-bf5acf05830b@quicinc.com>
- <20241010-dts_qcs8300-v1-1-bf5acf05830b@quicinc.com>
- <znm4hf6pjalknristwhp7kuxyxjt7dchwq42bpubcoxaof6ksx@gxvcxt6joauo>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <znm4hf6pjalknristwhp7kuxyxjt7dchwq42bpubcoxaof6ksx@gxvcxt6joauo>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ZiWIRtikK3fPQhJZDdoTGu2thyp3q6wo
-X-Proofpoint-GUID: ZiWIRtikK3fPQhJZDdoTGu2thyp3q6wo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 suspectscore=0 spamscore=0 priorityscore=1501 bulkscore=0
- phishscore=0 clxscore=1015 mlxlogscore=789 impostorscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410100044
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHbGWzwQMZqw76ooUWOpIJuIeDZyLJ8x9WAgAEVHYCAAHM4AIAA1CkdgABhFHA=
+Content-Language: en-us
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-
-
-On 2024-10-10 14:16, Krzysztof Kozlowski wrote:
-> On Thu, Oct 10, 2024 at 10:57:15AM +0800, Yijie Yang wrote:
->> Document the compatible for revision 2 of the qcs8300-ride board.
+> Gur Stavi wrote:
+> > > Gur Stavi wrote:
+> > > > >> @@ -1846,21 +1846,21 @@ static int fanout_add(struct sock *sk,
+> > > struct fanout_args *args)
+> > > > >>  	err = -EINVAL;
+> > > > >>
+> > > > >>  	spin_lock(&po->bind_lock);
+> > > > >> -	if (packet_sock_flag(po, PACKET_SOCK_RUNNING) &&
+> > > > >> -	    match->type == type &&
+> > > > >> +	if (match->type == type &&
+> > > > >>  	    match->prot_hook.type == po->prot_hook.type &&
+> > > > >>  	    match->prot_hook.dev == po->prot_hook.dev) {
+> > > > >
+> > > > > Remaining unaddressed issue is that the socket can now be added
+> > > > > before being bound. See comment in v1.
+> > > >
+> > > > I extended the psock_fanout test with unbound fanout test.
+> > > >
+> > > > As far as I understand, the easiest way to verify bind is to test
+> that
+> > > > po->prot_hook.dev != NULL, since we are under a bind_lock anyway.
+> > > > But perhaps a more readable and direct approach to test "bind"
+> would be
+> > > > to test po->ifindex != -1, as ifindex is commented as "bound
+> device".
+> > > > However, at the moment ifindex is not initialized to -1, I can add
+> such
+> > > > initialization, but perhaps I do not fully understand all the
+> logic.
+> > > >
+> > > > Any preferences?
+> > >
+> > > prot_hook.dev is not necessarily set if a packet socket is bound.
+> > > It may be bound to any device. See dev_add_pack and ptype_head.
+> > >
+> > > prot_hook.type, on the other hand, must be set if bound and is only
+> > > modified with the bind_lock held too.
+> > >
+> > > Well, and in packet_create. But setsockopt PACKET_FANOUT_ADD also
+> > > succeeds in case bind() was not called explicitly first to bind to
+> > > a specific device or change ptype.
+> >
+> > Please clarify the last paragraph? When you say "also succeeds" do you
+> > mean SHOULD succeed or MAY SUCCEED by mistake if "something" happens
+> ???
 > 
-> What are the differences? That's what you have commit msg for.
+> I mean it succeeds currently. Which behavior must then be maintained.
+> 
+> > Do you refer to the following scenario: socket is created with non-zero
+> > protocol and becomes RUNNING "without bind" for all devices. In that
+> case
+> > it can be added to FANOUT without bind. Is that considered a bug or
+> does
+> > the bind requirement for fanout only apply for all-protocol (0)
+> sockets?
+> 
+> I'm beginning to think that this bind requirement is not needed.
 
-Revision 2 has a different EPHY, identical to the one in sa8775p-ride 
-revision 3. I will document this in the commit message.
+I agree with that. I think that is an historical mistake that socket
+becomes implicitly bound to all interfaces if a protocol is defined
+during create. Without this bind requirement would make sense.
 
 > 
-> Best regards,
-> Krzysztof
+> All type and dev are valid, even if an ETH_P_NONE fanout group would
+> be fairly useless.
+
+Fanout is all about RX, I think that refusing fanout for socket that
+will not receive any packet is OK. The condition can be:
+if (po->ifindex == -1 || !po->num)
+
+I realized another possible problem. We should consider adding ifindex
+Field to struct packet_fanout to be used for lookup of an existing match.
+There is little sense to bind sockets to different interfaces and then
+put them in the same fanout group.
+If you agree, I can prepare a separate patch for that.
+
+> The type and dev must match that of the fanout group, and once added
+> to a fanout group can no longer be changed (bind will fail).
 > 
+> I briefy considered the reason might be max_num_members accounting.
+> Since f->num_members counts running sockets. But that is not used
+> when tracking membership of the group, sk_ref is. Every packet socket
+> whose po->rollover is increased increases this refcount.
+> 
+> > What about using ifindex to detect bind? Initialize it to -1 in
+> > packet_create and ensure that packet_do_bind, on success, sets it
+> > to device id or 0?
+> >
+> > psock_fanout, should probably be extended with scenarios that test
+> > "all devices" and all/specific protocols. Any specific scenario
+> > suggestions?
+> >
+> >
+> 
+
 
 
