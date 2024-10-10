@@ -1,137 +1,139 @@
-Return-Path: <netdev+bounces-134319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3B4998C3E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A64F998C91
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B3371F21274
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:48:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 586DC1C24506
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EFD1CCB59;
-	Thu, 10 Oct 2024 15:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EB71CCEE3;
+	Thu, 10 Oct 2024 15:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpjEzUaQ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="AQ5s48re"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB46E7DA62;
-	Thu, 10 Oct 2024 15:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725811C9B63
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728575130; cv=none; b=LOP+hhB/3+ZeqLn5CE9eOr9BbBO4e51vIP/2+tOekGbc9wo0QR8BqP6r4Ze7dKlYWFtTYqztpxD2rR/BY4wvj9XWF7ZQtABY/UWVAx+c4a/YCJYQ8qJ0QAMdjUN3kryIudyfqgFhjv4+y0iqjCL2aC1MzIWCqn5rpAKb5wzD0ds=
+	t=1728575976; cv=none; b=ZMkafNZwiL1g9t4CwpxUapw9robrJcWSLUhzeA9qO8bcDbyGIV7WUvAKSJAX8dfN5WWUOqW6WZ4l1jGsTQo/hcoy3CytOeedfVp00wlsqPch7O7IHG2u48yi6TBQL4MJ65GwdbsrV0becC14tAvN8Cu3XIHfjiuWTvi8xorf1vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728575130; c=relaxed/simple;
-	bh=FaZgrYXc5o2/CBC9caeUU0JWFjKlCFfVDG+pD5/WsRs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=KKzpVbdc3B9QG1ArasfnyYv7wve+E3m0ohlPiCb6ZKGytRLdgZERase1nkSyml1ptsasr2LsKIh8uP2czouWYcY9kBQURsG6SgGbLBa2hI7c2umYPS1qlZnu+aPbWv+TiZGUQo/DJ9SfmhRMKqQClmiTP99eAArrYsJuCiYga3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hpjEzUaQ; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c942815197so276363a12.1;
-        Thu, 10 Oct 2024 08:45:27 -0700 (PDT)
+	s=arc-20240116; t=1728575976; c=relaxed/simple;
+	bh=PfZeNcFw1bT/pN+WBxONE28O+RahXMikU7YuitEDd84=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MJYNFYjhRaUEsZi9C6UeT0dShxa72PHNtSrbZtb9q5fHBMTVIBfIcyW+2pOWEScaWQBm05cAimLfCBGPlVMaF9nV4jXK0xa7ZMjFQFIG0HdvIU+YIaU3g8sa1sH3+K3m3vIBvgJilvNt2aMbKvEgcD0YWvm3SnWkCgMVtQs0tnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=AQ5s48re; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3e039889ca0so621825b6e.3
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:59:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728575126; x=1729179926; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jTc+I2w2hhlqIY2pAipx9CwfTckiLBy2dTG4NBsK3Ek=;
-        b=hpjEzUaQrRy9xTK2WEfINKwK5BrIS52ZDjAAUEAxyaG+zZ4Dep/66dxaoGCfXkp7EJ
-         YpZ5b2j1XrCJtepvmcGVAQBY6e8iVdDGuZ4vn9M4RiCrMv1C6j8dkBkwJQ4pkoLL0xdH
-         bilG3fqBw6Y9Vw/FVMN5pjnfY/tTuc7FjbrojRIOR+lH/grAGUgwEYF+tMqeFfryJz0K
-         vcbxbmh814VJCA8/lxzoKmJtsd5nZVvdvXUgMfRoNH2mmV05aUufakPsk70wwK/2eK7e
-         klmA+rx/McD6ynrsFAu8O+jSSQ6Mlf9nmRnZlqUO0wH929rNAIBq/NktpyrN6TxP9TKN
-         FcPQ==
+        d=fastly.com; s=google; t=1728575973; x=1729180773; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yeku9+EKhD0eyLZNLUrY1WzCvsvKi1BJ6gq9NUUHrtQ=;
+        b=AQ5s48rekCCbw87iaHEPqcoXvyhDm9vluE6oNylcuF6w+wuBxJVKv56ryVuJkFKOa5
+         ri9P2mcx05hSIH9qyyi92wKEmr6ZD21ffUSYSr+j0NtQhMirHt/IruIgViA8nYqTHJ6x
+         32mpUl8ubnnI42uggIv3yr8QWFwAoYqcZGvmo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728575126; x=1729179926;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1728575973; x=1729180773;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jTc+I2w2hhlqIY2pAipx9CwfTckiLBy2dTG4NBsK3Ek=;
-        b=jNBRQ+npVXc+9WmZKHqhhL3QYB8GPeLJxgIFLdsYEM38JpEiHXtx1G0fvlELedaoYl
-         9ac8BX4EOYNUWMhSiEtm5uH/nqP6LSNE40NsVNSKGltoiVJ4c0zvZp8j9BcymE4ezdAj
-         8p3Vu526g2pOC8F+QQ5furFdptJX72RQCDfz+KSW2P8PSB7/YddNNaVtu397GUeDYaaN
-         sEO1W+IGuGhdWsgt0h3r0quwMm6h732Ia/mprVcngQzMQD//HRxdLrZEcMto9EFof2OU
-         QYDxjoy9J7mfVTbLE81mmU60uwnlhhFITtrJWGD7EmmVTAsE5G9FZ6VR7fhw1ZPhKBwS
-         VaiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdm7+r6Slfm5scJoem2MbN8FOaMQOce5oCQq5xVUoSYkGAPjO9p+w70rFQGWSqD0UifdMswSlhVTGZ9rY=@vger.kernel.org, AJvYcCWIK8YlrQC8TCfYhxP0Bn+mzXaaNJ/S+PQA/RGdopKLiS/xb+q25dhYzuU2TNmX262FzUcuz4i+@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF1/0EiVOGVsqlBFgnWj8PVZXCZXbk9ujnPlAlnixgqjvikNPL
-	8ptGBCHkNd/apxBOysC4sns1DIbzQfAOhLqyHzQHQ/6JyftSmo1j
-X-Google-Smtp-Source: AGHT+IG0jeJWdLIT94qSOZbGLGB2k9FA+DbhnpHm3ocn7eFqBjG5DNS6xpG0tUS62GqJn4wkY/nnVA==
-X-Received: by 2002:a05:6402:510f:b0:5c9:21aa:b145 with SMTP id 4fb4d7f45d1cf-5c921aab83amr6135256a12.36.1728575120295;
-        Thu, 10 Oct 2024 08:45:20 -0700 (PDT)
-Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c93f78a671sm708180a12.55.2024.10.10.08.45.19
+        bh=yeku9+EKhD0eyLZNLUrY1WzCvsvKi1BJ6gq9NUUHrtQ=;
+        b=lJMh26X5PmLwMWkzlW+hTzipkwjSvt1f6xrphQUu/7on57Jmhq/59HGBUCTV9dXgGj
+         rgXHEjtuh4RUlfANDA8OUy2d1Yk6KQKqVhQXmJxnwO5uItE8yIeg2DZM01mZB4ZLPKMR
+         A9PlwkOkfyE5IXlp048gF5H16qILkIbnt5F0rSU1iYZNNV0rA43JN0L8JASMHcHa4k77
+         8H8qqf6hN7q6FXrE+P2T1s5FxBYoWGFEhHxqJ6AL43pnoYFu17D46deb+TIE6qpwkoDY
+         rRz7zGiqLLb2eIjZ8KwwUO1OUdcGRTyDzCeqLZyUCXuJnPUB+17bWwpKqsTSjS2uzHQB
+         eJTA==
+X-Gm-Message-State: AOJu0Yypau0wZBXvmTUKycILluCneDjl6MSuumGKIUsn0Ahh3JlhOTRE
+	8bvouWS32M0uikNf/nwQWJSlgT4G31CZbTduybWBWYXLPHzdI3LUMxJYCHzaFBY=
+X-Google-Smtp-Source: AGHT+IEtL6WXGzPYuh+MnBkT5NJl2Cl0DdJhepAOU04VKXDoCawCLBlrMQZVO/pkGBZrqJMIhISK1A==
+X-Received: by 2002:a05:6808:1918:b0:3d2:18c1:bf35 with SMTP id 5614622812f47-3e4d71beaddmr4147622b6e.33.1728575973406;
+        Thu, 10 Oct 2024 08:59:33 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea4495d331sm1152526a12.60.2024.10.10.08.59.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 08:45:19 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next][V2] octeontx2-af: Fix potential integer overflows on integer shifts
-Date: Thu, 10 Oct 2024 16:45:19 +0100
-Message-Id: <20241010154519.768785-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        Thu, 10 Oct 2024 08:59:32 -0700 (PDT)
+Date: Thu, 10 Oct 2024 08:59:29 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
+	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next v5 5/9] net: napi: Add napi_config
+Message-ID: <Zwf54UVvfyx830sk@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
+	bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20241009005525.13651-1-jdamato@fastly.com>
+ <20241009005525.13651-6-jdamato@fastly.com>
+ <CANn89iKytfwyax_d+7U8Xw-Wvj5z1d7xoi4LNhmUQphDiborDQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKytfwyax_d+7U8Xw-Wvj5z1d7xoi4LNhmUQphDiborDQ@mail.gmail.com>
 
-The left shift int 32 bit integer constants 1 is evaluated using 32 bit
-arithmetic and then assigned to a 64 bit unsigned integer. In the case
-where the shift is 32 or more this can lead to an overflow. Avoid this
-by shifting using the BIT_ULL macro instead.
+On Thu, Oct 10, 2024 at 06:20:57AM +0200, Eric Dumazet wrote:
+> On Wed, Oct 9, 2024 at 2:56 AM Joe Damato <jdamato@fastly.com> wrote:
 
-Fixes: 019aba04f08c ("octeontx2-af: Modify SMQ flush sequence to drop packets")
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
+[...]
 
-V2: Fix both (1 << i) shifts, thanks to Dan Carpenter for spotting the
-    second shift that I overlooked in the first patch.
+> > +
+> > +static void napi_hash_add_with_id(struct napi_struct *napi,
+> > +                                 unsigned int napi_id)
+> > +{
+> > +       spin_lock(&napi_hash_lock);
+> > +       __napi_hash_add_with_id(napi, napi_id);
+> 
+> Hmmm... there is no check if 'napi_id' is already used and hashed.
+> 
+> I would add
+> 
+> WARN_ON_ONCE(napi_by_id(napi_id));
 
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks for the careful review, Eric.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 82832a24fbd8..da69350c6f76 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -2411,7 +2411,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
- 				 NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link));
- 		if (!(cfg & BIT_ULL(12)))
- 			continue;
--		bmap |= (1 << i);
-+		bmap |= BIT_ULL(i);
- 		cfg &= ~BIT_ULL(12);
- 		rvu_write64(rvu, blkaddr,
- 			    NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link), cfg);
-@@ -2432,7 +2432,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
- 
- 	/* Set NIX_AF_TL3_TL2_LINKX_CFG[ENA] for the TL3/TL2 queue */
- 	for (i = 0; i < (rvu->hw->cgx_links + rvu->hw->lbk_links); i++) {
--		if (!(bmap & (1 << i)))
-+		if (!(bmap & BIT_ULL(i)))
- 			continue;
- 		cfg = rvu_read64(rvu, blkaddr,
- 				 NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link));
--- 
-2.39.5
+I agree that adding this is a good idea and I will do so for the v6.
 
+Jakub: I hope that it's OK if I retain your Reviewed-by tag as the
+change Eric suggested is a minor one?
+
+If you'd prefer I drop your Reviewed-by from this one, please let me
+know.
 
