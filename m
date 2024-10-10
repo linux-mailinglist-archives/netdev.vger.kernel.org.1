@@ -1,238 +1,194 @@
-Return-Path: <netdev+bounces-134130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B8D09981C7
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:15:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB7C9981C4
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:15:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B1561C243E2
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:15:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65C1DB2B8BB
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6A31BE239;
-	Thu, 10 Oct 2024 09:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3680E1C2DD4;
+	Thu, 10 Oct 2024 09:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="mgf30k59"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJq4mpTA"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2085.outbound.protection.outlook.com [40.107.249.85])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC9B1B5ED6;
-	Thu, 10 Oct 2024 09:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728551551; cv=fail; b=AeTM+c+Vsi0HB5fSXWiuqt+XikxoJ+TBP3WrdDQVFxPO6e9OfbM94iJQ9aMfuf0rna7yXc2LEb6Fyr5Kx5ZKovEPnEEGwgd6E9Fpy1waYbZAl0IcZAZuLBuIW8qIOa4tvlBSABbLr2V83Re5730/FUlblvdo2p9TDAjpMxP0PK4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728551551; c=relaxed/simple;
-	bh=oWJfv7n0moS66M5NUU6/0w6G92QQlvIRNK6fSLlXeBo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ph0a2yQyqb67rgfBqQU4zbz5Rvb+ZgcRNAVGb1o7Gy3X0NMVPwGBHNYJSayuUt93bEpKeYyG/ADMcf/Hx0s9qcVbqzk276tNN78ecKeb1F+zXZRHiRBhgTWSYr7OAPV+By5V/ODfHkYrDDN0fhV7wZ2qfPEbOFNZu9nNMppGPug=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=mgf30k59; arc=fail smtp.client-ip=40.107.249.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=g0tCDoLCCxj1dNdyxXpfmcduMWTIZjm8GyOiV0HNQemZvj6WI4h6EAkx4AyZh/bZxlX9FS2bvkYd5Zom5eeDFTWFiN1QCoRbj1hHfuqftgesaL9D15ETskArbDdqQRShGZDodi4MfzfZDwv+JXjz5wdrQMNTdIXgnP6F3wKJtqZt5HxMHf1MccuC4FQgH/iwguv0SIHXKmcKkzpEpXy1wxZ7F+3EUw2sUR63LKjWATrJ9rhPlu8ubpforrBk4lK5Y2pQ4uG2cLpRh3KXN+FnqNx4ChNzsKlYyouPmrlaNmS29748sGu6YpcargF0tryIYIHUtsUXkHTyyC7RAfqHNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GQaOgy/+o9lLTYAKrT+lbChtHdwIEenLzXIFZDT1pnA=;
- b=x4g8UriJ9rIoa4vYRsbf42trhY7nCdF0ume4LEKoXgOjAUwBsscrFOnetYuUlGQznHvvm+rLmXSQ389+yOcNwIHiW/+6s/zKKRf7yYPdf6eiuuTLkv/0VS3rqT7zYscn+NHupagmF1RqZ8qHrqbtL53E68XSEzbAaAwnB6a2xu9ZE5fTSMO1nf+K4jc3yKvI3gAMCuJsqEcYdz7YFhteQqFeBUxzXLvsjYnkBcz2iEra0Il0soPR60c/UsaWkljrT/jEu91wAMfJ5Lln72u0heMJ+AIXNGIdMTYQoo5BeyQGLKF7ltnmTLlp6yV/HMIoo169VaJtdTU0DR1A7UsN/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
- dkim=pass header.d=nokia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GQaOgy/+o9lLTYAKrT+lbChtHdwIEenLzXIFZDT1pnA=;
- b=mgf30k592FFsZ6yCT+Kiygck1QuNTwSf8gpEYA6Mwle335DVuPgMFIx/Hc06e/zjA+6O+qxtWwTT6IoZ4UBUFclDeRb5i21usgW+EroPYioOYYsiWrZB4tuk4OEYS9rL2OVERkulKqPyEqwwVcdhkIHSvWWwBmefcZlq4M+oCWWTutqyx3fgIxkhhiytCw86UC4t67jkwFtqmGdNUlgaAt5Xjo4aOJ/csX4yzHei7mOnFJclHFdrDFmDhoLbaAPZZNguVJcSlvwO0Se+WKAGqJK2zdNYcDroZ0KOqBDNqu4bZA0YZOZGF6C/qQUVm/dnewpdjm4IzVxWuquIYvBHcw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia.com;
-Received: from PAWPR07MB9688.eurprd07.prod.outlook.com (2603:10a6:102:383::17)
- by DB9PR07MB9768.eurprd07.prod.outlook.com (2603:10a6:10:4c2::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Thu, 10 Oct
- 2024 09:12:25 +0000
-Received: from PAWPR07MB9688.eurprd07.prod.outlook.com
- ([fe80::6b9d:9c50:8fe6:b8c5]) by PAWPR07MB9688.eurprd07.prod.outlook.com
- ([fe80::6b9d:9c50:8fe6:b8c5%4]) with mapi id 15.20.8048.013; Thu, 10 Oct 2024
- 09:12:25 +0000
-From: Stefan Wiehler <stefan.wiehler@nokia.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wiehler <stefan.wiehler@nokia.com>
-Subject: [PATCH net v3 4/4] ip6mr: Lock RCU before ip6mr_get_table() call in ip6mr_get_route()
-Date: Thu, 10 Oct 2024 11:07:46 +0200
-Message-ID: <20241010090741.1980100-9-stefan.wiehler@nokia.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20241010090741.1980100-2-stefan.wiehler@nokia.com>
-References: <20241010090741.1980100-2-stefan.wiehler@nokia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0242.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f5::20) To PAWPR07MB9688.eurprd07.prod.outlook.com
- (2603:10a6:102:383::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5B81BC9E9
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 09:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728551506; cv=none; b=QUag+0Juby4xHeXSefREoPF19MVNkgaEKaVRbw5YCAqgwKgpkU16X7jOCEBHtKc/2pHrGsm57tq0w4ujis4lqaRNoMo1lwPdgJ/HJlJY+sUesap+alr4ePXrYwjldkeF6PoMXUg+0TPe8d3/alFPR5s3lpqy0QB6FIJyuZd3ZiY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728551506; c=relaxed/simple;
+	bh=+ex92FX/6NsvBWmXun+uf0gF3wK3BeTi9EqHuTvNsZQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DwrcGPETTtmBNRg+IRSr1bvEnQiskRcgVs89DLUbEZRKBddD8bZ0m+35lp+tN/4X1+VUwtOYRp8PpSH7luIu+NyZxza2j/n1BAwAE895/UXJta4f3ZNyB8PKuiPhwv73ife2lk+35+LwHRPgRoPcUX9Phw4dgyfEzv2BhLk+6UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NJq4mpTA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728551502;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+ex92FX/6NsvBWmXun+uf0gF3wK3BeTi9EqHuTvNsZQ=;
+	b=NJq4mpTAcVEpju4GP7UXQ3tFtQq/iwJKZbaUcP9X8XyhDE1gvMJPTtOarmmgE9+I0rCPf4
+	yeWON2JS3SedQ18+NhFqPdsIwG8QoFVuC3GYByzq0eMLlsw+e1MugbE70jLtAxPVn6b1tl
+	1n9SCjjvdqeNfSsVtuq3LybW+vJVIeA=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-241-9EdBzaRRPsSy5B6iqYBGIQ-1; Thu, 10 Oct 2024 05:11:40 -0400
+X-MC-Unique: 9EdBzaRRPsSy5B6iqYBGIQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-536800baa8aso728186e87.2
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:11:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728551499; x=1729156299;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+ex92FX/6NsvBWmXun+uf0gF3wK3BeTi9EqHuTvNsZQ=;
+        b=fZubIcZlqmze8WN012fEork019pYhNlhbatSPHWqbmoTgwPcbY6iXVKW2ZDGZMJpQ+
+         yHjiWYVXGSdE8BKKp3d5HnUdjvyxJ/nZ2UsErwubvd3Yzy7W/MJ3y8dpq8ekCv+hch9B
+         1nAumbvVR4XvD7Cpd6KQG4JR4Ea0L4O8hbTMrEjX1LBfxiT/KZIJ1zxdacWubtlzu9Ga
+         oYEwUsZX6T9BhTYzapGV0RRlLFpsAgX2LKuEauklEYdyOrYZnGty/MiRSkxvX5HBYDcv
+         ythy7lqVIrFFJWuT2k2iJGXflDhDacN/ArSej1jhDQihom5jgXJc4HUW8IJMga7iaGtb
+         sjQw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkGURKrFmnp+xeBUTB0hIf9OoAVqjnHHIGleDoW/L0V/tzhf4XFW+lrkp0FX64AXDzLU/Up20=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI4zwVDd0jpovsTxsCA0U5VSVU+75weQLbRp1qmK36eOtqVZmc
+	Fie/j60enIaxuBmjAoApP9AZaOOWyHRICbk2C+owCUcJob1h3uqd6HqzctIr4oYwlFVzVIzvPuQ
+	yfMhqz5X7IBvx02exUC1a5QyzWCKZHCz22X7s6/RTtXUJO/rPE0V77w==
+X-Received: by 2002:a05:6512:10d1:b0:536:55ae:7444 with SMTP id 2adb3069b0e04-539c4896eb7mr3177278e87.22.1728551499293;
+        Thu, 10 Oct 2024 02:11:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExq3OJhlyNTGpjtR1+LjaW3R0iv5Mu7sB9drW/xRJaoCLaoe8gSPgF49M2/ruF8wr/J6TLJA==
+X-Received: by 2002:a05:6512:10d1:b0:536:55ae:7444 with SMTP id 2adb3069b0e04-539c4896eb7mr3177227e87.22.1728551498734;
+        Thu, 10 Oct 2024 02:11:38 -0700 (PDT)
+Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b79fdc2sm949476f8f.88.2024.10.10.02.11.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 02:11:38 -0700 (PDT)
+Message-ID: <f42bb5de4c9aca307a3431dd15ace4c9cade1cb9.camel@redhat.com>
+Subject: Re: [RFC PATCH 13/13] Remove devres from pci_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+ <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
+ Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
+ Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
+ Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
+ <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
+ Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
+ ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
+ linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Thu, 10 Oct 2024 11:11:36 +0200
+In-Reply-To: <7f624c83-115b-4045-b068-0813a18c8200@stanley.mountain>
+References: <20241009083519.10088-1-pstanner@redhat.com>
+	 <20241009083519.10088-14-pstanner@redhat.com>
+	 <7f624c83-115b-4045-b068-0813a18c8200@stanley.mountain>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAWPR07MB9688:EE_|DB9PR07MB9768:EE_
-X-MS-Office365-Filtering-Correlation-Id: e89bdbe4-93d5-422e-8532-08dce90ba7d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|52116014|1800799024|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+hPWKmyeNOVlsRfih2lUWqLu8EGQb0DvxnaD86ETOEcO2yHY7xJMFWpkbLNW?=
- =?us-ascii?Q?rvt+Q2VDCU865UX+bHRBf6Cvv4RzB6ohAx74UBd3kBSH1s1ohiQz07daWj7Q?=
- =?us-ascii?Q?BQCdk1zkCrVBh39NqIUpbCyU8Dp7rCZnD6P5mA9JMMCblEtCgUR8spN3mCoY?=
- =?us-ascii?Q?6euDLnqokqlTJh6/+4O8uAwn5MKADkw0J9DqvLy9mzzS+C+Fni8Ej0EGf2Pc?=
- =?us-ascii?Q?+ln32QBwDNelm8pGgUh0bCQqxzaaijR+A9ehFZFjCPGF4rlv2Bu0fHx8UY/x?=
- =?us-ascii?Q?aejeR8R1pChZoEHrLeq9rWSHmzXXO9M2rbtAcFvbAauWFR/u5IybowKfgclY?=
- =?us-ascii?Q?2xMMTHO5grlHneDJ++6i3DH4FnuQaKwPJPzMtyh6viy0aNU5KvZ1xh3rRYrh?=
- =?us-ascii?Q?1RAe/rnOTr6v3UnXw1ApRXHeItPCJvolU0vSMwWmnVlB4BmFmveWHyzJoRVv?=
- =?us-ascii?Q?46w+9LCozCA+VK77SehUvFAHnAqyWE2AndOoglqxENg+VnSDRDEQKVQltKZp?=
- =?us-ascii?Q?dRdhUzabEpDLK2FaJzu5s5nyCYP2U1avPWgSW1b80bvdO5CmXXxCGMXeK1qX?=
- =?us-ascii?Q?L5IkTpsSCmq2M0DGnp8ax9casCPXmZlSp8To/51VTQqlT1YYYAs94wrLaueB?=
- =?us-ascii?Q?dRsQEETl2KFCpQrA2SxHFlm2AEpuphGZVMZlAwCBwhbEnXoris0X1NMyoL9P?=
- =?us-ascii?Q?NMZzcwA+iYI8b8gpPEk/PbpNKUzEQUVek4/1xG29POjMp7NvKQJbE3UQlCbH?=
- =?us-ascii?Q?keZ37S8RMuHwBl1lv7jzwhuvG2pRzk36fthfmxRlM43ZH6t4FaLG7LLSaPcK?=
- =?us-ascii?Q?VHvDNbEtSErbjyZ0e14J/QJfkuwK0iTvWBq2Si1pOKJfi3TNV6EvJlpYpr9y?=
- =?us-ascii?Q?NV6OIKCYEEnTaA1J/nuvbIGS9WN6fgQmTCNWqq40+pXLSijFSZKhupyMLRTX?=
- =?us-ascii?Q?/yoSCTAjipFsh+L4AP0UR7JNxh3YBnk6Icy+K7tgNAALqOC/kKWAIzDU7YH3?=
- =?us-ascii?Q?KAdpKhSfW++qqH+E493/DWIEObaD3lVp3ihT3/Gwkf7VhqwMGpn5bBCN8DjR?=
- =?us-ascii?Q?i/9h90mM0SxcV41ldnwk69HAclNGkS9TPMAkjg/jalYnaIBT/A8/5Be6n/9b?=
- =?us-ascii?Q?mGHc2tcTh1s8PA/3L6UfNC0gPJgqqGUvBRZ+riPZCFxr15rAV4KnHj/IQgLZ?=
- =?us-ascii?Q?+BTBbHCMD2yTx8FOIUpridZsrQ9iIa5jm6Jl48CS+iaZuylKmR8UiSu6oQyz?=
- =?us-ascii?Q?w0zAdj+UvmnVOYUGhuVNXqj+fL9KOFXiljMxp7kbSGOJ/CMQT0LLK9zoLjoD?=
- =?us-ascii?Q?DsxxjcGolRWmQMXrXY5J4anEyiA1Q1GmeRV6Y9q985Ebcg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR07MB9688.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?NOlYx7qzWvG59+Rs/6ulSFQt21SQ4fq5oix0GhptiCrY+umKAvFxqeO/HMeB?=
- =?us-ascii?Q?EFBUn61ozq+ssd/X2x7lE1zmrSptMonU7PKjcV6ZzEhdsw/EIlo4hwgi9IZW?=
- =?us-ascii?Q?EQjHkKfaWK07ohNXR3ywxq77nFe4k/dESwyRh/PV3dplMTRkY2Q9e5SwubW5?=
- =?us-ascii?Q?3Zy+kixDZZFJG+SLqNzWo5EyYfpp4QPB2Q9oKtr3zDNWq17IVhBmq1IhNfBi?=
- =?us-ascii?Q?8ZB0LXQysK5PGygoyPUTAZdONoZNryHX6i2bgmhULgzCtLCTPtxzCpE8iVAt?=
- =?us-ascii?Q?S6Hj3CywOd9tWOFy/hq8NmblaixVHfkuU1FHgqiLKwN8eovejAJUEA/ipOQR?=
- =?us-ascii?Q?V5Tittz/ZgQg7dLnDmHw7TSc+XNmZW1c3ZuBcflaJSPU9WactaeB6SZhBGIV?=
- =?us-ascii?Q?UTIF/PkIvhVZzpRPoej6t3XHA3WoFkzRLwLDrcXDEx1pETA5WIHKdGGiZ/8o?=
- =?us-ascii?Q?eqM2Q795cdu/xLYUbHNO0Hkzu1xh9D5Dfyf0e3AV0rtRLr2bYBfk3qKDePQ1?=
- =?us-ascii?Q?g8eNpJs6ZwgVblTxGl+MFVzD0NYHQjmIgRH6ooTwcGhDYvP0FX82bKt26Iz1?=
- =?us-ascii?Q?o/47s4WYcWHhB0OQLUIoHzvy2HjOu8+v2u61qEd5FJjDaniiTxhONaSe0YOS?=
- =?us-ascii?Q?A4oFvrsuVkH5fDjgK9PYIKeHjcGicg+tFvIRnrIJetTLvTO4hpySr0BMcEbn?=
- =?us-ascii?Q?yJDlam/KcLZKEJT8DySfPRBdqGwSLHOaAE0BzznZAsKRyNKjRVgsRaLS2gxV?=
- =?us-ascii?Q?UqlX7Mt7C2TyTpjhCdU4szF35/WzVl6XTusDEZF3GB9M+c/jWz/gPeViiC+s?=
- =?us-ascii?Q?RCb/+/Q3P4M1o966+Jh9jykeJQ3wIDuFwwbTLHIi5Ad2NRSYQ7c0U7/B/236?=
- =?us-ascii?Q?bLDOfLvsw5XRZgl6jy4uvpHGBGEqL9ZSV++LvQ/wTAYZ1T8nIkLui6UG+PMc?=
- =?us-ascii?Q?3f13ukFSIQaay5Fg/DZPvC9i//QgZ9cU9Qmiror/U/0j4XcE6b91DS0m6EtT?=
- =?us-ascii?Q?0efZnUCGUtVvoDrA45balxbXoavcGYf/jFywHWEKkIbH6Kk9rF2PwuELFLye?=
- =?us-ascii?Q?vWz7cmZTwdXRcLNsW6+JNVIClnU9r6GlKIrtC/5FA+NkjHIxf4G03cxIfFE8?=
- =?us-ascii?Q?J3ekdLhGpcXWywGrGKnXneolpmzvqd0VRHnc1uZbgZB6U54cJ2ncjAoMN2Aw?=
- =?us-ascii?Q?iRF9QJuUAcO8uhT3m0jERs38ka5foY/Qn4vu4OvftKh9rOv7W3uad6zdvV65?=
- =?us-ascii?Q?554qkmD1/OMmPOB8tlKbA38IP8HwaaLPdcgaLIy90gTeydyD5Rgr7K0Q69x0?=
- =?us-ascii?Q?hIUnY2KOPrZLgJJjh50knzRcwNgUPs8+cjosKP/jSXsAm0T86AIpln2QLWH2?=
- =?us-ascii?Q?WBzFwL0KV90ai1UUJbp2AO3yK8I9IrgKJVJY6wzsn9RzkU8D/nSVmq4KO4U5?=
- =?us-ascii?Q?/AGWeM4l7oHz1gUx+jOgxKLoVVEd+f0S1CDE4xUlKUkRhVwoRmZKj5itAvYW?=
- =?us-ascii?Q?y8YW1B9Gc8+G60l9JolapXOLQOrGfnXqx9b4TuZesuF4AVK5oOv7YnjzI9Nf?=
- =?us-ascii?Q?Gs6gA8aV+0GQ7K5IaQH2IfQisy6rXPorW7avTaZzG+OF7sKH13c7bBLOE9jd?=
- =?us-ascii?Q?Kw=3D=3D?=
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e89bdbe4-93d5-422e-8532-08dce90ba7d7
-X-MS-Exchange-CrossTenant-AuthSource: PAWPR07MB9688.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2024 09:12:25.0284
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EiL7tyGd35PQcFhTFv6NTAqyyPzu3RyoTK+2igAQQBvLgmvbHpC8nadyTQ2CxhM81BXuFhpcDpIsP9hg8G/fWb7Lf9NbNegobECU6qb5yU4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR07MB9768
 
-When IPV6_MROUTE_MULTIPLE_TABLES is enabled, calls to ip6mr_get_table()
-must be done under RCU or RTNL lock.
+On Thu, 2024-10-10 at 11:50 +0300, Dan Carpenter wrote:
+> On Wed, Oct 09, 2024 at 10:35:19AM +0200, Philipp Stanner wrote:
+> > pci_intx() is a hybrid function which can sometimes be managed
+> > through
+> > devres. This hybrid nature is undesirable.
+> >=20
+> > Since all users of pci_intx() have by now been ported either to
+> > always-managed pcim_intx() or never-managed pci_intx_unmanaged(),
+> > the
+> > devres functionality can be removed from pci_intx().
+> >=20
+> > Consequently, pci_intx_unmanaged() is now redundant, because
+> > pci_intx()
+> > itself is now unmanaged.
+> >=20
+> > Remove the devres functionality from pci_intx(). Remove
+> > pci_intx_unmanaged().
+> > Have all users of pci_intx_unmanaged() call pci_intx().
+> >=20
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+>=20
+> I don't like when we change a function like this but it still
+> compiles fine.
+> If someone is working on a driver and hasn't pushed it yet, then it's
+> probably
+> supposed to be using the new pcim_intx() but they won't discover that
+> until they
+> detect the leaks at runtime.
 
-Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
-Fixes: d1db275dd3f6 ("ipv6: ip6mr: support multiple tables")
----
-v3:
-  - split into separate patches
-v2: https://patchwork.kernel.org/project/netdevbpf/patch/20241001100119.230711-2-stefan.wiehler@nokia.com/
-  - rebase on top of net tree
-  - add Fixes tag
-  - refactor out paths
-v1: https://patchwork.kernel.org/project/netdevbpf/patch/20240605195355.363936-1-oss@malat.biz/
----
- net/ipv6/ip6mr.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+There wouldn't be any *leaks*, it's just that the INTx state would not
+automatically be restored. BTW the official documentation in its
+current state does not hint at pci_intx() doing anything automatically,
+but rather actively marks it as deprecated.
 
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 415ba6f55a44..0bc8d6b0569f 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -2302,11 +2302,13 @@ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
- 	struct mfc6_cache *cache;
- 	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
- 
-+	rcu_read_lock();
- 	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
--	if (!mrt)
--		return -ENOENT;
-+	if (!mrt) {
-+		err = -ENOENT;
-+		goto out;
-+	}
- 
--	rcu_read_lock();
- 	cache = ip6mr_cache_find(mrt, &rt->rt6i_src.addr, &rt->rt6i_dst.addr);
- 	if (!cache && skb->dev) {
- 		int vif = ip6mr_find_vif(mrt, skb->dev);
-@@ -2324,15 +2326,15 @@ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
- 
- 		dev = skb->dev;
- 		if (!dev || (vif = ip6mr_find_vif(mrt, dev)) < 0) {
--			rcu_read_unlock();
--			return -ENODEV;
-+			err = -ENODEV;
-+			goto out;
- 		}
- 
- 		/* really correct? */
- 		skb2 = alloc_skb(sizeof(struct ipv6hdr), GFP_ATOMIC);
- 		if (!skb2) {
--			rcu_read_unlock();
--			return -ENOMEM;
-+			err = -ENOMEM;
-+			goto out;
- 		}
- 
- 		NETLINK_CB(skb2).portid = portid;
-@@ -2354,12 +2356,13 @@ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
- 		iph->daddr = rt->rt6i_dst.addr;
- 
- 		err = ip6mr_cache_unresolved(mrt, vif, skb2, dev);
--		rcu_read_unlock();
- 
--		return err;
-+		goto out;
- 	}
- 
- 	err = mr_fill_mroute(mrt, skb, &cache->_c, rtm);
-+
-+out:
- 	rcu_read_unlock();
- 	return err;
- }
--- 
-2.42.0
+But you are right that a hypothetical new driver and OOT drivers could
+experience bugs through this change.
+
+>=20
+> Why not leave the pci_intx_unmanaged() name.=C2=A0 It's ugly and that wil=
+l
+> discorage
+> people from introducing new uses.
+
+I'd be OK with that. Then we'd have to remove pci_intx() as it has new
+users anymore.
+
+Either way should be fine and keep the behavior for existing drivers
+identical.
+
+I think Bjorn should express a preference
+
+P.
+
+>=20
+> regards,
+> dan carpenter
+>=20
 
 
