@@ -1,89 +1,101 @@
-Return-Path: <netdev+bounces-134203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229FF998642
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 14:39:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA750998647
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 14:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABB642821F3
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9D351C20E5A
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5AA1C6895;
-	Thu, 10 Oct 2024 12:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A181C57BA;
+	Thu, 10 Oct 2024 12:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gToKVi6l"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZezvnIBi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F3A1BD00B;
-	Thu, 10 Oct 2024 12:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAF41C57AD
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 12:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728563982; cv=none; b=pQH/V6QoLEgyMT2vtwQ/rPanH54tm0A4P8kbcjuVrZw3kx8vRq9apBnbo8JS9W2NDR5TvyoqZpL5sHa4yAzyl2AzmRc/LCXe3qD0HPKsGpkGiddjxFkz1iSpYYsxXC5d/78HMx/w8MZaUbau2Sf1kN6CIhD/GoMorbAX1nETYX8=
+	t=1728564002; cv=none; b=efFC/XhNRNwJqPi+YDdjiX4rqv2uABaa6dL/SalL2aqBcnZ35auyQVJxjClNrD812yqi9RjaXpZwtcYepL3U1PkWBI6XKRZ5AzjpgcZ8rzto5+bTevCNB1WORtQIWP/ZmyI8cWl6QIE0jdQS14bD147o0r3Sn+L1sowSpneCa58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728563982; c=relaxed/simple;
-	bh=LD8P8MlsEVOTw05eZKCVdmZseYjr8X9zmHUiU67aA+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L5yBtY91Oj85OYuMJqYQyb2oG8g6hDAfMLCDeLwcMiKOJaHKYynijjAgUBZ2pYLW12/0y2PM67mdqzPpAggjngmpSb99OY22tCTnSf0H5oghsW/BwrzbTXqKVmi2wz2fy753wyOf+vk0zIe71gkTF05oJGqOgXnIIBXORCCCdwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gToKVi6l; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xkDKvYgG1ZGbE9OZmdmZN6Uddg9Aj6h9bniy5gysQTY=; b=gToKVi6lxzjGuHvyqnPrbGWL1A
-	q/jFJjJD6k90RPTo9f0IZqNxVaBVWMXyOiE5whYGLurxFRjDWZwBAVYNGRiARf0VTR1QXH0bGYMg1
-	0cRbKKYPyV5t6aSqNlbIul1301twWLLQ7PAndqiULuU6ducugVA1ODRDhpO2PTBtdYkI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sysRu-009boT-SM; Thu, 10 Oct 2024 14:39:22 +0200
-Date: Thu, 10 Oct 2024 14:39:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] net: phy: aquantia: poll status register
-Message-ID: <0ab4a294-eaed-4dc6-acd0-391963b1f835@lunn.ch>
-References: <20241010004935.1774601-1-aryan.srivastava@alliedtelesis.co.nz>
+	s=arc-20240116; t=1728564002; c=relaxed/simple;
+	bh=+2OjwkJZLl6XXi5IMcc8eMd/qUG2tnfEj44HAryBP+g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pJGbESn2wdXSA+J3kYb2TETDzFFl9fl9Zq+yUYxDV4qkfnET4SFkb+gSkMa5+Tyt/quHTvI+f6vri8lAlfki0l6Ofnz/aU/QzeNdo0BOgbPcuPrIiUDH53OS37CXWzED1CrZ4LkuVTicqVlnK/oFYW1VFK2qoqUa0A48m3Rr8dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZezvnIBi; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c876ed9c93so1035213a12.2
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 05:40:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728563999; x=1729168799; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+2OjwkJZLl6XXi5IMcc8eMd/qUG2tnfEj44HAryBP+g=;
+        b=ZezvnIBiOKlbtD0FMcMiVSfBiRKQPGSa+loWZn2eRVK92bwuBsIHWpUUpxIv0Bd1SG
+         YVkwWLpkUQ5txTYRzaLOkp6tI9XCzrzQ1rHBoc392Et2Dg4DlOShm+0xXA0P81n3/BG8
+         lzVqJtxcy0QfQj5UVQchZiH2/kwxb/Gsy3iwWnY6mzxhA5HDuSRpvLTwxfDwE38jM20M
+         vtYIvcJm2TMK0JLa90o/oMApzlZCc6QarFflXkqtaeXVVS62w64nkNdo/BeDSiDjKt5e
+         +j/YK/JC0DwWcaGRDpglMgnrvw0rcDTDfQMJtrTbm7wDCzAfcqAFpaRt2u3etwnhpsgb
+         ziYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728563999; x=1729168799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+2OjwkJZLl6XXi5IMcc8eMd/qUG2tnfEj44HAryBP+g=;
+        b=clPdlZSOFgAgPVo+oxqSsCZAV9x3hh41aLS+tjBiEO/djFLa0STSYuoqpqDfAkBRYO
+         Mlnb7E9O+F5f35yktxLg66SNy1Z3MVsq0CHMZ6p6iJr4MEOB5yWOXIw7f7FwlTY5Tmzw
+         AjwiLJV3JqpKLsnQo/MVrfSxor3Jr/OJWDi1AkW6LdIjzWqrZBJu2BstEcv44J/Qx7aH
+         PSwUXKHvt9XEacZapiM5+GmqqpTnfI7gGChUJ4X69BhM0Ki6zisjZqQ3p9FM5L35FixR
+         4DvU+6CKYlDrFPmZHWm+aC7L3oAtb/wMeLEiLRlipSsR6hESckfZb4kKB6orD1fyftIT
+         3nVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKXE5XzBH3odxeiMdwN6jSY0j5GfPakFBHSp3LiIJfBF6H3eJIaXKuIBMVZiv2lLMqrX6eJTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQ1b6E5zlJMAxtwS0SEf2lPMj/rqxrXdYFGmrJFyf3NISdyOlD
+	x3UMT1ov7Ztnwbevj751Re8VNpuLOtSpdK13R2o+hLSYZ8kI8RxD+s7JSRsQZ6Z5Gmj4eRDHGhO
+	FISbvJY4CYyvZo41FV4yKbFm8lEkpBcrHNi1f
+X-Google-Smtp-Source: AGHT+IHVFnzgwdK4PcIpVittvcTXubUHFXpjv8LQDrM+hhzU+AWbXCgdvmAkl0bR5CynPaqjCvXxFtB289c3/jx2QXU=
+X-Received: by 2002:a05:6402:34cc:b0:5c4:2343:1227 with SMTP id
+ 4fb4d7f45d1cf-5c91d5377a2mr5554745a12.5.1728563998795; Thu, 10 Oct 2024
+ 05:39:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010004935.1774601-1-aryan.srivastava@alliedtelesis.co.nz>
+References: <20241009231656.57830-1-kuniyu@amazon.com> <20241009231656.57830-4-kuniyu@amazon.com>
+In-Reply-To: <20241009231656.57830-4-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 10 Oct 2024 14:39:47 +0200
+Message-ID: <CANn89iKQxHAFxPPMAjZFbqJ6_cS3V5yeHAJNoC++iinBaY-A1Q@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 03/13] rtnetlink: Factorise do_setlink() path
+ from __rtnl_newlink().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 10, 2024 at 01:49:34PM +1300, Aryan Srivastava wrote:
-> The system interface connection status register is not immediately
-> correct upon line side link up. This results in the status being read as
-> OFF and then transitioning to the correct host side link mode with a
-> short delay. This causes the phylink framework passing the OFF status
-> down to all MAC config drivers, resulting in the host side link being
-> misconfigured, which in turn can lead to link flapping or complete
-> packet loss in some cases.
-> 
-> Mitigate this by periodically polling the register until it not showing
-> the OFF state. This will be done every 1ms for 10ms, using the same
-> poll/timeout as the processor intensive operation reads.
-> 
-> If the phy is still expressing the OFF state after the timeout, then set
-> the link to false and pass the NA interface mode onto the phylink
-> framework.
-> 
-> Signed-off-by: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
+On Thu, Oct 10, 2024 at 1:18=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> __rtnl_newlink() got too long to maintain.
+>
+> For example, netdev_master_upper_dev_get()->rtnl_link_ops is fetched even
+> when IFLA_INFO_SLAVE_DATA is not specified.
+>
+> Let's factorise the single dev do_setlink() path to a separate function.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
