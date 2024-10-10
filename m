@@ -1,147 +1,124 @@
-Return-Path: <netdev+bounces-134360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3027998EAE
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:47:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99795998EB9
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2D411C20BA7
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:47:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410F31F24FF7
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A955F19D07B;
-	Thu, 10 Oct 2024 17:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486A319A292;
+	Thu, 10 Oct 2024 17:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ASqowXn6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Elm/IpL5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1643519CD19
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F5C19ABC6
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728582295; cv=none; b=g3Ufa5LnN/jyVKKKnf1rDkc9MKtBjy5fOZBhK6GKd92vm1/6zEJbzBYAasYLL8FeI6ve6IU2Njtdc95oBix+aeKREyoPniwr4iaib8/1U3+4USfVZ2XOxvMdWnfcU6PcGkJY0k42BpQKQ16Zw+20M09EgKElHpzj0hR9TXdxPy0=
+	t=1728582501; cv=none; b=P+Asx9UPEQ3dmZYtjFBCxSck7gZcHSU/npYMB5yXa0wBNPtD941zsWSYin1dBHKZ7p7NvNRF/fWD0c1bBJ7DM2+Wm8Y5XO/ouvO+Ey3xRgHhrjQBAmi4SppHwGlIP9utpc0JDKBaiQvKSWbvt7UOHasei2hyq7pTMg7k1W80830=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728582295; c=relaxed/simple;
-	bh=G+YlhLMery7c2PQZuybl3kAqhPqj+cOokjVVbYtmDys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tqAzXqYd6Pdotmda4uqWB6eCFN6odnrEy3v2DxOKLrchaWVnKThAeQ7Z0E1pvKLP4EBN5cA7OM+AXCmtDCcKXrWhmgvV8yx5j0+DyS05giTmgXQFucy1fnWyy2m0aY2uano7UsgW1YGsS5WZd5QBOssO1WIVuf8trWaC9GwWi6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ASqowXn6; arc=none smtp.client-ip=209.85.160.178
+	s=arc-20240116; t=1728582501; c=relaxed/simple;
+	bh=bCTFl/7F8LbeaJIpj3Udlkvsge65XDuwy/JgySGN0oM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OJ9+T9yAW4LKRH6+0FjHCamDeRkc2cz6TS6Z7gSHtwwAcSAcgfMM+iaA7gGzLgno+QAIlJaQKBLLCLcftns+6A5JaMBbQtUxztJg39cNZQ3yUkLY2agG8rr15D3r2+0yMqsrH2s/z4UO2YNiVZKE66l+2ruyUsk3lLwUfewdhGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Elm/IpL5; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-460395fb1acso28771cf.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:44:53 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e29b4f8837so18295997b3.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:48:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728582293; x=1729187093; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G+YlhLMery7c2PQZuybl3kAqhPqj+cOokjVVbYtmDys=;
-        b=ASqowXn6r12SAwlzz3G2qqnr1AW0tYJIanIt7myEDZvm+r7l7JPxfsWvYAI16bcdZW
-         p9oMoEP8/bksftUxpUNyVJvJH+cE0yCyC0CToTOYKCfyK5iWcJWcA9Jg4Dovp3DNJF/h
-         nNftGF3b7KjFOU2/EJrlRdQEVLjJ3z74anPCJZxWVjegjyZ3GTrSgDT5lo3/0hYhp5ro
-         3LcSm75XRCDEzKb3DccfyN0WB8J0Bj3d7vpQfNbXapxwIcHbTQ45W0bxIdFRfL5Rd0hC
-         +LRaB4GPa475RlPDT/lWdUM5tV6fM9UcarvwJl6pfRnkrIu4wElAXQu0zzFyS0gUGg7S
-         f0aA==
+        d=google.com; s=20230601; t=1728582498; x=1729187298; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Uo4jSsmbYIDoMRuJl6rYrKS3viZC0aPbs4SAjrDDDJY=;
+        b=Elm/IpL5nWdidvM+KtJsqyGPxYxP4ji0qB2Cxw6C5cGHuBb8SzmmeHvxNU0us57dRx
+         y5LHs4DMDdG0uAW1Jw4PS5kOQnWr3KmmZAQ34uBFTJD6crc2gA3wjOIgEYY+Exz/+Enk
+         sWiyiW+ZJZZxMFX7lhp3+FEAuwiW6swvbm3XnpTRTlWWCI3uDtiE5u/O429ZmX9R+Uof
+         cuCwIWjwPefoYQ+bF+vfgYKF0r3sryI4WzgJxDpeAcCrzxIUwygj2esykty6Sphm6TaX
+         1iJJP3Puu9NRLkWLnOUOWIDsj3Mw3Lj9BTaU/DeIXK/yYX5Bvg9fWvyNn/mJzNR8GXAr
+         EWow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728582293; x=1729187093;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G+YlhLMery7c2PQZuybl3kAqhPqj+cOokjVVbYtmDys=;
-        b=Sk1MC1UrNZ/jpa5xeRV3g308esnresaaCLnYsPfYpiR0+gYeZRLwlJp9/BHLtOWPGt
-         E1MN2IRceSlKjyROQ8gUAT0Zm1NqGA7FwdFvln9T+3icV5A7TCwaR7qrbGnmvwKtfLqA
-         +KUw1I7Tzk012wi8/kCMwa1Mxru/1aKSEfd8i/UcABuR8f3n4j+f+U4Ukq4YBDJf3O6s
-         CUFGeVK9kymFdQW4V9uWXxcw2saP1Gswk+fR8sXcmvoUAaJArA9jwJndn5nkblTGI1pg
-         LUNBIc5rZYOxaWQJVYLG2UpJEzzQCS7p+gAQ1aQ37Z2KfObfhRNyrpguDn2wRrKPTuYR
-         LnFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSsxM7/n5wboJmXx7ipn4WbsIQETIXH9yAvmsUlwX5aVcnJ/PC0t66lqZmHW+NmCwzDiIcwLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxouWYEZ/FiFpViJ4wpkmz7LNm9e7OiAHspQBJ4waBwAhrG8ds+
-	x4qWcgw99D6T9SvdMtxzzJ1W10sSKxyLHvSBo27/QEDX/tS5kX26niACsOPR7vr47Y0hlhgvP6R
-	DdQvGn+meqsRebQ3NnmRIoyAmBDtCTMA3aozx
-X-Google-Smtp-Source: AGHT+IHBhsaTPf8MZyXqXn+ky4tZtEVMbF5vDoqwo8wznqVtpsAMJ1C0i52LynbA8eDXzYQiG2Dtr0LY6Sw5vk7+MPY=
-X-Received: by 2002:a05:622a:a38b:b0:460:481a:d537 with SMTP id
- d75a77b69052e-460481ad644mr1794981cf.25.1728582292604; Thu, 10 Oct 2024
- 10:44:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728582498; x=1729187298;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Uo4jSsmbYIDoMRuJl6rYrKS3viZC0aPbs4SAjrDDDJY=;
+        b=c9mbaRCip8K2Ui7+289LocxC7zgVuSsoeqMg5EaL+14IPQ6Pji0+0B9EPc3AKEwO3k
+         uA9Y6mjlH2O6/8ET1CpH3bHLuaFksaG1ZccajWdtx+FWJ1ZVxUx72n7mGTonp2rpgM91
+         I7uyFC81fTVKiNgm3ikk8EXAxJLX2hVsSrLuqjnnCZT3ORqm/ViSNkYi5IQXw08UuItd
+         scioKN6UdrDugkOTxykA2zNVL3L8eKmdpjOty4zRe5sayu0ArrG/B+q/UPFrVbMzoWKZ
+         8/Z+R5XWruLhCzEGJrNpnXJB3CrbzTzAbwoFqbPDWDEZz6ghzWGhBn1p0dBrlGQp1QwA
+         dWuA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/WMgYnRpbdpFAtJKOn0wz8PlaKMbIFqDtJ0DucqKgDIyrpAiPBdZ7KCLGBiyEaziPNVWeNqc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8ZeQHo3STAc4fmxKDuBCWIL2g8SqmK34fVY0a8fpEyI8FiPAT
+	YCz9Eq801TaH/hgdfVsqtvFeoblrZ+FJMqOlZvh0jbb+7TAjTEmnz0Q805ACydj6PcfleF7Tg7n
+	egBR6hCtogg==
+X-Google-Smtp-Source: AGHT+IH5ZBhyPC+DKfAr/R1mcvjLHqfVvfrbarGAaTM+JWoguc0fCG2eAyiz6fSjmeJJm4ZMLOlrM78BDjMtBg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a05:690c:2881:b0:6e3:ad3:1f19 with SMTP
+ id 00721157ae682-6e32f25e97emr594667b3.3.1728582498655; Thu, 10 Oct 2024
+ 10:48:18 -0700 (PDT)
+Date: Thu, 10 Oct 2024 17:48:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-8-ap420073@gmail.com>
- <CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
- <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
- <20241008125023.7fbc1f64@kernel.org> <CAMArcTWVrQ7KWPt+c0u7X=jvBd2VZGVLwjWYCjMYhWZTymMRTg@mail.gmail.com>
- <20241009170102.1980ed1d@kernel.org>
-In-Reply-To: <20241009170102.1980ed1d@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 10 Oct 2024 10:44:38 -0700
-Message-ID: <CAHS8izMwd__+RkW-Nj3r3uG4gmocJa6QEqeHChzNXux1cbSS=w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory tcp
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
+Message-ID: <20241010174817.1543642-1-edumazet@google.com>
+Subject: [PATCH v3 net-next 0/5] tcp: add skb->sk to more control packets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Martin KaFai Lau <martin.lau@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Neal Cardwell <ncardwell@google.com>, Brian Vazquez <brianvv@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 9, 2024 at 5:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu, 10 Oct 2024 00:37:49 +0900 Taehee Yoo wrote:
-> > > Yes, but netmem_ref can be either a net_iov or a normal page,
-> > > and skb_add_rx_frag_netmem() and similar helpers should automatically
-> > > set skb->unreadable or not.
-> > >
-> > > IOW you should be able to always use netmem-aware APIs, no?
-> >
-> > I'm not sure the update skb->unreadable flag is possible because
-> > frag API like skb_add_rx_frag_netmem(), receives only frag, not skb.
-> > How about an additional API to update skb->unreadable flag?
-> > skb_update_unreadable() or skb_update_netmem()?
->
-> Ah, the case where we don't get skb is because we're just building XDP
-> frame at that stage. And XDP can't be netmem.
->
-> In that case switching to skb_frag_fill_netmem_desc() should be enough.
->
-> > > > The reason why the branch exists here is the PP_FLAG_ALLOW_UNREADAB=
-LE_NETMEM
-> > > > flag can't be used with PP_FLAG_DMA_SYNC_DEV.
-> > >
-> > > Hm. Isn't the existing check the wrong way around? Is the driver
-> > > supposed to sync the buffers for device before passing them down?
-> >
-> > I haven't thought the failure of PP_FLAG_DMA_SYNC_DEV
-> > for dmabuf may be wrong.
-> > I think device memory TCP is not related to this flag.
-> > So device memory TCP core API should not return failure when
-> > PP_FLAG_DMA_SYNC_DEV flag is set.
-> > How about removing this condition check code in device memory TCP core?
->
-> I think we need to invert the check..
-> Mina, WDYT?
->
+Currently, TCP can set skb->sk for a variety of transmit packets.
 
-On a closer look, my feeling is similar to Taehee,
-PP_FLAG_DMA_SYNC_DEV should be orthogonal to memory providers. The
-memory providers allocate the memory and provide the dma-addr, but
-need not dma-sync the dma-addr, right? The driver can sync the
-dma-addr if it wants and the driver can delegate the syncing to the pp
-via PP_FLAG_DMA_SYNC_DEV if it wants. AFAICT I think the check should
-be removed, not inverted, but I could be missing something.
+However, packets sent on behalf of a TIME_WAIT sockets do not
+have an attached socket.
 
---=20
-Thanks,
-Mina
+Same issue for RST packets.
+
+We want to change this, in order to increase eBPF program
+capabilities.
+
+This is slightly risky, because various layers could
+be confused by TIME_WAIT sockets showing up in skb->sk.
+
+v3: also changed sk_const_to_full_sk() to address CI splat in XFRM
+Link: https://netdev-3.bots.linux.dev/vmksft-nf-dbg/results/804321/21-conntrack-vrf-sh/stderr
+v2: audited all sk_to_full_sk() users and addressed Martin feedback.
+
+Eric Dumazet (5):
+  net: add TIME_WAIT logic to sk_to_full_sk()
+  net_sched: sch_fq: prepare for TIME_WAIT sockets
+  net: add skb_set_owner_edemux() helper
+  ipv6: tcp: give socket pointer to control skbs
+  ipv4: tcp: give socket pointer to control skbs
+
+ include/linux/bpf-cgroup.h |  2 +-
+ include/net/inet_sock.h    |  8 ++++++--
+ include/net/ip.h           |  3 ++-
+ include/net/sock.h         | 19 +++++++++++++++++++
+ net/core/filter.c          |  6 +-----
+ net/core/sock.c            |  9 +++------
+ net/ipv4/ip_output.c       |  5 ++++-
+ net/ipv4/tcp_ipv4.c        |  4 ++--
+ net/ipv4/tcp_output.c      |  2 +-
+ net/ipv6/tcp_ipv6.c        |  3 +++
+ net/sched/sch_fq.c         |  3 ++-
+ 11 files changed, 44 insertions(+), 20 deletions(-)
+
+-- 
+2.47.0.rc1.288.g06298d1525-goog
+
 
