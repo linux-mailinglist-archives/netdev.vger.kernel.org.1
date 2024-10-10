@@ -1,143 +1,92 @@
-Return-Path: <netdev+bounces-134368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74855998EF6
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:56:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F96998F1E
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2694C1F2369D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:56:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB7671F230F5
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB81C1CF29B;
-	Thu, 10 Oct 2024 17:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h1mbn/i9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0F21CC16D;
+	Thu, 10 Oct 2024 17:59:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3356A19D899
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872D419C57D;
+	Thu, 10 Oct 2024 17:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728582861; cv=none; b=Ekll/Nvhs/cYxOLUlKWXK3M/PFSej/gO0Uip8IUYGHGNTITYMbxgOozmkOR0HtnhzcP80b7TEwW2I1Ih4GM/TcepH8UyN/CQmokY7Y6BLXRa/fUNZrnZEmF1sp+rZfNzIKpwigWgS1vklABF3Rk/14M7FoM4zqpOmd+RoUKVuJY=
+	t=1728583171; cv=none; b=NuTQEdwKFwh3Yprl+2M2mlxwO3wCu8d3p+uzkw2uk7ZVC9Fy6WZkcIIq5Fao7R6K+9CqgjnHzRItF+btaiT92VvFFIe7XcrxkBiuaOd5BafYmMSP9XaNWU2ZMGCqm17ePKqzEuChDaI35qUlCVeaPVNVuOOr+UQwgLh6CtnX4bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728582861; c=relaxed/simple;
-	bh=ZW9HmnHolJg/LLgpuCO5NuvmDeeRr46LFSiQHdTmiI0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XZiJczM/KAAjb79Dh7M1I+8M5ZZU4dAAAMd2L2wisYKV2FddYhsSvbD889Z0EigZlYW6IHlZLpPuuXcaizlCXdZzSKTqX99ZMz2P1z/yw02+pzFeWFM3GFtimtobH2UGMBRtFG2irfEz7xGoreo1Msgw8YZy/yfJp5ilMecNZRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h1mbn/i9; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-45fb0ebb1d0so20441cf.1
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:54:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728582859; x=1729187659; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZW9HmnHolJg/LLgpuCO5NuvmDeeRr46LFSiQHdTmiI0=;
-        b=h1mbn/i9g/VXr2kQi0u52EAm79XWv7ovua9Er4Mmmrs7rXP6dlBITzZ4hhk0OYd/Xt
-         dUJ6jYMl495X3gdt9SwCGjJC51cWrb1dCSES4a6Ab1GC0u0Iyh9ateJs8+Y6FTALNMGN
-         pFHuCe5fSbal4x0q2mknn8SZQSmp5Ia5KnO3z670BxDRaW6xYHXcz3z28G6RuhGrz1kn
-         C+L/LGHBLCJwIatKlzWbfG+8H48qgGnJ9gw38kKofX2DR+bH7A8CrdOUr+neZ9idX3eZ
-         UyzHmMsDVXx2g7hvVckVLk3cHkJR0ltEtT6Ag5oogz6kwfiqVX0mrW1GnGl38PpWvcb7
-         Bbsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728582859; x=1729187659;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZW9HmnHolJg/LLgpuCO5NuvmDeeRr46LFSiQHdTmiI0=;
-        b=gBJQxEQJzFKAw+Qv7K9TW4AprQZSIiqI3yLHVJLcEoWdrwLY5J+UlZpl9q982JNpzL
-         ZMFVa4C614FRidvaeOXpMwrw14ulDBjso0QaJcNLaLrcY6Wzi7mFI+XdYhYs3aohNwmS
-         plN7v0u8e8i77zK5Hb1rTS/SKYp72PmrHyi0psRI8hjjlfX4riOOgo1NjWBtGeqVFOBW
-         xqkNR5eaxx/DYC38biArSvOvs9E3OWweVdMq8q9zTth5PKxkXDeh5Pf3GawxzcK4OsDc
-         lo/EM0c1rwOrbwY8LDTZA9Z/wdS81IsWN9GSVIWXid++ZUTe8SrT4B7VahFmzmcMbH5m
-         i0Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCU14wbxnVh62GOjWKq+ubD0UDiI2NH+0o3IAnXyO7RhIvXcUqx3FL1pVDtJ+mv7YfxGC+u5Hqg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxShDZdvDwmvccJozaA6lNLbmJTEldW2fH3TsG7sCNTXP6I6JKe
-	RIFN5KtUtX3oGTYEOzln6kUFCIBSvZguor3UXE5dB0n+/UsX237K38h+FhVgxlxYgq/KBnC/Dr+
-	I2Z+6lJzDGlYUOcuvgz6/FtfDunpENR8FMdtm
-X-Google-Smtp-Source: AGHT+IFoFOh5E6DMEbh1pCja/UyuJ4Nb4Q2wewSDJNAMu+Qapmq9K1pBPstKAJMuxmH2Et0n0YgSgpq3NSHvP8MHfdk=
-X-Received: by 2002:a05:622a:4e04:b0:458:14dd:108b with SMTP id
- d75a77b69052e-4604b132706mr26531cf.13.1728582858210; Thu, 10 Oct 2024
- 10:54:18 -0700 (PDT)
+	s=arc-20240116; t=1728583171; c=relaxed/simple;
+	bh=qfykBgfbtJOYVMCMJ6rPDAFl8steKNqmHZFQMQv+e9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tZmNtWCmaVrXbz0E5pf6Hq1teB19UUdEEdo0wfTDxVT05fm91fKLsdH6fH2uG/LkchhVo2+Za8gr+Ar7SdVIWk0btROCd7KdFdQuRPUtokRuKMj6rWTr2QVyJhos9SmPBWRaKq4psCMbtIiUssJGldS0GtfU95mMSVZEzGRM7jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1syxRd-0003Og-C8; Thu, 10 Oct 2024 19:59:25 +0200
+Date: Thu, 10 Oct 2024 19:59:25 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Florian Westphal <fw@strlen.de>, Richard Weinberger <richard@nod.at>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, kadlec@netfilter.org, pablo@netfilter.org,
+	rgb@redhat.com, upstream+net@sigma-star.at
+Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
+Message-ID: <20241010175925.GA11964@breakpoint.cc>
+References: <20241009203218.26329-1-richard@nod.at>
+ <20241009213345.GC3714@breakpoint.cc>
+ <CAHC9VhSFHQtg357WLoLrkN8wpPxDRmD_qA55NHOUEwFpE_pbrg@mail.gmail.com>
+ <20241009223409.GE3714@breakpoint.cc>
+ <CAHC9VhTC=KAXe6w9xTG_rY4zAnNvPv-brQ7cTYftcty866inCw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-7-dw@davidwei.uk>
- <CAHS8izPFp_Q1OngcwZDQeo=YD+nnA9vyVqhuaT--+uREEkfujQ@mail.gmail.com> <9f1897b3-0cea-4822-8e33-a4cab278b2ac@gmail.com>
-In-Reply-To: <9f1897b3-0cea-4822-8e33-a4cab278b2ac@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 10 Oct 2024 10:54:04 -0700
-Message-ID: <CAHS8izOxsLc82jX=b3cwEctASerQabKR=Kqqio2Rs7hVkDHL4A@mail.gmail.com>
-Subject: Re: [PATCH v1 06/15] net: page_pool: add ->scrub mem provider callback
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHC9VhTC=KAXe6w9xTG_rY4zAnNvPv-brQ7cTYftcty866inCw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Wed, Oct 9, 2024 at 2:58=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 10/9/24 22:00, Mina Almasry wrote:
-> > On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote=
-:
-> >>
-> >> From: Pavel Begunkov <asml.silence@gmail.com>
-> >>
-> >> page pool is now waiting for all ppiovs to return before destroying
-> >> itself, and for that to happen the memory provider might need to push
-> >> some buffers, flush caches and so on.
-> >>
-> >> todo: we'll try to get by without it before the final release
-> >>
-> >
-> > Is the intention to drop this todo and stick with this patch, or to
-> > move ahead with this patch?
->
-> Heh, I overlooked this todo. The plan is to actually leave it
-> as is, it's by far the simplest way and doesn't really gets
-> into anyone's way as it's a slow path.
->
-> > To be honest, I think I read in a follow up patch that you want to
-> > unref all the memory on page_pool_destory, which is not how the
-> > page_pool is used today. Tdoay page_pool_destroy does not reclaim
-> > memory. Changing that may be OK.
->
-> It doesn't because it can't (not breaking anything), which is a
-> problem as the page pool might never get destroyed. io_uring
-> doesn't change that, a buffer can't be reclaimed while anything
-> in the kernel stack holds it. It's only when it's given to the
-> user we can force it back out of there.
->
-> And it has to happen one way or another, we can't trust the
-> user to put buffers back, it's just devmem does that by temporarily
-> attaching the lifetime of such buffers to a socket.
->
+Paul Moore <paul@paul-moore.com> wrote:
+> Correct me if I'm wrong, but by using from_kXid(&init_user_ns, Xid) we
+> get the ID number that is correct for the init namespace, yes?  If so,
+> that's what we want as right now all of the audit records, filters,
+> etc. are intended to be set from the context of the initial namespace.
 
-(noob question) does io_uring not have a socket equivalent that you
-can tie the lifetime of the buffers to? I'm thinking there must be
-one, because in your patches IIRC you have the fill queues and the
-memory you bind from the userspace, there should be something that
-tells you that the userspace has exited/crashed and it's time to now
-destroy the fill queue and unbind the memory, right?
+Seems to be the case, from_kuid() kdoc says
+'There is always a mapping into the initial user_namespace.'.
 
-I'm thinking you may want to bind the lifetime of the buffers to that,
-instead of the lifetime of the pool. The pool will not be destroyed
-until the next driver/reset reconfiguration happens, right? That could
-be long long after the userspace has stopped using the memory.
+I'm confused because of the various means of dealing with this:
+9847371a84b0 ("netfilter: Allow xt_owner in any user namespace")
 
---=20
-Thanks,
-Mina
+Does: make_kgid(net->user_ns, ... and also rejects rule-add if
+net->user_ns != current_user_ns().  As this is for matching userids,
+this makes sense to me, any userns will 'just work' for normal uid/gid
+matching.
+
+a6c6796c7127 ("userns: Convert cls_flow to work with user namespaces enabled")
+Does: from_kuid(&init_user_ns, ... and rejects rule adds if sk_user_ns(NETLINK_CB(in_skb).ssk) != &init_user_ns)
+
+Seems just a more conservative solution to the former one.
+
+8c6e2a941ae7 ("userns: Convert xt_LOG to print socket kuids and kgids as uids and gids")
+... which looks like the proposed xt_AUDIT change.
+
+As I do not know what the use case is for xt_AUDIT rules residing in
+another, possibly unprivileged network namespace not managed by root-root user,
+I can't say if its right, but it should do the right thing.
+
+Sorry for the noise.
 
