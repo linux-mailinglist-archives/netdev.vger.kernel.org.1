@@ -1,166 +1,131 @@
-Return-Path: <netdev+bounces-134366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7022998EBE
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:49:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B7A998F19
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66AC6B28518
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:49:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3C6CB2A077
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C11D1CCEC5;
-	Thu, 10 Oct 2024 17:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D99019CD07;
+	Thu, 10 Oct 2024 17:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L+P+PIu5"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="c30ed0tW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12olkn2037.outbound.protection.outlook.com [40.92.23.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76031C9B6F
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728582510; cv=none; b=R08cws5A1jwbTCzFcVTDiOPB5SqwNFKN/QC+usf8V47P/7kDq/QyP2nBk5LN61WbmjTL7AGRRk2wquUGgAKJsfRRSbc5PADLwNOCnj1nj02ZfzfSabHGTG26QrU/fxneEMgASnWnXArr1j/ydZIIyB3fkAwII9EEniGBjBdpM6M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728582510; c=relaxed/simple;
-	bh=zonKsBU1GurMAmpIRhwC/D9RxGan+tC92g9iQoZgywc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HerhDAUjDQUOcQEHV+4+Fhps0Dk4kbl7rhLuhEuYhjrO/HxdG/kHx4r7ghBa/iy/TS9Ahl6Tg4lLvBfVold1sTKO2lrTzyVvkBI64D4e1EEL7IVa51xLWsK4tOBt2vapVnWq2H6b9VoXu0XGJGy2qGY6jbJ211PpngRkY0gwjVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L+P+PIu5; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3204db795so20872427b3.2
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:48:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728582508; x=1729187308; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tKR4YNRuy3v3002HCuwc8XsJfvyuPUaTnDkfawn1JOM=;
-        b=L+P+PIu5hQfeiduSb6P2U8xvVspccfKCKT11UUnjzSGZxxK38zRDSCPminXCcuAI3U
-         pfHfbqWk0MAkPvhnMyIKl5AP4ekSGBWr4OrPai/BmuHWrt/9JDdTA2pyeVUGt1FiPfsk
-         nbWLuvMFL/KEgzFTLOdyvqeGDvZ94w6t1GP3zi2lI1yjG90w2Y6JgiL9WqhAg6KyTtsD
-         4I0B0gTG0F6jwZbclzjAyifO3v9UsQjK5ODcmJ4OEpTdVScK+4en1WHMKkbIJZdDJy9N
-         Q2J7vvFFti+XIJYnip+uFo2xUDgXOtDD76nS9xUjlqJWu7QN+c0T9tUUsGjW0/fHIL7V
-         J1hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728582508; x=1729187308;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tKR4YNRuy3v3002HCuwc8XsJfvyuPUaTnDkfawn1JOM=;
-        b=ZOV454SfMHTuriM56Fenh7KbZ1EGO9xkWVpSlMKsavKetkpIbWWD8+C7L9tKlc32wp
-         AnBocyEqrzbgg13h0S7TA4GHy4KsEDQf52CbMuqB3mJctlMZlIh/xn+STPLfZvUBaYUB
-         99vrFTsUmtZ6eKnt9NhrZsbLeElCLSEwuX5S/VEPDR8k6Skj0uETqknXn7P1Eq0q7HUn
-         +G36E//d4i9ZrAYUd3d8Bhe2ZWtEvyWF5wps9Z603S0GkxHsYq6E2vbVACHyJZuTeSSJ
-         Yo9MuTBvpd0bbp/n9IVQmkyBbSy4OmmgeL4XvfNwPw+JhSv3lTPwlQZyvDMZB+cNpNXW
-         W+qg==
-X-Forwarded-Encrypted: i=1; AJvYcCXf0DNqx2u14EEw2HCy8Y/TrW4ScqMIq032rg2QDMJH7fqKlLcyjCEfocov4Aua++W4qrTWnWc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyje6/QojXFT8GYDXn3RFGotsT6iVl0MDy79hmS25+8fLJPFsSq
-	0YGPEK38bP5cU1zEkzS0HbZznj/2RtzPSDOODxzVFnVcNXL5sw52blMwpwHrOZsMOyGmyhpwhkV
-	ptt06ZwtQkQ==
-X-Google-Smtp-Source: AGHT+IGsQbetn9j7kXw+KnQ8FI4jlj3mf2IdaikLQuDPQGnnS8jTpwpDCkhBGduabrUTRvKH3aNTK2w4TMWrQg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:690c:460d:b0:6db:89f0:b897 with SMTP
- id 00721157ae682-6e3221683d8mr173547b3.4.1728582507790; Thu, 10 Oct 2024
- 10:48:27 -0700 (PDT)
-Date: Thu, 10 Oct 2024 17:48:17 +0000
-In-Reply-To: <20241010174817.1543642-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF951CB309
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.23.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728582716; cv=fail; b=qq+65sg1m8aCCDPM8MxW4dHH/xWgIwe20b4oAYvI6nWExCs1faiHyZLyRklND0nin0cAOQ9Zryc9IhFpzHPySWimeVJCes7j2ZmZUnDdtRSoXN9hcd1tcjnpc8mYsYh28M5ajarIjY23PW3aetA5iIhnMpwiofZNbkEWGaVyyWY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728582716; c=relaxed/simple;
+	bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
+	h=Message-ID:Date:To:From:Subject:Content-Type:MIME-Version; b=giQmqakmkS4ZibC3Xjmf6QgDvgEX9OXz7Uc2MYPLpTvaxMfd8Rf6YxFtmccYamqkOrY7HnrTIJSOU5iy82abp5fbaKN2UYdnYqeoQ1MVWHprA/wySPvYQJJ6+DYau6sBGNAdVHnndErxGJtBJMfYcyQ+RhmazMThAB170iY/QXs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=c30ed0tW; arc=fail smtp.client-ip=40.92.23.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rsJn5SwiZZMZXpGiYenqf+82YLi9xFYqYz2/ZGYZe+7RpAWGSDkffoIX6BCO00z60iAEr8KwxyNTf5M1XPuP4kLTUPwcZsThYlCpzXj+MZrjFcMhWWOAfujPqDtga/prTq7KSsK7H0b1TxMYqWdUXHxT7rC0n6WqBsBhDk9MoSLGOnWRbs8DuSlolQE1v5A7X7rJ5zrDbrg00Vqo6GUnfv8YxIZNshw/14O2uzM2hh7FOkS40fKsc3CTbqbJNU5ES712+MWVa1sgEwyG660JRcuoygAnJf/e58iwC2HnVbEU5e5LeJMBxflOwtdCApOeevFIZq4N3dR5rSlR4BRMKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
+ b=dlVknA43HlzXilkRMWB7q5sqXTqmPnD+aXhkurqQ4EsRXIpTaZhRP5H8QimQQmciDnPF4UgZXeNvlBl7svxK7I5k4xWe2Tcn9af0Ej8hVo0FTK3NivJ6+w2dIxEqH6znwXtXnbFHaTWOjzzoBSAJbCvsyOrcJjatyZqIIzAA5wEP9pWnF8Khhnr64jnzg5L3I3NdEGivWl1D8/+SSLqk+S20Fx3sMyi7UvfybLgJpkFjPd4TolgKKBDTN3n4FhSGkFOTZpLi/jnoT4DG/5jaleEWOnuOG6bM41wwCpkDAfFETKptbZyegQzd4T+m+dLPHGEF3hClHz+UzGSm82Z4vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
+ b=c30ed0tWpka3q4anc/ri4tV1+WgB6lJr+iFywzDcU8NBJ5WPfvRS6dWWCrhHBD/D6qnk/r4cpAyzndBiOwfAfmotZrfobLhLNu1hoDIp/ReCEKBRKyLjfJyoEj8y8p3ctEXStDtQrqkt67e3ovxZiJufIkau6l0DwvC1Tycx4cR2DBWOGprcEHNZ/xfImhGRO2xanhBqPK6PAZ1u0drd2TaoUz8TJQZ8kjS5iUr8uQ7AA6qEcAM5z7nw8YRLrrF6RmGWOmOliyPE0gnsxv6TlEJ7UH7+PJZe19jwHkoV58XZAYIdymgwHx01flJIlaKOV0gVO7kMRAv1P85FC8HkXg==
+Received: from CH3PR84MB3522.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:610:1ca::5)
+ by SJ0PR84MB1823.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:a03:435::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Thu, 10 Oct
+ 2024 17:51:52 +0000
+Received: from CH3PR84MB3522.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::ab1f:ea69:7433:dd47]) by CH3PR84MB3522.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::ab1f:ea69:7433:dd47%3]) with mapi id 15.20.8048.017; Thu, 10 Oct 2024
+ 17:51:52 +0000
+Message-ID:
+ <CH3PR84MB35221465D69F6E3CF2EFABDDD5782@CH3PR84MB3522.NAMPRD84.PROD.OUTLOOK.COM>
+Date: Thu, 10 Oct 2024 13:51:50 -0400
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+From: Iulian Gilca <igilca@outlook.com>
+Subject: subscribe
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BN9PR03CA0805.namprd03.prod.outlook.com
+ (2603:10b6:408:13f::30) To CH3PR84MB3522.NAMPRD84.PROD.OUTLOOK.COM
+ (2603:10b6:610:1ca::5)
+X-Microsoft-Original-Message-ID:
+ <b104727c-2b24-4ba2-896d-93f56fdc9d08@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241010174817.1543642-1-edumazet@google.com>
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010174817.1543642-6-edumazet@google.com>
-Subject: [PATCH v3 net-next 5/5] ipv4: tcp: give socket pointer to control skbs
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Martin KaFai Lau <martin.lau@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Neal Cardwell <ncardwell@google.com>, Brian Vazquez <brianvv@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR84MB3522:EE_|SJ0PR84MB1823:EE_
+X-MS-Office365-Filtering-Correlation-Id: 27219979-4545-4adb-1397-08dce954388e
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|19110799003|6090799003|461199028|15080799006|7092599003|5072599009|3412199025|440099028;
+X-Microsoft-Antispam-Message-Info:
+	MRvhv/SFi5OD0msAhOqKDoUldFeSXZ0xU0OgLxUzvgqoqEXSWWAxrE2rg05llvQrApxl+Bp14smjlwqWfuPGzAvMKRtut65yMXl//KgKCFAsdv5H9k/26Le5B6UJ3A0zWgkZmEGs6EVcXzyPcWUQWdw2gOK+wyE7ijQErG2n66LR+fQcp19ce5nnhQ1sAE08oBTlbYnZuqgVaEca24qMPgJs6Xvllhgu9JuMMwBfwGLMrtd5MCF5Whojb0T/e3pknELkwljE8IHt8c7mWZ8wpuN1XNaFlHiN0z4HKGJXkhEA6+hCnWnGUfhEC+G16HnSrkjR8b2UVd+hJRCirDz05QhKPMRyhgg+AlE/rBZC57od/I5WTfeaNH0MaQF+tvzdwoHxBnRTxoNjmckFJo/cH8Fe0HV1djbu2F+yKDHLLTEDygNbNCqrpLtNtXDS0VNy695Rff5pYBg4hrRmSDHREVfzrZPsqKci+AN5n9smpl0=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UEhHdXhoZW5IRSttclpEZ1NML2VzYncrUDdSRjIvZDJYc3h2ZndkTzhQcEt4?=
+ =?utf-8?B?Si9wRzZUWG9iWnlDQVlQWHBBWTBFc2ZibkVoM1MzSzM0d1Y4bloxWmVSRGhs?=
+ =?utf-8?B?aUJUYVlwREJMYW13dE5wZlZiUDdqRXMrM0Zjb2RDc0E3aVc4RTRoRGhiVS9K?=
+ =?utf-8?B?Vi9Vc0JWUFRGTzRCTmErSGsvRkhoVjg4a0N3WUl4Z1ZSbUlRV1RZTHY5bEpa?=
+ =?utf-8?B?NUQwT0Y4Wll4TXVEQ1V3K28wci8rQ0s4TGRPdHFQL0RmOUQycWNQWFYwTDRG?=
+ =?utf-8?B?cTkxZS9LTzhHdFF0b0ZhRUhOR2hKdENWOFZqRVhIczFBcXZLZTJKQU51R3dN?=
+ =?utf-8?B?aXFYZllIUlZpakZFWE4zTUdHU2Z3MlNrd2pCOHVDR2FjRkpRTTYrT0JuRzVp?=
+ =?utf-8?B?TndjOUROT0k2UlpXcncxTnpmaWd3MDZ4bXoxam94MmVCMUtJaGMzRkxlM1hp?=
+ =?utf-8?B?WlY3KzBCVE5nQTVNU1NKaWpRMFo1T2R6eDNKdmxNSHRpZXdpN1habnlRQjNh?=
+ =?utf-8?B?UDZxNGlVYVlmdWVvc0h6bE1SMVlXZlZ3enRBdHdHZXpseVE0T1RMYkFiT2xq?=
+ =?utf-8?B?a1BHWm56c2t6VTdncTJMRXRhb3U1RUJVeW1SSkdqMndkU1lHWURZY2x3ZHhK?=
+ =?utf-8?B?Q25LN2RtUjdnY3VUR0VTVmxLNENWbEdabndZY094OE85Y2NTbUZmOEdtUnZB?=
+ =?utf-8?B?VkZ0ZGFXZ3I0aFE5VldoU2kxSkhHdndTSkJDS3FlN2FSN2QvWDA3TGdjemlG?=
+ =?utf-8?B?c25UeFI4WGtPQytxa1NGSHFEd0NrczF3VXJtYkVlbThLQzhSWkZJVm5ISWV5?=
+ =?utf-8?B?SE1SN1paR1JmNENmemZBYjFYa2RRWTFIY2RTa25XaXB5SWpROGNWSTFjRWo1?=
+ =?utf-8?B?cmxUWjFUbnBPMkROV043b09uSUlTVUxmem0vRzNTZVNGaXEzbW1HbzJJZk45?=
+ =?utf-8?B?R0dKdWZCSTZ3SERSNS95Q25KSDZBdmpsbm5jdW1tbHp3S29WcDZwUU5ZYWkv?=
+ =?utf-8?B?aGI2TEdKWkNMVHhDa0Zjejh4bm9ra2pHVnZ0Q2JPaytKZFdJbnQ2Y2pnSm45?=
+ =?utf-8?B?Umo5d1QrbEZMQUE4L2Nad3B3Q0lyWndvZEU5c1ROY0lkdTlQdTBGblFjVm9K?=
+ =?utf-8?B?bnJ3UzJjcENxUEMxSGVBN3F6UEROOXZNVEdmNUZHLy9saDVjQXAwNU55d2lU?=
+ =?utf-8?B?RFY4UkIrQlpQQmszNHY2b1RaMm9hZUZ3OVZ5VFF4SkNoTDRRQy83TkF6SEpI?=
+ =?utf-8?B?MlUwK1NlYTJCWVBpSjd0SHhFYXBpMXlIenJTOFVJY0FOYkFTM0lCTDNveDVE?=
+ =?utf-8?B?ZlFQNE9MMGRIVGpkeHZrdVI3d0J0NUZhWStHZVNoNi9lSER6aDNaTm9aTGdF?=
+ =?utf-8?B?N1RmcGJPZU5iaEoxcVQra0dLbFZpdWxBQ0VnOGlIZjhyWno3L0hHRmFqWHN5?=
+ =?utf-8?B?UTVYd2E1NEFkQzNKZnhyM2s1c0FJamxuU1hCRGJoY0JaeTdYSkNTL0dBKzh4?=
+ =?utf-8?B?Y1JHMGE1VUtpNWxDMU0wVHZzbE4veitTR01aMUJCL28yTG9UTmlZZjRjMFZx?=
+ =?utf-8?B?LzgzZ1dvNlVyOHltOGNFK0d1c2tGb1Q2eVdGVHMwUUd2UnRrcTkrT25EUDQ1?=
+ =?utf-8?B?eTZKdk9DREd3QUMzc05nSG1aS0ZxQm4xUmFocFFCbU0zUGxSZHo5M29oSGNS?=
+ =?utf-8?B?TXlOTFYxVkR2QmVhaFlnTjJJeTBNQkpVbllPSERodTdVbzNHTERUMTUrZWMx?=
+ =?utf-8?Q?CJlrpRHdOUbYaVok8M=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27219979-4545-4adb-1397-08dce954388e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR84MB3522.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2024 17:51:51.9145
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR84MB1823
 
-ip_send_unicast_reply() send orphaned 'control packets'.
-
-These are RST packets and also ACK packets sent from TIME_WAIT.
-
-Some eBPF programs would prefer to have a meaningful skb->sk
-pointer as much as possible.
-
-This means that TCP can now attach TIME_WAIT sockets to outgoing
-skbs.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/ip.h     | 3 ++-
- net/ipv4/ip_output.c | 5 ++++-
- net/ipv4/tcp_ipv4.c  | 4 ++--
- 3 files changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/ip.h b/include/net/ip.h
-index bab084df15677543b7400bb2832c0e83988884cb..4be0a6a603b2b5d5cfddc045a7d49d0d77be9570 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -288,7 +288,8 @@ static inline __u8 ip_reply_arg_flowi_flags(const struct ip_reply_arg *arg)
- 	return (arg->flags & IP_REPLY_ARG_NOSRCCHECK) ? FLOWI_FLAG_ANYSRC : 0;
- }
- 
--void ip_send_unicast_reply(struct sock *sk, struct sk_buff *skb,
-+void ip_send_unicast_reply(struct sock *sk, const struct sock *orig_sk,
-+			   struct sk_buff *skb,
- 			   const struct ip_options *sopt,
- 			   __be32 daddr, __be32 saddr,
- 			   const struct ip_reply_arg *arg,
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index e5c55a95063dd8340f9a014102408e859b4eb755..0065b1996c947078bea210c9abe5c80fa0e0ab4f 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1596,7 +1596,8 @@ static int ip_reply_glue_bits(void *dptr, char *to, int offset,
-  *	Generic function to send a packet as reply to another packet.
-  *	Used to send some TCP resets/acks so far.
-  */
--void ip_send_unicast_reply(struct sock *sk, struct sk_buff *skb,
-+void ip_send_unicast_reply(struct sock *sk, const struct sock *orig_sk,
-+			   struct sk_buff *skb,
- 			   const struct ip_options *sopt,
- 			   __be32 daddr, __be32 saddr,
- 			   const struct ip_reply_arg *arg,
-@@ -1662,6 +1663,8 @@ void ip_send_unicast_reply(struct sock *sk, struct sk_buff *skb,
- 			  arg->csumoffset) = csum_fold(csum_add(nskb->csum,
- 								arg->csum));
- 		nskb->ip_summed = CHECKSUM_NONE;
-+		if (orig_sk)
-+			skb_set_owner_edemux(nskb, (struct sock *)orig_sk);
- 		if (transmit_time)
- 			nskb->tstamp_type = SKB_CLOCK_MONOTONIC;
- 		if (txhash)
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 985028434f644c399e51d12ba8d9c2c5740dc6e1..9d3dd101ea713b14e13afe662baa49d21b3b716c 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -907,7 +907,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb,
- 		ctl_sk->sk_mark = 0;
- 		ctl_sk->sk_priority = 0;
- 	}
--	ip_send_unicast_reply(ctl_sk,
-+	ip_send_unicast_reply(ctl_sk, sk,
- 			      skb, &TCP_SKB_CB(skb)->header.h4.opt,
- 			      ip_hdr(skb)->saddr, ip_hdr(skb)->daddr,
- 			      &arg, arg.iov[0].iov_len,
-@@ -1021,7 +1021,7 @@ static void tcp_v4_send_ack(const struct sock *sk,
- 	ctl_sk->sk_priority = (sk->sk_state == TCP_TIME_WAIT) ?
- 			   inet_twsk(sk)->tw_priority : READ_ONCE(sk->sk_priority);
- 	transmit_time = tcp_transmit_time(sk);
--	ip_send_unicast_reply(ctl_sk,
-+	ip_send_unicast_reply(ctl_sk, sk,
- 			      skb, &TCP_SKB_CB(skb)->header.h4.opt,
- 			      ip_hdr(skb)->saddr, ip_hdr(skb)->daddr,
- 			      &arg, arg.iov[0].iov_len,
--- 
-2.47.0.rc1.288.g06298d1525-goog
+subscribe
 
 
