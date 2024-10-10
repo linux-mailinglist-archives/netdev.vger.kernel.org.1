@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-134361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99795998EB9
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:48:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1797998EBA
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410F31F24FF7
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E6BD280ABC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486A319A292;
-	Thu, 10 Oct 2024 17:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AED519D88F;
+	Thu, 10 Oct 2024 17:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Elm/IpL5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1scUtVZL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F5C19ABC6
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00C619ABC6
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728582501; cv=none; b=P+Asx9UPEQ3dmZYtjFBCxSck7gZcHSU/npYMB5yXa0wBNPtD941zsWSYin1dBHKZ7p7NvNRF/fWD0c1bBJ7DM2+Wm8Y5XO/ouvO+Ey3xRgHhrjQBAmi4SppHwGlIP9utpc0JDKBaiQvKSWbvt7UOHasei2hyq7pTMg7k1W80830=
+	t=1728582504; cv=none; b=pAaOKpE/eDvJ8Uv2nfYuK73kqasQcVAcbhkNPe0u2+73STTK5wk7DKMRy0M/wm2xlc3CKQbGx1Ea/tG2UiaaztTfCawxyEdN0N04kXTydMxEHCRSUYVtBqSqo5UATr9EnU8TGsHDwwH/ujDSVhBDJRVa6pvJNDKoRUlGZt3mfCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728582501; c=relaxed/simple;
-	bh=bCTFl/7F8LbeaJIpj3Udlkvsge65XDuwy/JgySGN0oM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OJ9+T9yAW4LKRH6+0FjHCamDeRkc2cz6TS6Z7gSHtwwAcSAcgfMM+iaA7gGzLgno+QAIlJaQKBLLCLcftns+6A5JaMBbQtUxztJg39cNZQ3yUkLY2agG8rr15D3r2+0yMqsrH2s/z4UO2YNiVZKE66l+2ruyUsk3lLwUfewdhGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Elm/IpL5; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1728582504; c=relaxed/simple;
+	bh=q0ymEh3R3/S4uNyQ5q7zY0/XLw3g0RXbIdEqLudYaJs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=cCIu7Lnr5oENT3g8ouwFNBHBuvLkhdr5r4hnAmXqVu0dvDa4ckKSLeXZlRUoRX5rCTrYcCEtLPh7B+tx+m10DEkqYdXV1cJ9qVupTvoHDDSTZNVGnbB6a8smJ+5XXc/gAZqwLgvuYpt0ZfS6G2aESZy7DuqmCYYQUHPAmLaHZrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1scUtVZL; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e29b4f8837so18295997b3.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:48:19 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6dbbeee08f0so34194807b3.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:48:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728582498; x=1729187298; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Uo4jSsmbYIDoMRuJl6rYrKS3viZC0aPbs4SAjrDDDJY=;
-        b=Elm/IpL5nWdidvM+KtJsqyGPxYxP4ji0qB2Cxw6C5cGHuBb8SzmmeHvxNU0us57dRx
-         y5LHs4DMDdG0uAW1Jw4PS5kOQnWr3KmmZAQ34uBFTJD6crc2gA3wjOIgEYY+Exz/+Enk
-         sWiyiW+ZJZZxMFX7lhp3+FEAuwiW6swvbm3XnpTRTlWWCI3uDtiE5u/O429ZmX9R+Uof
-         cuCwIWjwPefoYQ+bF+vfgYKF0r3sryI4WzgJxDpeAcCrzxIUwygj2esykty6Sphm6TaX
-         1iJJP3Puu9NRLkWLnOUOWIDsj3Mw3Lj9BTaU/DeIXK/yYX5Bvg9fWvyNn/mJzNR8GXAr
-         EWow==
+        d=google.com; s=20230601; t=1728582501; x=1729187301; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XoMnp4Nry8CjnjfsHz9gkcWW9bq3s6INmjM+kPdCiJU=;
+        b=1scUtVZLOjJQTn2968wZXg2iLQMSOabVt42By88qfGTqRoDg+9gC37gWyB+LNZCkjK
+         WqelCHIKpC1LijjaKdhsWfkk+bEWQUCxxROMGOc5qRiOVTfMQcfG0kmm6OCDnBFCPUlr
+         LzXseiyYvFetGRcQAnV6i3cufQjUrJcqOzqPFLvqusJO0ePmwmu1H1qrRJ54mFml2esq
+         EpDbltrTOGbCwTANr+5ooNyiIZWGsazfBDq2EnzVlTlygv34THTV9PBrXaMVNOpInyFo
+         ploq/FEKyGkWp9iThk7zyn+NsyeW0MPyye9AYlep67Tglrhm9jJk7onW2amnXwJsC9Bh
+         jvBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728582498; x=1729187298;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Uo4jSsmbYIDoMRuJl6rYrKS3viZC0aPbs4SAjrDDDJY=;
-        b=c9mbaRCip8K2Ui7+289LocxC7zgVuSsoeqMg5EaL+14IPQ6Pji0+0B9EPc3AKEwO3k
-         uA9Y6mjlH2O6/8ET1CpH3bHLuaFksaG1ZccajWdtx+FWJ1ZVxUx72n7mGTonp2rpgM91
-         I7uyFC81fTVKiNgm3ikk8EXAxJLX2hVsSrLuqjnnCZT3ORqm/ViSNkYi5IQXw08UuItd
-         scioKN6UdrDugkOTxykA2zNVL3L8eKmdpjOty4zRe5sayu0ArrG/B+q/UPFrVbMzoWKZ
-         8/Z+R5XWruLhCzEGJrNpnXJB3CrbzTzAbwoFqbPDWDEZz6ghzWGhBn1p0dBrlGQp1QwA
-         dWuA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/WMgYnRpbdpFAtJKOn0wz8PlaKMbIFqDtJ0DucqKgDIyrpAiPBdZ7KCLGBiyEaziPNVWeNqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8ZeQHo3STAc4fmxKDuBCWIL2g8SqmK34fVY0a8fpEyI8FiPAT
-	YCz9Eq801TaH/hgdfVsqtvFeoblrZ+FJMqOlZvh0jbb+7TAjTEmnz0Q805ACydj6PcfleF7Tg7n
-	egBR6hCtogg==
-X-Google-Smtp-Source: AGHT+IH5ZBhyPC+DKfAr/R1mcvjLHqfVvfrbarGAaTM+JWoguc0fCG2eAyiz6fSjmeJJm4ZMLOlrM78BDjMtBg==
+        d=1e100.net; s=20230601; t=1728582502; x=1729187302;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XoMnp4Nry8CjnjfsHz9gkcWW9bq3s6INmjM+kPdCiJU=;
+        b=N1METCiZS7uyplNvOEUEJw0NVJoAiHfuiHChA+3NuDq/bUVy/6ecZB648nngrKbGY5
+         dg5LqGEWttE/zSDFHTW0nVEubyMQcZcgsCGTw7SCsGUjFFXhYZqHHTEKp9MmfiI/Tnbo
+         lxG4O3/o5cglZAWGnaZleO6EpkjqSIzlgeqap9d8Ji8fOL9clcxpUqwDiJPf7I7Y0NRU
+         w1xT9ASiPrmXYi5Uswwv4IuOB98zkJM6joxBRmxom3jxJts1ie5SM7GAFA0jv9OwD+/h
+         Gg+tv36LeqqG7I2Wv71hhboLVNIKE1rqFyVnayRdCTCmTsg+9uaaRT6JSaE/KLirUrwF
+         0cnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVw0Vpfp9229jCFTa62BAxZJ6XHjfUn2lTpOBi9W2TXWIhFwdh7gCxZOuv/Vf9xaHFE5Eb7mdg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywedza12WtE9xdMG+Aan9t89oc8mNbBXDEGVc6sY6nQngivZfkm
+	xoo9XSQ+Yj4XRPRS49oARTBXhBeeGuF5HB9AL4JWFjz7Fb20bjbzIEkFuFUCyqXaLYJknYJFABT
+	M7fYVm222Mw==
+X-Google-Smtp-Source: AGHT+IFd7PW72o3mET4chvQ8yYX2VyrAC6Vk/+fDf2YEWXTAmLfbdh8G9K7tEOjUFcQ8EI23xWRjS+0SxCTisg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:690c:2881:b0:6e3:ad3:1f19 with SMTP
- id 00721157ae682-6e32f25e97emr594667b3.3.1728582498655; Thu, 10 Oct 2024
- 10:48:18 -0700 (PDT)
-Date: Thu, 10 Oct 2024 17:48:12 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1813:b0:e24:b971:c4cb with SMTP
+ id 3f1490d57ef6-e290b7d67f3mr53411276.2.1728582501526; Thu, 10 Oct 2024
+ 10:48:21 -0700 (PDT)
+Date: Thu, 10 Oct 2024 17:48:13 +0000
+In-Reply-To: <20241010174817.1543642-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20241010174817.1543642-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010174817.1543642-1-edumazet@google.com>
-Subject: [PATCH v3 net-next 0/5] tcp: add skb->sk to more control packets
+Message-ID: <20241010174817.1543642-2-edumazet@google.com>
+Subject: [PATCH v3 net-next 1/5] net: add TIME_WAIT logic to sk_to_full_sk()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -81,43 +84,92 @@ Cc: Martin KaFai Lau <martin.lau@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.c
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Currently, TCP can set skb->sk for a variety of transmit packets.
+TCP will soon attach TIME_WAIT sockets to some ACK and RST.
 
-However, packets sent on behalf of a TIME_WAIT sockets do not
-have an attached socket.
+Make sure sk_to_full_sk() detects this and does not return
+a non full socket.
 
-Same issue for RST packets.
+v3: also changed sk_const_to_full_sk()
 
-We want to change this, in order to increase eBPF program
-capabilities.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/linux/bpf-cgroup.h | 2 +-
+ include/net/inet_sock.h    | 8 ++++++--
+ net/core/filter.c          | 6 +-----
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-This is slightly risky, because various layers could
-be confused by TIME_WAIT sockets showing up in skb->sk.
-
-v3: also changed sk_const_to_full_sk() to address CI splat in XFRM
-Link: https://netdev-3.bots.linux.dev/vmksft-nf-dbg/results/804321/21-conntrack-vrf-sh/stderr
-v2: audited all sk_to_full_sk() users and addressed Martin feedback.
-
-Eric Dumazet (5):
-  net: add TIME_WAIT logic to sk_to_full_sk()
-  net_sched: sch_fq: prepare for TIME_WAIT sockets
-  net: add skb_set_owner_edemux() helper
-  ipv6: tcp: give socket pointer to control skbs
-  ipv4: tcp: give socket pointer to control skbs
-
- include/linux/bpf-cgroup.h |  2 +-
- include/net/inet_sock.h    |  8 ++++++--
- include/net/ip.h           |  3 ++-
- include/net/sock.h         | 19 +++++++++++++++++++
- net/core/filter.c          |  6 +-----
- net/core/sock.c            |  9 +++------
- net/ipv4/ip_output.c       |  5 ++++-
- net/ipv4/tcp_ipv4.c        |  4 ++--
- net/ipv4/tcp_output.c      |  2 +-
- net/ipv6/tcp_ipv6.c        |  3 +++
- net/sched/sch_fq.c         |  3 ++-
- 11 files changed, 44 insertions(+), 20 deletions(-)
-
+diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
+index ce91d9b2acb9f8991150ceead4475b130bead438..f0f219271daf4afea2666c4d09fd4d1a8091f844 100644
+--- a/include/linux/bpf-cgroup.h
++++ b/include/linux/bpf-cgroup.h
+@@ -209,7 +209,7 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
+ 	int __ret = 0;							       \
+ 	if (cgroup_bpf_enabled(CGROUP_INET_EGRESS) && sk) {		       \
+ 		typeof(sk) __sk = sk_to_full_sk(sk);			       \
+-		if (sk_fullsock(__sk) && __sk == skb_to_full_sk(skb) &&	       \
++		if (__sk && __sk == skb_to_full_sk(skb) &&	       \
+ 		    cgroup_bpf_sock_enabled(__sk, CGROUP_INET_EGRESS))	       \
+ 			__ret = __cgroup_bpf_run_filter_skb(__sk, skb,	       \
+ 						      CGROUP_INET_EGRESS); \
+diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+index f01dd273bea69d2eaf7a1d28274d7f980942b78a..56d8bc5593d3dfffd5f94cf7c6383948881917df 100644
+--- a/include/net/inet_sock.h
++++ b/include/net/inet_sock.h
+@@ -321,8 +321,10 @@ static inline unsigned long inet_cmsg_flags(const struct inet_sock *inet)
+ static inline struct sock *sk_to_full_sk(struct sock *sk)
+ {
+ #ifdef CONFIG_INET
+-	if (sk && sk->sk_state == TCP_NEW_SYN_RECV)
++	if (sk && READ_ONCE(sk->sk_state) == TCP_NEW_SYN_RECV)
+ 		sk = inet_reqsk(sk)->rsk_listener;
++	if (sk && READ_ONCE(sk->sk_state) == TCP_TIME_WAIT)
++		sk = NULL;
+ #endif
+ 	return sk;
+ }
+@@ -331,8 +333,10 @@ static inline struct sock *sk_to_full_sk(struct sock *sk)
+ static inline const struct sock *sk_const_to_full_sk(const struct sock *sk)
+ {
+ #ifdef CONFIG_INET
+-	if (sk && sk->sk_state == TCP_NEW_SYN_RECV)
++	if (sk && READ_ONCE(sk->sk_state) == TCP_NEW_SYN_RECV)
+ 		sk = ((const struct request_sock *)sk)->rsk_listener;
++	if (sk && READ_ONCE(sk->sk_state) == TCP_TIME_WAIT)
++		sk = NULL;
+ #endif
+ 	return sk;
+ }
+diff --git a/net/core/filter.c b/net/core/filter.c
+index bd0d08bf76bb8de39ca2ca89cda99a97c9b0a034..202c1d386e19599e9fc6e0a0d4a95986ba6d0ea8 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -6778,8 +6778,6 @@ __bpf_sk_lookup(struct sk_buff *skb, struct bpf_sock_tuple *tuple, u32 len,
+ 		/* sk_to_full_sk() may return (sk)->rsk_listener, so make sure the original sk
+ 		 * sock refcnt is decremented to prevent a request_sock leak.
+ 		 */
+-		if (!sk_fullsock(sk2))
+-			sk2 = NULL;
+ 		if (sk2 != sk) {
+ 			sock_gen_put(sk);
+ 			/* Ensure there is no need to bump sk2 refcnt */
+@@ -6826,8 +6824,6 @@ bpf_sk_lookup(struct sk_buff *skb, struct bpf_sock_tuple *tuple, u32 len,
+ 		/* sk_to_full_sk() may return (sk)->rsk_listener, so make sure the original sk
+ 		 * sock refcnt is decremented to prevent a request_sock leak.
+ 		 */
+-		if (!sk_fullsock(sk2))
+-			sk2 = NULL;
+ 		if (sk2 != sk) {
+ 			sock_gen_put(sk);
+ 			/* Ensure there is no need to bump sk2 refcnt */
+@@ -7276,7 +7272,7 @@ BPF_CALL_1(bpf_get_listener_sock, struct sock *, sk)
+ {
+ 	sk = sk_to_full_sk(sk);
+ 
+-	if (sk->sk_state == TCP_LISTEN && sock_flag(sk, SOCK_RCU_FREE))
++	if (sk && sk->sk_state == TCP_LISTEN && sock_flag(sk, SOCK_RCU_FREE))
+ 		return (unsigned long)sk;
+ 
+ 	return (unsigned long)NULL;
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
