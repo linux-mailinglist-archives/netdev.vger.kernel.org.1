@@ -1,77 +1,59 @@
-Return-Path: <netdev+bounces-134395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87BA0999237
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:25:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04867999267
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B1A8B2185D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE1A1F23C31
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC4D1B6525;
-	Thu, 10 Oct 2024 19:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2521CF29E;
+	Thu, 10 Oct 2024 19:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VxL8Dtpm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iG9zYQkV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67962199E9B;
-	Thu, 10 Oct 2024 19:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B181CEAD5;
+	Thu, 10 Oct 2024 19:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728588165; cv=none; b=C8dGdTiqHBWieRkpfqq0TH6N7roM5DyAaqcc69440oHztKUOR9E7qihBOz6WME5cSl72CSTxx3MTS1aaDgNGeviRZ6Iy+x5TVRRmUfHi3xc9e28ttvT9jvGBdeSRGTr5WTynFkPer1JqeSECpyUh3m+mhsNfvBc0Ew4G61x1AKk=
+	t=1728588882; cv=none; b=m6K8k6TFaXDfRW0GH1Q1hp9ibFsOy3FsxhydpGXpWq7vURIfnHHT1be3Mp8XjGQJl2PWTvL3oBSD2lujLsV3I8q0j3AmowkmDQHva9K7EfNWtZiinh4PFSpyDQpCIw5e4neAg1YAZIPs5awQdY05w4CtjOsfjlCFMqnaVEZhPR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728588165; c=relaxed/simple;
-	bh=BobLlBAHXvgkmTfcYJ918ZwYFw0KZ50oja9YbgYE578=;
+	s=arc-20240116; t=1728588882; c=relaxed/simple;
+	bh=t75GofhSDibsXkq5vhS4pidBfayrClpUtE6ydgObg+o=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=WwxjmHy0i0bV7GNCEThF4AK8PPUpXZv/0vhH6Kg4pKy+r7z6ocUvYc0icarjJe0DZQ7QfiquExmYMND2wfuIFwWSn0wkpMnTh7ACPBqdKuHCxs2A/QfKEAF4nA5BBv/ge8/0kGhVfpT8l7kmHH9rA6D7vxKdqZ97RlzXfFUZdaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VxL8Dtpm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3EDDC4CECD;
-	Thu, 10 Oct 2024 19:22:44 +0000 (UTC)
+	 Content-Disposition:In-Reply-To; b=EYsvELSdHnU/R4VZnZamw0x95O95wZI85wMyqJHUfWhlIS6tMm9d8nYgCrl+yl8AoH6S9OO5d/lSUkzSGy+KdN+o38owkm+eDUdcHiRZzOrO25bUeNtjhUdooAdi3VVjBqYqw2svdNy3gLZmG5YiWNCXjc+P084M/d7t6X/O+go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iG9zYQkV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AB84C4CED3;
+	Thu, 10 Oct 2024 19:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728588165;
-	bh=BobLlBAHXvgkmTfcYJ918ZwYFw0KZ50oja9YbgYE578=;
+	s=k20201202; t=1728588881;
+	bh=t75GofhSDibsXkq5vhS4pidBfayrClpUtE6ydgObg+o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=VxL8DtpmsZ5s62//hcB6UyBuWVpNLlNZliRP1k6XpGxdgNjgkNJDpI+25sFjZnh1B
-	 hZF92dbDyUbZKSPKZR5OesyedLtFqu6Zv0xzmyzeuBNkShYrobrCwSJZnWaF0rQ/xY
-	 zzDxaVNBPuxseoYAbbjT3XpzqwcK33Tr7ZYMqZ32PY8JZZkzsg6DJCXlUoyYDWsb7w
-	 VOOJ6NEFaEUnikP1wCdqFs1I/EeHUC3+nJrbMXcyt05oAM/MuNHhwIyJoYRWOesePb
-	 1O/5LhM4vIOWCL6ft9LvN5ZND5wj2IJgJmTaCVhGpIBMJTMf0XjXF9ZR1wMkntSHiw
-	 SGBfd3g0zr+tg==
-Date: Thu, 10 Oct 2024 14:22:43 -0500
+	b=iG9zYQkVZOcHqaRKOI6wrEQfjZr1z2Z1D1IvFmoQOxkYniwUQ5sAxt06tdYj8VKcU
+	 xoTZ1cqyxu9E/OSihCgCRlY3narzag0HOkF5Kfxz4px/KIJZZVM2mdgN8tqPRKgNfI
+	 9fP+3VMNw8pby4faKrqHqyq1mhK7EKFg3knqgEaJUzrnVkyQOk4q9ejfN+SSKNNQnu
+	 fGJVvha/YpE7+9bZeOKyMSLTlmb5bADcEFNzrg/T9lNTjWMearBHlv7zKjxwBJgEo4
+	 R/A6gnNUokMqGUS6b540eVyh+ESwutnNCRc/vzvqxRWg2KU9qTpjGEDlLdEW2VJsjz
+	 dX2Q1jC5z6h7g==
+Date: Thu, 10 Oct 2024 14:34:39 -0500
 From: Bjorn Helgaas <helgaas@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Simon Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v9 1/6] misc: Add support for LAN966x PCI device
-Message-ID: <20241010192243.GA573660@bhelgaas>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next 07/11] PCI: Add NXP NETC vendor ID and device IDs
+Message-ID: <20241010193439.GA574630@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,91 +62,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241010063611.788527-2-herve.codina@bootlin.com>
+In-Reply-To: <20241009095116.147412-8-wei.fang@nxp.com>
 
-On Thu, Oct 10, 2024 at 08:36:01AM +0200, Herve Codina wrote:
-> Add a PCI driver that handles the LAN966x PCI device using a device-tree
-> overlay. This overlay is applied to the PCI device DT node and allows to
-> describe components that are present in the device.
+On Wed, Oct 09, 2024 at 05:51:12PM +0800, Wei Fang wrote:
+> NXP NETC is a multi-function PCIe Root Complex Integrated Endpoint
+> (RCiEP) and it contains multiple PCIe functions, such as EMDIO,
+> PTP Timer, ENETC PF and VF. Therefore, add these device IDs to
+> pci_ids.h
 > 
-> The memory from the device-tree is remapped to the BAR memory thanks to
-> "ranges" properties computed at runtime by the PCI core during the PCI
-> enumeration.
-> 
-> The PCI device itself acts as an interrupt controller and is used as the
-> parent of the internal LAN966x interrupt controller to route the
-> interrupts to the assigned PCI INTx interrupt.
-> 
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>	# quirks.c
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+
+OK as-is, but if you have occasion to update this series for other
+reasons:
+
+  - Slightly redundant to say "multi-function RCiEP ... contains
+    multiple functions".
+
+  - Mention the drivers that will use these symbols in this commit log
+    so it's obvious that they're used in multiple places.
+
+  - Wrap the commit log to fill 75 columns.
 
 > ---
->  drivers/misc/Kconfig          |  24 ++++
->  drivers/misc/Makefile         |   3 +
->  drivers/misc/lan966x_pci.c    | 215 ++++++++++++++++++++++++++++++++++
->  drivers/misc/lan966x_pci.dtso | 167 ++++++++++++++++++++++++++
->  drivers/pci/quirks.c          |   1 +
->  5 files changed, 410 insertions(+)
->  create mode 100644 drivers/misc/lan966x_pci.c
->  create mode 100644 drivers/misc/lan966x_pci.dtso
+>  include/linux/pci_ids.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-> index 3fe7e2a9bd29..8e5b06ac9b6f 100644
-> --- a/drivers/misc/Kconfig
-> +++ b/drivers/misc/Kconfig
-> @@ -610,6 +610,30 @@ config MARVELL_CN10K_DPI
->  	  To compile this driver as a module, choose M here: the module
->  	  will be called mrvl_cn10k_dpi.
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index 4cf6aaed5f35..acd7ae774913 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -1556,6 +1556,13 @@
+>  #define PCI_DEVICE_ID_PHILIPS_SAA7146	0x7146
+>  #define PCI_DEVICE_ID_PHILIPS_SAA9730	0x9730
 >  
-> +config MCHP_LAN966X_PCI
-> +	tristate "Microchip LAN966x PCIe Support"
-> +	depends on PCI
-> +	select OF
-> +	select OF_OVERLAY
-> +	select IRQ_DOMAIN
-> +	help
-> +	  This enables the support for the LAN966x PCIe device.
-> +	  This is used to drive the LAN966x PCIe device from the host system
-> +	  to which it is connected.
+> +/* NXP has two vendor IDs, the other one is 0x1957 */
+> +#define PCI_VENDOR_ID_NXP2		PCI_VENDOR_ID_PHILIPS
+> +#define PCI_DEVICE_ID_NXP2_ENETC_PF	0xe101
+> +#define PCI_DEVICE_ID_NXP2_NETC_EMDIO	0xee00
+> +#define PCI_DEVICE_ID_NXP2_NETC_TIMER	0xee02
+> +#define PCI_DEVICE_ID_NXP2_ENETC_VF	0xef00
 > +
-> +	  This driver uses an overlay to load other drivers to support for
-> +	  LAN966x internal components.
-> +	  Even if this driver does not depend on these other drivers, in order
-> +	  to have a fully functional board, the following drivers are needed:
-
-I don't think "overlay" by itself has enough context to be useful as
-help text.  Maybe "device tree" or similar hint?
-
-Add blank lines between paragraphs or reflow into a single paragraph.
-
-> +	    - fixed-clock (COMMON_CLK)
-> +	    - lan966x-oic (LAN966X_OIC)
-> +	    - lan966x-cpu-syscon (MFD_SYSCON)
-> +	    - lan966x-switch-reset (RESET_MCHP_SPARX5)
-> +	    - lan966x-pinctrl (PINCTRL_OCELOT)
-> +	    - lan966x-serdes (PHY_LAN966X_SERDES)
-> +	    - lan966x-miim (MDIO_MSCC_MIIM)
-> +	    - lan966x-switch (LAN966X_SWITCH)
-> +
->  source "drivers/misc/c2port/Kconfig"
->  source "drivers/misc/eeprom/Kconfig"
->  source "drivers/misc/cb710/Kconfig"
-
-> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-> index dccb60c1d9cc..41dec625ed7b 100644
-> --- a/drivers/pci/quirks.c
-> +++ b/drivers/pci/quirks.c
-> @@ -6266,6 +6266,7 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0xa76e, dpc_log_size);
->  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_XILINX, 0x5020, of_pci_make_dev_node);
->  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_XILINX, 0x5021, of_pci_make_dev_node);
->  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_REDHAT, 0x0005, of_pci_make_dev_node);
-> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_EFAR, 0x9660, of_pci_make_dev_node);
->  
->  /*
->   * Devices known to require a longer delay before first config space access
+>  #define PCI_VENDOR_ID_EICON		0x1133
+>  #define PCI_DEVICE_ID_EICON_DIVA20	0xe002
+>  #define PCI_DEVICE_ID_EICON_DIVA20_U	0xe004
 > -- 
-> 2.46.2
+> 2.34.1
 > 
 
