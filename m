@@ -1,201 +1,104 @@
-Return-Path: <netdev+bounces-134131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88419981D0
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:16:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AFE39981E1
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:18:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A59283E37
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 593851C2620A
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEAF31BF81A;
-	Thu, 10 Oct 2024 09:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+sBxVBc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17561C2335;
+	Thu, 10 Oct 2024 09:14:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A301BFDE2
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 09:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED65192B78;
+	Thu, 10 Oct 2024 09:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728551600; cv=none; b=pX3qnz1Srl8tcSZkjudxbdyVgijL+5IIFwRyMnmo1jSwXZ8AfwZpbtv++QDi+VM6s7i5PyH82yHOVq+tMRTLi0h9ypoSlbWEXiPbwAKKC7vKmI5f2NjLFvImoj7yOHjO5+aZNLMnXtDLicyZyeBkMYvUHlSrnGtJ3sQpvrsMksM=
+	t=1728551685; cv=none; b=FEknfpR+bk2tuQDzNlqFVC4rqRfDExx31/2iZ39UDVqQiCsI/4ZKCc+lWvQ+zlW+nziHc+0R0JclWIissoBs8NYD1iZFlYaCRjAiqfspo3W8Ma5LJzpSmHlVd4i3hxqMXyRmjOtzuOHsVtY4r0fJQTSTAP42hnDr3MHhFN1hWMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728551600; c=relaxed/simple;
-	bh=v4XN18e+CyZcuqWrnUyls/e8CpJTrCIwM8PKMvwb8/g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=a2e4xm3P1r33BnTspLI3QgAK0Dz4inRlqnAg+oo32t5UvxkKzOHgVYuqJ/KbkZeIK+WOqZXtGYmV+rf739SBa5mcYwAR5OMiYbcYXp0wetUlojkYEt9BglugWAW/VIYRjqYnwT+Mu192CDsblT7622cZfpg1jJWSSPNJ+RcRN4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c+sBxVBc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728551598;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v4XN18e+CyZcuqWrnUyls/e8CpJTrCIwM8PKMvwb8/g=;
-	b=c+sBxVBclE/ad3VRFgfdnV6lw9VVrxCPgaSVROvHtI5oDNs1IsiGnWxxxpg4IAAWz4oxiN
-	ga94eI0u5olM9rsRPsSYWkGlkHBbFU4gkg6kC4ZoGa8kZ5jhT/nMnpknEtKUz+EkcUIn5J
-	qUMOUv4vYjmUUmUk8abV0pxi1PFfkIM=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-155-shUH4vpoP9uqtgrMTTDi8w-1; Thu, 10 Oct 2024 05:13:17 -0400
-X-MC-Unique: shUH4vpoP9uqtgrMTTDi8w-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-71e0228d71dso722183b3a.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:13:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728551595; x=1729156395;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v4XN18e+CyZcuqWrnUyls/e8CpJTrCIwM8PKMvwb8/g=;
-        b=mEGI9WKnSrTh3DPJw5x9osAoQfMRWJtGoQ406+eMeZWqa6aqtI2IDiDq4NKY1AQqQM
-         EA8MkqtaA/qSxwtgNRQ5oW87r/UGzyL0XRJcGY3qxzmyJ6SwGtxD+9iUD/OqD+iTx9HY
-         xZ1CbH6ZG5O3b+wLxQ9uG62/jKv/NScpGmxV+PJs8dErF0xebjBd1b0yhQNJjpQ5wZue
-         uXyvO0pOZmFKZiLSHPKP4KxaAg1B9qG9zyEcNSXiaK3MkPj3ns10KHJA4g0pa3Dhx6uZ
-         x1ocXQj7Y//mBEQPpPEwcMdfwXjdcXxV1HteVJ/FEhuJYyDIVjUEW4FmjSqPgGttjzut
-         IHYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWq0ozqY3M05EwZRlr+swU5Vky40gvJemtVa4eZn4RkYr0eOzFVHQsy3iMbxL3/0KqZxsnRCmU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQgPdVlrCH2uKX4Vbw5VydJQjFj33TgLm6+ntfCw4M8SZ6j/av
-	AFhqopZwI4NWd3srm5oxtNOFMnvBZr+RjuR7jiG9ge7AtRAWMoggZ5MgGatkdOaG0uVi6rJi4LC
-	k5K+a/2bZCdA6ziNUcao+zSCgDqtLDYEL7w7kArlQZR2UPOOJU26wHQ==
-X-Received: by 2002:a05:6a00:3e12:b0:71e:cc7:c511 with SMTP id d2e1a72fcca58-71e1dbc7610mr9332049b3a.23.1728551594974;
-        Thu, 10 Oct 2024 02:13:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGep+sT+xfvdEWHCwKXB/cVXFvEo8d4o8Uec70ymXyXBB7IFwxFmp57q9aFEQPPEpGRMx5+Ug==
-X-Received: by 2002:a05:6a00:3e12:b0:71e:cc7:c511 with SMTP id d2e1a72fcca58-71e1dbc7610mr9331963b3a.23.1728551594451;
-        Thu, 10 Oct 2024 02:13:14 -0700 (PDT)
-Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2ab0a617sm642626b3a.192.2024.10.10.02.12.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 02:13:14 -0700 (PDT)
-Message-ID: <306f4f0c8c966647170cf7fdab11285dba976ea1.camel@redhat.com>
-Subject: Re: [RFC PATCH 10/13] staging: rts5280: Use always-managed version
- of pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Philipp Hortmann <philipp.g.hortmann@gmail.com>, Damien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Sergey Shtylyov
- <s.shtylyov@omp.ru>, Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri
- Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Arnd
- Bergmann <arnd@arndb.de>, Alex Dubov <oakad@yahoo.com>, Sudarsana Kalluru
- <skalluru@marvell.com>, Manish Chopra <manishc@marvell.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
- S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
- Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
- Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
- Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
- Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
- <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
- Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
- netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
- ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
- linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Thu, 10 Oct 2024 11:12:33 +0200
-In-Reply-To: <2024101006-chump-image-e65c@gregkh>
-References: <20241009083519.10088-1-pstanner@redhat.com>
-	 <20241009083519.10088-11-pstanner@redhat.com>
-	 <2024100936-brunette-flannels-0d82@gregkh>
-	 <411f3c94-58b5-471e-bc58-e23d89d2078f@gmail.com>
-	 <b57dbf0c83125d58e4e2b488b5b5f71410fd8d6a.camel@redhat.com>
-	 <2024101006-chump-image-e65c@gregkh>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1728551685; c=relaxed/simple;
+	bh=CljuXAkiklBjjcflk23mN/Np2eZe6Y4+FidqPD/vwQI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tlJ6GM2AQzNs6kj0EiTZgi4rj21d1gL/lbu2zqyAAYH17gIlblP2LPoVaM4NneyH8hCIpEmOFuDlcRFq3ipffTWVC7dvAOnwSOAoD9viAa4E3lAJTHyfmFopKtChWOWuwkUA/D4/plhQzubGZmnbscl5FlEeW4WRuKxMbCkCEDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XPPDs3RQqzyScP;
+	Thu, 10 Oct 2024 17:13:17 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C78261402CB;
+	Thu, 10 Oct 2024 17:14:34 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 10 Oct 2024 17:14:34 +0800
+Message-ID: <1cf2b294-d0b4-4116-bd14-a937bce7da4a@huawei.com>
+Date: Thu, 10 Oct 2024 17:14:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] page_pool: fix timing for checking and
+ disabling napi_local
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
+	<edumazet@google.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <20240925075707.3970187-2-linyunsheng@huawei.com>
+ <20241008174022.0b6d92b9@kernel.org>
+ <e420a11f-1c07-4a3f-85b4-b7679b4e50ce@huawei.com>
+ <20241009081314.611a5825@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20241009081314.611a5825@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Thu, 2024-10-10 at 11:03 +0200, Greg Kroah-Hartman wrote:
-> On Thu, Oct 10, 2024 at 10:03:30AM +0200, Philipp Stanner wrote:
-> > On Wed, 2024-10-09 at 21:41 +0200, Philipp Hortmann wrote:
-> > > On 10/9/24 11:38, Greg Kroah-Hartman wrote:
-> > > > On Wed, Oct 09, 2024 at 10:35:16AM +0200, Philipp Stanner
-> > > > wrote:
-> > > > > pci_intx() is a hybrid function which can sometimes be
-> > > > > managed
-> > > > > through
-> > > > > devres. To remove this hybrid nature from pci_intx(), it is
-> > > > > necessary to
-> > > > > port users to either an always-managed or a never-managed
-> > > > > version.
-> > > > >=20
-> > > > > rts5208 enables its PCI-Device with pcim_enable_device().
-> > > > > Thus,
-> > > > > it needs the
-> > > > > always-managed version.
-> > > > >=20
-> > > > > Replace pci_intx() with pcim_intx().
-> > > > >=20
-> > > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > > > > ---
-> > > > > =C2=A0 drivers/staging/rts5208/rtsx.c | 2 +-
-> > > > > =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >=20
-> > > > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > > >=20
-> > >=20
-> > > Hi Philipp,
-> > >=20
-> > > this driver (rts5208) will be removed soon - patch is send in.
-> > >=20
-> > > Discussion about removal:
-> > > https://lore.kernel.org/linux-staging/2024100943-shank-washed-a765@gr=
-egkh/T/#t
-> >=20
-> >=20
-> > Alright, thx for the heads up.
-> >=20
-> > I'm not entirely how best to deal with that, though. I could drop
-> > this
-> > patch, but then the driver would end up with an unmanaged
-> > pci_intx().
-> >=20
-> > Might this be a problem for users if my series lands sooner than
-> > the
-> > removal, say in v6.13 and your removal in v6.14?
->=20
-> The removal will happen in 6.13, I'm going to be queueing it up right
-> now.
+On 2024/10/9 23:13, Jakub Kicinski wrote:
+> On Wed, 9 Oct 2024 11:33:02 +0800 Yunsheng Lin wrote:
+>> Or I am missing something obvious here?
+> 
+> Seemingly the entire logic of how the safety of the lockless caching 
+> is ensured.
 
-Alright, thx. Then I drop patch #10.
+I looked at it more closely, it seems what you meant ensuring is by setting
+the napi->list_owner to -1 when disabling NAPI, right?
 
-P.
+But letting skb_defer_free_flush() holding on the napi instance to check
+the napi->list_owner without synchronizing with page_pool_destroy() seems
+a little surprised to me, as page_pool_destroy() may return to driver to
+free the napi even if it is a very very small time window, causing a
+possible used-after-free problem?
 
->=20
-> thanks,
->=20
-> greg k-h
->=20
+          CPU 0                           CPU1
+           .                               .
+           .                   skb_defer_free_flush()
+           .                               .
+           .                  napi = READ_ONCE(pool->p.napi);
+           .                               .
+page_pool_disable_direct_recycling()       .
+    driver free napi memory                .
+           .                               .
+           .              napi && READ_ONCE(napi->list_owner) == cpuid
+           .                               .
 
+> 
+> But I don't think you don't trust my opinion so I'll let others explain
+> this to you..
 
