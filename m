@@ -1,208 +1,162 @@
-Return-Path: <netdev+bounces-134220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 653EE99871D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:07:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7230A998720
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C15E3B22E98
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:07:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D032819A4
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45FD1C9B88;
-	Thu, 10 Oct 2024 13:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="yPuNHOdY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3B91C7B8F;
+	Thu, 10 Oct 2024 13:07:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D791C6F45
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58E41C7B86;
+	Thu, 10 Oct 2024 13:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728565616; cv=none; b=Q/ONkHZiFuncu8qpfcj5Vd5Z2kOMnnWiGG4lPrqlOnHR0hA5/xRNv/oHT2XUGl9dk9bYbLnPjUZyjQ96ioN+MSPcV98mtco7vC/j8+TMNDmrEFD9ZjonBPbR4iB7kKD4yzeOpBG2hK2M1t7616AoiuNgfiljtSLIs8r1+K+1hlM=
+	t=1728565644; cv=none; b=pQa88Eb3k/0A1vLJKMEWnOndZGds2jEqSELipjTgbnaXql8QGQnIGfK7oU81SsMWvmROLEvalfS/aihFSAzjfBeboeh97IchCagogwjYSNx0Zm/+T9Kgyt3XuM9S3dmxqWjFLzpP4LLuY1F3lkgmQHNkn13GLRscn5fH6c+wyBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728565616; c=relaxed/simple;
-	bh=OWQkn0MUW/mgdcHTmpEvTmkOW5fS/TnVBNLdryMDris=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dSLFvglqskAoVHLeetxEpY2Q+HBumA1G0AgkVsfo+SfeQwIqkAhz+7qGNLJYGxG7z2pWU1yN3ojS5QuPwUtHpMLdBCNVDsPrOLBHF/GYaCwkWyK/O+YaA74gM+inLr5zeT0nxEFfDF+L+VfK5mQqZjE2snhLn6rI/sXlASU4VQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=yPuNHOdY; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a994cd82a3bso128212666b.2
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 06:06:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1728565613; x=1729170413; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zNP9tX97GIxJUD92qKeaEfhfcrLGqlHC9vf8Y9pXLU0=;
-        b=yPuNHOdYIX2aWsz7c6uReVnPHnBg7BKUIv7hPQEVYE12SeVBDYHE7r5+LMcVZLd4yZ
-         hg8P4cHsqnvPTxniQ7igyI5dG7MCM84La01ZzABeuOCuJZBSoz4FNqEwzvobHeWFIcZx
-         hQ2UdN6+gIbpCBY/y3OuYYZa5exNcI9wETPVCXJGldk+4CmSWUPKKGOxlIWodB6v+SYZ
-         30ojT1x1GLOupNJ28HazczN8WUsaDaFfWeYT/K64AygtNMTKBtS2QagM9yyqulZoQaCa
-         q2s7+8WbgyVIv/DRz1bHoGN/IA3dKCVKoMHrL8zQpXp3DNBCndT/fobg7I8/JoE5TXK1
-         aMlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728565613; x=1729170413;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zNP9tX97GIxJUD92qKeaEfhfcrLGqlHC9vf8Y9pXLU0=;
-        b=hmR8NgYMcyNuFC8Jumj4bjXeA3Jh0iXxUEfL7JKvT4JKtpWSJ3qsT/+PW7ewVYq0cY
-         PqcFGbWYswfpyDb+/DW6MiO8R7llVleAbtqr9F9K37pA2Bgh9kbM3gi+/ObU6rTgC4HA
-         HecfnPnapMZXw2qjEG8ZXX9HhOcPuFvGB8gx40z6C4RSChaFRuexPrIt+WbEiGh14Jw9
-         wC+6TZlOWNzxLSnNanhVKxTY6ZToNzM4sWNq7ra8tt2aCzkKJZK2P1ZtUfeEN6bQ1idW
-         uVi+D1vv7+toA0su7P2FxAEky6uUjRFGZ6/yWJVwycXOAiuF9OwsOf8QmLsJz9sAe95/
-         9Etg==
-X-Gm-Message-State: AOJu0YyXumwdg8EILDWEFcy5hSveyK3dYgZZBeeMEhv+CJsZSkvuFRcN
-	8R7FbzOEf8kLn/tAvmv97Lk9CylyAXgRWlSBnaYoMQT41kRc2f2HuWdnlRxhfh3cYNXlwTlXfKG
-	d1ocv/A==
-X-Google-Smtp-Source: AGHT+IHrNRIB7LLSbzQ/YI359f1YBMO/pKtDeHMUZZgknMGEIuyVpTKxPOIM6pX3vjSrC2GkFuPeJA==
-X-Received: by 2002:a17:907:e89:b0:a99:3f4e:6de8 with SMTP id a640c23a62f3a-a998d3832e7mr554842566b.64.1728565613197;
-        Thu, 10 Oct 2024 06:06:53 -0700 (PDT)
-Received: from localhost ([37.48.49.80])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c9371533c4sm745604a12.54.2024.10.10.06.06.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 06:06:52 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com
-Subject: [PATCH net-next v2 2/2] net/mlx5: DPLL, Add clock quality level op implementation
-Date: Thu, 10 Oct 2024 15:06:46 +0200
-Message-ID: <20241010130646.399365-3-jiri@resnulli.us>
-X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20241010130646.399365-1-jiri@resnulli.us>
-References: <20241010130646.399365-1-jiri@resnulli.us>
+	s=arc-20240116; t=1728565644; c=relaxed/simple;
+	bh=TGS0ZK1e1WP/QJYP4eNJCEg/YWBBdI8ud91rOySDWCs=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=O21AHSJKqRaQ7voxB+W+F4j5Jhy2RZRdp9N3UR+FXrd3HWbkbj5FHRm1r7UVtbp3Prf26BZe78a3ZwQ1zz4smcbSDpIZOfqqIiMS1F6K2JaP6AItXQIhS4l+4n3XxEc8dFurfLA4QD6njtEEtPpwiX8S5c2oiBva81biGSN2VCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1syssx-000000003FQ-0T8K;
+	Thu, 10 Oct 2024 13:07:19 +0000
+Date: Thu, 10 Oct 2024 14:07:16 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 1/3] net: phy: realtek: read duplex and gbit
+ master from PHYSR register
+Message-ID: <b9a76341da851a18c985bc4774fa295babec79bb.1728565530.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Jiri Pirko <jiri@nvidia.com>
+The PHYSR MMD register is present and defined equally for all RTL82xx
+Ethernet PHYs.
+Read duplex and Gbit master bits from rtlgen_decode_speed() and rename
+it to rtlgen_decode_physr().
 
-Use MSECQ register to query clock quality from firmware. Implement the
-dpll op and fill-up the quality level value properly.
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v1->v2:
-- added "itu" prefix to the enum values
----
- .../net/ethernet/mellanox/mlx5/core/dpll.c    | 82 +++++++++++++++++++
- 1 file changed, 82 insertions(+)
+v2: don't override link up/down status from PHYSR
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-index 904e08de852e..ccb7477d77b6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-@@ -166,9 +166,91 @@ static int mlx5_dpll_device_mode_get(const struct dpll_device *dpll,
- 	return 0;
+ drivers/net/phy/realtek.c | 41 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index c15d2f66ef0d..9bbbbad1ca5a 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -80,15 +80,18 @@
+ 
+ #define RTL822X_VND2_GANLPAR				0xa414
+ 
+-#define RTL822X_VND2_PHYSR				0xa434
+-
+ #define RTL8366RB_POWER_SAVE			0x15
+ #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+ 
+ #define RTL9000A_GINMR				0x14
+ #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
+ 
+-#define RTLGEN_SPEED_MASK			0x0630
++#define RTL_VND2_PHYSR				0xa434
++#define RTL_VND2_PHYSR_DUPLEX			BIT(3)
++#define RTL_VND2_PHYSR_SPEEDL			GENMASK(5, 4)
++#define RTL_VND2_PHYSR_SPEEDH			GENMASK(10, 9)
++#define RTL_VND2_PHYSR_MASTER			BIT(11)
++#define RTL_VND2_PHYSR_SPEED_MASK		(RTL_VND2_PHYSR_SPEEDL | RTL_VND2_PHYSR_SPEEDH)
+ 
+ #define RTL_GENERIC_PHYID			0x001cc800
+ #define RTL_8211FVD_PHYID			0x001cc878
+@@ -660,9 +663,18 @@ static int rtl8366rb_config_init(struct phy_device *phydev)
  }
  
-+enum {
-+	MLX5_DPLL_SSM_CODE_PRC = 0b0010,
-+	MLX5_DPLL_SSM_CODE_SSU_A = 0b0100,
-+	MLX5_DPLL_SSM_CODE_SSU_B = 0b1000,
-+	MLX5_DPLL_SSM_CODE_EEC1 = 0b1011,
-+	MLX5_DPLL_SSM_CODE_PRTC = 0b0010,
-+	MLX5_DPLL_SSM_CODE_EPRTC = 0b0010,
-+	MLX5_DPLL_SSM_CODE_EEEC = 0b1011,
-+	MLX5_DPLL_SSM_CODE_EPRC = 0b0010,
-+};
+ /* get actual speed to cover the downshift case */
+-static void rtlgen_decode_speed(struct phy_device *phydev, int val)
++static void rtlgen_decode_physr(struct phy_device *phydev, int val)
+ {
+-	switch (val & RTLGEN_SPEED_MASK) {
++	/* bit 3
++	 * 0: Half Duplex
++	 * 1: Full Duplex
++	 */
++	if (val & RTL_VND2_PHYSR_DUPLEX)
++		phydev->duplex = DUPLEX_FULL;
++	else
++		phydev->duplex = DUPLEX_HALF;
 +
-+enum {
-+	MLX5_DPLL_ENHANCED_SSM_CODE_PRC = 0xff,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_SSU_A = 0xff,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_SSU_B = 0xff,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_EEC1 = 0xff,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_PRTC = 0x20,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_EPRTC = 0x21,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_EEEC = 0x22,
-+	MLX5_DPLL_ENHANCED_SSM_CODE_EPRC = 0x23,
-+};
++	switch (val & RTL_VND2_PHYSR_SPEED_MASK) {
+ 	case 0x0000:
+ 		phydev->speed = SPEED_10;
+ 		break;
+@@ -684,6 +696,19 @@ static void rtlgen_decode_speed(struct phy_device *phydev, int val)
+ 	default:
+ 		break;
+ 	}
 +
-+#define __MLX5_DPLL_SSM_COMBINED_CODE(ssm_code, enhanced_ssm_code)		\
-+	((ssm_code) | ((enhanced_ssm_code) << 8))
-+
-+#define MLX5_DPLL_SSM_COMBINED_CODE(type)					\
-+	__MLX5_DPLL_SSM_COMBINED_CODE(MLX5_DPLL_SSM_CODE_##type,		\
-+				      MLX5_DPLL_ENHANCED_SSM_CODE_##type)
-+
-+static int mlx5_dpll_clock_quality_level_get(const struct dpll_device *dpll,
-+					     void *priv,
-+					     enum dpll_clock_quality_level *ql,
-+					     struct netlink_ext_ack *extack)
-+{
-+	u8 network_option, ssm_code, enhanced_ssm_code;
-+	u32 out[MLX5_ST_SZ_DW(msecq_reg)] = {};
-+	u32 in[MLX5_ST_SZ_DW(msecq_reg)] = {};
-+	struct mlx5_dpll *mdpll = priv;
-+	int err;
-+
-+	err = mlx5_core_access_reg(mdpll->mdev, in, sizeof(in),
-+				   out, sizeof(out), MLX5_REG_MSECQ, 0, 0);
-+	if (err)
-+		return err;
-+	network_option = MLX5_GET(msecq_reg, out, network_option);
-+	if (network_option != 1)
-+		goto errout;
-+	ssm_code = MLX5_GET(msecq_reg, out, local_ssm_code);
-+	enhanced_ssm_code = MLX5_GET(msecq_reg, out, local_enhanced_ssm_code);
-+
-+	switch (__MLX5_DPLL_SSM_COMBINED_CODE(ssm_code, enhanced_ssm_code)) {
-+	case MLX5_DPLL_SSM_COMBINED_CODE(PRC):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_PRC;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(SSU_A):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_SSU_A;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(SSU_B):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_SSU_B;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(EEC1):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_EEC1;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(PRTC):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_PRTC;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(EPRTC):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_EPRTC;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(EEEC):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_EEEC;
-+		return 0;
-+	case MLX5_DPLL_SSM_COMBINED_CODE(EPRC):
-+		*ql = DPLL_CLOCK_QUALITY_LEVEL_ITU_EPRC;
-+		return 0;
++	/* bit 11
++	 * 0: Slave Mode
++	 * 1: Master Mode
++	 */
++	if (phydev->speed >= 1000) {
++		if (val & RTL_VND2_PHYSR_MASTER)
++			phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
++		else
++			phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
++	} else {
++		phydev->master_slave_state = MASTER_SLAVE_STATE_UNSUPPORTED;
 +	}
-+errout:
-+	NL_SET_ERR_MSG_MOD(extack, "Invalid clock quality level obtained from firmware\n");
-+	return -EINVAL;
-+}
-+
- static const struct dpll_device_ops mlx5_dpll_device_ops = {
- 	.lock_status_get = mlx5_dpll_device_lock_status_get,
- 	.mode_get = mlx5_dpll_device_mode_get,
-+	.clock_quality_level_get = mlx5_dpll_clock_quality_level_get,
- };
+ }
  
- static int mlx5_dpll_pin_direction_get(const struct dpll_pin *pin,
+ static int rtlgen_read_status(struct phy_device *phydev)
+@@ -701,7 +726,7 @@ static int rtlgen_read_status(struct phy_device *phydev)
+ 	if (val < 0)
+ 		return val;
+ 
+-	rtlgen_decode_speed(phydev, val);
++	rtlgen_decode_physr(phydev, val);
+ 
+ 	return 0;
+ }
+@@ -1007,11 +1032,11 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
+ 		return 0;
+ 
+ 	/* Read actual speed from vendor register. */
+-	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_PHYSR);
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL_VND2_PHYSR);
+ 	if (val < 0)
+ 		return val;
+ 
+-	rtlgen_decode_speed(phydev, val);
++	rtlgen_decode_physr(phydev, val);
+ 
+ 	return 0;
+ }
 -- 
-2.46.1
-
+2.47.0
 
