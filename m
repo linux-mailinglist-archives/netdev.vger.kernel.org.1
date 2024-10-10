@@ -1,108 +1,101 @@
-Return-Path: <netdev+bounces-134174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B790699844C
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:00:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D38699845D
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4AAB1C221C9
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:00:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0629A1F253EF
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3364D1BF322;
-	Thu, 10 Oct 2024 11:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F4D1C2308;
+	Thu, 10 Oct 2024 11:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6Aq8CwD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eg4e+wro"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDE01BD50A
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3322E1BD50C;
+	Thu, 10 Oct 2024 11:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728558030; cv=none; b=qH8TKc4Kg7nqePSl1zW+Ke1aFQDD3oUGpMeu0kDmdbqAvyK2KX6lLrQgwEeL3kMYqrxQ5p/nznXUIA1xEtXnxeUWGxkaSivIQqC5/saDYs6zev3ZSeaUVQaCW2WmmTl6BAkIT3X5RHomq2bUbVjiC6/giX8ItS9YFtgEuG8+c6o=
+	t=1728558261; cv=none; b=XpE8vYoqB/r4WyIWZCmZDwkBkTFiTun6yH8vCoa1ePIxrm9EsJCljI+0n7sjmhtakl8Mzdo9cKRhejd2nDLEXnibv1GQLO3K0f4YZnhuxX5UkN1znQOGQyBvB6iBDjgttrmRIY56dvUvzHlXETp+yJdeA5dc76iiKtxqOpCB4hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728558030; c=relaxed/simple;
-	bh=lPeD6pu6EH0Ub6IGT+1Jp9wPMIGega7wty/w3peViQE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZbLZ50huLkbkheo/WpmS+f/VNRBzZMzJmvVzEA49OQBmwoi208P89o2hiZ4pX4rCrH76F8g7zEZveMHgYmq7BuD4trho41y+P0RFtvXP2Ge3ulfFErFdKol3g64G9nntXzktK2y95lojOMD92syx6/DcOHw5Ux2ivWFDJUK/rWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6Aq8CwD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F771C4CEC5;
-	Thu, 10 Oct 2024 11:00:29 +0000 (UTC)
+	s=arc-20240116; t=1728558261; c=relaxed/simple;
+	bh=zf4nv8qFcn8j81wt7ScsTawq3mZ4ntDzcjIGAkTRTHA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pI2rhzciz3JNyJj/SMJIUyn4RMLT80RIb1LoiQe8LZHv3P1IJ80YNXdhT+tNrALf8fYEKDfL2b9Yn+yESOqqmahciPjlClFZ9wVCcY0aK5ibAnkVgodrfH/Ks7h+cJ9lRnN4Cvt8U5w/Brcono/uWCbx5CCveuUnMgVesRTrdhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eg4e+wro; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC2DEC4CEC5;
+	Thu, 10 Oct 2024 11:04:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728558029;
-	bh=lPeD6pu6EH0Ub6IGT+1Jp9wPMIGega7wty/w3peViQE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q6Aq8CwD8s8UaTxUC8q7bqolA14uL1YqDrj2MxcePp2IDH5rCTrEu6ksQQUb4Up9W
-	 leXMJc8zDJdRcTcOdLq0Ip5eFQoPi+uDkqInX3lGw9gzvaf/yqlxOaDLzvMFrvhaA2
-	 txkXXRHyTqlX7NOKd3OrNEeM5DWz7oGObzt/qxiWsVN0lXvlUVum9mr/JwriTHbxZR
-	 Qy1NR0Ea8nHvgW+0Ggr1tGwtS5Fv4cctSQx3ZVx62f5NYgCT8K3MJn92eQa0AdXtgJ
-	 ELph32ir5m6BfDeGCbOJmiXgw4MPy1BEtCsQ1z9QyQwO2EVk5ETO+CvwE89xC5v/nT
-	 Xqhce/pPedQxQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C823803263;
-	Thu, 10 Oct 2024 11:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728558259;
+	bh=zf4nv8qFcn8j81wt7ScsTawq3mZ4ntDzcjIGAkTRTHA=;
+	h=From:Subject:Date:To:Cc:From;
+	b=eg4e+wrorUQ0mot9ojJqURiCZlB2izm+fUL0Q1X5gKXMHMNCLFLUdyymqxlSPQXZb
+	 zQXaKmY123IEVo+kso85uULT4KFP6vwt6m1vg+S1KkCCef5zOtUV/uB1lXPSaohMnS
+	 hSQGhKEK0VxHWMCqwO1/XILHu+DuHq6Ns98cEzmufx326516O8hye3YYGTgv4iLfNL
+	 oaHOF4hPQWUo9wxR1c883B23Vl0l17NrX8bnLQcHCe4b8JYsgYMLByYuO0EsDkTxpr
+	 wg2OwFA9uITygJ0xhl9EdAqhBCAsndyi3w1vlAEyRHNfMh/D4+MSVOBRFuRnxWRQ/7
+	 K6KV97PTAPdFA==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2 0/3] net: ethernet: ti: Address some warnings
+Date: Thu, 10 Oct 2024 12:04:09 +0100
+Message-Id: <20241010-ti-warn-v2-0-9c8304af5544@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/5] eth: fbnic: add timestamping support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172855803404.1977777.10629332064232545504.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 11:00:34 +0000
-References: <20241008181436.4120604-1-vadfed@meta.com>
-In-Reply-To: <20241008181436.4120604-1-vadfed@meta.com>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: vadim.fedorenko@linux.dev, kuba@kernel.org, dsahern@kernel.org,
- pabeni@redhat.com, davem@davemloft.net, alexanderduyck@fb.com,
- netdev@vger.kernel.org, richardcochran@gmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKm0B2cC/2WNQQqDMBBFryKz7pQkpKBd9R7FRaITHVpimQS1i
+ HdvyLbLx/u8f0AiYUpwbw4QWjnxEguYSwPD7OJEyGNhMMpY1WmFmXFzEnH0g+9s25pwM1DWH6H
+ Aey09IVLGSHuGvpiZU17kWy9WXf1fbdWo0IVRk1XWeU+PF0mk93WRCfrzPH+9OI43qQAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Roger Quadros <rogerq@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, netdev@vger.kernel.org, 
+ linux-omap@vger.kernel.org, llvm@lists.linux.dev
+X-Mailer: b4 0.14.0
 
-Hello:
+Hi,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This patchset addresses some warnings flagged by Sparse, and clang-18 in
+TI Ethernet drivers.
 
-On Tue, 8 Oct 2024 11:14:31 -0700 you wrote:
-> The series is to add timestamping support for Meta's NIC driver.
-> 
-> Changelog:
-> v3 -> v4:
-> - use adjust_by_scaled_ppm() instead of open coding it
-> - adjust cached value of high bits of timestamp to be sure it
->   is older then incoming timestamps
-> v2 -> v3:
-> - rebase on top of net-next
-> - add doc to describe retur value of fbnic_ts40_to_ns()
-> v1 -> v2:
-> - adjust comment about using u64 stats locking primitive
-> - fix typo in the first patch
-> - Cc Richard
-> 
-> [...]
+Although these changes do not alter the functionality of the code, by
+addressing them real problems introduced in future which are flagged by
+tooling will stand out more readily.
 
-Here is the summary with links:
-  - [net-next,v4,1/5] eth: fbnic: add software TX timestamping support
-    https://git.kernel.org/netdev/net-next/c/be65bfc957eb
-  - [net-next,v4,2/5] eth: fbnic: add initial PHC support
-    https://git.kernel.org/netdev/net-next/c/ad8e66a4d963
-  - [net-next,v4,3/5] eth: fbnic: add RX packets timestamping support
-    https://git.kernel.org/netdev/net-next/c/6a2b3ede9543
-  - [net-next,v4,4/5] eth: fbnic: add TX packets timestamping support
-    https://git.kernel.org/netdev/net-next/c/ad3d9f8bc66c
-  - [net-next,v4,5/5] eth: fbnic: add ethtool timestamping statistics
-    https://git.kernel.org/netdev/net-next/c/96f358f75d1a
+Compile tested only.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---
+Changes in v2:
+- Dropped patch to directly address __percpu Sparse warnings and, instead
+- Add patch to use tstats
+- Added tags
+- Thanks to all for the review of v1
+- Link to v1: https://lore.kernel.org/r/20240910-ti-warn-v1-0-afd1e404abbe@kernel.org
 
+---
+Simon Horman (3):
+      net: ethernet: ti: am65-cpsw: Use __be64 type for id_temp
+      net: ethernet: ti: am65-cpsw: Use tstats instead of open coded version
+      net: ethernet: ti: cpsw_ale: Remove unused accessor functions
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 94 +++-----------------------------
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h |  9 ---
+ drivers/net/ethernet/ti/cpsw_ale.c       | 30 +++++++---
+ 3 files changed, 30 insertions(+), 103 deletions(-)
+
+base-commit: 09cf85ef183a5603db49d542264ddbece3258e55
 
 
