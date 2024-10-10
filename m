@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-134369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43F96998F1E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:00:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E839998F31
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB7671F230F5
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E55CA28BE61
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0F21CC16D;
-	Thu, 10 Oct 2024 17:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68031CF287;
+	Thu, 10 Oct 2024 18:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVW3kRZe"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872D419C57D;
-	Thu, 10 Oct 2024 17:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2BC1CEEB9;
+	Thu, 10 Oct 2024 18:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728583171; cv=none; b=NuTQEdwKFwh3Yprl+2M2mlxwO3wCu8d3p+uzkw2uk7ZVC9Fy6WZkcIIq5Fao7R6K+9CqgjnHzRItF+btaiT92VvFFIe7XcrxkBiuaOd5BafYmMSP9XaNWU2ZMGCqm17ePKqzEuChDaI35qUlCVeaPVNVuOOr+UQwgLh6CtnX4bU=
+	t=1728583225; cv=none; b=tcRB3TzkOvppJL7vyjoOrKIiE5dOylt/GCUEdFHvc1avx/rwwhxYyEONONUfyqW3W1Zod2wvIStGwvaI+RVLb1OHq2j2ovLLQaskyMhpLoXKlb+nNJoyJf1UYh+S9AQfataeMUucmxWDqvJMGBVSgBBcFezdxvpyPIX5UqAAtQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728583171; c=relaxed/simple;
-	bh=qfykBgfbtJOYVMCMJ6rPDAFl8steKNqmHZFQMQv+e9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZmNtWCmaVrXbz0E5pf6Hq1teB19UUdEEdo0wfTDxVT05fm91fKLsdH6fH2uG/LkchhVo2+Za8gr+Ar7SdVIWk0btROCd7KdFdQuRPUtokRuKMj6rWTr2QVyJhos9SmPBWRaKq4psCMbtIiUssJGldS0GtfU95mMSVZEzGRM7jY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1syxRd-0003Og-C8; Thu, 10 Oct 2024 19:59:25 +0200
-Date: Thu, 10 Oct 2024 19:59:25 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Florian Westphal <fw@strlen.de>, Richard Weinberger <richard@nod.at>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, kadlec@netfilter.org, pablo@netfilter.org,
-	rgb@redhat.com, upstream+net@sigma-star.at
-Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
-Message-ID: <20241010175925.GA11964@breakpoint.cc>
-References: <20241009203218.26329-1-richard@nod.at>
- <20241009213345.GC3714@breakpoint.cc>
- <CAHC9VhSFHQtg357WLoLrkN8wpPxDRmD_qA55NHOUEwFpE_pbrg@mail.gmail.com>
- <20241009223409.GE3714@breakpoint.cc>
- <CAHC9VhTC=KAXe6w9xTG_rY4zAnNvPv-brQ7cTYftcty866inCw@mail.gmail.com>
+	s=arc-20240116; t=1728583225; c=relaxed/simple;
+	bh=OMrWVEwG56phLjB3lXvtiLtZ/60G1Bl4ql3231HDQLM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rdmMLgSWMTENdh9aN8USns9Jz0LzIXN1ytR7W6a2giAmicrdU1kyHrhmaoqba3jGSQXwOoxvDzk4aRc+lOoQp1naF6xDL7mVRYAHGWvu0OpdoclHxA6xsjKGshLwXB/nNA3dmiIGzeDMQKn4KGF7zPGNBCS3mpFLy4D0/pX3cV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVW3kRZe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 512EDC4CEC6;
+	Thu, 10 Oct 2024 18:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728583225;
+	bh=OMrWVEwG56phLjB3lXvtiLtZ/60G1Bl4ql3231HDQLM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KVW3kRZeD1kePYkc78Nr3zoWKzbCrhXldWdSEI7SLXeRNGy/mu1x2nLMG/NCa9mCE
+	 7bHMR6MGhR26JMCfuhgBd3r6xBrezlFZDrsC3JAwuDtttfh5jO32VuIjc4f9JxozwJ
+	 y6ryZSIvsxHTMO6VldIHpHgskMXqRGaARSL98vYPsJbTuDSI7x1gIgsJpZZ7d5z42Y
+	 iiMmwaw2ONq7YuEchFWmhoNyFNjmdHppl+th2zGO9qDz51H713QyhHuVy8qHD0Z9hi
+	 PHiPSuTslM8NZ0f2h8z1vpftpaodFYlHsSsIf2Jx3WNQNdNcBkDb0tR9U3NSL0Xiyd
+	 asYY+CVW7cGXg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2E03803263;
+	Thu, 10 Oct 2024 18:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHC9VhTC=KAXe6w9xTG_rY4zAnNvPv-brQ7cTYftcty866inCw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v2 0/3] Fix caching of BTF for kfuncs in the verifier
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172858322977.2114175.5921702022516465256.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Oct 2024 18:00:29 +0000
+References: <20241010-fix-kfunc-btf-caching-for-modules-v2-0-745af6c1af98@redhat.com>
+In-Reply-To: <20241010-fix-kfunc-btf-caching-for-modules-v2-0-745af6c1af98@redhat.com>
+To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2VuIDx0b2tlQHJlZGhhdC5jb20+?=@codeaurora.org
+Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, memxor@gmail.com, simon.sundberg@kau.se,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
 
-Paul Moore <paul@paul-moore.com> wrote:
-> Correct me if I'm wrong, but by using from_kXid(&init_user_ns, Xid) we
-> get the ID number that is correct for the init namespace, yes?  If so,
-> that's what we want as right now all of the audit records, filters,
-> etc. are intended to be set from the context of the initial namespace.
+Hello:
 
-Seems to be the case, from_kuid() kdoc says
-'There is always a mapping into the initial user_namespace.'.
+This series was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-I'm confused because of the various means of dealing with this:
-9847371a84b0 ("netfilter: Allow xt_owner in any user namespace")
+On Thu, 10 Oct 2024 15:27:06 +0200 you wrote:
+> When playing around with defining kfuncs in some custom modules, we
+> noticed that if a BPF program calls two functions with the same
+> signature in two different modules, the function from the wrong module
+> may sometimes end up being called. Whether this happens depends on the
+> order of the calls in the BPF program, which turns out to be due to the
+> use of sort() inside __find_kfunc_desc_btf() in the verifier code.
+> 
+> [...]
 
-Does: make_kgid(net->user_ns, ... and also rejects rule-add if
-net->user_ns != current_user_ns().  As this is for matching userids,
-this makes sense to me, any userns will 'just work' for normal uid/gid
-matching.
+Here is the summary with links:
+  - [bpf,v2,1/3] bpf: fix kfunc btf caching for modules
+    https://git.kernel.org/bpf/bpf/c/6cb86a0fdece
+  - [bpf,v2,2/3] selftests/bpf: Provide a generic [un]load_module helper
+    https://git.kernel.org/bpf/bpf/c/4192bb294f80
+  - [bpf,v2,3/3] selftests/bpf: Add test for kfunc module order
+    https://git.kernel.org/bpf/bpf/c/f91b256644ea
 
-a6c6796c7127 ("userns: Convert cls_flow to work with user namespaces enabled")
-Does: from_kuid(&init_user_ns, ... and rejects rule adds if sk_user_ns(NETLINK_CB(in_skb).ssk) != &init_user_ns)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Seems just a more conservative solution to the former one.
 
-8c6e2a941ae7 ("userns: Convert xt_LOG to print socket kuids and kgids as uids and gids")
-... which looks like the proposed xt_AUDIT change.
-
-As I do not know what the use case is for xt_AUDIT rules residing in
-another, possibly unprivileged network namespace not managed by root-root user,
-I can't say if its right, but it should do the right thing.
-
-Sorry for the noise.
 
