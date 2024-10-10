@@ -1,80 +1,130 @@
-Return-Path: <netdev+bounces-134156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22677998340
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:10:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0032998352
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2E961F2343E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:10:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B9ABB21646
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D961C2DBF;
-	Thu, 10 Oct 2024 10:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2471BF7EE;
+	Thu, 10 Oct 2024 10:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HnmDxq/W"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n80285aQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62EE1C2DA1;
-	Thu, 10 Oct 2024 10:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A0C18C03D;
+	Thu, 10 Oct 2024 10:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728554987; cv=none; b=Vj03CEhdvglHt/PUWw5X0bF7cgqLrMt8KIZFdX/ppwoW6Tlr+mJy9mWMWeOZ66+XdDgAk1cpwXoxCEh55uTU4/ep8ffyuhCbIhIn9CBmJ0DNprQJ68mRfsVf78OdGWwTONVzci1eM/dhLMz6VHkSodd1f0a/SzAWmVJL0lun/VA=
+	t=1728555275; cv=none; b=j7D80a0JJcccr2Pl0agU+7kqDLZH/tIFY0HzJNAg6kLNLDzEqrkiBNKZWq6u0G7jni0ogMcjNYWBomdxqJtpIzOBlyTFaC6xdAoAqXeLaZgcy/I8Khw0WciqZPlOBv6s8ZlRvTjkSmU+23/uO947B3M/i3kngPYyJCzC4VbpcZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728554987; c=relaxed/simple;
-	bh=j6GAEoERZD7UeRkqfDNOjQFDSgVDtvchIHu+216zQcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mnk2QswwDFE3a7xxyHXbIr7dU9nr6x6NlZ/OmL56GiwrbHtzbt+uDTbqibkUZwGzhC9YWJQM6vUXDIMd7w8fqVv+M7Dfcc3Yp844+3ve95Zk+6d3B8l+VQw7N+cPEff0OOes2fLNkH4v7l/4oifVPTs/BlfaVRGfuTZ9qaDL7DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HnmDxq/W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90479C4CEC6;
-	Thu, 10 Oct 2024 10:09:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728554987;
-	bh=j6GAEoERZD7UeRkqfDNOjQFDSgVDtvchIHu+216zQcY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HnmDxq/WqqN5tn+iXS09HUyaukKBBKzi9jnHr4p9Eevpl8dUoe4y8xwuZZZF9iHYM
-	 FnbJ8Td3regJsB9lGsvAwHZboPfx0w4eEJaeTZ9bGYP+2OjZgkViL5ymqktHNmgmSe
-	 Ep5AWqoVl2BFYvuJrkN+DJ7K/bc2I3HsED/NNKHDFuM2y8c2qgr+QR7qHevZ8E0cie
-	 gRNX7pSzw40TxXks8lCppoMLSFR969B6W7dWOPZXQUMpd+6t6tc2hSLCCo4eB4Czq8
-	 jKEM49SiVgaTVBWxQUSGWpcogrwoCAWNKIJ3qa6JHcq2pTJXgWVCo5Lx2hNwMiMJ/e
-	 oUD/1Q8lyDNhw==
-Date: Thu, 10 Oct 2024 11:09:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sanman Pradhan <sanman.p211993@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	kernel-team@meta.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, jdelvare@suse.com, linux@roeck-us.net,
-	mohsin.bashr@gmail.com, sanmanpradhan@meta.com, andrew@lunn.ch,
-	linux-hwmon@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5] eth: fbnic: Add hardware monitoring support
- via HWMON interface
-Message-ID: <20241010100942.GF1098236@kernel.org>
-References: <20241009192018.2683416-1-sanman.p211993@gmail.com>
+	s=arc-20240116; t=1728555275; c=relaxed/simple;
+	bh=MrI7UO9DkNILrgrGDxPJFW3FSW9WF1yU5y98aHjfB9Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UJi6VttoWMXw0zXrBcLjOdpeNLKRBKPXu/BqYfjWF6cpZ7/fa8PrdBCmKurlJbRPGMpKu/hEmn+FHgiaSNiVAAZk9htur0ombcjv2HK/xPfNDys/zeE79JMrqGEAG4C6Gnh4fholD3wm76FTeU38TRVe9niF/nNUP6mKQdOv7mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=n80285aQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A1bLcD023702;
+	Thu, 10 Oct 2024 10:14:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	OM06fI4SwiEmMbVmLrFK9GDPa/CstAMR3gUBg0vz79Q=; b=n80285aQdJnkAKZL
+	5GMTU2qvXkYA+qmS1u8mlgPl6hbIBfhzc3jm82073rr3gINzF4e6k3kpONmUz/TP
+	SPU0pnAx+J+xOktEmDe/vcVEHHLsBQz6eeM3rWLq2wkFjlxgBOFDJnIH0gc8iW5e
+	22uT11+zKjhbYKQ8oSg6DNzMqdwU25n+Ot4hUxi/9rMTjOah/M3cE3fHhv74Qvhv
+	d7GyWFApmVoK9FqOr/Pu/EamiG2THk8JfkJpHFGzgIjMd14LqgK46ob3+P4SUNca
+	aP7HueTsdiRa11n3wgoDgdAKaL8ym69P9F4EhzIEDr7w1Ka5LPhcz8+P3WLuIz54
+	4miyIg==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 424ndyh21r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 10:14:29 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49AAEScq005747
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 10:14:28 GMT
+Received: from [10.253.78.114] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 10 Oct
+ 2024 03:14:24 -0700
+Message-ID: <bd209e3c-41b5-4e70-ad15-b3f2ff265afb@quicinc.com>
+Date: Thu, 10 Oct 2024 18:14:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009192018.2683416-1-sanman.p211993@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/5] arm64: dts: qcom: move common parts for qcs8300-ride
+ variants into a .dtsi
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>
+References: <20241010-dts_qcs8300-v1-0-bf5acf05830b@quicinc.com>
+ <20241010-dts_qcs8300-v1-4-bf5acf05830b@quicinc.com>
+ <75vxiq4n2tdx3ssmnbq7qpp2ujtzjs4bkgpkpsi623fs3mpslx@ijmaos2gg5ps>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <75vxiq4n2tdx3ssmnbq7qpp2ujtzjs4bkgpkpsi623fs3mpslx@ijmaos2gg5ps>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: TmYmN6RgKUPYTndxeSdPKTmNcd4aObyj
+X-Proofpoint-ORIG-GUID: TmYmN6RgKUPYTndxeSdPKTmNcd4aObyj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ bulkscore=0 adultscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
+ mlxlogscore=949 spamscore=0 suspectscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410100067
 
-On Wed, Oct 09, 2024 at 12:20:18PM -0700, Sanman Pradhan wrote:
-> From: Sanman Pradhan <sanmanpradhan@meta.com>
+
+
+On 2024-10-10 14:18, Krzysztof Kozlowski wrote:
+> On Thu, Oct 10, 2024 at 10:57:18AM +0800, Yijie Yang wrote:
+>> In order to support multiple revisions of the qcs8300-ride board, create
+>> a .dtsi containing the common parts and split out the ethernet bits into
+>> the actual board file as they will change in revision 2.
+>>
+>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+>> ---
+>>   arch/arm64/boot/dts/qcom/qcs8300-ride.dts  | 373 +----------------------------
+>>   arch/arm64/boot/dts/qcom/qcs8300-ride.dtsi | 364 ++++++++++++++++++++++++++++
 > 
-> This patch adds support for hardware monitoring to the fbnic driver,
-> allowing for temperature and voltage sensor data to be exposed to
-> userspace via the HWMON interface. The driver registers a HWMON device
-> and provides callbacks for reading sensor data, enabling system
-> admins to monitor the health and operating conditions of fbnic.
+> This is tricky to review. Use proper -M/-B/-C arguments for
+> format-patch, so the rename will be detected.
 > 
-> Signed-off-by: Sanman Pradhan <sanmanpradhan@meta.com>
+> You basically renamed entire file!
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Sure, I'll handle the optimization of that.
 
-...
+> 
+> Best regards,
+> Krzysztof
+> 
+
 
