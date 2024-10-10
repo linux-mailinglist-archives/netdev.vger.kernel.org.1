@@ -1,112 +1,131 @@
-Return-Path: <netdev+bounces-134371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278B6998F33
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:01:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF743998F3A
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF6881F22BF3
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:01:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4ADFB24EF1
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF2E1CCEDF;
-	Thu, 10 Oct 2024 18:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769EB19ABCE;
+	Thu, 10 Oct 2024 18:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etvIoIqg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0+TrZIQU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F202C19D880;
-	Thu, 10 Oct 2024 18:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93A517BB32
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 18:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728583237; cv=none; b=gAdw8bKGVz5wbT6/cZP4b7E71c8luwCcmrJGh6vnm+/R5svqpriF9Cvxt60xeA4kmRs9qec+ZUNbNo0xQ5nJj1rutI7/MwB+pq4DUKJM7sFd4VZs291l42wbfMC9gydYEWr7CvhZE05GWIw6vbop+1rZf5k3QU6SwWb8Zx+z5F4=
+	t=1728583297; cv=none; b=QKjI2Xht8z4LqFiobnoDPCqjYstEuvnnhmC72DUdUpEmlkXSCHPIwyYT1dc9YVIJR0ZJFXfC7quJ+F64O3ABQ1M5Zc9e0uwnQyDD2iZpFVVDnSNswwXXIlbjuqSagk5Q6Kfcl+iDj0/87BMEI3bDzduLdWhWMPLKr5emlTkdaQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728583237; c=relaxed/simple;
-	bh=vnXCeY/eIb6pDREyFMJGaK+pFEB8fxIiROrKc/YO4eo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pf+mF3g9lSddpT3y+98wFwOI39x+Zbeb9OQlnwZnYqe3Fwxq8E2TGjTcmiYHZVL1HTsvZv4TBFHFs+qmB4axekhOY9tW7vzPORH/Mwdx6FauqNRuA7Y99gl6erAOPMo5a1FtduwxbOSCbZuG4RXRXy5D5txykY3OsG3rxjPeg4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etvIoIqg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE7AAC4CEC6;
-	Thu, 10 Oct 2024 18:00:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728583236;
-	bh=vnXCeY/eIb6pDREyFMJGaK+pFEB8fxIiROrKc/YO4eo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=etvIoIqgciTpA/ZXHpxMX1IfEQEmJV86AHXQPf+6ONCaV6uR9nNqfWhTsGrbM9R/8
-	 qvrsieY4P+Bt8l7BFMdxjSNKLI93qigtaFV1/fdH4VcSwAEtugBWeGgIPJtTx5zKVy
-	 6GWYd32euVFTKwvdgJxCB6581EoEOUPnXNCQOH7CT/Zoy5jY7J4AQXdk5XDRkDrFm0
-	 xbwmhgb0l+ozeMtEKbsCzyIDj0LBCkSQgvBzjZ93upXBahY/xREpjhrI62Agt1WSZq
-	 EJbQ+TEEy5tkpFhhoIFCbSzvRPhGZOAbM/Fd2nwpSdoVDPsWn8SmIbXic5pJMBtC6R
-	 fKXVP7Ej4jLYg==
-Date: Thu, 10 Oct 2024 13:00:34 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
-	conor+dt@kernel.org, krzk+dt@kernel.org, andrew@lunn.ch,
-	andrei.botila@oss.nxp.com, horms@kernel.org,
-	devicetree@vger.kernel.org, kuba@kernel.org, imx@lists.linux.dev,
-	davem@davemloft.net, pabeni@redhat.com, hkallweit1@gmail.com,
-	edumazet@google.com, netdev@vger.kernel.org, f.fainelli@gmail.com
-Subject: Re: [PATCH v5 net-next 1/2] dt-bindings: net: tja11xx: add
- "nxp,rmii-refclk-out" property
-Message-ID: <172858323378.2094687.9350859179293389445.robh@kernel.org>
-References: <20241010061944.266966-1-wei.fang@nxp.com>
- <20241010061944.266966-2-wei.fang@nxp.com>
+	s=arc-20240116; t=1728583297; c=relaxed/simple;
+	bh=h4p6/oEJeeULQeOwzxT6gK43puyM2unadqeu1J64YA0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fS+tsBal3XSTXlRX8rSEpeIeFzfpm4SLXuoUwSKrrxm3YwqdQvWpr/HsovawoCCJIkKa+dXS6vsWS73ZFiIVz40MQDztzggvWZTgX9u578IyoPBjmzGAPM149byXXkWabJCvt8Dwuqda1mXHeERXJACaNoH/KT4BpbJVARIOSEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0+TrZIQU; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4603d3e0547so30471cf.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728583295; x=1729188095; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h4p6/oEJeeULQeOwzxT6gK43puyM2unadqeu1J64YA0=;
+        b=0+TrZIQU8bz3nlGvlw803qjqKzOMtDbfkowS1m9LybsRMobQsJAX9u5M3XlUcHmsKP
+         fjutNkmVUGWERLkXfkcfGTUeF7cOizU2NF0WnYI0N6M2qQyioDt4EDOgNTkGGCM1qwwW
+         RIJlNCtKq4SEoWTBM0d3WIDoikN/Atah57DmuocJuq+HgMuSsp3DD9/IkWYBiCOlHWiU
+         /4DASB8OpTgekVByE+DEQzqLjI13Awx2RxMkGQIWYVF8dr4DBnT1DD/R07pZQoc8t0QU
+         VhIQzs5epXMeZrjTFqyjE9MISPhQkNLT6p06i5S9T60gGPpBupMgGjHdTGyIBmzTiToJ
+         c7mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728583295; x=1729188095;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h4p6/oEJeeULQeOwzxT6gK43puyM2unadqeu1J64YA0=;
+        b=cHJ+ZG2tSXRB3SIAEiaK/EevUFdujlDNDdh94PezoCcevbQL1j6JlZbgK62/UlWhrm
+         L268ZJgstygv1Jif5OOaIu0BSXyVeJI/sHHjyfPlaoypEAIYmZDKCSHM2WUYX7l/wobr
+         aqeP2tMt7N7cGQLkgRNU8Jg71VV56rHYhyukqfFFMSwnSouQwlqJ3MtL0XMvltn8p+h9
+         X8fuk7+tgkGGSM9gUuFrLylD0ypALl69OApedIMzPDP0g4HvVq4YeTGJZIeOIoo+slfI
+         T02ZpfAn63m/2DB9meNMHKSEOjfCuF7dVacFG7DFNGzoVN8ROqu3XiyLIFYU8fL+l1KF
+         ndaA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXBOF7Gd9MxQlxo7BWszTCdyVjTqdTWphO8+KIKt7+CY5EfQ6OTjzkD5FNxqnV7/HZ+9k3n1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3z2vYsKYQWqJ3KmmRxvR1upgTZw5G6iv1r/qaFPNAQAXS2vJ0
+	D0Y1RRe37K2QZhhCRoy8EgOCC9Qc+s4gssKaGxRei5I84un+jPYxKDwV1q19tHlAcjZG2nCYwtf
+	I2KjrBH5LBRNJPxguI5NZPwmXFNlUyrP7dyNj
+X-Google-Smtp-Source: AGHT+IE1Co5d9FOgO1g5et54dnmdPYt/7A6Q5DwteQLTHpos6fidELAlf4jiFP4oYabOZqoHCxX2MnXbXIIvb5OVky8=
+X-Received: by 2002:a05:622a:a28c:b0:460:48f1:5a49 with SMTP id
+ d75a77b69052e-4604ac61976mr238341cf.14.1728583294536; Thu, 10 Oct 2024
+ 11:01:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010061944.266966-2-wei.fang@nxp.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-2-dw@davidwei.uk>
+ <CAHS8izMHmG8-Go6k63UaCtwvEcp=D73Ja0XfrTjNp_b5TUmUFA@mail.gmail.com> <ed21bca5-5087-4eff-814c-39180078a700@gmail.com>
+In-Reply-To: <ed21bca5-5087-4eff-814c-39180078a700@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 10 Oct 2024 11:01:20 -0700
+Message-ID: <CAHS8izNGdFTr789fFhV_NvYK0ORKPwn_KHu0CeaZp_xhg9PgCA@mail.gmail.com>
+Subject: Re: [PATCH v1 01/15] net: devmem: pull struct definitions out of ifdef
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Oct 9, 2024 at 4:16=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 10/9/24 21:17, Mina Almasry wrote:
+> > On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote=
+:
+> >>
+> >> From: Pavel Begunkov <asml.silence@gmail.com>
+> >>
+> >> Don't hide structure definitions under conditional compilation, it onl=
+y
+> >> makes messier and harder to maintain. Move struct
+> >> dmabuf_genpool_chunk_owner definition out of CONFIG_NET_DEVMEM ifdef
+> >> together with a bunch of trivial inlined helpers using the structure.
+> >>
+> >
+> > To be honest I think the way it is is better? Having the struct
+> > defined but always not set (because the code to set it is always
+> > compiled out) seem worse to me.
+> >
+> > Is there a strong reason to have this? Otherwise maybe drop this?
+> I can drop it if there are strong opinions on that, but I'm
+> allergic to ifdef hell and just trying to help to avoid it becoming
+> so. I even believe it's considered a bad pattern (is it?).
+>
+> As for a more technical description "why", it reduces the line count
+> and you don't need to duplicate functions. It's always annoying
+> making sure the prototypes stay same, but this way it's always
+> compiled and syntactically checked. And when refactoring anything
+> like the next patch does, you only need to change one function
+> but not both. Do you find that convincing?
+>
 
-On Thu, 10 Oct 2024 14:19:43 +0800, Wei Fang wrote:
-> Per the RMII specification, the REF_CLK is sourced from MAC to PHY
-> or from an external source. But for TJA11xx PHYs, they support to
-> output a 50MHz RMII reference clock on REF_CLK pin. Previously the
-> "nxp,rmii-refclk-in" was added to indicate that in RMII mode, if
-> this property present, REF_CLK is input to the PHY, otherwise it
-> is output. This seems inappropriate now. Because according to the
-> RMII specification, the REF_CLK is originally input, so there is
-> no need to add an additional "nxp,rmii-refclk-in" property to
-> declare that REF_CLK is input.
-> Unfortunately, because the "nxp,rmii-refclk-in" property has been
-> added for a while, and we cannot confirm which DTS use the TJA1100
-> and TJA1101 PHYs, changing it to switch polarity will cause an ABI
-> break. But fortunately, this property is only valid for TJA1100 and
-> TJA1101. For TJA1103/TJA1104/TJA1120/TJA1121 PHYs, this property is
-> invalid because they use the nxp-c45-tja11xx driver, which is a
-> different driver from TJA1100/TJA1101. Therefore, for PHYs using
-> nxp-c45-tja11xx driver, add "nxp,rmii-refclk-out" property to
-> support outputting RMII reference clock on REF_CLK pin.
-> 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
-> V2 changes:
-> 1. Change the property name from "nxp,reverse-mode" to
-> "nxp,phy-output-refclk".
-> 2. Simplify the description of the property.
-> 3. Modify the subject and commit message.
-> V3 changes:
-> 1. Keep the "nxp,rmii-refclk-in" property for TJA1100 and TJA1101.
-> 2. Rephrase the commit message and subject.
-> V4 changes:
-> 1. Change the property name from "nxp,phy-output-refclk" to
-> "nxp,rmii-refclk-out", which means the opposite of "nxp,rmii-refclk-in".
-> 2. Refactor the patch after fixing the original issue with this YAML.
-> V5 changes:
-> 1. Reword the description of "nxp,rmii-refclk-out" property.
-> ---
->  .../devicetree/bindings/net/nxp,tja11xx.yaml     | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
-> 
+To be honest the tradeoff wins in the other direction for me. The
+extra boiler plate is not that bad, and we can be sure that any code
+that touches net_devmem_dmabuf_binding will get a valid internals
+since it won't compile if the feature is disabled. This could be
+critical and could be preventing bugs.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
+--=20
+Thanks,
+Mina
 
