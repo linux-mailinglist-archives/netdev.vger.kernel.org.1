@@ -1,105 +1,115 @@
-Return-Path: <netdev+bounces-134308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1618A998AFA
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A807998AFF
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A99EF290F8E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:08:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 487A7291659
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A8A1CB523;
-	Thu, 10 Oct 2024 15:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E661C9ECA;
+	Thu, 10 Oct 2024 15:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKw/g2LO"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Bs890czY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD00838DE1;
-	Thu, 10 Oct 2024 15:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183941C3F28;
+	Thu, 10 Oct 2024 15:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728572583; cv=none; b=HHyi8bymNmVw3EqNQtJQ4eo5gFPwo+lAgF6DiaceH6NmOzrZwXetQe9EE1fjhuV0PklI+p1SRku6nkVg+ET5wmUbmSOivIMoXdPwSJwdPqgSOhJICzSOGf8IDac0yq6Bk/WZkAXjKQsAzdH0sdJ7QR7878gNx/k9UkLU6XpLDbI=
+	t=1728572774; cv=none; b=JYU0e1jerOM2+RBAJNU1g1oQm2kBLRbpBKqLTLkLQ6CKoxvaS9HoYAYhbjPp6C6wLtTnJV8UjjLouAIdYAci/3HbOmmSmN8DI53iTfLrklIpB4I/dbmTAphK7A6HaeJBfqJMICVyqLvH/X2/PfqjAWAfyjzhtAyTR64SayEkt+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728572583; c=relaxed/simple;
-	bh=Q+9jZOfEu+P6GJzAuvEVSPEa5zIZ8zMH0BMvCaLDHwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RhWTMJWBLjsR5c37hdh4ccwcENnfdCNNKRlcoBCG4050ujlSYxkzT99bR1PWQPmp4XBIgLx7Bep9Bla/pbDiM1BQMLv/G9AR3rry18Pjn8hWQUxbqyEO2YBUb3EKrG1ZsEsSVPBnXIbQvUYZVQG0s2PE2Z8T+T4Bfr4Da5YIHGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WKw/g2LO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09454C4CEC5;
-	Thu, 10 Oct 2024 15:03:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728572582;
-	bh=Q+9jZOfEu+P6GJzAuvEVSPEa5zIZ8zMH0BMvCaLDHwA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WKw/g2LOKBdWzy2XTY/Txpba1Pbk6DcO5YUN/KPBSm+pWIzeNFRWnxmzzMVOKT0n1
-	 Gw3qqPXU5CztciRelTGBLD2xA1JPjiUhkcomBCeRQ/ygMGbpYUQcxWesUJ4XUI399Q
-	 VO2ib0vfU8L6SwViI7uYS2DfyOyinx+1qiv6aGDNTqBPafOx2w+J8FgBKnbFcTLBzI
-	 PHJjDYxjEqAyH0WZ3+UIMPKBCFzSXH6WwidJczV+N3I48sjVF9k+0iHoAwhwB1Ahwb
-	 N0z07YI3piSe0HAmUBsNlZt8clQBzIAYUB/6W3NXMyoW6swQUc+Dq4hF78Sy11igGI
-	 9ZWOSTt4/mPmQ==
-Message-ID: <8ec09781-5d6b-4d9b-b29d-a0698bcff5fe@kernel.org>
-Date: Thu, 10 Oct 2024 09:03:01 -0600
+	s=arc-20240116; t=1728572774; c=relaxed/simple;
+	bh=m5uw3eXlhRpsgXeXdOs302gE4sX30libvcLIMVUcBAY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pSC0i+OOa5XxV5BiXcD6doO9b1yREPZbkH3wuCU59Y/ncsoUBus0UbjVyWfLS49YRS1tiAh3XtRRGijxV6RWdtthMfq5C80Yd7IVNPilm8Te3irvMaUGWNp0K/sAiG80WuK1PsFIv1n4IkFBIS5uGKiCqvucY4Adpv73xTMDYyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Bs890czY; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49AF5mdq037505;
+	Thu, 10 Oct 2024 10:05:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1728572748;
+	bh=GqRZLvl2DjQ0upPJP7Y+Ph6GptippgBWVgGt23VlipY=;
+	h=From:To:CC:Subject:Date;
+	b=Bs890czYvAfOqPp1SIaX0SIVFs6r3JxXydwN/VqnhuhK6aMrRd5VadUtk6/X/VU0E
+	 yUQ30kPiG3+4byOuaH9CkEBGv3tFtzREVbFODtjfiOhJhfyj3FQYZaI9fyfie7oOiT
+	 Tu/iGRRRDmkhUsm7ylbzWAOGD2XKv8rY+ZB28EBk=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49AF5msw113165
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 10 Oct 2024 10:05:48 -0500
+Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 10
+ Oct 2024 10:05:47 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 10 Oct 2024 10:05:47 -0500
+Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [10.24.72.81])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49AF5hN1030739;
+	Thu, 10 Oct 2024 10:05:44 -0500
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <rogerq@kernel.org>, <dan.carpenter@linaro.org>,
+        <jpanis@baylibre.com>, <u.kleine-koenig@baylibre.com>,
+        <c-vankar@ti.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        <s-vadapalli@ti.com>
+Subject: [PATCH net-next] net: ethernet: ti: am65-cpsw: Enable USXGMII mode for J7200 CPSW5G
+Date: Thu, 10 Oct 2024 20:35:43 +0530
+Message-ID: <20241010150543.2620448-1-s-vadapalli@ti.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <2e475d9f-8d39-43f4-adc5-501897c951a8@kernel.dk>
- <93036b67-018a-44fb-8d12-7328c58be3c4@kernel.org>
- <2144827e-ad7e-4cea-8e38-05fb310a85f5@kernel.dk>
- <3b2646d6-6d52-4479-b082-eb6264e8d6f7@kernel.org>
- <57391bd9-e56e-427c-9ff0-04cb49d2c6d8@kernel.dk>
- <d0ba9ba9-8969-4bf6-a8c7-55628771c406@kernel.dk>
- <b8fd4a5b-a7eb-45a7-a2f4-fce3b149bd5b@kernel.dk>
- <7f8c6192-3652-4761-b2e3-8a4bddb71e29@kernel.dk>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <7f8c6192-3652-4761-b2e3-8a4bddb71e29@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 10/10/24 8:21 AM, Jens Axboe wrote:
->> which adds zc send. I ran a quick test, and it does reduce cpu
->> utilization on the sender from 100% to 95%. I'll keep poking...
-> 
-> Update on this - did more testing and the 100 -> 95 was a bit of a
-> fluke, it's still maxed. So I added io_uring send and sendzc support to
-> kperf, and I still saw the sendzc being maxed out sending at 100G rates
-> with 100% cpu usage.
-> 
-> Poked a bit, and the reason is that it's all memcpy() off
-> skb_orphan_frags_rx() -> skb_copy_ubufs(). At this point I asked Pavel
-> as that made no sense to me, and turns out the kernel thinks there's a
-> tap on the device. Maybe there is, haven't looked at that yet, but I
-> just killed the orphaning and tested again.
-> 
-> This looks better, now I can get 100G line rate from a single thread
-> using io_uring sendzc using only 30% of the single cpu/thread (including
-> irq time). That is good news, as it unlocks being able to test > 100G as
-> the sender is no longer the bottleneck.
-> 
-> Tap side still a mystery, but it unblocked testing. I'll figure that
-> part out separately.
-> 
+TI's J7200 SoC supports USXGMII mode. Add USXGMII mode to the
+extra_modes member of the J7200 SoC data.
 
-Thanks for the update. 30% cpu is more inline with my testing.
+Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+---
 
-For the "tap" you need to make sure no packet socket applications are
-running -- e.g., lldpd is a typical open I have a seen in tests. Check
-/proc/net/packet
+Hello,
+
+This patch is based on commit
+16aef66643a2 net: phy: Validate PHY LED OPs presence before registering
+of the "main" branch of the net-next tree.
+
+Regards,
+Siddharth.
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 12ccdd3f19aa..09e57e66ea48 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -3445,7 +3445,8 @@ static const struct am65_cpsw_pdata j7200_cpswxg_pdata = {
+ 	.quirks = 0,
+ 	.ale_dev_id = "am64-cpswxg",
+ 	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
+-	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII),
++	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII) |
++		       BIT(PHY_INTERFACE_MODE_USXGMII),
+ };
+ 
+ static const struct am65_cpsw_pdata j721e_cpswxg_pdata = {
+-- 
+2.40.1
+
 
