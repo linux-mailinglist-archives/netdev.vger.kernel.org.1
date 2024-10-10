@@ -1,100 +1,134 @@
-Return-Path: <netdev+bounces-134030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339B1997AF5
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 05:01:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B82997B04
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 05:06:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E78C1287501
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 03:01:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3A201C23646
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 03:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A48418893C;
-	Thu, 10 Oct 2024 03:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E3D188CAE;
+	Thu, 10 Oct 2024 03:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9cYxlht"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HUcXzspJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CAB1BDDF;
-	Thu, 10 Oct 2024 03:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0867D18593B;
+	Thu, 10 Oct 2024 03:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728529264; cv=none; b=GGxGKUyPIhv0onBdpTbH2QXiBio6gS+FM+Fs1vss1HobVKsKVN5J7Tdz0dQ0e4s07tmJTp1PSz7FeJjLENsvWlwj373IVINwXNrx3qZYBH2Ut0RTi5+/CRJ5ZITTzDC+YvzH7B7A7QmCM6vwT3N+r1Ig4PydGh6m8HHuD2BFtog=
+	t=1728529562; cv=none; b=QxLd4+bycFE6f8NK1T0GR3/0PWe2xap0B6AOR92wNl/0jUOSvQ8kEn6Gb4puo5KI9GIylXTiTQCJkuAtBnk2rSBzGpnvaIEjNb8GVNfn3zmG1/92lHr3ww9kKhJmJqi8bP0xlKaSwoQOzbfkSX14A64/SrTMCONK7FBdnsRjET0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728529264; c=relaxed/simple;
-	bh=aLs0MvUCLAofU2lCCIVDPON8mIU1J1lcpTUT+63WbjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SFS/VFPuuLWqStS/17ae2b2VICo++UMYzPegmB6n+wMeQELjzSiIwYw9MygQyykykCdf8otHyFZkipV/MVE/GcNuBV8oVUtNwHwzMpch4FblApnxxL4JqolKFnA9O9J5DWXq+dNq92f3PnX4ITp+xgwPQac4sl5p5E44Ushq8VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9cYxlht; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-208cf673b8dso4110225ad.3;
-        Wed, 09 Oct 2024 20:01:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728529262; x=1729134062; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aLs0MvUCLAofU2lCCIVDPON8mIU1J1lcpTUT+63WbjI=;
-        b=k9cYxlhtF+MiQscHQ6BqZyq0Nyry91g2K9lW0lSKxacedOayV6a4Am0z2j9bHesF/d
-         gU2v+9s/q/v7NPM4TBZP9O6moINy8XhcIU9Bg1R+agde/UEKfhZoq2Lk3F1Nh9Wrm+gd
-         A/8cIbZtvQpx+11kGvY+eg2iFtd1f5gJzmy0rs7k6+38mclqfnsjFBubK6JduIAQD+wt
-         ZevPhyr/GSoFul1ZtFta/0TlvXKWvIXjp11OqwXWK6Hh4jfWR2LIlg3gGR8gekda3Rx3
-         xtGbIMpKJg6CQuJPAQNf48RkpbOWHv9HxL39RIcMt9UmsQBfLfeXG+Hk/Oe5WdHRWPOR
-         REqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728529262; x=1729134062;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aLs0MvUCLAofU2lCCIVDPON8mIU1J1lcpTUT+63WbjI=;
-        b=ALJGFzVdStCFGoW3tOPhpKu+/R0rHxYwBrzQ7CjrHk9OL5bvvgyN/CJ9zYenLoRJ+O
-         jBKKC8re16lwHTG+Cv2kgfDaEr7IchNG+7QS5sPCWOmlRlWIDjVcCF86UTWws4mCTZHm
-         oWpt/+beRgFArJAU+QKEwfjtdgDbyfRNdBWef/T/1oZCB9lQTpxL051K21w4YFLFPEUE
-         bPR2G+HkKNtCL8/JoSsgFDARGbz5uzja7AcN4xoLmAlT82LoNRfM7og1uYJ3Bk9XA0J5
-         XQtHZLgO+D/bD26iUq/AuWpSjv+ztdaqqkYGREGDM8/jEeXPtLV1ChGDAb8L6hpDXHvR
-         /BUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVxB29XfHTiExpSuoKqWPcC6I65n+2ie8vpB+gmQG/Wq8E+oLXOBeAlmP7QXyqaf4fBl5kaqJbT@vger.kernel.org, AJvYcCX0Cv3LkDKt7Il5MdZ1YMYEyuOhVb75F+d4D3hSG9r3ON5OBoBa4Xp0PmLGtTBJtz0aPdq0WjiiJdcVtVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yypu06nhse169tfQE7AKmRrPY93Qs8yYO68NggMXbx0DbRcmm7+
-	G62hXP0dO0quRzWN7XzL1yDI6vHHatLWYF55t6AS+5YRqyHUf8Gu
-X-Google-Smtp-Source: AGHT+IGRaakPox5E+y9r6VwzrOYOnwIpNk1IVI4a06VciaTfeETxIyK8+8aWPC31EdJRo+k2i14qTw==
-X-Received: by 2002:a17:902:e810:b0:20b:8776:4906 with SMTP id d9443c01a7336-20c6377f6e6mr69914725ad.37.1728529262239;
-        Wed, 09 Oct 2024 20:01:02 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8bad99ecsm1233235ad.3.2024.10.09.20.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 20:01:01 -0700 (PDT)
-Date: Thu, 10 Oct 2024 03:00:55 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] netdevsim: print human readable IP address
-Message-ID: <ZwdDZ01RG6Lp84BV@fedora>
-References: <20241008122134.4343-1-liuhangbin@gmail.com>
- <20241008122134.4343-2-liuhangbin@gmail.com>
- <20241009122122.GO99782@kernel.org>
- <ZwafpMwkVtcGjk0v@mini-arch>
+	s=arc-20240116; t=1728529562; c=relaxed/simple;
+	bh=H9/1rm682kIpqEYlTv9RjUv/KtXDeN/GSlWZNo2+UDY=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=ihg9ex2ADr1/DWaq9Nq70VQl6lDbLWNK/NNFLi8FVHCsssSZUwIoQnzGS6r6qzkrewP3QjGVnWbf15ICfb14HgjhcH0y3yO1TKxAmICxMptQhNvqwHae9jFDagC20qINnhnx5cS7QYJVNbaRNhyUtwznZ9v0pcSd9cU4ktnedes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HUcXzspJ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A1cqeh029507;
+	Thu, 10 Oct 2024 03:05:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=tOPtG7a4aMHdOzTcxr1162
+	f3diaXGmVyoleiBfe862Q=; b=HUcXzspJ/PLANQcQMbeDzCvBKe0zAxlQlad51z
+	lVh47yhgD5fC4iRjx6xLGtrjEECVrqUs4rHYdFJYatMz4ayigJTvr1+aAJnnl+pD
+	wxIJ6c6jK1dQxsaAKvtcsE7Idgzy4pTrm7gVwhGqIOUwKh28Ocf6/oC+K7nwCWnO
+	WfwzalW8Dm0cJWP49p3b2WzTXpLxjd1zwebdA1H8T0B+90siiu9uOanhVAS0jY3S
+	q2BsxtfBSW/B82g3yFl9tBEDVJ0AI/mm0OFzNjKaYL9/JQAnqJi0AaGgQcQ/mT7d
+	A7Sv2M2ttXfL/Wgt+EX2F85vTUyekxSFrxYB/vFu9ZDwhrTA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 425c8qvecv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 03:05:57 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49A35t2f027693
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 03:05:55 GMT
+Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 9 Oct 2024 20:05:51 -0700
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+Subject: [PATCH 0/2] Enable ethernet on qcs615
+Date: Thu, 10 Oct 2024 11:05:35 +0800
+Message-ID: <20241010-dts_qcs615-v1-0-05f27f6ac4d3@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwafpMwkVtcGjk0v@mini-arch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIBEB2cC/x3MSQqAMAxA0atI1hZacaBeRUQ6RJtN1UZEEO9ud
+ fkW/9/AmAgZ+uKGhCcxrTFDlQW4YOKCgnw2VLKqlVRS+IOn3XGrGuG72dTWNVqjhhxsCWe6/tk
+ wZlvDKGwy0YVvgUeA53kBWIdf/XIAAAA=
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>
+CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>,
+        Yijie Yang
+	<quic_yijiyang@quicinc.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1728529551; l=960;
+ i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
+ bh=H9/1rm682kIpqEYlTv9RjUv/KtXDeN/GSlWZNo2+UDY=;
+ b=xNeJRtmdBQkq3WS1HUWSTZJxI99btsl3X/UGyWNeKM+v27idQNuq892E6v0aT2HP4Iu7xj+fD
+ 74Qz7vkes/PBzPxInzAhaOSVI3ZTvZVq0Q09JogIbRNseMRyf6NNlRX
+X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
+ pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: gcWb3X4aOL6V--wFRn8Y4mR_3ca43Nm6
+X-Proofpoint-ORIG-GUID: gcWb3X4aOL6V--wFRn8Y4mR_3ca43Nm6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=445 malwarescore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 spamscore=0 phishscore=0 clxscore=1015
+ bulkscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2410100019
 
-On Wed, Oct 09, 2024 at 08:22:12AM -0700, Stanislav Fomichev wrote:
-> Can you also update tools/testing/selftests/net/rtnetlink.sh
-> accordingly? There is a part that diffs this file and it now fails due
-> to new format.
+Add dts nodes to enable ethernet interface on qcs615-ride platforms.
+This platform operates with RGMII interface and lacks SerDes. The EMAC and
+EPHY version are the same as those in sm8150.
 
-Thanks for the reminding, I will update it.
+Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+---
+This patch series depends on below patch series:
+https://lore.kernel.org/all/20240926-add_initial_support_for_qcs615-v3-0-e37617e91c62@quicinc.com/
+https://lore.kernel.org/all/20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com/
+
+---
+Yijie Yang (2):
+      arm64: dts: qcom: qcs615: add ethernet node
+      arm64: dts: qcom: qcs615-ride: Enable ethernet node
+
+ arch/arm64/boot/dts/qcom/qcs615-ride.dts | 105 +++++++++++++++++++++++++++++++
+ arch/arm64/boot/dts/qcom/qcs615.dtsi     |  27 ++++++++
+ 2 files changed, 132 insertions(+)
+---
+base-commit: 70c6ab36f8b7756260369952a3c13b3362034bd1
+change-id: 20241010-dts_qcs615-d7fa4bc599e9
+
+Best regards,
+-- 
+Yijie Yang <quic_yijiyang@quicinc.com>
+
 
