@@ -1,138 +1,135 @@
-Return-Path: <netdev+bounces-134389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCFDD9991ED
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:11:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCAC09991F1
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 195501C260DB
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:11:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC70F1C2646C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E981CEABD;
-	Thu, 10 Oct 2024 19:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4B819ABAC;
+	Thu, 10 Oct 2024 19:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="D5qHcTGQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXYRDCBC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DEB19ABA3
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 19:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B8A19ABA3;
+	Thu, 10 Oct 2024 19:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728587384; cv=none; b=cEJOUG4rJoGDApzlAlHUDf+YDvlt63f2L0LAEtGyltdL2VRPjgvRCYEU6lHbIB/Abb1iQjWSBZOSrNESAQ6B1kWrSNs+rwHOkV2bnvqzbxMtaXIe8q8y93HhAGByPdWsceaFZHX9fWZFpw5pa22v2d4vmYY7hxqe9NPudmM9nLw=
+	t=1728587514; cv=none; b=FhhMiRY+5M1c/86yc2ZmgcUEaI0ExhfWUXj8HWoFY6u50mBbHV1nins5DgBWNF9C2FsUQJfJ6G2WUzwlJ8bXp5gYKJf6aTnTQDTTPb2W2lJkMIHLJF5Bs0m8LK1ZhFg/v1qzOOEfNoCmEKlrwCkBussqTXcFMu02YpJc+RfDc5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728587384; c=relaxed/simple;
-	bh=WhVzjUdfieeUJG/hOSUYYFWGBfznG38KtyoPvazgo3o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fsKyn4sVWRBdLmeDfDMtUYf/KvTXwgOggMKZXB7ASQdDaEvm2a6Lz7DKBtD/u3m6wx7u2Rej2TCjgrEnk7p6o0dIpo7PAsgzo4xrldlkW86jl92oE6louQ7/kWDlTKBJJ2VoI9d2x6OArcSzT9xiVPILcziWHnPXElt44FPALOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=D5qHcTGQ; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e290582301fso1454640276.1
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 12:09:42 -0700 (PDT)
+	s=arc-20240116; t=1728587514; c=relaxed/simple;
+	bh=mavLUvPe/Z33R+r7s6f0yQ/Y1XkbhHeqDb+k+2j+8Fg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UtqAt0SYtK07kKtT3Wg7zMIU8cf8lnCFdju2LKnn6DZjd3WP4sYWOGtFTqj9mwfxc1+gcGHH+LZFLu/otEoR9DFiAfmJLqmaHHXmW8hbR63zVu/+65AUqhR9uQ9Dti9JnNX5DPdoEd3CgmkXyYCrxb99RCtpHau4qwgsovp+QPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NXYRDCBC; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb2f4b282cso2034371fa.2;
+        Thu, 10 Oct 2024 12:11:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1728587382; x=1729192182; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CikrYA4VnkuX9j2GWpHauE4P5KWQT6s9FPEdiS8GSrI=;
-        b=D5qHcTGQoBVELI9n5uaFfwrSDv5WZjTbwv8mLKRsKiGIsr/uQh/WUuKIQ1McaYzTZJ
-         DXQ+TuFPDKdcWJk0HKCoHg6o+AFfLvjjCdGqRLNyuVrt2cxM45O0XMU9uybI6BxVIHOl
-         FZxFomLD9twd2gfhch4r1J4nabyZOWbFBnqN29r0lZ6W3mkE8CIB3EbPFsStpLRs1kSa
-         DpUkF96txIe8DYmqZS1lcDX2duuaFZn4/ASa1NmbzBM2zWussaMHsdD3cEVDDZfUBi5+
-         WP8YLxhCaKdL3H1SkKd51d7nXEXrO0p9Ef7qhXFgqQTtNr0NCoRIjbjPPPIw1gQqnbol
-         7kaA==
+        d=gmail.com; s=20230601; t=1728587511; x=1729192311; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dV4Y8wvjEvYr9420WvUI+5b6+iJt6Y/8cuJ/hdjAW7A=;
+        b=NXYRDCBCFVNvH9SGiRDWscuNIGuN55vGXbNQJshIdwXt4kp/frb+9zrcLO0SmKX3//
+         8iy9eTQldmZlXmOBVITPscI0e39RqwaIU1sIKElyLU8TSo8OC4sWq/AcQ2AdVsFINWzG
+         fsv3wq4pzPBeNEUjuCwgsIuwm4sLF4H+T/IuryCL/C1+bnx19vNrV7Fey39LRuyvcEaN
+         jppGWaIRqA/TnYkr4pjc9erdFFE03594iceVjnRUJrAtqv3yN4DnXdNYDeBrw7jEneuF
+         RezfeF5oAjc1jhqs23M8QQX0LT5wFAmaFDmk/VjM0rJmS0yNUylgRBfLu5iKdtwhxbNM
+         88KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728587382; x=1729192182;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CikrYA4VnkuX9j2GWpHauE4P5KWQT6s9FPEdiS8GSrI=;
-        b=oZglN3gHNg7i8lFIiy8Eq2SXOiXFbIJZGVGSgDxmwxjjYSC3wKY6xoOhhsYh9yBB62
-         Jy1C+b5RLQfs3UuvFyZ6n2ZyObPAuGe+dAVZW/NxPLsvnlC3XSE2RHYBq1ADyeLsJvbo
-         At/biJddkA8oeUSMxddoGiZJpsK8p3xIw8lUTnNWJ3CjTC6F3/FdqlzO1Im4vvcCKh0h
-         em085lpWD+jwqjH8az9D6sdlOHP8L8tXeb45a1sQ0EgUSZkq9yugfE0v3MFxBfGKnwi/
-         4SdwREACRvgAEXwE8dmLe7k0Jpa1aZ6jGszbpO6H3XUW3QWs8fB7KjHO3MdLcHnR5SeD
-         M/ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXgG+5hGJHVrhswE/7kR7JGzNwE03iTAP3snQje17MHlZ+jaduL0A2Gyuzi11WXnIi+oh7KmIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKum0+M78S1fh/8WW6ZnarwbBx7+OWFtiWMjqOMLj69D7bC8J2
-	6fjtRf1+CxdvhW0OmhTWhKIGRBEoBaWnw8v/wXmo/MPpamWbfYAvtIXXuMP9b6jE1PLoazkMGyj
-	mpMBdSQQAs/jpjnYPr3m0la8+5b2N0QOdoKJaJaMzze9YeEQ=
-X-Google-Smtp-Source: AGHT+IFoDnIBQx3nd4BDAUPqV49GV7R9G6VM2UACY+9eMmhbM1oMiRtHmI2qWdFhcd2ns10uTkcEpuSvIg7Fd/Wg2bs=
-X-Received: by 2002:a05:690c:386:b0:6e3:220e:90dd with SMTP id
- 00721157ae682-6e32e435ae0mr50164777b3.35.1728587382162; Thu, 10 Oct 2024
- 12:09:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728587511; x=1729192311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dV4Y8wvjEvYr9420WvUI+5b6+iJt6Y/8cuJ/hdjAW7A=;
+        b=ejmTffBtxHSzRCCJHeTNEINassP3UV/k/oqz/Xo+wo7SA6rmTH71jhHScHXqpKykn8
+         cN2JlYWN9OZM7xakLG1tj+xO9WN8gceLXuxUpRQtSnLyvplyJGV0w2z86kgsvrWkKHf+
+         pUhJOVZtu9XTUziAqHauvKLHBoIL6DNH+DjHn62G4SaQBjp9+9amUDf1E8I7rrO8EEer
+         SgTdMqI8nAYabw4S5Is+0gMC8kcNCyRBKImc8quchnLASALnlbpK5JGYXDFIrmf5X3Te
+         Kx9gPMc7EkTx2lfQ02yueuxCaGr4b4S88c5Xgtbuawt2e8W4XQdKoCCDMm/hT9FAKicI
+         e43Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV1hYf5cTzBJfsYNPT2c6A8L3Iox8O1f3GD+jPrALCVOxD1MCP4IWDbDh+WfKCEmOiaXZpT+dJBg0E4ZQ==@vger.kernel.org, AJvYcCWBjw2cAPNqldK9P/HL+GfY9GdIhAaeCTZNXKreoC+UY/8uagTrnSvDkJVXl3OyOBmO30+qVZFeGDF8THreuruX@vger.kernel.org, AJvYcCWknM1lJTSuY87lubECfkWK9RDW6YgylCLEzEwQmR12QujM8fOeNxCZxjBI4P8TQkWHPOY/7N0D@vger.kernel.org, AJvYcCXvhHgC+AHEJFT3AkMHMUK60qRYXqI0OzbnsitDHQq4hTaXV1j3v7u8RXUJRStEyPCib3qtMLXMVXBMiT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSMujcfjfddXQi4aPMZzSaFbpsK0ejXX2pHOFg4NHcUwtu4/ca
+	jBybSZnv3kjy8G7CoVO3usIT/xVlSd+5OfvLPC22T7k0JPR1+GSZ
+X-Google-Smtp-Source: AGHT+IEuKfVs3iRf0Hz2+U1nsMKSApblmz+h7J4ac6CBD50ItYNEHj2D6C3yPD9lZXHenfR0Ve6hZQ==
+X-Received: by 2002:a05:6512:2342:b0:539:8d46:4746 with SMTP id 2adb3069b0e04-539c4980d63mr4709005e87.60.1728587510361;
+        Thu, 10 Oct 2024 12:11:50 -0700 (PDT)
+Received: from localhost (net-2-44-97-22.cust.vodafonedsl.it. [2.44.97.22])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7ede92bsm127899866b.28.2024.10.10.12.11.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 12:11:49 -0700 (PDT)
+Date: Thu, 10 Oct 2024 21:11:48 +0200
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: allison.henderson@oracle.com, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	skhan@linuxfoundation.org, anupnewsmail@gmail.com
+Subject: Re: [PATCH] selftests: net: rds: fix module not found
+Message-ID: <wldy6xafdjem7nni2bnaq7gvozkwqpdtsmed5aopdcedsegmzd@faw3xb76qqgd>
+References: <20241008082259.243476-1-alessandro.zanni87@gmail.com>
+ <20241009194031.269a1251@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009203218.26329-1-richard@nod.at> <CAHC9VhSbAM3iWxhO+rgJ0d0qOtrSouw0McrjstuP5xQw3=A35Q@mail.gmail.com>
- <4370155.VQJxnDRnGh@somecomputer>
-In-Reply-To: <4370155.VQJxnDRnGh@somecomputer>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 10 Oct 2024 15:09:31 -0400
-Message-ID: <CAHC9VhRDZVJbhCbVkfs8NC=vAx-QdQwX_jMq51xzoTxFuxSXLg@mail.gmail.com>
-Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
-To: Richard Weinberger <richard@sigma-star.at>
-Cc: Richard Weinberger <richard@nod.at>, upstream@sigma-star.at, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net, 
-	kadlec@netfilter.org, pablo@netfilter.org, rgb@redhat.com, 
-	upstream+net@sigma-star.at, audit@vger.kernel.org, 
-	linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009194031.269a1251@kernel.org>
 
-On Thu, Oct 10, 2024 at 2:24=E2=80=AFAM Richard Weinberger
-<richard@sigma-star.at> wrote:
-> Am Donnerstag, 10. Oktober 2024, 00:02:44 CEST schrieb Paul Moore:
-> > [CC'ing the audit and LSM lists for obvious reasons]
-> >
-> > If we're logging the subjective credentials of the skb's associated
-> > socket, we really should also log the socket's LSM secctx similar to
-> > what we do with audit_log_task() and audit_log_task_context().
-> > Unfortunately, I don't believe we currently have a LSM interface that
-> > return the secctx from a sock/socket, although we do have
-> > security_inode_getsecctx() which *should* yield the same result using
-> > SOCK_INODE(sk->sk_socket).
->
-> Hm, I thought about that but saw 2173c519d5e91 ("audit: normalize NETFILT=
-ER_PKT").
-> It removed usage of audit_log_secctx() and many other, IMHO, useful field=
-s.
+On 24/10/09 07:40, Jakub Kicinski wrote:
+> On Tue,  8 Oct 2024 10:22:53 +0200 Alessandro Zanni wrote:
+> > This fix solves this error, when calling kselftest with targets "net/rds":
+> > 
+> > selftests: net/rds: test.py
+> > Traceback (most recent call last):
+> >   File "tools/testing/selftests/net/rds/./test.py", line 17, in <module>
+> >     from lib.py import ip
+> > ModuleNotFoundError: No module named 'lib'
+> > 
+> > Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+> > ---
+> >  tools/testing/selftests/net/rds/test.py | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
+> > index e6bb109bcead..112a8059c030 100755
+> > --- a/tools/testing/selftests/net/rds/test.py
+> > +++ b/tools/testing/selftests/net/rds/test.py
+> > @@ -14,8 +14,9 @@ import sys
+> >  import atexit
+> >  from pwd import getpwuid
+> >  from os import stat
+> > -from lib.py import ip
+> >  
+> > +sys.path.append("..")
+> > +from lib.py.utils import ip
+> >  
+> >  libc = ctypes.cdll.LoadLibrary('libc.so.6')
+> >  setns = libc.setns
+> 
+> Does this work regardless of where we try to run the script from?
+> In other cross-imports we try to build the path based on __file__,
+> see: tools/testing/selftests/drivers/net/lib/py/__init__.py
 
-The main motivation for that patch was getting rid of the inconsistent
-usage of fields in the NETFILTER_PKT record (as mentioned in the
-commit description).  There's a lot of history around this, and why we
-are stuck with this pretty awful IMO, but one of the audit rules is
-that if a field appears in one instance of an audit record, it must
-appear in all instances of an audit record (which is why it is
-important and good that you used the "?" values for UID/GID when they
-are not able to be logged).
+Yes, it works regardeless where we run the script from but I agree
+with you to keep the same style used in other files.
+Thanks for pointing out.
 
-However, as part of that commit we also dropped a number of fields
-because it wasn't clear that anyone cared about them and if we were
-going to (re)normalize the NETFILTER_PKT record we figured it would be
-best to start small and re-add fields as needed to satisfy user
-requirements.  I'm working under the assumption that if you've taken
-the time to draft a patch and test it, you have a legitimate need :)
+> Would be good to keep consistency.
 
-> What about skb->secctx?
+Definitely. I'm sending a v2 patch with this in mind.
 
-Heh, if there is anything with more history than the swinging fields
-in an audit record, it would be that :)  We don't currently have an
-explicit LSM blob/secid/secctx in a skb and I wouldn't hold your
-breath waiting for one; we do have a secmark, but that is something
-entirely different.  We've invented some mechanisms to somewhat mimic
-a LSM security label for packets, but that's complicated and not
-something we would want to deal with in the NETFILTER_PKT record at
-this point in time.
-
---=20
-paul-moore.com
+> -- 
+> pw-bot: cr
 
