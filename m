@@ -1,141 +1,131 @@
-Return-Path: <netdev+bounces-133999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B0C997A69
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:07:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BB4997A59
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0F11C2308A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:07:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0800B284920
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00840192B69;
-	Thu, 10 Oct 2024 02:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FBF3224CF;
+	Thu, 10 Oct 2024 02:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IJ3N6W9d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqWtSqJK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7547919005D;
-	Thu, 10 Oct 2024 02:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8766A14293;
+	Thu, 10 Oct 2024 02:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728525954; cv=none; b=A5gRujXga68HyjEOe8wwiIzAVrD8jJSuP/uhiEhiUxOVfZofWfM3Tz2/lXuMgn/lSOXgu03u8cEyZ0H6g7hBJdid9zSszZoMVgRHfj2/8VGOBiNEisSVUiUL8YNqKsG9ULCsd4gmqnv6F2vO9uI9IktB5dcmoo0wNKg3kxAapmk=
+	t=1728525934; cv=none; b=dABL507twSSYrDjrRcGuvTzKhFVt+hlc6JHbmwD3VFmrFVKQlU/tGLRpE5n7ieEITnjLwhhbCdFrYfJPAXvDHukQ9CF41E9eYtrQMFAU5jGYLODG8mtQHo3IYbDvoOzoOYb/9nm2GzwRM5usZ2yaSRvnj255uqIa1ycx6ZLYd9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728525954; c=relaxed/simple;
-	bh=xDOzq8vKFs/+SMggfeJ4oQ3ElEkJI5aj2UIzGLX2a1c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=SRwtDLvghtDEUPPMvWLfLvtsl/GzOnVt2wwCz/NTovZcC2dyLC7nBHMKBr8POEgtNhcXaZumZoCtDtXiHdaOI/qVNMiXXBLMr8CxUxPQtnL5x+s291s9DRBuMP4h0dlqcE8TgACJzua7jGuvM6dI1fEXjR+li6I5ShN97091MiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IJ3N6W9d; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A1bFGg005694;
-	Thu, 10 Oct 2024 02:05:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	jMWB6PcATmbLPyC1cK3HP6Yj+b56f5C/ktZYBF11ToA=; b=IJ3N6W9dNP5sSNUP
-	lzjfIgjIEQnn8GECnRxP1oygMQHdez13S5aJumqMaHr0iKoUO63A2VDr1r9JYNgl
-	tMmlc7tM9gFsTMdRxW0rGZheSt1pRQJtVZc/ZWC84pq4du2LOsFt7//DvNEo+bCn
-	AsH0x3Mdap0T1ewRrj+QjmYP8blwW1tv710+UnPWiPc+nL0+DNoIK2ohrT95a9p4
-	sAWWRJsBrABZkWX0oG5JhyRTwyVLoJLKuFVs8GUPqA4LsaREmjcWG1M76greRVvQ
-	nbSgYIHAOTZaASPFx9bMd8ckBoMU+m42IMWttovyimDk9gvVlo2ySp4n/XF8nqXP
-	lTpOTw==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 424yj06tpy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 02:05:42 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49A25f68007438
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Oct 2024 02:05:41 GMT
-Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 9 Oct 2024 19:05:36 -0700
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-Date: Thu, 10 Oct 2024 10:03:45 +0800
-Subject: [PATCH 3/3] dt-bindings: net: qcom,ethqos: add description for
- qcs8300
+	s=arc-20240116; t=1728525934; c=relaxed/simple;
+	bh=oP5QYm/70vfqOtPdsGr2+LBh3R8qeM5xVe8DOd5ZiD8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OF2Tcmjlb4r8Z9/2e1I2R31Ay/hHHim5OBtrVGVwPoQy0vdkA/p2bcpCNRsDd8Fe31DTJeyWkAYREV0zhaQwSl5nSAu16mu/mShJeCH6g0XLdBaaxAtUFCB/SRZX0l97mmYjtHYFUUcfqtoOU/Lc10qj2ZUXB66/vk547tjIv1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqWtSqJK; arc=none smtp.client-ip=209.85.219.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e2904ce7e14so432455276.0;
+        Wed, 09 Oct 2024 19:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728525931; x=1729130731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NMrS54MxodS3n9OqxrG5rU5JYoDqHS/hBg9ei6ZcNfA=;
+        b=eqWtSqJKJKhYnrhr8TRMf6nMyW2YH8KE7rRFICtta40hpiNwk74YoahGaWBTPxU/L1
+         GPQgaTsWqad12UAWnJDafzdBI53ySaTVfPMOhalCkyHXjzzShsId/GLtDzZDQDkhocES
+         TeDC8QLZ/mUba91eV8Ip3nBatF9MOQvBXDUm49e2YzvTVvmkf1qwZvHek/kZijBGN3vS
+         hlaOdtbIonjC20QQwGtI85lQSv5yGQFvPVCt0durzKyfbwZzygwYjQZI7Q7kwxqCzv/9
+         O3lKD/PE5rMnAiTNbmJiaV74Jfqtzy9FaBW9OB0fzK9ljEUDmG9F0StKHv7clL05JKt6
+         HWCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728525931; x=1729130731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NMrS54MxodS3n9OqxrG5rU5JYoDqHS/hBg9ei6ZcNfA=;
+        b=Xd+yeeeanvQ2pQhD4UokANsDMH46f7ScI3zzzRMHwSaBCkMLL365OvNBGE7iJg7kZ3
+         LcWICTVAIoNKSJbCpiouv3ABGy1vZI5BavxNDPP47p3RuZ5REYPo7ByDgoYECk82Prkg
+         363B2Lm7rGAmOfi1fnKHcxDNnyYVKxHVhiuqoKtSPlnMiDQW0tThgJFcO6wEKFUYQInK
+         sb/eVAICjpVANNXAEPT/VNVACnd0d8vgRHtjV/15PwmcU/BX8yHC7jCdlU8gWvL0R4H1
+         bs7svn/IPbP5w1V7spUbtkE6bVEBJRI20/pIr17RnD204PfnNSGn4SjHgyaeKPjTA57d
+         kmgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQYvQa14NSo24w1GX3/hkRxca5ia1ts18HsAd3mms6WGFUi2HV8CSZgje8XIdprb8vWf4XY7xk@vger.kernel.org, AJvYcCXwWKG2guyR16gJ7FzZAyPbVqg8I7YGP72y6dtvZrrMmMUN93oWMthwmq2Ell72CC57Ol8nHTAmnBOQrzc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGOrVqtvhW5LENIklMUApqZg8+jQwsmQ82Yg1cqhg7Ero4EaRG
+	mluMZB+ItBKk1F1bztx7IzeQ+C/jgxadrbGl+rw1C9m1dOLeBtSrFytjWDlpCs7dF/1MJWOM51N
+	eG8v8YIFNCg9ncxGRguR/lXY1C/Y=
+X-Google-Smtp-Source: AGHT+IGx8Yz9D2oYZMxrivrhT/RrPksLeeIeW6BZDSTBHLzlqNKOeKwrgDz6WnDPsSv84d+PwSDXh+jx6w3kYpV0+lc=
+X-Received: by 2002:a05:6902:2310:b0:e29:c8f:14ba with SMTP id
+ 3f1490d57ef6-e290c8f16e2mr1156535276.5.1728525931383; Wed, 09 Oct 2024
+ 19:05:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20241010-schema-v1-3-98b2d0a2f7a2@quicinc.com>
-References: <20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com>
-In-Reply-To: <20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof
- Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bhupesh
- Sharma <bhupesh.sharma@linaro.org>,
-        Kishon Vijay Abraham I
-	<kishon@kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <quic_tingweiz@quicinc.com>,
-        <quic_aiquny@quicinc.com>, Yijie Yang <quic_yijiyang@quicinc.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1728525917; l=942;
- i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
- bh=xDOzq8vKFs/+SMggfeJ4oQ3ElEkJI5aj2UIzGLX2a1c=;
- b=1z1+gEQSdUNvVtWH1kgu0Wpf7p2NRFe4O2YM+HsztTu+HcMc2wDmNTYsfHcSS+5Eu0iJyRMHI
- SUuEsAMhH4iD7tvpvnA3onQ+/vnZO56Vkp7WCpF7rK0JNZwNMYlWypX
-X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
- pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: J2urINyswDZo1cM6XNga2xnvPLfW8L3Q
-X-Proofpoint-ORIG-GUID: J2urINyswDZo1cM6XNga2xnvPLfW8L3Q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- bulkscore=0 mlxlogscore=747 mlxscore=0 adultscore=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410100012
+References: <20241008142300.236781-1-dongml2@chinatelecom.cn>
+ <20241008142300.236781-9-dongml2@chinatelecom.cn> <ZwV0cjdg2x67URMx@debian>
+ <CADxym3ZDkjuu9TJQ_vmbky75T+bn32XMrMhQRi=rVtxgRXC_Zw@mail.gmail.com> <CAL+tcoAwJCsACt=Cc6HtzCFgBq_TUhmJq7dSuYnbFF5XGETQ_Q@mail.gmail.com>
+In-Reply-To: <CAL+tcoAwJCsACt=Cc6HtzCFgBq_TUhmJq7dSuYnbFF5XGETQ_Q@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 10 Oct 2024 10:06:13 +0800
+Message-ID: <CADxym3Y4p6kH=UGA7=bq6LKxBzLTpEPhUuJrd9FUqgL7_7HVJg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 08/12] net: vxlan: use kfree_skb_reason() in vxlan_xmit()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Guillaume Nault <gnault@redhat.com>, idosch@nvidia.com, kuba@kernel.org, 
+	aleksander.lobakin@intel.com, horms@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, 
+	dongml2@chinatelecom.cn, amcohen@nvidia.com, bpoirier@nvidia.com, 
+	b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add compatible for the MAC controller on qcs8300 platforms.
-Since qcs8300 shares the same EMAC as sa8775p, so it fallback to the
-compatible.
+On Wed, Oct 9, 2024 at 10:29=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Wed, Oct 9, 2024 at 9:37=E2=80=AFAM Menglong Dong <menglong8.dong@gmai=
+l.com> wrote:
+> >
+> > On Wed, Oct 9, 2024 at 2:05=E2=80=AFAM Guillaume Nault <gnault@redhat.c=
+om> wrote:
+> > >
+> > > On Tue, Oct 08, 2024 at 10:22:56PM +0800, Menglong Dong wrote:
+> > > > Replace kfree_skb() with kfree_skb_reason() in vxlan_xmit(). Follow=
+ing
+> > > > new skb drop reasons are introduced for vxlan:
+> > > >
+> > > > /* no remote found for xmit */
+> > > > SKB_DROP_REASON_VXLAN_NO_REMOTE
+> > > > /* packet without necessary metadata reached a device which is in
+> > > >  * "eternal" mode
+> > >
+> > > That should be "external" mode (with an "x").
+> > >
+> > > > +     /**
+> > > > +      * @SKB_DROP_REASON_TUNNEL_TXINFO: packet without necessary m=
+etadata
+> > > > +      * reached a device which is in "eternal" mode.
+> > >
+> > > Here too.
+> > >
+> >
+> > Oh, my eyes!
+> >
+> > I checked this document one by one, and I'm sure there
+> > are no more typos besides this one.
+> >
+>
+> You can try "codespell xxx.patch" to avoid typos easily before
+> submitting patches.
 
-Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
----
- Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-index 8cf29493b822..3ee5367bdde1 100644
---- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-+++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-@@ -23,6 +23,10 @@ properties:
-           - enum:
-               - qcom,qcs615-ethqos
-           - const: qcom,sm8150-ethqos
-+      - items:
-+          - enum:
-+              - qcom,qcs8300-ethqos
-+          - const: qcom,sa8775p-ethqos
-       - enum:
-           - qcom,qcs404-ethqos
-           - qcom,sa8775p-ethqos
-
--- 
-2.34.1
-
+That's a good idea! Thank you, xing~
 
