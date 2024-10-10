@@ -1,268 +1,295 @@
-Return-Path: <netdev+bounces-134054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715F0997BBE
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 06:21:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF78997BC3
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 06:25:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E58C11F2434E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:21:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C01C21C21FA0
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8EA19D070;
-	Thu, 10 Oct 2024 04:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B965C19D890;
+	Thu, 10 Oct 2024 04:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h73FDZI8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KFFIWhB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422DF1922DD
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 04:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD92615B0F2
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 04:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728534071; cv=none; b=P5rAgOjVKVzLanlqxONqIeLPGph7030YmyubNYyJexFwc1aZ6QWo8I/pC6JWygeTdJEpp+WsjBtFejBmbCVz6uxZDd7I3I9J4TIeiV0MyUdvW+z+TZHqbLnJSz42fab+eXXzKWDW1nurbL8/NYFxId937aZ/ZeuiIZ0khNafpGI=
+	t=1728534310; cv=none; b=mua8EQW/edi5LSci18rN0QSrjiIsRUmcnv8misGF4+fsONjCVK7T4tGC1nb8V9P/tFVEt1RzsFXwUXwA+6DGqfw/6WFZctsyNcc8d+tIlhmTZLAJGXIwikZe8KAfZkoCgZwCM5hY/yZqmE+2q31Q4HMjTzfdRCUVdD0tycwXSsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728534071; c=relaxed/simple;
-	bh=bPEY407b1mxDInoX7xZ2kjMSardJMi/Qo0GVtu1QSqA=;
+	s=arc-20240116; t=1728534310; c=relaxed/simple;
+	bh=IzrgkmuURIu8MAwSdYUsLYVkJkijsn1AfNL7OptyW/8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XZOVP1fa7URJ/Qr9TY/8OWW+aIn3NdbgC4zaoige5GR1XDzk2NSfGus4/j+CSUuueJ7uUBYShH3VwVATly+3aB+RO6hDJLIZgoXEYgch826VOiBf+DzTU5jBJFUvHkrRvkjkH0Ol2816jsctdj6CprYUE+XMbwLn5T8MytfFwoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h73FDZI8; arc=none smtp.client-ip=209.85.208.50
+	 To:Cc:Content-Type; b=PgduUVHsOLkEEXjIY7tinf3/uG1+5hGSfLZ9C4hDhWCnTQkcTNh1tj/PwQb/j7f6oyRmiOSDBrBzANKhjc7IPfAaVr96Cr2lxrsf0Hzlu/qG0KlGgwRtUoCcWeToQ8ZcXn51cTo7xslaZNvAgPWYmdYslknKozSPWC1Sbe0mKYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KFFIWhB7; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c903f5bd0eso561097a12.3
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 21:21:10 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c896b9b3e1so571477a12.2
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 21:25:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728534069; x=1729138869; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728534306; x=1729139106; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uBnxQhZMdJCucTfdJwBzEhkfmmeJb+9H/zZTu+WT3LU=;
-        b=h73FDZI85UboFhitzqOVQ7K9GUGF12iNQjXmhKkOjM4sBa98JtxoReTjLuqrzqO7yw
-         0OxuYmAlWlsus6ktLJYVG+apFnzPhzgrTla41U6y9M+JTmg4KLZ+/vOiSCRSSihMPcO2
-         +MBGTnv3QslSv0UTfIjYPcSnnh5sr5awmW8tzyLZAxlbQv//agCReYoeBdWbXN6dSpyB
-         hI46WlBeQ/gyP3stEpCn3o82FoojVjZOH7EbuCB5mQwOVKkDimj6uHBwLet88178BSCE
-         7e66aCG6RMAUnGQ8OVQm3SpQZd9h5stwPP7XiKzi5bqQ0trK2mq70B4kQrMnLlTWTPaw
-         cOGw==
+        bh=vS+5mt2Jic6TNgTcrAq7H8a5Jt96tTYPxl+St69+/88=;
+        b=KFFIWhB7XxViHuO8bU3/hnPTZAE1hTVs26PPaTEugtRhdH9SSSnGZJqLTFECEDplfc
+         r2wRwSY8eyGqEMDaZFWC7wlpwVqTuihcfV1rNXX7dkYnTlKTsgrrjndDCWokIdVDltJy
+         n+8AR0oYMgxhNBc1vyXomFCXud5MwPO7Wy1/hEGexb6FEil0PsufxwFxsL6yBZSZSGoN
+         y26ikF3e8+0NiLtHVifN1oG9D+BtJjlTPmJTSfMe8aRqUuYaUF+Cvbz4ByIGHiWs6FHE
+         cSxJ+zTTm9jQ3F+PMW5XY1fTUNGyIIzdQaG++R6v+z2+DxxI3u1+j77tSkgwikqibu9z
+         e6bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728534069; x=1729138869;
+        d=1e100.net; s=20230601; t=1728534306; x=1729139106;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uBnxQhZMdJCucTfdJwBzEhkfmmeJb+9H/zZTu+WT3LU=;
-        b=O5B8Sz0FEgjwsWv7DaYUYgtpLWbhYhUlhNVDOWkoAB0jbLmZNkuviPtfie8VYJjmEX
-         TelRWmzVopGUJHRDvkiagc20DuyhBtaft3/AM9ulIlh8a2vt2EDSR96Lxe1U2A2X0QjH
-         jPAPRhzN+UTBEHqhdSfFpV43CUN8AAklaQz1n4SE5XLiozNB1E+fPPl2PgFFPx+gvbGF
-         RfXYofOgMIXlPqcoOfpbHs6bRxLpsRxA3XQN7p8nqH7VsWZRAoMEMXJhXGJZuAg7kjcS
-         smPbumNcqIjVVZKHbNen8MMOx8CGtJ2jv6PPAtUd8tj/KkZIJQeu+EZMx8k0GGee1/4b
-         DK3A==
-X-Gm-Message-State: AOJu0Yykpwgf7tjcRtS44AZIGwXZ7Ea/IWFtcsEyrINLKjsDvbibNPzT
-	9G7M0vdpYrqEh2tHH45t/VKiLTnbBuQ2Rcqehesp5FFw3kU+E+FAxaQFrQ34Y9EBax279rMEH7+
-	I/XBUP8+IXlKZQgT93zUAbOEj2Y0oxq/Rsyv1
-X-Google-Smtp-Source: AGHT+IHTSg4j1DAEQNe89B9nEE0IWfnxBpuKfKV7CzxjHLtLxpkWkjce0nZGVNvYmtnMLjOJ8ReIDN4AoXvY55N/KbE=
-X-Received: by 2002:a05:6402:2713:b0:5c9:89f:9a with SMTP id
- 4fb4d7f45d1cf-5c91d689be7mr3247885a12.32.1728534068353; Wed, 09 Oct 2024
- 21:21:08 -0700 (PDT)
+        bh=vS+5mt2Jic6TNgTcrAq7H8a5Jt96tTYPxl+St69+/88=;
+        b=mCOVoTWtZZhsKGKD7HhIO9H6NCfy/dasvw/Mqcurf+a/llsl25m5+TdUe0XLX2uBp6
+         SNe6SbjjHSnKRH5y/1UfpUv+XJI+VKg/ZOsfPr3b5KF7GWeIV9BP/Y/AiVGKRJM08zKd
+         njvzg+KxazUkSKtUB5NPQl9lR+6upjsmnhhVL94b+MdDjth+36V82QLPMMHOHNygxtsA
+         A+d/wjgc6AydUwSJ63LD2DpXd5NvbXZlyMolSZIcJm+96KjesFbEEIQPPXyyuMWrSKBx
+         mWFc/5bTMfCgpHwhRvZdaPV2/KKQKDkJnSzlfLVym7K5CcBqWxPRJSu1RJj/z1+kwKRL
+         rrPg==
+X-Gm-Message-State: AOJu0YxFnTZ0ixhq3I4j/zONuDBELBsNvqw/R3x3jmubEhd9JgsiNUHI
+	NyIX0PEMIFdt1e9rnZtXKSFFbYy/YuKwkrOUA4aGsTsVyfRpLTSGPDgD/n6rrVDsFXn6YPRnuE2
+	2M05zb1hY5W4ek3Ocr4wbxWY/hKrObx4BOa0n
+X-Google-Smtp-Source: AGHT+IEgVe8WI6zZ9IXhPwM6gk7DQh07FJlH2KuBbAQRppOjApcfrMvKt96YYXcJnGDeQF5QVjBzy/Z/rbbCOB2UUbM=
+X-Received: by 2002:a05:6402:518f:b0:5c7:1ed7:8825 with SMTP id
+ 4fb4d7f45d1cf-5c91d5817c6mr3750836a12.12.1728534305884; Wed, 09 Oct 2024
+ 21:25:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009005525.13651-1-jdamato@fastly.com> <20241009005525.13651-6-jdamato@fastly.com>
-In-Reply-To: <20241009005525.13651-6-jdamato@fastly.com>
+References: <20241009005525.13651-1-jdamato@fastly.com> <20241009005525.13651-7-jdamato@fastly.com>
+In-Reply-To: <20241009005525.13651-7-jdamato@fastly.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 10 Oct 2024 06:20:57 +0200
-Message-ID: <CANn89iKytfwyax_d+7U8Xw-Wvj5z1d7xoi4LNhmUQphDiborDQ@mail.gmail.com>
-Subject: Re: [net-next v5 5/9] net: napi: Add napi_config
+Date: Thu, 10 Oct 2024 06:24:54 +0200
+Message-ID: <CANn89iJ1=xA9WGhXAMcCAeacE3pYgqiWjcBdxiWjGPACP-5n_g@mail.gmail.com>
+Subject: Re: [net-next v5 6/9] netdev-genl: Support setting per-NAPI config values
 To: Joe Damato <jdamato@fastly.com>
 Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com, 
 	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com, 
 	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Kory Maincent <kory.maincent@bootlin.com>, Johannes Berg <johannes.berg@intel.com>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Mina Almasry <almasrymina@google.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Oct 9, 2024 at 2:56=E2=80=AFAM Joe Damato <jdamato@fastly.com> wrot=
 e:
 >
-> Add a persistent NAPI config area for NAPI configuration to the core.
-> Drivers opt-in to setting the persistent config for a NAPI by passing an
-> index when calling netif_napi_add_config.
+> Add support to set per-NAPI defer_hard_irqs and gro_flush_timeout.
 >
-> napi_config is allocated in alloc_netdev_mqs, freed in free_netdev
-> (after the NAPIs are deleted).
->
-> Drivers which call netif_napi_add_config will have persistent per-NAPI
-> settings: NAPI IDs, gro_flush_timeout, and defer_hard_irq settings.
->
-> Per-NAPI settings are saved in napi_disable and restored in napi_enable.
->
-> Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
 > Signed-off-by: Joe Damato <jdamato@fastly.com>
 > ---
->  .../networking/net_cachelines/net_device.rst  |  1 +
->  include/linux/netdevice.h                     | 36 ++++++++-
->  net/core/dev.c                                | 79 +++++++++++++++++--
->  net/core/dev.h                                | 12 +++
->  4 files changed, 118 insertions(+), 10 deletions(-)
+>  Documentation/netlink/specs/netdev.yaml | 11 ++++++
+>  include/uapi/linux/netdev.h             |  1 +
+>  net/core/netdev-genl-gen.c              | 18 ++++++++++
+>  net/core/netdev-genl-gen.h              |  1 +
+>  net/core/netdev-genl.c                  | 45 +++++++++++++++++++++++++
+>  tools/include/uapi/linux/netdev.h       |  1 +
+>  6 files changed, 77 insertions(+)
 >
-> diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Doc=
-umentation/networking/net_cachelines/net_device.rst
-> index 3ab663b6cf16..9d86720cb722 100644
-> --- a/Documentation/networking/net_cachelines/net_device.rst
-> +++ b/Documentation/networking/net_cachelines/net_device.rst
-> @@ -183,5 +183,6 @@ struct_dpll_pin*                    dpll_pin
->  struct hlist_head                   page_pools
->  struct dim_irq_moder*               irq_moder
->  u64                                 max_pacing_offload_horizon
-> +struct_napi_config*                 napi_config
->  unsigned_long                       gro_flush_timeout
->  u32                                 napi_defer_hard_irqs
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 4239a4a9d295..b65a901ab4e7 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -342,6 +342,15 @@ struct gro_list {
->   */
->  #define GRO_HASH_BUCKETS       8
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netl=
+ink/specs/netdev.yaml
+> index bf13613eaa0d..7b4ea5a6e73d 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -690,6 +690,17 @@ operations:
+>          reply:
+>            attributes:
+>              - id
+> +    -
+> +      name: napi-set
+> +      doc: Set configurable NAPI instance settings.
+> +      attribute-set: napi
+> +      flags: [ admin-perm ]
+> +      do:
+> +        request:
+> +          attributes:
+> +            - id
+> +            - defer-hard-irqs
+> +            - gro-flush-timeout
 >
-> +/*
-> + * Structure for per-NAPI config
-> + */
-> +struct napi_config {
-> +       u64 gro_flush_timeout;
-> +       u32 defer_hard_irqs;
-> +       unsigned int napi_id;
-> +};
-> +
->  /*
->   * Structure for NAPI scheduling similar to tasklet but with weighting
->   */
-> @@ -379,6 +388,8 @@ struct napi_struct {
->         struct list_head        dev_list;
->         struct hlist_node       napi_hash_node;
->         int                     irq;
-> +       int                     index;
-> +       struct napi_config      *config;
+>  kernel-family:
+>    headers: [ "linux/list.h"]
+> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+> index cacd33359c76..e3ebb49f60d2 100644
+> --- a/include/uapi/linux/netdev.h
+> +++ b/include/uapi/linux/netdev.h
+> @@ -201,6 +201,7 @@ enum {
+>         NETDEV_CMD_NAPI_GET,
+>         NETDEV_CMD_QSTATS_GET,
+>         NETDEV_CMD_BIND_RX,
+> +       NETDEV_CMD_NAPI_SET,
+>
+>         __NETDEV_CMD_MAX,
+>         NETDEV_CMD_MAX =3D (__NETDEV_CMD_MAX - 1)
+> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+> index b28424ae06d5..e197bd84997c 100644
+> --- a/net/core/netdev-genl-gen.c
+> +++ b/net/core/netdev-genl-gen.c
+> @@ -22,6 +22,10 @@ static const struct netlink_range_validation netdev_a_=
+page_pool_ifindex_range =3D
+>         .max    =3D 2147483647ULL,
 >  };
 >
+> +static const struct netlink_range_validation netdev_a_napi_defer_hard_ir=
+qs_range =3D {
+> +       .max    =3D 2147483647ULL,
+
+Would (u64)INT_MAX  work ?
+
+> +};
+> +
+>  /* Common nested types */
+>  const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_PO=
+OL_IFINDEX + 1] =3D {
+>         [NETDEV_A_PAGE_POOL_ID] =3D NLA_POLICY_FULL_RANGE(NLA_UINT, &netd=
+ev_a_page_pool_id_range),
+> @@ -87,6 +91,13 @@ static const struct nla_policy netdev_bind_rx_nl_polic=
+y[NETDEV_A_DMABUF_FD + 1]
+>         [NETDEV_A_DMABUF_QUEUES] =3D NLA_POLICY_NESTED(netdev_queue_id_nl=
+_policy),
+>  };
+>
+> +/* NETDEV_CMD_NAPI_SET - do */
+> +static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_G=
+RO_FLUSH_TIMEOUT + 1] =3D {
+> +       [NETDEV_A_NAPI_ID] =3D { .type =3D NLA_U32, },
+> +       [NETDEV_A_NAPI_DEFER_HARD_IRQS] =3D NLA_POLICY_FULL_RANGE(NLA_U32=
+, &netdev_a_napi_defer_hard_irqs_range),
+> +       [NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] =3D { .type =3D NLA_UINT, },
+> +};
+> +
+>  /* Ops table for netdev */
+>  static const struct genl_split_ops netdev_nl_ops[] =3D {
+>         {
+> @@ -171,6 +182,13 @@ static const struct genl_split_ops netdev_nl_ops[] =
+=3D {
+>                 .maxattr        =3D NETDEV_A_DMABUF_FD,
+>                 .flags          =3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+>         },
+> +       {
+> +               .cmd            =3D NETDEV_CMD_NAPI_SET,
+> +               .doit           =3D netdev_nl_napi_set_doit,
+> +               .policy         =3D netdev_napi_set_nl_policy,
+> +               .maxattr        =3D NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
+> +               .flags          =3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> +       },
+>  };
+>
+>  static const struct genl_multicast_group netdev_nl_mcgrps[] =3D {
+> diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+> index 8cda334fd042..e09dd7539ff2 100644
+> --- a/net/core/netdev-genl-gen.h
+> +++ b/net/core/netdev-genl-gen.h
+> @@ -33,6 +33,7 @@ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, stru=
+ct netlink_callback *cb);
+>  int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+>                                 struct netlink_callback *cb);
+>  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info);
+> +int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)=
+;
+>
 >  enum {
-> @@ -1860,9 +1871,6 @@ enum netdev_reg_state {
->   *                             allocated at register_netdev() time
->   *     @real_num_rx_queues:    Number of RX queues currently active in d=
-evice
->   *     @xdp_prog:              XDP sockets filter program pointer
-> - *     @gro_flush_timeout:     timeout for GRO layer in NAPI
-> - *     @napi_defer_hard_irqs:  If not zero, provides a counter that woul=
-d
-> - *                             allow to avoid NIC hard IRQ, on busy queu=
-es.
->   *
->   *     @rx_handler:            handler for received packets
->   *     @rx_handler_data:       XXX: need comments on this one
-> @@ -2012,6 +2020,11 @@ enum netdev_reg_state {
->   *                where the clock is recovered.
->   *
->   *     @max_pacing_offload_horizon: max EDT offload horizon in nsec.
-> + *     @napi_config: An array of napi_config structures containing per-N=
-API
-> + *                   settings.
-> + *     @gro_flush_timeout:     timeout for GRO layer in NAPI
-> + *     @napi_defer_hard_irqs:  If not zero, provides a counter that woul=
-d
-> + *                             allow to avoid NIC hard IRQ, on busy queu=
-es.
->   *
->   *     FIXME: cleanup struct net_device such that network protocol info
->   *     moves out.
-> @@ -2405,6 +2418,7 @@ struct net_device {
->         struct dim_irq_moder    *irq_moder;
->
->         u64                     max_pacing_offload_horizon;
-> +       struct napi_config      *napi_config;
->         unsigned long           gro_flush_timeout;
->         u32                     napi_defer_hard_irqs;
->
-> @@ -2657,6 +2671,22 @@ netif_napi_add_tx_weight(struct net_device *dev,
->         netif_napi_add_weight(dev, napi, poll, weight);
+>         NETDEV_NLGRP_MGMT,
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 64e5e4cee60d..59523318d620 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -303,6 +303,51 @@ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, s=
+truct netlink_callback *cb)
+>         return err;
 >  }
 >
-> +/**
-> + * netif_napi_add_config - initialize a NAPI context with persistent con=
-fig
-> + * @dev: network device
-> + * @napi: NAPI context
-> + * @poll: polling function
-> + * @index: the NAPI index
-> + */
-> +static inline void
-> +netif_napi_add_config(struct net_device *dev, struct napi_struct *napi,
-> +                     int (*poll)(struct napi_struct *, int), int index)
+> +static int
+> +netdev_nl_napi_set_config(struct napi_struct *napi, struct genl_info *in=
+fo)
 > +{
-> +       napi->index =3D index;
-> +       napi->config =3D &dev->napi_config[index];
-> +       netif_napi_add_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
+> +       u64 gro_flush_timeout =3D 0;
+> +       u32 defer =3D 0;
+> +
+> +       if (info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]) {
+> +               defer =3D nla_get_u32(info->attrs[NETDEV_A_NAPI_DEFER_HAR=
+D_IRQS]);
+> +               napi_set_defer_hard_irqs(napi, defer);
+> +       }
+> +
+> +       if (info->attrs[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT]) {
+> +               gro_flush_timeout =3D nla_get_uint(info->attrs[NETDEV_A_N=
+API_GRO_FLUSH_TIMEOUT]);
+> +               napi_set_gro_flush_timeout(napi, gro_flush_timeout);
+> +       }
+> +
+> +       return 0;
 > +}
 > +
->  /**
->   * netif_napi_add_tx() - initialize a NAPI context to be used for Tx onl=
-y
->   * @dev:  network device
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index fca2295f4d95..bd87232f7b37 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -6503,6 +6503,22 @@ EXPORT_SYMBOL(napi_busy_loop);
->
->  #endif /* CONFIG_NET_RX_BUSY_POLL */
->
-> +static void __napi_hash_add_with_id(struct napi_struct *napi,
-> +                                   unsigned int napi_id)
+> +int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)
 > +{
-> +       napi->napi_id =3D napi_id;
-> +       hlist_add_head_rcu(&napi->napi_hash_node,
-> +                          &napi_hash[napi->napi_id % HASH_SIZE(napi_hash=
-)]);
+> +       struct napi_struct *napi;
+> +       unsigned int napi_id;
+> +       int err;
+> +
+> +       if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_ID))
+> +               return -EINVAL;
+> +
+> +       napi_id =3D nla_get_u32(info->attrs[NETDEV_A_NAPI_ID]);
+> +
+> +       rtnl_lock();
+
+Hmm.... please see my patch there :
+
+ https://patchwork.kernel.org/project/netdevbpf/patch/20241009232728.107604=
+-2-edumazet@google.com/
+
+Lets not add another rtnl_lock() :/
+
+> +
+> +       napi =3D napi_by_id(napi_id);
+> +       if (napi) {
+> +               err =3D netdev_nl_napi_set_config(napi, info);
+> +       } else {
+> +               NL_SET_BAD_ATTR(info->extack, info->attrs[NETDEV_A_NAPI_I=
+D]);
+> +               err =3D -ENOENT;
+> +       }
+> +
+> +       rtnl_unlock();
+> +
+> +       return err;
 > +}
 > +
-> +static void napi_hash_add_with_id(struct napi_struct *napi,
-> +                                 unsigned int napi_id)
-> +{
-> +       spin_lock(&napi_hash_lock);
-> +       __napi_hash_add_with_id(napi, napi_id);
-
-Hmmm... there is no check if 'napi_id' is already used and hashed.
-
-I would add
-
-WARN_ON_ONCE(napi_by_id(napi_id));
-
-> +       spin_unlock(&napi_hash_lock);
-> +}
-> +
->  static void napi_hash_add(struct napi_struct *napi)
->  {
->         if (test_bit(NAPI_STATE_NO_BUSY_POLL, &napi->state))
-> @@ -6515,10 +6531,8 @@ static void napi_hash_add(struct napi_struct *napi=
-)
->                 if (unlikely(++napi_gen_id < MIN_NAPI_ID))
->                         napi_gen_id =3D MIN_NAPI_ID;
->         } while (napi_by_id(napi_gen_id));
-> -       napi->napi_id =3D napi_gen_id;
+>  static int
+>  netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+>                          u32 q_idx, u32 q_type, const struct genl_info *i=
+nfo)
+> diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux=
+/netdev.h
+> index cacd33359c76..e3ebb49f60d2 100644
+> --- a/tools/include/uapi/linux/netdev.h
+> +++ b/tools/include/uapi/linux/netdev.h
+> @@ -201,6 +201,7 @@ enum {
+>         NETDEV_CMD_NAPI_GET,
+>         NETDEV_CMD_QSTATS_GET,
+>         NETDEV_CMD_BIND_RX,
+> +       NETDEV_CMD_NAPI_SET,
 >
-> -       hlist_add_head_rcu(&napi->napi_hash_node,
-> -                          &napi_hash[napi->napi_id % HASH_SIZE(napi_hash=
-)]);
-> +       __napi_hash_add_with_id(napi, napi_gen_id);
->
->         spin_unlock(&napi_hash_lock);
->  }
+>         __NETDEV_CMD_MAX,
+>         NETDEV_CMD_MAX =3D (__NETDEV_CMD_MAX - 1)
+> --
+> 2.34.1
 >
 
