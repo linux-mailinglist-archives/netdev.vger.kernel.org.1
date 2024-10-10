@@ -1,182 +1,82 @@
-Return-Path: <netdev+bounces-134411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1CA299940A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:59:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0061D99940C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FEF2286EA2
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:59:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C97A1F243FF
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2211E1A1F;
-	Thu, 10 Oct 2024 20:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D441E2029;
+	Thu, 10 Oct 2024 20:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ogSuu1Bz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eqwgyg8g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057AE1CFECC
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 20:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6AE1CEABC;
+	Thu, 10 Oct 2024 20:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728593946; cv=none; b=YxnNb4qXc1QVgrb158YSQafJcQFDXIfQ7/SC4UGYvkFEXVwDFyaPJALrAjaZI/16vidLYLb954aVpxoaSQ5KSQWEGC56JEwFnXND+97q2vWrda5i/iTnP6hvPo4MOX/dSg+THu/G1AM1V+3fgsmptU1X5B8ICXlfI7YlsEsShbs=
+	t=1728593970; cv=none; b=r+iMOFY1oJcKgxpMIYAdUpq4BHLUzM1jT2rIKCnlG/7/tQDS7d+doVI6abYXao3JvmumN5BTiRMFoDUWXfG2ljqtIOpa58WMhLwd9kpy6r52hjau8GkfIzAwWNU/jNxyziPnY0/u+XMka5TaCdtMeIkOQkVXVGpqkPJoegT7qQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728593946; c=relaxed/simple;
-	bh=s9pcdyZ9xEY3e8lQUS9MO4s8hNmOb2nddmzlpVdUfpc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mZcNBztBoIMU7WnMvcf1X5v+zdsmyeqJQzbSTuUkv+NsK49iF5nmyGOr9H6E50SF0RvIn5qU0gWSgz/anA9TyRqfuPWxWleMEk/1cnnt3B/IQnmk9kvr69mdcboYjA5o8Kwe86n73C/4PNVnMHUmrzreJ5gs6S2mZKyCh8GsoN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ogSuu1Bz; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-460395fb1acso88981cf.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:59:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728593944; x=1729198744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9pcdyZ9xEY3e8lQUS9MO4s8hNmOb2nddmzlpVdUfpc=;
-        b=ogSuu1BzO7sBGw1pckLXoUqF01mgFejdQ1bmI8IBVoTfDLPNRaH4vCtEW4tsIbBRIZ
-         HcJW13/HRFqcWURt0JHhD+PpJsxQ4lTbRJvUJedmNzYTRrP1+kSplkzuwGlHrdE/xA6H
-         M7yMJko5jQhKgd6qgCaLAkRW70cgm41N+WKVybwFZxB1mvmHn/UnO1tWkzeVNVkZcAx0
-         vOm4fLGoEVPeBVzlxqQoveNiOVZgQEoeNbkHwD55QBuZKaA9/2o//PxuFLaR46F+ugcg
-         wZnlTLG3flmGCQ5UtcqWQ1D00yr7/EjP94Nm5Kk8PZwpeJRn4K9qCA5LVttaoa23h0v1
-         RefQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728593944; x=1729198744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s9pcdyZ9xEY3e8lQUS9MO4s8hNmOb2nddmzlpVdUfpc=;
-        b=BX1oSwAzSG3lypWE8TfQJnG62l9URZkWljhCb/G3fRDo1xvvUVxfnW5a4WlGZPppex
-         Wv1IqMS8doTUEUaVzK/x1tRqbHA7gmTt5b0rXDf314jVmMZe5uERAARzeulgD6k5VL6v
-         h+eJXjYSA9MJcljnPdA9dUCJbh3PUnfF4YhGsX7duY0hT2hMF9VJO6FQm8x18Ci1rwxX
-         z6PyUs317poodA20ul5FYpCVr41Q3cWh/GqUNXJdSLh6f/xUCH1qW6D9T6aFuPN99EpR
-         Yqs96vFs7oOEnFLHb0LdFmbgbXu6B2w79e7ku1ogPtSqEQeesbkHvbKymNpMURdLid15
-         FqRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTh/sv8uePKyL6AUIM2o/XCfi4cQ6SrC3ced9Q3QZMjZvo/SQG+UI/e4MrjJvxKyW/UC1hvsM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBN6H4QWmWfJTnNvHJpv90p2US/4Vae8kdoCJsmcQNuivphnXW
-	jSLVCti7dJqOVpyyyT1ndttDWZ/OxavUFk3Sm65WssIShIlYpY4m0aBrDFeXz6hOTe+D/Vd+A70
-	SpWdaGXAZelpjyHHflRMQ0Rfc8NCxEshS7LlTasYhT4dkBIuDcmZVd7AgGQ==
-X-Google-Smtp-Source: AGHT+IF3R8R7YB9BMwW4arLIAfEe5Ep1D8pL4yiCAr9TXamF4tK2/fqoDt20lODSTwvVl2Uxw3exUPgMpvOHmkQG6Ss=
-X-Received: by 2002:a05:622a:8388:b0:458:1d2b:35f6 with SMTP id
- d75a77b69052e-4604af3a4bdmr1034811cf.24.1728593943606; Thu, 10 Oct 2024
- 13:59:03 -0700 (PDT)
+	s=arc-20240116; t=1728593970; c=relaxed/simple;
+	bh=9n2VAGdYcReqs35yJzOUGVVKVW0egsjavx4oUUSPykM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ImMz2zX6rvmlUiwAAb4AJYmeFD0+2npRGLTtTpfaOScGAENG+v/T1fphVN+KMyOlXPLlbX6pryLC0/a+WycEcz7vBCSbT5GYHmYwm5ZotioeFxOnwbOpq1Zpt2EF0SdM2A117uvCBHUy7l0kRd8+VIjLqAxBU/eMie4KuXise7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eqwgyg8g; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wvCWjvIp3pbwUedSVWqjjlF5QussOrPiSS8prGjuafc=; b=eqwgyg8gYQM54RGoCQ/HpOQ43o
+	IWd8or6heyYw8QrBWfZVKd6Xm2x4Ra2uESrfV3hLpx5465fQJrhV0WfMB93IPd7TRGimaG/3gjNCT
+	SvQ5wSYUhTBrjxBwmMVUoHCvLJWxkVtvmZEyevK1vk8piqm28+5/q6b6RrkaGuV/ilGI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sz0Ff-009ebS-LB; Thu, 10 Oct 2024 22:59:15 +0200
+Date: Thu, 10 Oct 2024 22:59:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Iulian Gilca <igilca1980@gmail.com>
+Cc: igilca@outlook.com, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] User random address if dt sets so
+Message-ID: <3287d9dd-94c2-45a8-b1e7-e4f895b75754@lunn.ch>
+References: <b4d4090a-2197-40ce-9bb5-1d651496d414@lunn.ch>
+ <20241010202949.226488-1-igilca1980@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-12-dw@davidwei.uk>
- <CAHS8izO-=ugX7S11dTr5cXp11V+L-gquvwBLQko8hW4AP9vg6g@mail.gmail.com>
- <94a22079-0858-473c-b07f-89343d9ba845@gmail.com> <CAHS8izPjHv_J8=Hz6xZmfa857st+zyA7MLSe+gCJTdZewPOmEw@mail.gmail.com>
- <f89c65da-197a-42d9-b78a-507951484759@gmail.com> <CAHS8izMrPuQNvwGwAUjh7GAY-CoC81rc5BD1ZMmy-nNds3xDgA@mail.gmail.com>
-In-Reply-To: <CAHS8izMrPuQNvwGwAUjh7GAY-CoC81rc5BD1ZMmy-nNds3xDgA@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 10 Oct 2024 13:58:46 -0700
-Message-ID: <CAHS8izOCLrLz-XuDq13At+wcVAJRPszSvt+ijeqi8qzxAazEAw@mail.gmail.com>
-Subject: Re: [PATCH v1 11/15] io_uring/zcrx: implement zerocopy receive pp
- memory provider
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010202949.226488-1-igilca1980@gmail.com>
 
-On Thu, Oct 10, 2024 at 1:53=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> > >>>>
-> > >>>> Once the user is done with the buffer processing, it must return i=
-t back
-> > >>>> via the refill queue, from where our ->alloc_netmems implementatio=
-n can
-> > >>>> grab it, check references, put IO_ZC_RX_UREF, and recycle the buff=
-er if
-> > >>>> there are no more users left. As we place such buffers right back =
-into
-> > >>>> the page pools fast cache and they didn't go through the normal pp
-> > >>>> release path, they are still considered "allocated" and no pp hold=
-_cnt
-> > >>>> is required.
-> > >>>
-> > >>> Why is this needed? In general the provider is to allocate free mem=
-ory
-> > >>
-> > >> I don't get it, what "this"? If it's refill queue, that's because
-> > >> I don't like actively returning buffers back via syscall / setsockop=
-t
-> > >> and trying to transfer them into the napi context (i.e.
-> > >> napi_pp_put_page) hoping it works / cached well.
-> > >>
-> > >> If "this" is IO_ZC_RX_UREF, it's because we need to track when a
-> > >> buffer is given to the userspace, and I don't think some kind of
-> > >> map / xarray in the hot path is the best for performance solution.
-> > >>
-> > >
-> > > Sorry I wasn't clear. By 'this' I'm referring to:
-> > >
-> > > "from where our ->alloc_netmems implementation can grab it, check
-> > > references, put IO_ZC_RX_UREF, and recycle the buffer if there are no
-> > > more users left"
-> > >
-> > > This is the part that I'm not able to stomach at the moment. Maybe if
-> > > I look deeper it would make more sense, but my first feelings is that
-> > > it's really not acceptable.
-> > >
-> > > alloc_netmems (and more generically page_pool_alloc_netmem), just
-> > > allocates a netmem and gives it to the page_pool code to decide
-> >
-> > That how it works because that's how devmem needs it and you
-> > tailored it, not the other way around. It could've pretty well
-> > been a callback that fills the cache as an intermediate, from
-> > where page pool can grab netmems and return back to the user,
-> > and it would've been a pretty clean interface as well.
-> >
->
-> It could have been, but that would be a much worse design IMO. The
-> whole point of memory proivders is that they provide memory to the
-> page_pool and the page_pool does its things (among which is recycling)
-> with that memory. In this patch you seem to have implemented a
-> provider which, if the page is returned by io_uring, then it's not
-> returned to the page_pool, it's returned directly to the provider. In
-> other code paths the memory will be returned to the page_pool.
->
-> I.e allocation is always:
-> provider -> pp -> driver
->
-> freeing from io_uring is:
-> io_uring -> provider -> pp
->
-> freeing from tcp stack or driver I'm guessing will be:
-> tcp stack/driver -> pp -> provider
->
-> I'm recommending that the model for memory providers must be in line
-> with what we do for pages, devmem TCP, and Jakub's out of tree huge
-> page provider (i.e. everything else using the page_pool). The model is
-> the streamlined:
->
-> allocation:
-> provider -> pp -> driver
->
-> freeing (always):
-> tcp stack/io_uring/driver/whatever else -> pp -> driver
->
+On Thu, Oct 10, 2024 at 04:29:37PM -0400, Iulian Gilca wrote:
 
-Should be:
+The commit message cannot be empty like this.
 
-> freeing (always):
-> tcp stack/io_uring/driver/whatever else -> pp -> provider
+Please explain in detail your use case. We need to understand the
+'Why?' to decide if this is the correct solution to the problem.  To
+me, it seems like you have a broken MAC driver, and fixing that MAC
+driver is the correct fix.
 
-I.e. the pp frees to the provider, not the driver.
+    Andrew
 
---=20
-Thanks,
-Mina
+---
+pw-bot: cr
+       
 
