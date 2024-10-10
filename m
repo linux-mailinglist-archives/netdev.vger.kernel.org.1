@@ -1,95 +1,150 @@
-Return-Path: <netdev+bounces-134159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E11C6998362
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:20:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B918998369
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92CFC1F22F53
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF896282284
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0621BE864;
-	Thu, 10 Oct 2024 10:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA681BE857;
+	Thu, 10 Oct 2024 10:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="boS0Pb9M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jfAzzQhB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979E01BE857;
-	Thu, 10 Oct 2024 10:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD0A1BDAB8;
+	Thu, 10 Oct 2024 10:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728555626; cv=none; b=LLSs/+wuXQ81ySALzibKzDT5LiIwQX9YcWk4MXDqqgee9IS7jnbOW/GuBQMdNDePSQJ1+GSOG5ACZSPjxxCEfNwZAmA62R13X65hDIa9JcALlbSGx3K/SgPFbYdluDJi/ntmLW6An24gvAKcRTl6rih0lqXelzOvPCo1uWh3CDc=
+	t=1728555728; cv=none; b=qDbupsWn2WU58+q8RT0ZkOGcDaVMS+aE94wTmbwDc8oT1BWFojol9AROInJ3e+pCcJ15XgEi86VEPjvJn5nJuT6Y/GKb14+HBwroo21s+DSa3uD4MJDzxmIBvoBpNr7bs6I/fKyiwK6SAsVwiTHoG4LNw8snmWBpg1WJ1Io+z/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728555626; c=relaxed/simple;
-	bh=vmLa9cWj0DTxvO3cFR3xMZnKt8WhNEdEBVpdLPCArLA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=URUiKCA3DGphVQ4ZwUkP/VMAGLuzyIfP42XDTWayMmdGlWRTe9mPLMnatjWNH8VWiJMM6xkldwzRNXJEBQGIXvepkiMdF0c2xxcKOl5eAsm+kobH0+ZeQ+CQux9P2f0sLuviJXPIZdMpAak5rA7LFzg8WIw4kJpF9L0CiWeJkLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=boS0Pb9M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 262BBC4CEC5;
-	Thu, 10 Oct 2024 10:20:26 +0000 (UTC)
+	s=arc-20240116; t=1728555728; c=relaxed/simple;
+	bh=noMQNUM0FgQjj7sTljBuE+0agFGGBwUO1uePFbZXEoo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n0PZYhC521GW6Q+lhtF4HHGnUtmfenDF7Gi+Od4UN2Wwdv5hYozohezxU0l1VkDAUh3GGDvwl9MmFXLWejR1v2KM4TH5RY0u6RPwOwXIGUlyBKI23v95wGCZbgzQ/taKht9JVr11wU5E/iofOQ0gR61hcI/Zm7ILcN7QrE+df+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jfAzzQhB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6061FC4CED4;
+	Thu, 10 Oct 2024 10:22:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728555626;
-	bh=vmLa9cWj0DTxvO3cFR3xMZnKt8WhNEdEBVpdLPCArLA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=boS0Pb9Mr4m1o1AHvon2IWJ4sKR8dDnlsl5x7y0z4pVNZzssdzma4dXXxz2fS7Ooe
-	 wOzHo1uJWUBWeWx4Ryvc6qYv/exAXCjhrtt421OcRjIoB3C3SYyPTww2xTsN5CZRMh
-	 bZ+D/fHyf3Ohn7GhGS/Yak/yL49JJiafNdsFrN3vHljE0hCIck9/sz2ZU3/jExfDCl
-	 pQSyBujOyHxV0fv1ty2m9c0u1ymmHH7mtSdm7H/MUHTmkvHFVAvI3IX8XjVZuUEJzk
-	 T2Cj1lePN1PiSzqOPuU3l2QEShNhupfXnuZTXAsMVXJRXMCG+BPiJn+ZO5oeSF8eQp
-	 I4ja9xqucXAXg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2363803263;
-	Thu, 10 Oct 2024 10:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728555727;
+	bh=noMQNUM0FgQjj7sTljBuE+0agFGGBwUO1uePFbZXEoo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jfAzzQhB7zXjxgBqto5C6yVPKnsNdIhtv8ZUuDlmzP/q34AgMSUUQhCCPZSVWMu9l
+	 0CjN+Pqpl9lcyV57cAolX8onG1L2/dlwY4ofv3Oszmg7fpVQYJash268DpTuh7nI6T
+	 rtMJ1NdsHUyU0R3stPra2CEta2W2YOliuxtxyvyRBV8eun2TZH46vMn86iYtoHpN24
+	 NE5p2pmFGiYX1O1G7mQZU/Cs1J+C9k6q0ZzEVAckSQQVK3nLZ0buzbvdH2aXkAcPhA
+	 Nm7nIIGQF0hu9jrLU6fzFVpnPoBHCTn5LjGPekxlllfuwEwCKzKdKz4VDwC4LLQgxi
+	 NQQ2tiMi1dJ/Q==
+Date: Thu, 10 Oct 2024 11:22:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	sudongming1@huawei.com, xujunsheng@huawei.com,
+	shiyongbang@huawei.com, libaihan@huawei.com, andrew@lunn.ch,
+	jdamato@fastly.com, kalesh-anakkur.purayil@broadcom.com,
+	christophe.jaillet@wanadoo.fr, jonathan.cameron@huawei.com,
+	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V11 net-next 04/10] net: hibmcge: Add interrupt supported
+ in this module
+Message-ID: <20241010102201.GG1098236@kernel.org>
+References: <20241008022358.863393-1-shaojijie@huawei.com>
+ <20241008022358.863393-5-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: Remove likely from
- l3mdev_master_ifindex_by_index
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172855563051.1965704.10127497741628036159.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 10:20:30 +0000
-References: <20241008163205.3939629-1-leitao@debian.org>
-In-Reply-To: <20241008163205.3939629-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kernel-team@meta.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241008022358.863393-5-shaojijie@huawei.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue,  8 Oct 2024 09:32:04 -0700 you wrote:
-> The likely() annotation in l3mdev_master_ifindex_by_index() has been
-> found to be incorrect 100% of the time in real-world workloads (e.g.,
-> web servers).
+On Tue, Oct 08, 2024 at 10:23:52AM +0800, Jijie Shao wrote:
+> The driver supports four interrupts: TX interrupt, RX interrupt,
+> mdio interrupt, and error interrupt.
 > 
-> Annotated branches shows the following in these servers:
+> Actually, the driver does not use the mdio interrupt.
+> Therefore, the driver does not request the mdio interrupt.
 > 
-> 	correct incorrect  %        Function                  File              Line
-> 	      0 169053813 100 l3mdev_master_ifindex_by_index l3mdev.h             81
+> The error interrupt distinguishes different error information
+> by using different masks. To distinguish different errors,
+> the statistics count is added for each error.
 > 
-> [...]
+> To ensure the consistency of the code process, masks are added for the
+> TX interrupt and RX interrupt.
+> 
+> This patch implements interrupt request, and provides a
+> unified entry for the interrupt handler function. However,
+> the specific interrupt handler function of each interrupt
+> is not implemented currently.
+> 
+> Because of pcim_enable_device(), the interrupt vector
+> is already device managed and does not need to be free actively.
+> 
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
-Here is the summary with links:
-  - [net-next] net: Remove likely from l3mdev_master_ifindex_by_index
-    https://git.kernel.org/netdev/net-next/c/9e542ff8b79a
+...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
 
+...
 
+> +static const char *irq_names_map[HBG_VECTOR_NUM] = { "tx", "rx", "err", "mdio" };
+> +
+> +int hbg_irq_init(struct hbg_priv *priv)
+> +{
+> +	struct hbg_vector *vectors = &priv->vectors;
+> +	struct device *dev = &priv->pdev->dev;
+> +	int ret, id;
+> +	u32 i;
+> +
+> +	/* used pcim_enable_device(),  so the vectors become device managed */
+> +	ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
+> +				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
+> +	if (ret < 0)
+> +		return dev_err_probe(dev, ret, "failed to allocate MSI vectors\n");
+> +
+> +	if (ret != HBG_VECTOR_NUM)
+> +		return dev_err_probe(dev, -EINVAL,
+> +				     "requested %u MSI, but allocated %d MSI\n",
+> +				     HBG_VECTOR_NUM, ret);
+> +
+> +	/* mdio irq not requested, so the number of requested interrupts
+> +	 * is HBG_VECTOR_NUM - 1.
+> +	 */
+> +	for (i = 0; i < HBG_VECTOR_NUM - 1; i++) {
+> +		id = pci_irq_vector(priv->pdev, i);
+> +		if (id < 0)
+> +			return dev_err_probe(dev, id, "failed to get irq number\n");
+> +
+> +		snprintf(vectors->name[i], sizeof(vectors->name[i]), "%s-%s-%s",
+> +			 dev_driver_string(dev), pci_name(priv->pdev),
+> +			 irq_names_map[i]);
+> +
+> +		ret = devm_request_irq(dev, id, hbg_irq_handle, 0,
+> +				       vectors->name[i], priv);
+> +		if (ret)
+> +			return dev_err_probe(dev, ret,
+> +					     "failed to requset irq: %s\n",
+
+nit: request
+
+> +					     irq_names_map[i]);
+> +	}
+> +
+> +	vectors->info_array = hbg_irqs;
+> +	vectors->info_array_len = ARRAY_SIZE(hbg_irqs);
+> +	return 0;
+> +}
+
+...
 
