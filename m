@@ -1,121 +1,144 @@
-Return-Path: <netdev+bounces-134233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3181A998764
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:18:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C34C99876F
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:19:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4330D1C21385
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:18:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A55401C20C73
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D839119E7D0;
-	Thu, 10 Oct 2024 13:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34201C9B88;
+	Thu, 10 Oct 2024 13:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ne/FRbhQ"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qGlJF3OJ";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qGlJF3OJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9F91C57B0;
-	Thu, 10 Oct 2024 13:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4121BE245;
+	Thu, 10 Oct 2024 13:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728566311; cv=none; b=tqBt597k8tkBMYOK/uOvboty9zr+H4WMT+a74YHmsumWdsiM3QTxM/rs+Wws2qi/4HmdDJRs6J3Z0eEtFYLN29WOcdW8w2wqO7BvmJPDYwYbupvXdQ8GEcKPLD5/im3pxwa0KnRy2XD/KCFkvR633VcEJjO2YIK26aEEFhoygZs=
+	t=1728566382; cv=none; b=k9QDPWWISJLsPVaAuhKtRTjrWNTOd2t2SP0IOReZPFFO3yacAnWxuIYAYaeHq0NdJ0FuqDV3AgymqqGlWuadB/mP2NtLmu+ObxNesLumRE1dmTVlFSx0NZFIHT1QW619R7fiAOeouCsbOdQNJpOef2dD/X4mIfUmQlNdvIh6lAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728566311; c=relaxed/simple;
-	bh=qXy9q0iSHkJyMKk1H6N6KbU2uVtJt0ntlke/Uo5d+S4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I7fPJhEToYO0IeAiTnLm5D0Ttd6SkOKgMS/O4rPFxXncQIyt8sNWFDyHVwIzndsXJFzQFrCwAh+TA1ype3cPSuXzhBeVkd+KIkdPC3jYqAx2vTi7nvfKZKp0PLecr6PL10DwKLvMPJgqM7S4vg7q8CXsd2Qmbt5jq7d2jilE5UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ne/FRbhQ; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a93c1cc74fdso154672166b.3;
-        Thu, 10 Oct 2024 06:18:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728566308; x=1729171108; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7ZBn+lAnzBaHMDuUYp+rp8OVT9yOBl3jTCFjHM6xNoQ=;
-        b=ne/FRbhQMKNWcNDbtP9aZ7auhzbLFcaLrrEKAIdtGbzvTnl5bgVj+IiYDQYotOtV90
-         34yB69HyeapfYoOLiP+5nOdNnpa/Xv2aXIAeZIbTPs5J0ADAjzjZ5ZksWyWaw43ELCNL
-         +L3gpK9stIgCyZ54Afa4x8OzYmnP1SQLfDux9zJt+ogkm376AVcja4KTbAGHB51SUfvz
-         xRdYaobseRuMPzsRmpNXAGB8oPYC1txu2lu/uGNiXeSrV1H7lQD6DU0kbkYliykKO/8K
-         osVgh7OfGCxi6oLzVGIq+XML7ZznjrFunf+tAwRaLJrcYhpQIebUvrRKvifxFr5kSaPh
-         FRqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728566308; x=1729171108;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7ZBn+lAnzBaHMDuUYp+rp8OVT9yOBl3jTCFjHM6xNoQ=;
-        b=aNpQYweN2x6YrIyzgCZbim5optJabYCyZjbct8Xm5oNFPx48ZnToZd/a4IyMy/w2YS
-         7BcUAL7WZodalUdvuagvp92dd3sMn26BEUlTsKIrXgbq2hYM1cT9ngYZKUYgTxEZHeaL
-         AYOo/K3KdaPSBoqvL3Y1/E4XlgH/krSnflTo14zyfETGth9pNIHft5OO+rsPx+vI1c3X
-         RdkHIdnf9BuGqpPMg20xiQnb0JDAxEF0FIlT6rfKL7JxuXwdgKhLAc6So5+Eq7zH6aEA
-         IULFi9ByU7WVHsSbfe02Vwsw0jCSrzfijqU3AlVqTGXCWUs9Fe5eDu/EmZ/8oZD4wcIf
-         LHSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVF/uhtvgDkw18s6j3/BgbRbK7JT2DCqqi2dHLdET08UvIYLjO7hjv8DwyQOmiJUrpPx5IJpiw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK8PkNz+skj1IdGROv0hCKesXhZEPxdxonH4ejDF6Ic64VOomj
-	/IBPWJ3uhY080hVLrD3vlB30EDseL+1Vrwv+7MmOul/UZ4KKHj0u
-X-Google-Smtp-Source: AGHT+IFo5KkwHjyHhdob4u/bFPM9b/EywFJPe9ioyboNa8H9bMxz1ekuMvRfh9FE+jUBfMWwDlmD7A==
-X-Received: by 2002:a17:907:6d24:b0:a99:3214:e6f with SMTP id a640c23a62f3a-a998d32b916mr588731466b.49.1728566308148;
-        Thu, 10 Oct 2024 06:18:28 -0700 (PDT)
-Received: from [192.168.42.45] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7f24569sm88670566b.58.2024.10.10.06.18.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 06:18:27 -0700 (PDT)
-Message-ID: <65f68caf-d5f1-42fa-b149-6aee5662081a@gmail.com>
-Date: Thu, 10 Oct 2024 14:19:03 +0100
+	s=arc-20240116; t=1728566382; c=relaxed/simple;
+	bh=Kip+g3NUeabI/R2YzpRmlSwA0m5LSlFdee3BzrAlaPw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RWIYCwZ9VnzHixNQfTtjDWyNjvmeuWoPT/VpXYOY/C1ck2nOHlM+akn2Kdsus2QmJzdPN1mdriiH289kJLjPZ1FdpBQxzUgCbYajZq8PUYShuJJoFglNPIHhmIlKJYtnc+3X5JEsR686gGho5LpqPpGABhqmacpi+o81dfRL5gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qGlJF3OJ; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qGlJF3OJ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B996C1F45A;
+	Thu, 10 Oct 2024 13:19:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1728566377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=yDqItrqmUk+6wjzIhXJNTmX7NNV0awuFoUw0XQgqWkA=;
+	b=qGlJF3OJVLrfjXd/fKZcRjIFd6h7nIqFcznaYFxHs7Z+pDNfo5wi5XmkjT4hiY4llslFa2
+	zZJouCZplHfuW8eTgamjVa4FlOL/UBp8KWHPsdcZS3LcTzQxWC3jC0NiZBCZMnbfwtPQNv
+	LgPmYLM2kWdFMcXzSAO4TFxerD5XTCU=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=qGlJF3OJ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1728566377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=yDqItrqmUk+6wjzIhXJNTmX7NNV0awuFoUw0XQgqWkA=;
+	b=qGlJF3OJVLrfjXd/fKZcRjIFd6h7nIqFcznaYFxHs7Z+pDNfo5wi5XmkjT4hiY4llslFa2
+	zZJouCZplHfuW8eTgamjVa4FlOL/UBp8KWHPsdcZS3LcTzQxWC3jC0NiZBCZMnbfwtPQNv
+	LgPmYLM2kWdFMcXzSAO4TFxerD5XTCU=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 791F213A6E;
+	Thu, 10 Oct 2024 13:19:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id c8JkHGnUB2fvUQAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Thu, 10 Oct 2024 13:19:37 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Subject: [PATCH net] net: usb: usbnet: fix race in probe failure
+Date: Thu, 10 Oct 2024 15:19:14 +0200
+Message-ID: <20241010131934.1499695-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-To: Pedro Tammela <pctammela@mojatatu.com>,
- Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <CAHS8izOv9cB60oUbxz_52BMGi7T4_u9rzTOCb23LGvZOX0QXqg@mail.gmail.com>
- <2b23d0ba-493b-48ba-beca-adc1d1e0be61@mojatatu.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <2b23d0ba-493b-48ba-beca-adc1d1e0be61@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: B996C1F45A
+X-Spam-Score: -3.01
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:mid,suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 10/9/24 19:21, Pedro Tammela wrote:
-> On 09/10/2024 13:55, Mina Almasry wrote:
->> [...]
->>
->> If not, I would like to see a comparison between TCP RX zerocopy and
->> this new io-uring zerocopy. For Google for example we use the TCP RX
->> zerocopy, I would like to see perf numbers possibly motivating us to
->> move to this new thing.
->>
->> [1] https://lwn.net/Articles/752046/
->>
-> 
-> Hi!
-> 
->  From my own testing, the TCP RX Zerocopy is quite heavy on the page unmapping side. Since the io_uring implementation is expected to be lighter (see patch 11), I would expect a simple comparison to show better numbers for io_uring.
+The same bug as in the disconnect code path also exists
+in the case of a failure late during the probe process.
+The flag must also be set.
 
-Let's see if kperf supports it or can be easily added, but since page
-flipping requires heavy mmap amortisation, looks there are even
-different sets of users the interfaces cover, in this sense comparing
-to copy IMHO could be more interesting.
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+---
+ drivers/net/usb/usbnet.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> To be fair to the existing implementation, it would then be needed to be paired with some 'real' computation, but that varies a lot. As we presented in netdevconf this year, HW-GRO eventually was the best option for us (no app changes, etc...) but still a case by case decision.
-
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 2506aa8c603e..ee1b5fd7b491 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1870,6 +1870,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+ 	 * may trigger an error resubmitting itself and, worse,
+ 	 * schedule a timer. So we kill it all just in case.
+ 	 */
++	usbnet_mark_going_away(dev);
+ 	cancel_work_sync(&dev->kevent);
+ 	del_timer_sync(&dev->delay);
+ 	free_netdev(net);
 -- 
-Pavel Begunkov
+2.46.1
+
 
