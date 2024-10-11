@@ -1,134 +1,274 @@
-Return-Path: <netdev+bounces-134574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD60D99A387
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:13:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9743C99A3A8
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80FAD1F22C93
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:13:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07C80B2160D
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E5A216A3E;
-	Fri, 11 Oct 2024 12:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C184209662;
+	Fri, 11 Oct 2024 12:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JcIR+2Mc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jV6YcTDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500141BDAA1
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986DB1494D4;
+	Fri, 11 Oct 2024 12:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728648833; cv=none; b=JM0f1d+n6c2bSpBKak9dnrlKxFzLlJXYQoTk7FSplju+4c5Z967NihKLAfdeIUMGCivnxPHFNL9D8psY1aYxhTuc2TasldgancFZ0mej/SO4vzwGGkgg23iBGQfYFPXDPXFnuMgAPdS5VK1w++fs2TpJ4+TaJGdddVajk6inaxQ=
+	t=1728648954; cv=none; b=Yt1QQzSFNU6A7bJbmzxMtE3R6238UsqkJW2PKyP2PcPSyL33m6N2ppV9dX+zcHlZ+gHdKRw9pcEmQ5BXdBnyXHWhQMfY3Af2ipcMXWOSixz2Wbnh0A+fqJHl+wDIFp8rUIeQqjradHjN9ZM1Zdqvx+3uPsTj8Zsg9tfs2jLH1AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728648833; c=relaxed/simple;
-	bh=pVgQ4qeBPZp/jrWkLQ9CTTXSj/41aLXmAoXMA/Sm+W4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E4xHMmzGVXNwY/TGWNXxJFBLmZNV/dnO8n2IeC0EbWqllYLnndGkMPb5QQbpwEg5Y61iu039iPGdkLIdnqkjaOUJpdHjQ4PN6mwND781lmcFeuDE74W6CKBHggCtK1cmdVMKgx11Ew3wWBiaTANlz80QOqnWeO9PDBIOZasfHTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JcIR+2Mc; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20bc506347dso15955495ad.0
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:13:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728648832; x=1729253632; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6DV8FmK9n2s3xaJw37bhq13Y2oj4hKbJoV0faMjnNfw=;
-        b=JcIR+2McKtwOE5Jd5A3c99BsRdTBzErzRGkGdtQDCZhtwGNaRfsM0HbWj1veOd22mW
-         /Owtk+Zyg0K0aJ93Mufj8B4Llmq/gr68p8Gk5lQk88nKgX60/DfaqyeoO1VAqkN6t5AU
-         2p+v2WZ9lAm+/quhSqJUv2BsrmPnAFhhA4x3PxLJq6eeVopDBuxTPH7JHI7i+2ciKu51
-         rr9H2uStt+n65k67NuTrIRq32N15k3wg9piyvlWUZiz0CmFku+AsMQ/jRNKYbNrQkruS
-         ZOHK7ubNkqkRV3WNcWmMm2/KxNeeOeLFsHxn0b7FfBny+iaq/LtbE6oEsE0Duy8olaCJ
-         AUOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728648832; x=1729253632;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6DV8FmK9n2s3xaJw37bhq13Y2oj4hKbJoV0faMjnNfw=;
-        b=JKdMy31frdu/n3UXWApswqDbnv7rTgEmSZdFgGnQE/Au4VTW4sSbT6twmphvLEsuOg
-         bMwuVn+3mOqD4niChH50uiP66s1QJ3/Ar5WnuSV/fQLWKJFm1uGdU+clLuVsmxENHnpa
-         ilPoKpcXq7PbEo1qW+fSq7kcWp6p3Ba9cuMWc/3LpnNt5wewFQJF5uEiqKo6vPPDLfCV
-         pd3AWjJpzW0gIWmwW9pq3zW0ClKjOuG1TaYSctpNddxp9JtKBv5w7BIOamV+Ejx1r9G7
-         ngOFz1SkXhtj1W59EgvTpXQjjdn9ppfjp4SwWUEE/s85cfS1Bj729m3s81TVwdnvYvaC
-         tsTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJRek8m7gyE7bFMBwBM1PvVZe9RcBTucNPZtgKOyRYblvwhngJpOSzHG+slVE64LlHIAvABPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDqwX+Q9Xgmc2HdEiLq8hLW+gocyPN6L3lq6V7bl00ROldV6Hc
-	KWvlMUZ0skUwT6hY5xHZ4JhPDN1oiTuuXxrItSSkDRV+4PUEc2YDt1B9pFw9xnDJl22/wDQr6Qe
-	7qwIUihVE8+6hrsmxcfgoW2WFVF7mrNSC/t/MBQ==
-X-Google-Smtp-Source: AGHT+IEhHh7IyxNNVXdhpzK7DYdwX3u4HJLwqzq8zbFcpGhkbrrdEfGF3mSpDzSVS0AcPKmBvtOSTltyzsarT9dBX/Q=
-X-Received: by 2002:a17:902:e845:b0:20b:b93f:300a with SMTP id
- d9443c01a7336-20ca14246b0mr37785885ad.7.1728648831700; Fri, 11 Oct 2024
- 05:13:51 -0700 (PDT)
+	s=arc-20240116; t=1728648954; c=relaxed/simple;
+	bh=3u60z18D7LwxQMADWHb5vuCGXZzarwojDMy7xDHWd7Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k1OWGvCirYS1g7E7qeKRSZC0x+AR6ysG9EE9TB/Yp0wez+2IgB0xnV7qKdJ0Kajo5IL/TjRwEqhDAw1A2gyQ9lkeOiioQPBLPG+LipxCKOx0Ksgmktd6c5SXwOoEUv5XfTc9AZ6p0ub4ku2Nrg7hQTAsQ4KzHpIkeqvVkpl36KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jV6YcTDl; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728648952; x=1760184952;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3u60z18D7LwxQMADWHb5vuCGXZzarwojDMy7xDHWd7Y=;
+  b=jV6YcTDlKOVC9SBUnh2Hs9mqVqgAUqA46JTWhgntcqH0K72doDLk8b6E
+   sbca6ufyoMssBLcbpUNdsnNqURTMDuWpVgTo3Up236hyHqEwqwlr4KcOB
+   9OwamTQfScw23P35WxQKiDT96wuXAYCRUAQyJfzfELPF+Lv2hCLAfI1uU
+   W+zes0PVBXfj9mZOVSN4X8O1L7IN3xZXJd/KUSmDZn+FE27JliHKOZVc/
+   xDLVhDZwmJuyBnYB+w/6pntfN0SePL86PZn51MJw+6jRyYc5FO0kSuj3N
+   ifaUIOxPT305qdAgsb9Xz8Dk8sfR5DiMLZN44bhWPmfxWPf7JQlFC1l0q
+   w==;
+X-CSE-ConnectionGUID: B3kDLGn7RDSS/GCemtdebQ==
+X-CSE-MsgGUID: clF8CiZnTuG6SyYStYblmw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11221"; a="28203973"
+X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
+   d="scan'208";a="28203973"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 05:15:51 -0700
+X-CSE-ConnectionGUID: GyI3WlUURoerF69HxqC/1A==
+X-CSE-MsgGUID: VxECejlVQBK5cZuwuzY4Fg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
+   d="scan'208";a="81422578"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa005.fm.intel.com with ESMTP; 11 Oct 2024 05:15:47 -0700
+Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.197])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 768E828781;
+	Fri, 11 Oct 2024 13:15:45 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: linux-kernel@vger.kernel.org,
+	Peter Zijlstra <peterz@infradead.org>
+Cc: amadeuszx.slawinski@linux.intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	Markus Elfring <Markus.Elfring@web.de>,
+	Kees Cook <keescook@chromium.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: [PATCH v3] cleanup: adjust scoped_guard() macros to avoid potential warning
+Date: Fri, 11 Oct 2024 14:15:27 +0200
+Message-ID: <20241011121535.28049-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241010114019.1734573-1-0x1207@gmail.com> <601d59f4-d554-4431-81ca-32bb02fb541f@huawei.com>
- <20241011101455.00006b35@gmail.com> <CAC_iWjL7Z6qtOkxXFRUnnOruzQsBNoKeuZ1iStgXJxTJ_P9Axw@mail.gmail.com>
- <20241011143158.00002eca@gmail.com> <21036339-3eeb-4606-9a84-d36bddba2b31@huawei.com>
-In-Reply-To: <21036339-3eeb-4606-9a84-d36bddba2b31@huawei.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Fri, 11 Oct 2024 15:13:15 +0300
-Message-ID: <CAC_iWjLE+R8sGYx74dZqc+XegLxvd4GGG2rQP4yY_p0DVuK-pQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] page_pool: check for dma_sync_size earlier
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	xfr@outlook.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, 11 Oct 2024 at 11:55, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->
-> On 2024/10/11 14:31, Furong Xu wrote:
-> > Hi Ilias,
-> >
-> > On Fri, 11 Oct 2024 08:06:04 +0300, Ilias Apalodimas <ilias.apalodimas@linaro.org> wrote:
-> >
-> >> Hi Furong,
-> >>
-> >> On Fri, 11 Oct 2024 at 05:15, Furong Xu <0x1207@gmail.com> wrote:
-> >>>
-> >>> On Thu, 10 Oct 2024 19:53:39 +0800, Yunsheng Lin <linyunsheng@huawei.com> wrote:
-> >>>
-> >>>> Is there any reason that those drivers not to unset the PP_FLAG_DMA_SYNC_DEV
-> >>>> when calling page_pool_create()?
-> >>>> Does it only need dma sync for some cases and not need dma sync for other
-> >>>> cases? if so, why not do the dma sync in the driver instead?
-> >>>
-> >>> The answer is in this commit:
-> >>> https://git.kernel.org/netdev/net/c/5546da79e6cc
-> >>
-> >> I am not sure I am following. Where does the stmmac driver call a sync
-> >> with len 0?
-> > For now, only drivers/net/ethernet/freescale/fec_main.c does.
-> > And stmmac driver does not yet, but I will send another patch to make it call sync with
-> > len 0. This is a proper fix as Jakub Kicinski suggested.
->
-> In order to support the above use case, it seems there might be two
-> options here:
-> 1. Driver calls page_pool_create() without PP_FLAG_DMA_SYNC_DEV and
->    handle the dma sync itself.
-> 2. Page_pool may provides a non-dma-sync version of page_pool_put_page()
->    API even when Driver calls page_pool_create() with PP_FLAG_DMA_SYNC_DEV.
->
-> Maybe option 2 is better one in the longer term as it may provide some
-> flexibility for the user and enable removing of the DMA_SYNC_DEV in the
-> future?
+Change scoped_guard() and scoped_cond_guard() macros to make reasoning
+about them easier for static analysis tools (smatch, compiler
+diagnostics), especially to enable them to tell if the given usage of
+scoped_guard() is with a conditional lock class (interruptible-locks,
+try-locks) or not (like simple mutex_lock()).
 
-Case 2 would be what this patch does. We already treat -1 as the
-maximum DMA memory size. I think it's ok to treat 0 as 'don't sync'. I
-need to figure out why people need this.
-IOW you still have to sync the page to use it. Now you can do it when
-allocating it, but why is that cheaper or preferable?
+Add compile-time error if scoped_cond_guard() is used for non-conditional
+lock class.
 
-Thanks
-/Ilias
+Beyond easier tooling and a little shrink reported by bloat-o-meter
+this patch enables developer to write code like:
+
+int foo(struct my_drv *adapter)
+{
+	scoped_guard(spinlock, &adapter->some_spinlock)
+		return adapter->spinlock_protected_var;
+}
+
+Current scoped_guard() implementation does not support that,
+due to compiler complaining:
+error: control reaches end of non-void function [-Werror=return-type]
+
+Technical stuff about the change:
+scoped_guard() macro uses common idiom of using "for" statement to declare
+a scoped variable. Unfortunately, current logic is too hard for compiler
+diagnostics to be sure that there is exactly one loop step; fix that.
+
+To make any loop so trivial that there is no above warning, it must not
+depend on any non-const variable to tell if there are more steps. There is
+no obvious solution for that in C, but one could use the compound
+statement expression with "goto" jumping past the "loop", effectively
+leaving only the subscope part of the loop semantics.
+
+More impl details:
+one more level of macro indirection is now needed to avoid duplicating
+label names;
+I didn't spot any other place that is using the
+"for (...; goto label) if (0) label: break;" idiom, so it's not packed for
+reuse beyond scoped_guard() family, what makes actual macros code cleaner.
+
+There was also a need to introduce const true/false variable per lock
+class, it is used to aid compiler diagnostics reasoning about "exactly
+1 step" loops (note that converting that to function would undo the whole
+benefit).
+
+Big thanks to Andy Shevchenko for help on this patch, both internal and
+public, ranging from whitespace/formatting, through commit message
+clarifications, general improvements, ending with presenting alternative
+approaches - all despite not even liking the idea.
+
+Big thanks to Dmitry Torokhov for the idea of compile-time check for
+scoped_cond_guard(), and general improvements for the patch.
+
+Big thanks to David Lechner for idea to cover also scoped_cond_guard().
+
+CC: David Lechner <dlechner@baylibre.com>
+CC: Dan Carpenter <dan.carpenter@linaro.org>
+CC: Peter Zijlstra <peterz@infradead.org>
+CC: Andy Shevchenko <andriy.shevchenko@intel.com>
+Reviewed-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+PATCH v3:
+cover also scoped_cond_guard() to be able to return from them (David Lechner);
+capitalize comment (Andy)
+
+PATCH v2:
+drop Andy's NACK,
+ (the reasons for NACK were in RFC v1; Peter backed up my idea for this
+ patch in PATCH v1 discussion, and Andy withdrawn the NACK);
+whitespace/formatting/style issues - Andy;
+additional code comments - Dmitry.
+https://lore.kernel.org/netdev/20241009114446.14873-1-przemyslaw.kitszel@intel.com
+
+PATCH v1:
+changes thanks to Dmitry Torokhov:
+ better writeup in commit msg;
+ "__" prefix added to internal macros;
+ reorder "if (0)-else" and "for" to avoid goto jumping back;
+ compile-time check for scoped_cond_guard()
+https://lore.kernel.org/netdev/20241003113906.750116-1-przemyslaw.kitszel@intel.com
+
+RFC v2:
+https://lore.kernel.org/netdev/20241001145718.8962-1-przemyslaw.kitszel@intel.com
+ remove ", 1" condition, as scoped_guard() could be used also for
+ conditional locks (try-lock, irq-lock, etc) - this was pointed out by
+ Dmitry Torokhov and Dan Carpenter;
+ reorder macros to have them defined prior to use - Markus Elfring.
+
+RFC v1:
+https://lore.kernel.org/netdev/20240926134347.19371-1-przemyslaw.kitszel@intel.com
+---
+ include/linux/cleanup.h | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
+
+diff --git a/include/linux/cleanup.h b/include/linux/cleanup.h
+index a3d3e888cf1f..6069dd6237df 100644
+--- a/include/linux/cleanup.h
++++ b/include/linux/cleanup.h
+@@ -149,14 +149,21 @@ static inline class_##_name##_t class_##_name##ext##_constructor(_init_args) \
+  *      similar to scoped_guard(), except it does fail when the lock
+  *      acquire fails.
+  *
++ *	Only for conditional locks.
++ *
+  */
+ 
++#define __DEFINE_CLASS_IS_CONDITIONAL(_name, _is_cond)	\
++static __maybe_unused const bool class_##_name##_is_conditional = _is_cond
++
+ #define DEFINE_GUARD(_name, _type, _lock, _unlock) \
++	__DEFINE_CLASS_IS_CONDITIONAL(_name, false); \
+ 	DEFINE_CLASS(_name, _type, if (_T) { _unlock; }, ({ _lock; _T; }), _type _T); \
+ 	static inline void * class_##_name##_lock_ptr(class_##_name##_t *_T) \
+ 	{ return *_T; }
+ 
+ #define DEFINE_GUARD_COND(_name, _ext, _condlock) \
++	__DEFINE_CLASS_IS_CONDITIONAL(_name##_ext, true); \
+ 	EXTEND_CLASS(_name, _ext, \
+ 		     ({ void *_t = _T; if (_T && !(_condlock)) _t = NULL; _t; }), \
+ 		     class_##_name##_t _T) \
+@@ -167,17 +174,32 @@ static inline class_##_name##_t class_##_name##ext##_constructor(_init_args) \
+ 	CLASS(_name, __UNIQUE_ID(guard))
+ 
+ #define __guard_ptr(_name) class_##_name##_lock_ptr
++#define __is_cond_ptr(_name) class_##_name##_is_conditional
+ 
+-#define scoped_guard(_name, args...)					\
+-	for (CLASS(_name, scope)(args),					\
+-	     *done = NULL; __guard_ptr(_name)(&scope) && !done; done = (void *)1)
++/*
++ * Helper macro for scoped_guard() and scoped_cond_guard().
++ *
++ * Note that the "__is_cond_ptr(_name)" part of the condition ensures that
++ * compiler would be sure that for the unconditional locks the body of the
++ * loop (caller-provided code glued to the else clause) could not be skipped.
++ * It is needed because the other part - "__guard_ptr(_name)(&scope)" - is too
++ * hard to deduce (even if could be proven true for unconditional locks).
++ */
++#define __scoped_guard(_name, _fail, _label, args...)				\
++	for (CLASS(_name, scope)(args);	true; ({ goto _label; }))		\
++		if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {	\
++			_fail;							\
++_label:										\
++			break;							\
++		} else
+ 
+-#define scoped_cond_guard(_name, _fail, args...) \
+-	for (CLASS(_name, scope)(args), \
+-	     *done = NULL; !done; done = (void *)1) \
+-		if (!__guard_ptr(_name)(&scope)) _fail; \
+-		else
++#define scoped_guard(_name, args...)	\
++	__scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+ 
++#define scoped_cond_guard(_name, _fail, args...)			\
++	__scoped_guard(_name,						\
++		       BUILD_BUG_ON(!__is_cond_ptr(_name)); _fail,	\
++		       __UNIQUE_ID(label), args)
+ /*
+  * Additional helper macros for generating lock guards with types, either for
+  * locks that don't have a native type (eg. RCU, preempt) or those that need a
+@@ -233,14 +255,17 @@ static inline class_##_name##_t class_##_name##_constructor(void)	\
+ }
+ 
+ #define DEFINE_LOCK_GUARD_1(_name, _type, _lock, _unlock, ...)		\
++__DEFINE_CLASS_IS_CONDITIONAL(_name, false);				\
+ __DEFINE_UNLOCK_GUARD(_name, _type, _unlock, __VA_ARGS__)		\
+ __DEFINE_LOCK_GUARD_1(_name, _type, _lock)
+ 
+ #define DEFINE_LOCK_GUARD_0(_name, _lock, _unlock, ...)			\
++__DEFINE_CLASS_IS_CONDITIONAL(_name, false);				\
+ __DEFINE_UNLOCK_GUARD(_name, void, _unlock, __VA_ARGS__)		\
+ __DEFINE_LOCK_GUARD_0(_name, _lock)
+ 
+ #define DEFINE_LOCK_GUARD_1_COND(_name, _ext, _condlock)		\
++	__DEFINE_CLASS_IS_CONDITIONAL(_name##_ext, true);		\
+ 	EXTEND_CLASS(_name, _ext,					\
+ 		     ({ class_##_name##_t _t = { .lock = l }, *_T = &_t;\
+ 		        if (_T->lock && !(_condlock)) _T->lock = NULL;	\
+
+base-commit: 44badc908f2c85711cb18e45e13119c10ad3a05f
+-- 
+2.46.0
+
 
