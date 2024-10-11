@@ -1,134 +1,102 @@
-Return-Path: <netdev+bounces-134617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C19299A78F
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 17:27:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC24999A7AC
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 17:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F41B62830B7
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 15:27:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C32331C25ED1
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 15:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B77194AE8;
-	Fri, 11 Oct 2024 15:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A549195F22;
+	Fri, 11 Oct 2024 15:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8L75zVt"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ez2qijYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32CF178372;
-	Fri, 11 Oct 2024 15:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8B7194C8D;
+	Fri, 11 Oct 2024 15:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728660432; cv=none; b=PjIrseXp/GEemARWjszBYmEXkyHh2uKyTwJBBE8gVmAFP54qrRNfDG5mxsHu2nvNEiRu5zq7b9+czPjiQPXsfgluKd/o6tAdBD42ZEDN4qX0BbubHHtFzFP9h3KE+pki8EI/pk9/OjTd9l8VVguRDSnR1muLmli7wmg92ZN/rxs=
+	t=1728660536; cv=none; b=cbuS8Kkmg7MLQ5RDOKnNLImtTYf7W7L4vB9NsWUfxVnQ13/cIZ017v2DBc45qerFJXY7ZSbq/l0wDFq6YS7tC6f/u8IQWujbdOX69ZlXwa/P601Oh/zMC4VICoT55Afgg+1wRJFrGqz0gVRhWR4ZShx99JjLBUwDlvGZvCQ+w6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728660432; c=relaxed/simple;
-	bh=sGWntrz3wIyVB8alp9rpncuZ1V1KDuURy3H+JpEcM7M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CAa0u1VNwrXu4AWZKa13D8IITkTYNjEqaH/NVcKmmUp4I8fo5VYBtH0NIRHn8EulJiUcpFARmVHXVfHwDHiDR88PG4O+8ffdm77bO6mNkpm0Mvg3O88kRLeQp+F1jx60uFQgATfnAX4GBglRAvAZhLwNq+p6eV29V/43Jrk2lDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8L75zVt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64E81C4CEC7;
-	Fri, 11 Oct 2024 15:27:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728660431;
-	bh=sGWntrz3wIyVB8alp9rpncuZ1V1KDuURy3H+JpEcM7M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I8L75zVtrZx7w5SpRULZ/piL2MAHcg+XRpGLvOSuuaq79SJWN4Fma1eeimZ3TTbVB
-	 s3Tj07SktC4NyMlxdWrHxkP9B09QxKjTACbn46Lcb7EZmhdJiFuU6u5LM0LB+VOnwB
-	 ipxmM/V1tJE/lNo+oR0h67Z16lt34GSW47dbcRsA2Rcnm7hvFzitsQaVu0tDTBL7I1
-	 XrWK27pP7SdJ/JUMi4LEQxyVwYXTQYUn1hmQM2ozZex/gG6pI4W/jWyE7zsMYDHYlF
-	 b7b0dB6+vFHNuxfWZal17srhcGgebXOevLR69yA//3wjEvgTu0P9zbH1pTrGNR4W9m
-	 VsL6bpzNsWhgg==
-Date: Fri, 11 Oct 2024 08:27:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: "Lai, Yi" <yi1.lai@linux.intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, Donald Hunter
- <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge
- Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Steffen
- Klassert <steffen.klassert@secunet.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Shuah Khan <shuah@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John
- Fastabend <john.fastabend@gmail.com>, Sumit Semwal
- <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
- Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Taehee Yoo <ap420073@gmail.com>, Willem de Bruijn <willemb@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, yi1.lai@intel.com
-Subject: Re: [PATCH net-next v25 10/13] net: add SO_DEVMEM_DONTNEED
- setsockopt to release RX frags
-Message-ID: <20241011082707.5de66f15@kernel.org>
-In-Reply-To: <CAHS8izPuEUA20BDXvwq2vW-24ez36YFJFMQok-oBDbgk6bajSA@mail.gmail.com>
-References: <20240909054318.1809580-1-almasrymina@google.com>
-	<20240909054318.1809580-11-almasrymina@google.com>
-	<Zwe3lWTN36IUaIdd@ly-workstation>
-	<CAHS8izPuEUA20BDXvwq2vW-24ez36YFJFMQok-oBDbgk6bajSA@mail.gmail.com>
+	s=arc-20240116; t=1728660536; c=relaxed/simple;
+	bh=bx074e4HGLmDJv06LML79379zBigZVqcIwirOD1IXIg=;
+	h=MIME-Version:Content-Type:Date:Message-ID:From:CC:To:Subject:
+	 References:In-Reply-To; b=PZaV2bS1ACuOekqzV7sPV269zgFLRZwf0qDW0TEyS8o983Cjes1NYCfRj+0asCYpW0w7vPrdC8vTVdNMIRKdDN/9LVNvu76VjzzDoNtgWrzMue7QsMLj7IcqLbHLCc5+QJsJC0T9SAL5zor6aQHiLNmMhyRkFNEnKKFLzka2WRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ez2qijYt; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1728660533; x=1760196533;
+  h=mime-version:content-transfer-encoding:date:message-id:
+   from:cc:to:subject:references:in-reply-to;
+  bh=bx074e4HGLmDJv06LML79379zBigZVqcIwirOD1IXIg=;
+  b=ez2qijYtBWKP3YXnq/bDahO0+MHH248zE79D7I+LQZRO/8l5Z+dl47Wq
+   44jjeH10WZxhb+iCOOvSno8kpTo00QxejjT2XO9ACzsVjoU4gS8ShFlpy
+   JvxwzzeRsj6ab2cDBpE5eaL7mNp21VBQFtwvpWnfAEmuzX/Ycwutty9he
+   N/ze04VpQxSV2lQmzpoPoytIa1eZwDZ2c6KDIbqF9wSfA885ZFzOBOOJc
+   aeapfBxFARrnya5f+CQgHulY0P25E+PVvPpPcGowFNgZe6JXUcstdcvPP
+   0vHcxBSbr6kSpf0aig3Y0xMgInEz7hX4Qtr9ZyIDHgeBMITd3QqS1AKg5
+   w==;
+X-CSE-ConnectionGUID: Y93VkM+wSkyKET2ip2ekUg==
+X-CSE-MsgGUID: QMsnCg/IQOazEdV6BmBZTw==
+X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
+   d="scan'208";a="32715362"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Oct 2024 08:28:52 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 11 Oct 2024 08:28:27 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 11 Oct 2024 08:28:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 11 Oct 2024 17:28:25 +0200
+Message-ID: <D4T308XAHU63.3213WKORD0FCL@microchip.com>
+From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+CC: <lars.povlsen@microchip.com>, <Steen.Hegelund@microchip.com>,
+	<daniel.machon@microchip.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Subject: Re: [PATCH] net: microchip: vcap api: Fix memory leaks in
+ vcap_api_encode_rule_test()
+X-Mailer: aerc 0.17.0-0-g6ea74eb30457
+References: <20241010130231.3151896-1-ruanjinjie@huawei.com>
+In-Reply-To: <20241010130231.3151896-1-ruanjinjie@huawei.com>
 
-On Thu, 10 Oct 2024 12:05:38 -0700 Mina Almasry wrote:
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 083d438d8b6f..cb3d8b19de14 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -1071,11 +1071,11 @@ sock_devmem_dontneed(struct sock *sk,
-> sockptr_t optval, unsigned int optlen)
->             optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
->                 return -EINVAL;
-> 
-> -       tokens = kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
-> +       num_tokens = optlen / sizeof(struct dmabuf_token);
-> +       tokens = kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
->         if (!tokens)
->                 return -ENOMEM;
-> 
-> -       num_tokens = optlen / sizeof(struct dmabuf_token);
->         if (copy_from_sockptr(tokens, optval, optlen)) {
->                 kvfree(tokens);
->                 return -EFAULT;
-> @@ -1083,6 +1083,10 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t
-> optval, unsigned int optlen)
-> 
->         xa_lock_bh(&sk->sk_user_frags);
->         for (i = 0; i < num_tokens; i++) {
-> +
-> +               if (tokens[i].token_count > MAX_DONTNEED_TOKENS)
-> +                       continue;
+On Thu Oct 10, 2024 at 3:02 PM CEST, Jinjie Ruan wrote:
+> Commit a3c1e45156ad ("net: microchip: vcap: Fix use-after-free error in
+> kunit test") fixed the use-after-free error, but introduced below
+> memory leaks by removing necessary vcap_free_rule(), add it to fix it.
 
-For the real fix let's scan the tokens before we take the xa lock
-and return an error rather than silently skipping?
+Thank you for the fix. I reproduced the bug and confirmed the fix.
 
->                 for (j = 0; j < tokens[i].token_count; j++) {
+...
+
+> Cc: stable@vger.kernel.org
+> Fixes: a3c1e45156ad ("net: microchip: vcap: Fix use-after-free error in k=
+unit test")
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+
+Reviewed-by: Jens Emil Schulz =C3=98stergaard <jensemil.schulzostergaard@mi=
+crochip.com>
 
 
