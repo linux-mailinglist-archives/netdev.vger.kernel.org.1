@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-134711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B006A99AE7F
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:08:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1A699AE80
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:08:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2DFBB20FA6
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:08:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E1C0B2248D
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB391D1E77;
-	Fri, 11 Oct 2024 22:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1851D1E79;
+	Fri, 11 Oct 2024 22:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZCP9EEhg"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="GAZRY+gb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993D71D1E72
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D761D1E72
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728684500; cv=none; b=EVuaNXdsZvwXjpgdsQjg01zcUYSlsHvSj04yLzRjRuYE4Wqw/XvLzgcZVU/9Q1u/fuCrWAfHWQIC7n17C0nbtasiKDewx2j4NUS40Dmj85rw7cV61Gcqs10yGDao/OlOfxl4N3zGzVCik6XtvkzCKwnAD2YkApRlgXJYDxaKdHE=
+	t=1728684515; cv=none; b=fyV2QlBUfcOfY8cRRiJzv5Uho5XfVJWp2xpKRL+1uR8mb756gkBVPQ92Ml7YP7U48oQYgpS7xNRP/nirVk3R9JhHP1cYy1S79nBu3/V6/NZAA3E+6A3d82S11rVJj7nVAX4aruyvyvm8kGV/2IlRCd0m8F9df09sp+6dKsvjISc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728684500; c=relaxed/simple;
-	bh=WerYwdF8Gng6/UmMi46Gs8wOYYFSWbUtgkp0TMmuAHk=;
+	s=arc-20240116; t=1728684515; c=relaxed/simple;
+	bh=CoxdsmG/OokTC8+uDqFGsrBS2dbBa4I6KZvwc73MxS8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rR5yOsF5PyBvgyZJXGljjqlKBD+afFI/CKgrmLyRaeHsvA9rpVwpTJnBR7irijcuVw5TpbpTaImmUwDxdEUggNOgs5sAleot6RUBqwJctaLeh2veRL+IPS1wlv8/tI3cxUH0RzxerzMxnla7Zedd9GVMVSy8N8bzurbfBA17LAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZCP9EEhg; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=rwdYjDSZ+HkrNSnagaHOh3Nck0SKUO5FnHp3xNGgqoRcMgvAOx3MlSWMNcYLr90Uvq2hBIz+DUB9jCZsM5XuiRFaYXvhljPYniKm76YIJv9kYceT1UJjpyZ8kQ9pHNR0B8BzIAQjsr9yza3xJZOh9svleVMYWWoToj2SKYSvEVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=GAZRY+gb; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728684498; x=1760220498;
+  t=1728684514; x=1760220514;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PnX2Ej9DXFBwozAh09x4okxSb//MbK4jONEj+7BgoKE=;
-  b=ZCP9EEhg5UdSjwjk9EDWNic8Wn2wXnkblVW7VQFef5REl9hbGO7oCxNM
-   F9i/vzrvMWenvNFfiu96C+JkaQRX6FYQ696nxZaJHJhKdsjdUTLaR/0Us
-   O52mbsbCws4Hp/y0Oh6yWnCXYfWnt5P5kxBlGwx3ISDMd0g7VuCT9UlDm
-   g=;
+  bh=Wrv9qmoj7o7oMQQllnLamcZ/MkPkQtYq1Al20R9ZT0A=;
+  b=GAZRY+gbAUeU0pXQi+wi0g3XiEelFMu/g1WO2FnS4/SX9wiUm+xSo4ki
+   SHAFoC99ghMHgKlJl49P595FjLrClKaFrhYZH4pntRJE0tvZLsIUKN6HQ
+   2NyhKuyUJ9j2oHVS34g9xOUrRdanKfqP+1Fj4cHXQirsK7gbgZTefXEf5
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.11,196,1725321600"; 
-   d="scan'208";a="440211205"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 22:08:15 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:62265]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
- id da62d421-07ba-494c-a2ca-51c52adb2d98; Fri, 11 Oct 2024 22:08:14 +0000 (UTC)
-X-Farcaster-Flow-ID: da62d421-07ba-494c-a2ca-51c52adb2d98
+   d="scan'208";a="137923185"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 22:08:33 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:37306]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.29:2525] with esmtp (Farcaster)
+ id cf3168b5-def1-4d6e-b7ab-588910f57c69; Fri, 11 Oct 2024 22:08:33 +0000 (UTC)
+X-Farcaster-Flow-ID: cf3168b5-def1-4d6e-b7ab-588910f57c69
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 11 Oct 2024 22:08:13 +0000
+ Fri, 11 Oct 2024 22:08:33 +0000
 Received: from 6c7e67c6786f.amazon.com (10.106.100.8) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 11 Oct 2024 22:08:11 +0000
+ Fri, 11 Oct 2024 22:08:30 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 07/11] ipv6: Use rtnl_register_many().
-Date: Fri, 11 Oct 2024 15:05:46 -0700
-Message-ID: <20241011220550.46040-8-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 08/11] ipmr: Use rtnl_register_many().
+Date: Fri, 11 Oct 2024 15:05:47 -0700
+Message-ID: <20241011220550.46040-9-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241011220550.46040-1-kuniyu@amazon.com>
 References: <20241011220550.46040-1-kuniyu@amazon.com>
@@ -77,249 +77,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
+X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will remove rtnl_register_module() in favour of rtnl_register_many().
+We will remove rtnl_register() and rtnl_register_module() in favour
+of rtnl_register_many().
 
-rtnl_register_many() will unwind the previous successful registrations
-on failure and simplify module error handling.
+When it succeeds for built-in callers, rtnl_register_many() guarantees
+all rtnetlink types in the passed array are supported, and there is no
+chance that a part of message types is not supported.
 
 Let's use rtnl_register_many() instead.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/core/fib_rules.c | 24 ++++++++++++--------
- net/ipv6/addrconf.c  | 52 +++++++++++++++-----------------------------
- net/ipv6/addrlabel.c | 27 +++++++++--------------
- net/ipv6/ip6_fib.c   |  9 +++++---
- net/ipv6/route.c     | 21 +++++++-----------
- 5 files changed, 57 insertions(+), 76 deletions(-)
+ net/ipv4/ipmr.c  | 19 ++++++++++---------
+ net/ipv6/ip6mr.c | 12 ++++++++----
+ 2 files changed, 18 insertions(+), 13 deletions(-)
 
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 154a2681f55c..7ed6f9928604 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -1289,17 +1289,24 @@ static struct pernet_operations fib_rules_net_ops = {
- 	.exit = fib_rules_net_exit,
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 089864c6a35e..2a5a6927229f 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -3139,6 +3139,14 @@ static struct pernet_operations ipmr_net_ops = {
+ 	.exit_batch = ipmr_net_exit_batch,
  };
  
-+static const struct rtnl_msg_handler fib_rules_rtnl_msg_handlers[] = {
-+	{NULL, PF_UNSPEC, RTM_NEWRULE, fib_nl_newrule, NULL, 0},
-+	{NULL, PF_UNSPEC, RTM_DELRULE, fib_nl_delrule, NULL, 0},
-+	{NULL, PF_UNSPEC, RTM_GETRULE, NULL, fib_nl_dumprule,
-+	 RTNL_FLAG_DUMP_UNLOCKED},
++static const struct rtnl_msg_handler ipmr_rtnl_msg_handlers[] = {
++	{NULL, RTNL_FAMILY_IPMR, RTM_GETLINK, NULL, ipmr_rtm_dumplink, 0},
++	{NULL, RTNL_FAMILY_IPMR, RTM_NEWROUTE, ipmr_rtm_route, NULL, 0},
++	{NULL, RTNL_FAMILY_IPMR, RTM_DELROUTE, ipmr_rtm_route, NULL, 0},
++	{NULL, RTNL_FAMILY_IPMR, RTM_GETROUTE,
++	 ipmr_rtm_getroute, ipmr_rtm_dumproute, 0},
 +};
 +
- static int __init fib_rules_init(void)
+ int __init ip_mr_init(void)
  {
  	int err;
--	rtnl_register(PF_UNSPEC, RTM_NEWRULE, fib_nl_newrule, NULL, 0);
--	rtnl_register(PF_UNSPEC, RTM_DELRULE, fib_nl_delrule, NULL, 0);
--	rtnl_register(PF_UNSPEC, RTM_GETRULE, NULL, fib_nl_dumprule,
--		      RTNL_FLAG_DUMP_UNLOCKED);
+@@ -3159,15 +3167,8 @@ int __init ip_mr_init(void)
+ 		goto add_proto_fail;
+ 	}
+ #endif
+-	rtnl_register(RTNL_FAMILY_IPMR, RTM_GETROUTE,
+-		      ipmr_rtm_getroute, ipmr_rtm_dumproute, 0);
+-	rtnl_register(RTNL_FAMILY_IPMR, RTM_NEWROUTE,
+-		      ipmr_rtm_route, NULL, 0);
+-	rtnl_register(RTNL_FAMILY_IPMR, RTM_DELROUTE,
+-		      ipmr_rtm_route, NULL, 0);
+-
+-	rtnl_register(RTNL_FAMILY_IPMR, RTM_GETLINK,
+-		      NULL, ipmr_rtm_dumplink, 0);
++	rtnl_register_many(ipmr_rtnl_msg_handlers);
 +
-+	err = rtnl_register_many(fib_rules_rtnl_msg_handlers);
-+	if (err)
-+		goto fail_rtnl;
+ 	return 0;
  
- 	err = register_pernet_subsys(&fib_rules_net_ops);
- 	if (err < 0)
--		goto fail;
-+		goto fail_pernet;
- 
- 	err = register_netdevice_notifier(&fib_rules_notifier);
- 	if (err < 0)
-@@ -1309,10 +1316,9 @@ static int __init fib_rules_init(void)
- 
- fail_unregister:
- 	unregister_pernet_subsys(&fib_rules_net_ops);
--fail:
--	rtnl_unregister(PF_UNSPEC, RTM_NEWRULE);
--	rtnl_unregister(PF_UNSPEC, RTM_DELRULE);
--	rtnl_unregister(PF_UNSPEC, RTM_GETRULE);
-+fail_pernet:
-+	rtnl_unregister_many(fib_rules_rtnl_msg_handlers);
-+fail_rtnl:
- 	return err;
- }
- 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index f31528d4f694..020519362b33 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -7406,6 +7406,22 @@ static struct rtnl_af_ops inet6_ops __read_mostly = {
- 	.set_link_af	  = inet6_set_link_af,
+ #ifdef CONFIG_IP_PIMSM_V2
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index 2ce4ae0d8dc3..8bb7bf4346f0 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -1369,6 +1369,11 @@ static struct pernet_operations ip6mr_net_ops = {
+ 	.exit_batch = ip6mr_net_exit_batch,
  };
  
-+static const struct rtnl_msg_handler addrconf_rtnl_msg_handlers[] = {
-+	{THIS_MODULE, PF_INET6, RTM_GETLINK, NULL, inet6_dump_ifinfo,
-+	 RTNL_FLAG_DUMP_UNLOCKED},
-+	{THIS_MODULE, PF_INET6, RTM_NEWADDR, inet6_rtm_newaddr, NULL, 0},
-+	{THIS_MODULE, PF_INET6, RTM_DELADDR, inet6_rtm_deladdr, NULL, 0},
-+	{THIS_MODULE, PF_INET6, RTM_GETADDR, inet6_rtm_getaddr, inet6_dump_ifaddr,
-+	 RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
-+	{THIS_MODULE, PF_INET6, RTM_GETMULTICAST, NULL, inet6_dump_ifmcaddr,
-+	 RTNL_FLAG_DUMP_UNLOCKED},
-+	{THIS_MODULE, PF_INET6, RTM_GETANYCAST, NULL, inet6_dump_ifacaddr,
-+	 RTNL_FLAG_DUMP_UNLOCKED},
-+	{THIS_MODULE, PF_INET6, RTM_GETNETCONF,
-+	 inet6_netconf_get_devconf, inet6_netconf_dump_devconf,
-+	 RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
++static const struct rtnl_msg_handler ip6mr_rtnl_msg_handlers[] = {
++	{THIS_MODULE, RTNL_FAMILY_IP6MR, RTM_GETROUTE,
++	 ip6mr_rtm_getroute, ip6mr_rtm_dumproute, 0},
 +};
 +
- /*
-  *	Init / cleanup code
-  */
-@@ -7449,42 +7465,10 @@ int __init addrconf_init(void)
- 
- 	rtnl_af_register(&inet6_ops);
- 
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETLINK,
--				   NULL, inet6_dump_ifinfo, RTNL_FLAG_DUMP_UNLOCKED);
--	if (err < 0)
-+	err = rtnl_register_many(addrconf_rtnl_msg_handlers);
-+	if (err)
- 		goto errout;
- 
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_NEWADDR,
--				   inet6_rtm_newaddr, NULL, 0);
--	if (err < 0)
--		goto errout;
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_DELADDR,
--				   inet6_rtm_deladdr, NULL, 0);
--	if (err < 0)
--		goto errout;
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETADDR,
--				   inet6_rtm_getaddr, inet6_dump_ifaddr,
--				   RTNL_FLAG_DOIT_UNLOCKED |
--				   RTNL_FLAG_DUMP_UNLOCKED);
--	if (err < 0)
--		goto errout;
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETMULTICAST,
--				   NULL, inet6_dump_ifmcaddr,
--				   RTNL_FLAG_DUMP_UNLOCKED);
--	if (err < 0)
--		goto errout;
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETANYCAST,
--				   NULL, inet6_dump_ifacaddr,
--				   RTNL_FLAG_DUMP_UNLOCKED);
--	if (err < 0)
--		goto errout;
--	err = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETNETCONF,
--				   inet6_netconf_get_devconf,
--				   inet6_netconf_dump_devconf,
--				   RTNL_FLAG_DOIT_UNLOCKED |
--				   RTNL_FLAG_DUMP_UNLOCKED);
--	if (err < 0)
--		goto errout;
- 	err = ipv6_addr_label_rtnl_register();
- 	if (err < 0)
- 		goto errout;
-diff --git a/net/ipv6/addrlabel.c b/net/ipv6/addrlabel.c
-index acd70b5992a7..b31738761b0b 100644
---- a/net/ipv6/addrlabel.c
-+++ b/net/ipv6/addrlabel.c
-@@ -634,23 +634,16 @@ static int ip6addrlbl_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	return err;
- }
- 
-+static const struct rtnl_msg_handler ipv6_adddr_label_rtnl_msg_handlers[] = {
-+	{THIS_MODULE, PF_INET6, RTM_NEWADDRLABEL, ip6addrlbl_newdel, NULL,
-+	 RTNL_FLAG_DOIT_UNLOCKED},
-+	{THIS_MODULE, PF_INET6, RTM_DELADDRLABEL, ip6addrlbl_newdel, NULL,
-+	 RTNL_FLAG_DOIT_UNLOCKED},
-+	{THIS_MODULE, PF_INET6, RTM_GETADDRLABEL, ip6addrlbl_get, ip6addrlbl_dump,
-+	 RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
-+};
-+
- int __init ipv6_addr_label_rtnl_register(void)
+ int __init ip6_mr_init(void)
  {
--	int ret;
--
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_NEWADDRLABEL,
--				   ip6addrlbl_newdel,
--				   NULL, RTNL_FLAG_DOIT_UNLOCKED);
--	if (ret < 0)
--		return ret;
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_DELADDRLABEL,
--				   ip6addrlbl_newdel,
--				   NULL, RTNL_FLAG_DOIT_UNLOCKED);
--	if (ret < 0)
--		return ret;
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETADDRLABEL,
--				   ip6addrlbl_get,
--				   ip6addrlbl_dump, RTNL_FLAG_DOIT_UNLOCKED |
--						    RTNL_FLAG_DUMP_UNLOCKED);
--	return ret;
-+	return rtnl_register_many(ipv6_adddr_label_rtnl_msg_handlers);
- }
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index eb111d20615c..b28259f23960 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -2500,6 +2500,11 @@ static struct pernet_operations fib6_net_ops = {
- 	.exit = fib6_net_exit,
- };
- 
-+static const struct rtnl_msg_handler fib6_rtnl_msg_handlers[] = {
-+	{THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL, inet6_dump_fib,
-+	 RTNL_FLAG_DUMP_UNLOCKED | RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
-+};
-+
- int __init fib6_init(void)
- {
- 	int ret = -ENOMEM;
-@@ -2513,9 +2518,7 @@ int __init fib6_init(void)
- 	if (ret)
- 		goto out_kmem_cache_create;
- 
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE, NULL,
--				   inet6_dump_fib, RTNL_FLAG_DUMP_UNLOCKED |
--				   RTNL_FLAG_DUMP_SPLIT_NLM_DONE);
-+	ret = rtnl_register_many(fib6_rtnl_msg_handlers);
- 	if (ret)
- 		goto out_unregister_subsys;
- 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b4251915585f..6f617c0f3db4 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -6680,6 +6680,13 @@ static void bpf_iter_unregister(void)
+ 	int err;
+@@ -1391,9 +1396,8 @@ int __init ip6_mr_init(void)
+ 		goto add_proto_fail;
+ 	}
  #endif
- #endif
+-	err = rtnl_register_module(THIS_MODULE, RTNL_FAMILY_IP6MR, RTM_GETROUTE,
+-				   ip6mr_rtm_getroute, ip6mr_rtm_dumproute, 0);
+-	if (err == 0)
++	err = rtnl_register_many(ip6mr_rtnl_msg_handlers);
++	if (!err)
+ 		return 0;
  
-+static const struct rtnl_msg_handler ip6_route_rtnl_msg_handlers[] = {
-+	{THIS_MODULE, PF_INET6, RTM_NEWROUTE, inet6_rtm_newroute, NULL, 0},
-+	{THIS_MODULE, PF_INET6, RTM_DELROUTE, inet6_rtm_delroute, NULL, 0},
-+	{THIS_MODULE, PF_INET6, RTM_GETROUTE, inet6_rtm_getroute, NULL,
-+	 RTNL_FLAG_DOIT_UNLOCKED},
-+};
-+
- int __init ip6_route_init(void)
+ #ifdef CONFIG_IPV6_PIMSM_V2
+@@ -1410,7 +1414,7 @@ int __init ip6_mr_init(void)
+ 
+ void ip6_mr_cleanup(void)
  {
- 	int ret;
-@@ -6722,19 +6729,7 @@ int __init ip6_route_init(void)
- 	if (ret)
- 		goto fib6_rules_init;
- 
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_NEWROUTE,
--				   inet6_rtm_newroute, NULL, 0);
--	if (ret < 0)
--		goto out_register_late_subsys;
--
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_DELROUTE,
--				   inet6_rtm_delroute, NULL, 0);
--	if (ret < 0)
--		goto out_register_late_subsys;
--
--	ret = rtnl_register_module(THIS_MODULE, PF_INET6, RTM_GETROUTE,
--				   inet6_rtm_getroute, NULL,
--				   RTNL_FLAG_DOIT_UNLOCKED);
-+	ret = rtnl_register_many(ip6_route_rtnl_msg_handlers);
- 	if (ret < 0)
- 		goto out_register_late_subsys;
- 
+-	rtnl_unregister(RTNL_FAMILY_IP6MR, RTM_GETROUTE);
++	rtnl_unregister_many(ip6mr_rtnl_msg_handlers);
+ #ifdef CONFIG_IPV6_PIMSM_V2
+ 	inet6_del_protocol(&pim6_protocol, IPPROTO_PIM);
+ #endif
 -- 
 2.39.5 (Apple Git-154)
 
