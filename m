@@ -1,156 +1,105 @@
-Return-Path: <netdev+bounces-134613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D702F99A6DE
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:50:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB9899A6E0
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:51:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FBFD1F221F3
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:50:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 141BC285EFC
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EBB15B0F7;
-	Fri, 11 Oct 2024 14:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18F119412E;
+	Fri, 11 Oct 2024 14:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T9AzQfPK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STq8YSyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BAC17BA2;
-	Fri, 11 Oct 2024 14:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DB7154C1E;
+	Fri, 11 Oct 2024 14:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728658212; cv=none; b=FMj8HZBcLw8DPUBqQsTW86P+OqhmO/1d8tJRT8CJKE+5m9nzUnA1/Mq9zb5IUp9t4m2omB215DkYI26N7Vkd27rGHjn8woH6IbudQDlEAEbPa2cCBe/DAT1QUiIaAMIUiz1D1B1dRRnCsC5Wt0JDZC5x13BHxph/qBVDkQA9384=
+	t=1728658213; cv=none; b=QM5k5P6xDusaBZed63idVksLk7DCEnILsc5ucU3MqXgIcpR59B5togv4euGApIDfWh252Smv6UlXhjfXwvILp1mpndEVFd+iSMPEVD3ZrIrn83bAAFeYuExl4IfZILQhWOAUze5CqW67wGAOAPZOkhZbaPE4g30c3c/742qMD/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728658212; c=relaxed/simple;
-	bh=ALvXlwzWsImyKJpYssHZdxx/SxSVdcAWFvhn6uc8woU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=i4Et2O/mQgn9Mt0CGaMtEACEIHvO4HXXoR3sI2jVZNKF3urjSNBjHDSeswUVCbWnJKsry2cdHMu6xa0M7T3olLFz5EayPnAztuTYIGzZAclaOeyDZ8iZruJ3BC4xIlSpVsdcnngtM/476YZd6pZ58RbPlA2T4aV5L2sA+YzmfWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T9AzQfPK; arc=none smtp.client-ip=209.85.219.172
+	s=arc-20240116; t=1728658213; c=relaxed/simple;
+	bh=g1BejgMxHi8WOL6Nwz5uzME1vA5rJHB3mKEaFaO4T8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dKZOBSwj5fapi73ce3yRJwZJzYBi5dngJ3o425p2NHYHmkh3XGKSNvzTsaB4Xjc2/o9lrwqr1FceFZ9HJNKVMKyQ4UfQRAbYIn6liUH3eFKS/mskb2fEQunH57BYOhs64m/iFtGm6TnGysHMGOOXCEHq9jn04VMtIBLvgSp2spU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=STq8YSyz; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e2910d4a247so1567163276.2;
-        Fri, 11 Oct 2024 07:50:10 -0700 (PDT)
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7db637d1e4eso1572800a12.2;
+        Fri, 11 Oct 2024 07:50:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728658210; x=1729263010; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9K1b4PxJViMvdmQyzpyoqgZ6Zjd4vnQ7NxL1imqB26M=;
-        b=T9AzQfPKP5gFl6Fdt0/to5juoAquaiAinby2Plf9AFnUN8TluoDMWtez6+5qqr8zcy
-         VBNxopn9Vjxgf/z1RuVwKZxRKDjNumC+L6oMmBCJ9bWfWFbnfJUy85wLp0g5F/gFA7ji
-         q5P/X6j9QEsDXq0VUOGVTinr1CZjnEy4b8UKs8c+Ek9FTl4De/0xlso61+SHqYZWDj76
-         I8H4QOWqZ7UBXUUQW8PPBoYg8ULVxCcyYWLTSGVxSM4EXn9+y+51LKN8oGkoh0lI6w6G
-         vQNco1uLD6tAVwCYgV0Z37VHsTr0ickWAcU2zAreEnqZaEVrvUJqZ2zLE9yt6v3vu5u0
-         cn5A==
+        d=gmail.com; s=20230601; t=1728658212; x=1729263012; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lwD/IxPjshg8sSRjxJ9nFSNy7cm9zyZxLj39yIl5YQc=;
+        b=STq8YSyz7KD5cQxG2mxlRjeYGJms2hT9gJGB4vZTyABbbWe8aqKTHPEh6p6EUZijbY
+         NBIHogRJ8cAP3pSXEzmj48oqXV0mp6V2mg/ykz+R/jog+Lwwrjlo9cw2+W6zyCCRKmQH
+         QqX8vJxW7+wZCovNTLDkGeY7F3VhravX8N5RoL3Z3sRl526dfO808L4s9xGuImncBlLW
+         INiNs5DMc1BcIGe7KsNoRuUmyK7PgjBChE6U0rXtWLadjMaFo/7eokgkpqcHt78Cul89
+         RCRu9/sr5LFkApMiF84YHTKbNjbGH5i0pARqXjMAt/tlPrwBS5k8Xqr2xSpuacoppagQ
+         d5Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728658210; x=1729263010;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9K1b4PxJViMvdmQyzpyoqgZ6Zjd4vnQ7NxL1imqB26M=;
-        b=p/szsgUuzTeTeIP/ip+M3rsEzA3zDJHGMi3IP6+lm5hJ3Sjt5/DWTsJgPTkseJNdr1
-         9edaBCGdvq8XjDxp4Kno8Bjzp+sJT4RZKlC7xjfoFkL1QJvpk7GAU+yeEbaSTdqc3LwT
-         hiq3aiqUBAGd7nQAuMx1jLIkLf3GAXFurG5+r9LDHx0/JEVeCYOgzSyBOcI1Paik7sYx
-         KYWn0wao7yLBzWF811XO5mxseBlXjXexXnyJ6sUlP3XBPZkP+Lm02GS/IJdQ9JcAGTpn
-         e9F2XJ0CbehuuFpuwC9Ke2Afd8gu25zO+EbeGJUg087dRP/WksfZXWKYG/gXO7t8ty8p
-         rmMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCKbN/M2jo5lkmEFyaRiUzQ7y/Vpmq1M2ZaUtMhmkgicjHX38dFpD4q4wmhx2xbPREU52Fajj/XpgmdDg=@vger.kernel.org, AJvYcCXSEBQ1AmAu6ArEYr2kZKc6vn6towLlIA3qpSZ1KojUj3VMaGeg3QMUNlYUNyoK45t4ePoFlMYC@vger.kernel.org
-X-Gm-Message-State: AOJu0YxilCdLbz39dLzSQaoy6pyBkP6wvPss/+tPqRA9TC6waMmsZXIa
-	uIczLp9GpKHQwJP06glnNi44rdIMaGhM0Fs4Ccgz1nyQ1+llIe7p7t5hFQ==
-X-Google-Smtp-Source: AGHT+IF0lhXmBu0yNYaHOAlYchoG74spgjpBxb77RA4xTor8dWzumE32/yso4mgG3vtPkpF3Ic4o4g==
-X-Received: by 2002:a05:6902:2b85:b0:e20:287d:5ca5 with SMTP id 3f1490d57ef6-e2919d6799dmr2024414276.2.1728658209615;
-        Fri, 11 Oct 2024 07:50:09 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b11497f90esm138220985a.125.2024.10.11.07.50.08
+        d=1e100.net; s=20230601; t=1728658212; x=1729263012;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lwD/IxPjshg8sSRjxJ9nFSNy7cm9zyZxLj39yIl5YQc=;
+        b=qePmz0uPd8j5EAdYE2W/OMedXGaK4lbgC2PGrucZIgySovA91p5DjJkURqXtftfwb7
+         spXob4NBv/4Ax9tkquE4IB5cxKclQd1NUJR389aN+R7eWzuXND/M2DfkKXL2cYhIbT+5
+         2J7xmUqKLqyCnmt0chay5hXNkieP2xKHVGeEYlkxPkO6NNkWQ1SBkp9K/wjcatOw5H7i
+         uyzG0Le/w7DTFKF1NrGqaL8JteMRZtCWStbKIAiH6vbHiUP5doxzr1aQxkmw4xikBg8w
+         Oz1ryIysH7ZjrE/HbQj+s6FiR5ZBs0t9cBAH7G4Sh0so95vnMSo+lAwVhxeiHvsJ5Gng
+         LS7w==
+X-Forwarded-Encrypted: i=1; AJvYcCW914bunVY3oOIgUUaRdmuQaNuhwvjL2koQ1/mwb3QDLfN4+WaGj/XOSTgkn/gnG+xX8y3aMi3aZnkTtRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxBtJCE2CnSlMWnas31/EODkBpuh2rHvC9DQarQY20oix5DQd0
+	7cr19CyasptWOZBPWcdtzS4yN1ZcK0lOTirxzFSbWXEmzMXHllI=
+X-Google-Smtp-Source: AGHT+IEV58zeyrV8J5giw7NLuSrTCxdHOlRif/CN+n4wGv4pU8yCB+XqFHdLqeKJ6QAyl936SFuovA==
+X-Received: by 2002:a05:6a21:2d86:b0:1d4:fcd0:5bea with SMTP id adf61e73a8af0-1d8bcf00ccdmr4711937637.6.1728658211212;
+        Fri, 11 Oct 2024 07:50:11 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea448e4147sm2605282a12.5.2024.10.11.07.50.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 07:50:09 -0700 (PDT)
-Date: Fri, 11 Oct 2024 10:50:08 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Philo Lu <lulie@linux.alibaba.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- antony.antony@secunet.com, 
- steffen.klassert@secunet.com, 
- linux-kernel@vger.kernel.org, 
- dust.li@linux.alibaba.com, 
- jakub@cloudflare.com, 
- fred.cc@alibaba-inc.com, 
- yubing.qiuyubing@alibaba-inc.com
-Message-ID: <67093b209de14_236a96294b2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <7e92c879-d449-4a5d-9f82-ebc711e6bd1b@linux.alibaba.com>
-References: <20241010090351.79698-1-lulie@linux.alibaba.com>
- <20241010090351.79698-4-lulie@linux.alibaba.com>
- <6707db74601d9_20292129449@willemb.c.googlers.com.notmuch>
- <7e92c879-d449-4a5d-9f82-ebc711e6bd1b@linux.alibaba.com>
-Subject: Re: [PATCH v3 net-next 3/3] ipv4/udp: Add 4-tuple hash for connected
- socket
+        Fri, 11 Oct 2024 07:50:10 -0700 (PDT)
+Date: Fri, 11 Oct 2024 07:50:10 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net-next 3/3] selftests: rtnetlink: update netdevsim
+ ipsec output format
+Message-ID: <Zwk7IjfSjWw7thjw@mini-arch>
+References: <20241010040027.21440-1-liuhangbin@gmail.com>
+ <20241010040027.21440-4-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241010040027.21440-4-liuhangbin@gmail.com>
 
-Philo Lu wrote:
+On 10/10, Hangbin Liu wrote:
+> After the netdevsim update to use human-readable IP address formats for
+> IPsec, we can now use the source and destination IPs directly in testing.
+> Here is the result:
+>   # ./rtnetlink.sh -t kci_test_ipsec_offload
+>   PASS: ipsec_offload
 > 
-> 
-> On 2024/10/10 21:49, Willem de Bruijn wrote:
-> > Philo Lu wrote:
-> >> Currently, the udp_table has two hash table, the port hash and portaddr
-> >> hash. Usually for UDP servers, all sockets have the same local port and
-> >> addr, so they are all on the same hash slot within a reuseport group.
-> >>
-> >> In some applications, UDP servers use connect() to manage clients. In
-> >> particular, when firstly receiving from an unseen 4 tuple, a new socket
-> >> is created and connect()ed to the remote addr:port, and then the fd is
-> >> used exclusively by the client.
-> >>
-> >> Once there are connected sks in a reuseport group, udp has to score all
-> >> sks in the same hash2 slot to find the best match. This could be
-> >> inefficient with a large number of connections, resulting in high
-> >> softirq overhead.
-> >>
-> >> To solve the problem, this patch implement 4-tuple hash for connected
-> >> udp sockets. During connect(), hash4 slot is updated, as well as a
-> >> corresponding counter, hash4_cnt, in hslot2. In __udp4_lib_lookup(),
-> >> hslot4 will be searched firstly if the counter is non-zero. Otherwise,
-> >> hslot2 is used like before. Note that only connected sockets enter this
-> >> hash4 path, while un-connected ones are not affected.
-> >>
-> >> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> >> Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
-> >> Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
-> >> Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-> > 
-> >> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> >> index bbf3352213c4..4d3dfcb48a39 100644
-> >> --- a/net/ipv6/udp.c
-> >> +++ b/net/ipv6/udp.c
-> >> @@ -111,7 +111,7 @@ void udp_v6_rehash(struct sock *sk)
-> >>   					  &sk->sk_v6_rcv_saddr,
-> >>   					  inet_sk(sk)->inet_num);
-> >>   
-> >> -	udp_lib_rehash(sk, new_hash);
-> >> +	udp_lib_rehash(sk, new_hash, 0); /* 4-tuple hash not implemented */
-> > 
-> > What is the plan for IPv6?
-> > 
-> 
-> iiuc, udp6 shares the same udptable with udp4, and the hash-related 
-> implementations are almost the same, so there is no obvious obstacle for 
-> udp6 hash4 as long as udp4 hash4 is ready. And I'll do it right after 
-> udp4 hash4.
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Okay great.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+
+Thank you!
 
