@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-134713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFF5899AE81
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:09:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA41499AE84
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 141FFB21447
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:09:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6771CB232EB
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30241D1E7F;
-	Fri, 11 Oct 2024 22:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3891E1D1F7F;
+	Fri, 11 Oct 2024 22:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="M1BIVwaB"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dQZELpVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C82E1D1E72
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513CC1D1F44
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728684537; cv=none; b=uYCfCY60kZML+6VlG6ROlTBUaYiIrCAClAwK1CXrAAY+iOck8WpnkPikTySDIzeJM+OqX485YxAGLU3GJ54ko6Tkbjm+eFOp0uggh5ZajXL5oQuM260JYpv55NwZBnF/mUwST/ulEYwTuje58GeW74eoE5r8c2cRkPDHXvhtg6A=
+	t=1728684559; cv=none; b=J8ZAFd82BRQl2KFdODsHqh5ygw+h5z8u3KVizSqueMhINSuzJtnExE0qrcrq/5NrOQdzaY9tpHjbz/DjTNr1kMThxHUAaQljBkQCL4857yExNcA+IG/V0+6+kjiB3v1I7bWCZ86Ih0uxagkPeQGNub81xSEVWDryHZyxX9o7Z/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728684537; c=relaxed/simple;
-	bh=wDzyL0up9g+8O6GCJy50C6oR8hAQcVHRkSpL2gV54ZA=;
+	s=arc-20240116; t=1728684559; c=relaxed/simple;
+	bh=AakWStbGg9Gq2r6p+9e4DM+/+1xCaPAUAsSwJmO54f0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kdpYRoPfESS8Wd2j1eQ2KoFACO+OuMtfBUB2wtDwDesQdsj4YgEUe/0GHgppFZd5ZAMRG1jXmJhddsGIfsoz8P8/dj8Cqm3s/WGq3/A425VGRoVn8lDsLxJA/SosPgSY58dVjYbE/dbcgmLa5ujykfZR/LtVjmgRolQqbAuj+pI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=M1BIVwaB; arc=none smtp.client-ip=52.119.213.152
+	 MIME-Version:Content-Type; b=BA/n5xnlQRS9dKjDXs+PtUMwD6tq7cuFHo5CMHTnuSMOIPb30AG8dtkztW2UpcQ+WKmmEJe/4B6KQqYxHHqgBqH2zlDbcxAqq8ZIHKodWIsOX2JaKEOyUydDKlj0H3WGjRCRIEn/0KJwQgxlcg5lrVhpaE/1Pnc4i5pKdQH29qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dQZELpVR; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728684536; x=1760220536;
+  t=1728684558; x=1760220558;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=X6nJomTu47Ltda+1poNuUgwGka5GsjY3n9TMkit5K6E=;
-  b=M1BIVwaBuAjqbgOsJTSRrgCRF1Yo56fO93gk3IX+GPHPcd1Ncn9+Z15v
-   sZqPqOHTbPN36B1aNq1ME2dmkB+CdLDNHHla+DsaYdn/3mJBLsq/tqnS9
-   DsiQdhTeVd0XIzyXt95yYDLdPvsz0cfOedHatFm3k+wjVYwFu1XKrjqiU
-   8=;
+  bh=KRn5QrX42HicQ1ybwE8gQsg6PxuOkGqkBd5sS0aIu0o=;
+  b=dQZELpVRfWOweetnTPpVVvKhMp2NctxblL72Fs68e6NgUoOc4Tj6VyjU
+   /gO5UckS2TRz3TAAs7t7gpcMYEGs2VQ2vHfyfycZZjoif8Fvf6BOlrqwb
+   6FPJIj67go55KO8k+KD/McMFSrSIKOGWXLY6aeZZ9P/VYJM36QMjlP4iX
+   4=;
 X-IronPort-AV: E=Sophos;i="6.11,196,1725321600"; 
-   d="scan'208";a="32613826"
+   d="scan'208";a="434489545"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 22:08:53 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:19518]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
- id 503c4393-d2e1-49ab-a788-e3818b8c2699; Fri, 11 Oct 2024 22:08:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 503c4393-d2e1-49ab-a788-e3818b8c2699
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 22:09:16 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:51936]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.107:2525] with esmtp (Farcaster)
+ id 1762e977-9390-4364-a34b-b4ad660966c8; Fri, 11 Oct 2024 22:09:15 +0000 (UTC)
+X-Farcaster-Flow-ID: 1762e977-9390-4364-a34b-b4ad660966c8
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 11 Oct 2024 22:08:52 +0000
+ Fri, 11 Oct 2024 22:09:12 +0000
 Received: from 6c7e67c6786f.amazon.com (10.106.100.8) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 11 Oct 2024 22:08:50 +0000
+ Fri, 11 Oct 2024 22:09:09 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 09/11] dcb: Use rtnl_register_many().
-Date: Fri, 11 Oct 2024 15:05:48 -0700
-Message-ID: <20241011220550.46040-10-kuniyu@amazon.com>
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Oliver Hartkopp
+	<socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH v1 net-next 10/11] can: gw: Use rtnl_register_many().
+Date: Fri, 11 Oct 2024 15:05:49 -0700
+Message-ID: <20241011220550.46040-11-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241011220550.46040-1-kuniyu@amazon.com>
 References: <20241011220550.46040-1-kuniyu@amazon.com>
@@ -77,48 +78,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
+X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will remove rtnl_register() in favour of rtnl_register_many().
+We will remove rtnl_register_module() in favour of rtnl_register_many().
 
-When it succeeds, rtnl_register_many() guarantees all rtnetlink types
-in the passed array are supported, and there is no chance that a part
-of message types is not supported.
+rtnl_register_many() will unwind the previous successful registrations
+on failure and simplify module error handling.
 
 Let's use rtnl_register_many() instead.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/dcb/dcbnl.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+ net/can/gw.c | 26 +++++++++-----------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
 
-diff --git a/net/dcb/dcbnl.c b/net/dcb/dcbnl.c
-index 2e6b8c8fd2de..c05d8400e616 100644
---- a/net/dcb/dcbnl.c
-+++ b/net/dcb/dcbnl.c
-@@ -2408,6 +2408,11 @@ static struct notifier_block dcbnl_nb __read_mostly = {
- 	.notifier_call  = dcbnl_netdevice_event,
+diff --git a/net/can/gw.c b/net/can/gw.c
+index 37528826935e..34d6b8c37b92 100644
+--- a/net/can/gw.c
++++ b/net/can/gw.c
+@@ -1265,6 +1265,12 @@ static struct pernet_operations cangw_pernet_ops = {
+ 	.exit_batch = cangw_pernet_exit_batch,
  };
  
-+static const struct rtnl_msg_handler dcbnl_rtnl_msg_handlers[] = {
-+	{NULL, PF_UNSPEC, RTM_GETDCB, dcb_doit, NULL, 0},
-+	{NULL, PF_UNSPEC, RTM_SETDCB, dcb_doit, NULL, 0},
++static const struct rtnl_msg_handler cgw_rtnl_msg_handlers[] = {
++	{THIS_MODULE, PF_CAN, RTM_NEWROUTE, cgw_create_job, NULL, 0},
++	{THIS_MODULE, PF_CAN, RTM_DELROUTE, cgw_remove_job, NULL, 0},
++	{THIS_MODULE, PF_CAN, RTM_GETROUTE, NULL, cgw_dump_jobs, 0},
 +};
 +
- static int __init dcbnl_init(void)
+ static __init int cgw_module_init(void)
  {
- 	int err;
-@@ -2416,8 +2421,7 @@ static int __init dcbnl_init(void)
- 	if (err)
- 		return err;
+ 	int ret;
+@@ -1290,27 +1296,13 @@ static __init int cgw_module_init(void)
+ 	if (ret)
+ 		goto out_register_notifier;
  
--	rtnl_register(PF_UNSPEC, RTM_GETDCB, dcb_doit, NULL, 0);
--	rtnl_register(PF_UNSPEC, RTM_SETDCB, dcb_doit, NULL, 0);
-+	rtnl_register_many(dcbnl_rtnl_msg_handlers);
+-	ret = rtnl_register_module(THIS_MODULE, PF_CAN, RTM_GETROUTE,
+-				   NULL, cgw_dump_jobs, 0);
+-	if (ret)
+-		goto out_rtnl_register1;
+-
+-	ret = rtnl_register_module(THIS_MODULE, PF_CAN, RTM_NEWROUTE,
+-				   cgw_create_job, NULL, 0);
+-	if (ret)
+-		goto out_rtnl_register2;
+-	ret = rtnl_register_module(THIS_MODULE, PF_CAN, RTM_DELROUTE,
+-				   cgw_remove_job, NULL, 0);
++	ret = rtnl_register_many(cgw_rtnl_msg_handlers);
+ 	if (ret)
+-		goto out_rtnl_register3;
++		goto out_rtnl_register;
  
  	return 0;
- }
+ 
+-out_rtnl_register3:
+-	rtnl_unregister(PF_CAN, RTM_NEWROUTE);
+-out_rtnl_register2:
+-	rtnl_unregister(PF_CAN, RTM_GETROUTE);
+-out_rtnl_register1:
++out_rtnl_register:
+ 	unregister_netdevice_notifier(&notifier);
+ out_register_notifier:
+ 	kmem_cache_destroy(cgw_cache);
 -- 
 2.39.5 (Apple Git-154)
 
