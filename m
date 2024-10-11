@@ -1,107 +1,121 @@
-Return-Path: <netdev+bounces-134598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47D6E99A574
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 15:52:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D57D299A5CD
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:09:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7597A1C22507
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 13:52:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA4E61F2243E
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80002218D98;
-	Fri, 11 Oct 2024 13:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DAA2185A5;
+	Fri, 11 Oct 2024 14:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdfuTpzC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3Gz4Nc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529412185B9;
-	Fri, 11 Oct 2024 13:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5C92185AF;
+	Fri, 11 Oct 2024 14:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728654770; cv=none; b=J6M+IHUEmeP7OrbCpQET2PRk6n8NVFJNh3Lho1mBJXmKtMQKjDIXFjxew0FPSgUftY92zGBwmACvKvBngR2xozYElE+Obgts/XzGEcRA7bZzzaxrf1ZkkcBHBIOo/hfPNGMEoEHHKy1HGTVq3Rp9tD6X85rXO5cjmus/sxPUyjM=
+	t=1728655783; cv=none; b=pwMaLr7iSaBTFSGu1ZPOZB7mWcik6hXl36vLTvn6VDubabWmB7B0+ftAQtrIE44qH6Pr4+lLygB2rOONaw61AYY9wCFi21sWKdEOmS+LWVsLQmT1b4HbMxIaIWPAjMja39ybPYeN1WhRDXT8Wtf0QfZkeXW/9NPtYhOSiB4roYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728654770; c=relaxed/simple;
-	bh=YpimA8c5con0pxEYgdVuNfg3HKik8NZXlPfITZ9AJIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eMyDlqnqgJJLla21NKlKf+axhcORUYk63RJihP4fYQqg1UBYw8q4Xkgg4+Ga9G2FPIGmtBWPxqqzUYY3rre/QgqYeNcHljIlzT64GcLiSeEimLblPMBcLBcGZTE82H6yZi5fQfm2BgGdzS51xS5CAdCeo8GnPxnVGak7Ee7fcHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mdfuTpzC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A33AEC4CECE;
-	Fri, 11 Oct 2024 13:52:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728654769;
-	bh=YpimA8c5con0pxEYgdVuNfg3HKik8NZXlPfITZ9AJIk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mdfuTpzC99Wu2IlCQBN0xUDH9VJORgNpbEqSQnpkaG7BExPTz63IgZYtQrl3v7I2k
-	 qDN5NCRD3HmbRiBOOPVgj7ZIxECOHp104qFI0jtv7Yg8rFRGq2WgPBWBOG7btKdqlu
-	 D224i9t/5ukkuQJunKIDlmnR1CNadf4MHBgFHcRfsr+1r8JxObLz7AhFad2Smiu8Tg
-	 au69aw548N6DPjtYLOo0thE92VUu2WbZqGtATMDeJZVu2q07qGvRTSaX9RHd77Ndum
-	 jMjL0fhx5pMmUyXCeTJjjJJjhXkiso+6ss0DzGs2ddNmJenKVIy8DYYpATVhj2XceI
-	 6QPhkWem5Pwzw==
-Date: Fri, 11 Oct 2024 09:52:48 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: James Chapman <jchapman@katalix.com>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Tom Parkin <tparkin@katalix.com>,
-	"David S . Miller" <davem@davemloft.net>, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.6 030/139] l2tp: don't use tunnel socket
- sk_user_data in ppp procfs output
-Message-ID: <ZwktsCI3Lsd0kaJq@sashalap>
-References: <20240925121137.1307574-1-sashal@kernel.org>
- <20240925121137.1307574-30-sashal@kernel.org>
- <20e00433-dc5c-74aa-6195-16281867dbb1@katalix.com>
+	s=arc-20240116; t=1728655783; c=relaxed/simple;
+	bh=kW9CDWhL8cU10uW30Ctc/KnAKpjn0N92tlitb9iuIII=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NuboeepslK1QCVvJKSCJK8ZMb3e8znlyivij1+n8op0mKoNy6bbuhIlRQcGPoCytfaxoAHw3FWHlIvLAItfgiMZlJc4Rl4kqr6pk7kGQQq9bXO4quetL+VXlWIvqMrPAttH2HyPdcghklWGQxgbT2uJU7inDOLCK56Q/rZ3l5HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R3Gz4Nc/; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-46040dadedfso19676351cf.1;
+        Fri, 11 Oct 2024 07:09:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728655780; x=1729260580; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=csdorD/XI9vvOYRw8oWUox4UAr37xXSbNh8csh0YlvE=;
+        b=R3Gz4Nc/bwVzExpNfEDGgoyuoBVNd8rRZuY0XWVReV5uhrjKgXXGg844OqxHL2zV/+
+         af3Ms58epqjeGpUa5OEElE55uKwFdHYK3qTXHvEq3/azETGpT9DQq6TbT8IfbSMoPajF
+         kf4ad2JQJ69cK0fx6JGnzZcj1Y787VSzWWGhoB8oZa4OLB0He6U4X8n2L+pPH/jwoDmP
+         Zy8Nj+PSW3Q+MfsY8oondFCSldSCRV3U9hkzYWqjPlrLSm/voN4WStwe3IZKsYonLvGq
+         XFUpJS7jvIcOi0TgDvJ2x2XdllFu2Lt35NoBcsX1Gg+UcMIFrl33g/07g2/OCmVjl0NF
+         /73A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728655780; x=1729260580;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=csdorD/XI9vvOYRw8oWUox4UAr37xXSbNh8csh0YlvE=;
+        b=GaY8q+WtIPgrc6LwbN7/MZddMvERZinbO4tuzsc+3aN0ARKxv8ded7sR41eQ30t0SM
+         pTgqARSzV+MkZ1LNLjoyMTj/h7dq50GowCTNDzuqHj89Rm25CL2TLdWagrxE9HYQcUHb
+         te0g2h3ZUB9SXh/CsnidKMDTmSGTm1V6pSF30prswuH9mUuVRqpfdpTsMKZqAQuT0l+D
+         Ah4TVJd5Dns3Ls1dNm9POlyMajyqiDclz3O++9tAAnv5+/emILbLS0W1ZLnQg+lRRxAh
+         BQHxkiCzHBGF2Bzu4Uinhz5Dcy5xFGGIMibUUsrbUSbhR9wSp2oTyd5Eyyogdezy9QQ3
+         DpxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcLBBBEuP5xKdDJxMMH4inoNfOby1gmF1Lz84zXEnKbAHoRasPK5pWJQdv0mGhVaEyUGwUtqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKDkwws/5p2W7QqX4xRjlpubH5luJRsV08DQeCruYEX7JLgE40
+	NR5KMJuPAeWuZrRfV+/HFuyc6npfHkKNGf07RkB0nbqh4vxAUyqq
+X-Google-Smtp-Source: AGHT+IHLko3U+XuJKW4KKsn1xXk814wIHDBygDMBFuKBHZLLU6nMu+8vFr1dqz3VYQ9FPYHGnkmDPw==
+X-Received: by 2002:a05:622a:1f07:b0:458:4ded:fe99 with SMTP id d75a77b69052e-4604bc2e4ffmr44246951cf.42.1728655780094;
+        Fri, 11 Oct 2024 07:09:40 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46042789ba9sm15573261cf.14.2024.10.11.07.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2024 07:09:39 -0700 (PDT)
+Date: Fri, 11 Oct 2024 10:09:38 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, 
+ kernel-team@cloudflare.com, 
+ Ivan Babrou <ivan@cloudflare.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ stable@vger.kernel.org
+Message-ID: <670931a2edb62_234aca29433@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+References: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+Subject: Re: [PATCH net v2] udp: Compute L4 checksum as usual when not
+ segmenting the skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20e00433-dc5c-74aa-6195-16281867dbb1@katalix.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 25, 2024 at 03:27:23PM +0100, James Chapman wrote:
->On 25/09/2024 13:07, Sasha Levin wrote:
->>From: James Chapman <jchapman@katalix.com>
->>
->>[ Upstream commit eeb11209e000797d555aefd642e24ed6f4e70140 ]
->>
->>l2tp's ppp procfs output can be used to show internal state of
->>pppol2tp. It includes a 'user-data-ok' field, which is derived from
->>the tunnel socket's sk_user_data being non-NULL. Use tunnel->sock
->>being non-NULL to indicate this instead.
->>
->>Signed-off-by: James Chapman <jchapman@katalix.com>
->>Signed-off-by: Tom Parkin <tparkin@katalix.com>
->>Signed-off-by: David S. Miller <davem@davemloft.net>
->>Signed-off-by: Sasha Levin <sashal@kernel.org>
->>---
->>  net/l2tp/l2tp_ppp.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->>diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
->>index 6146e4e67bbb5..6ab8c47487161 100644
->>--- a/net/l2tp/l2tp_ppp.c
->>+++ b/net/l2tp/l2tp_ppp.c
->>@@ -1511,7 +1511,7 @@ static void pppol2tp_seq_tunnel_show(struct seq_file *m, void *v)
->>  	seq_printf(m, "\nTUNNEL '%s', %c %d\n",
->>  		   tunnel->name,
->>-		   (tunnel == tunnel->sock->sk_user_data) ? 'Y' : 'N',
->>+		   tunnel->sock ? 'Y' : 'N',
->>  		   refcount_read(&tunnel->ref_count) - 1);
->>  	seq_printf(m, " %08x %ld/%ld/%ld %ld/%ld/%ld\n",
->>  		   0,
->
->This change isn't needed in 6.6. The commit was part of a series for 
->6.12 that removed use of sk_user_data in l2tp tunnel sockets.
+Jakub Sitnicki wrote:
+> If:
+> 
+>   1) the user requested USO, but
+>   2) there is not enough payload for GSO to kick in, and
+>   3) the egress device doesn't offer checksum offload, then
+> 
+> we want to compute the L4 checksum in software early on.
+> 
+> In the case when we are not taking the GSO path, but it has been requested,
+> the software checksum fallback in skb_segment doesn't get a chance to
+> compute the full checksum, if the egress device can't do it. As a result we
+> end up sending UDP datagrams with only a partial checksum filled in, which
+> the peer will discard.
+> 
+> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+> Reported-by: Ivan Babrou <ivan@cloudflare.com>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Acked-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Cc: stable@vger.kernel.org
 
-I'll drop it, thanks!
-
--- 
-Thanks,
-Sasha
+You already included my Acked-by, but just to confirm: LGTM.
 
