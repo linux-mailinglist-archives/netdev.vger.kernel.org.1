@@ -1,222 +1,227 @@
-Return-Path: <netdev+bounces-134579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A53799A408
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:38:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F9C99A416
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E092D2828D4
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:38:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B9231F22C89
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73132178EA;
-	Fri, 11 Oct 2024 12:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D56520C470;
+	Fri, 11 Oct 2024 12:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uuC8Ej9X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eN7kDlm/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B6A20ADF6;
-	Fri, 11 Oct 2024 12:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B051BE857
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728650319; cv=none; b=BxGDMazKo9hOpFfsZqPrM88JoouTfwcbE//a1EgTzztypWzN8ESlavbyzlzb+3uscWoZE9Bz1FtbJN5FI3yGGekRNngfyheIgaMj8Ub1DdXRltiIynWb0DK5qMz6UI6NZ3nhDs6jFveZZxvlOzU2IpkaZULc1sB5JMsexUlSUCI=
+	t=1728650463; cv=none; b=PoruadiHQWhW1bIWxWtGMaufMz9RSDwnTYSsBvFHNkTDx1W1SpwybZA3bebXBhYhu02w6CXZ/pS/Ss7WAyQ4DLv6hLkKgI6+k7hgNDhoEiM5IAGzPDwl4aSsytonkR9c9tVeY2g1c/VS2fXHU3QD4O2fjJxX2GXJ5PSIJTGpKYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728650319; c=relaxed/simple;
-	bh=foG8+vckoR1mQ2glQADILcmJ6jiSNlJ3mZrxtgFpCKk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=V/5JJ4bqBeZFQf4a6tl5X8R86z9qasHJMzGK9rtbWIyon3NDfzDb0409BAZJ7WI6+kfAsZbi/M+4uagFzgFFz2OnxQCly5nqBfU1nf/jT4tMMF3SnZHGrPZ/DzGEiB7kRhX05olV1pCLJmyzrzhA0/EUSzebE9rysCb6qKPDwAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uuC8Ej9X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1251FC4CEC3;
-	Fri, 11 Oct 2024 12:38:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728650319;
-	bh=foG8+vckoR1mQ2glQADILcmJ6jiSNlJ3mZrxtgFpCKk=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=uuC8Ej9XJA65Q2h/HJ7zNH1oU8lvpVAtFtS48dryytT/XrVJ/LyW5MZ53lg49WCiw
-	 rNjfKelnOyschGSmq+wW+393y0CW/TtXYHJ5w4zFaWFzu/JN5pKUHG9lBgXsokOJue
-	 /CbTAfeXBbGyd4Cag+CJJAcbm0pzFf6wUDQmbzaCDZE8SYCc4R0mWWbgsXzrWm7/cn
-	 90luO8XQv/Cs4CtQhJuM7ntW7ECPYnLit7Y0bJ2EnGxTpr2Qjb1v2FMftKZylYqWh0
-	 C6zJUTpqis466BBsctvPlIsmXmhFZHRJEeWKrtHy8JMYGbAsrw9kDZ43uFanLr37wv
-	 p+pTGFdQz/X5g==
-Message-ID: <b0cf00eec77014ad473d4510904eb2d4fd084e5a.camel@kernel.org>
-Subject: Re: [PATCH v3 -next 11/15] sunrpc: use vfs_pressure_ratio() helper
-From: Jeff Layton <jlayton@kernel.org>
-To: NeilBrown <neilb@suse.de>
-Cc: Kaixiong Yu <yukaixiong@huawei.com>, akpm@linux-foundation.org, 
- mcgrof@kernel.org, ysato@users.sourceforge.jp, dalias@libc.org, 
- glaubitz@physik.fu-berlin.de, luto@kernel.org, tglx@linutronix.de, 
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-  viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
- kees@kernel.org,  j.granados@samsung.com, willy@infradead.org,
- Liam.Howlett@oracle.com,  vbabka@suse.cz, lorenzo.stoakes@oracle.com,
- trondmy@kernel.org, anna@kernel.org,  chuck.lever@oracle.com,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, 
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  paul@paul-moore.com, jmorris@namei.org,
- linux-sh@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
- linux-security-module@vger.kernel.org, dhowells@redhat.com, 
- haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com,
- shikemeng@huaweicloud.com,  dchinner@redhat.com, bfoster@redhat.com,
- souravpanda@google.com,  hannes@cmpxchg.org, rientjes@google.com,
- pasha.tatashin@soleen.com,  david@redhat.com, ryan.roberts@arm.com,
- ying.huang@intel.com,  yang@os.amperecomputing.com, zev@bewilderbeest.net,
- serge@hallyn.com,  vegard.nossum@oracle.com, wangkefeng.wang@huawei.com,
- sunnanyong@huawei.com
-Date: Fri, 11 Oct 2024 08:38:32 -0400
-In-Reply-To: <172859659591.444407.1507982523726708908@noble.neil.brown.name>
-References: <>, <12ec5b63b17b360f2e249a4de0ac7b86e09851a3.camel@kernel.org>
-	 <172859659591.444407.1507982523726708908@noble.neil.brown.name>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1728650463; c=relaxed/simple;
+	bh=03qUdkV7dQjNZlV4Qwk4y2Hey13QcB/7p5Lmnsm8hl0=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=WyJvAcIPNJ+4PGzZTN5k55d1GbyLQPvgKmUDtpKCAFBsvgazOSNmPMQhHLzXTxGPrA3dZxTslvvoetz7FNv/FdijJvM3/qBPQABNbwWG6KcanBMoD9CQBhtfolVcsvudwtzmC6RSa4LTxHZIowifNZ09ShVruWSuVECTHTp7xzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eN7kDlm/; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9977360f9fso268624266b.0
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728650460; x=1729255260; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:cc:to:autocrypt:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gzkMRpIEVAFDCaGxuwOV0xI2CkUbjyWzRopUv1q7gB0=;
+        b=eN7kDlm/AhyejEtu5xJVNXZ9QGbfFOZYenqBpGhc2ugi3fW80KgPo6/tFwRk03J6Fd
+         UC9UgAlNEnAZ2y9G88nZ0BGcKxTuKYz9NTFZ+tOX/YDKohlW/GKVY01KjwEP8r1LPXBw
+         2CQH0g8GNrWqA/TPWu2gZZ1z78GK/+SUifO1O2QlkYqbX4JW1wHsF202UZIux43ZUMyA
+         Rs1xrxe6PPNf/UDa/sXsSuOSVrgoASEZGLEY13sfU1XuKsD8RjvxpgvfRtvLw/wM4xnf
+         OyEF1xrnGSAmr9e5CQqIgwvsSW2UdZcbAPVdpJwq7y8WOFvBpH80PWVWaYZ4b/WB5MQP
+         B1Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728650460; x=1729255260;
+        h=content-transfer-encoding:subject:cc:to:autocrypt:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gzkMRpIEVAFDCaGxuwOV0xI2CkUbjyWzRopUv1q7gB0=;
+        b=KMoRdXaIqFBLvWw8VMEMeJgMyDq7cJ0oMNg5aHkULclBK6pgusObEkANYQJgWG5WNK
+         hvKnKPztp0rQtsgosRupo12aGZ8UnJ6Kof6i7UEovotBuYNI8sdmCs1T1AP5H0kChX6D
+         ws52DBD5+YBwVvPsQ4Q0zNav/XPx9kSSQU/Dr0a53HN88rcFEB0pZdYWvo+jiXcjN70Z
+         UHAXWVvF8PvNtmjWzDDLd/qJfcF2Z8tib2UfvdYcO5CTU9DnP5kAnv+C5RgiRrywukc1
+         Z1dAMZl5BPtr9ebpp45hAClcMz7C48VFTad8Kpf8aGXgGAGfoo1W+t/QR7pBWuAP3nJR
+         0Gzg==
+X-Gm-Message-State: AOJu0Ywcb9Q6kMtfmSEHgCQo3mIBYd9jcLydDSNdz8tX9A0kK068X4bb
+	Tg/k7kDf20ALs/nr71j3eFukqA40WNsFtVjqAJBm/Kr017IUPkUT
+X-Google-Smtp-Source: AGHT+IEg1HjY+Tap+MkrK8JKRkLvaHcOLhLsBV30435rp7apR1h2VC64sQooS84EoKy4UT/dVqVepQ==
+X-Received: by 2002:a17:907:efde:b0:a99:3f4e:6de8 with SMTP id a640c23a62f3a-a99b966bddbmr204721066b.64.1728650459646;
+        Fri, 11 Oct 2024 05:40:59 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:afd7:9a00:c812:cea1:cecd:d47e? (dynamic-2a02-3100-afd7-9a00-c812-cea1-cecd-d47e.310.pool.telefonica.de. [2a02:3100:afd7:9a00:c812:cea1:cecd:d47e])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a99ccb76c26sm20527566b.45.2024.10.11.05.40.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 05:40:59 -0700 (PDT)
+Message-ID: <a3b9d8d5-55e3-4881-ac47-aa98d1a86532@gmail.com>
+Date: Fri, 11 Oct 2024 14:40:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: [PATCH net-next v3] r8169: use the extended tally counter available
+ from RTL8125
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2024-10-11 at 08:43 +1100, NeilBrown wrote:
-> On Fri, 11 Oct 2024, Jeff Layton wrote:
-> > On Thu, 2024-10-10 at 23:22 +0800, Kaixiong Yu wrote:
-> > > Use vfs_pressure_ratio() to simplify code.
-> > >=20
-> > > Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
-> > > Reviewed-by: Kees Cook <kees@kernel.org>
-> > > Acked-by: Anna Schumaker <anna.schumaker@oracle.com>
-> > > ---
-> > >  net/sunrpc/auth.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/net/sunrpc/auth.c b/net/sunrpc/auth.c
-> > > index 04534ea537c8..3d2b51d7e934 100644
-> > > --- a/net/sunrpc/auth.c
-> > > +++ b/net/sunrpc/auth.c
-> > > @@ -489,7 +489,7 @@ static unsigned long
-> > >  rpcauth_cache_shrink_count(struct shrinker *shrink, struct shrink_co=
-ntrol *sc)
-> > > =20
-> > >  {
-> > > -	return number_cred_unused * sysctl_vfs_cache_pressure / 100;
-> > > +	return vfs_pressure_ratio(number_cred_unused);
-> > >  }
-> > > =20
-> > >  static void
-> >=20
-> > Acked-by: Jeff Layton <jlayton@kernel.org>
-> >=20
->=20
-> I realise this is a bit of a tangent, and I'm not objecting to this
-> patch, but I wonder what the justification is for using
-> vfs_cache_pressure here.  The sysctl is documented as
->=20
->    This percentage value controls the tendency of the kernel to reclaim
->    the memory which is used for caching of directory and inode objects.
->=20
-> So it can sensibly be used for dentries and inode, and for anything
-> directly related like the nfs access cache (which is attached to inodes)
-> and the nfs xattr cache.
->=20
-> But the sunrpc cred cache scales with the number of active users, not
-> the number of inodes/dentries.
->=20
-> So I think this should simply "return number_cred_unused;".
->=20
-> What do others think?
->=20
-> NeilBrown
->=20
+The new hw stat fields partially duplicate existing fields, but with a
+larger field size now. Use these new fields to reduce the risk of
+overflows. In addition add support for relevant new fields which are
+available from RTL8125 only.
 
------------------8<------------------
- * @count_objects should return the number of freeable items in the cache. =
-If
- * there are no objects to free, it should return SHRINK_EMPTY, while 0 is
- * returned in cases of the number of freeable items cannot be determined
- * or shrinker should skip this cache for this time (e.g., their number
- * is below shrinkable limit)...
------------------8<------------------
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+v2:
+- added code for enabling the extended tally counter
+- included relevant new fields 
+v3:
+- fixed a clang compiler warning
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 40 ++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
-number_cred_unused does sound like a better way to report this.
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 1a2322824..8d869f757 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -1777,11 +1777,26 @@ static const char rtl8169_gstrings[][ETH_GSTRING_LEN] = {
+ 	"tx_underrun",
+ };
+ 
++static const char rtl8125_gstrings[][ETH_GSTRING_LEN] = {
++	"tx_bytes",
++	"rx_bytes",
++	"tx_pause_on",
++	"tx_pause_off",
++	"rx_pause_on",
++	"rx_pause_off",
++};
++
+ static int rtl8169_get_sset_count(struct net_device *dev, int sset)
+ {
++	struct rtl8169_private *tp = netdev_priv(dev);
++
+ 	switch (sset) {
+ 	case ETH_SS_STATS:
+-		return ARRAY_SIZE(rtl8169_gstrings);
++		if (rtl_is_8125(tp))
++			return ARRAY_SIZE(rtl8169_gstrings) +
++			       ARRAY_SIZE(rtl8125_gstrings);
++		else
++			return ARRAY_SIZE(rtl8169_gstrings);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -1873,13 +1888,33 @@ static void rtl8169_get_ethtool_stats(struct net_device *dev,
+ 	data[10] = le32_to_cpu(counters->rx_multicast);
+ 	data[11] = le16_to_cpu(counters->tx_aborted);
+ 	data[12] = le16_to_cpu(counters->tx_underrun);
++
++	if (rtl_is_8125(tp)) {
++		data[5] = le32_to_cpu(counters->align_errors32);
++		data[10] = le64_to_cpu(counters->rx_multicast64);
++		data[11] = le32_to_cpu(counters->tx_aborted32);
++		data[12] = le32_to_cpu(counters->tx_underrun32);
++
++		data[13] = le64_to_cpu(counters->tx_octets);
++		data[14] = le64_to_cpu(counters->rx_octets);
++		data[15] = le32_to_cpu(counters->tx_pause_on);
++		data[16] = le32_to_cpu(counters->tx_pause_off);
++		data[17] = le32_to_cpu(counters->rx_pause_on);
++		data[18] = le32_to_cpu(counters->rx_pause_off);
++	}
+ }
+ 
+ static void rtl8169_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+ {
++	struct rtl8169_private *tp = netdev_priv(dev);
++
+ 	switch(stringset) {
+ 	case ETH_SS_STATS:
+ 		memcpy(data, rtl8169_gstrings, sizeof(rtl8169_gstrings));
++		if (rtl_is_8125(tp)) {
++			data += sizeof(rtl8169_gstrings);
++			memcpy(data, rtl8125_gstrings, sizeof(rtl8125_gstrings));
++		}
+ 		break;
+ 	}
+ }
+@@ -3894,6 +3929,9 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
+ 		break;
+ 	}
+ 
++	/* enable extended tally counter */
++	r8168_mac_ocp_modify(tp, 0xea84, 0, BIT(1) | BIT(0));
++
+ 	rtl_hw_config(tp);
+ }
+ 
+-- 
+2.47.0
 
---=20
-Jeff Layton <jlayton@kernel.org>
+
 
