@@ -1,113 +1,98 @@
-Return-Path: <netdev+bounces-134547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD9E99A086
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 11:57:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0CD099A08F
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 11:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5226B25962
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 09:57:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2A5C1C216BC
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 09:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C20420FAA4;
-	Fri, 11 Oct 2024 09:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4543220FABE;
+	Fri, 11 Oct 2024 09:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8GyoRfR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uu45pac7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AE320C497
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 09:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1929020FA9C;
+	Fri, 11 Oct 2024 09:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728640528; cv=none; b=sqDi4dqTBSgA+gIew+R22697NBRK/STViBn3BxCIJeGU6562Lvg3DqSVCAyXsf+iRxNMhcBmF2jokU+QXXycZ0HIPaRSt61Zr0uOaODELfz8lYzaXNvuLbqhErSJl+i9hz+TLoYeQapS6R+TFpR+XCsRJ5t9cqBHhpXj0yDnpUM=
+	t=1728640639; cv=none; b=kTyl2IgecFr7QTtP0PmWLhJ4MMcI0OOJ2E43rEsvt8mQ6jkzRSFkt8m/yjkyitn+NbSuhT230o6auIa9JDuhHHqM4AP4ijZmk+V/Si2K02+qtraNMCLxAvzfw4s+BIIK71jQU8fCTP4Rqec3EUmSx/7lSMxLuOTEH3CyjkniuDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728640528; c=relaxed/simple;
-	bh=Hhsc/6vfZZzCx7r2Yk6BPq7a8poQ9ed8Zsq5qiJ1W1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m9HGcl4ZYRdfSbkzuUsEnNXzXID11t5BrbHwN4AXDqpGqhqarSP1b6ApH8YhnxiBIZ0ITHIHwiuJFR0hH9Dv6qTb/aZennZMVA0dGhvf6aFZr0fyskYqARBQHPrRtpQ0f4TFUz/v13DFcFvf/B00buAX8QIV/p/M5NfDLnxr/v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8GyoRfR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE20EC4CEC3;
-	Fri, 11 Oct 2024 09:55:24 +0000 (UTC)
+	s=arc-20240116; t=1728640639; c=relaxed/simple;
+	bh=Rz/W9QlH6CCASPfisYQo2Uxdr9sj88V+CDnZpNAOLWY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CgBtZFnMANesP8Y20oUq+pDa8o+1r/gsalTXyMRWPn37tGWWLKWtnENhCqhriuNQHyTMDkCCqdNXlBzrXPWNiY3UevGic2lAR7QWKBWvQ912I5dhrUxoulPxJ6k89gu9xGHFHMMEhNV2nA1TyV+5BtT9ZPfAJ2HHWHxBBjsVcB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uu45pac7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F0D7C4CEC3;
+	Fri, 11 Oct 2024 09:57:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728640526;
-	bh=Hhsc/6vfZZzCx7r2Yk6BPq7a8poQ9ed8Zsq5qiJ1W1w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R8GyoRfRKaAXNGGjC2w0hd4rY7eSkA/ZS+YYqXfL5dchzajs9QBUXr/MZix2qM8D0
-	 l2Icda5peRiqp18Fqoh1N4vwMtORQDhNFzqY647y5dMyrL93adwVrF0Eq3KeoKL9ka
-	 TCU4lga3sIkVSZNasrhVw/X7PZ1bCxOVqqyNQ2NSa55S7m3I4YGcK7BYZFbZdqQDl7
-	 IpJh7BWaska3Vjy+0bTwczvr17MVg6grqdIwe3DZ6z/nU5WkT2GiFGtYEo5PYZOfnS
-	 sU44ROQEK9V43n3KPBp6yxUzTRUxjL12m67EEvoMRXZGfH6mLv3bNyp+nC9Em6ONC9
-	 QxoUL2exHKgoA==
-Date: Fri, 11 Oct 2024 10:55:22 +0100
+	s=k20201202; t=1728640638;
+	bh=Rz/W9QlH6CCASPfisYQo2Uxdr9sj88V+CDnZpNAOLWY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Uu45pac7QlRCjDze5nXkdD3zdJRa8iASemsM6nXnwldHPXwQ5b4L/JUsH+wbmbNDw
+	 oDP2kOGu7RArTS+Fb33fCO2Gv8DpZAkRZVi1H9NwVfXsU605YwWCA9/aebTPMNdYql
+	 EFW9ycJ7FMxOw64JIHx2n9Wkg0EZ+u4yHVWMsFwwDO4dQoZU3OLiFiw04z5TmlqAlU
+	 1ixVxAF0QTTeo83suulLa4SEDDi4zKY3gCc4Hy4P38PkPbr/U7KLysbkQS9eF7SY50
+	 nJ4kZdICJgqAyx53rkUtiB6EOM6EVQsfqBH9gHUQJt2oesInVFBGMPKWm0lmz552IV
+	 0DWKPXb3dXhCQ==
 From: Simon Horman <horms@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2] r8169: use the extended tally counter
- available from RTL8125
-Message-ID: <20241011095522.GE66815@kernel.org>
-References: <43b100c5-9d53-46eb-bee0-940ab948722a@gmail.com>
- <30edd5d2-13aa-409f-9b12-f0c775c81f02@gmail.com>
+Subject: [PATCH net-next 0/3] net: String format safety updates
+Date: Fri, 11 Oct 2024 10:57:09 +0100
+Message-Id: <20241011-string-thing-v1-0-acc506568033@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <30edd5d2-13aa-409f-9b12-f0c775c81f02@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHX2CGcC/x2MywqAIBAAfyX2nKBW9PiV6FC22V62UAlB/Pesy
+ 8AcZhJ4dIQepiqBw4c8XVxE1RWYc2WLgvbioKVulVRK+OCIrQjnRzOu7WB0tzX9ACW5HR4U/90
+ MjEEwxgBLzi/82WLDaAAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Jiawen Wu <jiawenwu@trustnetic.com>, 
+ Mengyuan Lou <mengyuanlou@net-swift.com>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Jeffrey Hugo <quic_jhugo@quicinc.com>, 
+ Carl Vanderlip <quic_carlv@quicinc.com>, Oded Gabbay <ogabbay@kernel.org>, 
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, llvm@lists.linux.dev, 
+ linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org
+X-Mailer: b4 0.14.0
 
-On Thu, Oct 10, 2024 at 10:08:02PM +0200, Heiner Kallweit wrote:
-> On 10.10.2024 12:50, Heiner Kallweit wrote:
-> > The new hw stat fields partially duplicate existing fields, but with a
-> > larger field size now. Use these new fields to reduce the risk of
-> > overflows. In addition add support for relevant new fields which are
-> > available from RTL8125 only.
-> > 
-> > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Hi,
 
-...
+This series addresses string format safety issues that are
+flagged by tooling in files touched by recent patches.
 
-> > @@ -1873,13 +1888,33 @@ static void rtl8169_get_ethtool_stats(struct net_device *dev,
-> >  	data[10] = le32_to_cpu(counters->rx_multicast);
-> >  	data[11] = le16_to_cpu(counters->tx_aborted);
-> >  	data[12] = le16_to_cpu(counters->tx_underrun);
-> > +
-> > +	if (rtl_is_8125(tp)) {
-> > +		data[5] = le32_to_cpu(counters->align_errors32);
-> > +		data[10] = le64_to_cpu(counters->rx_multicast64);
-> > +		data[11] = le32_to_cpu(counters->tx_aborted32);
-> > +		data[12] = le32_to_cpu(counters->tx_underrun32);
-> > +
-> > +		data[13] = le64_to_cpu(counters->tx_octets);
-> > +		data[14] = le64_to_cpu(counters->rx_octets);
-> > +		data[15] = le32_to_cpu(counters->tx_pause_on);
-> > +		data[16] = le32_to_cpu(counters->tx_pause_off);
-> > +		data[17] = le32_to_cpu(counters->rx_pause_on);
-> > +		data[18] = le32_to_cpu(counters->rx_pause_off);
-> > +	}
-> >  }
-> >  
-> >  static void rtl8169_get_strings(struct net_device *dev, u32 stringset, u8 *data)
-> >  {
-> >  	switch(stringset) {
-> >  	case ETH_SS_STATS:
-> > +		struct rtl8169_private *tp = netdev_priv(dev);
-> 
-> patchwork lists the following warning for a clang build:
-> warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
-> 
-> gcc 14.2.1 however had no problem with this code, and also checkpatch didn't
-> complain. Is this code acceptable or should it be changed?
+I do not believe that any of these issues are bugs.
+Rather, I am providing these updates as I think there is a value
+in addressing such warnings so real problems stand out.
 
-Yes, I see that too.
-My feeling is that it would be best to change it as it
-seems likely that this will break compilation somewhere.
+---
+Simon Horman (3):
+      net: dsa: microchip: copy string using strscpy
+      net: txgbe: Pass string literal as format argument of alloc_workqueue()
+      accel/qaic: Pass string literal as format argument of alloc_workqueue()
+
+ drivers/accel/qaic/qaic_drv.c                  | 4 ++--
+ drivers/net/dsa/microchip/ksz_ptp.c            | 2 +-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+base-commit: 59ae83dcf102710f097aa14de88ea5cb1396b866
+
 
