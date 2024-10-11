@@ -1,185 +1,261 @@
-Return-Path: <netdev+bounces-134717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 250A599AEA0
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:25:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E12699AEC3
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9BCA2842F1
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:25:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBA2C1F24750
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1781D1F73;
-	Fri, 11 Oct 2024 22:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30841D0E30;
+	Fri, 11 Oct 2024 22:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D2krYZPa"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="NYzjn6q6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D5F1D1E8F
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E241322E;
+	Fri, 11 Oct 2024 22:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728685524; cv=none; b=NOe7tMJareSRBfJhOn/jrEg3BQ19kPLARiB9g9bfqHaXaZpNMUS/9fwZO3cFv9YIJHZm4ooaaPclcUV0vWKIhRCjVzlc0GxLN3FIuqg15rK9xXgMaeRJFaV0fhHxH2cjxcDsatcGdP9WM5g4up8cLFi2yqflayclPKYgVIF59mY=
+	t=1728686864; cv=none; b=vD3tVqlBHGV5+CETR2UdWJPJ3EXek/dRXSTDmTdPHnBWCoj+Uq89sEhYd8f6u1x8/Jerq/+BvzQ+R7f6pvtvFpTMzfKh3h9CQN8Zvw38AhwWGQmuhhTDOP9xwLCbkUppQUzFhKNkGQGLCZu7uH3kn7xJChRqd/wmbN15b+otM4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728685524; c=relaxed/simple;
-	bh=w+c2SiNGG+gLk+w9NxyvDJ39A6vf4qDArBdQMZWltIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jZ4Fvtkm5mk3ctqXm53wTYNM19CC17oUkX+4ZN6hHgSfHn88rUpsIbanLN+YmOB7NDQNc4qxQWmq+nRRmktpKjC62ezFvqDt7bLJGZJJeOYltPsNmm2QNJmKo9t8bBiSl6c1S3PLxZ6ygj2ixr1WGFk3k77U18VzdhP9nI/aJkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D2krYZPa; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4601a471aecso28971cf.1
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 15:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728685522; x=1729290322; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+h1NaO52L3keADit4L5nzUma14WANm1zayjXQh4SvHQ=;
-        b=D2krYZPagzumVze09YQsC6N1fBm8AgPYtRwsBKHQClvWv4hEDGl+vNaGdnIT+SXB0A
-         c5xECfR9HphUh4wZPjBEkAxvaIpIRiwSbnoCwdRE4mmjUrayCpsu/pZH00HW6kL9bZnI
-         +JQRVzpxdvxGdAL6a4pRgegFvWEd3OPWlgJVE01dpvCp4IcP68cgM3ZFBpnxpX7oO0ml
-         yrjPXTqupKuayqviHyw6q2xr4Hfn/r51KBB/o9rRvap+pR/tkWwPODawDR1d4bU5apFO
-         KAGADpMtFvXqBJq4wncL98yYrehsQZgrbQOrQCVjmp4Rmr1g8l/cbFQh4tasdib+OGMq
-         kbww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728685522; x=1729290322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+h1NaO52L3keADit4L5nzUma14WANm1zayjXQh4SvHQ=;
-        b=ZFqC/07SYaaVsVxTabLuoQGQvDY8JtB6VX39abx7Z1S0gkOqzkQFBLVA74IhuUEUC2
-         yXHcl8Fev4x0vwxmu4ZUrbPnlQYz0okhcw8AJAkMnRfpCa65VAcuz8jkkKATml/CQTuf
-         xHbuOgnbQ/lQuyr6uvEgLAUlW+j5g+h9bkNP2Udms/wZqDvYJHMLAC0Rd4np/raPPXch
-         pt+/TMEQj7GowHYuxhNOtnL0TuGZB9MmiUYmwaDDAlptVenxx98yRQDEs1+OOJAFmgTy
-         NEbkGmIWEgAtatwd0c7veIaqDRHTEo9sYQ2dI0KUYNbWXsMC+qRUfe3+Rq0rwGDrvLe2
-         dqfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVexgcgj1bkzs6RgudB7OD/f7fFICxoajBpM6WTc6JUSZVyndyIBJUBnDYmxyORAks9PU5n5PA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKUxhYHbUoXhP4Pqc/52QOb5D/VpmhwUjG4bvXPGH12lHyFiRt
-	HROVZqVXmUqVnUWNvMUWSLh0cJL1AY0ynAFTGycAp/CngSvuiwpgmigjQYj9OLnTeONqRJEsWZV
-	2dZjNFLjLK6pns3AfiuMW4Mdj2LSWFkeXsSjb
-X-Google-Smtp-Source: AGHT+IENA48OF10aYR6nuRZ+tX1ZxiXrHm2fXSiVlqt36ndGljZvf0/XxUlhuguOH+iK73QV9cNSMl03PeEGVd4H0uY=
-X-Received: by 2002:ac8:648a:0:b0:460:491e:d2a2 with SMTP id
- d75a77b69052e-46059c4a1f7mr310371cf.17.1728685521286; Fri, 11 Oct 2024
- 15:25:21 -0700 (PDT)
+	s=arc-20240116; t=1728686864; c=relaxed/simple;
+	bh=wnFR1KMTiXA09NIs9BwaYu51mrqwZTB59Q9vEXxNXso=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SnC5V+UbDL2bF9uiQk09rXG1wkkV/Gyu1YqR8cr9oFepBhjRpa1ic3VhKitNfq4tayqyDJqEH4pyP+rciQQm1hgphzKoYDQKuHXCY5FS2lsn+lEUE+42YTAHESfv7OMZoC9hMwbB8QZFuYk/fYuTZfbFlipafWpAQVCCJrW7cRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=NYzjn6q6; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=9CRHsu/4o39+CfyKz29v8UH0rvLQukqd+SAqdLtdYMw=; b=NYzjn6q6/VZsZOTv
+	YuwEHN3T+ilzOSydXXopeNegjUEP7U1aH9arTDN+EUAxCNC3EFZFc9shZURtRnharQMYgsWzAhoh1
+	vCD41DNSdT18mmQW8rc9ZGW6a5YbmD0UowPjrY+2DfOw5u6wl2FnHpee3+9TLM7UhfetX0ct3Dru1
+	e3s5aS3Y8AaeLxtShcT2Uvi6Q1pid0C9oniQkQvNy6pSnBu9g5vldSq1K4LVQw6u81o5oqzXhf+t2
+	ktofP1Hkp3bOfA5PuSAGB2KbIareUsX+BfgRR1XFEPo0xM8t+jPWECH6KegY2N+CqqEBz/5OWXjqp
+	WHW1roQkYXvochH4Og==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1szOQ5-00AcNy-2i;
+	Fri, 11 Oct 2024 22:47:37 +0000
+From: linux@treblig.org
+To: idryomov@gmail.com,
+	xiubli@redhat.com,
+	ceph-devel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] libceph: Remove crush deadcode
+Date: Fri, 11 Oct 2024 23:47:36 +0100
+Message-ID: <20241011224736.236863-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-4-dw@davidwei.uk>
- <ZwVT8AnAq_uERzvB@mini-arch> <ade753dd-caab-4151-af30-39de9080f69b@gmail.com>
- <ZwavJuVI-6d9ZSuh@mini-arch> <b2aa16ac-a5fe-4bab-a047-8f38086f4d43@davidwei.uk>
- <7d321d9e-48bb-4e5f-bca5-6a6c940e3a9a@gmail.com>
-In-Reply-To: <7d321d9e-48bb-4e5f-bca5-6a6c940e3a9a@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 11 Oct 2024 15:25:08 -0700
-Message-ID: <CAHS8izM4AVsB5+H4p05D_m-cwO5TqHfn28XfNUM-rDAO5=BTew@mail.gmail.com>
-Subject: Re: [PATCH v1 03/15] net: generalise net_iov chunk owners
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, Stanislav Fomichev <stfomichev@gmail.com>, io-uring@vger.kernel.org, 
-	netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 11, 2024 at 3:02=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 10/11/24 19:44, David Wei wrote:
-> > On 2024-10-09 09:28, Stanislav Fomichev wrote:
-> >> On 10/08, Pavel Begunkov wrote:
-> >>> On 10/8/24 16:46, Stanislav Fomichev wrote:
-> >>>> On 10/07, David Wei wrote:
-> >>>>> From: Pavel Begunkov <asml.silence@gmail.com>
-> >>>>>
-> >>>>> Currently net_iov stores a pointer to struct dmabuf_genpool_chunk_o=
-wner,
-> >>>>> which serves as a useful abstraction to share data and provide a
-> >>>>> context. However, it's too devmem specific, and we want to reuse it=
- for
-> >>>>> other memory providers, and for that we need to decouple net_iov fr=
-om
-> >>>>> devmem. Make net_iov to point to a new base structure called
-> >>>>> net_iov_area, which dmabuf_genpool_chunk_owner extends.
-> >>>>>
-> >>>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >>>>> Signed-off-by: David Wei <dw@davidwei.uk>
-> >>>>> ---
-> >>>>>    include/net/netmem.h | 21 ++++++++++++++++++++-
-> >>>>>    net/core/devmem.c    | 25 +++++++++++++------------
-> >>>>>    net/core/devmem.h    | 25 +++++++++----------------
-> >>>>>    3 files changed, 42 insertions(+), 29 deletions(-)
-> >>>>>
-> >>>>> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> >>>>> index 8a6e20be4b9d..3795ded30d2c 100644
-> >>>>> --- a/include/net/netmem.h
-> >>>>> +++ b/include/net/netmem.h
-> >>>>> @@ -24,11 +24,20 @@ struct net_iov {
-> >>>>>           unsigned long __unused_padding;
-> >>>>>           unsigned long pp_magic;
-> >>>>>           struct page_pool *pp;
-> >>>>> - struct dmabuf_genpool_chunk_owner *owner;
-> >>>>> + struct net_iov_area *owner;
-> >>>>
-> >>>> Any reason not to use dmabuf_genpool_chunk_owner as is (or rename it
-> >>>> to net_iov_area to generalize) with the fields that you don't need
-> >>>> set to 0/NULL? container_of makes everything harder to follow :-(
-> >>>
-> >>> It can be that, but then io_uring would have a (null) pointer to
-> >>> struct net_devmem_dmabuf_binding it knows nothing about and other
-> >>> fields devmem might add in the future. Also, it reduces the
-> >>> temptation for the common code to make assumptions about the origin
-> >>> of the area / pp memory provider. IOW, I think it's cleaner
-> >>> when separated like in this patch.
-> >>
-> >> Ack, let's see whether other people find any issues with this approach=
-.
-> >> For me, it makes the devmem parts harder to read, so my preference
-> >> is on dropping this patch and keeping owner=3Dnull on your side.
-> >
-> > I don't mind at this point which approach to take right now. I would
-> > prefer keeping dmabuf_genpool_chunk_owner today even if it results in a
-> > nullptr in io_uring's case. Once there are more memory providers in the
-> > future, I think it'll be clearer what sort of abstraction we might need
-> > here.
->
-> That's the thing about abstractions, if we say that devmem is the
-> only first class citizen for net_iov and everything else by definition
-> is 2nd class that should strictly follow devmem TCP patterns, and/or
-> that struct dmabuf_genpool_chunk_owner is an integral part of net_iov
-> and should be reused by everyone, then preserving the current state
-> of the chunk owner is likely the right long term approach. If not, and
-> net_iov is actually a generic piece of infrastructure, then IMHO there
-> is no place for devmem sticking out of every bit single bit of it, with
-> structures that are devmem specific and can even be not defined without
-> devmem TCP enabled (fwiw, which is not an actual problem for
-> compilation, juts oddness).
->
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-There is no intention of devmem TCP being a first class citizen or
-anything. Abstractly speaking, we're going to draw a line in the sand
-and say everything past this line is devmem specific and should be
-replaced by other users. In this patch you drew the line between
-dmabuf_genpool_chunk_owner and net_iov_area, which is fine by me on
-first look. What Stan and I were thinking at first glance is
-preserving dmabuf_* (and renaming) and drawing the line somewhere
-else, which would have also been fine.
+crush_bucket_alg_name(), crush_get_bucket_item_weight(), crush_hash32(),
+and crush_hash32_5() were added by commit
+5ecc0a0f8128 ("ceph: CRUSH mapping algorithm")
+in 2009 but never used.
 
-My real issue is whether its safe to do all this container_of while
-not always checking explicitly for the type of net_iov. I'm not 100%
-sure checking in tcp.c alone is enough, yet. I need to take a deeper
-look, no changes requested from me yet.
+crush_hash_name() was added a little later by commit
+fb690390e305 ("ceph: make CRUSH hash function a bucket property")
+and also not used.
 
-FWIW I'm out for the next couple of weeks. I'll have time to take a
-look during that but not as much as now.
+Remove them.
 
---=20
-Thanks,
-Mina
+They called a couple of static functions crush_hash32_rjenkins1()
+and crush_hash32_rjenkins1_5() which are now unused.
+
+Also remove them.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ include/linux/crush/crush.h |  2 --
+ include/linux/crush/hash.h  |  5 ----
+ net/ceph/crush/crush.c      | 37 -----------------------
+ net/ceph/crush/hash.c       | 59 -------------------------------------
+ 4 files changed, 103 deletions(-)
+
+diff --git a/include/linux/crush/crush.h b/include/linux/crush/crush.h
+index 30dba392b730..ed26099957df 100644
+--- a/include/linux/crush/crush.h
++++ b/include/linux/crush/crush.h
+@@ -117,7 +117,6 @@ enum {
+ 	CRUSH_BUCKET_STRAW = 4,
+ 	CRUSH_BUCKET_STRAW2 = 5,
+ };
+-extern const char *crush_bucket_alg_name(int alg);
+ 
+ /*
+  * although tree was a legacy algorithm, it has been buggy, so
+@@ -314,7 +313,6 @@ struct crush_map {
+ 
+ 
+ /* crush.c */
+-extern int crush_get_bucket_item_weight(const struct crush_bucket *b, int pos);
+ extern void crush_destroy_bucket_uniform(struct crush_bucket_uniform *b);
+ extern void crush_destroy_bucket_list(struct crush_bucket_list *b);
+ extern void crush_destroy_bucket_tree(struct crush_bucket_tree *b);
+diff --git a/include/linux/crush/hash.h b/include/linux/crush/hash.h
+index 904df41f7847..0ee007a98236 100644
+--- a/include/linux/crush/hash.h
++++ b/include/linux/crush/hash.h
+@@ -12,13 +12,8 @@
+ 
+ #define CRUSH_HASH_DEFAULT CRUSH_HASH_RJENKINS1
+ 
+-extern const char *crush_hash_name(int type);
+-
+-extern __u32 crush_hash32(int type, __u32 a);
+ extern __u32 crush_hash32_2(int type, __u32 a, __u32 b);
+ extern __u32 crush_hash32_3(int type, __u32 a, __u32 b, __u32 c);
+ extern __u32 crush_hash32_4(int type, __u32 a, __u32 b, __u32 c, __u32 d);
+-extern __u32 crush_hash32_5(int type, __u32 a, __u32 b, __u32 c, __u32 d,
+-			    __u32 e);
+ 
+ #endif
+diff --git a/net/ceph/crush/crush.c b/net/ceph/crush/crush.c
+index 254ded0b05f6..9331f91f1242 100644
+--- a/net/ceph/crush/crush.c
++++ b/net/ceph/crush/crush.c
+@@ -7,43 +7,6 @@
+ # include "crush.h"
+ #endif
+ 
+-const char *crush_bucket_alg_name(int alg)
+-{
+-	switch (alg) {
+-	case CRUSH_BUCKET_UNIFORM: return "uniform";
+-	case CRUSH_BUCKET_LIST: return "list";
+-	case CRUSH_BUCKET_TREE: return "tree";
+-	case CRUSH_BUCKET_STRAW: return "straw";
+-	case CRUSH_BUCKET_STRAW2: return "straw2";
+-	default: return "unknown";
+-	}
+-}
+-
+-/**
+- * crush_get_bucket_item_weight - Get weight of an item in given bucket
+- * @b: bucket pointer
+- * @p: item index in bucket
+- */
+-int crush_get_bucket_item_weight(const struct crush_bucket *b, int p)
+-{
+-	if ((__u32)p >= b->size)
+-		return 0;
+-
+-	switch (b->alg) {
+-	case CRUSH_BUCKET_UNIFORM:
+-		return ((struct crush_bucket_uniform *)b)->item_weight;
+-	case CRUSH_BUCKET_LIST:
+-		return ((struct crush_bucket_list *)b)->item_weights[p];
+-	case CRUSH_BUCKET_TREE:
+-		return ((struct crush_bucket_tree *)b)->node_weights[crush_calc_tree_node(p)];
+-	case CRUSH_BUCKET_STRAW:
+-		return ((struct crush_bucket_straw *)b)->item_weights[p];
+-	case CRUSH_BUCKET_STRAW2:
+-		return ((struct crush_bucket_straw2 *)b)->item_weights[p];
+-	}
+-	return 0;
+-}
+-
+ void crush_destroy_bucket_uniform(struct crush_bucket_uniform *b)
+ {
+ 	kfree(b->h.items);
+diff --git a/net/ceph/crush/hash.c b/net/ceph/crush/hash.c
+index fe79f6d2d0db..33792c0ea132 100644
+--- a/net/ceph/crush/hash.c
++++ b/net/ceph/crush/hash.c
+@@ -24,17 +24,6 @@
+ 
+ #define crush_hash_seed 1315423911
+ 
+-static __u32 crush_hash32_rjenkins1(__u32 a)
+-{
+-	__u32 hash = crush_hash_seed ^ a;
+-	__u32 b = a;
+-	__u32 x = 231232;
+-	__u32 y = 1232;
+-	crush_hashmix(b, x, hash);
+-	crush_hashmix(y, a, hash);
+-	return hash;
+-}
+-
+ static __u32 crush_hash32_rjenkins1_2(__u32 a, __u32 b)
+ {
+ 	__u32 hash = crush_hash_seed ^ a ^ b;
+@@ -73,34 +62,6 @@ static __u32 crush_hash32_rjenkins1_4(__u32 a, __u32 b, __u32 c, __u32 d)
+ 	return hash;
+ }
+ 
+-static __u32 crush_hash32_rjenkins1_5(__u32 a, __u32 b, __u32 c, __u32 d,
+-				      __u32 e)
+-{
+-	__u32 hash = crush_hash_seed ^ a ^ b ^ c ^ d ^ e;
+-	__u32 x = 231232;
+-	__u32 y = 1232;
+-	crush_hashmix(a, b, hash);
+-	crush_hashmix(c, d, hash);
+-	crush_hashmix(e, x, hash);
+-	crush_hashmix(y, a, hash);
+-	crush_hashmix(b, x, hash);
+-	crush_hashmix(y, c, hash);
+-	crush_hashmix(d, x, hash);
+-	crush_hashmix(y, e, hash);
+-	return hash;
+-}
+-
+-
+-__u32 crush_hash32(int type, __u32 a)
+-{
+-	switch (type) {
+-	case CRUSH_HASH_RJENKINS1:
+-		return crush_hash32_rjenkins1(a);
+-	default:
+-		return 0;
+-	}
+-}
+-
+ __u32 crush_hash32_2(int type, __u32 a, __u32 b)
+ {
+ 	switch (type) {
+@@ -130,23 +91,3 @@ __u32 crush_hash32_4(int type, __u32 a, __u32 b, __u32 c, __u32 d)
+ 		return 0;
+ 	}
+ }
+-
+-__u32 crush_hash32_5(int type, __u32 a, __u32 b, __u32 c, __u32 d, __u32 e)
+-{
+-	switch (type) {
+-	case CRUSH_HASH_RJENKINS1:
+-		return crush_hash32_rjenkins1_5(a, b, c, d, e);
+-	default:
+-		return 0;
+-	}
+-}
+-
+-const char *crush_hash_name(int type)
+-{
+-	switch (type) {
+-	case CRUSH_HASH_RJENKINS1:
+-		return "rjenkins1";
+-	default:
+-		return "unknown";
+-	}
+-}
+-- 
+2.47.0
+
 
