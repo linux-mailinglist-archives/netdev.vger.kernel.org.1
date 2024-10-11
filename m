@@ -1,258 +1,303 @@
-Return-Path: <netdev+bounces-134581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4CD999A43A
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:54:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B3999A461
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 15:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5041B1F23094
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:54:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C326B21E68
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 13:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D81C2178E6;
-	Fri, 11 Oct 2024 12:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8052178E5;
+	Fri, 11 Oct 2024 13:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dE3Idk3d"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VxDZKwg2";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="VHPhN9/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918C72178FF
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728651269; cv=none; b=N56GGHLL6tx0f3+xnFtY8oqS3V4AGYwvHYw+6yKaNHljNMKVmRMhISmrLgXLmV37mOvn0Rhje7A+fNgvCdhD2pZxCbMPyyD9AIEnymUhsB1bmPd+bpEx26oGHZ6dDXbX7ZTpPXzcpfO5oqc73m44Gbyb6tWQE44jhWyv+0+xfqU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728651269; c=relaxed/simple;
-	bh=VyUNwldRrrQYJDbp8UASTBoB6nfGOleGl++5aG0GTTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qwRvzjEBEcEGvxi/9Y2xS+S61GVy7hDKd+0icy4paHiRu0ZR7vwzrtNXm/xHNnE4LG/emiHHgyr2a6Fa/lxSfjNGjclvxNdnEdNa5H8o2UFc6jBig5WeoEmdo29MCZ2qcBKjsymzFnEF/4TNheW/AUZRuphq90QU05Y7UuI0SBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dE3Idk3d; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c3df1a3cb6so345995a12.2
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:54:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65F220B1F3;
+	Fri, 11 Oct 2024 13:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728651951; cv=fail; b=OgkxtNS1+DQ9AXaif/ZbdT1kgKYRBTZLcOZe+rS5L8sPe1UzVV7oMg/wCbVLt/v7C9Xxv0idEgsU11g7SCFx5Vd/ciYSzlYjQNYd30P4DNDQkqyRnNt5PbC8NM2ct9MIVLj/yiCBQvPSIgDMh+QEO/fh+SNqhk940jmMfh9exe8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728651951; c=relaxed/simple;
+	bh=6PNXI6UvFK5k97YGScUb0ryvdrqOkpLhomuEWIa5aEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Tq1Z+2H/h1yOGnJ2dvy5wNfE5+Fm57o0gDXQ9WaLAE6nRCcJh7NtqANUikaSOUF5L+E+nGhkwpDR1M5qEEYhnCR8ZHAIxpaG89jTOzm5Q3yjeoDiop2j9m51Qlq96lWZPLKtD2K1tgcrqNCjjvQ48smC8ZZF91UVTEvLIet60go=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=VxDZKwg2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=VHPhN9/9; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49BCpXD8010297;
+	Fri, 11 Oct 2024 13:04:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2023-11-20; bh=Xv7i4twWqZ2nPErweq
+	HXYV7ZL7AqvC/N6Aol1iMSENc=; b=VxDZKwg2BSkEAJCex17nsRFY8J+x1bNfEH
+	D588ObM8eYNw9/RwFmt8rAsDzYnT/fmpELXqlmrVzs2kI8sOkoaA92pP1MvZ7Wyc
+	PDWrl8sHJp1DkhhMNfwQWeU9PVn525mp4QvpgXOUY7EvMNvssNQoG5/oyHu1CBlB
+	iGOrJe8E9lLe4FV12pOn9kjtllotlZ3qp33ZqKISmGT66/eSeaN9p98zplPoT8Pr
+	plFwlXDSEOpwG/Uc2IliHWssnZOWgmzRhSe/4b+8pZMuLPd5UKbIhmbidp2Uvo5f
+	VeZUp7oNaQGpyS/U0CoYTuyFUoR4q1voEg7B/mIJfsf5uhfhC2ZQ==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 423063vspp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Oct 2024 13:04:16 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49BBYLYb040247;
+	Fri, 11 Oct 2024 13:04:16 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 422uwhmarc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Oct 2024 13:04:16 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=D/pa+BXukbV3KIhccmtx/vO7TJeTotJH3kEBHIcv/+ebUgaiZim4twyls7fnN8BIRSNJtaVQMJ9HpMOCXItXHrQbS7ed0ygoGMlVzUj6P0AnPihYgtP6BtfaJKueBMM9vcf6HTK0ky2b6+2OQyYBHuX8VQkLtmiOFBonq8yJe7P0qYpTNcN5j9W4WH4kAyr9nEog1qJUfE+bsMLzPXjahu/pbNgYqBxSL0gYhqvKT10JXvOaC1eoZEF57E8H7VLJpwz2paM+eRuKRLb8pdYjktivIw1fYo6A3qpmVnXjcSj4rgS3MhVmWI6+Drlc80UyWp4EU1DezXCp3W+MlScW3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xv7i4twWqZ2nPErweqHXYV7ZL7AqvC/N6Aol1iMSENc=;
+ b=a6Nw6dysBt37/iB+zOlnaACPfQ4Ye/oP8bQgueksTwtwsbAPaEo8aLg8fweNEbyWkTwT5IjC0GscH92DnWETHdS13VZOtIQpTZ24uR7d3A0irB0loBe6Wz0l8kgTRc9KhtdwULiHBbHkL2mSXxSL8sZpsQ/Z9JztrzVSXd5XDmSxgN6lAEMEihWza8qAq+ak214XFveA2ZegmkmwHUn6j5JD1p6jcfRXKMSS41rsef30O/KWvJGvREDXU4DgCaKRxwdYR6v3p95HOgvQlxcyD4Tvvb4DryIoMUXKgYVmFl34Yzz+r71NrUqvzT3V/L6MDrWSzq7AC05gc4JDZgnn+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728651266; x=1729256066; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FdJxVcplaevM05fTidW7N27f+ew3Acvc2RAb92XPyxE=;
-        b=dE3Idk3d/h5K49iug2gK1ia4A1N4AWuRK6XC6GlG2wh3KJQgiwEzO6AhtIAaOpNaJ2
-         xnf1Opaobi68Bg6PTKgqADgmPb4QpXERoPWobX70LQASERgjT3kmAqoiR6T2fU5biI9P
-         eTVUpjrPkOatYkmChhNHdwMTHFgW2N2PvkDcUrniYHU+9hvu27RJ1N4ZzWbE8F1AaBw2
-         xbhSWNW/WY2f8wn5581JjT7eQErVihCOLOft3GDbbDk6dveSXoTn4jefYnsXu4v4HXt7
-         HqqxUtjEPCuANnnWixTR3YOD1KxcVAdCm9takOrf27Vfk6YqnjhVkFeecb4NEr+iYXl/
-         xXkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728651266; x=1729256066;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FdJxVcplaevM05fTidW7N27f+ew3Acvc2RAb92XPyxE=;
-        b=Hrm034HuhtAocUYrM6lr+wqVlBoQHJh4pbICIKxx51+5S9AouHqJwB/PNQldlBbH3v
-         yRcZqwKKeANvBIkE4zxER2UDUqgqx9NQ3/zX46arg0ZalwCi38CCqOBqn1RYrnW1i03X
-         GP31CREdaNbAzr4OmfdAFkuAk3t8cajNa9n3iWrD6QRy2IHBEEQ0aufzh+jZ/VWMwJb9
-         iZfnyXxyshC2E5zcdM8QCj8ghC6AXzQ9tTFuRU9Nyi3Egy2x8jbnpmDL3+9gEVM1HS4G
-         G8vVN6oP6+ZKauszVXwCUsavVGQqTy8U3b9YhHJGwRcowsbKbz76u64wvFf4+gq5iPH7
-         /n+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUarMTqFqItpq6FD2rNQrb8sLCyQLVGHXKYoqD3qJaR+VcX0n+nKmFNF4x14OQFKKcDiZ4GINU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8OxUepdx/42ZY31LzktjzP11bL2mVYCFcvaCt5nrqMtl8r0DZ
-	pt88LkfhCdPeHbV4neZPf2j48iyYOheYIwwNPSpGoB3cEZ8Bd/T3
-X-Google-Smtp-Source: AGHT+IFj+5cVcEwcmTKG8nFQHA3Vlmz0vrd4X4eaM4oX3ZGJLI+Y4a1/QfiJmZEO34kf6ObJ6y1xLg==
-X-Received: by 2002:a17:906:f5aa:b0:a99:53cf:26d5 with SMTP id a640c23a62f3a-a99b945539emr103189666b.11.1728651265581;
-        Fri, 11 Oct 2024 05:54:25 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a80f2737sm209363966b.217.2024.10.11.05.54.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 05:54:24 -0700 (PDT)
-Date: Fri, 11 Oct 2024 15:54:21 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/3] net: phylink: remove "using_mac_select_pcs"
-Message-ID: <20241011125421.eflqwvpnkrt4pdxh@skbuf>
-References: <ZwfP8G+2BwNwlW75@shell.armlinux.org.uk>
- <20241011103912.wmzozfnj6psgqtax@skbuf>
- <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
- <E1syBPE-006Unh-TL@rmk-PC.armlinux.org.uk>
- <20241009122938.qmrq6csapdghwry3@skbuf>
- <Zwe4x0yzPUj6bLV1@shell.armlinux.org.uk>
- <ZwfP8G+2BwNwlW75@shell.armlinux.org.uk>
- <20241011103912.wmzozfnj6psgqtax@skbuf>
- <ZwkEv7rOlHqIqMIL@shell.armlinux.org.uk>
- <ZwkEv7rOlHqIqMIL@shell.armlinux.org.uk>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xv7i4twWqZ2nPErweqHXYV7ZL7AqvC/N6Aol1iMSENc=;
+ b=VHPhN9/96f+SOxtndT6MDFzuEDl3tS4DA5/7uHPI1rXC9eFkAgH72rPh+LRwVczv7MjbtDVyBcJxuvGfrwsaZvacqATw7X2mFrdicfUjOTrgtptMW3LVD0Cb7MQaIz4mNFKu3ayvelGvQImGXLyrOBMYaVvYCyV1YFgW0a3KxYc=
+Received: from DS0PR10MB7933.namprd10.prod.outlook.com (2603:10b6:8:1b8::15)
+ by BN0PR10MB4822.namprd10.prod.outlook.com (2603:10b6:408:124::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.20; Fri, 11 Oct
+ 2024 13:04:12 +0000
+Received: from DS0PR10MB7933.namprd10.prod.outlook.com
+ ([fe80::2561:85b0:ae8f:9490]) by DS0PR10MB7933.namprd10.prod.outlook.com
+ ([fe80::2561:85b0:ae8f:9490%6]) with mapi id 15.20.8048.017; Fri, 11 Oct 2024
+ 13:04:12 +0000
+Date: Fri, 11 Oct 2024 09:04:08 -0400
+From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+To: Kaixiong Yu <yukaixiong@huawei.com>
+Cc: akpm@linux-foundation.org, mcgrof@kernel.org, ysato@users.sourceforge.jp,
+        dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, jack@suse.cz, kees@kernel.org,
+        j.granados@samsung.com, willy@infradead.org, vbabka@suse.cz,
+        lorenzo.stoakes@oracle.com, trondmy@kernel.org, anna@kernel.org,
+        chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
+        okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, paul@paul-moore.com, jmorris@namei.org,
+        linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com,
+        shikemeng@huaweicloud.com, dchinner@redhat.com, bfoster@redhat.com,
+        souravpanda@google.com, hannes@cmpxchg.org, rientjes@google.com,
+        pasha.tatashin@soleen.com, david@redhat.com, ryan.roberts@arm.com,
+        ying.huang@intel.com, yang@os.amperecomputing.com,
+        zev@bewilderbeest.net, serge@hallyn.com, vegard.nossum@oracle.com,
+        wangkefeng.wang@huawei.com, sunnanyong@huawei.com
+Subject: Re: [PATCH v3 -next 00/15] sysctl: move sysctls from vm_table into
+ its own files
+Message-ID: <ykseykkxta6fk747pejzpatstsf3vzx63rk4gayfrh5hsru7nq@duruino6qmys>
+Mail-Followup-To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Kaixiong Yu <yukaixiong@huawei.com>, akpm@linux-foundation.org, mcgrof@kernel.org, 
+	ysato@users.sourceforge.jp, dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, 
+	hpa@zytor.com, viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, 
+	kees@kernel.org, j.granados@samsung.com, willy@infradead.org, vbabka@suse.cz, 
+	lorenzo.stoakes@oracle.com, trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com, 
+	jlayton@kernel.org, neilb@suse.de, okorniev@redhat.com, Dai.Ngo@oracle.com, 
+	tom@talpey.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, paul@paul-moore.com, jmorris@namei.org, linux-sh@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	dhowells@redhat.com, haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com, 
+	shikemeng@huaweicloud.com, dchinner@redhat.com, bfoster@redhat.com, souravpanda@google.com, 
+	hannes@cmpxchg.org, rientjes@google.com, pasha.tatashin@soleen.com, david@redhat.com, 
+	ryan.roberts@arm.com, ying.huang@intel.com, yang@os.amperecomputing.com, 
+	zev@bewilderbeest.net, serge@hallyn.com, vegard.nossum@oracle.com, 
+	wangkefeng.wang@huawei.com, sunnanyong@huawei.com
+References: <20241010152215.3025842-1-yukaixiong@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010152215.3025842-1-yukaixiong@huawei.com>
+User-Agent: NeoMutt/20240425
+X-ClientProxiedBy: YT3PR01CA0042.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:82::28) To DS0PR10MB7933.namprd10.prod.outlook.com
+ (2603:10b6:8:1b8::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwkEv7rOlHqIqMIL@shell.armlinux.org.uk>
- <ZwkEv7rOlHqIqMIL@shell.armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR10MB7933:EE_|BN0PR10MB4822:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc6501f8-e6a7-433b-5308-08dce9f533ac
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ku4B4DEneJi+OHNBKD5p7U1uHaSCfFQOGqJCUb9jCDui6F2QHDeK134U4DkP?=
+ =?us-ascii?Q?ER8LZBv97vJv/nTbvtXX6G8EVt+/uR4DB+4yWA93qgqSiaRFshSHxodN2nTM?=
+ =?us-ascii?Q?AxR++gQIwwqVeYmFumtt1GkiojVrkkwCIbmJ+XGamKPXlaKDr6l7OZlFqfT8?=
+ =?us-ascii?Q?gC3840b6Y3IoZ51boDWXuLvt9KYQa+shJX7Cf0BOM9w8UzUO8T1vj+HyVJBe?=
+ =?us-ascii?Q?56YpanbAjttEVobUL5D1D7Je/0s+zPybrP8jIVr8Q0f9YfDqBrjUV5y6FHkM?=
+ =?us-ascii?Q?On02DKuG+okxB2ExetnEDxAr9ITvaVL+Qjz4PDiMY37UDf5y8Uw1zG9lSeOX?=
+ =?us-ascii?Q?rrB29xQjJRpDNAdB59llEho0fefZaZyQqtRgqJIeGULtGHuoFDmkhRBzQG6v?=
+ =?us-ascii?Q?ventSjWMQHTFi4u1kqu5HujeK8T1sD2TPtI9o1gYU0CLORm+IIRL6n9772it?=
+ =?us-ascii?Q?JAHpeeObyyM7vacI2E8VcXaT+8rmJKdgbKPImyAMoKs3jYhs2bteYDn7garU?=
+ =?us-ascii?Q?HXdB5rS6TeNUPD3ElxY8pwNRYyx4yhn/4dJJTuhO/NY8Hj72trllXgnaHFJK?=
+ =?us-ascii?Q?6B2KeUqL1APhI5RwflhhSZvkMdUsiW8ZXjavZzvexVi3SjSip6m1tACxNpah?=
+ =?us-ascii?Q?SI72XqAxxHOAA6Ze0RG8TXeGKbgbukrtwKh3Xvj862OJ9x1pxtwu4pGjIDT0?=
+ =?us-ascii?Q?AadxJBHBmbTDaXp550ZcIVe9kgsn++80cVfgo91a8reyKGnv2mvCqsIwWNGu?=
+ =?us-ascii?Q?0/13XPy+GTT7de0FdXHfbwhYB9395BDMcv3nbfdWgfH74yDaQGrt504y4MWC?=
+ =?us-ascii?Q?otiIvTkoFbmrRNTa7cpOUncjIpvnWli24k8MiXmp5aPsIZo8ZDDrWCZ/Roqy?=
+ =?us-ascii?Q?IHtSRMswmqvZy+SfwoyeN5607oovHGquGHNSuWr/EQ7JLzBEU5GObzSkpO/O?=
+ =?us-ascii?Q?7s2zPhnnO1YcvmKZZYO6W+FJPmc2xEZSkGUyjg1kgZrf8p0b9BNxvD7P6XX+?=
+ =?us-ascii?Q?U1f4vFVjNtTkm4tY9dzHL/K3TTDgEByuMyq4FTMLuhOJRuGTSkXNkaA0uRj5?=
+ =?us-ascii?Q?dthkHQ4JtUPLTKJzAI3lxWcQApy4mfTrST1e5WsVB340mBk8SwnJj88zSlCQ?=
+ =?us-ascii?Q?pH2DTQeByWi21G2muEdKU4q2dp3mnNXuTCm7Fz7OS1o8UzhastLwSoAg7n64?=
+ =?us-ascii?Q?Z0Lvys1urM8OtbtdlbV8nvzuAIrQ4mY8XN+BgKGvnc1mT9SPaK1h/KONAlbt?=
+ =?us-ascii?Q?qKSua4lztpSnM9xAea8iqiUGCiFg3TthPpNWz5S6Wg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7933.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?PinfTI1DIDAf/pjKsYAQ+5RW44m9+3jd6/qPo8987Eqz1vtr7iJqDBeHiGA4?=
+ =?us-ascii?Q?+9E1ady++9lHfLm8dGPnw/Ra+GH1KKdaK3COa6VE2/YrJoREDME4c1V1/kaU?=
+ =?us-ascii?Q?WklPDjdQ0WNxVAXuW3mXNwGFQLa/jNN5HSWHSnlZdWiAqy8YnO1PWm84AfEN?=
+ =?us-ascii?Q?602hP53Y6XJAiLoi2FUSlwBnKTmWB/q72bad1S//i/lltRnAT2Waxwo4WDWT?=
+ =?us-ascii?Q?KQe+tDxpziaOvGZdjFQRHDnCfwHCnlxNsKKKJ+Eke6XvMA6v92L8OptVSPb9?=
+ =?us-ascii?Q?GSvzUv904URj9znMD+zCh4Vu2HahY9H2mpNFRQe+dv34pmbDUn+8VUOg/t5v?=
+ =?us-ascii?Q?IpvG2T7oojpyKb/AyD03KdQgcFQebmrS5rDXZfvXbSwEfbgOO9Bdcq1Epwrb?=
+ =?us-ascii?Q?1JhNF2b32ykjZWvZGuaIU+GSARTLHg9Ht5hRz3S7LsWdaqpQKtcX4D9fnebj?=
+ =?us-ascii?Q?afDW13DwygNLiWnrGs8T8zsZMmO5P9WEsOpx0s97kHXmK0Bnh+cqm7j7Whrl?=
+ =?us-ascii?Q?5iC06uuD2JH7b+zOmISMHJwwXgK2m6m1TvWw7+udZUEV1raSoGWlB07j/JAy?=
+ =?us-ascii?Q?zMQgwUZrl5Gm/ji4OIDS7QBDx9vWIehX/po5GLsZdl4ZR1Oj1K+c5FxWNXa4?=
+ =?us-ascii?Q?FIjAOMoik7dnNzSyQuSVnp1bNxPocLA7eD/e+poPPP5FBp6UyDtV3IzhA9CB?=
+ =?us-ascii?Q?sAowmEVzdc2yIEUzWTv0G7Q2AAt6l7Dh0CK1ykKs3trwRhI6d99aohAKaSvN?=
+ =?us-ascii?Q?M9o2Crk7/6UGid//DePHqjKX4vFbK7+1PYLE08YVLawR8pJquUPNNr2LHDFk?=
+ =?us-ascii?Q?LSAhjf5+59u7O+oquqK/cEwopHy8vheJQH++e1r4oaM54hudhGmD9pZA4IvN?=
+ =?us-ascii?Q?c2yI7NGbw9pSFs2BmbkHiuKX9whyCW1Fts2dJ1V+faIK6RuTq+qNNBhNSiC3?=
+ =?us-ascii?Q?39DDrtHJCf7uHA+tXMJYVdIg1Qgi21j3FR6fIveabHpU+rqQkeNsX4WJFlU9?=
+ =?us-ascii?Q?NOlFr3oUhGZhtXlRPRxNoi5gJ7HwbLhzkH3AV60No/OojPUDPhbPN6zWPTvo?=
+ =?us-ascii?Q?AFE7616X6EoUK7RjDDBlL3f7o9SIQLUuJMRZa+KMMYr4kl9EpX1t35OlvRnZ?=
+ =?us-ascii?Q?JJXuqtrAL1szaXdRJgGTaLymGtbyFOYEHAto9P4geq2a6oytOceZQWJV3cp0?=
+ =?us-ascii?Q?FsV4hohvX3OvyhHAgykA/KlWB1tznBd/SwQ7OECuhv6oZXz2RVCOKVnJJXX9?=
+ =?us-ascii?Q?W8MNXIw4L4CgXEU1WLTYLB6HTCxYYgXIed2VsqAqO2mXgIPqoZjD2znAEUGk?=
+ =?us-ascii?Q?ogwqXZKOyt0i6vgLgTcoSW4QdzXn6yKV3Q87qwqZSduJfZdB4aDAETdpYm0X?=
+ =?us-ascii?Q?L6v56wB6roDmuUioHaKQEW5vSwHEv0+IGB9cbK8oEXmUwUT3GaM+rx3x773w?=
+ =?us-ascii?Q?FdKfBdwt1NPSqJ7nf8MtZFogbeBqOZ2RtzfJGbXauyxYDBi3j9MxYUBbhL+K?=
+ =?us-ascii?Q?eh3eVr5lGg5sMm5NGq2O6t6rUlQhh1hrTHeFbrmhqyo8qAFX8tTtFgFToFLQ?=
+ =?us-ascii?Q?gGQvYL5BjaSC+dW8qkk41WSjfdAjTHm7EIrbV7Ao?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	zJYIfmwhgHfO176yTIsZD1jAFhn7zift1SJR9F4VWhnHe6hQyre9igRUu8mvrIq3nrTF9t56XndoZ36Y5MU01ep5habnE5G79gPIEBcjkVHygIPvKoCwB876wAyuXNhA8+BeWfZKUxvhFeYnG6D1VvN80l2OJCXkh/vSI4gOoOX65nH2ewhkThJhURQljs6UXRLbvbPwYxwXjuyR3BtYvMnbt7nycLUMrpQv7o3PM1ot53V7vSu0SPbaCNC8YWUJrkyUI45VVJNjy9/q170oD0X/kBJ/ez+D4Shd2tBrJtzBVbyYYHbQozUf6IfATKqV3KD+QPiMn5uoyLxJfwYBoZZFgKbWiAgacczKVistIsRXFOb2Ln4qAREzrcqCiLwOR5LuWpR89DORciACZlqm16fO+Mx7D5/wwDHcRiBOxcEEG40kqBzw1bSFyA2iTedSLo1k2d9CibgIz926IvzGxhu4ispLV1nFTYxkzjttam50W7VyD12gUvy4C6RFp1a8mJ7nY2ERroL6FDvkKRhsR+FYcEWMUBYSq4YkVOd8A7VZ+oCV7rd5+nqabehimhmmv+l5T38HRfhoK9IoESyQzJABcsGWM0x00BXaUwhfyxA=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc6501f8-e6a7-433b-5308-08dce9f533ac
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7933.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2024 13:04:12.5367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0ux76YyiUINMKGS+7t5G/jaxHBRXAKaGg6XhORb6/Cnf6okUMLnzlaYTPa9JWicdMzhFnAe4ftqi/legjabGtA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB4822
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-11_10,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=808
+ spamscore=0 adultscore=0 phishscore=0 suspectscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2409260000 definitions=main-2410110090
+X-Proofpoint-ORIG-GUID: AwLEYMl7R4QnbxQLdIHoNoaOCHWHMGly
+X-Proofpoint-GUID: AwLEYMl7R4QnbxQLdIHoNoaOCHWHMGly
 
-On Fri, Oct 11, 2024 at 11:58:07AM +0100, Russell King (Oracle) wrote:
-> On Fri, Oct 11, 2024 at 01:39:12PM +0300, Vladimir Oltean wrote:
-> > On Thu, Oct 10, 2024 at 02:00:32PM +0100, Russell King (Oracle) wrote:
-> > > On Thu, Oct 10, 2024 at 12:21:43PM +0100, Russell King (Oracle) wrote:
-> > > > Hmm. Looking at this again, we're getting into quite a mess because of
-> > > > one of your previous review comments from a number of years back.
-> > > > 
-> > > > You stated that you didn't see the need to support a transition from
-> > > > having-a-PCS to having-no-PCS. I don't have a link to that discussion.
-> > > > However, it is why we've ended up with phylink_major_config() having
-> > > > the extra complexity here, effectively preventing mac_select_pcs()
-> > > > from being able to remove a PCS that was previously added:
-> > > > 
-> > > > 		pcs_changed = pcs && pl->pcs != pcs;
-> > > > 
-> > > > because if mac_select_pcs() returns NULL, it was decided that any
-> > > > in-use PCS would not be removed. It seems (at least to me) to be a
-> > > > silly decision now.
-> > > > 
-> > > > However, if mac_select_pcs() in phylink_major_config() returns NULL,
-> > > > we don't do any validation of the PCS.
-> > > > 
-> > > > So this, today, before these patches, is already an inconsistent mess.
-> > > > 
-> > > > To fix this, I think:
-> > > > 
-> > > > 	struct phylink_pcs *pcs = NULL;
-> > > > ...
-> > > >         if (pl->mac_ops->mac_select_pcs) {
-> > > >                 pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
-> > > >                 if (IS_ERR(pcs))
-> > > >                         return PTR_ERR(pcs);
-> > > > 	}
-> > > > 
-> > > > 	if (!pcs)
-> > > > 		pcs = pl->pcs;
-> > > > 
-> > > > is needed to give consistent behaviour.
-> > > > 
-> > > > Alternatively, we could allow mac_select_pcs() to return NULL, which
-> > > > would then allow the PCS to be removed.
-> > > > 
-> > > > Let me know if you've changed your mind on what behaviour we should
-> > > > have, because this affects what I do to sort this out.
-> > > 
-> > > Here's a link to the original discussion from November 2021:
-> > > 
-> > > https://lore.kernel.org/all/E1mpSba-00BXp6-9e@rmk-PC.armlinux.org.uk/
-> > > 
-> > > Google uselessly refused to find it, so I searched my own mailboxes
-> > > to find the message ID.
-> > 
-> > Important note: I cannot find any discussion on any mailing list which
-> > fills the gap between me asking what is the real world applicability of
-> > mac_select_pcs() returning NULL after it has returned non-NULL, and the
-> > current phylink behavior, as described above by you. That behavior was
-> > first posted here:
-> > https://lore.kernel.org/netdev/Ybiue1TPCwsdHmV4@shell.armlinux.org.uk/
-> > in patches 1/7 and 2/7. I did not state that phylink should keep the old
-> > PCS around, and I do not take responsibility for that.
+* Kaixiong Yu <yukaixiong@huawei.com> [241010 10:11]:
+> This patch series moves sysctls of vm_table in kernel/sysctl.c to
+> places where they actually belong, and do some related code clean-ups.
+> After this patch series, all sysctls in vm_table have been moved into its
+> own files, meanwhile, delete vm_table.
 > 
-> I wanted to add support for phylink_set_pcs() to remove the current
-> PCS and submitted a patch for it. You didn't see a use case and objected
-> to the patch, which wasn't merged.
+> All the modifications of this patch series base on
+> linux-next(tags/next-20241010). To test this patch series, the code was
+> compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
+> x86_64 architectures. After this patch series is applied, all files
+> under /proc/sys/vm can be read or written normally.
 
-It was an RFC, it wasn't a candidate for merging anyway.
+This change set moves nommu code out of the common code into the nommu.c
+file (which is nice), but the above text implies that no testing was
+performed on that code.  Could we have some basic compile/boot testing
+for nommu?
 
-> I've kept that behaviour ever since on the grounds of your objection -
-> as per the link that I posted. This has been carried forward into the
-> mac_select_pcs() implementation where it explicitly does not allow a
-> PCS to be removed. Pointing to the introduction of mac_select_pcs() is
-> later than your objection.
-
-This does not invalidate my previous point in any way. The phylink_set_pcs()
-API at that time implied a voluntary call from the driver. "pcs" was not
-allowed to be NULL, and your patch was the one introducing phylink_set_pcs(NULL)
-as a valid call. That's what I objected to as not seeing the purpose of.
-
-Whereas the new mac_select_pcs() has "return NULL" already baked into it
-from day one (the one-to-one equivalent of it being: don't call
-phylink_set_pcs()). It becomes inevitable, in this new model, to handle
-somehow the "what if" scenario of returning NULL after non-NULL, whereas
-that was not necessary before. It's a different API, which automatically
-implies a new set of rules.
-
-My point is that it was impossible for me to consciously contribute to
-the definition of the mac_select_pcs() API rules. Saying that the
-introduction of mac_select_pcs() came later than my comment proves
-exactly that. I couldn't have possibly known that my review comment will
-be used for a different API than phylink_set_pcs(), because the new API
-hadn't been posted.
-
-Whereas what you are saying is that the mac_select_pcs() posting took
-place after my comment => of course you took my comment into consideration.
-You seem to be omitting that I did not have all information.
-
-> Let me restate it. As a *direct* result of your comments on patch 8/8
-> which starts here:
-> https://lore.kernel.org/netdev/E1mpSba-00BXp6-9e@rmk-PC.armlinux.org.uk/
-> I took your comments as meaning that you saw no reason why we should
-> allow a PCS to ever be removed.
-
-I still stand by that statement, in that context. You took it out of
-context.
-
-> phylink_set_pcs() needed to be modified to allow that to happen. Given
-> your objection, that behaviour has been carried forward by having
-> explicit additional code to ensure that a PCS can't be removed from
-> phylink without replacing it with a different PCS. In other words,
-> mac_select_pcs() returning NULL when it has previously returned a PCS
-> does *nothing* to remove the previous PCS.
-
-The carrying over of old behavior from one API to another API is merely
-one of the design choices that can be made, and far from the only
-option. In general, you introduce new API exactly _because_ you want to
-change the behavior in some conditions.
-
-> Maybe this was not your intention when reviewing patch 8/8, but that's
-> how your comments came over, and lead me to the conclusion that we
-> need to enforce that - and that is enforced by:
 > 
->                 pcs_changed = pcs && pl->pcs != pcs;
+> Changes in v3:
+>  - change patch1~10, patch14 title suggested by Joel Granados
+>  - change sysctl_stat_interval to static type in patch1
+>  - add acked-by from Paul Moore in patch7
+>  - change dirtytime_expire_interval to static type in patch9
+>  - add acked-by from Anna Schumaker in patch11
 > 
-> so pcs_change will always be false if pcs == NULL, thus preventing the
-> replacement of the pcs:
+> Changes in v2:
+>  - fix sysctl_max_map_count undeclared issue in mm/nommu.c for patch6
+>  - update changelog for patch7/12, suggested by Kees/Paul
+>  - fix patch8, sorry for wrong changes and forget to built with NOMMU
+>  - add reviewed-by from Kees except patch8 since patch8 is wrong in v1
+>  - add reviewed-by from Jan Kara, Christian Brauner in patch12
 > 
->         if (pcs_changed) {
->                 phylink_pcs_disable(pl->pcs);
+> Kaixiong Yu (15):
+>   mm: vmstat: move sysctls to mm/vmstat.c
+>   mm: filemap: move sysctl to mm/filemap.c
+>   mm: swap: move sysctl to mm/swap.c
+>   mm: vmscan: move vmscan sysctls to mm/vmscan.c
+>   mm: util: move sysctls to mm/util.c
+>   mm: mmap: move sysctl to mm/mmap.c
+>   security: min_addr: move sysctl to security/min_addr.c
+>   mm: nommu: move sysctl to mm/nommu.c
+>   fs: fs-writeback: move sysctl to fs/fs-writeback.c
+>   fs: drop_caches: move sysctl to fs/drop_caches.c
+>   sunrpc: use vfs_pressure_ratio() helper
+>   fs: dcache: move the sysctl to fs/dcache.c
+>   x86: vdso: move the sysctl to arch/x86/entry/vdso/vdso32-setup.c
+>   sh: vdso: move the sysctl to arch/sh/kernel/vsyscall/vsyscall.c
+>   sysctl: remove unneeded include
 > 
->                 if (pl->pcs)
->                         pl->pcs->phylink = NULL;
+>  arch/sh/kernel/vsyscall/vsyscall.c |  14 ++
+>  arch/x86/entry/vdso/vdso32-setup.c |  16 ++-
+>  fs/dcache.c                        |  21 ++-
+>  fs/drop_caches.c                   |  23 ++-
+>  fs/fs-writeback.c                  |  30 ++--
+>  include/linux/dcache.h             |   7 +-
+>  include/linux/mm.h                 |  23 ---
+>  include/linux/mman.h               |   2 -
+>  include/linux/swap.h               |   9 --
+>  include/linux/vmstat.h             |  11 --
+>  include/linux/writeback.h          |   4 -
+>  kernel/sysctl.c                    | 221 -----------------------------
+>  mm/filemap.c                       |  18 ++-
+>  mm/internal.h                      |  10 ++
+>  mm/mmap.c                          |  54 +++++++
+>  mm/nommu.c                         |  15 +-
+>  mm/swap.c                          |  16 ++-
+>  mm/swap.h                          |   1 +
+>  mm/util.c                          |  67 +++++++--
+>  mm/vmscan.c                        |  23 +++
+>  mm/vmstat.c                        |  44 +++++-
+>  net/sunrpc/auth.c                  |   2 +-
+>  security/min_addr.c                |  11 ++
+>  23 files changed, 330 insertions(+), 312 deletions(-)
 > 
->                 pcs->phylink = pl;
+> -- 
+> 2.34.1
 > 
->                 pl->pcs = pcs;
->         }
-> 
-> I wouldn't have coded it this way had you not objected to patch 8/8
-> which lead me to believe we should not allow a PCS to be removed.
-> 
-> Review comments do have implications for future patches... maybe it
-> wasn't want you intended, but this is a great example of cause and
-> (possibly unintended) effect.
-
-This restatement was not necessary, as I believe I got the point from
-your previous message.
-
-I still fundamentally reject any responsibility you wish to attribute to
-me here. For one, my review feedback was in a different context. But
-let's even assume it was directly related, and I knew mac_select_pcs()
-would come. If I were maintaining a piece of code and received some
-review feedback, I would not translate it into code that carries
-exclusively _my_ sign-off, unless _I_ agree with it and can justify it.
-I would not seek to transfer responsibility to somebody else. In fact,
-if I were to be held accountable for patches signed off by others, I
-wouldn't even be reviewing anything. So I think it's a very fair
-collaboration rule, and I'm only asking you to apply it to me as well.
 
