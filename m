@@ -1,302 +1,195 @@
-Return-Path: <netdev+bounces-134570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E454D99A334
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:04:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3135C99A339
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1210C1C2169E
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:04:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B04A6285C72
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F6E21732C;
-	Fri, 11 Oct 2024 12:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E7E216A32;
+	Fri, 11 Oct 2024 12:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmzvnJGf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvbF05Ki"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0650D210C18
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9C820C49B;
+	Fri, 11 Oct 2024 12:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728648229; cv=none; b=i7sPHdbMFH4+ixbsTCvI7JDLww8/wkZkxiK/zCo0fH5XigzY75waCwz6yl05qf5LrxUGEE57lu74DhHyDcByFmzWEcXACFBGP4jfIDwXprbkAi/kqTYPUiFxguBA0ii+Xodk8VcMRnwCEbQmJqbEETzMJI9q4v86Juo+e53bbb4=
+	t=1728648271; cv=none; b=KaHmziGNIOjLwIR+OJ1pQvmhW62lwpAl6tNSowbBzOFyZJ8TNsCz4TDyIssKfFvAQy4qeCNe1ienXUyZztzmfbC6pkzE8XhYRMVQYlBU8u7LE5DnqorbUwaPgYp/ZvetIufs4fjhyA6MWZwjva1nytIJyqHCAZ2ZltiXhE2deGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728648229; c=relaxed/simple;
-	bh=JWzZMjqpp/xPZ1MmHfjs2qnl7WyX+6LRJNU05aMLIA0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ItLiU9pPGbUvSF+XG7QYUTzf8HaqaKIiYp6l39t6XrcD9C4uNb9d86rsWIpFqe7mwXvv4/9hsoJbfp0iov99PytsmHLeG5oexqIBmOfUkJJJXCU41CftOl2C7h/yuONxX0RQd1hQwhqNFCjz0AjmUbBpOpfc0k4RvNjFUqgZny0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HmzvnJGf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728648225;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3I5lHL6mHTQWMds6pJC4dZUawdNZoxrsfeR6hWpkDqM=;
-	b=HmzvnJGfYk4/e7bD5ZZtE1b+i4kla43u+mtoVdV3eKIMww2ZKVEOWNRVmCAFhxkaud0pyw
-	62ACAt5xy88XuHaqmH9HbSsBJTLndAHJoeBq1lBq+gFVhHa8vfkJfotvh9lLvIjqjSQOes
-	3b7LgyMw9NRjHxYi4hxXNfddwU04vxg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-148-nhbce34IMQa7N_oNCuAIYA-1; Fri, 11 Oct 2024 08:03:44 -0400
-X-MC-Unique: nhbce34IMQa7N_oNCuAIYA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso11745855e9.3
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:03:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728648223; x=1729253023;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+	s=arc-20240116; t=1728648271; c=relaxed/simple;
+	bh=d2lsdLlJ23PzLx+t87PT/SQoDACaRKM+kkKERIEh25I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U063Nmb5AgUDJOkKFFscX6BrtXQeuDszyA9+/SO7Qo0qA8v1HAQswU3VUPNG3GRxHGn5Rlh2mwSVQiHIge9H1QVBEp5k4DS1XOAwepZExj9J9krmHDR+jgpOiK4I6EoouFJmJJaEf0XftLwDuZklFBt2zA/XcQ5DbbRPRc/TlPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvbF05Ki; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5398e53ca28so2175172e87.3;
+        Fri, 11 Oct 2024 05:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728648267; x=1729253067; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=3I5lHL6mHTQWMds6pJC4dZUawdNZoxrsfeR6hWpkDqM=;
-        b=OF785RsDt3B6C0WxDqH95fgm79B+aM/JMHwlZTCJ8B18uU09UAemC1Eo3O7ze79xOM
-         3OPnsIbOUJG1mBdy/koz2cX8sVfWK7/iwHO4BKNcortadVHm+VFJClWKbetUhL7PZiCe
-         Nk2bBAIgXKLlg7G6HP6dr29i7UM8WSMS76GQDRno3jhj4E/T+a/32Rd48YlCYEueeD9z
-         qk6WaZfSZQnS770anaN6u7bSqc9Ej8E/kw1QoKimExmOK69F1B45dnsKiHvsHYYdI2I7
-         qck50NglZnPdHfsuBCnDcqAcqLbZ2cJqCZN4qL4DBUb8TeLbkBBI4BpG7QgogMbOxFc4
-         9VtA==
-X-Forwarded-Encrypted: i=1; AJvYcCXrkOEO/7SjXcUl6xbBz8Q3GA+DlwEbTGQWLy1A/h/UXACZSVX+3jPeYOzt2QOAiHIp2j5IHIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkbwW6PUjWskx94ZNgEBTPGR2WrQRCXcpCmKKTeziGaXfi07yd
-	qS/+FjdXx2utWwK7yv6/COSw8NJ0CNjIzVKO92aIaat+NKnogW+jvIIbi3vDw0HOnF8VtAvDJfm
-	134E0q1IA8waJazCgExfWDR5URAAsxd+QzzO+xKwaq+3lkv4/UA1WxA==
-X-Received: by 2002:a05:600c:1d1c:b0:42c:c003:edd1 with SMTP id 5b1f17b1804b1-4311decaa48mr19191875e9.10.1728648222791;
-        Fri, 11 Oct 2024 05:03:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IExbuVJr4JGcXjTZsUgf0Q1cJGFJf/2hMvz1Z5drCky7hS/DrFylID4EQn0lZzCFTWpUUq6Zw==
-X-Received: by 2002:a05:600c:1d1c:b0:42c:c003:edd1 with SMTP id 5b1f17b1804b1-4311decaa48mr19191405e9.10.1728648222253;
-        Fri, 11 Oct 2024 05:03:42 -0700 (PDT)
-Received: from eisenberg.fritz.box ([2001:16b8:3d05:4700:3e59:7d70:cabd:144b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf51770sm73523925e9.22.2024.10.11.05.03.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 05:03:41 -0700 (PDT)
-Message-ID: <914de38f0b6b3d2ddf98c16e427085732bebfd4a.camel@redhat.com>
-Subject: Re: [RFC PATCH 01/13] PCI: Prepare removing devres from pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
- <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
- Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
- Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
- Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
- Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
- <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
- Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
- netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
- ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
- linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Fri, 11 Oct 2024 14:03:39 +0200
-In-Reply-To: <20241010114304.064f5d3d.alex.williamson@redhat.com>
-References: <20241009083519.10088-1-pstanner@redhat.com>
-	 <20241009083519.10088-2-pstanner@redhat.com>
-	 <20241010114304.064f5d3d.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        bh=AyShL+hX7deCzpof4F0fbg7eMw0Pnc7HEQfvWtO/NKM=;
+        b=NvbF05KiYYLN+x6VhpmQSaX8F3M6JPZDpqyioxOHzQ+u9P3BcelVt2acAP6hS/dFaJ
+         +vuNZhXQnHRc+KM2WK2DPbum0shqeAu/KOvIBZ0tEAt+hORzJLdHRnFEc+juq8CbOfRE
+         7v3sJ9tbSMM9ztvXodUesLvWFKygA7iF2H7Unyh5fjlq7L/eHsexEGEiZoFDxPtk4Jr8
+         DjndUI5yO/LWc0TmFiIyCAwVsdFanyeBG/+Lq66cqe4+PcLSWWOF1l8C8F6Xl+zuX+7I
+         gUYefWfW3j6T1jJtOJokeWSuLJh6QbYcYZfL30rozsg50l5ui+uTdCfTFGDMwwp7XKya
+         jOVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728648267; x=1729253067;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AyShL+hX7deCzpof4F0fbg7eMw0Pnc7HEQfvWtO/NKM=;
+        b=qx4dTOvJlUrp3yxy1/rfUblwOtvS+lUSvf79MAFwFzjS8lwVoMUnt4TeFGfQWGaSEB
+         tt1mVqYpl8IWfTQ2OeEqZsmHCBcijYYy+PmGP8NysK+VcmEIWOO0S7PpUdLE8uikebx7
+         pz2kaiskDum+5JEY3ABWZQ5PqzDGOp7UJujIgtsbcWBaZWn38gP1pm0GktbpfHyHvz+1
+         GPZp6zBHpmymsVD2bpkY/8vBRKMec7s48a3aSK6CmjPncqncBWvF6T5ljQic3v4IAXdX
+         qzrTMXqpE3J+Nr0pskiyXTbJzMaC3/PfC2svWNkxMb4fOE/8RBoP4zg7N1Y2rxfEw/FU
+         yiIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtg4YBJbx/NpTi4t0iv4yfXLyqhldh8wzs3K74WIXSZD4VrU6kXOCZVxH84e2ccyzKimSeCnG//yu/@vger.kernel.org, AJvYcCWS7u4ZR0vh0919JoxmRmNe64RjUjoF6xK0S6SpbgrFXWr5aSkBpTvg0vcgzIvVGwrId1Sch+bv@vger.kernel.org, AJvYcCXv1y1Xo+S3TGHNMhwmajRdAwIVpEXVzOdtMEQeOZ1grFDvuMzE6ZhMIktQKmFcoV76YZ9mu/LYcZ6bGuTO@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4mhNtLMwhJzEidr8pgp3SbXZDcmMZmuHaR1FlYDStSWHtLhBd
+	203P5Ywjla7zsquNDCya9o1rq/V/r/PgpgD523jSfZvF/5snniFJT5WL5NDB
+X-Google-Smtp-Source: AGHT+IEFmewdlQ1CPXu2nV+GJbqCzq5j5B1b19TApH5sZAJ+BffXTe4lNLUiGOh2G3Wr71IqwpAF9A==
+X-Received: by 2002:a05:6512:3b24:b0:539:9717:7ea0 with SMTP id 2adb3069b0e04-539da58b296mr1527424e87.55.1728648267031;
+        Fri, 11 Oct 2024 05:04:27 -0700 (PDT)
+Received: from [10.10.12.27] (91-118-163-37.static.upcbusiness.at. [91.118.163.37])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7f5c4c3sm206188966b.95.2024.10.11.05.04.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 05:04:26 -0700 (PDT)
+Message-ID: <105dfbaa-0b7f-4e9e-8ab8-16d35ec165d7@gmail.com>
+Date: Fri, 11 Oct 2024 14:04:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] device property: Introduce
+ fwnode_for_each_available_child_node_scoped()
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Daniel Scally <djrscally@gmail.com>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Linus Walleij <linus.walleij@linaro.org>, linux-acpi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
+ <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
+ <Zwi6Dn4yJxst4xv2@kekkonen.localdomain>
+ <07ec0837-d7a3-413e-a281-e06feafe7f34@gmail.com>
+ <Zwj12J5bTNUEnxA0@kekkonen.localdomain>
+Content-Language: en-US, de-AT
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+In-Reply-To: <Zwj12J5bTNUEnxA0@kekkonen.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2024-10-10 at 11:43 -0600, Alex Williamson wrote:
-> On Wed,=C2=A0 9 Oct 2024 10:35:07 +0200
-> Philipp Stanner <pstanner@redhat.com> wrote:
->=20
-> > pci_intx() is a hybrid function which sometimes performs devres
-> > operations, depending on whether pcim_enable_device() has been used
-> > to
-> > enable the pci_dev. This sometimes-managed nature of the function
-> > is
-> > problematic. Notably, it causes the function to allocate under some
-> > circumstances which makes it unusable from interrupt context.
-> >=20
-> > To, ultimately, remove the hybrid nature from pci_intx(), it is
-> > first
-> > necessary to provide an always-managed and a never-managed version
-> > of that function. Then, all callers of pci_intx() can be ported to
-> > the
-> > version they need, depending whether they use pci_enable_device()
-> > or
-> > pcim_enable_device().
-> >=20
-> > An always-managed function exists, namely pcim_intx(), for which
-> > __pcim_intx(), a never-managed version of pci_intx() had been
-> > implemented.
-> >=20
-> > Make __pcim_intx() a public function under the name
-> > pci_intx_unmanaged(). Make pcim_intx() a public function.
-> >=20
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > ---
-> > =C2=A0drivers/pci/devres.c | 24 +++---------------------
-> > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++=
-++
-> > =C2=A0include/linux/pci.h=C2=A0 |=C2=A0 2 ++
-> > =C2=A03 files changed, 31 insertions(+), 21 deletions(-)
-> >=20
-> > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-> > index b133967faef8..475a3ae5c33f 100644
-> > --- a/drivers/pci/devres.c
-> > +++ b/drivers/pci/devres.c
-> > @@ -411,31 +411,12 @@ static inline bool mask_contains_bar(int
-> > mask, int bar)
-> > =C2=A0	return mask & BIT(bar);
-> > =C2=A0}
-> > =C2=A0
-> > -/*
-> > - * This is a copy of pci_intx() used to bypass the problem of
-> > recursive
-> > - * function calls due to the hybrid nature of pci_intx().
-> > - */
-> > -static void __pcim_intx(struct pci_dev *pdev, int enable)
-> > -{
-> > -	u16 pci_command, new;
-> > -
-> > -	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
-> > -
-> > -	if (enable)
-> > -		new =3D pci_command & ~PCI_COMMAND_INTX_DISABLE;
-> > -	else
-> > -		new =3D pci_command | PCI_COMMAND_INTX_DISABLE;
-> > -
-> > -	if (new !=3D pci_command)
-> > -		pci_write_config_word(pdev, PCI_COMMAND, new);
-> > -}
-> > -
-> > =C2=A0static void pcim_intx_restore(struct device *dev, void *data)
-> > =C2=A0{
-> > =C2=A0	struct pci_dev *pdev =3D to_pci_dev(dev);
-> > =C2=A0	struct pcim_intx_devres *res =3D data;
-> > =C2=A0
-> > -	__pcim_intx(pdev, res->orig_intx);
-> > +	pci_intx_unmanaged(pdev, res->orig_intx);
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0static struct pcim_intx_devres *get_or_create_intx_devres(struct
-> > device *dev)
-> > @@ -472,10 +453,11 @@ int pcim_intx(struct pci_dev *pdev, int
-> > enable)
-> > =C2=A0		return -ENOMEM;
-> > =C2=A0
-> > =C2=A0	res->orig_intx =3D !enable;
-> > -	__pcim_intx(pdev, enable);
-> > +	pci_intx_unmanaged(pdev, enable);
-> > =C2=A0
-> > =C2=A0	return 0;
-> > =C2=A0}
-> > +EXPORT_SYMBOL(pcim_intx);
->=20
-> What precludes this from _GPL?=C2=A0 Also note that this is now calling a
-> GPL symbol, so by default I'd assume it should also be GPL.=C2=A0 Thanks,
+On 11/10/2024 11:54, Sakari Ailus wrote:
+> Hi Javier,
+> 
+> On Fri, Oct 11, 2024 at 10:34:32AM +0200, Javier Carrasco wrote:
+>> On 11/10/2024 07:39, Sakari Ailus wrote:
+>>> Hi Javier,
+>>>
+>>> On Tue, Oct 08, 2024 at 06:10:27PM +0200, Javier Carrasco wrote:
+>>>> Introduce the scoped variant of the
+>>>> fwnode_for_each_available_child_node() to automatically decrement the
+>>>> child's refcount when it goes out of scope, removing the need for
+>>>> explicit calls to fwnode_handle_put().
+>>>>
+>>>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+>>>> ---
+>>>>  include/linux/property.h | 5 +++++
+>>>>  1 file changed, 5 insertions(+)
+>>>>
+>>>> diff --git a/include/linux/property.h b/include/linux/property.h
+>>>> index 61fc20e5f81f..b37508ecf606 100644
+>>>> --- a/include/linux/property.h
+>>>> +++ b/include/linux/property.h
+>>>> @@ -168,6 +168,11 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
+>>>>  	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
+>>>>  	     child = fwnode_get_next_available_child_node(fwnode, child))
+>>>>  
+>>>> +#define fwnode_for_each_available_child_node_scoped(fwnode, child)	       \
+>>>> +	for (struct fwnode_handle *child __free(fwnode_handle) =	       \
+>>>> +		fwnode_get_next_available_child_node(fwnode, NULL); child;     \
+>>>> +	     child = fwnode_get_next_available_child_node(fwnode, child))
+>>>> +
+>>>
+>>> On OF, the implementation of the .get_next_child_node() fwnode op is:
+>>>
+>>> static struct fwnode_handle *
+>>> of_fwnode_get_next_child_node(const struct fwnode_handle *fwnode,
+>>>                               struct fwnode_handle *child)
+>>> {
+>>>         return of_fwnode_handle(of_get_next_available_child(to_of_node(fwnode),
+>>>                                                             to_of_node(child)));
+>>> }
+>>>
+>>> On ACPI we currently have .device_is_available() returning false but that
+>>> probably should be returning true instead (it's been virtually unused
+>>> previously).
+>>>
+>>> That makes fwnode_get_next_available_child_node() and
+>>> fwnode_get_next_child_node() equivalent on both ACPI and OF. Presumably
+>>> creating unavailable nodes would be useless on swnode, too.
+>>>
+>>> So my question is: what do we gain by adding all these fwnode_*available()
+>>> helpers?
+>>>
+>>>>  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+>>>>  						 struct fwnode_handle *child);
+>>>
+>>
+>> Hi Sakari, thanks for your feedback.
+>>
+>> I thought that the difference is not in OF (which either way ends up
+>> calling __of_device_is_available()), but in ACPI.
+>>
+>> For fwnode_for_each_child_node(), the ACPI callback is
+>> acpi_get_next_subnode(), and I don't see that the device_is_available()
+>> callback is used in that case.
+> 
+> fwnode_get_next_available_child_node() also calls
+> fwnode_device_is_available() and that returns false on all non-device nodes
+> right now. As noted above, fwnode_device_is_available() should probably
+> return true for non-device nodes on ACPI. I'll post a patch.
+> 
 
-Ah right, I overlooked that pci_intx() also has the _GPL version.
-Will make consistent.
+fwnode_device_is_available() is indeed called in
+fwnode_get_next_available_child_node(), as I stated a couple of lines below.
 
-Thx,
-P.
+My question on the other hand was how that is called in
+fwnode_for_each_child_node(), as I could not see any call to check
+availability in acpi_get_next_subnode().
+That is what confused me about the _available_ macros being the same as
+their counterparts without the _available_.
 
->=20
-> Alex
->=20
-> > =C2=A0
-> > =C2=A0static void pcim_disable_device(void *pdev_raw)
-> > =C2=A0{
-> > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> > index 7d85c04fbba2..318cfb5b5e15 100644
-> > --- a/drivers/pci/pci.c
-> > +++ b/drivers/pci/pci.c
-> > @@ -4476,6 +4476,32 @@ void pci_disable_parity(struct pci_dev *dev)
-> > =C2=A0	}
-> > =C2=A0}
-> > =C2=A0
-> > +/**
-> > + * pci_intx - enables/disables PCI INTx for device dev, unmanaged
-> > version
-> > + * @pdev: the PCI device to operate on
-> > + * @enable: boolean: whether to enable or disable PCI INTx
-> > + *
-> > + * Enables/disables PCI INTx for device @pdev
-> > + *
-> > + * This function behavios identically to pci_intx(), but is never
-> > managed with
-> > + * devres.
-> > + */
-> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
-> > +{
-> > +	u16 pci_command, new;
-> > +
-> > +	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
-> > +
-> > +	if (enable)
-> > +		new =3D pci_command & ~PCI_COMMAND_INTX_DISABLE;
-> > +	else
-> > +		new =3D pci_command | PCI_COMMAND_INTX_DISABLE;
-> > +
-> > +	if (new !=3D pci_command)
-> > +		pci_write_config_word(pdev, PCI_COMMAND, new);
-> > +}
-> > +EXPORT_SYMBOL_GPL(pci_intx_unmanaged);
-> > +
-> > =C2=A0/**
-> > =C2=A0 * pci_intx - enables/disables PCI INTx for device dev
-> > =C2=A0 * @pdev: the PCI device to operate on
-> > diff --git a/include/linux/pci.h b/include/linux/pci.h
-> > index 573b4c4c2be6..6b8cde76d564 100644
-> > --- a/include/linux/pci.h
-> > +++ b/include/linux/pci.h
-> > @@ -1353,6 +1353,7 @@ int __must_check pcim_set_mwi(struct pci_dev
-> > *dev);
-> > =C2=A0int pci_try_set_mwi(struct pci_dev *dev);
-> > =C2=A0void pci_clear_mwi(struct pci_dev *dev);
-> > =C2=A0void pci_disable_parity(struct pci_dev *dev);
-> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable);
-> > =C2=A0void pci_intx(struct pci_dev *dev, int enable);
-> > =C2=A0bool pci_check_and_mask_intx(struct pci_dev *dev);
-> > =C2=A0bool pci_check_and_unmask_intx(struct pci_dev *dev);
-> > @@ -2293,6 +2294,7 @@ static inline void pci_fixup_device(enum
-> > pci_fixup_pass pass,
-> > =C2=A0				=C2=A0=C2=A0=C2=A0 struct pci_dev *dev) { }
-> > =C2=A0#endif
-> > =C2=A0
-> > +int pcim_intx(struct pci_dev *pdev, int enabled);
-> > =C2=A0void __iomem *pcim_iomap(struct pci_dev *pdev, int bar, unsigned
-> > long maxlen);
-> > =C2=A0void __iomem *pcim_iomap_region(struct pci_dev *pdev, int bar,
-> > =C2=A0				const char *name);
->=20
+Could you please clarify that? Thanks again.
+
+>>
+>> For fwnode_for_each_available_child_node(),
+>> fwnode_get_next_available_child_node() is used, which checks
+>> fwnode_device_is_available(), which then calls device_is_available().
+>>
+>> What's the catch?
+> 
 
 
