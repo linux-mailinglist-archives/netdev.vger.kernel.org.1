@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17B799AF0F
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 01:10:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD59499AF11
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 01:11:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C9BA1F2288A
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 23:10:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DB17286FCB
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 23:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4339B1E47BE;
-	Fri, 11 Oct 2024 23:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC9C1E7640;
+	Fri, 11 Oct 2024 23:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RoMduaAi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g5kDCBCA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E581E3786;
-	Fri, 11 Oct 2024 23:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8231E6DDD;
+	Fri, 11 Oct 2024 23:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728688235; cv=none; b=qblaiPBgt7fmw+OUaSkP1s5tDaZPuLQtwWUylEW0srZDbEtlq4uSQ+c/faiwjOkP+t06nC/QZNByj4y1pQ1eGA5A5cXW4y53pzUHfQLP9oFlR9DMmFYkm5h6zbTWL1Gm624IYGvA8m/TLy07ScnuNUCjlOOUFdngnPT03EOK+3Q=
+	t=1728688236; cv=none; b=SG3c58yvP0eaXdQWFrA/iMcfxRPeezMPwuQ2mGlhqivP2hTKkzD1rYQU1c5puX6Snz3NER9U4D9YkTSqbUFq5kKGCGWwQHoOzlRZ2AU6YE6CSz8VauYt5/G92qFBavoRBF5z1VlXbZE9Vl6jWjCqbWQUr7f4p3cejZw9teLtk9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728688235; c=relaxed/simple;
-	bh=j9zN59cx19FqHur0YFxPqcYCl41LyYMRbn8YHI5JBEE=;
+	s=arc-20240116; t=1728688236; c=relaxed/simple;
+	bh=0ipEl/xozdmBLGShV6uOpVDxybg/hjHgi3Kudb4Tt5w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QakUmjPCET1A4ziwnI3FN2CyaCGLj+eeQX5spskBb7uxr0C+IFCua3rT1PVYvZmNJLaTUnXPNzZ6o9K6lFd4CVKeBQjwRGUUYXUPtiHz3BaCks4c0wXELT48PYS0ZAWFLE9uEqtaKAOORidCA9ZduVDilm6x9r34TWkbgEYuKsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RoMduaAi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95B0DC4CED1;
-	Fri, 11 Oct 2024 23:10:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qg70aommlhw3L1T6Q6PPwBMJR7J8WhjahEgE9SJJOOnIXr0xYUKBO4EAQRy4DzT8MUxY30MnMmgY9hrOJ/1V/RppuFB9rfGAJGgFrWnELqeR+cJRqNIF43f7cTJlJdvsFiW4b+xgp8spVgp43HBS0DW5A1/RmS6HpIzWq4XOlak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g5kDCBCA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A91DC4CEE5;
+	Fri, 11 Oct 2024 23:10:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728688234;
-	bh=j9zN59cx19FqHur0YFxPqcYCl41LyYMRbn8YHI5JBEE=;
+	s=k20201202; t=1728688236;
+	bh=0ipEl/xozdmBLGShV6uOpVDxybg/hjHgi3Kudb4Tt5w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RoMduaAiMX6S4iYv5OrR+rbr3LkHYnraMaDuM87829C4yLLkAj96hM5tV7FScZL0A
-	 dMj8hfjjW96pUYJvZNKlOAfeHVCbpuBWDM72wTBoL2KxwBbBElPVm8UB5/XuwqjA7I
-	 ko6D1NqicyukZ5BVP+mw9LjQIfDKuKX8vX8SmekQvDZ2p+IFrAtDF4xxTHCVmWmrB5
-	 eABUMixMU2TDrdVdcnTB/ZbAY1b6CwCjWUwH4J7bGSywFUHkt+5AUZGcF9Kbk/tQcJ
-	 Ok5DjOi4mRTz23S73oDkaER4Lqi9C+BApjxRFd301A6pHrWjzAtNP0K46cf2INofe+
-	 XJqniueg4fSdw==
+	b=g5kDCBCAcXeUeb2C0UZKaNHXpjQdtb4RxofS3nCKUI0ViYbduD5VK6BYrJo+RX8oK
+	 9m8sAPHqfZVrGmithBfYVo2/Gy9bhVO//OdRoa+/F4afFNtLN1yK7EGs/wrETv21+6
+	 aP+bY8ST0D7LydhNyzTdAPwZDejJmiOIAR+XiCSKJPAoHT7YWt20aFjHo9Lhcj8RSV
+	 g0B4STiHUzM3OdGuZp8quBIiZBU/bQefMmGhQOK3N85i2fYYPfm8T0AN2Sp/P1gG6a
+	 Q09cEn4XcYLFFVXWQNgN9omsFcPuKO4H7P1+VMes5CsBPGDpzOxOGVIFNFGE05s2Rs
+	 eTVY2XfPfZjzQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7119438363CB;
-	Fri, 11 Oct 2024 23:10:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB21D38363CB;
+	Fri, 11 Oct 2024 23:10:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: enetc: add missing static descriptor and inline
- keyword
+Subject: Re: [PATCH v2] selftests: drivers: net: fix name not defined
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172868823925.3022673.11344630026816990350.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Oct 2024 23:10:39 +0000
-References: <20241011030103.392362-1-wei.fang@nxp.com>
-In-Reply-To: <20241011030103.392362-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
+ <172868824050.3022673.6364802476859924447.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 23:10:40 +0000
+References: <20241010183034.24739-1-alessandro.zanni87@gmail.com>
+In-Reply-To: <20241010183034.24739-1-alessandro.zanni87@gmail.com>
+To: Alessandro Zanni <alessandro.zanni87@gmail.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
- christophe.leroy@csgroup.eu, linuxppc-dev@lists.ozlabs.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, imx@lists.linux.dev
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com, sdf@fomichev.me,
+ martin.lau@kernel.org, dw@davidwei.uk, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ skhan@linuxfoundation.org, anupnewsmail@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 11 Oct 2024 11:01:03 +0800 you wrote:
-> Fix the build warnings when CONFIG_FSL_ENETC_MDIO is not enabled.
-> The detailed warnings are shown as follows.
+On Thu, 10 Oct 2024 20:30:30 +0200 you wrote:
+> This fix solves this error, when calling kselftest with targets
+> "drivers/net":
 > 
-> include/linux/fsl/enetc_mdio.h:62:18: warning: no previous prototype for function 'enetc_hw_alloc' [-Wmissing-prototypes]
->       62 | struct enetc_hw *enetc_hw_alloc(struct device *dev, void __iomem *port_regs)
->          |                  ^
-> include/linux/fsl/enetc_mdio.h:62:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
->       62 | struct enetc_hw *enetc_hw_alloc(struct device *dev, void __iomem *port_regs)
->          | ^
->          | static
-> 8 warnings generated.
+> File "tools/testing/selftests/net/lib/py/nsim.py", line 64, in __init__
+>   if e.errno == errno.ENOSPC:
+> NameError: name 'errno' is not defined
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: enetc: add missing static descriptor and inline keyword
-    https://git.kernel.org/netdev/net/c/1d7b2ce43d2c
+  - [v2] selftests: drivers: net: fix name not defined
+    https://git.kernel.org/netdev/net/c/174714f0e505
 
 You are awesome, thank you!
 -- 
