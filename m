@@ -1,99 +1,142 @@
-Return-Path: <netdev+bounces-134663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 028A799AB7F
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 20:52:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6513D99AC52
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 21:05:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EDDCB232FD
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 18:52:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E43931F22847
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736031D016C;
-	Fri, 11 Oct 2024 18:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916C81D0789;
+	Fri, 11 Oct 2024 19:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VUO9ZYgU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahY7ztNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFC91CCB31
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 18:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE041BD4E7;
+	Fri, 11 Oct 2024 19:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728672592; cv=none; b=m57ZVVXKv0r+XgcheUHV0KgHGjwfSPt3w+l3BHfU4l6Moi8jToW5S6HSCVbJ5NGjTcMVdyIH98U8iTlXLW3yo752otFfkSaIjN0vxuySD6g688H+xD0bXzenJwmc5AfuHaBYGG4xuing/n38ot/gRO2Zf0G4vmoVuGk3iGPMQQQ=
+	t=1728673206; cv=none; b=qUla/OqQzFRtl0J2ez8OdZaSXuOdi04VGA7auIfr5adFnXYj1q0w2QjenNlhPbr2NX1eaLa4HKmltEF8M3XW2JY//Q7zBGcUnenHfNgQWvQrefUNPLH7LrvEdli6p1ePUns+E4nRsXrcEc1POT0///vssfEjXbEiNqmipfl25/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728672592; c=relaxed/simple;
-	bh=QIHwncpZoPxRu2uYUBr20M+nEnu60kU1bDm4StCp+FI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nsczhlsfjLY+VS1VLXzPc1ikrrS/z7yuBljkSUetQDwAnMSjkl+ao908RjRqrxwh2Z62mnSOsPqFBYGZUY0s61obwN0Ppr6IjhFM1hRAaRrRNYRIb7ZSfMDD63PFHJ4DGIRZmrQ7IIQGqhb0zi1GxtvnCv7Cr68B1PMmJ+aHD24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VUO9ZYgU; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c87c7d6ad4so3245399a12.3
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 11:49:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728672589; x=1729277389; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QIHwncpZoPxRu2uYUBr20M+nEnu60kU1bDm4StCp+FI=;
-        b=VUO9ZYgUu39w9QKq/L+qfsHIn52oQkaV089XNPV1JKUFUT11ceG/kBfrPsmg8Y0lZU
-         tvXCRhzKyK8kMSWN/PIN4sOcpFd6lFDRL/ARyQzEuAijIBptRrCOqPfueDI+b7XHfDTo
-         16Nqc6etYljjS1GHnUdgOZFqG4oqBtWn59/V4+36/JMkSCdP9Ovhue9vyqNpIM3vpMWx
-         kYefHKzFf1xoczxsY5TgTOMrgDdB9MOqGueAFhqq/Q4/bj/W21Q4pCUc6kIfqKkE/1gJ
-         zR5bBOatCg/TJ6lDO6NX2p8guGKcBs9Y6R/eBVUzeZ07hmaLyqMt+LBwfFrWH0Ncjjd7
-         39mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728672589; x=1729277389;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QIHwncpZoPxRu2uYUBr20M+nEnu60kU1bDm4StCp+FI=;
-        b=H3w7ivljQoxYOpyYYdGvpcnsjILRemFUOWd6GrV6BodMlwXLaQQ5IJ8xsYQ+m7n6Lm
-         PntKe0AQQ04ZVJflfq0VbuPKJlDFS5hkgppGWPX3U/ZFWRHb/nlpYht3lZvdD7rucVve
-         PWIIDtnoq6opPwzt1tiOkK0UOfZxcUgysZ9uzZCvmfJdXcwM+Y0CSI2WcLkO88XwNSxo
-         9B+tCVD3x3BArStgyQxCUCyLDENByP/BLvvSpBfOUzWGZ0NEewcJSTwzZEM58pM9DADh
-         SZbkwFBKKOl3UxlWJVl5A2RyMuz879dnDWKhi52x80KSV92ryIeTRxObgcGAwT4Zau3n
-         G+vw==
-X-Gm-Message-State: AOJu0YwajA0U2C7prnhJOmibbhZY+BHM0OesF3s/d9dvIL956TBY1t0u
-	GViZwWS++RcZuQVeuo2yfDiC29pnUvlRk9l16KtqJ0hGqUdFLksy/uH3PFG2Pbu2x0pxaaxHolW
-	nIbJYW+usYYkR/6Sj6SQYFH6l2eYqYrjs09qNRG4LHYeHvnSZIr8O
-X-Google-Smtp-Source: AGHT+IHkYbxqk/YesUXXruMuOI+CR8GCey6RROAO7yQ6qHLCyPdTSNHKOsMY9NIgQ6xgXpENUM2N0HadBwodQZ7bUD0=
-X-Received: by 2002:a05:6402:3512:b0:5c9:40e6:24e with SMTP id
- 4fb4d7f45d1cf-5c95ac4175emr209271a12.28.1728672588855; Fri, 11 Oct 2024
- 11:49:48 -0700 (PDT)
+	s=arc-20240116; t=1728673206; c=relaxed/simple;
+	bh=a84u9nTZ3sCDcURG6NNOgGWd1sDBA3xGdpK8P8jUnag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=apUH4Tn8KDvcB1B99GSBR3qCi2McDAltGEcY3IIIpYEyKHPI8IdNF2/fqalkWUkOYw/gyGSrjSKOySiSZEK5mlpa4G0J9s50Pu9FQA+HRx4mHdiY1YJyoPaxaU1wCqqEkt2cDgKIPEOo7GEx12yrBv5Tk/rSnqgAOdyf6ws4ekQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahY7ztNv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8944AC4CEC3;
+	Fri, 11 Oct 2024 19:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728673205;
+	bh=a84u9nTZ3sCDcURG6NNOgGWd1sDBA3xGdpK8P8jUnag=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ahY7ztNvTTetEplHcaY8bCL4JU7+eKJkpcwiGJvQZaC4cMapaXfQuxagwMLLJxHha
+	 xFjwj5ikLuNRcLJ1pNrhpQnsSEkP5vtKx7JYcTJ4M5MIjmGBg0lTSfqL5l39Qkeik8
+	 L4pjhKvmt+LcIpUsGysVpSOKc2LDX3aQmg+ZleHnz/qY4VQ7w5rhmFmzYrHE970D1N
+	 WJiIi43l5zjrUe5CjN3uz0vw7JfExbvfGxCXVeQ/L6tU7K97WawMsMSeU+yetPaeeg
+	 ivMmF7eM08D+Jk88NwhxzhkxPAgh8iT8k+RavqfWFA5zF5h043w4gZ3x3bm61/3jui
+	 Fecn1nuqgCTBw==
+Date: Fri, 11 Oct 2024 19:59:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Vishal Mahaveer <vishalm@ti.com>,
+	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v3 3/9] can: m_can: Map WoL to device_set_wakeup_enable
+Message-ID: <20241011185929.GA53629@kernel.org>
+References: <20241011-topic-mcan-wakeup-source-v6-12-v3-0-9752c714ad12@baylibre.com>
+ <20241011-topic-mcan-wakeup-source-v6-12-v3-3-9752c714ad12@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241011184527.16393-1-jdamato@fastly.com> <20241011184527.16393-7-jdamato@fastly.com>
-In-Reply-To: <20241011184527.16393-7-jdamato@fastly.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 11 Oct 2024 20:49:37 +0200
-Message-ID: <CANn89iLT1AFU7KidF=w0UkA0PXVa=engQjZvCgsoQ25pDa3S1w@mail.gmail.com>
-Subject: Re: [net-next v6 6/9] netdev-genl: Support setting per-NAPI config values
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com, 
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com, 
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com, 
-	Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Mina Almasry <almasrymina@google.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241011-topic-mcan-wakeup-source-v6-12-v3-3-9752c714ad12@baylibre.com>
 
-On Fri, Oct 11, 2024 at 8:46=E2=80=AFPM Joe Damato <jdamato@fastly.com> wro=
-te:
->
-> Add support to set per-NAPI defer_hard_irqs and gro_flush_timeout.
->
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+On Fri, Oct 11, 2024 at 03:16:40PM +0200, Markus Schneider-Pargmann wrote:
+> In some devices the pins of the m_can module can act as a wakeup source.
+> This patch helps do that by connecting the PHY_WAKE WoL option to
+> device_set_wakeup_enable. By marking this device as being wakeup
+> enabled, this setting can be used by platform code to decide which
+> sleep or poweroff mode to use.
+> 
+> Also this prepares the driver for the next patch in which the pinctrl
+> settings are changed depending on the desired wakeup source.
+> 
+> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/can/m_can/m_can.c | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+> 
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> index a978b960f1f1e1e8273216ff330ab789d0fd6d51..29accadc20de7e9efa509f14209cc62e599f03bb 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -2185,6 +2185,36 @@ static int m_can_set_coalesce(struct net_device *dev,
+>  	return 0;
+>  }
+>  
+> +static void m_can_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+> +{
+> +	struct m_can_classdev *cdev = netdev_priv(dev);
+> +
+> +	wol->supported = device_can_wakeup(cdev->dev) ? WAKE_PHY : 0;
+> +	wol->wolopts = device_may_wakeup(cdev->dev) ? WAKE_PHY : 0;
+> +}
+> +
+> +static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+> +{
+> +	struct m_can_classdev *cdev = netdev_priv(dev);
+> +	bool wol_enable = !!wol->wolopts & WAKE_PHY;
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Hi Markus,
+
+I suspect there is an order of operations issue here.
+Should the line above be like this?
+
+	bool wol_enable = !!(wol->wolopts & WAKE_PHY);
+
+> +	int ret;
+> +
+> +	if ((wol->wolopts & WAKE_PHY) != wol->wolopts)
+> +		return -EINVAL;
+> +
+> +	if (wol_enable == device_may_wakeup(cdev->dev))
+> +		return 0;
+> +
+> +	ret = device_set_wakeup_enable(cdev->dev, wol_enable);
+> +	if (ret) {
+> +		netdev_err(cdev->net, "Failed to set wakeup enable %pE\n",
+> +			   ERR_PTR(ret));
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+
+...
 
