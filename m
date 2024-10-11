@@ -1,121 +1,155 @@
-Return-Path: <netdev+bounces-134599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57D299A5CD
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:09:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD8499A601
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA4E61F2243E
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:09:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82E2EB26456
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DAA2185A5;
-	Fri, 11 Oct 2024 14:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3Gz4Nc/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E3A21D168;
+	Fri, 11 Oct 2024 14:10:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5C92185AF;
-	Fri, 11 Oct 2024 14:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A4C21A6E7
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 14:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728655783; cv=none; b=pwMaLr7iSaBTFSGu1ZPOZB7mWcik6hXl36vLTvn6VDubabWmB7B0+ftAQtrIE44qH6Pr4+lLygB2rOONaw61AYY9wCFi21sWKdEOmS+LWVsLQmT1b4HbMxIaIWPAjMja39ybPYeN1WhRDXT8Wtf0QfZkeXW/9NPtYhOSiB4roYI=
+	t=1728655856; cv=none; b=CrTG2gdYOp3H/nPfQxgM+KkLB0QWmLUWEta2gawyTPlXgRmFCRMdLgOsqEobLC0FpT6lwIzyIaBJwCRmiRv9NX7Wd1OzeLFoBgtOMEvAwlV+uAn86gSnZpFBcHSYcnZiU+cjRVrXQ/uEE7CUSAr6HNHXd9VmrD3hn6KIBWYQrtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728655783; c=relaxed/simple;
-	bh=kW9CDWhL8cU10uW30Ctc/KnAKpjn0N92tlitb9iuIII=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NuboeepslK1QCVvJKSCJK8ZMb3e8znlyivij1+n8op0mKoNy6bbuhIlRQcGPoCytfaxoAHw3FWHlIvLAItfgiMZlJc4Rl4kqr6pk7kGQQq9bXO4quetL+VXlWIvqMrPAttH2HyPdcghklWGQxgbT2uJU7inDOLCK56Q/rZ3l5HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R3Gz4Nc/; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-46040dadedfso19676351cf.1;
-        Fri, 11 Oct 2024 07:09:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728655780; x=1729260580; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=csdorD/XI9vvOYRw8oWUox4UAr37xXSbNh8csh0YlvE=;
-        b=R3Gz4Nc/bwVzExpNfEDGgoyuoBVNd8rRZuY0XWVReV5uhrjKgXXGg844OqxHL2zV/+
-         af3Ms58epqjeGpUa5OEElE55uKwFdHYK3qTXHvEq3/azETGpT9DQq6TbT8IfbSMoPajF
-         kf4ad2JQJ69cK0fx6JGnzZcj1Y787VSzWWGhoB8oZa4OLB0He6U4X8n2L+pPH/jwoDmP
-         Zy8Nj+PSW3Q+MfsY8oondFCSldSCRV3U9hkzYWqjPlrLSm/voN4WStwe3IZKsYonLvGq
-         XFUpJS7jvIcOi0TgDvJ2x2XdllFu2Lt35NoBcsX1Gg+UcMIFrl33g/07g2/OCmVjl0NF
-         /73A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728655780; x=1729260580;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=csdorD/XI9vvOYRw8oWUox4UAr37xXSbNh8csh0YlvE=;
-        b=GaY8q+WtIPgrc6LwbN7/MZddMvERZinbO4tuzsc+3aN0ARKxv8ded7sR41eQ30t0SM
-         pTgqARSzV+MkZ1LNLjoyMTj/h7dq50GowCTNDzuqHj89Rm25CL2TLdWagrxE9HYQcUHb
-         te0g2h3ZUB9SXh/CsnidKMDTmSGTm1V6pSF30prswuH9mUuVRqpfdpTsMKZqAQuT0l+D
-         Ah4TVJd5Dns3Ls1dNm9POlyMajyqiDclz3O++9tAAnv5+/emILbLS0W1ZLnQg+lRRxAh
-         BQHxkiCzHBGF2Bzu4Uinhz5Dcy5xFGGIMibUUsrbUSbhR9wSp2oTyd5Eyyogdezy9QQ3
-         DpxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcLBBBEuP5xKdDJxMMH4inoNfOby1gmF1Lz84zXEnKbAHoRasPK5pWJQdv0mGhVaEyUGwUtqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKDkwws/5p2W7QqX4xRjlpubH5luJRsV08DQeCruYEX7JLgE40
-	NR5KMJuPAeWuZrRfV+/HFuyc6npfHkKNGf07RkB0nbqh4vxAUyqq
-X-Google-Smtp-Source: AGHT+IHLko3U+XuJKW4KKsn1xXk814wIHDBygDMBFuKBHZLLU6nMu+8vFr1dqz3VYQ9FPYHGnkmDPw==
-X-Received: by 2002:a05:622a:1f07:b0:458:4ded:fe99 with SMTP id d75a77b69052e-4604bc2e4ffmr44246951cf.42.1728655780094;
-        Fri, 11 Oct 2024 07:09:40 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46042789ba9sm15573261cf.14.2024.10.11.07.09.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 07:09:39 -0700 (PDT)
-Date: Fri, 11 Oct 2024 10:09:38 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- kernel-team@cloudflare.com, 
- Ivan Babrou <ivan@cloudflare.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- stable@vger.kernel.org
-Message-ID: <670931a2edb62_234aca29433@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
-References: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
-Subject: Re: [PATCH net v2] udp: Compute L4 checksum as usual when not
- segmenting the skb
+	s=arc-20240116; t=1728655856; c=relaxed/simple;
+	bh=Evz9PqaYCouD/IH0SVGRo5c95kYbJTRWx/H2nAPLIQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HNIe9faoqP3SfRhvD2qOzenMBTlJOaPMoijltfD1E/U+dyngea+KEVWJLlhV6AI2cNRaAUOi3y197Xv97ePruiaP/mnxSL13sOmw34bk0aH55hNh9A6AvR9m2O9lATF0KjRUkbzSqgamixE3EgigaLAEE8pFpO42r3z+ORlA8kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1szGLX-0004Wz-Jd; Fri, 11 Oct 2024 16:10:23 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1szGLS-0016f6-BL; Fri, 11 Oct 2024 16:10:18 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1szGLS-005ipa-0l;
+	Fri, 11 Oct 2024 16:10:18 +0200
+Date: Fri, 11 Oct 2024 16:10:18 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Sabyrzhan Tasbolatov <snovitoll@gmail.com>
+Cc: eadavis@qq.com, davem@davemloft.net, edumazet@google.com,
+	kernel@pengutronix.de, kuba@kernel.org, leitao@debian.org,
+	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mkl@pengutronix.de, netdev@vger.kernel.org, pabeni@redhat.com,
+	robin@protonic.nl, socketcan@hartkopp.net,
+	syzbot+ad601904231505ad6617@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH net-next V2] can: j1939: fix uaf warning in
+ j1939_session_destroy
+Message-ID: <Zwkxyr-MndeD6mmB@pengutronix.de>
+References: <tencent_5B8967E03C7737A897DA36604A8A75DB7709@qq.com>
+ <20241011134124.3048936-1-snovitoll@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241011134124.3048936-1-snovitoll@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Jakub Sitnicki wrote:
-> If:
-> 
->   1) the user requested USO, but
->   2) there is not enough payload for GSO to kick in, and
->   3) the egress device doesn't offer checksum offload, then
-> 
-> we want to compute the L4 checksum in software early on.
-> 
-> In the case when we are not taking the GSO path, but it has been requested,
-> the software checksum fallback in skb_segment doesn't get a chance to
-> compute the full checksum, if the egress device can't do it. As a result we
-> end up sending UDP datagrams with only a partial checksum filled in, which
-> the peer will discard.
-> 
-> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
-> Reported-by: Ivan Babrou <ivan@cloudflare.com>
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-> Acked-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Cc: stable@vger.kernel.org
+Hi Sabyrzhan,
 
-You already included my Acked-by, but just to confirm: LGTM.
+On Fri, Oct 11, 2024 at 06:41:24PM +0500, Sabyrzhan Tasbolatov wrote:
+> On Thu, 8 Aug 2024 19:07:55 +0800, Edward Adam Davis wrote:
+> > On Thu, 8 Aug 2024 09:49:18 +0200, Oleksij Rempel wrote:
+> > > > the skb to the queue and increase the skb reference count through it.
+> > > > 
+> > > > Reported-and-tested-by: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
+> > > > Closes: https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
+> > > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > > 
+> > > This patch breaks j1939.
+> > > The issue can be reproduced by running following commands:
+> > I tried to reproduce the problem using the following command, but was 
+> > unsuccessful. Prompt me to install j1939cat and j1939acd, and there are
+> > some other errors.
+> > 
+> > Can you share the logs from when you reproduced the problem?
+ 
+ah, i was on vacation and it went under my radar, sorry :(
+
+> Hello,
+> 
+> Here is the log of can-tests/j1939/run_all.sh:
+> 
+> # ip link add type vcan
+> # ip l s dev vcan0 up
+> # ./run_all.sh vcan0 vcan0
+> ##############################################
+> run: j1939_ac_100k_dual_can.sh
+> generate random data for the test
+> 1+0 records in
+> 1+0 records out
+> 102400 bytes (102 kB, 100 KiB) copied, 0.00191192 s, 53.6 MB/s
+> start j1939acd and j1939cat on vcan0
+> 8321
+> 8323
+> start j1939acd and j1939cat on vcan0
+> [  132.211317][ T8326] vcan0: tx drop: invalid sa for name 0x0000000011223340
+> j1939cat: j1939cat_send_one: transfer error: -99: Cannot assign requested address
+> 
+> It fails here:
+> https://github.com/linux-can/can-tests/blob/master/j1939/j1939_ac_100k_dual_can.sh#L70
+
+I assume it is just secondary fail, it probably failed on address claim
+stage in j1939acd, so the j1939cat was not able to start transfer due to
+missing (not claimed) address.
+
+> The error message is printed in this condition:
+> https://elixir.bootlin.com/linux/v6.12-rc2/source/net/can/j1939/address-claim.c#L104-L108
+> 
+> I've applied your patch on the current 6.12.0-rc2 and the syzkaller C repro
+> doesn't trigger WARNING uaf, refcount anymore though.
+
+Yes, because transfer protocol is broken now. 
+
+> == Offtopic:
+> I wonder if can-tests/j1939 should be refactored from shell to C tests in the
+> same linux-can/can-tests repository (or even migrate to KUnit tests)
+> to improve debugging, test coverage. I'd like to understand which syscalls
+> and params are used j1939cat and j1939acd utils -- currently, tracing with
+> strace and trace-cmd (ftrace).
+
+I have nothing against it, some of them I implemented in C:
+https://github.com/linux-can/can-tests/blob/master/j1939/tst-j1939-ac.c#L1160
+
+Right now I do not have enough time to port it, but I can support anyone
+who is willing to do it.
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
