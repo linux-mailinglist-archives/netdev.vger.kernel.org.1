@@ -1,154 +1,190 @@
-Return-Path: <netdev+bounces-134577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 324F899A3B6
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:17:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 351AB99A3E3
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:28:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B823B28620F
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:17:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B72191F2584D
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2DA215026;
-	Fri, 11 Oct 2024 12:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDDA218D60;
+	Fri, 11 Oct 2024 12:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="NCF+0ZvP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fp6KMWPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02AC1BDAA1
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C102178F1
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728649064; cv=none; b=KRvQvo8rNG/MvjjRdaX3kFJGKpE4V18QeKzgo8V7MY0fFxjnltjvUJz39l4Xb1qve2ZNCrIJ3RPEhwzyTvV9vm4CGU40V8vtp5ovaE3d2WLbPYnQQtr896VcvrkHgPY7vle5uFkseLpYkVEk+xeXfHRZvAMAxogJpGAfGJccovY=
+	t=1728649678; cv=none; b=IJOKikKzd74w6i8tF02xuBFxDB7JyVtDf3JBphHucjzHR2uif1ke6V/1BSFih5G74Fwt3zs+o2TjZghBV49+3qM179cGQc8JpIcx+QQsc8f+HSA7B83Y2jy5zoP2UpKAx40+Oz/TbtHub00z5VuHyzprnetQBi04sGmykwq83Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728649064; c=relaxed/simple;
-	bh=eO62LU8SoD1YfaUuQEvmxDbXmclSlnyio751UBysGvM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gJCEQxes7ZVxQm25UnhoFFpXGuG9Z3yNa5njM3e4beo0ICZC2PxGCaxGmygicW9uJXQasx9/qkKf6Bj7BP4PCSrqmCph3X/li6HcZwhVwG5FBDTl6mK+D9bMzyaw2WJewBOH9h8pQbUGNQRsloqgzglv2dbWi4wtjTu4z3np9s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=NCF+0ZvP; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a9944c4d5d4so278267666b.0
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:17:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1728649061; x=1729253861; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YmRhYjgKFlXwHdCjp7CMmqDJ+gSj4F4GENuDhEWENZk=;
-        b=NCF+0ZvPSNQu++EfG9IMtYHGoQoCfSad4cKoTIf9/OdS+A49vx4jpwnxe6QIgV4huA
-         0ADUz73Spw/dYQMPQD0cLoWGiNXRnSod+3dxIAY7gSrKMahlURpmB/TxEfm+kD9uqQCp
-         y9Hx8eAyPy0XEY3TC8rKhkxyzexchuHpM8BWORyEXRuoyeKvJigATRG1wER2cO6SWoUF
-         yH54wvU+56Jc77Kz45tYmbXwY/TvWlUH758d4/jbFGe3cwHZOgDUl2g2rDIl5iCYvnWH
-         NiP0L+iQEzHM3tsrBhJ7h4Uj66psg6EobBbsRPfA+6UOHEug4O0k8tZ8tmXMUe8cWrae
-         PV9g==
+	s=arc-20240116; t=1728649678; c=relaxed/simple;
+	bh=ULnSG4geb8Txl5Cj3WsAJjHU3fohxOMG1UD3Gjc1u5Y=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pgdHu3Xr63gUqqG6TzbR9wVcTQleb9GofQcOdfw3onJ1vFU709bu2BOUIvIjJoAQKw2WgCi3pWEEYGvFczgXgGUrWP2Xq+quakZNsAeip8ISWt24Ms2GdbBi5CK4iB4nj3bUPkW9d63mcmO2HnsWc4nNgr57yrFOTVK9h7/qOtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fp6KMWPa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728649674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OvgPP8URR3aRLLAeRhIGd9GfEadFvbPu0wTLuyU+TtY=;
+	b=fp6KMWPanTJLYlJUNx65p4DGmVtecsomSgEDF+ivbF5NeUvydKp19dLwtIwo5u/Nm3zxwa
+	dMp9UrbMIwsOSTdEmDlpuTZGYmSYW1USKh7euU4hgrSbbtYFodJ/uINX8yvZAvbJM+jmPY
+	qHkBYqHfCs0YDCWQbLODd5x4w5aam/0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-501-2lTD4LD6P4uMgWi5FfYmqA-1; Fri, 11 Oct 2024 08:27:53 -0400
+X-MC-Unique: 2lTD4LD6P4uMgWi5FfYmqA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43111c47d0bso9790865e9.2
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:27:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728649061; x=1729253861;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YmRhYjgKFlXwHdCjp7CMmqDJ+gSj4F4GENuDhEWENZk=;
-        b=QiUSfe5FlU0KoJLGceZnHNnZXUtwW2GRuJlPOJP32+P+6NZV4Gcr7aGZA9fKUAtkVK
-         eoKKS7zMBkbHzitXTulQ6dccSGq5IM/NlkmiWqkTJOC4pkfoF+vNZqSWKxgRrxLKIQ6z
-         NTUY+DjkJibxaLRWCHtaGVb/XloSQQwCw1hwN9fei2u2lyWhSDAgO2K7R3j0dTkxhLnt
-         71SvRPuNVXSnb0fLIvw9XBJdpBV+jY9XEkeYwRKyQc4AS3JrxrdB8hymbDUNyc6l6cpz
-         vvKfoOxnTZOFR6DiwMkh6TYcoO5MkebDCUPivL5sVBfwSItcvSFsl52dk79/MfX44bTG
-         5CTQ==
-X-Gm-Message-State: AOJu0YwWxJpyJ1PF5sc6dQrOzl01fQZaeuQ4yGg/JHYQL+6V8ZCEw/Qz
-	kQRzFn73P7LiTx3y4Lo/kklS9T3zbCfbM6k7QjOAx2kdZAyITN+tiuMgvkGh5qQ=
-X-Google-Smtp-Source: AGHT+IHU0QNA+MmfpW76pz3Kn9cahurQK/twSOi5kFjPmPf5N0OSv0hj4JKUVaQsxLIaBgR+2Cg5DA==
-X-Received: by 2002:a17:907:f15b:b0:a99:7b6f:c8a7 with SMTP id a640c23a62f3a-a99b9582f23mr210085066b.46.1728649061069;
-        Fri, 11 Oct 2024 05:17:41 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:506b:2dc::49:1d6])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a80f29cdsm205928466b.210.2024.10.11.05.17.40
+        d=1e100.net; s=20230601; t=1728649672; x=1729254472;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OvgPP8URR3aRLLAeRhIGd9GfEadFvbPu0wTLuyU+TtY=;
+        b=E0PRw9Px56pwszSNj1Igvh2bvLAX6ES94vce9AoCQk/me4FoNnG5Lc/BO63lNYxNnQ
+         UsXJHWUw9GInslziipfQEHBm9qEYbtyErGhUYdle9zz5i4WZD3ZX/xY2dVHDZpznT2iV
+         fjzkjRYm2n/I/GxIPg3Bn/VhV/laRU0HwnRyw6w5yGhK6GMv5rQAdTCPBLOA51Edysl8
+         KN/JY1pLpLsM1JBpPHCBiScIPrz6j9jqIU/h2fxHLlP+MeGGoR7VU+xeLZaDA6SMMjtH
+         p2+XPWutd4qFtFPoNAvJwjR8Mo8K4nZdhrHUmcT80aj0rx6a2T3GGsb713r6XIs3wdGc
+         b23w==
+X-Forwarded-Encrypted: i=1; AJvYcCWpgfj6BCbIfZNO4Wgr4yUDjIBz2STBeu0UgebJWoUMXlIS9gGTIdLxI5UYfJvgTJXEm/k3ncg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDg6EloCaY8JtCoxvQuWFJt/ARiP7FliU0E66W8EX2PoSYUB0F
+	z7L1DZcKZbzfuBgZeSTVFVyN9RSOVYjKxbs7LZHdRA7z4LGrBAtG1O95S0gUysuxe6c0THIJBCD
+	8g7xOps0A+Ahutdtb68LQbsZNEGmLFFSGpjfTuoZZnu7nfLAr93OY5g==
+X-Received: by 2002:a05:600c:1f8c:b0:430:c3a5:652a with SMTP id 5b1f17b1804b1-4311ded53cbmr16268055e9.12.1728649672180;
+        Fri, 11 Oct 2024 05:27:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgVv3RNAOR2FC6mKD8YlkQf/6eOtik4XN5FWpHDbbO6uoNEPOtTgURod1/yDncIWXirvGTnQ==
+X-Received: by 2002:a05:600c:1f8c:b0:430:c3a5:652a with SMTP id 5b1f17b1804b1-4311ded53cbmr16267425e9.12.1728649671758;
+        Fri, 11 Oct 2024 05:27:51 -0700 (PDT)
+Received: from eisenberg.fritz.box ([2001:16b8:3d05:4700:3e59:7d70:cabd:144b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4311835d95bsm40843965e9.47.2024.10.11.05.27.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 05:17:40 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Fri, 11 Oct 2024 14:17:30 +0200
-Subject: [PATCH net v2] udp: Compute L4 checksum as usual when not
- segmenting the skb
+        Fri, 11 Oct 2024 05:27:51 -0700 (PDT)
+Message-ID: <b13b75ae16b5238ab8b6e6d6e7a0797ed8415e80.camel@redhat.com>
+Subject: Re: [RFC PATCH 02/13] ALSA: hda: hda_intel: Use always-managed
+ version of pcim_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+ <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
+ Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Hannes Reinecke <hare@suse.de>, John Garry
+ <john.g.garry@oracle.com>, Soumya Negi <soumya.negi97@gmail.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan
+ Gilbert" <linux@treblig.org>, Christian Brauner <brauner@kernel.org>, Ankit
+ Agrawal <ankita@nvidia.com>, Reinette Chatre <reinette.chatre@intel.com>,
+ Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
+ Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
+ ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
+ linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Fri, 11 Oct 2024 14:27:48 +0200
+In-Reply-To: <Zwfo4dr4bfqQGGyl@smile.fi.intel.com>
+References: <20241009083519.10088-1-pstanner@redhat.com>
+	 <20241009083519.10088-3-pstanner@redhat.com>
+	 <Zwfo4dr4bfqQGGyl@smile.fi.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
-X-B4-Tracking: v=1; b=H4sIAFkXCWcC/3WNwQqDMBBEf0X23C2JEZGe+h/FQ0w2NaBGskZbx
- H9vyL3Hmce8OYEpemJ4VCdE2j37sORQ3yowo17ehN7mDLWoGymkwMQB+TCcZnT+k1bU1LWqU4N
- QwkKerZEyKMoXLLRBn8vR8xbit9zssqD/xl2iRN0qN1ihG9mYp5lCsm7Ske4mzNBf1/UDAgdBj
- LoAAAA=
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com, 
- Ivan Babrou <ivan@cloudflare.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.14.1
 
-If:
+On Thu, 2024-10-10 at 17:46 +0300, Andy Shevchenko wrote:
+> On Wed, Oct 09, 2024 at 10:35:08AM +0200, Philipp Stanner wrote:
+> > pci_intx() is a hybrid function which can sometimes be managed
+> > through
+> > devres. To remove this hybrid nature from pci_intx(), it is
+> > necessary to
+> > port users to either an always-managed or a never-managed version.
+> >=20
+> > hda_intel enables its PCI-Device with pcim_enable_device(). Thus,
+> > it needs
+> > the always-managed version.
+> >=20
+> > Replace pci_intx() with pcim_intx().
+>=20
+> ...
+>=20
+> > =C2=A0	bus->irq =3D chip->pci->irq;
+> > =C2=A0	chip->card->sync_irq =3D bus->irq;
+> > -	pci_intx(chip->pci, !chip->msi);
+> > +	pcim_intx(chip->pci, !chip->msi);
+> > =C2=A0	return 0;
+>=20
+> I believe each driver needs an individual approach. Looking at the
+> above
+> I would first to understand why this one is being used and why we
+> can't
+> switch to pci{m}_alloc_irq_vectors(). (Yeah, managed
+> pci_alloc_irq_vectors()
+> is probably still missing, I don't remember if you introduced it or
+> not.
+>=20
 
-  1) the user requested USO, but
-  2) there is not enough payload for GSO to kick in, and
-  3) the egress device doesn't offer checksum offload, then
+Alright alright =E2=80=93 we touched it in the other mail briefly, but let =
+me
+point out another specific problem:
 
-we want to compute the L4 checksum in software early on.
+pci_alloc_irq_vectors() *uses* pci_intx(). And pci_intx() can be
+managed sometimes.
 
-In the case when we are not taking the GSO path, but it has been requested,
-the software checksum fallback in skb_segment doesn't get a chance to
-compute the full checksum, if the egress device can't do it. As a result we
-end up sending UDP datagrams with only a partial checksum filled in, which
-the peer will discard.
+See the problem? :(
 
-Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
-Reported-by: Ivan Babrou <ivan@cloudflare.com>
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-Acked-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: stable@vger.kernel.org
----
-Changes in v2:
-- Fix typo in patch description
-- Link to v1: https://lore.kernel.org/r/20241010-uso-swcsum-fixup-v1-1-a63fbd0a414c@cloudflare.com
----
- net/ipv4/udp.c | 4 +++-
- net/ipv6/udp.c | 4 +++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+So it's not just that I couldn't port the driver Alex is concerned
+about, it's also that MSI itself is a user of pci_intx().
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 8accbf4cb295..2849b273b131 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -951,8 +951,10 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
- 			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
- 			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
- 								 cork->gso_size);
-+
-+			/* Don't checksum the payload, skb will get segmented */
-+			goto csum_partial;
- 		}
--		goto csum_partial;
- 	}
- 
- 	if (is_udplite)  				 /*     UDP-Lite      */
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 52dfbb2ff1a8..0cef8ae5d1ea 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1266,8 +1266,10 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
- 			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
- 			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
- 								 cork->gso_size);
-+
-+			/* Don't checksum the payload, skb will get segmented */
-+			goto csum_partial;
- 		}
--		goto csum_partial;
- 	}
- 
- 	if (is_udplite)
+So a pcim_alloc_irq_vectors() might end up doing double-devres or God
+knows what else. Only once pci_intx() is clean one can start thinking
+about the code in pci/msi/
+
+It's the biggest reason why I want to clean it up as suggested here,
+and also why the only patch I'm really nervous about is number 8.
+
+
+P.
 
 
