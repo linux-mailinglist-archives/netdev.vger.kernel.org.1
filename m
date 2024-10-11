@@ -1,152 +1,164 @@
-Return-Path: <netdev+bounces-134481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E21A7999C23
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 07:39:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BF00999C39
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 07:47:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3D171C21BDC
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 05:39:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FCAAB22E27
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 05:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD951F706F;
-	Fri, 11 Oct 2024 05:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D2D19CC16;
+	Fri, 11 Oct 2024 05:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aUTTCd2O"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="giP3xilH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B141A2F26;
-	Fri, 11 Oct 2024 05:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E8F1946C8;
+	Fri, 11 Oct 2024 05:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728625175; cv=none; b=YH/niysU5o0eNMoVQTGZLrsX/jDhxphuzmNkltR/8SR+KUE2lEkOe0ZpaosVgCLWbU/myODsFufLpJNI5joDBXMBsPT7jcvSjNuYA2s2Vy3fmepnDcaDUF30vzmHSPanDXNY8aTa9QYoFQ8HcUB8OtS8XNyrHowyxerahRmNJuA=
+	t=1728625624; cv=none; b=slPILBnZ+MDqsrh4AnuQixOUhgnCFmNLFRXGhn6xjaH4D2Y73yz+8ypevmkpTX995MkoG5IpsSlKCP5bNZ3ETXHAbrFsaZKJG+F3v81W1VJkEQyiJbnDPo/mzBwl4XEJFgpepfCZB67CxYba+ZwUgZKXGyPpGU+ey0PNx7MJe3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728625175; c=relaxed/simple;
-	bh=+d42UvkUBu98QAceADfnNLgwqRMi7KeH8jtCFXIHtv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XqqCn0VBEXrTSrbm/ujMwmAISZmAXU3kvXCBaUOLpYkzIaLENABOrp+yNAcjzQoK/JWyeDn5rJDXWUPSZ4RCLoxDtDKsIN0/F0e9Qa22Yrw2PApCLx9kF7vtfu4+i1QMBfavFDTwF63ucaJRNT0ivNgxjrsros7H+1bKom8tap4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aUTTCd2O; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728625174; x=1760161174;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+d42UvkUBu98QAceADfnNLgwqRMi7KeH8jtCFXIHtv4=;
-  b=aUTTCd2OjDuOfv9+GwLO4AWEVRPjRhuuumNTlNZwukzjcYAo+VIYZrNT
-   cYAkFMkrDSBDq1m3QPImGtQX/BdogWsZlta37/GU3RsPAkMo6QoYByMfv
-   GbFqfdEPWxoEfnlrFEEf5mzIVZwDulCgIg0bF1ZDdxXWS58oWf2YKx9WD
-   Q8N9Yp43TM9W5zIjHceTdsyUBWsgr0eBDRCxGfGMHb0oxg5NCRHihyFBP
-   Yd3CdLic1p/RrWD9A8G+ADtmKaSGpMsItTN3hEckZBQR2/hMvNGJLIWBm
-   4Y2Ph8HmOcakw0DY7CghUGMstZVKf5z8f/GyREiq5i8Zqxk4eZQh2mm31
-   A==;
-X-CSE-ConnectionGUID: /Rfvx4KcRcyPkcLNs/NJ9g==
-X-CSE-MsgGUID: 6CYZGIpPRxKVD0upnjqI4w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11221"; a="27824747"
-X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
-   d="scan'208";a="27824747"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 22:39:33 -0700
-X-CSE-ConnectionGUID: CjJQ2kg9SW2lgwlQLQSKYA==
-X-CSE-MsgGUID: QF+qDOJ5TA6Re0RbSQUttA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
-   d="scan'208";a="107673577"
-Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 22:39:29 -0700
-Received: from kekkonen.localdomain (localhost [127.0.0.1])
-	by kekkonen.fi.intel.com (Postfix) with SMTP id 57B4D11F855;
-	Fri, 11 Oct 2024 08:39:26 +0300 (EEST)
-Date: Fri, 11 Oct 2024 05:39:26 +0000
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] device property: Introduce
- fwnode_for_each_available_child_node_scoped()
-Message-ID: <Zwi6Dn4yJxst4xv2@kekkonen.localdomain>
-References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
- <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
+	s=arc-20240116; t=1728625624; c=relaxed/simple;
+	bh=sKRsXEyxaeRla+k2w1rKXz1PU3G9sKxCHTHbocZ7Nns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=azD9d2k4BmcB3R4Jn5OhcB9AkBvwIOcKaAqQQ3nxqDklrgotDs72SxtehsE9KzAIhaVL7NEzHqFbjTY+dg1bwrAX+H5aW9gtIh+Q6nf+u7MeTnKFsBZrEG2ULj8G4aq41/T4q9X2sj1Oe3Cpcg5QB4+6eW8OAh/vcG3E0JRFzAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=giP3xilH; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49B1HfBX005437;
+	Fri, 11 Oct 2024 05:46:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	l9fDGbw6pgOmDAjZ0nxSCghmAFvcpRpZ5c10egbYI1U=; b=giP3xilHNe8A/9r1
+	aXUrUIhsX0oIohd35KFh7lgTpo0VMZ/QPqE1zKqgI6WazrblKtC/dtM6ZR9F8+ti
+	JggNy5/NNdPMqa/AdYngu5eU/HMpkklR0ccgzaxn4rER9JqCT87qiWozO1wO3Rk6
+	ezpeSCmzgiPqkfWgxTEnQ5Z5LICxJcBwX9BgNhxBCrdWCXP1dMHFSCHT6zAA2VAZ
+	bnhF1W9MIcXvzosnh+FsCcWyUmemCtjNOkv8lVGYch3jI/66BlHpCLrPNX7v+7xV
+	7Bq3MposIuNmvXQWrL+5RA1HN9LAplh1iWM25nAM9YbylpS5vaINtiWaz3ohsQSl
+	FRFIWg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 426t7srfqh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 11 Oct 2024 05:46:56 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49B5kjxx010041
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 11 Oct 2024 05:46:45 GMT
+Received: from [10.233.21.53] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 10 Oct
+ 2024 22:46:41 -0700
+Message-ID: <abc3516e-2c12-4612-9035-146b280b36df@quicinc.com>
+Date: Fri, 11 Oct 2024 13:46:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] pinctrl: qcom: add the tlmm driver for QCS8300
+ platforms
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Linus Walleij
+	<linus.walleij@linaro.org>,
+        Rob Herring <robh@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Richard
+ Cochran" <richardcochran@gmail.com>,
+        <quic_tengfan@quicinc.com>, <quic_tingweiz@quicinc.com>,
+        <quic_aiquny@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-gpio@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20241009-qcs8300_tlmm-v2-0-9e40dee5e4f1@quicinc.com>
+ <20241009-qcs8300_tlmm-v2-2-9e40dee5e4f1@quicinc.com>
+ <yh5qzohy42r226a4e7yupimfdl6xccpntuffot7dnhrftagtae@4ruw5vmcknfq>
+Content-Language: en-US
+From: Jingyi Wang <quic_jingyw@quicinc.com>
+In-Reply-To: <yh5qzohy42r226a4e7yupimfdl6xccpntuffot7dnhrftagtae@4ruw5vmcknfq>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: h73tjxlGhzXyl6k7L_50HFMFUVaBB5rs
+X-Proofpoint-ORIG-GUID: h73tjxlGhzXyl6k7L_50HFMFUVaBB5rs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0 priorityscore=1501
+ suspectscore=0 impostorscore=0 clxscore=1015 adultscore=0 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410110036
 
-Hi Javier,
 
-On Tue, Oct 08, 2024 at 06:10:27PM +0200, Javier Carrasco wrote:
-> Introduce the scoped variant of the
-> fwnode_for_each_available_child_node() to automatically decrement the
-> child's refcount when it goes out of scope, removing the need for
-> explicit calls to fwnode_handle_put().
+
+On 10/10/2024 8:56 PM, Dmitry Baryshkov wrote:
+> On Wed, Oct 09, 2024 at 03:13:34PM GMT, Jingyi Wang wrote:
+>> Add support for QCS8300 TLMM configuration and control via the
+>> pinctrl framework.
+>>
+>> Signed-off-by: Jingyi Wang <quic_jingyw@quicinc.com>
+>> ---
+>>  drivers/pinctrl/qcom/Kconfig.msm       |    7 +
+>>  drivers/pinctrl/qcom/Makefile          |    1 +
+>>  drivers/pinctrl/qcom/pinctrl-qcs8300.c | 1246 ++++++++++++++++++++++++++++++++
+>>  3 files changed, 1254 insertions(+)
+>>
 > 
-> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-> ---
->  include/linux/property.h | 5 +++++
->  1 file changed, 5 insertions(+)
+> [...]
 > 
-> diff --git a/include/linux/property.h b/include/linux/property.h
-> index 61fc20e5f81f..b37508ecf606 100644
-> --- a/include/linux/property.h
-> +++ b/include/linux/property.h
-> @@ -168,6 +168,11 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
->  	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
->  	     child = fwnode_get_next_available_child_node(fwnode, child))
->  
-> +#define fwnode_for_each_available_child_node_scoped(fwnode, child)	       \
-> +	for (struct fwnode_handle *child __free(fwnode_handle) =	       \
-> +		fwnode_get_next_available_child_node(fwnode, NULL); child;     \
-> +	     child = fwnode_get_next_available_child_node(fwnode, child))
-> +
+>> +	[125] = PINGROUP(125, phase_flag, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[126] = PINGROUP(126, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[127] = PINGROUP(127, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[128] = PINGROUP(128, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[129] = PINGROUP(129, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[130] = PINGROUP(130, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[131] = PINGROUP(131, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[132] = PINGROUP(132, _, _, _, _, _, _, _, _, _, _, egpio),
+>> +	[133] = UFS_RESET(ufs_reset, 0x92000),
+>> +	[134] = SDC_QDSD_PINGROUP(sdc1_rclk, 0x89000, 15, 0),
+>> +	[135] = SDC_QDSD_PINGROUP(sdc1_clk, 0x89000, 13, 6),
+>> +	[136] = SDC_QDSD_PINGROUP(sdc1_cmd, 0x89000, 11, 3),
+>> +	[137] = SDC_QDSD_PINGROUP(sdc1_data, 0x89000, 9, 0),
+>> +};
+>> +
+> 
+> [...]
+> 
+>> +
+>> +static const struct msm_pinctrl_soc_data qcs8300_pinctrl = {
+>> +	.pins = qcs8300_pins,
+>> +	.npins = ARRAY_SIZE(qcs8300_pins),
+>> +	.functions = qcs8300_functions,
+>> +	.nfunctions = ARRAY_SIZE(qcs8300_functions),
+>> +	.groups = qcs8300_groups,
+>> +	.ngroups = ARRAY_SIZE(qcs8300_groups),
+>> +	.ngpios = 134,
+> 
+> I believe this should be 133.
+> 
+133 should be right, thanks for review, will fix that.
+>> +	.wakeirq_map = qcs8300_pdc_map,
+>> +	.nwakeirq_map = ARRAY_SIZE(qcs8300_pdc_map),
+>> +	.egpio_func = 11,
+>> +};
+>> +
+> 
+Thanks,
+Jingyi
 
-On OF, the implementation of the .get_next_child_node() fwnode op is:
-
-static struct fwnode_handle *
-of_fwnode_get_next_child_node(const struct fwnode_handle *fwnode,
-                              struct fwnode_handle *child)
-{
-        return of_fwnode_handle(of_get_next_available_child(to_of_node(fwnode),
-                                                            to_of_node(child)));
-}
-
-On ACPI we currently have .device_is_available() returning false but that
-probably should be returning true instead (it's been virtually unused
-previously).
-
-That makes fwnode_get_next_available_child_node() and
-fwnode_get_next_child_node() equivalent on both ACPI and OF. Presumably
-creating unavailable nodes would be useless on swnode, too.
-
-So my question is: what do we gain by adding all these fwnode_*available()
-helpers?
-
->  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
->  						 struct fwnode_handle *child);
-
--- 
-Regards,
-
-Sakari Ailus
 
