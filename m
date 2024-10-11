@@ -1,225 +1,98 @@
-Return-Path: <netdev+bounces-134572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BA0E99A366
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:09:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54E8F99A374
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4A3C1F253AC
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:09:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76EDA1C22FE1
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3151F218D85;
-	Fri, 11 Oct 2024 12:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA71621858D;
+	Fri, 11 Oct 2024 12:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Prh5z9Ch"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMggbeoO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36499217918
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11DD218584;
+	Fri, 11 Oct 2024 12:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728648477; cv=none; b=FAcd2xWQ0X97b817ZHY9fhmGVAsMje1Qiao+Xoz5uFFHDWXkAtjiKJlBPAyZl08oyCR/kIy4s4c3S45XOOvZZ3gRrwb3HW75JAgoj23EKCanlUd5Y92vvmJ/L8UJwjCuVMo/KATqw0v0EUPvoguYqzRzi2XMik5xQdi886l+BkY=
+	t=1728648628; cv=none; b=uFnniegYGweYyji/w19RYQWwmGMLJb9jwAxWkvrMnZRfzg7LhkzpQbig4Y3t61RIynefHIkVYbCzhIEx/xii6AuFst7ktUS5claVAJok2cjOHP62QqAuUu15Q9PNXswreZRZFpLQCmmaem1K2CwsErA/utLpcDK1fzDIFfqzm7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728648477; c=relaxed/simple;
-	bh=MwKBr4MW13REKEdZEAqTL7D+rRGFsGjM7n9xGoHUCEw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HneK7fIuR/4fYPfHHfkbCfRwj8EZS2yXKUg6gvGy7PL+J2XGmMfJuA+RVzMmJP7IY0ju1QtrbOanQ1SKBCeDdOj03Nm+/KnZAjzjrcej0CN5yQDwpctL0/1FcSXMrPxwqsWDBB1e+KIkPUHUqMYOfErmWWhF2mFaGDdQQS8Ee4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Prh5z9Ch; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728648474;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MwKBr4MW13REKEdZEAqTL7D+rRGFsGjM7n9xGoHUCEw=;
-	b=Prh5z9Ch4Obg+vN9I0GUDr9uLmOGW5i1k9JsPMtpIOOEVIC8RHQAeNTH44HLR4LtC0lxKa
-	CAWpDlWvHpa6C+/1JDeBO5ISRvIbK5a/AySAO8siZdJVhFjDZA7QtU9swzHoHdkLURlnDD
-	dLfysmvU2ftmf6Q4Nso3HR1IWWhl4Qc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-81-5D_41rRLNhi3SajUfibZlA-1; Fri, 11 Oct 2024 08:07:53 -0400
-X-MC-Unique: 5D_41rRLNhi3SajUfibZlA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb0b0514bso12204315e9.1
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:07:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728648472; x=1729253272;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MwKBr4MW13REKEdZEAqTL7D+rRGFsGjM7n9xGoHUCEw=;
-        b=I/P396dg2rTxfksFWOVdYXp95Gmh7jDmjhE+ES2SrHwTnbEmzOFFaE3t3zC8+d0+AC
-         G6Jp3iu+ijFqO/jZz1Kx5SUkOpPOdCVJe8bSNTFLHUDy6xmHjeHpfIH547KLBdo6/Q2S
-         6tBq6gpkZhrI1PmeiXjncbAtnuGepXf+jl5gpB8HSMR1ildD/R2nyx+DZME1mVc3iZW4
-         mlLPNm2p+wAleLQ9d8WCJo6j9H2oa2XWDdFNqb7ziSiDhLONC7GUlB9uhS5cgwKMKVZQ
-         Wi1cmZY3I77PeY+QzC4qarstyrQ8eUqpJv7lmwUsIq3XUb+c+S/A10uZ4hLHHJ9qKMh4
-         IR0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWX3KsllHT7dugfToKx0qoaFZx3/pDPKBShYWAGcESI+r5ZKgYpTXaQxeCcUy3TW7hfpCXtlok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPBPBX/XcMAGyLxMEPp1flYXolPRlPVRKKVCXm4O/xOdrRhpNU
-	uW4ZKlrDebu6kF/9gM38p1uIicTaWA7cEVbKdKrFXHlRbIZI0XwWkrP0+PGSkCeH5DzJbsAst0Z
-	8zV6CLs/NxeVAd/LcWCDOwoJrYyKFqiQgol5su+klyRK5FU7OZ6k/fA==
-X-Received: by 2002:a05:600c:1d26:b0:42f:75cd:2566 with SMTP id 5b1f17b1804b1-4311deaea05mr17632145e9.2.1728648472025;
-        Fri, 11 Oct 2024 05:07:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfafWJbYY7XgafIoUBODjA0mqAG0Im27BYfV9oETn5/NEqgGUi/qx3b+BLDWe06kqudkM50g==
-X-Received: by 2002:a05:600c:1d26:b0:42f:75cd:2566 with SMTP id 5b1f17b1804b1-4311deaea05mr17631395e9.2.1728648471511;
-        Fri, 11 Oct 2024 05:07:51 -0700 (PDT)
-Received: from eisenberg.fritz.box ([2001:16b8:3d05:4700:3e59:7d70:cabd:144b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431182d7929sm40692135e9.4.2024.10.11.05.07.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 05:07:50 -0700 (PDT)
-Message-ID: <a688a4109e292d7510ebd7206bd3296e23ca1e3b.camel@redhat.com>
-Subject: Re: [RFC PATCH 13/13] Remove devres from pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Damien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Sergey Shtylyov
- <s.shtylyov@omp.ru>, Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri
- Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Arnd
- Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Alex Dubov <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>,  GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>,  Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
- S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
- Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
- Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
- Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
- Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
- <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
- Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
- netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
- ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
- linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Fri, 11 Oct 2024 14:07:48 +0200
-In-Reply-To: <20241010114314.296db535.alex.williamson@redhat.com>
-References: <20241009083519.10088-1-pstanner@redhat.com>
-	 <20241009083519.10088-14-pstanner@redhat.com>
-	 <7f624c83-115b-4045-b068-0813a18c8200@stanley.mountain>
-	 <f42bb5de4c9aca307a3431dd15ace4c9cade1cb9.camel@redhat.com>
-	 <20241010114314.296db535.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1728648628; c=relaxed/simple;
+	bh=QsWhg1lPTy3xAXP6qpwZyfL4P1tilWHSFqdyzad3j40=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hUsuOhkgPWS2BetnPElApjlNIue6BSk/Wfei2wE5tJ2jk6NrLXDfV1xjvx/XOZa8jDU6og6XV3WoTeHek99jHQAzRLBuPwHw6IwnIZGeQTuryL7FSqg3bYK5QvzyFZjcjPF5cR3cOXb11+osNl/fcJIzBx/c8PqC1qwhMoFtXkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MMggbeoO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CD1C4CECC;
+	Fri, 11 Oct 2024 12:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728648627;
+	bh=QsWhg1lPTy3xAXP6qpwZyfL4P1tilWHSFqdyzad3j40=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MMggbeoOZIDWYva2gyVPbsA18OBrYiUIncQeNizMo2465ZLLSHcF/mu4zoELbkv8x
+	 uFQUbLajDOG5+POY0aHajh6AbNxHYvAbNOD0mSm6O9yD7LpIhTFkyVqy9+zWewFEXC
+	 puNTTA31Dp9cjqB0jTahT24oN+/IR1r5gkqNbGPrG+U6kNlnTXY1yTxAjjVRBERK0s
+	 +ojLcILDgKUufReYbUHACMWdJysLI8aiL9MyXuqUXIgNVUrSmMy/uM9GLHQepRhoA0
+	 tGWNSkQbPenefNhG7PWTvVg/bCctqvhaC34FR/J7l8A793CWYH/4Zxhd7XEbz8cIhF
+	 nDvH0pfvn2viA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE33822E4C;
+	Fri, 11 Oct 2024 12:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] eth: remove the DLink/Sundance (ST201) driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172864863175.2796508.4724823416498296056.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 12:10:31 +0000
+References: <20241008154824.1448370-1-kuba@kernel.org>
+In-Reply-To: <20241008154824.1448370-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, kda@linux-powerpc.org, arnd@arndb.de,
+ tsbogend@alpha.franken.de, mpe@ellerman.id.au, npiggin@gmail.com,
+ christophe.leroy@csgroup.eu, naveen@kernel.org, maddy@linux.ibm.com,
+ pctammela@mojatatu.com, victor@mojatatu.com, coelacanthushex@gmail.com,
+ jhs@mojatatu.com, horms@kernel.org, shannon.nelson@amd.com,
+ sd@queasysnail.net, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-On Thu, 2024-10-10 at 11:43 -0600, Alex Williamson wrote:
-> On Thu, 10 Oct 2024 11:11:36 +0200
-> Philipp Stanner <pstanner@redhat.com> wrote:
->=20
-> > On Thu, 2024-10-10 at 11:50 +0300, Dan Carpenter wrote:
-> > > On Wed, Oct 09, 2024 at 10:35:19AM +0200, Philipp Stanner wrote:=C2=
-=A0
-> > > > pci_intx() is a hybrid function which can sometimes be managed
-> > > > through
-> > > > devres. This hybrid nature is undesirable.
-> > > >=20
-> > > > Since all users of pci_intx() have by now been ported either to
-> > > > always-managed pcim_intx() or never-managed
-> > > > pci_intx_unmanaged(),
-> > > > the
-> > > > devres functionality can be removed from pci_intx().
-> > > >=20
-> > > > Consequently, pci_intx_unmanaged() is now redundant, because
-> > > > pci_intx()
-> > > > itself is now unmanaged.
-> > > >=20
-> > > > Remove the devres functionality from pci_intx(). Remove
-> > > > pci_intx_unmanaged().
-> > > > Have all users of pci_intx_unmanaged() call pci_intx().
-> > > >=20
-> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>=C2=A0=20
-> > >=20
-> > > I don't like when we change a function like this but it still
-> > > compiles fine.
-> > > If someone is working on a driver and hasn't pushed it yet, then
-> > > it's
-> > > probably
-> > > supposed to be using the new pcim_intx() but they won't discover
-> > > that
-> > > until they
-> > > detect the leaks at runtime.=C2=A0=20
-> >=20
-> > There wouldn't be any *leaks*, it's just that the INTx state would
-> > not
-> > automatically be restored. BTW the official documentation in its
-> > current state does not hint at pci_intx() doing anything
-> > automatically,
-> > but rather actively marks it as deprecated.
-> >=20
-> > But you are right that a hypothetical new driver and OOT drivers
-> > could
-> > experience bugs through this change.
-> >=20
-> > >=20
-> > > Why not leave the pci_intx_unmanaged() name.=C2=A0 It's ugly and that
-> > > will
-> > > discorage
-> > > people from introducing new uses.=C2=A0=20
-> >=20
-> > I'd be OK with that. Then we'd have to remove pci_intx() as it has
-> > new
-> > users anymore.
-> >=20
-> > Either way should be fine and keep the behavior for existing
-> > drivers
-> > identical.
-> >=20
-> > I think Bjorn should express a preference
->=20
-> FWIW, I think pcim_intx() and pci_intx() align better to our naming
-> convention for devres interfaces.
+Hello:
 
-Yup, also my personal preference. But we can mark those functions as
-deprecated via docstring-comment. That should fullfill Damien's goal.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> =C2=A0 Would it be sufficient if pci_intx()
-> triggered a WARN_ON if called for a pci_is_managed() device?
+On Tue,  8 Oct 2024 08:48:24 -0700 you wrote:
+> Konstantin reports the maintainer's address bounces.
+> There is no other maintainer and the driver is quite old.
+> There is a good chance nobody is using this driver any more.
+> Let's try to remove it completely, we can revert it back in
+> if someone complains.
+> 
+> Link: https://lore.kernel.org/20240925-bizarre-earwig-from-pluto-1484aa@lemu/
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-No, I don't think that's a good idea; reason being that
-pci_is_managed() just checks that global boolean which we inherited
-from the old implementation and which should not be necessary with
-proper devres.
-The boolean is used for making functions such as pci_intx() and
-__pci_request_region() hybrid. So with our non-hybrid version we never
-need it.
+Here is the summary with links:
+  - [net-next] eth: remove the DLink/Sundance (ST201) driver
+    https://git.kernel.org/netdev/net-next/c/8401a108a633
 
-P.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> =C2=A0 Thanks,
->=20
-> Alex
->=20
 
 
