@@ -1,73 +1,50 @@
-Return-Path: <netdev+bounces-134629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FFF399A8B5
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 18:18:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB6FA99A8C9
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 18:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 901F51C22214
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:18:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 967321F2142F
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132AD196D9D;
-	Fri, 11 Oct 2024 16:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41AE194A6F;
+	Fri, 11 Oct 2024 16:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m+INzFeS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQBnhj2q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C4A79E1
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 16:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9098B5381E
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 16:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728663482; cv=none; b=b5VG+h/7OxGFDY8i841zuXjirh0lVUAAaGYjNTrJNHoh63L2Jnp8lyzknp3lpGnDyejRtlLjEdvZeIPx3/B/eQVfq3Ns7cO5sZooWuwkDE8GNzSPpOD2Rr7bHcfJlHW32IpTSmzG/CXkxauJ1eL/+Wue1Vz0UsvMuezcjv9Zk2U=
+	t=1728663623; cv=none; b=rlNqrDnsyTnlLjkvkHcGn5Zwv4sreYGzvZTjSYzFFBRQ8s8afVA2jm5yrAQb0dlPdetNrf9IGM/Kn/Y/FQy6nzHopCSSW6L1cDuoYPmnEPzgRFAU1KygbhMiU5qF5MLV86cP3fnu6KoxtmotepimJ29W+tdN5+rxAnU5viot4JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728663482; c=relaxed/simple;
-	bh=wQaXXBzmdSwPzDo3+l6LyGev6C0BwkZiX3MuPz/vVt4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m4iVVGZyb8U4laidWglXJT39qcHciYgAQYQiUtikXstf31nsTbnJQzNjF8hCFzusjX6nwLWi8M+OVErsasK9MWMdNTBUUcZb6oFFFnHcYCRdSW9PrpzZzzuhX2vKyjvHeYiWdzr5/U2FSm3ET0/nPowNNb/O0Xn8tb1ureNfhqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=m+INzFeS; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728663480; x=1760199480;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4yVolXS4ygYJ4EHLSGnNlhbJIVixMaa+YdbdfVJpNsY=;
-  b=m+INzFeSpPKN7RGcHCUZ8O5RYv0inPpU+0B2VoxCpqz4970C6po820Tm
-   5RK4D8DzWZG614n1n6/GH5S3aB1JFAiGKhg0rBka5P8Rw4Gu5pH7gHzXJ
-   WveaPgIeY54cGN5hhquL3jh7SNk4abkA8KCKGMlwpjLF3gHXCZk8e6HVc
-   w=;
-X-IronPort-AV: E=Sophos;i="6.11,196,1725321600"; 
-   d="scan'208";a="137830654"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 16:17:58 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:47658]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
- id 437482ba-543a-46d3-a842-485b20c15479; Fri, 11 Oct 2024 16:17:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 437482ba-543a-46d3-a842-485b20c15479
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 11 Oct 2024 16:17:57 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.100.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 11 Oct 2024 16:17:54 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lkp@intel.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <llvm@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<oe-kbuild-all@lists.linux.dev>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 12/13] rtnetlink: Call rtnl_link_get_net_capable() in do_setlink().
-Date: Fri, 11 Oct 2024 09:17:51 -0700
-Message-ID: <20241011161751.6563-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <202410111515.TbOH4hSS-lkp@intel.com>
-References: <202410111515.TbOH4hSS-lkp@intel.com>
+	s=arc-20240116; t=1728663623; c=relaxed/simple;
+	bh=mlFbrEOI1sWXzo/T40Mu7V+gzY/cAo7lpcrNEjn1t0s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IrZ6w/BmYizlCTQTAUSCIbkvhC2PwNbLOYhRCnhBcqu4qjcKzNeWuxbT37DXBaJlEXkPZdShY/EhsLN2QLVjgNFd+BSBSOCcAQGKBs1GHVlRRJnFY6TO++iyfC6nVIvxTVPrsQkVs6K1/yGHHabfXqp3UH/y2BhFTHrscQyfcqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQBnhj2q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A691C4CEC3;
+	Fri, 11 Oct 2024 16:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728663623;
+	bh=mlFbrEOI1sWXzo/T40Mu7V+gzY/cAo7lpcrNEjn1t0s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MQBnhj2qRyZcO5EQe34LKYnw+O8pcb5MBuALYZL4KDhDrZK/j9NAiSwUIE5LOYtxU
+	 rOTdQ1dqcWQ7l37o4Vu6IrY2Z+g6OdhZvMY8NajUGIxnvJoPhQSyQpu6jIjAO7DO2v
+	 jCizE5erWVWtuZA+8HCVInXumHimZ6Gl+k/YILpnY9I5N51G2xQZSvt542swcLtA8T
+	 fNswPmQg0dPix1k8Z5tnww1XenlU4L/lxZ42PkX4r5rtbyGq2jgFudZvZu/qjM+G9J
+	 +rR5mBQtYE87Z00COqaFZnduPIJNFpTyixoj72F2FAE3X0ObPvkf6LquQZ5DcElUYA
+	 B+thPZ2kbJ5Qw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB011380DBC0;
+	Fri, 11 Oct 2024 16:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,31 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH v2 net-next] tcp: move sysctl_tcp_l3mdev_accept to
+ netns_ipv4_read_rx
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172866362777.2871296.1184945994794038542.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 16:20:27 +0000
+References: <20241010034100.320832-1-edumazet@google.com>
+In-Reply-To: <20241010034100.320832-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, dsahern@kernel.org,
+ weiwan@google.com, lixiaoyan@google.com
 
-From: kernel test robot <lkp@intel.com>
-Date: Fri, 11 Oct 2024 15:36:55 +0800
-> cc6090e985d7d6 Jiri Pirko        2019-09-30  3264  
-> c21ef3e343ae91 David Ahern       2017-04-16  3265  static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
-> c21ef3e343ae91 David Ahern       2017-04-16  3266  			struct netlink_ext_ack *extack)
-> 0157f60c0caea2 Patrick McHardy   2007-06-13  3267  {
-> 3a6cb17da69fbf Kuniyuki Iwashima 2024-10-09  3268  	struct ifinfomsg *ifm = nlmsg_data(nlh);
-> 3b1e0a655f8eba YOSHIFUJI Hideaki 2008-03-26  3269  	struct net *net = sock_net(skb->sk);
-> 0157f60c0caea2 Patrick McHardy   2007-06-13  3270  	struct nlattr *tb[IFLA_MAX+1];
-> 3a6cb17da69fbf Kuniyuki Iwashima 2024-10-09  3271  	struct net_device *dev = NULL;
-> b27f78e2575aa2 Kuniyuki Iwashima 2024-10-09  3272  	struct net *tgt_net;
-> 3a6cb17da69fbf Kuniyuki Iwashima 2024-10-09  3273  	int err;
-> 0157f60c0caea2 Patrick McHardy   2007-06-13  3274  
-> 8cb081746c031f Johannes Berg     2019-04-26  3275  	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFLA_MAX,
-> 8cb081746c031f Johannes Berg     2019-04-26  3276  				     ifla_policy, extack);
-> 0157f60c0caea2 Patrick McHardy   2007-06-13  3277  	if (err < 0)
-> 0157f60c0caea2 Patrick McHardy   2007-06-13  3278  		goto errout;
-> 0157f60c0caea2 Patrick McHardy   2007-06-13  3279  
-> 4ff66cae7f10b6 Christian Brauner 2018-02-07  3280  	err = rtnl_ensure_unique_netns(tb, extack, false);
-> 4ff66cae7f10b6 Christian Brauner 2018-02-07 @3281  	if (err < 0)
-> 4ff66cae7f10b6 Christian Brauner 2018-02-07  3282  		goto errout;
+Hello:
 
-Oops, I'll simply remove the errout label in v2.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 10 Oct 2024 03:41:00 +0000 you wrote:
+> sysctl_tcp_l3mdev_accept is read from TCP receive fast path from
+> tcp_v6_early_demux(),
+>  __inet6_lookup_established,
+>   inet_request_bound_dev_if().
+> 
+> Move it to netns_ipv4_read_rx.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net-next] tcp: move sysctl_tcp_l3mdev_accept to netns_ipv4_read_rx
+    https://git.kernel.org/netdev/net-next/c/d677aebd663d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
