@@ -1,152 +1,180 @@
-Return-Path: <netdev+bounces-134545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CCCE99A071
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 11:54:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 652E699A07C
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 11:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20121286BD4
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 09:54:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBEA71F25A9E
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 09:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E554A217303;
-	Fri, 11 Oct 2024 09:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EBF21263B;
+	Fri, 11 Oct 2024 09:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mfIqlLPn"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B88215F56;
-	Fri, 11 Oct 2024 09:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC251F9415;
+	Fri, 11 Oct 2024 09:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728640321; cv=none; b=PeQ3w+w/886KXyfizJ1Gje8ab67jTnial/5PGlHH19UYEuR/O0DR7snwTJv4ddU0syoWhgkNjoFnvMDJ9auS52WQvhk2pN/dsM2YnqcAQ+1fP5dFIL9pU8z/PFL3y/6xQ4JIxirBSSqNcMlvjplFxEL+A0LBl11deXMbmTD5Vtk=
+	t=1728640481; cv=none; b=ihjAe0qAncmBpQ7A9LVIgtH8EIOYVUjJnzVvKWBNhuFNmpWT4LmxsRWc4obJjqqgQ/TZmLuy56T6ySChbrWzhbUm8bSp1Bj0rvO1vqlwvQucbrlsoHonFi6UcOC+9MDK9GRuaYdNjZuVnHAnIknVg6M7WBXU3jHjARwi9emdlEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728640321; c=relaxed/simple;
-	bh=eMbUoafWMeG/UhqmuGxOmA4MhgwPVoTSzE/aWUVtWgc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VVp28bKqzsd36S0sb6AZjRtTCOxemU/HGtaXAih6pf/1ClzFWabD+ecQJByU7MhMfue8YstjUyG1toavXIRMSMGN6EbkWHaNMUb9QK260ilAv+gyQecWRlpoi76E9rJSz9wOyorqcCCp8gTaxbwkgz2+hsuO7jevoq/yHoGpEDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XQ2065GjzzkWbs;
-	Fri, 11 Oct 2024 17:49:26 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 65C4E1401F3;
-	Fri, 11 Oct 2024 17:51:51 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 11 Oct 2024 17:51:50 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <salil.mehta@huawei.com>
-CC: <liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
-	<shaojijie@huawei.com>, <lanhao@huawei.com>, <chenhao418@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net 9/9] net: hns3: fix kernel crash when 1588 is sent on HIP08 devices
-Date: Fri, 11 Oct 2024 17:45:21 +0800
-Message-ID: <20241011094521.3008298-10-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241011094521.3008298-1-shaojijie@huawei.com>
-References: <20241011094521.3008298-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1728640481; c=relaxed/simple;
+	bh=RpeG/rTTMam2yBQbOjZii9wvh/NKHEVnxM1dRWn9JlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ylt8sa7l8Vybv+N5Htvfj3F0BEIZCUnjKsRamvFF3il0ipMBJWI+Su1EiFwXjlevpBdFfuBRQFimrcba1BPVb7y0UccdvZyiRLj/gWbZNyMghO1H969V6AWdC153dXhJO6PRzkr8Tc4WluaF7paRUHplF4FgZUE/pgQ7PaGMpbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mfIqlLPn; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728640480; x=1760176480;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RpeG/rTTMam2yBQbOjZii9wvh/NKHEVnxM1dRWn9JlM=;
+  b=mfIqlLPnoi9LKAppMJ7CX049bW+5fOZWs8BvT4rJ+PQX71lIK+SbIQsu
+   msQT+VuUPSOn0quMr8wOFuWtzg2tDu3olw42vX3c90VHx+RPHV58CCYXe
+   fYmXE1Lut26htCa2hvLijgsG2C4xkeQHJ3NFC1ElSoHHGHl03hAlQmkE/
+   5lhWTxzgiatKWHIei1bihXD/xecaJubpdSGSO0brAN5Q/qU6bkIWFKLJI
+   TLyt4AQi/4OZO+e37PcZzjwpxQsz9YCDXV7/ds8lQpriEiXhJ6eVwntCL
+   Cob+9yKO6UV+kbSWP7rToWjPRxhd+z2ppnFSljSrLjf7v9AsnjgziO7st
+   Q==;
+X-CSE-ConnectionGUID: i0nAVyW8Tsupl9bz4ipgbw==
+X-CSE-MsgGUID: VPiV68kCS3K02/GOagDHuQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11221"; a="38683728"
+X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
+   d="scan'208";a="38683728"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 02:54:39 -0700
+X-CSE-ConnectionGUID: LIUpkNU0QZuYvxJQr0bLDw==
+X-CSE-MsgGUID: QB9L8/v6RJuoJrQuGSxeJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
+   d="scan'208";a="77166591"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 02:54:35 -0700
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id C5D1611F855;
+	Fri, 11 Oct 2024 12:54:32 +0300 (EEST)
+Date: Fri, 11 Oct 2024 09:54:32 +0000
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] device property: Introduce
+ fwnode_for_each_available_child_node_scoped()
+Message-ID: <Zwj12J5bTNUEnxA0@kekkonen.localdomain>
+References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
+ <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
+ <Zwi6Dn4yJxst4xv2@kekkonen.localdomain>
+ <07ec0837-d7a3-413e-a281-e06feafe7f34@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07ec0837-d7a3-413e-a281-e06feafe7f34@gmail.com>
 
-From: Jie Wang <wangjie125@huawei.com>
+Hi Javier,
 
-Currently, HIP08 devices does not register the ptp devices, so the
-hdev->ptp is NULL. But the tx process would still try to set hardware time
-stamp info with SKBTX_HW_TSTAMP flag and cause a kernel crash.
+On Fri, Oct 11, 2024 at 10:34:32AM +0200, Javier Carrasco wrote:
+> On 11/10/2024 07:39, Sakari Ailus wrote:
+> > Hi Javier,
+> > 
+> > On Tue, Oct 08, 2024 at 06:10:27PM +0200, Javier Carrasco wrote:
+> >> Introduce the scoped variant of the
+> >> fwnode_for_each_available_child_node() to automatically decrement the
+> >> child's refcount when it goes out of scope, removing the need for
+> >> explicit calls to fwnode_handle_put().
+> >>
+> >> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+> >> ---
+> >>  include/linux/property.h | 5 +++++
+> >>  1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/include/linux/property.h b/include/linux/property.h
+> >> index 61fc20e5f81f..b37508ecf606 100644
+> >> --- a/include/linux/property.h
+> >> +++ b/include/linux/property.h
+> >> @@ -168,6 +168,11 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
+> >>  	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
+> >>  	     child = fwnode_get_next_available_child_node(fwnode, child))
+> >>  
+> >> +#define fwnode_for_each_available_child_node_scoped(fwnode, child)	       \
+> >> +	for (struct fwnode_handle *child __free(fwnode_handle) =	       \
+> >> +		fwnode_get_next_available_child_node(fwnode, NULL); child;     \
+> >> +	     child = fwnode_get_next_available_child_node(fwnode, child))
+> >> +
+> > 
+> > On OF, the implementation of the .get_next_child_node() fwnode op is:
+> > 
+> > static struct fwnode_handle *
+> > of_fwnode_get_next_child_node(const struct fwnode_handle *fwnode,
+> >                               struct fwnode_handle *child)
+> > {
+> >         return of_fwnode_handle(of_get_next_available_child(to_of_node(fwnode),
+> >                                                             to_of_node(child)));
+> > }
+> > 
+> > On ACPI we currently have .device_is_available() returning false but that
+> > probably should be returning true instead (it's been virtually unused
+> > previously).
+> > 
+> > That makes fwnode_get_next_available_child_node() and
+> > fwnode_get_next_child_node() equivalent on both ACPI and OF. Presumably
+> > creating unavailable nodes would be useless on swnode, too.
+> > 
+> > So my question is: what do we gain by adding all these fwnode_*available()
+> > helpers?
+> > 
+> >>  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+> >>  						 struct fwnode_handle *child);
+> > 
+> 
+> Hi Sakari, thanks for your feedback.
+> 
+> I thought that the difference is not in OF (which either way ends up
+> calling __of_device_is_available()), but in ACPI.
+> 
+> For fwnode_for_each_child_node(), the ACPI callback is
+> acpi_get_next_subnode(), and I don't see that the device_is_available()
+> callback is used in that case.
 
-[  128.087798] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000018
-...
-[  128.280251] pc : hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
-[  128.286600] lr : hclge_ptp_set_tx_info+0x20/0x140 [hclge]
-[  128.292938] sp : ffff800059b93140
-[  128.297200] x29: ffff800059b93140 x28: 0000000000003280
-[  128.303455] x27: ffff800020d48280 x26: ffff0cb9dc814080
-[  128.309715] x25: ffff0cb9cde93fa0 x24: 0000000000000001
-[  128.315969] x23: 0000000000000000 x22: 0000000000000194
-[  128.322219] x21: ffff0cd94f986000 x20: 0000000000000000
-[  128.328462] x19: ffff0cb9d2a166c0 x18: 0000000000000000
-[  128.334698] x17: 0000000000000000 x16: ffffcf1fc523ed24
-[  128.340934] x15: 0000ffffd530a518 x14: 0000000000000000
-[  128.347162] x13: ffff0cd6bdb31310 x12: 0000000000000368
-[  128.353388] x11: ffff0cb9cfbc7070 x10: ffff2cf55dd11e02
-[  128.359606] x9 : ffffcf1f85a212b4 x8 : ffff0cd7cf27dab0
-[  128.365831] x7 : 0000000000000a20 x6 : ffff0cd7cf27d000
-[  128.372040] x5 : 0000000000000000 x4 : 000000000000ffff
-[  128.378243] x3 : 0000000000000400 x2 : ffffcf1f85a21294
-[  128.384437] x1 : ffff0cb9db520080 x0 : ffff0cb9db500080
-[  128.390626] Call trace:
-[  128.393964]  hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
-[  128.399893]  hns3_nic_net_xmit+0x39c/0x4c4 [hns3]
-[  128.405468]  xmit_one.constprop.0+0xc4/0x200
-[  128.410600]  dev_hard_start_xmit+0x54/0xf0
-[  128.415556]  sch_direct_xmit+0xe8/0x634
-[  128.420246]  __dev_queue_xmit+0x224/0xc70
-[  128.425101]  dev_queue_xmit+0x1c/0x40
-[  128.429608]  ovs_vport_send+0xac/0x1a0 [openvswitch]
-[  128.435409]  do_output+0x60/0x17c [openvswitch]
-[  128.440770]  do_execute_actions+0x898/0x8c4 [openvswitch]
-[  128.446993]  ovs_execute_actions+0x64/0xf0 [openvswitch]
-[  128.453129]  ovs_dp_process_packet+0xa0/0x224 [openvswitch]
-[  128.459530]  ovs_vport_receive+0x7c/0xfc [openvswitch]
-[  128.465497]  internal_dev_xmit+0x34/0xb0 [openvswitch]
-[  128.471460]  xmit_one.constprop.0+0xc4/0x200
-[  128.476561]  dev_hard_start_xmit+0x54/0xf0
-[  128.481489]  __dev_queue_xmit+0x968/0xc70
-[  128.486330]  dev_queue_xmit+0x1c/0x40
-[  128.490856]  ip_finish_output2+0x250/0x570
-[  128.495810]  __ip_finish_output+0x170/0x1e0
-[  128.500832]  ip_finish_output+0x3c/0xf0
-[  128.505504]  ip_output+0xbc/0x160
-[  128.509654]  ip_send_skb+0x58/0xd4
-[  128.513892]  udp_send_skb+0x12c/0x354
-[  128.518387]  udp_sendmsg+0x7a8/0x9c0
-[  128.522793]  inet_sendmsg+0x4c/0x8c
-[  128.527116]  __sock_sendmsg+0x48/0x80
-[  128.531609]  __sys_sendto+0x124/0x164
-[  128.536099]  __arm64_sys_sendto+0x30/0x5c
-[  128.540935]  invoke_syscall+0x50/0x130
-[  128.545508]  el0_svc_common.constprop.0+0x10c/0x124
-[  128.551205]  do_el0_svc+0x34/0xdc
-[  128.555347]  el0_svc+0x20/0x30
-[  128.559227]  el0_sync_handler+0xb8/0xc0
-[  128.563883]  el0_sync+0x160/0x180
+fwnode_get_next_available_child_node() also calls
+fwnode_device_is_available() and that returns false on all non-device nodes
+right now. As noted above, fwnode_device_is_available() should probably
+return true for non-device nodes on ACPI. I'll post a patch.
 
-Fixes: 0bf5eb788512 ("net: hns3: add support for PTP")
-Signed-off-by: Jie Wang <wangjie125@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c | 3 +++
- 1 file changed, 3 insertions(+)
+> 
+> For fwnode_for_each_available_child_node(),
+> fwnode_get_next_available_child_node() is used, which checks
+> fwnode_device_is_available(), which then calls device_is_available().
+> 
+> What's the catch?
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-index 5505caea88e9..bab16c2191b2 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-@@ -58,6 +58,9 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb)
- 	struct hclge_dev *hdev = vport->back;
- 	struct hclge_ptp *ptp = hdev->ptp;
- 
-+	if (!ptp)
-+		return false;
-+
- 	if (!test_bit(HCLGE_PTP_FLAG_TX_EN, &ptp->flags) ||
- 	    test_and_set_bit(HCLGE_STATE_PTP_TX_HANDLING, &hdev->state)) {
- 		ptp->tx_skipped++;
 -- 
-2.33.0
+Kind regards,
 
+Sakari Ailus
 
