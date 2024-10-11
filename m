@@ -1,48 +1,59 @@
-Return-Path: <netdev+bounces-134530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B6CA99A009
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 11:21:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECE1699A01B
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 11:24:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E94741F233A4
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 09:21:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93ACA1F22DB3
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 09:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E70820B21C;
-	Fri, 11 Oct 2024 09:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C01220ADC7;
+	Fri, 11 Oct 2024 09:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tSUwXnvA"
 X-Original-To: netdev@vger.kernel.org
-Received: from gw.red-soft.ru (red-soft.ru [188.246.186.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B228F1F4FA8;
-	Fri, 11 Oct 2024 09:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.246.186.2
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728638468; cv=none; b=de8/IQhTgZoYywujN8IIWkYgQMD01zBb6Md+jULcx42i6xIsg+IpsvoOWkagJ4QmGuz+V2T1TrxEOIMcR9J3Gqer/cI0qNyJlVAqloBbxxMk6JCg6HDw9fwIeVgW8thgo7gZoqoU8YZuWUcv+Gmz8reH+RME9t/pblpYgEJy/KU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728638468; c=relaxed/simple;
-	bh=jU9b8meyfFqhj4XP4F0wIIf+V51oNcfs0XY3vOEztmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ThKzkUEZC3O2rCFE9z8TPiNgKcRVhT+u915a2rouDm0gqH5rxz9BLVui3y0ZiuhdPkHq/uBvqk7r/NOpoV/JDjenGUjmlfaNVOwIyBa0zxu4Na1jmMXvtKEByB5QOvjkKLRtyHzqfK3pc6ihyX72joKZqvl7m/1QUk+1Cm9C5ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=red-soft.ru; spf=pass smtp.mailfrom=red-soft.ru; arc=none smtp.client-ip=188.246.186.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=red-soft.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=red-soft.ru
-Received: from localhost.localdomain (unknown [10.81.100.48])
-	(using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by gw.red-soft.ru (Postfix) with ESMTPSA id 00F473E1C0D;
-	Fri, 11 Oct 2024 12:20:55 +0300 (MSK)
-Date: Fri, 11 Oct 2024 12:20:54 +0300
-From: Artem Chernyshev <artem.chernyshev@red-soft.ru>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH net] pktgen: Avoid out-of-range in get_imix_entries
-Message-ID: <Zwjt9pz3uYoK+Jco@localhost.localdomain>
-References: <20241006221221.3744995-1-artem.chernyshev@red-soft.ru>
- <20241008182319.0a6fe8ad@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F3020B1F3;
+	Fri, 11 Oct 2024 09:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728638694; cv=none; b=E0jA8P2pX8vzuZa8pB/hLshO7FmGs4GG9BxEPtSBTDMhpjd6duvgdhb+1RoTwBAyB2vh0mEUkV6bUzVHqrKTeesYmrY35wP6oEgRmq74fDYM6VJNK9jLAydnbe8iCTnUF97Y6PWMP19nFeUs0Itn50gYUTet8OfvINOp+XM4gXg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728638694; c=relaxed/simple;
+	bh=29JTHK8TtoAbpThuxLfdJOUJ6pvzU1TbMc+KdwGPaZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J1cpVnee3YtKY4IRSR7iWLGqAtGd5GnaUBiJPdZ5gnBLZ9zlN1TXun4tOiYK05eyFtWz0anNrRkiQItnVQjVvq94iGt/fGuPxdAV52sav6/oQeQPvteexz0tyOVVhvCQBlaQaRi2aUgHBV/hPunbfmO7rbkGRm5LNkC+FoV/C2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tSUwXnvA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8171FC4CEC3;
+	Fri, 11 Oct 2024 09:24:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728638694;
+	bh=29JTHK8TtoAbpThuxLfdJOUJ6pvzU1TbMc+KdwGPaZc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tSUwXnvAF8ga5/iEGs4FXVgxQJ9dkQV1S0UKyO+0mi/vWcKqXakdEsU2uC4l3Wt2y
+	 AoLojPTX7Y/dJ248yjJOrwGm2dhXCBUofB2zl3F05UXXjtep9yhHc4igBL9ou9II3L
+	 ENAeYXotK+wWpj+0o4LDVNUGXtBLPSvS2gS4OJbyFysKmSRcRQe13/yiygB8/4Z6ki
+	 1ehiS6MH9i6PHkKQ5wIO71DziOC535ec49xWJqu3nPp6xGiNETDezTznOsNixdXFQt
+	 Nb5MHqvbILWyXIx7oOl/anaBR4WDnFlwzaQp3jzoLVBvBj3I3kLEkO8KjN2yGv+Rxm
+	 mjgXL8GBv5cEQ==
+Date: Fri, 11 Oct 2024 10:24:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jensemil.schulzostergaard@microchip.com,
+	UNGLinuxDriver@microchip.com, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: microchip: vcap api: Fix memory leaks in
+ vcap_api_encode_rule_test()
+Message-ID: <20241011092449.GD66815@kernel.org>
+References: <20241010130231.3151896-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,37 +62,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241008182319.0a6fe8ad@kernel.org>
-X-KLMS-Rule-ID: 1
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Lua-Profiles: 188374 [Oct 11 2024]
-X-KLMS-AntiSpam-Version: 6.1.0.4
-X-KLMS-AntiSpam-Envelope-From: artem.chernyshev@red-soft.ru
-X-KLMS-AntiSpam-Rate: 0
-X-KLMS-AntiSpam-Status: not_detected
-X-KLMS-AntiSpam-Method: none
-X-KLMS-AntiSpam-Auth: dkim=none
-X-KLMS-AntiSpam-Info: LuaCore: 39 0.3.39 e168d0b3ce73b485ab2648dd465313add1404cce, {Tracking_from_domain_doesnt_match_to}, red-soft.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KLMS-AntiSpam-Interceptor-Info: scan successful
-X-KLMS-AntiPhishing: Clean, bases: 2024/10/11 08:06:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/10/11 07:41:00 #26731420
-X-KLMS-AntiVirus-Status: Clean, skipped
+In-Reply-To: <20241010130231.3151896-1-ruanjinjie@huawei.com>
 
-Thank you for the review. I will return with V2
-
-Best regards,
-Artem
-
-On Tue, Oct 08, 2024 at 06:23:19PM -0700, Jakub Kicinski wrote:
-> On Mon,  7 Oct 2024 01:12:20 +0300 Artem Chernyshev wrote:
-> > In get_imit_enries() pkt_dev->n_imix_entries = MAX_IMIX_ENTRIES 
-> > leads to oob for pkt_dev->imix_entries array.
+On Thu, Oct 10, 2024 at 09:02:31PM +0800, Jinjie Ruan wrote:
+> Commit a3c1e45156ad ("net: microchip: vcap: Fix use-after-free error in
+> kunit test") fixed the use-after-free error, but introduced below
+> memory leaks by removing necessary vcap_free_rule(), add it to fix it.
 > 
-> I don't think so, at least not exactly. It's legal to fill the array
-> completely. It's not legal to try to _add_ to an already full array.
-> 
-> AFAICT the fix needs more work.
-> -- 
-> pw-bot: cr
+> 	unreferenced object 0xffffff80ca58b700 (size 192):
+> 	  comm "kunit_try_catch", pid 1215, jiffies 4294898264
+> 	  hex dump (first 32 bytes):
+> 	    00 12 7a 00 05 00 00 00 0a 00 00 00 64 00 00 00  ..z.........d...
+> 	    00 00 00 00 00 00 00 00 00 04 0b cc 80 ff ff ff  ................
+> 	  backtrace (crc 9c09c3fe):
+> 	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+> 	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+> 	    [<0000000040a01b8d>] vcap_alloc_rule+0x3cc/0x9c4
+> 	    [<000000003fe86110>] vcap_api_encode_rule_test+0x1ac/0x16b0
+> 	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+> 	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+> 	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+> 	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+
+I guess that the rest of the log could be trimmed from the
+commit message. But I don't feel strongly about that.
+
+Also, it is probably not necessary to repost just because of this,
+but as a bug fix this patch should be targeted at the net tree
+and that should be indicated in the subject.
+
+  [PATCH net] ...
+
+...
+
+> Cc: stable@vger.kernel.org
+> Fixes: a3c1e45156ad ("net: microchip: vcap: Fix use-after-free error in kunit test")
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
