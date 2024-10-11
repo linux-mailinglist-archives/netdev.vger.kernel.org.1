@@ -1,195 +1,225 @@
-Return-Path: <netdev+bounces-134571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3135C99A339
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:04:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA0E99A366
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B04A6285C72
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:04:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4A3C1F253AC
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 12:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E7E216A32;
-	Fri, 11 Oct 2024 12:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3151F218D85;
+	Fri, 11 Oct 2024 12:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvbF05Ki"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Prh5z9Ch"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9C820C49B;
-	Fri, 11 Oct 2024 12:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36499217918
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728648271; cv=none; b=KaHmziGNIOjLwIR+OJ1pQvmhW62lwpAl6tNSowbBzOFyZJ8TNsCz4TDyIssKfFvAQy4qeCNe1ienXUyZztzmfbC6pkzE8XhYRMVQYlBU8u7LE5DnqorbUwaPgYp/ZvetIufs4fjhyA6MWZwjva1nytIJyqHCAZ2ZltiXhE2deGE=
+	t=1728648477; cv=none; b=FAcd2xWQ0X97b817ZHY9fhmGVAsMje1Qiao+Xoz5uFFHDWXkAtjiKJlBPAyZl08oyCR/kIy4s4c3S45XOOvZZ3gRrwb3HW75JAgoj23EKCanlUd5Y92vvmJ/L8UJwjCuVMo/KATqw0v0EUPvoguYqzRzi2XMik5xQdi886l+BkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728648271; c=relaxed/simple;
-	bh=d2lsdLlJ23PzLx+t87PT/SQoDACaRKM+kkKERIEh25I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U063Nmb5AgUDJOkKFFscX6BrtXQeuDszyA9+/SO7Qo0qA8v1HAQswU3VUPNG3GRxHGn5Rlh2mwSVQiHIge9H1QVBEp5k4DS1XOAwepZExj9J9krmHDR+jgpOiK4I6EoouFJmJJaEf0XftLwDuZklFBt2zA/XcQ5DbbRPRc/TlPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvbF05Ki; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5398e53ca28so2175172e87.3;
-        Fri, 11 Oct 2024 05:04:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728648267; x=1729253067; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AyShL+hX7deCzpof4F0fbg7eMw0Pnc7HEQfvWtO/NKM=;
-        b=NvbF05KiYYLN+x6VhpmQSaX8F3M6JPZDpqyioxOHzQ+u9P3BcelVt2acAP6hS/dFaJ
-         +vuNZhXQnHRc+KM2WK2DPbum0shqeAu/KOvIBZ0tEAt+hORzJLdHRnFEc+juq8CbOfRE
-         7v3sJ9tbSMM9ztvXodUesLvWFKygA7iF2H7Unyh5fjlq7L/eHsexEGEiZoFDxPtk4Jr8
-         DjndUI5yO/LWc0TmFiIyCAwVsdFanyeBG/+Lq66cqe4+PcLSWWOF1l8C8F6Xl+zuX+7I
-         gUYefWfW3j6T1jJtOJokeWSuLJh6QbYcYZfL30rozsg50l5ui+uTdCfTFGDMwwp7XKya
-         jOVQ==
+	s=arc-20240116; t=1728648477; c=relaxed/simple;
+	bh=MwKBr4MW13REKEdZEAqTL7D+rRGFsGjM7n9xGoHUCEw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HneK7fIuR/4fYPfHHfkbCfRwj8EZS2yXKUg6gvGy7PL+J2XGmMfJuA+RVzMmJP7IY0ju1QtrbOanQ1SKBCeDdOj03Nm+/KnZAjzjrcej0CN5yQDwpctL0/1FcSXMrPxwqsWDBB1e+KIkPUHUqMYOfErmWWhF2mFaGDdQQS8Ee4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Prh5z9Ch; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728648474;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MwKBr4MW13REKEdZEAqTL7D+rRGFsGjM7n9xGoHUCEw=;
+	b=Prh5z9Ch4Obg+vN9I0GUDr9uLmOGW5i1k9JsPMtpIOOEVIC8RHQAeNTH44HLR4LtC0lxKa
+	CAWpDlWvHpa6C+/1JDeBO5ISRvIbK5a/AySAO8siZdJVhFjDZA7QtU9swzHoHdkLURlnDD
+	dLfysmvU2ftmf6Q4Nso3HR1IWWhl4Qc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-81-5D_41rRLNhi3SajUfibZlA-1; Fri, 11 Oct 2024 08:07:53 -0400
+X-MC-Unique: 5D_41rRLNhi3SajUfibZlA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb0b0514bso12204315e9.1
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:07:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728648267; x=1729253067;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AyShL+hX7deCzpof4F0fbg7eMw0Pnc7HEQfvWtO/NKM=;
-        b=qx4dTOvJlUrp3yxy1/rfUblwOtvS+lUSvf79MAFwFzjS8lwVoMUnt4TeFGfQWGaSEB
-         tt1mVqYpl8IWfTQ2OeEqZsmHCBcijYYy+PmGP8NysK+VcmEIWOO0S7PpUdLE8uikebx7
-         pz2kaiskDum+5JEY3ABWZQ5PqzDGOp7UJujIgtsbcWBaZWn38gP1pm0GktbpfHyHvz+1
-         GPZp6zBHpmymsVD2bpkY/8vBRKMec7s48a3aSK6CmjPncqncBWvF6T5ljQic3v4IAXdX
-         qzrTMXqpE3J+Nr0pskiyXTbJzMaC3/PfC2svWNkxMb4fOE/8RBoP4zg7N1Y2rxfEw/FU
-         yiIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtg4YBJbx/NpTi4t0iv4yfXLyqhldh8wzs3K74WIXSZD4VrU6kXOCZVxH84e2ccyzKimSeCnG//yu/@vger.kernel.org, AJvYcCWS7u4ZR0vh0919JoxmRmNe64RjUjoF6xK0S6SpbgrFXWr5aSkBpTvg0vcgzIvVGwrId1Sch+bv@vger.kernel.org, AJvYcCXv1y1Xo+S3TGHNMhwmajRdAwIVpEXVzOdtMEQeOZ1grFDvuMzE6ZhMIktQKmFcoV76YZ9mu/LYcZ6bGuTO@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4mhNtLMwhJzEidr8pgp3SbXZDcmMZmuHaR1FlYDStSWHtLhBd
-	203P5Ywjla7zsquNDCya9o1rq/V/r/PgpgD523jSfZvF/5snniFJT5WL5NDB
-X-Google-Smtp-Source: AGHT+IEFmewdlQ1CPXu2nV+GJbqCzq5j5B1b19TApH5sZAJ+BffXTe4lNLUiGOh2G3Wr71IqwpAF9A==
-X-Received: by 2002:a05:6512:3b24:b0:539:9717:7ea0 with SMTP id 2adb3069b0e04-539da58b296mr1527424e87.55.1728648267031;
-        Fri, 11 Oct 2024 05:04:27 -0700 (PDT)
-Received: from [10.10.12.27] (91-118-163-37.static.upcbusiness.at. [91.118.163.37])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7f5c4c3sm206188966b.95.2024.10.11.05.04.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 05:04:26 -0700 (PDT)
-Message-ID: <105dfbaa-0b7f-4e9e-8ab8-16d35ec165d7@gmail.com>
-Date: Fri, 11 Oct 2024 14:04:24 +0200
+        d=1e100.net; s=20230601; t=1728648472; x=1729253272;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MwKBr4MW13REKEdZEAqTL7D+rRGFsGjM7n9xGoHUCEw=;
+        b=I/P396dg2rTxfksFWOVdYXp95Gmh7jDmjhE+ES2SrHwTnbEmzOFFaE3t3zC8+d0+AC
+         G6Jp3iu+ijFqO/jZz1Kx5SUkOpPOdCVJe8bSNTFLHUDy6xmHjeHpfIH547KLBdo6/Q2S
+         6tBq6gpkZhrI1PmeiXjncbAtnuGepXf+jl5gpB8HSMR1ildD/R2nyx+DZME1mVc3iZW4
+         mlLPNm2p+wAleLQ9d8WCJo6j9H2oa2XWDdFNqb7ziSiDhLONC7GUlB9uhS5cgwKMKVZQ
+         Wi1cmZY3I77PeY+QzC4qarstyrQ8eUqpJv7lmwUsIq3XUb+c+S/A10uZ4hLHHJ9qKMh4
+         IR0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWX3KsllHT7dugfToKx0qoaFZx3/pDPKBShYWAGcESI+r5ZKgYpTXaQxeCcUy3TW7hfpCXtlok=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPBPBX/XcMAGyLxMEPp1flYXolPRlPVRKKVCXm4O/xOdrRhpNU
+	uW4ZKlrDebu6kF/9gM38p1uIicTaWA7cEVbKdKrFXHlRbIZI0XwWkrP0+PGSkCeH5DzJbsAst0Z
+	8zV6CLs/NxeVAd/LcWCDOwoJrYyKFqiQgol5su+klyRK5FU7OZ6k/fA==
+X-Received: by 2002:a05:600c:1d26:b0:42f:75cd:2566 with SMTP id 5b1f17b1804b1-4311deaea05mr17632145e9.2.1728648472025;
+        Fri, 11 Oct 2024 05:07:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGfafWJbYY7XgafIoUBODjA0mqAG0Im27BYfV9oETn5/NEqgGUi/qx3b+BLDWe06kqudkM50g==
+X-Received: by 2002:a05:600c:1d26:b0:42f:75cd:2566 with SMTP id 5b1f17b1804b1-4311deaea05mr17631395e9.2.1728648471511;
+        Fri, 11 Oct 2024 05:07:51 -0700 (PDT)
+Received: from eisenberg.fritz.box ([2001:16b8:3d05:4700:3e59:7d70:cabd:144b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431182d7929sm40692135e9.4.2024.10.11.05.07.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2024 05:07:50 -0700 (PDT)
+Message-ID: <a688a4109e292d7510ebd7206bd3296e23ca1e3b.camel@redhat.com>
+Subject: Re: [RFC PATCH 13/13] Remove devres from pci_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri
+ Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Arnd
+ Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Alex Dubov <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ Manish Chopra <manishc@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>,  GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>,  Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
+ S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Mario Limonciello <mario.limonciello@amd.com>, Chen
+ Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
+ Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
+ Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, Eric Auger
+ <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>,
+ Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-input@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-wireless@vger.kernel.org,
+ ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
+ linux-staging@lists.linux.dev, kvm@vger.kernel.org, 
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Fri, 11 Oct 2024 14:07:48 +0200
+In-Reply-To: <20241010114314.296db535.alex.williamson@redhat.com>
+References: <20241009083519.10088-1-pstanner@redhat.com>
+	 <20241009083519.10088-14-pstanner@redhat.com>
+	 <7f624c83-115b-4045-b068-0813a18c8200@stanley.mountain>
+	 <f42bb5de4c9aca307a3431dd15ace4c9cade1cb9.camel@redhat.com>
+	 <20241010114314.296db535.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] device property: Introduce
- fwnode_for_each_available_child_node_scoped()
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Daniel Scally <djrscally@gmail.com>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Linus Walleij <linus.walleij@linaro.org>, linux-acpi@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
- <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
- <Zwi6Dn4yJxst4xv2@kekkonen.localdomain>
- <07ec0837-d7a3-413e-a281-e06feafe7f34@gmail.com>
- <Zwj12J5bTNUEnxA0@kekkonen.localdomain>
-Content-Language: en-US, de-AT
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-In-Reply-To: <Zwj12J5bTNUEnxA0@kekkonen.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 11/10/2024 11:54, Sakari Ailus wrote:
-> Hi Javier,
-> 
-> On Fri, Oct 11, 2024 at 10:34:32AM +0200, Javier Carrasco wrote:
->> On 11/10/2024 07:39, Sakari Ailus wrote:
->>> Hi Javier,
->>>
->>> On Tue, Oct 08, 2024 at 06:10:27PM +0200, Javier Carrasco wrote:
->>>> Introduce the scoped variant of the
->>>> fwnode_for_each_available_child_node() to automatically decrement the
->>>> child's refcount when it goes out of scope, removing the need for
->>>> explicit calls to fwnode_handle_put().
->>>>
->>>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
->>>> ---
->>>>  include/linux/property.h | 5 +++++
->>>>  1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/include/linux/property.h b/include/linux/property.h
->>>> index 61fc20e5f81f..b37508ecf606 100644
->>>> --- a/include/linux/property.h
->>>> +++ b/include/linux/property.h
->>>> @@ -168,6 +168,11 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
->>>>  	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
->>>>  	     child = fwnode_get_next_available_child_node(fwnode, child))
->>>>  
->>>> +#define fwnode_for_each_available_child_node_scoped(fwnode, child)	       \
->>>> +	for (struct fwnode_handle *child __free(fwnode_handle) =	       \
->>>> +		fwnode_get_next_available_child_node(fwnode, NULL); child;     \
->>>> +	     child = fwnode_get_next_available_child_node(fwnode, child))
->>>> +
->>>
->>> On OF, the implementation of the .get_next_child_node() fwnode op is:
->>>
->>> static struct fwnode_handle *
->>> of_fwnode_get_next_child_node(const struct fwnode_handle *fwnode,
->>>                               struct fwnode_handle *child)
->>> {
->>>         return of_fwnode_handle(of_get_next_available_child(to_of_node(fwnode),
->>>                                                             to_of_node(child)));
->>> }
->>>
->>> On ACPI we currently have .device_is_available() returning false but that
->>> probably should be returning true instead (it's been virtually unused
->>> previously).
->>>
->>> That makes fwnode_get_next_available_child_node() and
->>> fwnode_get_next_child_node() equivalent on both ACPI and OF. Presumably
->>> creating unavailable nodes would be useless on swnode, too.
->>>
->>> So my question is: what do we gain by adding all these fwnode_*available()
->>> helpers?
->>>
->>>>  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
->>>>  						 struct fwnode_handle *child);
->>>
->>
->> Hi Sakari, thanks for your feedback.
->>
->> I thought that the difference is not in OF (which either way ends up
->> calling __of_device_is_available()), but in ACPI.
->>
->> For fwnode_for_each_child_node(), the ACPI callback is
->> acpi_get_next_subnode(), and I don't see that the device_is_available()
->> callback is used in that case.
-> 
-> fwnode_get_next_available_child_node() also calls
-> fwnode_device_is_available() and that returns false on all non-device nodes
-> right now. As noted above, fwnode_device_is_available() should probably
-> return true for non-device nodes on ACPI. I'll post a patch.
-> 
+On Thu, 2024-10-10 at 11:43 -0600, Alex Williamson wrote:
+> On Thu, 10 Oct 2024 11:11:36 +0200
+> Philipp Stanner <pstanner@redhat.com> wrote:
+>=20
+> > On Thu, 2024-10-10 at 11:50 +0300, Dan Carpenter wrote:
+> > > On Wed, Oct 09, 2024 at 10:35:19AM +0200, Philipp Stanner wrote:=C2=
+=A0
+> > > > pci_intx() is a hybrid function which can sometimes be managed
+> > > > through
+> > > > devres. This hybrid nature is undesirable.
+> > > >=20
+> > > > Since all users of pci_intx() have by now been ported either to
+> > > > always-managed pcim_intx() or never-managed
+> > > > pci_intx_unmanaged(),
+> > > > the
+> > > > devres functionality can be removed from pci_intx().
+> > > >=20
+> > > > Consequently, pci_intx_unmanaged() is now redundant, because
+> > > > pci_intx()
+> > > > itself is now unmanaged.
+> > > >=20
+> > > > Remove the devres functionality from pci_intx(). Remove
+> > > > pci_intx_unmanaged().
+> > > > Have all users of pci_intx_unmanaged() call pci_intx().
+> > > >=20
+> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>=C2=A0=20
+> > >=20
+> > > I don't like when we change a function like this but it still
+> > > compiles fine.
+> > > If someone is working on a driver and hasn't pushed it yet, then
+> > > it's
+> > > probably
+> > > supposed to be using the new pcim_intx() but they won't discover
+> > > that
+> > > until they
+> > > detect the leaks at runtime.=C2=A0=20
+> >=20
+> > There wouldn't be any *leaks*, it's just that the INTx state would
+> > not
+> > automatically be restored. BTW the official documentation in its
+> > current state does not hint at pci_intx() doing anything
+> > automatically,
+> > but rather actively marks it as deprecated.
+> >=20
+> > But you are right that a hypothetical new driver and OOT drivers
+> > could
+> > experience bugs through this change.
+> >=20
+> > >=20
+> > > Why not leave the pci_intx_unmanaged() name.=C2=A0 It's ugly and that
+> > > will
+> > > discorage
+> > > people from introducing new uses.=C2=A0=20
+> >=20
+> > I'd be OK with that. Then we'd have to remove pci_intx() as it has
+> > new
+> > users anymore.
+> >=20
+> > Either way should be fine and keep the behavior for existing
+> > drivers
+> > identical.
+> >=20
+> > I think Bjorn should express a preference
+>=20
+> FWIW, I think pcim_intx() and pci_intx() align better to our naming
+> convention for devres interfaces.
 
-fwnode_device_is_available() is indeed called in
-fwnode_get_next_available_child_node(), as I stated a couple of lines below.
+Yup, also my personal preference. But we can mark those functions as
+deprecated via docstring-comment. That should fullfill Damien's goal.
 
-My question on the other hand was how that is called in
-fwnode_for_each_child_node(), as I could not see any call to check
-availability in acpi_get_next_subnode().
-That is what confused me about the _available_ macros being the same as
-their counterparts without the _available_.
+> =C2=A0 Would it be sufficient if pci_intx()
+> triggered a WARN_ON if called for a pci_is_managed() device?
 
-Could you please clarify that? Thanks again.
+No, I don't think that's a good idea; reason being that
+pci_is_managed() just checks that global boolean which we inherited
+from the old implementation and which should not be necessary with
+proper devres.
+The boolean is used for making functions such as pci_intx() and
+__pci_request_region() hybrid. So with our non-hybrid version we never
+need it.
 
->>
->> For fwnode_for_each_available_child_node(),
->> fwnode_get_next_available_child_node() is used, which checks
->> fwnode_device_is_available(), which then calls device_is_available().
->>
->> What's the catch?
-> 
+P.
+
+> =C2=A0 Thanks,
+>=20
+> Alex
+>=20
 
 
