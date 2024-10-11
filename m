@@ -1,158 +1,286 @@
-Return-Path: <netdev+bounces-134636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0548999AA67
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:38:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9BA199AA77
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DAD01F28BDA
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 17:38:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E107B1C212C9
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 17:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BA31C2DB7;
-	Fri, 11 Oct 2024 17:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCEC81CF2A7;
+	Fri, 11 Oct 2024 17:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0QcrklZ8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dWd5Mvw2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2045.outbound.protection.outlook.com [40.107.220.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC2B1C32FE
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 17:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728668040; cv=none; b=dtlHKA0xiAx9/EIrmu9BzPuTlbVu40foir+ko3Y1tiRCmiT6F9kibr/171sEjJKlRWfdjGc8JvTAzFC48KqRNPqHZGcBBvp1ro1Kho9tNoJmX+prwmOHEfByeBAt8+3uOv8mi8bkhKzISVPXeHy6gbLLZVxGf4CCxm91x5Tcg0Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728668040; c=relaxed/simple;
-	bh=VRrf8ntlcACFdviPg6gJE38L8OLS0KaeN7NIdzpw4Lw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OJeO7vClGCcRyQDznjlaeu8f0j4+6Og0vh0l47miXKaOAfiKo1na37D01fZY8ihzRymcTTllpuAmlypRAo+Bihs8dJ9Ibd6kLzVuOw2UNoSs4qwFpayx2VVJ9FXhgHOrFtoFayFPGjY58pX1ftkvBv76LyL/E/LS+qFCvGgy4DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0QcrklZ8; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4603d3e0547so6451cf.0
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 10:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728668037; x=1729272837; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KmnghbBZ3GwSfb268fMdvHk82X10qhUobyckvFj2KWQ=;
-        b=0QcrklZ8wXoEmcO/JXs3Eqc0BMbHGTDaH63XfoX2H2f1l3+VMBpXJ0IT2P5EWh7lE5
-         cF9uuskr1DAbyTBdQJ/rQCIAX3ecbmJPrBT4DDgc6N9AHGeS6cQtvJzSq3vNcfK4tjGB
-         KnsR3lYnIIXdiKoBKynw4u8SmyABEH/yLvMLrFAh5Fpmmz5ajJ6aWcri+TGrPoe+5REQ
-         GJr+Vq739eiiGR50xxEXL7RLHBbeOJZ4HV0/kylI9V47+GtoWLLE/J4FV0QaUWCubh3X
-         ZJSNEtZ5YNiMqscowmsHbI3avTraL6fY0eDnX/nrtGduh+yXcUvrvXbXKRdxkEIIHDMZ
-         aqWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728668037; x=1729272837;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KmnghbBZ3GwSfb268fMdvHk82X10qhUobyckvFj2KWQ=;
-        b=J1J3K2C+YqQdwTVlNkfgv8UgfHf54ddGubAVTllbQFSYYhAmKrprrZU2cWSU308QTM
-         Rb1OgbQ6cJrFApz1xkrD9eHLhqawCECDxqeLUDeQn5PyxRUkKYM10np6kckN+9kPt17S
-         fgOFGWp9byYfURFtklrwVB9YQBRdTfuBY+HrLIFo25oL5cnonAo8MJcU+CwwfPlPgtvt
-         QzReNabDO2//Qu3UIrwSBLfd6k0IO9WEczabj5s/NlxjTyvWKSpM/pDj/UznJW/+2/5T
-         tyfZrCj/y2BEZnlk2XPh6cdj7tmlYyKLB4xMiJV3zT4GSRFCwRLOsCyYr1Dg23kqt+T8
-         +zMg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLMzjNYiir111rGoSd6eDWt1Iu7dcIS6+PrVb2foh4k4yYqj/Z5FURhpJMduHPiVEiVZ9C5Nk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPxiDkuC747dv4vNjsUk0g1QfamwCQn1jKU31LBA+kXT0PMXjE
-	ARUJeXv42D6+00bXtBYmzYjGmOORWDYY6o305b68J7TWHBAjiNW8umHMFVyaJqeRNT0ho3pFIm6
-	kGuJOk0Usx8rTrJ3pD3mpEBxmdxosi9OaMWtP
-X-Google-Smtp-Source: AGHT+IFz4SsvmOVlN9wmuI0OD+n+Y3BKo/jR94QdcFEtQIr/0/iWWqkX2UXzu02XCIryglx7gU3frkwmZlQJh7tb8Tk=
-X-Received: by 2002:a05:622a:820c:b0:45c:9eab:cce0 with SMTP id
- d75a77b69052e-4604c16ba51mr3184741cf.15.1728668037354; Fri, 11 Oct 2024
- 10:33:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D6A1CF2A1;
+	Fri, 11 Oct 2024 17:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728668254; cv=fail; b=tcPEPNUpKzH4HvQkxaOilqRjMSyMMc23xSD7VZvmLYykB60bgZnCU3j5aJOMQrtTGfAJcmy0Yi7Xw/FF4un1TwNm4aTBrS1yc+UYJIGOTv0GMUfHBt6uchxyBMuF43SKoU7CXwsZXbTEeDfO3USD/1HL918mJk7oVmb5WXJexoc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728668254; c=relaxed/simple;
+	bh=JVY8SBPEc2iRwkfsJWdsDB4z1mVmK7emIJimTfH4MlQ=;
+	h=Message-ID:Date:Subject:To:References:From:Cc:In-Reply-To:
+	 Content-Type:MIME-Version; b=Kcdla261cO2ZnuwhzeA/9BrTlrlfcELkG/NQyOGfD2/K/JtyctK/RVGAE1TP198DOnPetDjNA4FihDXurBjCyNz/ABTL1g8iKFmNJxjGez10G8+LCWGGUysZjzFiKRXKDnKDJGAuPU/BCF2IXsft6e1PBVEDQ+RUBA+bqsuajeg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dWd5Mvw2; arc=fail smtp.client-ip=40.107.220.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YjOwmRzrv39NyfVR7yHIB3T1JKlSMVqSa6R9KX8Wadpyu3IRPzrhJrt02qU4is4xWKbWHPcgXK6QFoK6GGYj2L76pvP3AqO5s0LZtI+t4yGTPRLxL9DuusfIKfPGd4AGu2LCX9UYp2NIP85VzVEveV0DazAgjKRIDGKsqsijtAsGWQeq+AaVvWewlwZ+0Ah6J6QHaGtQsIb6SBpzRlhFf+D1P56E3lrm6x0/j4waEaDOjcuixtMU27k3hUNBb2upZBEdI3UA3cuzbB1+B8D0xs4J9GJUsbO2jsXn6KLIDj7nFuPY+iRM1i2lPerau90UV7HB2F6g62II4lBU0PaYDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CHmjdU4wpdGZ1W+exyIo7v74zWqZpTVJkx4W/HdHFgc=;
+ b=YOqi0cPAfg49Aggp5BzyOHpdhFkaEqJ6hfJAq8Ho3iJgfpqogPaLRlqaaMLCaZ8EWwNxMuFe0k9L0B1jFffrib7GkNZbB1192q95PK/qMfCKkiDxvlwioerTF1d+y9Ca6oq50P/6G5yXSpdRHqeKnHuRQhloM7xize7UWc11WR0SUwNZZPw8/iTZiP/tWGGvKlhT91M4sDSZJ+n07AHm57peVdMKZs7MkWjn8VB2CEkTfHbaJ1j389WmW8M945HTY5Ci0/AFCFrHxUWbMrWs8MCuyPQ4GXlELODsrwwWSCQ9CSD7b8kTmxjVi7hhnKsdD021/2aip1ao/MrZ0Bj4wQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CHmjdU4wpdGZ1W+exyIo7v74zWqZpTVJkx4W/HdHFgc=;
+ b=dWd5Mvw2UvLUEJgBrObQjkAu4bKmvI2L0XEAQeHGHmvyBDn1WeIM1GwbfR1Mr7bB9QZ8fTKHWBJSCCtsCrS5U+aCmMQL1+6YBaxm/2xn+hDI1lv0PQ6DOOPCkDkFCu3rjvru1t8q2XlcN+9y0zW3h3GxC87rvPOI2jw7BXM7Y5GhHyOZkVM5Wz+w84cAiIBhPhvmFQPWxIcTUoAHUCKmFo+AuKRVshv5XU7UYQwBo2UmMhGex8CfxbHmsb+ydVnVOnMCE6bhaerXVWu68iqlDX9EEeMPMuX9kliUYqxil06H0rCvgTiuZAGFRuaHCjxcEwdBIrt6djn329wK8rqTPQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com (2603:10b6:a03:4d0::11)
+ by PH0PR12MB8776.namprd12.prod.outlook.com (2603:10b6:510:26f::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Fri, 11 Oct
+ 2024 17:37:30 +0000
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9]) by SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9%5]) with mapi id 15.20.8048.013; Fri, 11 Oct 2024
+ 17:37:30 +0000
+Message-ID: <114b4c03-5d16-42ed-945d-cf78eabea12b@nvidia.com>
+Date: Fri, 11 Oct 2024 18:37:23 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/2] net: phy: aquantia: allow forcing order
+ of MDI pairs
+To: Daniel Golle <daniel@makrotopia.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Christian Marangi <ansuelsmth@gmail.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Robert Marko <robimarko@gmail.com>, =?UTF-8?Q?Pawe=C5=82_Owoc?=
+ <frut3k7@gmail.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <7ccf25d6d7859f1ce9983c81a2051cfdfb0e0a99.1728058550.git.daniel@makrotopia.org>
+ <9ed760ff87d5fc456f31e407ead548bbb754497d.1728058550.git.daniel@makrotopia.org>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+Cc: "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+In-Reply-To: <9ed760ff87d5fc456f31e407ead548bbb754497d.1728058550.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0038.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:61::26) To SJ2PR12MB8784.namprd12.prod.outlook.com
+ (2603:10b6:a03:4d0::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-8-ap420073@gmail.com>
- <CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
- <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
- <20241008125023.7fbc1f64@kernel.org> <CAMArcTWVrQ7KWPt+c0u7X=jvBd2VZGVLwjWYCjMYhWZTymMRTg@mail.gmail.com>
- <20241009170102.1980ed1d@kernel.org> <CAHS8izMwd__+RkW-Nj3r3uG4gmocJa6QEqeHChzNXux1cbSS=w@mail.gmail.com>
- <20241010183440.29751370@kernel.org>
-In-Reply-To: <20241010183440.29751370@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 11 Oct 2024 10:33:43 -0700
-Message-ID: <CAHS8izPuWkSmp4VCTYm93JB9fEJyUTztcT5u3UMX4b8ADWZGrA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory tcp
-To: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Samiullah Khawaja <skhawaja@google.com>
-Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8784:EE_|PH0PR12MB8776:EE_
+X-MS-Office365-Filtering-Correlation-Id: b5ea1e7f-f7ee-4fef-d412-08dcea1b6194
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?U3lqOG1uWDJJcHpwVm9pNmdIWDVWaUxGbWFtVzE3Ykg4NU9EdVR6NW9pZzJI?=
+ =?utf-8?B?dEdNSHNPMmVZcEpDNWZXYWtXL05ZdDIwd3MwR0ErY3hLdVkxUkk3R3FhcFFT?=
+ =?utf-8?B?QzBzY3pENWRuWFpneWdkR3JDTTVDMW5NM3NTVWpraDZ6NEtzVnNRTnhKY2U2?=
+ =?utf-8?B?ckVGMnZiUFZZdmROQVNxTkJiNnp6K1dER1Q2MFRmR1ZxcVZ2dnIzU2VNdjI3?=
+ =?utf-8?B?T1NNNklIU2lqRC9oTDlaU3QwK2JWNTNIWFgzTTNzbVpIL05aaEhyNjZrbHZF?=
+ =?utf-8?B?aUMrMzY2S0pVZ0ZML0FGeUEyV25IZGFKak9sZy9HOW9RTzFiQW9xN2tyMi80?=
+ =?utf-8?B?N3M5YU9CbkF4SGVmaFVFZG4vK1REd3kzMkd5RE16dXhxRXU2SkxDTzUxdHRI?=
+ =?utf-8?B?cDdrMmdQUEpNNmt5b1ZJaEI0SzFrMCtFbWRpR0hDcEd4NnU2REp2aHAxbEd3?=
+ =?utf-8?B?cVBBeE9DWnpHY0R1ME5lUGJXenE5RWttNm1qd1ZDVTNaMG1YVEg5Y0F0S0h3?=
+ =?utf-8?B?VjI2VkhNdklCZG1ENzFneEUxQlh0cGdhSnRrb3ppUTBER3VxQWM4TnlXL09h?=
+ =?utf-8?B?aVFzaFNkcy9wWFE0WFM4ZnY3bllWcVZnYTI3VmZudVdpUmg1eDBPS3B0cHhL?=
+ =?utf-8?B?Z0V6T0d5UUc3b3l2Y01OZzh4S1NtSFFvY2o1SGJtVW1tRjJsM0hJNWFvbGtT?=
+ =?utf-8?B?QlJvcVMwRFZmeWV3Z1ExN1VQY2p2MTJTdDh6OXNVNjlwNHpDc3pHb3ZNY0NE?=
+ =?utf-8?B?dW1la3VXZGhhQ21wTW1xMVMzeWhtbmxBQndqdDlkSDJCRmZEZlE1VlhpTndF?=
+ =?utf-8?B?d3B0WjBFSFdtclJkN3dqQmpRdnNmdGNJdjJrU1N0WWxQZ0NXNVd4RzhpYXJB?=
+ =?utf-8?B?NmpnQU5NQnZTdXhYa0JFUGZUL051dHNBY0xZRUlDWndlNzNUU1JseGkvTlpI?=
+ =?utf-8?B?NzJqSnVEWnpHTkpIc1ZXSTFRUDBncmMwQWJheWZLR2N3dllQMXVUQ3ZiTFg0?=
+ =?utf-8?B?VmxpNGM1SUwvY3RSbXY4T0lSaWs1Smc3b1V0Mzc0SEVpdGRGYzdwRW90UDJD?=
+ =?utf-8?B?LzQyd3hUZFBQKzFyN24xK3pQaFp5bmVHU3BLMmZoTHl0aFd0VUdnNldtd0d0?=
+ =?utf-8?B?SUYreXNSeFdnSVVKZ2lSV2NRVXpEUzhLamtEbVZEc1JpQS9ZSVB5Y1FGR3BC?=
+ =?utf-8?B?cFpiT2ZOamQ3MVlIRlQrdFU1aUNYMzJJVE4yckNONHZNSStacmRTS1lMUEpW?=
+ =?utf-8?B?eVVrUWZNRENWdjh0bWN5UlJmKy9JT24xcUtYdmRtZW1RWElmaldzaXRrYUp5?=
+ =?utf-8?B?MFc3ck5hZ1BaR1lRYzg2cktwSjVGY1NEcHRhazRROWp1eXNrVFBpOENVMXdP?=
+ =?utf-8?B?dXpuUThVUFhPWWl3QXhYUklJanJ5dFZVZlFFbFllSUduZmVDemEzakw1U2c0?=
+ =?utf-8?B?R21YaW1IZ05tc2pYMFc4emFNSTNSNkxsdE5iU2Y4VGx5ZXBaNUFYeDkrOE5v?=
+ =?utf-8?B?c2o3VktLWHRtZFEvYU80K1YwQkNuUUhOWjVWMG9yWUJ1YXdEbDlJaDZBRlhR?=
+ =?utf-8?B?VDJjK0xaTE5yTFlmMDJ0YitVMmdPY25SYVBOVHl2MWhPNXpCUDJNS0RDcWVt?=
+ =?utf-8?B?R3V2Rmh0NGlrV01PQXZiSGpoRlY5QThEMFEzWGN6bUcrMDJyNUtLVG4xeWRP?=
+ =?utf-8?B?RWppMisrN0ZNd3E0NFJLcUp0clhLRWpQRVgwektDZ0N6bE5DSUcyVGxPdnhX?=
+ =?utf-8?Q?7B2IFoLmUbnQYS4UKdaZQ/GAQja4ydLitUwNFlD?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8784.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d0t5c0dqcW5WczNwUjFhQUtEVENuOG80WmgwaStkZlluc3JqVzBQYURnUU5z?=
+ =?utf-8?B?R1ExRUY0a3lZY3d6R1k4UTFhUTNoSUVEMGFPZWpiaklvMU5sbDk1VVJ6Z2d1?=
+ =?utf-8?B?TzFqbElBZnRjUlNNZEFuUUdtL1JEbVpzeEVIQURhUnUxci81dmdwbnVuTGhG?=
+ =?utf-8?B?ZDRkSGVJSFRhbTgrQWJsOU0xVVQ5eldQMStGYndYdmtLNU4vTHBSajVRK0Z5?=
+ =?utf-8?B?MWViN0FjWHB1d2JNNmgreTBxanNXMktQdzFUL0tKN3J1VHF1clVhYi9MRHZX?=
+ =?utf-8?B?SFlBZlA0bENHQ2IrVWVra0JSTG9NUzFJMTZ2SmIwZ0hxUHE4QnordDZNdWVj?=
+ =?utf-8?B?UDIrbEhqd2ZGSlYxK3NUM0hGUHIrTFhhYzBZSDgyRDdQdy9PMEhvek5VSlI2?=
+ =?utf-8?B?aWx6QlN3L0FLdmRoV2h3cUc0R0lPeVVReXlZeElQa29abjk1OGFuY2dnZkRJ?=
+ =?utf-8?B?aytqbllQUlo3Y1NKRUsxU0Y3OFRzc3I2WjMxZ2pQS2M4SktvYVowam1ZaHlU?=
+ =?utf-8?B?M0ZvVkdyUXhtWGRndWlsaUM5UDhvTzh2M2JONWdSNlhCZTJtRlJDeExXVFQy?=
+ =?utf-8?B?M1ZBQ2dPdUtPK0o4NERaZGNScnhScjIyUzYyR0ZBWUNzUkxqSkwzeDlOKy9r?=
+ =?utf-8?B?TE8yRUxxaVFFdWhpZzFNQU9EdnFIdnpUTWRhbDRJTkZDNWpRNHlOSXkrVVFP?=
+ =?utf-8?B?RU1kLy9NYlRaS1BNYjVSRUxNOURGSXhkVWdlcVpSMFhzTnBXclhrd1c3SlNW?=
+ =?utf-8?B?NlVvakhjVDNvRFIvRFMvUUUrWVc0THJIKy9nSWJEQzJONEVyWWpKb2orK2JS?=
+ =?utf-8?B?YmZzV3h5NEljeHZDbHFrait1dWFMKzBWMzNNYlZsVEI4OHE1aytpWVQ3L292?=
+ =?utf-8?B?Q1FEeDhVSXAxUm8rRmY4UEM5MUswaEw2aHo0azJFU0xSMzVjR2FydjhaYTB1?=
+ =?utf-8?B?MWlUWjhzM0FER2RMOXBhc1BaaGUxTWFCNEJ6R042YWhobWxJUmc3NVJtL0ZL?=
+ =?utf-8?B?MDNtZGtWTTQ3QlVBdm5oanVZOE01OEQ1b2NFaktIWWN6OVMyZnVlOGtnM0M1?=
+ =?utf-8?B?eklicEUxc2ZXanptbUdOOTc2VHR2MjhvU2JJZjZRd2xnVnZpVnhtVVNCcEtP?=
+ =?utf-8?B?UGhxamJwOXZ1Rm9Wcll3TXpQUFdyZzFUWnZwK3BmK1RadHhaazJoeDZQWWxr?=
+ =?utf-8?B?emFudU5DcUxscGhWekthN3dIMVhnbG0wVmh6N3FUOHI5UXQwQm5TNDBmNVF6?=
+ =?utf-8?B?WXFJd1c2c3o2UEYzUnl0bnhWRG5FOE14OEdyZ1dIWTVmd0FEbXBKcS8zRW1L?=
+ =?utf-8?B?a3VuZ1QzSHRXby9XSkZwMVF5b3VaaDVGWkpKV1g0aUxBamlCd0Q3VkcyRDhL?=
+ =?utf-8?B?M3dnWVBlQ3dBYmhNZ005RTRQYnFwZTFDNXJTUnk5WDRxcmtJcFhNY0c5N0oy?=
+ =?utf-8?B?R3dYemYwOWVoWklYcmE2dENwM0tQbXlrY0phMVp5KzJOcis5UnJOZmpqa2xt?=
+ =?utf-8?B?ejJ1eDBUaStGM1NTRGY1Qm5CVEhKV0VxTWUxeEVlVGErdWgyRGd0Q0lzNVFW?=
+ =?utf-8?B?ZUxyWXBDMnpOeE9STzhLbGJpalVMdWpzbXYzNVdQUHB1Qi9FQ1BvMVhFTTF1?=
+ =?utf-8?B?c2RXS2N3UlVSQ084VjRqbzN5ZkNDTC9CUUM0d1g5NnorRDk1NVY1V09TWjd2?=
+ =?utf-8?B?L2hHTGczYjQ0WjdLY1hWOHVtOE5Ma3hFaW9qNzEybGZyVnhlY2JKOUFraUJE?=
+ =?utf-8?B?VTNhQjhFK1BwKytGWWFWVHBJak1kNS83amlPTlBMcnlBUG5OYjVucXdFRVBX?=
+ =?utf-8?B?UDVETmZXeDBRb21IUFQzWDgybzhGYUIvY0FzNmovT3VnU3J2aTRISXYvM1NG?=
+ =?utf-8?B?ZXh0U1hyNFdoVW1STzQxQjBhSldUUzhCWTF5RmlDTW9Eb2ZjeE53TkdzcVZX?=
+ =?utf-8?B?WFpiZGhXMkZvMWRQNU1sckFVdlMxc3o0V0pVTzNwejhyZmJzRUUyMkJ4d1ZC?=
+ =?utf-8?B?NndHb3ozU1hZdFYzeUx4S1Z5QzNleC9ESVJWQUVibmZGMm9UN0gxQnVhV0Zz?=
+ =?utf-8?B?MlZ6YURhN1VER0VOOE9VTGdVYW5rOFJSL1M4STlnY1M3RWIxNGEwOFErZk8y?=
+ =?utf-8?Q?vA2mB8No7OJ6XNoXK9B6A8Exc?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5ea1e7f-f7ee-4fef-d412-08dcea1b6194
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8784.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2024 17:37:30.3024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +AiCzL/tJUEGbUSbjqvhveIJXS/S74+UBIm9zEpAJJ/CGwxD898EseKtv6dLw8hWbMp+8PDEPhzD814fTYG9RA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8776
 
-On Thu, Oct 10, 2024 at 6:34=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 10 Oct 2024 10:44:38 -0700 Mina Almasry wrote:
-> > > > I haven't thought the failure of PP_FLAG_DMA_SYNC_DEV
-> > > > for dmabuf may be wrong.
-> > > > I think device memory TCP is not related to this flag.
-> > > > So device memory TCP core API should not return failure when
-> > > > PP_FLAG_DMA_SYNC_DEV flag is set.
-> > > > How about removing this condition check code in device memory TCP c=
-ore?
-> > >
-> > > I think we need to invert the check..
-> > > Mina, WDYT?
-> >
-> > On a closer look, my feeling is similar to Taehee,
-> > PP_FLAG_DMA_SYNC_DEV should be orthogonal to memory providers. The
-> > memory providers allocate the memory and provide the dma-addr, but
-> > need not dma-sync the dma-addr, right? The driver can sync the
-> > dma-addr if it wants and the driver can delegate the syncing to the pp
-> > via PP_FLAG_DMA_SYNC_DEV if it wants. AFAICT I think the check should
-> > be removed, not inverted, but I could be missing something.
->
-> I don't know much about dmabuf but it hinges on the question whether
-> doing DMA sync for device on a dmabuf address is :
->  - a good thing
->  - a noop
->  - a bad thing
->
-> If it's a good thing or a noop - agreed.
->
-> Similar question for the sync for CPU.
->
-> I agree that intuitively it should be all fine. But the fact that dmabuf
-> has a bespoke API for accessing the memory by the CPU makes me worried
-> that there may be assumptions about these addresses not getting
-> randomly fed into the normal DMA API..
+Hi Daniel,
 
-Sorry I'm also a bit unsure what is the right thing to do here. The
-code that we've been running in GVE does a dma-sync for cpu
-unconditionally on RX for dma-buf and non-dmabuf dma-addrs and we
-haven't been seeing issues. It never does dma-sync for device.
+On 04/10/2024 17:18, Daniel Golle wrote:
+> Despite supporting Auto MDI-X, it looks like Aquantia only supports
+> swapping pair (1,2) with pair (3,6) like it used to be for MDI-X on
+> 100MBit/s networks.
+> 
+> When all 4 pairs are in use (for 1000MBit/s or faster) the link does not
+> come up with pair order is not configured correctly, either using
+> MDI_CFG pin or using the "PMA Receive Reserved Vendor Provisioning 1"
+> register.
+> 
+> Normally, the order of MDI pairs being either ABCD or DCBA is configured
+> by pulling the MDI_CFG pin.
+> 
+> However, some hardware designs require overriding the value configured
+> by that bootstrap pin. The PHY allows doing that by setting a bit in
+> "PMA Receive Reserved Vendor Provisioning 1" register which allows
+> ignoring the state of the MDI_CFG pin and another bit configuring
+> whether the order of MDI pairs should be normal (ABCD) or reverse
+> (DCBA). Pair polarity is not affected and remains identical in both
+> settings.
+> 
+> Introduce property "marvell,mdi-cfg-order" which allows forcing either
+> normal or reverse order of the MDI pairs from DT.
+> 
+> If the property isn't present, the behavior is unchanged and MDI pair
+> order configuration is untouched (ie. either the result of MDI_CFG pin
+> pull-up/pull-down, or pair order override already configured by the
+> bootloader before Linux is started).
+> 
+> Forcing normal pair order is required on the Adtran SDG-8733A Wi-Fi 7
+> residential gateway.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+> v3: use u32 'marvell,mdi-cfg-order' instead of two mutually exclusive
+>      properties as suggested
+> v2: add missing 'static' keyword, improve commit description
+> 
+>   drivers/net/phy/aquantia/aquantia_main.c | 33 ++++++++++++++++++++++++
+>   1 file changed, 33 insertions(+)
+> 
+> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+> index 4d156d406bab..dcad3fa1ddc3 100644
+> --- a/drivers/net/phy/aquantia/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> @@ -11,6 +11,7 @@
+>   #include <linux/module.h>
+>   #include <linux/delay.h>
+>   #include <linux/bitfield.h>
+> +#include <linux/of.h>
+>   #include <linux/phy.h>
+>   
+>   #include "aquantia.h"
+> @@ -71,6 +72,11 @@
+>   #define MDIO_AN_TX_VEND_INT_MASK2		0xd401
+>   #define MDIO_AN_TX_VEND_INT_MASK2_LINK		BIT(0)
+>   
+> +#define PMAPMD_RSVD_VEND_PROV			0xe400
+> +#define PMAPMD_RSVD_VEND_PROV_MDI_CONF		GENMASK(1, 0)
+> +#define PMAPMD_RSVD_VEND_PROV_MDI_REVERSE	BIT(0)
+> +#define PMAPMD_RSVD_VEND_PROV_MDI_FORCE		BIT(1)
+> +
+>   #define MDIO_AN_RX_LP_STAT1			0xe820
+>   #define MDIO_AN_RX_LP_STAT1_1000BASET_FULL	BIT(15)
+>   #define MDIO_AN_RX_LP_STAT1_1000BASET_HALF	BIT(14)
+> @@ -485,6 +491,29 @@ static void aqr107_chip_info(struct phy_device *phydev)
+>   		   fw_major, fw_minor, build_id, prov_id);
+>   }
+>   
+> +static int aqr107_config_mdi(struct phy_device *phydev)
+> +{
+> +	struct device_node *np = phydev->mdio.dev.of_node;
+> +	u32 mdi_conf;
+> +	int ret;
+> +
+> +	ret = of_property_read_u32(np, "marvell,mdi-cfg-order", &mdi_conf);
+> +
+> +	/* Do nothing in case property "marvell,mdi-cfg-order" is not present */
+> +	if (ret == -ENOENT)
+> +		return 0;
 
-My first question is why is dma-sync for device needed on RX path at
-all for some drivers in the first place? For incoming (non-dmabuf)
-data, the data is written by the device and read by the cpu, so sync
-for cpu is really what's needed. Is the sync for device for XDP? Or is
-it that buffers should be dma-syncd for device before they are
-re-posted to the NIC?
 
-Christian/Jason, sorry quick question: are
-dma_sync_single_for_{device|cpu} needed or wanted when the dma-addrs
-come from a dma-buf? Or these dma-addrs to be treated like any other
-with the normal dma_sync_for_{device|cpu} rules?
+This change is breaking networking for one of our Tegra boards and on 
+boot I am seeing ...
 
---
-Thanks,
-Mina
+  tegra-mgbe 6800000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+  tegra-mgbe 6800000.ethernet eth0: __stmmac_open: Cannot attach to PHY
+  (error: -22)
+
+The issue is that of_property_read_u32() does not return -ENOENT if the 
+property is missing, it actually returns -EINVAL. See the description of 
+of_property_read_variable_u32_array() which is called by 
+of_property_read_u32().
+
+Andrew, can we drop this change from -next until this is fixed?
+
+Thanks!
+Jon
+
+-- 
+nvpublic
 
