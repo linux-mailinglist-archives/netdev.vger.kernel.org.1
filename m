@@ -1,93 +1,153 @@
-Return-Path: <netdev+bounces-134434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342499997EC
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 02:34:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EA79997FB
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 02:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6273B244B8
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:34:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7721D1C25F43
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2674B198A35;
-	Fri, 11 Oct 2024 00:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07C680603;
+	Fri, 11 Oct 2024 00:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uXgpHmEm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0gMQQ8Kg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A50175AB
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 00:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B3723BB
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 00:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728606624; cv=none; b=Ja9GvX2FfkS/78x+VGMiFajWnhPkq5mxf8jXLD/gPL/62sjPKhbtblPygnu7YacSCnDRZ5kW5z1jw6vYq1uI63uOFK3iNd3QS6QYXD98uWgo1sJl/VYt+0NeAFemL5WS46irVAHga1QMCOYG6zUnZsntVLVHVhHUmMVdTECNT7c=
+	t=1728606770; cv=none; b=PUxSd1tDYeLPMMjJOuwu4yqQ4LYEyiX/vxDCimk5bnXRvJJ3nfkuDFLVNYdGel0L49qczHWxh/wHwLmYgCSCmDNWY5QdHxLaLTyvcQq4VucWajq6wDBguZLLogR6jtdmiCbb0riBvWQYZt/oLWYmzgr7zFfoVeiHjYS2afjwyrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728606624; c=relaxed/simple;
-	bh=brQeJzBD++WJvMb64OfYRoRsCxvuM6Qw8E5RGWKZAms=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NA+hgvzcx+u7k95GDO9+jso2LwSxFpTmNVdDpy0DqRI4Tn6j0lys5jPjODOLG0uSxZJoCXGnFgFCEm68M/5GoRAVA6SLwokLlPrWbRJR/wa/DKNvdsfOElbMwlzbQIBvQzFi8j+TKoLnrZgqNohLkRI50pNkmlUeCat6edrHqYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uXgpHmEm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 857B4C4CEC5;
-	Fri, 11 Oct 2024 00:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728606623;
-	bh=brQeJzBD++WJvMb64OfYRoRsCxvuM6Qw8E5RGWKZAms=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uXgpHmEmKLSs8buaVEJ2nlhvQy3FFDX7AU2YrP5m7axInOxruMgA5w4xxstEh6XGi
-	 ACadWkAOhtpXmG/LBWBnmt7A6H2U/Ik7WcEQtcLHRe3/yUtP8h029k3pOQnVj2eDmV
-	 +e6MYCc9qsJrSft3XLFIBcxhMJ1hqgA0b730N+4Q0h2hzuK+aUwJiLu+/Qy1jNu78z
-	 aTwBkyt8QMrnOL66/XuKuaLkaY/p9p0i+ury9ASNzc5EV7SXOlm4I8bFXLFnZTBtle
-	 triAPxkiSbjWjK26v3EFw4KIyPtfJKoYbe2mZtRfyaklf0h+F6ApmqJaxY9HLAiP0z
-	 Go5wpMbccCaCw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C783803263;
-	Fri, 11 Oct 2024 00:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1728606770; c=relaxed/simple;
+	bh=UEm4w1+/BayVnYEyIYhV9w3Mjz/x786XWJdv52Ozd44=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=caftJwgv8pKTA8vzfyVVa6JOFQp7lhWcI03liBAij/zJB+AmjJe+RBf2C0yh33brKmNPjgPnYjCvZzdWN/Y8oF2T41USwCiwybLr1HndD3kIfTGjddWqXPy+IbW7KjooIJoc4Hklbqm82jS8j3tB+dNsArr6Z4hBfaegGf0xOpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0gMQQ8Kg; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4601a471aecso77621cf.1
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:32:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728606768; x=1729211568; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UEm4w1+/BayVnYEyIYhV9w3Mjz/x786XWJdv52Ozd44=;
+        b=0gMQQ8KgXrQRX85BoMveORkRYFrWllAqf5g7PNXYyDxJ4ftIB9hWMKDc8Japsoehn3
+         2Wxm2XXuGzUfSrMxwSbZ2Jh/paBp92LRjI5xOEDydzjA3m16PsCAf/R8BX3AqThSxrXK
+         qnZOC6moVn5kylGayrcnebFuDjiOYvf+9vvEy6SHxWstJ3YCggyi373VrKkJNIaT/kl4
+         lJHVcuh43A3DZM4fald8MR0obCCVDh780SwzglI19jtA0rhcAN419z7Zp6f6aybVJu4m
+         wPUXed649J9iMNWBH5GmGLXvWG9ALyo3M1D/CTxdTxd296DR5Z+9Cao+rOoGB3mZxooR
+         ZDTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728606768; x=1729211568;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UEm4w1+/BayVnYEyIYhV9w3Mjz/x786XWJdv52Ozd44=;
+        b=FlWnaCEu0BcTQA8KRHi6OpvgFmT7uZJgwDtWBI3UTJaxR+uwmemvrM9nPuSCNJJC7M
+         +VijNeZKaJEExUV1JQ6R60mkBBuuAd+8MVYVftAJPpHN2RtE5j3/cmEYvQ2CF7k28P0e
+         zuDa7APNgKdJIMKtqYSATy4XRo164GSKodOTSdH5pmyLwSORpMqtj6kaJOEJmr21nuP5
+         LSOB31wycmLQs4JQ3wgDAQOrQtbHioBqL+xQdnfVpA9Gsf5CZax2gLEIXOFCU4YaurQF
+         OEKYsCtCGV51xgkz5dlkBzDC5DMHsmmdSsUjUFMiaGxbiJGJXOFXswRPwgoLjSTfNMqn
+         vplQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPAfttRIsOxSIS8B5qAxTVGb//uGEdqxsCxXA3ODxZ6stUAYKtby319MPEml1Xvsuc0cV8LQQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx73I7Qi80jSMFEW4vZCmyV6r4MmCzEiXmOWjB8vEyAzA+wr+Vi
+	Qw4Bv7L1C2ES7v6A/jcDiO5KpbM+bPstu5W9SXiokYddigr/TS5tncPxyln5uYWK228PTJWrGTP
+	TU5vPa4zHtH4D192O2r62hK7WBA35v9ZHn4h1
+X-Google-Smtp-Source: AGHT+IFa3X3kXCvbMNV8e/CL1FECdovrHzWeLXI7K0gOLD45vSyGS+b4KWyH5KzMfNcOFtFTiBBiLpw+Z9LcZ01I2vQ=
+X-Received: by 2002:a05:622a:7b8a:b0:460:463d:78dd with SMTP id
+ d75a77b69052e-4604ac30a33mr1830201cf.4.1728606767741; Thu, 10 Oct 2024
+ 17:32:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next 0/2] iprule: Add DSCP support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172860662802.2221191.16278388821170752825.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Oct 2024 00:30:28 +0000
-References: <20241009062054.526485-1-idosch@nvidia.com>
-In-Reply-To: <20241009062054.526485-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
- gnault@redhat.com, petrm@nvidia.com
+References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-12-dw@davidwei.uk>
+ <CAHS8izO-=ugX7S11dTr5cXp11V+L-gquvwBLQko8hW4AP9vg6g@mail.gmail.com>
+ <94a22079-0858-473c-b07f-89343d9ba845@gmail.com> <CAHS8izPjHv_J8=Hz6xZmfa857st+zyA7MLSe+gCJTdZewPOmEw@mail.gmail.com>
+ <f89c65da-197a-42d9-b78a-507951484759@gmail.com> <CAHS8izMrPuQNvwGwAUjh7GAY-CoC81rc5BD1ZMmy-nNds3xDgA@mail.gmail.com>
+ <096387ce-64f0-402f-a5d2-6b51653f9539@gmail.com>
+In-Reply-To: <096387ce-64f0-402f-a5d2-6b51653f9539@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 10 Oct 2024 17:32:34 -0700
+Message-ID: <CAHS8izMi-yrCRx=VzhBH100MgxCpmQSNsqOLZ9efV+mFeS_Hnw@mail.gmail.com>
+Subject: Re: [PATCH v1 11/15] io_uring/zcrx: implement zerocopy receive pp
+ memory provider
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Thu, Oct 10, 2024 at 2:22=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> > page_pool. To make matters worse, the bypass is only there if the
+> > netmems are returned from io_uring, and not bypassed when the netmems
+> > are returned from driver/tcp stack. I'm guessing if you reused the
+> > page_pool recycling in the io_uring return path then it would remove
+> > the need for your provider to implement its own recycling for the
+> > io_uring return case.
+> >
+> > Is letting providers bypass and override the page_pool's recycling in
+> > some code paths OK? IMO, no. A maintainer will make the judgement call
+>
+> Mina, frankly, that's nonsense. If we extend the same logic,
+> devmem overrides page allocation rules with callbacks, devmem
+> overrides and violates page pool buffer lifetimes by extending
+> it to user space, devmem violates and overrides the page pool
+> object lifetime by binding buffers to sockets. And all of it
+> I'd rather name extends and enhances to fit in the devmem use
+> case.
+>
+> > and speak authoritatively here and I will follow, but I do think it's
+> > a (much) worse design.
+>
+> Sure, I have a completely opposite opinion, that's a much
+> better approach than returning through a syscall, but I will
+> agree with you that ultimately the maintainers will say if
+> that's acceptable for the networking or not.
+>
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+Right, I'm not suggesting that you return the pages through a syscall.
+That will add syscall overhead when it's better not to have that
+especially in io_uring context. Devmem TCP needed a syscall because I
+couldn't figure out a non-syscall way with sockets for the userspace
+to tell the kernel that it's done with some netmems. You do not need
+to follow that at all. Sorry if I made it seem like so.
 
-On Wed, 9 Oct 2024 09:20:52 +0300 you wrote:
-> Add DSCP selector support to ip-rule following kernel support that was
-> added in kernel commit 7bb50f30c123 ("Merge branch
-> 'net-fib_rules-add-dscp-selector-support'").
-> 
-> Patch #1 adds ip-rule(8) as generation target so that we could use
-> variable substitutions there in a similar fashion to other man pages.
-> 
-> [...]
+However, I'm suggesting that when io_uring figures out that the
+userspace is done with a netmem, that you feed that netmem back to the
+pp, and utilize the pp's recycling, rather than adding your own
+recycling in the provider.
 
-Here is the summary with links:
-  - [iproute2-next,1/2] man: Add ip-rule(8) as generation target
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=8ef80bcbbd21
-  - [iproute2-next,2/2] iprule: Add DSCP support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=75e760026c4d
+From your commit message:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+"we extend the lifetime by recycling buffers only after the user space
+acknowledges that it's done processing the data via the refill queue"
 
+It seems to me that you get some signal from the userspace that data
+is ready to be reuse via that refill queue (whatever it is, very
+sorry, I'm not that familiar with io_uring). My suggestion here is
+when the userspace tells you that a netmem is ready for reuse (however
+it does that), that you feed that page back to the pp via something
+like napi_pp_put_page() or page_pool_put_page_bulk() if that makes
+sense to you. FWIW I'm trying to look through your code to understand
+what that refill queue is and where - if anywhere - it may be possible
+to feed pages back to the pp, rather than directly to the provider.
 
+--=20
+Thanks,
+Mina
 
