@@ -1,112 +1,76 @@
-Return-Path: <netdev+bounces-134440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B981C999929
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 03:23:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5929999945
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 03:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E951A1C224CF
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 01:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A6D7284BBD
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 01:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911895227;
-	Fri, 11 Oct 2024 01:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="uFu2hozB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680B38F5E;
+	Fri, 11 Oct 2024 01:27:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D239BE40;
-	Fri, 11 Oct 2024 01:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8893232;
+	Fri, 11 Oct 2024 01:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728609803; cv=none; b=epmjXmLsUt69q28k88Ey9m6ZzKBVzz3hLVNTA3ncLp1v9qZdl3nXavUmE477osVM6k1p6SrmtbNUN6y/vgI4qOGtPBRBDiXNiCf4V9ioXQlwBHB4wB48sgi6FKVPzXHJsKmSDXgh2L37GYajqJxrnI2mExXIvu3z+6nbc3OHzNc=
+	t=1728610040; cv=none; b=odJdD2k9DJaWgs45IY2+1f4QkaVVsssbOsRR0cZ+sQxQPcG8XLgv4RKfn2HWrl9/GqAe+5G9JlFU1gnLNNh4tZAw0UzgUN2YauSeTtzPSXd0VCSzOaS70SIIzJVdzqb70KmYBD3EF7ODtbEA+NLZDX+w7Y2nd32onMQEQKV2Om4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728609803; c=relaxed/simple;
-	bh=MVt0xbd6/cjDBSCOCoTMD45L1cxpTSJ185fP46lFIWo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iBh+lp85CI3dH1ahFYDHoSjWOrmN1PtpuIt0RFQqx/BFph88AcK4aC2u6YcOqw+hJG0+6Ayjo7hq+6hL7Z0tqUznuGO33S6taiVrn6Gx2fcBWaA35yzmGrbCJ11YYM6fwuafO5z0tmJthVNJwkMPktmESQ4hunOm3lpxbKAWMcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=uFu2hozB; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728609796; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=TWqDwm7DtiHSTja+8n7rwlJMkkPCYhrvVsLMz86o+qE=;
-	b=uFu2hozBa8bxKhxX0lU07/MgySMuN6VC2QqYBU3bUBdZbZ65yJAGU+qTGYKZpkkgiY4s10n1VPlCYQHbP5TBlRzMqsOVYphRe/DyhelkbC2azOYSn1F+pS6FCQ6Utp/0hJfeoMV/+fS+DgCJRGQGNqPRILA/fqKKOKrKehnZUgY=
-Received: from 30.221.128.133(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WGo6zqk_1728609795 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 11 Oct 2024 09:23:16 +0800
-Message-ID: <ff81f918-527f-4114-abaf-0d3f9e207363@linux.alibaba.com>
-Date: Fri, 11 Oct 2024 09:23:15 +0800
+	s=arc-20240116; t=1728610040; c=relaxed/simple;
+	bh=nowPLvX4qMf0EM9WoC/4E/uvhJXTmb8BQzf8baINVr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oO/IvUhe7SpPgfCYoQvQJlvugx9T5PMjqcLS18fE4iJ05YhFVNPAQGLyy3ZTTuwzdH779U49UIXig8Be55qkxjKgkLw32I4VCmSz4+bcAlcXPWKNAKyuVbtUZJG2RH4Cqa3ckbWFASt63gUVqm2gS9+NsNtsSng5O7UpMj2kisQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sz4Qz-00076a-Tg; Fri, 11 Oct 2024 03:27:13 +0200
+Date: Fri, 11 Oct 2024 03:27:13 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Richard Weinberger <richard@sigma-star.at>
+Cc: Florian Westphal <fw@strlen.de>, Richard Weinberger <richard@nod.at>,
+	upstream@sigma-star.at, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, kadlec@netfilter.org,
+	pablo@netfilter.org, rgb@redhat.com, paul@paul-moore.com,
+	upstream+net@sigma-star.at
+Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
+Message-ID: <20241011012713.GA27167@breakpoint.cc>
+References: <20241009203218.26329-1-richard@nod.at>
+ <3048359.FXINqZMJnI@somecomputer>
+ <20241010134827.GC30424@breakpoint.cc>
+ <5243306.KhUVIng19X@somecomputer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 2/3] net/udp: Add 4-tuple hash list basis
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, antony.antony@secunet.com,
- steffen.klassert@secunet.com, linux-kernel@vger.kernel.org,
- dust.li@linux.alibaba.com, jakub@cloudflare.com, fred.cc@alibaba-inc.com,
- yubing.qiuyubing@alibaba-inc.com
-References: <20241010090351.79698-1-lulie@linux.alibaba.com>
- <20241010090351.79698-3-lulie@linux.alibaba.com>
- <6707db425cc49_202921294a9@willemb.c.googlers.com.notmuch>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <6707db425cc49_202921294a9@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5243306.KhUVIng19X@somecomputer>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+Richard Weinberger <richard@sigma-star.at> wrote:
+> Maybe I have wrong expectations.
+> e.g. I expected that sock_net_uid() will return 1000 when
+> uid 1000 does something like: unshare -Umr followed by a veth connection
+> to the host (initial user/net namespace).
+> Shouldn't on the host side a forwarded skb have a ->dev that belongs uid
+> 1000's net namespace?
 
+You mean skb->sk?  dev doesn't make much sense in this context to me.
+Else, please clarify.
 
-On 2024/10/10 21:48, Willem de Bruijn wrote:
-> Philo Lu wrote:
->> Add a new hash list, hash4, in udp table. It will be used to implement
->> 4-tuple hash for connected udp sockets. This patch adds the hlist to
->> table, and implements helpers and the initialization. 4-tuple hash is
->> implemented in the following patch.
->>
->> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
->> Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
->> Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
->> Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-> 
->> @@ -3480,16 +3486,15 @@ static struct udp_table __net_init *udp_pernet_table_alloc(unsigned int hash_ent
->>   	if (!udptable)
->>   		goto out;
->>   
->> -	slot_size = sizeof(struct udp_hslot) + sizeof(struct udp_hslot_main);
->> +	slot_size = 2 * sizeof(struct udp_hslot) + sizeof(struct udp_hslot_main);
->>   	udptable->hash = vmalloc_huge(hash_entries * slot_size,
->>   				      GFP_KERNEL_ACCOUNT);
->>   	if (!udptable->hash)
->>   		goto free_table;
->>   
->>   	udptable->hash2 = UDP_HSLOT_MAIN(udptable->hash + hash_entries);
->> -	udptable->mask = hash_entries - 1;
->> +	udptable->hash4 = (struct udp_hslot *)(udptable->hash2 + hash_entries);
-> 
-> Unintentional removal of the mask assignment?
-> 
-
-Will fix. Sorry for the mistake.
-
->>   	udptable->log = ilog2(hash_entries);
->> -
-> 
-> Unnecessary whitespace line removal
-> 
-
-Ditto.
-
-Thank you for review, Willem.
--- 
-Philo
-
+ip stack orphans incoming skbs, i.e. skb->sk is gone, see skb_orphan()
+call in ip_rcv_core().  So when packet enters init_net prerouting hook,
+association with originating netns or sk is not present anymore.
 
