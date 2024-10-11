@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB6FA99A8C9
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 18:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF77999A959
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 967321F2142F
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:20:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8052B283682
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 17:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41AE194A6F;
-	Fri, 11 Oct 2024 16:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074471BD519;
+	Fri, 11 Oct 2024 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQBnhj2q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NF45aIGe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9098B5381E
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 16:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C925D81AD7;
+	Fri, 11 Oct 2024 17:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728663623; cv=none; b=rlNqrDnsyTnlLjkvkHcGn5Zwv4sreYGzvZTjSYzFFBRQ8s8afVA2jm5yrAQb0dlPdetNrf9IGM/Kn/Y/FQy6nzHopCSSW6L1cDuoYPmnEPzgRFAU1KygbhMiU5qF5MLV86cP3fnu6KoxtmotepimJ29W+tdN5+rxAnU5viot4JA=
+	t=1728666027; cv=none; b=Udb/RiLo2DwL+C9i29mas/FXda+VWZVbM4Co48M7JB4MHG7FPs+3O8DTK69wyt+psddF4y+9/2GwHSwvKZevyqE5Gb3v4VMkD6LvUVv/rTbtk/PDsYwuWmVFggTHZfJGSQZ/1OEMRthSeNG10mIdMO0rL70mflVmDkUnlEWmzP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728663623; c=relaxed/simple;
-	bh=mlFbrEOI1sWXzo/T40Mu7V+gzY/cAo7lpcrNEjn1t0s=;
+	s=arc-20240116; t=1728666027; c=relaxed/simple;
+	bh=3PrcDyvK+Un7G7EbXkk1aEcgGFJg7JMH2EyFA1Zd40s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IrZ6w/BmYizlCTQTAUSCIbkvhC2PwNbLOYhRCnhBcqu4qjcKzNeWuxbT37DXBaJlEXkPZdShY/EhsLN2QLVjgNFd+BSBSOCcAQGKBs1GHVlRRJnFY6TO++iyfC6nVIvxTVPrsQkVs6K1/yGHHabfXqp3UH/y2BhFTHrscQyfcqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQBnhj2q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A691C4CEC3;
-	Fri, 11 Oct 2024 16:20:23 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=asN/Ae2Ae0iRJzeBe+9mKzP5j5GdGOp8JablpFj/vvJW5IdqB5vEyVKXPcLNFEEEF0Kr5K8TelCkyuoQmEtx5rWBBKlUQBUSyDC9vzxv+6IJJeO74I82DR/DRfyQmRyJfNwdk1iQ2Fs9xj1GxVu7pEUUIjO/3bhIRCdJXiQ/hmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NF45aIGe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7F37C4CEC3;
+	Fri, 11 Oct 2024 17:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728663623;
-	bh=mlFbrEOI1sWXzo/T40Mu7V+gzY/cAo7lpcrNEjn1t0s=;
+	s=k20201202; t=1728666027;
+	bh=3PrcDyvK+Un7G7EbXkk1aEcgGFJg7JMH2EyFA1Zd40s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MQBnhj2qRyZcO5EQe34LKYnw+O8pcb5MBuALYZL4KDhDrZK/j9NAiSwUIE5LOYtxU
-	 rOTdQ1dqcWQ7l37o4Vu6IrY2Z+g6OdhZvMY8NajUGIxnvJoPhQSyQpu6jIjAO7DO2v
-	 jCizE5erWVWtuZA+8HCVInXumHimZ6Gl+k/YILpnY9I5N51G2xQZSvt542swcLtA8T
-	 fNswPmQg0dPix1k8Z5tnww1XenlU4L/lxZ42PkX4r5rtbyGq2jgFudZvZu/qjM+G9J
-	 +rR5mBQtYE87Z00COqaFZnduPIJNFpTyixoj72F2FAE3X0ObPvkf6LquQZ5DcElUYA
-	 B+thPZ2kbJ5Qw==
+	b=NF45aIGeUE3dN1DOwQdV4gwCURIqUz3HB0h9HKnzllIrTio0IJbMvxugq/gT6tZ47
+	 HFvA6ed4DKTDE0qjR3gsye1SsKdhf/4S3MJf928YysCIk6rHcRop0BFr1ei5HHxSm4
+	 uDCm05MWCiDQUuP4nkF4ZlQRuR5RoBVU6kuAEKSlfnVZu/mB9vKwGVoTYCxDmS8Ihg
+	 GPoS+E/JWYI91RgLYP3CG/pNIm678Q7ZgeprtNaQy3YD+r64x6JGPqwIcE0c7cSTM0
+	 n2F2rmUDqze23q2ZugE/YtSERsX39PCatAwYKv2dHL5/9w2eQX1CISPyZJBqJWMDVQ
+	 RtJgQn/fBLGbA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB011380DBC0;
-	Fri, 11 Oct 2024 16:20:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E32380DBC0;
+	Fri, 11 Oct 2024 17:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] tcp: move sysctl_tcp_l3mdev_accept to
- netns_ipv4_read_rx
+Subject: Re: [PATCH,bpf-next v3 0/4] selftests/bpf: migrate and remove
+ cgroup/tracing related tests
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172866362777.2871296.1184945994794038542.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Oct 2024 16:20:27 +0000
-References: <20241010034100.320832-1-edumazet@google.com>
-In-Reply-To: <20241010034100.320832-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, dsahern@kernel.org,
- weiwan@google.com, lixiaoyan@google.com
+ <172866603225.2881487.4648695674968561173.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 17:00:32 +0000
+References: <20241011044847.51584-1-danieltimlee@gmail.com>
+In-Reply-To: <20241011044847.51584-1-danieltimlee@gmail.com>
+To: Daniel T. Lee <danieltimlee@gmail.com>
+Cc: daniel@iogearbox.net, ast@kernel.org, andrii.nakryiko@gmail.com,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
+ shuah@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-On Thu, 10 Oct 2024 03:41:00 +0000 you wrote:
-> sysctl_tcp_l3mdev_accept is read from TCP receive fast path from
-> tcp_v6_early_demux(),
->  __inet6_lookup_established,
->   inet_request_bound_dev_if().
+On Fri, 11 Oct 2024 04:48:43 +0000 you wrote:
+> The BPF testing framework has evolved significantly over time. However,
+> some legacy tests in the samples/bpf directory have not kept up with
+> these changes. These outdated tests can cause confusion and increase
+> maintenance efforts.
 > 
-> Move it to netns_ipv4_read_rx.
+> This patchset focuses on migrating outdated cgroup and tracing-related
+> tests from samples/bpf to selftests/bpf, ensuring the BPF test suite
+> remains current and efficient. Tests that are already covered by
+> selftests/bpf are removed, while those not yet covered are migrated.
+> This includes cgroup sock create tests for setting socket attributes
+> and blocking socket creation, as well as the removal of redundant
+> cgroup and tracing tests that have been replaced by newer tests.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next] tcp: move sysctl_tcp_l3mdev_accept to netns_ipv4_read_rx
-    https://git.kernel.org/netdev/net-next/c/d677aebd663d
+  - [bpf-next,v3,1/4] selftests/bpf: migrate cgroup sock create test for setting iface/mark/prio
+    https://git.kernel.org/bpf/bpf-next/c/ec6c4be07323
+  - [bpf-next,v3,2/4] selftests/bpf: migrate cgroup sock create test for prohibiting sockets
+    https://git.kernel.org/bpf/bpf-next/c/64a4658d6f76
+  - [bpf-next,v3,3/4] samples/bpf: remove obsolete cgroup related tests
+    https://git.kernel.org/bpf/bpf-next/c/5ea68f0493d1
+  - [bpf-next,v3,4/4] samples/bpf: remove obsolete tracing related tests
+    https://git.kernel.org/bpf/bpf-next/c/118740b87015
 
 You are awesome, thank you!
 -- 
