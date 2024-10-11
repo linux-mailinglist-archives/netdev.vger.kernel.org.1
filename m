@@ -1,816 +1,106 @@
-Return-Path: <netdev+bounces-134478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441DD999BE3
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 06:50:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64963999BF4
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 07:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00E37286674
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 04:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D4E11C20B8D
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 05:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72066209F2F;
-	Fri, 11 Oct 2024 04:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA78F1F4FDC;
+	Fri, 11 Oct 2024 05:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0jrgRCG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rtAru53S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A10209F28;
-	Fri, 11 Oct 2024 04:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA791BFDF7
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 05:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728622156; cv=none; b=aOOAtBBFy5qM4DqlTOvYxrpxca+zCifemX5+ahKD2J/Po5X8ig9M+XC4NHKSMI/Mhls04qW2a4eSAtmYBijGiWB00ugtyPSoxmsFSy5Le7HwImNIvgO9SRmX1AWyF910WmCq08RWc6qXAKoIlcFI8PApdQ8xZSpUvisSZILoJ9g=
+	t=1728623203; cv=none; b=fvKbRMDqCjp8osxEObGemw13yPxuS5c1cbPULnESGNU1xI8Ti4iRExJpXCupi4zJLTm9dpg9oYPQw9ASFgfFev1tTXsbn20LJXeGXcRnuCpZc5ia120utT+13hXzsWgFBcI9ma+UzILi3i8xKhM1uAZHYPoPGATwF/FWsF4YmVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728622156; c=relaxed/simple;
-	bh=Da4d8pxi6L+f5aEqaoLtt+qX+82o5XH0RiBtMtuGd1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nbRfMEFuzhsBXfSDlUNBcuNKKkih3NrFYRqytufjuPePecxwRwGZk3oklxFZr44Gzs66xFRlv0FTxSzCu3AkIyGxko/IMCU47lkN4uyE2q1amUzQtt7twz1sPmrWvEmB9pcwI4P7vyOO6xgE93fhKa+Gv8LE6C4uPb0fSicfn+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q0jrgRCG; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7ea06275ef2so1132044a12.0;
-        Thu, 10 Oct 2024 21:49:14 -0700 (PDT)
+	s=arc-20240116; t=1728623203; c=relaxed/simple;
+	bh=J4uZD2ticb9y1gX4UfHAeWDZG2392fPdEO/lHgBL3nI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SiW7LRYYaKcfoYvljir6keyj9WgvrdCejC98FeDCVjoX7ho6dQTSlnFTFPYbnHxBnwJxgO7cdtO3mDL5GzEyi3mlgOHcvLvwqmaIRz0P8/SMC51YZhkDNGZaTKtxf17Xt+o9NC7KwxYN2iRU34wT+RSxayiEvSSKjhwvlwlHojQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rtAru53S; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2e2a999b287so1443582a91.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:06:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728622153; x=1729226953; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kb13UgZLlG19j0yFKmh4sL7IUNSft//rvJxiI7I7+Yo=;
-        b=Q0jrgRCGiJ8PZ8wDOj4KB7emRv8nfR8q+EmvsMOLyrEDMSzK/1/c+PIVsGejNwh56e
-         R61KZh62t+oLAJA7e/r46XNGNlB+HTO9Yhm6pNJB/bs8yxVRAXXJqqhF9WUw5eTxaWL2
-         ByBJm5DVxudWRMZ7GiAK2WyPklS6NMnfzwpVvIi7d0cFf1C4lKW1TT+ZMgJHjEJB6t5M
-         YkHCss8WRH30ZWUbI81jFDF9nxDQg7TFt6hyTN7YhS573Ii6rLe0lA16l36KkR77GgOY
-         LNFbTj1iTtlJT3bN3oBVq+4G4I0er2PMJNwiVfkavDYf3A0qVnCtAykh2NcTzgFc7erk
-         NvWw==
+        d=linaro.org; s=google; t=1728623201; x=1729228001; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=J4uZD2ticb9y1gX4UfHAeWDZG2392fPdEO/lHgBL3nI=;
+        b=rtAru53SezxPsfcHOnV/8foj5dlkKpNsVzMcMbzDWT1QHADxIii0dy+k6d7zF6dLKd
+         Xv9Hc3aTFP1t4eEbgWpXOpfBM6x2e3YE7USW78Z1Fb8Z2WyBdD9UOkBjf0ni5Fd511C4
+         GZJayvLuVrFg1UUbDnwD+GY9/aCHANFEB9kiVKMCn2XiFeV7IYBj3h4U6UruZritdNag
+         fP/37Af2QCuzmuCYqca2HZxEyJsiA6RcOwb+x6MD1A4/2eTJ/gr+NIKkQM7HXlkfZCF8
+         axo8+DntxiHoTmwFX8ozIpCUJjA0Vxj12cvRzjbz5z8WxWKn+MGieoKgc0MqrpIFM9v/
+         2wrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728622153; x=1729226953;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kb13UgZLlG19j0yFKmh4sL7IUNSft//rvJxiI7I7+Yo=;
-        b=tWXePqbtkI94xyD0keabAkKCiHWm/tAbLACailowtxFZIViSydQLB8BwpFCLgd/2DT
-         DyJr0edTwIDJYkJIyklAJGSHOYnjOzJln+8XGE+ZQdgt27m5aOgVtjOcw2bhgrv/KODM
-         j8pK01QPq3P+bazAhEidTEDZT4459YngZdXLoY+HbzMR6Y/7u+o9hfg5oUtxmQGdrwa9
-         1Ga4pL6Qog7J1O3Uyed5AbS/6N0z4zPCaOxDVsT1avvMLwVNtm/iTmhA8c1WbJR9xOJZ
-         PyOHwSphJEQB6LI+Q6TZqZLVPN1qEAAXQgYzCoNZlEGS68zMv4j/Yo1GvXvcOZ6DVNOa
-         Iyzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVjKDcZ2N3fJdo8gPHSzx7RFKXbOxRosOLVC2XgVth8FjqQdGedGj0apQ0mUKeLhqPeDTRr3ie1ff0HkJhTkvhA@vger.kernel.org, AJvYcCXV78gfGlAHbHQgXtF+ykIK2QdiIeliHwBiMPQ/Oz3gc5GgD5Q/oLIUspqh7r5lU4G+43/vNYgc@vger.kernel.org, AJvYcCXkRC2wniZbFK36uw3pchw1o7CVxwcSjm5bTPMnnQpczEhOd8QpMZerQd79LpDmYi+pEDo8KFO7XpSPGSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpEu3aTV5O6licO/AIlKeS7kQhoF0FfWCAtLF/Hj818iKQqBfQ
-	UpqwEBbey23KFepAWxpqtbZbV5zSpf/vmm4nDwBAuXXoaMeR1aE=
-X-Google-Smtp-Source: AGHT+IFA9wymQYcGafgVvzTM1hsfU8vVEMF8r++KW7N7JGn7f+rv//DUPf40eICbzhW7MjvVfIV+5g==
-X-Received: by 2002:a05:6a21:181a:b0:1d2:f0e2:4ad6 with SMTP id adf61e73a8af0-1d8bcf18450mr2118741637.18.1728622153380;
-        Thu, 10 Oct 2024 21:49:13 -0700 (PDT)
-Received: from vagrant.. ([114.71.48.94])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2ab105f9sm1856692b3a.216.2024.10.10.21.49.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 21:49:12 -0700 (PDT)
-From: "Daniel T. Lee" <danieltimlee@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii.nakryiko@gmail.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: [PATCH,bpf-next v3 4/4] samples/bpf: remove obsolete tracing related tests
-Date: Fri, 11 Oct 2024 04:48:47 +0000
-Message-ID: <20241011044847.51584-5-danieltimlee@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241011044847.51584-1-danieltimlee@gmail.com>
-References: <20241011044847.51584-1-danieltimlee@gmail.com>
+        d=1e100.net; s=20230601; t=1728623201; x=1729228001;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J4uZD2ticb9y1gX4UfHAeWDZG2392fPdEO/lHgBL3nI=;
+        b=tDdPsTfGCwkc8h3+Pz7Z0LoKebxPaPqDrxn8jht76KwwkNxnh7Kj5rctvlsFiiZus+
+         CSXugihCo43tvG+BdOKCADwwkShzK/WC2O0JJ2A/Yx7vVJvqu0XrZ7jOlFInW4bzW16T
+         +lkh32bLExI6mPklsjeeCidTKKA9X5oPCT7NTPABJhOlJJXaTLDCrbXEzQPIsXxfGJ0R
+         Utkslwa+t/Nqd1QaHMERqpJoQtN7WrIqWJwlHYq10ctpZ3jEm/9+s4PTtkAjIKdeB2M6
+         0QcLwWU/u9n6y2XG+87MXJYnCU4Fl3zoqEUo2qxPnr+RKiU9rq7SyW+kapAx7L99SQZ3
+         45zA==
+X-Forwarded-Encrypted: i=1; AJvYcCVP+n7Eph8OvEnhlimcy6xdLY54B76ebtIewmmHqlPtrXEDic/dxHA0/Im+8FERWbxTAQT0Dd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhpA+OA1vBsah9427lAf9/P8jz9hlXyS/vkkAEjt0xKCIJj39e
+	9b1tTvmXDtdw060uHB0rrHWs2Y9g9BqLnhq8UAeDfyjCeVOldqXr96fkNuv+MTzFriCdtIDR7wI
+	FIV6GrlOhN03+j5+qdoyImHyEmB8/veaaBf6+033Jnu6bnKdsS6I=
+X-Google-Smtp-Source: AGHT+IF2UKkZO/KPx4VxT3b3zp+LfxkUvgapEeMAwfLsk65H8dL6bieyuMdum17C7XC0R5hWpJnsr+i4U/WOUpCeWPU=
+X-Received: by 2002:a17:90b:d97:b0:2e2:ebbb:7619 with SMTP id
+ 98e67ed59e1d1-2e2f0ab98cfmr1883401a91.9.1728623201577; Thu, 10 Oct 2024
+ 22:06:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241010114019.1734573-1-0x1207@gmail.com> <601d59f4-d554-4431-81ca-32bb02fb541f@huawei.com>
+ <20241011101455.00006b35@gmail.com>
+In-Reply-To: <20241011101455.00006b35@gmail.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Fri, 11 Oct 2024 08:06:04 +0300
+Message-ID: <CAC_iWjL7Z6qtOkxXFRUnnOruzQsBNoKeuZ1iStgXJxTJ_P9Axw@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] page_pool: check for dma_sync_size earlier
+To: Furong Xu <0x1207@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, xfr@outlook.com
+Content-Type: text/plain; charset="UTF-8"
 
-The samples/bpf has become outdated and often does not follow up with
-the latest. This commit removes obsolete tracing-related tests.
+Hi Furong,
 
-Specifically, 'test_overhead' is duplicate with selftests (and bench),
-and 'test_override_return', 'test_probe_write_user' tests are obsolete
-since they have been replaced by kprobe_multi_override and probe_user
-from selftests respectively.
+On Fri, 11 Oct 2024 at 05:15, Furong Xu <0x1207@gmail.com> wrote:
+>
+> On Thu, 10 Oct 2024 19:53:39 +0800, Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>
+> > Is there any reason that those drivers not to unset the PP_FLAG_DMA_SYNC_DEV
+> > when calling page_pool_create()?
+> > Does it only need dma sync for some cases and not need dma sync for other
+> > cases? if so, why not do the dma sync in the driver instead?
+>
+> The answer is in this commit:
+> https://git.kernel.org/netdev/net/c/5546da79e6cc
 
-The following files are removed:
-- test_overhead: tests the overhead of BPF programs with task_rename,
-  now covered by selftests and benchmark tests (rename-*). [1]
+I am not sure I am following. Where does the stmmac driver call a sync
+with len 0?
 
-- test_override_return: tests the return override functionality, now
-  handled by kprobe_multi_override in selftests.
-
-- test_probe_write_user: tests the probe_write_user functionality,
-  now replaced by the probe_user test in selftests.
-
-This cleanup will help to streamline the testing framework by removing
-redundant tests.
-
-[1]: https://patchwork.kernel.org/cover/13759916
-
-Signed-off-by: Daniel T. Lee <danieltimlee@gmail.com>
----
-Changes in V3:
-- Makefile fix
-
- samples/bpf/Makefile                     |  11 --
- samples/bpf/test_overhead_kprobe.bpf.c   |  41 -----
- samples/bpf/test_overhead_raw_tp.bpf.c   |  17 --
- samples/bpf/test_overhead_tp.bpf.c       |  23 ---
- samples/bpf/test_overhead_user.c         | 225 -----------------------
- samples/bpf/test_override_return.sh      |  16 --
- samples/bpf/test_probe_write_user.bpf.c  |  52 ------
- samples/bpf/test_probe_write_user_user.c | 108 -----------
- samples/bpf/tracex7.bpf.c                |  15 --
- samples/bpf/tracex7_user.c               |  56 ------
- 10 files changed, 564 deletions(-)
- delete mode 100644 samples/bpf/test_overhead_kprobe.bpf.c
- delete mode 100644 samples/bpf/test_overhead_raw_tp.bpf.c
- delete mode 100644 samples/bpf/test_overhead_tp.bpf.c
- delete mode 100644 samples/bpf/test_overhead_user.c
- delete mode 100755 samples/bpf/test_override_return.sh
- delete mode 100644 samples/bpf/test_probe_write_user.bpf.c
- delete mode 100644 samples/bpf/test_probe_write_user_user.c
- delete mode 100644 samples/bpf/tracex7.bpf.c
- delete mode 100644 samples/bpf/tracex7_user.c
-
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index e2abfc847389..bcf103a4c14f 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -17,14 +17,11 @@ tprogs-y += tracex3
- tprogs-y += tracex4
- tprogs-y += tracex5
- tprogs-y += tracex6
--tprogs-y += tracex7
--tprogs-y += test_probe_write_user
- tprogs-y += trace_output
- tprogs-y += lathist
- tprogs-y += offwaketime
- tprogs-y += spintest
- tprogs-y += map_perf_test
--tprogs-y += test_overhead
- tprogs-y += xdp_router_ipv4
- tprogs-y += trace_event
- tprogs-y += sampleip
-@@ -61,8 +58,6 @@ tracex3-objs := tracex3_user.o
- tracex4-objs := tracex4_user.o
- tracex5-objs := tracex5_user.o $(TRACE_HELPERS)
- tracex6-objs := tracex6_user.o
--tracex7-objs := tracex7_user.o
--test_probe_write_user-objs := test_probe_write_user_user.o
- trace_output-objs := trace_output_user.o
- lathist-objs := lathist_user.o
- offwaketime-objs := offwaketime_user.o $(TRACE_HELPERS)
-@@ -96,8 +91,6 @@ always-y += tracex3.bpf.o
- always-y += tracex4.bpf.o
- always-y += tracex5.bpf.o
- always-y += tracex6.bpf.o
--always-y += tracex7.bpf.o
--always-y += test_probe_write_user.bpf.o
- always-y += trace_output.bpf.o
- always-y += tcbpf1_kern.o
- always-y += tc_l2_redirect_kern.o
-@@ -105,9 +98,6 @@ always-y += lathist_kern.o
- always-y += offwaketime.bpf.o
- always-y += spintest.bpf.o
- always-y += map_perf_test.bpf.o
--always-y += test_overhead_tp.bpf.o
--always-y += test_overhead_raw_tp.bpf.o
--always-y += test_overhead_kprobe.bpf.o
- always-y += parse_varlen.o parse_simple.o parse_ldabs.o
- always-y += trace_event_kern.o
- always-y += sampleip_kern.o
-@@ -181,7 +171,6 @@ TPROGLDLIBS_xdp_router_ipv4	+= -lm -pthread
- TPROGLDLIBS_tracex4		+= -lrt
- TPROGLDLIBS_trace_output	+= -lrt
- TPROGLDLIBS_map_perf_test	+= -lrt
--TPROGLDLIBS_test_overhead	+= -lrt
-
- # Allows pointing LLC/CLANG to a LLVM backend with bpf support, redefine on cmdline:
- # make M=samples/bpf LLC=~/git/llvm-project/llvm/build/bin/llc CLANG=~/git/llvm-project/llvm/build/bin/clang
-diff --git a/samples/bpf/test_overhead_kprobe.bpf.c b/samples/bpf/test_overhead_kprobe.bpf.c
-deleted file mode 100644
-index 668cf5259c60..000000000000
---- a/samples/bpf/test_overhead_kprobe.bpf.c
-+++ /dev/null
-@@ -1,41 +0,0 @@
--/* Copyright (c) 2016 Facebook
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of version 2 of the GNU General Public
-- * License as published by the Free Software Foundation.
-- */
--#include "vmlinux.h"
--#include <linux/version.h>
--#include <bpf/bpf_helpers.h>
--#include <bpf/bpf_tracing.h>
--#include <bpf/bpf_core_read.h>
--
--SEC("kprobe/__set_task_comm")
--int prog(struct pt_regs *ctx)
--{
--	struct signal_struct *signal;
--	struct task_struct *tsk;
--	char oldcomm[TASK_COMM_LEN] = {};
--	char newcomm[TASK_COMM_LEN] = {};
--	u16 oom_score_adj;
--	u32 pid;
--
--	tsk = (void *)PT_REGS_PARM1_CORE(ctx);
--
--	pid = BPF_CORE_READ(tsk, pid);
--	bpf_core_read_str(oldcomm, sizeof(oldcomm), &tsk->comm);
--	bpf_core_read_str(newcomm, sizeof(newcomm),
--				  (void *)PT_REGS_PARM2(ctx));
--	signal = BPF_CORE_READ(tsk, signal);
--	oom_score_adj = BPF_CORE_READ(signal, oom_score_adj);
--	return 0;
--}
--
--SEC("kprobe/fib_table_lookup")
--int prog2(struct pt_regs *ctx)
--{
--	return 0;
--}
--
--char _license[] SEC("license") = "GPL";
--u32 _version SEC("version") = LINUX_VERSION_CODE;
-diff --git a/samples/bpf/test_overhead_raw_tp.bpf.c b/samples/bpf/test_overhead_raw_tp.bpf.c
-deleted file mode 100644
-index 6af39fe3f8dd..000000000000
---- a/samples/bpf/test_overhead_raw_tp.bpf.c
-+++ /dev/null
-@@ -1,17 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/* Copyright (c) 2018 Facebook */
--#include "vmlinux.h"
--#include <bpf/bpf_helpers.h>
--
--SEC("raw_tracepoint/task_rename")
--int prog(struct bpf_raw_tracepoint_args *ctx)
--{
--	return 0;
--}
--
--SEC("raw_tracepoint/fib_table_lookup")
--int prog2(struct bpf_raw_tracepoint_args *ctx)
--{
--	return 0;
--}
--char _license[] SEC("license") = "GPL";
-diff --git a/samples/bpf/test_overhead_tp.bpf.c b/samples/bpf/test_overhead_tp.bpf.c
-deleted file mode 100644
-index 5dc08b587978..000000000000
---- a/samples/bpf/test_overhead_tp.bpf.c
-+++ /dev/null
-@@ -1,23 +0,0 @@
--/* Copyright (c) 2016 Facebook
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of version 2 of the GNU General Public
-- * License as published by the Free Software Foundation.
-- */
--#include "vmlinux.h"
--#include <bpf/bpf_helpers.h>
--
--/* from /sys/kernel/tracing/events/task/task_rename/format */
--SEC("tracepoint/task/task_rename")
--int prog(struct trace_event_raw_task_rename *ctx)
--{
--	return 0;
--}
--
--/* from /sys/kernel/tracing/events/fib/fib_table_lookup/format */
--SEC("tracepoint/fib/fib_table_lookup")
--int prog2(struct trace_event_raw_fib_table_lookup *ctx)
--{
--	return 0;
--}
--char _license[] SEC("license") = "GPL";
-diff --git a/samples/bpf/test_overhead_user.c b/samples/bpf/test_overhead_user.c
-deleted file mode 100644
-index dbd86f7b1473..000000000000
---- a/samples/bpf/test_overhead_user.c
-+++ /dev/null
-@@ -1,225 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/* Copyright (c) 2016 Facebook
-- */
--#define _GNU_SOURCE
--#include <sched.h>
--#include <errno.h>
--#include <stdio.h>
--#include <sys/types.h>
--#include <asm/unistd.h>
--#include <fcntl.h>
--#include <unistd.h>
--#include <assert.h>
--#include <sys/wait.h>
--#include <sys/socket.h>
--#include <arpa/inet.h>
--#include <stdlib.h>
--#include <signal.h>
--#include <linux/bpf.h>
--#include <string.h>
--#include <time.h>
--#include <bpf/bpf.h>
--#include <bpf/libbpf.h>
--
--#define MAX_CNT 1000000
--#define DUMMY_IP "127.0.0.1"
--#define DUMMY_PORT 80
--
--static struct bpf_link *links[2];
--static struct bpf_object *obj;
--static int cnt;
--
--static __u64 time_get_ns(void)
--{
--	struct timespec ts;
--
--	clock_gettime(CLOCK_MONOTONIC, &ts);
--	return ts.tv_sec * 1000000000ull + ts.tv_nsec;
--}
--
--static void test_task_rename(int cpu)
--{
--	char buf[] = "test\n";
--	__u64 start_time;
--	int i, fd;
--
--	fd = open("/proc/self/comm", O_WRONLY|O_TRUNC);
--	if (fd < 0) {
--		printf("couldn't open /proc\n");
--		exit(1);
--	}
--	start_time = time_get_ns();
--	for (i = 0; i < MAX_CNT; i++) {
--		if (write(fd, buf, sizeof(buf)) < 0) {
--			printf("task rename failed: %s\n", strerror(errno));
--			close(fd);
--			return;
--		}
--	}
--	printf("task_rename:%d: %lld events per sec\n",
--	       cpu, MAX_CNT * 1000000000ll / (time_get_ns() - start_time));
--	close(fd);
--}
--
--static void test_fib_table_lookup(int cpu)
--{
--	struct sockaddr_in addr;
--	char buf[] = "test\n";
--	__u64 start_time;
--	int i, fd;
--
--	fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
--	if (fd < 0) {
--		printf("couldn't open socket\n");
--		exit(1);
--	}
--	memset((char *)&addr, 0, sizeof(addr));
--	addr.sin_addr.s_addr = inet_addr(DUMMY_IP);
--	addr.sin_port = htons(DUMMY_PORT);
--	addr.sin_family = AF_INET;
--	start_time = time_get_ns();
--	for (i = 0; i < MAX_CNT; i++) {
--		if (sendto(fd, buf, strlen(buf), 0,
--			   (struct sockaddr *)&addr, sizeof(addr)) < 0) {
--			printf("failed to start ping: %s\n", strerror(errno));
--			close(fd);
--			return;
--		}
--	}
--	printf("fib_table_lookup:%d: %lld events per sec\n",
--	       cpu, MAX_CNT * 1000000000ll / (time_get_ns() - start_time));
--	close(fd);
--}
--
--static void loop(int cpu, int flags)
--{
--	cpu_set_t cpuset;
--
--	CPU_ZERO(&cpuset);
--	CPU_SET(cpu, &cpuset);
--	sched_setaffinity(0, sizeof(cpuset), &cpuset);
--
--	if (flags & 1)
--		test_task_rename(cpu);
--	if (flags & 2)
--		test_fib_table_lookup(cpu);
--}
--
--static void run_perf_test(int tasks, int flags)
--{
--	pid_t pid[tasks];
--	int i;
--
--	for (i = 0; i < tasks; i++) {
--		pid[i] = fork();
--		if (pid[i] == 0) {
--			loop(i, flags);
--			exit(0);
--		} else if (pid[i] == -1) {
--			printf("couldn't spawn #%d process\n", i);
--			exit(1);
--		}
--	}
--	for (i = 0; i < tasks; i++) {
--		int status;
--
--		assert(waitpid(pid[i], &status, 0) == pid[i]);
--		assert(status == 0);
--	}
--}
--
--static int load_progs(char *filename)
--{
--	struct bpf_program *prog;
--	int err = 0;
--
--	obj = bpf_object__open_file(filename, NULL);
--	err = libbpf_get_error(obj);
--	if (err < 0) {
--		fprintf(stderr, "ERROR: opening BPF object file failed\n");
--		return err;
--	}
--
--	/* load BPF program */
--	err = bpf_object__load(obj);
--	if (err < 0) {
--		fprintf(stderr, "ERROR: loading BPF object file failed\n");
--		return err;
--	}
--
--	bpf_object__for_each_program(prog, obj) {
--		links[cnt] = bpf_program__attach(prog);
--		err = libbpf_get_error(links[cnt]);
--		if (err < 0) {
--			fprintf(stderr, "ERROR: bpf_program__attach failed\n");
--			links[cnt] = NULL;
--			return err;
--		}
--		cnt++;
--	}
--
--	return err;
--}
--
--static void unload_progs(void)
--{
--	while (cnt)
--		bpf_link__destroy(links[--cnt]);
--
--	bpf_object__close(obj);
--}
--
--int main(int argc, char **argv)
--{
--	int num_cpu = sysconf(_SC_NPROCESSORS_ONLN);
--	int test_flags = ~0;
--	char filename[256];
--	int err = 0;
--
--
--	if (argc > 1)
--		test_flags = atoi(argv[1]) ? : test_flags;
--	if (argc > 2)
--		num_cpu = atoi(argv[2]) ? : num_cpu;
--
--	if (test_flags & 0x3) {
--		printf("BASE\n");
--		run_perf_test(num_cpu, test_flags);
--	}
--
--	if (test_flags & 0xC) {
--		snprintf(filename, sizeof(filename),
--			 "%s_kprobe.bpf.o", argv[0]);
--
--		printf("w/KPROBE\n");
--		err = load_progs(filename);
--		if (!err)
--			run_perf_test(num_cpu, test_flags >> 2);
--
--		unload_progs();
--	}
--
--	if (test_flags & 0x30) {
--		snprintf(filename, sizeof(filename),
--			 "%s_tp.bpf.o", argv[0]);
--		printf("w/TRACEPOINT\n");
--		err = load_progs(filename);
--		if (!err)
--			run_perf_test(num_cpu, test_flags >> 4);
--
--		unload_progs();
--	}
--
--	if (test_flags & 0xC0) {
--		snprintf(filename, sizeof(filename),
--			 "%s_raw_tp.bpf.o", argv[0]);
--		printf("w/RAW_TRACEPOINT\n");
--		err = load_progs(filename);
--		if (!err)
--			run_perf_test(num_cpu, test_flags >> 6);
--
--		unload_progs();
--	}
--
--	return err;
--}
-diff --git a/samples/bpf/test_override_return.sh b/samples/bpf/test_override_return.sh
-deleted file mode 100755
-index 35db26f736b9..000000000000
---- a/samples/bpf/test_override_return.sh
-+++ /dev/null
-@@ -1,16 +0,0 @@
--#!/bin/bash
--
--rm -r tmpmnt
--rm -f testfile.img
--dd if=/dev/zero of=testfile.img bs=1M seek=1000 count=1
--DEVICE=$(losetup --show -f testfile.img)
--mkfs.btrfs -f $DEVICE
--mkdir tmpmnt
--./tracex7 $DEVICE
--if [ $? -eq 0 ]
--then
--	echo "SUCCESS!"
--else
--	echo "FAILED!"
--fi
--losetup -d $DEVICE
-diff --git a/samples/bpf/test_probe_write_user.bpf.c b/samples/bpf/test_probe_write_user.bpf.c
-deleted file mode 100644
-index a4f3798b7fb0..000000000000
---- a/samples/bpf/test_probe_write_user.bpf.c
-+++ /dev/null
-@@ -1,52 +0,0 @@
--/* Copyright (c) 2016 Sargun Dhillon <sargun@sargun.me>
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of version 2 of the GNU General Public
-- * License as published by the Free Software Foundation.
-- */
--#include "vmlinux.h"
--#include <string.h>
--#include <linux/version.h>
--#include <bpf/bpf_helpers.h>
--#include <bpf/bpf_tracing.h>
--#include <bpf/bpf_core_read.h>
--
--struct {
--	__uint(type, BPF_MAP_TYPE_HASH);
--	__type(key, struct sockaddr_in);
--	__type(value, struct sockaddr_in);
--	__uint(max_entries, 256);
--} dnat_map SEC(".maps");
--
--/* kprobe is NOT a stable ABI
-- * kernel functions can be removed, renamed or completely change semantics.
-- * Number of arguments and their positions can change, etc.
-- * In such case this bpf+kprobe example will no longer be meaningful
-- *
-- * This example sits on a syscall, and the syscall ABI is relatively stable
-- * of course, across platforms, and over time, the ABI may change.
-- */
--SEC("ksyscall/connect")
--int BPF_KSYSCALL(bpf_prog1, int fd, struct sockaddr_in *uservaddr,
--		 int addrlen)
--{
--	struct sockaddr_in new_addr, orig_addr = {};
--	struct sockaddr_in *mapped_addr;
--
--	if (addrlen > sizeof(orig_addr))
--		return 0;
--
--	if (bpf_probe_read_user(&orig_addr, sizeof(orig_addr), uservaddr) != 0)
--		return 0;
--
--	mapped_addr = bpf_map_lookup_elem(&dnat_map, &orig_addr);
--	if (mapped_addr != NULL) {
--		memcpy(&new_addr, mapped_addr, sizeof(new_addr));
--		bpf_probe_write_user(uservaddr, &new_addr,
--				     sizeof(new_addr));
--	}
--	return 0;
--}
--
--char _license[] SEC("license") = "GPL";
--u32 _version SEC("version") = LINUX_VERSION_CODE;
-diff --git a/samples/bpf/test_probe_write_user_user.c b/samples/bpf/test_probe_write_user_user.c
-deleted file mode 100644
-index 2a539aec4116..000000000000
---- a/samples/bpf/test_probe_write_user_user.c
-+++ /dev/null
-@@ -1,108 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--#include <stdio.h>
--#include <assert.h>
--#include <unistd.h>
--#include <bpf/bpf.h>
--#include <bpf/libbpf.h>
--#include <sys/socket.h>
--#include <netinet/in.h>
--#include <arpa/inet.h>
--
--int main(int ac, char **argv)
--{
--	struct sockaddr_in *serv_addr_in, *mapped_addr_in, *tmp_addr_in;
--	struct sockaddr serv_addr, mapped_addr, tmp_addr;
--	int serverfd, serverconnfd, clientfd, map_fd;
--	struct bpf_link *link = NULL;
--	struct bpf_program *prog;
--	struct bpf_object *obj;
--	socklen_t sockaddr_len;
--	char filename[256];
--	char *ip;
--
--	serv_addr_in = (struct sockaddr_in *)&serv_addr;
--	mapped_addr_in = (struct sockaddr_in *)&mapped_addr;
--	tmp_addr_in = (struct sockaddr_in *)&tmp_addr;
--
--	snprintf(filename, sizeof(filename), "%s.bpf.o", argv[0]);
--	obj = bpf_object__open_file(filename, NULL);
--	if (libbpf_get_error(obj)) {
--		fprintf(stderr, "ERROR: opening BPF object file failed\n");
--		return 0;
--	}
--
--	prog = bpf_object__find_program_by_name(obj, "bpf_prog1");
--	if (libbpf_get_error(prog)) {
--		fprintf(stderr, "ERROR: finding a prog in obj file failed\n");
--		goto cleanup;
--	}
--
--	/* load BPF program */
--	if (bpf_object__load(obj)) {
--		fprintf(stderr, "ERROR: loading BPF object file failed\n");
--		goto cleanup;
--	}
--
--	map_fd = bpf_object__find_map_fd_by_name(obj, "dnat_map");
--	if (map_fd < 0) {
--		fprintf(stderr, "ERROR: finding a map in obj file failed\n");
--		goto cleanup;
--	}
--
--	link = bpf_program__attach(prog);
--	if (libbpf_get_error(link)) {
--		fprintf(stderr, "ERROR: bpf_program__attach failed\n");
--		link = NULL;
--		goto cleanup;
--	}
--
--	assert((serverfd = socket(AF_INET, SOCK_STREAM, 0)) > 0);
--	assert((clientfd = socket(AF_INET, SOCK_STREAM, 0)) > 0);
--
--	/* Bind server to ephemeral port on lo */
--	memset(&serv_addr, 0, sizeof(serv_addr));
--	serv_addr_in->sin_family = AF_INET;
--	serv_addr_in->sin_port = 0;
--	serv_addr_in->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
--
--	assert(bind(serverfd, &serv_addr, sizeof(serv_addr)) == 0);
--
--	sockaddr_len = sizeof(serv_addr);
--	assert(getsockname(serverfd, &serv_addr, &sockaddr_len) == 0);
--	ip = inet_ntoa(serv_addr_in->sin_addr);
--	printf("Server bound to: %s:%d\n", ip, ntohs(serv_addr_in->sin_port));
--
--	memset(&mapped_addr, 0, sizeof(mapped_addr));
--	mapped_addr_in->sin_family = AF_INET;
--	mapped_addr_in->sin_port = htons(5555);
--	mapped_addr_in->sin_addr.s_addr = inet_addr("255.255.255.255");
--
--	assert(!bpf_map_update_elem(map_fd, &mapped_addr, &serv_addr, BPF_ANY));
--
--	assert(listen(serverfd, 5) == 0);
--
--	ip = inet_ntoa(mapped_addr_in->sin_addr);
--	printf("Client connecting to: %s:%d\n",
--	       ip, ntohs(mapped_addr_in->sin_port));
--	assert(connect(clientfd, &mapped_addr, sizeof(mapped_addr)) == 0);
--
--	sockaddr_len = sizeof(tmp_addr);
--	ip = inet_ntoa(tmp_addr_in->sin_addr);
--	assert((serverconnfd = accept(serverfd, &tmp_addr, &sockaddr_len)) > 0);
--	printf("Server received connection from: %s:%d\n",
--	       ip, ntohs(tmp_addr_in->sin_port));
--
--	sockaddr_len = sizeof(tmp_addr);
--	assert(getpeername(clientfd, &tmp_addr, &sockaddr_len) == 0);
--	ip = inet_ntoa(tmp_addr_in->sin_addr);
--	printf("Client's peer address: %s:%d\n",
--	       ip, ntohs(tmp_addr_in->sin_port));
--
--	/* Is the server's getsockname = the socket getpeername */
--	assert(memcmp(&serv_addr, &tmp_addr, sizeof(struct sockaddr_in)) == 0);
--
--cleanup:
--	bpf_link__destroy(link);
--	bpf_object__close(obj);
--	return 0;
--}
-diff --git a/samples/bpf/tracex7.bpf.c b/samples/bpf/tracex7.bpf.c
-deleted file mode 100644
-index ab8d6704a5a4..000000000000
---- a/samples/bpf/tracex7.bpf.c
-+++ /dev/null
-@@ -1,15 +0,0 @@
--#include "vmlinux.h"
--#include <linux/version.h>
--#include <bpf/bpf_helpers.h>
--
--SEC("kprobe/open_ctree")
--int bpf_prog1(struct pt_regs *ctx)
--{
--	unsigned long rc = -12;
--
--	bpf_override_return(ctx, rc);
--	return 0;
--}
--
--char _license[] SEC("license") = "GPL";
--u32 _version SEC("version") = LINUX_VERSION_CODE;
-diff --git a/samples/bpf/tracex7_user.c b/samples/bpf/tracex7_user.c
-deleted file mode 100644
-index b10b5e03a226..000000000000
---- a/samples/bpf/tracex7_user.c
-+++ /dev/null
-@@ -1,56 +0,0 @@
--#define _GNU_SOURCE
--
--#include <stdio.h>
--#include <unistd.h>
--#include <bpf/libbpf.h>
--
--int main(int argc, char **argv)
--{
--	struct bpf_link *link = NULL;
--	struct bpf_program *prog;
--	struct bpf_object *obj;
--	char filename[256];
--	char command[256];
--	int ret = 0;
--	FILE *f;
--
--	if (!argv[1]) {
--		fprintf(stderr, "ERROR: Run with the btrfs device argument!\n");
--		return 0;
--	}
--
--	snprintf(filename, sizeof(filename), "%s.bpf.o", argv[0]);
--	obj = bpf_object__open_file(filename, NULL);
--	if (libbpf_get_error(obj)) {
--		fprintf(stderr, "ERROR: opening BPF object file failed\n");
--		return 0;
--	}
--
--	prog = bpf_object__find_program_by_name(obj, "bpf_prog1");
--	if (!prog) {
--		fprintf(stderr, "ERROR: finding a prog in obj file failed\n");
--		goto cleanup;
--	}
--
--	/* load BPF program */
--	if (bpf_object__load(obj)) {
--		fprintf(stderr, "ERROR: loading BPF object file failed\n");
--		goto cleanup;
--	}
--
--	link = bpf_program__attach(prog);
--	if (libbpf_get_error(link)) {
--		fprintf(stderr, "ERROR: bpf_program__attach failed\n");
--		link = NULL;
--		goto cleanup;
--	}
--
--	snprintf(command, 256, "mount %s tmpmnt/", argv[1]);
--	f = popen(command, "r");
--	ret = pclose(f);
--
--cleanup:
--	bpf_link__destroy(link);
--	bpf_object__close(obj);
--	return ret ? 0 : 1;
--}
---
-2.43.0
+Thanks
+/Ilias
 
