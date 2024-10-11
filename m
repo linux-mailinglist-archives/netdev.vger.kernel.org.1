@@ -1,59 +1,50 @@
-Return-Path: <netdev+bounces-134727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4309999AF00
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 01:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C5E099AF0A
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 01:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F7161C21590
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 23:03:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4710B286F61
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 23:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F8E1D151E;
-	Fri, 11 Oct 2024 23:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2D21E0B6D;
+	Fri, 11 Oct 2024 23:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIfLyeer"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MihMjduf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBD71D049D
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 23:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D558A28EB;
+	Fri, 11 Oct 2024 23:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728687797; cv=none; b=d7sH4qdsDBDFxweWOWjEZLVTg9/6K5ERUOwWynziT5hcQipKknyIDUyZ8OdVWq2GgJp4hB5vRT89SJkZMfxUCgSmhQ6pFR66bmtQsOjXhd9gaELwYTZlwr/MbDmPY+Kjpwxc9EKwswBrXmauSPML+j7RITT4WKsOGLaoXvZp9tk=
+	t=1728688234; cv=none; b=Orywh2U8Z3Q3CTZhzEooHEsx0wtwtMJ38zz8d1TwQPxRWOUnoJ6a06iChoELl8qPicxZVA5tP3a5744lOQVvEfHOBELcyuXato9Q48C6a9b+pY3/csNKrI07Cg9BV+pO8716zlu5LbO7lpduA4fM3mKxFZUHSNtwGFP0fKlMPNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728687797; c=relaxed/simple;
-	bh=qwbp9dDov6OLftlst/qfGoIZ1uSZher+ccmeeGqmftk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=amkFspbMQ5lrep3mG3MQaiUA0y/FagISmQK1+9OnIPTyY/CiauqTwsKr00cW9OqfV/bC5/vO1svpc1871u+oTSGqtbrs6Hgb07DcoB+Ul/oB7ec5ItlM0/LU4393Ia+aguDWwgLkKP2pjapcV5oP4jF4LJm5FzTLdXxGM/D4lzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIfLyeer; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAA46C4CECF;
-	Fri, 11 Oct 2024 23:03:16 +0000 (UTC)
+	s=arc-20240116; t=1728688234; c=relaxed/simple;
+	bh=4mCJwn6mmu4ddpF1rCB/3XCYwBvtuMi7DFbsMpFHEEM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fCLTXwZmxbaVoB966O7dUbGVOVL7n/4Uu6ibrXN1kBybo4ffylyRM4fuwwFBNXvtQx6uOJeoILctEpeHokDrJHs5BLW2L/ozxHP34CwgIluPBaEC4toUEX/3Ula3HrQNJZQ14fpaDfqrxfLrjwrZ08x+U1YDG37zc+eFL9c5TU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MihMjduf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E4B4C4CECF;
+	Fri, 11 Oct 2024 23:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728687797;
-	bh=qwbp9dDov6OLftlst/qfGoIZ1uSZher+ccmeeGqmftk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gIfLyeerIt+RdBxIB0B8Z+yLjoEE7b6fIJmxn270UPLyvp6/HXWjxWIe7/PUUcKR+
-	 GK+2MrArI9PoHPlCbtaEZB0hfX679w9PZ+aBCB2BT38KEB+0kwMDyT7JS0uQPcZfQr
-	 DD5IecI/edOBnnGHVDl6XlA07ULrgS/WUWgQ3vJlHwQTGl7BDg8rfzZS12EVD7YmUy
-	 F7Yp3xCcrKfpVnOjW7N8bMvg+pYguKW0EPW5xER0xB58HcsoDHpS3yX6GvnBYc26ao
-	 21Xz1qNNzgO4CHD1eD9+6mtv1iSndJNMa6kL2wGfZIu3ttFOUTjvct1/DbpiNlYVKw
-	 rC6dkvdaQTx1A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/2] selftests: net: move EXTRA_CLEAN of libynl.a into ynl.mk
-Date: Fri, 11 Oct 2024 16:03:11 -0700
-Message-ID: <20241011230311.2529760-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241011230311.2529760-1-kuba@kernel.org>
-References: <20241011230311.2529760-1-kuba@kernel.org>
+	s=k20201202; t=1728688233;
+	bh=4mCJwn6mmu4ddpF1rCB/3XCYwBvtuMi7DFbsMpFHEEM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MihMjdufSziu3AeyBTVQDdBOHRif+6JcW1FqP7gPZLD0EH35L7YtDWBrUB5Vuasqw
+	 j/aQnEBftvDVquZLGAFwontFPky6ND4flSZC5b/3dJaKaONIfDjlpKxY38BFZ9jxlk
+	 qXDR0HSL7Rh/Z80WolRJIdOHgKfrpKAHomJUm2xcTYxLoRaGn5q+LlO2+BIzCHfYRL
+	 rJkh8jxQ8wfz0N24ceILC7O7+E8lra99kYMqRpYyKoa5ygv78pD6b5bs1Lqzq8XpUY
+	 6xROHy3k1yOBbmkxnH8GdmiDKov6uRjN+6W6xFPX9+D4f9vYSQuanHIEezGbsTGvLR
+	 CiMQQ0X7KEzCw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3443B38363CB;
+	Fri, 11 Oct 2024 23:10:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,44 +52,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 net 0/4] net: enetc: fix some issues of XDP
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172868823798.3022673.12555196619496789739.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 23:10:37 +0000
+References: <20241010092056.298128-1-wei.fang@nxp.com>
+In-Reply-To: <20241010092056.298128-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org,
+ imx@lists.linux.dev, rkannoth@marvell.com, maciej.fijalkowski@intel.com,
+ sbhatta@marvell.com
 
-Commit 1fd9e4f25782 ("selftests: make kselftest-clean remove libynl outputs")
-added EXTRA_CLEAN of YNL generated files to ynl.mk. We already had
-a EXTRA_CLEAN in the file including the snippet. Consolidate them.
+Hello:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-v2:
- - new patch
----
- tools/testing/selftests/net/Makefile | 1 -
- tools/testing/selftests/net/ynl.mk   | 3 ++-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 649f1fe0dc46..26a4883a65c9 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -98,7 +98,6 @@ TEST_PROGS += vlan_hw_filter.sh
- TEST_PROGS += bpf_offload.py
- 
- # YNL files, must be before "include ..lib.mk"
--EXTRA_CLEAN += $(OUTPUT)/libynl.a
- YNL_GEN_FILES := ncdevmem
- TEST_GEN_FILES += $(YNL_GEN_FILES)
- 
-diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
-index add5c0cdeac4..d43afe243779 100644
---- a/tools/testing/selftests/net/ynl.mk
-+++ b/tools/testing/selftests/net/ynl.mk
-@@ -33,4 +33,5 @@ $(OUTPUT)/libynl.a: $(YNL_SPECS) $(OUTPUT)/.libynl-$(YNL_GENS_HASH).sig
- EXTRA_CLEAN += \
- 	$(top_srcdir)/tools/net/ynl/lib/__pycache__ \
- 	$(top_srcdir)/tools/net/ynl/lib/*.[ado] \
--	$(OUTPUT)/.libynl-*.sig
-+	$(OUTPUT)/.libynl-*.sig \
-+	$(OUTPUT)/libynl.a
+On Thu, 10 Oct 2024 17:20:52 +0800 you wrote:
+> We found some bugs when testing the XDP function of enetc driver,
+> and these bugs are easy to reproduce. This is not only causes XDP
+> to not work, but also the network cannot be restored after exiting
+> the XDP program. So the patch set is mainly to fix these bugs. For
+> details, please see the commit message of each patch.
+> 
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4,net,1/4] net: enetc: remove xdp_drops statistic from enetc_xdp_drop()
+    https://git.kernel.org/netdev/net/c/412950d5746f
+  - [v4,net,2/4] net: enetc: block concurrent XDP transmissions during ring reconfiguration
+    https://git.kernel.org/netdev/net/c/c728a95ccf2a
+  - [v4,net,3/4] net: enetc: disable Tx BD rings after they are empty
+    https://git.kernel.org/netdev/net/c/0a93f2ca4be6
+  - [v4,net,4/4] net: enetc: disable NAPI after all rings are disabled
+    https://git.kernel.org/netdev/net/c/6b58fadd44aa
+
+You are awesome, thank you!
 -- 
-2.46.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
