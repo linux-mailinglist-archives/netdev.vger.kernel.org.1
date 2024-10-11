@@ -1,144 +1,169 @@
-Return-Path: <netdev+bounces-134593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568D399A4D6
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 15:21:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E36F99A4DA
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 15:21:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75F4280DCF
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 13:21:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E40EB2327B
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 13:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF47D21D18C;
-	Fri, 11 Oct 2024 13:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459532185B8;
+	Fri, 11 Oct 2024 13:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="gwBzVQGZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0EHnAFcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C261321C182
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 13:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17B9218D91
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 13:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728652693; cv=none; b=Gnr3caXCx7Wq6TlgJtgWGzzumne7xR9MqYPgUBSZv3YYQlSbBLs4hKtfQJjI2bHHZDrTBHaVAsq5T0UGGQNWu/iyjWQZ4x8k9y5s88PCuu4hA9lT7cL6dsXUhxvHbgcdmQnYcVoXcnMz2deEiA20YBH7dvfHcoYZ17M564D1Xds=
+	t=1728652727; cv=none; b=ctGdSEvnHWMGrqSWTK4itZhdUEe32LoQs3e0/IXatYxo5Q68l6MmRgnhrraP3NFWVqmljTZxDIsOT49HmKHItA5j6h77HyWNGCMa1n/DDzWHg5EVKTGRF7BvljN7GZdE336W9Cgvo19r+3lfUheVtOWKQ2GpIUSTHKZ+N6a/A38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728652693; c=relaxed/simple;
-	bh=Mzxbq0cogQNrwowj1zfIE0DVBGY5w4Uyxw7H3xobrQ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fa1niuNBFfQ4qjHLD1aPdDM3hV+R896h2PTTGQahvpAm+7+Uo1S2Qxd3sucj1zdpnoIXceb7a4OSPQvk8uKc895z3Pq07/UisjpXhoGdpqgtKiPI64RZGZv/8yJ2BZ4DxXjRU/AqgGxWkcHSGEoLW/KVRJwApsiNcDZ3kdlfyg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=gwBzVQGZ; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a99c0beaaa2so79324166b.1
-        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 06:18:11 -0700 (PDT)
+	s=arc-20240116; t=1728652727; c=relaxed/simple;
+	bh=KT9GuxsXvEDx7HeJdEbDffIthA1KA1w9blljJ5SmA+Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PRBr9NjBnTmajahcvwLH7eee7X2Y4teIvNSJ/GIKFzDeJ5MqeJ/ASaLxfpuu3kf4bUlFfZmkjXBxQVYS1hu9zfF9O2DxoYA1PzheeptxOx/YEB2+b2n3QhrzxjrPOsbiOvrEiU1Lf6PRdAU6s1EiGcZGV7IHGA4lEEGOpSIIJwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0EHnAFcS; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0353b731b8so2728308276.2
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 06:18:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1728652690; x=1729257490; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U0ITVZ/ruKG/TLGpfGAwzLMygWSysjucbld18q4vTYY=;
-        b=gwBzVQGZndUEnk7nqpMztkFRdJVhK1lS/IHjAzZZMCsoH3MudspQbAP8a3WGI3KwrC
-         PUB4BFvgN4Q6NCRexlhEhTG9bKGR9044A2JJ342iElzdf9vcBC1M0vdYcpg+F/MOfzMo
-         GpcDQeuDfiyHulOmFomxL8rm7LHuSFNWGiZkLHIrJsqI6LHtGNXIUWqcyjyi1aHZStqS
-         7Zq4skNrcIpD4FahHfeczTPQ4Mz9wtOHWZjqgxD2OmXAVUN3+NznO77PONnA0G6nvYMF
-         SKy2TmCmfBN5SZnLShyse/CfGatSl4C5JdWcGC6CNRj9jMLXPBLAk5HM/wRW0W855Aw6
-         8oTQ==
+        d=google.com; s=20230601; t=1728652724; x=1729257524; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qUtNGqKL635O1HEP3YP3IsdfBYvaoX15rGtKcLM6XyA=;
+        b=0EHnAFcSNqqsOtJKtzeaba80I5QvWkeDvy5TukZLzsrjZeuuVpjdgvsQCZvIxBxdSr
+         PDyGUkBFUdd7PTurrcJTC8sf37zcyuMO2cbJ37Cf1wMGqZZPEWt6/dtQq7gKvVooTwh9
+         JPJgkCRAOKii1A1KnD6EP97YEBRKR01TBgN9ai01Fd7/Nl5wzTLmt24vf6kmAGM3PhgU
+         DKHtOiT5iNWxd/lFN+kebK59CHV0Mfb4rCN2ZFmMVIWFbtmZWj/65CWjZ/Hw6dA3XVLE
+         E6rkh17UxEPmxTYgbgfVvk2wHVzkfc/9ZIQU2wmZ2dm9k7EiWzKoQ74W1C3JlfhtgIZ3
+         PQJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728652690; x=1729257490;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U0ITVZ/ruKG/TLGpfGAwzLMygWSysjucbld18q4vTYY=;
-        b=juYEFdwkIAYBpFstY8UZr4lvwheFlNM9FZ84J5XaG2LFaAeedXNAVwGlpSssXX4/aQ
-         p3egXssYzAMGR0/z6M3N/3AEXIX7KsZqZRDLf+uVr1k1GEh+5BHRwlE/Ij/DoyMm7uo2
-         tkB028dNHWQ9MFBF50cs81GJK+3jI5ZSNrcZEa/44nNtkQmd32c5W19GSV8zohiHUSap
-         dje9ZO8EmeHxqYe4/gQwE23yNHZCPzRW+SdgO0d/UCjqbdLV9LO13wKT+3OzTvRmssnS
-         Nt6f+37OS3M1npEl/olzrY/sz+vT3jpVDJHgqfHwlt2BjCtEP8xj3z0ZsdrZ4KNNSdEu
-         se6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXQM2pnJwHfyETaCYTSPboUUM8ORoAizWl62IXyCi8Fv7XetcIIk17TltJDzHdZ1q2+yyWD618=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFZ6FqASSi9ZRwsc36XEl0kGatwN2O1fYZco7KcqIkZEh2nhMX
-	1/63izU6971vthy8doQJTQE9CxCTzvTrkVBBXbeRORux1Gp6synQzsnIq5RjPhI=
-X-Google-Smtp-Source: AGHT+IG0Ub6gDX3IQh/3prA7jVWpquOOtRd9X2EDWha7QdWuTYm6Hzp02feEX0uQQCEAWTcDfR1ccw==
-X-Received: by 2002:a17:907:7290:b0:a8a:78bb:1e2 with SMTP id a640c23a62f3a-a99b9415479mr218657166b.6.1728652690098;
-        Fri, 11 Oct 2024 06:18:10 -0700 (PDT)
-Received: from localhost ([2001:4090:a244:83ae:2517:2666:43c9:d0d3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7ec4cd0sm211838966b.1.2024.10.11.06.18.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 06:18:09 -0700 (PDT)
-From: Markus Schneider-Pargmann <msp@baylibre.com>
-Date: Fri, 11 Oct 2024 15:16:46 +0200
-Subject: [PATCH v3 9/9] arm64: dts: ti: k3-am62p-mcu: Mark mcu_mcan0/1 as
- wakeup-source
+        d=1e100.net; s=20230601; t=1728652724; x=1729257524;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qUtNGqKL635O1HEP3YP3IsdfBYvaoX15rGtKcLM6XyA=;
+        b=fAaPtC3Ai1R3+lXrSLUEMTFrLMl2lYviIMV1skL+V9feAUTe+BLMreJ2+Ah2VSEoYt
+         1WIEu0c4/SCC0AjJfYjT44UALKEJjwswwvCacsMDrPVKWoYp75LdEjGVSTH7jbZU+RC6
+         RKKK/caBG8MU3Of5mi5VvHBzJQeFEfmvO2g9yCkz/Qns6Z4rVElDNkzoVHsyJCXlbgNO
+         hoh5IZn0zrf88TAb/67mt6CCSYCDfSCX/HJoGxR4GIcv4DXcRoltYa6atxd0i/hSCsrn
+         JTQpAXQRWLMKEv4txyfp12ZgweuT6wM5DLphjuuj+ebK8bhZikrgsx5txmyYvnjyN37O
+         6rZg==
+X-Gm-Message-State: AOJu0YwTxg/iVWsaJFWwebuDpQjwPCt01ckDO2oDk8DxhaX4D+AtKcVR
+	GJNG2tiwZ0rqV1yS/zR2dVjTHq1H1MoXoxs2aN0WBZFWc+fLRmsRTT/z5cIiEcedjkvlWGLedtf
+	KNavCYCna0w==
+X-Google-Smtp-Source: AGHT+IHg6QS1gb/y4xNSuBlDgEjyXPbL7JY4KfKTUSp00Gg43/XKxsbR+GYsyJVwfKXTw1yeNwTMlKOnb2/oqQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2687:b0:e28:eae7:f838 with SMTP
+ id 3f1490d57ef6-e2918e5b589mr2479276.0.1728652724577; Fri, 11 Oct 2024
+ 06:18:44 -0700 (PDT)
+Date: Fri, 11 Oct 2024 13:18:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241011-topic-mcan-wakeup-source-v6-12-v3-9-9752c714ad12@baylibre.com>
-References: <20241011-topic-mcan-wakeup-source-v6-12-v3-0-9752c714ad12@baylibre.com>
-In-Reply-To: <20241011-topic-mcan-wakeup-source-v6-12-v3-0-9752c714ad12@baylibre.com>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
- Vishal Mahaveer <vishalm@ti.com>, Kevin Hilman <khilman@baylibre.com>, 
- Dhruva Gole <d-gole@ti.com>, Markus Schneider-Pargmann <msp@baylibre.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1170; i=msp@baylibre.com;
- h=from:subject:message-id; bh=Tq/fbr0WhZHR5UVyg7x0DcqyPJVYjETLUN6TQAqpB5E=;
- b=owGbwMvMwCGm0rPl0RXRdfaMp9WSGNI5VesfX6o74PpSpyl1L/cP79iFPs5N6R87zlVHrVbf3
- ODYWdTcUcrCIMbBICumyHL3w8J3dXLXF0Sse+QIM4eVCWQIAxenAEzkqBTDH267DWZMkSz81mtV
- Hp0T6/9llxKY+8oi5irHtw9iRw4GxzL803umPvUb95Zdl44X/oiIijizXULx9rOMx4zSbI+9ZYK
- rmAA=
-X-Developer-Key: i=msp@baylibre.com; a=openpgp;
- fpr=BADD88DB889FDC3E8A3D5FE612FA6A01E0A45B41
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
+Message-ID: <20241011131843.2931995-1-edumazet@google.com>
+Subject: [PATCH net] netdevsim: use cond_resched() in nsim_dev_trap_report_work()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Vibhore Vardhan <vibhore@ti.com>
+I am still seeing many syzbot reports hinting that syzbot
+might fool nsim_dev_trap_report_work() with hundreds of ports [1]
 
-mcu_mcan0 and mcu_mcan1 can be wakeup sources for the SoC. Mark them
-accordingly in the devicetree. Based on the patch for AM62a.
+Lets use cond_resched(), and system_unbound_wq
+instead of implicit system_wq.
 
-Signed-off-by: Vibhore Vardhan <vibhore@ti.com>
-Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+[1]
+INFO: task syz-executor:20633 blocked for more than 143 seconds.
+      Not tainted 6.12.0-rc2-syzkaller-00205-g1d227fcc7222 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:25856 pid:20633 tgid:20633 ppid:1      flags:0x00004006
+...
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 16760 Comm: kworker/1:0 Not tainted 6.12.0-rc2-syzkaller-00205-g1d227fcc7222 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: events nsim_dev_trap_report_work
+ RIP: 0010:__sanitizer_cov_trace_pc+0x0/0x70 kernel/kcov.c:210
+Code: 89 fb e8 23 00 00 00 48 8b 3d 04 fb 9c 0c 48 89 de 5b e9 c3 c7 5d 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <f3> 0f 1e fa 48 8b 04 24 65 48 8b 0c 25 c0 d7 03 00 65 8b 15 60 f0
+RSP: 0018:ffffc90000a187e8 EFLAGS: 00000246
+RAX: 0000000000000100 RBX: ffffc90000a188e0 RCX: ffff888027d3bc00
+RDX: ffff888027d3bc00 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffff88804a2e6000 R08: ffffffff8a4bc495 R09: ffffffff89da3577
+R10: 0000000000000004 R11: ffffffff8a4bc2b0 R12: dffffc0000000000
+R13: ffff88806573b503 R14: dffffc0000000000 R15: ffff8880663cca00
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc90a747f98 CR3: 000000000e734000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 000000000000002b DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+  __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
+  spin_unlock_bh include/linux/spinlock.h:396 [inline]
+  nsim_dev_trap_report drivers/net/netdevsim/dev.c:820 [inline]
+  nsim_dev_trap_report_work+0x75d/0xaa0 drivers/net/netdevsim/dev.c:850
+  process_one_work kernel/workqueue.c:3229 [inline]
+  process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+  worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+  kthread+0x2f0/0x390 kernel/kthread.c:389
+  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Fixes: ba5e1272142d ("netdevsim: avoid potential loop in nsim_dev_trap_report_work()")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jiri Pirko <jiri@nvidia.com>
 ---
- arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/netdevsim/dev.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi b/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi
-index b33aff0d65c9def755f8dda9eb9feda7bc74e5c8..3afa17e6592f39387a667547835c90f95a9af351 100644
---- a/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi
-@@ -173,6 +173,7 @@ mcu_mcan0: can@4e08000 {
- 		interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>,
- 			     <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>;
- 		interrupt-names = "int0", "int1";
-+		wakeup-source;
- 		status = "disabled";
- 	};
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index 92a7a36b93ac0cc1b02a551b974fb390254ac484..2f98443230895e8b6ee4cc36d5a2add8c2c0a00e 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -848,11 +848,12 @@ static void nsim_dev_trap_report_work(struct work_struct *work)
+ 			continue;
  
-@@ -188,6 +189,7 @@ mcu_mcan1: can@4e18000 {
- 		interrupts = <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>,
- 			     <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>;
- 		interrupt-names = "int0", "int1";
-+		wakeup-source;
- 		status = "disabled";
- 	};
+ 		nsim_dev_trap_report(nsim_dev_port);
++		cond_resched();
+ 	}
+ 	devl_unlock(priv_to_devlink(nsim_dev));
+-
+-	schedule_delayed_work(&nsim_dev->trap_data->trap_report_dw,
+-			      msecs_to_jiffies(NSIM_TRAP_REPORT_INTERVAL_MS));
++	queue_delayed_work(system_unbound_wq,
++			   &nsim_dev->trap_data->trap_report_dw,
++			   msecs_to_jiffies(NSIM_TRAP_REPORT_INTERVAL_MS));
+ }
  
-
+ static int nsim_dev_traps_init(struct devlink *devlink)
+@@ -907,8 +908,9 @@ static int nsim_dev_traps_init(struct devlink *devlink)
+ 
+ 	INIT_DELAYED_WORK(&nsim_dev->trap_data->trap_report_dw,
+ 			  nsim_dev_trap_report_work);
+-	schedule_delayed_work(&nsim_dev->trap_data->trap_report_dw,
+-			      msecs_to_jiffies(NSIM_TRAP_REPORT_INTERVAL_MS));
++	queue_delayed_work(system_unbound_wq,
++			   &nsim_dev->trap_data->trap_report_dw,
++			   msecs_to_jiffies(NSIM_TRAP_REPORT_INTERVAL_MS));
+ 
+ 	return 0;
+ 
 -- 
-2.45.2
+2.47.0.rc1.288.g06298d1525-goog
 
 
