@@ -1,262 +1,152 @@
-Return-Path: <netdev+bounces-134480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2448999C04
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 07:17:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E21A7999C23
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 07:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E446C1C21845
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 05:17:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3D171C21BDC
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 05:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC3C1F942F;
-	Fri, 11 Oct 2024 05:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD951F706F;
+	Fri, 11 Oct 2024 05:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aUTTCd2O"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D02F19413B;
-	Fri, 11 Oct 2024 05:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B141A2F26;
+	Fri, 11 Oct 2024 05:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728623855; cv=none; b=edBuhZZ6kkZRusG0s0JdGiuHK6u+tLBu2eoHItaFvCoj4Ozylp3mRG85y/Ol1LZqACMpjKf7cWfC/48ytN2zaXtKVhfREs4rCl8/VoISXeFiG/bFxuSCal9eMnrJO5hhcLZKYXrf5lchY+bFMOTftSRZTPWt3eJbhnmkxOY8fRM=
+	t=1728625175; cv=none; b=YH/niysU5o0eNMoVQTGZLrsX/jDhxphuzmNkltR/8SR+KUE2lEkOe0ZpaosVgCLWbU/myODsFufLpJNI5joDBXMBsPT7jcvSjNuYA2s2Vy3fmepnDcaDUF30vzmHSPanDXNY8aTa9QYoFQ8HcUB8OtS8XNyrHowyxerahRmNJuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728623855; c=relaxed/simple;
-	bh=fyy4YIlptm8uOrcjxzHis/saN0wHpL8XX8tHYtpryeo=;
-	h=From:To:CC:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JH71R2IicItJXmld7QsKx39M1FUmwjlN3g5CV0yVyGrQyHwVG1RrC7iI9CyHlWLCto+aLRhAk8mv0ZBzHoE7kgWjnw/DqLQA4ZBYxWNXN/T9j9fi6wphEnFAHHwRIOj6SlwJvXvtzpu5wp5/PiB/6lyuEvZHfog3IuIH4LQyVnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XPvsC3kLpz6LDQN;
-	Fri, 11 Oct 2024 13:13:03 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4EB941400D7;
-	Fri, 11 Oct 2024 13:17:25 +0800 (CST)
-Received: from GurSIX1 (10.204.104.109) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 11 Oct
- 2024 07:17:19 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
-References: <67054127bb083_18b21e2943f@willemb.c.googlers.com.notmuch> <20241009065837.354332-1-gur.stavi@huawei.com> <67068a44bff02_1cca3129431@willemb.c.googlers.com.notmuch> <002201db1a75$9a83b420$cf8b1c60$@huawei.com> <67072012c983a_1e805629421@willemb.c.googlers.com.notmuch> <002701db1ae3$368d9b70$a3a8d250$@huawei.com> <6707e3028d844_20573a294f0@willemb.c.googlers.com.notmuch> <000101db1b2f$7410c2f0$5c3248d0$@huawei.com> <67085135e4fe2_21530629429@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67085135e4fe2_21530629429@willemb.c.googlers.com.notmuch>
-Subject: RE: [PATCH net-next v02 1/2] af_packet: allow fanout_add when socket is not RUNNING
-Date: Fri, 11 Oct 2024 08:17:12 +0300
-Message-ID: <000201db1b9c$db32f6c0$9198e440$@huawei.com>
+	s=arc-20240116; t=1728625175; c=relaxed/simple;
+	bh=+d42UvkUBu98QAceADfnNLgwqRMi7KeH8jtCFXIHtv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XqqCn0VBEXrTSrbm/ujMwmAISZmAXU3kvXCBaUOLpYkzIaLENABOrp+yNAcjzQoK/JWyeDn5rJDXWUPSZ4RCLoxDtDKsIN0/F0e9Qa22Yrw2PApCLx9kF7vtfu4+i1QMBfavFDTwF63ucaJRNT0ivNgxjrsros7H+1bKom8tap4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aUTTCd2O; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728625174; x=1760161174;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+d42UvkUBu98QAceADfnNLgwqRMi7KeH8jtCFXIHtv4=;
+  b=aUTTCd2OjDuOfv9+GwLO4AWEVRPjRhuuumNTlNZwukzjcYAo+VIYZrNT
+   cYAkFMkrDSBDq1m3QPImGtQX/BdogWsZlta37/GU3RsPAkMo6QoYByMfv
+   GbFqfdEPWxoEfnlrFEEf5mzIVZwDulCgIg0bF1ZDdxXWS58oWf2YKx9WD
+   Q8N9Yp43TM9W5zIjHceTdsyUBWsgr0eBDRCxGfGMHb0oxg5NCRHihyFBP
+   Yd3CdLic1p/RrWD9A8G+ADtmKaSGpMsItTN3hEckZBQR2/hMvNGJLIWBm
+   4Y2Ph8HmOcakw0DY7CghUGMstZVKf5z8f/GyREiq5i8Zqxk4eZQh2mm31
+   A==;
+X-CSE-ConnectionGUID: /Rfvx4KcRcyPkcLNs/NJ9g==
+X-CSE-MsgGUID: 6CYZGIpPRxKVD0upnjqI4w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11221"; a="27824747"
+X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
+   d="scan'208";a="27824747"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 22:39:33 -0700
+X-CSE-ConnectionGUID: CjJQ2kg9SW2lgwlQLQSKYA==
+X-CSE-MsgGUID: QF+qDOJ5TA6Re0RbSQUttA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,195,1725346800"; 
+   d="scan'208";a="107673577"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 22:39:29 -0700
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 57B4D11F855;
+	Fri, 11 Oct 2024 08:39:26 +0300 (EEST)
+Date: Fri, 11 Oct 2024 05:39:26 +0000
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] device property: Introduce
+ fwnode_for_each_available_child_node_scoped()
+Message-ID: <Zwi6Dn4yJxst4xv2@kekkonen.localdomain>
+References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
+ <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHbGWzwQMZqw76ooUWOpIJuIeDZyLJ8x9WAgAEVHYCAAHM4AIAA1CkdgADoeFuAAINGnIAAcnow
-Content-Language: en-us
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- frapeml500005.china.huawei.com (7.182.85.13)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241008-mv88e6xxx_leds_fwnode_put-v1-1-cfd7758cd176@gmail.com>
 
-> Gur Stavi wrote:
-> > > Gur Stavi wrote:
-> > > > > Gur Stavi wrote:
-> > > > > > > Gur Stavi wrote:
-> > > > > > > > >> @@ -1846,21 +1846,21 @@ static int fanout_add(struct
-> sock
-> > > *sk,
-> > > > > > > struct fanout_args *args)
-> > > > > > > > >>  	err = -EINVAL;
-> > > > > > > > >>
-> > > > > > > > >>  	spin_lock(&po->bind_lock);
-> > > > > > > > >> -	if (packet_sock_flag(po, PACKET_SOCK_RUNNING) &&
-> > > > > > > > >> -	    match->type == type &&
-> > > > > > > > >> +	if (match->type == type &&
-> > > > > > > > >>  	    match->prot_hook.type == po->prot_hook.type &&
-> > > > > > > > >>  	    match->prot_hook.dev == po->prot_hook.dev) {
-> > > > > > > > >
-> > > > > > > > > Remaining unaddressed issue is that the socket can now be
-> > > added
-> > > > > > > > > before being bound. See comment in v1.
-> > > > > > > >
-> > > > > > > > I extended the psock_fanout test with unbound fanout test.
-> > > > > > > >
-> > > > > > > > As far as I understand, the easiest way to verify bind is
-> to
-> > > test
-> > > > > that
-> > > > > > > > po->prot_hook.dev != NULL, since we are under a bind_lock
-> > > anyway.
-> > > > > > > > But perhaps a more readable and direct approach to test
-> "bind"
-> > > > > would be
-> > > > > > > > to test po->ifindex != -1, as ifindex is commented as
-> "bound
-> > > > > device".
-> > > > > > > > However, at the moment ifindex is not initialized to -1, I
-> can
-> > > add
-> > > > > such
-> > > > > > > > initialization, but perhaps I do not fully understand all
-> the
-> > > > > logic.
-> > > > > > > >
-> > > > > > > > Any preferences?
-> > > > > > >
-> > > > > > > prot_hook.dev is not necessarily set if a packet socket is
-> bound.
-> > > > > > > It may be bound to any device. See dev_add_pack and
-> ptype_head.
-> > > > > > >
-> > > > > > > prot_hook.type, on the other hand, must be set if bound and
-> is
-> > > only
-> > > > > > > modified with the bind_lock held too.
-> > > > > > >
-> > > > > > > Well, and in packet_create. But setsockopt PACKET_FANOUT_ADD
-> also
-> > > > > > > succeeds in case bind() was not called explicitly first to
-> bind
-> > > to
-> > > > > > > a specific device or change ptype.
-> > > > > >
-> > > > > > Please clarify the last paragraph? When you say "also succeeds"
-> do
-> > > you
-> > > > > > mean SHOULD succeed or MAY SUCCEED by mistake if "something"
-> > > happens
-> > > > > ???
-> > > > >
-> > > > > I mean it succeeds currently. Which behavior must then be
-> maintained.
-> > > > >
-> > > > > > Do you refer to the following scenario: socket is created with
-> non-
-> > > zero
-> > > > > > protocol and becomes RUNNING "without bind" for all devices. In
-> > > that
-> > > > > case
-> > > > > > it can be added to FANOUT without bind. Is that considered a
-> bug or
-> > > > > does
-> > > > > > the bind requirement for fanout only apply for all-protocol (0)
-> > > > > sockets?
-> > > > >
-> > > > > I'm beginning to think that this bind requirement is not needed.
-> > > >
-> > > > I agree with that. I think that is an historical mistake that
-> socket
-> > > > becomes implicitly bound to all interfaces if a protocol is defined
-> > > > during create. Without this bind requirement would make sense.
-> > > >
-> > > > >
-> > > > > All type and dev are valid, even if an ETH_P_NONE fanout group
-> would
-> > > > > be fairly useless.
-> > > >
-> > > > Fanout is all about RX, I think that refusing fanout for socket
-> that
-> > > > will not receive any packet is OK. The condition can be:
-> > > > if (po->ifindex == -1 || !po->num)
-> > >
-> > > Fanout is not limited to sockets bound to a specific interface.
-> > > This will break existing users.
-> >
-> > For specific interface ifindex >= 1
-> > For "any interface" ifindex == 0
-> > ifindex is -1 only if the socket was created unbound with proto == 0
-> > or for the rare race case that during re-bind the new dev became
-> unlisted.
-> > For both of these cases fanout should fail.
-> 
-> The only case where packet_create does not call __register_prot_hook
-> is if proto == 0. If proto is anything else, the socket will be bound,
-> whether to a device hook, or ptype_all. I don't think we need this
-> extra ifindex condition.
-> 
+Hi Javier,
 
-Even though "unbound" is an unlikely state for such a socket the code
-Should still address this state consistently. If do_bind sets ifindex
-to -1 on the unlikely unlisted scenario so should packet_create on the
-more likely proto == 0 scenario.
-
-> > >
-> > > Binding to ETH_P_NONE is useless, but we're not going to slow down
-> > > legitimate users with branches for cases that are harmless.
-> > >
-> >
-> > With "branch", do you refer to performance or something else?
-> > As I said in other mail, ETH_P_NONE could not be used in a fanout
-> > before as well because socket cannot become RUNNING with proto == 0.
+On Tue, Oct 08, 2024 at 06:10:27PM +0200, Javier Carrasco wrote:
+> Introduce the scoped variant of the
+> fwnode_for_each_available_child_node() to automatically decrement the
+> child's refcount when it goes out of scope, removing the need for
+> explicit calls to fwnode_handle_put().
 > 
-> Good point.
+> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+> ---
+>  include/linux/property.h | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> > For performance, we removed the RUNNING condition and added this.
-> > It is not like we need to perform 5M fanout registrations/sec. It is a
-> > syscall after all.
-> 
-> It's as much about code complexity as performance. Both the patch and
-> resulting code should be as small and self-evident as possible.
-> 
-> Patch v3 introduces a lot of code churn.
+> diff --git a/include/linux/property.h b/include/linux/property.h
+> index 61fc20e5f81f..b37508ecf606 100644
+> --- a/include/linux/property.h
+> +++ b/include/linux/property.h
+> @@ -168,6 +168,11 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
+>  	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
+>  	     child = fwnode_get_next_available_child_node(fwnode, child))
+>  
+> +#define fwnode_for_each_available_child_node_scoped(fwnode, child)	       \
+> +	for (struct fwnode_handle *child __free(fwnode_handle) =	       \
+> +		fwnode_get_next_available_child_node(fwnode, NULL); child;     \
+> +	     child = fwnode_get_next_available_child_node(fwnode, child))
+> +
 
-Did you look at a side by side comparison? There is really very little
-extra code.
+On OF, the implementation of the .get_next_child_node() fwnode op is:
 
-> 
-> If we don't care about opening up fanout groups to ETH_P_NONE, then
-> patch v2 seems sufficient. If explicitly blocking this, the ENXIO
-> return can be added, but ideally without touching the other lines.
-> 
+static struct fwnode_handle *
+of_fwnode_get_next_child_node(const struct fwnode_handle *fwnode,
+                              struct fwnode_handle *child)
+{
+        return of_fwnode_handle(of_get_next_available_child(to_of_node(fwnode),
+                                                            to_of_node(child)));
+}
 
-I am not the one to decide if opening it is a good idea but it will be
-ironic if a patch with the intention to remove the only-RUNNING
-restriction will end up allowing never-RUNNING sockets into a fanout
-group.
+On ACPI we currently have .device_is_available() returning false but that
+probably should be returning true instead (it's been virtually unused
+previously).
 
-> > > > I realized another possible problem. We should consider adding
-> ifindex
-> > > > Field to struct packet_fanout to be used for lookup of an existing
-> > > match.
-> > > > There is little sense to bind sockets to different interfaces and
-> then
-> > > > put them in the same fanout group.
-> > > > If you agree, I can prepare a separate patch for that.
-> > > >
-> > > > > The type and dev must match that of the fanout group, and once
-> added
-> > > > > to a fanout group can no longer be changed (bind will fail).
-> > > > >
-> > > > > I briefy considered the reason might be max_num_members
-> accounting.
-> > > > > Since f->num_members counts running sockets. But that is not used
-> > > > > when tracking membership of the group, sk_ref is. Every packet
-> socket
-> > > > > whose po->rollover is increased increases this refcount.
-> > > > >
-> > > > > > What about using ifindex to detect bind? Initialize it to -1 in
-> > > > > > packet_create and ensure that packet_do_bind, on success, sets
-> it
-> > > > > > to device id or 0?
-> > > > > >
-> > > > > > psock_fanout, should probably be extended with scenarios that
-> test
-> > > > > > "all devices" and all/specific protocols. Any specific scenario
-> > > > > > suggestions?
-> > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > > >
-> > >
-> >
-> >
-> 
+That makes fwnode_get_next_available_child_node() and
+fwnode_get_next_child_node() equivalent on both ACPI and OF. Presumably
+creating unavailable nodes would be useless on swnode, too.
 
+So my question is: what do we gain by adding all these fwnode_*available()
+helpers?
 
+>  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+>  						 struct fwnode_handle *child);
+
+-- 
+Regards,
+
+Sakari Ailus
 
