@@ -1,173 +1,126 @@
-Return-Path: <netdev+bounces-134703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3247E99AE6B
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:02:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E69CD99AE78
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B58E1C21C37
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 228261C21D35
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765FC10A1F;
-	Fri, 11 Oct 2024 22:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784BF1D174F;
+	Fri, 11 Oct 2024 22:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LyD7loEo"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qNY9EH3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2677F9;
-	Fri, 11 Oct 2024 22:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9219B7F9
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728684144; cv=none; b=ZkbQEr4r0SUHB6sgvgize/D1GsNqXW+/FSEu/aLdeYf3Jnhv2NU+zZHNtb+2IlGkJJXoyYDKTCYyeUXsEMm7uB7/SgoMtW3lL+yXCDJhbW+yBdrBLWvML5XriOmkFxoBfM+5opX/w3PgmXUk3CjgF1YN4K3xhTR9AubF4KaQer8=
+	t=1728684363; cv=none; b=Nv3Tfm55xF/DLiHYi/ZGOqhDpkgy/bEQLu8Tw3LrMW32QqgohvFuJt/MEz7zlvkEgGUhJe0AbwPolP7qGlqZeCGWiWbja2735pDaLUoaF7gMfEg/uWfdqhPKBCX80dM5rFY4/etwurVS3avfW9WTSra+gQeGDxtrVKQrfSNSQa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728684144; c=relaxed/simple;
-	bh=bgNYNmsflmWvAGLUvqWN3OoCog44ijpeG3esEhF/BUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GkDOutRHfrS6KjGyT1b1zd5Dro3iPFt4U49hIBl1JtGj9ktsoCh6nMI7+aFY6OEH2f+hvIrM3vDViD9l85uHMPp9nd2c7OWmeMaeP8TrWGxan26iUG/qWnngJmR3eRJnpb7eEsrbnvlS/dxldKTheCIFlk8KhEkuxvuJ2yZJT6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LyD7loEo; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a99650da839so411865066b.2;
-        Fri, 11 Oct 2024 15:02:22 -0700 (PDT)
+	s=arc-20240116; t=1728684363; c=relaxed/simple;
+	bh=8X4RLywbrH4DW4JHhECHz0WNDOYF+t0ki/eWMrFuMOM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B0ng2izcc46z3hnTXwUd4eqUxJPqycCHu31VZVsdWPvqI4MmHm3zTLOmgkyVU6hlodtJXWjPox9USyzpIU3r42LqBAFlMbU4KELQXK1Xqvs3uMinwRyT2PbgUaBPRIvcvKiIgesATuNLf2kM4qe2agIH6ctoHfJbKi6DrwV/jQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qNY9EH3v; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728684141; x=1729288941; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1kWUCwLnYbZlauyEs9Wnez5KPziLHEMtLzqhUZDiV3U=;
-        b=LyD7loEoa2ZMqPKTWxCe+HvDDnGN/6ptAWrijILpTbF6swaYj7qGa0LsAoKN7hUyD2
-         zIzwWhyQcgsXGCB9VSZ6nCfngxnKnyL8HMcP2LEy0HWLVkbs2ha7r05jeAyc+VlwqPSA
-         O+epfB99dEtV1uf2fooEq2SEX/sSQaS5JaTXyvFS5iDXqyuZ5S2J8QCed+syoDWQ8qXv
-         qCxmAsWjqE8iKeF0njKLoMcpHWtIFWRUUfGVScqIcP+uy4NIxRtwDG1HXZhviVCD1C50
-         mQdSZS3rypYhQkJ61xQ9EIA8hhFaKsVH8PtNAz9R8lwYwWWbuaHxS0zF2Qa1+cCVaZkT
-         /C2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728684141; x=1729288941;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1kWUCwLnYbZlauyEs9Wnez5KPziLHEMtLzqhUZDiV3U=;
-        b=TvrviG2LLKWht1WwkK9iJquUgbXPlzkjXseU58LxiduVZa1mHYP+dRCQsKtLfFqwSN
-         s8fEn8e2WX34lXLa7Id8MMpIC8IJYUQ2eHUrWuPLkD6DzHgcQ+ofHFcscBlja89zIW29
-         kZBmqeKu9xSz9PMPfCr3nOWmzrc74hVKaFFic5b8DnfrJ4WbVkuvk2HhW9bF9FbZpumE
-         5iX0CKvhRW2kCy2TTNwUhqu5RNsag7/iyheoNBi1TbB2h7CYb1q2EiZ5/LcIErUQ5lzr
-         2yzQRDxPhZIiuoaJPQ/htrStuCpO9e+we/zM7ivRQBa+yr/Gem1FhZJrtgQ1OHl8vycl
-         WHnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVC1sdeJ+a+VZPcTSJyExwdtgRQYBnnrqcrMC8Sd+USlVGmUN4Hrz815nG287W404BDhsEDG/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLhN7EE43IMyxXwcW9hJz4Ffh6nxwlB5PGA071RKmAIMXEMoh8
-	isecyO/QQZfgHsNhI79MGBv2NxJDZT2WEz+dUzZrySv6H/p/ZaQ1
-X-Google-Smtp-Source: AGHT+IENrLEGrfXplxgzPrLujFuIjCYP3tylt9fhO6wqNjcBzi5l8LxiTGPwJ6Q6RjaOxpo3OBaepg==
-X-Received: by 2002:a17:906:fe4b:b0:a99:8abf:3610 with SMTP id a640c23a62f3a-a99e3b30f48mr82456666b.14.1728684140695;
-        Fri, 11 Oct 2024 15:02:20 -0700 (PDT)
-Received: from [192.168.42.194] ([85.255.233.136])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a80dc524sm259482366b.148.2024.10.11.15.02.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 15:02:20 -0700 (PDT)
-Message-ID: <7d321d9e-48bb-4e5f-bca5-6a6c940e3a9a@gmail.com>
-Date: Fri, 11 Oct 2024 23:02:52 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728684362; x=1760220362;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=U8NibbuwsOAYpP/wbseyMkMnAATMttUw8oNp0YPMjmg=;
+  b=qNY9EH3vHmKWzNI2UX4lC6nqSjFq0fMlTrGCIZj3iCjqG44k/cjUJO2S
+   LyMjWkQ44Tr4QXTwnr74uGDrUqyuWfHDS2AHCGSKKPp6iGQO+x231eMrs
+   WoZbv1xHbl2DRcJ7aZVGhJ3HCOeqcK8CxCvn6yfju1xIv4/tBzVEUX4fB
+   k=;
+X-IronPort-AV: E=Sophos;i="6.11,196,1725321600"; 
+   d="scan'208";a="434489027"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 22:05:58 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:2962]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
+ id 22cae159-bf2c-4bf0-8fd9-a3e4b908d723; Fri, 11 Oct 2024 22:05:57 +0000 (UTC)
+X-Farcaster-Flow-ID: 22cae159-bf2c-4bf0-8fd9-a3e4b908d723
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 11 Oct 2024 22:05:57 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 11 Oct 2024 22:05:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 00/11] rtnetlink: Use rtnl_register_many().
+Date: Fri, 11 Oct 2024 15:05:39 -0700
+Message-ID: <20241011220550.46040-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 03/15] net: generalise net_iov chunk owners
-To: David Wei <dw@davidwei.uk>, Stanislav Fomichev <stfomichev@gmail.com>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <20241007221603.1703699-4-dw@davidwei.uk> <ZwVT8AnAq_uERzvB@mini-arch>
- <ade753dd-caab-4151-af30-39de9080f69b@gmail.com> <ZwavJuVI-6d9ZSuh@mini-arch>
- <b2aa16ac-a5fe-4bab-a047-8f38086f4d43@davidwei.uk>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <b2aa16ac-a5fe-4bab-a047-8f38086f4d43@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 10/11/24 19:44, David Wei wrote:
-> On 2024-10-09 09:28, Stanislav Fomichev wrote:
->> On 10/08, Pavel Begunkov wrote:
->>> On 10/8/24 16:46, Stanislav Fomichev wrote:
->>>> On 10/07, David Wei wrote:
->>>>> From: Pavel Begunkov <asml.silence@gmail.com>
->>>>>
->>>>> Currently net_iov stores a pointer to struct dmabuf_genpool_chunk_owner,
->>>>> which serves as a useful abstraction to share data and provide a
->>>>> context. However, it's too devmem specific, and we want to reuse it for
->>>>> other memory providers, and for that we need to decouple net_iov from
->>>>> devmem. Make net_iov to point to a new base structure called
->>>>> net_iov_area, which dmabuf_genpool_chunk_owner extends.
->>>>>
->>>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->>>>> Signed-off-by: David Wei <dw@davidwei.uk>
->>>>> ---
->>>>>    include/net/netmem.h | 21 ++++++++++++++++++++-
->>>>>    net/core/devmem.c    | 25 +++++++++++++------------
->>>>>    net/core/devmem.h    | 25 +++++++++----------------
->>>>>    3 files changed, 42 insertions(+), 29 deletions(-)
->>>>>
->>>>> diff --git a/include/net/netmem.h b/include/net/netmem.h
->>>>> index 8a6e20be4b9d..3795ded30d2c 100644
->>>>> --- a/include/net/netmem.h
->>>>> +++ b/include/net/netmem.h
->>>>> @@ -24,11 +24,20 @@ struct net_iov {
->>>>>    	unsigned long __unused_padding;
->>>>>    	unsigned long pp_magic;
->>>>>    	struct page_pool *pp;
->>>>> -	struct dmabuf_genpool_chunk_owner *owner;
->>>>> +	struct net_iov_area *owner;
->>>>
->>>> Any reason not to use dmabuf_genpool_chunk_owner as is (or rename it
->>>> to net_iov_area to generalize) with the fields that you don't need
->>>> set to 0/NULL? container_of makes everything harder to follow :-(
->>>
->>> It can be that, but then io_uring would have a (null) pointer to
->>> struct net_devmem_dmabuf_binding it knows nothing about and other
->>> fields devmem might add in the future. Also, it reduces the
->>> temptation for the common code to make assumptions about the origin
->>> of the area / pp memory provider. IOW, I think it's cleaner
->>> when separated like in this patch.
->>
->> Ack, let's see whether other people find any issues with this approach.
->> For me, it makes the devmem parts harder to read, so my preference
->> is on dropping this patch and keeping owner=null on your side.
-> 
-> I don't mind at this point which approach to take right now. I would
-> prefer keeping dmabuf_genpool_chunk_owner today even if it results in a
-> nullptr in io_uring's case. Once there are more memory providers in the
-> future, I think it'll be clearer what sort of abstraction we might need
-> here.
+This series converts all rtnl_register() and rtnl_register_module()
+to rtnl_register_many() and finally removes them.
 
-That's the thing about abstractions, if we say that devmem is the
-only first class citizen for net_iov and everything else by definition
-is 2nd class that should strictly follow devmem TCP patterns, and/or
-that struct dmabuf_genpool_chunk_owner is an integral part of net_iov
-and should be reused by everyone, then preserving the current state
-of the chunk owner is likely the right long term approach. If not, and
-net_iov is actually a generic piece of infrastructure, then IMHO there
-is no place for devmem sticking out of every bit single bit of it, with
-structures that are devmem specific and can even be not defined without
-devmem TCP enabled (fwiw, which is not an actual problem for
-compilation, juts oddness).
+Once this series is applied, I'll start converting doit() to per-netns
+RTNL.
 
-This patch is one way to do it. The other way assumed is to
-convert that binding pointer field to a type-less / void *
-context / private pointer, but that seems worse. The difference
-starts and the chunk owners, i.e. io_uring's area has to extend
-the structure, and we'd still need to cast both that private filed
-and the chunk owner / area (with container_of), + a couple more
-reasons on top.
+
+Kuniyuki Iwashima (11):
+  rtnetlink: Panic when __rtnl_register_many() fails for builtin
+    callers.
+  rtnetlink: Use rtnl_register_many().
+  neighbour: Use rtnl_register_many().
+  net: sched: Use rtnl_register_many().
+  net: Use rtnl_register_many().
+  ipv4: Use rtnl_register_many().
+  ipv6: Use rtnl_register_many().
+  ipmr: Use rtnl_register_many().
+  dcb: Use rtnl_register_many().
+  can: gw: Use rtnl_register_many().
+  rtnetlink: Remove rtnl_register() and rtnl_register_module().
+
+ include/net/rtnetlink.h  |  15 +++--
+ net/can/gw.c             |  26 +++-----
+ net/core/fib_rules.c     |  24 ++++---
+ net/core/neighbour.c     |  19 +++---
+ net/core/net_namespace.c |  13 ++--
+ net/core/rtnetlink.c     | 135 +++++++++++++++------------------------
+ net/dcb/dcbnl.c          |   8 ++-
+ net/ipv4/devinet.c       |  18 ++++--
+ net/ipv4/fib_frontend.c  |  12 ++--
+ net/ipv4/ipmr.c          |  19 +++---
+ net/ipv4/nexthop.c       |  26 ++++----
+ net/ipv4/route.c         |   8 ++-
+ net/ipv6/addrconf.c      |  52 ++++++---------
+ net/ipv6/addrlabel.c     |  27 +++-----
+ net/ipv6/ip6_fib.c       |   9 ++-
+ net/ipv6/ip6mr.c         |  12 ++--
+ net/ipv6/route.c         |  21 +++---
+ net/sched/act_api.c      |  12 ++--
+ net/sched/cls_api.c      |  24 +++----
+ net/sched/sch_api.c      |  18 +++---
+ 20 files changed, 238 insertions(+), 260 deletions(-)
 
 -- 
-Pavel Begunkov
+2.39.5 (Apple Git-154)
+
 
