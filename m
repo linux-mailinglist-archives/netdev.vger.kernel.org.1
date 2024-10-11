@@ -1,152 +1,152 @@
-Return-Path: <netdev+bounces-134603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D40A99A649
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:28:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BA4F99A64F
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 16:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E84692863F0
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:28:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC1241C2110E
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 14:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EA62194A5;
-	Fri, 11 Oct 2024 14:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DA2219C91;
+	Fri, 11 Oct 2024 14:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WHVjerdU"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="mgAWZOdK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B56212F13;
-	Fri, 11 Oct 2024 14:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E467521949A
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 14:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728656886; cv=none; b=j3O2lT2nzFLOII7VR5CU5gBZq8yq6qdZcScyTQFp7NAApCxRFsd83Ljy0IFxcpYicv5vGeVj2+fr3TIifh1eda/6XDlgWerYzrG0fOu/z1jGUn4cc90M8/0NeLSmZocsG60sL+p5xr5ZB+DKkD8q5r/+CRIBQ/RUSGQjzgWPp5E=
+	t=1728656895; cv=none; b=P/jEif/U0QaIz58JL6UybGeOn4h/DQc7BnjLuLhVNxvmUicmtG8kXcJ11GEWKiISocbSrTNCK5/A1/EtiVF4MLLhSJd8Lt/RkN8YXmr1UKVNgSDf8fDmFsr48zmNJ4klUlopECPFHHUGT17UcZ3CK07zDUEzI5u3HoCOqVP5vOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728656886; c=relaxed/simple;
-	bh=L+gXCKny+WaarEbGPHZM3dwhDvC1Mp2ZZsPvrE1lgBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kYWm8kp1d7IEX/rqAx+LhWYz/hW05nIsy4BwCeNP92KNzIIkRCo7IzDGG/4zlr+GwA3p2EwqT8YTa9bDzpJCJMjjgoy1f2uZxQLUx3m2PZXgCyKpL0Mvofvm21KhDx1DMoxDcp80PWJvZsNAZ/3qpYqS9bPGl3YV+ypidbypuC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WHVjerdU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49BAw7hA006577;
-	Fri, 11 Oct 2024 14:27:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	zLNY1QKiA67jtVorzKmEfKmwe+WAqPbBGq8S+bpyAzo=; b=WHVjerdUlVtW0KCl
-	4Mmxrn7fqWOKdGLTvuSQ7eOjr1shNhGb3FwZ3egWxs/g6Qlv+CKrtIvps+CbGtq3
-	+BR/EvjprAGPDGkz7KJSqEJ67eI/2NAnvcYeai6duKssWbkx0cDiQwhz7mdblEc1
-	AFZvnoHgBBwUw5qOZO2q5e+w5hVUy8v+G7FHAG5SMFHyVZRPHi3wTs6K7YvNotwZ
-	faoXMu9wKCNQKjm0O9Ngk37uP0XA52Beojq2Hxn6M/Z1OFRIsJWbozEkBCbUhkSj
-	8/0BnYOcfOy86+1sVonlUI5IfkvFEyR46B9iQQU1LBEkVIlZCwTNXbQ2/vPFltBA
-	NnsPMw==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 426t7st170-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 14:27:46 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49BERjhn002310
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 14:27:45 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 11 Oct
- 2024 07:27:44 -0700
-Message-ID: <468f05e2-1717-3bd1-2ccb-280865180b0c@quicinc.com>
-Date: Fri, 11 Oct 2024 08:27:43 -0600
+	s=arc-20240116; t=1728656895; c=relaxed/simple;
+	bh=dZ2uJBuBtTGAw2QAlPejjh+gQEDHGouBsp+uBPMgULQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HCIuJAEM9vs9r9HNh8W+whDjMhfWaubB47UflMKI/UZS8tJ/XdU/D8O3a9/FYHdvlVaZYI0JyguSRmr9Yh1vjwkbouy+vAPYj++Km/fGdGFz/QIWYjnSzzB49rGEPT88nHQghqrABf8Lp3SkgT0GWoX46Gd9GsYwdnXiWiKs1gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=mgAWZOdK; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20c544d345cso15323195ad.1
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 07:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1728656893; x=1729261693; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KBZQ+2J87sYav7kebav8OyZqDFhTRod6WA3hieQG8as=;
+        b=mgAWZOdKyCyZWUx5X3j7fGcx9gicg3nXuaGwPWhJ7UKQnWjBFqicLaPqmou4hw8vGy
+         FIAmpkzXwKCx/Hx5bGDILwl9z+P8EZQDsIwO6Aw+ETNIdF2AXNbqRVMOyBJxeoElKg25
+         GFwgZQBm6Aq4PkVWoAdViWztQ6FjgmR1xuWtZ2XGGkIJGbpGmB6Ql7YHOFZWVmFdSOmy
+         78Qq6zp7+UM1S0/1/6jlqTYDGTT/xst3YdxTqFDS4oAzXFpnRxWfX13cPhM2VuSvSB62
+         ml5WMURIRj5QY7feCoqmfxr2Qe8635D3dW5fPoTJD3zE44ZK4uOja31mybC4FgnNtJNg
+         jBDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728656893; x=1729261693;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KBZQ+2J87sYav7kebav8OyZqDFhTRod6WA3hieQG8as=;
+        b=vVImHJZqPj3GzrxXk0DHodogTbXOMjkDcHoFd1qrJL2X4Y2t0+FckIiiDQ7yKpfyX2
+         GRv7SBbt1LnNeCSax+QIU3oCFU98AcwX9wTawsn6Kp27TOSysx/pvXvl6UfHbMOV+XJX
+         q8wBaqibLc5nhnt9X2vVD02BhpY9Oz0V8C7I+p/uGv+YdzXG2raHUhINdWSR14bYbF4r
+         O2O5cAomTtLWjG05ZAOcs+fWu1/rEeRgwpsEJyh2qq4/Y3Ew1E3g3DWL2lI9AB1Lf47y
+         1ezplWH+QlBIVDhsBgmAtPjA7DfmfdVIazHltnLNEFpAykI9yoFHGb1zv20ISn391puF
+         IREg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHo30MpTcQ5VmcbVCw9+OQpL7e7iWOU5n7Q9xAKCET8zlROt+KH9l4VzYHTw54ZEYLbsyOKlg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy01fHWJlWWXQCr9NYJMYOJ/W/VrICRKteVDGtqWuqcImH/ukPz
+	sv+LxbUqqCMLUfXD5hTB3IMOATSvKu2qovs+NDI0Bcf2d27pZ2YXETlSftKHDg==
+X-Google-Smtp-Source: AGHT+IFpARG86PhhEVo6F/Tdu/AM2ZhKscV8jOqr4HoNjHDI+Ipqgu3Uc83GD/Wl5uxNiWS2KH90lw==
+X-Received: by 2002:a17:902:f54f:b0:20c:62af:a0f0 with SMTP id d9443c01a7336-20c80460de8mr127023015ad.7.1728656893153;
+        Fri, 11 Oct 2024 07:28:13 -0700 (PDT)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8badc3bdsm24008755ad.61.2024.10.11.07.28.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 07:28:12 -0700 (PDT)
+Message-ID: <d8e729ed-0bc8-4094-ad22-36c6312def25@mojatatu.com>
+Date: Fri, 11 Oct 2024 11:28:07 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH net-next 3/3] accel/qaic: Pass string literal as format
- argument of alloc_workqueue()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jiawen Wu
-	<jiawenwu@trustnetic.com>,
-        Mengyuan Lou <mengyuanlou@net-swift.com>,
-        "Nathan
- Chancellor" <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>,
-        "Carl Vanderlip" <quic_carlv@quicinc.com>,
-        Oded Gabbay <ogabbay@kernel.org>, <UNGLinuxDriver@microchip.com>,
-        <netdev@vger.kernel.org>, <llvm@lists.linux.dev>,
-        <linux-arm-msm@vger.kernel.org>, <dri-devel@lists.freedesktop.org>
-References: <20241011-string-thing-v1-0-acc506568033@kernel.org>
- <20241011-string-thing-v1-3-acc506568033@kernel.org>
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <20241011-string-thing-v1-3-acc506568033@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
+To: David Wei <dw@davidwei.uk>, Mina Almasry <almasrymina@google.com>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <CAHS8izOv9cB60oUbxz_52BMGi7T4_u9rzTOCb23LGvZOX0QXqg@mail.gmail.com>
+ <2b23d0ba-493b-48ba-beca-adc1d1e0be61@mojatatu.com>
+ <2ff04413-9826-4696-9c8a-7a40cd886aae@davidwei.uk>
+Content-Language: en-US, en-GB
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <2ff04413-9826-4696-9c8a-7a40cd886aae@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: PSMKLJF5TTSph64DwS_tuqCkpSa_1WXE
-X-Proofpoint-ORIG-GUID: PSMKLJF5TTSph64DwS_tuqCkpSa_1WXE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0 priorityscore=1501
- suspectscore=0 impostorscore=0 clxscore=1011 adultscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410110100
 
-On 10/11/2024 3:57 AM, Simon Horman wrote:
-> Recently I noticed that both gcc-14 and clang-18 report that passing
-> a non-string literal as the format argument of alloc_workqueue()
-> is potentially insecure.
+On 10/10/2024 21:35, David Wei wrote:
+> On 2024-10-09 11:21, Pedro Tammela wrote:
+>> On 09/10/2024 13:55, Mina Almasry wrote:
+>>> [...]
+>>>
+>>> If not, I would like to see a comparison between TCP RX zerocopy and
+>>> this new io-uring zerocopy. For Google for example we use the TCP RX
+>>> zerocopy, I would like to see perf numbers possibly motivating us to
+>>> move to this new thing.
+>>>
+>>> [1] https://lwn.net/Articles/752046/
+>>>
+>>
+>> Hi!
+>>
+>>  From my own testing, the TCP RX Zerocopy is quite heavy on the page unmapping side. Since the io_uring implementation is expected to be lighter (see patch 11), I would expect a simple comparison to show better numbers for io_uring.
 > 
-> E.g. clang-18 says:
+> Hi Pedro, I will add TCP_ZEROCOPY_RECEIVE to kperf and compare in the
+> next patchset.
 > 
-> .../qaic_drv.c:61:23: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
->     61 |         wq = alloc_workqueue(fmt, WQ_UNBOUND, 0);
->        |                              ^~~
-> .../qaic_drv.c:61:23: note: treat the string as an argument to avoid this
->     61 |         wq = alloc_workqueue(fmt, WQ_UNBOUND, 0);
->        |                              ^
->        |                              "%s",
+>>
+>> To be fair to the existing implementation, it would then be needed to be paired with some 'real' computation, but that varies a lot. As we presented in netdevconf this year, HW-GRO eventually was the best option for us (no app changes, etc...) but still a case by case decision.
 > 
-> It is always the case where the contents of fmt is safe to pass as the
-> format argument. That is, in my understanding, it never contains any
-> format escape sequences.
-> 
-> But, it seems better to be safe than sorry. And, as a bonus, compiler
-> output becomes less verbose by addressing this issue as suggested by
-> clang-18.
-> 
-> Also, change the name of the parameter of qaicm_wq_init from
-> fmt to name to better reflect it's purpose.
-> 
-> Compile tested only.
+> Why is there a need to add some computation to the benchmarks? A
+> benchmark is meant to be just that - a simple comparison that just looks
+> at the overheads of the stack.
 
-I'm not sure why this looks like it is targeted for net-next.  I'm not 
-seeing any dependencies on net code, nor is this a net driver.  My 
-confusion makes me think I might be missing something.
+For the use case we saw, streaming lots of data with zc, the RX pages 
+would linger for a reasonable time
+in processing and the unmap cost amortized in the hotpath.
+Which was not considered in our simple benchmark.
 
-I'll plan on independently taking this through DRM, unless something is 
-brought to my attention.
+So for Mina's case, I guess the only way to know for sure if it's worth 
+is to implement the io_uring approach and compare.
 
-Regarding the patch itself, looks sane to me.  I'll give it run through 
-on hardware soon.
+> Real workloads are complex, I don't see> this feature as a universal win in all cases, but very workload and
+> userspace architecture dependent.
 
--Jeff
+100% agree here, that's our experience so far as well.
+Just wanted to share this sentiment in my previous email.
+
+I personally believe the io_uring approach will encompass more use cases 
+than the existing implementation.
+
+> 
+> As for HW-GRO, whynotboth.jpg?
+
+For us the cost of changing the apps/services to accomodate rx zc was 
+prohibitive for now,
+which lead us to stick with HW-GRO.
+
+IIRC, you mentioned in netdevconf Meta uses a library for RPC, but we 
+don't have this luxury :/
+
+
+
 
