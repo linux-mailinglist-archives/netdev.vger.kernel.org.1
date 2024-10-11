@@ -1,118 +1,176 @@
-Return-Path: <netdev+bounces-134487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776D0999CBD
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 08:33:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB1D999CD6
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 08:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01BE6B224CB
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 06:33:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FF341C21ED6
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 06:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488A320A5FF;
-	Fri, 11 Oct 2024 06:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FE120897F;
+	Fri, 11 Oct 2024 06:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihyLHtcZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WykoIgtS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8441FCC75;
-	Fri, 11 Oct 2024 06:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398BE199FB9;
+	Fri, 11 Oct 2024 06:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728628329; cv=none; b=XUzgWcJw9eVUohRzsWBOPcdPy3cpOV5aw0I3HQpsOTdOlucl7ogCGHHIfD+V8xMJJzJyCr+6vT6Ymg5xF0omlqrlOJAp+Vz5l/+eibKI0r9dxjjZbqjB5U/jHZpBEXe3R3AQvDZGqPukD6t6CBx8ffl0AVMbomeYnxzRewTD+CM=
+	t=1728628933; cv=none; b=i3LV+mJE1dg88Z3ykOCIyRNd/pyFp4DgakkajEWzCG1N/uyczwkhboaXzp/O8INvf70+NreS6X/equ25SLaAxe+H2yF53GENGOkD4VJG3W9BBVTgSNwNWnUgOW25Gz9qsu8RG5Tb4jJPux/vFuNRTqW8e4fyq3jDdZluCAEo1To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728628329; c=relaxed/simple;
-	bh=13dCV3kWAAYPx5fa33hRGiCLH9dgqHe0//VTY9onCuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uf1kn5D/6aeAAOr+DiiQMMYtI/N5FMVyuxiPyEdKPU+W5F/HjjydU7BtBhXN8Alp3ukPoq0yj4erYpGmpWTE8qD+zh792UDirwtrANfhcLObPUjS0qAQQaUgQ1ty0drIIRc0RA2qM1KROhV6JfDNMGtCSemafIv0IbZ0dMPO7T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihyLHtcZ; arc=none smtp.client-ip=209.85.167.171
+	s=arc-20240116; t=1728628933; c=relaxed/simple;
+	bh=rTU3z5nXZ0203U12sB1J6Lev02OVO6OGTj84QaOG73M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m8FIXMLgJYKS3SFbnGx6UuO/XmzXOpuEAcmr2XRpkoYZf6TWP1Dq0msWq2IV0HwBrn6wzXwP8Pp82O09+bj3X5gXbXVJ+qoCuZSMDQUWjYH04yNjpP8A7ziyBaYb7/tKn0TvYK+q40MbI1JTDutj+xoFytcsAJ44JVJO28PRxzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WykoIgtS; arc=none smtp.client-ip=209.85.128.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3e3dfc24a80so1075658b6e.2;
-        Thu, 10 Oct 2024 23:32:07 -0700 (PDT)
+Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-6e34fa656a2so1880927b3.1;
+        Thu, 10 Oct 2024 23:42:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728628326; x=1729233126; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728628931; x=1729233731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a4XqDMH4pZzArH3MjM6e77LuXKEUbkAL8eknF5yWjS8=;
-        b=ihyLHtcZiUKlB9QdigWS9K0dQC62Y/O7YaaqUMaBAv2YJ+TB8JEuutGrX1VY6AuMzV
-         5G+abctJL0obs4T957pg3sgqItAP8Lqy+yghksCJnjCdUA1sBR55vX9dwsxc5YNk655I
-         RGT6ntPVaJdaw8m7iqKhX+CFTAJytgRuy2XG/yuzMelaYzh3gDMZ/x7dTpgM71q9RFfw
-         wobeFL21YxxV6xWe8+SL0XidT7JLKXve4ilgV615gV8lCRSwUQebc+L9RXwDZyZh3E7w
-         SY4MguhFSIl/mNPFhrFVIvO2J901WXTkH38pSNa7MAgeJ49AfbrMXSYSuOaLSTYQxEs8
-         FK6w==
+        bh=kVhuLsogfUzSYpWHUkggflusdlhQlsEWtOFwPdr5aPY=;
+        b=WykoIgtSugMAgD8gJOoZyVWORCDf8X46OFEeFCFHpiwQm+lRDoz7TgdAIZtx25vbTO
+         skHg94ykXZJbNhJOZ5731YrTt7/irTfnIqEMadyRbMkwd2Y9zvDDouJtgpECtewCHZGp
+         iN71VckEk8PkTG8thuwA1rDs+E74AMBo3l7DbHBmMWtwg5wwOMxNHYm5rgjLaMEEFbxL
+         Q6l6sEouLH78jaGkhZcNkaadV2mrL+HdlfJ3Kd3rAIXEiiRVt0wKIRj1QtwX7S4KLTTF
+         hMIZoUgdwhLHnRNQPJY+/Th1wvgJip7oigRyIA1VpVJkSedf91yWw1QeLfYgpxclSgbN
+         OM1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728628326; x=1729233126;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728628931; x=1729233731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a4XqDMH4pZzArH3MjM6e77LuXKEUbkAL8eknF5yWjS8=;
-        b=ONOS5P1awDi5pvzS/CiS3L/JwKM21NxLU+k6PbrLeqxVZERTJwEVTCh36lE6Q02V8m
-         L0YrHuyotIRXwFSy/v6l8HAHPF5fuaEmDorSj/UB1tZY1BMLUC1ghEcwfVgqWixFxtZK
-         TvPLCwyymJThVmSNpVzbzwOZL9928AuScyuGYdfpZgNiDvdo/Wdb1M34zWnAKEsTrlh4
-         8IO4mRf+FxD2uTI3iLLspnq+O63DBZVSHsDSKZXEWWfsKB3qYtQ4hAMD76eDc4HNTLeT
-         0bGr1AjWpDvS5c4Q4sGXMPP4FRiQRulykX5I4LSpS8iRUmupr30leP5EkG+5fgg+AuWi
-         44mw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjB8+sADZUOp+Ovo1IbCUtk31SspXFFwxLezzEFjq4Cz5l4FBMbCUahnCaNGkeHwJLDcrwfdTwDZ4cwoI=@vger.kernel.org, AJvYcCXkRFrkHEMua9oeW0WiIQMISgK2/L/TGDnVQdNU52WXq7hn0sGxF3Yt8QYeSjQv/yWWiTVgPUjN@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGeiodCr/gEXrypi7Vr1UypCdaKuqdfjdpBY3/dkjnIGRfHy7q
-	t72DcKNkwe9pxniJjaN9UzASZGQ7JQ4LTcLVXyaylU/AHNZSuO5C
-X-Google-Smtp-Source: AGHT+IHApRESLPacUyw6ARMFxeD+8+Myu2m3IOu4bGEFE6CDC5bPOhwCrGsxjsKZdWzx9x5vUwFAkw==
-X-Received: by 2002:a05:6808:210a:b0:3e0:4076:183b with SMTP id 5614622812f47-3e5c9119695mr1291478b6e.32.1728628326453;
-        Thu, 10 Oct 2024 23:32:06 -0700 (PDT)
-Received: from localhost ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2a9f5419sm2007668b3a.50.2024.10.10.23.32.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 23:32:06 -0700 (PDT)
-Date: Fri, 11 Oct 2024 14:31:58 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, xfr@outlook.com
-Subject: Re: [PATCH net-next v1] page_pool: check for dma_sync_size earlier
-Message-ID: <20241011143158.00002eca@gmail.com>
-In-Reply-To: <CAC_iWjL7Z6qtOkxXFRUnnOruzQsBNoKeuZ1iStgXJxTJ_P9Axw@mail.gmail.com>
-References: <20241010114019.1734573-1-0x1207@gmail.com>
-	<601d59f4-d554-4431-81ca-32bb02fb541f@huawei.com>
-	<20241011101455.00006b35@gmail.com>
-	<CAC_iWjL7Z6qtOkxXFRUnnOruzQsBNoKeuZ1iStgXJxTJ_P9Axw@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+        bh=kVhuLsogfUzSYpWHUkggflusdlhQlsEWtOFwPdr5aPY=;
+        b=wS36o6a55KXiEy28LJm3xKHxpB5tifvvhgoPoBnriZ/q/ayxoQvSPqH974t0ifukcg
+         V7YTgqhP0nIWxAn4gQEMd9PKeTVRJtZ5qpit6WTYXjaxTiAdQXc1lmFeZ76I82fSIsDj
+         9lD+rN9f03p0fmOPji8Ihqd6299r4mjvdLTj4tnGSYRKMOy0DU7pF2E4M0E2JIxmIFdZ
+         S6ZEuhdGueXswq5XHkIXcVV+1G7bz4+z0uM1EgDQpmMhYB5rp6oVnIs7xaxDyNss1xr9
+         w3KQuSJNBzONSWttN8yXdVvYOg5+Z6Ogx5LanIEiXI0utzVc/ADwuECdyxZXsQT3Rgu8
+         tn5w==
+X-Forwarded-Encrypted: i=1; AJvYcCUasYVsApHTe4bOjZNIipuxaEmd9EHJ147FMlI7dMdqDxq15rS2hc50WLaJIpR8qtN9WFg=@vger.kernel.org, AJvYcCVSVBPs2+bGuv+d78PxWTo7KfreVsJ5FstTfKzWArFUhKRE/FH9ktL6Iw0+5JG04feXU8aoUZ/c@vger.kernel.org, AJvYcCXep4mthh9uB4jg/jzZ5Z2nw3gjyV5dzSh3SKobVmLsw3Vfg1jjTv9rYbSenrRjdvyvkA7sxnJc+zTDZ1b4@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2nHN4ujwh2TxNB5DxHjd36M6FBfjnjhdTbtXwrkt/zZQxTdRA
+	w+OfRuRrR8/D58gtc2TQ96BcqxMfxm9K9lH4iq9GEmEWYfEO7Z6L1eD2UuVo5aI4vwHAMbDzi4D
+	KuwxUP7xHXijNUyEPRA53iFS5C/c=
+X-Google-Smtp-Source: AGHT+IGsjrvTm/ajEWNecyoWQ9v/ap1xzqKOckWzZqAyHc6KxoFC3fryNMajDXN25+sd4N5fKXWl0LfWyL51t+GAZa8=
+X-Received: by 2002:a05:690c:670e:b0:699:7b60:d349 with SMTP id
+ 00721157ae682-6e3479b94d3mr10877237b3.11.1728628931231; Thu, 10 Oct 2024
+ 23:42:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241007074702.249543-1-dongml2@chinatelecom.cn>
+ <20241007074702.249543-2-dongml2@chinatelecom.cn> <7caf130c-56f0-4f78-a006-5323e237cef1@redhat.com>
+ <CADxym3baw2nLvANd-D5D2kCNRRoDmdgexBeGmD-uCcYYqAf=EQ@mail.gmail.com>
+In-Reply-To: <CADxym3baw2nLvANd-D5D2kCNRRoDmdgexBeGmD-uCcYYqAf=EQ@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Fri, 11 Oct 2024 14:42:53 +0800
+Message-ID: <CADxym3ZGR59ojS3HApT30G2bKzht1pbZG212t3E7ku61SX29kg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/7] net: ip: make fib_validate_source()
+ return drop reason
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: edumazet@google.com, kuba@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
+	dongml2@chinatelecom.cn, bigeasy@linutronix.de, toke@redhat.com, 
+	idosch@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ilias,
-
-On Fri, 11 Oct 2024 08:06:04 +0300, Ilias Apalodimas <ilias.apalodimas@linaro.org> wrote:
-
-> Hi Furong,
-> 
-> On Fri, 11 Oct 2024 at 05:15, Furong Xu <0x1207@gmail.com> wrote:
+On Thu, Oct 10, 2024 at 5:18=E2=80=AFPM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> On Thu, Oct 10, 2024 at 4:25=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
 > >
-> > On Thu, 10 Oct 2024 19:53:39 +0800, Yunsheng Lin <linyunsheng@huawei.com> wrote:
-> >  
-> > > Is there any reason that those drivers not to unset the PP_FLAG_DMA_SYNC_DEV
-> > > when calling page_pool_create()?
-> > > Does it only need dma sync for some cases and not need dma sync for other
-> > > cases? if so, why not do the dma sync in the driver instead?  
 > >
-> > The answer is in this commit:
-> > https://git.kernel.org/netdev/net/c/5546da79e6cc  
-> 
-> I am not sure I am following. Where does the stmmac driver call a sync
-> with len 0?
-For now, only drivers/net/ethernet/freescale/fec_main.c does.
-And stmmac driver does not yet, but I will send another patch to make it call sync with
-len 0. This is a proper fix as Jakub Kicinski suggested.
+> >
+> > On 10/7/24 09:46, Menglong Dong wrote:
+> > > In this commit, we make fib_validate_source/__fib_validate_source ret=
+urn
+> > > -reason instead of errno on error. As the return value of them can be
+> > > -errno, 0, and 1, we can't make it return enum skb_drop_reason direct=
+ly.
+> > >
+> > > In the origin logic, if __fib_validate_source() return -EXDEV,
+> > > LINUX_MIB_IPRPFILTER will be counted. And now, we need to adjust it b=
+y
+> > > checking "reason =3D=3D SKB_DROP_REASON_IP_RPFILTER". However, this w=
+ill take
+> > > effect only after the patch "net: ip: make ip_route_input_noref() ret=
+urn
+> > > drop reasons", as we can't pass the drop reasons from
+> > > fib_validate_source() to ip_rcv_finish_core() in this patch.
+> > >
+> > > We set the errno to -EINVAL when fib_validate_source() is called and =
+the
+> > > validation fails, as the errno can be checked in the caller and now i=
+ts
+> > > value is -reason, which can lead misunderstand.
+> > >
+> > > Following new drop reasons are added in this patch:
+> > >
+> > >    SKB_DROP_REASON_IP_LOCAL_SOURCE
+> > >    SKB_DROP_REASON_IP_INVALID_SOURCE
+> > >
+> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> >
+> > Looking at the next patches, I'm under the impression that the overall
+> > code will be simpler if you let __fib_validate_source() return directly
+> > a drop reason, and fib_validate_source(), too. Hard to be sure without
+> > actually do the attempt... did you try such patch by any chance?
+> >
+>
+> I analysed the usages of fib_validate_source() before. The
+> return value of fib_validate_source() can be -errno, "0", and "1".
+> And the value "1" can be used by the caller, such as
+> __mkroute_input(). Making it return drop reasons can't cover this
+> case.
+>
+> It seems that __mkroute_input() is the only case that uses the
+> positive returning value of fib_validate_source(). Let me think
+> about it more in this case.
+
+Hello,
+
+After digging into the code of __fib_validate_source() and __mkroute_input(=
+),
+I think it's hard to make __fib_validate_source() return drop reasons
+directly.
+
+The __fib_validate_source() will return 1 if the scope of the
+source(revert) route is HOST. And the __mkroute_input()
+will mark the skb with IPSKB_DOREDIRECT in this
+case (combine with some other conditions). And then, a REDIRECT
+ICMP will be sent in ip_forward() if this flag exists.
+
+I don't find a way to pass this information to __mkroute_input
+if we make __fib_validate_source() return drop reasons. Can we?
+
+An option is to add a wrapper for fib_validate_source(), such as
+fib_validate_source_reason(), which returns drop reasons. And in
+__mkroute_input(), we still call fib_validate_source().
+
+What do you think?
+
+Thanks!
+Menglong Dong
+
+>
+> > Thanks!
+> >
+> > Paolo
+> >
 
