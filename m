@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73EB099AECC
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:50:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A719599AECD
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 00:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA9F8B22635
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:50:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6CAE1C21682
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 22:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763EF1D14E0;
-	Fri, 11 Oct 2024 22:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8CC1E0B60;
+	Fri, 11 Oct 2024 22:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZiNovO40"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roAXh8m1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F9D10A1F
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 22:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924EA1D4336;
+	Fri, 11 Oct 2024 22:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728687027; cv=none; b=TGVu6GhpeWdMuF5c/ufnyydiZW+OPiy4CeXej39GHa9/FAAsxxkGtRpmeQ2OqdJm4tVBZst02PA9QFcwn6EXE4CiBBtFLsFLyXP+s0FkrjRBX8MEWxKIS2cpFv/AWTeZ3WLkrqpdFinPcQm9iiLZnxr8BnN0yHIir4wImJvB/Dc=
+	t=1728687028; cv=none; b=k0BKUalUpTOIvmz+mC6KtYZI4YvuCUwKmN3aIv3RXh8MKVmn9NlU9uvf7goqnhCHE6vL30zaOccMy/oPHwWl3C1rYe6Hh4H1F7SdRvb0psJM0Wk/qNKubMm22ELHhazAuk9isxG0nO4FatZtSVxot31QgFHO/LEVcljk4OO6hjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728687027; c=relaxed/simple;
-	bh=PLjvL5IHaDFoyfSzKprVS38o3Pc2mOeUvjP7YrUWx9s=;
+	s=arc-20240116; t=1728687028; c=relaxed/simple;
+	bh=kXPAbdzBQ5lsXpHo5aujwn0RTu4gEfdHPJJ28FdpBs0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UbG5ArVTDYSozZFJ9yrPrOLUrMADueCJmBioXVGbDYdSo5ReDSSD12IQ1+Dzc6JSV1NwGdAjXhC+lBu2ywc4koign9XRpzHADhZDU2mFyGWEzqaoRxc3tUxGt3rK6UG2NjOdNqCZw+MiX3Qe2o5Ep6QV2zItiJLbPLLlnuHUd9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZiNovO40; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF073C4CEC3;
-	Fri, 11 Oct 2024 22:50:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ADY5POYe2Bpt6foGh7gB53ur4chnNyubdb1H9K1NHTmASt4kEwey3QPyH/uz9u+BtdrjZ3fH23Yk3ak6OaXLQz5qPDYYXNf37mbOgMdjFUcYiNZJpXHMp4oTCHK4Jalt5204xbeM89R1fBQZ9wyK4pr4R9yBpufkPQ1Dh2itIoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roAXh8m1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B40C4CECE;
+	Fri, 11 Oct 2024 22:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728687026;
-	bh=PLjvL5IHaDFoyfSzKprVS38o3Pc2mOeUvjP7YrUWx9s=;
+	s=k20201202; t=1728687028;
+	bh=kXPAbdzBQ5lsXpHo5aujwn0RTu4gEfdHPJJ28FdpBs0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZiNovO40rP5iBX/h78kEqIgimtwv5ubaNNfxB+G1y8sxo6TGGiTxs6zISSGUF4KI5
-	 FiGLEw5sZfDhEZ13p/dsXupLnnqfPP+MmyKQgoFkCXrkSSXgQSuXL3AsA1u+au12IH
-	 51C1xPgaDIfUGmzymSY8bQGeQgM+oCyKffjtrxqc98y9P8JTFwv2j/RTnBKP7F2K52
-	 qJdWApzEPkjFeNmTi8Rd4zdWaq4JbOjmJcAuci3d/btxqHj+DFfZBNfsdUZigY1HfM
-	 01rkI8kx2LA4d1o5JpznAuNpjJqvF1srQ58dx0ftImpcfkeThRzbIyGKRzmocyD3as
-	 auyPtjJetFR7g==
+	b=roAXh8m1yaFRe0i87B3c6iMzKvnX3qFRMUIAD0SZcZDk83+NMa6KX6fu4PHLkExp9
+	 U3UZgmj57ZACCmVQJCcVfQ4LaCo/vELYaQVbt+Y/1TGD5ot+sZtTrPJ9s7KHmuDlcR
+	 82q6TManrZ2mPvo6s/XStyLXSnqCW8zt/8PTpqPOhcZTF7TwXRlktxY2S2oAQ4TTxv
+	 2Sf1SZ3KOs9Hq/qiMole7G4hi5yGS92sE5hEqGjaIK0HYsQVbWiYPtxzi/mETTsbQW
+	 LS80IoT04pjcnU9T4oHKbPxTX1832OmGE7LYNidHDR+0KqRDqzDjqxlsr6D7kHC0FT
+	 xMDqDOETzxhoQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE28138363CB;
-	Fri, 11 Oct 2024 22:50:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB13938363CB;
+	Fri, 11 Oct 2024 22:50:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv4: give an IPv4 dev to blackhole_netdev
+Subject: Re: [PATCH net] net: sparx5: fix source port register when mirroring
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172868703151.3018281.10440332628872972423.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Oct 2024 22:50:31 +0000
-References: <3000792d45ca44e16c785ebe2b092e610e5b3df1.1728499633.git.lucien.xin@gmail.com>
-In-Reply-To: <3000792d45ca44e16c785ebe2b092e610e5b3df1.1728499633.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, maheshb@google.com
+ <172868703275.3018281.7758535089888571331.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 22:50:32 +0000
+References: <20241009-mirroring-fix-v1-1-9ec962301989@microchip.com>
+In-Reply-To: <20241009-mirroring-fix-v1-1-9ec962301989@microchip.com>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  9 Oct 2024 14:47:13 -0400 you wrote:
-> After commit 8d7017fd621d ("blackhole_netdev: use blackhole_netdev to
-> invalidate dst entries"), blackhole_netdev was introduced to invalidate
-> dst cache entries on the TX path whenever the cache times out or is
-> flushed.
+On Wed, 9 Oct 2024 14:49:56 +0200 you wrote:
+> When port mirroring is added to a port, the bit position of the source
+> port, needs to be written to the register ANA_AC_PROBE_PORT_CFG.  This
+> register is replicated for n_ports > 32, and therefore we need to derive
+> the correct register from the port number.
 > 
-> When two UDP sockets (sk1 and sk2) send messages to the same destination
-> simultaneously, they are using the same dst cache. If the dst cache is
-> invalidated on one path (sk2) while the other (sk1) is still transmitting,
-> sk1 may try to use the invalid dst entry.
+> Before this patch, we wrongly calculate the register from portno /
+> BITS_PER_BYTE, where the divisor ought to be 32, causing any port >=8 to
+> be written to the wrong register. We fix this, by using do_div(), where
+> the dividend is the register, the remainder is the bit position and the
+> divisor is now 32.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ipv4: give an IPv4 dev to blackhole_netdev
-    https://git.kernel.org/netdev/net/c/22600596b675
+  - [net] net: sparx5: fix source port register when mirroring
+    https://git.kernel.org/netdev/net/c/8a6be4bd6fb3
 
 You are awesome, thank you!
 -- 
