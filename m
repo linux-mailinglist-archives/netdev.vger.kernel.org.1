@@ -1,88 +1,166 @@
-Return-Path: <netdev+bounces-134680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA5999ACBD
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 21:34:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE94E99ACD5
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 21:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 969121F22DDC
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:34:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE4C31C26B39
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E97F1D07B6;
-	Fri, 11 Oct 2024 19:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281F11D07A8;
+	Fri, 11 Oct 2024 19:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iH0GxxP6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XjkjknEt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F371D07AE
-	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 19:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FEF61D048E
+	for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 19:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728675190; cv=none; b=RreCvpRiIyLrXwfb+E0xKyglR3klhk2H/nsIP7/eBvz6PTbZFWSBkDaAmlUmHN3jEJpXkQRhxbFVuTsCUtkLWjmBPFnl+t6Y9q4VfhIGQu1BsKkJ+N3FBHMdhJtg2xb5scKCA5k4wfkiuENy1VHBoNHNZ/31HbDPOK1BRG5GuxU=
+	t=1728675511; cv=none; b=jbNNTBqR5enQx3LBD1lLKiqf6GsLLQ3YXHml45y0U9qL6lctKF9zshD0ZkEewv3x+DoYCKO0iXCXjwqCNtf1XkzsZXFMQb1GjlvfUTyBh/hmC8J6gy8pI1ncJarcocZeMCtV1BLBmdU57sPmeQ0+ik0CJ1PGXtOpi7tLqwr+YhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728675190; c=relaxed/simple;
-	bh=c2WiAkVNOZQ6wd0rx4188voQxJtCOm0yiqpnATco/fo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qxwHHQbOiLuGghItvuY8PVBEBn1iC8myApFg1thadDNPLPDyIj4AmAxzg+cmt1aCP5silnBZfZLgPA6B59P08kWrd3gcFfoVXD0gzEl8moaYDKIYV62xdgBJbVN9ui9FQC+YrwlZxVxp+/KNL0rZB9YejwGXsQlVPxhm1KBUnsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iH0GxxP6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE374C4CEC3;
-	Fri, 11 Oct 2024 19:33:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728675190;
-	bh=c2WiAkVNOZQ6wd0rx4188voQxJtCOm0yiqpnATco/fo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=iH0GxxP6mo4DDISsEisax+d1unBRBgiHE484v8Wo4P5seaojM8zG+uo+MsJkwejk5
-	 h6/tPdwXx8PqibBxifirfQeL4VYccPrn5vOr2oJu6iRjp97GbwsfBfpUgloiKE+GAo
-	 JAS0t0nMhmBGDy3nMLpaQY9dbRl/W1ZCWUo5cAkUY7aZMc5GLiXsedXrAzXtj34zfm
-	 YVrsLPKMYSsHl3sHZp6EsSPZrsoBWlSHoG3KpbCdCzcsuQQR59Nna7ifQKFSB5f2zS
-	 u78V2HMH0+QbYtofVyAyn2QEyyTf3uGex13EO10+Z5tOj2TEa/Cbx1QjLO7TWrEbQk
-	 8vGouLjvnFdVg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net] MAINTAINERS: add Andrew Lunn as a co-maintainer of all networking drivers
-Date: Fri, 11 Oct 2024 12:33:03 -0700
-Message-ID: <20241011193303.2461769-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1728675511; c=relaxed/simple;
+	bh=lIT4MF3P08EUQ/ItxiJCyTg8JaALptzUPgWCabDCkKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nLkQDT1zO2F/LQ6ydGiTT5ggwDJTPNca3ASmq0gDtCQIhWWONqpBfdcsSroT5frzF1pEB5ytMAnqoYHPfmNmKT5SWNR051QRdgXSp8Up8Vy+Js1w2wdTJpU6wLx8v1HYHAV2rq8gexL8Q+NK83k76Cdp6xxrsPzdroqWWwh7y4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XjkjknEt; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4601a471aecso35341cf.1
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 12:38:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728675507; x=1729280307; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f4/PPqatSk2BAD8kUIT/38Gyd1BY7fTrP7ap/2S9Mqk=;
+        b=XjkjknEt5tftq70KCGlTHLD1Bh2BPjVE2PxpnBWMyyvy0Sp3gh+Ou2AGHu9p3dWutG
+         Ly3++jhiM30xrysorDSmgJ1/CrEZtf6ayIU3Zmwx3Vb8IUgL3FRRSfyF9Uq+Uzbj3vUN
+         u/bUYraAbm5jodAmY4pqow/Khq+dr2J2OnWFkAw+h8J7APJ1G+1llNpGccZsVYLd3rvD
+         +QBQRdyuhuBJG6aMG9ikacbC88xyvg5Opx9d5h6aw4PuP1rE87zMIrrAmpxqP3AFOGuK
+         ExS8+5YeQleDH4F25vvvICWGh0gbjOcW75+6kisVvnRm7+3uDYn2SyaicjpmO643m7Cu
+         Y50g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728675507; x=1729280307;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f4/PPqatSk2BAD8kUIT/38Gyd1BY7fTrP7ap/2S9Mqk=;
+        b=iTkFK0IitYBmVOjgKM9aYGOIYB1Ev1QXxUzXaM6ZDFSFdwxg62mdq9xIo0vwspkiAv
+         UBaHAnUBcEHh0KZrVVcgf23J21cBYCzUnJnHO0jNh6u1Bsrc35lXdVPhmnr9LLnjlk5u
+         twwCcrjP/uWLGfHEb3mzpU/rUOWCaeC3xD18zc/2Z06Zsh7wo1RyZx1SymKI6eUf6dmo
+         S7weqS+4hfkypB77uqc2/fghOwV+W7zSci2Ib5AEqDdslc/lg6WEzBZoAfanAA5lUHAJ
+         Jl+qY+mPigwYcZR9rWLVAb/VPC86GSyQo5fdI7XBHy2Y1Cv4Tr46r1NuCzDEIUIpaxfU
+         HCmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVsL7Y8XUDBxai0l4Hd3Pz6oijOtd4ebFG7oVC1/DZlo7zwz59EowqA+G3HblIbls1eis4PQkY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhMazeL2pf8MOyH3TeO+7OBHRLTvzC9tdcPoitN9EzBjTKJc/Z
+	CAjhkpLE319miY6DvVcEq1iyA5Uv6v8zkrB+iruIzpO2fpI24xHRo2/lDSgr9F8T6oirZtsXqXU
+	Y6C0EUWyxHi0JFrElgdd9j7QXL+0bWvxrc6eK
+X-Google-Smtp-Source: AGHT+IEJvq2uzdDh3W2Sfu5aWaK5xhLaKiCn2xWH/iIRkxgpB4FklAs+UX9kaTQ1TkS7P0dLyhTRAOjn/li4z+5WdqQ=
+X-Received: by 2002:a05:622a:468c:b0:45c:9eab:cce0 with SMTP id
+ d75a77b69052e-46059046571mr529141cf.15.1728675507274; Fri, 11 Oct 2024
+ 12:38:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240909054318.1809580-1-almasrymina@google.com>
+ <20240909054318.1809580-11-almasrymina@google.com> <Zwe3lWTN36IUaIdd@ly-workstation>
+ <CAHS8izPuEUA20BDXvwq2vW-24ez36YFJFMQok-oBDbgk6bajSA@mail.gmail.com> <20241011082707.5de66f15@kernel.org>
+In-Reply-To: <20241011082707.5de66f15@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 11 Oct 2024 12:38:14 -0700
+Message-ID: <CAHS8izMVjfrYopPpmg4dN33VL7bF-icS=HFDPOhmW96rgthErg@mail.gmail.com>
+Subject: Re: [PATCH net-next v25 10/13] net: add SO_DEVMEM_DONTNEED setsockopt
+ to release RX frags
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Lai, Yi" <yi1.lai@linux.intel.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, yi1.lai@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Andrew has been a pillar of the community for as long as I remember.
-Focusing on embedded networking, co-maintaining Ethernet PHYs and
-DSA code, but also actively reviewing MAC and integrated NIC drivers.
-Elevate Andrew to the status of co-maintainer of all netdev drivers.
+On Fri, Oct 11, 2024 at 8:27=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 10 Oct 2024 12:05:38 -0700 Mina Almasry wrote:
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index 083d438d8b6f..cb3d8b19de14 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -1071,11 +1071,11 @@ sock_devmem_dontneed(struct sock *sk,
+> > sockptr_t optval, unsigned int optlen)
+> >             optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
+> >                 return -EINVAL;
+> >
+> > -       tokens =3D kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
+> > +       num_tokens =3D optlen / sizeof(struct dmabuf_token);
+> > +       tokens =3D kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERN=
+EL);
+> >         if (!tokens)
+> >                 return -ENOMEM;
+> >
+> > -       num_tokens =3D optlen / sizeof(struct dmabuf_token);
+> >         if (copy_from_sockptr(tokens, optval, optlen)) {
+> >                 kvfree(tokens);
+> >                 return -EFAULT;
+> > @@ -1083,6 +1083,10 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t
+> > optval, unsigned int optlen)
+> >
+> >         xa_lock_bh(&sk->sk_user_frags);
+> >         for (i =3D 0; i < num_tokens; i++) {
+> > +
+> > +               if (tokens[i].token_count > MAX_DONTNEED_TOKENS)
+> > +                       continue;
+>
+> For the real fix let's scan the tokens before we take the xa lock
+> and return an error rather than silently skipping?
+>
+> >                 for (j =3D 0; j < tokens[i].token_count; j++) {
+>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Yes, sorry, I called the diff above an 'untested fix' but it was more
+of a hack to see if I got the root cause right. For a proper fix, we
+should do exactly that. Scan and see how many tokens the user is
+asking us to free ahead of time, then exit early if it's too much
+before we acquire locks and loop. Will do!
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d1d95b276f0f..fc1a19809ea1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16104,6 +16104,7 @@ F:	include/uapi/linux/net_dropmon.h
- F:	net/core/drop_monitor.c
- 
- NETWORKING DRIVERS
-+M:	Andrew Lunn <andrew+netdev@lunn.ch>
- M:	"David S. Miller" <davem@davemloft.net>
- M:	Eric Dumazet <edumazet@google.com>
- M:	Jakub Kicinski <kuba@kernel.org>
--- 
-2.46.2
-
+--=20
+Thanks,
+Mina
 
