@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-134690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B071399AD36
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 21:58:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20D899AD38
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 21:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1FDA1C20A44
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:58:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32AFF1F27829
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 19:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B9A1E766C;
-	Fri, 11 Oct 2024 19:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E819E1E9079;
+	Fri, 11 Oct 2024 19:56:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UB4PgeA4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iu7ISXP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5171E5738;
-	Fri, 11 Oct 2024 19:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7521E766D;
+	Fri, 11 Oct 2024 19:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728676596; cv=none; b=Eqmr14sNnRYbLiImIuM0QZ+DugZwCyQ3iezzGhDg8sFU/VuiGHAg08dqevNfVx//QIQLqXcK+Pn7NPN5+1SNw3BVn2tEDDrx7m/jgi9rFPQOT2BqN+0b0OkI09YXK3jJMQ/tTaWE6sowi1sgQ0Tua8mQuU0Kl6ZGN0vcj0WNbWk=
+	t=1728676598; cv=none; b=EXMKb1GijsNm1R0GpNogSUUe3yCbD16v3r4KGmP8N4rqEF8xSnJk7z57aGjI+5jX7jFBHAUE5tqqXtjJ2NM0S8pDgzB9d7h2QbMzIFFKo1Dx/CzsoAeBdtlRGZeOhjnBuYJLn4nrN83OjVyU3h17soRVZjUka8667f32KS443fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728676596; c=relaxed/simple;
-	bh=ZFLwNIwVctzCdMWUmYqjFWKxhWyGXaQSvfsB3UlKlms=;
+	s=arc-20240116; t=1728676598; c=relaxed/simple;
+	bh=Q+2VmB7zmwm1vNofxnzfIwwJAhE9qy4N4+vT35MU/DE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G8d39DAb1szu1q+GALR7hHPzm6WRPjU/sdH2fW59mCTXZru0hW3e95q1NoS5CdHbTKd7uEwIRrOPu+A6+P8UgLIFe7L0Cy4UxyU78YnWMzuFvlZ3jEpv03HF62dcKpSVYDSOQC1rNVSSPHXaSwUoHjIN0LRL9NuUM4B43AoT7Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UB4PgeA4; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=LVYFqG3n/LcK/VyYRtnr1h3cXY5zjtG5CAt9dthko+MB4NHw2PvowIQHpmqVv3ZN/+VIoT3UDsaC+HC43ZezTLbAts+sX6zP8AzX9LCCizI9BSBmxexmDw2oJu7kBIjgz10epPP7vtrfqm1fmeSPGmYByZ/MNQj+b2iz937R+Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iu7ISXP4; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-71e427e29c7so514799b3a.3;
-        Fri, 11 Oct 2024 12:56:34 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71df468496fso2228028b3a.1;
+        Fri, 11 Oct 2024 12:56:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728676594; x=1729281394; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728676596; x=1729281396; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D2WAmEDR6gKCLxTUFCfK9dcDmpMYacx8M4fUpcsQvz4=;
-        b=UB4PgeA4jSgZJ4+xcKszMpUybEiPToMd6lBejRmVfNUiwaRA5T8x9GoRiXbB0AZlpp
-         YI5FJJdaBIp3WmQzrmWzOr65xVRJ+hqWywvwGGNx8DD1XvuTfqXoB6GwuaKK0wXPD03l
-         LRz/THSWRTY+RXAERcVbxabAOaA8QnJmayqHTxXuMbXp2BboYaFrEakKXEuR4MdkSTUp
-         YQhCM/azALN8WZe6Jd55JAJ5QfbNKMP92pTnIJBL1V+tS6/PP6hwJSc1cIDuRJSsfbyq
-         gf4Bf3y5AcgUBZ+QfV9ydZklJ1zvdPNObHeQ3XiIb21v7sNkPfvhil7IiuRy8ZqvVTPO
-         YX5w==
+        bh=F8hI452n5jGYTy09LuqtDFWI02BUPHpDd5D1l/Si5SU=;
+        b=iu7ISXP42LWfEzeZgWIZeK/ZNsRY6kxXO3DroVp4Gxhxz+09s6cmRNiTmMGG5+sjZ1
+         MGzpg4shHHbsbIzSgeNFjgEQo0+45rZBkpBxVUVhctL8JS2R2vltBYih2/DRD6YFy7Cf
+         WqvMMq5V7qe7PELECoU8HUBSr+IrgX+IwuM0d8yJ0j61+Wv5jX3ZZQ9FoLRJWkoYBz40
+         JBnJyEZON3sJJH4FsKbQBGS1lClgwb60yYzp+YeC4iOtl5q+Q01T+iCvuYxSsT3bS/Ht
+         W4ullV8bRTkDF3wwuN1u+GiBHrdoAIeoUUK8a2vSJHJi3FWU2uaJBXSkGsSKnuJZ0FTM
+         aSwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728676594; x=1729281394;
+        d=1e100.net; s=20230601; t=1728676596; x=1729281396;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D2WAmEDR6gKCLxTUFCfK9dcDmpMYacx8M4fUpcsQvz4=;
-        b=MUATfSmJvsYpCJtkSmqeNXq7HM1viaUsw2baJdXWnCgZIx0S7FqRRVERoE/f0k6zHy
-         Jy8P2uVpLgT7onF1BQyual04T4kiOu57898MEmC86+YH6WIN8a37/eW51BqVC1tkQUDk
-         zPuN6wK1uqqnDFyJmyM0iAKSeiiRVLMNhv3ZPmLHHul7WrsEnuHjFSj/ad4Z0Au8Y+zh
-         QPrRExUKzzUSSxWPcCL8t+t36oFpLXgY/Sr/IG2DJbTzvS2b3uzRm4wiW5Q0zLKZ16aC
-         qs5q/ym5BE23cqLm4t1/rrwVzTSvTPaIsmymJkYeWSCAKGGzRn1l8e9lPL6QL21jF20v
-         58qA==
-X-Forwarded-Encrypted: i=1; AJvYcCUW1gR+T5EaVq+uWQPmU2i3ZHGCBsO1oAZ7+W3VF/skBY0+zkPakaJ00QnJtlpv1wcQq+jxG9iTiYwFArQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygKLav0oSo8bAyvuAOxPrbz2sNLwsagLVnoEnu9v2mhLKwkZxf
-	kjPHIIokq56hektuyxvJEkgsIKjGYJlx4f9hpic75Xni3jdsoCWjSFKuwvYy
-X-Google-Smtp-Source: AGHT+IGKtuXO8HpH3Q29vbeuin2SpoxWZ4wtdof68DM7RwFmhSHYfQUt48LOGAT07h7L3J9hI4SBjw==
-X-Received: by 2002:a05:6a20:c88d:b0:1d7:11af:6a with SMTP id adf61e73a8af0-1d8c9690587mr896919637.37.1728676594083;
-        Fri, 11 Oct 2024 12:56:34 -0700 (PDT)
+        bh=F8hI452n5jGYTy09LuqtDFWI02BUPHpDd5D1l/Si5SU=;
+        b=q2PrS76xvNtEOHkr/qFICDmQ+nHCBvWYdTWRf/9XqUUMUJoEWOOLlhOEi/e6CoXuod
+         /D7abM63/ACUTlV/GIks1Vd0MM9Hupv23ktizm9dqia9xCGVIKxbhuuxYAjo+S88dJf5
+         P3aRyBUXKsvDYF5HAG0DmK+ibYuzdBndsGH332zP9P8XX8GE3pk7dDDFIvYhsCHHZJby
+         6AdpBevQoyHoNtqLZJfOZTIADAbZ7S+iOshPWkvk2rtO9d9gZQYUh9d9x2FS9C7TXF/n
+         WKAvaDbULBGUSnQrHjKaeETbITnf++Bf2ZZI1mSn/xXhuTy5eA6hO9xalcxjQFvOZeOp
+         ayrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVesPNkCuFdV8PL7XiIOPDx4tZH2bvuC/GSG8kSlX5JdtSQBaoSlt2V1T2xnOY6GT/AKJDeQ/7l9q+0n3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv2sOGB4TerUqwoLXbhFuNUPt3M0pKE/NN88PJ7F++vG1ssBC2
+	HMVfk6b+VO34XWVrqFF4xqYVdmcwlIEqST72irYm6XSw/PygiCauxqMv/3v7
+X-Google-Smtp-Source: AGHT+IGJVzIq8XjXkrMRO8UiphyJSQ5kK/ZaUXkNpMjkU8CBPHmpUJoc+tx8Q3qJizT56BjCuoKyDQ==
+X-Received: by 2002:a05:6a21:6e4a:b0:1d8:a9c0:8853 with SMTP id adf61e73a8af0-1d8bcf3bd6amr6957438637.23.1728676595598;
+        Fri, 11 Oct 2024 12:56:35 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea44907ea9sm2846025a12.40.2024.10.11.12.56.32
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea44907ea9sm2846025a12.40.2024.10.11.12.56.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 12:56:33 -0700 (PDT)
+        Fri, 11 Oct 2024 12:56:35 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -82,9 +82,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jeff Johnson <quic_jjohnson@quicinc.com>,
 	Christian Marangi <ansuelsmth@gmail.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv6 net-next 6/7] net: ibm: emac: generate random MAC if not found
-Date: Fri, 11 Oct 2024 12:56:21 -0700
-Message-ID: <20241011195622.6349-7-rosenp@gmail.com>
+Subject: [PATCHv6 net-next 7/7] net: ibm: emac: use of_find_matching_node
+Date: Fri, 11 Oct 2024 12:56:22 -0700
+Message-ID: <20241011195622.6349-8-rosenp@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241011195622.6349-1-rosenp@gmail.com>
 References: <20241011195622.6349-1-rosenp@gmail.com>
@@ -96,40 +96,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On this Cisco MX60W, u-boot sets the local-mac-address property.
-Unfortunately by default, the MAC is wrong and is actually located on a
-UBI partition. Which means nvmem needs to be used to grab it.
+Cleaner than using of_find_all_nodes and then of_match_node.
 
-In the case where that fails, EMAC fails to initialize instead of
-generating a random MAC as many other drivers do.
-
-Match behavior with other drivers to have a working ethernet interface.
+Also modified EMAC_BOOT_LIST_SIZE check to run before of_node_get to
+avoid having to call of_node_put on failure.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/core.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index b9ccaae61c48..faa483790b29 100644
+index faa483790b29..5265616400c2 100644
 --- a/drivers/net/ethernet/ibm/emac/core.c
 +++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -2937,9 +2937,12 @@ static int emac_init_config(struct emac_instance *dev)
+@@ -3253,21 +3253,17 @@ static void __init emac_make_bootlist(void)
+ 	int cell_indices[EMAC_BOOT_LIST_SIZE];
  
- 	/* Read MAC-address */
- 	err = of_get_ethdev_address(np, dev->ndev);
--	if (err)
--		return dev_err_probe(&dev->ofdev->dev, err,
--				     "Can't get valid [local-]mac-address from OF !\n");
-+	if (err == -EPROBE_DEFER)
-+		return err;
-+	if (err) {
-+		dev_warn(&dev->ofdev->dev, "Can't get valid mac-address. Generating random.");
-+		eth_hw_addr_random(dev->ndev);
-+	}
+ 	/* Collect EMACs */
+-	while((np = of_find_all_nodes(np)) != NULL) {
++	while((np = of_find_matching_node(np, emac_match))) {
+ 		u32 idx;
  
- 	/* IAHT and GAHT filter parameterization */
- 	if (emac_has_feature(dev, EMAC_FTR_EMAC4SYNC)) {
+-		if (of_match_node(emac_match, np) == NULL)
+-			continue;
+ 		if (of_property_read_bool(np, "unused"))
+ 			continue;
+ 		if (of_property_read_u32(np, "cell-index", &idx))
+ 			continue;
+ 		cell_indices[i] = idx;
+-		emac_boot_list[i++] = of_node_get(np);
+-		if (i >= EMAC_BOOT_LIST_SIZE) {
+-			of_node_put(np);
++		if (i >= EMAC_BOOT_LIST_SIZE)
+ 			break;
+-		}
++		emac_boot_list[i++] = of_node_get(np);
+ 	}
+ 	max = i;
+ 
 -- 
 2.47.0
 
