@@ -1,107 +1,124 @@
-Return-Path: <netdev+bounces-134870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657AC99B6A3
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:49:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC97399B69D
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:42:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0B31C20F4B
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:49:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E95C11C20DB4
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:42:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0546284A4D;
-	Sat, 12 Oct 2024 18:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B6B83CDB;
+	Sat, 12 Oct 2024 18:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="ccdlqy93"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HfAJmhSL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx06lb.world4you.com (mx06lb.world4you.com [81.19.149.116])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2306A43173;
-	Sat, 12 Oct 2024 18:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE9B768FD
+	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 18:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728758959; cv=none; b=m3B8QI9F5whrHYN45WLPazKWPEniABdWnlMJi2PaeqOAWj6irG3M2QE/OBUuQNs+p3IahmU0u2aLMKykOnBWAcr5eTOnewM9KAN3k83q7med/82XGXmw+R6i5pXZjrhi28cduh8PSJT+CivsWSTXRdutKxU0hAIp48VfhKtrf+o=
+	t=1728758568; cv=none; b=h8LQKRTd1LPRtMe9oQTHbXavw5n+ly/gihDJ17aRWTkaRl6gHKBGE9/ba9CFbQ0sbCSl0Xw5+v/7RB8h7WPuQ70Ntzs7KuUNG7BfUXxQGoYRBJSYK7pQ2PB5VNKNwTxjVmM3u0Dkg0RGNzyb3S8iRtS0XUOcxE5vMSP78CaMPw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728758959; c=relaxed/simple;
-	bh=WTOAJxAmlJGtHrKLllDBenmOvdMX8ckNkVnWU2XR9jY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BlsV9auQAB2QvksSLoJ87p7x/cPaGZBDixCMC6jDCcHIPX1mXQFXttsv7VArmlnX3OMVZnl+78JkjpQIE5fiEmsdw2qIdUJqMTog45hFAQ8/MVm1wrScS2gCN20sl8bzgdKE/eiYGxanmpIeZiB8gc2koraMFhuItHRetEbcwLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=ccdlqy93; arc=none smtp.client-ip=81.19.149.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=whpQlU3hR2/YXN1DhRTRvCI/ym7MCRC4OzO6uxuM/GY=; b=ccdlqy93TurNdfokQXprfkjeRQ
-	mc8SGfgQPyrQlQ6y/VhI/h77wySjL0a/4yYvPYQfG33Nzi956lZT+DpN1QaA2tEBkKtDrxfVDs9vz
-	EAJoW82c82G5McGn+0hLK6QCkVxqGGk7e9xHIlef4FcMvK0L40roOwyfaTxvM9bFtWEU=;
-Received: from [88.117.56.173] (helo=[10.0.0.160])
-	by mx06lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1szgsn-000000002LP-2rRm;
-	Sat, 12 Oct 2024 20:30:29 +0200
-Message-ID: <75072c5d-9145-492c-b99a-4f47ae88b069@engleder-embedded.com>
-Date: Sat, 12 Oct 2024 20:30:28 +0200
+	s=arc-20240116; t=1728758568; c=relaxed/simple;
+	bh=aD9769Ai33ANRRwRfBKAvc06HGoBZ3EEiEmQXAolgZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cbkh98uy57sHPK/GvREz8UNHowYWlwdhraRRkDdRnPs86/FgPJmZE5bQpeVVTgcd+8PyggihghO4GieZHfU1ve0v7ZKfZ/ukn4HOvfxMF5Cp9x5Qp/bd6Be6UPFu5aaY0+yddVmbWLZ2cBiQ9cy09Jdwx5ouNipLJvUcrnIClxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HfAJmhSL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Z9Vw9tqTsh2NIgXn2Uom2hDgSwNfIr0HX3ljk/NnuIg=; b=HfAJmhSL4g3kOsUQKML81Gg3vK
+	sClunIM9MCqsdL+9gFNEypLQ8lYWeBayvoeKYpt/HMWgZvZH7EtYtKvtyX7HtgWPJcDMIZ8Jsgpwy
+	2e5CO39h4Uaa+TI9PRz6T8dh3IHqbasKUqaO98Wf/gLUgAVCkMlN/L5QrcA6kb0OrEtw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1szh4R-009oTJ-PA; Sat, 12 Oct 2024 20:42:31 +0200
+Date: Sat, 12 Oct 2024 20:42:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, Gerhard Engleder <eg@keba.com>
+Subject: Re: [PATCH RFC net-next] e1000e: Fix real-time violations on link up
+Message-ID: <f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch>
+References: <20241011195412.51804-1-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: ethernet: aeroflex: fix potential memory leak
- in greth_start_xmit_gbit()
-To: Wang Hai <wanghai38@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kristoffer@gaisler.com, zhangxiaoxu5@huawei.com, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andreas@gaisler.com
-References: <20241012110434.49265-1-wanghai38@huawei.com>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20241012110434.49265-1-wanghai38@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241011195412.51804-1-gerhard@engleder-embedded.com>
 
-On 12.10.24 13:04, Wang Hai wrote:
-> The greth_start_xmit_gbit() returns NETDEV_TX_OK without freeing skb
-> in case of skb->len being too long, add dev_kfree_skb() to fix it.
+On Fri, Oct 11, 2024 at 09:54:12PM +0200, Gerhard Engleder wrote:
+> From: Gerhard Engleder <eg@keba.com>
 > 
-> Fixes: d4c41139df6e ("net: Add Aeroflex Gaisler 10/100/1G Ethernet MAC driver")
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+> Link down and up triggers update of MTA table. This update executes many
+> PCIe writes and a final flush. Thus, PCIe will be blocked until all writes
+> are flushed. As a result, DMA transfers of other targets suffer from delay
+> in the range of 50us. The result are timing violations on real-time
+> systems during link down and up of e1000e.
+> 
+> Execute a flush after every single write. This prevents overloading the
+> interconnect with posted writes. As this also increases the time spent for
+> MTA table update considerable this change is limited to PREEMPT_RT.
+> 
+> Signed-off-by: Gerhard Engleder <eg@keba.com>
 > ---
-> v1->v2: Using dev_kfree_skb() in error handling.
->   drivers/net/ethernet/aeroflex/greth.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/intel/e1000e/mac.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/aeroflex/greth.c b/drivers/net/ethernet/aeroflex/greth.c
-> index 27af7746d645..adf6f67c5fcb 100644
-> --- a/drivers/net/ethernet/aeroflex/greth.c
-> +++ b/drivers/net/ethernet/aeroflex/greth.c
-> @@ -484,7 +484,7 @@ greth_start_xmit_gbit(struct sk_buff *skb, struct net_device *dev)
->   
->   	if (unlikely(skb->len > MAX_FRAME_SIZE)) {
->   		dev->stats.tx_errors++;
-> -		goto out;
-> +		goto len_error;
->   	}
->   
->   	/* Save skb pointer. */
-> @@ -575,6 +575,7 @@ greth_start_xmit_gbit(struct sk_buff *skb, struct net_device *dev)
->   map_error:
->   	if (net_ratelimit())
->   		dev_warn(greth->dev, "Could not create TX DMA mapping\n");
-> +len_error:
->   	dev_kfree_skb(skb);
->   out:
->   	return err;
+> diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
+> index d7df2a0ed629..f4693d355886 100644
+> --- a/drivers/net/ethernet/intel/e1000e/mac.c
+> +++ b/drivers/net/ethernet/intel/e1000e/mac.c
+> @@ -331,9 +331,15 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
+>  	}
+>  
+>  	/* replace the entire MTA table */
+> -	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--)
+> +	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
+>  		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw->mac.mta_shadow[i]);
+> +#ifdef CONFIG_PREEMPT_RT
+> +		e1e_flush();
+> +#endif
+> +	}
+> +#ifndef CONFIG_PREEMPT_RT
+>  	e1e_flush();
+> +#endif
 
-Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+#ifdef FOO is generally not liked because it reduces the effectiveness
+of build testing.
+
+Two suggestions:
+
+	if (IS_ENABLED(CONFIG_PREEMPT_RT))
+		e1e_flush();
+
+This will then end up as and if (0) or if (1), with the statement
+following it always being compiled, and then optimised out if not
+needed.
+
+Alternatively, consider something like:
+
+	if (i % 8)
+		e1e_flush()
+
+if there is a reasonable compromise between RT and none RT
+performance. Given that RT is now fully merged, we might see some
+distros enable it, so a compromise would probably be better.
+
+	Andrew
 
