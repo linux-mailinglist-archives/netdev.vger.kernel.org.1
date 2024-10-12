@@ -1,108 +1,107 @@
-Return-Path: <netdev+bounces-134867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7CC99B698
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:29:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657AC99B6A3
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37074283010
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:29:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0B31C20F4B
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C06B84E04;
-	Sat, 12 Oct 2024 18:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0546284A4D;
+	Sat, 12 Oct 2024 18:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wYMiyIvC"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="ccdlqy93"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx06lb.world4you.com (mx06lb.world4you.com [81.19.149.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7EA2110E;
-	Sat, 12 Oct 2024 18:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2306A43173;
+	Sat, 12 Oct 2024 18:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728757759; cv=none; b=SYIEzPV538NiMmLEpymiLpaoz5w7s7lRH9IqJm1mwKr2SU3y0OGMLmPHmFKG0Dmsb0FvdWtJp02mNgDKGXu60Z0uMhku2h/OZhwfUw+EM4Z+/0SPq1dBAcX24LiMfmdokEKSwddRLwE3dnlsKQtlKQZSMA37RJDT1SAROOcEOIc=
+	t=1728758959; cv=none; b=m3B8QI9F5whrHYN45WLPazKWPEniABdWnlMJi2PaeqOAWj6irG3M2QE/OBUuQNs+p3IahmU0u2aLMKykOnBWAcr5eTOnewM9KAN3k83q7med/82XGXmw+R6i5pXZjrhi28cduh8PSJT+CivsWSTXRdutKxU0hAIp48VfhKtrf+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728757759; c=relaxed/simple;
-	bh=Qg8+YlMWVycQQ0N7V4mJ6bWJn6wFCTzfiXzJsajCrM4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TeIfz9AFzSrVhRZhzrQCB4r9VyircOseZpjGfp5JK1kpa3SatLNLTtbFiFn1ptYXmNXVFeF2gtlKrnq4rkZ3QbVFba/wb4gJ9Q5AgyPPXNpvg4AYckuSA9rOgGvkAXvNGbr2d22ACB7PD6pgCpCY+JLXRB3lFafIdUoBCjmGM8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wYMiyIvC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JXGrwAJ4nPZdixL8Osla8TyTvVRvZyTkZ+Q5jkHPYos=; b=wYMiyIvCGjzwAv/fbxB3IFL4hV
-	hmEb7g/dW9qnh3hz/neGGBuhLtpEkMxnJEuyOvqU8tnncm21lDlHV3AuvGYzs1b8Aacm6l0v4MgGw
-	qMTj5qVWv+4K3x5NPBbiLiLsEp8NetfJvH5XUWl0lc/rXe/IwjuuTMzC5V0RVzH7Qxyk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1szgrP-009oRv-KA; Sat, 12 Oct 2024 20:29:03 +0200
-Date: Sat, 12 Oct 2024 20:29:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jacob.e.keller@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net] net: ftgmac100: corrcet the phy interface of NC-SI mode
-Message-ID: <e22bf47d-db22-4659-8246-619aafe1ba43@lunn.ch>
-References: <20241011082827.2205979-1-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1728758959; c=relaxed/simple;
+	bh=WTOAJxAmlJGtHrKLllDBenmOvdMX8ckNkVnWU2XR9jY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BlsV9auQAB2QvksSLoJ87p7x/cPaGZBDixCMC6jDCcHIPX1mXQFXttsv7VArmlnX3OMVZnl+78JkjpQIE5fiEmsdw2qIdUJqMTog45hFAQ8/MVm1wrScS2gCN20sl8bzgdKE/eiYGxanmpIeZiB8gc2koraMFhuItHRetEbcwLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=ccdlqy93; arc=none smtp.client-ip=81.19.149.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=whpQlU3hR2/YXN1DhRTRvCI/ym7MCRC4OzO6uxuM/GY=; b=ccdlqy93TurNdfokQXprfkjeRQ
+	mc8SGfgQPyrQlQ6y/VhI/h77wySjL0a/4yYvPYQfG33Nzi956lZT+DpN1QaA2tEBkKtDrxfVDs9vz
+	EAJoW82c82G5McGn+0hLK6QCkVxqGGk7e9xHIlef4FcMvK0L40roOwyfaTxvM9bFtWEU=;
+Received: from [88.117.56.173] (helo=[10.0.0.160])
+	by mx06lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1szgsn-000000002LP-2rRm;
+	Sat, 12 Oct 2024 20:30:29 +0200
+Message-ID: <75072c5d-9145-492c-b99a-4f47ae88b069@engleder-embedded.com>
+Date: Sat, 12 Oct 2024 20:30:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241011082827.2205979-1-jacky_chou@aspeedtech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] net: ethernet: aeroflex: fix potential memory leak
+ in greth_start_xmit_gbit()
+To: Wang Hai <wanghai38@huawei.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kristoffer@gaisler.com, zhangxiaoxu5@huawei.com, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andreas@gaisler.com
+References: <20241012110434.49265-1-wanghai38@huawei.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20241012110434.49265-1-wanghai38@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Fri, Oct 11, 2024 at 04:28:27PM +0800, Jacky Chou wrote:
-> In NC-SI specification, NC-SI is using RMII, not MII.
+On 12.10.24 13:04, Wang Hai wrote:
+> The greth_start_xmit_gbit() returns NETDEV_TX_OK without freeing skb
+> in case of skb->len being too long, add dev_kfree_skb() to fix it.
 > 
-> Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> Fixes: d4c41139df6e ("net: Add Aeroflex Gaisler 10/100/1G Ethernet MAC driver")
+> Signed-off-by: Wang Hai <wanghai38@huawei.com>
 > ---
->  drivers/net/ethernet/faraday/ftgmac100.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v1->v2: Using dev_kfree_skb() in error handling.
+>   drivers/net/ethernet/aeroflex/greth.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-> index ae0235a7a74e..85fea13b2879 100644
-> --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> @@ -1913,7 +1913,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
->  			goto err_phy_connect;
->  		}
->  		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-> -					 PHY_INTERFACE_MODE_MII);
-> +					 PHY_INTERFACE_MODE_RMII);
->  		if (err) {
->  			dev_err(&pdev->dev, "Connecting PHY failed\n");
->  			goto err_phy_connect;
+> diff --git a/drivers/net/ethernet/aeroflex/greth.c b/drivers/net/ethernet/aeroflex/greth.c
+> index 27af7746d645..adf6f67c5fcb 100644
+> --- a/drivers/net/ethernet/aeroflex/greth.c
+> +++ b/drivers/net/ethernet/aeroflex/greth.c
+> @@ -484,7 +484,7 @@ greth_start_xmit_gbit(struct sk_buff *skb, struct net_device *dev)
+>   
+>   	if (unlikely(skb->len > MAX_FRAME_SIZE)) {
+>   		dev->stats.tx_errors++;
+> -		goto out;
+> +		goto len_error;
+>   	}
+>   
+>   	/* Save skb pointer. */
+> @@ -575,6 +575,7 @@ greth_start_xmit_gbit(struct sk_buff *skb, struct net_device *dev)
+>   map_error:
+>   	if (net_ratelimit())
+>   		dev_warn(greth->dev, "Could not create TX DMA mapping\n");
+> +len_error:
+>   	dev_kfree_skb(skb);
+>   out:
+>   	return err;
 
-I'm a but confused here. Please could you expand the commit
-message. When i look at the code:
-
-		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
-		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-					 PHY_INTERFACE_MODE_MII);
-		if (err) {
-			dev_err(&pdev->dev, "Connecting PHY failed\n");
-			goto err_phy_connect;
-		}
-
-The phy being connected to is a fixed PHY. So the interface mode
-should not matter, at least to the PHY, since there is no physical
-PHY. Does the MAC driver get this value returned to it, e.g. as part
-of ftgmac100_adjust_link, and the MAC then configures itself into the
-wrong interface mode?
-
-For a patch with a Fixes: it is good to describe the problem the user
-sees.
-
-	Andrew
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
