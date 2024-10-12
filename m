@@ -1,120 +1,57 @@
-Return-Path: <netdev+bounces-134855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD3D99B5DC
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 17:29:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F66E99B630
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 19:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8761F22781
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 15:29:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D46B1B2245D
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 17:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C057C182A0;
-	Sat, 12 Oct 2024 15:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A8154FAD;
+	Sat, 12 Oct 2024 17:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h6SgVh0O"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BhBms6GG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179541B977;
-	Sat, 12 Oct 2024 15:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82DE42A8B;
+	Sat, 12 Oct 2024 17:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728746961; cv=none; b=R7JD5gWRr7fuZMIbRpvALYC/zKjm6GSJPWHzwoHL/o55euQaJ6A3RQFYDrattLGE3R9g+W//pNCHasIGKxBAS31l9H8Vk0A4C5ojelSYDorxtUI2v3eWsmR+O/oZDRI957l0yazA4wEnvNoypD3P4IeST1RzK1E8MJ4SZSRq9Sc=
+	t=1728753499; cv=none; b=MNu+iHJtv5amx6VVjXNzdUThSczyqxrU6dBAHhMtESOAbfH1ldLspMceyAYdF+xav1Letme1gvKnqft4yv/C3TRO6re/drmIq64za8bhxEVEzsb31oEzrUJ0fTjDhvbJST4fHFjDgP3BL8Qsl+Dbr2F3ibwtdR21JVRPMCz12es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728746961; c=relaxed/simple;
-	bh=pk03R0PgeUhtt8tr3mq21IqEAPtVnj0vnrFMB2XqHaE=;
+	s=arc-20240116; t=1728753499; c=relaxed/simple;
+	bh=NULuAUl/txXW+gPsM35SLhVrxhpry3h6INgvOGfVwrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cgr2rLaMoEbrtaUY763xwg5+J9a3VAgOqX81J3GVyZCko1UDjJekRO+T0GoGrNZBuS4PFU+m8DWRjgUtPtHaTH9ZdRUFulWiL9DGJwrwYosOL2O7nMbxx5CEI2hEXdbgnmkn0n+dj2UOeulDonFUXbGecpQTzGn/ZiwlYmP5KRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h6SgVh0O; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6cbd005d0f9so27687666d6.3;
-        Sat, 12 Oct 2024 08:29:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728746959; x=1729351759; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6j+FVCgxZfKadKF+/f2Quoi7dAVKG0Z89u9PtWRfpKs=;
-        b=h6SgVh0ONBf2VhjO1agutxSZ5/vv+pBAVuRtHxCTDgqsdlRYZb34XJthaiR7fUIZYW
-         SHfV3CF7ir/mGBC6/v25di00foiVK9+IPGCHYY5yU6AsguEy0yZzU6QXWmjrAHM6q70/
-         ONCqUVYdKTBWzey8Zwr7EcOl5lAsCHXtYo9T8BrG8+U2DloewNq8anDcMYLrLy+RzEK9
-         dy9QMCvh6xwbaDYkw5zc3DlaffRRGwUcshznTOVgcJa0GBH96LxRyhsBESQrGwYmTyMJ
-         WmVuQkKoP5QDeY1z29mU/jOKpk2UEKWOQlIIKCiuANiL83SivwZoN7bZQ5rXpLR4yP60
-         kSdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728746959; x=1729351759;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6j+FVCgxZfKadKF+/f2Quoi7dAVKG0Z89u9PtWRfpKs=;
-        b=lkSRCP4mgop8N64QdjuJ9AMHFjduEfpeZRZtSWrmIMfOWpjHZBTNuCMXkEd7Gwwqlc
-         iOvYrocSt84t6ZeTk42IJgbLsjyd7jd2A9PLjJBJUk6+/zuPVKDbNu3yRMuC6UW7XAK7
-         c6ZCMdm073RuelI9atfxKkh2tygTjGB/Ep/ORC6jQr2wv0btDWp3HzOS7FXFwNDC4qFl
-         fwOy/CB3Fo01Oiu1cctQ9MfmvlgqBoj5xqskDsil9CoV/ICpmoUDUeaWJ0W1eF/fFIsk
-         KNPHoLHXNxIL+IgJTxrb873pUBi4+133/OgRIKZYQosWMmiJayz7/hU5XK7U5qCmhbMj
-         2njw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNL3np2SGoU5lTLWpNnbfUsLMNn8Tj9bF0B+vqTjTiITkZQXQG9vQH3FU5pSykYBaOBY0hnS3Lz2BmfNg=@vger.kernel.org, AJvYcCVDA9xKVktpZINKqLFGaX2cYovGyjNJ1dLV3abvW7Ikb1vlzO+M7Ei7uLNi4oJEYVbWQN6mBr0w7ZkaTQMvjYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpYf4uEd7wOdSBJkBOsBldWqcSGtTJ4K2MyK/hvoojy7mqGudc
-	cm8nPSYyVJvEXG+gEL/lDesAveKDJCUQ8p1fH14a3AvIF7Q809J5
-X-Google-Smtp-Source: AGHT+IF/EDW9cEkH4aC29lEw1icZ1Kdm7gfHx7mToMwD5a5W4EBJCgfi45RAjKeE4P04nb8zL8QY+Q==
-X-Received: by 2002:a05:6214:4981:b0:6cb:f853:9eca with SMTP id 6a1803df08f44-6cbf9d10272mr54404586d6.25.1728746958840;
-        Sat, 12 Oct 2024 08:29:18 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cbe85b9545sm25873136d6.57.2024.10.12.08.29.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2024 08:29:18 -0700 (PDT)
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 099F81200066;
-	Sat, 12 Oct 2024 11:29:18 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Sat, 12 Oct 2024 11:29:18 -0400
-X-ME-Sender: <xms:zZUKZ7CLprxm149-YkF2JgUbk7-fDvwOFj7h8AYkIa0JvF7THn1rSQ>
-    <xme:zZUKZxi2n6JmyaSZQd3wGAF7pf9k7KT1Su_ExMenoC4h6VfmZXHJ0eQeOdRHn7yGO
-    7WwLVxptO4gnK6ZGQ>
-X-ME-Received: <xmr:zZUKZ2lwGmEWOnZqU-gSvDbYUWYFdGdz6djLdnsgzlTan1ZOeAe2gAV2Jd3sgA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeguddgkeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtrodttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpeejffegieejvddtgfekkefhjeegjeevuedugfeh
-    fedtkeffjedtleeiuefhvdefgeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
-    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
-    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
-    mhgvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    epfhhujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehn
-    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehruhhsthdqfh
-    horhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgu
-    rhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilh
-    drtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughupdhrtghpthht
-    ohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnh
-    horhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgv
-    th
-X-ME-Proxy: <xmx:zZUKZ9ye7wzfjjbtI7BsyR9KxGs3_T4Ht33FE_ediU4aOGU1JzSPkQ>
-    <xmx:zZUKZwQQ1EFfrzOAJnJbiy4LKSTVdjJk04sYujc7cn9MmOkB376L5Q>
-    <xmx:zZUKZwYGRUrXA0NOrYqm5XSK1AhVkeVK6b7lwVOMI6CZvAsWjfLL3w>
-    <xmx:zZUKZxSG8tYAgGZaA_F-UxjQZ637Y1diI_l4Ux6aT6LfvkKxA1P9eQ>
-    <xmx:zpUKZ2Db2WS0_vWL9cME5BP42GU2Rs5VY-tzIxo_FE_zGGVFFFAF83Lb>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 12 Oct 2024 11:29:17 -0400 (EDT)
-Date: Sat, 12 Oct 2024 08:29:06 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
-	tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/6] rust: Add IO polling
-Message-ID: <ZwqVwktWNMrxFvGH@boqun-archlinux>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XttvYrcdjCvQwZF5DawK2WGS3D+fWQlFpyyrDGaC9vND7Ige+oEKfruSe/J2isMzn+UgT9mKk8pZvLx+CYlWdDxsjkSNOdg6pS4ajaVOdb+/+c5yvwV8FVcJ4lN6fpSat/Fq/mjZ0YOr0KWT2MjruL7a/FjUZHVJdr9OJFAkKOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BhBms6GG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5d6c72w9wUF/3LQbANdW7l+NbbqSByq50oUXh0tn+Yo=; b=BhBms6GGOzGvIifwVRM7z2AtSv
+	13cZIFMWYTxD1oxHKA9V87dUUfCS9kHtpKvFGBj2tQN3rzSgmuCzOE42lToDX3k4LZB+r3JuMg6dk
+	o1vD1fwOk8E/5UYDkncBAvij4xLlo7KL1CiOEL8uIZ8TQgfxt/eWvErVZ+9FfPqK2ZC8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1szfkS-009oEg-HD; Sat, 12 Oct 2024 19:17:48 +0200
+Date: Sat, 12 Oct 2024 19:17:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jacob.e.keller@intel.com, rentao.bupt@gmail.com,
+	f.fainelli@gmail.com, andrew@aj.id.au, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net] net: ftgmac100: refactor getting phy device handle
+Message-ID: <be591afe-d70b-4208-a189-40e65227ad14@lunn.ch>
+References: <20241011081633.2171603-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -123,83 +60,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+In-Reply-To: <20241011081633.2171603-1-jacky_chou@aspeedtech.com>
 
-Hi Tomo,
+On Fri, Oct 11, 2024 at 04:16:33PM +0800, Jacky Chou wrote:
+> The ftgmac100 supports NC-SI mode, dedicated PHY and fixed-link
+> PHY. The dedicated PHY is using the phy_handle property to get
+> phy device handle and the fixed-link phy is using the fixed-link
+> property to register a fixed-link phy device.
+> 
+> In of_phy_get_and_connect function, it help driver to get and register
+> these PHYs handle.
+> Therefore, here refactors this part by using of_phy_get_and_connect.
+> 
+> Fixes: 38561ded50d0 ("net: ftgmac100: support fixed link")
+> Fixes: 39bfab8844a0 ("net: ftgmac100: Add support for DT phy-handle property")
 
-On Sat, Oct 05, 2024 at 09:25:25PM +0900, FUJITA Tomonori wrote:
-> Add Rust version of read_poll_timeout (include/linux/iopoll.h), which
-> polls periodically until a condition is met or a timeout is reached.
-> By using the function, the 6th patch fixes QT2025 PHY driver to sleep
-> until the hardware becomes ready.
-> 
-> As a result of the past discussion, this introduces a new type
-> representing a span of time instead of using core::time::Duration or
-> time::Ktime.
-> 
+Fixes: implies something is broken. What is actually wrong with this
+code? What sort of problem does a user see?
 
-While, we are at it, I want to suggest that we also add
-rust/kernel/time{.rs, /} into the "F:" entries of TIME subsystem like:
+> -		phy_support_asym_pause(phy);
+> +		if (of_get_property(np, "phy-handle", NULL))
+> +			phy_support_asym_pause(phy);
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b77f4495dcf4..09e46a214333 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23376,6 +23376,8 @@ F:      kernel/time/timeconv.c
- F:     kernel/time/timecounter.c
- F:     kernel/time/timekeeping*
- F:     kernel/time/time_test.c
-+F:     rust/kernel/time.rs
-+F:     rust/kernel/time/
- F:     tools/testing/selftests/timers/
+This is probably wrong. This is the MAC layer telling phylib that the
+MAC supports asym pause. It should makes no difference to the MAC what
+sort of PHY is being used, all the MAC is looking at/sending is pause
+frames.
 
- TIPC NETWORK LAYER
+    Andrew
 
-This will help future contributers copy the correct people while
-submission. Could you maybe add a patch of this in your series if this
-sounds reasonable to you? Thanks!
+---
+pw-bot: cr
 
-Regards,
-Boqun
-
-> Unlike the old rust branch, This adds a wrapper for fsleep() instead
-> of msleep(). fsleep() automatically chooses the best sleep method
-> based on a duration.
-> 
-> v2:
-> - Introduce time::Delta instead of core::time::Duration
-> - Add some trait to Ktime for calculating timeout
-> - Use read_poll_timeout in QT2025 driver instead of using fsleep directly
-> v1: https://lore.kernel.org/netdev/20241001112512.4861-1-fujita.tomonori@gmail.com/
-> 
-> 
-> FUJITA Tomonori (6):
->   rust: time: Implement PartialEq and PartialOrd for Ktime
->   rust: time: Introduce Delta type
->   rust: time: Implement addition of Ktime and Delta
->   rust: time: add wrapper for fsleep function
->   rust: Add read_poll_timeout function
->   net: phy: qt2025: wait until PHY becomes ready
-> 
->  drivers/net/phy/qt2025.rs |  11 +++-
->  rust/helpers/helpers.c    |   2 +
->  rust/helpers/kernel.c     |  13 +++++
->  rust/helpers/time.c       |  19 +++++++
->  rust/kernel/error.rs      |   1 +
->  rust/kernel/io.rs         |   5 ++
->  rust/kernel/io/poll.rs    |  70 +++++++++++++++++++++++
->  rust/kernel/lib.rs        |   1 +
->  rust/kernel/time.rs       | 113 ++++++++++++++++++++++++++++++++++++++
->  9 files changed, 234 insertions(+), 1 deletion(-)
->  create mode 100644 rust/helpers/kernel.c
->  create mode 100644 rust/helpers/time.c
->  create mode 100644 rust/kernel/io.rs
->  create mode 100644 rust/kernel/io/poll.rs
-> 
-> 
-> base-commit: d521db38f339709ccd23c5deb7663904e626c3a6
-> -- 
-> 2.34.1
-> 
-> 
 
