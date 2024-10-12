@@ -1,89 +1,109 @@
-Return-Path: <netdev+bounces-134865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BC299B685
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:00:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D54799B68F
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10C25B21660
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:00:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48A0F1F21C56
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB8B136330;
-	Sat, 12 Oct 2024 18:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B79484A3F;
+	Sat, 12 Oct 2024 18:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R49lbYXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A93813B2A2
-	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 18:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7396C81AC6;
+	Sat, 12 Oct 2024 18:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728756005; cv=none; b=YxpLb4ZHBdaUvGw0NCeSw2IpPJHuihzemQ0A8z0f6tCWvlxWTM9Sa1MsgAWB7bh6S2AgvbA9QN0+n6tyA97VzF10Eupj9ACRSieJS5WpwYCuIRfarEh7mRAtoFpONTdwRZEVZ6TbSAVdI2hHfXmRP2WvK6r93jpoVfY1rswyJ4c=
+	t=1728756895; cv=none; b=Bqhx84HDvnUazgErltYzYKObs7tPCngt+lL8XMh1N4XVhZFJPIwryaLHnTALxQCgmlzJ5NvrWBh8vLHaHTucoNDjijz5HXxl9idAQUFayWvXZvctWDvbj9tte63wnrWOouOiifBVkxIIyHFTNL6i/1vkXeCXNgUOLhIuYGDoHFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728756005; c=relaxed/simple;
-	bh=8hHt5+iGh39sjPHzAaTebYzs9NAavjCpggn19QT5Ygg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=UHx/JYLek6zQieR2pPytd0v95CO+Z+EF8v6wLj3OGr9RzWrKDQoQ6m72gzVfpgwa27GrB6a+GbS52RCP0uUHvZMbcmiPPfb+jRMBtSFaFBG4neLM5Ed3efLSt8q4eAhnOgd8TeWEs0u3VFk027hnyfDmK/LbrtMYUgSp6yVYzOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a34988d6b4so48077915ab.2
-        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 11:00:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728756003; x=1729360803;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L47wACq13635XdZjofeiVNe4JkOgqBJXEN4PIFmbHa4=;
-        b=ddUoDSCgBGbVaG3489zx0r07uKgOX9nw1p1cApWw9vG5CPrAHcjn6I3OjpmorFdGbb
-         E8DElzrzjIa9XFho8hHg2YNf32M9MIglYSCyodwPyX50U/VqyNPny6jKcXHpRk5nYVEw
-         FEAx+cwYUcUMyydNVIeoXzbJmBPBGz2Fgernr2TdhGfAU+oPACSHO+TH94g9Yp6GXpbn
-         EZUMxu9cvxQ40R0EV0Ji3BHRnii13JiLsTp8nuIWdOMi/G1TJHwZAFLfwH9tm7ygzb5L
-         Ti1+MzghyrYSNqsfe54+CQEBxbnUfcemWS4rKJ02pBIrJ4zgsY4URy5OIsLhoFVSbChx
-         fMhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtgi5bUREuZK8DX+ucOt6wi+vRYPYsTf5/T+LzALbuwfflnOmrSP/IyKZG8oOGErt1zYiCZd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWzz/Kz7jHr7VY+WDiTb/4siGqkkl7RzUqv1UW/u9Y7VrCxN0j
-	jtf46uVQk34ufsAA7S+yLXPTirfndoKuCBNjDsqT9q1a8Q58Grppv9MrPVaOI2FLD1qdG96N/ql
-	5P9nO6am3La+GINPsS6scU+975hpYwoyyCcHVJI0UrrYjTrGeopzblos=
-X-Google-Smtp-Source: AGHT+IG6LjZwaZf0PkapF36b7e6PJiIgY1UV/fM3a8Ux0q94gT0tk4EZeblrJM6H9JkIA5LDTwp2w+HCtPmT7M+vjB39+784nixA
+	s=arc-20240116; t=1728756895; c=relaxed/simple;
+	bh=F43Ef2FxRFG2dCTICzYZwwxEWCgji1udsNDsdvVtJew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cKnHbPw5aJCyNQIEUZ9DLnCh5eU05D6R1dZmZb88CGyVPDIAYO0dy2O+vsaB0Vjon6jTECVNWYPb2tJestmoC1DRwRPPiHaTZQb9kUz529fe7WuJuTKcrS23CF53Es6IBG/XlV9G7RPAff9od3Qorswn0rzuBRyUS9NmvJdjihw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R49lbYXW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RtgkYBkKn4YW6WOs02680DjsXE7fPjhLxXICoPrpxqw=; b=R49lbYXWwnbo9n/i4DeXA3tKMQ
+	K6I0iJX7idZZv6xm1cu+oFSn86FjQDZLXRH6mJ9+9Li3PytyveNr0P81f6kIyHovjL0lXB00tIt6c
+	tizGXNc4KOU9EtetST6KAp6CVwfLrSpDxXAt3K0l7fHz9TyIyM3n9N5VLYgFa6HJOOIM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1szgdX-009oQI-Rh; Sat, 12 Oct 2024 20:14:43 +0200
+Date: Sat, 12 Oct 2024 20:14:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	stable@vger.kernel.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
+Subject: Re: [PATCH net v1 1] net: macb: Avoid 20s boot delay by skipping
+ MDIO bus registration for fixed-link PHY
+Message-ID: <379d10d5-468c-4d88-984e-df9ddc52f28e@lunn.ch>
+References: <20241010105101.3128090-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cdad:0:b0:3a1:a20f:c09c with SMTP id
- e9e14a558f8ab-3a3bce0b1e1mr28399625ab.22.1728756003623; Sat, 12 Oct 2024
- 11:00:03 -0700 (PDT)
-Date: Sat, 12 Oct 2024 11:00:03 -0700
-In-Reply-To: <ZwqEijEvP7tGGZtW@fedora>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <670ab923.050a0220.3e960.0029.GAE@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_ntf_packet (3)
-From: syzbot <syzbot+3f8fa0edaa75710cd66e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, krzk@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	qianqiang.liu@163.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010105101.3128090-1-o.rempel@pengutronix.de>
 
-Hello,
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index f06babec04a0b..e4ee55bc53ba7 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -930,9 +930,6 @@ static int macb_mdiobus_register(struct macb *bp)
+>  		return ret;
+>  	}
+> 
+> -	if (of_phy_is_fixed_link(np))
+> -		return mdiobus_register(bp->mii_bus);
+> -
+>  	/* Only create the PHY from the device tree if at least one PHY is
+>  	 * described. Otherwise scan the entire MDIO bus. We do this to support
+>  	 * old device tree that did not follow the best practices and did not
+> @@ -953,8 +950,19 @@ static int macb_mdiobus_register(struct macb *bp)
+> 
+>  static int macb_mii_init(struct macb *bp)
+>  {
+> +	struct device_node *child, *np = bp->pdev->dev.of_node;
+>  	int err = -ENXIO;
+> 
+> +	/* With fixed-link, we don't need to register the MDIO bus,
+> +	 * except if we have a child named "mdio" in the device tree.
+> +	 * In that case, some PHYs may be attached to the MACB's MDIO bus.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+nitpick. It could be a switch on the MDIO bus, so "some devices may
+be"
 
-Reported-by: syzbot+3f8fa0edaa75710cd66e@syzkaller.appspotmail.com
-Tested-by: syzbot+3f8fa0edaa75710cd66e@syzkaller.appspotmail.com
+> +	 */
+> +	child = of_get_child_by_name(np, "mdio");
+> +	if (child)
+> +		of_node_put(child);
 
-Tested on:
+The code now gets this node twice. You could add an optimisation patch
+which passed child to macb_mdiobus_register().
 
-commit:         7234e2ea Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b63fd0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=981fe2ff8a1e457a
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f8fa0edaa75710cd66e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=14f87b27980000
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Note: testing is done by a robot and is best-effort only.
+    Andrew
 
