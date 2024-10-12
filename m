@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-134866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D54799B68F
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:15:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7CC99B698
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 20:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48A0F1F21C56
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:15:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37074283010
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 18:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B79484A3F;
-	Sat, 12 Oct 2024 18:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C06B84E04;
+	Sat, 12 Oct 2024 18:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R49lbYXW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wYMiyIvC"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7396C81AC6;
-	Sat, 12 Oct 2024 18:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7EA2110E;
+	Sat, 12 Oct 2024 18:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728756895; cv=none; b=Bqhx84HDvnUazgErltYzYKObs7tPCngt+lL8XMh1N4XVhZFJPIwryaLHnTALxQCgmlzJ5NvrWBh8vLHaHTucoNDjijz5HXxl9idAQUFayWvXZvctWDvbj9tte63wnrWOouOiifBVkxIIyHFTNL6i/1vkXeCXNgUOLhIuYGDoHFQ=
+	t=1728757759; cv=none; b=SYIEzPV538NiMmLEpymiLpaoz5w7s7lRH9IqJm1mwKr2SU3y0OGMLmPHmFKG0Dmsb0FvdWtJp02mNgDKGXu60Z0uMhku2h/OZhwfUw+EM4Z+/0SPq1dBAcX24LiMfmdokEKSwddRLwE3dnlsKQtlKQZSMA37RJDT1SAROOcEOIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728756895; c=relaxed/simple;
-	bh=F43Ef2FxRFG2dCTICzYZwwxEWCgji1udsNDsdvVtJew=;
+	s=arc-20240116; t=1728757759; c=relaxed/simple;
+	bh=Qg8+YlMWVycQQ0N7V4mJ6bWJn6wFCTzfiXzJsajCrM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKnHbPw5aJCyNQIEUZ9DLnCh5eU05D6R1dZmZb88CGyVPDIAYO0dy2O+vsaB0Vjon6jTECVNWYPb2tJestmoC1DRwRPPiHaTZQb9kUz529fe7WuJuTKcrS23CF53Es6IBG/XlV9G7RPAff9od3Qorswn0rzuBRyUS9NmvJdjihw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R49lbYXW; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=TeIfz9AFzSrVhRZhzrQCB4r9VyircOseZpjGfp5JK1kpa3SatLNLTtbFiFn1ptYXmNXVFeF2gtlKrnq4rkZ3QbVFba/wb4gJ9Q5AgyPPXNpvg4AYckuSA9rOgGvkAXvNGbr2d22ACB7PD6pgCpCY+JLXRB3lFafIdUoBCjmGM8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wYMiyIvC; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,27 +36,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RtgkYBkKn4YW6WOs02680DjsXE7fPjhLxXICoPrpxqw=; b=R49lbYXWwnbo9n/i4DeXA3tKMQ
-	K6I0iJX7idZZv6xm1cu+oFSn86FjQDZLXRH6mJ9+9Li3PytyveNr0P81f6kIyHovjL0lXB00tIt6c
-	tizGXNc4KOU9EtetST6KAp6CVwfLrSpDxXAt3K0l7fHz9TyIyM3n9N5VLYgFa6HJOOIM=;
+	bh=JXGrwAJ4nPZdixL8Osla8TyTvVRvZyTkZ+Q5jkHPYos=; b=wYMiyIvCGjzwAv/fbxB3IFL4hV
+	hmEb7g/dW9qnh3hz/neGGBuhLtpEkMxnJEuyOvqU8tnncm21lDlHV3AuvGYzs1b8Aacm6l0v4MgGw
+	qMTj5qVWv+4K3x5NPBbiLiLsEp8NetfJvH5XUWl0lc/rXe/IwjuuTMzC5V0RVzH7Qxyk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1szgdX-009oQI-Rh; Sat, 12 Oct 2024 20:14:43 +0200
-Date: Sat, 12 Oct 2024 20:14:43 +0200
+	id 1szgrP-009oRv-KA; Sat, 12 Oct 2024 20:29:03 +0200
+Date: Sat, 12 Oct 2024 20:29:03 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
-Subject: Re: [PATCH net v1 1] net: macb: Avoid 20s boot delay by skipping
- MDIO bus registration for fixed-link PHY
-Message-ID: <379d10d5-468c-4d88-984e-df9ddc52f28e@lunn.ch>
-References: <20241010105101.3128090-1-o.rempel@pengutronix.de>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net] net: ftgmac100: corrcet the phy interface of NC-SI mode
+Message-ID: <e22bf47d-db22-4659-8246-619aafe1ba43@lunn.ch>
+References: <20241011082827.2205979-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,45 +59,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241010105101.3128090-1-o.rempel@pengutronix.de>
+In-Reply-To: <20241011082827.2205979-1-jacky_chou@aspeedtech.com>
 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index f06babec04a0b..e4ee55bc53ba7 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -930,9 +930,6 @@ static int macb_mdiobus_register(struct macb *bp)
->  		return ret;
->  	}
+On Fri, Oct 11, 2024 at 04:28:27PM +0800, Jacky Chou wrote:
+> In NC-SI specification, NC-SI is using RMII, not MII.
 > 
-> -	if (of_phy_is_fixed_link(np))
-> -		return mdiobus_register(bp->mii_bus);
-> -
->  	/* Only create the PHY from the device tree if at least one PHY is
->  	 * described. Otherwise scan the entire MDIO bus. We do this to support
->  	 * old device tree that did not follow the best practices and did not
-> @@ -953,8 +950,19 @@ static int macb_mdiobus_register(struct macb *bp)
+> Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> ---
+>  drivers/net/ethernet/faraday/ftgmac100.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->  static int macb_mii_init(struct macb *bp)
->  {
-> +	struct device_node *child, *np = bp->pdev->dev.of_node;
->  	int err = -ENXIO;
-> 
-> +	/* With fixed-link, we don't need to register the MDIO bus,
-> +	 * except if we have a child named "mdio" in the device tree.
-> +	 * In that case, some PHYs may be attached to the MACB's MDIO bus.
+> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+> index ae0235a7a74e..85fea13b2879 100644
+> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+> @@ -1913,7 +1913,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
+>  			goto err_phy_connect;
+>  		}
+>  		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
+> -					 PHY_INTERFACE_MODE_MII);
+> +					 PHY_INTERFACE_MODE_RMII);
+>  		if (err) {
+>  			dev_err(&pdev->dev, "Connecting PHY failed\n");
+>  			goto err_phy_connect;
 
-nitpick. It could be a switch on the MDIO bus, so "some devices may
-be"
+I'm a but confused here. Please could you expand the commit
+message. When i look at the code:
 
-> +	 */
-> +	child = of_get_child_by_name(np, "mdio");
-> +	if (child)
-> +		of_node_put(child);
+		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
+		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
+					 PHY_INTERFACE_MODE_MII);
+		if (err) {
+			dev_err(&pdev->dev, "Connecting PHY failed\n");
+			goto err_phy_connect;
+		}
 
-The code now gets this node twice. You could add an optimisation patch
-which passed child to macb_mdiobus_register().
+The phy being connected to is a fixed PHY. So the interface mode
+should not matter, at least to the PHY, since there is no physical
+PHY. Does the MAC driver get this value returned to it, e.g. as part
+of ftgmac100_adjust_link, and the MAC then configures itself into the
+wrong interface mode?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+For a patch with a Fixes: it is good to describe the problem the user
+sees.
 
-    Andrew
+	Andrew
 
