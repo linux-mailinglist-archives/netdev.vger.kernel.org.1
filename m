@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-134792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C8899B31B
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 12:42:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4DC99B330
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 12:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C32BE1C21CA8
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 10:42:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5311F22D74
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 10:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D5F154BE9;
-	Sat, 12 Oct 2024 10:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0780155330;
+	Sat, 12 Oct 2024 10:57:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="CJ1ch+Xs"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="CSeLt16K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1BB1547CE
-	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 10:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BD91547EB
+	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 10:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728729759; cv=none; b=ePC8Iw+WpfSgqZA7S1IMIMLhgmRAHhyZo0KJYMngU3kzyK1xNOG2dPXKCaEG8kDlBkCX+nP3OzuAnC1kbPOyoP6+bO/CZftRGv2Lo3MHbZjYLdRna+7O9gSJeGjCnlC7HbzPjzuLu2/Hr86gpahG5+jGPzqu0Xc+krHRmkWkJlQ=
+	t=1728730651; cv=none; b=Jhy86k3gdWcNbglCP6Rlg6U9gk8bpnwC9LW40MbJU8bDVi2b33v5/F/WOD7h/4g9HCTfJrKMqJFcDU9j9pvnshzHCNsbK8axjh/7fAG8oKlIsl5PnoYkFFbZO6aTj9qqBSTsYLCAUtxVFFJ5DFSW57QmjASKPebC3NfVbesMBI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728729759; c=relaxed/simple;
-	bh=F2Sp1fzcw8Uf/QMINhGhDYWS9F5dWa9nb4/qh8r/ALY=;
+	s=arc-20240116; t=1728730651; c=relaxed/simple;
+	bh=yzj48cWj4L8LiQC5ox1BGXI/Tjjq1Nx6uec3CrMVcKI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jdBIXyeUNThMvgVQbcye+kC4qjNxOH90yld9otaEfxtyn4MshA7tD51wx0DjnJ8pvp9pn0Fx+fKECv7XnGRHlHdzjMkPh8slzHT8a2BHzwnoTpPA4DX98gl8JxU9OgLcm8lfWmzoDBVWaJBSUqHI6oN1VoFwKvhHaYBrGXPTv2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=CJ1ch+Xs; arc=none smtp.client-ip=209.85.214.171
+	 In-Reply-To:Content-Type; b=XQFmUo11UsJjDNbPfMTOSrx9jrVg8Yom+8ovicXsBp2so0gi0HWnhwnnyZTmsm9hlae8+X6Q9KOdx/z5sik4kSUStlAJYdZDUCEo41ESFT4zThxzbjB/ggiTT5waTjVJN1yYzvKBJ5UYI+vjqPhGPuVzBXEKPu8tUQVpOSGfsNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=CSeLt16K; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20b93887decso25742695ad.3
-        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 03:42:37 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71e4244fdc6so919995b3a.0
+        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 03:57:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1728729757; x=1729334557; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1728730648; x=1729335448; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=rnVDkA3/NaAKhKgMUHvmItPchk02Cn37cnkYPg5p2Qw=;
-        b=CJ1ch+XsP3k9Bdzgi04+URwvUed22kf7IKlTv1B37FV6auETP4UlJefSeJXGYF9vSb
-         BndSPWHOFR5xJEBQbpFAxbda8AOE0AO2cUs5dvj0yNA6O+i1JXchGPZMtEEcUBJ1jDpA
-         9ae5pOZ4/yMrP9TjbkbPbVtkeUGQhjollE3J4wiGs9fK52X2x1+HrGucK/JOEL2JW79P
-         6cInfHli9hUziadd/Wsbh4zll4iZ37mOZPwoSCDOt8srfmrJtBy+AFMV/iBVQfaWP60W
-         LDAvyZwIkTLvul7Ko140liyADahfYrbPfITSn4SlImw3918FdMwtiQzT5teJi6CGysLl
-         wU9g==
+        bh=RQHS9P9S9IhAfq2pHjdIrMEoP4ui2SXVS05dgp3eWDo=;
+        b=CSeLt16KDtXf38VTmxWsiaFLnugXTgimirMnF9N8sJe5GkzloTe+Cf2vHLD/+aTL3/
+         jsYZjwPHHeORE8nXdtkqDJmjwzhBQ8Vo2ESaQGb4lg/z6XYjXSqrk9a9r8xdJnPEKeHu
+         oAs2XGtt3uDAd9xGGQIvAlhmIEl51dgY4MCz6uTwGtyejn7w1eehw2/2Zc6hHT9YUK0y
+         zQL0NkzuObzhHwzwzsfCiahehxbzWJ8nHn1zWa1BhRnChTSau1gK81t2YlxnEE+/Mwx8
+         txJMD0M59MeuoRP5soEe/L+6zeOpBGCa47wkL0A/pWzorP2KXjci/My5fYT9f8dAAxLv
+         3roA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728729757; x=1729334557;
+        d=1e100.net; s=20230601; t=1728730648; x=1729335448;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rnVDkA3/NaAKhKgMUHvmItPchk02Cn37cnkYPg5p2Qw=;
-        b=bSfGrueWf5M2G0UmhQAc6jsqBG01yjLo/WA5otejXY5ohJDaN4iCDyUUvK+ViWryjN
-         ax920bL/31gPe/i/wBzIQiO8Ml8pGOj7Y87iGltibR+U5XJB0hZ9VkBAyf8s7UuO5nQn
-         mR7weaLiIuQ4Bv3nGmTZ96MCLhB7GyRUPZxRqQJ+npuB0r2FpxoQcXLgCfxJoPEchj3G
-         ibhJ1heqtB9uOTcEh67d/xoK6B3gYthJHrBCwnE5V6zQKm8+TNHq6/9Rr1QV5C6Z6uRJ
-         2k24y8KAMZNOpB2CzPHrK5so2x9tHl8G7b9TZewy2RFdVg6JbLrNufwZ4ulQ41TqhyIG
-         y1JA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrX41pDP0pumw3l3YjYhVl9+gqX/i0qgnDcXI5Cj0h0jQoyjK2z+Li12AiysPhVQ6TvZm6IHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1mSt2YD9UzqxkoPN5xkEvPJHk01JdLRcIzviWOpmwkLmh3U5+
-	HGvgGyhmhvm5W3yHIZB5cB6lMtJiR/pGqHFki6QOPM1aOTnh4XUYQaWcZy1yBVI=
-X-Google-Smtp-Source: AGHT+IHAAJSka16NZVOG9ERRGT0s8XZNSpBXGOA3FY01waa9+ItcfG5gf6PTH3meZ9nN0csYqZ692Q==
-X-Received: by 2002:a17:902:e5d2:b0:20c:ce9c:bbb0 with SMTP id d9443c01a7336-20cce9cbddfmr6671465ad.0.1728729757238;
-        Sat, 12 Oct 2024 03:42:37 -0700 (PDT)
+        bh=RQHS9P9S9IhAfq2pHjdIrMEoP4ui2SXVS05dgp3eWDo=;
+        b=sV74FqRvT27VKSRz8DOoBwxufx+Ww2JiqZVSPp8ytLlPTSo6nWBvgd1AG5wbxCG6ht
+         OYKshhMtta5H7NEf5UMe6MWHDhLk2yLT1uvyEjd8LfnFkY4NjKiZ0Igz0nYVFvZfnY80
+         hC85IRm0UlB9c3scTqQvm/eeM3Rmf8UgKihMvMrw6jbm3TFnZ9VmO9rrS82mF0DNQmCK
+         kpSeMOqdTn3cmyILyS9UxM/7ud0ZPfBB8UIh4A6CdH+wpHMHB/RPgsZUufCpQDweNoCw
+         z+qBy39hvbSX2vGIPOcluBOPGQmF1aHAsEA6jzS0WBFEdTB/HKZ7L+MaZbHSIiH/zmGn
+         mgww==
+X-Forwarded-Encrypted: i=1; AJvYcCVeLFYC37l9h3lh+bPW91hC7ssUyQnNyznjpVsxfQu3zFzHdrfdjK4YCySljm6ENQw6zqcnxBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi6uJuSgM57jLycGERubIyO/k10EYIjDOo15wdAxwg4Ngtcxxu
+	e/+Y7PwnBUnddUzhy7oVcDSSQSRRJau3A/8amjTFgrooeVH2m9exdsT9HdiWDik=
+X-Google-Smtp-Source: AGHT+IFekv1Jof5V0rzE74khJL3aujdAI4lCz36fIxAEe87tyEoPh3HrVVeYVj30VhB4bKJv7WvZZQ==
+X-Received: by 2002:a05:6a20:e617:b0:1d8:aade:dae8 with SMTP id adf61e73a8af0-1d8c96c477bmr3811262637.49.1728730648461;
+        Sat, 12 Oct 2024 03:57:28 -0700 (PDT)
 Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c33ffadsm35367635ad.266.2024.10.12.03.42.32
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea6ed5f6d0sm676332a12.53.2024.10.12.03.57.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 12 Oct 2024 03:42:36 -0700 (PDT)
-Message-ID: <30bbebd8-1692-4b62-9a1f-070f6152061c@daynix.com>
-Date: Sat, 12 Oct 2024 19:42:31 +0900
+        Sat, 12 Oct 2024 03:57:28 -0700 (PDT)
+Message-ID: <f4501f54-875a-4c46-9e77-802bd81f4230@daynix.com>
+Date: Sat, 12 Oct 2024 19:57:22 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +76,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v5 01/10] virtio_net: Add functions for hashing
+Subject: Re: [PATCH RFC v5 04/10] tun: Unify vnet implementation
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
  Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -90,25 +90,57 @@ To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
  Andrew Melnychenko <andrew@daynix.com>,
  Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
 References: <20241008-rss-v5-0-f3cf68df005d@daynix.com>
- <20241008-rss-v5-1-f3cf68df005d@daynix.com>
- <67068a7261d8c_1cca3129414@willemb.c.googlers.com.notmuch>
+ <20241008-rss-v5-4-f3cf68df005d@daynix.com>
+ <67068b632d2d2_1cca3129484@willemb.c.googlers.com.notmuch>
 Content-Language: en-US
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <67068a7261d8c_1cca3129414@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67068b632d2d2_1cca3129484@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2024/10/09 22:51, Willem de Bruijn wrote:
+On 2024/10/09 22:55, Willem de Bruijn wrote:
 > Akihiko Odaki wrote:
->> They are useful to implement VIRTIO_NET_F_RSS and
->> VIRTIO_NET_F_HASH_REPORT.
+>> Both tun and tap exposes the same set of virtio-net-related features.
+>> Unify their implementations to ease future changes.
 >>
 >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 >> ---
->>   include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
+>>   MAINTAINERS            |   1 +
+>>   drivers/net/tap.c      | 172 ++++++----------------------------------
+>>   drivers/net/tun.c      | 208 ++++++++-----------------------------------------
+>>   drivers/net/tun_vnet.h | 181 ++++++++++++++++++++++++++++++++++++++++++
 > 
-> No need for these to be in header files
+> Same point: should not be in a header.
+> 
+> Also: I've looked into deduplicating code between the various tun, tap
+> and packet socket code as well.
+> 
+> In general it's a good idea. The main counter arguments is that such a
+> break in continuity also breaks backporting fixes to stable. So the
+> benefit must outweight that cost.
+> 
+> In this case, the benefits in terms of LoC are rather modest. Not sure
+> it's worth it.
+> 
+> Even more importantly: are the two code paths that you deduplicate
+> exactly identical? Often in the past the two subtly diverged over
+> time, e.g., due to new features added only to one of the two.
 
-I naively followed prior examples in this file. Do you have an 
-alternative idea?
+I find extracting the virtio_net-related code into functions is 
+beneficial. For example, tun_get_user() is a big function and extracting 
+the virtio_net-related code into tun_vnet_hdr_get() will ease 
+understanding tun_get_user() when you are not interested in virtio_net. 
+If virtio_net is your interest, you can look at this group of functions 
+to figure out how they interact with each other.
+
+Currently, the extracted code is almost identical for tun and tap so 
+they can share it. We can copy the code back (but keep functions as 
+semantic units) if they diverge in the future.
+
+> 
+> If so, call out any behavioral changes to either as a result of
+> deduplicating explicitly.
+
+This adds an error message for GSO failure, which was missing for tap. I 
+will note that in the next version.
 
