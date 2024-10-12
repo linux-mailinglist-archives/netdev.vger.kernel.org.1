@@ -1,62 +1,67 @@
-Return-Path: <netdev+bounces-134802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC1799B3C1
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:34:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DAE999B3D3
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:36:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B2531F26191
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:34:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 732D7B23F7A
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649021AC459;
-	Sat, 12 Oct 2024 11:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5F61C9B97;
+	Sat, 12 Oct 2024 11:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8YzoDSx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zv7GplDe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE161ABEA6;
-	Sat, 12 Oct 2024 11:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7182A161310;
+	Sat, 12 Oct 2024 11:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728732466; cv=none; b=dxPghH/e5xhn8lmONbkJVl3gEHjK9CYvyYgmZwQlkpKvF8EAtjpz8Pa2vBa94bbDBA46/oZ4kghfIZDawFSi7GeAPiqpjsY3PABfHcJImQG1TD/Xyzaa/FJghFNLSpCawlF6noBIDoE1QQkROc4+lHm4DBSS20onkZv3XWeZnr8=
+	t=1728732481; cv=none; b=Hwd7ChECQ7ILWIghi4/ueBYXlnUeZyOJCygscUAVG7eUhiQIed4zmmNhdWtXg4NbtXQ2jacPhBTKY2JE1INeocAI9Eg/uZk9KzxrneAKkVIbPjho3axUjVbv8XVfKWyu52p3A7/8EP2w3ERAORHt76O6xRuw3Ysx6cNBzf2g3GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728732466; c=relaxed/simple;
-	bh=VH0aY4estQCwicRYBWlxraTzj5ZQ7u7+dU1JRYM3hdE=;
+	s=arc-20240116; t=1728732481; c=relaxed/simple;
+	bh=puTmv4xsqmpJFI+PMGcQwnS9bPy4XtIzMU074nWDteA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SLJBDe35tAMPfY9bZgMf6RaMXiJtEJzj/ZyjIRzQ9VnCK5upmgTeeWjpsE7lcI++y6/VGUQO4ka3A9FFInTj2EtySd/GQEVQyOg9pdNWNthBNsMkXTZFvs4L52nN0WXwt/j7yYd7cRNQMRxjrFb1pOXC3jjvuxdeVR7opqmRVCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8YzoDSx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E93C4CEC6;
-	Sat, 12 Oct 2024 11:27:44 +0000 (UTC)
+	 MIME-Version; b=YA+4UDgWogXtWIeNeAPbOivprBiWE79NMaQC1VMN7c7t8Gt8A+GrdzLnsPQf02ahh2NY7eCLTTS8dbwU+x2Tp+lYSJMMAny90vifF6ELu21SnhClGimiRVQaR6l5irfLv5jYw/WPAVx+NkOsdH2hE9+gMF24IO9z14tpmGZRASQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zv7GplDe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3025FC4CEC7;
+	Sat, 12 Oct 2024 11:27:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728732466;
-	bh=VH0aY4estQCwicRYBWlxraTzj5ZQ7u7+dU1JRYM3hdE=;
+	s=k20201202; t=1728732481;
+	bh=puTmv4xsqmpJFI+PMGcQwnS9bPy4XtIzMU074nWDteA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A8YzoDSx/ht8s3EpvszBlYNVXd3K780SFr1tSZw0ElADgYAAixZR7ckTAer9doSc4
-	 WZ0AVn7SIQXetiLjCHHZj6KffGboyWrN9NLKia2VKEpJb4iMvpdC+PqcpUSUQnlPPV
-	 uzYciEGC9r5xgNkKWgI8dxcaww+Uv5QNlAZtyb/dOkz1vMl8i7DJGDofmYfvsK6v+O
-	 lysZ5N4cWXkkn9tNvLV0AkbuDNe0h57CgzCd/iTzii9zju/fiFhi82OwCrlmQDSNb+
-	 Tc3ZbOPAAe9NhrjQWkKHO6TvDV6We2gF/mdb7QaiH1mWL4oUFoKHK0ENpBULjGOee/
-	 3jSFZ6l1/XBaA==
+	b=Zv7GplDewklujL8JgOan25g0blEshr2AiM+AARcdBxksJJ5wY/O5a+w1v4rhpK8Ip
+	 nb0094khM8Sr380fK2fz3Fgp1TLwjsv3HM5dcN+JGEaTqCoi2QDjz7OoBYgCSHDrEG
+	 O7YdJ0yAU464nAvOQMNrLC7hKYyY8apSH3kwnm7E0r8eVBZm+6pwz2UsfhJArDJKXN
+	 9osX+wfAS47iRRY5EHlCQFg10tXqjWr/DhhiC0Gf+lVXU0SfuZv778eGg0Obet4vou
+	 z2xPV3Oa1x2DFKRVxI3JIfNy7wzeWMETgw974as+hpoDr6ETenkl1byZEgT70aKSad
+	 V9dECtBJodSkg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Peiyang Wang <wangpeiyang1@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
+	yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
+	horms@kernel.org,
+	liuyonglong@huawei.com,
+	lanhao@huawei.com,
+	shenjian15@huawei.com,
+	chenhao418@huawei.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 13/20] net: phy: vitesse: repair vsc73xx autonegotiation
-Date: Sat, 12 Oct 2024 07:26:45 -0400
-Message-ID: <20241012112715.1763241-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 19/20] net: hns3: use correct release function during uninitialization
+Date: Sat, 12 Oct 2024 07:26:51 -0400
+Message-ID: <20241012112715.1763241-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241012112715.1763241-1-sashal@kernel.org>
 References: <20241012112715.1763241-1-sashal@kernel.org>
@@ -71,74 +76,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.56
 Content-Transfer-Encoding: 8bit
 
-From: Pawel Dembicki <paweldembicki@gmail.com>
+From: Peiyang Wang <wangpeiyang1@huawei.com>
 
-[ Upstream commit de7a670f8defe4ed2115552ad23dea0f432f7be4 ]
+[ Upstream commit 7660833d217528c8f2385528951ab820a031e4e3 ]
 
-When the vsc73xx mdio bus work properly, the generic autonegotiation
-configuration works well.
+pci_request_regions is called to apply for PCI I/O and memory resources
+when the driver is initialized, Therefore, when the driver is uninstalled,
+pci_release_regions should be used to release PCI I/O and memory resources
+instead of pci_release_mem_regions is used to release memory reasouces
+only.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/vitesse.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
-index 897b979ec03c8..3b5fcaf0dd36d 100644
---- a/drivers/net/phy/vitesse.c
-+++ b/drivers/net/phy/vitesse.c
-@@ -237,16 +237,6 @@ static int vsc739x_config_init(struct phy_device *phydev)
- 	return 0;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index c8059d96f64be..3b01447478159 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -11358,7 +11358,7 @@ static void hclge_pci_uninit(struct hclge_dev *hdev)
+ 
+ 	pcim_iounmap(pdev, hdev->hw.hw.io_base);
+ 	pci_free_irq_vectors(pdev);
+-	pci_release_mem_regions(pdev);
++	pci_release_regions(pdev);
+ 	pci_disable_device(pdev);
  }
  
--static int vsc73xx_config_aneg(struct phy_device *phydev)
--{
--	/* The VSC73xx switches does not like to be instructed to
--	 * do autonegotiation in any way, it prefers that you just go
--	 * with the power-on/reset defaults. Writing some registers will
--	 * just make autonegotiation permanently fail.
--	 */
--	return 0;
--}
--
- /* This adds a skew for both TX and RX clocks, so the skew should only be
-  * applied to "rgmii-id" interfaces. It may not work as expected
-  * on "rgmii-txid", "rgmii-rxid" or "rgmii" interfaces.
-@@ -444,7 +434,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc738x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -453,7 +442,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc738x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -462,7 +450,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc739x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -471,7 +458,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc739x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
 -- 
 2.43.0
 
