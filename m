@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-134840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7746999B494
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:55:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB2799B495
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE03DB2499C
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:55:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE80A1C235C0
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FC419B5B5;
-	Sat, 12 Oct 2024 11:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F47619C56B;
+	Sat, 12 Oct 2024 11:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="opm1zZm4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pifHjNqk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87076174EFC
-	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 11:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FFF19C555
+	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 11:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728733678; cv=none; b=gNM97Qy32ragO2wx4iqWqSIDRlTSeQK5cnX5Eo03ukGbfmqZXfnIowaSjW9pwuvteyqCrEquCO+GzdOO5X+rX59MfFQ2Yd3kGdfhX/GmxA8SN0oE+FTJSoU1+MvVCcc5aR/bY+dn3S2kQ5z2eWMrPs7LwqsaVtjVztzWJGveL2Y=
+	t=1728733684; cv=none; b=NnYNgezFG7p+bD7cCI/w9SE4c0CgRUXlvyfywgifBk7ad4eEbXc0HSrovN+Db/e01E14XiWALkl4tDWFtnEp8xsjuWAmvdErPx/LXaqF8NsokBFuuD8c8FMi5QQ6q1w7BSSCpKSEGrvQa5uhipOEAWQYM1MpxdLrrZLWqbzJgk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728733678; c=relaxed/simple;
-	bh=wMEzQDgxlBALIhduUpoQoDITHC5O1pOXtSgjt/0Igxs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eqDAq30zI3gMVFYDxg6GbV905n+ph8gNhR/tA0lSAIGV/Ub7TPPM6R4i8sC2F7v1FncLxxCbcQNLpC9C1dGtLL1gb/BQsI8KA4NQ0yI/+JvtTAmzfuzqrgMxVDTd5ZR56INMPj0Pgjm2+1sO43tMnPwK1RP+NRucHhLI3d+FOLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=opm1zZm4; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1728733684; c=relaxed/simple;
+	bh=1g1b1pXyjZxGa3Qh7WC8Q0JOQpG0CNJqkMWxx8Yuzls=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HzRGB2PNdBnI90uphW3ROunQPICjt80Xr0YqdujPAUo4xmrSYCmF+AJa1JVEc3P4AeIawiwXeEj6rC/w6fNXpXFjA+zmrvO5xca1h9k5qdeQzD62TF7QFUmHMjGDDFEK/parTVlU6C1yruDt4AVFi8wUOBDuuIaoFeVopcgC0gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pifHjNqk; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e26ba37314so52052767b3.0
-        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 04:47:56 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6886cd07673so59923747b3.3
+        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 04:48:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728733675; x=1729338475; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728733681; x=1729338481; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=PC1TT8s5aJVZuPxi84fwP2du0aqC4j59rElSaUuKUNM=;
-        b=opm1zZm4xvemSLXOIN3Qkf9GJ/9x7ikaunUKO8OLMZnN4hBe6/WLRxH9/hc0mawMEq
-         A/aO4ad2dwxWClAiPIzkDgbgUTeyirYHTdbjGpKdoXBq+NbFqv1WPHK+PyqFDjtxw7Yl
-         +RKFilrFQE4Vv6M3AxUBG1uPRgsZ3+u/Zs8W0o6cbGxoxDIXDTnx++iDisJiOsSuGLCn
-         uI3ToFh8AMokVLQKykSWp6j6rJDe51KBQHVAFFqZElD1e4B8A9u7tiX/K2q2PRNw+JF8
-         n2xbLX6Bz+w7Nlf7PvwyhzSas6c0LNn2ohpuUkiTk92DX1tdFh/miUAYJO9/6JSszgRQ
-         0Vjw==
+        bh=l0ebcgRIRh90MOHtpCFWoKc1X14VIpR1q5b48hz4kwg=;
+        b=pifHjNqkOGUBdr1l7shFlWBDuHonJCjC+XRBl4f9+upAsuiBgA7ikDhgU4SwSar362
+         4rm/gVNkpIB2hb3sZxEQSkFSK/D4/zYoAUFqHIVA9rfICOr0+apJJ27Xxk/fN68Xq4E9
+         HJxrV8roGnZsfGpAw011ODkZ8LYdbFFqA5V9LJMIl9fS9nfvn/rOt7Pr/wJ+znfLiozH
+         AHslwnI9DqOhd56YKiCtKSezKsGTR5vNdTJDEnrEug/PTdYwtzZ75xYZ3HgXwk9MCLCg
+         BPeAa8lmVIHHwcCcnQHqSM5NdB83GLVqNlCfoiyCMmPWDS9Zpmx8T/6ovH5m75xXUKwO
+         YSkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728733675; x=1729338475;
+        d=1e100.net; s=20230601; t=1728733681; x=1729338481;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=PC1TT8s5aJVZuPxi84fwP2du0aqC4j59rElSaUuKUNM=;
-        b=T7lVBIrVyJ0KihwGszP/QbOSNcYMoJ8cVB9+rU+0m9uaJqc5PWKWmFp2UNRWJzvRAw
-         1HyIGs51XvTZxYRL89nKlBk3mfOhdnDX+CE+efY2LRpfsNCr8yKsP4J/yxtKrfwTHfcT
-         +aBOI0xnteAQj8NKd9wAmCpuyPTSRtiFxjDaVs5r1mPbf3xX2ETqmTO0jogTcnVNh7UJ
-         sMaPM2XG2tCp9QqQyCFV8I1uoBrgp42jqC+zgF5HTad7fWybLNlsb0Eg0UoJvTgPi6oK
-         1749ccF3Qzf+j4gN2yruyVT4RHcFv3LNDb/+v3ALgqcRNcnlWqwxRmm5qyH1V+Os8M4G
-         eAGg==
-X-Gm-Message-State: AOJu0Yx46M05bx2uJzQDVcZuMCIVKZjw/KKQjaXiZ4Z5b8+8xrAw8Kf6
-	8l+t6vmxFixf4GzmP8fmuOuGCm/QjjHD3knroYDlNPfCzA/er3/ewiQivrAv96BMh3VqJkWfRa3
-	Rxjst/CJZ4dV6z2kJ6gMp4GJ+Jd4ge6eA2WKY8yIcBw0bzxxy0Xg3kg51snO+OVQWt1WOIJP5um
-	PMn4yk6sCJu1xS6e2TZcJfAbK9PdTUh7MJLHzmDA==
-X-Google-Smtp-Source: AGHT+IG1a6pW1bKGlaOANRqkZC/AJNE7vuySbOR8Q4Y9nHHY4V5qhn7gR3kjNilliBxESLSlU6pNh5dVgRIG
+        bh=l0ebcgRIRh90MOHtpCFWoKc1X14VIpR1q5b48hz4kwg=;
+        b=mpi4QW8Okwb5XzEkdCk5RP2OdZJ8yH8sSjBOMcVn27Yh0fz0VtPEYLSsTHOsec40t+
+         FIAlc+GWg6sLgaFYCwgBjmFU/IUodzViRxXgyIPV+/ZpnjTZvqjGoYLuWCN04a9j97ze
+         56V1JRYbw7D/Kx6GkoJxIuL9ucD/py+qtBM75bjb8S2TC2bCe8Sd8Jthld6Ig7Rkp69q
+         SIsdeZw08/An07bEM3zOy0SNjACJ0k8djcprGVHV/ryRpipPZqdUkIZaCkOUZmjPjZ74
+         qZUYICWbrK0m4szp/ARDgZqRFArQoeT2qPK1+Emq4FMPYAbrpuateJkyDn264RFyZyUg
+         OW/A==
+X-Gm-Message-State: AOJu0YyipY9WIxrkl+euwJsdD4ZAnMTbAihNJ3HCWN0zstDH3mNbl2Mv
+	AkYvZacaOiUwy3DmBMttMD72yjb92vIXMKgpQhHWuIWWzKME8FZ9rTnZuZYZopYdYLtFdjc5OTL
+	YGt+F60dOnpEcbVKnWVNOEh67trooMkjmZ3dUmiurkbtc+vn5Ujoa3f8t93DADJr0eynuaRWlg0
+	/xzlPEWKPhAqcACijEW4Peg/boDb8b9uxfUL+YoQ==
+X-Google-Smtp-Source: AGHT+IHBcjkOzufjEfEoPQNGwufFOu2yHyx49mK+6RbzmHVvWGQyI/65rI0vW1TEmJHlur6M6YIduz03sT+/
 X-Received: from coldfire.c.googlers.com ([fda3:e722:ac3:cc00:4e:3bc9:ac1c:310])
- (user=maheshb job=sendgmr) by 2002:a25:b810:0:b0:e25:17cb:352e with SMTP id
- 3f1490d57ef6-e2919ff850emr3418276.9.1728733674480; Sat, 12 Oct 2024 04:47:54
- -0700 (PDT)
-Date: Sat, 12 Oct 2024 04:47:51 -0700
+ (user=maheshb job=sendgmr) by 2002:a05:690c:7446:b0:62c:f6fd:5401 with SMTP
+ id 00721157ae682-6e347b4b2edmr294907b3.6.1728733680865; Sat, 12 Oct 2024
+ 04:48:00 -0700 (PDT)
+Date: Sat, 12 Oct 2024 04:47:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,9 +71,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241012114751.2508834-1-maheshb@google.com>
-Subject: [PATCHv2 net-next 1/3] mlx4: introduce the time_cache into the mlx4
- PTP implementation
+Message-ID: <20241012114755.2509083-1-maheshb@google.com>
+Subject: [PATCHv2 net-next 2/3] mlx4: update mlx4_read_clock() to provide
+ pre/post timestamps
 From: Mahesh Bandewar <maheshb@google.com>
 To: Netdev <netdev@vger.kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
 	Yishai Hadas <yishaih@nvidia.com>
@@ -83,135 +83,136 @@ Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
 	Mahesh Bandewar <maheshb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The mlx4_clock_read() function, when invoked by cycle_counter->read(),
-previously returned only the raw cycle count. However, for PTP helpers
-like gettimex64(), which require both pre- and post-timestamps,
-returning just the raw cycles is insufficient; the necessary
-timestamps must also be provided.
-
-This patch introduces the time_cache into the implementation. As a
-result, mlx4_en_read_clock() is now responsible for reading and
-updating the clock_cache. This allows the function
-mlx4_en_read_clock_cache() to serve as the cycle reader for
-cycle_counter->read(), maintaining the same interface
+Enhance mlx4_read_clock() and mlx4_en_read_clock() to provide
+both pre- and post-timestamps along with the raw cycle count,
+which are required to support the gettimex64() operation.
 
 Signed-off-by: Mahesh Bandewar <maheshb@google.com>
 ---
- drivers/net/ethernet/mellanox/mlx4/en_clock.c | 28 +++++++++++++++----
- drivers/net/ethernet/mellanox/mlx4/main.c     |  1 -
- drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |  1 +
- 3 files changed, 24 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/en_clock.c | 15 ++++++++-------
+ drivers/net/ethernet/mellanox/mlx4/main.c     | 11 +++++++++--
+ include/linux/mlx4/device.h                   |  3 ++-
+ 3 files changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-index cd754cd76bde..cab9221a0b26 100644
+index cab9221a0b26..69c5e4c5e036 100644
 --- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
 +++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-@@ -36,15 +36,22 @@
- 
- #include "mlx4_en.h"
- 
--/* mlx4_en_read_clock - read raw cycle counter (to be used by time counter)
-+/* mlx4_en_read_clock_cache - read cached raw cycle counter (to be
-+ * used by time counter)
-  */
--static u64 mlx4_en_read_clock(const struct cyclecounter *tc)
-+static u64 mlx4_en_read_clock_cache(const struct cyclecounter *tc)
- {
- 	struct mlx4_en_dev *mdev =
- 		container_of(tc, struct mlx4_en_dev, cycles);
--	struct mlx4_dev *dev = mdev->dev;
- 
--	return mlx4_read_clock(dev) & tc->mask;
-+	return READ_ONCE(mdev->clock_cache) & tc->mask;
-+}
-+
-+static void mlx4_en_read_clock(struct mlx4_en_dev *mdev)
-+{
-+	u64 cycles = mlx4_read_clock(mdev->dev);
-+
-+	WRITE_ONCE(mdev->clock_cache, cycles);
+@@ -47,9 +47,10 @@ static u64 mlx4_en_read_clock_cache(const struct cyclecounter *tc)
+ 	return READ_ONCE(mdev->clock_cache) & tc->mask;
  }
  
- u64 mlx4_en_get_cqe_ts(struct mlx4_cqe *cqe)
-@@ -109,6 +116,9 @@ void mlx4_en_ptp_overflow_check(struct mlx4_en_dev *mdev)
+-static void mlx4_en_read_clock(struct mlx4_en_dev *mdev)
++static void mlx4_en_read_clock(struct mlx4_en_dev *mdev,
++			       struct ptp_system_timestamp *sts)
+ {
+-	u64 cycles = mlx4_read_clock(mdev->dev);
++	u64 cycles = mlx4_read_clock(mdev->dev, sts);
  
+ 	WRITE_ONCE(mdev->clock_cache, cycles);
+ }
+@@ -117,7 +118,7 @@ void mlx4_en_ptp_overflow_check(struct mlx4_en_dev *mdev)
  	if (timeout) {
  		write_seqlock_irqsave(&mdev->clock_lock, flags);
-+		/* refresh the clock_cache */
-+		mlx4_en_read_clock(mdev);
-+
+ 		/* refresh the clock_cache */
+-		mlx4_en_read_clock(mdev);
++		mlx4_en_read_clock(mdev, NULL);
+ 
  		timecounter_read(&mdev->clock);
  		write_sequnlock_irqrestore(&mdev->clock_lock, flags);
- 		mdev->last_overflow_check = jiffies;
-@@ -135,6 +145,8 @@ static int mlx4_en_phc_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- 	mult = (u32)adjust_by_scaled_ppm(mdev->nominal_c_mult, scaled_ppm);
+@@ -146,7 +147,7 @@ static int mlx4_en_phc_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
  
  	write_seqlock_irqsave(&mdev->clock_lock, flags);
-+	/* refresh the clock_cache */
-+	mlx4_en_read_clock(mdev);
+ 	/* refresh the clock_cache */
+-	mlx4_en_read_clock(mdev);
++	mlx4_en_read_clock(mdev, NULL);
  	timecounter_read(&mdev->clock);
  	mdev->cycles.mult = mult;
  	write_sequnlock_irqrestore(&mdev->clock_lock, flags);
-@@ -179,6 +191,8 @@ static int mlx4_en_phc_gettime(struct ptp_clock_info *ptp,
- 	u64 ns;
+@@ -192,7 +193,7 @@ static int mlx4_en_phc_gettime(struct ptp_clock_info *ptp,
  
  	write_seqlock_irqsave(&mdev->clock_lock, flags);
-+	/* refresh the clock_cache */
-+	mlx4_en_read_clock(mdev);
+ 	/* refresh the clock_cache */
+-	mlx4_en_read_clock(mdev);
++	mlx4_en_read_clock(mdev, NULL);
  	ns = timecounter_read(&mdev->clock);
  	write_sequnlock_irqrestore(&mdev->clock_lock, flags);
  
-@@ -205,6 +219,8 @@ static int mlx4_en_phc_settime(struct ptp_clock_info *ptp,
- 
+@@ -220,7 +221,7 @@ static int mlx4_en_phc_settime(struct ptp_clock_info *ptp,
  	/* reset the timecounter */
  	write_seqlock_irqsave(&mdev->clock_lock, flags);
-+	/* refresh the clock_cache */
-+	mlx4_en_read_clock(mdev);
+ 	/* refresh the clock_cache */
+-	mlx4_en_read_clock(mdev);
++	mlx4_en_read_clock(mdev, NULL);
  	timecounter_init(&mdev->clock, &mdev->cycles, ns);
  	write_sequnlock_irqrestore(&mdev->clock_lock, flags);
  
-@@ -273,7 +289,7 @@ void mlx4_en_init_timestamp(struct mlx4_en_dev *mdev)
- 	seqlock_init(&mdev->clock_lock);
- 
- 	memset(&mdev->cycles, 0, sizeof(mdev->cycles));
--	mdev->cycles.read = mlx4_en_read_clock;
-+	mdev->cycles.read = mlx4_en_read_clock_cache;
- 	mdev->cycles.mask = CLOCKSOURCE_MASK(48);
- 	mdev->cycles.shift = freq_to_shift(dev->caps.hca_core_clock);
- 	mdev->cycles.mult =
-@@ -281,6 +297,8 @@ void mlx4_en_init_timestamp(struct mlx4_en_dev *mdev)
- 	mdev->nominal_c_mult = mdev->cycles.mult;
+@@ -298,7 +299,7 @@ void mlx4_en_init_timestamp(struct mlx4_en_dev *mdev)
  
  	write_seqlock_irqsave(&mdev->clock_lock, flags);
-+	/* initialize the clock_cache */
-+	mlx4_en_read_clock(mdev);
+ 	/* initialize the clock_cache */
+-	mlx4_en_read_clock(mdev);
++	mlx4_en_read_clock(mdev, NULL);
  	timecounter_init(&mdev->clock, &mdev->cycles,
  			 ktime_to_ns(ktime_get_real()));
  	write_sequnlock_irqrestore(&mdev->clock_lock, flags);
 diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
-index febeadfdd5a5..9408313b0f4d 100644
+index 9408313b0f4d..d9ef6006ada3 100644
 --- a/drivers/net/ethernet/mellanox/mlx4/main.c
 +++ b/drivers/net/ethernet/mellanox/mlx4/main.c
-@@ -1946,7 +1946,6 @@ u64 mlx4_read_clock(struct mlx4_dev *dev)
- }
- EXPORT_SYMBOL_GPL(mlx4_read_clock);
+@@ -43,6 +43,7 @@
+ #include <linux/io-mapping.h>
+ #include <linux/delay.h>
+ #include <linux/etherdevice.h>
++#include <linux/ptp_clock_kernel.h>
+ #include <net/devlink.h>
  
--
- static int map_internal_clock(struct mlx4_dev *dev)
+ #include <uapi/rdma/mlx4-abi.h>
+@@ -1925,7 +1926,7 @@ static void unmap_bf_area(struct mlx4_dev *dev)
+ 		io_mapping_free(mlx4_priv(dev)->bf_mapping);
+ }
+ 
+-u64 mlx4_read_clock(struct mlx4_dev *dev)
++u64 mlx4_read_clock(struct mlx4_dev *dev, struct ptp_system_timestamp *sts)
  {
+ 	u32 clockhi, clocklo, clockhi1;
+ 	u64 cycles;
+@@ -1933,7 +1934,13 @@ u64 mlx4_read_clock(struct mlx4_dev *dev)
  	struct mlx4_priv *priv = mlx4_priv(dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-index 28b70dcc652e..077b529eb01a 100644
---- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-+++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
-@@ -435,6 +435,7 @@ struct mlx4_en_dev {
- 	unsigned long		last_overflow_check;
- 	struct ptp_clock	*ptp_clock;
- 	struct ptp_clock_info	ptp_clock_info;
-+	u64			clock_cache;
- 	struct notifier_block	netdev_nb;
- 	struct notifier_block	mlx_nb;
- };
+ 
+ 	for (i = 0; i < 10; i++) {
+-		clockhi = swab32(readl(priv->clock_mapping));
++		if (sts) {
++			ptp_read_system_prets(sts);
++			clockhi = swab32(readl(priv->clock_mapping));
++			ptp_read_system_postts(sts);
++		} else {
++			clockhi = swab32(readl(priv->clock_mapping));
++		}
+ 		clocklo = swab32(readl(priv->clock_mapping + 4));
+ 		clockhi1 = swab32(readl(priv->clock_mapping));
+ 		if (clockhi == clockhi1)
+diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+index 27f42f713c89..265accc4e606 100644
+--- a/include/linux/mlx4/device.h
++++ b/include/linux/mlx4/device.h
+@@ -44,6 +44,7 @@
+ #include <linux/refcount.h>
+ 
+ #include <linux/timecounter.h>
++#include <linux/ptp_clock_kernel.h>
+ 
+ #define DEFAULT_UAR_PAGE_SHIFT  12
+ 
+@@ -1483,7 +1484,7 @@ int mlx4_get_roce_gid_from_slave(struct mlx4_dev *dev, int port, int slave_id,
+ int mlx4_FLOW_STEERING_IB_UC_QP_RANGE(struct mlx4_dev *dev, u32 min_range_qpn,
+ 				      u32 max_range_qpn);
+ 
+-u64 mlx4_read_clock(struct mlx4_dev *dev);
++u64 mlx4_read_clock(struct mlx4_dev *dev, struct ptp_system_timestamp *sts);
+ 
+ struct mlx4_active_ports {
+ 	DECLARE_BITMAP(ports, MLX4_MAX_PORTS);
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
