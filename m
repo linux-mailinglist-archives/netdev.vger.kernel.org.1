@@ -1,136 +1,100 @@
-Return-Path: <netdev+bounces-134842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5542099B496
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:55:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746AF99B4BB
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 14:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F03831F25441
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:55:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 346C3281BD8
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 12:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449EB19CC04;
-	Sat, 12 Oct 2024 11:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rZuARbR0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C90F15887C;
+	Sat, 12 Oct 2024 12:06:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC9519C555
-	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 11:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E287147F69;
+	Sat, 12 Oct 2024 12:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728733687; cv=none; b=ZRbU7FXaOw8jSx6VFNhwH0yjyWLghcDSCbkjFnWU3cMdHchs3ID5U8Cgmf3mVfr+z5WtRv67hqXLJsge/Ig1IfGwCGD4HLN0E/L5XL6+2QqDIBI4aqhQqR0mZ3qkAE4TLP7WPU7kfrb+ZM/r57dd+6eVxnUnJk3dzjikLexa9g4=
+	t=1728734785; cv=none; b=q3axZSWP7m76Lu0yRxKv2oUOV6W7Snp8eo/e0SEp3F9r3fHnpbZHeVlvXteHUtjFO96H2w++83RVBCbpGPi30ypzJRvjTq/5Xi6EFy5v1eQcW8K/JkT8sqia6E8shaXMQ6GXbH6OPpkYVYLUsHFqzwmy+1hAHH35gVzHPxjlkaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728733687; c=relaxed/simple;
-	bh=FIq3S1rziFzdnFy88UW6etu84Y8qvKY6dst/hCQLK2I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eSPjsWW7omCcJ45CdC9f1PcC57u46Ey52prtf/BfI8ZU9+KTc4uXjgqfwyvh+SpgeWxGsgxVy2zK94pOOePiy/pGNA0r7xLHlTktetREmB77G9sxdEkjWziIneDcU+QghStWjo7JDl9YijQCOw8lw4NlR9E2a6Jys5pzf5JPQjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rZuARbR0; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maheshb.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e22f8dc491so51253867b3.1
-        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 04:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728733684; x=1729338484; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FiRzyXQ9xXdahikMNzOzVXG9Bvdh1qlBmql1pijis9U=;
-        b=rZuARbR0RgKROKXwpo/+exdxS9FqezuKCVESx5cqJ4Je2V4yUMNMoyGnL5IP395qsX
-         7QkByBgQHQI2TLmKZEQBYroOGldENFxoJL0xqSCMx2nYckLuIJeW6Gjd3hPVEbCkX1EN
-         eJfF8/SwagjhuwN4c/u0XpntyCffnj8jkULHvtCRfmww9+b6XgYRGAU1K1GxZHJKhz+G
-         QUck2ldTML+UgUV5nVhLBMWkwl8ws3MczvCLjrzbXP16469EahQcZ/ZbWIIExr+VsBfA
-         Z3ASU9BtC1P5KOeHyLDIaeVjev8lWP2JkUyrKPm4EADiVxsppaErQN9vSrsFPTdaY3Um
-         UpJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728733684; x=1729338484;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FiRzyXQ9xXdahikMNzOzVXG9Bvdh1qlBmql1pijis9U=;
-        b=avRdLk5ZynIUtueKQoHt7IFsoAJ0v7UU+G+LN+OjLZcO/bQI4dM3u/oNYj78yAFdZ5
-         czjUtsDe5A1FotPtVspET52WdzMHAqHKQoC51ukpUjNMSuj5gvjSEzs6933Gpa+NmNV3
-         AF1EUIt1OFTX2QW55AW7G/SGHStKGYndZ+X5ujRaf68ShzUJ0r3Uj9KhqzSe6qKNujGD
-         S4oY4FRj5K2sCYCkIWZVEGvS1buI5be5XxX7AMWactP5dAv+VV0vDTbfkSsPlLOupIQ2
-         qQqAqgHAmaanB7tW110cvZXDHq0eytCQjiH6ia7rImdsKM7v1KGkT1dlh+xEijrJOb+u
-         PM6w==
-X-Gm-Message-State: AOJu0Yznu3Q8uxCGSRgQrwo//MfWJqumsDuQTHgnZSeiaqWoKPAn3ujr
-	SQ1giLQ4ZbQMWs3fix/1vwOsqr1/t+SsizK0Wd2pOf6jlD23ZLRuyd5AwFcdfahoxdHYiqCbqWl
-	nj4ptfapbu39/kqB06p6nelDrKWjUSuSNw85iML9KfEAiHGezpHbWAUz5+YBONg+WMttxCZYnVI
-	30tYSWabN57Lt4HHSsMlo3SyHPCE5H0S2uqVpeLg==
-X-Google-Smtp-Source: AGHT+IFNKApunENsaO1A9Q6f6twMpZseHiJLXQj9C8k/rGbscD/LVbvgDHibTa3iJlMSAxdMbElyUr/mpowy
-X-Received: from coldfire.c.googlers.com ([fda3:e722:ac3:cc00:4e:3bc9:ac1c:310])
- (user=maheshb job=sendgmr) by 2002:a05:690c:3304:b0:6e3:f32:5fc8 with SMTP id
- 00721157ae682-6e3477bf10cmr140717b3.1.1728733684237; Sat, 12 Oct 2024
- 04:48:04 -0700 (PDT)
-Date: Sat, 12 Oct 2024 04:48:01 -0700
+	s=arc-20240116; t=1728734785; c=relaxed/simple;
+	bh=IwUtYPQKqU20Pw5cpn9ykl4bTHIrKjZbpIEJm7B8vG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gURJaQ1P6VpZrkAFvBLiEbZ7tr2qYDSW9VqR5iaWOg9tIl+nDRznHDItxiFsmcao6kZi5FAhnYRKNH3ysdoYokmvDplAmwpYNuP4QdkzG23Wui1jkVOWWkzZzXex/MxlrZwLvBv77XDtZ9f90n0s334tGDIuJ/RNKu5V6QW49E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XQhvv1XPnzkWcD;
+	Sat, 12 Oct 2024 20:03:07 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 66A98140393;
+	Sat, 12 Oct 2024 20:05:32 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 12 Oct 2024 20:05:32 +0800
+Message-ID: <b1fd5ece-b967-4e56-ad4f-64ec437e2634@huawei.com>
+Date: Sat, 12 Oct 2024 20:05:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241012114801.2509341-1-maheshb@google.com>
-Subject: [PATCHv2 net-next 3/3] mlx4: add gettimex64() ptp method
-From: Mahesh Bandewar <maheshb@google.com>
-To: Netdev <netdev@vger.kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Yishai Hadas <yishaih@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Mahesh Bandewar <mahesh@bandewar.net>, 
-	Mahesh Bandewar <maheshb@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/2] fix two bugs related to page_pool
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <liuyonglong@huawei.com>, <fanghaiqing@huawei.com>,
+	<zhangkun09@huawei.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
+	<alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20240925075707.3970187-1-linyunsheng@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Introduce the gettimex64() PTP method implementation, which enhances
-the PTP clock read operation by providing pre- and post-timestamps to
-determine the clock-read-call-width.
+On 2024/9/25 15:57, Yunsheng Lin wrote:
+> Patch 1 fix a possible time window problem for page_pool.
+> Patch 2 fix the kernel crash problem at iommu_get_dma_domain
+> reported in [1].
 
-Signed-off-by: Mahesh Bandewar <maheshb@google.com>
----
- drivers/net/ethernet/mellanox/mlx4/en_clock.c | 21 +++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Hi, all
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-index 69c5e4c5e036..d3f6ece1531e 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-@@ -202,6 +202,26 @@ static int mlx4_en_phc_gettime(struct ptp_clock_info *ptp,
- 	return 0;
- }
- 
-+static int mlx4_en_phc_gettimex(struct ptp_clock_info *ptp,
-+				struct timespec64 *ts,
-+				struct ptp_system_timestamp *sts)
-+{
-+	struct mlx4_en_dev *mdev = container_of(ptp, struct mlx4_en_dev,
-+						ptp_clock_info);
-+	unsigned long flags;
-+	u64 ns;
-+
-+	write_seqlock_irqsave(&mdev->clock_lock, flags);
-+	/* refresh the clock_cache but get the pre/post ts */
-+	mlx4_en_read_clock(mdev, sts);
-+	ns = timecounter_read(&mdev->clock);
-+	write_sequnlock_irqrestore(&mdev->clock_lock, flags);
-+
-+	*ts = ns_to_timespec64(ns);
-+
-+	return 0;
-+}
-+
- /**
-  * mlx4_en_phc_settime - Set the current time on the hardware clock
-  * @ptp: ptp clock structure
-@@ -255,6 +275,7 @@ static const struct ptp_clock_info mlx4_en_ptp_clock_info = {
- 	.adjfine	= mlx4_en_phc_adjfine,
- 	.adjtime	= mlx4_en_phc_adjtime,
- 	.gettime64	= mlx4_en_phc_gettime,
-+	.gettimex64	= mlx4_en_phc_gettimex,
- 	.settime64	= mlx4_en_phc_settime,
- 	.enable		= mlx4_en_phc_enable,
- };
--- 
-2.47.0.rc1.288.g06298d1525-goog
+Through the discussions, it seems there are some main concerns
+as below:
+1. Semantics changing of supporting unlimited inflight pages
+   to limited inflight pages that are as large as the pool_size
+   of page_pool.
+2. The overhead of finding available pool->items in
+   page_pool_item_add().
 
+Any other concerns I missed here?
+As it is unclear about the impact of the above concerns, which seemed
+to lead Paolo to suggest this patchset targetting net-next tree
+instead of net tree, so I am planning to target the net-next tree
+keeping the 'Fixes' tag for the next version, if there is any other
+opinion here, please let me know.
+
+Also, I still have the page_frag refactoring patchset pending in the
+nex-next, please let me know if I should wait for that patchset to
+be applied before sending this one to the net-next tree.
+
+> 
 
