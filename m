@@ -1,348 +1,361 @@
-Return-Path: <netdev+bounces-134754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD6E99AFDD
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 03:30:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D3999AFEE
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 03:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE8721C2174A
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 01:30:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F9D71F23DAE
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 01:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F751B969;
-	Sat, 12 Oct 2024 01:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAADD2FF;
+	Sat, 12 Oct 2024 01:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aT1WEZZI"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Z/0WUiBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0991C13C;
-	Sat, 12 Oct 2024 01:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880F2BE65
+	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 01:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728696569; cv=none; b=e+jVO1/ZVt1bfxEB8t5yMp7PmR01dZ8c3gIiVM8+4T/yhACFbT38YQ1/a7j1lEn9Z0zEdxW7npJbIS0H/iCNXPtagCK+GtlPVyIQcDPFza+qCAvYqKGEGNOVh3s/cEV7nIXmCwYdXRuzgVfnlagaaB6JfGWfFvlB8M4T+RzoTAc=
+	t=1728698303; cv=none; b=ThGk5iyoYy2bX1PHpbQQ6PUHdZWI1S4jypyarVcM6wVG9LTXZE7T29Z7CsjG1YwBjqiIQBoNCHcpG77QEU+7VkNBGkwfRpQ7bY+bfuiyjXcGZa1MIjPMg+xTo5REcdKaL2WGOu6WqL2UFRsr1HEusC4aRBpENbXzqE1exRRd2hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728696569; c=relaxed/simple;
-	bh=UyRRmdSiBSiSEtr7Ig4aUmF7hG5TYY9ph5NJyArBOaw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qzvu/xMukTRZW7dkuTG7QluzEYlok51j4zTx+kVorpA8w6ydxSQxI9KOFl16MK4q/caB/uOvzW1KAwuiIftDFRcAUnp9PX3dHWz1uBVr4PTPRzvlK0wSm9k5ybVYxm0UPr9ZZ+blsTz1X+5VITbKjUOqZ01s2mEKNyeBCVnvcD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aT1WEZZI; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728696563; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=y1N2AVpnjdi1B9UGRgfVFOIURIhOEBNxoghNH/yKJVk=;
-	b=aT1WEZZIgzCRLMdYtCd6tSTXZ3WtFd1gHw2jtlt2cVoq152DJrnyZ54bvrX8TEQBbNPFMbpFemIqDWrIPLoCPp40fbFN3sz36kn3POctOnHXiktBQWG3lBCtoDsON/SltY+i/cl5lpPoF2kmXqSn3iCePYDa23PIw6E1hjzgKhg=
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WGtAIG6_1728696561 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 12 Oct 2024 09:29:22 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	antony.antony@secunet.com,
-	steffen.klassert@secunet.com,
-	linux-kernel@vger.kernel.org,
-	dust.li@linux.alibaba.com,
-	jakub@cloudflare.com,
-	fred.cc@alibaba-inc.com,
-	yubing.qiuyubing@alibaba-inc.com
-Subject: [PATCH v4 net-next 3/3] ipv4/udp: Add 4-tuple hash for connected socket
-Date: Sat, 12 Oct 2024 09:29:18 +0800
-Message-Id: <20241012012918.70888-4-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20241012012918.70888-1-lulie@linux.alibaba.com>
-References: <20241012012918.70888-1-lulie@linux.alibaba.com>
+	s=arc-20240116; t=1728698303; c=relaxed/simple;
+	bh=JYyhdjLuK+sa9K5bjE1c35qX1akVAJs5ZAijfqzQmpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNa23E5GZOnVyvkkGzJWt9W0C3gQroHFOcx4WmPLikM0U+fLQYvB10O3YfxoTvhxmrTXwvjBvhRJJn9Xio0twcvgNvaFsR4rISefBuU1BbcDoanYvH/95KsFqoxyPKszeIEIyjYZrs3iWQAFAF4DriZUsmRMpb2Y7MG8bQ5ilDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Z/0WUiBW; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20c803787abso17911345ad.0
+        for <netdev@vger.kernel.org>; Fri, 11 Oct 2024 18:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1728698301; x=1729303101; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sPTxo3VFYU4gU7ufZRtzjpXalxztZVEPSaPzwsbMAL4=;
+        b=Z/0WUiBWQSuZ2BqmSHQ1tFPqHEc2V4hRBCWntI1URq1lEfG0GZ6+HmLZgsff+4xeWt
+         1lbWez7Co1Gx7ozPYGN4YDFk0n1Y9gsj2rTXg+LFLfl6zYX9FjmwdjZ14aa50BvkegQE
+         PRoKvZutJcn4jkZEkS99lQmHY9rPW4VCU0cFc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728698301; x=1729303101;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sPTxo3VFYU4gU7ufZRtzjpXalxztZVEPSaPzwsbMAL4=;
+        b=w6pN3IrNicoU64GtlBKVIk3oLLp7wA/FKM0xb6INYMgijWOrB1UqeBFB7bUf3tev7y
+         HDYs3TtUtkx3fB6vQtNHD+mrX5hIw9jcGb6crn+X7+TF7C0ai57fGtzpTMuRrcfPYxSN
+         cNqN4p1DagZh6n5eBEs8w2mtKE2AnrQ5yyEb4FkjxJxRCUXJPBSF0R9TADbKFCQpmwxP
+         I7Bsu+yuKnn+QDLkLkxz5YkgDR/B9mYh8K1QA46w4DJaklp0vcKDXYa78DdtGArT3GKw
+         G+DIPDk1noWrXEisygG38Le3MEUPb9Ui7Ss49gSIbaQuDzfkE7Tv0nfvZoqJGajakv1v
+         FQHg==
+X-Gm-Message-State: AOJu0YzzsPEpWbtKolUmzUs5QtiXAmunKOu+CisQUYeqD27hwlABhEX6
+	yq0Feo7zp9hObsPKnDdE946o/WDfOdLygcjrirkceek1dwgYTJLE7lCKpYqg5Xc=
+X-Google-Smtp-Source: AGHT+IFVwIQ6PMGM56eLlaZkrc08o6k3Sy0bydvPmDgSTXAqrEzreKcjXkDt2YW3st/N3yNRzoCaPA==
+X-Received: by 2002:a17:902:c403:b0:20b:c043:3873 with SMTP id d9443c01a7336-20ca03d6844mr64920765ad.21.1728698300799;
+        Fri, 11 Oct 2024 18:58:20 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8bad9b4asm29730905ad.45.2024.10.11.18.58.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2024 18:58:20 -0700 (PDT)
+Date: Fri, 11 Oct 2024 18:58:17 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next 2/2] igc: Link queues to NAPI instances
+Message-ID: <ZwnXuSUbaFiyGn52@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>, netdev@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20241003233850.199495-1-jdamato@fastly.com>
+ <20241003233850.199495-3-jdamato@fastly.com>
+ <87msjg46lw.fsf@kurt.kurt.home>
+ <Zwa3sW-4s7oqktX3@LQ3V64L9R2>
+ <87wmig3063.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wmig3063.fsf@kurt.kurt.home>
 
-Currently, the udp_table has two hash table, the port hash and portaddr
-hash. Usually for UDP servers, all sockets have the same local port and
-addr, so they are all on the same hash slot within a reuseport group.
+On Thu, Oct 10, 2024 at 09:08:20AM +0200, Kurt Kanzenbach wrote:
+> On Wed Oct 09 2024, Joe Damato wrote:
+> > On Mon, Oct 07, 2024 at 11:14:51AM +0200, Kurt Kanzenbach wrote:
+> >> Hi Joe,
+> >> 
+> >> On Thu Oct 03 2024, Joe Damato wrote:
+> >> > Link queues to NAPI instances via netdev-genl API so that users can
+> >> > query this information with netlink:
+> >> >
+> >> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> >> >                          --dump queue-get --json='{"ifindex": 2}'
+> >> >
+> >> > [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+> >> >  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+> >> >  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
+> >> >  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
+> >> >  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+> >> >  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
+> >> >  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
+> >> >  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+> >> >
+> >> > Since igc uses only combined queues, you'll note that the same NAPI ID
+> >> > is present for both rx and tx queues at the same index, for example
+> >> > index 0:
+> >> >
+> >> > {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+> >> > {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+> >> >
+> >> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> >> > ---
+> >> >  drivers/net/ethernet/intel/igc/igc_main.c | 30 ++++++++++++++++++++---
+> >> >  1 file changed, 26 insertions(+), 4 deletions(-)
+> >> >
+> >> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> >> > index 7964bbedb16c..b3bd5bf29fa7 100644
+> >> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> >> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> >> > @@ -4955,6 +4955,7 @@ static int igc_sw_init(struct igc_adapter *adapter)
+> >> >  void igc_up(struct igc_adapter *adapter)
+> >> >  {
+> >> >  	struct igc_hw *hw = &adapter->hw;
+> >> > +	struct napi_struct *napi;
+> >> >  	int i = 0;
+> >> >  
+> >> >  	/* hardware has been reset, we need to reload some things */
+> >> > @@ -4962,8 +4963,17 @@ void igc_up(struct igc_adapter *adapter)
+> >> >  
+> >> >  	clear_bit(__IGC_DOWN, &adapter->state);
+> >> >  
+> >> > -	for (i = 0; i < adapter->num_q_vectors; i++)
+> >> > -		napi_enable(&adapter->q_vector[i]->napi);
+> >> > +	for (i = 0; i < adapter->num_q_vectors; i++) {
+> >> > +		napi = &adapter->q_vector[i]->napi;
+> >> > +		napi_enable(napi);
+> >> > +		/* igc only supports combined queues, so link each NAPI to both
+> >> > +		 * TX and RX
+> >> > +		 */
+> >> 
+> >> igc has IGC_FLAG_QUEUE_PAIRS. For example there may be 2 queues
+> >> configured, but 4 vectors active (and 4 IRQs). Is your patch working
+> >> with that?  Can be tested easily with `ethtool -L <inf> combined 2` or
+> >> by booting with only 2 CPUs.
+> >
+> > I tested what you asked, here's what it looks like on my system:
+> 
+> Thanks.
+> 
+> >
+> > 16 core Intel(R) Core(TM) i7-1360P
+> >
+> > lspci:
+> > Ethernet controller: Intel Corporation Device 125c (rev 04)
+> >                      Subsystem: Intel Corporation Device 3037
+> >
+> > ethtool -i:
+> > firmware-version: 2017:888d
+> >
+> > $ sudo ethtool -L enp86s0 combined 2
+> > $ sudo ethtool -l enp86s0
+> > Channel parameters for enp86s0:
+> > Pre-set maximums:
+> > RX:		n/a
+> > TX:		n/a
+> > Other:		1
+> > Combined:	4
+> > Current hardware settings:
+> > RX:		n/a
+> > TX:		n/a
+> > Other:		1
+> > Combined:	2
+> >
+> > $ cat /proc/interrupts | grep enp86s0 | cut --delimiter=":" -f1
+> >  144
+> >  145
+> >  146
+> >  147
+> >  148
+> >
+> > Note that IRQ 144 is the "other" IRQ, so if we ignore that one...
+> > /proc/interrupts shows 4 IRQs, despite there being only 2 queues.
+> >
+> > Querying netlink to see which IRQs map to which NAPIs:
+> >
+> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> >                          --dump napi-get --json='{"ifindex": 2}'
+> > [{'id': 8200, 'ifindex': 2, 'irq': 148},
+> >  {'id': 8199, 'ifindex': 2, 'irq': 147},
+> >  {'id': 8198, 'ifindex': 2, 'irq': 146},
+> >  {'id': 8197, 'ifindex': 2, 'irq': 145}]
+> >
+> > This suggests that all 4 IRQs are assigned to a NAPI (this mapping
+> > happens due to netif_napi_set_irq in patch 1).
+> >
+> > Now query the queues and which NAPIs they are associated with (which
+> > is what patch 2 adds):
+> >
+> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \ 
+> >                          --dump queue-get --json='{"ifindex": 2}'
+> > [{'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
+> >  {'id': 1, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
+> >  {'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'tx'},
+> >  {'id': 1, 'ifindex': 2, 'napi-id': 8198, 'type': 'tx'}]
+> >
+> > As you can see above, since the queues are combined and there are
+> > only 2 of them, NAPI IDs 8197 and 8198 (which are triggered via IRQ
+> > 145 and 146) are displayed.
+> 
+> Is that really correct?
 
-In some applications, UDP servers use connect() to manage clients. In
-particular, when firstly receiving from an unseen 4 tuple, a new socket
-is created and connect()ed to the remote addr:port, and then the fd is
-used exclusively by the client.
+So I definitely think the case where IGC_FLAG_QUEUE_PAIRS is enabled is
+correct, that case is highlighted by the original commit message.
 
-Once there are connected sks in a reuseport group, udp has to score all
-sks in the same hash2 slot to find the best match. This could be
-inefficient with a large number of connections, resulting in high
-softirq overhead.
+I think IGC_FLAG_QUEUE_PAIRS disabled was buggy, as you pointed out, and I've
+made a change I'll include in the next RFC, which I believe fixes it.
 
-To solve the problem, this patch implement 4-tuple hash for connected
-udp sockets. During connect(), hash4 slot is updated, as well as a
-corresponding counter, hash4_cnt, in hslot2. In __udp4_lib_lookup(),
-hslot4 will be searched firstly if the counter is non-zero. Otherwise,
-hslot2 is used like before. Note that only connected sockets enter this
-hash4 path, while un-connected ones are not affected.
+Please see below for the case where IGC_FLAG_QUEUE_PAIRS is disabled and a
+walk-through.
 
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
-Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
-Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
----
- include/net/udp.h |   3 +-
- net/ipv4/udp.c    | 142 ++++++++++++++++++++++++++++++++++++++++++++--
- net/ipv6/udp.c    |   2 +-
- 3 files changed, 141 insertions(+), 6 deletions(-)
+> There are four NAPI IDs which are triggered by
+> the four IRQs.
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 80f9622d0db3..5633b51cf8d4 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -226,7 +226,7 @@ static inline int udp_lib_hash(struct sock *sk)
- }
- 
- void udp_lib_unhash(struct sock *sk);
--void udp_lib_rehash(struct sock *sk, u16 new_hash);
-+void udp_lib_rehash(struct sock *sk, u16 new_hash, u16 new_hash4);
- 
- static inline void udp_lib_close(struct sock *sk, long timeout)
- {
-@@ -319,6 +319,7 @@ int udp_rcv(struct sk_buff *skb);
- int udp_ioctl(struct sock *sk, int cmd, int *karg);
- int udp_init_sock(struct sock *sk);
- int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
-+int udp_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
- int __udp_disconnect(struct sock *sk, int flags);
- int udp_disconnect(struct sock *sk, int flags);
- __poll_t udp_poll(struct file *file, struct socket *sock, poll_table *wait);
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 1498ccb79c58..d7e3866617e0 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -478,6 +478,27 @@ static struct sock *udp4_lib_lookup2(const struct net *net,
- 	return result;
- }
- 
-+static struct sock *udp4_lib_lookup4(const struct net *net,
-+				     __be32 saddr, __be16 sport,
-+				     __be32 daddr, unsigned int hnum,
-+				     int dif, int sdif,
-+				     struct udp_table *udptable)
-+{
-+	unsigned int hash4 = udp_ehashfn(net, daddr, hnum, saddr, sport);
-+	const __portpair ports = INET_COMBINED_PORTS(sport, hnum);
-+	struct udp_hslot *hslot4 = udp_hashslot4(udptable, hash4);
-+	struct udp_sock *up;
-+	struct sock *sk;
-+
-+	INET_ADDR_COOKIE(acookie, saddr, daddr);
-+	udp_lrpa_for_each_entry_rcu(up, &hslot4->head) {
-+		sk = (struct sock *)up;
-+		if (inet_match(net, sk, acookie, ports, dif, sdif))
-+			return sk;
-+	}
-+	return NULL;
-+}
-+
- /* UDP is nearly always wildcards out the wazoo, it makes no sense to try
-  * harder than this. -DaveM
-  */
-@@ -493,6 +514,12 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
- 	hash2 = ipv4_portaddr_hash(net, daddr, hnum);
- 	hslot2 = udp_hashslot2(udptable, hash2);
- 
-+	if (UDP_HSLOT_MAIN(hslot2)->hash4_cnt) {
-+		result = udp4_lib_lookup4(net, saddr, sport, daddr, hnum, dif, sdif, udptable);
-+		if (result) /* udp4_lib_lookup4 return sk or NULL */
-+			return result;
-+	}
-+
- 	/* Lookup connected or non-wildcard socket */
- 	result = udp4_lib_lookup2(net, saddr, sport,
- 				  daddr, hnum, dif, sdif,
-@@ -1931,6 +1958,85 @@ int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- }
- EXPORT_SYMBOL(udp_pre_connect);
- 
-+/* In hash4, rehash can also happen in connect(), where hash4_cnt keeps unchanged. */
-+static void udp4_rehash4(struct udp_table *udptable, struct sock *sk, u16 newhash4)
-+{
-+	struct udp_hslot *hslot4, *nhslot4;
-+
-+	hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
-+	nhslot4 = udp_hashslot4(udptable, newhash4);
-+	udp_sk(sk)->udp_lrpa_hash = newhash4;
-+
-+	if (hslot4 != nhslot4) {
-+		spin_lock_bh(&hslot4->lock);
-+		hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-+		hslot4->count--;
-+		spin_unlock_bh(&hslot4->lock);
-+
-+		synchronize_rcu();
-+
-+		spin_lock_bh(&nhslot4->lock);
-+		hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &nhslot4->head);
-+		nhslot4->count++;
-+		spin_unlock_bh(&nhslot4->lock);
-+	}
-+}
-+
-+/* call with sock lock */
-+static void udp4_hash4(struct sock *sk)
-+{
-+	struct udp_hslot *hslot, *hslot4;
-+	struct udp_hslot_main *hslotm2;
-+	struct net *net = sock_net(sk);
-+	struct udp_table *udptable;
-+	unsigned int hash;
-+
-+	if (sk_unhashed(sk) || inet_sk(sk)->inet_rcv_saddr == htonl(INADDR_ANY))
-+		return;
-+
-+	hash = udp_ehashfn(net, inet_sk(sk)->inet_rcv_saddr, inet_sk(sk)->inet_num,
-+			   inet_sk(sk)->inet_daddr, inet_sk(sk)->inet_dport);
-+
-+	udptable = net->ipv4.udp_table;
-+	if (udp_hashed4(sk)) {
-+		udp4_rehash4(udptable, sk, hash);
-+		return;
-+	}
-+
-+	hslot = udp_hashslot(udptable, net, udp_sk(sk)->udp_port_hash);
-+	hslotm2 = udp_hashslot2_main(udptable, udp_sk(sk)->udp_portaddr_hash);
-+	hslot4 = udp_hashslot4(udptable, hash);
-+	udp_sk(sk)->udp_lrpa_hash = hash;
-+
-+	spin_lock_bh(&hslot->lock);
-+	if (rcu_access_pointer(sk->sk_reuseport_cb))
-+		reuseport_detach_sock(sk);
-+
-+	spin_lock(&hslot4->lock);
-+	hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &hslot4->head);
-+	hslot4->count++;
-+	spin_unlock(&hslot4->lock);
-+
-+	spin_lock(&hslotm2->hslot.lock);
-+	hslotm2->hash4_cnt++;
-+	spin_unlock(&hslotm2->hslot.lock);
-+
-+	spin_unlock_bh(&hslot->lock);
-+}
-+
-+int udp_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
-+{
-+	int res;
-+
-+	lock_sock(sk);
-+	res = __ip4_datagram_connect(sk, uaddr, addr_len);
-+	if (!res)
-+		udp4_hash4(sk);
-+	release_sock(sk);
-+	return res;
-+}
-+EXPORT_SYMBOL(udp_connect);
-+
- int __udp_disconnect(struct sock *sk, int flags)
- {
- 	struct inet_sock *inet = inet_sk(sk);
-@@ -1972,7 +2078,7 @@ void udp_lib_unhash(struct sock *sk)
- {
- 	if (sk_hashed(sk)) {
- 		struct udp_table *udptable = udp_get_table_prot(sk);
--		struct udp_hslot *hslot, *hslot2;
-+		struct udp_hslot *hslot, *hslot2, *hslot4;
- 
- 		hslot  = udp_hashslot(udptable, sock_net(sk),
- 				      udp_sk(sk)->udp_port_hash);
-@@ -1990,6 +2096,18 @@ void udp_lib_unhash(struct sock *sk)
- 			hlist_del_init_rcu(&udp_sk(sk)->udp_portaddr_node);
- 			hslot2->count--;
- 			spin_unlock(&hslot2->lock);
-+
-+			if (udp_hashed4(sk)) {
-+				hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
-+				spin_lock(&hslot4->lock);
-+				hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-+				hslot4->count--;
-+				spin_unlock(&hslot4->lock);
-+
-+				spin_lock(&hslot2->lock);
-+				UDP_HSLOT_MAIN(hslot2)->hash4_cnt--;
-+				spin_unlock(&hslot2->lock);
-+			}
- 		}
- 		spin_unlock_bh(&hslot->lock);
- 	}
-@@ -1999,7 +2117,7 @@ EXPORT_SYMBOL(udp_lib_unhash);
- /*
-  * inet_rcv_saddr was changed, we must rehash secondary hash
-  */
--void udp_lib_rehash(struct sock *sk, u16 newhash)
-+void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
- {
- 	if (sk_hashed(sk)) {
- 		struct udp_table *udptable = udp_get_table_prot(sk);
-@@ -2031,6 +2149,19 @@ void udp_lib_rehash(struct sock *sk, u16 newhash)
- 				spin_unlock(&nhslot2->lock);
- 			}
- 
-+			if (udp_hashed4(sk)) {
-+				udp4_rehash4(udptable, sk, newhash4);
-+
-+				if (hslot2 != nhslot2) {
-+					spin_lock(&hslot2->lock);
-+					UDP_HSLOT_MAIN(hslot2)->hash4_cnt--;
-+					spin_unlock(&hslot2->lock);
-+
-+					spin_lock(&nhslot2->lock);
-+					UDP_HSLOT_MAIN(nhslot2)->hash4_cnt++;
-+					spin_unlock(&nhslot2->lock);
-+				}
-+			}
- 			spin_unlock_bh(&hslot->lock);
- 		}
- 	}
-@@ -2042,7 +2173,10 @@ void udp_v4_rehash(struct sock *sk)
- 	u16 new_hash = ipv4_portaddr_hash(sock_net(sk),
- 					  inet_sk(sk)->inet_rcv_saddr,
- 					  inet_sk(sk)->inet_num);
--	udp_lib_rehash(sk, new_hash);
-+	u16 new_hash4 = udp_ehashfn(sock_net(sk),
-+				    inet_sk(sk)->inet_rcv_saddr, inet_sk(sk)->inet_num,
-+				    inet_sk(sk)->inet_daddr, inet_sk(sk)->inet_dport);
-+	udp_lib_rehash(sk, new_hash, new_hash4);
- }
- 
- static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
-@@ -2935,7 +3069,7 @@ struct proto udp_prot = {
- 	.owner			= THIS_MODULE,
- 	.close			= udp_lib_close,
- 	.pre_connect		= udp_pre_connect,
--	.connect		= ip4_datagram_connect,
-+	.connect		= udp_connect,
- 	.disconnect		= udp_disconnect,
- 	.ioctl			= udp_ioctl,
- 	.init			= udp_init_sock,
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index bbf3352213c4..4d3dfcb48a39 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -111,7 +111,7 @@ void udp_v6_rehash(struct sock *sk)
- 					  &sk->sk_v6_rcv_saddr,
- 					  inet_sk(sk)->inet_num);
- 
--	udp_lib_rehash(sk, new_hash);
-+	udp_lib_rehash(sk, new_hash, 0); /* 4-tuple hash not implemented */
- }
- 
- static int compute_score(struct sock *sk, const struct net *net,
--- 
-2.32.0.3.g01195cf9f
+I'm not an IGC expert and I appreciate your review/comments very much, so thank
+you!
 
+I don't think the number of queues I create with ethtool factors into whether
+or not IGC_FLAG_QUEUE_PAIRS is enabled or not. Please forgive me for the length
+of my message, but let me walk through the code to see if I've gotten it right,
+including some debug output I added:
+
+In igc_init_queue_configuration:
+
+max_rss_queues = IGC_MAX_RX_QUEUES (4)
+
+and
+
+adapter->rss_queues = min of 4 or num_online_cpus
+
+which I presume is 16 on my 16 core machine, so:
+
+adapter->rss_queues = 4 (see below for debug output which verifies this)
+
+In igc_set_flag_queue_pairs, the flag IGC_FLAG_QUEUE_PAIRS is set only if:
+
+(adapter->rss_queues (4) > max_rss_queues(4) / 2) which simplifies
+to (4 > 2), meaning the flag would be enabled regardless of the
+number of queues I create with ethtool, as long as I boot my machine
+with 16 cores available.
+
+I verified this by adding debug output to igc_set_flag_queue_pairs and
+igc_init_queue_configuration, which outputs:
+
+igc 0000:56:00.0: IGC_FLAG_QUEUE_PAIRS on
+igc 0000:56:00.0: max_rss_queues: 4, rss_queues: 4
+
+That's at boot with the default number of combined queues of 4 (which is also
+the hardware max).
+
+The result of IGC_FLAG_QUEUE_PAIRS on was the result posted in the
+original commit message of this patch and I believe that to be
+correct.
+
+The only place I can see that IGC_FLAG_QUEUE_PAIRS has any impact
+(aside from ethtool IRQ coalescing, which we can ignore) is
+igc_set_interrupt_capability:
+
+  /* start with one vector for every Rx queue */
+  numvecs = adapter->num_rx_queues;
+  
+  /* if Tx handler is separate add 1 for every Tx queue */
+  if (!(adapter->flags & IGC_FLAG_QUEUE_PAIRS))
+    numvecs += adapter->num_tx_queues;
+
+In this case, the flag only has impact if it is _off_.
+
+It impacts the number of vectors allocated, so I made a small change
+to the driver, which I'll include in the next RFC to deal with the
+IGC_FLAG_QUEUE_PAIRS off case.
+
+In order to get IGC_FLAG_QUEUE_PAIRS off, I boot my machine with the grub
+command line option "maxcpus=2", which should force the flag off.
+
+Checking my debug output at boot to make sure:
+
+igc 0000:56:00.0: IGC_FLAG_QUEUE_PAIRS off
+igc 0000:56:00.0: max_rss_queues: 4, rss_queues: 2
+
+So, now IGC_FLAG_QUEUE_PAIRS is off which should impact
+igc_set_interrupt_capability and the vector calculation.
+
+Let's check how things look at boot:
+
+$ ethtool -l enp86s0 | tail -5
+Current hardware settings:
+RX:		n/a
+TX:		n/a
+Other:		1
+Combined:	2
+
+2 combined queues by default when I have 2 CPUs.
+
+$ cat /proc/interrupts  | grep enp
+ 127:  enp86s0
+ 128:  enp86s0-rx-0
+ 129:  enp86s0-rx-1
+ 130:  enp86s0-tx-0
+ 131:  enp86s0-tx-1
+
+1 other IRQ, and 2 IRQs for each of RX and TX.
+
+Compare to netlink:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                       --dump napi-get --json='{"ifindex": 2}'
+[{'id': 8196, 'ifindex': 2, 'irq': 131},
+ {'id': 8195, 'ifindex': 2, 'irq': 130},
+ {'id': 8194, 'ifindex': 2, 'irq': 129},
+ {'id': 8193, 'ifindex': 2, 'irq': 128}]
+
+So the driver has 4 IRQs linked to 4 different NAPIs, let's check queues:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump queue-get --json='{"ifindex": 2}'
+
+[{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+ {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+ {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
+ {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+
+In this case you can see that each RX and TX queue has a unique NAPI.
+
+I think this is correct, but slightly confusing :) as ethtool
+reports n/a for RX and TX and only reports a combined queue count,
+but you were correct that there was a bug for this case in the code
+I proposed in this RFC.
+
+I think this new output looks correct and will include the adjusted
+patch and a detailed commit message in the next RFC.
+
+Let me know if you think the output looks right to you now?
 
