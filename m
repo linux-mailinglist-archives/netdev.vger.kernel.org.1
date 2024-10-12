@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-134828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C82B399B454
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:48:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B9199B45B
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 13:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4888C28E33C
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:48:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D790E1C2328B
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 11:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988702040A2;
-	Sat, 12 Oct 2024 11:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC154204F76;
+	Sat, 12 Oct 2024 11:29:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9094C1A0B08;
-	Sat, 12 Oct 2024 11:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9412040B0;
+	Sat, 12 Oct 2024 11:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728732597; cv=none; b=Mg6C0v3L7jZwahJ1NbjrF6z8KtbpzfPB4igPLOnNDmrPcLpx+DeJY0Y6S6uoljE4yJi10PTsylHgDQLnATXhBIb704foQxsvXM8asVwlGA8i2jWpiNKz6ow8aGUVfTnwxTxeikChXQaz4Fj9ZzNcUZ8MRodA3boIGet0IVqxrq0=
+	t=1728732599; cv=none; b=CDVqki+UE5ENeOkaE9U2R8hqP2PfWdVxCZhE2N6Y0v6/2D+LtKxmw/PIlXx2l2PTNfhFCoR8xLyc6xT3nPyZmCy4R6qMU7NUOl8QC/bHnyXY+6JUtsnQ5yVQqLkCO9PhnghvyXUpOOnQGW9+ZnqfiNAE4zrb0DixKIFfdEptCKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728732597; c=relaxed/simple;
-	bh=le1jJsxG2hG8+S/6kiQeOL3nY3QgeFDH/55Gds/jM3o=;
+	s=arc-20240116; t=1728732599; c=relaxed/simple;
+	bh=rbHZBZOXHfiZy/gmHARXVXNCWRv4406Hnk7FgPY+Cpo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qZ2jI2b5UnWuO69z9ZqKpEtbaLyv7UZnhzyYl0l/yiM/cfling9F7YxAZMmsL56/a3qcCizSmOJ0FG/sHqFj9stOVTp1TaKzpc07r/jFjZqlxURWn3bFwgF7j09bBsHs56T/pNtwDGfBy7qKdiMKd6wjMe27uUBbxZde7VbQQJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=Pkt3IAtLoXHA7hH1nhMXC23eSGQzi/lUw+jpeEoUExvNShejnTIy9T9S8XPJ8pZ0oN/AHSDff2naKt/i/ulFxBHaSlp8QXa2zWgnSvVuEm4IoC44Kk+4rNb0Y/6HyyQWXvmsf8zo0j9VENPaYHWkNBlHWiyDRuKnod9F9q2aLhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XQh8n2VjszQrcZ;
-	Sat, 12 Oct 2024 19:29:13 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XQh9h4zCnz1ymwy;
+	Sat, 12 Oct 2024 19:30:00 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 65C0D180087;
-	Sat, 12 Oct 2024 19:29:53 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 9D0321402CA;
+	Sat, 12 Oct 2024 19:29:55 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 12 Oct 2024 19:29:53 +0800
+ 15.2.1544.11; Sat, 12 Oct 2024 19:29:55 +0800
 From: Yunsheng Lin <linyunsheng@huawei.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
 	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Andrew
- Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>
-Subject: [PATCH net-next v21 10/14] mm: page_frag: introduce prepare/probe/commit API
-Date: Sat, 12 Oct 2024 19:23:16 +0800
-Message-ID: <20241012112320.2503906-11-linyunsheng@huawei.com>
+ Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
+	<linux-mm@kvack.org>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next v21 11/14] mm: page_frag: add testing for the newly added prepare API
+Date: Sat, 12 Oct 2024 19:23:17 +0800
+Message-ID: <20241012112320.2503906-12-linyunsheng@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241012112320.2503906-1-linyunsheng@huawei.com>
 References: <20241012112320.2503906-1-linyunsheng@huawei.com>
@@ -61,224 +62,213 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-There are many use cases that need minimum memory in order
-for forward progress, but more performant if more memory is
-available or need to probe the cache info to use any memory
-available for frag caoleasing reason.
-
-Currently skb_page_frag_refill() API is used to solve the
-above use cases, but caller needs to know about the internal
-detail and access the data field of 'struct page_frag' to
-meet the requirement of the above use cases and its
-implementation is similar to the one in mm subsystem.
-
-To unify those two page_frag implementations, introduce a
-prepare API to ensure minimum memory is satisfied and return
-how much the actual memory is available to the caller and a
-probe API to report the current available memory to caller
-without doing cache refilling. The caller needs to either call
-the commit API to report how much memory it actually uses, or
-not do so if deciding to not use any memory.
+Add testing for the newly added prepare API, for both aligned
+and non-aligned API, also probe API is also tested along with
+prepare API.
 
 CC: Alexander Duyck <alexander.duyck@gmail.com>
 Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 ---
- include/linux/page_frag_cache.h | 135 ++++++++++++++++++++++++++++++++
- mm/page_frag_cache.c            |  21 +++++
- 2 files changed, 156 insertions(+)
+ .../selftests/mm/page_frag/page_frag_test.c   | 76 +++++++++++++++++--
+ tools/testing/selftests/mm/run_vmtests.sh     |  4 +
+ tools/testing/selftests/mm/test_page_frag.sh  | 27 +++++++
+ 3 files changed, 102 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index feed99d0cddb..e21688e7edc8 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -38,6 +38,11 @@ static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
- 	return encoded_page_decode_pfmemalloc(nc->encoded_page);
+diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+index e806c1866e36..1e47e9ad66f0 100644
+--- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
++++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+@@ -32,6 +32,10 @@ static bool test_align;
+ module_param(test_align, bool, 0);
+ MODULE_PARM_DESC(test_align, "use align API for testing");
+ 
++static bool test_prepare;
++module_param(test_prepare, bool, 0);
++MODULE_PARM_DESC(test_prepare, "use prepare API for testing");
++
+ static int test_alloc_len = 2048;
+ module_param(test_alloc_len, int, 0);
+ MODULE_PARM_DESC(test_alloc_len, "alloc len for testing");
+@@ -74,6 +78,21 @@ static int page_frag_pop_thread(void *arg)
+ 	return 0;
  }
  
-+static inline unsigned int page_frag_cache_page_offset(const struct page_frag_cache *nc)
++static void frag_frag_test_commit(struct page_frag_cache *nc,
++				  struct page_frag *prepare_pfrag,
++				  struct page_frag *probe_pfrag,
++				  unsigned int used_sz)
 +{
-+	return nc->offset;
++	if (prepare_pfrag->page != probe_pfrag->page ||
++	    prepare_pfrag->offset != probe_pfrag->offset ||
++	    prepare_pfrag->size != probe_pfrag->size) {
++		force_exit = true;
++		WARN_ONCE(true, TEST_FAILED_PREFIX "wrong probed info\n");
++	}
++
++	page_frag_commit(nc, prepare_pfrag, used_sz);
 +}
 +
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
-@@ -46,6 +51,10 @@ void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
- unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
- 					    struct page_frag *pfrag,
- 					    unsigned int used_sz);
-+void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
-+					   unsigned int fragsz,
-+					   struct page_frag *pfrag,
-+					   unsigned int align_mask);
+ static int page_frag_push_thread(void *arg)
+ {
+ 	struct ptr_ring *ring = arg;
+@@ -86,15 +105,61 @@ static int page_frag_push_thread(void *arg)
+ 		int ret;
  
- static inline unsigned int __page_frag_cache_commit(struct page_frag_cache *nc,
- 						    struct page_frag *pfrag,
-@@ -88,6 +97,132 @@ static inline void *page_frag_alloc(struct page_frag_cache *nc,
- 	return __page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
+ 		if (test_align) {
+-			va = page_frag_alloc_align(&test_nc, test_alloc_len,
+-						   GFP_KERNEL, SMP_CACHE_BYTES);
++			if (test_prepare) {
++				struct page_frag prepare_frag, probe_frag;
++				void *probe_va;
++
++				va = page_frag_alloc_refill_prepare_align(&test_nc,
++									  test_alloc_len,
++									  &prepare_frag,
++									  GFP_KERNEL,
++									  SMP_CACHE_BYTES);
++
++				probe_va = __page_frag_alloc_refill_probe_align(&test_nc,
++										test_alloc_len,
++										&probe_frag,
++										-SMP_CACHE_BYTES);
++				if (va != probe_va) {
++					force_exit = true;
++					WARN_ONCE(true, TEST_FAILED_PREFIX "wrong va\n");
++				}
++
++				if (likely(va))
++					frag_frag_test_commit(&test_nc, &prepare_frag,
++							      &probe_frag, test_alloc_len);
++			} else {
++				va = page_frag_alloc_align(&test_nc,
++							   test_alloc_len,
++							   GFP_KERNEL,
++							   SMP_CACHE_BYTES);
++			}
+ 
+ 			if ((unsigned long)va & (SMP_CACHE_BYTES - 1)) {
+ 				force_exit = true;
+ 				WARN_ONCE(true, TEST_FAILED_PREFIX "unaligned va returned\n");
+ 			}
+ 		} else {
+-			va = page_frag_alloc(&test_nc, test_alloc_len, GFP_KERNEL);
++			if (test_prepare) {
++				struct page_frag prepare_frag, probe_frag;
++				void *probe_va;
++
++				va = page_frag_alloc_refill_prepare(&test_nc, test_alloc_len,
++								    &prepare_frag, GFP_KERNEL);
++
++				probe_va = page_frag_alloc_refill_probe(&test_nc, test_alloc_len,
++									&probe_frag);
++
++				if (va != probe_va) {
++					force_exit = true;
++					WARN_ONCE(true, TEST_FAILED_PREFIX "wrong va\n");
++				}
++
++				if (likely(va))
++					frag_frag_test_commit(&test_nc, &prepare_frag,
++							      &probe_frag, test_alloc_len);
++			} else {
++				va = page_frag_alloc(&test_nc, test_alloc_len, GFP_KERNEL);
++			}
+ 		}
+ 
+ 		if (!va)
+@@ -176,8 +241,9 @@ static int __init page_frag_test_init(void)
+ 	}
+ 
+ 	duration = (u64)ktime_us_delta(ktime_get(), start);
+-	pr_info("%d of iterations for %s testing took: %lluus\n", nr_test,
+-		test_align ? "aligned" : "non-aligned", duration);
++	pr_info("%d of iterations for %s %s API testing took: %lluus\n", nr_test,
++		test_align ? "aligned" : "non-aligned",
++		test_prepare ? "prepare" : "alloc", duration);
+ 
+ out:
+ 	ptr_ring_cleanup(&ptr_ring, NULL);
+diff --git a/tools/testing/selftests/mm/run_vmtests.sh b/tools/testing/selftests/mm/run_vmtests.sh
+index 2c5394584af4..f6ff9080a6f2 100755
+--- a/tools/testing/selftests/mm/run_vmtests.sh
++++ b/tools/testing/selftests/mm/run_vmtests.sh
+@@ -464,6 +464,10 @@ CATEGORY="page_frag" run_test ./test_page_frag.sh aligned
+ 
+ CATEGORY="page_frag" run_test ./test_page_frag.sh nonaligned
+ 
++CATEGORY="page_frag" run_test ./test_page_frag.sh aligned_prepare
++
++CATEGORY="page_frag" run_test ./test_page_frag.sh nonaligned_prepare
++
+ echo "SUMMARY: PASS=${count_pass} SKIP=${count_skip} FAIL=${count_fail}" | tap_prefix
+ echo "1..${count_total}" | tap_output
+ 
+diff --git a/tools/testing/selftests/mm/test_page_frag.sh b/tools/testing/selftests/mm/test_page_frag.sh
+index f55b105084cf..1c757fd11844 100755
+--- a/tools/testing/selftests/mm/test_page_frag.sh
++++ b/tools/testing/selftests/mm/test_page_frag.sh
+@@ -43,6 +43,8 @@ check_test_failed_prefix() {
+ SMOKE_PARAM="test_push_cpu=$TEST_CPU_0 test_pop_cpu=$TEST_CPU_1"
+ NONALIGNED_PARAM="$SMOKE_PARAM test_alloc_len=75 nr_test=$NR_TEST"
+ ALIGNED_PARAM="$NONALIGNED_PARAM test_align=1"
++NONALIGNED_PREPARE_PARAM="$NONALIGNED_PARAM test_prepare=1"
++ALIGNED_PREPARE_PARAM="$ALIGNED_PARAM test_prepare=1"
+ 
+ check_test_requirements()
+ {
+@@ -77,6 +79,20 @@ run_aligned_check()
+ 	insmod $DRIVER $ALIGNED_PARAM > /dev/null 2>&1
  }
  
-+static inline bool __page_frag_refill_align(struct page_frag_cache *nc,
-+					    unsigned int fragsz,
-+					    struct page_frag *pfrag,
-+					    gfp_t gfp_mask,
-+					    unsigned int align_mask)
++run_nonaligned_prepare_check()
 +{
-+	if (unlikely(!__page_frag_cache_prepare(nc, fragsz, pfrag, gfp_mask,
-+						align_mask)))
-+		return false;
++	echo "Run performance tests to evaluate how fast nonaligned prepare API is."
 +
-+	__page_frag_cache_commit(nc, pfrag, fragsz);
-+	return true;
++	insmod $DRIVER $NONALIGNED_PREPARE_PARAM > /dev/null 2>&1
 +}
 +
-+static inline bool page_frag_refill_align(struct page_frag_cache *nc,
-+					  unsigned int fragsz,
-+					  struct page_frag *pfrag,
-+					  gfp_t gfp_mask, unsigned int align)
++run_aligned_prepare_check()
 +{
-+	WARN_ON_ONCE(!is_power_of_2(align));
-+	return __page_frag_refill_align(nc, fragsz, pfrag, gfp_mask, -align);
++	echo "Run performance tests to evaluate how fast aligned prepare API is."
++
++	insmod $DRIVER $ALIGNED_PREPARE_PARAM > /dev/null 2>&1
 +}
 +
-+static inline bool page_frag_refill(struct page_frag_cache *nc,
-+				    unsigned int fragsz,
-+				    struct page_frag *pfrag, gfp_t gfp_mask)
-+{
-+	return __page_frag_refill_align(nc, fragsz, pfrag, gfp_mask, ~0u);
-+}
-+
-+static inline bool __page_frag_refill_prepare_align(struct page_frag_cache *nc,
-+						    unsigned int fragsz,
-+						    struct page_frag *pfrag,
-+						    gfp_t gfp_mask,
-+						    unsigned int align_mask)
-+{
-+	return !!__page_frag_cache_prepare(nc, fragsz, pfrag, gfp_mask,
-+					   align_mask);
-+}
-+
-+static inline bool page_frag_refill_prepare_align(struct page_frag_cache *nc,
-+						  unsigned int fragsz,
-+						  struct page_frag *pfrag,
-+						  gfp_t gfp_mask,
-+						  unsigned int align)
-+{
-+	WARN_ON_ONCE(!is_power_of_2(align));
-+	return __page_frag_refill_prepare_align(nc, fragsz, pfrag, gfp_mask,
-+						-align);
-+}
-+
-+static inline bool page_frag_refill_prepare(struct page_frag_cache *nc,
-+					    unsigned int fragsz,
-+					    struct page_frag *pfrag,
-+					    gfp_t gfp_mask)
-+{
-+	return __page_frag_refill_prepare_align(nc, fragsz, pfrag, gfp_mask,
-+						~0u);
-+}
-+
-+static inline void *__page_frag_alloc_refill_prepare_align(struct page_frag_cache *nc,
-+							   unsigned int fragsz,
-+							   struct page_frag *pfrag,
-+							   gfp_t gfp_mask,
-+							   unsigned int align_mask)
-+{
-+	return __page_frag_cache_prepare(nc, fragsz, pfrag, gfp_mask, align_mask);
-+}
-+
-+static inline void *page_frag_alloc_refill_prepare_align(struct page_frag_cache *nc,
-+							 unsigned int fragsz,
-+							 struct page_frag *pfrag,
-+							 gfp_t gfp_mask,
-+							 unsigned int align)
-+{
-+	WARN_ON_ONCE(!is_power_of_2(align));
-+	return __page_frag_alloc_refill_prepare_align(nc, fragsz, pfrag,
-+						      gfp_mask, -align);
-+}
-+
-+static inline void *page_frag_alloc_refill_prepare(struct page_frag_cache *nc,
-+						   unsigned int fragsz,
-+						   struct page_frag *pfrag,
-+						   gfp_t gfp_mask)
-+{
-+	return __page_frag_alloc_refill_prepare_align(nc, fragsz, pfrag,
-+						      gfp_mask, ~0u);
-+}
-+
-+static inline void *page_frag_alloc_refill_probe(struct page_frag_cache *nc,
-+						 unsigned int fragsz,
-+						 struct page_frag *pfrag)
-+{
-+	return __page_frag_alloc_refill_probe_align(nc, fragsz, pfrag, ~0u);
-+}
-+
-+static inline bool page_frag_refill_probe(struct page_frag_cache *nc,
-+					  unsigned int fragsz,
-+					  struct page_frag *pfrag)
-+{
-+	return !!page_frag_alloc_refill_probe(nc, fragsz, pfrag);
-+}
-+
-+static inline void page_frag_commit(struct page_frag_cache *nc,
-+				    struct page_frag *pfrag,
-+				    unsigned int used_sz)
-+{
-+	__page_frag_cache_commit(nc, pfrag, used_sz);
-+}
-+
-+static inline void page_frag_commit_noref(struct page_frag_cache *nc,
-+					  struct page_frag *pfrag,
-+					  unsigned int used_sz)
-+{
-+	__page_frag_cache_commit_noref(nc, pfrag, used_sz);
-+}
-+
-+static inline void page_frag_alloc_abort(struct page_frag_cache *nc,
-+					 unsigned int fragsz)
-+{
-+	VM_BUG_ON(fragsz > nc->offset);
-+
-+	nc->pagecnt_bias++;
-+	nc->offset -= fragsz;
-+}
-+
- void page_frag_free(void *addr);
- 
- #endif
-diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-index f55d34cf7d43..5ea4b663ab8e 100644
---- a/mm/page_frag_cache.c
-+++ b/mm/page_frag_cache.c
-@@ -112,6 +112,27 @@ unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
+ run_smoke_check()
+ {
+ 	echo "Run smoke test."
+@@ -87,6 +103,7 @@ run_smoke_check()
+ usage()
+ {
+ 	echo -n "Usage: $0 [ aligned ] | [ nonaligned ] | | [ smoke ] | "
++	echo "[ aligned_prepare ] | [ nonaligned_prepare ] | "
+ 	echo "manual parameters"
+ 	echo
+ 	echo "Valid tests and parameters:"
+@@ -107,6 +124,12 @@ usage()
+ 	echo "# Performance testing for aligned alloc API"
+ 	echo "$0 aligned"
+ 	echo
++	echo "# Performance testing for nonaligned prepare API"
++	echo "$0 nonaligned_prepare"
++	echo
++	echo "# Performance testing for aligned prepare API"
++	echo "$0 aligned_prepare"
++	echo
+ 	exit 0
  }
- EXPORT_SYMBOL(__page_frag_cache_commit_noref);
  
-+void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
-+					   unsigned int fragsz,
-+					   struct page_frag *pfrag,
-+					   unsigned int align_mask)
-+{
-+	unsigned long encoded_page = nc->encoded_page;
-+	unsigned int size, offset;
-+
-+	size = PAGE_SIZE << encoded_page_decode_order(encoded_page);
-+	offset = __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
-+	if (unlikely(!encoded_page || offset + fragsz > size))
-+		return NULL;
-+
-+	pfrag->page = encoded_page_decode_page(encoded_page);
-+	pfrag->size = size - offset;
-+	pfrag->offset = offset;
-+
-+	return encoded_page_decode_virt(encoded_page) + offset;
-+}
-+EXPORT_SYMBOL(__page_frag_alloc_refill_probe_align);
-+
- void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
- 				struct page_frag *pfrag, gfp_t gfp_mask,
- 				unsigned int align_mask)
+@@ -158,6 +181,10 @@ function run_test()
+ 			run_nonaligned_check
+ 		elif [[ "$1" = "aligned" ]]; then
+ 			run_aligned_check
++		elif [[ "$1" = "nonaligned_prepare" ]]; then
++			run_nonaligned_prepare_check
++		elif [[ "$1" = "aligned_prepare" ]]; then
++			run_aligned_prepare_check
+ 		else
+ 			run_manual_check $@
+ 		fi
 -- 
 2.33.0
 
