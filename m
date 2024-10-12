@@ -1,95 +1,133 @@
-Return-Path: <netdev+bounces-134861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6040499B64C
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 19:30:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE7D99B661
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 19:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21F9B28346E
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 17:30:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2BA01F22248
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 17:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1B381751;
-	Sat, 12 Oct 2024 17:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5112824AD;
+	Sat, 12 Oct 2024 17:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S4Ff3VwS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZCvm5VC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155B46F06A;
-	Sat, 12 Oct 2024 17:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1031E529;
+	Sat, 12 Oct 2024 17:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728754235; cv=none; b=B5m+1MWeuVn+DMpAkBiGC1DdNl6JnXmEi4f4dMF0vSclerzZT4V4YhmpKKIsLUOkMfd6Ytkdo3VXPt4l1bWj4PxnHDRvbQhf4BFaJsmVQAiiCk9+wk2AWqym8w0HyeWn8y5B5PC5riwfPDYE8htn8xXCyEL1Y4k0BF2/M9ve20E=
+	t=1728754822; cv=none; b=Z23C0QzRJDxSFpEjDAUUcLMp5W1DfaABE67uLFuW86dcoE3xToGMz/3H9oDLWvTura6Ml5ZusobCUdqgDb+xc7vsC/4CvoOL/YWRDyenDZrA2y3j7cdoMC9hUhEcccJdP4Bg0Kl70Tmoi8YwaQ98ZI1uKoqgDgmFtzxickVi6VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728754235; c=relaxed/simple;
-	bh=lAmk8qweEfG9WF+FkFKFFHuHtt4spQx5ZrigpxHR2oE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XvYVrm14PvJDU4R9Fn8VZZsYMDIrhphLVcHyIt77mKfibpjQUPzz1zWsirt/p46JUmK0RV3yvkeoYfsvI4Kz/wpHXB8xUZnDEpNXZ6lbHLO0cmWQD6nv0imwNSoWWjk58Sjj5Q+w+bQK0ookSFmGFO7zZGJ2hYd4rD2dNIlhgPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=S4Ff3VwS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DQm141ViCMzhU11jXjJClJYjjMCDmk8T4ukFMZIGqnc=; b=S4Ff3VwSFeXUoMKXaJ6HEPfZ8v
-	CUoSBNtqEp8z3PQ+A4E24cO5Ipjt8p04YwFuz3oDjav398C24tjeCTwGInoiBNugaCYKYb2rkKS2c
-	OX0iVUGwfNEk48fuLs3m59NQngJkXGnhf2/IfGvmjng9C3byQXc1+NfHQXX98ejQlNSE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1szfwa-009oJ2-Vr; Sat, 12 Oct 2024 19:30:20 +0200
-Date: Sat, 12 Oct 2024 19:30:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xu Liang <lxu@maxlinear.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/5] net: phy: intel-xway: add support for
- PHY LEDs
-Message-ID: <8ee4f92f-aaf4-436a-bc1e-23fcb24e22ca@lunn.ch>
-References: <e9b15613a81129ceecb07ec51f71bbe75425ad2e.1728558223.git.daniel@makrotopia.org>
- <81f4717ab9acf38f3239727a4540ae96fd01109b.1728558223.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1728754822; c=relaxed/simple;
+	bh=j+0eugA5qlshkzOWKhURgw3WOGiDbE79dVsJbtUFeow=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=oaNHgbKv8/MXQmYOqdsoC+V1SI5lRyPVwGkO4jfp/UIxbncV4mWpHQ56FnpmFZD531ZUBANXmo/2vMjVLsNDg+S03J8zcS3hGp9xKIq3R5/s6iGXyvtobUUOwxUhu8Msq3RsTGYaKcmcJvx2X7eoMrCWZsb0io3+udhCJqM3CBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZCvm5VC; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7afc5925679so199781185a.3;
+        Sat, 12 Oct 2024 10:40:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728754820; x=1729359620; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qeQVh5vaiF4LZT4ihfN5o5UvxngIEpWBJHf7f40MegM=;
+        b=eZCvm5VCYp/LZJpGzPs060EjyOHR2THPclhS7YUG0LYAsBTFigTWV/qLfo0kO8by7S
+         E65OiJYfbL3ZesVIWzZnW1zbA8PFJyRczjMcQTplbLqWmkHacP6SnfKPvOVqOEDiITYJ
+         OfJAJ0i1v1I62yE5RPccZzDjOKLxxykYBdUHGOf/EcJ1fwxp0vTeM2Nlh/dS4VG1EhL9
+         x9goVd9FgCINdYdWE9zdaxTEVSGKe7nDYHvZt/mSHuKiFrWS/rf8L7Ec/vJwqGus9pHk
+         e2K44mNtXCsoVWSfkq7xU9tvdJEvL3LUVIdrRoKiNuMVs8IY4ojWHJcEAnG7kAdwW21Q
+         fcFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728754820; x=1729359620;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qeQVh5vaiF4LZT4ihfN5o5UvxngIEpWBJHf7f40MegM=;
+        b=VktZInrqqBtD+QyMi0+9tA1/vwGr3vafqIEOKx5RYB4S2wr2T6kSh5gYYLm6NqQ9Ru
+         TKzel2KwDZImceRc4D9AnV26neMPkPC/B0bcAe5p1lg4WrPRL1mOcNrSZJ+gte03CKhJ
+         LIFrya9zBCe5T9zOuv5f2pH3tWyBaYGvW6QT6wUDxxPLYiwmZ/W520sVDnuDaBi/Vdq0
+         ngA48WeHCJQ/pCTR2d+2uk0sOYsrY6vWvXgLFkM89zhenr0aabtQRwwq4ClKdNKgcRKx
+         qhIKL4YGAXuBIApoSDs0pYvkXevpsjopFASIHQjGy8GHfqPrjiCicoHf9fJw3QfbqDac
+         AYfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMv/N1PEvTVl61Mq5CHelYmF6mtp415xVq/A1TGb8Tqht6wWfA9AnT22VjU6GpG8q3//k=@vger.kernel.org, AJvYcCVTnuGEBOSy6KdT3vnyHQBn3wQvS5Lhawe+8IAb0MeB8Y+vs2B2IdyZzR+8pvwcOBrjrLfuxY0KnwHI@vger.kernel.org, AJvYcCViWhEfQRwpgJNYCP1neiZ8BJkyHb4eqMenuPHiSyfP1k2ubvC2oGMAs2NfjCVe65p2Ej6keuioYlyQATYY@vger.kernel.org, AJvYcCXbLqUowG7YzRhYD3kC/ZoRGeTJXmv5uxKhTy9KeOYmMNMTSPcCzzG21OkyMUoPvdvAL2JUotf064rB0nB0gUEZ@vger.kernel.org, AJvYcCXmUGvT/NtvQfOlKWQSdI7/nHMLWHgpFE/J2bdzIE2ZPyg+SolShdcw7U0uoT5Gj8b71qHlBz13@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyQ1kXvi+7fbqpo2SXIQVXanKHkURLs6R9BVAUqzUXj+5PmAUr
+	h7dcw3Gl+IIwsYIyFVOvKQnTVWE5ZS03yUTimtE8tXqFu1l1/G2j
+X-Google-Smtp-Source: AGHT+IHm4Bx8DL3ED0EiIGa9UoE0AQ+a9pp5rid+2GyH7NTS4vnz6h0mFmR06lQvNNdN+JG5fbYMyg==
+X-Received: by 2002:a05:620a:4446:b0:7af:ce6e:1663 with SMTP id af79cd13be357-7b12101be7bmr436841385a.60.1728754820032;
+        Sat, 12 Oct 2024 10:40:20 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1148c7129sm240855985a.19.2024.10.12.10.40.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Oct 2024 10:40:19 -0700 (PDT)
+Date: Sat, 12 Oct 2024 13:40:18 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com
+Message-ID: <670ab482ba75d_2737bf2945a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <30bbebd8-1692-4b62-9a1f-070f6152061c@daynix.com>
+References: <20241008-rss-v5-0-f3cf68df005d@daynix.com>
+ <20241008-rss-v5-1-f3cf68df005d@daynix.com>
+ <67068a7261d8c_1cca3129414@willemb.c.googlers.com.notmuch>
+ <30bbebd8-1692-4b62-9a1f-070f6152061c@daynix.com>
+Subject: Re: [PATCH RFC v5 01/10] virtio_net: Add functions for hashing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <81f4717ab9acf38f3239727a4540ae96fd01109b.1728558223.git.daniel@makrotopia.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 10, 2024 at 01:55:29PM +0100, Daniel Golle wrote:
-> The intel-xway PHY driver predates the PHY LED framework and currently
-> initializes all LED pins to equal default values.
+Akihiko Odaki wrote:
+> On 2024/10/09 22:51, Willem de Bruijn wrote:
+> > Akihiko Odaki wrote:
+> >> They are useful to implement VIRTIO_NET_F_RSS and
+> >> VIRTIO_NET_F_HASH_REPORT.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> ---
+> >>   include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
+> > 
+> > No need for these to be in header files
 > 
-> Add PHY LED functions to the drivers and don't set default values if
-> LEDs are defined in device tree.
-> 
-> According the datasheets 3 LEDs are supported on all Intel XWAY PHYs.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
+> I naively followed prior examples in this file. Do you have an 
+> alternative idea?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This is long overdue really, not specific to this fuatre.
 
-    Andrew
+And extends to your patch 4 that deduplicates tun.c and tap.c.
+
+Perhaps drivers/net/virtio_net_hdr.c.
+
+Or drivers/net/tun_vnet.c, matching your choice of drivers/net/tun_vnet.h.
+
 
