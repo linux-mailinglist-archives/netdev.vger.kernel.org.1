@@ -1,60 +1,120 @@
-Return-Path: <netdev+bounces-134854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAF899B5D3
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 17:13:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD3D99B5DC
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 17:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 216C21C21B00
-	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 15:13:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8761F22781
+	for <lists+netdev@lfdr.de>; Sat, 12 Oct 2024 15:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780DE199934;
-	Sat, 12 Oct 2024 15:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C057C182A0;
+	Sat, 12 Oct 2024 15:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VsNzXrFk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h6SgVh0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BE9148FF9
-	for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 15:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179541B977;
+	Sat, 12 Oct 2024 15:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728745989; cv=none; b=J5LqfjZFcg6AjP5te3ZbIkQMFPFIRBd0KUdTu3gB5AZ9utRJvA8Q8PzASViAHitKnthGucQvu9qbKesUcgMKk515K1VXADGMhOd4NdZ//vjenUS1wqJXi+Pxrlwkf+10yEZVrtLuD5soJ2Bm60gOcmsKbIAkQeq549QaF7wkFPw=
+	t=1728746961; cv=none; b=R7JD5gWRr7fuZMIbRpvALYC/zKjm6GSJPWHzwoHL/o55euQaJ6A3RQFYDrattLGE3R9g+W//pNCHasIGKxBAS31l9H8Vk0A4C5ojelSYDorxtUI2v3eWsmR+O/oZDRI957l0yazA4wEnvNoypD3P4IeST1RzK1E8MJ4SZSRq9Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728745989; c=relaxed/simple;
-	bh=X9Ab7tshI5kNRSZBOc7vNlX5e2NKrp5MjV1nHpOxXps=;
+	s=arc-20240116; t=1728746961; c=relaxed/simple;
+	bh=pk03R0PgeUhtt8tr3mq21IqEAPtVnj0vnrFMB2XqHaE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q9E/BFmxTpYzq95zk+/vjpUHrbbomTWT+KT925fL+ULxmX+6TWKohEcCTwPMlf+DoC99V8ToBY+S1PLyceTa5Yv3J5bh6Mqja8FtndoFToowykGfF4ywsN1vpgIUR7SPtgpSK6Ap9FCaIUT5J57q5qweFP7Be+JkKIvKwxKpHjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VsNzXrFk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 461B0C4CEC6;
-	Sat, 12 Oct 2024 15:13:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728745988;
-	bh=X9Ab7tshI5kNRSZBOc7vNlX5e2NKrp5MjV1nHpOxXps=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VsNzXrFkmWrwZ9Zg4euPqC9wPzuNeLZGPnJOSGoR9M/FQrCgRMfZpIJLEn6Gwa1K2
-	 M+T8J+RGmQqtsAbTdJ6fB6vsa+rwJJFVjIXnkM7TEIXUgykbqjro8iAUtwnPPf+scU
-	 GVeysPVsb7+UDLm8OjDDTm71atrDf97jh93IGnE6I8luZ2019UNrwMVgH+elIP1yRc
-	 ZkKA4/EToUDo8qEQBLbsO67fjXhZp1QikZJN8ozAX2zMrOWtV6ZnEdnw5qHLdl3mvP
-	 WqXvkj17wIH1DBo6CvgYj3mbOLDlaAJwWhfFDXYgk1dATEfI3pFsbqarR7dh1BQdiX
-	 lcALNa9knsyng==
-Date: Sat, 12 Oct 2024 16:13:04 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com, pio.raczynski@gmail.com,
-	konrad.knitter@intel.com, marcin.szycik@intel.com,
-	wojciech.drewek@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
-	przemyslaw.kitszel@intel.com, jiri@resnulli.us,
-	David Laight <David.Laight@aculab.com>
-Subject: Re: [iwl-next v4 3/8] ice: get rid of num_lan_msix field
-Message-ID: <20241012151304.GK77519@kernel.org>
-References: <20240930120402.3468-1-michal.swiatkowski@linux.intel.com>
- <20240930120402.3468-4-michal.swiatkowski@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cgr2rLaMoEbrtaUY763xwg5+J9a3VAgOqX81J3GVyZCko1UDjJekRO+T0GoGrNZBuS4PFU+m8DWRjgUtPtHaTH9ZdRUFulWiL9DGJwrwYosOL2O7nMbxx5CEI2hEXdbgnmkn0n+dj2UOeulDonFUXbGecpQTzGn/ZiwlYmP5KRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h6SgVh0O; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6cbd005d0f9so27687666d6.3;
+        Sat, 12 Oct 2024 08:29:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728746959; x=1729351759; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6j+FVCgxZfKadKF+/f2Quoi7dAVKG0Z89u9PtWRfpKs=;
+        b=h6SgVh0ONBf2VhjO1agutxSZ5/vv+pBAVuRtHxCTDgqsdlRYZb34XJthaiR7fUIZYW
+         SHfV3CF7ir/mGBC6/v25di00foiVK9+IPGCHYY5yU6AsguEy0yZzU6QXWmjrAHM6q70/
+         ONCqUVYdKTBWzey8Zwr7EcOl5lAsCHXtYo9T8BrG8+U2DloewNq8anDcMYLrLy+RzEK9
+         dy9QMCvh6xwbaDYkw5zc3DlaffRRGwUcshznTOVgcJa0GBH96LxRyhsBESQrGwYmTyMJ
+         WmVuQkKoP5QDeY1z29mU/jOKpk2UEKWOQlIIKCiuANiL83SivwZoN7bZQ5rXpLR4yP60
+         kSdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728746959; x=1729351759;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6j+FVCgxZfKadKF+/f2Quoi7dAVKG0Z89u9PtWRfpKs=;
+        b=lkSRCP4mgop8N64QdjuJ9AMHFjduEfpeZRZtSWrmIMfOWpjHZBTNuCMXkEd7Gwwqlc
+         iOvYrocSt84t6ZeTk42IJgbLsjyd7jd2A9PLjJBJUk6+/zuPVKDbNu3yRMuC6UW7XAK7
+         c6ZCMdm073RuelI9atfxKkh2tygTjGB/Ep/ORC6jQr2wv0btDWp3HzOS7FXFwNDC4qFl
+         fwOy/CB3Fo01Oiu1cctQ9MfmvlgqBoj5xqskDsil9CoV/ICpmoUDUeaWJ0W1eF/fFIsk
+         KNPHoLHXNxIL+IgJTxrb873pUBi4+133/OgRIKZYQosWMmiJayz7/hU5XK7U5qCmhbMj
+         2njw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNL3np2SGoU5lTLWpNnbfUsLMNn8Tj9bF0B+vqTjTiITkZQXQG9vQH3FU5pSykYBaOBY0hnS3Lz2BmfNg=@vger.kernel.org, AJvYcCVDA9xKVktpZINKqLFGaX2cYovGyjNJ1dLV3abvW7Ikb1vlzO+M7Ei7uLNi4oJEYVbWQN6mBr0w7ZkaTQMvjYc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpYf4uEd7wOdSBJkBOsBldWqcSGtTJ4K2MyK/hvoojy7mqGudc
+	cm8nPSYyVJvEXG+gEL/lDesAveKDJCUQ8p1fH14a3AvIF7Q809J5
+X-Google-Smtp-Source: AGHT+IF/EDW9cEkH4aC29lEw1icZ1Kdm7gfHx7mToMwD5a5W4EBJCgfi45RAjKeE4P04nb8zL8QY+Q==
+X-Received: by 2002:a05:6214:4981:b0:6cb:f853:9eca with SMTP id 6a1803df08f44-6cbf9d10272mr54404586d6.25.1728746958840;
+        Sat, 12 Oct 2024 08:29:18 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cbe85b9545sm25873136d6.57.2024.10.12.08.29.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Oct 2024 08:29:18 -0700 (PDT)
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 099F81200066;
+	Sat, 12 Oct 2024 11:29:18 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Sat, 12 Oct 2024 11:29:18 -0400
+X-ME-Sender: <xms:zZUKZ7CLprxm149-YkF2JgUbk7-fDvwOFj7h8AYkIa0JvF7THn1rSQ>
+    <xme:zZUKZxi2n6JmyaSZQd3wGAF7pf9k7KT1Su_ExMenoC4h6VfmZXHJ0eQeOdRHn7yGO
+    7WwLVxptO4gnK6ZGQ>
+X-ME-Received: <xmr:zZUKZ2lwGmEWOnZqU-gSvDbYUWYFdGdz6djLdnsgzlTan1ZOeAe2gAV2Jd3sgA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeguddgkeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtrodttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpeejffegieejvddtgfekkefhjeegjeevuedugfeh
+    fedtkeffjedtleeiuefhvdefgeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
+    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
+    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
+    mhgvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    epfhhujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehn
+    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehruhhsthdqfh
+    horhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgu
+    rhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilh
+    drtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughupdhrtghpthht
+    ohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnh
+    horhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgv
+    th
+X-ME-Proxy: <xmx:zZUKZ9ye7wzfjjbtI7BsyR9KxGs3_T4Ht33FE_ediU4aOGU1JzSPkQ>
+    <xmx:zZUKZwQQ1EFfrzOAJnJbiy4LKSTVdjJk04sYujc7cn9MmOkB376L5Q>
+    <xmx:zZUKZwYGRUrXA0NOrYqm5XSK1AhVkeVK6b7lwVOMI6CZvAsWjfLL3w>
+    <xmx:zZUKZxSG8tYAgGZaA_F-UxjQZ637Y1diI_l4Ux6aT6LfvkKxA1P9eQ>
+    <xmx:zpUKZ2Db2WS0_vWL9cME5BP42GU2Rs5VY-tzIxo_FE_zGGVFFFAF83Lb>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 12 Oct 2024 11:29:17 -0400 (EDT)
+Date: Sat, 12 Oct 2024 08:29:06 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me, a.hindborg@samsung.com,
+	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+	tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/6] rust: Add IO polling
+Message-ID: <ZwqVwktWNMrxFvGH@boqun-archlinux>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,147 +123,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240930120402.3468-4-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20241005122531.20298-1-fujita.tomonori@gmail.com>
 
-+ David Laight
+Hi Tomo,
 
-On Mon, Sep 30, 2024 at 02:03:57PM +0200, Michal Swiatkowski wrote:
-> Remove the field to allow having more queues than MSI-X on VSI. As
-> default the number will be the same, but if there won't be more MSI-X
-> available VSI can run with at least one MSI-X.
+On Sat, Oct 05, 2024 at 09:25:25PM +0900, FUJITA Tomonori wrote:
+> Add Rust version of read_poll_timeout (include/linux/iopoll.h), which
+> polls periodically until a condition is met or a timeout is reached.
+> By using the function, the 6th patch fixes QT2025 PHY driver to sleep
+> until the hardware becomes ready.
 > 
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice.h         |  1 -
->  drivers/net/ethernet/intel/ice/ice_base.c    | 10 +++-----
->  drivers/net/ethernet/intel/ice/ice_ethtool.c |  8 +++---
->  drivers/net/ethernet/intel/ice/ice_irq.c     | 11 +++------
->  drivers/net/ethernet/intel/ice/ice_lib.c     | 26 +++++++++++---------
->  5 files changed, 27 insertions(+), 29 deletions(-)
+> As a result of the past discussion, this introduces a new type
+> representing a span of time instead of using core::time::Duration or
+> time::Ktime.
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> index cf824d041d5a..1e23aec2634f 100644
-> --- a/drivers/net/ethernet/intel/ice/ice.h
-> +++ b/drivers/net/ethernet/intel/ice/ice.h
-> @@ -622,7 +622,6 @@ struct ice_pf {
->  	u16 max_pf_txqs;	/* Total Tx queues PF wide */
->  	u16 max_pf_rxqs;	/* Total Rx queues PF wide */
->  	struct ice_pf_msix msix;
-> -	u16 num_lan_msix;	/* Total MSIX vectors for base driver */
->  	u16 num_lan_tx;		/* num LAN Tx queues setup */
->  	u16 num_lan_rx;		/* num LAN Rx queues setup */
->  	u16 next_vsi;		/* Next free slot in pf->vsi[] - 0-based! */
 
-...
+While, we are at it, I want to suggest that we also add
+rust/kernel/time{.rs, /} into the "F:" entries of TIME subsystem like:
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index 85a3b2326e7b..e5c56ec8bbda 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -3811,8 +3811,8 @@ ice_get_ts_info(struct net_device *dev, struct kernel_ethtool_ts_info *info)
->   */
->  static int ice_get_max_txq(struct ice_pf *pf)
->  {
-> -	return min3(pf->num_lan_msix, (u16)num_online_cpus(),
-> -		    (u16)pf->hw.func_caps.common_cap.num_txq);
-> +	return min_t(u16, num_online_cpus(),
-> +		     pf->hw.func_caps.common_cap.num_txq);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b77f4495dcf4..09e46a214333 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -23376,6 +23376,8 @@ F:      kernel/time/timeconv.c
+ F:     kernel/time/timecounter.c
+ F:     kernel/time/timekeeping*
+ F:     kernel/time/time_test.c
++F:     rust/kernel/time.rs
++F:     rust/kernel/time/
+ F:     tools/testing/selftests/timers/
 
-It is unclear why min_t() is used here or elsewhere in this patch
-instead of min() as it seems that all the entities being compared
-are unsigned. Are you concerned about overflowing u16? If so, perhaps
-clamp, or some error handling, is a better approach.
+ TIPC NETWORK LAYER
 
-I am concerned that the casting that min_t() brings will hide
-any problems that may exist.
+This will help future contributers copy the correct people while
+submission. Could you maybe add a patch of this in your series if this
+sounds reasonable to you? Thanks!
 
->  }
->  
->  /**
-> @@ -3821,8 +3821,8 @@ static int ice_get_max_txq(struct ice_pf *pf)
->   */
->  static int ice_get_max_rxq(struct ice_pf *pf)
->  {
-> -	return min3(pf->num_lan_msix, (u16)num_online_cpus(),
-> -		    (u16)pf->hw.func_caps.common_cap.num_rxq);
-> +	return min_t(u16, num_online_cpus(),
-> +		     pf->hw.func_caps.common_cap.num_rxq);
->  }
->  
->  /**
+Regards,
+Boqun
 
-...
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-> index d4e74f96a8ad..26cfb4b67972 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-> @@ -157,6 +157,16 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
->  	}
->  }
->  
-> +static u16 ice_get_rxq_count(struct ice_pf *pf)
-> +{
-> +	return min_t(u16, ice_get_avail_rxq_count(pf), num_online_cpus());
-> +}
-> +
-> +static u16 ice_get_txq_count(struct ice_pf *pf)
-> +{
-> +	return min_t(u16, ice_get_avail_txq_count(pf), num_online_cpus());
-> +}
-> +
->  /**
->   * ice_vsi_set_num_qs - Set number of queues, descriptors and vectors for a VSI
->   * @vsi: the VSI being configured
-> @@ -178,9 +188,7 @@ static void ice_vsi_set_num_qs(struct ice_vsi *vsi)
->  			vsi->alloc_txq = vsi->req_txq;
->  			vsi->num_txq = vsi->req_txq;
->  		} else {
-> -			vsi->alloc_txq = min3(pf->num_lan_msix,
-> -					      ice_get_avail_txq_count(pf),
-> -					      (u16)num_online_cpus());
-> +			vsi->alloc_txq = ice_get_txq_count(pf);
->  		}
->  
->  		pf->num_lan_tx = vsi->alloc_txq;
-> @@ -193,17 +201,14 @@ static void ice_vsi_set_num_qs(struct ice_vsi *vsi)
->  				vsi->alloc_rxq = vsi->req_rxq;
->  				vsi->num_rxq = vsi->req_rxq;
->  			} else {
-> -				vsi->alloc_rxq = min3(pf->num_lan_msix,
-> -						      ice_get_avail_rxq_count(pf),
-> -						      (u16)num_online_cpus());
-> +				vsi->alloc_rxq = ice_get_rxq_count(pf);
->  			}
->  		}
->  
->  		pf->num_lan_rx = vsi->alloc_rxq;
->  
-> -		vsi->num_q_vectors = min_t(int, pf->num_lan_msix,
-> -					   max_t(int, vsi->alloc_rxq,
-> -						 vsi->alloc_txq));
-> +		vsi->num_q_vectors = max_t(int, vsi->alloc_rxq,
-> +					   vsi->alloc_txq);
->  		break;
->  	case ICE_VSI_SF:
->  		vsi->alloc_txq = 1;
-> @@ -1173,12 +1178,11 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
->  static void
->  ice_chnl_vsi_setup_q_map(struct ice_vsi *vsi, struct ice_vsi_ctx *ctxt)
->  {
-> -	struct ice_pf *pf = vsi->back;
->  	u16 qcount, qmap;
->  	u8 offset = 0;
->  	int pow;
->  
-> -	qcount = min_t(int, vsi->num_rxq, pf->num_lan_msix);
-> +	qcount = vsi->num_rxq;
->  
->  	pow = order_base_2(qcount);
->  	qmap = FIELD_PREP(ICE_AQ_VSI_TC_Q_OFFSET_M, offset);
+> Unlike the old rust branch, This adds a wrapper for fsleep() instead
+> of msleep(). fsleep() automatically chooses the best sleep method
+> based on a duration.
+> 
+> v2:
+> - Introduce time::Delta instead of core::time::Duration
+> - Add some trait to Ktime for calculating timeout
+> - Use read_poll_timeout in QT2025 driver instead of using fsleep directly
+> v1: https://lore.kernel.org/netdev/20241001112512.4861-1-fujita.tomonori@gmail.com/
+> 
+> 
+> FUJITA Tomonori (6):
+>   rust: time: Implement PartialEq and PartialOrd for Ktime
+>   rust: time: Introduce Delta type
+>   rust: time: Implement addition of Ktime and Delta
+>   rust: time: add wrapper for fsleep function
+>   rust: Add read_poll_timeout function
+>   net: phy: qt2025: wait until PHY becomes ready
+> 
+>  drivers/net/phy/qt2025.rs |  11 +++-
+>  rust/helpers/helpers.c    |   2 +
+>  rust/helpers/kernel.c     |  13 +++++
+>  rust/helpers/time.c       |  19 +++++++
+>  rust/kernel/error.rs      |   1 +
+>  rust/kernel/io.rs         |   5 ++
+>  rust/kernel/io/poll.rs    |  70 +++++++++++++++++++++++
+>  rust/kernel/lib.rs        |   1 +
+>  rust/kernel/time.rs       | 113 ++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 234 insertions(+), 1 deletion(-)
+>  create mode 100644 rust/helpers/kernel.c
+>  create mode 100644 rust/helpers/time.c
+>  create mode 100644 rust/kernel/io.rs
+>  create mode 100644 rust/kernel/io/poll.rs
+> 
+> 
+> base-commit: d521db38f339709ccd23c5deb7663904e626c3a6
 > -- 
-> 2.42.0
+> 2.34.1
 > 
 > 
 
