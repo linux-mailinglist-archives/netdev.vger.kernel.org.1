@@ -1,156 +1,175 @@
-Return-Path: <netdev+bounces-134882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC83B99B7EA
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 03:30:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD4999B7FC
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 04:28:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D02BB21AA7
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 01:30:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D87A41F2219D
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 02:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF6C1849;
-	Sun, 13 Oct 2024 01:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661181849;
+	Sun, 13 Oct 2024 02:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="FnwmDu39"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WrGhdZ5A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191E517C9;
-	Sun, 13 Oct 2024 01:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF6B231CB4;
+	Sun, 13 Oct 2024 02:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728783003; cv=none; b=pmzjE8b+AAJmT/HaIDJFocETGV4wcw9p3WP2pMsf3LjRqL13JX1NK50/JwrETAjr/SJ44p6+H6SaPg1ZSidXcsbEitPkYfuNCY5c0JdtWKjIqCrbU2mx7jtr9UTPXHParTST5t/Z9ZxNsZuyPqrisxorJZJwtM+5zpAQI7WRqAI=
+	t=1728786519; cv=none; b=WZNJvP/XDC6z4S0P8ZPlkKLwc41VsmO18Jacuu2ydgyOk7OPbJApwa+zI09a4V5ED8v4gT2bul0TEM3nPt8Ylwg572Hb9dH31Zw/SY23rFa7ClQjzXQ4TlNg2FufbLenXrj5GIUocpFQvYk+K2VTvXW62SITUW0wPCSStZz56JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728783003; c=relaxed/simple;
-	bh=B+G1ePAoG6zIOvr2BdtmD3pf5geReJjQGtNTzBr1aKg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o9e/lWy661S9Lp+R+xCpCKrKsA/cEMcvHoDAn82W/0/66nmAd8wtakMgvI1qJQRPe5KsYQ5ZN3PdQXItlcro61IQvAQ59dhqD7/2f6LSA6Zqz1Pu36brgOK6cVxQb7YK09CT0FpNPFNRM/2qkEaBnKeYHGWwmWy0Mgk8dURrfXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=FnwmDu39; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=fO53weLP+Aw4ySdODx/4ElwMlhKm+tjgTNBZRL+OdFA=; b=FnwmDu39IlX8Br5U
-	BzCHEjquG6BL45N9Y+vaxtNHime5RvvyHnsuZPEhynjH3RjVU+S1gDuDGXwB/Hvi+4xnarmrXTNhq
-	g4HzhYJuePkhem+1AhStaEcBUppFl1lchKUivW0cgL9yBTL9PHt070CidzGvfPglq0cnOVRTuqDZX
-	CHRv3jP5o/cFcaTc6UoBHupmXuyeCqGjBvQdH4Gk3uiaKcezFo2D92Z3ytsLxelJPZNW7IaSSgNe6
-	yuy5z4GpFRbXk//sjN74zV1GH5jlAg/HRA7MpysNjgIcaZY5ldPFJoNA651RLJDUa2gZvHpQFQr3t
-	LJFVqIfc7JKJUVFWlg==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1sznQY-00Ajk1-2u;
-	Sun, 13 Oct 2024 01:29:46 +0000
-From: linux@treblig.org
-To: bharat@chelsio.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] net: cxgb3: Remove stid deadcode
-Date: Sun, 13 Oct 2024 02:29:46 +0100
-Message-ID: <20241013012946.284721-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1728786519; c=relaxed/simple;
+	bh=kxw0/5KQqdN8nbP5+1lX3aIizA0MM7Ku7mcSHuuSt78=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pfRNniVbwgyDqa9gsiW9kggoJNDalfkUrpa9MnT6DSqLcY5EEgyLVUad2xl4x2JlwgrahdFS4p9zEjAY5TTkqr39LszECLgg9zUixypzbmPU3+n37CbiBFzrFJA2yoJ/YkojGDnQarebqiDglGXu8PUVG1Z8Efn8QXXqtNN9fZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WrGhdZ5A; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728786517; x=1760322517;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kxw0/5KQqdN8nbP5+1lX3aIizA0MM7Ku7mcSHuuSt78=;
+  b=WrGhdZ5AosXWjiZOSFaMtToHiFij0gvT1WZ4p2gR0ui5X1+7VztdCtae
+   proKltb9ZHkdec2Lkpp+7nO3PXKEehyL3ZISX6TP6PIInjNG3+8Kbgkkn
+   6DQn4WTucTt21rZvqFVciFESRTb4NlMgwslJflFITKxFXpGPnZrhSXKaE
+   +WfBlreK82gMioCsQdSYKqaE5llbKInDKxH17AAv3r02Nyax+qJ4j3M9w
+   CSJCThAy0z1FxxU8emEIiFihUO94WXMlec9v+8jDCjbnA8qqnSzfpXoU+
+   JvnoemjKwTiZhd5ofU7qOak8TI25BP5bkyrJhAfKIA57mDiAJQa/jk//V
+   g==;
+X-CSE-ConnectionGUID: CS5TS9tHTUitzBFIhjFP7g==
+X-CSE-MsgGUID: jv2in9R0S8uMllx732FifQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="38731315"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="38731315"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2024 19:28:37 -0700
+X-CSE-ConnectionGUID: do3bFO2CTB68Q54myxA8Nw==
+X-CSE-MsgGUID: pH9+hgyLT8y7Svldl/1AxA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="77172345"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 12 Oct 2024 19:28:32 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1szoLN-000E0B-1Z;
+	Sun, 13 Oct 2024 02:28:29 +0000
+Date: Sun, 13 Oct 2024 10:27:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com
+Cc: oe-kbuild-all@lists.linux.dev, imx@lists.linux.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next 05/11] net: enetc: add enetc-pf-common driver
+ support
+Message-ID: <202410131001.KjFCfYWr-lkp@intel.com>
+References: <20241009095116.147412-6-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009095116.147412-6-wei.fang@nxp.com>
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+Hi Wei,
 
-cxgb3_alloc_stid() and cxgb3_free_stid() have been unused since
-commit 30e0f6cf5acb ("RDMA/iw_cxgb3: Remove the iw_cxgb3 module
-from kernel")
+kernel test robot noticed the following build errors:
 
-Remove them.
+[auto build test ERROR on net-next/main]
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- .../ethernet/chelsio/cxgb3/cxgb3_offload.c    | 39 -------------------
- .../ethernet/chelsio/cxgb3/cxgb3_offload.h    |  3 --
- 2 files changed, 42 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Fang/dt-bindings-net-add-compatible-string-for-i-MX95-EMDIO/20241009-181113
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241009095116.147412-6-wei.fang%40nxp.com
+patch subject: [PATCH net-next 05/11] net: enetc: add enetc-pf-common driver support
+config: powerpc-randconfig-r062-20241013 (https://download.01.org/0day-ci/archive/20241013/202410131001.KjFCfYWr-lkp@intel.com/config)
+compiler: powerpc-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241013/202410131001.KjFCfYWr-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.c b/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.c
-index 89256b866840..5a9f6925e1fa 100644
---- a/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.c
-+++ b/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.c
-@@ -515,23 +515,6 @@ void *cxgb3_free_atid(struct t3cdev *tdev, int atid)
- 
- EXPORT_SYMBOL(cxgb3_free_atid);
- 
--/*
-- * Free a server TID and return it to the free pool.
-- */
--void cxgb3_free_stid(struct t3cdev *tdev, int stid)
--{
--	struct tid_info *t = &(T3C_DATA(tdev))->tid_maps;
--	union listen_entry *p = stid2entry(t, stid);
--
--	spin_lock_bh(&t->stid_lock);
--	p->next = t->sfree;
--	t->sfree = p;
--	t->stids_in_use--;
--	spin_unlock_bh(&t->stid_lock);
--}
--
--EXPORT_SYMBOL(cxgb3_free_stid);
--
- void cxgb3_insert_tid(struct t3cdev *tdev, struct cxgb3_client *client,
- 		      void *ctx, unsigned int tid)
- {
-@@ -671,28 +654,6 @@ int cxgb3_alloc_atid(struct t3cdev *tdev, struct cxgb3_client *client,
- 
- EXPORT_SYMBOL(cxgb3_alloc_atid);
- 
--int cxgb3_alloc_stid(struct t3cdev *tdev, struct cxgb3_client *client,
--		     void *ctx)
--{
--	int stid = -1;
--	struct tid_info *t = &(T3C_DATA(tdev))->tid_maps;
--
--	spin_lock_bh(&t->stid_lock);
--	if (t->sfree) {
--		union listen_entry *p = t->sfree;
--
--		stid = (p - t->stid_tab) + t->stid_base;
--		t->sfree = p->next;
--		p->t3c_tid.ctx = ctx;
--		p->t3c_tid.client = client;
--		t->stids_in_use++;
--	}
--	spin_unlock_bh(&t->stid_lock);
--	return stid;
--}
--
--EXPORT_SYMBOL(cxgb3_alloc_stid);
--
- /* Get the t3cdev associated with a net_device */
- struct t3cdev *dev2t3cdev(struct net_device *dev)
- {
-diff --git a/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.h b/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.h
-index 929c298115ca..7419824f9926 100644
---- a/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.h
-+++ b/drivers/net/ethernet/chelsio/cxgb3/cxgb3_offload.h
-@@ -95,10 +95,7 @@ struct cxgb3_client {
-  */
- int cxgb3_alloc_atid(struct t3cdev *dev, struct cxgb3_client *client,
- 		     void *ctx);
--int cxgb3_alloc_stid(struct t3cdev *dev, struct cxgb3_client *client,
--		     void *ctx);
- void *cxgb3_free_atid(struct t3cdev *dev, int atid);
--void cxgb3_free_stid(struct t3cdev *dev, int stid);
- void cxgb3_insert_tid(struct t3cdev *dev, struct cxgb3_client *client,
- 		      void *ctx, unsigned int tid);
- void cxgb3_queue_tid_release(struct t3cdev *dev, unsigned int tid);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410131001.KjFCfYWr-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   powerpc-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_pf_common.o: in function `enetc_sriov_configure':
+>> drivers/net/ethernet/freescale/enetc/enetc_pf_common.c:336:(.text+0x55c): undefined reference to `enetc_msg_psi_free'
+>> powerpc-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_pf_common.c:349:(.text+0x5e4): undefined reference to `enetc_msg_psi_init'
+>> powerpc-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_pf_common.c:365:(.text+0x658): undefined reference to `enetc_msg_psi_free'
+   powerpc-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_pf_common.o: in function `enetc_pf_netdev_setup':
+   drivers/net/ethernet/freescale/enetc/enetc_pf_common.c:106:(.text+0xb00): undefined reference to `enetc_set_ethtool_ops'
+
+
+vim +336 drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
+
+   324	
+   325	int enetc_sriov_configure(struct pci_dev *pdev, int num_vfs)
+   326	{
+   327		struct enetc_si *si = pci_get_drvdata(pdev);
+   328		struct enetc_pf *pf = enetc_si_priv(si);
+   329		int err;
+   330	
+   331		if (!IS_ENABLED(CONFIG_PCI_IOV))
+   332			return 0;
+   333	
+   334		if (!num_vfs) {
+   335			pci_disable_sriov(pdev);
+ > 336			enetc_msg_psi_free(pf);
+   337			kfree(pf->vf_state);
+   338			pf->num_vfs = 0;
+   339		} else {
+   340			pf->num_vfs = num_vfs;
+   341	
+   342			pf->vf_state = kcalloc(num_vfs, sizeof(struct enetc_vf_state),
+   343					       GFP_KERNEL);
+   344			if (!pf->vf_state) {
+   345				pf->num_vfs = 0;
+   346				return -ENOMEM;
+   347			}
+   348	
+ > 349			err = enetc_msg_psi_init(pf);
+   350			if (err) {
+   351				dev_err(&pdev->dev, "enetc_msg_psi_init (%d)\n", err);
+   352				goto err_msg_psi;
+   353			}
+   354	
+   355			err = pci_enable_sriov(pdev, num_vfs);
+   356			if (err) {
+   357				dev_err(&pdev->dev, "pci_enable_sriov err %d\n", err);
+   358				goto err_en_sriov;
+   359			}
+   360		}
+   361	
+   362		return num_vfs;
+   363	
+   364	err_en_sriov:
+ > 365		enetc_msg_psi_free(pf);
+   366	err_msg_psi:
+   367		kfree(pf->vf_state);
+   368		pf->num_vfs = 0;
+   369	
+   370		return err;
+   371	}
+   372	EXPORT_SYMBOL_GPL(enetc_sriov_configure);
+   373	
+
 -- 
-2.47.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
