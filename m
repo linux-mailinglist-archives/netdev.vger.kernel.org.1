@@ -1,375 +1,173 @@
-Return-Path: <netdev+bounces-134947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C7D099BA7A
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 19:07:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97EA799BA87
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 19:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B14721F2170A
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 17:07:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BE061C20AC7
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 17:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36045148FF6;
-	Sun, 13 Oct 2024 17:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BB01487CE;
+	Sun, 13 Oct 2024 17:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="J3O3vcGk"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="AaGI1Pv+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5451487D6;
-	Sun, 13 Oct 2024 17:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D9483CDA
+	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 17:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728839216; cv=none; b=r1Ix82UhgFg4XetOIEIn12GgaXBM1AEgk4nc0AGzx4vB+Qe35XMOvLPHncahB2huqR20GGP4LLb0bXb183bCxqK7wPQMZ7co5QocqQ622sC7saHwIaESoSZmKUR98LCZTk10o4d1UrXbDTUkd83GgKHb1p1r4jORLxujaCs/trI=
+	t=1728840325; cv=none; b=LWJTlvKWQsIV19Y32foeufFmtK5zNH7dkdqdM5mq7lxT3b4MPTYMZpTEG28KrYcYda6rgGiJCD0RYv8Q/dYNcic5wUoaslwWKt0sDalXsdCFjhVoKtNW/XMuh/WN48WvOo0mrrz66VJs9/0y6I2Igq9nqkocg1s9yqZ07sEXORQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728839216; c=relaxed/simple;
-	bh=+Uiy6+SWHck8h6tWIlj0e9xsNLC/f+37RB98m8T/pNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z/rfmBTHqdi3P/qTYpKxhq4g/p94e88YwWCzXMf00+OB0fSlE519uIR6wp5RdAqKA8EjqQhIeiFvGcinlmOaXUxhsvHaHA6h5XPCORk92t/JTHEw4s0F3d6fERtsin1iP7f08xhPooyBuGdWJOZrUBDf/oS2777oP14mIopEvdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=J3O3vcGk; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49DBih6P017972;
-	Sun, 13 Oct 2024 17:06:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2023-11-20; bh=qe/Ww
-	XnzDCfVyljeHrmGvaE+Qj46LfS5BKsd/ceTinw=; b=J3O3vcGk9DNjGDq4c0+D7
-	qBbhB2kNqLbaEBBttRlxmsZQkMrv7qNCgIQNZtu8+G1klu6Hki3fLn5V/awOpubZ
-	F79D25wIqeDq+ic81YXtwEMuJamgvJCxYyoDDOjMZWal4BsMedPuQEjWYOObigfN
-	uMkdBNkX+6ZG+mEokA6U0iB5Usi/ICZioNlqZrEztkeU+/JA8BYUHyKOAn+EatbD
-	pDy+AjOQ6Vk/3lS9uZsgJoWMW69YawiIVa2zYmMhiVVOf5O/cpk0M9VugSEgWRnc
-	014cS3v00K03HNAnouJeVc93gkPl2kMVZIRi5PaPo/fCWrNyvEfY5KKheN3J5GIL
-	A==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 427hnt19dn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 13 Oct 2024 17:06:34 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49DBtMvK026424;
-	Sun, 13 Oct 2024 17:06:33 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 427fj561ej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 13 Oct 2024 17:06:33 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 49DH6MFE040166;
-	Sun, 13 Oct 2024 17:06:33 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 427fj561c0-4;
-	Sun, 13 Oct 2024 17:06:32 +0000
-From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-To: davem@davemloft.net, Liam.Howlett@Oracle.com
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mingo@redhat.com,
-        peterz@infradead.org, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-        vschneid@redhat.com, jiri@resnulli.us, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, akpm@linux-foundation.org, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org, anjali.k.kulkarni@oracle.com,
-        peili.io@oracle.com
-Subject: [PATCH net-next v1 3/3] connector/cn_proc: Selftest for threads
-Date: Sun, 13 Oct 2024 10:06:17 -0700
-Message-ID: <20241013170617.2139204-4-anjali.k.kulkarni@oracle.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241013170617.2139204-1-anjali.k.kulkarni@oracle.com>
-References: <20241013170617.2139204-1-anjali.k.kulkarni@oracle.com>
+	s=arc-20240116; t=1728840325; c=relaxed/simple;
+	bh=0r6ubmKK3fTmaW9p5/f0rrKPVpMMmuQVR6OAALoZIEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qs49bxt8M4g9/qIWXeYRI6LSGavLTlVHeeBX7PpZowTnpCLh2y588mlvPy9jTTng6KDI3wK6JSYkrQ8b3Wz2sCBumZ3TZikeGsxIt5wexUunqvjqYeo4CeO0+WYgZVG7Qu7FSN/BggmO4Kell6Nm8LDtgxlSnNH/e+znUf6wCtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=AaGI1Pv+; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2e2ed2230d8so1645061a91.0
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 10:25:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1728840323; x=1729445123; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PiTx0ha6pjBtkUTB0+EsHxh7W7/HixrnetXsL0FLYCI=;
+        b=AaGI1Pv+TJSF9B8Y6Z2nvwY0BKgeOpNB3WNxy0pW/0uuHJAAuMzPO3xyAlY/oK8+dN
+         J1jdttpdf/OgFlIGT33KDxoQ41Xyowj5glcjoaS+x7tXiiOPkdYqZVSB3065fCpP1iD4
+         i7l8uUqlGSgUpvzSDPTdrmmC5Rxq5S5ZPuNY/HfG1CFaZjzrCDWN6ESfV9HicbSwbKyj
+         fI6cIWtrkHtPgK8bd19nGQ5Z7HO3CsdnrIx1Q7q2DmOpg6z489nrIoSP05vf/TXemD9s
+         jpOoJt6T8VAP1o6eEJzHY1Zswp9D+U1OYdJXg7TrJvRTOEvnBNYK1QKrNa/Jv93rP6pk
+         MfLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728840323; x=1729445123;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PiTx0ha6pjBtkUTB0+EsHxh7W7/HixrnetXsL0FLYCI=;
+        b=omvX/66kn8EN4Pz05LRaRVvue9m5SytYdTuSpt5notIDaQq9C9wJ+XNOtz4An8ocpJ
+         YT/PVAKcv3Q4lxtn921OSdbrtn85IqsOXatFYEe4w1jZb8EyPHrHtr3qlbamAxYnUEeJ
+         uNQOLbB67+CbaPhPO4eQHPbW3fp7uNZYXGmZjDmxTONpGSsA/Rl4PbvjgKV+Bi+ZtEh9
+         RtwRfcnAHeS2UtD52wi5oNt4lgcuSYe5WYshJhs99xX//blgVbVEDvqo7x9tPpaKOeL3
+         CQHoUxNm4OToL4JuJHBUw5Hwi/oMicG2EMt6UnhLgPCQEoY0Mksc51YcKIWEn8Jbm3gt
+         XNOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUiIPyQF174guN2hSVasezeYx9ZmHYRfmnr7oJHNa9xudvzcvHc0Mganfgyw0F8Zff6qR0b8oc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwebpnKMXnukecpaQOkoAf6Nt4DGAJVinwb0NVlFdr9aUqBTrIi
+	HpOxXTEq2BjdNgfkeyqj4CuNE4cBHJf3hW0DrYy+rj+azcuYgo76shhKpVrJgnQAo6WLUs9Ry79
+	PIew=
+X-Google-Smtp-Source: AGHT+IEGlI8g2iMGz4qmfmF8QvVGmGKgZur5IagnbQDPTXE0fj9TljUIlg4BCVsEX9orjPo8VEvZrw==
+X-Received: by 2002:a17:90b:3850:b0:2cf:c9ab:e747 with SMTP id 98e67ed59e1d1-2e3151b415fmr7876066a91.1.1728840323422;
+        Sun, 13 Oct 2024 10:25:23 -0700 (PDT)
+Received: from [192.168.1.24] (174-21-189-109.tukw.qwest.net. [174.21.189.109])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e3132badd2sm3603920a91.40.2024.10.13.10.25.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Oct 2024 10:25:22 -0700 (PDT)
+Message-ID: <5d7925ed-91bf-4c78-8b70-598ae9ab3885@davidwei.uk>
+Date: Sun, 13 Oct 2024 10:25:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 06/15] net: page_pool: add ->scrub mem provider
+ callback
+Content-Language: en-GB
+To: Mina Almasry <almasrymina@google.com>,
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ David Wei <dw@davidwei.uk>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-7-dw@davidwei.uk>
+ <CAHS8izPFp_Q1OngcwZDQeo=YD+nnA9vyVqhuaT--+uREEkfujQ@mail.gmail.com>
+ <9f1897b3-0cea-4822-8e33-a4cab278b2ac@gmail.com>
+ <CAHS8izOxsLc82jX=b3cwEctASerQabKR=Kqqio2Rs7hVkDHL4A@mail.gmail.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <CAHS8izOxsLc82jX=b3cwEctASerQabKR=Kqqio2Rs7hVkDHL4A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-13_11,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
- bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
- definitions=main-2410130128
-X-Proofpoint-ORIG-GUID: I2xa_47FiyaIji2U3unHtHHwY6W5Blnv
-X-Proofpoint-GUID: I2xa_47FiyaIji2U3unHtHHwY6W5Blnv
 
-Test to check if setting PROC_CN_MCAST_NOTIFY in proc connector API, allows
-a thread's non-zero exit status to be returned to proc_filter.
+On 2024-10-10 10:54, Mina Almasry wrote:
+> On Wed, Oct 9, 2024 at 2:58 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> On 10/9/24 22:00, Mina Almasry wrote:
+>>> On Mon, Oct 7, 2024 at 3:16 PM David Wei <dw@davidwei.uk> wrote:
+>>>>
+>>>> From: Pavel Begunkov <asml.silence@gmail.com>
+>>>>
+>>>> page pool is now waiting for all ppiovs to return before destroying
+>>>> itself, and for that to happen the memory provider might need to push
+>>>> some buffers, flush caches and so on.
+>>>>
+>>>> todo: we'll try to get by without it before the final release
+>>>>
+>>>
+>>> Is the intention to drop this todo and stick with this patch, or to
+>>> move ahead with this patch?
+>>
+>> Heh, I overlooked this todo. The plan is to actually leave it
+>> as is, it's by far the simplest way and doesn't really gets
+>> into anyone's way as it's a slow path.
+>>
+>>> To be honest, I think I read in a follow up patch that you want to
+>>> unref all the memory on page_pool_destory, which is not how the
+>>> page_pool is used today. Tdoay page_pool_destroy does not reclaim
+>>> memory. Changing that may be OK.
+>>
+>> It doesn't because it can't (not breaking anything), which is a
+>> problem as the page pool might never get destroyed. io_uring
+>> doesn't change that, a buffer can't be reclaimed while anything
+>> in the kernel stack holds it. It's only when it's given to the
+>> user we can force it back out of there.
 
-The threads.c program creates 2 child threads. 1st thread handles signal
-SIGSEGV, and 2nd thread needs to indicate some error condition (value 1)
-to the kernel, instead of using pthread_exit() with 1.
+The page pool will definitely be destroyed, the call to
+netdev_rx_queue_restart() with mp_ops/mp_priv set to null and netdev
+core will ensure that.
 
-In both cases, child sends notify_netlink_thread_exit(exit_code) to kernel,
-to let kernel know it has exited abnormally with exit_code.
+>>
+>> And it has to happen one way or another, we can't trust the
+>> user to put buffers back, it's just devmem does that by temporarily
+>> attaching the lifetime of such buffers to a socket.
+>>
+> 
+> (noob question) does io_uring not have a socket equivalent that you
+> can tie the lifetime of the buffers to? I'm thinking there must be
+> one, because in your patches IIRC you have the fill queues and the
+> memory you bind from the userspace, there should be something that
+> tells you that the userspace has exited/crashed and it's time to now
+> destroy the fill queue and unbind the memory, right?
+> 
+> I'm thinking you may want to bind the lifetime of the buffers to that,
+> instead of the lifetime of the pool. The pool will not be destroyed
+> until the next driver/reset reconfiguration happens, right? That could
+> be long long after the userspace has stopped using the memory.
+> 
 
-Compile:
-    make thread
-    make proc_filter
-To see non-zero exit notifications, run:
-    ./proc_filter -f
-Run threads code in another window:
-    ./threads
-Note the 2 child thread IDs reported above
-Send SIGSEGV signal to the child handling SIGSEGV:
-    kill -11 <child1-tid>
-Watch the child 1 tid being notified with exit code 11 to proc_filter
-Watch child 2 tid being notified with exit code 1 (value defined in code)
-to proc_filter
+Yes, there are io_uring objects e.g. interface queue that hold
+everything together. IIRC page pool destroy doesn't unref but it waits
+for all pages that are handed out to skbs to be returned. So for us,
+below might work:
 
-Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
----
- tools/testing/selftests/connector/Makefile    | 23 ++++-
- .../testing/selftests/connector/proc_filter.c |  5 +
- tools/testing/selftests/connector/thread.c    | 90 ++++++++++++++++++
- .../selftests/connector/thread_filter.c       | 93 +++++++++++++++++++
- 4 files changed, 210 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/connector/thread.c
- create mode 100644 tools/testing/selftests/connector/thread_filter.c
+1. Call netdev_rx_queue_restart() which allocates a new pp for the rx
+   queue and tries to free the old pp
+2. At this point we're guaranteed that any packets hitting this rx queue
+   will not go to user pages from our memory provider
+3. Assume userspace is gone (either crash or gracefully terminating),
+   unref the uref for all pages, same as what scrub() is doing today
+4. Any pages that are still in skb frags will get freed when the sockets
+   etc are closed
+5. Rely on the pp delay release to eventually terminate and clean up
 
-diff --git a/tools/testing/selftests/connector/Makefile b/tools/testing/selftests/connector/Makefile
-index 92188b9bac5c..bf335826bc3b 100644
---- a/tools/testing/selftests/connector/Makefile
-+++ b/tools/testing/selftests/connector/Makefile
-@@ -1,5 +1,26 @@
- # SPDX-License-Identifier: GPL-2.0
--CFLAGS += -Wall $(KHDR_INCLUDES)
-+KERNEL="../../../.."
-+
-+CFLAGS += -Wall $(KHDR_INCLUDES) -I $(KERNEL)/include/uapi -I $(KERNEL)/include
-+
-+proc_filter: proc_filter.o
-+	cc proc_filter.o -o proc_filter
-+
-+proc_filter.o: proc_filter.c
-+	cc -c proc_filter.c -o proc_filter.o $(CFLAGS)
-+
-+thread: thread.o thread_filter.o
-+	cc thread.o thread_filter.o -o thread
-+
-+thread.o: thread.c $(DEPS)
-+		cc -c thread.c -o thread.o $(CFLAGS)
-+
-+thread_filter.o: thread_filter.c
-+		cc -c thread_filter.c -o thread_filter.o $(CFLAGS)
-+
-+define EXTRA_CLEAN
-+	rm *.o thread
-+endef
- 
- TEST_GEN_PROGS = proc_filter
- 
-diff --git a/tools/testing/selftests/connector/proc_filter.c b/tools/testing/selftests/connector/proc_filter.c
-index 4a825b997666..6fb4842894f8 100644
---- a/tools/testing/selftests/connector/proc_filter.c
-+++ b/tools/testing/selftests/connector/proc_filter.c
-@@ -1,4 +1,9 @@
- // SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Author: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-+ *
-+ * Copyright (c) 2024 Oracle and/or its affiliates.
-+ */
- 
- #include <sys/types.h>
- #include <sys/epoll.h>
-diff --git a/tools/testing/selftests/connector/thread.c b/tools/testing/selftests/connector/thread.c
-new file mode 100644
-index 000000000000..77cba2b266dc
---- /dev/null
-+++ b/tools/testing/selftests/connector/thread.c
-@@ -0,0 +1,90 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Author: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-+ *
-+ * Copyright (c) 2024 Oracle and/or its affiliates.
-+ */
-+
-+#include <pthread.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <signal.h>
-+
-+/*
-+ * This code tests a thread exit notification when thread exits abnormally.
-+ * Normally, when a thread exits abnormally, the kernel is not aware of the
-+ * exit code. This is usually only conveyed from child to parent via the
-+ * pthread_exit() and pthread_join() calls. Sometimes, however, a parent
-+ * process cannot monitor all child processes via pthread_join(), particularly
-+ * when there is a huge amount of child processes. In this case, the parent
-+ * has created the child with PTHREAD_CREATE_DETACHED attribute.
-+ * To fix this problem, either when child wants to convey non-zero exit via
-+ * pthread_exit() or in a signal handler, the child can notify the kernel's
-+ * connector module it's exit status via a netlink call with new type
-+ * PROC_CN_MCAST_NOTIFY. (Implemented in the thread_filter.c file).
-+ * This will send the exit code from the child to the kernel, which the kernel
-+ * can later return to proc_filter program when the child actually exits.
-+ * To test this usecase:
-+ * Compile:
-+ *	make thread
-+ *	make proc_filter
-+ * To see non-zero exit notifications, run:
-+ *	./proc_filter -f
-+ * Start the threads code, creating 2 threads, in another window:
-+ *	./threads
-+ * Note the 2 child thread IDs reported above
-+ * Send SIGSEGV signal to the child handling SIGSEGV:
-+ *	kill -11 <child1-tid>
-+ * Watch the event being notified with exit code 11 to proc_filter
-+ * Watch child 2 tid being notified with exit code 1 (value defined in code)
-+ * to proc_filter
-+ */
-+
-+extern int notify_netlink_thread_exit(unsigned int exit_code);
-+
-+static void sigsegvh(int sig)
-+{
-+	unsigned int exit_code = (unsigned int) sig;
-+	/*
-+	 * Send any non-zero value to get a notification. Here we are
-+	 * sending the signal number for SIGSEGV which is 11
-+	 */
-+	notify_netlink_thread_exit(exit_code);
-+}
-+
-+void *threadc1(void *ptr)
-+{
-+	signal(SIGSEGV, sigsegvh);
-+	printf("Child 1 thread id %d, handling SIGSEGV\n", gettid());
-+	sleep(30);
-+	pthread_exit(NULL);
-+}
-+
-+void *threadc2(void *ptr)
-+{
-+	int exit_val = 1;
-+
-+	printf("Child 2 thread id %d, wants to exit with value %d\n",
-+			gettid(), exit_val);
-+	sleep(2);
-+	notify_netlink_thread_exit(exit_val);
-+	pthread_exit(NULL);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	pthread_t thread1, thread2;
-+	pthread_attr_t attr1, attr2;
-+
-+	pthread_attr_init(&attr1);
-+	pthread_attr_setdetachstate(&attr1, PTHREAD_CREATE_DETACHED);
-+	pthread_create(&thread1, &attr1, *threadc1, NULL);
-+
-+	pthread_attr_init(&attr2);
-+	pthread_attr_setdetachstate(&attr2, PTHREAD_CREATE_DETACHED);
-+	pthread_create(&thread2, &attr2, *threadc2, NULL);
-+
-+	sleep(30);
-+	exit(0);
-+}
-diff --git a/tools/testing/selftests/connector/thread_filter.c b/tools/testing/selftests/connector/thread_filter.c
-new file mode 100644
-index 000000000000..4b666004313b
---- /dev/null
-+++ b/tools/testing/selftests/connector/thread_filter.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Author: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-+ *
-+ * Copyright (c) 2024 Oracle and/or its affiliates.
-+ */
-+
-+#include <sys/types.h>
-+#include <sys/epoll.h>
-+#include <sys/socket.h>
-+#include <linux/netlink.h>
-+#include <linux/connector.h>
-+#include <linux/cn_proc.h>
-+
-+#include <stddef.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <strings.h>
-+#include <errno.h>
-+#include <signal.h>
-+#include <string.h>
-+
-+#define NL_MESSAGE_SIZE (sizeof(struct nlmsghdr) + sizeof(struct cn_msg) + \
-+			sizeof(struct proc_input))
-+
-+/*
-+ * Send PROC_CN_MCAST_NOTIFY type notification to the connector code in kernel.
-+ * This will send the exit_code specified by user to the connector layer, so
-+ * it can send a notification for that event to any listening process
-+ */
-+int send_message(int nl_sock, unsigned int exit_code)
-+{
-+	char buff[NL_MESSAGE_SIZE];
-+	struct nlmsghdr *hdr;
-+	struct cn_msg *msg;
-+
-+	hdr = (struct nlmsghdr *)buff;
-+	hdr->nlmsg_len = NL_MESSAGE_SIZE;
-+	hdr->nlmsg_type = NLMSG_DONE;
-+	hdr->nlmsg_flags = 0;
-+	hdr->nlmsg_seq = 0;
-+	hdr->nlmsg_pid = getpid();
-+
-+	msg = (struct cn_msg *)NLMSG_DATA(hdr);
-+	msg->id.idx = CN_IDX_PROC;
-+	msg->id.val = CN_VAL_PROC;
-+	msg->seq = 0;
-+	msg->ack = 0;
-+	msg->flags = 0;
-+
-+	msg->len = sizeof(struct proc_input);
-+	((struct proc_input *)msg->data)->mcast_op =
-+		PROC_CN_MCAST_NOTIFY;
-+	((struct proc_input *)msg->data)->uexit_code = exit_code;
-+
-+	if (send(nl_sock, hdr, hdr->nlmsg_len, 0) == -1) {
-+		perror("send failed");
-+		return -errno;
-+	}
-+	return 0;
-+}
-+
-+int notify_netlink_thread_exit(unsigned int exit_code)
-+{
-+	struct sockaddr_nl sa_nl;
-+	int err = 0;
-+	int nl_sock;
-+
-+	nl_sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_CONNECTOR);
-+
-+	if (nl_sock == -1) {
-+		perror("socket failed");
-+		return -errno;
-+	}
-+
-+	bzero(&sa_nl, sizeof(sa_nl));
-+	sa_nl.nl_family = AF_NETLINK;
-+	sa_nl.nl_groups = CN_IDX_PROC;
-+	sa_nl.nl_pid    = gettid();
-+
-+	if (bind(nl_sock, (struct sockaddr *)&sa_nl, sizeof(sa_nl)) == -1) {
-+		perror("bind failed");
-+		return -errno;
-+	}
-+
-+	err = send_message(nl_sock, exit_code);
-+
-+	if (err < 0)
-+		return err;
-+
-+	return 0;
-+}
--- 
-2.46.0
-
+Let me know what you think Pavel.
 
