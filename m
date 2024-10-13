@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-134917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F053199B8CB
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 10:44:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1A999B8EB
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 11:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F21EB1F217B8
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 08:44:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50F611F2185E
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 09:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58F412C7F9;
-	Sun, 13 Oct 2024 08:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59B4288B5;
+	Sun, 13 Oct 2024 09:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwp2qVL1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsqmFkix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26B97F460
-	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 08:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC45231CAE
+	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 09:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728809076; cv=none; b=ApSKynQHSwvulUxB/LviwMmmGQ3F3BjiBd64auNFmcQHdVurvkaAkf65Q1diJ7qc+y0maGqUq/YdLrtrwns3Hpmuw4hcwkpkwo9YDPyO/3j3vlMTKNQpUw3Y58PZga+tHES+UEV3R8hAkTlRetfYyGP792/h7lxd3IqO4k2NxPA=
+	t=1728811063; cv=none; b=cEk9a8+bu0spdAbyjFqDbG+/0RJ4BEWKQO52kQ4/SXaRi5lKqbUp5e6zjRlSyJIkpjX4+q+6cN+HApI24mqPpje5fZMkK9bjFHhj6iq0Y/BEjB77yO2Wu1geeg8R6WmecezvJsYxsl9PqMM6Prh3Ll/bzf3uuN9CpySSW0ot/k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728809076; c=relaxed/simple;
-	bh=iuzfiHX/QP7BpOCHPwIU07nTIyMhdnzBs8DsMsbfPc8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=dw6tYNy5Htk+K0fgD3idjNOe0Ayl/78Br9uBEGb1PyZV9ADMwgllqNnIFkGAt5WwYnzaUzIO/+POrgDYgZ0khen8S3j6aHiDgA6WXWUDdLjxnvbgIuAUuFUHIe5/1jkhgOvld1q6aTSZN8vj8WJBei/ETDEEuvXwbTuqOBlILlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hwp2qVL1; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1728811063; c=relaxed/simple;
+	bh=jA999EtYcc46c5AVRSFuNpTW/swUY9sQa/A6PyRF8Kk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=JtCqZaT5JWBqTIGZo/bmUEmC3lafRhB2MKEBMdcE2K2qaz88e/blYj+cUXym7sShC3Tcl++C4B4QS1/k9/9rYd3wNhm21xZ+fhz7odXRE+C9ktt6Z4HgQWVo77QgAlFoYvcsy9Mq/H76xGQ0S3hwxNRJyNtUEYlNqcx3JM/Flgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsqmFkix; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c5bca6603aso3781319a12.1
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 01:44:34 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c94b0b466cso2362705a12.0
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 02:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728809073; x=1729413873; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oidOQ+9NvlFXTkjDmGpZoueB4tKItPMp4EzlS4EL+gA=;
-        b=hwp2qVL1Kb3KN0ZUszezcEpktWJZVtSIVOnMVK5z5CHFsEBFe8sO/IM7vEo+X6kUVV
-         7mBB9lDivJfsMWGv+8rav0wi1rTNEG5JXTPSvLbUTOvCZofO0DLZUH0g/dFrIYLUCzpB
-         uzBUuT9Pcoeo/0AHmsm8Rag9OgbMXnYT97W1cNB4o7Bfvo2DC53rdrsT9t14Uk3HHGga
-         k9qFlCpgWlAnwbb6iDSWLA4e+apsWgx9+1Qw2ZZEjiaJZAmpA7BJNKWGHkSstXiofhXG
-         pUo2JzQWzGp4tbeWc/6+38mRjiEbFj2Jld/loJt86cV/UGESrxrhJwBZElCb68audSY+
-         Ct/w==
+        d=gmail.com; s=20230601; t=1728811060; x=1729415860; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GWRZd+ObWk5LIlgE1sIM7Jp9NK41l65XCqKRDlS3dDE=;
+        b=nsqmFkixMju/1i3PcarQvAqh3Y6RGS9CJIQLdM/N9EJWSjFJ6LAWi2OmhqcC52mJyN
+         KiltQQ9RcIgqbodvDLnvBhU+YROE0+mjscp8daKq6pHbaTW7BaWi+EWxqJ0wtH15uy+f
+         forFeZ+irJsCooaNmKBwFtZNMUtBWWu96a3dG7pSe9md6pJl3lz8FAFWHVACI/lASWVN
+         VZt/A/FTuTeLaBXwPZ8TEV3yV7CEnvxbJoDIWMtgiJaCcKAOzA58tUi1z0nwOxJQZV5b
+         43YJgHOhScVKm5PIMcxU3mUSkXAIBdr0sOFlQbFkN0SK9pw/U6bYsvW57my3MyLIRLpp
+         y+sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728809073; x=1729413873;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oidOQ+9NvlFXTkjDmGpZoueB4tKItPMp4EzlS4EL+gA=;
-        b=gumbeqR+0SNFssA/oPuSKxTRLZflyCXG5J0K7Th1RCMpsHYn7h/DJsEbvg/jm4HhOg
-         TV8ZOlPNrdXUy9yPS2oI2EXnsG+E1lluf2mtOGlmef0ML8At2B94zWOWApCxYqps+fOz
-         3NKxGbDJukdVPZZZrCYSlu5MfrljDoNj5EY344dadU1Rwa5T7Us3jHoHmOQF++lS3YJ4
-         +lYrMzqcr9nUHek9iRGmrkJe/oLRFx6ahNXyNHVD+U0FdiA9DEXb6y2kcgG76444VRb/
-         /JR54YSNFqtrzis5Y8xvE4f0LWyvG7o0eO0KPw+r72GbK0CxMidyU1cX3+X5Miyqamiv
-         DM2g==
-X-Forwarded-Encrypted: i=1; AJvYcCUAgU2B0Y9rggwMhZpTHPmsbJJdhPVcePI2cNcmlsvT/RLypuKp0opsZNNc5qKdpwL28998PY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrbnvPujz6raUlsoc2mIahp7NVD1f5z+yhgZU0stFm7periZEd
-	uiXnSZEoXI/ACpCJUcqiMg+nsRuGDdSUjBJR72CxjqZ+eLSUq2plPhavxw==
-X-Google-Smtp-Source: AGHT+IG62HtGucK9ojj5fS5KJ8Zk5QHtPBN7TV75nuTR1CixUYvt+VdMBLm1XKuGz2g1TfxKCaKhlw==
-X-Received: by 2002:a17:907:7ba1:b0:a9a:9b1:f972 with SMTP id a640c23a62f3a-a9a09b1fabamr67895366b.40.1728809072781;
-        Sun, 13 Oct 2024 01:44:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728811060; x=1729415860;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GWRZd+ObWk5LIlgE1sIM7Jp9NK41l65XCqKRDlS3dDE=;
+        b=Viek5gBimDJdHN00pYQfRlvCw38fZ8lGboqF21kuqJ4wH7y88zkzL9vfOOU8JNtnvH
+         lt789OfU3G9W3+ZaSm/+HoydRYLzzr08Bco73H4uG7+8KWrMSfwG0n8dh06x+QhnCbt1
+         iv53Voz9pHRixFGsjHiLRT10QpVA0iypzgAEQouUbPRQ4NB5U6iiBsaBhRcCd6Vv6odS
+         90sJW4u6xusaiBdxET1DKCdBrzEJDAbBCWSKY62/yEMpByrMFW3O74y2Ph2CWIzDSj2Z
+         yhm5b79Jl1oIL+Q9xM6VK6H5s+SaRlXCLVbZDW0bSn+1TgCqWotgT4sHQkzQ0j/57K6p
+         5A5A==
+X-Gm-Message-State: AOJu0YxMQV3974opGWXBLf9aAULt0LbyHlWdqgZM1zkFlnnrf8Sl1leO
+	u7MPHLRHyqPdvhybdaWwhowv85H9lViIyKzDTNcmMgqMCQKxIlH/
+X-Google-Smtp-Source: AGHT+IEJEYrOQd2LntAKP9ooI/KLPhlpyiAD/4g4XNTbgT2tXxGyqB63CdK2y6+tuS4uqeaaRYjTbw==
+X-Received: by 2002:a17:906:6a07:b0:a99:f9d6:5590 with SMTP id a640c23a62f3a-a99f9d659f2mr239620466b.60.1728811060105;
+        Sun, 13 Oct 2024 02:17:40 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:aefe:d400:a889:69f8:ae21:ed4d? (dynamic-2a02-3100-aefe-d400-a889-69f8-ae21-ed4d.310.pool.telefonica.de. [2a02:3100:aefe:d400:a889:69f8:ae21:ed4d])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a99a7ec5839sm416389966b.4.2024.10.13.01.44.31
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a99ee8da1besm164960466b.216.2024.10.13.02.17.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Oct 2024 01:44:31 -0700 (PDT)
-Message-ID: <73e05f2e-2e0c-4a72-94a6-3f618b0e616e@gmail.com>
-Date: Sun, 13 Oct 2024 10:44:31 +0200
+        Sun, 13 Oct 2024 02:17:38 -0700 (PDT)
+Message-ID: <58e0da73-a7dd-4be3-82ae-d5b3f9069bde@gmail.com>
+Date: Sun, 13 Oct 2024 11:17:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,11 +74,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: r8169 unknown chip XID 688
-To: Luc Willems <luc.willems@t-m-m.be>, netdev@vger.kernel.org
-References: <CAHJ97wTDiqgOHfLJc3pEjz=ZwpWP4LJV7sxUfYxQmkryi-rv0A@mail.gmail.com>
 Content-Language: en-US
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: implement additional ethtool stats ops
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -125,187 +124,134 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <CAHJ97wTDiqgOHfLJc3pEjz=ZwpWP4LJV7sxUfYxQmkryi-rv0A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12.10.2024 21:03, Luc Willems wrote:
-> using new gigabyte X870E AORUS ELITE WIFI7 board, running proxmox pve kernel
-> 
-> Linux linux-s05 6.8.12-2-pve #1 SMP PREEMPT_DYNAMIC PMX 6.8.12-2
-> (2024-09-05T10:03Z) x86_64 GNU/Linux
-> 
-> 11:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8125
-> 2.5GbE Controller (rev 0c)
->         Subsystem: Gigabyte Technology Co., Ltd RTL8125 2.5GbE Controller
->         Flags: fast devsel, IRQ 43, IOMMU group 26
->         I/O ports at e000 [size=256]
->         Memory at dd900000 (64-bit, non-prefetchable) [size=64K]
->         Memory at dd910000 (64-bit, non-prefetchable) [size=16K]
->         Capabilities: [40] Power Management version 3
->         Capabilities: [50] MSI: Enable- Count=1/1 Maskable+ 64bit+
->         Capabilities: [70] Express Endpoint, MSI 01
->         Capabilities: [b0] MSI-X: Enable- Count=64 Masked-
->         Capabilities: [d0] Vital Product Data
->         Capabilities: [100] Advanced Error Reporting
->         Capabilities: [148] Virtual Channel
->         Capabilities: [164] Device Serial Number 01-00-00-00-68-4c-e0-00
->         Capabilities: [174] Transaction Processing Hints
->         Capabilities: [200] Latency Tolerance Reporting
->         Capabilities: [208] L1 PM Substates
->         Capabilities: [218] Vendor Specific Information: ID=0002 Rev=4
-> Len=100 <?>
->         Kernel modules: r8169
-> 
-> root@linux-s05:/root# dmesg |grep r8169
-> [    6.353276] r8169 0000:11:00.0: error -ENODEV: unknown chip XID
-> 688, contact r8169 maintainers (see MAINTAINERS file)
-> 
+This adds support for ethtool standard statistics, and makes use of the
+extended hardware statistics being available from RTl8125.
 
-Below is a patch with experimental support for RTL8125D. Could you
-please test it? Few notes:
-- Depending on the PHY ID of the integrated PHY you may receive an
-  error message that there's no dedicated PHY driver. Please forward the
-  error message with the PHY ID in this case.
-- As long as the firmware for this chip version isn't available, link
-  might be unstable or worst case completely missing. Driver will complain
-  about the missing firmware file, but this error message can be ignored for now.
-
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169.h          |  1 +
- drivers/net/ethernet/realtek/r8169_main.c     | 23 +++++++++++++------
- .../net/ethernet/realtek/r8169_phy_config.c   |  7 ++++++
- 3 files changed, 24 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 82 +++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index e2db944e6..be4c96226 100644
---- a/drivers/net/ethernet/realtek/r8169.h
-+++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -68,6 +68,7 @@ enum mac_version {
- 	/* support for RTL_GIGA_MAC_VER_60 has been removed */
- 	RTL_GIGA_MAC_VER_61,
- 	RTL_GIGA_MAC_VER_63,
-+	RTL_GIGA_MAC_VER_64,
- 	RTL_GIGA_MAC_VER_65,
- 	RTL_GIGA_MAC_VER_66,
- 	RTL_GIGA_MAC_NONE
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 1a2322824..dcd176a77 100644
+index dcd176a77..558921e32 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -56,6 +56,7 @@
- #define FIRMWARE_8107E_2	"rtl_nic/rtl8107e-2.fw"
- #define FIRMWARE_8125A_3	"rtl_nic/rtl8125a-3.fw"
- #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
-+#define FIRMWARE_8125D_1	"rtl_nic/rtl8125d-1.fw"
- #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
- #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
+@@ -2161,6 +2161,19 @@ static void rtl8169_get_ringparam(struct net_device *dev,
+ 	data->tx_pending = NUM_TX_DESC;
+ }
  
-@@ -139,6 +140,7 @@ static const struct {
- 	[RTL_GIGA_MAC_VER_61] = {"RTL8125A",		FIRMWARE_8125A_3},
- 	/* reserve 62 for CFG_METHOD_4 in the vendor driver */
- 	[RTL_GIGA_MAC_VER_63] = {"RTL8125B",		FIRMWARE_8125B_2},
-+	[RTL_GIGA_MAC_VER_64] = {"RTL8125D",		FIRMWARE_8125D_1},
- 	[RTL_GIGA_MAC_VER_65] = {"RTL8126A",		FIRMWARE_8126A_2},
- 	[RTL_GIGA_MAC_VER_66] = {"RTL8126A",		FIRMWARE_8126A_3},
++static void rtl8169_get_pause_stats(struct net_device *dev,
++				    struct ethtool_pause_stats *pause_stats)
++{
++	struct rtl8169_private *tp = netdev_priv(dev);
++
++	if (!rtl_is_8125(tp))
++		return;
++
++	rtl8169_update_counters(tp);
++	pause_stats->tx_pause_frames = le32_to_cpu(tp->counters->tx_pause_on);
++	pause_stats->rx_pause_frames = le32_to_cpu(tp->counters->rx_pause_on);
++}
++
+ static void rtl8169_get_pauseparam(struct net_device *dev,
+ 				   struct ethtool_pauseparam *data)
+ {
+@@ -2187,6 +2200,69 @@ static int rtl8169_set_pauseparam(struct net_device *dev,
+ 	return 0;
+ }
+ 
++static void rtl8169_get_eth_mac_stats(struct net_device *dev,
++				      struct ethtool_eth_mac_stats *mac_stats)
++{
++	struct rtl8169_private *tp = netdev_priv(dev);
++
++	rtl8169_update_counters(tp);
++
++	mac_stats->FramesTransmittedOK =
++		le64_to_cpu(tp->counters->tx_packets);
++	mac_stats->SingleCollisionFrames =
++		le32_to_cpu(tp->counters->tx_one_collision);
++	mac_stats->MultipleCollisionFrames =
++		le32_to_cpu(tp->counters->tx_multi_collision);
++	mac_stats->FramesReceivedOK =
++		le64_to_cpu(tp->counters->rx_packets);
++	mac_stats->AlignmentErrors =
++		le16_to_cpu(tp->counters->align_errors);
++	mac_stats->FramesLostDueToIntMACXmitError =
++		le64_to_cpu(tp->counters->tx_errors);
++	mac_stats->BroadcastFramesReceivedOK =
++		le64_to_cpu(tp->counters->rx_broadcast);
++	mac_stats->MulticastFramesReceivedOK =
++		le32_to_cpu(tp->counters->rx_multicast);
++
++	if (!rtl_is_8125(tp))
++		return;
++
++	mac_stats->AlignmentErrors =
++		le32_to_cpu(tp->counters->align_errors32);
++	mac_stats->OctetsTransmittedOK =
++		le64_to_cpu(tp->counters->tx_octets);
++	mac_stats->LateCollisions =
++		le32_to_cpu(tp->counters->tx_late_collision);
++	mac_stats->FramesAbortedDueToXSColls =
++		le32_to_cpu(tp->counters->tx_aborted32);
++	mac_stats->OctetsReceivedOK =
++		le64_to_cpu(tp->counters->rx_octets);
++	mac_stats->FramesLostDueToIntMACRcvError =
++		le32_to_cpu(tp->counters->rx_mac_error);
++	mac_stats->MulticastFramesXmittedOK =
++		le64_to_cpu(tp->counters->tx_multicast64);
++	mac_stats->BroadcastFramesXmittedOK =
++		le64_to_cpu(tp->counters->tx_broadcast64);
++	mac_stats->MulticastFramesReceivedOK =
++		le64_to_cpu(tp->counters->rx_multicast64);
++	 mac_stats->FrameTooLongErrors =
++		le32_to_cpu(tp->counters->rx_frame_too_long);
++}
++
++static void rtl8169_get_eth_ctrl_stats(struct net_device *dev,
++				       struct ethtool_eth_ctrl_stats *ctrl_stats)
++{
++	struct rtl8169_private *tp = netdev_priv(dev);
++
++	if (!rtl_is_8125(tp))
++		return;
++
++	rtl8169_update_counters(tp);
++
++	ctrl_stats->UnsupportedOpcodesReceived =
++		le32_to_cpu(tp->counters->rx_unknown_opcode);
++}
++
+ static const struct ethtool_ops rtl8169_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+@@ -2208,8 +2284,11 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
+ 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+ 	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
+ 	.get_ringparam		= rtl8169_get_ringparam,
++	.get_pause_stats	= rtl8169_get_pause_stats,
+ 	.get_pauseparam		= rtl8169_get_pauseparam,
+ 	.set_pauseparam		= rtl8169_set_pauseparam,
++	.get_eth_mac_stats	= rtl8169_get_eth_mac_stats,
++	.get_eth_ctrl_stats	= rtl8169_get_eth_ctrl_stats,
  };
-@@ -708,6 +710,7 @@ MODULE_FIRMWARE(FIRMWARE_8168FP_3);
- MODULE_FIRMWARE(FIRMWARE_8107E_2);
- MODULE_FIRMWARE(FIRMWARE_8125A_3);
- MODULE_FIRMWARE(FIRMWARE_8125B_2);
-+MODULE_FIRMWARE(FIRMWARE_8125D_1);
- MODULE_FIRMWARE(FIRMWARE_8126A_2);
- MODULE_FIRMWARE(FIRMWARE_8126A_3);
  
-@@ -2099,10 +2102,7 @@ static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
- 		tp->tx_lpi_timer = timer_val;
- 		r8168_mac_ocp_write(tp, 0xe048, timer_val);
+ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
+@@ -3903,6 +3982,9 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
  		break;
--	case RTL_GIGA_MAC_VER_61:
--	case RTL_GIGA_MAC_VER_63:
--	case RTL_GIGA_MAC_VER_65:
--	case RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
- 		tp->tx_lpi_timer = timer_val;
- 		RTL_W16(tp, EEE_TXIDLE_TIMER_8125, timer_val);
- 		break;
-@@ -2234,6 +2234,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
- 		{ 0x7cf, 0x64a,	RTL_GIGA_MAC_VER_66 },
- 		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_65 },
+ 	}
  
-+		/* 8125D family. */
-+		{ 0x7cf, 0x688,	RTL_GIGA_MAC_VER_64 },
++	/* enable extended tally counter */
++	r8168_mac_ocp_modify(tp, 0xea84, 0, BIT(1) | BIT(0));
 +
- 		/* 8125B family. */
- 		{ 0x7cf, 0x641,	RTL_GIGA_MAC_VER_63 },
- 
-@@ -2501,9 +2504,7 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
- 	case RTL_GIGA_MAC_VER_61:
- 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
- 		break;
--	case RTL_GIGA_MAC_VER_63:
--	case RTL_GIGA_MAC_VER_65:
--	case RTL_GIGA_MAC_VER_66:
-+	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_66:
- 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
- 			RX_PAUSE_SLOT_ON);
- 		break;
-@@ -3815,6 +3816,12 @@ static void rtl_hw_start_8125b(struct rtl8169_private *tp)
- 	rtl_hw_start_8125_common(tp);
+ 	rtl_hw_config(tp);
  }
  
-+static void rtl_hw_start_8125d(struct rtl8169_private *tp)
-+{
-+	rtl_set_def_aspm_entry_latency(tp);
-+	rtl_hw_start_8125_common(tp);
-+}
-+
- static void rtl_hw_start_8126a(struct rtl8169_private *tp)
- {
- 	rtl_set_def_aspm_entry_latency(tp);
-@@ -3863,6 +3870,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
- 		[RTL_GIGA_MAC_VER_53] = rtl_hw_start_8117,
- 		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
- 		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
-+		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
- 		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8126a,
- 		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8126a,
- 	};
-@@ -3880,6 +3888,7 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
- 	/* disable interrupt coalescing */
- 	switch (tp->mac_version) {
- 	case RTL_GIGA_MAC_VER_61:
-+	case RTL_GIGA_MAC_VER_64:
- 		for (i = 0xa00; i < 0xb00; i += 4)
- 			RTL_W32(tp, i, 0);
- 		break;
-diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index cf29b1208..6b70f23c8 100644
---- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-+++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -1104,6 +1104,12 @@ static void rtl8125b_hw_phy_config(struct rtl8169_private *tp,
- 	rtl8125b_config_eee_phy(phydev);
- }
- 
-+static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
-+				   struct phy_device *phydev)
-+{
-+	r8169_apply_firmware(tp);
-+}
-+
- static void rtl8126a_hw_phy_config(struct rtl8169_private *tp,
- 				   struct phy_device *phydev)
- {
-@@ -1160,6 +1166,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
- 		[RTL_GIGA_MAC_VER_53] = rtl8117_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_61] = rtl8125a_2_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
-+		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_65] = rtl8126a_hw_phy_config,
- 		[RTL_GIGA_MAC_VER_66] = rtl8126a_hw_phy_config,
- 	};
 -- 
 2.47.0
-
 
 
