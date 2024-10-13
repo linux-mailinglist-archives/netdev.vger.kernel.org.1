@@ -1,121 +1,210 @@
-Return-Path: <netdev+bounces-134971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FED599BB4E
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 21:39:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4E199BB6E
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49C4D281827
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 19:38:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99CBB1F20C66
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275F214A098;
-	Sun, 13 Oct 2024 19:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF83155345;
+	Sun, 13 Oct 2024 20:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b="UFatiFfE"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="exIvs+i/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90481149E17
-	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 19:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581047F48C;
+	Sun, 13 Oct 2024 20:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728848336; cv=none; b=rfLPyCZ39d3JHax860tMZIWIXyD8pGXcOZwShXJMfGOoMUrpCGMSXS+YAmxqZp7MnoIzfeHZ/IiPulQhA+G8oqITo56RUT+Uohodh1S2ds8PadSuAQSaJZviRWOgkJGfu3PpTK3GXebpVSEIw4dOmiqZuJOvoB7lfXni2FM+418=
+	t=1728850693; cv=none; b=HfBruTqb7LNmJUiO4htNyniHlxe8R8otcYTeado2p2kykbJRcUj6rTMiYNrMd1hmjmna15fcZ3COAuOgexZphAIM8j/a0dKz/0hh0ztfYuo9Q8hdOfVNNlxNoFok5gbsHP/G8dl4f308Vebp9JPjXfzxIXLeAH9a7/Dohv0Cp9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728848336; c=relaxed/simple;
-	bh=Rn4LuLno1J6JnL48cDT1UwWv0Syqc0ZUWDyqGBgfgnU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lHzAOCkq+uNtX2LJZOcw96mSP6xXpk/sz5FQP1qj8WuKehG5pSbm6NeEbc6vvFlU25FcKqnJJoB2sPYHN3Ii1Guzcio67j+j2gldcs8GbWOHsE+OpIZpN0TwqfHRdRT+8905BYmcivxrGOKS98tTI7Jgqk0hiOZ2teZV6MuJ8RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info; spf=pass smtp.mailfrom=shenghaoyang.info; dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b=UFatiFfE; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shenghaoyang.info
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2e2c2a17aa4so727368a91.0
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 12:38:54 -0700 (PDT)
+	s=arc-20240116; t=1728850693; c=relaxed/simple;
+	bh=2uXmFeIEmUi172m67TxMp84JNKzsDgsI9o/AeKyM2yc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ResDTWNsgJvHCWHNpBfkWHFiYGyNcQzG3Tvro7hAjRNjYGfZ3YsuWd/s2/77VW3nPiYGPNL/Gkro6wAPWnNtwhxzVsylwhAy3XlRnCHOENMbDolvurAinI2hltmlTOCw/U06xSi5ebtpEy2+LLaXEf4B1ZA1e5qRK3MISLGnkKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=exIvs+i/; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shenghaoyang.info; s=google; t=1728848334; x=1729453134; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DeRJ7jTyoUmJqEEnMOUpJazUGBODRoEG1ZhWDyHmXKY=;
-        b=UFatiFfE1KeFQcLTRX6UighJ+zCnbvW9YOiYDmoMFqFtj+ru23iuEr5SZe9wb7Hv63
-         U5RyLtNX6JDq89C/H00tR93Hfk8gzgGg8KcMiROOdnCruPEdJwkSHG0C9Qawu/lIuQp1
-         ykLYKHvAknkwzmabj+ZMxfoAsC9snG/0jmS3+nXj9clvbGCVwZKCR6Mp4UUeJJOgiKz0
-         6os50/zJpSIlCflrLmBpO1ZJGCPoRNr4Um/wsNv5N3bS9AY/9YbTuxi1+lk6TC77HwjZ
-         Wsw4EKzfJFAtJ3nmCWs55A77XFgpOXWYnvEYBgAf5sdl4zMknNLcjh4LUeCRVrVX9/D9
-         +SzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728848334; x=1729453134;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DeRJ7jTyoUmJqEEnMOUpJazUGBODRoEG1ZhWDyHmXKY=;
-        b=UuuB9bMQL4eYa84wa1KT8USF0waQGX9SXdFkwvLEUBLYqu4IW+wTjLf40JXJJwGwXv
-         /3kQS54xXi3mbyGqOLoVEhDtOOgbjqh27f9xzyBZnsz+P5DvudJVvZ05OPClwcKNZS8p
-         V3n4kEgzCoLlHuxfxwGcYgRT6HjgUNocebH68RMmuNKFcTplYJJXXgAxDpD46d6G41xV
-         pKV/e1LmqbNPG2eowAlUw3j+5V7f9rP8FWjjEyGUO4AGp5IKVq5H7zqm63qfwTMs3H66
-         /JeAZfINEmvEzjowfMsCBClD2JfDlM9JjFP/ygMINtwalM5UcHhEPoFzZ9xOC0dluBKd
-         58xA==
-X-Gm-Message-State: AOJu0YzE/IuTLMdHkXwYDqVN9FY9GSOWHe9JFFrCcV7O9mymdP3SluWE
-	oUAJoyPNnGKzQxMXlLZvIQd38Ik6TSpeg5h76maesPLQPLz2gf7Ncq/+i9tqUX0=
-X-Google-Smtp-Source: AGHT+IG2pcVYBkzbQ0xeaMbvUcS8mZPkd2Yjrph0r8OTX3YfDn/sMoZQfByANkrIj+RRg8YMFU44dw==
-X-Received: by 2002:a17:902:db12:b0:20c:876a:fdac with SMTP id d9443c01a7336-20ca1320237mr56741575ad.0.1728848333744;
-        Sun, 13 Oct 2024 12:38:53 -0700 (PDT)
-Received: from [10.0.0.211] ([132.147.84.99])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c0e7620sm53162185ad.140.2024.10.13.12.38.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Oct 2024 12:38:53 -0700 (PDT)
-Message-ID: <3be1961d-d451-4038-9cf1-5bcd44550346@shenghaoyang.info>
-Date: Mon, 14 Oct 2024 03:38:49 +0800
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Sja7FWx2J2pFF7H03F4ldwixL8Qb/r4LwdjP0v1pkNc=;
+  b=exIvs+i/vmrrOC1BhG1dWTdYhowcV77JbThYwDdjK0/Wqiaqq9Fr0cce
+   rNzCFJlH0Zl3Gc94qiLI1s9PCSVuCYpsLvZjcvp+ULtzzTXbcfRvMqOYM
+   ncj7g6L1s1poZOa9BL666TBGtZjDcSWk9IcDnPVvWZAmigUTgCebAcAqC
+   Y=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.11,201,1725314400"; 
+   d="scan'208";a="98968275"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2024 22:17:57 +0200
+From: Julia Lawall <Julia.Lawall@inria.fr>
+To: linux-nfs@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	vbabka@suse.cz,
+	paulmck@kernel.org,
+	Tom Talpey <tom@talpey.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Neil Brown <neilb@suse.de>,
+	linux-can@vger.kernel.org,
+	bridge@lists.linux.dev,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	linux-kernel@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	ecryptfs@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH 00/17] replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Sun, 13 Oct 2024 22:16:47 +0200
+Message-Id: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v2 2/3] net: dsa: mv88e6xxx: read cycle counter period
- from hardware
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
- pavana.sharma@digi.com, ashkan.boldaji@digi.com, kabel@kernel.org
-References: <20241006145951.719162-1-me@shenghaoyang.info>
- <20241006145951.719162-3-me@shenghaoyang.info>
- <9b1fe702-39b2-4492-b107-f1b3e7f3c2a9@lunn.ch>
- <1c768936-9306-4bb9-8a2f-1e21e09e4b56@shenghaoyang.info>
- <f33e48fd-b8fe-4c7f-9180-fe6d23c1e48a@lunn.ch>
-Content-Language: en-US
-From: Shenghao Yang <me@shenghaoyang.info>
-In-Reply-To: <f33e48fd-b8fe-4c7f-9180-fe6d23c1e48a@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Since SLOB was removed and since
+commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+it is not necessary to use call_rcu when the callback only performs
+kmem_cache_free. Use kfree_rcu() directly.
 
-On 14/10/24 01:01, Andrew Lunn wrote:
+The changes were done using the following Coccinelle semantic patch.
+This semantic patch is designed to ignore cases where the callback
+function is used in another way.
 
->> I've looked around a bit and this doesn't seem possible - the common
->> timecounter code in time/timecounter.c and linux/timecounter.h has a
->> dependency on the cc_mult and cc_shift fields within the cyclecounter
->> tstamp_cc.
-> 
-> Ah, sorry. I did not see that tstamp_cc was a timecounter structure.
-> 
-> Maybe have 3 const struct cyclecounter similar to you having 3 const
-> mv88e6xxx_cc_coeffs. Assign the appropriate one to chip. mult and
-> shift can then be dropped from mv88ex6xxx_cc_coeffs?
-> 
-> 	Andrew
+// <smpl>
+#spatch --all-includes --include-headers
 
-Hi Andrew,
+@r@
+expression e;
+local idexpression e2;
+identifier cb,f,g;
+position p;
+@@
 
-That might be a bit hairy too - the cyclecounters need way to reference
-the chip so they can access the hardware counter in tstamp_cc->read.
+(
+call_rcu(...,e2)
+|
+call_rcu(&e->f,cb@p)
+|
+call_rcu(&e->f.g,cb@p)
+)
 
-That's currently done via a container_of() on tstamp_cc itself in
-mv88e6xxx_ptp_clock_read. With only that single pointer available
-sharing doesn't seem too possible :/.
+@r1@
+type T,T1;
+identifier x,r.cb;
+@@
 
-Thanks,
+ cb(...) {
+(
+   kmem_cache_free(...);
+|
+   T x = ...;
+   kmem_cache_free(...,(T1)x);
+|
+   T x;
+   x = ...;
+   kmem_cache_free(...,(T1)x);
+)
+ }
 
-Shenghao
+@s depends on r1@
+position p != r.p;
+identifier r.cb;
+@@
+
+ cb@p
+
+@script:ocaml@
+cb << r.cb;
+p << s.p;
+@@
+
+Printf.eprintf "Other use of %s at %s:%d\n" cb (List.hd p).file (List.hd p).line
+
+@depends on r1 && !s@
+expression e;
+identifier r.cb,f,g;
+position r.p;
+@@
+
+(
+- call_rcu(&e->f,cb@p)
++ kfree_rcu(e,f)
+|
+- call_rcu(&e->f.g,cb@p)
++ kfree_rcu(e,f.g)
+)
+
+@r1a depends on !s@
+type T,T1;
+identifier x,r.cb;
+@@
+
+- cb(...) {
+(
+-  kmem_cache_free(...);
+|
+-  T x = ...;
+-  kmem_cache_free(...,(T1)x);
+|
+-  T x;
+-  x = ...;
+-  kmem_cache_free(...,(T1)x);
+)
+- }
+
+@r2 depends on !r1@
+identifier r.cb;
+@@
+
+cb(...) {
+ ...
+}
+
+@script:ocaml depends on !r1 && !r2@
+cb << r.cb;
+@@
+
+Printf.eprintf "need definition for %s\n" cb
+// </smpl>
+
+---
+
+ arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 ------
+ block/blk-ioc.c                     |    9 ------
+ drivers/net/wireguard/allowedips.c  |    9 +-----
+ fs/ecryptfs/dentry.c                |    8 ------
+ fs/nfsd/nfs4state.c                 |    9 ------
+ kernel/time/posix-timers.c          |    9 ------
+ net/batman-adv/translation-table.c  |   47 ++----------------------------------
+ net/bridge/br_fdb.c                 |    9 ------
+ net/can/gw.c                        |   13 ++-------
+ net/ipv4/fib_trie.c                 |    8 ------
+ net/ipv4/inetpeer.c                 |    9 +-----
+ net/ipv6/ip6_fib.c                  |    9 ------
+ net/ipv6/xfrm6_tunnel.c             |    8 ------
+ net/kcm/kcmsock.c                   |   10 -------
+ net/netfilter/nf_conncount.c        |   10 -------
+ net/netfilter/nf_conntrack_expect.c |   10 -------
+ net/netfilter/xt_hashlimit.c        |    9 ------
+ 17 files changed, 23 insertions(+), 171 deletions(-)
 
