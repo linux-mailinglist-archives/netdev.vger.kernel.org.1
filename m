@@ -1,207 +1,172 @@
-Return-Path: <netdev+bounces-134886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A462799B81C
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:16:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F7F99B821
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DAD91C214CA
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 03:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0FAA1C212E4
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 03:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB6A7406D;
-	Sun, 13 Oct 2024 03:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2858C12AAC6;
+	Sun, 13 Oct 2024 03:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmtljHxs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WihsZuTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7152E231CB3;
-	Sun, 13 Oct 2024 03:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9124C12B176;
+	Sun, 13 Oct 2024 03:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728789410; cv=none; b=si+b8By0B0vSvZ8ykFu8qwTM/jFwYPPKjnOPZhjcOh0qoeH2lgHuckCckl10vFQXfKy/megu3yuUcsIjttnzrxL5UUTx70HhExwwmov7G7JSbuDooI+U7DeYkanfRNVCp6588ZgXhaEyr/Jrfx3nkJzGW8y0ARG4asgukphdFCs=
+	t=1728790141; cv=none; b=p3k6HI69uDrdPptpdANBc7flm+0XTkkGYurqO0epjn9Pt0VF3rVmcRSKpttYCLFmGCOpCeFX/i4pjOW+YfFqRhUcaImuRm3saY+s6f2ZST7/0Dvg2/eqGPaNy4abN0z7G4KLfPhUqtBKJV54dDHM7SMVlszQIZxrWzCfzTPK9co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728789410; c=relaxed/simple;
-	bh=wYw45KJ87Tz+41/dwsmk/arKMh0CcaxFGtU+lzmA5h0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hn+A3qWkmoo1I0AWG7X/yDSlgPZxQq75Deazx/sAV2sxSuI5ZPr3zO1trMg+dmxCciuHyeP9gABNQPot7P5SYqyb9MwSslZqDNSZyFS1L3FLiUjzdxAvbngIjvdG7Jpu2/CooqiVX+1E/jPQcYUS+4ojVNOjfCv0MWg+y2S+NQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hmtljHxs; arc=none smtp.client-ip=209.85.222.175
+	s=arc-20240116; t=1728790141; c=relaxed/simple;
+	bh=RE5D09/ETSo0oJuS9PoJemCypbmSJu/wM/sfzwVWU/k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QmUxHDG4M3ez9tT8XnVWcn4bmlyM88LSisGcKamo4vwhf9F04WxkEc7IB6UHw5djTllwF6CX6fihAmPr5nAx9BlPVQo6Xq/yA6kyIdzkUUIscslESviG4MRgdg6HywM6E4RQPDG3Zh+PROKMqXx1BWycjK9EaSuy31fH36mJzLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WihsZuTQ; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7afcf50e2d0so154159885a.3;
-        Sat, 12 Oct 2024 20:16:48 -0700 (PDT)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a3b67cd89dso5172195ab.0;
+        Sat, 12 Oct 2024 20:28:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728789407; x=1729394207; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728790138; x=1729394938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iWX1pHC59HWQu7vk0ZAQ8Do+vw5b/RWukPcaBvgOC4A=;
-        b=hmtljHxsA8yxb903buTYGgQNWoNrjq4cVpnI/bynT22g08VBiDtNyNCTgjbsWeXQBk
-         oz5M7Z7Jf2UU8aQZKuOtwX72QjFBBar/gzJCcon8/vwYWz/gCdv7hwRznMXdujF4wsHK
-         msHGw84eKeJ34ft+lqOBBuGkg+xqe9QyEyzQvMHupYvfxBOLG/mBXCOtO6Nd0fLi5AYn
-         jkTlK8II6Nn99PcfwDZ5XDcHAemghaaMeF+6ou78pUT45xrpHtFy4uvB8c5Kgp32zs4T
-         v4EX7Qrkz/+lxuNstGenhH0fqAIx/KP/BFBOnMPDPjVZxaCt8fe09RikEA0jrKZMYUSv
-         GPKA==
+        bh=cSCy8XZCN59y6q/2jNyFlpssyR8wul9nt1j85mpQHLw=;
+        b=WihsZuTQzNaHOQ8wRiqPeEHGs6aA9aChMDEcjKm3uFJ9IMHU0FXhIa6FsQnXzIDxq+
+         8XVP1vudHH2vkujUFwz8LOsxOzl1oJ9oJQ+mSLqY8p3VQXjwvYo8f3q8+m+QzimnKjxK
+         9A3dkpdgMCXJSulveT0lwof3BDuneZUCHBzCQhrPrT4ZK/USRb8QamKfbsjphI8WoCVE
+         8hdmLtybkjUb6utkCFugnAcybMdJM7ZYQWm2yg9Quy91eNla3SZZ9i5n90rQj5i6D7w1
+         gWDf/rkI+Fqgs3rrLypxwHLZCox1hju2CvDYOrCMzCFYN53dPPk6+0Vp4NQNb0qlE8LA
+         01vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728789407; x=1729394207;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728790138; x=1729394938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iWX1pHC59HWQu7vk0ZAQ8Do+vw5b/RWukPcaBvgOC4A=;
-        b=YxC79BOk9gAkLhGz/GaAvZcMimG9HWxkX3qnC4r4087+zeMstm+QpYwP3ajHRiERaJ
-         ztIUISOnw7yLTg7lKuRyALU3XRVr87RWRtXzAEqG1qLhBPFfTUtE1K/iekCwCHprGY/R
-         D7vEdZC7IsrwdKNDtWdQgFyOWZ80r2HUBaq8DWSkegXp1ikwW93xCmxQTI/F20jxnPVR
-         99A44F8KPoMPQy9Krzy/TpqTJ/Razc4qwrQ5GSwUIcRyKnkGiYS9Pp8+LvfJsGwbfNbz
-         /yRpYPH1Gtbn4n83mFnGLt8VRRHcvVp9wsADZ/8MMsfruMYbfsG24NYP5OdRqxMPo0+T
-         TkkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsDG56V96AnCNKtBT12WCzFvSjnAQsbL5Tze/Ws+hsgzZQ/0X5wErmZQf0ApRBnRLhVeWkpCFtKTnORVc=@vger.kernel.org, AJvYcCW+XUGdrsRW8w81RuV4kCbU7RfV9C30K0P4mFhIiyu6w65eSWPh3xtCUfEKSpC7SClrMAQQVXij8ChYPXuKKqs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycpaDi2DO48dK3V6wtueFE1t9rjCQRoYPyF45hTLH5NluUaHnj
-	vCdnpG6VEx69Ci0TOKJpsk1Qe4yiwz5OO+KILONm9fbvjFNpFVwU
-X-Google-Smtp-Source: AGHT+IH1SxP3Fviq6G/vghaX4YA+TCGWPdtpdOVEhs0VAymzntxHUIrXQ8DafuNBwPf0CZFLjCkJYw==
-X-Received: by 2002:a05:620a:7207:b0:7a9:a810:9930 with SMTP id af79cd13be357-7b11a362117mr1170556285a.23.1728789407261;
-        Sat, 12 Oct 2024 20:16:47 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460428069bbsm30746971cf.54.2024.10.12.20.16.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2024 20:16:46 -0700 (PDT)
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfauth.phl.internal (Postfix) with ESMTP id E69801200076;
-	Sat, 12 Oct 2024 23:16:45 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Sat, 12 Oct 2024 23:16:45 -0400
-X-ME-Sender: <xms:nTsLZ9hH4CM0rQbG7V6z15fsviqItf4Qv34cyyYkLBWADqhujHzeYg>
-    <xme:nTsLZyDDIJqu20i8r_Y7sLwrMDH443J3qGq6DK2FFkoZF8aLAAq0CVLGf-ssFskkm
-    TnJebNAT5XQKKGOSQ>
-X-ME-Received: <xmr:nTsLZ9EsIqglSHZ2xoCdiTEih8Qz04KMI7yBZBPfVGcIky9klfjB6-CswDk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdegvddgieelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteeh
-    uddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
-    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
-    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
-    mhgvpdhnsggprhgtphhtthhopedvuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    epfhhujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehn
-    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehruhhsthdqfh
-    horhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgu
-    rhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilh
-    drtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughupdhrtghpthht
-    ohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnh
-    horhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgv
-    th
-X-ME-Proxy: <xmx:nTsLZyRHYB4zpDJrbm9anmEvdPjQVnUhESV0R9_xMXZuI84OOfgBeg>
-    <xmx:nTsLZ6xmXHhoHTxsnY1Gy5ULM_Qz1GV8F9jYZpSPTTV4B22W-uz8bg>
-    <xmx:nTsLZ47bDJMpY7-ESFkAGikpEqTkS5LQtPKMg8XtykPTD-NZsxcRxA>
-    <xmx:nTsLZ_ygQCeU_aoXtKqdbsnvsbJATb2L8VNBmbc9Q1JJLj-_8wQW5Q>
-    <xmx:nTsLZyjAJ8AhMzgNi1K5ZfYUTfd1Ap4a4MHZXNzw2VbGInBJ3ekKTqXY>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 12 Oct 2024 23:16:45 -0400 (EDT)
-Date: Sat, 12 Oct 2024 20:16:44 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
-	tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org,
-	jstultz@google.com, sboyd@kernel.org
-Subject: Re: [PATCH net-next v2 0/6] rust: Add IO polling
-Message-ID: <Zws7nK549LWOccEj@Boquns-Mac-mini.local>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <ZwqVwktWNMrxFvGH@boqun-archlinux>
- <20241013.101505.2305788717444047197.fujita.tomonori@gmail.com>
- <20241013.115033.709062352209779601.fujita.tomonori@gmail.com>
+        bh=cSCy8XZCN59y6q/2jNyFlpssyR8wul9nt1j85mpQHLw=;
+        b=h8ekyDub1IM2lfD68+qPUe+N3npaqJ664EcsMfq/yHaz0CB2rfknpiUr8BPCLLVpYo
+         zydEVfYpk+ArB8tZKPlLYEewxa49rWAcIHlcqLpVeG6vnL58LZXY522gAtfVyr+lmSYB
+         HqSTUYHWZ8XNgkyJR8dlriiLCVNWu8OR2BVhguZNKLuyDp2cuH/OYL9/LH9VAlsSSBUA
+         vMCJdySRrNACBVk0zRAJlrQmWtGVDt4Sai6FxhvCNQWTc1Gq6FvC6AABDjJI0FfJzhSL
+         pTaERVJywzARwF+oFGpZzSMpmkwcm1CEioTqc+PeDLPWu3qsvn+DGhz8yYLpd0UbOMq6
+         zeqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2pXxInj7DtTJdX5RAMgXOhWue2Ub5gBQjl60B6CJJuEo4FI6AO+LE/eVFoZBu7LReB9U=@vger.kernel.org, AJvYcCVdWrG4ZEMcdwTCM0+9TZbvbDtUM+UPecfs2eStqRyAg2Xuo4/bP9JeOnwTJ3r9RLsp87QJzOdl@vger.kernel.org
+X-Gm-Message-State: AOJu0YysdfKl2xB3nCfBVcBs8I9RtuPoxrDaShe/YQxNXgH7pgNG/woy
+	LLwCsXbfsbAJWPwGY7f8MoY7JB50vC8vkzJiz6w1TF3GLUH6xB6yG6AKtEUIAY9/OoF+Csu9wHD
+	5gUHNiRWMJJ9qeP4jLI5drdUIwh0=
+X-Google-Smtp-Source: AGHT+IE3OYnn9Dnw3m+Eh/WBpmmYAsT5ThgPGL8L8n2dkFeKcFXbL7LXLT+0IKcF+wHiHf6xGZMXHmwVqbS6b0p8lOc=
+X-Received: by 2002:a05:6e02:1805:b0:39f:5def:a23d with SMTP id
+ e9e14a558f8ab-3a3a70a4785mr72872055ab.5.1728790138430; Sat, 12 Oct 2024
+ 20:28:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241013.115033.709062352209779601.fujita.tomonori@gmail.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com> <670ab67920184_2737bf29465@willemb.c.googlers.com.notmuch>
+In-Reply-To: <670ab67920184_2737bf29465@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 13 Oct 2024 11:28:22 +0800
+Message-ID: <CAL+tcoAv+QPUcNs6nV=TNjSZ69+GfaRgRROJ-LMEtpOC562-jA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 00/12] net-timestamp: bpf extension to equip
+ applications transparently
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 13, 2024 at 11:50:33AM +0900, FUJITA Tomonori wrote:
-> On Sun, 13 Oct 2024 10:15:05 +0900 (JST)
-> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
-> 
-> > On Sat, 12 Oct 2024 08:29:06 -0700
-> > Boqun Feng <boqun.feng@gmail.com> wrote:
-> > 
-> >> While, we are at it, I want to suggest that we also add
-> >> rust/kernel/time{.rs, /} into the "F:" entries of TIME subsystem like:
-> >> 
-> >> diff --git a/MAINTAINERS b/MAINTAINERS
-> >> index b77f4495dcf4..09e46a214333 100644
-> >> --- a/MAINTAINERS
-> >> +++ b/MAINTAINERS
-> >> @@ -23376,6 +23376,8 @@ F:      kernel/time/timeconv.c
-> >>  F:     kernel/time/timecounter.c
-> >>  F:     kernel/time/timekeeping*
-> >>  F:     kernel/time/time_test.c
-> >> +F:     rust/kernel/time.rs
-> >> +F:     rust/kernel/time/
-> >>  F:     tools/testing/selftests/timers/
-> >> 
-> >>  TIPC NETWORK LAYER
-> >> 
-> >> This will help future contributers copy the correct people while
-> >> submission. Could you maybe add a patch of this in your series if this
-> >> sounds reasonable to you? Thanks!
-> > 
-> > Agreed that it's better to have Rust time abstractions in
-> > MAINTAINERS. You add it into the time entry but there are two options
-> > in the file; time and timer?
-> > 
-> > TIMEKEEPING, CLOCKSOURCE CORE, NTP, ALARMTIMER
-> > M:      John Stultz <jstultz@google.com>
-> > M:      Thomas Gleixner <tglx@linutronix.de>
-> > R:      Stephen Boyd <sboyd@kernel.org>
-> > 
-> > HIGH-RESOLUTION TIMERS, TIMER WHEEL, CLOCKEVENTS
-> > M:      Anna-Maria Behnsen <anna-maria@linutronix.de>
-> > M:      Frederic Weisbecker <frederic@kernel.org>
-> > M:      Thomas Gleixner <tglx@linutronix.de>
-> > 
-> > The current Rust abstractions which play mainly with ktimer.h. it's 
-> > not time, timer stuff, I think.
-> 
-> Oops, s/ktimer.h/ktime.h/
-> 
-> No entry for ktime.h in MAINTAINERS; used by both time and timer
-> stuff.
-> 
+On Sun, Oct 13, 2024 at 1:48=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > A few weeks ago, I planned to extend SO_TIMESTMAMPING feature by using
+> > tracepoint to print information (say, tstamp) so that we can
+> > transparently equip applications with this feature and require no
+> > modification in user side.
+> >
+> > Later, we discussed at netconf and agreed that we can use bpf for bette=
+r
+> > extension, which is mainly suggested by John Fastabend and Willem de
+> > Bruijn. Many thanks here! So I post this series to see if we have a
+> > better solution to extend. My feeling is BPF is a good place to provide
+> > a way to add timestamping by administrators, without having to rebuild
+> > applications.
+> >
+> > This approach mostly relies on existing SO_TIMESTAMPING feature, users
+> > only needs to pass certain flags through bpf_setsocktop() to a separate
+> > tsflags. For TX timestamps, they will be printed during generation
+> > phase. For RX timestamps, we will wait for the moment when recvmsg() is
+> > called.
+> >
+> > After this series, we could step by step implement more advanced
+> > functions/flags already in SO_TIMESTAMPING feature for bpf extension.
+> >
+> > In this series, I only support TCP protocol which is widely used in
+> > SO_TIMESTAMPING feature.
+> >
+> > ---
+> > V2
+> > Link: https://lore.kernel.org/all/20241008095109.99918-1-kerneljasonxin=
+g@gmail.com/
+> > 1. Introduce tsflag requestors so that we are able to extend more in th=
+e
+> > future. Besides, it enables TX flags for bpf extension feature separate=
+ly
+> > without breaking users. It is suggested by Vadim Fedorenko.
+> > 2. introduce a static key to control the whole feature. (Willem)
+> > 3. Open the gate of bpf_setsockopt for the SO_TIMESTAMPING feature in
+> > some TX/RX cases, not all the cases.
+> >
+> > Note:
+> > The main concern we've discussion in V1 thread is how to deal with the
+> > applications using SO_TIMESTAMPING feature? In this series, I allow bot=
+h
+> > cases to happen at the same time, which indicates that even one
+> > applications setting SO_TIMESTAMPING can still be traced through BPF
+> > program. Please see patch [04/12].
+>
+> This revision does not address the main concern.
+>
+> An administrator installed BPF program can affect results of a process
+> using SO_TIMESTAMPING in ways that break it.
 
-I think ktime.h belongs to TIMEKEEPING, since ktime_get() is defined in
-kernel/time/timekeeping.c and that's a core function for ktime_t, but
-you're not wrong that there is no entry of ktime.h in MAINTAINERS, so if
-you want to wait for or check with Thomas, feel free.
+Sorry, I didn't get it. How the following code snippet would break users?
 
-> > As planned, we'll move *.rs files from rust/kernel in the future,
-> > how we handle time and timer abstractions?
+void __skb_tstamp_tx(struct sk_buff *orig_skb,
+                     const struct sk_buff *ack_skb,
+                     struct skb_shared_hwtstamps *hwtstamps,
+                     struct sock *sk, int tstype)
+{
+        if (!sk)
+                return;
 
-I don't think core stuffs will be moved from rust/kernel, i.e. anything
-correspond to the concepts defined in kernel/ directory probably stays
-in rust/kernel, so time and timer fall into that category.
+        if (static_branch_unlikely(&bpf_tstamp_control))
+                bpf_skb_tstamp_tx_output(sk, orig_skb, tstype, hwtstamps);
 
-> 
-> Looks like that we'll add rust/kernel/hrtimer/ soon. I feel that it's
-> better to decide on the layout of time and timer abstractions now
-> rather than later.
+        skb_tstamp_tx_output(orig_skb, ack_skb, hwtstamps, sk,
+tstype);
+}
 
-I already suggested we move hrtimer.rs into rust/kernel/time to match
-the hierarchy of the counterpart in C (kernel/time/hrtimer.c):
+You can see, the application shipped with SO_TIMESTAMPING still prints
+timestamps even when the application stays in the attached cgroup
+directory.
 
-	https://lore.kernel.org/rust-for-linux/ZwqTf-6xaASnIn9l@boqun-archlinux/
-
-Regards,
-Boqun
+Thanks,
+Jason
 
