@@ -1,185 +1,486 @@
-Return-Path: <netdev+bounces-134892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69B1C99B842
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 07:15:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBEAB99B846
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 07:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3C9C1F21DA5
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:15:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 914AC2828CA
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF39F84D0D;
-	Sun, 13 Oct 2024 05:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5857B136657;
+	Sun, 13 Oct 2024 05:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJezFpjy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a/8lr/eL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EB62AD18;
-	Sun, 13 Oct 2024 05:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740154EB45;
+	Sun, 13 Oct 2024 05:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728796514; cv=none; b=Gs+FExuUQLcVIbcz99QZ9YLdNhspUrU2/+0Mh6FDOqIf8zXzwtRMXIQVcJgrlVr4rY9T4RlReFWVn8TrjiW2Ddry8m/vKsFbXapvo8mhh3Te4WtCdG/HnPhlDGXHE2G1FmVN0EOrKXeHXmvg8uNIl+Lk90zsdoZ7B8aIbhVD4xc=
+	t=1728796604; cv=none; b=O5CG8q5W88+hsg4SnUblLU5G68LzuZw9gjYPNz5Gug4wACxbl4htVkn3QZm4ZfGwbAOW++GHVw9GrkZjztyRDNGg+QIEpHPOrtCsUmFFhwlwy/zepJ0Lrd6pPeOfxr+kauGFP30sdwFtmEPI7Dl5zS5fWxfRVMolHh+aLcLMXsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728796514; c=relaxed/simple;
-	bh=kxcy2RlMglBoUgg4GE0rq7b9omyBE2JmSWO++esHBOY=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=EdPQPrM19W3acjaiKcRf5x35QQyN7aLMSGWCXk/3QzIF2iQC8EJBCzivQFJuRdnMkGg0Fz2lBwfOUYUGKn5uMJ2xD433bdoHaakwuBpie6b8K783MpiWS7zRhz4EciHFCve5USSX7QgfX2KiQCrkIgI5mA0OpDeN/2nbQTLcvJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJezFpjy; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20cdb889222so1844425ad.3;
-        Sat, 12 Oct 2024 22:15:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728796512; x=1729401312; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YVwr1Cb7sAdt+UT07RBe5ZH+FrBE6ooNRnlIiE0/nA0=;
-        b=iJezFpjygvxPXVOGbfU+d0boFzE0MUAXegTPGslWkD3Tvs+1+eNTIECB8IEH++Ys9D
-         IknUFgqrgc+UnzT0k2cANWZnArYr8wtP4u0P9zoyKL68DfjBVxkHWPghpBrf6dlO3em/
-         OA8TlTEZR348WNRDYMF4HuEGDImuE5iph+Y9avG3HNt5L1SZ33aeRFtdk0LRJOnIoIu+
-         p+FgFnsnw60IAVqp77GCRgVCZkq5f4ziZzTtRcSwHj8shC+MUHtmrDvaUZyx++yom72x
-         P1IY3T99izbXHEpCjpjYlU2vAvBLd/AIXTws4d0NGn1t4icAJ7eCHEehLzpOALIcx4iY
-         WYWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728796512; x=1729401312;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YVwr1Cb7sAdt+UT07RBe5ZH+FrBE6ooNRnlIiE0/nA0=;
-        b=U8fTG2SJ8wRLJtAckT0YGe808g0M901/S/k9y0XqQ0NkisD6gNimyopzRqTSY5m9le
-         VI3fJ1PanVk4q1Qkhf892xrNXXrisMnzx1+0UDUkXtXKiIJHcjZpct+y35PXVPrUfp62
-         +wJ6KGLK+YuRN1iFMc0Vjqh8XPgfznVcwRssA+eWy7mt3z+pW95I8KcBJ/IDHeD9P3in
-         UOjDvTMZaB2TvhnPSbpNF4UFbQnoZZ397yuZ15OcZNTDp2QxA3ee0E4yjpOtS38ikYiN
-         ItBgXejF0K2OiMxcZo1mUQh+tcRtR82/ggTZXr8CrHgIJbzRx/63nyRYxI3G5NDGAOeq
-         Xwxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZsAPmAvW9HyqLusL/iIKHmu5sg4BYdV/J0XAJ9QP9TiY/7Tz5730RPRN/K6JQcEwkOqaruCfF@vger.kernel.org, AJvYcCWKMoUnUKHQ8MzDvvsSztSADxuRqqeNYGVTvOjfrPP93GPHsTZQj7hkQWjF7TlJTM4k3d9GsWK0l6T+o5U=@vger.kernel.org, AJvYcCX1YlIUXa6OXxCgtIIcjQNaKcOPJcUEK30GGVrRist7MB3ByclMqYrlfCUmfQJYZW16mWTl52JQyofVVlKNHog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuGK8JkAXm9C17Yx2rGkdLbYc3ObvgNRhOWtSt2LYkVLDiM5st
-	N1X0DP9eEa6KPC6u79RK4TyBVx0X0SGoH+jQRuJzNPt+yYdQPZr7
-X-Google-Smtp-Source: AGHT+IF33t1fD42C1/4LU9fR0rKwJp98vkZGnud1eHt9LMLbFeMKtMa4oNFpwv554E2wi59xG0/BHw==
-X-Received: by 2002:a17:902:f64b:b0:20b:ab4b:5432 with SMTP id d9443c01a7336-20ca13f8416mr101939175ad.12.1728796512322;
-        Sat, 12 Oct 2024 22:15:12 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8bad34f4sm44928135ad.47.2024.10.12.22.15.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2024 22:15:12 -0700 (PDT)
-Date: Sun, 13 Oct 2024 14:15:06 +0900 (JST)
-Message-Id: <20241013.141506.1304316759533641692.fujita.tomonori@gmail.com>
-To: boqun.feng@gmail.com
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
- linux-kernel@vger.kernel.org, jstultz@google.com, sboyd@kernel.org
-Subject: Re: [PATCH net-next v2 0/6] rust: Add IO polling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <Zws7nK549LWOccEj@Boquns-Mac-mini.local>
-References: <20241013.101505.2305788717444047197.fujita.tomonori@gmail.com>
-	<20241013.115033.709062352209779601.fujita.tomonori@gmail.com>
-	<Zws7nK549LWOccEj@Boquns-Mac-mini.local>
+	s=arc-20240116; t=1728796604; c=relaxed/simple;
+	bh=dDEb9KPSfDkk4dMvl8+gZX9+2Yq+zVtsM2W8q+8arOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OG8oRAht73JmxR6hi09UcF6F5tV7ER/RE59lis+LmjXVdk4eBzPTmqhwvxilUn3n8z8lCrO9peOCGdxenq4WJmjKm3iRYLvkbExSndAS459+mSorg6WP7dtcvrzZRRNBrU9NnwlbO6KGWb5mglQ0z9cxulJQ4ZuEkRRTYnrkMZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a/8lr/eL; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728796601; x=1760332601;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=dDEb9KPSfDkk4dMvl8+gZX9+2Yq+zVtsM2W8q+8arOk=;
+  b=a/8lr/eL6DPAeSIKFdH/ktYrjYYYnKTvMVi8VjKCJU/HN8LsyXhj6YOF
+   7c47R+4QY+56NfmEv5IZ+3v5fvllkrlQSAY7SavKGez2zvVCRh9+H5yBz
+   5iGkbyZ6tErNzI3+uPiexZh4hi6mM8jT0IhGMYrU1jbzBjkBE5lyZ7+mU
+   q7slLkMchGpUrATRO9QJVkaJB2rUSmjsYJv8+xvGSED5Or/qrmZz88UZk
+   VPACfWAQe4IWQqmAlbfVGnb/tx/UCA8/4x8MPGkwlpRQrakSiJKGF28xr
+   SBl7nFAEXhJXILp7R5m494nGfbYc+Yv9rabd+Bs1C6WKduADSOIR60uVB
+   w==;
+X-CSE-ConnectionGUID: 43ZpfFfyTZSdkD4CesCGxw==
+X-CSE-MsgGUID: WfU3mLKrTSSbK+JSgZ6wLQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28253431"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="28253431"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2024 22:16:40 -0700
+X-CSE-ConnectionGUID: O5AzXYBFSjqv1gceKNBZhg==
+X-CSE-MsgGUID: nLYs637tQfuP3qnB4gLT4A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="81274022"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 12 Oct 2024 22:16:37 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1szqy2-000E75-2s;
+	Sun, 13 Oct 2024 05:16:34 +0000
+Date: Sun, 13 Oct 2024 13:16:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	amadeuszx.slawinski@linux.intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	Markus Elfring <Markus.Elfring@web.de>,
+	Kees Cook <keescook@chromium.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	David Lechner <dlechner@baylibre.com>,
+	Dan Carpenter <error27@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: Re: [PATCH v3] cleanup: adjust scoped_guard() macros to avoid
+ potential warning
+Message-ID: <202410131247.7EWZ1WLP-lkp@intel.com>
+References: <20241011121535.28049-1-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241011121535.28049-1-przemyslaw.kitszel@intel.com>
 
-On Sat, 12 Oct 2024 20:16:44 -0700
-Boqun Feng <boqun.feng@gmail.com> wrote:
+Hi Przemek,
 
-> On Sun, Oct 13, 2024 at 11:50:33AM +0900, FUJITA Tomonori wrote:
->> On Sun, 13 Oct 2024 10:15:05 +0900 (JST)
->> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
->> 
->> > On Sat, 12 Oct 2024 08:29:06 -0700
->> > Boqun Feng <boqun.feng@gmail.com> wrote:
->> > 
->> >> While, we are at it, I want to suggest that we also add
->> >> rust/kernel/time{.rs, /} into the "F:" entries of TIME subsystem like:
->> >> 
->> >> diff --git a/MAINTAINERS b/MAINTAINERS
->> >> index b77f4495dcf4..09e46a214333 100644
->> >> --- a/MAINTAINERS
->> >> +++ b/MAINTAINERS
->> >> @@ -23376,6 +23376,8 @@ F:      kernel/time/timeconv.c
->> >>  F:     kernel/time/timecounter.c
->> >>  F:     kernel/time/timekeeping*
->> >>  F:     kernel/time/time_test.c
->> >> +F:     rust/kernel/time.rs
->> >> +F:     rust/kernel/time/
->> >>  F:     tools/testing/selftests/timers/
->> >> 
->> >>  TIPC NETWORK LAYER
->> >> 
->> >> This will help future contributers copy the correct people while
->> >> submission. Could you maybe add a patch of this in your series if this
->> >> sounds reasonable to you? Thanks!
->> > 
->> > Agreed that it's better to have Rust time abstractions in
->> > MAINTAINERS. You add it into the time entry but there are two options
->> > in the file; time and timer?
->> > 
->> > TIMEKEEPING, CLOCKSOURCE CORE, NTP, ALARMTIMER
->> > M:      John Stultz <jstultz@google.com>
->> > M:      Thomas Gleixner <tglx@linutronix.de>
->> > R:      Stephen Boyd <sboyd@kernel.org>
->> > 
->> > HIGH-RESOLUTION TIMERS, TIMER WHEEL, CLOCKEVENTS
->> > M:      Anna-Maria Behnsen <anna-maria@linutronix.de>
->> > M:      Frederic Weisbecker <frederic@kernel.org>
->> > M:      Thomas Gleixner <tglx@linutronix.de>
->> > 
->> > The current Rust abstractions which play mainly with ktimer.h. it's 
->> > not time, timer stuff, I think.
->> 
->> Oops, s/ktimer.h/ktime.h/
->> 
->> No entry for ktime.h in MAINTAINERS; used by both time and timer
->> stuff.
->> 
-> 
-> I think ktime.h belongs to TIMEKEEPING, since ktime_get() is defined in
-> kernel/time/timekeeping.c and that's a core function for ktime_t, but
+kernel test robot noticed the following build warnings:
 
-Sounds reasonable.
+[auto build test WARNING on 44badc908f2c85711cb18e45e13119c10ad3a05f]
 
-This patchset adds Delta (also belongs to time, I guess) and fsleep to
-rust/kernel/time.rs. I think that fsleep belongs to timer (because
-sleep functions in kernel/time/timer.c). It's better to add
-rust/kerne/time/timer.rs for fsleep() rather than putting both time
-and timer stuff to rust/kernel/time.rs?
+url:    https://github.com/intel-lab-lkp/linux/commits/Przemek-Kitszel/cleanup-adjust-scoped_guard-macros-to-avoid-potential-warning/20241011-201702
+base:   44badc908f2c85711cb18e45e13119c10ad3a05f
+patch link:    https://lore.kernel.org/r/20241011121535.28049-1-przemyslaw.kitszel%40intel.com
+patch subject: [PATCH v3] cleanup: adjust scoped_guard() macros to avoid potential warning
+config: hexagon-randconfig-001-20241013 (https://download.01.org/0day-ci/archive/20241013/202410131247.7EWZ1WLP-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 70e0a7e7e6a8541bcc46908c592eed561850e416)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241013/202410131247.7EWZ1WLP-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410131247.7EWZ1WLP-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from sound/core/pcm_native.c:8:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from sound/core/pcm_native.c:15:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from sound/core/pcm_native.c:15:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from sound/core/pcm_native.c:15:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> sound/core/pcm_native.c:2277:2: warning: variable 'target_group' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+    2277 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   sound/core/pcm_native.c:2285:25: note: uninitialized use occurs here
+    2285 |         snd_pcm_group_lock_irq(target_group, nonatomic);
+         |                                ^~~~~~~~~~~~
+   sound/core/pcm_native.c:2277:2: note: remove the 'if' if its condition is always false
+    2277 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   sound/core/pcm_native.c:2249:36: note: initialize the variable 'target_group' to silence this warning
+    2249 |         struct snd_pcm_group *target_group;
+         |                                           ^
+         |                                            = NULL
+>> sound/core/pcm_native.c:2993:2: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+    2993 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   sound/core/pcm_native.c:3001:9: note: uninitialized use occurs here
+    3001 |         return ret;
+         |                ^~~
+   sound/core/pcm_native.c:2993:2: note: remove the 'if' if its condition is always false
+    2993 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   sound/core/pcm_native.c:2988:23: note: initialize the variable 'ret' to silence this warning
+    2988 |         snd_pcm_sframes_t ret;
+         |                              ^
+         |                               = 0
+   sound/core/pcm_native.c:3012:2: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+    3012 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   sound/core/pcm_native.c:3020:9: note: uninitialized use occurs here
+    3020 |         return ret;
+         |                ^~~
+   sound/core/pcm_native.c:3012:2: note: remove the 'if' if its condition is always false
+    3012 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   sound/core/pcm_native.c:3007:23: note: initialize the variable 'ret' to silence this warning
+    3007 |         snd_pcm_sframes_t ret;
+         |                              ^
+         |                               = 0
+>> sound/core/pcm_native.c:3028:2: warning: variable 'err' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+    3028 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   sound/core/pcm_native.c:3035:9: note: uninitialized use occurs here
+    3035 |         return err;
+         |                ^~~
+   sound/core/pcm_native.c:3028:2: note: remove the 'if' if its condition is always false
+    3028 |         scoped_guard(pcm_stream_lock_irq, substream) {
+         |         ^
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   sound/core/pcm_native.c:3026:9: note: initialize the variable 'err' to silence this warning
+    3026 |         int err;
+         |                ^
+         |                 = 0
+   11 warnings generated.
+--
+>> sound/core/sound.c:152:2: warning: variable 'new_fops' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     152 |         scoped_guard(mutex, &sound_mutex) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   sound/core/sound.c:161:7: note: uninitialized use occurs here
+     161 |         if (!new_fops)
+         |              ^~~~~~~~
+   include/linux/compiler.h:55:47: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                                               ^~~~
+   include/linux/compiler.h:57:52: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                                                    ^~~~
+   sound/core/sound.c:152:2: note: remove the 'if' if its condition is always false
+     152 |         scoped_guard(mutex, &sound_mutex) {
+         |         ^
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   sound/core/sound.c:147:40: note: initialize the variable 'new_fops' to silence this warning
+     147 |         const struct file_operations *new_fops;
+         |                                               ^
+         |                                                = NULL
+   1 warning generated.
+--
+   In file included from drivers/mailbox/arm_mhuv3.c:15:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from drivers/mailbox/arm_mhuv3.c:15:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from drivers/mailbox/arm_mhuv3.c:15:
+   In file included from include/linux/interrupt.h:11:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> drivers/mailbox/arm_mhuv3.c:642:3: warning: variable 'fired_dbs' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     642 |                 scoped_guard(spinlock_irqsave, &e->pending_lock) {
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:55:28: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:57:30: note: expanded from macro '__trace_if_var'
+      57 | #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+         |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/mailbox/arm_mhuv3.c:650:3: note: uninitialized use occurs here
+     650 |                 fired_dbs &= ~BIT(*db);
+         |                 ^~~~~~~~~
+   drivers/mailbox/arm_mhuv3.c:642:3: note: remove the 'if' if its condition is always false
+     642 |                 scoped_guard(spinlock_irqsave, &e->pending_lock) {
+         |                 ^
+   include/linux/cleanup.h:197:2: note: expanded from macro 'scoped_guard'
+     197 |         __scoped_guard(_name, /* empty */, __UNIQUE_ID(label), args)
+         |         ^
+   include/linux/cleanup.h:190:3: note: expanded from macro '__scoped_guard'
+     190 |                 if (!__guard_ptr(_name)(&scope) && __is_cond_ptr(_name)) {      \
+         |                 ^
+   include/linux/compiler.h:55:23: note: expanded from macro 'if'
+      55 | #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+         |                       ^
+   drivers/mailbox/arm_mhuv3.c:634:28: note: initialize the variable 'fired_dbs' to silence this warning
+     634 |                 u32 active_dbs, fired_dbs;
+         |                                          ^
+         |                                           = 0
+   7 warnings generated.
+..
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [y]:
+   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
 
 
-> you're not wrong that there is no entry of ktime.h in MAINTAINERS, so if
-> you want to wait for or check with Thomas, feel free.
-> 
->> > As planned, we'll move *.rs files from rust/kernel in the future,
->> > how we handle time and timer abstractions?
-> 
-> I don't think core stuffs will be moved from rust/kernel, i.e. anything
-> correspond to the concepts defined in kernel/ directory probably stays
-> in rust/kernel, so time and timer fall into that category.
+vim +2277 sound/core/pcm_native.c
 
-Seems that I misunderstood. The plan for the future layout is
-documented somewhere?
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2240  
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2241  /*
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2242   * PCM link handling
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2243   */
+877211f5e1b119 Takashi Iwai    2005-11-17  2244  static int snd_pcm_link(struct snd_pcm_substream *substream, int fd)
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2245  {
+877211f5e1b119 Takashi Iwai    2005-11-17  2246  	struct snd_pcm_file *pcm_file;
+877211f5e1b119 Takashi Iwai    2005-11-17  2247  	struct snd_pcm_substream *substream1;
+ae921398486419 Takashi Iwai    2024-02-22  2248  	struct snd_pcm_group *group __free(kfree) = NULL;
+ae921398486419 Takashi Iwai    2024-02-22  2249  	struct snd_pcm_group *target_group;
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2250  	bool nonatomic = substream->pcm->nonatomic;
+d90950c6a2658e Takashi Iwai    2024-02-23  2251  	CLASS(fd, f)(fd);
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2252  
+1da91ea87aefe2 Al Viro         2024-05-31  2253  	if (!fd_file(f))
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2254  		return -EBADFD;
+1da91ea87aefe2 Al Viro         2024-05-31  2255  	if (!is_pcm_file(fd_file(f)))
+d90950c6a2658e Takashi Iwai    2024-02-23  2256  		return -EBADFD;
+ae921398486419 Takashi Iwai    2024-02-22  2257  
+1da91ea87aefe2 Al Viro         2024-05-31  2258  	pcm_file = fd_file(f)->private_data;
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2259  	substream1 = pcm_file->substream;
+951e2736f4b11b Michał Mirosław 2020-06-08  2260  
+d90950c6a2658e Takashi Iwai    2024-02-23  2261  	if (substream == substream1)
+d90950c6a2658e Takashi Iwai    2024-02-23  2262  		return -EINVAL;
+951e2736f4b11b Michał Mirosław 2020-06-08  2263  
+73365cb10b280e Takashi Iwai    2019-01-13  2264  	group = kzalloc(sizeof(*group), GFP_KERNEL);
+d90950c6a2658e Takashi Iwai    2024-02-23  2265  	if (!group)
+d90950c6a2658e Takashi Iwai    2024-02-23  2266  		return -ENOMEM;
+73365cb10b280e Takashi Iwai    2019-01-13  2267  	snd_pcm_group_init(group);
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2268  
+dd0da75b9a2768 Takashi Iwai    2024-02-27  2269  	guard(rwsem_write)(&snd_pcm_link_rwsem);
+f0061c18c169f0 Takashi Iwai    2022-09-26  2270  	if (substream->runtime->state == SNDRV_PCM_STATE_OPEN ||
+f0061c18c169f0 Takashi Iwai    2022-09-26  2271  	    substream->runtime->state != substream1->runtime->state ||
+dd0da75b9a2768 Takashi Iwai    2024-02-27  2272  	    substream->pcm->nonatomic != substream1->pcm->nonatomic)
+dd0da75b9a2768 Takashi Iwai    2024-02-27  2273  		return -EBADFD;
+dd0da75b9a2768 Takashi Iwai    2024-02-27  2274  	if (snd_pcm_stream_linked(substream1))
+dd0da75b9a2768 Takashi Iwai    2024-02-27  2275  		return -EALREADY;
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2276  
+650224fe8d5f6d Takashi Iwai    2024-02-27 @2277  	scoped_guard(pcm_stream_lock_irq, substream) {
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2278  		if (!snd_pcm_stream_linked(substream)) {
+a41c4cb913b53b Takashi Iwai    2019-01-13  2279  			snd_pcm_group_assign(substream, group);
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2280  			group = NULL; /* assigned, don't free this one below */
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2281  		}
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2282  		target_group = substream->group;
+650224fe8d5f6d Takashi Iwai    2024-02-27  2283  	}
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2284  
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2285  	snd_pcm_group_lock_irq(target_group, nonatomic);
+e18035cf5cb3d2 Michał Mirosław 2020-06-08  2286  	snd_pcm_stream_lock_nested(substream1);
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2287  	snd_pcm_group_assign(substream1, target_group);
+0e279dcea0ec89 Takashi Iwai    2019-07-19  2288  	refcount_inc(&target_group->refs);
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2289  	snd_pcm_stream_unlock(substream1);
+f57f3df03a8e60 Takashi Iwai    2019-01-13  2290  	snd_pcm_group_unlock_irq(target_group, nonatomic);
+dd0da75b9a2768 Takashi Iwai    2024-02-27  2291  	return 0;
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2292  }
+^1da177e4c3f41 Linus Torvalds  2005-04-16  2293  
 
-
->> Looks like that we'll add rust/kernel/hrtimer/ soon. I feel that it's
->> better to decide on the layout of time and timer abstractions now
->> rather than later.
-> 
-> I already suggested we move hrtimer.rs into rust/kernel/time to match
-> the hierarchy of the counterpart in C (kernel/time/hrtimer.c):
-> 
-> 	https://lore.kernel.org/rust-for-linux/ZwqTf-6xaASnIn9l@boqun-archlinux/
-
-Sounds good.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
