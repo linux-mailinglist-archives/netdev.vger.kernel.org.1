@@ -1,152 +1,133 @@
-Return-Path: <netdev+bounces-134895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE8199B865
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 07:30:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE62D99B86B
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 08:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 350FC1C2114B
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:29:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ACE2B21BB3
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 06:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FCC139D03;
-	Sun, 13 Oct 2024 05:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE1477112;
+	Sun, 13 Oct 2024 06:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSWUREjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB00137747
-	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 05:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E52D2E406;
+	Sun, 13 Oct 2024 06:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728797387; cv=none; b=KnNKCIe4aKZ+4HGXm2mhVPP0hipZE9UitN07wPfeNIdfrWbgclCy9wxee4UiUJuYbxGjePDD5vSgcYqxZOn/zEUqEvHAhxlVL0StZ5HLAhRhsSKouNDZpUJg71GUYjvjHQffVsndcd5nEp6xErobOvpS0x9HDd9E2CBVrIJxDo8=
+	t=1728799577; cv=none; b=P03uY/vWwlWy9DLPcBINYsnaOkdxHC7qHc8e/YYKH+nEyI405BVZDk5EAYfRg81baoOVeWuKZezpAacl+sca+RG02wnuWDytbSCgtjOmSzskE3B8ARW7WLnHlvD3EUpKyd0yW/QseIZWAO0QhgZAtg4M0RKXfkEdbN50f2uA6KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728797387; c=relaxed/simple;
-	bh=q04B0oSl6B/Lr1hoL1EbdP8rVFP1TuxT4h5lIQMuenk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CrVoB3CsMTEh3eB+kp3w9+k7wMg9veHuHVVF19O+UrR64oP/Gw4dmBw85xXhpMWMdV/30K+tdLGJoPijBEzZ3XGnvBRwmV8bLHR0zjnr/maFA3xe5AAq4RMzRldVDJ3sPndeoQmt+YVIJ7LjS4xdBxuFrv8rJMsoGf5PE3j085g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1szrAP-0003RN-BY; Sun, 13 Oct 2024 07:29:21 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1szrAN-001U5I-Dx; Sun, 13 Oct 2024 07:29:19 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1szrAN-00D4Oc-1C;
-	Sun, 13 Oct 2024 07:29:19 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	stable@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
-Subject: [PATCH net v2 1/1] net: macb: Avoid 20s boot delay by skipping MDIO bus registration for fixed-link PHY
-Date: Sun, 13 Oct 2024 07:29:16 +0200
-Message-Id: <20241013052916.3115142-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1728799577; c=relaxed/simple;
+	bh=Fmf5Oe34tGT1Da8S8SsfkMXstT4pOKmcQHklchR0EJU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k0fPUaYnQVti+lccjEN2BHwtjoriEBDS+nmLHEDBBOV99NPOLKFGfqcjNnHf+3ste4XgcOkutS6z4Xdayd2OaGp3lIiqFHcIbHV1kitmNknKKgUzj23N+WJUqEM7TDcbP3r90geaqPaJevcX/KUs43lf1BPyqUxEwQ3rruOcjJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jSWUREjF; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-8354b8df4c9so113449139f.1;
+        Sat, 12 Oct 2024 23:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728799575; x=1729404375; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gnxrE3Yvm03jjj0jNaq11fJdS+HVMoZrq1TgWsDd7Ug=;
+        b=jSWUREjFPzinwL+XEuwGS0t7mV+zUygTMfHan7zBJZMbZEVcldRpnuaiASvpjdyAhC
+         a9IRBNUMFrwpxhxvBrNdiiwh54h2v0moVFNBXFd2M/I/kwoqMubtEQ3wkeRec3uUowId
+         iG4aqzlNEYyRFDoGerBx/To6npkV+DEHIY/TZpYxAaDQGMSyYILXOwk2exTTsQEysUup
+         XDmj5EB6mANkGOFCjW4vtPqM1Tf5YAnlvn0oBwFilLdAt09TwGGfebt3jus0cUx6MjQH
+         DsjS++IyagrGxPjEEehVpHF5Ji/QSRZkUgXyMHw5KTZvQ/SRUQQan2mfHBiabxvgh/N5
+         Sgtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728799575; x=1729404375;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gnxrE3Yvm03jjj0jNaq11fJdS+HVMoZrq1TgWsDd7Ug=;
+        b=OU6L9IaD+hcuZvyzQ3gOMe7UaKVoqkNGebM6vxkWxxMILA4pAZyAhrq4coGp08drhP
+         B7t/celu8ZsxhCjqsSDUoGR23nx0hMYU14rweq1HOVL94KtvNMkTYVPJfhNF6G7KHb3R
+         YtQJg9LQH0MeVPjJBtlLfA3uQ3wRPpE8JV0v/BtlG9fSIOUq4+V2vUe+DeH02DOphkLi
+         QeSS/qf8ptX5GEdhAOQ6ZwVRApQ6YlD4ut6UvysOgpEg8Wm1U3AIpzGFNe9JzsUcuLtr
+         uYoxU5taJcO+ZGuPE+eDGTNaCC02SgrcQ1iv76XDqFZZX1MJnC37smMYr9ZwbsXe0Tb9
+         sDIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgm0hiTZ9pt+aICvbfraJartIwILO7imWi0BCcWDNomOYNkLoS3/qpFguJXAdpfaY1Uf4=@vger.kernel.org, AJvYcCUjcvpYBE4MO6FXTinpDtD8XOdblVpUBoWwPkNvgTFDH9gRnQWhk5x9ihySgpL0tMA5PZ3aeal0@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWwIFd5uI8XWSD+smV2EtDhcYeqKnh0W91/pzms+/GLUwUkvQ9
+	mdSOC0sbXpvh+BsucuQ6Ou8MQCTJK56vElQWOaBzBaTRj/HjtdT+HfZmLKK2FCcAZYC1TioFAvE
+	RNGAtwEhRVqaWt/Krrj2EfxNjyaVgjC5H
+X-Google-Smtp-Source: AGHT+IHjAlYtPnOHfkI1YQY5/F2Bag+jyBNrPTP9M1jj2Rx+3unj849hdMlb1guxcHfwrzLEd1QQoREtA1X3LPs6oKU=
+X-Received: by 2002:a05:6e02:1446:b0:3a3:67b1:3080 with SMTP id
+ e9e14a558f8ab-3a3bcdbb5acmr35808605ab.7.1728799574997; Sat, 12 Oct 2024
+ 23:06:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <670ab67920184_2737bf29465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoAv+QPUcNs6nV=TNjSZ69+GfaRgRROJ-LMEtpOC562-jA@mail.gmail.com> <CAL+tcoCwQpM3mMsB3Trw0XrHoLcHqSFxU1LSs0AxUyiZc1wNgw@mail.gmail.com>
+In-Reply-To: <CAL+tcoCwQpM3mMsB3Trw0XrHoLcHqSFxU1LSs0AxUyiZc1wNgw@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 13 Oct 2024 14:05:38 +0800
+Message-ID: <CAL+tcoD-595iMJ79L7kVUsMgBfjnTQJgPaycOw2iP-nUDHCivA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 00/12] net-timestamp: bpf extension to equip
+ applications transparently
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 
-A boot delay was introduced by commit 79540d133ed6 ("net: macb: Fix
-handling of fixed-link node"). This delay was caused by the call to
-`mdiobus_register()` in cases where a fixed-link PHY was present. The
-MDIO bus registration triggered unnecessary PHY address scans, leading
-to a 20-second delay due to attempts to detect Clause 45 (C45)
-compatible PHYs, despite no MDIO bus being attached.
+> I tested this by running "./txtimestamp -4 -L 127.0.0.1 -l 1000 -c 5"
+> in the bpf attached directory and it can correctly print the
+> timestamp. So it would not break users.
+>
+> And surprisingly I found the key is not that right (ERROR: key 1000,
+> expected 999). I will investigate and fix it.
 
-The commit 79540d133ed6 ("net: macb: Fix handling of fixed-link node")
-was originally introduced to fix a regression caused by commit
-7897b071ac3b4 ("net: macb: convert to phylink"), which caused the driver
-to misinterpret fixed-link nodes as PHY nodes. This resulted in warnings
-like:
-mdio_bus f0028000.ethernet-ffffffff: fixed-link has invalid PHY address
-mdio_bus f0028000.ethernet-ffffffff: scan phy fixed-link at address 0
-...
-mdio_bus f0028000.ethernet-ffffffff: scan phy fixed-link at address 31
+Ah, I think I know the reason. In this series, the BPF extension
+allows setting before sending SYN packet in the beginning of
+tcp_connect(), which is different from the original design that allows
+setting after sending the SYN packet. It causes the unexpected key.
+They are different. The reason why the failure is triggered is because
+I reuse the tskey logic in the BPF extension...
 
-This patch reworks the logic to avoid registering and allocation of the
-MDIO bus when:
-  - The device tree contains a fixed-link node.
-  - There is no "mdio" child node in the device tree.
+====
+Back to the question on how to solve the conflicts, if we finally
+reckon that the original feature has the first priority, I can change
+the order in the next version.
 
-If a child node named "mdio" exists, the MDIO bus will be registered to
-support PHYs  attached to the MACB's MDIO bus. Otherwise, with only a
-fixed-link, the MDIO bus is skipped.
+void __skb_tstamp_tx(struct sk_buff *orig_skb,
+                     const struct sk_buff *ack_skb,
+                     struct skb_shared_hwtstamps *hwtstamps,
+                     struct sock *sk, int tstype)
+{
+        if (!sk)
+                return;
 
-Tested on a sama5d35 based system with a ksz8863 switch attached to
-macb0.
+       ret = skb_tstamp_tx_output(orig_skb, ack_skb, hwtstamps, sk, tstype);
+       if (ret)
+               /* Apps does set the SO_TIMESTAMPING flag, return directly */
+               return;
 
-Fixes: 79540d133ed6 ("net: macb: Fix handling of fixed-link node")
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: stable@vger.kernel.org
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
-changes v2:
-- s/some PHYs may be attached/some devices may be attached/
----
- drivers/net/ethernet/cadence/macb_main.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+       if (static_branch_unlikely(&bpf_tstamp_control))
+                bpf_skb_tstamp_tx_output(sk, orig_skb, tstype, hwtstamps);
+}
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index f06babec04a0b..56901280ba047 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -930,9 +930,6 @@ static int macb_mdiobus_register(struct macb *bp)
- 		return ret;
- 	}
- 
--	if (of_phy_is_fixed_link(np))
--		return mdiobus_register(bp->mii_bus);
--
- 	/* Only create the PHY from the device tree if at least one PHY is
- 	 * described. Otherwise scan the entire MDIO bus. We do this to support
- 	 * old device tree that did not follow the best practices and did not
-@@ -953,8 +950,19 @@ static int macb_mdiobus_register(struct macb *bp)
- 
- static int macb_mii_init(struct macb *bp)
- {
-+	struct device_node *child, *np = bp->pdev->dev.of_node;
- 	int err = -ENXIO;
- 
-+	/* With fixed-link, we don't need to register the MDIO bus,
-+	 * except if we have a child named "mdio" in the device tree.
-+	 * In that case, some devices may be attached to the MACB's MDIO bus.
-+	 */
-+	child = of_get_child_by_name(np, "mdio");
-+	if (child)
-+		of_node_put(child);
-+	else if (of_phy_is_fixed_link(np))
-+		return macb_mii_probe(bp->dev);
-+
- 	/* Enable management port */
- 	macb_writel(bp, NCR, MACB_BIT(MPE));
- 
--- 
-2.39.5
+In this way, it will allow either of two features to work. Willem, do
+you think it is fine with you?
 
+Thanks,
+Jason
 
