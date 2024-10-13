@@ -1,126 +1,123 @@
-Return-Path: <netdev+bounces-134990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F8599BBC0
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:39:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 675CD99BBD1
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3EE5B20DA5
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:39:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E73281847
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00536156C69;
-	Sun, 13 Oct 2024 20:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600F21531F2;
+	Sun, 13 Oct 2024 20:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="KfabtnhZ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="siip4Rmw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EBB14F9E2;
-	Sun, 13 Oct 2024 20:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7DB14B956
+	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 20:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728851929; cv=none; b=WXSgC8TK/LrWq7XQ9tK7+IQcNrP9a19e8lOGK8Durwn1w5SS0UFigVafs1uZAxSp3c807aFh46qyK2tvYwbGT8VMmNRg6NJDQEb1GIo9RHCWwN4VLNhz/2sWNK9ZBYeqH+ayE50JSdnETIPS+lOVgtHZKeNkzn3V03y0lrG2Dnk=
+	t=1728852815; cv=none; b=I6BLxZJ1jiRPhkWyORKhpVCCr2wQAwdF9thg1D/Q3KUcPm4syfWmE9yj7Gw59//vGlFKwFAjwfwDE/934PXEl7bD52Yp24kGYelW6F0a+0RLvEcAJ+U2VQylfZB4E4yZ5/urv2VMu70MNxA0FJWZrKpOOznmssJPgngktJzVMCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728851929; c=relaxed/simple;
-	bh=RlpXOidSIkDtXwfikagOesfLxTriDN+l1/Ar8iVwTQg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LtFmR/qjv30bLwpdKO/Tlfr0xSzrqgNh4V9Kx+EumizdRJ1xscyzwav95+X1vyPLHNUa0ihef80jOJCDonDuzA/x4orNvnCHId3m/zrafLUQ3XESQ3mfmYEh/EaeBHCSh0SL3uQKlKU2vOh8zX9fTJ+C1TNCPSYwkYC+D4z2uJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=KfabtnhZ; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=NZNaeQVpUHOr17M4VqCALkPHgzs8AAqDAyl+ctHVJo8=; b=KfabtnhZLzFOCW1g
-	6qVeF5hwO2Iu+fOSkrU4Rrk6AKOFKzXb9k+Z/7pgZ5OCw3znfqcIT0iyHh1Ym86+mFYuDbcs2Y3ar
-	wGiGInJw4eQryqfmqT0AXPcYl3X93brjfQ09703GLmFaJN0aBYE/vtJIv4owzQn35m9rS+aiG5q3B
-	wcZlt2AgYoB6hkKtrIe8A74fvcypgOukBWHNHJ0AEm/NxvpXFi6d7dk1N79zvQEQqS2oHMjbSjidK
-	y5nT59IXDixE/716GKIM6TYsU05rS5ebET7vD/J0wZjw5BkfTae747IR6AuLG2ipJUEjMH2gHFrIW
-	G+XZMxj8m+u2EEKOJA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1t05MP-00AnUX-0p;
-	Sun, 13 Oct 2024 20:38:41 +0000
-From: linux@treblig.org
-To: bharat@chelsio.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 6/6] cxgb4: Remove unused t4_free_ofld_rxqs
-Date: Sun, 13 Oct 2024 21:38:31 +0100
-Message-ID: <20241013203831.88051-7-linux@treblig.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241013203831.88051-1-linux@treblig.org>
-References: <20241013203831.88051-1-linux@treblig.org>
+	s=arc-20240116; t=1728852815; c=relaxed/simple;
+	bh=2IcaxRsCZu1Weo0t3+AVfcXRdGrBjE6IgF1kYYjiVfU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=EdNhHZCBgheMvRTJDSUFCKbaWH1qlDLT98vS9M08nkOKcfr3m4hY4HCZ0hrRhx00JvaCjBs/ljuXAUl5s39dL1jU2R1viLCxKekIlhtqpY5qgCdPk8QFS07FQ2cMyxuNBiRqUgqPNCkmxSo4p1f2McFcNS9PNlsUMTbKgi+bvn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=siip4Rmw; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71e67d505ceso123860b3a.1
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 13:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728852813; x=1729457613; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tW/oVLxMGVp293pF30Jw4BkfUNSmxaGcYjy7Hqe9zSo=;
+        b=siip4RmwMjZU+1aLa2isf62iO/PUxAwUMitbswzRhZl2Wm7XYbwBvEh6ghMlcy6HX0
+         p+CHV9a4l3LBJGOOL0WnlPho23AAtQnHgS2Egs/1i4dhSOLSR4lTYtnxZdh/f1gACW0C
+         ted3/v4g17PBHA23o1DTxlg6pv4wVCpE4LyBiV1Z6YxKet6/UjfejzmomLunSs/tu24d
+         mnPJXlbSM7njM2Kc2kACuGTkhqiXK2bkGXZq3XtcBho3son8FAGEAL1Qa595sI2FcFBw
+         xwRDsZlaG63VF2oSnxMzM9arpzlFZzSf0qVTcb7f20qTdWlqtdburfnUf8zM2iXINQ4Q
+         Ieew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728852813; x=1729457613;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tW/oVLxMGVp293pF30Jw4BkfUNSmxaGcYjy7Hqe9zSo=;
+        b=wh+O4rP+6WcCeIhSbdK2mLmhwN5I8kdPDMTD6IMJ5MuQivbB+8ehX5Q6nKPAKASpaF
+         Q6n+V482zVnBBExzoNZsBZFDNVxdyJSiCFdZ9ID8iz9P8CAUB5XzgJjHZXT0zTv3G8m4
+         JAXazAxUlEXPNrLIqnx3ndJRqyTIP+bXgb7rMALUGJiOIq2/GLkaryPVNE2vKaFm4WGR
+         82a5bEeMUSTXLJ0XLwq2o0rsdLKhXx+8UcwYmzUcJtJzOhkuvihhuVkqxnpzkVYBfmxR
+         bvksn08twBF6kaX+gXXzKSwb+PLMl0JmDmbsRccPVW5ffOeOaghjknFNgZSKnx3TpCkP
+         HtxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW6yUGF48YyUL8YWnstuQxuGZ83MsZOiHPfo671VH4HuvKLAOJQfQWx3OMjEVyv3PB1Tzh4/5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxMV7y8JljwvFt9NuuGTcdfLeH38CtgV5+Aib0DjjQJhxgEAD3
+	XFu2I+i5BoMxBeSqoxsC8PIJ5tUjiqSnRMi9qaCNVZbCsRDBeE6X0nw/5pPBdKI=
+X-Google-Smtp-Source: AGHT+IGeHW/T1utnJaL2THMthWNT/SlEE9KTreIWsQr33pvF5db22afBNXHDL1azWfd6tDGW/vbLCA==
+X-Received: by 2002:a05:6a00:1391:b0:71e:ba5:820e with SMTP id d2e1a72fcca58-71e4c1dcd95mr9404250b3a.27.1728852812746;
+        Sun, 13 Oct 2024 13:53:32 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e48bcfe81sm3815287b3a.66.2024.10.13.13.53.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Oct 2024 13:53:32 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-nfs@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>
+Cc: kernel-janitors@vger.kernel.org, vbabka@suse.cz, paulmck@kernel.org, 
+ Tom Talpey <tom@talpey.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Neil Brown <neilb@suse.de>, 
+ linux-can@vger.kernel.org, bridge@lists.linux.dev, 
+ b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org, 
+ wireguard@lists.zx2c4.com, netdev@vger.kernel.org, ecryptfs@vger.kernel.org, 
+ linux-block@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+Subject: Re: (subset) [PATCH 00/17] replace call_rcu by kfree_rcu for
+ simple kmem_cache_free callback
+Message-Id: <172885281086.338120.2063739137198887833.b4-ty@kernel.dk>
+Date: Sun, 13 Oct 2024 14:53:30 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-t4_free_ofld_rxqs() has been unused since
-commit 0fbc81b3ad51 ("chcr/cxgb4i/cxgbit/RDMA/cxgb4: Allocate resources
-dynamically for all cxgb4 ULD's")
+On Sun, 13 Oct 2024 22:16:47 +0200, Julia Lawall wrote:
+> Since SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
+> 
+> The changes were done using the following Coccinelle semantic patch.
+> This semantic patch is designed to ignore cases where the callback
+> function is used in another way.
+> 
+> [...]
 
-Remove it.
+Applied, thanks!
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- drivers/net/ethernet/chelsio/cxgb4/cxgb4.h |  1 -
- drivers/net/ethernet/chelsio/cxgb4/sge.c   | 16 ----------------
- 2 files changed, 17 deletions(-)
+[09/17] block: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+        commit: 7a9b197adbafa9d6d1a79a0633607b78b1adef82
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-index 1c302dfd6503..75bd69ff61a8 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-@@ -1608,7 +1608,6 @@ void t4_os_portmod_changed(struct adapter *adap, int port_id);
- void t4_os_link_changed(struct adapter *adap, int port_id, int link_stat);
- 
- void t4_free_sge_resources(struct adapter *adap);
--void t4_free_ofld_rxqs(struct adapter *adap, int n, struct sge_ofld_rxq *q);
- irq_handler_t t4_intr_handler(struct adapter *adap);
- netdev_tx_t t4_start_xmit(struct sk_buff *skb, struct net_device *dev);
- int cxgb4_selftest_lb_pkt(struct net_device *netdev);
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-index de52bcb884c4..a7d76a8ed050 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-@@ -4874,22 +4874,6 @@ void free_rspq_fl(struct adapter *adap, struct sge_rspq *rq,
- 	}
- }
- 
--/**
-- *      t4_free_ofld_rxqs - free a block of consecutive Rx queues
-- *      @adap: the adapter
-- *      @n: number of queues
-- *      @q: pointer to first queue
-- *
-- *      Release the resources of a consecutive block of offload Rx queues.
-- */
--void t4_free_ofld_rxqs(struct adapter *adap, int n, struct sge_ofld_rxq *q)
--{
--	for ( ; n; n--, q++)
--		if (q->rspq.desc)
--			free_rspq_fl(adap, &q->rspq,
--				     q->fl.size ? &q->fl : NULL);
--}
--
- void t4_sge_free_ethofld_txq(struct adapter *adap, struct sge_eohw_txq *txq)
- {
- 	if (txq->q.desc) {
+Best regards,
 -- 
-2.47.0
+Jens Axboe
+
+
 
 
