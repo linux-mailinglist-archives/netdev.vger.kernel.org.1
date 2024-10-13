@@ -1,191 +1,140 @@
-Return-Path: <netdev+bounces-134888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB6699B827
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC4299B829
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 05:47:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D70E282B06
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 03:44:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27C65282B39
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 03:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B91B12C54B;
-	Sun, 13 Oct 2024 03:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1547B335D3;
+	Sun, 13 Oct 2024 03:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQQniB7Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WjppBfC6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79132F32;
-	Sun, 13 Oct 2024 03:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B001862
+	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 03:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728791069; cv=none; b=dbTCFI9fX3G+gVAvBZDQ4PRfV/GMH/9NF1m/TYiY7SGC5xxqN0hIUdlN4s/OacrZLOx32Sye3Ukff1v+8S/nNZB5zMMp+Thgb+beCuwNeKQGmVkFR7DqQTGTGiYA+QAK/YroXbHZu2IWEfiSXVsKIxhW0Bh5eDDOntHj5JXa8n8=
+	t=1728791271; cv=none; b=OxZK5wYtyNpdCpeVAkiSe1p4CN/tHIRNqGPrkhGvF/ZUNdBcxUnxPZVxBbrn8P1I5QSnp2GiAlIUhq1nbDGrknTwx0vNtqsZcGY9/iruDgJsIYctGrcTyTRhkxszkxKiN5Gm7+qoiFzfUD75nCZEs0ILs0pLdyS1lKFxIGcjZIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728791069; c=relaxed/simple;
-	bh=fD+yBTzY+VRkPpNuuawmArRdA6ZiaPgMeL8qxug5m1k=;
+	s=arc-20240116; t=1728791271; c=relaxed/simple;
+	bh=plED+xCHktvbXRmKGbrS99mMgO2z4EA4tAZ8g2RAGB0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lszyKfUNh4naCPv6NmVuffpnOS8DULJMqYe4CtAhlxXjMjbkkTX/k+PbU++0usrxXNUEwYu86+jeFvfenCdzIW0fn9p2b0roLiChIYt2gEA8F2ZJ2KUvXqNcZ6jFbVX+kyskr4KBVYXFgsN0hR29NXc5VjdYC6ZvlNmY7qtVl8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQQniB7Z; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3a39cabb9faso10891605ab.3;
-        Sat, 12 Oct 2024 20:44:25 -0700 (PDT)
+	 To:Cc:Content-Type; b=V56Soq5ad+yjavD+sNTbnHOxtqspkf3BWjrNJ+LwJOfcvJo3cLvGwrVaRWquHprhV7ZcMhgzw3rPsWCLl+kHsTJrx7lOaahxcCKYLT6xaM8KdsfOliWIQfz82fYh6HyzTWFbu+fzVlSs/d8YPT3l3LnIW5mlwD84c4RcNIgAPNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WjppBfC6; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4603d3e0547so222551cf.0
+        for <netdev@vger.kernel.org>; Sat, 12 Oct 2024 20:47:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728791065; x=1729395865; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728791268; x=1729396068; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XBI4zAZ3xLhFRzT01S8Qd2MLhVethc1bvcMVmsscP3o=;
-        b=CQQniB7ZSDLhaxOIyJhhlausn4XVTFkQPeR7Yiyp7rSvXUspk7z2BD7xQ/oJJVnQA6
-         kiqg1yU7IOQMdXNqFLTO4VSPM038YVr40N3YyRGeEqt57J9PilszAC5kAk3s5EEv9byW
-         TFd8Mf8jRDZ6rYcZbF9HtTn7+Ia616gsQQRkIFklpuZTgb7EChadsZDJsM0NeB3Y+OP/
-         10vpk6iaf1HvEgvF0L8jW8Ts30AI1Q/deUrGWPmx3ky7ATlxLluIW+hv/3YjEmjawzs9
-         +u37E/L+kwYVaRB0YfNh9UpCGup7D5MEAqLahm3B0BWjKizGHm3yN8cZIOZTQfOURnyX
-         oAHA==
+        bh=7n0KvzvB9CapIDrVdKAoECRFJHz95I4tKIuKCEKYze8=;
+        b=WjppBfC6UdqPV1ZhB003ofssXjkvImncJJ2sVxBq6TNfDuNJDkF5GZn2B56o4d8oxs
+         +4DiIuj6oeT2pUqv5LiH/PC+vvCZAHzF8T38cICLKXBza4Ey+pa9PQD9Bg8CGzBcbxNe
+         sCJ7N9Ww8Ufru8oi9fET4/gwPbjocqEpMN1XbZnYcLchaGHtrk1VnOlvRUMt5Ckvrqhb
+         Wzy34YDbmfUgWHnUtEf7aunaGXadVtkbechm4FriZB77EM6yjjkQKL0DlgIuQjxFE7TM
+         oRds5VLWdySYsGl3uP5F7B2kEOc52rK+MT0mnLYT9ykvWixpI9/W6TmT4K1yIozuTLh+
+         iaoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728791065; x=1729395865;
+        d=1e100.net; s=20230601; t=1728791268; x=1729396068;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XBI4zAZ3xLhFRzT01S8Qd2MLhVethc1bvcMVmsscP3o=;
-        b=j8rOCFVjWEV+1rmSqaqp8ypJRei/qRUHn2Cebkhbd23onFJ0hVZQEGEy+sDPhY1Uo9
-         iScR7Tbrgmw97fIMbS6URhbmzfVxqzlFzPp2KdqgAQa71OL389WpMxlgbKmughg2MbWQ
-         3nciUDtCKqyXLcCj9AhdcANQRNM0ytSkxqCKkebQRd42NHHTDxgB0nmsERVoFRORySOl
-         GznV8KUFZdIV+BY6w1IDDGkke6r4wYDWM5JHzSD57UTlwB4ZyQoprTaijZmTUf1xj952
-         p5W2+yr0IihDG5lI5qk/6mp1ORcBShj3ZXIk32NfzY/18IbrrrWZ3KjHZmhJgv3y5Wfa
-         f+2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUx5/82aBg2yG5002hmuH6MdP4KNmj/3M5+Lerdz7gCpRS0aHevJMp5i16whB6jXq9LxccBwUIG@vger.kernel.org, AJvYcCXLdY7Rg35FVubr13zYY9NnUqDVzvObvcIHcVDlAbE06nyDxseaZvc39M7DlYKmwI3scSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3YHXNaz3lqDE4zaN6Kd3p4zM7mG9Jk3U7xp1q03BCOBbthMYf
-	mxcVib/B1l75ZsjQhCSjRccyYfS84hRV0HmKGCoANtHg/DpdZ341kO/eW+wESFz060QjQYo78fO
-	mYYXMC1sl+YhIqr7bfkFXzdGoqTA=
-X-Google-Smtp-Source: AGHT+IHkIkmGPC4w5BfCmj6pay7q+CEdqTz690E1prQpjGkD80lafcWICvsGjQr2VoS9QghUnI/IffSRFOgWQQH6558=
-X-Received: by 2002:a05:6e02:168a:b0:3a2:f7b1:2f89 with SMTP id
- e9e14a558f8ab-3a3b6022e6cmr54510935ab.18.1728791064799; Sat, 12 Oct 2024
- 20:44:24 -0700 (PDT)
+        bh=7n0KvzvB9CapIDrVdKAoECRFJHz95I4tKIuKCEKYze8=;
+        b=n21730DPrjFflb6fP1ryr1fbqTpHJ37Dcc5PRWQ2QtfIpMUdHtzv3iCoHQGO/fsDTD
+         3Ekak2/0wqlE9FQbTbNiDj95SaTqGM1KTFm6gByqxvKabrHYUE12Os2bjb1I/KNA+3Ua
+         EcPHlslGMNyISO/djFDZCAFb1b7gylLq2vyPbQODsJN7FtZuV0Qb83SV2wTb2SGQcBPo
+         Tg0b1z77myGsOHISB/fA1XeuWFcn9SAefDN6VQ55zYdrumu8EYdx6KDJL9HWu7eVbtLb
+         HGoEn/l2NsEtzHyHh0Yk0EWOqzPz7BAI6ZgBcqqqppM3czO3T0B8sX1CbpM/ht3eKIhF
+         mNgg==
+X-Gm-Message-State: AOJu0Yx4ftMnhTJb+IifAhaNP8oGTCpyeZDwO+U4ysf8jPKQubfOImi+
+	IAp2VPejcemmatREXzoVMNRJv00yE2eIp6pGuNS2k5aME6cJze8c9VBWPrv9KM8S7Djc5VXPgL1
+	RUNk4KNBaRNgrpSNkVYTuji+8EAMI6cCvP+XQ
+X-Google-Smtp-Source: AGHT+IEegumLi7zIKhRDNuipCvvZooP2Kk/YLm97Km4CLU4GcPGmRQrtliNANV8X1S8PU/eajdg6/KIpUAF/SzQSHHI=
+X-Received: by 2002:a05:622a:5d13:b0:45f:997:4e5a with SMTP id
+ d75a77b69052e-46059c4465bmr1985201cf.11.1728791267980; Sat, 12 Oct 2024
+ 20:47:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <670ab67920184_2737bf29465@willemb.c.googlers.com.notmuch> <CAL+tcoAv+QPUcNs6nV=TNjSZ69+GfaRgRROJ-LMEtpOC562-jA@mail.gmail.com>
-In-Reply-To: <CAL+tcoAv+QPUcNs6nV=TNjSZ69+GfaRgRROJ-LMEtpOC562-jA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 13 Oct 2024 11:43:48 +0800
-Message-ID: <CAL+tcoCwQpM3mMsB3Trw0XrHoLcHqSFxU1LSs0AxUyiZc1wNgw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 00/12] net-timestamp: bpf extension to equip
- applications transparently
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241009171252.2328284-1-sdf@fomichev.me> <20241009171252.2328284-6-sdf@fomichev.me>
+In-Reply-To: <20241009171252.2328284-6-sdf@fomichev.me>
+From: Mina Almasry <almasrymina@google.com>
+Date: Sat, 12 Oct 2024 20:47:32 -0700
+Message-ID: <CAHS8izNuNwSjWTkHo545HT8r2JEp_idY34NGPEEyiTj8XmzW3Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 05/12] selftests: ncdevmem: Remove default arguments
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 13, 2024 at 11:28=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
+On Wed, Oct 9, 2024 at 10:13=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.me=
+> wrote:
 >
-> On Sun, Oct 13, 2024 at 1:48=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > A few weeks ago, I planned to extend SO_TIMESTMAMPING feature by usin=
-g
-> > > tracepoint to print information (say, tstamp) so that we can
-> > > transparently equip applications with this feature and require no
-> > > modification in user side.
-> > >
-> > > Later, we discussed at netconf and agreed that we can use bpf for bet=
-ter
-> > > extension, which is mainly suggested by John Fastabend and Willem de
-> > > Bruijn. Many thanks here! So I post this series to see if we have a
-> > > better solution to extend. My feeling is BPF is a good place to provi=
-de
-> > > a way to add timestamping by administrators, without having to rebuil=
-d
-> > > applications.
-> > >
-> > > This approach mostly relies on existing SO_TIMESTAMPING feature, user=
-s
-> > > only needs to pass certain flags through bpf_setsocktop() to a separa=
-te
-> > > tsflags. For TX timestamps, they will be printed during generation
-> > > phase. For RX timestamps, we will wait for the moment when recvmsg() =
-is
-> > > called.
-> > >
-> > > After this series, we could step by step implement more advanced
-> > > functions/flags already in SO_TIMESTAMPING feature for bpf extension.
-> > >
-> > > In this series, I only support TCP protocol which is widely used in
-> > > SO_TIMESTAMPING feature.
-> > >
-> > > ---
-> > > V2
-> > > Link: https://lore.kernel.org/all/20241008095109.99918-1-kerneljasonx=
-ing@gmail.com/
-> > > 1. Introduce tsflag requestors so that we are able to extend more in =
-the
-> > > future. Besides, it enables TX flags for bpf extension feature separa=
-tely
-> > > without breaking users. It is suggested by Vadim Fedorenko.
-> > > 2. introduce a static key to control the whole feature. (Willem)
-> > > 3. Open the gate of bpf_setsockopt for the SO_TIMESTAMPING feature in
-> > > some TX/RX cases, not all the cases.
-> > >
-> > > Note:
-> > > The main concern we've discussion in V1 thread is how to deal with th=
-e
-> > > applications using SO_TIMESTAMPING feature? In this series, I allow b=
-oth
-> > > cases to happen at the same time, which indicates that even one
-> > > applications setting SO_TIMESTAMPING can still be traced through BPF
-> > > program. Please see patch [04/12].
-> >
-> > This revision does not address the main concern.
-> >
-> > An administrator installed BPF program can affect results of a process
-> > using SO_TIMESTAMPING in ways that break it.
+> To make it clear what's required and what's not. Also, some of the
+> values don't seem like a good defaults; for example eth1.
 >
-> Sorry, I didn't get it. How the following code snippet would break users?
+> Move the invocation comment to the top, add missing -s to the client
+> and cleanup the client invocation a bit to make more readable.
 >
-> void __skb_tstamp_tx(struct sk_buff *orig_skb,
->                      const struct sk_buff *ack_skb,
->                      struct skb_shared_hwtstamps *hwtstamps,
->                      struct sock *sk, int tstype)
-> {
->         if (!sk)
->                 return;
+> Cc: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  tools/testing/selftests/net/ncdevmem.c | 49 ++++++++++++++------------
+>  1 file changed, 27 insertions(+), 22 deletions(-)
 >
->         if (static_branch_unlikely(&bpf_tstamp_control))
->                 bpf_skb_tstamp_tx_output(sk, orig_skb, tstype, hwtstamps)=
-;
->
->         skb_tstamp_tx_output(orig_skb, ack_skb, hwtstamps, sk,
-> tstype);
-> }
->
-> You can see, the application shipped with SO_TIMESTAMPING still prints
-> timestamps even when the application stays in the attached cgroup
-> directory.
+> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
+ests/net/ncdevmem.c
+> index 2ee7b4eb9f71..99ae3a595787 100644
+> --- a/tools/testing/selftests/net/ncdevmem.c
+> +++ b/tools/testing/selftests/net/ncdevmem.c
+> @@ -1,4 +1,19 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * tcpdevmem netcat. Works similarly to netcat but does device memory TC=
+P
+> + * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
+> + *
+> + * Usage:
+> + *
+> + *     On server:
+> + *     ncdevmem -s <server IP> [-c <client IP>] -f eth1 -l -p 5201
+> + *
+> + *     On client:
+> + *     echo -n "hello\nworld" | nc -s <server IP> 5201 -p 5201
+> + *
 
-I tested this by running "./txtimestamp -4 -L 127.0.0.1 -l 1000 -c 5"
-in the bpf attached directory and it can correctly print the
-timestamp. So it would not break users.
+No need to remove the documentation telling users how to do validation
+when moving these docs. Please have a secondary section that retains
+the docs for the validation:
 
-And surprisingly I found the key is not that right (ERROR: key 1000,
-expected 999). I will investigate and fix it.
+* Usage:
 
+(what you have)
+
+* Test data validation:
+
+(What I had before)
+
+With that:
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+--=20
 Thanks,
-Jason
+Mina
 
