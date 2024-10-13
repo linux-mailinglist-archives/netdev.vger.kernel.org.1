@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-134985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0315E99BBB6
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:38:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3117C99BBC2
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27C761C20C6E
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:38:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D83351F2149C
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6535F14D2A0;
-	Sun, 13 Oct 2024 20:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA62814E2C0;
+	Sun, 13 Oct 2024 20:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Yr5U/Gee"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="fBg0dGvr"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0470149E13;
-	Sun, 13 Oct 2024 20:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CDD15CD64;
+	Sun, 13 Oct 2024 20:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728851927; cv=none; b=bVtBe2+FL3Z/VJt1/odIo8EY9Ey/zOuAOB6k7uk+IzPJbB1bQ9le+WZyxmX6ypKSBGn8SJKMGowWR4mPcawp1JxtlWlDfJoRSfr+YSOfFBcgnWOgQwSqJuVbqmefTAK6Ui8KYAEJ8vk5mFD6hHyB2NYj0QdomZpK+dTzdu/vBFs=
+	t=1728851934; cv=none; b=lXKN7EJ/W1KAddDphCCJzdUW/mgvztY3u6IPmMk9DMfLosXOTozonGh6LOj5t1Ha7b1vvqEOcQkDggp+bYfCh5jjCRRxjLPCclfDXwXTykUuCEs60izCDOrnq3JBwa1ZnXWraFAjAMh2qjX7B+j/mgYdSFI8kW/Ov0zxVI33+Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728851927; c=relaxed/simple;
-	bh=Fj0J825jzpGUhzbd+jhdu/I+6ynYvltWXDjamahmznw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q3AqrK9WvZJlPgqroOV562Kg7ntTmjE1tGQ8ik/HewaED6yIEVNvIQ9RRGdGbe/GZ9LcTs2pI0FETLrC6AKmVIrsQ2LMm+GUU2XqIeeGrxXLd2f3aFLmzFxIsFy1FFaq1R2BGLpQxC6CEZAoQtjfh3uvHp3t6Jy9H0EWIYB7m2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Yr5U/Gee; arc=none smtp.client-ip=46.235.229.95
+	s=arc-20240116; t=1728851934; c=relaxed/simple;
+	bh=MBwMZ4xiO0sumWJtTHTe6GkRXUXySlWfbs3PmjCuG78=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=s3Y92DNpf0QmuORRvmhH2NpG60/bM2vdTsV3HyQTHhKePSWT9G1WW22ISalHR6EiWbvBL6upsIGNZVNnwVQYv5MTrtzfNPeDm2LFOx+Jp+8fJ5cJ7G2vqyP1xwNRPf8Uxt8MtYBnvrqdszoiH2ix2HX47XbZBNXWsTqXfgfkRs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=fBg0dGvr; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=ucizAdyhiCOUunoRreah5hE0Z6dugC99p9oKd7SBn3c=; b=Yr5U/GeeGe/fB90o
-	glrN8yAtk4UE+pz3KL0EulPFuOXV70kbSdrN5w1XSbSCLM/9Y3kRqb46G/Bs0fFQ6kl+iH1QUOHj2
-	J+c+CfCKo2X/C+NukLJmd3gvBRIRwuubRx9A4VfYoVveUKJg1UNoDjVgHL2kLdiSojjG7zpkJujxe
-	iGCcCforhBUSDfO/iW6CpqcFOlRav4zYDCUH8dL7IXXpATdKaxZW/jAkNVdRhlBPyw8cLZPlmr86m
-	5ezl5P67IGfML+nZjw6AOz9QtQ+eIDKWxhOViYdkusiKnR2y21CT9fDe7aYCHdPEvYzClv5f0cSMw
-	K0UrVHAmGBfuFaKMLg==;
+	:Subject; bh=IczDtGTS4Z5CULUm4z191Tp3qUncfTs57+PPNdjNah8=; b=fBg0dGvrShDBM1NT
+	7mxAz6mbR8FJbIf+ZQ0TZaSLO2xWtoPtmfxWoak+VsKHfYF1dYdKYmrDUu6gwu+y58QoD8fNXRSY+
+	oBWT+p4ABTY9NQ5cEw6arClzaclIVIY1VzwnpAVukNGeTn6cZkGd+7I0qjrf4o8Z2OD2ac1FSzdd5
+	JP/KlmjkrwAI7JN3aAx5CA6Tq2e4pyxX0aY1b8Tp33s2CegmaFSufG3Jg0R4yl5zlCmGXto3VuZ1Z
+	aeVf7HZVBIThOL8cKuWvYyCyBu2ZMNzAqiut+0H7BuT/7XsxOQqo4rb4JUYGd1AjL7qUIvkCXlzSr
+	QFng5HnOMj4VnwTnaw==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1t05MK-00AnUX-24;
-	Sun, 13 Oct 2024 20:38:36 +0000
+	id 1t05ML-00AnUX-1m;
+	Sun, 13 Oct 2024 20:38:37 +0000
 From: linux@treblig.org
 To: bharat@chelsio.com,
 	davem@davemloft.net,
@@ -52,10 +53,12 @@ To: bharat@chelsio.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 0/6] cxgb4: Deadcode removal
-Date: Sun, 13 Oct 2024 21:38:25 +0100
-Message-ID: <20241013203831.88051-1-linux@treblig.org>
+Subject: [PATCH net-next 1/6] cxgb4: Remove unused cxgb4_alloc/free_encap_mac_filt
+Date: Sun, 13 Oct 2024 21:38:26 +0100
+Message-ID: <20241013203831.88051-2-linux@treblig.org>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241013203831.88051-1-linux@treblig.org>
+References: <20241013203831.88051-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,38 +69,76 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Hi,
-  This is a bunch of deadcode removal in cxgb4.
-It's all complete function removal rather than any actual change to
-logic.
+cxgb4_alloc_encap_mac_filt() and cxgb4_free_encap_mac_filt() have been
+unused since
+commit 28b3870578ef ("cxgb4: Re-work the logic for mps refcounting")
 
-Build and boot tested, but I don't have the hardware to test
-the actual card.
-
-Dave
+Remove them.
 
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h    |  6 ----
+ .../net/ethernet/chelsio/cxgb4/cxgb4_mps.c    | 30 -------------------
+ 2 files changed, 36 deletions(-)
 
-
-Dr. David Alan Gilbert (6):
-  cxgb4: Remove unused cxgb4_alloc/free_encap_mac_filt
-  cxgb4: Remove unused cxgb4_alloc/free_raw_mac_filt
-  cxgb4: Remove unused cxgb4_get_srq_entry
-  cxgb4: Remove unused cxgb4_scsi_init
-  cxgb4: Remove unused cxgb4_l2t_alloc_switching
-  cxgb4: Remove unused t4_free_ofld_rxqs
-
- drivers/net/ethernet/chelsio/cxgb4/cxgb4.h    | 23 -----
- .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   | 12 ---
- .../net/ethernet/chelsio/cxgb4/cxgb4_mps.c    | 98 -------------------
- .../net/ethernet/chelsio/cxgb4/cxgb4_uld.h    |  2 -
- drivers/net/ethernet/chelsio/cxgb4/l2t.c      | 19 ----
- drivers/net/ethernet/chelsio/cxgb4/l2t.h      |  2 -
- drivers/net/ethernet/chelsio/cxgb4/sge.c      | 16 ---
- drivers/net/ethernet/chelsio/cxgb4/srq.c      | 58 -----------
- drivers/net/ethernet/chelsio/cxgb4/srq.h      |  2 -
- 9 files changed, 232 deletions(-)
-
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+index bbf7641a0fc7..1efb0a73ce0e 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+@@ -2141,12 +2141,6 @@ int cxgb4_free_mac_filt(struct adapter *adap, unsigned int viid,
+ 			unsigned int naddr, const u8 **addr, bool sleep_ok);
+ int cxgb4_init_mps_ref_entries(struct adapter *adap);
+ void cxgb4_free_mps_ref_entries(struct adapter *adap);
+-int cxgb4_alloc_encap_mac_filt(struct adapter *adap, unsigned int viid,
+-			       const u8 *addr, const u8 *mask,
+-			       unsigned int vni, unsigned int vni_mask,
+-			       u8 dip_hit, u8 lookup_type, bool sleep_ok);
+-int cxgb4_free_encap_mac_filt(struct adapter *adap, unsigned int viid,
+-			      int idx, bool sleep_ok);
+ int cxgb4_free_raw_mac_filt(struct adapter *adap,
+ 			    unsigned int viid,
+ 			    const u8 *addr,
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_mps.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_mps.c
+index a020e8490681..0e5663d19fcf 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_mps.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_mps.c
+@@ -187,36 +187,6 @@ int cxgb4_alloc_raw_mac_filt(struct adapter *adap,
+ 	return ret;
+ }
+ 
+-int cxgb4_free_encap_mac_filt(struct adapter *adap, unsigned int viid,
+-			      int idx, bool sleep_ok)
+-{
+-	int ret = 0;
+-
+-	if (!cxgb4_mps_ref_dec(adap, idx))
+-		ret = t4_free_encap_mac_filt(adap, viid, idx, sleep_ok);
+-
+-	return ret;
+-}
+-
+-int cxgb4_alloc_encap_mac_filt(struct adapter *adap, unsigned int viid,
+-			       const u8 *addr, const u8 *mask,
+-			       unsigned int vni, unsigned int vni_mask,
+-			       u8 dip_hit, u8 lookup_type, bool sleep_ok)
+-{
+-	int ret;
+-
+-	ret = t4_alloc_encap_mac_filt(adap, viid, addr, mask, vni, vni_mask,
+-				      dip_hit, lookup_type, sleep_ok);
+-	if (ret < 0)
+-		return ret;
+-
+-	if (cxgb4_mps_ref_inc(adap, addr, ret, mask)) {
+-		ret = -ENOMEM;
+-		t4_free_encap_mac_filt(adap, viid, ret, sleep_ok);
+-	}
+-	return ret;
+-}
+-
+ int cxgb4_init_mps_ref_entries(struct adapter *adap)
+ {
+ 	spin_lock_init(&adap->mps_ref_lock);
 -- 
 2.47.0
 
