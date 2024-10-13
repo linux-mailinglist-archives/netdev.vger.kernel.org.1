@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E396199BBBE
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:39:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F8599BBC0
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38C8DB20F15
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:39:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3EE5B20DA5
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E980155A25;
-	Sun, 13 Oct 2024 20:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00536156C69;
+	Sun, 13 Oct 2024 20:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="s3g6eN04"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="KfabtnhZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F3B1514CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EBB14F9E2;
 	Sun, 13 Oct 2024 20:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728851929; cv=none; b=IRaEyDhE9jhRWMuvvlRm95/PFlfXrvlcxD0fDR3UdySyxl7GgVr46T7TO6SZb9hZKB61OdF6CRfWr09I7pePsTN6sOFNTowvUmw4daEyamifmZiaqEf0GWWHknjyf99uqHaxHhgVzWEbkaQSlJfU89ULoMwtVsag0y1GgvMZJdg=
+	t=1728851929; cv=none; b=WXSgC8TK/LrWq7XQ9tK7+IQcNrP9a19e8lOGK8Durwn1w5SS0UFigVafs1uZAxSp3c807aFh46qyK2tvYwbGT8VMmNRg6NJDQEb1GIo9RHCWwN4VLNhz/2sWNK9ZBYeqH+ayE50JSdnETIPS+lOVgtHZKeNkzn3V03y0lrG2Dnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728851929; c=relaxed/simple;
-	bh=7/r3ahWmKb5y3GrgXA4FtVlNFSHbjzDmV4Rb2+s+4Io=;
+	bh=RlpXOidSIkDtXwfikagOesfLxTriDN+l1/Ar8iVwTQg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FEGuvPnDWEeegIfvMN6iPXaUBkhIeEgLZfXscichDe5gHE2O55RpbRobvzqjqbIoUrS0q5bAUf3puxEmrIB4FY2CRJBR6XT1ViVYfVyRMVXoPzCrbgTh5jlR3Redw4MXj07kiZ6wP0MV0qMNdWzvayjqtB4j/M4hHRtv50S/jH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=s3g6eN04; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=LtFmR/qjv30bLwpdKO/Tlfr0xSzrqgNh4V9Kx+EumizdRJ1xscyzwav95+X1vyPLHNUa0ihef80jOJCDonDuzA/x4orNvnCHId3m/zrafLUQ3XESQ3mfmYEh/EaeBHCSh0SL3uQKlKU2vOh8zX9fTJ+C1TNCPSYwkYC+D4z2uJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=KfabtnhZ; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=T7awRtjFbenc+GOlGd9rhHppedzLJGsTCN5jnGB4TbE=; b=s3g6eN04lgIN9tdA
-	zZ3lMblJ9cH9uduJ+X5f86CvcFw/O7d+cgctdMTfQLVVwuIoi12ccPuhd+8WhpBqJpvYtJawtB9kY
-	ujzX71fiZPD4xUf+M+rRHDAaNSkFAJplCv/6JjFwkljByT08up9wa0vJ/8sGY7CEqw3k6PZaQiIbE
-	ApiBgNfqvzOyr69m6bQIjrKw4D5zSQZ/bxG/Ig/YPjB8m9HI4A2uXALJ6Mzx3lJHlF9v20wQUAY0H
-	PfUE6bmuIxs7PaJIhEar7uuJwfKQdmU6yEF9+4ttGiuf8HWFz8Vrkh1TpDcGFpPcc1Lj+iEMKLzkK
-	iCprPF0EeZD/RPtBOw==;
+	:Subject; bh=NZNaeQVpUHOr17M4VqCALkPHgzs8AAqDAyl+ctHVJo8=; b=KfabtnhZLzFOCW1g
+	6qVeF5hwO2Iu+fOSkrU4Rrk6AKOFKzXb9k+Z/7pgZ5OCw3znfqcIT0iyHh1Ym86+mFYuDbcs2Y3ar
+	wGiGInJw4eQryqfmqT0AXPcYl3X93brjfQ09703GLmFaJN0aBYE/vtJIv4owzQn35m9rS+aiG5q3B
+	wcZlt2AgYoB6hkKtrIe8A74fvcypgOukBWHNHJ0AEm/NxvpXFi6d7dk1N79zvQEQqS2oHMjbSjidK
+	y5nT59IXDixE/716GKIM6TYsU05rS5ebET7vD/J0wZjw5BkfTae747IR6AuLG2ipJUEjMH2gHFrIW
+	G+XZMxj8m+u2EEKOJA==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1t05MO-00AnUX-1G;
-	Sun, 13 Oct 2024 20:38:40 +0000
+	id 1t05MP-00AnUX-0p;
+	Sun, 13 Oct 2024 20:38:41 +0000
 From: linux@treblig.org
 To: bharat@chelsio.com,
 	davem@davemloft.net,
@@ -53,9 +53,9 @@ To: bharat@chelsio.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 5/6] cxgb4: Remove unused cxgb4_l2t_alloc_switching
-Date: Sun, 13 Oct 2024 21:38:30 +0100
-Message-ID: <20241013203831.88051-6-linux@treblig.org>
+Subject: [PATCH net-next 6/6] cxgb4: Remove unused t4_free_ofld_rxqs
+Date: Sun, 13 Oct 2024 21:38:31 +0100
+Message-ID: <20241013203831.88051-7-linux@treblig.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241013203831.88051-1-linux@treblig.org>
 References: <20241013203831.88051-1-linux@treblig.org>
@@ -69,61 +69,57 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-cxgb4_l2t_alloc_switching() has been unused since it was added in
-commit f7502659cec8 ("cxgb4: Add API to alloc l2t entry; also update
-existing ones")
+t4_free_ofld_rxqs() has been unused since
+commit 0fbc81b3ad51 ("chcr/cxgb4i/cxgbit/RDMA/cxgb4: Allocate resources
+dynamically for all cxgb4 ULD's")
 
 Remove it.
 
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- drivers/net/ethernet/chelsio/cxgb4/l2t.c | 19 -------------------
- drivers/net/ethernet/chelsio/cxgb4/l2t.h |  2 --
- 2 files changed, 21 deletions(-)
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h |  1 -
+ drivers/net/ethernet/chelsio/cxgb4/sge.c   | 16 ----------------
+ 2 files changed, 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/l2t.c b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-index 1e5f5b1a22a6..c02b4e9c06b2 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-@@ -608,25 +608,6 @@ struct l2t_entry *t4_l2t_alloc_switching(struct adapter *adap, u16 vlan,
- 	return e;
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+index 1c302dfd6503..75bd69ff61a8 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+@@ -1608,7 +1608,6 @@ void t4_os_portmod_changed(struct adapter *adap, int port_id);
+ void t4_os_link_changed(struct adapter *adap, int port_id, int link_stat);
+ 
+ void t4_free_sge_resources(struct adapter *adap);
+-void t4_free_ofld_rxqs(struct adapter *adap, int n, struct sge_ofld_rxq *q);
+ irq_handler_t t4_intr_handler(struct adapter *adap);
+ netdev_tx_t t4_start_xmit(struct sk_buff *skb, struct net_device *dev);
+ int cxgb4_selftest_lb_pkt(struct net_device *netdev);
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c b/drivers/net/ethernet/chelsio/cxgb4/sge.c
+index de52bcb884c4..a7d76a8ed050 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
+@@ -4874,22 +4874,6 @@ void free_rspq_fl(struct adapter *adap, struct sge_rspq *rq,
+ 	}
  }
  
 -/**
-- * cxgb4_l2t_alloc_switching - Allocates an L2T entry for switch filters
-- * @dev: net_device pointer
-- * @vlan: VLAN Id
-- * @port: Associated port
-- * @dmac: Destination MAC address to add to L2T
-- * Returns pointer to the allocated l2t entry
+- *      t4_free_ofld_rxqs - free a block of consecutive Rx queues
+- *      @adap: the adapter
+- *      @n: number of queues
+- *      @q: pointer to first queue
 - *
-- * Allocates an L2T entry for use by switching rule of a filter
+- *      Release the resources of a consecutive block of offload Rx queues.
 - */
--struct l2t_entry *cxgb4_l2t_alloc_switching(struct net_device *dev, u16 vlan,
--					    u8 port, u8 *dmac)
+-void t4_free_ofld_rxqs(struct adapter *adap, int n, struct sge_ofld_rxq *q)
 -{
--	struct adapter *adap = netdev2adap(dev);
--
--	return t4_l2t_alloc_switching(adap, vlan, port, dmac);
+-	for ( ; n; n--, q++)
+-		if (q->rspq.desc)
+-			free_rspq_fl(adap, &q->rspq,
+-				     q->fl.size ? &q->fl : NULL);
 -}
--EXPORT_SYMBOL(cxgb4_l2t_alloc_switching);
 -
- struct l2t_data *t4_init_l2t(unsigned int l2t_start, unsigned int l2t_end)
+ void t4_sge_free_ethofld_txq(struct adapter *adap, struct sge_eohw_txq *txq)
  {
- 	unsigned int l2t_size;
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/l2t.h b/drivers/net/ethernet/chelsio/cxgb4/l2t.h
-index 340fecb28a13..8aad7e9dee6d 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/l2t.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/l2t.h
-@@ -115,8 +115,6 @@ struct l2t_entry *cxgb4_l2t_get(struct l2t_data *d, struct neighbour *neigh,
- 				unsigned int priority);
- u64 cxgb4_select_ntuple(struct net_device *dev,
- 			const struct l2t_entry *l2t);
--struct l2t_entry *cxgb4_l2t_alloc_switching(struct net_device *dev, u16 vlan,
--					    u8 port, u8 *dmac);
- void t4_l2t_update(struct adapter *adap, struct neighbour *neigh);
- struct l2t_entry *t4_l2t_alloc_switching(struct adapter *adap, u16 vlan,
- 					 u8 port, u8 *dmac);
+ 	if (txq->q.desc) {
 -- 
 2.47.0
 
