@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-134993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C146799BBE6
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 23:03:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0315E99BBB6
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:38:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 670A22829CE
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 21:03:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27C761C20C6E
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00AC1494A5;
-	Sun, 13 Oct 2024 21:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6535F14D2A0;
+	Sun, 13 Oct 2024 20:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="BR/SWXqc"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Yr5U/Gee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx14lb.world4you.com (mx14lb.world4you.com [81.19.149.124])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D40148314
-	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 21:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0470149E13;
+	Sun, 13 Oct 2024 20:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728853405; cv=none; b=Qut4UsHMJEFJRud7UjujzYG4nZ2Qs9AFn4ymUSfj6R/92k3aItTiNKsubqbqU8JUNZOUOrAKEeMpQ3mpiAG3C5YfnlcPQuZApjckbRiSyqroX3zr5/owxRsjLxN94pOyXJ8PZNdfoqBiUzM9qQdgBgMfafvwH4wGBAhbgTY4Zkg=
+	t=1728851927; cv=none; b=bVtBe2+FL3Z/VJt1/odIo8EY9Ey/zOuAOB6k7uk+IzPJbB1bQ9le+WZyxmX6ypKSBGn8SJKMGowWR4mPcawp1JxtlWlDfJoRSfr+YSOfFBcgnWOgQwSqJuVbqmefTAK6Ui8KYAEJ8vk5mFD6hHyB2NYj0QdomZpK+dTzdu/vBFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728853405; c=relaxed/simple;
-	bh=9CQpwdgXVc21I8EUQ4DUE2KYJ69fMnFI7RjT7KcNiM0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nhoiwB5Q6h/PaB/i+6kVWv5RBK/V8yHoUbO174RyjoaZmAXKeKDX/2McEglOkngZrIOsPlwlQzqA7frnz/5jC4up/TLgwzgljvdGvP6clRUe2u0FoRFa1c1oPrm4/UV4B182OibZNSjeHDVGcb3NWormurC/Cwjw88Aw+Jf6HvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=BR/SWXqc; arc=none smtp.client-ip=81.19.149.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=19LHjx0sTM0kv9XanzWE8FODtpIz64O5KVgtFRfu2pg=; b=BR/SWXqcnkjCCWdpyB32ql0pPa
-	gJ1TxElsH/THb7IGM+1fNhCeAaAiPp4UQIg2ZgtAg7om6weUiWSn5mUTgW3wL5plBUIfKLR7edi2z
-	gcHYPN2V4D8Wmc43/P2cEwcXC+Udo+dMs5ZGCarxE0uLzkE9RK5XhdPfVGbFrDze/ptE=;
-Received: from [88.117.56.173] (helo=hornet.engleder.at)
-	by mx14lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1t0594-000000008Un-3qzu;
-	Sun, 13 Oct 2024 22:24:55 +0200
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
+	s=arc-20240116; t=1728851927; c=relaxed/simple;
+	bh=Fj0J825jzpGUhzbd+jhdu/I+6ynYvltWXDjamahmznw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q3AqrK9WvZJlPgqroOV562Kg7ntTmjE1tGQ8ik/HewaED6yIEVNvIQ9RRGdGbe/GZ9LcTs2pI0FETLrC6AKmVIrsQ2LMm+GUU2XqIeeGrxXLd2f3aFLmzFxIsFy1FFaq1R2BGLpQxC6CEZAoQtjfh3uvHp3t6Jy9H0EWIYB7m2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Yr5U/Gee; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=ucizAdyhiCOUunoRreah5hE0Z6dugC99p9oKd7SBn3c=; b=Yr5U/GeeGe/fB90o
+	glrN8yAtk4UE+pz3KL0EulPFuOXV70kbSdrN5w1XSbSCLM/9Y3kRqb46G/Bs0fFQ6kl+iH1QUOHj2
+	J+c+CfCKo2X/C+NukLJmd3gvBRIRwuubRx9A4VfYoVveUKJg1UNoDjVgHL2kLdiSojjG7zpkJujxe
+	iGCcCforhBUSDfO/iW6CpqcFOlRav4zYDCUH8dL7IXXpATdKaxZW/jAkNVdRhlBPyw8cLZPlmr86m
+	5ezl5P67IGfML+nZjw6AOz9QtQ+eIDKWxhOViYdkusiKnR2y21CT9fDe7aYCHdPEvYzClv5f0cSMw
+	K0UrVHAmGBfuFaKMLg==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1t05MK-00AnUX-24;
+	Sun, 13 Oct 2024 20:38:36 +0000
+From: linux@treblig.org
+To: bharat@chelsio.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>
-Subject: [PATCH RFC net-next] net: phy: micrel: Improve loopback support if autoneg is enabled
-Date: Sun, 13 Oct 2024 22:24:30 +0200
-Message-Id: <20241013202430.93851-1-gerhard@engleder-embedded.com>
-X-Mailer: git-send-email 2.39.2
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next 0/6] cxgb4: Deadcode removal
+Date: Sun, 13 Oct 2024 21:38:25 +0100
+Message-ID: <20241013203831.88051-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,78 +63,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-AV-Do-Run: Yes
-X-ACL-Warn: X-W4Y-Internal
 
-Prior to commit 6ff3cddc365b it was possible to enable loopback with
-a defined speed. First a fixed speed was set with ETHTOOL_SLINKSETTINGS
-and afterwards the loopback was enabled. This worked, because
-genphy_loopback() uses the current speed and duplex. I used this
-mechanism to test tsnep in loopback with different speeds. A KSZ9031 PHY
-is used.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-With commit 6ff3cddc365b for 1000 Mbit/s auto negotiation was enabled.
-Setting a fixed speed with ETHTOOL_SLINKSETTINGS does not work anymore
-for 1000 Mbit/s as speed and duplex of the PHY now depend on the result
-of the auto negotiation. As a result, genphy_loopback() also depends on
-the result of the auto negotiation. But enabling loopback shall be
-independent of any auto negotiation process.
+Hi,
+  This is a bunch of deadcode removal in cxgb4.
+It's all complete function removal rather than any actual change to
+logic.
 
-Make loopback of KSZ9031 PHY work even if current speed and/or duplex of
-PHY are unkown because of autoneg.
+Build and boot tested, but I don't have the hardware to test
+the actual card.
 
-Fixes: 6ff3cddc365b ("net: phylib: do not disable autoneg for fixed speeds >= 1G")
-Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
----
- drivers/net/phy/micrel.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+Dave
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 65b0a3115e14..3cbe40265190 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1028,6 +1028,32 @@ static int ksz9021_config_init(struct phy_device *phydev)
- #define MII_KSZ9031RN_EDPD		0x23
- #define MII_KSZ9031RN_EDPD_ENABLE	BIT(0)
- 
-+static int ksz9031_set_loopback(struct phy_device *phydev, bool enable)
-+{
-+	if (enable) {
-+		u16 ctl = BMCR_LOOPBACK;
-+		int ret, val;
-+
-+		if ((phydev->speed != SPEED_10) && (phydev->speed != SPEED_100))
-+			phydev->speed = SPEED_1000;
-+		phydev->duplex = DUPLEX_FULL;
-+
-+		ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-+
-+		phy_modify(phydev, MII_BMCR, ~0, ctl);
-+
-+		ret = phy_read_poll_timeout(phydev, MII_BMSR, val,
-+					    val & BMSR_LSTATUS, 5000, 500000,
-+					    true);
-+		if (ret)
-+			return ret;
-+	} else {
-+		return genphy_loopback(phydev, enable);
-+	}
-+
-+	return 0;
-+}
-+
- static int ksz9031_of_load_skew_values(struct phy_device *phydev,
- 				       const struct device_node *of_node,
- 				       u16 reg, size_t field_sz,
-@@ -5478,6 +5504,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.resume		= kszphy_resume,
- 	.cable_test_start	= ksz9x31_cable_test_start,
- 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
-+	.set_loopback	= ksz9031_set_loopback,
- }, {
- 	.phy_id		= PHY_ID_LAN8814,
- 	.phy_id_mask	= MICREL_PHY_ID_MASK,
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+
+
+Dr. David Alan Gilbert (6):
+  cxgb4: Remove unused cxgb4_alloc/free_encap_mac_filt
+  cxgb4: Remove unused cxgb4_alloc/free_raw_mac_filt
+  cxgb4: Remove unused cxgb4_get_srq_entry
+  cxgb4: Remove unused cxgb4_scsi_init
+  cxgb4: Remove unused cxgb4_l2t_alloc_switching
+  cxgb4: Remove unused t4_free_ofld_rxqs
+
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h    | 23 -----
+ .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   | 12 ---
+ .../net/ethernet/chelsio/cxgb4/cxgb4_mps.c    | 98 -------------------
+ .../net/ethernet/chelsio/cxgb4/cxgb4_uld.h    |  2 -
+ drivers/net/ethernet/chelsio/cxgb4/l2t.c      | 19 ----
+ drivers/net/ethernet/chelsio/cxgb4/l2t.h      |  2 -
+ drivers/net/ethernet/chelsio/cxgb4/sge.c      | 16 ---
+ drivers/net/ethernet/chelsio/cxgb4/srq.c      | 58 -----------
+ drivers/net/ethernet/chelsio/cxgb4/srq.h      |  2 -
+ 9 files changed, 232 deletions(-)
+
 -- 
-2.39.2
+2.47.0
 
 
