@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-134973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20FC99BB67
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:18:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D28399BB70
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 22:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E41C81C20ADF
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:18:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F3CBB20CC9
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA0E153812;
-	Sun, 13 Oct 2024 20:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3213155389;
+	Sun, 13 Oct 2024 20:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="kXPfAbHE"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="W5ceyRck"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33FE14A4D1;
-	Sun, 13 Oct 2024 20:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9DF1547C8;
+	Sun, 13 Oct 2024 20:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728850691; cv=none; b=cfefXfUzPXSZUdIu1v08fPgjfgh8GzDwJz6A7//49wrpkP30OsJgRFZf5xF0onffE3korKai47fG0lGyO5rtwF2rA6tUal5bemNzZqWiYsV8WG4e65670RsrjZ8NF+K+ho0ufaFYqAFAuz37ovKiKFFg7Zzm8vWxCqovNTJTlDE=
+	t=1728850693; cv=none; b=Oj0bE0mhuQUoGwADK1qT+0RSnI2MIS+vyCrkG6Uio25wSeYyKpgfdjTLEdkcTw6LopNlx3JsBsolIAxFpzKHtL8QtiQUYCK77sitXMz0pl8dHq0kje4uvlopVlEsRonkH+0zZG1fBRXYaP0Qm25tBCft+hxbfFWFwthds2YClwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728850691; c=relaxed/simple;
-	bh=zDeSKBxm2z8O2RbPJ9sII8/fJpOe3if41TWqeXw6hJs=;
+	s=arc-20240116; t=1728850693; c=relaxed/simple;
+	bh=V5PBUsKncn96bjJ6u6sEVK5EB02JGY/yi9/jA8dXD+0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Rod4FUr0jE9ZUYCc1MwPQgcjiUHNTEExy1daQs6LPGuzerjTEvzL5dCpq7ljsUm9SSlLp9rHIzYa1hxOGpDHbLbQ3wsKjx3iLBk9p0Xydk/LyQhiQSBrfeeZSpHApCj/dbgUbOZnLWbm8kQzUc9kJAO2oGbNdT2lcFXVnOJvHwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=kXPfAbHE; arc=none smtp.client-ip=192.134.164.104
+	 MIME-Version; b=LJPXniyOWj+Hw/dsrcoJ4SEdgzj7lzIWGaGyYze6Ojd8qCa7HQOovfq1KcwBzzZr+4KXSbfhn29R5hFMTC1gyaaGDGwAl4xh2tyXKUwafYO+mkwXHvuM8Jb+kwwsW35QsYasMwLKnZ7OxzqqJIK/8g9L5ybVTxb42xl5lNtSN0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=W5ceyRck; arc=none smtp.client-ip=192.134.164.104
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=inria.fr; s=dc;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=J1tYeT9VeCXpALXQ0bc1ciiw3Tk4RkmKTcpa+Vc2tJM=;
-  b=kXPfAbHE9s/JEwRLLDQseG0jzQD4031m8cn79HtXCapqYMMDRcR2wMtp
-   UgWJV+ZlOr5YNheV5bxu0aRjysYhcA3rxgAnXoresyTL84JnBBwHfKEJx
-   nUr3JX5GTSn/YPGfE/XwHfGo+Y2jSUaM12teN+fwkXW+NJExFVBxEkIzS
-   c=;
+  bh=w6aCSwa7ytGQWGO1WgXKWjeSpz8ULYiZpM+CVF4UzPA=;
+  b=W5ceyRck/ORTx4UMgMCOzTVZ8kE7KmD5/3/1h/Ie5UWlkhD6xyV3+AVL
+   pKdsJBVojKwRj9U9bH6xhs6Fu81wmnvMcktusXNX0fozRk1yBzUCrhC8G
+   Wk4uPXSuqiyVXkOG0y+JDvO/W3Pv3CCsltP8MG5K8x78paS5b+ENsr+ca
+   Q=;
 Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
 X-IronPort-AV: E=Sophos;i="6.11,201,1725314400"; 
-   d="scan'208";a="98968277"
+   d="scan'208";a="98968278"
 Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
   by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2024 22:17:58 +0200
 From: Julia Lawall <Julia.Lawall@inria.fr>
@@ -56,9 +56,9 @@ Cc: kernel-janitors@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 02/17] ipv4: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-Date: Sun, 13 Oct 2024 22:16:49 +0200
-Message-Id: <20241013201704.49576-3-Julia.Lawall@inria.fr>
+Subject: [PATCH 03/17] inetpeer: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Sun, 13 Oct 2024 22:16:50 +0200
+Message-Id: <20241013201704.49576-4-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
 References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
@@ -80,29 +80,42 @@ The changes were made using Coccinelle.
 Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
 ---
- net/ipv4/fib_trie.c |    8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ net/ipv4/inetpeer.c |    9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 09e31757e96c..161f5526b86c 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -292,15 +292,9 @@ static const int inflate_threshold = 50;
- static const int halve_threshold_root = 15;
- static const int inflate_threshold_root = 30;
- 
--static void __alias_free_mem(struct rcu_head *head)
--{
--	struct fib_alias *fa = container_of(head, struct fib_alias, rcu);
--	kmem_cache_free(fn_alias_kmem, fa);
--}
--
- static inline void alias_free_mem_rcu(struct fib_alias *fa)
- {
--	call_rcu(&fa->rcu, __alias_free_mem);
-+	kfree_rcu(fa, rcu);
+diff --git a/net/ipv4/inetpeer.c b/net/ipv4/inetpeer.c
+index 5bd759963451..5ab56f4cb529 100644
+--- a/net/ipv4/inetpeer.c
++++ b/net/ipv4/inetpeer.c
+@@ -128,11 +128,6 @@ static struct inet_peer *lookup(const struct inetpeer_addr *daddr,
+ 	return NULL;
  }
  
- #define TNODE_VMALLOC_MAX \
+-static void inetpeer_free_rcu(struct rcu_head *head)
+-{
+-	kmem_cache_free(peer_cachep, container_of(head, struct inet_peer, rcu));
+-}
+-
+ /* perform garbage collect on all items stacked during a lookup */
+ static void inet_peer_gc(struct inet_peer_base *base,
+ 			 struct inet_peer *gc_stack[],
+@@ -168,7 +163,7 @@ static void inet_peer_gc(struct inet_peer_base *base,
+ 		if (p) {
+ 			rb_erase(&p->rb_node, &base->rb_root);
+ 			base->total--;
+-			call_rcu(&p->rcu, inetpeer_free_rcu);
++			kfree_rcu(p, rcu);
+ 		}
+ 	}
+ }
+@@ -242,7 +237,7 @@ void inet_putpeer(struct inet_peer *p)
+ 	WRITE_ONCE(p->dtime, (__u32)jiffies);
+ 
+ 	if (refcount_dec_and_test(&p->refcnt))
+-		call_rcu(&p->rcu, inetpeer_free_rcu);
++		kfree_rcu(p, rcu);
+ }
+ EXPORT_SYMBOL_GPL(inet_putpeer);
+ 
 
 
