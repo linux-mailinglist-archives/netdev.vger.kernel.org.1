@@ -1,301 +1,239 @@
-Return-Path: <netdev+bounces-134969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE2099BB2A
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 20:59:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B975D99BB40
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 21:32:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B45D11F21A81
-	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 18:59:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D18F71C20E95
+	for <lists+netdev@lfdr.de>; Sun, 13 Oct 2024 19:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AA619CC09;
-	Sun, 13 Oct 2024 18:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k6beZ14d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C5A814900B;
+	Sun, 13 Oct 2024 19:32:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CED197A68;
-	Sun, 13 Oct 2024 18:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FAF1459E0
+	for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 19:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728845751; cv=none; b=RZIhdPn20u46pKvwLytL6P11Mmlt8IiHvJfWx7C+jYYQCPG3SAr9+zqmimh8UimQigNWg7TvNAn6Zezs9w37blmamTomifMvzgT1DK92Beydtj/ZuXTqmsOwOVrPZmiGTzUOn7zpXLproTsvsKOARZ/rLhYWvO3LshkqqDqgsUA=
+	t=1728847952; cv=none; b=BTeF5gResquC3BvLb9Pbnqiplv3LiTwFaPkwITRPHu11BhM4nX/nYQT/vFKbqsC4iZe9RRBByOmF2TwTNRXzSjAmUgmOkzYku1ydafI16C+a0E2nAT6f22UQ6bnc6lYwsowxZjMH17G0MDi903BxdmD9sHoQU0wl7vd/BQdNpcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728845751; c=relaxed/simple;
-	bh=n5GlTdCtKOmtjAaFIunijEhjxn6K4vforcxuYnG9cJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GqqO7uSrgFHIHUtD0MKTgQHwKyLt7UQWJ4nqbjUvE4U3HUGpSRHSeqE2+4Dxgb6GgBNh49ztatXo49zV+/VLfQwfkqiyDUTGbDZVC9Ea22rEiETAgk1tnXaxlskPVyoJIxkFTaQV5yMS+rRH808hw1GWgxcyZJeRYplKd1RrHv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k6beZ14d; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a99f1fd20c4so189157866b.0;
-        Sun, 13 Oct 2024 11:55:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728845748; x=1729450548; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nXqA2N6PSdeku8lbnGk/r0H6SHXM5r8C6mfKewggPXk=;
-        b=k6beZ14dj1lQG6jpSqamSyfeOqeyPm1p6byFsZuGX9D3L10O2p/l6jhWg8s8qNoqRH
-         +cP7uWvViwFtHoiSMzSfVZfQVrlqFJajIB1+A6xoHwUozvoJRvC5gnmsNM42dbE5wtew
-         eWzUzUAY5EGk87ob8Ip2gA9TfB3DOBRFrbZM/GRnl49W9xneQklcPlne1KjQnBpzTsGd
-         Wi9t6MVrclDmulR/E56JCNR9SwpHwbPWPSlvHK+mLwt3me5WoN0PMW7gJqMtfC5IrFeb
-         U3UMHw0C8SuZHNvgK+d4wv1is531ZTSLO+Gh3QikmKWj/bOplxWbB7fyzdN1NVSt4djG
-         WdkA==
+	s=arc-20240116; t=1728847952; c=relaxed/simple;
+	bh=5IMCkh7XK+8hzLI7GtjWMJ3bu/ultQoSdOa70YKazZ0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JiM+h85h3PstADJ++x6DhwfPh6BaPwmBUKFU3ua4Me57ZH8Jh4Gxy6OyUGLSPt1u71PFWVPxHbEHZu7MtxnzlUd/nWFFfQB6QNfQpskACLqrALEFyytb0oC/dcRFedrffMiJw1Ipr6Ia7eKiU0bK1hpylbjgQDvZHPMbK9/SkQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a3b7ecad71so9854195ab.0
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 12:32:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728845748; x=1729450548;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nXqA2N6PSdeku8lbnGk/r0H6SHXM5r8C6mfKewggPXk=;
-        b=JwFoHRSptyF6Mb6usIPGeOOLF/Vo8fh54B2UFylaTU6blzhe23vNq9PY3ctOTzIFkq
-         H/5Bc1V9H+I8ONdMk5IVGNDC0YnACTylSL4XRaxM6uFcs5ce2WuAs7xD8rW0Puch1gUZ
-         j7PeqcjKoncH2PPUotAjoWfc7XWsk+XEG/52LS4xQfw7KVdHpW7qWLNdJBPIze5csJ7n
-         uJeFoNOhLWsTIwbS0Ezi6KAC+BSKAGVDSmGDH+ONT+sk/BzOp45b2gGY3T/rCSTK8cgZ
-         1wwKbmTDQAjEl7+bDp0QcY+wcMrW5ZY/79xmL/axYCuMEwiSblNZr5q1JGsvqimxK97D
-         b5Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSqn9zPVGWm6P6v9H3eHxCE8Or+tlch8OxZ3NeqrcYcHUW+05H7S/fmhl7qEt6IDKUVVZI8Hz7NMX3osg=@vger.kernel.org, AJvYcCXAzItjBDrWwIDl5zvI4LV16kAPAebh27FlhiDd85LcNFpa3sjj++zfAPpt44FOfRQPwbc8GHCULE0S6pJh0Hoj@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz487lkdcB+goUEkni7SdAsz48w2fh1p2JxOwVZy5WVkfkjApL3
-	sFsNKGlXQnj2du+AIVi1D0L3lrq0xgVdbL8o2DqZkijqczy7ewWZ
-X-Google-Smtp-Source: AGHT+IGDRNNl2WNHKk/RQYIt3X3ZUbDBl2cG/u3cyrPOyqik2hRlsXTDnJIYfMk+W8sAqccVFejf5w==
-X-Received: by 2002:a17:906:6a0f:b0:a9a:196:fc29 with SMTP id a640c23a62f3a-a9a0196fee5mr289924666b.61.1728845748194;
-        Sun, 13 Oct 2024 11:55:48 -0700 (PDT)
-Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a12d384b9sm13500866b.172.2024.10.13.11.55.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Oct 2024 11:55:47 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"Frank Wunderlich" <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Eric Woudstra <ericwouds@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH RFC v1 net-next 12/12] netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
-Date: Sun, 13 Oct 2024 20:55:08 +0200
-Message-ID: <20241013185509.4430-13-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241013185509.4430-1-ericwouds@gmail.com>
-References: <20241013185509.4430-1-ericwouds@gmail.com>
+        d=1e100.net; s=20230601; t=1728847949; x=1729452749;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q5vxLDF4f9NGdanT/PV+W/Ynxu0cCem0tCTu7tK9OAQ=;
+        b=URe61VUpSDtM60MEdYgEd/3FCUo6TtfVbFTA9cbqtu44NWvqy9sc2nkwf0pYaDPerr
+         eXKv8xy6voK32XejAd8BCa1DMfAejgqYWB3+YKg0gN1tN4n0/C29vXjQ/6wYWrCRh1HV
+         wl4KFCTFLU7PChv7oD2PXokfEPOF1qd2fdfRHTYmEvjUDDen9Y/myMSnr+oqAT5+tWjm
+         ttGODW05E2PiVO5UtsGlbHqzN5NQFyx7ENz7tFTBmiXP0pQJtDeXPZaeQDUgQchSNXN7
+         l1nXUBZmAgrZtP9tsptAdaCbGeIvCQl0aNctRXvnL3Q0zA5Nx+jJDyQNfvMuYosM2nSd
+         0AVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUjRsDstp3jPYuO5SXJPBjaG7aDPr88brG2i/TWLrLp7npl+HVR//PesnXYrufJuxlaJCR0do4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCjnLU0GcGTvqB2R1sIaBzOpAaTnzIHMbuDbrutCz74JwljdZr
+	AHLMJ6Wo10Y6dSn2vVQv3kxSaR2LWzOjVl5NE8WDLDPDEurwcSZb9en4TLoJdxQFerx4P8iiFl9
+	mcWdVo+ev1QCbsI4LNtNLGXskIb0z0G5BjQaQ0TN7+vY6D1LsrN7aWJc=
+X-Google-Smtp-Source: AGHT+IG8qjvwAtLyhycOsHiEOdPCCpwtKgV09YbYTxtre+KgVeuGMFBDND42QQGVZRXLYACNlctRnmUhG8ZodkAVrbTvXNv3n4dC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:168e:b0:3a3:9337:4cf4 with SMTP id
+ e9e14a558f8ab-3a3b5f21b3cmr61233895ab.4.1728847949230; Sun, 13 Oct 2024
+ 12:32:29 -0700 (PDT)
+Date: Sun, 13 Oct 2024 12:32:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <670c204d.050a0220.3e960.0045.GAE@google.com>
+Subject: [syzbot] [bpf?] [net?] KASAN: slab-use-after-free Read in page_pool_put_unrefed_netmem
+From: syzbot <syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	hawk@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Edit nft_flow_offload_eval() to make it possible to handle a flowtable of
-the nft bridge family.
+Hello,
 
-Use nft_flow_offload_bridge_init() to fill the flow tuples. It uses
-nft_dev_fill_bridge_path() in each direction.
+syzbot found the following issue on:
 
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+HEAD commit:    80cb3fb61135 Merge branch 'for-next/core', remote-tracking..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=15485780580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b9f31443a725c681
+dashboard link: https://syzkaller.appspot.com/bug?extid=204a4382fcb3311f3858
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b1e78177ae84/disk-80cb3fb6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/656db61d4272/vmlinux-80cb3fb6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e5b0b3f63a30/Image-80cb3fb6.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in page_pool_put_unrefed_netmem+0x8b8/0x11f4
+Read of size 8 at addr ffff0000c924c708 by task syz-executor/7103
+
+CPU: 0 UID: 0 PID: 7103 Comm: syz-executor Not tainted 6.12.0-rc1-syzkaller-g80cb3fb61135 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Call trace:
+ dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x198/0x538 mm/kasan/report.c:488
+ kasan_report+0xd8/0x138 mm/kasan/report.c:601
+ __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
+ page_pool_put_unrefed_netmem+0x8b8/0x11f4
+ page_pool_put_netmem include/net/page_pool/helpers.h:323 [inline]
+ page_pool_put_full_page include/net/page_pool/helpers.h:368 [inline]
+ __xdp_return+0x3b8/0x760 net/core/xdp.c:387
+ xdp_return_frame+0x94/0x2cc net/core/xdp.c:422
+ tun_do_read+0x4dc/0x13b8 drivers/net/tun.c:2246
+ tun_chr_read_iter+0x114/0x25c drivers/net/tun.c:2274
+ new_sync_read fs/read_write.c:488 [inline]
+ vfs_read+0x740/0x970 fs/read_write.c:569
+ ksys_read+0x15c/0x26c fs/read_write.c:712
+ __do_sys_read fs/read_write.c:722 [inline]
+ __se_sys_read fs/read_write.c:720 [inline]
+ __arm64_sys_read+0x7c/0x90 fs/read_write.c:720
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:732
+ el0t_64_sync_handler+0x84/0x108 arch/arm64/kernel/entry-common.c:750
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+
+Allocated by task 7090:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x40/0x78 mm/kasan/common.c:68
+ kasan_save_alloc_info+0x40/0x50 mm/kasan/generic.c:565
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0xac/0xc4 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:257 [inline]
+ __kmalloc_cache_node_noprof+0x274/0x3b8 mm/slub.c:4308
+ kmalloc_node_noprof include/linux/slab.h:901 [inline]
+ page_pool_create_percpu+0x94/0xa48 net/core/page_pool.c:335
+ page_pool_create+0x24/0x34 net/core/page_pool.c:364
+ xdp_test_run_setup net/bpf/test_run.c:182 [inline]
+ bpf_test_run_xdp_live+0x27c/0x1a90 net/bpf/test_run.c:382
+ bpf_prog_test_run_xdp+0x6a0/0xfc4 net/bpf/test_run.c:1317
+ bpf_prog_test_run+0x294/0x33c kernel/bpf/syscall.c:4247
+ __sys_bpf+0x314/0x5f0 kernel/bpf/syscall.c:5652
+ __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
+ __arm64_sys_bpf+0x80/0x98 kernel/bpf/syscall.c:5739
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:732
+ el0t_64_sync_handler+0x84/0x108 arch/arm64/kernel/entry-common.c:750
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+
+Freed by task 6473:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x40/0x78 mm/kasan/common.c:68
+ kasan_save_free_info+0x54/0x6c mm/kasan/generic.c:579
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x64/0x8c mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:2343 [inline]
+ slab_free mm/slub.c:4580 [inline]
+ kfree+0x184/0x47c mm/slub.c:4728
+ __page_pool_destroy net/core/page_pool.c:1018 [inline]
+ page_pool_release+0x780/0x820 net/core/page_pool.c:1056
+ page_pool_release_retry+0x30/0x24c net/core/page_pool.c:1068
+ process_one_work+0x7bc/0x1600 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x97c/0xeec kernel/workqueue.c:3391
+ kthread+0x288/0x310 kernel/kthread.c:389
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+
+Last potentially related work creation:
+ kasan_save_stack+0x40/0x6c mm/kasan/common.c:47
+ __kasan_record_aux_stack+0xd0/0xec mm/kasan/generic.c:541
+ kasan_record_aux_stack_noalloc+0x14/0x20 mm/kasan/generic.c:551
+ insert_work+0x54/0x2d4 kernel/workqueue.c:2183
+ __queue_work+0xe20/0x1308 kernel/workqueue.c:2339
+ delayed_work_timer_fn+0x74/0x90 kernel/workqueue.c:2485
+ call_timer_fn+0x1b4/0x8e8 kernel/time/timer.c:1794
+ expire_timers kernel/time/timer.c:1840 [inline]
+ __run_timers kernel/time/timer.c:2419 [inline]
+ __run_timer_base+0x59c/0x7b4 kernel/time/timer.c:2430
+ run_timer_base kernel/time/timer.c:2439 [inline]
+ run_timer_softirq+0xcc/0x194 kernel/time/timer.c:2449
+ handle_softirqs+0x2e0/0xbf8 kernel/softirq.c:554
+ __do_softirq+0x14/0x20 kernel/softirq.c:588
+
+The buggy address belongs to the object at ffff0000c924c000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 1800 bytes inside of
+ freed 2048-byte region [ffff0000c924c000, ffff0000c924c800)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x109248
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x5ffc00000000040(head|node=0|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 05ffc00000000040 ffff0000c0002000 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000000080008 00000001f5000000 0000000000000000
+head: 05ffc00000000040 ffff0000c0002000 dead000000000100 dead000000000122
+head: 0000000000000000 0000000000080008 00000001f5000000 0000000000000000
+head: 05ffc00000000003 fffffdffc3249201 ffffffffffffffff 0000000000000000
+head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff0000c924c600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff0000c924c680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff0000c924c700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                      ^
+ ffff0000c924c780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff0000c924c800: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
 ---
- net/netfilter/nft_flow_offload.c | 142 +++++++++++++++++++++++++++++--
- 1 file changed, 137 insertions(+), 5 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
-index 2923286d475e..bd4850691baa 100644
---- a/net/netfilter/nft_flow_offload.c
-+++ b/net/netfilter/nft_flow_offload.c
-@@ -184,6 +184,129 @@ static bool nft_flowtable_find_dev(const struct net_device *dev,
- 	return found;
- }
- 
-+static int nft_dev_fill_bridge_path(struct flow_offload *flow,
-+				    struct nft_flowtable *ft,
-+				    const struct nft_pktinfo *pkt,
-+				    enum ip_conntrack_dir dir,
-+				    const struct net_device *src_dev,
-+				    const struct net_device *dst_dev,
-+				    unsigned char *src_ha,
-+				    unsigned char *dst_ha)
-+{
-+	struct flow_offload_tuple_rhash *th = flow->tuplehash;
-+	struct net_device_path_stack stack;
-+	struct net_device_path_ctx ctx = {};
-+	struct nft_forward_info info = {};
-+	int i, j = 0;
-+
-+	for (i = th[dir].tuple.encap_num - 1; i >= 0 ; i--) {
-+		if (info.num_encaps >= NF_FLOW_TABLE_ENCAP_MAX)
-+			return -1;
-+		info.encap[info.num_encaps].id = th[dir].tuple.encap[i].id;
-+		info.encap[info.num_encaps].proto = th[dir].tuple.encap[i].proto;
-+		info.num_encaps++;
-+
-+		if (th[dir].tuple.encap[i].proto == htons(ETH_P_PPP_SES))
-+			continue;
-+
-+		if (ctx.num_vlans >= NET_DEVICE_PATH_VLAN_MAX)
-+			return -1;
-+		ctx.vlan[ctx.num_vlans].id = th[dir].tuple.encap[i].id;
-+		ctx.vlan[ctx.num_vlans].proto = th[dir].tuple.encap[i].proto;
-+		ctx.num_vlans++;
-+	}
-+	ctx.dev = src_dev;
-+	ether_addr_copy(ctx.daddr, dst_ha);
-+
-+	if (dev_fill_bridge_path(&ctx, &stack) < 0)
-+		return -1;
-+
-+	nft_dev_path_info(&stack, &info, dst_ha, &ft->data);
-+
-+	if (!info.indev || info.indev != dst_dev)
-+		return -1;
-+
-+	th[!dir].tuple.iifidx = info.indev->ifindex;
-+	for (i = info.num_encaps - 1; i >= 0; i--) {
-+		th[!dir].tuple.encap[j].id = info.encap[i].id;
-+		th[!dir].tuple.encap[j].proto = info.encap[i].proto;
-+		if (info.ingress_vlans & BIT(i))
-+			th[!dir].tuple.in_vlan_ingress |= BIT(j);
-+		j++;
-+	}
-+	th[!dir].tuple.encap_num = info.num_encaps;
-+
-+	th[dir].tuple.mtu = dst_dev->mtu;
-+	ether_addr_copy(th[dir].tuple.out.h_source, src_ha);
-+	ether_addr_copy(th[dir].tuple.out.h_dest, dst_ha);
-+	th[dir].tuple.out.ifidx = info.outdev->ifindex;
-+	th[dir].tuple.out.hw_ifidx = info.hw_outdev->ifindex;
-+	th[dir].tuple.xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
-+
-+	return 0;
-+}
-+
-+static int nft_flow_offload_bridge_init(struct flow_offload *flow,
-+					const struct nft_pktinfo *pkt,
-+					enum ip_conntrack_dir dir,
-+					struct nft_flowtable *ft)
-+{
-+	struct ethhdr *eth = eth_hdr(pkt->skb);
-+	struct flow_offload_tuple *tuple;
-+	const struct net_device *out_dev;
-+	const struct net_device *in_dev;
-+	int err, i = 0;
-+
-+	in_dev = nft_in(pkt);
-+	if (!in_dev || !nft_flowtable_find_dev(in_dev, ft))
-+		return -1;
-+
-+	out_dev = nft_out(pkt);
-+	if (!out_dev || !nft_flowtable_find_dev(out_dev, ft))
-+		return -1;
-+
-+	tuple =  &flow->tuplehash[!dir].tuple;
-+
-+	if (skb_vlan_tag_present(pkt->skb)) {
-+		tuple->encap[i].id = skb_vlan_tag_get(pkt->skb);
-+		tuple->encap[i].proto = pkt->skb->vlan_proto;
-+		i++;
-+	}
-+	switch (pkt->skb->protocol) {
-+	case htons(ETH_P_8021Q):
-+		struct vlan_hdr *vhdr;
-+
-+		vhdr = (struct vlan_hdr *)skb_network_header(pkt->skb);
-+		tuple->encap[i].id = ntohs(vhdr->h_vlan_TCI);
-+		tuple->encap[i].proto = pkt->skb->protocol;
-+		i++;
-+		break;
-+	case htons(ETH_P_PPP_SES):
-+		struct pppoe_hdr *phdr;
-+
-+		phdr = (struct pppoe_hdr *)skb_network_header(pkt->skb);
-+		tuple->encap[i].id = ntohs(phdr->sid);
-+		tuple->encap[i].proto = pkt->skb->protocol;
-+		i++;
-+		break;
-+	}
-+	tuple->encap_num = i;
-+
-+	err = nft_dev_fill_bridge_path(flow, ft, pkt, !dir, out_dev, in_dev,
-+				       eth->h_dest, eth->h_source);
-+	if (err < 0)
-+		return err;
-+
-+	memset(tuple->encap, 0, sizeof(tuple->encap));
-+
-+	err = nft_dev_fill_bridge_path(flow, ft, pkt, dir, in_dev, out_dev,
-+				       eth->h_source, eth->h_dest);
-+	if (err < 0)
-+		return err;
-+
-+	return 0;
-+}
-+
- static void nft_dev_forward_path(struct nf_flow_route *route,
- 				 const struct nf_conn *ct,
- 				 enum ip_conntrack_dir dir,
-@@ -294,6 +417,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- {
- 	struct nft_flow_offload *priv = nft_expr_priv(expr);
- 	struct nf_flowtable *flowtable = &priv->flowtable->data;
-+	bool routing = (flowtable->type->family != NFPROTO_BRIDGE);
- 	struct tcphdr _tcph, *tcph = NULL;
- 	struct nf_flow_route route = {};
- 	enum ip_conntrack_info ctinfo;
-@@ -347,14 +471,20 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- 		goto out;
- 
- 	dir = CTINFO2DIR(ctinfo);
--	if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
--		goto err_flow_route;
-+	if (routing) {
-+		if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
-+			goto err_flow_route;
-+	}
- 
- 	flow = flow_offload_alloc(ct);
- 	if (!flow)
- 		goto err_flow_alloc;
- 
--	flow_offload_route_init(flow, &route);
-+	if (routing)
-+		flow_offload_route_init(flow, &route);
-+	else
-+		if (nft_flow_offload_bridge_init(flow, pkt, dir, priv->flowtable) < 0)
-+			goto err_flow_route;
- 
- 	if (tcph) {
- 		ct->proto.tcp.seen[0].flags |= IP_CT_TCP_FLAG_BE_LIBERAL;
-@@ -407,8 +537,10 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- err_flow_add:
- 	flow_offload_free(flow);
- err_flow_alloc:
--	dst_release(route.tuple[dir].dst);
--	dst_release(route.tuple[!dir].dst);
-+	if (routing) {
-+		dst_release(route.tuple[dir].dst);
-+		dst_release(route.tuple[!dir].dst);
-+	}
- err_flow_route:
- 	clear_bit(IPS_OFFLOAD_BIT, &ct->status);
- out:
--- 
-2.45.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
