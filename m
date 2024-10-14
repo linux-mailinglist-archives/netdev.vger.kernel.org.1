@@ -1,99 +1,209 @@
-Return-Path: <netdev+bounces-135339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930AB99D8D6
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:15:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8A499D8E7
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:19:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D3D0280123
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:15:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 025012828A8
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6E71D12FE;
-	Mon, 14 Oct 2024 21:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5291C8FB3;
+	Mon, 14 Oct 2024 21:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rsEBMNO2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cNNxQJxL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6921D0E3E;
-	Mon, 14 Oct 2024 21:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCD714B965;
+	Mon, 14 Oct 2024 21:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728940496; cv=none; b=WdQB4wNs5in5vSy78NH/OT47/igLow6TKHy9YKtQENXXJ3TXb/pjkgWEbyhNhOlb4FH6djCu41lXiI9FBjO2oyZ/uS7OEK7ezB5JvJywrMgu/H8rQeavnCNHNk5AmfAg1wBpWbpCdRD+ID9HAD8ruJT4VTRQIkm3enihMKk78xg=
+	t=1728940760; cv=none; b=kXcuPeP8aTwCONbbjmdqMqwn4YKAexY2KIhIrFeEstFBEWyLOSSObEMFz5Ay5arfDgLNmByfwLnjMIvDhIAEmkpzTIsxadyjo8UsgE5JsMLMrCQhKU4PXleF206tutTVFuyhs2y5dMv7Dvju+t1dj+MgvhkyLkF36gVOxujoJ1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728940496; c=relaxed/simple;
-	bh=rvIywEjogCiwXVzlP8g7B4K28/cFU0k/kLvToB8437w=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eJkDJ8xuZCH8P6qCRJS0pmCyh1hVxLPygRXl0LImjdD3xJcTh8Eg2QD+N+QQYZQIxkloU2x8p8E0efPiTQHKmACBcsrv1w6NCZCr2UykFJLIE/gMy6d3tGZQGSE8w+5YILvXFAlakdxXmcxxXvC+njPiPPkZ3vrzLfL3VWCAQ4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rsEBMNO2; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1728940760; c=relaxed/simple;
+	bh=PAFmPTsYSqrYbsWSt40iPYIj+XMcnRXnWh1XxTwJTHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8mFosKhuKMoR0A2+mXL8PXByTVAPY0MPjPsxoMGgHDv60bPEe2QimaXo/jK5b+4bVkBw+61+0p84A4NvI2J4LSTQQrDx0Mbfsg09ZFj10WzgaGY/BE/Vq+FjNtHg9pLIQP25iSVcL2SEgZjg8WDiRSdF+sLSjxDNNiqDKqL5j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cNNxQJxL; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6cbe9914487so32624906d6.1;
+        Mon, 14 Oct 2024 14:19:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728940495; x=1760476495;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lm1nlbhRFalml+XjwqIVmMPssVpEVAP0w03w1PajwV0=;
-  b=rsEBMNO2kFFaMZCX0/4GanWBnD4I7v7M9VK1dwghRZLUW2QgJvXk3EWI
-   Ts/Zf7LCaI8PiIWjbaINwzYnvOohv+jBv/8NKvd23hO2qr3UrYjIGIw0x
-   mncJuF9ihRHViFruPG36pa5URlVDyy3NogyLSfPtQT3Ifgdvq/MAKWML7
-   s=;
-X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
-   d="scan'208";a="138023042"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 21:14:53 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:20116]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
- id 8bc78cd4-9c40-4b9c-b747-d35989fc65d1; Mon, 14 Oct 2024 21:14:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 8bc78cd4-9c40-4b9c-b747-d35989fc65d1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 14 Oct 2024 21:14:52 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 14 Oct 2024 21:14:47 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ignat@cloudflare.com>
-CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
-	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v3 1/9] af_packet: avoid erroring out after sock_init_data() in packet_create()
-Date: Mon, 14 Oct 2024 14:14:42 -0700
-Message-ID: <20241014211442.96478-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241014153808.51894-2-ignat@cloudflare.com>
-References: <20241014153808.51894-2-ignat@cloudflare.com>
+        d=gmail.com; s=20230601; t=1728940757; x=1729545557; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2MiOAdp88mxGwhMyB4rO6W4QU/jKLCZmdITKe/BNgZQ=;
+        b=cNNxQJxLoPh5EjtDOWhBiU08DhZ1krxyVkejo7bQXctLA0181Oj1n11bTEGo28QBq9
+         h85VYqjd15b7Ni4eUkrDqrdbK9QO6+1MfAiqpr0RzbCRsxGwWC5nuM9W32dME9FuObhg
+         FucVHnmJNYan8coNMLfYOCIZS05Sbs6fHhmpRnrEB3bcPXPPMTva9U+nXqEgBL9f1l9N
+         yqYIy7tU4e63x69UKS7k1oIiZWbB8Hj/Bexs832S6DkE4oC1tpJMqjChQV4x0xaGw2ap
+         eRg0KryU3VPOC1pzTHBYG8XkcdmHQAmhf+AQq0cJkt4N0a6U4/rHeNhkrYvounbIwrGk
+         6m9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728940757; x=1729545557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2MiOAdp88mxGwhMyB4rO6W4QU/jKLCZmdITKe/BNgZQ=;
+        b=aWssAe2+saCPpsW1irC1/OlLyYTwjJzbENBUAYheu0j8v8tkQUXRykMyqMc8HQI3e4
+         +Dw7n4rHzHfPsbdvThr9v3YTrlNsm43nU5qPCxLLeCpOoWruAC7CaHYUWvLhVL6lILDd
+         w8iZ+1EX6duOijFCN/fPNK+cJ9nIZPuxJYANYJH1neDVckxkopYr82N4mwiG48AV5CY9
+         rEOpEeXG1lG5Zj/A5XyVot+KJJR5tIXt90gsn5xAupeTiEpEV42q+vcdKn7SUbJOw7Fk
+         D+z62AYFPaUH2yTxFMOZ/6xVdeNvTi6OVQ1tn0/w6ANQh/MpvcXMCG7iOJBa2mIeFnpr
+         Dq0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVZfH3wvGZRNwM21xwQgrSXe89grB+iU8I59Hj+JzNO+zSR7toXUPBKfWtYZc8kXXqVLQqm6sFV85sy+z3xGtc=@vger.kernel.org, AJvYcCVaut/qLB6I20n8A5NchcbZpN7tB+fI9KHeAQ4hTfaMce/zCPfJU/HdKxirA8sPUDactfRxYo3nX872Jhs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWDA8d+igvKbRRkU7OYToZpcoujw1RmVpL1S7lgU1j8YRYjZq5
+	e+ONv+d92u3X/LTuwgSy6mscHxZGxIkL19y0MrVbTaz1kSmHc9Vx
+X-Google-Smtp-Source: AGHT+IGzO2q2s/9dn/cat1gPPyuyoPo+e7nJjOpJTMDlhlAABmQkhJExK4JTITevnji+6N6fPr8Plg==
+X-Received: by 2002:a05:6214:54c8:b0:6cb:d4e6:2507 with SMTP id 6a1803df08f44-6cbeffc1e72mr205437426d6.22.1728940757307;
+        Mon, 14 Oct 2024 14:19:17 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cbe863002bsm49615756d6.110.2024.10.14.14.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Oct 2024 14:19:16 -0700 (PDT)
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 159A71200069;
+	Mon, 14 Oct 2024 17:19:16 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Mon, 14 Oct 2024 17:19:16 -0400
+X-ME-Sender: <xms:04oNZ5v42dhsrUUl3yRs2sERmh4OTDH3Q7T1SuEHgN5rIMgSKhnrjQ>
+    <xme:04oNZyc4BAsUgxOkCsruCdFvEghmauScldEoeqaTKwqG2miMCQO8-UCoQUCDlpp_c
+    VrKj2yhksGRvEIWGQ>
+X-ME-Received: <xmr:04oNZ8xKkwj0Q5XPBevFyEXPGZwamzwVbl0O6d_XZ7SOUwtEHxX8rqitujclyg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeghedgudeiudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilh
+    drtghomheqnecuggftrfgrthhtvghrnhephedugfduffffteeutddvheeuveelvdfhleel
+    ieevtdeguefhgeeuveeiudffiedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghl
+    ihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepgh
+    hmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopedvuddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepfhhujhhithgrrdhtohhmohhnohhrihesgh
+    hmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehruhhsthdqfhhorhdqlhhinhhugiesvhhgvghrrdhkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthho
+    pehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehtmhhgrhhosh
+    hssehumhhitghhrdgvughupdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilhdrtghomhdprhgtphhtth
+    hopehgrghrhiesghgrrhihghhuohdrnhgvth
+X-ME-Proxy: <xmx:04oNZwON3RzZUxrTrjLIjnSz8FVL90ZoxRxmkY3GNbkV9d4qkrPn4g>
+    <xmx:1IoNZ5-ADSxyVJdj8tR0fIHRgjlmBN4yQN47UKgfQEhdyvBN86TsWA>
+    <xmx:1IoNZwU6ydicMPxOl9nWPVtuvp2rgcp7rzkL3v6jQjZsYgPQyGW1Yw>
+    <xmx:1IoNZ6fDB12MD_VplaR7LP1gVAd-iHFnz1olszwV9qIA-M6WOjtVVA>
+    <xmx:1IoNZ_cku84vArsLoZdIw9otQKX5sj6ZrsVmIqEwSHI8gYiGnig_RhNR>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Oct 2024 17:19:15 -0400 (EDT)
+Date: Mon, 14 Oct 2024 14:18:57 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me, a.hindborg@samsung.com,
+	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+	tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org,
+	jstultz@google.com, sboyd@kernel.org
+Subject: Re: [PATCH net-next v2 0/6] rust: Add IO polling
+Message-ID: <Zw2KwQbAAKZ_5lPL@boqun-archlinux>
+References: <20241013.101505.2305788717444047197.fujita.tomonori@gmail.com>
+ <20241013.115033.709062352209779601.fujita.tomonori@gmail.com>
+ <Zws7nK549LWOccEj@Boquns-Mac-mini.local>
+ <20241013.141506.1304316759533641692.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241013.141506.1304316759533641692.fujita.tomonori@gmail.com>
 
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Mon, 14 Oct 2024 16:38:00 +0100
-> After sock_init_data() the allocated sk object is attached to the provided
-> sock object. On error, packet_create() frees the sk object leaving the
-> dangling pointer in the sock object on return. Some other code may try
-> to use this pointer and cause use-after-free.
+On Sun, Oct 13, 2024 at 02:15:06PM +0900, FUJITA Tomonori wrote:
+> On Sat, 12 Oct 2024 20:16:44 -0700
+> Boqun Feng <boqun.feng@gmail.com> wrote:
 > 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> > On Sun, Oct 13, 2024 at 11:50:33AM +0900, FUJITA Tomonori wrote:
+> >> On Sun, 13 Oct 2024 10:15:05 +0900 (JST)
+> >> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+> >> 
+> >> > On Sat, 12 Oct 2024 08:29:06 -0700
+> >> > Boqun Feng <boqun.feng@gmail.com> wrote:
+> >> > 
+> >> >> While, we are at it, I want to suggest that we also add
+> >> >> rust/kernel/time{.rs, /} into the "F:" entries of TIME subsystem like:
+> >> >> 
+> >> >> diff --git a/MAINTAINERS b/MAINTAINERS
+> >> >> index b77f4495dcf4..09e46a214333 100644
+> >> >> --- a/MAINTAINERS
+> >> >> +++ b/MAINTAINERS
+> >> >> @@ -23376,6 +23376,8 @@ F:      kernel/time/timeconv.c
+> >> >>  F:     kernel/time/timecounter.c
+> >> >>  F:     kernel/time/timekeeping*
+> >> >>  F:     kernel/time/time_test.c
+> >> >> +F:     rust/kernel/time.rs
+> >> >> +F:     rust/kernel/time/
+> >> >>  F:     tools/testing/selftests/timers/
+> >> >> 
+> >> >>  TIPC NETWORK LAYER
+> >> >> 
+> >> >> This will help future contributers copy the correct people while
+> >> >> submission. Could you maybe add a patch of this in your series if this
+> >> >> sounds reasonable to you? Thanks!
+> >> > 
+> >> > Agreed that it's better to have Rust time abstractions in
+> >> > MAINTAINERS. You add it into the time entry but there are two options
+> >> > in the file; time and timer?
+> >> > 
+> >> > TIMEKEEPING, CLOCKSOURCE CORE, NTP, ALARMTIMER
+> >> > M:      John Stultz <jstultz@google.com>
+> >> > M:      Thomas Gleixner <tglx@linutronix.de>
+> >> > R:      Stephen Boyd <sboyd@kernel.org>
+> >> > 
+> >> > HIGH-RESOLUTION TIMERS, TIMER WHEEL, CLOCKEVENTS
+> >> > M:      Anna-Maria Behnsen <anna-maria@linutronix.de>
+> >> > M:      Frederic Weisbecker <frederic@kernel.org>
+> >> > M:      Thomas Gleixner <tglx@linutronix.de>
+> >> > 
+> >> > The current Rust abstractions which play mainly with ktimer.h. it's 
+> >> > not time, timer stuff, I think.
+> >> 
+> >> Oops, s/ktimer.h/ktime.h/
+> >> 
+> >> No entry for ktime.h in MAINTAINERS; used by both time and timer
+> >> stuff.
+> >> 
+> > 
+> > I think ktime.h belongs to TIMEKEEPING, since ktime_get() is defined in
+> > kernel/time/timekeeping.c and that's a core function for ktime_t, but
+> 
+> Sounds reasonable.
+> 
+> This patchset adds Delta (also belongs to time, I guess) and fsleep to
+> rust/kernel/time.rs. I think that fsleep belongs to timer (because
+> sleep functions in kernel/time/timer.c). It's better to add
+> rust/kerne/time/timer.rs for fsleep() rather than putting both time
+> and timer stuff to rust/kernel/time.rs?
+> 
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Good point. So how about putting fsleep() into rusk/kernel/time/delay.rs
+and add that into the "F:" entry of TIMER subsystem? Since "sleep"s are
+a set of particular usage of timers which don't directly interact with a
+timer or hrtimer struct, so I feel it's better to have their own
+file/mod rather than sharing it with timers. Plus this results in less
+potential conflicts with Andreas' hrtimer series.
+
+Regards,
+Boqun
+
+[...]
 
