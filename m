@@ -1,319 +1,138 @@
-Return-Path: <netdev+bounces-135169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75BD799C9B1
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:08:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A8A99C9D2
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1F8F1C221C0
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 12:08:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77543B20A89
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 12:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0521119F13C;
-	Mon, 14 Oct 2024 12:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02EC19F489;
+	Mon, 14 Oct 2024 12:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JfC55cLQ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BfGevVBG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TOjL8u/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C5E156F3F;
-	Mon, 14 Oct 2024 12:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A456819D086;
+	Mon, 14 Oct 2024 12:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728907719; cv=none; b=Dh9Tc3/29UistLuQMrx64PtHYQB5qtRRlbXLhLZlwqjaH+fm7nO7iDsYMki1309Jwx1iI7rCYy9TDJ0yT7aYgQrvVfa/pnqsz48iqyc/XX+H6aw8PcpNlfmCEqGtb4tGm1OyWn/y/bLJKgLLjq5i0dU9Sxok0BDM2b4/my4hnIY=
+	t=1728908011; cv=none; b=FjwoB9cxCFFawPPuVjgIApGbqz6SQL2jPi76/Rj+XogqTsOZwGx2iCLPyR6U0lgGcwBOemYHep5garAKi4hHC13rft8DbiFtjvbrgSu4pu2/4B5RBbYP5RE2JrVtRxyTkyjgqyvKIDUXOupBpxvaWePSz4UcJI/Lq3B8NmCZhN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728907719; c=relaxed/simple;
-	bh=7cwaBakNlQOpTCKiMwec1+Z7Ie0CXH+4rd43XaE+aUA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=j7wgH7WkBaXhnDu9LvVSMOSEC4K+lVmKu46zVp1jIlEN0UtG5QsknI/LwkeGZD/nOF9ZhZclfVJgGgoewE6o/eczznDOJE0/Ur4X12dFyzFb2QvsW330fVWXUBngLjeezhWzZLpJ4cO9PF6U0Cn2WtIpBbxRx/gS+a4xXbeiXtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JfC55cLQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BfGevVBG; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1728907716;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gEcJR/qQYI7JBHCDG5kvF4CZ4xrhEgVc83vGvWKLtEU=;
-	b=JfC55cLQE21yNRRGy8L6KJTgjXE/lFCHHYGV9LC58B/hIRGwr+0ihe1918BJlUpYLPVzpu
-	QJZkwYtoDpOjA06ZLKcvYosEy3LXF58PAu5hNqjvstONTAn0jT9E8O6zQNwt1GzdxVwZ6e
-	OAJKImax+Gqr6G8gqWqUJizOy/A2lDrL3nYtctVRXlNuQWpNGbI+0/ETJzLfQolMiCtU4k
-	Lrz/66OPjzfmNAxYGcsSMDIMU19FiJygwcogz1ji5JU0TJ+bpEa68x1xiuMxYjcR3yadh7
-	lTM7kacXImPmGtMUtR0DYnHyQzq4029N8HIrF4s+quXpM8YlLawB5gf3AnSqhQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1728907716;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gEcJR/qQYI7JBHCDG5kvF4CZ4xrhEgVc83vGvWKLtEU=;
-	b=BfGevVBGI4KMq+TlAwIDcMsUEF7NJNpO2YwmCGoRB+sdcTi4l8gVeS/X+SNUfNlfBb3gLT
-	YA4IN5uYWOKCuvBg==
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "moderated list:INTEL
- ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 2/2] igc: Link queues to NAPI instances
-In-Reply-To: <ZwnXuSUbaFiyGn52@LQ3V64L9R2>
-References: <20241003233850.199495-1-jdamato@fastly.com>
- <20241003233850.199495-3-jdamato@fastly.com>
- <87msjg46lw.fsf@kurt.kurt.home> <Zwa3sW-4s7oqktX3@LQ3V64L9R2>
- <87wmig3063.fsf@kurt.kurt.home> <ZwnXuSUbaFiyGn52@LQ3V64L9R2>
-Date: Mon, 14 Oct 2024 14:08:34 +0200
-Message-ID: <87zfn6c2f1.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1728908011; c=relaxed/simple;
+	bh=Pqcl0dwf49EdBvTszQmFGHzrd66GK6QAO4IKAI4N30Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pedsqHzY8JAD8mFXONwTwN0PWScEFvZbe2ZNwm0ujPORKQqTWNkFtl2ISpQewtXyAFKbkGOgZFgDkq/qjs8pUIWoc2EfMN3jiwYAtVOIQ8nONfsNjNLySwLcFOyvtxS3XYxRUJ4cDhBstGtMeqH+uaB5CugQ4gheTWgShUm371E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TOjL8u/z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 596EFC4CEC3;
+	Mon, 14 Oct 2024 12:13:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728908011;
+	bh=Pqcl0dwf49EdBvTszQmFGHzrd66GK6QAO4IKAI4N30Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TOjL8u/z2Kga9VObd6TWtDpF8KY3MXxRzJWYOMnMOsIC6IsMZ2dNDiieIWJDGvCce
+	 nqRtUfMBZC537LmFYTarzmtsbh/LLF8IQuLoxO2JrckofKKwGvRnfeEnqDEXmxEwLl
+	 N55dohhrj51rGq6szyhCsKHt+oAkrJr0Pj7Cr1beHxF+T0ipqObt+SnssA28RecQsK
+	 mq2iaL81hT+C4tgZ+D6vAEZf/LhEu++7dYTcTFZdZAT3WRBf9/T71m82+h28+w84SS
+	 3yvfmBOw3WaRbrWGUm7duJpTcx1aton7uzy03IzG4WhB5nJHVkkkh5eOR9Dl+MtwRt
+	 wXV0BU6RxTLLA==
+Date: Mon, 14 Oct 2024 13:13:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	Al Viro <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>,
+	Li Zetao <lizetao1@huawei.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v7 4/5] gpio: Replace deprecated PCI functions
+Message-ID: <20241014121324.GT77519@kernel.org>
+References: <20241014075329.10400-1-pstanner@redhat.com>
+ <20241014075329.10400-5-pstanner@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241014075329.10400-5-pstanner@redhat.com>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 14, 2024 at 09:53:25AM +0200, Philipp Stanner wrote:
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> 
+> Replace those functions with calls to pcim_iomap_region().
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> Reviewed-by: Andy Shevchenko <andy@kernel.org>
+> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  drivers/gpio/gpio-merrifield.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/gpio/gpio-merrifield.c b/drivers/gpio/gpio-merrifield.c
+> index 421d7e3a6c66..274afcba31e6 100644
+> --- a/drivers/gpio/gpio-merrifield.c
+> +++ b/drivers/gpio/gpio-merrifield.c
+> @@ -78,24 +78,24 @@ static int mrfld_gpio_probe(struct pci_dev *pdev, const struct pci_device_id *id
+>  	if (retval)
+>  		return retval;
+>  
+> -	retval = pcim_iomap_regions(pdev, BIT(1) | BIT(0), pci_name(pdev));
+> -	if (retval)
+> -		return dev_err_probe(dev, retval, "I/O memory mapping error\n");
+> -
+> -	base = pcim_iomap_table(pdev)[1];
+> +	base = pcim_iomap_region(pdev, 1, pci_name(pdev));
+> +	if (IS_ERR(base))
+> +		return dev_err_probe(dev, PTR_ERR(base), "I/O memory mapping error\n");
+>  
+>  	irq_base = readl(base + 0 * sizeof(u32));
+>  	gpio_base = readl(base + 1 * sizeof(u32));
+>  
+>  	/* Release the IO mapping, since we already get the info from BAR1 */
+> -	pcim_iounmap_regions(pdev, BIT(1));
+> +	pcim_iounmap_region(pdev, 1);
+>  
+>  	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+>  	if (!priv)
+>  		return -ENOMEM;
+>  
+>  	priv->dev = dev;
+> -	priv->reg_base = pcim_iomap_table(pdev)[0];
+> +	priv->reg_base = pcim_iomap_region(pdev, 0, pci_name(pdev));
+> +	if (IS_ERR(priv->reg_base))
+> +		return dev_err_probe(dev, PTR_ERR(base), "I/O memory mapping error\n");
 
-On Fri Oct 11 2024, Joe Damato wrote:
->> > 16 core Intel(R) Core(TM) i7-1360P
->> >
->> > lspci:
->> > Ethernet controller: Intel Corporation Device 125c (rev 04)
->> >                      Subsystem: Intel Corporation Device 3037
->> >
->> > ethtool -i:
->> > firmware-version: 2017:888d
->> >
->> > $ sudo ethtool -L enp86s0 combined 2
->> > $ sudo ethtool -l enp86s0
->> > Channel parameters for enp86s0:
->> > Pre-set maximums:
->> > RX:		n/a
->> > TX:		n/a
->> > Other:		1
->> > Combined:	4
->> > Current hardware settings:
->> > RX:		n/a
->> > TX:		n/a
->> > Other:		1
->> > Combined:	2
->> >
->> > $ cat /proc/interrupts | grep enp86s0 | cut --delimiter=3D":" -f1
->> >  144
->> >  145
->> >  146
->> >  147
->> >  148
->> >
->> > Note that IRQ 144 is the "other" IRQ, so if we ignore that one...
->> > /proc/interrupts shows 4 IRQs, despite there being only 2 queues.
->> >
->> > Querying netlink to see which IRQs map to which NAPIs:
->> >
->> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yam=
-l \
->> >                          --dump napi-get --json=3D'{"ifindex": 2}'
->> > [{'id': 8200, 'ifindex': 2, 'irq': 148},
->> >  {'id': 8199, 'ifindex': 2, 'irq': 147},
->> >  {'id': 8198, 'ifindex': 2, 'irq': 146},
->> >  {'id': 8197, 'ifindex': 2, 'irq': 145}]
->> >
->> > This suggests that all 4 IRQs are assigned to a NAPI (this mapping
->> > happens due to netif_napi_set_irq in patch 1).
->> >
->> > Now query the queues and which NAPIs they are associated with (which
->> > is what patch 2 adds):
->> >
->> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yam=
-l \=20
->> >                          --dump queue-get --json=3D'{"ifindex": 2}'
->> > [{'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
->> >  {'id': 1, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
->> >  {'id': 0, 'ifindex': 2, 'napi-id': 8197, 'type': 'tx'},
->> >  {'id': 1, 'ifindex': 2, 'napi-id': 8198, 'type': 'tx'}]
->> >
->> > As you can see above, since the queues are combined and there are
->> > only 2 of them, NAPI IDs 8197 and 8198 (which are triggered via IRQ
->> > 145 and 146) are displayed.
->>=20
->> Is that really correct?
->
-> So I definitely think the case where IGC_FLAG_QUEUE_PAIRS is enabled is
-> correct, that case is highlighted by the original commit message.
+Hi Philipp,
 
-Yes.
+There seems to be a mismatch in the use of priv->reg_base and base above.
+Should the above use PTR_ERR(priv->reg_base) instead of PTR_ERR(base)?
 
->
-> I think IGC_FLAG_QUEUE_PAIRS disabled was buggy, as you pointed out, and =
-I've
-> made a change I'll include in the next RFC, which I believe fixes it.
-
-Great, thanks :).
-
->
-> Please see below for the case where IGC_FLAG_QUEUE_PAIRS is disabled and a
-> walk-through.
->
->> There are four NAPI IDs which are triggered by
->> the four IRQs.
->
-> I'm not an IGC expert and I appreciate your review/comments very much, so=
- thank
-> you!
->
-> I don't think the number of queues I create with ethtool factors into whe=
-ther
-> or not IGC_FLAG_QUEUE_PAIRS is enabled or not.
-
-igc_ethtool_set_channels() sets adapter->rss_queues and calls
-igc_set_flag_queue_pairs(). So, ethtool should influence it.
-
-> Please forgive me for the length of my message, but let me walk
-> through the code to see if I've gotten it right, including some debug
-> output I added:
->
-> In igc_init_queue_configuration:
->
-> max_rss_queues =3D IGC_MAX_RX_QUEUES (4)
->
-> and
->
-> adapter->rss_queues =3D min of 4 or num_online_cpus
->
-> which I presume is 16 on my 16 core machine, so:
->
-> adapter->rss_queues =3D 4 (see below for debug output which verifies this)
->
-> In igc_set_flag_queue_pairs, the flag IGC_FLAG_QUEUE_PAIRS is set only if:
->
-> (adapter->rss_queues (4) > max_rss_queues(4) / 2) which simplifies
-> to (4 > 2), meaning the flag would be enabled regardless of the
-> number of queues I create with ethtool, as long as I boot my machine
-> with 16 cores available.
->
-> I verified this by adding debug output to igc_set_flag_queue_pairs and
-> igc_init_queue_configuration, which outputs:
->
-> igc 0000:56:00.0: IGC_FLAG_QUEUE_PAIRS on
-> igc 0000:56:00.0: max_rss_queues: 4, rss_queues: 4
->
-> That's at boot with the default number of combined queues of 4 (which is =
-also
-> the hardware max).
->
-> The result of IGC_FLAG_QUEUE_PAIRS on was the result posted in the
-> original commit message of this patch and I believe that to be
-> correct.
->
-> The only place I can see that IGC_FLAG_QUEUE_PAIRS has any impact
-> (aside from ethtool IRQ coalescing, which we can ignore) is
-> igc_set_interrupt_capability:
->
->   /* start with one vector for every Rx queue */
->   numvecs =3D adapter->num_rx_queues;
->=20=20=20
->   /* if Tx handler is separate add 1 for every Tx queue */
->   if (!(adapter->flags & IGC_FLAG_QUEUE_PAIRS))
->     numvecs +=3D adapter->num_tx_queues;
->
-> In this case, the flag only has impact if it is _off_.
->
-> It impacts the number of vectors allocated, so I made a small change
-> to the driver, which I'll include in the next RFC to deal with the
-> IGC_FLAG_QUEUE_PAIRS off case.
->
-> In order to get IGC_FLAG_QUEUE_PAIRS off, I boot my machine with the grub
-> command line option "maxcpus=3D2", which should force the flag off.
->
-> Checking my debug output at boot to make sure:
->
-> igc 0000:56:00.0: IGC_FLAG_QUEUE_PAIRS off
-> igc 0000:56:00.0: max_rss_queues: 4, rss_queues: 2
->
-> So, now IGC_FLAG_QUEUE_PAIRS is off which should impact
-> igc_set_interrupt_capability and the vector calculation.
->
-> Let's check how things look at boot:
->
-> $ ethtool -l enp86s0 | tail -5
-> Current hardware settings:
-> RX:		n/a
-> TX:		n/a
-> Other:		1
-> Combined:	2
->
-> 2 combined queues by default when I have 2 CPUs.
->
-> $ cat /proc/interrupts  | grep enp
->  127:  enp86s0
->  128:  enp86s0-rx-0
->  129:  enp86s0-rx-1
->  130:  enp86s0-tx-0
->  131:  enp86s0-tx-1
->
-> 1 other IRQ, and 2 IRQs for each of RX and TX.
->
-> Compare to netlink:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                        --dump napi-get --json=3D'{"ifindex": 2}'
-> [{'id': 8196, 'ifindex': 2, 'irq': 131},
->  {'id': 8195, 'ifindex': 2, 'irq': 130},
->  {'id': 8194, 'ifindex': 2, 'irq': 129},
->  {'id': 8193, 'ifindex': 2, 'irq': 128}]
->
-> So the driver has 4 IRQs linked to 4 different NAPIs, let's check queues:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
->
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
->
-> In this case you can see that each RX and TX queue has a unique NAPI.
->
-> I think this is correct, but slightly confusing :) as ethtool
-> reports n/a for RX and TX and only reports a combined queue count,
-> but you were correct that there was a bug for this case in the code
-> I proposed in this RFC.
->
-> I think this new output looks correct and will include the adjusted
-> patch and a detailed commit message in the next RFC.
->
-> Let me know if you think the output looks right to you now?
-
-Looks good to me now.
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcNCcITHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgmfuD/9PLA6H/l3Onsm204kSaDJQkhAj8/qf
-nBm0wqMs1nw/DmpJAfb8WaaZpYgPhMQNYzRCgZBTMDBStG1dvPudanxeVzDfoHfh
-TAJa4SDjzqryywCDRCf7kmmsltVnbc6Zyv9rWunNuQFjdcOSQHV9aRBE7IKZ/DiX
-nrKLQpmK77KiIrMFxv3q/H6pz2pItlJrTmofUe9kXEcYZgLNDidBPZuQR5tX9ny5
-bzr2tTnd9O7zmTnpHA4FYhaGpDStS0k7wzcodbI4AXI4THHx6g6M1Yj8ZWG9LxpZ
-LhKUA86wF5URlwR0gJxUXOS4PT9gQb9loiOmgWVqYqvfL8uToql6Mwf//NSXY4bb
-MS71auFDnqkbLnXd5MhXIb9J5QboEjP4yfK4EgRFjdBZFGKflXFJe25/5JssZmDq
-Zv+rcSQBGa09WcxcIHdRsYllTXK0pUEKMoLuFux3nlV2mhaygPy/KTSM01VWRmo/
-LfD15FJbdJLErM7QuowaSJ+t2B8RqVNNuEHYohAY1btK1MWcsbuIHz1weInCnEIl
-o3XSJKvwfyDotnwhhclr+DN4QBi/ispbJHRJPZlFtCJ+8qUp20PbH8h1FOj5JWh6
-VYrGcLg8bR9LcdqgDs1jiugmUgfk5wn7OKtbViVFrGSMrTtG/NaEi6O1gnHdzh9D
-YyYzJufnkRqXqA==
-=vwnG
------END PGP SIGNATURE-----
---=-=-=--
+>  
+>  	priv->pin_info.pin_ranges = mrfld_gpio_ranges;
+>  	priv->pin_info.nranges = ARRAY_SIZE(mrfld_gpio_ranges);
+> -- 
+> 2.46.2
+> 
+> 
 
