@@ -1,232 +1,343 @@
-Return-Path: <netdev+bounces-135051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C231B99BFF6
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:22:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06F1F99BFF7
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6A361C22B11
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:22:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5282BB22D2E
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67888143890;
-	Mon, 14 Oct 2024 06:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Lu53X58m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8D913FD83;
+	Mon, 14 Oct 2024 06:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CE913B7A3
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 06:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B061313B287
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 06:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728886934; cv=none; b=JJp1je11MEstupnZKGZzvL+hZMzWZBW4ypDgkfaYdenWHK/ngru/XzzGMvyHgWbh4GHMGYKDSIapxltSYY14FUudGTnfQH2Of33j9MszS/SrERCAIxaLwj+MJSGvujPhkMDaK048gOYMaCiicwMcA2BBDgW/a9dtUnyvuBx7X/w=
+	t=1728887011; cv=none; b=BCMUmwCWq1E21zhpFfNgUSQfKzrhRj8YyPh1QKRfF7VbEmo4kU9fb8SAYXK6Q4rI27PJT2lFOvqe1y2xir1BuQ4F0+kSfleDDMiLM9Yhh559oHOtgNrDeqeEjM6dvsOvT/J0zd0+hV6QqjtPsY0GhSP0N5h3bkzwaLr3JEBjtVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728886934; c=relaxed/simple;
-	bh=nK0LzvmwgliCXQsEMTkAl3C+q8LITusoWA60LSfPQtg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=A7gUb/xUeijVLgAjyjOqqAzlVEPmIoexircKwssXrkwYfC0ZJOqsmjxDmYve0/egSrvcnG1gkEizRcW6OJT06FuZfyMK7O2qXP+V5oV/q903YG0sX9EIQHjUHZJqchO0hYu7ygjbeNAiYcc652wUlaUrZLwyNq1OFox84W1GBoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Lu53X58m; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9a01810fffso140293666b.3
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 23:22:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1728886929; x=1729491729; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LGGL1J/PYpfVQt9U8v/NWEtE6h5sWLzedGtSBPsspeY=;
-        b=Lu53X58m46y3w3sJshuPm4ErLGZ/OgmFDgU0I6ueJA7ghqKIpenvHqkdJ4UpUNxMrf
-         lq1ymgVg7qAsZANM9vb4X7necP8z2YktVkuPrrAyP9frKOTryjJ9vcnmjFUyK2OwyUbD
-         FUmQzry/8UryZmvurgw+IAlFrEfKqBNw+nEqr6cCjikYL7Rqxfm7gbrP+cHykhRsFcN2
-         O+zTbB+jWckfWjlPTOTE/bBIMXHOf2dLhjOu6UVbeW/lIeiFSPYeG5Q1JKkS8BU5+7L3
-         qKim4icYU1ctpvqX+4eUDTEfgRmhuNcRGOMDp0ikHPkqsbweqBnauoBPFAn+lC927v5l
-         a16g==
+	s=arc-20240116; t=1728887011; c=relaxed/simple;
+	bh=mIjIjOcqcVG+Di2IlldoF087Ep8ZF9pzUQhjWXnr+ak=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TiCq5xFHQ0DyR7lBWsq1bXqFlWCefWhWSQ7Rr3KLcP0M5fnNWZ6FtgdpQHLvGhCR6tIzZZ3hNhrfsLGZRt8z0yCdAB5EaMpM2sBYKoD8d+4jXDvWYRi7xmSI5rHH7AnIoU0u9/89a+utOkbaL+0NLDhfLE/3fA8093lBS4xQmNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a3bea901ffso28963025ab.0
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 23:23:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728886929; x=1729491729;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LGGL1J/PYpfVQt9U8v/NWEtE6h5sWLzedGtSBPsspeY=;
-        b=X0Tup+GE1MdwmnlkdumB6pX9Ac17iDJ3cCBXoYPN1mtqOfE+3umPeLc+hnUFFlCNlJ
-         +wACHqEa/VvPtrwpTOMclX0NZJWgbN7wECVu12iEip6m+vw99MLbUPjySReFMZXGbgk1
-         DVIC6usC4g1A94itvGBoXfFLMB/Y2W0u1TNAcS3TaDHs+dVvYQOK5QutaA7RzdDemaa3
-         YmtQTuuuJl6RrarOWXzEbxaC3nMsrtG5H6/5S7GwJrRh8N7tZ4W/uMHbDeRV9HG5Q5jJ
-         BKRsSE+tvcmi2iNsNYXWUB6XAFczS9wPgjcWJm6WU//cfV56eK9QeXiXwIUHJu/s30hT
-         cmUg==
-X-Gm-Message-State: AOJu0YxsbfmxgULkSmAXHdO+cxqMHW3nGG8dxa/c2ZlRUlNrHLeb7RR7
-	IuRAnJ6/LFKVIgH+LmgtLhBtiX2TRVJHC+2lUj2S4xjuEEGPLbiuN9UAyXUpfYE=
-X-Google-Smtp-Source: AGHT+IHVur/aV2xDIG/Y4Ciomygy3p/dpFh9piHKROvSG20M9nxSRBAcVlry/ihfS/LPn7d/B70JrQ==
-X-Received: by 2002:a17:907:7296:b0:a91:158f:6693 with SMTP id a640c23a62f3a-a99e39cfc56mr689668266b.9.1728886929350;
-        Sun, 13 Oct 2024 23:22:09 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99f085fb70sm264862666b.7.2024.10.13.23.22.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Oct 2024 23:22:08 -0700 (PDT)
-Message-ID: <6209405e-7100-43f9-b415-3be8fbcc6352@blackwall.org>
-Date: Mon, 14 Oct 2024 09:22:07 +0300
+        d=1e100.net; s=20230601; t=1728887009; x=1729491809;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hxtbwJ84bc/y0EqJX+HE6FUt5NlZynbiN6WOyx11l1A=;
+        b=edUH9TaIQpyXkYQtR6F1BonfwHMbzalF/Kt1GXdh7qoRKQM/ucz4x7RCBWk2Isln0f
+         gLpHMLtq76soAT5ojuGODkHG2k4uRnQvAzxndoBemNINffGj77BpZlPc61X5zT7TiUN9
+         sS8PFkyiFFffFDOHtwt3PPjmp7z7yZ2C5jU98xBRFjDEFZDNtg/3DWt52kJbzee5QWUr
+         PX1legtQSlNBZ+LNotasZowOP/vKkvtSR/J99qp2SsNRYynDGToHGIMx19ZdLy6T+khU
+         cyo48FcVJXiAJVayfg9X7FKNMJADCd25oNJxgg9vHU6TdwXeaxQoJ7uLAh/y6tVGVC92
+         k4Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSm0pP652HfqYm3enRX/Ow1WzIT3VjU5sy59qPcyCA+p/7uIwoLRNF1kbtPmP7Badx8VI4CCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOAfN8FGXK41w5qxwQlElQvQtlMCffTSmnc+qPbP2uKAs5sSFx
+	GgFW8Ceu5libZwFuINuTEv8ytFX/jMUFalJkZDNySQ3/NR0S+NDdf+LtNa9Z7wJMS3wrXSUQztD
+	VP3lcX9lMyUAFf1Q5/nCJsx/ozg0OhpNm+xpnWyvNBNhqYj9AgKILsew=
+X-Google-Smtp-Source: AGHT+IEhvpvk6RwBtBhI+SRP/T8RR8GtqfK17RK+e/ly9pawZoaMZ70YjGjqRCP3XT3uT5F0jQYn48wfkJxujFGhfowSxlmomSgT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 11/12] bridge:
- br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Eric Woudstra <ericwouds@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <20241013185509.4430-12-ericwouds@gmail.com>
- <281cce27-c832-41c8-87d0-fbac05b8e802@blackwall.org>
-Content-Language: en-US
-In-Reply-To: <281cce27-c832-41c8-87d0-fbac05b8e802@blackwall.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:19cb:b0:3a3:3e17:994e with SMTP id
+ e9e14a558f8ab-3a3bcdc0bdamr59897005ab.9.1728887008864; Sun, 13 Oct 2024
+ 23:23:28 -0700 (PDT)
+Date: Sun, 13 Oct 2024 23:23:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <670cb8e0.050a0220.4cbc0.0045.GAE@google.com>
+Subject: [syzbot] [usb?] [net?] KASAN: slab-use-after-free Read in usbnet_deferred_kevent
+From: syzbot <syzbot+a9c09d568f7e4153f53d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 14/10/2024 09:18, Nikolay Aleksandrov wrote:
-> On 13/10/2024 21:55, Eric Woudstra wrote:
->> In network setup as below:
->>
->>              fastpath bypass
->>  .----------------------------------------.
->> /                                          \
->> |                        IP - forwarding    |
->> |                       /                \  v
->> |                      /                  wan ...
->> |                     /
->> |                     |
->> |                     |
->> |                   brlan.1
->> |                     |
->> |    +-------------------------------+
->> |    |           vlan 1              |
->> |    |                               |
->> |    |     brlan (vlan-filtering)    |
->> |    |               +---------------+
->> |    |               |  DSA-SWITCH   |
->> |    |    vlan 1     |               |
->> |    |      to       |               |
->> |    |   untagged    1     vlan 1    |
->> |    +---------------+---------------+
->> .         /                   \
->>  ----->wlan1                 lan0
->>        .                       .
->>        .                       ^
->>        ^                     vlan 1 tagged packets
->>      untagged packets
->>
->> Now that DEV_PATH_MTK_WDMA is added to nft_dev_path_info() the forward
->> path is filled also when ending with the mediatek wlan1, info.indev not
->> NULL now in nft_dev_forward_path(). This results in a direct transmit
->> instead of a neighbor transmit. This is how it should be, But this fails.
->>
->> br_vlan_fill_forward_path_mode() sets DEV_PATH_BR_VLAN_UNTAG_HW when
->> filling in from brlan.1 towards wlan1. But it should be set to
->> DEV_PATH_BR_VLAN_UNTAG in this case. Using BR_VLFLAG_ADDED_BY_SWITCHDEV
->> is not correct. The dsa switchdev adds it as a foreign port.
->>
->> Use BR_VLFLAG_TAGGING_BY_SWITCHDEV to make sure DEV_PATH_BR_VLAN_UNTAG is
->> set when there is a dsa-switch inside the bridge.
->>
->> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
->> ---
->>  net/bridge/br_private.h |  1 +
->>  net/bridge/br_vlan.c    | 18 +++++++++++++++++-
->>  2 files changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
->> index 8da7798f9368..7d427214cc7c 100644
->> --- a/net/bridge/br_private.h
->> +++ b/net/bridge/br_private.h
->> @@ -180,6 +180,7 @@ enum {
->>  	BR_VLFLAG_MCAST_ENABLED = BIT(2),
->>  	BR_VLFLAG_GLOBAL_MCAST_ENABLED = BIT(3),
->>  	BR_VLFLAG_NEIGH_SUPPRESS_ENABLED = BIT(4),
->> +	BR_VLFLAG_TAGGING_BY_SWITCHDEV = BIT(5),
->>  };
->>  
->>  /**
->> diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
->> index 1830d7d617cd..b7877724b969 100644
->> --- a/net/bridge/br_vlan.c
->> +++ b/net/bridge/br_vlan.c
->> @@ -3,6 +3,7 @@
->>  #include <linux/netdevice.h>
->>  #include <linux/rtnetlink.h>
->>  #include <linux/slab.h>
->> +#include <net/dsa.h>
->>  #include <net/switchdev.h>
->>  
->>  #include "br_private.h"
->> @@ -100,6 +101,19 @@ static void __vlan_flags_commit(struct net_bridge_vlan *v, u16 flags)
->>  	__vlan_flags_update(v, flags, true);
->>  }
->>  
->> +static inline bool br_vlan_tagging_by_switchdev(struct net_bridge *br)
-> 
-> no inline in .c files and also constify br
-> 
->> +{
->> +#if IS_ENABLED(CONFIG_NET_DSA)
->> +	struct net_bridge_port *p;
->> +
->> +	list_for_each_entry(p, &br->port_list, list) {
->> +		if (dsa_user_dev_check(p->dev))
-> 
-> I don't think this can change at runtime, so please keep a counter in
-> the bridge and don't walk the port list on every vlan add.
-> 
+Hello,
 
-you can use an internal bridge opt (check br_private.h) with a private opt
-that's set when such device is added as a port, no need for a full counter
-obviously
+syzbot found the following issue on:
 
->> +			return false;
->> +	}
->> +#endif
->> +	return true;
->> +}
->> +
->>  static int __vlan_vid_add(struct net_device *dev, struct net_bridge *br,
->>  			  struct net_bridge_vlan *v, u16 flags,
->>  			  struct netlink_ext_ack *extack)
->> @@ -113,6 +127,8 @@ static int __vlan_vid_add(struct net_device *dev, struct net_bridge *br,
->>  	if (err == -EOPNOTSUPP)
->>  		return vlan_vid_add(dev, br->vlan_proto, v->vid);
->>  	v->priv_flags |= BR_VLFLAG_ADDED_BY_SWITCHDEV;
->> +	if (br_vlan_tagging_by_switchdev(br))
->> +		v->priv_flags |= BR_VLFLAG_TAGGING_BY_SWITCHDEV;
->>  	return err;
->>  }
->>  
->> @@ -1491,7 +1507,7 @@ int br_vlan_fill_forward_path_mode(struct net_bridge *br,
->>  
->>  	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG)
->>  		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
->> -	else if (v->priv_flags & BR_VLFLAG_ADDED_BY_SWITCHDEV)
->> +	else if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
->>  		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
->>  	else
->>  		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
-> 
+HEAD commit:    27cc6fdf7201 Merge tag 'linux_kselftest-fixes-6.12-rc2' of..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1728cd27980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6248f0ab12f33349
+dashboard link: https://syzkaller.appspot.com/bug?extid=a9c09d568f7e4153f53d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6977fdc3f229/disk-27cc6fdf.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e3cb80988930/vmlinux-27cc6fdf.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/030bdb347b6a/bzImage-27cc6fdf.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a9c09d568f7e4153f53d@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in instrument_atomic_read include/linux/instrumented.h:68 [inline]
+BUG: KASAN: slab-use-after-free in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+BUG: KASAN: slab-use-after-free in usbnet_deferred_kevent+0x2b/0xe90 drivers/net/usb/usbnet.c:1153
+Read of size 8 at addr ffff88804f87d1e8 by task kworker/1:11/15337
+
+CPU: 1 UID: 0 PID: 15337 Comm: kworker/1:11 Not tainted 6.12.0-rc1-syzkaller-00306-g27cc6fdf7201 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: events usbnet_deferred_kevent
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0xc3/0x620 mm/kasan/report.c:488
+ kasan_report+0xd9/0x110 mm/kasan/report.c:601
+ check_region_inline mm/kasan/generic.c:183 [inline]
+ kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+ usbnet_deferred_kevent+0x2b/0xe90 drivers/net/usb/usbnet.c:1153
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 14552:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:257 [inline]
+ __do_kmalloc_node mm/slub.c:4264 [inline]
+ __kmalloc_node_noprof+0x211/0x430 mm/slub.c:4270
+ __kvmalloc_node_noprof+0x6f/0x1a0 mm/util.c:658
+ alloc_netdev_mqs+0xd1/0x1420 net/core/dev.c:11097
+ usbnet_probe+0x1b9/0x2730 drivers/net/usb/usbnet.c:1712
+ usb_probe_interface+0x309/0x9d0 drivers/usb/core/driver.c:399
+ call_driver_probe drivers/base/dd.c:579 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:658
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
+ __device_attach_driver+0x1df/0x310 drivers/base/dd.c:958
+ bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:459
+ __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1030
+ bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:534
+ device_add+0x114b/0x1a70 drivers/base/core.c:3675
+ usb_set_configuration+0x10cb/0x1c50 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xb1/0x110 drivers/usb/core/generic.c:254
+ usb_probe_device+0xec/0x3e0 drivers/usb/core/driver.c:294
+ call_driver_probe drivers/base/dd.c:579 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:658
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
+ __device_attach_driver+0x1df/0x310 drivers/base/dd.c:958
+ bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:459
+ __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1030
+ bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:534
+ device_add+0x114b/0x1a70 drivers/base/core.c:3675
+ usb_new_device+0xd90/0x1a10 drivers/usb/core/hub.c:2651
+ hub_port_connect drivers/usb/core/hub.c:5521 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x2d9a/0x4e10 drivers/usb/core/hub.c:5903
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Freed by task 14552:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:2342 [inline]
+ slab_free mm/slub.c:4579 [inline]
+ kfree+0x14f/0x4b0 mm/slub.c:4727
+ kvfree+0x47/0x50 mm/util.c:701
+ device_release+0xa1/0x240 drivers/base/core.c:2575
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1e4/0x5a0 lib/kobject.c:737
+ put_device+0x1f/0x30 drivers/base/core.c:3783
+ free_netdev+0x4b7/0x670 net/core/dev.c:11255
+ usbnet_disconnect+0x25c/0x500 drivers/net/usb/usbnet.c:1652
+ usb_unbind_interface+0x1e8/0x970 drivers/usb/core/driver.c:461
+ device_remove drivers/base/dd.c:569 [inline]
+ device_remove+0x122/0x170 drivers/base/dd.c:561
+ __device_release_driver drivers/base/dd.c:1273 [inline]
+ device_release_driver_internal+0x44a/0x610 drivers/base/dd.c:1296
+ bus_remove_device+0x22f/0x420 drivers/base/bus.c:576
+ device_del+0x396/0x9f0 drivers/base/core.c:3864
+ usb_disable_device+0x36c/0x7f0 drivers/usb/core/message.c:1418
+ usb_disconnect+0x2e1/0x920 drivers/usb/core/hub.c:2304
+ hub_port_connect drivers/usb/core/hub.c:5361 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x1da5/0x4e10 drivers/usb/core/hub.c:5903
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Last potentially related work creation:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ __kasan_record_aux_stack+0xba/0xd0 mm/kasan/generic.c:541
+ insert_work+0x36/0x230 kernel/workqueue.c:2183
+ __queue_work+0x97e/0x1080 kernel/workqueue.c:2339
+ queue_work_on+0x11a/0x140 kernel/workqueue.c:2390
+ queue_work include/linux/workqueue.h:662 [inline]
+ schedule_work include/linux/workqueue.h:723 [inline]
+ usbnet_defer_kevent+0xd2/0x270 drivers/net/usb/usbnet.c:468
+ usbnet_link_change drivers/net/usb/usbnet.c:2009 [inline]
+ usbnet_probe+0x1990/0x2730 drivers/net/usb/usbnet.c:1856
+ usb_probe_interface+0x309/0x9d0 drivers/usb/core/driver.c:399
+ call_driver_probe drivers/base/dd.c:579 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:658
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
+ __device_attach_driver+0x1df/0x310 drivers/base/dd.c:958
+ bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:459
+ __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1030
+ bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:534
+ device_add+0x114b/0x1a70 drivers/base/core.c:3675
+ usb_set_configuration+0x10cb/0x1c50 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xb1/0x110 drivers/usb/core/generic.c:254
+ usb_probe_device+0xec/0x3e0 drivers/usb/core/driver.c:294
+ call_driver_probe drivers/base/dd.c:579 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:658
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
+ __device_attach_driver+0x1df/0x310 drivers/base/dd.c:958
+ bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:459
+ __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1030
+ bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:534
+ device_add+0x114b/0x1a70 drivers/base/core.c:3675
+ usb_new_device+0xd90/0x1a10 drivers/usb/core/hub.c:2651
+ hub_port_connect drivers/usb/core/hub.c:5521 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x2d9a/0x4e10 drivers/usb/core/hub.c:5903
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+The buggy address belongs to the object at ffff88804f87c000
+ which belongs to the cache kmalloc-cg-8k of size 8192
+The buggy address is located 4584 bytes inside of
+ freed 8192-byte region [ffff88804f87c000, ffff88804f87e000)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x4f878
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+memcg:ffff888031822b81
+flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000040 ffff88801b04f640 ffffea0001f7c600 dead000000000002
+raw: 0000000000000000 0000000080020002 00000001f5000000 ffff888031822b81
+head: 00fff00000000040 ffff88801b04f640 ffffea0001f7c600 dead000000000002
+head: 0000000000000000 0000000080020002 00000001f5000000 ffff888031822b81
+head: 00fff00000000003 ffffea00013e1e01 ffffffffffffffff 0000000000000000
+head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd60c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 10578, tgid 10578 (syz-executor), ts 527342139934, free_ts 519758587910
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1537
+ prep_new_page mm/page_alloc.c:1545 [inline]
+ get_page_from_freelist+0x101e/0x3070 mm/page_alloc.c:3457
+ __alloc_pages_noprof+0x223/0x25c0 mm/page_alloc.c:4733
+ alloc_pages_mpol_noprof+0x2c9/0x610 mm/mempolicy.c:2265
+ alloc_slab_page mm/slub.c:2412 [inline]
+ allocate_slab mm/slub.c:2578 [inline]
+ new_slab+0x2ba/0x3f0 mm/slub.c:2631
+ ___slab_alloc+0xdac/0x1880 mm/slub.c:3818
+ __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3908
+ __slab_alloc_node mm/slub.c:3961 [inline]
+ slab_alloc_node mm/slub.c:4122 [inline]
+ __do_kmalloc_node mm/slub.c:4263 [inline]
+ __kmalloc_node_noprof+0x357/0x430 mm/slub.c:4270
+ __kvmalloc_node_noprof+0x6f/0x1a0 mm/util.c:658
+ alloc_netdev_mqs+0xd1/0x1420 net/core/dev.c:11097
+ nsim_create+0x98/0xb20 drivers/net/netdevsim/netdev.c:734
+ __nsim_dev_port_add+0x42c/0x7d0 drivers/net/netdevsim/dev.c:1390
+ nsim_dev_port_add_all drivers/net/netdevsim/dev.c:1446 [inline]
+ nsim_drv_probe+0xdbf/0x1490 drivers/net/netdevsim/dev.c:1604
+ call_driver_probe drivers/base/dd.c:579 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:658
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
+page last free pid 937 tgid 937 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1108 [inline]
+ free_unref_page+0x5f4/0xdc0 mm/page_alloc.c:2638
+ kasan_depopulate_vmalloc_pte+0x63/0x80 mm/kasan/shadow.c:408
+ apply_to_pte_range mm/memory.c:2817 [inline]
+ apply_to_pmd_range mm/memory.c:2861 [inline]
+ apply_to_pud_range mm/memory.c:2897 [inline]
+ apply_to_p4d_range mm/memory.c:2933 [inline]
+ __apply_to_page_range+0x5fd/0xd30 mm/memory.c:2967
+ kasan_release_vmalloc+0xac/0xc0 mm/kasan/shadow.c:525
+ purge_vmap_node+0x3fb/0x930 mm/vmalloc.c:2204
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Memory state around the buggy address:
+ ffff88804f87d080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88804f87d100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88804f87d180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                          ^
+ ffff88804f87d200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88804f87d280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
