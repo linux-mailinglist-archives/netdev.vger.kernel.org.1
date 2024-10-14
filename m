@@ -1,93 +1,101 @@
-Return-Path: <netdev+bounces-135100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0058199C3BF
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 10:43:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 060F899C404
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 10:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0AA31F23F90
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:43:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 980E2B243B8
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEB514B086;
-	Mon, 14 Oct 2024 08:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4E91531E1;
+	Mon, 14 Oct 2024 08:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eWo5zf1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78FD1494C3
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 08:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A121514EE;
+	Mon, 14 Oct 2024 08:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728895367; cv=none; b=PNs+Z35J1/6vNPiE5u2JmlJpSOMrvgEm9t+Xjbl9Zw7cIXQ80Fjxe5hCjOZZPLmp9FnqvQwyvwCUgmFHe7SF49s8hH0EIHqqE8hVJtc5Psxg1BY7bE6Rdopv4+gWkXk2prDwIg3ZLthBSXAgzH8YdWC9EAW1PxHHNxmseuafjsE=
+	t=1728895888; cv=none; b=dSuqMlFTXOde6ArklOY1KGItsbSlopJ29vtkJT+SrtEqAjK7c0zp3Jhm6pFwCdKKheNyRNSNljlKvedk4EOfABen3hJHUIdThJE0+xc6Y5mY+ioD2Gm9r/mp7l3HtjlMAAkj2qVzDB5VTKE90CEpYdHGiR45Ixr7+Qg8oBt883k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728895367; c=relaxed/simple;
-	bh=5yHjcG23l2RiY+X6SeesaOy4Cjp/tQ5jwtipApmb/RA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=NKJVJsXQaFghriSoRZ/azVgELaoua37Py1Ozhd5ibfpGtONfbUmOpfBNjugEWIyJoCe88IanBKoUGKAI22i6yI4hzD7KvHG8wPWSqSwT9AmwMstZZ9PbAexVzRmyZUX4ZwAKGYBX1hsT2C9VvmFDJ/3CtXSZhzfPoAYybvbkEsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-237-As3E12owNUiKpRqDsAirYw-1; Mon, 14 Oct 2024 09:42:43 +0100
-X-MC-Unique: As3E12owNUiKpRqDsAirYw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 14 Oct
- 2024 09:42:42 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 14 Oct 2024 09:42:42 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Jens Axboe' <axboe@kernel.dk>, David Ahern <dsahern@kernel.org>, "David
- Wei" <dw@davidwei.uk>, "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Mina Almasry <almasrymina@google.com>
-Subject: RE: [PATCH v1 00/15] io_uring zero copy rx
-Thread-Topic: [PATCH v1 00/15] io_uring zero copy rx
-Thread-Index: AQHbGz/uyU8SPZfot0qITi1hCcBR0bKF8pRg
-Date: Mon, 14 Oct 2024 08:42:41 +0000
-Message-ID: <bee3c385d0af490ea0dc92adeba67dfb@AcuMS.aculab.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <2e475d9f-8d39-43f4-adc5-501897c951a8@kernel.dk>
- <93036b67-018a-44fb-8d12-7328c58be3c4@kernel.org>
- <2144827e-ad7e-4cea-8e38-05fb310a85f5@kernel.dk>
- <3b2646d6-6d52-4479-b082-eb6264e8d6f7@kernel.org>
- <57391bd9-e56e-427c-9ff0-04cb49d2c6d8@kernel.dk>
- <d0ba9ba9-8969-4bf6-a8c7-55628771c406@kernel.dk>
- <b8fd4a5b-a7eb-45a7-a2f4-fce3b149bd5b@kernel.dk>
- <7f8c6192-3652-4761-b2e3-8a4bddb71e29@kernel.dk>
- <9bbab76f-70db-48ef-9dcc-7fedd75582cb@kernel.dk>
-In-Reply-To: <9bbab76f-70db-48ef-9dcc-7fedd75582cb@kernel.dk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1728895888; c=relaxed/simple;
+	bh=HlYKvFyTI+h9yfs5jdeGzQdG/BYt6ViKVZgJ3ftC7yc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h9lvWSQd00fZvvQFyQ4P4fjqQi8tZnx1gGMhPz5Bi5loAXUyGqmhcmeq9MUAHZc9eTZCrw77HEByADAKZ2zSxq/baq5nRxfeHyA0jNS0mQlHSEeotLgWnGHi8Bd6f8u4rUKOzri/pjR/T9zDqFBkEH5+eLZeYtuEG1Pd+Sk769A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eWo5zf1R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3705C4CEC3;
+	Mon, 14 Oct 2024 08:51:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728895887;
+	bh=HlYKvFyTI+h9yfs5jdeGzQdG/BYt6ViKVZgJ3ftC7yc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eWo5zf1RYDeR5/6QMU2aPVhosbME/qwKL2vNGtLRlYt0TWyhY9OO2Yj8/BkJGPRtB
+	 va+roREyhtt6b6wVu2BtBZrfh9JDZlrP3py/H+QW0wtsEYpO7UpLNILZQkqtt/aw5i
+	 zy0uV5CPQbd/3/lTW2O0808zKtA2iSSUYlZ91KXb4NcMC20exHBUlmu/Ubcuq+03+M
+	 JThqHyjqMfd3gdv4pMQQ70MlmdINVIYYqEH2c3++6deAuIzupc9+Z0bFrF/5mZ0sLz
+	 CLhPgGbn478N8Jb8nSiM14ZlQirTcvDY6/4Ai4WG0xbTH645eaBltR5JtgCgAG6K7T
+	 lsRhCFNSFA2rg==
+Date: Mon, 14 Oct 2024 09:51:22 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC v1 net-next] net: ethernet: mtk_ppe_offload: Allow
+ QinQ
+Message-ID: <20241014085122.GN77519@kernel.org>
+References: <20241013185056.4077-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241013185056.4077-1-ericwouds@gmail.com>
 
-Li4uDQo+ID4gVGFwIHNpZGUgc3RpbGwgYSBteXN0ZXJ5LCBidXQgaXQgdW5ibG9ja2VkIHRlc3Rp
-bmcuIEknbGwgZmlndXJlIHRoYXQNCj4gPiBwYXJ0IG91dCBzZXBhcmF0ZWx5Lg0KPiANCj4gRnVy
-dGhlciB1cGRhdGUgLSB0aGUgYWJvdmUgbXlzdGVyeSB3YXMgZGhjbGllbnQsIHRoYW5rcyBhIGxv
-dCB0byBEYXZpZA0KPiBmb3IgYmVpbmcgYWJsZSB0byBmaWd1cmUgdGhhdCBvdXQgdmVyeSBxdWlj
-a2x5Lg0KDQpJJ3ZlIHNlZW4gdGhhdCBiZWZvcmUgLSBvbiB0aGUgcnggc2lkZS4NCklzIHRoZXJl
-IGFueSB3YXkgdG8gZGVmZXIgdGhlIGNvcHkgdW50aWwgdGhlIHBhY2tldCBwYXNzZXMgYSBmaWx0
-ZXI/DQpPciBiZXR0ZXIgdGVhY2ggZGhjcCB0byB1c2UgYSBub3JtYWwgVURQIHNvY2tldD8/DQoN
-CglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwg
-TW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzog
-MTM5NzM4NiAoV2FsZXMpDQo=
+On Sun, Oct 13, 2024 at 08:50:56PM +0200, Eric Woudstra wrote:
+> mtk_foe_entry_set_vlan() in mtk_ppe.c already seems to support
+> double vlan tagging, but mtk_flow_offload_replace() in
+> mtk_ppe_offload.c only allows for 1 vlan tag, optionally in
+> combination with pppoe and dsa tags.
+> 
+> This patch adds QinQ support to mtk_flow_offload_replace().
+> 
+> Only PPPoE-in-Q (as before) and Q-in-Q are allowed. A combination
+> of PPPoE and Q-in-Q is not allowed.
+> 
+> As I do not have any documentation of the ppe hardware, I do not
+> know if there is any other reason to not implement Q-in-Q in
+> mtk_flow_offload_replace().
+> 
+> Tested on the BPI-R3(mini), on non-dsa-ports and dsa-ports.
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 
+Hi Eric,
+
+I see that this patch supports up to two VLANs, both with EtherType 0x8100.
+And assuming that is supported by the hardware, that seems fine to me.
+
+But I winder if you know if this hardware supports other VLAN EtherTypes,
+such as  0x88a8 which is described in 802.1ad?
+
+...
 
