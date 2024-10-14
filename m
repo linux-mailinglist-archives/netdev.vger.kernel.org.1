@@ -1,190 +1,121 @@
-Return-Path: <netdev+bounces-135035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00EE499BE43
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:38:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07AA199BE8E
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B048C283220
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 03:38:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3781C22C54
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 04:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373A684D3E;
-	Mon, 14 Oct 2024 03:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A27156644;
+	Mon, 14 Oct 2024 03:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K1Rkcksv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oB9llIhR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE4C1369BC
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 03:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A987315624B;
+	Mon, 14 Oct 2024 03:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728877081; cv=none; b=C1Bxq1UFOyY0vAskheNY9TyeUzUmVNBSju2Tx83Spq+eX39nOVyUrosWPDN/z0y4UQ4ovff9mthURMQKpKrituOcMVmnoFRjTXqLyGSYIC41CcN+LH6T3x3R4xfuUin9/wL7kLWZ+BCNd40LHq7u0E4wyPBNts2rCm1S8iUPpG0=
+	t=1728878283; cv=none; b=O6FtiQslI52sangiy6UKh+Uj9gLIoaRUh3C87ECxNFCealN7YEMeN/3UgsACDkr5jmLacl/IJ9NdSicpYx0jzU+VOddxRaBxlzrvHbcxjBMSvGeSNoAQpMqk1LfmIYrKFoAwfvNg6Lggqp240bvaZBgGcQ3vpQOa9olLVDjk+b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728877081; c=relaxed/simple;
-	bh=AEq7r2Z/C0nVowIvQwN2buM/ovi8XK7aQqIYuzfWjnA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jvowYS4+tq9IPbYnE91tMKhTacgCxsKDXbyu3TnFH0uiDb5fcMyMmnryqRHlMP5u0dKkIAE7W13O+eCdSb4/nFud+CtQU4Cd5rNvGHkfZfeh400uv97Eox8VNlcclNiRg93GEeQd8FQ1qLQOirL2qSNfO4xSQFEOsTtcJTt+vXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=K1Rkcksv; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-539e6c754bdso992087e87.2
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 20:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728877077; x=1729481877; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AEq7r2Z/C0nVowIvQwN2buM/ovi8XK7aQqIYuzfWjnA=;
-        b=K1RkcksvuR3dfGFAX+DTFhVsXeyIEkRpbqMvfxZ4eV4DNNQe4iJwp2BQr34n/u5ZI4
-         w8nLExbg/TCLMhAojG0oFzwif+G/C9My1/XwRbyQ9ZooF0kEzVQODFQxRGNn4ZmPbkTv
-         56aG10C7Nz94MkrnEjI7x7GWbqIzAPDtfWZrA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728877077; x=1729481877;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AEq7r2Z/C0nVowIvQwN2buM/ovi8XK7aQqIYuzfWjnA=;
-        b=nsbeEDBZ3ZINUjrtq6xxqOsuUwEz/xvr/zBw6porLBke5w5o87k50agj0KYOT3MM7n
-         eU55TXvbpHvNZUyngssde8bmxqqwRSEZnpdVbHqORQ9zd7mTK3M0NBwbYOaxeuWLTRVQ
-         8+utK45t65stowe2xpDViOec3GBD4KA6CrW+e89K/5KOlZ76YTn+JQK7i0aGZIu3X0vf
-         QFU8W9THe8ftMel7V5DxP+EkV7nZB2U9yvqJ4ChOQoKl+NGJFLrAZb5aZUDw0S8Pt/e5
-         BEamZFLlRr3ot+/XpMwT+q8D8hEJ0edzOXIbxquY/gtRUyPKiDIrtghBTEQNA7ySY3/k
-         1eIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV++WXFl44xY9gAXRxD/Au8JOQqQdT0E3zp5iPOqeWe17Tkj/c3O12jjasbK9v0cVUI9JJpH2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF/7va/P8nvYM6IAr1o2sR7vwi0VoUeze7HKdOQY5CoF9hC1g7
-	FxRVCvh4rB48h/5tponQlfENXLUaDQaqSM0eKCRuhzDQhuodF1dRzuSURVKRujZ19fta/OOGiuU
-	y9nHau3x+QOfcQu0Q/Ee7AOTm/USjUoPoUQDl
-X-Google-Smtp-Source: AGHT+IFLgN6T2WOc1fl7pwW0tsTPcVSVKjQ4YS9ywPS+z8WLA3X/LwUST4uKOC67sF+N6U4dJmz6MkJTKxRFmL6GPjU=
-X-Received: by 2002:a05:6512:33c2:b0:533:4b70:8722 with SMTP id
- 2adb3069b0e04-539da3c7d44mr3904214e87.15.1728877077520; Sun, 13 Oct 2024
- 20:37:57 -0700 (PDT)
+	s=arc-20240116; t=1728878283; c=relaxed/simple;
+	bh=qCICDlZnGDoXb58vGlFU3fU9K0Vyajcva5EQv963CPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uNAY+qomPRxPjGvADg+qV/dydTN61WRowKNc16Ur8VjMIgniCJ7q5WSWKUYIdYiJMlsP6F1clyL3D6Q5CIpMIxuSfBec1I7CxSLSsjEGSSTrOxjgvLTXBi4Fw362ZojzCqhFVxGnRA1IF1WOn3w19fr29GfnfBcKPh7+RifPYak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oB9llIhR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47D36C4CECE;
+	Mon, 14 Oct 2024 03:58:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728878283;
+	bh=qCICDlZnGDoXb58vGlFU3fU9K0Vyajcva5EQv963CPg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oB9llIhRwE/k8udl1Xlcsxo5b6EH7MixnHrfnEaYKVT6FUaUIQNvJZPaH23Ne83Ds
+	 avuT8fgFUEjhFtbR9T/TKhoSaGiEt8PKdRLm7dAjyY9X+cWlnoYvgDJIvAIA9bItku
+	 3KwBEuB4qUb1mLordxIOMPVHvsKeCWZjHlU+rdOBb41un3czbFwldku71TG0VdPBiU
+	 y4sF0EzuyLfoEGNuXd5dE9zBOoZC1hpCzz/i0GoKIRQga70bBisNpaqleu6gUxQf+A
+	 xmtPCNMnyuPIEOgY2eq1ucq1HAnt/46ObACs1ySoe9I3xoW12bVSSSNMpayqpIMfPD
+	 vB67aTHgFPoew==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Daniel Palmer <daniel@0x0f.com>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	quic_jjohnson@quicinc.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 18/20] net: amd: mvme147: Fix probe banner message
+Date: Sun, 13 Oct 2024 23:57:20 -0400
+Message-ID: <20241014035731.2246632-18-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241014035731.2246632-1-sashal@kernel.org>
+References: <20241014035731.2246632-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241013203831.88051-1-linux@treblig.org> <20241013203831.88051-3-linux@treblig.org>
-In-Reply-To: <20241013203831.88051-3-linux@treblig.org>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 14 Oct 2024 09:07:46 +0530
-Message-ID: <CAH-L+nNSaUT8CVNSMD=0x2wqYx5J0Op_tTViv8seoYu9=dBUGg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/6] cxgb4: Remove unused cxgb4_alloc/free_raw_mac_filt
-To: linux@treblig.org
-Cc: bharat@chelsio.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000016c40e06246790be"
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.11.3
+Content-Transfer-Encoding: 8bit
 
---00000000000016c40e06246790be
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Daniel Palmer <daniel@0x0f.com>
 
-On Mon, Oct 14, 2024 at 2:09=E2=80=AFAM <linux@treblig.org> wrote:
->
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
->
-> cxgb4_alloc_raw_mac_filt() and cxgb4_free_raw_mac_filt() have been
-> unused since they were added in 2019 commit
-> 5fab51581f62 ("cxgb4: Add MPS TCAM refcounting for raw mac filters")
->
-> Remove them.
->
-> This was also the last use of cxgb4_mps_ref_dec().
-> Remove it.
->
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+[ Upstream commit 82c5b53140faf89c31ea2b3a0985a2f291694169 ]
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Currently this driver prints this line with what looks like
+a rogue format specifier when the device is probed:
+[    2.840000] eth%d: MVME147 at 0xfffe1800, irq 12, Hardware Address xx:xx:xx:xx:xx:xx
 
---=20
-Regards,
-Kalesh A P
+Change the printk() for netdev_info() and move it after the
+registration has completed so it prints out the name of the
+interface properly.
 
---00000000000016c40e06246790be
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Signed-off-by: Daniel Palmer <daniel@0x0f.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/amd/mvme147.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIB/i0iUFG7MumKEVUdV4RANRdT4010RXGwM80Uku7a3YMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAxNDAzMzc1N1owaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCnCXAJCeRV
-z2db0S/nF/MQB0aQ1i3MqrsJiKX8sUkJmHVVePRkiddg/5/6v6K/46te1NtFwi6c+pIG/hTdcGdt
-6J1KLxsj/3XNA5DUHxmksMIWe2caAWMLTJQ0uAkYsQds48tYKVeI9jxn5cG5uXxBflbTPq/GKt6t
-lkp7EcCSyMjWDG5zUvalK8MOkUvXdJY0a7CNhImLNgehKQd8GYtEBzmcfysmrAa1mCOwC8oxWI+Q
-cZdHUzTWpD6Gx5/Irni7fzU2GotFNMNcoE6CdQuolId2Tcu+vqPgZRjQlU78ybHWT6DhLZn+IP2h
-sD5SoN8GXC2Ax9Kwc5y6zPUnx471
---00000000000016c40e06246790be--
+diff --git a/drivers/net/ethernet/amd/mvme147.c b/drivers/net/ethernet/amd/mvme147.c
+index c156566c09064..f19b04b92fa9f 100644
+--- a/drivers/net/ethernet/amd/mvme147.c
++++ b/drivers/net/ethernet/amd/mvme147.c
+@@ -105,10 +105,6 @@ static struct net_device * __init mvme147lance_probe(void)
+ 	macaddr[3] = address&0xff;
+ 	eth_hw_addr_set(dev, macaddr);
+ 
+-	printk("%s: MVME147 at 0x%08lx, irq %d, Hardware Address %pM\n",
+-	       dev->name, dev->base_addr, MVME147_LANCE_IRQ,
+-	       dev->dev_addr);
+-
+ 	lp = netdev_priv(dev);
+ 	lp->ram = __get_dma_pages(GFP_ATOMIC, 3);	/* 32K */
+ 	if (!lp->ram) {
+@@ -138,6 +134,9 @@ static struct net_device * __init mvme147lance_probe(void)
+ 		return ERR_PTR(err);
+ 	}
+ 
++	netdev_info(dev, "MVME147 at 0x%08lx, irq %d, Hardware Address %pM\n",
++		    dev->base_addr, MVME147_LANCE_IRQ, dev->dev_addr);
++
+ 	return dev;
+ }
+ 
+-- 
+2.43.0
+
 
