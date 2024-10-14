@@ -1,72 +1,71 @@
-Return-Path: <netdev+bounces-135312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A591099D81C
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:22:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4FB599D81E
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D76F01C22681
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:22:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8C891C21668
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EC21CDFD2;
-	Mon, 14 Oct 2024 20:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833B91D0DEB;
+	Mon, 14 Oct 2024 20:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="j4yX2+RT"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="or0Cg0bo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3924149C47
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 20:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58DD1D0943
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 20:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728937320; cv=none; b=h9vMM/0GF3WnghQCLYl9BnMrTFEMsIEURgEl3FEeFI2KbAeBQ9WEgVu2EVbPrMKT0q2csyms75kAlRqPFZ5LiiUjaWh7d/4OIfqIcNyudOh3v5/AcRp1vLzAPempiKVN03C4bdFVEV5JbiD94NZsfmJ08CqrqjirTf9am21aDaM=
+	t=1728937338; cv=none; b=kENY0KyLO30K32Nir64jpMvo1s39owW0v9vpV9wPDKAnMYoxTmR3SsXAupS7lT41/hDY4fgP1C+AmERsw0zcdlYHCXKBL/bBkD3U1oSKY0wfNHLMFDf4tbpwwhmGM+2uQpucAwdkqM3rcVVt028csySMXhoOmkHNd6sTyQKHYps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728937320; c=relaxed/simple;
-	bh=gpAJNfzBOZ+Op84kxQp9W7WL/Ilixmd/JWAbHi8HPQM=;
+	s=arc-20240116; t=1728937338; c=relaxed/simple;
+	bh=LpOndllIAxcBG13ZYSNZuRr2zXqyl7X0RaEl/I/ku20=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L6x0nHu2hkTL6zaNtAkwOUfkJuVXCT+6kf8vKX5Woy+xFKQi+y/xfGTPMYGyx4M+WZD/3Vh6poEWVU5+my+/5W/QxV75XjDztqW7rLAi2STYEMOF/6Q5yiFmxKR1W6aKS3gayJh5R+Dd7jWL+K5MWvVtq3RSgeKWJT4y7HNXjbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=j4yX2+RT; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=WlPSUYzH/NPgRZ/iFFmNVDqIsu5QE26aazPH1QrW4W3Vfg9chulMKG2kVDWzdfPzg10NBNY2qAKMyopKmzZcbmNmdikYQ9KpDE2gYa/BoubqKKhR+w1m7lz2SadjDHD4CZjCVHvz/b4aAa5Bp+rDLctvmdwxV2pBWWkucdwBlrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=or0Cg0bo; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728937318; x=1760473318;
+  t=1728937337; x=1760473337;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RILhGzyr/xs2ZbFs/Wg/td011AFjhneT2w0dh4/jpXg=;
-  b=j4yX2+RT4QqGJS4tX946upmrDFm77TFPNzOJBYiV0P+0J4PsXONGW2ta
-   qMAoaY6nuyg6ms6NVtkm9zvLJwrasJ4JnLGIvy60JDY5d/twNQmgjPWWh
-   doKFXi8RRtVvehpd/bewAgLC4sAyZYXqLqDVbd5JnnZRkX+DC6hoHY2Ms
-   E=;
+  bh=8dwptSTJN0DiVuJVkYG/a9xZa+YOAOsdyYaD++ooLDc=;
+  b=or0Cg0bo0fPtfrGgvEqh04lG8384LKmraAF8ObMZ6QUr8R2ekujf2ELy
+   uiv6fFd0Ztcfj4kEp4SE15Qlj03HQq9qGKRiNYXTbB9zojxL/B4wGrCqZ
+   J68CeryEe6nwceKPPZ8xW/OBcDu4BOYNNh2vLPfDNUDQjATFgTlyXkRXL
+   Y=;
 X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
-   d="scan'208";a="440745752"
+   d="scan'208";a="666112151"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 20:21:54 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:46236]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.26:2525] with esmtp (Farcaster)
- id a450b907-6c79-4d2e-a16f-cd48bbd62aed; Mon, 14 Oct 2024 20:21:53 +0000 (UTC)
-X-Farcaster-Flow-ID: a450b907-6c79-4d2e-a16f-cd48bbd62aed
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 20:22:14 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:42129]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
+ id 75084963-0824-4e83-8d93-a1b48f2f95bd; Mon, 14 Oct 2024 20:22:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 75084963-0824-4e83-8d93-a1b48f2f95bd
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 14 Oct 2024 20:21:53 +0000
+ Mon, 14 Oct 2024 20:22:13 +0000
 Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 14 Oct 2024 20:21:50 +0000
+ Mon, 14 Oct 2024 20:22:10 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Oliver Hartkopp
-	<socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH v2 net-next 10/11] can: gw: Use rtnl_register_many().
-Date: Mon, 14 Oct 2024 13:18:27 -0700
-Message-ID: <20241014201828.91221-11-kuniyu@amazon.com>
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net-next 11/11] rtnetlink: Remove rtnl_register() and rtnl_register_module().
+Date: Mon, 14 Oct 2024 13:18:28 -0700
+Message-ID: <20241014201828.91221-12-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241014201828.91221-1-kuniyu@amazon.com>
 References: <20241014201828.91221-1-kuniyu@amazon.com>
@@ -78,79 +77,158 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
+X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will remove rtnl_register_module() in favour of rtnl_register_many().
+No one uses rtnl_register() and rtnl_register_module().
 
-rtnl_register_many() will unwind the previous successful registrations
-on failure and simplify module error handling.
-
-Let's use rtnl_register_many() instead.
+Let's remove them.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+ include/net/rtnetlink.h | 15 ++++++---
+ net/core/rtnetlink.c    | 74 ++++++++++++-----------------------------
+ 2 files changed, 31 insertions(+), 58 deletions(-)
 
-v2:
-  * Add __initconst_or_module
-  * Use C99 initialisation
----
- net/can/gw.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
-
-diff --git a/net/can/gw.c b/net/can/gw.c
-index 37528826935e..ef93293c1fae 100644
---- a/net/can/gw.c
-+++ b/net/can/gw.c
-@@ -1265,6 +1265,15 @@ static struct pernet_operations cangw_pernet_ops = {
- 	.exit_batch = cangw_pernet_exit_batch,
+diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
+index 2d3eb7cb4dff..bb49c5708ce7 100644
+--- a/include/net/rtnetlink.h
++++ b/include/net/rtnetlink.h
+@@ -29,6 +29,16 @@ static inline enum rtnl_kinds rtnl_msgtype_kind(int msgtype)
+ 	return msgtype & RTNL_KIND_MASK;
+ }
+ 
++/**
++ *	struct rtnl_msg_handler - rtnetlink message type and handlers
++ *
++ *	@owner: NULL for built-in, THIS_MODULE for module
++ *	@protocol: Protocol family or PF_UNSPEC
++ *	@msgtype: rtnetlink message type
++ *	@doit: Function pointer called for each request message
++ *	@dumpit: Function pointer called for each dump request (NLM_F_DUMP) message
++ *	@flags: rtnl_link_flags to modify behaviour of doit/dumpit functions
++ */
+ struct rtnl_msg_handler {
+ 	struct module *owner;
+ 	int protocol;
+@@ -38,11 +48,6 @@ struct rtnl_msg_handler {
+ 	int flags;
  };
  
-+static const struct rtnl_msg_handler cgw_rtnl_msg_handlers[] __initconst_or_module = {
-+	{.owner = THIS_MODULE, .protocol = PF_CAN, .msgtype = RTM_NEWROUTE,
-+	 .doit = cgw_create_job},
-+	{.owner = THIS_MODULE, .protocol = PF_CAN, .msgtype = RTM_DELROUTE,
-+	 .doit = cgw_remove_job},
-+	{.owner = THIS_MODULE, .protocol = PF_CAN, .msgtype = RTM_GETROUTE,
-+	 .dumpit = cgw_dump_jobs},
-+};
-+
- static __init int cgw_module_init(void)
- {
- 	int ret;
-@@ -1290,27 +1299,13 @@ static __init int cgw_module_init(void)
- 	if (ret)
- 		goto out_register_notifier;
+-void rtnl_register(int protocol, int msgtype,
+-		   rtnl_doit_func, rtnl_dumpit_func, unsigned int flags);
+-int rtnl_register_module(struct module *owner, int protocol, int msgtype,
+-			 rtnl_doit_func, rtnl_dumpit_func, unsigned int flags);
+-int rtnl_unregister(int protocol, int msgtype);
+ void rtnl_unregister_all(int protocol);
  
--	ret = rtnl_register_module(THIS_MODULE, PF_CAN, RTM_GETROUTE,
--				   NULL, cgw_dump_jobs, 0);
--	if (ret)
--		goto out_rtnl_register1;
+ int __rtnl_register_many(const struct rtnl_msg_handler *handlers, int n);
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 0fbbfeb2cb50..a9c92392fb1d 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -338,57 +338,6 @@ static int rtnl_register_internal(struct module *owner,
+ 	return ret;
+ }
+ 
+-/**
+- * rtnl_register_module - Register a rtnetlink message type
+- *
+- * @owner: module registering the hook (THIS_MODULE)
+- * @protocol: Protocol family or PF_UNSPEC
+- * @msgtype: rtnetlink message type
+- * @doit: Function pointer called for each request message
+- * @dumpit: Function pointer called for each dump request (NLM_F_DUMP) message
+- * @flags: rtnl_link_flags to modify behaviour of doit/dumpit functions
+- *
+- * Like rtnl_register, but for use by removable modules.
+- */
+-int rtnl_register_module(struct module *owner,
+-			 int protocol, int msgtype,
+-			 rtnl_doit_func doit, rtnl_dumpit_func dumpit,
+-			 unsigned int flags)
+-{
+-	return rtnl_register_internal(owner, protocol, msgtype,
+-				      doit, dumpit, flags);
+-}
+-EXPORT_SYMBOL_GPL(rtnl_register_module);
 -
--	ret = rtnl_register_module(THIS_MODULE, PF_CAN, RTM_NEWROUTE,
--				   cgw_create_job, NULL, 0);
--	if (ret)
--		goto out_rtnl_register2;
--	ret = rtnl_register_module(THIS_MODULE, PF_CAN, RTM_DELROUTE,
--				   cgw_remove_job, NULL, 0);
-+	ret = rtnl_register_many(cgw_rtnl_msg_handlers);
- 	if (ret)
--		goto out_rtnl_register3;
-+		goto out_rtnl_register;
+-/**
+- * rtnl_register - Register a rtnetlink message type
+- * @protocol: Protocol family or PF_UNSPEC
+- * @msgtype: rtnetlink message type
+- * @doit: Function pointer called for each request message
+- * @dumpit: Function pointer called for each dump request (NLM_F_DUMP) message
+- * @flags: rtnl_link_flags to modify behaviour of doit/dumpit functions
+- *
+- * Registers the specified function pointers (at least one of them has
+- * to be non-NULL) to be called whenever a request message for the
+- * specified protocol family and message type is received.
+- *
+- * The special protocol family PF_UNSPEC may be used to define fallback
+- * function pointers for the case when no entry for the specific protocol
+- * family exists.
+- */
+-void rtnl_register(int protocol, int msgtype,
+-		   rtnl_doit_func doit, rtnl_dumpit_func dumpit,
+-		   unsigned int flags)
+-{
+-	int err;
+-
+-	err = rtnl_register_internal(NULL, protocol, msgtype, doit, dumpit,
+-				     flags);
+-	if (err)
+-		pr_err("Unable to register rtnetlink message handler, "
+-		       "protocol = %d, message type = %d\n", protocol, msgtype);
+-}
+-
+ /**
+  * rtnl_unregister - Unregister a rtnetlink message type
+  * @protocol: Protocol family or PF_UNSPEC
+@@ -396,7 +345,7 @@ void rtnl_register(int protocol, int msgtype,
+  *
+  * Returns 0 on success or a negative error code.
+  */
+-int rtnl_unregister(int protocol, int msgtype)
++static int rtnl_unregister(int protocol, int msgtype)
+ {
+ 	struct rtnl_link __rcu **tab;
+ 	struct rtnl_link *link;
+@@ -419,7 +368,6 @@ int rtnl_unregister(int protocol, int msgtype)
  
  	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtnl_unregister);
  
--out_rtnl_register3:
--	rtnl_unregister(PF_CAN, RTM_NEWROUTE);
--out_rtnl_register2:
--	rtnl_unregister(PF_CAN, RTM_GETROUTE);
--out_rtnl_register1:
-+out_rtnl_register:
- 	unregister_netdevice_notifier(&notifier);
- out_register_notifier:
- 	kmem_cache_destroy(cgw_cache);
+ /**
+  * rtnl_unregister_all - Unregister all rtnetlink message type of a protocol
+@@ -454,6 +402,26 @@ void rtnl_unregister_all(int protocol)
+ }
+ EXPORT_SYMBOL_GPL(rtnl_unregister_all);
+ 
++/**
++ * __rtnl_register_many - Register rtnetlink message types
++ * @handlers: Array of struct rtnl_msg_handlers
++ * @n: The length of @handlers
++ *
++ * Registers the specified function pointers (at least one of them has
++ * to be non-NULL) to be called whenever a request message for the
++ * specified protocol family and message type is received.
++ *
++ * The special protocol family PF_UNSPEC may be used to define fallback
++ * function pointers for the case when no entry for the specific protocol
++ * family exists.
++ *
++ * When one element of @handlers fails to register,
++ * 1) built-in: panics.
++ * 2) modules : the previous successful registrations are unwinded
++ *              and an error is returned.
++ *
++ * Use rtnl_register_many().
++ */
+ int __rtnl_register_many(const struct rtnl_msg_handler *handlers, int n)
+ {
+ 	const struct rtnl_msg_handler *handler;
 -- 
 2.39.5 (Apple Git-154)
 
