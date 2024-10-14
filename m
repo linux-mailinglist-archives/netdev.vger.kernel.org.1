@@ -1,114 +1,137 @@
-Return-Path: <netdev+bounces-135082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE3799C25F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 10:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E12499C26E
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 10:02:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BF51C2698D
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:00:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EEFE1C240F2
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E810A155CA5;
-	Mon, 14 Oct 2024 07:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B7E1494A7;
+	Mon, 14 Oct 2024 08:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="yW7oWpZA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kRnWGdcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B38155A30
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 07:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D27814EC77
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 08:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728892762; cv=none; b=mKWB1nXLDRytLOEtKf5RnZyGj1haFUYr9/tgwkQXkWPUZgJgrY3yBb2pk+WHeXo510u47iGVHCQpm2CvO8Gt5OzYjhrRWLZ7PzVG0XtV4E93oSBD3Ez4sAa0zP70cRDJ2aSCPUJxoac8czkOKYwUtdiFovdS/uB7sRBGOQn96EQ=
+	t=1728892929; cv=none; b=dA5TDaG/Jme/FqXPy8aEth86r3YkUtfY3E5APKTpSj5/12tNco65J6P5fGEHWK9ruiFAdwhF52tgjWpuQSfwegc5gqntE4wYyLAghmW8t8XoE7E5JWiGgQ3H8sqL2+gZMs9xrtcYJn9+B9whpIE/IKrAfZY5+1Sm9T0rnY/k5/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728892762; c=relaxed/simple;
-	bh=6tVaK1PwUlL+I4aBVzPDvZNVDH6jBwylHdHPE0Qiet8=;
+	s=arc-20240116; t=1728892929; c=relaxed/simple;
+	bh=nuZ+/9Xi8MObRa9fKflg+L/SWu48UZGuezop0WPxIho=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i3oTLrFNwCxIMgMZSk0IA3OOA21K9ZlebxWH6WlaUAPbxV0kxQ6I19iV1YiEfLBVsikunLgzy2dWSCRVk+6+1kE793vA3nrFXkmhwsPzG8Ml91bLIZ7XSROM+K6VaZL5FsJB7+T/7B6gtb1JTVpleUABlEduzgGxRo1TAxHFRCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=yW7oWpZA; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-539f4d8ef66so932721e87.1
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 00:59:20 -0700 (PDT)
+	 To:Cc:Content-Type; b=BkiGcNJHDfe+lvgtltv9WDDugqZ/8HtIbxceI/RpTKVXtZg1TDYsQ2Dj7JcBVf2fWPXsOT/0W7YUS7Ev7ULM8wOk0kRr80b+vnZkJBfhBxhsF9ExD24EGxYgprZXeU9Cz49bIikBfpmvUFampp7Tj0V/4iqniMIMAnj0AVX7wDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kRnWGdcS; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c903f5bd0eso5952131a12.3
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 01:02:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1728892759; x=1729497559; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728892926; x=1729497726; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6tVaK1PwUlL+I4aBVzPDvZNVDH6jBwylHdHPE0Qiet8=;
-        b=yW7oWpZA3BTF2qLluR9yNKl8wmcaBX1Ca0r0VcsJjz8TMfs1Q9ltSdkFdoGa0n0gZg
-         9vz175ulwvN72ljFMjlXE8Bda7Aq4wDL9T7c5J6rwm35psM+brYjcdbDnERepfTa76V/
-         F8QGNrShmfHd4tak/31zRJl7xsCjwl4y3Zm4TS1tLYK5lyLqTAUNRDf29LzLQ/kP1lJv
-         D6n53Zv3bAKKSjwrY7AQoH1R6r7ofISZ17sdk8Gux7jvb+M57yd5zH/SeWjbaierGyFG
-         DHSpZWXtskUg2d9ZgVE2Atis6F/5bFru7s31ew8AijdX0+ATXXx2TaYS41AhF39aNNjE
-         sWXQ==
+        bh=WsfMlAFoOVRfJ6OWn19ze27ra+qpllPZSwMGKUlhEkc=;
+        b=kRnWGdcS97O8eJCy1hBOlAq+tmzOT1NBP0Ozf95cGRt7O0KQ22HIDpzy7Z9VynObQN
+         iTtSeYANSUg4U469qK9mGjVdk7dfrfNabmqcFEz9AwJyiGbaPnh/8hLrCJ/UMYtIRkSW
+         h9FnUmyzxdd+uhtq47Z7zCOp0wQ80i2JpwjORJWu0vlMDjz4ec+tLpYEynBJywDOIRfw
+         4+lYvKOKIjYpnocMNB3JfJL4ACrIs1WccvZkIQqBl9o08Vl1SjeOO36j5MX7Q+0LtQ6E
+         kQZOAcJyfXe9dGUQaCXtbKBv5K5Fjhzu3K6+ql5q7691Y/mIFxSGTupwdxZSjced7EaM
+         B9cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728892759; x=1729497559;
+        d=1e100.net; s=20230601; t=1728892926; x=1729497726;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6tVaK1PwUlL+I4aBVzPDvZNVDH6jBwylHdHPE0Qiet8=;
-        b=om94hSCyaSDHN9a0CremOu+jdUl73NRcn3CbG+/K5nopkevK2ew2dVMr9o9q+w7xMd
-         Omopi99LzoFByadEhoO9SmqV9rzM+Qj5JrujW2feULYApuRSAlAVwkgUEhl1sB4W9MJX
-         AkwoI6i2RQiome1CWAg1RexZpFLoYN3EsOGEMOBC2Ve+vnNsYtO0jPPC07Edav4MASqM
-         jx3zxQIF2RhY/oYZ0D2n6PKkidKpnWXLkLZRFjj5T6ZRcQ7QpDaVsoryypBt1OgrN7X2
-         SG+nkGgpyuLVJj4IY9EUaSJutahopc0vKsoIz969L2/ekFHkCvhPwwTWCYbM9hErYT4G
-         8b+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVWm0vjKBeh65Wll8ie7qCAtvtnpQieLAm95baPvrYDUwccrldBwwt42ksl6pGdPDvcRwByb+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsbgvG9wemx+lt5DOMGgCkvR99PgEPm6mjXWw+I5snspHQWSIi
-	0c4HloxExyr/Xg3q/vhtGylrUPLaved65azpvXC10QSCk0ohghxqBmufmAwDXvKjlYxjGSWc27w
-	rjI41ygpZjRRtOn/qPZkByKux++sss+zXlbBPkg==
-X-Google-Smtp-Source: AGHT+IEpWHvzePip2AbpOZrDDoOTlWCLBCnZZjhQ7Blogjf+ZP6Ifrw41m8GkUv9NHZszflLIk7m6dG7ATFP47hYxNQ=
-X-Received: by 2002:a05:6512:3a8d:b0:52e:76d5:9504 with SMTP id
- 2adb3069b0e04-539da3be550mr5304615e87.3.1728892759031; Mon, 14 Oct 2024
- 00:59:19 -0700 (PDT)
+        bh=WsfMlAFoOVRfJ6OWn19ze27ra+qpllPZSwMGKUlhEkc=;
+        b=gRDChLCDr0vTwnp3dEdT/Tbkb1HSXwswRFJZ9oIEKkZkv5TF85J50wBigchmayAito
+         BMjOgb39aCtKLGF6md8sw/ZC5etRrVcPyRcwqr5Zk0MQZeiFhaEmMo8oc8iuqyuWnshE
+         1ICtSjWNYUws2Dq5140025fhIcxBxUyYnrRbBLrfN9FXDzK/5qlUu6MX523NGS3WLXIG
+         Y1uPkb83rwQHEC6+AvoDrQ7lWxy2mUQlFpFpuSlBBTC9UbDahCD3I5gAR7kuBJmWNJ+o
+         lzc9MLamV2iOLh2JToGhatM0EoTGrhxDhfMSrFeJvDfOx0ro3JXuBe5rN3OrloIxhCA6
+         4JrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYp8PZ/A9awKtogrMLhYivLIeVJwvPm7RmRMOBwprWZuRr/HfmiKFNsEGC0gh3XuCA+K5h1LA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy6aFnZtwf4hSmACCTiEPFHQT8MqRS4NJlg3MT39YW/m6Bz1AH
+	m9sPET7Cj8FrfWf0fy/L1ftaDg9kQiHOUpeFjOgby2aC5w6+1TXKgZ4ucb3fW3naTQldkXpk4S7
+	GSskRW2xReLdFtPgC2lZJ/8S5DazNxYBa5f59cC60FdT3PBvHQYQh
+X-Google-Smtp-Source: AGHT+IESBSR/j3NNtjjOZAMpaiJq0RzZ/OhtmG8+L1HoOFeeNyxITRAraKvPq36us/jB/UmzHFnKmo77m9Wi+RK9yRo=
+X-Received: by 2002:a05:6402:4402:b0:5c8:84b2:6ddc with SMTP id
+ 4fb4d7f45d1cf-5c948dac386mr7433193a12.33.1728892925562; Mon, 14 Oct 2024
+ 01:02:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014075329.10400-1-pstanner@redhat.com> <20241014075329.10400-5-pstanner@redhat.com>
-In-Reply-To: <20241014075329.10400-5-pstanner@redhat.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 14 Oct 2024 09:59:08 +0200
-Message-ID: <CAMRc=McAfEPM0b0m6oYUO9_RC=qTd1vsg4wMn1Hb4jYQbx4irA@mail.gmail.com>
-Subject: Re: [PATCH v7 4/5] gpio: Replace deprecated PCI functions
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, 
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Keith Busch <kbusch@kernel.org>, Li Zetao <lizetao1@huawei.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20241011220550.46040-1-kuniyu@amazon.com> <20241011220550.46040-4-kuniyu@amazon.com>
+In-Reply-To: <20241011220550.46040-4-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 14 Oct 2024 10:01:54 +0200
+Message-ID: <CANn89iLhMM9BJLYMg9N0iDfLg-iTjjSof8djopYQfMdbbLeZLA@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 03/11] neighbour: Use rtnl_register_many().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 9:53=E2=80=AFAM Philipp Stanner <pstanner@redhat.co=
-m> wrote:
+On Sat, Oct 12, 2024 at 12:06=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
 >
-> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
-> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> We will remove rtnl_register() in favour of rtnl_register_many().
 >
-> Replace those functions with calls to pcim_iomap_region().
+> When it succeeds, rtnl_register_many() guarantees all rtnetlink types
+> in the passed array are supported, and there is no chance that a part
+> of message types is not supported.
 >
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> Reviewed-by: Andy Shevchenko <andy@kernel.org>
-> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Let's use rtnl_register_many() instead.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > ---
+>  net/core/neighbour.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
+>
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index 77b819cd995b..f6137ee80965 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -3886,17 +3886,18 @@ EXPORT_SYMBOL(neigh_sysctl_unregister);
+>
+>  #endif /* CONFIG_SYSCTL */
+>
 
-This is part of a larger series so I acked it previously but at second
-glance it doesn't look like it depends on anything that comes before?
-Should it have been sent separately to the GPIO tree? Should I pick it
-up independently?
 
-Bart
+
+> +static const struct rtnl_msg_handler neigh_rtnl_msg_handlers[] =3D {
+> +       {NULL, PF_UNSPEC, RTM_NEWNEIGH, neigh_add, NULL, 0},
+> +       {NULL, PF_UNSPEC, RTM_DELNEIGH, neigh_delete, NULL, 0},
+> +       {NULL, PF_UNSPEC, RTM_GETNEIGH, neigh_get, neigh_dump_info,
+> +        RTNL_FLAG_DUMP_UNLOCKED},
+> +       {NULL, PF_UNSPEC, RTM_GETNEIGHTBL, NULL, neightbl_dump_info, 0},
+> +       {NULL, PF_UNSPEC, RTM_SETNEIGHTBL, neightbl_set, NULL, 0},
+> +};
+> +
+
+Please add __initconst qualifier.
+
+Also C99 initializations look better to me.
+
++static const struct rtnl_msg_handler neigh_rtnl_msg_handlers[] __initconst=
+ =3D {
++       {.msgtype =3D RTM_NEWNEIGH, .doit =3D neigh_add},
++       {.msgtype =3D RTM_DELNEIGH, .doit =3D neigh_delete},
++       {.msgtype =3D RTM_GETNEIGH, .doit =3D neigh_get,
++       .dumpit =3D neigh_dump_info, .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
++       {.msgtype =3D RTM_GETNEIGHTBL, .dumpit =3D neightbl_dump_info},
++       {.msgtype =3D RTM_SETNEIGHTBL, .doit =3D neightbl_set},
++};
++
 
