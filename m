@@ -1,170 +1,128 @@
-Return-Path: <netdev+bounces-135365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363B299D9E5
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:48:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A50B99D9E6
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF17C2828D2
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:48:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C74282B4B
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417901CC158;
-	Mon, 14 Oct 2024 22:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A961D172B;
+	Mon, 14 Oct 2024 22:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tce+0bqv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v1jOz6On"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B3E155A5D
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC991CC158
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728946084; cv=none; b=G1kdC3oluEPpsm2SaTX2mzkSTpdO57OM94GoQI9QUDMzbs3St5ZI9AiSWmCT3SoPHh3uEG++362Gk+NXpcQy8imkEiOqpX7FCr+ScyU1S0NuaBa+kemQa/Pcc2IhPoaou+wr4mBC6NeWO7XEnBw8HMHlac85d63VwIE2SvBEj34=
+	t=1728946175; cv=none; b=Ux8p59ZW+PWcrk99aBwsZ7R3Mn+ogpYI8yQwCzE1C9tk3fuJ+TC45TPZVmB20X8ZdmdPCVjymTtQMCdFQJGqy2OCwMfgCYHWdLr89UQGbSZnKeBOwrQzbN/LJWWRjZKgpYQID3Y2LjOjuANRR/Sw34IPjM20uf1gvg9Q+/472+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728946084; c=relaxed/simple;
-	bh=h01itfcR9qRaWa19N85yiNugdjtIHwIJxtddaVAAxzE=;
+	s=arc-20240116; t=1728946175; c=relaxed/simple;
+	bh=4elktoXETCpagETj2EpFgO5MSsOXV5w6UAt5koHLyZQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N+MW6QDTJ23T03501Fp2qY8GrRHIVLrThLdFfIVnw3MMbZC/w7Z/hNQXGGhICWye5fcPqqHyeqi/HLYJGZ8Pp8UrteQc9zhXNNtJhtrdNldO5MP1X0Msa9KJeeLo+B7+BE/UYeAAdrnsTgLk3CJMRSlPB5hPji4WojayO3AiZ10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tce+0bqv; arc=none smtp.client-ip=209.85.160.177
+	 To:Cc:Content-Type; b=U6MTF+X3KnevXmlbYQU699hK83fczwQV/cYv1XxEWSrWVIHLNB7A1ysV8sl6TnBQrkLiD+/470zQqxrt3mHZs0ZR8PuWJq+AuWBwdFRJxv9U7ZihZ1OViMbZJRCceE6YZvcXQEdFrrOINTlXpWYj8zXkpeGAYZH66gECBMigzXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v1jOz6On; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-460395fb1acso542111cf.0
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 15:48:02 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4603d3e0547so514891cf.0
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 15:49:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728946081; x=1729550881; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728946172; x=1729550972; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2AM5iQOXVm81ybdI+9FnK0hKwVljlcVaSvRX3XtC02g=;
-        b=Tce+0bqvjweeo6MYEVX6+ZFh/9g3QS/a4hp1B6ao3vXLeXOO0aLMnI/60j9a0/cwL2
-         q4mJ0GWcHQsBuX/KdZzHx3E7eAK2p/hpCXez1CHu9N6JslwwvKdy8SAesaiUCsLmrghF
-         4ORZC8l4esuQtqjqcpCe1TQ2MWYandDkBiDcgaYc5w/BB0uRs6Wkp5AaeYpO26q5yH9S
-         MCdOBdjjw9u2ITHOu86FZtbuyjdHgU8Pk+re298TYR/P43tJ7kmtKXQsKl4S8NoDBx0l
-         kmnxYasFflAnizkknW4C0hB55pWZoIGOP1SLl2bfWUz7+CUbBzUdNGdtmu2RUFjPqs2f
-         iXfw==
+        bh=BfUVuPmIHXxTrNMPoVC3QVY09itfrJasWDhq086IzqU=;
+        b=v1jOz6Onnuxez7xVDM9wzDTHMTUDMLLGDEsj3kAbhpsYr106oyACG595FDKo8tty5W
+         PljPhxWNmQCNASmYRo34SeYz5nGkbik7yefnCzMoXwxr1DHZ8sDe2Uy4a8WXgGQJZeV4
+         +wIu8sHyx+KcBPcRTKkQzMIUCiricdmDh0qvqHwQNcFjhyMIHAD2L98MSBCWpQtNg+9M
+         GFSDbJBDN9SxIw47FAOizUMnGT5CXl+NDhsNljYgrc2KyPimR0CRKfGiMFpB61wxu/ed
+         11MQyi2j9Jzc5jfBJ3pJeDLME1IM8caGqe//yEcDHCmu2B/Ubg6q1GVCfcBCz1XMhHxw
+         6cWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728946081; x=1729550881;
+        d=1e100.net; s=20230601; t=1728946172; x=1729550972;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2AM5iQOXVm81ybdI+9FnK0hKwVljlcVaSvRX3XtC02g=;
-        b=RfrmaSvpXeB84nh5TqaShV2a6tcrdFTyJRV8wVtU3yZtnvasibh444XtLOmXX8zNg4
-         zXL8IaA9qiN1w3aL94XKVJTr/j9LFyv8bwT7eD97GkZq6r/9wOnt5XvgXIgr/Sex2LFV
-         8wqSIBvkHv1+uIQ8h/bVwHHcOUVpD/UB0P6S/M87aiEk6N5et25xtSYJEUtE0xY/IqiP
-         FCSEtyxm++3xv+Seuw3qkp/vnegitW3Zq/2kVIoE4QwMdYCvRv2YyCvpGGv3kuQ32bTN
-         g62IYBkdKtsj+3Z/e9ALoO/TyBi9qb94L8S7wFFpgk0Rv3tEx7MU33Fwjn+yv1z64Ixy
-         5pnQ==
-X-Gm-Message-State: AOJu0YwJnR8EFC2X66lPGO/CU7BwQnb5aBNkthPZlJXzTrTntkgON3CU
-	jasArw1I7v33KoqgXDMTzZWHDxSuLpTv8PAvS+h3dhCHe5d3CZ/HGD38rYsnyRo5M88ZkLpBL9K
-	zT/wP637EKXWOP5vWqSQF2WZ68DlfH8wwynH7
-X-Google-Smtp-Source: AGHT+IGyAUVEVxHjwjwQ1XvK7UprmNMIKUgGJafvbxHnY3vCBJZ+YhutCw4qPXx5J0DKWvoMexEzirB+/mhzmet7m7g=
-X-Received: by 2002:a05:622a:528c:b0:460:481a:d537 with SMTP id
- d75a77b69052e-46059c77be0mr6064101cf.25.1728946081288; Mon, 14 Oct 2024
- 15:48:01 -0700 (PDT)
+        bh=BfUVuPmIHXxTrNMPoVC3QVY09itfrJasWDhq086IzqU=;
+        b=TjukQX6TOxZdzZqXjRzDqPe3ogZk3P7mYInnFhAFwrlMUZs0zvlARxQNzFwQZrxPVp
+         d5Fek0OMyfkgKWmDLs7BkKENRzjTlgYezp+esjSs4NNhqmTewVSzvOF2xebe62elUUet
+         mnt3PI7wLHwYqt/6BQ04OKk0cCRhqZUHX1npQLDgAzs6YU314Al1dyVFtHgJ3GK4kOXh
+         Iq3iaryZA1IQ5NxrX8N9dALlb1Ept8QC6CPuyxqjPURwZsloplI5XCHLb5UDA7il/Rra
+         OTt2jc4IJ29IkmLL+ZfMXw8um+MSpVCNmsa0mrcp1XWoYk7IWcrGt9uhSrJwzD8EhfxJ
+         OE3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUzZofvZ7AHK9YKtGbO8XRPEOXK7z1WBD9XMqdUt+MyEYL2fqlWrsWbtwR2i4NIxnWnm1KP0Fc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyElBeowdjKoFgKjaguzY2YYMBWO4UE1nFRJIu+orGmY90U0iBE
+	gT8gmFVmzS/S4j0HyQsgQnotSqiA7KtzjvUNBiFnL9lUQA1iBXSRjrRA2SKgD+C3UbE0dl6OLCq
+	rFTBwqDOdHSAEG9tkNYqah8EmmZiQ6U06z36S
+X-Google-Smtp-Source: AGHT+IHXDzWbjGiFPahH1pmtVeE3RjcCX0XJJ8LvZXKbZ/oM9QqI2PTj4H4C5OmuPNseLplmLLkIvTVpiNH4O4uELgU=
+X-Received: by 2002:a05:622a:7c0e:b0:460:4546:12f2 with SMTP id
+ d75a77b69052e-46059c47130mr5774831cf.7.1728946172280; Mon, 14 Oct 2024
+ 15:49:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009171252.2328284-1-sdf@fomichev.me> <20241009171252.2328284-11-sdf@fomichev.me>
-In-Reply-To: <20241009171252.2328284-11-sdf@fomichev.me>
+References: <20241009171252.2328284-1-sdf@fomichev.me> <20241009171252.2328284-10-sdf@fomichev.me>
+ <CAHS8izPh7kwnvQtxwqGxka_rOe0fB21R7B167j2guJXkve9_bg@mail.gmail.com> <Zw0vByssO2j6wfxI@mini-arch>
+In-Reply-To: <Zw0vByssO2j6wfxI@mini-arch>
 From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 15 Oct 2024 01:47:48 +0300
-Message-ID: <CAHS8izMCwm+iW2u_jTTzNW0DPV7Rc3HHev+t8N+iof4XmaeChw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/12] selftests: ncdevmem: Run selftest when
- none of the -s or -c has been provided
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
+Date: Tue, 15 Oct 2024 01:49:19 +0300
+Message-ID: <CAHS8izOd1eGzBUo-Mj-Cdp+MLbzNVxWBZ0vHu3iySNxMocufOA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 09/12] selftests: ncdevmem: Remove hard-coded
+ queue numbers
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 9, 2024 at 8:13=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me>=
- wrote:
+On Mon, Oct 14, 2024 at 5:47=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> This will be used as a 'probe' mode in the selftest to check whether
-> the device supports the devmem or not. Use hard-coded queue layout
-> (two last queues) and prevent user from passing custom -q and/or -t.
+> On 10/12, Mina Almasry wrote:
+> > On Wed, Oct 9, 2024 at 10:13=E2=80=AFAM Stanislav Fomichev <sdf@fomiche=
+v.me> wrote:
+> > >
+> > > Use single last queue of the device and probe it dynamically.
+> > >
+> >
+> > Sorry I thought agreed that multi-queue binding test coverage is import=
+ant.
+> >
+> > Can you please leave the default of num_queues to be 8 queues, or
+> > rxq_num / 2? You can override num_queues to 1 in your test invocations
+> > if you want. I would like by default an unaware tester that doesn't
+> > set num_queues explicitly to get multi-queue test coverage.
 >
-> Cc: Mina Almasry <almasrymina@google.com>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  tools/testing/selftests/net/ncdevmem.c | 42 ++++++++++++++++++++------
->  1 file changed, 32 insertions(+), 10 deletions(-)
+> I might have misunderstood the agreement :-) I though you were ok with
+> the following arrangement:
 >
-> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
-ests/net/ncdevmem.c
-> index 90aacfb3433f..3a456c058241 100644
-> --- a/tools/testing/selftests/net/ncdevmem.c
-> +++ b/tools/testing/selftests/net/ncdevmem.c
-> @@ -64,7 +64,7 @@ static char *client_ip;
->  static char *port;
->  static size_t do_validation;
->  static int start_queue =3D -1;
-> -static int num_queues =3D 1;
-> +static int num_queues =3D -1;
->  static char *ifname;
->  static unsigned int ifindex;
->  static unsigned int dmabuf_id;
-> @@ -706,19 +706,31 @@ int main(int argc, char *argv[])
->                 }
->         }
+> 1. use num_queues / 2 in the selftest mode to make sure binding to multip=
+le
+>    queues works (and this gets exercised from the python kselftest)
+> 2. use single queue for the actual data path test (since we are
+>    installing single flow steering rule, having multiple queues here is
+>    confusing)
 >
-> -       if (!server_ip)
-> -               error(1, 0, "Missing -s argument\n");
-> -
-> -       if (!port)
-> -               error(1, 0, "Missing -p argument\n");
-> -
->         if (!ifname)
->                 error(1, 0, "Missing -f argument\n");
+> The num_queues / 2 part is here:
+> https://lore.kernel.org/netdev/20241009171252.2328284-11-sdf@fomichev.me/
 >
->         ifindex =3D if_nametoindex(ifname);
->
-> -       if (start_queue < 0) {
-> -               start_queue =3D rxq_num(ifindex) - 1;
-> +       if (!server_ip && !client_ip) {
-> +               if (start_queue < 0 && num_queues < 0) {
-> +                       num_queues =3D rxq_num(ifindex);
-> +                       if (num_queues < 0)
-> +                               error(1, 0, "couldn't detect number of qu=
-eues\n");
-> +                       /* make sure can bind to multiple queues */
-> +                       start_queues =3D num_queues / 2;
-> +                       num_queues /=3D 2;
-> +               }
-> +
-> +               if (start_queue < 0 || num_queues < 0)
-> +                       error(1, 0, "Both -t and -q are requred\n");
-> +
-> +               run_devmem_tests();
-> +               return 0;
-> +       }
-> +
-> +       if (start_queue < 0 && num_queues < 0) {
-> +               num_queues =3D 1;
-> +               start_queue =3D rxq_num(ifindex) - num_queues;
->
+> Anything I'm missing?
 
-Nit: this can be written into the more readable:
-
-// set start_queues =3D rxq_num / 2;
-if (!server_ip && !client_ip) {
-  // set num_queues rxq_num/2
-  run_devmem_tests();
-} else {
-  // set num_queue =3D 1.
-  run_server();
-}
-
-With build error fixed:
+Sorry, I indeed missed that this is reworked in patch 10/12. Squashing
+the patches could be OK, because the changes to num_queues here are
+essentially reworked in the next patch, but this is also fine.
 
 Reviewed-by: Mina Almasry <almasrymina@google.com>
-
 
 --=20
 Thanks,
