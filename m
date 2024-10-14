@@ -1,103 +1,172 @@
-Return-Path: <netdev+bounces-135364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8ECE99D9DD
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 363B299D9E5
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C4DE28228F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF17C2828D2
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E744D1D0F61;
-	Mon, 14 Oct 2024 22:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417901CC158;
+	Mon, 14 Oct 2024 22:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ToUZL1zr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tce+0bqv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3874614D439
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B3E155A5D
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728945823; cv=none; b=rmEGrRcip4O6ue+yKRuec3H7UKt7dc9TxzIwJA3BFajjxVlRNJgxiLJQ5pXqOVc9volFf4BZ4PVQ+WWPq4dTnhoC290LrOTI3tvqX71FIVFOM9vV83Q0cuDcThC5+cGaM079b+p207P0bgFXTtgmjAi72yTAtG1TbyEftmIWjxQ=
+	t=1728946084; cv=none; b=G1kdC3oluEPpsm2SaTX2mzkSTpdO57OM94GoQI9QUDMzbs3St5ZI9AiSWmCT3SoPHh3uEG++362Gk+NXpcQy8imkEiOqpX7FCr+ScyU1S0NuaBa+kemQa/Pcc2IhPoaou+wr4mBC6NeWO7XEnBw8HMHlac85d63VwIE2SvBEj34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728945823; c=relaxed/simple;
-	bh=xEz9ekkSg87yBeMAROCegHNDfFf3oQvX128VxUMW2lg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rAYoPwLWuZ+KMomjeWGv8ReidM9ZNSW+3RNYzgDL6rScQNQaAs4IIoVYg96SEMzB0pGXg/kgn5IaM5Y/QyuYpp+awGsvHd0GdriClCTSanqpxhfkFDvIxFZXzjdzAhAOHbVHOorVCMtGiUSyneA8a3wrt8kwLx1brga8LZLDuS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ToUZL1zr; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1728946084; c=relaxed/simple;
+	bh=h01itfcR9qRaWa19N85yiNugdjtIHwIJxtddaVAAxzE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N+MW6QDTJ23T03501Fp2qY8GrRHIVLrThLdFfIVnw3MMbZC/w7Z/hNQXGGhICWye5fcPqqHyeqi/HLYJGZ8Pp8UrteQc9zhXNNtJhtrdNldO5MP1X0Msa9KJeeLo+B7+BE/UYeAAdrnsTgLk3CJMRSlPB5hPji4WojayO3AiZ10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tce+0bqv; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-460395fb1acso542111cf.0
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 15:48:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728945823; x=1760481823;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Lch8UcCeQEZ3qggxdDl9Ee591IdCexyhfRiBAQo1UXQ=;
-  b=ToUZL1zrHRkQVopLEblIqK2UXZeX2Ufp8EXMYH09X0pubvKOrug49WUm
-   wp+Si9eS+hJd/Ht4Q3Ge7am/xZ/m1Cp1SdPys+WSS23ZyNp28M902I9pR
-   AgY84+3bP6SngaJST95onWsgdrsdaX2+is90ofqwIfeyregyWsJK/p298
-   s=;
-X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
-   d="scan'208";a="239265503"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 22:43:39 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:16042]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.142:2525] with esmtp (Farcaster)
- id b77555b3-6888-4d4f-bc4e-f2aadd78bd88; Mon, 14 Oct 2024 22:43:38 +0000 (UTC)
-X-Farcaster-Flow-ID: b77555b3-6888-4d4f-bc4e-f2aadd78bd88
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 14 Oct 2024 22:43:38 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 14 Oct 2024 22:43:35 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <gnaaman@drivenets.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3 1/2] Convert neighbour-table to use hlist
-Date: Mon, 14 Oct 2024 15:43:32 -0700
-Message-ID: <20241014224332.5038-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241013104521.3844432-1-gnaaman@drivenets.com>
-References: <20241013104521.3844432-1-gnaaman@drivenets.com>
+        d=google.com; s=20230601; t=1728946081; x=1729550881; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2AM5iQOXVm81ybdI+9FnK0hKwVljlcVaSvRX3XtC02g=;
+        b=Tce+0bqvjweeo6MYEVX6+ZFh/9g3QS/a4hp1B6ao3vXLeXOO0aLMnI/60j9a0/cwL2
+         q4mJ0GWcHQsBuX/KdZzHx3E7eAK2p/hpCXez1CHu9N6JslwwvKdy8SAesaiUCsLmrghF
+         4ORZC8l4esuQtqjqcpCe1TQ2MWYandDkBiDcgaYc5w/BB0uRs6Wkp5AaeYpO26q5yH9S
+         MCdOBdjjw9u2ITHOu86FZtbuyjdHgU8Pk+re298TYR/P43tJ7kmtKXQsKl4S8NoDBx0l
+         kmnxYasFflAnizkknW4C0hB55pWZoIGOP1SLl2bfWUz7+CUbBzUdNGdtmu2RUFjPqs2f
+         iXfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728946081; x=1729550881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2AM5iQOXVm81ybdI+9FnK0hKwVljlcVaSvRX3XtC02g=;
+        b=RfrmaSvpXeB84nh5TqaShV2a6tcrdFTyJRV8wVtU3yZtnvasibh444XtLOmXX8zNg4
+         zXL8IaA9qiN1w3aL94XKVJTr/j9LFyv8bwT7eD97GkZq6r/9wOnt5XvgXIgr/Sex2LFV
+         8wqSIBvkHv1+uIQ8h/bVwHHcOUVpD/UB0P6S/M87aiEk6N5et25xtSYJEUtE0xY/IqiP
+         FCSEtyxm++3xv+Seuw3qkp/vnegitW3Zq/2kVIoE4QwMdYCvRv2YyCvpGGv3kuQ32bTN
+         g62IYBkdKtsj+3Z/e9ALoO/TyBi9qb94L8S7wFFpgk0Rv3tEx7MU33Fwjn+yv1z64Ixy
+         5pnQ==
+X-Gm-Message-State: AOJu0YwJnR8EFC2X66lPGO/CU7BwQnb5aBNkthPZlJXzTrTntkgON3CU
+	jasArw1I7v33KoqgXDMTzZWHDxSuLpTv8PAvS+h3dhCHe5d3CZ/HGD38rYsnyRo5M88ZkLpBL9K
+	zT/wP637EKXWOP5vWqSQF2WZ68DlfH8wwynH7
+X-Google-Smtp-Source: AGHT+IGyAUVEVxHjwjwQ1XvK7UprmNMIKUgGJafvbxHnY3vCBJZ+YhutCw4qPXx5J0DKWvoMexEzirB+/mhzmet7m7g=
+X-Received: by 2002:a05:622a:528c:b0:460:481a:d537 with SMTP id
+ d75a77b69052e-46059c77be0mr6064101cf.25.1728946081288; Mon, 14 Oct 2024
+ 15:48:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20241009171252.2328284-1-sdf@fomichev.me> <20241009171252.2328284-11-sdf@fomichev.me>
+In-Reply-To: <20241009171252.2328284-11-sdf@fomichev.me>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 15 Oct 2024 01:47:48 +0300
+Message-ID: <CAHS8izMCwm+iW2u_jTTzNW0DPV7Rc3HHev+t8N+iof4XmaeChw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 10/12] selftests: ncdevmem: Run selftest when
+ none of the -s or -c has been provided
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Gilad Naaman <gnaaman@drivenets.com>
-Date: Sun, 13 Oct 2024 10:45:21 +0000
-> > The current neigh_for_each() is only used in spectrum_router.c
-> > and can be moved to mlxsw_sp_neigh_rif_made_sync_each() with
-> > the new macro used.
-> 
-> Oh, I completely missed that it exists, sorry.
-> 
-> > Let's split this patch for ease of review.
-> > 
-> >   1. Add hlist_node and link/unlink by hlist_add() / hlist_del()
-> >   2. Define neigh_for_each() macro and move the current
-> >      neigh_for_each() to mlxsw_sp_neigh_rif_made_sync_each()
-> >   3. Rewrite the seq_file part with macro
-> >   4. Convert the rest of while()/for() with macro
-> >   5. Remove ->next
-> 
-> Just making sure, you mean that in (1.) I should add hlist_node *alongside*
-> the current `struct neighbour __rcu *next`, and only remove this duplication in
-> (5.)?
+On Wed, Oct 9, 2024 at 8:13=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me>=
+ wrote:
+>
+> This will be used as a 'probe' mode in the selftest to check whether
+> the device supports the devmem or not. Use hard-coded queue layout
+> (two last queues) and prevent user from passing custom -q and/or -t.
+>
+> Cc: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  tools/testing/selftests/net/ncdevmem.c | 42 ++++++++++++++++++++------
+>  1 file changed, 32 insertions(+), 10 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
+ests/net/ncdevmem.c
+> index 90aacfb3433f..3a456c058241 100644
+> --- a/tools/testing/selftests/net/ncdevmem.c
+> +++ b/tools/testing/selftests/net/ncdevmem.c
+> @@ -64,7 +64,7 @@ static char *client_ip;
+>  static char *port;
+>  static size_t do_validation;
+>  static int start_queue =3D -1;
+> -static int num_queues =3D 1;
+> +static int num_queues =3D -1;
+>  static char *ifname;
+>  static unsigned int ifindex;
+>  static unsigned int dmabuf_id;
+> @@ -706,19 +706,31 @@ int main(int argc, char *argv[])
+>                 }
+>         }
+>
+> -       if (!server_ip)
+> -               error(1, 0, "Missing -s argument\n");
+> -
+> -       if (!port)
+> -               error(1, 0, "Missing -p argument\n");
+> -
+>         if (!ifname)
+>                 error(1, 0, "Missing -f argument\n");
+>
+>         ifindex =3D if_nametoindex(ifname);
+>
+> -       if (start_queue < 0) {
+> -               start_queue =3D rxq_num(ifindex) - 1;
+> +       if (!server_ip && !client_ip) {
+> +               if (start_queue < 0 && num_queues < 0) {
+> +                       num_queues =3D rxq_num(ifindex);
+> +                       if (num_queues < 0)
+> +                               error(1, 0, "couldn't detect number of qu=
+eues\n");
+> +                       /* make sure can bind to multiple queues */
+> +                       start_queues =3D num_queues / 2;
+> +                       num_queues /=3D 2;
+> +               }
+> +
+> +               if (start_queue < 0 || num_queues < 0)
+> +                       error(1, 0, "Both -t and -q are requred\n");
+> +
+> +               run_devmem_tests();
+> +               return 0;
+> +       }
+> +
+> +       if (start_queue < 0 && num_queues < 0) {
+> +               num_queues =3D 1;
+> +               start_queue =3D rxq_num(ifindex) - num_queues;
+>
 
-Right, it will allow part-by-part changes that are easier to review.
+Nit: this can be written into the more readable:
+
+// set start_queues =3D rxq_num / 2;
+if (!server_ip && !client_ip) {
+  // set num_queues rxq_num/2
+  run_devmem_tests();
+} else {
+  // set num_queue =3D 1.
+  run_server();
+}
+
+With build error fixed:
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+
+--=20
+Thanks,
+Mina
 
