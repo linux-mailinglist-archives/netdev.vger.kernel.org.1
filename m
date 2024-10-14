@@ -1,102 +1,166 @@
-Return-Path: <netdev+bounces-135074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3383199C1C2
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:43:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6DB099C1ED
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B7C41C235F9
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 07:43:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F0F81F20FFB
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 07:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7EE14A0B7;
-	Mon, 14 Oct 2024 07:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LVeG1lyX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FC214AD2E;
+	Mon, 14 Oct 2024 07:49:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A678C145324
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 07:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BF3146D6F;
+	Mon, 14 Oct 2024 07:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728891820; cv=none; b=uKSq/IFKz8AMkze/r/3x42Uv7Jklpx4BIpOPJ7cOAp7I2PjAloxCfadXQdMDAidrW2hrOSUj1PWQFnPXvBogD0ONON2REawG3mwQqltavWVlQkcYgzmE7NvhXr7f9uBn5UTadU2hQXZ4O6wsL4TlqoaAMf0DHTkOK2mVZOFpM8c=
+	t=1728892140; cv=none; b=hDeI2tLq8L9w3OSX3+zS64uoszoouJeYQhZZSB9ykQxSLG18I9RA/RgFdDzsoBssdJfbK3XE8sOxB2bbEdA6Z1Yj/a1xaasSZ6oscM3fz3dX/PysxZlOdNQFcB2BeC6FEJD/igor4dAIqqijVDAMjOSqz399zKhvRMzx0CIrYPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728891820; c=relaxed/simple;
-	bh=+g4VLx1y4rTCco0Bfo9tUTjB1bWOGr7+O8v5/Po4yFI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hi6XWxtY+x3xnTCBeYq+cwa1TQO1aPusYmNsC4ZPmTUemQIDVzWIm8IoZO3QbrPfvE9XiXp/xZwgzEOSNMvsTLgNsIOd5ry38TialkTxZ8p1V4U8u/fVK90KAg2h+ZzPbHGBuZcsXxHugErEkbPCOqVMtYrAIKZi/+wO/I0YAXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LVeG1lyX; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a994ecf79e7so627737566b.0
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 00:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728891817; x=1729496617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+g4VLx1y4rTCco0Bfo9tUTjB1bWOGr7+O8v5/Po4yFI=;
-        b=LVeG1lyXx7hnoLsKQMacLX15ir9sUiYTaPcupelSSfelKngBDLEmH2SQJBpOxHOKPw
-         7AbFdBGhZhLzS5NZBKoMMAMjg9SF+2lVAd+oihKGW/dxuFAibJBYoVlvB5KtN2xxQRdM
-         YTsUpbZ0YL6sLrTDOp2NdzLjLr+ddA0TlsGig2Ct1QFFJuylM/fWVVlMcgaKMsqGnhsE
-         k6OAijEUPshfCXimhnGjxDYbBSICqkYGxsmIScqB0rhlOfrKKFJ1A++zxRkPPWst10R7
-         heqzcV6DCxk2c7+kx9AjAtlXEr+JoUjRj78xP25OWtnjUvwKO7t4zLRMZjIpqU/ydEUk
-         atxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728891817; x=1729496617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+g4VLx1y4rTCco0Bfo9tUTjB1bWOGr7+O8v5/Po4yFI=;
-        b=BCHkEfuUGSQtVtNPZbAn4adaeR+mn6xptDYsWBWt0IIN7dQSeDDuoRt9/tjxPND9zY
-         uzVgvjFqDifzjwG3aBKqjLApEEY+itA1apUemMa7p/8vit/RB83LifjlJcxcqA1QPArY
-         gg9Mh35UWxNf58zqLG5w4XkxDXmpyA/UNkTjRBvAaKqZW9efQHxvDQnarx62SL2cNkIF
-         v2ouW7nzZpr5Dn6TG2ew0TudtOxsaRGPCInlK9Bb1onYQ7HggmjFGWMARi+DZDmL1ESt
-         zHeKb0jV2sG0EOpo2M8Exx5Tcnj3i+s7PCuy0MD14maT3buRhkXmm7w6Lzo81FbDNStc
-         Hz+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUzJSrHZE7m0+yl2EYwkiPYbYFZyrX02dgEnbj9DyMPUHzIxKas8x32yNHWkIMPKIMZEeJWm8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQXcvoTnF8g7pNu1hs1mHlifkQilhrvM6zCtFU1olOdI7h0Jj3
-	9tnMSuEzsujMXQFrixveYxTn/YREZ+lEsN2FasumcD62u56GAN3oJdoncdTqhexG4zP8omlbE0U
-	jKxrVuUqkTZ9Om/Hcb/eDLrvSjABG995xB/MiQp2O3ni4gAD7yK7A
-X-Google-Smtp-Source: AGHT+IHnZkjVP2r7pHiHbF6hr7YjrWQOYu5wNEGh0c/yJ2G4DoqhzAtXz/FASCdsr2WwE42Fq2111yQTmdPNnfSAldE=
-X-Received: by 2002:a17:906:f581:b0:a99:f3ab:c58d with SMTP id
- a640c23a62f3a-a99f3abe8b7mr526573766b.16.1728891816887; Mon, 14 Oct 2024
- 00:43:36 -0700 (PDT)
+	s=arc-20240116; t=1728892140; c=relaxed/simple;
+	bh=3rkZwtyh6Rfwszh3yxvTLn4jOr2u46BL520LAHsC2bE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VnXTTWSE8gvMB4lR/KfgjFRYqfPKDdHmNPPohEwdGLUABUJM7HA9pWK7Uz38k2UodGksp4nnaVlYS3D1qLC1st271PWHfnDpov+Fr12w/QXJPZTo9IwmilVcqt5R/KZAXuqEJeEfwHDJPjM9L3mI/kt+xdnxT44BBkni44dYxvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 9A57920083D;
+	Mon, 14 Oct 2024 09:48:50 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 892942021D8;
+	Mon, 14 Oct 2024 09:48:50 +0200 (CEST)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 3319B20327;
+	Mon, 14 Oct 2024 09:48:51 +0200 (CEST)
+Date: Mon, 14 Oct 2024 09:48:50 +0200
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>
+Subject: Re: [PATCH v3 13/16] dt-bindings: net: Add DT bindings for DWMAC on
+ NXP S32G/R SoCs
+Message-ID: <ZwzM4tx3zj8+M/Om@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20241013-upstream_s32cc_gmac-v3-0-d84b5a67b930@oss.nxp.com>
+ <20241013-upstream_s32cc_gmac-v3-13-d84b5a67b930@oss.nxp.com>
+ <44745af3-1644-4a71-82b6-a33fb7dc1ff4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr> <20241013201704.49576-5-Julia.Lawall@inria.fr>
-In-Reply-To: <20241013201704.49576-5-Julia.Lawall@inria.fr>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 14 Oct 2024 09:43:25 +0200
-Message-ID: <CANn89i+EwGme3GEq9j8hPUqZ3+vCy3+73tTNM=1p=51eKPpPGA@mail.gmail.com>
-Subject: Re: [PATCH 04/17] ipv6: replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-To: Julia Lawall <Julia.Lawall@inria.fr>
-Cc: "David S. Miller" <davem@davemloft.net>, kernel-janitors@vger.kernel.org, vbabka@suse.cz, 
-	paulmck@kernel.org, David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <44745af3-1644-4a71-82b6-a33fb7dc1ff4@kernel.org>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On Sun, Oct 13, 2024 at 10:18=E2=80=AFPM Julia Lawall <Julia.Lawall@inria.f=
-r> wrote:
->
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache=
-_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
->
-> The changes were made using Coccinelle.
->
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+On Mon, Oct 14, 2024 at 08:56:58AM +0200, Krzysztof Kozlowski wrote:
+> On 13/10/2024 23:27, Jan Petrous via B4 Relay wrote:
+> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> > 
+> > Add basic description for DWMAC ethernet IP on NXP S32G2xx, S32G3xx
+> > and S32R45 automotive series SoCs.
+> > 
+> > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> > ---
+> >  .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 97 ++++++++++++++++++++++
+> >  .../devicetree/bindings/net/snps,dwmac.yaml        |  1 +
+> >  2 files changed, 98 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> > new file mode 100644
+> > index 000000000000..4c65994cbe8b
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> > @@ -0,0 +1,97 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +# Copyright 2021-2024 NXP
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/nxp,s32-dwmac.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: NXP S32G2xx/S32G3xx/S32R45 GMAC ethernet controller
+> > +
+> > +maintainers:
+> > +  - Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> > +
+> > +description:
+> > +  This device is a Synopsys DWC IP, integrated on NXP S32G/R SoCs.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - nxp,s32g2-dwmac
+> 
+> Where are the other compatibles? Commit msg mentions several devices.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Well, I removed other compatibles thinking we can re-use this only one
+also for other SoCs as, on currect stage, we don't need to do any
+SoC specific setup.
+
+Is it ok or shall I reinsert them?
+
+> 
+> > +
+> > +  reg:
+> > +    items:
+> > +      - description: Main GMAC registers
+> > +      - description: GMAC PHY mode control register
+> > +
+> 
+> ...
+> 
+> > +
+> > +        mdio {
+> > +          #address-cells = <1>;
+> > +          #size-cells = <0>;
+> > +          compatible = "snps,dwmac-mdio";
+> > +
+> > +          phy0: ethernet-phy@0 {
+> > +              reg = <0>;
+> > +          };
+> > +
+> 
+> Stray blank line.
+> 
+
+Ah, missed it. Thanks. Will fix it in v4.
+
+/Jan
 
