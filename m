@@ -1,147 +1,139 @@
-Return-Path: <netdev+bounces-135369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9038699D9FE
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:11:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 143E099DA07
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 891AE1C21550
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D3DA1F232BE
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A505F1D966F;
-	Mon, 14 Oct 2024 23:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6E0158D87;
+	Mon, 14 Oct 2024 23:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts21/p3x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB751D14FF
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DB920323;
+	Mon, 14 Oct 2024 23:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728947485; cv=none; b=X9WDLP1ZnaY2KoK7hu8Q+JmQjr9IMrEsrP8jCMEkviywGpNUqUHbEzPCUGXceXN2yaQfDiwvVlHrkjFThN9900Jr7bzpGatgkW1udKaPCotNkmIb6oEBBQaHnqWvoA+GrT979QJllJiTBhDiJj+ILseMNmW+/aOdvUSqUXPcBOk=
+	t=1728947793; cv=none; b=eSIJdgZzZk0XtTXOoLwIZlJtShc06Op5/54CYgowaaMv8Nn4oSk9oUUa6Y64SlFKYQ8ApYMj2d2kzSZTQgYdhaKrBMeI/o5uaZCC94M+qaywzAtHUhZ7Iv6ZAx1M3K2x7mAmD7pddSO3lnaVoMTUmJ+0OuI/M3LoGtjUe1H8ubY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728947485; c=relaxed/simple;
-	bh=cTPb/+CuKf6RzOOp01YUuyy7ZgHrNXQDBLiqaBFMdqk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=IuW9wtKEy102/8bcWc7blWsXv4040eprjI/z29QLtLic/Dm5fcyBbRlNc/BfTUjHKjC+viPay4s1CSzta+xYknZ995W/j94wrOdokGp7HU17NV2/Rt5zu5OZ8Ns/VghUG2YjFUqYIQ9LxRLjeaTUfg9B8vVWU+KKc+1EfgembK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3b2aee1a3so34648465ab.1
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:11:23 -0700 (PDT)
+	s=arc-20240116; t=1728947793; c=relaxed/simple;
+	bh=XsyRd9j07T8HoPKbHrQZGPgE/ewJ2mD/zTuF8VZMJx0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=c/BUzzKyz9LlqesD0kOlhBI3Qz3uWAjmHZEBLiIqzZJ7UD+EyL3s284d44yyAc7DZOFGEsRMZp4JrIMvogCIK5bXRwTp4BqdKoUNQFAbFT5SNWwvBjK3kYuXDB18D+De8XTZA1NQkpPXkv2JJOH7qziX425m80mYJutuzOUvkac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts21/p3x; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e6f085715so858110b3a.2;
+        Mon, 14 Oct 2024 16:16:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728947791; x=1729552591; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K2B0FW8ZH5nWjEg/AXzAlnKbTbSdi9xuM3Vgwwr8KQQ=;
+        b=Ts21/p3xtUe/yGgLhR5mdvWeEFdE16M98z5iWEhYriI1hTYOy8Vf6HmLjf4oo0hT7J
+         qJT1UPvfJYrqFiMcapFtwOsSnkgrNY88UvShNKSrzMN6rr1CJ24jrDFQpXIxGhvMsTnK
+         dvIIuF7OlaASwsydYm5sjBN6+uHRRJN7hRlAdTksaJYoBK/NZwkBZMzn3fh3YTYPpJB/
+         NoGb/tk1Cfs7QFDlgTHoX1JuKqNjPNPwzyvV9uAnUcBieErLEuwOu76hucEEuQSF5vGr
+         ViF0J2Ksx1uj3UHSQvOtYeeM5aqqgpMZvxebmhZI+9x7Qjkv3CUuFOeQBXAsmxzWcmdH
+         WfCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728947483; x=1729552283;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1728947791; x=1729552591;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jADd+awwER/GNY1SV/A2ec4ZVyfHexs847wg1ft/r10=;
-        b=Kiy9MCQehYukvbHTyIYyLTHWv9x7NBsKzGtt6LpALp/LLQBJE4g2PXfigEW9LyZKhp
-         hT/KzMzSCRfI+fETpOdJMVc9Wf3ED/i3crybOLMoMT9w3uyieHGrZERm+NdgPgZJzeUX
-         mjS8sbckI35PBaICps7qKODPkFFe1rxBzw5Q3U5V/39kz0CGzZ4TFTEARnddDdsUevak
-         paJ3EAwPuofnMopi3tg5YkJeBrrkL0rEp1nOj/ozYRrgO1Qa7pr2J+2FLhVo1k5Oz4l9
-         hjzhzljg83d6NmcIi7GpSYg+1si7SqWk++KXTWBO8qWYlxPN3wh3TJslVUfknx+R8bzz
-         ytyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYOkobH3Wog0VptjeYcmEkyNYAWQawCh+GlQUmMupDOsPd1NwOLaSnUgAZxMqO62hufHkm4Vk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbS0fRX7+UcEpNPcbM5btHeAeaYFMBPiTypRafF88q6pwKzYJs
-	Dhow7Z5sJfjgvTZBqdARk0IoDy5vt/hqNHHlhs8Ot8vAd0No/Lye638a7i9TgkEwV9/braka5I4
-	B5CEu2/t0DMdnFTRJmnAB4KsIvBANfvlpyJ+uKisZrLiUO3vtVKL4nPM=
-X-Google-Smtp-Source: AGHT+IEdGt9cixSDWctMRkMkr4qELW5SlvCHwj5aT/xtHiemsiLiT/PsieRzLmsVVzuSdZUeRz1gbT6YaGdXQ1ijH1C1i+f8sfy3
+        bh=K2B0FW8ZH5nWjEg/AXzAlnKbTbSdi9xuM3Vgwwr8KQQ=;
+        b=IFlUN7O8yShBZuWJlBFGRXRy4yPHRiA4dAY0Sor2RleI8zjJhK6Vxg62JLz+JMo1x1
+         mqYNAOu5yDika5iFIfhuQS6baSsI3+0xEAYsP5ojokTlwEtCeKQJtp9z9owdYbAWw6im
+         RF/wtC2x8LIeipx2W/OMgpG/B0c+zfNaAFErMvA1YdHsYMWGCEFvORF3AHHxljr7SHZ8
+         1mfpb+7BSpeL86hYyubWw93q09OKVplZxPHwuCp4FaOfbGh3ySIW45rcwbiA+reTKguk
+         B/czxnqli0fmGnxpzWz0hvbNb6ZvgqikkK51fCyITlWLxY/XtdFdxoGloUWGDFFY8E1Y
+         wzZg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1WsiwYBW2Wg5pJhSJDUe7NTknqtNdQOGQu0rM24ivSguT3CoJSTdqNf7NcXeGPQJCfC76bvsAvxhzWEE=@vger.kernel.org, AJvYcCURXRDMcYJeYTayb5NHYnbc2yhF/gD3r3o4i1YiWDIlekYDAsAuP3xxyvtqCHag2bddszqkr1FF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5jL/LaU5o2WhBtY0VMQy+qeOdEe63nGk1FUbjJjDr2gu3uXA8
+	7jHZBya76qZkGi6cCwM2Vb63CRrkFyUZ0y1xi0y00+Gdegc0jdho7vITWCEESZw=
+X-Google-Smtp-Source: AGHT+IGIPxJJ9r2kB4BtcvYdvYR1x/+1ppYNz4QAE9m866VfOGdYSYuQYWDJmxVzEMp3VVIrPaFjEg==
+X-Received: by 2002:a05:6a00:a93:b0:71e:b8:1930 with SMTP id d2e1a72fcca58-71e4c17bb0dmr16083237b3a.16.1728947790938;
+        Mon, 14 Oct 2024 16:16:30 -0700 (PDT)
+Received: from Fantasy-Ubuntu ([2001:56a:7eb6:f700:f281:80d8:4268:4a6])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea9c6c1948sm82872a12.27.2024.10.14.16.16.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Oct 2024 16:16:30 -0700 (PDT)
+Date: Mon, 14 Oct 2024 17:16:29 -0600
+From: Johnny Park <pjohnny0508@gmail.com>
+To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] igb: Fix styling in enable/disable SR-IOV
+Message-ID: <Zw2mTeDYEkWnh36A@Fantasy-Ubuntu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2181:b0:3a0:c88c:e674 with SMTP id
- e9e14a558f8ab-3a3b5f1de0bmr101237355ab.1.1728947483238; Mon, 14 Oct 2024
- 16:11:23 -0700 (PDT)
-Date: Mon, 14 Oct 2024 16:11:23 -0700
-In-Reply-To: <000000000000cd69c7061dfe35d2@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <670da51b.050a0220.f16b.0004.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] WARNING: ODEBUG bug in hci_release_dev (2)
-From: syzbot <syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-syzbot has found a reproducer for the following issue on:
+This patch fixes the checks and warnings for igb_enable_sriov and
+igb_disable_sriov function reported by checkpatch.pl
 
-HEAD commit:    0b84db5d8f25 MAINTAINERS: add Andrew Lunn as a co-maintain..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=10505727980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7cd9e7e4a8a0a15b
-dashboard link: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f84030580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bd00feb30432/disk-0b84db5d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e39e30a1ae6d/vmlinux-0b84db5d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/87eafcdafd48/bzImage-0b84db5d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff88806c380978 object type: timer_list hint: hci_cmd_timeout+0x0/0x1e0
-WARNING: CPU: 1 PID: 11255 at lib/debugobjects.c:517 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
-Modules linked in:
-CPU: 1 UID: 0 PID: 11255 Comm: syz.1.2889 Not tainted 6.12.0-rc2-syzkaller-00216-g0b84db5d8f25 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
-Code: e8 5b 1a 3c fd 4c 8b 0b 48 c7 c7 e0 04 61 8c 48 8b 74 24 08 48 89 ea 44 89 e1 4d 89 f8 ff 34 24 e8 db 63 93 fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 64 a7 5a 0b 48 83 c4 10 5b 41 5c 41 5d 41 5e 41
-RSP: 0018:ffffc90003e17818 EFLAGS: 00010286
-RAX: b20dce31d0d23300 RBX: ffffffff8c0cd900 RCX: ffff88807aa40000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffffff8c610660 R08: ffffffff8155e402 R09: fffffbfff1cf9fd8
-R10: dffffc0000000000 R11: fffffbfff1cf9fd8 R12: 0000000000000000
-R13: ffffffff8c610578 R14: dffffc0000000000 R15: ffff88806c380978
-FS:  00007fd4093cf6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f55ce736000 CR3: 0000000074a94000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
- debug_check_no_obj_freed+0x45b/0x580 lib/debugobjects.c:1019
- slab_free_hook mm/slub.c:2273 [inline]
- slab_free mm/slub.c:4579 [inline]
- kfree+0x11f/0x440 mm/slub.c:4727
- hci_release_dev+0x1525/0x16b0 net/bluetooth/hci_core.c:2759
- bt_host_release+0x83/0x90 net/bluetooth/hci_sysfs.c:94
- device_release+0x99/0x1c0
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x22f/0x480 lib/kobject.c:737
- hci_dev_put include/net/bluetooth/hci_core.h:1581 [inline]
- hci_dev_cmd+0x296/0xa50 net/bluetooth/hci_core.c:763
- sock_do_ioctl+0x158/0x460 net/socket.c:1227
- sock_ioctl+0x626/0x8e0 net/socket.c:1346
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd40857dff9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd4093cf038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fd408735f80 RCX: 00007fd40857dff9
-RDX: 0000000020000240 RSI: 00000000400448dd RDI: 0000000000000004
-RBP: 00007fd4085f0296 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fd408735f80 R15: 00007ffd5284c118
- </TASK>
-
-
+Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ drivers/net/ethernet/intel/igb/igb_main.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 1ef4cb871452..5a3b10b81848 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -3703,10 +3703,10 @@ static int igb_disable_sriov(struct pci_dev *pdev, bool reinit)
+ 			dev_warn(&pdev->dev,
+ 				 "Cannot deallocate SR-IOV virtual functions while they are assigned - VFs will not be deallocated\n");
+ 			return -EPERM;
+-		} else {
+-			pci_disable_sriov(pdev);
+-			msleep(500);
+ 		}
++
++		pci_disable_sriov(pdev);
++		msleep(500);
+ 		spin_lock_irqsave(&adapter->vfs_lock, flags);
+ 		kfree(adapter->vf_mac_list);
+ 		adapter->vf_mac_list = NULL;
+@@ -3739,6 +3739,7 @@ static int igb_enable_sriov(struct pci_dev *pdev, int num_vfs, bool reinit)
+ 		err = -EPERM;
+ 		goto out;
+ 	}
++
+ 	if (!num_vfs)
+ 		goto out;
+ 
+@@ -3746,11 +3747,13 @@ static int igb_enable_sriov(struct pci_dev *pdev, int num_vfs, bool reinit)
+ 		dev_info(&pdev->dev, "%d pre-allocated VFs found - override max_vfs setting of %d\n",
+ 			 old_vfs, max_vfs);
+ 		adapter->vfs_allocated_count = old_vfs;
+-	} else
++	} else {
+ 		adapter->vfs_allocated_count = num_vfs;
++	}
+ 
+ 	adapter->vf_data = kcalloc(adapter->vfs_allocated_count,
+-				sizeof(struct vf_data_storage), GFP_KERNEL);
++				   sizeof(struct vf_data_storage),
++				   GFP_KERNEL);
+ 
+ 	/* if allocation failed then we do not support SR-IOV */
+ 	if (!adapter->vf_data) {
+-- 
+2.43.0
+
 
