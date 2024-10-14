@@ -1,88 +1,130 @@
-Return-Path: <netdev+bounces-135117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E89699C5D7
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:35:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A591E99C5ED
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:39:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE8181F214AE
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:35:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64AD4283F12
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBB015539F;
-	Mon, 14 Oct 2024 09:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F405815687D;
+	Mon, 14 Oct 2024 09:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hW1U9i9H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iG7FsJrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C517154C0C
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D34B156885;
+	Mon, 14 Oct 2024 09:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728898525; cv=none; b=CEZF0TXy62upPZkG1fIVchpYCUsIax6HkxH7t5GosfQSyPtH0OUDct6T/eGeYjpeB+BgisCw9Wcnyh2kQr7UYJraBjk5Yx8cOtW7bQJ+o6XsXMVnA3/Jj86FD1domOcDE2NepUEExMMyojWUsRpG8KvRfd9AQ2RH+cBTuN7JEEk=
+	t=1728898771; cv=none; b=cUIW2h3VwbrkfzCafS8BSZV6Z/Dd/thkr/KximaVYts8o2SeufGbTkqF7PW7Z172ELEWHcRvqXFWD9xeCyhlEcjFMFzlAH1/wmhLaCurEAYBEht3F6Wb/tvIVPebHionMPRVQcIlPdCEfjic846eRMSP/cCnh5lYIa+trbOLOeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728898525; c=relaxed/simple;
-	bh=BX28rAzmD4iiFzVyOHBt728GRE15tu8MjCYp4yUF6Zs=;
-	h=From:Message-ID:To:Subject:Date:MIME-Version:Content-Type; b=pqSPgyAlCmdQhPRJS1Sz3A/f5qDbCpDu8BP/+AYBkQE9qyd5dHQKIXl5mJ2OvrvQ1SD6Cj6SW+Vx+ebl2i8HNvdwpzExMunWVp/UO2GCLdCpekjNpiVYJb9NwxThUyjxrgbtwA3bYZWyRViYCIhJSa+e3TGCroLlEP21pMaWw4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hW1U9i9H; arc=none smtp.client-ip=209.85.210.196
+	s=arc-20240116; t=1728898771; c=relaxed/simple;
+	bh=hSExf4atp+U51gi7jYudiyiV0XJl/A3cSzCmKq/njJA=;
+	h=Message-ID:Date:MIME-Version:To:From:Cc:Subject:Content-Type; b=gtq3OP9D8rtNe86TUVzQWjifRxML9o48b8qYkIaU4WkLHnQS7+tRsp5jT0zSN+1sGMURj/NQjQgfSP1o5IsXbV0Cu32VXaAFQPYL/8JB9hLo2yhJN3Tbdlpb3eQWlFYIaMjI60cVlB0qq/5smDSNJ2+H2rrEHXQW0t4sz4Dlb/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iG7FsJrW; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-71e4fa3ea7cso1418976b3a.0
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 02:35:23 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37d461162b8so2703457f8f.1;
+        Mon, 14 Oct 2024 02:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728898523; x=1729503323; darn=vger.kernel.org;
-        h=mime-version:date:subject:to:reply-to:message-id:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BX28rAzmD4iiFzVyOHBt728GRE15tu8MjCYp4yUF6Zs=;
-        b=hW1U9i9Hhco61iB5w7RhuNQWQ0klVl87YtGzfcWyerQ18/Z4Aft0mTsQCuGGjO6NES
-         PcE6RvPi/pJDDcTjLAO0YKWDKMA5qbNxSdlLO/HwA3FfpqYsyKVlMBF/NTLTg36QLoZR
-         w+RAIN8erxilLDcwGXZ38VwbmFfJ9RkdvtZtg0rBNXOeZ37RXdKc75FWuJkzwc1eMADT
-         2DFASsC2Rr1eCKevuC8+9wQvgH/poU86THtaC3+87hUwvgYRawbTtzsm919G3cIM1of9
-         reK1tydFyJNIsTrP7D0bAsk6RCrO7ab/UGM5bLpqYdrBjYIKXTZnfTeA24RWefDHGQZb
-         y8Fg==
+        d=gmail.com; s=20230601; t=1728898769; x=1729503569; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:cc:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rXvmuKgNurYfFmlWGhrBnQNjxraoDSU6b11R1GM4I2w=;
+        b=iG7FsJrWynqLnJ/GHbsiySJGvi6nGoxkCFw4J7/pBCx39U8UanO7t/R/E40+pt1Jhj
+         iU6f+APR9WX4Pyo5oNqQQUhdJ+YwANV5m69C4sR8ya9E/sWpxOQgLWMFD1ao7Yfh119D
+         qknF5n87s8J6j3vvVAkA/uewTi9IgOJ4/lus7S2McGwh2WBsTmZ8kzXntaBKH0J3W4vc
+         Dhw1mGFuyf+cxLSavNELtOAlr/BV4ROCwXpC8R3+RuqC37BSkSOIfY/j+qP/WOn5BdXZ
+         iTEx0UV+rkuZX/O1qeeCzzS4fdzywZ/lVvw2cU92CfCqmm62r6bvfyeH6DxWR0Hdpczn
+         uv+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728898523; x=1729503323;
-        h=mime-version:date:subject:to:reply-to:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BX28rAzmD4iiFzVyOHBt728GRE15tu8MjCYp4yUF6Zs=;
-        b=lwtdCeebnznZol9J/6mBArxopLnGslthSeQ/xIKgmwANQbJglftvm2SYlVSz89PMlu
-         cZgYQ0fLYlxhWB+oolY0teNDM/As+0tX0mXIM9Zew5OOfwhlS/v/jlNG00YSLSsvgQnf
-         JjR/5GHozXkGjK89wJHFfQX0ZYYPHI+nZ/QED204htqlJNv7xDL+h0JTwhC8p4RXLrit
-         CILQP9wBme6Jq9WYQlDhIc2vS95pklGGzSvPO3sYvMht9U16Z1tLwbN7IHZJPSzS0Cts
-         W36ym3zs8mcZuRaXZz+3CXjM9W49VFVG6Rcpny+JUlPwlg4Wvi5CBRufrFNmAWuVq+Qc
-         7pdg==
-X-Gm-Message-State: AOJu0YxdXvX6byu90cOcnOH2341bIms+kxgOS1YrnEGpus/pebh4uIgC
-	0r+MrKZlREh0Zku/qtFgf09iRtqnHnc+/5BLoE4wxmdjyyWhkdtSz6GThUku
-X-Google-Smtp-Source: AGHT+IEiEWjMnoTnDYxx+kSA2FF0FV5fLKC6nKIYGWgQW09Nxif3PfoCgRKHo02Z/IdJstJpAyyHXQ==
-X-Received: by 2002:a05:6a00:2401:b0:71d:fe19:83ee with SMTP id d2e1a72fcca58-71e4c151a6emr11757829b3a.10.1728898523280;
-        Mon, 14 Oct 2024 02:35:23 -0700 (PDT)
-Received: from [103.67.163.162] ([103.67.163.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e5e2840ebsm2472726b3a.130.2024.10.14.02.35.22
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Oct 2024 02:35:22 -0700 (PDT)
-From: Debbie Magoffin <celalkara2001@gmail.com>
-X-Google-Original-From: Debbie Magoffin <dmagoffin@outlook.com>
-Message-ID: <1ac98cfacfc5c04748440ddd48fabf0e88ac59a2e28b8037fd359fcbe6da38dd@mx.google.com>
-Reply-To: dmagoffin@outlook.com
-To: netdev@vger.kernel.org
-Subject: Yamaha Piano 10/14
-Date: Mon, 14 Oct 2024 05:35:19 -0400
+        d=1e100.net; s=20230601; t=1728898769; x=1729503569;
+        h=content-transfer-encoding:subject:cc:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rXvmuKgNurYfFmlWGhrBnQNjxraoDSU6b11R1GM4I2w=;
+        b=xUvdrOmeW6OCgFRGMoXp+0I8JANvfxs/n/rpbUJqfMu2+DwJ9xGj8P9KLAxcpO1lgn
+         8905hvNVOQRP1wlyCC/Jp5pw+sB64hCSI6M8R5NdzLJqxSjUGrXUiZoCGpBDhwjsOFgu
+         ZvzxXYGH1keRh9pQcwFRNLh2fB5pi7blWv0ksi62RXK21Hp6lqPMYC3TDvrwfITrri2l
+         n/4F9p7aIpv3kZl7UevWb+XTqvhNhyFSGCGq2cFRKN414HV8En7cInNZ0htQtPsz8k1p
+         wZ7K6/dXSK3CM642FSV+Yodrq4qr9IshXE7ivw19N4OHASvBwLE0JtUSV7OR6vFAtF8M
+         hXZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpKjLpXCuhGIld2ulRkfj6q9NwKFgTN159EG+wPpaoOol08yAybXlhIb7OR3v/Mu0GGp+DI3bzeVMyCxE=@vger.kernel.org, AJvYcCVqwN//vdVXnXGBMU4XdiZhWGJiYQ6Ghnirz8fFB54358hGhf5LvmxEzUaAdDpQ/Bs8lAipQWu6@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5PUIuQRJIbW6HC3v190c/fuKT+Yr3otsD6EyAie+d/TVb282j
+	NwvDyQYa5NytK/xfsp5oKJNqMGdWPD3b9NiGKkNxo5aESVVDKIht
+X-Google-Smtp-Source: AGHT+IHvlPq8uXKsAnqFl6SXuA29bSIr6fSRIYWCunQYemcdhRdpsILntml+usT+l9Gmo3QcVnWMDw==
+X-Received: by 2002:a5d:59a5:0:b0:37d:3973:cb8d with SMTP id ffacd0b85a97d-37d5feccac8mr6510785f8f.24.1728898768397;
+        Mon, 14 Oct 2024 02:39:28 -0700 (PDT)
+Received: from [192.168.0.101] (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-430d70b444csm149379745e9.33.2024.10.14.02.39.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Oct 2024 02:39:27 -0700 (PDT)
+Message-ID: <eb09900a-8443-4260-9b66-5431a85ca102@gmail.com>
+Date: Mon, 14 Oct 2024 10:39:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+From: "Colin King (gmail)" <colin.i.king@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin\"" <mst@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: re: virtio_net: support device stats
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Hi,
 
-I am offering my late husband?s Yamaha piano to anyone who would truly appreciate it. If you or someone you know would be interested in receiving this instrument for free, please do not hesitate to contact me.
+Static analysis on Linux-next has detected a potential issue with the 
+following commit:
 
-Warm regards,
-Debbie
+commit 941168f8b40e50518a3bc6ce770a7062a5d99230
+Author: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Date:   Fri Apr 26 11:39:24 2024 +0800
+
+     virtio_net: support device stats
+
+
+The issue is in function virtnet_stats_ctx_init, in 
+drivers/net/virtio_net.c as follows:
+
+         if (vi->device_stats_cap & VIRTIO_NET_STATS_TYPE_CVQ) {
+                 queue_type = VIRTNET_Q_TYPE_CQ;
+
+                 ctx->bitmap[queue_type]   |= VIRTIO_NET_STATS_TYPE_CVQ;
+                 ctx->desc_num[queue_type] += 
+ARRAY_SIZE(virtnet_stats_cvq_desc);
+                 ctx->size[queue_type]     += sizeof(struct 
+virtio_net_stats_cvq);
+         }
+
+
+ctx->bitmap is declared as a u32 however it is being bit-wise or'd with 
+VIRTIO_NET_STATS_TYPE_CVQ and this is defined as 1 << 32:
+
+include/uapi/linux/virtio_net.h:#define VIRTIO_NET_STATS_TYPE_CVQ 
+(1ULL << 32)
+
+..and hence the bit-wise or operation won't set any bits in ctx->bitmap 
+because 1ULL < 32 is too wide for a u32. I suspect ctx->bitmap should be 
+declared as u64.
+
+Colin
+
+
+
+
 
