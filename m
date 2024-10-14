@@ -1,139 +1,147 @@
-Return-Path: <netdev+bounces-135368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C888E99D9F1
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:01:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9038699D9FE
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:11:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89DDF282D4B
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:01:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 891AE1C21550
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C071C57B1;
-	Mon, 14 Oct 2024 23:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nhaE/t44"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A505F1D966F;
+	Mon, 14 Oct 2024 23:11:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8407148826
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB751D14FF
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728946871; cv=none; b=NfuZlVy40vVX8nuLiaIeEGwg1jYwscFIsXNy5ixYB8RQf6DINJSoCmVDPXtV3SK58aSFMUSz4SN+xvETXOsHrDfRqcMTPnPVs3Pb9gQn8t7/t2NZIKiFB4jsItsqKDxZ1yn/Mkj7zEw3FGKKDxajkV+yhEmyHnZ0Qmk0q+9J9S4=
+	t=1728947485; cv=none; b=X9WDLP1ZnaY2KoK7hu8Q+JmQjr9IMrEsrP8jCMEkviywGpNUqUHbEzPCUGXceXN2yaQfDiwvVlHrkjFThN9900Jr7bzpGatgkW1udKaPCotNkmIb6oEBBQaHnqWvoA+GrT979QJllJiTBhDiJj+ILseMNmW+/aOdvUSqUXPcBOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728946871; c=relaxed/simple;
-	bh=pdm0OrgR020m1wg0Z5PfCUimmSwEKwH8LVeO6mpjzpQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=to02iDVysiN0b/+ZKRVR2yV7uxQyRsBYmNuWeHb5EnAjhvh1tRDctqjuhqR0loIbz0S/92+MKzV2WrFv7VRd2Tx1qPxnjoGdxVdefOqL7u+w9feCkVO1LLGTDvgPEg+YvPx3BeqnTYhVLJeOX+quVzwmPK4HWX1ehbRfzMmfrug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nhaE/t44; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c9362c26d8so8036184a12.1
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:01:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728946868; x=1729551668; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IEvhOYbhIILLB1qSYINeHhmw2BARcJ2f8Nui9BVtChY=;
-        b=nhaE/t44I9fO4AVQxYIY6EGuYZ1RXOyEw8veMBkCH4Mno7SffuESfJKbP3W/zgSTaL
-         tB7iHQvYuheB1RdOZQ3rZTHOdDUygBipctJFDRZkag6JIqO5249Z00fld5NNKMSkX5Ji
-         nQJe9P+i8PnOXbGfjKrN/QguQ1HdxTvHBmSfPA6PiJ7PYq7G4xCnNi/KO9jZxRPZvIXE
-         NXz9BIxmdscK92emPnUspaYLvZRoC7ROIfyMW5KHxzNwIDMqqcyhETLpjeDfYiso3J6k
-         PRRZA9yvAZKXx8knnyrRi5ArPZBh4ZTd5TZbDQNF79+j0g39eNAzVrPT5WQ2tGnpB1g6
-         8PTw==
+	s=arc-20240116; t=1728947485; c=relaxed/simple;
+	bh=cTPb/+CuKf6RzOOp01YUuyy7ZgHrNXQDBLiqaBFMdqk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=IuW9wtKEy102/8bcWc7blWsXv4040eprjI/z29QLtLic/Dm5fcyBbRlNc/BfTUjHKjC+viPay4s1CSzta+xYknZ995W/j94wrOdokGp7HU17NV2/Rt5zu5OZ8Ns/VghUG2YjFUqYIQ9LxRLjeaTUfg9B8vVWU+KKc+1EfgembK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3b2aee1a3so34648465ab.1
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:11:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728946868; x=1729551668;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IEvhOYbhIILLB1qSYINeHhmw2BARcJ2f8Nui9BVtChY=;
-        b=Wh+Jl5npcacUH0CTGeZcfYi+KZXUC2QKPkvDSwxLnQEmO0eOONw4HU7ES+cCgu42iI
-         AOHhN1Wat3gJBUXDkEKVLKEX8ahKKEY2u7RZvqUeICRldBJCDgw5n7uCH96lYysOaBSm
-         COJqqVkzyzSMDAyb8fOb71O6h+8tgOyjAdzKnEzphgsABM8ylEE8z+dOcxYUYiIIIyV1
-         BHUZ2+Z0PnLQZMfLAJxeFjmmaPLb3w7T2RHkBaBDZpHNQPZ9kjtQNeKbjAfNPXRtClwJ
-         y9hN2wY0Cc51+1uSK92HqfQlGPqvEqjwVZj9FsRBBfZQ83BzKbcImxlkzD7Z8QJxw3RJ
-         g6Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNth1L8wwvSNE6nkfpfCWeqoZMRu2468R2miGcREyC2CXeA6oLy8/nBRR+op6NBsIaf3bQ8yI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzmum2vXkspcg6VaJP0uE9AWYnsa0Wg2Bz8G4YUXvNb9++ogdqy
-	B4+BMMRcRFdBXi8fDvkyFEnMg/xfPHNKKnOmco5DAbZpaBPXU2Z/GswA5Szt93ruAbGYdqGz7k8
-	I88AUsh1SLrffozNrPTuG0rdYCIHJkmjWsvbD
-X-Google-Smtp-Source: AGHT+IEF7BAH7BBqfFSuPVqFExLRaO9MfAeZQxaesgLe9iVoNzAIzQCDm8YKsl92mGXc4xE+dvinxkXcT4d7/GZsF20=
-X-Received: by 2002:a05:6402:2352:b0:5c9:813a:b1c1 with SMTP id
- 4fb4d7f45d1cf-5c9813ab2e9mr3253152a12.1.1728946867821; Mon, 14 Oct 2024
- 16:01:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728947483; x=1729552283;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jADd+awwER/GNY1SV/A2ec4ZVyfHexs847wg1ft/r10=;
+        b=Kiy9MCQehYukvbHTyIYyLTHWv9x7NBsKzGtt6LpALp/LLQBJE4g2PXfigEW9LyZKhp
+         hT/KzMzSCRfI+fETpOdJMVc9Wf3ED/i3crybOLMoMT9w3uyieHGrZERm+NdgPgZJzeUX
+         mjS8sbckI35PBaICps7qKODPkFFe1rxBzw5Q3U5V/39kz0CGzZ4TFTEARnddDdsUevak
+         paJ3EAwPuofnMopi3tg5YkJeBrrkL0rEp1nOj/ozYRrgO1Qa7pr2J+2FLhVo1k5Oz4l9
+         hjzhzljg83d6NmcIi7GpSYg+1si7SqWk++KXTWBO8qWYlxPN3wh3TJslVUfknx+R8bzz
+         ytyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYOkobH3Wog0VptjeYcmEkyNYAWQawCh+GlQUmMupDOsPd1NwOLaSnUgAZxMqO62hufHkm4Vk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbS0fRX7+UcEpNPcbM5btHeAeaYFMBPiTypRafF88q6pwKzYJs
+	Dhow7Z5sJfjgvTZBqdARk0IoDy5vt/hqNHHlhs8Ot8vAd0No/Lye638a7i9TgkEwV9/braka5I4
+	B5CEu2/t0DMdnFTRJmnAB4KsIvBANfvlpyJ+uKisZrLiUO3vtVKL4nPM=
+X-Google-Smtp-Source: AGHT+IEdGt9cixSDWctMRkMkr4qELW5SlvCHwj5aT/xtHiemsiLiT/PsieRzLmsVVzuSdZUeRz1gbT6YaGdXQ1ijH1C1i+f8sfy3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829175201.670718-1-oneukum@suse.com> <CANn89i+m69mWQw+V6XWCzmF84s6uQV15m_YdkPDQptoxUks4=w@mail.gmail.com>
- <fd906211-7f31-4daf-8935-2be1378a75f8@suse.com>
-In-Reply-To: <fd906211-7f31-4daf-8935-2be1378a75f8@suse.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 01:00:53 +0200
-Message-ID: <CANn89iJWATVhMVDgq3fcV9zpZRt8nd_bWp3=qRHo8L3tJP==Kg@mail.gmail.com>
-Subject: Re: [PATCHv2 net] usbnet: modern method to get random MAC
-To: Oliver Neukum <oneukum@suse.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@kernel.org, 
-	John Sperbeck <jsperbeck@google.com>, Brian Vazquez <brianvv@google.com>
+X-Received: by 2002:a05:6e02:2181:b0:3a0:c88c:e674 with SMTP id
+ e9e14a558f8ab-3a3b5f1de0bmr101237355ab.1.1728947483238; Mon, 14 Oct 2024
+ 16:11:23 -0700 (PDT)
+Date: Mon, 14 Oct 2024 16:11:23 -0700
+In-Reply-To: <000000000000cd69c7061dfe35d2@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <670da51b.050a0220.f16b.0004.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] WARNING: ODEBUG bug in hci_release_dev (2)
+From: syzbot <syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 15, 2024 at 12:24=E2=80=AFAM Oliver Neukum <oneukum@suse.com> w=
-rote:
->
-> On 14.10.24 21:59, Eric Dumazet wrote:
->
-> > As diagnosed by John Sperbeck :
-> >
-> > This patch implies all ->bind() method took care of populating net->dev=
-_addr ?
-> >
-> > Otherwise the following existing heuristic is no longer working
-> >
-> > // heuristic:  "usb%d" for links we know are two-host,
-> > // else "eth%d" when there's reasonable doubt.  userspace
-> > // can rename the link if it knows better.
-> > if ((dev->driver_info->flags & FLAG_ETHER) !=3D 0 &&
-> >      ((dev->driver_info->flags & FLAG_POINTTOPOINT) =3D=3D 0 ||
-> >       (net->dev_addr [0] & 0x02) =3D=3D 0))
-> > strscpy(net->name, "eth%d", sizeof(net->name));
-> >
->
-> Hi,
->
-> you need to have a MAC to be an ethernet device, don't you?
+syzbot has found a reproducer for the following issue on:
 
-Before or after your patch, there was/is a MAC address, eventually random.
+HEAD commit:    0b84db5d8f25 MAINTAINERS: add Andrew Lunn as a co-maintain..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=10505727980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7cd9e7e4a8a0a15b
+dashboard link: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f84030580000
 
-The problem is about the test, which is now done while dev->dev_addr
-is full of zeroes, which is not a valid address,
-as shown by :
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/bd00feb30432/disk-0b84db5d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e39e30a1ae6d/vmlinux-0b84db5d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/87eafcdafd48/bzImage-0b84db5d.xz
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index e4775fb5a2f6..1a316773319f 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1750,7 +1750,8 @@ usbnet_probe (struct usb_interface *udev, const
-struct usb_device_id *prod)
-                // can rename the link if it knows better.
-                if ((dev->driver_info->flags & FLAG_ETHER) !=3D 0 &&
-                    ((dev->driver_info->flags & FLAG_POINTTOPOINT) =3D=3D 0=
- ||
--                    (net->dev_addr [0] & 0x02) =3D=3D 0))
-+                    (is_valid_ether_addr(net->dev_addr) &&
-+                     (net->dev_addr [0] & 0x02) =3D=3D 0)))
-                        strscpy(net->name, "eth%d", sizeof(net->name));
-                /* WLAN devices should always be named "wlan%d" */
-                if ((dev->driver_info->flags & FLAG_WLAN) !=3D 0)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
 
-To be clear : We are hitting a regression after your patch was
-backported to stable versions.
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff88806c380978 object type: timer_list hint: hci_cmd_timeout+0x0/0x1e0
+WARNING: CPU: 1 PID: 11255 at lib/debugobjects.c:517 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
+Modules linked in:
+CPU: 1 UID: 0 PID: 11255 Comm: syz.1.2889 Not tainted 6.12.0-rc2-syzkaller-00216-g0b84db5d8f25 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
+Code: e8 5b 1a 3c fd 4c 8b 0b 48 c7 c7 e0 04 61 8c 48 8b 74 24 08 48 89 ea 44 89 e1 4d 89 f8 ff 34 24 e8 db 63 93 fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 64 a7 5a 0b 48 83 c4 10 5b 41 5c 41 5d 41 5e 41
+RSP: 0018:ffffc90003e17818 EFLAGS: 00010286
+RAX: b20dce31d0d23300 RBX: ffffffff8c0cd900 RCX: ffff88807aa40000
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffffff8c610660 R08: ffffffff8155e402 R09: fffffbfff1cf9fd8
+R10: dffffc0000000000 R11: fffffbfff1cf9fd8 R12: 0000000000000000
+R13: ffffffff8c610578 R14: dffffc0000000000 R15: ffff88806c380978
+FS:  00007fd4093cf6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f55ce736000 CR3: 0000000074a94000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+ debug_check_no_obj_freed+0x45b/0x580 lib/debugobjects.c:1019
+ slab_free_hook mm/slub.c:2273 [inline]
+ slab_free mm/slub.c:4579 [inline]
+ kfree+0x11f/0x440 mm/slub.c:4727
+ hci_release_dev+0x1525/0x16b0 net/bluetooth/hci_core.c:2759
+ bt_host_release+0x83/0x90 net/bluetooth/hci_sysfs.c:94
+ device_release+0x99/0x1c0
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x22f/0x480 lib/kobject.c:737
+ hci_dev_put include/net/bluetooth/hci_core.h:1581 [inline]
+ hci_dev_cmd+0x296/0xa50 net/bluetooth/hci_core.c:763
+ sock_do_ioctl+0x158/0x460 net/socket.c:1227
+ sock_ioctl+0x626/0x8e0 net/socket.c:1346
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd40857dff9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fd4093cf038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fd408735f80 RCX: 00007fd40857dff9
+RDX: 0000000020000240 RSI: 00000000400448dd RDI: 0000000000000004
+RBP: 00007fd4085f0296 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fd408735f80 R15: 00007ffd5284c118
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
