@@ -1,74 +1,53 @@
-Return-Path: <netdev+bounces-135285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1D899D699
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:34:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C865399D714
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61CBB1C246D8
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:34:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF3A2B22589
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 19:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D53A1C9B97;
-	Mon, 14 Oct 2024 18:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC1E1C7603;
+	Mon, 14 Oct 2024 19:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jeDcHjAK"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="sXifZNbi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx09lb.world4you.com (mx09lb.world4you.com [81.19.149.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98961C82F4;
-	Mon, 14 Oct 2024 18:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A491C3306
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 19:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728930852; cv=none; b=WEGRBj/SDKeKe7GqjqqcNNlXBbauJU+DEZJ07FWfhDdnlaJoR+lyF06iz0wKy3CZVpu1LntCimkrhCxcMC8iWKOoBuJWA0SF3xS27404xN+On9vuBOVo9FG/o+SiTVlF1pnrMMwlR4INjQUXVKW0Xf9LWYEJTvkbLtRPNMAGjSs=
+	t=1728933315; cv=none; b=MuSJWEejmB5+tCNDNK8IyJsPh7pkNZO5/zzPK8i0C0OWj4JHVatJ5t+rMyM1pmaVkXKKm3Bv5a9AxGxzoZnR80ivEkXMTlUtLmOPO4IsJcp39M/NHF1p7LeBdikMcfwbnH4DB76TbsMywZKefatLq4KBhcfrFhJdku+07lUPJVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728930852; c=relaxed/simple;
-	bh=UO2Bad4J5y0XW53XxtAm0h5XmWXUfxO04tiAMyE160U=;
+	s=arc-20240116; t=1728933315; c=relaxed/simple;
+	bh=MMvUSRb3hsQCsLjN+p94fgRzpUrEqtu6wMtabPdTwfA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FAhZDu3wIKEf5QvzBlGUHNROXDz3TW+8+YFFckl7eZTGRA2TFvcGvfQwM3So/EMLF89CTPxiKZ+YHPPgmeYgii3jbVAogLVM7GJVqNpO1yMzf7AboegvCNWP5z90TJvzFK+vi+qsnrYNUafNtk9Q0siw0Om5fWsO4vwwrYGjk4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jeDcHjAK; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a86e9db75b9so665903966b.1;
-        Mon, 14 Oct 2024 11:34:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728930849; x=1729535649; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VlOnxyLsKzjPmX7mgEUAeOELC286PF6R2i4tL7ZkhEQ=;
-        b=jeDcHjAKHo9pO8oKHIsC6kLiPjNYsWRoulcGf5Wipz2wQjA7tCtlocQLgJTomFUCtW
-         XoB0uxM7/oLsDMzVDmJbHo5k+IYAGbXSyZjnFWb/yZ9ozCvurPvGnaRJDj28/+2BVdN5
-         bZGdPY4OgA28wSQuB1nwBS7XdB5sJOKyE4nKlCpa+ZkhsL3WW/jV8Fv18iW+ZwQnUxub
-         Tgi2YcG0r71rKyrYKs6d9wXqcCg2g8bF0VLHxpTVlp12vyO6OldI5g4pVJ96wzW9z348
-         V1RFKSvZQvvTcl/YbTZDfXkXrtOxLbPtt6akvorsngWorcQA5xsfeQ1uzINU2M5EIrib
-         ZdrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728930849; x=1729535649;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VlOnxyLsKzjPmX7mgEUAeOELC286PF6R2i4tL7ZkhEQ=;
-        b=EMZzj9U/+pF03nhPC6KqGVVDgP+uwVsJu0SDmSDJuDbAf25eq7aXL7b8O8GacwnOjV
-         GU4WENMh8rKr3Pbp1ToT/1LShgRhrRog8d+v8gDLnYX4ze6NvuMxHyKl6oKYeI6c0QN3
-         br67G1srqiVNdKBaoqMCF6C5Mh+Iclelr9cN12i313ryguqHTDNgaQdAZf8F0FZVuCNw
-         e/2A0ttMpFLmvaZNb5AxrzvW7TRd1VQrIr+YdcBTJOjRqmDg9adtvGxHvw4QM5TkULXq
-         ZXreoXkx00bxdru6rD//6Bbp0fadL4isuXdWKD+xg8Jt7aoClAPOc4+v8KXYmr39QTZD
-         Yh3w==
-X-Forwarded-Encrypted: i=1; AJvYcCU3HUyNPrcPjmrfLYSRUK3sGoHsB/F2jHBjLCKmIrHLGqp0L1XIJG1uS5YmIISWv6iRrSFvZNUOn0BExPM=@vger.kernel.org, AJvYcCWq2T8G6J73U4bM2byTaCR0Q57zED2oj+AeJquwW/JgZPwACBI3Hri43zeKK46uQj5bqaw9YOkjcJpK0rGmHDAy@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGYNs6+wZGYgywTANuCJwXgPj83GGrubonNmoxAUennUVLxwZx
-	Q31LWsQ3u5yQi7ADo+WCFIlN0zncXgQ4T3e4vd1atSnDdZ1dg6z/
-X-Google-Smtp-Source: AGHT+IHKZO+fC56r4LaVpTKQzX/+/pa5l07qojFohlY7OCNXpmf0sPt3hbXHuNvHiBIPoGLRAmVB1g==
-X-Received: by 2002:a17:907:97cd:b0:a99:dfb3:dcb4 with SMTP id a640c23a62f3a-a99dfb3df63mr790057066b.39.1728930848857;
-        Mon, 14 Oct 2024 11:34:08 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a04223e3csm261266766b.52.2024.10.14.11.34.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 11:34:08 -0700 (PDT)
-Message-ID: <a0db4efa-2328-4935-9eb6-3344fcbc4b07@gmail.com>
-Date: Mon, 14 Oct 2024 20:34:07 +0200
+	 In-Reply-To:Content-Type; b=YDodjTqDMLCM7Wg7WMxeEmMuzyAk1EgVK+dXf0/2HkZAsinos2hpATE+V/+bmQmmkKmN2RWU/KuM718s5h8uaV2To174m4QlCah6qMcL+q3b96yPPQAgg935VLI0Xe55iCbsB5o6mUjla+m1BBR7LrOh+7h9QMl7+Ec8PN/NRHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=sXifZNbi; arc=none smtp.client-ip=81.19.149.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NpiFOxMjDOI1s6M2dDGRxm7ZqqtS7QwC3673jWn+xGM=; b=sXifZNbiIIEqoHWsqFRVPSCyv8
+	IknJQDZ0kiAVLSim9OAv5eR+C1TGMdq9qKwdAyEoGHdjGQ+/dNTgPKJmCdXu3Y0IbOKovIRXzmBdi
+	pdli3BYSg5ZYRtfY27USPpjOXLP4mYTlmNADehpPJ09+6y+ruT4IJpWDQTYa/3WLcwdg=;
+Received: from [88.117.56.173] (helo=[10.0.0.160])
+	by mx09lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1t0Pzk-000000000zA-3djb;
+	Mon, 14 Oct 2024 20:40:40 +0200
+Message-ID: <3c77d9b2-0933-4da5-a12b-1dd7ebcfebad@engleder-embedded.com>
+Date: Mon, 14 Oct 2024 20:40:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,190 +55,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 06/12] net: core: dev: Add
- dev_fill_bridge_path()
-To: Nikolay Aleksandrov <razor@blackwall.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <20241013185509.4430-7-ericwouds@gmail.com>
- <c3678626-7f5c-4446-9b4d-2650ddf5d5a6@blackwall.org>
-From: Eric Woudstra <ericwouds@gmail.com>
+Subject: Re: [PATCH RFC net-next] net: phy: micrel: Improve loopback support
+ if autoneg is enabled
 Content-Language: en-US
-In-Reply-To: <c3678626-7f5c-4446-9b4d-2650ddf5d5a6@blackwall.org>
-Content-Type: text/plain; charset=UTF-8
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20241013202430.93851-1-gerhard@engleder-embedded.com>
+ <63352ee3-f056-4e28-bc10-b6e971e2c775@lunn.ch>
+ <Zw0jHKKt6z4O3D5U@shell.armlinux.org.uk>
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <Zw0jHKKt6z4O3D5U@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-
-
-On 10/14/24 8:59 AM, Nikolay Aleksandrov wrote:
-> On 13/10/2024 21:55, Eric Woudstra wrote:
->> New function dev_fill_bridge_path(), similar to dev_fill_forward_path().
->> It handles starting from a bridge port instead of the bridge master.
->> The structures ctx and nft_forward_info need to be already filled in with
->> the (vlan) encaps.
+On 14.10.24 15:56, Russell King (Oracle) wrote:
+> On Mon, Oct 14, 2024 at 03:18:29PM +0200, Andrew Lunn wrote:
+>> Russell's reading of 802.3 is that 1G requires autoneg. Hence the
+>> change. Loopback is however special. Either the PHY needs to do
+>> autoneg with itself, which is pretty unlikely, or it needs to ignore
+>> autoneg and loopback packets independent of the autoneg status.
 >>
->> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
->> ---
->>  include/linux/netdevice.h |  2 +
->>  net/core/dev.c            | 77 ++++++++++++++++++++++++++++++++-------
->>  2 files changed, 66 insertions(+), 13 deletions(-)
->>
->> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->> index e87b5e488325..9d80f650345e 100644
->> --- a/include/linux/netdevice.h
->> +++ b/include/linux/netdevice.h
->> @@ -3069,6 +3069,8 @@ void dev_remove_offload(struct packet_offload *po);
->>  
->>  int dev_get_iflink(const struct net_device *dev);
->>  int dev_fill_metadata_dst(struct net_device *dev, struct sk_buff *skb);
->> +int dev_fill_bridge_path(struct net_device_path_ctx *ctx,
->> +			 struct net_device_path_stack *stack);
->>  int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
->>  			  struct net_device_path_stack *stack);
->>  struct net_device *__dev_get_by_flags(struct net *net, unsigned short flags,
->> diff --git a/net/core/dev.c b/net/core/dev.c
->> index cd479f5f22f6..49959c4904fc 100644
->> --- a/net/core/dev.c
->> +++ b/net/core/dev.c
->> @@ -713,44 +713,95 @@ static struct net_device_path *dev_fwd_path(struct net_device_path_stack *stack)
->>  	return &stack->path[k];
->>  }
->>  
->> -int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
->> -			  struct net_device_path_stack *stack)
->> +static int dev_fill_forward_path_common(struct net_device_path_ctx *ctx,
->> +					struct net_device_path_stack *stack)
->>  {
->>  	const struct net_device *last_dev;
->> -	struct net_device_path_ctx ctx = {
->> -		.dev	= dev,
->> -	};
->>  	struct net_device_path *path;
->>  	int ret = 0;
->>  
->> -	memcpy(ctx.daddr, daddr, sizeof(ctx.daddr));
->> -	stack->num_paths = 0;
->> -	while (ctx.dev && ctx.dev->netdev_ops->ndo_fill_forward_path) {
->> -		last_dev = ctx.dev;
->> +	while (ctx->dev && ctx->dev->netdev_ops->ndo_fill_forward_path) {
->> +		last_dev = ctx->dev;
->>  		path = dev_fwd_path(stack);
->>  		if (!path)
->>  			return -1;
->>  
->>  		memset(path, 0, sizeof(struct net_device_path));
->> -		ret = ctx.dev->netdev_ops->ndo_fill_forward_path(&ctx, path);
->> +		ret = ctx->dev->netdev_ops->ndo_fill_forward_path(ctx, path);
->>  		if (ret < 0)
->>  			return -1;
->>  
->> -		if (WARN_ON_ONCE(last_dev == ctx.dev))
->> +		if (WARN_ON_ONCE(last_dev == ctx->dev))
->>  			return -1;
->>  	}
->>  
->> -	if (!ctx.dev)
->> +	if (!ctx->dev)
->>  		return ret;
->>  
->>  	path = dev_fwd_path(stack);
->>  	if (!path)
->>  		return -1;
->>  	path->type = DEV_PATH_ETHERNET;
->> -	path->dev = ctx.dev;
->> +	path->dev = ctx->dev;
->> +
->> +	return ret;
->> +}
->> +
->> +int dev_fill_bridge_path(struct net_device_path_ctx *ctx,
->> +			 struct net_device_path_stack *stack)
->> +{
->> +	const struct net_device *last_dev, *br_dev;
->> +	struct net_device_path *path;
->> +	int ret = 0;
->> +
->> +	stack->num_paths = 0;
->> +
->> +	if (!ctx->dev || !netif_is_bridge_port(ctx->dev))
->> +		return -1;
->> +
->> +	br_dev = netdev_master_upper_dev_get_rcu((struct net_device *)ctx->dev);
->> +	if (!br_dev || !br_dev->netdev_ops->ndo_fill_forward_path)
->> +		return -1;
->> +
->> +	last_dev = ctx->dev;
->> +	path = dev_fwd_path(stack);
->> +	if (!path)
->> +		return -1;
->> +
->> +	memset(path, 0, sizeof(struct net_device_path));
->> +	ret = br_dev->netdev_ops->ndo_fill_forward_path(ctx, path);
->> +	if (ret < 0)
->> +		return -1;
->> +
->> +	if (!ctx->dev || WARN_ON_ONCE(last_dev == ctx->dev))
->> +		return -1;
->> +
->> +	if (!netif_is_bridge_master(ctx->dev))
+>> What does 802.3 say about loopback? At least the bit in BMCR must be
+>> defined. Is there more? Any mention of how it should work in
+>> combination with autoneg?
 > 
-> hmm, do we expect ctx->dev to be a bridge master? Looking at
-> br_fill_forward_path, it seems to be == fdb->dst->dev which
-> should be the target port
-
-It would indeed be very unlikely. It was a left-over from code I wrote,
-thinking that here I could handle cascaded bridges (via vlan-device). I
-dropped that, since conntrack does not follow this flow.
-
-So would it be better to only make sure that ctx->dev is not a bridge
-master?
-
-	if (netif_is_bridge_master(ctx->dev))
-		return -1;
-
-	return dev_fill_forward_path_common(ctx, stack);
-
->> +		return dev_fill_forward_path_common(ctx, stack);
->> +
->> +	path = dev_fwd_path(stack);
->> +	if (!path)
->> +		return -1;
->> +	path->type = DEV_PATH_ETHERNET;
->> +	path->dev = ctx->dev;
->>  
->>  	return ret;
->>  }
->> +EXPORT_SYMBOL_GPL(dev_fill_bridge_path);
->> +
->> +int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
->> +			  struct net_device_path_stack *stack)
->> +{
->> +	struct net_device_path_ctx ctx = {
->> +		.dev	= dev,
->> +	};
->> +
->> +	memcpy(ctx.daddr, daddr, sizeof(ctx.daddr));
->> +
->> +	stack->num_paths = 0;
->> +
->> +	return dev_fill_forward_path_common(&ctx, stack);
->> +}
->>  EXPORT_SYMBOL_GPL(dev_fill_forward_path);
->>  
->>  /**
+> Loopback is not defined to a great degree in 802.3, its only suggesting
+> that as much of the PHY data path should be exercised as possible.
+> However, it does state in clause 22 that the duplex bit should not
+> affect loopback.
 > 
+> It doesn't make any reference to speed or autoneg.
+> 
+> Given that PHYs that support multiple speeds need to have different
+> data paths through them, and the requirement for loopback to use as
+> much of the data path as possible, it does seem sensible that some
+> PHYs may not be able to negotiate with themselves in loopback mode,
+> (e.g. at 1G speeds, one PHY needs to be master the other slave, how
+> does a single PHY become both master and slave at the same time...)
+> then maybe forced speed is necessary when entering loopback.
+> 
+> So probably yes, when entering loopback, we probably ought to force
+> the PHY speed, but that gets difficult for a PHY that is down and
+> as autoneg enabled (what speed do we force?)
+> 
+> We do have the forced-settings in phy->autoneg, phy->speed and
+> phy->duplex even after the referred to commit, so we could use
+> that to switch the PHY back to a forced mode. However, I suepct
+> we're into PHY specific waters here - whether the PHY supports
+> 1G without AN even in loopback mode is probably implementation
+> specific.
+
+I posted as a RFC, because I felt not able to suggest a more generic
+solution without any input. But I can add some facts about the KSZ9031
+PHY. The data sheet agrees with Russells commit: "For 1000BASE-T mode,
+auto-negotiation is required and always used to establish a link"
+It also requests autoneg disable, full duplex and speed bits set for
+loopback. So loopback speed is configurable. For 1000 Mbps it also
+requires some slave configuration. genphy_loopback() mostly follows
+the data sheet.
+
+In my opinion the genphy_loopback() seems to work with most PHYs
+or most real use cases. Otherwise, there would have been more PHY
+specific set_loopback() implementations. The only problem is how
+speed/duplex is determined. It is not guaranteed that phydev->speed and
+phydev->duplex have reasonable values if autoneg has been triggered,
+maybe because autoneg is still in progress or link is down or just
+because the PHY state machine has not run so far. Always enabling
+autoneg for 1000 Mbps only made the problem more apparent.
+
+My suggestion would be to improve the speed/duplex selection for
+loopback in the generic code. The selected speed/duplex should be
+forwarded to genphy_loopback() or PHY specific set_loopback().
+If speed/duplex have valid values, then these values should be used.
+Otherwise the maximum speed/duplex of the PHY should be used.
+Would that be a valid solution?
+
+Gerhard
 
