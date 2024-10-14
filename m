@@ -1,190 +1,99 @@
-Return-Path: <netdev+bounces-135338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDFD299D8C5
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:11:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 930AB99D8D6
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E79031C21EDE
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D3D0280123
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94AF21CB336;
-	Mon, 14 Oct 2024 21:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6E71D12FE;
+	Mon, 14 Oct 2024 21:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="eVgp0nd4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rsEBMNO2"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C902E4683;
-	Mon, 14 Oct 2024 21:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6921D0E3E;
+	Mon, 14 Oct 2024 21:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728940280; cv=none; b=udeghPW1c+HRfF8Yl/vrTgNC2xeqx3taCWSz5S0QGJC+NClc7YsdSjtOG83SOdIIkmhxP4rv2kNoHGzL/NAIVjU+MyiKcmFw6EXvXJTPn8r/Or950UtnMfn7glpa0oiUl8p9C4sqggf9cKLDodxAGKHwRJJlM0Lzn91cyf+l0s0=
+	t=1728940496; cv=none; b=WdQB4wNs5in5vSy78NH/OT47/igLow6TKHy9YKtQENXXJ3TXb/pjkgWEbyhNhOlb4FH6djCu41lXiI9FBjO2oyZ/uS7OEK7ezB5JvJywrMgu/H8rQeavnCNHNk5AmfAg1wBpWbpCdRD+ID9HAD8ruJT4VTRQIkm3enihMKk78xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728940280; c=relaxed/simple;
-	bh=R/DLS+Xw7OyYhNxfeQXWUUUD6LkllQytJ1hPyqj1kMA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=e0BsfbEDaQ8Lw1VBcId1ITNERrLWY5vhIh6oIEnMOiy10XizVguUhEsNSY8tZItb3TPbmPhhsAm+0ZHMIAWl/q75WB0QuCR+FQmKUbtg8TZgyUemqNI+To43hTxNYWsyfdO4l6/JR6K39k9dbxTdC1XPpekqJzO6VrKzUB6QRmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=eVgp0nd4; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=SdUR8mON2IFLbntfrRFLdckUiOEXcRl2h7inwZBQyuI=; b=eVgp0nd4gTpE+m/EayIw1OhzTW
-	V0udynR9BSafUsEi10BcelXeIgdOu7VaBxgOEO8/9Ou4F0hKQ99w1kd5WZgGPM8mZmHD4Z0VsgchB
-	6AWRuvQuUinfb4/8Taf1P/MY5TaINkjkwSRZax4KFNWB61/BAP6czMt0DE5Zx2ntoN5nKI2/VR6eK
-	Sf251yo1PWezKldaS4H1AlKPLrfKlROBxIvAkQ3dOdeQws7GQcpjYo2DzTlM+cf9V4klmTPxmGyzt
-	lRFi4i+A7kzSvkz2aeEz4Pi+gNqw13v7yRXxoSsMEyKlselFfAZiX/KtlJtb+HBNnCpKb5V1RjiQ6
-	0AgGt4Og==;
-Received: from 47.249.197.178.dynamic.cust.swisscom.net ([178.197.249.47] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1t0SLP-00031X-Bs; Mon, 14 Oct 2024 23:11:11 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2024-10-14
-Date: Mon, 14 Oct 2024 23:11:10 +0200
-Message-Id: <20241014211110.16562-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1728940496; c=relaxed/simple;
+	bh=rvIywEjogCiwXVzlP8g7B4K28/cFU0k/kLvToB8437w=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eJkDJ8xuZCH8P6qCRJS0pmCyh1hVxLPygRXl0LImjdD3xJcTh8Eg2QD+N+QQYZQIxkloU2x8p8E0efPiTQHKmACBcsrv1w6NCZCr2UykFJLIE/gMy6d3tGZQGSE8w+5YILvXFAlakdxXmcxxXvC+njPiPPkZ3vrzLfL3VWCAQ4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rsEBMNO2; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728940495; x=1760476495;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=lm1nlbhRFalml+XjwqIVmMPssVpEVAP0w03w1PajwV0=;
+  b=rsEBMNO2kFFaMZCX0/4GanWBnD4I7v7M9VK1dwghRZLUW2QgJvXk3EWI
+   Ts/Zf7LCaI8PiIWjbaINwzYnvOohv+jBv/8NKvd23hO2qr3UrYjIGIw0x
+   mncJuF9ihRHViFruPG36pa5URlVDyy3NogyLSfPtQT3Ifgdvq/MAKWML7
+   s=;
+X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
+   d="scan'208";a="138023042"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 21:14:53 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:20116]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
+ id 8bc78cd4-9c40-4b9c-b747-d35989fc65d1; Mon, 14 Oct 2024 21:14:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 8bc78cd4-9c40-4b9c-b747-d35989fc65d1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 14 Oct 2024 21:14:52 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 14 Oct 2024 21:14:47 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ignat@cloudflare.com>
+CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next v3 1/9] af_packet: avoid erroring out after sock_init_data() in packet_create()
+Date: Mon, 14 Oct 2024 14:14:42 -0700
+Message-ID: <20241014211442.96478-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241014153808.51894-2-ignat@cloudflare.com>
+References: <20241014153808.51894-2-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27427/Mon Oct 14 10:48:30 2024)
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Mon, 14 Oct 2024 16:38:00 +0100
+> After sock_init_data() the allocated sk object is attached to the provided
+> sock object. On error, packet_create() frees the sk object leaving the
+> dangling pointer in the sock object on return. Some other code may try
+> to use this pointer and cause use-after-free.
+> 
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 
-The following pull-request contains BPF updates for your *net-next* tree.
-
-We've added 21 non-merge commits during the last 18 day(s) which contain
-a total of 21 files changed, 1185 insertions(+), 127 deletions(-).
-
-The main changes are:
-
-1) Put xsk sockets on a struct diet and add various cleanups. Overall, this helps
-   to bump performance by 12% for some workloads, from Maciej Fijalkowski.
-
-2) Extend BPF selftests to increase coverage of XDP features in combination
-   with BPF cpumap, from Alexis Lothoré (eBPF Foundation).
-
-3) Extend netkit with an option to delegate skb->{mark,priority} scrubbing to
-   its BPF program, from Daniel Borkmann.
-
-4) Make the bpf_get_netns_cookie() helper available also to tc(x) BPF programs,
-   from Mahe Tardy.
-
-5) Extend BPF selftests covering a BPF program setting socket options per MPTCP
-   subflow, from Geliang Tang and Nicolas Rybowski.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Jakub Kicinski, Jordan Rife, Magnus Karlsson, Mat Martineau, Matthieu 
-Baerts (NGI0), Nikolay Aleksandrov
-
-----------------------------------------------------------------
-
-The following changes since commit c824deb1a89755f70156b5cdaf569fca80698719:
-
-  cxgb4: clip_tbl: Fix spelling mistake "wont" -> "won't" (2024-09-27 12:44:08 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to e6c4047f5122803f2fe4ab9b1ab7038626e51ec1:
-
-  xsk: Use xsk_buff_pool directly for cq functions (2024-10-14 17:23:49 +0200)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Alexis Lothoré (eBPF Foundation) (4):
-      selftests/bpf: add missing header include for htons
-      selftests/bpf: fix bpf_map_redirect call for cpu map test
-      selftests/bpf: make xdp_cpumap_attach keep redirect prog attached
-      selftests/bpf: check program redirect in xdp_cpumap_attach
-
-Daniel Borkmann (5):
-      netkit: Add option for scrubbing skb meta data
-      netkit: Simplify netkit mode over to use NLA_POLICY_MAX
-      netkit: Add add netkit scrub support to rt_link.yaml
-      tools: Sync if_link.h uapi tooling header
-      selftests/bpf: Extend netkit tests to validate skb meta data
-
-Geliang Tang (2):
-      selftests/bpf: Add getsockopt to inspect mptcp subflow
-      selftests/bpf: Add mptcp subflow subtest
-
-Maciej Fijalkowski (7):
-      bpf: Remove unused macro
-      xsk: Get rid of xdp_buff_xsk::xskb_list_node
-      xsk: s/free_list_node/list_node/
-      xsk: Get rid of xdp_buff_xsk::orig_addr
-      xsk: Carry a copy of xdp_zc_max_segs within xsk_buff_pool
-      xsk: Wrap duplicated code to function
-      xsk: Use xsk_buff_pool directly for cq functions
-
-Mahe Tardy (2):
-      bpf: add get_netns_cookie helper to tc programs
-      selftests/bpf: add tcx netns cookie tests
-
-Martin KaFai Lau (3):
-      Merge branch 'selftests/bpf: new MPTCP subflow subtest'
-      Merge branch 'netkit: Add option for scrubbing skb meta data'
-      Merge branch 'selftests/bpf: add coverage for xdp_features in test_progs'
-
-Nicolas Rybowski (1):
-      selftests/bpf: Add mptcp subflow example
-
- Documentation/netlink/specs/rt_link.yaml           |  15 +
- MAINTAINERS                                        |   2 +-
- drivers/net/netkit.c                               |  91 ++--
- include/net/xdp_sock_drv.h                         |  14 +-
- include/net/xsk_buff_pool.h                        |  23 +-
- include/uapi/linux/if_link.h                       |  15 +
- net/core/filter.c                                  |  17 +-
- net/xdp/xsk.c                                      |  38 +-
- net/xdp/xsk_buff_pool.c                            |  54 +-
- net/xdp/xsk_queue.h                                |   2 +-
- tools/include/uapi/linux/if_link.h                 | 553 ++++++++++++++++++++-
- tools/testing/selftests/bpf/network_helpers.h      |   1 +
- tools/testing/selftests/bpf/prog_tests/mptcp.c     | 121 +++++
- .../selftests/bpf/prog_tests/netns_cookie.c        |  29 +-
- tools/testing/selftests/bpf/prog_tests/tc_netkit.c |  94 +++-
- .../selftests/bpf/prog_tests/xdp_cpumap_attach.c   |  44 +-
- tools/testing/selftests/bpf/progs/mptcp_bpf.h      |  42 ++
- tools/testing/selftests/bpf/progs/mptcp_subflow.c  | 128 +++++
- .../selftests/bpf/progs/netns_cookie_prog.c        |  10 +
- tools/testing/selftests/bpf/progs/test_tc_link.c   |  12 +
- .../bpf/progs/test_xdp_with_cpumap_helpers.c       |   7 +-
- 21 files changed, 1185 insertions(+), 127 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/mptcp_bpf.h
- create mode 100644 tools/testing/selftests/bpf/progs/mptcp_subflow.c
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
