@@ -1,209 +1,116 @@
-Return-Path: <netdev+bounces-135055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1927099C012
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:35:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C6399C01A
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:36:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FC33280FE5
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:35:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3DB91F232F7
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A11142623;
-	Mon, 14 Oct 2024 06:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926E513BC3F;
+	Mon, 14 Oct 2024 06:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="oZjV7se+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q93u0woa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C311136353
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 06:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321E033C9;
+	Mon, 14 Oct 2024 06:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728887732; cv=none; b=Ti5zlsiNoLOPP0b4xRduZlJ43svSmvzgljH4++dbMbPRD333lJ1t5o4gxOjZdAIPFvkGImAOCy9+xqH/CsGAkf0xeu1fi32i6WugA3AYzAZ3yFD28Y6uDaVgdqg2jdE8vjTZYIwehIIs5jFVuRwYpWqG3wX7u3EMeoZ+w/Xu15s=
+	t=1728887753; cv=none; b=oK6PCAiQKc53Lxrff8cWap2K6LhlXaWP7wTxAqOUbA4oEqsYEAZ05+2SWM1qvCrxzJSkNhwsTFo4p6S9U8AgWiJM8xpGu4k8GObPkgnZAhnQ06VCQG2FZmDRGAiZj8wmz2RDw9gc/Nix3nUd6LKCzNs03QqDbpkoBHzmMZaNekA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728887732; c=relaxed/simple;
-	bh=ZGBoVdbwgat/NxUEjyYnv4uZ19nNnybh9UIeSIN7bUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NkM5z7jgF7WN0CfElQd/DQom6J2fFSfpfVluNzh3nUICp2gDFNvvfuvqBoANlz3tvGxStBphfxDE08A32tLySwWGQVXhohJRYSbLduWhDIxNeNaF3XmxckVnwJ8Uxe+AOxXNAranoYxHj9Ba0IJqK8okAbR1Y4qJ0s6Q+LShFdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=oZjV7se+; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c42f406e29so5002611a12.2
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 23:35:30 -0700 (PDT)
+	s=arc-20240116; t=1728887753; c=relaxed/simple;
+	bh=c2dldEwImcCdkCjsmThkQqhn6rCIzzV1kMDKmm4/Sl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aTowLvhudWQ9FlL0y9HeYz4wAuVTItU5uKsnkpIl9qKckUqJE6/JN+H6l+KgL7oq35VmXceZTmYGj0Fy8BagtNIr382TRz5OmgE68hOOJBJ6Th/VoiBesBiw1P5Q1dqRUR6nGsamrYbHYY0CfKatUVzYQw/EfDbwv+Q3r0MSphc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q93u0woa; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20ceb8bd22fso4457935ad.3;
+        Sun, 13 Oct 2024 23:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1728887729; x=1729492529; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EzkqcrvTVaKqpqDByKdgad826mxzpVo//v8QIefMOL8=;
-        b=oZjV7se+MygIvrpcqkj1fVVSQjt60aQ7CiM+JUr6kHJeTXlb/iAjysm2vlfAnsUODv
-         lQx3ft0MZJOuumMJHSWgWYgu2qKemVeXb5PBoKx0/mrvAWh/8/RHSElFGesjriNh70u/
-         JEhMNQUvWLseauVOt4/zVYhrr8/l+H82CwFK7hWjGh2d3L13a1/3gp8071MNALWj1kib
-         o0o8dju8wb1zHeYuJttJ72tNQ7a/yimpjjnr+hFaOzy3XSaYFp+/QrURpE4J/wCW/N3S
-         1zqTdxSuejztMbyv+DBcHhvpkqhnrWPyVa686DZxtBfW4ylStj5sDD+uRDRM2iGsvn4W
-         CLSA==
+        d=gmail.com; s=20230601; t=1728887751; x=1729492551; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=okTGDMk4YPdgJsXtmkY+DN9uCqBGI3OTCf7BpUSy0YI=;
+        b=Q93u0woa3O0VMl3QpvV/vdlD1PcKIkBHPkRQq9RC8vNAEJmikCD3wtUvPgdKeU11ca
+         AhQ7uy1p30el2Kr4NUx00HDI19K7b3mQX0sElfYWQIY+NoUDaD6ReBT4d/pznkE0tbLE
+         IQYgXNjixhlatKUPmk+tlIjCl5Wt3fohRHNe3de9KQPfDhbaiSYPUXPngt5w3BQphCcE
+         1r+Qsabg7cSBEIMHeJaMTedQ/qLS+7StMw2X/+7Lhw8EDItyRgY4GDjRVO70aKpQNDtx
+         ASrhv1TN0jY8JncnibzMeUBBg7uD99EFnHf3B7wSkJ98s2hFVBc5NZvogvw8B3OugE0L
+         zlOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728887729; x=1729492529;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EzkqcrvTVaKqpqDByKdgad826mxzpVo//v8QIefMOL8=;
-        b=fKwUYiTh+gGf03Uo8VQt5eB5qwGrvhMOBPEtPhlxfoAbzRm1RA9wY1B42H3DiQzBsW
-         UC/xmCSdU6tqRu2omt36ndC+3w54rZxZIsWOaHX6whkfXigBFAbAQvcdD9dluWzmmdW7
-         XlEQKCwDUaMUc9UAhDcA6r9+hNwjfme0VF94ZMWp+14H2R8B8Z26anI23P1fzp7Jp5vO
-         3+zC3rrmMFXb/z8YHTeWgtZDwvPL2nb/m1pQ2ikDgKt0hjtFBirdtoe7AJjeOmhGPWFP
-         oBGOnH9XhFedlj5uNifC9jBtpvZf1KDGTLTJxLdlpO33vbtZ0Qvl87JHKog6CkavucJv
-         M5rQ==
-X-Gm-Message-State: AOJu0Yxi5lT0Ka8H40PW8cNRFdnWfwpCsvilOUFDS4LANNoTn6EZZU4C
-	R+2wp4OkyDqAuFtUJSQGxeMz087YPxKNJEeJef0SaGGEDukaozorVwsiG77upac=
-X-Google-Smtp-Source: AGHT+IHtsfhY77d2hmhJ/UeBZXQQAahrdwUCAyfXzQzRvrPqdSAngDAVOM6fkmoaHNagJzIo6u/AkQ==
-X-Received: by 2002:a17:907:d01:b0:a99:403e:2578 with SMTP id a640c23a62f3a-a99b9313475mr1017156666b.5.1728887728814;
-        Sun, 13 Oct 2024 23:35:28 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99ee8da1besm278784766b.216.2024.10.13.23.35.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Oct 2024 23:35:28 -0700 (PDT)
-Message-ID: <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
-Date: Mon, 14 Oct 2024 09:35:26 +0300
+        d=1e100.net; s=20230601; t=1728887751; x=1729492551;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=okTGDMk4YPdgJsXtmkY+DN9uCqBGI3OTCf7BpUSy0YI=;
+        b=oQAHp9YrmVrW4BTJ+DQrpooEsuEUU7gCxBCZBeKG0i7xMIg9dfITUjIGKXcniT3jj8
+         sRWQosDInsI+TSIVlkOYizBcto/M9mFCU8BgIqYR/UfkDwY2ZI6+kxungkUvx8DnRsHp
+         7Bw1WawYy36yuxhFfE3cEXCml0pJUweQSksOFb1hhM/1kPSppYuMoahqHJTH8ccvFMsd
+         EJM3DW1rI37+arA5g/EGby86CdehcCR353YAIxLiO+z1Vvw3X72jWdaeShWIVoD0e6d5
+         my2nMxD7lkhwaQPLsyAr3HLVrKb48ObqNd3e0ymIi5qOJAUI5pWN5A6icaxArIeIjh8Y
+         xIuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU24Ii2Pllkylu8OCknP00Ks/jjvrBmiNlyRtlL5jEKQpAHndJD8cl8unlbiXMs2Sm3B8FG248V@vger.kernel.org, AJvYcCUuoQvI/LM3/he1REX6kjloknHd+s9Gm6iQFFZW0s3eycXQOscwPgDqh2rO/kMJvtsFuh4BCnn56dYzIX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrVHPDWzccHbkx3xyGpPvknLrxUTzmslWzBxWUE3bsZWlT0a2S
+	g1828BN7nPLE/aKxq75sjiASnlS43qCE2OOXcsA2tRL4ou/ZtYiC
+X-Google-Smtp-Source: AGHT+IHOH9g3wnh6yWrjAq3lOUnbhV7oz+QGKL/F/3PFnu7guCAt3IHSrMwCMyWwobvMd1ji/EWhLw==
+X-Received: by 2002:a17:902:ecc9:b0:20b:61ec:7d3c with SMTP id d9443c01a7336-20cbb254364mr131026075ad.49.1728887751250;
+        Sun, 13 Oct 2024 23:35:51 -0700 (PDT)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c33cd05sm59522105ad.245.2024.10.13.23.35.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Oct 2024 23:35:50 -0700 (PDT)
+Date: Mon, 14 Oct 2024 14:35:42 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, <xfr@outlook.com>
+Subject: Re: [PATCH net-next v1] page_pool: check for dma_sync_size earlier
+Message-ID: <20241014143542.000028dc@gmail.com>
+In-Reply-To: <d920e23b-643d-4d35-9b1a-8b4bfa5b545f@huawei.com>
+References: <20241010114019.1734573-1-0x1207@gmail.com>
+	<601d59f4-d554-4431-81ca-32bb02fb541f@huawei.com>
+	<20241011101455.00006b35@gmail.com>
+	<CAC_iWjL7Z6qtOkxXFRUnnOruzQsBNoKeuZ1iStgXJxTJ_P9Axw@mail.gmail.com>
+	<20241011143158.00002eca@gmail.com>
+	<21036339-3eeb-4606-9a84-d36bddba2b31@huawei.com>
+	<CAC_iWjLE+R8sGYx74dZqc+XegLxvd4GGG2rQP4yY_p0DVuK-pQ@mail.gmail.com>
+	<d920e23b-643d-4d35-9b1a-8b4bfa5b545f@huawei.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
- improvements
-To: Eric Woudstra <ericwouds@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241013185509.4430-1-ericwouds@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 13/10/2024 21:54, Eric Woudstra wrote:
-> This patchset makes it possible to set up a (hardware offloaded) fastpath
-> for bridged interfaces.
-> 
+Hi Yunsheng,
 
-The subject and this sentence are misleading, you're talking about netfilter bridge
-fastpath offload, please mention it in both places. When you just say bridge fast
-path, I think of the software fast path.
+On Sat, 12 Oct 2024 14:14:41 +0800, Yunsheng Lin <linyunsheng@huawei.com> wrote:
 
-> To set up the fastpath with offloading, add this extra flowtable:
+> I would prefer to add a new api to do that, as it makes the semantic
+> more obvious and may enable removing some checking in the future.
 > 
-> table bridge filter {
->         flowtable fb {
->                 hook ingress priority filter
->                 devices = { lan0, lan1, lan2, lan3, lan4, wlan0, wlan1 }
->                 flags offload
->         }
->         chain forward {
->                 type filter hook forward priority filter; policy accept;
-> 		ct state established flow add @fb
->         }
-> }
-> 
-> Creating a separate fastpath for bridges.
-> 
->          forward fastpath bypass
->  .----------------------------------------.
-> /                                          \
-> |                        IP - forwarding    |
-> |                       /                \  v
-> |                      /                  wan ...
-> |                     /
-> |                     |
-> |                     |
-> |                   brlan.1
-> |                     |
-> |    +-------------------------------+
-> |    |           vlan 1              |
-> |    |                               |
-> |    |     brlan (vlan-filtering)    |
-> |    +---------------+               |
-> |    |  DSA-SWITCH   |               |
-> |    |               |    vlan 1     |
-> |    |               |      to       |
-> |    |   vlan 1      |   untagged    |
-> |    +---------------+---------------+
-> .         /                   \
->  ------>lan0                 wlan1
->         .  ^                 ^
->         .  |                 |
->         .  \_________________/
->         .  bridge fastpath bypass
->         .
->         ^
->      vlan 1 tagged packets
-> 
-> To have the ability to handle xmit direct with outgoing encaps in the
-> bridge fastpass bypass, we need to be able to handle them without going
-> through vlan/pppoe devices. So I've applied, amended and squashed wenxu's
-> patchset. This patch also makes it possible to egress from vlan-filtering
-> brlan to lan0 with vlan tagged packets, if the bridge master port is doing
-> the vlan tagging, instead of the vlan-device. Without this patch, this is
-> not possible in the bridge-fastpath and also not in the forward-fastpath,
-> as seen in the figure above.
-> 
-> There are also some more fixes for filling in the forward path. These
-> fixes also apply to for the forward-fastpath. They include handling
-> DEV_PATH_MTK_WDMA in nft_dev_path_info() and avoiding
-> DEV_PATH_BR_VLAN_UNTAG_HW for bridges with ports that use dsa.
-> 
-> Conntrack bridge only tracks untagged and 802.1q. To make the bridge
-> fastpath experience more similar to the forward fastpath experience,
-> I've added double vlan, pppoe and pppoe-in-q tagged packets to bridge
-> conntrack and to bridge filter chain.
-> 
-> Eric Woudstra (12):
->   netfilter: nf_flow_table_offload: Add nf_flow_encap_push() for xmit
->     direct
->   netfilter: bridge: Add conntrack double vlan and pppoe
->   netfilter: nft_chain_filter: Add bridge double vlan and pppoe
->   bridge: br_vlan_fill_forward_path_pvid: Add port to port
->   bridge: br_fill_forward_path add port to port
->   net: core: dev: Add dev_fill_bridge_path()
->   netfilter :nf_flow_table_offload: Add nf_flow_rule_bridge()
->   netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
->   netfilter: nft_flow_offload: Add NFPROTO_BRIDGE to validate
->   netfilter: nft_flow_offload: Add DEV_PATH_MTK_WDMA to
->     nft_dev_path_info()
->   bridge: br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
->   netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
-> 
->  include/linux/netdevice.h                  |   2 +
->  include/net/netfilter/nf_flow_table.h      |   3 +
->  net/bridge/br_device.c                     |  20 ++-
->  net/bridge/br_private.h                    |   2 +
->  net/bridge/br_vlan.c                       |  24 +++-
->  net/bridge/netfilter/nf_conntrack_bridge.c |  86 ++++++++++--
->  net/core/dev.c                             |  77 +++++++++--
->  net/netfilter/nf_flow_table_inet.c         |  13 ++
->  net/netfilter/nf_flow_table_ip.c           |  96 ++++++++++++-
->  net/netfilter/nf_flow_table_offload.c      |  13 ++
->  net/netfilter/nft_chain_filter.c           |  20 ++-
->  net/netfilter/nft_flow_offload.c           | 154 +++++++++++++++++++--
->  12 files changed, 463 insertions(+), 47 deletions(-)
-> 
+> And we may need to disable this 'feature' for frag relate API for now,
+> as currently there may be multi callings to page_pool_put_netmem() for
+> the same page, and dma_sync is only done for the last one, which means
+> it might cause some problem for those usecases when using frag API.
 
+I am not an expert on page_pool.
+So would you mind sending a new patch to add a non-dma-sync version of
+page_pool_put_page() and CC it to me?
+I am so glad to test it on my device ;)
+Thanks.
 
