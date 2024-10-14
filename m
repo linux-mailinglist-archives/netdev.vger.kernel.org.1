@@ -1,119 +1,96 @@
-Return-Path: <netdev+bounces-135296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E857999D7EE
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:10:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A58599D7F5
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:12:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C43D1C21CA3
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A71FF1C218CD
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220271CF7B0;
-	Mon, 14 Oct 2024 20:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE61A1CF7AE;
+	Mon, 14 Oct 2024 20:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDoPWG4t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l4xDbyNF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE45F1CF5EE;
-	Mon, 14 Oct 2024 20:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9415314A4E7;
+	Mon, 14 Oct 2024 20:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728936629; cv=none; b=FxpNlKZX77ZnaGJsfY+6j5qVI7X929al6fTa5Edt70vKRs3M00AhlJlsdNVay2K3hueQpsoB0WOKqfn4bkLH8HZoJWc+x0y3GTyXgK3EzJNC1AoLwVxVq3v3X0Op3y+ZmtzF4MihD1yVUxlbAANgegNS43joNl7obfEF5E9T0zA=
+	t=1728936760; cv=none; b=SbPps0Uj3ukZiT3PnEBt/1lY/9JXRa8GdN0+fOlBObaAyzvo7mhazBYpDkiEi8TEkmHRxi7dB0TkV9EnHMq8b3cJ6Dy00jQ38/8Ulo6VveN6flVulmqSYA/k8cukV9jVGFchyRWjkLTZDBY8399reAraBlYlGlHuw6lPCuAYwBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728936629; c=relaxed/simple;
-	bh=vEn4m9waBM0pwb9EoGuHyHoQ7+1no5tRr2PNgfO5AZ8=;
+	s=arc-20240116; t=1728936760; c=relaxed/simple;
+	bh=ZTBxdRUCQr80BBF8O7VYgUYSjhbIYghb8AV3U3WUn/o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bzwTjDJNVImb32p8WB0NqexvveypfHptr4mgqVOkdMNq0x1aBoraN1n41oZBCeUUmQeuROF+HHbwbFdwcTmOr8xKZv7ZfcDSOVobbu+8Mczt7yn3/XOrPEWf67J0ahOjcPSqvU9ffPtwQu6ymTR49Ljww0lVnVyLVz6VWJb9fZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDoPWG4t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AC78C4CEC3;
-	Mon, 14 Oct 2024 20:10:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ccCTEMyPXLLmqLa7wFZ4FAfEdBSs+1G7X4J7GAnx32pFtHVJaEDFY28aKA/HDuOE0Q0sjvLd/Yy9ocpBcRa5rUnavgsCQXh1ptv+o4DV2Tc1UItCRFMi1e2RVYogSkY3DsWf+HSptUyIk7gwNc89M3WB4GLQafwTsHtNF48KOgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l4xDbyNF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2ED4C4CEC3;
+	Mon, 14 Oct 2024 20:12:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728936627;
-	bh=vEn4m9waBM0pwb9EoGuHyHoQ7+1no5tRr2PNgfO5AZ8=;
+	s=k20201202; t=1728936760;
+	bh=ZTBxdRUCQr80BBF8O7VYgUYSjhbIYghb8AV3U3WUn/o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IDoPWG4tx2OQ9b/Nm4C0/k1gTe/Qp446Zrqtq5E5hSCIqBaApV217BeHBq15HybjN
-	 T+mcTTm44ae9OLTWHjeTR9784xv5b5VCUE0XbL7EWadUmKxnF1piI/sQrOiqoAIKaf
-	 PSDN0eC+MTnG04S/GkAecYaI0NvdoVSyH7uGed3j4SrliJ2ibjCwSUq3t/9onG97EG
-	 hbbuekggq39ulCjSpoPK9DHF4xFToXIFXKWytEMN3a3fosNR4VXc2+Y93moGIetfBZ
-	 7LcDQI7/x7+zUmeF0dFR+fDhnXOb7Bpgg+rz6Jwu5OCO23aNsZ1keL+kh0ZFzuZFZw
-	 bXk0mXJPNKb3Q==
-Date: Mon, 14 Oct 2024 13:10:26 -0700
+	b=l4xDbyNFEt5AbgSRRn6USSqmX4KqbacdsJnmKr1iUXlZc1hV+G0tPUz4bLCpYhrU7
+	 1BMbEuAzxNfPY5HZGTq27URh+n5VJQzOtXE8F/ArHmPO7Ou0nb1hRLM7QgX4rA1mZX
+	 +4WQHPIw3WKobqtPu13Gspjw8UOssLPxFXSpgSXtuUxoNAkgPTKp9rI+FvTPEFgKo/
+	 5t862vqDQuUfEMXaPyafwXPIhNAOpVsTdkPNSiA1wkib4U/fSIaItErgNbKNbUQEwN
+	 YilCTnDOxiI/0ehc/aBqZvVKjefh2pUgSyerPStonPQJ6dJ8hs+BnIterzf75wLWfD
+	 gS1zONSrqmJqQ==
+Date: Mon, 14 Oct 2024 13:12:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- fw@strlen.de
-Subject: Re: [PATCH net-next 0/9] Netfilter updates for net-net
-Message-ID: <20241014131026.18abcc6b@kernel.org>
-In-Reply-To: <20241014111420.29127-1-pablo@netfilter.org>
-References: <20241014111420.29127-1-pablo@netfilter.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
+ <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
+ David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
+ <abuehaze@amazon.com>, Paolo Abeni <pabeni@redhat.com>, "Christopher S .
+ Hall" <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>,
+ John Stultz <jstultz@google.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier
+ <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, qemu-devel
+ <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v7] ptp: Add support for the AMZNC10C 'vmclock'
+ device
+Message-ID: <20241014131238.405c1e58@kernel.org>
+In-Reply-To: <c20d5f27c9106f3cb49e2d8467ade680f0092f91.camel@infradead.org>
+References: <78969a39b51ec00e85551b752767be65f6794b46.camel@infradead.org>
+	<20241009173253.5eb545db@kernel.org>
+	<c20d5f27c9106f3cb49e2d8467ade680f0092f91.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 14 Oct 2024 13:14:11 +0200 Pablo Neira Ayuso wrote:
-> Hi,
-> 
-> The following series contains Netfilter updates for net-next:
-> 
-> 1) Fix sparse warning in nf_tables related to use of percpu counters,
->    from Uros Bizjak.
-> 
-> 2) use strscpy_pad in nft_meta_bridge, from Justin Stitt.
-> 
-> 3) A series from patch #3 to patch #7 to reduce memory footprint of set
->    element transactions, Florian Westphal says:
-> 
->    When doing a flush on a set or mass adding/removing elements from a
->    set, each element needs to allocate 96 bytes to hold the transactional
->    state.
-> 
->    In such cases, virtually all the information in struct nft_trans_elem
->    is the same.
-> 
->    Change nft_trans_elem to a flex-array, i.e. a single nft_trans_elem
->    can hold multiple set element pointers.
-> 
->    The number of elements that can be stored in one nft_trans_elem is limited
->    by the slab allocator, this series limits the compaction to at most 62
->    elements as it caps the reallocation to 2048 bytes of memory.
-> 
-> 4) Document legacy toggles for xtables packet classifiers, from
->    Bruno Leitao.
-> 
-> 5) Use kfree_rcu() instead of call_rcu() + kmem_cache_free(), from Julia Lawall.
+On Mon, 14 Oct 2024 08:25:35 +0100 David Woodhouse wrote:
+> On Wed, 2024-10-09 at 17:32 -0700, Jakub Kicinski wrote:
+> > On Sun, 06 Oct 2024 08:17:58 +0100 David Woodhouse wrote: =20
+> > > +config PTP_1588_CLOCK_VMCLOCK
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tristate "Virtual machine =
+PTP clock"
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on X86_TSC || ARM_=
+ARCH_TIMER
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on PTP_1588_CLOCK =
+&& ACPI && ARCH_SUPPORTS_INT128
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0default y =20
+> >=20
+> > Why default to enabled? Linus will not be happy.. =20
+>=20
+> Want an incremental patch to change that?
 
-Hi! Are you seeing any failures in nft_audit? I haven't looked closely
-but it seems that this PR causes: 
-
-<snip>
-# testing for cmd: nft reset quotas t1 ... OK
-# testing for cmd: nft reset quotas t2 ... OK
-# testing for cmd: nft reset quotas ... OK
-# testing for cmd: nft delete rule t1 c1 handle 4 ... OK
-# testing for cmd: nft delete rule t1 c1 handle 5; delete rule t1 c1 handle 6 ... OK
-# testing for cmd: nft flush chain t1 c2 ... OK
-# testing for cmd: nft flush table t2 ... OK
-# testing for cmd: nft delete chain t2 c2 ... OK
-# testing for cmd: nft delete element t1 s { 22 } ... OK
-# testing for cmd: nft delete element t1 s { 80, 443 } ... FAIL
-# -table=t1 family=2 entries=2 op=nft_unregister_setelem
-# +table=t1 family=2 entries=1 op=nft_unregister_setelem
-# testing for cmd: nft flush set t1 s2 ... FAIL
-# -table=t1 family=2 entries=3 op=nft_unregister_setelem
-# +table=t1 family=2 entries=1 op=nft_unregister_setelem
-# testing for cmd: nft delete set t1 s2 ... OK
-# testing for cmd: nft delete set t1 s3 ... OK
-not ok 1 selftests: net/netfilter: nft_audit.sh # exit=251
-
-https://netdev-3.bots.linux.dev/vmksft-nf-dbg/results/815301/10-nft-audit-sh/stdout
+Yes please and thank you! We gotta straighten it out before=20
+the merge window.
 
