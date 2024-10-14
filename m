@@ -1,254 +1,119 @@
-Return-Path: <netdev+bounces-135219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0732899CED3
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 16:47:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF36E99CF20
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 16:51:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F7A0B23AA9
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:47:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9626B1F22B3E
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:51:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EC41AC459;
-	Mon, 14 Oct 2024 14:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F571CF5CF;
+	Mon, 14 Oct 2024 14:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOWmznil"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BhNta/wC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3097249659;
-	Mon, 14 Oct 2024 14:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A23B1AE006
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 14:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728917181; cv=none; b=KkboFk1NOhJPn/HlkJRayHrKsgjikDGpFkxC0DSlOBdtuVb1ZvAlELNvHM4Zv3BL8Y6+SA9to2V76xj0Xuc1b7p/1zngs0bSTD4SuvW8MyYG8IaPGVqEgeihEzmBKWKcNhuQUK39padMr+b3aVHeRTjH8YHLFfUPKm12vSfLNQ4=
+	t=1728917258; cv=none; b=b0u22tx3YTTlu+pefdMC8SYWL37dzwrmYv2hG6nmC945CUoCe7co2k4E36n3ioOc4I40oovVRNsxd7dgisJwawsjx5aZ2FvQqgiqxykj4a3FdF3VGXH+xcXo1m0eKRQN8dWKbujmlReZCFHYDfKzhlDhDg8fQCkolZ1cj4bCK9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728917181; c=relaxed/simple;
-	bh=k2uQWd7iswZDi+HVtJAsEETlLzBCW8Ql3yT+TWiS9GA=;
+	s=arc-20240116; t=1728917258; c=relaxed/simple;
+	bh=doj0P5GhKM4YIvj+TDuAKBnEepWgnnzHNTT95DMXkbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUq97UoFESfjq6Rt4pxxvpgg+ma4yu9DsD16oFao2t1MtRDj09eakKtJ/MIRbreCMj0H2TcMhifoW7n+dA5RaUYaeEj5IN+8mr6+kJybeQ67QyPSvBdePbWHx3Hdr+6gWWX2rVlw4wbcZQxjnJh7d8lSO9icSQa9UyGOhYZV0yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOWmznil; arc=none smtp.client-ip=209.85.128.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=f5zYZGj/BY/trzBe8FF8e97A45yj7iPZV++7BkEKUzfpnLO//NdZWmJxycJ63mir4UcoXN+HV10D+P5t+2hvtlR6FEaQVQ84aYBxsKnFbe8q2mXG0e1YPEJEktpazPiiDemctJX9f0s/jC1f+jlyodSzus4DQKCDRmV14PsiUGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BhNta/wC; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-430576fe517so6753705e9.1;
-        Mon, 14 Oct 2024 07:46:18 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71e52582d0bso1382519b3a.3
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 07:47:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728917177; x=1729521977; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=toAdeYu7YM++Cxc6jEpju3gZivvLZBwOrQ+Xf1nUCvc=;
-        b=dOWmznilHeMIo6IQnNVmaW82sF41vfEZT0c9r/6MDEowbQTHx+NA5FuVMX9w3/gdpF
-         F9v2zlD05IHc0ImPzDwUJNAH9tFKm2dR3g7/yqfQeOPBGKS9jvQCkXhTvFot0IaVEpsb
-         SQDqHuycZQ3i9iWIqX2iVl1vVqc32cCzAY+2L5hoQAndYipnhhgOn4SNoCnHrElC9LhF
-         942oQ3wRFG4K321aFTNmQY33e8YWz9DXEh0a2xFehnNbEH0vSXBEqgthJAMGV9v4K2JI
-         5pJi7ahthzutNCia3IqK44KmgSRYFApZeb5g0p0dhuBALfFxUCu+VkQL4QLkZZSull0U
-         8Vpg==
+        d=gmail.com; s=20230601; t=1728917257; x=1729522057; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9+SOYGG18L/eqmyP2BFsCgTBDLF3yHS8aNOV5qOU8R4=;
+        b=BhNta/wCMvA3X9eoiqcNX/0ZA0GaOzSNdd3WHyqg0rUbnnbbzDy/XkHGOcGP05Harj
+         ET26pgxRO8Ylnm5xFSXiazrE05MDONTi5krCcLbSIcSmlqfIiihZOaCorerwthX1osGO
+         d+IZc19PAf+KzF+LlnXlMl3AkUbNY10Qc+dBypsf8Cy5aes5ZpuHKiRbpN7XHqWhSItV
+         6MrjVFRC4WJFqHgwb4hY1vrcMFBxh64RsSW0N1fuRbRVFJ/S9HFApkQ/IS6AdDER/EzP
+         R3fq/ZkmdGS6ayUPftjVhMkJlxPVteyj5Asd92X4pnUuqjU5siVjm4l4UUHsGI+cqHVU
+         DaSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728917177; x=1729521977;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=toAdeYu7YM++Cxc6jEpju3gZivvLZBwOrQ+Xf1nUCvc=;
-        b=LFavJzgywlZjtNUrf8YIJDowLiloqn4wKpGj1UH78O7rId+IO9rU7eXnLLGTHWPQkd
-         MYB6EvtWPNGb2ACy9NpJoZQnNMP8zhyEOzEzehG0T4lslXdZ0xqbeI3xjr+S5Xe6Lgil
-         wIhE4/9awQMtUq48E9jN6Nbi8MiT8b6I/QI1CgjjZ7MlPUo9G0gYLItWLtSgU5b5XuOm
-         H/RyeMypR/QqXYF55/r5y2jiURVJ0CUMXD2g1zlt7eQpQgt21ID4aIRlzfbWX+kEBR9P
-         E1KL7Sy6S+gcw5c7j7u6dFRR+i+FCBn/fg5HTUV9RgoE3fpGrwEP/RsGB2nVu2m/jbR4
-         eGRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNNaqMGN7Src0MTY43XwE6VVFq0WS6UGtWKApCSXWZu3fyLlVdzPPF/3TGa+A4GhqD5oKX7deQ@vger.kernel.org, AJvYcCVhHjDMz3ApClAHDuYEeKsg7PJb/bKFkU7SKAF9NBFkkEa2HiMldMlroXVtfel6beiKoMTrlTQ2QXOwqKo=@vger.kernel.org, AJvYcCWm/dLC7ojSZZA6ZkrQdfv1qkTmFKCat/CTwv+4eTEs2xPjr3qgP3Mm6fX5yce3RDALSeQUhf2VR3zx4RkJvKTL@vger.kernel.org
-X-Gm-Message-State: AOJu0YzElbiDAK/nQEyC4NswB5DaECYjd3P/rAmPJ/bzf+MsKfHotPjF
-	INx0eO9VvJk3tFmnOSdppL1/dTJZ7MCngroFQMAeVASsIyVWsvJC4mKSm1JQ
-X-Google-Smtp-Source: AGHT+IHnyoTO36H7Xhyv3DPKerYRmIm0V8WWjqWCmc69d+AosbpQg92p6SCpOjFVzfiFZSzf4BgSUQ==
-X-Received: by 2002:a05:600c:358f:b0:42c:bfd6:9d1f with SMTP id 5b1f17b1804b1-4311debbe68mr44024185e9.1.1728917177205;
-        Mon, 14 Oct 2024 07:46:17 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431183062ddsm123553365e9.27.2024.10.14.07.46.15
+        d=1e100.net; s=20230601; t=1728917257; x=1729522057;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9+SOYGG18L/eqmyP2BFsCgTBDLF3yHS8aNOV5qOU8R4=;
+        b=N7HG9KmKaTP/2iqfUc/8LVEZ/sHzpWeHHnL1q+wBc5oIm8AO1rkmZO55umhEGERPyU
+         FBABQiezNoPbewyK8e50vQAczHBOUGNWs0JUCfzodvPYoBAJzGYdbeD1UtJw4Dhsyj+t
+         xlPZNMtpfgucPPUxU0rNK1QTxUep/KmTOnzhS9yYf+KnV+uP0zYkTMva2B99+V6etboL
+         Q4NE81J3QcpzRAj1tWo/XEfhOsRYVbB7GoYLOSJdI8zSI60rDGFdOsxCPtVMcph8Cok/
+         rPqdin+0KkzNrYYUWijHJeLhdqUH+qvD4l3o9trjqT99xdOH8fujozCSEfJ6uMFGYFhc
+         gwzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcijsXgxZZ/Vj7gsGL50Z4UAeI48gulWR5MFhVnd0PlmbXuEcY0pFgfjiScwAhXGyn/0NNGaI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE6G4QxmKGllsNb7vL7isaDzdvoAPz/Fc2eo2inAlS/3xcY0rF
+	nHZcrrpQHFPxeIPqqeEek79af+ROcBZGko3j5dlm2LNVDVpR2MoF2AQd
+X-Google-Smtp-Source: AGHT+IEdn/Pt50YyqH/6AYFzofmbnErNXDIc5vzdlaIUW+dHFN0Epy2f5RQlYhLtct+OhdwAPBxztA==
+X-Received: by 2002:a05:6a00:2d26:b0:71d:ea77:e954 with SMTP id d2e1a72fcca58-71e4c17b537mr13444538b3a.14.1728917256555;
+        Mon, 14 Oct 2024 07:47:36 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e576b2020sm3827506b3a.102.2024.10.14.07.47.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 07:46:16 -0700 (PDT)
-Date: Mon, 14 Oct 2024 17:46:13 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH RFC v1 net-next 11/12] bridge:
- br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
-Message-ID: <20241014144613.mkc62dvfzp3vr7rj@skbuf>
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <20241013185509.4430-12-ericwouds@gmail.com>
- <281cce27-c832-41c8-87d0-fbac05b8e802@blackwall.org>
- <6209405e-7100-43f9-b415-3be8fbcc6352@blackwall.org>
+        Mon, 14 Oct 2024 07:47:36 -0700 (PDT)
+Date: Mon, 14 Oct 2024 07:47:35 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v3 09/12] selftests: ncdevmem: Remove hard-coded
+ queue numbers
+Message-ID: <Zw0vByssO2j6wfxI@mini-arch>
+References: <20241009171252.2328284-1-sdf@fomichev.me>
+ <20241009171252.2328284-10-sdf@fomichev.me>
+ <CAHS8izPh7kwnvQtxwqGxka_rOe0fB21R7B167j2guJXkve9_bg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6209405e-7100-43f9-b415-3be8fbcc6352@blackwall.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izPh7kwnvQtxwqGxka_rOe0fB21R7B167j2guJXkve9_bg@mail.gmail.com>
 
-Keeping the full email body untrimmed for extra context for the newly
-added people.
-
-On Mon, Oct 14, 2024 at 09:22:07AM +0300, Nikolay Aleksandrov wrote:
-> On 14/10/2024 09:18, Nikolay Aleksandrov wrote:
-> > On 13/10/2024 21:55, Eric Woudstra wrote:
-> >> In network setup as below:
-> >>
-> >>              fastpath bypass
-> >>  .----------------------------------------.
-> >> /                                          \
-> >> |                        IP - forwarding    |
-> >> |                       /                \  v
-> >> |                      /                  wan ...
-> >> |                     /
-> >> |                     |
-> >> |                     |
-> >> |                   brlan.1
-> >> |                     |
-> >> |    +-------------------------------+
-> >> |    |           vlan 1              |
-> >> |    |                               |
-> >> |    |     brlan (vlan-filtering)    |
-> >> |    |               +---------------+
-> >> |    |               |  DSA-SWITCH   |
-> >> |    |    vlan 1     |               |
-> >> |    |      to       |               |
-> >> |    |   untagged    1     vlan 1    |
-> >> |    +---------------+---------------+
-> >> .         /                   \
-> >>  ----->wlan1                 lan0
-> >>        .                       .
-> >>        .                       ^
-> >>        ^                     vlan 1 tagged packets
-> >>      untagged packets
-> >>
-> >> Now that DEV_PATH_MTK_WDMA is added to nft_dev_path_info() the forward
-> >> path is filled also when ending with the mediatek wlan1, info.indev not
-> >> NULL now in nft_dev_forward_path(). This results in a direct transmit
-> >> instead of a neighbor transmit. This is how it should be, But this fails.
-> >>
-> >> br_vlan_fill_forward_path_mode() sets DEV_PATH_BR_VLAN_UNTAG_HW when
-> >> filling in from brlan.1 towards wlan1. But it should be set to
-> >> DEV_PATH_BR_VLAN_UNTAG in this case. Using BR_VLFLAG_ADDED_BY_SWITCHDEV
-> >> is not correct. The dsa switchdev adds it as a foreign port.
-> >>
-> >> Use BR_VLFLAG_TAGGING_BY_SWITCHDEV to make sure DEV_PATH_BR_VLAN_UNTAG is
-> >> set when there is a dsa-switch inside the bridge.
-> >>
-> >> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> >> ---
-> >>  net/bridge/br_private.h |  1 +
-> >>  net/bridge/br_vlan.c    | 18 +++++++++++++++++-
-> >>  2 files changed, 18 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-> >> index 8da7798f9368..7d427214cc7c 100644
-> >> --- a/net/bridge/br_private.h
-> >> +++ b/net/bridge/br_private.h
-> >> @@ -180,6 +180,7 @@ enum {
-> >>  	BR_VLFLAG_MCAST_ENABLED = BIT(2),
-> >>  	BR_VLFLAG_GLOBAL_MCAST_ENABLED = BIT(3),
-> >>  	BR_VLFLAG_NEIGH_SUPPRESS_ENABLED = BIT(4),
-> >> +	BR_VLFLAG_TAGGING_BY_SWITCHDEV = BIT(5),
-> >>  };
-> >>  
-> >>  /**
-> >> diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
-> >> index 1830d7d617cd..b7877724b969 100644
-> >> --- a/net/bridge/br_vlan.c
-> >> +++ b/net/bridge/br_vlan.c
-> >> @@ -3,6 +3,7 @@
-> >>  #include <linux/netdevice.h>
-> >>  #include <linux/rtnetlink.h>
-> >>  #include <linux/slab.h>
-> >> +#include <net/dsa.h>
-> >>  #include <net/switchdev.h>
-> >>  
-> >>  #include "br_private.h"
-> >> @@ -100,6 +101,19 @@ static void __vlan_flags_commit(struct net_bridge_vlan *v, u16 flags)
-> >>  	__vlan_flags_update(v, flags, true);
-> >>  }
-> >>  
-> >> +static inline bool br_vlan_tagging_by_switchdev(struct net_bridge *br)
-> > 
-> > no inline in .c files and also constify br
-> > 
-> >> +{
-> >> +#if IS_ENABLED(CONFIG_NET_DSA)
-> >> +	struct net_bridge_port *p;
-> >> +
-> >> +	list_for_each_entry(p, &br->port_list, list) {
-> >> +		if (dsa_user_dev_check(p->dev))
-> > 
-> > I don't think this can change at runtime, so please keep a counter in
-> > the bridge and don't walk the port list on every vlan add.
-> > 
+On 10/12, Mina Almasry wrote:
+> On Wed, Oct 9, 2024 at 10:13 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
+> >
+> > Use single last queue of the device and probe it dynamically.
+> >
 > 
-> you can use an internal bridge opt (check br_private.h) with a private opt
-> that's set when such device is added as a port, no need for a full counter
-> obviously
+> Sorry I thought agreed that multi-queue binding test coverage is important.
+> 
+> Can you please leave the default of num_queues to be 8 queues, or
+> rxq_num / 2? You can override num_queues to 1 in your test invocations
+> if you want. I would like by default an unaware tester that doesn't
+> set num_queues explicitly to get multi-queue test coverage.
 
-To continue on Nikolay's line of thought...
+I might have misunderstood the agreement :-) I though you were ok with
+the following arrangement:
 
-Can you abstractly describe which functional behavior do you need the
-bridge port to perform, rather than "it needs to be a DSA user port"?
+1. use num_queues / 2 in the selftest mode to make sure binding to multiple
+   queues works (and this gets exercised from the python kselftest)
+2. use single queue for the actual data path test (since we are
+   installing single flow steering rule, having multiple queues here is
+   confusing)
 
-switchdev_bridge_port_offload() has a mechanism to inform the bridge
-core of extra abilities (like tx_fwd_offload). Perhaps you could modify
-the DSA drivers you need to set a similar bit to inform the bridge of
-their presence and ability. That would also work when the bridge port is
-a LAG over a DSA user port.
+The num_queues / 2 part is here:
+https://lore.kernel.org/netdev/20241009171252.2328284-11-sdf@fomichev.me/
 
-Also, please also CC DSA maintainers when you use DSA API outside
-net/dsa/ and drivers/net/dsa/. I am in the process of revamping the
-public DSA API and would like to be in touch with changes as they are
-made.
-
-> >> +			return false;
-> >> +	}
-> >> +#endif
-> >> +	return true;
-> >> +}
-> >> +
-> >>  static int __vlan_vid_add(struct net_device *dev, struct net_bridge *br,
-> >>  			  struct net_bridge_vlan *v, u16 flags,
-> >>  			  struct netlink_ext_ack *extack)
-> >> @@ -113,6 +127,8 @@ static int __vlan_vid_add(struct net_device *dev, struct net_bridge *br,
-> >>  	if (err == -EOPNOTSUPP)
-> >>  		return vlan_vid_add(dev, br->vlan_proto, v->vid);
-> >>  	v->priv_flags |= BR_VLFLAG_ADDED_BY_SWITCHDEV;
-> >> +	if (br_vlan_tagging_by_switchdev(br))
-> >> +		v->priv_flags |= BR_VLFLAG_TAGGING_BY_SWITCHDEV;
-> >>  	return err;
-> >>  }
-> >>  
-> >> @@ -1491,7 +1507,7 @@ int br_vlan_fill_forward_path_mode(struct net_bridge *br,
-> >>  
-> >>  	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG)
-> >>  		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
-> >> -	else if (v->priv_flags & BR_VLFLAG_ADDED_BY_SWITCHDEV)
-> >> +	else if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
-> >>  		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
-> >>  	else
-> >>  		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
-> > 
+Anything I'm missing?
 
