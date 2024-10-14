@@ -1,272 +1,209 @@
-Return-Path: <netdev+bounces-135054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD65799C005
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1927099C012
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CBBD282A0F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:31:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FC33280FE5
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C6A83CC1;
-	Mon, 14 Oct 2024 06:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A11142623;
+	Mon, 14 Oct 2024 06:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LD5JQmZ5"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="oZjV7se+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5616233C9;
-	Mon, 14 Oct 2024 06:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C311136353
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 06:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728887471; cv=none; b=Go7u3xxSfH32/Clcl2BYY0VKbwubs9nRlUVWRjb9Q+6bztfe/xvMACFkywYmcGaK8Asi2erg9sQ/6FRkR8hCyrEyEyF2LWdjkp1lXhhetiqAHmKDmHYSLpQajNfKbSJy71z6YKs+Uk3vVYpuRvQarr62T9dX4PV4mgLZWiAk6Qk=
+	t=1728887732; cv=none; b=Ti5zlsiNoLOPP0b4xRduZlJ43svSmvzgljH4++dbMbPRD333lJ1t5o4gxOjZdAIPFvkGImAOCy9+xqH/CsGAkf0xeu1fi32i6WugA3AYzAZ3yFD28Y6uDaVgdqg2jdE8vjTZYIwehIIs5jFVuRwYpWqG3wX7u3EMeoZ+w/Xu15s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728887471; c=relaxed/simple;
-	bh=2iVA8og+Znq5XoxQN0K0qs/uEy4/poo8Xb+g9fzrF44=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V5ZFbkyad5OdKj+KEjG4LiNRo8RCHKX1qA7Sf0mRrWFaTl8YEJ/1AUHuckyzlDPBuXjdWxuTYkKiqBRRc1T+DJcxsCoVqNtsZnaG0Jcgurb76w19sOxTm24KECzs7MyKUDiS+Lo46UXXWIoo2NGxfF8ge3dud0WdP8uvTPVZShI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LD5JQmZ5; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6e314136467so33267387b3.0;
-        Sun, 13 Oct 2024 23:31:09 -0700 (PDT)
+	s=arc-20240116; t=1728887732; c=relaxed/simple;
+	bh=ZGBoVdbwgat/NxUEjyYnv4uZ19nNnybh9UIeSIN7bUE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NkM5z7jgF7WN0CfElQd/DQom6J2fFSfpfVluNzh3nUICp2gDFNvvfuvqBoANlz3tvGxStBphfxDE08A32tLySwWGQVXhohJRYSbLduWhDIxNeNaF3XmxckVnwJ8Uxe+AOxXNAranoYxHj9Ba0IJqK8okAbR1Y4qJ0s6Q+LShFdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=oZjV7se+; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c42f406e29so5002611a12.2
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 23:35:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728887468; x=1729492268; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=scvH+wQ9oK4DVljmMl6t02Jt9RrS6mbubZ45OO3GOXw=;
-        b=LD5JQmZ5VDSGUcB6ms6mxOrNmVeP0ypX9CjTF9LnHHOiuYyEVeDdByZqHGw3W04+IG
-         FUjBvC4S+vfPAHQyMXa05F94NjS8ZFDdPLPsOPLAFYRxILJNLO0aTXBM/lTi3LGhzSHj
-         sx8N0WYksBrAQv8+Pk+DF6ohioAGM6bLcT+pveVywPV4bCXbsUteLrsgBgftza57akcm
-         4H2qcC5HgjnEPlFnTP8nfCJ34sZOLwqEHJvICuGCShRvCfnoCE01l0/Xg/awnMytLVYp
-         gYDICBVRrgPf8W2Kv1LSVCR3LXnDjHoFSQFhnX/fNrh93sZI5SGAvTQNJD6gLER8Zfzf
-         mlIQ==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1728887729; x=1729492529; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EzkqcrvTVaKqpqDByKdgad826mxzpVo//v8QIefMOL8=;
+        b=oZjV7se+MygIvrpcqkj1fVVSQjt60aQ7CiM+JUr6kHJeTXlb/iAjysm2vlfAnsUODv
+         lQx3ft0MZJOuumMJHSWgWYgu2qKemVeXb5PBoKx0/mrvAWh/8/RHSElFGesjriNh70u/
+         JEhMNQUvWLseauVOt4/zVYhrr8/l+H82CwFK7hWjGh2d3L13a1/3gp8071MNALWj1kib
+         o0o8dju8wb1zHeYuJttJ72tNQ7a/yimpjjnr+hFaOzy3XSaYFp+/QrURpE4J/wCW/N3S
+         1zqTdxSuejztMbyv+DBcHhvpkqhnrWPyVa686DZxtBfW4ylStj5sDD+uRDRM2iGsvn4W
+         CLSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728887468; x=1729492268;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=scvH+wQ9oK4DVljmMl6t02Jt9RrS6mbubZ45OO3GOXw=;
-        b=D+Vpx0/A+vM/Qfhw0QDCre5GSg0bFs8P0ag9RdaHTjLR4dDmNWvibdk4I2Is0q5FZJ
-         yeR8f4TbN1k724oTbpaxjGn+5yeHiPn3D4Ipy6jJAvOfmOJh3mV5PXslxotrCEvUoL2v
-         mL4js1n/HQd2W342xsJgcjrEd03M+YGp+CKTIIbq/sNjJw6WpxJsih5TMQEfljtcrZWP
-         0Sy3KFIUwpQKd8G579MmUlP4TPXG5GmH0AIW1chEH1XkeWwSwdiS5zn7L6wfuV8OE8dE
-         /FUohCPqEyfujk96pCsz0rifkxmghMG5ze2/okNIIOF6hicwOUZFncN9zKGHj1TnaSOR
-         68uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6jF9SJpwx1FHeL7EAwITRrrH94gJHlnN+W3FY7F7DvNDfmgIleAVUiP2tZdGGxF+Ggomc5vku@vger.kernel.org, AJvYcCVgId2jglKNSx1+3jdbS/klzAuDsF8Lp7mwF1IUZRNdfXnXN5mHjkaoEFG7IcfkyKfqmPZ0w15TXIwt2w==@vger.kernel.org, AJvYcCXENNrV+ZB8sO81F6eKfYv45mEb7W9dn3N+2em86bteY7mnIhLO+1GuqIyI0+nb6YmM0fXiZ3FN7A6y2QE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvmDEpChCUKVaAqYDQowSwtR8GVVNgwQLYlUDDXBZ2NtrA6VmV
-	HlGtS8JQYBFCQBu8SEBMon0oxysxwinZF2xuocu+w3cVHldJeAHjYh6Rjp3LJk2szhvZYBD00UW
-	3vQTDFERZNu7a6h5Zzeq+xOe99Ms=
-X-Google-Smtp-Source: AGHT+IEwjFpe3Nw6Ev4sqyc5/u+WpT76m4BnTAmhvDkxzoKZiqPG/k5DwmBK5Ulu80FSHLUqW55giftKWPPw17D80Nc=
-X-Received: by 2002:a05:690c:3010:b0:64b:1eb2:3dd4 with SMTP id
- 00721157ae682-6e344c2978dmr52922357b3.8.1728887468194; Sun, 13 Oct 2024
- 23:31:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728887729; x=1729492529;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EzkqcrvTVaKqpqDByKdgad826mxzpVo//v8QIefMOL8=;
+        b=fKwUYiTh+gGf03Uo8VQt5eB5qwGrvhMOBPEtPhlxfoAbzRm1RA9wY1B42H3DiQzBsW
+         UC/xmCSdU6tqRu2omt36ndC+3w54rZxZIsWOaHX6whkfXigBFAbAQvcdD9dluWzmmdW7
+         XlEQKCwDUaMUc9UAhDcA6r9+hNwjfme0VF94ZMWp+14H2R8B8Z26anI23P1fzp7Jp5vO
+         3+zC3rrmMFXb/z8YHTeWgtZDwvPL2nb/m1pQ2ikDgKt0hjtFBirdtoe7AJjeOmhGPWFP
+         oBGOnH9XhFedlj5uNifC9jBtpvZf1KDGTLTJxLdlpO33vbtZ0Qvl87JHKog6CkavucJv
+         M5rQ==
+X-Gm-Message-State: AOJu0Yxi5lT0Ka8H40PW8cNRFdnWfwpCsvilOUFDS4LANNoTn6EZZU4C
+	R+2wp4OkyDqAuFtUJSQGxeMz087YPxKNJEeJef0SaGGEDukaozorVwsiG77upac=
+X-Google-Smtp-Source: AGHT+IHtsfhY77d2hmhJ/UeBZXQQAahrdwUCAyfXzQzRvrPqdSAngDAVOM6fkmoaHNagJzIo6u/AkQ==
+X-Received: by 2002:a17:907:d01:b0:a99:403e:2578 with SMTP id a640c23a62f3a-a99b9313475mr1017156666b.5.1728887728814;
+        Sun, 13 Oct 2024 23:35:28 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99ee8da1besm278784766b.216.2024.10.13.23.35.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Oct 2024 23:35:28 -0700 (PDT)
+Message-ID: <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
+Date: Mon, 14 Oct 2024 09:35:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005045411.118720-1-danielyangkang@gmail.com>
- <CANn89iKk8TOvzD4cAanACtD0-x2pciEoSJbk9mF97wxNzxmUCg@mail.gmail.com>
- <CAGiJo8RCXp8MqTPcPY4vyQAJCMhOStSApZzA5RcTq5BJgzXoeQ@mail.gmail.com> <36b455d7-a743-47c7-928c-e62146a12b9c@linux.alibaba.com>
-In-Reply-To: <36b455d7-a743-47c7-928c-e62146a12b9c@linux.alibaba.com>
-From: Daniel Yang <danielyangkang@gmail.com>
-Date: Sun, 13 Oct 2024 23:30:32 -0700
-Message-ID: <CAGiJo8Qv6xbBDZSCmMs=o11Lbxfi0ni1JB5Jx_bxqaYV1cP2Uw@mail.gmail.com>
-Subject: Re: [PATCH v2] resolve gtp possible deadlock warning
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Eric Dumazet <edumazet@google.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Jan Karcher <jaka@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
+ improvements
+To: Eric Woudstra <ericwouds@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241013185509.4430-1-ericwouds@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 9, 2024 at 12:20=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
->
->
->
-> On 10/7/24 2:54 PM, Daniel Yang wrote:
-> > On Sat, Oct 5, 2024 at 12:25=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> >>
-> >> On Sat, Oct 5, 2024 at 6:54=E2=80=AFAM Daniel Yang <danielyangkang@gma=
-il.com> wrote:
-> >>>
-> >>> Fixes deadlock described in this bug:
-> >>> https://syzkaller.appspot.com/bug?extid=3De953a8f3071f5c0a28fd.
-> >>> Specific crash report here:
-> >>> https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D14670e079800=
-00.
-> >>>
-> >>> This bug is a false positive lockdep warning since gtp and smc use
-> >>> completely different socket protocols.
-> >>>
-> >>> Lockdep thinks that lock_sock() in smc will deadlock with gtp's
-> >>> lock_sock() acquisition. Adding a function that initializes lockdep
-> >>> labels for smc socks resolved the false positives in lockdep upon
-> >>> testing. Since smc uses AF_SMC and SOCKSTREAM, two labels are created=
- to
-> >>> distinguish between proper smc socks and non smc socks incorrectly
-> >>> input into the function.
-> >>>
-> >>> Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
-> >>> Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-> >>> ---
-> >>> v1->v2: Add lockdep annotations instead of changing locking order
-> >>>   net/smc/af_smc.c | 21 +++++++++++++++++++++
-> >>>   1 file changed, 21 insertions(+)
-> >>>
-> >>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> >>> index 0316217b7..4de70bfd5 100644
-> >>> --- a/net/smc/af_smc.c
-> >>> +++ b/net/smc/af_smc.c
-> >>> @@ -16,6 +16,8 @@
-> >>>    *              based on prototype from Frank Blaschka
-> >>>    */
-> >>>
-> >>> +#include "linux/lockdep_types.h"
-> >>> +#include "linux/socket.h"
-> >>>   #define KMSG_COMPONENT "smc"
-> >>>   #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
-> >>>
-> >>> @@ -2755,6 +2757,24 @@ int smc_getname(struct socket *sock, struct so=
-ckaddr *addr,
-> >>>          return smc->clcsock->ops->getname(smc->clcsock, addr, peer);
-> >>>   }
-> >>>
-> >>> +static struct lock_class_key smc_slock_key[2];
-> >>> +static struct lock_class_key smc_key[2];
-> >>> +
-> >>> +static inline void smc_sock_lock_init(struct sock *sk)
-> >>> +{
-> >>> +       bool is_smc =3D (sk->sk_family =3D=3D AF_SMC) && sk_is_tcp(sk=
-);
-> >>> +
-> >>> +       sock_lock_init_class_and_name(sk,
-> >>> +                                     is_smc ?
-> >>> +                                     "smc_lock-AF_SMC_SOCKSTREAM" :
-> >>> +                                     "smc_lock-INVALID",
-> >>> +                                     &smc_slock_key[is_smc],
-> >>> +                                     is_smc ?
-> >>> +                                     "smc_sk_lock-AF_SMC_SOCKSTREAM"=
- :
-> >>> +                                     "smc_sk_lock-INVALID",
-> >>> +                                     &smc_key[is_smc]);
-> >>> +}
-> >>> +
-> >>>   int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len=
-)
-> >>>   {
-> >>>          struct sock *sk =3D sock->sk;
-> >>> @@ -2762,6 +2782,7 @@ int smc_sendmsg(struct socket *sock, struct msg=
-hdr *msg, size_t len)
-> >>>          int rc;
-> >>>
-> >>>          smc =3D smc_sk(sk);
-> >>> +       smc_sock_lock_init(sk);
-> >>>          lock_sock(sk);
-> >>>
-> >>>          /* SMC does not support connect with fastopen */
-> >>> --
-> >>> 2.39.2
-> >>>
-> >>
-> >> sock_lock_init_class_and_name() is not meant to be repeatedly called,
-> >> from sendmsg()
-> >>
-> >> Find a way to do this once, perhaps in smc_create_clcsk(), but I will
-> >> let SMC experts chime in.
-> >
-> > So I tried putting the lockdep annotations in smc_create_clcsk() as
-> > well as smc_sock_alloc() and they both fail to remove the false
-> > positive but putting the annotations in smc_sendmsg() gets rid of
-> > them. I put some print statements in the functions to see the
-> > addresses of the socks.
-> >
-> > [   78.121827][ T8326] smc: smc_create_clcsk clcsk_addr: ffffc90007f0fd=
-20
-> > [   78.122436][ T8326] smc: sendmsg sk_addr: ffffc90007f0fa88
-> > [   78.126907][ T8326] smc: __smc_create input_param clcsock: 000000000=
-0000000
-> > [   78.134395][ T8326] smc: smc_sock_alloc sk_addr: ffffc90007f0fd70
-> > [   78.136679][ T8326] smc: smc_create_clcsk clcsk_clcsk: ffffc90007f0f=
-d70
-> >
-> > It appears that none of the smc allocation methods are called, so
-> > where else exactly could the sock used in sendmsg be created?
->
->
-> I think the problem you described can be solved through
-> https://lore.kernel.org/netdev/20240912000446.1025844-1-xiyou.wangcong@gm=
-ail.com/, but Cong Wang
-> seems to have given up on following up at the moment. If you are interest=
-ed, you can try take on
-> this problem.
->
->
-> Additionally, if you want to make sock_lock_init_class_and_name as a solu=
-tion, the correct approach
-> might be (But I do not recommend doing so. I still hope to maintain consi=
-stency between IPPROTO_SMC
-> and other inet implementations as much as possible.)
->
->
-> +static struct lock_class_key smc_slock_keys[2];
-> +static struct lock_class_key smc_keys[2];
-> +
->   static int smc_inet_init_sock(struct sock *sk)
->   {
->          struct net *net =3D sock_net(sk);
-> +       int rc;
->
->          /* init common smc sock */
->          smc_sk_init(net, sk, IPPROTO_SMC);
->          /* create clcsock */
-> -       return smc_create_clcsk(net, sk, sk->sk_family);
-> +       rc =3D smc_create_clcsk(net, sk, sk->sk_family);
-> +       if (rc)
-> +               return rc;
-> +
-> +       switch (sk->sk_family) {
-> +       case AF_INET:
-> +               sock_lock_init_class_and_name(sk, "slock-AF_INET-SMC",
-> +                                             &smc_slock_keys[0],
-> +                                             "sk_lock-AF_INET-SMC",
-> +                                             &smc_keys[0]);
-> +               break;
-> +       case AF_INET6:
-> +               sock_lock_init_class_and_name(sk, "slock-AF_INET6-SMC",
-> +                                             &smc_slock_keys[1],
-> +                                             "sk_lock-AF_INET6-SMC",
-> +                                             &smc_keys[1]);
-> +               break;
-> +       default:
-> +               WARN_ON_ONCE(1);
-> +       }
-> +
-> +       return 0;
->   }
->
->
+On 13/10/2024 21:54, Eric Woudstra wrote:
+> This patchset makes it possible to set up a (hardware offloaded) fastpath
+> for bridged interfaces.
+> 
 
-I took a look at Cong Wang's patches and it seems that switching from
-rtnl to rcu is unfeasible since gtp_encap_enable_socket is called by
-rtnl_newlink_create through a function pointer and the rtnl_mutex
-acquisition happens somewhere up the call stack. Since many other
-newlink() functions rely on the assumption of rtnl lock being
-acquired, it seems quite unfeasible to use this approach in this case.
-I tried your suggested solution and it got rid of the bug. I made
-small changes to it for readability and will resend it. Should lockdep
-annotations also be added to smc_sock_alloc since smc_sk_init() is
-also called there as well or is it guaranteed to have non-conflicting
-lockdep labels?
+The subject and this sentence are misleading, you're talking about netfilter bridge
+fastpath offload, please mention it in both places. When you just say bridge fast
+path, I think of the software fast path.
+
+> To set up the fastpath with offloading, add this extra flowtable:
+> 
+> table bridge filter {
+>         flowtable fb {
+>                 hook ingress priority filter
+>                 devices = { lan0, lan1, lan2, lan3, lan4, wlan0, wlan1 }
+>                 flags offload
+>         }
+>         chain forward {
+>                 type filter hook forward priority filter; policy accept;
+> 		ct state established flow add @fb
+>         }
+> }
+> 
+> Creating a separate fastpath for bridges.
+> 
+>          forward fastpath bypass
+>  .----------------------------------------.
+> /                                          \
+> |                        IP - forwarding    |
+> |                       /                \  v
+> |                      /                  wan ...
+> |                     /
+> |                     |
+> |                     |
+> |                   brlan.1
+> |                     |
+> |    +-------------------------------+
+> |    |           vlan 1              |
+> |    |                               |
+> |    |     brlan (vlan-filtering)    |
+> |    +---------------+               |
+> |    |  DSA-SWITCH   |               |
+> |    |               |    vlan 1     |
+> |    |               |      to       |
+> |    |   vlan 1      |   untagged    |
+> |    +---------------+---------------+
+> .         /                   \
+>  ------>lan0                 wlan1
+>         .  ^                 ^
+>         .  |                 |
+>         .  \_________________/
+>         .  bridge fastpath bypass
+>         .
+>         ^
+>      vlan 1 tagged packets
+> 
+> To have the ability to handle xmit direct with outgoing encaps in the
+> bridge fastpass bypass, we need to be able to handle them without going
+> through vlan/pppoe devices. So I've applied, amended and squashed wenxu's
+> patchset. This patch also makes it possible to egress from vlan-filtering
+> brlan to lan0 with vlan tagged packets, if the bridge master port is doing
+> the vlan tagging, instead of the vlan-device. Without this patch, this is
+> not possible in the bridge-fastpath and also not in the forward-fastpath,
+> as seen in the figure above.
+> 
+> There are also some more fixes for filling in the forward path. These
+> fixes also apply to for the forward-fastpath. They include handling
+> DEV_PATH_MTK_WDMA in nft_dev_path_info() and avoiding
+> DEV_PATH_BR_VLAN_UNTAG_HW for bridges with ports that use dsa.
+> 
+> Conntrack bridge only tracks untagged and 802.1q. To make the bridge
+> fastpath experience more similar to the forward fastpath experience,
+> I've added double vlan, pppoe and pppoe-in-q tagged packets to bridge
+> conntrack and to bridge filter chain.
+> 
+> Eric Woudstra (12):
+>   netfilter: nf_flow_table_offload: Add nf_flow_encap_push() for xmit
+>     direct
+>   netfilter: bridge: Add conntrack double vlan and pppoe
+>   netfilter: nft_chain_filter: Add bridge double vlan and pppoe
+>   bridge: br_vlan_fill_forward_path_pvid: Add port to port
+>   bridge: br_fill_forward_path add port to port
+>   net: core: dev: Add dev_fill_bridge_path()
+>   netfilter :nf_flow_table_offload: Add nf_flow_rule_bridge()
+>   netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
+>   netfilter: nft_flow_offload: Add NFPROTO_BRIDGE to validate
+>   netfilter: nft_flow_offload: Add DEV_PATH_MTK_WDMA to
+>     nft_dev_path_info()
+>   bridge: br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
+>   netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
+> 
+>  include/linux/netdevice.h                  |   2 +
+>  include/net/netfilter/nf_flow_table.h      |   3 +
+>  net/bridge/br_device.c                     |  20 ++-
+>  net/bridge/br_private.h                    |   2 +
+>  net/bridge/br_vlan.c                       |  24 +++-
+>  net/bridge/netfilter/nf_conntrack_bridge.c |  86 ++++++++++--
+>  net/core/dev.c                             |  77 +++++++++--
+>  net/netfilter/nf_flow_table_inet.c         |  13 ++
+>  net/netfilter/nf_flow_table_ip.c           |  96 ++++++++++++-
+>  net/netfilter/nf_flow_table_offload.c      |  13 ++
+>  net/netfilter/nft_chain_filter.c           |  20 ++-
+>  net/netfilter/nft_flow_offload.c           | 154 +++++++++++++++++++--
+>  12 files changed, 463 insertions(+), 47 deletions(-)
+> 
+
 
