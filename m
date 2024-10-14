@@ -1,108 +1,100 @@
-Return-Path: <netdev+bounces-135353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A81EE99D950
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:40:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEEE99D953
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62E90282C6B
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:40:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BB601F22CF0
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8541D3184;
-	Mon, 14 Oct 2024 21:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A361D1E62;
+	Mon, 14 Oct 2024 21:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UjMQxEx/"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C1A1D1728;
-	Mon, 14 Oct 2024 21:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEA91D1518;
+	Mon, 14 Oct 2024 21:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728942035; cv=none; b=MZzZigAhG5uUTjEfsXqIit3lvPv3Pq7HzwX2n66S47INop3fFKdzX7tXHmg9Y47IBHOMiPrn9rtGjmV4L+Gf/UcmnxvNA1Q7HdJncfYPoTkHZNjzQa6+MRBraQyWTHMTEgvJBBzGGCLaAiLA9WaELqyU0UYULP8a+8+pN3PU47s=
+	t=1728942060; cv=none; b=duGpj3sLpdwjAYSXn2f19Rnf/1Gltiewji2Y3L+9tqfjIAD+GTErRB2rDVCac41oh9gNP8sYfYeSMv9CcVfio51N6ipQyxvUwH/9MVsFtK2f8wmSv91+TN0x99w9qErON3ntsu+Ejvxq23Lk2I8KBE+HRponM/Isyu1qziduJmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728942035; c=relaxed/simple;
-	bh=77/8jR5Bft15FMbxXdTWqphAhiu72q9meKgSlzWhDnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a4pl5HuqC+yd8259jxnkVO3wRJg/dZG8/ZqQ/DNsmcA9E1AixV4pLQ0itREifrDKKxFdGdMEI4t9HwGdXkopzgt9CoHLNfwHyP//G0uJxWvKlQdlpA4Rc6o1ZCFf096Lv1pRi+x9a0u6aiUpm+b7QirAYFYUz/c3ay8tDCDXBRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 4D55F200A7E;
-	Mon, 14 Oct 2024 23:40:32 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3DCF820067A;
-	Mon, 14 Oct 2024 23:40:32 +0200 (CEST)
-Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BBCBD20340;
-	Mon, 14 Oct 2024 23:40:32 +0200 (CEST)
-Date: Mon, 14 Oct 2024 23:40:32 +0200
-From: Jan Petrous <jan.petrous@oss.nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v3 05/16] net: dwmac-dwc-qos-eth: Use helper rgmii_clock
-Message-ID: <Zw2P0OCKGqMxh/+K@lsv051416.swis.nl-cdc01.nxp.com>
-References: <20241013-upstream_s32cc_gmac-v3-0-d84b5a67b930@oss.nxp.com>
- <20241013-upstream_s32cc_gmac-v3-5-d84b5a67b930@oss.nxp.com>
- <1f38695e-642d-41e5-bf95-d4a4c55e416b@lunn.ch>
+	s=arc-20240116; t=1728942060; c=relaxed/simple;
+	bh=5tybJj87GEUPc0wTVFPoTUOp5X7TYtD+hUTHPDwr2dY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K+4WmpgOahMIEEDU4/+NzYRWah2rKiewD2iXL9PEaP0b+vvPS/W6zMTe7l8XEYOwniOZG3BxI/ei0Bb7TeZ8hrf7wpBkyKVm+AEVFHb55bJcftkJ149IiWJSp7HWSQtBrFs+By67C9mxcznbJe+OvOZBwmE0iXTH1gTt5dEA4nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UjMQxEx/; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728942060; x=1760478060;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=TsWdPhAg78zah+haKesFDNmrKf2/vLwX+nTS3fPXyEY=;
+  b=UjMQxEx/PDhrSgVPkR1duuqcbMs4srZFCaL0N+/nI01SoN56zndIbvSF
+   Njg2KgKZItVAzVlBfNyx30Kpg3EAAmTTkGXVHkcTOajep5WZKuVp5Pbx3
+   /+DmJTVZAViZ5E3YhmeuFbnSQ/RIrZen7IBObdkT3Cp414lRAKjsEPfwo
+   A=;
+X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
+   d="scan'208";a="440762113"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 21:40:57 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:34442]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.107:2525] with esmtp (Farcaster)
+ id ba444916-cb10-4a0b-bce8-f20f62f6a979; Mon, 14 Oct 2024 21:40:55 +0000 (UTC)
+X-Farcaster-Flow-ID: ba444916-cb10-4a0b-bce8-f20f62f6a979
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 14 Oct 2024 21:40:55 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 14 Oct 2024 21:40:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ignat@cloudflare.com>
+CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next v3 8/9] net: warn, if pf->create does not clear sock->sk on error
+Date: Mon, 14 Oct 2024 14:40:46 -0700
+Message-ID: <20241014214046.99495-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241014153808.51894-9-ignat@cloudflare.com>
+References: <20241014153808.51894-9-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f38695e-642d-41e5-bf95-d4a4c55e416b@lunn.ch>
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Oct 14, 2024 at 03:46:56PM +0200, Andrew Lunn wrote:
-> On Sun, Oct 13, 2024 at 11:27:40PM +0200, Jan Petrous via B4 Relay wrote:
-> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> > 
-> > ???
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Mon, 14 Oct 2024 16:38:07 +0100
+> All pf->create implementations have been fixed now to clear sock->sk on
+> error, when they deallocate the allocated sk object.
 > 
-> It does need to say something. The change is also not 100% obviously
-> correct. So you could explain the change a bit.
+> Put a warning in place to make sure we don't break this promise in the
+> future.
 > 
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 
-Oh, my prepared commit messaged got lost. I'm sorry, I will
-fix it in v4.
-
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
