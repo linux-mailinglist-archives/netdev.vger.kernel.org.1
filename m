@@ -1,540 +1,229 @@
-Return-Path: <netdev+bounces-135283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410AC99D668
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:25:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8F599D676
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 20:29:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13C5C1C2217D
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:25:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FC72B20D80
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070741C876F;
-	Mon, 14 Oct 2024 18:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E71A1C879E;
+	Mon, 14 Oct 2024 18:29:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e1FKL3W7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fy7774lI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C99B1C830B
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 18:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486341B85C2;
+	Mon, 14 Oct 2024 18:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728930296; cv=none; b=L4hhNEtc+/0+z3x3Ar8nokYleAIy7dUsEX7hkHaxQwHclM0VJhMNghhU6DqHQwbK2qaw8hlQdRlF0yROynn00hXgVi4Er222yz6iGcSGT0F77hN/oqF+5opjmmdEv2t7udHVoPuodL4ECxC3tt2n113FdwpBz8WbQgwVvSmW4Fo=
+	t=1728930555; cv=none; b=L1WdtWq3uBHvhcQVS4e3io5vYP/wXaWnswa3mH5EeNtTiF/D7kpP0sYwZyZGLH3wbz826UBXxibPCVEmazLqa+YdZzCDRjzRnF33OmoKSVBmYilKzaELhU/xHR0AXQ3KqYbiXtc1buJktZU3IGvTqdWpyrfFhbWCEdFHugGLX1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728930296; c=relaxed/simple;
-	bh=ZviL4SD0SPwnmZAqn9IceugqvwcopwFYok+DgZfQNQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nZtopoAZmOyUxOo0qxasEeh+Ime5jwKSe6xiBeqXMkjZwTiItUlgNxn2x931ZKfZq9QzMmoU0FATRwUSwwrd0CVst80NSAzf7NxNFLymlpgpFeOwE13PFoqv3AxSMdUale5C/lFEZCLYrdPkyTcT1G+2CfyIkUB1ecNh0kKY/+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e1FKL3W7; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db90a28cf6so3822365a12.0
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 11:24:54 -0700 (PDT)
+	s=arc-20240116; t=1728930555; c=relaxed/simple;
+	bh=YdSNSZiYhLJAGb49SZ1o5DnuzbdzPsZNyJNQt7oBen0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gU7pzYaDNISMgdfq8i5ssQhhceHs4+nBQdBH8ezm40X2S3ewi1I81rPkk4rypV56/udqU2hPad4d6x+3dVb//VXVJ6XCgtiGga/LVKCpotHPvWBlt9ZaYD5FI3KkzSNLpe2aLSBQgReBvKkUAxCyy7ksXLMxKZdn2ZWuBEq6eA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fy7774lI; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9a01810fffso247491166b.3;
+        Mon, 14 Oct 2024 11:29:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728930294; x=1729535094; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yEAtlm8aW4w81QuxKsQllg3gsuzIyEarbwweY5HANGo=;
-        b=e1FKL3W7WW9VLRuUOLOfh6FEUQUiK0UDVptUDaKUL2GM/ZMzPCO+1UZy4p+8utKYXb
-         YK7sWlXl5unQF8fd3fIRDN3+RLKTcOi+uCrAoxP1Ve+I8OTnmp5HONiGdUugxPMxKEUr
-         X5Pc1WyEp0Iio7FRIPoHOck0etWPKFCek2ilQ=
+        d=gmail.com; s=20230601; t=1728930552; x=1729535352; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D81y7fKwRxdQsGqZVOlIH9RZC5XB7EL1pIKoTfjy1Kg=;
+        b=Fy7774lIWiAHMFFejMS74DU2LtY65f/Q/snpqQN4GdRFTmpSvfC89lWYLvHx5/iCbi
+         q6hfuAXLJVGk6DK4u8QYXWwE8ooo4PMgBeM2B4BBE2WV2n0xg8KsFHNN881CQWbMWi6/
+         S34usH+1roJZlHgUyUjFcgQJ6CjjQgiKd4dMq1ZPewtluG4RmUQk/rKeFm8AA4q0nGzT
+         wcpyRhOFyZTcJYV+wG2kI4/iMmdJrZ8CvtqegDtSZ98s8TEIMO4igwFqOc1GXAQ6kEX3
+         EBGJXgc4FGOblXmyvZcsWmeQrpHPzVfcNxMeVSmOeMGFUuL+lqpAmuOmYx7vH96tyIPN
+         NOCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728930294; x=1729535094;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yEAtlm8aW4w81QuxKsQllg3gsuzIyEarbwweY5HANGo=;
-        b=H6ioSENjqWqoVo/b7Jm1qqpPkGPrvB0OCpsKfqYsInWnaz7LtSQMnYbw6LZErSIKPf
-         dd97vrcxfanAF8zjjWm8aIc0QBLe4OT3ZUUYG6zwG/f8xXTS+2bYQCuZplfUO7Ysp/me
-         e9eZwjFazG3VSx/qSVQrvh6uXajTVgT5jT+4N8IgDDyHth2IP2FquoxMKEz7wcwReBFM
-         sx03zXmyJlINqVsl9zLuF5yrtGBhybGufuZFxdFozlvB2KhXqW4NYCj8863HcW+VDgvJ
-         wBbRcTC/PC8mRy5FK0hz2xwwd8N0hl3yt8+duaWvEECDHIDispUa3pEa5PiB1Csj9vHp
-         HJTA==
-X-Gm-Message-State: AOJu0YwVqatyhc06I5kbvNSb/FQGC79cRbdpj2jggcXFYG0eKlJyOccE
-	qAMEb2ibYhEstJyaOunnp+xe74mMg7XMVMyHqAsZuSjO7LHqfyssIZ1ER9OrYsTtd3Lq4+rW0Zy
-	nNSWmvsDBs78eME84wzqFzai7ELYFPF3euWGJ
-X-Google-Smtp-Source: AGHT+IHr3YNUwZWay+7cynwxgML3zAFDQzJd/5AHx3h9tKWwjz/nfzsRu1/+bo/FLVV6AKwZyvhbN7TU1lEpxNrY278=
-X-Received: by 2002:a17:90a:a00b:b0:2e2:a96b:2ccb with SMTP id
- 98e67ed59e1d1-2e2c802a7b1mr23666648a91.7.1728930294194; Mon, 14 Oct 2024
- 11:24:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728930552; x=1729535352;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D81y7fKwRxdQsGqZVOlIH9RZC5XB7EL1pIKoTfjy1Kg=;
+        b=m4RlBR8QXJS+KIk5jkdyzZmQEJH75wtWvvgLlx7riblW6OfGIqb/vXQWRg8VDjYB32
+         i3+9zuXwb7IAWgT9LPk7gS3Tx14kMnTB+1IsrBxmNMQNDQJ1p9aXDvKnl0ODQVkZLGtc
+         3Rlt1NxbmYqrqez4y2yOy06iWOE23X47eSEs09LkYhn2200QgT2OeIFBUTaKklXjTrIy
+         SNjecQvqIv+opUE1T+5XccDtcTUldSNjfeMr1apeU278sJAFI7NGk7pVfjr0EIOPtg6R
+         5KU19fl6qFEw0IGsj0QUOuHOQZJGtmMJdwiLPYht8pDMzUcVVQ7lzHmMsASRxVMMoBdq
+         c1DA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtG7Z8m5wOwRuHJYJPpbYA7KEPWBfBWA+GhqaMYNtvzJ+Y5URL4VJ3TYfMN9Wa+2yEnPWY7AGQHfR4gq6WRX/1@vger.kernel.org, AJvYcCVm3GVa8r0kKzu3TqgWPepiFcvyUc5OG9VAUP/kYi6JJQhLtfIgghCD1Bx8libfB3fdtpbNaXzqftGlBeg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBDxdMuLW0P4qprjtq61aKTFVnHEGaaBxLyUvOA3vTm0BDMUDP
+	6TL5WeVqnN/3Ae5VrD0nfJtnnMD3/PfbMceURSlE117HUVGfX/TJOCnPomR2
+X-Google-Smtp-Source: AGHT+IG2fUbfuh5wkGWZbcGbeW+oiKoSliAYbpoN9TVWJ2yiOiQqFWSM3p/oEnVvn3XUKpbClxQrlw==
+X-Received: by 2002:a17:907:f70a:b0:a99:40e6:157c with SMTP id a640c23a62f3a-a99e39e5061mr856384766b.4.1728930551244;
+        Mon, 14 Oct 2024 11:29:11 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a06169946sm247327066b.204.2024.10.14.11.29.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Oct 2024 11:29:10 -0700 (PDT)
+Message-ID: <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
+Date: Mon, 14 Oct 2024 20:29:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240904054815.1341712-1-jitendra.vegiraju@broadcom.com>
- <20240904054815.1341712-3-jitendra.vegiraju@broadcom.com> <mhfssgiv7unjlpve45rznyzr72llvchcwzk4f7obnvp5edijqc@ilmxqr5gaktb>
- <CAMdnO-+CcCAezDXLwTe7fEZPQH6_B1zLD2g1J6uWiKi12vOxzg@mail.gmail.com> <sn5epdl4jdwj4t6mo55w4poz6vkdcuzceezsmpb7447hmaj2ot@gmlxst7gdcix>
-In-Reply-To: <sn5epdl4jdwj4t6mo55w4poz6vkdcuzceezsmpb7447hmaj2ot@gmlxst7gdcix>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Mon, 14 Oct 2024 11:24:42 -0700
-Message-ID: <CAMdnO-JjbK2ajLwrs42ftThp56Bt9kBjVaFRG5wWLj545WjSzQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/5] net: stmmac: Add basic dw25gmac support
- in stmmac core
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, rmk+kernel@armlinux.org.uk, 
-	ahalaney@redhat.com, xiaolei.wang@windriver.com, rohan.g.thomas@intel.com, 
-	Jianheng.Zhang@synopsys.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
+ improvements
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+ <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Serge,
-Thanks for the feedback.
-On Thu, Oct 10, 2024 at 4:55=E2=80=AFPM Serge Semin <fancer.lancer@gmail.co=
-m> wrote:
->
-> On Mon, Sep 16, 2024 at 04:32:33PM GMT, Jitendra Vegiraju wrote:
-> > Hi Serge,
-> >
-> > On Tue, Sep 10, 2024 at 12:25=E2=80=AFPM Serge Semin <fancer.lancer@gma=
-il.com> wrote:
-> > >
-> > > > +static u32 decode_vdma_count(u32 regval)
-> > > > +{
-> > > > +     /* compressed encoding for vdma count
-> > > > +      * regval: VDMA count
-> > > > +      * 0-15  : 1 - 16
-> > > > +      * 16-19 : 20, 24, 28, 32
-> > > > +      * 20-23 : 40, 48, 56, 64
-> > > > +      * 24-27 : 80, 96, 112, 128
-> > > > +      */
-> > > > +     if (regval < 16)
-> > > > +             return regval + 1;
-> > > > +     return (4 << ((regval - 16) / 4)) * ((regval % 4) + 5);
-> > >
-> > > The shortest code isn't always the best one. This one gives me a
-> > > headache in trying to decipher whether it really matches to what is
-> > > described in the comment. What about just:
-> > >
-> > >         if (regval < 16) /* Direct mapping */
-> > >                 return regval + 1;
-> > >         else if (regval < 20) /* 20, 24, 28, 32 */
-> > >                 return 20 + (regval - 16) * 4;
-> > >         else if (regval < 24) /* 40, 48, 56, 64 */
-> > >                 return 40 + (regval - 20) * 8;
-> > >         else if (regval < 28) /* 80, 96, 112, 128 */
-> > >                 return 80 + (regval - 24) * 16;
-> > >
-> > > ?
-> > Couldn't agree more :)
-> > Thanks, I will replace it with your code, which is definitely more read=
-able.
-> >
-> > >
-> > > > +}
-> > > > +
-> > > > +static void dw25gmac_read_hdma_limits(void __iomem *ioaddr,
-> > > > +                                   struct stmmac_hdma_cfg *hdma)
-> > > > +{
-> > > > +     u32 hw_cap;
-> > > > +
-> > > > +     /* Get VDMA/PDMA counts from HW */
-> > > > +     hw_cap =3D readl(ioaddr + XGMAC_HW_FEATURE2);
-> > >
-> > >
-> > > > +     hdma->tx_vdmas =3D decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT=
-_VDMA_TXCNT,
-> > > > +                                                  hw_cap));
-> > > > +     hdma->rx_vdmas =3D decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT=
-_VDMA_RXCNT,
-> > > > +                                                  hw_cap));
-> > > > +     hdma->tx_pdmas =3D FIELD_GET(XGMAC_HWFEAT_TXQCNT, hw_cap) + 1=
-;
-> > > > +     hdma->rx_pdmas =3D FIELD_GET(XGMAC_HWFEAT_RXQCNT, hw_cap) + 1=
-;
-> > >
-> > > Hmm, these are the Tx/Rx DMA-channels and Tx/Rx MTL-queues count
-> > > fields. Can't you just use the
-> > > dma_features::{number_tx_channel,number_tx_queues} and
-> > > dma_features::{number_rx_channel,number_rx_queues} fields to store th=
-e
-> > > retrieved data?
-> > >
-> > > Moreover why not to add the code above to the dwxgmac2_get_hw_feature=
-() method?
-> > >
-> > Thanks, I missed the reuse of existing fields.
->
-> > However, since the VDMA count has a slightly bigger bitmask, we need to=
- extract
-> > VDMA channel count as per DW25GMAC spec.
-> > Instead of duplicating dwxgmac2_get_hw_feature(), should we add wrapper=
- for
-> > dw25gmac, something like the following?
->
-> Yeah, and there is the encoded fields value. Your suggestion sounds
-> reasonable.
->
-> > dw25gmac_get_hw_feature(ioaddr, dma_cap)
-> > {
-> >     u32 hw_cap;
->
-> >     int rc;
->
-> s/rc/ret
->
-> + newline
->
-> >     rc =3D dwxgmac2_get_hw_feature(ioaddr, dma_cap);
->
-> newline
->
-> >     /* Get VDMA counts from HW */
-> >     hw_cap =3D readl(ioaddr + XGMAC_HW_FEATURE2);
-> >    dma_cap->num_tx_channels =3D
-> > decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT_VDMA_TXCNT,
-> >      hw_cap));
-> >    dma_cap->num_rx_channels =3D
-> > decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT_VDMA_RXCNT,
-> >      hw_cap));
->
-> newline
->
-Ack
-> >    return rc;
-> > }
-> >
-> > > > +}
-> > > > +
-> > > > +int dw25gmac_hdma_cfg_init(struct stmmac_priv *priv)
-> > > > +{
-> > > > +     struct plat_stmmacenet_data *plat =3D priv->plat;
-> > > > +     struct device *dev =3D priv->device;
-> > > > +     struct stmmac_hdma_cfg *hdma;
-> > > > +     int i;
-> > > > +
-> > > > +     hdma =3D devm_kzalloc(dev,
-> > > > +                         sizeof(*plat->dma_cfg->hdma_cfg),
-> > > > +                         GFP_KERNEL);
-> > > > +     if (!hdma)
-> > > > +             return -ENOMEM;
-> > > > +
-> > > > +     dw25gmac_read_hdma_limits(priv->ioaddr, hdma);
-> > > > +
-> > > > +     hdma->tvdma_tc =3D devm_kzalloc(dev,
-> > > > +                                   sizeof(*hdma->tvdma_tc) * hdma-=
->tx_vdmas,
-> > > > +                                   GFP_KERNEL);
-> > > > +     if (!hdma->tvdma_tc)
-> > > > +             return -ENOMEM;
-> > > > +
-> > > > +     hdma->rvdma_tc =3D devm_kzalloc(dev,
-> > > > +                                   sizeof(*hdma->rvdma_tc) * hdma-=
->rx_vdmas,
-> > > > +                                   GFP_KERNEL);
-> > > > +     if (!hdma->rvdma_tc)
-> > > > +             return -ENOMEM;
-> > > > +
-> > > > +     hdma->tpdma_tc =3D devm_kzalloc(dev,
-> > > > +                                   sizeof(*hdma->tpdma_tc) * hdma-=
->tx_pdmas,
-> > > > +                                   GFP_KERNEL);
-> > > > +     if (!hdma->tpdma_tc)
-> > > > +             return -ENOMEM;
-> > > > +
-> > > > +     hdma->rpdma_tc =3D devm_kzalloc(dev,
-> > > > +                                   sizeof(*hdma->rpdma_tc) * hdma-=
->rx_pdmas,
-> > > > +                                   GFP_KERNEL);
-> > > > +     if (!hdma->rpdma_tc)
-> > > > +             return -ENOMEM;
-> > > > +
-> > >
-> > > > +     /* Initialize one-to-one mapping for each of the used queues =
-*/
-> > > > +     for (i =3D 0; i < plat->tx_queues_to_use; i++) {
-> > > > +             hdma->tvdma_tc[i] =3D i;
-> > > > +             hdma->tpdma_tc[i] =3D i;
-> > > > +     }
-> > > > +     for (i =3D 0; i < plat->rx_queues_to_use; i++) {
-> > > > +             hdma->rvdma_tc[i] =3D i;
-> > > > +             hdma->rpdma_tc[i] =3D i;
-> > > > +     }
-> > >
-> > > So the Traffic Class ID is initialized for the
-> > > tx_queues_to_use/rx_queues_to_use number of channels only, right? Wha=
-t
-> > > about the Virtual and Physical DMA-channels with numbers greater than
-> > > these values?
-> > >
->
-> > You have brought up a question that applies to remaining comments in
-> > this file as well.
-> > How the VDMA/PDMA mapping is used depends on the device/glue driver.
-> > For example in
-> > our SoC the remaining VDMAs are meant to be used with SRIOV virtual
-> > functions and not
-> > all of them are available for physical function.
-> > Since additional VDMAs/PDMAs remain unused in hardware I let them stay =
-at their
-> > default values. No traffic is expected to be mapped to unused V/PDMAs.
-> >  I couldn't think of a reason for it to be an issue from a driver persp=
-ective.
-> > Please let me know, if I am missing something or we need to address a
-> > use case with bigger scope.
-> > The responses for following comments also depend on what approach we ta=
-ke here.
->
-> If they are unused, then I suggest to follow the KISS principle. See
-> my last comment for details.
->
-> >
-> > > > +     plat->dma_cfg->hdma_cfg =3D hdma;
-> > > > +
-> > > > +     return 0;
-> > > > +}
-> > > > +
-> > > > +
-> > > > +void dw25gmac_dma_init(void __iomem *ioaddr,
-> > > > +                    struct stmmac_dma_cfg *dma_cfg)
-> > > > +{
-> > > > +     u32 value;
-> > > > +     u32 i;
-> > > > +
-> > > > +     value =3D readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> > > > +     value &=3D ~(XGMAC_AAL | XGMAC_EAME);
-> > > > +     if (dma_cfg->aal)
-> > > > +             value |=3D XGMAC_AAL;
-> > > > +     if (dma_cfg->eame)
-> > > > +             value |=3D XGMAC_EAME;
-> > > > +     writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
-> > > > +
-> > > > +     for (i =3D 0; i < dma_cfg->hdma_cfg->tx_vdmas; i++) {
-> > > > +             value =3D rd_dma_ch_ind(ioaddr, MODE_TXDESCCTRL, i);
-> > > > +             value &=3D ~XXVGMAC_TXDCSZ;
-> > > > +             value |=3D FIELD_PREP(XXVGMAC_TXDCSZ,
-> > > > +                                 XXVGMAC_TXDCSZ_256BYTES);
-> > > > +             value &=3D ~XXVGMAC_TDPS;
-> > > > +             value |=3D FIELD_PREP(XXVGMAC_TDPS, XXVGMAC_TDPS_HALF=
-);
-> > > > +             wr_dma_ch_ind(ioaddr, MODE_TXDESCCTRL, i, value);
-> > > > +     }
-> > > > +
-> > > > +     for (i =3D 0; i < dma_cfg->hdma_cfg->rx_vdmas; i++) {
-> > > > +             value =3D rd_dma_ch_ind(ioaddr, MODE_RXDESCCTRL, i);
-> > > > +             value &=3D ~XXVGMAC_RXDCSZ;
-> > > > +             value |=3D FIELD_PREP(XXVGMAC_RXDCSZ,
-> > > > +                                 XXVGMAC_RXDCSZ_256BYTES);
-> > > > +             value &=3D ~XXVGMAC_RDPS;
-> > > > +             value |=3D FIELD_PREP(XXVGMAC_TDPS, XXVGMAC_RDPS_HALF=
-);
-> > > > +             wr_dma_ch_ind(ioaddr, MODE_RXDESCCTRL, i, value);
-> > > > +     }
-> > > > +
-> > >
-> > > > +     for (i =3D 0; i < dma_cfg->hdma_cfg->tx_pdmas; i++) {
-> > > > +             value =3D rd_dma_ch_ind(ioaddr, MODE_TXEXTCFG, i);
-> > > > +             value &=3D ~(XXVGMAC_TXPBL | XXVGMAC_TPBLX8_MODE);
-> > > > +             if (dma_cfg->pblx8)
-> > > > +                     value |=3D XXVGMAC_TPBLX8_MODE;
-> > > > +             value |=3D FIELD_PREP(XXVGMAC_TXPBL, dma_cfg->pbl);
-> > > > +             wr_dma_ch_ind(ioaddr, MODE_TXEXTCFG, i, value);
-> > > > +             xgmac4_tp2tc_map(ioaddr, i, dma_cfg->hdma_cfg->tpdma_=
-tc[i]);
-> > > > +     }
-> > > > +
-> > > > +     for (i =3D 0; i < dma_cfg->hdma_cfg->rx_pdmas; i++) {
-> > > > +             value =3D rd_dma_ch_ind(ioaddr, MODE_RXEXTCFG, i);
-> > > > +             value &=3D ~(XXVGMAC_RXPBL | XXVGMAC_RPBLX8_MODE);
-> > > > +             if (dma_cfg->pblx8)
-> > > > +                     value |=3D XXVGMAC_RPBLX8_MODE;
-> > > > +             value |=3D FIELD_PREP(XXVGMAC_RXPBL, dma_cfg->pbl);
-> > > > +             wr_dma_ch_ind(ioaddr, MODE_RXEXTCFG, i, value);
-> > > > +             xgmac4_rp2tc_map(ioaddr, i, dma_cfg->hdma_cfg->rpdma_=
-tc[i]);
-> > >
-> > > What if tx_pdmas doesn't match plat_stmmacenet_data::tx_queues_to_use
-> > > and rx_pdmas doesn't match to plat_stmmacenet_data::rx_queues_to_use?
-> > >
-> > > If they don't then you'll get out of the initialized tpdma_tc/rpdma_t=
-c
-> > > fields and these channels will be pre-initialized with the zero TC. I=
-s
-> > > that what expected? I doubt so.
-> > >
-> > As mentioned in the previous response the remaining resources are unuse=
-d
-> > and no traffic is mapped to those resources.
-> >
-> > > > +     }
-> > > > +}
-> > > > +
-> > >
-> > > > +void dw25gmac_dma_init_tx_chan(struct stmmac_priv *priv,
-> > > > +                            void __iomem *ioaddr,
-> > > > +                            struct stmmac_dma_cfg *dma_cfg,
-> > > > +                            dma_addr_t dma_addr, u32 chan)
-> > > > +{
-> > > > +     u32 value;
-> > > > +
-> > >
-> > > > +     value =3D readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
-> > > > +     value &=3D ~XXVGMAC_TVDMA2TCMP;
-> > > > +     value |=3D FIELD_PREP(XXVGMAC_TVDMA2TCMP,
-> > > > +                         dma_cfg->hdma_cfg->tvdma_tc[chan]);
-> > > > +     writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
-> > >
-> > > Please note this will have only first
-> > > plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use} VDMA
-> > > channels initialized. Don't you have much more than just 4 channels?
-> > >
-> > Yes, there are 32 VDMA channels on this device. In our application the
-> > additional channels are partitioned for use with SRIOV virtual function=
-s.
-> > Similar to PDMA comment above, the additional VDMAs are not enabled,
-> > and left in default state.
-> > My thinking is, when another 25gmac device comes along that requires a
-> > different mapping we may need to add the ability to set the mapping in
-> > glue driver.
-> > We can support this by adding a check in dw25gmac_setup()
-> > @@ -1708,8 +1708,10 @@ int dw25gmac_setup(struct stmmac_priv *priv)
-> >         mac->mii.clk_csr_shift =3D 19;
-> >         mac->mii.clk_csr_mask =3D GENMASK(21, 19);
-> >
-> > -       /* Allocate and initialize hdma mapping */
-> > -       return dw25gmac_hdma_cfg_init(priv);
-> > +       /* Allocate and initialize hdma mapping, if not done by glue dr=
-iver. */
-> > +       if (!priv->plat->dma_cfg->hdma_cfg)
-> > +               return dw25gmac_hdma_cfg_init(priv);
-> > +       return 0;
-> >  }
->
-> So the use-case is actually hypothetical. Then I don't see a point in
-> adding the stmmac_hdma_cfg structure. See my last comment for details.
->
-Yes, It's better to not over-complicate the  patch for the hypothetical cas=
-e.
-I will remove the new struct in next update.
-> >
-> > > > +
-> > > > +     writel(upper_32_bits(dma_addr),
-> > > > +            ioaddr + XGMAC_DMA_CH_TxDESC_HADDR(chan));
-> > > > +     writel(lower_32_bits(dma_addr),
-> > > > +            ioaddr + XGMAC_DMA_CH_TxDESC_LADDR(chan));
-> > > > +}
-> > > > +
-> > > > +void dw25gmac_dma_init_rx_chan(struct stmmac_priv *priv,
-> > > > +                            void __iomem *ioaddr,
-> > > > +                            struct stmmac_dma_cfg *dma_cfg,
-> > > > +                            dma_addr_t dma_addr, u32 chan)
-> > > > +{
-> > > > +     u32 value;
-> > > > +
-> > >
-> > > > +     value =3D readl(ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
-> > > > +     value &=3D ~XXVGMAC_RVDMA2TCMP;
-> > > > +     value |=3D FIELD_PREP(XXVGMAC_RVDMA2TCMP,
-> > > > +                         dma_cfg->hdma_cfg->rvdma_tc[chan]);
-> > > > +     writel(value, ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
-> > >
-> > > The same question.
-> > >
-> > > > +
-> > > > +     writel(upper_32_bits(dma_addr),
-> > > > +            ioaddr + XGMAC_DMA_CH_RxDESC_HADDR(chan));
-> > > > +     writel(lower_32_bits(dma_addr),
-> > > > +            ioaddr + XGMAC_DMA_CH_RxDESC_LADDR(chan));
-> > > > +}
-> > >
-> > > These methods are called for each
-> > > plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
-> > > DMA-channel/Queue. The static mapping means you'll have each
-> > > PDMA/Queue assigned a static traffic class ID corresponding to the
-> > > channel ID. Meanwhile the VDMA channels are supposed to be initialize=
-d
-> > > with the TC ID corresponding to the matching PDMA ID.
-> > >
-> > > The TC ID in this case is passed as the DMA/Queue channel ID. Then th=
-e
-> > > Tx/Rx DMA-channels init methods can be converted to:
-> > >
-> > > dw25gmac_dma_init_Xx_chan(chan)
-> > > {
-> > >         /* Map each chan-th VDMA to the single chan PDMA by assigning
-> > >          * the static TC ID.
-> > >          */
-> > >         for (i =3D chan; i < Xx_vdmas; i +=3D (Xx_vdmas / Xx_queues_t=
-o_use)) {
-> > >                 /* Initialize VDMA channels */
-> > >                 XXVGMAC_TVDMA2TCMP =3D chan;
-> > >         }
-> > >
-> > >         /* Assign the static TC ID to the specified PDMA channel */
-> > >         xgmac4_rp2tc_map(chan, chan)
-> > > }
-> > >
-> > > , where X=3D{t,r}.
-> > >
-> > > Thus you can redistribute the loops implemented in dw25gmac_dma_init(=
-)
-> > > to the respective Tx/Rx DMA-channel init methods.
-> > >
-> > > Am I missing something?
-> > I think your visualization of HDMA may be going beyond the application
-> > I understand.
-> > We are allocating a VDMA for each of the TX/RX channels. The use of
-> > additional VDMAs
-> > depends on how the device is partitioned for virtualization.
-> > In the non-SRIOV case the remaining VDMAs will remain unused.
-> > Please let me know if I missed your question.
->
-> So you say that you need a 1:1 mapping between
-> First-VDMAs:PDMAs/Queues, and there are only
-> tx_queues_to_use/rx_queues_to_use pairs utilized. Right? If so I don't
-> really see a need in implementing the overcomplicated solution you
-> suggest, especially seeing the core driver already supports an
-> infrastructure for the DMA-Queue managing:
-> 1. Rx path: dwxgmac2_map_mtl_to_dma() - set VDMA-Rx-Queue TC
->             dwxgmac2_rx_queue_enable()
-> 2. Tx path: dwxgmac2_dma_tx_mode() - set VDMA-Tx-Queue TC
->
-> In the first case the mapping can be changed via the MTL DT-nodes. In
-> the second case the mapping is one-on-one static. Thus you'll be able
-> to keep the dw25gmac_dma_init_tx_chan()/dw25gmac_dma_init_rx_chan()
-> method simple initializing the PBL/Descriptor/etc-related stuff only,
-> as it's done for the DW QoS Eth and XGMAC/XLGMAC IP-cores.  You won't
-> need to introduce a new structure stmmac_hdma_cfg, especially either
-> seeing it is anyway redundant for your use-case.
->
-> BTW could you clarify:
->
-> 1. is the TCes specified for the VDMA/PDMA-queue mapping the same as
-> the TCs assigned to the Tx-Queues in the MTL_TxQ0_Operation_Mode
-> register? If they aren't, then what is the relation between them?
->
-In register documentation for HDMA XGMAC IP, the Q2TCMAP field in
-MTL_TxQ0_Operation_Mode is marked as *reserved" and is ignored.
-The VDMA->TC->PDMA mapping is used for DMA scheduling.
 
-This static mapping can be done in dw25gmac_dma_init_tx_chan() and
-dw25gmac_dma_init_rx_chan().
 
-> 2. Similarly, if there is a TC-based Rx VDMA/Queue mapping, then
-> what's the function of the MTL_RxQ_DMA_MAP* registers?
+On 10/14/24 8:35 AM, Nikolay Aleksandrov wrote:
+> On 13/10/2024 21:54, Eric Woudstra wrote:
+>> This patchset makes it possible to set up a (hardware offloaded) fastpath
+>> for bridged interfaces.
+>>
+> 
+> The subject and this sentence are misleading, you're talking about netfilter bridge
+> fastpath offload, please mention it in both places. When you just say bridge fast
+> path, I think of the software fast path.
+> 
 
-In the RX direction MTL_RxQ_DMA_MAP* decides the VDMA channel for a
-given RXQ.
-The TC for VDMA channel is decided by VDMA/TC mapping. Then TC to
-PDMA mapping is used to pick PDMA for actual DMA operation.
+Hello Nikolay,
 
->
-> -Serge(y)
->
-> > >
-> > > -Serge()
-> > >
-> > > > [...]
+It would be no problem for me to change the subject and body, if you
+think that is better.
+
+The thing is, these patches actually make it possible to set up a fully
+functional software fastpath between bridged interfaces. Only after the
+software fastpath is set up and functional, it can be offloaded, which
+happens to by my personal motivation to write this patch-set.
+
+If the offload flag is set in the flowtable, the software fastpath will
+be offloaded. But in this patch-set, there is nothing that changes
+anything there, the existing code is used unchanged.
+
+>> To set up the fastpath with offloading, add this extra flowtable:
+>>
+>> table bridge filter {
+>>         flowtable fb {
+>>                 hook ingress priority filter
+>>                 devices = { lan0, lan1, lan2, lan3, lan4, wlan0, wlan1 }
+>>                 flags offload
+>>         }
+>>         chain forward {
+>>                 type filter hook forward priority filter; policy accept;
+>> 		ct state established flow add @fb
+>>         }
+>> }
+>>
+>> Creating a separate fastpath for bridges.
+>>
+>>          forward fastpath bypass
+>>  .----------------------------------------.
+>> /                                          \
+>> |                        IP - forwarding    |
+>> |                       /                \  v
+>> |                      /                  wan ...
+>> |                     /
+>> |                     |
+>> |                     |
+>> |                   brlan.1
+>> |                     |
+>> |    +-------------------------------+
+>> |    |           vlan 1              |
+>> |    |                               |
+>> |    |     brlan (vlan-filtering)    |
+>> |    +---------------+               |
+>> |    |  DSA-SWITCH   |               |
+>> |    |               |    vlan 1     |
+>> |    |               |      to       |
+>> |    |   vlan 1      |   untagged    |
+>> |    +---------------+---------------+
+>> .         /                   \
+>>  ------>lan0                 wlan1
+>>         .  ^                 ^
+>>         .  |                 |
+>>         .  \_________________/
+>>         .  bridge fastpath bypass
+>>         .
+>>         ^
+>>      vlan 1 tagged packets
+>>
+>> To have the ability to handle xmit direct with outgoing encaps in the
+>> bridge fastpass bypass, we need to be able to handle them without going
+>> through vlan/pppoe devices. So I've applied, amended and squashed wenxu's
+>> patchset. This patch also makes it possible to egress from vlan-filtering
+>> brlan to lan0 with vlan tagged packets, if the bridge master port is doing
+>> the vlan tagging, instead of the vlan-device. Without this patch, this is
+>> not possible in the bridge-fastpath and also not in the forward-fastpath,
+>> as seen in the figure above.
+>>
+>> There are also some more fixes for filling in the forward path. These
+>> fixes also apply to for the forward-fastpath. They include handling
+>> DEV_PATH_MTK_WDMA in nft_dev_path_info() and avoiding
+>> DEV_PATH_BR_VLAN_UNTAG_HW for bridges with ports that use dsa.
+>>
+>> Conntrack bridge only tracks untagged and 802.1q. To make the bridge
+>> fastpath experience more similar to the forward fastpath experience,
+>> I've added double vlan, pppoe and pppoe-in-q tagged packets to bridge
+>> conntrack and to bridge filter chain.
+>>
+>> Eric Woudstra (12):
+>>   netfilter: nf_flow_table_offload: Add nf_flow_encap_push() for xmit
+>>     direct
+>>   netfilter: bridge: Add conntrack double vlan and pppoe
+>>   netfilter: nft_chain_filter: Add bridge double vlan and pppoe
+>>   bridge: br_vlan_fill_forward_path_pvid: Add port to port
+>>   bridge: br_fill_forward_path add port to port
+>>   net: core: dev: Add dev_fill_bridge_path()
+>>   netfilter :nf_flow_table_offload: Add nf_flow_rule_bridge()
+>>   netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
+>>   netfilter: nft_flow_offload: Add NFPROTO_BRIDGE to validate
+>>   netfilter: nft_flow_offload: Add DEV_PATH_MTK_WDMA to
+>>     nft_dev_path_info()
+>>   bridge: br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
+>>   netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
+>>
+>>  include/linux/netdevice.h                  |   2 +
+>>  include/net/netfilter/nf_flow_table.h      |   3 +
+>>  net/bridge/br_device.c                     |  20 ++-
+>>  net/bridge/br_private.h                    |   2 +
+>>  net/bridge/br_vlan.c                       |  24 +++-
+>>  net/bridge/netfilter/nf_conntrack_bridge.c |  86 ++++++++++--
+>>  net/core/dev.c                             |  77 +++++++++--
+>>  net/netfilter/nf_flow_table_inet.c         |  13 ++
+>>  net/netfilter/nf_flow_table_ip.c           |  96 ++++++++++++-
+>>  net/netfilter/nf_flow_table_offload.c      |  13 ++
+>>  net/netfilter/nft_chain_filter.c           |  20 ++-
+>>  net/netfilter/nft_flow_offload.c           | 154 +++++++++++++++++++--
+>>  12 files changed, 463 insertions(+), 47 deletions(-)
+>>
+> 
 
