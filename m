@@ -1,139 +1,182 @@
-Return-Path: <netdev+bounces-135182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321C099CA63
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:39:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B39299CA77
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB9FF1F22A7F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 12:39:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0FFE1C226DF
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 12:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684F91A725F;
-	Mon, 14 Oct 2024 12:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADAC1A7265;
+	Mon, 14 Oct 2024 12:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="VxyaRFCj";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HHUEX/vp"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7561A7265;
-	Mon, 14 Oct 2024 12:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817B91A76CE;
+	Mon, 14 Oct 2024 12:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728909542; cv=none; b=FsF3S9DmvI0tqnQ6RIy5T3AIrvI0KUd95AWugPlVisibIQSQZRHPCWF+1e3KwIRb6A30EYQS48Ain3BdgoKKWngWSFHmIq7zjfnR4OPiHj6XbuZ3sjJJqBAX+lvdQ/apOdmqUm6tNa2Hz47gE4OoE23Sz0N1YFyTAU4EanipUXo=
+	t=1728909851; cv=none; b=FIIzqHkqtn9PkoiQHhjgANCyIM0r0ZsjnJQlOSRRAGaq1HH5c2spEFL1bphRaxdJGg9aVWTZc6SUd71FeN02Z3k5sONZkt79ElaRA3CW8c2TGGYst1znU9vlU68MfFVjlnKCWLo0uBouiehr2/dJVKnivgHMT6x+dEmGBNfhh2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728909542; c=relaxed/simple;
-	bh=rYDIZbKlan7o80zOmIUX4D3Rm04vlRDItz+xRnK70vU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kFpXaXq+UGbm4fX1jsEyL6DDEyKGK1tA3QIVlV1MpX+tVTKUBwcZD/w+otca38Ar6D2/MCGi+7F3Q3TxEHOhfl/8dYSPkPLpu+guOVAfirzb42ecXGQLQDOfIePsLiT7XFtKJvCPGPyAecfZCwtIoKrdY1WoFJdRMNtBpCzXGAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XRxZj6RbrzyTBb;
-	Mon, 14 Oct 2024 20:37:33 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id B53501402CA;
-	Mon, 14 Oct 2024 20:38:55 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 14 Oct 2024 20:38:55 +0800
-Message-ID: <14627cec-d54a-4732-8a99-3b1b5757987d@huawei.com>
-Date: Mon, 14 Oct 2024 20:38:55 +0800
+	s=arc-20240116; t=1728909851; c=relaxed/simple;
+	bh=XxZxGnn82mxIvEbUeBzMWAPVGZurpXTncZODheaqPz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AdJM6G/fUPXiQqr5AhrH7Nt5zhJitVEsgaWy8KEiKK6SoJm/EmW7l0e2U41PRMfsCK14a7h0T4Nvh2krIVmYATP8LsKXNtxR9TvuAiJENvmJGmanEiOQQOGvnBjm5tH7pxiesBuqK3pMnB1hiGMzyV8F0G39JBv6LumV3x48O9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=VxyaRFCj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HHUEX/vp; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id 76AD31380238;
+	Mon, 14 Oct 2024 08:44:05 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 14 Oct 2024 08:44:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm1; t=1728909845; x=1728996245; bh=Wg
+	GNG557jItPuCdILvkW7mh7kR6bwMiXVlvUp8h0QJk=; b=VxyaRFCjgH8Q/pP8xS
+	S+KgxYNnMCaQ0GcPnCeRW7oc/L3Q2IPZ2TUwKsZLHbQh7koeLAJl7P2YyIfpCj3c
+	b5bo/P6Jf2FibVops0eDpSdzzYnViiiRcYEoZ+zAMzw2Qa5WQqLbKXxRvMoDKOJH
+	q7MkAJPQqswYjQJSo6moL27lUnfa2SQOahuj9Men+RyXPC5shyksjcjexknwZ2XO
+	CX/fGcaVkBudYfNcU/UMDpxGIYVd69Q/17kxZ1gQBM/0RDEdkZsFH3QDn00276JT
+	ghsTsjIxf6T45nvuHrEvmniTSGdRgOoSh8K3iyeAdWrrUgKvQfHrzErl0ujVZkDF
+	CO5A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1728909845; x=1728996245; bh=WgGNG557jItPu
+	CdILvkW7mh7kR6bwMiXVlvUp8h0QJk=; b=HHUEX/vpWP6o/9MngjE+fB14Xvp8C
+	VE40CBdDy+dFQUarKH1dGglxx14cBBcRcbJAgFFrSCu1uavdpyHCs+Nnn39GfuJO
+	uM5ZMg5zaBWSwlX2Tdy+cMwVEIyREn+WTFSYO7hsYRjF6YXZwyE7I0SrtgrCLpJa
+	P9iQ3i9ISBvC0WlcZ/PY9cmU2AOp2G8USxfu5qe5WDEStmfES1hB3GUnwc5g1A25
+	cNbIqfLtBZbRueGRywuqkyRMet2WS+lYrF7/aDB31d53fE+p4eOA1k+zpRAwW9OZ
+	7eFgVpzbHWJ6u8WJNUpr9cAdBsZdRA7Qwch/sXiFo15+wy4psZaO836DQ==
+X-ME-Sender: <xms:FBINZ8cFdyolrf6nFtonRbl2vRlH9KvaRiBdy0t-dsjNK3k6tOQ8yg>
+    <xme:FBINZ-NbSDH1GqrOzmZ4xbEAXVUHSRyK3zNC98NqvYCCsQMbJmwGFeZZLUR5FRTl_
+    EiICG0CKLULsZ3vRCs>
+X-ME-Received: <xmr:FBINZ9hpAYW52WmJs65Cnl7c5lKKt-4mpBerEH6TEkxW81BQBACYkTAEWoxM4QxRTUKrCGYIoG1dNpOTRExPpybElg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeghedgheegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecu
+    hfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrh
+    hluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgv
+    rhhnpeehudelteetkefgffefudefuedvjeeivdekhfevieefgeffheeltddvvefhfeetge
+    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhk
+    lhgrshdrshhouggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtth
+    hopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshdrshhhthihlhihohhv
+    sehomhhprdhruhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
+    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehk
+    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
+    drtghomhdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgdruhhjsegsphdrrhgv
+    nhgvshgrshdrtghomhdprhgtphhtthhopehprghulhdrsggrrhhkvghrrdgtthessghprd
+    hrvghnvghsrghsrdgtohhmpdhrtghpthhtohepsghijhhurdgurghsrdhjiiessghprdhr
+    vghnvghsrghsrdgtohhmpdhrtghpthhtohepphhrrggshhgrkhgrrhdrmhgrhhgruggvvh
+    dqlhgrugdrrhhjsegsphdrrhgvnhgvshgrshdrtghomh
+X-ME-Proxy: <xmx:FBINZx-NtQ7o8LVIN5qnhEtlrDAGrEk_HEmTrbiM2wPQyE2yj_skXQ>
+    <xmx:FBINZ4u07paDBkT5gC4QAap7gxsuiY9uQongHJW3kpZ_lchZz8dv9A>
+    <xmx:FBINZ4Fd4jSpalHm5d9yQ_xQBaJ9f6ddH12df3uQFk5NTXYTtrAhhw>
+    <xmx:FBINZ3NH7WeVsA8-fbai4nRA8uFqwJbG37QlTwhPiduLqmw2Tq0wuA>
+    <xmx:FRINZ5EKlmTlGTbDtBpBUO6Pt4zEehMmzB8FIxK_YQiYdOCZyfh5zLVw>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Oct 2024 08:44:03 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next,v2] net: ravb: Only advertise Rx/Tx timestamps if hardware supports it
+Date: Mon, 14 Oct 2024 14:43:43 +0200
+Message-ID: <20241014124343.3875285-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] page_pool: check for dma_sync_size earlier
-To: Furong Xu <0x1207@gmail.com>
-CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<xfr@outlook.com>
-References: <20241010114019.1734573-1-0x1207@gmail.com>
- <601d59f4-d554-4431-81ca-32bb02fb541f@huawei.com>
- <20241011101455.00006b35@gmail.com>
- <CAC_iWjL7Z6qtOkxXFRUnnOruzQsBNoKeuZ1iStgXJxTJ_P9Axw@mail.gmail.com>
- <20241011143158.00002eca@gmail.com>
- <21036339-3eeb-4606-9a84-d36bddba2b31@huawei.com>
- <CAC_iWjLE+R8sGYx74dZqc+XegLxvd4GGG2rQP4yY_p0DVuK-pQ@mail.gmail.com>
- <d920e23b-643d-4d35-9b1a-8b4bfa5b545f@huawei.com>
- <20241014143542.000028dc@gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20241014143542.000028dc@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2024/10/14 14:35, Furong Xu wrote:
-> Hi Yunsheng,
-> 
-> On Sat, 12 Oct 2024 14:14:41 +0800, Yunsheng Lin <linyunsheng@huawei.com> wrote:
-> 
->> I would prefer to add a new api to do that, as it makes the semantic
->> more obvious and may enable removing some checking in the future.
->>
->> And we may need to disable this 'feature' for frag relate API for now,
->> as currently there may be multi callings to page_pool_put_netmem() for
->> the same page, and dma_sync is only done for the last one, which means
->> it might cause some problem for those usecases when using frag API.
-> 
-> I am not an expert on page_pool.
-> So would you mind sending a new patch to add a non-dma-sync version of
-> page_pool_put_page() and CC it to me?
+Recent work moving the reporting of Rx software timestamps to the core
+[1] highlighted an issue where hardware time stamping was advertised
+for the platforms where it is not supported.
 
-As I have at least two patchsets pending for the net-next, which seems
-it might take a while, so it might take a while for me to send another
-new patch.
+Fix this by covering advertising support for hardware timestamps only if
+the hardware supports it. Due to the Tx implementation in RAVB software
+Tx timestamping is also only considered if the hardware supports
+hardware timestamps. This should be addressed in future, but this fix
+only reflects what the driver currently implements.
 
-Perhaps just add something like page_pool_put_page_nosync() as
-page_pool_put_full_page() does for the case of dma_sync_size being
--1? and leave removing of extra checking as later refactoring and
-optimization.
+1. Commit 277901ee3a26 ("ravb: Remove setting of RX software timestamp")
 
-As for the frag related API like page_pool_alloc_frag() and
-page_pool_alloc(), we don't really have a corresponding free side
-API for them, instead we reuse page_pool_put_page() for the free
-side, and don't really do any dma sync unless it is the last frag
-user of the same page, see the page_pool_is_last_ref() checking in
-page_pool_put_netmem().
+Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Reviewed-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+Tested-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+---
+* Changes since v1
+- Improve spelling in commit message.
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 25 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-So it might require more refactoring to support the usecase of
-this patch for frag API, for example we might need to pull the
-dma_sync operation out of __page_pool_put_page(), and put it in
-page_pool_put_netmem() so that dma_sync is also done for the
-non-last frag user too.
-Or not support it for frag API for now as stmmac driver does not
-seem to be using frag API, and put a warning to catch the case of
-misusing of the 'feature' for frag API in the 'if' checking in
-page_pool_put_netmem() before returning? something like below:
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index 41f88f8836f8..83c6b885f1c2 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1750,20 +1750,19 @@ static int ravb_get_ts_info(struct net_device *ndev,
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *hw_info = priv->info;
+ 
+-	info->so_timestamping =
+-		SOF_TIMESTAMPING_TX_SOFTWARE |
+-		SOF_TIMESTAMPING_TX_HARDWARE |
+-		SOF_TIMESTAMPING_RX_HARDWARE |
+-		SOF_TIMESTAMPING_RAW_HARDWARE;
+-	info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
+-	info->rx_filters =
+-		(1 << HWTSTAMP_FILTER_NONE) |
+-		(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
+-		(1 << HWTSTAMP_FILTER_ALL);
+-	if (hw_info->gptp || hw_info->ccc_gac)
++	if (hw_info->gptp || hw_info->ccc_gac) {
++		info->so_timestamping =
++			SOF_TIMESTAMPING_TX_SOFTWARE |
++			SOF_TIMESTAMPING_TX_HARDWARE |
++			SOF_TIMESTAMPING_RX_HARDWARE |
++			SOF_TIMESTAMPING_RAW_HARDWARE;
++		info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
++		info->rx_filters =
++			(1 << HWTSTAMP_FILTER_NONE) |
++			(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
++			(1 << HWTSTAMP_FILTER_ALL);
+ 		info->phc_index = ptp_clock_index(priv->ptp.clock);
+-	else
+-		info->phc_index = 0;
++	}
+ 
+ 	return 0;
+ }
+-- 
+2.46.2
 
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -317,8 +317,10 @@ static inline void page_pool_put_netmem(struct page_pool *pool,
-         * allow registering MEM_TYPE_PAGE_POOL, but shield linker.
-         */
- #ifdef CONFIG_PAGE_POOL
--       if (!page_pool_is_last_ref(netmem))
-+       if (!page_pool_is_last_ref(netmem)) {
-+		/* Big comment why frag API is not support yet */
-+               DEBUG_NET_WARN_ON_ONCE(!dma_sync_size);
-                return;
-+       }
-
-        page_pool_put_unrefed_netmem(pool, netmem, dma_sync_size, allow_direct);
- #endif
-
-
-> I am so glad to test it on my device ;)
-> Thanks.
-> 
-> 
 
