@@ -1,135 +1,170 @@
-Return-Path: <netdev+bounces-135272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D2299D4F6
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:50:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C68F99D50F
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:56:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37414283B6C
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 16:50:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31BF21C21830
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 16:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC3C1A76C4;
-	Mon, 14 Oct 2024 16:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41F21BB6BB;
+	Mon, 14 Oct 2024 16:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ORuyyX+W"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ctQVpgpY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A57314AA9;
-	Mon, 14 Oct 2024 16:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A901AD3F6
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728924611; cv=none; b=KDOeBWnEbaOpxxiFHXyvQ7Gid0sCcuIj4vAfVlzlPYWRfWrhAwyh6Ke6Ddz+3A5eN7xHzWxts3/k11BeFF1PgiznXvnMjAMsMhv3RieM5Ld4sOCDdTqQElgssueXMs5UVTu6YrfN6DgxLGLX3HRx5R5+acRlcJvhN7y3zaUKPm4=
+	t=1728924989; cv=none; b=MlHDBsGUK5AdFTFWeCBrgadVzWLAA/RI6a+eE3Ce6kQvTIywIPgY3B1wh/16ZcxX6Ih2oas6CPinidJYEN6KS7vhSXNIfGe1N6FtJXg8yXna/Q8c5I2zd0CLb14/X6ZBnRL9gZpJ4hAewy35a9+LgLLr/6PyerUqtxrKXxtcDGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728924611; c=relaxed/simple;
-	bh=PHv4z0xumvLIMKuvR0UiwaSEIlHhagU1gIkwblkg77I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=OcTNX2e26x6zqIR5IbRGuvZ/hSZ0FROywYp4NSGUUy1GkkgRI9Ssmu1jA9fakM+AnxpG1LekHfgATwDyqOkF/mPwSy2JeFligzn6dmj/06ub7ZLMg6nMKYvh0Fucc4pcL9VhyNt8PGXVxb9BdAMlRgsc/TK4+zS+kI1LN0/0k0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ORuyyX+W; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71e6f1a5a19so480105b3a.3;
-        Mon, 14 Oct 2024 09:50:10 -0700 (PDT)
+	s=arc-20240116; t=1728924989; c=relaxed/simple;
+	bh=k8fFu63Mnqa9R96BH6wgTaXjgAGSuyRmS3aedznynuQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MuHSnrta2TezcLC731MwtlUdtxStP3efTcnc0w1GX9TagiEem/9GOXG4Pov0AWOEB54hmXF9mRPK8WhMsc+U2jvrdmgtwxnRVNAGtzPYsisYhTtlcHAUodCp8gwn6IK5i7Ma0wC4Y9yyGo9/L+oAcSqoqLIXjUICUD7BdmsOcjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ctQVpgpY; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-20bb39d97d1so37938365ad.2
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:56:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728924610; x=1729529410; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1hF8DDbV51nUKC7lXOLJQ/Phz5F2FSROyTD24YcvrCo=;
-        b=ORuyyX+Wq+eimFHUUOVoJdQs4HVX6Md2/vhRS8GcIGMG5nEMVM/L239AYRFDCSIHqC
-         v1tuZsch09vx5rETFDCuj626P9LqGVhtTjk7r5+KEEexZPuMOXaotNFPc2P+GOw5/GgS
-         IpFN9GPNQrQ8m+VJ/Ai2Ak5HMKE3wkccr9UTX3FuVNRG5ChF130hs7m7Bn9kfTt15tvo
-         37p86l9iKFEHRF+NG80Q94pMPRqjiKqPOxTndIqiRTzOaR8iRqg+czXU8iSpzcptpcYK
-         JDpd+uLsH5t/FHUUxH+K1OxVvS/Mrz4p4VCx4EP4/YJECVCHBVodZNH3v9Z7BzJbu0ik
-         /xmw==
+        d=broadcom.com; s=google; t=1728924987; x=1729529787; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XshrvEkrWmKQRy64hShoDm58Lk89RKJKAsS7vcs1Ows=;
+        b=ctQVpgpYbs9koz11JffTjs34OqY+lbUI92CTXcGHQLnBTVUBCqMZ++ohQrjcqj28F+
+         NPFfh8UrU7GuBsIWtQ9x8m6hdfCzkHKALZD0/M/ngD4BvBcl87pyB/GdXf5XFzafbfEf
+         PhyM1mRHzA9GRziIf5ykIJFKoyYngoL0fMDyM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728924610; x=1729529410;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1hF8DDbV51nUKC7lXOLJQ/Phz5F2FSROyTD24YcvrCo=;
-        b=WH6wPez15CSfZd1idHlPV6tFQQIb4wOIn8G6mpfYCIUmYMZrP1rxDG7FG6BrDk2hrV
-         NJoaaqvwDNAwK9besQMbNVy7q7R2eYE7IWtBX/drSSb1WUfyqB4hNXzfmr95MtgZ7D5Z
-         v6qSZaYAusLJpY+KRle+lJ0of6IHn+y1giCo6m5aS8umV+TFtzajCmjxnWiQjFNHvmC0
-         /WOEZ0O8vNMCK5XYG6z+Sujtz65fD3R+UaLPQCmM1sGxupNdwoE04B6+VSDCc1uwvq5C
-         nI+bkVM2J7xkdx7l47zD6JP6YbM4yuU18XR9RGhSKZZ7+KUWBLSzDXrLBfKxUMcUdKha
-         BLyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDqXwpxgm9nevuqr2RGsITVD1BpM0PE/xzltMogeakmYsaHGOteMKh5KMbM3OXSa1uF5APfquD@vger.kernel.org, AJvYcCUOSP4wESwkBIrcCmlFZHxf8w5nhZHPFESTenAeGdxxbkAuNedvGku2Os7f+TFW+23XEIGWA0a0CG3lLy2zUAN2@vger.kernel.org, AJvYcCWm3TL5t1CxROTBLzOZnyZqJ9+yM8X6MWwJ5C6QW7kNZzEaYK+8qmm7eCtfrhYF0fWEk13t4/us4+gi1yE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPgYh784gso/507g9C3iDXBvur7KHY64pQJ+FOY1pcPaE9s8Uv
-	/XMGwztv5ijcy5pN5XjB0bKxw+JoXrA1BDXsp+SGuOd73yHcddVB
-X-Google-Smtp-Source: AGHT+IFAdAbQDL99HEFQiwO6fQqydkuUmIyEFAHSNXx9Nx/vW+qmdXM3Lf30N5cERh19QJ2e+y1RTQ==
-X-Received: by 2002:a05:6a00:1829:b0:71e:722b:ae1d with SMTP id d2e1a72fcca58-71e722bc2dcmr1622921b3a.25.1728924609588;
-        Mon, 14 Oct 2024 09:50:09 -0700 (PDT)
-Received: from Emma ([2401:4900:1c96:4540:5054:ff:fe53:2787])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e584b31fdsm3940212b3a.178.2024.10.14.09.50.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 09:50:09 -0700 (PDT)
-Date: Mon, 14 Oct 2024 16:50:06 +0000
-From: Karan Sanghavi <karansanghvi98@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: Karan Sanghavi <karansanghvi98@gamil.com>
-Subject: [PATCH v2 net-next] selftests: tc-testing: Fixed Typo error
-Message-ID: <Zw1LvrSdnl5bS-uS@Emma>
+        d=1e100.net; s=20230601; t=1728924987; x=1729529787;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XshrvEkrWmKQRy64hShoDm58Lk89RKJKAsS7vcs1Ows=;
+        b=Y6hYjFACo2hjMhVuLscg/d97uW2rs0Y+ooHmWmqifRqYS3l+5nbaU7r01LXjj7K98p
+         kOpjyzfpcvJ2J1uNtKuDRLPXi7JshRdctRmEIhwaBisv7wqGqCEoNYOeWO+Dij3RCcJf
+         WA1YvPtJijZicX3duMD6cKGBFWP19jOkDI86Q/NIuo7ILsj8FZcmfhrYtaf5KBNiGJHS
+         Lg49cJisNYVenDRVewrVTdGBWMOzaflrmRS1LLdJqwYPsZekcyE53xRmWQYiFQEVdjAi
+         i5r+z5ho9bEfsyXFMPZXIPLFxpMHPP0UDKyAYsfjJ9U4xnXmSYu2yminRorFddpNliFe
+         4MeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWIKUyAydw0/2xFWodvbSxp3x8Fdlqaztg6WTbKEmVL1Su4DY3IXdH9tPgFKehElfmB7WFlAnA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfU15ZI4qXmlIcxribU9TsSSTXlcgM6khsnLQ9Tz+/C/VRsSdU
+	fayq1MbrpHW3UxAT8aoYJsbR+s6cwLFH6jZmlncNZ+5eL5esi0CGHTCsDf7b44MwZvOdLDWf5F6
+	eHg==
+X-Google-Smtp-Source: AGHT+IEBwtkMuz59Zc84AsR0slLKr5kYtqrxnj7DgZmB2A+4e91Eecm9SOzZie3yc4k87AzSEQqbPg==
+X-Received: by 2002:a17:903:190:b0:20c:f648:e39e with SMTP id d9443c01a7336-20cf648e4f7mr36987285ad.58.1728924987323;
+        Mon, 14 Oct 2024 09:56:27 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c0e74d6sm68525565ad.166.2024.10.14.09.56.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Oct 2024 09:56:26 -0700 (PDT)
+Message-ID: <c5ffe617-e182-4561-95d4-5f635fda53db@broadcom.com>
+Date: Mon, 14 Oct 2024 09:56:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: systemport: avoid build warnings due to
+ unused I/O helpers
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+References: <20241014150139.927423-1-vladimir.oltean@nxp.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20241014150139.927423-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This commit combines two fixes for typographical errors
-in the "name" fields of the JSON objects with IDs 
-"4319" and "4341" in the tc-testing selftests.
-For the files tc-tests/filters/cgroup.json and
-/tc-tests/filters/flow.json.
+On 10/14/24 08:01, Vladimir Oltean wrote:
+> A clang-16 W=1 build emits the following (abridged):
+> 
+> warning: unused function 'txchk_readl' [-Wunused-function]
+> BCM_SYSPORT_IO_MACRO(txchk, SYS_PORT_TXCHK_OFFSET);
+> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
+> 
+> warning: unused function 'txchk_writel' [-Wunused-function]
+> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
+> 
+> warning: unused function 'tbuf_readl' [-Wunused-function]
+> BCM_SYSPORT_IO_MACRO(tbuf, SYS_PORT_TBUF_OFFSET);
+> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
+> 
+> warning: unused function 'tbuf_writel' [-Wunused-function]
+> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
+> 
+> Annotate the functions with the __maybe_unused attribute to tell the
+> compiler it's fine to do dead code elimination, and suppress the
+> warnings.
+> 
+> Also, remove the "inline" keyword from C files, since the compiler is
+> free anyway to inline or not.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-v2:
-- Combine two earlier patches into one
-- Links to v1 of each patch
-  [1] https://lore.kernel.org/all/Zqp9asVA-q_OzDP-@Emma/
-  [2] https://lore.kernel.org/all/Zqp92oXa9joXk4T9@Emma/
+clang is adequately warning that the txchk_{read,write}l functions are 
+not used at all, so while your patch is correct, I think we could also 
+go with this one liner in addition, or as a replacement to your patch:
 
-
-Signed-off-by: Karan Sanghavi <karansanghvi98@gmail.com>
----
- tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json | 2 +-
- tools/testing/selftests/tc-testing/tc-tests/filters/flow.json   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json b/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json
-index 03723cf84..6897ff5ad 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json
-@@ -1189,7 +1189,7 @@
-     },
-     {
-         "id": "4319",
--        "name": "Replace cgroup filter with diffferent match",
-+        "name": "Replace cgroup filter with different match",
-         "category": [
-             "filter",
-             "cgroup"
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json b/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json
-index 58189327f..996448afe 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json
-@@ -507,7 +507,7 @@
-     },
-     {
-         "id": "4341",
--        "name": "Add flow filter with muliple ops",
-+        "name": "Add flow filter with multiple ops",
-         "category": [
-             "filter",
-             "flow"
+diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c 
+b/drivers/net/ethernet/broadcom/bcmsysport.c
+index c9faa8540859..7cea30eac83a 100644
+--- a/drivers/net/ethernet/broadcom/bcmsysport.c
++++ b/drivers/net/ethernet/broadcom/bcmsysport.c
+@@ -46,7 +46,6 @@ BCM_SYSPORT_IO_MACRO(umac, SYS_PORT_UMAC_OFFSET);
+  BCM_SYSPORT_IO_MACRO(gib, SYS_PORT_GIB_OFFSET);
+  BCM_SYSPORT_IO_MACRO(tdma, SYS_PORT_TDMA_OFFSET);
+  BCM_SYSPORT_IO_MACRO(rxchk, SYS_PORT_RXCHK_OFFSET);
+-BCM_SYSPORT_IO_MACRO(txchk, SYS_PORT_TXCHK_OFFSET);
+  BCM_SYSPORT_IO_MACRO(rbuf, SYS_PORT_RBUF_OFFSET);
+  BCM_SYSPORT_IO_MACRO(tbuf, SYS_PORT_TBUF_OFFSET);
+  BCM_SYSPORT_IO_MACRO(topctrl, SYS_PORT_TOPCTRL_OFFSET);
 -- 
-2.43.0
-
+Florian
 
