@@ -1,397 +1,109 @@
-Return-Path: <netdev+bounces-135029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1BB999BE18
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:19:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D1E199BE32
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9D51C215E7
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 03:19:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C583F282C23
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 03:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8319353368;
-	Mon, 14 Oct 2024 03:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219913B796;
+	Mon, 14 Oct 2024 03:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ckw8eP7I"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aBVM1+VH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D48E231CA7
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 03:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B191F941
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 03:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728875964; cv=none; b=aTHoJwV8pFyRPuDUVQariFFZXF8fHKoechtuWs2g8wLO+Frk6F3vYWCndAumJV+MLxPJKi/4HBSGzaSvQ2Jj3i1ri3nSLMxcXs/He8J+rzuS6TQpFHds6cRd/eCaXz6N7ewutIJC8lKoS2pejo5JEWivRKLGDMEuwQpIc2y6rcY=
+	t=1728876688; cv=none; b=axEIrJ6TRlp9x031Pl3/egFwS+mi8ubSaKrDzYim/1sDl1vD0Q2qr8e9CV6X4CeBkN4ThdclIioQoyTowv0uRkJ0/I7likZeunFOyAy1RiK/4Uue+xJ3ByxedQu/9VLLHwrpS4Xdh98f9qqIT1xDWQmvvBqbwZKk1Uc3zdJzjAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728875964; c=relaxed/simple;
-	bh=O4omEXybxngMPlwVm6NfRReSqBCCbFS9DYn8E7hn/2A=;
+	s=arc-20240116; t=1728876688; c=relaxed/simple;
+	bh=nMl3jpueAPLroRRkUpgmP8kpXH1UVyVDMR2QNTS1sj8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bhBvMNdo5AO45td/ajT4ZMm7n1rPMPVihPncmn03+RopiWNoz3I+5oFGR5Hh2an2VlMb/DTXrZh6CSPUhfVFvll2qBQgbrjudRvgUW6w9lK96VLht/nHkZNWhVfztYKFyGgnm8B+086BcDS4P8e4zmU5yIt6BSq48KmW4oB+mAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ckw8eP7I; arc=none smtp.client-ip=209.85.167.47
+	 To:Cc:Content-Type; b=bislI+Gjr5qWgUMqT/1thGK8yijMIgDlKZwlfiOvnMdv0xwG2Wfb4rTS/0TygMr1Kor5shI+vdzG4lA4dw6QGAQaiqbz7dH7Juraaq7hAv4hT82u+OxH06dogRm17rI3tOIjLrmJg2qd7XS5KSYgWY2xrKnPkkYXdi78FbP0nPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aBVM1+VH; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539e5c15fd3so1229474e87.3
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 20:19:20 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-539f0f9ee49so734426e87.1
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 20:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728875959; x=1729480759; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1728876684; x=1729481484; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4MJSm5bWu9yDKaGKCMC1+t21tYXJV0yZxIbuCiumz8=;
-        b=Ckw8eP7IE4tPkALu+RyMaBZExpxxI3q/ccXxVgYFgEUCnM3HgNb5rF8zAzmzfeD+2H
-         GD4nVV9YRlGDAd/5S41QgONK6h/Vkg4xFmZeE8is6hnYsn0ZCAO0qSmAeHazpfLo5gm3
-         qZFrgskPAMVJnRcOiVe+pLRL3j8DeqxLKTrSk=
+        bh=nMl3jpueAPLroRRkUpgmP8kpXH1UVyVDMR2QNTS1sj8=;
+        b=aBVM1+VHJ9GdAD6jHa+nf/eR3o6q4VhFTG15sH4p3byB0EeIOjAgUSW/YPazlAX0za
+         UviYmAm1HGIoXnOGbooi5OqX+90cnLR3Gy9juUR+0bInPDN5p5ugMUomTkWjnZnMiAVo
+         56XFqpWvRIRmj82nC3EkvtcgDG7mXebvxog54=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728875959; x=1729480759;
+        d=1e100.net; s=20230601; t=1728876684; x=1729481484;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Q4MJSm5bWu9yDKaGKCMC1+t21tYXJV0yZxIbuCiumz8=;
-        b=Y1WBKYCK1FwNY+SzG+KDEjYZ3AsdRwXvdGPry3kUzX+JixmBkKYwGGih8pYRrBOqVj
-         yuu9LyccdeOkb1gBncxNOu1nSBgxR7czwiuBORA9CBzzmRcEd31I/CzKzc8MCok1zD9K
-         nbQhs5cvkV74iCLWq1oxQ8rSRRgCxRkGSqWvFhMBkJh9DbVq6Dr2ov3cKOiKb+ste3vL
-         qdWkFCsoTL+Y8FVXQ/1uEpNbQg34vcmkZcvKqKPAmDvpuakEsVIUkmk31FsER2I2z7D/
-         P8daW1jlrwQbLtQTiMjvp1ULRr3KqRPTZrnk7AsHz9SovXE5WPUtF7qcNUVrs+Ix9+E2
-         Fgiw==
-X-Gm-Message-State: AOJu0Yzf/dFvwClH491RfJjSkkFT5T5fewc1uytFAYnXRlEZ6ad6vVnX
-	erYaX/iG+qeE3pgsNaX/Zs1E4UrdbM38ciV50UBAbWkiuoUHu9u3DgjZyE0y21sw3WpXtpkMlTv
-	FPv5TjZdiolegb6tzki+wle/2f757Ww9xCDhA
-X-Google-Smtp-Source: AGHT+IGv0WAcQ1g/v5aYNyoEIImGekASX3eAsisKllX7e6IV9ryePb8CZvwa9ZJFGYofvvTBoE5Xl3t6r6ZURTaqlx4=
-X-Received: by 2002:a05:6512:1393:b0:539:ebe5:298e with SMTP id
- 2adb3069b0e04-539ebe52c0fmr1225877e87.59.1728875959122; Sun, 13 Oct 2024
- 20:19:19 -0700 (PDT)
+        bh=nMl3jpueAPLroRRkUpgmP8kpXH1UVyVDMR2QNTS1sj8=;
+        b=HLtva2MVU6pxct/Z6qBZfy7QbPqPeG9ghKRMRhY6OHofccPYImO5mmdsjzvkDI7DX5
+         BcLsr+/3qNSua95+WrmuYcNAjg5fYiXaui7wpcEsfegyKL7BzF73qn1ARpcgjvkc4ehD
+         jxQHHz3LPcReBShG1u6byoX+k9eJS/Azf88ovZuLAgJK5TwJXpA1dsuqXj+b0xuGvC1W
+         fAfoKSmVHQ9515D+kFppKhYyVsuLlQG9rZjyZcGs+BMk0fdXs/nY3C7u3lP0iHRZ/Zi8
+         GmfwZYu4JKaWFYfnU2MOJq4B9cNvMUQv220gP0fyUrH9LKjI2iypHW8K16Mi+cBFpwFX
+         zfyA==
+X-Forwarded-Encrypted: i=1; AJvYcCVO8MXuvu/jxS1BFi0SWq7NkNqALxQaiGqMP3X+G2cm0KwOi/vxQGhgBZoOeCsZPZVVehZGeV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsHmyjV2mYxmzoAJzy1ymwH0l9EP/chAjixvlnw4xkxpfP9iTu
+	LD3qelVulVcmNIJkZ8Z03nuyfDw9yIB1RxS8Pb/mfMl6f3wIn9LAt1YzIDYqNFJ8Bb3BUaPl3Xl
+	AzdAFSn4mZqvxVnYM9akt5tHoE/4khUNNCfWw
+X-Google-Smtp-Source: AGHT+IHosT05uJpd5mStQSSLnvHzGU4JrxkYCmpA8tK8pwcB973Z4q2WHXu2O9A06QbFRUr79q3T8MEizdBeP3QniQg=
+X-Received: by 2002:a05:6512:3c95:b0:533:44e7:1b2a with SMTP id
+ 2adb3069b0e04-539da54792amr4681151e87.40.1728876684438; Sun, 13 Oct 2024
+ 20:31:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241011235847.1209435-1-sanman.p211993@gmail.com>
-In-Reply-To: <20241011235847.1209435-1-sanman.p211993@gmail.com>
+References: <20241013203831.88051-1-linux@treblig.org> <20241013203831.88051-7-linux@treblig.org>
+In-Reply-To: <20241013203831.88051-7-linux@treblig.org>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 14 Oct 2024 08:49:06 +0530
-Message-ID: <CAH-L+nN8UQeznWkJrZn4nTNeA+OW6MBq8RhCb0Nn0Q2C+uM8Gw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6] eth: fbnic: Add hardware monitoring support
- via HWMON interface
-To: Sanman Pradhan <sanman.p211993@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org, 
-	kernel-team@meta.com, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, jdelvare@suse.com, linux@roeck-us.net, horms@kernel.org, 
-	mohsin.bashr@gmail.com, sanmanpradhan@meta.com, andrew@lunn.ch, 
-	linux-hwmon@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 14 Oct 2024 09:01:12 +0530
+Message-ID: <CAH-L+nP8LaWnhHwntqgY6+pfH2ouPHQ-J5uUhyjVL1T2spB2VQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 6/6] cxgb4: Remove unused t4_free_ofld_rxqs
+To: linux@treblig.org
+Cc: bharat@chelsio.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006f603f0624674deb"
+	boundary="000000000000a99ddb062467785a"
 
---0000000000006f603f0624674deb
+--000000000000a99ddb062467785a
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-One minor nit in line. LGTM otherwise.
+On Mon, Oct 14, 2024 at 2:10=E2=80=AFAM <linux@treblig.org> wrote:
+>
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>
+> t4_free_ofld_rxqs() has been unused since
+> commit 0fbc81b3ad51 ("chcr/cxgb4i/cxgbit/RDMA/cxgb4: Allocate resources
+> dynamically for all cxgb4 ULD's")
+>
+> Remove it.
+>
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-Thanks for taking care of the comments.
-
-On Sat, Oct 12, 2024 at 5:29=E2=80=AFAM Sanman Pradhan <sanman.p211993@gmai=
-l.com> wrote:
->
-> From: Sanman Pradhan <sanmanpradhan@meta.com>
->
-> This patch adds support for hardware monitoring to the fbnic driver,
-> allowing for temperature and voltage sensor data to be exposed to
-> userspace via the HWMON interface. The driver registers a HWMON device
-> and provides callbacks for reading sensor data, enabling system
-> admins to monitor the health and operating conditions of fbnic.
->
-> Signed-off-by: Sanman Pradhan <sanmanpradhan@meta.com>
->
-> ---
-> v6:
->   - Add get_sensor implementation
->
-> v5: https://patchwork.kernel.org/project/netdevbpf/patch/20241009192018.2=
-683416-1-sanman.p211993@gmail.com/
->
-> v4: https://patchwork.kernel.org/project/netdevbpf/patch/20241008143212.2=
-354554-1-sanman.p211993@gmail.com/
->
-> v3: https://patchwork.kernel.org/project/netdevbpf/patch/20241004204953.2=
-223536-1-sanman.p211993@gmail.com/
->
-> v2: https://patchwork.kernel.org/project/netdevbpf/patch/20241003173618.2=
-479520-1-sanman.p211993@gmail.com/
->
-> v1: https://lore.kernel.org/netdev/153c5be4-158e-421a-83a5-5632a9263e87@r=
-oeck-us.net/T/
->
-> ---
->  drivers/net/ethernet/meta/fbnic/Makefile      |  1 +
->  drivers/net/ethernet/meta/fbnic/fbnic.h       |  5 ++
->  drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  7 ++
->  drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c | 81 +++++++++++++++++++
->  drivers/net/ethernet/meta/fbnic/fbnic_mac.c   | 23 ++++++
->  drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  7 ++
->  drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  3 +
->  7 files changed, 127 insertions(+)
->  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
->
-> diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ether=
-net/meta/fbnic/Makefile
-> index ed4533a73c57..41494022792a 100644
-> --- a/drivers/net/ethernet/meta/fbnic/Makefile
-> +++ b/drivers/net/ethernet/meta/fbnic/Makefile
-> @@ -11,6 +11,7 @@ fbnic-y :=3D fbnic_devlink.o \
->            fbnic_ethtool.o \
->            fbnic_fw.o \
->            fbnic_hw_stats.o \
-> +          fbnic_hwmon.o \
->            fbnic_irq.o \
->            fbnic_mac.o \
->            fbnic_netdev.o \
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethern=
-et/meta/fbnic/fbnic.h
-> index 0f9e8d79461c..ff0ff012c8d6 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-> @@ -18,6 +18,7 @@
->  struct fbnic_dev {
->         struct device *dev;
->         struct net_device *netdev;
-> +       struct device *hwmon;
->
->         u32 __iomem *uc_addr0;
->         u32 __iomem *uc_addr4;
-> @@ -30,6 +31,7 @@ struct fbnic_dev {
->
->         struct fbnic_fw_mbx mbx[FBNIC_IPC_MBX_INDICES];
->         struct fbnic_fw_cap fw_cap;
-> +       struct fbnic_fw_completion *cmpl_data;
->         /* Lock protecting Tx Mailbox queue to prevent possible races */
->         spinlock_t fw_tx_lock;
->
-> @@ -127,6 +129,9 @@ void fbnic_devlink_unregister(struct fbnic_dev *fbd);
->  int fbnic_fw_enable_mbx(struct fbnic_dev *fbd);
->  void fbnic_fw_disable_mbx(struct fbnic_dev *fbd);
->
-> +void fbnic_hwmon_register(struct fbnic_dev *fbd);
-> +void fbnic_hwmon_unregister(struct fbnic_dev *fbd);
-> +
->  int fbnic_pcs_irq_enable(struct fbnic_dev *fbd);
->  void fbnic_pcs_irq_disable(struct fbnic_dev *fbd);
->
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/eth=
-ernet/meta/fbnic/fbnic_fw.h
-> index 221faf8c6756..7cd8841920e4 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-> @@ -44,6 +44,13 @@ struct fbnic_fw_cap {
->         u8      link_fec;
->  };
->
-> +struct fbnic_fw_completion {
-> +       struct {
-> +               s32 millivolts;
-> +               s32 millidegrees;
-> +       } tsene;
-> +};
-> +
->  void fbnic_mbx_init(struct fbnic_dev *fbd);
->  void fbnic_mbx_clean(struct fbnic_dev *fbd);
->  void fbnic_mbx_poll(struct fbnic_dev *fbd);
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c b/drivers/net/=
-ethernet/meta/fbnic/fbnic_hwmon.c
-> new file mode 100644
-> index 000000000000..bcd1086e3768
-> --- /dev/null
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
-> @@ -0,0 +1,81 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-> +
-> +#include <linux/hwmon.h>
-> +
-> +#include "fbnic.h"
-> +#include "fbnic_mac.h"
-> +
-> +static int fbnic_hwmon_sensor_id(enum hwmon_sensor_types type)
-> +{
-> +       if (type =3D=3D hwmon_temp)
-> +               return FBNIC_SENSOR_TEMP;
-> +       if (type =3D=3D hwmon_in)
-> +               return FBNIC_SENSOR_VOLTAGE;
-> +
-> +       return -EOPNOTSUPP;
-> +}
-> +
-> +static umode_t fbnic_hwmon_is_visible(const void *drvdata,
-> +                                     enum hwmon_sensor_types type,
-> +                                     u32 attr, int channel)
-> +{
-> +       if (type =3D=3D hwmon_temp && attr =3D=3D hwmon_temp_input)
-> +               return 0444;
-> +       if (type =3D=3D hwmon_in && attr =3D=3D hwmon_in_input)
-> +               return 0444;
-> +
-> +       return 0;
-> +}
-> +
-> +static int fbnic_hwmon_read(struct device *dev, enum hwmon_sensor_types =
-type,
-> +                           u32 attr, int channel, long *val)
-> +{
-> +       struct fbnic_dev *fbd =3D dev_get_drvdata(dev);
-> +       const struct fbnic_mac *mac =3D fbd->mac;
-> +       int id;
-> +
-> +       id =3D fbnic_hwmon_sensor_id(type);
-> +       return id < 0 ? id : mac->get_sensor(fbd, id, val);
-> +}
-> +
-> +static const struct hwmon_ops fbnic_hwmon_ops =3D {
-> +       .is_visible =3D fbnic_hwmon_is_visible,
-> +       .read =3D fbnic_hwmon_read,
-> +};
-> +
-> +static const struct hwmon_channel_info *fbnic_hwmon_info[] =3D {
-> +       HWMON_CHANNEL_INFO(temp, HWMON_T_INPUT),
-> +       HWMON_CHANNEL_INFO(in, HWMON_I_INPUT),
-> +       NULL
-> +};
-> +
-> +static const struct hwmon_chip_info fbnic_chip_info =3D {
-> +       .ops =3D &fbnic_hwmon_ops,
-> +       .info =3D fbnic_hwmon_info,
-> +};
-> +
-> +void fbnic_hwmon_register(struct fbnic_dev *fbd)
-> +{
-> +       if (!IS_REACHABLE(CONFIG_HWMON))
-> +               return;
-> +
-> +       fbd->hwmon =3D hwmon_device_register_with_info(fbd->dev, "fbnic",
-> +                                                    fbd, &fbnic_chip_inf=
-o,
-> +                                                    NULL);
-> +       if (IS_ERR(fbd->hwmon)) {
-> +               dev_notice(fbd->dev,
-> +                          "Failed to register hwmon device %pe\n",
-> +                       fbd->hwmon);
-> +               fbd->hwmon =3D NULL;
-> +       }
-> +}
-> +
-> +void fbnic_hwmon_unregister(struct fbnic_dev *fbd)
-> +{
-> +       if (!IS_REACHABLE(CONFIG_HWMON) || !fbd->hwmon)
-> +               return;
-> +
-> +       hwmon_device_unregister(fbd->hwmon);
-> +       fbd->hwmon =3D NULL;
-> +}
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/et=
-hernet/meta/fbnic/fbnic_mac.c
-> index 7b654d0a6dac..aabfb0b72f52 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-> @@ -686,6 +686,28 @@ fbnic_mac_get_eth_mac_stats(struct fbnic_dev *fbd, b=
-ool reset,
->                             MAC_STAT_TX_BROADCAST);
->  }
->
-> +static int fbnic_mac_get_sensor_asic(struct fbnic_dev *fbd, int id, long=
- *val)
-> +{
-> +       struct fbnic_fw_completion fw_cmpl;
-> +       int err =3D 0;
-[Kalesh] No need of local variable "rc"
-> +       s32 *sensor;
-> +
-> +       switch (id) {
-> +       case FBNIC_SENSOR_TEMP:
-> +               sensor =3D &fw_cmpl.tsene.millidegrees;
-> +               break;
-> +       case FBNIC_SENSOR_VOLTAGE:
-> +               sensor =3D &fw_cmpl.tsene.millivolts;
-> +               break;
-> +       default:
-> +               return -EINVAL;
-> +       }
-> +
-> +       *val =3D *sensor;
-> +
-> +       return err;
-> +}
-> +
->  static const struct fbnic_mac fbnic_mac_asic =3D {
->         .init_regs =3D fbnic_mac_init_regs,
->         .pcs_enable =3D fbnic_pcs_enable_asic,
-> @@ -695,6 +717,7 @@ static const struct fbnic_mac fbnic_mac_asic =3D {
->         .get_eth_mac_stats =3D fbnic_mac_get_eth_mac_stats,
->         .link_down =3D fbnic_mac_link_down_asic,
->         .link_up =3D fbnic_mac_link_up_asic,
-> +       .get_sensor =3D fbnic_mac_get_sensor_asic,
->  };
->
->  /**
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/et=
-hernet/meta/fbnic/fbnic_mac.h
-> index 476239a9d381..05a591653e09 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-> @@ -47,6 +47,11 @@ enum {
->  #define FBNIC_LINK_MODE_PAM4   (FBNIC_LINK_50R1)
->  #define FBNIC_LINK_MODE_MASK   (FBNIC_LINK_AUTO - 1)
->
-> +enum fbnic_sensor_id {
-> +       FBNIC_SENSOR_TEMP,              /* Temp in millidegrees Centigrad=
-e */
-> +       FBNIC_SENSOR_VOLTAGE,           /* Voltage in millivolts */
-> +};
-> +
->  /* This structure defines the interface hooks for the MAC. The MAC hooks
->   * will be configured as a const struct provided with a set of function
->   * pointers.
-> @@ -83,6 +88,8 @@ struct fbnic_mac {
->
->         void (*link_down)(struct fbnic_dev *fbd);
->         void (*link_up)(struct fbnic_dev *fbd, bool tx_pause, bool rx_pau=
-se);
-> +
-> +       int (*get_sensor)(struct fbnic_dev *fbd, int id, long *val);
->  };
->
->  int fbnic_mac_init(struct fbnic_dev *fbd);
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/et=
-hernet/meta/fbnic/fbnic_pci.c
-> index a4809fe0fc24..ef9dc8c67927 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-> @@ -289,6 +289,8 @@ static int fbnic_probe(struct pci_dev *pdev, const st=
-ruct pci_device_id *ent)
->
->         fbnic_devlink_register(fbd);
->
-> +       fbnic_hwmon_register(fbd);
-> +
->         if (!fbd->dsn) {
->                 dev_warn(&pdev->dev, "Reading serial number failed\n");
->                 goto init_failure_mode;
-> @@ -345,6 +347,7 @@ static void fbnic_remove(struct pci_dev *pdev)
->                 fbnic_netdev_free(fbd);
->         }
->
-> +       fbnic_hwmon_unregister(fbd);
->         fbnic_devlink_unregister(fbd);
->         fbnic_fw_disable_mbx(fbd);
->         fbnic_free_irqs(fbd);
-> --
-> 2.43.5
->
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 
 --=20
 Regards,
 Kalesh A P
 
---0000000000006f603f0624674deb
+--000000000000a99ddb062467785a
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -463,14 +175,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIIenCZ+PhcXge7qI2QGBxcfS4nV+8hxoV57vhO/EZgxpMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAxNDAzMTkxOVowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIN6eSchhXfaUSXR3hgDLqlquz4Yb5e/f94y1OVcItHxaMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAxNDAzMzEyNFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAUJgjM+ZMO
-wShtI5qXhlw1wr3dRt/2/lhTQTk0okROnBEOgFArKziaSgHwD9Jz25MAL4vPGhHD+7tkEtN1ZURZ
-pOeQFkKFviDBj0x0hG7icOsNZ4M02/4s0gYEbxYZlGsIl0Cxs3HCM3kyj2/jH4qLaTmYpNFwZEta
-iVIfA2nlnNb5xW1hPCQyV4FADGGNBwY5iQ2+gKQ4smVKwkBGcgIsOcQ/i79SAmbYZMC9oQAzAg1X
-lQyG7UQUCYSZebqVeDowEVFGUwYF8jN2fk4QQBy794yhQKKWrlA236Z79fIEGzXfJE6+JWBgbIn7
-wUljdU/G5Tw9bu+2Xih14PD0Pv+N
---0000000000006f603f0624674deb--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBfyKqtZM2B
+rxwsNYxrpY50OyLyETFxUhMB6StOG94z40SQhkL2gqy+s3bQ6HHFpbwn+3t/1mTRw/oSQRnC+9QF
+MM3CKPyc/WyQpDTjYJbYjHkYW05L0wIW/QBc59IRfFHk6nkow8Yf1qKejHjW9fMEBq0Ck+NB7E5L
+gU55FwaFWxSGaXGvsiDy+lM8UDtkQcsoTaYvpvk7N4yRyqfvtbhAiawyFjhHKG/1x8brPALiA8A9
+ub+ME5wTFNfBqpBT2cLNmB5OuaSfV4aGsipa2ERh2LYFHJ8ZntlIASJR/kRp+npwEXDzD+n4z4Ld
+ujuczKheQ4lKF3B+V0iV6td6pLl7
+--000000000000a99ddb062467785a--
 
