@@ -1,117 +1,78 @@
-Return-Path: <netdev+bounces-135360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC62B99D9C3
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:24:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 759BA99D9C7
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 710A12819A8
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:24:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08FBA1F21148
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E41A1CC179;
-	Mon, 14 Oct 2024 22:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TVokI9lr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC245158DDC;
+	Mon, 14 Oct 2024 22:25:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BD415855E
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88188231C88;
+	Mon, 14 Oct 2024 22:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728944675; cv=none; b=mmY14CbUcqDiJ/LanQAk+1JII4dje5uu8e/SerkKsVHByEAuhu7FnLHARrGNsW898D99GYgXQouF7nGHdsMgGN3rU4qq0tIc4CKuSmdqE5XxRTKlV5SaWVKl6WBk2OlhSp0knhKfwXOv3bqm6EUz9ZmxVFMebxb75xbRe8Ha+IM=
+	t=1728944715; cv=none; b=uw+J/kVoJGZO8Dr7OYeVvAU2gALkZXPeRp7z2u54A9vSATMDVbfB3Wv9yiSCwaJr2H/9qpKv5MPIuCS37lgQFHudKNmPllDOMjn0x5QfOaGPopYvhKe7F/B6Qk1ZhD9fbgo803LdJWmglfolQkYIM17VhHARyU6I+PR2AzfWSgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728944675; c=relaxed/simple;
-	bh=ktAwmyevO98oWbYObx8Tjj+HI86c/yB3aFGzDIddWJ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qTqyC1uXwjpjcjuZfsWBCamIFdJy7W7lJGdjQ4IydjK1pg7RgHG5A7YeP8qzj60w+g+tuZ7ultxUKJGJSVIATLKGPy0j/2DAWUSMio3+ZOMGkDvumIIXCIno1+Y7/6c5fPP/ZFxesP2staF1EqzJojKcxGzpVkUVQf/ZoQEZbTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TVokI9lr; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-37d4a5ecc44so3354212f8f.2
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 15:24:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1728944671; x=1729549471; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ckgWCFQW027WKgN5jAosSmWvTt+ot1PMFeyvaWEixRU=;
-        b=TVokI9lrwH41o3uvrsKVSmwAl4DziTmkL13rinV+KXYmC8OtFkMlAeMDnOWDvgG2aC
-         1WSSDf2Wi/e+j/rnH3kWadxaX27psZ57VNahQRakGli/LzXNGQ+k/6nzjWg7rxCXota3
-         DWRk1wGjQYPqMv33lLsWCI1tPO+psoZizb19jb38ruKBDfbz1qnL9R4mNKesjtAF1ULz
-         i7LNMTetOD8uahCljsZv7OIma/GWN68VgQlbWOgyplmokopUZ3M/1eFQa+nVT2CxhCEg
-         x0+sFahWQWvomJWhj6okaGSK76K2y1WW/KCKSGyCtulk33Wxy3Y1PBHrkyUdduNuMGP/
-         waBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728944671; x=1729549471;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ckgWCFQW027WKgN5jAosSmWvTt+ot1PMFeyvaWEixRU=;
-        b=MYQo6ck5JEnGGYUD51qnKnxox+OidkNrrm11Ofei6v5uKcefFgehyzbDlcv0Z9RUKx
-         owCgMH19cJtmjk0JLzeHZ22XSZtmcZtgqsq7C6gJh1IBRM9PI2yKHid6VQ5AqAHfCUrP
-         /vi2qa+zsVH8+348rW5lKpz9KtaviriiU4kCRScCMGNJUte9V6DK3Jvpandofw2q7Gir
-         LcyIZymkeiybg/+xlnux/wh3y6oEsR5CLxbc1z3hznfshb7tBhc1+xlxR07cMGX6NSFM
-         XFqe/lJkyAW5GCJnLjaJX+nfLnAlr6OODSsMPpxiiGv6VV8eHI35Y/Bc4fvbec5gkheX
-         pO6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUViOFPMriYp15+yuSJFacpXcizhBum90D/6PCZ0Zqsi5DL4a4IE/1EKjqEixH8JjfkwYzRmaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMPONacSCOLe1plBqNJytfDT+GFF7uITUexu++tSG0kNaldpb5
-	9N83PZUgQ8Z1jkOH+9GZEVrDHym8PtkzpoVS0AFoj0u/eWCMouW6vL47ZgLFluQ=
-X-Google-Smtp-Source: AGHT+IEQomvdP7m32YYsQBNAvNQ8OxC5zjT2kRvDHpaaO8cZj0QxPiKr/UekWgIgfny2+pIy9TPIqw==
-X-Received: by 2002:a5d:4591:0:b0:37d:4fb1:4faa with SMTP id ffacd0b85a97d-37d55313054mr8300515f8f.50.1728944671462;
-        Mon, 14 Oct 2024 15:24:31 -0700 (PDT)
-Received: from ?IPV6:2001:a61:139f:d001:dc4d:86d4:76a4:bf51? ([2001:a61:139f:d001:dc4d:86d4:76a4:bf51])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f5699fbsm524405e9.17.2024.10.14.15.24.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 15:24:31 -0700 (PDT)
-Message-ID: <fd906211-7f31-4daf-8935-2be1378a75f8@suse.com>
-Date: Tue, 15 Oct 2024 00:24:30 +0200
+	s=arc-20240116; t=1728944715; c=relaxed/simple;
+	bh=WjdCa9zkPPdCam1sb0uGOvCf0/zHeH7QAgrGQX8ikLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C3Fo59t87A+VB4Rh4NwyU8WDiTLl5w/veGdNcaPvHT9vGvAKexvrRPprNUGoRlIY5eMhVcDC6j+GnxpOydAhNYLWYZxFbZ5tSvhotP64uIUrSJ50OiyesSKrSwsFGcGI+DfPSgE5i+8g+TGXoGvPVdH9QxtecOapq9exnO5TR3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=52630 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1t0TUy-007TMA-Ma; Tue, 15 Oct 2024 00:25:10 +0200
+Date: Tue, 15 Oct 2024 00:25:07 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com,
+	edumazet@google.com
+Subject: Re: [PATCH net-next 0/9] Netfilter updates for net-net
+Message-ID: <Zw2aQzCNu6Merw14@calendula>
+References: <20241014111420.29127-1-pablo@netfilter.org>
+ <20241014131026.18abcc6b@kernel.org>
+ <20241014210925.GA7558@breakpoint.cc>
+ <Zw2UgAlqi_Zxaphu@calendula>
+ <20241014222059.GA9739@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net] usbnet: modern method to get random MAC
-To: Eric Dumazet <edumazet@google.com>, Oliver Neukum <oneukum@suse.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@kernel.org,
- John Sperbeck <jsperbeck@google.com>, Brian Vazquez <brianvv@google.com>
-References: <20240829175201.670718-1-oneukum@suse.com>
- <CANn89i+m69mWQw+V6XWCzmF84s6uQV15m_YdkPDQptoxUks4=w@mail.gmail.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <CANn89i+m69mWQw+V6XWCzmF84s6uQV15m_YdkPDQptoxUks4=w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241014222059.GA9739@breakpoint.cc>
+X-Spam-Score: -1.9 (-)
 
-On 14.10.24 21:59, Eric Dumazet wrote:
-
-> As diagnosed by John Sperbeck :
+On Tue, Oct 15, 2024 at 12:20:59AM +0200, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > At quick glance, I can see the audit logic is based in transaction
+> > objects, so now it counts one single entry for the two elements in one
+> > single transaction. I can look into this to fix this.
+> > 
+> > Florian, are you seing any other issues apart for this miscount?
 > 
-> This patch implies all ->bind() method took care of populating net->dev_addr ?
-> 
-> Otherwise the following existing heuristic is no longer working
-> 
-> // heuristic:  "usb%d" for links we know are two-host,
-> // else "eth%d" when there's reasonable doubt.  userspace
-> // can rename the link if it knows better.
-> if ((dev->driver_info->flags & FLAG_ETHER) != 0 &&
->      ((dev->driver_info->flags & FLAG_POINTTOPOINT) == 0 ||
->       (net->dev_addr [0] & 0x02) == 0))
-> strscpy(net->name, "eth%d", sizeof(net->name));
-> 
+> Yes, crash when bisecting (its "fixed" by later patch,
+> hunk must be moved to earlier patch), nft_trans_elems_activate
+> must emit notify also for update case.
 
-Hi,
+Correct, event is missed.
 
-you need to have a MAC to be an ethernet device, don't you?
+> Maybe more.  Just remove these patches.
 
-	Regards
-		Oliver
-
+OK, this needs more work.
 
