@@ -1,98 +1,104 @@
-Return-Path: <netdev+bounces-135030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1E199BE32
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:31:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C9999BE35
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C583F282C23
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 03:31:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C80271F22510
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 03:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219913B796;
-	Mon, 14 Oct 2024 03:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75D83E47B;
+	Mon, 14 Oct 2024 03:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aBVM1+VH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e1w4PKzR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B191F941
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 03:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BAC1F941
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 03:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728876688; cv=none; b=axEIrJ6TRlp9x031Pl3/egFwS+mi8ubSaKrDzYim/1sDl1vD0Q2qr8e9CV6X4CeBkN4ThdclIioQoyTowv0uRkJ0/I7likZeunFOyAy1RiK/4Uue+xJ3ByxedQu/9VLLHwrpS4Xdh98f9qqIT1xDWQmvvBqbwZKk1Uc3zdJzjAA=
+	t=1728876797; cv=none; b=rfNHNZnZbLDFg961AV9qDlt1x3JrLhncCPKpym4FOCiokDVMmX4ZgvFUq53sfXOanuMvvLPxpibNppTD2Ii4KpCHS68SmYfPFQ3HY4jOtTTTeBeXsQDya3UV1+FFLIRW2wTGd/UZOaWnzsztrw4RwQkQ3UTABThQXSzBye4KN8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728876688; c=relaxed/simple;
-	bh=nMl3jpueAPLroRRkUpgmP8kpXH1UVyVDMR2QNTS1sj8=;
+	s=arc-20240116; t=1728876797; c=relaxed/simple;
+	bh=xOK7OJQ05P5y/eUKXMmwNqNd1V28SZFHnUIbKPQxlPI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bislI+Gjr5qWgUMqT/1thGK8yijMIgDlKZwlfiOvnMdv0xwG2Wfb4rTS/0TygMr1Kor5shI+vdzG4lA4dw6QGAQaiqbz7dH7Juraaq7hAv4hT82u+OxH06dogRm17rI3tOIjLrmJg2qd7XS5KSYgWY2xrKnPkkYXdi78FbP0nPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=aBVM1+VH; arc=none smtp.client-ip=209.85.167.49
+	 To:Cc:Content-Type; b=nLgrd4DGe5Nukva5jSLh7hxMY2xJ28EpKJiWkJjquMmJJ8pfhhuJ0lETruoqnJXiZovjptj3di7DsGX4ZhGl/93QHrGYFrwsjCJW4x60+B2P3/AZxO7exXo2ZnCcSOiS6Cyhmpuycva3IEav6U8zo/a4EULAfMtDsDVbbL3o4Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e1w4PKzR; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-539f0f9ee49so734426e87.1
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 20:31:26 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539eb97f26aso888571e87.2
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 20:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728876684; x=1729481484; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1728876794; x=1729481594; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nMl3jpueAPLroRRkUpgmP8kpXH1UVyVDMR2QNTS1sj8=;
-        b=aBVM1+VHJ9GdAD6jHa+nf/eR3o6q4VhFTG15sH4p3byB0EeIOjAgUSW/YPazlAX0za
-         UviYmAm1HGIoXnOGbooi5OqX+90cnLR3Gy9juUR+0bInPDN5p5ugMUomTkWjnZnMiAVo
-         56XFqpWvRIRmj82nC3EkvtcgDG7mXebvxog54=
+        bh=cBHJHNhTSX4APHDjMTRRezeOIINpFIwliTy2ziGLz3I=;
+        b=e1w4PKzRpoVjuhDa5zH0WAd3w0GKt2mCUVFLkAv15MEl86TKMs386x+1H7SCZwKI5k
+         TF0Sxip4Dnqza89RUwEiPV6sDADGC6KpxN/Zzx28I0xPWyeTVSi46ilDFU9gaj4YlvOc
+         fF95kPMus52DZBMncD2dnWb28Zbj5592L9jFU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728876684; x=1729481484;
+        d=1e100.net; s=20230601; t=1728876794; x=1729481594;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nMl3jpueAPLroRRkUpgmP8kpXH1UVyVDMR2QNTS1sj8=;
-        b=HLtva2MVU6pxct/Z6qBZfy7QbPqPeG9ghKRMRhY6OHofccPYImO5mmdsjzvkDI7DX5
-         BcLsr+/3qNSua95+WrmuYcNAjg5fYiXaui7wpcEsfegyKL7BzF73qn1ARpcgjvkc4ehD
-         jxQHHz3LPcReBShG1u6byoX+k9eJS/Azf88ovZuLAgJK5TwJXpA1dsuqXj+b0xuGvC1W
-         fAfoKSmVHQ9515D+kFppKhYyVsuLlQG9rZjyZcGs+BMk0fdXs/nY3C7u3lP0iHRZ/Zi8
-         GmfwZYu4JKaWFYfnU2MOJq4B9cNvMUQv220gP0fyUrH9LKjI2iypHW8K16Mi+cBFpwFX
-         zfyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVO8MXuvu/jxS1BFi0SWq7NkNqALxQaiGqMP3X+G2cm0KwOi/vxQGhgBZoOeCsZPZVVehZGeV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsHmyjV2mYxmzoAJzy1ymwH0l9EP/chAjixvlnw4xkxpfP9iTu
-	LD3qelVulVcmNIJkZ8Z03nuyfDw9yIB1RxS8Pb/mfMl6f3wIn9LAt1YzIDYqNFJ8Bb3BUaPl3Xl
-	AzdAFSn4mZqvxVnYM9akt5tHoE/4khUNNCfWw
-X-Google-Smtp-Source: AGHT+IHosT05uJpd5mStQSSLnvHzGU4JrxkYCmpA8tK8pwcB973Z4q2WHXu2O9A06QbFRUr79q3T8MEizdBeP3QniQg=
-X-Received: by 2002:a05:6512:3c95:b0:533:44e7:1b2a with SMTP id
- 2adb3069b0e04-539da54792amr4681151e87.40.1728876684438; Sun, 13 Oct 2024
- 20:31:24 -0700 (PDT)
+        bh=cBHJHNhTSX4APHDjMTRRezeOIINpFIwliTy2ziGLz3I=;
+        b=TRSPfe1W1sAmmamKsF+/V2zr/MewCg2FfpuScuDtgC+eznajNAhe/LXyknqZpuVtH1
+         dL/dXEez9sEAHJv6zr5hWQFIrACV6HOonbZi2JhDT2WdkTQ+LF1Y/iZqLdQrvVsdWikK
+         zgHe+O5IemLMVQMb16i6ADTA2QvotHGjB69R5lx1rwNql/qImIj9eXZKo6SjBRTW87/O
+         v+kH4TZEfApPp3Jijng/66otOJcq6ZYRav8vIijRGQIYwY/K/ARSBUN7XFP8wGUyf4Jm
+         4PgZ8rMmLWmj4S1NhBDNAhpf7q/0pWs1bnnG8FV5Gcy5UrZ+WPIb80DENdqqUNpEFpZ7
+         6oyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXIsVYygKzAhIfqfT25ONAhmqHER9/VBED1FeATA/mrxn7TQCoDWOAhr/HVUzGq48cx2PC4CA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTJMSeODW1qHLW28Lwixq0iowY+gIvvvGueeQCImWVXFBCIv9F
+	JD19CWs/bYBduKY5eCmiyFNU6oGsQ7T0LemJszhwd+DrL4ecjjQ2y6+lksiqqx7t5FJAkQMT2XB
+	B9epBYibmMOKCpIkVipkHAR4oxe/S7GaZo0wq
+X-Google-Smtp-Source: AGHT+IHY3GNXX2cuhXHcUe5/TaTZoWw3ztpGyR8ep46Ue6APfSbf7tQ52QSHKAV7DXcMA6JfFMb+SQN2tmlEZp+gdHg=
+X-Received: by 2002:a05:6512:4204:b0:539:e3d8:fa33 with SMTP id
+ 2adb3069b0e04-539e3d8fcd6mr2859244e87.54.1728876794104; Sun, 13 Oct 2024
+ 20:33:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241013203831.88051-1-linux@treblig.org> <20241013203831.88051-7-linux@treblig.org>
-In-Reply-To: <20241013203831.88051-7-linux@treblig.org>
+References: <20241013203831.88051-1-linux@treblig.org> <20241013203831.88051-4-linux@treblig.org>
+In-Reply-To: <20241013203831.88051-4-linux@treblig.org>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 14 Oct 2024 09:01:12 +0530
-Message-ID: <CAH-L+nP8LaWnhHwntqgY6+pfH2ouPHQ-J5uUhyjVL1T2spB2VQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 6/6] cxgb4: Remove unused t4_free_ofld_rxqs
+Date: Mon, 14 Oct 2024 09:03:02 +0530
+Message-ID: <CAH-L+nP2MLv3iLN9XriRHXcVBYOMSbNYH5tu21Oaah3t05VwNg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/6] cxgb4: Remove unused cxgb4_get_srq_entry
 To: linux@treblig.org
 Cc: bharat@chelsio.com, davem@davemloft.net, edumazet@google.com, 
 	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a99ddb062467785a"
+	boundary="0000000000003261b10624677fd3"
 
---000000000000a99ddb062467785a
+--0000000000003261b10624677fd3
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 2:10=E2=80=AFAM <linux@treblig.org> wrote:
+On Mon, Oct 14, 2024 at 2:09=E2=80=AFAM <linux@treblig.org> wrote:
 >
 > From: "Dr. David Alan Gilbert" <linux@treblig.org>
 >
-> t4_free_ofld_rxqs() has been unused since
-> commit 0fbc81b3ad51 ("chcr/cxgb4i/cxgbit/RDMA/cxgb4: Allocate resources
-> dynamically for all cxgb4 ULD's")
+> cxgb4_get_srq_entry() has been unused since 2018's commit
+> e47094751ddc ("cxgb4: Add support to initialise/read SRQ entries")
+> which added it.
 >
 > Remove it.
+>
+> Note: I'm a bit suspicious whether any of the srq code in there
+> actually does anything useful;  without this get I can't see anything
+> that reads the data, so perhaps the whole thing should go?
+> But that however would remove one of the opcode handlers, and I have
+> no way to test that.
 >
 > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
@@ -103,7 +109,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh A P
 
---000000000000a99ddb062467785a
+--0000000000003261b10624677fd3
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -175,14 +181,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIN6eSchhXfaUSXR3hgDLqlquz4Yb5e/f94y1OVcItHxaMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAxNDAzMzEyNFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIG1GlndlzR+7FyQBIXpX9ivMINtrZmNPsvpns72TsC+4MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAxNDAzMzMxNFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBfyKqtZM2B
-rxwsNYxrpY50OyLyETFxUhMB6StOG94z40SQhkL2gqy+s3bQ6HHFpbwn+3t/1mTRw/oSQRnC+9QF
-MM3CKPyc/WyQpDTjYJbYjHkYW05L0wIW/QBc59IRfFHk6nkow8Yf1qKejHjW9fMEBq0Ck+NB7E5L
-gU55FwaFWxSGaXGvsiDy+lM8UDtkQcsoTaYvpvk7N4yRyqfvtbhAiawyFjhHKG/1x8brPALiA8A9
-ub+ME5wTFNfBqpBT2cLNmB5OuaSfV4aGsipa2ERh2LYFHJ8ZntlIASJR/kRp+npwEXDzD+n4z4Ld
-ujuczKheQ4lKF3B+V0iV6td6pLl7
---000000000000a99ddb062467785a--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCTbrAyUAU4
+85+ykc/0i/9WL7/iEfqnD+q2+g+esedjzxkd3ReHCiOKhO5z/4i1zNttrRb9ov5E7al/DKuqSk+a
+eRY+JZiwkvhYcGoDeeSQZk892z3VbrEPwmb6CEBqGcTHFz22M+i8jSYFG5na4sk7YcIqClSr+acg
+MJZiuy4Iqvx6H5dNiP18Qya9Gf+d0/wXCN4CVqKndVSwe4dz2REdRVqpuh+c1Nb5uwwOQZ3IlP/M
+ujYFy1hVx1lwKc9f+M+yG6BUGJXHK+0FvS5R6BSeoxpoa/mq4DGmkHs9gMehL3S/ySQdYHt1U8qM
+6btnY883YrmX4SeF18OX6UjJz0e5
+--0000000000003261b10624677fd3--
 
