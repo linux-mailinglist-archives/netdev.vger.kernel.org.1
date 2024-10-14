@@ -1,176 +1,368 @@
-Return-Path: <netdev+bounces-135134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D168599C652
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:47:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9E499C67D
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D44285EDC
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:47:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 188BF1F238F1
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416661547EF;
-	Mon, 14 Oct 2024 09:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB47415697B;
+	Mon, 14 Oct 2024 09:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDd1L5KU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tL2RFCGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9B8146A79
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA6815C120
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728899272; cv=none; b=CsOLiaQ2AO3hoGWjT9pGd7+2fubrQ0E70bcTqjUJf+E2Mb8Wr9dpfuv2QX8pfC8KkoFS25+13QGcx3iReObyDmA+fDPn0FH1rnq93P6Huj+A9ByRC/avBbLFs24IOp9zk20vnVsXmSSF9S7br40uKKXUxQV3UBibb90xXaJFXOA=
+	t=1728899655; cv=none; b=e/QMNAvdGqh9U0AMtNa+9Xmf/YbPfzMuFlAdqAeIxN8Ehn6OlOXJNUf9OgCsOs1mqH/fwjUnyKjjG6TSIHeoOWIElE9cnD9nfqV0YKn0rilK7yyyPDJ+w6mO3oWufNwHihdPkJX61k3LWPFSeLOySLp+V+V03nJLD7o46UCxVU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728899272; c=relaxed/simple;
-	bh=b8NCLRJKGrm+n0lum0OQZapBDj5h/D1HEj2AK7tWcKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DEcCjkPKr0Nm/czHx3I2SDJ3t6qDD/krRHOCIXubB3yTdyLmGuMQC3Rd6lROtMALwsBciTXvC5a8LOUQLW1TNcTad+JEletauNspTNHMe09PW+kbVIAvCym7jLCihLjRiTuvLvUrKmyolN+xA64YZURuMtygBuGEE4AsKsdh8Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bDd1L5KU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728899269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sbyVEHx1wYT46hZ0YR53rr13HilYd79w5fQFSE3Vqco=;
-	b=bDd1L5KU6NufRvg/tuuRymQ7geTiod+4yoil6cZT/KfghQxbDhVSzfO4nWAvJd6NfQ9gnt
-	AVPrqW/DxJ4Z6+X/rL8alj77tGsFwj6FilW+DY9KfdNZq5aS16uXZh+/nNtccRLjnln1Do
-	bIbvrqWTKLKy3ThLq41YZE0rDWMv2S8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-118-5QVgXFflNAy3E_JTOzqKGA-1; Mon, 14 Oct 2024 05:47:47 -0400
-X-MC-Unique: 5QVgXFflNAy3E_JTOzqKGA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a9a1e429a8fso2663166b.0
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 02:47:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728899266; x=1729504066;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1728899655; c=relaxed/simple;
+	bh=DVBd3qXDpONaqbNtzNeQIdNWsAb8y/r9hmaj7fksrhA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pSrRXJNF2yQEZXZnC0zOpfAK8kEzyRuXXp0KTYWtkO0SEQ58Kk0gS2V+GGrSiE1ckliQavyBlxExSIy7vvwVIjXqZEews5kUoGAF1uxKEdY3EwTj//PC3zzcUjKSFpM9eBMca2lg7m1xcvVJKIukNDXWJ6xp7fOR19jjfO3zRSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tL2RFCGc; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2e2fb304e7dso2339676a91.1
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 02:54:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728899653; x=1729504453; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sbyVEHx1wYT46hZ0YR53rr13HilYd79w5fQFSE3Vqco=;
-        b=USMMAr1xlrciB0YSDdBBpwg2zw9P3FdUVYDfAo/rXQx55BgsQNe4a1hhpM1eLTuxtr
-         5T3sCUizNjhJ6cK/Q0VLK1FEg96fcuTQ34I5LvZYJz1R4Sjds0+gppueI2pkgITXXqMu
-         af+rC9lkaU6DxVH6WtwzFq7dUzFRF0mTAcAlP+UD72hymzc8TTIeXX0Ow1SR1uJq4HU4
-         G9hyD4cJfY6PeVGBw75FAyHsouocEu2WaiqPWxs3qDJ6Ta1564lFdR1ZTWr42laYPfwu
-         d8Bf+V8qHPfwlxyhaMLWIO7bUFZtcH/15SJ6kXcLaVUxM7OXap3HYM7lMHm1H93HvmTC
-         vkEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyxEyYO6wFRlbM5I/ig90KE3N/ip3tBh3FgpooKivt/hZsrVmL5h8beLCLjLKPT1RAdcH0rNE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzizkna3XBVGGNBTzax88rPERNtzHuSU87i9JDAp92YOjpq35+
-	p+WumGmGoBehOPTBz2TJcCEnepHQiR2ZknX9HDcSgro9gyWjhwRuhWERPAIqV1DtWvaeRL02q61
-	AG7mcJl8lxeOdoTdQsTXdZ2DzsgqIQpb5+lAsmlk3bfLuygcbqZdUBQ==
-X-Received: by 2002:a17:907:31c8:b0:a8d:2b7a:ff44 with SMTP id a640c23a62f3a-a99e3c97e69mr785564966b.32.1728899266553;
-        Mon, 14 Oct 2024 02:47:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMHMu4YWij0zyJOKwCcWc+znbiga0jEn5SFeqDdbHrQBD3dXiMBV8NYSsDJh+q3dUEZeJFiA==
-X-Received: by 2002:a17:907:31c8:b0:a8d:2b7a:ff44 with SMTP id a640c23a62f3a-a99e3c97e69mr785562766b.32.1728899266063;
-        Mon, 14 Oct 2024 02:47:46 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1ec:d16c:2d5b:a55d:7fda:5330])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a07662ffbsm178004966b.130.2024.10.14.02.47.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 02:47:45 -0700 (PDT)
-Date: Mon, 14 Oct 2024 05:47:41 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Colin King (gmail)" <colin.i.king@gmail.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jason Wang <jasowang@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: virtio_net: support device stats
-Message-ID: <20241014054305-mutt-send-email-mst@kernel.org>
-References: <eb09900a-8443-4260-9b66-5431a85ca102@gmail.com>
+        bh=M1Faqy3HxaOuKMHfc4NtonnnYTIZWAT6guhpv3enJlk=;
+        b=tL2RFCGcNOCrnZp9BUIS17bgFfpr2Hhj60/DmHRp4HaK047tR2oYyukI8xMIzpCJXy
+         N7rAdAXwXSXry+fyCuZz+twrwRrjhO4Nb8wZ2d19496Aa0w4EJGmuZiJwGdDGKk++S0l
+         wk8gUQwdzkbExA9dn2UC8j/eG/gZAPsjLJ5CgPqBquGMgxm8Cp0Ryyopgh/tCChdxBbH
+         DRt/5/BeE91hiONESRKIhZTvyV17zhuRyVrucR8gKJ264k3XVykrAfB978mp0q2Mcy88
+         oSgpaRpBOFEtlDtXJraWR8oi9pKotn/k+cj0Pk/PUySVREakGIo5oe4dRoSnEySI6G0Y
+         qehA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728899653; x=1729504453;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M1Faqy3HxaOuKMHfc4NtonnnYTIZWAT6guhpv3enJlk=;
+        b=Aioxefu+vDVrNiUK48rKJs8pMrU6bQxdGvi4ZiVqKBxghQjsKMn4WlyHlewvb9Rjb7
+         VGAEtQajLJ8NCLwSSX7ZeWD5eXTctxJ3kE7inALj79I/ROcnIZpjgNc9fzUuW5xCrJ+g
+         UZmqmRTblvQ8t5x8xCa5803eYjD7do0SLteRhfYH8i97T7BbDj9zFdi5+mzAUmlnrwuQ
+         huCUJjKNV8jcVyS1FfCWIMHkhn4snPSCcWRp3eNrfap3OvENtPA5mGlCHoJF7ZdmsnxJ
+         n86lGZzmOtSEwBl5hy7bFpau+aLk23/5/PXKy4eVzJZBM8YZmaq4XITabSUWyLUEx31z
+         eoAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVWwiOyHIxHx9FudoYCm1HpFyFwyAdCvi7GZ80jcMF0h8PEb0dBMqV6NWGjTT9BSZfp6icBKkg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBtHciIbK0rzUHK80GPU5f7pSZWEhPiQ6C83vIG+c+Mvl6S+Rd
+	I2Dr6ndsbaVJcTda5qmX51GgJun5zDjjBMF7GbBx2K05RTmf4m9XmGuRFb4TWh9AhA4TXd7n95X
+	AtZZA+Nnq6T2Yor/spbJ3SoYQS2sDWrtAfcBW
+X-Google-Smtp-Source: AGHT+IH45tjvIMTh7lS27dhZHd+EASEQRoQe+56iSwpDqOwOAKP1mYq09lv+pqCa+9Fiztw9fCqY9G1PxH88qqzf2zw=
+X-Received: by 2002:a17:90a:e2d7:b0:2e2:cc47:f1b0 with SMTP id
+ 98e67ed59e1d1-2e2f0a065c3mr13511926a91.3.1728899652765; Mon, 14 Oct 2024
+ 02:54:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb09900a-8443-4260-9b66-5431a85ca102@gmail.com>
+References: <6707f07f.050a0220.64b99.001b.GAE@google.com> <05d3d02d-69c7-24a4-c2b2-26bdb53556db@candelatech.com>
+In-Reply-To: <05d3d02d-69c7-24a4-c2b2-26bdb53556db@candelatech.com>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Mon, 14 Oct 2024 11:54:00 +0200
+Message-ID: <CANp29Y5Jc9VG107iV1jKJuLi4H20TUpYLuLWzddan0=39qwCKw@mail.gmail.com>
+Subject: Re: [syzbot] [wireless?] INFO: task hung in cfg80211_event_work (4)
+To: Ben Greear <greearb@candelatech.com>
+Cc: syzbot <syzbot+5506b2556159a1ab6923@syzkaller.appspotmail.com>, 
+	davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 10:39:26AM +0100, Colin King (gmail) wrote:
-> Hi,
-> 
-> Static analysis on Linux-next has detected a potential issue with the
-> following commit:
-> 
-> commit 941168f8b40e50518a3bc6ce770a7062a5d99230
-> Author: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Date:   Fri Apr 26 11:39:24 2024 +0800
-> 
->     virtio_net: support device stats
-> 
-> 
-> The issue is in function virtnet_stats_ctx_init, in drivers/net/virtio_net.c
-> as follows:
-> 
->         if (vi->device_stats_cap & VIRTIO_NET_STATS_TYPE_CVQ) {
->                 queue_type = VIRTNET_Q_TYPE_CQ;
-> 
->                 ctx->bitmap[queue_type]   |= VIRTIO_NET_STATS_TYPE_CVQ;
->                 ctx->desc_num[queue_type] +=
-> ARRAY_SIZE(virtnet_stats_cvq_desc);
->                 ctx->size[queue_type]     += sizeof(struct
-> virtio_net_stats_cvq);
->         }
-> 
-> 
-> ctx->bitmap is declared as a u32 however it is being bit-wise or'd with
-> VIRTIO_NET_STATS_TYPE_CVQ and this is defined as 1 << 32:
-> 
-> include/uapi/linux/virtio_net.h:#define VIRTIO_NET_STATS_TYPE_CVQ (1ULL <<
-> 32)
-> 
-> ..and hence the bit-wise or operation won't set any bits in ctx->bitmap
-> because 1ULL < 32 is too wide for a u32.
+Hi Ben,
 
-Indeed. Xuan Zhuo how did you test this patch?
+On Fri, Oct 11, 2024 at 11:50=E2=80=AFAM Ben Greear <greearb@candelatech.co=
+m> wrote:
+>
+> On 10/10/24 08:19, syzbot wrote:
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    2a130b7e1fcd Merge tag 'kbuild-fixes-v6.12' of git://gi=
+t.k..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D1206e79f980=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Df38c36a9554=
+31c1
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D5506b2556159a=
+1ab6923
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for D=
+ebian) 2.40
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D155b83279=
+80000
+>
+> This looks like something I saw in 6.11 and 6.10.  My guess was that one =
+of the
+> running processes that lockdep does not print locks for is holding the wi=
+phy mtx.
+>
+> Maybe it would help if syzbot would use sysrq to dump all running tasks t=
+o the console, and maybe
+> lockdep could print locks for running processes, even if they are marked =
+as potentially
+> unreliable?
 
-> I suspect ctx->bitmap should be
-> declared as u64.
-> 
-> Colin
-> 
-> 
+Thanks for the suggestions!
 
-In fact, it is read into a u64:
+We do have an open issue re. SysRq:
+https://github.com/google/syzkaller/issues/4200
+I've noted a +1 to that.
 
-       u64 offset, bitmap;
-....
-        bitmap = ctx->bitmap[queue_type];
+Regarding the locks -- they are actually already printed in the
+original bug report, under "Showing all locks held in the system:". Or
+did you mean something else?
 
-we'll have to reorder fields to avoid wasting memory.
-Like this I guess:
+--=20
+Aleksandr
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-Colin, can you confirm pls?
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c6af18948092..ef221429f784 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4111,12 +4111,12 @@ struct virtnet_stats_ctx {
- 	/* Used to calculate the offset inside the output buffer. */
- 	u32 desc_num[3];
- 
--	/* The actual supported stat types. */
--	u32 bitmap[3];
--
- 	/* Used to calculate the reply buffer size. */
- 	u32 size[3];
- 
-+	/* The actual supported stat types. */
-+	u64 bitmap[3];
-+
- 	/* Record the output buffer. */
- 	u64 *data;
- };
--- 
-MST
-
+>
+> Thanks,
+> Ben
+>
+> >
+> > Downloadable assets:
+> > disk image (non-bootable): https://storage.googleapis.com/syzbot-assets=
+/7feb34a89c2a/non_bootable_disk-2a130b7e.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/ea0b899b6053/vmli=
+nux-2a130b7e.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/4ef0bad329fe=
+/bzImage-2a130b7e.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the co=
+mmit:
+> > Reported-by: syzbot+5506b2556159a1ab6923@syzkaller.appspotmail.com
+> >
+> > INFO: task kworker/u4:4:5271 blocked for more than 143 seconds.
+> >        Not tainted 6.12.0-rc1-syzkaller-00381-g2a130b7e1fcd #0
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
+e.
+> > task:kworker/u4:4    state:D stack:25712 pid:5271  tgid:5271  ppid:2   =
+   flags:0x00004000
+> > Workqueue: cfg80211 cfg80211_event_work
+> > Call Trace:
+> >   <TASK>
+> >   context_switch kernel/sched/core.c:5315 [inline]
+> >   __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
+> >   __schedule_loop kernel/sched/core.c:6752 [inline]
+> >   schedule+0x14b/0x320 kernel/sched/core.c:6767
+> >   schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
+> >   __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+> >   __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
+> >   wiphy_lock include/net/cfg80211.h:6014 [inline]
+> >   cfg80211_event_work+0x27/0x40 net/wireless/core.c:334
+> >   process_one_work kernel/workqueue.c:3229 [inline]
+> >   process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+> >   worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+> >   kthread+0x2f0/0x390 kernel/kthread.c:389
+> >   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+> >   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> >   </TASK>
+> >
+> > Showing all locks held in the system:
+> > 1 lock held by khungtaskd/25:
+> >   #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquir=
+e include/linux/rcupdate.h:337 [inline]
+> >   #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock i=
+nclude/linux/rcupdate.h:849 [inline]
+> >   #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_=
+locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
+> > 1 lock held by kswapd0/73:
+> > 3 locks held by kworker/0:3/909:
+> > 3 locks held by kworker/u4:9/2509:
+> > 3 locks held by kworker/u4:11/3318:
+> > 1 lock held by dhcpcd/4814:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 2 locks held by getty/4897:
+> >   #0: ffff88801dda90a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref=
+_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+> >   #1: ffffc9000039b2f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tt=
+y_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
+> > 3 locks held by kworker/u4:0/5118:
+> >   #0: ffff88803c425948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: =
+process_one_work kernel/workqueue.c:3204 [inline]
+> >   #0: ffff88803c425948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: =
+process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+> >   #1: ffffc90002d1fd00 ((work_completion)(&(&ifa->dad_work)->work)){+.+=
+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+> >   #1: ffffc90002d1fd00 ((work_completion)(&(&ifa->dad_work)->work)){+.+=
+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+> >   #2: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_dad_work+=
+0xd0/0x16f0 net/ipv6/addrconf.c:4196
+> > 3 locks held by kworker/0:2/5170:
+> > 2 locks held by kworker/u4:2/5176:
+> > 3 locks held by kworker/u4:3/5211:
+> > 1 lock held by syz-executor/5254:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers=
+/net/tun.c:698 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b=
+/0x1b0 drivers/net/tun.c:3517
+> > 1 lock held by syz-executor/5255:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers=
+/net/tun.c:698 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b=
+/0x1b0 drivers/net/tun.c:3517
+> > 1 lock held by syz-executor/5258:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers=
+/net/tun.c:698 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b=
+/0x1b0 drivers/net/tun.c:3517
+> > 1 lock held by syz-executor/5264:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers=
+/net/tun.c:698 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b=
+/0x1b0 drivers/net/tun.c:3517
+> > 3 locks held by kworker/u4:4/5271:
+> >   #0: ffff88801ebdf948 ((wq_completion)cfg80211){+.+.}-{0:0}, at: proce=
+ss_one_work kernel/workqueue.c:3204 [inline]
+> >   #0: ffff88801ebdf948 ((wq_completion)cfg80211){+.+.}-{0:0}, at: proce=
+ss_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+> >   #1: ffffc90002617d00 ((work_completion)(&rdev->event_work)){+.+.}-{0:=
+0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+> >   #1: ffffc90002617d00 ((work_completion)(&rdev->event_work)){+.+.}-{0:=
+0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+> >   #2: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock i=
+nclude/net/cfg80211.h:6014 [inline]
+> >   #2: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: cfg80211_eve=
+nt_work+0x27/0x40 net/wireless/core.c:334
+> > 1 lock held by syz-executor/5273:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers=
+/net/tun.c:698 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3b=
+/0x1b0 drivers/net/tun.c:3517
+> > 3 locks held by kworker/u4:6/5278:
+> > 4 locks held by kworker/0:6/5390:
+> >   #0: ffff88801ac75948 ((wq_completion)events_power_efficient){+.+.}-{0=
+:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+> >   #0: ffff88801ac75948 ((wq_completion)events_power_efficient){+.+.}-{0=
+:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+> >   #1: ffffc90002adfd00 ((reg_check_chans).work){+.+.}-{0:0}, at: proces=
+s_one_work kernel/workqueue.c:3205 [inline]
+> >   #1: ffffc90002adfd00 ((reg_check_chans).work){+.+.}-{0:0}, at: proces=
+s_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+> >   #2: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: reg_check_chans_wo=
+rk+0x99/0xfd0 net/wireless/reg.c:2480
+> >   #3: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock i=
+nclude/net/cfg80211.h:6014 [inline]
+> >   #3: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: reg_leave_in=
+valid_chans net/wireless/reg.c:2468 [inline]
+> >   #3: ffff888055538768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: reg_check_ch=
+ans_work+0x164/0xfd0 net/wireless/reg.c:2483
+> > 3 locks held by kworker/0:9/5444:
+> > 3 locks held by kworker/0:10/5446:
+> > 2 locks held by kworker/0:12/5449:
+> > 3 locks held by kworker/0:14/5454:
+> > 2 locks held by kworker/0:15/5455:
+> > 3 locks held by kworker/0:16/5456:
+> > 4 locks held by kworker/u4:10/5469:
+> >   #0: ffff88801be8b148 ((wq_completion)netns){+.+.}-{0:0}, at: process_=
+one_work kernel/workqueue.c:3204 [inline]
+> >   #0: ffff88801be8b148 ((wq_completion)netns){+.+.}-{0:0}, at: process_=
+scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+> >   #1: ffffc90002cafd00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_=
+work kernel/workqueue.c:3205 [inline]
+> >   #1: ffffc90002cafd00 (net_cleanup_work){+.+.}-{0:0}, at: process_sche=
+duled_works+0x976/0x1850 kernel/workqueue.c:3310
+> >   #2: ffffffff8fcc51d0 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+=
+0x16a/0xcc0 net/core/net_namespace.c:580
+> >   #3: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: wg_netns_pre_exit+=
+0x1f/0x1e0 drivers/net/wireguard/device.c:414
+> > 2 locks held by kworker/u4:13/5492:
+> > 1 lock held by syz-executor/5502:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5515:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5522:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5526:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5534:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5535:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5550:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5553:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5557:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5562:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5569:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> > 1 lock held by syz-executor/5573:
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core=
+/rtnetlink.c:79 [inline]
+> >   #0: ffffffff8fcd1cc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+=
+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> --
+> Ben Greear <greearb@candelatech.com>
+> Candela Technologies Inc  http://www.candelatech.com
+>
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgi=
+d/syzkaller-bugs/05d3d02d-69c7-24a4-c2b2-26bdb53556db%40candelatech.com.
 
