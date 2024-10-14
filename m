@@ -1,73 +1,83 @@
-Return-Path: <netdev+bounces-135098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD06599C35D
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 10:32:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCF499C38B
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 10:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81D542833C0
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:32:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8105F2847EE
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE3A14F12D;
-	Mon, 14 Oct 2024 08:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UhlqlJSa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977A914B946;
+	Mon, 14 Oct 2024 08:38:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAD114A60F
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 08:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700EA14A62A
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 08:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728894698; cv=none; b=F1zaSegdIGNR+dB480JA1iZW9c4sv68i/zU+kBWa/zBj/A4PentjFUjhjA139iivX9Pvzvv5vMpUIGVtkIE/OLrxheN4vPjMTu6atXaSuqPaDM4u0ZvQxVmt4y1eAsKZYbQ8JG1bu0rHFxwZ/a5FC7FaP87S2od4Tbwoerd4BNU=
+	t=1728895110; cv=none; b=Vlee5nJaEvRgEw3W0jbXlCo3DOeI/poOOwI1NtOMjNqTFRw3hoHTBxs4ShU1iS5NrhJJQT7OeqYqgRnlnuJMChTCBHp2N+Op7fqgXKj1tm2fXyDPZ+qrz/87rLI7X+cBEuMVc3qZaui7ACrcve7jZvVWTK5ZszsP2Xa5cjd6y4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728894698; c=relaxed/simple;
-	bh=4ods7aJLQvBDP32mFMeuQJAEmLsu3AktdfWzx++QINA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hTIOEEqgelDvEI6Jz7ac8KqE14XjG5fHNWyLvsxD3e+Ogab090ka51E0ig9n1FlDYn9GUOBvND5kNG8MYLW6rrdaoUKDS3pYZ8yEwkKjYEIEuKwgaAOPh5D9eIQ0z9jwvaQsDXYdMdyGAokrTYFU/ktvPE04Se6BkAgbk27O+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UhlqlJSa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46A9EC4CEC3;
-	Mon, 14 Oct 2024 08:31:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728894697;
-	bh=4ods7aJLQvBDP32mFMeuQJAEmLsu3AktdfWzx++QINA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UhlqlJSaHFAUb1m6vAWiLWJloQUGMESZ00Vw4eet9OiGTAb6xD/a0rNOVnwzLqYu7
-	 dCQSe8yyPGTSRSNBxqg5iYf5bXN3OomzO1DEJPU1JHHT0tG9S2KJs/9T90KpCTIXo9
-	 RBPKsG7wCB01LspqDNTsuJjgvImAEPwWz/3zh0q41q4Jk4I0/ZoXWiTQlLxk9FItTr
-	 It0cmg4lsMz0bm9/Z4mFnLMC4LeTPeLclisxMyz4hhzD9kbkbcwXMo1IUJV8upDIJW
-	 LjCesPgK2xjLAhSSuiO+3uohOHYfjmef4xeBSGHotaXcJduDhag+YjMWlPhR/5faxP
-	 cS0WMsV4SdhTQ==
-Date: Mon, 14 Oct 2024 09:31:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] r8169: implement additional ethtool stats ops
-Message-ID: <20241014083134.GM77519@kernel.org>
-References: <58e0da73-a7dd-4be3-82ae-d5b3f9069bde@gmail.com>
+	s=arc-20240116; t=1728895110; c=relaxed/simple;
+	bh=/dUWEIi+InAp3Vp2QtogS30edtdBl+MDwOreGHW9KvY=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Fg+IEkcr1YTbUF+Yg1w2RBn1NVc0FbR9UzvSeWoEt00dPCrmFJvJczLXbsfhxacNZB9U9DXkH0qjZITzZ8uNZu3VwpLzfOYB5Y2aIEa7iPFrUMat9wkwpbtzRAGmomTkIL5tBS+M8iTZfGGfcrRE8dS6N/4jk+F1Oz/sV5O4DQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:3f20:7967:2d40:9ad2])
+	by albert.telenet-ops.be with cmsmtp
+	id Q8eL2D00W54R7sz068eL3A; Mon, 14 Oct 2024 10:38:20 +0200
+Received: from geert (helo=localhost)
+	by ramsan.of.borg with local-esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1t0Gaq-003k6x-Jb;
+	Mon, 14 Oct 2024 10:38:20 +0200
+Date: Mon, 14 Oct 2024 10:38:20 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: linux-kernel@vger.kernel.org
+cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+    dmaengine@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Build regressions/improvements in v6.12-rc3
+In-Reply-To: <20241014072731.3807160-1-geert@linux-m68k.org>
+Message-ID: <711d7f6d-b785-7560-f4dc-c6aad2cce99@linux-m68k.org>
+References: <CAHk-=wg061j_0+a0wen8E-wxSzKx_TGCkKw-r1tvsp5fLeT0pA@mail.gmail.com> <20241014072731.3807160-1-geert@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58e0da73-a7dd-4be3-82ae-d5b3f9069bde@gmail.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Sun, Oct 13, 2024 at 11:17:39AM +0200, Heiner Kallweit wrote:
-> This adds support for ethtool standard statistics, and makes use of the
-> extended hardware statistics being available from RTl8125.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+On Mon, 14 Oct 2024, Geert Uytterhoeven wrote:
+> JFYI, when comparing v6.12-rc3[1] to v6.12-rc2[3], the summaries are:
+>  - build errors: +3/-1
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+   + /kisskb/src/crypto/async_tx/async_tx.c: error: no previous prototype for '__async_tx_find_channel' [-Werror=missing-prototypes]:  => 43:1
 
+powerpc-gcc{5,13}/ppc44x_allmodconfig
+
+   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t {aka long long unsigned int}' [-Werror=format=]:  => 126:37
+   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t' {aka 'long long unsigned int'} [-Werror=format=]:  => 126:46
+
+powerpc-gcc{5,13}/ppc85xx_allmodconfig
+
+> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/8e929cb546ee42c9a61d24fae60605e9e3192354/ (all 194 configs)
+> [3] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b/ (131 out of 194 configs)
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
 
