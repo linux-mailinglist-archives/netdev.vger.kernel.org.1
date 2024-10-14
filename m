@@ -1,185 +1,139 @@
-Return-Path: <netdev+bounces-135367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E25599D9F0
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:59:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C888E99D9F1
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB7F0B215DB
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:59:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89DDF282D4B
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F184F1D9A50;
-	Mon, 14 Oct 2024 22:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C071C57B1;
+	Mon, 14 Oct 2024 23:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YFMHE/P5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nhaE/t44"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B381D968D
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8407148826
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728946747; cv=none; b=ZnelQUY9xjlwuNwo3DpWQMWrJf8hv0oT8VUZsEjxouR5uay9dICwreXJNqTago8o9/8tSeGMQ+9UoPwxtWoBNxdK8m2FHPFfJl0kgtaPDvEWyhT4doZwbFUZTAjH0Dv5R/BohgCJBoqwiaSZlDuhWF0QG0VYbSUd3lryD1qrFas=
+	t=1728946871; cv=none; b=NfuZlVy40vVX8nuLiaIeEGwg1jYwscFIsXNy5ixYB8RQf6DINJSoCmVDPXtV3SK58aSFMUSz4SN+xvETXOsHrDfRqcMTPnPVs3Pb9gQn8t7/t2NZIKiFB4jsItsqKDxZ1yn/Mkj7zEw3FGKKDxajkV+yhEmyHnZ0Qmk0q+9J9S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728946747; c=relaxed/simple;
-	bh=kgyxeDiq/TF18phQu3LIBibupFlnc/6lG6nTp6V5Drk=;
+	s=arc-20240116; t=1728946871; c=relaxed/simple;
+	bh=pdm0OrgR020m1wg0Z5PfCUimmSwEKwH8LVeO6mpjzpQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pWXPfjb97yYFXiUBE+iKQGC7FmQSJbDs0ZwGgeodQE2RRW9C6pOZKH8dHCF0BbuSq50Sqkb6HDbCYZUvC70ibjQ3rVM13k0VQ4HQYiYcxXN95l05lPN5LTKqKvMUR9Jqvr1sRQOzAqtYb4CU/KUFnRRGqSht1I47MClfHbA+mSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YFMHE/P5; arc=none smtp.client-ip=209.85.160.182
+	 To:Cc:Content-Type; b=to02iDVysiN0b/+ZKRVR2yV7uxQyRsBYmNuWeHb5EnAjhvh1tRDctqjuhqR0loIbz0S/92+MKzV2WrFv7VRd2Tx1qPxnjoGdxVdefOqL7u+w9feCkVO1LLGTDvgPEg+YvPx3BeqnTYhVLJeOX+quVzwmPK4HWX1ehbRfzMmfrug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nhaE/t44; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4601a471aecso530141cf.1
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 15:59:06 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c9362c26d8so8036184a12.1
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:01:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728946745; x=1729551545; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728946868; x=1729551668; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1jigxX/V8cRx+fhdhBLrAQEYbLCMTieORk5qB+lhWQw=;
-        b=YFMHE/P52lKiTKNOXUjWd+lqYguSzDMeVQte0zantUUeCl5Yx/m4kSkVf79bh0Bkd+
-         1hShER09gnYbxZzQnr2fIdhIIKxUMpKoYAUXc1WXr9EL1FH4hdCZbwJ/jc5iK8oBF7Ya
-         ir0b1+5y4FYlnTPOpCgNzhvEvzA2I7BpmE2zHA72cgawXSybzOJD2cuy8wvgAPZ2ilYe
-         xTPrro/I6EqO3fB/m2Ry5gMehWkPrj1Wj9hsSCA6z7Rj5X4LQqgy1YVylni3ZINPKWfw
-         tW9uq9xRpyCGheYx7iI2MZHMSWEUMiMHwVlDmY1ne+SBc1iEWsdRyMW/E9CjAjeraB43
-         BBAw==
+        bh=IEvhOYbhIILLB1qSYINeHhmw2BARcJ2f8Nui9BVtChY=;
+        b=nhaE/t44I9fO4AVQxYIY6EGuYZ1RXOyEw8veMBkCH4Mno7SffuESfJKbP3W/zgSTaL
+         tB7iHQvYuheB1RdOZQ3rZTHOdDUygBipctJFDRZkag6JIqO5249Z00fld5NNKMSkX5Ji
+         nQJe9P+i8PnOXbGfjKrN/QguQ1HdxTvHBmSfPA6PiJ7PYq7G4xCnNi/KO9jZxRPZvIXE
+         NXz9BIxmdscK92emPnUspaYLvZRoC7ROIfyMW5KHxzNwIDMqqcyhETLpjeDfYiso3J6k
+         PRRZA9yvAZKXx8knnyrRi5ArPZBh4ZTd5TZbDQNF79+j0g39eNAzVrPT5WQ2tGnpB1g6
+         8PTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728946745; x=1729551545;
+        d=1e100.net; s=20230601; t=1728946868; x=1729551668;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1jigxX/V8cRx+fhdhBLrAQEYbLCMTieORk5qB+lhWQw=;
-        b=YQP4toDIS1x/5Ix/THdO7nLm2Ub8WNelkgQoVwCMZX6V/9ydXzC+0TRnIHRbnHYkkC
-         U1Fxd5fJdJW7RhLEJaiLb1XTLeqQ6eGqX4oyAUFPaDd17Kn4NtHlmMrpG/AwrhYI7Kip
-         WYDNL4w5uBBzE/B7W7HkFSiHrtX7LWdqM5q9CeFX8vdL0ra4tcDg/5Vzs/pwzWwYtFWi
-         o5kD+QCu/6wcdLG4MIe94/MjqFwJgIjAazNz5wFhJHc2rB3TUTYKtSBaJc3tsWeIzsKC
-         VNG8wSgt9Xj8s7CJUL1OkcJSsYDQbtPXqcM0aJitXlid+1X1LRkflcUaxSYMIIJbMzkN
-         ng7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhGYaIhFpUpocYTW4Dou1o6PKYRpUPITMM6QjRI93hIpPWZbPC7DF7A+ZQHyi7NQS9Ml4C/X4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFSJM7hLjiB7QR300Bo0FkFJ1lsWUI+ZNNCx8hXl503EKz7tdo
-	55YYz/X+a0Ce/4ERFlqx/z41LEdxzzcV3utqDYNxezIKDS4OAZPlWa8CncsYK0Fkv71yPHoxC2R
-	oiNmu7qUp484YbUfg4KXF8pg96ClcT09oYvMJ
-X-Google-Smtp-Source: AGHT+IEoIx7F4bjtbUEULIjiw+M1oASHOtYx8yzJC1dGrDni6q/NIslrip9C6AI4B4Zq8cHmSWZHu8NyzVgr4DflpuM=
-X-Received: by 2002:a05:622a:758f:b0:460:371b:bfd9 with SMTP id
- d75a77b69052e-46059bf49ddmr5870781cf.5.1728946744923; Mon, 14 Oct 2024
- 15:59:04 -0700 (PDT)
+        bh=IEvhOYbhIILLB1qSYINeHhmw2BARcJ2f8Nui9BVtChY=;
+        b=Wh+Jl5npcacUH0CTGeZcfYi+KZXUC2QKPkvDSwxLnQEmO0eOONw4HU7ES+cCgu42iI
+         AOHhN1Wat3gJBUXDkEKVLKEX8ahKKEY2u7RZvqUeICRldBJCDgw5n7uCH96lYysOaBSm
+         COJqqVkzyzSMDAyb8fOb71O6h+8tgOyjAdzKnEzphgsABM8ylEE8z+dOcxYUYiIIIyV1
+         BHUZ2+Z0PnLQZMfLAJxeFjmmaPLb3w7T2RHkBaBDZpHNQPZ9kjtQNeKbjAfNPXRtClwJ
+         y9hN2wY0Cc51+1uSK92HqfQlGPqvEqjwVZj9FsRBBfZQ83BzKbcImxlkzD7Z8QJxw3RJ
+         g6Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNth1L8wwvSNE6nkfpfCWeqoZMRu2468R2miGcREyC2CXeA6oLy8/nBRR+op6NBsIaf3bQ8yI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzmum2vXkspcg6VaJP0uE9AWYnsa0Wg2Bz8G4YUXvNb9++ogdqy
+	B4+BMMRcRFdBXi8fDvkyFEnMg/xfPHNKKnOmco5DAbZpaBPXU2Z/GswA5Szt93ruAbGYdqGz7k8
+	I88AUsh1SLrffozNrPTuG0rdYCIHJkmjWsvbD
+X-Google-Smtp-Source: AGHT+IEF7BAH7BBqfFSuPVqFExLRaO9MfAeZQxaesgLe9iVoNzAIzQCDm8YKsl92mGXc4xE+dvinxkXcT4d7/GZsF20=
+X-Received: by 2002:a05:6402:2352:b0:5c9:813a:b1c1 with SMTP id
+ 4fb4d7f45d1cf-5c9813ab2e9mr3253152a12.1.1728946867821; Mon, 14 Oct 2024
+ 16:01:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-7-dw@davidwei.uk>
- <CAHS8izPFp_Q1OngcwZDQeo=YD+nnA9vyVqhuaT--+uREEkfujQ@mail.gmail.com>
- <9f1897b3-0cea-4822-8e33-a4cab278b2ac@gmail.com> <CAHS8izOxsLc82jX=b3cwEctASerQabKR=Kqqio2Rs7hVkDHL4A@mail.gmail.com>
- <5d7925ed-91bf-4c78-8b70-598ae9ab3885@davidwei.uk>
-In-Reply-To: <5d7925ed-91bf-4c78-8b70-598ae9ab3885@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 15 Oct 2024 01:58:52 +0300
-Message-ID: <CAHS8izNt8pfBwGnRNWphN4vJJ=1yJX=++-RmGVHrVOvy59=13Q@mail.gmail.com>
-Subject: Re: [PATCH v1 06/15] net: page_pool: add ->scrub mem provider callback
-To: David Wei <dw@davidwei.uk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org, 
-	netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20240829175201.670718-1-oneukum@suse.com> <CANn89i+m69mWQw+V6XWCzmF84s6uQV15m_YdkPDQptoxUks4=w@mail.gmail.com>
+ <fd906211-7f31-4daf-8935-2be1378a75f8@suse.com>
+In-Reply-To: <fd906211-7f31-4daf-8935-2be1378a75f8@suse.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 15 Oct 2024 01:00:53 +0200
+Message-ID: <CANn89iJWATVhMVDgq3fcV9zpZRt8nd_bWp3=qRHo8L3tJP==Kg@mail.gmail.com>
+Subject: Re: [PATCHv2 net] usbnet: modern method to get random MAC
+To: Oliver Neukum <oneukum@suse.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@kernel.org, 
+	John Sperbeck <jsperbeck@google.com>, Brian Vazquez <brianvv@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 13, 2024 at 8:25=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+On Tue, Oct 15, 2024 at 12:24=E2=80=AFAM Oliver Neukum <oneukum@suse.com> w=
+rote:
 >
-> On 2024-10-10 10:54, Mina Almasry wrote:
-> > On Wed, Oct 9, 2024 at 2:58=E2=80=AFPM Pavel Begunkov <asml.silence@gma=
-il.com> wrote:
-> >>
-> >> On 10/9/24 22:00, Mina Almasry wrote:
-> >>> On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wro=
-te:
-> >>>>
-> >>>> From: Pavel Begunkov <asml.silence@gmail.com>
-> >>>>
-> >>>> page pool is now waiting for all ppiovs to return before destroying
-> >>>> itself, and for that to happen the memory provider might need to pus=
-h
-> >>>> some buffers, flush caches and so on.
-> >>>>
-> >>>> todo: we'll try to get by without it before the final release
-> >>>>
-> >>>
-> >>> Is the intention to drop this todo and stick with this patch, or to
-> >>> move ahead with this patch?
-> >>
-> >> Heh, I overlooked this todo. The plan is to actually leave it
-> >> as is, it's by far the simplest way and doesn't really gets
-> >> into anyone's way as it's a slow path.
-> >>
-> >>> To be honest, I think I read in a follow up patch that you want to
-> >>> unref all the memory on page_pool_destory, which is not how the
-> >>> page_pool is used today. Tdoay page_pool_destroy does not reclaim
-> >>> memory. Changing that may be OK.
-> >>
-> >> It doesn't because it can't (not breaking anything), which is a
-> >> problem as the page pool might never get destroyed. io_uring
-> >> doesn't change that, a buffer can't be reclaimed while anything
-> >> in the kernel stack holds it. It's only when it's given to the
-> >> user we can force it back out of there.
+> On 14.10.24 21:59, Eric Dumazet wrote:
 >
-> The page pool will definitely be destroyed, the call to
-> netdev_rx_queue_restart() with mp_ops/mp_priv set to null and netdev
-> core will ensure that.
->
-> >>
-> >> And it has to happen one way or another, we can't trust the
-> >> user to put buffers back, it's just devmem does that by temporarily
-> >> attaching the lifetime of such buffers to a socket.
-> >>
+> > As diagnosed by John Sperbeck :
 > >
-> > (noob question) does io_uring not have a socket equivalent that you
-> > can tie the lifetime of the buffers to? I'm thinking there must be
-> > one, because in your patches IIRC you have the fill queues and the
-> > memory you bind from the userspace, there should be something that
-> > tells you that the userspace has exited/crashed and it's time to now
-> > destroy the fill queue and unbind the memory, right?
+> > This patch implies all ->bind() method took care of populating net->dev=
+_addr ?
 > >
-> > I'm thinking you may want to bind the lifetime of the buffers to that,
-> > instead of the lifetime of the pool. The pool will not be destroyed
-> > until the next driver/reset reconfiguration happens, right? That could
-> > be long long after the userspace has stopped using the memory.
+> > Otherwise the following existing heuristic is no longer working
+> >
+> > // heuristic:  "usb%d" for links we know are two-host,
+> > // else "eth%d" when there's reasonable doubt.  userspace
+> > // can rename the link if it knows better.
+> > if ((dev->driver_info->flags & FLAG_ETHER) !=3D 0 &&
+> >      ((dev->driver_info->flags & FLAG_POINTTOPOINT) =3D=3D 0 ||
+> >       (net->dev_addr [0] & 0x02) =3D=3D 0))
+> > strscpy(net->name, "eth%d", sizeof(net->name));
 > >
 >
-> Yes, there are io_uring objects e.g. interface queue that hold
-> everything together. IIRC page pool destroy doesn't unref but it waits
-> for all pages that are handed out to skbs to be returned. So for us,
-> below might work:
+> Hi,
 >
-> 1. Call netdev_rx_queue_restart() which allocates a new pp for the rx
->    queue and tries to free the old pp
-> 2. At this point we're guaranteed that any packets hitting this rx queue
->    will not go to user pages from our memory provider
-> 3. Assume userspace is gone (either crash or gracefully terminating),
->    unref the uref for all pages, same as what scrub() is doing today
-> 4. Any pages that are still in skb frags will get freed when the sockets
->    etc are closed
-> 5. Rely on the pp delay release to eventually terminate and clean up
->
-> Let me know what you think Pavel.
+> you need to have a MAC to be an ethernet device, don't you?
 
-Something roughly along those lines sounds more reasonable to me.
+Before or after your patch, there was/is a MAC address, eventually random.
 
-The critical point is as I said above, if you free the memory only
-when the pp is destroyed, then the memory lives from 1 io_uring ZC
-instance to the next. The next instance will see a reduced address
-space because the previously destroyed io_uring ZC connection did not
-free the memory. You could have users in production opening thousands
-of io_uring ZC connections between rxq resets, and not cleaning up
-those connections. In that case I think eventually they'll run out of
-memory as the memory leaks until it's cleaned up with a pp destroy
-(driver reset?).
+The problem is about the test, which is now done while dev->dev_addr
+is full of zeroes, which is not a valid address,
+as shown by :
 
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index e4775fb5a2f6..1a316773319f 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1750,7 +1750,8 @@ usbnet_probe (struct usb_interface *udev, const
+struct usb_device_id *prod)
+                // can rename the link if it knows better.
+                if ((dev->driver_info->flags & FLAG_ETHER) !=3D 0 &&
+                    ((dev->driver_info->flags & FLAG_POINTTOPOINT) =3D=3D 0=
+ ||
+-                    (net->dev_addr [0] & 0x02) =3D=3D 0))
++                    (is_valid_ether_addr(net->dev_addr) &&
++                     (net->dev_addr [0] & 0x02) =3D=3D 0)))
+                        strscpy(net->name, "eth%d", sizeof(net->name));
+                /* WLAN devices should always be named "wlan%d" */
+                if ((dev->driver_info->flags & FLAG_WLAN) !=3D 0)
 
---=20
-Thanks,
-Mina
+To be clear : We are hitting a regression after your patch was
+backported to stable versions.
 
