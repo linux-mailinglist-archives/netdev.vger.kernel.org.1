@@ -1,450 +1,499 @@
-Return-Path: <netdev+bounces-135152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF7C899C812
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 13:05:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67B3999C849
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 13:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D21891C24BB5
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:05:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB8ED1F23EC3
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2109F1A3A9A;
-	Mon, 14 Oct 2024 11:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E3D1A01C5;
+	Mon, 14 Oct 2024 11:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DSyIH1Na"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460B21A3A8D;
-	Mon, 14 Oct 2024 11:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9160F19CD0E
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 11:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728903662; cv=none; b=dqTSU7ZNEkUtCmzIKFUd7WSC+yRfvPExhrvsqu83sY36zi8YSwgw+XKRnsiqwsSdS6SyrYuy+axewb1ML694B6tVlAP/870Kyi2d99MyMScXtuA3QERMk2pwn/VIB1GzVRL2gLV4dHsWJOSvfJJLaiBGM86h03xwbN1vpsyHR3Y=
+	t=1728903954; cv=none; b=H/BXUcWHVmrJiFNeMG8TPiPmuUvexJM2fzqQ5VgBqD0ONyLkWU2SvObOd6iXoga/4yujapZzx/nJ2tKeCvP1yA6c9Locmcsk9coqa5jqsWX4YRWbFgS264FSZTHWAoD/wXrDEypwq+v8UtDb5pWJLy+DgRF5tziTlAPsrUJvoi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728903662; c=relaxed/simple;
-	bh=tzdy785kFrFRI53xQ9lfWvkqL9ohQDSOol3AgCY29T0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DcCu1kNLHOoAx5llXTjRUsdKQTlln5J5gESeYi5D+H2w+R5eI1H/WwLrpzy92vYP8T8O+n4IwOorBA/exQHvWzhUAInGGHBBlgFM9eFjw95MPCmnmZAqQjqAK7TO6KZ7A0NA4dwobgVWNNhMe+PtMiMfJ1xP8WxxTcUXPWHwgMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 45F9016A3;
-	Mon, 14 Oct 2024 04:01:29 -0700 (PDT)
-Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 635553F51B;
-	Mon, 14 Oct 2024 04:00:56 -0700 (PDT)
-From: Ryan Roberts <ryan.roberts@arm.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Greg Marsden <greg.marsden@oracle.com>,
-	Ivan Ivanov <ivan.ivanov@suse.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kalesh Singh <kaleshsingh@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Miroslav Benes <mbenes@suse.cz>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Will Deacon <will@kernel.org>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
-	bpf@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org
-Subject: [RFC PATCH v1 29/57] net: igb: Remove PAGE_SIZE compile-time constant assumption
-Date: Mon, 14 Oct 2024 11:58:36 +0100
-Message-ID: <20241014105912.3207374-29-ryan.roberts@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241014105912.3207374-1-ryan.roberts@arm.com>
-References: <20241014105514.3206191-1-ryan.roberts@arm.com>
- <20241014105912.3207374-1-ryan.roberts@arm.com>
+	s=arc-20240116; t=1728903954; c=relaxed/simple;
+	bh=SZduyd5PlZwbvcO1kNCCzjkc3tuS/Im4y2OrFxkyM+s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NvVt7dZIkM928VfL85d9R8vpQVUFsq+l1iIbnE2c7okpE2p7EE5/7uKPXd3b/Ff5t0vkJafixui99qH1UsSbADydyoHcSUZ+z/CesA99JghoRG0ST6DpqjgEvfDsIVpAWm6hAfS7QA2dkmpMjFVk93FCg2ScWAYaAYmboXbMkbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DSyIH1Na; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ece8648c-e555-4a7a-9b73-8a8e7afd7b05@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728903949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bztqRj+LjYKMuLBZdcPQ7znVekB8Zzh9IllBzUVGDRk=;
+	b=DSyIH1NaLNaJTuAWWFqza4OdmoPV91a7X6BueZCvfJ7Zcvr/GgJ8xKqPJloDP5IokABKcv
+	yBFlHC8gY75uF1VbE3FGg8vtRdV1lM6GPrGoImmFdku50EWMF0WmRBGsH3V+IspSxt55tu
+	fhqLpmkRT0foO/Qx342I0TuOPbb4lM0=
+Date: Mon, 14 Oct 2024 12:05:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 1/2] eth: fbnic: Add mailbox support for PLDM
+ updates
+To: Lee Trager <lee@trager.us>, Alexander Duyck <alexanderduyck@fb.com>,
+ Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>, Simon Horman <horms@kernel.org>,
+ Sanman Pradhan <sanmanpradhan@meta.com>, Al Viro <viro@zeniv.linux.org.uk>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241012023646.3124717-1-lee@trager.us>
+ <20241012023646.3124717-2-lee@trager.us>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241012023646.3124717-2-lee@trager.us>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-To prepare for supporting boot-time page size selection, refactor code
-to remove assumptions about PAGE_SIZE being compile-time constant. Code
-intended to be equivalent when compile-time page size is active.
+On 12/10/2024 03:34, Lee Trager wrote:
+> This adds driver support to utilize the kernel completion API. This allows
+> the driver to block on a response from firmware. Initially
+> fbnic_fw_completion only has support for updates, future patches will add
+> additional features.
+> 
+> Signed-off-by: Lee Trager <lee@trager.us>
+> ---
+>   drivers/net/ethernet/meta/fbnic/fbnic.h    |   1 +
+>   drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 263 +++++++++++++++++++++
+>   drivers/net/ethernet/meta/fbnic/fbnic_fw.h |  59 +++++
+>   3 files changed, 323 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> index ca59261f0155..f58727e6e45a 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> @@ -31,6 +31,7 @@ struct fbnic_dev {
+> 
+>   	struct fbnic_fw_mbx mbx[FBNIC_IPC_MBX_INDICES];
+>   	struct fbnic_fw_cap fw_cap;
+> +	struct fbnic_fw_completion *cmpl_data;
+>   	/* Lock protecting Tx Mailbox queue to prevent possible races */
+>   	spinlock_t fw_tx_lock;
+> 
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> index 8f7a2a19ddf8..deebff3b6821 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> @@ -207,6 +207,38 @@ static int fbnic_mbx_map_tlv_msg(struct fbnic_dev *fbd,
+>   	return err;
+>   }
+> 
+> +static int fbnic_mbx_map_req_w_cmpl(struct fbnic_dev *fbd,
+> +				    struct fbnic_tlv_msg *msg,
+> +				    struct fbnic_fw_completion *cmpl_data)
+> +{
+> +	unsigned long flags;
+> +	int err;
+> +
+> +	spin_lock_irqsave(&fbd->fw_tx_lock, flags);
+> +
+> +	/* If we are already waiting on a completion then abort */
+> +	if (cmpl_data && fbd->cmpl_data) {
+> +		err = -EBUSY;
+> +		goto unlock_mbx;
+> +	}
+> +
+> +	/* Record completion location and submit request */
+> +	if (cmpl_data)
+> +		fbd->cmpl_data = cmpl_data;
+> +
+> +	err = fbnic_mbx_map_msg(fbd, FBNIC_IPC_MBX_TX_IDX, msg,
+> +				le16_to_cpu(msg->hdr.len) * sizeof(u32), 1);
+> +
+> +	/* If msg failed then clear completion data for next caller */
+> +	if (err && cmpl_data)
+> +		fbd->cmpl_data = NULL;
+> +
+> +unlock_mbx:
+> +	spin_unlock_irqrestore(&fbd->fw_tx_lock, flags);
+> +
+> +	return err;
+> +}
+> +
+>   static void fbnic_mbx_process_tx_msgs(struct fbnic_dev *fbd)
+>   {
+>   	struct fbnic_fw_mbx *tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
+> @@ -651,6 +683,225 @@ void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd)
+>   		dev_warn(fbd->dev, "Failed to send heartbeat message\n");
+>   }
+> 
+> +/**
+> + * fbnic_fw_xmit_fw_start_upgrade - Create and transmit a start update message
+> + * @fbd: FBNIC device structure
+> + * @cmpl_data: Completion data for upgrade process
+> + * @id: Component ID
+> + * @len: Length of FW update package data
+> + *
+> + * Return: zero on success, negative value on failure
+> + *
+> + * Asks the FW to prepare for starting a firmware upgrade
+> + */
+> +int fbnic_fw_xmit_fw_start_upgrade(struct fbnic_dev *fbd,
+> +				   struct fbnic_fw_completion *cmpl_data,
+> +				   unsigned int id, unsigned int len)
+> +{
+> +	struct fbnic_tlv_msg *msg;
+> +	int err;
+> +
+> +	if (!len)
+> +		return -EINVAL;
+> +
+> +	msg = fbnic_tlv_msg_alloc(FBNIC_TLV_MSG_ID_FW_START_UPGRADE_REQ);
+> +	if (!msg)
+> +		return -ENOMEM;
+> +
+> +	err = fbnic_tlv_attr_put_int(msg, FBNIC_FW_START_UPGRADE_SECTION, id);
+> +	if (err)
+> +		goto free_message;
+> +
+> +	err = fbnic_tlv_attr_put_int(msg, FBNIC_FW_START_UPGRADE_IMAGE_LENGTH,
+> +				     len);
+> +	if (err)
+> +		goto free_message;
+> +
+> +	err = fbnic_mbx_map_req_w_cmpl(fbd, msg, cmpl_data);
+> +	if (err)
+> +		goto free_message;
+> +
+> +	return 0;
+> +
+> +free_message:
+> +	free_page((unsigned long)msg);
+> +	return err;
+> +}
+> +
+> +static const struct fbnic_tlv_index fbnic_fw_start_upgrade_resp_index[] = {
+> +	FBNIC_TLV_ATTR_S32(FBNIC_FW_START_UPGRADE_ERROR),
+> +	FBNIC_TLV_ATTR_LAST
+> +};
+> +
+> +static int fbnic_fw_parse_fw_start_upgrade_resp(void *opaque,
+> +						struct fbnic_tlv_msg **results)
+> +{
+> +	struct fbnic_dev *fbd = opaque;
+> +	struct fbnic_fw_completion *cmpl_data;
 
-Convert CPP conditionals to C conditionals. The compiler will dead code
-strip when doing a compile-time page size build, for the same end
-effect. But this will also work with boot-time page size builds.
+Hi Lee!
 
-Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
----
+Looks like you didn't follow reverse Xmas tree for variables here and
+in several functions later, all about cmpl_data variable.
 
-***NOTE***
-Any confused maintainers may want to read the cover note here for context:
-https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
+> +	int err = 0;
+> +
+> +	/* Verify we have a completion pointer */
+> +	cmpl_data = READ_ONCE(fbd->cmpl_data);
+> +	if (!cmpl_data ||
+> +	    cmpl_data->msg_type != FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ)
+> +		return -ENOSPC;
+> +
+> +	/* Check for errors */
+> +	get_signed_result(FBNIC_FW_START_UPGRADE_ERROR, err);
+> +
+> +	cmpl_data->result = err;
+> +	complete(&cmpl_data->done);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct fbnic_tlv_index fbnic_fw_write_chunk_req_index[] = {
+> +	FBNIC_TLV_ATTR_U32(FBNIC_FW_WRITE_CHUNK_OFFSET),
+> +	FBNIC_TLV_ATTR_U32(FBNIC_FW_WRITE_CHUNK_LENGTH),
+> +	FBNIC_TLV_ATTR_LAST
+> +};
+> +
+> +static int fbnic_fw_parse_fw_write_chunk_req(void *opaque,
+> +					     struct fbnic_tlv_msg **results)
+> +{
+> +	struct fbnic_dev *fbd = opaque;
+> +	struct fbnic_fw_completion *cmpl_data;
 
- drivers/net/ethernet/intel/igb/igb.h      |  25 ++--
- drivers/net/ethernet/intel/igb/igb_main.c | 149 +++++++++++-----------
- 2 files changed, 82 insertions(+), 92 deletions(-)
+here again...
 
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-index 3c2dc7bdebb50..04aeebcd363b3 100644
---- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -158,7 +158,6 @@ struct vf_mac_filter {
-  *	 up negative.  In these cases we should fall back to the 3K
-  *	 buffers.
-  */
--#if (PAGE_SIZE < 8192)
- #define IGB_MAX_FRAME_BUILD_SKB (IGB_RXBUFFER_1536 - NET_IP_ALIGN)
- #define IGB_2K_TOO_SMALL_WITH_PADDING \
- ((NET_SKB_PAD + IGB_TS_HDR_LEN + IGB_RXBUFFER_1536) > SKB_WITH_OVERHEAD(IGB_RXBUFFER_2048))
-@@ -177,6 +176,9 @@ static inline int igb_skb_pad(void)
- {
- 	int rx_buf_len;
- 
-+	if (PAGE_SIZE >= 8192)
-+		return NET_SKB_PAD + NET_IP_ALIGN;
-+
- 	/* If a 2K buffer cannot handle a standard Ethernet frame then
- 	 * optimize padding for a 3K buffer instead of a 1.5K buffer.
- 	 *
-@@ -196,9 +198,6 @@ static inline int igb_skb_pad(void)
- }
- 
- #define IGB_SKB_PAD	igb_skb_pad()
--#else
--#define IGB_SKB_PAD	(NET_SKB_PAD + NET_IP_ALIGN)
--#endif
- 
- /* How many Rx Buffers do we bundle into one write to the hardware ? */
- #define IGB_RX_BUFFER_WRITE	16 /* Must be power of 2 */
-@@ -280,7 +279,7 @@ struct igb_tx_buffer {
- struct igb_rx_buffer {
- 	dma_addr_t dma;
- 	struct page *page;
--#if (BITS_PER_LONG > 32) || (PAGE_SIZE >= 65536)
-+#if (BITS_PER_LONG > 32) || (PAGE_SIZE_MAX >= 65536)
- 	__u32 page_offset;
- #else
- 	__u16 page_offset;
-@@ -403,22 +402,20 @@ enum e1000_ring_flags_t {
- 
- static inline unsigned int igb_rx_bufsz(struct igb_ring *ring)
- {
--#if (PAGE_SIZE < 8192)
--	if (ring_uses_large_buffer(ring))
--		return IGB_RXBUFFER_3072;
-+	if (PAGE_SIZE < 8192) {
-+		if (ring_uses_large_buffer(ring))
-+			return IGB_RXBUFFER_3072;
- 
--	if (ring_uses_build_skb(ring))
--		return IGB_MAX_FRAME_BUILD_SKB;
--#endif
-+		if (ring_uses_build_skb(ring))
-+			return IGB_MAX_FRAME_BUILD_SKB;
-+	}
- 	return IGB_RXBUFFER_2048;
- }
- 
- static inline unsigned int igb_rx_pg_order(struct igb_ring *ring)
- {
--#if (PAGE_SIZE < 8192)
--	if (ring_uses_large_buffer(ring))
-+	if (PAGE_SIZE < 8192 && ring_uses_large_buffer(ring))
- 		return 1;
--#endif
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 1ef4cb871452a..4f2c53dece1a2 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -4797,9 +4797,7 @@ void igb_configure_rx_ring(struct igb_adapter *adapter,
- static void igb_set_rx_buffer_len(struct igb_adapter *adapter,
- 				  struct igb_ring *rx_ring)
- {
--#if (PAGE_SIZE < 8192)
- 	struct e1000_hw *hw = &adapter->hw;
--#endif
- 
- 	/* set build_skb and buffer size flags */
- 	clear_ring_build_skb_enabled(rx_ring);
-@@ -4810,12 +4808,11 @@ static void igb_set_rx_buffer_len(struct igb_adapter *adapter,
- 
- 	set_ring_build_skb_enabled(rx_ring);
- 
--#if (PAGE_SIZE < 8192)
--	if (adapter->max_frame_size > IGB_MAX_FRAME_BUILD_SKB ||
-+	if (PAGE_SIZE < 8192 &&
-+	    (adapter->max_frame_size > IGB_MAX_FRAME_BUILD_SKB ||
- 	    IGB_2K_TOO_SMALL_WITH_PADDING ||
--	    rd32(E1000_RCTL) & E1000_RCTL_SBP)
-+	    rd32(E1000_RCTL) & E1000_RCTL_SBP))
- 		set_ring_uses_large_buffer(rx_ring);
--#endif
- }
- 
- /**
-@@ -5314,12 +5311,10 @@ static void igb_set_rx_mode(struct net_device *netdev)
- 				     E1000_RCTL_VFE);
- 	wr32(E1000_RCTL, rctl);
- 
--#if (PAGE_SIZE < 8192)
--	if (!adapter->vfs_allocated_count) {
-+	if (PAGE_SIZE < 8192 && !adapter->vfs_allocated_count) {
- 		if (adapter->max_frame_size <= IGB_MAX_FRAME_BUILD_SKB)
- 			rlpml = IGB_MAX_FRAME_BUILD_SKB;
- 	}
--#endif
- 	wr32(E1000_RLPML, rlpml);
- 
- 	/* In order to support SR-IOV and eventually VMDq it is necessary to set
-@@ -5338,11 +5333,10 @@ static void igb_set_rx_mode(struct net_device *netdev)
- 
- 	/* enable Rx jumbo frames, restrict as needed to support build_skb */
- 	vmolr &= ~E1000_VMOLR_RLPML_MASK;
--#if (PAGE_SIZE < 8192)
--	if (adapter->max_frame_size <= IGB_MAX_FRAME_BUILD_SKB)
-+	if (PAGE_SIZE < 8192 &&
-+	    adapter->max_frame_size <= IGB_MAX_FRAME_BUILD_SKB)
- 		vmolr |= IGB_MAX_FRAME_BUILD_SKB;
- 	else
--#endif
- 		vmolr |= MAX_JUMBO_FRAME_SIZE;
- 	vmolr |= E1000_VMOLR_LPE;
- 
-@@ -8435,17 +8429,17 @@ static bool igb_can_reuse_rx_page(struct igb_rx_buffer *rx_buffer,
- 	if (!dev_page_is_reusable(page))
- 		return false;
- 
--#if (PAGE_SIZE < 8192)
--	/* if we are only owner of page we can reuse it */
--	if (unlikely((rx_buf_pgcnt - pagecnt_bias) > 1))
--		return false;
--#else
-+	if (PAGE_SIZE < 8192) {
-+		/* if we are only owner of page we can reuse it */
-+		if (unlikely((rx_buf_pgcnt - pagecnt_bias) > 1))
-+			return false;
-+	} else {
- #define IGB_LAST_OFFSET \
- 	(SKB_WITH_OVERHEAD(PAGE_SIZE) - IGB_RXBUFFER_2048)
- 
--	if (rx_buffer->page_offset > IGB_LAST_OFFSET)
--		return false;
--#endif
-+		if (rx_buffer->page_offset > IGB_LAST_OFFSET)
-+			return false;
-+	}
- 
- 	/* If we have drained the page fragment pool we need to update
- 	 * the pagecnt_bias and page count so that we fully restock the
-@@ -8473,20 +8467,22 @@ static void igb_add_rx_frag(struct igb_ring *rx_ring,
- 			    struct sk_buff *skb,
- 			    unsigned int size)
- {
--#if (PAGE_SIZE < 8192)
--	unsigned int truesize = igb_rx_pg_size(rx_ring) / 2;
--#else
--	unsigned int truesize = ring_uses_build_skb(rx_ring) ?
-+	unsigned int truesize;
-+
-+	if (PAGE_SIZE < 8192)
-+		truesize = igb_rx_pg_size(rx_ring) / 2;
-+	else
-+		truesize = ring_uses_build_skb(rx_ring) ?
- 				SKB_DATA_ALIGN(IGB_SKB_PAD + size) :
- 				SKB_DATA_ALIGN(size);
--#endif
-+
- 	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buffer->page,
- 			rx_buffer->page_offset, size, truesize);
--#if (PAGE_SIZE < 8192)
--	rx_buffer->page_offset ^= truesize;
--#else
--	rx_buffer->page_offset += truesize;
--#endif
-+
-+	if (PAGE_SIZE < 8192)
-+		rx_buffer->page_offset ^= truesize;
-+	else
-+		rx_buffer->page_offset += truesize;
- }
- 
- static struct sk_buff *igb_construct_skb(struct igb_ring *rx_ring,
-@@ -8494,16 +8490,16 @@ static struct sk_buff *igb_construct_skb(struct igb_ring *rx_ring,
- 					 struct xdp_buff *xdp,
- 					 ktime_t timestamp)
- {
--#if (PAGE_SIZE < 8192)
--	unsigned int truesize = igb_rx_pg_size(rx_ring) / 2;
--#else
--	unsigned int truesize = SKB_DATA_ALIGN(xdp->data_end -
--					       xdp->data_hard_start);
--#endif
- 	unsigned int size = xdp->data_end - xdp->data;
-+	unsigned int truesize;
- 	unsigned int headlen;
- 	struct sk_buff *skb;
- 
-+	if (PAGE_SIZE < 8192)
-+		truesize = igb_rx_pg_size(rx_ring) / 2;
-+	else
-+		truesize = SKB_DATA_ALIGN(xdp->data_end - xdp->data_hard_start);
-+
- 	/* prefetch first cache line of first page */
- 	net_prefetch(xdp->data);
- 
-@@ -8529,11 +8525,10 @@ static struct sk_buff *igb_construct_skb(struct igb_ring *rx_ring,
- 		skb_add_rx_frag(skb, 0, rx_buffer->page,
- 				(xdp->data + headlen) - page_address(rx_buffer->page),
- 				size, truesize);
--#if (PAGE_SIZE < 8192)
--		rx_buffer->page_offset ^= truesize;
--#else
--		rx_buffer->page_offset += truesize;
--#endif
-+		if (PAGE_SIZE < 8192)
-+			rx_buffer->page_offset ^= truesize;
-+		else
-+			rx_buffer->page_offset += truesize;
- 	} else {
- 		rx_buffer->pagecnt_bias++;
- 	}
-@@ -8546,16 +8541,17 @@ static struct sk_buff *igb_build_skb(struct igb_ring *rx_ring,
- 				     struct xdp_buff *xdp,
- 				     ktime_t timestamp)
- {
--#if (PAGE_SIZE < 8192)
--	unsigned int truesize = igb_rx_pg_size(rx_ring) / 2;
--#else
--	unsigned int truesize = SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) +
--				SKB_DATA_ALIGN(xdp->data_end -
--					       xdp->data_hard_start);
--#endif
- 	unsigned int metasize = xdp->data - xdp->data_meta;
-+	unsigned int truesize;
- 	struct sk_buff *skb;
- 
-+	if (PAGE_SIZE < 8192)
-+		truesize = igb_rx_pg_size(rx_ring) / 2;
-+	else
-+		truesize = SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) +
-+			   SKB_DATA_ALIGN(xdp->data_end -
-+					  xdp->data_hard_start);
-+
- 	/* prefetch first cache line of first page */
- 	net_prefetch(xdp->data_meta);
- 
-@@ -8575,11 +8571,10 @@ static struct sk_buff *igb_build_skb(struct igb_ring *rx_ring,
- 		skb_hwtstamps(skb)->hwtstamp = timestamp;
- 
- 	/* update buffer offset */
--#if (PAGE_SIZE < 8192)
--	rx_buffer->page_offset ^= truesize;
--#else
--	rx_buffer->page_offset += truesize;
--#endif
-+	if (PAGE_SIZE < 8192)
-+		rx_buffer->page_offset ^= truesize;
-+	else
-+		rx_buffer->page_offset += truesize;
- 
- 	return skb;
- }
-@@ -8634,14 +8629,14 @@ static unsigned int igb_rx_frame_truesize(struct igb_ring *rx_ring,
- {
- 	unsigned int truesize;
- 
--#if (PAGE_SIZE < 8192)
--	truesize = igb_rx_pg_size(rx_ring) / 2; /* Must be power-of-2 */
--#else
--	truesize = ring_uses_build_skb(rx_ring) ?
--		SKB_DATA_ALIGN(IGB_SKB_PAD + size) +
--		SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) :
--		SKB_DATA_ALIGN(size);
--#endif
-+	if (PAGE_SIZE < 8192)
-+		truesize = igb_rx_pg_size(rx_ring) / 2; /* Must be power-of-2 */
-+	else
-+		truesize = ring_uses_build_skb(rx_ring) ?
-+			SKB_DATA_ALIGN(IGB_SKB_PAD + size) +
-+			SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) :
-+			SKB_DATA_ALIGN(size);
-+
- 	return truesize;
- }
- 
-@@ -8650,11 +8645,11 @@ static void igb_rx_buffer_flip(struct igb_ring *rx_ring,
- 			       unsigned int size)
- {
- 	unsigned int truesize = igb_rx_frame_truesize(rx_ring, size);
--#if (PAGE_SIZE < 8192)
--	rx_buffer->page_offset ^= truesize;
--#else
--	rx_buffer->page_offset += truesize;
--#endif
-+
-+	if (PAGE_SIZE < 8192)
-+		rx_buffer->page_offset ^= truesize;
-+	else
-+		rx_buffer->page_offset += truesize;
- }
- 
- static inline void igb_rx_checksum(struct igb_ring *ring,
-@@ -8825,12 +8820,12 @@ static struct igb_rx_buffer *igb_get_rx_buffer(struct igb_ring *rx_ring,
- 	struct igb_rx_buffer *rx_buffer;
- 
- 	rx_buffer = &rx_ring->rx_buffer_info[rx_ring->next_to_clean];
--	*rx_buf_pgcnt =
--#if (PAGE_SIZE < 8192)
--		page_count(rx_buffer->page);
--#else
--		0;
--#endif
-+
-+	if (PAGE_SIZE < 8192)
-+		*rx_buf_pgcnt = page_count(rx_buffer->page);
-+	else
-+		*rx_buf_pgcnt = 0;
-+
- 	prefetchw(rx_buffer->page);
- 
- 	/* we are reusing so sync this buffer for CPU use */
-@@ -8881,9 +8876,8 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
- 	int rx_buf_pgcnt;
- 
- 	/* Frame size depend on rx_ring setup when PAGE_SIZE=4K */
--#if (PAGE_SIZE < 8192)
--	frame_sz = igb_rx_frame_truesize(rx_ring, 0);
--#endif
-+	if (PAGE_SIZE < 8192)
-+		frame_sz = igb_rx_frame_truesize(rx_ring, 0);
- 	xdp_init_buff(&xdp, frame_sz, &rx_ring->xdp_rxq);
- 
- 	while (likely(total_packets < budget)) {
-@@ -8932,10 +8926,9 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
- 
- 			xdp_prepare_buff(&xdp, hard_start, offset, size, true);
- 			xdp_buff_clear_frags_flag(&xdp);
--#if (PAGE_SIZE > 4096)
- 			/* At larger PAGE_SIZE, frame_sz depend on len size */
--			xdp.frame_sz = igb_rx_frame_truesize(rx_ring, size);
--#endif
-+			if (PAGE_SIZE > 4096)
-+				xdp.frame_sz = igb_rx_frame_truesize(rx_ring, size);
- 			skb = igb_run_xdp(adapter, rx_ring, &xdp);
- 		}
- 
--- 
-2.43.0
+> +	u32 length = 0, offset = 0;
+> +	struct fbnic_tlv_msg *msg;
+> +	int err;
+> +
+> +	/* Start by attempting to allocate a response to the message */
+> +	msg = fbnic_tlv_msg_alloc(FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_RESP);
+> +	if (!msg)
+> +		return -ENOMEM;
+> +
+> +	/* Verify we have a completion pointer */
+> +	cmpl_data = READ_ONCE(fbd->cmpl_data);
+> +	if (!cmpl_data ||
+> +	    cmpl_data->msg_type != FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ) {
+> +		err = -ENOSPC;
+> +		goto msg_err;
+> +	}
+> +
+> +	/* Notify FW if the data link has been severed */
+> +	if (!cmpl_data->fw_update.data) {
+> +		err = -ECANCELED;
+> +		goto msg_err;
+> +	}
+> +
+> +	/* Pull length/offset pair and mark it as complete */
+> +	get_unsigned_result(FBNIC_FW_WRITE_CHUNK_OFFSET, offset);
+> +	get_unsigned_result(FBNIC_FW_WRITE_CHUNK_LENGTH, length);
+> +
+> +	/* Record offset and length for the response */
+> +	if (offset) {
+> +		err = fbnic_tlv_attr_put_int(msg, FBNIC_FW_WRITE_CHUNK_OFFSET,
+> +					     offset);
+> +		if (err)
+> +			goto msg_err;
+> +	}
+> +
+> +	err = fbnic_tlv_attr_put_int(msg, FBNIC_FW_WRITE_CHUNK_LENGTH,
+> +				     length);
+> +	if (err)
+> +		goto msg_err;
+> +
+> +	/* Verify length */
+> +	if (!length || length > TLV_MAX_DATA) {
+> +		err = -EINVAL;
+> +		goto msg_err;
+> +	}
+> +
+> +	/* Verify offset and length are within bounds */
+> +	if (offset >= cmpl_data->fw_update.size ||
+> +	    offset + length > cmpl_data->fw_update.size) {
+> +		err = -EFAULT;
+> +		goto msg_err;
+> +	}
+> +
+> +	/* Add outbound data to message */
+> +	err = fbnic_tlv_attr_put_value(msg, FBNIC_FW_WRITE_CHUNK_DATA,
+> +				       cmpl_data->fw_update.data + offset,
+> +				       length);
+> +
+> +	/* Notify the waiting thread that we processed a message */
+> +	if (!err)
+> +		cmpl_data->fw_update.last_offset = offset;
+> +
+> +	cmpl_data->result = err;
+> +	complete(&cmpl_data->done);
+> +
+> +msg_err:
+> +	/* Report error to FW if one occurred */
+> +	if (err)
+> +		fbnic_tlv_attr_put_int(msg, FBNIC_FW_WRITE_CHUNK_ERROR, err);
+> +
+> +	/* Map and send the response */
+> +	err = fbnic_mbx_map_tlv_msg(fbd, msg);
+> +	if (err)
+> +		free_page((unsigned long)msg);
+> +
+> +	return err;
+> +}
+> +
+> +static const struct fbnic_tlv_index fbnic_fw_verify_image_resp_index[] = {
+> +	FBNIC_TLV_ATTR_S32(FBNIC_FW_VERIFY_IMAGE_ERROR),
+> +	FBNIC_TLV_ATTR_LAST
+> +};
+> +
+> +static int fbnic_fw_parse_fw_verify_image_resp(void *opaque,
+> +					       struct fbnic_tlv_msg **results)
+> +{
+> +	struct fbnic_dev *fbd = opaque;
+> +	struct fbnic_fw_completion *cmpl_data;
+
+.. and again..
+
+> +	int err = 0;
+> +
+> +	/* Verify we have a completion pointer */
+> +	cmpl_data = READ_ONCE(fbd->cmpl_data);
+> +	if (!cmpl_data ||
+> +	    cmpl_data->msg_type != FBNIC_TLV_MSG_ID_FW_VERIFY_IMAGE_RESP)
+> +		return -ENOSPC;
+> +
+> +	/* Check for errors */
+> +	get_signed_result(FBNIC_FW_VERIFY_IMAGE_ERROR, err);
+> +
+> +	cmpl_data->result = err;
+> +	complete(&cmpl_data->done);
+> +
+> +	return err;
+> +}
+> +
+> +static const struct fbnic_tlv_index fbnic_fw_finish_upgrade_req_index[] = {
+> +	FBNIC_TLV_ATTR_S32(FBNIC_FW_FINISH_UPGRADE_ERROR),
+> +	FBNIC_TLV_ATTR_LAST
+> +};
+> +
+> +static int fbnic_fw_parse_fw_finish_upgrade_req(void *opaque,
+> +						struct fbnic_tlv_msg **results)
+> +{
+> +	struct fbnic_dev *fbd = opaque;
+> +	struct fbnic_fw_completion *cmpl_data;
+
+...and again...
+
+> +	int err = 0;
+> +
+> +	/* Verify we have a completion pointer */
+> +	cmpl_data = READ_ONCE(fbd->cmpl_data);
+> +	if (!cmpl_data ||
+> +	    cmpl_data->msg_type != FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ)
+> +		return -ENOSPC;
+> +
+> +	/* Check for errors */
+> +	get_signed_result(FBNIC_FW_FINISH_UPGRADE_ERROR, err);
+> +
+> +	/* Close out update by clearing data pointer */
+> +	cmpl_data->fw_update.last_offset = cmpl_data->fw_update.size;
+> +	cmpl_data->fw_update.data = NULL;
+> +
+> +	cmpl_data->result = err;
+> +	complete(&cmpl_data->done);
+> +
+> +	return 0;
+> +}
+> +
+>   static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
+>   	FBNIC_TLV_PARSER(FW_CAP_RESP, fbnic_fw_cap_resp_index,
+>   			 fbnic_fw_parse_cap_resp),
+> @@ -658,6 +909,18 @@ static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
+>   			 fbnic_fw_parse_ownership_resp),
+>   	FBNIC_TLV_PARSER(HEARTBEAT_RESP, fbnic_heartbeat_resp_index,
+>   			 fbnic_fw_parse_heartbeat_resp),
+> +	FBNIC_TLV_PARSER(FW_START_UPGRADE_RESP,
+> +			 fbnic_fw_start_upgrade_resp_index,
+> +			 fbnic_fw_parse_fw_start_upgrade_resp),
+> +	FBNIC_TLV_PARSER(FW_WRITE_CHUNK_REQ,
+> +			 fbnic_fw_write_chunk_req_index,
+> +			 fbnic_fw_parse_fw_write_chunk_req),
+> +	FBNIC_TLV_PARSER(FW_VERIFY_IMAGE_RESP,
+> +			 fbnic_fw_verify_image_resp_index,
+> +			 fbnic_fw_parse_fw_verify_image_resp),
+> +	FBNIC_TLV_PARSER(FW_FINISH_UPGRADE_REQ,
+> +			 fbnic_fw_finish_upgrade_req_index,
+> +			 fbnic_fw_parse_fw_finish_upgrade_req),
+>   	FBNIC_TLV_MSG_ERROR
+>   };
+> 
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> index 221faf8c6756..a638d73d2da5 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> @@ -44,6 +44,19 @@ struct fbnic_fw_cap {
+>   	u8	link_fec;
+>   };
+> 
+> +struct fbnic_fw_completion {
+> +	u32 msg_type;
+> +	struct completion done;
+> +	int result;
+> +	union {
+> +		struct {
+> +			u32 size;
+> +			u32 last_offset;
+> +			const u8 *data;
+> +		} fw_update;
+> +	};
+> +};
+> +
+>   void fbnic_mbx_init(struct fbnic_dev *fbd);
+>   void fbnic_mbx_clean(struct fbnic_dev *fbd);
+>   void fbnic_mbx_poll(struct fbnic_dev *fbd);
+> @@ -52,6 +65,9 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
+>   int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership);
+>   int fbnic_fw_init_heartbeat(struct fbnic_dev *fbd, bool poll);
+>   void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd);
+> +int fbnic_fw_xmit_fw_start_upgrade(struct fbnic_dev *fbd,
+> +				   struct fbnic_fw_completion *cmpl_data,
+> +				   unsigned int id, unsigned int len);
+> 
+>   #define fbnic_mk_full_fw_ver_str(_rev_id, _delim, _commit, _str, _str_sz) \
+>   do {									\
+> @@ -67,6 +83,15 @@ do {									\
+>   #define fbnic_mk_fw_ver_str(_rev_id, _str) \
+>   	fbnic_mk_full_fw_ver_str(_rev_id, "", "", _str, sizeof(_str))
+> 
+> +enum {
+> +	QSPI_SECTION_CMRT			= 0,
+> +	QSPI_SECTION_CONTROL_FW			= 1,
+> +	QSPI_SECTION_UCODE			= 2,
+> +	QSPI_SECTION_OPTION_ROM			= 3,
+> +	QSPI_SECTION_USER			= 4,
+> +	QSPI_SECTION_INVALID,
+> +};
+> +
+>   #define FW_HEARTBEAT_PERIOD		(10 * HZ)
+> 
+>   enum {
+> @@ -76,6 +101,14 @@ enum {
+>   	FBNIC_TLV_MSG_ID_OWNERSHIP_RESP			= 0x13,
+>   	FBNIC_TLV_MSG_ID_HEARTBEAT_REQ			= 0x14,
+>   	FBNIC_TLV_MSG_ID_HEARTBEAT_RESP			= 0x15,
+> +	FBNIC_TLV_MSG_ID_FW_START_UPGRADE_REQ		= 0x22,
+> +	FBNIC_TLV_MSG_ID_FW_START_UPGRADE_RESP		= 0x23,
+> +	FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ		= 0x24,
+> +	FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_RESP		= 0x25,
+> +	FBNIC_TLV_MSG_ID_FW_VERIFY_IMAGE_REQ		= 0x26,
+> +	FBNIC_TLV_MSG_ID_FW_VERIFY_IMAGE_RESP		= 0x27,
+> +	FBNIC_TLV_MSG_ID_FW_FINISH_UPGRADE_REQ		= 0x28,
+> +	FBNIC_TLV_MSG_ID_FW_FINISH_UPGRADE_RESP		= 0x29,
+>   };
+> 
+>   #define FBNIC_FW_CAP_RESP_VERSION_MAJOR		CSR_GENMASK(31, 24)
+> @@ -121,4 +154,30 @@ enum {
+>   	FBNIC_FW_OWNERSHIP_FLAG			= 0x0,
+>   	FBNIC_FW_OWNERSHIP_MSG_MAX
+>   };
+> +
+> +enum {
+> +	FBNIC_FW_START_UPGRADE_ERROR		= 0x0,
+> +	FBNIC_FW_START_UPGRADE_SECTION		= 0x1,
+> +	FBNIC_FW_START_UPGRADE_IMAGE_LENGTH	= 0x2,
+> +	FBNIC_FW_START_UPGRADE_MSG_MAX
+> +};
+> +
+> +enum {
+> +	FBNIC_FW_WRITE_CHUNK_OFFSET		= 0x0,
+> +	FBNIC_FW_WRITE_CHUNK_LENGTH		= 0x1,
+> +	FBNIC_FW_WRITE_CHUNK_DATA		= 0x2,
+> +	FBNIC_FW_WRITE_CHUNK_ERROR		= 0x3,
+> +	FBNIC_FW_WRITE_CHUNK_MSG_MAX
+> +};
+> +
+> +enum {
+> +	FBNIC_FW_VERIFY_IMAGE_ERROR		= 0x0,
+> +	FBNIC_FW_VERIFY_IMAGE_MSG_MAX
+> +};
+> +
+> +enum {
+> +	FBNIC_FW_FINISH_UPGRADE_ERROR		= 0x0,
+> +	FBNIC_FW_FINISH_UPGRADE_MSG_MAX
+> +};
+> +
+>   #endif /* _FBNIC_FW_H_ */
+> --
+> 2.43.5
 
 
