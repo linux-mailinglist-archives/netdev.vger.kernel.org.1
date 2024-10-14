@@ -1,95 +1,91 @@
-Return-Path: <netdev+bounces-135021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C190699BDDF
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 04:40:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE2699BDF2
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 643731F23CB8
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 02:40:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63D0E28209F
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 03:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC24450F2;
-	Mon, 14 Oct 2024 02:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eN0zs3UL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538283CF73;
+	Mon, 14 Oct 2024 03:04:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D09231C98;
-	Mon, 14 Oct 2024 02:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BA5196;
+	Mon, 14 Oct 2024 03:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728873643; cv=none; b=U6j8D6XMKlJi/Xxr6FHKMsR1O8GxDz+ntS68n8JvyowchsApp7ts3OtYifqy4pChjjoa1ELhKExrHrs8KBx8uJ1cmQwdFV/wB+wXJg0C5vw7m6jvXCDcQHgEZvwpsQBHHQSeri6aKEacYPZVHZ/0+nLapbvES//JO7VcnSEjccc=
+	t=1728875046; cv=none; b=a/dTDeBjvdhWXL8PHohb6BgEDplJS4SbZSi1S9xAwEkJK72gDLNJZFbgzifb58WauvOv6ok1bqI1rESbGiqubdnrNRTU1qPQEPvMXu+WpzV2lrydL4E4ZrnSVigQtydhnNTAPsu/tYlXqdNt0292dkzWR84VyL2SJSZ9sGu5338=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728873643; c=relaxed/simple;
-	bh=t3kb3sk3nqXksOWZLn1m/EtCh5AmbMgfAQEMRKM1ZRI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ANWYP4yfQHR1OVrtS1wT55vG+5zNBn2abSclUwcHN607QHqlrYdYxddJhGMl6+LwzpEyzGBw1eKEiVhpiv1KAbwBqntIFgE9bKAq/9yQ/BvuUeN9Pfra0ie+JAv4LXmn03NFxJa6fsD0mmei2jDpXC38Q2ii1kh3avSXONDQAgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eN0zs3UL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CB5C4CEC5;
-	Mon, 14 Oct 2024 02:40:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728873642;
-	bh=t3kb3sk3nqXksOWZLn1m/EtCh5AmbMgfAQEMRKM1ZRI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eN0zs3UL9eRaqhRbmdwyhzx/ttdYM0zrJxkW3sPjblMLsAyDXb3SkCITlfm3/ihxa
-	 5zK0iJLinjNx60SVgQAZuf7/EEH4eG6OkEb9SMUBbbKYz3vqX9AusGkPKz3dpSwwXo
-	 oqqDwIFPzGaK852yFdmsDshH7TZ4SC5+6XcneIXuChyjXUJ0NAnc6yfBt/+dw0EGIi
-	 3tlfsVjDppKC6Ish+xsLG/tytM4zoeSHzsvHVyK+Heoz/lKxNbqAMbpiQQD27qfaX8
-	 wp5r8OytSWVZqb8M4aFkkYys8ytTM5p/0e87lI/rbAN3pdhsYXRCJjiWCv8qCengDB
-	 4icx3XxsFlPbw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF0238111D2;
-	Mon, 14 Oct 2024 02:40:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1728875046; c=relaxed/simple;
+	bh=wi//xKA17vRkcbTb40CDhI5yUW/c0y31lrn/7YX8/Ys=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jidrrh0X75Ya0S5WKfLGIuG4JZY708doPyWFJX+Tc7oKNAal6GDAAnU+LkC9nIPFLw93WIgsLaOSmNJ8R4yI0/a4wVi+pQh0wkFg1E2wmX6321rXFOqueOVSDOwoV7eQ+xNroF6uB8x+3ltcH+gviFhp8fiewt1NuVCgsDEO4sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9a0ef5179dso72507566b.1;
+        Sun, 13 Oct 2024 20:04:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728875042; x=1729479842;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wi//xKA17vRkcbTb40CDhI5yUW/c0y31lrn/7YX8/Ys=;
+        b=dmyfYtCU1dhNC5L0OT9a2cpT5ZrsqlxxA7T4DDQUCXREetaDYpO6VFBreMWueUiHuG
+         E63kv/88zXMqnKXw41KAdBVLIVn+QMeuXrDw9Hc5Ji6micRswSkfTSLKyj6naO/DylO7
+         YVWj5maurl7uHXY7s1pPaRh8ZMORhLiVnKjdb+Nd8xkCshngEe88KaC67KWYtuBzVJGQ
+         iqDrcBQKDPHOJVQbdF0gYhG6de5RaCl22WGuTePHBmyU9YCn6rlv3N5BKeODUt4G7bSg
+         wiKKqvXif6+e2aMCRg5vemK4NfRzkolxzW0UxzQxHpZmrJcHxjMJ/nAHnwoF2BQv9eLX
+         7c7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUbW0pjVYzq4/ipE8SbdvMMtNQ7fCBblWtQiJFTffyzXAu2H/UvYRDkKrjTyQHF9hzJhxqmrPRr@vger.kernel.org, AJvYcCUqnxA7WW/p7DQuJzf+LiEqs1sJLWifDe5eyiRTUCwjPVROpvO5G2cvQZwgoKlW7K9g3mezcJ+awJEvG2/dMv0=@vger.kernel.org, AJvYcCX2yXFKcJYSS5ObWPXKWm2QH9BuFf1LJ1QeKqdS3+d1PVuLO8SUAyQlQA75KgxWGiDpd+a6dLBSfAJG@vger.kernel.org, AJvYcCXZIB9VxP74OBl1EW7bgXzWsWmOD5MSlEmyDawl3DkDCj8hwEDsnJiCN7oyWJhvlf5bJtgCQfaQJ0tGQ/15@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7vbP85qbKacFkQ4TXfjcJGWDiR+tiwK1Mx9CasZix9GsFJ+I1
+	joIzhyMFs4sbpFcDYnK+TZhDp4vu+xmaQ2c1eEfP6K4XG6BpIhx1e6R1g2/C49CKMzbiql2xN/a
+	L0YOhIco/wM8rITA18aWz+hnkc8Y=
+X-Google-Smtp-Source: AGHT+IFNiMGbY/5Zo805pZfKtRSxuh/9OJ5e3DgonSSpqNK1J1+bOAyc8dhhBwU4LB+KnrEKnjMkRHHeVnQRBcJhBGw=
+X-Received: by 2002:a17:907:3e23:b0:a99:43e1:21ad with SMTP id
+ a640c23a62f3a-a99b9585822mr939308266b.45.1728875042463; Sun, 13 Oct 2024
+ 20:04:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/2] ethtool: Add support for writing firmware
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172887364748.3904732.16162419800738341582.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Oct 2024 02:40:47 +0000
-References: <20241009105347.2863905-1-danieller@nvidia.com>
-In-Reply-To: <20241009105347.2863905-1-danieller@nvidia.com>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, yuehaibing@huawei.com, horms@kernel.org,
- linux-kernel@vger.kernel.org, petrm@nvidia.com
+References: <20241013201704.49576-1-Julia.Lawall@inria.fr> <20241013201704.49576-11-Julia.Lawall@inria.fr>
+In-Reply-To: <20241013201704.49576-11-Julia.Lawall@inria.fr>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Mon, 14 Oct 2024 12:03:51 +0900
+Message-ID: <CAMZ6RqL2+srRF15spoLqXhe40w02TEDpAzb+gnbVgD-os-f87Q@mail.gmail.com>
+Subject: Re: [PATCH 10/17] can: gw: replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+To: Julia Lawall <Julia.Lawall@inria.fr>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, kernel-janitors@vger.kernel.org, vbabka@suse.cz, 
+	"Paul E . McKenney" <paulmck@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-can <linux-can@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hi Julia,
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Thanks for the patch.
 
-On Wed, 9 Oct 2024 13:53:45 +0300 you wrote:
-> In the CMIS specification for pluggable modules, LPL (Local Payload) and
-> EPL (Extended Payload) are two types of data payloads used for managing
-> various functions and features of the module.
-> 
-> EPL payloads are used for more complex and extensive management functions
-> that require a larger amount of data, so writing firmware blocks using EPL
-> is much more efficient.
-> 
-> [...]
+On Mon. 14 Oct. 2024, 05:21, Julia Lawall <Julia.Lawall@inria.fr> wrote:
+> Since SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
+>
+> The changes were made using Coccinelle.
+>
+> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
-Here is the summary with links:
-  - [net-next,v5,1/2] net: ethtool: Add new parameters and a function to support EPL
-    https://git.kernel.org/netdev/net-next/c/edc344568922
-  - [net-next,v5,2/2] net: ethtool: Add support for writing firmware blocks using EPL payload
-    https://git.kernel.org/netdev/net-next/c/9a3b0d078bd8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
