@@ -1,73 +1,71 @@
-Return-Path: <netdev+bounces-135273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C68F99D50F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:56:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0F0399D515
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 18:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31BF21C21830
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 16:56:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20DF81C21B0A
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 16:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41F21BB6BB;
-	Mon, 14 Oct 2024 16:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE201BD00A;
+	Mon, 14 Oct 2024 16:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ctQVpgpY"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EdxZoV14"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A901AD3F6
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE271AD3F6
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 16:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728924989; cv=none; b=MlHDBsGUK5AdFTFWeCBrgadVzWLAA/RI6a+eE3Ce6kQvTIywIPgY3B1wh/16ZcxX6Ih2oas6CPinidJYEN6KS7vhSXNIfGe1N6FtJXg8yXna/Q8c5I2zd0CLb14/X6ZBnRL9gZpJ4hAewy35a9+LgLLr/6PyerUqtxrKXxtcDGk=
+	t=1728925171; cv=none; b=dZ7rnrk/YqdNqZqiM+vXUgE5LmUSXK9dwb/c2AzB78txM5l+z0QNBcQRFgUapC0K0PbNzZy9E1ng3w5zeXm7jphDRY8Ca29D38wfr317aq1tZPJ/cCN6RUMX2T6TtsLQiJH9MI/d/q195XKtoEpBIrg4//c+yuG+YRvLgNF9zrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728924989; c=relaxed/simple;
-	bh=k8fFu63Mnqa9R96BH6wgTaXjgAGSuyRmS3aedznynuQ=;
+	s=arc-20240116; t=1728925171; c=relaxed/simple;
+	bh=IAEXoTKbuaet2ein7Is+rP2m/6PrfzTUYg6uUkxmlBw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MuHSnrta2TezcLC731MwtlUdtxStP3efTcnc0w1GX9TagiEem/9GOXG4Pov0AWOEB54hmXF9mRPK8WhMsc+U2jvrdmgtwxnRVNAGtzPYsisYhTtlcHAUodCp8gwn6IK5i7Ma0wC4Y9yyGo9/L+oAcSqoqLIXjUICUD7BdmsOcjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ctQVpgpY; arc=none smtp.client-ip=209.85.214.172
+	 In-Reply-To:Content-Type; b=kszOxEhIbDNp1EaFzpy6VsRrxpDJOaOopJsVnhrQV/o4nvtK94guNFxlP4zHc+Fit2R/hVggWuIIqTC0NHmK4Zoh9O/V7vvWijk9hUp+wFZkvPNHht8l4ES+oAWgRSjNC0ep9uVeaqMpCBHZIBxOHOaMPPcPwjo4XDRJ7FQXD0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EdxZoV14; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-20bb39d97d1so37938365ad.2
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:56:27 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71e6f1a5a19so486022b3a.3
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:59:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728924987; x=1729529787; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1728925169; x=1729529969; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XshrvEkrWmKQRy64hShoDm58Lk89RKJKAsS7vcs1Ows=;
-        b=ctQVpgpYbs9koz11JffTjs34OqY+lbUI92CTXcGHQLnBTVUBCqMZ++ohQrjcqj28F+
-         NPFfh8UrU7GuBsIWtQ9x8m6hdfCzkHKALZD0/M/ngD4BvBcl87pyB/GdXf5XFzafbfEf
-         PhyM1mRHzA9GRziIf5ykIJFKoyYngoL0fMDyM=
+        bh=O1syxfSnQyHySLm6XoSC5cHIpkKL030ar0h5eOxBwi4=;
+        b=EdxZoV141w1RPTgZ/TlvpFH19M5nvlZ3H6aNaMISNWevPppLQfau/AjgN2Jn2+d8nL
+         iBiSqIbrq9elxYiHsUK5dgFQznlCZBthJA0/wK435Y/YMpLLuE/rah6Z/6yiB8g/lb0I
+         yIMTBuPOmdn5tvMQm9bKGS/kOFJjVQyJJe5EY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728924987; x=1729529787;
+        d=1e100.net; s=20230601; t=1728925169; x=1729529969;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XshrvEkrWmKQRy64hShoDm58Lk89RKJKAsS7vcs1Ows=;
-        b=Y6hYjFACo2hjMhVuLscg/d97uW2rs0Y+ooHmWmqifRqYS3l+5nbaU7r01LXjj7K98p
-         kOpjyzfpcvJ2J1uNtKuDRLPXi7JshRdctRmEIhwaBisv7wqGqCEoNYOeWO+Dij3RCcJf
-         WA1YvPtJijZicX3duMD6cKGBFWP19jOkDI86Q/NIuo7ILsj8FZcmfhrYtaf5KBNiGJHS
-         Lg49cJisNYVenDRVewrVTdGBWMOzaflrmRS1LLdJqwYPsZekcyE53xRmWQYiFQEVdjAi
-         i5r+z5ho9bEfsyXFMPZXIPLFxpMHPP0UDKyAYsfjJ9U4xnXmSYu2yminRorFddpNliFe
-         4MeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIKUyAydw0/2xFWodvbSxp3x8Fdlqaztg6WTbKEmVL1Su4DY3IXdH9tPgFKehElfmB7WFlAnA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfU15ZI4qXmlIcxribU9TsSSTXlcgM6khsnLQ9Tz+/C/VRsSdU
-	fayq1MbrpHW3UxAT8aoYJsbR+s6cwLFH6jZmlncNZ+5eL5esi0CGHTCsDf7b44MwZvOdLDWf5F6
-	eHg==
-X-Google-Smtp-Source: AGHT+IEBwtkMuz59Zc84AsR0slLKr5kYtqrxnj7DgZmB2A+4e91Eecm9SOzZie3yc4k87AzSEQqbPg==
-X-Received: by 2002:a17:903:190:b0:20c:f648:e39e with SMTP id d9443c01a7336-20cf648e4f7mr36987285ad.58.1728924987323;
-        Mon, 14 Oct 2024 09:56:27 -0700 (PDT)
+        bh=O1syxfSnQyHySLm6XoSC5cHIpkKL030ar0h5eOxBwi4=;
+        b=s1SMc3pwbnVisiy2uM9VqwV0MbIKYbB0xXfrMpnMhd4gAwgMJpdFCC4MDjelav9T7Q
+         /5CLHCMxBt4kPn+pkVKmcpeb2si/UYGBrzr4LBX1kvjUWDjQUD2Wn5KQNGD9OKS0XYC2
+         7qHpKn6hAfLNNrn5Ycws5MJuOQFVQY1TAPbZx9Gh+wl9XzVz+sBBxNMAxwdc/kMbnXlq
+         wbk49VV83BwdeaHazmCy1W0no/xLqdwc/jTMUNzaSYS5lPv9wn6acM0VVUtBeohs1Zvf
+         Uj88uuQmVmy6cLKPOZStHQuJ3W7NU4PgeiB8bc84GtX9UyHTTSbfl691GhYZ33ICmW37
+         ewmA==
+X-Gm-Message-State: AOJu0YxXo+APakt2AlpCNWT6BGjNoHFPZivnZMmnLuKtDqteecavlbiW
+	gLWMYabE7cwwrnaoMPmXfRBZKq4nkB6yvtnrAmF4nmAUeEqOxtGzpqIOhh+yNg==
+X-Google-Smtp-Source: AGHT+IGDop3vsO9bjydZXq2P+39lYFaW+oypuSKZBK74M5rCrtPylZjtzOQ5TTC40Pxy+ozQGkW0GA==
+X-Received: by 2002:a05:6a00:1310:b0:71e:cc7:c511 with SMTP id d2e1a72fcca58-71e3807443cmr21479086b3a.23.1728925169376;
+        Mon, 14 Oct 2024 09:59:29 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c0e74d6sm68525565ad.166.2024.10.14.09.56.26
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e3a3b6185sm6296915b3a.38.2024.10.14.09.59.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Oct 2024 09:56:26 -0700 (PDT)
-Message-ID: <c5ffe617-e182-4561-95d4-5f635fda53db@broadcom.com>
-Date: Mon, 14 Oct 2024 09:56:25 -0700
+        Mon, 14 Oct 2024 09:59:28 -0700 (PDT)
+Message-ID: <0c21ac6a-fda4-4924-9ad1-db1b549be418@broadcom.com>
+Date: Mon, 14 Oct 2024 09:59:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,15 +73,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: systemport: avoid build warnings due to
- unused I/O helpers
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org
-References: <20241014150139.927423-1-vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net] net: systemport: fix potential memory leak in
+ bcm_sysport_xmit()
+To: Wang Hai <wanghai38@huawei.com>, bcm-kernel-feedback-list@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, zhangxiaoxu5@huawei.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241014145115.44977-1-wanghai38@huawei.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -118,53 +114,33 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20241014150139.927423-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20241014145115.44977-1-wanghai38@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/14/24 08:01, Vladimir Oltean wrote:
-> A clang-16 W=1 build emits the following (abridged):
+On 10/14/24 07:51, Wang Hai wrote:
+> The bcm_sysport_xmit() returns NETDEV_TX_OK without freeing skb
+> in case of dma_map_single() fails, add dev_kfree_skb() to fix it.
 > 
-> warning: unused function 'txchk_readl' [-Wunused-function]
-> BCM_SYSPORT_IO_MACRO(txchk, SYS_PORT_TXCHK_OFFSET);
-> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
+> Fixes: 80105befdb4b ("net: systemport: add Broadcom SYSTEMPORT Ethernet MAC driver")
+> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+ > --->   drivers/net/ethernet/broadcom/bcmsysport.c | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> warning: unused function 'txchk_writel' [-Wunused-function]
-> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
-> 
-> warning: unused function 'tbuf_readl' [-Wunused-function]
-> BCM_SYSPORT_IO_MACRO(tbuf, SYS_PORT_TBUF_OFFSET);
-> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
-> 
-> warning: unused function 'tbuf_writel' [-Wunused-function]
-> note: expanded from macro 'BCM_SYSPORT_IO_MACRO'
-> 
-> Annotate the functions with the __maybe_unused attribute to tell the
-> compiler it's fine to do dead code elimination, and suppress the
-> warnings.
-> 
-> Also, remove the "inline" keyword from C files, since the compiler is
-> free anyway to inline or not.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
+> index c9faa8540859..0a68b526e4a8 100644
+> --- a/drivers/net/ethernet/broadcom/bcmsysport.c
+> +++ b/drivers/net/ethernet/broadcom/bcmsysport.c
+> @@ -1359,6 +1359,7 @@ static netdev_tx_t bcm_sysport_xmit(struct sk_buff *skb,
+>   		netif_err(priv, tx_err, dev, "DMA map failed at %p (len=%d)\n",
+>   			  skb->data, skb_len);
+>   		ret = NETDEV_TX_OK;
+> +		dev_kfree_skb_any(skb);
 
-clang is adequately warning that the txchk_{read,write}l functions are 
-not used at all, so while your patch is correct, I think we could also 
-go with this one liner in addition, or as a replacement to your patch:
-
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c 
-b/drivers/net/ethernet/broadcom/bcmsysport.c
-index c9faa8540859..7cea30eac83a 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -46,7 +46,6 @@ BCM_SYSPORT_IO_MACRO(umac, SYS_PORT_UMAC_OFFSET);
-  BCM_SYSPORT_IO_MACRO(gib, SYS_PORT_GIB_OFFSET);
-  BCM_SYSPORT_IO_MACRO(tdma, SYS_PORT_TDMA_OFFSET);
-  BCM_SYSPORT_IO_MACRO(rxchk, SYS_PORT_RXCHK_OFFSET);
--BCM_SYSPORT_IO_MACRO(txchk, SYS_PORT_TXCHK_OFFSET);
-  BCM_SYSPORT_IO_MACRO(rbuf, SYS_PORT_RBUF_OFFSET);
-  BCM_SYSPORT_IO_MACRO(tbuf, SYS_PORT_TBUF_OFFSET);
-  BCM_SYSPORT_IO_MACRO(topctrl, SYS_PORT_TOPCTRL_OFFSET);
+Since we already have a private counter tracking DMA mapping errors, I 
+would follow what the driver does elsewhere in the transmit path, 
+especially what bcm_sysport_insert_tsb() does, and just use 
+dev_consume_skb_any() here.
 -- 
 Florian
 
