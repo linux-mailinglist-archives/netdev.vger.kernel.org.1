@@ -1,186 +1,218 @@
-Return-Path: <netdev+bounces-135047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C110499BF6B
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 07:44:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BC599BF70
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 07:49:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCB551C216A0
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:44:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0911C216C4
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE7513B287;
-	Mon, 14 Oct 2024 05:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A29013B792;
+	Mon, 14 Oct 2024 05:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="zA8OwGZW"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cWTYpbQ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.44])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A59633998
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 05:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A08284A2F;
+	Mon, 14 Oct 2024 05:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728884671; cv=none; b=M1Lt+YYHX+Ug1n8pZTfpjdB+UtAt2HYED20RfiuhKxPRvf3giZ0H9WWH3UCcD/3AEMtrtbWihXLYRKkTqhpqecfgVJ9P/45HPqw9+ji6xZIWYMvJuNMEzhKIZBmr5eCbfQWCZSvZ1yA24HkmqbzCxKkUbshhuG+DdMvkaaE7ODg=
+	t=1728884961; cv=none; b=Xes1LXCsZFd2L+2EIRHeeJLdA6F3sKc9F22dkksJ26wZqX1aS0a6SV0552mjBmzYbQH7+TSACVlZDMORduDFF0HVckPDQ0m4MueG7fvXca1fSNHjswyv8tGj8xjG3ZK6VvYYYKbUQIcTUJNmLEVH8tJVgDPhhk79DG7ldvYD6Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728884671; c=relaxed/simple;
-	bh=A3SsPtjELHjf0XPV9pBjDTL4MKNQLICWboT88ToXqbo=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=NZEGcG6w2FR6JH+lYRaLu/Ai3v0AIe7UtRmeMkNXreeS8baxXmQeJiy2NPPbtloz9lkPCUpd99KYFgMjVbGYsz2qu3jpq5m06eBlErNouYc8ad4lkxNzeWS/B8tbKiPLLfNzeTM1iXXcTs6a6Ltln63gFnYJ5nu5BZIuvgczNWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=zA8OwGZW; arc=none smtp.client-ip=43.163.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1728884664; bh=zykUKuNup4jjj1keaoTageR77Aw8N8gLKffRUfbNM1M=;
-	h=From:To:Cc:Subject:Date;
-	b=zA8OwGZWXCukl/ydwSbcvqyD8yX/nPrr3rRtOKEUbdDO9HAr1pikZpE0tgtpNKz75
-	 6K4iwAWtUoDWrmTnkQQ/sjxBLdby+g2f9ZF3Td/wEgu/tZp8kJqX/onO4D8rQTURT7
-	 tQXfZ3wYw13T1cP85vcnGbwMi8QqySuP/wY6Unes=
-Received: from localhost ([58.246.87.66])
-	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
-	id B163EEA5; Mon, 14 Oct 2024 13:44:22 +0800
-X-QQ-mid: xmsmtpt1728884662tem01wy8w
-Message-ID: <tencent_6BF819F333D995B4D3932826194B9B671207@qq.com>
-X-QQ-XMAILINFO: MtZ4zLDUQmWftoaGVfpgi0UBPJG43WK+AXmPEzJmz8wRePCudnUm7nInAQ5bbP
-	 3bpr52/zBq3Ol7pFuvMCyrXQ3A4gTGwORfQbtUhisKL62AXBaEbJbVheb56+27TdtetLkvW2GKGi
-	 op4Y56NyLqjeYzDRZYQZkBL+d21TC1K48LCW2mysmVPWwefd8kmXJXsOtoItoC2GBFqJa+9lgr8m
-	 GilFcQxjLyCigjY+4Pqg5a3aeD5ilzCcul5Ah+wPdWM5ACM9U7ohwkaQ61/UUkIiI3kDnDDiqnVa
-	 UWkq/PMynrkF7GY+Y/GAIy14GbikmFiqUC3XD9VNrvRW8ITkGarq2eZXC0EvLd2q9W800xNA2Wo4
-	 8wrxZ/hc8B2Hjw1ywaPrcIban+k7LuUfXOQaTdEdZB5V0gcPYKqFmYILMmal9En8JpCARi3J4Tsm
-	 7bHilsC7nJvp/TaSCFGBZXQvTZJ+kxAM18XEy6VoI1lhf71xBAbQYvvS+pQx8VX2FKre2pM3vx4w
-	 lxXswVSQctN4fevpryZJ4v4YnbNkq1DfwFDvtFUt9PIuAbHerM/9JN2f76/fy/iaRnfJo3b+Eaq7
-	 MMocBE5Ju2uZshXUKUp+CWaMJK+Sde0/oMKLyQg3YZAsN5lb1bhOgyJwDUhb6gQAOssII7TiA4zq
-	 KHhcYW7XFsvZgmb+uhDK8ngWv0hFwUoyut7mLtnDzSzE/HLZDdIWdohdRCX4UTtTO7NYA+lqTRur
-	 Ohj15rS+Ro6opPCj0c5EEAdn3xnxuxJT5mjrG6NYKPZ1lDMAMmyvjbMUMTvjFMtwudG68BndRDFD
-	 UAzL+EtP/2TgsUgQZ56TO+rb1NOoourF+UH2mrEeiG97wEz6DoPhMODT6mMcLJ/ZemoDHMfuOkmR
-	 QA9nzeCHZqmCVm8ynt8XSZKmiDckIOKsm5GIgatZ7s62RlukwuTMdSCasPT8ACxJyXoujIw19mYI
-	 8U19seLMrdQMnsLB9bu4dfzh3X/LzR
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-From: 2694439648@qq.com
-To: alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	hailong.fan@siengine.com
-Subject: [PATCH] net: stmmac: enable MAC after MTL configuring
-Date: Mon, 14 Oct 2024 13:44:03 +0800
-X-OQ-MSGID: <20241014054403.71750-1-2694439648@qq.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1728884961; c=relaxed/simple;
+	bh=GZPQGeuVLly80GBQ5LNdOoFSVtvCh6X+j4fAOpNl+fw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oNbKFNLg9sHhCyd2xE6AjT9HTxhuPRAXMr7X8o5YaNJ84FC6RpRRLxXrLpcJBtU7NwAUx4Jlx6D/Zo9dWw9edLs1ho3BB+hxKZO+JxisXaJgAbKAeDry7+gLzOYLNJhoAuUR3btj2aSPw5RSgLNvBeuSTsSaD+mZWdIdBymOVOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cWTYpbQ0; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1728884954; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=tgmBE+YRai5Mg3O+pgz5N0iZD5sYwVXA22b3yvk3T5U=;
+	b=cWTYpbQ0TwLtcWFAeba0C+QZuwlfbJdHWzQJIXaauchjNC8CNazF68dyAKRILQr/Vw19XEsHIokrw1h/fIhyCgt/m2tFjCYQWBSPBbbXjfkHFFGPhyz27FiPiPpAgrx64ATAG8o5DQBdeGDoqpMa1ViLvjeUw3fxppSbTvZxQi0=
+Received: from 30.32.80.190(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WH0jDKk_1728884953 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 14 Oct 2024 13:49:14 +0800
+Message-ID: <523f99d8-8b21-48a7-827c-01491994db6f@linux.alibaba.com>
+Date: Mon, 14 Oct 2024 13:49:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: Introduce a hook to modify syn_smc at
+ runtime
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ wintera@linux.ibm.com, guwen@linux.alibaba.com,
+ Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Network Development <netdev@vger.kernel.org>,
+ linux-s390 <linux-s390@vger.kernel.org>, linux-rdma@vger.kernel.org,
+ Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, bpf <bpf@vger.kernel.org>
+References: <1728532691-20044-1-git-send-email-alibuda@linux.alibaba.com>
+ <CAADnVQLXyA__zdDSiTdhaw=dXyfgmkr--cH068JvNK=JAYvRDA@mail.gmail.com>
+ <b5aa477d-a4b1-45cb-af44-bd737504734e@linux.alibaba.com>
+ <CAADnVQLS69MVZwTrek=ixP+1T7=+Fq0_kuOKgqBS+o4UoXMxFw@mail.gmail.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <CAADnVQLS69MVZwTrek=ixP+1T7=+Fq0_kuOKgqBS+o4UoXMxFw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: "hailong.fan" <hailong.fan@siengine.com>
 
-DMA maybe block while ETH is opening,
-Adjust the enable sequence, put the MAC enable last
 
-Signed-off-by: hailong.fan <hailong.fan@siengine.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c   |  8 --------
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c | 12 ------------
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  6 +++---
- 3 files changed, 3 insertions(+), 23 deletions(-)
+On 10/11/24 11:37 PM, Alexei Starovoitov wrote:
+> On Thu, Oct 10, 2024 at 11:44 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
+>>
+>>
+>>
+>> On 10/11/24 12:21 AM, Alexei Starovoitov wrote:
+>>> On Wed, Oct 9, 2024 at 8:58 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
+>>>>
+>>>>
+>>>> +__bpf_hook_start();
+>>>> +
+>>>> +__weak noinline int select_syn_smc(const struct sock *sk, struct sockaddr *peer)
+>>>> +{
+>>>> +       return 1;
+>>>> +}
+>>>> +
+>>>> +__bpf_hook_end();
+>>>> +
+>>>>    int smc_nl_dump_hs_limitation(struct sk_buff *skb, struct netlink_callback *cb)
+>>>>    {
+>>>>           struct smc_nl_dmp_ctx *cb_ctx = smc_nl_dmp_ctx(cb);
+>>>> @@ -156,19 +165,43 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+>>>>           return NULL;
+>>>>    }
+>>>>
+>>>> -static bool smc_hs_congested(const struct sock *sk)
+>>>> +static void smc_openreq_init(struct request_sock *req,
+>>>> +                            const struct tcp_options_received *rx_opt,
+>>>> +                            struct sk_buff *skb, const struct sock *sk)
+>>>>    {
+>>>> +       struct inet_request_sock *ireq = inet_rsk(req);
+>>>> +       struct sockaddr_storage rmt_sockaddr = {};
+>>>>           const struct smc_sock *smc;
+>>>>
+>>>>           smc = smc_clcsock_user_data(sk);
+>>>>
+>>>>           if (!smc)
+>>>> -               return true;
+>>>> +               return;
+>>>>
+>>>> -       if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+>>>> -               return true;
+>>>> +       if (smc->limit_smc_hs && workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+>>>> +               goto out_no_smc;
+>>>>
+>>>> -       return false;
+>>>> +       rmt_sockaddr.ss_family = sk->sk_family;
+>>>> +
+>>>> +       if (rmt_sockaddr.ss_family == AF_INET) {
+>>>> +               struct sockaddr_in *rmt4_sockaddr =  (struct sockaddr_in *)&rmt_sockaddr;
+>>>> +
+>>>> +               rmt4_sockaddr->sin_addr.s_addr = ireq->ir_rmt_addr;
+>>>> +               rmt4_sockaddr->sin_port = ireq->ir_rmt_port;
+>>>> +#if IS_ENABLED(CONFIG_IPV6)
+>>>> +       } else {
+>>>> +               struct sockaddr_in6 *rmt6_sockaddr =  (struct sockaddr_in6 *)&rmt_sockaddr;
+>>>> +
+>>>> +               rmt6_sockaddr->sin6_addr = ireq->ir_v6_rmt_addr;
+>>>> +               rmt6_sockaddr->sin6_port = ireq->ir_rmt_port;
+>>>> +#endif /* CONFIG_IPV6 */
+>>>> +       }
+>>>> +
+>>>> +       ireq->smc_ok = select_syn_smc(sk, (struct sockaddr *)&rmt_sockaddr);
+>>>> +       return;
+>>>> +out_no_smc:
+>>>> +       ireq->smc_ok = 0;
+>>>> +       return;
+>>>>    }
+>>>>
+>>>>    struct smc_hashinfo smc_v4_hashinfo = {
+>>>> @@ -1671,7 +1704,7 @@ int smc_connect(struct socket *sock, struct sockaddr *addr,
+>>>>           }
+>>>>
+>>>>           smc_copy_sock_settings_to_clc(smc);
+>>>> -       tcp_sk(smc->clcsock->sk)->syn_smc = 1;
+>>>> +       tcp_sk(smc->clcsock->sk)->syn_smc = select_syn_smc(sk, addr);
+>>>>           if (smc->connect_nonblock) {
+>>>>                   rc = -EALREADY;
+>>>>                   goto out;
+>>>> @@ -2650,8 +2683,7 @@ int smc_listen(struct socket *sock, int backlog)
+>>>>
+>>>>           inet_csk(smc->clcsock->sk)->icsk_af_ops = &smc->af_ops;
+>>>>
+>>>> -       if (smc->limit_smc_hs)
+>>>> -               tcp_sk(smc->clcsock->sk)->smc_hs_congested = smc_hs_congested;
+>>>> +       tcp_sk(smc->clcsock->sk)->smc_openreq_init = smc_openreq_init;
+>>>>
+>>>>           rc = kernel_listen(smc->clcsock, backlog);
+>>>>           if (rc) {
+>>>> @@ -3475,6 +3507,24 @@ static void __net_exit smc_net_stat_exit(struct net *net)
+>>>>           .exit = smc_net_stat_exit,
+>>>>    };
+>>>>
+>>>> +#if IS_ENABLED(CONFIG_BPF_SYSCALL)
+>>>> +BTF_SET8_START(bpf_smc_fmodret_ids)
+>>>> +BTF_ID_FLAGS(func, select_syn_smc)
+>>>> +BTF_SET8_END(bpf_smc_fmodret_ids)
+>>>> +
+>>>> +static const struct btf_kfunc_id_set bpf_smc_fmodret_set = {
+>>>> +       .owner = THIS_MODULE,
+>>>> +       .set   = &bpf_smc_fmodret_ids,
+>>>> +};
+>>>> +
+>>>> +static int bpf_smc_kfunc_init(void)
+>>>> +{
+>>>> +       return register_btf_fmodret_id_set(&bpf_smc_fmodret_set);
+>>>> +}
+>>>
+>>> fmodret was an approach that hid-bpf took initially,
+>>> but eventually they removed it all and switched to struct-ops approach.
+>>> Please learn that lesson.
+>>> Use struct_ops from the beginning.
+>>>
+>>> I did a presentation recently explaining the motivation behind
+>>> struct_ops and tips on how to extend the kernel.
+>>> TLDR: the step one is to design the extension _without_ bpf.
+>>> The interface should be usable for kernel modules.
+>>> And then when you have *_ops style api in place
+>>> the bpf progs will plug-in without extra work.
+>>>
+>>> Slides:
+>>> https://github.com/4ast/docs/blob/main/BPF%20struct-ops.pdf
+>>
+>>
+>> Hi Alexei,
+>>
+>> Thanks very much for your suggestion.
+>>
+>> In fact, I tried struct_ops in SMC about a year ago. Unfortunately, at that time struct_ops did not
+>> support registration from modules, and I had to move some smc dependencies into bpf, which met with
+>> community opposition. However, I noticed that this feature is now supported, so perhaps this is an
+>> opportunity.
+>>
+>> But on the other hand, given the current functionality, I wonder if struct_ops might be an overkill.
+>> I haven't been able to come up with a suitable abstraction to define this ops, and in the future,
+>> this ops might only contain the very one callback (select_syn_smc).
+>>
+>> Looking forward for your advises.
+> 
+> I guess I wasn't clear. It's a Nack to the current fmodret approach.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-index 0d185e54e..92448d858 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-@@ -50,10 +50,6 @@ void dwmac4_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
- 
- 	value |= DMA_CONTROL_ST;
- 	writel(value, ioaddr + DMA_CHAN_TX_CONTROL(dwmac4_addrs, chan));
--
--	value = readl(ioaddr + GMAC_CONFIG);
--	value |= GMAC_CONFIG_TE;
--	writel(value, ioaddr + GMAC_CONFIG);
- }
- 
- void dwmac4_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
-@@ -77,10 +73,6 @@ void dwmac4_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
- 	value |= DMA_CONTROL_SR;
- 
- 	writel(value, ioaddr + DMA_CHAN_RX_CONTROL(dwmac4_addrs, chan));
--
--	value = readl(ioaddr + GMAC_CONFIG);
--	value |= GMAC_CONFIG_RE;
--	writel(value, ioaddr + GMAC_CONFIG);
- }
- 
- void dwmac4_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-index 7840bc403..cba12edc1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-@@ -288,10 +288,6 @@ static void dwxgmac2_dma_start_tx(struct stmmac_priv *priv,
- 	value = readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
- 	value |= XGMAC_TXST;
- 	writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
--
--	value = readl(ioaddr + XGMAC_TX_CONFIG);
--	value |= XGMAC_CONFIG_TE;
--	writel(value, ioaddr + XGMAC_TX_CONFIG);
- }
- 
- static void dwxgmac2_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
-@@ -302,10 +298,6 @@ static void dwxgmac2_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
- 	value = readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
- 	value &= ~XGMAC_TXST;
- 	writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
--
--	value = readl(ioaddr + XGMAC_TX_CONFIG);
--	value &= ~XGMAC_CONFIG_TE;
--	writel(value, ioaddr + XGMAC_TX_CONFIG);
- }
- 
- static void dwxgmac2_dma_start_rx(struct stmmac_priv *priv,
-@@ -316,10 +308,6 @@ static void dwxgmac2_dma_start_rx(struct stmmac_priv *priv,
- 	value = readl(ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
- 	value |= XGMAC_RXST;
- 	writel(value, ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
--
--	value = readl(ioaddr + XGMAC_RX_CONFIG);
--	value |= XGMAC_CONFIG_RE;
--	writel(value, ioaddr + XGMAC_RX_CONFIG);
- }
- 
- static void dwxgmac2_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index e21404822..c19ca62a4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3437,9 +3437,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
- 		priv->hw->rx_csum = 0;
- 	}
- 
--	/* Enable the MAC Rx/Tx */
--	stmmac_mac_set(priv, priv->ioaddr, true);
--
- 	/* Set the HW DMA mode and the COE */
- 	stmmac_dma_operation_mode(priv);
- 
-@@ -3523,6 +3520,9 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
- 	/* Start the ball rolling... */
- 	stmmac_start_all_dma(priv);
- 
-+	/* Enable the MAC Rx/Tx */
-+	stmmac_mac_set(priv, priv->ioaddr, true);
-+
- 	stmmac_set_hw_vlan_mode(priv, priv->hw);
- 
- 	return 0;
--- 
-2.34.1
 
+Understood, we do not oppose the use of struct_ops, especially when modules registration
+was already supported.
 
