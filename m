@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-135040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66DD399BEF6
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:11:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D14399BEFD
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2EF4B23436
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 04:11:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 425A91F24717
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 04:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144C1136337;
-	Mon, 14 Oct 2024 03:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A6D13665A;
+	Mon, 14 Oct 2024 04:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lmDgkRtY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aeUzZ1wr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF76E136331;
-	Mon, 14 Oct 2024 03:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F16314C5BD;
+	Mon, 14 Oct 2024 04:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728878392; cv=none; b=ZiuA6PQ8EzQu1hHjC/MZXn6zICDIli/oYv6Y98X20atWBmgz3zOn7ublW0PDw+wKnRsREWQEJWN6FrNAI7I/wO8OW+/UvOL9hF0D9nF9dqvNiIF1GyF4W5X2wneBHiMTPtpzc9qYzC9KbcUE3OsE1W3AKsduwDGVSLuWbfW4tpY=
+	t=1728878401; cv=none; b=fPr/5BBpIPPRnwJGxNGPMUtQB1gacjiWpjl1rCDq0e5klJE3ZoyAV7AySUEMk7YA1sdbjWkJyco4mUtToJcQfIrrLwNRsiNCf8RHGPZulsncBJ9tVTV2uYIXKaFXhE+LJ7KzID+1HyjN4KTLr9pFANocRO0fHNFG4MV40evUjbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728878392; c=relaxed/simple;
-	bh=Ny8O9DOIZ6581+wK/ZRWd9/dZUeGNzBgDAi9on7Jt3Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=saxwWStMfan0lENOz/URqOVPCZV1Bpn52N+hKS1FhCqutlHn0IFPrN7VM2jZKJNHMfItyhh7MPczmreKiVpDPu2/gK241Bp1HRNV4w/PVyVNDt3MYpBSkTbKqKFMW8G98e9Knf0rxYtOZsYA6V6dBeKvU/vQc5T4aPwudiSWJXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lmDgkRtY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1583DC4CEC3;
-	Mon, 14 Oct 2024 03:59:49 +0000 (UTC)
+	s=arc-20240116; t=1728878401; c=relaxed/simple;
+	bh=IJPe+KHMs0Jr4wtbXXie9OWisHlE7T9H0zYOSBGDXPk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U35oaBcaZ0RCbEqxUIFWzCYnsJBITDygliDlDOBBQJMURAPtArAj7IqB6YnE4HJNV9NXg4VO2UX33jZoUSLUidl6/ySTSsSno43pGp35LTCOyQSj4jZJCZgTKbXVsyfTQ9RiRX311Hw9PLh2Ta6/4OlqYcaE68qeqbVceZl1ODE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aeUzZ1wr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF6A8C4CEC3;
+	Mon, 14 Oct 2024 03:59:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728878391;
-	bh=Ny8O9DOIZ6581+wK/ZRWd9/dZUeGNzBgDAi9on7Jt3Q=;
+	s=k20201202; t=1728878401;
+	bh=IJPe+KHMs0Jr4wtbXXie9OWisHlE7T9H0zYOSBGDXPk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=lmDgkRtYpEYTykMtR/z4X8ClVqSrI/xIFhkvzjDZcZhFFU3UIdMcKcdlwItDDmi2x
-	 S3Szrl/eZSSNI5YhmXOOIpXAwIAYOR0AUzu9nTlVVU85BMksykkfjylVR3JOf/oXot
-	 QzaVi5Rvv13RYn1nAYH2Sm/OW9Mnk2w21ZQsoZiCoqpkP/0NiuzdMYnh/yUoqASxZM
-	 efX5+4fJI12Dcjd0dQ1NBoTXi7bkdcklMpQGdSXeFj6cU2ys249AQfY4skwxA4KdDj
-	 P13iqoRT5oFJeX4rY30l1InreVv2BLZg3V5mptwyfTeD5LjKWa5XrsZLnc3W59Caod
-	 BGrFyKfBvBrIw==
+	b=aeUzZ1wrD/PNXdA3RsxS3JmlJ+C3S0SBBuSuBij1P9z9HTZMDTBsSmu1JjcecNJeZ
+	 LOWobA3dJXZ90Tm9uTFwb3E0a9Im+AFkyBOQZzghGGUYX9oDaIW6FlMLNETb7Y2QJn
+	 XuV56IgeQ6aL888f/AIeWtazVlsbnKfareLfCjwrvZ+RBgD89TN1/+l5ZisYPouKTI
+	 iNFUgBqPLfDi5RUaSVp0oEcR7vmx1lH15JFTWSiX7fotdZb/+q7RUToNUbcgguFQIz
+	 b2yMz4RmW5tAR5lMcwlLVMpJ6nQSeRqeRedMK8sc237abeDtlWQw0xAv1q5ofUAcq4
+	 mqozGZcHI5EVw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -52,9 +52,9 @@ Cc: Daniel Palmer <daniel@0x0f.com>,
 	pabeni@redhat.com,
 	quic_jjohnson@quicinc.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 1/3] net: amd: mvme147: Fix probe banner message
-Date: Sun, 13 Oct 2024 23:59:41 -0400
-Message-ID: <20241014035948.2261641-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 1/2] net: amd: mvme147: Fix probe banner message
+Date: Sun, 13 Oct 2024 23:59:53 -0400
+Message-ID: <20241014035958.2266211-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.226
+X-stable-base: Linux 5.4.284
 Content-Transfer-Encoding: 8bit
 
 From: Daniel Palmer <daniel@0x0f.com>
@@ -88,7 +88,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/amd/mvme147.c b/drivers/net/ethernet/amd/mvme147.c
-index 3f2e4cdd0b83e..133fe0f1166b0 100644
+index 72abd3f82249b..eb7b1da2fb06f 100644
 --- a/drivers/net/ethernet/amd/mvme147.c
 +++ b/drivers/net/ethernet/amd/mvme147.c
 @@ -106,10 +106,6 @@ struct net_device * __init mvme147lance_probe(int unit)
