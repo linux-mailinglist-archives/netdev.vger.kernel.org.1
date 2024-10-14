@@ -1,74 +1,133 @@
-Return-Path: <netdev+bounces-135154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE55A99C87D
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 13:17:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B63699C885
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 13:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CD511F21D6E
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:17:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 057F5288ACC
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCE273446;
-	Mon, 14 Oct 2024 11:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9F71A2574;
+	Mon, 14 Oct 2024 11:14:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E24E156C69;
-	Mon, 14 Oct 2024 11:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BE2132117;
+	Mon, 14 Oct 2024 11:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728904423; cv=none; b=VpuRfu+NTG2JArcHF9SesguzGhKWMJNgIw09rDnxoGqIGwsUbU8tTOgE1nmENXs7riLRtkcX1ohvhNWaEMNNmHT6DmhsLeIpU1Nr8KAYBHgYcA/KNF4yW4VphxkDEAV/XHUaxxMhIxzSGPsHMbb2EzvEJue7zL7ojxDFsUzORMs=
+	t=1728904470; cv=none; b=JmxkL/PTOCosU04q2ORsbly7e0dv+XOhEmbZZ8YBtQDMTK4CpeE3ctAhCwi1zhTYi000/eic0CYeCHcZWj3k8l1bXqDUnyRTFvDbtsqEC3tuQkZ41sx6eSaFSVw26Ls1vYSad/OvN/bkOVEa+PnPkf9PQ6wTz3ChESXlrlYc8yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728904423; c=relaxed/simple;
-	bh=s9EdIrToNe1X4raz+OIvL//9qPb1YTxtelE1sffA10w=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=KJifnSmF5ex9KppAqJAnp4ZfxAIe9bcRylS49WswBQo334ShcE+aYji6U3ZP/VDArvHB7ih6expv5E0iYjnO01BHvhPmlVMGE1CTBEpfGlO+DnUVYvTL9mXq6Dc802iIhZbPaHLwC4cZAiVumZlgng6UH7ybBmtpSwRSAFLdsbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-	id 8135492009C; Mon, 14 Oct 2024 13:13:39 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by angie.orcam.me.uk (Postfix) with ESMTP id 7C88A92009B;
-	Mon, 14 Oct 2024 12:13:39 +0100 (BST)
-Date: Mon, 14 Oct 2024 12:13:39 +0100 (BST)
-From: "Maciej W. Rozycki" <macro@orcam.me.uk>
-To: Thorsten Leemhuis <linux@leemhuis.info>
-cc: Johannes Berg <johannes@sipsolutions.net>, 
-    Jakub Kicinski <kuba@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>, 
-    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-    Linux Networking <netdev@vger.kernel.org>, 
-    Loic Poulain <loic.poulain@linaro.org>, 
-    Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Simon Horman <horms@kernel.org>, Martin Wolf <mwolf@adiumentum.com>
-Subject: Re: [PATCH net v2 1/2] MAINTAINERS: Move M Chetan Kumar to CREDITS
-In-Reply-To: <cc949ab7-b5aa-4812-9c4a-d50bfee92de0@leemhuis.info>
-Message-ID: <alpine.DEB.2.21.2410141209390.40463@angie.orcam.me.uk>
-References: <20231023032905.22515-2-bagasdotme@gmail.com> <20231023032905.22515-3-bagasdotme@gmail.com> <20231023093837.49c7cb35@kernel.org> <e1b1f477-e41d-4834-984b-0db219342e5b@gmail.com> <20231023185221.2eb7cb38@kernel.org>
- <3a68f9ff27d9c82a038aea6acfb39848d0b31842.camel@sipsolutions.net> <cc949ab7-b5aa-4812-9c4a-d50bfee92de0@leemhuis.info>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+	s=arc-20240116; t=1728904470; c=relaxed/simple;
+	bh=m3oA3DjQG0zAgXDJR6EQNfJPvp53CEpoyvjfzeSTx1I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cm5zJI4LNHzZHGIsuWMhUC/yMOitrB0dDxWDJSCu6fEQC56Ui1o6BfjGj5ldIY1ERiINGIrtv91SzYU+TljmcqN/cA7kkhDhM0SlJ2SqfmhuZ4FkGeRiGDmKp4dP6DPQylzTCNqA7gyUoT4ZnoQI1D1YdnHeGJc7rlqVmadL2ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 0/9] Netfilter updates for net-net
+Date: Mon, 14 Oct 2024 13:14:11 +0200
+Message-Id: <20241014111420.29127-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 
-On Mon, 14 Oct 2024, Thorsten Leemhuis wrote:
+Hi,
 
-> >>> He's now in a state of limbo. He has significant contribution
-> >>> (and gets listed by get_maintainer script with (AFAIK) no way
-> >>> to filter him out), yet emails to him bounces. What will be
-> >>> the resolution then?
-> >>
-> >> Yes :( Not much we can do about that (even if we drop him from
-> >> maintainers all fixes will CC him based on the sign-off tags).
+The following series contains Netfilter updates for net-next:
 
- FWIW adding an entry to .get_maintainer.ignore is the way to sort it.
+1) Fix sparse warning in nf_tables related to use of percpu counters,
+   from Uros Bizjak.
 
-  Maciej
+2) use strscpy_pad in nft_meta_bridge, from Justin Stitt.
+
+3) A series from patch #3 to patch #7 to reduce memory footprint of set
+   element transactions, Florian Westphal says:
+
+   When doing a flush on a set or mass adding/removing elements from a
+   set, each element needs to allocate 96 bytes to hold the transactional
+   state.
+
+   In such cases, virtually all the information in struct nft_trans_elem
+   is the same.
+
+   Change nft_trans_elem to a flex-array, i.e. a single nft_trans_elem
+   can hold multiple set element pointers.
+
+   The number of elements that can be stored in one nft_trans_elem is limited
+   by the slab allocator, this series limits the compaction to at most 62
+   elements as it caps the reallocation to 2048 bytes of memory.
+
+4) Document legacy toggles for xtables packet classifiers, from
+   Bruno Leitao.
+
+5) Use kfree_rcu() instead of call_rcu() + kmem_cache_free(), from Julia Lawall.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-24-10-14
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit f66ebf37d69cc700ca884c6a18c2258caf8b151b:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-10-03 10:05:55 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-24-10-14
+
+for you to fetch changes up to 9539446cc659e390942b46df871f8abdd4750999:
+
+  netfilter: replace call_rcu by kfree_rcu for simple kmem_cache_free callback (2024-10-14 12:30:20 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-10-14
+
+----------------------------------------------------------------
+Breno Leitao (1):
+      netfilter: Make legacy configs user selectable
+
+Florian Westphal (5):
+      netfilter: nf_tables: prefer nft_trans_elem_alloc helper
+      netfilter: nf_tables: add nft_trans_commit_list_add_elem helper
+      netfilter: nf_tables: prepare for multiple elements in nft_trans_elem structure
+      netfilter: nf_tables: switch trans_elem to real flex array
+      netfilter: nf_tables: allocate element update information dynamically
+
+Julia Lawall (1):
+      netfilter: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+
+Justin Stitt (1):
+      netfilter: nf_tables: replace deprecated strncpy with strscpy_pad
+
+Uros Bizjak (1):
+      netfilter: nf_tables: Fix percpu address space issues in nf_tables_api.c
+
+ include/net/netfilter/nf_tables.h      |  25 +--
+ net/bridge/netfilter/Kconfig           |   8 +-
+ net/bridge/netfilter/nft_meta_bridge.c |   2 +-
+ net/ipv4/netfilter/Kconfig             |  16 +-
+ net/ipv6/netfilter/Kconfig             |   9 +-
+ net/netfilter/nf_conncount.c           |  10 +-
+ net/netfilter/nf_conntrack_expect.c    |  10 +-
+ net/netfilter/nf_tables_api.c          | 370 +++++++++++++++++++++++++--------
+ net/netfilter/xt_hashlimit.c           |   9 +-
+ 9 files changed, 330 insertions(+), 129 deletions(-)
 
