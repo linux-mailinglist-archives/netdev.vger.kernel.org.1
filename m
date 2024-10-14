@@ -1,76 +1,125 @@
-Return-Path: <netdev+bounces-135373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD0A599DA23
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:35:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D3999DA57
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:53:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCA8283040
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:35:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B456281E1C
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531B91D9685;
-	Mon, 14 Oct 2024 23:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B177D1A4E9D;
+	Mon, 14 Oct 2024 23:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUdQohqY"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qtsbLgqz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2565322318
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB00D1E4A6
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728948940; cv=none; b=fdKgoFMpsXQV6Hbf8e5AjO+qFJkfqKhM0E5ECu8t2ajxrY4EcN/2oUtbVlVYJQqfhhNOZ/rk7nx61aEz2Wodd1RQTZIe2xcsaMxG4LdfKNUag8xUBRNxPTtOULRQc5fCF1sCm3NB3PvqAFjBP9wUSH3iUpj6mjB+4FcCo7nYLQE=
+	t=1728949979; cv=none; b=S6kjvuAy2+efwlobALj0MxxXc3Zq+t+r1aNYrKYDkAd71XLOkBcJ5FNGH6o3ATQD0PNOkMXoLaj+Owdz1kCRXwzDUjVBVkIoqO85Ioum6QIb9xQ5ngCkES24kUb2LZ0UwAsAJfrkUKP7MuE7Xz+/NWu+2BFaR/FXN+USFPyg+O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728948940; c=relaxed/simple;
-	bh=sjN0R8V1gEsWJGhOPn3LinwX4xloqEljgMK6jqED1Uc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bP5Rle22Jtj49cSeW0on/yIHLZT4zQoGUAVM+MFATxftaLEnsCNiMYMFoGgtqrTpSvBQ9pS7HTu9GE7ZQTX6VFmSTstCGt9zGFkoJ1P2SibnmgET8RBvo9pSKPlRNOodxhsvRA9DcyPvsiZB/ut6AWp/YOCvrJeqMUd4CliCS9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IUdQohqY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BD3CC4CEC3;
-	Mon, 14 Oct 2024 23:35:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728948939;
-	bh=sjN0R8V1gEsWJGhOPn3LinwX4xloqEljgMK6jqED1Uc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IUdQohqYm/vyZDZwZDKBFfy5ZXtIMmyLwvEVh5RDqWY4Q0i2b37ItT5SwegC25I+z
-	 5AKVqrPudCXv+Pu8qCRwhs6nphRJsnMlziggOdDFmzurRGFprCVW6XslR2efoOxBZM
-	 XKFs0jgH5I1ow5Uc/7AVFgGhMV1AohS5QbFwn4WFb0kPqllA1yCK64ArzPssabqzzf
-	 fPMm/n8XBPG7aILvRLHnCf7t61IwEe/iiJicKfQqRnStGbgabkiZLZIij1oD502dOk
-	 M8LZk/lUC81q3+SrtSile/Kv2PvLFrhDBre64HLGYuOUEpX/ROP8oECVOsV+NmBpR+
-	 5kWeAdYuB0bTg==
-Date: Mon, 14 Oct 2024 16:35:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Michael Chan <michael.chan@broadcom.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] bnxt_en: replace PTP spinlock with seqlock
-Message-ID: <20241014163538.1ac0d88d@kernel.org>
-In-Reply-To: <20241014232947.4059941-1-vadfed@meta.com>
-References: <20241014232947.4059941-1-vadfed@meta.com>
+	s=arc-20240116; t=1728949979; c=relaxed/simple;
+	bh=wQZbWozopGyU060iMif4sIqcu4V3V2DOZtNXEx/ktu0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bN04vMP3USx+WFxXUE9fFhPJ+ISJH48JAsvdjD5OS+d9VqTIXRtb7OYcSRax9jhQpIaxLkfRYBqL7soV8oeMKquYh54r2rBakgdlJrP3Dzt/dvZLbsZpc1jbzo+Q9ajdbqmIFSfriII5tKJyThO4+cqsIhY32G+8G1qaUik42XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qtsbLgqz; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728949978; x=1760485978;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Wz3y9Gk2WHoiisL+s/5eOq2a5dO4FZ0GltFXEV6EMzw=;
+  b=qtsbLgqzIM9JlmPpkQRo3QY0ZfvVYTcZDiMCoMYl30JsVoB51VaggUCO
+   RjgLT6bZL6JjR/gNkaYPD+yCQexI2axyxDcD6gG1K5D6nKH8/dcfo0vvP
+   XL9xJ6HjO2fJf57XfjJh9JVRtNw8BMmOGbfvPc+/5uFnzddyj5vxoVAu6
+   U=;
+X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
+   d="scan'208";a="343063872"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 23:52:57 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:53939]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.95:2525] with esmtp (Farcaster)
+ id 8ae9135c-28d9-446f-aa47-c46ee22ea071; Mon, 14 Oct 2024 23:52:56 +0000 (UTC)
+X-Farcaster-Flow-ID: 8ae9135c-28d9-446f-aa47-c46ee22ea071
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 14 Oct 2024 23:52:55 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 14 Oct 2024 23:52:53 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next] neighbour: Remove NEIGH_DN_TABLE.
+Date: Mon, 14 Oct 2024 16:52:16 -0700
+Message-ID: <20241014235216.10785-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, 14 Oct 2024 16:29:47 -0700 Vadim Fedorenko wrote:
-> -	spin_lock_bh(&ptp->ptp_lock);
-> +	write_seqlock_irqsave(&ptp->ptp_lock, flags);
->  	timecounter_adjtime(&ptp->tc, delta);
-> -	spin_unlock_bh(&ptp->ptp_lock);
-> +	write_sequnlock_irqrestore(&ptp->ptp_lock, flags);
+Since commit 1202cdd66531 ("Remove DECnet support from kernel"),
+NEIGH_DN_TABLE is no longer used.
 
-I think when you adjtime / adjfine (IOW on all the write path) you still
-need the spin lock. But in addition also the seq lock. And then the
-read path can take just the seq lock.
+MPLS has implicit dependency on it in nla_put_via(), but nla_get_via()
+does not support DECnet.
 
-This will also remove any uncertainty about the bit ops.
+Let's remove NEIGH_DN_TABLE.
+
+Now, neigh_tables[] has only 2 elements and no extra iteration
+for DECnet in many places.
+
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/neighbour.h | 1 -
+ net/mpls/af_mpls.c      | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+index a44f262a7384..3887ed9e5026 100644
+--- a/include/net/neighbour.h
++++ b/include/net/neighbour.h
+@@ -239,7 +239,6 @@ struct neigh_table {
+ enum {
+ 	NEIGH_ARP_TABLE = 0,
+ 	NEIGH_ND_TABLE = 1,
+-	NEIGH_DN_TABLE = 2,
+ 	NEIGH_NR_TABLES,
+ 	NEIGH_LINK_TABLE = NEIGH_NR_TABLES /* Pseudo table for neigh_xmit */
+ };
+diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+index df62638b6498..a0573847bc55 100644
+--- a/net/mpls/af_mpls.c
++++ b/net/mpls/af_mpls.c
+@@ -1664,7 +1664,7 @@ static int nla_put_via(struct sk_buff *skb,
+ 		       u8 table, const void *addr, int alen)
+ {
+ 	static const int table_to_family[NEIGH_NR_TABLES + 1] = {
+-		AF_INET, AF_INET6, AF_DECnet, AF_PACKET,
++		AF_INET, AF_INET6, AF_PACKET,
+ 	};
+ 	struct nlattr *nla;
+ 	struct rtvia *via;
+-- 
+2.39.5 (Apple Git-154)
+
 
