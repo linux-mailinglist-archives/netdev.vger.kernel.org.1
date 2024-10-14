@@ -1,218 +1,113 @@
-Return-Path: <netdev+bounces-135048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14BC599BF70
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 07:49:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A14399BFC1
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 08:06:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0911C216C4
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 05:49:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F0FB283033
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A29013B792;
-	Mon, 14 Oct 2024 05:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868D113CFB6;
+	Mon, 14 Oct 2024 06:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cWTYpbQ0"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="g+BpLFZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A08284A2F;
-	Mon, 14 Oct 2024 05:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7DA2B9A6;
+	Mon, 14 Oct 2024 06:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728884961; cv=none; b=Xes1LXCsZFd2L+2EIRHeeJLdA6F3sKc9F22dkksJ26wZqX1aS0a6SV0552mjBmzYbQH7+TSACVlZDMORduDFF0HVckPDQ0m4MueG7fvXca1fSNHjswyv8tGj8xjG3ZK6VvYYYKbUQIcTUJNmLEVH8tJVgDPhhk79DG7ldvYD6Qo=
+	t=1728885982; cv=none; b=Q5JX8KDZKp4JM6aSeGiK1XgnhpynzMQ2mhQv5J/jfId2UP5OkD5DTRAEM3BA+7Q53SKl8aMN+cFAaoGMQEh70x+l5IwWfTe+6Bsro1iPXjC7EqItVgZiEAweujXIZLKXlS1914defbq7+kenpkDXnVMWHbKd7Olw/N+GuAs4QKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728884961; c=relaxed/simple;
-	bh=GZPQGeuVLly80GBQ5LNdOoFSVtvCh6X+j4fAOpNl+fw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oNbKFNLg9sHhCyd2xE6AjT9HTxhuPRAXMr7X8o5YaNJ84FC6RpRRLxXrLpcJBtU7NwAUx4Jlx6D/Zo9dWw9edLs1ho3BB+hxKZO+JxisXaJgAbKAeDry7+gLzOYLNJhoAuUR3btj2aSPw5RSgLNvBeuSTsSaD+mZWdIdBymOVOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cWTYpbQ0; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728884954; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=tgmBE+YRai5Mg3O+pgz5N0iZD5sYwVXA22b3yvk3T5U=;
-	b=cWTYpbQ0TwLtcWFAeba0C+QZuwlfbJdHWzQJIXaauchjNC8CNazF68dyAKRILQr/Vw19XEsHIokrw1h/fIhyCgt/m2tFjCYQWBSPBbbXjfkHFFGPhyz27FiPiPpAgrx64ATAG8o5DQBdeGDoqpMa1ViLvjeUw3fxppSbTvZxQi0=
-Received: from 30.32.80.190(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WH0jDKk_1728884953 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 14 Oct 2024 13:49:14 +0800
-Message-ID: <523f99d8-8b21-48a7-827c-01491994db6f@linux.alibaba.com>
-Date: Mon, 14 Oct 2024 13:49:11 +0800
+	s=arc-20240116; t=1728885982; c=relaxed/simple;
+	bh=sNjJpZs/AXmHgdHozMgXsndo2NdM6J2FNMZb2BVpV0k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DDRtPmA4hTp9b28a6ESwz2mPigOfwqwhkOmzmJ5CHC4RD/NAawH7eeA2Kcg8hajdGtKnbXlu0fGwjqyy8L+zdjvAek4iSluvglglug8LbLs11ko+4yl7BqYUrf1fCesBdu+PiujVQtvsx/g6ZhHYPuRwb6dheinniXQqhC6hhpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=g+BpLFZZ; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 6706e69889f211ef8b96093e013ec31c-20241014
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=Yds5XsztjRetd0eY+2gfotwVU2fKNh8j54ZoUQ3yI+4=;
+	b=g+BpLFZZGuLU85enMvoYdtDjfavdzDqx+7BiTB2PuPh8s0xCacKetlu2azX6p5SHIcKlU/lsZ0gmreqYhijDRs1ogYzO1TkWjDJ+7dlVk50Lo9XltAx1U0C3QYaA31Cwql5rLHGgYDPTIotvHrDgTPGMIU84qb8NJpslAJ3cnOw=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:72ba451e-7a81-4136-9399-69b391773ffb,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6dc6a47,CLOUDID:79e9bc06-3d5c-41f6-8d90-a8be388b5b5b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 6706e69889f211ef8b96093e013ec31c-20241014
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
+	(envelope-from <skylake.huang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1314852581; Mon, 14 Oct 2024 14:06:07 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Sun, 13 Oct 2024 23:06:06 -0700
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 14 Oct 2024 14:06:06 +0800
+From: Sky Huang <SkyLake.Huang@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Sky Huang
+	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
+	<skylake.huang@mediatek.com>
+Subject: [RFC PATCH net-next 1/1] net: phy: Add capability to enable/disable 2.5G/5G/10G AN in ethtool
+Date: Mon, 14 Oct 2024 14:06:03 +0800
+Message-ID: <20241014060603.29878-1-SkyLake.Huang@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: Introduce a hook to modify syn_smc at
- runtime
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- wintera@linux.ibm.com, guwen@linux.alibaba.com,
- Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>,
- Network Development <netdev@vger.kernel.org>,
- linux-s390 <linux-s390@vger.kernel.org>, linux-rdma@vger.kernel.org,
- Tony Lu <tonylu@linux.alibaba.com>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, bpf <bpf@vger.kernel.org>
-References: <1728532691-20044-1-git-send-email-alibuda@linux.alibaba.com>
- <CAADnVQLXyA__zdDSiTdhaw=dXyfgmkr--cH068JvNK=JAYvRDA@mail.gmail.com>
- <b5aa477d-a4b1-45cb-af44-bd737504734e@linux.alibaba.com>
- <CAADnVQLS69MVZwTrek=ixP+1T7=+Fq0_kuOKgqBS+o4UoXMxFw@mail.gmail.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <CAADnVQLS69MVZwTrek=ixP+1T7=+Fq0_kuOKgqBS+o4UoXMxFw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
+From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
+For phy loopback test, we need to disable AN. In this way,
+users can disable/enable phy AN more conveniently.
 
-On 10/11/24 11:37 PM, Alexei Starovoitov wrote:
-> On Thu, Oct 10, 2024 at 11:44 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
->>
->>
->>
->> On 10/11/24 12:21 AM, Alexei Starovoitov wrote:
->>> On Wed, Oct 9, 2024 at 8:58 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
->>>>
->>>>
->>>> +__bpf_hook_start();
->>>> +
->>>> +__weak noinline int select_syn_smc(const struct sock *sk, struct sockaddr *peer)
->>>> +{
->>>> +       return 1;
->>>> +}
->>>> +
->>>> +__bpf_hook_end();
->>>> +
->>>>    int smc_nl_dump_hs_limitation(struct sk_buff *skb, struct netlink_callback *cb)
->>>>    {
->>>>           struct smc_nl_dmp_ctx *cb_ctx = smc_nl_dmp_ctx(cb);
->>>> @@ -156,19 +165,43 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
->>>>           return NULL;
->>>>    }
->>>>
->>>> -static bool smc_hs_congested(const struct sock *sk)
->>>> +static void smc_openreq_init(struct request_sock *req,
->>>> +                            const struct tcp_options_received *rx_opt,
->>>> +                            struct sk_buff *skb, const struct sock *sk)
->>>>    {
->>>> +       struct inet_request_sock *ireq = inet_rsk(req);
->>>> +       struct sockaddr_storage rmt_sockaddr = {};
->>>>           const struct smc_sock *smc;
->>>>
->>>>           smc = smc_clcsock_user_data(sk);
->>>>
->>>>           if (!smc)
->>>> -               return true;
->>>> +               return;
->>>>
->>>> -       if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
->>>> -               return true;
->>>> +       if (smc->limit_smc_hs && workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
->>>> +               goto out_no_smc;
->>>>
->>>> -       return false;
->>>> +       rmt_sockaddr.ss_family = sk->sk_family;
->>>> +
->>>> +       if (rmt_sockaddr.ss_family == AF_INET) {
->>>> +               struct sockaddr_in *rmt4_sockaddr =  (struct sockaddr_in *)&rmt_sockaddr;
->>>> +
->>>> +               rmt4_sockaddr->sin_addr.s_addr = ireq->ir_rmt_addr;
->>>> +               rmt4_sockaddr->sin_port = ireq->ir_rmt_port;
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +       } else {
->>>> +               struct sockaddr_in6 *rmt6_sockaddr =  (struct sockaddr_in6 *)&rmt_sockaddr;
->>>> +
->>>> +               rmt6_sockaddr->sin6_addr = ireq->ir_v6_rmt_addr;
->>>> +               rmt6_sockaddr->sin6_port = ireq->ir_rmt_port;
->>>> +#endif /* CONFIG_IPV6 */
->>>> +       }
->>>> +
->>>> +       ireq->smc_ok = select_syn_smc(sk, (struct sockaddr *)&rmt_sockaddr);
->>>> +       return;
->>>> +out_no_smc:
->>>> +       ireq->smc_ok = 0;
->>>> +       return;
->>>>    }
->>>>
->>>>    struct smc_hashinfo smc_v4_hashinfo = {
->>>> @@ -1671,7 +1704,7 @@ int smc_connect(struct socket *sock, struct sockaddr *addr,
->>>>           }
->>>>
->>>>           smc_copy_sock_settings_to_clc(smc);
->>>> -       tcp_sk(smc->clcsock->sk)->syn_smc = 1;
->>>> +       tcp_sk(smc->clcsock->sk)->syn_smc = select_syn_smc(sk, addr);
->>>>           if (smc->connect_nonblock) {
->>>>                   rc = -EALREADY;
->>>>                   goto out;
->>>> @@ -2650,8 +2683,7 @@ int smc_listen(struct socket *sock, int backlog)
->>>>
->>>>           inet_csk(smc->clcsock->sk)->icsk_af_ops = &smc->af_ops;
->>>>
->>>> -       if (smc->limit_smc_hs)
->>>> -               tcp_sk(smc->clcsock->sk)->smc_hs_congested = smc_hs_congested;
->>>> +       tcp_sk(smc->clcsock->sk)->smc_openreq_init = smc_openreq_init;
->>>>
->>>>           rc = kernel_listen(smc->clcsock, backlog);
->>>>           if (rc) {
->>>> @@ -3475,6 +3507,24 @@ static void __net_exit smc_net_stat_exit(struct net *net)
->>>>           .exit = smc_net_stat_exit,
->>>>    };
->>>>
->>>> +#if IS_ENABLED(CONFIG_BPF_SYSCALL)
->>>> +BTF_SET8_START(bpf_smc_fmodret_ids)
->>>> +BTF_ID_FLAGS(func, select_syn_smc)
->>>> +BTF_SET8_END(bpf_smc_fmodret_ids)
->>>> +
->>>> +static const struct btf_kfunc_id_set bpf_smc_fmodret_set = {
->>>> +       .owner = THIS_MODULE,
->>>> +       .set   = &bpf_smc_fmodret_ids,
->>>> +};
->>>> +
->>>> +static int bpf_smc_kfunc_init(void)
->>>> +{
->>>> +       return register_btf_fmodret_id_set(&bpf_smc_fmodret_set);
->>>> +}
->>>
->>> fmodret was an approach that hid-bpf took initially,
->>> but eventually they removed it all and switched to struct-ops approach.
->>> Please learn that lesson.
->>> Use struct_ops from the beginning.
->>>
->>> I did a presentation recently explaining the motivation behind
->>> struct_ops and tips on how to extend the kernel.
->>> TLDR: the step one is to design the extension _without_ bpf.
->>> The interface should be usable for kernel modules.
->>> And then when you have *_ops style api in place
->>> the bpf progs will plug-in without extra work.
->>>
->>> Slides:
->>> https://github.com/4ast/docs/blob/main/BPF%20struct-ops.pdf
->>
->>
->> Hi Alexei,
->>
->> Thanks very much for your suggestion.
->>
->> In fact, I tried struct_ops in SMC about a year ago. Unfortunately, at that time struct_ops did not
->> support registration from modules, and I had to move some smc dependencies into bpf, which met with
->> community opposition. However, I noticed that this feature is now supported, so perhaps this is an
->> opportunity.
->>
->> But on the other hand, given the current functionality, I wonder if struct_ops might be an overkill.
->> I haven't been able to come up with a suitable abstraction to define this ops, and in the future,
->> this ops might only contain the very one callback (select_syn_smc).
->>
->> Looking forward for your advises.
-> 
-> I guess I wasn't clear. It's a Nack to the current fmodret approach.
+Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+---
+ drivers/net/phy/phy.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 14224e0..10772f8 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1085,7 +1085,10 @@ int phy_ethtool_ksettings_set(struct phy_device *phydev,
+ 		return -EINVAL;
+ 
+ 	if (autoneg == AUTONEG_DISABLE &&
+-	    ((speed != SPEED_1000 &&
++	    ((speed != SPEED_10000 &&
++	      speed != SPEED_5000 &&
++	      speed != SPEED_2500 &&
++	      speed != SPEED_1000 &&
+ 	      speed != SPEED_100 &&
+ 	      speed != SPEED_10) ||
+ 	     (duplex != DUPLEX_HALF &&
+-- 
+2.45.2
 
-Understood, we do not oppose the use of struct_ops, especially when modules registration
-was already supported.
 
