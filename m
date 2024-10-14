@@ -1,104 +1,92 @@
-Return-Path: <netdev+bounces-135355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F0999D959
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 23:42:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A3299D98E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E8F1C218C4
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 21:42:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CE491F22F71
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 22:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843111D0E13;
-	Mon, 14 Oct 2024 21:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DD4/OUrS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F283A1D5AB7;
+	Mon, 14 Oct 2024 22:00:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8746A26296;
-	Mon, 14 Oct 2024 21:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A400F1D4154;
+	Mon, 14 Oct 2024 22:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728942173; cv=none; b=Wh1Y97xoFk/cNFKZ7Op//k3plb9sGLp5eIjtaQ+5nxpGWBgKggzKwWxQO0F180tw1H+HunnT8c+lVvXiQsFD0GvUqb8TC1EosiaQNsDTl6cf6xEgfXhUOP4NApFuTqLTVf3L7L3Zt3+0c+uNVzhub85YxEB5Ndb81dWm/dnXSLc=
+	t=1728943243; cv=none; b=K9w7A2tt5NszeY25xUT9ROexLqmiXqsiSesL6LlQV61mx5f5r4O2kKO8lBe90d8l2bxN7TxRyakDgA4kjzyzpIzSHYDHajnfkAtDkYFANeCtwfLQAX9tGEXaFHw/TeVe97GadAbCex1PuZtmSWJsGGHtWJLU5DZawFAHqGLP+Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728942173; c=relaxed/simple;
-	bh=R8TLXuDeZ/MYISPWdcvYZ2Bu1EAnbjLogEwVptKbAUs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j75xeKOnmoh3dmAST+6/ykYMW+YLBzb1gYKcOh3/CW5qN5J/yH1i5j6lOaEqqqtidaPv08uWnnwBVIkm3RtOfKfGJWUMCaQy9ZHLHMYRfpeYr0z8ee8f1UISLJ1y5jHDS2MHELTyegVPfaJ3dmo5ySa/yiSDgtnTGHl3TOgA21I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DD4/OUrS; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728942173; x=1760478173;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=38tSf7bWxW+kNdx5AoLI8mlMpML3oA826XH6AyrChzQ=;
-  b=DD4/OUrSTY6/0T2KoqkgDEYMV4sBOvWtRVas2Ni2BVaEusydwX6wEG75
-   KDMrr44OtRASa+KKAVUvryKFeL3kA8QB5QFI8PLR9x2T2gSa9anQfVnI9
-   qVzG6gqYLofWkY4+OQPh9d36l3ivUSxUlp10RlawcDd6Gmry5EuAkk96V
-   w=;
-X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
-   d="scan'208";a="33178660"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 21:42:48 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:26950]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.95:2525] with esmtp (Farcaster)
- id 74ac6199-0006-44ac-aa20-580d5d9f7a7d; Mon, 14 Oct 2024 21:42:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 74ac6199-0006-44ac-aa20-580d5d9f7a7d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 14 Oct 2024 21:42:45 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 14 Oct 2024 21:42:40 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ignat@cloudflare.com>
-CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
-	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v3 9/9] Revert "net: do not leave a dangling sk pointer, when socket creation fails"
-Date: Mon, 14 Oct 2024 14:42:36 -0700
-Message-ID: <20241014214236.99604-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241014153808.51894-10-ignat@cloudflare.com>
-References: <20241014153808.51894-10-ignat@cloudflare.com>
+	s=arc-20240116; t=1728943243; c=relaxed/simple;
+	bh=lK5pAK2E68CMaTy4EmAUcpJFEZj/0OnHejYDPYJ2LBo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E9tfwlgVN5B3ZNEVPsepu/7WS0X/zPIEXdL5bFR+ksJ0bDhB52mAw4+MGOq2DaDD8RLTOAuTVsK5lxeLW4kpDwq/KUwtebo9bKMMnJUcItZ5JRnKFKFT1E/PRZrPTxi9a71rl0gj7Ujm3CF7iMhrW1NhsMwyQWVoIwKZrGgjN4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=40274 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1t0T7C-007QD4-9o; Tue, 15 Oct 2024 00:00:37 +0200
+Date: Tue, 15 Oct 2024 00:00:32 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com,
+	edumazet@google.com
+Subject: Re: [PATCH net-next 0/9] Netfilter updates for net-net
+Message-ID: <Zw2UgAlqi_Zxaphu@calendula>
+References: <20241014111420.29127-1-pablo@netfilter.org>
+ <20241014131026.18abcc6b@kernel.org>
+ <20241014210925.GA7558@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241014210925.GA7558@breakpoint.cc>
+X-Spam-Score: -1.9 (-)
 
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Mon, 14 Oct 2024 16:38:08 +0100
-> This reverts commit 6cd4a78d962bebbaf8beb7d2ead3f34120e3f7b2.
+On Mon, Oct 14, 2024 at 11:09:25PM +0200, Florian Westphal wrote:
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> > > 5) Use kfree_rcu() instead of call_rcu() + kmem_cache_free(), from Julia Lawall.
+> > 
+> > Hi! Are you seeing any failures in nft_audit? I haven't looked closely
+> > but it seems that this PR causes: 
+> > 
+> > <snip>
+> > # testing for cmd: nft reset quotas t1 ... OK
+> > # testing for cmd: nft reset quotas t2 ... OK
+> > # testing for cmd: nft reset quotas ... OK
+> > # testing for cmd: nft delete rule t1 c1 handle 4 ... OK
+> > # testing for cmd: nft delete rule t1 c1 handle 5; delete rule t1 c1 handle 6 ... OK
+> > # testing for cmd: nft flush chain t1 c2 ... OK
+> > # testing for cmd: nft flush table t2 ... OK
+> > # testing for cmd: nft delete chain t2 c2 ... OK
+> > # testing for cmd: nft delete element t1 s { 22 } ... OK
+> > # testing for cmd: nft delete element t1 s { 80, 443 } ... FAIL
+> > # -table=t1 family=2 entries=2 op=nft_unregister_setelem
+> > # +table=t1 family=2 entries=1 op=nft_unregister_setelem
+> > # testing for cmd: nft flush set t1 s2 ... FAIL
 > 
-> inet/inet6->create() implementations have been fixed to explicitly NULL the
-> allocated sk object on error.
+> My fault, Pablo, please toss all of my patches.
 > 
-> A warning was put in place to make sure any future changes will not leave
-> a dangling pointer in pf->create() implementations.
-> 
-> So this code is now redundant.
-> 
-> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> I do not know when I will resend, so do not wait.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+At quick glance, I can see the audit logic is based in transaction
+objects, so now it counts one single entry for the two elements in one
+single transaction. I can look into this to fix this.
+
+Florian, are you seing any other issues apart for this miscount?
+
+Thanks.
 
