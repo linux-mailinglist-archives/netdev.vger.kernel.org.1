@@ -1,100 +1,89 @@
-Return-Path: <netdev+bounces-135176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BFD99CA23
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:30:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8A6999CA26
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 14:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B3FA1C227A4
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 12:30:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 359B4B21183
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 12:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4E51A4E77;
-	Mon, 14 Oct 2024 12:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACEF8158DD1;
+	Mon, 14 Oct 2024 12:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cc8oNisw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGnAFLrJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4101A4AB3;
-	Mon, 14 Oct 2024 12:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820BD13A3F3;
+	Mon, 14 Oct 2024 12:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728909024; cv=none; b=cVzPqbZ0rRLcttWxozpxvPALmDaFptaEjcPqgYmSOssB47NAOhUe48cFYMGEF+c5ZIRs7Bcztfx20JVgDB1bnQOFGjxgM3ev7Rekth4XL4IrDeUpGGyDWjwSKcQSfmtXtDqK3h/uaYoaqWzFSc6ofNJ99wsO5H6gL9ioNfTsaiI=
+	t=1728909054; cv=none; b=a4UsSaEX4Hj3Y3FieQUFF8WZWJjDAIovh2VEIRX65lc7YAEslEmwDo4i2OwsbCJaJ+YrkEyawDguPyXa/SYNaH7FH/kcCrEmNINFaq1r0Vql47yDc3BlvPnwFlI+QQJ168msS9PYRV+/EU3ZuP1CHVhFolpiPXK4is6EUS9mAAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728909024; c=relaxed/simple;
-	bh=XVK9EjCdeEAv4B/wdJyWPtMZjV/x5MQsY7gUvvin5dU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OEfjGcPXhf1hlLofS+tA/gjifnXuJL7CK2Ii8Vu6bu2c5FpaaViFcJ8IuYkblzU1/wXyDfFh7sdQTk4DrD+FQRQjmbBo5a/BisEe5VwAm8WYCUd+xnyp9RmKxb01adV56r9trK/VISBjSdl7WhDYeWPorwpPcs97hyaKVmz4qzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cc8oNisw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33E56C4CEC3;
-	Mon, 14 Oct 2024 12:30:24 +0000 (UTC)
+	s=arc-20240116; t=1728909054; c=relaxed/simple;
+	bh=1w2lXMaNjPUZjj0BggGaU2E2DAW80+wEucUfAkKlySo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uROGhU6SvGZz4LBpCfCA6MslIutBZK/wjxCYd57RV3imjvS8ICQLHzW/yEy1ceb08mUAzKTxXIK9V85xPHkdVCBPTd5PX27I/JKzDgUT0kVNalBMBPxms5NIIo0ACioWe2Qq94TvPV/N6sQLdaTH1AJ+IisQpAg3gqZm9f8y+yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGnAFLrJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A536C4CEC3;
+	Mon, 14 Oct 2024 12:30:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728909024;
-	bh=XVK9EjCdeEAv4B/wdJyWPtMZjV/x5MQsY7gUvvin5dU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cc8oNisw3v0g4p9hXkd/PebHJc8em1Ay7gUAztHCIcaSLKYcZGeuxAa85xc8Lesh2
-	 YZAu+IiiwkmJha+280HQYX1OjvSeTxCYtJnxqsLD3BwYiNQ7JHQVUb3va3xHvwsPYk
-	 6Kr+k8zsYuRh6baZVOFmSs65IiuaFt/E3JX6KRH6YggGultzGAJtKpycu1pZuF8arZ
-	 +TxvbfVZ3PJopZ2mLbPoEcGYYUdAux8ETpus6v6ZkGVuPJ0zagBWPVbmV2uiW3ifbz
-	 G+k3Ia3/9pW/RmP7kKKxuvGiyHmaONsP8A5D7eAmxwXtkxXWlO7yIAVkVJU86d7voX
-	 flCAHVNoh6ZGA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715D43822E4C;
-	Mon, 14 Oct 2024 12:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728909054;
+	bh=1w2lXMaNjPUZjj0BggGaU2E2DAW80+wEucUfAkKlySo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZGnAFLrJ0+Rd2qguSCsdDc4MQ6NEul2rDcUGYZTfYQDujr3LblDhP8vAlXCtLu2Fc
+	 8SMUAu1D6pjNUsObg0cl6TyJDdaet9dSRgNnQnDpbxiywPbb7dLeKurLk/4dfXmZkm
+	 WPm4e4delqXXnRGBNZEELeGgZVIqmNI4Ij/fkL6vdDcGOdaEh4nmSFbUxktB1r4Ix/
+	 z/pSAaScT7rjKYwfgKgeBe2HkesW6AWt0AmNk1n5KwrZtjbE6yabC9DnvfvenB8fwj
+	 tMXqUh239MHV1CA7YuuhURDg4e1fm+eFD/Ae1tj+eieUKcAMXViD2YPIz6Y2fTCXZL
+	 9oAOpRIgkSlxQ==
+Date: Mon, 14 Oct 2024 13:30:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 1/1] tg3: Increase buffer size for IRQ label
+Message-ID: <20241014123050.GU77519@kernel.org>
+References: <20241014103810.4015718-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] net: ethernet: ti: Address some warnings
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172890902927.497553.15127625651293052823.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Oct 2024 12:30:29 +0000
-References: <20241010-ti-warn-v2-0-9c8304af5544@kernel.org>
-In-Reply-To: <20241010-ti-warn-v2-0-9c8304af5544@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, rogerq@kernel.org, nathan@kernel.org,
- ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
- kalesh-anakkur.purayil@broadcom.com, netdev@vger.kernel.org,
- linux-omap@vger.kernel.org, llvm@lists.linux.dev
+In-Reply-To: <20241014103810.4015718-1-andriy.shevchenko@linux.intel.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 10 Oct 2024 12:04:09 +0100 you wrote:
-> Hi,
+On Mon, Oct 14, 2024 at 01:38:10PM +0300, Andy Shevchenko wrote:
+> GCC is not happy with the current code, e.g.:
 > 
-> This patchset addresses some warnings flagged by Sparse, and clang-18 in
-> TI Ethernet drivers.
+> .../tg3.c:11313:37: error: ‘-txrx-’ directive output may be truncated writing 6 bytes into a region of size between 1 and 16 [-Werror=format-truncation=]
+> 11313 |                                  "%s-txrx-%d", tp->dev->name, irq_num);
+>       |                                     ^~~~~~
+> .../tg3.c:11313:34: note: using the range [-2147483648, 2147483647] for directive argument
+> 11313 |                                  "%s-txrx-%d", tp->dev->name, irq_num);
 > 
-> Although these changes do not alter the functionality of the code, by
-> addressing them real problems introduced in future which are flagged by
-> tooling will stand out more readily.
+> When `make W=1` is supplied, this prevents kernel building. Fix it by
+> increasing the buffer size for IRQ label and use sizeoF() instead of
+> hard coded constants.
 > 
-> [...]
+> While at it, move the respective buffer out from the structure as
+> it's used only in one caller. This also improves memory footprint
+> of struct tg3_napi.
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-Here is the summary with links:
-  - [net-next,v2,1/3] net: ethernet: ti: am65-cpsw: Use __be64 type for id_temp
-    https://git.kernel.org/netdev/net-next/c/5c16e118b796
-  - [net-next,v2,2/3] net: ethernet: ti: am65-cpsw: Use tstats instead of open coded version
-    https://git.kernel.org/netdev/net-next/c/4a7b2ba94a59
-  - [net-next,v2,3/3] net: ethernet: ti: cpsw_ale: Remove unused accessor functions
-    https://git.kernel.org/netdev/net-next/c/2c9eacbb56de
+Very nice to see this addressed :)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
