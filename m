@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-135195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F89699CB7F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 15:22:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29E999CB93
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 15:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B67B11F21C76
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 13:22:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCA0C1C21788
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 13:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32BA1A726B;
-	Mon, 14 Oct 2024 13:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EE71A0B07;
+	Mon, 14 Oct 2024 13:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qIdTn5bq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4lOD80bw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298144A3E;
-	Mon, 14 Oct 2024 13:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31471A726B
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 13:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728912148; cv=none; b=QsCqpHl3v1vEkTfsm6LlHv2YjKas3JlCW/0fI5t4FJlpD+bQI8mI5Y6zupFwthdZTpN5iDJgzQgLAfw+cvGNbQPRy+QdSfZydU5X1uRvIV5yfGGOxGWljXL2ZQk4g55B2F1pvdClISLxeZJT/mPltxMcG7JvKzhOciuvNjGU1XY=
+	t=1728912600; cv=none; b=gkcOxipZXeKvd5fbVHw19VT+S3Ofc5dU3n/i+Vo6Ys7GevjylG9hcBMRm8oFp/kWxohpGJHGRV4C2V6zjPspSrxwpPMWLAOgV4jTjKB0PbEZl79oRH0VTGc7BgLBi2wNSQ+AlItFvPJUC0e+KK9ALjfva+VWAY420u9dTA6Mx2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728912148; c=relaxed/simple;
-	bh=feqJ70DmJ2H3ePXvPbCOLKSz9tHkhUPaXDX02tFCN0c=;
+	s=arc-20240116; t=1728912600; c=relaxed/simple;
+	bh=jrmza/8m6NVkPAtqGDzYH66dUcYa1DiOiP6SpnQGKNA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dBAkADcx20leG33qiEx5wtNVWPUVxN+xhz2ZOOxUbKt725rNE7lSzChpMwQh4LKzE0No7Rd0rc4EvTLGxIkf/6py1ecVsQCFnXyahrEk2KkyvmlqutaT47Ag5KfYsm38wyQEIMGP9ycHrs1pD/zP2dHtUadJc9eVCnoXz0od1VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qIdTn5bq; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=d5KPzOYjImlEqYVdPi05Mwqz9oF42D0nLCpCxrUBrwQ8JCTn4zwJVB/sQ4qnPM8FKO59OMMdtzn5JMcAL5emAbF4DpyQjECg5zVZoIDEbz1tqA6f/lxs35ARn6jKg4esN6HxgsXXPI0rDny2F5lGD+cK8vXt+gCPz1aAJnJCd9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4lOD80bw; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,28 +36,20 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9i0GmyStiYse6NHTKKq1pGmahkzhq31504Qqrm1csDU=; b=qIdTn5bqH5Qe6afQZSxu2BtIbk
-	hHep3vL5Z3qs6jS5/i/17/ogiKyGm6cjsQU3vu/GFSODid10FW8FXGT3RQ4jIB9du45fkMy6Ed0hE
-	NX3xiW0dhDYOz2p/x4qhBvQn/M5ZYSgTohm/YOeMT85wVnqdZ5+e9TpQIZIE5AGP2lHk=;
+	bh=tLoeIYjJblCXeoCoIZm61CRPMFyzayogWLkcYe+8+OQ=; b=4lOD80bwNAiY2Uyw4Px0EL6bLa
+	C1+Grqd15PW27uY85JK1MMMcj+FkdEGLVFoKRvVuQXzvoH7lO8JZB9AyJC6h5P9EKAX8anegEtjCe
+	yuj0HWfznapA69bNCyc1kxY9dNC1V8rdio0wvrcDI+Nx2DoyYqpTawTB6212cR8bZFT0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t0L1b-009vVd-NB; Mon, 14 Oct 2024 15:22:15 +0200
-Date: Mon, 14 Oct 2024 15:22:15 +0200
+	id 1t0L92-009vb7-Hg; Mon, 14 Oct 2024 15:29:56 +0200
+Date: Mon, 14 Oct 2024 15:29:56 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: =?utf-8?B?5Zue6KaGOiBbbmV0?= =?utf-8?Q?=5D?= net: ftgmac100:
- corrcet the phy interface of NC-SI mode
-Message-ID: <44575610-70e1-48cf-ac19-3edef0b7a58f@lunn.ch>
-References: <20241011082827.2205979-1-jacky_chou@aspeedtech.com>
- <e22bf47d-db22-4659-8246-619aafe1ba43@lunn.ch>
- <SEYPR06MB51349C634A15F932ED0ECF4F9D442@SEYPR06MB5134.apcprd06.prod.outlook.com>
+To: Peter Rashleigh <peter@rashleigh.ca>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Fix errors in max_vid and port
+ policy for 88E6361
+Message-ID: <5cce39c3-0ab6-46e6-881c-540efc5347ee@lunn.ch>
+References: <20241014045053.9152-1-peter@rashleigh.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,69 +58,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SEYPR06MB51349C634A15F932ED0ECF4F9D442@SEYPR06MB5134.apcprd06.prod.outlook.com>
+In-Reply-To: <20241014045053.9152-1-peter@rashleigh.ca>
 
-On Mon, Oct 14, 2024 at 02:23:40AM +0000, Jacky Chou wrote:
-> Hi Andrew,
-> 
-> Thanks for the review.
-> 
-> > > In NC-SI specification, NC-SI is using RMII, not MII.
-> > >
-> > > Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for
-> > > NC-SI")
-> > > Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> > > ---
-> > >  drivers/net/ethernet/faraday/ftgmac100.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/faraday/ftgmac100.c
-> > > b/drivers/net/ethernet/faraday/ftgmac100.c
-> > > index ae0235a7a74e..85fea13b2879 100644
-> > > --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> > > +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> > > @@ -1913,7 +1913,7 @@ static int ftgmac100_probe(struct platform_device
-> > *pdev)
-> > >  			goto err_phy_connect;
-> > >  		}
-> > >  		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-> > > -					 PHY_INTERFACE_MODE_MII);
-> > > +					 PHY_INTERFACE_MODE_RMII);
-> > >  		if (err) {
-> > >  			dev_err(&pdev->dev, "Connecting PHY failed\n");
-> > >  			goto err_phy_connect;
-> > 
-> > I'm a but confused here. Please could you expand the commit message. When i
-> > look at the code:
-> > 
-> > 		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
-> > 		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-> > 					 PHY_INTERFACE_MODE_MII);
-> > 		if (err) {
-> > 			dev_err(&pdev->dev, "Connecting PHY failed\n");
-> > 			goto err_phy_connect;
-> > 		}
-> > 
-> > The phy being connected to is a fixed PHY. So the interface mode should not
-> > matter, at least to the PHY, since there is no physical PHY. Does the MAC driver
-> > get this value returned to it, e.g. as part of ftgmac100_adjust_link, and the
-> > MAC then configures itself into the wrong interface mode?
-> > 
-> > For a patch with a Fixes: it is good to describe the problem the user sees.
-> 
-> Although it is connected to a fixed PHY and do not care what interface mode is, 
-> the driver still configures the correct interface.
-> 
-> In the ftgmac100 driver, the MAC driver does not actually need to know the interface mode 
-> connecting the MAC and PHY.
-> The driver just needs to get some information from the PHY, like speed, duplex and so on, to 
-> configure the MAC.
-> 
-> Perhaps it is not matter on PHY interface to MAC, it should correct to the correct interface mode 
-> for code.
+On Sun, Oct 13, 2024 at 09:50:53PM -0700, Peter Rashleigh wrote:
+> The 88E6361 has two VTU pages (8192 VIDs), so fix the max_vid definition.
 
-So nothing is actually broken which a user would notice. So please
-drop the Fixes: tag, and submit this for net-next.
+Hi Peter
 
-     Andrew
+Is 88E6361 correct?
+
+> 
+> Also fix an error in mv88e6393x_port_set_policy where the register
+> gets an unexpected value because the ptr is written over the data bits.
+
+Please make this two patches, since you fixing two things. Each patch
+needs a Fixes: tag.
+
+    Andrew
+
+---
+pw-bot: cr
 
