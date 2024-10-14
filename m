@@ -1,229 +1,157 @@
-Return-Path: <netdev+bounces-135112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 697A199C563
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:21:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1624A99C56A
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 11:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD9428B28F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:21:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A33FA28B2B2
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 09:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA7D157E6B;
-	Mon, 14 Oct 2024 09:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF0F1A256F;
+	Mon, 14 Oct 2024 09:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="IFKqvVag"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FybViEqO"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2068.outbound.protection.outlook.com [40.107.20.68])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707F1156F3F;
-	Mon, 14 Oct 2024 09:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728897240; cv=fail; b=VFN9DuuK9JAfErn2nHdz8QIIIi4bLWD9Gm6/utFDMULmNe0iJSxt8ACw09BPKv+jb1Wl819LXZEkeVxl/enZs2/FJU7YSyxy5Ns5mo6fUQJJLz/PMNmsQZB/4DbRvXErRi6VrDOLiIAr3kj6qiT9W9tMf+QP6vIl4WNNlrkcSaE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728897240; c=relaxed/simple;
-	bh=piJ838p7rfE8QNJZxqHQyj9jj0uIINewc9X5nM3ggcI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=h/pvvnkYTP5Fvq4YZRMpW2LbHhA/omlS9Sb13NA/msns30hvFxoJa60NEx3dodBPjeGzLheUmabCPo0BG3xF7f8tP3/XqXRBFVADQ1pW6TjBTZr4Pxk8WQfblybbGqK9o6R0op20y3DQnwNrK+lHkHQMUsWTRRi6OK2ffEpnQF4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=IFKqvVag; arc=fail smtp.client-ip=40.107.20.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fReRlFowtdoSNudSzxoY+AHFIRmMiFU/1HelTDRagnhSsrgLZDe0FQl4HQ+wlSWODct+XcPepSVtfnXGxkP0zsyMpIUvyZucim5WCeILe/8gOujtUE4Q8SIPA8mGy5oA08F19Ch54T/X1LdQmUYMUx82+zTP3yjNS4g8DNhFBhcm3Fpq2c9GwHcv14FEMf4HU/XDZqPPnzy7kbdlVYxsSPZAV0CzdHv/OHCQMa7DKXJXDSYbTuANqsYDkjzyiKIbZfMNp6Lms6mgZzk5kDDE+IvqXH6viWcp3bB4hB34f5nnpUi/ZkDXJKY8YwWHPMuX8eQdmWglEnIzjnUowCbQaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=piJ838p7rfE8QNJZxqHQyj9jj0uIINewc9X5nM3ggcI=;
- b=N/Ekc+RB68TWBxv8jW/G6Wz5sXnSkak7qERw9cu2GyEIR5YUmUCqIsR/VfAMRVLpRZ8hpUYbCMIEPFk3fhw9gMj79ilbkl+lfkPjPIJVMlWnhDc0O4+TUmQvBWvdwJmOlHIad7ZdnR1I40hxF+Aq8sybzIjBbKSPl8l7hktBI8FAYqiJDvm2H/m4XZaX/NvDXWbKp00VH2uypg8qANEgnJ1U7Vz5+FxKmFv7HXktVdkdct79SUTmjBEyFZlp3ln5tIXjuXcNUTAVQvwtJ1225XAqIs07W4fwvylO0ek6W4jWBhEb/9PdBxQmjkOIzOX4YQjXDFkt1MbxOcntlyEnLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=piJ838p7rfE8QNJZxqHQyj9jj0uIINewc9X5nM3ggcI=;
- b=IFKqvVagr1Aa3HZKmBHEAowiDipqiNUe4lZB2EW61LURxG39wkX5V1e9ytPA+r3m3miO8J77WqRcIINAk0Z3ypEuhVQccfHipmeUj9fUaQkT4ZDw6z0Pn2D7gv0nnKYcBxzowYwURr40X8JKOfOLaefhh1CjjlR4K8M4ZD/IhalwaumQUUNSa0n/lkSbZBR7vc5RlBJGKy9SuAGkJ893++J1hReOfIRLHxGQQn7houIYdkTIpWb/RcU4tVsVdWVaUyfvw3PxwqD3jfAjw/fxWVKacyqko69ygg/qPOa5qaWU/mA/ITio9BFcueazXJEyBdBNJohqk1GZoJ4745Yufw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DBBPR04MB7546.eurprd04.prod.outlook.com (2603:10a6:10:1f7::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Mon, 14 Oct
- 2024 09:13:55 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8026.019; Mon, 14 Oct 2024
- 09:13:55 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Simon Horman <horms@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu
- Manoil <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Frank Li
-	<frank.li@nxp.com>, "christophe.leroy@csgroup.eu"
-	<christophe.leroy@csgroup.eu>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "bhelgaas@google.com" <bhelgaas@google.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>
-Subject: RE: [PATCH net-next 10/11] net: enetc: add preliminary support for
- i.MX95 ENETC PF
-Thread-Topic: [PATCH net-next 10/11] net: enetc: add preliminary support for
- i.MX95 ENETC PF
-Thread-Index: AQHbGjMCRp6WYylLaEyKPUuJKhwhaLKF/FoAgAABjsA=
-Date: Mon, 14 Oct 2024 09:13:55 +0000
-Message-ID:
- <PAXPR04MB8510F4E7432BA882BA7E623788442@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20241009095116.147412-1-wei.fang@nxp.com>
- <20241009095116.147412-11-wei.fang@nxp.com>
- <20241014090638.GP77519@kernel.org>
-In-Reply-To: <20241014090638.GP77519@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DBBPR04MB7546:EE_
-x-ms-office365-filtering-correlation-id: 531e156e-ed09-4500-e3df-08dcec308788
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?gb2312?B?cEVhaHdibGpoNHMxTFpCZFZvK1YvRE1hcytlTk44MW14dXpJdHpZa01zWFNr?=
- =?gb2312?B?QjZaNGpPZUUxaGZuY05ZZllGQ1BuODJVT3RUaVpoTnFSZzdNQm5QUGFQN1Rj?=
- =?gb2312?B?TFBsWnY3NVViRFR4a0JEcDBZTWNoWm1kQW9LRVhSNEpzbU9Mam9JQXdvSFhW?=
- =?gb2312?B?bVhQY3NLR2VKazhod2k0VnUraWJQNlhBMVRhdGFiSzFSMGh0cU5YYk5scG5j?=
- =?gb2312?B?T1BRTjZJQTRlTTlISEhLcnZXTHdjN050SlRVSU1tcG95alB6UDIzOVFMYTU3?=
- =?gb2312?B?RmhVZmltdTcwVXdDTTRTSjZpNVlSamZxYUorRStBUjcza0Z6VS9GanVMQmFU?=
- =?gb2312?B?eFVyRU9FaCtsNTZlL0xnTkR6T2pGeTZHelNxUjA2R25iZTZkMFpVcGNYWEpx?=
- =?gb2312?B?eG5kbnJIUi8xUGVNWmNLL1h3d3QzakdYU3o5MWxMaTd3UGYxMm8ySGh6Y1Y1?=
- =?gb2312?B?cWg2TitkT2RDMUxGMGFFY24zRC9tWWxneGxMV084NXIrVHBSYkRCdllsK285?=
- =?gb2312?B?V1plNTFaVm1oMDR5VnlsZ3BHZG51UG9ZbjBoZ2lnNkNhTkJvOFZtYXNWcmhD?=
- =?gb2312?B?WWJzTTVCSnF1NkZ1ckFXWE40MStmZHBvdmI4UmxCV0ZSaVIvbm05QXhoalQw?=
- =?gb2312?B?QmxVQ0ZpejBKdW52WGdDUDdLWHVJUG9zclBUTkl4ZHdwajRPdDVyRTNBN1RQ?=
- =?gb2312?B?NnNwaUFCRGVIRCs1cHJ6K3VQYW9STHQrWURob21HdmlSclRGUTNEL3FmeHYv?=
- =?gb2312?B?ZTQ2bEd2Z1MxWFFHMU5VMGtmbTRzRjRHVUdVZEhUZXFyWm40Q1p4akhVWXJi?=
- =?gb2312?B?S1krUmRyN3FmVkZNTEFoOGNxZjNzQ01ocER6anJQdFROM0YxemdiMUlCcHNl?=
- =?gb2312?B?ZVNCRzZaL0FneEFzb3ZsV3d3bHpQYnhJbU1uQk5vRFpJMmdQOGxPTUJWV0VS?=
- =?gb2312?B?UUpGYjdQT0gzV0hNaWlXV2swMnZHV3ZOUlpXeGJ5UTJmRHhlWlJRT0FuODlQ?=
- =?gb2312?B?S1ZzNXQxNFFaM2VJZzFKN3hzOTJhcEhhMnpZcGFIQWI4a2dPNCtzWDFPNDNR?=
- =?gb2312?B?MGhDSzNtT0hTZjNDT3ZZUHIydkdZZmVRbDRQdG55M2VrWDl0Tm93eGpzWDQ4?=
- =?gb2312?B?b2wwWWp2TkJyaXA5M0UwYXNFVDYwdUovemlrRkFEUTVrdjV3TmljbVlRb1p4?=
- =?gb2312?B?dzdiZHAvQnFvbVhCY3dMMlNCbG5naTFOTjVMZTFwcVZRR2cvU3pDZkNDdGF2?=
- =?gb2312?B?UGt3ZjliZmxlTVJ4NitTS0xsRjFxaHhhUVEra2hiK1hqeGJUb1dUOFcyZm5n?=
- =?gb2312?B?bWN0NzBlazR3VFFRdVZvZXg1OGM3U1RLeEh5ZnhaUlFYbnhVMG5vZTRhNUFp?=
- =?gb2312?B?OW8yS09KbHZ4aXJYNUJFRFhiNDBQaXFNRXVkcGIybnVhalNIWVpGdXlrUUI4?=
- =?gb2312?B?THZxU2Z6V0l5YzlsRExZV2tuR1QwUGpiRUEyQXBwTTdmbkNhd2cvVjIxR0kr?=
- =?gb2312?B?aHRSMmFJalZHV2FuMTg0aEYrTUFUdWhocEdHcG1vTmc3SXk5QkNOZ3Z4dzhq?=
- =?gb2312?B?RnJDempGdDBXazJGV2hhbGZDUUN3NHFTWitDM0hzTHp0NGJhME5uL2Y0a3py?=
- =?gb2312?B?SDJvblA5eWE5YVp6cFlFTjBaMEdNdCsrQXZXZTRka3orUFpERHM3K1A4ejky?=
- =?gb2312?B?Ryswak85OVh1MkRrbFkwaDBXMTdzYThHSG5wcG5RcVRjbFFySmZPN1F1cnVQ?=
- =?gb2312?B?T3dWbm9KdExkb2VrczltMUdKNzJSTjFqZkNDMGl6WG5JR3VDYlcxNzNPTnB6?=
- =?gb2312?B?TUxEaW9NN0tlcXcvdHB1dz09?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?N3NlNDlPMmIwTk5nWFQ5M1JmMjZiQWZTRXJRSFF5T0FPOWhsMFZoREhjeXFl?=
- =?gb2312?B?MnAzOVdEblpRd3pRRUZSa1RHRXNicXhiK0xkMzdySXBCRUlZTDBIaitYTUQ4?=
- =?gb2312?B?YnNDTi9VMXluK0lEbldFYmNyOFFUS0FnOUZOclc3MVFMV2Q0NWJHQSt0blJH?=
- =?gb2312?B?ZWRocjI1a3dEZlkwK01UZHB3SklydEtuMWlTbEp3a1BJRHlvZ2JUYmliSmd0?=
- =?gb2312?B?T1FZYzIyL2wxMFBnU1dzcXJuelFIYWFZenhHcXdNNkg5VXo2Zm1vc2lHU21C?=
- =?gb2312?B?MXNsYTUzcnJORGx0ZFNWTkRZTllpQjMzNWxKb1BXK1cvakxpbytvV0IvRW9U?=
- =?gb2312?B?TVprbHFGTW44M3V3aS8rMkE2WGw2VXhYZlFIMlg5Q0ZnQjBXTW5yc21sZCtk?=
- =?gb2312?B?QXNLbFFrRVFFdVNzeS9QU2tyYWpIRkxJbnhreTl6MmkvNy9LbWNRa2xsd2pR?=
- =?gb2312?B?OE4ySDNETGxiZXMxaHhlbmwxR0h5eTZRdXF4ek1jSDR2SWVQRmhvbnkyTlY2?=
- =?gb2312?B?R21XL01jZkUyZ0pvemtRenZ1NlppSDR5ckM0VGpBamkzMTJ4Y2ZFOGM0REdV?=
- =?gb2312?B?czNienk2V2piNi9yb0dUOVkreC90TkRBOVl6WlZBTzI4QlMveHl2TFl6NzFh?=
- =?gb2312?B?ZitRbVR2Nk9WaUo2ekc0NWY3akJQSXhCd3dyYTEwMDBhUjhwbmVWeHI3TUUw?=
- =?gb2312?B?QWhTZFc5ZmJhYVYwR0hkOGM2K0FndTFROG9sWnhPbjN0RGtzaHBMcGk4cGVS?=
- =?gb2312?B?aWlJWGVtMmpzaWJsVDNuNXZLR2cwVHpLRmEwZmVEVlZ2ZVJ6QnphK2Y0L2sv?=
- =?gb2312?B?R2pQQkxqY3FzTytmd24yNGZDZzN2VjU4ZTBRQWR0RjhpQXpHUmFaa212ZXBK?=
- =?gb2312?B?L0JPMGl1UWNlY1VIb3M1dUNwcCtxSmVMKysyWTdlVG5PZU9SZFQ0S3dOMk43?=
- =?gb2312?B?dFpxNDVNVC9OV3o5RDVmNUxJVFJ2cnhudnM2TlEvSTdZTi91UkZ5OWdTY2RN?=
- =?gb2312?B?VnpCQXdVeUFjaWpYUENEQnFXSXhUcDhSY3lyeVg2OUxSWEtHVVlUZzFwaElp?=
- =?gb2312?B?bFBxVzZzK0VPZ2M1ckpxM1pCUG9LMEVaajV1cTlBZ2tMNGo1Qng3dlo1QUJo?=
- =?gb2312?B?bmhGU3BXUWo3b2E5UjdKL0ZaVHc5WXFYazVmdW9kN0R0SG1XcGo3SmU2NHdW?=
- =?gb2312?B?ZnhHeEF4NlhXZnNxUkZqWGNCM1ZzWkl5alk4dDNtdlNuSmg2UVFhQnRRMEh5?=
- =?gb2312?B?Q0NvTms5MlhVbzNZUHYrK3YwMWpiczZDbk91S3YyNFZyME5xZ0FhUVo2OVhH?=
- =?gb2312?B?bkZ5UnpUQTc3d3E5Q0dYdm1SSmJBZTRqL0RSd3RsUXh3QlR1eEIzM1huVkND?=
- =?gb2312?B?NHV3SEdyejE3MXNFaHJQUDhNZHhuSWhhNFJNZkxyeGVwK1NxMURSZkRKWXVQ?=
- =?gb2312?B?YUNSYk5Fa3A3VUZVYUZsVGJ0Q0RKVGd1WHRyZmFmWUg1elp5Um54R3hveE1D?=
- =?gb2312?B?ZHdOZEZMMHFMdmlMQSs0QWcvV05iSWpQOGd3aHRNU1Q1Z2xzRDNnNG1EaTNi?=
- =?gb2312?B?L25RTXZ4SnN2bjZNVHF2Vkh5MC9vbHlydmIxUWo2UDQxZjNpMmRuSWJCQ1gr?=
- =?gb2312?B?a1AzQ1JrZmhGYmtVM1E3R2VEQUNkZHRBNjY3N0ZNU2FjNHhhNHBkcGkrSEk1?=
- =?gb2312?B?R21aUTRIQjVmd1BsUFpLZ3Z5WGpBdEZNL3l6UjBLYkdTUWlDdUNQUFJmY1VZ?=
- =?gb2312?B?bmZtZEpSRWs2MjkyZGN3Tk4zeC8rbFZYbzZIb3M3eG1PeVErdllQTUhSc3Zm?=
- =?gb2312?B?L0J1MnUvTFpENThGNGVmRm5mV09Md1lhUEtwLzR5c1U0bWZMNUxnazkxdDVW?=
- =?gb2312?B?eG55UEo0NytJRkI1TVVLUTIzMHh2aWVkL2YvWGdWbmhCczhkL0E4czJLMzNT?=
- =?gb2312?B?eTNxY1I5L250RC9GbGRHOEYvc3NNWDErdEY2L1NzenFMV3d6OEZSQktOemFL?=
- =?gb2312?B?cllTMzdjVUVCUzNGQkh0amJBTGVhWDZRazVZdGNGTUJYaENqQ01GNGhOMkNV?=
- =?gb2312?B?OTE3OE1FU3BkTk50c3BxWXJPTWVvSTdYVUZoK1F5WlpNT0NOMlNrZHRndy92?=
- =?gb2312?Q?+e5E=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372401A2545
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 09:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728897462; cv=none; b=rDHNr7psQp5eI37B2Fgyiuy5mvN+2hMjyz3IN3KPZChrwc7+9ZPsxtaeax/+Zwm70ddMZpP/X0uUK1nRM0Qmqv14vktUW2WRURPOK0v3o3pzwXeqy72Nn77u2UjC0NfcpWDjM8koCuDkauGO/YXVq5MfGqrXmtyHls5lSxeLVSk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728897462; c=relaxed/simple;
+	bh=X9tVAxIBKX22qtH1w56dXRIVjc6wvJfam+RvxZKJOnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DRFRsmokhFBQpmWFySuXdhM0eXgP9afcXca5DGSSaNEdnVRtLnTY2L5FaILyRGkccDHTMHot/ncuXMPHe1xXNeOB1E+x4tvSD9p7LgZKkMSr82OPIILy5xUxBRmpkncqfNOg7nEWChpvVS4yaQ3/qSefkp2cC2s/cCgBoNqmONM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FybViEqO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97F3CC4CEC3;
+	Mon, 14 Oct 2024 09:17:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728897461;
+	bh=X9tVAxIBKX22qtH1w56dXRIVjc6wvJfam+RvxZKJOnM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FybViEqOg6bZYWO8QvPiZztvl2c1rLIx1/O/ER/TUnwoQlKlBBH/FMYSmZ5rHPOwI
+	 hWzXqb5+glpTnlUN0D5WkdhWw87fz03P6pPAEDI4VZgS/Wyl0+ialsdmBB+RHGDqaQ
+	 BtS/NzTKrhu45fqgCSRkUM4nBtg4AWZVqdFh9I36kTLpC0SjH3RpkfxUJ0noi4++wD
+	 OzDfWqXFOkDOq1S1/d6PqjZPSLOnDjhbM489fTcR/u08q5y0X5169FWBoj9VbdJK+b
+	 hGT7b6Ene9AFyDnf28w9DT5SecbsFh/o5TA8Wv8pMdRHh8I6FV4UkzEZPpqGqyBRKG
+	 0Q1PXbsv3XzFg==
+Date: Mon, 14 Oct 2024 10:17:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, cjubran@nvidia.com,
+	cratiu@nvidia.com
+Subject: Re: [PATCH net-next 06/15] net/mlx5: Introduce node struct and
+ rename group terminology to node
+Message-ID: <20241014091737.GQ77519@kernel.org>
+References: <20241013064540.170722-1-tariqt@nvidia.com>
+ <20241013064540.170722-7-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 531e156e-ed09-4500-e3df-08dcec308788
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2024 09:13:55.5787
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1pI+SNR2w8AS0DEISRycqmYXxPGHj6E6/w/5BqawNjieN80L5mwHFkLXCFZ6wJbSHoFSp3E4zD8iWNiB2+QllQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7546
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241013064540.170722-7-tariqt@nvidia.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTaW1vbiBIb3JtYW4gPGhvcm1z
-QGtlcm5lbC5vcmc+DQo+IFNlbnQ6IDIwMjTE6jEw1MIxNMjVIDE3OjA3DQo+IFRvOiBXZWkgRmFu
-ZyA8d2VpLmZhbmdAbnhwLmNvbT4NCj4gQ2M6IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGVkdW1hemV0
-QGdvb2dsZS5jb207IGt1YmFAa2VybmVsLm9yZzsNCj4gcGFiZW5pQHJlZGhhdC5jb207IHJvYmhA
-a2VybmVsLm9yZzsga3J6aytkdEBrZXJuZWwub3JnOw0KPiBjb25vcitkdEBrZXJuZWwub3JnOyBW
-bGFkaW1pciBPbHRlYW4gPHZsYWRpbWlyLm9sdGVhbkBueHAuY29tPjsgQ2xhdWRpdQ0KPiBNYW5v
-aWwgPGNsYXVkaXUubWFub2lsQG54cC5jb20+OyBDbGFyayBXYW5nIDx4aWFvbmluZy53YW5nQG54
-cC5jb20+Ow0KPiBGcmFuayBMaSA8ZnJhbmsubGlAbnhwLmNvbT47IGNocmlzdG9waGUubGVyb3lA
-Y3Nncm91cC5ldTsNCj4gbGludXhAYXJtbGludXgub3JnLnVrOyBiaGVsZ2Fhc0Bnb29nbGUuY29t
-OyBpbXhAbGlzdHMubGludXguZGV2Ow0KPiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBkZXZpY2V0
-cmVlQHZnZXIua2VybmVsLm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgbGlu
-dXgtcGNpQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IDEw
-LzExXSBuZXQ6IGVuZXRjOiBhZGQgcHJlbGltaW5hcnkgc3VwcG9ydCBmb3INCj4gaS5NWDk1IEVO
-RVRDIFBGDQo+IA0KPiBPbiBXZWQsIE9jdCAwOSwgMjAyNCBhdCAwNTo1MToxNVBNICswODAwLCBX
-ZWkgRmFuZyB3cm90ZToNCj4gPiBUaGUgaS5NWDk1IEVORVRDIGhhcyBiZWVuIHVwZ3JhZGVkIHRv
-IHJldmlzaW9uIDQuMSwgd2hpY2ggaXMgdmVyeQ0KPiA+IGRpZmZlcmVudCBmcm9tIHRoZSBMUzEw
-MjhBIEVORVRDIChyZXZpc2lvbiAxLjApIGV4Y2VwdCBmb3IgdGhlIFNJDQo+ID4gcGFydC4gVGhl
-cmVmb3JlLCB0aGUgZnNsLWVuZXRjIGRyaXZlciBpcyBpbmNvbXBhdGlibGUgd2l0aCBpLk1YOTUN
-Cj4gPiBFTkVUQyBQRi4gU28gd2UgZGV2ZWxvcGVkIHRoZSBueHAtZW5ldGM0IGRyaXZlciBmb3Ig
-aS5NWDk1IEVORVRDDQo+ID4gUEYsIGFuZCB0aGlzIGRyaXZlciB3aWxsIGJlIHVzZWQgdG8gc3Vw
-cG9ydCB0aGUgRU5FVEMgUEYgd2l0aCBtYWpvcg0KPiA+IHJldmlzaW9uIDQgaW4gdGhlIGZ1dHVy
-ZS4NCj4gPg0KPiA+IEN1cnJlbnRseSwgdGhlIG54cC1lbmV0YzQgZHJpdmVyIG9ubHkgc3VwcG9y
-dHMgYmFzaWMgdHJhbnNtaXNzaW9uDQo+ID4gZmVhdHVyZSBmb3IgaS5NWDk1IEVORVRDIFBGLCB0
-aGUgbW9yZSBiYXNpYyBhbmQgYWR2YW5jZWQgZmVhdHVyZXMNCj4gPiB3aWxsIGJlIGFkZGVkIGlu
-IHRoZSBzdWJzZXF1ZW50IHBhdGNoZXMuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBXZWkgRmFu
-ZyA8d2VpLmZhbmdAbnhwLmNvbT4NCj4gDQo+IC4uLg0KPiANCj4gPiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2VuZXRjL2VuZXRjNF9wZi5jDQo+IGIvZHJpdmVy
-cy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2VuZXRjL2VuZXRjNF9wZi5jDQo+IA0KPiAuLi4NCj4g
-DQo+ID4gK3N0YXRpYyB2b2lkIGVuZXRjNF9wZl9yZW1vdmUoc3RydWN0IHBjaV9kZXYgKnBkZXYp
-DQo+ID4gK3sNCj4gPiArCXN0cnVjdCBlbmV0Y19zaSAqc2k7DQo+ID4gKwlzdHJ1Y3QgZW5ldGNf
-cGYgKnBmOw0KPiA+ICsNCj4gPiArCXNpID0gcGNpX2dldF9kcnZkYXRhKHBkZXYpOw0KPiA+ICsJ
-cGYgPSBlbmV0Y19zaV9wcml2KHNpKTsNCj4gDQo+IEhpIFdlaSBGYW5nLA0KPiANCj4gcGYgaXMg
-c2V0IGJ1dCBvdGhlcndpc2UgdW51c2VkIGluIHRoaXMgZnVuY3Rpb24uICBTbyBJIHRoaW5rIHRo
-YXQgaXQsIGFuZA0KPiB0aGUgY2FsbCB0byBlbmV0Y19zaV9wcml2KCkgc2hvdWxkIHByb2JhYmx5
-IGJlIHJlbW92ZWQuIFRoZXkgY2FuIGJlIGFkZGVkDQo+IGJhY2sgaWYgYW5kIHdoZW4gdGhleSBh
-cmUgbmVlZGVkIGluIHN1YnNlcXVlbnQgcGF0Y2hlcy4NCj4NCg0KVGhhbmtzIHZlcnkgbXVjaCwg
-SSBmb3Jnb3QgdG8gcmVtb3ZlIGl0IHdoZW4gSSBjb3BpZWQgZnJvbSBsb2NhbCBicmFuY2guIDoo
-DQoNCj4gPiArDQo+ID4gKwllbmV0YzRfcGZfbmV0ZGV2X2Rlc3Ryb3koc2kpOw0KPiA+ICsJZW5l
-dGNfcGNpX3JlbW92ZShwZGV2KTsNCj4gPiArfQ0KPiANCj4gLi4uDQo=
+On Sun, Oct 13, 2024 at 09:45:31AM +0300, Tariq Toukan wrote:
+> From: Carolina Jubran <cjubran@nvidia.com>
+> 
+> Introduce the `mlx5_esw_sched_node` struct, consolidating all rate
+> hierarchy related details, including membership and scheduling
+> parameters.
+> 
+> Since the group concept aligns with the `mlx5_esw_sched_node`, replace
+> the `mlx5_esw_rate_group` struct with it and rename the "group"
+> terminology to "node" throughout the rate hierarchy.
+> 
+> All relevant code paths and structures have been updated to use the
+> "node" terminology accordingly, laying the groundwork for future
+> patches that will unify the handling of different types of members
+> within the rate hierarchy.
+> 
+> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+
+...
+
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
+
+...
+
+> -static struct mlx5_esw_rate_group *
+> -__esw_qos_create_vports_rate_group(struct mlx5_eswitch *esw, struct mlx5_esw_rate_group *parent,
+> -				   struct netlink_ext_ack *extack)
+> +static struct mlx5_esw_sched_node *
+> +__esw_qos_create_vports_rate_node(struct mlx5_eswitch *esw, struct mlx5_esw_sched_node *parent,
+> +				  struct netlink_ext_ack *extack)
+>  {
+> -	struct mlx5_esw_rate_group *group;
+> +	struct mlx5_esw_sched_node *node;
+>  	u32 tsar_ix, err;
+>  
+> -	err = esw_qos_create_group_sched_elem(esw->dev, esw->qos.root_tsar_ix, &tsar_ix);
+> +	err = esw_qos_create_node_sched_elem(esw->dev, esw->qos.root_tsar_ix, &tsar_ix);
+>  	if (err) {
+> -		NL_SET_ERR_MSG_MOD(extack, "E-Switch create TSAR for group failed");
+> +		NL_SET_ERR_MSG_MOD(extack, "E-Switch create TSAR for node failed");
+>  		return ERR_PTR(err);
+>  	}
+>  
+> -	group = __esw_qos_alloc_rate_group(esw, tsar_ix, SCHED_NODE_TYPE_VPORTS_TSAR, parent);
+> -	if (!group) {
+> -		NL_SET_ERR_MSG_MOD(extack, "E-Switch alloc group failed");
+> +	node = __esw_qos_alloc_rate_node(esw, tsar_ix, SCHED_NODE_TYPE_VPORTS_TSAR, parent);
+> +	if (!node) {
+> +		NL_SET_ERR_MSG_MOD(extack, "E-Switch alloc node failed");
+>  		err = -ENOMEM;
+> -		goto err_alloc_group;
+> +		goto err_alloc_node;
+
+Hi Carolina and Tariq,
+
+node is NULL here, but will be dereferenced after jumping to err_alloc_node.
+
+Flagged by Smatch.
+
+>  	}
+>  
+>  	err = esw_qos_normalize_min_rate(esw, extack);
+>  	if (err) {
+> -		NL_SET_ERR_MSG_MOD(extack, "E-Switch groups normalization failed");
+> +		NL_SET_ERR_MSG_MOD(extack, "E-Switch nodes normalization failed");
+>  		goto err_min_rate;
+>  	}
+> -	trace_mlx5_esw_group_qos_create(esw->dev, group, group->tsar_ix);
+> +	trace_mlx5_esw_node_qos_create(esw->dev, node, node->ix);
+>  
+> -	return group;
+> +	return node;
+>  
+>  err_min_rate:
+> -	__esw_qos_free_rate_group(group);
+> -err_alloc_group:
+> +	__esw_qos_free_node(node);
+> +err_alloc_node:
+>  	if (mlx5_destroy_scheduling_element_cmd(esw->dev,
+>  						SCHEDULING_HIERARCHY_E_SWITCH,
+> -						tsar_ix))
+> -		NL_SET_ERR_MSG_MOD(extack, "E-Switch destroy TSAR for group failed");
+> +						node->ix))
+> +		NL_SET_ERR_MSG_MOD(extack, "E-Switch destroy TSAR for node failed");
+>  	return ERR_PTR(err);
+>  }
+
+...
 
