@@ -1,124 +1,130 @@
-Return-Path: <netdev+bounces-135044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54C0599BF35
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:51:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E8FF99BF3F
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 06:57:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6DE5B2186F
-	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 04:51:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A228282E78
+	for <lists+netdev@lfdr.de>; Mon, 14 Oct 2024 04:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC0C288DB;
-	Mon, 14 Oct 2024 04:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A895FB8D;
+	Mon, 14 Oct 2024 04:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rashleigh-ca.20230601.gappssmtp.com header.i=@rashleigh-ca.20230601.gappssmtp.com header.b="cEBI9QAD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gJizudvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D5B4A1C
-	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 04:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870414A1C
+	for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 04:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728881479; cv=none; b=ZzU1vWzEESKUyTmX5QlJWH84aU1w465/R+scZKa0j7t7ejllK8mcFdqPqdaNDF27gQ+nNCt16sWsoBxNHN9Ctk4M65fnzzp//MF5poSkGeoy1iaIXHCDPt9WKfQGFgDAfws4pqtFCqkRZ65BvJ4wLDycAsM1YmY+vZ8tO3DgZvg=
+	t=1728881874; cv=none; b=Ku1xfMad+ROfvW+wezwUKABGB/qKMZbwzN1p8MlCyQXJaFR7mdDjhcT/zDYcEvlBOo7Q4G+wM0ATAF7vkna70rQ0T3yBwbJAy2p3vHDBVJQ97trwnwidIgjDhMvKSdU3wvdPClfpf5FmFtDTsUTwLQe8Txl+aAapJTd+McfwpRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728881479; c=relaxed/simple;
-	bh=szngIC35k6CKPbcTAMxtBGDJIKxmU5ECzgawAmP75eI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=V6NsORfR3r9Zw15xPA0n7NcQ33as5fAgweuheeYQUnOPIAxcfoLBCJbBzMEqa8aIS3oavOYVKsM0OUHnuHjUNuNyQl0XyffQfNG7QrEgKMlQQ8OZ2aaLz+K6LeV63Jg9CbSeTwoH/uwcqFS7OcjtHc+BcmbwrJHYupkGH8iJtNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rashleigh.ca; spf=none smtp.mailfrom=rashleigh.ca; dkim=pass (2048-bit key) header.d=rashleigh-ca.20230601.gappssmtp.com header.i=@rashleigh-ca.20230601.gappssmtp.com header.b=cEBI9QAD; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rashleigh.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=rashleigh.ca
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e2b549799eso2669863a91.3
-        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 21:51:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rashleigh-ca.20230601.gappssmtp.com; s=20230601; t=1728881476; x=1729486276; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RnXyrcF13nH7Fsy/SloXfO7Sw46e4tPjxRhFLLmjMds=;
-        b=cEBI9QAD4DRrnyuxM0bfxQKE7FQBzAMoM0YX+0qALla1pMIaSQ6H52nrJaE9f3OVTt
-         YBp5x3Ppbmh6pL2R9C5AInSsmxNx3Yum932SdhR4xtDVliIi1rL0giSTVA+xeVqMoe2a
-         MgpIma9PDkZlxPnDGXgDeI7gFPpSO/JZXs5lhxgEw9Z69U9YN7pMN8v9VsR+KnMqxOv8
-         aLgdbY6QIrbWdi4NOg7akd/d1VkkSoafLi5/ayEbHQlnUyTKi09pbKKl7vl/upXfmOnc
-         oLHVJuoZoQuQLfo5w9nhPq52dC77u7ciVYHfsHH2f0GWBsgIUF3z6UAK7mjtLgyQpOVA
-         rr6g==
+	s=arc-20240116; t=1728881874; c=relaxed/simple;
+	bh=XTX+OYWTvegQz4+v0ZFkHfZzljt0DOpIst10jFFEJps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A0BicaJuXNjXg6uQcoL4DSipvNMLV0oLM+RcwrwQv30M9xCMHwOnDJMi6WMmP6kcSH0FpuBo/5kEGLE9d0kX0dEOZaG6NU5Rsh4VN7D3JXJgX22k2frQrfbhyTFa0itO14XtQ4gIS0OLZaRxH9hXDxrl36P4v9/OMv0SWKzPqro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gJizudvS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728881871;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NNfw05JeqCiaE0aPXcBAetAKovvsf7rX91wGjBumb7E=;
+	b=gJizudvSu++VFAn+jaLZW3512tqZ0b809E0Ws2UVmqjET4Zu/EKHO2foW7nFXzDQDcvIgz
+	lj4juBJQgJ2GlUXp7ncA/ECEllksVu8+IkE/X+XZgeCjahh4dvZ9+92gF0pxScLNpG+Fyl
+	7S1lFcdZAZDnLMnuDcAFikbFPYgsdds=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-20-zTt7kecDNDWkW89Dd7RB1w-1; Mon, 14 Oct 2024 00:57:49 -0400
+X-MC-Unique: zTt7kecDNDWkW89Dd7RB1w-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5c95ac2d13bso1446141a12.2
+        for <netdev@vger.kernel.org>; Sun, 13 Oct 2024 21:57:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728881476; x=1729486276;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RnXyrcF13nH7Fsy/SloXfO7Sw46e4tPjxRhFLLmjMds=;
-        b=AmHk8yHF//dzRx6zKRinYaBPEzuSo8BTOuLgbKCuXbn9QWwoGjxKamRKQTDhFYGK3W
-         vQAGuskDNnNds77qojvQPs35Aq8tie/U/cp6w2kt80R+ktYE3kCmkGdOBHz45fvMIBwm
-         4uc+6WSDPlQ+TaEVyDsgqWksZY38mAUUAsxzRYVRXi4xlMyz0+ZKitRF+gFUoujDj1or
-         JNDnmBv1DHF48F8+NJaV4+A0bMteE6H1x7Dpn1XrmM338zHqZ8sTi5roSE3vj0jd++Z6
-         hTPrcxCjj4iN1A+OGaGHC2AluQLGU7erj/4ViStss/Omo1iM5hEUEUn/iqNbZLS2u2sy
-         T1Bg==
-X-Gm-Message-State: AOJu0YyZ53+hf3jqFlpw88kt51HOY61o2TSMjfjEWzZIRSXr1atxEU6r
-	6/gu2A5jRzHEmHNSKFZN3zh7ydIz1Riqv4mL8g99VdjWcT4hxIEwYnnyDJ2zjLA=
-X-Google-Smtp-Source: AGHT+IHwj2gCcM55X8/QEu6zcXIhaqXCYMJPJUXF9myIe+Q+OnSxstf+86mokI0AHpZ+l+GZuHvwTA==
-X-Received: by 2002:a17:90a:17e2:b0:2c8:65cf:e820 with SMTP id 98e67ed59e1d1-2e3151b7869mr8785918a91.2.1728881476052;
-        Sun, 13 Oct 2024 21:51:16 -0700 (PDT)
-Received: from peter-MacBookAir.. ([2001:569:be2b:2100:90a6:1ab1:2ac8:9cda])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2d5eeb082sm7738860a91.21.2024.10.13.21.51.15
+        d=1e100.net; s=20230601; t=1728881869; x=1729486669;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NNfw05JeqCiaE0aPXcBAetAKovvsf7rX91wGjBumb7E=;
+        b=DMtxVYvWQfjXt4/iJBYlnplyTaXAnYXnK0UF5EG50Mxns3i6Cxf0SXdbQFS2gpApxR
+         xzcQpgIjIHP3CIsJLelCOeyXP/1Z22slK1YaWCvDr3kCG5r91PDOmEOz+ldOpdFD8gy3
+         59nBbKAQWPqxDGeEkKzFd2k82f0KKjeGRsGgphMnp8hMGJ78wsUF+BPUR+O3n2jaN85F
+         9FFF0DCQ5sYmuXAsD86HFzBzt57kkWTNVvC+kjrHgjEmbZKHPGV5/Zgf64e93/gKT0CC
+         hg5GDhtupFk69jeg35bAEYDuY45id1aN/5O2qGLrJSTb1u2DIJjMOOZCMw3feIJeJF21
+         FNtQ==
+X-Gm-Message-State: AOJu0YyszX0M0ZjndXrblAJ2elnEbAsYfEIUBhQHCduhGFnQ3nCf/MhI
+	OcHpPHbYKuCrDrCivH9bkKlCnN+gdrluOQ0GrPwB0Ystx5VGFBZbzsdSxzWPZrOyzPIjnc9cSZW
+	v0ZRoqBsdmC8+xMGC0bQB/GbbjGA1z54vBH8drr/izV6WM2mxdyhf5Q==
+X-Received: by 2002:a50:cb88:0:b0:5c9:5a96:2863 with SMTP id 4fb4d7f45d1cf-5c95ac1582emr4347116a12.13.1728881868671;
+        Sun, 13 Oct 2024 21:57:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEg1zgGKPYY2qUjDast+zBLcsCYUTRpyjjjgmslaW62xyjr0N9eWzmfPPhE/J3MFikwUsQyCQ==
+X-Received: by 2002:a50:cb88:0:b0:5c9:5a96:2863 with SMTP id 4fb4d7f45d1cf-5c95ac1582emr4347104a12.13.1728881868323;
+        Sun, 13 Oct 2024 21:57:48 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1ec:d16c:2d5b:a55d:7fda:5330])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c937267272sm4425344a12.75.2024.10.13.21.57.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Oct 2024 21:51:15 -0700 (PDT)
-From: Peter Rashleigh <peter@rashleigh.ca>
-To: andrew@lunn.ch
-Cc: netdev@vger.kernel.org,
-	Peter Rashleigh <peter@rashleigh.ca>
-Subject: [PATCH net] net: dsa: mv88e6xxx: Fix errors in max_vid and port policy for 88E6361
-Date: Sun, 13 Oct 2024 21:50:53 -0700
-Message-Id: <20241014045053.9152-1-peter@rashleigh.ca>
-X-Mailer: git-send-email 2.34.1
+        Sun, 13 Oct 2024 21:57:46 -0700 (PDT)
+Date: Mon, 14 Oct 2024 00:57:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev,
+	Darren Kenny <darren.kenny@oracle.com>,
+	Si-Wei Liu <si-wei.liu@oracle.com>
+Subject: Re: [PATCH 0/5] virtio_net: enable premapped mode by default
+Message-ID: <20241014005529-mutt-send-email-mst@kernel.org>
+References: <20241014031234.7659-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241014031234.7659-1-xuanzhuo@linux.alibaba.com>
 
-The 88E6361 has two VTU pages (8192 VIDs), so fix the max_vid definition.
+On Mon, Oct 14, 2024 at 11:12:29AM +0800, Xuan Zhuo wrote:
+> In the last linux version, we disabled this feature to fix the
+> regress[1].
+> 
+> The patch set is try to fix the problem and re-enable it.
+> 
+> More info: http://lore.kernel.org/all/20240820071913.68004-1-xuanzhuo@linux.alibaba.com
+> 
+> Thanks.
+> 
+> [1]: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
 
-Also fix an error in mv88e6393x_port_set_policy where the register
-gets an unexpected value because the ptr is written over the data bits.
+Darren, you previously reported crashes with a patch very similar to 1/5.
+Can you please test this patchset and report whether they
+are still observed?
+If yes, any data on how to reproduce would be very benefitial for Xuan
+Zhuo.
 
-Signed-off-by: Peter Rashleigh <peter@rashleigh.ca>
----
- drivers/net/dsa/mv88e6xxx/chip.c | 2 +-
- drivers/net/dsa/mv88e6xxx/port.c | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 5b4e2ce5470d..284270a4ade1 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -6347,7 +6347,7 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
- 		.invalid_port_mask = BIT(1) | BIT(2) | BIT(8),
- 		.num_internal_phys = 5,
- 		.internal_phys_offset = 3,
--		.max_vid = 4095,
-+		.max_vid = 8191,
- 		.max_sid = 63,
- 		.port_base_addr = 0x0,
- 		.phy_base_addr = 0x0,
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index 5394a8cf7bf1..04053fdc6489 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -1713,6 +1713,7 @@ int mv88e6393x_port_set_policy(struct mv88e6xxx_chip *chip, int port,
- 	ptr = shift / 8;
- 	shift %= 8;
- 	mask >>= ptr * 8;
-+	ptr <<= 8;
- 
- 	err = mv88e6393x_port_policy_read(chip, port, ptr, &reg);
- 	if (err)
-
-base-commit: d3d1556696c1a993eec54ac585fe5bf677e07474
--- 
-2.34.1
+> Xuan Zhuo (5):
+>   virtio-net: fix overflow inside virtnet_rq_alloc
+>   virtio_net: introduce vi->mode
+>   virtio_net: big mode skip the unmap check
+>   virtio_net: enable premapped mode for merge and small by default
+>   virtio_net: rx remove premapped failover code
+> 
+>  drivers/net/virtio_net.c | 168 ++++++++++++++++++++++++---------------
+>  1 file changed, 105 insertions(+), 63 deletions(-)
+> 
+> --
+> 2.32.0.3.g01195cf9f
 
 
