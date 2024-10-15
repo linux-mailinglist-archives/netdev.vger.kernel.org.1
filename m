@@ -1,142 +1,95 @@
-Return-Path: <netdev+bounces-135484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 991B999E119
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:31:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B77199E11B
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E1A5283359
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:31:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED46E1F21EC8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B1918BBA2;
-	Tue, 15 Oct 2024 08:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9778E1BFE00;
+	Tue, 15 Oct 2024 08:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M4Rcykp1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gTK4HbXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B8E20EB
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FEE185936;
+	Tue, 15 Oct 2024 08:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728981095; cv=none; b=PzhUZkklPGQ8wlTrnqcbU/ixArdlJoxYb8thcQFSCVGVHCu7N20S/tOp9SL2W93UIjsO9KIWSs303Kz5zIaTe7PowRJauZLHomIQepPJEB8Ip98gBuDWlTbUJKfvs97TgdrR+lveXA+jPp32glC088Segck+NZZapSMF49Bmunc=
+	t=1728981115; cv=none; b=cnshZbkf73MgnhmA2qO3s7pGuQGsqcsRxfe3XE4xpo6sodmCC2rCy/ILGmZmCLl6dkyEPNS2yFaDLPjYaHSojgbQsh5kC4xuox/ceE1huU4h1maAR1TT9tYWzLPwqEi/ujHxX8XQAQQ+rQw+jDDObggzLf5DgAQJvAvmh/4eknI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728981095; c=relaxed/simple;
-	bh=hgqAAx4EXuLzjTAMpE/1zx1P9x/Ou/rzS1Y2g4R0qeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BKJV5FIAqV+Tles3KY+lcysl/LLWzuavzyjXSFzFZRqRcq/mnWV8vy48V4J+LofFzOnt0HCIO5ZA2v3gRZUbbCtpnfY10kyiPVDMu7UPckvZ3ZZ3kEBbw/VT5z1CSBXjEk7Ia1RHqfxJot0aK/TJT6KPsSvtxW1GBb1dHyBRYU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M4Rcykp1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728981092;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vU1tV99MICfeCvP47NVxkR5AS+mMop7OeRAQ6h/1+Po=;
-	b=M4Rcykp1jHKDhlK0AYJCD3wHi8ulb1keXreewipWLbfTgwTeLMJaGFLt5lcreylSjx76ew
-	vPTelK6SaqFOSkK1YJx+mahkJngXgMIzvgAkxndnPm+EIFlFOTVwhwQ80M2xZNcH49lqOg
-	2SsFTwla3dsilSxtNaMjySI2UBUWr4g=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-35-gAOXYtqiP1qERwhhHpcMSQ-1; Tue, 15 Oct 2024 04:31:31 -0400
-X-MC-Unique: gAOXYtqiP1qERwhhHpcMSQ-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7ac8f684cdaso967776285a.3
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:31:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728981090; x=1729585890;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vU1tV99MICfeCvP47NVxkR5AS+mMop7OeRAQ6h/1+Po=;
-        b=E3THXmW6sSU5AboyYba7IO1Jruiw8kwwA3ZDmbOtO5/twghwcJwZdOhlUi9W9gVmkF
-         GEVFUj56paOSyRUGJdYfBXG3cbHZAPCLMzN5OOLhdUETlTVv6D44QLh5+/6t1W7RlRKP
-         xQLXKYvm5Z/1QxJG9mAtVIAzoJ8c+MoLkt7qf4mvyQClEU1Lj7Jys5qRGmOKoIc4fVFi
-         U4BNWI0b9oqfDerVh9UgevalmqbRl4c7ez+fufsRyl1E9ua2y4sa4D8f9kkaf5PRaCp7
-         416rOCp3XA/DNEP4ol3/QPe6rH+OM7j4cHYWMwZHEFLqfkSBAu7dtJFsPjwnDAkLeQLL
-         xbTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWa3j18ITlD/3QQSqWpj88FYw1g7Z+oZ98MqT90TmIeLOp2tc3UufRz9XVNlDaPZDdZ/I6J4Qo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNaX9sG56Ud3GPXfo7DgFhe6lrmbYEhGG/qaCSFjT7iDdPjiUy
-	Kz8g4u+e7HFD6jDm8vkuohJxse/cgtmsXCG7Llia/J3P3Af9jUlFW4eplyMCH4IRpCU6BVIcrII
-	hwNqvhXC2QBN/sj3JfmiHgD8sS8UkHPl4oOykk14FgC357SoYqokTAQ==
-X-Received: by 2002:a05:620a:269b:b0:79d:759d:4016 with SMTP id af79cd13be357-7b11a35f88amr1853078985a.11.1728981090582;
-        Tue, 15 Oct 2024 01:31:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFP+1imT6eQmZuNh3f2P9AoQ77FpHYqXCEyc78GwkbX2P9i4NBcMxSLOaZ+ozuJjTN34arlEw==
-X-Received: by 2002:a05:620a:269b:b0:79d:759d:4016 with SMTP id af79cd13be357-7b11a35f88amr1853076785a.11.1728981090132;
-        Tue, 15 Oct 2024 01:31:30 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b13639560csm41873585a.79.2024.10.15.01.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 01:31:29 -0700 (PDT)
-Date: Tue, 15 Oct 2024 10:31:23 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Jakub Sitnicki <jakub@cloudflare.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf v2 0/4] bpf, vsock: Fixes related to sockmap/sockhash
- redirection
-Message-ID: <ledcus5cpzgm5oymzc7ezdzl7ddequt7tnqricgj4d6rrwlsoa@2buj3owbqard>
-References: <20241013-vsock-fixes-for-redir-v2-0-d6577bbfe742@rbox.co>
+	s=arc-20240116; t=1728981115; c=relaxed/simple;
+	bh=czGm3bsjbOginSrzN3yTJzEs4FxqKQu7b+ZKVUrchuk=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=WFxyqE5duKaTvkY8xqIsw7EapGkwQ5Fzpn4fZZKzvF4Z4sr2zjfWBNYRJrkRhiMG8+aiu7Mt1FgbnTdQjoZ+nze3/Df2r2OPCqrG12Btjz0xloGZIBHZKEKN44t1aAezkBSRxzYZW1gsU27ePusDJSzszuJXMRTDURoVA4dmzMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gTK4HbXA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECED0C4CEC7;
+	Tue, 15 Oct 2024 08:31:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728981115;
+	bh=czGm3bsjbOginSrzN3yTJzEs4FxqKQu7b+ZKVUrchuk=;
+	h=From:To:In-Reply-To:References:Subject:Date:From;
+	b=gTK4HbXA/7vb70s7Zutj2rEn64AKAmOMgyYLGQCfqs6FhyT0Y5XbcUhiQQVcs1W1g
+	 MPDBUKlqFBEF5qGtFJbxpO7Egxsuh9uoFRk2cpPAjNf45HUyREVoKIMxh0PlXT0lw3
+	 O39L+x3JdHwQUduLSL/3j8gSy4CKfq3Jiz3icOzDlJ1f5fmziEeX1ctUTrC+jIsYGl
+	 tJz7mibI42FYaelzjPuvVtyNCpuHkhkD5RtsbMyXzIlKX03jvI5Xs0xdc3SWGMt5GF
+	 pohvpF43mlH+2yLnA0Zk4ChseNxCoMbO4s7GmccVe27g3ULtGh0oVsogkZJCHCD/a1
+	 wMj4zhVo7vUkg==
+From: Lee Jones <lee@kernel.org>
+To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Xu Liang <lxu@maxlinear.com>, Christian Marangi <ansuelsmth@gmail.com>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+ Robert Marko <robimarko@gmail.com>, 
+ Russell King <rmk+kernel@armlinux.org.uk>, 
+ Jacek Anaszewski <jacek.anaszewski@gmail.com>, linux-leds@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>
+In-Reply-To: <e9b15613a81129ceecb07ec51f71bbe75425ad2e.1728558223.git.daniel@makrotopia.org>
+References: <e9b15613a81129ceecb07ec51f71bbe75425ad2e.1728558223.git.daniel@makrotopia.org>
+Subject: Re: (subset) [PATCH net-next v2 1/5] dt-bindings: leds: add
+ 'active-high' property
+Message-Id: <172898111066.383402.12632073984288018090.b4-ty@kernel.org>
+Date: Tue, 15 Oct 2024 09:31:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241013-vsock-fixes-for-redir-v2-0-d6577bbfe742@rbox.co>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.13.0
 
-On Sun, Oct 13, 2024 at 06:26:38PM +0200, Michal Luczaj wrote:
->Series consists of few fixes for issues uncovered while working on a BPF
->sockmap/sockhash redirection selftest.
->
->The last patch is more of a RFC clean up attempt. Patch claims that there's
->no functional change, but effectively it removes (never touched?) reference
->to sock_map_unhash().
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
->Changes in v2:
->- Patch 2/4: Send a credit update [Stefano]
->- Collect Reviewed-by
->- Link to v1: https://lore.kernel.org/r/20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co
+On Thu, 10 Oct 2024 13:53:36 +0100, Daniel Golle wrote:
+> Other than described in commit c94d1783136e ("dt-bindings: net: phy:
+> Make LED active-low property common") the absence of the 'active-low'
+> property means not to touch the polarity settings which are inherited
+> from reset defaults, the bootloader or bootstrap configuration. Hence,
+> in order to override a LED pin being active-high in case of the default,
+> bootloader or bootstrap setting being active-low an additional property
+> 'active-high' is required. Document that property and make it mutually
+> exclusive to the existing 'active-low' property.
+> 
+> [...]
 
-For the virtio-vsock point of view, the series LGTM and I reviewed patch 
-2 and 3. I don't know BPF enough for the rest but I can't see anything 
-wrong.
+Applied, thanks!
 
-Thanks,
-Stefano
+[1/5] dt-bindings: leds: add 'active-high' property
+      commit: fcaade450ea25e0162ee4a28ac0c7b911fa25674
 
->
->---
->Michal Luczaj (4):
->      bpf, sockmap: SK_DROP on attempted redirects of unsupported af_vsock
->      vsock: Update rx_bytes on read_skb()
->      vsock: Update msg_count on read_skb()
->      bpf, vsock: Drop static vsock_bpf_prot initialization
->
-> include/net/sock.h                      |  5 +++++
-> net/core/sock_map.c                     |  8 ++++++++
-> net/vmw_vsock/virtio_transport_common.c | 14 ++++++++++++--
-> net/vmw_vsock/vsock_bpf.c               |  8 --------
-> 4 files changed, 25 insertions(+), 10 deletions(-)
->---
->base-commit: afeb2b51a761c9c52be5639eb40460462083f222
->change-id: 20241009-vsock-fixes-for-redir-86707e1e8c04
->
->Best regards,
->-- 
->Michal Luczaj <mhal@rbox.co>
->
+--
+Lee Jones [李琼斯]
 
 
