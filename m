@@ -1,387 +1,266 @@
-Return-Path: <netdev+bounces-135423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A28899DD6C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 07:20:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ABFE99DDA5
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 07:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6DDA1F23EBC
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 05:20:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C59C21F215E6
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 05:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7159616DEAA;
-	Tue, 15 Oct 2024 05:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5C2167296;
+	Tue, 15 Oct 2024 05:47:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IqyHxwaI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NgyKi6i8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1A2158D9C;
-	Tue, 15 Oct 2024 05:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9E733F9
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 05:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728969635; cv=none; b=aeBj4GM1ZCrNno5pzQYfFd/Pdlg+qfzGMQq1OVhLmrtzzsXzzvNWyJEPf2xUqUs+C2/D0wraQfF+L00jo2MEDhXzBn3eGk3eO1gGwdBJVun/SlBm9k5lr0dg53JbnfmuM0X7VZsDl3Yj3kiGeopH9ZogsyB7mybb5LKARDwTHjQ=
+	t=1728971242; cv=none; b=Wo5V83FtqRQZs8KVeYL7valr+Qc2oAh1rT7PXVXHcBhn8a72cRMOFq0f+i3Si24FGTQuSLT2a45b91VqxT2wHF+/BY7KbFt2qLT7drq/8jtKODpiUqIpLTsCWVUzQM10NNmgud4RcwgpwG+WWWI5j3Yuy3er+I8WB5whFbT+c50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728969635; c=relaxed/simple;
-	bh=rZTuJA0XgneHld4XMUgodeC5ue8N4Ux6YuviVK1vDNE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dT5fuyI9hj2DuJUoC6+Vl0pFaYT2jKaxzHzAzzj3/WwZ63uRzXXU1ZLEC99C+XcuWdukPFUmK6JaoiTen/eQZM1GPqJSrC5XVGpGaOQQkyFILkjWF9afxYFUcVhCmE5+0FfYJsSw5nsqUdltaKEKvAYXJ9imX9HEH3k5Ftc/GGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IqyHxwaI; arc=none smtp.client-ip=209.85.215.175
+	s=arc-20240116; t=1728971242; c=relaxed/simple;
+	bh=HVgpjUSB7t0rot20NrZXPV2RbpDXJBnkh9KrYsnYICY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Y7gybHZ1iEd/G0oaI5571Ydq6qaKw8QFquZCx9qsBy/UG8RJGnHjWTxuPXW3I+ycpFt0wSvr0a7ioxszWwuaQWuqLz4TlXqj56veFyPQL9oDeVrJZwRxhUGlBnev71xSnCdLDEpSn1R7ic/qxHS/bJVOnlduociHRLpJHFRacdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NgyKi6i8; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ea7e2ff5ceso1332307a12.2;
-        Mon, 14 Oct 2024 22:20:33 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42f6bec84b5so47852205e9.1
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 22:47:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728969633; x=1729574433; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z2IhkJXPFLzz+hPR/kWflHimnMzSkOTzvQDFAvHBhxY=;
-        b=IqyHxwaIjXxWg8yl/WZIPVpc9G0Q+vTXukjF7QXH0nQlIM+1kLET6TLEKL6CruS0hm
-         cKHMhbU9/i7KGsj4LacrMI7nUg1h+ksQtMMJQw0eS4i5n8Xrqo/gZUUi+elHq1MExXCA
-         qpLmUExzxpBCSQA4X6VmdKbSwERAyzBcQU1r8L47k0Y4/7AVNECtEqfVESPHW/7Bgf8n
-         2LFP5zD1ugLJSsu2xlNsrERh5fLiyvJUm4sZPkpkHGi8/Aa5FeKIqJP3d72jP2KkOvln
-         +dnCmG8n3lCiiRBoO3i0cHJlbqQrqvHrlowafmebrqJZ/H3m0qcdLWVr7o7VYOjrPg4u
-         uDlA==
+        d=gmail.com; s=20230601; t=1728971238; x=1729576038; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GB08+bZjwtvGU3PV2Kyw6rs/EbzEepZD29srDnzoHoM=;
+        b=NgyKi6i8t8Kl77kX8rYmzWZIIkKxOo0LbgTT7gzZDO3RB4D1OAwJdJKukOGyfzKLc0
+         1dkP4ROsPSBQAJOzwtNrYVdXTaWLoBlgFakGxoEijeqyWgxUnEU0csPHo/E3k7wW5VEi
+         QCe7o9OBAiPSc2zFv8nfWFRrhjV6Tp97vA3n2JAefXxQSB5Wbl35JTCeAgpU0ct7OMn1
+         fV7nKD/RfoJsiRyrfwRmSEhNOdR06QvvPV35qBfweuMaHZt16RDpBNDoxq43ss90SQwU
+         yhcsv51olVdaE7D8Ykby1qX+5KbBsLIH8dZlEwoSd1LVXdjl0tSuP4mvAtc+YqlDATQS
+         9adw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728969633; x=1729574433;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z2IhkJXPFLzz+hPR/kWflHimnMzSkOTzvQDFAvHBhxY=;
-        b=fU2wMPJz7uTNDe1GWBz8m5/DM2o1lDs974WhP56dWVdMdaan3ljlmvn/ge5mBXNLdm
-         WbNKzWnqriIA2n4LydWKQZn/lf6ABS+1IzwCSR38jjzzIOq5GUp8Ziqvu0NMVkcS3/IQ
-         vpUr0XX4pYnsj/T98fXVjIyYyFYWS/1XuF+P9hYQjwYKf/KQwaaxS33R1VVyVkqA3dK7
-         RY3m5l7UzfYX2ck3dGuPT8vaVF+RJkPUSqfLN6SfMLOWX5PfnO4/zvqV5f+l8c8laywf
-         mrrb2hrtm9bLijovNxu90BamQazBkCu2ZS/wEhSfFbRm2E5ICmW4rHnrlQtUmCtsFd3r
-         92xw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7rwrPl6+FfcPqqobE99CTYccAiybZpYsyIzAxSxbyuze/4HwhV/cw5D1Y6tktsnTVEDNwneepWxM=@vger.kernel.org, AJvYcCVkgZvnJT1lDuvEolXkEoDKtdQkiiLV1DVuHVLQ0aZwV5iRIVpGQPmynI7Ay0ZDnOAkN45QdWZ3DjGq4KHt@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOiH2AhnkYCAX6wLvRPW8jePUU0NIPInRQ3v4/7U7y28YlYWZp
-	yE0q1UXvht9nL6eKZzuHxj9T6RAc9FPouQKW0759WEVyHpjso89Z
-X-Google-Smtp-Source: AGHT+IH3MzNOvexbhwEGTN4Lxk5gpsONFsFijM346VGqnxk5o8siCWx9cs7S/tdiu2/LDwkXCQUQpQ==
-X-Received: by 2002:a05:6a21:6b0b:b0:1d2:e78d:214a with SMTP id adf61e73a8af0-1d8bcfbae38mr21602493637.44.1728969632596;
-        Mon, 14 Oct 2024 22:20:32 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e392ed3b5esm577391a91.18.2024.10.14.22.20.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 22:20:31 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 520064250F47; Tue, 15 Oct 2024 12:20:28 +0700 (WIB)
-Date: Tue, 15 Oct 2024 12:20:28 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH net-next v21 13/14] mm: page_frag: update documentation
- for page_frag
-Message-ID: <Zw37nCqT4RY1udAK@archie.me>
-References: <20241012112320.2503906-1-linyunsheng@huawei.com>
- <20241012112320.2503906-14-linyunsheng@huawei.com>
+        d=1e100.net; s=20230601; t=1728971238; x=1729576038;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GB08+bZjwtvGU3PV2Kyw6rs/EbzEepZD29srDnzoHoM=;
+        b=SDHyM9Oh+YOB+HtZGv51qHPgthACTAbzrE465j5i8aaXixEnLQrxInSemmWQW6dS0G
+         LyW0bPEzPbUqmMVootc5l4KggakGg3VtLbP8GrycbBIgx5zX+5mXfDM+p2HNq02V1zpv
+         6wmn02BEWQGPG/DPvIagKiYSOYRhownCIB0GmBra+ckjsUSEzPrBWaGJWHnNfca/sy6L
+         tP7fStFSpuSQWwJWIuZyg3FrBlT7Ln+2ptVmc73GSPXE2Ikk29/qGxX4bJwZ13cd4HgM
+         DqrZlBgLEipyvxvgAE+XImOlJpRkb5SDBL4hwvzR9uZGk4oIgjGNZe6txBumxsHo4Foc
+         MtmA==
+X-Gm-Message-State: AOJu0YzQzIPCPR8wtgDpJo+UM70P9lBqfu8YlvksrBzsNMwhE+n6pr+v
+	bpzctysTaqA2v7ieo3FHwhUqx+gKyNjsxerT5v944CmCoy5oGKy7UI6RYA==
+X-Google-Smtp-Source: AGHT+IGqvT0+Zsz9RM5faG8z6gIxxpRm451vcENYTy/QucurNa4Cj2jEJu/wBZsdlDgiu8gk1Gxvzg==
+X-Received: by 2002:adf:f1d2:0:b0:374:c847:852 with SMTP id ffacd0b85a97d-37d551f18e2mr8968122f8f.29.1728971237997;
+        Mon, 14 Oct 2024 22:47:17 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:9c13:8200:9c9c:f106:963e:7a47? (dynamic-2a02-3100-9c13-8200-9c9c-f106-963e-7a47.310.pool.telefonica.de. [2a02:3100:9c13:8200:9c9c:f106:963e:7a47])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37d7fc45577sm616330f8f.116.2024.10.14.22.47.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Oct 2024 22:47:16 -0700 (PDT)
+Message-ID: <c57081a6-811f-4571-ab35-34f4ca6de9af@gmail.com>
+Date: Tue, 15 Oct 2024 07:47:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="uausBQGM1VviM0gB"
-Content-Disposition: inline
-In-Reply-To: <20241012112320.2503906-14-linyunsheng@huawei.com>
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: realtek: merge the drivers for internal
+ NBase-T PHY's
+To: Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+The Realtek RTL8125/RTL8126 NBase-T MAC/PHY chips have internal PHY's
+which are register-compatible, at least for the registers we use here.
+So let's use just one PHY driver to support all of them.
+These internal PHY's exist also as external C45 PHY's, but on the
+internal PHY's no access to MMD registers is possible. This can be
+used to differentiate between the internal and external version.
+
+As a side effect the drivers for two now external-only drivers don't
+require read_mmd/write_mmd hooks any longer.
+
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/realtek.c | 53 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 43 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index 166f6a728..830a0d337 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -92,6 +92,7 @@
+ 
+ #define RTL_GENERIC_PHYID			0x001cc800
+ #define RTL_8211FVD_PHYID			0x001cc878
++#define RTL_8221B				0x001cc840
+ #define RTL_8221B_VB_CG				0x001cc849
+ #define RTL_8221B_VN_CG				0x001cc84a
+ #define RTL_8251B				0x001cc862
+@@ -1040,6 +1041,23 @@ static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
+ 	return val >= 0 && val & MDIO_PMA_SPEED_2_5G;
+ }
+ 
++/* On internal PHY's MMD reads over C22 always return 0.
++ * Check a MMD register which is known to be non-zero.
++ */
++static bool rtlgen_supports_mmd(struct phy_device *phydev)
++{
++	int val;
++
++	phy_lock_mdio_bus(phydev);
++	__phy_write(phydev, MII_MMD_CTRL, MDIO_MMD_PCS);
++	__phy_write(phydev, MII_MMD_DATA, MDIO_PCS_EEE_ABLE);
++	__phy_write(phydev, MII_MMD_CTRL, MDIO_MMD_PCS | MII_MMD_CTRL_NOINCR);
++	val = __phy_read(phydev, MII_MMD_DATA);
++	phy_unlock_mdio_bus(phydev);
++
++	return val > 0;
++}
++
+ static int rtlgen_match_phy_device(struct phy_device *phydev)
+ {
+ 	return phydev->phy_id == RTL_GENERIC_PHYID &&
+@@ -1049,7 +1067,8 @@ static int rtlgen_match_phy_device(struct phy_device *phydev)
+ static int rtl8226_match_phy_device(struct phy_device *phydev)
+ {
+ 	return phydev->phy_id == RTL_GENERIC_PHYID &&
+-	       rtlgen_supports_2_5gbps(phydev);
++	       rtlgen_supports_2_5gbps(phydev) &&
++	       rtlgen_supports_mmd(phydev);
+ }
+ 
+ static int rtlgen_is_c45_match(struct phy_device *phydev, unsigned int id,
+@@ -1061,6 +1080,11 @@ static int rtlgen_is_c45_match(struct phy_device *phydev, unsigned int id,
+ 		return !is_c45 && (id == phydev->phy_id);
+ }
+ 
++static int rtl8221b_match_phy_device(struct phy_device *phydev)
++{
++	return phydev->phy_id == RTL_8221B && rtlgen_supports_mmd(phydev);
++}
++
+ static int rtl8221b_vb_cg_c22_match_phy_device(struct phy_device *phydev)
+ {
+ 	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
+@@ -1081,9 +1105,21 @@ static int rtl8221b_vn_cg_c45_match_phy_device(struct phy_device *phydev)
+ 	return rtlgen_is_c45_match(phydev, RTL_8221B_VN_CG, true);
+ }
+ 
+-static int rtl8251b_c22_match_phy_device(struct phy_device *phydev)
++static int rtl_internal_nbaset_match_phy_device(struct phy_device *phydev)
+ {
+-	return rtlgen_is_c45_match(phydev, RTL_8251B, false);
++	if (phydev->is_c45)
++		return false;
++
++	switch (phydev->phy_id) {
++	case RTL_GENERIC_PHYID:
++	case RTL_8221B:
++	case RTL_8251B:
++		break;
++	default:
++		return false;
++	}
++
++	return rtlgen_supports_2_5gbps(phydev) && !rtlgen_supports_mmd(phydev);
+ }
+ 
+ static int rtl8251b_c45_match_phy_device(struct phy_device *phydev)
+@@ -1345,10 +1381,8 @@ static struct phy_driver realtek_drvs[] = {
+ 		.resume		= rtlgen_resume,
+ 		.read_page	= rtl821x_read_page,
+ 		.write_page	= rtl821x_write_page,
+-		.read_mmd	= rtl822x_read_mmd,
+-		.write_mmd	= rtl822x_write_mmd,
+ 	}, {
+-		PHY_ID_MATCH_EXACT(0x001cc840),
++		.match_phy_device = rtl8221b_match_phy_device,
+ 		.name		= "RTL8226B_RTL8221B 2.5Gbps PHY",
+ 		.get_features	= rtl822x_get_features,
+ 		.config_aneg	= rtl822x_config_aneg,
+@@ -1359,8 +1393,6 @@ static struct phy_driver realtek_drvs[] = {
+ 		.resume		= rtlgen_resume,
+ 		.read_page	= rtl821x_read_page,
+ 		.write_page	= rtl821x_write_page,
+-		.read_mmd	= rtl822x_read_mmd,
+-		.write_mmd	= rtl822x_write_mmd,
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001cc838),
+ 		.name           = "RTL8226-CG 2.5Gbps PHY",
+@@ -1438,8 +1470,9 @@ static struct phy_driver realtek_drvs[] = {
+ 		.read_page      = rtl821x_read_page,
+ 		.write_page     = rtl821x_write_page,
+ 	}, {
+-		.match_phy_device = rtl8251b_c22_match_phy_device,
+-		.name           = "RTL8126A-internal 5Gbps PHY",
++		.match_phy_device = rtl_internal_nbaset_match_phy_device,
++		.name           = "Realtek Internal NBASE-T PHY",
++		.flags		= PHY_IS_INTERNAL,
+ 		.get_features   = rtl822x_get_features,
+ 		.config_aneg    = rtl822x_config_aneg,
+ 		.read_status    = rtl822x_read_status,
+-- 
+2.47.0
 
 
---uausBQGM1VviM0gB
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Oct 12, 2024 at 07:23:19PM +0800, Yunsheng Lin wrote:
-> +Architecture overview
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +.. code-block:: none
-> +
-> +                      +----------------------+
-> +                      | page_frag API caller |
-> +                      +----------------------+
-> +                                  |
-> +                                  |
-> +                                  v
-> +    +------------------------------------------------------------------+
-> +    |                   request page fragment                          |
-> +    +------------------------------------------------------------------+
-> +             |                                 |                     |
-> +             |                                 |                     |
-> +             |                          Cache not enough             |
-> +             |                                 |                     |
-> +             |                         +-----------------+           |
-> +             |                         | reuse old cache |--Usable-->|
-> +             |                         +-----------------+           |
-> +             |                                 |                     |
-> +             |                             Not usable                |
-> +             |                                 |                     |
-> +             |                                 v                     |
-> +        Cache empty                   +-----------------+            |
-> +             |                        | drain old cache |            |
-> +             |                        +-----------------+            |
-> +             |                                 |                     |
-> +             v_________________________________v                     |
-> +                              |                                      |
-> +                              |                                      |
-> +             _________________v_______________                       |
-> +            |                                 |              Cache is en=
-ough
-> +            |                                 |                      |
-> + PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE         |                      |
-> +            |                                 |                      |
-> +            |               PAGE_SIZE >=3D PAGE_FRAG_CACHE_MAX_SIZE    |
-> +            v                                 |                      |
-> +    +----------------------------------+      |                      |
-> +    | refill cache with order > 0 page |      |                      |
-> +    +----------------------------------+      |                      |
-> +      |                    |                  |                      |
-> +      |                    |                  |                      |
-> +      |              Refill failed            |                      |
-> +      |                    |                  |                      |
-> +      |                    v                  v                      |
-> +      |      +------------------------------------+                  |
-> +      |      |   refill cache with order 0 page   |                  |
-> +      |      +----------------------------------=3D-+                  |
-> +      |                       |                                      |
-> + Refill succeed               |                                      |
-> +      |                 Refill succeed                               |
-> +      |                       |                                      |
-> +      v                       v                                      v
-> +    +------------------------------------------------------------------+
-> +    |             allocate fragment from cache                         |
-> +    +------------------------------------------------------------------+
-> +
-> +API interface
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +As the design and implementation of page_frag API implies, the allocatio=
-n side
-> +does not allow concurrent calling. Instead it is assumed that the caller=
- must
-> +ensure there is not concurrent alloc calling to the same page_frag_cache
-> +instance by using its own lock or rely on some lockless guarantee like N=
-API
-> +softirq.
-> +
-> +Depending on different aligning requirement, the page_frag API caller ma=
-y call
-> +page_frag_*_align*() to ensure the returned virtual address or offset of=
- the
-> +page is aligned according to the 'align/alignment' parameter. Note the s=
-ize of
-> +the allocated fragment is not aligned, the caller needs to provide an al=
-igned
-> +fragsz if there is an alignment requirement for the size of the fragment.
-> +
-> +Depending on different use cases, callers expecting to deal with va, pag=
-e or
-> +both va and page for them may call page_frag_alloc, page_frag_refill, or
-> +page_frag_alloc_refill API accordingly.
-> +
-> +There is also a use case that needs minimum memory in order for forward =
-progress,
-> +but more performant if more memory is available. Using page_frag_*_prepa=
-re() and
-> +page_frag_commit*() related API, the caller requests the minimum memory =
-it needs
-> +and the prepare API will return the maximum size of the fragment returne=
-d. The
-> +caller needs to either call the commit API to report how much memory it =
-actually
-> +uses, or not do so if deciding to not use any memory.
-
-Looks OK.
-
-> +Coding examples
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Init & Drain API
-> +----------------
-
-Initialization and draining API?
-
-> +Alloc & Free API
-> +----------------
-
-Shouldn't it be called allocation API?
-
-> +Prepare & Commit API
-> +--------------------
-
-This one looks OK.
-
-> +/**
-> + * page_frag_cache_init() - Init page_frag cache.
-> + * @nc: page_frag cache from which to init
-> + *
-> + * Inline helper to init the page_frag cache.
-> + */
-s/Init/Initialize/
->  static inline void page_frag_cache_init(struct page_frag_cache *nc)
->  {
->  	nc->encoded_page =3D 0;
->  }
-> =20
-> +/**
-> + * page_frag_cache_is_pfmemalloc() - Check for pfmemalloc.
-> + * @nc: page_frag cache from which to check
-> + *
-> + * Used to check if the current page in page_frag cache is pfmemalloc'ed.
-                                                           is allocated by =
-pfmemalloc()?
-> + * It has the same calling context expectation as the alloc API.
-> + *
-> + * Return:
-> + * true if the current page in page_frag cache is pfmemalloc'ed, otherwi=
-se
-> + * return false.
-> + */
->  static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache =
-*nc)
->  {
->  	return encoded_page_decode_pfmemalloc(nc->encoded_page);
->  }
-> =20
-> +/**
-> + * page_frag_cache_page_offset() - Return the current page fragment's of=
-fset.
-> + * @nc: page_frag cache from which to check
-> + *
-> + * The API is only used in net/sched/em_meta.c for historical reason, do=
- not use
-> + * it for new caller unless there is a strong reason.
-
-Then what does page_frag_cache_page_offset() do then?
-
-> + *
-> + * Return:
-> + * the offset of the current page fragment in the page_frag cache.
-> + */
->  static inline unsigned int page_frag_cache_page_offset(const struct page=
-_frag_cache *nc)
->  {
->  	return nc->offset;
-> @@ -66,6 +93,19 @@ static inline unsigned int __page_frag_cache_commit(st=
-ruct page_frag_cache *nc,
->  	return __page_frag_cache_commit_noref(nc, pfrag, used_sz);
->  }
-> =20
-> +/**
-> + * __page_frag_alloc_align() - Alloc a page fragment with aligning
-> + * requirement.
-> + * @nc: page_frag cache from which to allocate
-> + * @fragsz: the requested fragment size
-> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
-> + * @align_mask: the requested aligning requirement for the 'va'
-> + *
-> + * Alloc a page fragment from page_frag cache with aligning requirement.
-      Allocate
-> + *
-> + * Return:
-> + * Virtual address of the page fragment, otherwise return NULL.
-> + */
->  static inline void *__page_frag_alloc_align(struct page_frag_cache *nc,
->  					    unsigned int fragsz, gfp_t gfp_mask,
->  					    unsigned int align_mask)
-> @@ -83,6 +123,19 @@ static inline void *__page_frag_alloc_align(struct pa=
-ge_frag_cache *nc,
->  	return va;
->  }
-> =20
-> +/**
-> + * page_frag_alloc_align() - Alloc a page fragment with aligning require=
-ment.
-> + * @nc: page_frag cache from which to allocate
-> + * @fragsz: the requested fragment size
-> + * @gfp_mask: the allocation gfp to use when cache needs to be refilled
-> + * @align: the requested aligning requirement for the fragment
-> + *
-> + * WARN_ON_ONCE() checking for @align before allocing a page fragment fr=
-om
-                                                allocating
-> + * page_frag cache with aligning requirement.
-> + *
-> + * Return:
-> + * virtual address of the page fragment, otherwise return NULL.
-> + */
->  static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
->  					  unsigned int fragsz, gfp_t gfp_mask,
->  					  unsigned int align)
-> @@ -91,12 +144,36 @@ static inline void *page_frag_alloc_align(struct pag=
-e_frag_cache *nc,
->  	return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
->  }
-> =20
-> +/**
-> + * page_frag_alloc() - Alloc a page fragment.
-> + * @nc: page_frag cache from which to allocate
-> + * @fragsz: the requested fragment size
-> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
-> + *
-> + * Alloc a page fragment from page_frag cache.
-      Allocate
-> + *
-> + * Return:
-> + * virtual address of the page fragment, otherwise return NULL.
-> + */
->  static inline void *page_frag_alloc(struct page_frag_cache *nc,
->  				    unsigned int fragsz, gfp_t gfp_mask)
->  {
->  	return __page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
->  }
-> =20
-> +/**
-> + * __page_frag_alloc_refill_prepare_align() - Prepare allocing a fragmen=
-t and
-> + * refilling a page_frag with aligning requirement.
-> + * @nc: page_frag cache from which to allocate and refill
-> + * @fragsz: the requested fragment size
-> + * @pfrag: the page_frag to be refilled.
-> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
-> + * @align_mask: the requested aligning requirement for the fragment.
-> + *
-> + * Prepare allocing a fragment and refilling a page_frag from page_frag =
-cache.
-      Prepare allocating?
-> + *
-> + * Return:
-> + * virtual address of the page fragment, otherwise return NULL.
-> + */
->  static inline void *__page_frag_alloc_refill_prepare_align(struct page_f=
-rag_cache *nc,
->  							   unsigned int fragsz,
->  							   struct page_frag *pfrag,
-> @@ -166,6 +324,21 @@ static inline void *__page_frag_alloc_refill_prepare=
-_align(struct page_frag_cach
->  	return __page_frag_cache_prepare(nc, fragsz, pfrag, gfp_mask, align_mas=
-k);
->  }
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---uausBQGM1VviM0gB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZw37lwAKCRD2uYlJVVFO
-ozsyAQD/vI8ZDKqg1/mPx9QCFewRQlcaTj1hUmavIjvE6eMZIwD+MJo+IyfxYIMz
-Vejvd38012SypK8hEnXwGWhvPMavcwU=
-=GCX2
------END PGP SIGNATURE-----
-
---uausBQGM1VviM0gB--
 
