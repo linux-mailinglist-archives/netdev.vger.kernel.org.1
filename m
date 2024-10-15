@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-135856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA2499F708
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:18:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC3799F70D
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:19:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C3A41F248FC
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:18:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D94D7B22144
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE361FBF79;
-	Tue, 15 Oct 2024 19:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC1F1FE0F0;
+	Tue, 15 Oct 2024 19:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="g8MztsLb"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="xOVqTCen"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD991FAF04
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 19:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A0A1F80C3
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 19:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729019840; cv=none; b=m0WRCtPOSn/ZtKy3ed7pF7c4zCm2e4Sw2lsx7qpP2FZxFBWREKm49m2cIlJdIHOfC5w9dSL+0W/G7bRncBdB6AGsamu2uvbgd1vkb9LqaDjrmmtQrCTbtOi+PumiwWGHALLbGaWFHYaB+Jki+/9IYUQcYP3gTEW9R3VG0ow06EQ=
+	t=1729019841; cv=none; b=GMJkjqg4n5symkGW+c6DI3gjOh0iVNTcWqO2eCz+sRQ9kbnNj+oqQAOBVDwdayYXs71DBANA7tMr9rWPF40ZP8uqfv0RoBtGr09Rtc7CBartcYEPmRYB2ePxwVAkmCPa307+tW79zXu+rFmPkBXDj6+B/3IXoQPJ20/Eg2hDAok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729019840; c=relaxed/simple;
-	bh=fXagSgDKvwKb5T6QGKzoWAYbWw5MKKnGO7kvv5dC+zw=;
+	s=arc-20240116; t=1729019841; c=relaxed/simple;
+	bh=aipUUq+7RrB1fQczjwGFQJsXFUnND3UwiWP5TZKO64w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=I14TBQY8AhuUObMCF9cu1IKBETtdjfSaZTwWaFJQhO+ii1NoHiQMaDsdR0dpLKI/TimAKkB85I5LB6T9xDV4YYx5xO05pODiIlU8bj1Q6UCyf6d3ttGoul3Xx/CM0Y+9d0YOuWzwDMxKuAh9C1C5ynqhjkS+o9JDfNE9qUvHjeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=g8MztsLb; arc=none smtp.client-ip=209.85.208.51
+	 In-Reply-To:To:Cc; b=uzWPOn5ztKFjSXqCaRf0fYPglj/kwZ16Ny4yjM3O8VKmxvIVHNMm5X8L9gXtbehCjb3HQZcAU25HGPWnXaJtc7BxOL3Q4cRbzaZ0Y8OxEiFEXbRJFLqUDE7wZiPhObkMwFngnKIqSD5xLXJ1vkDL8ZMam1deVZukScd6uspU7t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=xOVqTCen; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c97c7852e8so3696257a12.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 12:17:16 -0700 (PDT)
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fb5a9c7420so13788911fa.3
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 12:17:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1729019835; x=1729624635; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1729019837; x=1729624637; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=C53L7ElLnJx+g4UjgYE4Yk8Jb0cDN7FkWpfutP4xQkE=;
-        b=g8MztsLbbVe2vbXc3HI9g111NcVnftyTdIDoktkJf6sxtGJKEdRxSzPvJMU9OJe682
-         k2srQbja1hjXcKdIjF/r7yzVJAIxKX3EivNIQDxOCEoU8d/xASrQ9WSgQqkpyhE/wHjf
-         t/OZSpKpNJAUGbvpn4SDak8IEn+yD8vaGxw0npgqeDsdcb5VJfybMVXUhJ3b3LYQ1jZ0
-         asPIt3zpRhJo6Hi6FaEOkn9zhq4SAibfKuHwNxhMhEwu6fxK8QbrXxSLjMU3pDdiHM/x
-         jpEYj+zcG0YrsSjSMK6h6SYUufvHMie5hGAgkVW6SVJ03MiqgqbGEbT06+YuEUs1US0g
-         Pe8A==
+        bh=sjKPLiEdokQkg97Y4Rb67l893kRgrHE7+ULSYL6zJKs=;
+        b=xOVqTCenmIJTaAmWEqUZFj30FSLRy9LU/fiU1SyDuIpBkv9vDstdB8qspfAjO7TncI
+         /Lp4zd4Hgt6nIp+MuPptwGr54JSrrccKnjuI20BjkuTwMTblcmqHdfvTR+eziZKayFYs
+         fzaK0Y/j/pPHbro4wZ48B+iRuQz8lSRtwLzkTtgnb5PAji+oqNsSJ6V/oE5thC5fKR7n
+         ruo8vW3y0XGekPQsjKi9q8AmhNRISPamgt1eVlfcXAM/zGIglQhshmRo+vLYDkZQrdTv
+         fdK0nYf108A5dYAup7tqiGv3qo6No5FWWidZjc03XrfUpnLh3TkFQb9pNbxMBr4/nNrI
+         ipDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729019835; x=1729624635;
+        d=1e100.net; s=20230601; t=1729019837; x=1729624637;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C53L7ElLnJx+g4UjgYE4Yk8Jb0cDN7FkWpfutP4xQkE=;
-        b=t54G/NiBpZ4W1erf6z19WB8lbEjmtzqsi2shi+XbVgSI2CxwHuZfpZqIGNC2HOitEz
-         ds7zvof4RKI1eaQpsCEc4oRFT62pykg8C0cuAKRswZkmZ4e+tG5syajjdiNgzMH9maKf
-         xRAWM693qUbRkZvP4hBNVLxSfD/2tkFE3HfJPv70e14fjgWn+OUJl3Z0QNtlGiz18hFt
-         u8msqfyCFROEVEvnFYv1pHCRH/sL5JKaKvmhGuOL8ot4EpPVRp1ggBr4tjNDz92GbGw1
-         1PwX/gnWMHtqHI74sadzduQOMlUim+UcnHA3kYzvDPrsO196aabN9kSrSKyDPy0ISBJl
-         Nvhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGE3UFt2DWvUOAauuzbemnRaHGR6FqioAav4R4NX1B/LEezitKefWCjK0Ax4NF84OdQ8ytVuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTc5E256oz2hKWbkJ2T2V8h4gcZExcoAlwfTQ7Cj1yNxhURsxu
-	PoXKCmuB/+ueA6+bpxJESjgNBBMy/XaQ2f9cgSGRBkPOyGpeFwlUKSZUfutwnEg=
-X-Google-Smtp-Source: AGHT+IFuNaXJ/r/nqGOo1Icj0J/5EWknD2G800st6YUHsrMWW7mRsRlVQykeajKpoYEWh9kT1ftaMA==
-X-Received: by 2002:a05:6402:5191:b0:5c9:5e43:9480 with SMTP id 4fb4d7f45d1cf-5c95e43f157mr8602638a12.7.1729019835369;
-        Tue, 15 Oct 2024 12:17:15 -0700 (PDT)
+        bh=sjKPLiEdokQkg97Y4Rb67l893kRgrHE7+ULSYL6zJKs=;
+        b=RqauuSlgw3wtmFNWEsfCWynJRso42wIzu5CbnX6YQgflCuSdE/cHBidZ7jrtlJMlsA
+         V6x4JUlHiEBrUeIXAbEsjME2GwnqtfT1bPcHCWDFshl1uV5RAb+7atyqpe2h9TrC+AL4
+         cf9eTHS0X1E4FPUdTz8OfqhnEJe8hsAbbbWY+rdeS8Yi4S7SJU6GfQfGtP2GsNMDbjuv
+         xE3EOUOlrUolMnRqpCosiritooHeyOcF0YNOZ+UcGMbyaWfhQh1Njyxy/rh3G/1ml+3v
+         HSj9N+soG+cE25B3FOKFYTbYVSkoI0XmvEH8cSfhr6Y2+3wSFn/VIJBK8BxoIcBfgNNH
+         RXIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWM8L+s10eGpbvO4kgmVqnCvllvX8hNW3VlCqVI1B6Px3M3p0xCskS8zzirEBsg9EW1dbNJYEs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7KydSNxLmUDnhrnwwG9UG4g9gAsbceqZ3gw2Or47W8weiUZEi
+	4G/aCc7HqZ9jiWqcJ/0tOeS974yFgTcNfVIXlg7Q32zWnu5KQzGFmYTIBML7ZMY=
+X-Google-Smtp-Source: AGHT+IE4dzRsD/tCQ28U43nJXbo8BVQgpvc+e/8APYlr/mwBjZLsFjDakC3/JIU6v1rQg0lg4s5rnQ==
+X-Received: by 2002:a2e:b8ce:0:b0:2fb:c20:dbc3 with SMTP id 38308e7fff4ca-2fb3f2edde8mr59233971fa.39.1729019836565;
+        Tue, 15 Oct 2024 12:17:16 -0700 (PDT)
 Received: from localhost ([2001:4090:a244:83ae:2517:2666:43c9:d0d3])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d5298d1sm990283a12.57.2024.10.15.12.17.14
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d779975sm971515a12.67.2024.10.15.12.17.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 12:17:14 -0700 (PDT)
+        Tue, 15 Oct 2024 12:17:16 -0700 (PDT)
 From: Markus Schneider-Pargmann <msp@baylibre.com>
-Date: Tue, 15 Oct 2024 21:15:59 +0200
-Subject: [PATCH v4 5/9] can: m_can: Support pinctrl wakeup state
+Date: Tue, 15 Oct 2024 21:16:00 +0200
+Subject: [PATCH v4 6/9] can: m_can: Add use of optional regulator
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,7 +78,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241015-topic-mcan-wakeup-source-v6-12-v4-5-fdac1d1e7aa6@baylibre.com>
+Message-Id: <20241015-topic-mcan-wakeup-source-v6-12-v4-6-fdac1d1e7aa6@baylibre.com>
 References: <20241015-topic-mcan-wakeup-source-v6-12-v4-0-fdac1d1e7aa6@baylibre.com>
 In-Reply-To: <20241015-topic-mcan-wakeup-source-v6-12-v4-0-fdac1d1e7aa6@baylibre.com>
 To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
@@ -98,142 +98,48 @@ Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
  Vincent MAILHOL <mailhol.vincent@wanadoo.fr>, 
  Markus Schneider-Pargmann <msp@baylibre.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4027; i=msp@baylibre.com;
- h=from:subject:message-id; bh=fXagSgDKvwKb5T6QGKzoWAYbWw5MKKnGO7kvv5dC+zw=;
- b=owGbwMvMwCGm0rPl0RXRdfaMp9WSGNL59s9uW8v09/SRimWqRdrZTa8f+wvx3hdxjb40ibtyW
- kPi0VCzjlIWBjEOBlkxRZa7Hxa+q5O7viBi3SNHmDmsTCBDGLg4BWAiTz8yMmyomvCWXXrysZVi
- HZXeE9ms2F33pGXcrYjQbDRR2r9z4RFGho4nHXcD3TPPxG17WRX4rudRD3OK5KsTb6+y+FfkTem
- I5AAA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1254; i=msp@baylibre.com;
+ h=from:subject:message-id; bh=aipUUq+7RrB1fQczjwGFQJsXFUnND3UwiWP5TZKO64w=;
+ b=owGbwMvMwCGm0rPl0RXRdfaMp9WSGNL59s/XqnFdKfDRbN+T+WsKHVybDbOyYt1kjex0p2ZPP
+ 8fbcdSko5SFQYyDQVZMkeXuh4Xv6uSuL4hY98gRZg4rE8gQBi5OAZiI3W1GhjWPb03bLCHc+rVj
+ 3ZH/zMcOcPNpBHzacP4tp8yJfSt1F2xnZHj2dff7aQv9JK24TzXfzy/8Wc/B2PdyzTW3nvPTvY3
+ Cm7gA
 X-Developer-Key: i=msp@baylibre.com; a=openpgp;
  fpr=BADD88DB889FDC3E8A3D5FE612FA6A01E0A45B41
 
-am62 requires a wakeup flag being set in pinctrl when mcan pins acts as
-a wakeup source. Add support to select the wakeup state if WOL is
-enabled.
+Add support to use a regulator for the core. This is optional and used
+to register the dependency on the regulator.
 
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
 ---
- drivers/net/can/m_can/m_can.c | 68 +++++++++++++++++++++++++++++++++++++++++++
- drivers/net/can/m_can/m_can.h |  4 +++
- 2 files changed, 72 insertions(+)
+ drivers/net/can/m_can/m_can.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 5a4e0ad07e9ecc82de5f1f606707f3380d3679fc..c539375005f71c88fd1f7d1a885ce890ce0e9327 100644
+index c539375005f71c88fd1f7d1a885ce890ce0e9327..274fdcae49c31d4792b81cdc065821206d3cb206 100644
 --- a/drivers/net/can/m_can/m_can.c
 +++ b/drivers/net/can/m_can/m_can.c
-@@ -2196,6 +2196,7 @@ static void m_can_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
-+	struct pinctrl_state *new_pinctrl_state = NULL;
- 	bool wol_enable = !!(wol->wolopts & WAKE_PHY);
- 	int ret;
+@@ -23,6 +23,7 @@
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#include <linux/regulator/consumer.h>
  
-@@ -2212,7 +2213,28 @@ static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 		return ret;
- 	}
+ #include "m_can.h"
  
-+	if (wol_enable)
-+		new_pinctrl_state = cdev->pinctrl_state_wakeup;
-+	else
-+		new_pinctrl_state = cdev->pinctrl_state_default;
-+
-+	if (IS_ERR_OR_NULL(new_pinctrl_state))
-+		return 0;
-+
-+	ret = pinctrl_select_state(cdev->pinctrl, new_pinctrl_state);
-+	if (ret) {
-+		netdev_err(cdev->net, "Failed to select pinctrl state %pE\n",
-+			   ERR_PTR(ret));
-+		goto err_wakeup_enable;
-+	}
-+
- 	return 0;
-+
-+err_wakeup_enable:
-+	/* Revert wakeup enable */
-+	device_set_wakeup_enable(cdev->dev, !wol_enable);
-+
-+	return ret;
- }
+@@ -2421,6 +2422,11 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
+ 	if (dev->of_node && of_property_read_bool(dev->of_node, "wakeup-source"))
+ 		device_set_wakeup_capable(dev, true);
  
- static const struct ethtool_ops m_can_ethtool_ops_coalescing = {
-@@ -2340,6 +2362,44 @@ int m_can_class_get_clocks(struct m_can_classdev *cdev)
- }
- EXPORT_SYMBOL_GPL(m_can_class_get_clocks);
- 
-+static int m_can_class_setup_optional_pinctrl(struct m_can_classdev *class_dev)
-+{
-+	struct device *dev = class_dev->dev;
-+	int ret;
-+
-+	class_dev->pinctrl = devm_pinctrl_get(dev);
-+	if (IS_ERR(class_dev->pinctrl)) {
-+		ret = PTR_ERR(class_dev->pinctrl);
-+		class_dev->pinctrl = NULL;
-+
-+		if (ret == -ENODEV)
-+			return 0;
-+
-+		return dev_err_probe(dev, ret, "Failed to get pinctrl\n");
-+	}
-+
-+	class_dev->pinctrl_state_wakeup =
-+		pinctrl_lookup_state(class_dev->pinctrl, "wakeup");
-+	if (IS_ERR(class_dev->pinctrl_state_wakeup)) {
-+		ret = PTR_ERR(class_dev->pinctrl_state_wakeup);
-+		class_dev->pinctrl_state_wakeup = NULL;
-+
-+		if (ret == -ENODEV)
-+			return 0;
-+
-+		return dev_err_probe(dev, ret, "Failed to lookup pinctrl wakeup state\n");
-+	}
-+
-+	class_dev->pinctrl_state_default =
-+		pinctrl_lookup_state(class_dev->pinctrl, "default");
-+	if (IS_ERR(class_dev->pinctrl_state_default)) {
-+		ret = PTR_ERR(class_dev->pinctrl_state_default);
-+		return dev_err_probe(dev, ret, "Failed to lookup pinctrl default state\n");
-+	}
-+
-+	return 0;
-+}
-+
- struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
- 						int sizeof_priv)
- {
-@@ -2380,7 +2440,15 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
- 
- 	m_can_of_parse_mram(class_dev, mram_config_vals);
- 
-+	ret = m_can_class_setup_optional_pinctrl(class_dev);
++	ret = devm_regulator_get_enable_optional(dev, "vio");
 +	if (ret)
-+		goto err_free_candev;
++		return ERR_PTR(
++			dev_err_probe(dev, ret, "Failed to get or enable optional regulator\n"));
 +
- 	return class_dev;
-+
-+err_free_candev:
-+	free_candev(net_dev);
-+	return ERR_PTR(ret);
- }
- EXPORT_SYMBOL_GPL(m_can_class_allocate_dev);
- 
-diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
-index 92b2bd8628e6b31370f4accbc2e28f3b2257a71d..b75b0dd6ccc93973d0891daac07c92b61f81dc2a 100644
---- a/drivers/net/can/m_can/m_can.h
-+++ b/drivers/net/can/m_can/m_can.h
-@@ -126,6 +126,10 @@ struct m_can_classdev {
- 	struct mram_cfg mcfg[MRAM_CFG_NUM];
- 
- 	struct hrtimer hrtimer;
-+
-+	struct pinctrl *pinctrl;
-+	struct pinctrl_state *pinctrl_state_default;
-+	struct pinctrl_state *pinctrl_state_wakeup;
- };
- 
- struct m_can_classdev *m_can_class_allocate_dev(struct device *dev, int sizeof_priv);
+ 	/* Get TX FIFO size
+ 	 * Defines the total amount of echo buffers for loopback
+ 	 */
 
 -- 
 2.45.2
