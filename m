@@ -1,111 +1,96 @@
-Return-Path: <netdev+bounces-135595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A82799E4D9
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:59:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D747399E4E3
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC2CA1C24207
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:59:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 145271C25426
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF921EABD6;
-	Tue, 15 Oct 2024 10:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC09C1D5ADD;
+	Tue, 15 Oct 2024 11:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Iw+gT87b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ry2Uy1Hf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4E01E9082;
-	Tue, 15 Oct 2024 10:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C417F18A944;
+	Tue, 15 Oct 2024 11:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728989954; cv=none; b=L9XGiymjgCplmqGSD+VeLXyHPEDcP/W4fWg7JWMpivR/jQU2GnVFqqhBF0mFUJTqTUoAZ0G9sZjAK0xaT13R+Oc9BWWZMyG3afGGN3h9uUsD2KHlOBdBoSqjNbs4XH9yVKhe9ggZr6HN5BTIALCjbHz2wvgQ4EgFgjLYlwKVwk4=
+	t=1728990024; cv=none; b=CD14nTrd7zSZW/CFI/bUbVwEQp8wuzfxvBnJLpQbR1cr2JFxbl/Goyh5n0qpF3jxRgchB3d0Z5c/Ib1BF00mMdNRkbFqds3KITTLvA4dXPqPbXj5YlEP3g4bgCx74DL8R0ZkmutboR74ZDtEIXwCJUZY2pQ0ppW+ts9GCp9n5ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728989954; c=relaxed/simple;
-	bh=A7b36Qe+jBmoRqJT42Uq3hba5sAV9MjZtFPwQ8Tz9Qo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rnvoBEPv9vzNhoUGyw9Y7rKNsSp2W9+rLqDCixUDP8X7qtOqChCL0oMGhP1MShFdOq/sdYFR9XLf8nspBqBQ2KDRbyyr6qvUwjOdJaRlozSN9Kk09HfOd1qqESHEI+Z0szU7ZmycwpiEwznHMJbqxndpw8oOWPa4sMAHyfzfGi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Iw+gT87b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F740C4CEC6;
-	Tue, 15 Oct 2024 10:59:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1728989953;
-	bh=A7b36Qe+jBmoRqJT42Uq3hba5sAV9MjZtFPwQ8Tz9Qo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Iw+gT87bhV7efFNMhRGEidJ6phxJ+kNTWKFZumBng4uiKMeJoDrim2/jmDluAYsvT
-	 p5z6M95J2WY8ETQhdGkuhBzTDUZTpXLq6kFx5c0G2ZKlwBzrv60C4sQiYCXw9k/eUK
-	 +04gegmLeYWK1Hl8sEJU1PTxPVH+SR8Xzl6W4d5s=
-Date: Tue, 15 Oct 2024 12:59:10 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sven Schnelle <svens@linux.ibm.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
-Message-ID: <2024101532-batboy-twentieth-75c4@gregkh>
-References: <20241015105414.2825635-1-svens@linux.ibm.com>
- <20241015105414.2825635-3-svens@linux.ibm.com>
+	s=arc-20240116; t=1728990024; c=relaxed/simple;
+	bh=bGGxOzimidnVoOqV+3Adr/vRqEyTdvN/AtdteletgS4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jqM7Zw9zwCdnIg+UBiIdvvVpVBJJPJrTMBRYNrMAb/pyJpUm0SduIEBBsw7EMpDIP0d+hI8vIK8kfiFMfAt17CS+CizBN5p1ow9Y3KxUJX4ka+VuU3FIfXsK+RPgxn3Le7N24Dz98GHoaCTooW+yii2Ow7lSSYGdNAmTVPsZEAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ry2Uy1Hf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E58EC4CEC6;
+	Tue, 15 Oct 2024 11:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728990024;
+	bh=bGGxOzimidnVoOqV+3Adr/vRqEyTdvN/AtdteletgS4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ry2Uy1Hff/h1CjesBZz+nLXaoFm7Zft6X1DmbtBGirwgM3Q0cEuIgj9/R6RMVhVA1
+	 M5xKa07ZjF0/HEhKqBlJazQyQCE+rpKobkVKokSiKQHEStzCFxJi85/RmhSqXLNKMO
+	 ra59hxWTOWbIajFpihClO6hbIXlsova/6IutsrkEMIl/Q0CF7XIY0twS6ggyUcC5xg
+	 kf4ZfClHbXxgmKpB95R7G/tZiEcFcoYwg1O3XAmIm5oj2tkT0RAy4xz6F3AbUXJSb/
+	 8DH6N/474/y0ne567aJaVTN9Mk/w7C25c1AarndxDKJ1RSeZCy8MFDxuiL/hrNq/Su
+	 faFmJlGA3kAQg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD363809A8A;
+	Tue, 15 Oct 2024 11:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015105414.2825635-3-svens@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: Enable USXGMII mode
+ for J7200 CPSW5G
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172899002952.1116703.4106967634840832752.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Oct 2024 11:00:29 +0000
+References: <20241010150543.2620448-1-s-vadapalli@ti.com>
+In-Reply-To: <20241010150543.2620448-1-s-vadapalli@ti.com>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, rogerq@kernel.org, dan.carpenter@linaro.org,
+ jpanis@baylibre.com, u.kleine-koenig@baylibre.com, c-vankar@ti.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com
 
-On Tue, Oct 15, 2024 at 12:54:13PM +0200, Sven Schnelle wrote:
-> To allow users to have stable device names with the help of udev,
-> add the name to the udev event that is sent when a new PtP clock
-> is available. The key is called 'PTP_CLOCK_NAME'.
+Hello:
 
-Where are you documenting this new user/kernel api you are adding?
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
+On Thu, 10 Oct 2024 20:35:43 +0530 you wrote:
+> TI's J7200 SoC supports USXGMII mode. Add USXGMII mode to the
+> extra_modes member of the J7200 SoC data.
 > 
-> Signed-off-by: Sven Schnelle <svens@linux.ibm.com>
+> Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 > ---
->  drivers/ptp/ptp_clock.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index c56cd0f63909..15937acb79c6 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -25,9 +25,11 @@
->  #define PTP_PPS_EVENT PPS_CAPTUREASSERT
->  #define PTP_PPS_MODE (PTP_PPS_DEFAULTS | PPS_CANWAIT | PPS_TSFMT_TSPEC)
->  
-> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env);
->  const struct class ptp_class = {
->  	.name = "ptp",
-> -	.dev_groups = ptp_groups
-> +	.dev_groups = ptp_groups,
-> +	.dev_uevent = ptp_udev_uevent
->  };
->  
->  /* private globals */
-> @@ -514,6 +516,13 @@ EXPORT_SYMBOL(ptp_cancel_worker_sync);
->  
->  /* module operations */
->  
-> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env)
-> +{
-> +	struct ptp_clock *ptp = container_of(dev, struct ptp_clock, dev);
-> +
-> +	return add_uevent_var(env, "PTP_CLOCK_NAME=%s", ptp->info->name);
+> Hello,
+> 
+> [...]
 
-Why is this needed?  Can't you get the name from the sysfs paths, the
-symlink should be there already.
+Here is the summary with links:
+  - [net-next] net: ethernet: ti: am65-cpsw: Enable USXGMII mode for J7200 CPSW5G
+    https://git.kernel.org/netdev/net-next/c/97802ffca711
 
-thanks,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-greg k-h
+
 
