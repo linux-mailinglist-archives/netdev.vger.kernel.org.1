@@ -1,77 +1,92 @@
-Return-Path: <netdev+bounces-135670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8145099ED7C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:28:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29B499ED85
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39CBA1F246B7
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:28:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AE6F1F2115B
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F362B1FC7F6;
-	Tue, 15 Oct 2024 13:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D123A1FC7FD;
+	Tue, 15 Oct 2024 13:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcMAehVr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JE5Ie0SW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2881FC7F4;
-	Tue, 15 Oct 2024 13:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96F71FC7EF;
+	Tue, 15 Oct 2024 13:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728998922; cv=none; b=cQzds3H+JWBracPT/89GLKA0pC7g4Qnsa4fqj8dEzioIxwOaAvj3teijhPSGU4OuctYPQchpJdXO+rDNlJAI6Zq+2AKDIv9Aw/fNyXa+xWe+nINPHhmTNCOvpkNkfOKwI0x7TkBkwwDw/u9ZEh0o/Eib9X2XSs5N8s9/j3kWre8=
+	t=1728999028; cv=none; b=YTdOgGi5rD/Vmqq0NLeansAwN8QL1ZJPlXh3Wc64tiP7kexeLKLKCzkPkQc9hBfwY865PvhNTBU+/TkZ6h5iJMgWvrTl/qt3fpGWFBvgoHfNyuzgT6Je8Y2RvN6sm8epdyqIcNEY/zKzCFv/RxloxYEqpfLGT/br+w2e2sBR7HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728998922; c=relaxed/simple;
-	bh=rdqT2EodJ8Ix2L0ycX2C3KeM0vWWuvwqEUXf8iaIIFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mzk3hDkVwSaxc0ND088SdvtymAaeGVkRqFFAcUjgoZ6iSWggOo2m/mK6nxFldmpMATwST6R0+cjs5kUI/61IxJxAQnZDm6u2ZdSGGLga9S7TU3etVm8XeglrqLQdx2y7NXsALNzq8ty2N2JkF8vOSlPjbS9lAu0tt66mQiNlgEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcMAehVr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3714DC4CECE;
-	Tue, 15 Oct 2024 13:28:40 +0000 (UTC)
+	s=arc-20240116; t=1728999028; c=relaxed/simple;
+	bh=RLxwPHH2fBSYue1e3OstnRQCGv1pY2ed1e9CMYRPUSk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JaDYpv2DMC0yEe6dkUzboYmsNWvmTJToLmKOPjIqbPwjvYKZ0nzu2vgGJHZm2Kkpc+Y6BjiC3Oi2gvVmqFdRD1rP4MLPnIOg1csd9NkvrENzAACdStFGInoKWG7O899xocaaI4VSve9/vnhHVL9McD3ksy81W0ZeRpVplSs1OPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JE5Ie0SW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15311C4CEC6;
+	Tue, 15 Oct 2024 13:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728998922;
-	bh=rdqT2EodJ8Ix2L0ycX2C3KeM0vWWuvwqEUXf8iaIIFA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pcMAehVrmQrOr67xvxzA41DHOblLu12fG/K3UcWXMxodrk1yE7iEnLsBaWeL8CMWh
-	 CsiohzZg1OArfe2seH7VDk1UoIoVVB9h+HWLTDC49X5+H98/BsOMCI774bNZW1h0fv
-	 RP7sdj5nPy8GQWokCx/COQVRzFodRlX5WOnOoMhWHUfgqLKlYZyhb/mXUx4ZRHgaxg
-	 qmQntKlZh/+aHWaYfbWCzCPjqWj1VmUeNdMF3THMKV1577ZWyx8NAZ7vi5nb1B7duI
-	 YWQRcc+I4sgR40e8s9JoTG3WkJaHbgfOaB4W201rnRkMNcW4kVh7R8V2ft58FPP+oF
-	 7O3xaYxsjgNqQ==
-Date: Tue, 15 Oct 2024 14:28:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>, thomas.petazzoni@bootlin.com,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: pse-pd: Fix out of bound for loop
-Message-ID: <20241015132838.GB2162@kernel.org>
-References: <20241015130255.125508-1-kory.maincent@bootlin.com>
+	s=k20201202; t=1728999028;
+	bh=RLxwPHH2fBSYue1e3OstnRQCGv1pY2ed1e9CMYRPUSk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JE5Ie0SWgDmXOPHUuZnS7urYNVMCmtbKTFwnrtMVEGzRPuA4FT/FMInyqImftdUj/
+	 Hf8GqNoxc0EP8pyqHTa5Bpv3IFkqb/TxKe+08r1Ym0GEwR7UA0SyrsbV+j7/d8zkuP
+	 N1xHiZkMLrmquqy5MjkqN4qGUmBa0gDHRYZ2uLqA70qv9UFNRXqAROsMFHkDMDpIby
+	 8cIvR+aERMEniqGwwJaG2M0+Ml1qHXAq3ErfSoJ5cOw6stI/zJ+m+kzCl9u2ygc8nc
+	 fl7R/WVF9vu9UfBAtASa0vwLp2WReFb2rY06ONK62BjbG8qVfUos8Csv52wAmpAQnP
+	 KcmeHa94VurEA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B9C3809A8A;
+	Tue, 15 Oct 2024 13:30:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015130255.125508-1-kory.maincent@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2024-10-14
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172899903326.1161856.7083596631931585539.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Oct 2024 13:30:33 +0000
+References: <20241014211110.16562-1-daniel@iogearbox.net>
+In-Reply-To: <20241014211110.16562-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Tue, Oct 15, 2024 at 03:02:54PM +0200, Kory Maincent wrote:
-> Adjust the loop limit to prevent out-of-bounds access when iterating over
-> PI structures. The loop should not reach the index pcdev->nr_lines since
-> we allocate exactly pcdev->nr_lines number of PI structures. This fix
-> ensures proper bounds are maintained during iterations.
+Hello:
+
+This pull request was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 14 Oct 2024 23:11:10 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> Fixes: 9be9567a7c59 ("net: pse-pd: Add support for PSE PIs")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 21 non-merge commits during the last 18 day(s) which contain
+> a total of 21 files changed, 1185 insertions(+), 127 deletions(-).
+> 
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Here is the summary with links:
+  - pull-request: bpf-next 2024-10-14
+    https://git.kernel.org/netdev/net-next/c/39ab20647d7b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
