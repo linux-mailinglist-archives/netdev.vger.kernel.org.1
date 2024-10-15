@@ -1,113 +1,127 @@
-Return-Path: <netdev+bounces-135467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C1699E091
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:13:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D422999E095
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:14:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD122B20F9B
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:13:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10C481C215FA
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5BB1AE006;
-	Tue, 15 Oct 2024 08:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3761C302E;
+	Tue, 15 Oct 2024 08:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kKdhYobI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RdM8f/3x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF671AB512
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644F41AE006
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728979994; cv=none; b=nyELbKJVdIoZCdqBT2+PxIFWtjmOFCmGJy4oUK2s9+8Cdq38Jrvn61XqWMKkylOiKiE1At9HkXLN8CekJb3a1Otc1Tay8kopq2ReFP3qlUxBAnBgzEoMqteVM43gCf5nXPyzLf3PnljVZtoh8Ng4p+j3K3KlWCSl9J4E4fH5Fa8=
+	t=1728980070; cv=none; b=l2CcOlSkUlX062o0fKCCvwFLoz/+xLjYt3QKMK611U1/pb3Ty3rRMPDW84J0shE2dr+CXAjDpku5JV0Nn5oRUPkFo1ccBQp8FAiQXa1MfxeiP9kTpStilCrgUtckYWgFVrlwWrYoL4X+frqug62E/LlxhWZRvL+FkftchHPiI1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728979994; c=relaxed/simple;
-	bh=P3FMywqnNGquuZZGSkU2EwOtO2dk/J3t68nOwd0zwUQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VCC2VSWG/eLAyap14pXIi0UeFREWRVO4XKrpo9sy7vYbiLcoClHGs3yl7LM2d4rmqtHkaBs/hzmuo85YLywMhb8BueGecd6RDitl8t9YyIlyo7nBy/WsLocVwiNFGJxkNO9kFswQXklaIvC/tUJeTpQZRCUJiJJ6ENm8lgkrp2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kKdhYobI; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c97cc83832so2257415a12.0
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:13:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728979991; x=1729584791; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P3FMywqnNGquuZZGSkU2EwOtO2dk/J3t68nOwd0zwUQ=;
-        b=kKdhYobIqN7TeORazdY1NEJ7mCtuX4wtmbZejuMKOXmpZahafKEwCO8lpE5xO8LlWQ
-         DPRzvjyaAS8vcCaxh7XZFNCwJX5xuaOfMO+BlnPrvXnkYUn9LoHF7aPL32Z1AqJ5bHAR
-         pZSLPqEuNPBr28QQlcQLs17UghaVvjDU0+Ox+FWemDZS1aTupNd5nJ2aKAljyj127I1C
-         FtFval6plvIjI6rJ/yzJHxsqzZ4t3IrXU/PsFRdxdPMVsDjvU+/rQPb0/56khhWprUm8
-         beJwLUopTIKn1RjPTkkiVi02w5fi5mBXUFZxMgCaD7fnHNX5hR03wzHGksu6OYlKvo7O
-         l2BA==
+	s=arc-20240116; t=1728980070; c=relaxed/simple;
+	bh=huAJ1quTTVf9I7zIA1DxYzuxMyL3Ic5yTgUo81F9fW8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t1heQES73pJ9KFahpiMrt7pT/Mg8pEndjKE6K1jUSjATg/HbbboLmXgC3q7H4Ij8+p7oEFtAx1WZAGrCdi6bzM/i6jzpN27qfAcmGY+bHopU35BUb0ghL10/I9TrP5eEyDLS+YlWka+5/HmIrMG4SxM4ZaJ+UswvYuacOZBt2hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RdM8f/3x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728980067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ovmdFPXf/mk8R/1ge0kg1lpqUjDGEvD34K1g7jLLqgo=;
+	b=RdM8f/3xofD4HXBlwLi3I56XypEVMeqma3/u3fu5uMns2/1FHGfB6WvHaHBYofpmoSCuCW
+	gBv2AvGJUMm5ab7bWtNZovFy06I5m9TnGyynfWv8Ndx47hYYnMH4MQ0dY/uG9qo6R1CubN
+	rad+xq9Wk+iatKuvRtv2pg3qaToAOB0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-ak5TKEv-MQeW9rZUXSIbYA-1; Tue, 15 Oct 2024 04:14:25 -0400
+X-MC-Unique: ak5TKEv-MQeW9rZUXSIbYA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-431159f2864so26518915e9.0
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:14:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728979991; x=1729584791;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P3FMywqnNGquuZZGSkU2EwOtO2dk/J3t68nOwd0zwUQ=;
-        b=DpQU4WOyDHSmdE8v42FYTSb2egEUGB3YrZo8ZTU3GN8X60T34ln19JB+Ovx9b/TxNj
-         pKuu3trg9igflyadJF7vGvHPoZ3s3c1ZpkddspYDQ0q4wZVeYD5ujOptjoPUsobAsVD2
-         hHBsE57RKdpOv/s45zWs+ojpH+4br4IYSjUKc8j7Ir1ALzF3V6NKhf/nzZWlJKBwsWdy
-         Gzipi29K6VdNn3a2gEwpQoiJr4WfLSAIzVcxXHGkGQLVwWiCzxw+oCd0vGEH3aMHktHs
-         F2g9JG2YMZdo9YPndQ1iI6K/ZFln3CmeoMf75roGYbY589zlM2lay/8zSn8Gwxvd3nwu
-         OhhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhhpc8eleRqVeQkqVLvFMmm2gIiUL7kXB45JuCNuSojttLnf6g2PrM6MZA1Dl4oWXxUL8qXEY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7mvFq09Sd/LVg8biWbh4FGzG0cLhNhBDGpQ2y2UVCCKnNjN4x
-	YrXFDAO+A5N3SqlZyJYEvVrA7iGGEH725/jyDWCPOekhZq0OEJ9xUONOrdNukuHrj+xkbxfzDHc
-	2qBlJQ45EwKhN+Y5lAI4JW95egFLGCga8CweY
-X-Google-Smtp-Source: AGHT+IEU4wEvDgzgXZNh/xC/9FCAcOdcylUmrJFNg6ULu5XEBGX57uqe3aYI52GT1hhWqfsmPrT3qfjpUb+j0P5YtnE=
-X-Received: by 2002:a05:6402:2805:b0:5c9:4885:85aa with SMTP id
- 4fb4d7f45d1cf-5c948d808dcmr7353311a12.31.1728979991294; Tue, 15 Oct 2024
- 01:13:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728980064; x=1729584864;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ovmdFPXf/mk8R/1ge0kg1lpqUjDGEvD34K1g7jLLqgo=;
+        b=vbN4JAYVIo40iUfBaszTNQ0fei8+8VewaxLiIwoUECRYdAuGynEYteoWdUxcXgVbYc
+         6Mmuv2ZSW6UaBFVQhsTy3gvlQ2wrC9gZrsv88DM6+U3rK3pDsjb5a9PXec5y0iHVYePF
+         4/jRJjWWMIuX8UxytHId7RgQT4tD6blaDMqa087vbBd3kc7j5sZXb0VATL6J6/YgrAsi
+         8v5k9ot9T3dGt9zDy5iVAopBgjw/5CafqtGuVO68aI9PeqmDiWB+IoJZlQKNndKec1BP
+         Dc5Zb8kV/wKKg49cU0eGuyCftD9EZRwzqqtzRsm3GBKRVFtMOf3VzStp2LkpwsWzTTaA
+         PV/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWgpakNmmdFmC4apGhp+tuOFcJKYyQdkmUl8zRqLFnA26hHqzL7Ujlodapd/SNSly8tpx5zynY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD0ZIeHZbm+8uN5eX84Ygc37wSP466aZvzKma1anycXPWcVduc
+	wT7+MQcvXG9fT4HNPYEW6kWCGMu83IAfxuSew1+93CcO/rGK4IbgD/i4EP1qqHgVAyH07LXY9OV
+	bp7dhajDG6JnDOJAaJPRTigLevqvpy6DvBMUeIWDi9P24t8nAvXR0EA==
+X-Received: by 2002:a05:600c:4ec7:b0:427:ff3b:7a20 with SMTP id 5b1f17b1804b1-4311df47618mr98786595e9.27.1728980064564;
+        Tue, 15 Oct 2024 01:14:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEQLgzwoml0dhiEu0fUCEh7JGHCpNVpyeXag9LTrZVLQNlOQxnNBGgh/VQejL3rJ8a4BvtE6A==
+X-Received: by 2002:a05:600c:4ec7:b0:427:ff3b:7a20 with SMTP id 5b1f17b1804b1-4311df47618mr98786325e9.27.1728980064088;
+        Tue, 15 Oct 2024 01:14:24 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43144c7982asm4255355e9.14.2024.10.15.01.14.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 01:14:23 -0700 (PDT)
+Message-ID: <85f5d99b-52cf-449d-93da-57e7504685e1@redhat.com>
+Date: Tue, 15 Oct 2024 10:14:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-2-kuniyu@amazon.com>
-In-Reply-To: <20241014201828.91221-2-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 10:13:00 +0200
-Message-ID: <CANn89iLZVL4VGUh-=O+PJ8n+3agwOswu0QVDua4mp8RD5q4mQg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 01/11] rtnetlink: Panic when
- __rtnl_register_many() fails for builtin callers.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 04/10] selftests: RED: Use defer for test cleanup
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+ Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Ido Schimmel <idosch@nvidia.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, mlxsw@nvidia.com
+References: <cover.1728473602.git.petrm@nvidia.com>
+ <4a9b24fa7e582bdf457b550bb27bb1e227f05b48.1728473602.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <4a9b24fa7e582bdf457b550bb27bb1e227f05b48.1728473602.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 14, 2024 at 10:18=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> We will replace all rtnl_register() and rtnl_register_module() with
-> rtnl_register_many().
->
-> Currently, rtnl_register() returns nothing and prints an error message
-> when it fails to register a rtnetlink message type and handlers.
->
-> The failure happens only when rtnl_register_internal() fails to allocate
-> rtnl_msg_handlers[protocol][msgtype], but it's unlikely for built-in
-> callers on boot time.
->
-> rtnl_register_many() unwinds the previous successful registrations on
-> failure and returns an error, but it will be useless for built-in callers=
-,
-> especially some subsystems that do not have the legacy ioctl() interface
-> and do not work without rtnetlink.
->
-> Instead of booting up without rtnetlink functionality, let's panic on
-> failure for built-in rtnl_register_many() callers.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
+On 10/9/24 14:06, Petr Machata wrote:
+> @@ -450,6 +415,7 @@ __do_ecn_test()
+>   
+>   	start_tcp_traffic $h1.$vlan $(ipaddr 1 $vlan) $(ipaddr 3 $vlan) \
+>   			  $h3_mac tos=0x01
+> +	defer stop_traffic $!
+>   	sleep 1
+>   
+>   	ecn_test_common "$name" "$get_nmarked" $vlan $limit
+> @@ -462,7 +428,6 @@ __do_ecn_test()
+>   	check_fail $? "UDP traffic went into backlog instead of being early-dropped"
+>   	log_test "TC $((vlan - 10)): $name backlog > limit: UDP early-dropped"
+>   
+> -	stop_traffic
+>   	sleep 1
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+I'm wodering what role/goal has the above 'sleep 1'?!? It looks like it 
+could/should be removed after moving the stop_traffic call to the 
+deferred cleanup.
+
+Other similar instances below.
+
+Cheers,
+
+Paolo
+
 
