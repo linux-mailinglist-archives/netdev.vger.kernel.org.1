@@ -1,98 +1,94 @@
-Return-Path: <netdev+bounces-135477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E8899E0DD
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:21:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A29F99E0EA
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 243021C21724
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:21:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5119F1F21AF8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7971C7B99;
-	Tue, 15 Oct 2024 08:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3FE1D95B6;
+	Tue, 15 Oct 2024 08:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YPa2LeRD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k22R0ocR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D51B1C68AA
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3004F1D9A6C
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728980503; cv=none; b=YewbSzNstIY6DZsr3orqSQufhUESzhsx3wLaaXSOO2SzNM1qVLQTZOi30RgwiGBPTmxpX17D/Rg2hiDfUYFwW+QHFTw2JVJczpd7zFNBmDAf7xa4gvASdLDQ7UgrONZi8wHLhysl/xU8XMB+Lluwy//1i8GplPQlLXNNOS0o9Z4=
+	t=1728980528; cv=none; b=qFKoGxSv3di0lkoShIBFx8Isd5TYPpDDtpMPDpUKmM0RLHbhNrKgC+lTP/80AEHd+ccFAtj7AzFiOWxLwQFj/6KyQ53rbpSxKtngXEY4Oi+B3XhtSgEtQUDdQHBINpQVOlm7LuNxpzzQev6NJycHffEy2PfcrOFxmzDaPwrTbwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728980503; c=relaxed/simple;
-	bh=LES2uBIxczbxDVs+cSbXU1thHwIA+M4/UkP0RYskqEQ=;
+	s=arc-20240116; t=1728980528; c=relaxed/simple;
+	bh=BEcL+du+l18iEF8QfCpqfmg4zOcAQAejO9fnBlzxFjA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kTrPXHY4Ag/ekvhckdMzVNH33hPXxZMGdjq3TMNBESNlUdrdJ6tQGoYyKxRCD6MzRGBBElCNM23MJgCPLawfePePctD8SAzwJ3LvSExUQQUIH8Ep5037TW1TMdY7ei6qkJiWs/6APueee7+ONSCvL2tvRe1axiK//00Ss4Rxz60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YPa2LeRD; arc=none smtp.client-ip=209.85.208.52
+	 To:Cc:Content-Type; b=MygC5/JrPrS9GvzqLo4HLGDVHbJLYUsB9FrxUjprL2nFHkf9Ruuirx5FEDSwyPxtRfyGd1azJ9rP0eE9LhNJVYL9d6TwoFAy6lUrNF/cfoVyfCCBLOwmCNx/q5QWgBPhwrINnXq2WCLBUQakWpT2SwKiHWKc/HPwFEMk/URfCFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k22R0ocR; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c42e7adbddso6717991a12.2
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:21:40 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c984352742so1843487a12.1
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728980499; x=1729585299; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728980525; x=1729585325; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LES2uBIxczbxDVs+cSbXU1thHwIA+M4/UkP0RYskqEQ=;
-        b=YPa2LeRDhjIsSGWsyYXua8J0WezRU2Bit+KIUt6Wldn1mtWJXmg8VHbOdPCmd0LC8i
-         aBeVcvXrMmvwJ9SdzPCJXEEpLxA2iEGwZHTA6pr9eejBKKRqR8C+hfmmDC5Ba4ijcLRl
-         ctf7ZCNwnT91DThyOLcwSvQZ2k8AB6Tf+NhRkmraF90VK/CB4xRhRGe0CopcyJjxl+zj
-         wrMspj8chHsE8RWUkSIduyafakJo1w4r+FSg/5sqw/QUxjFPws7MBhBhSz2B7ryDlnlm
-         fUXRPpKIab8uo3/qvMO+Smk5S6CtmYab0NkR5AuvGKUe88l0zZrVBUjwlXIMn045Jp2r
-         WK5A==
+        bh=BEcL+du+l18iEF8QfCpqfmg4zOcAQAejO9fnBlzxFjA=;
+        b=k22R0ocRYvsRyyp4PEIx0xoSCR3IpMiRNsR0216gF5wB2gpTNoI8gOCwksYv2KzI5Z
+         14xO+HWZIlNyOuuG790/3F+EF8qtDA1NC68GYGrYh710q+EOjnjAFFnpy2Z2u3+utjlX
+         PEkd/0rFBGtVLPaTwT8UcLclHXvwT1T9zK0LbUGE5H1jMF1rvcj6AApC3hdo21zXZToh
+         FxfrQGKvyqcLcmFeNrG+8+PHMbL81I+aRZRnghzpo2nmzRmpQcAhVgZ15lNGWjt60KJ3
+         PS7YcKX4celSbl+H/wP5sipYC5gN5VIuGvQSX79F0z4x/aLOqYbVhIS4NtlB5QbbHXFC
+         ZLow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728980499; x=1729585299;
+        d=1e100.net; s=20230601; t=1728980525; x=1729585325;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LES2uBIxczbxDVs+cSbXU1thHwIA+M4/UkP0RYskqEQ=;
-        b=VV9Tnj/x3QOrjb5WwktJ3tz7/H7N/LL2IuGBTWHm8kSsRWbanC8yVZWLVCbtLI2xwE
-         xr0C9KGMeCpAmOM6Sf8mrsLDLBwubVFB0mxTr4XnMKtS0JTZQuJ8VwNEBBWLYvRRTabL
-         8PNgO5gBcHal5uk0TEORSfuxjXHtfHkZLYakjdCXRaFv37EEK6fWUbzYIKvn7TyKhsJr
-         cQKTw5zk9esu1SeMXT7H4FiECbgPIzNlymzFY9uQu2qXbd+TDhZOcFGnAY6ZcUllt/NO
-         Slb2Oj+7LplwwDiTfYDP5E8kTo7JYk0GVifXO5y0uDSy9jJ+njh/shXlYWn0YXdCidTj
-         Ifug==
-X-Forwarded-Encrypted: i=1; AJvYcCU8aIoxcTzS4XngUc/YA6fEgP4CtsMnqPKTpuYNWA/G2YmOJ8IuxCNWTRYZG5I0UG5uDmoxqN8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNS1K1pNNj5A9pAFRYjMboeCvoWm2yhojRMk57/IvDOH9HUQpA
-	cIvzVKbxymlmTVj7Bv3V7Lswn6ROQ9LL11MjwtPUrpus/7+j0AwZocAOW+8Ar0Z/CZP5/oSmWd5
-	MHdBeMPyNdZV7nsRVCp5Jv89H1TfbA+gvOXDRMRQPs1AuS3EBpQ==
-X-Google-Smtp-Source: AGHT+IFMOUpmjvik8XV6iipUriDfgeV0YLg7/Rpyyr5C9w+tuEzt+O98Jag1+C3+YMy/X1ndRHyai8jm06yMJd1cC8M=
-X-Received: by 2002:a05:6402:e8d:b0:5c9:1c15:7a2b with SMTP id
- 4fb4d7f45d1cf-5c95ac41600mr7003433a12.26.1728980499072; Tue, 15 Oct 2024
- 01:21:39 -0700 (PDT)
+        bh=BEcL+du+l18iEF8QfCpqfmg4zOcAQAejO9fnBlzxFjA=;
+        b=hrbdaTaf2VpmjfiA35nNQc43qUw7YS8e21xAmZq3BKRpm3QDTFti4850WqTWme3zlo
+         H6Z2ct8mk3SQY29vXoVYI2hRssZ1IKpxAP6HCIEyV57VRPeyjGSaHyplkDBiOMPgjcA0
+         M1wCYw78wWMxacrwL0GBXzy3g4EKrA9TpPhAdzPzgm29S0LSqoAgXyS90NYCXu36bwYr
+         ffpSqpsjX5xUzphjLcaPyeT8DetwKK7InGP3WXKGizq5mF+70wu1hrgfU51mVu8Af/4t
+         WJgqInzqO8VHmrIunjb8WONMfOM+OmfEfoB73vPzD71rppIqA2bX4ND5CwWMbQwHZyyv
+         oosg==
+X-Forwarded-Encrypted: i=1; AJvYcCW4zvzxFrWsk9TIUAJAU4zigVpknfUMjecJ9VUSiWEam9JfGxX5ny/I5g1aZMG1VWmv6Z4GSYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvST71pR0tJGdLm80RkNisCroSik4HiU8gHL2L92NSS1K1bETv
+	HI511LvJVD5ituYflYDoAQ7j+TqdcQrBeFMDgFTy+51U3FIHhILdhb9IGu5RGi5kC6EBBNSoatX
+	iMQ6liFOnmkz+NuUyxqycebVC5WwMxM1CTaKR
+X-Google-Smtp-Source: AGHT+IFSx5Y0ylEOgLSDDusCUD7oSb9C+YeFLn8BdrweET0ZhvejtnEGgPEvqfojZNCNJuzYY7ki2m9202GbgpLB358=
+X-Received: by 2002:a05:6402:51ca:b0:5c9:6c38:f188 with SMTP id
+ 4fb4d7f45d1cf-5c96c38faedmr6409736a12.26.1728980525372; Tue, 15 Oct 2024
+ 01:22:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-10-kuniyu@amazon.com>
-In-Reply-To: <20241014201828.91221-10-kuniyu@amazon.com>
+References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-12-kuniyu@amazon.com>
+In-Reply-To: <20241014201828.91221-12-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 10:21:27 +0200
-Message-ID: <CANn89iJm_mOFATf6MBYZOL+z4DORc+cGdNvuMi7ypbwJDoLLaA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 09/11] dcb: Use rtnl_register_many().
+Date: Tue, 15 Oct 2024 10:21:54 +0200
+Message-ID: <CANn89i+7wNtVhav9COCL336Q1iL4whE4PrzEJzAY_fOSCikyJQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 11/11] rtnetlink: Remove rtnl_register() and rtnl_register_module().
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 10:21=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+On Mon, Oct 14, 2024 at 10:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
 om> wrote:
 >
-> We will remove rtnl_register() in favour of rtnl_register_many().
+> No one uses rtnl_register() and rtnl_register_module().
 >
-> When it succeeds, rtnl_register_many() guarantees all rtnetlink types
-> in the passed array are supported, and there is no chance that a part
-> of message types is not supported.
->
-> Let's use rtnl_register_many() instead.
+> Let's remove them.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > ---
