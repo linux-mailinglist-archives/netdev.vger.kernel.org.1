@@ -1,136 +1,122 @@
-Return-Path: <netdev+bounces-135608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5E099E5B2
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:31:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99D8E99E5B5
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22D6B282174
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:31:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 509E01F213E6
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D470D1D90CD;
-	Tue, 15 Oct 2024 11:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735561D9674;
+	Tue, 15 Oct 2024 11:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mm5Hqvkr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aCXFZCqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEE513F435;
-	Tue, 15 Oct 2024 11:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E39F13F435
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728991899; cv=none; b=d3pr4Ys+xVNf9PG4sxCkPBOXwRGuGRxgDBymF/BSiQpCEgb+DBAojIyy8TjVRtZ1w1mmEq7KbURkp02Ikdxcugtcz4nPwopKmp6M8UvmoGzGjEH5kjoGeAjAZP13COrT9R8dViTdS0rrgllUK/bjzj8QaMwmsKT/NFOiNTd6jgw=
+	t=1728991983; cv=none; b=MzMAG+VWpCy9HURoY+AwyaXK25G2Gij9bO8/u0Fxs1Weh+pZnTN6717Et0jay+K8QhMsL2ZxJPiUfKQS/UIUIxx5pb+ArAqqsKyXaB/e9B5L3iYLmU6A1O0WDnGjZgZyoUEerCQlsWa4RjW4JW6VdCustJXRDsKAEaUZBQV0K7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728991899; c=relaxed/simple;
-	bh=CVVxLu0JmRDSvBdIV7tsZ8eXW2BO5i1vh2jk1o6sDe8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uwNavmKb3t3DDJG+iyoBhJ5HQojVDFNyGViXzjt1pYWghuevaMCb1avZGSNG4OdQa9Q5QIlS9UCkLhDbkuP68d/O2OUhWOGuA7liAtkPkNZHJuJ25uIVKLjNE1yP+JZuEKsAnIuEPsBEN9s5Mx6DwZz0p6/btHk0cwK8ouu9o6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mm5Hqvkr; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20ceb8bd22fso15376985ad.3;
-        Tue, 15 Oct 2024 04:31:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728991898; x=1729596698; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdKELXMq1PEuMas5CJuhADZebUH3WeuRSY59CmiBMOk=;
-        b=mm5HqvkrhiBinvtltw9If2pk4fHxFW/B2kR7g8hI+PkQ9oQulg/yyARF+FHNH9LQSP
-         oLCsTQfGtDvEnVMHitMbldPpdiQEqW2XIFibfMSaUmB1ggmlYe7q1lhUcLKvilMrX0Qi
-         zg1H13YLNOTDdheKOJ1PN8zEQstGgdwjkvxrvmePbkf1Uz06sZptz3jKr8vQt7Ke3JX3
-         Yl21mR6fhbA8KNpFU8YiN0zWGXKX+1HyIFkFnDmFFUp6hf6OhXi9RATcuvrEcshjWyED
-         E+epXyYtFlM6gLeTuI0p0Qgp2RoxxL5cuwy5fDYYoUYD86HK+pB46/7SRt/SqoyOJbEA
-         nX+g==
+	s=arc-20240116; t=1728991983; c=relaxed/simple;
+	bh=4LJhOFliEGCYJeXPJjq9rcUD45sfo6k8OvuueXwJPNI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lIAJwulPX+KC3+xzVlQ8ErFj9upjdtOSIiICMmn0vbO961u7NU8Di3+wtEaYs8owX9EooJrHl4OTvYbexcpBddJGNLHC75XP/XbPdwrrHqkxflQWH+n6N4oAfDjcNcU+ukGR5FpXbNwIOZRBPuAwyK50gpa9D95Bw6ELX0OrY4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aCXFZCqg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728991980;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/HGIkCUj4P3GarxgLwJxQhDbXDAu8fFAFismcPS1kbs=;
+	b=aCXFZCqgc/97wXkszn6KCFesGptpNwFlxI3HLlv/BQGoLanD0HJTGYF5G0aYksGMSXvRu5
+	4XZLh9p2NwOFmanED4KPd1mTldzXSDBSVasjyDZEQHH9OZEclhZosUl9W4S2aj5U7TFr3x
+	CbC1wd6BywYMR5hXTNoFXh7Ybebi4WI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-215-FLyDS_UOMP-wNve45TtBvg-1; Tue, 15 Oct 2024 07:32:59 -0400
+X-MC-Unique: FLyDS_UOMP-wNve45TtBvg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d47fdbbd6so2456739f8f.3
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 04:32:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728991898; x=1729596698;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JdKELXMq1PEuMas5CJuhADZebUH3WeuRSY59CmiBMOk=;
-        b=s62ELUUSABDdiut1gyjoO+nTCCkotiVBHjsTDrPdEY10qYrIgnzdmhlEutjUy7Q7Uo
-         4CQr2QrOAS0WHG781FjuY3RZiHaDq+45q9Sf2rFxpDHUdqfU+UPXS6fveuC8n+prfAO/
-         MeftqOET8qc/6+0ifkRciNfGfLXTkwA+cvH9TCnQwAPv+XWQLK9p1vvYcnEX5JaDuX7n
-         pbv8i6ql6AKmQXtdxZuMD5QmbpcW3fiIzCLrQDMpwD2AKRwdbuHOxnPFJ8qbO2qy7GdZ
-         vnFTf04cnf8UP9plGbJOVVo3qOMYFvhDJ+0oGsvSGscqHjnfCIO7WRMlhrjmJ2wXUXd2
-         Sq2w==
-X-Forwarded-Encrypted: i=1; AJvYcCV7aReb/dHxewfVJNfaWaMw0WenNxjEl+DCjPC773vAB8IYjw5D/Z62eV4hVhoJ7B+uh7I=@vger.kernel.org, AJvYcCW9qlyIQ2Q0E5GLwZAX5bg/+dbBFhpxyOWUg2FylbGh420I3o91IZzwGCI6D632MLraxltNlmQY@vger.kernel.org, AJvYcCXuH042GN8++Gmvy2kbV6fYqZOOK84F8CxGj1EQJYsjKsZaIT40f3Z4LhQazlzvv8wZhMqQKEpF2w99dSol@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWpikxqs4IUopcjfoq+UQoNNwjHfRuddxuWOm5F69JpO1wnsIs
-	3h4ZTh4E6hjlKJrs7KDsWN70hfF9mwtHsUoLMuNXPSYLFI+jE/8F
-X-Google-Smtp-Source: AGHT+IH/syk3kJeyL33iNkVh5fCsycKcjcescS7AdlXX48Z6beh6F9TvMIT3NzoS/stFaD9oDJ+Pwg==
-X-Received: by 2002:a17:902:e80d:b0:20b:9c8c:e9f3 with SMTP id d9443c01a7336-20cbb19a7f8mr199640755ad.14.1728991897714;
-        Tue, 15 Oct 2024 04:31:37 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d17f844a5sm10125025ad.17.2024.10.15.04.31.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 04:31:37 -0700 (PDT)
-Date: Tue, 15 Oct 2024 11:31:27 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrii Nakryiko <andriin@fb.com>, Jussi Maki <joamaki@gmail.com>,
-	Jay Vosburgh <jv@jvosburgh.net>, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] bpf: xdp: fallback to SKB mode if DRV flag is absent.
-Message-ID: <Zw5Sj6ODbaMyLrrf@fedora>
-References: <20241015033632.12120-1-liuhangbin@gmail.com>
- <8ef07e79-4812-4e02-a5d1-03a05726dd07@iogearbox.net>
- <2cdcad89-2677-4526-8ab5-3624d0300b7f@blackwall.org>
- <Zw5GNHSjgut12LEV@fedora>
- <8088f2a7-3ab1-4a1e-996d-c15703da13cc@blackwall.org>
+        d=1e100.net; s=20230601; t=1728991978; x=1729596778;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HGIkCUj4P3GarxgLwJxQhDbXDAu8fFAFismcPS1kbs=;
+        b=sJq6XV25IRY/rD0HkSSPKXbMASlQlQlWbHIKnKIEov6Pzin8h1b2+dkvUQILAstDOZ
+         eZl4+u1RQJqGCKl8B1nXYSuApmGmA23tA3mZwKfSi4ANYGVs3oT+uHtRMn8o8f0mELtU
+         mI/yh3g8wl+at+nwOFsdcDEty4MIAzRK/6Xf1AvwD0bktxAT2z0CFuvlzRXxxIlu5/E6
+         WsLDVtbbFTCGio8AkqNi+3h6Xb+MqIij2fRfi9jsCgymPP1jlt2uoh0mQhDzmelxqxvy
+         QpUAE74XZI+j5s3hcPOWxZfIbIe109MJpQFMfrUuku50jhZeASTk9oaxRsLZodapmswC
+         5t3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWzPe5ZiN0ImfXMAFT+jKwg02oBLey2OM2js32KF7cSp3ESUCgFMwLdhZwuVfAgT9xixhXJ5Gg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy96vXEWBHCphnxa+eMkSHsbEV4tBFWI+gmzNPSdRvZeyo5Znw1
+	NiPWktF83Q4DioL+zXLzMHgzGfg46Ek4Xm11D71MFwW0OulBSxY3z27K8AV0k528nohpLe9YIPM
+	I1iNh1O89zOosL8GPBAvUzRhmBjUJrzwAK/hsBDKiANQEDfFi64wwgA==
+X-Received: by 2002:adf:e88b:0:b0:37d:4cd6:6f2b with SMTP id ffacd0b85a97d-37d551d2566mr8948113f8f.14.1728991978137;
+        Tue, 15 Oct 2024 04:32:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0OIgcZteYdJmzz82U4QRQMqjjMjSGyiYZpdCbwV+aF+nP0JM4GQJ9u+1zyEL5Auz8eFwycg==
+X-Received: by 2002:adf:e88b:0:b0:37d:4cd6:6f2b with SMTP id ffacd0b85a97d-37d551d2566mr8948093f8f.14.1728991977737;
+        Tue, 15 Oct 2024 04:32:57 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fc411fbsm1332551f8f.107.2024.10.15.04.32.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 04:32:57 -0700 (PDT)
+Message-ID: <d2cef2e4-d697-456f-8893-57f29ad17f3b@redhat.com>
+Date: Tue, 15 Oct 2024 13:32:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8088f2a7-3ab1-4a1e-996d-c15703da13cc@blackwall.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next][V2] octeontx2-af: Fix potential integer overflows
+ on integer shifts
+To: Colin Ian King <colin.i.king@gmail.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
+ hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Naveen Mamindlapalli <naveenm@marvell.com>, netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241010154519.768785-1-colin.i.king@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241010154519.768785-1-colin.i.king@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 15, 2024 at 01:46:53PM +0300, Nikolay Aleksandrov wrote:
-> > This should not be a behaviour change, it just follow the fallback rules.
+On 10/10/24 17:45, Colin Ian King wrote:
+> The left shift int 32 bit integer constants 1 is evaluated using 32 bit
+> arithmetic and then assigned to a 64 bit unsigned integer. In the case
+> where the shift is 32 or more this can lead to an overflow. Avoid this
+> by shifting using the BIT_ULL macro instead.
 > 
-> hm, what fallback rules? I see dev_xdp_attach() exits on many errors
-> with proper codes and extack messages, am I missing something, where's the
-> fallback?
-
-I mean in the `man ip link` page [1], it said
-
-ip link output will indicate a xdp flag for the networking device. If the
-driver does not have native XDP support, the kernel will fall back to a
-slower, driver-independent "generic" XDP variant.
+> Fixes: 019aba04f08c ("octeontx2-af: Modify SMQ flush sequence to drop packets")
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
 > 
-> >> IMO it's better to explicitly
-> >> error out and let the user decide how to resolve the situation. 
-> > 
-> > The user feels confused and reported a bug. Because cmd
-> > `ip link set bond0 xdp obj xdp_dummy.o section xdp` failed with "Operation
-> > not supported" in stead of fall back to xdpgeneral mode.
-> > 
-> 
-> Where's the nice extack msg then? :)
-> 
-> We can tell them what's going on, maybe they'll want to change the bonding mode
-> and still use this mode rather than falling back to another mode silently.
-> That was my point, fallback is not the only solution.
+> V2: Fix both (1 << i) shifts, thanks to Dan Carpenter for spotting the
+>      second shift that I overlooked in the first patch.
 
-Yes, that's also a good solution. My goal is to either inform the user why
-the XDP program couldn't be loaded, or load it in SKB mode if the user
-hasn't specifically requested XDPDRV mode. Otherwise, the user might be
-confused about why the kernel didn't automatically fall back to SKB mode.
+The blamed commit is in the 'net' tree already, I'm applying the patch 
+there.
 
-Thanks
-Hangbin
+Cheers,
+
+Paolo
+
 
