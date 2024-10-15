@@ -1,104 +1,90 @@
-Return-Path: <netdev+bounces-135717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74DF99F028
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:52:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2389699F02D
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 669FFB21250
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:52:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533FD1C20F90
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FDD1C07F8;
-	Tue, 15 Oct 2024 14:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C301C4A24;
+	Tue, 15 Oct 2024 14:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRQL9w0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238A21FC7EC;
-	Tue, 15 Oct 2024 14:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13151AF0D5
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 14:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729003934; cv=none; b=qHB686wqbpa7RaTEhXvNZfxhfUl9lz524OJAn68/xBsx7IC7NrHhhj5S+L5kRtNL1O3jzlbEZwxLzbAMkjSwwvgt489M0LglMvGGfmMkVoAkAnPjAHjln5sY3UewMrmuBz74VlZl2l/WNxoxW9QZJRvwefztl6EWlqYi+ggwwkM=
+	t=1729003977; cv=none; b=SFIdBP54TOA0S7hxXsBVa4/tzO6Z35BgU0XM4qIdEXaZ7Vv83EmU+on12vzV7Dp6UnVzPcXp2i3WFpzgy+16Pflxj/X3xlas2cjWy+YOs8nb4R9fzMiNMZowZOM/awP6oLgpup+rZ0abe+lXi5/VZIMWlrpyIt5jkrVyuahIHWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729003934; c=relaxed/simple;
-	bh=y87iWwER98HS/XwERmHJIlph+6PTIfqI7aOgycGVSFw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tMNmXRXifjj3/Q4KvcSbcC5rfRhMJgFDhEojIklh7UqqG1dRmcun8QO8YpulYtWReW+Ku/KD0y9ACw7PBaDhJTamjcdzHWxP+l0JRqbJeQdSlFdy+eTghEM+FjY0bSVSP3LPcKiCU+mf1Ji6kqFcGynNCpYBTs14D1ixR/4WeeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XScTz4FybzySVc;
-	Tue, 15 Oct 2024 22:50:47 +0800 (CST)
-Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9447018005F;
-	Tue, 15 Oct 2024 22:52:10 +0800 (CST)
-Received: from [10.174.176.245] (10.174.176.245) by
- kwepemm600001.china.huawei.com (7.193.23.3) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 15 Oct 2024 22:52:09 +0800
-Message-ID: <f275b30a-4892-4867-936f-c8de41c05b9e@huawei.com>
-Date: Tue, 15 Oct 2024 22:52:08 +0800
+	s=arc-20240116; t=1729003977; c=relaxed/simple;
+	bh=ULeqHrjM6cbbb/s4qCgU3Og1jHFr033Dqlv56eFagKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FxKvefiJJcXqzJ7oZnh/+wX1HqYfjr43cGQ2VCgLbDIC+YimfkcvyXhI8NqVNcYjUL/2xw6kmNTZNyR3IJ80NL04Bz1KmSmW2nxg6s95VAlg2MLYxXDbkPBiqoBUuBzHRDuxIsQcgfMidMjHHbH9Mk14565gdJzS9NcLlAfell0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRQL9w0S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BAFEC4CEC6;
+	Tue, 15 Oct 2024 14:52:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729003977;
+	bh=ULeqHrjM6cbbb/s4qCgU3Og1jHFr033Dqlv56eFagKE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SRQL9w0SZlfryymgG1uvMKHL6/+N8g2/+6xim/qUoXxzPvLDCvsEfXBp7uKJpf+x5
+	 soKHGgyzAnC8DrtIG5Dv0sqWxym/2OsWLimZyPgAInZ/xbuMWR9UfEdAhbbJmS/n9s
+	 /5rQrcndHIJV3L0AkOxxYK0jGmigK7JZ8YiTT/ukTyUU0tr13I7j/jE4s8oxtRdTK8
+	 RoY9t1hSjvl4FE7OKA3fRi4trdrNCzK7ctWuFKb56adtMZ9gMURKiW+OH8FvftMBJt
+	 v/d5cHjmzSeflwm5+rhSg9KChnjfg87h0Zw5GFqspKbgDsVPpQyBOAMMzX8CV/Yrly
+	 UPrhu1WDT5sYQ==
+Date: Tue, 15 Oct 2024 07:52:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Mark
+ Lee <Mark-MC.Lee@mediatek.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, upstream@airoha.com
+Subject: Re: [PATCH net-next v2] net: airoha: Implement BQL support
+Message-ID: <20241015075255.7a50074f@kernel.org>
+In-Reply-To: <Zw5-jJUIWhG6-Ja4@lore-desk>
+References: <20241012-en7581-bql-v2-1-4deb4efdb60b@kernel.org>
+	<20241015073255.74070172@kernel.org>
+	<Zw5-jJUIWhG6-Ja4@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmasp: fix potential memory leak in
- bcmasp_xmit()
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	<justin.chen@broadcom.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<zhangxiaoxu5@huawei.com>
-CC: <bcm-kernel-feedback-list@broadcom.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20241014145901.48940-1-wanghai38@huawei.com>
- <924f6a1b-17af-4dc8-80e3-7c7df687131a@broadcom.com>
-Content-Language: en-US
-From: Wang Hai <wanghai38@huawei.com>
-In-Reply-To: <924f6a1b-17af-4dc8-80e3-7c7df687131a@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600001.china.huawei.com (7.193.23.3)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Tue, 15 Oct 2024 16:39:08 +0200 Lorenzo Bianconi wrote:
+> On Oct 15, Jakub Kicinski wrote:
+> > On Sat, 12 Oct 2024 11:01:11 +0200 Lorenzo Bianconi wrote:  
+> > > Introduce BQL support in the airoha_eth driver reporting to the kernel
+> > > info about tx hw DMA queues in order to avoid bufferbloat and keep the
+> > > latency small.  
+> > 
+> > TBH I haven't looked at the code again, but when I looked at v1 I was
+> > surprised you don't have a reset in airoha_qdma_cleanup_tx_queue().
+> > Are you sure it's okay? It's a common bug not to reset the BQL state
+> > when queue is purged while stopping the interface.  
+> 
+> So far airoha_qdma_cleanup_tx_queue() is called just in airoha_hw_cleanup()
+> that in turn runs just when the module is removed (airoha_remove()).
+> Do we need it?
 
-On 2024/10/15 1:14, Florian Fainelli wrote:
-> On 10/14/24 07:59, Wang Hai wrote:
->> The bcmasp_xmit() returns NETDEV_TX_OK without freeing skb
->> in case of mapping fails, add dev_kfree_skb() to fix it.
->>
->> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet 
->> controller")
->> Signed-off-by: Wang Hai <wanghai38@huawei.com>
->> ---
->>   drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c 
->> b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
->> index 82768b0e9026..9ea16ef4139d 100644
->> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
->> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
->> @@ -322,6 +322,7 @@ static netdev_tx_t bcmasp_xmit(struct sk_buff 
->> *skb, struct net_device *dev)
->>               }
->>               /* Rewind so we do not have a hole */
->>               spb_index = intf->tx_spb_index;
->> +            dev_kfree_skb(skb);
->
-> Similar reasoning to the change proposed to bcmsysport.c, we already 
-> have a private counter tracking DMA mapping errors, therefore I would 
-> consider using dev_consume_skb_any() here.
+Oh, thought its called on stop. In that case we're probably good
+from BQL perspective.
 
-Hi, Florian.
-
-Thanks for the suggestion, I've resent v2.
-
-[PATCH v2 net] net: bcmasp: fix potential memory leak in bcmasp_xmit()
-
+But does it mean potentially very stale packets can sit on the Tx
+ring when the device is stopped, until it's started again?
 
