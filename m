@@ -1,139 +1,262 @@
-Return-Path: <netdev+bounces-135535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F83D99E3D9
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:28:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86B9A99E3DD
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:30:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC4B1C21114
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:28:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B9C280E45
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359661E5717;
-	Tue, 15 Oct 2024 10:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760891C7269;
+	Tue, 15 Oct 2024 10:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="brVGufr9"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="QXC3sbmI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2084.outbound.protection.outlook.com [40.107.20.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F501E4930
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 10:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728988115; cv=none; b=KQh3qBUDEETGHY3oEIv/H5Zv55+xn+HHVAGdlQMU0M4+Z6toLDKe7dku2g8yjgHPkwC9UWxDCBGdORsxq4mAoDbDR7dz8AfF+zcnH5ft5Jyd9fN7NoJwCE8UKPlScrXDEvzfX2pAjATTmJ2w0aumxoG2Oi2vH4SSDd0Bq1VLtg4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728988115; c=relaxed/simple;
-	bh=VgJvuDkJACz+nKbm3fgGpAqb49d91mYdGlKdFuQGhR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O0oizdPuqdneoV//MbHS9zMMPYHNgziIEd8bnTKXkOc1gOxZya5l/hQkIXK6xNBYGe3k+bS16ze8E/Yfq/UIpT50tQdpE1hXdQ9v/eJ9bJcTIMLkgNhvv3yXTP7UvoG/KpkeCK7VjJUO3CcxMB4/95TGadikrsBuIeJIt0SVECg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=brVGufr9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728988112;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cps/LOuop4Pu5oc4Vsr3y8b/IN0J5M76l5RtraQo7R0=;
-	b=brVGufr9Y4DwoVHwzP3oiM6btrumXzmIIBV5oQlfQUAedSXAaenkX47WFXTd5yIKUwmmE0
-	pCrbBMF+rRrUCvY3Fh6iJicPuovOEggTI5hdsvSGWn74m6dw1jN5Xu367rslZZlZDTDYuA
-	v34lYf7o8B5ZWLpyMgbXJIpCI2f18W4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-sDgKzwtdNOaYlHwyHAgUwQ-1; Tue, 15 Oct 2024 06:28:31 -0400
-X-MC-Unique: sDgKzwtdNOaYlHwyHAgUwQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d4854fa0eso2580129f8f.2
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 03:28:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728988110; x=1729592910;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cps/LOuop4Pu5oc4Vsr3y8b/IN0J5M76l5RtraQo7R0=;
-        b=f/EWF5HPKclh1gXk+WEF+beePf6zzcPuSIY8dr1JEBiQlvngxaiDfgUJSIi3IuQ7YJ
-         aUoK65qCgvZfhK0qIMRL4Irm5df2eJ3GSlIoBtvH4JjBy9L3+pkde3pR52XooDkpkls+
-         BDU8ceZS24Rezqd2XVRW62EG7kFjE4fJg9/IAt8gxstKprpuOZKZKjA7SlFQxNONmO1H
-         FbNV1hFqwZH/rxtXHX/1AkU2rGETjHZuldesulYawt0fwYNwwkMTW/O7azXgL46qpBQy
-         26UrPbP7ckeoCkHATf32g7XhwRjWPa7vrOJke0qqr4fpgzLWiky3JGxmRziuOgRkwfqL
-         J79A==
-X-Forwarded-Encrypted: i=1; AJvYcCUX+pdscn2ziHC9U6Qt50SPcEImo06GbuIubRIrTriPfrIDYdtrncXrzTj0KKdHsAnwA/0d2qI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNx12RKnOCYhr2zuykZ1gSZK/RpZoS7kp13dmdgA3l4guCVolB
-	FEBC0Mwkv+c+BWPWoacihfkulyXd6wc6w8/ar9gbC624XhFuhW6LS6WwCSCWwzTtKoszRHtAP3V
-	joUUdtePCXLemx+SimZLo+Pm3HAhqOUvJcrsYyXJzTRZu1UF/4Osfwg==
-X-Received: by 2002:a5d:4c43:0:b0:37d:5496:290c with SMTP id ffacd0b85a97d-37d551aac20mr8651059f8f.7.1728988110005;
-        Tue, 15 Oct 2024 03:28:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IExTzwbPKlTTkRpsnClYF7+R/Tjm4icbAPJb2joq7lD1QZdO9fKsuHcYHIuJ+ORRD3Pk1H9WA==
-X-Received: by 2002:a5d:4c43:0:b0:37d:5496:290c with SMTP id ffacd0b85a97d-37d551aac20mr8651040f8f.7.1728988109542;
-        Tue, 15 Oct 2024 03:28:29 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fc41154sm1194674f8f.108.2024.10.15.03.28.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 03:28:29 -0700 (PDT)
-Message-ID: <2dd71e95-5fb2-42c9-aff0-3189e958730a@redhat.com>
-Date: Tue, 15 Oct 2024 12:28:26 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6914683
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 10:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728988210; cv=fail; b=Gij5dufWf1fZdgaND42pDjFDwxsbM7B6qqJiLLGURo9v0H/esPoUrCqZz2iw/XJXsI1uLtODHuH26g9PTD/0a+BBQICBEyTSjq5WjU6Q7RkUvdLiQyHgUW43PgOQMPAs7sAQeDnGuPYe+KKn6pmVwiQotu8nHq8kRsNbBDmiidI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728988210; c=relaxed/simple;
+	bh=aqRI2ufGxWxMdy6PCtZw+0GVTJZkdJFYFJBxBfiAiPs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=qx+Vw8hi3ZakYjoN92gQU7YTr/DddMrWy5/oE3tkvDAigrzXVnsT0ANtXaC+vt/JpmDwhsM2HFLiRSuKsEe9n2GLBxnWQoZk2uRYC/h6AsepT0Rgm9CL2cXhhrNAs0/fh+7d0hnjZD6dYDrGzyuvzrU9uMWH5/Q6bGrK9Rf2LQg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=QXC3sbmI; arc=fail smtp.client-ip=40.107.20.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KwnR1MRm5wA4Wx9lkyGANfPOatz/scGqfZ4/wJTEoUjuWI0z6SoWcdJb/A27wO819sKaZWwhLHLkJ/hM6dY6L5j/hKelVamcA53tPFd5NFLMYelk91yvfl7YbVfg0fhNYXzaKUMHDmojACxu+kAFUWUUciaNUZXgSzuH66Rh1yMds1axcrnX/K7M/vLiigC+u5dOHJHs3xeQS+Epu9cMBkf+1B4ySQBNmn9g+uHZ8RpwVrufCnbudVPUuUabXEUvBidw3gUqZGYoPTRDfkL+9BmOGt9E5JdBXhKFCNcZfd2dFW/0GjFqxUEKhbKUcwcX75h42qQJ6keClR3egb8N7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QsBdypBk56+RcfmEeCIcYfFEC7Ize0ckJwyLXxxwVLY=;
+ b=jH2FYbnAAu3lx30qyG+AeQHcMwgp4ZnL/JwvHTLYk4mK7IuMFCCRDG1ZuwMAwxKy6SjruPuj0vo5kfznd9DD1Tv6u1FivTnlMluh3VdBqaRRbLdy41GFqCHyYv7ZT7veCmfzlF6N17frtdI5255KQgoA6GaxW49FEdZdoAYP6ApMe5MzPUzLHpZoJRhJYWzvUH3v0Ab0LL1+V0OUrSnTzDv3IXbDEx3mYQleIQLLfzX06qPgrGUsZWnVKb9AnHLxUbTwugYLtH5qgGaVo3qivIwkV1tY3h5e7w4IVxphTpsnPalxxqnupNFiUSFmNLl+9TtJBgcTFaqEVRrLbto46w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 131.228.6.101) smtp.rcpttodomain=nokia-bell-labs.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=temperror action=none
+ header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QsBdypBk56+RcfmEeCIcYfFEC7Ize0ckJwyLXxxwVLY=;
+ b=QXC3sbmICQO952dnefBj4qbSIwanfmREJ17qJIN5IsK1/52Fk+mJin1I0aIVCb+D6mtrcTXqG0KdUrvtvU/11HD41aqtcIqxV9gKxAABPOR+KC5csrcLSRhREWjHLIvNPwUzNO9arhQX7tUBqDQ1evKxgi4euuvsFY5zjLSXLAHIQZLeCdfwU3qkecXKXXqnC6bwUp8fQewXGGckWj68gtaLavjc/F+B+7/PSRa5IFp/M8C0oBVyfX3lER5TFzS3WKreJWlSt4TA1s+Wu2SYW7Cqf/VjJhwLL9BdwedY0Aw+ZlqecSoPJmaj+ckjMxuOed3o0sPYPx/WMjmcfuxPyQ==
+Received: from DBBPR09CA0003.eurprd09.prod.outlook.com (2603:10a6:10:c0::15)
+ by AS8PR07MB7845.eurprd07.prod.outlook.com (2603:10a6:20b:350::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.27; Tue, 15 Oct
+ 2024 10:30:03 +0000
+Received: from DU2PEPF00028D08.eurprd03.prod.outlook.com
+ (2603:10a6:10:c0:cafe::4c) by DBBPR09CA0003.outlook.office365.com
+ (2603:10a6:10:c0::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.27 via Frontend
+ Transport; Tue, 15 Oct 2024 10:30:03 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 131.228.6.101) smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not
+ signed) header.d=none;dmarc=temperror action=none
+ header.from=nokia-bell-labs.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of nokia-bell-labs.com: DNS Timeout)
+Received: from fr712usmtp1.zeu.alcatel-lucent.com (131.228.6.101) by
+ DU2PEPF00028D08.mail.protection.outlook.com (10.167.242.168) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8069.17 via Frontend Transport; Tue, 15 Oct 2024 10:30:02 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr712usmtp1.zeu.alcatel-lucent.com (GMO) with ESMTP id 49FATtn4029578;
+	Tue, 15 Oct 2024 10:29:56 GMT
+From: chia-yu.chang@nokia-bell-labs.com
+To: netdev@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+        koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
+        ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+        cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+        vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH net-next 00/44] DualPI2, Accurate ECN, TCP Prague patch series
+Date: Tue, 15 Oct 2024 12:28:56 +0200
+Message-Id: <20241015102940.26157-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V12 net-next 07/10] net: hibmcge: Implement rx_poll
- function to receive packets
-To: Jijie Shao <shaojijie@huawei.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org
-Cc: shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
- chenhao418@huawei.com, sudongming1@huawei.com, xujunsheng@huawei.com,
- shiyongbang@huawei.com, libaihan@huawei.com, andrew@lunn.ch,
- jdamato@fastly.com, horms@kernel.org, kalesh-anakkur.purayil@broadcom.com,
- christophe.jaillet@wanadoo.fr, jonathan.cameron@huawei.com,
- shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241010142139.3805375-1-shaojijie@huawei.com>
- <20241010142139.3805375-8-shaojijie@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241010142139.3805375-8-shaojijie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PEPF00028D08:EE_|AS8PR07MB7845:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4e0d65da-cfd3-44e5-e195-08dced045402
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZzJlcU82OWVrNkZVRnI5Tk1XVW9BOXV3cFg2TTk4UWU5R3Qxemx5dzNOTE5C?=
+ =?utf-8?B?cWV5V3N0ZUg0S21hUlV6UElDRFVmTkJSeVFuZnZ0NDJTVm9oQm54VTNmNG9P?=
+ =?utf-8?B?dDZVSVRWYys4K2RTWE54MnNEWTUyaHh4RTg3NmFydXk4ME9xYk1EQkF0RExZ?=
+ =?utf-8?B?ZE0raVdyNDB6NTRDWVN6dHp0ZUpnbWpRcndEQ1hyNGdQZ3o4TXhMNnJEYmE5?=
+ =?utf-8?B?MU03SzF5SzM0OWVDd1ZiczUxTjQ0b3ZKYzJtL2VsY2tDSUFwbDlBVUpLaSsy?=
+ =?utf-8?B?c0Vqb0VkekJITGpjb2FFcEhjSkxKeW9yMkZzVWxwNWFpbllrSWVKUzZWVElh?=
+ =?utf-8?B?WGNTbjE4bHp3dVpFTERvSW1qQnRJajBBWFFiLzZwUFZ2Tmd2ZmYyanFYcWVx?=
+ =?utf-8?B?dXAzM3FSb2lOK25LMW1WMHRrZjdhRFdSMHpKYjYzVkVTOGRVVWczeEJTMWhm?=
+ =?utf-8?B?VWRlMW5nbnZ6UlNhNzlhb0ZGUWVscG9ibGgxVW9vb1pjT0VSSWR6cUFmNzMr?=
+ =?utf-8?B?TlVPc3Z4elZtVWJSTTVzbXR4MzcwYXNyVlBnaFhvckZLREl1c08xZVR1Ty94?=
+ =?utf-8?B?MWNUQjFaR29MWDJnRFE3WWhVT1QycnFjc2lEaitWYlB6a3Z6alhkSFlWbW9I?=
+ =?utf-8?B?R05jNjI4UnZxSkZaTUFxeDNMakdaNmVQelUybkZObFdqZGx4RDIxTXJYSHBD?=
+ =?utf-8?B?c2VVaFFCK2JES3BSQjUxWjRtVXBuOG05YzEwbFY0bWd6d3dNWThRaW8vbTVE?=
+ =?utf-8?B?Y0lkWUNvYU0vR28vcTdlOXBJWnFXOUlpWUNPNlhkRWdqbDkyS2xXUGRLTjVI?=
+ =?utf-8?B?MGlnVFJtcERIYUozR0xNVVVWeWMrbERnVmxwQkxGS1ppUytRbVdEV0g2YXZM?=
+ =?utf-8?B?ZWhEcmYvcU5MVURzaURicWwwMVdieWVtSk9wTWduT0lMSE5tTUM4N0Q0d1Q2?=
+ =?utf-8?B?U0V3RXM2ejJGSFhhT2JrM3AxN0tmM2M2LzJQYXBwbllqaUgzc0VVU2xJd0I4?=
+ =?utf-8?B?Nmx4eHErdnVzWTE5d3dDRnZsWVZCbnlMaUN2WjY1d3Axa01LTU16ZWtLL0xT?=
+ =?utf-8?B?a0ptYnh3L3M5OXBJYnB1WkcyN29ZM2s5ZGZoRlR3a3VXcC8wTXErZHRVdVEv?=
+ =?utf-8?B?VXpHR2tOV29mb3U5WW5sSE5WUWs0U0hWdmxaRTF2Z3NLQ2FncW52aWltbmFB?=
+ =?utf-8?B?cytKVFl0RWhQdEU4bzlqVnQ5M0c3d1ozTkVwZFRiaVNldFJGdzcrektncWw2?=
+ =?utf-8?B?WnVnUVNiOCtKSDJvZ2JTL016N3JHODJJVHFRY3N6d0pTMFpESUhvRXF3QXRP?=
+ =?utf-8?B?NWlFRkYrcmJ5VkdacW94a0tqNEJMbytGY3FWa1lmRFEyYzdZR1J3Y0QyTjVo?=
+ =?utf-8?B?NXhKd1pkQ3RheEV4NXU4NjNrK1E5RzZUUU5qN2VzS0s0ZGNPRjlmOUtZWUxD?=
+ =?utf-8?B?eWx0L3AyTnJHazdRa1FzTzRGRG5qcC9DaVpFWk9NNkllWm05c3JKTmVpbDZK?=
+ =?utf-8?B?Ri9tZHpiTTlCdXVJa2x5QTdBNXlIL1k5a0VoOXBZanArRWpCZk9vZWZBcGJZ?=
+ =?utf-8?B?R2w0VVZJbzFuSzFPY2kwbUx4YmJhZG5aOU9OUGJJdE9nM1hwQ3JrVVV6TGx1?=
+ =?utf-8?B?T0k2Z3NORjBWbGJLcmxBNklDZVdGZDZ6UFpDUW1XREpCWXBsYTVPRGNYSUFm?=
+ =?utf-8?B?eTBleVppK2EyMTVHczdaOG5za1YvN3NvLzVRZWlTSzhkNG5lb1ZzK3BaV080?=
+ =?utf-8?B?WHVpc3RvNE54M1gyemVtUUdoL1hRRmxBT2ZSTHdxUlVRL213b1ZRK1hnVVA0?=
+ =?utf-8?B?OUtSYkRGS2d5ajd5a1JSZm5xMjByVk9MVnhGVU5INU1FZVJJR1hEWWJsWkht?=
+ =?utf-8?B?b0IrU2NXSXVseXo2cUZFWjJORkRhNzdrR0pGeGpDajJnUXc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:131.228.6.101;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr712usmtp1.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 10:30:02.3019
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e0d65da-cfd3-44e5-e195-08dced045402
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.101];Helo=[fr712usmtp1.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU2PEPF00028D08.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB7845
 
-On 10/10/24 16:21, Jijie Shao wrote:
-> @@ -124,6 +129,20 @@ static void hbg_buffer_free_skb(struct hbg_buffer *buffer)
->   	buffer->skb = NULL;
->   }
->   
-> +static int hbg_buffer_alloc_skb(struct hbg_buffer *buffer)
-> +{
-> +	u32 len = hbg_spec_max_frame_len(buffer->priv, buffer->dir);
-> +	struct hbg_priv *priv = buffer->priv;
-> +
-> +	buffer->skb = netdev_alloc_skb(priv->netdev, len);
-> +	if (unlikely(!buffer->skb))
-> +		return -ENOMEM;
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-It looks like I was not clear enough in my previous feedback: allocating 
-the sk_buff struct at packet reception time, will be much more 
-efficient, because the sk_buff contents will be hot in cache for the RX 
-path, while allocating it here, together with the data pointer itself 
-will almost ensure 2-4 cache misses per RX packet.
+Hello,
 
-You could allocate here the data buffer i.e. via a page allocator and
-at rx processing time use build_skb() on top of such data buffer.
+Please find the enclosed patch series covering the L4S (Low Latency,
+Low Loss, and Scalable Throughput) as outlined in IETF RFC9330:
+https://datatracker.ietf.org/doc/html/rfc9330
 
-I understand it's probably such refactor would be painful at this point, 
-but you should consider it as a follow-up.
+* 1 patch for DualPI2 (cf. IETF RFC9332
+  https://datatracker.ietf.org/doc/html/rfc9332)
+* 40 pataches for Accurate ECN (It implements the AccECN protocol
+  in terms of negotiation, feedback, and compliance requirements:
+  https://datatracker.ietf.org/doc/html/draft-ietf-tcpm-accurate-ecn-28)
+* 3 patches for TCP Prague (It implements the performance and safety
+  requirements listed in Appendix A of IETF RFC9331:
+  https://datatracker.ietf.org/doc/html/rfc9331)
 
-Side note: the above always uses the maximum MTU for the packet size, if 
-the device supports jumbo frames (8Kb size packets), it will produce 
-quite bad layout for the incoming packets... Is the device able to use 
-multiple buffers for the incoming packets?
+Best regagrds,
+Chia-Yu
 
-Thanks,
+Chia-Yu Chang (17):
+  tcp: use BIT() macro in include/net/tcp.h
+  net: sysctl: introduce sysctl SYSCTL_FIVE
+  tcp: accecn: AccECN option failure handling
+  tcp: L4S ECT(1) identifier for CC modules
+  tcp: disable RFC3168 fallback identifier for CC modules
+  tcp: accecn: handle unexpected AccECN negotiation feedback
+  tcp: accecn: retransmit downgraded SYN in AccECN negotiation
+  tcp: move increment of num_retrans
+  tcp: accecn: retransmit SYN/ACK without AccECN option or non-AccECN
+    SYN/ACK
+  tcp: accecn: unset ECT if receive or send ACE=0 in AccECN negotiaion
+  tcp: accecn: fallback outgoing half link to non-AccECN
+  tcp: accecn: verify ACE counter in 1st ACK after AccECN negotiation
+  tcp: accecn: stop sending AccECN option when loss ACK with AccECN
+    option
+  Documentation: networking: Update ECN related sysctls
+  tcp: Add tso_segs() CC callback for TCP Prague
+  tcp: Add mss_cache_set_by_ca for CC algorithm to set MSS
+  tcp: Add the TCP Prague congestion control module
 
-Paolo
+Ilpo Järvinen (26):
+  tcp: reorganize tcp_in_ack_event() and tcp_count_delivered()
+  tcp: create FLAG_TS_PROGRESS
+  tcp: extend TCP flags to allow AE bit/ACE field
+  tcp: reorganize SYN ECN code
+  tcp: rework {__,}tcp_ecn_check_ce() -> tcp_data_ecn_check()
+  tcp: helpers for ECN mode handling
+  gso: AccECN support
+  gro: prevent ACE field corruption & better AccECN handling
+  tcp: AccECN support to tcp_add_backlog
+  tcp: allow ECN bits in TOS/traffic class
+  tcp: Pass flags to __tcp_send_ack
+  tcp: fast path functions later
+  tcp: AccECN core
+  tcp: accecn: AccECN negotiation
+  tcp: accecn: add AccECN rx byte counters
+  tcp: allow embedding leftover into option padding
+  tcp: accecn: AccECN needs to know delivered bytes
+  tcp: sack option handling improvements
+  tcp: accecn: AccECN option
+  tcp: accecn: AccECN option send control
+  tcp: accecn: AccECN option ceb/cep heuristic
+  tcp: accecn: AccECN ACE field multi-wrap heuristic
+  tcp: accecn: try to fit AccECN option with SACK
+  tcp: try to avoid safer when ACKs are thinned
+  gro: flushing when CWR is set negatively affects AccECN
+  tcp: accecn: Add ece_delta to rate_sample
+
+Koen De Schepper (1):
+  sched: Add dualpi2 qdisc
+
+ Documentation/networking/ip-sysctl.rst |   55 +-
+ include/linux/netdev_features.h        |    5 +-
+ include/linux/netdevice.h              |    2 +
+ include/linux/skbuff.h                 |    2 +
+ include/linux/sysctl.h                 |   17 +-
+ include/linux/tcp.h                    |   31 +-
+ include/net/inet_ecn.h                 |   20 +-
+ include/net/netns/ipv4.h               |    2 +
+ include/net/tcp.h                      |  299 +++++--
+ include/uapi/linux/inet_diag.h         |   13 +
+ include/uapi/linux/pkt_sched.h         |   34 +
+ include/uapi/linux/tcp.h               |   16 +-
+ kernel/sysctl.c                        |    2 +-
+ net/ethtool/common.c                   |    1 +
+ net/ipv4/Kconfig                       |   37 +
+ net/ipv4/Makefile                      |    1 +
+ net/ipv4/bpf_tcp_ca.c                  |    2 +-
+ net/ipv4/inet_connection_sock.c        |    8 +-
+ net/ipv4/ip_output.c                   |    3 +-
+ net/ipv4/syncookies.c                  |    3 +
+ net/ipv4/sysctl_net_ipv4.c             |   18 +
+ net/ipv4/tcp.c                         |   26 +-
+ net/ipv4/tcp_cong.c                    |    9 +-
+ net/ipv4/tcp_dctcp.c                   |    2 +-
+ net/ipv4/tcp_dctcp.h                   |    2 +-
+ net/ipv4/tcp_input.c                   |  689 ++++++++++++++--
+ net/ipv4/tcp_ipv4.c                    |   33 +-
+ net/ipv4/tcp_minisocks.c               |  117 ++-
+ net/ipv4/tcp_offload.c                 |   13 +-
+ net/ipv4/tcp_output.c                  |  336 +++++++-
+ net/ipv4/tcp_prague.c                  |  866 ++++++++++++++++++++
+ net/ipv6/syncookies.c                  |    1 +
+ net/ipv6/tcp_ipv6.c                    |   27 +-
+ net/netfilter/nf_log_syslog.c          |    8 +-
+ net/sched/Kconfig                      |   20 +
+ net/sched/Makefile                     |    1 +
+ net/sched/sch_dualpi2.c                | 1046 ++++++++++++++++++++++++
+ 37 files changed, 3519 insertions(+), 248 deletions(-)
+ create mode 100644 net/ipv4/tcp_prague.c
+ create mode 100644 net/sched/sch_dualpi2.c
+
+-- 
+2.34.1
 
 
