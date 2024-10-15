@@ -1,101 +1,150 @@
-Return-Path: <netdev+bounces-135479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63D899E0ED
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:23:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14CD499E0EE
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13A671C21451
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:23:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 980BD1F21354
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D41CB53A;
-	Tue, 15 Oct 2024 08:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210E21D0942;
+	Tue, 15 Oct 2024 08:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SP3V+4NI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsj+jLUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0C51C7B99
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E98E1C8767
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728980576; cv=none; b=dLU4BSu4dCKWGFs4usV7Z3swWSqnLQWx68yBil59zXFrlI9SmcfiMJZS7r3g1CfTOjk9ZLv8O3LJGEcDjtPauQZbXxsp/MclzIJ7k1BSV3Z2AQiROrwPzJbYAGzxUP45fMHiAEbLuslTTCjNMkfkQHSKzXFVTGaCMdw6CfqDxgM=
+	t=1728980577; cv=none; b=hiuwDGEy3CP752EBSRMZOnTr6689mGtnTe1NCvypqcESIQuRmgaqUMvJZUvXQ4RnUHvcNmY8lXF4hBs27lmwdbe21u5/f/vSVhRBq4neIu3A+9XpYEYxqIvmdq3KFkkDuDl7Cva7qJ97ps8TNudgYapJVl+i+nRcEuUtRlEAbQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728980576; c=relaxed/simple;
-	bh=NNPZrM/hsHsaii0u40T5699JhwPSOd1nnJljs5kFqUE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qr035rUd0nEnGvS7jy2UCmPv4/ju1Dx44wurZBkBo5CT/CXYPKjYDtsIzs48TKnt/dbCg4yKGn+y6V3OmLtbpcoHshLX7gCl9iOKTpxeqB96wsJPW6WQjXcGaNppAX4nAk4yY2lEiqErNH0V30avx0mwJTaf+qULZN3d53u8oJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SP3V+4NI; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c949d60d84so4662680a12.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:22:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728980573; x=1729585373; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NNPZrM/hsHsaii0u40T5699JhwPSOd1nnJljs5kFqUE=;
-        b=SP3V+4NIBGh6XBYek9vvRdPWo4yeGkLw/itkdXSL4pwmGUSFpifdl0sNrxpnev82ML
-         3r+jbc3y00aXhdNaWREC2KPDG7iaZlHRLx0m48tMmJw1i5zB/33geFyY5qj1UDWBx8k1
-         DJHrRK80c7Dx84H3NGor3UmpMBQmlfhNGiq7fSIoIrEAaVvciBJuGEUm7I0fgHgIJ01B
-         SOWTqaKk3JRWmw0Cn2JghlswFZRkjOWyBOFuR1Bm5P6GCgfEaO1bsPAzE85iggsG4kB+
-         nlbD/qQHMnpTRLmC8UrlC2UReJcLGyaWr9VPy+r90szFK/pPTaRVMi64xxoNE4MB9UCd
-         5I2w==
+	s=arc-20240116; t=1728980577; c=relaxed/simple;
+	bh=cUwe0v7vBLeUuYtqFoHOZI44JFRnj3mCsTB1ARnQFBk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BVapp6pAUUAcaCZ/2DMdPVILNPNBsFydQQ6ukXRcS97Z96/aLw6VWbx+DT31GfDgLyreGwNq8At8ZfgSJpBPnaFWj1A+HPjoux3vaB5otf7vt1KhlynazpQOo8QrUSypngi1y9/Iqa+ehDDMG+mUBHqVNNYKc7/6oSFqqTc5nxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fsj+jLUi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728980574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HZT5NqeAX+0TO6OTyvaLn7KXovdqFQioxNek5XGLyj4=;
+	b=fsj+jLUibGeRHi+7onQBnGM4NRiHJmIUmJTPRfs3ruBttivXIu9Ix8CY+db0mcO6sAjOsb
+	VggQrRRPK1I1OGc1I7+O8GYLy2FhaVY0LHsNRz5BMaCQaZ/XqZWj8KtrT1gG+mX405jXAl
+	eCabnuy6H16HScCo71YoLYAPsKLdlKA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-178-Pzyge3KqNAK81IPivMhZSg-1; Tue, 15 Oct 2024 04:22:53 -0400
+X-MC-Unique: Pzyge3KqNAK81IPivMhZSg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43058dce286so29157615e9.2
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:22:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728980573; x=1729585373;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NNPZrM/hsHsaii0u40T5699JhwPSOd1nnJljs5kFqUE=;
-        b=eaHQMcBc5xwU+vFCuT/hUi80Ba7QupHb7IlWqmsZQbDKkUduOJKlGaWYfHDgZpRSkx
-         S2bwPTKi6dL7AG1CYPMbfJHWORj2vWWgbdpZHzAMCRZOs6K3xqAfTV/+UytHy4KsSB8z
-         p77GtPzEyNJ5QtYqIUsya9fgF1htgMG3zsQLQaSVxIDKyIaGslzqq/XKBs89ws6/INDk
-         e+SZttQHYTPhG5AiN0LcP7C7CHcXvqpOGZDC73B5ZNm6PEPqMXwZm9Pr4rNtycCYuj2a
-         zUO5enu/PBCWYE3fl017/n8aH1QYemRJ5EqjcSRBbtEYl3rP0tV16ohTbYbouWBKysDu
-         1nlA==
-X-Forwarded-Encrypted: i=1; AJvYcCXfH0uLF2B9YRLm0BMaD7TFMpu1vZinu4HadE9dE1vSuvnL7lYw6mjgi4kF9oXYpsZ+u6DXIQg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/37sd/HpuiNGWnYTTndQOCOLznRJ3X2TxaJyDvUgpfbCpwbwZ
-	TXcyyBpyZHwYRe83UWVtgVGEDU2AeqTQUssg5vp/XfdEKRgGvhuIZ/f6zhGSaRtbavdcw4eOMnu
-	FH8eq9iieM1prybHNaej4F23SXNTHQyyeTv3Y
-X-Google-Smtp-Source: AGHT+IHnv0vuPkUPs0o0pqod/fLyBEoogWYUEly+HOnq11w0qHY2J5JlzhJtuvfYN+63xVIzsfPdS28d0VN8OKDpTfE=
-X-Received: by 2002:a05:6402:2747:b0:5c8:8c16:3969 with SMTP id
- 4fb4d7f45d1cf-5c948c88313mr9638974a12.7.1728980573079; Tue, 15 Oct 2024
- 01:22:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728980572; x=1729585372;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HZT5NqeAX+0TO6OTyvaLn7KXovdqFQioxNek5XGLyj4=;
+        b=M4mhI8s+m4sPHjCAV6+iQu2zJ+uIEANrPar1HaOslfKrPwvvY4Ivx8xsjHIZKRMnMe
+         kyOmpOXCYiG7zU4Ov0RfyPFZHAtZZCQ0GWihrz7bXISpecwXDpDcPGX1apJbOOfor8mb
+         kIJUtDnAIB7y0ysYIfhJFkPAmvGAS0kW05QzcdKLkhWlRcx33AzM1KudHQYF3dmmm67A
+         5J5J9zO3oFyZa1EQHlP0/8DW0owvFv4iiayzxeUhfJHXDNvw9ncHdgCARYmdTOMBC9vz
+         MRHHPs8KyEB6xeasoqUH5vUVTXUz6n23aZ+gr0AgZwSRNPpBNMt5BSLOfqu/JKMVdvln
+         cLAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOq2jntlbFWxVsMHNeogSrKNQxuhPG0mQC91iQL3JDbkQzZzEFODfUeyoCbtKvvE+2vbxC7h0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9zxvue54UNewtZtwb4qMQrD3kMuBlBcxKSZCJekBCi9vH5lnv
+	2Ik8ghc24XQjPruEKQ6Y1nlQKLX8LPA0WjDmVRHyXvONpsI3WaljWEArvLmroF/YOYhnar/DN8Y
+	p9/xt0wo7++tB0NI/QsFg7+3urvBnZgAqBd3AWTv8R/F6NCPYWLL2qg==
+X-Received: by 2002:a05:600c:190f:b0:430:53f8:38bc with SMTP id 5b1f17b1804b1-431255dcb76mr84598525e9.12.1728980571896;
+        Tue, 15 Oct 2024 01:22:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGb9R0EruHHyWpo5DjDeKbICO+26yqisy6fvsgv2XfNXRWKW5oDvwU8eVyVBYf6OquOO+b6nA==
+X-Received: by 2002:a05:600c:190f:b0:430:53f8:38bc with SMTP id 5b1f17b1804b1-431255dcb76mr84598275e9.12.1728980571475;
+        Tue, 15 Oct 2024 01:22:51 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f56a583sm10390135e9.19.2024.10.15.01.22.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 01:22:51 -0700 (PDT)
+Message-ID: <0b947dd2-5891-457c-8511-52781764857d@redhat.com>
+Date: Tue, 15 Oct 2024 10:22:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-11-kuniyu@amazon.com>
-In-Reply-To: <20241014201828.91221-11-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 10:22:41 +0200
-Message-ID: <CANn89i+HwQiypVTgcBmUAkjL+jeMx_YNxrnZ4uGqttW-4CBwQA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 10/11] can: gw: Use rtnl_register_many().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/10] selftests: net: lib: Introduce deferred
+ commands
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+ Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Ido Schimmel <idosch@nvidia.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, mlxsw@nvidia.com
+References: <cover.1728473602.git.petrm@nvidia.com>
+ <5c0506e2d1bcdd513b9917716702c9bc5f656198.1728473602.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <5c0506e2d1bcdd513b9917716702c9bc5f656198.1728473602.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 14, 2024 at 10:21=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> We will remove rtnl_register_module() in favour of rtnl_register_many().
->
-> rtnl_register_many() will unwind the previous successful registrations
-> on failure and simplify module error handling.
->
-> Let's use rtnl_register_many() instead.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
+Hi,
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+On 10/9/24 14:06, Petr Machata wrote:
+> diff --git a/tools/testing/selftests/net/lib/sh/defer.sh b/tools/testing/selftests/net/lib/sh/defer.sh
+> new file mode 100644
+> index 000000000000..8d205c3f0445
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/lib/sh/defer.sh
+> @@ -0,0 +1,115 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +# map[(scope_id,track,cleanup_id) -> cleanup_command]
+> +# track={d=default | p=priority}
+> +declare -A __DEFER__JOBS
+> +
+> +# map[(scope_id,track) -> # cleanup_commands]
+> +declare -A __DEFER__NJOBS
+> +
+> +# scope_id of the topmost scope.
+> +__DEFER__SCOPE_ID=0
+> +
+> +__defer__ndefer_key()
+> +{
+> +	local track=$1; shift
+
+Minor nit: IMHO the trailing shift is here a bit confusing: it let me 
+think about other arguments, which are not really expected.
+
+[...]
+> +__defer__schedule()
+> +{
+> +	local track=$1; shift
+> +	local ndefers=$(__defer__ndefers $track)
+> +	local ndefers_key=$(__defer__ndefer_key $track)
+> +	local defer_key=$(__defer__defer_key $track $ndefers)
+> +	local defer="$@"
+> +
+> +	__DEFER__JOBS[$defer_key]="$defer"
+> +	__DEFER__NJOBS[$ndefers_key]=$((${__DEFER__NJOBS[$ndefers_key]} + 1))
+
+'${__DEFER__NJOBS[$ndefers_key]}' is actually '$ndefers', right? If so 
+it would be better to reuse the avail variable.
+
+Thanks,
+
+Paolo
+
 
