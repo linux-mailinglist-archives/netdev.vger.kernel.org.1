@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-135418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57D8599DCBB
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 05:28:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796FD99DCDD
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 05:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FF101C20F33
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:28:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22BCB1F2276B
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D7F16EC0E;
-	Tue, 15 Oct 2024 03:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FEF170A1A;
+	Tue, 15 Oct 2024 03:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EseVOeF3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QjFQVLrl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C1C154456
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 03:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3B64A3C;
+	Tue, 15 Oct 2024 03:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728962920; cv=none; b=AtjHQWn3dGVhlTafFlijIJSE7QHDtyradpB8diextvNBBU2LvQfT8jD4A34DYXuwZu5Lev1eeTEzlECJFf2CgoK4ukBamQEf7R2KsOg7DAxqNrpGhJ2hzspo7OqBpUYW/50HyALYat92t5WR+KAe2f8ZkBDzCl0cRcUnLPi3G7Q=
+	t=1728963407; cv=none; b=RP4qzmaenVulCZ0avJUO3V80w6h7whuKDXkYtgbHb1PtUvySYyZAToG4DQZ6Zpizyhe7kfTswD3j6QFUMhcugSoYlWD59BtcFxyfH0mZql7qT4LoOmuC0LXiPkbLkmUmzTdnzul1zRGmgJGPCxOQjbnNcj9PtXRhuWKLzmtXyOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728962920; c=relaxed/simple;
-	bh=9qfn9VbbRjKgR++iThcquREsFkOqgP2o/GwT1+A9F50=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U0AxZQ5ZmnHCngJ8AU1eZ4gGswnPIbmcv8sISDmW08deTcupd/YknVoRuApxX6olgrumm37L+iQcgG/EY10J69gz9nOIT+LTQXp44FmQAM+bAE5njOWfxF/QolUCndSXbdB8xGiYFpYq0+mRi98P63eZPrk67bYZcToHf8CgNRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EseVOeF3; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1728963407; c=relaxed/simple;
+	bh=IG3XD04vq8XRCloN1zWCeLhVLSJJ1bc/lJNrVV1t19Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C8+PqAOeDKwy1zxKswfnMKBIRqRq0YotfmuzqKT2Tk4QMvEmnI1cQCyydkzW/4YgKFOsiNJJXhjnOf/hrzKXKzmj8I7xlK5D88mNvQWbGtgo5gIUkHQ/p95sJ1Zq3rQ8nRsqmibrs2muthk2dZHD1Zke6RUHtMx1iZWgEUt1mtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QjFQVLrl; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20ceb8bd22fso12566795ad.3
-        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 20:28:38 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71e49ef3bb9so2007001b3a.1;
+        Mon, 14 Oct 2024 20:36:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728962917; x=1729567717; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728963405; x=1729568205; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5toA+i342QCyHiEYfQpngKk7r+1pZDBgH0RjgANa6XY=;
-        b=EseVOeF3N97H4kBci1T04wxBoZeiX6WtJixuFLDhsWIZI1SURJHss1HrSSQ/VD/6n3
-         qdiuCdJOwSqjrm3fLtHeH+AwSXkdc7fVQ66DZJVM12KH2SfdIKi2ApdyW/1gg5vXqtvJ
-         Na78k8bOO8KDaP8pmvdNJAvKYYEKhTA5gZDM+XxRoNUSqvf3s1ZyLFfBx9Bh/qjXzFVp
-         q20kpio0NyklwYsxgCGec3k4nRh9w1Regmc27NNFVO0RM5naGLT0hyrE8DsrI217UDGG
-         NJrUgNmhd70DxL0xN1VT1TTI4jvYK8WL7G48jivX7nGSVeOxTM7A5lPhfKr5V+QkfwXk
-         5j9A==
+        bh=/3pmHU7vhPrYcyCzss6urx3Tnp2KXqxZWV5m+7oVlXQ=;
+        b=QjFQVLrlmcG568MQN0PMg1dV6UQ7+i+gheath0Ig3xPjghmso/Ng0q8Mhu7817z+fs
+         zNLrZFX1m/7Q0O52K+OyiH8I9t+utXXp17BOJMd8CTjYnsSQvaaZbTRFN3lOTLGl4KKN
+         ZHSUm2jPHCrHVswwoUPlHmZDgVIDn06ADOF5WoG0CSckgSMA9BNuR8L1+a6eqvL3mhpq
+         1RgKrNwPALPSBJ1Q25n4ko1nqwzXL7jLdZFBQoqM90KqOVezoco+mOpboE3o27hEyV77
+         HUXqJ2pJV/msg6Ya2nW1DO3ea943TL3HOTAHn22yWShCHOR2jZyeNrTlr5GwAezsGwXN
+         OpWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728962917; x=1729567717;
+        d=1e100.net; s=20230601; t=1728963405; x=1729568205;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5toA+i342QCyHiEYfQpngKk7r+1pZDBgH0RjgANa6XY=;
-        b=SJn4HvYPt5LdxnAf+pKVbSGGqECCW34Ffa/Ooc4Kwvio5evYZjHBoBQ/xbZnVloSVt
-         cXBAyE5wPI6CYEu5XgJz0+h6nE5u9vvQF2H+vxKb9uZsm496w3xk6s+bTmWeuL+Xsijf
-         /1ZlCCXRxatqjeeFB0TFEiQWDdFfukflHj2EVCKrpBo7vLHemOuO8bJlM8cx2kPfRGKF
-         ZFKzXFDIy9eQF8UWleiprZIuVd5/r8ZvXCgV+cQZDW71vLCX2hnMKuEfV7nvWo9mabsN
-         tvByBZ2kWSgygrQ0/YQBsZ4njoAA5VL06YtXjct2xSVyXND++Q8vpXJeHCgKuVQ2mN7/
-         hmDA==
-X-Gm-Message-State: AOJu0Yz6Y2vNVQ8ChhqJOHmFANfzDHI27nLIeoSGVj1yGf8+p27euVJC
-	yJhdcQaTLWnyGAlSUudMus9Ofxx/DGQrlIBJtOyDkduYwxtSVOEIVTRqjAq5
-X-Google-Smtp-Source: AGHT+IFkkeRsQOCFrl7ubPyos8WBLRbx8OL51e45EkMfFWUlxyhzoH1mi6W60ixNwcxDkTLxUBbvTw==
-X-Received: by 2002:a17:902:f550:b0:20c:a175:1942 with SMTP id d9443c01a7336-20cbb1aa3a5mr131065495ad.24.1728962917283;
-        Mon, 14 Oct 2024 20:28:37 -0700 (PDT)
-Received: from localhost ([2402:7500:477:e9fa:5129:403f:9618:b589])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d1804eb2bsm2722625ad.188.2024.10.14.20.28.36
+        bh=/3pmHU7vhPrYcyCzss6urx3Tnp2KXqxZWV5m+7oVlXQ=;
+        b=EaGkQ7ch++1ZI3e/cggSkcYb6YEBUFTDtr228WeEhuhXoleQk+MjjMKvW6+ROXSRZx
+         noNANVYIFRsyVNbBPOUzh8iHH4C49UWX/gP8neEr4SgkYsgtEM0gDmU2CHsagqYtspVo
+         YUdrNG7n7NHdwLLtXtUujH8OjY7RFG3drKFIhzr0t347FZYHZsDQTUQAmLOVplwCAfUY
+         BHHwvhhh9kP3qjfEd8L6Urv9DH4fKITkrzvCd+RGIF8MyY59la6lvufvf6JpZPngTRKm
+         HByWk2dnrOcT/yBBbIj2/mbNerVks073RLKmW2lSPQ6hlBf0h8ZeIAuZJDBZMM8938t9
+         9Vog==
+X-Forwarded-Encrypted: i=1; AJvYcCVgzD8EY6AbMd+KOjyMWoH87YeB6sVgGLG4QuMdWZOo0VkW5qao0eLL1dROpGjLxbtKQps=@vger.kernel.org, AJvYcCVl/WohduNlRhajB2gGIujAcpWOrSzzk92dRvmOF0VM0ooA13twCsRIpyoez9BmbZbEUJKI1cHoj0x1XvDt@vger.kernel.org
+X-Gm-Message-State: AOJu0YycuIlMHG+WEF7FhYIpWIgQoE+3NqoFfvITlhRWdyurmmHy/YIr
+	LIhQMW7PqePLimUx4APcGrRqUyyDo/2IqD7Y7naHVxPQSdowswx3q8SB71Eh30o=
+X-Google-Smtp-Source: AGHT+IF3ESuhQZCT1Iiw9p1S5INzWYGNFho5Yws1UkPDaoRKDK6B+H3B/zsxXOVuDAydY/j9A8J4EQ==
+X-Received: by 2002:a05:6a00:859a:b0:71e:66e6:ca17 with SMTP id d2e1a72fcca58-71e66e6d110mr8433621b3a.9.1728963404599;
+        Mon, 14 Oct 2024 20:36:44 -0700 (PDT)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e775259a1sm300054b3a.204.2024.10.14.20.36.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 20:28:36 -0700 (PDT)
-From: wojackbb@gmail.com
+        Mon, 14 Oct 2024 20:36:44 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org,
-	matthias.bgg@gmail.com,
-	Jack Wu <wojackbb@gmail.com>
-Subject: [PATCH] [net,v3] net: wwan: t7xx: add PM_AUTOSUSPEND_MS_BY_DW5933E for Dell DW5933e
-Date: Tue, 15 Oct 2024 11:28:20 +0800
-Message-Id: <20241015032820.2265382-1-wojackbb@gmail.com>
-X-Mailer: git-send-email 2.34.1
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrii Nakryiko <andriin@fb.com>,
+	Jussi Maki <joamaki@gmail.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Liang Li <liali@redhat.com>
+Subject: [PATCH net] bpf: xdp: fallback to SKB mode if DRV flag is absent.
+Date: Tue, 15 Oct 2024 03:36:32 +0000
+Message-ID: <20241015033632.12120-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,80 +97,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jack Wu <wojackbb@gmail.com>
+After commit c8a36f1945b2 ("bpf: xdp: Fix XDP mode when no mode flags
+specified"), the mode is automatically set to XDP_MODE_DRV if the driver
+implements the .ndo_bpf function. However, for drivers like bonding, which
+only support native XDP for specific modes, this may result in an
+"unsupported" response.
 
-Because optimizing the power consumption of Dell DW5933e,
-Add a new auto suspend time for Dell DW5933e.
+In such cases, let's fall back to SKB mode if the user did not explicitly
+request DRV mode.
 
-The Tests uses a small script to loop through the power_state
-of Dell DW5933e.
-(for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
-
-* If Auto suspend is 20 seconds,
-  test script show power_state have 5% of the time was in D3 state
-  when host don't have data packet transmission.
-
-* Changed auto suspend time to 5 seconds,
-  test script show power_state have 50% of the time was in D3 state
-  when host don't have data packet transmission.
-
-Signed-off-by: Jack Wu <wojackbb@gmail.com>
+Fixes: c8a36f1945b2 ("bpf: xdp: Fix XDP mode when no mode flags specified")
+Reported-by: Liang Li <liali@redhat.com>
+Closes: https://issues.redhat.com/browse/RHEL-62339
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-V3:
- * supplementary commit information
-V2:
- * Fix code style error
----
----
- drivers/net/wwan/t7xx/t7xx_pci.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ net/core/dev.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
-index e556e5bd49ab..ec567153ea6e 100644
---- a/drivers/net/wwan/t7xx/t7xx_pci.c
-+++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-@@ -49,6 +49,7 @@
- #define PM_SLEEP_DIS_TIMEOUT_MS		20
- #define PM_ACK_TIMEOUT_MS		1500
- #define PM_AUTOSUSPEND_MS		20000
-+#define PM_AUTOSUSPEND_MS_BY_DW5933E 5000
- #define PM_RESOURCE_POLL_TIMEOUT_US	10000
- #define PM_RESOURCE_POLL_STEP_US	100
+diff --git a/net/core/dev.c b/net/core/dev.c
+index ea5fbcd133ae..e32069d81cd7 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9579,6 +9579,7 @@ static int dev_xdp_attach(struct net_device *dev, struct netlink_ext_ack *extack
  
-@@ -174,7 +175,7 @@ static int t7xx_wait_pm_config(struct t7xx_pci_dev *t7xx_dev)
- 	return ret;
- }
+ 	/* don't call drivers if the effective program didn't change */
+ 	if (new_prog != cur_prog) {
++reinstall:
+ 		bpf_op = dev_xdp_bpf_op(dev, mode);
+ 		if (!bpf_op) {
+ 			NL_SET_ERR_MSG(extack, "Underlying driver does not support XDP in native mode");
+@@ -9586,8 +9587,17 @@ static int dev_xdp_attach(struct net_device *dev, struct netlink_ext_ack *extack
+ 		}
  
--static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
-+static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev, int pm_autosuspend_ms)
- {
- 	struct pci_dev *pdev = t7xx_dev->pdev;
+ 		err = dev_xdp_install(dev, mode, bpf_op, extack, flags, new_prog);
+-		if (err)
++		if (err) {
++			/* The driver returns not supported even .ndo_bpf
++			 * implemented, fall back to SKB mode.
++			 */
++			if (err == -EOPNOTSUPP && mode == XDP_MODE_DRV &&
++			    !(flags & XDP_FLAGS_DRV_MODE)) {
++				mode = XDP_MODE_SKB;
++				goto reinstall;
++			}
+ 			return err;
++		}
+ 	}
  
-@@ -191,7 +192,7 @@ static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
- 				DPM_FLAG_NO_DIRECT_COMPLETE);
- 
- 	iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) + DISABLE_ASPM_LOWPWR);
--	pm_runtime_set_autosuspend_delay(&pdev->dev, PM_AUTOSUSPEND_MS);
-+	pm_runtime_set_autosuspend_delay(&pdev->dev, pm_autosuspend_ms);
- 	pm_runtime_use_autosuspend(&pdev->dev);
- 
- 	return 0;
-@@ -824,7 +825,13 @@ static int t7xx_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	IREG_BASE(t7xx_dev) = pcim_iomap_table(pdev)[T7XX_PCI_IREG_BASE];
- 	t7xx_dev->base_addr.pcie_ext_reg_base = pcim_iomap_table(pdev)[T7XX_PCI_EREG_BASE];
- 
--	ret = t7xx_pci_pm_init(t7xx_dev);
-+	if (id->vendor == 0x14c0 && id->device == 0x4d75) {
-+		/* Dell DW5933e */
-+		ret = t7xx_pci_pm_init(t7xx_dev, PM_AUTOSUSPEND_MS_BY_DW5933E);
-+	} else {
-+		/* Other devices */
-+		ret = t7xx_pci_pm_init(t7xx_dev, PM_AUTOSUSPEND_MS);
-+	}
- 	if (ret)
- 		return ret;
- 
+ 	if (link)
 -- 
-2.34.1
+2.46.0
 
 
