@@ -1,80 +1,46 @@
-Return-Path: <netdev+bounces-135587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEA199E487
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:51:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F3199E49C
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA9141F23E08
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:51:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDE291F23FF9
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DEF1E4110;
-	Tue, 15 Oct 2024 10:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwZHP7Y/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DAB1E632D;
+	Tue, 15 Oct 2024 10:52:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBEBB4683
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 10:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5911E4110;
+	Tue, 15 Oct 2024 10:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728989481; cv=none; b=HcIymVGlva8FmPTGBLAx6riCnMfUua6I765hHeQLOc4cDZS/40A8Y2BPuWtosCs93E6i83nhh66Udts2fVfpV1FwEn5uKvW3XQ000A1g+FSIbpwrf7IzBZ+gBqNl5LHneuJH7pJfoV1oNVZBT0t9kfkNEX3qpF9GSG9O36ynXLw=
+	t=1728989560; cv=none; b=XlA6kEDmLPrHtYkSIA2zw0wTUFcqbJ9Li3BXuNOA0KTvzKKtqVgUz4yTPa+5Q9WKS/7olHIYsRUHoCei7fxWLl2/m2FXzLgwQR75VDqMQzMKWEP3ugEl29jUvtCrFOzyL8AW83xnPpCgczPdJZaA/WJPt0SaUKiUZwTNToMeWzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728989481; c=relaxed/simple;
-	bh=OlSRe+v89BUVEzFTyw8ZODIjlKrNeb6AifaPvdYS1Ug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HumBkHyNcIGZ5qHRqTGpFcvkYX/kjPIzzdAtFrccL3iukIzM66/L4CFQD56haXOZnHYWTdCR7IQPyx6/L3z2opA6xR/zAnHnuGuf+DTHf76VfpOTD+eO9p85baMuEK5R7YKjYiG12axi98BKF1FdR6Q2Cb957nDsvdmE54KzgeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dwZHP7Y/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728989478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ACwYefm6l2URot12EcphyQyGwsZDzRGyFtbx+GsFfYo=;
-	b=dwZHP7Y/UrzjTrTKN0yY7AyIJTb9YXbYEtp7b0k1+yDk7E3q5WnJWGo70Rq0oU709SczK2
-	CZuEO45R+1L8vsWm9LuOVOe3JpmmrGH2HBTAhfcipgccFNPmN/WElMH/zyEGOI84prKCj8
-	mzSPrAr7jbl5dMDvydRW3xqiUIEU5fg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-418-Npdi_-GrPeSemTpDB6Y41g-1; Tue, 15 Oct 2024 06:51:17 -0400
-X-MC-Unique: Npdi_-GrPeSemTpDB6Y41g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43117b2a901so44267885e9.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 03:51:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728989475; x=1729594275;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ACwYefm6l2URot12EcphyQyGwsZDzRGyFtbx+GsFfYo=;
-        b=orOGORxd41uVatNAJCgBqDO2v4zHpk8lda6kaVt3dJ7tn4/Wbma6C3vjOmQStYhQou
-         iaMGs4ahLnT0+WN0WRmpDzKkKbxcc6mojesoISXAIvhfzwU937u/bwW8P3/2UnpKuBx3
-         jUq+4mtEhtXegvZvYY2dqxC6olDmbyfJxDyjGxgncm7ZKLEy9kDH+E2+vJCO0KEjwP7p
-         hZLeugSZCnPg/gCoz91UC/8lIAQGkUjIJJKy9cq6yxj6CzPHNOMPljTc27TBcvxvCxAq
-         0FX0cE+vKgR1UaVdVzS7FE4+inLh2LKBKvk66l9APwvfciXNVC70qLN23LeqfQBx9Lmw
-         88Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBgrf4DGmWUfn2Po26xKtuPRZ7768AlB4vGmST8KlHDdFwA2IhNzPF7GEm61yQNdhe+YsvOO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8Z8yE7iJ7zkGkh7XFG5UjczwyJRiD6OqfqBvZNFiZnuxIZw1J
-	U9F9dcGMH9RV4inV1dujtYsmqijmqbLP3LuiWUF4ZFr7zhxqkMpZWqHDsW17ZaBjnEHuGqXBwH1
-	lKCFpALgB+FnaWhCC2VIcouB58hhNDE4ITlzjhtKgLQO4BGh3fiZKpI1S08QsvF4X
-X-Received: by 2002:a05:600c:5251:b0:42a:a6b8:f09f with SMTP id 5b1f17b1804b1-43125607846mr127978865e9.23.1728989475170;
-        Tue, 15 Oct 2024 03:51:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGQsG9eFlpSFRtHVQa6oYNquUnAwW0xQdK+boCE3bIwFJUEd05YYAi4+xVVwrzWhiWMkiPsgw==
-X-Received: by 2002:a05:600c:5251:b0:42a:a6b8:f09f with SMTP id 5b1f17b1804b1-43125607846mr127978665e9.23.1728989474795;
-        Tue, 15 Oct 2024 03:51:14 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f55e0b2sm14320075e9.4.2024.10.15.03.51.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 03:51:13 -0700 (PDT)
-Message-ID: <dc3db616-1f97-4599-8a77-7c9022b7133c@redhat.com>
-Date: Tue, 15 Oct 2024 12:51:12 +0200
+	s=arc-20240116; t=1728989560; c=relaxed/simple;
+	bh=JbYhV7N7Mb4Y/IMjLhPKo5oTfSI5VQYw4oDX2w97mTs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Y9m+drDEuBZCEsSRbzbLxKQv3wmaAAzMUNZ+IF9bmEKbBa95XVZs3Zbqzx6u6/rRvA9NMuGT8pBJGj2v/7hOE/61Ay8kRBK9g8Bz5YoxBDnKGbHjIVfL0s+4QdNeA+vtqwEsxa7CF43z2vhrT7NOptdqZuhJYxBhWUQ7RnOJ2pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XSW8J5gS7zfdGR;
+	Tue, 15 Oct 2024 18:50:08 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5FC56140257;
+	Tue, 15 Oct 2024 18:52:35 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 15 Oct 2024 18:52:35 +0800
+Message-ID: <5d9ea7bd-67bb-4a9d-a120-c8f290c31a47@huawei.com>
+Date: Tue, 15 Oct 2024 18:52:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,56 +48,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/44] DualPI2, Accurate ECN, TCP Prague patch
- series
-To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@CableLabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20241015102940.26157-1-chia-yu.chang@nokia-bell-labs.com>
+Subject: Re: [PATCH net v2 0/2] fix two bugs related to page_pool
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <b1fd5ece-b967-4e56-ad4f-64ec437e2634@huawei.com>
+ <20241014171406.43e730c9@kernel.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241015102940.26157-1-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20241014171406.43e730c9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 10/15/24 12:28, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On 2024/10/15 8:14, Jakub Kicinski wrote:
+> On Sat, 12 Oct 2024 20:05:31 +0800 Yunsheng Lin wrote:
+>> 1. Semantics changing of supporting unlimited inflight pages
+>>    to limited inflight pages that are as large as the pool_size
+>>    of page_pool.
 > 
-> Hello,
+> How can this possibly work?
+
+As a similar comment in [1], do we really need unlimited inflight pages
+for the page_pool to work? If we do, it seems there is something really
+need fixing here. I am agreed changing of semantics here might introduce
+regressions here because there may be some subsystem depending on the
+previous semantics or incorrect calculating of how many inflight pages it
+is needed, so I am agreed that it might be better to target the net-next
+tree to give some cycles of testing before backporting it.
+
+1. https://lore.kernel.org/all/842c8cc6-f716-437a-bc98-70bc26d6fd38@huawei.com/
+
 > 
-> Please find the enclosed patch series covering the L4S (Low Latency,
-> Low Loss, and Scalable Throughput) as outlined in IETF RFC9330:
-> https://datatracker.ietf.org/doc/html/rfc9330
+> The main thing stopping me from reposting my fix that it'd be nice to
+> figure out if a real IOMMU device is bound or not. If we don't have
+
+device_iommu_mapped() might be used to check if a real IOMMU device is
+bound or not.
+I am afraid it is not just about IOMMU here as there might be other
+resource behind the dma mapping, like the bounce buffer memory as below:
+
+https://elixir.bootlin.com/linux/v6.7-rc8/source/drivers/iommu/dma-iommu.c#L1204
+https://elixir.bootlin.com/linux/v6.7-rc8/source/kernel/dma/direct.h#L125
+
+And we may argue is_swiotlb_active() can be used check if there is any
+bounce buffer memory behind the dma mapping as the device_iommu_mapped()
+does, but I am not sure if there is any other resource besides iommu and
+bounce buffer.
+
+> real per-device mappings we presumably don't have to wait. If we can 
+
+For not having to wait part:
+I am not sure if the page_pool_destroy()/__page_pool_release_page_dma()
+need to synchronize with arch_teardown_dma_ops() or how to synchronize
+with it, as it seems to be called when driver unloading even if we have
+ensured that there is no IOMMU or bounce buffer memory behind the device
+by the above checking:
+__device_release_driver -> device_unbind_cleanup -> arch_teardown_dma_ops
+
+> check this condition we are guaranteed not to introduce regressions,
+> since we would be replacing a crash by a wait, which is strictly better.
+
+For the waiting part:
+The problem is how much time we need to wait when device_iommu_mapped()
+or is_swiotlb_active() return true here, as mentioned in [2], [3]. And
+currently the waiting might be infinite as the testing in [4].
+
 > 
-> * 1 patch for DualPI2 (cf. IETF RFC9332
->    https://datatracker.ietf.org/doc/html/rfc9332)
-> * 40 pataches for Accurate ECN (It implements the AccECN protocol
->    in terms of negotiation, feedback, and compliance requirements:
->    https://datatracker.ietf.org/doc/html/draft-ietf-tcpm-accurate-ecn-28)
-> * 3 patches for TCP Prague (It implements the performance and safety
->    requirements listed in Appendix A of IETF RFC9331:
->    https://datatracker.ietf.org/doc/html/rfc9331)
+> If we'd need to fiddle with too many internals to find out if we have
+> to wait - let's just always wait and see if anyone complains.
+
+Does the testing report in [4] classify as someone complaining? As
+the driver unloading seems to be stalling forever, and the cause of the
+infinite stalling is skb_attempt_defer_free() by debugging as mentioned
+in [2].
+
+2. https://lore.kernel.org/all/2c5ccfff-6ab4-4aea-bff6-3679ff72cc9a@huawei.com/
+3. https://lore.kernel.org/netdev/d50ac1a9-f1e2-49ee-b89b-05dac9bc6ee1@huawei.com/
+4. https://lore.kernel.org/netdev/758b4d47-c980-4f66-b4a4-949c3fc4b040@huawei.com/
+
 > 
-> Best regagrds,
-> Chia-Yu
-
-I haven't looked into the series yet, and I doubt I'll be able to do 
-that anytime soon, but you must have a good read of the netdev process 
-before any other action, specifically:
-
-https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/process/maintainer-netdev.rst#L351
-
-and
-
-https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/process/maintainer-netdev.rst#L15
-
-Just to be clear: splitting the series into 3 and posting all of them 
-together will not be good either.
-
-Thanks,
-
-Paolo
-
 
