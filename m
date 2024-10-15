@@ -1,151 +1,113 @@
-Return-Path: <netdev+bounces-135673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E019199ED9C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:32:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FC2499EDCF
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0B1328654A
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:32:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7222E1C21CB8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352062746D;
-	Tue, 15 Oct 2024 13:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CqccxPrL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FAC1B219A;
+	Tue, 15 Oct 2024 13:37:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C1528691;
-	Tue, 15 Oct 2024 13:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4401B2186;
+	Tue, 15 Oct 2024 13:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728999137; cv=none; b=j81L0leJZRsAqgvLPTCZpT4twRjUmjm5gO2jgfZBgDgN3oqjtLW2DAsV4SCi/RwoftERX93H6PKZ82ELHxWAlP3alEbQkVvfdtpQ7u4PC+Gt77WshRTT3+JmZTMjdKEvmVjPtkBapppq5Xf8R0qfWRUqQm2aNsMdq0AkZ3qDQTk=
+	t=1728999422; cv=none; b=A7H2YSZXN8uSIGa2/Ssth9AvbjIKkhbmAmys2Bn3QF0nA/se9fDdRQ/muioU4v3mew4tmWClpopHEvOe+SQEncD+4gC/mKPVjowmDfWswUPKo92hrEsE6lY/Nbwz1JJaMjhhrs5ThRYnbh9f+aXGMrroWwTnfwpQEs1/VE8pQjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728999137; c=relaxed/simple;
-	bh=XGgtJDDDYxzb48QuctikU+Vt9hxTUybzOHi+IPF+7QE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MXfmZnQ/XUXSrra/7npDwA0XU1mNa6g2MOJ87KB84tToB4hXKu5DnmdAbBoa5yiUg8vnHTvLP1ZfavBsoVIeTDmxzuEwxEDwmIRcYqLIdHM80NfE7xY/rUE5Vt4QkalRsbqEB31hAoAPBAFB+p6IcZvvn/V6M79tWnGI4ucyPZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CqccxPrL; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a99f629a7aaso460776366b.1;
-        Tue, 15 Oct 2024 06:32:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728999134; x=1729603934; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wgxlf8j6C6WxbcSqLlRz/GSOnVwKwwZyR7OiY8684pQ=;
-        b=CqccxPrLmX6Ku2XhhmRKxyXSn9u7vcqGo71o3gaCsSVTncunpfDSnGEYSC9RM78uLY
-         mt5fYGd9sesoRmllXpRC/p6cLBEMlIUBl1nkGdS+Za5LmaOtuZ85kzUfXyFZDuAVN/MX
-         ifEZQdbTPrtjiUG+IGq7OFjZhsm5HJJOjJFg+lhKflKj4dVgZkUhCvM1RniDhKGnZvzG
-         PfYTydhbMWLSaIs7gypaXqPHfgUoFxvX1EWEBjphIBb4qOqCzktHgejCocZ3q6umTQOG
-         uBcHn35eDaXGz6O/4uXOsYuqn4Opmv1OtTThlHf7q31DA3zWdwsKi5YNc42H86CYh75j
-         Lklg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728999134; x=1729603934;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wgxlf8j6C6WxbcSqLlRz/GSOnVwKwwZyR7OiY8684pQ=;
-        b=XWi/PcFjrZUrquhu77fuZ6h7C70BwXXOJ7A6hes6jePp4TuE/7xE5va7+dflRGVHWF
-         3S+WrH1WDRrnPu34pKUxGzZ56TrKs4caGNoVWKzmKXJi+ypRCH0Nl9hiuIFDF7QT2O1j
-         xGJhlKvIbS0RPeulynEFVj5ARD+5vQ5otEukRf6POpFOvlcohP24IUS9Etl9UC2YfbQs
-         I/WSheIIUHJ90c9uEc87cOOu/mahRpi7OXlipI+4At+OWzSdnoxqhh9PvxppnSuyWj5S
-         1uf5LF8Fc1A7+ciJOCnu0kndpgxS5mY+/Sa4VP+exzyzyBxwI7OL0fXtA7lAlxBffOwW
-         GRSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUQtOhjJWzKqMZsRoJ8OW2oWFOG/HwK5DMqpiMtDguFsdyjcCNgDN7qoYuIDyFARuZ/BJ6+gOPmwrqfK4=@vger.kernel.org, AJvYcCX2kLzEuf+ZiAHpapVnlAPg7rggENGuuIrRPg5XDQUg/ugSlwP+vTsuKRdc+oDq+x5xcCqzfWbSWOJJBX0KnoLD@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpSgQxuRk7Gt4qAyvvejY3LIGVMsIyKbyZzgKtGYDSOOv96GkF
-	pZA2lNMohP0t5CwCc1yhUlQ5uWBw0/P72Z5JWExuzkPYNiHbPjif
-X-Google-Smtp-Source: AGHT+IHead+svkj8BMnd2AtLtotz8v11llLgziR4JZ6WubowTfOWTXfJTTlJA3fxQTd68GmzjhaI0A==
-X-Received: by 2002:a17:906:7955:b0:a9a:f19:8c2a with SMTP id a640c23a62f3a-a9a335726dfmr74735966b.6.1728999133316;
-        Tue, 15 Oct 2024 06:32:13 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2974960esm72107366b.62.2024.10.15.06.32.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 06:32:12 -0700 (PDT)
-Message-ID: <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
-Date: Tue, 15 Oct 2024 15:32:11 +0200
+	s=arc-20240116; t=1728999422; c=relaxed/simple;
+	bh=P3L57nX+ko8t5TS/eBuVpC/lpxOJcUmp6kjrLXmEMHs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G85aP61rNpXx30ieO4IsL1H/vMOi+dPJdf2Tcb+dUqijLYkEwQ1HaFtvsqzOHRxtPqH7DBdoUkNlruK+qf2z4Y3syhpnZk4brieOptzrZRFLQN+gr/tzl0dLu3xqRFpL0QXgiACLCiqTTk2XN57ypiYH8EV/kVBuvzu1cgjo4uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.11,205,1725289200"; 
+   d="scan'208";a="225980117"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 15 Oct 2024 22:36:53 +0900
+Received: from GBR-5CG2373LKG.adwin.renesas.com (unknown [10.226.93.176])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 7C2E04007529;
+	Tue, 15 Oct 2024 22:36:46 +0900 (JST)
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH v2 00/10] Extend GbEth checksum offload support to VLAN/IPv6 packets
+Date: Tue, 15 Oct 2024 14:36:24 +0100
+Message-Id: <20241015133634.193-1-paul.barker.ct@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
- improvements
-To: Felix Fietkau <nbd@nbd.name>, Nikolay Aleksandrov <razor@blackwall.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
- <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
- <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+The GbEth IP found in Renesas RZ/G2L, RZ/G3S and related SoCs supports
+hardware checksum offload for packets in the following cases:
 
+ - there are zero or one VLAN headers with TPID=0x8100
+ - the network protocol is IPv4 or IPv6
+ - the transport protocol is TCP, UDP or ICMP
+ - the packet is not fragmented 
 
-On 10/15/24 2:16 PM, Felix Fietkau wrote:
-> Hi Eric,
-> 
-> On 14.10.24 20:29, Eric Woudstra wrote:
->> It would be no problem for me to change the subject and body, if you
->> think that is better.
->>
->> The thing is, these patches actually make it possible to set up a fully
->> functional software fastpath between bridged interfaces. Only after the
->> software fastpath is set up and functional, it can be offloaded, which
->> happens to by my personal motivation to write this patch-set.
->>
->> If the offload flag is set in the flowtable, the software fastpath will
->> be offloaded. But in this patch-set, there is nothing that changes
->> anything there, the existing code is used unchanged.
-> 
-> FWIW, a while back, I also wanted to add a software fast path for the
-> bridge layer to the kernel, also with the intention of using it for
-> hardware offload. It wasn't accepted back then, because (if I remember
-> correctly) people didn't want any extra complexity in the network stack
-> to make the bridge layer faster.
+To complete the support for all these cases in the ravb driver, we need
+to add handling for VLAN-tagged packets and IPv6 packets in both the TX
+and RX code paths. Handling for ICMP packets in the TX path is not added
+as it cannot currently be tested.
 
-Hello Felix,
+These patches also do some refactoring/tidy-up, drop unnecessary checks
+from performance sensitive code paths and disable unnecessary IP header
+checksum offloading.
 
-I think this patch-set is a clear showcase it is not very complex at
-all. The core of making it possible only consists a few patches. Half of
-this patch-set involves improvements that also apply to the
-forward-fastpath.
+Changes v1->v2:
+  - Use get_unaligned() to access hw_csum in ravb_rx_csum_gbeth().
+  - Dropped patch "Support ICMP TX checksum offload for GbEth" and
+    simplified TX checksum offload path.
+  - Moved last_frag into if condition in ravb_can_tx_csum_gbeth().
+  - Dropped unnecessary check for skb->vlan_proto in
+    ravb_can_tx_csum_gbeth().
+  - s/HW/hardware/ in "Simplify types in RX csum validation" commit
+    message.
+  - s/null/zero/ in "Simplify UDP TX checksum offload" commit message.
+  - Specified TX/RX direction in "Enable IPv6 TX/RX checksum offloading
+    for GbEth" commit messages.
+  - Dropped unnecessary whitespace.
+  - Added Sergey's Reviewed-by tags.
 
-> Because of that, I created this piece of software:
-> https://github.com/nbd168/bridger
-> 
-> It uses an eBPF TC classifier for discovering flows and handling the
-> software fast path, and also creates hardware offload rules for flows.
-> With that, hardware offloading for bridged LAN->WLAN flows is fully
-> supported on MediaTek hardware with upstream kernels.
-> 
-> - Felix
+Paul Barker (10):
+  net: ravb: Factor out checksum offload enable bits
+  net: ravb: Disable IP header RX checksum offloading
+  net: ravb: Drop IP protocol check from RX csum verification
+  net: ravb: Combine if conditions in RX csum validation
+  net: ravb: Simplify types in RX csum validation
+  net: ravb: Disable IP header TX checksum offloading
+  net: ravb: Simplify UDP TX checksum offload
+  net: ravb: Enable IPv6 RX checksum offloading for GbEth
+  net: ravb: Enable IPv6 TX checksum offload for GbEth
+  net: ravb: Add VLAN checksum support
 
-Thanks, I've seen that already. Nice piece of software, but I'm not
-running openwrt. I would like to see a solution implemented in the
-kernel, so any operating system can use it.
+ drivers/net/ethernet/renesas/ravb.h      |   6 ++
+ drivers/net/ethernet/renesas/ravb_main.c | 101 ++++++++++++-----------
+ 2 files changed, 61 insertions(+), 46 deletions(-)
+
+-- 
+2.43.0
+
 
