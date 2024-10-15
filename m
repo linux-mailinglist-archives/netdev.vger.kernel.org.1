@@ -1,123 +1,163 @@
-Return-Path: <netdev+bounces-135617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D943799E7BA
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:57:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18DCD99E825
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:02:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 849841F22DA0
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:57:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C7F41F21551
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156321E766C;
-	Tue, 15 Oct 2024 11:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A0F1E378C;
+	Tue, 15 Oct 2024 12:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJseQGVs"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sf0WAxmg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B52E1E7640
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45891D8DEA;
+	Tue, 15 Oct 2024 12:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728993436; cv=none; b=jTS+ddlYxuom7yzIOFmvqfSzNfu00KrPHm9bsHKYr4fV0eZ11Cash0IxiLcIpYu6Xn/BQ8AXiQF4ti0nzK7B7Ih0cwS69RljY8y5l+KUgg0JhgrdmdsCDmPE92SbeAESXq3o8+eGUW4ZUzPCkq4q6TrT2Wpz2jxHY4rospSCvAk=
+	t=1728993750; cv=none; b=BF7kR2eKnSVHDf53fxvsXK/mJs94ogJNE1ukj/yUUIkmko/4Loyl0HDRz86I8Jzr+r0wQPXwHLVg20f/LNgDePnGpCS2VuYiuq1k26vNdAfsI5qpfXAtLxY2nBapnp+DbGg78FzbnF7Mo/xE7P658VlxXLvZ5oY4PXOJ2gUGmdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728993436; c=relaxed/simple;
-	bh=+wbt9HYrwKb1hGEQj88VTKcXRjJD0VJdt3AAdIFXDHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q61mIYNwjMoco8G3YLyXaZ/L68bw67WSwkbJyfE0PS3CB0n7ztrWNY/rCqPyO8YIrxakCYmb/ngHHaNr8ZVfMGUShgm737iBlIQtcmGJHRFtz+99nAufr9C/kBcDm6k4TIY37Gfq229Mhgekd9D/Vx7/c+alrEcWiPdOumw9t60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJseQGVs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728993433;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7wUX33MfqTqiveIoRD7qXu/Q16SC0eDMuZFXHUiauSQ=;
-	b=iJseQGVsB6CJwxKbZC2cD3EpNuKQ23LBremeJKmni5lz24GcWeafO9TUfDLbIPVFOk3Jzv
-	EVw1Jw3LRSvHVc/I+/NJBcWBrdyZtTczaxTQ1OtNuuxdAYnJX9fPq6HIdQUyNi/+uBbjZD
-	5I9rkz7+8FuRLwMcs8GbmEml/k1YsVE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-lOrdKcTKM_WNZzbbDwP9Yg-1; Tue, 15 Oct 2024 07:57:12 -0400
-X-MC-Unique: lOrdKcTKM_WNZzbbDwP9Yg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-430581bd920so34031815e9.3
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 04:57:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728993431; x=1729598231;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7wUX33MfqTqiveIoRD7qXu/Q16SC0eDMuZFXHUiauSQ=;
-        b=PDkv9OGyoKk+sq4hXRTET7AH9wbkZ/N1UX+/bJFlNjNrbGeof1GztgpHTCu/uQ9ThI
-         705JdewaCX52mjpi/h0wdWHhF3o2eobfYGww+mP3pksNJy7K3YFB2QZnayMK/zhYZ1f1
-         YsQv6LEyBmap+VYcKSYz5Tas7nlFcoIL7tWNPAUgmHO0kw0ru8e9F/bFeA45viIw2B6X
-         MiHWjT/+uGLBpTeVmQunQje7EqqLJ/8ei05v9atEEN9wTC+9z7AYCr+gn60EoN4+Xur3
-         btAv7+hG8dAzxpEm4bPbh2supghclAzM4y86GdU9oBe3FJfA+9qS3HVgCrgdi7cpD6qY
-         JJlA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmxz9q/LnqbNQNX+d3DtetLl85MlSbz/L4jWY8nXxVzQfMI7ZfEoKr5Myjqppa9OMFyzB/Aeg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg3YsMSylfD7zb4Fww9t+rwl0bOksp3/L8tYypnhM4fC+mkIXI
-	OVbrGHggkQXTkOHL6Sf1FfhG4ZYxiapn88K1QGpxO254OzMtAZOtLmKj63w7bpOeWy2lBC5j4NU
-	pzV2F4ypFI5S+/7wXwEISkqSmZmfg27Ow2jyl8LMYWFp87m2STyKn8g==
-X-Received: by 2002:a05:600c:b8d:b0:42c:cd88:d0f4 with SMTP id 5b1f17b1804b1-4314a379091mr2264325e9.22.1728993430942;
-        Tue, 15 Oct 2024 04:57:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGaJdcOU0I1Tkr1eCvK/bDSFFWcsaC47MEVBpFH6HL5g1NpyHM6DXLpl2DzYAls6KyAVexj9Q==
-X-Received: by 2002:a05:600c:b8d:b0:42c:cd88:d0f4 with SMTP id 5b1f17b1804b1-4314a379091mr2264085e9.22.1728993430455;
-        Tue, 15 Oct 2024 04:57:10 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431487c194asm4869335e9.21.2024.10.15.04.57.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 04:57:09 -0700 (PDT)
-Message-ID: <ee1205d6-3d6b-447f-991e-903936d45ac7@redhat.com>
-Date: Tue, 15 Oct 2024 13:57:07 +0200
+	s=arc-20240116; t=1728993750; c=relaxed/simple;
+	bh=Mb2jMIhgPn95C310AjLjdOHybGQPmJhBSETFECJjd7A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=aPUPIUHhd+qMTCit4h8im6pBExE2PUXwj/JPBUAGTtUVVCMCueIpbSkSAd/MZiy7NZDflHC3yekdZLfc+915BNdFi6ORBSqfTSoliSdBCK7VpXyj1Irx8n4z7X2wMtwF/k3Q/Xjj6B7zbIceSMkTvIcwU2Cy5LNLLNwFIp14U0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sf0WAxmg; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FBsoCX000968;
+	Tue, 15 Oct 2024 12:02:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=zr/zrrWXTvhTWxhtih01DT725ChHcY
+	Ut7x8P1H+ErnU=; b=sf0WAxmgUYeiUPYg9G6M1xZaaSEFYKOgmf+xedBVHTitag
+	/KMzx7kVzRzWtXcuIXL2uiFc/nPJCKW9EzzAdODparpS749PimFWFzplcJZv4pzG
+	scnLGhEbfCXz1Gi8AxwTJlOUzUdy8qhLM5qKcJK0MnUW28eTOzVeG93yQHr/3jte
+	z+/ygvkkXNvcE6hCAcKU0oxn+/nlXQtfdQaUXkFNyYmCLEBMKQwIikLJ4AmKs5lQ
+	GliTNdyr97+wtmETffLrisJEKcXmBF0D1aOiR3Ukf1oRmFL6FL0lPB8jI0lI4IPo
+	wvYe1bgBo64I44xxBSu2+Y46AYHqI0aDPLA+gjxw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429qxf81u9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 12:02:22 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49FC0OFx015624;
+	Tue, 15 Oct 2024 12:02:22 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429qxf81u4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 12:02:22 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F8jtuN005215;
+	Tue, 15 Oct 2024 12:02:21 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4285nj3cxd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 12:02:20 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FC2Hrm16843084
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Oct 2024 12:02:17 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B5152004D;
+	Tue, 15 Oct 2024 12:02:17 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47B8220043;
+	Tue, 15 Oct 2024 12:02:17 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 15 Oct 2024 12:02:17 +0000 (GMT)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        "Ricardo B. Marliere" <ricardo@marliere.net>,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
+In-Reply-To: <2024101532-batboy-twentieth-75c4@gregkh> (Greg Kroah-Hartman's
+	message of "Tue, 15 Oct 2024 12:59:10 +0200")
+References: <20241015105414.2825635-1-svens@linux.ibm.com>
+	<20241015105414.2825635-3-svens@linux.ibm.com>
+	<2024101532-batboy-twentieth-75c4@gregkh>
+Date: Tue, 15 Oct 2024 14:02:17 +0200
+Message-ID: <yt9dmsj5r2uu.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V12 net-next 07/10] net: hibmcge: Implement rx_poll
- function to receive packets
-To: Jijie Shao <shaojijie@huawei.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org
-Cc: shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
- chenhao418@huawei.com, sudongming1@huawei.com, xujunsheng@huawei.com,
- shiyongbang@huawei.com, libaihan@huawei.com, andrew@lunn.ch,
- jdamato@fastly.com, horms@kernel.org, kalesh-anakkur.purayil@broadcom.com,
- christophe.jaillet@wanadoo.fr, jonathan.cameron@huawei.com,
- shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241010142139.3805375-1-shaojijie@huawei.com>
- <20241010142139.3805375-8-shaojijie@huawei.com>
- <2dd71e95-5fb2-42c9-aff0-3189e958730a@redhat.com>
- <44023e6f-5a52-4681-84fc-dd623cd9f09d@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <44023e6f-5a52-4681-84fc-dd623cd9f09d@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: C5MxkPI-lNzpY37PKc_4CQ7i5Q9PFrJ4
+X-Proofpoint-GUID: EhLHQRuyEm3Gn599LIfAKyUbfl87nRQ0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ mlxlogscore=723 lowpriorityscore=0 suspectscore=0 priorityscore=1501
+ spamscore=0 clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410150081
 
-On 10/15/24 13:41, Jijie Shao wrote:
-> on 2024/10/15 18:28, Paolo Abeni wrote:
->> Side note: the above always uses the maximum MTU for the packet size,
->> if the device supports jumbo frames (8Kb size packets), it will
->> produce quite bad layout for the incoming packets... Is the device
->> able to use multiple buffers for the incoming packets?
-> 
-> In fact, jumbo frames are not supported in device, and the maximum MTU is 4Kb.
+Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
 
-FTR, even 4Kb is bad enough: tiny packets (tcp syn, UDP dns req) will 
-use a truesize above 5K. You can get a much better the layout using 
-copybreak.
+> On Tue, Oct 15, 2024 at 12:54:13PM +0200, Sven Schnelle wrote:
+>> To allow users to have stable device names with the help of udev,
+>> add the name to the udev event that is sent when a new PtP clock
+>> is available. The key is called 'PTP_CLOCK_NAME'.
+>
+> Where are you documenting this new user/kernel api you are adding?
+>
+>> 
+>> Signed-off-by: Sven Schnelle <svens@linux.ibm.com>
+>> ---
+>>  drivers/ptp/ptp_clock.c | 11 ++++++++++-
+>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+>> index c56cd0f63909..15937acb79c6 100644
+>> --- a/drivers/ptp/ptp_clock.c
+>> +++ b/drivers/ptp/ptp_clock.c
+>> @@ -25,9 +25,11 @@
+>>  #define PTP_PPS_EVENT PPS_CAPTUREASSERT
+>>  #define PTP_PPS_MODE (PTP_PPS_DEFAULTS | PPS_CANWAIT | PPS_TSFMT_TSPEC)
+>>  
+>> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env);
+>>  const struct class ptp_class = {
+>>  	.name = "ptp",
+>> -	.dev_groups = ptp_groups
+>> +	.dev_groups = ptp_groups,
+>> +	.dev_uevent = ptp_udev_uevent
+>>  };
+>>  
+>>  /* private globals */
+>> @@ -514,6 +516,13 @@ EXPORT_SYMBOL(ptp_cancel_worker_sync);
+>>  
+>>  /* module operations */
+>>  
+>> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env)
+>> +{
+>> +	struct ptp_clock *ptp = container_of(dev, struct ptp_clock, dev);
+>> +
+>> +	return add_uevent_var(env, "PTP_CLOCK_NAME=%s", ptp->info->name);
+>
+> Why is this needed?  Can't you get the name from the sysfs paths, the
+> symlink should be there already.
 
-Cheers,
-
-Paolo
-
+You mean the 'clock_name' attribute in sysfs? That would require to
+write some script to iterate over all ptp devices and check the name,
+or is there a way to match that in udev?
 
