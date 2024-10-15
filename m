@@ -1,94 +1,98 @@
-Return-Path: <netdev+bounces-135478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A29F99E0EA
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:22:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63D899E0ED
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5119F1F21AF8
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:22:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13A671C21451
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3FE1D95B6;
-	Tue, 15 Oct 2024 08:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D41CB53A;
+	Tue, 15 Oct 2024 08:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k22R0ocR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SP3V+4NI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3004F1D9A6C
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0C51C7B99
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728980528; cv=none; b=qFKoGxSv3di0lkoShIBFx8Isd5TYPpDDtpMPDpUKmM0RLHbhNrKgC+lTP/80AEHd+ccFAtj7AzFiOWxLwQFj/6KyQ53rbpSxKtngXEY4Oi+B3XhtSgEtQUDdQHBINpQVOlm7LuNxpzzQev6NJycHffEy2PfcrOFxmzDaPwrTbwE=
+	t=1728980576; cv=none; b=dLU4BSu4dCKWGFs4usV7Z3swWSqnLQWx68yBil59zXFrlI9SmcfiMJZS7r3g1CfTOjk9ZLv8O3LJGEcDjtPauQZbXxsp/MclzIJ7k1BSV3Z2AQiROrwPzJbYAGzxUP45fMHiAEbLuslTTCjNMkfkQHSKzXFVTGaCMdw6CfqDxgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728980528; c=relaxed/simple;
-	bh=BEcL+du+l18iEF8QfCpqfmg4zOcAQAejO9fnBlzxFjA=;
+	s=arc-20240116; t=1728980576; c=relaxed/simple;
+	bh=NNPZrM/hsHsaii0u40T5699JhwPSOd1nnJljs5kFqUE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MygC5/JrPrS9GvzqLo4HLGDVHbJLYUsB9FrxUjprL2nFHkf9Ruuirx5FEDSwyPxtRfyGd1azJ9rP0eE9LhNJVYL9d6TwoFAy6lUrNF/cfoVyfCCBLOwmCNx/q5QWgBPhwrINnXq2WCLBUQakWpT2SwKiHWKc/HPwFEMk/URfCFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k22R0ocR; arc=none smtp.client-ip=209.85.208.41
+	 To:Cc:Content-Type; b=qr035rUd0nEnGvS7jy2UCmPv4/ju1Dx44wurZBkBo5CT/CXYPKjYDtsIzs48TKnt/dbCg4yKGn+y6V3OmLtbpcoHshLX7gCl9iOKTpxeqB96wsJPW6WQjXcGaNppAX4nAk4yY2lEiqErNH0V30avx0mwJTaf+qULZN3d53u8oJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SP3V+4NI; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c984352742so1843487a12.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:22:06 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c949d60d84so4662680a12.1
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:22:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728980525; x=1729585325; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728980573; x=1729585373; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BEcL+du+l18iEF8QfCpqfmg4zOcAQAejO9fnBlzxFjA=;
-        b=k22R0ocRYvsRyyp4PEIx0xoSCR3IpMiRNsR0216gF5wB2gpTNoI8gOCwksYv2KzI5Z
-         14xO+HWZIlNyOuuG790/3F+EF8qtDA1NC68GYGrYh710q+EOjnjAFFnpy2Z2u3+utjlX
-         PEkd/0rFBGtVLPaTwT8UcLclHXvwT1T9zK0LbUGE5H1jMF1rvcj6AApC3hdo21zXZToh
-         FxfrQGKvyqcLcmFeNrG+8+PHMbL81I+aRZRnghzpo2nmzRmpQcAhVgZ15lNGWjt60KJ3
-         PS7YcKX4celSbl+H/wP5sipYC5gN5VIuGvQSX79F0z4x/aLOqYbVhIS4NtlB5QbbHXFC
-         ZLow==
+        bh=NNPZrM/hsHsaii0u40T5699JhwPSOd1nnJljs5kFqUE=;
+        b=SP3V+4NIBGh6XBYek9vvRdPWo4yeGkLw/itkdXSL4pwmGUSFpifdl0sNrxpnev82ML
+         3r+jbc3y00aXhdNaWREC2KPDG7iaZlHRLx0m48tMmJw1i5zB/33geFyY5qj1UDWBx8k1
+         DJHrRK80c7Dx84H3NGor3UmpMBQmlfhNGiq7fSIoIrEAaVvciBJuGEUm7I0fgHgIJ01B
+         SOWTqaKk3JRWmw0Cn2JghlswFZRkjOWyBOFuR1Bm5P6GCgfEaO1bsPAzE85iggsG4kB+
+         nlbD/qQHMnpTRLmC8UrlC2UReJcLGyaWr9VPy+r90szFK/pPTaRVMi64xxoNE4MB9UCd
+         5I2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728980525; x=1729585325;
+        d=1e100.net; s=20230601; t=1728980573; x=1729585373;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BEcL+du+l18iEF8QfCpqfmg4zOcAQAejO9fnBlzxFjA=;
-        b=hrbdaTaf2VpmjfiA35nNQc43qUw7YS8e21xAmZq3BKRpm3QDTFti4850WqTWme3zlo
-         H6Z2ct8mk3SQY29vXoVYI2hRssZ1IKpxAP6HCIEyV57VRPeyjGSaHyplkDBiOMPgjcA0
-         M1wCYw78wWMxacrwL0GBXzy3g4EKrA9TpPhAdzPzgm29S0LSqoAgXyS90NYCXu36bwYr
-         ffpSqpsjX5xUzphjLcaPyeT8DetwKK7InGP3WXKGizq5mF+70wu1hrgfU51mVu8Af/4t
-         WJgqInzqO8VHmrIunjb8WONMfOM+OmfEfoB73vPzD71rppIqA2bX4ND5CwWMbQwHZyyv
-         oosg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4zvzxFrWsk9TIUAJAU4zigVpknfUMjecJ9VUSiWEam9JfGxX5ny/I5g1aZMG1VWmv6Z4GSYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvST71pR0tJGdLm80RkNisCroSik4HiU8gHL2L92NSS1K1bETv
-	HI511LvJVD5ituYflYDoAQ7j+TqdcQrBeFMDgFTy+51U3FIHhILdhb9IGu5RGi5kC6EBBNSoatX
-	iMQ6liFOnmkz+NuUyxqycebVC5WwMxM1CTaKR
-X-Google-Smtp-Source: AGHT+IFSx5Y0ylEOgLSDDusCUD7oSb9C+YeFLn8BdrweET0ZhvejtnEGgPEvqfojZNCNJuzYY7ki2m9202GbgpLB358=
-X-Received: by 2002:a05:6402:51ca:b0:5c9:6c38:f188 with SMTP id
- 4fb4d7f45d1cf-5c96c38faedmr6409736a12.26.1728980525372; Tue, 15 Oct 2024
- 01:22:05 -0700 (PDT)
+        bh=NNPZrM/hsHsaii0u40T5699JhwPSOd1nnJljs5kFqUE=;
+        b=eaHQMcBc5xwU+vFCuT/hUi80Ba7QupHb7IlWqmsZQbDKkUduOJKlGaWYfHDgZpRSkx
+         S2bwPTKi6dL7AG1CYPMbfJHWORj2vWWgbdpZHzAMCRZOs6K3xqAfTV/+UytHy4KsSB8z
+         p77GtPzEyNJ5QtYqIUsya9fgF1htgMG3zsQLQaSVxIDKyIaGslzqq/XKBs89ws6/INDk
+         e+SZttQHYTPhG5AiN0LcP7C7CHcXvqpOGZDC73B5ZNm6PEPqMXwZm9Pr4rNtycCYuj2a
+         zUO5enu/PBCWYE3fl017/n8aH1QYemRJ5EqjcSRBbtEYl3rP0tV16ohTbYbouWBKysDu
+         1nlA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfH0uLF2B9YRLm0BMaD7TFMpu1vZinu4HadE9dE1vSuvnL7lYw6mjgi4kF9oXYpsZ+u6DXIQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/37sd/HpuiNGWnYTTndQOCOLznRJ3X2TxaJyDvUgpfbCpwbwZ
+	TXcyyBpyZHwYRe83UWVtgVGEDU2AeqTQUssg5vp/XfdEKRgGvhuIZ/f6zhGSaRtbavdcw4eOMnu
+	FH8eq9iieM1prybHNaej4F23SXNTHQyyeTv3Y
+X-Google-Smtp-Source: AGHT+IHnv0vuPkUPs0o0pqod/fLyBEoogWYUEly+HOnq11w0qHY2J5JlzhJtuvfYN+63xVIzsfPdS28d0VN8OKDpTfE=
+X-Received: by 2002:a05:6402:2747:b0:5c8:8c16:3969 with SMTP id
+ 4fb4d7f45d1cf-5c948c88313mr9638974a12.7.1728980573079; Tue, 15 Oct 2024
+ 01:22:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-12-kuniyu@amazon.com>
-In-Reply-To: <20241014201828.91221-12-kuniyu@amazon.com>
+References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-11-kuniyu@amazon.com>
+In-Reply-To: <20241014201828.91221-11-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 10:21:54 +0200
-Message-ID: <CANn89i+7wNtVhav9COCL336Q1iL4whE4PrzEJzAY_fOSCikyJQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 11/11] rtnetlink: Remove rtnl_register() and rtnl_register_module().
+Date: Tue, 15 Oct 2024 10:22:41 +0200
+Message-ID: <CANn89i+HwQiypVTgcBmUAkjL+jeMx_YNxrnZ4uGqttW-4CBwQA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 10/11] can: gw: Use rtnl_register_many().
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 10:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+On Mon, Oct 14, 2024 at 10:21=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
 om> wrote:
 >
-> No one uses rtnl_register() and rtnl_register_module().
+> We will remove rtnl_register_module() in favour of rtnl_register_many().
 >
-> Let's remove them.
+> rtnl_register_many() will unwind the previous successful registrations
+> on failure and simplify module error handling.
+>
+> Let's use rtnl_register_many() instead.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > ---
