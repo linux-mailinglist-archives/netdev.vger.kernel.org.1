@@ -1,93 +1,167 @@
-Return-Path: <netdev+bounces-135693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF62899EEB1
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:06:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E55499EEBD
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:08:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9499328778B
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:06:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92F361F255EE
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:08:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351661AF0DC;
-	Tue, 15 Oct 2024 14:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956FB1B218B;
+	Tue, 15 Oct 2024 14:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QH0a1BVa"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A393E1AF0BD
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 14:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2D514D283;
+	Tue, 15 Oct 2024 14:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729001178; cv=none; b=Tju2DBtR1eRQxY4rbVv/d5Cbwb+VXoifBZqxuDPs08ImKgb6A41JDr+Yjmp6P12iDC1l7yeOqpGM8YhBrUb9dEyq9g38NGlexFLA1l6VugmR8+m209SVaoLTIvfqzb/CYVR05I7p8A/Jrt9ULEBpfFwTdh3HzzGi1Dc4AQ7zO4Q=
+	t=1729001297; cv=none; b=HPvtrGd38SJ7sdnIlUUb/0JdhID9yse9KMLlbXtj4apseNIVyh810U/sWAmwkeSXTflsJ4Z7WXXBtTVNyUA5MfpB/tdYf3cou38R7J/D2j5IKENbuSIcQ7wFhAUjLhBpr82DznsG0+0gYZus0x93T1LAbFz+aF4HJYuFfl0B1As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729001178; c=relaxed/simple;
-	bh=GDyftvXopT+cv6kx5gYTqJO0DdX4M+l0jMnqMQooPmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gFgvGw+xlHXCQ3WpW550YP9l5QE4YHZa74EZSVeVTdrRPi8vGE/cQH0duR4MHRqtMiLdCMGfaA9lrq+qMiwKSfDrXG/Nc9wb8mjUAAq8sqoLbXhQUS2JNAEOSs0u3LZfns1ScLa8IL8tlnnIOpvvEOJu8l1pe6CIr0Lv0uDM5Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t0iBb-0008Uc-5g; Tue, 15 Oct 2024 16:06:07 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t0iBY-0022xx-RN; Tue, 15 Oct 2024 16:06:04 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t0iBY-00ChNx-2O;
-	Tue, 15 Oct 2024 16:06:04 +0200
-Date: Tue, 15 Oct 2024 16:06:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>, thomas.petazzoni@bootlin.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: pse-pd: Fix out of bound for loop
-Message-ID: <Zw52zAqcvtFL29z2@pengutronix.de>
-References: <20241015130255.125508-1-kory.maincent@bootlin.com>
+	s=arc-20240116; t=1729001297; c=relaxed/simple;
+	bh=SdRhUPPHFHXC1xpfQuq0g1vtB4NUTL+nVKsz52Zeais=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Rn07vENTrNFnvCo1B56n5Gv0TtIhFYGw826nJFIyd90sxCRDolCDVocipof1wc2/QSID8lED6LhAR3OiBsHuzwKsda4zCPU/NIqZI87O8mY/Ppi9dVJha45Mhu2YUIIDHocZa2SDz0AhVf2tgRbp8og6X0N4NxbPo0sHD2gniZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QH0a1BVa; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-20ca388d242so28633385ad.2;
+        Tue, 15 Oct 2024 07:08:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729001295; x=1729606095; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=59OjeE70KMfAYYXX4g/s1D5SKLpH3DxcgTnqpspojAE=;
+        b=QH0a1BVazLTHNevSjOwlRww7Zgt3f2jKPCSsYR1/BLQwmBnt1t4lmRlI2d/thMlJOD
+         7FfbSWXzujlTokantV/hiEvWFQ0Xo6pSFOZ7X/vh14a7G8+hAf/WHqG7MzRO8bhNYFcP
+         wQnITlK/OsiJ02ON1y1JNjZFSL6PgkXu7w14tbeAOOkvbPLwb2GbOdsZkSW4d+V3YaPl
+         db1y772DAQsXlLEnZZF345sl4Zts4Ix3K1rP2pdx2w32GdHiD3nvUlb9V6dvXZbE/NOX
+         f+9yg13bv7NzHsQ4c3x+w5zErL49tHhkrgcWcnft06LOEyutDNDIu8XIiepBixfBCtm6
+         YCFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729001295; x=1729606095;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=59OjeE70KMfAYYXX4g/s1D5SKLpH3DxcgTnqpspojAE=;
+        b=qTNBo73rIgtWuRDpwunjjRw6fK+YCVC7aE6yf8jOZHWbRuqC3wQO8WoRGQNA/Vs6/I
+         ZffuOSZMTz2icxeBFRww/IKQYKov6Sq2mp0WNsNv/kS2Na4hJJ2SYVZ2/PervIb7XWOU
+         wQNgDjqzz/8RKku3Zg3BCwH9usipJgVpmRtzDm78G1WorDY4FCxdgTapzxhl/ZDilSD+
+         V1e7LBYZ0UHjuQJe9HQ2ejpXhXkehvkIK4ZE3OOn6UY993yrffBVJdgtxNq94SNfyk7I
+         kt1eG3mSFZ3JwO08nJYc9hJLVo389vjwwBsX7JMfYh24w4kOqO8Vit3z/pc/0/pWxS5a
+         qgMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHiAXBzDs/SFrjd31CCEntvI2UhX8nQRcRIE+k4n2jka0hRnWE5f4soORInEOXfayJ6wEfUDq4pUifDzci@vger.kernel.org, AJvYcCWwcE8Y2WnxrFdjjkXA5JefHUXcq81ZCJDqMV2+hMJjAaY45ifcA6KUSTNUEqMJRSjDYHzZZQEJUBxWcGSzlHvD@vger.kernel.org, AJvYcCX9lE9fEdtZoCW3UrN/6OH3ARC13IBARHzyQUIruzV6k+L9O70auE97g4Iz0glZ5sQx7n6+3NNK@vger.kernel.org, AJvYcCXN8UDv7fV3+mKThI8gDgGXZOCYDe2cxhX8D8ZlrslVthWryNYQFP/1XYnBVnCh9c4gCGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz485Vt07rvuM+FAH0qM1mJ9dYtHT7Mn7dzNaJM+Si/wcB/6YYC
+	enuEFYjzaxt0WjhJE42rJyLj+DTby+lkwu+WIkiHxZkL3Rhw+Fae
+X-Google-Smtp-Source: AGHT+IHuZyCLIzTWRvWfCqwBL2LHNbLeK+xm/bpQdNVx7q0gy5JC5xAbFQM6Eh5o+P/Yka4vu8yY8Q==
+X-Received: by 2002:a17:902:db0d:b0:20c:637e:b28 with SMTP id d9443c01a7336-20cbb23057bmr167155595ad.39.1729001295219;
+        Tue, 15 Oct 2024 07:08:15 -0700 (PDT)
+Received: from localhost.localdomain ([43.129.25.208])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d17f9d419sm12437625ad.93.2024.10.15.07.08.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 07:08:14 -0700 (PDT)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	dsahern@kernel.org,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	roopa@nvidia.com,
+	razor@blackwall.org,
+	gnault@redhat.com,
+	bigeasy@linutronix.de,
+	idosch@nvidia.com,
+	ast@kernel.org,
+	dongml2@chinatelecom.cn,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	bridge@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v3 00/10] net: ip: add drop reasons to input route
+Date: Tue, 15 Oct 2024 22:07:50 +0800
+Message-Id: <20241015140800.159466-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241015130255.125508-1-kory.maincent@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 15, 2024 at 03:02:54PM +0200, Kory Maincent wrote:
-> Adjust the loop limit to prevent out-of-bounds access when iterating over
-> PI structures. The loop should not reach the index pcdev->nr_lines since
-> we allocate exactly pcdev->nr_lines number of PI structures. This fix
-> ensures proper bounds are maintained during iterations.
-> 
-> Fixes: 9be9567a7c59 ("net: pse-pd: Add support for PSE PIs")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+In this series, we mainly add some skb drop reasons to the input path of
+ip routing, and we make the following functions return drop reasons:
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+  fib_validate_source()
+  ip_route_input_mc()
+  ip_mc_validate_source()
+  ip_route_input_slow()
+  ip_route_input_rcu()
+  ip_route_input_noref()
+  ip_route_input()
+  ip_mkroute_input()
+  __mkroute_input()
+  ip_route_use_hint()
 
-Thank you!
+In order to make fib_validate_source() return drop reasons, we do some
+refactoring to fib_validate_source() and __fib_validate_source(). The
+main idea is to combine fib_validate_source() into __fib_validate_source()
+and make fib_validate_source() an inline call to __fib_validate_source()
+in the 1st patch.
+
+And following new skb drop reasons are added:
+
+  SKB_DROP_REASON_IP_LOCAL_SOURCE
+  SKB_DROP_REASON_IP_INVALID_SOURCE
+  SKB_DROP_REASON_IP_LOCALNET
+  SKB_DROP_REASON_IP_INVALID_DEST
+
+Changes since v2:
+- refactor fib_validate_source and __fib_validate_source to make
+  fib_validate_source return drop reasons
+- add the 9th and 10th patches to make this series cover the input route
+  code path
+
+Changes since v1:
+- make ip_route_input_noref/ip_route_input_rcu/ip_route_input_slow return
+  drop reasons, instead of passing a local variable to their function
+  arguments.
+
+Menglong Dong (10):
+  net: ip: refactor fib_validate_source/__fib_validate_source
+  net: ip: make fib_validate_source() return drop reason
+  net: ip: make ip_route_input_mc() return drop reason
+  net: ip: make ip_mc_validate_source() return drop reason
+  net: ip: make ip_route_input_slow() return drop reasons
+  net: ip: make ip_route_input_rcu() return drop reasons
+  net: ip: make ip_route_input_noref() return drop reasons
+  net: ip: make ip_route_input() return drop reasons
+  net: ip: make ip_mkroute_input/__mkroute_input return drop reasons
+  net: ip: make ip_route_use_hint() return drop reasons
+
+ include/net/dropreason-core.h   |  26 ++++
+ include/net/ip_fib.h            |  18 ++-
+ include/net/route.h             |  34 ++---
+ net/bridge/br_netfilter_hooks.c |  11 +-
+ net/core/lwt_bpf.c              |   1 +
+ net/ipv4/fib_frontend.c         |  81 ++++++------
+ net/ipv4/icmp.c                 |   1 +
+ net/ipv4/ip_fragment.c          |  12 +-
+ net/ipv4/ip_input.c             |  20 ++-
+ net/ipv4/route.c                | 212 ++++++++++++++++++--------------
+ 10 files changed, 245 insertions(+), 171 deletions(-)
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.39.5
+
 
