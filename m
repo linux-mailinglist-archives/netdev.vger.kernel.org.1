@@ -1,183 +1,166 @@
-Return-Path: <netdev+bounces-135867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EEDC99F76A
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:41:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 624BD99F773
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:45:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D210C28493C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:41:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19DCC285C25
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3299B1B6D07;
-	Tue, 15 Oct 2024 19:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADB51F76A9;
+	Tue, 15 Oct 2024 19:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="22Mj0xz6"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="q0UQPzEo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93863176228
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 19:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF3A1F5854;
+	Tue, 15 Oct 2024 19:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729021282; cv=none; b=W6mnXOy8qA548KzXBKhgwVbNtPaSCJMrLmMkgPHsGCxIgA4NYxNl5zKto5jPQXQhZ8WGRKWBkU33RCWnJMBthps9CGEIZMRKTUkCL6AZOK19ZRtpO6CJgX6OnN2/WaRuPIbolxPmGZoxlHjmwRAygFPa2WehwXu6GlolwFYAKQg=
+	t=1729021511; cv=none; b=u/q6URYJJ7JonsTK039+PdeVuMF6eE0g/ckcGyvijxcrZKz82bMfREXsnUEuLNVnhlPKQ6l7BARQA6w0h4oJ/c/89OobT3NmQn+rQf6PkJkHZ/JN/pRbAb7p8yADsS017CXT5mhmC7XxULU7sztHMSp8gZ0EYf+A57pKbxWq+Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729021282; c=relaxed/simple;
-	bh=u1nHyn49z3Ie5rS+Gise21zMxOIyqdyakEmeJXIMqOI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=L2bJcW4DTZ6DPXaRd1Nb6gZN9Q5cJ03U8NMmcbKAAXn12R32IegRgEu1WUrVc9x/R6spne13KAIfR9Yiz9cBotfJc7MNx5GenHMzJRrMJsq7/VcvVZLOcc7ZUaGDmpXGl8PcngJQIL2WldD/BsW/FeG96U66b/ppATGjRD/dhFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=22Mj0xz6; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e293b3e014aso4478223276.3
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 12:41:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729021279; x=1729626079; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C34RbrV5RscxnInxdbsFU69/amtxycWH9NlU+nUp1Z8=;
-        b=22Mj0xz6s+Dv83RU5Y22m5AK8wPwl1WqN5bWvjp2wuY3ncZRBRpZl1T0mTARVzn+Gp
-         1ExDpqBs4f4TvnuVz6lJHKTnfRITNMU9xSNtQjwKbLCwAX/TIVs/E1T1PelIOPnEKj6S
-         Gyln7bshp8yc73Z5f++RYVk/naF0bsLaxCZ/e8KZcGXAQa1f608eMzgXf6m/smKcG0he
-         gdSA4kCdLvpwqJ4Sj8IyJu1xnm2Lh5tQZH3gfIZNYPVHw90yoyeg9H2M/4xQUdBCEJro
-         3oGTf8EwWplAQfFloLmxZboRCgmk00pCUeI/e5p7qW35xFk28FIeWXg+fpoxCItOYwmS
-         hLfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729021279; x=1729626079;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C34RbrV5RscxnInxdbsFU69/amtxycWH9NlU+nUp1Z8=;
-        b=rQ9vWVyF+9inFLYzBG9TP8psAC+Tn/acMWVymNv7H8kO68/vkADws0PekkV+C20/DF
-         M4BHtM4r9GoEx1uxCLtstGMWXaK0q3T4mMezsRl/uJWY6Bfm3zBDTnQiD9JaOtxA4JVG
-         sdhB7+YgaQG3htChNVjOyOZqI6ROO2/5kGpXP/bxc8PpB/OGd+bzSY7nDFJNACWuVv1R
-         M1cPwoGrkmqRwpfc9Puf4CXuhcjS2y2egKtHZ9+ChrWsRVgdSgQJGtid8wB4YQkeGoJQ
-         2Dgw4rHgo/QGBiJopNFFp5BDBMsAY0KjNx4/b6yFHXL0VAujPsKxKgua5jSigUg7zU9c
-         3Oxg==
-X-Gm-Message-State: AOJu0YwLKZmKMbNG5umeGj2VJhy2bSNu7xBtWLVhI+MoQ3E16HcpEgbP
-	yl6A7FeaQQC7ceCaIXGds8riIernWz7DrCJne4AZoaeIaWd2ObeIEkG9POLJSRomH4BZW9oj7eF
-	HBRlaUNl8wA==
-X-Google-Smtp-Source: AGHT+IH0KYLLRcgWYYR3/EZ4z3kKcrbdpo0VOTZAsL7EgzGr3Uqzx8AfHEw+VLoX40yHrf7mtRFxSc3+GYVZNQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:9702:0:b0:e28:e510:6ab1 with SMTP id
- 3f1490d57ef6-e297857f673mr671276.8.1729021279389; Tue, 15 Oct 2024 12:41:19
- -0700 (PDT)
-Date: Tue, 15 Oct 2024 19:41:18 +0000
+	s=arc-20240116; t=1729021511; c=relaxed/simple;
+	bh=Jxw4wtlEr6vIs5MfVc+/KOu5i1arbajJ5xkHL+jGtOE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J0bwyjJgFiqjXzdhadv9lxijemKeO6Y7I0OE7XCaF3IHExtLsrT93SAU1m3byjTsvTCApT9ZYRSgfguax/CoaIBtMXAJY5L8JDd0T+koMWWPipIosJNJ6j+p5soc983/P7WHqEXLmaDr3QgsATUVsKagxeP0LR9ZGe9TVVrVwqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=q0UQPzEo; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bwhtgi8DcQyDJ8FWIikvDQQ5XGGnfVqxrzGDPV+2pkY=; b=q0UQPzEohGuorgdFB4IwQpx1yq
+	GxIVNS6g41P3QuqbKLt22y2lwrJpodiLo3mk1Nfrqv1Pvurq6zvOI6tXrm3k0Jw0mz0PZJ2QosunQ
+	lE8xR87+5HHebNwe5uSRwkWAYPaWlOsY9QT8x5IZqBTh+xQKQeojq94bdj/swJAkyv9k=;
+Received: from p54ae9bfc.dip0.t-ipconnect.de ([84.174.155.252] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1t0nTR-009Kvt-0i;
+	Tue, 15 Oct 2024 21:44:53 +0200
+Message-ID: <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
+Date: Tue, 15 Oct 2024 21:44:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241015194118.3951657-1-edumazet@google.com>
-Subject: [PATCH net] net: fix races in netdev_tx_sent_queue()/dev_watchdog()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
+ improvements
+To: Eric Woudstra <ericwouds@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+ <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
+ <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
+ <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
+ <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some workloads hit the infamous dev_watchdog() message:
+On 15.10.24 15:32, Eric Woudstra wrote:
+> 
+> 
+> On 10/15/24 2:16 PM, Felix Fietkau wrote:
+>> Hi Eric,
+>> 
+>> On 14.10.24 20:29, Eric Woudstra wrote:
+>>> It would be no problem for me to change the subject and body, if you
+>>> think that is better.
+>>>
+>>> The thing is, these patches actually make it possible to set up a fully
+>>> functional software fastpath between bridged interfaces. Only after the
+>>> software fastpath is set up and functional, it can be offloaded, which
+>>> happens to by my personal motivation to write this patch-set.
+>>>
+>>> If the offload flag is set in the flowtable, the software fastpath will
+>>> be offloaded. But in this patch-set, there is nothing that changes
+>>> anything there, the existing code is used unchanged.
+>> 
+>> FWIW, a while back, I also wanted to add a software fast path for the
+>> bridge layer to the kernel, also with the intention of using it for
+>> hardware offload. It wasn't accepted back then, because (if I remember
+>> correctly) people didn't want any extra complexity in the network stack
+>> to make the bridge layer faster.
+> 
+> Hello Felix,
+> 
+> I think this patch-set is a clear showcase it is not very complex at
+> all. The core of making it possible only consists a few patches. Half of
+> this patch-set involves improvements that also apply to the
+> forward-fastpath.
 
-"NETDEV WATCHDOG: eth0 (xxxx): transmit queue XX timed out"
+It's definitely an interesting approach. How does it deal with devices 
+roaming from one bridge port to another? I couldn't find that in the code.
 
-It seems possible to hit this even for perfectly normal
-BQL enabled drivers:
+>> Because of that, I created this piece of software:
+>> https://github.com/nbd168/bridger
+>> 
+>> It uses an eBPF TC classifier for discovering flows and handling the
+>> software fast path, and also creates hardware offload rules for flows.
+>> With that, hardware offloading for bridged LAN->WLAN flows is fully
+>> supported on MediaTek hardware with upstream kernels.
+>> 
+>> - Felix
+> 
+> Thanks, I've seen that already. Nice piece of software, but I'm not
+> running openwrt. I would like to see a solution implemented in the
+> kernel, so any operating system can use it.
 
-1) Assume a TX queue was idle for more than dev->watchdog_timeo
-   (5 seconds unless changed by the driver)
+Makes sense. By the way, bridger can easily be built for non-OpenWrt 
+systems too. The only library that's actually needed is libubox - that 
+one is small and can be linked in statically. ubus support is fully 
+optional and not necessary for standard cases.
 
-2) Assume a big packet is sent, exceeding current BQL limit.
-
-3) Driver ndo_start_xmit() puts the packet in TX ring,
-   and netdev_tx_sent_queue() is called.
-
-4) QUEUE_STATE_STACK_XOFF could be set from netdev_tx_sent_queue()
-   before txq->trans_start has been written.
-
-5) txq->trans_start is written later, from netdev_start_xmit()
-
-    if (rc == NETDEV_TX_OK)
-          txq_trans_update(txq)
-
-dev_watchdog() running on another cpu could read the old
-txq->trans_start, and then see QUEUE_STATE_STACK_XOFF, because 5)
-did not happen yet.
-
-To solve the issue, write txq->trans_start right before one XOFF bit
-is set :
-
-- _QUEUE_STATE_DRV_XOFF from netif_tx_stop_queue()
-- __QUEUE_STATE_STACK_XOFF from netdev_tx_sent_queue()
-
-From dev_watchdog(), we have to read txq->state before txq->trans_start.
-
-Add memory barriers to enforce correct ordering.
-
-In the future, we could avoid writing over txq->trans_start for normal
-operations, and rename this field to txq->xoff_start_time.
-
-Fixes: bec251bc8b6a ("net: no longer stop all TX queues in dev_watchdog()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/netdevice.h | 12 ++++++++++++
- net/sched/sch_generic.c   |  8 +++++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 4d20c776a4ff3d0e881b8d9b99901edb35f66da2..8896705ccd638bcb7d2ca8f3905351fc823f71b8 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3325,6 +3325,12 @@ static inline void netif_tx_wake_all_queues(struct net_device *dev)
- 
- static __always_inline void netif_tx_stop_queue(struct netdev_queue *dev_queue)
- {
-+	/* Paired with READ_ONCE() from dev_watchdog() */
-+	WRITE_ONCE(dev_queue->trans_start, jiffies);
-+
-+	/* This barrier is paired with smp_mb() from dev_watchdog() */
-+	smp_mb__before_atomic();
-+
- 	/* Must be an atomic op see netif_txq_try_stop() */
- 	set_bit(__QUEUE_STATE_DRV_XOFF, &dev_queue->state);
- }
-@@ -3451,6 +3457,12 @@ static inline void netdev_tx_sent_queue(struct netdev_queue *dev_queue,
- 	if (likely(dql_avail(&dev_queue->dql) >= 0))
- 		return;
- 
-+	/* Paired with READ_ONCE() from dev_watchdog() */
-+	WRITE_ONCE(dev_queue->trans_start, jiffies);
-+
-+	/* This barrier is paired with smp_mb() from dev_watchdog() */
-+	smp_mb__before_atomic();
-+
- 	set_bit(__QUEUE_STATE_STACK_XOFF, &dev_queue->state);
- 
- 	/*
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 2af24547a82c49efc64528fd27087144c4f43b7c..38ec18f73de43aed565c653fffb838f54e7c824b 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -512,9 +512,15 @@ static void dev_watchdog(struct timer_list *t)
- 				struct netdev_queue *txq;
- 
- 				txq = netdev_get_tx_queue(dev, i);
--				trans_start = READ_ONCE(txq->trans_start);
- 				if (!netif_xmit_stopped(txq))
- 					continue;
-+
-+				/* Paired with WRITE_ONCE() + smp_mb...() in
-+				 * netdev_tx_sent_queue() and netif_tx_stop_queue().
-+				 */
-+				smp_mb();
-+				trans_start = READ_ONCE(txq->trans_start);
-+
- 				if (time_after(jiffies, trans_start + dev->watchdog_timeo)) {
- 					timedout_ms = jiffies_to_msecs(jiffies - trans_start);
- 					atomic_long_inc(&txq->trans_timeout);
--- 
-2.47.0.rc1.288.g06298d1525-goog
-
+- Felix
 
