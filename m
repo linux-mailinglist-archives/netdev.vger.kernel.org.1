@@ -1,112 +1,104 @@
-Return-Path: <netdev+bounces-135716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB4199F01E
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:50:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74DF99F028
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E78B228121E
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:50:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 669FFB21250
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5321C4A0C;
-	Tue, 15 Oct 2024 14:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VaG53/dM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FDD1C07F8;
+	Tue, 15 Oct 2024 14:52:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68541FC7EC
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 14:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238A21FC7EC;
+	Tue, 15 Oct 2024 14:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729003853; cv=none; b=bIF/MZlq54PDHP06HTy1hq3WhjxSb1dQXj/978ES+6ojAL2JgkG0FuYIzi10rEGd95idpRclnF4wgZmj/3+LdqQdP1S0gIwviZOuEHFa/svGOjOegNJGgYysA70nlg2+WAvlKoHd7qXqaGOpaUoaMHxC+fc6pNkY5PQh+rMX+UQ=
+	t=1729003934; cv=none; b=qHB686wqbpa7RaTEhXvNZfxhfUl9lz524OJAn68/xBsx7IC7NrHhhj5S+L5kRtNL1O3jzlbEZwxLzbAMkjSwwvgt489M0LglMvGGfmMkVoAkAnPjAHjln5sY3UewMrmuBz74VlZl2l/WNxoxW9QZJRvwefztl6EWlqYi+ggwwkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729003853; c=relaxed/simple;
-	bh=b6F6HTbAK3k27jEF5hs4VdapSaS6BeVeKSt7AY8Mb2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kelW3uAGlS22yyAcbWXwkADxl5vkOcCmpFSIDl9amqx8GiRNDsPBQhhjWSjrdjgjuB13KDkFtAvtAOJRyZJgYVFAfXUlu8TP7OvMBqiG+eDKku3e3P80Xe8zhJOwpYVpfhYKgWaTbC8wnHDiAuj6ncp56QM9GomIUpoPCMCGacY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VaG53/dM; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2ec44c11-8387-4c38-97f4-a1fbcb5e1a4e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729003848;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VFvlDlqDsNKF7C/Lz/vpUsIFwUvMLwmRA1uoFF8DY7E=;
-	b=VaG53/dMPxQl7ShsOD54bS8aa/2XZtteNE9GWBuypF3UuLtBvU2Dom6E1uTn1UaMLF7339
-	HPh6YBSlTjFraNEESeWRQDHIBxe7KPUEY/MCJH33HJ3jmMngZP2IBaweKPWV7jJ9wstAT7
-	jUoDanXjLj84U0Ojrf20lksTLCqggwY=
-Date: Tue, 15 Oct 2024 15:50:41 +0100
+	s=arc-20240116; t=1729003934; c=relaxed/simple;
+	bh=y87iWwER98HS/XwERmHJIlph+6PTIfqI7aOgycGVSFw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tMNmXRXifjj3/Q4KvcSbcC5rfRhMJgFDhEojIklh7UqqG1dRmcun8QO8YpulYtWReW+Ku/KD0y9ACw7PBaDhJTamjcdzHWxP+l0JRqbJeQdSlFdy+eTghEM+FjY0bSVSP3LPcKiCU+mf1Ji6kqFcGynNCpYBTs14D1ixR/4WeeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XScTz4FybzySVc;
+	Tue, 15 Oct 2024 22:50:47 +0800 (CST)
+Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9447018005F;
+	Tue, 15 Oct 2024 22:52:10 +0800 (CST)
+Received: from [10.174.176.245] (10.174.176.245) by
+ kwepemm600001.china.huawei.com (7.193.23.3) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 15 Oct 2024 22:52:09 +0800
+Message-ID: <f275b30a-4892-4867-936f-c8de41c05b9e@huawei.com>
+Date: Tue, 15 Oct 2024 22:52:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 1/2] dpll: add clock quality level attribute
- and op
-To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, donald.hunter@gmail.com, arkadiusz.kubalewski@intel.com,
- saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com
-References: <20241014081133.15366-1-jiri@resnulli.us>
- <20241014081133.15366-2-jiri@resnulli.us>
- <20241015072638.764fb0da@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: bcmasp: fix potential memory leak in
+ bcmasp_xmit()
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	<justin.chen@broadcom.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<zhangxiaoxu5@huawei.com>
+CC: <bcm-kernel-feedback-list@broadcom.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241014145901.48940-1-wanghai38@huawei.com>
+ <924f6a1b-17af-4dc8-80e3-7c7df687131a@broadcom.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241015072638.764fb0da@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Wang Hai <wanghai38@huawei.com>
+In-Reply-To: <924f6a1b-17af-4dc8-80e3-7c7df687131a@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600001.china.huawei.com (7.193.23.3)
 
-On 15/10/2024 15:26, Jakub Kicinski wrote:
-> On Mon, 14 Oct 2024 10:11:32 +0200 Jiri Pirko wrote:
->> +    type: enum
->> +    name: clock-quality-level
->> +    doc: |
->> +      level of quality of a clock device. This mainly applies when
->> +      the dpll lock-status is not DPLL_LOCK_STATUS_LOCKED.
->> +      The current list is defined according to the table 11-7 contained
->> +      in ITU-T G.8264/Y.1364 document. One may extend this list freely
->> +      by other ITU-T defined clock qualities, or different ones defined
->> +      by another standardization body (for those, please use
->> +      different prefix).
-> 
-> uAPI extensibility aside - doesn't this belong to clock info?
-> I'm slightly worried we're stuffing this attr into DPLL because
-> we have netlink for DPLL but no good way to extend clock info.
 
-There is a work going on by Maciek Machnikowski about extending clock
-info. But the progress is kinda slow..
+On 2024/10/15 1:14, Florian Fainelli wrote:
+> On 10/14/24 07:59, Wang Hai wrote:
+>> The bcmasp_xmit() returns NETDEV_TX_OK without freeing skb
+>> in case of mapping fails, add dev_kfree_skb() to fix it.
+>>
+>> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet 
+>> controller")
+>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>> ---
+>>   drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c 
+>> b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+>> index 82768b0e9026..9ea16ef4139d 100644
+>> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+>> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+>> @@ -322,6 +322,7 @@ static netdev_tx_t bcmasp_xmit(struct sk_buff 
+>> *skb, struct net_device *dev)
+>>               }
+>>               /* Rewind so we do not have a hole */
+>>               spb_index = intf->tx_spb_index;
+>> +            dev_kfree_skb(skb);
+>
+> Similar reasoning to the change proposed to bcmsysport.c, we already 
+> have a private counter tracking DMA mapping errors, therefore I would 
+> consider using dev_consume_skb_any() here.
 
->> +    entries:
->> +      -
->> +        name: itu-opt1-prc
->> +        value: 1
->> +      -
->> +        name: itu-opt1-ssu-a
->> +      -
->> +        name: itu-opt1-ssu-b
->> +      -
->> +        name: itu-opt1-eec1
->> +      -
->> +        name: itu-opt1-prtc
->> +      -
->> +        name: itu-opt1-eprtc
->> +      -
->> +        name: itu-opt1-eeec
->> +      -
->> +        name: itu-opt1-eprc
->> +    render-max: true
-> 
-> Why render max? Just to align with other unnecessary max defines in
-> the file?
+Hi, Florian.
+
+Thanks for the suggestion, I've resent v2.
+
+[PATCH v2 net] net: bcmasp: fix potential memory leak in bcmasp_xmit()
 
 
