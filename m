@@ -1,218 +1,149 @@
-Return-Path: <netdev+bounces-135916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E53699FCA0
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:54:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025F299FCA1
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:56:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A76441F23F86
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:54:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D3B4B23384
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C3F1B0F33;
-	Tue, 15 Oct 2024 23:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EA41DBB24;
+	Tue, 15 Oct 2024 23:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Y+HFw/5/"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZyKWIbuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9281B0F0B
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB2921E3D9
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729036494; cv=none; b=ssek1ny2xSSe2GAL7nj8Chi3WGVhindOKVJr2BkqZhHP+BQqG0j9q7yO+aaruaxvwP64hjGOJYbWqLN+0XBEDZ4btFrUbfYjIy2p14GogI0xUucHF9yRp1uo5qrkbsqNmFYgNZIbjhlVqhmD/IWp33q6digovCzgyu9FwanP3Y8=
+	t=1729036566; cv=none; b=IMDk8D6BDcdAG6t32fwPZGVd7mMFaBwsTWBPLnOLeQ5TQHXhl8i0iWErXbhQLnoUOhk9Js/VM/sm4sJl9TRIvsHDIq7SNIslr2pl/efaCSPa++nv9g4NsaWv6OUBOL89RWKuL8XGGeyQQGqRTc0KwwkkRuosvKR74UL7OZ3DLH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729036494; c=relaxed/simple;
-	bh=vCJ+T5dD6mLroc7eyvlIb05tnAP2QzJ13yEQDBR6dLA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dh6MTzc96sx6ZiOE68JjNZz+kky6IPkdW/AevEGVUknMvrZj+o+nDi9r8meOnWNtQ9mIxIKXhBymAv8JUBrx7Gt5+WIsAHqGpDyyEq1I2bicAhrdxp+RfEHBOx33yiYapPHShR5+NkcF39GFL/IOe+Ui9e/uzlY3sanBGz11ycg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Y+HFw/5/; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1729036566; c=relaxed/simple;
+	bh=R/JU7WWK4nH9sjVY5CGheYv12+wBHyOelkg+CwSXKG4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gpHEbmZaTB0tBIN6hPOZrqE6NHNViH/wBXABvQflpA7AGCBmFROS+85qR5DL1kSq/Nn3Sq6J1bg+dLAJbYPbWzTrufFFfJkA3fImz9V58OFHllwf/aKBMO23Jw8UUUusb4AmM7aT0na6ZJfLDD/KdNbClZLoaFruLE4b2Vy3FYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZyKWIbuc; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7b1205e0e03so323717385a.3
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 16:56:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729036494; x=1760572494;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Z5DB3gQsjgdXrosW98Zy7OZQem4eEFj6DSgkRzVD378=;
-  b=Y+HFw/5/BjPEcRWIRiv1QeZKbp8f0Ds2fH0kegHEScrHY+7osJ3Iq0J+
-   6z7FS9vyPu8v4TABsLKVQhP070QkVw9b8QLwa7QLw1VoNS1WVDX+5pd4x
-   XtIO4ybM9URkz1cdbghfXbWF5EpeNw6MkMFMJO1uUxjVltWoXAX7E04PA
-   E=;
-X-IronPort-AV: E=Sophos;i="6.11,206,1725321600"; 
-   d="scan'208";a="461100837"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 23:54:49 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:35926]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.107:2525] with esmtp (Farcaster)
- id ce6f2192-46c9-4409-a686-df5f6cb83067; Tue, 15 Oct 2024 23:54:47 +0000 (UTC)
-X-Farcaster-Flow-ID: ce6f2192-46c9-4409-a686-df5f6cb83067
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 15 Oct 2024 23:54:47 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 15 Oct 2024 23:54:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <gnaaman@drivenets.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v4 6/6] Create netdev->neighbour association
-Date: Tue, 15 Oct 2024 16:54:41 -0700
-Message-ID: <20241015235441.69622-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241015165929.3203216-7-gnaaman@drivenets.com>
-References: <20241015165929.3203216-7-gnaaman@drivenets.com>
+        d=broadcom.com; s=google; t=1729036563; x=1729641363; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Faj3gXWvchlvCwalbAFXavfgfdm6k2lCm93N+mX1N28=;
+        b=ZyKWIbuc9dq090mSQp4pH6vQ64DJb/+F5xvFrtdyt2wyISzRY139SlTJyz/v8CSe7v
+         y57B0lr2F7/gLNoLwPA7xfFCq5hc9qUfWszmyC3n54/9U0WNPTZbP+0OQGQJNfFUHgZ5
+         124SJ7h/P5SL9OxRNiRBGaCOKSP/ayVqqs7Xc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729036563; x=1729641363;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Faj3gXWvchlvCwalbAFXavfgfdm6k2lCm93N+mX1N28=;
+        b=X7YjVvk9x00Cb0ohHInQiA8yfozQug0g6seqnXHgrLEoU8PUJigACE3N1RZ7o5yv8w
+         5DS8otEtnIwVotxlE/DspdhJUWmePwA19CQbbqEcthyS2KnEmWVJcKUd9fEVqy+ejS7r
+         YW5RAEr/D0BUUNTP73t+MUbW8ZxD6re3fQxi3E2oHw0XgHAdapBRxJ8b5Q9DxagGWQDy
+         shsbaNlEBat1OBrHD8jBHBnExMLwSNGP2Fm9/2GRwTN186+3Y+QBvpiOqyOJM1VDaxyx
+         42Gwm4ziyK2DVcahTQYjvO0KZQ78qDC39MeZpTV+qcGCJxLgAXW2YYgyDo9KChvrswI1
+         jK2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWvNzRfj7HdcG8haV58CjNj3B7sGPI9/ARnmacTZM8cFEJbjNkI41lmMKoINpbjetbzy9+90m4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYb/CKmyHJAcVfnMVhzixnXGBKndtC2fovEl9PZ72opH9BUALy
+	/7kRbKMHZ6vJ+FMEHAiTo98J+UOphbiKNqwBpsig9EGMbDF6kq5cPARCShgcoQ==
+X-Google-Smtp-Source: AGHT+IFZua85gX9gwebbB6yQ3hldssx/0GepO83ztgnfFWjhClWK60xdFYL+sKiGOQ9xZi3RbSFRow==
+X-Received: by 2002:a05:620a:2909:b0:7b1:1cb8:198c with SMTP id af79cd13be357-7b1417abd25mr245389185a.4.1729036563568;
+        Tue, 15 Oct 2024 16:56:03 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1361726cfsm122192785a.47.2024.10.15.16.56.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 16:56:02 -0700 (PDT)
+Message-ID: <d5a7d26c-982b-49cd-8bc9-2f2c535af2e2@broadcom.com>
+Date: Tue, 15 Oct 2024 16:55:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: systemport: fix potential memory leak in
+ bcm_sysport_xmit()
+To: Jakub Kicinski <kuba@kernel.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Wang Hai <wanghai38@huawei.com>, bcm-kernel-feedback-list@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ zhangxiaoxu5@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241014145115.44977-1-wanghai38@huawei.com>
+ <0c21ac6a-fda4-4924-9ad1-db1b549be418@broadcom.com>
+ <20241015110154.55c7442f@kernel.org>
+ <ed541d60-46dd-4b23-b810-548166b7a826@broadcom.com>
+ <20241015125434.7e9dfb04@kernel.org>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20241015125434.7e9dfb04@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Gilad Naaman <gnaaman@drivenets.com>
-Date: Tue, 15 Oct 2024 16:59:26 +0000
-> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> index 61b5f0d4896a..dbfd27f79bb8 100644
-> --- a/net/core/neighbour.c
-> +++ b/net/core/neighbour.c
-> @@ -61,6 +61,19 @@ static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
->  static const struct seq_operations neigh_stat_seq_ops;
->  #endif
->  
-> +static int family_to_neightbl_index(int family)
-> +{
+On 10/15/24 12:54, Jakub Kicinski wrote:
+> On Tue, 15 Oct 2024 11:07:29 -0700 Florian Fainelli wrote:
+>>>> Since we already have a private counter tracking DMA mapping errors, I
+>>>> would follow what the driver does elsewhere in the transmit path,
+>>>> especially what bcm_sysport_insert_tsb() does, and just use
+>>>> dev_consume_skb_any() here.
+>>>
+>>> Are you saying that if the packet drop is accounted is some statistics
+>>> we should not inform drop monitor about it? 🤔️
+>>> That wasn't my understanding of kfree_skb vs consume_skb..
+>>
+>> Yes that's my reasoning here, now given that we have had packet drops on
+>> transmit that took forever to track down, maybe I better retract that
+>> statement and go with v1.
+> 
+> Sounds good, we can apply v1. Would you like to ack/review here?
+> 
 
-Let's return hlist_head * like this:
+Yes, now done, thanks!
+-- 
+Florian
 
-static hlist_head *neigh_get_dev_table(struct net_device *dev, int family)
-{
-	int i;
-
-	switch (family) {
-	case default:
-		DEBUG_NET_WARN_ON_ONCE(1);
-		fallthrough; /* to avoid panic by null-ptr-deref */
-	case AF_INET:
-		i = NEIGH_ARP_TABLE;
-		break;
-	case AF_INET6:
-		i = NEIGH_ND_TABLE;
-		break;
-	}
-
-	return &dev->neighbours[i];
-}
-
-
->  @@ -357,46 +371,45 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
->  			    bool skip_perm)
->  {
->  	int i;
-> +	struct neighbour *n;
-> +	struct hlist_node *tmp;
-
-nit: reverse xmas tree order.
-
-and cache hlist_head * from neigh_get_dev_table().
-
->  	struct neigh_hash_table *nht;
-
-nht is no longer used ?
-
-
->  
-> +	i = family_to_neightbl_index(tbl->family);
-> +
->  	nht = rcu_dereference_protected(tbl->nht,
->  					lockdep_is_held(&tbl->lock));
->  
-> -	for (i = 0; i < (1 << nht->hash_shift); i++) {
-> -		struct neighbour *n;
-> -
-> -		neigh_for_each(n, &nht->hash_heads[i]) {
-> -			if (dev && n->dev != dev)
-> -				continue;
-> -			if (skip_perm && n->nud_state & NUD_PERMANENT)
-> -				continue;
-> +	hlist_for_each_entry_safe(n, tmp, &dev->neighbours[i], dev_list) {
-> +		if (skip_perm && n->nud_state & NUD_PERMANENT)
-> +			continue;
->  
-> -			hlist_del_rcu(&n->hash);
-> -			write_lock(&n->lock);
-> -			neigh_del_timer(n);
-> -			neigh_mark_dead(n);
-> -			if (refcount_read(&n->refcnt) != 1) {
-> -				/* The most unpleasant situation.
-> -				   We must destroy neighbour entry,
-> -				   but someone still uses it.
-> -
-> -				   The destroy will be delayed until
-> -				   the last user releases us, but
-> -				   we must kill timers etc. and move
-> -				   it to safe state.
-> -				 */
-> -				__skb_queue_purge(&n->arp_queue);
-> -				n->arp_queue_len_bytes = 0;
-> -				WRITE_ONCE(n->output, neigh_blackhole);
-> -				if (n->nud_state & NUD_VALID)
-> -					n->nud_state = NUD_NOARP;
-> -				else
-> -					n->nud_state = NUD_NONE;
-> -				neigh_dbg(2, "neigh %p is stray\n", n);
-> -			}
-> -			write_unlock(&n->lock);
-> -			neigh_cleanup_and_release(n);
-> +		hlist_del_rcu(&n->hash);
-> +		hlist_del_rcu(&n->dev_list);
-> +		write_lock(&n->lock);
-> +		neigh_del_timer(n);
-> +		neigh_mark_dead(n);
-> +		if (refcount_read(&n->refcnt) != 1) {
-> +			/* The most unpleasant situation.
-> +			 * We must destroy neighbour entry,
-> +			 * but someone still uses it.
-> +			 *
-> +			 * The destroy will be delayed until
-> +			 * the last user releases us, but
-> +			 * we must kill timers etc. and move
-> +			 * it to safe state.
-> +			 */
-> +			__skb_queue_purge(&n->arp_queue);
-> +			n->arp_queue_len_bytes = 0;
-> +			WRITE_ONCE(n->output, neigh_blackhole);
-> +			if (n->nud_state & NUD_VALID)
-> +				n->nud_state = NUD_NOARP;
-> +			else
-> +				n->nud_state = NUD_NONE;
-> +			neigh_dbg(2, "neigh %p is stray\n", n);
->  		}
-> +		write_unlock(&n->lock);
-> +		neigh_cleanup_and_release(n);
->  	}
->  }
->  
-> @@ -672,6 +685,10 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
->  	if (want_ref)
->  		neigh_hold(n);
->  	hlist_add_head_rcu(&n->hash, &nht->hash_heads[hash_val]);
-> +
-> +	error = family_to_neightbl_index(tbl->family);
-> +	hlist_add_head_rcu(&n->dev_list, &dev->neighbours[error]);
-
-Let's use neigh_dev_get_table() directly.
-
-> +
->  	write_unlock_bh(&tbl->lock);
->  	neigh_dbg(2, "neigh %p is created\n", n);
->  	rc = n;
 
