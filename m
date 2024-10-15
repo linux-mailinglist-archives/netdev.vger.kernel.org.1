@@ -1,235 +1,315 @@
-Return-Path: <netdev+bounces-135776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAD499F2E5
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:41:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1C199F2E8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDF08B20FBE
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:41:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C26DC280E89
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118F21F7065;
-	Tue, 15 Oct 2024 16:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADBF1F76A4;
+	Tue, 15 Oct 2024 16:41:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AI19WCCq"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="k1Tq6ZbP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2042.outbound.protection.outlook.com [40.107.103.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8DA1B3931
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 16:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729010500; cv=none; b=jD7xvl9gcgpHCJ1PZZA3k96MXLUjeoFMddJUs/sOPyoPY/Y1QKE2/jj1Z+ggV/Xadids8eJPD+aidZyVTh2cU7tJiB4nVPAtSNFlV9ZRGkJ22TSEpbp2h1r0+Gsmo7Fqh1iwkQ3Uers0RjFkTqfgRn7I/bcbSDBDcqkCA8ro9I4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729010500; c=relaxed/simple;
-	bh=1RCvuv83jk4fBfbF/fCasfyo6o7vAPm6BJjDx/dVE1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ajPV+IDfVIK3KRav/oh7ibFHFTHyMQa3euPzKz9XdF+6iBmPBxddPtrHXE9h/JY6/ne/NS0imcRJk7aiB91DthI6NbA4o11AwWFUwOLPe+P/YD7NqvuRVo1t0t4ao9bXMUYMBdVpsBUYm3KJGbA7F+rw8KTISn+T2ivmyd4DRHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AI19WCCq; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729010498; x=1760546498;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1RCvuv83jk4fBfbF/fCasfyo6o7vAPm6BJjDx/dVE1A=;
-  b=AI19WCCqRWbf9I7CUOJqlO/O4yIoI00s9A5swg7B+cxT+uYkaCv1v5g3
-   xS0xGgTHU0LNiFkHYHsq0dIAiIwE3xtbwf48qkIXvAHw8uB2TXG4Pc989
-   24oRsYWxLkas9juumr3hX8EbrbJqIBz5Y12e5FxCI4D+IozFPrX7VZn2N
-   VGlOaGKCKvr4wLVukCxoWTIm2d1D3+o+6nbLeJ79nvARTNP0ubQzIqOSu
-   RCqGEzrigXj5LP2TVFLnnHxXZCFfYG53a6qGisjids1z8yjN8WuP3kxMa
-   ByXBfnTkTFR2SAzkSJKUU1uzrJhNfG+YxsKf+qiQZmXG1j86E95tn6EU3
-   g==;
-X-CSE-ConnectionGUID: ZRnehBAjR0+vomIF4rFzTA==
-X-CSE-MsgGUID: l+IaLB8QRB2MinQufCBvoA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="28547866"
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="scan'208";a="28547866"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 09:41:38 -0700
-X-CSE-ConnectionGUID: SczcHlVvR2aaw+M8ZU1KJQ==
-X-CSE-MsgGUID: MBS919D0RLCIncI6MSDq/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="scan'208";a="78131266"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 15 Oct 2024 09:41:36 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t0kc1-000Jcn-2i;
-	Tue, 15 Oct 2024 16:41:33 +0000
-Date: Wed, 16 Oct 2024 00:41:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	intel-wired-lan@lists.osuosl.org, aleksander.lobakin@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v11 09/14] libeth: move
- idpf_rx_csum_decoded and idpf_rx_extracted
-Message-ID: <202410160029.BdxyUZWz-lkp@intel.com>
-References: <20241013154415.20262-10-mateusz.polchlopek@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB531F7065;
+	Tue, 15 Oct 2024 16:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729010519; cv=fail; b=CbT8KlGeJO3PWeqAlnhS4go9fbIXToIPOD2Oc5yYzm445vxsJNOFXbr+T8qOpDGp18sQ5Foc0IGnjYJVqSeeOi3iVyHyVpaKS+UUVb4UMnJTY1Pe1lY5aAyQA3G3iZfAudThAR5Px74lHYfADRmZbWSytWAk5b0u8+5Wn7gkEf0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729010519; c=relaxed/simple;
+	bh=eQn7Maskr7kxSqqjSpK1WFuScrtI4YaqS2fe1Q8FOMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=J0gdACFgMLDIrWl82/sP6s2S3pPfzzQR6eJqbjmObra6hzWIoBO44mBxkCZKFukuc/Vr0Wx/uM3gdNd+asUCprKs0d9WEqiE+Gkm4VhUCmvgrNeNUwpJ4lYuIVmrUwpuPLggGGSGtw0k50qOBgYMObWVJn+3+LZ2OGoOykf3kB4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=k1Tq6ZbP; arc=fail smtp.client-ip=40.107.103.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XPE51g2NAaE755IXZNV+873Ru9+cc+zvrSGUBmtYw6EXgUVhvalhpTvibmfg72c3xsMLj37qH8OZW/4zrly7M1gC9P8rMFuL+YIk7oSFUuT81J6PXRUVuZiiGKpwSJRknLgXJqXx8daaY57ob0Ufa23AMqJAJbo1c9ypVeJQjeKQR9TmgON89sbsTqKS7Bv8VbZkFC+FSENtyLlKMNcmhx+l2ZHS2cAp7ZexW/kdS/6xC2/Cgkvql4EtpXoyKhPBKKlpb2qadL6iNLls0JzMnl+TdSqE0YCqI4yP7fCn5dnRLD0zJatQP0Nq/AbRxpmToAyIoIEg9UH9D+/JmFD35w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3TX4oDaZ/mWRRsvQ8S7wor13K/u+Ko9ElOs1Qv3apEQ=;
+ b=C/JFCQLJldQVUaJSX9opduDA2ao4hPu1RV4/JPOXB+w1BcaVU5IovQHsYAH9TEQLnAHSlvCD+9nt+EY6atwj8o6KoYXxlqXhNEdbCLKbPXf3OMUHdqfll4d302/7K/WkN1hFzT9IwPzIimY7Bsqh0EP266HkSB5BGEEkrTMcF10Vkx5CIEsYwBC3PGet6AXVlHfFaWa62GFO5N4UpFHbHhWBw6ZlaJkpca/tjQHAT+e/Sacf4PeJUwQ2UQzRbCASkumWkx4eLJLc8Z6IA13bc0SAcMKMr2i7n8OOoCuukIQfOhwqRTQbTt7qPSybOcjl2t+gY8Ij0qSfvyJhVkOL6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3TX4oDaZ/mWRRsvQ8S7wor13K/u+Ko9ElOs1Qv3apEQ=;
+ b=k1Tq6ZbPy4nQUcTGvsvrVJvBrI4MelRzBHbkuf3bpP9T9bmhRsxBy3kaNO3tEYU571EwzJuuvRrWUJSKfadO4m0RQvJ6OE4gCv4giMqLuTEWdjlxAjYPSJTVtrjNGT2gbyXM/i6w0Y/EyL6807NEsPugmOGoUQmhit8EV/pZZtGyZuMtJk+CMaOo2X+XbuCYqCTVALigNfB2MCVQse10MOmeXG0xO6A2msnbVoKvMiQ6l4ZHR+XKKDH7ypVCCNfDRwbjqrogBVOzdFfkYnjtnYWXPXPeRZoMJx6w6G+UvUQT2ytVC1Fvz8cHxObLBiSFLO03YXMU3VE0uCcL0GWQRw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by AM0PR04MB6787.eurprd04.prod.outlook.com (2603:10a6:208:18a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.27; Tue, 15 Oct
+ 2024 16:41:54 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%4]) with mapi id 15.20.8069.016; Tue, 15 Oct 2024
+ 16:41:52 +0000
+Date: Tue, 15 Oct 2024 12:41:43 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com, horms@kernel.org, imx@lists.linux.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 07/13] net: enetc: only enable ERR050089
+ workaround on LS1028A
+Message-ID: <Zw6bR0L9tBOhQWkE@lizhi-Precision-Tower-5810>
+References: <20241015125841.1075560-1-wei.fang@nxp.com>
+ <20241015125841.1075560-8-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015125841.1075560-8-wei.fang@nxp.com>
+X-ClientProxiedBy: SJ0PR13CA0116.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c5::31) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241013154415.20262-10-mateusz.polchlopek@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|AM0PR04MB6787:EE_
+X-MS-Office365-Filtering-Correlation-Id: 165d286b-f877-48c5-8b56-08dced3845a4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|52116014|1800799024|376014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AHnl1TSulsBf481ozWGkTVkiivkE1Rq8jjegq3Wy1P3vmwf3yXMMiI9jZ9ZJ?=
+ =?us-ascii?Q?kwmknLCzD8DhVeWsah/rvTrL4CacWtHbz3EOFwEyWcqE6B3O4/JClAlPdaDW?=
+ =?us-ascii?Q?idbmOy5+KLnkvH7RFUtoqVJTgQu6ISzX7sq4Eil0Q2J7ybj+JID4EwEBrfU+?=
+ =?us-ascii?Q?JuvuWDVpUEGhSPiUKb1hSvwBycedwOt314mqnA89MHzsqPPSW9GXygSMuTs2?=
+ =?us-ascii?Q?smskCHI8ZIerZ6+V6tAfqcDEnHGzACu5qj3fgPgT6ZekpMETAzPu8qQya/Mr?=
+ =?us-ascii?Q?NfePnDC7IHYwdB2u9qF+38Z3Y5BqOpiY8HllrG5f4IzFj0rHRBnEt8GTYFs2?=
+ =?us-ascii?Q?XAo+2MvydJ5dbG4IpeGcHX61F0R84EBDGUJc4ARJjclKKn9bcFKe4PRJ0u5I?=
+ =?us-ascii?Q?wb7MoX9yS2v5p3EJEwSS+LVfEDuB4igctEotGR2gJzdKJAZg+qYAd5UceepB?=
+ =?us-ascii?Q?PNdX7QHC0Srf1U2Y0s+pW8KYZFbm/ufCaMobJEPfs+JtLPfDOT1cP+8EqPLO?=
+ =?us-ascii?Q?ybeU3hDNDpfw2vXEvwCR8M2X5D+5yk8cQqekf7iB8eWMr/g22Cn8J0sD8S7E?=
+ =?us-ascii?Q?Eoo1zwwRv+s7gEvK4ZTQ0PpjrAkxLEwytqigLXRXCDtQhWZgLBFpfGTPWwNc?=
+ =?us-ascii?Q?5Tc5tZJNSwBlDpji7bmkqaq1d+/I6Ko4nkk8dLuJWYTjqGuOcSfO6TvDKQiu?=
+ =?us-ascii?Q?oxhS33/PYhfN9MGEeVbu2C9i9ode/oj/VZFP3g74HfEClP5cXEg5OkhEzHkz?=
+ =?us-ascii?Q?lOAqv6usN3DNhs5R31X7OevURTVqclCRQXraUwzf1wFukWlN8B5LWCAkNIB7?=
+ =?us-ascii?Q?RqvIXNWNWZ1ZpeVel7jzjNSzopNQbAT9s4epZqbRtIGaPQM+T560Oj9i6COb?=
+ =?us-ascii?Q?d2PYfYksWG05etf42GeR9km2PB3UKZwwibjQLa2+KdUpyWTR+NBgOYxT6EnY?=
+ =?us-ascii?Q?B3H3I04/lwkldRvWpRpg2ZcOHmJERk28yKFYcgsTXfqpVZnqT4ArjgsZVaRi?=
+ =?us-ascii?Q?SAFQWuckdZOG9RwU0TcTnJQATp6Tqzp0KuX2C7HxUjJVXti8wdidp/7Jz5dQ?=
+ =?us-ascii?Q?qOu7nkxMiqgDC0vb8MyxTU+xA060DK3vkEntgnQXg/0RjL2MsPz2vza5wbEW?=
+ =?us-ascii?Q?lnqM9IH4Ip3OE4Hg6Wh0KSoe97lkmY4a2117qvdcf0xHxLdPfxwDOGxqBSE8?=
+ =?us-ascii?Q?kyK2cfVQL7PyD2pA0U9eXpR5fu0rgkFtOsbvK/5g/QpxNZnquiC4w5ZIVJJ3?=
+ =?us-ascii?Q?XZUFjBmwCy6fgZOqaHcq07hilBaiqi0Hv9TbB2jZfWomjUfXHG8769tSHFhO?=
+ =?us-ascii?Q?dbGPAfAIKv4mAIPZciWPkaelVIdEmW2XcZyvGpvjXdQkFw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(1800799024)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?huZw3A+eVn53YuFq7BPPqG5cCEeJM5oGxjAef+z7lh8BfnQpown5ZZ8XHnRt?=
+ =?us-ascii?Q?7hGPtMDShKIwBEswZgKd75TkmeSKeI/xS3Ct1E2LfgWFm9ncm+vOo09+c3V8?=
+ =?us-ascii?Q?SBrqcn/P10Lde+lvunxgUtmdVNt13chv/ot55zvphq4iR2rcJzJmjLeEEWHQ?=
+ =?us-ascii?Q?mwugyBCk2HQQsIqVIRCE2C6gDEQot31xLItLvdZprrua7Izdrq2Yi59cItq4?=
+ =?us-ascii?Q?jD04Sku+SSfip4Zj0l420qfPRfbt5GEkkX1vsZund0thlA6oOKseeg91RRN2?=
+ =?us-ascii?Q?L1r9B+0B/M1DF7YsjRX3YZNWGPtyDjNPqIBeZ1uIK3CQ2dar/JRhqBHK+TFz?=
+ =?us-ascii?Q?V9UZztsRB5b+t7HcjK+RpxedDp218ZbaiqoF22ikvYhpbdyjnA7GDuLZeROC?=
+ =?us-ascii?Q?Hq+1k2FHFzRyDB0shRicYHR3dAOvoxJyLXoUxgf61Earhzb+CIVoxKVJanBU?=
+ =?us-ascii?Q?tZeBXNhGjvmFwrK1fR+Dz9nuykx6ipwsaJY/PIgXmBawBKdi150Gkf560PIL?=
+ =?us-ascii?Q?stio+6Ku2SV9LSG1hlZ/dh59uLqwjKoOMQvLKN/7tvzYDXkQesbV2Ljq744P?=
+ =?us-ascii?Q?DqU7ZOqs9+sGpPfFJw9PvPWkHZDgvWoDZ4tyifB4W9g/MXiAUwSWkN82tF44?=
+ =?us-ascii?Q?LC5InTe9iDOphl6ZZOYFS4SIftWxtFUBh1hwre0bwyquRvOgcnP0ML17a1Tr?=
+ =?us-ascii?Q?owPHBBVu2dYkvop0TQdY0KuQH74juNJVwVvjCpNz/gVKWrhZGXYq/ZZNy0Pl?=
+ =?us-ascii?Q?voN0bxKQfr3viTbW8AaaAj2BmLKfyAy1UQUc4qxm7VdFrwxt9omDpPJl0gC/?=
+ =?us-ascii?Q?w+wCWZJ0rrqpurpQR4Q4nKP27Pf+bADEZqZabs1q+rReVeohdAY+jHZqsdQt?=
+ =?us-ascii?Q?iqp5UkiTxeC2mZvQUpbjUNgvlqL3XQCHyB0M8nvSmtz6TewBZrFUPCxKChxS?=
+ =?us-ascii?Q?P7tXp1RUoCJDXknihC0KP0/k7gVzG+xRN82Z7iL2wC/PPqIugyRHpKjZMgL5?=
+ =?us-ascii?Q?bC0rpnnHn12Bv2bT1gQ+fMafgbwbKPDu46BDaRr69xKee2aLq40yLvLirn5B?=
+ =?us-ascii?Q?MQ763K9skRXRFZ9yj9CTF8ghjKVZn7BM5aJ777xtaz1PBHT8w7c1RcZ0ARi+?=
+ =?us-ascii?Q?KA4DmTXaBblls4+RwVUAq4/6sFbFarnOGM4sBfjXPJ0M8TbdE7ZaTJAmKbZB?=
+ =?us-ascii?Q?8X2yyWpyTJpA7KrU4SLpmkMfzdlPeYn83CXXbwq3hEEG3ikEP6faEu0ysUvO?=
+ =?us-ascii?Q?YLqWHfKxhL4NQk/nFYmPlltQd14xWw3e/2LsKA3KBWbmXermIN/fV58HY8GZ?=
+ =?us-ascii?Q?laSkEd5bnHztUSFhJn1yjbTfE/xYb4Kbm5U3N3Vs2HSO/BgR1J6woSxQ68l8?=
+ =?us-ascii?Q?RKit5cnEjVED66RUNsO8FIlqBsUNgPrxuvOU0kVC7sgfdrWebG7ROSj1mL6J?=
+ =?us-ascii?Q?PVUbJSVF1i325bH1epbywMT+KuRvukVoSp47H668WSd+NxJY8XEvI8GTXQkT?=
+ =?us-ascii?Q?1vTd+y3YPGnL/gb8pkhWAdhMHTBZHr7aCi2ciKv/AInSXcDxFtn9+r7wgJbL?=
+ =?us-ascii?Q?EZjEGIOZGtlP2rD1aVUEGJyyjq051NMdwYdtKv11?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 165d286b-f877-48c5-8b56-08dced3845a4
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 16:41:52.3832
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ma/0+HxvgLDvFaAb9MwZ0OF12EahGNInaJ5s2wA0cQCEmu2m1XDH+bY7/d5wgggcLxhPhFT9E+fkY1XcQhszuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6787
 
-Hi Mateusz,
+On Tue, Oct 15, 2024 at 08:58:35PM +0800, Wei Fang wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+>
+> There are performance issues associated with the ERR050089 workaround,
+> as well as potential functional issues (RCU stalls) under certain
+> workloads. There is no reason why new SoCs like i.MX95 should even do
+> anything in enetc_lock_mdio() and enetc_unlock_mdio(), so just use a
+> static key so that they're compiled out at runtime.
 
-kernel test robot noticed the following build errors:
+Remove ERR050089 workaround for i.MX95
 
-[auto build test ERROR on a77c49f53be0af1efad5b4541a9a145505c81800]
+The ERR050089 workaround causes performance degradation and potential
+functional issues (e.g., RCU stalls) under certain workloads. Since new
+SoCs like i.MX95 do not require this workaround, use a static key to
+compile out enetc_lock_mdio() and enetc_unlock_mdio() at runtime, improving
+performance and avoiding unnecessary logic.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mateusz-Polchlopek/virtchnl-add-support-for-enabling-PTP-on-iAVF/20241014-174710
-base:   a77c49f53be0af1efad5b4541a9a145505c81800
-patch link:    https://lore.kernel.org/r/20241013154415.20262-10-mateusz.polchlopek%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-next v11 09/14] libeth: move idpf_rx_csum_decoded and idpf_rx_extracted
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20241016/202410160029.BdxyUZWz-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241016/202410160029.BdxyUZWz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410160029.BdxyUZWz-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c: In function 'idpf_rx_singleq_clean':
->> drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c:1040:78: error: expected ';' before 'napi_gro_receive'
-    1040 |                 idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc, ptype)
-         |                                                                              ^
-         |                                                                              ;
-   ......
-    1043 |                 napi_gro_receive(rx_q->pp->p.napi, skb);
-         |                 ~~~~~~~~~~~~~~~~                                              
-
-
-vim +1040 drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-
-   954	
-   955	/**
-   956	 * idpf_rx_singleq_clean - Reclaim resources after receive completes
-   957	 * @rx_q: rx queue to clean
-   958	 * @budget: Total limit on number of packets to process
-   959	 *
-   960	 * Returns true if there's any budget left (e.g. the clean is finished)
-   961	 */
-   962	static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
-   963	{
-   964		unsigned int total_rx_bytes = 0, total_rx_pkts = 0;
-   965		struct sk_buff *skb = rx_q->skb;
-   966		u16 ntc = rx_q->next_to_clean;
-   967		u16 cleaned_count = 0;
-   968		bool failure = false;
-   969	
-   970		/* Process Rx packets bounded by budget */
-   971		while (likely(total_rx_pkts < (unsigned int)budget)) {
-   972			struct libeth_rqe_info fields = { };
-   973			union virtchnl2_rx_desc *rx_desc;
-   974			struct idpf_rx_buf *rx_buf;
-   975			u32 ptype;
-   976	
-   977			/* get the Rx desc from Rx queue based on 'next_to_clean' */
-   978			rx_desc = &rx_q->rx[ntc];
-   979	
-   980			/* status_error_ptype_len will always be zero for unused
-   981			 * descriptors because it's cleared in cleanup, and overlaps
-   982			 * with hdr_addr which is always zero because packet split
-   983			 * isn't used, if the hardware wrote DD then the length will be
-   984			 * non-zero
-   985			 */
-   986	#define IDPF_RXD_DD VIRTCHNL2_RX_BASE_DESC_STATUS_DD_M
-   987			if (!idpf_rx_singleq_test_staterr(rx_desc,
-   988							  IDPF_RXD_DD))
-   989				break;
-   990	
-   991			/* This memory barrier is needed to keep us from reading
-   992			 * any other fields out of the rx_desc
-   993			 */
-   994			dma_rmb();
-   995	
-   996			idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields, &ptype);
-   997	
-   998			rx_buf = &rx_q->rx_buf[ntc];
-   999			if (!libeth_rx_sync_for_cpu(rx_buf, fields.len))
-  1000				goto skip_data;
-  1001	
-  1002			if (skb)
-  1003				idpf_rx_add_frag(rx_buf, skb, fields.len);
-  1004			else
-  1005				skb = idpf_rx_build_skb(rx_buf, fields.len);
-  1006	
-  1007			/* exit if we failed to retrieve a buffer */
-  1008			if (!skb)
-  1009				break;
-  1010	
-  1011	skip_data:
-  1012			rx_buf->page = NULL;
-  1013	
-  1014			IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
-  1015			cleaned_count++;
-  1016	
-  1017			/* skip if it is non EOP desc */
-  1018			if (idpf_rx_singleq_is_non_eop(rx_desc) || unlikely(!skb))
-  1019				continue;
-  1020	
-  1021	#define IDPF_RXD_ERR_S FIELD_PREP(VIRTCHNL2_RX_BASE_DESC_QW1_ERROR_M, \
-  1022					  VIRTCHNL2_RX_BASE_DESC_ERROR_RXE_M)
-  1023			if (unlikely(idpf_rx_singleq_test_staterr(rx_desc,
-  1024								  IDPF_RXD_ERR_S))) {
-  1025				dev_kfree_skb_any(skb);
-  1026				skb = NULL;
-  1027				continue;
-  1028			}
-  1029	
-  1030			/* pad skb if needed (to make valid ethernet frame) */
-  1031			if (eth_skb_pad(skb)) {
-  1032				skb = NULL;
-  1033				continue;
-  1034			}
-  1035	
-  1036			/* probably a little skewed due to removing CRC */
-  1037			total_rx_bytes += skb->len;
-  1038	
-  1039			/* protocol */
-> 1040			idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc, ptype)
-  1041	
-  1042			/* send completed skb up the stack */
-  1043			napi_gro_receive(rx_q->pp->p.napi, skb);
-  1044			skb = NULL;
-  1045	
-  1046			/* update budget accounting */
-  1047			total_rx_pkts++;
-  1048		}
-  1049	
-  1050		rx_q->skb = skb;
-  1051	
-  1052		rx_q->next_to_clean = ntc;
-  1053	
-  1054		page_pool_nid_changed(rx_q->pp, numa_mem_id());
-  1055		if (cleaned_count)
-  1056			failure = idpf_rx_singleq_buf_hw_alloc_all(rx_q, cleaned_count);
-  1057	
-  1058		u64_stats_update_begin(&rx_q->stats_sync);
-  1059		u64_stats_add(&rx_q->q_stats.packets, total_rx_pkts);
-  1060		u64_stats_add(&rx_q->q_stats.bytes, total_rx_bytes);
-  1061		u64_stats_update_end(&rx_q->stats_sync);
-  1062	
-  1063		/* guarantee a trip back through this routine if there was a failure */
-  1064		return failure ? budget : (int)total_rx_pkts;
-  1065	}
-  1066	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> v2 changes: no changes
+> ---
+>  .../net/ethernet/freescale/enetc/enetc_hw.h   | 34 +++++++++++++------
+>  .../ethernet/freescale/enetc/enetc_pci_mdio.c | 17 ++++++++++
+>  2 files changed, 41 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> index 1619943fb263..6a7b9b75d660 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> @@ -396,18 +396,22 @@ struct enetc_hw {
+>   */
+>  extern rwlock_t enetc_mdio_lock;
+>
+> +DECLARE_STATIC_KEY_FALSE(enetc_has_err050089);
+> +
+>  /* use this locking primitive only on the fast datapath to
+>   * group together multiple non-MDIO register accesses to
+>   * minimize the overhead of the lock
+>   */
+>  static inline void enetc_lock_mdio(void)
+>  {
+> -	read_lock(&enetc_mdio_lock);
+> +	if (static_branch_unlikely(&enetc_has_err050089))
+> +		read_lock(&enetc_mdio_lock);
+>  }
+>
+>  static inline void enetc_unlock_mdio(void)
+>  {
+> -	read_unlock(&enetc_mdio_lock);
+> +	if (static_branch_unlikely(&enetc_has_err050089))
+> +		read_unlock(&enetc_mdio_lock);
+>  }
+>
+>  /* use these accessors only on the fast datapath under
+> @@ -416,14 +420,16 @@ static inline void enetc_unlock_mdio(void)
+>   */
+>  static inline u32 enetc_rd_reg_hot(void __iomem *reg)
+>  {
+> -	lockdep_assert_held(&enetc_mdio_lock);
+> +	if (static_branch_unlikely(&enetc_has_err050089))
+> +		lockdep_assert_held(&enetc_mdio_lock);
+>
+>  	return ioread32(reg);
+>  }
+>
+>  static inline void enetc_wr_reg_hot(void __iomem *reg, u32 val)
+>  {
+> -	lockdep_assert_held(&enetc_mdio_lock);
+> +	if (static_branch_unlikely(&enetc_has_err050089))
+> +		lockdep_assert_held(&enetc_mdio_lock);
+>
+>  	iowrite32(val, reg);
+>  }
+> @@ -452,9 +458,13 @@ static inline u32 _enetc_rd_mdio_reg_wa(void __iomem *reg)
+>  	unsigned long flags;
+>  	u32 val;
+>
+> -	write_lock_irqsave(&enetc_mdio_lock, flags);
+> -	val = ioread32(reg);
+> -	write_unlock_irqrestore(&enetc_mdio_lock, flags);
+> +	if (static_branch_unlikely(&enetc_has_err050089)) {
+> +		write_lock_irqsave(&enetc_mdio_lock, flags);
+> +		val = ioread32(reg);
+> +		write_unlock_irqrestore(&enetc_mdio_lock, flags);
+> +	} else {
+> +		val = ioread32(reg);
+> +	}
+>
+>  	return val;
+>  }
+> @@ -463,9 +473,13 @@ static inline void _enetc_wr_mdio_reg_wa(void __iomem *reg, u32 val)
+>  {
+>  	unsigned long flags;
+>
+> -	write_lock_irqsave(&enetc_mdio_lock, flags);
+> -	iowrite32(val, reg);
+> -	write_unlock_irqrestore(&enetc_mdio_lock, flags);
+> +	if (static_branch_unlikely(&enetc_has_err050089)) {
+> +		write_lock_irqsave(&enetc_mdio_lock, flags);
+> +		iowrite32(val, reg);
+> +		write_unlock_irqrestore(&enetc_mdio_lock, flags);
+> +	} else {
+> +		iowrite32(val, reg);
+> +	}
+>  }
+>
+>  #ifdef ioread64
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
+> index a1b595bd7993..2445e35a764a 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
+> @@ -9,6 +9,9 @@
+>  #define ENETC_MDIO_BUS_NAME	ENETC_MDIO_DEV_NAME " Bus"
+>  #define ENETC_MDIO_DRV_NAME	ENETC_MDIO_DEV_NAME " driver"
+>
+> +DEFINE_STATIC_KEY_FALSE(enetc_has_err050089);
+> +EXPORT_SYMBOL_GPL(enetc_has_err050089);
+> +
+>  static int enetc_pci_mdio_probe(struct pci_dev *pdev,
+>  				const struct pci_device_id *ent)
+>  {
+> @@ -62,6 +65,12 @@ static int enetc_pci_mdio_probe(struct pci_dev *pdev,
+>  		goto err_pci_mem_reg;
+>  	}
+>
+> +	if (pdev->vendor == PCI_VENDOR_ID_FREESCALE &&
+> +	    pdev->device == ENETC_MDIO_DEV_ID) {
+> +		static_branch_inc(&enetc_has_err050089);
+> +		dev_info(&pdev->dev, "Enabled ERR050089 workaround\n");
+> +	}
+> +
+>  	err = of_mdiobus_register(bus, dev->of_node);
+>  	if (err)
+>  		goto err_mdiobus_reg;
+> @@ -88,6 +97,14 @@ static void enetc_pci_mdio_remove(struct pci_dev *pdev)
+>  	struct enetc_mdio_priv *mdio_priv;
+>
+>  	mdiobus_unregister(bus);
+> +
+> +	if (pdev->vendor == PCI_VENDOR_ID_FREESCALE &&
+> +	    pdev->device == ENETC_MDIO_DEV_ID) {
+> +		static_branch_dec(&enetc_has_err050089);
+> +		if (!static_key_enabled(&enetc_has_err050089.key))
+> +			dev_info(&pdev->dev, "Disabled ERR050089 workaround\n");
+> +	}
+> +
+>  	mdio_priv = bus->priv;
+>  	iounmap(mdio_priv->hw->port);
+>  	pci_release_region(pdev, 0);
+> --
+> 2.34.1
+>
 
