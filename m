@@ -1,93 +1,72 @@
-Return-Path: <netdev+bounces-135904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B3F99FBB7
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:49:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275E499FBBA
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:50:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 073F41C236F5
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:49:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C692C283A99
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A363B1FDF83;
-	Tue, 15 Oct 2024 22:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C481B0F1D;
+	Tue, 15 Oct 2024 22:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3cn6/KQ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WExCpSnd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E68E1FBF7B;
-	Tue, 15 Oct 2024 22:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A82146A9B
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 22:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729032519; cv=none; b=IslLNKrpqylcLl1YDPan07na/iKY1OAkTwVAgqfcJdE2I1xS3uv86gF6D3MhdVbzjdutRonuhWO07gEzghgKn1Lp7b50ycIoqcZKZCWaGRNJHpQof11g2DN4yC5r4xEjXoOiBxbUBPP9NRmKrLc84eZTkuGC/Au9Xc+qrJtzfss=
+	t=1729032611; cv=none; b=BdSPT3Q8VAtPPFVhYnl6iUqsyyIPxmPnrQXUOVpg8XJzqa4QhpfesOjmvCmSedfTca+xPuAN0a4gv3E+YFv8UK/tIZJAjoGCKUjBqy/Oz7ALJQV60t5Gti78EDN7mSEK978EVqyg8nwNBL3zd5O1/bRo52SGnZILP9ayOpKE0+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729032519; c=relaxed/simple;
-	bh=6fug8UcZA31z1WDHRjCaQNBPXIA2Ym99No37vjGAAvo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hGXefg3KaTEtbGBcISf2Dzgy8Fuve7hwYczEDcoqFxtpTfg01ha9SbnH9nuP4rKMzjGk8bS03ZClldIGGh7N1Z92FyOb9Me6rnK6USmf+y3M9TDNv8EcGhOlZEhr9o7fI/PZKLvCbc89MkxOxHU7mG4o6yhKd/lLrggr9jaefJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3cn6/KQ; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20cdda5cfb6so28220235ad.3;
-        Tue, 15 Oct 2024 15:48:38 -0700 (PDT)
+	s=arc-20240116; t=1729032611; c=relaxed/simple;
+	bh=VNCuWU0HqA5n/81+4GrsgERgsjUDkBUQVw4NYjtaZOs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NN3shxDEv4hXvjWZK6xGsCNXqG4CPwiFmzKf6BEmGRAs34rzOaTyfWMvrpAMgxmn43HkzQH5VGiq4xIAunL7YkVuiIecWEBzqUsn2mR3SzkAKyxtfwrIKIta86nEaAka+IgUfxrcEnlVZVoCzPk8qD9aL03v1PJrqvSumCAiwBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WExCpSnd; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729032517; x=1729637317; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jhopaATavFb8v8R1JjsKVC6ma8QBMUL6hqdDjaAqBYI=;
-        b=G3cn6/KQ8OYnoKOs0Hqpq9VH4sTsgVZ4a6SHnIOWGbUi0PZvIiBAAfEOxt1Gz/Yrd4
-         68itHcuBvyCOZTVy0bhQbpzM4RiY9o8TZScE8nRCEuweg8FD/nM0/drHaszRJnCQWcKe
-         2GbfL+GQChXOy7ZM4rrKb522Jkpv+YewVw+TjJS8DJCrxQ87+ejij0GEvvir50wW47zj
-         jTT+0/+sUVp+fAuSLUc3QcxTSslv692QbA4ZE7z9X6wY5+Vn0VzWWN5/efChCvPO2Y7K
-         daY5D9RXnJV96ErAgHgMhRUcYOwiLEyP4zOPKXHo3Bme3bF5sd2cIJHCIQcdTKw/pJcP
-         9YYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729032517; x=1729637317;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jhopaATavFb8v8R1JjsKVC6ma8QBMUL6hqdDjaAqBYI=;
-        b=Y8IuNEwrmBEVVeH+vL5gXtmpWC87reqnqEsXRbijHZlFNEwcy/UE42SbfLAIjYSFUD
-         h+zL4TwI+8Etw/m8eiyL2EJt4W+f+4HdvNl8Qmd1MV2AIUjnEBhC/7AyN24BAoQFw1p+
-         kHCNL13tbMJEegUQ9zLADOK5/y3L+bbs+Sg4YsKi+tyIQzv2yw4ahx1n3XkJU4PbqARW
-         /DuwYuSJJZ/P4UQJ+49J9gR1to3wijDpjuGIG3+uct19VyUywIs6v15LjO3OFmL2Px2q
-         SiKwo5nxuRiosPWoC/2Ycj9qyVq5xzJnS7Yq8GVpdcQUTDMzOD3yVsLdFYJqWXpZ5mw+
-         pO+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVM/YaZHFqhFQ1Ildmu8jOn6n49sPyrQPHLxeJ1PgeInjQ6eMCPQKmxNcUNiFlSGEyYN4l7PYDmiVXvqbg=@vger.kernel.org, AJvYcCVO4atZnWcC8VvJfIBrhUeNSBiT7xUYxiB/ANt3lgdrlHeS/+76LRYbqJ18UuenGreqEbKy4xMx@vger.kernel.org, AJvYcCXeLAKgMxDk+E2qMysYMMkJrBoPzQ71yA5mGqZRn86Sq75zWSCh16IqJr/bWXR9dDHSIDuutXx0k6WkPw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdAiBPjPv8ceR/vIkuIHdbumOn2g78XoJJQkG5Rd3oKMiSujVJ
-	EWsftRAXRehOQwLeZLBSo3cqFaaDJcsb6siRDpeXBNW0Vda6jr6y
-X-Google-Smtp-Source: AGHT+IGB7TcN1tpZ+LTRdXOjO2Zpt63vGVNmdoYU7qqqJYSD2RKOb3BCwhuqjOA1pTX+2q1UBAg4ag==
-X-Received: by 2002:a17:903:32c8:b0:207:15f4:2637 with SMTP id d9443c01a7336-20ca142a227mr190912615ad.12.1729032517513;
-        Tue, 15 Oct 2024 15:48:37 -0700 (PDT)
-Received: from debian.resnet.ucla.edu (s-169-232-97-87.resnet.ucla.edu. [169.232.97.87])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20d180366fdsm17205465ad.128.2024.10.15.15.48.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 15:48:37 -0700 (PDT)
-From: Daniel Yang <danielyangkang@gmail.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: danielyangkang@gmail.com,
-	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-Subject: [PATCH v3 2/2 RESEND] resolve gtp possible deadlock warning
-Date: Tue, 15 Oct 2024 15:48:05 -0700
-Message-Id: <c2ac8e30806af319eb96f67103196b7cda22d562.1729031472.git.danielyangkang@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <cover.1729031472.git.danielyangkang@gmail.com>
-References: <cover.1729031472.git.danielyangkang@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729032609; x=1760568609;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=g9wy9Z76PFDQQRGVzsoxvB9UOmWjIcRqmyQPNolJ9M8=;
+  b=WExCpSndJDMVky4Q0NR3/s/G+KgLjYEk+wEUdQlXeAbvDHwhMsmvzGTc
+   X8HdNaoCVULj0ZvC+7tgpQPGcWQK9YyuFVmpcTHbZhBnPlbaZBSihfsml
+   ACkEN99oJ59/G1OnzGfrxp4RuqT8K+7v3iodgsFiRO4Zrjj364AkDwmp3
+   o=;
+X-IronPort-AV: E=Sophos;i="6.11,206,1725321600"; 
+   d="scan'208";a="431749836"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 22:50:05 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:8396]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.142:2525] with esmtp (Farcaster)
+ id f80a93eb-0f49-4855-bf2d-bb4f73007ac4; Tue, 15 Oct 2024 22:50:05 +0000 (UTC)
+X-Farcaster-Flow-ID: f80a93eb-0f49-4855-bf2d-bb4f73007ac4
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 15 Oct 2024 22:50:04 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 15 Oct 2024 22:50:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnaaman@drivenets.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 1/6] Add hlist_node to struct neighbour
+Date: Tue, 15 Oct 2024 15:49:58 -0700
+Message-ID: <20241015224958.64713-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241015165929.3203216-2-gnaaman@drivenets.com>
+References: <20241015165929.3203216-2-gnaaman@drivenets.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,66 +74,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Daniel Yang <danielyangkang@gmail.com>
+From: Gilad Naaman <gnaaman@drivenets.com>
+Date: Tue, 15 Oct 2024 16:59:21 +0000
+> @@ -531,7 +533,9 @@ static void neigh_get_hash_rnd(u32 *x)
+>  static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
+>  {
+>  	size_t size = (1 << shift) * sizeof(struct neighbour *);
+> +	size_t hash_heads_size = (1 << shift) * sizeof(struct hlist_head);
+>  	struct neigh_hash_table *ret;
+> +	struct hlist_head *hash_heads;
+>  	struct neighbour __rcu **buckets;
+>  	int i;
 
-Moved lockdep annotation to separate function for readability.
+nit:
 
-Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
-Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+While at it, please sort variables in reverse xmas tree order.
+Same for other places.
 
----
- net/smc/smc_inet.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
 
-diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
-index 7ae49ffd2..b3eedc3b0 100644
---- a/net/smc/smc_inet.c
-+++ b/net/smc/smc_inet.c
-@@ -111,18 +111,7 @@ static struct inet_protosw smc_inet6_protosw = {
- static struct lock_class_key smc_slock_keys[2];
- static struct lock_class_key smc_keys[2];
- 
--static int smc_inet_init_sock(struct sock *sk)
--{
--	struct net *net = sock_net(sk);
--	int rc;
--
--	/* init common smc sock */
--	smc_sk_init(net, sk, IPPROTO_SMC);
--	/* create clcsock */
--	rc = smc_create_clcsk(net, sk, sk->sk_family);
--	if (rc)
--		return rc;
--
-+static inline void smc_inet_lockdep_annotate(struct sock *sk) {
- 	switch (sk->sk_family) {
- 		case AF_INET:
- 			sock_lock_init_class_and_name(sk, "slock-AF_INET-SMC",
-@@ -139,8 +128,21 @@ static int smc_inet_init_sock(struct sock *sk)
- 		default:
- 			WARN_ON_ONCE(1);
- 	}
-+}
- 
--	return 0;
-+static int smc_inet_init_sock(struct sock *sk)
-+{
-+	struct net *net = sock_net(sk);
-+	int rc;
-+
-+	/* init common smc sock */
-+	smc_sk_init(net, sk, IPPROTO_SMC);
-+	/* create clcsock */
-+	rc = smc_create_clcsk(net, sk, sk->sk_family);
-+	if (!rc)
-+		smc_inet_lockdep_annotate(sk);
-+
-+	return rc;
- }
- 
- int __init smc_inet_init(void)
--- 
-2.39.2
+>  
+> @@ -540,17 +544,28 @@ static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
+>  		return NULL;
+>  	if (size <= PAGE_SIZE) {
+>  		buckets = kzalloc(size, GFP_ATOMIC);
+> +		hash_heads = kzalloc(hash_heads_size, GFP_ATOMIC);
+> +		if (!hash_heads)
+> +			kfree(buckets);
+>  	} else {
+>  		buckets = (struct neighbour __rcu **)
+>  			  __get_free_pages(GFP_ATOMIC | __GFP_ZERO,
+>  					   get_order(size));
+>  		kmemleak_alloc(buckets, size, 1, GFP_ATOMIC);
+> +
+> +		hash_heads = (struct hlist_head *)
+> +			  __get_free_pages(GFP_ATOMIC | __GFP_ZERO,
+> +					   get_order(hash_heads_size));
+> +		kmemleak_alloc(hash_heads, hash_heads_size, 1, GFP_ATOMIC);
+> +		if (!hash_heads)
+> +			free_pages((unsigned long)buckets, get_order(size));
+>  	}
+> -	if (!buckets) {
+> +	if (!buckets || !hash_heads) {
+>  		kfree(ret);
+>  		return NULL;
 
+If buckets is NULL and hash_heads isn't, hash_heads is leaked.
+
+
+>  	}
+>  	ret->hash_buckets = buckets;
+> +	ret->hash_heads = hash_heads;
+>  	ret->hash_shift = shift;
+>  	for (i = 0; i < NEIGH_NUM_HASH_RND; i++)
+>  		neigh_get_hash_rnd(&ret->hash_rnd[i]);
 
