@@ -1,94 +1,105 @@
-Return-Path: <netdev+bounces-135829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43E999F4E0
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 20:10:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B035499F515
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 20:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 995F128471C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:10:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 664A41F23C2A
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C42920822B;
-	Tue, 15 Oct 2024 18:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159961FC7CB;
+	Tue, 15 Oct 2024 18:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsNmSnfO"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Akl35Y1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0961FC7DB;
-	Tue, 15 Oct 2024 18:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB4F1F9EA8;
+	Tue, 15 Oct 2024 18:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729015826; cv=none; b=WvV3FbHU/4+lXaVe+562Lq7OoWCWC3L5Nsg0xbHS+vLHSnSbrTtWztDCUEdz6h2Yoqgq9rTUwmovL9U4hURMQeUsO/xLvY4HbJZlq6SYuLcB/w2l5oLyZvIzOY4HhjdZ4Nwh3BIqviDRza5jk1bPdIHpnhloTjBxwVon1n5s0UE=
+	t=1729016426; cv=none; b=Dhib6LN4U1T5SKPdbE5o+M6tQ/cRdX3MtNukTTp9aXWkYXOod5V6YyNIvZ0y2dDbLOGUpxaYEmTqeBqJAFT5+lw4IrA1XBN3/fqitU4z4qMjjQFk/mI0cNpGKasT/tW+UVbeifSQyW+TKMDl/DPO3B4Aa7dJs8s24HRydWNkOYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729015826; c=relaxed/simple;
-	bh=yzfmLFfW7KRae6EsSLqq5M5XQcSSL4FeQhWYFB1EXr0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gTr3pCl8Yb/EX8+9VctpiyZ6u+TDe47y8reFZF0JXuESa4PEQKQPbSwaVk99G5YnJLhiZ8ZoIugNhs9v29A/1XFj1RDrx08lbr5EsnEV88LyipLhpWoAKVY4IzsLGhnVJsz3KXl0AAkBTj0rptUZCIHtzRVRM1Ze9JXzTtO+1uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsNmSnfO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BADEAC4CED2;
-	Tue, 15 Oct 2024 18:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729015825;
-	bh=yzfmLFfW7KRae6EsSLqq5M5XQcSSL4FeQhWYFB1EXr0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DsNmSnfOeD42upxuYWaCx5RVUrFb4b/pbtWCbwM1gNUOEwj+Zo8oe4XELbPYYYs8N
-	 HdACqxE4m/wPhcwpu+8TB6+0/L+NiyDQhPbOC0gB1RCgaqAg5z5qMr4e+CCPBjmGjm
-	 upWhqr9JaT/XWE/VXFL14ZcoTeOoDd2vWOjbyrbDuKOvaNhfgji50935EtmSk6qndJ
-	 liPYYmW/wR0inv3+oeryfOkksEdqjW2GK537nvyEVWTs0TU9jO8thAaLSnNpbMB7bM
-	 jXVIYbSbDJPCXCV8dtbTwAOR1CDhVoBW2mEUHgEoFZqG7b1bIuUQV6Krpzkyv69pKF
-	 sthTsh9IuWlhw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AD03809A8A;
-	Tue, 15 Oct 2024 18:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729016426; c=relaxed/simple;
+	bh=xlJulwgFadsww1fxuY/kdqupOC+XrWysfnSRy7xGE1Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gwaZBxRDNPAatMbty44qAWO217sYDJWkNhq/uwkYGLlW6gqz5sH7qs2NL0BPFSiKP2/AQMKS5OvyY3lTfiwHr8Hx9itONUSGGqeYT5uz4RUn5o/ewOVd/qSqf8ILHR8MxIICd4YYSmJ2uSLc36Zf1vfGYXVE+k1fxvPuWd0O/gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Akl35Y1N; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1729016421;
+	bh=xlJulwgFadsww1fxuY/kdqupOC+XrWysfnSRy7xGE1Q=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Akl35Y1Nf6JAV23EHQ1lKZaz2LzFQPmujxrUcTdcGTTOaBPjJ8YCMZcR+C5u+ccCQ
+	 pta/nIQ+eJPSQPO03pogjoFtXgeO7S5rStsaS+F4gu0BosaQp9iZAMLVh9Vb72NzOE
+	 fx4sJ/G97bpMsQgchqabMQkeCDoThib27vDXb/IhacuIo07CLOa6tZo1MVIwewk5pV
+	 RHAj/IKzk12H/0h2inkDyCQpPdH9S61r+OXw3l0IWs+filtdSLUAOZ6gUj3tZ6K4mi
+	 nGIBf3Dwefwn+oCkzJI53nPKmoStF8h+LpjZ6tYKCiJubkwvRDWeCL5qfWA650pcZz
+	 O3MWQ2fo6LomQ==
+Received: from [192.168.1.206] (pool-100-2-116-133.nycmny.fios.verizon.net [100.2.116.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: nfraprado)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id DAFC417E3687;
+	Tue, 15 Oct 2024 20:20:19 +0200 (CEST)
+From: =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>
+Subject: [PATCH 0/2] Enable Ethernet on the Genio 700 EVK board
+Date: Tue, 15 Oct 2024 14:15:00 -0400
+Message-Id: <20241015-genio700-eth-v1-0-16a1c9738cf4@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: xilinx: axienet: fix potential memory leak in
- axienet_start_xmit()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172901583074.1246543.12469731603853856024.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Oct 2024 18:10:30 +0000
-References: <20241014143704.31938-1-wanghai38@huawei.com>
-In-Reply-To: <20241014143704.31938-1-wanghai38@huawei.com>
-To: Wang Hai <wanghai38@huawei.com>
-Cc: radhey.shyam.pandey@amd.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
- andre.przywara@arm.com, zhangxiaoxu5@huawei.com, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-B4-Tracking: v=1; b=H4sIACSxDmcC/x3MQQqAIBBA0avIrBNGK4WuEi3EJp2NhkYE4d2Tl
+ m/x/wuVClOFRbxQ6ObKOXWoQYCPLgWSvHeDRj0pVLMMlDhbRElXlHrWI067s8Z46MlZ6ODn361
+ bax/KJmqpXgAAAA==
+X-Change-ID: 20241015-genio700-eth-252304da766c
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Richard Cochran <richardcochran@gmail.com>
+Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>, 
+ Jianguo Zhang <jianguo.zhang@mediatek.com>, 
+ Macpaul Lin <macpaul.lin@mediatek.com>, 
+ Hsuan-Yu Lin <shane.lin@canonical.com>, Pablo Sun <pablo.sun@mediatek.com>, 
+ fanyi zhang <fanyi.zhang@mediatek.com>
+X-Mailer: b4 0.14.2
 
-Hello:
+The patches in this series add the ethernet node on mt8188 and enable it
+on the Genio 700 EVK board.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The changes were picked up from the downstream branch at
+https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-mtk/+git/jammy,
+cleaned up and split into two commits.
 
-On Mon, 14 Oct 2024 22:37:04 +0800 you wrote:
-> The axienet_start_xmit() returns NETDEV_TX_OK without freeing skb
-> in case of dma_map_single() fails, add dev_kfree_skb_any() to fix it.
-> 
-> Fixes: 71791dc8bdea ("net: axienet: Check for DMA mapping errors")
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> ---
->  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 2 ++
->  1 file changed, 2 insertions(+)
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+Nícolas F. R. A. Prado (2):
+      arm64: dts: mediatek: mt8188: Add ethernet node
+      arm64: dts: mediatek: mt8390-genio-700-evk: Enable ethernet
 
-Here is the summary with links:
-  - [net] net: xilinx: axienet: fix potential memory leak in axienet_start_xmit()
-    https://git.kernel.org/netdev/net/c/99714e37e833
+ arch/arm64/boot/dts/mediatek/mt8188.dtsi           | 95 ++++++++++++++++++++++
+ .../boot/dts/mediatek/mt8390-genio-700-evk.dts     | 25 ++++++
+ 2 files changed, 120 insertions(+)
+---
+base-commit: 7f773fd61baa9b136faa5c4e6555aa64c758d07c
+change-id: 20241015-genio700-eth-252304da766c
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Nícolas F. R. A. Prado <nfraprado@collabora.com>
 
 
