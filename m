@@ -1,103 +1,99 @@
-Return-Path: <netdev+bounces-135474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EAA499E0C4
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBBAD99E0CE
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:19:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D1AA1C21A49
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:18:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04E841C21BE9
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78141CACF9;
-	Tue, 15 Oct 2024 08:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD90E1C9ED5;
+	Tue, 15 Oct 2024 08:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="XB+ebulV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BXS5pQbn"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8692518A6A9;
-	Tue, 15 Oct 2024 08:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B201AC887
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 08:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728980309; cv=none; b=pzeFLtT/E8aq7KOvq5gtLMBqah6hpPksLmz0gpqaw9xC2EkV7ueYUIaxDk3a/coPCkVEOOALXO43Vy9mCKpBRm2hwRoa0q3U/09Pz1NtZ0nJRnqXW9jcHlVsX2ZsYCBsJBVF+DfK0iw1w51dF7eEgDqaVUAGxfIlYNHL6Kyz2oA=
+	t=1728980349; cv=none; b=P0s+kHGLgcPd7m5EVoiF4Q5ybB8WJdiDWKdY3sfnhXvlpaUt0YYOHTmE+EH5+7IIzs5NWHevU5xLmbsIfHeSRRsSnjgnO2IcwpVMg/A0EoIfCP1/BN9rcGAbh2P3578r4XRgeLRRRpc21fGNKC3J73dkfZLU++9kNVv/3sYHneM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728980309; c=relaxed/simple;
-	bh=NbHr+sWsDbevorbbFL4J6SWjgNNZ/c1Zpl7MLnFkww8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UTk7SLrX/+uG5zMiqyDX0wFPb3osVNj14+tS2Ro0qZuiqNYRE4HVGu9gKFYcpmsInHYptBqT4d/880s9c+/h8g92y2wL1iQwaypHYgvwnFHZ423pTSokyPxOhJ6vDALXWp4maLVl+sNMewFL0mCJbPz7LPopyFArClAR78y8w00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=XB+ebulV; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=y+olST8w9L1bmQWPvzyB/DLsZjm8Pf3Fnd+REUY4aOQ=; b=XB+ebulVCajAqXaxMgX/MKVrqq
-	lA7o3FZP43feVJV9Ul2yrWBLfPf9RjMpY7QIOLjcf+i+/nUyiV9H1KRUEA+vdYzjEO12BCJZd16np
-	tX5dL4xQIMjTeCur1G3N6g7q7F6FJqD8Wv5pNoXTuzjFu1rI7llYzM15DxOGsGLw7Grs=;
-Received: from p54ae9bfc.dip0.t-ipconnect.de ([84.174.155.252] helo=Maecks.lan)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1t0ckm-0091io-0H;
-	Tue, 15 Oct 2024 10:18:04 +0200
-From: Felix Fietkau <nbd@nbd.name>
-To: netdev@vger.kernel.org,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: ethernet: mtk_eth_soc: fix memory corruption during fq dma init
-Date: Tue, 15 Oct 2024 10:17:55 +0200
-Message-ID: <20241015081755.31060-1-nbd@nbd.name>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1728980349; c=relaxed/simple;
+	bh=36Vb0vpil/W1GB9wbmMtavb0r0T9tdrzR8pFMEvtzXw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QmyQcDGKuOan0HQ1lNJ950i+LEhu/ZD5EwmqVTP3K8gav22esIF8NBXhQFSr3XuawB5y+0id2aux4bHs+ZGqkx3Htgak8z52Vzz7bLw52c/zYGMS6YuaP9JflxXLwnHG3r+oKYcaJ1EPLTtPX4uV1lFHTeA6haXDTkIRCSC973U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BXS5pQbn; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c42e7adbddso6715056a12.2
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 01:19:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728980346; x=1729585146; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=36Vb0vpil/W1GB9wbmMtavb0r0T9tdrzR8pFMEvtzXw=;
+        b=BXS5pQbnwgX1iqERnIGwFXQh8gCSNfflBx0FEmpwakpgSw7cGa3rUfTODqrfEy2RH8
+         jsPHAlTIo1KPfLim2DNxg8to1G7PdXZ9uR2biJjQ5HUYr6jHAysYuZNVY/lqaBBJEH6k
+         356935f6qs0cXGu2o3e8NObG2bekd/3YXCEts4rR/O7Y/+VbaWFXnDDPdQHSBnQLB2W9
+         SFeCoXscH5wWwIkwabvNskQSJ5UQRQ3zwNXdpIqpBqMKIDMTat1rqLXTrphfXqstsbDn
+         vgwj6oFLF2IRvUUAzJdTbj7ngi/43p9iu4mZo1aKcWdwspCJEj6IwJLkfwqsvXjGwoJc
+         noqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728980346; x=1729585146;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=36Vb0vpil/W1GB9wbmMtavb0r0T9tdrzR8pFMEvtzXw=;
+        b=KsW+ZmGS2GijDiTlxLpwLZjcaMf5SXyyG60UEkwUI5p1ZjOOusoAT4qiXNlLhr8GGp
+         ZyRb4X+ULq9CfLScajnvS5UCqbwe4LrEkoKMbXEqVPrcuDeUiuZSKzxnUpk2Q7DTP5AV
+         UHRx+1V1WlW8EQxV36izV1pWJJefdT9mnQpAymXRIchcAS1MN38cA8KgEK+lYYQ2dy2C
+         iE6IgFdSoI0Bv3TLgs/nyswEtM59G5s4w8vcpytfyN0HrE9MkoWfXLm7BGdFy1lKj/3G
+         RbeNJKHOOkSIcoQLvW3o+uzvouN63MOh6BU64GhcvBRlWSW/MKZ/TL+pvGqsjz+5cIBP
+         DX0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVp72uKG29KJXQ4vyYu8l6bcXctUbGa0hUmd3NhG0u8aYbtLOGU1gHFyeuDDo2GhE/4P6PDPRY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxStXhBmKpmugSivu+2ihAT9uuUIh56KtjfnUhM2R5Btd8WzTXE
+	TOS1V+eIEbAuODx8hlK2E7XE3T5ApIQus+YEv4voIObU8WOKjc0ki8qcDimulmB37flwOlGO1vY
+	25Un6MQUjn0hLR8TF8BPtKq18NU5iNVP0gRwx
+X-Google-Smtp-Source: AGHT+IHADN5dwSmG0g+5Pkc5Qa/YKxgfwpzwEulr95hVJlfLpoVkvx2e8qSZXLd7exkY00AkOFcowpjF3M6fi2+mZs4=
+X-Received: by 2002:a05:6402:40c3:b0:5c8:9e36:ccaf with SMTP id
+ 4fb4d7f45d1cf-5c95ac506famr6552322a12.33.1728980346156; Tue, 15 Oct 2024
+ 01:19:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-8-kuniyu@amazon.com>
+In-Reply-To: <20241014201828.91221-8-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 15 Oct 2024 10:18:53 +0200
+Message-ID: <CANn89iJH2huEOznHbxwzhzObK2e4U5TP1VjtP9ROQ7FC+VuKng@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 07/11] ipv6: Use rtnl_register_many().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The loop responsible for allocating up to MTK_FQ_DMA_LENGTH buffers must
-only touch as many descriptors, otherwise it ends up corrupting unrelated
-memory. Fix the loop iteration count accordingly.
+On Mon, Oct 14, 2024 at 10:20=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+>
+> We will remove rtnl_register_module() in favour of rtnl_register_many().
+>
+> rtnl_register_many() will unwind the previous successful registrations
+> on failure and simplify module error handling.
+>
+> Let's use rtnl_register_many() instead.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Fixes: c57e55819443 ("net: ethernet: mtk_eth_soc: handle dma buffer size soc specific")
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 16ca427cf4c3..ed7313c10a05 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -1171,7 +1171,7 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
- 		if (unlikely(dma_mapping_error(eth->dma_dev, dma_addr)))
- 			return -ENOMEM;
- 
--		for (i = 0; i < cnt; i++) {
-+		for (i = 0; i < len; i++) {
- 			struct mtk_tx_dma_v2 *txd;
- 
- 			txd = eth->scratch_ring + (j * MTK_FQ_DMA_LENGTH + i) * soc->tx.desc_size;
--- 
-2.47.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
