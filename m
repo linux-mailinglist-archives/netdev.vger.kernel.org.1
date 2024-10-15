@@ -1,86 +1,84 @@
-Return-Path: <netdev+bounces-135406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9821F99DBEE
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:55:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D682E99DBF4
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:58:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1165BB21805
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:55:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 065131C2197F
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C946C156F30;
-	Tue, 15 Oct 2024 01:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11C6157A48;
+	Tue, 15 Oct 2024 01:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVXbgdHs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZa2auGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A72156C40;
-	Tue, 15 Oct 2024 01:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9D417BD3;
+	Tue, 15 Oct 2024 01:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728957342; cv=none; b=eYuIxyjZPJVK4sSbAm3PE8/MldIRpLKCxu7cRHi+Wrh4hmBLnGDpsAC3s+yeGsC3/l7avFaQDsLs567D1V0s3vYXV/CQZjlPeodcp1vKgweJf/E/8JX14n33G4nALHijbYTrsjpXSanE6PHEImfrkH0zMTaMcY/N8K64dijnF3I=
+	t=1728957531; cv=none; b=A9gNmdSPt4SSnb/2hP9BKaB1Deepl8qE9v1aKXBWMs57adTX7PwEYqRPzDwh6wnDyXLmpkfV5hfSUCKYwxui3q3Fwil3erzyTQR7rZFbG2OAmtMvbsc8YVUfdRwE5JNLLRBMafjG009j+QuH0NUq3e5MMLgRIIbPzPwni6DLbEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728957342; c=relaxed/simple;
-	bh=DM7a1CGfKtDxyz/KOOYehbWVMXU/1JLpdOAKi0rkUe4=;
+	s=arc-20240116; t=1728957531; c=relaxed/simple;
+	bh=/0gsE0u6DA07Za63Ru15AVvJ6inJaTvSPG8xjdYV7Vw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VF7VcdIttAGBHyxZqCTy6KGrgh9iyqOrpadfZ1sPUXLjgx5ltY3HBNPvEOg5ixXJTZLqqXE3KL6WeYVVZIGzS8z0XjwfddvGFlsYlW8+ssf7IuUXSCSpd7fDqjUju6cDPtSgMuQwclnieqm2dYRnQ5LQKWd6peCDi2lA1XhzijU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LVXbgdHs; arc=none smtp.client-ip=209.85.128.195
+	 To:Cc:Content-Type; b=aLTU8OqcOgnVBy0O816B8vSMFHIE7WxCYll+cPIKvI63nXiiAShTyn7NjsjAoRLvt549xae/sAy8EG87TCxTH7kfV+87hrUANAWaevYT93HOSjpqHksR5R+Q2rr8ZPF8yytNa4ubcIxlMzQyZ7V+Nw0kq/FdqM9j0+89sWrQirs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bZa2auGt; arc=none smtp.client-ip=209.85.128.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-6e2e41bd08bso50313927b3.2;
-        Mon, 14 Oct 2024 18:55:40 -0700 (PDT)
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-6e35f08e23eso23820517b3.2;
+        Mon, 14 Oct 2024 18:58:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728957339; x=1729562139; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728957529; x=1729562329; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FQHynSk+TGPwk975UzGx2hiDb6Ij1y1by+5kqLU/s4g=;
-        b=LVXbgdHson+FqiVeTCi5QI9kxbd+ESuebXgtaVaQFsJS42ncJDZ/0lOkmIUPesTMXU
-         xAw1d2QWvajNeEKOquFNCuTLOVZnv8itra2UoxbVgyADeezcOHxR41bx+jLnCPHIZj30
-         NclzJ3zTLgNXJcENc6E/wui/1ift4DZQTMXArZi201RuoCWxkxe0+kv+6w9JfZapmfRB
-         NO4d4uZVPpHAyBqXA6+w7Hi9cbL0crkFBLrOS2CooT1XmgVyoUBQmW0Uf2nWK1KvQqzF
-         9HFs0o6j9y3oG2cTudGKKeyJrk+fC7gE0YnPVfqRNJ6r1jMl0RTHfBBRqKHHKHM8k70n
-         z6FQ==
+        bh=5gsbhtgFL9eLe0z8N0+DuikAHWepswx4QLWPWc7s490=;
+        b=bZa2auGtFOzIuMVcgs/HMeX0gnpK8WKxkfCxEYaYYuyNUvFT+bUDja5e5Z1LMs1F8P
+         A4J8Z6sGZvPjlTEF+zTWvePlzdcJxhd+XONVh/vCzRO8P6z/cyYD89pJK02eR++iRwJh
+         cnchso0h9BzKAwqnIe3vq12fOcWfwHAJ5UEKCd69GY0RjVE53VmfRfdCue6vTRdtbvwN
+         a+PFY+MEgg2sRJ6QkuCgJk0AL9STYByYoqjD2E7fHn7qE+c+2rDpKLUncIE52lb83f72
+         5vJbM1qaabTv0clHQFvQ/mgY652ozVdek+pb5ibgi3XUuXMzDkKIMqcvtZX8slVGupZ6
+         j9Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728957339; x=1729562139;
+        d=1e100.net; s=20230601; t=1728957529; x=1729562329;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FQHynSk+TGPwk975UzGx2hiDb6Ij1y1by+5kqLU/s4g=;
-        b=e6Z280xwnprtj/RHzjQl/4eXlnKsgBVhi+3QggJy9AUb6JwlXg5Bgd8p7BsVS15pDR
-         6jjFGuYFhRds0txSRO6IOaGcxGi7BmfjmCx9ZT5ho8imcvUx7I9NogXVt60xTEVvYSYu
-         njO3QG5h8Uw5/L2sgCud7YAs9FuguDTDfYxBio8qosl+HthbYT+sQw3EMsaU+OKK4B8V
-         gH2PgUoLbiOuVy92t2hzb+2VD1m2cWwIWygCFGanry6uxVvdow+7Efv4v1cOEkYj6o27
-         JJhNKVIzXq9RJtzXxuTcT41I/uWu+9CaUuQ5XfacnxJO7W8vrS1IuamkvCTWL5W0+9TC
-         ndRA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIhckuI63Ix3BPFJIaujQHhAUpWJfINTk2PZ+4zUW/pZ+Qfb2dUGHhkFuINfCUsMlkP+mHq138@vger.kernel.org, AJvYcCX8prDqMuzqHzy5RXSsND7Kp7T0kiWaAakLHGjGgSbAqxzXY2uzeq/Nf5AqRPtNOdZMqG7IPUX60IQvKGE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/81OAXeAUuFnir1+hkXHjw0Je/ilIlC/tBpzWyQgtc53wh86Q
-	VGypTA72/FXVHC2uNbqaAw5tUUSTszhPgdXG1HGR2iJ7dwt7C3l38cPF0tTXRrNbmTsrl8tTMMs
-	mLu/YKznur6faXEAyuzzfsnth8o0=
-X-Google-Smtp-Source: AGHT+IEVtP/rrgxKTWfJ5xT6Asy25uJs+Mj+/cIC3Qkep5p33ak9DVjFpxxWfnBV03ktv/Pr8f6FBeITm1sslePxnKA=
-X-Received: by 2002:a05:690c:9a06:b0:6e3:1903:5608 with SMTP id
- 00721157ae682-6e36415dabcmr79398177b3.21.1728957339210; Mon, 14 Oct 2024
- 18:55:39 -0700 (PDT)
+        bh=5gsbhtgFL9eLe0z8N0+DuikAHWepswx4QLWPWc7s490=;
+        b=R27cGlBtG7cvLhMXAx7y7rH4nWD+UBm9/I7bYrNFNH8Wb0dhhTGEV/OjpeOGRI7X69
+         gWV+pvFtaJnd8+pup+lurpLcthE0b2cTM/D9YsOgCO9QqEgSML21aGa0YXdoWX4BOQiv
+         +25P/rn0qOKkVSPzg584cTBQROQkEVHWrW/GJ6WSmth8Kl8yEbJ/NFzMQf2mnvMzEU9B
+         a5GvKsS2RYefMWnLOiaROyC0EJY5ndP9Xsf38IR6L/qOjjvt0WkfxZBcUKws4JnWyGEP
+         PvekareymlYe1n/Xe1egtcGd9ipF/19iFKZ0mo5NNMPhBC0/2eXHSt/reDMPP4GGF7lK
+         /JCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTVjpfs/u+nNPOn9h61i2tLRAc3YbXakVbc1qHLsJUzehTaP5fu0hCvn8fnO0slP0icwszck3TnM6B5f4=@vger.kernel.org, AJvYcCVAU8veTDu3Giz3pEBxyEMuKRBGYjNODGlymUTigC2G3fTiXAGkETeaDV/XqJ9vLdlFJN/pH1aU@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBg1tQyolqIg4P4DHrnGMKllO/+ehJvB5okrCdytzCXHb0hL7f
+	+mZMY/fPlWWM8jz8eIMjFZ8u3UojNHDqceFAsubafBBVc2zKsUfGLHOBlFn79iSGmkC01n1APCM
+	gcO/0LSgSiGKDVei96L1rIuocXIw=
+X-Google-Smtp-Source: AGHT+IGRZLtUEZQRlXhNx/Bhkj2AdycqIRHwyIudTb83MPZjUuvtaZzUc9GdH+lXrWIoqSULqp1foFsjRPw4QyhPKvA=
+X-Received: by 2002:a05:690c:289:b0:6e3:23df:cc25 with SMTP id
+ 00721157ae682-6e347b185d0mr99036847b3.26.1728957529235; Mon, 14 Oct 2024
+ 18:58:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009022830.83949-1-dongml2@chinatelecom.cn>
- <20241009022830.83949-9-dongml2@chinatelecom.cn> <ZwvAVvGFju94UmxN@shredder.mtl.com>
- <CADxym3Yjv6uDicfsog_sP9iWmr_Ay+ZsyZTrMoVdufTA2BnGOg@mail.gmail.com> <Zw09Gs26YDUniCI4@shredder.mtl.com>
-In-Reply-To: <Zw09Gs26YDUniCI4@shredder.mtl.com>
+References: <20241009022830.83949-1-dongml2@chinatelecom.cn> <20241014172158.382fb9c9@kernel.org>
+In-Reply-To: <20241014172158.382fb9c9@kernel.org>
 From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Tue, 15 Oct 2024 09:55:39 +0800
-Message-ID: <CADxym3YHMOe8VfO0sPr8rPOBL+KhT2_DBoby5HUkBDNDOZCtYw@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 08/12] net: vxlan: use kfree_skb_reason() in vxlan_xmit()
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: kuba@kernel.org, aleksander.lobakin@intel.com, horms@kernel.org, 
+Date: Tue, 15 Oct 2024 09:58:48 +0800
+Message-ID: <CADxym3a3OQ0tuxXT+i=BORVo69btM+XNUWmwCrUjs_pZtUuOsg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 00/12] net: vxlan: add skb drop reasons support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: idosch@nvidia.com, aleksander.lobakin@intel.com, horms@kernel.org, 
 	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
 	dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com, 
 	gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com, 
@@ -89,44 +87,24 @@ Cc: kuba@kernel.org, aleksander.lobakin@intel.com, horms@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 11:47=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> w=
-rote:
+On Tue, Oct 15, 2024 at 8:22=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> On Mon, Oct 14, 2024 at 08:35:57PM +0800, Menglong Dong wrote:
-> > On Sun, Oct 13, 2024 at 8:43=E2=80=AFPM Ido Schimmel <idosch@nvidia.com=
-> wrote:
-> > >
-> > > On Wed, Oct 09, 2024 at 10:28:26AM +0800, Menglong Dong wrote:
-> > > > Replace kfree_skb() with kfree_skb_reason() in vxlan_xmit(). Follow=
-ing
-> > > > new skb drop reasons are introduced for vxlan:
-> > > >
-> > > > /* no remote found for xmit */
-> > > > SKB_DROP_REASON_VXLAN_NO_REMOTE
-> > > > /* packet without necessary metadata reached a device which is
-> > > >  * in "external" mode
-> > > >  */
-> > > > SKB_DROP_REASON_TUNNEL_TXINFO
-> > > >
-> > > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > > Reviewed-by: Simon Horman <horms@kernel.org>
-> > >
-> > > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> > >
-> > > The first reason might be useful for the bridge driver as well when
-> > > there are no ports to forward the packet to (because of egress filter=
-ing
-> > > for example), but we can make it more generic if / when the bridge
-> > > driver is annotated.
-> >
-> > You are right. As we already need a new version, so we can
-> > do something for this patch too. As you said, maybe we can rename the
-> > reason VXLAN_NO_REMOTE to NO_REMOTE for more generic
-> > usage?
+> On Wed,  9 Oct 2024 10:28:18 +0800 Menglong Dong wrote:
+> > In this series, we add skb drop reasons support to VXLAN, and following
+> > new skb drop reasons are introduced:
 >
-> "NO_REMOTE" is not really applicable to the bridge driver as there are
-> no remotes, but bridge ports. I'm fine with keeping it as is for now and
-> changing it later if / when needed.
+> Looks like DaveM already applied this (silently?)
 
-Okay!
+Yeah, the bot didn't notify me this time :/
+
+> so please *do* follow up on Ido's reviews but as incremental patches
+> rather than v8
+
+Okay, I'll send new patches to fix the comment of vxlan_snoop(),
+and use SKB_DROP_REASON_VXLAN_VNI_NOT_ FOUND in
+encap_bypass_if_local().
+
+Thanks!
+Menglong Dong
 
