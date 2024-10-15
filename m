@@ -1,123 +1,162 @@
-Return-Path: <netdev+bounces-135686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0543199EE07
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:43:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F4699EE19
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:46:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37AE01C2117D
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:42:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5631C211A6
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D811C07F7;
-	Tue, 15 Oct 2024 13:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F6E824A0;
+	Tue, 15 Oct 2024 13:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uX00nqRb"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bH2f/BKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A5D1C07CC;
-	Tue, 15 Oct 2024 13:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39FD1FC7C3
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 13:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728999628; cv=none; b=CRPqQgcXYko0uyCHqUOnDYOa6q3AlpeIJM6t/cIKbSmBCUwI4ZQ+TXN9VbTdGsdoihjYFg6mb/e+pYgF83I03wF9IXvYGIoZTSnoVhRy8hxYJhOxJwBWa0Kox316+ZHHuZs/1KvhCwJrwI8EYaoLddNxnf8XJky6IPSafrlS8C0=
+	t=1729000005; cv=none; b=sNOfKLxRrbbX53rsZGgnq4K3Mz4nELrdpsUci4Yhq5+bJJy1LBgqVG12QleZfjI5W3C5ucuEWzG/Hy6OJIrUIp83rYHO3dXsOW8c7gtaxZiJD7HIvww1nOvFK3O9Fa5OO8xGzottPLFASo/trWlzRJGPZOyI06dC2tiX0LjrS04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728999628; c=relaxed/simple;
-	bh=+eg5Ogets9SiLlYwP2uE1cyuHarfu0eMJpCc1LNOyZk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ug4MgT8fgB7kMq9hVseVE0EAWTXXezthk4GuhW0dcHjEoxnkLzY9RRTsKpoyfXf+6y4CbmDdFdnsdJ3+Ydizvu4VqhbFM6nlobQVoUO3lTsdULFp1bdrbcGGFtxlV2vm83tT/Iq/RhDT5Eu1hrDnVpRLuvgIyWIraeoWWUSSLQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uX00nqRb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D07C4CEC6;
-	Tue, 15 Oct 2024 13:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728999626;
-	bh=+eg5Ogets9SiLlYwP2uE1cyuHarfu0eMJpCc1LNOyZk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uX00nqRbj0TEG1Tz8shbGOT2WxuN/MzsJ0/O8D6fMk7nTY7nynwkrPoV5Izq1912G
-	 MCNxilzGTiCcfUAS5pjSXwW6q3cRG/BW6D6YbtnmlO0q+fhZtWAV8iW5Tl912r9gZP
-	 jE929Z//XzSjfIYVBdbbV+yN6bRsMcoaXu9P5SmP/HpGUsX8oWRvpS3y/CHIagsxmZ
-	 wSs02+S5+DmmcEkoZwbxu00ArbFRTvF91bDqH9pPk66sN6FjSlgd1oE0CGyqAvnLq/
-	 xoAmzPiMCVa7yA7fqt68pGzpMEomnxnAVW+/H1RaLmsld8vRk3GlFiM5j84R4We9bm
-	 NTYamxloL6Fqw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B943809A8A;
-	Tue, 15 Oct 2024 13:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729000005; c=relaxed/simple;
+	bh=q62JnlpGvQrNlL5bd2tboYXBr4WTw0avkPIpj98C1ss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VuOsbbLGali7T09/LxPszmPl2GGHf0mUa7DQcYFiGybdVUFYu3+etAsGWpCrBVSZnaPnG5xhnPJJtb9QzMAEEjCkT4qKyy8OWa8XCUAQxB6c9B7A5xbfNXvFApGhEOJNF+Dp2svqqwsEWqJsy1LVzswnJJFsLSWLZX7a0hPDwug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bH2f/BKR; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2883e3f5419so2007527fac.1
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 06:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1729000003; x=1729604803; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+cS+yYy++qjTT7dM/j+ez5JiqVIlQGcvtkUSzcKR6nA=;
+        b=bH2f/BKRZM2mAmWAyZ8uwkvL2rs8uO4nY2Oz4ZfnwdXWPVASOT2rqg02OAcxCaFZ+E
+         up5eknN28DbyIzwWeGPSDG1d35z1V0DhbYHGF+Uij9Gn20b5RXEKVq7/lvEFlhInt055
+         tx0Bpwzr1Ra/Nb+L2Obus9IKzqq4vSyC3YkGxTmX8YZ733cQJCP8LdlezMgU+jjjVhIB
+         o249CUQhp+41euHfpuhcKz/qbyzf/nbvWv1m2d6xR4JkNmwzI0TvjxxLyWDroulkCK9O
+         YSXLu13EUWlWnguyBhrIMW+AL6YFrZ1wAod3LYvmZ7gBzmB7HB44lIbuEsM2ECdMQSKI
+         QSxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729000003; x=1729604803;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+cS+yYy++qjTT7dM/j+ez5JiqVIlQGcvtkUSzcKR6nA=;
+        b=PpYmqRewbGz3R87rfaqCtNLgn0Of6WuTdWxzugHNzSGcGXLC3Po/pluMI6nH3383Ws
+         /ZJEB0i8JbbQ3N/ZqWa2KSoeefqNiDihoMqiSKc2ERJDbbGX0VAyhNeRPKILQbTa096a
+         I8z0P/+IGhdAvxpmDdocrUsI1bG0Tunru/u89BYyKc50v0GnQMR+OTJRWihYT0XFgHgT
+         zqToExzFU232RNlsC3AicRTCmg6+jjBRMtgPUSd1QLO7Qv0szM4bHKtgB8cAk1JoFFCc
+         PQPB1/zmx8CpQWv25HyiVjcIr65NAFe2ZIT34j1aYne5cfNEbxYr7wP37SmH2FCqgj7h
+         i3UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJzdjDakkqXT30gs/2fZrJtn/Y7HffKpiIJUXhCnHpJ6Ch72XH2SNirbtKgcgBN+/Z8m0d1W4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs8dSSuzQFB2DmXcpU1iRqgOpPuNsfBnlbvBvSBw9ik7PZhYv8
+	E2lXPcboBfPpP/YrTlMHlSRK4bc1KIyCQQ+cLJ8wrcF+yexYGUHgp/t4ea1nHW3TFs44DZDbO91
+	VuvvA5s/vS/UP2rHgrz03+NO7Y6ePvKxWK21gFQ==
+X-Google-Smtp-Source: AGHT+IEYlnTWfFWQ/I/EEX0CtwI4n+u4/5Onk4nA64oS/h4StMzYNdzAJiuW3+5Y0RW1u/msH971/mQA4eRlCU2fCQk=
+X-Received: by 2002:a05:6870:56a5:b0:284:ff51:58ad with SMTP id
+ 586e51a60fabf-2886ddfbf2cmr11429139fac.27.1729000002788; Tue, 15 Oct 2024
+ 06:46:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172899963173.1165800.13282848624565322990.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Oct 2024 13:40:31 +0000
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
-In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
-To: Julia Lawall <julia.lawall@inria.fr>
-Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
- vbabka@suse.cz, paulmck@kernel.org, tom@talpey.com, Dai.Ngo@oracle.com,
- okorniev@redhat.com, neilb@suse.de, linux-can@vger.kernel.org,
- bridge@lists.linux.dev, b.a.t.m.a.n@lists.open-mesh.org,
- linux-kernel@vger.kernel.org, wireguard@lists.zx2c4.com,
- netdev@vger.kernel.org, ecryptfs@vger.kernel.org,
- linux-block@vger.kernel.org, npiggin@gmail.com, christophe.leroy@csgroup.eu,
- naveen@kernel.org, maddy@linux.ibm.com, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+References: <20241015131621.47503-1-linma@zju.edu.cn>
+In-Reply-To: <20241015131621.47503-1-linma@zju.edu.cn>
+From: Loic Poulain <loic.poulain@linaro.org>
+Date: Tue, 15 Oct 2024 15:46:06 +0200
+Message-ID: <CAMZdPi_nPx+FaNsEzmN9L=uFGr5xPRud8L3CodgTtSsSsFKSpw@mail.gmail.com>
+Subject: Re: [PATCH net v1] net: wwan: fix global oob in wwan_rtnl_policy
+To: Lin Ma <linma@zju.edu.cn>
+Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+On Tue, 15 Oct 2024 at 15:16, Lin Ma <linma@zju.edu.cn> wrote:
+>
+> The variable wwan_rtnl_link_ops assign a *bigger* maxtype which leads to
+> a global out-of-bounds read when parsing the netlink attributes. Exactly
+> same bug cause as the oob fixed in commit b33fb5b801c6 ("net: qualcomm:
+> rmnet: fix global oob in rmnet_policy").
+>
+> ==================================================================
+> BUG: KASAN: global-out-of-bounds in validate_nla lib/nlattr.c:388 [inline]
+> BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+> Read of size 1 at addr ffffffff8b09cb60 by task syz.1.66276/323862
+>
+> CPU: 0 PID: 323862 Comm: syz.1.66276 Not tainted 6.1.70 #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x177/0x231 lib/dump_stack.c:106
+>  print_address_description mm/kasan/report.c:284 [inline]
+>  print_report+0x14f/0x750 mm/kasan/report.c:395
+>  kasan_report+0x139/0x170 mm/kasan/report.c:495
+>  validate_nla lib/nlattr.c:388 [inline]
+>  __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+>  __nla_parse+0x3c/0x50 lib/nlattr.c:700
+>  nla_parse_nested_deprecated include/net/netlink.h:1269 [inline]
+>  __rtnl_newlink net/core/rtnetlink.c:3514 [inline]
+>  rtnl_newlink+0x7bc/0x1fd0 net/core/rtnetlink.c:3623
+>  rtnetlink_rcv_msg+0x794/0xef0 net/core/rtnetlink.c:6122
+>  netlink_rcv_skb+0x1de/0x420 net/netlink/af_netlink.c:2508
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1326 [inline]
+>  netlink_unicast+0x74b/0x8c0 net/netlink/af_netlink.c:1352
+>  netlink_sendmsg+0x882/0xb90 net/netlink/af_netlink.c:1874
+>  sock_sendmsg_nosec net/socket.c:716 [inline]
+>  __sock_sendmsg net/socket.c:728 [inline]
+>  ____sys_sendmsg+0x5cc/0x8f0 net/socket.c:2499
+>  ___sys_sendmsg+0x21c/0x290 net/socket.c:2553
+>  __sys_sendmsg net/socket.c:2582 [inline]
+>  __do_sys_sendmsg net/socket.c:2591 [inline]
+>  __se_sys_sendmsg+0x19e/0x270 net/socket.c:2589
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x45/0x90 arch/x86/entry/common.c:81
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7f67b19a24ad
+> RSP: 002b:00007f67b17febb8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f67b1b45f80 RCX: 00007f67b19a24ad
+> RDX: 0000000000000000 RSI: 0000000020005e40 RDI: 0000000000000004
+> RBP: 00007f67b1a1e01d R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007ffd2513764f R14: 00007ffd251376e0 R15: 00007f67b17fed40
+>  </TASK>
+>
+> The buggy address belongs to the variable:
+>  wwan_rtnl_policy+0x20/0x40
+>
+> The buggy address belongs to the physical page:
+> page:ffffea00002c2700 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xb09c
+> flags: 0xfff00000001000(reserved|node=0|zone=1|lastcpupid=0x7ff)
+> raw: 00fff00000001000 ffffea00002c2708 ffffea00002c2708 0000000000000000
+> raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> page_owner info is not present (never set?)
+>
+> Memory state around the buggy address:
+>  ffffffff8b09ca00: 05 f9 f9 f9 05 f9 f9 f9 00 01 f9 f9 00 01 f9 f9
+>  ffffffff8b09ca80: 00 00 00 05 f9 f9 f9 f9 00 00 03 f9 f9 f9 f9 f9
+> >ffffffff8b09cb00: 00 00 00 00 05 f9 f9 f9 00 00 00 00 f9 f9 f9 f9
+>                                                        ^
+>  ffffffff8b09cb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> ==================================================================
+>
+> According to the comment of `nla_parse_nested_deprecated`, use correct size
+> `IFLA_WWAN_MAX` here to fix this issue.
+>
+> Fixes: 88b710532e53 ("wwan: add interface creation support")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-This series was applied to netdev/net-next.git (main)
-by Simon Wunderlich <sw@simonwunderlich.de>:
-
-On Sun, 13 Oct 2024 22:16:47 +0200 you wrote:
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
-> 
-> The changes were done using the following Coccinelle semantic patch.
-> This semantic patch is designed to ignore cases where the callback
-> function is used in another way.
-> 
-> [...]
-
-Here is the summary with links:
-  - [01/17] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [02/17] ipv4: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [03/17] inetpeer: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [04/17] ipv6: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [05/17] xfrm6_tunnel: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [06/17] batman-adv: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    https://git.kernel.org/netdev/net-next/c/356c81b6c494
-  - [08/17] net: bridge: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [10/17] can: gw: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [14/17] kcm: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [15/17] netfilter: nf_conncount: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [16/17] netfilter: expect: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-  - [17/17] netfilter: xt_hashlimit: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Loic Poulain <loic.poulain@linaro.org>
 
