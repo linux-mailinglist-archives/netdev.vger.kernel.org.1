@@ -1,84 +1,50 @@
-Return-Path: <netdev+bounces-135391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE21C99DB16
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:08:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B4199DB21
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77D841F232C9
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:08:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27F6A1C21068
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 01:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F97B7CF16;
-	Tue, 15 Oct 2024 01:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F47513CA97;
+	Tue, 15 Oct 2024 01:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="WJRs2hV2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lgx7Ucg6"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56688DDBB;
-	Tue, 15 Oct 2024 01:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.253
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300CE3BBF6;
+	Tue, 15 Oct 2024 01:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728954490; cv=none; b=OJS0wNR8BVpq/TFykbsbTrCdSduWU+5/3LF2SPgt12CYFT8NQxrGGBXcjisc75cVgUTy92PudzMldSm7Rl5LTQEyxSXtR+eBKnuAfFUW4UWHE+IZm9pynU0fObXmsxD5814Pu/4lhuqZdYF2LUBweV5A1KZOIrNAPZvD/RFxVKA=
+	t=1728954626; cv=none; b=f8woOOtpGZLMnUdWD8zJKeaKMl6LWS6R18NvgjiBPiMoy7hpaHyJZwXZlwAyvKgZ4mdDfWkrsnSKi6W1IWb9Y9xrl3rD3z+FcNr9jJ+u0uNkpnin6cbAtV7SWJ/rpc3HPYyL5Az6uAx5FlP7opoJMybzKGNCTISSHx1IhUgZsOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728954490; c=relaxed/simple;
-	bh=tv5IX+ovqKeWK7u83IH4qp3NmpBqy6RR5KBT2nTwQ/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vs4Vp3oVX0PeMEKS2VUpRaQMV2g+Lig3x+BoKZWVBj+AlnOnRmT11YrUlgvfwspRKgXQySvqrDlRbXToghKBd4FTI3jWFHvnbhjJzAk3MM1sUjmSlb6tFgDI0fwCxgmgLJTJ6l1n6zCYQ0pApijhv2wPQXdrgErwHfWcDVRQeSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=WJRs2hV2; arc=none smtp.client-ip=139.138.61.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1728954488; x=1760490488;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tv5IX+ovqKeWK7u83IH4qp3NmpBqy6RR5KBT2nTwQ/Q=;
-  b=WJRs2hV2Ilelj+ULSYGdEjq82Cc1c7F7EPMiPsD8wbzwIfDt8OCDuTra
-   uH66+ewzqlSfx3rf43dO4oSAshdG2V5dO2b6HpiNpJESl6Z2d0QTFZwD9
-   CNHMVwkRjG5CjghTjCHEWiwBqMEWU9rHSOn/QgHsknx01L0eeYH/UTJ4w
-   xeE1M01yGtycaTFz5HMMirB8jXXTMI4eTn9rRxV8Z6wr37WLScpaFGaWr
-   qjNAb1doycRwR3OMgAK+Dx9Ns1h5J2v803jLf/zWiLUSGCwXtSgwe6HOr
-   aNrF//8Y+amAg3wkJPU48Q/eH3D2xCVqVrHDgX+0LZNuJ55yrvMwVNm/2
-   w==;
-X-CSE-ConnectionGUID: VsVHaeNjRn684VMovI6MHw==
-X-CSE-MsgGUID: emeS+53kQe2Vz2fyyAZyeg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="164725997"
-X-IronPort-AV: E=Sophos;i="6.11,204,1725289200"; 
-   d="scan'208";a="164725997"
-Received: from unknown (HELO yto-r3.gw.nic.fujitsu.com) ([218.44.52.219])
-  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 10:07:38 +0900
-Received: from yto-m2.gw.nic.fujitsu.com (yto-nat-yto-m2.gw.nic.fujitsu.com [192.168.83.65])
-	by yto-r3.gw.nic.fujitsu.com (Postfix) with ESMTP id 7B0D5E852C;
-	Tue, 15 Oct 2024 10:07:36 +0900 (JST)
-Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
-	by yto-m2.gw.nic.fujitsu.com (Postfix) with ESMTP id AE069D511C;
-	Tue, 15 Oct 2024 10:07:35 +0900 (JST)
-Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
-	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 414206BA7F;
-	Tue, 15 Oct 2024 10:07:35 +0900 (JST)
-Received: from iaas-rdma.. (unknown [10.167.135.44])
-	by edo.cn.fujitsu.com (Postfix) with ESMTP id 4F35B1A01E9;
-	Tue, 15 Oct 2024 09:07:34 +0800 (CST)
-From: Li Zhijian <lizhijian@fujitsu.com>
-To: linux-kselftest@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	Li Zhijian <lizhijian@fujitsu.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 2/3] selftests/net: Fix ./ns-XXXXXX not cleanup
-Date: Tue, 15 Oct 2024 09:08:16 +0800
-Message-ID: <20241015010817.453539-2-lizhijian@fujitsu.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241015010817.453539-1-lizhijian@fujitsu.com>
-References: <20241015010817.453539-1-lizhijian@fujitsu.com>
+	s=arc-20240116; t=1728954626; c=relaxed/simple;
+	bh=f3dwvBKGvFEEsvPqhMyxQVtJUS+PjOGaid6s3BccY34=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VSB6AK1fi+gA3ui4DPjlnpvP3n4MkjATPJ48nVTXZ8p82kqPvlxY0Dyhij6cztwOJKlpCr1sb2RaVJGp8OKnghXQbda8yXtTSPovBwFXnq1dfmJQzwitX494Casi00iFh/3mWFqzHLsPrcwgZm8Rl/lcP2F14vMgXDYOqkk10sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lgx7Ucg6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BC2BC4CEC3;
+	Tue, 15 Oct 2024 01:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728954625;
+	bh=f3dwvBKGvFEEsvPqhMyxQVtJUS+PjOGaid6s3BccY34=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lgx7Ucg6IXiOkkX6z+B0c/ENuAdJmSLPCfhOYgH6jVCsWB7Hu+lvDOjTOMRVWQhr0
+	 2Vte+ijHtTG/uniE6F696TmwwFMhTHW4C3qwqGgZ8G3txf/+aJG/R9tr/d9Vl2RTc9
+	 En9SKRbPGXw6E4seCxwdRtUZkAy9Fx3mS4pBACktwZactcSttL1WJvlf28en0CsR5c
+	 vo/2XXm6yqEd2X56NuC3pNlSkmgkhbxnr87fFF/nS9mTdtf9kfLqGSIDSvK8/jwqHp
+	 +retpcAbv6nN6RQ8fteagfT5XqRRPtRNL1wNFdEAcBdd1hOolxso4ZabLzokVkyZnS
+	 zjXH17o4gXjZg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEFB3822E4C;
+	Tue, 15 Oct 2024 01:10:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,53 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28732.003
-X-TM-AS-User-Approved-Sender: Yes
-X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28732.003
-X-TMASE-Result: 10--0.683100-10.000000
-X-TMASE-MatchedRID: lbdkQWb+CNa+AcfZRlRvHuOnF2j8nBWbn5nfR7I2dFNlmPP/XnGELrmK
-	lv3K7lvCloSrM+MzMAEa/Rm8RmNZp6s4CIwqUsM8rMZ+BqQt2NrBOVz0Jwcxl6vCrG0TnfVUg9x
-	e4gtUJtonayl/4MJ4nGMemTaDph9uYPx7yddt9jKeAiCmPx4NwGmRqNBHmBveafSbrzwSjfwqtq
-	5d3cxkNXiltRsZXo+3UppxeetCusqmTKwyS/M9OKJ605sIm6Udg2SiYCo8mFfuNSBApl5QIs8Ue
-	T0AOb1weaIz6J16T197bWtV+OQFC/4Bx1weaSflFcUQf3Yp/ridO0/GUi4gFb0fOPzpgdcEKeJ/
-	HkAZ8Is=
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+Subject: Re: [PATCH net] net/smc: Fix memory leak when using percpu refs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172895463077.686374.5703280844710549815.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Oct 2024 01:10:30 +0000
+References: <20241010115624.7769-1-KaiShen@linux.alibaba.com>
+In-Reply-To: <20241010115624.7769-1-KaiShen@linux.alibaba.com>
+To: Kai Shen <KaiShen@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
+ tonylu@linux.alibaba.com, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org
 
-```
-readonly STATS="$(mktemp -p /tmp ns-XXXXXX)"
-readonly BASE=`basename $STATS`
-```
-It would be a mistake to write to $BASE rather than $STATS, where $STATS
-is used to save the NSTAT_HISTORY and it will be cleaned up before exit.
+Hello:
 
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
----
-Cc: netdev@vger.kernel.org
----
- tools/testing/selftests/net/veth.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/tools/testing/selftests/net/veth.sh b/tools/testing/selftests/net/veth.sh
-index 4f1edbafb946..457312ef135a 100755
---- a/tools/testing/selftests/net/veth.sh
-+++ b/tools/testing/selftests/net/veth.sh
-@@ -46,8 +46,8 @@ create_ns() {
- 		ip -n $BASE$ns addr add dev veth$ns $BM_NET_V4$ns/24
- 		ip -n $BASE$ns addr add dev veth$ns $BM_NET_V6$ns/64 nodad
- 	done
--	echo "#kernel" > $BASE
--	chmod go-rw $BASE
-+	echo "#kernel" > $STATS
-+	chmod go-rw $STATS
- }
- 
- __chk_flag() {
+On Thu, 10 Oct 2024 11:56:24 +0000 you wrote:
+> This patch adds missing percpu_ref_exit when releasing percpu refs.
+> When releasing percpu refs, percpu_ref_exit should be called.
+> Otherwise, memory leak happens.
+> 
+> Fixes: 79a22238b4f2 ("net/smc: Use percpu ref for wr tx reference")
+> Signed-off-by: Kai Shen <KaiShen@linux.alibaba.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net/smc: Fix memory leak when using percpu refs
+    https://git.kernel.org/netdev/net/c/25c12b459db8
+
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
