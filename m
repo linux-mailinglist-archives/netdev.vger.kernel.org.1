@@ -1,122 +1,84 @@
-Return-Path: <netdev+bounces-135387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B999B99DAE0
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 02:52:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F6799DAF9
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 02:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92D211C21342
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:52:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 585B1B2281A
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF78F40BE5;
-	Tue, 15 Oct 2024 00:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07B049625;
+	Tue, 15 Oct 2024 00:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUsV0w4f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbPbOi3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB531BF58;
-	Tue, 15 Oct 2024 00:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866C0535DC;
+	Tue, 15 Oct 2024 00:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728953554; cv=none; b=IGm+Re2b+cgUP7S0dwylLfW4U9VLw9+qe0oYtfv//bkcoR/zFRgIThXQXRO6Cw0Nf3+nFdieVaebvJgrnfcWkZfDcyebhzk/Lrjja28OMEXISPYMH4PBek5U2RYD1ti5+szxTzf3OBl+n1SsjkICJ0hXoOf5wSUJRDbMzdMm95o=
+	t=1728953636; cv=none; b=BwO27up9O5eWdcTO+EdTGViwWYdimOi977Yhc+B6FJTUnJC2O6TfFuDZDtCOj4qPyI8ej8la8R1RozD1BhcH69XOPpRuUIXlHdH1U5H/++vCZt0/RXLIjfXaI7ervj4TkV8388UkXP1S+p17w4ClhSXQUB9n+uDtfoJ4hBMgQ8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728953554; c=relaxed/simple;
-	bh=aVKfZJ4eEpOYJu+6LVskjGJAV3K8Q656V8WpGjiOEso=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UeFhEpwFUyw5JGSdzxk/anLOQBubDnmAytmoAtZ5halNo1YmHFiA9LhN7Kvmb1UCbB8nelbwgsbBNSlfsFNwykdZmhhjkhiqO84J/qoN40Y1/A3ZVkE5qw/KayjZ0zWmBzBckwVGwpAj2NsiBXIk1taw6bV1DKSFYctCngW2HI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MUsV0w4f; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7ac83a98e5eso408703385a.0;
-        Mon, 14 Oct 2024 17:52:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728953552; x=1729558352; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2aYX219RK+CaWry4o0T9wVu7qlr1XF5G4zHAtaRKlIU=;
-        b=MUsV0w4fomBWYZr05GqjfEN2mIhs41pygkqZknQ5f2nELAV/Dc4r3ZszWbYSN8ctuv
-         nNo190AyPvNUG9FlMsggLnKmb0ZyffKTffsM3G7IDPrd9rkCVe8qlIPFSnYJQRZK1dZy
-         z7mo9VjL2OT7d/biUqaIWSTOBovnQMuHXDrVDkXr2IJgKrVDGjgQK2VoVkTq9vP8TG1n
-         o2IJBVtyivvPEGAFURHhSmhp2o+JOaNrKHsJ3mCH0I91T2R0iTI1ijj/DbO1OlNwjYeM
-         KIw+gbA7bizbYuOhKtkSvHHqxdC/8aOzvLt6ANUcBmYhl8s0RYMHLxgoQj7+c3pXhHZG
-         T9CQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728953552; x=1729558352;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2aYX219RK+CaWry4o0T9wVu7qlr1XF5G4zHAtaRKlIU=;
-        b=nxLEvpyS9nQ15NgCqhs26915V0Ulvf9lxS2nnS0RIlxvDPtifChiNnXUpH4Ip++rsX
-         bcZKAbUznHJNrdRZPE+jUmFekLsK7cVRr9mvYaDKXGrhrJ+8E66XYp2jwcJWvtW8noJd
-         tGCA2pIMdJW4ydik7qJxsPGmljRRuFIH/etsthfiwVwBoRT/A2dRFxQAEbGHMaLSiMf4
-         K5TYDN5jVRVsUm+3ESHxUQB3z9G3W4HCgROZzFTmtCSYb3LnlNrFCd3HWVLkhi/QjQ1n
-         mL6vI7OkFaMwHvZA/doAo/SiwTxwew7pSGN2a3tFIlCoVwI5PgzX6nunnUlsXzv3YmMr
-         CFSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkh8FHx7kviVPlsD4wzc4NJ4qhaHgAdIBd2cT4mW877Zi+Bzz2Z27lWlkmo5EUvSX4kh31UH2KZhJJ+w==@vger.kernel.org, AJvYcCW4RaElOADJvGC2q8eAuSpyJT6XKS9+5VqO5weVvuXZMRBzkh1M0B586kVD+Gl5yGAC9nrsH8UAu7aWCCMgt5g=@vger.kernel.org, AJvYcCWR0gXHZvcEdNYzk0ypKdnJvLGu12tgaDNPilEw3SqsmH5TtCzcwAKhaAjQseor6ozXW9Sdb/8g@vger.kernel.org, AJvYcCWYSm2RNw3rC8aINeKyQhCq22S37et+10ZSnhW9T9rdnq4iRmvr1nAcruln3ARtAvIJGbbQqqR5VnEckYQG@vger.kernel.org, AJvYcCXriFA686ew/qLj+B6BF8jLMFQVYYoUjAxx0W9NE3EXX0vI7n7MEaimtGimbjOSmvm6HmePtpZ6g1XU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5kTrr6bmtmOiFMUzCzbSXCXhtWQleeoW/hoy4cjl6rcJEkDfw
-	QnWK73E6BJeKzBwnnVApeh8ERaX/FxIIaEIs5h8hoHPJ3hK0LZey
-X-Google-Smtp-Source: AGHT+IFbmtgU86GpXLnwWNb+P/+we0eWd+N28TohoCcxIS9tuL/e9rBJv8T+QvMJ+TVmhykYKs2KDg==
-X-Received: by 2002:a05:620a:4547:b0:7ac:e8bf:894a with SMTP id af79cd13be357-7b112517b5cmr2674571185a.20.1728953552152;
-        Mon, 14 Oct 2024 17:52:32 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b13616735fsm10528285a.19.2024.10.14.17.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 17:52:31 -0700 (PDT)
-Date: Mon, 14 Oct 2024 20:52:31 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ignat Korchagin <ignat@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Oliver Hartkopp <socketcan@hartkopp.net>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Stefan Schmidt <stefan@datenfreihafen.org>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- David Ahern <dsahern@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- linux-bluetooth@vger.kernel.org, 
- linux-can@vger.kernel.org, 
- linux-wpan@vger.kernel.org
-Cc: kernel-team@cloudflare.com, 
- kuniyu@amazon.com, 
- alibuda@linux.alibaba.com, 
- Ignat Korchagin <ignat@cloudflare.com>
-Message-ID: <670dbccfd4c2_2e17422947e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241014153808.51894-2-ignat@cloudflare.com>
-References: <20241014153808.51894-1-ignat@cloudflare.com>
- <20241014153808.51894-2-ignat@cloudflare.com>
-Subject: Re: [PATCH net-next v3 1/9] af_packet: avoid erroring out after
- sock_init_data() in packet_create()
+	s=arc-20240116; t=1728953636; c=relaxed/simple;
+	bh=Vlwh+IoKxo+PywJMA1nuZ9Uc0Ubh1fRLfDOQVqPQIi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TAUHvB4Wv/1VraixlKX1qeLoeZiWoKCWYSHcDM45PC+oQtLQ3PF64nxGteyWSFVPlOP6OIhO3hzWTG9FG9sqvIKBGxklnw+hLHBq8sk5Ap0EC5A3DKSXZqcrWAy//xX1awOw8HYwWWcwBbnwhIs5aILmxdMG2Vj0ocpVxEldQNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbPbOi3p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E80C4CEC3;
+	Tue, 15 Oct 2024 00:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728953636;
+	bh=Vlwh+IoKxo+PywJMA1nuZ9Uc0Ubh1fRLfDOQVqPQIi8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IbPbOi3pQRnqOPqXwSVZfkQ/g3RGpNg3KdNfAdDHfhJgEd4CGxt761VAlvvk+ZKeO
+	 0uyekOFdfJi43rQVQNljvPK2Q7w5H2FCtniYHPxf/M4zWVEe/6pd+k+6WWLF9o5Qgs
+	 Q8csLd3wPaf2o7/sE9vo0ufkx/7tfYOdbMOv5JkioE0W7Nkl3sCoYOMzyr3ukB+g7Y
+	 I8xXRzEPOMexys2trAvTg6pPaPt2V4DeATHG/LGsWMv6lu3UX22v6T+hg2HO4wuU1X
+	 hcYj/rYVw0jflKdEkdzbTb9gdvvW3IG2gfc5JPRR6WhsLJ4evvKPL6XoIJXzE5PTtM
+	 lXCq4muDBNk+g==
+Date: Mon, 14 Oct 2024 17:53:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] ethtool: rss: prevent rss ctx deletion
+ when in use
+Message-ID: <20241014175355.62d40b01@kernel.org>
+In-Reply-To: <966a82d9-c835-e87e-2c54-90a9a2552a21@gmail.com>
+References: <20241011183549.1581021-1-daniel.zahka@gmail.com>
+	<20241011183549.1581021-2-daniel.zahka@gmail.com>
+	<966a82d9-c835-e87e-2c54-90a9a2552a21@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Ignat Korchagin wrote:
-> After sock_init_data() the allocated sk object is attached to the provided
-> sock object. On error, packet_create() frees the sk object leaving the
-> dangling pointer in the sock object on return. Some other code may try
-> to use this pointer and cause use-after-free.
+On Mon, 14 Oct 2024 11:10:33 +0100 Edward Cree wrote:
+> On 11/10/2024 19:35, Daniel Zahka wrote:
+> > A list of active
+> > ntuple filters and their associated rss contexts can be compiled by
+> > querying a device's ethtool_ops.get_rxnfc. This patch checks to see if
+> > any ntuple filters are referencing an rss context during context
+> > deletion, and prevents the deletion if the requested context is still
+> > in use.  
 > 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> Imho it would make more sense to add core tracking of ntuple
+>  filters, along with a refcount on the rss context.  That way
+>  context deletion just has to check the count is zero.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+True... This is my least favorite kind of situation, where the posted
+code is clearly much better than the status quo, but even better
+solution is possible. So question becomes do we push for the optimal
+solution and potentially get neither or do we apply what's posted and
+hope the better one will still be delivered later..
 
