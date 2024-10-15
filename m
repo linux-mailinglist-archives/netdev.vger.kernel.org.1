@@ -1,183 +1,190 @@
-Return-Path: <netdev+bounces-135889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE4D99F83E
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:42:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7C499F895
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CEF5B214FC
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 20:42:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 301C0B2136B
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617081F818E;
-	Tue, 15 Oct 2024 20:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421671FBF4E;
+	Tue, 15 Oct 2024 21:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SK8fQTbu"
+	dkim=pass (2048-bit key) header.d=gateworks.com header.i=@gateworks.com header.b="mcRfG5qa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B736158D9C
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 20:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FED51F582F
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 21:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729024954; cv=none; b=dk0eWL58asaEkqrgl2ub/iwad9RKeXHZarD9Yh74XKLtzd5uP7YbL0RXoRFAxwUYbHFj4JlNCY2cbT/QY/1DotAkIh5R0kzNA0EzNUQq6bt9kcpq652QMKiFNfFK9H/PkbQfZcIqNxFo7vTQPQJKKhszSnZAFmRBJz7fpinaf1g=
+	t=1729026295; cv=none; b=a/TBhEyd3ANxSVlmc+7BcxAqBxq3svm1+W4whJ8QyLmgXIicZGGpg+jVL7//AK8mxYAevyrZlRbzrDkSi36y4UkiqbwHu8CrAs39dGb1dzFla+X/J/qTBL2XfHbGUjlkQzArCYyERdU2ZdPa90cy8lgo1Dy64Pqd6rQMbJ5i/Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729024954; c=relaxed/simple;
-	bh=kdXSJkVNAq9dkeQk80wzpoAZOthAqy9gaz8a6xGLKkw=;
+	s=arc-20240116; t=1729026295; c=relaxed/simple;
+	bh=zT0nCGbUs6GQL3x+J3RS9+mj4BSonnPhxWcD75B+TrU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m6RD6sMAL+UNfgBUousCbg8vRwUisS8zHbY+KlLPn8cBZXNzO4w954ntzfGyeb32BtnhSbG7Txr8QEM5VdesLPsNINWR83pZGYsWDk0dmz3z1AHHDRQu9ie5yV1Xai3Ko7NXFYx/J5jJQPriusKo5avivZdD0hGO6iSBljsxkkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SK8fQTbu; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c949d60d84so5599408a12.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 13:42:32 -0700 (PDT)
+	 To:Cc:Content-Type; b=NGina0HmGLlQcEUj+wsiQ1ce2RKRI+NsxS3bKYzIEemxPxzaKrGa33Fn4hl1x+/JxBe7eQKFRxneme8OUXhDCgTqHuBAk62qDTwM+YL8SMIG3V6zfo52i4hmaBpLZ9P4gFFRqnKV5ZxIvcwA/wCHeOQKKWbVCpLPtUdh05joTBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com; spf=pass smtp.mailfrom=gateworks.com; dkim=pass (2048-bit key) header.d=gateworks.com header.i=@gateworks.com header.b=mcRfG5qa; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gateworks.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e29267b4dc4so3922818276.0
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 14:04:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1729024951; x=1729629751; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kdXSJkVNAq9dkeQk80wzpoAZOthAqy9gaz8a6xGLKkw=;
-        b=SK8fQTbuKIDlKKV32lt7w60AvqsetHSMaIALyCkHq9F5x47HOdu5MjMu7V0dnvGhNv
-         GXPfE12aip/d2VG3F4rHJRIxzEKdP8DYPLVXfgS3RzhOU4s/ab0PTl1eX/Cav88V/dR6
-         gAW+mvMk+GSww5AIuKUaT53LNQAeRieCUyvTU=
+        d=gateworks.com; s=google; t=1729026292; x=1729631092; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ToZPK88KWBXsHpBzgS7HGSIabqX2813JKy9iAtzVQYQ=;
+        b=mcRfG5qaqEDSdJW8OBy2M7yGcldzlfEK3sEmJ+VyqOCO8NH3fwdLlbRImjXYamTUVg
+         UoiNP6nfQiiCYxFLK1Dd7hdLbESzgYyIcrq/ngvKowVzQhlcA6N4t/tC/jiZf6RuZXBx
+         8fO6tnoy1tnS5Qgo+Nj/cR8tbPSZmqTOxxsi0sDQhSvW23ljuKfRc0p/O391UmV8+Mlt
+         eDGUXa4Ur520/ieoMXMHsDmkNuDp0tzFow0BUlAbLWKlAOmdOYnJgtCAnigDJmOj+sV9
+         y4qZB7vvd3LvQauVOBimFX8QfidXrcgexegFFYaRK8NWPRiQFlltdmTbnm5L3zVMHHmN
+         /UfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729024951; x=1729629751;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kdXSJkVNAq9dkeQk80wzpoAZOthAqy9gaz8a6xGLKkw=;
-        b=OjaCPbLUfYkgDNb3ejzGo9TEP/MiEFSEUPbMRVXyeZPOiBqrYr2DEWUNTS2RFJkQXH
-         orV6IZ8hcQ7qN6f05GqYTZ/+HixkASSR8i41QbHIGyKNBRCcOx+vRtTHDFrBGi+o+0y+
-         N7qFr+IAQbqgsg1FhQjRLO+S1CN/a207f4lG9FiAM5sKRSxZTo8+xhdKVg0TKEHafsj4
-         ykNVmf98dOU26CE6b4X/+qn9/qEr9Px+IXw85KOwLbaKS2FANtkM9rp4kd59DReOQtGI
-         CfHQBpINHXvW2rMTBto88BTKwR3PCkLLAC1Oec/WByy1WESKdwH21Fmf5VVYCP9r/lQm
-         UJcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtwG9Knzb8jfTRhjBzem+AFTczpt/z1ZX5Ax9KdrZebPXdlgFrYEb5ev4vOB2L8SoPY84XE4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDqNNfwNlbWaSFZwDKdDEkVDOKBMM2FlmiqVls9zwQHBvOrgO/
-	+Qn9htaXveGcjEDBaONzVlbLdJGiTwcbN8GYosn0j0Ae1t/v77lSOEgX5r12OMTbCkXRVY63y8U
-	RIajUiy0NJdZTVs8S4N7UpDR+0LaHi4zzQ8EJARSn3sPPb4MMBw==
-X-Google-Smtp-Source: AGHT+IGKpAvTk0bSuTx118OVCJ6RNzTkfKcoLBE2J9HmgwV8x1RmtjkBQ10wxE52ftwFFNPbFuX0A3zi8bzkEkTqiRY=
-X-Received: by 2002:a05:6402:4402:b0:5c8:84b2:6ddc with SMTP id
- 4fb4d7f45d1cf-5c948dac386mr11624536a12.33.1729024950615; Tue, 15 Oct 2024
- 13:42:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729026292; x=1729631092;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ToZPK88KWBXsHpBzgS7HGSIabqX2813JKy9iAtzVQYQ=;
+        b=XeqRKZK28tFtBR/T3ALnipLMe67mtca3wlwM1pkYDigszFhw7WofJjq0Er2N1own1b
+         jOZtIVeFL5mlKoNATE53bm3rbiy9/LM7E1+julWYzCv3v3xYk7EuhB7tE8Z8zXE2CJZi
+         L2Src29vr+lSpo3XQ6+OZ6ynncq5IGAC3I8jy3ti3ce+kqYSRHfiZ8HeFJPMnKTgdUyi
+         WiF7BV6LlLFVr65aguQkpn/WJ6RxTuIWpCrmYMfJYY1D5eXAqeO1HfPxjFUOecGqahuW
+         AzhYVyEse7Xacby3Lx+E4/vRauwE8q0x8gDPGn1YXDYsAx1uCqgx4OitjP1KAOvrxDUt
+         G94A==
+X-Forwarded-Encrypted: i=1; AJvYcCWf/z+XNE38iALNc4JVS1yx315qSQn7C6hBRr6RLLRYMfxL5EYzoY3bkcmGuJPhuZU90YYzf5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEXfyVIQygDqnl9kiHOZPCue8WTMHzuAKsHYcDqhGDuceX94hm
+	jJ18l0bh1g408mBeBrvAEcV3d/ZGX3iuLUMsBOgZiDQM6+nhrWQwgjGhF4fy2NIuI8j/vO+eWk6
+	ZOAFMPeGYEwZwuJDg5+xTeXQHjSu2ZQosJeF6SQ==
+X-Google-Smtp-Source: AGHT+IFfuqTbgppzNExdeMLg6EEca8KoCbP9TBNY3PTiaiEc2Vyiet9kqiI/+PLRD056KzMrBN/GBjlHYa6fKvwqvUM=
+X-Received: by 2002:a05:6902:160f:b0:e1d:9b03:8812 with SMTP id
+ 3f1490d57ef6-e2931ddc566mr8554841276.57.1729026291971; Tue, 15 Oct 2024
+ 14:04:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241015185310.608328-1-vadfed@meta.com>
-In-Reply-To: <20241015185310.608328-1-vadfed@meta.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 15 Oct 2024 13:42:18 -0700
-Message-ID: <CACKFLikahUtGiJJoqT2mxJN-gfRT1z1Cy0bjLo6ZZRxk=bt0ig@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: replace ptp_lock with irqsave variant
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Edwin Peer <edwin.peer@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Richard Cochran <richardcochran@gmail.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000004ddd6062489fec2"
-
---00000000000004ddd6062489fec2
+References: <20241007174211.3511506-1-tharvey@gateworks.com> <ZwQqokf15iMEIrAf@pengutronix.de>
+In-Reply-To: <ZwQqokf15iMEIrAf@pengutronix.de>
+From: Tim Harvey <tharvey@gateworks.com>
+Date: Tue, 15 Oct 2024 14:04:41 -0700
+Message-ID: <CAJ+vNU0BGaLco2g9mTf4eDyY4-u9P0HWeK-TUzsb8JPsZs3Ymg@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: phy: disable eee due to errata on various KSZ switches
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 15, 2024 at 11:53=E2=80=AFAM Vadim Fedorenko <vadfed@meta.com> =
-wrote:
+On Mon, Oct 7, 2024 at 11:38=E2=80=AFAM Oleksij Rempel <o.rempel@pengutroni=
+x.de> wrote:
 >
-> In netpoll configuration the completion processing can happen in hard
-> irq context which will break with spin_lock_bh() for fullfilling RX
-> timestamp in case of all packets timestamping. Replace it with
-> spin_lock_irqsave() variant.
+> On Mon, Oct 07, 2024 at 10:42:11AM -0700, Tim Harvey wrote:
+> > The well-known errata regarding EEE not being functional on various KSZ
+> > switches has been refactored a few times. Recently the refactoring has
+> > excluded several switches that the errata should also apply to.
+> >
+> > Disable EEE for additional switches with this errata.
+> >
+> > The original workaround for the errata was applied with a register
+> > write to manually disable the EEE feature in MMD 7:60 which was being
+> > applied for KSZ9477/KSZ9897/KSZ9567 switch ID's.
+> >
+> > Then came commit ("26dd2974c5b5 net: phy: micrel: Move KSZ9477 errata
+> > fixes to PHY driver") and commit ("6068e6d7ba50 net: dsa: microchip:
+> > remove KSZ9477 PHY errata handling") which moved the errata from the
+> > switch driver to the PHY driver but only for PHY_ID_KSZ9477 (PHY ID)
+> > however that PHY code was dead code because an entry was never added
+> > for PHY_ID_KSZ9477 via MODULE_DEVICE_TABLE.
+> >
+> > This was apparently realized much later and commit ("54a4e5c16382 net:
+> > phy: micrel: add Microchip KSZ 9477 to the device table") added the
+> > PHY_ID_KSZ9477 to the PHY driver but as the errata was only being
+> > applied to PHY_ID_KSZ9477 it's not completely clear what switches
+> > that relates to.
+> >
+> > Later commit ("6149db4997f5 net: phy: micrel: fix KSZ9477 PHY issues
+> > after suspend/resume") breaks this again for all but KSZ9897 by only
+> > applying the errata for that PHY ID.
+> >
+> > The most recent time this was affected was with commit ("08c6d8bae48c
+> > net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)") which
+> > removes the blatant register write to MMD 7:60 and replaces it by
+> > setting phydev->eee_broken_modes =3D -1 so that the generic phy-c45 cod=
+e
+> > disables EEE but this is only done for the KSZ9477_CHIP_ID (Switch ID).
+> >
+> > Fixes: 08c6d8bae48c ("net: phy: Provide Module 4 KSZ9477 errata (DS8000=
+0754C)")
+> > Signed-off-by: Tim Harvey <tharvey@gateworks.com>
+> > ---
+> > v3: added missing fixes tag
+> > v2: added fixes tag and history of issue
+> > ---
+> >  drivers/net/dsa/microchip/ksz_common.c | 16 ++++++++++++----
+> >  1 file changed, 12 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/m=
+icrochip/ksz_common.c
+> > index b074b4bb0629..d2bd82a1067c 100644
+> > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > @@ -2578,11 +2578,19 @@ static u32 ksz_get_phy_flags(struct dsa_switch =
+*ds, int port)
+> >               if (!port)
+> >                       return MICREL_KSZ8_P1_ERRATA;
+> >               break;
+> > +     case KSZ8795_CHIP_ID:
+> > +     case KSZ8794_CHIP_ID:
+> > +     case KSZ8765_CHIP_ID:
+> > +             /* KSZ87xx DS80000687C Module 2 */
+> > +     case KSZ9896_CHIP_ID:
+> > +             /* KSZ9896 Errata DS80000757A Module 2 */
+> > +     case KSZ9897_CHIP_ID:
+> > +             /* KSZ9897 Errata DS00002394C Module 4 */
+> > +     case KSZ9567_CHIP_ID:
+> > +             /* KSZ9567 Errata DS80000756A Module 4 */
+> >       case KSZ9477_CHIP_ID:
+> > -             /* KSZ9477 Errata DS80000754C
+> > -              *
+> > -              * Module 4: Energy Efficient Ethernet (EEE) feature sele=
+ct must
+> > -              * be manually disabled
+> > +             /* KSZ9477 Errata DS80000754C Module 4 */
+> > +             /* Energy Efficient Ethernet (EEE) feature select must be=
+ manually disabled
+> >                *   The EEE feature is enabled by default, but it is not=
+ fully
+> >                *   operational. It must be manually disabled through re=
+gister
+> >                *   controls. If not disabled, the PHY ports can auto-ne=
+gotiate
+> > --
 >
-> Fixes: 7f5515d19cd7 ("bnxt_en: Get the RX packet timestamp")
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> Similar fix is already present in net:
+> 0411f73c13afc ("net: dsa: microchip: disable EEE for KSZ8567/KSZ9567/KSZ9=
+896/KSZ9897.")
+>
+> But your patch provides some quirks for KSZ87xx  and some extra comments
+> which are nice to have too. Can you please rebase your patch on top of
+> latest net.
+>
 
-Thanks.
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Hi Oleksij,
 
---00000000000004ddd6062489fec2
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Yes, I can submit an update.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICyYQXxo+V/US2QRevuk77Mb0Dad/i+q
-F/v+n6lG7TupMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAx
-NTIwNDIzMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQB6gpKOyiCIeafsFdxSh6SsojbFgflWkoB9K1SJZKdzZrwEeQeb
-MiIFo2j0NZDDqkz8eDmqgMNK15mvRDxXn0H2UlnLrqT+AWmzOhuGJcM3z7J8Kbl5gIwVDzwIzPo5
-5q+nUcNKZnEEfi57HFlMRsLQLmOHlS36wUVfgRxMPXgDZSwRM6GMd8/5rBQ4c2vEWJGXaWaouWpW
-yYGbabIfq74k7LCkn9Xu7A3vsQKtvVGF4mKj2KCCz62bhd8Z0oLpQod1h3fJ7El/OKtv3QwezB16
-0J0yvevtipaWNbhRKFKUtQ/kZ29cPe7vwvyfKjzKevIGEQGccQJ+Ws+LvturajqK
---00000000000004ddd6062489fec2--
+Best Regards,
+
+Tim
 
