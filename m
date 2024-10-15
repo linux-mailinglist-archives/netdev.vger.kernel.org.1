@@ -1,107 +1,117 @@
-Return-Path: <netdev+bounces-135861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5522099F728
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:21:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246F799F72A
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:22:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C16FAB23980
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:21:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5DA11F2704E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3646D1F8198;
-	Tue, 15 Oct 2024 19:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7271F669D;
+	Tue, 15 Oct 2024 19:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="l3IujrR9";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="yg1qUcE2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d/ODG50u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB2C1F818E;
-	Tue, 15 Oct 2024 19:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878D51B3929;
+	Tue, 15 Oct 2024 19:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729019891; cv=fail; b=N1YJSYh/Frwc3fmfi74wdIiIq0X/bcHUMWOKj8M29kvij4s30eNC5ONektacPzD75xEubkKM1LYUAht5Ph8yDxBm7scoL9lbldqdSdDcyOuhYemkw3Oe2shUoMMk3B5aVatJorcTYGgG45DeZVejlSBjb01EurP9x+WvPrgwjBA=
+	t=1729019958; cv=fail; b=EsqOFXC5lTs2gPM+4WG1UQYD+A3tz+uFlEpw0K5K2OBtQeKvf+0ksuk17pZQbAIHgJWtJf3O0BEHiIyj58bHUHd/StFq5JzN+mH8LL/OOF9peILaoPDIQuhp2oHt7tS7eS49ceG6wPPzXvvMQT+LeqL/ZOM9kD2BYoc+cF/sXkg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729019891; c=relaxed/simple;
-	bh=X4LbpPCUxKH5Zmd4BdgH+jSajdZQwDwUVgMO8lY1dOM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Uw2pAP9N18t1pzV8G5XTigJzJCZF8GqdOs+wyn2pEbTgBJrhwrw6qbkAmJ80yIjGwtTURvsJLlFUxpGWjs6e6KlQFhGV2ZqX9UD67dZsUN2qaowFiUcBzpCmn+0H3hNV2/J8xFzlCWAaC0xbtCiLNT3fieNyZz10Q7KpP6SS/0Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=l3IujrR9; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=yg1qUcE2; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FHtiVS001626;
-	Tue, 15 Oct 2024 19:17:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2023-11-20; bh=0vY5cYuz4er/ibsH4D
-	zI/B7RnNM68m5N1RoQOTxriAg=; b=l3IujrR9gOlYUh3Eme8yN+xRD9tuL3bMSM
-	MSuZLnRmr6Gnea7FOFdMf5yPxwyU4O1FFXpHmLiOj9y+I0PlKivmg8vMFHpmw+8a
-	9XpNGCWI9YqEw4EIRPDCPIaUPnoDEkiimSXWJWly1bwIrrASiNflAwhV8QCSjism
-	op+FjsSDd6Gh64MDCWxX6nGNHW4cPaA4bY3rSaGJEI8RRHlrG9UWFAeII+aygV+Z
-	38I3QuI28JXRyxrqRHNXqv6mFnk9mSTaJHGysdpptJC8eQiYutbd5CrtoRZmgYuQ
-	xQIme0ZQ9/2MauB8g6YvMQ1LHHwsbp69IFz3+R14OcPPWwsVzbGw==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 427g1ahud8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 19:17:00 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49FIxFTe010371;
-	Tue, 15 Oct 2024 19:16:59 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2173.outbound.protection.outlook.com [104.47.59.173])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 427fje6mep-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 19:16:59 +0000
+	s=arc-20240116; t=1729019958; c=relaxed/simple;
+	bh=gYlhxWsPhrwMGmXJFyyA5EQr9iOuoO82C7nUr5q9LaE=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Q0tAucHiYJ0vTQOpalhNZoeyV0gnTAEMk2sBqJHf9+gHIQRpAbe6Gi6B3PX4IUJqyw4BHH19IN+8PQvaIhUSk8aAB0XsLTfGaPOxkx+CkPMcCmtN+Urdx+YIiyLQGp5WgQYzVQ+4YnTBfzDniINkz4FoNkzDiCukJFcXCgjNWPw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d/ODG50u; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729019957; x=1760555957;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gYlhxWsPhrwMGmXJFyyA5EQr9iOuoO82C7nUr5q9LaE=;
+  b=d/ODG50utT1hD0YkQntopF912xES8qLHTo+bMV7gRTrWLUnj/lY0qyjH
+   2YrJ02EFI2BbVf71tzh+hQj52qOZock76z2G6ekuEQdq8diIfaH+5a1he
+   fdJB2n5+Ld4u5xWBkf2GuGCTi4dv7RUzuxziBr/FLTJytA0pyppRBCu6R
+   wsNdYrPiAK7toZFPpmZT71rdsH+Co66b79AGfmYcFJaQ3ajZQUFxBf6r1
+   Rv95SJbZmaWGxxe5oKzs9kIIQmhPUdOjn4Is+lhL8k0AjI6yXubfZgbL3
+   steCKUNjP847p1ROg5YvGzajwWmJaGJPlsi7GWLQpfg3TRzcuNSng2DWh
+   Q==;
+X-CSE-ConnectionGUID: 7JlZLrQcQJmwJYnkgv9AjA==
+X-CSE-MsgGUID: UnpDGZJGQPijdnnjFRdhzA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="53846860"
+X-IronPort-AV: E=Sophos;i="6.11,206,1725346800"; 
+   d="scan'208";a="53846860"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 12:19:16 -0700
+X-CSE-ConnectionGUID: VlgtFzg/ScGl0Sfzz7pnMg==
+X-CSE-MsgGUID: DAwpOZczQ1S9BIpZo2Ll5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,206,1725346800"; 
+   d="scan'208";a="77876820"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Oct 2024 12:19:16 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 15 Oct 2024 12:19:15 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 15 Oct 2024 12:19:15 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 15 Oct 2024 12:19:14 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X0BrT6teW3hP6BPDSMYhALs6wR5i501silxRkFaVV1M908L65B4Rhb6SVdBjj4GJ3Udnvypg2ns4QYC+riBfKKRi1iEmMpNjA0bcU6OMZ0fD3e6QKuegNhR8HIAwkGh67Dazrz59HpnTw3W9nL/FqXaEDRylaIMZkAqyIfbAi3HM8erbiC4+oe21+KNyZpnX5o7boMiAfJHmGB3wPOLfZYkYDwNCwQRTCdB9oC9hrBfHT67qoQspqYXfrpncZf82MFIUy2F8IAja/no7S3A3hG3drG9pp9whClZFMfTazwVwydTnBiOuNpb7aVMA9mlV4tOr+f/02ZotTWKsZLPxuQ==
+ b=N/bDds8aZNhezXkCrHvQyqDTdT1lnsdP8HsUhZbPPAveMnXsk4la3jmZr7rRzcu/FLHDo4EGoU0ljqlMzDXOuQHaB0zyn71DsiRtYqmZqfERXY6ZVAHafBCa5CzSmXeFUXSvKJ2Ru+Ba4YdeLXLEAEDnKDqzqW5bnAP51DmCQg0lLajflX0JpEZWwdnqYj5udMcVGbq4m7QDOYZf9z8OHfKMGjPFiBc6epUwhTwnaHwmbhFAAVgwpgKE5Rauc0n6ZuGSZJtfSRD8Q3dGPzUy9pkne00DotWpFGghr81p0lsmvYDeoS5H+9na83hYWu8N5wi/+VSo3yhxyiFKVbopKA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0vY5cYuz4er/ibsH4DzI/B7RnNM68m5N1RoQOTxriAg=;
- b=xpRevIzBpFWyc8H3wFia4HkmCKeCZGKS3gkG2bgz8r1Udk56dSTlqLz/WAZy4cxUcHnKctQ7td1TN1XScfrJt5nLzHVHCa8IJJV1bxnY1xkisEX0pxzFxjjk151ngIUbDyni0ghL9BHAPjVM4S5BSb4FcajWy++H+PsCXTpmccnQopuDXvim274mCMC6pqMPLm4jOAzblI21eX/LkXvY3bZwRg238ueIZrTXuOlsPGtvX5GbuM8R7R40qp/8nHLNpa5NHhoIa0uIDiIpS77DLvDWjvWRj+yUjzG3bYqBQHsmHbM801YfK6vU5u//SdhF98Uw9Bof2ZvFo0469r+ueQ==
+ bh=2YC8Q413ogFt/WGCOrZggjjQzp+u6BOpWvo899TWErU=;
+ b=eff3fFA24Xbp24WkK/VDPrpcZIBI4WWbemsrQTT2JX4V2DgdWd4aHsJykKqhq7dwO99SxeOeLKfoK1IqrG0zkL/1dYd5gk83RA3lRgFL6FHoU6oqgYJncGspSKukK9Yll/VttwBF6SU1uKn7gi9B/e0xiYes1CbCkquvEAU490SQhcwEwTgqcQJwJYi5aS4Y0yaUvIDDJPDqTrDOpGPE1PT6aevlOU4n02U74Re7xoATg588wBlneWp5QSNz3uB9jT9lX09Zso88IxlSX8l+z1ORA3KngF1YJAXLQhNs376FeyA7PNt7UIBKfcUbXdJ8fwc7R5XXowl4LiGzwX5vog==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0vY5cYuz4er/ibsH4DzI/B7RnNM68m5N1RoQOTxriAg=;
- b=yg1qUcE2Z1kZQbeXNUdcjOe59OBEYVe00q+mO61WdHxiqHpe7lAASevAvjf1Nj+anKB6HLfYpz/PzYjBXB+z321zfqOAMGg26eSdNrFIermtX8u7HF0bWmFwFo7WZdjmnq5ePPQExmTkmNfJ20zWQ4uVAXQznKwgwKd+cMNAaWE=
-Received: from DS0PR10MB7933.namprd10.prod.outlook.com (2603:10b6:8:1b8::15)
- by IA3PR10MB8116.namprd10.prod.outlook.com (2603:10b6:208:50b::15) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB6977.namprd11.prod.outlook.com (2603:10b6:510:205::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.27; Tue, 15 Oct
- 2024 19:16:56 +0000
-Received: from DS0PR10MB7933.namprd10.prod.outlook.com
- ([fe80::2561:85b0:ae8f:9490]) by DS0PR10MB7933.namprd10.prod.outlook.com
- ([fe80::2561:85b0:ae8f:9490%7]) with mapi id 15.20.8069.016; Tue, 15 Oct 2024
- 19:16:56 +0000
-Date: Tue, 15 Oct 2024 15:16:25 -0400
-From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mingo@redhat.com, peterz@infradead.org,
-        juri.lelli@redhat.com, vincent.guittot@linaro.org,
-        dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
-        mgorman@suse.de, vschneid@redhat.com, jiri@resnulli.us,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        akpm@linux-foundation.org, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org, peili.io@oracle.com
-Subject: Re: [PATCH net-next v2 2/3] connector/cn_proc: Kunit tests for
- threads hash table
-Message-ID: <cslvxh4obzmzbaekc52h4t3b2e4ru2kypvjy3545lucvw2jlmx@3wgym6gbgb2b>
-References: <20241015173014.1083069-1-anjali.k.kulkarni@oracle.com>
- <20241015173014.1083069-3-anjali.k.kulkarni@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015173014.1083069-3-anjali.k.kulkarni@oracle.com>
-User-Agent: NeoMutt/20240425
-X-ClientProxiedBy: YT3PR01CA0076.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:84::19) To DS0PR10MB7933.namprd10.prod.outlook.com
- (2603:10b6:8:1b8::15)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.17; Tue, 15 Oct
+ 2024 19:19:11 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8069.016; Tue, 15 Oct 2024
+ 19:19:11 +0000
+Message-ID: <6cf46beb-92e8-42b4-a49a-aaf897143d8b@intel.com>
+Date: Tue, 15 Oct 2024 12:19:09 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/8] lib: packing: add pack_fields() and
+ unpack_fields()
+To: Masahiro Yamada <masahiroy@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Vladimir Oltean <olteanv@gmail.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com>
+ <20241011-packing-pack-fields-and-ice-implementation-v1-3-d9b1f7500740@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20241011-packing-pack-fields-and-ice-implementation-v1-3-d9b1f7500740@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR17CA0021.namprd17.prod.outlook.com
+ (2603:10b6:a03:1b8::34) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,499 +119,317 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7933:EE_|IA3PR10MB8116:EE_
-X-MS-Office365-Filtering-Correlation-Id: 63514feb-efb7-41f6-ecd8-08dced4dea11
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB6977:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77e5e9c8-bbd9-440e-9c81-08dced4e3f77
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XdxBmsmbtOCAUjF/Wsuf+h0mSOsiGSGBF+gc5m3qE0H0B5dC2LxhexHTnwSx?=
- =?us-ascii?Q?/AKqeWBXxa887tMEzA9CZoYtWyTRGZoorHnz+hKN4jTnmNS2LPiX8rcYx+9d?=
- =?us-ascii?Q?e6Z/bnZBFtbPBCpeu+c1lQZF6Oa2ApRlKw9Cr3PSGul01kef6nMKrLudJU4C?=
- =?us-ascii?Q?/5PFwUf1+aN6c6WVczz2HF7imo/DOSxv1Hl+8P9eVTkgNtqZFj+l+2IMy78W?=
- =?us-ascii?Q?gKhvof2kBbrx+shmlXNLbUxAi5eoqLY21RCLupqGYNNvyKo0rqBZVvdFtOF0?=
- =?us-ascii?Q?YrvL/5QHwDBIaoVrBEUrZtFbQLyfdHaR6hI1IOU5THyPAZG1GVpQP4qoWSe/?=
- =?us-ascii?Q?MoDA696BZh81/XHPMVE3RQu48eof07lA/t91zES9hu2AJhGji6AxTZCPqkvG?=
- =?us-ascii?Q?xheQaVOuiF4nzCYc1Imt0aKcr7gEGplOUH0eU1g38VraTjwHu7R2ieeXxdI8?=
- =?us-ascii?Q?/dHnzIg0Ocmvw2+VUr7RmXJJc7Cnejey3awcUyOTy1EzkcNZHbJwHmQhbxzM?=
- =?us-ascii?Q?pFaWmGJuG21JBVgIgpEaA0sdtr2FLIEMZbIWGcdWRDp5z8qLZrZ3XQv7bfJq?=
- =?us-ascii?Q?lrz22KLD1kBuzxv7ir5bE5GRnsbb6tUxgNFckzdg1eaITOtWq2+xFo+J69C0?=
- =?us-ascii?Q?iyuwVU7wkPgZSWefSRlOp/gyugqtwtp47KbUbsIfsmK3LJanEKD/XqY3ZOan?=
- =?us-ascii?Q?unLiSZbFMbbFXmlJF6MHhUO3aaB8+eMj3iNXdVeXNR3F5pwu0DlFYPQYYm79?=
- =?us-ascii?Q?J9Vcmbf048nWfJWG2H5JuHiEahWUOnDghZCgA+S2U+hpqnCVfK5AxahK+eOP?=
- =?us-ascii?Q?h3zRSwXTYAoXVqhKDUrfgT1fz5SFTvmvcG6IZx8pd1Tg10HlVJB3EclqTL2G?=
- =?us-ascii?Q?TdaVl8aIk4n/UkrVWeZK5BgXaKsZGe55rZan/9JOalh/SbJmRg2EloRuNukJ?=
- =?us-ascii?Q?OYCa98me4QJYpPK6kWfrYrwB6IG7cnKbMr6jiBZTFl+2LhRcoGrjBSdfp/q8?=
- =?us-ascii?Q?PwmKDi1ZnV1DQRbZAS+Cu8Rp8K9Vsp8ODq9uLRgRkYRBD+dbX+ATwoQf0sEG?=
- =?us-ascii?Q?GkCTUxtNNgYOJO93CXVOIqo/JgJ5uRq88LCRitToY/KFn/9VNJ6n66fEQPLB?=
- =?us-ascii?Q?dL5/NYtBevLeu6C540pkO/DmEZc3EY7mET8frJpVpVz7CNtjd7Ds7jnhjFkb?=
- =?us-ascii?Q?kb3hC5ZAtyoIwL57AcUzkqjJ4AKKUzPfDdcQpePkS7iebu/xH5cGFH07103k?=
- =?us-ascii?Q?Jaiy3kOcGGiV25wwR/eGauvkaF00mUuBc6/CK5HXuQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7933.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?b0IxRFJQTW43OWloTUFYejVyM0V0WVg4UnNlZHlzeGZWbnZaMTMrbGdZdHRB?=
+ =?utf-8?B?N0tQTG03T2h1dm1XbDExY2l2akJ1VExTQ2UxRVFCUG9GK1NDdEdRMExDdkk1?=
+ =?utf-8?B?ZXNNamxBbmMxcUVBbVZJOC80S2FGY3RqWnRBayswSlFmNHRsc2gwVEJzUkFa?=
+ =?utf-8?B?N3g3VERma3FmTURYSW5acHMxZThKQVFaR0djS25HQ0l6WU54eXloQnJCVlFl?=
+ =?utf-8?B?MWs3T1pXZTdUM1VKUVkxeFFqVzhpbzNpdUFkTWc4YkhBdjFjU2o5NzYwa282?=
+ =?utf-8?B?WWEzU2F2d3l6dFRJaDFKWlIrSXpLYkdWMEpJNHRSa0VLeEFuQlg0U0xrS3ZZ?=
+ =?utf-8?B?TlNueStjaWZ1dDhZaXJUTWI1THNkbkpVUDVuZGRzamNjQ1hQSkpzb2FtK05K?=
+ =?utf-8?B?NFBobk9qalZOd3BUS1U4dmpTRXZhTzZSdis4M1lkbjdrbGIzS3ZhWGpTZ0Z4?=
+ =?utf-8?B?M3I4enhraVVqR2ZzOUdtU0duWlVjdjB2d0Z2QUhiNjArNUVjNTZPanVLWng2?=
+ =?utf-8?B?cmFuNW1XcFErOWdFalN1cmRMbDhuNFVZMFl5TU5ETFRMMkNTTWl6WDZYZjht?=
+ =?utf-8?B?cHF2WEdwbWFBT1RvbVBXWGtZdzZoeG0wYWVFWktRZUtZRWNPOU9VZU9RRTRC?=
+ =?utf-8?B?ZW1UZ1QrRmtmMmNlQ3VtZkhBT011Q3NqNjd2cml2WmcyNkJsSG93MkpZSjNx?=
+ =?utf-8?B?RFRvNGFncXF2K01FSXIvajhyb1lWSFRldmEraUd5ZjQyTi9BUUdBakRJeGZS?=
+ =?utf-8?B?OHVoM0dqaTY5aWx5QjVBek9GWnVOY0pBV0NHWVA4U1ZHdEZuZTZnc09DTWtH?=
+ =?utf-8?B?cUdjS2F6ZFZnQjBUcE5mTUljUzR0VlI5cEdTUUhWS2lUd2JJVXN1cURiOG41?=
+ =?utf-8?B?UUFSZkMwUWU1MGd3bjRmWlZUVlBxSEQveEIxT2wrT3QyeTB3ai92Z2psZHc0?=
+ =?utf-8?B?QXByWW9heGxETmhUNGwwK2VOaUpEcGZJNlkzWU5nMTZZY1JaMWNWajZWWi9P?=
+ =?utf-8?B?RjJMR3ZYYVlQdjRaK1htcG5iaW1EaFc5dE1LUWpmdjllSUtFYjRUQlJsSFFZ?=
+ =?utf-8?B?ZTJ3elcycjBmcjlmMHVhOFVsR3NQWWdUcGhVVGZSSUp0Rm55dGM0QTFITXgr?=
+ =?utf-8?B?S3RaOG5mcVpySytDaC95MmlSZDdSNnJocXhKWmlwMUpKNWQwdExaTis5cFBM?=
+ =?utf-8?B?eTIxazVuUjdOTEhnaVIxSTdZQko5N214bSszakJYNStXUVBycWpPcjRvaWFT?=
+ =?utf-8?B?OFVESnFpbG9DckFHWW9udzdFWFdSbVFSOXF2QjE4WFUrZHpNYTB2NjFBR0Rx?=
+ =?utf-8?B?OUxaaG42NVdSRmRvakpMMlNsS0p4MThmR3NDNlc2aXg3MFBZWE0zTXJIVDBx?=
+ =?utf-8?B?VlhzaFVvK3VPNWhOeGxHSkNWeEk5bnQ1YWZrUWs1bThHYkYrZXlTL2daNnd2?=
+ =?utf-8?B?TTJjbHJMM0lheUluOFhJY2hzWXdlODFSU0h0MGgxenpLanRvR0c5RHlmVjUr?=
+ =?utf-8?B?Z0NYNi9ocXdtTWowZVNaNzh1RUxGWWpLYUhsQ1JTVFg0TFJ6UVF2VjBIbmpm?=
+ =?utf-8?B?VTkzalhxQmtCNi83bjFFWlF1aXBjVXNOMDdZWDhhVFJJTmJqVW5QdVB1UUJs?=
+ =?utf-8?B?VXVoTmtaTHJFK1o3ckhiWnBPYkhmd0ZLSGNYZlFjdkpjQ0kyakNGRWdOZ3VQ?=
+ =?utf-8?B?WjZhK1U0Z1lUbXpRNHlOSUo0UjhrUDNGQmxDRVRUT0wwTE9tVnhZYjZBPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Q1YjYsp9kj9MJOGe38ZY1xENBpApO4YGZavCvps66DwCnLk2qJV+pTETTSpI?=
- =?us-ascii?Q?ZorwZbtuKBwY9L64Y0UCsnj7xblOZ/0A62onYSLd77cgvdPV0/47INCsbC9S?=
- =?us-ascii?Q?mZRVBnQlzIJ0LcSPykGD2Sa7dGRQu7sAEo91nGfVME3WWdncqx/xEmE4DMcb?=
- =?us-ascii?Q?bdhLXsow0IUqI3FRJiP4yzbhyNqeN47eKaTicl1pYBWdUo3KB8qEGGtkmdp4?=
- =?us-ascii?Q?XQVkbt800C1JGjWKYfI7fSVJZIQ1hBkHGtADO20KgABAWdNKZ+9T6cl1xbVQ?=
- =?us-ascii?Q?tV6/KFmj1G+AcCirStB+BoPEdI656QUtjOCJsZAjG9pKftIPDsZ+Ys/49c23?=
- =?us-ascii?Q?ZuEFh55a5OgralFRC0urNHuOBFmHUfFZBJoiLmJ6YTBOh5oK26Hi+3nOLbUD?=
- =?us-ascii?Q?W5jmaNNL5exbiXG+Bd7bmYLGCWr0Sq0mBm+Trs98kA+D9SCCVkH0dMf7uaH0?=
- =?us-ascii?Q?MtnAgbuQck1cTQeebivjgu6Wgw7QDnF3xmU4zTusoFcHixvTf3M1nL7podFL?=
- =?us-ascii?Q?xZexMPD7DJe3jUcxhBY+mfGa+XKSoJ3WGndbryCaOGIlFb4V8I+/R41Etf9+?=
- =?us-ascii?Q?4JpE2vSQpVSwEUNtH/ay2UgqyJYqrqnvY2k3REn1iXYkmP36iDfkMcFOR6a4?=
- =?us-ascii?Q?2Ob8u6U6o8G4oXwDS/iOqyx490PqSdxDfAaEg1w5KDc9cGIWlejR15gtmief?=
- =?us-ascii?Q?r48r7FnXmLYNnd8qnP8gkTnkxOeiDlUZD8+WXX6sINJI8vsDCja7fJ9EPGZF?=
- =?us-ascii?Q?4aDl1PsX08L/HEfFncONI7nzkn/Ohi+TXrjb6AgyUwPAldiZRDFrxiOkuWZW?=
- =?us-ascii?Q?2kOz7VNLuqgeF5vBOBHH0Xs6r/AEuXrHf9voJTHw6MxWR8nbHC3HLXHcUlYj?=
- =?us-ascii?Q?pkjFvUUNrBNzclqReTOJhliOD9dC9eDeTXHiZv4Ka70mfJv1Tsg6VAJAlhwJ?=
- =?us-ascii?Q?K/DRETmtkSj5LzXY9Rjrf+YA4lFd7Z/FZkaD4Dy2UPf9VCAhLqjGCSqvjFKN?=
- =?us-ascii?Q?qoBPVt6Fv+vTx/jV6fp60OY24OIIEXnzxIFqj2asbIHFqkAnlU58lDGcu/MX?=
- =?us-ascii?Q?WU4vqc25tDiAX/3tc4VbqMxaLlz/N+gqkj7WEfy43vGWRLbZasScKD5CHRpd?=
- =?us-ascii?Q?XLdlr5OEdGiT2N+TmaTBMZ0SnTGzY9pkHn28vK57mfMV5RIYb4orjw9fpOn+?=
- =?us-ascii?Q?9VKKYxw3hsTndmdIhX7mJiOzZrYb+A6pMUHQX/KFWefXYvXXGP9r1OdDQ2NU?=
- =?us-ascii?Q?SXdqaYoXFpPajj2Xa5xxGzed5C7jawHaKvWHYP2dWgYIn6o5jwpZ2bxq5nM+?=
- =?us-ascii?Q?ssfVb6cdMcc1c65ATGMeBglx5czfTw4VcNgikptUQ0uEurXK5nn22pSFBfam?=
- =?us-ascii?Q?8it7zlmomtGzdPu3eUD8aSmuGqNK1o5WJbjEFua2Br42u2SSRrUEYhras7oo?=
- =?us-ascii?Q?ul9mLTTawsJpwl9rKLkio2UuN4xtDfWjdmTEScQL7ehLqJAFItNANJgqodgL?=
- =?us-ascii?Q?Am5NnWglmPuz4Fc8XXnkUjShni2cZyB0jXHtVdnZxNqdXSl2AIxsdTI+zOQq?=
- =?us-ascii?Q?7ZZEsKkR/ca3ILArc9QIAPmGYoY+1xQnJBlyZbEeRCO+NKPR+t/+TAAKfIiw?=
- =?us-ascii?Q?/Q=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	NEn7R0ZaPZh4ETmvs8YkUQr2MWWUUHcxYsYvE+bf0x3sLQ1icggoyj99sCmg/JWyFHbgNQSANuWEjJUuhlM52OgVIJwlRequCPidB9Cu0chveW6/BcB9rDGrRO9GM5Ea1rsgdY5FchVLVgT6WIyRTAEECzSol2cv0dpEK2nY1HbExP3JhczGcoB74eMkb3fCnZeGmfnAGDDGfGdsnND/LDEc7nSjGPWnhshVEnS9bf+xrxph7K85txgnypmvJCHD4/hu1Ly/g4LgaRONW+cY8zZOEALT1cdSaTxhRxyOoue0dnVO+FQCQfg0IVZEMHUtzRiBZYqOxAosrKvdwN9494F+fCSdKv6n0i8XFkjm5W92jsHWUBMW/WKE2G4Ak0Y4pEz/ORHYcNGyYaTzxWtbmtKbrn1ipy1OaAFcwTz6yfVUywtouZ+iT3jC9N/hPC8u542LJ5Uzry+NdlK6Dm+dI3NhkECh/pAc8tEYURkejNegJGXSiWy4JTGuVcfFEqa6eviIqP2Pf9I87zRkDJY5OsoK7HRSnf8hxNBXtbzsxAKzlIM100GX8ikMyjEZnMYYX7yKFbKZ9J7FkWobAKwZh812r/6Ona/6er0oN7+dn7g=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63514feb-efb7-41f6-ecd8-08dced4dea11
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7933.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SE5NR3FwRTcvRjBONDVGRWNrNTh0OXpSdVpLcmNlWkRBRzR3dlYvT0VWRlgv?=
+ =?utf-8?B?NE50UDdEa2ludmhCM294STZ4R2huYTJVcnNrTXg5SU9nNjJBRldDTmFhd2xB?=
+ =?utf-8?B?ZWh5MkpYcVJQR1FFbFVIU2VPVGprOXhsR2FUSS81cjNKaVNpRy90UDQ3S2sy?=
+ =?utf-8?B?VC85YlY1MjBJU3Y0T2NONzFycERMWDZJR29lVVl1QjYrSUdhbEFIbzBhSnJu?=
+ =?utf-8?B?dXd4WGZtNGJxbWZZWDVCUmZhaXJMU3BGanFEbGhuLytySVZ3cjdad3FQMnA0?=
+ =?utf-8?B?aW55a0JrOVBDeDVrVlVMOVgybGM5QlJ3ZjBhT05BNVZ1d2RDb1BUTU1FK2ZD?=
+ =?utf-8?B?K0V1ZWt3Y0JKV1lYR3poZ1N0VHlJOVB2dTNJUCtmdG5JTDBjWk5BM0I1RDM3?=
+ =?utf-8?B?cW9YWTNGamNRWnExOFFqWDNTYURkd295TkhxYkp5Nk9DWGo5M3JreTZEdERw?=
+ =?utf-8?B?ZUJxd1ljRjZNN0ZzNTJWdzBQWXNsNFRLVm5vWi9SWGF6ZDFDN1BFcUJJbzA0?=
+ =?utf-8?B?ZUZZRHZrU2dvV0x5Y1FvNlk1a293aFZpWE4wQUhzWlZNUWxQa0J1MjlmTlJN?=
+ =?utf-8?B?blcvWGZnQVpCMVFYZ3lKTXpsSDZYblZNZ1Z4RnBiaURjSU8zbmhlTW94WHpI?=
+ =?utf-8?B?Nnl4dUo1SDkzU2N4VmVwRFlQUTBGclRNeFZrNDdXQmNIem1mQ25zcFc2blN3?=
+ =?utf-8?B?NEdlRmphN01ESjBjZVdhYkFna2l2eEl5REdWMnU4ZDVMV0duc3NsZG5YaG9l?=
+ =?utf-8?B?dkVUcW1NMEtoVWcwSVdkTCtteStnOUVRcnFDMDhWcWh5WmhlVkNuYXFBVW9N?=
+ =?utf-8?B?cm42WkdDVWpxSXFuMXJ3TkdzVlJ0SmxwaXlMZTZEeFNOVStyOVYrMGRTUkFr?=
+ =?utf-8?B?VHJEYVpPT2FDdHhOM1ZUT09nZ2FmZjJzaVVOa2VOK3dZaTE0VG9FeldzWEZR?=
+ =?utf-8?B?ZXNkNmptVmlXUXJpY0lkQzFVdTNuLzFjUHNLWUxJWHRQODN3Szk3b0pKWkNB?=
+ =?utf-8?B?QXZPQk9zcU0zMVJ6OUVpMDlnR09sV3Z4UGZHaTFLbXhNcThLZVRHUlBSbWpW?=
+ =?utf-8?B?bGs2djg0cDR3dnh0a1lxWVpnMWFHYUZqelZQeWQwQ3o3OWVZOVZ5OUZmTHFD?=
+ =?utf-8?B?S09vQnZTbkt0akZjUXYxbGpkOGVNbkoydkZpUnJENkszZ2tncnJHWXdLN1ZO?=
+ =?utf-8?B?Z1BuR29hMUxPRGtHazg1YUtYdkNuQ1dqOUZTczQrTmhqVWw0RVFpS0gweXIx?=
+ =?utf-8?B?KzU1SzhxN1E2ZmVrRmFrbklOV0xYc3NGN0ZMK01jUkFzQ05CSnBHWnJvRmxM?=
+ =?utf-8?B?N0k3U1VGSnd6ZjUxQzI3ZXprVmttZ2pibUtNWm94SEEyM0lJa3M1NVFCZGxt?=
+ =?utf-8?B?dFhXT0VyVytSR241eHFQcC90OVpmOVZYWnV0TjJlb0w5SUdGRTMzS1pxenVt?=
+ =?utf-8?B?WTVNc1Q1b2FuZ01XSGgwcm1UNHZNbXFPd08xOHJZc3ZGWndhY3ViK2M5MUdR?=
+ =?utf-8?B?anNRSWJRY1NseFNDT29pV0p4QjZpZEdpMzlTVHFFRVgzVEpVUFc2UWhPMFV5?=
+ =?utf-8?B?WE1kNnBlc3hBa2YyUDlmcTUxb0h2UmVsNmkyRjdEY3ZaYTQ4VFhDcFpqMkRa?=
+ =?utf-8?B?UjBYTXIvS1R1KzJpNEV1L1FrcnRlS2hTS1NKNlhQaEwxeUx0MTNxa2dZa0sz?=
+ =?utf-8?B?dzM4VzVKVi9hSFhOQStSNXlFTXN6Y0o3bDJqc0l1bFVGdGJLdFZRbkxtZ0hp?=
+ =?utf-8?B?bjZRSjFFYXN5aEZqRkIzWUZ6K2pid3FQOUdEd2ZCa3lyY2pacGxVQUV6UHRJ?=
+ =?utf-8?B?VjVsZWVjSVpDdDNSNXRhWk1NWmRNWWE5dXZyNDc2V281aEE5Tk1ibk9iT0U3?=
+ =?utf-8?B?MkRVbnNlbk5Zb3lkSzA5LzdjSy83UGJHbmEzVFIvV1pSRjA1Yk41OUxtekda?=
+ =?utf-8?B?U2U3SmpiVUVZZmZEMGJLSjlIa3VHd1FFL245VWlMTFp4a25yd2FUVS91ZGZ2?=
+ =?utf-8?B?Q05wWkIxWUxwN05WR1R2bjYrZzJ5aHIwMklOQzZBWHE5RkJIS2tLM0lIUUdY?=
+ =?utf-8?B?UGFXaGdVMEJlUzQwb1lFalRlMi9KSGxOc2lNM1ZtK2gwb1NvdjY3OTB0elNq?=
+ =?utf-8?B?UWVybkZXck91YzhlV0U1QlVQUmJvUkpVUjk5cUQzOUJIeXhXU0pQU0x2d0M4?=
+ =?utf-8?B?eGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77e5e9c8-bbd9-440e-9c81-08dced4e3f77
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 19:16:55.6551
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 19:19:10.9304
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L48touKgaIqs7/8jNLSHKQMdG6gP6INqqNwchC0t87K6C8Oy1HK6GHZy8U4zhyTlcUab/zidK6ese5QuwIurLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR10MB8116
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_14,2024-10-15_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- adultscore=0 spamscore=0 mlxscore=0 suspectscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2409260000 definitions=main-2410150129
-X-Proofpoint-GUID: rDfez8jCjouJt4m5Kfl0EhPksjUYCND0
-X-Proofpoint-ORIG-GUID: rDfez8jCjouJt4m5Kfl0EhPksjUYCND0
+X-MS-Exchange-CrossTenant-UserPrincipalName: gykuiEO+dC+2wI5Ns8sWVxEFEC5ZLsWOj36HSyIRDe3qFbxrRkl/yqHjOIBBmkbJi5kMcjW001/z4zs3AlKQF2h9zsKd/0HjrRXYaBKbQB0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6977
+X-OriginatorOrg: intel.com
 
-* Anjali Kulkarni <anjali.k.kulkarni@oracle.com> [241015 13:30]:
-> Kunit tests to test hash table add, delete, duplicate add and delete.
-> Add following configs and compile kernel code:
+On 10/11/2024 11:48 AM, Jacob Keller wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
 > 
-> CONFIG_CONNECTOR=y
-> CONFIG_PROC_EVENTS=y
-> CONFIG_NET=y
-> CONFIG_KUNIT=m
-> CONFIG_CN_HASH_KUNIT_TEST=m
+> This is new API which caters to the following requirements:
 > 
-> To run kunit tests:
-> sudo modprobe cn_hash_test
+> - Pack or unpack a large number of fields to/from a buffer with a small
+>   code footprint. The current alternative is to open-code a large number
+>   of calls to pack() and unpack(), or to use packing() to reduce that
+>   number to half. But packing() is not const-correct.
 > 
-> Output of kunit tests and hash table contents are displayed in
-> /var/log/messages (at KERN_DEBUG level).
+> - Use unpacked numbers stored in variables smaller than u64. This
+>   reduces the rodata footprint of the stored field arrays.
 > 
-> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+> - Perform error checking at compile time, rather than at runtime, and
+>   return void from the API functions. To that end, we introduce
+>   CHECK_PACKED_FIELD_*() macros to be used on the arrays of packed
+>   fields. Note: the C preprocessor can't generate variable-length code
+>   (loops),  as would be required for array-style definitions of struct
+>   packed_field arrays. So the sanity checks use code generation at
+>   compile time to $KBUILD_OUTPUT/include/generated/packing-checks.h.
+>   There are explicit macros for sanity-checking arrays of 1 packed
+>   field, 2 packed fields, 3 packed fields, ..., all the way to 50 packed
+>   fields. In practice, the sja1105 driver will actually need the variant
+>   with 40 fields. This isn't as bad as it seems: feeding a 39 entry
+>   sized array into the CHECK_PACKED_FIELDS_40() macro will actually
+>   generate a compilation error, so mistakes are very likely to be caught
+>   by the developer and thus are not a problem.
+> 
+> - Reduced rodata footprint for the storage of the packed field arrays.
+>   To that end, we have struct packed_field_s (small) and packed_field_m
+>   (medium). More can be added as needed (unlikely for now). On these
+>   types, the same generic pack_fields() and unpack_fields() API can be
+>   used, thanks to the new C11 _Generic() selection feature, which can
+>   call pack_fields_s() or pack_fields_m(), depending on the type of the
+>   "fields" array - a simplistic form of polymorphism. It is evaluated at
+>   compile time which function will actually be called.
+> 
+> Over time, packing() is expected to be completely replaced either with
+> pack() or with pack_fields().
+> 
+> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 > ---
->  drivers/connector/cn_hash.c   |  49 +++++++++-
->  drivers/connector/connector.c |  15 ++-
->  include/linux/connector.h     |   8 +-
->  lib/Kconfig.debug             |  17 ++++
->  lib/Makefile                  |   1 +
->  lib/cn_hash_test.c            | 167 ++++++++++++++++++++++++++++++++++
->  lib/cn_hash_test.h            |  12 +++
->  7 files changed, 264 insertions(+), 5 deletions(-)
->  create mode 100644 lib/cn_hash_test.c
->  create mode 100644 lib/cn_hash_test.h
+>  include/linux/packing.h  |  69 ++++++++++++++++++++++
+>  lib/gen_packing_checks.c |  31 ++++++++++
+>  lib/packing.c            | 149 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  Kbuild                   |  13 ++++-
+>  4 files changed, 259 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/connector/cn_hash.c b/drivers/connector/cn_hash.c
-> index a0211cd99132..8f0eb6acb158 100644
-> --- a/drivers/connector/cn_hash.c
-> +++ b/drivers/connector/cn_hash.c
-> @@ -166,7 +166,7 @@ __u32 cn_hash_del_get_exval(struct cn_hash_dev *hdev, pid_t pid)
->  	return 0;
->  }
+> diff --git a/include/linux/packing.h b/include/linux/packing.h
+> index 5d36dcd06f60..eeb23d90e5e0 100644
+> --- a/include/linux/packing.h
+> +++ b/include/linux/packing.h
+> @@ -26,4 +26,73 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
+>  int unpack(const void *pbuf, u64 *uval, size_t startbit, size_t endbit,
+>  	   size_t pbuflen, u8 quirks);
 >  
-> -__u32 cn_hash_get_exval(struct cn_hash_dev *hdev, pid_t pid)
-> +int cn_hash_get_exval(struct cn_hash_dev *hdev, pid_t pid)
-
-Is this return type change supposed to be here?
-
->  {
->  	struct uexit_pid_hnode *hnode;
->  	__u32 excde;
-> @@ -189,7 +189,52 @@ __u32 cn_hash_get_exval(struct cn_hash_dev *hdev, pid_t pid)
->  	return -EINVAL;
->  }
->  
-> +int cn_hash_display_hlist(struct cn_hash_dev *hdev, pid_t pid, int max_len,
-> +				int *hkey, int *key_display)
-> +{
-> +	struct uexit_pid_hnode *hnode;
-> +	int key, count = 0;
+> +#define GEN_PACKED_FIELD_MEMBERS(__type) \
+> +	__type startbit; \
+> +	__type endbit; \
+> +	__type offset; \
+> +	__type size;
 > +
-> +	mutex_lock(&hdev->uexit_hash_lock);
-> +	key = hash_min(pid, HASH_BITS(hdev->uexit_pid_htable));
-> +	pr_debug("Bucket: %d\n", key);
+> +/* Small packed field. Use with bit offsets < 256, buffers < 32B and
+> + * unpacked structures < 256B.
+> + */
+> +struct packed_field_s {
+> +	GEN_PACKED_FIELD_MEMBERS(u8);
+> +};
 > +
-> +	hlist_for_each_entry(hnode,
-> +			&hdev->uexit_pid_htable[key],
-> +			uexit_pid_hlist) {
-> +		if (key_display[key] != 1) {
-> +			if (hnode->uexit_pid_hlist.next == NULL)
-> +				pr_debug("pid %d ", hnode->pid);
-> +			else
-> +				pr_debug("pid %d --> ", hnode->pid);
-> +		}
-> +		count++;
+> +/* Medium packed field. Use with bit offsets < 65536, buffers < 8KB and
+> + * unpacked structures < 64KB.
+> + */
+> +struct packed_field_m {
+> +	GEN_PACKED_FIELD_MEMBERS(u16);
+> +};
+> +
+> +#define PACKED_FIELD(start, end, struct_name, struct_field) \
+> +	{ \
+> +		(start), \
+> +		(end), \
+> +		offsetof(struct_name, struct_field), \
+> +		sizeof_field(struct_name, struct_field), \
 > +	}
 > +
-> +	mutex_unlock(&hdev->uexit_hash_lock);
+> +#define CHECK_PACKED_FIELD(field, pbuflen) \
+> +	({ typeof(field) __f = (field); typeof(pbuflen) __len = (pbuflen); \
+> +	BUILD_BUG_ON(__f.startbit < __f.endbit); \
+> +	BUILD_BUG_ON(__f.startbit >= BITS_PER_BYTE * __len); \
+> +	BUILD_BUG_ON(__f.startbit - __f.endbit >= BITS_PER_BYTE * __f.size); \
+> +	BUILD_BUG_ON(__f.size != 1 && __f.size != 2 && __f.size != 4 && __f.size != 8); })
 > +
-> +	if ((key_display[key] != 1) && !count)
-> +		pr_debug("(empty)\n");
+> +#define CHECK_PACKED_FIELD_OVERLAP(field1, field2) \
+> +	({ typeof(field1) _f1 = (field1); typeof(field2) _f2 = (field2); \
+> +	BUILD_BUG_ON(max(_f1.endbit, _f2.endbit) <=  min(_f1.startbit, _f2.startbit)); })
 > +
-> +	pr_debug("\n");
-
-It seems like you maybe added an extra \n if you print the (empty) line
-above?
-
+> +#include <generated/packing-checks.h>
 > +
-> +	*hkey = key;
+> +void pack_fields_s(void *pbuf, size_t pbuflen, const void *ustruct,
+> +		   const struct packed_field_s *fields, size_t num_fields,
+> +		   u8 quirks);
 > +
-> +	if (count > max_len) {
-> +		pr_err("%d entries in hlist for key %d, expected %d\n",
-> +				count, key, max_len);
-> +		return -EINVAL;
-> +	}
+> +void pack_fields_m(void *pbuf, size_t pbuflen, const void *ustruct,
+> +		   const struct packed_field_m *fields, size_t num_fields,
+> +		   u8 quirks);
 > +
-> +	return 0;
-> +}
+> +void unpack_fields_s(const void *pbuf, size_t pbuflen, void *ustruct,
+> +		     const struct packed_field_s *fields, size_t num_fields,
+> +		     u8 quirks);
 > +
->  bool cn_hash_table_empty(struct cn_hash_dev *hdev)
->  {
-> -	return hash_empty(hdev->uexit_pid_htable);
-> +	bool is_empty;
+> +void unpack_fields_m(const void *pbuf, size_t pbuflen, void *ustruct,
+> +		      const struct packed_field_m *fields, size_t num_fields,
+> +		      u8 quirks);
 > +
-> +	is_empty = hash_empty(hdev->uexit_pid_htable);
-> +	pr_debug("Hash table is %s\n", (is_empty ? "empty" : "not empty"));
+> +#define pack_fields(pbuf, pbuflen, ustruct, fields, quirks) \
+> +	_Generic((fields), \
+> +		 const struct packed_field_s * : pack_fields_s, \
+> +		 const struct packed_field_m * : pack_fields_m \
+> +		)(pbuf, pbuflen, ustruct, fields, ARRAY_SIZE(fields), quirks)
 > +
-> +	return is_empty;
-
-It seems odd to have this change in the kunit change.
-
->  }
-> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
-> index 506e3cbedf85..28e60c8b0fdf 100644
-> --- a/drivers/connector/connector.c
-> +++ b/drivers/connector/connector.c
-> @@ -308,7 +308,7 @@ int cn_add_elem(__u32 uexit_code, pid_t pid)
->  }
->  EXPORT_SYMBOL_GPL(cn_add_elem);
->  
-> -__u32 cn_get_exval(pid_t pid)
-> +int cn_get_exval(pid_t pid)
->  {
->  	struct cn_dev *dev = &cdev;
->  	__u32 exval;
-> @@ -321,6 +321,19 @@ __u32 cn_get_exval(pid_t pid)
->  }
->  EXPORT_SYMBOL_GPL(cn_get_exval);
->  
-> +int cn_display_hlist(pid_t pid, int max_len, int *hkey,
-> +			int *key_display)
-
-This can probably be one line here.
-
-> +{
-> +	struct cn_dev *dev = &cdev;
+> +#define unpack_fields(pbuf, pbuflen, ustruct, fields, quirks) \
+> +	_Generic((fields), \
+> +		 const struct packed_field_s * : unpack_fields_s, \
+> +		 const struct packed_field_m * : unpack_fields_m \
+> +		)(pbuf, pbuflen, ustruct, fields, ARRAY_SIZE(fields), quirks)
 > +
-> +	if (!cn_already_initialized)
-> +		return 0;
-> +
-> +	return cn_hash_display_hlist(dev->hdev, pid, max_len,
-> +					hkey, key_display);
-> +}
-> +EXPORT_SYMBOL_GPL(cn_display_hlist);
-> +
->  bool cn_table_empty(void)
->  {
->  	struct cn_dev *dev = &cdev;
-> diff --git a/include/linux/connector.h b/include/linux/connector.h
-> index 094e1730a4f6..af801c5005e8 100644
-> --- a/include/linux/connector.h
-> +++ b/include/linux/connector.h
-> @@ -165,7 +165,7 @@ __u32 cn_hash_del_get_exval(struct cn_hash_dev *hdev, pid_t pid);
->  int cn_add_elem(__u32 uexit_code, pid_t pid);
->  int cn_del_elem(pid_t pid);
->  __u32 cn_del_get_exval(pid_t pid);
-> -__u32 cn_get_exval(pid_t pid);
-> +int cn_get_exval(pid_t pid);
->  
->  struct cn_hash_dev *cn_hash_alloc_dev(const char *name);
->  void cn_hash_free_dev(struct cn_hash_dev *hdev);
-> @@ -175,9 +175,13 @@ void cn_hash_free_elem(struct uexit_pid_hnode *elem);
->  int cn_hash_add_elem(struct cn_hash_dev *hdev, __u32 uexit_code, pid_t pid);
->  int cn_hash_del_elem(struct cn_hash_dev *hdev, pid_t pid);
->  __u32 cn_hash_del_get_exval(struct cn_hash_dev *hdev, pid_t pid);
-> -__u32 cn_hash_get_exval(struct cn_hash_dev *hdev, pid_t pid);
-> +int cn_hash_get_exval(struct cn_hash_dev *hdev, pid_t pid);
-
-It seems like the change in type should be with another change or on its
-own?
-
->  
->  bool cn_table_empty(void);
->  bool cn_hash_table_empty(struct cn_hash_dev *hdev);
->  
-> +int cn_display_hlist(pid_t pid, int max_len, int *hkey, int *key_display);
-> +int cn_hash_display_hlist(struct cn_hash_dev *hdev, pid_t pid, int max_len,
-> +				int *hkey, int *key_display);
-> +
->  #endif				/* __CONNECTOR_H */
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index 7315f643817a..23599beb9bec 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -2705,6 +2705,23 @@ config HASHTABLE_KUNIT_TEST
->  
->  	  If unsure, say N.
->  
-> +config CONFIG_CN_HASH_KUNIT_TEST
-> +	tristate "KUnit Test for connector hashtable code" if !KUNIT_ALL_TESTS
-> +	depends on KUNIT
-> +	default KUNIT_ALL_TESTS
-> +	help
-> +	  This builds the hashtable KUnit test suite.
-> +	  It tests the basic functionality of the API defined in
-> +	  drivers/connector/cn_hash.c.
-> +	  CONFIG_CONNECTOR=y, CONFIG_PROC_EVENTS=y as well as CONFIG_NET=y
-> +	  needs to be enabled along with CONFIG_CN_HASH_KUNIT_TEST=m and
-> +	  CONFIG_KUNIT=m in .config file to compile and then test as a kernel
-> +	  module with "modprobe cn_hash_test".
-> +	  For more information on KUnit and unit tests in general please
-> +	  refer to the KUnit documentation in Documentation/dev-tools/kunit/.
-> +
-> +	  If unsure, say N.
-> +
->  config LINEAR_RANGES_TEST
->  	tristate "KUnit test for linear_ranges"
->  	depends on KUNIT
-> diff --git a/lib/Makefile b/lib/Makefile
-> index 811ba12c8cd0..2c59c82b0b18 100644
-> --- a/lib/Makefile
-> +++ b/lib/Makefile
-> @@ -379,6 +379,7 @@ obj-$(CONFIG_CMDLINE_KUNIT_TEST) += cmdline_kunit.o
->  obj-$(CONFIG_SLUB_KUNIT_TEST) += slub_kunit.o
->  obj-$(CONFIG_MEMCPY_KUNIT_TEST) += memcpy_kunit.o
->  obj-$(CONFIG_IS_SIGNED_TYPE_KUNIT_TEST) += is_signed_type_kunit.o
-> +obj-$(CONFIG_CN_HASH_KUNIT_TEST) += cn_hash_test.o
->  CFLAGS_overflow_kunit.o = $(call cc-disable-warning, tautological-constant-out-of-range-compare)
->  obj-$(CONFIG_OVERFLOW_KUNIT_TEST) += overflow_kunit.o
->  CFLAGS_stackinit_kunit.o += $(call cc-disable-warning, switch-unreachable)
-> diff --git a/lib/cn_hash_test.c b/lib/cn_hash_test.c
+>  #endif
+> diff --git a/lib/gen_packing_checks.c b/lib/gen_packing_checks.c
 > new file mode 100644
-> index 000000000000..78c39c0a0997
+> index 000000000000..3213c858c2fe
 > --- /dev/null
-> +++ b/lib/cn_hash_test.c
-> @@ -0,0 +1,167 @@
+> +++ b/lib/gen_packing_checks.c
+> @@ -0,0 +1,31 @@
 > +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * KUnit test for the connector threads hashtable code.
-> + *
-> + * Copyright (c) 2024 Oracle and/or its affiliates.
-> + * Author: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-> + */
-> +#include <kunit/test.h>
+> +#include <stdio.h>
 > +
-> +#include "cn_hash_test.h"
-> +
-> +#define ARR_SIZE	4
-> +#define HASH_TABLE_LEN	1024
-> +
-> +struct add_data {
-> +	pid_t pid;
-> +	int exit_val;
-> +	int key;
-> +};
-> +
-> +static struct add_data adata[ARR_SIZE];
-> +static int key_display[HASH_TABLE_LEN];
-> +
-> +static int cn_hash_init(struct kunit *test)
+> +int main(int argc, char **argv)
 > +{
-> +	for (int i = 0; i < HASH_TABLE_LEN; i++)
-> +		key_display[i] = 0;
+> +	printf("/* Automatically generated - do not edit */\n\n");
+> +	printf("#ifndef GENERATED_PACKING_CHECKS_H\n");
+> +	printf("#define GENERATED_PACKING_CHECKS_H\n\n");
 > +
-> +	return 0;
-> +}
+> +	for (int i = 1; i <= 50; i++) {
+> +		printf("#define CHECK_PACKED_FIELDS_%d(fields, pbuflen) \\\n", i);
+> +		printf("\t({ typeof(&(fields)[0]) _f = (fields); typeof(pbuflen) _len = (pbuflen); \\\n");
+> +		printf("\tBUILD_BUG_ON(ARRAY_SIZE(fields) != %d); \\\n", i);
+> +		for (int j = 0; j < i; j++) {
+> +			int final = (i == 1);
 > +
-> +static void cn_display_htable(struct kunit *test, int len)
-> +{
-> +	int i, err;
+> +			printf("\tCHECK_PACKED_FIELD(_f[%d], _len);%s\n",
+> +			       j, final ? " })\n" : " \\");
+> +		}
+> +		for (int j = 1; j < i; j++) {
+> +			for (int k = 0; k < j; k++) {
+> +				int final = (j == i - 1) && (k == j - 1);
 > +
-> +	cn_hash_init(test);
-> +
-> +	pr_debug("\n");
-> +	pr_debug("Displaying hash table:\n");
-> +
-> +	for (i = 0; i < len; i++) {
-> +		err = cn_display_hlist(adata[i].pid, len, &adata[i].key,
-> +					key_display);
-> +		key_display[adata[i].key] = 1;
-> +		KUNIT_EXPECT_EQ(test, err, 0);
-> +	}
-> +}
-> +
-> +static void cn_hash_test_add(struct kunit *test)
-> +{
-> +	int err, i;
-> +	int exit_val;
-> +
-> +	adata[0].pid = 1;
-> +	adata[0].exit_val = 45;
-> +
-> +	adata[1].pid = 2;
-> +	adata[1].exit_val = 13;
-> +
-> +	adata[2].pid = 1024;
-> +	adata[2].exit_val = 16;
-> +
-> +	adata[3].pid = 1023;
-> +	adata[3].exit_val = 71;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(adata); i++) {
-> +		err = cn_add_elem(adata[i].exit_val, adata[i].pid);
-> +		KUNIT_EXPECT_EQ_MSG(test, 0, err,
-> +				"Adding pid %d returned err %d",
-> +				adata[i].pid, err);
-> +
-> +		exit_val = cn_get_exval(adata[i].pid);
-> +		KUNIT_EXPECT_EQ(test, adata[i].exit_val, exit_val);
+> +				printf("\tCHECK_PACKED_FIELD_OVERLAP(_f[%d], _f[%d]);%s\n",
+> +				       k, j, final ? " })\n" : " \\");
+> +			}
+> +		}
 > +	}
 > +
-> +	cn_display_htable(test, ARRAY_SIZE(adata));
+> +	printf("#endif /* GENERATED_PACKING_CHECKS_H */\n");
 > +}
-> +
-> +static void cn_hash_test_del(struct kunit *test)
-> +{
-> +	int i, err;
-> +	int exit_val;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(adata); i++) {
-> +		err = cn_del_elem(adata[i].pid);
-> +		KUNIT_EXPECT_EQ_MSG(test, 0, err,
-> +				"Deleting pid %d returned err %d",
-> +				adata[i].pid, err);
-> +
-> +		exit_val = cn_get_exval(adata[i].pid);
-> +		KUNIT_EXPECT_EQ(test, -EINVAL, exit_val);
-> +	}
-> +
-> +	cn_display_htable(test, ARRAY_SIZE(adata));
-> +	KUNIT_EXPECT_TRUE(test, cn_table_empty());
-> +}
-> +
-> +static void cn_hash_test_del_get_exval(struct kunit *test)
-> +{
-> +	int i, exval;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(adata); i++) {
-> +		exval = cn_del_get_exval(adata[i].pid);
-> +		KUNIT_EXPECT_EQ(test, adata[i].exit_val, exval);
-> +
-> +		cn_display_htable(test, ARRAY_SIZE(adata));
-> +	}
-> +
-> +	KUNIT_EXPECT_TRUE(test, cn_table_empty());
-> +}
-> +static void cn_hash_test_dup_add(struct kunit *test)
-> +{
-> +	int err, exit_val;
-> +
-> +	adata[0].pid = 10;
-> +	adata[0].exit_val = 21;
-> +
-> +	err = cn_add_elem(adata[0].exit_val, adata[0].pid);
-> +	KUNIT_EXPECT_EQ(test, 0, err);
-> +
-> +	exit_val = cn_get_exval(adata[0].pid);
-> +	KUNIT_EXPECT_EQ(test, 21, exit_val);
-> +
-> +	adata[1].pid = 10;
-> +	adata[1].exit_val = 12;
-> +
-> +	err = cn_add_elem(adata[1].exit_val, adata[1].pid);
-> +	KUNIT_EXPECT_EQ(test, -EEXIST, err);
-> +
-> +	exit_val = cn_get_exval(adata[1].pid);
-> +	KUNIT_EXPECT_EQ(test, 21, exit_val);
-> +
-> +	cn_display_htable(test, 1);
-> +}
-> +
-> +static void cn_hash_test_dup_del(struct kunit *test)
-> +{
-> +	int err;
-> +
-> +	err = cn_del_elem(adata[0].pid);
-> +	KUNIT_EXPECT_EQ(test, 0, err);
-> +
-> +	err = cn_del_elem(adata[0].pid);
-> +	KUNIT_EXPECT_EQ(test, -EINVAL, err);
-> +
-> +	KUNIT_EXPECT_TRUE(test, cn_table_empty());
-> +}
-> +
-> +static struct kunit_case cn_hashtable_test_cases[] = {
-> +	KUNIT_CASE(cn_hash_test_add),
-> +	KUNIT_CASE(cn_hash_test_del),
-> +	KUNIT_CASE(cn_hash_test_dup_add),
-> +	KUNIT_CASE(cn_hash_test_dup_del),
-> +	KUNIT_CASE(cn_hash_test_add),
-> +	KUNIT_CASE(cn_hash_test_del_get_exval),
-> +	{},
-> +};
-> +
-> +static struct kunit_suite cn_hashtable_test_module = {
-> +	.name = "cn_hashtable",
-> +	.init = cn_hash_init,
-> +	.test_cases = cn_hashtable_test_cases,
-> +};
-> +kunit_test_suite(cn_hashtable_test_module);
-> +
-> +MODULE_DESCRIPTION("KUnit test for the connector threads hashtable code");
-> +MODULE_LICENSE("GPL");
-> diff --git a/lib/cn_hash_test.h b/lib/cn_hash_test.h
-> new file mode 100644
-> index 000000000000..46fcda31b25c
-> --- /dev/null
-> +++ b/lib/cn_hash_test.h
-> @@ -0,0 +1,12 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ */
-> +/*
-> + * Copyright (c) 2024 Oracle and/or its affiliates.
-> + * Author: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-> + */
-> +extern int cn_display_hlist(pid_t pid, int max_len, int *hkey,
-> +				int *key_display);
-> +extern int cn_del_elem(pid_t pid);
-> +extern int cn_add_elem(__u32 uexit_code, pid_t pid);
-> +extern __u32 cn_del_get_exval(pid_t pid);
-> +extern int cn_get_exval(pid_t pid);
-> +extern bool cn_table_empty(void);
 
-I think we are not adding externs to headers anymore.
+Hi Masahiro,
 
-> -- 
-> 2.46.0
+The changes in this patch contains some code and Kbuild changes to
+generate compile-time macro checks at build time (instead of committing
+20 thousand lines of code directly to git). I'd appreciate if you could
+review this change, specifically the auto-generation of packing-checks.h
+
+The full series can be viewed on lore at:
+
+> https://lore.kernel.org/netdev/20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com/
+
+> diff --git a/Kbuild b/Kbuild
+> index 464b34a08f51..35a8b78b72d9 100644
+> --- a/Kbuild
+> +++ b/Kbuild
+> @@ -34,6 +34,17 @@ arch/$(SRCARCH)/kernel/asm-offsets.s: $(timeconst-file) $(bounds-file)
+>  $(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s FORCE
+>  	$(call filechk,offsets,__ASM_OFFSETS_H__)
+>  
+> +# Generate packing-checks.h
+> +
+> +hostprogs += lib/gen_packing_checks
+> +
+> +packing-checks := include/generated/packing-checks.h
+> +
+> +filechk_gen_packing_checks = lib/gen_packing_checks
+> +
+> +$(packing-checks): lib/gen_packing_checks FORCE
+> +	$(call filechk,gen_packing_checks)
+> +
+>  # Check for missing system calls
+>  
+>  quiet_cmd_syscalls = CALL    $<
+> @@ -70,7 +81,7 @@ $(atomic-checks): $(obj)/.checked-%: include/linux/atomic/%  FORCE
+>  # A phony target that depends on all the preparation targets
+>  
+>  PHONY += prepare
+> -prepare: $(offsets-file) missing-syscalls $(atomic-checks)
+> +prepare: $(offsets-file) missing-syscalls $(atomic-checks) $(packing-checks)
+>  	@:
+>  
+>  # Ordinary directory descending
 > 
+
+In particular, I tried a variety of places to put the build-time
+generation logic, and ended up having to stick it in the top level
+Kbuild file as part of the prepare target. I was unable to figure out
+another way to get the include dependency correct.
+
+packing-checks.h contains the set of macros generated for checking
+various sizes of the packing array, which we want to have at compile
+time, so we need to generate packing-checks.h before any code which
+includes <linux/packing.h> which is what ultimately includes
+<generated/packing-checks.h>
+
+Vladimir and I tried to come up with other methods of doing the compile
+time checking and validation of the structures. But the limited C
+pre-processor prevents us from doing loops, which is what led to the
+large number of generated macros.
+
+Thanks,
+Jake
 
