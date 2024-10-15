@@ -1,132 +1,122 @@
-Return-Path: <netdev+bounces-135613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 842EA99E6F8
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:47:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9B099E71C
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49AE32857BD
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A34C71F21D22
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 358EB1E7669;
-	Tue, 15 Oct 2024 11:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93FA1E764A;
+	Tue, 15 Oct 2024 11:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYh18z/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C8B1D0492
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AC81E7640
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728992853; cv=none; b=UGX+vw0tzcinvdNPW/74s6ZSegdAhJDmICx2ImJ/KKli8lVVVvrWEIbQtP44QoDdm+cFP4ExvIcVPoVcfGs2BlUw5HdTMaPOM8iI4f0pzRcpUS6IGYls7aUJ0rZdm/lU0QdzClc2s0GrmaRulTMFTHAs3qEeUA1JCTRanrC4zuo=
+	t=1728992951; cv=none; b=Ar+YxQd9gd+nxvNVbjwfOmj70u0nIcdv7gccg0evorTf77r/mddLSRE6ZF1JhIvkwG+ed3VFMTW436Nx2LRiQjHVAFjx/Utgha5g2MKpvoB0BRzZrF4dGotW1RuhM6p3b9Xs2fWgh+BAZPi6kPdfqSGLi7O7NVzD9LGpWO1Heb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728992853; c=relaxed/simple;
-	bh=Mwj8t0g9irVrQ+b+ekQ9LDH1eHLuPOL0ztAzSYX+vGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=YHbUj9CGBzCLvMgaqR3CkFkKeWZnhp5QCW/m7kz82UviPsimCHEbgk/76Wl8EMhZ9g2uzJFBeZPasJCbNgzXx87StTHKke2K1OgI0RtoeqKs2Q1UCWOodCXCsJeHz5jNwqGlf+ubsMqsPYSOrhzqd97+PADHvCpCSBb/e3rbTvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-128-Ijlk96LgNIOVXVw2fCSE6w-1; Tue,
- 15 Oct 2024 07:47:26 -0400
-X-MC-Unique: Ijlk96LgNIOVXVw2fCSE6w-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AE061955F40;
-	Tue, 15 Oct 2024 11:47:24 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4029F3000198;
-	Tue, 15 Oct 2024 11:47:21 +0000 (UTC)
-Date: Tue, 15 Oct 2024 13:47:18 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>, Ales Nezbeda <anezbeda@redhat.com>
-Cc: netdev@vger.kernel.org, sdf@fomichev.me, davem@davemloft.net
-Subject: Re: [PATCH net v2] selftests: rtnetlink: add 'ethtool' as a
- dependency
-Message-ID: <Zw5WRhrNqJCZp1mf@hog>
-References: <20240909083410.60121-1-anezbeda@redhat.com>
- <20240909170737.1dbaa027@kernel.org>
- <CAL_-bo0QJJJootMQysNSLNmu0Fps3dqjPE0F0_=R23h7GqAkfQ@mail.gmail.com>
+	s=arc-20240116; t=1728992951; c=relaxed/simple;
+	bh=LNwsw1uVbVCJ2v+7xMauklsNh6wzAl/7e9KsLYhfzCM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iEaFbEiFZybeVW/5VZQUCLbVMLgIupAeVdq0TYU0nNsc8x48d94KLY7NfB7n91puh9LWzOnPrEk5gaq+9cqd85V/9i3E/NVHwTUc936JSn05cYA/WRJgwOmBGxmQPvKChCOisvSqN8zeQz27vb2141fk3FXA6xpv9WRD75A7a3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jYh18z/l; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5e989f7cc7aso2249384eaf.0
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 04:49:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728992949; x=1729597749; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tnNoUvDvy8NJSqFhvtQChMq30XHN2g+e1YRoM9IqmN0=;
+        b=jYh18z/l5EieKWrOc1cjfUuSY/vBRWI8YQ77Vm4f4I8ez/vCewZf6YIQj5jZ7X7EA1
+         pm/GJzv4N8WeLWGsquZ6U9TrAZ/9+6fAaJ5YzCRhQz6RxCnPppxNFjH+SStcOUn3yVMs
+         y8RIuqOTTC8thI2QOVJI1qEd3NyhOafxbTwelhnVy/WLqsQO4HM7IJy129bKfk6WSCvr
+         TyJA3T87+L8Oouaaqzie1g93Zwkly3PZFmLqNGGtX6ORT11aapK30v2FROqKDs9ecpr3
+         KzxK/Zc4Y9yzcXftqJorRRRzzMFk1b9PuPryHaeSzPIo+iDgKCvcNHNDZxVu1DxI4zW0
+         pqJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728992949; x=1729597749;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tnNoUvDvy8NJSqFhvtQChMq30XHN2g+e1YRoM9IqmN0=;
+        b=C+no7Xkswk1n3///m0jKkSBEpj7URqFwEWVxlWN6vwwzkLTyn4A5EEp6ke6X3EIPtN
+         /bdiMuSmL/ISAfj+qy2myDLJUD7Rl/gUrpl52n4u0yTCIB7TYx8CwrWRKb7imQtfTJux
+         Nl/dqNKiH+35eYecTswsXRF+uLwVLkOeuDSmAeVsYdcMYk5nVFZUpgulXVA9FBramIAn
+         dRCsqjqH1snGTyLamLCR1OBdpvF3YCb9HwnoWyUUZKo+nW1bHlMhYOylGumARUR8UGW+
+         rIidfcyv/1JVB3lq2w0w6x5JblMjji60MKmp6J9A1JKMMSFLOHW+/7R15Sp/ypu+IHLi
+         X/mA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6C2BKQ0bf3JJt9md2o1+UKz5cyAt1UQ2FR3R9VrMVBTeAEwcYfQaYOl0nRCgAbZYGcr+npSc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/ITkLDxuEcqV0fWZ3slCs/PraNd5KPhSAQSK5VNJZLwyp3eud
+	hB0+nQUWyEl9QQOekkDPDjhAA4KE1VIYA3Z59QmqIUjY7H6P7WXPgqrI5SCDkD39pcp5kq3GCPk
+	MUQR6r/Jn2m1FE7X3tdOcx6iaTck=
+X-Google-Smtp-Source: AGHT+IFby9QZ9UCHNxkqDRt4g+bRcIRfpNvaMs+2S45wpEFS5Bp3nNeacEKZ7OcGs3iSRran007eeSaUdp1ezOpWyZ8=
+X-Received: by 2002:a05:6870:89a9:b0:277:d9f6:26f6 with SMTP id
+ 586e51a60fabf-2886ddd3206mr8779044fac.12.1728992949069; Tue, 15 Oct 2024
+ 04:49:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAL_-bo0QJJJootMQysNSLNmu0Fps3dqjPE0F0_=R23h7GqAkfQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <cover.1728982714.git.gnault@redhat.com> <4c397061eb9f054cdcc3f5e60716b77c6b7912ad.1728982714.git.gnault@redhat.com>
+In-Reply-To: <4c397061eb9f054cdcc3f5e60716b77c6b7912ad.1728982714.git.gnault@redhat.com>
+From: Eyal Birger <eyal.birger@gmail.com>
+Date: Tue, 15 Oct 2024 04:48:57 -0700
+Message-ID: <CAHsH6GuCd4K_cWzc4LF3YkXACcY3GAVN4ZT_hLsHk0r=B+t8zQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/6] xfrm: Convert xfrm_dst_lookup() to dscp_t.
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
-
-(this thread probably got buried in your inbox due to netconf/LPC)
-
-2024-09-16, 11:18:13 +0200, Ales Nezbeda wrote:
-> On Tue, Sep 10, 2024 at 2:17=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> > Don't think it qualifies as a fix, it's an improvement.
->=20
-> Well, if the `ethtool` is not present the test will fail with dubious
-> results that would indicate that the test failed due to the system not
-> supporting MACsec offload, which is not true. The error message
-> doesn't reflect what went wrong, so I thought about it as an issue
-> that is being fixed.
-
-I also think it's a (pretty minor) fix, since the error message is
-really misleading.
-
-> If this is not the case please let me know,
-> because based on the docs 'Fixes: tag indicates that the patch fixes
-> an issue', which I would think that wrong error message is an issue. I
-> might be wrong here though, so if the definition of 'issue' is more
-> restrictive I can remove the 'Fixes:' tag.
->=20
-> > You can use net/forwarding's lib.sh in net/, altnames.sh already
-> > uses it.
->=20
-> I see, the problem (and probably should have mentioned it in the patch
-> itself) is that `rtnetlink.sh` is using one of the variables defined
-> in the `net/lib.sh` - specifically `ksft_skip`.
-
-net/forwarding/lib.sh seems to include net/lib.sh, and uses ksft_skip
-too, so there should be no problem:
-
-    source "$net_forwarding_dir/../lib.sh"
-   =20
-    #######################################################################=
-#######
-    # Sanity checks
-   =20
-    check_tc_version()
-    {
-    =09tc -j &> /dev/null
-    =09if [[ $? -ne 0 ]]; then
-    =09=09echo "SKIP: iproute2 too old; tc is missing JSON support"
-    =09=09exit $ksft_skip
-    =09fi
-    }
+On Tue, Oct 15, 2024 at 2:14=E2=80=AFAM Guillaume Nault <gnault@redhat.com>=
+ wrote:
+>
+> Pass a dscp_t variable to xfrm_dst_lookup(), instead of an int, to
+> prevent accidental setting of ECN bits in ->flowi4_tos.
+>
+> Only xfrm_bundle_create() actually calls xfrm_dst_lookup(). Since it
+> already has a dscp_t variable to pass as parameter, we only need to
+> remove the inet_dscp_to_dsfield() conversion.
+>
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
+>  net/xfrm/xfrm_policy.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> index c6ea3ca69e95..6e30b110accf 100644
+> --- a/net/xfrm/xfrm_policy.c
+> +++ b/net/xfrm/xfrm_policy.c
+> @@ -291,7 +291,7 @@ struct dst_entry *__xfrm_dst_lookup(struct net *net, =
+int tos, int oif,
+>  EXPORT_SYMBOL(__xfrm_dst_lookup);
+>
+>  static inline struct dst_entry *xfrm_dst_lookup(struct xfrm_state *x,
+> -                                               int tos, int oif,
+> +                                               dscp_t dscp, int oif,
 
 
-> Furthermore, I felt
-> like a more clean approach would be to add the `require_command()` to
-> the `net/lib.sh` so that other tests down the road could potentially
-> use it as well. Picking a different `lib.sh` would mean either
+FWIW this looks like it's going to conflict with a commit currently in
+the ipsec tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git/commit/?=
+id=3De509996b16728e37d5a909a5c63c1bd64f23b306
 
-Moving require_command from net/forwarding/lib.sh to net/lib.sh also
-seems pretty reasonable.
-
---=20
-Sabrina
-
+Eyal.
 
