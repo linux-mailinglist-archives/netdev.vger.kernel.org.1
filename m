@@ -1,136 +1,86 @@
-Return-Path: <netdev+bounces-135894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE1199FA9E
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:56:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223EC99FAA2
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:56:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C20B61C23B62
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:56:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDC7BB2141C
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E7E21E3BC;
-	Tue, 15 Oct 2024 21:56:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1974521E3C9;
+	Tue, 15 Oct 2024 21:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IUHkbGEP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psqEJMF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1018E21E3B4;
-	Tue, 15 Oct 2024 21:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33E921E3BF;
+	Tue, 15 Oct 2024 21:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729029363; cv=none; b=m2A4R3i73Uu4jsS4teFqOiwSsO+GGUCrqoi9NQakYXlIkfrKXIV/Bwthl3I8hhcKOvYci/cdchOUtQfsRQQq3OIGzPhMyBySRms/hepW6lsRs4t9EFXnQWQo6sVfcOw+/veVbOxyCRS0yQQMbabHiwX2hcW/p5x6jHnDkEQ7K60=
+	t=1729029380; cv=none; b=gNTuTt03DiIrznNFeAT0FMtDqr9vDXoqanurWfSiQ3GSyduJ7KWOZNBzXuw3jojHNA+W++wrPFqoE6VyGYM4S35jMRtyE/uvi/RBIoAqhtrHh2AsU0Ffr9orj6nBmg8GHp1u9IrHy+d7Llhp+b4Ti6HUZmXhE6o5+3gn9Dzlayw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729029363; c=relaxed/simple;
-	bh=SDDMiSwvUKtjVdXtci4v2XOT6lK4S4zHaRyrw0LDgqU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=iZl+siTXTnch65FpNJioYkMN86m0wC+QFhwBwjz6j2Ai/dv+9mKDEcmYJXYPQHFBrvOtmRUyYSyeX9HmxPsqZwoStNFXOdCbLbLlO2b90VfdJh84uKMDrxw2TpXTeeimKEN80NyGMScXV7qBtopmd+nyq3TBjxVhhl5NKLymDgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IUHkbGEP; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-46040dadedfso60906331cf.1;
-        Tue, 15 Oct 2024 14:56:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729029361; x=1729634161; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ALbA0OtkGhEuyk66SZ8LvdH5SaUs+SRp6a+9/W836nw=;
-        b=IUHkbGEPP34UTppC5URkyXJgsUDJerq28dcfNgydxa4/8jkAK919UvRDcr2o0P54e6
-         DjsL25YJfk+sZPQjl4+ecn3P3sR8XC7IDYgnGD5uAZ/AziDGaA+z31cWXncOcrdHgr6O
-         sdEDe05TU9o/DdhEg3tCtWW71BHECmfbLGx0Xm/nfHlcmzoDC9rV22K5urMSon3uK2ro
-         ja9VvG4n5seNmaxAh2gibSL/RbRQ6OaYlrQeUNfGpGX/3O7JEjVVuqk9Pb9pfu4r2YSF
-         TiRthkV5TkF/sfkovMbVmNgtw21PyZ6SroMpsMdn9zuiQ8sdjOaGv59/4WPRYUHXMu9T
-         ezpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729029361; x=1729634161;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ALbA0OtkGhEuyk66SZ8LvdH5SaUs+SRp6a+9/W836nw=;
-        b=lO7hcunf0EtrEQvSxgvHGoV4TCK1xzP1ZgItpcNKIJZHKsJnpwEY1G4oO+7lyc2cNZ
-         q7LwnU+Vqz6Qx2a8J/3zAxmrT0ZhHLdxEQCMTv/O5E0hyhwRb50n2y+yeOxWbc3djgOv
-         DOPQRxw5zm8HtkgOQaWDKFFtQOoHTSNiS0zhr1TE6+nNF4F7Q79jbu2i8oUqaPaufcC6
-         9I3YTJjquNAhYALjKOltAUKvUmEA/U8sfvDu4RZbsihdDmZhNo4jxBJ7LipACd6s0mx6
-         lo6fNcQg13rDvqMLPoDN7eRYCNuSv/3r6m6jrbms0nEX5wJXqmoMdzhoKDse8/YqnFcZ
-         Vddg==
-X-Forwarded-Encrypted: i=1; AJvYcCUM4APIAARD6BaevHc5rt8TiHz0YCPvW0wjQ8TmaI5JuzuPbAuHNd5HLaKyVqZitHWVtyc=@vger.kernel.org, AJvYcCWsCLemGNmjLjSD9Cix0Pnk8VTAnZuC73bsLCK6fmQ6djV0qEJR9wXvDApFABd9kZ0kl/TgLXC0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt8bGgZ6iiZak7IZy5+bQEjmWfPMO5G/0DSO4WAtfBN5qdKR5d
-	b/81+4iBmNbJHKCw3vA+9qBpE8Cu9WwZ7dsmixPUzEaKyzAA+anzST8Z3w==
-X-Google-Smtp-Source: AGHT+IF/biGK7BKGx6ds9lQaGsIFu5VWXdLYdNp1Cqk82qtu/FHJCZLwXG3dkyzDgKCeWnsOYMa4LQ==
-X-Received: by 2002:a05:622a:250b:b0:458:29fe:d254 with SMTP id d75a77b69052e-4608a52b41amr24565931cf.59.1729029360926;
-        Tue, 15 Oct 2024 14:56:00 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4607b0fa227sm10800231cf.32.2024.10.15.14.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 14:56:00 -0700 (PDT)
-Date: Tue, 15 Oct 2024 17:55:59 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, 
- Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <670ee4efea023_322ac329445@willemb.c.googlers.com.notmuch>
-In-Reply-To: <cb96b56a-0c00-4f57-b4b5-8a7e00065cdc@linux.dev>
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-3-kerneljasonxing@gmail.com>
- <cb96b56a-0c00-4f57-b4b5-8a7e00065cdc@linux.dev>
-Subject: Re: [PATCH net-next v2 02/12] net-timestamp: open gate for
- bpf_setsockopt
+	s=arc-20240116; t=1729029380; c=relaxed/simple;
+	bh=FEqerJBuQ58gg8O693l9lf/6FSUknQEcXmuLQP0+nbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gb5Gzl+v+mCJCKJHa7ZZS4amxdIPrzKnZyDc0c767Sprjist9RfS9tx+MYHvpvwazUA9wpkNKD1F5Tbhb6RAss7yWUFZ/hFbX9A5aMcAH2iXt5iZ+C3uBK+z+eFqC+FM1XhwOQDsU2UFfqPIdDJWbkDjmDeGjw4NXLJHzmsl2z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psqEJMF+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E157C4CEC6;
+	Tue, 15 Oct 2024 21:56:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729029379;
+	bh=FEqerJBuQ58gg8O693l9lf/6FSUknQEcXmuLQP0+nbk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=psqEJMF+ByIlDNMNGy+4xfUymKgJSCwWV8Y324pbWj1xeZ0HwjPP7Zj4vamk1z6X6
+	 C4kcxXiVfspAvha8eVgxh5zi5LpFgHOuH1u3c72WsF4yHc3kkvDecD8zzb4N92eJER
+	 7JxlA+bWyo81Ol2M2NVwdnod7KV+L2S4S9RN++FZRyB7jkr1iebhztDZmTxarLjzCc
+	 K7mmpvQFh0kLFfzZQTj0N/QzIsjowPpNQzeH1+exZAK7OhZdMW9vqQ+2ftRbATRBCc
+	 morkRV/n3KjTvRZZWnBgRnL1n01Od4gcS8/7O3Vuy6riWkqS6YQdJQVuB2qRbUdJdx
+	 GGUthdkUuoMkQ==
+Date: Tue, 15 Oct 2024 16:56:18 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: imx@lists.linux.dev, edumazet@google.com, Frank.Li@nxp.com,
+	conor+dt@kernel.org, kuba@kernel.org, bhelgaas@google.com,
+	linux-pci@vger.kernel.org, claudiu.manoil@nxp.com,
+	christophe.leroy@csgroup.eu, xiaoning.wang@nxp.com,
+	krzk+dt@kernel.org, linux-kernel@vger.kernel.org,
+	vladimir.oltean@nxp.com, davem@davemloft.net, horms@kernel.org,
+	netdev@vger.kernel.org, linux@armlinux.org.uk,
+	devicetree@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v2 net-next 01/13] dt-bindings: net: add compatible
+ string for i.MX95 EMDIO
+Message-ID: <172902935285.2022343.10056149639875783222.robh@kernel.org>
+References: <20241015125841.1075560-1-wei.fang@nxp.com>
+ <20241015125841.1075560-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015125841.1075560-2-wei.fang@nxp.com>
 
-Martin KaFai Lau wrote:
-> On 10/11/24 9:06 PM, Jason Xing wrote:
-> >   static int sol_socket_sockopt(struct sock *sk, int optname,
-> >   			      char *optval, int *optlen,
-> >   			      bool getopt)
-> >   {
-> > +	struct so_timestamping ts;
-> > +	int ret = 0;
-> > +
-> >   	switch (optname) {
-> >   	case SO_REUSEADDR:
-> >   	case SO_SNDBUF:
-> > @@ -5225,6 +5245,13 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
-> >   		break;
-> >   	case SO_BINDTODEVICE:
-> >   		break;
-> > +	case SO_TIMESTAMPING_NEW:
-> > +	case SO_TIMESTAMPING_OLD:
+
+On Tue, 15 Oct 2024 20:58:29 +0800, Wei Fang wrote:
+> The EMDIO of i.MX95 has been upgraded to revision 4.1, and the vendor
+> ID and device ID have also changed, so add the new compatible strings
+> for i.MX95 EMDIO.
 > 
-> How about remove the "_OLD" support ?
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> v2 changes: remove "nxp,netc-emdio" compatible string.
+> ---
+>  .../devicetree/bindings/net/fsl,enetc-mdio.yaml       | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
 
-+1 I forgot to mention that yesterday.
-
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
