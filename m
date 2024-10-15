@@ -1,239 +1,138 @@
-Return-Path: <netdev+bounces-135899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F64C99FB39
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:16:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2323F99FB42
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EE9283B7A
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:16:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4C6F1F22873
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A3E1B0F0F;
-	Tue, 15 Oct 2024 22:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469851B0F22;
+	Tue, 15 Oct 2024 22:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="PEY7qMYr"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gS4t2AGk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E1F21E3DB
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 22:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D42B185B47;
+	Tue, 15 Oct 2024 22:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729030602; cv=none; b=Yz24dJp3pCQm6n0mGXeebZ6GPyepIgmJ8CEKcxyse4qty68gFNEgqiazUUw/027H7kiep90dsYl5j2k81XQazPx7GlLf989EJ7vAly4Ra+yh77rJo7/8LCSPezvr+m6OLeBZQtZp7/MMkiLShp0KjGYEsdtumRdd35eZZgPqmsA=
+	t=1729030845; cv=none; b=epxscwD8E8odYge2afriZ8H/Vcdm/gjnptg8mDx3jKZuNajz5HFnZgPp8xc3Ju78+n1qU8ijFbLONuo/pk8oz/o9QVOHwq1KXGCve4ahsThg/cTQFJOJ9G4uHnDEwzJk2+wqXyPzmk61RiEqFsesCLChNVJCJYaHu4UbA0hEEZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729030602; c=relaxed/simple;
-	bh=hAXhPSiFEzq/5C5oDsoq2csifhVliKPy6KZ87upJlBc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZS/KsRJZY30EIxKW1fMa+GiVhlTGvtpfXpKpbajvkjDQnmNGoNnBSHl8dYTpHXlEHloPl1JOEwZsThIQW7NFteKtsUBFwLIHYlMKrFpD41oeZ5ms2nAPwMbZEUMtg+XaPE7YED0YZgKfOrauVvu+5w3z5zXjIAZ9maLWRgc52XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=PEY7qMYr; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e7086c231so1458121b3a.0
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 15:16:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1729030599; x=1729635399; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mIVUa6cza5As2WnLp7U7w9Jj8bSiKZ0fCkvvBrUYIew=;
-        b=PEY7qMYrap/wb48FZNfeBwE/zCdjd6qwwLIfyFkv288uJ5EofInI2ocpEh9Ochfa+4
-         wQNvydvyZEwauH4J3CmkTwTsovoNZY8l3bMBYncDqTC354LmJ5guEQ1w+hAdtvli2J3b
-         QVGeeOiWT2eH2NpdNKtg1+D2J8r0d5Rh4EoMQUuFmjd7VV9X4srCZrha8PC5pfCoAq9S
-         MUp8cpDxAXdYm6fGzTRDYiK2BImHODu5qMbAq8kbzrUs/RFQkfe8ipYXTek4mSZxGKiJ
-         UHQxjtklG3u1jaOHWRcjhuB/oXyOBNAg8obd3HEJbI6KcJDmm0sK4PEj8QeoCf4V38+0
-         MwNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729030599; x=1729635399;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mIVUa6cza5As2WnLp7U7w9Jj8bSiKZ0fCkvvBrUYIew=;
-        b=GdW/goXqr7eBWOH+howH6jddaUQBQ72kQfZllcfqZ6lLJZSBECOVmTunVk9fwtk7r0
-         /vWFpvgiNz1VniQVwZ6Fmr4wPDNBpJgpPq7lfsh8GhOAR1DZgtt+9zURseB0rCI6QQpT
-         3Gl17mDxfTpFICnWuqJ8dZoqu7QWJasE0aQyD3g8DC/wM6oovGPfSSkAseQ07AUbd5e8
-         5xrU/D+MEvVkMYcFaXYgztiDW2MhQ9I1Zi5+HiCA6Y76+5AtFICauv0xgWTVavuzJlPR
-         UcddSKZByZF9G49sWW6bdIVzy0lQzhvLJ6IH142/mUpeaFawdVPt7G1oj4SZs0KDzWw4
-         FpWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuM2tAd5A0OU2wPnO3LfIk4edcp0AZM98r92QtKNuWEHwo9dIGORjhuCAjEeDUTxo0rqmFsRI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYSVdSbPiu4HvPM/9hgmvW5l4l0jkylmBgDV0drSf2Ku1GRlRj
-	YrTblF3ZMgVssbnVbsO7kRIKiLgRd9CXw822sM8PnOVB7fitG/7MWH17vnZH+SbuBGXC2jlEkdF
-	EYQJ6xLaVB4S3Oy/u09ybxktMtSd0zjnG1/da
-X-Google-Smtp-Source: AGHT+IH3BXX+JcNRfkJENr9XGmKh9x735MwNRDflhh6VSEZcWFiIDCp6gqxA3ieR1ImXFm5ypzu7lZLNX6MqSYCxTCQ=
-X-Received: by 2002:a05:6a00:3cca:b0:71d:eb7d:20d5 with SMTP id
- d2e1a72fcca58-71e7da25185mr3031687b3a.8.1729030599152; Tue, 15 Oct 2024
- 15:16:39 -0700 (PDT)
+	s=arc-20240116; t=1729030845; c=relaxed/simple;
+	bh=XYyFKaNRA4wWaSAfK8rsk2azG+eY0S/cwk//6ZrNo8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PFtrRqE11P24rBhZP0QXSvC+g3ASyD+HRXuWd0Mw+yRwEE6xHkvVs/VoXJI+durjP7mfKnINlLccpShqhKNzMRt/gGhjYV7CFhRK7WTzjqpTF/WKECxvbGb34rnIMZvkIbqNiKTwHy1UhomK8gATakylok8JsiUr9xEZGAYDfho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=gS4t2AGk; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FHth3T019373;
+	Tue, 15 Oct 2024 22:20:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=9amxsHQkQT/G9w3PaJaVF40PUix0E
+	rL5Pm84yf3YqPc=; b=gS4t2AGkl98LYAhuJ6m2b5XYCRScFGfkcqxQgwCmW+zCC
+	DpGzwRw+NlK1LmC3GukPrGh5k5CdJAVQ/jWWM6CJWTvkVwJHRUL0s1uVuuKj20C8
+	IF320xSQ9c1k4SiskUtXhh2AbUT0eHd8x3mFGPy6azPyyNMwIull+3xsE41+5bnc
+	rPpzg7NHvmvRjNLosx+L0HigMo7iLdiuYQgwbAx7f/4ubOiq34QBHUu4OA8/0NGa
+	1dq6FoSgczwa1WWe9jtYBXGOuQ1Tto3kcAZBMU0mXcCLpDK8F8TE/KsnyrWbviMK
+	ToFUzzZrH5MPVfGCErZFCsISKzpP3Tk89paAaa/XQ==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 427gq7jdab-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Oct 2024 22:20:34 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49FLWmX5026429;
+	Tue, 15 Oct 2024 22:20:33 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 427fj82ve0-1;
+	Tue, 15 Oct 2024 22:20:33 +0000
+From: Sherry Yang <sherry.yang@oracle.com>
+To: stable@vger.kernel.org, sashal@kernel.org, gregkh@linuxfoundation.org
+Cc: johannes@sipsolutions.net, davem@davemloft.net, kuba@kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH 5.15.y 5.10.y 5.4.y] wifi: mac80211: fix potential key use-after-free
+Date: Tue, 15 Oct 2024 15:20:30 -0700
+Message-ID: <20241015222030.1105765-1-sherry.yang@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014201828.91221-1-kuniyu@amazon.com> <20241014201828.91221-5-kuniyu@amazon.com>
-In-Reply-To: <20241014201828.91221-5-kuniyu@amazon.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 15 Oct 2024 18:16:28 -0400
-Message-ID: <CAM0EoMkAns=QXc-Lh3gkRmJ4SrGbbKpSbaSy5Btv7uw0NTUYUA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 04/11] net: sched: Use rtnl_register_many().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_17,2024-10-15_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
+ definitions=main-2410150147
+X-Proofpoint-ORIG-GUID: MlRzkmW65rnXGfo3puKQ1oyeU0YjGui1
+X-Proofpoint-GUID: MlRzkmW65rnXGfo3puKQ1oyeU0YjGui1
 
-On Mon, Oct 14, 2024 at 4:20=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> We will remove rtnl_register() in favour of rtnl_register_many().
->
-> When it succeeds, rtnl_register_many() guarantees all rtnetlink types
-> in the passed array are supported, and there is no chance that a part
-> of message types is not supported.
->
-> Let's use rtnl_register_many() instead.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-LGTM.
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+[ Upstream commit 31db78a4923ef5e2008f2eed321811ca79e7f71b ]
 
-cheers,
-jamal
-> ---
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
->
-> v2:
->   * Add __initconst
->   * Use C99 initialisation
-> ---
->  net/sched/act_api.c | 13 ++++++++-----
->  net/sched/cls_api.c | 25 ++++++++++++++-----------
->  net/sched/sch_api.c | 20 ++++++++++++--------
->  3 files changed, 34 insertions(+), 24 deletions(-)
->
-> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> index 2714c4ed928e..5bbfb83ed600 100644
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -2243,13 +2243,16 @@ static int tc_dump_action(struct sk_buff *skb, st=
-ruct netlink_callback *cb)
->         return skb->len;
->  }
->
-> +static const struct rtnl_msg_handler tc_action_rtnl_msg_handlers[] __ini=
-tconst =3D {
-> +       {.msgtype =3D RTM_NEWACTION, .doit =3D tc_ctl_action},
-> +       {.msgtype =3D RTM_DELACTION, .doit =3D tc_ctl_action},
-> +       {.msgtype =3D RTM_GETACTION, .doit =3D tc_ctl_action,
-> +        .dumpit =3D tc_dump_action},
-> +};
-> +
->  static int __init tc_action_init(void)
->  {
-> -       rtnl_register(PF_UNSPEC, RTM_NEWACTION, tc_ctl_action, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_DELACTION, tc_ctl_action, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_GETACTION, tc_ctl_action, tc_dump_ac=
-tion,
-> -                     0);
-> -
-> +       rtnl_register_many(tc_action_rtnl_msg_handlers);
->         return 0;
->  }
->
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index 17d97bbe890f..7637f979d689 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -4055,6 +4055,19 @@ static struct pernet_operations tcf_net_ops =3D {
->         .size =3D sizeof(struct tcf_net),
->  };
->
-> +static const struct rtnl_msg_handler tc_filter_rtnl_msg_handlers[] __ini=
-tconst =3D {
-> +       {.msgtype =3D RTM_NEWTFILTER, .doit =3D tc_new_tfilter,
-> +        .flags =3D RTNL_FLAG_DOIT_UNLOCKED},
-> +       {.msgtype =3D RTM_DELTFILTER, .doit =3D tc_del_tfilter,
-> +        .flags =3D RTNL_FLAG_DOIT_UNLOCKED},
-> +       {.msgtype =3D RTM_GETTFILTER, .doit =3D tc_get_tfilter,
-> +        .dumpit =3D tc_dump_tfilter, .flags =3D RTNL_FLAG_DOIT_UNLOCKED}=
-,
-> +       {.msgtype =3D RTM_NEWCHAIN, .doit =3D tc_ctl_chain},
-> +       {.msgtype =3D RTM_DELCHAIN, .doit =3D tc_ctl_chain},
-> +       {.msgtype =3D RTM_GETCHAIN, .doit =3D tc_ctl_chain,
-> +        .dumpit =3D tc_dump_chain},
-> +};
-> +
->  static int __init tc_filter_init(void)
->  {
->         int err;
-> @@ -4068,17 +4081,7 @@ static int __init tc_filter_init(void)
->                 goto err_register_pernet_subsys;
->
->         xa_init_flags(&tcf_exts_miss_cookies_xa, XA_FLAGS_ALLOC1);
-> -
-> -       rtnl_register(PF_UNSPEC, RTM_NEWTFILTER, tc_new_tfilter, NULL,
-> -                     RTNL_FLAG_DOIT_UNLOCKED);
-> -       rtnl_register(PF_UNSPEC, RTM_DELTFILTER, tc_del_tfilter, NULL,
-> -                     RTNL_FLAG_DOIT_UNLOCKED);
-> -       rtnl_register(PF_UNSPEC, RTM_GETTFILTER, tc_get_tfilter,
-> -                     tc_dump_tfilter, RTNL_FLAG_DOIT_UNLOCKED);
-> -       rtnl_register(PF_UNSPEC, RTM_NEWCHAIN, tc_ctl_chain, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_DELCHAIN, tc_ctl_chain, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_GETCHAIN, tc_ctl_chain,
-> -                     tc_dump_chain, 0);
-> +       rtnl_register_many(tc_filter_rtnl_msg_handlers);
->
->         return 0;
->
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index 2eefa4783879..da2da2ab858b 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -2420,6 +2420,17 @@ static struct pernet_operations psched_net_ops =3D=
- {
->  DEFINE_STATIC_KEY_FALSE(tc_skip_wrapper);
->  #endif
->
-> +static const struct rtnl_msg_handler psched_rtnl_msg_handlers[] __initco=
-nst =3D {
-> +       {.msgtype =3D RTM_NEWQDISC, .doit =3D tc_modify_qdisc},
-> +       {.msgtype =3D RTM_DELQDISC, .doit =3D tc_get_qdisc},
-> +       {.msgtype =3D RTM_GETQDISC, .doit =3D tc_get_qdisc,
-> +        .dumpit =3D tc_dump_qdisc},
-> +       {.msgtype =3D RTM_NEWTCLASS, .doit =3D tc_ctl_tclass},
-> +       {.msgtype =3D RTM_DELTCLASS, .doit =3D tc_ctl_tclass},
-> +       {.msgtype =3D RTM_GETTCLASS, .doit =3D tc_ctl_tclass,
-> +        .dumpit =3D tc_dump_tclass},
-> +};
-> +
->  static int __init pktsched_init(void)
->  {
->         int err;
-> @@ -2438,14 +2449,7 @@ static int __init pktsched_init(void)
->         register_qdisc(&mq_qdisc_ops);
->         register_qdisc(&noqueue_qdisc_ops);
->
-> -       rtnl_register(PF_UNSPEC, RTM_NEWQDISC, tc_modify_qdisc, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_DELQDISC, tc_get_qdisc, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_GETQDISC, tc_get_qdisc, tc_dump_qdis=
-c,
-> -                     0);
-> -       rtnl_register(PF_UNSPEC, RTM_NEWTCLASS, tc_ctl_tclass, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_DELTCLASS, tc_ctl_tclass, NULL, 0);
-> -       rtnl_register(PF_UNSPEC, RTM_GETTCLASS, tc_ctl_tclass, tc_dump_tc=
-lass,
-> -                     0);
-> +       rtnl_register_many(psched_rtnl_msg_handlers);
->
->         tc_wrapper_init();
->
-> --
-> 2.39.5 (Apple Git-154)
->
+When ieee80211_key_link() is called by ieee80211_gtk_rekey_add()
+but returns 0 due to KRACK protection (identical key reinstall),
+ieee80211_gtk_rekey_add() will still return a pointer into the
+key, in a potential use-after-free. This normally doesn't happen
+since it's only called by iwlwifi in case of WoWLAN rekey offload
+which has its own KRACK protection, but still better to fix, do
+that by returning an error code and converting that to success on
+the cfg80211 boundary only, leaving the error for bad callers of
+ieee80211_gtk_rekey_add().
+
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Fixes: fdf7cb4185b6 ("mac80211: accept key reinstall without changing anything")
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Sherry: bp to fix CVE-2023-52530, resolved minor conflicts in 
+net/mac80211/cfg.c because of context change due to missing commit
+23a5f0af6ff4 ("wifi: mac80211: remove cipher scheme support")
+ccdde7c74ffd ("wifi: mac80211: properly implement MLO key handling")]
+Signed-off-by: Sherry Yang <sherry.yang@oracle.com>
+---
+ net/mac80211/cfg.c | 3 +++
+ net/mac80211/key.c | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index f652982a106b..c54b3be62c0a 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -511,6 +511,9 @@ static int ieee80211_add_key(struct wiphy *wiphy, struct net_device *dev,
+ 		sta->cipher_scheme = cs;
+ 
+ 	err = ieee80211_key_link(key, sdata, sta);
++	/* KRACK protection, shouldn't happen but just silently accept key */
++	if (err == -EALREADY)
++		err = 0;
+ 
+  out_unlock:
+ 	mutex_unlock(&local->sta_mtx);
+diff --git a/net/mac80211/key.c b/net/mac80211/key.c
+index f695fc80088b..7b427e39831b 100644
+--- a/net/mac80211/key.c
++++ b/net/mac80211/key.c
+@@ -843,7 +843,7 @@ int ieee80211_key_link(struct ieee80211_key *key,
+ 	 */
+ 	if (ieee80211_key_identical(sdata, old_key, key)) {
+ 		ieee80211_key_free_unused(key);
+-		ret = 0;
++		ret = -EALREADY;
+ 		goto out;
+ 	}
+ 
+-- 
+2.46.0
+
 
