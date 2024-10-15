@@ -1,84 +1,227 @@
-Return-Path: <netdev+bounces-135909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A58B999FC65
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:22:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BA4699FC71
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D4B31F21730
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:22:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0070281E53
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B681D63E7;
-	Tue, 15 Oct 2024 23:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E262B1D9A69;
+	Tue, 15 Oct 2024 23:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCavwmTh"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jx2L2j42"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A38519C542;
-	Tue, 15 Oct 2024 23:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C6B1B0F1F
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729034549; cv=none; b=mwupl2wlXaw3yBfafcoEmkkymwih+pIbrnxjb8rP3zWMDV630wawbbXT8i39nJ8drfVo5YT62PEwQdH0I9eI1sfz7c/70C+16A+XkoKe3exIj87nPUHyar7Cpo1RpdcgpHpeJFusTy8XNl8J+wyo2bjaPhHTSd6qEOnTAfQXI64=
+	t=1729034743; cv=none; b=AsGHvXigailfTeApVnMmVB3u8crT4U8kc3v5lT/i0Ile+A1x3TI64aeA9cxdRKm2RgxbkHGnPBFxDQXkgbkh2oNeIULkMGJ7R+4YTOsSmtZG3FgqoCgzhGkiJPvb6R5zRJgfk5zAahhJMhHa660oQPovBR1qbSJjCUg3mQxGRcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729034549; c=relaxed/simple;
-	bh=SZbokGXMJZ3coHJvqdScXDpyPhe0Y00MZjJqgrpRdPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BDz4jMiq/q/el6vETfCBqi49LDVfBvEyhiBg+aW+tiXh7Q+tp4jVR8DytX5jYdC2tLn3e6/+R4ObpPrWJ39us/ap+v9VPW8KFpZd+fNTeRyzpqf8krClaBmDHZOrxq2zfhSRSi4qKHEn70m9Gs0OcPNGfr1XpZ2zqkZtZXtF9G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCavwmTh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE0F3C4CEC6;
-	Tue, 15 Oct 2024 23:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729034549;
-	bh=SZbokGXMJZ3coHJvqdScXDpyPhe0Y00MZjJqgrpRdPs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MCavwmThkKLRCH1gx9a9O0fFGORP/RNa+Dv9/0uvpZkeiuCXPVI+M9vzStMaV8jLK
-	 D+dc33UWSljwE/fv6MKsEdjawDnxveO7My8XzRmVn5nr3DtGE3zpZzuIOeSX7A3pFG
-	 iPyiNW0j3kOws/JWEjZwo+b/1PkI0g/jSNFWCzQVfKFLGglTLQQ1xtenTSDph9cFnY
-	 AZz3mWaFyBoMAwNPi+eZd4oe/S5NfKfE4AxNM/B3EQQ6RS76QFIffgO03DA9c5TvuM
-	 YaS9OrzjlmpVOnbGXkG8+ySVGvrppcUvbu1wfrFxUm7VvaPlvz4YFwoZhK90aiKm4N
-	 YzR9HO48LPNPg==
-Date: Tue, 15 Oct 2024 16:22:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Jinjie Ruan <ruanjinjie@huawei.com>, bryan.whitehead@microchip.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- anna-maria@linutronix.de, frederic@kernel.org, richardcochran@gmail.com,
- johnstul@us.ibm.com, UNGLinuxDriver@microchip.com, jstultz@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 RESEND 1/2] posix-clock: Fix missing timespec64 check
- in pc_clock_settime()
-Message-ID: <20241015162227.4265d7b2@kernel.org>
-In-Reply-To: <87v7xtc7z5.ffs@tglx>
-References: <20241009072302.1754567-1-ruanjinjie@huawei.com>
-	<20241009072302.1754567-2-ruanjinjie@huawei.com>
-	<20241011125726.62c5dde7@kernel.org>
-	<87v7xtc7z5.ffs@tglx>
+	s=arc-20240116; t=1729034743; c=relaxed/simple;
+	bh=4ZecKPSbSYl3zv8hsAIyVCzTKhoHTyMc30JK18ESCPQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GCWXn7i3f9zKLfaPoBEm0Fkqs/DEcsXOxBfq6ssvFpbiNQLl7inYu72oNsAp6VKnwsoWsKXuCNRJ6m/Eoumll+dxw9S6zouAp366pndtEpyHSn2+gDnpfsGnrKtQkaG8zvfqJ7nqmpBh5XZoBBTevlawZm8Ue2/vYXdoPIpWzPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jx2L2j42; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729034742; x=1760570742;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=tB0ISUu2OMnwIjSWC/cR4ftu4vdX+Ul2SKgiPsfc3jE=;
+  b=jx2L2j428H3s0+Kj/OD/y3cBCVHlvomBPN9YdwKCT6/cTdTnwVX3feXC
+   Zz8JDc7Z1GZfApw2md6VDk1qv2lzg0b8FJKWohb1mADKWkFmhv7GQPCzK
+   sTtlZIdgrnSb11aspPP9qazlxYLRvjJN3IzZvkzI+bk1yKFXjCsrZHLS7
+   U=;
+X-IronPort-AV: E=Sophos;i="6.11,206,1725321600"; 
+   d="scan'208";a="766891757"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 23:25:37 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:21926]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.29:2525] with esmtp (Farcaster)
+ id 6bb65c20-b3ad-4bcf-95e6-76e029caaad6; Tue, 15 Oct 2024 23:25:36 +0000 (UTC)
+X-Farcaster-Flow-ID: 6bb65c20-b3ad-4bcf-95e6-76e029caaad6
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 15 Oct 2024 23:25:35 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 15 Oct 2024 23:25:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnaaman@drivenets.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 3/6] Convert neigh_* seq_file functions to use hlist
+Date: Tue, 15 Oct 2024 16:25:29 -0700
+Message-ID: <20241015232529.67605-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241015165929.3203216-4-gnaaman@drivenets.com>
+References: <20241015165929.3203216-4-gnaaman@drivenets.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB004.ant.amazon.com (10.13.138.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, 16 Oct 2024 00:33:02 +0200 Thomas Gleixner wrote:
-> > I'm guessing we can push this into 6.12-rc and the other patch into
-> > net-next. I'll toss it into net on Monday unless someone objects.  
+From: Gilad Naaman <gnaaman@drivenets.com>
+Date: Tue, 15 Oct 2024 16:59:23 +0000
+> Convert seq_file-related neighbour functionality to use neighbour::hash
+> and the related for_each macro.
 > 
-> Can you folks please at least wait until the maintainers of the code in
-> question had a look ?
+> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
+> ---
+>  include/net/neighbour.h |  4 ++++
+>  net/core/neighbour.c    | 26 ++++++++++----------------
+>  2 files changed, 14 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+> index 2f4cb9e51364..7dc0d4d6a4a8 100644
+> --- a/include/net/neighbour.h
+> +++ b/include/net/neighbour.h
+> @@ -279,6 +279,10 @@ static inline void *neighbour_priv(const struct neighbour *n)
+>  extern const struct nla_policy nda_policy[];
+>  
+>  #define neigh_for_each(pos, head) hlist_for_each_entry(pos, head, hash)
+> +#define neigh_hlist_entry(n) hlist_entry_safe(n, struct neighbour, hash)
+> +#define neigh_first_rcu(bucket) \
+> +	neigh_hlist_entry(rcu_dereference(hlist_first_rcu(bucket)))
 
-You are literally quoting the text where I say I will wait 3 more days.
-Unfortunately "until the maintainers respond" leads to waiting forever
-50% of the time, and even when we cap at 3 working days we have 300
-patches in the queue (292 right now, and I already spent 2 hours
-reviewing today). Hope you understand.
+No RCU helpers are needed, seq file is under RCU & tbl->lock
 
-Sorry if we applied too early, please review, I'll revert if it's no
-good.
+#define neigh_first_entry(bucket)				\
+	hlist_entry_safe((bucket)->first, struct neighbour, hash)
+
+> +
+
+nit: unnecessary newline.
+
+
+>  
+>  static inline bool neigh_key_eq32(const struct neighbour *n, const void *pkey)
+>  {
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index e91105a4c5ee..4bdf7649ca57 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -3207,25 +3207,21 @@ static struct neighbour *neigh_get_first(struct seq_file *seq)
+>  
+>  	state->flags &= ~NEIGH_SEQ_IS_PNEIGH;
+>  	for (bucket = 0; bucket < (1 << nht->hash_shift); bucket++) {
+> -		n = rcu_dereference(nht->hash_buckets[bucket]);
+> -
+> -		while (n) {
+> +		neigh_for_each(n, &nht->hash_heads[bucket]) {
+>  			if (!net_eq(dev_net(n->dev), net))
+> -				goto next;
+> +				continue;
+>  			if (state->neigh_sub_iter) {
+>  				loff_t fakep = 0;
+>  				void *v;
+>  
+>  				v = state->neigh_sub_iter(state, n, &fakep);
+>  				if (!v)
+> -					goto next;
+> +					continue;
+>  			}
+>  			if (!(state->flags & NEIGH_SEQ_SKIP_NOARP))
+>  				break;
+
+Let's avoid double-break and use goto just before setting bucket like:
+
+out:
+	state->bucket = bucket
+
+
+>  			if (READ_ONCE(n->nud_state) & ~NUD_NOARP)
+>  				break;
+
+Same here.
+
+
+> -next:
+> -			n = rcu_dereference(n->next);
+>  		}
+>  
+>  		if (n)
+
+Then, this null check & break will be unnecessary.
+
+
+> @@ -3249,34 +3245,32 @@ static struct neighbour *neigh_get_next(struct seq_file *seq,
+>  		if (v)
+>  			return n;
+>  	}
+> -	n = rcu_dereference(n->next);
+>  
+>  	while (1) {
+> -		while (n) {
+> +		hlist_for_each_entry_continue_rcu(n, hash) {
+>  			if (!net_eq(dev_net(n->dev), net))
+> -				goto next;
+> +				continue;
+>  			if (state->neigh_sub_iter) {
+>  				void *v = state->neigh_sub_iter(state, n, pos);
+>  				if (v)
+>  					return n;
+> -				goto next;
+> +				continue;
+>  			}
+>  			if (!(state->flags & NEIGH_SEQ_SKIP_NOARP))
+>  				break;
+>  
+>  			if (READ_ONCE(n->nud_state) & ~NUD_NOARP)
+>  				break;
+
+Same remark here.
+
+
+> -next:
+> -			n = rcu_dereference(n->next);
+>  		}
+>  
+>  		if (n)
+>  			break;
+
+and here.
+
+>  
+> -		if (++state->bucket >= (1 << nht->hash_shift))
+> -			break;
+
+Let's keep this,
+
+
+> +		while (!n && ++state->bucket < (1 << nht->hash_shift))
+> +			n = neigh_first_rcu(&nht->hash_heads[state->bucket]);
+>  
+> -		n = rcu_dereference(nht->hash_buckets[state->bucket]);
+
+and simply fetch neigh_first_entry().
+
+Then, we can let the next loop handle the termination condition
+and keep the code simple.
+
+
+> +		if (!n)
+> +			break;
+>  	}
+>  
+>  	if (n && pos)
+> -- 
+> 2.46.0
 
