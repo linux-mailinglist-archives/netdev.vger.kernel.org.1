@@ -1,142 +1,138 @@
-Return-Path: <netdev+bounces-135588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43F3199E49C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:53:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AA699E4AA
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:55:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDE291F23FF9
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:53:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B03331F23FAE
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DAB1E632D;
-	Tue, 15 Oct 2024 10:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B4A1E9076;
+	Tue, 15 Oct 2024 10:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="n//Oe3bf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5911E4110;
-	Tue, 15 Oct 2024 10:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670671E32D0;
+	Tue, 15 Oct 2024 10:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728989560; cv=none; b=XlA6kEDmLPrHtYkSIA2zw0wTUFcqbJ9Li3BXuNOA0KTvzKKtqVgUz4yTPa+5Q9WKS/7olHIYsRUHoCei7fxWLl2/m2FXzLgwQR75VDqMQzMKWEP3ugEl29jUvtCrFOzyL8AW83xnPpCgczPdJZaA/WJPt0SaUKiUZwTNToMeWzQ=
+	t=1728989688; cv=none; b=XqatZJYWq1gS6IIDYxk/Jn8jdE+QWDHtNLQROkkheAf2sr/upnj9MDB8rmiiHc/9FFrIBwuGX9a4LdBpmgz+umWFruLwMCturv2V2YgzpU1tcTPkXU0t8sqYCV2+PavSUfXDYxYF8UVvAftfVLcnxJ5jVhcpFwgD9OYFBCCLHLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728989560; c=relaxed/simple;
-	bh=JbYhV7N7Mb4Y/IMjLhPKo5oTfSI5VQYw4oDX2w97mTs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Y9m+drDEuBZCEsSRbzbLxKQv3wmaAAzMUNZ+IF9bmEKbBa95XVZs3Zbqzx6u6/rRvA9NMuGT8pBJGj2v/7hOE/61Ay8kRBK9g8Bz5YoxBDnKGbHjIVfL0s+4QdNeA+vtqwEsxa7CF43z2vhrT7NOptdqZuhJYxBhWUQ7RnOJ2pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XSW8J5gS7zfdGR;
-	Tue, 15 Oct 2024 18:50:08 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5FC56140257;
-	Tue, 15 Oct 2024 18:52:35 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 15 Oct 2024 18:52:35 +0800
-Message-ID: <5d9ea7bd-67bb-4a9d-a120-c8f290c31a47@huawei.com>
-Date: Tue, 15 Oct 2024 18:52:34 +0800
+	s=arc-20240116; t=1728989688; c=relaxed/simple;
+	bh=0GjnuafM8+MuY524RzRyuybMbh2e1W5adOorLwp9ITw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d+pEJs9JD+Uu1lNEaGOTkYYZAqkaPP/kQInb8RONULWZrzKcETg+2NdcMzMpz2bBtZ0aaB6f1LgW7/Xttql6W7ErF2Rw6ZJWc6bWwOVaqLDeYqKAoFawO8GgXiHpIT2kjHmJis1NwukiDJAu2OW8txCv+aaRZH9n7ooRuz0865Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=n//Oe3bf; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FApOv6013632;
+	Tue, 15 Oct 2024 10:54:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=6fsOagLG+nDf85J5DatB5patV9Oe55a8JmOALUnjE
+	80=; b=n//Oe3bfyDbve1gkdx9BaQ38NYVprDivMQSdj9tpmCiLJzc62VAt2kfR9
+	Yb1Ty5NicPsgEAnhJZaegaxTebyN2bUJfNeXJA1vg8Vlb+ASM70rej5dyGoM/6R7
+	qbfox8En6vxWmXRtoEVJh2C0RJGbNsvs3YVcEmM4WRMzCHv0ksVzqZKHlwgWJoHk
+	CApMVNrAPXXgHnQ2AXbv/5+b7Uf80iydpTGINVZWtBkWkAt+iD7IV+RcgqprW0pN
+	8gO1IMGE9dStHo6eFFRMlNx6+cw23mZ5ZgcgJAWyEngQLWKRRgntzZqe/MEl9kc+
+	ppAxyFZvogei+W/dwyPNfHBI7Vuzw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429q0gg0n1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 10:54:34 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49FAsYRl020601;
+	Tue, 15 Oct 2024 10:54:34 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429q0gg0mw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 10:54:34 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F943eJ005951;
+	Tue, 15 Oct 2024 10:54:33 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 428650u092-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 10:54:33 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FAsUtj45154746
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Oct 2024 10:54:30 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0981D20040;
+	Tue, 15 Oct 2024 10:54:30 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EAC6A2005A;
+	Tue, 15 Oct 2024 10:54:29 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 15 Oct 2024 10:54:29 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55390)
+	id 7A0F4E0125; Tue, 15 Oct 2024 12:54:29 +0200 (CEST)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Ricardo B. Marliere" <ricardo@marliere.net>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH RESEND 0/3] PtP driver for s390 clocks
+Date: Tue, 15 Oct 2024 12:54:11 +0200
+Message-ID: <20241015105414.2825635-1-svens@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/2] fix two bugs related to page_pool
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Robin Murphy <robin.murphy@arm.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-References: <20240925075707.3970187-1-linyunsheng@huawei.com>
- <b1fd5ece-b967-4e56-ad4f-64ec437e2634@huawei.com>
- <20241014171406.43e730c9@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20241014171406.43e730c9@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iOuI4dTUGHzT8hkOBGbOW4ro6_dV7sy3
+X-Proofpoint-GUID: v7l7l6wg5oaeQfeQFKftht8yVhUZCnBN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 clxscore=1011 mlxlogscore=514
+ priorityscore=1501 bulkscore=0 spamscore=0 mlxscore=0 malwarescore=0
+ adultscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2410150072
 
-On 2024/10/15 8:14, Jakub Kicinski wrote:
-> On Sat, 12 Oct 2024 20:05:31 +0800 Yunsheng Lin wrote:
->> 1. Semantics changing of supporting unlimited inflight pages
->>    to limited inflight pages that are as large as the pool_size
->>    of page_pool.
-> 
-> How can this possibly work?
+Hi,
 
-As a similar comment in [1], do we really need unlimited inflight pages
-for the page_pool to work? If we do, it seems there is something really
-need fixing here. I am agreed changing of semantics here might introduce
-regressions here because there may be some subsystem depending on the
-previous semantics or incorrect calculating of how many inflight pages it
-is needed, so I am agreed that it might be better to target the net-next
-tree to give some cycles of testing before backporting it.
+these patches add support for using the s390 physical and TOD clock as ptp
+clock. To do so, the first patch adds a clock id to the s390 TOD clock. The
+second patch adds sending a udev event when a ptp device is added, so that
+userspace is able to generate stable device names for virtual ptp devices.
+The last patch adds the PtP driver itself.
 
-1. https://lore.kernel.org/all/842c8cc6-f716-437a-bc98-70bc26d6fd38@huawei.com/
+Sven Schnelle (3):
+  s390/time: Add clocksource id to TOD clock
+  ptp: Add clock name to uevent
+  s390/time: Add PtP driver
 
-> 
-> The main thing stopping me from reposting my fix that it'd be nice to
-> figure out if a real IOMMU device is bound or not. If we don't have
+ MAINTAINERS                     |   6 ++
+ arch/s390/include/asm/timex.h   |   8 ++
+ arch/s390/kernel/time.c         |   8 ++
+ drivers/ptp/Kconfig             |  11 +++
+ drivers/ptp/Makefile            |   1 +
+ drivers/ptp/ptp_clock.c         |  11 ++-
+ drivers/ptp/ptp_s390.c          | 127 ++++++++++++++++++++++++++++++++
+ include/linux/clocksource_ids.h |   1 +
+ 8 files changed, 172 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/ptp/ptp_s390.c
 
-device_iommu_mapped() might be used to check if a real IOMMU device is
-bound or not.
-I am afraid it is not just about IOMMU here as there might be other
-resource behind the dma mapping, like the bounce buffer memory as below:
+-- 
+2.43.0
 
-https://elixir.bootlin.com/linux/v6.7-rc8/source/drivers/iommu/dma-iommu.c#L1204
-https://elixir.bootlin.com/linux/v6.7-rc8/source/kernel/dma/direct.h#L125
-
-And we may argue is_swiotlb_active() can be used check if there is any
-bounce buffer memory behind the dma mapping as the device_iommu_mapped()
-does, but I am not sure if there is any other resource besides iommu and
-bounce buffer.
-
-> real per-device mappings we presumably don't have to wait. If we can 
-
-For not having to wait part:
-I am not sure if the page_pool_destroy()/__page_pool_release_page_dma()
-need to synchronize with arch_teardown_dma_ops() or how to synchronize
-with it, as it seems to be called when driver unloading even if we have
-ensured that there is no IOMMU or bounce buffer memory behind the device
-by the above checking:
-__device_release_driver -> device_unbind_cleanup -> arch_teardown_dma_ops
-
-> check this condition we are guaranteed not to introduce regressions,
-> since we would be replacing a crash by a wait, which is strictly better.
-
-For the waiting part:
-The problem is how much time we need to wait when device_iommu_mapped()
-or is_swiotlb_active() return true here, as mentioned in [2], [3]. And
-currently the waiting might be infinite as the testing in [4].
-
-> 
-> If we'd need to fiddle with too many internals to find out if we have
-> to wait - let's just always wait and see if anyone complains.
-
-Does the testing report in [4] classify as someone complaining? As
-the driver unloading seems to be stalling forever, and the cause of the
-infinite stalling is skb_attempt_defer_free() by debugging as mentioned
-in [2].
-
-2. https://lore.kernel.org/all/2c5ccfff-6ab4-4aea-bff6-3679ff72cc9a@huawei.com/
-3. https://lore.kernel.org/netdev/d50ac1a9-f1e2-49ee-b89b-05dac9bc6ee1@huawei.com/
-4. https://lore.kernel.org/netdev/758b4d47-c980-4f66-b4a4-949c3fc4b040@huawei.com/
-
-> 
 
