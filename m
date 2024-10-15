@@ -1,56 +1,66 @@
-Return-Path: <netdev+bounces-135380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 234F699DAA8
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 02:26:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0811599DAB5
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 02:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7A7B2810B4
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:26:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CF43B2117D
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 00:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B7A8F77;
-	Tue, 15 Oct 2024 00:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4BFBA4B;
+	Tue, 15 Oct 2024 00:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C4Itt4d5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cufWovvF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFFE191;
-	Tue, 15 Oct 2024 00:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E051B7F4;
+	Tue, 15 Oct 2024 00:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728951963; cv=none; b=f50l6KSdr9GrpZppJT0RKG3cAtFoe0e1wC67YVMXK4Se+jZTKm1U9MG0peplYnzhFju6nKaRoVkCjTUdAXUD6+4eX+GeuFJmgnrnBQgWTeko2xqEEgaYLAvd7b3DyuD7KOQc+N/gPNyhENnf2DdwDIClB0RZj56WXOl3uzMMxyM=
+	t=1728952637; cv=none; b=iLsh4HY/mEFQTfiwvT+14rBW6I8Q+DIbrqiUF7BGZNL08Z1Wesne0433Q143zVEiqinyfeoO4n3JYR1CvGbYatHC3ni43gy6R6SDGAAbwI557C3Uw4T768H/SrfuGT0MgfVDkAqyy6vEflIi7Wx7o8+G5VdEjNBWCdfGMMuMGdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728951963; c=relaxed/simple;
-	bh=1irKL8feAdHhHDFB2eddIyClO0Y4Pse8KtbdmmCG3HA=;
+	s=arc-20240116; t=1728952637; c=relaxed/simple;
+	bh=ghXbgNkKFxzOJvB3Lri2nXRIzvvHq7IauZH0nYGZG9A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pIqGDTEzyWQYVomtTZzIGZfiT005jZDK5YZs+JAlozTtr9LDirrJe4PLU1ywAwyu662JzESnXDMSv8sHwZrUHl4ZtmZm9+FG36zVhJu6zLnbVWzTJTgM4PWnsFdnaYYeFjRs2B0kcuu1tK279OsS3iIhyrohAfNGdozcZY4JQCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C4Itt4d5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00F05C4CEC3;
-	Tue, 15 Oct 2024 00:26:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iXjB5Dh64n8MnSiXrq6VgaFA/h9F7fDtZXTAHuc6iZDJQvKQhy1LdKxEo3keYq8Y0g+ILtBoXtJnvj9cga3pzuCiXxnZNLReREejQ8IxAgh43tEVdFaJz4EOp+jU+bkMaIlEK4Tp+uws9BsLPWGqPfXAS+leHSZGMwlShlck0fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cufWovvF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79FA2C4CEC3;
+	Tue, 15 Oct 2024 00:37:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728951963;
-	bh=1irKL8feAdHhHDFB2eddIyClO0Y4Pse8KtbdmmCG3HA=;
+	s=k20201202; t=1728952637;
+	bh=ghXbgNkKFxzOJvB3Lri2nXRIzvvHq7IauZH0nYGZG9A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C4Itt4d5L7KqM0w3J6RXpsg3lo6dF6jBZaOyZXMQjaUed7m1JLrC3LQHwl/bVyDeD
-	 6rYX2+DYleR8wwxg7r1FIGnz4RvIaxBc0QC798/OcxYwo0etj/4ZirbDvTQiAGTtK2
-	 1cMOQhttUTGR1b8cr4nwXJ2W1ZwP5bhW17PGaFdof3WxWJP7tv1cnsZOP/0jcCfgsh
-	 5W6v9NqXMhyDmrhdbDZblc3UcKjumhqxGtbKXSi4VgdfccJWIXU/Lt4szPpFJf4YEW
-	 5EsttwSgRhXlQYMSvBqoiu/Xkfoty3aUdp6/FkKrgBX3w8NyA7cIGWH288HuV6Ki/P
-	 pMI3pP9itGSMA==
-Date: Mon, 14 Oct 2024 17:26:02 -0700
+	b=cufWovvFgwK2IVGZJsetcYLZPuzGzH1ItVbbP83pc5RKItZtg6KCAICtXUDvGqLv7
+	 XXQGapYhsuYgflwzZ2AM2tRJKTVKZXBbomwxttBCJg7gYd09x+mQWCpxpb6X8ve0e3
+	 +QkA4vbFmwBdzlIA3YQusWuQjtq1LdEaxUbtFbOjw8f/dvTFuWNbQIx3xNJOFQHn8w
+	 hXdoYj0nUG5T4d3B5C2VdOgZZ4X8AUwBdeBukTzkB9DJ/FlAS/Hikwo+WF7tM5aj9j
+	 qtqa0lN2x4V1jIucxo8kCWuM1zp39ewayG6GEwvjb5mY1OZcQCZuKIgcAJMl5q9A+W
+	 MPVWiiYIACb/Q==
+Date: Mon, 14 Oct 2024 17:37:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenz Brun <lorenz@monogon.tech>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND] net: add config option for tunnel fallback devs
-Message-ID: <20241014172602.7c55a4d4@kernel.org>
-In-Reply-To: <20241009110421.41187-1-lorenz@monogon.tech>
-References: <20241009110421.41187-1-lorenz@monogon.tech>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Xu Liang <lxu@maxlinear.com>, Christian Marangi
+ <ansuelsmth@gmail.com>, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>, Robert Marko <robimarko@gmail.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>, Jacek Anaszewski
+ <jacek.anaszewski@gmail.com>, linux-leds@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/5] dt-bindings: leds: add 'active-high'
+ property
+Message-ID: <20241014173715.08a2313d@kernel.org>
+In-Reply-To: <e9b15613a81129ceecb07ec51f71bbe75425ad2e.1728558223.git.daniel@makrotopia.org>
+References: <e9b15613a81129ceecb07ec51f71bbe75425ad2e.1728558223.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,20 +70,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed,  9 Oct 2024 13:04:19 +0200 Lorenz Brun wrote:
-> This adds a Kconfig option to set the default behavior regarding tunnel
-> fallback devices.
-> For setups where the initial namespace should also not have these, the
-> only preexisting option is to use a kernel command line option which
-> needs to be passed to every kernel invocation, which can be inconvenient
-> in certain setups.
-> If a kernel is built for a specific environment this knob allows
-> disabling the compatibility behavior outright, without requiring any
-> additional actions.
+On Thu, 10 Oct 2024 13:53:36 +0100 Daniel Golle wrote:
+> Other than described in commit c94d1783136e ("dt-bindings: net: phy:
+> Make LED active-low property common") the absence of the 'active-low'
+> property means not to touch the polarity settings which are inherited
+> from reset defaults, the bootloader or bootstrap configuration. Hence,
+> in order to override a LED pin being active-high in case of the default,
+> bootloader or bootstrap setting being active-low an additional property
+> 'active-high' is required. Document that property and make it mutually
+> exclusive to the existing 'active-low' property.
 
-I don't hate the idea, but could you comment a bit more on practical
-usability of such a change? Whatever software depends on the new
-behavior will likely not work with distro kernels, right?
+Daniel, please make sure you provide a cover letter for any submissions
+longer than 2 patches. If nothing else it gives the maintainers a quick
+overview of which files you're touching.
 
-Did you consider kernel boot param?
+This submission is okay but please correct going forward.
+
+Let's wait a bit longer for Lee to ack / take the first patch and then
+I presume we take the rest.
 
