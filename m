@@ -1,154 +1,137 @@
-Return-Path: <netdev+bounces-135446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87C299DF82
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 09:45:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9D299DF98
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 09:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E392B20E41
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 07:45:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F2F8283C53
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 07:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE1717E016;
-	Tue, 15 Oct 2024 07:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F991AAE2C;
+	Tue, 15 Oct 2024 07:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="f8UvGRaH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ckw0BXoP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63877231C95
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 07:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E37A17334E
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 07:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728978317; cv=none; b=rb5VFiMPRXxRtewJ/RcMnVBKZXN37fF58hqmrwnLgxE7ENLBZ3AhaE9Qng2Q1Ayv3An4getgHAYsj19HoEsqc5JAFrIfRKG/Rzf1B3shs7sighZwo32TP95OfEKzWj2a4cnO+xe6EKcRRyns2bnunk7FnOv+kzwwsjioK9JuPR4=
+	t=1728978440; cv=none; b=rQxsbk8MTRDwDws98EcZZwLiGEeK+xib5ITy5U3rJaxiACPONZqUn6GwhHHGG55L3VchihunCOkM69qTI9T0MQvZel21PlzBofq8PHjyJgoI5BF0bcsj6NbK5D6rUfPsN7Ys/dj+lBBr+LdjaYsN2g6C+VyUG7icBB/tUNQZIBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728978317; c=relaxed/simple;
-	bh=8WFPwkfl5Zl279e9KpqKxJLo3XaklUu8GfbAqveSirI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=t4bt+bKJNCNj1hZphg9qPhKkMV+yYTZTBP/OFp+7tUqI4el6dntr08ApNO3UqpSV8OHIPls1Y2lecx62rW42lTRw1kiPJ4QuBLbRsWXzH7UyBCsi6OUgwrorJbIUjaVhkfCOxbcp9+pE1LB+tyEgk5ok0XSH2jiZLpxXoKww5fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=f8UvGRaH; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4304ea60a58so6306045e9.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 00:45:15 -0700 (PDT)
+	s=arc-20240116; t=1728978440; c=relaxed/simple;
+	bh=+Ej1MNiBqld9sr/rde/khIhq0J381uRG4buKgfobWSU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DkF+CVRjm0wkJvLY1hxlyrdbH1Hyc1g/g4ymkEqqtP/9RViQDqwQceZuuRL3cl7zBKUAWsHMhZYSL1pcZFBfvDwdOn/xilBmRlaSFqo8pxa4NKk6XOHDsoVRS6I5PaRwfVsOTVviwEo5P6tcmLJQqG4mp2m/Cii/DOYq+baK0z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ckw0BXoP; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9a14cb0147so209216366b.0
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 00:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1728978314; x=1729583114; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tCjTOD6RccsjBLhCHqxQsUi4Ne/TR+Hf8YTrvIBi5Y8=;
-        b=f8UvGRaHO3qoNFlsf2UWIeCjtFjEj8BkG6rDW0zQ/CHylRRgrOTlhmPa8Su+XmCiTK
-         h2VGu5uY3sIyujASlDwyHqbR1fEIBpquz/jztHX6bzUxfXmTtR+Zk8LPsFniV5td5lgn
-         pOKS4T/Hb8v6sxWSiEeGDU4XEkhF3CL6+hwB5+OKrPPHMYrOQ9U7RiJaQN9d3ghuenBf
-         2u30HbmX0+fHLIr3xAccbEYQ9ZtWHqj5HFhXU8W8UBcbDQ3J2vEBElt8arQoLfNW/pkd
-         p2DqZFFX2xXErIHnQ3NlCNZN9+4ZKJnnocFEgfAzpbnRCwMV8GI11N0nmN7CfGzR7Dqp
-         2MWg==
+        d=google.com; s=20230601; t=1728978437; x=1729583237; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NGTAwWYylrgHxys3J7g7Oj8BY+b7ECipEcgHj47PxZg=;
+        b=ckw0BXoPwqSakKCCbSFQMVYHsVK4NLgJf2u0hZZa7aJuFVbuoRfeJt/TZzfXySaaCq
+         UP1Az4aNkicI8l6K0PNLLrJWJled027jM9HgMNagQOOqc+rIRy/xBNAcPQxoRmNzQc17
+         RsljHRjEdoDpG9lZjS2o+bkS2n4QHZPC+Hg2xCO+DZ+ijBOiwkxbPBCBGn1OrspTHtuS
+         j8C4tkxj3KH1kPG1l9PhkN904TgKPlvMfryPnBEDuZedL0ht6Ctg4QCciXs0Hk6BYME6
+         q4VxqsLE1n+wMAo0X7XEsj7gG8eEG8tTV1EHii7MnQJYTDvquSJtAj6QZ2WyxqORuK5N
+         BIjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728978314; x=1729583114;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tCjTOD6RccsjBLhCHqxQsUi4Ne/TR+Hf8YTrvIBi5Y8=;
-        b=dCjqXq8tgDyjrlJkKhTq+KHhTSSaTZIna5ioTBrZjXIlENR8NHgfX6w8670Jinr0do
-         Pee47LkiUVbp9FO24fOyoXmunE/H9oHLPpvr0NZkMpn+2+cLIn9ZeY3P0gSUY/fmvQdg
-         TAMe63Wls7lcIv/+na+MTqkJ/ZadZPghMR4/XY84s5hAfjJ3gExA8TFDS2VIq6vxw0Pq
-         bD9VmGqWeydbsBl5OTeUVlidjdX93hH2ZiNmx4OgPLwdzp8YrI/4j27MuXHSahaUE9pJ
-         zn0+auEAM8hPG777bM8M1CqdGbg837eyKXihO87w1eaiCIWVdpfxwbIzjZ/L8lzqxMXO
-         SdFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXrm3fDTTq+XWV6T35lExsufiUe87+skp4u1eGvoPZzzPvg2K3PC+MseJBB6zYw8Wnkg+ACv8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDJxuCgtc/G9bBuCApWY/ztgT79IBU/IRryvqRXleUNod1zkNq
-	Y7TajxJO/UHBqgXf1miCgfwSUC8ZmDuvCKHbiXQREN4QLwxq5mDIKhmXffekg3g=
-X-Google-Smtp-Source: AGHT+IHuJ/KdZ3x8Px7xIduqo0njRD1I2750TFgOAiI/NqqJyKAEa5B6bgZrrKDKLXUKRHeB0Ofmog==
-X-Received: by 2002:a05:600c:358f:b0:430:549c:8d55 with SMTP id 5b1f17b1804b1-4311de9fffamr52605705e9.2.1728978313672;
-        Tue, 15 Oct 2024 00:45:13 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:3580:daf2:14d4:f937? ([2a01:e0a:b41:c160:3580:daf2:14d4:f937])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fbf8382sm846599f8f.86.2024.10.15.00.45.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2024 00:45:12 -0700 (PDT)
-Message-ID: <3ad78fb0-4aa2-424b-9e91-8c32b1c266f5@6wind.com>
-Date: Tue, 15 Oct 2024 09:45:12 +0200
+        d=1e100.net; s=20230601; t=1728978437; x=1729583237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NGTAwWYylrgHxys3J7g7Oj8BY+b7ECipEcgHj47PxZg=;
+        b=gPBsWKd9sDmd7mKCkDC7GUmccxsF2iWeSD3Iu1CIIYau0HEpQ2ckxd6gvpZzP0eKPZ
+         1Lyf5rpauXdq4XFeTkQKqxjWKF7rLDyeTlZNgPixp/6VDHda5LSL4e7wPoxRthkTGDaD
+         zi5KK9Gp8UseEuYXGhOFNmGjqBkhTnT9tUxFvzXV4B1ujvGdsV9n8YV4s4tu5SHAa3hJ
+         LhhXwxgMk2cqPUGC3c+6nuI6Rbo8Lzq5pWtkjCm1pQrUme4JVpwOAOhstsqv8NQ32nvX
+         do4j6CLTf82UnRWssxZCaKGnH97THIO0zE98qN3wyDEWkaSUuYOxpuGT6vtOqqzEu0Uq
+         Bzgg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYXP86WHNLLVMjtjpCHLjXEWujLsTzeUF3IAyMesMtNBWUNVpw/pMiH18bdbkg12+xTFziRZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk1XJ8ZwY7yS8XkagKQ7L0wfcZ/7aIPMZ9g9zs7GCl7YaFxsMN
+	ETkTqZJC4lPLE8vZD/1ozAhrpaJczgzO7thATZjagBqkCWeUuQ/GHF5gxm4qgSYb3cZRocX6VQL
+	rRe98MgumGHFxOChuaxSrOkMrohLfD3NBlphd
+X-Google-Smtp-Source: AGHT+IHOWVLnPX4C3QWmkZye9E646q8g8t2prDsYgVCykbq1ehRGzgpHCukbcmwC4labaeZy8W5xKeFOMAJpBJdxCWE=
+X-Received: by 2002:a17:906:6a14:b0:a99:ed0c:1d6 with SMTP id
+ a640c23a62f3a-a99ed0c0ac9mr795036266b.49.1728978436290; Tue, 15 Oct 2024
+ 00:47:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v2 iproute2 2/2] iplink: Fix link-netns id and link
- ifindex
-To: Xiao Liang <shaw.leon@gmail.com>,
- Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-References: <20241011080111.387028-1-shaw.leon@gmail.com>
- <20241011080111.387028-3-shaw.leon@gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20241011080111.387028-3-shaw.leon@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241014144250.38802-1-wanghai38@huawei.com> <CAMuHMdVsagE1HMf5aLD_ZrubocY_DqX-UrTLxiFOMT+kwVhysg@mail.gmail.com>
+In-Reply-To: <CAMuHMdVsagE1HMf5aLD_ZrubocY_DqX-UrTLxiFOMT+kwVhysg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 15 Oct 2024 09:47:03 +0200
+Message-ID: <CANn89i+Srr=M5+f0PbLs1OrWtOPNYULopNS+6-dy6EYNX8Ua0Q@mail.gmail.com>
+Subject: Re: [PATCH net] net: ethernet: rtsn: fix potential memory leak in rtsn_start_xmit()
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Wang Hai <wanghai38@huawei.com>, niklas.soderlund@ragnatech.se, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, 
+	zhangxiaoxu5@huawei.com, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 11/10/2024 à 10:01, Xiao Liang a écrit :
-> When link-netns or link-netnsid is supplied, lookup link in that netns.
-> And if both netns and link-netns are given, IFLA_LINK_NETNSID should be
-> the nsid of link-netns from the view of target netns, not from current
-> one.
-> 
-> For example, when handling:
-> 
->     # ip -n ns1 link add netns ns2 link-netns ns3 link eth1 eth1.100 type vlan id 100
-> 
-> should lookup eth1 in ns3 and IFLA_LINK_NETNSID is the id of ns3 from
-> ns2.
-Indeed.
+On Tue, Oct 15, 2024 at 8:58=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68=
+k.org> wrote:
+>
+> Hi Wang,
+>
+> On Mon, Oct 14, 2024 at 4:43=E2=80=AFPM Wang Hai <wanghai38@huawei.com> w=
+rote:
+> > The rtsn_start_xmit() returns NETDEV_TX_OK without freeing skb
+> > in case of skb->len being too long, add dev_kfree_skb_any() to fix it.
+> >
+> > Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethe=
+rnet-TSN")
+> > Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>
+> Thanks for your patch!
+>
+> > --- a/drivers/net/ethernet/renesas/rtsn.c
+> > +++ b/drivers/net/ethernet/renesas/rtsn.c
+> > @@ -1057,6 +1057,7 @@ static netdev_tx_t rtsn_start_xmit(struct sk_buff=
+ *skb, struct net_device *ndev)
+> >         if (skb->len >=3D TX_DS) {
+> >                 priv->stats.tx_dropped++;
+> >                 priv->stats.tx_errors++;
+> > +               dev_kfree_skb_any(skb);
+> >                 goto out;
+> >         }
+>
+> Does the same apply to the skb_put_padto() failure path below?
+>
+> drivers/net/ethernet/renesas/rtsn.c-    if (skb_put_padto(skb, ETH_ZLEN))
+> drivers/net/ethernet/renesas/rtsn.c-            goto out;
 
-> 
-> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
-> ---
->  ip/iplink.c | 143 +++++++++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 118 insertions(+), 25 deletions(-)
-> 
+In case of error, skb_put_padto() frees the skb.
 
-[snip]
-
-> @@ -618,20 +653,25 @@ int iplink_parse(int argc, char **argv, struct iplink_req *req, char **type)
->  			if (offload && name == dev)
->  				dev = NULL;
->  		} else if (strcmp(*argv, "netns") == 0) {
-> +			int pid;
-> +
->  			NEXT_ARG();
->  			if (netns != -1)
->  				duparg("netns", *argv);
->  			netns = netns_get_fd(*argv);
-> -			if (netns >= 0) {
-> -				open_fds_add(netns);
-> -				addattr_l(&req->n, sizeof(*req), IFLA_NET_NS_FD,
-> -					  &netns, 4);
-> +			if (netns < 0 && get_integer(&pid, *argv, 0) == 0) {
-> +				char path[PATH_MAX];
-> +
-> +				snprintf(path, sizeof(path), "/proc/%d/ns/net",
-> +					 pid);
-> +				netns = open(path, O_RDONLY);
->  			}
-This chunk is added to allow the user to give a pid instead of a netns name.
-It's not directly related to the patch topic. Could you put in a separate patch?
-
-> -			else if (get_integer(&netns, *argv, 0) == 0)
-> -				addattr_l(&req->n, sizeof(*req),
-> -					  IFLA_NET_NS_PID, &netns, 4);
-> -			else
-> +			if (netns < 0)
->  				invarg("Invalid \"netns\" value\n", *argv);
-> +
-> +			open_fds_add(netns);
-> +			addattr_l(&req->n, sizeof(*req), IFLA_NET_NS_FD,
-> +				  &netns, 4);
->  			move_netns = true;
->  		} else if (strcmp(*argv, "multicast") == 0) {
->  			NEXT_ARG();
+/**
+ * skb_put_padto - increase size and pad an skbuff up to a minimal size
+ * @skb: buffer to pad
+ * @len: minimal length
+ *
+ * Pads up a buffer to ensure the trailing bytes exist and are
+ * blanked. If the buffer already contains sufficient data it
+ * is untouched. Otherwise it is extended. Returns zero on
+ * success. The skb is freed on error.
+ */
+static inline int __must_check skb_put_padto(struct sk_buff *skb,
+unsigned int len)
+{
+return __skb_put_padto(skb, len, true);
+}
 
