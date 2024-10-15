@@ -1,97 +1,84 @@
-Return-Path: <netdev+bounces-135765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE3599F210
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 17:56:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E7999F23E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F30B1C230AA
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:56:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D9D5B22FCA
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD5F1DD0FF;
-	Tue, 15 Oct 2024 15:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDFCD1DD0D0;
+	Tue, 15 Oct 2024 16:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nXn0Hjn+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxNMf1F2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F3D1CB9EB
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 15:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F991B3949;
+	Tue, 15 Oct 2024 16:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729007790; cv=none; b=dbX6rk87++HXfbG+2qSyiOFS2UDvlcblVY5R4itCqPMXiMCDufQ2qss8HWGlZyut0AUCOd7Fc9rCr8qB0B4EVA4aka9tzMbT18kzZCQzPf/meGXiZC3ib/7WcIoKxcs4Ejue1ckKjVOlP+KMIGZOv1qsn2aeKTTrJOCATfx/i38=
+	t=1729008110; cv=none; b=Zs9EcCe6acCcfbnJhI97XDykhMh/isi5nXsNlw2zkfpFGBrDbz5zlYq2T+8KKAQGLt5MlhJJ2sOIsKYBXVGhBEV+qXtCQ0ahJKLXalZQxTA/lGRG6HklPXjhp206PnXrlG4wcr+j4sY3SDoXivIgSHl0vWk+XsEOGRwM5A1lLGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729007790; c=relaxed/simple;
-	bh=A4aSlMS3npW1r8pP2wqIvP5yMZMzeaXPbcDUtBoG1/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VY7yC4TELm4rbOw+bQyU+V0NjJ4lQj2gCZhCmQ2DcTbjzAGrrAwoXOOy9hJ9Bryyyr4WRbEK77VumqCRXyIxtOfjX8gjrXUrYeM/O7nCwxyxB8JMPtBFDLQRWKz3+UivS5SkBmDjstjd/Bma7wLUUelYf4L5oJ4prsMeHRcyOgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nXn0Hjn+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RRX6r5xYRXgboqStl2B9PLAY7QMuBPCcEaoMbKKhPX8=; b=nXn0Hjn+54jccvb2X4iDnCTjER
-	5MvwIZi4dN7zxugpOtMobRLAxxl3PcV55TCn6u6kdazyu13+x50xAabDZSxJF48t0wGkoDdt12XL/
-	oXza0Qw9WLehXZ6Vtg5FF3xd9HTNODtLB1C0ybfMaO5G3p53XBxJJk1YuQc8JB1h5lDM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t0juJ-00A3A8-Vo; Tue, 15 Oct 2024 17:56:23 +0200
-Date: Tue, 15 Oct 2024 17:56:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: wojackbb@gmail.com
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
-Subject: Re: [PATCH] [net,v3] net: wwan: t7xx: add
- PM_AUTOSUSPEND_MS_BY_DW5933E for Dell DW5933e
-Message-ID: <85cda68e-93d9-4f69-a59e-6c7c292f3a25@lunn.ch>
-References: <20241015032820.2265382-1-wojackbb@gmail.com>
+	s=arc-20240116; t=1729008110; c=relaxed/simple;
+	bh=/TepmO8XoWWeSS4iyG4ssEgu5Umu35Qomt7Z8VC5VhA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P9ukfw4cTeEk9XWnn3yukuOsu8GUSG3zD5K5uVbWe7dIwaSMtERe9eCK0ShJWXz3IjoEBN+bMx3MRK4cncVuqhrSdxbvLdevU0/3F+t7TCmSMJ0HEUZ+4SujAC0W4QARpkdOrg5KiyCbSBoTVSS8vkcCZy6PbpaG18r/RyojuO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxNMf1F2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D6AC4CEC6;
+	Tue, 15 Oct 2024 16:01:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729008110;
+	bh=/TepmO8XoWWeSS4iyG4ssEgu5Umu35Qomt7Z8VC5VhA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LxNMf1F2Bz6spUKy3ynW4DnfoIPogTZO1Di02ybSsp3NWZweEy7l72WQ3M7sf+qLN
+	 GQRF6u6OC1DllmQPzO+TyZB8uul4XVEk/chRn6u0Z1VBNmBG9zoGxXLXlul9p1Hgbs
+	 GuIy2ccc3rQopDApQfKeRtPFb4HOJjEcYzbFLIP0lYPBPMeD8bCxx8dlXyXTx0+eet
+	 y8vswW1u/Tb0EuLwdrOv1TUZaTx+MUjG41z+E57wwiYe1SnjATTWFmEb6RbjjQw1fy
+	 VGzqv72vud0o4PalF+s8XhZUQvRP/6fMeJs0AB6VQfjyI+3F1UEgfNXlVjKUrfXXhU
+	 LePb5hBSiSz/w==
+Date: Tue, 15 Oct 2024 09:01:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+Cc: davem@davemloft.net, Liam.Howlett@Oracle.com, edumazet@google.com,
+ pabeni@redhat.com, mingo@redhat.com, peterz@infradead.org,
+ juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, jiri@resnulli.us,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ akpm@linux-foundation.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, peili.io@oracle.com
+Subject: Re: [PATCH net-next v1 0/3] Threads support in proc connector
+Message-ID: <20241015090148.72e83f7f@kernel.org>
+In-Reply-To: <20241013170617.2139204-1-anjali.k.kulkarni@oracle.com>
+References: <20241013170617.2139204-1-anjali.k.kulkarni@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015032820.2265382-1-wojackbb@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 15, 2024 at 11:28:20AM +0800, wojackbb@gmail.com wrote:
-> From: Jack Wu <wojackbb@gmail.com>
-> 
-> Because optimizing the power consumption of Dell DW5933e,
-> Add a new auto suspend time for Dell DW5933e.
-> 
-> The Tests uses a small script to loop through the power_state
-> of Dell DW5933e.
-> (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
-> 
-> * If Auto suspend is 20 seconds,
->   test script show power_state have 5% of the time was in D3 state
->   when host don't have data packet transmission.
-> 
-> * Changed auto suspend time to 5 seconds,
->   test script show power_state have 50% of the time was in D3 state
->   when host don't have data packet transmission.
+On Sun, 13 Oct 2024 10:06:14 -0700 Anjali Kulkarni wrote:
+> However, for threads, when it does a pthread_exit(&exit_status) call, the
+> kernel is not aware of the exit status with which pthread_exit is called.
+> It is sent by child thread to the parent process, if it is waiting in
+> pthread_join(). Hence, for a thread exiting abnormally, kernel cannot
+> send notifications to any listening processes.
 
-There are still open questions on V2:
+I really don't think this should be going via networking.
+We can help review the netlink bits, if any, but otherwise we are far
+outside of our comfort zone. 
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20240930031624.2116592-1-wojackbb@gmail.com/
-
-    Andrew
-
----
-pw-bot: cr
+IOW when you repost please drop the net-next designation and you'll
+need to find someone else to merge these patches, or send a PR directly
+to Linus himself during the merge window.
+-- 
+pw-bot: nap
 
