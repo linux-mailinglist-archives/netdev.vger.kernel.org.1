@@ -1,86 +1,131 @@
-Return-Path: <netdev+bounces-135763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9134799F1FB
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 17:51:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C2399F206
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 17:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5579E282863
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:51:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC562833A8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2FB1DD0C0;
-	Tue, 15 Oct 2024 15:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35001D514E;
+	Tue, 15 Oct 2024 15:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+9nQ8G7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Me6mUSlJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C291714BE;
-	Tue, 15 Oct 2024 15:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE2514A0A7
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 15:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729007483; cv=none; b=pK5GqF4jjU/xKoQ5NRLB+e67TNe9pnG54ooPzgmUDjgnPNwEx0eUbBcb9DW90usqYIg3rLHwA9ywE2j7G4FmzS4o9oAeK4kk/KeqjxhjHy5oK8lWIjwTLQU76CHuPh2YOWpEikfyUVqGxGVeempPEfTTufDhGdOlUxjtKiC1h5E=
+	t=1729007702; cv=none; b=KYlv+VrJOkmI37LMaJNbdBP3FCkBwEosP9LvytB8XtZFQJZM7X6cuZ8spr/pY6xE7CXMGadk1Ut8HTW5kL8twSpR9WWw11KM+bYdSAgeMLs5rxDtA0G8oV2Yzz1OpMsPq+UHbfbOTlnWP2Vr/L6wem1GJDTgpa1TuusDBGtIcGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729007483; c=relaxed/simple;
-	bh=grArdQkCShh+C6dJgpxXV1EytHE5WpU0yGVIeKNoxNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oJKREqFxUBM5gUFZVyYa9GtCUpzZyi5Wo7Eb7hh9AYdpg+wMPfeCyh65AhqpBd+DdY1PtGTh1TugoNXbkk5Ak0q8NTbd9oUSynKF7M844MrVe22BR0bADDgmPl0XmYix4NLYE7tKCnHWjy8jKurrf0mpVXbPN0OI3w0NPLSNtuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+9nQ8G7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56560C4CEC6;
-	Tue, 15 Oct 2024 15:51:22 +0000 (UTC)
+	s=arc-20240116; t=1729007702; c=relaxed/simple;
+	bh=FZT8eUVAP1Th0PhWw2NBLyprwi9M9ThW0WrOYeOJ1ok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XNZkYDRTHT+omrDUaI/3btEgK3Nzv8uJT5MMY7AIg2OwHeJqvHjjEDTY//JarjlG68HHtYuoyEe81yMjahCesBfbdB/7YbbYwodCi3HVZTyKvfVwCo8yIkkTxZ5ayi9l0JKm9tcnOrywoC39jJjaJjvSVmL0Sybm4yqo7rJvmVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Me6mUSlJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4594C4CECF;
+	Tue, 15 Oct 2024 15:55:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729007483;
-	bh=grArdQkCShh+C6dJgpxXV1EytHE5WpU0yGVIeKNoxNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c+9nQ8G7Y9i/LwN7VNpV0DrdRQZkNBQPlKR8dE3HSexY+pKDsTc/SCMK2hMsar88w
-	 syKDfIFrTL9X/Qg9yNQQ0AHFsO6hOj3SW0KGr9OCMmTBp8cWOiYxpJrdYVga0K1/SX
-	 96iKIpBlsOWG/PRp4+eurZrZDHsM8qFZREzbIa0UZq+TDhm0ooUsjIJYDJs0L3PNHs
-	 bMgCuSovbXQTndefYSXXcNaQhTsofxc93EYdkTt49wyOVokXLmXFogNrvy8GkDw5tY
-	 Y6q0VoLjkA0JkzvDGD/z3Ed4BaigFe8R6RJ2lUUBoFA+Lab2t4Gy1m3D2uPOmRAeE5
-	 cLFPyx5C3n3ig==
-Date: Tue, 15 Oct 2024 08:51:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Andrii Nakryiko <andriin@fb.com>, Jussi Maki
- <joamaki@gmail.com>, Jay Vosburgh <jv@jvosburgh.net>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, Liang Li
- <liali@redhat.com>
-Subject: Re: [PATCH net] bpf: xdp: fallback to SKB mode if DRV flag is
- absent.
-Message-ID: <20241015085121.5f22e96f@kernel.org>
-In-Reply-To: <20241015033632.12120-1-liuhangbin@gmail.com>
-References: <20241015033632.12120-1-liuhangbin@gmail.com>
+	s=k20201202; t=1729007702;
+	bh=FZT8eUVAP1Th0PhWw2NBLyprwi9M9ThW0WrOYeOJ1ok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Me6mUSlJBOODqtENnFguUrYd2grSuTFrIEjflVdbxhijjEN1wVDSv5C3eiQehdfh5
+	 PZgnTuMFb7HH8nRmaB/XG+ZUDGEswzxkZuu6Y4pvFGJx0XweHnQrfyAAVrLrZLGFyp
+	 x0DUu9PM8mrsknA+ceaAn62sG0Dp2rC2opS8zPr8AvDAkFDEugF8JGW7/mX+b+VNEq
+	 WxhHeFq/NJCM3yfo7sfXsHW2QY1OJKNEeRfeARGZh7Zldvhn/uXEZMdO7B3MlWRfgY
+	 tGJIjHwGZRpqUfBEl5lzYEjWcMaZbbm97Dq6eNWuaoDQuHq3SKWBKMoF6Gq6YqBaqT
+	 Ty6NDEmJ99jrg==
+Date: Tue, 15 Oct 2024 17:54:59 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [PATCH net-next v2] net: airoha: Implement BQL support
+Message-ID: <Zw6QUxpdnJtorc_e@lore-desk>
+References: <20241012-en7581-bql-v2-1-4deb4efdb60b@kernel.org>
+ <20241015073255.74070172@kernel.org>
+ <Zw5-jJUIWhG6-Ja4@lore-desk>
+ <20241015075255.7a50074f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="h6qBPvwxWse3BTuY"
+Content-Disposition: inline
+In-Reply-To: <20241015075255.7a50074f@kernel.org>
 
-On Tue, 15 Oct 2024 03:36:32 +0000 Hangbin Liu wrote:
-> After commit c8a36f1945b2 ("bpf: xdp: Fix XDP mode when no mode flags
-> specified"), the mode is automatically set to XDP_MODE_DRV if the driver
-> implements the .ndo_bpf function. However, for drivers like bonding, which
-> only support native XDP for specific modes, this may result in an
-> "unsupported" response.
-> 
-> In such cases, let's fall back to SKB mode if the user did not explicitly
-> request DRV mode.
 
-Looks like the issue is reported by QA rather than a real user.
-A weak -1 from me on building such unreliable heuristics into
-the kernel. As BPF CI's failure points out the ops can return
-EOPNOTSUPP for multiple reasons while dev_xdp_mode() only checks 
-if the driver *has* ndo_bpf, not if it fails.
+--h6qBPvwxWse3BTuY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Oct 15, Jakub Kicinski wrote:
+> On Tue, 15 Oct 2024 16:39:08 +0200 Lorenzo Bianconi wrote:
+> > On Oct 15, Jakub Kicinski wrote:
+> > > On Sat, 12 Oct 2024 11:01:11 +0200 Lorenzo Bianconi wrote: =20
+> > > > Introduce BQL support in the airoha_eth driver reporting to the ker=
+nel
+> > > > info about tx hw DMA queues in order to avoid bufferbloat and keep =
+the
+> > > > latency small. =20
+> > >=20
+> > > TBH I haven't looked at the code again, but when I looked at v1 I was
+> > > surprised you don't have a reset in airoha_qdma_cleanup_tx_queue().
+> > > Are you sure it's okay? It's a common bug not to reset the BQL state
+> > > when queue is purged while stopping the interface. =20
+> >=20
+> > So far airoha_qdma_cleanup_tx_queue() is called just in airoha_hw_clean=
+up()
+> > that in turn runs just when the module is removed (airoha_remove()).
+> > Do we need it?
+>=20
+> Oh, thought its called on stop. In that case we're probably good
+> from BQL perspective.
+>=20
+> But does it mean potentially very stale packets can sit on the Tx
+> ring when the device is stopped, until it's started again?
+
+Do you mean the packets that the stack is transmitting when the .ndo_stop()=
+ is
+run?=20
+In airoha_dev_stop() we call netif_tx_disable() to disable the transmission=
+ on
+new packets and inflight packets will be consumed by the completion napi,
+is it not enough? I guess we can even add netdev_tx_reset_subqueue() for al=
+l netdev
+queues in airoha_dev_stop(), I do not have a strong opinion about it. What
+do you prefer?
+
+Regards,
+Lorenzo
+
+--h6qBPvwxWse3BTuY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZw6QUwAKCRA6cBh0uS2t
+rCyKAQDDWOwLJQOoDmMd9LiMu19jaoyDYvhimdVvvRQYcr5rcAD+JJizGAhBA8wi
+/V2iQsgIkeOGWyDjiuxvCNclacQM/ww=
+=cJ72
+-----END PGP SIGNATURE-----
+
+--h6qBPvwxWse3BTuY--
 
