@@ -1,113 +1,174 @@
-Return-Path: <netdev+bounces-135417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26AF99DCA5
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 05:17:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D8599DCBB
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 05:28:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 623E51F230AA
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:17:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FF101C20F33
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 03:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F75016087B;
-	Tue, 15 Oct 2024 03:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D7F16EC0E;
+	Tue, 15 Oct 2024 03:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzxpRdsr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EseVOeF3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC3D4C8C;
-	Tue, 15 Oct 2024 03:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C1C154456
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 03:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728962220; cv=none; b=G4Q9Ji52v1x8rXT+hmqhr6OgE0fCp178UH8E5IsaXs1gliclU18AsVqa/1P3QXVwjSdu1HdSueLpSyuDDNdHItC0PQ9nzRhQGYmiMyFhlqokK487WALAkKkqylJMKjE+IWBH6ROKHfje3/Uh4bgyk5CAlX8JjKDZoKXlIWMlZNo=
+	t=1728962920; cv=none; b=AtjHQWn3dGVhlTafFlijIJSE7QHDtyradpB8diextvNBBU2LvQfT8jD4A34DYXuwZu5Lev1eeTEzlECJFf2CgoK4ukBamQEf7R2KsOg7DAxqNrpGhJ2hzspo7OqBpUYW/50HyALYat92t5WR+KAe2f8ZkBDzCl0cRcUnLPi3G7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728962220; c=relaxed/simple;
-	bh=Vy5+b03BWuS+g4Wcrm8bS07wpHcNGmDKzU4Frh3eis8=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=PWg6eiv27uY7LCvTFWUVxA4jwRoRpQXC8p/CnBNUAQEXFlwIGfdfCwQOum8KAy+YbYjGWoTCSKM81Vjsm5pC9UjO1f6qD4FCMesFpK6iS/IwdFJ3wYysX+cS2cUSKHq2BCJuvEqfrNPKl9ZrwYPEuePPXCKqep58r+Y7gRZVAOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzxpRdsr; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1728962920; c=relaxed/simple;
+	bh=9qfn9VbbRjKgR++iThcquREsFkOqgP2o/GwT1+A9F50=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U0AxZQ5ZmnHCngJ8AU1eZ4gGswnPIbmcv8sISDmW08deTcupd/YknVoRuApxX6olgrumm37L+iQcgG/EY10J69gz9nOIT+LTQXp44FmQAM+bAE5njOWfxF/QolUCndSXbdB8xGiYFpYq0+mRi98P63eZPrk67bYZcToHf8CgNRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EseVOeF3; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20c693b68f5so49347995ad.1;
-        Mon, 14 Oct 2024 20:16:58 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20ceb8bd22fso12566795ad.3
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 20:28:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728962218; x=1729567018; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xkYR7td2l+FeCuSLcJD66wuG7yiW4yRioWP8jk1sCVs=;
-        b=EzxpRdsrBQEcWr+WMhj6lqepNjiCvhoOoEnrsWlJmIYVNSjGVlL7r10t8/n/E5z7p/
-         n5EeSFrYMemmbxo9ibtIasJ1D5ZqAv8KOSakcrbHTWbqRZgdi75bv6uCSN5VyoqHgSpL
-         VNXPgGm8oMSrswqyin+flf28h5IyyiX0rPdGPLHZNtWhBqj+qd/wKhVDuM7VeTizFEcM
-         2aQD7yIwfnvfutyNb73pQrqJi029llzlI3hdm/8xBwKWqWe8uV0UXt038/4Aj9Y6q0H8
-         NPCtK2BCFbk1hIhE8Gv8ZsXn8XLS+fAHdDM8hmewL35665ryBY3Fpl5BeRz6v1SuHvda
-         0K/g==
+        d=gmail.com; s=20230601; t=1728962917; x=1729567717; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5toA+i342QCyHiEYfQpngKk7r+1pZDBgH0RjgANa6XY=;
+        b=EseVOeF3N97H4kBci1T04wxBoZeiX6WtJixuFLDhsWIZI1SURJHss1HrSSQ/VD/6n3
+         qdiuCdJOwSqjrm3fLtHeH+AwSXkdc7fVQ66DZJVM12KH2SfdIKi2ApdyW/1gg5vXqtvJ
+         Na78k8bOO8KDaP8pmvdNJAvKYYEKhTA5gZDM+XxRoNUSqvf3s1ZyLFfBx9Bh/qjXzFVp
+         q20kpio0NyklwYsxgCGec3k4nRh9w1Regmc27NNFVO0RM5naGLT0hyrE8DsrI217UDGG
+         NJrUgNmhd70DxL0xN1VT1TTI4jvYK8WL7G48jivX7nGSVeOxTM7A5lPhfKr5V+QkfwXk
+         5j9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728962218; x=1729567018;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xkYR7td2l+FeCuSLcJD66wuG7yiW4yRioWP8jk1sCVs=;
-        b=SlqfIViq9XXhNO2mIV4dZpyc2VAH7XknUz4RlMCZhktz9AIHf6NwuCrnwpDdp8YON/
-         pUWaJu0/Fd3Uwf9B8BaZ+mQCNscz2Id6uuIT3ttXwPaGAY98XQfl/VviP+pNKlFpdPfb
-         o3JFa2VIYo5bwuAeudrgDP6YUmvTHoPSmTqqdgY3huXN8co4JkLjySqZKSRVXG2Fxf68
-         xVboS6At0LfNz4tkhLR+o3fEOXcRL1x35O4M0dvzBeJ5Op/hNHMMzhruUh62TVDMI2I3
-         4LM+QNBTuCoSXSJ+wWUXFCojMMkQclSkLs2rHLThbJSrGCeAaerV1ISYAgtExNN/MFIY
-         CLaA==
-X-Forwarded-Encrypted: i=1; AJvYcCVmTJffxAMmlXv2xMbAsSqUmARpYMHfqvKcTP2/ddNAEvQCMUPKj5oFjPZL5jaFlJJP6OjcIV9W@vger.kernel.org, AJvYcCVz2TbaclSBE/E/q1T/cOMtWwxujTdL7n0s2QoT0s0WmXJcA6tbmEW0uwLtk62tHrZqi3NRnotpSMoXK20=@vger.kernel.org, AJvYcCWBOlCP2QU/mXfpCfXxooaGLT10q2casd0MKDCm/hRKxTby656b5secM8JG8dUkq7drWdG+SkbLK0L/RxuFAFY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/4mAB3xV4pfGxxNlo8vJROwRQzuIDqvYpoPX+rXKKG2cJOEBt
-	vPf+dYz9Mhl+TN1imz9E08hnpnMK6ttI68oA7pocirhiyi3FHC0T
-X-Google-Smtp-Source: AGHT+IHfnyTgworhr6LYwqZjKuVR1XpcYvqTA1bM8IJkqIEMPsuzzH5ABHcOoQ0B+2FhYCQE8kAs/w==
-X-Received: by 2002:a17:902:e845:b0:20b:b26e:c149 with SMTP id d9443c01a7336-20ca1467cf5mr192200905ad.29.1728962218285;
-        Mon, 14 Oct 2024 20:16:58 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d1804b5cfsm2566795ad.205.2024.10.14.20.16.54
+        d=1e100.net; s=20230601; t=1728962917; x=1729567717;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5toA+i342QCyHiEYfQpngKk7r+1pZDBgH0RjgANa6XY=;
+        b=SJn4HvYPt5LdxnAf+pKVbSGGqECCW34Ffa/Ooc4Kwvio5evYZjHBoBQ/xbZnVloSVt
+         cXBAyE5wPI6CYEu5XgJz0+h6nE5u9vvQF2H+vxKb9uZsm496w3xk6s+bTmWeuL+Xsijf
+         /1ZlCCXRxatqjeeFB0TFEiQWDdFfukflHj2EVCKrpBo7vLHemOuO8bJlM8cx2kPfRGKF
+         ZFKzXFDIy9eQF8UWleiprZIuVd5/r8ZvXCgV+cQZDW71vLCX2hnMKuEfV7nvWo9mabsN
+         tvByBZ2kWSgygrQ0/YQBsZ4njoAA5VL06YtXjct2xSVyXND++Q8vpXJeHCgKuVQ2mN7/
+         hmDA==
+X-Gm-Message-State: AOJu0Yz6Y2vNVQ8ChhqJOHmFANfzDHI27nLIeoSGVj1yGf8+p27euVJC
+	yJhdcQaTLWnyGAlSUudMus9Ofxx/DGQrlIBJtOyDkduYwxtSVOEIVTRqjAq5
+X-Google-Smtp-Source: AGHT+IFkkeRsQOCFrl7ubPyos8WBLRbx8OL51e45EkMfFWUlxyhzoH1mi6W60ixNwcxDkTLxUBbvTw==
+X-Received: by 2002:a17:902:f550:b0:20c:a175:1942 with SMTP id d9443c01a7336-20cbb1aa3a5mr131065495ad.24.1728962917283;
+        Mon, 14 Oct 2024 20:28:37 -0700 (PDT)
+Received: from localhost ([2402:7500:477:e9fa:5129:403f:9618:b589])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d1804eb2bsm2722625ad.188.2024.10.14.20.28.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 20:16:57 -0700 (PDT)
-Date: Tue, 15 Oct 2024 12:16:42 +0900 (JST)
-Message-Id: <20241015.121642.1320408148892534399.fujita.tomonori@gmail.com>
-To: boqun.feng@gmail.com
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
- linux-kernel@vger.kernel.org, jstultz@google.com, sboyd@kernel.org
-Subject: Re: [PATCH net-next v2 0/6] rust: Add IO polling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <Zw2KwQbAAKZ_5lPL@boqun-archlinux>
-References: <Zws7nK549LWOccEj@Boquns-Mac-mini.local>
-	<20241013.141506.1304316759533641692.fujita.tomonori@gmail.com>
-	<Zw2KwQbAAKZ_5lPL@boqun-archlinux>
+        Mon, 14 Oct 2024 20:28:36 -0700 (PDT)
+From: wojackbb@gmail.com
+To: netdev@vger.kernel.org
+Cc: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	angelogioacchino.delregno@collabora.com,
+	linux-mediatek@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	Jack Wu <wojackbb@gmail.com>
+Subject: [PATCH] [net,v3] net: wwan: t7xx: add PM_AUTOSUSPEND_MS_BY_DW5933E for Dell DW5933e
+Date: Tue, 15 Oct 2024 11:28:20 +0800
+Message-Id: <20241015032820.2265382-1-wojackbb@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 14 Oct 2024 14:18:57 -0700
-Boqun Feng <boqun.feng@gmail.com> wrote:
+From: Jack Wu <wojackbb@gmail.com>
 
->> This patchset adds Delta (also belongs to time, I guess) and fsleep to
->> rust/kernel/time.rs. I think that fsleep belongs to timer (because
->> sleep functions in kernel/time/timer.c). It's better to add
->> rust/kerne/time/timer.rs for fsleep() rather than putting both time
->> and timer stuff to rust/kernel/time.rs?
->> 
-> 
-> Good point. So how about putting fsleep() into rusk/kernel/time/delay.rs
-> and add that into the "F:" entry of TIMER subsystem? Since "sleep"s are
-> a set of particular usage of timers which don't directly interact with a
-> timer or hrtimer struct, so I feel it's better to have their own
-> file/mod rather than sharing it with timers. Plus this results in less
-> potential conflicts with Andreas' hrtimer series.
+Because optimizing the power consumption of Dell DW5933e,
+Add a new auto suspend time for Dell DW5933e.
 
-Sure. I'll go with rust/kernel/time/delay.rs.
+The Tests uses a small script to loop through the power_state
+of Dell DW5933e.
+(for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
+
+* If Auto suspend is 20 seconds,
+  test script show power_state have 5% of the time was in D3 state
+  when host don't have data packet transmission.
+
+* Changed auto suspend time to 5 seconds,
+  test script show power_state have 50% of the time was in D3 state
+  when host don't have data packet transmission.
+
+Signed-off-by: Jack Wu <wojackbb@gmail.com>
+---
+V3:
+ * supplementary commit information
+V2:
+ * Fix code style error
+---
+---
+ drivers/net/wwan/t7xx/t7xx_pci.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
+index e556e5bd49ab..ec567153ea6e 100644
+--- a/drivers/net/wwan/t7xx/t7xx_pci.c
++++ b/drivers/net/wwan/t7xx/t7xx_pci.c
+@@ -49,6 +49,7 @@
+ #define PM_SLEEP_DIS_TIMEOUT_MS		20
+ #define PM_ACK_TIMEOUT_MS		1500
+ #define PM_AUTOSUSPEND_MS		20000
++#define PM_AUTOSUSPEND_MS_BY_DW5933E 5000
+ #define PM_RESOURCE_POLL_TIMEOUT_US	10000
+ #define PM_RESOURCE_POLL_STEP_US	100
+ 
+@@ -174,7 +175,7 @@ static int t7xx_wait_pm_config(struct t7xx_pci_dev *t7xx_dev)
+ 	return ret;
+ }
+ 
+-static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
++static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev, int pm_autosuspend_ms)
+ {
+ 	struct pci_dev *pdev = t7xx_dev->pdev;
+ 
+@@ -191,7 +192,7 @@ static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
+ 				DPM_FLAG_NO_DIRECT_COMPLETE);
+ 
+ 	iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) + DISABLE_ASPM_LOWPWR);
+-	pm_runtime_set_autosuspend_delay(&pdev->dev, PM_AUTOSUSPEND_MS);
++	pm_runtime_set_autosuspend_delay(&pdev->dev, pm_autosuspend_ms);
+ 	pm_runtime_use_autosuspend(&pdev->dev);
+ 
+ 	return 0;
+@@ -824,7 +825,13 @@ static int t7xx_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	IREG_BASE(t7xx_dev) = pcim_iomap_table(pdev)[T7XX_PCI_IREG_BASE];
+ 	t7xx_dev->base_addr.pcie_ext_reg_base = pcim_iomap_table(pdev)[T7XX_PCI_EREG_BASE];
+ 
+-	ret = t7xx_pci_pm_init(t7xx_dev);
++	if (id->vendor == 0x14c0 && id->device == 0x4d75) {
++		/* Dell DW5933e */
++		ret = t7xx_pci_pm_init(t7xx_dev, PM_AUTOSUSPEND_MS_BY_DW5933E);
++	} else {
++		/* Other devices */
++		ret = t7xx_pci_pm_init(t7xx_dev, PM_AUTOSUSPEND_MS);
++	}
+ 	if (ret)
+ 		return ret;
+ 
+-- 
+2.34.1
+
 
