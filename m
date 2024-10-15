@@ -1,337 +1,148 @@
-Return-Path: <netdev+bounces-135606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007D699E545
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:12:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D9999E592
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59027B272A0
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:12:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C21E51C22E9F
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5851D89F3;
-	Tue, 15 Oct 2024 11:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FAD1E7661;
+	Tue, 15 Oct 2024 11:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtOzurZd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jwdUVPUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6FD1D89F5
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9168A1E764B
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728990752; cv=none; b=FUU/kuo3Tq8NdCVBbsNOzcg62L6Bc1bHkPHMfmup/Ouffn2xYFSwGFlWxbNuM/syNB5BKDFfSDRBvYSe76qwaU4m9WUClV45HtR3OP/JzOuTEsGDstMGOoX2VSgfVpd+jm3SWSUBZf0cGIo7IY3H2nEhbSMj7Ea4fTCf31x4uNs=
+	t=1728991575; cv=none; b=nZ9ndRi280xO/ussgSWP8R987yc/DKIhPJ+3Kt0powOeocmDzbmKSQUAyucxPCbUDdj7A6uOxxU5symH81qFWnTPDxh43DPawQ2IYW43ec7HtmWDTdm9ZK3jcmBnk5KroS3z8EY4cpLaYyg31n0xqVS93e5B6vRtbhBbF8bysS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728990752; c=relaxed/simple;
-	bh=dT9hpcl8Vj5/LM2hagh5dH40epqV0sohjSTAr1dgtfU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mqFbzlr49wDmrMebj0sDujlL1csyFEcsLJuuOcLTo0w7EYkiwu+66Jrq1TjwlkmRt3wrcMlQ2CX4J5IO87bp4JazX5blK7AhgqVh3hcRZJhVbvni84WzDOeyjvRVnjbyuH3zDNOM71rLAaVECB+E9psfEUWHRuYdG7tSm/WJ6xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DtOzurZd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728990749;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=A2jbNmsLktPbk4ow5hOVnlhPUm3jOtLymoFqsYAJr3A=;
-	b=DtOzurZdltDaJzFam8ZGAgx2r2zQWXT7pew1L32j3yAErJnZqnrVoSOfV8om214BgB23HJ
-	UYHsrXSOfNhzYkkAj9w/0hOvPKB20fPHbnxBwn5Ei3ym5SL0+iQFf6/RALtW8QqMD2dcAr
-	5ZuFyLfRiX1trZT8zAFPcnEY5W/oF48=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-224-7vB_j6t2NGKLR2MbB03h7Q-1; Tue, 15 Oct 2024 07:12:27 -0400
-X-MC-Unique: 7vB_j6t2NGKLR2MbB03h7Q-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d662dd3c8so1254261f8f.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 04:12:27 -0700 (PDT)
+	s=arc-20240116; t=1728991575; c=relaxed/simple;
+	bh=63xtQQOYr6JT+AUuvH8Uqmj4NX27Tw2xHiweMWlTOF8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZZWgWw3qAZUA5bEv37o5xrJ4tMF/yIkSBCIBsdJ7lxBbJriEsna8LuHpsVMD+/lOKGXcgNwCQDzVow92VnTCEVPuSZJ6VTcamVw3sRTUR+NdNivHOGlzLpqNh5VY7rYKbR1fvJzdT5lrCDBSGALDdXuWPvosnAqVlhzE+o90r48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jwdUVPUs; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43123368ea9so27429325e9.0
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 04:26:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728991572; x=1729596372; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OHXeweE6JHcUFPqO8Un8+WVyWXQppoPaA4xEDsAZwwE=;
+        b=jwdUVPUsV8+S5DdOURFmCagQy4YplFiUTGnKxu2lwkDUz1wPtga3Sdywp6Wr8nvOtu
+         RIppc2ztKIu5BVStrtKBBLe7Dw4wOpAUGfLhJj+G2mUgcdvI62JzDdlvJ9arSXrU0RXs
+         A4VH3QIUAfGO82SScbF29FyAqupefkzKpSppVggrf0tAHZ48/6Y5g6zx03b1LgT0WpiA
+         HV0xMw/8DRQfy3cIta4Hje/HQHhsG9fyk5a9cuz3P+AxXYlzKyNee87VI0n6lmLikDmb
+         idcQlEq0tUGalMn+pNdZm6RwgO/yjg101DQVe9GrdLGg07nCcjX8Q+d5OPfQa/PdfMmO
+         FWEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728990746; x=1729595546;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A2jbNmsLktPbk4ow5hOVnlhPUm3jOtLymoFqsYAJr3A=;
-        b=FnEEzu9sPEcmrW8LBml/4xmrkxzKBcT7yO9MMdDD35P6KeLbRgUk5BWvtyWXb36IMO
-         3ZomCpbCKOGUG2NYo8fEzYhHjYlYn0tiIu7GQjCrOFEkKseguLxk7cz7E6tCq25rWfc0
-         qWdrD9oFwoRvP/6USDhR1m0kaLIWwY1fu+SLUEafE/209y5zSrKoEtd71kXwe/Wzigj5
-         XeCDlw/us7L2+M0cmXc6zTIwgZWXbA9Zl+wfQq+Ssh6d6ZhS6Bh7NW9JAoZTeSteQ5Im
-         6+pF2MJ61OHUCukT/zKdCMHeZUNe8QvKQgP/+Hz1PKHRjN7R/u/THqTuQYTUkzpiSGIT
-         jJ8Q==
-X-Gm-Message-State: AOJu0YxFwyLsHxop4qZg4PxisrWMvMCLbIuKtid2A5OHH1o8OWFX6mur
-	/U9JrWV+GDf2HP66CaUfOCJ4YY3vq0Vq2hkuNqBChN9+WaaBQfgJdQ9e8o7+K6qzwJHxnoAMfIg
-	D8mSMniyOBUVVlrdUVn6uULhMpJz+66tDXQOe/ISIPbKfVSepFmfkZaj0mGGLJBplHePTj5hehK
-	sfpLy8TnXb8Piw5HV9mgg8fii0htTz9yAONtXGjg==
-X-Received: by 2002:adf:ec4d:0:b0:371:8319:4dcc with SMTP id ffacd0b85a97d-37d55184d55mr8932038f8f.2.1728990745982;
-        Tue, 15 Oct 2024 04:12:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEJVtPy37P5l4pwBAnpmBjBSOwVZPSBzL4MuRt4z/OZyH5c+k3dr1usKtuBc6aZWqAGjbOaYg==
-X-Received: by 2002:adf:ec4d:0:b0:371:8319:4dcc with SMTP id ffacd0b85a97d-37d55184d55mr8932011f8f.2.1728990745422;
-        Tue, 15 Oct 2024 04:12:25 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:8308:a105:b900:7e63:fa61:98e3:21ee])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fc42160sm1286041f8f.112.2024.10.15.04.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 04:12:25 -0700 (PDT)
-From: Ales Nezbeda <anezbeda@redhat.com>
-To: netdev@vger.kernel.org
-Cc: sd@queasysnail.net,
-	kuba@kernel.org,
-	Ales Nezbeda <anezbeda@redhat.com>
-Subject: [PATCH net] netdevsim: macsec: pad u64 to correct length in logs
-Date: Tue, 15 Oct 2024 13:09:43 +0200
-Message-ID: <20241015110943.94217-1-anezbeda@redhat.com>
-X-Mailer: git-send-email 2.46.2
+        d=1e100.net; s=20230601; t=1728991572; x=1729596372;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OHXeweE6JHcUFPqO8Un8+WVyWXQppoPaA4xEDsAZwwE=;
+        b=oNTMymOT1HweeErMUjUe1RhYmCvQlcnrTKYakTxbhatYOptvOpfANMrbTljbQ50O/4
+         aLQSIEpufQNDDh//k5H30+DxAgJYUefR+/EgYKX6mPjKuzMhzh6i0iYq8GCdT803zuWb
+         u1DSQpQ8PYa9ftH6FCi3wWVjNKTxEtTa/2YCopZtY1By5IoInn9BnhWdhsYoEhdklPMF
+         Xo2ZaWI+/mgXrE4Xn/HQE5BjRFuIFmYFh5Kzg2ZwanjIoOWyW/YxxAbk739gycCseB9C
+         ffvdWhzcDdPSmndXBKc6HEQCgZCzoIPFRvSTn7rDxV354QDgjiF7o6FO0aUKLy5YIuO9
+         zMuw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5SbzfI4MuT4MYHD9MLcSF63cjk98WEMLM9Hhs2q7lyoX/hdlCFX9OJVhbipXFwLDnJ/UIUPQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD4jb5g8orq1eIE/Fd51ohQ9mifBCBW40PH8pkS2VCx2tuc9NC
+	xiR4+g6r0+KcAIBpedxs22NozLYhUN+hMjm53mlqRWruMDr42k5o
+X-Google-Smtp-Source: AGHT+IG6UKCfVWVozDJMcyqWN14TCPlLe1gdw8doyVlgLxdv3OPo0syVWoYQxXxy4bRT1FKB9c6G2A==
+X-Received: by 2002:a05:600c:354e:b0:42f:8267:69e6 with SMTP id 5b1f17b1804b1-431255d4afcmr99714765e9.3.1728991571509;
+        Tue, 15 Oct 2024 04:26:11 -0700 (PDT)
+Received: from [172.27.21.116] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f569a06sm14973495e9.16.2024.10.15.04.26.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 04:26:11 -0700 (PDT)
+Message-ID: <55da37ab-6a4c-4c9c-b152-461ff75f7f60@gmail.com>
+Date: Tue, 15 Oct 2024 14:26:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 09/15] net/mlx5: Remove vport QoS enabled flag
+To: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>, cjubran@nvidia.com, cratiu@nvidia.com
+References: <20241014205300.193519-1-tariqt@nvidia.com>
+ <20241014205300.193519-10-tariqt@nvidia.com>
+ <20241015110407.GD569285@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20241015110407.GD569285@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently, we pad u64 number to 8 characters using "%08llx" format
-specifier.
 
-Changing format specifier to "%016llx" ensures that no matter the value
-the representation of number in log is always the same length.
 
-Before this patch, entry in log for value '1' would say:
-    removing SecY with SCI 00000001 at index 2
-After this patch is applied, entry in log will say:
-    removing SecY with SCI 0000000000000001 at index 2
+On 15/10/2024 14:04, Simon Horman wrote:
+> On Mon, Oct 14, 2024 at 11:52:54PM +0300, Tariq Toukan wrote:
+>> From: Carolina Jubran <cjubran@nvidia.com>
+>>
+>> Remove the `enabled` flag from the `vport->qos` struct, as QoS now
+>> relies solely on the `sched_node` pointer to determine whether QoS
+>> features are in use.
+>>
+>> Currently, the vport `qos` struct consists only of the `sched_node`,
+>> introducing an unnecessary two-level reference. However, the qos struct
+>> is retained as it will be extended in future patches to support new QoS
+>> features.
+>>
+>> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+>> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+>> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+>> ---
+>>   drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c | 13 ++++++-------
+>>   drivers/net/ethernet/mellanox/mlx5/core/eswitch.h |  2 --
+>>   2 files changed, 6 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
+> 
+> ...
+> 
+>> @@ -933,7 +932,7 @@ int mlx5_esw_qos_modify_vport_rate(struct mlx5_eswitch *esw, u16 vport_num, u32
+>>   	}
+>>   
+>>   	esw_qos_lock(esw);
+>> -	if (!vport->qos.enabled) {
+>> +	if (!vport->qos.sched_node) {
+>>   		/* Eswitch QoS wasn't enabled yet. Enable it and vport QoS. */
+>>   		err = esw_qos_vport_enable(vport, rate_mbps, vport->qos.sched_node->bw_share, NULL);
+> 
+> Sorry, another nit from my side:
+> 
+> If we get here then vport->qos.sched_node is NULL,
+> but it is dereferenced on the line above.
+> 
+> Flagged by Smatch.
+> 
 
-Fixes: 02b34d03a24b ("netdevsim: add dummy macsec offload")
-Signed-off-by: Ales Nezbeda <anezbeda@redhat.com>
----
- drivers/net/netdevsim/macsec.c | 56 +++++++++++++++++-----------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+I should definitely check why I'm not getting these ones flagged.
 
-diff --git a/drivers/net/netdevsim/macsec.c b/drivers/net/netdevsim/macsec.c
-index aa007b1e4b78..bdc8020d588e 100644
---- a/drivers/net/netdevsim/macsec.c
-+++ b/drivers/net/netdevsim/macsec.c
-@@ -46,7 +46,7 @@ static int nsim_macsec_add_secy(struct macsec_context *ctx)
- 		return -ENOSPC;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: adding new secy with sci %08llx at index %d\n",
-+	netdev_dbg(ctx->netdev, "%s: adding new secy with sci %016llx at index %d\n",
- 		   __func__, sci_to_cpu(ctx->secy->sci), idx);
- 	ns->macsec.nsim_secy[idx].used = true;
- 	ns->macsec.nsim_secy[idx].nsim_rxsc_count = 0;
-@@ -63,12 +63,12 @@ static int nsim_macsec_upd_secy(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: updating secy with sci %08llx at index %d\n",
-+	netdev_dbg(ctx->netdev, "%s: updating secy with sci %016llx at index %d\n",
- 		   __func__, sci_to_cpu(ctx->secy->sci), idx);
- 
- 	return 0;
-@@ -81,12 +81,12 @@ static int nsim_macsec_del_secy(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: removing SecY with SCI %08llx at index %d\n",
-+	netdev_dbg(ctx->netdev, "%s: removing SecY with SCI %016llx at index %d\n",
- 		   __func__, sci_to_cpu(ctx->secy->sci), idx);
- 
- 	ns->macsec.nsim_secy[idx].used = false;
-@@ -104,7 +104,7 @@ static int nsim_macsec_add_rxsc(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
-@@ -122,7 +122,7 @@ static int nsim_macsec_add_rxsc(struct macsec_context *ctx)
- 		netdev_err(ctx->netdev, "%s: nsim_rxsc_count not full but all RXSCs used\n",
- 			   __func__);
- 
--	netdev_dbg(ctx->netdev, "%s: adding new rxsc with sci %08llx at index %d\n",
-+	netdev_dbg(ctx->netdev, "%s: adding new rxsc with sci %016llx at index %d\n",
- 		   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
- 	secy->nsim_rxsc[idx].used = true;
- 	secy->nsim_rxsc[idx].sci = ctx->rx_sc->sci;
-@@ -139,7 +139,7 @@ static int nsim_macsec_upd_rxsc(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
-@@ -147,12 +147,12 @@ static int nsim_macsec_upd_rxsc(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_rxsc(secy, ctx->rx_sc->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
- 			   __func__, sci_to_cpu(ctx->rx_sc->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: updating RXSC with sci %08llx at index %d\n",
-+	netdev_dbg(ctx->netdev, "%s: updating RXSC with sci %016llx at index %d\n",
- 		   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
- 
- 	return 0;
-@@ -166,7 +166,7 @@ static int nsim_macsec_del_rxsc(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
-@@ -174,12 +174,12 @@ static int nsim_macsec_del_rxsc(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_rxsc(secy, ctx->rx_sc->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
- 			   __func__, sci_to_cpu(ctx->rx_sc->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: removing RXSC with sci %08llx at index %d\n",
-+	netdev_dbg(ctx->netdev, "%s: removing RXSC with sci %016llx at index %d\n",
- 		   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
- 
- 	secy->nsim_rxsc[idx].used = false;
-@@ -197,7 +197,7 @@ static int nsim_macsec_add_rxsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
-@@ -205,12 +205,12 @@ static int nsim_macsec_add_rxsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
- 			   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
-+	netdev_dbg(ctx->netdev, "%s: RXSC with sci %016llx, AN %u\n",
- 		   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
- 
- 	return 0;
-@@ -224,7 +224,7 @@ static int nsim_macsec_upd_rxsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
-@@ -232,12 +232,12 @@ static int nsim_macsec_upd_rxsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
- 			   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
-+	netdev_dbg(ctx->netdev, "%s: RXSC with sci %016llx, AN %u\n",
- 		   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
- 
- 	return 0;
-@@ -251,7 +251,7 @@ static int nsim_macsec_del_rxsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
-@@ -259,12 +259,12 @@ static int nsim_macsec_del_rxsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
- 			   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
-+	netdev_dbg(ctx->netdev, "%s: RXSC with sci %016llx, AN %u\n",
- 		   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
- 
- 	return 0;
-@@ -277,12 +277,12 @@ static int nsim_macsec_add_txsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
-+	netdev_dbg(ctx->netdev, "%s: SECY with sci %016llx, AN %u\n",
- 		   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
- 
- 	return 0;
-@@ -295,12 +295,12 @@ static int nsim_macsec_upd_txsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
-+	netdev_dbg(ctx->netdev, "%s: SECY with sci %016llx, AN %u\n",
- 		   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
- 
- 	return 0;
-@@ -313,12 +313,12 @@ static int nsim_macsec_del_txsa(struct macsec_context *ctx)
- 
- 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
- 	if (idx < 0) {
--		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
-+		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
- 			   __func__, sci_to_cpu(ctx->secy->sci));
- 		return -ENOENT;
- 	}
- 
--	netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
-+	netdev_dbg(ctx->netdev, "%s: SECY with sci %016llx, AN %u\n",
- 		   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
- 
- 	return 0;
--- 
-2.46.2
+Will fix. Thanks.
+
+>>   	} else {
+> 
+> ...
+> 
 
 
