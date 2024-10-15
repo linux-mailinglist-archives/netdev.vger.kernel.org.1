@@ -1,162 +1,194 @@
-Return-Path: <netdev+bounces-135432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C7CE99DE41
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:28:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 578FB99DE6E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:32:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B7DA2857CE
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 06:28:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FBC8282B49
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 06:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC822189BB3;
-	Tue, 15 Oct 2024 06:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A88B189F43;
+	Tue, 15 Oct 2024 06:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+nGoZq5"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="PL6Bi1BB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A037D189BA9;
-	Tue, 15 Oct 2024 06:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F83F17335E
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 06:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728973686; cv=none; b=b2TU8K/a9Gsn476Wt2EAy6Q4/V0TKJ2ScFl0sN9LFZHKhVEVc7DlGqv4x/nLeb3baYq6Dn/fT8i7mOtAhLTLXfJ6sgE3rGdmGwgyQgwdunA2XAx4XE6RAzVeKvH+hneYAGU8qPJpcBVKLaQU4SsPvfv2tBi6ewZ6scVtDWTdpSw=
+	t=1728973942; cv=none; b=P8j1nLhMXNeSul4/OkiFCt/0jpekjaN0/W4Q+pJBveHYN4x4DkToZS/CeaYP4cMGZ9mXaL0EuuvPrphE4sWDk8KVoigRVwZwE9Z3Wbqo+ZY9CDuqGUg97nf61MnGUHD5RJJmjYrgx5OCvQSnyewNJsEFbmwtemfp1TW+w09MPKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728973686; c=relaxed/simple;
-	bh=tPQDC6jWE/QSFlktB+sW1IjHMIzKkrLP0/8RKmBWHug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=asIVvy0K8SDfj1b+ClLBkCx2r37uCX8rH4r3HxZmfzKZ7W7JLDHCuDK4YhG678LfLbDrbProGA/s4GPmHzobu3RFdtRX17bzTZ1s3LBz6avewKU2PL0mN2ohj/upr4AQBRn1064wb6iTcg7W2GgOft7/1xcCgr7p5xgACGHGYls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+nGoZq5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7F4C4CEC7;
-	Tue, 15 Oct 2024 06:27:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728973686;
-	bh=tPQDC6jWE/QSFlktB+sW1IjHMIzKkrLP0/8RKmBWHug=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o+nGoZq5itIkZyD5F2liKKz1Uw12xx+MPZXRBfFe/iLWO07ykJlkT2m30ClLZxPBz
-	 qXamBn8TdEgE/c9JnJLuz8WMuI7AEA8F145zGiCrrhZ/9xFleOikATBbH5jFaj6CsM
-	 1PQbn1dlLz4JDmI6Dl/JCEMB7NRSlDK1NzKbKxK+m1d7/+RuqXBYACU3kr4qMe/KJS
-	 eNJTtHPtcosha73Obd8eGjkliCk46jY+O9VTaSLXZOlTFGngSvBdNTf3c16K2/aKFr
-	 aA2BpnQB+5wQRMDGEX4xQSkKehfNKiDtPi7wRlvC3svMBN1ZT4FiL3sguD/nm6b1J9
-	 Ey6bluucObdmA==
-Message-ID: <f96fe4a7-9903-4b15-9994-985004bd6d4c@kernel.org>
-Date: Tue, 15 Oct 2024 08:27:57 +0200
+	s=arc-20240116; t=1728973942; c=relaxed/simple;
+	bh=1q4Y/mLkXbRsgsUsBr1rXVG3WA30GAlbK74JzmOqeeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aNg/wBbLP5XmGrTuXC6M+VMfvSoNUN0u8tbHoHWgRkCcQR0/S5NF+gyV+UrNPuR+/Zmrm38kLHG10Rcs8wF4gaeP/qo9cJjJN0fjEJdhxMFbh4YeUqZe6b4wexlYWjPtI7pg6sSEYm4gVCklWoGjtSYxiR8tzJkCsnLnsnlTKUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=PL6Bi1BB; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9a1b71d7ffso171935166b.1
+        for <netdev@vger.kernel.org>; Mon, 14 Oct 2024 23:32:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1728973937; x=1729578737; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7op+5UqCxwoHXxBuDQd+qJjZ+3UWGpylDlz/kTqb0xg=;
+        b=PL6Bi1BBWUhrw++H6juzfxzC3YlEUviBtwOm6kT1GykiAzWchkJ9G4AfMib3717w21
+         HnF47beitC2XSanFc3m6unEAuRZr9gr1JZOH/pv7ApTpP+Vy+UazxPoGx/G1oqvOGRME
+         KmTc9KP72e3PkgJThMh0EdNsiRg6sLHBnxNCmzmtXNHfQiMOeVvZj4M/utxcXP5hYFWd
+         r/GFhpml3/WbjxpZwNvwIHNdRNkXX1BNQxet3bjGzGYlDsgGCd9jCBGrAOT99Eo2c5y6
+         7zEzFw5wQFfvpmlWeU9TPUDcIrMdgpcMK2dN++avlBmxr0QC4do1Usim/S4cUc7jwr6W
+         1nKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728973937; x=1729578737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7op+5UqCxwoHXxBuDQd+qJjZ+3UWGpylDlz/kTqb0xg=;
+        b=Xrq2LdyD/pQKH3R8PR5ea3YLO3Hnutfm+WD3k9jB2vtAd/dhz0giKzUQRmiTdIOjAf
+         Thpap21r+fuG3dN5n+ARIYR3Osesc8J/TY382cfaDx68+MtPoT5HndK6iq+rTPalHkM3
+         y/DAHceEPqMku3XF6oxJ72WGYUWZtnoK3STRFBKMiBgN+F4VRcrTKnPEi4bxOoY60QCt
+         84JYX2Ln4+0noB2cDLXPHQhH3RfWt2lKxZVpjZ2OM65vc6G7mhvazW8oEfxMC3oTXTZz
+         l/1urJZm8AlB5jylSC7DOmmys1fVNiuF4eiS8qsOvqyvxRcLLB0ARkR9VqqF/L4kGYp3
+         ldwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRgQp3FH5bXDgOVfBOwj3TrKamP+COKmRGIbNZ8IG77aDMDgZ0VSqDc1/UWphERRP2rtbPV1w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVAaoF+J4MdDYOC7qcLeRwudWZwU7W4uyWWJ30sw3WjTDAqyjD
+	BDBOJs+oRi3ccPy7K+v3uCfuWwwOKHI8f1NDM0zwIs9OC+4bRpfFwguKduq04n8=
+X-Google-Smtp-Source: AGHT+IGO9kn6nJ4TYuBfxJXBP1NHraNDZPSzUfn+T9RlBAD6g56KlbxRj/4ac95OylIrX3b4RE5stA==
+X-Received: by 2002:a17:906:7312:b0:a9a:139:5ef3 with SMTP id a640c23a62f3a-a9a01396165mr745726666b.55.1728973936618;
+        Mon, 14 Oct 2024 23:32:16 -0700 (PDT)
+Received: from localhost ([2001:4090:a244:83ae:c75a:6d73:cead:b69a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2984396esm30947666b.164.2024.10.14.23.32.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Oct 2024 23:32:15 -0700 (PDT)
+Date: Tue, 15 Oct 2024 08:32:14 +0200
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
+	Vishal Mahaveer <vishalm@ti.com>, Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, 
+	Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v3 3/9] can: m_can: Map WoL to device_set_wakeup_enable
+Message-ID: <cxembrzcref2shryu3sisexjuf7jwn7ieknuw2eyzd5lpb7atq@ivtpvhrwww5q>
+References: <20241011-topic-mcan-wakeup-source-v6-12-v3-0-9752c714ad12@baylibre.com>
+ <20241011-topic-mcan-wakeup-source-v6-12-v3-3-9752c714ad12@baylibre.com>
+ <20241011185929.GA53629@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] dt-bindings: net: qcom,ethqos: add description for
- qcs8300
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-phy@lists.infradead.org, quic_tingweiz@quicinc.com,
- quic_aiquny@quicinc.com
-References: <20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com>
- <20241010-schema-v1-3-98b2d0a2f7a2@quicinc.com>
- <da45vocnwnnnlo6nrxh6x4xwmnsgdp5axfvomzniw5vxlmerer@6ntl3ae4q2ci>
- <b2f027d1-5b4a-4b73-aa26-a332df2a561b@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <b2f027d1-5b4a-4b73-aa26-a332df2a561b@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="23bg3cpe6mlws6xq"
+Content-Disposition: inline
+In-Reply-To: <20241011185929.GA53629@kernel.org>
 
-On 15/10/2024 08:21, Yijie Yang wrote:
-> 
-> 
-> On 2024-10-10 14:15, Krzysztof Kozlowski wrote:
->> On Thu, Oct 10, 2024 at 10:03:45AM +0800, Yijie Yang wrote:
->>> Add compatible for the MAC controller on qcs8300 platforms.
->>> Since qcs8300 shares the same EMAC as sa8775p, so it fallback to the
->>> compatible.
->>>
->>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->>> ---
->>>   Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 4 ++++
->>>   1 file changed, 4 insertions(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
->>> index 8cf29493b822..3ee5367bdde1 100644
->>> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
->>> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
->>> @@ -23,6 +23,10 @@ properties:
->>>             - enum:
->>>                 - qcom,qcs615-ethqos
->>>             - const: qcom,sm8150-ethqos
->>> +      - items:
->>> +          - enum:
->>> +              - qcom,qcs8300-ethqos
->>> +          - const: qcom,sa8775p-ethqos
->>
->> This block should go before earlier qcs615, to keep order by fallback.
 
---------------------------------------------------^^^^^^^^^^^^^^^^^^^^^^^
+--23bg3cpe6mlws6xq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Here
+On Fri, Oct 11, 2024 at 07:59:29PM GMT, Simon Horman wrote:
+> On Fri, Oct 11, 2024 at 03:16:40PM +0200, Markus Schneider-Pargmann wrote:
+> > In some devices the pins of the m_can module can act as a wakeup source.
+> > This patch helps do that by connecting the PHY_WAKE WoL option to
+> > device_set_wakeup_enable. By marking this device as being wakeup
+> > enabled, this setting can be used by platform code to decide which
+> > sleep or poweroff mode to use.
+> >=20
+> > Also this prepares the driver for the next patch in which the pinctrl
+> > settings are changed depending on the desired wakeup source.
+> >=20
+> > Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > ---
+> >  drivers/net/can/m_can/m_can.c | 37 +++++++++++++++++++++++++++++++++++=
+++
+> >  1 file changed, 37 insertions(+)
+> >=20
+> > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_ca=
+n.c
+> > index a978b960f1f1e1e8273216ff330ab789d0fd6d51..29accadc20de7e9efa509f1=
+4209cc62e599f03bb 100644
+> > --- a/drivers/net/can/m_can/m_can.c
+> > +++ b/drivers/net/can/m_can/m_can.c
+> > @@ -2185,6 +2185,36 @@ static int m_can_set_coalesce(struct net_device =
+*dev,
+> >  	return 0;
+> >  }
+> > =20
+> > +static void m_can_get_wol(struct net_device *dev, struct ethtool_wolin=
+fo *wol)
+> > +{
+> > +	struct m_can_classdev *cdev =3D netdev_priv(dev);
+> > +
+> > +	wol->supported =3D device_can_wakeup(cdev->dev) ? WAKE_PHY : 0;
+> > +	wol->wolopts =3D device_may_wakeup(cdev->dev) ? WAKE_PHY : 0;
+> > +}
+> > +
+> > +static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinf=
+o *wol)
+> > +{
+> > +	struct m_can_classdev *cdev =3D netdev_priv(dev);
+> > +	bool wol_enable =3D !!wol->wolopts & WAKE_PHY;
+>=20
+> Hi Markus,
+>=20
+> I suspect there is an order of operations issue here.
+> Should the line above be like this?
+>=20
+> 	bool wol_enable =3D !!(wol->wolopts & WAKE_PHY);
 
-> 
-> Why this block should positioned before qcs615, given that it comes 
-> later in alphabetical order?
+Yes, you are absolutely right, thanks for spotting this.
 
-sa < sm
+Best
+Markus
 
-Best regards,
-Krzysztof
+>=20
+> > +	int ret;
+> > +
+> > +	if ((wol->wolopts & WAKE_PHY) !=3D wol->wolopts)
+> > +		return -EINVAL;
+> > +
+> > +	if (wol_enable =3D=3D device_may_wakeup(cdev->dev))
+> > +		return 0;
+> > +
+> > +	ret =3D device_set_wakeup_enable(cdev->dev, wol_enable);
+> > +	if (ret) {
+> > +		netdev_err(cdev->net, "Failed to set wakeup enable %pE\n",
+> > +			   ERR_PTR(ret));
+> > +		return ret;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+>=20
+> ...
 
+--23bg3cpe6mlws6xq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd8KHufh7XoFiu4kEkjLTi1BWuPwUCZw4MZgAKCRAkjLTi1BWu
+P53TAQCj7dklp8iNY9/7+mXl3KO4/Qhx6MY4breTVV2LuvTk4QD/fCiMaCYLJQXv
+5aeaj3cc9UUeFKO61bSzmqzV92dHeQU=
+=Kr5x
+-----END PGP SIGNATURE-----
+
+--23bg3cpe6mlws6xq--
 
