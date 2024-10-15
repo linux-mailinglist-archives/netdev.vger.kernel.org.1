@@ -1,76 +1,86 @@
-Return-Path: <netdev+bounces-135709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85AD499EFA2
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:33:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 044CD99EFAB
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30F47B22242
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:33:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 834D6B226A9
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0321C4A3A;
-	Tue, 15 Oct 2024 14:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hc9G1Z1E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8121B21BA;
+	Tue, 15 Oct 2024 14:34:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758E71FC7F6
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 14:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3B21FC7F6;
+	Tue, 15 Oct 2024 14:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729002778; cv=none; b=Pkw9L4Jz+KfDP9z7cqlRF3QuQR56C6FFYdSNAERW4/9a9SfStHIVOHT4QEpjFXiTHAeG8JLL1qHIIJUxFkN8/03O02rQkToD6BTa31AAI26yX9BPJuU+wu1xWMMf0qTUAgq9UZYvzwVGS7aEm5khp942aEXPqo4125gFfrRux8w=
+	t=1729002886; cv=none; b=XhrzdZqpqMh7keBSQNY9vF3dTmvTqeBf8nOEFs2GDInJ2JBKIdtGNDG1sbmYEuHqBYG0ga46rjnAJfDKMA1g3rODLh3u/0Y7fLxZDTHpwctbGGsA1aHOqKn0X5nPflaiCF1g8MxJF5IBWd72ksQNbXY9QnjKmKe7FlOhWKnQoPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729002778; c=relaxed/simple;
-	bh=qiIdI+oKKf7EnhVJ9UTp2/T9X1iGlVqfTw1ubb8h0MU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BffTQzix6NLy5dgLgjj2sX6d0eRTORFbh7b3FurNH6KS9HOX0JFY2Jcbn1HVwek1NBVlaJf1OUaMFz5uF3ytuVP5ErlwLtxJpmkMrb1TUNsMARKuk1/LIqUt2Ku8Xl93l02P5RcnyE0Nzco7CCg1rKisydBPvVS4PR/7TGCmE10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hc9G1Z1E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D66C4CECF;
-	Tue, 15 Oct 2024 14:32:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729002777;
-	bh=qiIdI+oKKf7EnhVJ9UTp2/T9X1iGlVqfTw1ubb8h0MU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hc9G1Z1Efr+MQFhbIYFxZW5fRw3i2SaqqyRekw29bIHD7b+7ONrDfVlLdehPrNOs6
-	 LRjuZVWnllcBrtbv6+fjnSKjEFqTUkC6Nc39en0PDl6pQF9GXeWeObklF8XqfzHfNE
-	 G0JwdeHgWNJfFK6OuU/U3ySXaDCuXopuT/m/kzKrchWHQrPX8bJZ7Xt4X1ot6YIt2y
-	 mlfR3eNeu4AO9/ptLwLYNaUnJinhOE//kzQl8A59WMR6EXNamg+/xBAuMOJYuPVoyN
-	 bHcEkSaTq5g+K06G7XHolHUW+8am0ZQ2I8JSqg2mRy48rtVANI3bLI43+GgGnMjxFt
-	 rarUoOMJnU5Xw==
-Date: Tue, 15 Oct 2024 07:32:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Mark
- Lee <Mark-MC.Lee@mediatek.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, upstream@airoha.com
-Subject: Re: [PATCH net-next v2] net: airoha: Implement BQL support
-Message-ID: <20241015073255.74070172@kernel.org>
-In-Reply-To: <20241012-en7581-bql-v2-1-4deb4efdb60b@kernel.org>
-References: <20241012-en7581-bql-v2-1-4deb4efdb60b@kernel.org>
+	s=arc-20240116; t=1729002886; c=relaxed/simple;
+	bh=XMIoWev0kv1xeiX1+EYBjpQo4Zf+CDnGmlVuNWFszXM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XR/+01dFiUw+4rcLc8zNY8XET3TRotZyaiL81RVC4348rB+ep7WYPYDbxQc1/nM/kuIMaswV0lttccynixTo0mT5LDChhWpSkf8LVPKDOQJYYg44IpVr7IrvPKKRivDQjMT5ULpUWwr2dni7okPiQtt/G+ZV6r8cHBBn6r3zbNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XSc6Z4Njmz20qLP;
+	Tue, 15 Oct 2024 22:33:58 +0800 (CST)
+Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
+	by mail.maildlp.com (Postfix) with ESMTPS id CEF47140134;
+	Tue, 15 Oct 2024 22:34:41 +0800 (CST)
+Received: from huawei.com (10.175.113.133) by kwepemm600001.china.huawei.com
+ (7.193.23.3) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Oct
+ 2024 22:34:40 +0800
+From: Wang Hai <wanghai38@huawei.com>
+To: <justin.chen@broadcom.com>, <florian.fainelli@broadcom.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <zhangxiaoxu5@huawei.com>
+CC: <bcm-kernel-feedback-list@broadcom.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <wanghai38@huawei.com>
+Subject: [PATCH v2 net] net: bcmasp: fix potential memory leak in bcmasp_xmit()
+Date: Tue, 15 Oct 2024 22:34:24 +0800
+Message-ID: <20241015143424.71543-1-wanghai38@huawei.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600001.china.huawei.com (7.193.23.3)
 
-On Sat, 12 Oct 2024 11:01:11 +0200 Lorenzo Bianconi wrote:
-> Introduce BQL support in the airoha_eth driver reporting to the kernel
-> info about tx hw DMA queues in order to avoid bufferbloat and keep the
-> latency small.
+The bcmasp_xmit() returns NETDEV_TX_OK without freeing skb
+in case of mapping fails, add dev_consume_skb_any() to fix it.
 
-TBH I haven't looked at the code again, but when I looked at v1 I was
-surprised you don't have a reset in airoha_qdma_cleanup_tx_queue().
-Are you sure it's okay? It's a common bug not to reset the BQL state
-when queue is purged while stopping the interface.
+Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
+Signed-off-by: Wang Hai <wanghai38@huawei.com>
+---
+v1->v2: replace dev_kfree_skb() with dev_consume_skb_any()
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+index 82768b0e9026..8cc8efa8d1fb 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+@@ -322,6 +322,7 @@ static netdev_tx_t bcmasp_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			}
+ 			/* Rewind so we do not have a hole */
+ 			spb_index = intf->tx_spb_index;
++			dev_consume_skb_any(skb);
+ 			return NETDEV_TX_OK;
+ 		}
+ 
+-- 
+2.17.1
+
 
