@@ -1,137 +1,136 @@
-Return-Path: <netdev+bounces-135452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9D299DF98
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 09:47:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B42DD99DFA1
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 09:49:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F2F8283C53
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 07:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78684280D83
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 07:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F991AAE2C;
-	Tue, 15 Oct 2024 07:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6702E189BA7;
+	Tue, 15 Oct 2024 07:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ckw0BXoP"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="g9rf4uN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E37A17334E
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 07:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2BB231C95
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 07:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728978440; cv=none; b=rQxsbk8MTRDwDws98EcZZwLiGEeK+xib5ITy5U3rJaxiACPONZqUn6GwhHHGG55L3VchihunCOkM69qTI9T0MQvZel21PlzBofq8PHjyJgoI5BF0bcsj6NbK5D6rUfPsN7Ys/dj+lBBr+LdjaYsN2g6C+VyUG7icBB/tUNQZIBQ=
+	t=1728978542; cv=none; b=GSF5TMlKbzObl3bOAgvUrnykQqWOj33k+hlNhnH3/uh/XbX/paMvLsDU0RMe3vcV6Ahbywt1eK0Lnto6lzbCyCVVz0ARCAzXuyfzUSSdF++qfyXE9ZWRbAfMXlt8izSXvaXNcr0NsH9TxkDWqQkjXqurryjhhFm1UNbilcE4yPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728978440; c=relaxed/simple;
-	bh=+Ej1MNiBqld9sr/rde/khIhq0J381uRG4buKgfobWSU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DkF+CVRjm0wkJvLY1hxlyrdbH1Hyc1g/g4ymkEqqtP/9RViQDqwQceZuuRL3cl7zBKUAWsHMhZYSL1pcZFBfvDwdOn/xilBmRlaSFqo8pxa4NKk6XOHDsoVRS6I5PaRwfVsOTVviwEo5P6tcmLJQqG4mp2m/Cii/DOYq+baK0z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ckw0BXoP; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9a14cb0147so209216366b.0
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 00:47:18 -0700 (PDT)
+	s=arc-20240116; t=1728978542; c=relaxed/simple;
+	bh=iIUbLt9kvCLkI557/g86IlmJZITOMGz9tInCY/BfK5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ie8QSm8Unh7kja8Iz0wRrTSM5JPoeJ0LfOajP2K2VFrEBRmsx7iAeg8mhzOfaTFPPAGHcd706lD/cZ8+86TrRG2GrKwZgwPU3ym6tw0vePIA2NjBCMcqXDgGrJ5TFP4V7AAlpODSLk4r83btW1VOIIL8F30aCguISXTZ4pXqnxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=g9rf4uN4; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9a0c7abaa6so263806666b.2
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 00:49:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728978437; x=1729583237; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGTAwWYylrgHxys3J7g7Oj8BY+b7ECipEcgHj47PxZg=;
-        b=ckw0BXoPwqSakKCCbSFQMVYHsVK4NLgJf2u0hZZa7aJuFVbuoRfeJt/TZzfXySaaCq
-         UP1Az4aNkicI8l6K0PNLLrJWJled027jM9HgMNagQOOqc+rIRy/xBNAcPQxoRmNzQc17
-         RsljHRjEdoDpG9lZjS2o+bkS2n4QHZPC+Hg2xCO+DZ+ijBOiwkxbPBCBGn1OrspTHtuS
-         j8C4tkxj3KH1kPG1l9PhkN904TgKPlvMfryPnBEDuZedL0ht6Ctg4QCciXs0Hk6BYME6
-         q4VxqsLE1n+wMAo0X7XEsj7gG8eEG8tTV1EHii7MnQJYTDvquSJtAj6QZ2WyxqORuK5N
-         BIjg==
+        d=suse.com; s=google; t=1728978539; x=1729583339; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BOJdjyePrT3s5NTIWoXorfasxWwZGTRkmpxbaaJbdio=;
+        b=g9rf4uN4DvBBRZl/2u+qMWZjF5FZW+DwlJRM5k46w6uHk08rqfwT3xlAyEPTZz5jLw
+         wzHMHZQxCSKv+2OoOBZinRtO/hg7H8C97o2D7UYS1lXpw9R80DmceN5VSOR56n+tWqgk
+         JjBXEytnAwF/Mj/2K3ubRi27tMhCTRfNdWIHP3eBKRiC6LzdDTAbbrtelfHw+8GJkLjT
+         lu54Jf2ECUaQuD8m6FfAQEoVVFViI4/zLYZOakWFlcDy9LA6IiCRGurhoBsod8Qb08n/
+         6kIlW20p49DVMmk7ErdpcGUj5UT0OgBbEUmd6UDaB/v/UtoOuTSZigOo/RXAYmjOoaIG
+         ebOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728978437; x=1729583237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NGTAwWYylrgHxys3J7g7Oj8BY+b7ECipEcgHj47PxZg=;
-        b=gPBsWKd9sDmd7mKCkDC7GUmccxsF2iWeSD3Iu1CIIYau0HEpQ2ckxd6gvpZzP0eKPZ
-         1Lyf5rpauXdq4XFeTkQKqxjWKF7rLDyeTlZNgPixp/6VDHda5LSL4e7wPoxRthkTGDaD
-         zi5KK9Gp8UseEuYXGhOFNmGjqBkhTnT9tUxFvzXV4B1ujvGdsV9n8YV4s4tu5SHAa3hJ
-         LhhXwxgMk2cqPUGC3c+6nuI6Rbo8Lzq5pWtkjCm1pQrUme4JVpwOAOhstsqv8NQ32nvX
-         do4j6CLTf82UnRWssxZCaKGnH97THIO0zE98qN3wyDEWkaSUuYOxpuGT6vtOqqzEu0Uq
-         Bzgg==
-X-Forwarded-Encrypted: i=1; AJvYcCWYXP86WHNLLVMjtjpCHLjXEWujLsTzeUF3IAyMesMtNBWUNVpw/pMiH18bdbkg12+xTFziRZs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk1XJ8ZwY7yS8XkagKQ7L0wfcZ/7aIPMZ9g9zs7GCl7YaFxsMN
-	ETkTqZJC4lPLE8vZD/1ozAhrpaJczgzO7thATZjagBqkCWeUuQ/GHF5gxm4qgSYb3cZRocX6VQL
-	rRe98MgumGHFxOChuaxSrOkMrohLfD3NBlphd
-X-Google-Smtp-Source: AGHT+IHOWVLnPX4C3QWmkZye9E646q8g8t2prDsYgVCykbq1ehRGzgpHCukbcmwC4labaeZy8W5xKeFOMAJpBJdxCWE=
-X-Received: by 2002:a17:906:6a14:b0:a99:ed0c:1d6 with SMTP id
- a640c23a62f3a-a99ed0c0ac9mr795036266b.49.1728978436290; Tue, 15 Oct 2024
- 00:47:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728978539; x=1729583339;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BOJdjyePrT3s5NTIWoXorfasxWwZGTRkmpxbaaJbdio=;
+        b=KeMujP1BwBX9CbExwNOwV/+Fnz1JYkwoIxXbcBjoF+t4LhI9wytaFDyduzbZGkmoxI
+         vFJu6yBBbNH1aIOcrniWOnxZJNI9j8sy/rWR3PXoibl+3I3cAYlY4GYV6Z4l2z2TzCmK
+         Jrz/tHSbmDgQjnVdk5nSobMB8BQc13sbRR2P+QFP3HFb1esXI1/bn79q0QWU7Bi6kj2J
+         VoBNqJp9+uLetsK90veIz2AaY2vx7v1+NRp6QFfxNhMOY0oPYmKNDxO08DwgBoryOBua
+         FOqF2AXvHfGskYOUil1BWyHOOGzHf41UQtLELZzNWU071qPhAQ4LX2HeRGvXwjBveFG4
+         ILTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHz7j1lYgPCGz2jY5o9NfeGkDbtIjfaZKoQDABTNKnkJcK99R6xegGj0e8q4mKiSfVp5XaVpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz2OQk260qkNAm+KuV7lEpLngjj2TGulEawW7yNIbHRrnQtfvG
+	YlX+an3NleXrsr/6MTxWK4aIF52wtHqrRsX0WbKRMk1EhwljIqcZuUEqb8UAypY=
+X-Google-Smtp-Source: AGHT+IGtJZCKtA9eEpUdQE2A13JrPU/h/W+a6q4VltO9TMaYnvQRXRkysIb/+243uS0AJxvtyHBoHQ==
+X-Received: by 2002:a17:907:1b24:b0:a99:4601:b9d8 with SMTP id a640c23a62f3a-a99e3ea6502mr1121252966b.63.1728978538888;
+        Tue, 15 Oct 2024 00:48:58 -0700 (PDT)
+Received: from ?IPV6:2001:a61:13a7:a01:4f03:92b2:1779:9aa4? ([2001:a61:13a7:a01:4f03:92b2:1779:9aa4])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2974db0fsm37838966b.83.2024.10.15.00.48.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 00:48:58 -0700 (PDT)
+Message-ID: <93a8a951-7e0f-4504-8407-15d920236f9c@suse.com>
+Date: Tue, 15 Oct 2024 09:48:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014144250.38802-1-wanghai38@huawei.com> <CAMuHMdVsagE1HMf5aLD_ZrubocY_DqX-UrTLxiFOMT+kwVhysg@mail.gmail.com>
-In-Reply-To: <CAMuHMdVsagE1HMf5aLD_ZrubocY_DqX-UrTLxiFOMT+kwVhysg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 09:47:03 +0200
-Message-ID: <CANn89i+Srr=M5+f0PbLs1OrWtOPNYULopNS+6-dy6EYNX8Ua0Q@mail.gmail.com>
-Subject: Re: [PATCH net] net: ethernet: rtsn: fix potential memory leak in rtsn_start_xmit()
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Wang Hai <wanghai38@huawei.com>, niklas.soderlund@ragnatech.se, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, 
-	zhangxiaoxu5@huawei.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net] usbnet: modern method to get random MAC
+To: Eric Dumazet <edumazet@google.com>, Oliver Neukum <oneukum@suse.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@kernel.org,
+ John Sperbeck <jsperbeck@google.com>, Brian Vazquez <brianvv@google.com>
+References: <20240829175201.670718-1-oneukum@suse.com>
+ <CANn89i+m69mWQw+V6XWCzmF84s6uQV15m_YdkPDQptoxUks4=w@mail.gmail.com>
+ <fd906211-7f31-4daf-8935-2be1378a75f8@suse.com>
+ <CANn89iJWATVhMVDgq3fcV9zpZRt8nd_bWp3=qRHo8L3tJP==Kg@mail.gmail.com>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <CANn89iJWATVhMVDgq3fcV9zpZRt8nd_bWp3=qRHo8L3tJP==Kg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 15, 2024 at 8:58=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68=
-k.org> wrote:
->
-> Hi Wang,
->
-> On Mon, Oct 14, 2024 at 4:43=E2=80=AFPM Wang Hai <wanghai38@huawei.com> w=
-rote:
-> > The rtsn_start_xmit() returns NETDEV_TX_OK without freeing skb
-> > in case of skb->len being too long, add dev_kfree_skb_any() to fix it.
-> >
-> > Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethe=
-rnet-TSN")
-> > Signed-off-by: Wang Hai <wanghai38@huawei.com>
->
-> Thanks for your patch!
->
-> > --- a/drivers/net/ethernet/renesas/rtsn.c
-> > +++ b/drivers/net/ethernet/renesas/rtsn.c
-> > @@ -1057,6 +1057,7 @@ static netdev_tx_t rtsn_start_xmit(struct sk_buff=
- *skb, struct net_device *ndev)
-> >         if (skb->len >=3D TX_DS) {
-> >                 priv->stats.tx_dropped++;
-> >                 priv->stats.tx_errors++;
-> > +               dev_kfree_skb_any(skb);
-> >                 goto out;
-> >         }
->
-> Does the same apply to the skb_put_padto() failure path below?
->
-> drivers/net/ethernet/renesas/rtsn.c-    if (skb_put_padto(skb, ETH_ZLEN))
-> drivers/net/ethernet/renesas/rtsn.c-            goto out;
 
-In case of error, skb_put_padto() frees the skb.
 
-/**
- * skb_put_padto - increase size and pad an skbuff up to a minimal size
- * @skb: buffer to pad
- * @len: minimal length
- *
- * Pads up a buffer to ensure the trailing bytes exist and are
- * blanked. If the buffer already contains sufficient data it
- * is untouched. Otherwise it is extended. Returns zero on
- * success. The skb is freed on error.
- */
-static inline int __must_check skb_put_padto(struct sk_buff *skb,
-unsigned int len)
-{
-return __skb_put_padto(skb, len, true);
-}
+On 15.10.24 01:00, Eric Dumazet wrote:
+> On Tue, Oct 15, 2024 at 12:24 AM Oliver Neukum <oneukum@suse.com> wrote:
+>>
+>> On 14.10.24 21:59, Eric Dumazet wrote:
+>>
+>>> As diagnosed by John Sperbeck :
+>>>
+>>> This patch implies all ->bind() method took care of populating net->dev_addr ?
+>>>
+>>> Otherwise the following existing heuristic is no longer working
+>>>
+>>> // heuristic:  "usb%d" for links we know are two-host,
+>>> // else "eth%d" when there's reasonable doubt.  userspace
+>>> // can rename the link if it knows better.
+>>> if ((dev->driver_info->flags & FLAG_ETHER) != 0 &&
+>>>       ((dev->driver_info->flags & FLAG_POINTTOPOINT) == 0 ||
+>>>        (net->dev_addr [0] & 0x02) == 0))
+>>> strscpy(net->name, "eth%d", sizeof(net->name));
+>>>
+>>
+>> Hi,
+>>
+>> you need to have a MAC to be an ethernet device, don't you?
+> 
+> Before or after your patch, there was/is a MAC address, eventually random.
+> 
+> The problem is about the test, which is now done while dev->dev_addr
+> is full of zeroes, which is not a valid address,
+> as shown by :
+
+Hi,
+
+I am sorry I misunderstood you. Yes, I overlooked the test for whether
+the MAC has been altered. I am preparing a patch. Could you give me
+John Perbeck's address, so I can include him in "reported-by"?
+
+	Sorry
+		Oliver
+
 
