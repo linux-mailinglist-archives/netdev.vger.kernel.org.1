@@ -1,117 +1,132 @@
-Return-Path: <netdev+bounces-135612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D91E99E6AE
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:44:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842EA99E6F8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6E22B262D1
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:44:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49AE32857BD
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BB21EF089;
-	Tue, 15 Oct 2024 11:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 358EB1E7669;
+	Tue, 15 Oct 2024 11:47:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AE019B3FF;
-	Tue, 15 Oct 2024 11:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C8B1D0492
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728992632; cv=none; b=ipYScYaV2AFei2Oh3lfFj4tX3zdqRLYmo209HajYz4LO0IvYfbkuaUAwf9v/00eCaaIqDEMHaGXOYcJj2SVU0MK9JsbJTMHeTdaCX73g6jXKL5StgIn2VNBQBxPZ18jGDo8ZzTyLfWyXX9YYNp+e6YdVZjI9g2Oyk/TCsLd+XUw=
+	t=1728992853; cv=none; b=UGX+vw0tzcinvdNPW/74s6ZSegdAhJDmICx2ImJ/KKli8lVVVvrWEIbQtP44QoDdm+cFP4ExvIcVPoVcfGs2BlUw5HdTMaPOM8iI4f0pzRcpUS6IGYls7aUJ0rZdm/lU0QdzClc2s0GrmaRulTMFTHAs3qEeUA1JCTRanrC4zuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728992632; c=relaxed/simple;
-	bh=LyeO++gxMXeIsertvvHiY2szir0HJvoZmpgq+Y8HsUU=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Gfn1+Q4eLVzRzu6C8wL6Nh/HNjAi3HepgDNkhP1f3fqvwvIrOOfmMHQG/exnxbEW1Q13ud3wKF4TCHfCulVDEBSkq8O5spaHKCKrglQxCBcQNG1sqprDeysG0IaARSE4BiVH7jlDAwJFpp46ZM5zm/FuacMZ4IHjwY9onugRnwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XSXLK14nCz1ymk1;
-	Tue, 15 Oct 2024 19:43:53 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 73FA41A0188;
-	Tue, 15 Oct 2024 19:43:47 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 15 Oct 2024 19:43:46 +0800
-Message-ID: <9c6778b6-81f3-48da-930e-125d1442bc46@huawei.com>
-Date: Tue, 15 Oct 2024 19:43:45 +0800
+	s=arc-20240116; t=1728992853; c=relaxed/simple;
+	bh=Mwj8t0g9irVrQ+b+ekQ9LDH1eHLuPOL0ztAzSYX+vGU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=YHbUj9CGBzCLvMgaqR3CkFkKeWZnhp5QCW/m7kz82UviPsimCHEbgk/76Wl8EMhZ9g2uzJFBeZPasJCbNgzXx87StTHKke2K1OgI0RtoeqKs2Q1UCWOodCXCsJeHz5jNwqGlf+ubsMqsPYSOrhzqd97+PADHvCpCSBb/e3rbTvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-128-Ijlk96LgNIOVXVw2fCSE6w-1; Tue,
+ 15 Oct 2024 07:47:26 -0400
+X-MC-Unique: Ijlk96LgNIOVXVw2fCSE6w-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AE061955F40;
+	Tue, 15 Oct 2024 11:47:24 +0000 (UTC)
+Received: from hog (unknown [10.39.192.7])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4029F3000198;
+	Tue, 15 Oct 2024 11:47:21 +0000 (UTC)
+Date: Tue, 15 Oct 2024 13:47:18 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>, Ales Nezbeda <anezbeda@redhat.com>
+Cc: netdev@vger.kernel.org, sdf@fomichev.me, davem@davemloft.net
+Subject: Re: [PATCH net v2] selftests: rtnetlink: add 'ethtool' as a
+ dependency
+Message-ID: <Zw5WRhrNqJCZp1mf@hog>
+References: <20240909083410.60121-1-anezbeda@redhat.com>
+ <20240909170737.1dbaa027@kernel.org>
+ <CAL_-bo0QJJJootMQysNSLNmu0Fps3dqjPE0F0_=R23h7GqAkfQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>,
-	<wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
-	<libaihan@huawei.com>, <andrew@lunn.ch>, <jdamato@fastly.com>,
-	<horms@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>,
-	<christophe.jaillet@wanadoo.fr>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V12 net-next 10/10] net: hibmcge: Add maintainer for
- hibmcge
-To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>
-References: <20241010142139.3805375-1-shaojijie@huawei.com>
- <20241010142139.3805375-11-shaojijie@huawei.com>
- <d1ead515-8ecb-4b43-8077-92229618aa43@redhat.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <d1ead515-8ecb-4b43-8077-92229618aa43@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+In-Reply-To: <CAL_-bo0QJJJootMQysNSLNmu0Fps3dqjPE0F0_=R23h7GqAkfQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Jakub,
+
+(this thread probably got buried in your inbox due to netconf/LPC)
+
+2024-09-16, 11:18:13 +0200, Ales Nezbeda wrote:
+> On Tue, Sep 10, 2024 at 2:17=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > Don't think it qualifies as a fix, it's an improvement.
+>=20
+> Well, if the `ethtool` is not present the test will fail with dubious
+> results that would indicate that the test failed due to the system not
+> supporting MACsec offload, which is not true. The error message
+> doesn't reflect what went wrong, so I thought about it as an issue
+> that is being fixed.
+
+I also think it's a (pretty minor) fix, since the error message is
+really misleading.
+
+> If this is not the case please let me know,
+> because based on the docs 'Fixes: tag indicates that the patch fixes
+> an issue', which I would think that wrong error message is an issue. I
+> might be wrong here though, so if the definition of 'issue' is more
+> restrictive I can remove the 'Fixes:' tag.
+>=20
+> > You can use net/forwarding's lib.sh in net/, altnames.sh already
+> > uses it.
+>=20
+> I see, the problem (and probably should have mentioned it in the patch
+> itself) is that `rtnetlink.sh` is using one of the variables defined
+> in the `net/lib.sh` - specifically `ksft_skip`.
+
+net/forwarding/lib.sh seems to include net/lib.sh, and uses ksft_skip
+too, so there should be no problem:
+
+    source "$net_forwarding_dir/../lib.sh"
+   =20
+    #######################################################################=
+#######
+    # Sanity checks
+   =20
+    check_tc_version()
+    {
+    =09tc -j &> /dev/null
+    =09if [[ $? -ne 0 ]]; then
+    =09=09echo "SKIP: iproute2 too old; tc is missing JSON support"
+    =09=09exit $ksft_skip
+    =09fi
+    }
 
 
-on 2024/10/15 18:30, Paolo Abeni wrote:
-> On 10/10/24 16:21, Jijie Shao wrote:
->> Add myself as the maintainer for the hibmcge ethernet driver.
->>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->> ChangeLog:
->> v11 -> v12:
->>    - remove the W entry of hibmcge driver from MAINTAINERS, suggested 
->> by Jakub.
->>    v11: 
->> https://lore.kernel.org/all/20241008022358.863393-1-shaojijie@huawei.com/
->> ---
->>   MAINTAINERS | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 1389704c7d8d..371d4dc4aafb 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -10275,6 +10275,12 @@ S:    Maintained
->>   W:    http://www.hisilicon.com
->>   F:    drivers/net/ethernet/hisilicon/hns3/
->>   +HISILICON NETWORK HIBMCGE DRIVER
->> +M:    Jijie Shao <shaojijie@huawei.com>
->> +L:    netdev@vger.kernel.org
->> +S:    Maintained
->> +F:    drivers/net/ethernet/hisilicon/hibmcge/
->> +
->>   HISILICON NETWORK SUBSYSTEM DRIVER
->>   M:    Yisen Zhuang <yisen.zhuang@huawei.com>
->>   M:    Salil Mehta <salil.mehta@huawei.com>
->
-> Unfortunately does not apply anymore. Please rebase, thanks.
->
-> Paolo
+> Furthermore, I felt
+> like a more clean approach would be to add the `require_command()` to
+> the `net/lib.sh` so that other tests down the road could potentially
+> use it as well. Picking a different `lib.sh` would mean either
 
-Ok, I'll resend it.
+Moving require_command from net/forwarding/lib.sh to net/lib.sh also
+seems pretty reasonable.
 
-Thanks，
-
-Jijie Shao
+--=20
+Sabrina
 
 
