@@ -1,59 +1,50 @@
-Return-Path: <netdev+bounces-135683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E34F99EDED
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:41:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C17299EE02
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DECB0B23AE8
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:41:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12A7E1F25809
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8AC71FAF0C;
-	Tue, 15 Oct 2024 13:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010D41B2181;
+	Tue, 15 Oct 2024 13:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gc80enfs"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B083D1FAF14;
-	Tue, 15 Oct 2024 13:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D100E147C91
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 13:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728999462; cv=none; b=fU4TEpszesArAXCGEqE3aHuJQKb9+NRXDWoB/hCaLFKstJGF+9nN3Bt+8HlI51lWl89DuoBZkofkLumbm9gRNpdBV5S4IanXT8aCDIyoQztz/bk/98PaV8tvyOQM/XQUnQ5xXhb6ppx5De7vF31gPd+sKNcioaP51RgYYzG8wfI=
+	t=1728999625; cv=none; b=jiDb3q4FWAko/7kB00A9UdQY+trMGgy90xVKQ5/73+36OVGzhqUhomx1CGkeSOiwvOmOUjberFyXU7YMteFvQnkNQ5SpN6TcnkqYL1+Qh0zhzV+K2Vn+bbswyZCeu+wgtlgsM2VFtOXvJOesoGfdjFkPNvNMVsz2GvPhE1K1inE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728999462; c=relaxed/simple;
-	bh=j6RReWYcf79gWTDSp+9jFx/cBR/XOms6tCBdzHuMCHc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W11uC32GiAHRuU7bgHaPOxR3RH0bpc6eJdLFsv3tZ8LTzX0Vdp3x3BBzTUCD+U8NBoi+XI/hZzFkug+ZCZqY4UWLSzKIKECBNEjkKw0vvGkvT6JVu1CcJ91efkjlKDhkbr8VWcg8Q+TvznitIHo12xunP//KuXzXvGgU4Ft1gqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.11,205,1725289200"; 
-   d="scan'208";a="225980160"
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 15 Oct 2024 22:37:38 +0900
-Received: from GBR-5CG2373LKG.adwin.renesas.com (unknown [10.226.93.176])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 687F040031EA;
-	Tue, 15 Oct 2024 22:37:34 +0900 (JST)
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v2 10/10] net: ravb: Add VLAN checksum support
-Date: Tue, 15 Oct 2024 14:36:34 +0100
-Message-Id: <20241015133634.193-11-paul.barker.ct@bp.renesas.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20241015133634.193-1-paul.barker.ct@bp.renesas.com>
-References: <20241015133634.193-1-paul.barker.ct@bp.renesas.com>
+	s=arc-20240116; t=1728999625; c=relaxed/simple;
+	bh=b5y3IscGRmb/wpzVvp1/nTnMJhvtbyKoww/llZjjv78=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=S8V/5F/s2ALvNDQ+A5dzOKjaBJO2/pJEZ6uIGuPbeAL2k0zFAvV2GfDGJhMGyX2vTQUU/eY1iHwZQjG7gOFYuuMK9cfHJtbGxvYTbXlV7Zd/otuAxgb/FGysAnFFGMI3vi8mx9F6f523KKueL6uYACK22KRZzOohhPlDkeD5sDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gc80enfs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FDDFC4CEC6;
+	Tue, 15 Oct 2024 13:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728999625;
+	bh=b5y3IscGRmb/wpzVvp1/nTnMJhvtbyKoww/llZjjv78=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gc80enfsBa3TXrTI7U/d604am910OUv4UigweWPOKIX123whHbH/BPaSE/yPFtZhe
+	 Dd2ge8JvNm8YiAmzkKqDmhaE584HZBHN98/DbSzHWWuuB2+/2tEGJlrZv2VnW6U6Ir
+	 M/Sk6XGLdD+3t7YvuVRnn65BzC8JAyqxPOJNmi4dMiwJ59c66QbWoIydzlQ67eWhvC
+	 acT/ieKnEu10sT70CgeFqKSfQbXYY41QeCVb1Xjth3ujN9N3XUGCnKChTc6WCx+g2A
+	 0PwET2BK5mmBkOsMTDfl2unzx5PXpq7Yj63j2FU6qFAiBJTAVPcA2mQQaeOqm+Z9Kq
+	 X3TXS/0F7PvrQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDAE3809A8A;
+	Tue, 15 Oct 2024 13:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,82 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/4] batman-adv: Start new development cycle
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172899963051.1165800.3482605759558886670.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Oct 2024 13:40:30 +0000
+References: <20241015073946.46613-2-sw@simonwunderlich.de>
+In-Reply-To: <20241015073946.46613-2-sw@simonwunderlich.de>
+To: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org
 
-The GbEth IP supports offloading checksum calculation for VLAN-tagged
-packets, provided that the EtherType is 0x8100 and only one VLAN tag is
-present.
+Hello:
 
-Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
----
- drivers/net/ethernet/renesas/ravb.h      |  1 +
- drivers/net/ethernet/renesas/ravb_main.c | 24 ++++++++++++++++++++----
- 2 files changed, 21 insertions(+), 4 deletions(-)
+This series was applied to netdev/net-next.git (main)
+by Simon Wunderlich <sw@simonwunderlich.de>:
 
-diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-index d7b3810ce21b..7b48060c250b 100644
---- a/drivers/net/ethernet/renesas/ravb.h
-+++ b/drivers/net/ethernet/renesas/ravb.h
-@@ -1055,6 +1055,7 @@ struct ravb_hw_info {
- 	size_t gstrings_size;
- 	netdev_features_t net_hw_features;
- 	netdev_features_t net_features;
-+	netdev_features_t vlan_features;
- 	int stats_len;
- 	u32 tccr_mask;
- 	u32 tx_max_frame_size;
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 14b4462331b0..bc56f1f4bec9 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2063,13 +2063,27 @@ static void ravb_tx_timeout_work(struct work_struct *work)
- 
- static bool ravb_can_tx_csum_gbeth(struct sk_buff *skb)
- {
-+	u16 net_protocol = ntohs(skb->protocol);
- 	u8 inner_protocol;
- 
--	/* TODO: Need to add support for VLAN tag 802.1Q */
--	if (skb_vlan_tag_present(skb))
--		return false;
-+	/* GbEth IP can calculate the checksum if:
-+	 * - there are zero or one VLAN headers with TPID=0x8100
-+	 * - the network protocol is IPv4 or IPv6
-+	 * - the transport protocol is TCP, UDP or ICMP
-+	 * - the packet is not fragmented
-+	 */
-+
-+	if (net_protocol == ETH_P_8021Q) {
-+		struct vlan_hdr vhdr, *vh;
-+
-+		vh = skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &vhdr);
-+		if (!vh)
-+			return false;
-+
-+		net_protocol = ntohs(vh->h_vlan_encapsulated_proto);
-+	}
- 
--	switch (ntohs(skb->protocol)) {
-+	switch (net_protocol) {
- 	case ETH_P_IP:
- 		inner_protocol = ip_hdr(skb)->protocol;
- 		break;
-@@ -2772,6 +2786,7 @@ static const struct ravb_hw_info gbeth_hw_info = {
- 	.gstrings_size = sizeof(ravb_gstrings_stats_gbeth),
- 	.net_hw_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
- 	.net_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
-+	.vlan_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
- 	.stats_len = ARRAY_SIZE(ravb_gstrings_stats_gbeth),
- 	.tccr_mask = TCCR_TSRQ0,
- 	.tx_max_frame_size = 1522,
-@@ -2914,6 +2929,7 @@ static int ravb_probe(struct platform_device *pdev)
- 
- 	ndev->features = info->net_features;
- 	ndev->hw_features = info->net_hw_features;
-+	ndev->vlan_features = info->vlan_features;
- 
- 	error = reset_control_deassert(rstc);
- 	if (error)
+On Tue, 15 Oct 2024 09:39:43 +0200 you wrote:
+> This version will contain all the (major or even only minor) changes for
+> Linux 6.13.
+> 
+> The version number isn't a semantic version number with major and minor
+> information. It is just encoding the year of the expected publishing as
+> Linux -rc1 and the number of published versions this year (starting at 0).
+> 
+> [...]
+
+Here is the summary with links:
+  - [1/4] batman-adv: Start new development cycle
+    https://git.kernel.org/netdev/net-next/c/0f4e6f947600
+  - [2/4] batman-adv: Add flex array to struct batadv_tvlv_tt_data
+    https://git.kernel.org/netdev/net-next/c/4436df478860
+  - [3/4] batman-adv: Use string choice helper to print booleans
+    https://git.kernel.org/netdev/net-next/c/5c956d11cfca
+  - [4/4] batman-adv: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+    https://git.kernel.org/netdev/net-next/c/356c81b6c494
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
