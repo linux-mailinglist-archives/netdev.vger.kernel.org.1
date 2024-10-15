@@ -1,123 +1,167 @@
-Return-Path: <netdev+bounces-135651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5197E99EB89
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 206B399ECE0
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 15:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15D31284F88
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:08:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0602849E1
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 13:23:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E171AF0D7;
-	Tue, 15 Oct 2024 13:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="LghZXKpr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1935B1DD0E9;
+	Tue, 15 Oct 2024 13:19:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A0F1AF0A9;
-	Tue, 15 Oct 2024 13:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E781DD0DD;
+	Tue, 15 Oct 2024 13:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728997686; cv=none; b=ZanZcQrtI2m7SNWLmsFl2n8RZ6aVzvQ7npdBqEUZ57piM0f6JPjqpMoTgWn6mibfT2C5eQ9WbMSf0+L+4bwHxVb0Ye71rOUpP+CA3Pz0MOf5lgOQ+W07b55SqR2ti0/qy3f17EtvLTyMl07rbWlsete+iQeBlU3NT40Ezb/DLN4=
+	t=1728998348; cv=none; b=saaARZ4iFN4+rfZud5CnZsL8UsYx9O88QIK4gmKqioYs4u5DW11xTE5bfwp4AV10tFfBDOghDbLKpne6U6ptecHdXL4dOPRg1/Dw/0KfzUQbZukF18Gyfbrp1/RMNwUq/cr06RKUp8V0uoIY2ElpbIqPqleU+1cRTX6d7fLvzio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728997686; c=relaxed/simple;
-	bh=a3nB+9tQPAJSsl8Qm2/pe8fFu9bJdaYkRXWc1LV5jmw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MNL+y9TVvJWOfLi7QchNE7rcamDBuXP5wW/zhxP6+F2C3s+NBkyI1NmSeoux5kYwNHdfx8oIXWrXpoBS63+8ezTvSAnGYwn8SCdx0j/ACRuHJfTe3vgOPPsTLvkWVzZLGGX4MxIlWWkpEDwz2B7oY4SfHHZWz3p/gslEG93spwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=LghZXKpr; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=p5BHUyPt1EyFTjMoAsnVPZVSP1YnGZbvLucwi3hkXsc=; b=LghZXKprKdh4ZKP8MMVtLHKtNQ
-	0aWIrf57zzmuxOu2+1wHVipPHf5I5kH4/MyyXF2wdk6ZjtA0WMRAMQd+ZYJ1/siIrF+XsH1dCLLkt
-	HsPGXeNgxJ+QCxa+O7HvSVgtEznp5ish9tOfkEBTCEG3SfibiXIQzPCaK1Hxvp1Js1NI=;
-Received: from p54ae9bfc.dip0.t-ipconnect.de ([84.174.155.252] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1t0hHC-0099iN-2Y;
-	Tue, 15 Oct 2024 15:07:50 +0200
-Message-ID: <695421bb-6f31-4bae-8c8c-6d4fccf1b497@nbd.name>
-Date: Tue, 15 Oct 2024 15:07:50 +0200
+	s=arc-20240116; t=1728998348; c=relaxed/simple;
+	bh=QpqIaM8N9zPhfV9L2BCBLTRstVrV21xsVwggs+Q3r34=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U5JRz8sEp9vtoqmtZbPOCQT1Q14/gp1IMF/YsDWx1vQkhHvNCHpLDB1sydnjGasX+y6ZIJfA6cvcdoswUZYF19Ak4cOOrHPcYwLmRWUTNGSLWYY8qU1JR1vPSgixy7VFGSKGp6e6c4EvFjQaG3ly/KMcRTSEsrursn/EvQOtpJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=207.46.229.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from localhost (unknown [10.193.54.193])
+	by mail-app3 (Coremail) with SMTP id cC_KCgBXbWYmaw5nTTojAA--.14492S2;
+	Tue, 15 Oct 2024 21:16:22 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH net v1] net: wwan: fix global oob in wwan_rtnl_policy
+Date: Tue, 15 Oct 2024 21:16:21 +0800
+Message-Id: <20241015131621.47503-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.39.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] net: ethernet: mtk_eth_soc: optimize dma
- ring address/index calculation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241015110940.63702-1-nbd@nbd.name>
- <20241015110940.63702-4-nbd@nbd.name>
- <e67883e3-b278-4052-849c-8a9a8ef145f0@lunn.ch>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <e67883e3-b278-4052-849c-8a9a8ef145f0@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cC_KCgBXbWYmaw5nTTojAA--.14492S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGr48Wr1DAFWrJFW3Kr45ZFb_yoWrurW3p3
+	90gryxGr48Jry0qF4xXw1rJr1xXF1DA3WUGr1xWr1rAF15Gw1UJryUtFW3JrnxuF90yFy7
+	Xr1DJr40vr15GaUanT9S1TB71UUUUb7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUHFb7Iv0xC_tr1lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
+	AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
+	6r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI
+	0_GcCE3s1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj64x0Y40En7xvr7AKxVWUJVW8JwAv7VC0I7IYx2IY67AKxVWUAV
+	WUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAK
+	I48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262
+	kKe7AKxVWrXVW3AwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj4RWuWlUUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 
-On 15.10.24 14:54, Andrew Lunn wrote:
-> On Tue, Oct 15, 2024 at 01:09:38PM +0200, Felix Fietkau wrote:
->> Since DMA descriptor sizes are all power of 2, we can avoid costly integer
->> division in favor or simple shifts.
-> 
-> Could a BUILD_BUG_ON() be added to validate this?
+The variable wwan_rtnl_link_ops assign a *bigger* maxtype which leads to
+a global out-of-bounds read when parsing the netlink attributes. Exactly
+same bug cause as the oob fixed in commit b33fb5b801c6 ("net: qualcomm:
+rmnet: fix global oob in rmnet_policy").
 
-Not sure if that would be useful. I can't put the BUILD_BUG_ON in the 
-initializer macro, so I could only add it for the individual dma 
-descriptor structs.
-Since the size of those structs will not be changed (otherwise it would 
-immediately visibly break with existing hw), the remaining possibility 
-would be adding new structs that violate this expectation. However, 
-those would then not be covered by the BUILD_BUG_ON.
+==================================================================
+BUG: KASAN: global-out-of-bounds in validate_nla lib/nlattr.c:388 [inline]
+BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+Read of size 1 at addr ffffffff8b09cb60 by task syz.1.66276/323862
 
-> Do you have some benchmark data for this series? It would be good to
-> add to a patch 0/4.
+CPU: 0 PID: 323862 Comm: syz.1.66276 Not tainted 6.1.70 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x177/0x231 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:284 [inline]
+ print_report+0x14f/0x750 mm/kasan/report.c:395
+ kasan_report+0x139/0x170 mm/kasan/report.c:495
+ validate_nla lib/nlattr.c:388 [inline]
+ __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+ __nla_parse+0x3c/0x50 lib/nlattr.c:700
+ nla_parse_nested_deprecated include/net/netlink.h:1269 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:3514 [inline]
+ rtnl_newlink+0x7bc/0x1fd0 net/core/rtnetlink.c:3623
+ rtnetlink_rcv_msg+0x794/0xef0 net/core/rtnetlink.c:6122
+ netlink_rcv_skb+0x1de/0x420 net/netlink/af_netlink.c:2508
+ netlink_unicast_kernel net/netlink/af_netlink.c:1326 [inline]
+ netlink_unicast+0x74b/0x8c0 net/netlink/af_netlink.c:1352
+ netlink_sendmsg+0x882/0xb90 net/netlink/af_netlink.c:1874
+ sock_sendmsg_nosec net/socket.c:716 [inline]
+ __sock_sendmsg net/socket.c:728 [inline]
+ ____sys_sendmsg+0x5cc/0x8f0 net/socket.c:2499
+ ___sys_sendmsg+0x21c/0x290 net/socket.c:2553
+ __sys_sendmsg net/socket.c:2582 [inline]
+ __do_sys_sendmsg net/socket.c:2591 [inline]
+ __se_sys_sendmsg+0x19e/0x270 net/socket.c:2589
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x45/0x90 arch/x86/entry/common.c:81
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f67b19a24ad
+RSP: 002b:00007f67b17febb8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f67b1b45f80 RCX: 00007f67b19a24ad
+RDX: 0000000000000000 RSI: 0000000020005e40 RDI: 0000000000000004
+RBP: 00007f67b1a1e01d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffd2513764f R14: 00007ffd251376e0 R15: 00007f67b17fed40
+ </TASK>
 
-No, I just ran basic tests that everything still works well and looked 
-at the assembly diff to ensure that the generated code seems sane.
+The buggy address belongs to the variable:
+ wwan_rtnl_policy+0x20/0x40
 
-- Felix
+The buggy address belongs to the physical page:
+page:ffffea00002c2700 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xb09c
+flags: 0xfff00000001000(reserved|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000001000 ffffea00002c2708 ffffea00002c2708 0000000000000000
+raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner info is not present (never set?)
+
+Memory state around the buggy address:
+ ffffffff8b09ca00: 05 f9 f9 f9 05 f9 f9 f9 00 01 f9 f9 00 01 f9 f9
+ ffffffff8b09ca80: 00 00 00 05 f9 f9 f9 f9 00 00 03 f9 f9 f9 f9 f9
+>ffffffff8b09cb00: 00 00 00 00 05 f9 f9 f9 00 00 00 00 f9 f9 f9 f9
+                                                       ^
+ ffffffff8b09cb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
+
+According to the comment of `nla_parse_nested_deprecated`, use correct size
+`IFLA_WWAN_MAX` here to fix this issue.
+
+Fixes: 88b710532e53 ("wwan: add interface creation support")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+ drivers/net/wwan/wwan_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
+index 17431f1b1a0c..65a7ed4d6766 100644
+--- a/drivers/net/wwan/wwan_core.c
++++ b/drivers/net/wwan/wwan_core.c
+@@ -1038,7 +1038,7 @@ static const struct nla_policy wwan_rtnl_policy[IFLA_WWAN_MAX + 1] = {
+ 
+ static struct rtnl_link_ops wwan_rtnl_link_ops __read_mostly = {
+ 	.kind = "wwan",
+-	.maxtype = __IFLA_WWAN_MAX,
++	.maxtype = IFLA_WWAN_MAX,
+ 	.alloc = wwan_rtnl_alloc,
+ 	.validate = wwan_rtnl_validate,
+ 	.newlink = wwan_rtnl_newlink,
+-- 
+2.39.2
+
 
