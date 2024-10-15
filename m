@@ -1,123 +1,148 @@
-Return-Path: <netdev+bounces-135429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66C9699DE1C
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:22:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8268699DE1E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 08:22:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B4B71F23217
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 06:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B23284832
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 06:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F41E189B9B;
-	Tue, 15 Oct 2024 06:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C78189BAD;
+	Tue, 15 Oct 2024 06:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jsXb/0aB"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B24F189917
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 06:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC56B189B85;
+	Tue, 15 Oct 2024 06:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728973330; cv=none; b=PU8RX0f23zqr54xNOBi7EM/c+0CSSGSEkmUPouMy7W8ao4L+U49Qhp2XvXdLiJqknf9OwDX/Q++A78Kd1kJmTbsyPWYlr8F2v70W8Y5A0pEU5x6Nm7EbqvP5nTtSniVo/OHLX6FB+2jfg0WhTzxPMGqHBnlwIJ7mtoTETYOq7WQ=
+	t=1728973341; cv=none; b=si3J2L6TD4fFTNPcksKjMot/19X/9DjA1PcIDFxBOqxpQ6G36esQehTZFkQfeeNtAK+LhxiL5PfIBQQj6hWpCv5eLRhloOhlRS94Y6ecyEKIxPbHHsbMp0+t9BCV8PYmcHVbidJ/CKIhrdQi8QTovQuVIionO1YtolQbtpXYZug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728973330; c=relaxed/simple;
-	bh=F0nO1ju9yrHwcLaUuiotyknrNbm/NPjEBqUywm3szCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iEdEXJhdknNxf05lVgbIkxYQ5QCDpbiuTO5npyjCQps1ADtYKpnrUf6/AtNOFoVzUZfSBeE4WYKj9kun3oUggtZYoaXowUfvJf0bW72xvLjPergeHx3umO4gQhdzj1XXw1rInJ2SmNT2/QrZW4tsJhWNqxODixtEy3nVKtLbt8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t0aw2-0008D4-5Z; Tue, 15 Oct 2024 08:21:34 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t0avx-001xwW-6v; Tue, 15 Oct 2024 08:21:29 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B1B32352EC0;
-	Tue, 15 Oct 2024 06:21:28 +0000 (UTC)
-Date: Tue, 15 Oct 2024 08:21:28 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
-	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, kernel-team@cloudflare.com, kuniyu@amazon.com, 
-	alibuda@linux.alibaba.com, Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: Re: [PATCH net-next v3 4/9] net: af_can: do not leave a dangling sk
- pointer in can_create()
-Message-ID: <20241015-fast-smilodon-of-maturity-c983eb-mkl@pengutronix.de>
-References: <20241014153808.51894-1-ignat@cloudflare.com>
- <20241014153808.51894-5-ignat@cloudflare.com>
+	s=arc-20240116; t=1728973341; c=relaxed/simple;
+	bh=GzwAch/zlTRYOnBiTi/vJ6rawKsWFke2WDsqdkoAmcA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gCePDa4l7xGJepfuT+EXkVVRMRIejv+IrtYrSlv+sZT8jwEw+S3VH//R4H87uSJt8iJ68Mc/CYRfmuWonaZq8ScMCFL4onM9bhPjop4OhSL2X0EYtNye+U1AisJmHrC1xpBKzWTCGEpD1jVgbj/GVsCKf++aNFrjsGRwN1RxN8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jsXb/0aB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49F60ccs022241;
+	Tue, 15 Oct 2024 06:21:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	g8emflX/OpMc2gjb7urs+l6mNv4BW0vVjUVUTl7rJLI=; b=jsXb/0aBv/Aesf0/
+	tq39kVisjauBOVeQz4Uw7BBcETyXIxNMpWP50RicMzOEbxTMr2vVK/egypv6qVil
+	+916QPutprqAzJTOgVKXvRitRJJRONQ+1WAd+o3D3SrUnfP8bfM0QAbJ3RQ3IuYw
+	hI9mezoqqqe+53zdW7sc1KF7w7ym4Et5tbIMYzrUyZf7whoLmqTf87L4eBMRZg9k
+	8xToJmaY7TfRuIyA0kWRUH+ueZvuvSwr6/aJjHNcGDVZa0pwmo2a49jQN89rRXf5
+	dCHtbq/URLolg2hwlMpEX65CxinA/KKZVGNzZe8grKpgs2EOvlxY2048w/o5Yk1a
+	d8kYUA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 429jrf81m9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 06:21:54 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49F6LrW4006749
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 15 Oct 2024 06:21:53 GMT
+Received: from [10.64.70.122] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 14 Oct
+ 2024 23:21:47 -0700
+Message-ID: <b2f027d1-5b4a-4b73-aa26-a332df2a561b@quicinc.com>
+Date: Tue, 15 Oct 2024 14:21:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ozf36irfkpdfb4wj"
-Content-Disposition: inline
-In-Reply-To: <20241014153808.51894-5-ignat@cloudflare.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] dt-bindings: net: qcom,ethqos: add description for
+ qcs8300
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        "Paolo
+ Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bhupesh
+ Sharma <bhupesh.sharma@linaro.org>,
+        Kishon Vijay Abraham I
+	<kishon@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <quic_tingweiz@quicinc.com>,
+        <quic_aiquny@quicinc.com>
+References: <20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com>
+ <20241010-schema-v1-3-98b2d0a2f7a2@quicinc.com>
+ <da45vocnwnnnlo6nrxh6x4xwmnsgdp5axfvomzniw5vxlmerer@6ntl3ae4q2ci>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <da45vocnwnnnlo6nrxh6x4xwmnsgdp5axfvomzniw5vxlmerer@6ntl3ae4q2ci>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 5LP9lC2ukrn9cy7hIl7Qu-Uv4jFT_NPG
+X-Proofpoint-ORIG-GUID: 5LP9lC2ukrn9cy7hIl7Qu-Uv4jFT_NPG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ spamscore=0 malwarescore=0 suspectscore=0 phishscore=0 impostorscore=0
+ clxscore=1015 mlxlogscore=890 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410150043
 
 
---ozf36irfkpdfb4wj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 14.10.2024 16:38:03, Ignat Korchagin wrote:
-> On error can_create() frees the allocated sk object, but sock_init_data()
-> has already attached it to the provided sock object. This will leave a
-> dangling sk pointer in the sock object and may cause use-after-free later.
->=20
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-> Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+On 2024-10-10 14:15, Krzysztof Kozlowski wrote:
+> On Thu, Oct 10, 2024 at 10:03:45AM +0800, Yijie Yang wrote:
+>> Add compatible for the MAC controller on qcs8300 platforms.
+>> Since qcs8300 shares the same EMAC as sa8775p, so it fallback to the
+>> compatible.
+>>
+>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+>> ---
+>>   Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+>> index 8cf29493b822..3ee5367bdde1 100644
+>> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+>> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
+>> @@ -23,6 +23,10 @@ properties:
+>>             - enum:
+>>                 - qcom,qcs615-ethqos
+>>             - const: qcom,sm8150-ethqos
+>> +      - items:
+>> +          - enum:
+>> +              - qcom,qcs8300-ethqos
+>> +          - const: qcom,sa8775p-ethqos
+> 
+> This block should go before earlier qcs615, to keep order by fallback.
 
-Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Why this block should positioned before qcs615, given that it comes 
+later in alphabetical order?
 
-regards,
-Marc
+> 
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> Best regards,
+> Krzysztof
+> 
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ozf36irfkpdfb4wj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcOCeYACgkQKDiiPnot
-vG/xXAf+LTXGlSudJMf/9rFosFeT91u30bZgRzlfS9tfAK9w2089Upi/Exhd/ogn
-fV/Auin/lIVDdcenPoVsSApA5kWdKLvfP+pu/RPXN38IrDQV8rwel0JjEDCzSYOL
-6KkFDtfEOHrDoikDtf1v+4wHX4Gy0hVXD8ODTIkXFwGolFBXK7+RTQx3O1H+Rw3p
-6oMv4Ve2xrP/5i8Lh/5emQVq7M5XqkapXUwmyOImTRwCqrnCtjZYEiy8GqYDcbes
-zGW5n5UvJOpiY6IM+tNdjOT5aEioR5XeuR/s0ORBiAppNrKjuIDgkkIC6gARZbzZ
-hqMhoIOx2Mu2d0iEy8By7FqJ48ZoVg==
-=wmsj
------END PGP SIGNATURE-----
-
---ozf36irfkpdfb4wj--
 
