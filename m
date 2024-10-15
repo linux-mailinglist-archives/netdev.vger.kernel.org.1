@@ -1,233 +1,151 @@
-Return-Path: <netdev+bounces-135826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C328599F4C5
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 20:03:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA9999F4CF
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 20:07:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E61E81C20D43
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:03:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5311C21A1D
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 18:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B004C1B219C;
-	Tue, 15 Oct 2024 18:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0555F1FAF0D;
+	Tue, 15 Oct 2024 18:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RWsz94JK"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="B6u/r6Lc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E45E1B392C
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 18:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62291173347
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 18:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729015425; cv=none; b=eiWZqRaeGkcAMbgMRtc0GpKNM0FTBlhRQMd56JTLF3SZf5U+H9EirOXlzYX+4VGtP8zQ3NvOYOu5NHAkiKnDkyCpsJBj8o43aUkd8g+Yc66FcEioIu1cYTQlCXYQWe8EA7SqbLmXQePXWEaqdb1gq7aHDlxObTYfMEN2DB3PckI=
+	t=1729015653; cv=none; b=cd7OWHehDGLB13rJ7IduT2Vb/+nXi75B3BChYyxZeqNU5GmkHlxrvXYozDHvFvWDCxNEuvs9wGL8A7Z2NtZHwnGTtDltTwjjEBFltHGJ6u4i5OWEcz3lY5kTKno0mn/XodnBfEK/TdfuAg0He3sOhsqprLjHi0GscVQQtPNEeK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729015425; c=relaxed/simple;
-	bh=FUxYJtCSs6rsDB6KaZF+B5u3c5DTcljuc15UIOoOLjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sn77cYEe7F2JC9BngLwVlJYG2McrJci8+oisEN7Yf36oTOljcan6qlWBkPph8xuYqnYTv4LCjOWTJEnkd2VFX0Yz4NNdG8SDwKXkmlaPXiOG9dyJP0z57JWJbdxmbsFJLW6kZBczallSa2k/5rQWzDWMgbebHvx4KGoA2Si6dNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RWsz94JK; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729015423; x=1760551423;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FUxYJtCSs6rsDB6KaZF+B5u3c5DTcljuc15UIOoOLjw=;
-  b=RWsz94JKmy7fZKnQ24GOQ6F+4qUnG9gsbviltR6qH8ABGthqFm/r4Pqe
-   mL7cTVGRyWVbNCYmiO77jmEIvXcgPG0hZ4WeBDrR0SdpYmt5Xd61sV2WM
-   csESPJzXX7iMo1zrSG+SNpna/LxkTN3Z/nnl7rLJ55GOWE5CTS5pqOSGV
-   D64hxux1vq64QQNob1p/vsTLZzLd7kmax4MhDmsGUWJARfqjZGruPedfG
-   HwuRf5rLNz8uV5dHsXbq93n7M5ygpZ1mrX5CL/X6vaYaEcDW/dhHvU5Bk
-   /G0mh1SwZq5/Cc/ltSz4SQ/hr/zToLwcDNXWlVFX5fKp9bhGD3Eqvbw/X
-   A==;
-X-CSE-ConnectionGUID: L5Iy+IX9QbyXLrJeVv5Ruw==
-X-CSE-MsgGUID: X6Gy2k3uSIS0PiySS+QbXA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="39818627"
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="scan'208";a="39818627"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 11:03:43 -0700
-X-CSE-ConnectionGUID: 2OLwxAtWR3mbgRXseSctXw==
-X-CSE-MsgGUID: 8OsR92p0ScO85/UBS+NHkw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
-   d="scan'208";a="78158364"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 15 Oct 2024 11:03:41 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t0ltS-000JhW-23;
-	Tue, 15 Oct 2024 18:03:38 +0000
-Date: Wed, 16 Oct 2024 02:03:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	intel-wired-lan@lists.osuosl.org, aleksander.lobakin@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v11 09/14] libeth: move
- idpf_rx_csum_decoded and idpf_rx_extracted
-Message-ID: <202410160123.5dWnVGKr-lkp@intel.com>
-References: <20241013154415.20262-10-mateusz.polchlopek@intel.com>
+	s=arc-20240116; t=1729015653; c=relaxed/simple;
+	bh=mp2svKcmNny1JZ8mUVCe1St4WuevGVB4bca4Z482AGM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VnEgKGYnxz0pg93Mp/g9JvF/jDNcCYiFUSqAz73XSPgW3aY2brSQlZ296GuDlyO47yNDun3gakmtYoPlzuBI1eErZyOwHGASyfoK3AKfPA+UH9QYF0RUtbMJD+pQcuA2QNZE8yHjSwTUbPYlae2Nsz9+OTdKrM3U1gzYvr7qSto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=B6u/r6Lc; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71e74900866so910722b3a.1
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 11:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1729015652; x=1729620452; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=uyplW89FHBeoQEYicibHANYldii1FOFczTEx2pQXNVc=;
+        b=B6u/r6Lc8t2noN5Xd7C8kLdrJgNksClxutdcKxkz2mimW2OcbbIbDsPDbsW7NRpSj/
+         yHwIT316lwgZVuioIQoBHW26lb+7gXKyL6kk21O5dl9BYSlYb7cYXmvqefHNGXU3MARQ
+         meu8PFf84YwvvrwTHBDHMaT+73zbU6mMHQ4JM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729015652; x=1729620452;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uyplW89FHBeoQEYicibHANYldii1FOFczTEx2pQXNVc=;
+        b=eCn3nIobPzvkanl+lSUQMSoTpQW8k77c3inejnRn4qVrmWOGp3OxPDsDTpzBm0w0yh
+         BgxQDLbXjY6rAM4HxeUwSbgVYU40wEce4IFt4esGB5ekXiv3QwIy17btV/WFHRBAMVRT
+         VM+vC4TRORNtMGSwGTMhUnv+QVVCRpGkD4H89mANKtZJPSFnDuQcStYSOkGX0jtvQMoA
+         J6+Ebyprdx9oivbSp0JPSp0SmWXNyb4wAyicBDRkN7ewkP0k8ZXOOaMYkhfd2XVkjdyL
+         vl66XZxvGEenFvllUoQ8/oxJRlxbIVNt51YsAmWucO1wWkYrvE8DOVyOAFt0l9slAVy+
+         YPHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXqFT4MR09db+DWS//vo5Pb1JeT9bZFLxvvd72j17REV4H9XGN4kZr3ZTukHjJiIuTlXlrWb8g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzsoi51gP4Y4Oh4kousvArvt+ebkeeHEl4gpdBGT7/Og3cCeVLD
+	Jki0kTs+rwXfd0ClMm2pMgIexaDJ8JfYbRwKr5MY/r5nNOjheh47hTYubqxSaDCIPFWl+We5KgQ
+	CZw==
+X-Google-Smtp-Source: AGHT+IGkgFxmWu3ONSnK7BzmVrFic2xtXKYm0lvFrM56CsdAhB3PKvklnkPE6VXQrWi3toc6W5vxhA==
+X-Received: by 2002:a05:6a00:178b:b0:717:9154:b5d6 with SMTP id d2e1a72fcca58-71e7daef79amr1507687b3a.22.1729015651593;
+        Tue, 15 Oct 2024 11:07:31 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e77507db4sm1571983b3a.188.2024.10.15.11.07.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 11:07:30 -0700 (PDT)
+Message-ID: <ed541d60-46dd-4b23-b810-548166b7a826@broadcom.com>
+Date: Tue, 15 Oct 2024 11:07:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241013154415.20262-10-mateusz.polchlopek@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: systemport: fix potential memory leak in
+ bcm_sysport_xmit()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Wang Hai <wanghai38@huawei.com>, bcm-kernel-feedback-list@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ zhangxiaoxu5@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241014145115.44977-1-wanghai38@huawei.com>
+ <0c21ac6a-fda4-4924-9ad1-db1b549be418@broadcom.com>
+ <20241015110154.55c7442f@kernel.org>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20241015110154.55c7442f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Mateusz,
+On 10/15/24 11:01, Jakub Kicinski wrote:
+> On Mon, 14 Oct 2024 09:59:27 -0700 Florian Fainelli wrote:
+>>> diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
+>>> index c9faa8540859..0a68b526e4a8 100644
+>>> --- a/drivers/net/ethernet/broadcom/bcmsysport.c
+>>> +++ b/drivers/net/ethernet/broadcom/bcmsysport.c
+>>> @@ -1359,6 +1359,7 @@ static netdev_tx_t bcm_sysport_xmit(struct sk_buff *skb,
+>>>    		netif_err(priv, tx_err, dev, "DMA map failed at %p (len=%d)\n",
+>>>    			  skb->data, skb_len);
+>>>    		ret = NETDEV_TX_OK;
+>>> +		dev_kfree_skb_any(skb);
+>>
+>> Since we already have a private counter tracking DMA mapping errors, I
+>> would follow what the driver does elsewhere in the transmit path,
+>> especially what bcm_sysport_insert_tsb() does, and just use
+>> dev_consume_skb_any() here.
+> 
+> Are you saying that if the packet drop is accounted is some statistics
+> we should not inform drop monitor about it? 🤔️
+> That wasn't my understanding of kfree_skb vs consume_skb..
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on a77c49f53be0af1efad5b4541a9a145505c81800]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Mateusz-Polchlopek/virtchnl-add-support-for-enabling-PTP-on-iAVF/20241014-174710
-base:   a77c49f53be0af1efad5b4541a9a145505c81800
-patch link:    https://lore.kernel.org/r/20241013154415.20262-10-mateusz.polchlopek%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-next v11 09/14] libeth: move idpf_rx_csum_decoded and idpf_rx_extracted
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20241016/202410160123.5dWnVGKr-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241016/202410160123.5dWnVGKr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410160123.5dWnVGKr-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c:1040:64: error: expected ';' after expression
-    1040 |                 idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc, ptype)
-         |                                                                              ^
-         |                                                                              ;
-   1 error generated.
-
-
-vim +1040 drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-
-   954	
-   955	/**
-   956	 * idpf_rx_singleq_clean - Reclaim resources after receive completes
-   957	 * @rx_q: rx queue to clean
-   958	 * @budget: Total limit on number of packets to process
-   959	 *
-   960	 * Returns true if there's any budget left (e.g. the clean is finished)
-   961	 */
-   962	static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
-   963	{
-   964		unsigned int total_rx_bytes = 0, total_rx_pkts = 0;
-   965		struct sk_buff *skb = rx_q->skb;
-   966		u16 ntc = rx_q->next_to_clean;
-   967		u16 cleaned_count = 0;
-   968		bool failure = false;
-   969	
-   970		/* Process Rx packets bounded by budget */
-   971		while (likely(total_rx_pkts < (unsigned int)budget)) {
-   972			struct libeth_rqe_info fields = { };
-   973			union virtchnl2_rx_desc *rx_desc;
-   974			struct idpf_rx_buf *rx_buf;
-   975			u32 ptype;
-   976	
-   977			/* get the Rx desc from Rx queue based on 'next_to_clean' */
-   978			rx_desc = &rx_q->rx[ntc];
-   979	
-   980			/* status_error_ptype_len will always be zero for unused
-   981			 * descriptors because it's cleared in cleanup, and overlaps
-   982			 * with hdr_addr which is always zero because packet split
-   983			 * isn't used, if the hardware wrote DD then the length will be
-   984			 * non-zero
-   985			 */
-   986	#define IDPF_RXD_DD VIRTCHNL2_RX_BASE_DESC_STATUS_DD_M
-   987			if (!idpf_rx_singleq_test_staterr(rx_desc,
-   988							  IDPF_RXD_DD))
-   989				break;
-   990	
-   991			/* This memory barrier is needed to keep us from reading
-   992			 * any other fields out of the rx_desc
-   993			 */
-   994			dma_rmb();
-   995	
-   996			idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields, &ptype);
-   997	
-   998			rx_buf = &rx_q->rx_buf[ntc];
-   999			if (!libeth_rx_sync_for_cpu(rx_buf, fields.len))
-  1000				goto skip_data;
-  1001	
-  1002			if (skb)
-  1003				idpf_rx_add_frag(rx_buf, skb, fields.len);
-  1004			else
-  1005				skb = idpf_rx_build_skb(rx_buf, fields.len);
-  1006	
-  1007			/* exit if we failed to retrieve a buffer */
-  1008			if (!skb)
-  1009				break;
-  1010	
-  1011	skip_data:
-  1012			rx_buf->page = NULL;
-  1013	
-  1014			IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
-  1015			cleaned_count++;
-  1016	
-  1017			/* skip if it is non EOP desc */
-  1018			if (idpf_rx_singleq_is_non_eop(rx_desc) || unlikely(!skb))
-  1019				continue;
-  1020	
-  1021	#define IDPF_RXD_ERR_S FIELD_PREP(VIRTCHNL2_RX_BASE_DESC_QW1_ERROR_M, \
-  1022					  VIRTCHNL2_RX_BASE_DESC_ERROR_RXE_M)
-  1023			if (unlikely(idpf_rx_singleq_test_staterr(rx_desc,
-  1024								  IDPF_RXD_ERR_S))) {
-  1025				dev_kfree_skb_any(skb);
-  1026				skb = NULL;
-  1027				continue;
-  1028			}
-  1029	
-  1030			/* pad skb if needed (to make valid ethernet frame) */
-  1031			if (eth_skb_pad(skb)) {
-  1032				skb = NULL;
-  1033				continue;
-  1034			}
-  1035	
-  1036			/* probably a little skewed due to removing CRC */
-  1037			total_rx_bytes += skb->len;
-  1038	
-  1039			/* protocol */
-> 1040			idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc, ptype)
-  1041	
-  1042			/* send completed skb up the stack */
-  1043			napi_gro_receive(rx_q->pp->p.napi, skb);
-  1044			skb = NULL;
-  1045	
-  1046			/* update budget accounting */
-  1047			total_rx_pkts++;
-  1048		}
-  1049	
-  1050		rx_q->skb = skb;
-  1051	
-  1052		rx_q->next_to_clean = ntc;
-  1053	
-  1054		page_pool_nid_changed(rx_q->pp, numa_mem_id());
-  1055		if (cleaned_count)
-  1056			failure = idpf_rx_singleq_buf_hw_alloc_all(rx_q, cleaned_count);
-  1057	
-  1058		u64_stats_update_begin(&rx_q->stats_sync);
-  1059		u64_stats_add(&rx_q->q_stats.packets, total_rx_pkts);
-  1060		u64_stats_add(&rx_q->q_stats.bytes, total_rx_bytes);
-  1061		u64_stats_update_end(&rx_q->stats_sync);
-  1062	
-  1063		/* guarantee a trip back through this routine if there was a failure */
-  1064		return failure ? budget : (int)total_rx_pkts;
-  1065	}
-  1066	
-
+Yes that's my reasoning here, now given that we have had packet drops on 
+transmit that took forever to track down, maybe I better retract that 
+statement and go with v1.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Florian
 
