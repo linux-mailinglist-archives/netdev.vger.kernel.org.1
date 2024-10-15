@@ -1,80 +1,142 @@
-Return-Path: <netdev+bounces-135911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BAC899FC83
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:35:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75F299FC87
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD9C31C24559
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:35:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2248E282EC6
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 23:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5B51A76DD;
-	Tue, 15 Oct 2024 23:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E5C1D63E7;
+	Tue, 15 Oct 2024 23:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pacobu+5"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UIHPTiBf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0975021E3D8
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB53321E3D8
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729035323; cv=none; b=aoOVYuzcOxjsL8kkC4YjcUVp6JMJ1+IuRMLl0AiNwJVa8Pkh0Y4GmKWfR6aAv9PLcgzTYukvggEhkMcAHOlvxcZH5YgG1NXPdT0PRVFNK0vSyNyshJzxt5VGox3onprMZZksk/GJW39WnHqy+4TN09vFTMiDJxqsE8XppqfkJR8=
+	t=1729035543; cv=none; b=Zt2Fv5WJ6aj/58rUpkkIje5+mIpsVvKfqJJdzGNj/x6qlDCN4CM02iEoVnsaYJylI7CmW445dGD4XMerCpmQerI5vi7GLEkglRX1w4BSK7pxO/KYUQhzuu05iaqQhjkBR3xpi8Xh0PdmR+UTes97RmtuzYThplRajokfXOUxJjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729035323; c=relaxed/simple;
-	bh=qReQMe5MZdLGxAFuPEj0cFwS60ezZmrmsKSK7Jqqeyk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ggFbcrlsKlVACzxPxgpHCXmnrea5DhHqmCtGSAnr6RB/jXpe4LTVxrQGoGcGosey0fQRUIckfW4XwtWYq/3k4P9lBAl2s5K1JtnENCafpoLNcozOnUDppuYj2LvU/gqtRyvUxg9XoEnZ3F9lqjJI7i7qv1wP/Tr9sYAddw5DP84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pacobu+5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67618C4CEC6;
-	Tue, 15 Oct 2024 23:35:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729035322;
-	bh=qReQMe5MZdLGxAFuPEj0cFwS60ezZmrmsKSK7Jqqeyk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pacobu+5r1T0St1oxZi4PgcDs+yDVW1GSUnq9a+AWl8jeBgYJcANJd+r5Fou5Uj2A
-	 q1qku4VCjPFXykMFhMIhTz39V2Jh4m0FdDDu0FSz0M6Wyh6wj/kxlMe3a6n198Xwoy
-	 fG0mrT+sl6eL31UDIJQ5fiKcPeEIfiEL9u8T303iPNN1+rQ14i/1K07BU8EQXUqGK/
-	 u7XTWsJLbh9UmKcqVJ/IGE40tlvdAI3vbi16uXYmL2iu6LYX5v+s0wiMpPB6jEGozQ
-	 dlb78ZeWCpmVTmREjxlHZbQl+Kg5wDLkQxob4PdrhzH+R7svN4ehKERn4Shp1eZSnT
-	 2LiysM+j7pI1A==
-Date: Tue, 15 Oct 2024 16:35:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ales Nezbeda <anezbeda@redhat.com>
-Cc: netdev@vger.kernel.org, sd@queasysnail.net
-Subject: Re: [PATCH net] netdevsim: macsec: pad u64 to correct length in
- logs
-Message-ID: <20241015163521.3765bd68@kernel.org>
-In-Reply-To: <20241015110943.94217-1-anezbeda@redhat.com>
-References: <20241015110943.94217-1-anezbeda@redhat.com>
+	s=arc-20240116; t=1729035543; c=relaxed/simple;
+	bh=cZ5lDKAdRo8zkryOq3f33RCjNa7zFkn6RfUk80viQkI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Hfh74PhVdOmY2neWb1a0s2OYuEseX/HMPabztzLAzPI4XJRpx4nWF+kJHcpBHqU0LnKarKpNvV6RMktWooSes7cCkC1mZrTw1VXWpiS1IriB+XQ8qbWthKsRB1O1E1wHEsIbLJVj2ZEqE9zZKc1SWacxpJL7LPL6od0OEI6anX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UIHPTiBf; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729035543; x=1760571543;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ydixF+4y0pxuCRQ5eqM2xdHC35AOsrmJ5zu6A2zjyLk=;
+  b=UIHPTiBfCt4D1dwekpC2dcQMpCJ+4i46aFeuI1aDSA01qfbQ/5X0QyQI
+   wqrJvrnC4ZO08tZXAsyU9u6EZ2TmkYOshW6EIEegzhd227NFeA+i3rEdy
+   LCc4IGQWYBYsj0hAhxX5WZPbNMxbYnX96XeeCb6xOFAlJkaaiNzV0PTHn
+   w=;
+X-IronPort-AV: E=Sophos;i="6.11,206,1725321600"; 
+   d="scan'208";a="666459263"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 23:38:59 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:38410]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.108:2525] with esmtp (Farcaster)
+ id 1e7d3980-ebac-4593-9251-e0a9acf17c99; Tue, 15 Oct 2024 23:38:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 1e7d3980-ebac-4593-9251-e0a9acf17c99
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 15 Oct 2024 23:38:57 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 15 Oct 2024 23:38:55 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnaaman@drivenets.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4 4/6] Convert neighbour iteration to use hlist+macro
+Date: Tue, 15 Oct 2024 16:38:51 -0700
+Message-ID: <20241015233851.68607-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241015165929.3203216-5-gnaaman@drivenets.com>
+References: <20241015165929.3203216-5-gnaaman@drivenets.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB004.ant.amazon.com (10.13.139.150) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, 15 Oct 2024 13:09:43 +0200 Ales Nezbeda wrote:
-> Currently, we pad u64 number to 8 characters using "%08llx" format
-> specifier.
-> 
-> Changing format specifier to "%016llx" ensures that no matter the value
-> the representation of number in log is always the same length.
-> 
-> Before this patch, entry in log for value '1' would say:
->     removing SecY with SCI 00000001 at index 2
-> After this patch is applied, entry in log will say:
->     removing SecY with SCI 0000000000000001 at index 2
-> 
-> Fixes: 02b34d03a24b ("netdevsim: add dummy macsec offload")
+From: Gilad Naaman <gnaaman@drivenets.com>
+Date: Tue, 15 Oct 2024 16:59:24 +0000
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index 4bdf7649ca57..cca524a55c97 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -391,8 +391,7 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
+>  		struct neighbour *n;
+>  		struct neighbour __rcu **np = &nht->hash_buckets[i];
+>  
+> -		while ((n = rcu_dereference_protected(*np,
+> -					lockdep_is_held(&tbl->lock))) != NULL) {
+> +		neigh_for_each(n, &nht->hash_heads[i]) {
+>  			if (dev && n->dev != dev) {
+>  				np = &n->next;
+>  				continue;
+> @@ -427,6 +426,7 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
+>  					n->nud_state = NUD_NONE;
+>  				neigh_dbg(2, "neigh %p is stray\n", n);
+>  			}
+> +			np = &n->next;
+>  			write_unlock(&n->lock);
+>  			neigh_cleanup_and_release(n);
+>  		}
 
-padding prints in a test harness is not a fix so let's drop the Fixes
-tag and repost against net-next
--- 
-pw-bot: cr
+Is this chunk necessary ?
+
+
+> @@ -976,6 +970,7 @@ static void neigh_periodic_work(struct work_struct *work)
+>  {
+>  	struct neigh_table *tbl = container_of(work, struct neigh_table, gc_work.work);
+>  	struct neighbour *n;
+> +	struct hlist_node *tmp;
+>  	struct neighbour __rcu **np;
+>  	unsigned int i;
+>  	struct neigh_hash_table *nht;
+
+nit: let's sort variables in reverse xmas tree order.
+
+
+
+> @@ -3124,11 +3117,11 @@ void __neigh_for_each_release(struct neigh_table *tbl,
+>  					lockdep_is_held(&tbl->lock));
+>  	for (chain = 0; chain < (1 << nht->hash_shift); chain++) {
+>  		struct neighbour *n;
+> +		struct hlist_node *tmp;
+>  		struct neighbour __rcu **np;
+
+nit: reverse xmas tree order.
+
+
+>  
+>  		np = &nht->hash_buckets[chain];
+> -		while ((n = rcu_dereference_protected(*np,
+> -					lockdep_is_held(&tbl->lock))) != NULL) {
+> +		neigh_for_each_safe(n, tmp, &nht->hash_heads[chain]) {
+>  			int release;
+>  
+>  			write_lock(&n->lock);
+> -- 
+> 2.46.0
 
