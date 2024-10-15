@@ -1,219 +1,350 @@
-Return-Path: <netdev+bounces-135704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57D699EEF7
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:12:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584D899EF77
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 16:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7CE51C20D42
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:12:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16CCF282B00
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5271D514C;
-	Tue, 15 Oct 2024 14:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D587B1B21BE;
+	Tue, 15 Oct 2024 14:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ncg+p762"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UtsRE/4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6B81C4A2E;
-	Tue, 15 Oct 2024 14:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54631B2191
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 14:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729001367; cv=none; b=rnVKUfG2wCOXhwWMUL6+dDYR0KXfNa6ZwGRveVVrRItjXDlBfsLir2fGqRr5alZSIDn+WxB2y5uxaeUl7EV3N7OlsI85sVvtBjGGX4rCdGlDgDiZ88JUKZVQOMbyi+EOgTv91C0ZZGVlroMrh66PIpwQmF45WwXfkIQcRIWKPo8=
+	t=1729002256; cv=none; b=V/n3QAZOXDLuJrzvtDBQHITIdvYN7s8EqmnqVWawMlZOVVm4Li2PbNB5gzOcMBX0rzIjTj+TcpBEqzMCCQVO15zgPtwxOyuGXTtfE4885jL0NMNGDPMqMMVZHOEu5RKeiERs/OKsMiCGKRu8n1ZwdKggu4lAAOGn7MuEOx6mw1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729001367; c=relaxed/simple;
-	bh=J47DiM7it9UqLoIOTYLS3JMdWYRznJt9vbjuYFkxJkY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kPmkXvCr2Gtk4UMm6fOgiDkqMpsJe/F9toK5Q+9FmIRpHfuxj3urg7fmk+CHtCxgoJypBFJBA8L4Lm7+XJAB/+e3AwWAQke8qOcpZtLYh2ZAnkunuZIulFEKM2QaLNZrmxZ+s9r5kSdf6f/+rohprLBLuN/99uaNUqYP7kzQslc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ncg+p762; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-20c805a0753so44526025ad.0;
-        Tue, 15 Oct 2024 07:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729001366; x=1729606166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xu2WL8L9YsDBkU34XcEw9nzL+sIi7gQQkUV02cDwen8=;
-        b=ncg+p762iO+ME0Omj2KSQiDgTQ2alR8jywHug2sqGtokmR+iR0o9OJqCjUXwINoBu4
-         3pleluKzXNIbRbhzz57Hp1fcz7gOfNgyd13FwhpLMQWMTfvN0KlYJeprrOwwGT8S9cHE
-         uo2Bl0x95WnfVir8P08TsxZ9hHr5WiJ5j2UhEcot+Wvuyb/nm0QVCkujVUlXSBLW8qYF
-         U5gEHPgl1KFRp3uQtFg0f7mlkrHARyfWjeUOj0S7PwIdn0Ht5x5bs7WJibXAjuDFAKpd
-         WqKAOiUVk3b9IZ8wXK+Vm2giN7V+W8mpV3PWp0U+XQMCfZwEfE+7oR42QDHKN7Fxt5aK
-         ulhg==
+	s=arc-20240116; t=1729002256; c=relaxed/simple;
+	bh=oATTuToY1x3h9znQPx851OCX9zyzrrY9t7chtcMOBHk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ovKlJKfdBJyT77zgTAdS6f/51GPd9iPG1lg5kyEwpYZHIUzi0Cvh60KwiaITFh5g5GiiXgIpu+wp/ZivavlvJ83Q4a+tRfNcbrxrOilQ/m+lqYbgI6hNgcAy4+WrHGcTJpy6MfKLp/uEk/QKM9FqAmxZ4+DpiZ4E82bpyVhxgLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UtsRE/4Q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729002253;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nUJ5+CiRrnpWtm4sKZq+yWA3zpfyYa1SXfkj0///Dbc=;
+	b=UtsRE/4QSsa5xKRZ0RCPExJgY92p4pfNboYIHXZ732SUAacaoM+xZmqVgFXmLl35qbAVMm
+	ZHs17KNf4EDVrx4jH9Owt8zLuVLq8jFZHZax7h7LMWpW44zYRZ3+s9BJ8R6kwE2qly0KCm
+	APiVM0C4ow3imKzSHSBSxoYRPaNX/Go=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-M1e2UUeKO3m7iGlNlqS8LA-1; Tue, 15 Oct 2024 10:24:10 -0400
+X-MC-Unique: M1e2UUeKO3m7iGlNlqS8LA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-431177f2bb3so27471515e9.1
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 07:24:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729001366; x=1729606166;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xu2WL8L9YsDBkU34XcEw9nzL+sIi7gQQkUV02cDwen8=;
-        b=vgL2YClR6jLAVa1Ry/Sa+Tf47OkKSSkXGMxZ/CHwxLj1Hd2tLvwWAoibnq5HDdWXqu
-         A6sXF8LNgBpBRp37mmPr2lnZybL9YHJAwH4UGjeTPEs38cwBI1uZ8d98Nl+3+71NLBEQ
-         pUSeFG45pEANgsVwci1MJZZpMLuFyxNqVemCuMYoUAwR6AEja60MBBQd2ZhsVpcDajDD
-         jeroDfgwkcSFLK0ifbPvxjHTHa5lS1KEibc3ECOAfqNP4o3QSQ56mCptLDxae25K+r54
-         qAHvhPiqQ8qhGE1k1IhVVwcrAp05bhMsuQHWtjVttJYKgX1QylfQYGMQhEfipEohT2Uo
-         7unA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAv6LzlfdwMdBiy51IPdoXP1EqqtR409WabNRl9e9fjQFLplGCmc5hvoJKocHBZsN/bqD/Xsol@vger.kernel.org, AJvYcCUKQklcpf8pt8tww0HHjMu4tpmYMe88QuESN7NpwlRDw/B8zfQJT1IJeew4fn0oFJoAMB5XyxF5a6cuuZtqUFTB@vger.kernel.org, AJvYcCUUw3cpcRYkRKDOAMf1XGfAsfEz1WkwumYUaVJCEGhhWaaVxPud7XwqNo1mVoKGn5ta8GFAgFt0n9B5p1Vv@vger.kernel.org, AJvYcCWZAHHks3xlmqKNf54n9kidqoxs4bgraoZ3kI7F4gSW8gfEtjDeiyF9GPsNae+9l0/3DwY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSuNUzqZVeYaXLxMRXGCkwdsSWYqQbg5FDKDENlyjMdII+1h7o
-	6Y/F4XjxP3gy52pRWLRwRsxlrQDPcIYSC+9k/bZ+3m8sJSaoclJZ
-X-Google-Smtp-Source: AGHT+IEEdhkY93DkVnsHYKcg3Nn1LJ22CyQpWTu6lhDCBND8N0iZZ4Hbvrszipi9s+zu9OsPn3PgDw==
-X-Received: by 2002:a17:903:230b:b0:20c:e262:2580 with SMTP id d9443c01a7336-20d27f0d040mr5161505ad.44.1729001365587;
-        Tue, 15 Oct 2024 07:09:25 -0700 (PDT)
-Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d17f9d419sm12437625ad.93.2024.10.15.07.09.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 07:09:25 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: pabeni@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	dsahern@kernel.org,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	roopa@nvidia.com,
-	razor@blackwall.org,
-	gnault@redhat.com,
-	bigeasy@linutronix.de,
-	idosch@nvidia.com,
-	ast@kernel.org,
-	dongml2@chinatelecom.cn,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux.dev,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next v3 10/10] net: ip: make ip_route_use_hint() return drop reasons
-Date: Tue, 15 Oct 2024 22:08:00 +0800
-Message-Id: <20241015140800.159466-11-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241015140800.159466-1-dongml2@chinatelecom.cn>
-References: <20241015140800.159466-1-dongml2@chinatelecom.cn>
+        d=1e100.net; s=20230601; t=1729002249; x=1729607049;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nUJ5+CiRrnpWtm4sKZq+yWA3zpfyYa1SXfkj0///Dbc=;
+        b=oZ2HzOJxe9S8YMTWMP4yO93pS3rGcReoNCCKf5fl++5cMIJZ2mKYGyPRQ0fgj1s0jy
+         LxTBueEYRxAGJYDkCP4KWMCIKXmDV525kQVpZYLDTGbFuFM4jFJZq8WOU9sQPuiaqzCK
+         RmK/qajBG/o0W7A0Fg60niLdbcOm3NFALi2x/S3FsHU4/2tWQvzNc6U+Y8ge6xGN1NiE
+         svmbcwieRTq2AMr08zIphQGplB3Hrs+M9N0Y3jXb+HiZy9qE0AbkUYQAIq8JEV99RlXT
+         25zxUn9MIwY3rXW100poJlWEjHaR7cQGt2l6Jksf0ym14nPRwIe04kEmhv5F+/7//l3X
+         YUew==
+X-Gm-Message-State: AOJu0YyG1y1I0tH0wJ1F4g21x6LypojOlSEq3Q1OL7BG3NGyPQYOUI+a
+	a/3FG19j3ETHAqJ197YEITo66VLTTu5iCs+HbEov+DCL0hZie2fyVIgVHS9sxirZnN1MqMedt5s
+	rO6y2FAOn/byqGdU/7YYkz1krJyYIsMZ8tzpCnmZ/gMdrp6x1VX6n8w==
+X-Received: by 2002:adf:fcd1:0:b0:37d:51a2:accd with SMTP id ffacd0b85a97d-37d5fd4603bmr8648766f8f.0.1729002248851;
+        Tue, 15 Oct 2024 07:24:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF4EEQaQ3xbpfloGtENYpctq+DBQXMCCt84rnsOIZpOXOfe9CHjTUEgevqIN7obrCLmcRZqGA==
+X-Received: by 2002:adf:fcd1:0:b0:37d:51a2:accd with SMTP id ffacd0b85a97d-37d5fd4603bmr8648738f8f.0.1729002248299;
+        Tue, 15 Oct 2024 07:24:08 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f6c63c2sm19413035e9.47.2024.10.15.07.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 07:24:07 -0700 (PDT)
+Message-ID: <9f49bc32-a694-4d5a-8451-27708baefbe9@redhat.com>
+Date: Tue, 15 Oct 2024 16:24:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] mptcp: pm: fix UaF read in
+ mptcp_pm_nl_rm_addr_or_subflow
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, syzbot+3c8b7a8e7df6a2a226ca@syzkaller.appspotmail.com
+References: <20241015-net-mptcp-uaf-pm-rm-v1-1-c4ee5d987a64@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241015-net-mptcp-uaf-pm-rm-v1-1-c4ee5d987a64@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In this commit, we make ip_route_use_hint() return drop reasons. The
-drop reasons that we return are similar to what we do in
-ip_route_input_slow(), and no drop reasons are added in this commit.
+On 10/15/24 10:38, Matthieu Baerts (NGI0) wrote:
+> Syzkaller reported this splat:
+> 
+>    ==================================================================
+>    BUG: KASAN: slab-use-after-free in mptcp_pm_nl_rm_addr_or_subflow+0xb44/0xcc0 net/mptcp/pm_netlink.c:881
+>    Read of size 4 at addr ffff8880569ac858 by task syz.1.2799/14662
+> 
+>    CPU: 0 UID: 0 PID: 14662 Comm: syz.1.2799 Not tainted 6.12.0-rc2-syzkaller-00307-g36c254515dc6 #0
+>    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+>    Call Trace:
+>     <TASK>
+>     __dump_stack lib/dump_stack.c:94 [inline]
+>     dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+>     print_address_description mm/kasan/report.c:377 [inline]
+>     print_report+0xc3/0x620 mm/kasan/report.c:488
+>     kasan_report+0xd9/0x110 mm/kasan/report.c:601
+>     mptcp_pm_nl_rm_addr_or_subflow+0xb44/0xcc0 net/mptcp/pm_netlink.c:881
+>     mptcp_pm_nl_rm_subflow_received net/mptcp/pm_netlink.c:914 [inline]
+>     mptcp_nl_remove_id_zero_address+0x305/0x4a0 net/mptcp/pm_netlink.c:1572
+>     mptcp_pm_nl_del_addr_doit+0x5c9/0x770 net/mptcp/pm_netlink.c:1603
+>     genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
+>     genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+>     genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
+>     netlink_rcv_skb+0x165/0x410 net/netlink/af_netlink.c:2551
+>     genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+>     netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+>     netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1357
+>     netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
+>     sock_sendmsg_nosec net/socket.c:729 [inline]
+>     __sock_sendmsg net/socket.c:744 [inline]
+>     ____sys_sendmsg+0x9ae/0xb40 net/socket.c:2607
+>     ___sys_sendmsg+0x135/0x1e0 net/socket.c:2661
+>     __sys_sendmsg+0x117/0x1f0 net/socket.c:2690
+>     do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+>     __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
+>     do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
+>     entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+>    RIP: 0023:0xf7fe4579
+>    Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+>    RSP: 002b:00000000f574556c EFLAGS: 00000296 ORIG_RAX: 0000000000000172
+>    RAX: ffffffffffffffda RBX: 000000000000000b RCX: 0000000020000140
+>    RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+>    RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+>    R10: 0000000000000000 R11: 0000000000000296 R12: 0000000000000000
+>    R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+>     </TASK>
+> 
+>    Allocated by task 5387:
+>     kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+>     kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+>     poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+>     __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
+>     kmalloc_noprof include/linux/slab.h:878 [inline]
+>     kzalloc_noprof include/linux/slab.h:1014 [inline]
+>     subflow_create_ctx+0x87/0x2a0 net/mptcp/subflow.c:1803
+>     subflow_ulp_init+0xc3/0x4d0 net/mptcp/subflow.c:1956
+>     __tcp_set_ulp net/ipv4/tcp_ulp.c:146 [inline]
+>     tcp_set_ulp+0x326/0x7f0 net/ipv4/tcp_ulp.c:167
+>     mptcp_subflow_create_socket+0x4ae/0x10a0 net/mptcp/subflow.c:1764
+>     __mptcp_subflow_connect+0x3cc/0x1490 net/mptcp/subflow.c:1592
+>     mptcp_pm_create_subflow_or_signal_addr+0xbda/0x23a0 net/mptcp/pm_netlink.c:642
+>     mptcp_pm_nl_fully_established net/mptcp/pm_netlink.c:650 [inline]
+>     mptcp_pm_nl_work+0x3a1/0x4f0 net/mptcp/pm_netlink.c:943
+>     mptcp_worker+0x15a/0x1240 net/mptcp/protocol.c:2777
+>     process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
+>     process_scheduled_works kernel/workqueue.c:3310 [inline]
+>     worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+>     kthread+0x2c1/0x3a0 kernel/kthread.c:389
+>     ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>     ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+>    Freed by task 113:
+>     kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+>     kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+>     kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+>     poison_slab_object mm/kasan/common.c:247 [inline]
+>     __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
+>     kasan_slab_free include/linux/kasan.h:230 [inline]
+>     slab_free_hook mm/slub.c:2342 [inline]
+>     slab_free mm/slub.c:4579 [inline]
+>     kfree+0x14f/0x4b0 mm/slub.c:4727
+>     kvfree+0x47/0x50 mm/util.c:701
+>     kvfree_rcu_list+0xf5/0x2c0 kernel/rcu/tree.c:3423
+>     kvfree_rcu_drain_ready kernel/rcu/tree.c:3563 [inline]
+>     kfree_rcu_monitor+0x503/0x8b0 kernel/rcu/tree.c:3632
+>     kfree_rcu_shrink_scan+0x245/0x3a0 kernel/rcu/tree.c:3966
+>     do_shrink_slab+0x44f/0x11c0 mm/shrinker.c:435
+>     shrink_slab+0x32b/0x12a0 mm/shrinker.c:662
+>     shrink_one+0x47e/0x7b0 mm/vmscan.c:4818
+>     shrink_many mm/vmscan.c:4879 [inline]
+>     lru_gen_shrink_node mm/vmscan.c:4957 [inline]
+>     shrink_node+0x2452/0x39d0 mm/vmscan.c:5937
+>     kswapd_shrink_node mm/vmscan.c:6765 [inline]
+>     balance_pgdat+0xc19/0x18f0 mm/vmscan.c:6957
+>     kswapd+0x5ea/0xbf0 mm/vmscan.c:7226
+>     kthread+0x2c1/0x3a0 kernel/kthread.c:389
+>     ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>     ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+>    Last potentially related work creation:
+>     kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+>     __kasan_record_aux_stack+0xba/0xd0 mm/kasan/generic.c:541
+>     kvfree_call_rcu+0x74/0xbe0 kernel/rcu/tree.c:3810
+>     subflow_ulp_release+0x2ae/0x350 net/mptcp/subflow.c:2009
+>     tcp_cleanup_ulp+0x7c/0x130 net/ipv4/tcp_ulp.c:124
+>     tcp_v4_destroy_sock+0x1c5/0x6a0 net/ipv4/tcp_ipv4.c:2541
+>     inet_csk_destroy_sock+0x1a3/0x440 net/ipv4/inet_connection_sock.c:1293
+>     tcp_done+0x252/0x350 net/ipv4/tcp.c:4870
+>     tcp_rcv_state_process+0x379b/0x4f30 net/ipv4/tcp_input.c:6933
+>     tcp_v4_do_rcv+0x1ad/0xa90 net/ipv4/tcp_ipv4.c:1938
+>     sk_backlog_rcv include/net/sock.h:1115 [inline]
+>     __release_sock+0x31b/0x400 net/core/sock.c:3072
+>     __tcp_close+0x4f3/0xff0 net/ipv4/tcp.c:3142
+>     __mptcp_close_ssk+0x331/0x14d0 net/mptcp/protocol.c:2489
+>     mptcp_close_ssk net/mptcp/protocol.c:2543 [inline]
+>     mptcp_close_ssk+0x150/0x220 net/mptcp/protocol.c:2526
+>     mptcp_pm_nl_rm_addr_or_subflow+0x2be/0xcc0 net/mptcp/pm_netlink.c:878
+>     mptcp_pm_nl_rm_subflow_received net/mptcp/pm_netlink.c:914 [inline]
+>     mptcp_nl_remove_id_zero_address+0x305/0x4a0 net/mptcp/pm_netlink.c:1572
+>     mptcp_pm_nl_del_addr_doit+0x5c9/0x770 net/mptcp/pm_netlink.c:1603
+>     genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
+>     genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+>     genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
+>     netlink_rcv_skb+0x165/0x410 net/netlink/af_netlink.c:2551
+>     genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+>     netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+>     netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1357
+>     netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
+>     sock_sendmsg_nosec net/socket.c:729 [inline]
+>     __sock_sendmsg net/socket.c:744 [inline]
+>     ____sys_sendmsg+0x9ae/0xb40 net/socket.c:2607
+>     ___sys_sendmsg+0x135/0x1e0 net/socket.c:2661
+>     __sys_sendmsg+0x117/0x1f0 net/socket.c:2690
+>     do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+>     __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
+>     do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
+>     entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+> 
+>    The buggy address belongs to the object at ffff8880569ac800
+>     which belongs to the cache kmalloc-512 of size 512
+>    The buggy address is located 88 bytes inside of
+>     freed 512-byte region [ffff8880569ac800, ffff8880569aca00)
+> 
+>    The buggy address belongs to the physical page:
+>    page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x569ac
+>    head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+>    flags: 0x4fff00000000040(head|node=1|zone=1|lastcpupid=0x7ff)
+>    page_type: f5(slab)
+>    raw: 04fff00000000040 ffff88801ac42c80 dead000000000100 dead000000000122
+>    raw: 0000000000000000 0000000080100010 00000001f5000000 0000000000000000
+>    head: 04fff00000000040 ffff88801ac42c80 dead000000000100 dead000000000122
+>    head: 0000000000000000 0000000080100010 00000001f5000000 0000000000000000
+>    head: 04fff00000000002 ffffea00015a6b01 ffffffffffffffff 0000000000000000
+>    head: 0000000000000004 0000000000000000 00000000ffffffff 0000000000000000
+>    page dumped because: kasan: bad access detected
+>    page_owner tracks the page as allocated
+>    page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 10238, tgid 10238 (kworker/u32:6), ts 597403252405, free_ts 597177952947
+>     set_page_owner include/linux/page_owner.h:32 [inline]
+>     post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1537
+>     prep_new_page mm/page_alloc.c:1545 [inline]
+>     get_page_from_freelist+0x101e/0x3070 mm/page_alloc.c:3457
+>     __alloc_pages_noprof+0x223/0x25a0 mm/page_alloc.c:4733
+>     alloc_pages_mpol_noprof+0x2c9/0x610 mm/mempolicy.c:2265
+>     alloc_slab_page mm/slub.c:2412 [inline]
+>     allocate_slab mm/slub.c:2578 [inline]
+>     new_slab+0x2ba/0x3f0 mm/slub.c:2631
+>     ___slab_alloc+0xd1d/0x16f0 mm/slub.c:3818
+>     __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3908
+>     __slab_alloc_node mm/slub.c:3961 [inline]
+>     slab_alloc_node mm/slub.c:4122 [inline]
+>     __kmalloc_cache_noprof+0x2c5/0x310 mm/slub.c:4290
+>     kmalloc_noprof include/linux/slab.h:878 [inline]
+>     kzalloc_noprof include/linux/slab.h:1014 [inline]
+>     mld_add_delrec net/ipv6/mcast.c:743 [inline]
+>     igmp6_leave_group net/ipv6/mcast.c:2625 [inline]
+>     igmp6_group_dropped+0x4ab/0xe40 net/ipv6/mcast.c:723
+>     __ipv6_dev_mc_dec+0x281/0x360 net/ipv6/mcast.c:979
+>     addrconf_leave_solict net/ipv6/addrconf.c:2253 [inline]
+>     __ipv6_ifa_notify+0x3f6/0xc30 net/ipv6/addrconf.c:6283
+>     addrconf_ifdown.isra.0+0xef9/0x1a20 net/ipv6/addrconf.c:3982
+>     addrconf_notify+0x220/0x19c0 net/ipv6/addrconf.c:3781
+>     notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
+>     call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1996
+>     call_netdevice_notifiers_extack net/core/dev.c:2034 [inline]
+>     call_netdevice_notifiers net/core/dev.c:2048 [inline]
+>     dev_close_many+0x333/0x6a0 net/core/dev.c:1589
+>    page last free pid 13136 tgid 13136 stack trace:
+>     reset_page_owner include/linux/page_owner.h:25 [inline]
+>     free_pages_prepare mm/page_alloc.c:1108 [inline]
+>     free_unref_page+0x5f4/0xdc0 mm/page_alloc.c:2638
+>     stack_depot_save_flags+0x2da/0x900 lib/stackdepot.c:666
+>     kasan_save_stack+0x42/0x60 mm/kasan/common.c:48
+>     kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+>     unpoison_slab_object mm/kasan/common.c:319 [inline]
+>     __kasan_slab_alloc+0x89/0x90 mm/kasan/common.c:345
+>     kasan_slab_alloc include/linux/kasan.h:247 [inline]
+>     slab_post_alloc_hook mm/slub.c:4085 [inline]
+>     slab_alloc_node mm/slub.c:4134 [inline]
+>     kmem_cache_alloc_noprof+0x121/0x2f0 mm/slub.c:4141
+>     skb_clone+0x190/0x3f0 net/core/skbuff.c:2084
+>     do_one_broadcast net/netlink/af_netlink.c:1462 [inline]
+>     netlink_broadcast_filtered+0xb11/0xef0 net/netlink/af_netlink.c:1540
+>     netlink_broadcast+0x39/0x50 net/netlink/af_netlink.c:1564
+>     uevent_net_broadcast_untagged lib/kobject_uevent.c:331 [inline]
+>     kobject_uevent_net_broadcast lib/kobject_uevent.c:410 [inline]
+>     kobject_uevent_env+0xacd/0x1670 lib/kobject_uevent.c:608
+>     device_del+0x623/0x9f0 drivers/base/core.c:3882
+>     snd_card_disconnect.part.0+0x58a/0x7c0 sound/core/init.c:546
+>     snd_card_disconnect+0x1f/0x30 sound/core/init.c:495
+>     snd_usx2y_disconnect+0xe9/0x1f0 sound/usb/usx2y/usbusx2y.c:417
+>     usb_unbind_interface+0x1e8/0x970 drivers/usb/core/driver.c:461
+>     device_remove drivers/base/dd.c:569 [inline]
+>     device_remove+0x122/0x170 drivers/base/dd.c:561
+> 
+> That's because 'subflow' is used just after 'mptcp_close_ssk(subflow)',
+> which will initiate the release of its memory. Even if it is very likely
+> the release and the re-utilisation will be done later on, it is of
+> course better to avoid any issues and read the content of 'subflow'
+> before closing it.
+> 
+> Fixes: 1c1f72137598 ("mptcp: pm: only decrement add_addr_accepted for MPJ req")
+> Cc: stable@vger.kernel.org
+> Reported-by: syzbot+3c8b7a8e7df6a2a226ca@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/670d7337.050a0220.4cbc0.004f.GAE@google.com
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+>   net/mptcp/pm_netlink.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+> index f6f0a38a0750f82bc909f02a75beec980d951f1f..4dd61284afc5f7f70708827056fb4530c8879502 100644
+> --- a/net/mptcp/pm_netlink.c
+> +++ b/net/mptcp/pm_netlink.c
+> @@ -873,12 +873,12 @@ static void mptcp_pm_nl_rm_addr_or_subflow(struct mptcp_sock *msk,
+>   				 i, rm_id, id, remote_id, msk->mpc_endpoint_id);
+>   			spin_unlock_bh(&msk->pm.lock);
+>   			mptcp_subflow_shutdown(sk, ssk, how);
+> +			removed |= subflow->request_join;
+>   
+>   			/* the following takes care of updating the subflows counter */
+>   			mptcp_close_ssk(sk, ssk, subflow);
+>   			spin_lock_bh(&msk->pm.lock);
+>   
+> -			removed |= subflow->request_join;
+>   			if (rm_type == MPTCP_MIB_RMSUBFLOW)
+>   				__MPTCP_INC_STATS(sock_net(sk), rm_type);
+>   		}
+> 
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- include/net/route.h |  7 ++++---
- net/ipv4/ip_input.c |  9 ++++-----
- net/ipv4/route.c    | 26 ++++++++++++++++----------
- 3 files changed, 24 insertions(+), 18 deletions(-)
-
-diff --git a/include/net/route.h b/include/net/route.h
-index f4ab5412c9c9..4debc335d276 100644
---- a/include/net/route.h
-+++ b/include/net/route.h
-@@ -206,9 +206,10 @@ ip_mc_validate_source(struct sk_buff *skb, __be32 daddr, __be32 saddr,
- enum skb_drop_reason
- ip_route_input_noref(struct sk_buff *skb, __be32 daddr, __be32 saddr,
- 		     dscp_t dscp, struct net_device *dev);
--int ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
--		      dscp_t dscp, struct net_device *dev,
--		      const struct sk_buff *hint);
-+enum skb_drop_reason
-+ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
-+		  dscp_t dscp, struct net_device *dev,
-+		  const struct sk_buff *hint);
- 
- static inline enum skb_drop_reason
- ip_route_input(struct sk_buff *skb, __be32 dst, __be32 src, dscp_t dscp,
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index 513eb0c6435a..f0a4dda246ab 100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -322,15 +322,14 @@ static int ip_rcv_finish_core(struct net *net, struct sock *sk,
- 	int err, drop_reason;
- 	struct rtable *rt;
- 
--	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
--
- 	if (ip_can_use_hint(skb, iph, hint)) {
--		err = ip_route_use_hint(skb, iph->daddr, iph->saddr,
--					ip4h_dscp(iph), dev, hint);
--		if (unlikely(err))
-+		drop_reason = ip_route_use_hint(skb, iph->daddr, iph->saddr,
-+						ip4h_dscp(iph), dev, hint);
-+		if (unlikely(drop_reason))
- 			goto drop_error;
- 	}
- 
-+	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	if (READ_ONCE(net->ipv4.sysctl_ip_early_demux) &&
- 	    !skb_dst(skb) &&
- 	    !skb->sk &&
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index cb6beb270265..fe57f6abf53e 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -2142,28 +2142,34 @@ ip_mkroute_input(struct sk_buff *skb, struct fib_result *res,
-  * assuming daddr is valid and the destination is not a local broadcast one.
-  * Uses the provided hint instead of performing a route lookup.
-  */
--int ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
--		      dscp_t dscp, struct net_device *dev,
--		      const struct sk_buff *hint)
-+enum skb_drop_reason
-+ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
-+		  dscp_t dscp, struct net_device *dev,
-+		  const struct sk_buff *hint)
- {
-+	enum skb_drop_reason reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	struct in_device *in_dev = __in_dev_get_rcu(dev);
- 	struct rtable *rt = skb_rtable(hint);
- 	struct net *net = dev_net(dev);
--	enum skb_drop_reason reason;
--	int err = -EINVAL;
- 	u32 tag = 0;
- 
- 	if (!in_dev)
--		return -EINVAL;
-+		return reason;
- 
--	if (ipv4_is_multicast(saddr) || ipv4_is_lbcast(saddr))
-+	if (ipv4_is_multicast(saddr) || ipv4_is_lbcast(saddr)) {
-+		reason = SKB_DROP_REASON_IP_INVALID_SOURCE;
- 		goto martian_source;
-+	}
- 
--	if (ipv4_is_zeronet(saddr))
-+	if (ipv4_is_zeronet(saddr)) {
-+		reason = SKB_DROP_REASON_IP_INVALID_SOURCE;
- 		goto martian_source;
-+	}
- 
--	if (ipv4_is_loopback(saddr) && !IN_DEV_NET_ROUTE_LOCALNET(in_dev, net))
-+	if (ipv4_is_loopback(saddr) && !IN_DEV_NET_ROUTE_LOCALNET(in_dev, net)) {
-+		reason = SKB_DROP_REASON_IP_LOCALNET;
- 		goto martian_source;
-+	}
- 
- 	if (rt->rt_type != RTN_LOCAL)
- 		goto skip_validate_source;
-@@ -2179,7 +2185,7 @@ int ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
- 
- martian_source:
- 	ip_handle_martian_source(dev, in_dev, skb, daddr, saddr);
--	return err;
-+	return reason;
- }
- 
- /* get device for dst_alloc with local routes */
--- 
-2.39.5
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
