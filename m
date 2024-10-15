@@ -1,255 +1,116 @@
-Return-Path: <netdev+bounces-135533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA75999E3D3
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED2C99E3D8
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:28:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99DE228175A
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:27:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92C91281F7E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 10:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30711E379E;
-	Tue, 15 Oct 2024 10:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="B0/fQViY";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XNFspYli"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A521E5021;
+	Tue, 15 Oct 2024 10:28:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DB71E378C;
-	Tue, 15 Oct 2024 10:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3A21D5AC9
+	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 10:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728988027; cv=none; b=ldc2MapLsdCwSAtzWS0AvR4QWvO4WQ2W2/2PB9gmIUyQlTutnKD29fAP+zUbc47NVBYw0BarEXSW3JVxNsqsuNgbHeNUVSWaUTbEPbpD+opVMmSKtLmnE7svlyg2i5tWv0jpVoD8L/v8XjWhza3QMtI5va0fYwJ2MsqnswX+1bU=
+	t=1728988114; cv=none; b=rqY5KZwurRiGMiisTD48k+2o+C/w4fpzeyVEbK4BXxSzQ7wOcco4V3sUn1+YVc5aQZyLnpwK0zDjGcoC89hWiHRIYdLxXuoLarZB5jSsTbEezZvh0VpBOxgGcgiubIRxDPBdlECOrmLr8KiyRkydaQfKWINkC3BxE4DneCKik4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728988027; c=relaxed/simple;
-	bh=QeoXDzoV9yjOqKK+9QC14lCPArOF1lBbk+V/VmEEVSk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fU88wrjJr3DBBtz3ZfPudoT9AOq8zpTzCkGr6V+GLnzAY95G7P8waXuyt0LIbbJ3jqiB87Uw7laHMVzR3YnzdBKsahTO0aNfN5NjuIFDbzzMw9adrV2gYjxsuqZ00b2PGZlbWTStwCFfkFXsPhsbGOX+ZVJ+KAxO5gMS/jRfhxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=B0/fQViY; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XNFspYli; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1728988023;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZpIqGV3FZABzIvwPIJ5wx08SyD5BMrHZo4Js9GlnC54=;
-	b=B0/fQViYnGcwZkjQZs8vbCUqHVQOoQNorEgLOrCnMT3vYDGaR0Nn95bIYWFC1xtOzg+Rng
-	wDIl46GY1RVTe6eAaTUVq5qsL9oB7kbUd2a2OgyGBonb2Ay6GaszVee+P+V176vZPYwmmS
-	5ei7r6hiqvGM786Yp6uT3UF23VdR7s7uKctL0pMvp59t0O/MLl+2ltrBYl4OqFN+BgqEgq
-	rO87KpZjg1HGHYOdJSL2WBgpk8+7gN1gXs8kOKTBC/uMvfcOClbZDNkYSgis6xWOjw3zyh
-	xYWIcfCAU4QAonSwpCdUA9Faa3Sz3B/7DA8HxkkZwtuUpLFfjRexk+LBQqw07g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1728988023;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZpIqGV3FZABzIvwPIJ5wx08SyD5BMrHZo4Js9GlnC54=;
-	b=XNFspYlioZsgZddnrxGs0PI4T2EM6GhW1kvaym/ivzoAGUyjWZm91IPy6KSuszl8vAPU0I
-	ciNVLtnKOz/v3TBQ==
-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
-Cc: vinicius.gomes@intel.com, Joe Damato <jdamato@fastly.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
- <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, "moderated
- list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
- <linux-kernel@vger.kernel.org>, "open list:XDP (eXpress Data Path)"
- <bpf@vger.kernel.org>
-Subject: Re: [RFC net-next v2 2/2] igc: Link queues to NAPI instances
-In-Reply-To: <20241014213012.187976-3-jdamato@fastly.com>
-References: <20241014213012.187976-1-jdamato@fastly.com>
- <20241014213012.187976-3-jdamato@fastly.com>
-Date: Tue, 15 Oct 2024 12:27:01 +0200
-Message-ID: <87h69d3bm2.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1728988114; c=relaxed/simple;
+	bh=Z8qUG1gqu6HdLvuKmiAROp/AIfr1K8BzIJ2KjubJkxM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=mH5P2+dGM8OwesnaJnhnJ+wMK15Y65F4Reru7LCATFdWtF1ASBL+qM798tZrL31qzZFaGt8KxlALSyCtx51EA8vO1Ehxi+FYzf6tVCDa5jqvixnHD9RDjHyPu6H2hXBPzwGZx0NE3DHCVs1Hqwob0VJhPYETsm5j/g10+W8uc0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-56JXC-70OwqQEvoZOjuufQ-1; Tue,
+ 15 Oct 2024 06:28:28 -0400
+X-MC-Unique: 56JXC-70OwqQEvoZOjuufQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C9D1195609E;
+	Tue, 15 Oct 2024 10:28:25 +0000 (UTC)
+Received: from hog (unknown [10.39.192.7])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1818B19560A2;
+	Tue, 15 Oct 2024 10:28:20 +0000 (UTC)
+Date: Tue, 15 Oct 2024 12:28:18 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Patrisious Haddad <phaddad@nvidia.com>, Chris Mi <cmi@nvidia.com>
+Subject: Re: [PATCH net] macsec: Fix use-after-free while sending the
+ offloading packet
+Message-ID: <Zw5DwvIlxyL5n_T1@hog>
+References: <20241014090720.189898-1-tariqt@nvidia.com>
+ <Zw4uRHzqS05UBMCg@hog>
+ <89ccd2ac-5cb8-46e1-86c0-efc741ff18c9@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-
---=-=-=
-Content-Type: text/plain
+In-Reply-To: <89ccd2ac-5cb8-46e1-86c0-efc741ff18c9@nvidia.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon Oct 14 2024, Joe Damato wrote:
-> Link queues to NAPI instances via netdev-genl API so that users can
-> query this information with netlink. Handle a few cases in the driver:
->   1. Link/unlink the NAPIs when XDP is enabled/disabled
->   2. Handle IGC_FLAG_QUEUE_PAIRS enabled and disabled
->
-> Example output when IGC_FLAG_QUEUE_PAIRS is enabled:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
->
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
->
-> Since IGC_FLAG_QUEUE_PAIRS is enabled, you'll note that the same NAPI ID
-> is present for both rx and tx queues at the same index, for example
-> index 0:
->
-> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
-> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->
-> To test IGC_FLAG_QUEUE_PAIRS disabled, a test system was booted using
-> the grub command line option "maxcpus=3D2" to force
-> igc_set_interrupt_capability to disable IGC_FLAG_QUEUE_PAIRS.
->
-> Example output when IGC_FLAG_QUEUE_PAIRS is disabled:
->
-> $ lscpu | grep "On-line CPU"
-> On-line CPU(s) list:      0,2
->
-> $ ethtool -l enp86s0  | tail -5
-> Current hardware settings:
-> RX:		n/a
-> TX:		n/a
-> Other:		1
-> Combined:	2
->
-> $ cat /proc/interrupts  | grep enp
->  144: [...] enp86s0
->  145: [...] enp86s0-rx-0
->  146: [...] enp86s0-rx-1
->  147: [...] enp86s0-tx-0
->  148: [...] enp86s0-tx-1
->
-> 1 "other" IRQ, and 2 IRQs for each of RX and Tx, so we expect netlink to
-> report 4 IRQs with unique NAPI IDs:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump napi-get --json=3D'{"ifindex": 2}'
-> [{'id': 8196, 'ifindex': 2, 'irq': 148},
->  {'id': 8195, 'ifindex': 2, 'irq': 147},
->  {'id': 8194, 'ifindex': 2, 'irq': 146},
->  {'id': 8193, 'ifindex': 2, 'irq': 145}]
->
-> Now we examine which queues these NAPIs are associated with, expecting
-> that since IGC_FLAG_QUEUE_PAIRS is disabled each RX and TX queue will
-> have its own NAPI instance:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
->
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  v2:
->    - Update commit message to include tests for IGC_FLAG_QUEUE_PAIRS
->      disabled
->    - Refactored code to move napi queue mapping and unmapping to helper
->      functions igc_set_queue_napi and igc_unset_queue_napi
->    - Adjust the code to handle IGC_FLAG_QUEUE_PAIRS disabled
->    - Call helpers to map/unmap queues to NAPIs in igc_up, __igc_open,
->      igc_xdp_enable_pool, and igc_xdp_disable_pool
->
->  drivers/net/ethernet/intel/igc/igc.h      |  3 ++
->  drivers/net/ethernet/intel/igc/igc_main.c | 58 +++++++++++++++++++++--
->  drivers/net/ethernet/intel/igc/igc_xdp.c  |  2 +
->  3 files changed, 59 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/=
-intel/igc/igc.h
-> index eac0f966e0e4..7b1c9ea60056 100644
-> --- a/drivers/net/ethernet/intel/igc/igc.h
-> +++ b/drivers/net/ethernet/intel/igc/igc.h
-> @@ -337,6 +337,9 @@ struct igc_adapter {
->  	struct igc_led_classdev *leds;
->  };
->=20=20
-> +void igc_set_queue_napi(struct igc_adapter *adapter, int q_idx,
-> +			struct napi_struct *napi);
-> +void igc_unset_queue_napi(struct igc_adapter *adapter, int q_idx);
->  void igc_up(struct igc_adapter *adapter);
->  void igc_down(struct igc_adapter *adapter);
->  int igc_open(struct net_device *netdev);
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethe=
-rnet/intel/igc/igc_main.c
-> index 7964bbedb16c..59c00acfa0ed 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -4948,6 +4948,47 @@ static int igc_sw_init(struct igc_adapter *adapter)
->  	return 0;
->  }
->=20=20
-> +void igc_set_queue_napi(struct igc_adapter *adapter, int q_idx,
-> +			struct napi_struct *napi)
-> +{
-> +	if (adapter->flags & IGC_FLAG_QUEUE_PAIRS) {
-> +		netif_queue_set_napi(adapter->netdev, q_idx,
-> +				     NETDEV_QUEUE_TYPE_RX, napi);
-> +		netif_queue_set_napi(adapter->netdev, q_idx,
-> +				     NETDEV_QUEUE_TYPE_TX, napi);
-> +	} else {
-> +		if (q_idx < adapter->num_rx_queues) {
-> +			netif_queue_set_napi(adapter->netdev, q_idx,
-> +					     NETDEV_QUEUE_TYPE_RX, napi);
-> +		} else {
-> +			q_idx -=3D adapter->num_rx_queues;
-> +			netif_queue_set_napi(adapter->netdev, q_idx,
-> +					     NETDEV_QUEUE_TYPE_TX, napi);
-> +		}
-> +	}
-> +}
+2024-10-15, 17:57:59 +0800, Jianbo Liu wrote:
+>=20
+>=20
+> On 10/15/2024 4:56 PM, Sabrina Dubroca wrote:
+> > 2024-10-14, 12:07:20 +0300, Tariq Toukan wrote:
+> > > From: Jianbo Liu <jianbol@nvidia.com>
+> > >=20
+> > > KASAN reports the following UAF. The metadata_dst, which is used to
+> > > store the SCI value for macsec offload, is already freed by
+> > > metadata_dst_free() in macsec_free_netdev(), while driver still use i=
+t
+> > > for sending the packet.
+> > >=20
+> > > To fix this issue, dst_release() is used instead to release
+> > > metadata_dst. So it is not freed instantly in macsec_free_netdev() if
+> > > still referenced by skb.
+> >=20
+> > Ok. Then that packet is going to get dropped when it reaches the
+> > driver, right? At this point the TXSA we need shouldn't be configured
+>=20
+> I think so because dst's output should be updated.
 
-In addition, to what Vinicius said. I think this can be done
-simpler. Something like this?
+What updates the dst when we're deleting the macsec device? And this
+is just a metadata_dst, it's only useful to hold the SCI.
 
-void igc_set_queue_napi(struct igc_adapter *adapter, int vector,
-			struct napi_struct *napi)
-{
-	struct igc_q_vector *q_vector =3D adapter->q_vector[vector];
+But I guess we would have the same issue when the macsec device still
+exists but the TXSA is gone, so hopefully this is handled well by all
+drivers.
 
-	if (q_vector->rx.ring)
-		netif_queue_set_napi(adapter->netdev, vector, NETDEV_QUEUE_TYPE_RX, napi);
 
-	if (q_vector->tx.ring)
-		netif_queue_set_napi(adapter->netdev, vector, NETDEV_QUEUE_TYPE_TX, napi);
-}
+> But the problem here is
+> dst free is delayed by RCU, which causes UAF.
 
-Thanks,
-Kurt
+To be clear, I'm not objecting to the patch, I'm wondering about other
+related issues once we fix that.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+--=20
+Sabrina
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcOQ3UTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzggP+EACbgGaNTWYbIcp1ENi3SQd4VQWHfX4P
-NLZHtOiG+aBHjfLRpW+pHulbwJ4+fn/XOIoWc1HyoS3IjF95CKAiwK8SNPBivGb9
-5zRmEqoz0yUZHJjdhZIboVwAZ9/1O92eE3gwtE++LW0oEoBcE4TqItDeZgQJ/jb8
-zdmXp0pxQns7TEfFv5cDPTnnxZJgbbyDBHr9Le0jA27/hMwDzclgHqgpqyzoypdD
-+B99POsjugofhiOVmzvWVYtTQ2Km/7Yt4pc45IAJG7M5sfqly8hfAmvutTuCeE0p
-NGjW43qgpzCThQCWRL6QgiEqlDHndYAkLjrRxUNBEy2RwMvtZPJCFw54h3XrzfXB
-/JXen5j1+gaFuFS/tF743VvLprsYPsKnKOa9sYU6ji7uKd6yKml8Rw8XUrWnPwjS
-hpgzkewBeZVBYOJ/x+odtVMPBiFxhpoSmbhPnPNGs7P5SESJgPAtdkiQNqGzI81Z
-mFgkNkRTkeyBiJ6NN43diLanEFeH5pGbFs8m7hrXBrAHxQP/c6A09KmCR5XS3Hra
-dzG7EB+tvIrYfsQiEWwhZEC+j9m2MGT190NusYPX+Gv7d5RgL80vw7XGly5t91el
-/SO30QNj8yItov0R//NqlZKx76hugTbW4NO+hJLqNCpU0woBG56v5N8y2VSuS4Fh
-jQrQCDjVYZqMyg==
-=yqMd
------END PGP SIGNATURE-----
---=-=-=--
 
