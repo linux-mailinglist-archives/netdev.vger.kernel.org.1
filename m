@@ -1,138 +1,106 @@
-Return-Path: <netdev+bounces-135900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2323F99FB42
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:20:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F08999FB77
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4C6F1F22873
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:20:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E946CB219D4
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 22:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469851B0F22;
-	Tue, 15 Oct 2024 22:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C815D21E3D8;
+	Tue, 15 Oct 2024 22:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gS4t2AGk"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sNV4hazi";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nkVO2kyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D42B185B47;
-	Tue, 15 Oct 2024 22:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A38D21E3A4;
+	Tue, 15 Oct 2024 22:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729030845; cv=none; b=epxscwD8E8odYge2afriZ8H/Vcdm/gjnptg8mDx3jKZuNajz5HFnZgPp8xc3Ju78+n1qU8ijFbLONuo/pk8oz/o9QVOHwq1KXGCve4ahsThg/cTQFJOJ9G4uHnDEwzJk2+wqXyPzmk61RiEqFsesCLChNVJCJYaHu4UbA0hEEZI=
+	t=1729031586; cv=none; b=YE90So/M6pS9PZBU/fQlCALjHkxiH4hBKPfjtekIwI6g3FFtf4IyCZ1o2WEeJTIWLUQ0h1bnWH1ZW+q/lyHoVQh2egglv2ly47vP2bgFBZlJWO4dcJpO5eB5MzTpATWMrvukaR64Q0VC8uvhWObXOo7UFY4npwVaXA15HxakNMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729030845; c=relaxed/simple;
-	bh=XYyFKaNRA4wWaSAfK8rsk2azG+eY0S/cwk//6ZrNo8w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PFtrRqE11P24rBhZP0QXSvC+g3ASyD+HRXuWd0Mw+yRwEE6xHkvVs/VoXJI+durjP7mfKnINlLccpShqhKNzMRt/gGhjYV7CFhRK7WTzjqpTF/WKECxvbGb34rnIMZvkIbqNiKTwHy1UhomK8gATakylok8JsiUr9xEZGAYDfho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=gS4t2AGk; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FHth3T019373;
-	Tue, 15 Oct 2024 22:20:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2023-11-20; bh=9amxsHQkQT/G9w3PaJaVF40PUix0E
-	rL5Pm84yf3YqPc=; b=gS4t2AGkl98LYAhuJ6m2b5XYCRScFGfkcqxQgwCmW+zCC
-	DpGzwRw+NlK1LmC3GukPrGh5k5CdJAVQ/jWWM6CJWTvkVwJHRUL0s1uVuuKj20C8
-	IF320xSQ9c1k4SiskUtXhh2AbUT0eHd8x3mFGPy6azPyyNMwIull+3xsE41+5bnc
-	rPpzg7NHvmvRjNLosx+L0HigMo7iLdiuYQgwbAx7f/4ubOiq34QBHUu4OA8/0NGa
-	1dq6FoSgczwa1WWe9jtYBXGOuQ1Tto3kcAZBMU0mXcCLpDK8F8TE/KsnyrWbviMK
-	ToFUzzZrH5MPVfGCErZFCsISKzpP3Tk89paAaa/XQ==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 427gq7jdab-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 22:20:34 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49FLWmX5026429;
-	Tue, 15 Oct 2024 22:20:33 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 427fj82ve0-1;
-	Tue, 15 Oct 2024 22:20:33 +0000
-From: Sherry Yang <sherry.yang@oracle.com>
-To: stable@vger.kernel.org, sashal@kernel.org, gregkh@linuxfoundation.org
-Cc: johannes@sipsolutions.net, davem@davemloft.net, kuba@kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH 5.15.y 5.10.y 5.4.y] wifi: mac80211: fix potential key use-after-free
-Date: Tue, 15 Oct 2024 15:20:30 -0700
-Message-ID: <20241015222030.1105765-1-sherry.yang@oracle.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1729031586; c=relaxed/simple;
+	bh=21aizJ5YYhhn9K5puew1ayyZTyLTfBXxhZOksdxbccs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hMemEk+xdhPQc/TCwcJrAobHpyseLEMqHk/mpkizkDXbRVYhNmpQ2SbKsRTTAAK0D8D3J1BdyeGoP6aoItbYeaQq3roW5LaBhf4AC3LNJvhjmnalzrtDDge9O0PDbKAGAN95FhjsyGLRVymhloXkem2VQ05q+z1Rzouqrhbxdt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sNV4hazi; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nkVO2kyD; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1729031583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nCsw8WsG67bUmKOynRzbJkIDd3tvleEozUUHLnGNguo=;
+	b=sNV4hazio0R3LDNriyoTWB8Yh3xrhahtVegCJBJOJBCNfYNM6YKbvkM6m3BYTNFVEIy0Lb
+	yTQCcegKephX5hh41MqPn4PXYnNYT3vk9nKu1vBrDoK8QwFbtCfCTfaWteMFh5cHI8QjuJ
+	jj1mOP00F+mb7/DAgL7v+UPm9A1RBhrMcWu2RePbtGWKE7DwwSKNiF/jbdeYRTkPTmuGXf
+	Y0lmv/fiD7V6eEBTPZn3MTDOq7tSbNR7F5cu2eLvvOBGUZRkurfRyVH0Mvz7ctGVesGZ6b
+	s6hIiM1NZqgvIkVvVpvYMqtwHtrp/WbHtfbm3qo5V1VMBjJnx64JQDENYzR63A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1729031583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nCsw8WsG67bUmKOynRzbJkIDd3tvleEozUUHLnGNguo=;
+	b=nkVO2kyDZZveTRPEgvcljraHcB33uLVieWywE5nDUQNflPqW1QA+rIEgfuFyoIKV1jq6TA
+	EumwgzDAmEEucGAQ==
+To: Jakub Kicinski <kuba@kernel.org>, Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, anna-maria@linutronix.de, frederic@kernel.org,
+ richardcochran@gmail.com, johnstul@us.ibm.com,
+ UNGLinuxDriver@microchip.com, jstultz@google.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 RESEND 1/2] posix-clock: Fix missing timespec64 check
+ in pc_clock_settime()
+In-Reply-To: <20241011125726.62c5dde7@kernel.org>
+References: <20241009072302.1754567-1-ruanjinjie@huawei.com>
+ <20241009072302.1754567-2-ruanjinjie@huawei.com>
+ <20241011125726.62c5dde7@kernel.org>
+Date: Wed, 16 Oct 2024 00:33:02 +0200
+Message-ID: <87v7xtc7z5.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_17,2024-10-15_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
- bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
- definitions=main-2410150147
-X-Proofpoint-ORIG-GUID: MlRzkmW65rnXGfo3puKQ1oyeU0YjGui1
-X-Proofpoint-GUID: MlRzkmW65rnXGfo3puKQ1oyeU0YjGui1
+Content-Type: text/plain
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Fri, Oct 11 2024 at 12:57, Jakub Kicinski wrote:
+> On Wed, 9 Oct 2024 15:23:01 +0800 Jinjie Ruan wrote:
+>> As Andrew pointed out, it will make sense that the PTP core
+>> checked timespec64 struct's tv_sec and tv_nsec range before calling
+>> ptp->info->settime64().
+>> 
+>> As the man manual of clock_settime() said, if tp.tv_sec is negative or
+>> tp.tv_nsec is outside the range [0..999,999,999], it should return EINVAL,
+>> which include dynamic clocks which handles PTP clock, and the condition is
+>> consistent with timespec64_valid(). As Thomas suggested, timespec64_valid()
+>> only check the timespec is valid, but not ensure that the time is
+>> in a valid range, so check it ahead using timespec64_valid_strict()
+>> in pc_clock_settime() and return -EINVAL if not valid.
+>> 
+>> There are some drivers that use tp->tv_sec and tp->tv_nsec directly to
+>> write registers without validity checks and assume that the higher layer
+>> has checked it, which is dangerous and will benefit from this, such as
+>> hclge_ptp_settime(), igb_ptp_settime_i210(), _rcar_gen4_ptp_settime(),
+>> and some drivers can remove the checks of itself.
+>
+> I'm guessing we can push this into 6.12-rc and the other patch into
+> net-next. I'll toss it into net on Monday unless someone objects.
 
-[ Upstream commit 31db78a4923ef5e2008f2eed321811ca79e7f71b ]
+Can you folks please at least wait until the maintainers of the code in
+question had a look ?
 
-When ieee80211_key_link() is called by ieee80211_gtk_rekey_add()
-but returns 0 due to KRACK protection (identical key reinstall),
-ieee80211_gtk_rekey_add() will still return a pointer into the
-key, in a potential use-after-free. This normally doesn't happen
-since it's only called by iwlwifi in case of WoWLAN rekey offload
-which has its own KRACK protection, but still better to fix, do
-that by returning an error code and converting that to success on
-the cfg80211 boundary only, leaving the error for bad callers of
-ieee80211_gtk_rekey_add().
+Thanks,
 
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Fixes: fdf7cb4185b6 ("mac80211: accept key reinstall without changing anything")
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Sherry: bp to fix CVE-2023-52530, resolved minor conflicts in 
-net/mac80211/cfg.c because of context change due to missing commit
-23a5f0af6ff4 ("wifi: mac80211: remove cipher scheme support")
-ccdde7c74ffd ("wifi: mac80211: properly implement MLO key handling")]
-Signed-off-by: Sherry Yang <sherry.yang@oracle.com>
----
- net/mac80211/cfg.c | 3 +++
- net/mac80211/key.c | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
-index f652982a106b..c54b3be62c0a 100644
---- a/net/mac80211/cfg.c
-+++ b/net/mac80211/cfg.c
-@@ -511,6 +511,9 @@ static int ieee80211_add_key(struct wiphy *wiphy, struct net_device *dev,
- 		sta->cipher_scheme = cs;
- 
- 	err = ieee80211_key_link(key, sdata, sta);
-+	/* KRACK protection, shouldn't happen but just silently accept key */
-+	if (err == -EALREADY)
-+		err = 0;
- 
-  out_unlock:
- 	mutex_unlock(&local->sta_mtx);
-diff --git a/net/mac80211/key.c b/net/mac80211/key.c
-index f695fc80088b..7b427e39831b 100644
---- a/net/mac80211/key.c
-+++ b/net/mac80211/key.c
-@@ -843,7 +843,7 @@ int ieee80211_key_link(struct ieee80211_key *key,
- 	 */
- 	if (ieee80211_key_identical(sdata, old_key, key)) {
- 		ieee80211_key_free_unused(key);
--		ret = 0;
-+		ret = -EALREADY;
- 		goto out;
- 	}
- 
--- 
-2.46.0
-
+        tglx
 
