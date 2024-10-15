@@ -1,123 +1,134 @@
-Return-Path: <netdev+bounces-135495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F4599E240
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:08:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1E499E25C
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 11:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E3ED1C21707
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 09:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DD6F1C21A9E
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 09:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E22E1DAC8D;
-	Tue, 15 Oct 2024 09:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735991CFEB5;
+	Tue, 15 Oct 2024 09:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKGXRtcE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhZ5UG62"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF41B1D9A7F
-	for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 09:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022E91CDA1C;
+	Tue, 15 Oct 2024 09:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728983254; cv=none; b=iHFOA7u0SbuRHaOwO1ZPHLKwRKTEt4vrMB1apQrmO1alcuC59My3R7PStoSyuc5ajVGbJ/i/A1DifiGj9O/xgOGwPB1lLG8Dq8y4q/mi7692K/2XnRT5TyhJVVFLzrjVgK5TpPNpBVjnQy2SUG+3bC2O6yxq7i2SP1Se4cETwY0=
+	t=1728983393; cv=none; b=eARtQ81XZ1g4o6AWWVveLuzStqhAh2b/zWJfnfgYPY9tah9ykWgVTD4kA/o3uoKasYNPLbMy0jM5RmdxBGd2pZIkjOOEqJwiVPYWC8LVIC0Il8gt2iwLfdWajb95HvI/9G8PhKrKc23PyTmGMRhzH63VaCnHNiEWyG3gvKAloX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728983254; c=relaxed/simple;
-	bh=oCjWOF503rcT4c0Xx5RdN6ucpRfwbJjuYJBlNO0Cl3Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hm0iiBXvhBMEZCtp+etAKAD3jP0LbNSxv52sMNLqQEI/BpoSR4kzBvFAh7819oYip8kyE31Qu3FYBBLn3vXB332naRCa3d6VQi6jVe4vM3iDSl9eQ7dkn3jZA1k9cGiEFoBFLyhcY4cUmKiGddKLBW+FgO48QgHlB8rVvzP5o0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NKGXRtcE; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1728983393; c=relaxed/simple;
+	bh=CUf1xhmh5CFKPoCzustBibfvzHISdKK+GgBumXZ1+cM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PTkMQr6eA7oWyIhhh6ft7V0kpM7zaj+QBlKYbl//kIVWWS10mS4yjludQuCBwSVSyc6tsfLSB3U7LjAtfPZJVEv4JyK/JZas9lZdpzAVknp2mplaWbZ3/O8h7J1ENjqmeQvOJlO8m0Gzv2NnyLfyDKEuD/a5i72QBMImNPyUtk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NhZ5UG62; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-37d4d1b48f3so3264337f8f.1
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 02:07:32 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7ea78037b7eso2049287a12.0;
+        Tue, 15 Oct 2024 02:09:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728983251; x=1729588051; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NAqE00nuYG0iOJRr3q7L1x6bg2EAu6mZzcRTFTFPvds=;
-        b=NKGXRtcExB7TDGhugYpN0+CbQ2d02xV7I9W7IXPxPQqr9rojm97wqkXl2HAnIt0ZDv
-         YPZU2w0c3AyMb2T0crr5tmd4jIXef7tQKinbkePNIkfZHBcyBeqete1rcsit6Y3pZpwc
-         yxx1y9pGZnK8FbA7+WBJRP5jN7Sx5F7+yDdvRfmq9dLL7ulm7oMG/CYwtZ+8nvv8vZq3
-         SZhZQYpqJftoIox4Ilbc67xnH8FbLJ3KebpCnf1JXuq++otBdVpM35qo+AoHu1zIAVGk
-         zVeG81P/xOeI/2Ye6VFcKbvjV2uNMDIi5b7fXQu0GfSan4kWKvNHbN3/tQ09P8yN6JR4
-         k1BA==
+        d=gmail.com; s=20230601; t=1728983390; x=1729588190; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+rAVWSk33yzFNuxYAb2kshPjGwfRkyohC13H7ruK8yQ=;
+        b=NhZ5UG62FoLbgQzLu6OxxrCs+lbn/f0rU95PEMpRNKw72NTmD09eAQfSowYfveecDQ
+         eHtuJ8viMjFQu7KPKo0JY3F0pxH5zLoq9xUXjbiFA9JgK6OjiViGTtVvm3VS8vP8swAQ
+         LlVqgF8/gO+Ju9TVQVJxQ/Tt/Y7wKiiMD6R3CWe3bN88mBJg5Rlu8yvzh7+FDQKjw5xP
+         UXC/85xBiT8SgIKUFvsngkIM5zT7BS0DWMsBe9O70oWepPnQS/Jh4XqONP1MG69q723M
+         8FDrR5L8UebG5U4dyPSHKa9QOCj03bQg7fB5DNNxIl/XIhxFAFm4ROXX9fQfrUnA7kJs
+         7q6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728983251; x=1729588051;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NAqE00nuYG0iOJRr3q7L1x6bg2EAu6mZzcRTFTFPvds=;
-        b=umhXjbF3vEDiJQgabDd6CLtPJLnp0boxIxxBIC0ynPk6tpoVnoKQmyAuQfehSQ1qHU
-         WEn2bwFuAkda1Qsb2Pv8Xlk2H9moRjugp5brJ+uTyeluadOkQSfDo5QxRpVf5t09fyL8
-         Fe2fOFXvsVpzr+Z6TZluMLg5y+3MmIcLxFOe05R2/7ytzaDuWJTKuroK702YFnFC2sPz
-         qxHNEOmMy+/nG8GsZ9x01ZJbjM7nBiH6w9UdDC8r50x6iMC3cTIeNCvlBI7J5yQwm5v6
-         bvxXqe38xy357Xxc9X0fY1G5w5WZL+R01U5R7wYooTS/YXveqTA5Gy35u8p0u6dPitwp
-         pbzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVR/ctsbskdTDkC5j2wBo4oWB++b0ymhN09JJJh5zaqUS6V8YLhU+ptUGN8yFyzsqhR+CI0HcQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOIMn+Bk9qBIqHurPmwf+zHkThUtpe9rmECZbmPEFsmz41EmDe
-	jsN7sEUK/z4GvwZ7gOQq3FsdkYF3mrSFYKQl+e1F2YMTTrMQisWmD4s8etaLp2VaSdiTYQhRJGf
-	d+2aOek3xcxRhDwWGOrgtyLXCthY=
-X-Google-Smtp-Source: AGHT+IEyB5sgGFX19G1WkwbkJ6DEhVNR0E+9zcEg8bKChGAkw9U7Ses4mrvVVcLy7VqJ2CjQA4BFOCYbQqDux5NAC+M=
-X-Received: by 2002:adf:ec4d:0:b0:371:8319:4dcc with SMTP id
- ffacd0b85a97d-37d55184d55mr8723913f8f.2.1728983250604; Tue, 15 Oct 2024
- 02:07:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728983390; x=1729588190;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+rAVWSk33yzFNuxYAb2kshPjGwfRkyohC13H7ruK8yQ=;
+        b=Luq7OGEoB3OZOj6L+NP6ogHt2GUPmbkWJT4Eb43E7d1EpSRKFpTpqIr2OWhE7VhJKy
+         8q+PQxzm0EtkB7JELNxLI8md46gWICVbLG91m/waYzV36OYNVfZ9yxWDDe6rk87Aae/3
+         R7cfeA72KADDTqL5pYpJ8sxQBezv+r8pk12l7+at5HEqNQfY+TSpI6ieL9/HUbcwFNS1
+         1PnLOaiiEg7GTqMttdf6ynju7vvd6end2Y3S3Rd6K35egPBJc4ljQrBFsqGM6F4gUu3s
+         xgQrQFfXy4rsgMmqBLCfIpXChgmLhsHePH94SpXgh4Zh9IK75Fl7wcJm1iNMCFfg6+l/
+         m0Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7gcrBbdq0uC/QE3GYhhuhDWHAkeNZnlG4OARo/C2Y1/IvU9fyRxP4hwsoybA53HdTp6UgvKPXGNKsEAQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytat9eqL/+MQ5UcsLCPww16L2uPp5F6ao97m6yy90pUK2GqOUh
+	aGNvtVqRxyj1A8/t6rFHn/hzcS7B5CXQJ7mewJZAioJp2aPMiS4pUvxQPA==
+X-Google-Smtp-Source: AGHT+IH2FmmE/B412YTtjplQJI8buvMqqeNbFsv4Gh0T/efoJEx1gqHO/rnFjmNENHAao3BcqsnkXw==
+X-Received: by 2002:a05:6a21:e591:b0:1d5:125f:feb0 with SMTP id adf61e73a8af0-1d8bcf14d2amr20182563637.18.1728983390268;
+        Tue, 15 Oct 2024 02:09:50 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20d17ec8f35sm7905095ad.0.2024.10.15.02.09.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 02:09:49 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v1 0/5] net: stmmac: Refactor FPE as a separate module
+Date: Tue, 15 Oct 2024 17:09:21 +0800
+Message-Id: <cover.1728980110.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241011080111.387028-1-shaw.leon@gmail.com> <20241011080111.387028-3-shaw.leon@gmail.com>
- <3ad78fb0-4aa2-424b-9e91-8c32b1c266f5@6wind.com>
-In-Reply-To: <3ad78fb0-4aa2-424b-9e91-8c32b1c266f5@6wind.com>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Tue, 15 Oct 2024 17:06:54 +0800
-Message-ID: <CABAhCOQ_EYqsdrAH+aDKvK3h_s3cBfhrYsmAuqCeGkpgx3WUZg@mail.gmail.com>
-Subject: Re: [PATCH v2 iproute2 2/2] iplink: Fix link-netns id and link ifindex
-To: nicolas.dichtel@6wind.com
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 15, 2024 at 3:45=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
+Refactor FPE implementation by moving common code for DWMAC4 and
+DWXGMAC into a separate FPE module.
 
-> > @@ -618,20 +653,25 @@ int iplink_parse(int argc, char **argv, struct ip=
-link_req *req, char **type)
-> >                       if (offload && name =3D=3D dev)
-> >                               dev =3D NULL;
-> >               } else if (strcmp(*argv, "netns") =3D=3D 0) {
-> > +                     int pid;
-> > +
-> >                       NEXT_ARG();
-> >                       if (netns !=3D -1)
-> >                               duparg("netns", *argv);
-> >                       netns =3D netns_get_fd(*argv);
-> > -                     if (netns >=3D 0) {
-> > -                             open_fds_add(netns);
-> > -                             addattr_l(&req->n, sizeof(*req), IFLA_NET=
-_NS_FD,
-> > -                                       &netns, 4);
-> > +                     if (netns < 0 && get_integer(&pid, *argv, 0) =3D=
-=3D 0) {
-> > +                             char path[PATH_MAX];
-> > +
-> > +                             snprintf(path, sizeof(path), "/proc/%d/ns=
-/net",
-> > +                                      pid);
-> > +                             netns =3D open(path, O_RDONLY);
-> >                       }
-> This chunk is added to allow the user to give a pid instead of a netns na=
-me.
-> It's not directly related to the patch topic. Could you put in a separate=
- patch?
+FPE implementation for DWMAC4 and DWXGMAC differs only for:
+1) Offset address of MAC_FPE_CTRL_STS and MTL_FPE_CTRL_STS
+2) FPRQ(Frame Preemption Residue Queue) field in MAC_RxQ_Ctrl1
 
-Currently ip-link already accepts pid as netns argument, and passes to
-kernel as IFLA_NET_NS_PID. This patch converts it to fd for
-simplicity, so that it can be reused in later setns() call (before
-opening RTNL in target netns).
+Tested on DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
+
+Furong Xu (5):
+  net: stmmac: Introduce separate files for FPE implementation
+  net: stmmac: Introduce stmmac_fpe_ops for gmac4 and xgmac
+  net: stmmac: Rework marco definitions for gmac4 and xgmac
+  net: stmmac: xgmac: Rename XGMAC_RQ to XGMAC_FPRQ
+  net: stmmac: xgmac: Complete FPE support
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  12 -
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  | 150 ------
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  26 --
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |   7 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  28 --
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   7 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  54 ++-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  10 -
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 442 ++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |  38 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 149 +-----
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   4 +-
+ 15 files changed, 527 insertions(+), 405 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+
+-- 
+2.34.1
+
 
