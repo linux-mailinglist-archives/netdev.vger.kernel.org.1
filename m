@@ -1,126 +1,139 @@
-Return-Path: <netdev+bounces-135627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D41A99E956
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:16:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 712F499E98B
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF0221C2314F
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:16:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99D3F1C21B43
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C19B1EBA19;
-	Tue, 15 Oct 2024 12:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E006D1EF943;
+	Tue, 15 Oct 2024 12:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UYN/PYWn"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="LQRJxS3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4FF1EABC6;
-	Tue, 15 Oct 2024 12:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC77F1EBA14;
+	Tue, 15 Oct 2024 12:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728994573; cv=none; b=oMEMjLWVAl7VhQD656mQbasvXayS9iLceUlYZ5WkHmi6qVfuMq1Csf0r78DQ0VgG0ZF2tsNyLWH3yq6HjzatZBePuyqBvfhzFOPW+6Zycflnx8zMKHOK/jRp6gN3PhaLQLw+doQnWHUJSKOK7j7OpFC/XR1jnqAeTIHEPgXY6q0=
+	t=1728994631; cv=none; b=MbQmkzhyYdwVSalqS4xB9qFRFmWRaHHYMgrXiI/8igOhn5hvw76gEgqXNNhG+u4W1ks4NVp/tBUIj+/eNh1KyCOU40UlTr3fFFN2Fg6CO1zpyp3nHqkrFE/EWN8E5HCkha2W3GdiyCERMV/HwCjsQNc+57sViiftRHik8err1sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728994573; c=relaxed/simple;
-	bh=sdbX0S0NB+46Vx7HJphg85Y7GQXTkDsx9c2KykXd9C0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CsTaV7Wz9s902/FEYkZZBIJbBgdKvz1k/BMhZcIag+g1/049m1xntm8sDz8atGYslvff/1mBk9Ad6RK0MveYvH1Z8kFohK4AFeiCoEsDOipzFQw/DcL07EXubymgpCm+8pdm++GoXkoxd+Gb9Dt+Iq7fSRMCJokDm5gsUvfb6gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UYN/PYWn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72AC5C4CED0;
-	Tue, 15 Oct 2024 12:16:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1728994572;
-	bh=sdbX0S0NB+46Vx7HJphg85Y7GQXTkDsx9c2KykXd9C0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UYN/PYWnjVAz1/Xuie8aKA2yLkRalK1Rofne/TFnZaf11+IuVDQquqx1SX2Eu7a/H
-	 HTO3TONeW78BNnfGxDK+fjBENBstM99/7ouqh7t7t+CeyfFGzg1HXiNFAhDj/hJzHx
-	 tzd+TztG+PHdQSAmNwtjC1WpqEWXCWHgRyDLlk7s=
-Date: Tue, 15 Oct 2024 14:16:09 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sven Schnelle <svens@linux.ibm.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
-Message-ID: <2024101549-bungee-dodge-057d@gregkh>
-References: <20241015105414.2825635-1-svens@linux.ibm.com>
- <20241015105414.2825635-3-svens@linux.ibm.com>
- <2024101532-batboy-twentieth-75c4@gregkh>
- <yt9dmsj5r2uu.fsf@linux.ibm.com>
+	s=arc-20240116; t=1728994631; c=relaxed/simple;
+	bh=Gy1dAILNeinuYTGKjcudXMKHv5g2Rwn6XKTzJ9Yw9Ng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RB5PAHFl/TrCY2AM6hk2U/DR7GG89eEvzhbXNamObneXUXFfWgEiR/D5I2h7xoElFb74ScQ9cKcQxPSNoWObfjDNYk5NlLjvC13Z6KNJsbKCSh+GWAQm9t7qAhM9CRmyQ4zSnPr42roiLoJAAKPHWHHMlrlr1+kmvznJNRJl+h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=LQRJxS3d; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XieAo9HL5vyNwm1c3ghYumY3Fx+xJStWHjWEsuxERvg=; b=LQRJxS3d8EEzk5CygKZkzSHCTs
+	lXK+k6n8WMjYXlQyvTMXFODG+6BILFSq1lndW23xP5oHk3beQYvFwW136ysQoPwnWVT/NUGA6a4FN
+	5J+hbozH7mJddHnpR+bbd6Wg0z8AA1u/ONYUNC1pLVaqilwRs112O1yfMCeA2Xm6Wc5E=;
+Received: from p54ae9bfc.dip0.t-ipconnect.de ([84.174.155.252] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1t0gTm-0098D2-11;
+	Tue, 15 Oct 2024 14:16:46 +0200
+Message-ID: <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
+Date: Tue, 15 Oct 2024 14:16:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yt9dmsj5r2uu.fsf@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
+ improvements
+To: Eric Woudstra <ericwouds@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+ <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
+ <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 15, 2024 at 02:02:17PM +0200, Sven Schnelle wrote:
-> Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
+Hi Eric,
+
+On 14.10.24 20:29, Eric Woudstra wrote:
+> It would be no problem for me to change the subject and body, if you
+> think that is better.
 > 
-> > On Tue, Oct 15, 2024 at 12:54:13PM +0200, Sven Schnelle wrote:
-> >> To allow users to have stable device names with the help of udev,
-> >> add the name to the udev event that is sent when a new PtP clock
-> >> is available. The key is called 'PTP_CLOCK_NAME'.
-> >
-> > Where are you documenting this new user/kernel api you are adding?
-> >
-> >> 
-> >> Signed-off-by: Sven Schnelle <svens@linux.ibm.com>
-> >> ---
-> >>  drivers/ptp/ptp_clock.c | 11 ++++++++++-
-> >>  1 file changed, 10 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> >> index c56cd0f63909..15937acb79c6 100644
-> >> --- a/drivers/ptp/ptp_clock.c
-> >> +++ b/drivers/ptp/ptp_clock.c
-> >> @@ -25,9 +25,11 @@
-> >>  #define PTP_PPS_EVENT PPS_CAPTUREASSERT
-> >>  #define PTP_PPS_MODE (PTP_PPS_DEFAULTS | PPS_CANWAIT | PPS_TSFMT_TSPEC)
-> >>  
-> >> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env);
-> >>  const struct class ptp_class = {
-> >>  	.name = "ptp",
-> >> -	.dev_groups = ptp_groups
-> >> +	.dev_groups = ptp_groups,
-> >> +	.dev_uevent = ptp_udev_uevent
-> >>  };
-> >>  
-> >>  /* private globals */
-> >> @@ -514,6 +516,13 @@ EXPORT_SYMBOL(ptp_cancel_worker_sync);
-> >>  
-> >>  /* module operations */
-> >>  
-> >> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env)
-> >> +{
-> >> +	struct ptp_clock *ptp = container_of(dev, struct ptp_clock, dev);
-> >> +
-> >> +	return add_uevent_var(env, "PTP_CLOCK_NAME=%s", ptp->info->name);
-> >
-> > Why is this needed?  Can't you get the name from the sysfs paths, the
-> > symlink should be there already.
+> The thing is, these patches actually make it possible to set up a fully
+> functional software fastpath between bridged interfaces. Only after the
+> software fastpath is set up and functional, it can be offloaded, which
+> happens to by my personal motivation to write this patch-set.
 > 
-> You mean the 'clock_name' attribute in sysfs?
+> If the offload flag is set in the flowtable, the software fastpath will
+> be offloaded. But in this patch-set, there is nothing that changes
+> anything there, the existing code is used unchanged.
 
-Great, yes, it's right there.
+FWIW, a while back, I also wanted to add a software fast path for the 
+bridge layer to the kernel, also with the intention of using it for 
+hardware offload. It wasn't accepted back then, because (if I remember 
+correctly) people didn't want any extra complexity in the network stack 
+to make the bridge layer faster.
 
-> That would require to
-> write some script to iterate over all ptp devices and check the name,
-> or is there a way to match that in udev?
+Because of that, I created this piece of software:
+https://github.com/nbd168/bridger
 
-Yes there is.  Please use that :)
+It uses an eBPF TC classifier for discovering flows and handling the 
+software fast path, and also creates hardware offload rules for flows.
+With that, hardware offloading for bridged LAN->WLAN flows is fully 
+supported on MediaTek hardware with upstream kernels.
 
-thanks,
-
-greg k-h
+- Felix
 
