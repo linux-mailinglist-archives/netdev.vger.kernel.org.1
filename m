@@ -1,166 +1,165 @@
-Return-Path: <netdev+bounces-135869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624BD99F773
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:45:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1901F99F770
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 21:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19DCC285C25
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:45:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD24C285580
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 19:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADB51F76A9;
-	Tue, 15 Oct 2024 19:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D261F5824;
+	Tue, 15 Oct 2024 19:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="q0UQPzEo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pu6+vb1W"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF3A1F5854;
-	Tue, 15 Oct 2024 19:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE941EBA0B;
+	Tue, 15 Oct 2024 19:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729021511; cv=none; b=u/q6URYJJ7JonsTK039+PdeVuMF6eE0g/ckcGyvijxcrZKz82bMfREXsnUEuLNVnhlPKQ6l7BARQA6w0h4oJ/c/89OobT3NmQn+rQf6PkJkHZ/JN/pRbAb7p8yADsS017CXT5mhmC7XxULU7sztHMSp8gZ0EYf+A57pKbxWq+Zg=
+	t=1729021505; cv=none; b=sm/NHv3cpmDenSlkqJ4Pj4YM71XWEijSDGaOeaRM+N9aTpczLHx2QmqfAZWRtJx3fgi+mvtgNbgVy0oLiCZe0f4RN+S8Wmei81a8Qhz/cFJ9lmFS0uxqxJAiyNeJ6iHOmuRvFFx80BPD9aghQYeMaxnoPcgOPN920qdrR9tGsXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729021511; c=relaxed/simple;
-	bh=Jxw4wtlEr6vIs5MfVc+/KOu5i1arbajJ5xkHL+jGtOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J0bwyjJgFiqjXzdhadv9lxijemKeO6Y7I0OE7XCaF3IHExtLsrT93SAU1m3byjTsvTCApT9ZYRSgfguax/CoaIBtMXAJY5L8JDd0T+koMWWPipIosJNJ6j+p5soc983/P7WHqEXLmaDr3QgsATUVsKagxeP0LR9ZGe9TVVrVwqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=q0UQPzEo; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bwhtgi8DcQyDJ8FWIikvDQQ5XGGnfVqxrzGDPV+2pkY=; b=q0UQPzEohGuorgdFB4IwQpx1yq
-	GxIVNS6g41P3QuqbKLt22y2lwrJpodiLo3mk1Nfrqv1Pvurq6zvOI6tXrm3k0Jw0mz0PZJ2QosunQ
-	lE8xR87+5HHebNwe5uSRwkWAYPaWlOsY9QT8x5IZqBTh+xQKQeojq94bdj/swJAkyv9k=;
-Received: from p54ae9bfc.dip0.t-ipconnect.de ([84.174.155.252] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1t0nTR-009Kvt-0i;
-	Tue, 15 Oct 2024 21:44:53 +0200
-Message-ID: <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
-Date: Tue, 15 Oct 2024 21:44:52 +0200
+	s=arc-20240116; t=1729021505; c=relaxed/simple;
+	bh=Q6gIsqbPWQZY8KO+ccS3pnE8GBPtmwXBTH+lqXGVDRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rcCQGCaF2WNoilGwqxx5omrd+YEEec6XskiG9OdAZGgzsH53HAKFlw2JpsZi3r28V8w0NSQMpAceGJNE/6kdYByHNWXRORKXJ2tJvt7mtdYMgB3sC0CiTc0o3oE1C4biGrm59Iiq4fFZATGqLJMEAHRejYVnmx+rCCKO5CDPQZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pu6+vb1W; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6e396a69062so19783047b3.0;
+        Tue, 15 Oct 2024 12:45:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729021503; x=1729626303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m42kdib9zk5ToFc7jQXCVgkzCmUlpD/gymmWQ8KbQho=;
+        b=Pu6+vb1WjSl3vK+rrqgy6atZz/OOtCauO9xMpP+A3DR8hBy5/CIxJbVBSQtYW+fNLb
+         DVErf69o7vlq3Ky0gZpMFu4JrraMVUUtovbYsTua1uxBihdVAskqrjnFO4KDMBeC8f+x
+         //SUs9LrxPRsZWNieBmnC7/3ymZ1H78HzOT6h4XDYcbhbOCeY91dncNgg8sn3w1JhKjJ
+         n0XhszRIYMiuhw2vRoyts+cuJ9LcH/I2jNGAchj2ZzE3rwzd6zxoeU7gm/I3zUkgzmV0
+         3xfAtlLDVQ+5Ts1A1b/9M4VHTGrdy1mWCddRYAkzrTF3J30gm7bX+0+nWyi42fBYxqdM
+         4Y2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729021503; x=1729626303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m42kdib9zk5ToFc7jQXCVgkzCmUlpD/gymmWQ8KbQho=;
+        b=DybPCnE+bEyOlk7xdmJ3cJA6Dia8Lt85Gs62IcRsDIuogHaerSfT08Utg9gK803WNN
+         MHOXnOUSB41QxdUiwMPZefemG3Gjgw5RCa7IFYQGdTVhX5uW/hPw92HAGPLsDLZ8ivH0
+         1zlsDuW25WXQ2Lhq5I4wQwVPykab/+q1SzVBloimPF7k5PhmtoH9U7Kec5rLZSz74iw/
+         bf3MN1+1F4zL+DSWPH3J3n1XVWv7BUayIOY6de5ICY/j2nGrdjkl0k4whllBnDqX7c1C
+         vCQ5GnF37RTOgMtJ5OXUB6vZV6WRYDN/J3b1y9HrKnnxpYikTLq18448SYwlX3s9wDrG
+         J6Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCUjIBdqJCXwOx3gxctxlNZXHtq1eBLHPJiuo709czK6u8MViF5KIVMscrwVX6F20MaQllqKCK/b83R3eBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5k+wOntbHMJWkQk+I6oA2Ozuh8hfeupiy9TC/3L4Ba0siysHR
+	YqMjWjuLv3Cucbq8AcfdP9pFlfgVxiW5BNdWi1JZ6018TWj0uECbHVBTORO08wqon+dDnsv28nC
+	4nWjP8O54kIhBgnC2bRz5LC/xyQM=
+X-Google-Smtp-Source: AGHT+IHkItiEolL7LIA+8kG//UdQcyl5SXWJdW9LjXMVyn0uq5l0M5w2qsiNlSwpwaHJgzO7LSZgkzMhvlQ9xbjJMsw=
+X-Received: by 2002:a05:690c:7506:b0:6e2:63e:f087 with SMTP id
+ 00721157ae682-6e347c6e493mr119845947b3.42.1729021503026; Tue, 15 Oct 2024
+ 12:45:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
- improvements
-To: Eric Woudstra <ericwouds@gmail.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
- <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
- <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
- <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241011195622.6349-1-rosenp@gmail.com> <20241011195622.6349-7-rosenp@gmail.com>
+ <20241012131651.GE77519@kernel.org>
+In-Reply-To: <20241012131651.GE77519@kernel.org>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Tue, 15 Oct 2024 12:44:52 -0700
+Message-ID: <CAKxU2N87Nqa73M+wda3Phayu5dmkWEMhDXgxz=4bASV_-8D4yQ@mail.gmail.com>
+Subject: Re: [PATCHv6 net-next 6/7] net: ibm: emac: generate random MAC if not found
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Shannon Nelson <shannon.nelson@amd.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+	Breno Leitao <leitao@debian.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	Christian Marangi <ansuelsmth@gmail.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 15.10.24 15:32, Eric Woudstra wrote:
-> 
-> 
-> On 10/15/24 2:16 PM, Felix Fietkau wrote:
->> Hi Eric,
->> 
->> On 14.10.24 20:29, Eric Woudstra wrote:
->>> It would be no problem for me to change the subject and body, if you
->>> think that is better.
->>>
->>> The thing is, these patches actually make it possible to set up a fully
->>> functional software fastpath between bridged interfaces. Only after the
->>> software fastpath is set up and functional, it can be offloaded, which
->>> happens to by my personal motivation to write this patch-set.
->>>
->>> If the offload flag is set in the flowtable, the software fastpath will
->>> be offloaded. But in this patch-set, there is nothing that changes
->>> anything there, the existing code is used unchanged.
->> 
->> FWIW, a while back, I also wanted to add a software fast path for the
->> bridge layer to the kernel, also with the intention of using it for
->> hardware offload. It wasn't accepted back then, because (if I remember
->> correctly) people didn't want any extra complexity in the network stack
->> to make the bridge layer faster.
-> 
-> Hello Felix,
-> 
-> I think this patch-set is a clear showcase it is not very complex at
-> all. The core of making it possible only consists a few patches. Half of
-> this patch-set involves improvements that also apply to the
-> forward-fastpath.
-
-It's definitely an interesting approach. How does it deal with devices 
-roaming from one bridge port to another? I couldn't find that in the code.
-
->> Because of that, I created this piece of software:
->> https://github.com/nbd168/bridger
->> 
->> It uses an eBPF TC classifier for discovering flows and handling the
->> software fast path, and also creates hardware offload rules for flows.
->> With that, hardware offloading for bridged LAN->WLAN flows is fully
->> supported on MediaTek hardware with upstream kernels.
->> 
->> - Felix
-> 
-> Thanks, I've seen that already. Nice piece of software, but I'm not
-> running openwrt. I would like to see a solution implemented in the
-> kernel, so any operating system can use it.
-
-Makes sense. By the way, bridger can easily be built for non-OpenWrt 
-systems too. The only library that's actually needed is libubox - that 
-one is small and can be linked in statically. ubus support is fully 
-optional and not necessary for standard cases.
-
-- Felix
+On Sat, Oct 12, 2024 at 6:16=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Fri, Oct 11, 2024 at 12:56:21PM -0700, Rosen Penev wrote:
+> > On this Cisco MX60W, u-boot sets the local-mac-address property.
+> > Unfortunately by default, the MAC is wrong and is actually located on a
+> > UBI partition. Which means nvmem needs to be used to grab it.
+> >
+> > In the case where that fails, EMAC fails to initialize instead of
+> > generating a random MAC as many other drivers do.
+> >
+> > Match behavior with other drivers to have a working ethernet interface.
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > ---
+> >  drivers/net/ethernet/ibm/emac/core.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/etherne=
+t/ibm/emac/core.c
+> > index b9ccaae61c48..faa483790b29 100644
+> > --- a/drivers/net/ethernet/ibm/emac/core.c
+> > +++ b/drivers/net/ethernet/ibm/emac/core.c
+> > @@ -2937,9 +2937,12 @@ static int emac_init_config(struct emac_instance=
+ *dev)
+> >
+> >       /* Read MAC-address */
+> >       err =3D of_get_ethdev_address(np, dev->ndev);
+> > -     if (err)
+> > -             return dev_err_probe(&dev->ofdev->dev, err,
+> > -                                  "Can't get valid [local-]mac-address=
+ from OF !\n");
+> > +     if (err =3D=3D -EPROBE_DEFER)
+> > +             return err;
+> > +     if (err) {
+> > +             dev_warn(&dev->ofdev->dev, "Can't get valid mac-address. =
+Generating random.");
+> > +             eth_hw_addr_random(dev->ndev);
+> > +     }
+>
+> The above seems to take the random path for all errors other than
+> -EPROBE_DEFER. That seems too broad to me, and perhaps it would
+> be better to be more specific. Assuming the case that needs
+> to be covered is -EINVAL (a guess on my part), perhaps something like thi=
+s
+> would work? (Completely untested!)
+>
+>         err =3D of_get_ethdev_address(np, dev->ndev);
+>         if (err =3D=3D -EINVAL) {
+>                 /* An explanation should go here, mentioning Cisco MX60W
+>                  * Maybe the logic should even be specific to that hw?
+>                  */
+>                 dev_warn(&dev->ofdev->dev, "Can't get valid mac-address. =
+Generating random.");
+>                 eth_hw_addr_random(dev->ndev);
+>         } else if (err) {
+>                 return dev_err_probe(&dev->ofdev->dev, err,
+>                                      "Can't get valid [local-]mac-address=
+ from OF !\n");
+>         }
+That's just yak shaving. besides 0 and EPROBE_DEFER,
+of_get_ethdev_address returns ENODEV, EINVAL, and maybe something
+else. I don't see a good enough reason to diverge from convention
+here. This same pattern is present in other drivers.
+>
+> Also, should this be a bug fix with a Fixes tag for net?
+No. It's more of a feature honestly.
+>
+> >
+> >       /* IAHT and GAHT filter parameterization */
+> >       if (emac_has_feature(dev, EMAC_FTR_EMAC4SYNC)) {
+> > --
+> > 2.47.0
+> >
 
