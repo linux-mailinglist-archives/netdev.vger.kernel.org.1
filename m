@@ -1,163 +1,310 @@
-Return-Path: <netdev+bounces-135618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18DCD99E825
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:02:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF4F99E868
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 14:05:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C7F41F21551
-	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:02:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9D3282C4F
+	for <lists+netdev@lfdr.de>; Tue, 15 Oct 2024 12:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A0F1E378C;
-	Tue, 15 Oct 2024 12:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BE91E7658;
+	Tue, 15 Oct 2024 12:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sf0WAxmg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I8mt3Ed1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45891D8DEA;
-	Tue, 15 Oct 2024 12:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728993750; cv=none; b=BF7kR2eKnSVHDf53fxvsXK/mJs94ogJNE1ukj/yUUIkmko/4Loyl0HDRz86I8Jzr+r0wQPXwHLVg20f/LNgDePnGpCS2VuYiuq1k26vNdAfsI5qpfXAtLxY2nBapnp+DbGg78FzbnF7Mo/xE7P658VlxXLvZ5oY4PXOJ2gUGmdY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728993750; c=relaxed/simple;
-	bh=Mb2jMIhgPn95C310AjLjdOHybGQPmJhBSETFECJjd7A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=aPUPIUHhd+qMTCit4h8im6pBExE2PUXwj/JPBUAGTtUVVCMCueIpbSkSAd/MZiy7NZDflHC3yekdZLfc+915BNdFi6ORBSqfTSoliSdBCK7VpXyj1Irx8n4z7X2wMtwF/k3Q/Xjj6B7zbIceSMkTvIcwU2Cy5LNLLNwFIp14U0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sf0WAxmg; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49FBsoCX000968;
-	Tue, 15 Oct 2024 12:02:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=zr/zrrWXTvhTWxhtih01DT725ChHcY
-	Ut7x8P1H+ErnU=; b=sf0WAxmgUYeiUPYg9G6M1xZaaSEFYKOgmf+xedBVHTitag
-	/KMzx7kVzRzWtXcuIXL2uiFc/nPJCKW9EzzAdODparpS749PimFWFzplcJZv4pzG
-	scnLGhEbfCXz1Gi8AxwTJlOUzUdy8qhLM5qKcJK0MnUW28eTOzVeG93yQHr/3jte
-	z+/ygvkkXNvcE6hCAcKU0oxn+/nlXQtfdQaUXkFNyYmCLEBMKQwIikLJ4AmKs5lQ
-	GliTNdyr97+wtmETffLrisJEKcXmBF0D1aOiR3Ukf1oRmFL6FL0lPB8jI0lI4IPo
-	wvYe1bgBo64I44xxBSu2+Y46AYHqI0aDPLA+gjxw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429qxf81u9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 12:02:22 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49FC0OFx015624;
-	Tue, 15 Oct 2024 12:02:22 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429qxf81u4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 12:02:22 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49F8jtuN005215;
-	Tue, 15 Oct 2024 12:02:21 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4285nj3cxd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 12:02:20 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FC2Hrm16843084
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 12:02:17 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B5152004D;
-	Tue, 15 Oct 2024 12:02:17 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 47B8220043;
-	Tue, 15 Oct 2024 12:02:17 +0000 (GMT)
-Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 15 Oct 2024 12:02:17 +0000 (GMT)
-From: Sven Schnelle <svens@linux.ibm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Ricardo B. Marliere" <ricardo@marliere.net>,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
-In-Reply-To: <2024101532-batboy-twentieth-75c4@gregkh> (Greg Kroah-Hartman's
-	message of "Tue, 15 Oct 2024 12:59:10 +0200")
-References: <20241015105414.2825635-1-svens@linux.ibm.com>
-	<20241015105414.2825635-3-svens@linux.ibm.com>
-	<2024101532-batboy-twentieth-75c4@gregkh>
-Date: Tue, 15 Oct 2024 14:02:17 +0200
-Message-ID: <yt9dmsj5r2uu.fsf@linux.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F541C57B1;
+	Tue, 15 Oct 2024 12:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728993939; cv=fail; b=BeR2VvhFtHDodkWQSkWhJiypk+pUAVqOEmBXyibsoaCeZ0RCeCBbAGe7f+J6/n9+na4OXX99JJkYycqkibJLeWZNHd/ZafVn4tf4c/UU4SXue2/K4dnju6qmqj8AlCjRVeWqpn5xXFNpNSkr9/T1gyvnWHCF1Sg8RzgHj/c3U8I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728993939; c=relaxed/simple;
+	bh=2bp/ZMybGMnZkdJDypKUp+kvYu5dlcFaPTWCJoPvwvw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=YKKk8PHOMgJDo3V13flrAa7unR3L87+YG176nXMX5wr6lA/6F7pUHSQiqrowfGUmjBUD/IEYbP3LjULij04+evJNhd97x5WeQRMbWym90vksvb6EBFRGKTec4+iaozmHHlLkY50cUJR0IvaFLK3kCx2K6Wv5Pl6G4i76i8cPIwY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I8mt3Ed1; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728993938; x=1760529938;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=2bp/ZMybGMnZkdJDypKUp+kvYu5dlcFaPTWCJoPvwvw=;
+  b=I8mt3Ed1ZYa46HIRhgiHFE4fkJOe3NKW/mo0ZUoSA4B9hAA6geJ6cIG4
+   DSnl3t74kB0MEW7JbKg/mdvqS6AvQhIvNprFxeEeFoaHgegr/SyZ2GVRq
+   2qmIRBjwljfOPlsJXC+vzXUIUXIGnzpPmDYrvv58qx9GsGBfXDOpFqakm
+   DslY2IaMgHB7gKpCrvLhZqm+VEXT7+GpBx44y4n/FlZ42qK9b0cD9dTQp
+   PdF8GMeow38EMNE96O7JS4U83eceK8FU2x2iqdvgTgBx/2BpKOTK83ucr
+   kzKmPCPgCq5LXwfcEhokX2siKBimr55GfSFhTQMKYyh5Y2BCflFPCe/Gj
+   A==;
+X-CSE-ConnectionGUID: LWcXf+W8RyeqgNEPwFwfVQ==
+X-CSE-MsgGUID: 0RrqANXeQKipqMQ+qDtbnA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="32074002"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="32074002"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 05:05:37 -0700
+X-CSE-ConnectionGUID: 8eX9PABzT+alDbIxVrCnvg==
+X-CSE-MsgGUID: RoyVa/KBRcSOKI3jlBcW/Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,205,1725346800"; 
+   d="scan'208";a="78324914"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Oct 2024 05:05:37 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 15 Oct 2024 05:05:36 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 15 Oct 2024 05:05:36 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 15 Oct 2024 05:05:36 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 15 Oct 2024 05:05:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J4Rx8fDPzAGx80WUSCDzpX1e45Gy9RVX/W4GSe6unhMO5oOdbVQQy+hEgVLsSzEw62d/lIy/qBCm1X9Wm6oSGKN8EzGiWkVc7Cz9qE33Qb2RfGhmydZlsw1YL36+XRKdOlmaVMfgPfrbA0fBpMdIbbZBY/1SGRMD+SqdHNYuWEfGpdk3aIcn+MzgnnQrJG+AfurbfRdXQyDecdfqz6KU4k/FpZXAhDhSDFuWxR6pTKzTp+U1e9woA9QUBTDNbfbXzJKgZghQCCZIJykSxiOLJfagdX55tCSkHEq3KBDPprsrkwKcJtKIfUFXfoVgFG1GlbIjLgdff2G7W+oHGBCMIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3eqTDtGim9NuO8xDAVrU0i8IaZxNm104OfQdajGup5k=;
+ b=NijQ3zNVQXYlFd2Fi+Dzbo19kTgOMMnr9RxwbTdRBvd9lldDw5g1Ququ+4zCYl+kD27SATP9TwnRYHlT2ctUsFX9XN5ccXCc5rCn3keJ/yf6pFLE5VRo8PA3IFUCZLA5yMaSSZ9lbSr3f2rBR8LfPeNzQez2e8IW7FY1LQ+IXBEVw3DtiiSq5gCAJ5iyrmgcAlNBVMQ58km1kJOIGZkGGnP9kVT1xTtsUajfL6P2c+KYikM+m+jHV2hWSIZmb6UzR9FCNfMTjIbEflcnz8TkjgDreXuhIyKxYeLWBUVdnRVCzL0hvAm/L2qziWER7cJd3u7/puqwZ4VscMz7OLI7/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8048.27; Tue, 15 Oct 2024 12:05:32 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%5]) with mapi id 15.20.8048.020; Tue, 15 Oct 2024
+ 12:05:32 +0000
+Date: Tue, 15 Oct 2024 14:05:20 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Richard Cochran
+	<richardcochran@gmail.com>, Sriram Yagnaraman
+	<sriram.yagnaraman@ericsson.com>, Benjamin Steinke
+	<benjamin.steinke@woks-audio.com>, Sebastian Andrzej Siewior
+	<bigeasy@linutronix.de>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: Re: [PATCH iwl-next v8 4/6] igb: Add XDP finalize and stats update
+ functions
+Message-ID: <Zw5agKXFRJ84u1c8@boxer>
+References: <20241011-b4-igb_zero_copy-v8-0-83862f726a9e@linutronix.de>
+ <20241011-b4-igb_zero_copy-v8-4-83862f726a9e@linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241011-b4-igb_zero_copy-v8-4-83862f726a9e@linutronix.de>
+X-ClientProxiedBy: WA0P291CA0021.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::25) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C5MxkPI-lNzpY37PKc_4CQ7i5Q9PFrJ4
-X-Proofpoint-GUID: EhLHQRuyEm3Gn599LIfAKyUbfl87nRQ0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- mlxlogscore=723 lowpriorityscore=0 suspectscore=0 priorityscore=1501
- spamscore=0 clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410150081
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|BL3PR11MB6435:EE_
+X-MS-Office365-Filtering-Correlation-Id: 892bbfa5-690e-4353-bdeb-08dced11ab3f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?qJUm+ZmYVdMrtOTQsApncUe4izHxF7lwDeVGUtKmYmssgEwNKDPHk5XB3yGU?=
+ =?us-ascii?Q?+CdHOPx/M05LiGtXq40WpRUEK+YWAdYyKiFVymVoJaNsJdJH1tV8X6UZsEUy?=
+ =?us-ascii?Q?VMDGwKooqqYrYBEfzeYIoKPmh9FIdqNY+RA1d/xZMCehU+4TH+M74SZk27ys?=
+ =?us-ascii?Q?L6liMVHBz8w8hfb0P+q9yitdjR0F25Htcno98QrQ5AoSdzetJPdS6fklTYZt?=
+ =?us-ascii?Q?SjseTTxUzhPrUdbS4SnYZAnxF/r262Fqr8BShGSlJVe5p/QJ2QU19HVXDiEw?=
+ =?us-ascii?Q?0hsA8qqaNowuALMveFcWEwGZ6jHwMNDE2r17TnLSLrp/LUQwcJhCe1PLlDAy?=
+ =?us-ascii?Q?6vYhquxyv6fZeTCMc4jBEz3Htb6FQBetPrM/9I2lSvHn1PM3ZBRJZ8RI2174?=
+ =?us-ascii?Q?K33cbj3wffz4K7Pfp75y+1s98GZBTg/RpBw4N/WcOKTRyVtLTFhK7KX4D/P7?=
+ =?us-ascii?Q?puCQH4zUr2R1joDgBtbDsoWgPUnVQLVitT2o19huSU/vl+sDpCpE7tYbQgRw?=
+ =?us-ascii?Q?v56l/g1jv9MADv1jKxBMGxnlMhZrx5yNS9zBi2dObp/btPw6t+FcdCxNUfXN?=
+ =?us-ascii?Q?IqlUXSPCuTsSjN7zj4JiQ0MnN2tpxSG4Hn+LUsrgFS+6WQRJVIlFJEEVWnC7?=
+ =?us-ascii?Q?1LyTWsJQV5K3ae9mbE6rFLv2ceB+KaM6GZVREYx/ztrDxjHlIdcksjX8VEsM?=
+ =?us-ascii?Q?k1bo4QZJAmhkIsrmYcpU/Fk4QABz3W2hciwsWbTARyo7Ui/3DAE5n4K+0G2W?=
+ =?us-ascii?Q?bxwWSuVIPrvHPSTL3YgqLLGza610OYP7oKjFZi7+rSFyn4diDwJow/DcNIRf?=
+ =?us-ascii?Q?mDSU83u5zgevTcoGzcvZQtJZOzciLLLdILlk27VCfO+kHKGFqHmsjGmmGRTm?=
+ =?us-ascii?Q?JeNTbzhBhSOfWusBKyGc7cGn5lHQ8SoRlt8iTQhAUMHYyEtQ11zmD1el/6bG?=
+ =?us-ascii?Q?xLpHgG1OTPzv1HHVLB7HUxhef5el72Fj6XOQfG90FpdeUcr9KAOZXrLG3aaM?=
+ =?us-ascii?Q?hGlYWYKRRhr8W79tVUavSbHDgCeFBaRH6nmQO3EIi9acD9dNBoRiDbLV1To0?=
+ =?us-ascii?Q?8GmpmSTImIlcRtd4mrRfK8ylrv7oWucz/qQWuiMwMh7QxnSPpBBr4Li71BAS?=
+ =?us-ascii?Q?KTp7bzhgKry0Qm97GybgXl6jycB/MGYE8jDLNSukoDHAKhIUnsUZUrA9xPiU?=
+ =?us-ascii?Q?UgIFIIu0sxesj0zLeGGD2cMyNmdtA6Nyol+0gtgo0DNXTQPiRz0t4mS+wsDr?=
+ =?us-ascii?Q?DPMLA+0MxlpgeAN++2bj?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MfuSrqyDinnA7FZEsb5stHOw/l6Jnqjzmwoh1VIU7zgjsLf/HT33ZE71XGzq?=
+ =?us-ascii?Q?714HrcLHENSFtuNEVp3Lr6zpgH1JLsojo2WifrCDRNitr7zHqMsxhDRhyvne?=
+ =?us-ascii?Q?W6gzUL37k4IA0l9s9tL0G5npF7/EavUWBeRzaTG06qDDKPSzeZGVRmhhxh3w?=
+ =?us-ascii?Q?ViFW0oycHHep8UhEF+OsQhD9toAzBnA+FACtuJ5I5KLDa4YqCW5iYUCSi/zg?=
+ =?us-ascii?Q?+HWwlBexy0bs6t0KS4RWrDeGidL2xLXnA0s2//iJq1vejeT3lpenM8MvrXba?=
+ =?us-ascii?Q?IX05/EQuVOLzwb9yzUC8PHCam5BDZYe73evG+cGEZt/ABUiGe6Tyh01XRmpy?=
+ =?us-ascii?Q?q18slBZe/YZeansNaAVYg6jnk354rG3Jk0Nwux2YRq8e3WqFK50ewpGOo/BB?=
+ =?us-ascii?Q?MJkZXGNI+U1g4VZtccjKqX/UEHFSEj/AvK09O7vopnA8BFfzY41nn974s33k?=
+ =?us-ascii?Q?DLWSsC/8uh1WoyYNjTa8afSIcdYZvcQoFCXoWSiuXjw3RPASXPUHZT7i6rWF?=
+ =?us-ascii?Q?bzEQzU1lXM6rGMaMIWvKnsqAi455mMXMsKdko5deFStr5LY15aJvDrppiVVH?=
+ =?us-ascii?Q?NRgZiXBD7BXyLRrtPzkM+53xB2WAUMQ0mLnQO3+hfB2qnBr/1iXTQtomsNeO?=
+ =?us-ascii?Q?mJy+puTFIkDGAiWEk2fiETYpO6lcQcIOnK3osAEYHZ08wKe0qa+O+P27zY5w?=
+ =?us-ascii?Q?IXvXy1oPte3t0GYLdSrodhBrEzFDKfaK9vhcFpmeh8HtRBIOUJgEClQiRXJR?=
+ =?us-ascii?Q?z11a7ffAbF2bbkB43HmCmwfJcZ+hgnZLOFXkiV31ESX+h1Slt9o34xgTc7/M?=
+ =?us-ascii?Q?RmCFUvHirWwpmxvRlYokSdIEGB9urMuAZy4E68S2a+OgZnMaHEUdq96rYRl+?=
+ =?us-ascii?Q?q3KSNYk1ZGQ0fvZTC8YqM4Q/Et+0uon4iDGdHnko/A6poDd4r6PHaju+U2gN?=
+ =?us-ascii?Q?GFKPl8A4+F0Yk6gFtaNRiKNIUcF962JSgAPMLhI3k9ARPMJh0okVfDoqYkXx?=
+ =?us-ascii?Q?cIl/LFf5J2reXPkriaNYfzYQp9UEmchoGuWpvFA/hZ0U2Egtx4P1d2t/nL2J?=
+ =?us-ascii?Q?mzIh464QfHuyUPHaMNyTm31S8GyR8rHtdSfw/bGkIFEo05vEPB9SRhSMuVFB?=
+ =?us-ascii?Q?KdcvUvYyU4cj/Rd7ORm6KYpWJ5vL50eLgUL0m2GB8UnBIVI5qkU2WYJlavN/?=
+ =?us-ascii?Q?E1fV0+zvoCzmqh6P8JhbYOifNrBZEnN/i9eUVA8me+XpxVA1H38qT18eu04T?=
+ =?us-ascii?Q?rBZCXnTDNdzpKHz0UgN+TNJB0k2MBd0gZi6ED5Rg236dnu/i4YS89gnm5ssQ?=
+ =?us-ascii?Q?pNxfEO7NkgF4G5oYZ0Nr+Fnwu11f7yEtgorXnFa4fePgzHcVAQVTf2Kk0wLi?=
+ =?us-ascii?Q?d77B3MrZOXOWLCWq8sQdL3dsnRuHQ2azYWfwA10/is2Dwy38iTElaG7TD4Qr?=
+ =?us-ascii?Q?sA93r5NswpTPvypSW2ybabz6VkqAJXDvTdNMMDLzWCIjx+0fa2tFLSWEqRxJ?=
+ =?us-ascii?Q?LvcZuhWx3ODdFMZheEwR7o8TsXdHlU8B6/cMIcjzDxSVF4gyCfUiU5l0ApbY?=
+ =?us-ascii?Q?GJMzykytupiPZmJrcwal6IlU5OT6ZcvAonQ4N8WWAmgCrCu78jN3BvIhjDc2?=
+ =?us-ascii?Q?HQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 892bbfa5-690e-4353-bdeb-08dced11ab3f
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2024 12:05:32.4639
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aZdWoOdpKo5N2PMVLBeTABrEQffyMLoh7UyO3yvlDOaUKn09O/LjhqFFlFqcZPhzNJYJICUqXsmI1BSNjWsHfEgoih2P2JC0FP5r0qUR7hA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6435
+X-OriginatorOrg: intel.com
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
+On Fri, Oct 11, 2024 at 11:01:02AM +0200, Kurt Kanzenbach wrote:
+> Move XDP finalize and Rx statistics update into separate functions. This
+> way, they can be reused by the XDP and XDP/ZC code later.
+> 
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 
-> On Tue, Oct 15, 2024 at 12:54:13PM +0200, Sven Schnelle wrote:
->> To allow users to have stable device names with the help of udev,
->> add the name to the udev event that is sent when a new PtP clock
->> is available. The key is called 'PTP_CLOCK_NAME'.
->
-> Where are you documenting this new user/kernel api you are adding?
->
->> 
->> Signed-off-by: Sven Schnelle <svens@linux.ibm.com>
->> ---
->>  drivers/ptp/ptp_clock.c | 11 ++++++++++-
->>  1 file changed, 10 insertions(+), 1 deletion(-)
->> 
->> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
->> index c56cd0f63909..15937acb79c6 100644
->> --- a/drivers/ptp/ptp_clock.c
->> +++ b/drivers/ptp/ptp_clock.c
->> @@ -25,9 +25,11 @@
->>  #define PTP_PPS_EVENT PPS_CAPTUREASSERT
->>  #define PTP_PPS_MODE (PTP_PPS_DEFAULTS | PPS_CANWAIT | PPS_TSFMT_TSPEC)
->>  
->> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env);
->>  const struct class ptp_class = {
->>  	.name = "ptp",
->> -	.dev_groups = ptp_groups
->> +	.dev_groups = ptp_groups,
->> +	.dev_uevent = ptp_udev_uevent
->>  };
->>  
->>  /* private globals */
->> @@ -514,6 +516,13 @@ EXPORT_SYMBOL(ptp_cancel_worker_sync);
->>  
->>  /* module operations */
->>  
->> +static int ptp_udev_uevent(const struct device *dev, struct kobj_uevent_env *env)
->> +{
->> +	struct ptp_clock *ptp = container_of(dev, struct ptp_clock, dev);
->> +
->> +	return add_uevent_var(env, "PTP_CLOCK_NAME=%s", ptp->info->name);
->
-> Why is this needed?  Can't you get the name from the sysfs paths, the
-> symlink should be there already.
+Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-You mean the 'clock_name' attribute in sysfs? That would require to
-write some script to iterate over all ptp devices and check the name,
-or is there a way to match that in udev?
+> ---
+>  drivers/net/ethernet/intel/igb/igb.h      |  3 ++
+>  drivers/net/ethernet/intel/igb/igb_main.c | 54 ++++++++++++++++++++-----------
+>  2 files changed, 38 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
+> index c30d6f9708f8..1e65b41a48d8 100644
+> --- a/drivers/net/ethernet/intel/igb/igb.h
+> +++ b/drivers/net/ethernet/intel/igb/igb.h
+> @@ -740,6 +740,9 @@ void igb_clean_tx_ring(struct igb_ring *tx_ring);
+>  void igb_clean_rx_ring(struct igb_ring *rx_ring);
+>  void igb_configure_tx_ring(struct igb_adapter *, struct igb_ring *);
+>  void igb_configure_rx_ring(struct igb_adapter *, struct igb_ring *);
+> +void igb_finalize_xdp(struct igb_adapter *adapter, unsigned int status);
+> +void igb_update_rx_stats(struct igb_q_vector *q_vector, unsigned int packets,
+> +			 unsigned int bytes);
+>  void igb_setup_tctl(struct igb_adapter *);
+>  void igb_setup_rctl(struct igb_adapter *);
+>  void igb_setup_srrctl(struct igb_adapter *, struct igb_ring *);
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 341b83e39019..4d3aed6cd848 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -8852,6 +8852,38 @@ static void igb_put_rx_buffer(struct igb_ring *rx_ring,
+>  	rx_buffer->page = NULL;
+>  }
+>  
+> +void igb_finalize_xdp(struct igb_adapter *adapter, unsigned int status)
+> +{
+> +	int cpu = smp_processor_id();
+> +	struct netdev_queue *nq;
+> +
+> +	if (status & IGB_XDP_REDIR)
+> +		xdp_do_flush();
+> +
+> +	if (status & IGB_XDP_TX) {
+> +		struct igb_ring *tx_ring = igb_xdp_tx_queue_mapping(adapter);
+> +
+> +		nq = txring_txq(tx_ring);
+> +		__netif_tx_lock(nq, cpu);
+> +		igb_xdp_ring_update_tail(tx_ring);
+> +		__netif_tx_unlock(nq);
+> +	}
+> +}
+> +
+> +void igb_update_rx_stats(struct igb_q_vector *q_vector, unsigned int packets,
+> +			 unsigned int bytes)
+> +{
+> +	struct igb_ring *ring = q_vector->rx.ring;
+> +
+> +	u64_stats_update_begin(&ring->rx_syncp);
+> +	ring->rx_stats.packets += packets;
+> +	ring->rx_stats.bytes += bytes;
+> +	u64_stats_update_end(&ring->rx_syncp);
+> +
+> +	q_vector->rx.total_packets += packets;
+> +	q_vector->rx.total_bytes += bytes;
+> +}
+> +
+>  static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
+>  {
+>  	unsigned int total_bytes = 0, total_packets = 0;
+> @@ -8859,9 +8891,7 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
+>  	struct igb_ring *rx_ring = q_vector->rx.ring;
+>  	u16 cleaned_count = igb_desc_unused(rx_ring);
+>  	struct sk_buff *skb = rx_ring->skb;
+> -	int cpu = smp_processor_id();
+>  	unsigned int xdp_xmit = 0;
+> -	struct netdev_queue *nq;
+>  	struct xdp_buff xdp;
+>  	u32 frame_sz = 0;
+>  	int rx_buf_pgcnt;
+> @@ -8983,24 +9013,10 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
+>  	/* place incomplete frames back on ring for completion */
+>  	rx_ring->skb = skb;
+>  
+> -	if (xdp_xmit & IGB_XDP_REDIR)
+> -		xdp_do_flush();
+> -
+> -	if (xdp_xmit & IGB_XDP_TX) {
+> -		struct igb_ring *tx_ring = igb_xdp_tx_queue_mapping(adapter);
+> -
+> -		nq = txring_txq(tx_ring);
+> -		__netif_tx_lock(nq, cpu);
+> -		igb_xdp_ring_update_tail(tx_ring);
+> -		__netif_tx_unlock(nq);
+> -	}
+> +	if (xdp_xmit)
+> +		igb_finalize_xdp(adapter, xdp_xmit);
+>  
+> -	u64_stats_update_begin(&rx_ring->rx_syncp);
+> -	rx_ring->rx_stats.packets += total_packets;
+> -	rx_ring->rx_stats.bytes += total_bytes;
+> -	u64_stats_update_end(&rx_ring->rx_syncp);
+> -	q_vector->rx.total_packets += total_packets;
+> -	q_vector->rx.total_bytes += total_bytes;
+> +	igb_update_rx_stats(q_vector, total_packets, total_bytes);
+>  
+>  	if (cleaned_count)
+>  		igb_alloc_rx_buffers(rx_ring, cleaned_count);
+> 
+> -- 
+> 2.39.5
+> 
 
