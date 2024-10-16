@@ -1,154 +1,103 @@
-Return-Path: <netdev+bounces-136079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EF549A0417
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:21:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7130F9A0418
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54A3E1C2AA4D
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:21:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31281281000
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAFD1D278B;
-	Wed, 16 Oct 2024 08:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250B51C2DAE;
+	Wed, 16 Oct 2024 08:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vw9LJJZQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gA6Io4dD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687D21D1F76
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8DA1B21AE
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729066878; cv=none; b=qdzl4D3/kjy2Y9sPZD0v2Fv+yySFZz+6FBiQPIgAbe6svsx7hICmi8Pb/N4hg27mKWO/VO/sD8YcnYeSUjxBZnfBZc1MifM0JBfqQVMeWVRzeSRMSWvPZwyKi5YN0hHplGI9ZGwvkuajH/DBSgrAIkhkNX95n1tmbNNbLAypgBU=
+	t=1729066941; cv=none; b=XjJoY8CYJDwedNZLBwu1OvVX5omAR4SE1fR9XaHPUiO/KLWKvcP7Bo3WmWYh/2l1vz/2Re/pDcV3jxJE7ZAfXBazB7z3XhyqnFGyvxBt5caSbNMm/97jW8pgpWB4Q8rAqdr5BSR6rM5bc4uiowWC6pD65WSb+9fn3kV4UbJHUXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729066878; c=relaxed/simple;
-	bh=aJueLz+IN4WlI4tmlwGHSA+XgBXSW5DM+SgqfEl3YDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PsQ7uab/W7uouJxVR9wZol4ysGIl2M9YZ08Cdru2EssDoYm9JrCRf4Ol9RMfU2PIjbY7mh+vnLfBdSFz9TlZdPQyA+E3MK5lWfR91R88pgFe3wyKsLo3vh2Y8o02V97OgNqz9MmaT/4Qn6ZD5giiBwNcboF7B1O1kZ8/afjRrY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vw9LJJZQ; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-37d473c4bb6so4877241f8f.3
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:21:16 -0700 (PDT)
+	s=arc-20240116; t=1729066941; c=relaxed/simple;
+	bh=K0d18THzbfUB6LwAU1/WojMFGE73LSJivrI3N2f3R8Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j12IDov5NoUmnqfzkYuK6MpaVmxSoWViUPuBGlnU/P5UB27cpVg4sCCxQcCZUlhMEx45fHyC17fcml43965r4syyPJZ8SKGmsgYE/mstHTnef7brhD7szJGtpM3mDT/TOocZ8vSjd+6frQcEIHB6JFxoaM90ITUHeGemo1y/qAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gA6Io4dD; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-37d461162b8so4180946f8f.1
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:22:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1729066875; x=1729671675; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tP50kWPiw0MifDHtIyl2wdMhk6Jfke3YsVD3vsO0JF8=;
-        b=vw9LJJZQyaPUkPSdeVBuXLaFMee3xvntMo50obSjx8jhhDVmvCG07S2RFP9QNVmqCZ
-         5QOAcyXKxtmv8q/DYcfvEM2yYh031EYzJnaY+Wj3o9oPyHLJKA1Q6c2WVuJxtc/4mKob
-         CAPU1URBKBFEh2fdHHIpLnkjzYBlPriWXjnyvcSxrBEI5+cSHr/J3phBOSkMv3jrDn9W
-         Xl2ufjDJojO/97oolj3GNAlIlObb9G+IDHxHQi4Z4u1Vsy03bsoD+EIKB1BsQHWCKoqb
-         4GcCOF3u+MR8koGsgUmjaLkzYG2nWK58Ap4H/JNxSPFDvH6qKwuY5exOKXYrX2dts5Pv
-         aSfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729066875; x=1729671675;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1729066938; x=1729671738; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tP50kWPiw0MifDHtIyl2wdMhk6Jfke3YsVD3vsO0JF8=;
-        b=iUu2WPx7thNXgkjfoOkBAKoeJc/b2UO3/6vkPmx2HmCO46AhGKYr/ZPqB6MB6XC/lb
-         dL2hmL/2QStCLUvCBpkmFOVcjKnlm8z7rafZ3Cc4efddcQYitiwkSlgZhwcOu7tLklqr
-         Tr3uFPCf9m24Wzzk2+4+Uqgmfy6IrsDckJP9a6BdXPg+rm3QyQinq1jvkCDFaMmWTvXT
-         kTFXuUk3MKxLs2bm10Tk1W4pla1XrTvGes98orZjaw1iYDIOyaVR3VkHYNUMi/ZVXs8Z
-         iLb0vi0idL2kScpXc7ADSiu/s+KHdnOShVdctADf7t/W6EEF/oV5UxClAGXo15PgI7J3
-         Mhmg==
-X-Gm-Message-State: AOJu0YxniEkfIrwX/S0rWjV3qLjYX4C8nztUC+uqh2kM1oQmM3qlsitY
-	9ejyl7olLpA501d7k0cND0o3Nl703VXhyBIPk5rJGGeSip3cZWquGvvh0VKUfSc=
-X-Google-Smtp-Source: AGHT+IG4cjXE6vaHzEExA5NCTXa1i23amKdREgZQifEbDS9I5YXhdEmEZ9VOiFHQFdYbciM+U/Bq3w==
-X-Received: by 2002:adf:fa46:0:b0:37c:cc4b:d1d6 with SMTP id ffacd0b85a97d-37d5ff8e817mr12950900f8f.27.1729066874557;
-        Wed, 16 Oct 2024 01:21:14 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa7a173sm3651876f8f.15.2024.10.16.01.21.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 01:21:14 -0700 (PDT)
-Date: Wed, 16 Oct 2024 10:21:11 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, donald.hunter@gmail.com,
-	vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com,
-	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com
-Subject: Re: [PATCH net-next v3 1/2] dpll: add clock quality level attribute
- and op
-Message-ID: <Zw93d2xz3TpOVp73@nanopsycho.orion>
-References: <20241014081133.15366-1-jiri@resnulli.us>
- <20241014081133.15366-2-jiri@resnulli.us>
- <20241015072638.764fb0da@kernel.org>
- <Zw5-fNY2_vqWFSJp@nanopsycho.orion>
- <20241015080108.7ea119a6@kernel.org>
+        bh=K0d18THzbfUB6LwAU1/WojMFGE73LSJivrI3N2f3R8Y=;
+        b=gA6Io4dDXIGUWESIL+pPZJM9oFaXSBXdm8/QhkTbkaCwt5+xc9zsPcEx8Lifk3+B2g
+         SFomvBdmlvN6O/3KCKiH3W/lhWnKlaQyZd0optgGWenOXDPDPWrMab8322yYoHac/2+J
+         xsdM3vZQfliWGnW8V3WI3zE3gQq9hT2dxPtbDDDgDcoWJ971Hb+97vND+v1ULIlF0fJt
+         8AzDfUG0OP7zv8OhQVZVKoA28Ji3rBCdTETYhShkcTna6vA9TrBEgcJtOQ54ZbCeW5KS
+         s7HjJe3Ofxyw896YqbkJVrIeKQR7/kT+YLSY+O1aouJDVnSpnKSre7JnhtjIXQsMqasV
+         tZTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729066938; x=1729671738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K0d18THzbfUB6LwAU1/WojMFGE73LSJivrI3N2f3R8Y=;
+        b=MQp6FqjjtAL6In7HBEWMnqN1BhHS/31DqBCGPhg8v2No6zuZMkSQtP8uQelcE+szU6
+         ROoYCTph+15aWvjG60u5gieFyNj+X+YwgSAIjj/1zVDgqwk9juDsglgou49TBIpNxopI
+         xbP4znSy2vHwc+YpN7u+IrVyiRmndWzn1R1ypEpm3buxJ4aMHe9WWu/R/H5D9qGw5+0x
+         TAgOapoeysUFc3FTVfn+ItxZdWw0wtb5FRZvgA+v39F0WIML6mxrj9sXDnqXS+ELtBZT
+         FWOLihxAsBQBtTH/8+nzfHCa4UMu9au+dbMixFWfXyUY05umpfBicHCJ+x+CA2HAnMWk
+         ISBA==
+X-Gm-Message-State: AOJu0YyTD7FufXnmPECKDYkmhMlWtzUOibPATfhyIu0t03mdp5LpYJDI
+	YtiqJnA0lr62Jl+YNMCS76QQ3W+ewvZrz+pTtzMoVgASndkGKgc0Lw1/08hAduuOzEwHyG8un/9
+	bfqYFcfYzTvHU18IqhwfOZpD6yz9WxnujVgzOk9tIw8fRP12W5Edx
+X-Google-Smtp-Source: AGHT+IE7/jkWnCvaXDH4bpwieZj+PapXKebg3i0C/PdKAq14Yf4znUUh+mfI0Es0gbzWdaKd9zJxMPPQltY4iL4gTLY=
+X-Received: by 2002:adf:e64b:0:b0:37d:5274:7878 with SMTP id
+ ffacd0b85a97d-37d5ff6ce4amr9292585f8f.38.1729066937877; Wed, 16 Oct 2024
+ 01:22:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015080108.7ea119a6@kernel.org>
+References: <20241016035214.2229-1-fujita.tomonori@gmail.com> <20241016035214.2229-2-fujita.tomonori@gmail.com>
+In-Reply-To: <20241016035214.2229-2-fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Wed, 16 Oct 2024 10:22:06 +0200
+Message-ID: <CAH5fLgiz51z-9oqSM9vOAKUDTireJnRsvQkqh=1hOuBi4M9wxA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/8] rust: time: Add PartialEq/Eq/PartialOrd/Ord
+ trait to Ktime
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
+	sboyd@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Oct 15, 2024 at 05:01:08PM CEST, kuba@kernel.org wrote:
->On Tue, 15 Oct 2024 16:38:52 +0200 Jiri Pirko wrote:
->> Tue, Oct 15, 2024 at 04:26:38PM CEST, kuba@kernel.org wrote:
->> >On Mon, 14 Oct 2024 10:11:32 +0200 Jiri Pirko wrote:  
->> >> +    type: enum
->> >> +    name: clock-quality-level
->> >> +    doc: |
->> >> +      level of quality of a clock device. This mainly applies when
->> >> +      the dpll lock-status is not DPLL_LOCK_STATUS_LOCKED.
->> >> +      The current list is defined according to the table 11-7 contained
->> >> +      in ITU-T G.8264/Y.1364 document. One may extend this list freely
->> >> +      by other ITU-T defined clock qualities, or different ones defined
->> >> +      by another standardization body (for those, please use
->> >> +      different prefix).  
->> >
->> >uAPI extensibility aside - doesn't this belong to clock info?
->> >I'm slightly worried we're stuffing this attr into DPLL because
->> >we have netlink for DPLL but no good way to extend clock info.  
->> 
->> Not sure what do you mean by "clock info". Dpll device and clock is kind
->> of the same thing. The dpll device is identified by clock-id. I see no
->> other attributes on the way this direction to more extend dpll attr
->> namespace.
+On Wed, Oct 16, 2024 at 5:53=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
 >
->I'm not an expert but I think the standard definition of a DPLL
->does not include a built-in oscillator, if that's what you mean.
+> Add PartialEq/Eq/PartialOrd/Ord trait to Ktime so two Ktime instances
+> can be compared to determine whether a timeout is met or not.
 >
->> >> +    entries:
->> >> +      -
->> >> +        name: itu-opt1-prc
->> >> +        value: 1
->> >> +      -
->> >> +        name: itu-opt1-ssu-a
->> >> +      -
->> >> +        name: itu-opt1-ssu-b
->> >> +      -
->> >> +        name: itu-opt1-eec1
->> >> +      -
->> >> +        name: itu-opt1-prtc
->> >> +      -
->> >> +        name: itu-opt1-eprtc
->> >> +      -
->> >> +        name: itu-opt1-eeec
->> >> +      -
->> >> +        name: itu-opt1-eprc
->> >> +    render-max: true  
->> >
->> >Why render max? Just to align with other unnecessary max defines in
->> >the file?  
->> 
->> Yeah, why not?
+> Use the derive implements; we directly touch C's ktime_t rather than
+> using the C's accessors because more efficient and we already do in
+> the existing code (Ktime::sub).
 >
->If it wasn't pointless it would be the default for our code gen.
->Please remove it unless you can point at some code that will likely
->need it. We can always add it later, we can't remove it.
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-Well, I use it internally to define the length of bitmap. Does that
-justify? I mean, it would be very odd to define the bitmap length
-differently.
-
-Thanks!
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
