@@ -1,145 +1,118 @@
-Return-Path: <netdev+bounces-136177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE4C9A0CBF
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:34:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81EDD9A0D00
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D7621C215DC
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:34:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EDD3B285D6
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105A31BAED6;
-	Wed, 16 Oct 2024 14:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD0920C492;
+	Wed, 16 Oct 2024 14:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qwMc9f4y"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o6VnULHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA9F52F76;
-	Wed, 16 Oct 2024 14:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9974820C00D
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 14:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729089277; cv=none; b=k4dH1XuOvLECGvmVRzIPa0BGV9VJ9S1cRsZPjh5CCb1n7KoW1ETIGu1chw300/Kkn7ZRosHX44P9u7hioI2xmSci7Xt/A0spC0GicHJJCZDadggIqYtH5Nxf7+095AFqiF2b6BL+rwCOlQp6NfKcUM3GekCW5GurVEe7+tXstj8=
+	t=1729089713; cv=none; b=ExkhbigEoDE18Ra/8tcfnYwHvIzF5ct23FdzAj67sKJHzNHrsOcfDuDND+O51SWCNmEshQiFTappXsTsn3o4mS/IsTnmKCjOoFc+B2qPHtGyZ7kqXgJeI6YImsS/Y4S1TlhiPXwpotFnfvQfR4LPAT0GEvjfedXLHdy4Xbbyvfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729089277; c=relaxed/simple;
-	bh=/Q2Fdo3DQMDJW7+zCNQDyn/3Ues5Xdu5MPKqpemcjCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RjXMF3cSOjQBbohHa1PBabDjMLHdeaCfoh5fqP4WG8TUDk9Of7Ep600kcC+AmCImdXyezGrWUcyrUuloRXdUO7o1USDNwqSvEfjLOfYWP6LaF5d639JDrNX+IdsPcVQM+cNch+OGYMmlFazIx/qZbRl9fV6zXq14TiCrwf5ESf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qwMc9f4y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C1F7C4CEC5;
-	Wed, 16 Oct 2024 14:34:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729089276;
-	bh=/Q2Fdo3DQMDJW7+zCNQDyn/3Ues5Xdu5MPKqpemcjCs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qwMc9f4yT9P5bQ7c/FT4vnvjbycz0SNLuDaYnusdNchhUT/Th2/v8nyYzAei+paPC
-	 U90HnaU97YXI88xPaFaUqe2F2+93Mj25Xqv6Vwvo8o9vaKdEtE+ONzgY6DPJ7+nocE
-	 4WsUme/lKbHP5zzQj9CL+c41EqiqikX4ngyVDLSOsAGKnf0RAOga9zK+Su6JltJsOI
-	 u7bVLq0mcZVv2j8DA0Alop8bAHVS9lllvlGiNPfqjcSHuZHrL0l/FyzWxv0Iw8ziPm
-	 SelPbykMzcHENeMNAvQCMYlkkaEDHlQ62LdvHqZiHtM4kNs2sJ6j7kLZZfptch2Cvl
-	 Ul2TvbC5TDsHg==
-Date: Wed, 16 Oct 2024 15:34:31 +0100
-From: Simon Horman <horms@kernel.org>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH net-next 1/1] net: phy: Refactor mediatek-ge-soc.c for
- clarity and correctness
-Message-ID: <20241016143431.GJ2162@kernel.org>
-References: <20241014040521.24949-1-SkyLake.Huang@mediatek.com>
- <20241014081823.GL77519@kernel.org>
- <d2c24d063bea99be5380203ec4fafe3e4f0f9043.camel@mediatek.com>
+	s=arc-20240116; t=1729089713; c=relaxed/simple;
+	bh=Xm89ZQTxOiruJJc2c626as0TSbAz4qE0b9K3bd8RCaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=o1fM74H7JZxaAsWa2rgdKEDNhdHpX9xKoItGXZ6zT08tMzVlpzicO5Fycqld00Kjg7wjbTTaMD8b5L3p66am7lByOXhovbTFyg1uugRoYUtTblgv4x2PShDjOgXlyBRoCpBvOWwnXgIA/1aa/bzYP+M/sAomnlZpBPHpAzTmnds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=o6VnULHa; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539f0f9ee49so4343328e87.1
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 07:41:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1729089709; x=1729694509; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yZJgMAiThnKM9DCESXpeGrJ3grxtNNbWoomMwPV4xGU=;
+        b=o6VnULHanMtG7+dCzRcGgocskm9o/gmsp+galBAsKkrCr5Gy1gY9wqefvB6+/wIyX3
+         7cJ8alqUKZW0TxWhDdzqee+HklgqkawQ8IysYinTiWnrvgYpdKiBXLAN9ounWmTdO/28
+         dEBvFrZ2C3OWisam3IQuA3ojln+9G/oUU6xFS+f/8Khts32Lu2AVayP9GG3VzE93m058
+         j3H0hJfT0zG5G3iX9tN3qWEPCq3NuidhRHkbCgociedQgil+JFA5s7sWWFaxDQQh6MSv
+         bZVJScVhmQz/pQ39jekVzabRjeG2gZA8fmLkTFVCW70rhx1dBgBUTeciIli14J5WfOFS
+         cEew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729089709; x=1729694509;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yZJgMAiThnKM9DCESXpeGrJ3grxtNNbWoomMwPV4xGU=;
+        b=VjWGlo8Bkrj04CBBCAJZsAyvn5cQYQ7p1oRp+mMduJT6AFBObvGENyqevBCcWHAVMz
+         Vj0mvmFEK2xGjjWHH1rvnFHp+wTQs16rQx4CjLekKrWPblF01wOB4YfvFkaZiJtCwT7E
+         KwPr+PvdooEnSi5o0G7W5s3dF7lGtBl7cjSfQolvTmDc0e3I/qhKB3dby2UYbzmHyYsB
+         GzqGXL+6CMnIxCN8gXZ5XqAmuGRB2WxwQiiB9KZ3mDGGHDh0V6JRXzEDcjwdhIXUsjKE
+         vhdkvxpt0SYWE+IGAqN5KvxOco2LRELTnVIBVB2pmKs6U/h37uxG0zUhVYBALL+yhBAy
+         B/HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUv6/EIKUFtLsOCBnaBeNu1/FfuGPC2KCLQu4/vsComhI1BCG1KQhcsGia9sqf6QFZ/eFTMAW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+SPX0eGtKq5wJ1efKelPtm81X50haIoS9lB4hWmEL0wFQr2Vf
+	iuK1HJCTAeXD7K+mWvyVMWHGUfRicABY6WTzurfq5sDNMfZdbwEDyefochpXNk8=
+X-Google-Smtp-Source: AGHT+IEO8z3y3HtXlHNDMzb5tA37caZtOPrnQTurgO1vgyFjMMIuObM//raNXXBa8cL3Rrh3e6nZ6Q==
+X-Received: by 2002:a05:6512:e85:b0:539:ec29:1cc3 with SMTP id 2adb3069b0e04-53a03f2da18mr2766237e87.30.1729089708648;
+        Wed, 16 Oct 2024 07:41:48 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2987c700sm190328866b.189.2024.10.16.07.41.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 07:41:48 -0700 (PDT)
+Date: Wed, 16 Oct 2024 17:41:44 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dave Penkler <dpenkler@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Roger Quadros <rogerq@kernel.org>,
+	Julien Panis <jpanis@baylibre.com>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Nicolas Pitre <npitre@baylibre.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-staging@lists.linux.dev, kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] net: ethernet: ti: am65-cpsw: Fix uninitialized
+ variable
+Message-ID: <b168d5c7-704b-4452-84f9-1c1762b1f4ce@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d2c24d063bea99be5380203ec4fafe3e4f0f9043.camel@mediatek.com>
+X-Mailer: git-send-email haha only kidding
 
-On Tue, Oct 15, 2024 at 05:18:49PM +0000, SkyLake Huang (黃啟澤) wrote:
-> On Mon, 2024-10-14 at 09:18 +0100, Simon Horman wrote:
-> >  	 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> >  On Mon, Oct 14, 2024 at 12:05:21PM +0800, Sky Huang wrote:
-> > > From: "SkyLake.Huang" <skylake.huang@mediatek.com>
-> > > 
-> > > This patch does the following clean-up:
-> > > 1. Fix spelling errors and rearrange variables with reverse
-> > >    Xmas tree order.
-> > > 2. Shrink mtk-ge-soc.c line wrapping to 80 characters.
-> > > 3. Propagate error code correctly in cal_cycle().
-> > > 4. Fix some functions with FIELD_PREP()/FIELD_GET().
-> > > 5. Remove unnecessary outer parens of supported_triggers var.
-> > > 
-> > > Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
-> > > ---
-> > > This patch is derived from Message ID:
-> > > 20241004102413.5838-9-SkyLake.Huang@mediatek.com
-> > 
-> > Hi Sky,
-> > 
-> > I think this patch is trying to do two many things (at least 5 are
-> > listed
-> > above). Please consider breaking this up into separate patches,
-> > perhaps
-> > one for each of the points above.
-> > 
-> > Also, I think it would be best to drop the following changes unless
-> > you are
-> > touching those lines for some other reason [1] or are preparing to do
-> > so:
-> > 
-> > * xmas tree
-> > * 80 character lines
-> > * parentheses updates
-> > 
-> > [1] 
-> > https://docs.kernel.org/process/maintainer-netdev.html#clean-up-patches
-> 
-> Hi Simon,
->   Reverse Xmas tree style & 80 char preferences come from your advise
-> in  
-> https://lore.kernel.org/all/20240530034844.11176-6-SkyLake.Huang@mediatek.com/
->   Parens removing comes from Daniel's advise in 
-> https://lore.kernel.org/all/20240701105417.19941-14-SkyLake.Huang@mediatek.com/
+The *ndev pointer needs to be set or it leads to an uninitialized variable
+bug in the caller.
 
-Ok, sorry for the mixed messages.
-In this case think these can stay after all.
+Fixes: 4a7b2ba94a59 ("net: ethernet: ti: am65-cpsw: Use tstats instead of open coded version")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 1 +
+ 1 files changed, 1 insertion(+)
 
-> 
->   Because previous patchset(
-> https://lore.kernel.org/all/20240701105417.19941-1-SkyLake.Huang@mediatek.com/
-> ) is too large, I guess it's better to commit this change first so that
-> I can handle the rest. And this should be "some other reason"?
-
-I think it is sufficient to bring to our attention that there is "some
-other reason". Sorry for not remembering it.
-
->   And since this patch is simple clean-ups, is it necessary to separate
-> it?
-
-I do think that would be best.
-But if you strongly think otherwise I can try to review it as-is.
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index cda7ddfe6845..fe1f2fa0ff9c 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -1341,6 +1341,7 @@ am65_cpsw_nuss_tx_compl_packet_xdp(struct am65_cpsw_common *common,
+ 
+ 	port = am65_common_get_port(common, port_id);
+ 	dev_sw_netstats_tx_add(port->ndev, 1, xdpf->len);
++	*ndev = port->ndev;
+ 
+ 	return xdpf;
+ }
 
