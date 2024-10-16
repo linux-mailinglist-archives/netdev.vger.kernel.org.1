@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-136084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8638A9A0429
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:25:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 869509A042C
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B90B1F22585
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:25:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47C622822EE
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F521D1305;
-	Wed, 16 Oct 2024 08:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E189F1D131D;
+	Wed, 16 Oct 2024 08:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rZKWlFK3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ulGuSHs/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A23E1C07E3
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BF11862AE
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729067128; cv=none; b=Mnv9qveWq55m2AHPZbJEWX64HBuV4kRLdF6evyWLkvh3FhNfgNzGG8uDuN9bI7Idl3lQKyoPKq+IaU5attsp7OoXWbdh1NdSez5YAP4rlrc3fgA+lz2V1Egix/Ifz7xZH1wkM3igDqy47621LRl6bTbLslwjCOfa7QPlHElcQcQ=
+	t=1729067171; cv=none; b=duCACEofSvwa6573MJdioryk2BMDatDvD22VQ76i/+pMpr8BJ0u9ij3uF3G3MIODri3QJumMVbOdIibctSStpwx0JEJJqfrjspIdVGE9iytkScyIrkHcGpBdWCykMBkGapPErZ8PQHqSWKTaA+G11JcanYpG2zaG1jqKkCFK3LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729067128; c=relaxed/simple;
-	bh=GdAyAonw0lhETMxgs5zFKVxDfwdt0gZ2m2246xw34ro=;
+	s=arc-20240116; t=1729067171; c=relaxed/simple;
+	bh=tygiRFqbv+djzCkWAvjrXrySmhBjmetaHW6CXjdEyUE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R04PkVkWVANwgZ3XIEIGa0vDaE3cnUhGwZ3JvJMKIu24V5V/l2mwCjS+W0CSFrRgqh+hB2qkgYT5UNEMTbnHGC4velE/4JiiE8o7+eUDzYcNmFhgoc/g41DtFnWk+CUWz6pSqIzFfA4JOkl+WDx8aIgDFPqTuM/SrLXUgdRQSBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rZKWlFK3; arc=none smtp.client-ip=209.85.128.50
+	 To:Cc:Content-Type; b=rXpBb5ufYmoMvbwR8rY+E5LfmwKEDXcUUpixH5ZakD1WFDb+962xXJYDmzifXD8EYj5ClUqTEDAaa6j7Lrj7NaSm7DqFqbXIz/lnPzufMBQQdDpEWFBqm6TWgk/RJ6LnQbphGi1Ht4SIV5fvC3XwraGfQoKDUgbRYChw0IBP2ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ulGuSHs/; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4314311959aso11800605e9.1
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:25:26 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37d4ba20075so4143981f8f.0
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:26:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729067125; x=1729671925; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1729067169; x=1729671969; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GdAyAonw0lhETMxgs5zFKVxDfwdt0gZ2m2246xw34ro=;
-        b=rZKWlFK3Xwm5lj3ojiOxX+gQ3IT1PWqEHPdOB2/+wntq2GEmJ8kWJTjt2VyOI2IVuH
-         ORfeuyRiYRh+jJ62sPu+DAVJND+l96QvKMOUHDuizozSlhoRN/yhbjV5UhUamGtf+6PZ
-         VfHdCqyjNX0zouv1WwkVRLq0F6HMcCFqd70zFbE+R7b5ts8id3ammLeCo9scfGdAZfLM
-         9lBK6/iPWXlA0Zsdi6yhPyoDdc9UTU7yLILiVmBxqxVi6uYezTgUnhTnn+3igfwq0jvS
-         yE2PXimnu+NIlNYrIRrr0EnRR/ybVqPg/piaEynBekLUa6ehKufeIGUP3gLZ8Dauw8Yf
-         sqoQ==
+        bh=I+7LwnnrTbH3RKt7BRM7LcBiqKf9Vi4DwjUCj0Z2Cpc=;
+        b=ulGuSHs/Zgf6jxgwGsWmkoTkCwt/2B9NgJ87CrKY+390dJsev3nit0AVgnF+YGhFxA
+         XXI4pPseYdHmZ56BQvw1y0HpUbKAmtgwewC9E8UJnmoTYkgP+F4vVjMC4B0jXlt/QdZo
+         UnVmJWQDflxVlHN38kKjp+ngP3LZ+ZRLCn8vr7ntt2HzS46029vs0ZWM7R1co3s6I5uA
+         GvR8lG2yeAtsmp/XgT5P5lP5b7ZsjgX6gDRfjdn5FF3PxWL8Tcob7oFSMWIVC5rfSI92
+         /nUuNmzFyZFguapVJ9zzGeXJtiuzRAEw4GONVAofLwZ28xj+dBz+ouhnXmjt8qW4BD8k
+         80aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729067125; x=1729671925;
+        d=1e100.net; s=20230601; t=1729067169; x=1729671969;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GdAyAonw0lhETMxgs5zFKVxDfwdt0gZ2m2246xw34ro=;
-        b=Nr0ZeWuSwWCxNrgg3551Syakdw6YXrdyaXKU9Ssona6WPAhdc4YWS+kZ54MovBNTb7
-         IcKUH64Re2wYwzvqPfTunna0fVR4aAHJi7Kgez5kWRNLXOaWv4S6t1e25APLcYryPF/J
-         J7KxAvZCE3rtUAgsIdmvPWkMt6ZRB4eiaDRBQ/8d+r966hJKuOgjAdkcFCvyE5VNE4IF
-         Zhq3vSwd96fQwaNfL+SEpA52YKSPVLZ0nnPEp2z96SOF7dke1ni5hGNoWGyuw6K0ix2W
-         Wi0vULdhBG5Q1bbl1zZNZdQBrfn4dXyYRagGTSKs+lemXqJAHfq2j6npp56XwEj+Ak+a
-         FczQ==
-X-Gm-Message-State: AOJu0YzgNzfMQrL5X2/JPRv91wGii22OGwAafYm8cQHScw3M9ScJmEse
-	GcBnpYiHSYbxBkSCw0MrDVrByQzN3hp6H1M16JD3oII3lW6Hk7R2H0tY+CIWkzc4gDB852elPx4
-	oee4ntd0+BdYrBmAtJLzm1Ia3A8zeE1FqcPVM
-X-Google-Smtp-Source: AGHT+IEApi9dCVmH+iFfN2VYbxBm8PF+pe38gGf01vU4SF+ykoiE21dcj6paXzZPtBxSH+8uzj9i0Ryw/Y5uTcsq2ik=
-X-Received: by 2002:a5d:4f8a:0:b0:37c:d53a:6132 with SMTP id
- ffacd0b85a97d-37d5fefa845mr9658199f8f.31.1729067125280; Wed, 16 Oct 2024
- 01:25:25 -0700 (PDT)
+        bh=I+7LwnnrTbH3RKt7BRM7LcBiqKf9Vi4DwjUCj0Z2Cpc=;
+        b=rhiWQ3snIrmS+Eb1KqFrafiCFPjPk68684jfnhRSwegquKPXGoddvMSl17U6NHqCBe
+         eLpspmo/UagDQIRAJmVdGhsbgd5GRM9+KG+gF78Sal857kJtfKZCTYS9kj/VxEObQ6hY
+         QMc0ZdlznmV3qu6RnSRM1VrjMUhr4NYyHm40xsIlxwGJdsHqxL5juP61CzFu8brOpsrf
+         PYS79n3u2DgAvf7kE26nrWjAtfiE3hFvhetCoKjmktC5LTg69nQuXMDY5J0sb8afReDD
+         rINqaO1BtXltqxRjZsvEm+c8NaKOJVtbgT14VfMiQh1JZCtYwANvGTQawri/mEzRmF9l
+         yOWQ==
+X-Gm-Message-State: AOJu0YxDvHaIgxL9DIgzhueGVEY2XxVszSHdIIORciBDWV4ZeoxTOA9+
+	dvZAKzESvtKtMY0dax4ycVMjr49JW1O7letORHFNY95INx8NTR6a3zwj+ZwHwa70ou9GU05THib
+	53Y5HsewyDMB6rbQUyIVGvvE5QzbMNqubacch
+X-Google-Smtp-Source: AGHT+IG3IXPeMudvkdrtSejG9A2Vrc5kJHuxJRzENV1HoWLFGAnZtzhqRbbC+l/e1CT7Jq8syro7lAXEjkQOMCt5MBo=
+X-Received: by 2002:a5d:6b83:0:b0:37d:395a:bb7 with SMTP id
+ ffacd0b85a97d-37d551fc5ffmr10919996f8f.31.1729067168659; Wed, 16 Oct 2024
+ 01:26:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com> <20241016035214.2229-4-fujita.tomonori@gmail.com>
-In-Reply-To: <20241016035214.2229-4-fujita.tomonori@gmail.com>
+References: <20241016035214.2229-1-fujita.tomonori@gmail.com> <20241016035214.2229-5-fujita.tomonori@gmail.com>
+In-Reply-To: <20241016035214.2229-5-fujita.tomonori@gmail.com>
 From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 16 Oct 2024 10:25:11 +0200
-Message-ID: <CAH5fLgjKH_mQcAjwtAWAxnFYXvL6z24=Zcp-ou188-c=eQwPBw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/8] rust: time: Change output of Ktime's sub
- operation to Delta
+Date: Wed, 16 Oct 2024 10:25:56 +0200
+Message-ID: <CAH5fLgjHtRJg9E7Xjxt+Xgt_0=7zk2jFYLiuzJSeibdx2yHrWQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 4/8] rust: time: Implement addition of Ktime
+ and Delta
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>
 Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
 	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
@@ -90,24 +90,44 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Oct 16, 2024 at 5:53=E2=80=AFAM FUJITA Tomonori
 <fujita.tomonori@gmail.com> wrote:
 >
-> Change the output type of Ktime's subtraction operation from Ktime to
-> Delta. Currently, the output is Ktime:
+> Implement Add<Delta> for Ktime to support the operation:
 >
-> Ktime =3D Ktime - Ktime
+> Ktime =3D Ktime + Delta
 >
-> It means that Ktime is used to represent timedelta. Delta is
-> introduced so use it. A typical example is calculating the elapsed
-> time:
+> This is typically used to calculate the future time when the timeout
+> will occur.
 >
-> Delta =3D current Ktime - past Ktime;
+> timeout Ktime =3D current Ktime (via ktime_get()) + Delta;
+> // do something
+> if (ktime_get() > timeout Ktime) {
+>     // timed out
+> }
 >
 > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-So this means that you are repurposing Ktime as a replacement for
-Instant rather than making both a Delta and Instant type? Okay. That
-seems reasonable enough.
-
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+
+>  rust/kernel/time.rs | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
+> index 8c00854db58c..9b0537b63cf7 100644
+> --- a/rust/kernel/time.rs
+> +++ b/rust/kernel/time.rs
+> @@ -155,3 +155,14 @@ pub fn as_secs(self) -> i64 {
+>          self.nanos / NSEC_PER_SEC
+>      }
+>  }
+> +
+> +impl core::ops::Add<Delta> for Ktime {
+> +    type Output =3D Ktime;
+> +
+> +    #[inline]
+> +    fn add(self, delta: Delta) -> Ktime {
+> +        Ktime {
+> +            inner: self.inner + delta.as_nanos(),
+
+You don't want to do `delta.inner` here?
 
 Alice
 
