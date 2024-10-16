@@ -1,92 +1,123 @@
-Return-Path: <netdev+bounces-136110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8703E9A05D2
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:42:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381C49A05AB
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A952B27508
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:42:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7F3F1F26332
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9424206046;
-	Wed, 16 Oct 2024 09:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C222205E35;
+	Wed, 16 Oct 2024 09:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKOX9/0G"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9810205E35;
-	Wed, 16 Oct 2024 09:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F6F205E05;
+	Wed, 16 Oct 2024 09:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729071702; cv=none; b=TwmIBWTn+OD/LRbtoeTQnzSxKaQwA/euFnL1JPrhUm3aJdgHH979x/XagzbH/5u8Ej0hFoe2kMqTs0H0JdoGWDuVkUdiTUJ9SlPLOX8adpDzj8R7R4xoivqpOTGzHSfN58wwXPOSm6EGgCpJtkP6Ti943XwAgobpcdu3ahEFVY8=
+	t=1729071432; cv=none; b=tMUv6aUC8PIdhk+1ZEkqzFNMbxjkAYK92e8rEkrxRAsAh8pqGy3tiPGc92oHPhDrmtZGo/urrewcAA5wSvD5wVFvFV8LVSwilyITZ2WJkYSLp7GwkgNDexnDllcOOOqGqQK9dQ3AR0NqQ35lnnb/P7O78WHtgmtmI0Z+fMN6Y1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729071702; c=relaxed/simple;
-	bh=gqR0uJIVTlZsI3+1S0rqvu4BJdP6x2Da03BQmJFgk28=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mdQjvOH922gxOB91cn9SLq0Nr4jOgPFr5rcd8ojvZB4R814LSVSY1sWIYGRguAT2SplRQJSfgsP367j14t8EDP/U2mn+BcMWfKBv7YcuUp+s+U1B0b4krURIR+MZX2O2nnWXmXmjPxMdPcWvovr+nRGpa0g90LOgjfhW1E9JdoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XT5YK69T8z1SCjK;
-	Wed, 16 Oct 2024 17:40:21 +0800 (CST)
-Received: from kwepemf100018.china.huawei.com (unknown [7.202.181.17])
-	by mail.maildlp.com (Postfix) with ESMTPS id 95E61140361;
-	Wed, 16 Oct 2024 17:41:36 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemf100018.china.huawei.com (7.202.181.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 16 Oct 2024 17:41:36 +0800
-From: Junxian Huang <huangjunxian6@hisilicon.com>
-To: <larrystevenwise@gmail.com>, <leon@kernel.org>, <dsahern@gmail.com>,
-	<stephen@networkplumber.org>
-CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>,
-	<huangjunxian6@hisilicon.com>
-Subject: [PATCH iproute2-rc] rdma: Fix help information of 'rdma resource'
-Date: Wed, 16 Oct 2024 17:35:26 +0800
-Message-ID: <20241016093526.2106051-1-huangjunxian6@hisilicon.com>
-X-Mailer: git-send-email 2.30.0
+	s=arc-20240116; t=1729071432; c=relaxed/simple;
+	bh=3qs9RCIcBMaiRaaQowBtUAYRplzqstMrihAHPPNLmDY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Cnc8wtkcZW4olhmy2rYsWJnD/QgVO9gh2vUVBSkOn67kPDmY099bhEA8vV66VwO97rNkYvxIM3kXWhNUrdu/pbB7gXJTcsJqQdGPIPjm4g3/vevlGgQ40ytb1ARV34FsVdK9InA5uAqNp79NI27YxaJ6uee+i65AQPJYPQSmYKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKOX9/0G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A83DEC4CECF;
+	Wed, 16 Oct 2024 09:37:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729071431;
+	bh=3qs9RCIcBMaiRaaQowBtUAYRplzqstMrihAHPPNLmDY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=TKOX9/0GP1+lza5sQLTeaGorlh3MWnyZcXGq05D/f/GBd2opmS8ChUbAgJdPb/CZ1
+	 yn5rFWuoHPLLh+d3Tn7faqhBzYHFIRUNCjskSa+aHE7Hk+eHTbbOc5TCSh9q9iJ3uy
+	 ecD+a1d8UI2TkI22bqwo5dXLynEXWBDFQZqY5PiV0eO3UFpqqqMhVJV65YiRQTDMNj
+	 WP2usCFu0zlWexw7EVaqgNj9e/FFPneDaR8h9YjjAPmN4hPc1uAoQejPiORMJPvOU5
+	 CWaLZFgGsjhgxS13aQ+7ta5bJuOGaob/3dXOYCK3/wDOU6szpcWpgz4jJlrkWESsRr
+	 s45FfeYSH4aKw==
+From: Kalle Valo <kvalo@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>,  Niklas Cassel <cassel@kernel.org>,
+  Sergey Shtylyov <s.shtylyov@omp.ru>,  Basavaraj Natikar
+ <basavaraj.natikar@amd.com>,  Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>,  Arnd Bergmann <arnd@arndb.de>,  Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>,  Alex Dubov <oakad@yahoo.com>,
+  Sudarsana Kalluru <skalluru@marvell.com>,  Manish Chopra
+ <manishc@marvell.com>,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Rasesh Mody <rmody@marvell.com>,
+  GR-Linux-NIC-Dev@marvell.com,  Igor Mitsyanko <imitsyanko@quantenna.com>,
+  Sergey Matyukevich <geomatsi@gmail.com>,  Sanjay R Mehta
+ <sanju.mehta@amd.com>,  Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,  Jon
+ Mason <jdmason@kudzu.us>,  Dave Jiang <dave.jiang@intel.com>,  Allen Hubbe
+ <allenbh@gmail.com>,  Bjorn Helgaas <bhelgaas@google.com>,  Alex
+ Williamson <alex.williamson@redhat.com>,  Juergen Gross <jgross@suse.com>,
+  Stefano Stabellini <sstabellini@kernel.org>,  Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>,
+  Takashi Iwai <tiwai@suse.com>,  Chen Ni <nichen@iscas.ac.cn>,  Mario
+ Limonciello <mario.limonciello@amd.com>,  Ricky Wu <ricky_wu@realtek.com>,
+  Al Viro <viro@zeniv.linux.org.uk>,  Breno Leitao <leitao@debian.org>,
+  Kevin Tian <kevin.tian@intel.com>,  Thomas Gleixner <tglx@linutronix.de>,
+  Ilpo =?utf-8?Q?J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,  Andy
+ Shevchenko
+ <andriy.shevchenko@linux.intel.com>,  Mostafa Saleh <smostafa@google.com>,
+  Jason Gunthorpe <jgg@ziepe.ca>,  Yi Liu <yi.l.liu@intel.com>,  Christian
+ Brauner <brauner@kernel.org>,  Ankit Agrawal <ankita@nvidia.com>,  Eric
+ Auger <eric.auger@redhat.com>,  Reinette Chatre
+ <reinette.chatre@intel.com>,  Ye Bin <yebin10@huawei.com>,  Marek
+ =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+  Pierre-Louis
+ Bossart <pierre-louis.bossart@linux.dev>,  Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>,  Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>,  Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
+  linux-ide@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-input@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-wireless@vger.kernel.org,  ntb@lists.linux.dev,
+  linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+  xen-devel@lists.xenproject.org,  linux-sound@vger.kernel.org
+Subject: Re: [PATCH 10/13] wifi: qtnfmac: use always-managed version of
+ pcim_intx()
+References: <20241015185124.64726-1-pstanner@redhat.com>
+	<20241015185124.64726-11-pstanner@redhat.com>
+Date: Wed, 16 Oct 2024 12:36:58 +0300
+In-Reply-To: <20241015185124.64726-11-pstanner@redhat.com> (Philipp Stanner's
+	message of "Tue, 15 Oct 2024 20:51:20 +0200")
+Message-ID: <87y12o4ced.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemf100018.china.huawei.com (7.202.181.17)
 
-From: wenglianfa <wenglianfa@huawei.com>
+Philipp Stanner <pstanner@redhat.com> writes:
 
-'rdma resource show cq' supports object 'dev' but not 'link', and
-doesn't support device name with port.
+> pci_intx() is a hybrid function which can sometimes be managed through
+> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> port users to either an always-managed or a never-managed version.
+>
+> qtnfmac enables its PCI-Device with pcim_enable_device(). Thus, it needs
+> the always-managed version.
+>
+> Replace pci_intx() with pcim_intx().
+>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-Fixes: b0b8e32cbf6e ("rdma: Add CQ resource tracking information")
-Signed-off-by: wenglianfa <wenglianfa@huawei.com>
-Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
----
- rdma/res.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Feel free to take this via the PCI tree:
 
-diff --git a/rdma/res.c b/rdma/res.c
-index c311513a..7e7de042 100644
---- a/rdma/res.c
-+++ b/rdma/res.c
-@@ -16,8 +16,8 @@ static int res_help(struct rd *rd)
- 	pr_out("          resource show qp link [DEV/PORT] [FILTER-NAME FILTER-VALUE]\n");
- 	pr_out("          resource show cm_id link [DEV/PORT]\n");
- 	pr_out("          resource show cm_id link [DEV/PORT] [FILTER-NAME FILTER-VALUE]\n");
--	pr_out("          resource show cq link [DEV/PORT]\n");
--	pr_out("          resource show cq link [DEV/PORT] [FILTER-NAME FILTER-VALUE]\n");
-+	pr_out("          resource show cq dev [DEV]\n");
-+	pr_out("          resource show cq dev [DEV] [FILTER-NAME FILTER-VALUE]\n");
- 	pr_out("          resource show pd dev [DEV]\n");
- 	pr_out("          resource show pd dev [DEV] [FILTER-NAME FILTER-VALUE]\n");
- 	pr_out("          resource show mr dev [DEV]\n");
+Acked-by: Kalle Valo <kvalo@kernel.org>
+
 -- 
-2.33.0
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
