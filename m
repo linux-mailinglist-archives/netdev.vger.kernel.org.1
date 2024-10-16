@@ -1,179 +1,145 @@
-Return-Path: <netdev+bounces-136176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CC89A0CB9
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:32:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DE4C9A0CBF
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6A4FB278D3
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:32:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D7621C215DC
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B3620C014;
-	Wed, 16 Oct 2024 14:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105A31BAED6;
+	Wed, 16 Oct 2024 14:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qwMc9f4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91D2209F59;
-	Wed, 16 Oct 2024 14:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA9F52F76;
+	Wed, 16 Oct 2024 14:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729089140; cv=none; b=eum6IIF90iIbE1JI5GFLHPPBKrkP3srSIf6G2XrvZD2IBB0rA2e0QYZqbsGyOpCSk0uV1RKBXG4s7cC1ew1z4AkbMbQ6sSe9bYsUkqCMj9uQ8tgL4Fox5VQeqQmd5TEByaxxX58Fy+TTOkgTkmDSvcqbnAs0/UMPyMzrM7InkXQ=
+	t=1729089277; cv=none; b=k4dH1XuOvLECGvmVRzIPa0BGV9VJ9S1cRsZPjh5CCb1n7KoW1ETIGu1chw300/Kkn7ZRosHX44P9u7hioI2xmSci7Xt/A0spC0GicHJJCZDadggIqYtH5Nxf7+095AFqiF2b6BL+rwCOlQp6NfKcUM3GekCW5GurVEe7+tXstj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729089140; c=relaxed/simple;
-	bh=cL6/iEITEkqI1kGR9ikJ0rjtp3Ih/i+CjMVOEFFmh4g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uNiV83DIAh25bG43ufByw04Ovz9DiYz1QoGwNWoMiD+Yv9iyyU85UAMKdB9doV4Jy0OzzqR+QpgL3vtRT5ftxxVA+h6VxvunNoVWk0xzSyGzdaW9cg9BySRItlE0+eue6jPLDjgBZYz+IsVvYXOUGzoZsvTRYm3Wv8Cti56dHus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a9a0ef5179dso467865966b.1;
-        Wed, 16 Oct 2024 07:32:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729089136; x=1729693936;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sSNiWdoyjPld1XydLnGWhx59ZAvesHEXD9q6WahTtD8=;
-        b=rE7/0CAcBj0oFHOpPX/8Iyg7ukpQMun1EgnSmyPyLt7f3hqy+MaFZFfd7H8hj9GGJo
-         Nd8yZE7PHISk5sGvqu7NnQLU1xkz2zP9kUQdZaEuMuOQhT5FumezwTagUZeI1mhA/Hn+
-         i9Ag24AOhwwVFHFNjM+PBUGqR4AQ+9alRcl0pEuyqg0BmAM3m6fxiwunlwu+wZVH3kPz
-         1vi4ZGZBtWK1dB2md5Zl0bvXaAt1rl1nYp8ylq60XNqc1znq7YdxPfJqkLSvqYqMh4ru
-         7xwmUeLW8fnBapguqkFZ9yl2AhydDFNdtGCKkpuj3vDDHF4XksSs6dloFMHyufhHSNk3
-         cutA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhqbT4UQ6ooaZyNpk6zWdIqbbiO6zpLGiERbWYu7kBNk5VA9MrDl/JGHEShnikJyB1zuvAIPWBWqBQEW8l@vger.kernel.org, AJvYcCV9WERxtx59g65J8syNoE/wx128gdFlO2yvvbmiAgtrG+0D364d60PLq4BOs8DUI+JoF4QKqv3OHmYj@vger.kernel.org, AJvYcCX35nH5DsJcLOP5GmaqM/Vtu27zw96QYr6t/Iq+lRb4DS5s03bIVFW11eYAhLHr2DL2ePAWjZKohaTL@vger.kernel.org, AJvYcCX7N22Ie9F2twII6Zcib54WpSmkI6qbL5uATbdinkQxM+P3Y6Q24/sDdZfWFEp0FmTtjyCfYenY@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPfWYS3Cxh+G7cRrKBNhJvqNjLNvNfB3SOKFASumwJbMPF9kgT
-	5nxh/fQNWVVNDBUmi0fBu7dfBy5a1rOuf/6FTOMPhuPt3a+B0IaTWyKgQYa8WkFWOzXYGFCk7+/
-	2xjnDRrFUuOT3Oe3GnLTxMA7t4G8=
-X-Google-Smtp-Source: AGHT+IHIRvEp4YvtVQ1ixCe8NKzoxNPRFn5DlgVaLXK5XyUINKKI62mZa6ua3k/lIFZaBGu7y/WSpqnDGSIiREWEh6c=
-X-Received: by 2002:a17:907:d85f:b0:a99:4025:82e1 with SMTP id
- a640c23a62f3a-a9a34dfd1fbmr318914166b.41.1729089136043; Wed, 16 Oct 2024
- 07:32:16 -0700 (PDT)
+	s=arc-20240116; t=1729089277; c=relaxed/simple;
+	bh=/Q2Fdo3DQMDJW7+zCNQDyn/3Ues5Xdu5MPKqpemcjCs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RjXMF3cSOjQBbohHa1PBabDjMLHdeaCfoh5fqP4WG8TUDk9Of7Ep600kcC+AmCImdXyezGrWUcyrUuloRXdUO7o1USDNwqSvEfjLOfYWP6LaF5d639JDrNX+IdsPcVQM+cNch+OGYMmlFazIx/qZbRl9fV6zXq14TiCrwf5ESf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qwMc9f4y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C1F7C4CEC5;
+	Wed, 16 Oct 2024 14:34:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729089276;
+	bh=/Q2Fdo3DQMDJW7+zCNQDyn/3Ues5Xdu5MPKqpemcjCs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qwMc9f4yT9P5bQ7c/FT4vnvjbycz0SNLuDaYnusdNchhUT/Th2/v8nyYzAei+paPC
+	 U90HnaU97YXI88xPaFaUqe2F2+93Mj25Xqv6Vwvo8o9vaKdEtE+ONzgY6DPJ7+nocE
+	 4WsUme/lKbHP5zzQj9CL+c41EqiqikX4ngyVDLSOsAGKnf0RAOga9zK+Su6JltJsOI
+	 u7bVLq0mcZVv2j8DA0Alop8bAHVS9lllvlGiNPfqjcSHuZHrL0l/FyzWxv0Iw8ziPm
+	 SelPbykMzcHENeMNAvQCMYlkkaEDHlQ62LdvHqZiHtM4kNs2sJ6j7kLZZfptch2Cvl
+	 Ul2TvbC5TDsHg==
+Date: Wed, 16 Oct 2024 15:34:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dqfext@gmail.com" <dqfext@gmail.com>,
+	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net-next 1/1] net: phy: Refactor mediatek-ge-soc.c for
+ clarity and correctness
+Message-ID: <20241016143431.GJ2162@kernel.org>
+References: <20241014040521.24949-1-SkyLake.Huang@mediatek.com>
+ <20241014081823.GL77519@kernel.org>
+ <d2c24d063bea99be5380203ec4fafe3e4f0f9043.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241015-topic-mcan-wakeup-source-v6-12-v4-0-fdac1d1e7aa6@baylibre.com>
- <20241015-topic-mcan-wakeup-source-v6-12-v4-3-fdac1d1e7aa6@baylibre.com>
-In-Reply-To: <20241015-topic-mcan-wakeup-source-v6-12-v4-3-fdac1d1e7aa6@baylibre.com>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Wed, 16 Oct 2024 23:32:06 +0900
-Message-ID: <CAMZ6RqJfBbFRaynjFAbi5quAvcA1bYj7Dw_vJ7rDsLRaEheZrw@mail.gmail.com>
-Subject: Re: [PATCH v4 3/9] can: m_can: Map WoL to device_set_wakeup_enable
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, Vishal Mahaveer <vishalm@ti.com>, 
-	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d2c24d063bea99be5380203ec4fafe3e4f0f9043.camel@mediatek.com>
 
-On Wed. 16 Oct. 2024 at 04:18, Markus Schneider-Pargmann
-<msp@baylibre.com> wrote:
-> In some devices the pins of the m_can module can act as a wakeup source.
-> This patch helps do that by connecting the PHY_WAKE WoL option to
-> device_set_wakeup_enable. By marking this device as being wakeup
-> enabled, this setting can be used by platform code to decide which
-> sleep or poweroff mode to use.
->
-> Also this prepares the driver for the next patch in which the pinctrl
-> settings are changed depending on the desired wakeup source.
->
-> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+On Tue, Oct 15, 2024 at 05:18:49PM +0000, SkyLake Huang (黃啟澤) wrote:
+> On Mon, 2024-10-14 at 09:18 +0100, Simon Horman wrote:
+> >  	 
+> > External email : Please do not click links or open attachments until
+> > you have verified the sender or the content.
+> >  On Mon, Oct 14, 2024 at 12:05:21PM +0800, Sky Huang wrote:
+> > > From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+> > > 
+> > > This patch does the following clean-up:
+> > > 1. Fix spelling errors and rearrange variables with reverse
+> > >    Xmas tree order.
+> > > 2. Shrink mtk-ge-soc.c line wrapping to 80 characters.
+> > > 3. Propagate error code correctly in cal_cycle().
+> > > 4. Fix some functions with FIELD_PREP()/FIELD_GET().
+> > > 5. Remove unnecessary outer parens of supported_triggers var.
+> > > 
+> > > Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+> > > ---
+> > > This patch is derived from Message ID:
+> > > 20241004102413.5838-9-SkyLake.Huang@mediatek.com
+> > 
+> > Hi Sky,
+> > 
+> > I think this patch is trying to do two many things (at least 5 are
+> > listed
+> > above). Please consider breaking this up into separate patches,
+> > perhaps
+> > one for each of the points above.
+> > 
+> > Also, I think it would be best to drop the following changes unless
+> > you are
+> > touching those lines for some other reason [1] or are preparing to do
+> > so:
+> > 
+> > * xmas tree
+> > * 80 character lines
+> > * parentheses updates
+> > 
+> > [1] 
+> > https://docs.kernel.org/process/maintainer-netdev.html#clean-up-patches
+> 
+> Hi Simon,
+>   Reverse Xmas tree style & 80 char preferences come from your advise
+> in  
+> https://lore.kernel.org/all/20240530034844.11176-6-SkyLake.Huang@mediatek.com/
+>   Parens removing comes from Daniel's advise in 
+> https://lore.kernel.org/all/20240701105417.19941-14-SkyLake.Huang@mediatek.com/
 
-I left a nitpick below. Regardless:
+Ok, sorry for the mixed messages.
+In this case think these can stay after all.
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+> 
+>   Because previous patchset(
+> https://lore.kernel.org/all/20240701105417.19941-1-SkyLake.Huang@mediatek.com/
+> ) is too large, I guess it's better to commit this change first so that
+> I can handle the rest. And this should be "some other reason"?
 
-> ---
->  drivers/net/can/m_can/m_can.c | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->
-> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-> index a978b960f1f1e1e8273216ff330ab789d0fd6d51..d427645a5b3baf7d0a648e3b008d7d7de7f23374 100644
-> --- a/drivers/net/can/m_can/m_can.c
-> +++ b/drivers/net/can/m_can/m_can.c
-> @@ -2185,6 +2185,36 @@ static int m_can_set_coalesce(struct net_device *dev,
->         return 0;
->  }
->
-> +static void m_can_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
-> +{
-> +       struct m_can_classdev *cdev = netdev_priv(dev);
-> +
-> +       wol->supported = device_can_wakeup(cdev->dev) ? WAKE_PHY : 0;
-> +       wol->wolopts = device_may_wakeup(cdev->dev) ? WAKE_PHY : 0;
-> +}
-> +
-> +static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
-> +{
-> +       struct m_can_classdev *cdev = netdev_priv(dev);
-> +       bool wol_enable = !!(wol->wolopts & WAKE_PHY);
-> +       int ret;
-> +
-> +       if ((wol->wolopts & WAKE_PHY) != wol->wolopts)
+I think it is sufficient to bring to our attention that there is "some
+other reason". Sorry for not remembering it.
 
-Here, you want to check if a bit other than WAKE_PHY is set, isn't it?
-What about doing this:
+>   And since this patch is simple clean-ups, is it necessary to separate
+> it?
 
-          if (wol->wolopts & ~WAKE_PHY)
-
-instead?
-
-> +               return -EINVAL;
-> +
-> +       if (wol_enable == device_may_wakeup(cdev->dev))
-> +               return 0;
-> +
-> +       ret = device_set_wakeup_enable(cdev->dev, wol_enable);
-> +       if (ret) {
-> +               netdev_err(cdev->net, "Failed to set wakeup enable %pE\n",
-> +                          ERR_PTR(ret));
-> +               return ret;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  static const struct ethtool_ops m_can_ethtool_ops_coalescing = {
->         .supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS_IRQ |
->                 ETHTOOL_COALESCE_RX_MAX_FRAMES_IRQ |
-> @@ -2194,10 +2224,14 @@ static const struct ethtool_ops m_can_ethtool_ops_coalescing = {
->         .get_ts_info = ethtool_op_get_ts_info,
->         .get_coalesce = m_can_get_coalesce,
->         .set_coalesce = m_can_set_coalesce,
-> +       .get_wol = m_can_get_wol,
-> +       .set_wol = m_can_set_wol,
->  };
->
->  static const struct ethtool_ops m_can_ethtool_ops = {
->         .get_ts_info = ethtool_op_get_ts_info,
-> +       .get_wol = m_can_get_wol,
-> +       .set_wol = m_can_set_wol,
->  };
->
->  static int register_m_can_dev(struct m_can_classdev *cdev)
-> @@ -2324,6 +2358,9 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
->                 goto out;
->         }
->
-> +       if (dev->of_node && of_property_read_bool(dev->of_node, "wakeup-source"))
-> +               device_set_wakeup_capable(dev, true);
-> +
->         /* Get TX FIFO size
->          * Defines the total amount of echo buffers for loopback
->          */
->
-> --
-> 2.45.2
->
->
+I do think that would be best.
+But if you strongly think otherwise I can try to review it as-is.
 
