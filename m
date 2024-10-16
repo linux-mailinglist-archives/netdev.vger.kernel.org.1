@@ -1,130 +1,119 @@
-Return-Path: <netdev+bounces-136054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184BA9A0245
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:19:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C729A028D
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:28:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74CFAB213BD
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:19:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15E11F267FD
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0ED1B0F14;
-	Wed, 16 Oct 2024 07:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF8B1B652B;
+	Wed, 16 Oct 2024 07:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jLSBKOJO"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58391B07D4
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 07:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934641B218C;
+	Wed, 16 Oct 2024 07:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729063144; cv=none; b=SK09YVTzckUSHEMvM0yPfe30K7eEa4L/P7RtPfU9C5Tppj71Ugm6qx2dQ9mlxFmYj/QiP5as5IpFjtKMkKCuf32PyastYhigeAuQDCkl+VVrnhTKRgH7xzCKWwdqaB0+oJOPdcbN6jlYo+uVGX8TWNRLeJRcI3g0dt6SGmHBwUg=
+	t=1729063703; cv=none; b=a/59Ua6I16w4yYabFSVFGNVAN2rSXJHAkbgvGKAz64lwRaGoiEHY4Q5UXdd7v6rVuB5ZG/QiQPEDTjW1KX5W37lVqFXvJ/r+R2GJE8cfhSLFrBYxUdRLhNk3diCA5wmGrvLgT76rFMbRmYzKeA24Y3+sM0R9Hw3+mqtR2Rnulb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729063144; c=relaxed/simple;
-	bh=Ho5hRgkoHaDJ09OEyH7e46Yif/V/JZhDZuMMNX8r+YA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HsglQoxX9/F49j6GYT96LkO+40TsFaFcAabBb6Xjr0xbPn1mbulUjglglbQLhgXg20UacvW3LhWssixiBkUrhX/eBQCOA2mjneGDcZ6zXfjWqasQl7prRh7TWGne7FW8jHqGZt5+naEm0IA5xGa/X6tgxIiKICmxFvXBB3np7WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t0yJ0-0007jg-4y; Wed, 16 Oct 2024 09:18:50 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t0yIy-002DO4-7X; Wed, 16 Oct 2024 09:18:48 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id E3141353E8B;
-	Wed, 16 Oct 2024 07:18:47 +0000 (UTC)
-Date: Wed, 16 Oct 2024 09:18:47 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	socketcan@hartkopp.net
-Subject: Re: [PATCH v2 net-next 10/11] can: gw: Use rtnl_register_many().
-Message-ID: <20241016-ostrich-of-perpetual-whirlwind-9a5b8d-mkl@pengutronix.de>
-References: <20241015-ochre-gaur-of-whirlwind-d6e892-mkl@pengutronix.de>
- <20241015174031.17958-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1729063703; c=relaxed/simple;
+	bh=JcM+9pWXeAegDo4OG0mB7GirtHWlPzLRq2vIje6fn6g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kMlgx0Yb9jb2L4uJMgmuxSpVu2nHysJgMzTlnSUhDbNwRxYAgzLipo49kiS7xQJH2HJk6lvEvWcVsItcYi6ZXv8g5DPFPwwxarv8zk56T28YPvQFTQ1kXbJkZYoTkWY1/1LUkG61yMUbBvWPuOwXGrOxdIBbqzdCpx8tc67ciWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jLSBKOJO; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1729063696; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=lp6IQeJ5GDXVaA1KkIbKbWF4AL7Kg5dWxIeMCGlMYYY=;
+	b=jLSBKOJOLk4cDpiZ37YbIMNtXd2O58Y4J/ynXEkiZcn/++FeTzQFWh3VsFimvzbWVkMY2tkstBtdmOVsx+NpL3ZKweed2tC2lpYyvByXpEusjWun45rJ5zZ9gf9x1fWCEDThS+TcmhdDRevWBVXbjHYFDAf2vWD4K61J6XQ7aNw=
+Received: from 30.221.128.116(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WHGWwEo_1729063695 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 16 Oct 2024 15:28:15 +0800
+Message-ID: <bf6e0548-7cb3-41b4-b90e-57538e8303ff@linux.alibaba.com>
+Date: Wed, 16 Oct 2024 15:28:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="s65w3nk65l2ukrpg"
-Content-Disposition: inline
-In-Reply-To: <20241015174031.17958-1-kuniyu@amazon.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 3/3] ipv4/udp: Add 4-tuple hash for connected
+ socket
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
+ antony.antony@secunet.com, steffen.klassert@secunet.com,
+ linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
+ jakub@cloudflare.com, fred.cc@alibaba-inc.com,
+ yubing.qiuyubing@alibaba-inc.com
+References: <20241012012918.70888-1-lulie@linux.alibaba.com>
+ <20241012012918.70888-4-lulie@linux.alibaba.com>
+ <9c636d54-4276-4e28-abd3-0860bc738640@redhat.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <9c636d54-4276-4e28-abd3-0860bc738640@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---s65w3nk65l2ukrpg
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 15.10.2024 10:40:31, Kuniyuki Iwashima wrote:
-> From: Marc Kleine-Budde <mkl@pengutronix.de>
-> Date: Tue, 15 Oct 2024 08:23:27 +0200
-> > On 14.10.2024 13:18:27, Kuniyuki Iwashima wrote:
-> > > We will remove rtnl_register_module() in favour of rtnl_register_many=
-().
-> > >=20
-> > > rtnl_register_many() will unwind the previous successful registrations
-> > > on failure and simplify module error handling.
-> > >=20
-> > > Let's use rtnl_register_many() instead.
-> > >=20
-> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> >=20
-> > Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> >=20
-> > Who is going to take this patch?
->=20
-> It will be netdev maintainers because the last patch in this series
-> depends on this change.
+On 2024/10/14 18:19, Paolo Abeni wrote:
+> On 10/12/24 03:29, Philo Lu wrote:
+>> Currently, the udp_table has two hash table, the port hash and portaddr
+>> hash. Usually for UDP servers, all sockets have the same local port and
+>> addr, so they are all on the same hash slot within a reuseport group.
+>>
+>> In some applications, UDP servers use connect() to manage clients. In
+>> particular, when firstly receiving from an unseen 4 tuple, a new socket
+>> is created and connect()ed to the remote addr:port, and then the fd is
+>> used exclusively by the client.
+> 
+> How do you handle the following somewhat racing scenario? a 2nd packet 
+> beloning to the same 4-tulpe lands into the unconnected socket receive 
+> queue just after the 1st one, before the connected socket is created. 
+> The server process such packet after the connected socket creation.
+> 
 
-That's fine with me.
+One method is to address it in application. Application maintains the 
+information of connections, and it knows which connection to deliver 
+incoming packets.
 
-> I'll add a note below "---" next time for such a case.
+If the 2nd packet comes from the "listen" socket (i.e., the initial 
+unconnected socket), app can search for the connection of it. Note that 
+upon the 1st packet receiving, the connection is already created though 
+the socket is not ready, so it can be found for the 2nd packet.
 
-regards,
-Marc
+In this case, maybe several packets are processed with this method until 
+the new connected socket created. Then it runs as we expect.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+So I think it cannot be prevented but can be handled, depending on how 
+applications use it.
 
---s65w3nk65l2ukrpg
-Content-Type: application/pgp-signature; name="signature.asc"
+> How many connected sockets is your system serving concurrently? Possibly 
 
------BEGIN PGP SIGNATURE-----
+About 10000 conns in general. So current same-sized hash4 table is 
+enough for us now.
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcPaNUACgkQKDiiPnot
-vG/kHwf/cs93+0DUYmXLGNuCul2xEqM/gaS9ud+R/Pp5N7nebPH76OS1pQFNrNJZ
-5QMssb/JndFcsvssYGyL+EMIW8+uQXKBE8T0kMOJxAW7BPguEnsjZ5/qzoHJjSfg
-ycERQduPB6hlFRKK7l+lOq70GWcd+aNcRg3fqOaT2LF6jHZK8NvvKlGJuhnY5too
-+lS/8JcCqUJHKY++qB+XCquzgWs03hkQmaZSlpOk+T0sdv+4agLXR+p/MX6Y3303
-feXmNZfUGuj7S1YPeUu8Lpr0GJ6WULi6sSGx/mtwB3nUMWz4grYdkMSOivDmpBrD
-o23AQuZQrD0kzIQISrQU5xXziF4eNg==
-=10/9
------END PGP SIGNATURE-----
+> it would make sense to allocate a larger hash table for the connected 
+> UDP sockets, using separate/different min/max/scale values WRT to the 
+> unconnected tables.
+> 
 
---s65w3nk65l2ukrpg--
+Agreed that it's a good idea. But imo it could be left as future work 
+when we definitely need it.
+
+Thanks.
+-- 
+Philo
+
 
