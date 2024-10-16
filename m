@@ -1,216 +1,110 @@
-Return-Path: <netdev+bounces-135934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA6699FD32
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:33:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D17F99FD52
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:42:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75263281E4C
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:33:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1050F2824FA
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:42:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EF22E40B;
-	Wed, 16 Oct 2024 00:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFAB10A1C;
+	Wed, 16 Oct 2024 00:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/ZDfg4Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AArDDwWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F102F27442;
-	Wed, 16 Oct 2024 00:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB13E1097B
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 00:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729038807; cv=none; b=BV9hKqMXVQekXSQ6wN4d2R5J75jRH2G9qDc53goeOfXrR5y1SB38ZdyydXdp3rV0onQZo1lYrHgXT20j+dnO7DADKUbZaZGyUmbAD1r4rK9YGW40rQzB25Wm6a8yndfDUh6c6sUgippFqXCmOhxyM+ce1N+LRQTgBA/jgguGuEw=
+	t=1729039353; cv=none; b=SuDMvgR8iNZjvKPJzoBrOXYOZJ9gAZ1w+YzlLGdh/OYyMK0TtpQJfkdHl6Ib/hEcujCDw0ofaIRHx6nBk8WuMsDi/Z9TwdOKA0AggOgExsmTUmXISU13j3XApxGcYiAOFQ4iG3vNdAcdViSNoIY8CXgoeWmjqNokot26w5q95M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729038807; c=relaxed/simple;
-	bh=oCHAROvOfTrDd21uZhMKFN0mvX2Z8eFLJfvyvCryopU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azqludNCkBQk41Q8U6BHZk/Q3G6jO6gixvuDE9Ww5tL/6XDLS8blL6nl2XeWIXhngEOWrXl2z06RyvPXeVTLkI0bbiDv8LnJlvIqgcjS/J/CskLBG3uL00G6kgvxrBtXFzTZNXI45NOt8q3F2pTp/Vc73CX2R9MTisobs0DXC0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/ZDfg4Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E06BCC4CEC6;
-	Wed, 16 Oct 2024 00:33:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729038806;
-	bh=oCHAROvOfTrDd21uZhMKFN0mvX2Z8eFLJfvyvCryopU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U/ZDfg4ZW2jJhzFvezkTW3RHesXKCzaGqIvjexwiCVMrOjWzzqnv67ehbWf3En/wa
-	 qhxzPQbZt4DFL8gdb8NeSm90FjkqcU3wYrsNHtJi6KJzN95p7xQmCJPrkoIofBSTS5
-	 I2PfpxVSjuYL/mqCMq83YrRRF8A/ThQQ69PgAwRbvWR5LEv6++gqYwtNDJJkwG7QXn
-	 0lUug0BEYdzOJWu/9k11HfbNCXasJArkbbMy/UDFo6drSaqhsA8b9tKRWJGzq0Mj0j
-	 WZQiYkTIw7uKgdEkOyfqThn5TtH+4o1Ge2OUFsTWBbDe7/CN59ObHOhPlW693lz2KI
-	 dBeizE1bd/s0A==
-Date: Tue, 15 Oct 2024 18:33:23 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
-Subject: [PATCH 5/5][next] uapi: net: Avoid -Wflex-array-member-not-at-end
- warnings
-Message-ID: <d64af418459145b7d8eb94cd300fb4b7d2659a3c.1729037131.git.gustavoars@kernel.org>
-References: <cover.1729037131.git.gustavoars@kernel.org>
+	s=arc-20240116; t=1729039353; c=relaxed/simple;
+	bh=L8Q8qpJfCaCE7Q/0SdKqr4Ppr5gsSqj9uwoMS3P1hIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bbu50z9zqU5415JBGZGX7AXi1c0AhSxmEL9S0p9Xi+BUPXxVEl/DB+77RwvSyHMsu3LgUc1BVWjIQ8hKL6cYs7ek+yoFY4LqTb3z2Thd+vY1uuopf2EoVfzrgKNh9+++9wvNM1QoGlWEp0fnXHuQyUKWBVxIIXzjQKs2ViK7Zes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AArDDwWl; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6cbce9e4598so39800316d6.2
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 17:42:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729039351; x=1729644151; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QqmwkpLQ/gsJYGO3lKpckNbCmMjQD8PgT5aXoiuk0mA=;
+        b=AArDDwWlAUbwXQVbO+B1M3OhIsK2mMdIQIZQQsaiuyiuzovn1uVmYDE5XjrOktAd8x
+         r7SKw5fLAIM/3DxYMI7YD38CjQUHpMKGUatdH5Ju+gIwzFxj6wnuPIVSmBYbqHEWCRyi
+         PbvWvPlweQP8jwszIiC3NQFiPSDxH/OWx1iNdbg7381Fd43+91D/qv5VRSoxnorSyn38
+         QtGZk1vgVvsTDBswM5bkAfV3YZ62v5QGueDIENrT+DbqGECFDbRrT4T8PUNh/JeJ0tSI
+         rikTetno5r2t8CCGEEj2sWipZIOcQN3VwbwwmcJXlIPxAHjJuzsUBTTEzowIpfRZm1iP
+         VeTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729039351; x=1729644151;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QqmwkpLQ/gsJYGO3lKpckNbCmMjQD8PgT5aXoiuk0mA=;
+        b=jtoszfxyrgiAi2IoY5WAnhL8Wpl+h/vWjuNcxj08JvPbVy+FgPG69W13cCd7buLmrn
+         5rG/KmtNhRTh4l/t4ixEvki8bnH9urRpV6x8wqtIKxT7ByP17x7XlUulaNm475FUugcL
+         c2z9kvtmBZ56M1vZrnEnl86eRZktUsyztR57qbBFMWFFLwrxKbOA4RXk82R53isv7MBm
+         ZjIuoau4GkNJOgga5Epm8nyoIkB8oRdynGBgFxA4jmNoE7iFhlwxZ4OCWLOx7FDvh4mo
+         52kFvX7eDIBp+34iB2YicrmTL20ErFF24NWwe40AJ79yIyRgH6YSiIqUOLIKjLYCuKOX
+         IjBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXe/QCIjMU+Oh7pIHa1IGzZunBKBm4qu1kuP0Ky76pV12JW2licH68Ay6TDqBJIwB+MMgp4QR8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIM6Vc3i5t+Rv9h3e/9+vnFnQqOZMOZxMcB0Wni1GvJVKpmRIf
+	BgoTgkx+YW00ur9oXs5DSpDiJicZ/x19PIrvvI11L7+oGLaack6q
+X-Google-Smtp-Source: AGHT+IHyxsruF7k/NrdPy4+YIRCykvf51b28z+y5y2nJnt6dtwj1EDgBZuXEPSViTJkM5xKBg2hjog==
+X-Received: by 2002:a05:6214:449c:b0:6cb:c9bb:b040 with SMTP id 6a1803df08f44-6cbf9d0bfcamr194842936d6.3.1729039350842;
+        Tue, 15 Oct 2024 17:42:30 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c0a8:11c1::11b5? ([2620:10d:c091:400::5:f725])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cc2295a367sm12123136d6.90.2024.10.15.17.42.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 17:42:30 -0700 (PDT)
+Message-ID: <51205a15-762c-43b6-8df1-0cbfe2380108@gmail.com>
+Date: Tue, 15 Oct 2024 20:42:29 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1729037131.git.gustavoars@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC ethtool] ethtool: mock JSON output for --module-info
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: mkubecek@suse.cz, netdev@vger.kernel.org, Jakub Kicinski
+ <kuba@kernel.org>, idosch@nvidia.com, danieller@nvidia.com
+References: <7d3b3d56-b3cf-49aa-9690-60d230903474@gmail.com>
+ <816b36d3-7e12-4b58-8b99-4e477e76372c@lunn.ch>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <816b36d3-7e12-4b58-8b99-4e477e76372c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
 
-Address the following warnings by changing the type of the middle struct
-members in a couple of composite structs, which are currently causing
-trouble, from `struct sockaddr` to `struct sockaddr_legacy`. Note that
-the latter struct doesn't contain a flexible-array member.
+On 10/15/24 7:16 PM, Andrew Lunn wrote:
+>> Vendor PN                                 : QDD-400G-XDR4
+>>      "vendor_name" : [65, 114, 105, 115, 116, 97, 32, 78, 101, 116, 119, 111,
+>> 114, 107, 115, 32],
+>>      "vendor_pn" : [81, 68, 68, 45, 52, 48, 48, 71, 45, 88, 68, 82, 52],
+>>      "vendor_sn" : [88, 75, 84, 50, 52, 50, 50, 49, 49, 52, 56, 49],
+> Why use byte arrays? String, maybe UTF-8, would be more natural.
+>
+> 	Andrew
 
-include/uapi/linux/route.h:33:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-include/uapi/linux/route.h:34:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-include/uapi/linux/route.h:35:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end
-include/net/compat.h:34:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-include/net/compat.h:35:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+Ah, I mistakenly thought that the "-" characters in the vendor pn were 
+put there by ethtool in place of non-printable characters, but I see now 
+that those are just regular ASCII hyphens. The CMIS spec says that the 
+four vendor_* fields all contain ASCII characters, but can possibly be 
+all null characters.
 
-Also, update some related code, accordingly.
-
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- include/net/compat.h       | 30 +++++++++++++++---------------
- include/uapi/linux/route.h | 28 ++++++++++++++--------------
- net/appletalk/ddp.c        |  2 +-
- net/ipv4/af_inet.c         |  2 +-
- net/ipv4/fib_frontend.c    |  2 +-
- 5 files changed, 32 insertions(+), 32 deletions(-)
-
-diff --git a/include/net/compat.h b/include/net/compat.h
-index 84c163f40f38..89e891d8dcf3 100644
---- a/include/net/compat.h
-+++ b/include/net/compat.h
-@@ -29,21 +29,21 @@ struct compat_cmsghdr {
- };
- 
- struct compat_rtentry {
--	u32		rt_pad1;
--	struct sockaddr rt_dst;         /* target address               */
--	struct sockaddr rt_gateway;     /* gateway addr (RTF_GATEWAY)   */
--	struct sockaddr rt_genmask;     /* target network mask (IP)     */
--	unsigned short	rt_flags;
--	short		rt_pad2;
--	u32		rt_pad3;
--	unsigned char	rt_tos;
--	unsigned char	rt_class;
--	short		rt_pad4;
--	short		rt_metric;      /* +1 for binary compatibility! */
--	compat_uptr_t	rt_dev;         /* forcing the device at add    */
--	u32		rt_mtu;         /* per route MTU/Window         */
--	u32		rt_window;      /* Window clamping              */
--	unsigned short  rt_irtt;        /* Initial RTT                  */
-+	u32			rt_pad1;
-+	struct sockaddr_legacy	rt_dst;         /* target address               */
-+	struct sockaddr_legacy	rt_gateway;     /* gateway addr (RTF_GATEWAY)   */
-+	struct sockaddr_legacy	rt_genmask;     /* target network mask (IP)     */
-+	unsigned short		rt_flags;
-+	short			rt_pad2;
-+	u32			rt_pad3;
-+	unsigned char		rt_tos;
-+	unsigned char		rt_class;
-+	short			rt_pad4;
-+	short			rt_metric;      /* +1 for binary compatibility! */
-+	compat_uptr_t		rt_dev;         /* forcing the device at add    */
-+	u32			rt_mtu;         /* per route MTU/Window         */
-+	u32			rt_window;      /* Window clamping              */
-+	unsigned short		rt_irtt;        /* Initial RTT                  */
- };
- 
- int __get_compat_msghdr(struct msghdr *kmsg, struct compat_msghdr *msg,
-diff --git a/include/uapi/linux/route.h b/include/uapi/linux/route.h
-index a0de9a7331a2..7e43765e03dd 100644
---- a/include/uapi/linux/route.h
-+++ b/include/uapi/linux/route.h
-@@ -29,22 +29,22 @@
- 
- /* This structure gets passed by the SIOCADDRT and SIOCDELRT calls. */
- struct rtentry {
--	unsigned long	rt_pad1;
--	struct sockaddr	rt_dst;		/* target address		*/
--	struct sockaddr	rt_gateway;	/* gateway addr (RTF_GATEWAY)	*/
--	struct sockaddr	rt_genmask;	/* target network mask (IP)	*/
--	unsigned short	rt_flags;
--	short		rt_pad2;
--	unsigned long	rt_pad3;
--	void		*rt_pad4;
--	short		rt_metric;	/* +1 for binary compatibility!	*/
--	char __user	*rt_dev;	/* forcing the device at add	*/
--	unsigned long	rt_mtu;		/* per route MTU/Window 	*/
-+	unsigned long		rt_pad1;
-+	struct sockaddr_legacy	rt_dst;		/* target address		*/
-+	struct sockaddr_legacy	rt_gateway;	/* gateway addr (RTF_GATEWAY)	*/
-+	struct sockaddr_legacy	rt_genmask;	/* target network mask (IP)	*/
-+	unsigned short		rt_flags;
-+	short			rt_pad2;
-+	unsigned long		rt_pad3;
-+	void			*rt_pad4;
-+	short			rt_metric;	/* +1 for binary compatibility!	*/
-+	char __user		*rt_dev;	/* forcing the device at add	*/
-+	unsigned long		rt_mtu;		/* per route MTU/Window		*/
- #ifndef __KERNEL__
--#define rt_mss	rt_mtu			/* Compatibility :-(            */
-+#define rt_mss	rt_mtu				/* Compatibility :-(            */
- #endif
--	unsigned long	rt_window;	/* Window clamping 		*/
--	unsigned short	rt_irtt;	/* Initial RTT			*/
-+	unsigned long		rt_window;	/* Window clamping		*/
-+	unsigned short		rt_irtt;	/* Initial RTT			*/
- };
- 
- 
-diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-index b068651984fe..aac82a4af36f 100644
---- a/net/appletalk/ddp.c
-+++ b/net/appletalk/ddp.c
-@@ -1832,7 +1832,7 @@ static int atalk_compat_routing_ioctl(struct sock *sk, unsigned int cmd,
- 	struct rtentry rt;
- 
- 	if (copy_from_user(&rt.rt_dst, &ur->rt_dst,
--			3 * sizeof(struct sockaddr)) ||
-+			3 * sizeof(struct sockaddr_legacy)) ||
- 	    get_user(rt.rt_flags, &ur->rt_flags) ||
- 	    get_user(rt.rt_metric, &ur->rt_metric) ||
- 	    get_user(rt.rt_mtu, &ur->rt_mtu) ||
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index b24d74616637..75bd15d884e3 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -1021,7 +1021,7 @@ static int inet_compat_routing_ioctl(struct sock *sk, unsigned int cmd,
- 	struct rtentry rt;
- 
- 	if (copy_from_user(&rt.rt_dst, &ur->rt_dst,
--			3 * sizeof(struct sockaddr)) ||
-+			3 * sizeof(struct sockaddr_legacy)) ||
- 	    get_user(rt.rt_flags, &ur->rt_flags) ||
- 	    get_user(rt.rt_metric, &ur->rt_metric) ||
- 	    get_user(rt.rt_mtu, &ur->rt_mtu) ||
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index 8353518b110a..595b9ac58e92 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -452,7 +452,7 @@ int fib_validate_source(struct sk_buff *skb, __be32 src, __be32 dst,
- 				     itag);
- }
- 
--static inline __be32 sk_extract_addr(struct sockaddr *addr)
-+static inline __be32 sk_extract_addr(struct sockaddr_legacy *addr)
- {
- 	return ((struct sockaddr_in *) addr)->sin_addr.s_addr;
- }
--- 
-2.34.1
+I agree. Strings would be better.
 
 
