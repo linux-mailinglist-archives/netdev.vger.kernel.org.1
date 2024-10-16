@@ -1,86 +1,89 @@
-Return-Path: <netdev+bounces-136154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD599A0922
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:17:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C404A9A0927
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDCE11F2132A
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 12:17:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B5551F22D46
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 12:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D71206E71;
-	Wed, 16 Oct 2024 12:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3BD2076C2;
+	Wed, 16 Oct 2024 12:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XPEiZgCa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYdsGP02"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D27156E4;
-	Wed, 16 Oct 2024 12:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F551206E71;
+	Wed, 16 Oct 2024 12:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729081019; cv=none; b=dwjEDVNSWlHTxEIjFNWBjFlaQ4VKgpvj5rBulmP9vlayBdyZraPgdowQ/Sxd82u0Rslfzl5pW04YaYZMQyyGViF9JR3uk3lqcaijeYT6nmvkSvb7HfLo7zYIFRVWuQlHsmEv0HD0f7YE/rc77ruKICpsbIz1Z+VMP6ZsUO9SWV4=
+	t=1729081094; cv=none; b=cDXPH2GWVzOZ6QLLeQSBPZ/62rVy9TXUnPiEoovqc/LEK5WMkxShUI9e8Oxdpm85NqcInWrIyghLj3gYmkhoJmNMrkKaVXkvOpoYzZfM0w0qhfRpPImR9k6nvHtofXytcf33LHUVWYUpqsfMnb7IvFbVXRm54w19JRRCY8sHWJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729081019; c=relaxed/simple;
-	bh=VRbMtHGfLmz9IpUkFeNIapr7LLyr32SyBhaKq4Er/uc=;
+	s=arc-20240116; t=1729081094; c=relaxed/simple;
+	bh=VE3vvit23P0+USt/yIlIXHODZ1vWSLYZXNEVrLwpKrQ=;
 	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UzcGOYW8H8vTJlR3qsgiM/2/UnAxGgJBXOOAu0crA1WF1ZjK5d0blPrjMlpx4MQwo6fXsBnGBWT9QdBQ69gyUz7K5KIrl5ebOQnBhgT6kZuD5pn9EJvay2taMO8+0n8WG9dci4CkAB+Ael7F+rKtrRHt7Ka4gQkTiPQVwN0zAFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XPEiZgCa; arc=none smtp.client-ip=209.85.167.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=h0erx7LuPckdKOYkx7bjmNH3x+J7yWDpORXxurSzVjNLGx+T7HAsDHujldJsQGcIPkMULqTruxY+oXgga8QjD8QDvisn7/MRg7GzaG/lnwMbZclvrmZk7Tjf2Ckx03Qshq7n9oSJvtZuKxgdsYW2KZUAZomT0GnMg5Q0L2BT054=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYdsGP02; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539f4d8ef66so4633815e87.1;
-        Wed, 16 Oct 2024 05:16:57 -0700 (PDT)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539f76a6f0dso3072842e87.1;
+        Wed, 16 Oct 2024 05:18:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729081016; x=1729685816; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729081091; x=1729685891; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CDov8APJOOY/cDWD+dhTm3Ac4uukJrdJwPWwPvWrkPw=;
-        b=XPEiZgCa8SrESu31S49UkFIyFsqMf1x8mG7puxssXLRW8dp60xwpsZPLGjyv1MZynw
-         sFTHs2MBZWgjnbfzwi4zXg3Ead8Y8BiqoO9f/SXdk0fVfe79kvZMdGjvsQivtSyHlN5r
-         w4GPccoemGpH50NqYbOwaUlA4cTH/nwht40FIFI3RWyoeczO5Ihp9/g/ZE6N7u+Rjg2R
-         nAhc/kRtvMXE/jwURlfNOcMmH/s4WzOD4pIbGca85S599uRnk61i17NzDwo9YZGhTbhQ
-         8LJnUyy5rPkjl4ekAZ6/pQZaaJhlksB9MEsY/JtauaxR4azQlm23cb4QYWzWLhg/h8x3
-         TiEA==
+        bh=RlYmgAFXSAyX0VM0McobVNjJxsrO1YN8W/zUQvWby+A=;
+        b=ZYdsGP02ncz33Hr6zDBKs6vwgojgR/Z0m4v8+FS7PEZk+sxiFgfJf8qMPO/QLEA6vC
+         cVd2froBR0ydk3DWaPUdwBZIMjF2CcpZrfLZSAUCqrfoIqsqeJbKnhw/S8MPeniMUe9j
+         9SeFhVdz4gPTTr2bHgfcYrJvO6p/72gPH9V5tEbW42XW5GonIzf/FHyrl+cmBe7MUeku
+         MIwlvhmakENsKL/XRxVnVNFUd8FrpLbfREvwVFXghk7x/2c4J93l+m/PSuxJCYfgKvaA
+         KDTAIjYBe7L7HQlHfPz0DqNZwzXgCocENJlZGb5aOJPEv4J17dqCO/TE/fkOONes7fVG
+         zuyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729081016; x=1729685816;
+        d=1e100.net; s=20230601; t=1729081091; x=1729685891;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CDov8APJOOY/cDWD+dhTm3Ac4uukJrdJwPWwPvWrkPw=;
-        b=jZoIzic8NN4TrLn0cWmLiUq2VYbXTVYxkHOx/RM5T+iQkmjafC81DvIZdysLu7uJ+2
-         Sgs8Py9QxcyFcFpA1DQsrPdv6U1nFGAYYr85lTn9knQMgzqg/omQfuoF9kDOP9KlERw2
-         KI+WiIYzeheF0KlkWQ/5c8Lpg7N4HNLJWPwxwIXsEFCsYY/LxxDh+bpGUws42sEHVg42
-         3QKMB6tAUmeoYy1gYOdy4QeWJdXblSouwn8zvY15kXpM3RxcHwPDcEtKyijbgfSiJCl/
-         YUDDdMInoPaYV+sUmJm2gmr9cImBDlETm2ZzHQ86Ypniu0ZP1gK8DqRhhpK8djQhJh6x
-         d4fA==
-X-Forwarded-Encrypted: i=1; AJvYcCUlWOSQ2f4taaV91nEz3GCQzyDxGYyYC65mJCxBg6PymiXHd+x6iWvj8nHZhlflfw/L1tfZdL1QCsiGuxdJ@vger.kernel.org, AJvYcCXSyFhW4779/AgJ7xWxJPEnlB97sGgt5Ganw5sFsFhIZXtdFA7TpzN3Tofglcg5z3EULR/sL1uY@vger.kernel.org, AJvYcCXXr7Km8tM0PsWTvMiDl7MIj4r8H0GbR8t/mtTPPRjYunVyEVX3q7bK6gzYIBB0M3/p41c5M9DOMLDtzEbD8Wo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGh1wvXqRdbvXIQ/G2uC//TIxa/PL3867xw0NV2yrtBSsvHzEF
-	AxjPmI/PMipAtgaTlby2HtISdcRxjUyfbTH0rFe9C1FPTWcTewB9GMwd4kQN
-X-Google-Smtp-Source: AGHT+IGWc8sGpjeR4SGgRsNAjAxNT/4+L5ndjrGR9jX2QnJ+dKZ49fOcS/bpP6UNUfKoq8DB8HsUiQ==
-X-Received: by 2002:a05:6512:2804:b0:539:e110:4d72 with SMTP id 2adb3069b0e04-53a03f88d6fmr2443362e87.56.1729081015929;
-        Wed, 16 Oct 2024 05:16:55 -0700 (PDT)
+        bh=RlYmgAFXSAyX0VM0McobVNjJxsrO1YN8W/zUQvWby+A=;
+        b=PboZschfK7Qh/XvdKpma++vbvR5T4n89vv4hpoNz5t9cEFkdlSQlzkhybCEJoN+h7B
+         jf80Eq8IHafI31yd2xF8fMJqQ1EC6/y1qt5Tyd2rZKKDiS5H5i8NVhPsBWe/Wkyp1P66
+         d7ziiVKOlu9Hx9wkBb5C/y+j+dTjRWDW+4iEiv5uWiTFNfKAP8oKAlojQwj7bbiI11UE
+         Ssugpafgohk1SIHdS5OAesOXNVTY6vOrTP+DHJMKbnwIozijouvyk+7UTkn+K7zhhP1r
+         lA7PkE3aPd2tsmh6kwW7Qv75pnZejDmhMzyr1VGud1ImQCZjPlkoHBdCJ30nFwffTkjh
+         gAwA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5gFH6gzukOOZBsRBLOsF1CZtnuDb6L1cf6JJWo2xIJoivOhx06g4mMnR3jW84R1srpbCAA7m1@vger.kernel.org, AJvYcCVooYk2xlBQqyzmftITo5d3LXimibpqqvfURJoo5vQTghPFUg9ZZB5L1XguBH+tQUOKClaWcb0HBtj2maaqnm+4@vger.kernel.org, AJvYcCWeayEOxsTJJmdvup40URdjBycnyrVVL4awTE/2tpLGUnxIZWcbYuF7cyJ3BL7RedVeG+BIk5lWQedg9niQ@vger.kernel.org, AJvYcCWgr9knRl2Fa1EZi1LrMivRNLBYa7+YhNbTTM22ForFwpdBm/Ue98clxQZtV8j8lfoWfBWxoBGtghZwtASc4Vw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlnnZr1NGRlQSKu3SjapOZlsvIb3OkshhMBiZGt0vOVe2m/t1X
+	pOQzRuGTp0oQL0SRrkxLEq3vDF1lgd8SaBz9Meaa4UNj9Ugo4ts6
+X-Google-Smtp-Source: AGHT+IEh405fIE8O2dgxoey2Tjwfu4VDPTNDqK3Xi0W6ubocSWeelce5HL1j3sLXc1WD/lVvPidpkg==
+X-Received: by 2002:a05:6512:685:b0:539:d1d4:9c3b with SMTP id 2adb3069b0e04-539da3c5e45mr9390487e87.14.1729081090387;
+        Wed, 16 Oct 2024 05:18:10 -0700 (PDT)
 Received: from pc636 (host-95-203-1-67.mobileonline.telia.com. [95.203.1.67])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-539ffff3a1fsm441780e87.127.2024.10.16.05.16.54
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-539ffff3ad7sm440905e87.141.2024.10.16.05.18.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 05:16:55 -0700 (PDT)
+        Wed, 16 Oct 2024 05:18:10 -0700 (PDT)
 From: Uladzislau Rezki <urezki@gmail.com>
 X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Wed, 16 Oct 2024 14:16:52 +0200
+Date: Wed, 16 Oct 2024 14:18:07 +0200
 To: Julia Lawall <Julia.Lawall@inria.fr>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
 	kernel-janitors@vger.kernel.org, vbabka@suse.cz, paulmck@kernel.org,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 14/17] kcm: replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zw-utC4rCCongW_N@pc636>
+Subject: Re: [PATCH 16/17] netfilter: expect: replace call_rcu by kfree_rcu
+ for simple kmem_cache_free callback
+Message-ID: <Zw-u_56SSySvioJu@pc636>
 References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
- <20241013201704.49576-15-Julia.Lawall@inria.fr>
+ <20241013201704.49576-17-Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,9 +92,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241013201704.49576-15-Julia.Lawall@inria.fr>
+In-Reply-To: <20241013201704.49576-17-Julia.Lawall@inria.fr>
 
-On Sun, Oct 13, 2024 at 10:17:01PM +0200, Julia Lawall wrote:
+On Sun, Oct 13, 2024 at 10:17:03PM +0200, Julia Lawall wrote:
 > Since SLOB was removed and since
 > commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
 > it is not necessary to use call_rcu when the callback only performs
@@ -102,37 +105,33 @@ On Sun, Oct 13, 2024 at 10:17:01PM +0200, Julia Lawall wrote:
 > Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 > 
 > ---
->  net/kcm/kcmsock.c |   10 +---------
+>  net/netfilter/nf_conntrack_expect.c |   10 +---------
 >  1 file changed, 1 insertion(+), 9 deletions(-)
 > 
-> diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-> index d4118c796290..24aec295a51c 100644
-> --- a/net/kcm/kcmsock.c
-> +++ b/net/kcm/kcmsock.c
-> @@ -1584,14 +1584,6 @@ static int kcm_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
->  	return err;
+> diff --git a/net/netfilter/nf_conntrack_expect.c b/net/netfilter/nf_conntrack_expect.c
+> index 21fa550966f0..9dcaef6f3663 100644
+> --- a/net/netfilter/nf_conntrack_expect.c
+> +++ b/net/netfilter/nf_conntrack_expect.c
+> @@ -367,18 +367,10 @@ void nf_ct_expect_init(struct nf_conntrack_expect *exp, unsigned int class,
 >  }
+>  EXPORT_SYMBOL_GPL(nf_ct_expect_init);
 >  
-> -static void free_mux(struct rcu_head *rcu)
+> -static void nf_ct_expect_free_rcu(struct rcu_head *head)
 > -{
-> -	struct kcm_mux *mux = container_of(rcu,
-> -	    struct kcm_mux, rcu);
+> -	struct nf_conntrack_expect *exp;
 > -
-> -	kmem_cache_free(kcm_muxp, mux);
+> -	exp = container_of(head, struct nf_conntrack_expect, rcu);
+> -	kmem_cache_free(nf_ct_expect_cachep, exp);
 > -}
 > -
->  static void release_mux(struct kcm_mux *mux)
+>  void nf_ct_expect_put(struct nf_conntrack_expect *exp)
 >  {
->  	struct kcm_net *knet = mux->knet;
-> @@ -1619,7 +1611,7 @@ static void release_mux(struct kcm_mux *mux)
->  	knet->count--;
->  	mutex_unlock(&knet->mutex);
->  
-> -	call_rcu(&mux->rcu, free_mux);
-> +	kfree_rcu(mux, rcu);
+>  	if (refcount_dec_and_test(&exp->use))
+> -		call_rcu(&exp->rcu, nf_ct_expect_free_rcu);
+> +		kfree_rcu(exp, rcu);
 >  }
+>  EXPORT_SYMBOL_GPL(nf_ct_expect_put);
 >  
->  static void kcm_done(struct kcm_sock *kcm)
 > 
 > 
 Reviewed-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
