@@ -1,339 +1,168 @@
-Return-Path: <netdev+bounces-136041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3309A0116
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:09:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EFF9A0202
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ECAE1C214F9
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:09:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F00F1F209AE
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E5E18C331;
-	Wed, 16 Oct 2024 06:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvTyGDOd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AA91AF0B9;
+	Wed, 16 Oct 2024 07:00:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2098.outbound.protection.partner.outlook.cn [139.219.17.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD693156E4;
-	Wed, 16 Oct 2024 06:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729058941; cv=none; b=rLBgj2sgd2dmBrLYRwsUhAj/PELHJs7fnzAbQCncAZoVwQcFY/FySWwkY5UeFrBQm2c94VEfpDiT5gs6PAAYQ9eXy+fQA50lSDUWmYERrkkmppxA+kJsv/V25ZaL4WixeDDocEplV3nELajrT+RQX2zQf9hYIMdrg68rS+Fn/Z8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729058941; c=relaxed/simple;
-	bh=ebzumEmDzyjF0JoG4K8R+WuweV5IQu3/k3g/AmH5Xl4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CuCn428z5CeIQO3IdtUE+BmQs/PkN9OBmzfcJJWl3N7Qq1dlFufQvasYHEKvafPAKSDDja8GuGfhDZfxNmzkmG2oncReRmwHUuclpNooOygbMM87mvqhEP03973xhRmk9TmaBm71ecFm/znFKb3Jtq83m1ZuhGAKauqRhpcNZAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvTyGDOd; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a3a309154aso22010805ab.2;
-        Tue, 15 Oct 2024 23:08:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729058939; x=1729663739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z1UikS0EzH5Q7Y3AmkF1RjpIHDh5aj7sa0kYtYAxZDE=;
-        b=dvTyGDOdGAPOQl/DuMA5AOtNj0WzE1zz1/vpll4+ugCJgy3JKY5aDO7sihUfBISTku
-         Zcozlt6scYlm3fcrd7ZEX9waVsf8fzkU1zo3shyQ5TKH3OsQMdPj5dedK0jOHlVTirJm
-         NoBmBwau0I1rtso5Z2iX2Lq2fQHD1MtqehOkpr+R/wdQZ0pmrJtqPx6J3u+gxFEgnX6j
-         Xan6gbyn42GVu6Qtzo/BtfjvIIx6f/bpW918lDUF/P2JfGtx08Clip3md9/wsPTwP+Yd
-         aR8I2dnyQ9xb3L9Ma1Vo0P9HNyxbn2Q4VD8y1M+fun6u117v8aOvFZ8NYgP7bq5c7tSB
-         c+Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729058939; x=1729663739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z1UikS0EzH5Q7Y3AmkF1RjpIHDh5aj7sa0kYtYAxZDE=;
-        b=MLDwja0wXQml4yiVYXvc7ha1ULqL0a93El45tMnZRQyfFfgzOGOhP1iCCxfKEe4WYX
-         pstPx0VY8p+E4JVOPFlK/t+FiloqUh9/vEuVkW43ontonwZWdr2+My1cvrwopFUlWw7h
-         irJqv1d/MyEb4STJXvyxiia9LJQWwTgeUwjy0C+Jogjj4pMO5hIfcFm9/VSGL20LJ9MR
-         qJPkJ99PSRgbBg3YTA0J+jyAQTXLzmNT+koGYkEqgjI8e7H4sCUjbZM4PmSI2dC6AJF6
-         xEapeW4b6+Nmc6qH7t0URibNokIAoozzjmkAj7IaCIXuQU6fh2ZxpV7IerKMI6fqYX1e
-         tuig==
-X-Forwarded-Encrypted: i=1; AJvYcCW9ccratULpUtXYQi2wuX3T3wHv/ik5Mnxn+8v8xyUoNUhMPk8LuoftJlidgt3S4CvpVakYgxZJ@vger.kernel.org, AJvYcCWWWLVwemeFmlUtB5taqDNIwgUQJ7Bb+98t64nzFSiMqaDcYdxTEMvN9IrEau/LKL8UEMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz17PAL+LqcQW5SA1vXP7YgoFgkiqIrgbFrSKnVOJ6Up9KkjJE5
-	lNxioaJ0Ds5DvCG/me3syZIUDQbrFJfs2/looj3gE8UBrBdhnwsMY5yUdB4bHOp10GRgGE9S7kG
-	BW5wcb3VZdo3Xb6QP/8SWoxYnjJY=
-X-Google-Smtp-Source: AGHT+IHJRM1q5fRv9cX0UeH9F6Neillbbvr9FRau8xvPKCT4WfK3v7j7OxdZ6y1SEdjto4yp6hq528SDivruOpxXHw8=
-X-Received: by 2002:a05:6e02:168e:b0:3a0:451b:ade3 with SMTP id
- e9e14a558f8ab-3a3b5f6b26bmr160402745ab.10.1729058938716; Tue, 15 Oct 2024
- 23:08:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E211170A37;
+	Wed, 16 Oct 2024 06:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.98
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729062003; cv=fail; b=BTsLYqfWgdRgL2ohPSaNpOuZRaPeHelSRR5aRRvruWUNuWJO5ME79zsnjGFh4d8uom5Zf3YBS5fh7tgalrNnezDCLzZV8bGjGcbY87ulzYdjONQtfygnjVcZKrXSAbQIp2m+oBBZyLsJXVmrHJtpMK4mkk+hq7VjhmNxnF+b35I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729062003; c=relaxed/simple;
+	bh=Je8/JiAq+jCFOhMqUwDcgjqO5Y2TVK8Tv1Ue2QWsXCU=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=u11CHA6bt3H/KzSQnLFznaXUxgY4xGZaHTF+GRfIfvkIdkGu5qZjP7cBxuqoc6H/ZzY6WmAjtf2yVIkcmEg5KFYVyRjlcSwxng0axd/bj+jblJJC9Ldk1SUglzsp3iIxQI02qdL/uI7etacndHA3kQR2InuDbKmFT+HdHkTUh9w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bDPNv3U4Jjsxiv8HwGy8GCnV+6kNT9EzXP0UBrykegkmNsmE2MpLCd+cKHrKoDWtEusUpvLg1K4EBXCOojOnO5+fYPueWeYBvF/+5SRUQSwBwTPuWd3sbjQ6UCJG7Hh8fMmeUIMQmqYCZ21eMtYnZCHt2Va8VLtDBP77iCnBkxFsiu9pC6hdUHAtQOkMnYh7JKFvKTcQgL3Dc2qwnSxLcy1TDSltGlDX6U0EOdEVozmM0HnWHKNDkle87cETRR4+ZCgtjIZxGF1aC3KoanFR0W+PdPEgS7htcgZvlrkDO0jZKx8RvsRI1z8ikw6v0Pth6BAM7wTR+XCM9vqUih1uLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Je8/JiAq+jCFOhMqUwDcgjqO5Y2TVK8Tv1Ue2QWsXCU=;
+ b=R79Ame0WqfAt6etuTPrQQl9qNNw0H//I+LFOenLxYUlnchgARfgLyJI/TklLFd2zxfaHssMEFEcP2aF84NkgNaC1c1i1+nxeyGdFD+q3K+QiofG7KIXB+Nm9+v6VPlVnYOtCTfiPja7DeDUv4PBtIYx2H85P1ShacpwAj55Am4DrCVdldAw6v/Kc2YV6+9f2wyVfdqJuiO1tlAq2GTrQPfDyy+wXsJw5UL+RjX4skC6FobiqETtqfP5LW2CHAvwxj0rAVLWMqF3k7bPuNaHVpffdfLSJ3/1uYej5zexxU7EPZlnrJO48DxPQrVNxPni5hUCrVSFSj08RspYVVlF9Uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12) by ZQZPR01MB0961.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:9::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.21; Wed, 16 Oct
+ 2024 02:25:39 +0000
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ ([fe80::617c:34a2:c5bf:8095]) by
+ ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn ([fe80::617c:34a2:c5bf:8095%4])
+ with mapi id 15.20.8048.013; Wed, 16 Oct 2024 02:25:38 +0000
+From: Leyfoon Tan <leyfoon.tan@starfivetech.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lftan.linux@gmai.com" <lftan.linux@gmai.com>
+Subject: RE: [PATCH net-next 1/4] net: stmmac: dwmac4: Fix MTL_OP_MODE_RTC
+ mask and shift macros
+Thread-Index: AQHbHs+EDa5qCNz7PUiaD/wu3WV237KIo4WAgAAEDZA=
+Date: Wed, 16 Oct 2024 02:25:38 +0000
+Message-ID:
+ <ZQZPR01MB09793D5AAFFC51427B9A0E158A462@ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: ZQZPR01MB0979:EE_|ZQZPR01MB0961:EE_
+x-ms-office365-filtering-correlation-id: 7788f24b-bf53-4ea0-023f-08dced89d326
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|41320700013|38070700018;
+x-microsoft-antispam-message-info:
+ QSs9+gELsdZUzv25qvDLyR7bq+VtNO1PXQRgHV+tBavcZyO0GtjekbeaqpUYcDz4iSfeTj5IzyC/imSLIvwTDKBUImbYg+CTr6W797PMd5bO0rsamIDPA8GqXztbpoz1oHt/PQT68yoNnuFZaclF9d7TuFMjk3jc/pGqntDmX4e6o6Iy779gQrkbEZbza8r3c10EZmoOnmtzD0v6EuOUF/4FsFZbcNtnEpcNSeWhtoa1lBbLSB1sOX8Ss3cK1aATmsUkxMSHrwS23uh9qYGtXMxtLGV7ayYtGufZW2O6DIuSmVMh00u9lXJIU7+eDsrpRURVuGtEmGEt0pBd22jz0bcjP8djr2T6rYi6mrUMaoO5euKHnWEsjM6TyvrErQjKrHusWQsy4dCbWZbaM8KGzSlN0hUW+8+1r9vrk9kFt98VTd3XkBI3YpZv1FJTk+rfYPFOEvZeLAr1gybiJpmniGwhbIh56CE4y393bQ2qDzA8fgP4caQvc7A3EZ74MrC5uXTb4T8AnUIHFUNc2jRSy0HRvwjMK2bJHwEK+pP3AJ0PA1gajfkSIxWTv+0w8B5YqU3OlexnIZB40SScrnveUh5Gmy3QuiYwKdTZxqRn7Nvbw0w6P6WSoIk0bijA9KqG
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(41320700013)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ykMfhD5JE8XmZd7QnmH/FTFu+ru8obgfclTavfHh/ES8s5U43KJmKjeX0pwF?=
+ =?us-ascii?Q?HViXhO24M3efUVpN+9vnEyoEPRF1u7bZLR+tkEYkFFY+YrY3fBUdyeXSS4A5?=
+ =?us-ascii?Q?sRO1r2tGpdB033UhjcOIxcXtbP4hyALTNNPNL95gW4OE3Q2+YOuDI8b9ivOP?=
+ =?us-ascii?Q?8Zra9IfkZeCCT9JotpGEt09nsuPKkUfs3wf7bnrGkypIDVZ4/M+uXKg6VpId?=
+ =?us-ascii?Q?jjADLnvimqaZpFhM6Da3HSe1+CcmCyA9w8kcH4W3en0WfsOf9YajY3uJUAtn?=
+ =?us-ascii?Q?VBshg52y34kaCeDGZud9J02TRIMeLyS2HFtKWNn/JCWwaoEjHukLVmU5T8sG?=
+ =?us-ascii?Q?DkYIgLQ3e53vmBXLcz3cI+lUYu7aX8daKGS3drKJnTQtVTVl1b74LpTcPFIU?=
+ =?us-ascii?Q?y8g/I6lTvm3mlHmYFDFeJgtqPEht3IYHcGO/3IdBW7Rv6z+0PvI/ULSB+c7e?=
+ =?us-ascii?Q?iVf/GcdGlt8SsOneDSKM+LjX1RFRj0/PeHLk/jHczyQ+ufzQG3SuTLy6dIAh?=
+ =?us-ascii?Q?LpJtW655cgZUr/PNyX/R0b6ko+LWedrT5mDGrsuMFGBoNodPLQZnBtYROgwP?=
+ =?us-ascii?Q?U9654UQYxTJqvzpE2KqlxB6r3ds0NvRJ3TYUS7G6bcUZxnKSIMCJYO+M9g6z?=
+ =?us-ascii?Q?jq4bFUIb9FSR7lr+VQ0e0lV4Kq+ROE4q6KfqZqQ5eSFsyB/SOGFg0xrxu5C+?=
+ =?us-ascii?Q?XcvlLaDuG/N4j5n2z859Zpa4PTXFF+8OLNJeNjdOtXR+f4+jvXqoaYlXdynK?=
+ =?us-ascii?Q?520LOBpGORlfKGi1l+RB+0PUtihlvkx/LfKebesFTdtL4AGMADkDE4+qLKKO?=
+ =?us-ascii?Q?Maa9a3rcNEAHVGhqNbtkP+jUrHXjdp5IgwVlh/cjLj1zaswsRwhSY8Xn4igh?=
+ =?us-ascii?Q?qXBi8LqWii3Y5crDFz/1MSFNPqLBXVHyzQq57bSQf/HNoHC5kz0tOvCMSJE9?=
+ =?us-ascii?Q?Q+k8Tyx5wQUAGytBYJuwgnRQKElTbYRTwpZ0ddou9x37h8pQsj0108P7KM6H?=
+ =?us-ascii?Q?V1ld9ITCNcpyiWn2tW3qQEGBJ9RCLWrd/u2efpjCULAy+zfjwn4K49REo0th?=
+ =?us-ascii?Q?XhdMVd+ukucMZLBuGwe8mb4bKz8KmnoB6gfoRTgSngqkAs6ffRc2oln0FbiW?=
+ =?us-ascii?Q?x+nWQIYb31hjT5Bpd8Q/VpyZQ+u+z2BUB78JJOyGu4Evvz0I1pMjCD47UOrU?=
+ =?us-ascii?Q?mJ0Nv4RLDyMndJzZJl1ZQsHj1RyBRmPUVecIdOaPL6Yxh3hFDMakVegIppQK?=
+ =?us-ascii?Q?65ZXd0VQpcQ3qWUC3JiLUCvzSwGeOUANJLcmEfn5RBFQagIcr6D5X9AX6fB7?=
+ =?us-ascii?Q?E/VahZ53sEPVFtFwt98e8TM6djq7OvOJxqXsjfuQXwRICP9cGTPf4PSp8T2B?=
+ =?us-ascii?Q?EXhHKxwOkJokh47QVx0bQ5xBoAnDcSbkRsTIPfkwMvU+UWeGcxCKGg5DpBCW?=
+ =?us-ascii?Q?rxlePprM0T4tSyyMxCkkHsATfj7HaZPrqr0RkZTjPBV/b8MrPIMAbHsBulZH?=
+ =?us-ascii?Q?RyANAqSeknRtZfd70Cj6y9q7JkuTZMNX5f1oEa0ImzeFv8aFKyr6xXk9UlSr?=
+ =?us-ascii?Q?OC4O1goBWrvK61gmAVEy1AdcI+PRmbxL36N0Eu0MoODClmZfTmrWTo/xpU9d?=
+ =?us-ascii?Q?WQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-7-kerneljasonxing@gmail.com> <b4767fab-9c61-49f0-8185-6445349ae30b@linux.dev>
- <CAL+tcoD8OF0LCSFVEN-oEQas1JGfR+HF7Zt+2fqMH5_4eK9X4g@mail.gmail.com> <7c7b2366-074e-48c1-a918-daf0a94c4b55@linux.dev>
-In-Reply-To: <7c7b2366-074e-48c1-a918-daf0a94c4b55@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 16 Oct 2024 14:08:22 +0800
-Message-ID: <CAL+tcoBU1FSVvhiTmapX=Byhv8W0T1f8oFR4sAZ1g4xONgSPrg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 06/12] net-timestamp: introduce
- TS_SCHED_OPT_CB to generate dev xmit timestamp
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7788f24b-bf53-4ea0-023f-08dced89d326
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2024 02:25:38.8470
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 827SE0xBHuyqGxAHyd8r4ViRg5qYBSXTtcw6gsy+lMeecweLbWx5gr9kEuUEP2n4l9lH8vDopCHquyvWL3TTXC0jmY4dXQRb1d600my38MU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQZPR01MB0961
 
-On Wed, Oct 16, 2024 at 1:35=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 10/15/24 6:24 PM, Jason Xing wrote:
-> > On Wed, Oct 16, 2024 at 9:01=E2=80=AFAM Martin KaFai Lau <martin.lau@li=
-nux.dev> wrote:
-> >>
-> >> On 10/11/24 9:06 PM, Jason Xing wrote:
-> >>> From: Jason Xing <kernelxing@tencent.com>
-> >>>
-> >>> Introduce BPF_SOCK_OPS_TS_SCHED_OPT_CB flag so that we can decide to
-> >>> print timestamps when the skb just passes the dev layer.
-> >>>
-> >>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> >>> ---
-> >>>    include/uapi/linux/bpf.h       |  5 +++++
-> >>>    net/core/skbuff.c              | 17 +++++++++++++++--
-> >>>    tools/include/uapi/linux/bpf.h |  5 +++++
-> >>>    3 files changed, 25 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> >>> index 157e139ed6fc..3cf3c9c896c7 100644
-> >>> --- a/include/uapi/linux/bpf.h
-> >>> +++ b/include/uapi/linux/bpf.h
-> >>> @@ -7019,6 +7019,11 @@ enum {
-> >>>                                         * by the kernel or the
-> >>>                                         * earlier bpf-progs.
-> >>>                                         */
-> >>> +     BPF_SOCK_OPS_TS_SCHED_OPT_CB,   /* Called when skb is passing t=
-hrough
-> >>> +                                      * dev layer when SO_TIMESTAMPI=
-NG
-> >>> +                                      * feature is on. It indicates =
-the
-> >>> +                                      * recorded timestamp.
-> >>> +                                      */
-> >>>    };
-> >>>
-> >>>    /* List of TCP states. There is a build check in net/ipv4/tcp.c to=
- detect
-> >>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> >>> index 3a4110d0f983..16e7bdc1eacb 100644
-> >>> --- a/net/core/skbuff.c
-> >>> +++ b/net/core/skbuff.c
-> >>> @@ -5632,8 +5632,21 @@ static void bpf_skb_tstamp_tx_output(struct so=
-ck *sk, int tstype)
-> >>>                return;
-> >>>
-> >>>        tp =3D tcp_sk(sk);
-> >>> -     if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT=
-_CB_FLAG))
-> >>> -             return;
-> >>> +     if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT=
-_CB_FLAG)) {
-> >>> +             struct timespec64 tstamp;
-> >>> +             u32 cb_flag;
-> >>> +
-> >>> +             switch (tstype) {
-> >>> +             case SCM_TSTAMP_SCHED:
-> >>> +                     cb_flag =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
-> >>> +                     break;
-> >>> +             default:
-> >>> +                     return;
-> >>> +             }
-> >>> +
-> >>> +             tstamp =3D ktime_to_timespec64(ktime_get_real());
-> >>> +             tcp_call_bpf_2arg(sk, cb_flag, tstamp.tv_sec, tstamp.tv=
-_nsec);
-> >>
-> >> There is bpf_ktime_get_*() helper. The bpf prog can directly call the
-> >> bpf_ktime_get_* helper and use whatever clock it sees fit instead of e=
-nforcing
-> >> real clock here and doing an extra ktime_to_timespec64. Right now the
-> >> bpf_ktime_get_*() does not have real clock which I think it can be add=
-ed.
+
+
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Wednesday, October 16, 2024 10:10 AM
+> To: Leyfoon Tan <leyfoon.tan@starfivetech.com>
+> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu
+> <joabreu@synopsys.com>; David S . Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; lftan.linux@gmai.co=
+m
+> Subject: Re: [PATCH net-next 1/4] net: stmmac: dwmac4: Fix
+> MTL_OP_MODE_RTC mask and shift macros
+>=20
+> On Tue, 15 Oct 2024 14:57:05 +0800 Ley Foon Tan wrote:
+> > RTC fields are located in bits [1:0]. Correct the _MASK and _SHIFT
+> > macros to use the appropriate mask and shift.
 > >
-> > In this way, there is no need to add tcp_call_bpf_*arg() to pass
-> > timestamp to userspace, right? Let the bpf program implement it.
+> > Fixes: 35f74c0c5dce ("stmmac: add GMAC4 DMA/CORE Header File")
 > >
-> > Now I wonder what information I should pass? Sorry for the lack of BPF
-> > related knowledge :(
->
-> Just pass the cb_flag op in this case.
+> > Signed-off-by: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+>=20
+> no empty line between Fixes and Signed-off-by lines, please.
+>=20
+> Please fix and resend with [PATCH net] in the title.
+> All fixes which are needed in current Linus's tree need to go to net, rat=
+her
+> than net-next, see:
+> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#git-
+> trees-and-patch-flow
+> --
+> pw-bot: cr
 
-I see. I saw one example just passing a NULL parameter:
-tcp_call_bpf(sk, BPF_SOCK_OPS_BASE_RTT, 0, NULL);.
+Noted, will resend.
 
->
-> A bpf selftest is missing in this series to show how it is going to be us=
-ed.
-
-Sorry, I didn't implement a standard selftest, but I wrote a full BPF
-program in patch[0/12]. I planned to write a selftests after every
-expert agrees the current approach.
-
-> Yes, there are existing socket API tests on time stamping but I believe t=
-his
-> discussion has already shown some subtle differences that warrant a close=
-r to
-> real world bpf prog example first.
->
-> >
-> >>
-> >> I think overall the tstamp reporting interface does not necessarily ha=
-ve to
-> >> follow the socket API. The bpf prog is running in the kernel. It could=
- pass
-> >> other information to the bpf prog if it sees fit. e.g. the bpf prog co=
-uld also
-> >> get the original transmitted tcp skb if it is useful.
-> >
-> > Good to know that! But how the BPF program parses the skb by using
-> > tcp_call_bpf_2arg() which only passes u32 parameters.
->
-> "struct skbuff *skb" has already been added to "struct bpf_sock_ops_kern"=
-. It is
-> only assigned during the "BPF_SOCK_OPS_PARSE_*HDR_CB". It is not exposed
-> directly to bpf prog but it could be. However, it may need to change some
-> convert_ctx code in filter.c which I am not excited about. We haven't add=
-ed
-> convert_ctx changes for a while since it is the old way.
->
-> Together with the "u32  bpf_sock_ops_cb_flags;" change in patch 9 which i=
-s only
-> for tcp_sock and other _CB flags are also tcp specific only. For now, I a=
-m not
-
-Right, the first move I made is to make TCP work.
-
-> sure carrying this sockops to the future UDP support is desired.
-
-I hope so. But it's not an urgent thing that needs to be done recently.
-
->
-> Take a look at tcp_call_bpf(). It needs to initialize the whole "struct
-> bpf_sock_ops_kern" regardless of what the bpf prog is needed before calli=
-ng the
-> bpf prog. The "u32 args[4]" is one of them. The is the older way of using=
- bpf to
-> extend kernel.
-
-I see.
-
->
-> bpf has struct_ops support now which can pass only what is needed and wit=
-hout
-> the need of doing the convert_ctx in filter.c. The "struct tcp_congestion=
-_ops"
-> can already be implemented in bpf. Take a look at
-> selftests/bpf/progs/bpf_cubic.c. All the BPF_SOCK_OPS_*_CB (e.g.
-> BPF_SOCK_OPS_TS_SCHED_OPT_CB here) could just a "ops" in the struct_ops.
-
-Interesting, but it seems this way is much more complex than the
-current approach.
-
->
-> That said, I think the first thing needs to figure out is how to enable b=
-pf time
-> stamping without having side effect on the user space.
-
-In the next version, I will avoid affecting the cmsg case, so no more
-side effects I think.
-
-> Continue the sockops approach first
-
-I'm a little hesitant to do so because it looks like we will introduce
-more codes. Please let me investigate more :)
-
-> and use it to create a selftest bpf prog example. Then we can decide.
-
-I copy the BPF program from patch [0/12], please take a look and help
-me review this:
----
-Here is the test output:
-1) receive path
-iperf3-987305  [008] ...11 179955.200990: bpf_trace_printk: rx: port:
-5201:55192, swtimestamp: 1728167973,670426346, hwtimestamp: 0,0
-2) xmit path
-iperf3-19765   [013] ...11  2021.329602: bpf_trace_printk: tx: port:
-47528:5201, key: 1036, timestamp: 1728357067,436678584
-iperf3-19765   [013] b..11  2021.329611: bpf_trace_printk: tx: port:
-47528:5201, key: 1036, timestamp: 1728357067,436689976
-iperf3-19765   [013] ...11  2021.329622: bpf_trace_printk: tx: port:
-47528:5201, key: 1036, timestamp: 1728357067,436700739
-
-Here is the full bpf program:
-#include <linux/bpf.h>
-
-#include <bpf/bpf_helpers.h>
-#include <bpf/bpf_endian.h>
-#include <uapi/linux/net_tstamp.h>
-
-int _version SEC("version") =3D 1;
-char _license[] SEC("license") =3D "GPL";
-
-# define SO_TIMESTAMPING         37
-
-__section("sockops")
-int set_initial_rto(struct bpf_sock_ops *skops)
-{
-        int op =3D (int) skops->op;
-        u32 sport =3D 0, dport =3D 0;
-        int flags;
-
-        switch (op) {
-        //case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
-        case BPF_SOCK_OPS_TCP_CONNECT_CB:
-        case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
-                flags =3D SOF_TIMESTAMPING_RX_SOFTWARE |
-                        SOF_TIMESTAMPING_TX_SCHED |
-SOF_TIMESTAMPING_TX_ACK | SOF_TIMESTAMPING_TX_SOFTWARE |
-                        SOF_TIMESTAMPING_OPT_ID | SOF_TIMESTAMPING_OPT_ID_T=
-CP;
-                bpf_setsockopt(skops, SOL_SOCKET, SO_TIMESTAMPING,
-&flags, sizeof(flags));
-                bpf_sock_ops_cb_flags_set(skops,
-BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG|BPF_SOCK_OPS_RX_TIMESTAMPING_OPT_C=
-B_FLAG);
-                break;
-        case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-        case BPF_SOCK_OPS_TS_SW_OPT_CB:
-        case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-                dport =3D bpf_ntohl(skops->remote_port);
-                sport =3D skops->local_port;
-                bpf_printk("tx: port: %u:%u, key: %u, timestamp: %u,%u\n",
-                            sport, dport, skops->args[0],
-skops->args[1], skops->args[2]);
-                break;
-        case BPF_SOCK_OPS_TS_RX_OPT_CB:
-                dport =3D bpf_ntohl(skops->remote_port);
-                sport =3D skops->local_port;
-                bpf_printk("rx: port: %u:%u, swtimestamp: %u,%u,
-hwtimestamp: %u,%u\n",
-                           sport, dport, skops->args[0],
-skops->args[1], skops->args[2], skops->args[3]);
-                break;
-        }
-        return 1;
-}
----
-
-What is your opinion on the above?
-
-Thanks,
-Jason
+Thanks.
+Regards
+Ley Foon
 
