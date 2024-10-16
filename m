@@ -1,97 +1,72 @@
-Return-Path: <netdev+bounces-135923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5757D99FCB4
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:03:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0668999FCC7
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CB8D286B60
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:03:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37BEE1C23A62
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E551FB3;
-	Wed, 16 Oct 2024 00:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530EAA31;
+	Wed, 16 Oct 2024 00:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="q0G8FTHO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFqZDjiU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E17C28EA;
-	Wed, 16 Oct 2024 00:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2B14C91;
+	Wed, 16 Oct 2024 00:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729036990; cv=none; b=jmx41DODyRHjvF3TZ943ZrZXKvPOVXaA7vBcwTS1xHHcJ+GIG9iejxx4B+7t7YQwOyuZnXEJbY5YhnPDuk5NLjDWFntlFNehfv2pn4zdj96hbpbiQk+rozjT/Pv1WVxNv+zxRyDScZFd68CM2P4yOB8wZ5kquwEpZveeCutWiHk=
+	t=1729037204; cv=none; b=KPdnvzjb7MKhaheCpcImNewUVp3F3oFBF70gTPc5hAocD5GqXFlEffWN21hbqdqOASvwafXY4ELDtyAfTWzNEbfufsT5MugBHkuppeG8yt7nr/uBfwg+d/RfVYBbwLUqflz/iz2vVXmY7yBLjnRPWxdseoDB+0WOXr6komCu6cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729036990; c=relaxed/simple;
-	bh=EsQUlY0iIVqr49EUFFG3JKe16MmGbUs8PhKtWDaafzI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e/u15PSmjO/A6xRYQ8+1anKjfxgiTAJoGRIF1nmyIY0zo4LgGVZ5a9p1BGwKv2UDSGaOE5psug8OVx5zvTl2B3Jj5aivEYZPer1IhgcBZdSU2Q/WovEVluGrPrpwBznoK08uq3Zcvr8mfRVbSfsk1O+kHr3gPdEGMWotETgCQRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=q0G8FTHO; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729036989; x=1760572989;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4E+/Rqgrgl4WKr4CdpxCbdJJMyhPANBPQnK9tayaHNI=;
-  b=q0G8FTHOHeVVC+spUGv9ZPqHz1JzGBd5KgEWnZoTwwLERNUlK8GufsOE
-   YCQx3uioIBt9YA4azYzi+SZd8OKmnMSEIGdSEnW25dlyn4XppOPru+u09
-   udNU183jIBpIR4wuWIidUIjJDvtQtr3bF22+lpKAq6KG1TUOtlx6dLz9M
-   w=;
-X-IronPort-AV: E=Sophos;i="6.11,206,1725321600"; 
-   d="scan'208";a="461102459"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 00:03:08 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:12286]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.26:2525] with esmtp (Farcaster)
- id aa6e0dc7-036c-4370-99d9-a7c022c5ce00; Wed, 16 Oct 2024 00:03:08 +0000 (UTC)
-X-Farcaster-Flow-ID: aa6e0dc7-036c-4370-99d9-a7c022c5ce00
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 16 Oct 2024 00:03:07 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 16 Oct 2024 00:03:04 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <danielyangkang@gmail.com>
-CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<guwen@linux.alibaba.com>, <jaka@linux.ibm.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com>,
-	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>
-Subject: Re: [PATCH v3 2/2 RESEND] resolve gtp possible deadlock warning
-Date: Tue, 15 Oct 2024 17:03:00 -0700
-Message-ID: <20241016000300.70582-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <c2ac8e30806af319eb96f67103196b7cda22d562.1729031472.git.danielyangkang@gmail.com>
-References: <c2ac8e30806af319eb96f67103196b7cda22d562.1729031472.git.danielyangkang@gmail.com>
+	s=arc-20240116; t=1729037204; c=relaxed/simple;
+	bh=HG/5Lf4PN8ZwfOLHeb7Pqn9YbCXldMzqVdPyn+SXG4c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Js6w/xoZhg8SnsLnzclsF55UKpDPZ4y6uUeujpJk0vGVdykWMEKgrhLJT5Mhe8obQOA/qI7pB1vUj2PNw/vRwX4EJnrchYpovgWpwTItBvO/gE6pyTprEymVlMW12Y+anK4qijIUx9BMMwXz6r3You7jJGi6ND3SR6ukNpreVDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFqZDjiU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33946C4CECD;
+	Wed, 16 Oct 2024 00:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729037203;
+	bh=HG/5Lf4PN8ZwfOLHeb7Pqn9YbCXldMzqVdPyn+SXG4c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EFqZDjiUPmdkaOmaHtl1KJLKkq4CCKgPwYVv9MkOpp0V3JMEiY6VpF3iepC2+B/12
+	 Y63UobablX2Awm72leh+BhyHzZLO4lKgWzYkRe8tMI+C5sywkbItgXAxbtlZ/7QK1c
+	 JbRhc8tOm+W/Jb7nsWCKkwot4yqYqv+N2vCM4ZpKM835BMGJ2K8ih7GwAEr4ZU+qbR
+	 sPlya9WHXfC99BZ+GusLgCthJa9rpT05K6akJhNpFKcNEUdIaL0fyJTwt3dRxbrFYr
+	 iWHZHQ/KlAI6Gm2drwXTvBoERjdwqLp/xEw4SCj8c2Yb7Mfmf3JeaJK+07LcVrldJ3
+	 mHreeFIWIcmEQ==
+Date: Tue, 15 Oct 2024 17:06:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stefan Wiehler <stefan.wiehler@nokia.com>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v5 00/10] Lock RCU before calling ip6mr_get_table()
+Message-ID: <20241015170642.190cf837@kernel.org>
+In-Reply-To: <20241014151247.1902637-1-stefan.wiehler@nokia.com>
+References: <20241014151247.1902637-1-stefan.wiehler@nokia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Daniel Yang <danielyangkang@gmail.com>
-Date: Tue, 15 Oct 2024 15:48:05 -0700
-> From: Daniel Yang <danielyangkang@gmail.com>
-> 
-> Moved lockdep annotation to separate function for readability.
-> 
-> Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
-> Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+On Mon, 14 Oct 2024 17:05:46 +0200 Stefan Wiehler wrote:
+> v2: https://patchwork.kernel.org/project/netdevbpf/patch/20241001100119.230711-2-stefan.wiehler@nokia.com/
+>   - rebase on top of net tree
+>   - add Fixes tag
+>   - refactor out paths
 
-This tag is bogus, why not squash to patch 1 ?
-
-Also, patch 1 needs Fixes: tag.
+Please add the relevant info (from patch 2?) to the cover letter.
+Otherwise it's hard to figure out at a glance what this series is
+fixing.
 
