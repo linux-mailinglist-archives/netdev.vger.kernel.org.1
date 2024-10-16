@@ -1,246 +1,232 @@
-Return-Path: <netdev+bounces-136194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B889A0F0F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 17:52:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 315459A0EC2
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 17:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ABFE281CAA
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 15:52:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF3EF2815D0
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 15:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5BE20E021;
-	Wed, 16 Oct 2024 15:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F86E20F5A3;
+	Wed, 16 Oct 2024 15:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b="BzG4JQiZ"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="H3jAQDNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.thorsis.com (mail.thorsis.com [217.92.40.78])
+Received: from SJ2PR03CU002.outbound.protection.outlook.com (mail-westusazon11023079.outbound.protection.outlook.com [52.101.44.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8623120CCE5;
-	Wed, 16 Oct 2024 15:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.92.40.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729093923; cv=none; b=eY3oZdWgBA3wMO4kd0ojAT5ABURoEJriM1t/OwI5mlnQq+llyzFsciGKOlig2i5gk601JDKQoGruzvaE2PGKj4a3/YrFnYkmKpPI/WdwtyiEzYyDBnsgSGl7JBZVTti0Od0+i9RuDxibSU58pEAbgopHjulc6pXBSAj/n6+0cWY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729093923; c=relaxed/simple;
-	bh=zKV+CN4oRDPuYTsLKdyjZVaGHKxw7iSdD7MeBWyrXGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=MWpf6pYCXGhWOYASUqp65ytdpwQPan7THsSeiemq8w3i6ScYJOKLi/YvJJtGr0Q/1yTpLx7a23iTVnvAiLACNZqdICuXlZXOQJdVaSVoJC6KZAA/tKoa7Lyo+2EmXXziQStYbA2E8XFl9zat4ROD4POkA9fhjK1c/LQNQunoE04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com; spf=pass smtp.mailfrom=thorsis.com; dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b=BzG4JQiZ; arc=none smtp.client-ip=217.92.40.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorsis.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C09A514838D6;
-	Wed, 16 Oct 2024 17:43:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thorsis.com; s=dkim;
-	t=1729093409; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=7tJSztIo9asoNqABnecSCXzHZLed1LkHJmvJttnWSz0=;
-	b=BzG4JQiZFJCLM96P4AEIt52RVEsiZt+0P987nJZfXLGtCBZaVKKDO5Eo44HEzhYFJ3JIlF
-	s61YYfjZwPGSc/87l0uYUdGrcJ4O0Fmc/3M5uBRhBbaXozJxFjW9295VBSMaSf8SnbDlZa
-	NyGjopuvhqURnTL8Ek905+nnkWRMnTHxVLE7XICKEm3j4PR/sD4q5a2FyXL4JqLsTnzU3A
-	nTL6omduEO+RwCMGGzizq3uXgBTVc48SCSL7dTqHnKXuidmZP2lQdmgxEEjHZiJdLIfPGx
-	l2iAPhHiylGxatnABWjmy0Rf7pvyD0iXIbh/2ACuNlsenuwNOtJ+LxEWJspV7Q==
-Date: Wed, 16 Oct 2024 17:43:22 +0200
-From: Alexander Dahl <ada@thorsis.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: micrel ksz8081 RMII phy and clause-22 broadcast
-Message-ID: <20241016-kissing-baffle-da66ca25d14a@thorsis.com>
-Mail-Followup-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C018920C002;
+	Wed, 16 Oct 2024 15:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.44.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729093474; cv=fail; b=Cv+6hpoarqOEU2/K68D9hYwsx0letJYj1Ts5aeC660/X15HFGWDqoffbg/calFT2NH1MOb1EhOovVS3Hmqzmh09gojBBzuHS+ASEU3/Z96GoRkhyVUv+OsTz1PQQPTSbKxzvI4c6dflBN/TQ8SVcqB09DegMgXnX22FMHgYwMUI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729093474; c=relaxed/simple;
+	bh=smUyEFpDvHhbHIz7L6+8Yqg97+CnKsqn7wSVTZ4/vgc=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=huDb302ZC9hut/eKDuBGbUOoG417ykpF+KI6WrvIsE4yc0Fflc0N8nTqkhzO+E21W9h8q5rjQkfzzIc88eZ0k7GE0Ecj+NId5XdwnMkN4GH14Vn9xqtmjgHWnLzF6UblxV9Ho8NTrgdP3SdaZXn+NbkmRh8XjGifUH716zadryo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=H3jAQDNJ; arc=fail smtp.client-ip=52.101.44.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YwhtF7AKF+kd0X64Uu8+u9VyYuH1pyY0T/00AWswr3ejBIUjy7AVVewHsQK4AxbODnrPghXRbztzuPvejLIObJQPjNku4jt1EdvZw63pYzUm8UjueapSGGCdoMjnBO3FRFUdKicR84WULRHM0rqmUr2ohr4VkYlB8XrzgtlmwXCYYkUJiKtNgtxyt8EJbrUIYI+azfeAHaGD7MhyNhmn77WZKQjaoyWQ1pqGXXpuwTGWcXVens2IIw4Xo3X4AgTzTMaGjKtQOA2rY5xsCx6MGxsNqPzVNb/EkC3iWCm4xTi6biYpdFvSH6mCbEdKm+CFYEuSNtkQTvIyr5OLdJgDhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Pv9flViILqejI/SYMFN/ZQlQcYMTAXXvlrC8QcCAnHw=;
+ b=hcJTOkMlhXuhrNGVDEitjoEggOsv0Uvf5yHugl6jIJGDQZFv0HNCkf8qESHKQD+qVGy1QvNmNrRvUWu9wdjlr2D8cUc4zQnc6FwLcObmH2k/OT7IEab/vKr+2KOtrVuYj4nnzqJUgGRwuxHVQSbA3Nq0pkYG7qSTWD0ayCDM2zvHAJ2IMnpsKFvkstXfwoLDu3qeP7PEGwuSt35JWHYtDqk/yZUQyp0QaRuK39uqzdnOgA8hCqP1QtEBMhZLc00sn3PfNuZmbjyLviwkmrH3cur9WReEaVm02DRVuwc1IHk+gAQ20gYyvoiQ3ZZHPJh1pKgp2sUaS5hDZW71ACoq9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pv9flViILqejI/SYMFN/ZQlQcYMTAXXvlrC8QcCAnHw=;
+ b=H3jAQDNJYh5l94tZR4vDlio5AhLbb/T9MYz9piQZitxyzrliMflRfKTX0YSOOJ/a4RjaMmrzAEuNpJ/C/ZdmTvHoAdk1i/6ufDKJEQ4/Iq34vGTy9n8+Tri0ithML3ElJYLFrh5pn3/ejzKNyGBT/JE0nGFvPFbpgmWfaEaUqsc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
+ by BY5PR21MB1396.namprd21.prod.outlook.com (2603:10b6:a03:23d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.7; Wed, 16 Oct
+ 2024 15:44:30 +0000
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::2c5a:1a34:2c8d:48ef]) by BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::2c5a:1a34:2c8d:48ef%7]) with mapi id 15.20.8093.000; Wed, 16 Oct 2024
+ 15:44:30 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	stephen@networkplumber.org,
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net,v2] hv_netvsc: Fix VF namespace also in synthetic NIC NETDEV_REGISTER event
+Date: Wed, 16 Oct 2024 08:43:57 -0700
+Message-Id: <1729093437-28674-1-git-send-email-haiyangz@microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+Content-Type: text/plain
+X-ClientProxiedBy: MW4PR03CA0273.namprd03.prod.outlook.com
+ (2603:10b6:303:b5::8) To BY5PR21MB1443.namprd21.prod.outlook.com
+ (2603:10b6:a03:21f::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Last-TLS-Session-Version: TLSv1.3
+Sender: LKML haiyangz <lkmlhyz@microsoft.com>
+X-MS-Exchange-MessageSentRepresentingType: 2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|BY5PR21MB1396:EE_
+X-MS-Office365-Filtering-Correlation-Id: a34dae16-3214-4934-eeb1-08dcedf96c48
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|52116014|376014|366016|1800799024|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?WjsFlY2TsKRlZ0aUtND57/cAPUqr3Ih4s1tFkgtLRo+NauPi56q4ZFWu3g1g?=
+ =?us-ascii?Q?tIvA/ne3msaAV7yFC4bfMbHb7dG8VWyN+BK9rM65N3oeKxIhVUUE4GCJa0px?=
+ =?us-ascii?Q?DJ02mwjMY+tnRvhxX/0ogGsdXtYzDk60zno38CIsbFRUU77zUizWoph2HQwT?=
+ =?us-ascii?Q?hwhd63YgrwqxbNiHc4wgC2BzQbR9itIxeoLTZ2oVpPqwksQ7bmHt0XmgYxbQ?=
+ =?us-ascii?Q?CotVg6wUOZeqADMoryZtritu+5plhLiwHKqP2v1dKDI5kop3ucnNRdTruj0o?=
+ =?us-ascii?Q?4DjDUV+kCP1VMx1UsoXcYRsS/IanOBz1CEgJhcZSp6D0bzXSQW4AbwEbM6jt?=
+ =?us-ascii?Q?7RX4mzCGVzhg3D88Ofa49Msiw/iDq6M5XgLCoK3/SA4gNsUOW2c4ay/x6j/j?=
+ =?us-ascii?Q?vkKPCiRRaaxjXy+hi5LAcnPmfk47WOe8MyFzeYkLtsq66JXFzZYAqqUecaRA?=
+ =?us-ascii?Q?tGYNVBU7YkGL27WfCcvYq1HAeP8SpbshDoMaC/j6EkEaHSK2QIG4SJmZbZs+?=
+ =?us-ascii?Q?omuoFSPloX7/Ubjj/w937vhkKPNuUNm4Ja5mCFu4uHDCGqRTuAT5nCNyS8dO?=
+ =?us-ascii?Q?qqfc4MkpoHZiXH0TWmZm4IJ6eRkPzp4jUA6zeEZSpnN81lweH2kQXlJ8Ko+0?=
+ =?us-ascii?Q?I8csjGbL1kwVeY+qQDZXiAk1a9jwrZyT/hnI66aJOUdxf5N2GvL8u5YSgrcB?=
+ =?us-ascii?Q?WnEIM78dF9eYEzTaeIV608jJuiSt2MSQkgc72wPWmhP28L30atl9lJX9lNG4?=
+ =?us-ascii?Q?kkiC6+cmCRitOg4FPVRWA+Ko7lh+SENZktUKsIFYYAcCaKKodNjrwD12LNxD?=
+ =?us-ascii?Q?kZPiDiLWm+giH769+nJOslRsSTa5JYRdbW44JqFpkCF/yRWShUgwWB5FNu2L?=
+ =?us-ascii?Q?qamWDIsrKtPfelCTCdqJiOxFqjNywpctNLlt0sFTWCWB2Vp3ipX7SPf4enjt?=
+ =?us-ascii?Q?CGg7mGkNmmsHO49IS89ZUHOSrJaXL8Me1p02x6c56tAe2CtMNCchDylWNDSc?=
+ =?us-ascii?Q?OlKD8VlspLgDCE4bVTTtzx4jMgQSFoYPlBitIxjtFX/0qmuwWP5/KXIi1iiq?=
+ =?us-ascii?Q?EkG4XpGLQ/MTTkT7Qz4ASwBYJM3n2zDQo+w6FQzQxsBCvEHvPxWFIUjFNi4h?=
+ =?us-ascii?Q?9zBNvqO8YwOKUWTBDCaZ4/3jY0joy4wLOadI0P1bdfvchMOvuthxfF0eiH7z?=
+ =?us-ascii?Q?fl837Mf3Bh7IZFLnM/52V9mNUK/dMJ0P3YrFaF5McdDzyabthKNJK/NEzSTS?=
+ =?us-ascii?Q?ujgk1fInLvLkTKwwuiJbxiestWOga4GqqHqX1EZdN4rb9Ql/zeF6TrOU0YIo?=
+ =?us-ascii?Q?rIhd9eQGqxDVxnOgj4HQohd29x90y1+bl2AQmMcDMwKNPg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(376014)(366016)(1800799024)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+D9WTWNxZYafXV/JwJy0cZg+u2NCOrpZWnKUjkdifr7hqRHYxnJy1AuB4Ysq?=
+ =?us-ascii?Q?pkWtNOWhPdtnmJiGPoghaqB5Y2DvRmyc7otwxm8VA0d4Fp5Y/QrtFyu0nHyv?=
+ =?us-ascii?Q?t88fMThg1dmOlRS4mKexoL9e8m58/tUMOIbTpwx9MZZigPXXsmc6I4kauc1A?=
+ =?us-ascii?Q?UtheCvYM+r96aO45kMjXSOOJAZ0kK08Ey+kD4f32gcglqpkTakL96wKPOeh0?=
+ =?us-ascii?Q?Zc7iwFunnpDTsVuvtNrEE1jyunDGZ7e2Ri0xBS2yv44VdgXzJqAGTTvt3OUv?=
+ =?us-ascii?Q?ozk67kV0tF87K5Zw7n9J5D77HBwGTN70+7EWVPavPqLeBcdp0X/uOwPfbJJK?=
+ =?us-ascii?Q?ZpI9ESRJ0hWVtyjH0W+d8IImVxH00MgnTcbDRcsIE7FpBd4W4uTTbRFmy3Dr?=
+ =?us-ascii?Q?UmowVq8h8L+qe0C6/N1IOf+/NgMykqeNufLJrdU5SCseM5AeD/iAtJa1jW6u?=
+ =?us-ascii?Q?myb5wQKS5D38+Phiy57fHZcnWuzfWJ7OWMUyX25QKut7nWY96urRlzr4M4a+?=
+ =?us-ascii?Q?eArO51KOOhy5d53CU2yuvqXncnHuiYIUQWWqDMOPiYzfsyDkpwxK6cjHRGqw?=
+ =?us-ascii?Q?cfQzh5g1sGaVa4v09+7zEvysgDycG5zlaKtXCv59IJlIMWiGgElM65HgNNUu?=
+ =?us-ascii?Q?ZDAT4yde8wQ/G7J9mcZOfgGOpyHE6Qs19tTPIefftIrtLzp3Gb7/gFeMDK76?=
+ =?us-ascii?Q?VEEm3NocbW9NcDXT8hx9DviL3t7BVaY60EQyBD4tvp18xVAbb2fNk3Egd0rp?=
+ =?us-ascii?Q?QLGrUXPjGJ/OG52vZwRGdl7DVdzwiM547Di4HQcOYDPIycfUvaBRsYoXZSmF?=
+ =?us-ascii?Q?NIvWZW8uAZUD+9Na9MePVcm8iC6RapjSA+07wiUPBdDOKWTo4L4bEhb1Sf+Z?=
+ =?us-ascii?Q?7Tit0axWXG8BOlRUj8RRuA3gsDObIZOwNjV63zpgQ+Mi523Q+TeqMZhn/VSQ?=
+ =?us-ascii?Q?va5ooHTi3W8g3om7BQrNPmvUJdRkF9iszqUFTFy2JXZIhVr+/+KfYzCTZtCm?=
+ =?us-ascii?Q?U9dE6KW1qczE5W/Y5j4pRcjYMuwA8u6BA2WDozO5HDXMTYgCKmNA7Vn8qcCT?=
+ =?us-ascii?Q?aM4pKPV6vLYXrkuFiodRkfDSfx770nISt4aYqjqDb+ObLY0FoZYn1jBrO2N5?=
+ =?us-ascii?Q?P7HOxMbGnWK1VpDzO0Hu0Mfa6x5BdPqGDEKbwvCkmwn5/O1mVoZBS/lQ92qo?=
+ =?us-ascii?Q?i9AVvjyDBvbeRInrmGZlGnaycoqTkCSCZejhMSPJ5HoWCZ2eozAeYdtb9uDu?=
+ =?us-ascii?Q?Xyv85fdUy22qd7F5tqTjrcvnZq0vl1F23wthex/wbL789QCBT6skOevdz0pU?=
+ =?us-ascii?Q?loM+2Zm/Tri7H0fxJK7fM8Lnq2JTHpuch6kv1tWwQDlT6STjU/hYR8xyHeHd?=
+ =?us-ascii?Q?OCICYaVNcGASPYrP82tTMuzjtGbaHul9fmEFzglbM72yu9zRPxObkmP9JCYp?=
+ =?us-ascii?Q?MKJzJ9oG3SgTVKVE5ILvzmDnaoxdnTrg5YYtnPjsYSM6a1q23ONkDZ1/RxRL?=
+ =?us-ascii?Q?W3mJq5+K3lrzQKDYZ30QdlW9G1EoHx1hIa991oGVdie92MrjNVK1TB20/64T?=
+ =?us-ascii?Q?HgXIonkC5C4853iNtwHG1SINaAnJ4Gn5SkhcvS26?=
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a34dae16-3214-4934-eeb1-08dcedf96c48
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 15:44:30.2479
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C5s/Mc6QYa3ZDd8GCNRC7BkUtqcRvuu0QLbgIrt0HiHGyUSqEJs0aKBSu2a723J6JGZHMxqyyL2y0Nmm8H0CLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR21MB1396
 
-Hello everyone,
+The existing code moves VF to the same namespace as the synthetic NIC
+during netvsc_register_vf(). But, if the synthetic device is moved to a
+new namespace after the VF registration, the VF won't be moved together.
 
-migrating an old board with an SMSC LAN8720A PHY to a new hardware
-revision with a Micrel KSZ8081 PHY (both Microchip now) caused me
-quite some headaches this week, and I did not come to a satisfying
-solution, although I tried quite some different approaches.  I got
-questions.  This is all about addressing on the MDIO bus and different
-PHYs behaving differently.  Maybe someone can shed some light on it?
+To make the behavior more consistent, add a namespace check for synthetic
+NIC's NETDEV_REGISTER event (generated during its move), and move the VF
+if it is not in the same namespace.
 
-(Note: Facing the same problem on four different boards using
-different at91 socs (sam9g20, sama5d2, sam9x60), but all the using
-'macb' ethernet driver.)
+Cc: stable@vger.kernel.org
+Fixes: c0a41b887ce6 ("hv_netvsc: move VF to same namespace as netvsc device")
+Suggested-by: Stephen Hemminger <stephen@networkplumber.org>
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+v2: Move my fix to synthetic NIC's NETDEV_REGISTER event as suggested by Stephen.
 
-Old hardware revision uses the LAN8720, but unfortunately the PHYAD
-strap resistors where forgotten, so that the PHY could end up with
-either address 0 or 1 on the MDIO bus.  This one problem on its own
-could be handled in two different ways in DTS:
+---
+ drivers/net/hyperv/netvsc_drv.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-        macb0: ethernet@fffc4000 {
-                phy-mode = "rmii";
-                status = "okay";
-
-                /*
-                 * We have to disable energy-detect because the 50 MHz
-                 * ref_clk signal is used by … and must not be switched off.
-                 * Disabling this through DT was introduced in Linux
-                 * v4.3 and fixed in v4.5.
-                 *
-                 * Adding two PHY nodes here, because in schematics
-                 * PHYAD pin is not explicitly pulled up or down and
-                 * address thus might be one or the other.
-                 */
-                phy0: ethernet-phy@0 {
-                        reg = <0>;
-                        smsc,disable-energy-detect;
-                };
-
-                phy1: ethernet-phy@1 {
-                        reg = <1>;
-                        smsc,disable-energy-detect;
-                };
-        };
-
-Or if the 'smsc,disable-energy-detect' is not needed, and because the
-kernel (phy core or macb driver or both?) iterates over all possible
-phy addresses to find a phy:
-
-        &macb0 {
-                pinctrl-names = "default";
-                pinctrl-0 = <&pinctrl_macb0_default>;
-                phy-mode = "rmii";
-                status = "okay";
-        };
-
-Entering the new hardware, using different options, now we need irq
-settings, and to not get in conflict with the old addresses we now add
-another node, so it looks like this now:
-
-        &macb0 {
-                pinctrl-names = "default";
-                pinctrl-0 = <&pinctrl_macb0_default>;
-                phy-mode = "rmii";
-                status = "okay";
-
-                /* HW <= v0.2, LAN8720 */
-                ethernet-phy@0 {
-                        reg = <0x0>;
-                        smsc,disable-energy-detect;
-                };
-
-                /* HW <= v0.2, LAN8720 */
-                ethernet-phy@1 {
-                        reg = <0x1>;
-                        smsc,disable-energy-detect;
-                };
-
-                /* HW >= v1.0, KSZ8081 */
-                ethernet-phy@7 {
-                        reg = <0x7>;
-                        interrupt-parent = <&pioA>;
-                        interrupts = <PIN_PC21 IRQ_TYPE_LEVEL_LOW>;
-                };
-        };
-
-The idea of this was: phy core steps through all these phy nodes,
-finds only one of them present, and uses exactly that one.  I found
-other .dts files doing the same IIRC.
-
-Problem: the KSZ8081 follows the IEEE 802.3 clause 22 which states
-this in section '22.2.4.5.5 PHYAD (PHY Address)':
-
-    A PHY that is connected to the station management entity via the
-    mechanical interface defined in 22.6 shall always respond to
-    transactions addressed to PHY Address zero <00000>. A station
-    management entity that is attached to multiple PHYs must have
-    prior knowledge of the appropriate PHY Address for each PHY.
-
-So according to standard, PHYs should all answer to address 0, even if
-they are on a different address, like a broadcast.  LAN8720 does not
-behave like that, KSZ8081 has flag in a vendor register to disable it,
-and the 'micrel' driver actually clears that flag in .config_init aka
-kszphy_config_init() - alas too late …
-
-The sequence how I understand it, is more or less like this:
-
-1. ethernet driver probe, that calls macb_mii_init() which leads to
-creating all phy devices in one or the other way.  The one and only
-KSZ8081 answers to addresses 0 and 7, thus we get two mdio/phy
-devices (and none on address 1, because there is just the single PHY
-chip):
-
-    $ ls -l /sys/bus/mdio_bus/devices/
-    lrwxrwxrwx    1 root     root             0 Jan  1 03:50 f802c000.ethernet-ffffffff:00 -> ../../../devices/platform/ahb/ahb:apb/f802c000.ethernet/mdio_bus/f802c000.ethernet-ffffffff/f802c000.ethernet-ffffffff:00
-    lrwxrwxrwx    1 root     root             0 Jan  1 03:50 f802c000.ethernet-ffffffff:07 -> ../../../devices/platform/ahb/ahb:apb/f802c000.ethernet/mdio_bus/f802c000.ethernet-ffffffff/f802c000.ethernet-ffffffff:07
-
-2. ethernet device (eth0) bringup, which somewhere down the call path
-calls phy_init_hw() and phydev->drv->config_init() disabling that
-broadcast flag.  From this point the KSZ8081 does not answer on
-address 0 anymore.
-
-3. the system (not sure which part exactly) tries to use the first phy
-it finds on that mdio bus, still address 0, but that chip does not
-answer anymore on that address after turning off broadcast, because it
-has address 7 configured through resitor straps, this looks like this
-in messages for example:
-
-    macb f8008000.ethernet eth0: Cadence GEM rev 0x00020203 at 0xf8008000 irq 156 (a2:09:7e:80:00:02)
-    macb f8008000.ethernet eth0: PHY [f8008000.ethernet-ffffffff:00] driver [Micrel KSZ8081 or KSZ8091] (irq=POLL)
-    macb f8008000.ethernet eth0: configuring for phy/rmii link mode
-    Micrel KSZ8081 or KSZ8091 f8008000.ethernet-ffffffff:00: phy_poll_reset failed: -110
-    macb f8008000.ethernet eth0: Could not attach PHY (-110)
-
-What did I try to solve this?  (Note: I don't like any of those
-approaches for different reasons.)
-
-1. Changing the order of nodes in .dts → no effect, this is considered
-at driver loading time, not at eth0 bringup time, still get two phy
-devices
-
-2. explicitly using the phy IDs in dts as compatible string, like
-'compatible = "ethernet-phy-id0007.c0f0"' for phy@0 … this leads to
-using the smsc driver for the ksz8081 phy, that's probably not good?
-
-3. tweaking kszphy_config_init() to not disable that broadcast flag,
-if the address configured (you can read that from vendor register 17h
-in the ksz8081) is not the same as the one of the phydev.  Leads to
-communicating with that phy through broadcast address 0, not a future
-proof solution IMHO.
-
-4. disabling that broadcast flag in bootloader already: increases the
-boot time quite some seconds, and adds some kind of dependency to the
-bootloader: not nice.
-
-5. returning an error in micrel PHY driver probe, well then the
-generic phy driver is used, I could achieve the same by disabling
-CONFIG_MICREL_PHY in kernel, but then we would not get vendor specific
-tweaks for that phy, and I'm not sure that interrupt stuff would still
-work.
-
-6. using phy_register_fixup_for_uid() in the micrel driver, so
-phy_scan_fixups() could return an error if phydev addr and phyad strap
-address do not match.  This leads to phy@0 not being attached on eth0
-bringup, but the phydev at address 0 is not removed (only
-unregistered) and the other phydev for address 7 is never tried then.
-
-What do I take home from this:
-
-- different PHYs behave differently with regard to the IEEE standard
-- I found no mechanism to disable broadcast in a PHY specific driver
-  early enough so the phydev for address 0 is not created (or removed
-  after creation)
-
-Would be happy if anyone could suggest a path forward here?
-
-(In the end, it will probably be solved with multiple devicetree files
-depending on hardware revision, but that is the can of worms I wanted
-to avoid in the first place.)
-
-Thanks for reading.
-
-Greets
-Alex
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index 153b97f8ec0d..54e98356ee93 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2798,6 +2798,30 @@ static struct  hv_driver netvsc_drv = {
+ 	},
+ };
+ 
++/* Set VF's namespace same as the synthetic NIC */
++static void netvsc_event_set_vf_ns(struct net_device *ndev)
++{
++	struct net_device_context *ndev_ctx = netdev_priv(ndev);
++	struct net_device *vf_netdev = rtnl_dereference(ndev_ctx->vf_netdev);
++	int ret;
++
++	if (!vf_netdev)
++		return;
++
++	if (!net_eq(dev_net(ndev), dev_net(vf_netdev))) {
++		ret = dev_change_net_namespace(vf_netdev, dev_net(ndev),
++					       "eth%d");
++		if (ret)
++			netdev_err(vf_netdev,
++				   "Cannot move to same namespace as %s: %d\n",
++				   ndev->name, ret);
++		else
++			netdev_info(vf_netdev,
++				    "Moved VF to namespace with: %s\n",
++				    ndev->name);
++	}
++}
++
+ /*
+  * On Hyper-V, every VF interface is matched with a corresponding
+  * synthetic interface. The synthetic interface is presented first
+@@ -2810,6 +2834,11 @@ static int netvsc_netdev_event(struct notifier_block *this,
+ 	struct net_device *event_dev = netdev_notifier_info_to_dev(ptr);
+ 	int ret = 0;
+ 
++	if (event_dev->netdev_ops == &device_ops && event == NETDEV_REGISTER) {
++		netvsc_event_set_vf_ns(event_dev);
++		return NOTIFY_DONE;
++	}
++
+ 	ret = check_dev_is_matching_vf(event_dev);
+ 	if (ret != 0)
+ 		return NOTIFY_DONE;
+-- 
+2.34.1
 
 
