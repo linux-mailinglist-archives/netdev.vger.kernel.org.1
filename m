@@ -1,194 +1,217 @@
-Return-Path: <netdev+bounces-136165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D0F9A0BBF
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 15:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13F8F9A0BC5
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 15:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 965E3286978
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 13:28:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6E06284BB0
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 13:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E4C209F3C;
-	Wed, 16 Oct 2024 13:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E26206E96;
+	Wed, 16 Oct 2024 13:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="ADa6Bp5m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FLiRBi62"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2069.outbound.protection.outlook.com [40.107.22.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCEAD520;
-	Wed, 16 Oct 2024 13:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729085328; cv=fail; b=bZoyjVxPV3JlQjRs+lAotVBhxFm2lunzi8AifzPP2EPVr/iDWnMpY1CPCDZQl5JhPxB6Yg4dFv7gdmYQvNSx1MBdAxeWtfCnPo8GeKaXNTk26eMwooeHuRdNdZKe88euHmTbKSit/GtILrBsrugGPTxmkL8CWnItHYo9UVHh6/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729085328; c=relaxed/simple;
-	bh=KVmxKsdZRAM5bwH1JdVOCmWmaAODzdSBLIRWAAKYdcU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dRfmFfW5oSMVo6xW8MwTGK4qytSF66abJdFqdzdLXUliubRKc4q0jCnsoNVrC4kzZ5qzOykWYCia5kKHpnhZjbTVCelDI4k09CE/l7+dpyvZs+H//6TkYT/mRI+41th00qAMhar4n2Hr2XiTJx6jbX8NVkDiOslmvFx4+5pZc6U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=ADa6Bp5m; arc=fail smtp.client-ip=40.107.22.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=e1L7L3TfTCYAyqOl4oZE3YXqgR6MteXKJDXqDJExb5q+oxq/8P4/vpdvw6z86iZFZ9Wgnh/Dg1qHx90YXU9stNlec3/DuLquAmqRxCrP3ovDji7t5gIjvQ841UnBHA3N0q+JJiRSB4wB+rb4eR8ZEOkCi7i9nr7oVQ7jAHPZ2of+4lUV5K4LwEVjzf4BB4nF1V0TTjGELBppDxxZheaPy3rdOtvuGgYoXEmX+jDy9Ms6ae48+G/pzniPOV8U7TANpUFsEwE63R8lb04l7B4O2k1SiKDz2Ni9lUI30fhJhniYNcgHd+AbzXI6AYwIJegRSsf9r+rTIqqBLhV7UpryzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0CJ4bmZhe8u5GUomhH8IJfA4ILb53mEd5t3kQ3nqz6I=;
- b=jepBAVsBik26wK33v+h3l+TSGdif4iT8ks6CguZFH1fcQ6XkRytpYjTjx7xI4LN2mlHjhQw5InfZLCuiSVqEHOJTDCNYblF2R9lDxin7R1IEYx+dS/xIX1ZE4oIm1AiEFM7HgkpKnInwERPbAF0AcuoUbLRulUoY0tm/4axHeXLRgtcuF5YveEkogP9CWtk0uKnNwa9zLJASw5W0VXhJXz/oWBN6FBEhEPd1EXkSDDny+E5Jqp1f1RF1uYX425yj4rK+cZ6qxGqXprE4sK0Iqidc+zGSkdv/r6Ng+r5g6GOKXqqhj48x/qE8Mr78kX9ErlALKlWZLweu+jRnl4XFHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
- dkim=pass header.d=nokia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0CJ4bmZhe8u5GUomhH8IJfA4ILb53mEd5t3kQ3nqz6I=;
- b=ADa6Bp5mlVhpOy3drCTYjDEa33zOBK0KvpBgqjN9zfuo2R4NlnzAEFWh61ol18lkuU+kP8hcLASHaqN3zaAJenMg92iOc4QTW1qghrPQAu/hPL+WwNDeIJUrsiqKXNB3J+fGM8/1V1LNpMT/d0nLebV+v4p3DUFwLlrYlDdQHi17qfi2MzJTtDQSEjGR2m1AQIXBwFBArpmf+MqcPfcSadqstDNhMUX5+Tjhd2hDnZP3v3FeHv3exsBbbBVBDK6e1Mhoe/BqGvpN6uRjFHsynI2yGdYUDb659lZVTk7pVtWHd3/t1YL9uaULAzKVybCGqbnoNzOHeRT/CGqChVCWGQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia.com;
-Received: from VI1PR07MB9706.eurprd07.prod.outlook.com (2603:10a6:800:1d2::12)
- by DBAPR07MB7014.eurprd07.prod.outlook.com (2603:10a6:10:19d::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Wed, 16 Oct
- 2024 13:28:43 +0000
-Received: from VI1PR07MB9706.eurprd07.prod.outlook.com
- ([fe80::1620:bf68:4eec:61c1]) by VI1PR07MB9706.eurprd07.prod.outlook.com
- ([fe80::1620:bf68:4eec:61c1%5]) with mapi id 15.20.8069.016; Wed, 16 Oct 2024
- 13:28:43 +0000
-Message-ID: <7caaefb9-c1e5-48b8-b457-8b9e7e2d491e@nokia.com>
-Date: Wed, 16 Oct 2024 15:28:41 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5 08/10] ip6mr: Lock RCU before ip6mr_get_table()
- call in ip6_mroute_getsockopt()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241014151247.1902637-1-stefan.wiehler@nokia.com>
- <20241014151247.1902637-9-stefan.wiehler@nokia.com>
- <20241015171013.7cc3617e@kernel.org>
-Content-Language: en-US
-From: Stefan Wiehler <stefan.wiehler@nokia.com>
-Organization: Nokia
-In-Reply-To: <20241015171013.7cc3617e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0424.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:d1::17) To VI1PR07MB9706.eurprd07.prod.outlook.com
- (2603:10a6:800:1d2::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D14E125B9;
+	Wed, 16 Oct 2024 13:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729086037; cv=none; b=Un2JlKxXtRJLa7l+mLzO/XChZV2/PWD0IfbXmxzfOvAqBkxJMXCVvMfxCjZ26y9l6eXJhMOKbJV5NFG2jRSbYoZxEV8WpBNTewmDswt99XEOqjErNEARy1RRvnkyYoA4K1/A0FfhYneF62u6W5z7AZSzUTlQezTjwYbAmFC9bNw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729086037; c=relaxed/simple;
+	bh=G++ORK2FgZevGvdY+BTR6KcoC7OqkSgsfdR9UEvc5pA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UW/SXzKy5mTHys67bp4R5sQF3pl5nSIwNXek3VrqGTobXf28rWMzPCyHAPImO+hPwqKZGSSSWLAjMMpIWtLcEGrpd36oQ32WIVugRqEx028dHxzsiGzV8aqhBFpMtMY2IYC2QaBEH/lelPJYRJ8xEplXeobmp49CDn2dTHcsyK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FLiRBi62; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4314ff68358so1261295e9.1;
+        Wed, 16 Oct 2024 06:40:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729086035; x=1729690835; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8+QnUShLc/0+IHM+m9BqL3B3PrvM4XJTQxj3ySk1rs=;
+        b=FLiRBi62Ymu/kx0f6SSj2sB8uUvfIU9fihnxFjVBszpG8eh6IkDwGYhcuzQ9Zjty48
+         lF4soTYUre4hw3pZA2weBWpO9V16wjkAgVfmHAZP19qE7DqnMi+i6Qj3ibuilVthODIL
+         uu+zhIhd/WV89BivDBmvG/bvZRrDueA0g21InuRh8FkfERO01vX3DXj9cQktwvFz7q7e
+         qdvMrwIz/S4iw7VQicjx2hXGHEmJA374CsvtlRTNvdLo2ICINYulcnhVFXXbHlWbsncm
+         FGQTztt7snEDnbvPja9B261sBBMMqEGYWbz/aGolaXap/wfcK1VeCg3SeTCKFfhJ9z+6
+         ry2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729086035; x=1729690835;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q8+QnUShLc/0+IHM+m9BqL3B3PrvM4XJTQxj3ySk1rs=;
+        b=iTZC7hTBJBkWyXA3+f3NM621fwUh0iRlHxPXm4dFxpd5RyR9CXfw8U1Uv/wZbYy2eZ
+         WN1KCx3EAO5G1Tjs68oeFaGPcdG1ZIpwtPndKw6WVZ8yvJ2PqMzPWYSDAbdEj73VpqaU
+         +g4J6dKPVWiqUOwnXxiOhRpNzYornPUWJQtfoRWdPj9QE0eEwtqgETMT5kkfTt1BqxHi
+         NlB7FB0WGRFK5aMTOPk0S4WJI58MHIRqMrR9CbxCWjRsHlJT/GHpXoR0Zv6F5rP63LP5
+         YoN6kI1fLwvUICvlXY3/GysMGwZPMUxZoL0qvunZQKTcHlrAPLxqF/p2kxYHBW4B64sB
+         reZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhJlJjdIJqEiegyjyDzN1QmpJiRJcUupgIqApT0PLvvWff8xLT6JAbx1jaUJJ0ovKJriTSsGBS@vger.kernel.org, AJvYcCXhdIGUMvTpKvRZGdvvNSOLopA3+ORIxI0twI/nrf9OhWOnek/OqSMhXS3JUsF8P5Cs6hzcZjw6iw0ssuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0Qigtqtz87X5D0zTWFvEZVq8UGUYWtiJbRxPRUHhl5oa48nkO
+	u1FmHIajOH+wDF8KgVVen6hvp6acvfWy/abhMvaUJLSgPzq6g5oa
+X-Google-Smtp-Source: AGHT+IFYU0g4E6OJoqqKxOHSnMeeJNON1t/f2Dc5TZXb9Hbv/s4VzmQuXbC0K1Smyh0vOOfE3l6kRQ==
+X-Received: by 2002:a05:600c:1ca4:b0:42c:c59a:ac21 with SMTP id 5b1f17b1804b1-4311deae91bmr74783345e9.2.1729086034401;
+        Wed, 16 Oct 2024 06:40:34 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f56a583sm49608605e9.19.2024.10.16.06.40.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 06:40:33 -0700 (PDT)
+Date: Wed, 16 Oct 2024 16:40:30 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next 3/8] lib: packing: add pack_fields() and
+ unpack_fields()
+Message-ID: <20241016134030.mzglrc245gh257mg@skbuf>
+References: <20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com>
+ <20241011-packing-pack-fields-and-ice-implementation-v1-3-d9b1f7500740@intel.com>
+ <601668d5-2ed2-4471-9c4f-c16912dd59a5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR07MB9706:EE_|DBAPR07MB7014:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a39e0f1-5175-4055-6582-08dcede6746d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UEw2SGI0KzZZTGY2c2VQVFRmd3QvMC9CeUJLcVFUWkdrT1pZZTI0V0ZuRVF0?=
- =?utf-8?B?Q1FFbmZQcG9id25VTTlodjJVNktPcXZGL09CWkZ6eW9wczZZSlgvYUw4eTJw?=
- =?utf-8?B?VkZXRjU3SHZaRlplN1FLNThnYnd1TTNqZ3QxQUY1eXpMRUpYeW5iYTlsMXFR?=
- =?utf-8?B?YStTWkpWSlZzWUtnZnVKL2RPZ3ZzbW0yRWpWLzRoN2JwRDlSd05yMmFPN3Rw?=
- =?utf-8?B?eEFtWHFwbm9qRW94Yy9pdnpGYTJnRWZuYTJKWHVtZjUrdWI1S1QrM1hybzFx?=
- =?utf-8?B?TXo3VjBud2p3REhEY3VHeXZBQXp1NFJqTEkzcEx4RWczbFViK0pFOGw4bk5V?=
- =?utf-8?B?bHp5aXNhNEFKRkVucWxsNEppT3BWU2lUeTJzOStmQmNLdVJWeUwxN1RwUTJE?=
- =?utf-8?B?SDkrSENMdXBYcjRpbzVneDdRazRqVnpxVitCdFQ5b3dhb2h2MjcxSEJsSmtt?=
- =?utf-8?B?M1A5cGNLazhGOTM0K0ZKVU5iS0ZCZUk4MXFuVU96RmEvZlJxMkozdldaeWcz?=
- =?utf-8?B?RTExUWo2MVdGb284Q3lwUllwQXk0YndmS2NuYlc2VmhyOHFlejBPZzFTNkxq?=
- =?utf-8?B?VU44R2w1azZnWmdabUFBaldCYU96cXZndFkzRzFCNHZQYnB3aHF0ekd6Rm9S?=
- =?utf-8?B?bkphazVjVlRrdUZwY1U0Z2tVMURKamcxNEt3K0Z4aXFLUXZzazdxU2dkaThZ?=
- =?utf-8?B?V0pnUkYxcXdVaSszRWJoV0l0d2JOU2lBSDhoZlpLNFpZS0NXTVRzWUNGeE8v?=
- =?utf-8?B?V1hTN3E1em1TbHZ5V3hKdlNpMTVjMkhHWGV6LzB5emNycW1OczU3OHhEQmg0?=
- =?utf-8?B?WjNIOEc0eWplaGgvZEdqR05ER0h0N0laTXR5NFEwbG5acW4zK1BKQzB1cTAx?=
- =?utf-8?B?WXh0enVDa1hpVVZUc0c1TXU2K09RTlJkMXMyWGdSZVRkQzRkcUpyS3pJRkNy?=
- =?utf-8?B?cE1IQW13blE0MFBwaEJMLzBSRDRkVjQvOWQ1cFhHd2x2dzdQUGUyb0ZpSTly?=
- =?utf-8?B?KzY0VlFEbDcwbVRzdTc4eXg3VWZxQ2ZUcHA4RHV4UHZZV0V0UHdTWkFwd3VN?=
- =?utf-8?B?aDF2Qk1TYUhzMkJ6YmNxWXMyaHltbnVrUmZYb1M5MTVKL1RHY1B4dXc5VytX?=
- =?utf-8?B?NXZqZ2htWXZ1NFFleCtXajlGM0RNVW02R1oxSExqckQzTUI3NEMyaW1Jd3p5?=
- =?utf-8?B?NHZRVXJSWHNjNFU4UklUTGxXWlNBbVFEWk90MkdFMFNFbHZSMUU3Z0xPUFZo?=
- =?utf-8?B?OTdFQm5MYU9INFhQZHZDeTZId1lhR0pZQTNtOWovVzBxZmxHUTgvRllHOVpy?=
- =?utf-8?B?UFpwelZXY1Izb3p3ak0rRGRqL2tac2VUUmp5ZTZKNWVOVXpoQ3Jua2ZTTUlF?=
- =?utf-8?B?VXdKRGVaVTBIN0dXNVlrNjJONHYxR1JnVTZNQmkyTFBEa0lJTGlmTDNzbHdS?=
- =?utf-8?B?NDRnWUFNRzlxL0NDa3B6OGVtSkh1K2Jwb0pld0YxaU14UlFjR1NIaFhQUFc5?=
- =?utf-8?B?VlhXbFg3aXcrdkRYQThWTk1yVE5vcDB1MUtiK0NIdGswU2lBRGJmYzZadkkz?=
- =?utf-8?B?eUNtbXY2NE5jNGMrSVk2djE1Z3EyaGlka2xNK0lPd1RDU00zaW1wdHJqYkR3?=
- =?utf-8?B?YUhhM0FIbTVubFZPOE1uU0ZBU2pINFBlS3A1UitJd2x3dE1VaG8zNXIzMGM1?=
- =?utf-8?B?TXZmZlovYjh6Wm95bXdVNjgzaDV1YmU4RDdaVktKL2liSWxadFlVZFlBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR07MB9706.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Qm11Ukt6Z3YwZE5yVmcrdTM2OE52dnJLK1dzL1BDaEtPc3JsR1dLa3N5ZDA3?=
- =?utf-8?B?MWI1NStOaU52cXJ5Mm04UVpmMHMrb2xxemR2UHlPVWVORkVWQkJZWlRSN1dZ?=
- =?utf-8?B?R0p2NC9NNFplU3Jqb28rckZIUFd1QklvaWJRSmkxcld0WUVOU1ZJV01pY05V?=
- =?utf-8?B?NjJoeC9ZZ3FIVHN3b1NVTnRxanRtZDA5NldNU25qZGNHTi9GWVF6YzVWZUpo?=
- =?utf-8?B?SWI4NG9EZ3VlaU5aUWtOQjI0SjNsa2FGd244STQvQTdBZ1dOT2lUcFVCckpZ?=
- =?utf-8?B?Q3ZHTGd0dDZkTmYwazhRVTZoU2dtb01rb1ZIK2FnQWJnQVJGNDkyTllnUmxs?=
- =?utf-8?B?djRDVlhNMnRZd1NUYnNDNUl3NWtYT3ZlYnlsYlhOU0txNDM1NHJYM0lKaUVP?=
- =?utf-8?B?VURUMjZQcHk4cFQvMldIN2NmOC9zTEREa3hWSTlJenRwS21IUWsrcXJyTS83?=
- =?utf-8?B?OXBCdFNMUHN5M21RdEkrU2dxVjBwVnVjdG1tZDZmWE1FaEJaUFJqaGh2THJG?=
- =?utf-8?B?SExubUNxZVdjMEhuTDFwM2NMbExIRnFaVjM2RjN5S0tkTm5IaG5qUkFYWkZE?=
- =?utf-8?B?N2c3SmkwVHcwelBmbTZFcFF0b3lMamRYM0k0QjJuQ1NIS0tzYTNRTWNnV1BG?=
- =?utf-8?B?M0FsVjJ1TTlPSit0dDY5STR2dWNMUTk1WHcxVjFnMUNTTTFVWlEveUNhZ0lm?=
- =?utf-8?B?djduSzZubW1tMDZ3NEtPTzZwUTAvVlRha3QzUEJFbHpyRGFVQ01IUVhGOW5r?=
- =?utf-8?B?MW9FanRuQkV3czFsc0QwakRBekxYdW5EeU5uVzNaemJXSWNlM0w5TlJ3T1Bl?=
- =?utf-8?B?VEEvdWNTMzFwb2Qzd0JwY01mb3VzUm5yY3MzR2RSaW9XaVQrRitCdHpQSHpL?=
- =?utf-8?B?SnF4YXhFTnduai9ESFF6T2d5b1hFMWZvNUtqU210ay9nZE5oQnYwWEYvZ3hy?=
- =?utf-8?B?S2c3QUxVT1h4K3JtejEwYWpaajlqbmQ2RmlyOWhQNi8yeTcxN3J4SEZCUmVl?=
- =?utf-8?B?dUFGUXhFNUF4VFpMemEyVXVFYVgydTdhalErdnpsUndKWFM3NDVRNUdxSHE3?=
- =?utf-8?B?eC8yVk9xTjFLT0NOdEhYQ0dMU05vRStIUVo1WmxqbjFiRlZ3RFZvaytFQzll?=
- =?utf-8?B?Y2EzWUJqTWduVEd0UnBNV0tQZXRFbjFoa3pJOUhqZkNZWGdQUlpLT3ZMZzcy?=
- =?utf-8?B?dytWbEVicVI0Y0lCdHo5bDZ5SHVYK216dFFkTnBMNGxRd2lZeGpRY3orYVI3?=
- =?utf-8?B?Wnp4WS9rNHVlR2NwbmNqYTJzOWZockJsUk1VWVRjZVBLTVVRTFhlMlhvMERS?=
- =?utf-8?B?bWUzdXlTMWJMOFJDa2RsU0pSODhTU1gwT3pMRXlEUUgvN1R2cVdFTTB1VElm?=
- =?utf-8?B?QjZqQUc2eEJPNDIzZ2syalhrK2JnaFdpNi9iV3ZLbS9laUJaWWFOSVV1a0ps?=
- =?utf-8?B?ejdFZU1GNmg5enZVT2dXNHg0NVdKY2l4RmE0dlZPVk1YKzJLb3lTYngrMHBz?=
- =?utf-8?B?d1NrbjI0MGtKaGZHaHpHV1VwQVZnVVprV0lvVkhkVHBic0tsMlVFWWgrbGF5?=
- =?utf-8?B?TFZMS1ZZSVFRbHdPeUw5VG8wYlcvTnJTUlZ2ZXozcEVZYWJIT1dnV1RKWjlV?=
- =?utf-8?B?c2JRRC9PeU9zSTkyMDZ1b05SV2NKQWxTN0lOaE0xZEp6cHdINW00OFJKMDVP?=
- =?utf-8?B?OXlOSUlBN0pCRzFDN0pKc3dVVU56dEwxbCsxUVlzOStUMFN5RDBhWUR4Wnlw?=
- =?utf-8?B?UkYxazg3Z25SUXU1d3dSeFhJZDlueTFMZTdwN2JyS2p4L1NqeDRqeHNZTHJz?=
- =?utf-8?B?UUp3NHo5ektpSCtpbmhKQnRFUnJZY0dDYWdKVmI1ekNKY2ZJZGZRbTJvTHhF?=
- =?utf-8?B?ZnZsMVZ3c0FaUTFsbGxCVVEyL3hPNzlYS1IxUlJkY1hOa2lyZDNaT2ZvRFhX?=
- =?utf-8?B?UGsxTDhLN0NCV1ZZaEY0WmNYME9URW5ndHV0R2E3YzRpVDMxMDdqNjE3N3ZT?=
- =?utf-8?B?WmdHaWhYbjI0WGdqT2JrZW8wTWpzSFB4cVVzZDRiZHR3RS94Mk92WGJPY3h4?=
- =?utf-8?B?b1BWMjd3NTRHZmJrS05EV0prclVvdllYaXVpQ1dBRFpCYzE3SS9zK2dxNjN5?=
- =?utf-8?B?OFI1THdqYStxT2pBK25zNVNtTHVNNjJaL2VGbXdIM01ad3VTb042U2JGRUxH?=
- =?utf-8?B?WkE9PQ==?=
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a39e0f1-5175-4055-6582-08dcede6746d
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR07MB9706.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 13:28:43.3239
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7GmL8KLnX5+9PG6NXLhaJDg9zEr8Zoi9J50Bd2mIhFulfLAG1Ge+k2umxFytbkqGHpsYTXoVxGYGomb4F8M8Qc9scVEEf1cNFkHtBFRf2Xc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR07MB7014
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <601668d5-2ed2-4471-9c4f-c16912dd59a5@intel.com>
 
->> +     rcu_read_lock();
->>       mrt = ip6mr_get_table(net, raw6_sk(sk)->ip6mr_table ? : RT6_TABLE_DFLT);
->> +     rcu_read_unlock();
->>       if (!mrt)
->>               return -ENOENT;
+On Wed, Oct 16, 2024 at 03:02:38PM +0200, Przemek Kitszel wrote:
+> On 10/11/24 20:48, Jacob Keller wrote:
+> > From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > 
+> > This is new API which caters to the following requirements:
+> > 
+> > - Pack or unpack a large number of fields to/from a buffer with a small
+> >    code footprint. The current alternative is to open-code a large number
+> >    of calls to pack() and unpack(), or to use packing() to reduce that
+> >    number to half. But packing() is not const-correct.
+> > 
+> > - Use unpacked numbers stored in variables smaller than u64. This
+> >    reduces the rodata footprint of the stored field arrays.
+> > 
+> > - Perform error checking at compile time, rather than at runtime, and
+> >    return void from the API functions. To that end, we introduce
+> >    CHECK_PACKED_FIELD_*() macros to be used on the arrays of packed
+> >    fields. Note: the C preprocessor can't generate variable-length code
+> >    (loops),  as would be required for array-style definitions of struct
+> >    packed_field arrays. So the sanity checks use code generation at
+> >    compile time to $KBUILD_OUTPUT/include/generated/packing-checks.h.
+> >    There are explicit macros for sanity-checking arrays of 1 packed
+> >    field, 2 packed fields, 3 packed fields, ..., all the way to 50 packed
+> >    fields. In practice, the sja1105 driver will actually need the variant
+> >    with 40 fields. This isn't as bad as it seems: feeding a 39 entry
+> >    sized array into the CHECK_PACKED_FIELDS_40() macro will actually
+> >    generate a compilation error, so mistakes are very likely to be caught
+> >    by the developer and thus are not a problem.
+> > 
+> > - Reduced rodata footprint for the storage of the packed field arrays.
+> >    To that end, we have struct packed_field_s (small) and packed_field_m
+> >    (medium). More can be added as needed (unlikely for now). On these
+> >    types, the same generic pack_fields() and unpack_fields() API can be
+> >    used, thanks to the new C11 _Generic() selection feature, which can
+> >    call pack_fields_s() or pack_fields_m(), depending on the type of the
+> >    "fields" array - a simplistic form of polymorphism. It is evaluated at
+> >    compile time which function will actually be called.
+> > 
+> > Over time, packing() is expected to be completely replaced either with
+> > pack() or with pack_fields().
+> > 
+> > Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > ---
+> >   include/linux/packing.h  |  69 ++++++++++++++++++++++
+> >   lib/gen_packing_checks.c |  31 ++++++++++
+> >   lib/packing.c            | 149 ++++++++++++++++++++++++++++++++++++++++++++++-
+> >   Kbuild                   |  13 ++++-
+> >   4 files changed, 259 insertions(+), 3 deletions(-)
 > 
-> presumably you're trying to protect mrt with RCU?
-> so using mrt after unlocking is not right, you gotta hold the lock
-> longer
+> 
+> > diff --git a/lib/gen_packing_checks.c b/lib/gen_packing_checks.c
+> > new file mode 100644
+> > index 000000000000..3213c858c2fe
+> > --- /dev/null
+> > +++ b/lib/gen_packing_checks.c
+> > @@ -0,0 +1,31 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +#include <stdio.h>
+> > +
+> > +int main(int argc, char **argv)
+> > +{
+> > +	printf("/* Automatically generated - do not edit */\n\n");
+> > +	printf("#ifndef GENERATED_PACKING_CHECKS_H\n");
+> > +	printf("#define GENERATED_PACKING_CHECKS_H\n\n");
+> > +
+> > +	for (int i = 1; i <= 50; i++) {
+> 
+> either you missed my question, or I have missed your reply during
+> internal round of review, but:
+> 
+> do we need 50? that means 1MB file, while it is 10x smaller for n=27
 
-Thanks, you're right of course, I'll be fixing this everywhere and send a v6
-shortly; also with more extensive reasoning for this series in the cover
-letter.
+The sja1105 driver will need checks for arrays of 40 fields, it's in the
+commit message. Though if the file size is going to generate comments
+even at this initial dimension, then maybe it isn't the best way forward...
 
-Kind regards,
+Suggestions for how to scale up the compile-time checks?
 
-Stefan
+Originally the CHECK_PACKED_FIELD_OVERLAP() weren't the cartesian
+product of all array elements. I just assumed that the field array would
+be ordered from MSB to LSB. But then, Jacob wondered why the order isn't
+from LSB to MSB. The presence/absence of the QUIRK_LSW32_IS_FIRST quirk
+seems to influence the perception of which field layout is natural.
+So the full-blown current overlap check is the compromise to use the
+same sanity check macros everywhere. Otherwise, we'd have to introduce
+CHECK_PACKED_FIELDS_5_UP() and CHECK_PACKED_FIELDS_5_DOWN(), and
+although even that would be smaller in size than the full cartesian
+product, it's harder to use IMO.
+
+> > +		printf("#define CHECK_PACKED_FIELDS_%d(fields, pbuflen) \\\n", i);
+> > +		printf("\t({ typeof(&(fields)[0]) _f = (fields); typeof(pbuflen) _len = (pbuflen); \\\n");
+> > +		printf("\tBUILD_BUG_ON(ARRAY_SIZE(fields) != %d); \\\n", i);
+> > +		for (int j = 0; j < i; j++) {
+> > +			int final = (i == 1);
+> 
+> you could replace both @final variables and ternary operators from
+> the prints by simply moving the final "})\n" outside the loops
+
+I don't see how, could you illustrate with some code? (assuming you're
+not proposing to change the generated output?) Even if you move the
+final "})\n" outside the loop, I'm not seeing how you would avoid
+printing the last " \\" without keeping track of the "final" variable
+anyway, point at which you're better off with the ternary than yet
+another printf() call?
+
+> > +
+> > +			printf("\tCHECK_PACKED_FIELD(_f[%d], _len);%s\n",
+> > +			       j, final ? " })\n" : " \\");
+> > +		}
+> > +		for (int j = 1; j < i; j++) {
+> > +			for (int k = 0; k < j; k++) {
+> > +				int final = (j == i - 1) && (k == j - 1);
+> > +
+> > +				printf("\tCHECK_PACKED_FIELD_OVERLAP(_f[%d], _f[%d]);%s\n",
+> > +				       k, j, final ? " })\n" : " \\");
+> > +			}
+> > +		}
+> > +	}
+> > +
+> > +	printf("#endif /* GENERATED_PACKING_CHECKS_H */\n");
+> > +}
 
