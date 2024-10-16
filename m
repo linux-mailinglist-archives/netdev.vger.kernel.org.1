@@ -1,101 +1,144 @@
-Return-Path: <netdev+bounces-136141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EFE39A0899
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 13:44:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC6879A08BE
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 13:52:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09B2E287BFF
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:44:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE1CD1C2448F
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B7F206E9C;
-	Wed, 16 Oct 2024 11:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B44E208D9D;
+	Wed, 16 Oct 2024 11:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VpOvVWWc"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B47206066;
-	Wed, 16 Oct 2024 11:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C94207A1A;
+	Wed, 16 Oct 2024 11:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729079054; cv=none; b=PDUU7mZ+Udsk+QvE/9FTQZG6Nk9F0xshwv5p2RdQ2zBeawRrqu0F+KK8D4NF66wFILV592omRzqRkpwOCk+8O9RsImcKyMb8iEeLevaI1TZKEGXZNQDiibbD+JMByVI3TMv0kgzazZPCeH1l6u2svV/gN54DSzqoWiP7TKZ/lhA=
+	t=1729079453; cv=none; b=jjw4G5/754yk1WWRXUk7hIxZLFEsRPTkig2vffWbkMlJFnnRJxscYrwQHwFRDhGCHhXys4YijwHxV7NAXIMosdlFZTbgzl8nRKzBmUF1bo9CRgjEkex0dHj+/ONdlXNpdEXIRVHmuqIE6y6pJgFNUOa6f/Azn9lGX1WNEhg9XCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729079054; c=relaxed/simple;
-	bh=lWu/eJGxWC/MEmN5hUSxpztsApgCY9co9LzEtyYVJ8M=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ps4H8BUhpy3JhqJduRO1NFn8BxxPTn7iOTuqQQGfhXDmUyFN9pULg7kAI3nA4NNLBkQjRkgMALPxPoBrjwQuEfGVymroBGvySHu6u+34OlTKYmQuxuTWVoMhpSqypE/H7xd6US5VDveLF15TuzMQcf4Nh+LaJD3jFQTbdPVSpFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XT8GY2qg1zyTCr;
-	Wed, 16 Oct 2024 19:42:45 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5620F140257;
-	Wed, 16 Oct 2024 19:44:09 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 16 Oct 2024 19:44:08 +0800
-Message-ID: <cf89bdd3-9c1a-4cc0-ba64-2b66e5ff2a4c@huawei.com>
-Date: Wed, 16 Oct 2024 19:44:07 +0800
+	s=arc-20240116; t=1729079453; c=relaxed/simple;
+	bh=AX30tUD6dKOkQQBmFEEpg1NhT/sQin54YAyP7K2bkRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jppENS1K8wwuK19ZkZ5zEb9nFOED/2WuTETn+wTfkkDsn9btfQYQXXd3eNu/dqnmK15xjSMLWcErfODgRg7FA7JD1ozlkhF4V3hLROeI5HRmRJI/PQBX6kbNC4/8eg1JO4VZoTncJNFR07Ppd4lMjGXVdT1n+NhIZWs3c2eISDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VpOvVWWc; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49G9P1tP023751;
+	Wed, 16 Oct 2024 11:50:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=2iEKv6VzLgvZF9EE2zsOh7qrMnIjPazyMscKpQ65L
+	5Y=; b=VpOvVWWcWiCUyrF8JH4Qe6/LgUbE2ffkQ3/wOW4mxL8EA/ZPtcaTLs4l0
+	djiUSNGZrW2kfOLcbYA06FlCF4mnk02RvJ95ZcoC9CgORPAjCvCwpweF2fqBjaaL
+	n5+/gkr9+a16OYoyidSJW3HQe8qPvcBsS0LSE0bW6XRq4Ugyt7cZOEPBvWsLHBDe
+	W1UAQK07e5xb/gmo6zLXCHB7FwZIImPNreAxAnPA0dIuIWEA3jD9K0hpthCtEXUF
+	UkzE/vYL5ked/U062pGSmrMNGFOyXB68aQ/NokU9xKFUU4Kq3eGArB2p2v0H2oMN
+	yCC9vi5+VmvtsK/Ou+YOWXhOLZ1lw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42aau5rrg7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 11:50:40 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49GBoe05026734;
+	Wed, 16 Oct 2024 11:50:40 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42aau5rrg0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 11:50:40 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49GATBRT002452;
+	Wed, 16 Oct 2024 11:50:38 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284ems70h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 11:50:38 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49GBoZO653608790
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Oct 2024 11:50:35 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3D122004E;
+	Wed, 16 Oct 2024 11:50:34 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D178C2004D;
+	Wed, 16 Oct 2024 11:50:34 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 16 Oct 2024 11:50:34 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55390)
+	id 8FB92E069D; Wed, 16 Oct 2024 13:50:34 +0200 (CEST)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        "Ricardo B. Marliere" <ricardo@marliere.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH 0/2] PtP driver for s390 clocks
+Date: Wed, 16 Oct 2024 13:50:28 +0200
+Message-ID: <20241016115030.2653675-1-svens@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <salil.mehta@huawei.com>,
-	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <lanhao@huawei.com>,
-	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 1/9] net: hns3: default enable tx bounce buffer when
- smmu enabled
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20241011094521.3008298-1-shaojijie@huawei.com>
- <20241011094521.3008298-2-shaojijie@huawei.com>
- <20241015181657.14fe9227@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20241015181657.14fe9227@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: y2DgTJzREa8t7SWzXBIzwFMUk93jmmA9
+X-Proofpoint-GUID: GbgkTQxseAY5nFGDhbu6YQncIuqXBD1x
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=864
+ priorityscore=1501 bulkscore=0 suspectscore=0 malwarescore=0 spamscore=0
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 phishscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410160073
 
+Hi,
 
-on 2024/10/16 9:16, Jakub Kicinski wrote:
-> On Fri, 11 Oct 2024 17:45:13 +0800 Jijie Shao wrote:
->> From: Peiyang Wang <wangpeiyang1@huawei.com>
->>
->> When TX bounce buffer is enabled, dma map is used only when the buffer
->> initialized. When spending packages, the driver only do dma sync. To
-> packages -> packets
->
->> avoid SMMU prefetch, default enable tx bounce buffer if smmu enabled.
-> you seem to force it to be enabled, rather than just changing
-> the default. That is strange. Why not let the user lower the value?
->
-> Also I don't see why this is a fix. Seems like a performance
-> improvement.
+these patches add support for using the s390 physical and TOD clock as ptp
+clock. To do so, the first patch adds a clock id to the s390 TOD clock,
+while the second patch adds the PtP driver itself.
 
-Sorry, there's a problem with the layout of the first reply.
+Changes in v2:
+- add missing MODULE_DESCRIPTION()
+- drop udev event patch
+- simplify eitod_to_ns()
+- use store_tod_clock_ext() instead of store_tod_clock_ext_cc()
+- move stp_enabled() declaration to stp.h
+- use s390 instead of 'Z' in clock names
+- defconfig symbol should be default-n
 
-The SMMU engine on HIP09 chip has a hardware issue.
-SMMU pagetable prefetch features may prefetch and use a invalid PTE
-even the PTE is valid at that time. This will cause the device trigger fake pagefaults.
-The solution is to avoid prefetching by adding a SYNC command when smmu mapping a iova.
-But the performance of nic has a sharp drop. Then we do this workaround, always enable tx bounce buffer,
-avoid mapping/unmapping on TX path.
+Sven Schnelle (2):
+  s390/time: Add clocksource id to TOD clock
+  s390/time: Add PtP driver
 
-This issue only affects HNS3, so we always enable tx bounce buffer to improve performance.
+ MAINTAINERS                     |   6 ++
+ arch/s390/include/asm/stp.h     |   1 +
+ arch/s390/include/asm/timex.h   |   6 ++
+ arch/s390/kernel/time.c         |   7 ++
+ drivers/ptp/Kconfig             |  11 +++
+ drivers/ptp/Makefile            |   1 +
+ drivers/ptp/ptp_s390.c          | 129 ++++++++++++++++++++++++++++++++
+ include/linux/clocksource_ids.h |   1 +
+ 8 files changed, 162 insertions(+)
+ create mode 100644 drivers/ptp/ptp_s390.c
 
-Thanks
-Jijie Shao
-
-
+-- 
+2.43.0
 
 
