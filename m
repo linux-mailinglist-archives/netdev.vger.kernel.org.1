@@ -1,119 +1,145 @@
-Return-Path: <netdev+bounces-136055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C729A028D
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:28:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9419A0292
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15E11F267FD
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:28:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0BDB1F2682F
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF8B1B652B;
-	Wed, 16 Oct 2024 07:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CFA1B78F3;
+	Wed, 16 Oct 2024 07:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jLSBKOJO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCajMOzJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934641B218C;
-	Wed, 16 Oct 2024 07:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8401F1B218C;
+	Wed, 16 Oct 2024 07:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729063703; cv=none; b=a/59Ua6I16w4yYabFSVFGNVAN2rSXJHAkbgvGKAz64lwRaGoiEHY4Q5UXdd7v6rVuB5ZG/QiQPEDTjW1KX5W37lVqFXvJ/r+R2GJE8cfhSLFrBYxUdRLhNk3diCA5wmGrvLgT76rFMbRmYzKeA24Y3+sM0R9Hw3+mqtR2Rnulb8=
+	t=1729063775; cv=none; b=aEmwfO/2xD7QeA9jX/O3Ff7z+KNbwpXPhkWpO3k2SaXQDowdciQ+c4iSN1V1OdwZ9c1cSmpt77vSy298Nq6NKgbsX+ciGA2VOGgqT+UGVP0bMOn+1orjPF5SOMiNqsTpxsjzoLDiBITRQLJYFUs8kRkFtGel13JiDTZyIeNws6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729063703; c=relaxed/simple;
-	bh=JcM+9pWXeAegDo4OG0mB7GirtHWlPzLRq2vIje6fn6g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kMlgx0Yb9jb2L4uJMgmuxSpVu2nHysJgMzTlnSUhDbNwRxYAgzLipo49kiS7xQJH2HJk6lvEvWcVsItcYi6ZXv8g5DPFPwwxarv8zk56T28YPvQFTQ1kXbJkZYoTkWY1/1LUkG61yMUbBvWPuOwXGrOxdIBbqzdCpx8tc67ciWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jLSBKOJO; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729063696; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=lp6IQeJ5GDXVaA1KkIbKbWF4AL7Kg5dWxIeMCGlMYYY=;
-	b=jLSBKOJOLk4cDpiZ37YbIMNtXd2O58Y4J/ynXEkiZcn/++FeTzQFWh3VsFimvzbWVkMY2tkstBtdmOVsx+NpL3ZKweed2tC2lpYyvByXpEusjWun45rJ5zZ9gf9x1fWCEDThS+TcmhdDRevWBVXbjHYFDAf2vWD4K61J6XQ7aNw=
-Received: from 30.221.128.116(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WHGWwEo_1729063695 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 16 Oct 2024 15:28:15 +0800
-Message-ID: <bf6e0548-7cb3-41b4-b90e-57538e8303ff@linux.alibaba.com>
-Date: Wed, 16 Oct 2024 15:28:15 +0800
+	s=arc-20240116; t=1729063775; c=relaxed/simple;
+	bh=oyVzPIXWh8SgdGYhhreMtS6eYl9vpvKp3W4abajSFNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZluyWsNofpRHuDMcjBE9cs/8Xhme6SfsLvV+w+MARSejgDTHC6m889HwTN3hKOjb/5+nbZSmQ8LRa71ECSNZJ0GTF/n4JmrHbDJ1sAXSF2TQadqxOfMD5OTknh/3CvfrYHwPPTJwWRUfQJSlkt1grEel3VYCfqHrKmdtA2gxHM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCajMOzJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 786DDC4CEC5;
+	Wed, 16 Oct 2024 07:29:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729063775;
+	bh=oyVzPIXWh8SgdGYhhreMtS6eYl9vpvKp3W4abajSFNM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WCajMOzJ5QkaGdE00N+57EHtenrZH62UzIrz+faKKQeXbgc+P3/jr+O8TSYkNMJT2
+	 R1uQa+XGPMhByFtVyS93U6NHUqHPWdwn9H+/XA2OGXcmT0ApWvTAftOknkvBhjfQne
+	 C8UGvVlEf0COyvCcC0MvxVVPRv6S3m8Ydw8k2OPkohVJuD4lw7MeCqcbT3DIfKWA4e
+	 C7avxFd1Q+hIYO5M/GX7iKtkZVWEVYboWtOEnb/YmWxVeItdldNhi/UvbtibzJiIiX
+	 osiiCFubzdWIv7RAbY86oxffRW3ir9zX5rEefcsHixkDcWzuQ/wMwksbB9Zb0ZjFRu
+	 DNTBbn0Vg6f9w==
+Date: Wed, 16 Oct 2024 08:29:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 10/13] net: enetc: extract
+ enetc_int_vector_init/destroy() from enetc_alloc_msix()
+Message-ID: <20241016072929.GD2162@kernel.org>
+References: <20241015125841.1075560-1-wei.fang@nxp.com>
+ <20241015125841.1075560-11-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 3/3] ipv4/udp: Add 4-tuple hash for connected
- socket
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
- antony.antony@secunet.com, steffen.klassert@secunet.com,
- linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
- jakub@cloudflare.com, fred.cc@alibaba-inc.com,
- yubing.qiuyubing@alibaba-inc.com
-References: <20241012012918.70888-1-lulie@linux.alibaba.com>
- <20241012012918.70888-4-lulie@linux.alibaba.com>
- <9c636d54-4276-4e28-abd3-0860bc738640@redhat.com>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <9c636d54-4276-4e28-abd3-0860bc738640@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015125841.1075560-11-wei.fang@nxp.com>
 
-
-
-On 2024/10/14 18:19, Paolo Abeni wrote:
-> On 10/12/24 03:29, Philo Lu wrote:
->> Currently, the udp_table has two hash table, the port hash and portaddr
->> hash. Usually for UDP servers, all sockets have the same local port and
->> addr, so they are all on the same hash slot within a reuseport group.
->>
->> In some applications, UDP servers use connect() to manage clients. In
->> particular, when firstly receiving from an unseen 4 tuple, a new socket
->> is created and connect()ed to the remote addr:port, and then the fd is
->> used exclusively by the client.
+On Tue, Oct 15, 2024 at 08:58:38PM +0800, Wei Fang wrote:
+> From: Clark Wang <xiaoning.wang@nxp.com>
 > 
-> How do you handle the following somewhat racing scenario? a 2nd packet 
-> beloning to the same 4-tulpe lands into the unconnected socket receive 
-> queue just after the 1st one, before the connected socket is created. 
-> The server process such packet after the connected socket creation.
+> Extract enetc_int_vector_init() and enetc_int_vector_destroy() from
+> enetc_alloc_msix() so that the code is more concise and readable.
 > 
-
-One method is to address it in application. Application maintains the 
-information of connections, and it knows which connection to deliver 
-incoming packets.
-
-If the 2nd packet comes from the "listen" socket (i.e., the initial 
-unconnected socket), app can search for the connection of it. Note that 
-upon the 1st packet receiving, the connection is already created though 
-the socket is not ready, so it can be found for the 2nd packet.
-
-In this case, maybe several packets are processed with this method until 
-the new connected socket created. Then it runs as we expect.
-
-So I think it cannot be prevented but can be handled, depending on how 
-applications use it.
-
-> How many connected sockets is your system serving concurrently? Possibly 
-
-About 10000 conns in general. So current same-sized hash4 table is 
-enough for us now.
-
-> it would make sense to allocate a larger hash table for the connected 
-> UDP sockets, using separate/different min/max/scale values WRT to the 
-> unconnected tables.
+> Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> v2 changes:
+> This patch is separated from v1 patch 9 ("net: enetc: optimize the
+> allocation of tx_bdr"). Separate enetc_int_vector_init() from the
+> original patch. In addition, add new help function
+> enetc_int_vector_destroy().
+> ---
+>  drivers/net/ethernet/freescale/enetc/enetc.c | 174 +++++++++----------
+>  1 file changed, 87 insertions(+), 87 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index 032d8eadd003..d36af3f8ba31 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -2965,6 +2965,87 @@ int enetc_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
+>  }
+>  EXPORT_SYMBOL_GPL(enetc_ioctl);
+>  
+> +static int enetc_int_vector_init(struct enetc_ndev_priv *priv, int i,
+> +				 int v_tx_rings)
+> +{
+> +	struct enetc_int_vector *v __free(kfree);
+> +	struct enetc_bdr *bdr;
+> +	int j, err;
+> +
+> +	v = kzalloc(struct_size(v, tx_ring, v_tx_rings), GFP_KERNEL);
+> +	if (!v)
+> +		return -ENOMEM;
 
-Agreed that it's a good idea. But imo it could be left as future work 
-when we definitely need it.
+...
 
-Thanks.
--- 
-Philo
+>  int enetc_alloc_msix(struct enetc_ndev_priv *priv)
+>  {
+>  	struct pci_dev *pdev = priv->si->pdev;
 
+...
+
+> @@ -2986,64 +3067,9 @@ int enetc_alloc_msix(struct enetc_ndev_priv *priv)
+>  	/* # of tx rings per int vector */
+>  	v_tx_rings = priv->num_tx_rings / priv->bdr_int_num;
+>  
+> -	for (i = 0; i < priv->bdr_int_num; i++) {
+> -		struct enetc_int_vector *v;
+> -		struct enetc_bdr *bdr;
+> -		int j;
+> -
+> -		v = kzalloc(struct_size(v, tx_ring, v_tx_rings), GFP_KERNEL);
+> -		if (!v) {
+> -			err = -ENOMEM;
+> +	for (i = 0; i < priv->bdr_int_num; i++)
+> +		if (enetc_int_vector_init(priv, i, v_tx_rings))
+>  			goto fail;
+
+Hi Wei Fang,
+
+It looks like, if we reach this error handling during the first iteration
+of the for loop then err, which will be return value returned by the function,
+is ininitialised. Perhaps this would be better expressed as follows?
+(Completely untested!)
+
+		err = enetc_int_vector_init(priv, i, v_tx_rings);
+		if (err)
+			goto fail;
+
+Flagged by Smatch.
+
+...
 
