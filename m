@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-136180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1E789A0D0F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:43:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8551A9A0D11
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33819B22EAD
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:43:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6ED11C2417D
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7B620C02B;
-	Wed, 16 Oct 2024 14:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F5520C017;
+	Wed, 16 Oct 2024 14:43:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A710187555;
-	Wed, 16 Oct 2024 14:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D26D208D63;
+	Wed, 16 Oct 2024 14:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729089801; cv=none; b=M8Sa+H4NH3TQfc/k8omK93zd6SlknIjWXeMJQv19KsAAnVNrDQSqQZcDCLICYbese0qMCTsi0Oe047bm54pKK9vjzcs62oJIx1/aLDRUlQSUGhOToDqbXUVITcijvoAJgd/v5ADXLXnqv+KkofmgP4xgrH4Wv30XfrjCzOOlNuY=
+	t=1729089837; cv=none; b=JsPigZoGeVRHO0t9gXkGIBtASJ7eYVxlAdc7KyDbbyf2njnSjNqKj2iZ2shppJgkUbpCBt2Ew6H1nXX3jeNI1G7FZkO2+Ck3W53y7T0jF+SziSMRgDMOrBbKjBOEffTc5lasOZJ597T9qezCyhXE9BTNOnxqaDhTBOOpCtHFx9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729089801; c=relaxed/simple;
-	bh=uHu2wnCxq7+KdVcby4uiVib+3jF6AfIrBZZsSVLrzlE=;
+	s=arc-20240116; t=1729089837; c=relaxed/simple;
+	bh=JiVa5/90/cZvb2+61ERpg3MxggQZczhhtMnM0mhJmMw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WevecUkHeR9jwwsNi7x2raX74ijpuC2xsQ2WQdH54ufDlZy+6J62/ivv3F4D23gtF3Q7G+1zXF6pyKGOrPpCtjL2RtvUvh+0OYLcL25rCLFqkkvJRMYzpxcSqj5dTPeZSVH7eMy0MJGkuuYxZGi8Bco4u9y0uiCkwlw6n4rihOk=
+	 In-Reply-To:Content-Type; b=jTi/PW1VzuGjkipxF/Jo5uGVhh+qSoHAqa3XwQ3H3Ghx8CNhU/1/UP9a3h4XycmCTRVhL3JmtJp24E0hvH0zve1pxEx0Ty491lRRgAoqst9NI2/pS90IWRdLj1T9NoHqICrMEm03t4pwJPL+nGPz0ssY3FTpwJSoBusXQhIXJNI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41A961007;
-	Wed, 16 Oct 2024 07:43:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FD381007;
+	Wed, 16 Oct 2024 07:44:25 -0700 (PDT)
 Received: from [10.1.28.177] (XHFQ2J9959.cambridge.arm.com [10.1.28.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 13D063F71E;
-	Wed, 16 Oct 2024 07:43:13 -0700 (PDT)
-Message-ID: <ed44eb37-b901-4a01-87a3-3670f8f57338@arm.com>
-Date: Wed, 16 Oct 2024 15:43:11 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D5FBD3F71E;
+	Wed, 16 Oct 2024 07:43:51 -0700 (PDT)
+Message-ID: <456ea437-fe6c-474f-bd9f-583c6fce9151@arm.com>
+Date: Wed, 16 Oct 2024 15:43:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,11 +42,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 23/57] net: Remove PAGE_SIZE compile-time constant
- assumption
+Subject: Re: [RFC PATCH v1 27/57] net: e1000: Remove PAGE_SIZE compile-time
+ constant assumption
 Content-Language: en-GB
 To: "David S. Miller" <davem@davemloft.net>,
- Andrew Morton <akpm@linux-foundation.org>, Anna Schumaker <anna@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
  Anshuman Khandual <anshuman.khandual@arm.com>,
  Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  David Hildenbrand <david@redhat.com>, Eric Dumazet <edumazet@google.com>,
@@ -54,20 +54,20 @@ To: "David S. Miller" <davem@davemloft.net>,
  Jakub Kicinski <kuba@kernel.org>, Kalesh Singh <kaleshsingh@google.com>,
  Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
  Matthias Brugger <mbrugger@suse.com>, Miroslav Benes <mbenes@suse.cz>,
- Paolo Abeni <pabeni@redhat.com>, Trond Myklebust <trondmy@kernel.org>,
- Will Deacon <will@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-nfs@vger.kernel.org, netdev@vger.kernel.org
+ Paolo Abeni <pabeni@redhat.com>, Will Deacon <will@kernel.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org
 References: <20241014105514.3206191-1-ryan.roberts@arm.com>
  <20241014105912.3207374-1-ryan.roberts@arm.com>
- <20241014105912.3207374-23-ryan.roberts@arm.com>
+ <20241014105912.3207374-27-ryan.roberts@arm.com>
 From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <20241014105912.3207374-23-ryan.roberts@arm.com>
+In-Reply-To: <20241014105912.3207374-27-ryan.roberts@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-+ Chuck Lever, Jeff Layton
++ Przemek Kitszel, Tony Nguyen
 
 This was a rather tricky series to get the recipients correct for and my script
 did not realize that "supporter" was a pseudonym for "maintainer" so you were
@@ -82,22 +82,9 @@ On 14/10/2024 11:58, Ryan Roberts wrote:
 > to remove assumptions about PAGE_SIZE being compile-time constant. Code
 > intended to be equivalent when compile-time page size is active.
 > 
-> Define NLMSG_GOODSIZE using min() instead of ifdeffery. This will now
-> evaluate to a compile-time constant for compile-time page size, but
-> evaluate at run-time when using boot-time page size.
-> 
-> Rework NAPI small page frag infrastructure so that for boot-time page
-> size it is compiled in if 4K page size is in the possible range, but
-> defer deciding to use it to run time when the page size is known. No
-> change for compile-time page size case.
-> 
-> Resize cache_defer_hash[] array for PAGE_SIZE_MAX.
-> 
-> Convert a complex BUILD_BUG_ON() to runtime BUG_ON().
-> 
-> Wrap global variables that are initialized with PAGE_SIZE derived values
-> using DEFINE_GLOBAL_PAGE_SIZE_VAR() so their initialization can be
-> deferred for boot-time page size builds.
+> Convert CPP conditionals to C conditionals. The compiler will dead code
+> strip when doing a compile-time page size build, for the same end
+> effect. But this will also work with boot-time page size builds.
 > 
 > Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 > ---
@@ -106,112 +93,27 @@ On 14/10/2024 11:58, Ryan Roberts wrote:
 > Any confused maintainers may want to read the cover note here for context:
 > https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
 > 
->  include/linux/netlink.h    | 6 +-----
->  net/core/hotdata.c         | 4 ++--
->  net/core/skbuff.c          | 4 ++--
->  net/core/sysctl_net_core.c | 2 +-
->  net/sunrpc/cache.c         | 3 ++-
->  net/unix/af_unix.c         | 2 +-
->  6 files changed, 9 insertions(+), 12 deletions(-)
+>  drivers/net/ethernet/intel/e1000/e1000_main.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/linux/netlink.h b/include/linux/netlink.h
-> index b332c2048c755..ffa1e94111f89 100644
-> --- a/include/linux/netlink.h
-> +++ b/include/linux/netlink.h
-> @@ -267,11 +267,7 @@ netlink_skb_clone(struct sk_buff *skb, gfp_t gfp_mask)
->   *	use enormous buffer sizes on recvmsg() calls just to avoid
->   *	MSG_TRUNC when PAGE_SIZE is very large.
->   */
-> -#if PAGE_SIZE < 8192UL
-> -#define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(PAGE_SIZE)
-> -#else
-> -#define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(8192UL)
+> diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+> index ab7ae418d2948..cc14788f5bb04 100644
+> --- a/drivers/net/ethernet/intel/e1000/e1000_main.c
+> +++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+> @@ -3553,12 +3553,10 @@ static int e1000_change_mtu(struct net_device *netdev, int new_mtu)
+>  
+>  	if (max_frame <= E1000_RXBUFFER_2048)
+>  		adapter->rx_buffer_len = E1000_RXBUFFER_2048;
+> -	else
+> -#if (PAGE_SIZE >= E1000_RXBUFFER_16384)
+> +	else if (PAGE_SIZE >= E1000_RXBUFFER_16384)
+>  		adapter->rx_buffer_len = E1000_RXBUFFER_16384;
+> -#elif (PAGE_SIZE >= E1000_RXBUFFER_4096)
+> +	else if (PAGE_SIZE >= E1000_RXBUFFER_4096)
+>  		adapter->rx_buffer_len = PAGE_SIZE;
 > -#endif
-> +#define NLMSG_GOODSIZE	SKB_WITH_OVERHEAD(min(PAGE_SIZE, 8192UL))
 >  
->  #define NLMSG_DEFAULT_SIZE (NLMSG_GOODSIZE - NLMSG_HDRLEN)
->  
-> diff --git a/net/core/hotdata.c b/net/core/hotdata.c
-> index d0aaaaa556f22..e1f30e87ba6e9 100644
-> --- a/net/core/hotdata.c
-> +++ b/net/core/hotdata.c
-> @@ -5,7 +5,7 @@
->  #include <net/hotdata.h>
->  #include <net/proto_memory.h>
->  
-> -struct net_hotdata net_hotdata __cacheline_aligned = {
-> +__DEFINE_GLOBAL_PAGE_SIZE_VAR(struct net_hotdata, net_hotdata, __cacheline_aligned, {
->  	.offload_base = LIST_HEAD_INIT(net_hotdata.offload_base),
->  	.ptype_all = LIST_HEAD_INIT(net_hotdata.ptype_all),
->  	.gro_normal_batch = 8,
-> @@ -21,5 +21,5 @@ struct net_hotdata net_hotdata __cacheline_aligned = {
->  	.sysctl_max_skb_frags = MAX_SKB_FRAGS,
->  	.sysctl_skb_defer_max = 64,
->  	.sysctl_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE
-> -};
-> +});
->  EXPORT_SYMBOL(net_hotdata);
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 83f8cd8aa2d16..b6c8eee0cc74b 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -219,9 +219,9 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
->  #define NAPI_SKB_CACHE_BULK	16
->  #define NAPI_SKB_CACHE_HALF	(NAPI_SKB_CACHE_SIZE / 2)
->  
-> -#if PAGE_SIZE == SZ_4K
-> +#if PAGE_SIZE_MIN <= SZ_4K && SZ_4K <= PAGE_SIZE_MAX
->  
-> -#define NAPI_HAS_SMALL_PAGE_FRAG	1
-> +#define NAPI_HAS_SMALL_PAGE_FRAG	(PAGE_SIZE == SZ_4K)
->  #define NAPI_SMALL_PAGE_PFMEMALLOC(nc)	((nc).pfmemalloc)
->  
->  /* specialized page frag allocator using a single order 0 page
-> diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-> index 86a2476678c48..a7a2eb7581bd1 100644
-> --- a/net/core/sysctl_net_core.c
-> +++ b/net/core/sysctl_net_core.c
-> @@ -33,7 +33,7 @@ static int int_3600 = 3600;
->  static int min_sndbuf = SOCK_MIN_SNDBUF;
->  static int min_rcvbuf = SOCK_MIN_RCVBUF;
->  static int max_skb_frags = MAX_SKB_FRAGS;
-> -static int min_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE;
-> +static DEFINE_GLOBAL_PAGE_SIZE_VAR(int, min_mem_pcpu_rsv, SK_MEMORY_PCPU_RESERVE);
->  
->  static int net_msg_warn;	/* Unused, but still a sysctl */
->  
-> diff --git a/net/sunrpc/cache.c b/net/sunrpc/cache.c
-> index 95ff747061046..4e682c0cd7586 100644
-> --- a/net/sunrpc/cache.c
-> +++ b/net/sunrpc/cache.c
-> @@ -573,13 +573,14 @@ EXPORT_SYMBOL_GPL(cache_purge);
->   */
->  
->  #define	DFR_HASHSIZE	(PAGE_SIZE/sizeof(struct list_head))
-> +#define	DFR_HASHSIZE_MAX (PAGE_SIZE_MAX/sizeof(struct list_head))
->  #define	DFR_HASH(item)	((((long)item)>>4 ^ (((long)item)>>13)) % DFR_HASHSIZE)
->  
->  #define	DFR_MAX	300	/* ??? */
->  
->  static DEFINE_SPINLOCK(cache_defer_lock);
->  static LIST_HEAD(cache_defer_list);
-> -static struct hlist_head cache_defer_hash[DFR_HASHSIZE];
-> +static struct hlist_head cache_defer_hash[DFR_HASHSIZE_MAX];
->  static int cache_defer_cnt;
->  
->  static void __unhash_deferred_req(struct cache_deferred_req *dreq)
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 0be0dcb07f7b6..1cf9f583358af 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -2024,7 +2024,7 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
->  				 MAX_SKB_FRAGS * PAGE_SIZE);
->  		data_len = PAGE_ALIGN(data_len);
->  
-> -		BUILD_BUG_ON(SKB_MAX_ALLOC < PAGE_SIZE);
-> +		BUG_ON(SKB_MAX_ALLOC < PAGE_SIZE);
->  	}
->  
->  	skb = sock_alloc_send_pskb(sk, len - data_len, data_len,
+>  	/* adjust allocation if LPE protects us, and we aren't using SBP */
+>  	if (!hw->tbi_compatibility_on &&
 
 
