@@ -1,229 +1,92 @@
-Return-Path: <netdev+bounces-136253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0813D9A1203
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:54:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 578099A1205
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EAB01F23AC9
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:54:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88D6A1C22AEF
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A084217300;
-	Wed, 16 Oct 2024 18:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25B72141CC;
+	Wed, 16 Oct 2024 18:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="RiAPnvgK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWmGtJLB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC102170CC
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 18:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75B618DF97;
+	Wed, 16 Oct 2024 18:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729104803; cv=none; b=WsX7tml/v4cOI2bBuRGDbvANCArWhJOP5MXTQYYnNUMewIYUm5i98pj8k9JJQarj7bEjoDFqq6HjgmwZIMjhnJcF47/7AsSIdNZ+QmgNy+1nJ462qawr3P7yRfA99jLcatLQ1p7nugENTtVNRGRWgmHd4Q2LcIGK5WUlIkzbQ+k=
+	t=1729104819; cv=none; b=TMR4FgjM45W1NXkf8qf2Bp8kIBKz5ER8MoKFLNmXe7pDu9PwTzK0szyd8uBGTaGEnJvWxNQXm66XJ5WtymecJQ3l2Vi4jzsFhSM9fWksGAeKXCCqRfS50VEkI4/VNjOEU5e578EMtg3t0FM9+rfSaix8dwBgFJ+qqZvlpC56K3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729104803; c=relaxed/simple;
-	bh=R2xg4awbMnuxmxxdZQvawbB6Glg1Q6V2IXHJy+GrJgk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aoG9Y5Cc/tDQUyx5vnIuU05SPX5v8BDPSMbnz2iwVtnKakRy03zjy5TUW992+LVieZ8BczXfzoZ4365sfiPzayoijjd86rHOwnHDZJVa4F9g9anlF7kVjRQnqIOsDJFNe/jQvlcMQ6TG6ZSfWc6mYQT1mOV4ZyUUXbj5r4P8g+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=RiAPnvgK; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71e49ef3bb9so95267b3a.1
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 11:53:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1729104801; x=1729709601; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pcqR/6GFofymoBmw+CHLZpbByxhu6rkcZaJ0jMgsDWE=;
-        b=RiAPnvgK6zExA7UeqFGRhk0KxDZ67zFyBESZ92aSVDF8p96tdCFvoKZb5hQZx39bpI
-         bngA4PQSPYmTINJBR6vxPTQ2Am9NwbQWNv7927Px1II6wjbspaw37DTfyIgtZM57VKrZ
-         uCVhobruDG38tI+vMOsW4iEDX4eMqeJaSyM4AFDaaD89NLy39uxK9gGWxZqbfBAF7l6Q
-         UTN2Uxs/B7qktCptjxFppUnWmWfReGxz4GmCuG3Wo2YAo/huazZM9S8Ev/MBhFP+ecEb
-         X7gcunIdvJ11eLVeh5OkACqPRYUgVJ+rf1UOAEtjixwTSnObc8mOAt+/osZ8t1LI9MvW
-         OI0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729104801; x=1729709601;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pcqR/6GFofymoBmw+CHLZpbByxhu6rkcZaJ0jMgsDWE=;
-        b=WwuyWNBsXJQ8s4tyY76iXgi6n60LzzxdKYglOSdM/Icc9ij4UAscXKpUuPgs/8jQie
-         qKxjjcrxgrxL7Ix/tgmi+PI1auIGyhqevrCN7QadzmYy/rnFA5z9bbEAr68n74uwugw1
-         IUmNMcuFGV3Sa09Rdel40Q2I2ScO73wM4V4RhClCNEG/mStYPZKT53uuR6nJKLvfVj6u
-         rnG/o75GMjKyxi5+FMo7jHBp73Po59qHmT/qqxV6V79Xk4RtpibL2pUfLyn2gLYdXAbC
-         RtkqVlLdug8ssUNzrASfSvIVRXkoCUT+Nkgn21+EnX+/pjPf6apIXzF8jcssiQeT1SNW
-         cjBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnVKNKDbF/Afh5skl1tQj4m0QcAvDUBEIYfGIxk3vZD6Dygs92FzUXEQTLNOorYXmBKbuhnYw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ6allp7KwO70sftxvZTDPWoLBRos3XeDtsQcY0inNkDXVUV+Q
-	1QVZbJ9CtpUg0oKrvTpTjds7+ZakMVsBdknvChvtKMxz4RQoyeVNMvIjqpTRPnc=
-X-Google-Smtp-Source: AGHT+IFq74+NXxlV/h/CvdQlFy6zQsMt566N2UrAfZP9nAHBsh0K1U4WjJq/895gJxJA1ElmiuflXg==
-X-Received: by 2002:a05:6a00:3cd1:b0:71e:44f6:690f with SMTP id d2e1a72fcca58-71e8fd8d44dmr813114b3a.8.1729104801317;
-        Wed, 16 Oct 2024 11:53:21 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-023.fbsv.net. [2a03:2880:ff:17::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e77518a5fsm3382791b3a.214.2024.10.16.11.53.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 11:53:20 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: David Wei <dw@davidwei.uk>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH v6 15/15] io_uring/zcrx: throttle receive requests
-Date: Wed, 16 Oct 2024 11:52:52 -0700
-Message-ID: <20241016185252.3746190-16-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241016185252.3746190-1-dw@davidwei.uk>
-References: <20241016185252.3746190-1-dw@davidwei.uk>
+	s=arc-20240116; t=1729104819; c=relaxed/simple;
+	bh=Y/Vqjn7AS4QmH95MO8AvZCxoQ6XG93780zk6JPh7v0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sjo6SV5QwZXd0OmOwH8AK68Uf/0PsZm8nVJr2kWPNCYREGP6hOkJFNWlQiBarr4tVI+mzzogyv2GTsB5Cn+8olXgsICyDnHNAhmS0s6p0EaD3QlcpxLm4+k7+p+0DT6kMV3cC7gA+ISVEuPgHGqLPh7qt5UwTuzcmpd0Bi8kpDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWmGtJLB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97651C4CEC5;
+	Wed, 16 Oct 2024 18:53:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729104819;
+	bh=Y/Vqjn7AS4QmH95MO8AvZCxoQ6XG93780zk6JPh7v0o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aWmGtJLBhHBuC2eGL/nM5trZ/bmISrffOYX6BavdrXMmlINXDYuD7mD1Tc6pesfvQ
+	 dsATNy1gjXju1TWzmTfXDRxjUHZCBmo2c8I2CrNi1KwaA6Awlzvbdl8MXH1iHoPPEX
+	 BBaZOkz0l6JoFNo24aP9x5NjSLK8NirkDhEboWCIMzDgam8Hby11CTM4OYB/00+bp3
+	 L4K4o6ibNgOA8v40bJYnnZJi5mJoZ6hjL20Uv6vboGNcBA+J1CNiU/E12sVnejkNKC
+	 1mox9Ytacs1U8LlFVAcPtAF1qEfUReXUV42WYuqkRIxugf0FoC1nScQToQ2jrZT48i
+	 aHEuW0W9yHvFQ==
+Date: Wed, 16 Oct 2024 19:53:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, vedang.patel@intel.com,
+	andre.guedes@intel.com, maciej.fijalkowski@intel.com,
+	jithu.joseph@intel.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH net] igc: Fix passing 0 to ERR_PTR in igc_xdp_run_prog()
+Message-ID: <20241016185333.GL2162@kernel.org>
+References: <20241016105310.3500279-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241016105310.3500279-1-yuehaibing@huawei.com>
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+On Wed, Oct 16, 2024 at 06:53:10PM +0800, Yue Haibing wrote:
+> Return NULL instead of passing to ERR_PTR while res is IGC_XDP_PASS,
+> which is zero, this fix smatch warnings:
+> drivers/net/ethernet/intel/igc/igc_main.c:2533
+>  igc_xdp_run_prog() warn: passing zero to 'ERR_PTR'
+> 
+> Fixes: 26575105d6ed ("igc: Add initial XDP support")
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 6e70bca15db1..c3d6e20c0be0 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -2530,7 +2530,7 @@ static struct sk_buff *igc_xdp_run_prog(struct igc_adapter *adapter,
+>  	res = __igc_xdp_run_prog(adapter, prog, xdp);
+>  
+>  out:
+> -	return ERR_PTR(-res);
+> +	return res ? ERR_PTR(-res) : NULL;
 
-io_zc_rx_tcp_recvmsg() continues until it fails or there is nothing to
-receive. If the other side sends fast enough, we might get stuck in
-io_zc_rx_tcp_recvmsg() producing more and more CQEs but not letting the
-user to handle them leading to unbound latencies.
-
-Break out of it based on an arbitrarily chosen limit, the upper layer
-will either return to userspace or requeue the request.
-
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- io_uring/net.c  |  5 ++++-
- io_uring/zcrx.c | 17 ++++++++++++++---
- io_uring/zcrx.h |  6 ++++--
- 3 files changed, 22 insertions(+), 6 deletions(-)
-
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 9716ecdcb570..27966dfa2938 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -1255,10 +1255,13 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
- 	if (unlikely(!sock))
- 		return -ENOTSOCK;
- 
--	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT);
-+	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT,
-+			   issue_flags);
- 	if (unlikely(ret <= 0) && ret != -EAGAIN) {
- 		if (ret == -ERESTARTSYS)
- 			ret = -EINTR;
-+		if (ret == IOU_REQUEUE)
-+			return IOU_REQUEUE;
- 
- 		req_set_fail(req);
- 		io_req_set_res(req, ret, 0);
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 1f4db70e3370..a2c753e8e46e 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -24,10 +24,13 @@
- 
- #define IO_RQ_MAX_ENTRIES		32768
- 
-+#define IO_SKBS_PER_CALL_LIMIT	20
-+
- struct io_zcrx_args {
- 	struct io_kiocb		*req;
- 	struct io_zcrx_ifq	*ifq;
- 	struct socket		*sock;
-+	unsigned		nr_skbs;
- };
- 
- struct io_zc_refill_data {
-@@ -701,6 +704,9 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- 	int i, copy, end, off;
- 	int ret = 0;
- 
-+	if (unlikely(args->nr_skbs++ > IO_SKBS_PER_CALL_LIMIT))
-+		return -EAGAIN;
-+
- 	if (unlikely(offset < skb_headlen(skb))) {
- 		ssize_t copied;
- 		size_t to_copy;
-@@ -778,7 +784,8 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- }
- 
- static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--				struct sock *sk, int flags)
-+				struct sock *sk, int flags,
-+				unsigned int issue_flags)
- {
- 	struct io_zcrx_args args = {
- 		.req = req,
-@@ -804,6 +811,9 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 			ret = -ENOTCONN;
- 		else
- 			ret = -EAGAIN;
-+	} else if (unlikely(args.nr_skbs > IO_SKBS_PER_CALL_LIMIT) &&
-+		   (issue_flags & IO_URING_F_MULTISHOT)) {
-+		ret = IOU_REQUEUE;
- 	} else if (sock_flag(sk, SOCK_DONE)) {
- 		/* Make it to retry until it finally gets 0. */
- 		ret = -EAGAIN;
-@@ -814,7 +824,8 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- }
- 
- int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--		 struct socket *sock, unsigned int flags)
-+		 struct socket *sock, unsigned int flags,
-+		 unsigned int issue_flags)
- {
- 	struct sock *sk = sock->sk;
- 	const struct proto *prot = READ_ONCE(sk->sk_prot);
-@@ -823,5 +834,5 @@ int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 		return -EPROTONOSUPPORT;
- 
- 	sock_rps_record_flow(sk);
--	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags);
-+	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags, issue_flags);
- }
-diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-index 5d7920972e95..45485bdce61a 100644
---- a/io_uring/zcrx.h
-+++ b/io_uring/zcrx.h
-@@ -48,7 +48,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx);
- void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx);
- int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--		 struct socket *sock, unsigned int flags);
-+		 struct socket *sock, unsigned int flags,
-+		 unsigned int issue_flags);
- #else
- static inline int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 					struct io_uring_zcrx_ifq_reg __user *arg)
-@@ -62,7 +63,8 @@ static inline void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
- {
- }
- static inline int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--			       struct socket *sock, unsigned int flags)
-+				struct socket *sock, unsigned int flags,
-+				unsigned int issue_flags)
- {
- 	return -EOPNOTSUPP;
- }
--- 
-2.43.5
-
+I think this is what PTR_ERR_OR_ZERO() is for.
 
