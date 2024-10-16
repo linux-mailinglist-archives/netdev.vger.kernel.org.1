@@ -1,231 +1,304 @@
-Return-Path: <netdev+bounces-136049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B5F9A01EB
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:58:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D696B9A0206
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:01:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBB4B1F260F1
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:58:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E169AB24F06
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F691AAE17;
-	Wed, 16 Oct 2024 06:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F7D18C331;
+	Wed, 16 Oct 2024 07:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faAgi0n+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RqLqulpW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E5919340B
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 06:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C4013212A
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 07:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729061892; cv=none; b=ogdzzkbRUiWOl4m44sZQNwkqkU7eZaCzt8v1Vj1mCRCgtO8v2dTCkfCQ5qwjj4jaq+iiekjsb36mFpZhpIEK1v2ZR9rKvrwfVdambNZ+wGE0o6ByI0b6zVQNuGh9+Zj8ncM4+PBakJvI8KE3RI+D4/KNCR8O13KBx+uuZthhUXo=
+	t=1729062083; cv=none; b=c4W9WhDpMRgzltlMqAw1pHVQcsqbCGl85sVfyZV+vRDHM6YNAN6ROlIB/WEr3ADRpsswh3FhrXT60ZinH0MROC6X6e0j1/L4YjIdyFvPJIG9E8F1IuQ/SBgXBoHJ9ydvNeIz97YA86REmMRdZxK9/OTzanjW3s7KxfsKwYPSXUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729061892; c=relaxed/simple;
-	bh=nKJfP3LmeT/Qx7oKj5HM871IgPtYRSHVMsPL1c0DDh4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kmn44vtBHcJXgd5BAUXT84fXU18X3uG9jm7o/jBkbSh3BaJ4vPwk1vANxtSyvhZhIcrcY489gaS0vaMa83cbBhVTCCQHBMLkwsSGzAPqmKJ3KKTMZGG0PIk5L1Hx0YNENo8ZdEXTjyaJmS5r7YEun7dU42gbyg/H5oDHl6YA9h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=faAgi0n+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729061889;
+	s=arc-20240116; t=1729062083; c=relaxed/simple;
+	bh=WpMEz2+CAg7eyCt8osSSHYXl9oy7NCeTMcWuXCmr6QY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=euhtepATANhlcuEN7x1lmBKoHZ1/o0xwjSx9A0LJGq5nCgfY6pLhaBShPRsBYg35x2XRBCRT6VLWGwOQ3fnGhGci8fS97aS9vyUo66EmoliX9saM2uSJn0YJ1one1XRiIeP7dCABpLwrikX1BEkiwnX3XxG9nyq2dYRRDu/oXzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RqLqulpW; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5398c020-e9b4-49d2-a5fa-dca047296ddd@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729062078;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nKJfP3LmeT/Qx7oKj5HM871IgPtYRSHVMsPL1c0DDh4=;
-	b=faAgi0n+nbWHYJ4pDmHKIOAXnzZ19LFScJO289nhqxn51rHmnBrwc5qTlpbmCAiin+iS5E
-	eFQ2EeUBmDSaB5ATUx2+ha6H060UW6foeQ9yzW05yiP0Ae1JLq7a4ifOEAdMkXN/CRRhj+
-	q/4Ss0Ui80qpErz8YtHn3X3bqq1PsOg=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-497--rwDewsiOIaVMiAM9hednw-1; Wed, 16 Oct 2024 02:58:08 -0400
-X-MC-Unique: -rwDewsiOIaVMiAM9hednw-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b111381632so1218010885a.3
-        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:58:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729061887; x=1729666687;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nKJfP3LmeT/Qx7oKj5HM871IgPtYRSHVMsPL1c0DDh4=;
-        b=qkjND/9FdqrQOrXwvkQQmc7FWWV0F1yaWEBHQf6ZWamOp23Wkg20N4c8JHtbXvdye+
-         sLFUv9BPgG7ec7VHcrFUSnqFPeQBPCo+WOQDHLjyBohm7TCsXnU0k7ZIUriWcNkqJMmS
-         pzo0O4Q0wUp6GObGW3z8yhcVF7XRs/ySCvLG86hVkQ1PWYTbJdBVC0uONVr689vCuDNE
-         akZPtmTPGZXvqhrudd8aARpSyUMeT6+mG1gx3TXoQ2im5aIQPwBgPrU++ybVdLKoVpQK
-         0ug2rtLLEbwUMvpDycU7B955aWvsVIl3twopnmjZE/OfHMVrRgtLmUDyUa1/dN5tP/Um
-         FIxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXF2J005E73oC3/masL4TvM61SiauwM5JhYf+Knfqlnmgm87SU9C6mSaXYzcGn6q5KJDN2hf6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHDk1q5Q3mSPRqnecRdAd4q0CqAlrw6aKSxKvbvu15t4U8/hXE
-	HaQMvFP5898w9kEI/mDDT0B/tej6cfBc+uJIPJNSodEj+RL2DqpUoHFxylw8OPW2FHfHLe5Hwpu
-	W2CLy01VUg1xvGoj6kVuwBM0LmfIJYLYfjp1riYsHGrgh/gx7NH21oQ==
-X-Received: by 2002:a05:620a:400d:b0:7a1:62ad:9d89 with SMTP id af79cd13be357-7b14186f1c8mr461445385a.64.1729061887545;
-        Tue, 15 Oct 2024 23:58:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFcw8kz1/9R04Vwhhq2lqNVDk3gX6xFnXYOAV6a2cL/WNRAli0C59zaADhpNPO2+u1Q91URSw==
-X-Received: by 2002:a05:620a:400d:b0:7a1:62ad:9d89 with SMTP id af79cd13be357-7b14186f1c8mr461441885a.64.1729061887092;
-        Tue, 15 Oct 2024 23:58:07 -0700 (PDT)
-Received: from dhcp-64-113.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b136164dfbsm149785985a.21.2024.10.15.23.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 23:58:06 -0700 (PDT)
-Message-ID: <fc7244823a5665d3db40c94aea099a2973032a0b.camel@redhat.com>
-Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
- <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>,  Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>,  Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>,  Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>,  Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
- <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>, Ankit Agrawal
- <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette Chatre
- <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Wed, 16 Oct 2024 08:57:58 +0200
-In-Reply-To: <20241015135336.0de9795e.alex.williamson@redhat.com>
-References: <20241015185124.64726-1-pstanner@redhat.com>
-	 <20241015185124.64726-14-pstanner@redhat.com>
-	 <20241015135336.0de9795e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	bh=jJBKRnCSRhUn8APVEtnTckzAplaNlY5XWu9UXdR8lEE=;
+	b=RqLqulpWwDHfY7MoIuzb5z/dBAkhzHNY9VZiY62Czf6Lf0CU4k4503emQ9cRt4AkcLjJNo
+	fHMTzag8CSXN9ZnncRnseUreGKjOG3utKddkC/90auaAx1xk+k/uH6CAPLBwCKfz2AzbJV
+	vxhFaWZnuxzmFHtgrHYYHo+oKL6n6wE=
+Date: Wed, 16 Oct 2024 00:01:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
+ control the whole bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+ willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-5-kerneljasonxing@gmail.com>
+ <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
+ <CAL+tcoBieZ3_ZX3PRY8k7-C6Rv2g=Mr1U1NAQkQpbHYYvtWpTQ@mail.gmail.com>
+ <CAL+tcoBXj=EO-sk-dS+dN-pCZf8OKeOZ4LXb9GZnja3EfOhXYg@mail.gmail.com>
+ <9f050a5c-644f-4fbb-ac37-53edfd160edc@linux.dev>
+ <CAL+tcoDyt=3hjwdx8Wk-abKg=qQsY=7UKu9=TU4iUAk5gMT2MQ@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <CAL+tcoDyt=3hjwdx8Wk-abKg=qQsY=7UKu9=TU4iUAk5gMT2MQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
-> On Tue, 15 Oct 2024 20:51:23 +0200
-> Philipp Stanner <pstanner@redhat.com> wrote:
->=20
-> > pci_intx() and its managed counterpart pcim_intx() only exist for
-> > older
-> > drivers which have not been ported yet for various reasons. Future
-> > drivers should preferably use pci_alloc_irq_vectors().
-> >=20
-> > Mark pci_intx() and pcim_intx() as deprecated and encourage usage
-> > of
-> > pci_alloc_irq_vectors() in its place.
->=20
-> I don't really understand this.=C2=A0 As we've discussed previously
-> pci_alloc_irq_vectors() is, unsurprisingly, for allocating PCI IRQ
-> vectors while pci_intx() is for manipulating the INTx disable bit on
-> PCI devices.=C2=A0 The latter is a generic mechanism for preventing PCI
-> devices from generating INTx, regardless of whether there's a vector
-> allocated for it.=C2=A0 How does the former replace the latter and why do
-> we
-> feel the need to deprecate the latter?
->=20
-> It feels like this fits some narrow narrative and makes all users of
-> these now deprecated functions second class citizens.=C2=A0 Why?=C2=A0 At=
- it's
-> root these are simply providing mask and set or mask and clear
-> register
-> bit operations.=C2=A0 Thanks,
+On 10/15/24 11:30 PM, Jason Xing wrote:
+> On Wed, Oct 16, 2024 at 2:13 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 10/15/24 6:32 PM, Jason Xing wrote:
+>>> On Wed, Oct 16, 2024 at 9:04 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
+>>>>
+>>>> On Wed, Oct 16, 2024 at 8:10 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>>>
+>>>>> On 10/11/24 9:06 PM, Jason Xing wrote:
+>>>>>> From: Jason Xing <kernelxing@tencent.com>
+>>>>>>
+>>>>>> Willem suggested that we use a static key to control. The advantage
+>>>>>> is that we will not affect the existing applications at all if we
+>>>>>> don't load BPF program.
+>>>>>>
+>>>>>> In this patch, except the static key, I also add one logic that is
+>>>>>> used to test if the socket has enabled its tsflags in order to
+>>>>>> support bpf logic to allow both cases to happen at the same time.
+>>>>>> Or else, the skb carring related timestamp flag doesn't know which
+>>>>>> way of printing is desirable.
+>>>>>>
+>>>>>> One thing important is this patch allows print from both applications
+>>>>>> and bpf program at the same time. Now we have three kinds of print:
+>>>>>> 1) only BPF program prints
+>>>>>> 2) only application program prints
+>>>>>> 3) both can print without side effect
+>>>>>>
+>>>>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>>>>>> ---
+>>>>>>     include/net/sock.h |  1 +
+>>>>>>     net/core/filter.c  |  3 +++
+>>>>>>     net/core/skbuff.c  | 38 ++++++++++++++++++++++++++++++++++++++
+>>>>>>     3 files changed, 42 insertions(+)
+>>>>>>
+>>>>>> diff --git a/include/net/sock.h b/include/net/sock.h
+>>>>>> index 66ecd78f1dfe..b7c51b95c92d 100644
+>>>>>> --- a/include/net/sock.h
+>>>>>> +++ b/include/net/sock.h
+>>>>>> @@ -2889,6 +2889,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
+>>>>>>     void sock_def_readable(struct sock *sk);
+>>>>>>
+>>>>>>     int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_sk);
+>>>>>> +DECLARE_STATIC_KEY_FALSE(bpf_tstamp_control);
+>>>>>>     void sock_set_timestamp(struct sock *sk, int optname, bool valbool);
+>>>>>>     int sock_get_timestamping(struct so_timestamping *timestamping,
+>>>>>>                           sockptr_t optval, unsigned int optlen);
+>>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
+>>>>>> index 996426095bd9..08135f538c99 100644
+>>>>>> --- a/net/core/filter.c
+>>>>>> +++ b/net/core/filter.c
+>>>>>> @@ -5204,6 +5204,8 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
+>>>>>>         .arg1_type      = ARG_PTR_TO_CTX,
+>>>>>>     };
+>>>>>>
+>>>>>> +DEFINE_STATIC_KEY_FALSE(bpf_tstamp_control);
+>>>>>> +
+>>>>>>     static int bpf_sock_set_timestamping(struct sock *sk,
+>>>>>>                                      struct so_timestamping *timestamping)
+>>>>>>     {
+>>>>>> @@ -5217,6 +5219,7 @@ static int bpf_sock_set_timestamping(struct sock *sk,
+>>>>>>                 return -EINVAL;
+>>>>>>
+>>>>>>         WRITE_ONCE(sk->sk_tsflags[BPFPROG_TS_REQUESTOR], flags);
+>>>>>> +     static_branch_enable(&bpf_tstamp_control);
+>>>>>
+>>>>> Not sure when is a good time to do static_branch_disable().
+>>>>
+>>>> Thanks for the review.
+>>>>
+>>>> To be honest, I considered how to disable the static key. Like you
+>>>> said, I failed to find a good chance that I can accurately disable it.
+>>>>
+>>>>>
+>>>>> The bpf prog may be detached also. (IF) it ends up staying with the
+>>>>> cgroup/sockops interface, it should depend on the existing static key in
+>>>>> cgroup_bpf_enabled(CGROUP_SOCK_OPS) instead of adding another one.
+>>>>
+>>>> Are you suggesting that we need to remove the current static key? In
+>>>> the previous thread, the reason why Willem came up with this idea is,
+>>>> I think, to avoid affect the non-bpf timestamping feature.
+>>>>
+>>>>>
+>>>>>>
+>>>>>>         return 0;
+>>>>>>     }
+>>>>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+>>>>>> index f36eb9daa31a..d0f912f1ff7b 100644
+>>>>>> --- a/net/core/skbuff.c
+>>>>>> +++ b/net/core/skbuff.c
+>>>>>> @@ -5540,6 +5540,29 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
+>>>>>>     }
+>>>>>>     EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+>>>>>>
+>>>>>> +static bool sk_tstamp_tx_flags(struct sock *sk, u32 tsflags, int tstype)
+>>>>>
+>>>>> sk is unused.
+>>>>
+>>>> Thanks for the careful check.
+>>>>
+>>>>>
+>>>>>> +{
+>>>>>> +     u32 testflag;
+>>>>>> +
+>>>>>> +     switch (tstype) {
+>>>>>> +     case SCM_TSTAMP_SCHED:
+>>>>>
+>>>>> Instead of doing this translation,
+>>>>> is it easier to directly store the bpf prog desired ts"type" (i.e. the
+>>>>> SCM_TSTAMP_*) in the sk->sk_tsflags_bpf?
+>>>>> or there is a specific need to keep the SOF_TIMESTAMPING_* value in
+>>>>> sk->sk_tsflags_bpf?
+>>>>
+>>>> We have to reuse SOF_TIMESTAMPING_* because there are more flags, say,
+>>>> SOF_TIMESTAMPING_OPT_ID, that we need to support.
+>>>>
+>>>>>
+>>>>>> +             testflag = SOF_TIMESTAMPING_TX_SCHED;
+>>>>>> +             break;
+>>>>>> +     case SCM_TSTAMP_SND:
+>>>>>> +             testflag = SOF_TIMESTAMPING_TX_SOFTWARE;
+>>>>>> +             break;
+>>>>>> +     case SCM_TSTAMP_ACK:
+>>>>>> +             testflag = SOF_TIMESTAMPING_TX_ACK;
+>>>>>> +             break;
+>>>>>> +     default:
+>>>>>> +             return false;
+>>>>>> +     }
+>>>>>> +     if (tsflags & testflag)
+>>>>>> +             return true;
+>>>>>> +
+>>>>>> +     return false;
+>>>>>> +}
+>>>>>> +
+>>>>>>     static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>>>>>>                                  const struct sk_buff *ack_skb,
+>>>>>>                                  struct skb_shared_hwtstamps *hwtstamps,
+>>>>>> @@ -5558,6 +5581,9 @@ static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>>>>>>         if (!skb_may_tx_timestamp(sk, tsonly))
+>>>>>>                 return;
+>>>>>>
+>>>>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
+>>>>>
+>>>>> This is a new test. tsflags is the sk->sk_tsflags here if I read it correctly.
+>>>>
+>>>> This test will be used in bpf and non-bpf cases. Because of this, we
+>>>> can support BPF extension. In this function, if skb has tsflags but we
+>>>> don't know which approach the user expects, sk_tstamp_tx_flags() can
+>>>> help us.
+>>>>
+>>>>>
+>>>>> My understanding is the sendmsg can provide SOF_TIMESTAMPING_* for individual
+>>>>> skb. Would it break?
+>>>>
+>>>> Oh, you're right. I didn't support cmsg mode...
+>>>
+>>> I think I only need to test if it's in the bpf mode, or else let the
+>>> original way print the timestamp, which can solve the issue.
+>>
+>>   From looking at the existing "__skb_tstamp_tx(skb, NULL, NULL, skb->sk,
+>> SCM_TSTAMP_SCHED);":
+>>
+>> int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+>> {
+>>          /* ... */
+>>
+>>          if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
+>>                  __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHED);
+>>
+>>          /* ... */
+>> }
+>>
+>> I am still puzzling how __skb_tstamp_tx() will be called if only bpf has enabled
+>> the timestamping. I may have missed somewhere in the patch set that the skb's
+>> tx_flags is changed by sk->sk_tsflags_bpf alone?
+> 
+> If sk_tsflags_bpf is set, tcp_sendmsg() -> tcp_tx_timestamp() will be
+> helpful, which initializes every last skb, please see patch [10/12].
 
-I got the feeling from the RFC discussion that that was basically the
-consensus: people should use pci_alloc_irq_vectors(). Or did I
-misunderstand Andy and Heiner?
+Ah. ok. It is the thing I missed. Thanks for the pointer.
 
-I'm perfectly happy with dropping this patch and continue offering
-pci{m}_intx() to users, since after removing that hybrid hazzard I
-don't see any harm in them anymore.
+>>
+>> I think a skb tskey is still desired (?), so eventually we want some spaces in
+> 
+> tskey function is optional I think. It depends whether users want to
+> use it or not. It can controlled by SOF_TIMESTAMPING_OPT_ID flag.
+> 
+>> the skb for bpf. Jakub Sitnicki (cc-ed) has presented in LPC about extending
+>> skb->data_meta usage outside of xdp and tc. I think here we want to have it
+>> available at the tx side to store the tx_flags and tskey but probably want them
+>> at a specific place/offset at the data_meta.
+> 
+> If we have the plan to store extra information in data_meta, I can
+> give it a try:)
+> 
+>>
+>> For now, is there thing we can explore to share in the skb_shared_info?
+> 
+> My initial thought is just to reuse these fields in skb. It can work
+> without interfering one another.
+
+After reading closer to patch 10, I am likely still missing something. How can 
+it tell if the tx_flags is set by the bpf or by the user space cmsg?
+
+> 
+>> Can the "struct skb_shared_hwtstamps hwtstamps;" be used for the bpf tx_flags and tskey
+>> only at the "tx" side? There is already another union member.
+> 
+> tskey is always used in the tx path.
+> 
+> hwtstamps can be used in both rx and tx cases (please see
+> tcp_update_recv_tstamps() and skb_tstamp_tx()).
+
+hmm... we only need some where to store the bpf tx_flags and bpf tskey in the 
+TX-ing skb. You meant the hwtstamps of a Tx-ing skb is not empty?
+
+At skb_tstamp_tx (TX side only?), the orig_skb's hwtstamps has not been written yet?
+
+> 
+>> The hwtstamps should only be needed when the NIC is done sending?
+> 
+> In this patch, yes, hwtstamps are the records in tx path.
+> 
+> Thanks,
+> Jason
 
 
-P.
-
->=20
-> Alex
-> =C2=A0
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > ---
-> > =C2=A0drivers/pci/devres.c | 5 ++++-
-> > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0 | 5 ++++-
-> > =C2=A02 files changed, 8 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-> > index 6f8f712fe34e..4c76fc063104 100644
-> > --- a/drivers/pci/devres.c
-> > +++ b/drivers/pci/devres.c
-> > @@ -435,7 +435,7 @@ static struct pcim_intx_devres
-> > *get_or_create_intx_devres(struct device *dev)
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0/**
-> > - * pcim_intx - managed pci_intx()
-> > + * pcim_intx - managed pci_intx() (DEPRECATED)
-> > =C2=A0 * @pdev: the PCI device to operate on
-> > =C2=A0 * @enable: boolean: whether to enable or disable PCI INTx
-> > =C2=A0 *
-> > @@ -443,6 +443,9 @@ static struct pcim_intx_devres
-> > *get_or_create_intx_devres(struct device *dev)
-> > =C2=A0 *
-> > =C2=A0 * Enable/disable PCI INTx for device @pdev.
-> > =C2=A0 * Restore the original state on driver detach.
-> > + *
-> > + * This function is DEPRECATED. Do not use it in new code.
-> > + * Use pci_alloc_irq_vectors() instead (there is no managed
-> > version, currently).
-> > =C2=A0 */
-> > =C2=A0int pcim_intx(struct pci_dev *pdev, int enable)
-> > =C2=A0{
-> > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> > index 7ce1d0e3a1d5..dc69e23b8982 100644
-> > --- a/drivers/pci/pci.c
-> > +++ b/drivers/pci/pci.c
-> > @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct pci_dev
-> > *dev)
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0/**
-> > - * pci_intx - enables/disables PCI INTx for device dev
-> > + * pci_intx - enables/disables PCI INTx for device dev
-> > (DEPRECATED)
-> > =C2=A0 * @pdev: the PCI device to operate on
-> > =C2=A0 * @enable: boolean: whether to enable or disable PCI INTx
-> > =C2=A0 *
-> > =C2=A0 * Enables/disables PCI INTx for device @pdev
-> > + *
-> > + * This function is DEPRECATED. Do not use it in new code.
-> > + * Use pci_alloc_irq_vectors() instead.
-> > =C2=A0 */
-> > =C2=A0void pci_intx(struct pci_dev *pdev, int enable)
-> > =C2=A0{
->=20
 
 
