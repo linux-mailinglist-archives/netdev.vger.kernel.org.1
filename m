@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-136301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84EC79A141F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 22:35:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6CA9A1420
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 22:35:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA820B229C3
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E560B1C2277C
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67878218307;
-	Wed, 16 Oct 2024 20:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9694D21830E;
+	Wed, 16 Oct 2024 20:34:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DDD20E03C
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 20:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D68E218304
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 20:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729110876; cv=none; b=kTd2RevjxwtGyiSNndQdO0vMWqitrCQ10diXtEcaZBZHL3MkaIJ6wXsVZV79i++RExdIMWAgysp33Y+xz28glLDUTn3N2xUJywWqMd/GGloErek94/GwAIaAfEPqJZOxww+nrbBy0LDo67m70YRyqyW+K6e0b49rxIMoBFD3YZI=
+	t=1729110877; cv=none; b=Kchi8HOv/Q9PhUP9gc0UQ+Ffx6U/SDNguZBeR+tHV2IpJOObvv3cBaAEgtJRDVoAHK3ni/zVSoKVgcfg+UmtgHcL7ZsiQ3Pihzu7yFUsCD2zudKuzNGZr//DyTRr3L0x8sWjkD7/l5AEWkeHKWhRPuPBOMu67+Ud5DWCJpQRErg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729110876; c=relaxed/simple;
-	bh=hvKtAdMmMJwdlK6/D7XzrcA06TFwhy+PbhqXtSzunAk=;
+	s=arc-20240116; t=1729110877; c=relaxed/simple;
+	bh=k7uXbcrhbzP8K055+WyplYpJpaVE+a1Q1HejtDhedYM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ByWZk31fLf8x5RWl7zJA7jA/198+l9R9KARigoqOQk2KIiXRBRNhFQ+GXRK5yGC9xHtugLLI3mD710P6Z1fPInKEEcwQ06I7xPG09OL+yDDc1xp1ehWaX4kYDdeR/X7mCcPxnpAnx/GBkDzKYW6KxaFlcJaBMY0lAafHSJunn7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.42
+	 MIME-Version; b=lWqkyvuYVI9IlDunjmwob5nhwuxKXpDckJoYCNz1a0Wz5/XYX6lqWqXyzzDeWV0YuGlDfrrGrVlRdCfFxCme2Ev0JxVxM4DMK4+ut605aQN7tSGaIDQ5JRY1CIdhAOz/zSm43H15JQKhFlLrSnx6SS0SbLTG2va2hoo2GLOILEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e30116efc9so178977a91.2
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 13:34:34 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2e3686088c3so183103a91.0
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 13:34:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729110874; x=1729715674;
+        d=1e100.net; s=20230601; t=1729110875; x=1729715675;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ou7AVRJVOE2su/I9RGHce01ov8DJaMMy2O5CuqD9wpw=;
-        b=jZO/uqRJsBqGl8yqjcbOrRlSs3mBHj6muJLNh7xTq36IzOUWYrTLYVdS6FkfcTcooh
-         uoEDYsqO0Ws9dhy24SykW88aec+pTqgFV31HIyg0ueOuHyXZk3xbc5roVeuyrG4mSjIJ
-         lhnQeSh+9AEeVRghf+3qUj1mkXqq0fZQPipKGxllW/cPCmqX7eJYcGxP3MhrAWax3Te1
-         9ra9DhS8wvAjB864RS4Ccc6tcqRZZkeL3HfvFntkeah8vq/uES54+9cU8bxIu9NxtXbk
-         M/7Z0m3lMnmBFnltHhSkS9Nj74JUXQYUeNjFKedUPl/EvISFJ9fxFa2C/20vYofiUxsy
-         Q5jA==
-X-Gm-Message-State: AOJu0YweEa0e4oaJPVXSU+lMzLIQ/SyWkTK9Lktnt6Z+T4N4KDJQ9kj2
-	M3OYHibymK9k7SAU/M7TcNthMVNL7Hnn4vlYAZvBJyfYTkVLHz10vQEgx00=
-X-Google-Smtp-Source: AGHT+IHUAvcxS/gPWKaSEVoDy90oH4TqpKvtxPdxkHIjjtC0/YWZIlJxLsFdK3Ndet2rzGV5x9wGLg==
-X-Received: by 2002:a17:90b:1648:b0:2e2:aef9:8f60 with SMTP id 98e67ed59e1d1-2e3ab6c62c4mr6195664a91.0.1729110874134;
-        Wed, 16 Oct 2024 13:34:34 -0700 (PDT)
+        bh=aLyMP4azBwRpdtrx/e0g3jtBqjD3VddbI/H/8FwQDZM=;
+        b=JP+wuxfGqrBr1JUHv/qNuprHnKyxcJxNU6wY8uNJmGUsHmK4IQxw4WfAV4DoOVt9Ar
+         YeCKOI879xwDIA6nII/VKEGHQR+LTJtA/NZr4o1k+zkgCLqPr2HUAFUW8ts8gZe8DUyh
+         l5ju+YVR1KFnLy8eqPXoXVqTuaraaOI+sJ5UNIueo7VjIjQPAek2Or6buD0svnEG518+
+         2No6Hp4r2BUPp1t91kmtyNeGBpToK8lTjtDkq9Pibk/RRMyjSZeZeuU6eJPJVyO23ZYC
+         FD+jZcp5oD9kPWqXJgPzUhUkiTBaVrYqPGntqS6vrBu9WoTr1jJZBDKSHjkUDKbgZ98M
+         +eSw==
+X-Gm-Message-State: AOJu0Yzr5KBnQbBUQtDZnNKaio8hhIsLzAHHlMHYLSz7wVv8WDWGriCB
+	tRvHnB7ImwOAzKWO4y5M8Wcycv5nsFWu8rQQT7DHLQQY6Lsdkvcvmyafkhg=
+X-Google-Smtp-Source: AGHT+IFtnznKlaXszyFkUjYO9xwhAPFFuVaoSUx/IlvS2e832nxVhfa/PWG5sQYNi/lWDL0JsGxG2w==
+X-Received: by 2002:a17:90b:1056:b0:2e0:db81:4f79 with SMTP id 98e67ed59e1d1-2e2f0a2fb2cmr21905993a91.2.1729110875275;
+        Wed, 16 Oct 2024 13:34:35 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e3e08c18cbsm243892a91.20.2024.10.16.13.34.33
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e3e094a1b1sm231464a91.49.2024.10.16.13.34.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 13:34:33 -0700 (PDT)
+        Wed, 16 Oct 2024 13:34:34 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -59,9 +59,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH net-next v4 09/12] selftests: ncdevmem: Remove hard-coded queue numbers
-Date: Wed, 16 Oct 2024 13:34:19 -0700
-Message-ID: <20241016203422.1071021-10-sdf@fomichev.me>
+Subject: [PATCH net-next v4 10/12] selftests: ncdevmem: Run selftest when none of the -s or -c has been provided
+Date: Wed, 16 Oct 2024 13:34:20 -0700
+Message-ID: <20241016203422.1071021-11-sdf@fomichev.me>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241016203422.1071021-1-sdf@fomichev.me>
 References: <20241016203422.1071021-1-sdf@fomichev.me>
@@ -73,79 +73,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use single last queue of the device and probe it dynamically.
+This will be used as a 'probe' mode in the selftest to check whether
+the device supports the devmem or not. Use hard-coded queue layout
+(two last queues) and prevent user from passing custom -q and/or -t.
 
 Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- tools/testing/selftests/net/ncdevmem.c | 40 ++++++++++++++++++++++++--
- 1 file changed, 38 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/ncdevmem.c | 42 ++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 10 deletions(-)
 
 diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-index eb026633fdcf..a7f7bf0da792 100644
+index a7f7bf0da792..4c6baee972ba 100644
 --- a/tools/testing/selftests/net/ncdevmem.c
 +++ b/tools/testing/selftests/net/ncdevmem.c
-@@ -75,8 +75,8 @@ static char *server_ip;
- static char *client_ip;
+@@ -76,7 +76,7 @@ static char *client_ip;
  static char *port;
  static size_t do_validation;
--static int start_queue = 8;
--static int num_queues = 8;
-+static int start_queue = -1;
-+static int num_queues = 1;
+ static int start_queue = -1;
+-static int num_queues = 1;
++static int num_queues = -1;
  static char *ifname;
  static unsigned int ifindex;
  static unsigned int dmabuf_id;
-@@ -208,6 +208,33 @@ void validate_buffer(void *line, size_t size)
- 	fprintf(stdout, "Validated buffer\n");
- }
+@@ -718,19 +718,31 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
  
-+static int rxq_num(int ifindex)
-+{
-+	struct ethtool_channels_get_req *req;
-+	struct ethtool_channels_get_rsp *rsp;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+	int num = -1;
-+
-+	ys = ynl_sock_create(&ynl_ethtool_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return -1;
-+	}
-+
-+	req = ethtool_channels_get_req_alloc();
-+	ethtool_channels_get_req_set_header_dev_index(req, ifindex);
-+	rsp = ethtool_channels_get(ys, req);
-+	if (rsp)
-+		num = rsp->rx_count + rsp->combined_count;
-+	ethtool_channels_get_req_free(req);
-+	ethtool_channels_get_rsp_free(rsp);
-+
-+	ynl_sock_destroy(ys);
-+
-+	return num;
-+}
-+
- #define run_command(cmd, ...)                                           \
- 	({                                                              \
- 		char command[256];                                      \
-@@ -702,6 +729,15 @@ int main(int argc, char *argv[])
+-	if (!server_ip)
+-		error(1, 0, "Missing -s argument\n");
+-
+-	if (!port)
+-		error(1, 0, "Missing -p argument\n");
+-
+ 	if (!ifname)
+ 		error(1, 0, "Missing -f argument\n");
  
  	ifindex = if_nametoindex(ifname);
  
-+	if (start_queue < 0) {
-+		start_queue = rxq_num(ifindex) - 1;
+-	if (start_queue < 0) {
+-		start_queue = rxq_num(ifindex) - 1;
++	if (!server_ip && !client_ip) {
++		if (start_queue < 0 && num_queues < 0) {
++			num_queues = rxq_num(ifindex);
++			if (num_queues < 0)
++				error(1, 0, "couldn't detect number of queues\n");
++			/* make sure can bind to multiple queues */
++			start_queue = num_queues / 2;
++			num_queues /= 2;
++		}
 +
-+		if (start_queue < 0)
-+			error(1, 0, "couldn't detect number of queues\n");
++		if (start_queue < 0 || num_queues < 0)
++			error(1, 0, "Both -t and -q are requred\n");
 +
-+		fprintf(stderr, "using queues %d..%d\n", start_queue, start_queue + num_queues);
++		run_devmem_tests();
++		return 0;
 +	}
 +
++	if (start_queue < 0 && num_queues < 0) {
++		num_queues = 1;
++		start_queue = rxq_num(ifindex) - num_queues;
+ 
+ 		if (start_queue < 0)
+ 			error(1, 0, "couldn't detect number of queues\n");
+@@ -741,7 +753,17 @@ int main(int argc, char *argv[])
  	for (; optind < argc; optind++)
  		fprintf(stderr, "extra arguments: %s\n", argv[optind]);
  
+-	run_devmem_tests();
++	if (start_queue < 0)
++		error(1, 0, "Missing -t argument\n");
++
++	if (num_queues < 0)
++		error(1, 0, "Missing -q argument\n");
++
++	if (!server_ip)
++		error(1, 0, "Missing -s argument\n");
++
++	if (!port)
++		error(1, 0, "Missing -p argument\n");
+ 
+ 	mem = provider->alloc(getpagesize() * NUM_PAGES);
+ 	ret = is_server ? do_server(mem) : 1;
 -- 
 2.47.0
 
