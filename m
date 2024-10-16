@@ -1,130 +1,110 @@
-Return-Path: <netdev+bounces-136197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D049A0F5B
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:09:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 624989A0F87
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DBF21C22C31
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:09:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AB3A1C21E4C
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A3A20F5C6;
-	Wed, 16 Oct 2024 16:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5B520F5CB;
+	Wed, 16 Oct 2024 16:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuHKFKLE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8418720F5B0;
-	Wed, 16 Oct 2024 16:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FA112DD8A;
+	Wed, 16 Oct 2024 16:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729094974; cv=none; b=m7LEjik0YK6vJVTWLC7gdggjTe41G3PARlzjlE5nZBp5Ek8SXR1QSQktvb9JvjpKYCFN74piIPcymOy7RmJ09MiygUmZ+lMCach7AF9bbodFZXl+6N63TW7+byXzgtL3La4QYkwmtA5uaeui58SlOx0sbT/lIizQlEsnYVOVfzQ=
+	t=1729095807; cv=none; b=jmY9j2UHAn87rwZE+kqPGLmOTt8OJW+G33lMt1HvxD5SFWRNYcyE84U3+SuyuIgW8PTUcyTw9x2Se8ywvbr2Skqs4lrwnVqAClqRInbSBa8Jc4xgbktkfWXkXU5JR5AD0Njka1/lyFjc6wC4MCyAdzcwUf5h54BkQZHakafKJsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729094974; c=relaxed/simple;
-	bh=vSsZqDJWpQ20mq3tHE0Fb47pANLlhNT0u6UPTtuQgeg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DvD9Zz9FUYurKlthPzGGAOJT3xcymrWLyi8otLmb+zAotPMvX6v7CXvzb4MRqVc5LqLVKFQ/Cf2j492ug0Y3bym2NOkTV3J4BxYPk3E91AvG/DjMZqOrh+Z/HrAcSQ3sRxqGGNaAk8l6sMId/eJ3KGeLZGUd3/+BDaAtQvdtN+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
+	s=arc-20240116; t=1729095807; c=relaxed/simple;
+	bh=1BQ2OjRpyiDw2g2stbTQFI+FzPWBKEQi93YUtJmVsbs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=KkgJfXhgbXrn9MsESgwdIb9vSqkKEff9IdH29+Y0M591TVZaR5m3Ax7HNNACawyHUO4e1ixhTRqsejcMAjqjIZsABLXuJZ20T/ZXGLgrCsxCDSRJUmbXqOB0C7YPqgu3h1VwQUhgqQUqqg8kPHg2nsB4QyTWSdksbS8DrTSp8M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AuHKFKLE; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a99ebb390a5so211609766b.1;
-        Wed, 16 Oct 2024 09:09:32 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43140a2f7f7so168025e9.1;
+        Wed, 16 Oct 2024 09:23:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729095804; x=1729700604; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uHQi4sDcUkh4HrcchY9/4FMu7XZ+1dZcINfwy3wM6SI=;
+        b=AuHKFKLEfRB97YeaTjw1KX5Q5FFoNECrGYwxl06q+kBey5d7fBRt+ztw9A+nHRazDl
+         O4Pp7NHi5Lj/Z9qO2qcsgMTYJYLCSOlmpG/USKeBSFKvkw/0RoeZOkoh0nmZGWKHkJBB
+         JiDyiVFapqQf6qReuTz6Ss5H2z6Z1fZ5h/EfAIM4ugud0ZPpSqjDQZwRP3TcaALPhScu
+         CqzhrIfvjvQg26ZkcaKDIauUJVZMU16HrJfQGDOU1ZrJXGhsl5M1BY28jPJnjgy3EySk
+         YBTr5FrBjC/FZ0cYebknypKQFBpqYPF8qWam13r2TdAD3yJi+SOv/ygZI0OOWxoAZWdR
+         kE8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729094971; x=1729699771;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OmTlR+mvqJAz1EmxrOCGVHDAWntliLwxpGc0qQgNhZ0=;
-        b=BKBgrMchnzIJR1QsHT5xqQm5vRmEKHqjlmjUdJUAWlRG5ENXRThrVZW1d0Y6H4qntH
-         OvsWH8Wm53XzS0auV83d/133kAl+1zSeynUW7KMZwNoPD6Ufa94pFwzSAd+tTIhMefUn
-         2YNCcnhVyPZhZcLqPkSxKkE45ISSnMZLEMRX5ozkM00rARajENkZLhCnFOZIoESDepCa
-         G3WHTecQFcOKbDnbx3lGpWqr+pZeC1t1bBuQCJEnRrWdK1UN6//U9Vg8zyfieGBuAMb2
-         wcNu1YD/0NjgMUQRAaMJ8R8fS/JPwXKDs7wroW2kuwfI0wHptCT/IXAgpMl1llKAAXrQ
-         pyrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUA/itMSQK3YLZHA7B/A1ouFG8upDJW7BZ8w7UgqSYitzHQazbyFJpnGOo6/gydHc0KMJRlKQZIN7vA@vger.kernel.org, AJvYcCWFYJUkMuw/gW3mlm7DpCw2QuKCSXsaD1X8et8AZZsssiVSSUhUZbNPn23miiv0DjKvZ5uyBFPgZX8COUvn@vger.kernel.org, AJvYcCWuURtGMF2+NNwKLujAi/9rJHJrKzfR1HehZ3SobMY9OnXmvDMg2rRI7JL7XKcrPybuFwgB26eXVf0l@vger.kernel.org, AJvYcCXUmbaom7v6kqmvhAyq3etLSTokpsNcty1kj8M4nZWAwpRhQwrtrgm6+TSNgaEW8suYbKoJxo53@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrd3LFHHoElTHUxuRk2+s9MjvUnJaB5lSpnGfS1Vf9KkjxGX53
-	9qB2CqgKYq/vBK2BG1Q8iLI/sSF1x1XAYOE4ohYGzWFhmNG0gx07v3qBHPBQ5slDPkeFaF8EI4n
-	8+VByvHfhMGZLWzqXMRHYtfPUH40=
-X-Google-Smtp-Source: AGHT+IE59HHi6RfvNl0jd60GRp+Q4oTDVjpD1WxXKT5MU1/v8dV6ZpMG9trRhhhjywvzxGohJIOt3dIwrEjC1SoM+b8=
-X-Received: by 2002:a17:906:7308:b0:a9a:3df1:436a with SMTP id
- a640c23a62f3a-a9a4c2f3ce7mr14608566b.8.1729094970681; Wed, 16 Oct 2024
- 09:09:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729095804; x=1729700604;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uHQi4sDcUkh4HrcchY9/4FMu7XZ+1dZcINfwy3wM6SI=;
+        b=B9UgMG6O6QITvb2/jnAwAwHRPTPuz5d2Sd9m6YZGrBvmEmI5fSdyaokdwfJxPgNbMU
+         EryQiCbMdwHdgKhQyC4Q64p5JIMuc+DvEr6AlO62X3adF2pULDfzO6yNx3UDl3yPB6D3
+         yCJxtBficZmAvQgRT89hORz88b917r7Hy5xgqiRz8mbpCmHS0XYwgPDtLDxYj44/T2tC
+         TYFrZjFD27wuchSFIhjzSmkmkpEAlosgYWrWENN1XE7Sm7Pcm3l2FRBnTVCdN/VtbMhl
+         W0CJmbKyAlR0/7pPPZt45W1vpecri6cHJZssJLtyN2jKjj2k45mZyOXHTDYj0ctWmHIS
+         GxRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWh9CiF3WJxfjDl0cWoMCHrqTMc07qu8NjWPyiKiLo4bCrWaRr3KlHBdAK1AVm/OkUcXfXSP+aRM7PnBVI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcK6khHyRV+OZGsaohe9nNJCvB/hsKmW7ttNuUR2dX/1kCpFQ4
+	U89VzSIAQyTomftEcfz0TipWrQdeF+D3SPY7B/4agxUjJYrIMB3EPKUKHw==
+X-Google-Smtp-Source: AGHT+IG0sUIYFY463O8t5Ty2rTEwo91mJXa/m5lTA+AfWloVFS9zJvnAeMcjLXsrrvP2xMJ1hXOr8g==
+X-Received: by 2002:adf:facf:0:b0:37c:c892:a98c with SMTP id ffacd0b85a97d-37d86d70bbemr3146554f8f.56.1729095802697;
+        Wed, 16 Oct 2024 09:23:22 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4313f6c5d7fsm53764965e9.42.2024.10.16.09.23.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2024 09:23:22 -0700 (PDT)
+Subject: Re: [PATCH net-next 1/2] ethtool: rss: prevent rss ctx deletion when
+ in use
+To: Daniel Zahka <daniel.zahka@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241011183549.1581021-1-daniel.zahka@gmail.com>
+ <20241011183549.1581021-2-daniel.zahka@gmail.com>
+ <966a82d9-c835-e87e-2c54-90a9a2552a21@gmail.com>
+ <43a98a99-4c79-4954-82f1-b634e4d1be82@gmail.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <c32a876f-4d20-c975-5a2f-3fa0ab229f05@gmail.com>
+Date: Wed, 16 Oct 2024 17:23:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241015-topic-mcan-wakeup-source-v6-12-v4-0-fdac1d1e7aa6@baylibre.com>
- <20241015-topic-mcan-wakeup-source-v6-12-v4-5-fdac1d1e7aa6@baylibre.com>
- <CAMZ6Rq+NA9G=iON56vQcr5dxEMqn-FFzT5rdxc6XrtW+4ww1XQ@mail.gmail.com> <xiptvia2w5ocs7td2zgn3pueok2nzdslf7og4ekg3o6hdxus7r@quz2v54zmhyz>
-In-Reply-To: <xiptvia2w5ocs7td2zgn3pueok2nzdslf7og4ekg3o6hdxus7r@quz2v54zmhyz>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Thu, 17 Oct 2024 01:09:19 +0900
-Message-ID: <CAMZ6Rq+sWB_SV0gt6K8n0cw+PjoN_fifCUJXTxJ7Hp8FEAt7-w@mail.gmail.com>
-Subject: Re: [PATCH v4 5/9] can: m_can: Support pinctrl wakeup state
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, Vishal Mahaveer <vishalm@ti.com>, 
-	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <43a98a99-4c79-4954-82f1-b634e4d1be82@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 
-On Thu. 17 Oct. 2024 at 00:42, Markus Schneider-Pargmann
-<msp@baylibre.com> wrote:
-> Hi Vincent,
->
-> On Wed, Oct 16, 2024 at 11:26:22PM GMT, Vincent MAILHOL wrote:
-> > Hi Markus,
-> >
-> > This is a nice improvement from the v3.
-> >
-> > On Wed. 16 Oct. 2024 at 04:19, Markus Schneider-Pargmann
-> > <msp@baylibre.com> wrote:
-> > > am62 requires a wakeup flag being set in pinctrl when mcan pins acts as
-> > > a wakeup source. Add support to select the wakeup state if WOL is
-> > > enabled.
-> > >
-> > > Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+On 15/10/2024 17:31, Daniel Zahka wrote:
+> On 10/14/24 6:10 AM, Edward Cree wrote:
+>> Imho it would make more sense to add core tracking of ntuple
+>>   filters, along with a refcount on the rss context.  That way
+>>   context deletion just has to check the count is zero.
+>>
+>> -ed
+> 
+> That sounds good to me. Is that something you are planning on sending patches for?
 
-(...)
-
-> > > +       class_dev->pinctrl_state_default =
-> > > +               pinctrl_lookup_state(class_dev->pinctrl, "default");
-> > > +       if (IS_ERR(class_dev->pinctrl_state_default)) {
-> > > +               ret = PTR_ERR(class_dev->pinctrl_state_default);
-> >
-> > Sorry if this is a silly question, but why aren't you doing the:
-> >
-> >                   class_dev->pinctrl_state_default = NULL;
-> >
-> >                   if (ret == -ENODEV)
-> >                           return 0;
-> >
-> > thing the same way you are doing it for the pinctrl and the
-> > pinctrl_state_wakeup?
->
-> There are no silly questions.
-> The idea is that if the wakeup pinctrl state was already found, then the
-> default pinctrl state is required and not optional, so no check for
-> -ENODEV. Otherwise it doesn't make sense with the current binding or the
-> implementation of the driver.
-
-ACK. With this:
-
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-
-This concludes my review of your series. I am skipping the dt-bindings
-and the dts parts because I am not knowledgeable in those domains.
-
-
-Yours sincerely,
-Vincent Mailhol
+I'm afraid I don't have the bandwidth to do it any time soon.
+If you aren't able to take this on, I'm okay with your original
+ approach to get the issue fixed; I just wanted to ensure the
+ 'better' solution was considered if you do have the time for it.
 
