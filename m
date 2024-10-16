@@ -1,77 +1,110 @@
-Return-Path: <netdev+bounces-135926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B810B99FCCD
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:10:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1C3F99FD15
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51AFBB24635
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:10:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF54B1C242B5
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C4E4C98;
-	Wed, 16 Oct 2024 00:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6502BA3D;
+	Wed, 16 Oct 2024 00:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3KUnawI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6FO8NLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2E94C91;
-	Wed, 16 Oct 2024 00:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38769B641;
+	Wed, 16 Oct 2024 00:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729037414; cv=none; b=TtsJ8nK+ZO8xrO5/NtGc3uO5E0i0XezktBbgQUXi3LYksf9QwV9zjxo5A5dUjoU7Vn8C+pOzGRLzOZR5vk+UBojaT8nTNBGzuuiGsB+0FHScPhORURF0Bwi280mSums8xxTIijDAF7av1NDlDyT7PzsLkEfe+0h5TtPlzUj9Rd0=
+	t=1729038337; cv=none; b=OyyS0jny9h163fHEECpTZottJEofY3r1c0uMmaURN2hbCIsDbIkUucOauBR5jjDKenvg6e9RnnJ2z0Lo8Ns9UvYl8de0r9XRb5l3a0whfyoe+4PJM9KaP5BwlcG5va5uZ2+a0MTLnbaa9UEse1eYRj0UpHPPLKU1aGA6senaUsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729037414; c=relaxed/simple;
-	bh=PEvu6ecLrtTLoIG7xngZEUysaFi9La5kNX6nC4vOi/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p7Y5OMcvnpohOdBxxQrsl/t7LSbYRMHXuqEgas47mfmUqKkd2jyeKVnv07EO2VNqae5Z54Hhv1dlmUzxEoyBkqq1n5HjJRrRpcbGtH2ovcq8s5jcaRksDsBjsijP7W7MitYg1Gl9B6ZJyBrdrDFXJxMe8ZaCENx8IgtWpdhCY3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3KUnawI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05DFCC4CEC6;
-	Wed, 16 Oct 2024 00:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729037414;
-	bh=PEvu6ecLrtTLoIG7xngZEUysaFi9La5kNX6nC4vOi/I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m3KUnawIAQ0CMgdKWfeNLAL3rCS5+MTD/b7uGynfE6oWaFRqJVWnQX4m8ok/NnFAE
-	 nuDx07ClSvGPnKtZRrBLPYykgabxBDoilk0yPuidQYKvxKK/NfRIIikhGrRQA8EkuH
-	 ZN0LjzYkn20x7O8Y++84f1AN/LtMIH85IvpYEnRtPEhKRZEyt7ghDDToP2SriSN8TC
-	 cInTCIHJ8bwax6aAkxYgQi7zA8iNG+0KivlymeeqNDTGexfZtfJbKD3V/Rgecq9bHc
-	 962C2ctuPcvPH3H106lgsRhwW6QlHOduW1PLETMaFr1ZMNy2VsHu2T1WuEaBSq/Ga7
-	 3AQPlRXClZ4rQ==
-Date: Tue, 15 Oct 2024 17:10:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefan Wiehler <stefan.wiehler@nokia.com>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v5 08/10] ip6mr: Lock RCU before ip6mr_get_table()
- call in ip6_mroute_getsockopt()
-Message-ID: <20241015171013.7cc3617e@kernel.org>
-In-Reply-To: <20241014151247.1902637-9-stefan.wiehler@nokia.com>
-References: <20241014151247.1902637-1-stefan.wiehler@nokia.com>
-	<20241014151247.1902637-9-stefan.wiehler@nokia.com>
+	s=arc-20240116; t=1729038337; c=relaxed/simple;
+	bh=rqIZtvXctmAYJMrBZLyNIeQUeCbHnZJe1GvXXllvP6Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M9YT5cAxOrrs+F0vklNHPAFa/ifXVO5n+KATj2QGna/+HL/w7hd1B0BM8yRvY8uusKE17ROYrrGvyTPvvZprMpINsjej4YkmMAnVhbgvtwOYGolYTkdOg3bBXiw5mbJXMeLlh5wPwS2CIKM5SZ73PfMrcX1qfWcg+S/OR9jHH7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6FO8NLO; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6e39bf12830so2974507b3.1;
+        Tue, 15 Oct 2024 17:25:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729038335; x=1729643135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rqIZtvXctmAYJMrBZLyNIeQUeCbHnZJe1GvXXllvP6Q=;
+        b=U6FO8NLON+ndkAhm1i6v9r8ptXhTnesF4HzquvX4OQpzq1fme3bnty61PZ5culI8cN
+         4xJz9ZW9q/j9yVM1aLceFVbBDytHYf9KSQBik5gZRwApeJ6pPJuMcbwh/lBUTgu2EynS
+         SjgPTikVOyRRIakc9GfZOv/B1s8lKBjbn6mHmyK9hJhDVunslHHO+sMxHPaqqJ1z2Vs1
+         AepTBjIpEfwp5+Zld/Q6EuI5Zj3iJnLj+Sg1A7qFlgmPZXOnpnJHgYWmV5HpGQuGlRb9
+         FRq+5/IPQxHVa63++13gapWkP0wdJcg1zKIYPKXU+tm+oi0s/7FVcr/gpgO1KSpTX31h
+         qOcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729038335; x=1729643135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rqIZtvXctmAYJMrBZLyNIeQUeCbHnZJe1GvXXllvP6Q=;
+        b=TBAM7kDfUg5GaPhWYyfI6DFjdkymr10iUOZ4I/K8if2RdQye3CU2gLow5QhXAu9siF
+         uuAw0nnag7ieUTVwDULRtJZeKQqzECHWA1Rl29uAZzI4SMe6zkX+7t44q/rAEUjsM81C
+         4cWW/ZKb0t71/v6/Xm3phiGnkx7x4G62uV9Qk1V8rV1odRvr+QeJFr1AbkNRnWE4eN7r
+         j3BdHANXNzFThiBj1emgkQlUP40Pq6YMlW70IP4R7mmoGuqWNBxwSeLI71THhwCYx6JE
+         ARIPkcaIFxXLuDcw+jA7a1r58LJvt/BuQssQqgMIG5oS/N5YQD0QErg4ld8Dn2GYh5pd
+         sizQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ3OMD+coe1gI8j68B+AhD3jGfBePO6REkrMjfVLBTWjae07D7zr8GiEgjLp4qOnOAnbuzy6rI@vger.kernel.org, AJvYcCWOF7wEEqNZhO/TmJCzYI+8/s8+ekl7Y1D2DBagAHIXTj0OUvHFC2usoJDYuXI39RqkTmkXUp4i8APujQ==@vger.kernel.org, AJvYcCX+27pX3csaky6Z1TK2G4l5Y2/cJWRd5JKv+z3MsEDUBGvhs1glWb9T1PcZZkpYgM0O3/r9hAcvn/4rP3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZItJpTOvy+WfNan67krZ+/XKLrGJmgcy0VeLL2bWKfgkBrNKT
+	C8bcFT8O/eKJhZ7LRNYxJNeDbgMs88nZlGEsZjylueJEK6JnAdexvk2KxDmZ/fmihbpoaTMw5lt
+	qQ2HJv8JLf+WatZ6xugPEMbkPcIM=
+X-Google-Smtp-Source: AGHT+IFbgbPgSKYpuAnLjCIsvyOx18JpQUlHFxXiepXTjGj/OtGqmS8xC4iu66gAWy6OuCHlutJVn4fGqGobMz7ycHI=
+X-Received: by 2002:a05:690c:281:b0:6e3:2dec:6b01 with SMTP id
+ 00721157ae682-6e3d34ee42cmr22082977b3.4.1729038335194; Tue, 15 Oct 2024
+ 17:25:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <c2ac8e30806af319eb96f67103196b7cda22d562.1729031472.git.danielyangkang@gmail.com>
+ <20241016000300.70582-1-kuniyu@amazon.com>
+In-Reply-To: <20241016000300.70582-1-kuniyu@amazon.com>
+From: Daniel Yang <danielyangkang@gmail.com>
+Date: Tue, 15 Oct 2024 17:24:59 -0700
+Message-ID: <CAGiJo8Qo-uZZLLyRsq+BKfcxgcpA7B5agOzSkO5czHv6aHLStw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2 RESEND] resolve gtp possible deadlock warning
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alibuda@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
+	guwen@linux.alibaba.com, jaka@linux.ibm.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com, 
+	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 14 Oct 2024 17:05:54 +0200 Stefan Wiehler wrote:
-> +	rcu_read_lock();
->  	mrt = ip6mr_get_table(net, raw6_sk(sk)->ip6mr_table ? : RT6_TABLE_DFLT);
-> +	rcu_read_unlock();
->  	if (!mrt)
->  		return -ENOENT;
+On Tue, Oct 15, 2024 at 5:03=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Daniel Yang <danielyangkang@gmail.com>
+> Date: Tue, 15 Oct 2024 15:48:05 -0700
+> > From: Daniel Yang <danielyangkang@gmail.com>
+> >
+> > Moved lockdep annotation to separate function for readability.
+> >
+> > Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
+> > Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+>
+> This tag is bogus, why not squash to patch 1 ?
+>
+> Also, patch 1 needs Fixes: tag.
 
-presumably you're trying to protect mrt with RCU?
-so using mrt after unlocking is not right, you gotta hold the lock
-longer
--- 
-pw-bot: cr
+I wanted to split them up since D. Wythe suggested the fix when I was
+having trouble finding where the packets were being created so I
+wanted to give credit.
 
