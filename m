@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-136181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8551A9A0D11
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:44:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3665D9A0D15
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6ED11C2417D
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:44:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 682E41C241DA
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F5520C017;
-	Wed, 16 Oct 2024 14:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C51220C02B;
+	Wed, 16 Oct 2024 14:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D26D208D63;
-	Wed, 16 Oct 2024 14:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10EEC20C012;
+	Wed, 16 Oct 2024 14:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729089837; cv=none; b=JsPigZoGeVRHO0t9gXkGIBtASJ7eYVxlAdc7KyDbbyf2njnSjNqKj2iZ2shppJgkUbpCBt2Ew6H1nXX3jeNI1G7FZkO2+Ck3W53y7T0jF+SziSMRgDMOrBbKjBOEffTc5lasOZJ597T9qezCyhXE9BTNOnxqaDhTBOOpCtHFx9I=
+	t=1729089868; cv=none; b=ssK/YvQy/3ui4iHSFmkKa68H09N8N95tpvxvhFBC2Oo0CRC83GC/Oy58FbOUQpfI6CtKATXnI5Ub4ZSY1uuznIdUEEW2IQff46cCk3RZDHhBTT7xGIYtTUjRYoefCWABQvibf2KZfJ5h1lnCYhOxDuJE0G7yC7M6PhnAHLnRHlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729089837; c=relaxed/simple;
-	bh=JiVa5/90/cZvb2+61ERpg3MxggQZczhhtMnM0mhJmMw=;
+	s=arc-20240116; t=1729089868; c=relaxed/simple;
+	bh=GD9ZIVfEWNFVbxGWqL+Z2BFFxwhZ+TB8F6JoPexbAJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTi/PW1VzuGjkipxF/Jo5uGVhh+qSoHAqa3XwQ3H3Ghx8CNhU/1/UP9a3h4XycmCTRVhL3JmtJp24E0hvH0zve1pxEx0Ty491lRRgAoqst9NI2/pS90IWRdLj1T9NoHqICrMEm03t4pwJPL+nGPz0ssY3FTpwJSoBusXQhIXJNI=
+	 In-Reply-To:Content-Type; b=ZmZRucbR00a9kSW//QOQcTBLk4SEGdr+0WTwybk59yhX+NSUWErxzKGESa3WckRihyXwImvq9P3YjNEXSCpbV693vktDl9kJUbthieWKX+VE0tQCVIsE1c07AlaWe5PJe1e2+nt4VIPDXTCBctvJGfC62yjWKspfL1yG2FBb2Eg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FD381007;
-	Wed, 16 Oct 2024 07:44:25 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E13BF1007;
+	Wed, 16 Oct 2024 07:44:55 -0700 (PDT)
 Received: from [10.1.28.177] (XHFQ2J9959.cambridge.arm.com [10.1.28.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D5FBD3F71E;
-	Wed, 16 Oct 2024 07:43:51 -0700 (PDT)
-Message-ID: <456ea437-fe6c-474f-bd9f-583c6fce9151@arm.com>
-Date: Wed, 16 Oct 2024 15:43:50 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84AB63F71E;
+	Wed, 16 Oct 2024 07:44:22 -0700 (PDT)
+Message-ID: <6463a9f9-76ee-48bc-9173-75b220fcb3ac@arm.com>
+Date: Wed, 16 Oct 2024 15:44:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 27/57] net: e1000: Remove PAGE_SIZE compile-time
+Subject: Re: [RFC PATCH v1 28/57] net: igbvf: Remove PAGE_SIZE compile-time
  constant assumption
 Content-Language: en-GB
 To: "David S. Miller" <davem@davemloft.net>,
@@ -61,9 +61,9 @@ Cc: intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org
 References: <20241014105514.3206191-1-ryan.roberts@arm.com>
  <20241014105912.3207374-1-ryan.roberts@arm.com>
- <20241014105912.3207374-27-ryan.roberts@arm.com>
+ <20241014105912.3207374-28-ryan.roberts@arm.com>
 From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <20241014105912.3207374-27-ryan.roberts@arm.com>
+In-Reply-To: <20241014105912.3207374-28-ryan.roberts@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
@@ -93,27 +93,27 @@ On 14/10/2024 11:58, Ryan Roberts wrote:
 > Any confused maintainers may want to read the cover note here for context:
 > https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
 > 
->  drivers/net/ethernet/intel/e1000/e1000_main.c | 6 ++----
+>  drivers/net/ethernet/intel/igbvf/netdev.c | 6 ++----
 >  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-> index ab7ae418d2948..cc14788f5bb04 100644
-> --- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-> +++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-> @@ -3553,12 +3553,10 @@ static int e1000_change_mtu(struct net_device *netdev, int new_mtu)
->  
->  	if (max_frame <= E1000_RXBUFFER_2048)
->  		adapter->rx_buffer_len = E1000_RXBUFFER_2048;
+> diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
+> index 925d7286a8ee4..2e11d999168de 100644
+> --- a/drivers/net/ethernet/intel/igbvf/netdev.c
+> +++ b/drivers/net/ethernet/intel/igbvf/netdev.c
+> @@ -2419,12 +2419,10 @@ static int igbvf_change_mtu(struct net_device *netdev, int new_mtu)
+>  		adapter->rx_buffer_len = 1024;
+>  	else if (max_frame <= 2048)
+>  		adapter->rx_buffer_len = 2048;
 > -	else
-> -#if (PAGE_SIZE >= E1000_RXBUFFER_16384)
-> +	else if (PAGE_SIZE >= E1000_RXBUFFER_16384)
->  		adapter->rx_buffer_len = E1000_RXBUFFER_16384;
-> -#elif (PAGE_SIZE >= E1000_RXBUFFER_4096)
-> +	else if (PAGE_SIZE >= E1000_RXBUFFER_4096)
->  		adapter->rx_buffer_len = PAGE_SIZE;
+> -#if (PAGE_SIZE / 2) > 16384
+> +	else if ((PAGE_SIZE / 2) > 16384)
+>  		adapter->rx_buffer_len = 16384;
+> -#else
+> +	else
+>  		adapter->rx_buffer_len = PAGE_SIZE / 2;
 > -#endif
 >  
 >  	/* adjust allocation if LPE protects us, and we aren't using SBP */
->  	if (!hw->tbi_compatibility_on &&
+>  	if ((max_frame == ETH_FRAME_LEN + ETH_FCS_LEN) ||
 
 
