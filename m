@@ -1,104 +1,166 @@
-Return-Path: <netdev+bounces-136017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A10499FF92
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:38:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D00D99FFA1
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB2E1C24447
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:38:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E77571F21A6F
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7252175D44;
-	Wed, 16 Oct 2024 03:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDF717BEC7;
+	Wed, 16 Oct 2024 03:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSWt+MhC"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JqdLQPKH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F7F157A41;
-	Wed, 16 Oct 2024 03:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EEC148FED;
+	Wed, 16 Oct 2024 03:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729049914; cv=none; b=BOg/gRdsk4GLMhvW2qR50qWRKSS0Wvkd/URLBkt5L76NArfPyULDTcfpTz5rZtKcafKZz1QuOkbLUHxKF5h48Fc3TKUKPQvxadMuOg9Ahcb3lvYFpmVs8IfeSpcbzgIEfIhZ7VjPa2QgKVTmv1N1OB/1jgCJw6dH5l3z4KxNJIU=
+	t=1729050281; cv=none; b=kedo6D987Ioi3pCYuptL/iXZkkZM9goRKDNHt2b59q7X4sizenDoOsjs3QIAUj7KOxdmiE8tNZ1JBX/kY3fIA5A/Z/xFULPBf/RWkmvhBq51F7DmsNqOCVWl9SNAz8tS39+ypMVBLWqPw6a5buacmNgMENtOYDBaxAcOa2n5kO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729049914; c=relaxed/simple;
-	bh=IiwQTOReGpHpyc57pvtjEfBBpq/82DCVCZB2+aVwLdo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FmFIIoy4YIcQERG+UfXf7Wz4TmNnXc91BXGzDzg7W9qRwexEGozAtM41j1XQEx0Qt23Or2AaveCsT7ZhlCNoKrQ3wAbOUsFgYZ7orqI7ZeNOXdP5smAkgkBfnlW8fBU/CdbzLHYqRQFlIyVPJv7C/hLeSrfmF3qjtmpYHWCC1Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSWt+MhC; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2e2ed59a35eso4541182a91.0;
-        Tue, 15 Oct 2024 20:38:33 -0700 (PDT)
+	s=arc-20240116; t=1729050281; c=relaxed/simple;
+	bh=XKIX/PPjlVjz+E9X1RtcSZEjQ2SxFf5rGp/JXYet2g0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DVt1B4duxAYpDvF5IgFE04Etr/j9IvoeuWQguTlbLvkkUFBR/4dyAt0e8BfGIrhDX1nrjfRIny1SDscqrgTewmmfyeQUAjfN/i8J6L04uix90wqxkdEKRYeJsEyyT7JfRpugrGDDNpttQ+0elR3YNi4WZLrMWBrOtO7PRXJX23I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JqdLQPKH; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729049913; x=1729654713; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YOVrKg3W/lMlewNmiQ2TbyPettlnm3jdFbJlR9Wuzis=;
-        b=aSWt+MhCTgL6gSM7aaA3pChsAp0I3xOz3LvjV2iqhchJeaEjqHBpmEjb3UW8WesN8n
-         y9H3YCMnvh2IE2BTuORQJHnd6sg2For8tYpo0YwDIWoYxC5agnm61uWd9sAic8ZRlP+T
-         T2w9exAVimTzKkyQtNg4hUHIHuyAlGyJFfGPHttxyh7WUO01UdxkqLjtGPgcYYDsrz/E
-         lbcefe8QL9E3Tor1tHZG5jhTEf85lkGNqvxAbPCsCv6C/eqqTWn8/nfTWbPC2Pl0qzUc
-         sTBWYdokdMs3x+0dit2mFvVqKkvp8NSGYdancnYyseGp1FMImZNo86K5AUNxZkkgWyM1
-         +9Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729049913; x=1729654713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YOVrKg3W/lMlewNmiQ2TbyPettlnm3jdFbJlR9Wuzis=;
-        b=M0PbqqcmEAAAOYMdPa+lKb6x9MKjB+zYuutVLoS1Rs58tvAtPtEdBf0fO33pHsro+5
-         1Wamdmhbp9CG5BQQQ7v5wg4PnwwSYWVWPvGvPYbcpUDsONQEqs5/cD4H0Gz/FAOUlBvK
-         vckW4Pc+8IijOdRW1IC3PG0GdqdliICnjEIEkcYvILbLBg7w55VJPgC3Iw8O6M+7loE7
-         NX+5Q+zWjrvbDngrzUETrxdl4lT40i0vNKLxangz25pNW4+jVBV8lwbmkhn19I6TV1Wr
-         XUj8IbfsoXkWSV4WCcTapg47j/crFnP30WJBY3xDX8WfHZBfGo7tZbyXjlvF2wtuk1L/
-         AxHw==
-X-Forwarded-Encrypted: i=1; AJvYcCWF6R4xpnODEr6idnxyrHl7KFyvgLoPK/ZRqFtehzFlCRUNhOqx/kD5Sunv6rQ/1z7kDIkcza6w@vger.kernel.org, AJvYcCWOfZZ3ZnKi2CFd/8eJYTZK3b6zxL4jmJvfddGYFTtC4qfCnpp+giRH2m6A6nT5b8UGUuC1ooz/c5o3rA==@vger.kernel.org, AJvYcCWT+cmq9BGdMsItcojo8xYULKvIcPPBO3NE2Zpyy5MVakQ20hYQVshNTdH03NBQwbXapE6fhgJfM4VBsmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK3PJvOMezCvMLw+ZL7/1c3hfwT9UBlPCVnip4kNMXXfGJkLUB
-	wEcROUUIGe+jR8/fyeVBYzX1ashc9yGwq3pqrOHMQRNnwk27K0+HPPzlmQ==
-X-Google-Smtp-Source: AGHT+IE3vnWlR7rGXqBZsgmkw8xrNg/Q9W20jINBB6XcWIz0wpEmNiY/PEfBGkaLCcIUlyXo+pNhCA==
-X-Received: by 2002:a17:90a:e7c4:b0:2e2:d82b:d144 with SMTP id 98e67ed59e1d1-2e3ab8e2885mr3170552a91.37.1729049912721;
-        Tue, 15 Oct 2024 20:38:32 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e392e8ce39sm2832641a91.12.2024.10.15.20.38.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 20:38:32 -0700 (PDT)
-Date: Tue, 15 Oct 2024 20:38:30 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
-	Yangbo Lu <yangbo.lu@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
-Message-ID: <Zw81Nlx9OF-PveY0@hoboy.vegasvil.org>
-References: <20241015084728.1833876-1-svens@linux.ibm.com>
- <20241015084728.1833876-3-svens@linux.ibm.com>
- <c9c1c660-9278-426c-9290-b9b0cb76dcaf@lunn.ch>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729050280; x=1760586280;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kTefGyhsaXlGrGMS7ueF3RA+bgVcym7IGr4Wg2bFR9I=;
+  b=JqdLQPKH73Q5WoRRI58pyV+H8jZVNqN6jZZ01l+Em7lpLkPkhIOpx2BV
+   s2XzaXqimlEvxV3ijWx3c5rZEEwnWS8x6RIpOZNF3DeHgcq4Cf4pr/x8D
+   l4H4KtCZqfibvzAHNKttIRCRzeG0AsKvS5yO77xJ3NNK1+rZbkbsmGwIA
+   g=;
+X-IronPort-AV: E=Sophos;i="6.11,207,1725321600"; 
+   d="scan'208";a="343490900"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 03:44:38 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:55992]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
+ id 70b42be6-3f9e-4b52-a24f-c1fbff175f87; Wed, 16 Oct 2024 03:44:37 +0000 (UTC)
+X-Farcaster-Flow-ID: 70b42be6-3f9e-4b52-a24f-c1fbff175f87
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 16 Oct 2024 03:44:37 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 16 Oct 2024 03:44:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gustavoars@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kees@kernel.org>, <kuba@kernel.org>,
+	<linux-hardening@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH 4/5][next] uapi: net: arp: Avoid -Wflex-array-member-not-at-end warnings
+Date: Tue, 15 Oct 2024 20:44:29 -0700
+Message-ID: <20241016034429.90455-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <f04e61e1c69991559f5589080462320bf772499d.1729037131.git.gustavoars@kernel.org>
+References: <f04e61e1c69991559f5589080462320bf772499d.1729037131.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c9c1c660-9278-426c-9290-b9b0cb76dcaf@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Oct 15, 2024 at 02:43:28PM +0200, Andrew Lunn wrote:
->  * @name:      A short "friendly name" to identify the clock and to
->  *             help distinguish PHY based devices from MAC based ones.
->  *             The string is not meant to be a unique id.
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Date: Tue, 15 Oct 2024 18:32:43 -0600
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
 > 
-> If the name is not unique, you probably should not be using it for
-> udev naming.
+> Address the following warnings by changing the type of the middle struct
+> members in a couple of composite structs, which are currently causing
+> trouble, from `struct sockaddr` to `struct sockaddr_legacy`. Note that
+> the latter struct doesn't contain a flexible-array member.
+> 
+> include/uapi/linux/if_arp.h:118:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> include/uapi/linux/if_arp.h:119:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> include/uapi/linux/if_arp.h:121:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> include/uapi/linux/if_arp.h:126:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> include/uapi/linux/if_arp.h:127:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Also, update some related code, accordingly.
+> 
+> No binary differences are present after these changes.
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+>  include/uapi/linux/if_arp.h | 18 +++++++++---------
+>  net/ipv4/arp.c              |  2 +-
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/uapi/linux/if_arp.h b/include/uapi/linux/if_arp.h
+> index 4783af9fe520..cb6813f7783a 100644
+> --- a/include/uapi/linux/if_arp.h
+> +++ b/include/uapi/linux/if_arp.h
+> @@ -115,18 +115,18 @@
+>  
+>  /* ARP ioctl request. */
+>  struct arpreq {
+> -	struct sockaddr	arp_pa;		/* protocol address		 */
+> -	struct sockaddr	arp_ha;		/* hardware address		 */
+> -	int		arp_flags;	/* flags			 */
+> -	struct sockaddr arp_netmask;    /* netmask (only for proxy arps) */
+> -	char		arp_dev[IFNAMSIZ];
+> +	struct sockaddr_legacy	arp_pa;		/* protocol address		 */
+> +	struct sockaddr_legacy	arp_ha;		/* hardware address		 */
+> +	int			arp_flags;	/* flags			 */
+> +	struct sockaddr_legacy	arp_netmask;    /* netmask (only for proxy arps) */
+> +	char			arp_dev[IFNAMSIZ];
+>  };
+>  
+>  struct arpreq_old {
+> -	struct sockaddr	arp_pa;		/* protocol address		 */
+> -	struct sockaddr	arp_ha;		/* hardware address		 */
+> -	int		arp_flags;	/* flags			 */
+> -	struct sockaddr	arp_netmask;    /* netmask (only for proxy arps) */
+> +	struct sockaddr_legacy	arp_pa;		/* protocol address		 */
+> +	struct sockaddr_legacy	arp_ha;		/* hardware address		 */
+> +	int			arp_flags;	/* flags			 */
+> +	struct sockaddr		arp_netmask;    /* netmask (only for proxy arps) */
 
-+1
+I think we can use _legacy here too, 14 bytes are enough for ARP.
 
-Maybe the name is unique for s390, but it will not be in general.
+But whichever is fine to me because arpreq_old is not used in
+kernel, so
 
-Thanks,
-Richard
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+>  };
+>  
+>  /* ARP Flag values. */
+> diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
+> index 11c1519b3699..3a97efe1587b 100644
+> --- a/net/ipv4/arp.c
+> +++ b/net/ipv4/arp.c
+> @@ -1185,7 +1185,7 @@ static int arp_req_get(struct net *net, struct arpreq *r)
+>  
+>  	read_lock_bh(&neigh->lock);
+>  	memcpy(r->arp_ha.sa_data, neigh->ha,
+> -	       min(dev->addr_len, sizeof(r->arp_ha.sa_data_min)));
+> +	       min(dev->addr_len, sizeof(r->arp_ha.sa_data)));
+>  	r->arp_flags = arp_state_to_flags(neigh);
+>  	read_unlock_bh(&neigh->lock);
+>  
+> -- 
+> 2.34.1
 
