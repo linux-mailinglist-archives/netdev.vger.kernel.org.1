@@ -1,146 +1,252 @@
-Return-Path: <netdev+bounces-136206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B2B29A1094
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 19:27:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5462D9A10C3
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 19:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 439651C21900
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 17:27:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAF301F22957
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 17:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31B520FAA7;
-	Wed, 16 Oct 2024 17:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EEA2101A1;
+	Wed, 16 Oct 2024 17:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHy9yOHP"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ir7ndUXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2078.outbound.protection.outlook.com [40.107.237.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C66B20C487
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 17:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729099638; cv=none; b=JPhS3WV453iW1DdZrPrirk67o9ZO7HUtVnPegq/zJT/mlj1d+1TYA2jEhNmB7N8MN7ivMkwmT5rYmtNXagdPPuCQWk9D8X+hzRAZs4YxuWWUt0yEbiHEQv+UFSkfbEnZHW7oWkrprXMO+IMwkq6A4ULw3Os18E/pZmGWHjHOf6Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729099638; c=relaxed/simple;
-	bh=fzLmjTYv50o4SO1uhihHDhxEFGjJN+CktGLAz3N15Yg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=A0DtGnVKq9j5uphvK6t7Z8GLM8hVLzF79xzN4a756ktc9j85mqswqUk+Ffg3keih9UibudOqN0V6oAn8Z6N+rRq0P7L/nPziuR/0dZat+5JR55U29ME19U6C9icKlBqONJSjO6yAG96M25R16cIi5BX3ePF8NVV0V1t/dFCk7Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XHy9yOHP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729099636;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=mm9TWMoNEKmC5/H75qa50GgVA8uFrq/T9r2miRc0UHg=;
-	b=XHy9yOHPLqIiocxvFjK6TfjEy8wBdj6JDs10vNRPgWxzPQoDA7tvjoLPGQlMHx+YU/Zd6e
-	2THAD6/wZ06L/KOMUiz9PzIXA424vhQCfwawx9ulbKzgyAeTFfUpLGiHH+ml9h2ryBgxnH
-	983M4vLbv/gjwHk1q59+kY3feESz+7k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-H_ZyJT4YMwmlUk4xjKhoHQ-1; Wed, 16 Oct 2024 13:27:14 -0400
-X-MC-Unique: H_ZyJT4YMwmlUk4xjKhoHQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d3e8dccc9so1245f8f.1
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 10:27:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729099633; x=1729704433;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mm9TWMoNEKmC5/H75qa50GgVA8uFrq/T9r2miRc0UHg=;
-        b=d+1gF2nxl4s+BnRxYweRBSZwRnuybFo42N9ZFcCLGuhyqcjK9P6wgeOuNZbrqco+tD
-         d0nawz3wijZbPpKQosdhKseV/fqITqcskuqi5hWJUOAGlhY1Ka8yjQ9ooDw1ymfQlKzN
-         mYytIcq+C8PQ0JLECJJBaEDaACrP8W2L+CGVHb3D5/NtPbHd37nZzr8wJbSEIw5rBYA/
-         gk2PvY20FGwwSZQhRHNlLs1hN7UlzxtlMX/9eMyk5d8HDpOXSd762dXxnIZN2Ydvy24D
-         b3WiTmp98ZVkRde9nMjzWeDxE+2MsrP55Uy9FuAFPr95cdjh8V66jmnLjDvHPznwvDQf
-         Krrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWyOZZl3xtgB28dnueZtyp0BRIjvpfC7I3c0fyQj/racdL18FShUaSv+zNXcn/c2PRfbIJlPrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzXYYTVSBOKzhaFdQEpoxa1vYvicwk8djygedDum9OWrgGzcSz
-	qFF2rsPajQHIiUdNbrUTfdmfaLxVxdZj2AaLu4NVqvH5gJtF/myEnGwbzsQPUSmaUjpH8UG4JvK
-	h/Hq8RVJU5vNzUQyeGx1uSHysh7Ca28lPl8lLfMfkjSj+NQm5Nxr7Qw==
-X-Received: by 2002:a5d:6703:0:b0:37d:4dd5:220f with SMTP id ffacd0b85a97d-37d551fba84mr12804132f8f.26.1729099633369;
-        Wed, 16 Oct 2024 10:27:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF/2kqVFlb2DtsXVfaMvtF8YMmP+fSHaEOFSLeUgaj7tCoSNI0g7YeZxeafsJNPE7r4ODqUXg==
-X-Received: by 2002:a5d:6703:0:b0:37d:4dd5:220f with SMTP id ffacd0b85a97d-37d551fba84mr12804117f8f.26.1729099632938;
-        Wed, 16 Oct 2024 10:27:12 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:174:b9f1:592:644a:6aa0:615c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fc445fesm4832875f8f.113.2024.10.16.10.27.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 10:27:12 -0700 (PDT)
-Date: Wed, 16 Oct 2024 13:27:07 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: "Colin King (gmail)" <colin.i.king@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: [PATCH] virtio_net: fix integer overflow in stats
-Message-ID: <53e2bd6728136d5916e384a7840e5dc7eebff832.1729099611.git.mst@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF3A18660A
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 17:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729100241; cv=fail; b=WEuAs5nZ4fHbSK8Tb1qnNpG8DQ8Iu2m+mFH9rQxWc3yxP5Ct9UiQ6pOoNdS68sh2wnIHkYkctVksax6Xxnj3psWry1dDkYvBx5Mwowl7ePJxgZA+HHV1B7iRyXS/oSsGY8bQxeqhOW4otedtMFEXTeT4YiPxKL7eec/C6PEAwxI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729100241; c=relaxed/simple;
+	bh=0XX1Srr05XvdZrBpJ7KCiqIjDCznR/0++qYNN6wAWXs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=APieKhMR15/tMCxe44v8wWlrN7ZiMhmqnVvLUZ2MN2RLthaMmf4Eh0p8fxhpDrlZgkqHTtcW5daB9zq/a3pci0oGjR19GZ5OPmbzCpfXTU1I+QMhYVuUeZPj9q3epcHI3vq4Tq8ZaFwKQVuotpexqz4CsB/ipTvEkUaRnS5NpJs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ir7ndUXd; arc=fail smtp.client-ip=40.107.237.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XXM1NN88/kkARQX5lTryuy8QZYLN6geqPTEA9KDfnOpl4EneGQiZtRJ3W+B5WG5oWzr+fo32+zGFExArci9xR+YFujZTxZ702AzinhXl+Kyrl/M2eKqcGO0axytjXjirzqWk9dNTQXEUoOJh0mg18RSb07GsgL3yRK7uKR9tOOMbcjyCCvFxbLD9or8TN/pjebr+ZBnMWYXSjJY1EwAqpfaUNEQFK+qqdNs9HgFPKeUOuFC5YJ7m8lSx2foioni6hUe1FzM3o14QhXUJa8uIwT729RdsKdRvHv7joY2Fib3KVw9bMszTGvS8KOjO6AQ13hMd3MNBnuNqXZbRGeDCUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B/sM26cgFuys+5OHimnAL3/AnvQrTGJXro/CUkgXMMs=;
+ b=YMS6u6EdHbscI/282BhXWcxtHiuXBljTlH8C+AXm8rc8IDRsMA6NrgKLv835/10r3zxt9J4+yD3XTsNEXTGKeHSf+Ux1cI9sosCaNw5GLra5qCb2WeW0nt+UoKoYynQ5HRDGyxo70pVuTbC303+iRM9I2wlgA8f2dPMnj2c2pTIJIeKCnaLOCIg15kMQfnO4VQK4QfxG/giTZkis/eOphlN52ebuU72UV1r/GIH0GrElKY8mMtu0UWukYhlC9h9lX/ItchmVKXBvqXmVlqjyRA4EkR5yfWF5XTeu41OoHV9N9JWEbKmsdoKUpLLrf8BGgSFJao87zXdKpOjJAtfbrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B/sM26cgFuys+5OHimnAL3/AnvQrTGJXro/CUkgXMMs=;
+ b=Ir7ndUXdFNMzRrt8hX4cGURHg9OCi4TwhFUfuFVrIoHjF+u81lb8w2stLoB97bq1s3LiWsf9JwYwcKjLczn8R3eUAkqMrf9YSsaEC8G0wpeqhdM++IGccOCpI9lDZbICnP25vwZsAdokf47ZtdZrrnxy++I8MCojRmHkN98iGILVB/8lPHWYT9xZ1IqDkvA5CsiIPjAerb0dmA2zOC4SbIxxnfk5eU9Om9m7dxKuqzXXhJob3i4/bB62TOk3lR6IXnEXPDvuCkLjzEZ2sd4cab4z36nh2o37LF5mhA0O358jaiQHqdb9AxCFzC2Trbht/0clrxNqAAa5CobgNgAeOg==
+Received: from BY5PR03CA0010.namprd03.prod.outlook.com (2603:10b6:a03:1e0::20)
+ by LV3PR12MB9144.namprd12.prod.outlook.com (2603:10b6:408:19d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Wed, 16 Oct
+ 2024 17:37:13 +0000
+Received: from SJ5PEPF00000206.namprd05.prod.outlook.com
+ (2603:10b6:a03:1e0:cafe::49) by BY5PR03CA0010.outlook.office365.com
+ (2603:10b6:a03:1e0::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.17 via Frontend
+ Transport; Wed, 16 Oct 2024 17:37:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SJ5PEPF00000206.mail.protection.outlook.com (10.167.244.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8069.17 via Frontend Transport; Wed, 16 Oct 2024 17:37:13 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 16 Oct
+ 2024 10:37:05 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 16 Oct 2024 10:37:05 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 16 Oct 2024 10:37:02 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, <cjubran@nvidia.com>,
+	<cratiu@nvidia.com>, Simon Horman <horms@kernel.org>, Daniel Machon
+	<daniel.machon@microchip.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next V3 00/15] net/mlx5: Refactor esw QoS to support generalized operations
+Date: Wed, 16 Oct 2024 20:36:02 +0300
+Message-ID: <20241016173617.217736-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000206:EE_|LV3PR12MB9144:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47ec0779-4aea-4a56-3152-08dcee092b70
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SjVERi8wRm95NG9UYlhNc2Z5ditkRUxqTUlsR0tDUUNCRElBL2hEUnZGb0JB?=
+ =?utf-8?B?U25aUnkrd1BWcXZxL1hMbXlxLzFXaHJaWWFvVXAvNkxobGtKekx1QmNDYVlF?=
+ =?utf-8?B?d2VTWUNQWVlPUEZiL0dVRmxvSWpBb20zaHRzNUw2cnAvMmxlNnZWMWwwZ3RJ?=
+ =?utf-8?B?RC9ZcHBjeWxaRVZyYklxSGdhMkltenNKcnI1cDNiNFJKTmJqVTNwTU1KU1R6?=
+ =?utf-8?B?Sm5jcElOa0dLd1h3aitoTXQvVFRMVzdKSXFJaUNTRUtjazRaaWFmaTZvYm0r?=
+ =?utf-8?B?MEhEanBZYkVJeFVIeVJTckhxTE9yV09KVGpHUE04bW0rMVV2clg1ZGZuMWRv?=
+ =?utf-8?B?c3U4N21zS0FpeDRDUnhTSmRGeEJVVHJJNkxPQXptc2xHaVJ2bm10K1h1VUU4?=
+ =?utf-8?B?TnFFSDVTRTBjanZkaGtIRENuR0NNRlBKVms1bEhhdzdQdXhvVFBoQk9VbDFK?=
+ =?utf-8?B?SWlKY3FEZlR6SUczTmRSNW44ZWgwWGY0SHlPN2pXRE0reG1zcFF2My9lRjh6?=
+ =?utf-8?B?d29qcUI2LzFNWXpjanBOMFVQaDJPeDNZME1hbXM1cktTaXhaSXVsc2xpNGEr?=
+ =?utf-8?B?MHlVbHVTM3JKZjdnY3RyRFlUQWo2bmx2NnhScWRWU01WaG04TkFKYUNLemRF?=
+ =?utf-8?B?YWYzNS9VUFdBWEltblNRTGNDMk5SWXVQc1FVMGZUcFpvNUUwMXRBWjgvbFFN?=
+ =?utf-8?B?ZjdXclNNazJZM1VabEJRaWlCSWtvNHdvTDl5ZUI5N3VnWDE2RVNHQkVKS284?=
+ =?utf-8?B?L1JGVVhjRU0yUmpPbVRtWFkraXQ3SEJuTUdrUXpnbHppRWhnR2VyVWdwMEt1?=
+ =?utf-8?B?SmxZUnlFeWo4MFNwQ0hWcktMMlh0b1pmSGU1TWZVcmh2TzZHNEJKbE5HQkJp?=
+ =?utf-8?B?dzcwbUxEYjZ5Q3dmNzQwZndtN1FuR3VDdjBMSFp6YXFEQmhMQ2ltMWIwTTVJ?=
+ =?utf-8?B?SXZTQ1NqQ2VBSlZVUE5ZME5HVkJ3ckRtVVg1MEN0RzNXM1FhZWRrZm5ockFz?=
+ =?utf-8?B?N08yV1NwSHc4NWJHSU00anNxT0RVcGpmT0dtamhkS0pQNnNnQko0OCs5dU1k?=
+ =?utf-8?B?aEpsNWQwZ3FIc2JTeVlic1pqeUJ3UVRNeHJkcHR6RUJiYm5aZGNsT2ZZZC9Y?=
+ =?utf-8?B?QkVTWXFYWFQxazRkblhPaXZ4RktNNWEwYU1vNG1TK3F2SjhlMGI1ODV5aENZ?=
+ =?utf-8?B?d0ltbTMrZVc3TjZocURZaGx0bHh5dUhLQWFKaG9RaW1SM3dDVmNsL09ucjM0?=
+ =?utf-8?B?ZUxDYUVSdkNoWU5hNlNKNmdUd29qSjRyQ2tyaVl4TXhUY2Z6Nzd0dnFMdGxs?=
+ =?utf-8?B?Vnd3SWdhOTU3bzNqMCt2Um5wY3QybUFxMEE4MHdnRmczQW94U2NRRlkvYU5w?=
+ =?utf-8?B?VmV5eGh4bktsbGJYTmRvWUFzdVQ3dHkxdWNPeGNnMGFEMlhCS2lWcGlRUS8w?=
+ =?utf-8?B?KzBwN3M3anBJMC9pVC9GblNQTENqSndEVGVkT3c5WDd3bVp3MHRyMURlUmEw?=
+ =?utf-8?B?MUZuaklYZXM0emg5akIzZzdERXE2NU5jcDZuU3hNeTQ0TkVFd1dUTnFIcVY1?=
+ =?utf-8?B?UTVGM2ZEL0Y5YXNWOEZBVytyZVhZUFBXenZSL2FoL0E1Z3FTMUF6Zmw2aGYw?=
+ =?utf-8?B?ZHhoMWZWcTRWWGk5VlFCK3ZjNG1CZGxBRnVPVTgwNzh6K3JqakpwU211a2xW?=
+ =?utf-8?B?Yng3UVpMWjNSQ0FnZngrVFhLaGtOc20zUjZHTm5vWlFMV05vVEZMQ0VDRC94?=
+ =?utf-8?B?dzlFN3VBS2VscXZpYitadVEvaWNreThVSExCS3hDOGU2M3Jjdk5ZZXpmLzhx?=
+ =?utf-8?B?V2pUT2I3RVBmMXNRaVFFclVzOEhlWFF0Nmp5ckdEMVM0V1Bzc2xwNTROUEhp?=
+ =?utf-8?Q?Xcjb3N6Pkoap4?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 17:37:13.0500
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47ec0779-4aea-4a56-3152-08dcee092b70
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF00000206.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9144
 
-Static analysis on linux-next has detected the following issue
-in function virtnet_stats_ctx_init, in drivers/net/virtio_net.c :
+Hi,
 
-        if (vi->device_stats_cap & VIRTIO_NET_STATS_TYPE_CVQ) {
-                queue_type = VIRTNET_Q_TYPE_CQ;
-                ctx->bitmap[queue_type]   |= VIRTIO_NET_STATS_TYPE_CVQ;
-                ctx->desc_num[queue_type] += ARRAY_SIZE(virtnet_stats_cvq_desc);
-                ctx->size[queue_type]     += sizeof(struct virtio_net_stats_cvq);
-        }
+This patch series from the team to mlx5 core driver consists of one main
+QoS part followed by small misc patches.
 
-ctx->bitmap is declared as a u32 however it is being bit-wise or'd with
-VIRTIO_NET_STATS_TYPE_CVQ and this is defined as 1 << 32:
+This main part (patches 1 to 11) by Carolina refactors the QoS handling
+to generalize operations on scheduling groups and vports. These changes
+are necessary to support new features that will extend group
+functionality, introduce new group types, and support deeper
+hierarchies.
 
-include/uapi/linux/virtio_net.h:#define VIRTIO_NET_STATS_TYPE_CVQ (1ULL << 32)
+Additionally, this refactor updates the terminology from "group" to
+"node" to better reflect the hardware’s rate hierarchy and its use
+of scheduling element nodes.
 
-..and hence the bit-wise or operation won't set any bits in ctx->bitmap
-because 1ULL < 32 is too wide for a u32.
+Simplify group scheduling element creation:
+- net/mlx5: Refactor QoS group scheduling element creation
 
-In fact, the field is read into a u64:
+Refactor to support generalized operations for QoS:
+- net/mlx5: Introduce node type to rate group structure
+- net/mlx5: Add parent group support in rate group structure
+- net/mlx5: Restrict domain list insertion to root TSAR ancestors
+- net/mlx5: Rename vport QoS group reference to parent
+- net/mlx5: Introduce node struct and rename group terminology to node
+- net/mlx5: Refactor vport scheduling element creation function
+- net/mlx5: Refactor vport QoS to use scheduling node structure
+- net/mlx5: Remove vport QoS enabled flag
 
-       u64 offset, bitmap;
-....
-       bitmap = ctx->bitmap[queue_type];
+Support generalized operations for QoS elements:
+- net/mlx5: Simplify QoS scheduling element configuration
+- net/mlx5: Generalize QoS operations for nodes and vports
 
-so to fix, it is enough to make bitmap an array of u64.
+On top, patch 12 by Moshe handles FW request to move to drop mode.
 
-Fixes: 941168f8b40e5 ("virtio_net: support device stats")
-Reported-by: "Colin King (gmail)" <colin.i.king@gmail.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In patch 13, Benjamin Poirier removes an empty eswitch flow table when
+not used, which improves packet processing performance.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c6af18948092..b950d24b1ffa 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4112,7 +4112,7 @@ struct virtnet_stats_ctx {
- 	u32 desc_num[3];
- 
- 	/* The actual supported stat types. */
--	u32 bitmap[3];
-+	u64 bitmap[3];
- 
- 	/* Used to calculate the reply buffer size. */
- 	u32 size[3];
+Patches 14 and 15 by Moshe are small field renamings as preparation for
+future fields addition to these structures.
+
+Series generated against:
+commit c531f2269a53 ("net: bcmasp: enable SW timestamping")
+
+Regards,
+Tariq
+
+V3:
+- Fixed potential NULL dereference for vport sched_node.
+- Updated the check in esw_qos_normalize_min_rate to stop on leafs.
+
+V2:
+- Declared int err separately to fix the type mismatch with u32.
+- Fixed potential NULL dereference in the node allocation error path.
+- Removed "rate_node" renamings, as it referred to the old "rate_group".
+- Replaced 0 with NULL in mlx5_esw_qos_vport_get_parent.
+- Fixed vport node allocation error path.
+- Initialized dev in mlx5_esw_qos_vport_disable.
+- Access vport_node->esw directly where possible.
+
+
+Benjamin Poirier (1):
+  net/mlx5: Only create VEPA flow table when in VEPA mode
+
+Carolina Jubran (11):
+  net/mlx5: Refactor QoS group scheduling element creation
+  net/mlx5: Introduce node type to rate group structure
+  net/mlx5: Add parent group support in rate group structure
+  net/mlx5: Restrict domain list insertion to root TSAR ancestors
+  net/mlx5: Rename vport QoS group reference to parent
+  net/mlx5: Introduce node struct and rename group terminology to node
+  net/mlx5: Refactor vport scheduling element creation function
+  net/mlx5: Refactor vport QoS to use scheduling node structure
+  net/mlx5: Remove vport QoS enabled flag
+  net/mlx5: Simplify QoS scheduling element configuration
+  net/mlx5: Generalize QoS operations for nodes and vports
+
+Moshe Shemesh (3):
+  net/mlx5: Add sync reset drop mode support
+  net/mlx5: fs, rename packet reformat struct member action
+  net/mlx5: fs, rename modify header struct member action
+
+ .../mellanox/mlx5/core/en/tc/ct_fs_smfs.c     |   4 +-
+ .../mellanox/mlx5/core/esw/devlink_port.c     |   2 +-
+ .../mlx5/core/esw/diag/qos_tracepoint.h       |  53 +-
+ .../ethernet/mellanox/mlx5/core/esw/legacy.c  |  27 +-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 669 +++++++++---------
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.h |   3 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |   2 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  25 +-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.h |   4 +-
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    |   9 +-
+ .../mellanox/mlx5/core/steering/fs_dr.c       |  35 +-
+ 11 files changed, 435 insertions(+), 398 deletions(-)
+
 -- 
-MST
+2.44.0
 
 
