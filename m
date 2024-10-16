@@ -1,114 +1,112 @@
-Return-Path: <netdev+bounces-136029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1331599FFDD
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:03:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84CF399FFF7
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:08:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34DD11C23BB2
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 04:02:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB669B22B2D
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 04:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8E41537C8;
-	Wed, 16 Oct 2024 04:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8F51714BD;
+	Wed, 16 Oct 2024 04:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMXt/G2T"
+	dkim=pass (2048-bit key) header.d=rashleigh-ca.20230601.gappssmtp.com header.i=@rashleigh-ca.20230601.gappssmtp.com header.b="sVIfX/83"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64679487A5;
-	Wed, 16 Oct 2024 04:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F23165F17
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 04:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729051374; cv=none; b=VpYNRYMwAHmNnfcqsVX4vv5KbefUT0ihKLdOARSU3i1GDztURNRhcyb9nHKaCPeImY+nOV1oDOc1lW3qjbCu0OcXE8AESCboaWeNlr1rDl40InLAUWkc1asNPhRcE9PvwoYJPIqQvWEjEOxUQj/A/3PoYtHWZyIWioFfl0ap0nU=
+	t=1729051718; cv=none; b=R5GDdksZfnpgUy9phgjL2oEFu8CvZl5xMzyFWy7mlusplSp7E441/slQ2BDjuB9hI/Y6a5NxgsqMRWN418uJhkmhnSmGu1EhRCK6XNh9oL4FrG5/wspqBy+ggiJRfC+Wcp+LJSG6AEjwkwnZg8cFVmQKYiMl04V5fBbPe5n+/IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729051374; c=relaxed/simple;
-	bh=DCfW+aMLbxAPA6ifhf1ThCxeG6r04GjhljO/+nKPQ5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RlLPN/eqF4A3JZOaEY+jrM5fksHXKhkLpN0YzMOGVKkvJlGIK518V4O7CDfIB6VWTszJSemhPYl6FoxmSZtdNSOzV+3sWlTKyXhrDzUWSyIYJbTawz6HtS8+0CLZY+Vkr7RnnvFkJhQr/zRsKrfFtEzAYh/H+ekEmfKUydo+maA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMXt/G2T; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20cdda5cfb6so30067745ad.3;
-        Tue, 15 Oct 2024 21:02:53 -0700 (PDT)
+	s=arc-20240116; t=1729051718; c=relaxed/simple;
+	bh=rDDNeYqvkvtb4rkbGd7OqvgdRYatNgVzVnyYdt4qgJo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZmVC2gJhfHWICnAzSF0+zhe+KBrEhvXLNlb57k6EsfSpAZO3r9yTe9sR+mJ6+F1w0ij9bpUAUqxm9J5ov4xeFTcuV8AAIAl4susDxeiWlxmkoFG3M/N9CkPzrefbwW+FSJcaVSZLEcSwNtYMeWhglHMN0zCeqg62HKXF7tziox4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rashleigh.ca; spf=none smtp.mailfrom=rashleigh.ca; dkim=pass (2048-bit key) header.d=rashleigh-ca.20230601.gappssmtp.com header.i=@rashleigh-ca.20230601.gappssmtp.com header.b=sVIfX/83; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rashleigh.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=rashleigh.ca
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ea8ecacf16so1616681a12.1
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 21:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729051373; x=1729656173; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ntsHHgsKKirQ6ZAZrxHrp2nW0QPmelrzaOWFkgE7yAU=;
-        b=LMXt/G2TEfs3zEM47/xTGFWpdKCZha1YuddMSGZflDY/EI1AYuZGqFocUQrtQJzcyM
-         0riXWFjkaOVI4uvmdyb/AazeslRw5KbPHbng4b9taYzbFo4It+kOX7fhxyZGgBwQ/8gz
-         sFS7UzAoFhI8vUG3yztS4yQAhySO0NkhEcB+b8L5eqd0q9Tv4a0FcPIXHdd/kym7GOwi
-         UwtzaxvUlWt6YbzPxuvekxZfFI/qro/DXtFoiqMn16qRIVAcgg0aPr99t++Mp48gFIsp
-         /Vb7445zTViQt0Mz1gEkl6Z09yh7jh0NHV9/6zx16A7GmF5ryc6jAEs/AirznaXFwvHa
-         rXjQ==
+        d=rashleigh-ca.20230601.gappssmtp.com; s=20230601; t=1729051716; x=1729656516; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8QG8NBf3zRAuAEWxk5GFyScinHdujSAhRXpVbDCMkr8=;
+        b=sVIfX/83+z+y6dqRzAHa2kvQoLqpl0IJeBF27vmlmoZPgTZBUxAFTlKYfAId8x7kEe
+         YfYx16h4rPlOQdWW7fsQCI1TMqr/TvSorcyGi2HHKCU4Xip+1UiRJs5UOZR15XuOtly4
+         KIkRraJuoB88tKe2wvbpdc15DMY4Vy5a48Ajwlt1T3cYrnNDr59tcqTDK/Zi9//1Yopi
+         g2U2o22khWydXcwnecyD8VkE4bIC0qkFoo9/2KWPNmdsCJ8nBj2/EINwCBveNUXXML+H
+         kRKEY7k+HTY6wbQVvarDKrOSNbp2tbFayZe0Eo5DtCAq1TdwlK7SUBA85m+hMkPr397i
+         jTZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729051373; x=1729656173;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ntsHHgsKKirQ6ZAZrxHrp2nW0QPmelrzaOWFkgE7yAU=;
-        b=K/wGyxaSk6h2QqlqTcTBen7M6A+sqJlykAGVAzIeLNZTOTFudB5+N+M26cfhV//U4P
-         wnCUafyXz3cRVtEDPrfB5nbEwRP6cxnkj5L4FSTOm07EkK2aR5zSazhU0JsEwqqyTHbv
-         +vzLYnKHL2x/ZX81W+EcyjHH6WLH7p0mspDo3Z91TybUnKvVOsphGdnVN119bioAP5xP
-         g3h3MRw0ewKeChzQLy88ndUi6XuHxUTCtwoAwtbXw9hLiZJ4RpTLc+rjO5wACygGeLyJ
-         miRyiF0t+SRkYE7qrixoJmZeD+KJZnPnZc1zmzRyXA/3B2lOmsHjTJ9Cys4CRvW2dbG6
-         yeVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVaEBBv29XUeLdrDS22J9B2QotaCoBnT3MQJIc/XbVeY8Z8Lbe/mJy+ImUetRhwD1oqyDq+e4I2e1NLeAs=@vger.kernel.org, AJvYcCVdNZlAkVrQkn8LDZbVg+Gg3/Al+yRG7UXHjyhpVS2ply6fAQkbiiklzzu/lGXKZReXVQavmA2t@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGuIiTBSOQLpUAykIkoM0Mu/ULAcjXLtvznzB381JSkEpnmS6m
-	CLh/XC62yz1O6u3eKfH4io7vDYKiyQtzIClZUlzeEsjVAm9ZkJdi
-X-Google-Smtp-Source: AGHT+IEE+gmw+5w0f4YcSUcAKGq5Xdyra0HmV91k0/Fsm+itmUFGK2zWKtURAkx6foMhV4Jj3f87uA==
-X-Received: by 2002:a17:902:fc8f:b0:20b:5231:cd61 with SMTP id d9443c01a7336-20ca14732d9mr227299045ad.24.1729051372491;
-        Tue, 15 Oct 2024 21:02:52 -0700 (PDT)
-Received: from Fantasy-Ubuntu ([2001:56a:7eb6:f700:d7a1:e36a:e9c7:6c4b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d17f82c7csm20226785ad.16.2024.10.15.21.02.51
+        d=1e100.net; s=20230601; t=1729051716; x=1729656516;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8QG8NBf3zRAuAEWxk5GFyScinHdujSAhRXpVbDCMkr8=;
+        b=WU/WK6ofQrgYqtMyFB+q0hpFRZwEALigW6x/kmeYjWgUMEwgNoEsETlX5NTfbD8AFj
+         ZkZ0fYN8g7oQ+dCtJfKjgykcKd/f3GqNmaSt8kS2rAQqSx/ESCjqikFnahqimylkecUF
+         IMLUCaR+rvAprdf8s4COFVKsZxU9NeW2/dy1jwYYgmiJ8o4cFQ8j0KOOyU3WEeM0yOCA
+         5qqyjYMY/Krarf4uBr4P1DEuc58Fs9CWj/DtgKoI0av0o1ADPe6w2n9KBW9vDfjd4TmQ
+         71EJgifkDwCiF76oR2AiJxOZ1wzFRWQOhzrC87/CT6pjaiUbBdKG3Wr0OcaG/LmKyvPK
+         aQHQ==
+X-Gm-Message-State: AOJu0Yx5JMKo8T74XqHDOeQyDc8hRCP/ptgxynSaklnCaDxMk71UtFd1
+	PLvHFEtjJ9bITPCrxslTR/TNPsLW3h45lVpDHdDanoLy7aCD/iLJ29mv9Hx9ikQ=
+X-Google-Smtp-Source: AGHT+IER3rPBJw46WxdbW2JJEhZHOvgkjPLMsnarFrLaOG0cCovNa6CpxhCbIYEQJW2AQKDPNlavuQ==
+X-Received: by 2002:a05:6a21:3305:b0:1cf:6c64:ee72 with SMTP id adf61e73a8af0-1d8c9699c8dmr21309096637.34.1729051715955;
+        Tue, 15 Oct 2024 21:08:35 -0700 (PDT)
+Received: from peter-MacBookAir.. ([2001:569:be2b:2100:b7e5:b2b1:7cd2:2a86])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea9c7058afsm2296679a12.74.2024.10.15.21.08.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 21:02:51 -0700 (PDT)
-Date: Tue, 15 Oct 2024 22:02:49 -0600
-From: Johnny Park <pjohnny0508@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] igb: Fix styling in enable/disable SR-IOV
-Message-ID: <Zw866aMO9sfBXRsm@Fantasy-Ubuntu>
-References: <Zw2mTeDYEkWnh36A@Fantasy-Ubuntu>
- <20241015174607.6c29bb8d@kernel.org>
+        Tue, 15 Oct 2024 21:08:35 -0700 (PDT)
+From: Peter Rashleigh <peter@rashleigh.ca>
+To: andrew@lunn.ch
+Cc: netdev@vger.kernel.org,
+	kuba@kernel.org,
+	Peter Rashleigh <peter@rashleigh.ca>
+Subject: [PATCH RESEND net] net: dsa: mv88e6xxx: Fix error when setting port policy on mv88e6393x
+Date: Tue, 15 Oct 2024 21:08:22 -0700
+Message-Id: <20241016040822.3917-1-peter@rashleigh.ca>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015174607.6c29bb8d@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 15, 2024 at 05:46:07PM -0700, Jakub Kicinski wrote:
-> On Mon, 14 Oct 2024 17:16:29 -0600 Johnny Park wrote:
-> > This patch fixes the checks and warnings for igb_enable_sriov and
-> > igb_disable_sriov function reported by checkpatch.pl
-> 
-> Quoting documentation:
-> 
->   Clean-up patches
->   ~~~~~~~~~~~~~~~~
->   
->   Netdev discourages patches which perform simple clean-ups, which are not in
->   the context of other work. For example:
->   
->   * Addressing ``checkpatch.pl`` warnings
->   * Addressing :ref:`Local variable ordering<rcs>` issues
->   * Conversions to device-managed APIs (``devm_`` helpers)
->   
->   This is because it is felt that the churn that such changes produce comes
->   at a greater cost than the value of such clean-ups.
->   
->   Conversely, spelling and grammar fixes are not discouraged.
->   
-> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
-I see. Apologies for the inconvenience, I'm new to this area so I must have missed that portion of documentation.
+mv88e6393x_port_set_policy doesn't correctly shift the ptr value when
+converting the policy format between the old and new styles, so the 
+target register ends up with the ptr being written over the data bits.
+
+Shift the pointer to align with the format expected by 
+mv88e6393x_port_policy_write().
+
+Fixes: 6584b26020fc ("net: dsa: mv88e6xxx: implement .port_set_policy for Amethyst")
+Signed-off-by: Peter Rashleigh <peter@rashleigh.ca>
+---
+ drivers/net/dsa/mv88e6xxx/port.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index 5394a8cf7bf1..04053fdc6489 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -1713,6 +1713,7 @@ int mv88e6393x_port_set_policy(struct mv88e6xxx_chip *chip, int port,
+ 	ptr = shift / 8;
+ 	shift %= 8;
+ 	mask >>= ptr * 8;
++	ptr <<= 8;
+ 
+ 	err = mv88e6393x_port_policy_read(chip, port, ptr, &reg);
+ 	if (err)
+-- 
+2.34.1
+
 
