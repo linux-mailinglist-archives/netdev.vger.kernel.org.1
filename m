@@ -1,241 +1,237 @@
-Return-Path: <netdev+bounces-136062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 972B19A02C3
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:39:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E65659A02E5
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD2131C22402
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:39:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E84D287797
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561DA1C07C7;
-	Wed, 16 Oct 2024 07:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12971C4A02;
+	Wed, 16 Oct 2024 07:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="GAYnILYP"
+	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="JEUjsCpV"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11012019.outbound.protection.outlook.com [52.101.66.19])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2064.outbound.protection.outlook.com [40.107.22.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D20C1BA89B;
-	Wed, 16 Oct 2024 07:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE26B1B4C23;
+	Wed, 16 Oct 2024 07:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729064345; cv=fail; b=Cgl2mKyUiDqJ+Lnrt/cpmO7TUbaalPx02aoeUHuKhOAqDfUDyjrBrbIf+QVCV5XhVhSCDD29oqhkVet0ELirDjQgZ2MTCWGFCajFlXq4cct6Za9N8H1O8bwhZlaJdEX75O3eofpaoEkYG3lvwXx2fN4F5QDugB/ZoKiC0JW4qNg=
+	t=1729064647; cv=fail; b=Y/WvdpnDX3p6ZAAnWbEHtFXA3fk8DM6O5rtouSnv+0MUR1H/d4waM3SUgGRftFPIMR1610OO483aRNWvObLJjljVlg8K2UorxfLgfPeIqy4u1I1gIDuThgcGMFLAxxD76/UajiVvRgric1ibsRUkWmtb5JRnmDU+9EZlwO37YRQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729064345; c=relaxed/simple;
-	bh=5Deuxt/VkOoRg1BF1rf0pHgR5RQvb9U1lsWDQqpSPkc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VRQegiUkt4eun+mw+nxIqIb/AIV6mwJYZGZ+VkCstTzjjFI2zP6zx0iTo0aVl5GK3HCzmGFWlr9ZTuRXQVuZnnCc7WMDV0oXf42fwrrw9gfKtv77a7dNXWXk/A5qV3qpBMYVUuz9kA46Vw/D206FJyAmEXO3nPF6uRVfRJhUIYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=GAYnILYP; arc=fail smtp.client-ip=52.101.66.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1729064647; c=relaxed/simple;
+	bh=ECj8R/F1t3KFohA8yQAwqii2MacCWG7p82k2bB/SGws=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=o9TWMgs/MuYwueYBHl6thBoAVk1f4+ERtSTd5Kwc1MuaYRIm2h3qV7QlktlBNn2fsd1KcX9ws1jbuimdffxRvd2Lrj/FujMvyvGi+h8MNUDE9Y9wKF6hb60YA2S8r4rnmUOdOD7PfDNyuBugO5loIZBML7Cxe1kZJNm3dG290JE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=JEUjsCpV; arc=fail smtp.client-ip=40.107.22.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bcxyiMMAo8bAES7QRzXhAyJ4p+GZ5DarbGS3x/P1L+9F1jHivfUngMZsAiYnM79FQ2qNNMSZSnDPevAHGOwV5IUq8ofQryiEMmOLHbwQ67mmK9wktkhkraJkocMi59PjNoVgGicvnskn1csv9NM9kexvw+J2K0w3/hd0JSKrkqxxFQMALUvuSsQLaMvNVWnfbFHp1piJkP7aCXfzEHYUGGcUm31PI+0X4ZJJT0Ztp14Dqx4isSH0mqQopReOz64cwLSM/osiBppP5ezbg/x17gefxzVSyYZ9U/Kt+uPmS4FYdqwOGf/LAOokHqmnQHoQqOpNteRIsKLD7uDCapWOHA==
+ b=TlC7V+39aES++2Q4Se91LowYIWhx0PRnFbA77BnwelFRf8RbKBKW8W60qQPgNm2jNc4IB6i2uQi1Fz0SaB+JhXysRTT0qHgl/q2V1bgAuVgwaUoxvTtkBc8KjANFbr+gCR7AsBHJPl+YkgJ1IyYJMUJI5p/5M7MNdlAJb8LDbi88pZrWRRL/KqR5TwioXR6ejUTJJ9Iydm05kg0yg/ZDXWBhQqwOJK6E1t+s0SHDfqjcyNGnJu+zVHRoIDdxmycJvQFezXET6fh9LmyK504+B3xxZ7n1AmQiACHvDaYdkcMsJwa54q/WZbzfUy1QVMivS4YnkAGvTchZKLWQvtd3cw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QIm4QckzCbMK6nds/4rD63cLypdMFKlTwTgSScW6tfc=;
- b=Drbcd410YyuLp0KXiVgFh5cM+yr9X2XF3Yn8OE69MHKTnq8MntshsKJCsFD+94Uo8WVe1I/9+YCazaf2oqBG+YEEoOPoITmQoHDxIfChZzVdUhzyx5e9HPejfj7R3IX9I1kQYHSJsRGbarcF7Yswv/gzceBJ7zbvIrg4Chi2/1bBqaDpA30wESNYiEbrz/8JUgdtIT9AgLo8rCIoWPOFogu80IJb9u0BOpuz8kGXCb8gZ+75RijTA5/mpf+q2hduKD1neLGzNbB5scJyUHfLSDJYdS9s9OVdFU7kHXF/pdAgXjP72jOW7aCOOQ2cCsHbj+LxTfLY7NpT7L9eyhNSqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ bh=f44ml4snFkVwlkTRiqFlMQtrTlIyA2nxYMZaPdOLAWk=;
+ b=a3JaNqMrRQp3a94WHIeXdAiic3AN0JpcyrsEVE4RfMCcmDqer/kotFQ1MnDXCFBdgCFe7YHlVa+MI0s+nrE7lMSU6YQ7bxK4csRicRV66lyWFMbLZRfjLfdj+milrqV77/d0sV7zuG2Wu9jjQbYYAVsFASYzWy2dtXpNIoYgHqT/b5i+lYlCxNzm4s/bQnE3jDzQUUJUA2P8o9OihgLo3t1NMoX56B8JTUFO4Kble5a7AoqdbQWTVrhw0q+vzNDI7P9l/LNgvc266I/COVMvqHuD6J83e/g+HgCGVP5Nq1Osmm5Yk5S3oHhno04CZNoasZQxbsB/UchhZ8kP1TaFmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=leica-geosystems.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QIm4QckzCbMK6nds/4rD63cLypdMFKlTwTgSScW6tfc=;
- b=GAYnILYPvkmejDVIQ4aX8iHfcUFtzxeOo2mDNcWtxVJsxnbtJzYZa5YVmBp3obWImd1HufKFYIynPIIDqyabuOO0E1NUjwkYeyINQ3HPLPT//TO9llSWkL1cGmtNaMCyn6dCY8Su38FpFBn9h7AX4CT+IE7TuFm1YpjJbF81IyMioNowrpfyWS3XfTZWHOCYvUOnnvWrg4PfOMa2mCaB1Uu+Rf7sTuy6Vh7JtxdgyiMrunUtuc8UHIFHCNAAqv5sYuP4TWax8XGTCotypmrnOSeQRd2kiPHUaGDtn1Cs3lCeoLKbgpAMf83fTPJ7rzV/7LfsR6E02f86rtTywDf9pQ==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GV1PR04MB9102.eurprd04.prod.outlook.com (2603:10a6:150:21::12) with
+ bh=f44ml4snFkVwlkTRiqFlMQtrTlIyA2nxYMZaPdOLAWk=;
+ b=JEUjsCpVb5cCFSJ4iudOLfkC283O99Yvy4YJY8hX8lrYhdunx8aNfexsNlA1BldBrCUy3zyBDIQuMsPzJaj9QlE7JuyXvzUelvhX5xV1INQwBraewy/QmIswvuVGrFOW2ksCG8j4tCDz6rnuB3J28w/rf768evj+sqs1GTvcToM=
+Received: from DU2PR04CA0292.eurprd04.prod.outlook.com (2603:10a6:10:28c::27)
+ by DB8PR06MB6363.eurprd06.prod.outlook.com (2603:10a6:10:129::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Wed, 16 Oct
- 2024 07:38:59 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8048.020; Wed, 16 Oct 2024
- 07:38:59 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Simon Horman <horms@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu
- Manoil <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Frank Li
-	<frank.li@nxp.com>, "christophe.leroy@csgroup.eu"
-	<christophe.leroy@csgroup.eu>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "bhelgaas@google.com" <bhelgaas@google.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>
-Subject: RE: [PATCH v2 net-next 10/13] net: enetc: extract
- enetc_int_vector_init/destroy() from enetc_alloc_msix()
-Thread-Topic: [PATCH v2 net-next 10/13] net: enetc: extract
- enetc_int_vector_init/destroy() from enetc_alloc_msix()
-Thread-Index: AQHbHwQq4QKqZMQ9p0KkBhFIskuic7KI/D2AgAABGCA=
-Date: Wed, 16 Oct 2024 07:38:58 +0000
-Message-ID:
- <PAXPR04MB8510FEE221C7B3B9FDB0801188462@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20241015125841.1075560-1-wei.fang@nxp.com>
- <20241015125841.1075560-11-wei.fang@nxp.com>
- <20241016072929.GD2162@kernel.org>
-In-Reply-To: <20241016072929.GD2162@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GV1PR04MB9102:EE_
-x-ms-office365-filtering-correlation-id: 6212c280-ba16-4978-00b9-08dcedb598e4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?xS+svd4jRK3RM81/P62/1/PR6+5D7XksA3yWjxBmLdsMmjb+Lv84uhBsY2lq?=
- =?us-ascii?Q?vQeCS1jdpZSWFTRt+wcaH9I0mPXQGadsgfh47guI1zQ3Y7ri43xont368XDs?=
- =?us-ascii?Q?C8Gx0woTRr3EUfNFplHxZWOgCVua4ocE4hgWkrc5I8hli2iDfoZCIi7Ynp7m?=
- =?us-ascii?Q?4E6/dnzrKD2abc1q9tISY5XnCFIe48NHpYIiQbjXQJqgEyej/4HPQTkQt89K?=
- =?us-ascii?Q?tpfzqhRYM1/rjaKcv11Aa8QEncg5W8TwzYGjp438AF33kkYHhJ3L8DGx19D4?=
- =?us-ascii?Q?KHTDTD26mdrH5dPZG7XM9Ll+9QZ7/EStHTDIpLWVYcV+Lj6EjqXS/MSFyXY/?=
- =?us-ascii?Q?lNdCh67Uc+KJGRfzliDujamY2iCAOqHOt2fSL13uGfYr9h3vKp4gt4YdFJ58?=
- =?us-ascii?Q?HIAgY2Pr/OAAicZ1XlczBeS6Dr7SdJ+hKku6sXz/wdTWOSySYhoqm0AH63jz?=
- =?us-ascii?Q?us/Z1cnP3TwDN35+1h/K+A5oig12N6ANrlYn9QYzTrompBxAHv+rKVXQUC7h?=
- =?us-ascii?Q?mXAVthhuLGISRaIpMNKEflZwA8zE09oHqWke5HGKJ58TBxI91KpT4ah8RFPl?=
- =?us-ascii?Q?p41VXeNWl6MiSBD/CKHDzTau1SmDJTlr76sOUMQvbjMXd0T/83qfHIKvntR0?=
- =?us-ascii?Q?x0oIR6QkzDynWKFuZYNT7YLeDKKXFCQYkSwkWTeNVoylb7xGGrB+9pJNyXWU?=
- =?us-ascii?Q?4kcaVvYn6ncqhBySRgk1t8cjqamIhKpPukOepRP7k/pQk2PZsukoeNa9rZ4e?=
- =?us-ascii?Q?gOMiNZQ0DLyD8+LqB7rV0I033xHvG7X3/KW6MncDhcvNN75ESAU1o3NbNxAe?=
- =?us-ascii?Q?5waC0ZC0HyQpGKBr6av9hEJsKCo3O1EY4BT69MCotAbqzjzk0FBTgOCyIiTt?=
- =?us-ascii?Q?lNn1gFu06VQEqUAmp2VZUuLn3nUrBmz7f2Qa4eoAypGAlG0+hjOuCyKxnnxA?=
- =?us-ascii?Q?HJ1y20cj9RAJt1CPWv8X1A1H8j5byvn64P8NDOkFmh+vCxrBjy7q23NwZl9n?=
- =?us-ascii?Q?6GELX/hwlMbqXXqPBz/idQ2Z0ywNtMaewrisiVb80MyhyZ3eFZ31wVm3aZVK?=
- =?us-ascii?Q?Dw9xxGe438lOoRLxuXVJareb7RxJsBfcogTRMGgTZvza/rSfqBIG3C2L68rk?=
- =?us-ascii?Q?JFL3DxdM4tCYCPU/gAisMEojH32BKLN2NNuO3iW3ACNW9k4uRtyT7Yhhivl3?=
- =?us-ascii?Q?Ly7+8bEnkRttfD5JzHMKXYuLpFi+28y1tc+xbBhlsK4KIUsossK+5XI6vcj9?=
- =?us-ascii?Q?4ZL2bGbP06cJ7nWHzL+hN/rOJvt795nh+INdqSY7DyJK2mwK/Hod9k2TB+0a?=
- =?us-ascii?Q?Un4Ul7B2Alv6VzGc1IJCi+YQsa6gI0QrQEXHWxoU5LCBGA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?79z5fp39BzhhaS8H012+fpF73a/sZxTTe3lG6g0dFZuayjtUyiWiScC/EGjB?=
- =?us-ascii?Q?WxeUW2eDMOQcGlyfgrzuhi1RgUrliIBaHGn0nyoqahyArslIOvdwMtgLI82e?=
- =?us-ascii?Q?nwZNV5dD0obPKlfAWPKgoBNFKnde9dMr9nyoLMmi3TE09UApfcPfQOnL/mB9?=
- =?us-ascii?Q?aufWQcKBYwOQlGsygrXvJkADSXzzy2nuGH8KTbCcUkuPOtniDc6WWdSDE6xe?=
- =?us-ascii?Q?C6yymVIUlhKfeHGFRpvoZZpVGYiVncya2PpkPusaXSHbBdxhT8/KBaGsOBkL?=
- =?us-ascii?Q?+H5rp3lsWLbzy6BrOdZukpx2HhNoP3pu86iIm1pP21SKe74j0Q8qsxCTWxLh?=
- =?us-ascii?Q?ddk17QpVQSACMAw2uSsqFMpsI52pNUMKWcVtb5I0djNftFN6QpUwRPL5XvIk?=
- =?us-ascii?Q?1UW2apY+74bOq72VfLVr67sDhe3sDuLyJ5DV5zcIBCdGA70mUmxb53Ae1gb4?=
- =?us-ascii?Q?j2rvRv9rzqmEx3MP9eGKooYZsoALG4h0KR8DNj/MOUWSwESbCfsn/9/tvXgC?=
- =?us-ascii?Q?ARmulYnjoVq2NDw+gyC4Hh2tl9CeYZ34B6W25y7mCg4W5RJWMGJN23ur90LL?=
- =?us-ascii?Q?IMRsoqPqmeLPD7ZS1OP6N1JFjp2Lcqo9EESovT+uPdpdTuEFp8NnJRXLDRvs?=
- =?us-ascii?Q?NJZ+Pq7mESi+HpS2W6HYd011r424e8dV0vdbGYqawepksr5S6q/gg32fYErP?=
- =?us-ascii?Q?Ay8tDzdhZMJBzAuvMoJ6c4cddQM0qnXy5clURm5mIPI1YD/0byQDg1evPvv6?=
- =?us-ascii?Q?aYSvUO/aUGO96p1wXgAuNS5jmDoWC1RB8NzGuyQ5cpWG0PdUHY9puoo3782G?=
- =?us-ascii?Q?VvFfcWWMVKVbNffm0hPbri8O+0r/xw+gYi7ZGW3amY7Q/2wRtipFyN26Nz7C?=
- =?us-ascii?Q?oYa+a0wVJFFgn7s773PhuVhlrLk/ng2cAwbHm2Xps7R51p7+fr9RwaQl4ZOM?=
- =?us-ascii?Q?oCmoeoGKv2BAE+Dqvqp2a9Vh3ZX5gu20OiN4aufL6JZsLJOPaHaCsGdTkx3t?=
- =?us-ascii?Q?2xRD8WuFW4qMVzmRmgi6H4Kd0wjmAJGO5wQEo+tbpgBTlQzyAbGsGA2SV1eL?=
- =?us-ascii?Q?TRSROju5SoIOhapMRJYdLQ/uncFGT+DLjgHA2Eb4dWDEWUwgZp7IWbV7yqsA?=
- =?us-ascii?Q?xvbZ7lsDV6X+l6GZbXcwjGxs0LvaT9P+17KJ8oJnazv9HnNO1o6sfiiT+tKv?=
- =?us-ascii?Q?53wmjMKLnZALpianZYF33MKF3xlK7+KYVE4jXXXQ9swYw0m4Ibv/e0FEix62?=
- =?us-ascii?Q?ZfkyGgtK09b3FVkEQ8r+WxJjQv4x3RMZnWI+JF4Ql8xJPbm256Hu6ttoOzDe?=
- =?us-ascii?Q?fqaiazwiU8/e4IxEIh8iPmxvRi4vV7D5TPEfmOfZEj42SM6YvYm+TYrx4WjA?=
- =?us-ascii?Q?57n96i3ehNJCeXexA54RnTT8owFN7gRoLaOksMIHcylWOXs2Y0lK4Nb6Iwt5?=
- =?us-ascii?Q?KXVW/OoTKz+mGVUghffagbvSyzMMgUa9b/na9bd5AjfqHJFAMU6w3Vk06MtM?=
- =?us-ascii?Q?GwL+kXbXBfrN7maEcehrXFSwXLAqFj99W7+GnduR9MKkqjd+et7olEr2U0jD?=
- =?us-ascii?Q?5OuFNYPP7n/uovO2nsI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Wed, 16 Oct
+ 2024 07:43:59 +0000
+Received: from DB1PEPF000509EB.eurprd03.prod.outlook.com
+ (2603:10a6:10:28c:cafe::8e) by DU2PR04CA0292.outlook.office365.com
+ (2603:10a6:10:28c::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18 via Frontend
+ Transport; Wed, 16 Oct 2024 07:43:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
+ smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
+Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
+ designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.8.40.94; helo=hexagon.com; pr=C
+Received: from hexagon.com (193.8.40.94) by
+ DB1PEPF000509EB.mail.protection.outlook.com (10.167.242.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8069.17 via Frontend Transport; Wed, 16 Oct 2024 07:43:58 +0000
+Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
+	 Wed, 16 Oct 2024 09:43:58 +0200
+From: Mamta Shukla <mamta.shukla@leica-geosystems.com>
+To: dinguyen@kernel.org,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: bsp-development.geo@leica-geosystems.com,
+	Mamta Shukla <mamta.shukla@leica-geosystems.com>
+Subject: [PATCH] arm: dts: socfpga: use reset-name "stmmaceth-ocp" instead of "ahb"
+Date: Wed, 16 Oct 2024 09:41:59 +0200
+Message-Id: <20241016074159.2723256-1-mamta.shukla@leica-geosystems.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6212c280-ba16-4978-00b9-08dcedb598e4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2024 07:38:58.9234
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 16 Oct 2024 07:43:58.0704 (UTC) FILETIME=[29149F00:01DB1F9F]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509EB:EE_|DB8PR06MB6363:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: dde93b50-dd76-47c7-501d-08dcedb64bc5
+X-SET-LOWER-SCL-SCANNER: YES
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?76yeJazws6bjd4cjwxbOp8Orqqbvp4bGLbwkKUumqjYWYeq1MaX72NpL652a?=
+ =?us-ascii?Q?YH+hhWeYZQCFTKfhem974RoRw6jcbGp04mNy9IZvW9h3k0PZ1hagQtfBaMAo?=
+ =?us-ascii?Q?FOs+2CvNHHvDJaX9ZI4AuWhgvv09h7yc4ogcg6G+7K4kSmzylJS6t61p0Sjp?=
+ =?us-ascii?Q?CksIDI538OI1b7dYFSbpCbVgrrR21VuXE0Vg+eEwkmmMW5FRTCE/m7mh8nps?=
+ =?us-ascii?Q?SLvP5HwzikyYYA8SzX2fQrbgR+Zm3yvus34wUuGTfz9ZXauQrRCtRxe5rTfd?=
+ =?us-ascii?Q?Gm7t1TFJVV/s7FmWrRXmp6bXJzetsDXCPN1BmZvOrqGFjMcCrl/loyOKDBOP?=
+ =?us-ascii?Q?RNWvrOghuumWXpdBI/4HUJl8adj281bXWhi0EA4Kt0NaH293zPa30fkta7L/?=
+ =?us-ascii?Q?XMLM8RiBN9vOOBPjn/UDZtRf7Iz3iVrik1ixnaAoPMrjGPgeTG9zTmP+uXRe?=
+ =?us-ascii?Q?6I4c1/QTVglMbQR3AEzLByGN3bGao6vWkovKWwjzN9sTS/ZUpcYm6fWYkNZE?=
+ =?us-ascii?Q?azBu/sy/K3meIGlgC+Tin3cQR4+CO093qyeJnI0NbkhRqqAyz07ha58KCeSW?=
+ =?us-ascii?Q?huE4eMsmExYPdHOTSxBYqMIIAWQnlPRvH7hlh56xqxQvQq1LMY/Zb7bfCCRl?=
+ =?us-ascii?Q?3VbWqNX3H7+N6ojZv7cGi9YI784GdMsqYxOLDvBcun3n+06KVXyLjMNP4at/?=
+ =?us-ascii?Q?dkxH7rqtFJGAusJa5MpI4RKmv5hGiin7ko1Dl118g6PM8+dRljlJetVZdI1S?=
+ =?us-ascii?Q?NIzc3aT/IXmdOhwh1on/2G8G/cocRGeYnjpKDw7ZIfWnkjpcd7v4X6gnykVA?=
+ =?us-ascii?Q?7KelyWwci9KJuDmEqJF8YBP5xHklnfgUJaRWDJu0TjtGIaEo3RMEKga6iWyw?=
+ =?us-ascii?Q?N8aYFdnCV1I9Y41hqeDe8Y27mm5aCS3yR/xcwEVse7f5eu4h0ucMWIyidNXb?=
+ =?us-ascii?Q?NUsD5Z8aMtd0WJc4wD47uqhQNZiz2fX76fbPzKuf6Q4qlHBp7Hi9FTwjHzrG?=
+ =?us-ascii?Q?W7nbo4XJXdpRbanVgib/cBbW0rlF+ix/TCWN8ZN70kIIB+u4rv6ZfIjGdIYQ?=
+ =?us-ascii?Q?bwzl0hDs0GfRN/MZ9f0HvWj0WYCM2E5m2Aa3lr1afHhco/46SunUjGngZzkI?=
+ =?us-ascii?Q?N0kQ9MTiEbHLwNxeyvxwUbjGlP3KNhPbibjugBgUf/a1+Hl7A8lSxlDBKXns?=
+ =?us-ascii?Q?qyQlDnJL++SEYYGhAZAwGZ8NJXM7ln4Kj6nTCMnWoLh3LmyvRLF7L+6N/yPX?=
+ =?us-ascii?Q?ZH8Y5P3z0ag17gnqjEZj/QZKJNe3KtFQXnrZfXIplzEACjZSxeoEULB7CmMc?=
+ =?us-ascii?Q?/6sT21GEJPB5iLfQ2DRtPusoj6wdgurc57jSRHay11ag7O+OU9sm46/6IAre?=
+ =?us-ascii?Q?VrYD+BAkV+K93H0wFrFXtbVP+rav0xVfH0BCLAkwIFvWQ+iN4Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: leica-geosystems.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 07:43:58.9414
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: utqoiHexh76q20d3M+ctrOgzwmE/oGFTSt1zCjVgkpn3qrugsAyUebJUV+ID6aE46hUs33zKKPaEURF/kiQYsg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB9102
+X-MS-Exchange-CrossTenant-Network-Message-Id: dde93b50-dd76-47c7-501d-08dcedb64bc5
+X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509EB.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR06MB6363
 
->=20
-> On Tue, Oct 15, 2024 at 08:58:38PM +0800, Wei Fang wrote:
-> >  drivers/net/ethernet/freescale/enetc/enetc.c | 174 +++++++++----------
-> >  1 file changed, 87 insertions(+), 87 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > index 032d8eadd003..d36af3f8ba31 100644
-> > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > @@ -2965,6 +2965,87 @@ int enetc_ioctl(struct net_device *ndev, struct
-> ifreq *rq, int cmd)
-> >  }
-> >  EXPORT_SYMBOL_GPL(enetc_ioctl);
-> >
-> > +static int enetc_int_vector_init(struct enetc_ndev_priv *priv, int i,
-> > +				 int v_tx_rings)
-> > +{
-> > +	struct enetc_int_vector *v __free(kfree);
-> > +	struct enetc_bdr *bdr;
-> > +	int j, err;
-> > +
-> > +	v =3D kzalloc(struct_size(v, tx_ring, v_tx_rings), GFP_KERNEL);
-> > +	if (!v)
-> > +		return -ENOMEM;
->=20
-> ...
->=20
-> >  int enetc_alloc_msix(struct enetc_ndev_priv *priv)
-> >  {
-> >  	struct pci_dev *pdev =3D priv->si->pdev;
->=20
-> ...
->=20
-> > @@ -2986,64 +3067,9 @@ int enetc_alloc_msix(struct enetc_ndev_priv
-> *priv)
-> >  	/* # of tx rings per int vector */
-> >  	v_tx_rings =3D priv->num_tx_rings / priv->bdr_int_num;
-> >
-> > -	for (i =3D 0; i < priv->bdr_int_num; i++) {
-> > -		struct enetc_int_vector *v;
-> > -		struct enetc_bdr *bdr;
-> > -		int j;
-> > -
-> > -		v =3D kzalloc(struct_size(v, tx_ring, v_tx_rings), GFP_KERNEL);
-> > -		if (!v) {
-> > -			err =3D -ENOMEM;
-> > +	for (i =3D 0; i < priv->bdr_int_num; i++)
-> > +		if (enetc_int_vector_init(priv, i, v_tx_rings))
-> >  			goto fail;
->=20
-> Hi Wei Fang,
->=20
-> It looks like, if we reach this error handling during the first iteration
-> of the for loop then err, which will be return value returned by the func=
-tion,
-> is ininitialised. Perhaps this would be better expressed as follows?
-> (Completely untested!)
->=20
-> 		err =3D enetc_int_vector_init(priv, i, v_tx_rings);
-> 		if (err)
-> 			goto fail;
->=20
-> Flagged by Smatch.
->=20
+The "stmmaceth-ocp" reset line in dwmac-socfpga driver is required
+to get EMAC controller out of reset on Arria10[1].
+Changed in Upstream to "ahb"(331085a423b  arm64: dts: socfpga: change the
+reset-name of "stmmaceth-ocp" to "ahb" ).
 
-Thanks, you are correct, I will fix it.
+If "ahb" reset-line is used, connection via ssh is found to be slow and significant
+packet loss observed with ping. This prominently happens with Real Time Kernel
+(PREEMPT_RT enabled). Further with STMMAC-SELFTEST Driver enabled, ethtool test
+also FAILS.
+
+$ ethtool -t eth0
+[  322.946709] socfpga-dwmac ff800000.ethernet eth0: entered promiscuous mode
+[  323.374558] socfpga-dwmac ff800000.ethernet eth0: left promiscuous mode
+The test result is FAIL
+The test extra info:
+ 1. MAC Loopback                 0
+ 2. PHY Loopback                 -110
+ 3. MMC Counters                 -110
+ 4. EEE                          -95
+ 5. Hash Filter MC               0
+ 6. Perfect Filter UC            -110
+ 7. MC Filter                    -110
+ 8. UC Filter                    0
+ 9. Flow Control                 -110
+10. RSS                          -95
+11. VLAN Filtering               -95
+12. VLAN Filtering (perf)        -95
+13. Double VLAN Filter           -95
+14. Double VLAN Filter (perf)    -95
+15. Flexible RX Parser           -95
+16. SA Insertion (desc)          -95
+17. SA Replacement (desc)        -95
+18. SA Insertion (reg)           -95
+19. SA Replacement (reg)         -95
+20. VLAN TX Insertion            -95
+21. SVLAN TX Insertion           -95
+22. L3 DA Filtering              -95
+23. L3 SA Filtering              -95
+24. L4 DA TCP Filtering          -95
+25. L4 SA TCP Filtering          -95
+26. L4 DA UDP Filtering          -95
+27. L4 SA UDP Filtering          -95
+28. ARP Offload                  -95
+29. Jumbo Frame                  -110
+30. Multichannel Jumbo           -95
+31. Split Header                 -95
+32. TBS (ETF Scheduler)          -95
+
+[  324.881327] socfpga-dwmac ff800000.ethernet eth0: Link is Down
+[  327.995360] socfpga-dwmac ff800000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+
+Link:[1] https://www.intel.com/content/www/us/en/docs/programmable/683711/21-2/functional-description-of-the-emac.html
+Signed-off-by: Mamta Shukla <mamta.shukla@leica-geosystems.com>
+---
+ arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+index f36063c57c7f..72c55e5187ca 100644
+--- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
++++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
+@@ -440,7 +440,7 @@ gmac0: ethernet@ff800000 {
+ 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
+-			reset-names = "stmmaceth", "ahb";
++			reset-names = "stmmaceth", "stmmaceth-ocp";
+ 			snps,axi-config = <&socfpga_axi_setup>;
+ 			status = "disabled";
+ 		};
+@@ -460,7 +460,7 @@ gmac1: ethernet@ff802000 {
+ 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
+-			reset-names = "stmmaceth", "ahb";
++			reset-names = "stmmaceth", "stmmaceth-ocp";
+ 			snps,axi-config = <&socfpga_axi_setup>;
+ 			status = "disabled";
+ 		};
+@@ -480,7 +480,7 @@ gmac2: ethernet@ff804000 {
+ 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
+ 			clock-names = "stmmaceth", "ptp_ref";
+ 			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
+-			reset-names = "stmmaceth", "ahb";
++			reset-names = "stmmaceth", "stmmaceth-ocp";
+ 			snps,axi-config = <&socfpga_axi_setup>;
+ 			status = "disabled";
+ 		};
+-- 
+2.25.1
 
 
