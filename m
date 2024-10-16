@@ -1,257 +1,206 @@
-Return-Path: <netdev+bounces-136042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24EAC9A0126
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:14:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C103F9A0141
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324631C22A8F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:14:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3E631C22C20
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE61118CBFB;
-	Wed, 16 Oct 2024 06:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330FA18CBEC;
+	Wed, 16 Oct 2024 06:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EUy+e6IB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A2eRYinE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F34190073
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 06:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB3F156E4;
+	Wed, 16 Oct 2024 06:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729059205; cv=none; b=rDQPgFt+0dMA6ierqOzwLlsinM7dJvVrnTKinJ2qKpqrfdAvjPX9GYon30nNMZ8ruEb/7hNM07Bdl69dT+ZWq9iYuNGrMO9XDYyZ5DeBl9gzzGZWzzH2S34Lg6ls0qjk2WwWAL2SWwJ8h+bgiUcrIg7ukhqY6WMt3MW3j1c2kB0=
+	t=1729059607; cv=none; b=DoNEP7ueerjR6C0ubltPApRs0W8h1BtkWkuORDwZS+HNBgIF7uKnmQQexqdg6fbRkv1c05McqXLMHVMW53TX1/dEnU2+OxHMtEv7K1cns5OVkQbncuB1+bwX3/yTntim/JMh8Zyvtx1oOuHYnsJI8ofggKaW8DJFSRxaDjwvBSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729059205; c=relaxed/simple;
-	bh=DsxSfc/wVAicVW4ZE2j3oy8TOKT4hQM+eSYQHjnO4Sc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MRDNX3pdeYgUvgiYH2OI0kUNWr+w3pEabQKsIbbF4wPB19ZfTllxkQoW5gCmm1XqwAuaNBVJa7XvPJJ4ZlnrIt+2FRWbbyaaGiXViIkZfj2r6QCL6zHC5YBnLeRdPFszulZymDMfPGK6O1NY8HJQip77MAIhVM1yRev+3bTTPZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EUy+e6IB; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9f050a5c-644f-4fbb-ac37-53edfd160edc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729059201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F2WpRL/fEl1sFSMPFklMJYqOuFIEswYtJX1E9qM9Bkg=;
-	b=EUy+e6IBf1aCn+xCTOc4ymcRwPBSgCxBPRHv8b3pFuRWXkKX0bjyjckNe3G0PxcyA4atLH
-	BaCX7Crc5w5Ik2WTWehcdc4Wgo9AVpCndkkm8uEmlDx8wMA/Q/g1IGOOAb8nInW9gj6bWW
-	YTXhQqERJul7wV7A1PL4YFsjuv88Hio=
-Date: Tue, 15 Oct 2024 23:13:09 -0700
+	s=arc-20240116; t=1729059607; c=relaxed/simple;
+	bh=qoQIhnscpiMhEnHFEwY7bxIRzEKmXMR4NV1svM0kguw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CQthn8zRA3iTWi2HpCyl/nUlkfobjm9yIo+t4MtyXwPurQNtad57aBa+CqL9lFoD/jXmsDLi5ckYUzofaQda4e1GRaVlnqDcJzBiUNPqSzxRQJXs0KafH5qFzbBCMSG17MOsZ/Qs7S63Ta9cing8E2Ll7ENevhQMaOfl0mkWTrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A2eRYinE; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729059604; x=1760595604;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qoQIhnscpiMhEnHFEwY7bxIRzEKmXMR4NV1svM0kguw=;
+  b=A2eRYinEShSWyvaXYeeiR8E3G6hRyLhn+0vdi420zezs56bEZhC+112L
+   sm2fP7Hv0X4UzyPHhZUUW0JqHIegAQPemd2LgbjHdV6IpsdqZwymvxj6j
+   N4HnV64XdPE7SXRy52E5/2mW83zLXF3jPKfAkfiL+x+cW/z0yL06o7WiM
+   WfsMsk8Is6NHYSze5NNBBinW+dCkoxpRJQFYK6llETDRDTR71BJ0HJk3I
+   0V8kluihSWsgDZbTYnHm0PzCYxsiyaSMy+mlbKSKh0+JH3Kwhn/vlwLFz
+   b+gvQHtxsuM9bs5jOaHM5cvahNTcvOVyODwoyIOpXcLrKZ3lsNZhvLPSz
+   Q==;
+X-CSE-ConnectionGUID: E8NT637mTO+qG+F2LEb8bA==
+X-CSE-MsgGUID: aHH+HhneThSHHQWFqf5/cQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="31359178"
+X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
+   d="scan'208";a="31359178"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 23:20:03 -0700
+X-CSE-ConnectionGUID: hiR/INNfShqLgmZEeaXA2w==
+X-CSE-MsgGUID: ZxHKS3cmSV2OIpmrPJpQVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
+   d="scan'208";a="78295489"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 15 Oct 2024 23:20:01 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t0xO2-000KRX-0i;
+	Wed, 16 Oct 2024 06:19:58 +0000
+Date: Wed, 16 Oct 2024 14:19:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sven Schnelle <svens@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 3/3] s390/time: Add PtP driver
+Message-ID: <202410161414.jC5t2eWE-lkp@intel.com>
+References: <20241015105414.2825635-4-svens@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
- control the whole bpf extension
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-5-kerneljasonxing@gmail.com>
- <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
- <CAL+tcoBieZ3_ZX3PRY8k7-C6Rv2g=Mr1U1NAQkQpbHYYvtWpTQ@mail.gmail.com>
- <CAL+tcoBXj=EO-sk-dS+dN-pCZf8OKeOZ4LXb9GZnja3EfOhXYg@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <CAL+tcoBXj=EO-sk-dS+dN-pCZf8OKeOZ4LXb9GZnja3EfOhXYg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015105414.2825635-4-svens@linux.ibm.com>
 
-On 10/15/24 6:32 PM, Jason Xing wrote:
-> On Wed, Oct 16, 2024 at 9:04 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
->>
->> On Wed, Oct 16, 2024 at 8:10 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>>
->>> On 10/11/24 9:06 PM, Jason Xing wrote:
->>>> From: Jason Xing <kernelxing@tencent.com>
->>>>
->>>> Willem suggested that we use a static key to control. The advantage
->>>> is that we will not affect the existing applications at all if we
->>>> don't load BPF program.
->>>>
->>>> In this patch, except the static key, I also add one logic that is
->>>> used to test if the socket has enabled its tsflags in order to
->>>> support bpf logic to allow both cases to happen at the same time.
->>>> Or else, the skb carring related timestamp flag doesn't know which
->>>> way of printing is desirable.
->>>>
->>>> One thing important is this patch allows print from both applications
->>>> and bpf program at the same time. Now we have three kinds of print:
->>>> 1) only BPF program prints
->>>> 2) only application program prints
->>>> 3) both can print without side effect
->>>>
->>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
->>>> ---
->>>>    include/net/sock.h |  1 +
->>>>    net/core/filter.c  |  3 +++
->>>>    net/core/skbuff.c  | 38 ++++++++++++++++++++++++++++++++++++++
->>>>    3 files changed, 42 insertions(+)
->>>>
->>>> diff --git a/include/net/sock.h b/include/net/sock.h
->>>> index 66ecd78f1dfe..b7c51b95c92d 100644
->>>> --- a/include/net/sock.h
->>>> +++ b/include/net/sock.h
->>>> @@ -2889,6 +2889,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
->>>>    void sock_def_readable(struct sock *sk);
->>>>
->>>>    int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_sk);
->>>> +DECLARE_STATIC_KEY_FALSE(bpf_tstamp_control);
->>>>    void sock_set_timestamp(struct sock *sk, int optname, bool valbool);
->>>>    int sock_get_timestamping(struct so_timestamping *timestamping,
->>>>                          sockptr_t optval, unsigned int optlen);
->>>> diff --git a/net/core/filter.c b/net/core/filter.c
->>>> index 996426095bd9..08135f538c99 100644
->>>> --- a/net/core/filter.c
->>>> +++ b/net/core/filter.c
->>>> @@ -5204,6 +5204,8 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
->>>>        .arg1_type      = ARG_PTR_TO_CTX,
->>>>    };
->>>>
->>>> +DEFINE_STATIC_KEY_FALSE(bpf_tstamp_control);
->>>> +
->>>>    static int bpf_sock_set_timestamping(struct sock *sk,
->>>>                                     struct so_timestamping *timestamping)
->>>>    {
->>>> @@ -5217,6 +5219,7 @@ static int bpf_sock_set_timestamping(struct sock *sk,
->>>>                return -EINVAL;
->>>>
->>>>        WRITE_ONCE(sk->sk_tsflags[BPFPROG_TS_REQUESTOR], flags);
->>>> +     static_branch_enable(&bpf_tstamp_control);
->>>
->>> Not sure when is a good time to do static_branch_disable().
->>
->> Thanks for the review.
->>
->> To be honest, I considered how to disable the static key. Like you
->> said, I failed to find a good chance that I can accurately disable it.
->>
->>>
->>> The bpf prog may be detached also. (IF) it ends up staying with the
->>> cgroup/sockops interface, it should depend on the existing static key in
->>> cgroup_bpf_enabled(CGROUP_SOCK_OPS) instead of adding another one.
->>
->> Are you suggesting that we need to remove the current static key? In
->> the previous thread, the reason why Willem came up with this idea is,
->> I think, to avoid affect the non-bpf timestamping feature.
->>
->>>
->>>>
->>>>        return 0;
->>>>    }
->>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
->>>> index f36eb9daa31a..d0f912f1ff7b 100644
->>>> --- a/net/core/skbuff.c
->>>> +++ b/net/core/skbuff.c
->>>> @@ -5540,6 +5540,29 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
->>>>    }
->>>>    EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
->>>>
->>>> +static bool sk_tstamp_tx_flags(struct sock *sk, u32 tsflags, int tstype)
->>>
->>> sk is unused.
->>
->> Thanks for the careful check.
->>
->>>
->>>> +{
->>>> +     u32 testflag;
->>>> +
->>>> +     switch (tstype) {
->>>> +     case SCM_TSTAMP_SCHED:
->>>
->>> Instead of doing this translation,
->>> is it easier to directly store the bpf prog desired ts"type" (i.e. the
->>> SCM_TSTAMP_*) in the sk->sk_tsflags_bpf?
->>> or there is a specific need to keep the SOF_TIMESTAMPING_* value in
->>> sk->sk_tsflags_bpf?
->>
->> We have to reuse SOF_TIMESTAMPING_* because there are more flags, say,
->> SOF_TIMESTAMPING_OPT_ID, that we need to support.
->>
->>>
->>>> +             testflag = SOF_TIMESTAMPING_TX_SCHED;
->>>> +             break;
->>>> +     case SCM_TSTAMP_SND:
->>>> +             testflag = SOF_TIMESTAMPING_TX_SOFTWARE;
->>>> +             break;
->>>> +     case SCM_TSTAMP_ACK:
->>>> +             testflag = SOF_TIMESTAMPING_TX_ACK;
->>>> +             break;
->>>> +     default:
->>>> +             return false;
->>>> +     }
->>>> +     if (tsflags & testflag)
->>>> +             return true;
->>>> +
->>>> +     return false;
->>>> +}
->>>> +
->>>>    static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
->>>>                                 const struct sk_buff *ack_skb,
->>>>                                 struct skb_shared_hwtstamps *hwtstamps,
->>>> @@ -5558,6 +5581,9 @@ static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
->>>>        if (!skb_may_tx_timestamp(sk, tsonly))
->>>>                return;
->>>>
->>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
->>>
->>> This is a new test. tsflags is the sk->sk_tsflags here if I read it correctly.
->>
->> This test will be used in bpf and non-bpf cases. Because of this, we
->> can support BPF extension. In this function, if skb has tsflags but we
->> don't know which approach the user expects, sk_tstamp_tx_flags() can
->> help us.
->>
->>>
->>> My understanding is the sendmsg can provide SOF_TIMESTAMPING_* for individual
->>> skb. Would it break?
->>
->> Oh, you're right. I didn't support cmsg mode...
-> 
-> I think I only need to test if it's in the bpf mode, or else let the
-> original way print the timestamp, which can solve the issue.
+Hi Sven,
 
- From looking at the existing "__skb_tstamp_tx(skb, NULL, NULL, skb->sk, 
-SCM_TSTAMP_SCHED);":
+kernel test robot noticed the following build errors:
 
-int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
-{
-	/* ... */
+[auto build test ERROR on s390/features]
+[also build test ERROR on linus/master v6.12-rc3 next-20241015]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
-		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHED);
+url:    https://github.com/intel-lab-lkp/linux/commits/Sven-Schnelle/s390-time-Add-clocksource-id-to-TOD-clock/20241015-185651
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git features
+patch link:    https://lore.kernel.org/r/20241015105414.2825635-4-svens%40linux.ibm.com
+patch subject: [PATCH 3/3] s390/time: Add PtP driver
+config: x86_64-buildonly-randconfig-003-20241016 (https://download.01.org/0day-ci/archive/20241016/202410161414.jC5t2eWE-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241016/202410161414.jC5t2eWE-lkp@intel.com/reproduce)
 
-	/* ... */
-}
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410161414.jC5t2eWE-lkp@intel.com/
 
-I am still puzzling how __skb_tstamp_tx() will be called if only bpf has enabled 
-the timestamping. I may have missed somewhere in the patch set that the skb's 
-tx_flags is changed by sk->sk_tsflags_bpf alone?
+All error/warnings (new ones prefixed by >>):
 
-I think a skb tskey is still desired (?), so eventually we want some spaces in 
-the skb for bpf. Jakub Sitnicki (cc-ed) has presented in LPC about extending 
-skb->data_meta usage outside of xdp and tc. I think here we want to have it 
-available at the tx side to store the tx_flags and tskey but probably want them 
-at a specific place/offset at the data_meta.
+>> drivers/ptp/ptp_s390.c:21:52: warning: declaration of 'union tod_clock' will not be visible outside of this function [-Wvisibility]
+      21 | static struct timespec64 eitod_to_timespec64(union tod_clock *clk)
+         |                                                    ^
+>> drivers/ptp/ptp_s390.c:23:26: error: call to undeclared function 'eitod_to_ns'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      23 |         return ns_to_timespec64(eitod_to_ns(clk));
+         |                                 ^
+>> drivers/ptp/ptp_s390.c:28:26: error: call to undeclared function 'tod_to_ns'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      28 |         return ns_to_timespec64(tod_to_ns(tod - TOD_UNIX_EPOCH));
+         |                                 ^
+>> drivers/ptp/ptp_s390.c:28:42: error: use of undeclared identifier 'TOD_UNIX_EPOCH'
+      28 |         return ns_to_timespec64(tod_to_ns(tod - TOD_UNIX_EPOCH));
+         |                                                 ^
+>> drivers/ptp/ptp_s390.c:34:18: error: variable has incomplete type 'union tod_clock'
+      34 |         union tod_clock tod;
+         |                         ^
+   drivers/ptp/ptp_s390.c:34:8: note: forward declaration of 'union tod_clock'
+      34 |         union tod_clock tod;
+         |               ^
+>> drivers/ptp/ptp_s390.c:36:7: error: call to undeclared function 'stp_enabled'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      36 |         if (!stp_enabled())
+         |              ^
+>> drivers/ptp/ptp_s390.c:39:2: error: call to undeclared function 'store_tod_clock_ext_cc'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      39 |         store_tod_clock_ext_cc(&tod);
+         |         ^
+>> drivers/ptp/ptp_s390.c:49:2: error: call to undeclared function 'ptff'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      49 |         ptff(&tod, sizeof(tod), PTFF_QPT);
+         |         ^
+>> drivers/ptp/ptp_s390.c:49:26: error: use of undeclared identifier 'PTFF_QPT'
+      49 |         ptff(&tod, sizeof(tod), PTFF_QPT);
+         |                                 ^
+   drivers/ptp/ptp_s390.c:64:18: error: variable has incomplete type 'union tod_clock'
+      64 |         union tod_clock clk;
+         |                         ^
+   drivers/ptp/ptp_s390.c:64:8: note: forward declaration of 'union tod_clock'
+      64 |         union tod_clock clk;
+         |               ^
+   drivers/ptp/ptp_s390.c:66:2: error: call to undeclared function 'store_tod_clock_ext_cc'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      66 |         store_tod_clock_ext_cc(&clk);
+         |         ^
+   drivers/ptp/ptp_s390.c:67:29: error: call to undeclared function 'tod_to_ns'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      67 |         *device_time = ns_to_ktime(tod_to_ns(clk.tod - TOD_UNIX_EPOCH));
+         |                                    ^
+   drivers/ptp/ptp_s390.c:67:49: error: use of undeclared identifier 'TOD_UNIX_EPOCH'
+      67 |         *device_time = ns_to_ktime(tod_to_ns(clk.tod - TOD_UNIX_EPOCH));
+         |                                                        ^
+   drivers/ptp/ptp_s390.c:76:7: error: call to undeclared function 'stp_enabled'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      76 |         if (!stp_enabled())
+         |              ^
+   1 warning and 13 errors generated.
 
-For now, is there thing we can explore to share in the skb_shared_info? Can the 
-"struct skb_shared_hwtstamps hwtstamps;" be used for the bpf tx_flags and tskey 
-only at the "tx" side? There is already another union member. The hwtstamps 
-should only be needed when the NIC is done sending?
+
+vim +/eitod_to_ns +23 drivers/ptp/ptp_s390.c
+
+    20	
+  > 21	static struct timespec64 eitod_to_timespec64(union tod_clock *clk)
+    22	{
+  > 23		return ns_to_timespec64(eitod_to_ns(clk));
+    24	}
+    25	
+    26	static struct timespec64 tod_to_timespec64(unsigned long tod)
+    27	{
+  > 28		return ns_to_timespec64(tod_to_ns(tod - TOD_UNIX_EPOCH));
+    29	}
+    30	
+    31	static int ptp_s390_stcke_gettime(struct ptp_clock_info *ptp,
+    32					  struct timespec64 *ts)
+    33	{
+  > 34		union tod_clock tod;
+    35	
+  > 36		if (!stp_enabled())
+    37			return -EOPNOTSUPP;
+    38	
+  > 39		store_tod_clock_ext_cc(&tod);
+    40		*ts = eitod_to_timespec64(&tod);
+    41		return 0;
+    42	}
+    43	
+    44	static int ptp_s390_qpt_gettime(struct ptp_clock_info *ptp,
+    45					struct timespec64 *ts)
+    46	{
+    47		unsigned long tod;
+    48	
+  > 49		ptff(&tod, sizeof(tod), PTFF_QPT);
+    50		*ts = tod_to_timespec64(tod);
+    51		return 0;
+    52	}
+    53	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
