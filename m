@@ -1,133 +1,137 @@
-Return-Path: <netdev+bounces-136104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597859A0541
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:21:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E30C9A0568
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 120081F25258
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:21:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 507742822A7
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243FF205125;
-	Wed, 16 Oct 2024 09:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2AC205159;
+	Wed, 16 Oct 2024 09:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="CeN1sePk"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864431DE3C8
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 09:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1C01C07E7
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 09:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729070457; cv=none; b=WP0JTjrJbo1ED+4pMRJHL6UIDza4IMVBwuDf54VPoKIVxepMNAnLNQd/99yq47vGrH7WR3D9yGoa6u7LurQ6FKDP38XsLxG0LSdZSY8j2LE4lV33hVtcQAhEVJ8AtCu26urmOyjqMit7+9XNCCakX6pBUywGhujuRjHlp+ULBEQ=
+	t=1729070730; cv=none; b=MBjfA2jN5NXd0o38uwenECqAL0BndNGlhftU2D3f3COV85m05lNj8Y+8gTHEQ1o4Wg/lrnysW2l0EaP7wYil4BzVDb68QGgmUZSc2X7+Feeyguujqq32o+ZbXKHPV0kx1jabw5zEDX85YMTtlaKBkjB+z4RnQwmhYt/duxz0WPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729070457; c=relaxed/simple;
-	bh=P/Ydz5Di/X5ftPuix74WEe2g1Deqm8n03SA7g25JTDc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RzvBDPjYjH4m+So6cnTtZXeObsKI8oinyPkNnY4Uys8xOHPia8hDVPy8aGBDVOpmfstp90LTnhaa00oE59IYj+sVgdzMqNBJsjN+v4jwuNCwv2NuAJJaOE9hU9ucwdmZghTO/7NfJVzT4jgywaGX8Du3l63/CQLpOTRFuZgHp9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XT55P6YLxz1jB2Y;
-	Wed, 16 Oct 2024 17:19:37 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id DAA05140361;
-	Wed, 16 Oct 2024 17:20:51 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 16 Oct 2024 17:20:51 +0800
-Message-ID: <89d7ce83-cc1d-4791-87b5-6f7af29a031d@huawei.com>
-Date: Wed, 16 Oct 2024 17:20:51 +0800
+	s=arc-20240116; t=1729070730; c=relaxed/simple;
+	bh=CsGgD+qH71/AKiBo/WfF0YMK/W1xSO5fBqqJd4DYfSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=REmZ7tRU5bEXMkv9VFm/MOrFaC1Ja+zPEe6jW1sI8XZrcpwwVOEqJI5l6U5T80lAp/a4CTxxBhugygXIHrGxMtcPSRa5v5wQnrSu1R0WHW/kCgTK4plWI3wIrjUKO1XoIRxNRxNffFeFcz7BRl+xkrk5xKf4ds9th/DlpxPE/q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=CeN1sePk; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a99ebb390a5so131633866b.1
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 02:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1729070727; x=1729675527; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nAcAhz+WKByaKGZfhQyRvSHovNnJyQjvHY17d0j7nbE=;
+        b=CeN1sePko6BupsLWMU5Bew+MiCam5HBqApyfr1bbevRByKdxO8Mj1gVG33FSykzRTz
+         qpBJfd/UCTPOAtC2falu+3MZjQD7oBdXwIe+Ej59z8xlfYN1MMle4PLuAxphffw6lxPE
+         EGvLt2k/dR+0s742UvxCYJ6cEGYAa48E1ZfBuMSiV8eeGYuhv4gu1QJDcPvWw6i7YtTi
+         z2C3VI3E4o3Tgxno24j7f1hDK7Ak5E+WQRMNqdE+VhrXUFChveK+Lax+EpRxanXeIiXM
+         1eJWuq6x+YKgvp3GaFAPPiTOt7OvkZ8nunTS4fn5VC9FwnC42Q4IytW3I9aHw/RMAwoO
+         fE3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729070727; x=1729675527;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nAcAhz+WKByaKGZfhQyRvSHovNnJyQjvHY17d0j7nbE=;
+        b=QCeKJMm9Sdl5SudV+9+Po8L/nzklNVCS5fll0iHvh3lganXM/8+3woOJa8bYKBo9kY
+         ilD9A9uWKra7h2U3iZlNyGV5tl289DHOf6P24EnUPeCHGM6sCn2lFJXRpLoMC2Ba69fn
+         pgxfYzUHF9mvgqJGObxsH/0RBvISTi0jqhcyM6wBzkt7imvaV0igXkNBOrQTS9WJuWWE
+         JneX7/oJu6BJtyyH0LRjVdWDqPgAPiApwwGmQvJbhWYEurXI/EjswEQGzvUkJTuk0dRy
+         94ac6RPdJya9dTvMumb6cANx8XW8RmXjogXW9mjZhKJR8dcqxBK7F8xsXvIdR5xXOcue
+         6M2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVU+EJe4HlQ1kSpUss+B9EV79A29J0urb++ES0b3SwVB5mBc2BRs6/j25aV2pDHxcGMYuXrFfM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRgJAhkqEkSOeg+5lyuayIxOh2St0ecqvAVVRMhB9Kzam4EBKR
+	mqIqhTmSGL2YzITRxsQNpietRYsxzwWDGjFMGp+nssIEQ0W/ETH0NgJ95DVvfmQ=
+X-Google-Smtp-Source: AGHT+IGuH9rxVdG1k866GOE7xv2ukPlrZjmmiS/KSiq5f3JFKCZWOSxSvImth/A6E1KhcU5tZlcuVQ==
+X-Received: by 2002:a17:907:2da9:b0:a99:4566:cd42 with SMTP id a640c23a62f3a-a9a332bd9bcmr393696566b.0.1729070727076;
+        Wed, 16 Oct 2024 02:25:27 -0700 (PDT)
+Received: from localhost (p200300f65f19e3002f38cf427133ca7b.dip0.t-ipconnect.de. [2003:f6:5f19:e300:2f38:cf42:7133:ca7b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a29817520sm161210466b.114.2024.10.16.02.25.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 02:25:26 -0700 (PDT)
+Date: Wed, 16 Oct 2024 11:25:25 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Jingyi Wang <quic_jingyw@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, quic_tengfan@quicinc.com, quic_tingweiz@quicinc.com, 
+	quic_aiquny@quicinc.com, linux-arm-msm@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] pinctrl: qcom: add the tlmm driver for QCS8300
+ platforms
+Message-ID: <c7ahyrbo3bw6vgfwqaubricap52muhxyhsnb5cfhzvo3n67dsr@gp6vehlfwblo>
+References: <20241009-qcs8300_tlmm-v2-0-9e40dee5e4f1@quicinc.com>
+ <20241009-qcs8300_tlmm-v2-2-9e40dee5e4f1@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/3] gve: adopt page pool for DQ RDA mode
-To: Praveen Kaligineedi <pkaligineedi@google.com>, <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <willemb@google.com>, <jeroendb@google.com>,
-	<shailend@google.com>, <hramamurthy@google.com>, <ziweixiao@google.com>,
-	<shannon.nelson@amd.com>, <jacob.e.keller@intel.com>
-References: <20241014202108.1051963-1-pkaligineedi@google.com>
- <20241014202108.1051963-3-pkaligineedi@google.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20241014202108.1051963-3-pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemf200006.china.huawei.com (7.185.36.61)
-
-On 2024/10/15 4:21, Praveen Kaligineedi wrote:
-
-...
-
-> +void gve_free_to_page_pool(struct gve_rx_ring *rx,
-> +			   struct gve_rx_buf_state_dqo *buf_state,
-> +			   bool allow_direct)
-> +{
-> +	struct page *page = buf_state->page_info.page;
-> +
-> +	if (!page)
-> +		return;
-> +
-> +	page_pool_put_page(page->pp, page, buf_state->page_info.buf_size,
-> +			   allow_direct);
-
-page_pool_put_full_page() might be a better option here for now when
-page_pool is created with PP_FLAG_DMA_SYNC_DEV flag and frag API like
-page_pool_alloc() is used in gve_alloc_from_page_pool(), as explained
-in below:
-
-https://lore.kernel.org/netdev/20241014143542.000028dc@gmail.com/T/#mdaba23284a37affc2c46ef846674ae6aa49f8f04
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="j5kcwsuh3x6dnxeb"
+Content-Disposition: inline
+In-Reply-To: <20241009-qcs8300_tlmm-v2-2-9e40dee5e4f1@quicinc.com>
 
 
-> +	buf_state->page_info.page = NULL;
-> +}
-> +
-> +static int gve_alloc_from_page_pool(struct gve_rx_ring *rx,
-> +				    struct gve_rx_buf_state_dqo *buf_state)
-> +{
-> +	struct gve_priv *priv = rx->gve;
-> +	struct page *page;
-> +
-> +	buf_state->page_info.buf_size = priv->data_buffer_size_dqo;
-> +	page = page_pool_alloc(rx->dqo.page_pool,
-> +			       &buf_state->page_info.page_offset,
-> +			       &buf_state->page_info.buf_size, GFP_ATOMIC);
-> +
-> +	if (!page)
-> +		return -ENOMEM;
-> +
-> +	buf_state->page_info.page = page;
-> +	buf_state->page_info.page_address = page_address(page);
-> +	buf_state->addr = page_pool_get_dma_addr(page);
-> +
-> +	return 0;
-> +}
-> +
-> +struct page_pool *gve_rx_create_page_pool(struct gve_priv *priv,
-> +					  struct gve_rx_ring *rx)
-> +{
-> +	u32 ntfy_id = gve_rx_idx_to_ntfy(priv, rx->q_num);
-> +	struct page_pool_params pp = {
-> +		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-> +		.order = 0,
-> +		.pool_size = GVE_PAGE_POOL_SIZE_MULTIPLIER * priv->rx_desc_cnt,
-> +		.dev = &priv->pdev->dev,
-> +		.netdev = priv->dev,
-> +		.napi = &priv->ntfy_blocks[ntfy_id].napi,
-> +		.max_len = PAGE_SIZE,
-> +		.dma_dir = DMA_FROM_DEVICE,
-> +	};
-> +
-> +	return page_pool_create(&pp);
-> +}
-> +
+--j5kcwsuh3x6dnxeb
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Subject: Re: [PATCH v2 2/2] pinctrl: qcom: add the tlmm driver for QCS8300
+ platforms
+MIME-Version: 1.0
+
+Hello,
+
+On Wed, Oct 09, 2024 at 03:13:34PM +0800, Jingyi Wang wrote:
+> +static struct platform_driver qcs8300_pinctrl_driver = {
+> +	.driver = {
+> +		.name = "qcs8300-tlmm",
+> +		.of_match_table = qcs8300_pinctrl_of_match,
+> +	},
+> +	.probe = qcs8300_pinctrl_probe,
+> +	.remove_new = msm_pinctrl_remove,
+> +};
+
+After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
+return void") .remove() is (again) the right callback to implement for
+platform drivers. Please just drop "_new".
+
+Best regards
+Uwe
+
+--j5kcwsuh3x6dnxeb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmcPhoMACgkQj4D7WH0S
+/k5wKAf+IPTyWzUJGyfnwvsaubOBtnB01M9oVSzRUcNzhJPT73Kfs+cV+EuTUZAO
+BCLxBt2kYj7apexaqmUlQ1tXV4LKJg/b3HMSRRSse/p8/3coNijUhzWrkyecF5mz
+4OiEhQ1+n08h+u3ewHZ1WqQFICNXmOvoeYZ1DoZYV+G0N3sPsFHfngj9luRiI/4A
+fhwzWJA+0P3AWQQYWGMouOFZh5WXQXsEHwwfEUfBg7s/pyL7wiJtXKTVTx7Ziv1X
+cd2LuwjZvlstCkQrnS6QRn9G9XuE0YSfE+H4vra5SRr6k7YaKqlY2OIKev7OFbhV
+7KiwUUEE0UdVHFDIeXrvZ7lCJN/9/w==
+=BODQ
+-----END PGP SIGNATURE-----
+
+--j5kcwsuh3x6dnxeb--
 
