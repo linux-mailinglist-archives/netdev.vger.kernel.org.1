@@ -1,134 +1,231 @@
-Return-Path: <netdev+bounces-136048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2F79A01B0
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:45:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48B5F9A01EB
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 418EBB24B24
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:45:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBB4B1F260F1
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 06:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6DA18C029;
-	Wed, 16 Oct 2024 06:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F691AAE17;
+	Wed, 16 Oct 2024 06:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2VF0+RX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faAgi0n+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5002A184549;
-	Wed, 16 Oct 2024 06:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E5919340B
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 06:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729061142; cv=none; b=tqgJKuP8Ev0jYM/TAC3eNXenCkz5PCONawurBzmQZo2u5twOSAEm9YbdM6fObGru31Hk2Ne+R1dfsL3YCifcgFVOSrVoo0CoQtvEmlebS3/y1uUd4Mk2rXEaeOVymeu/0MnPhnDuCVDKXLCxkc+MRMlSRlggGnWk3Qyn/e6HupI=
+	t=1729061892; cv=none; b=ogdzzkbRUiWOl4m44sZQNwkqkU7eZaCzt8v1Vj1mCRCgtO8v2dTCkfCQ5qwjj4jaq+iiekjsb36mFpZhpIEK1v2ZR9rKvrwfVdambNZ+wGE0o6ByI0b6zVQNuGh9+Zj8ncM4+PBakJvI8KE3RI+D4/KNCR8O13KBx+uuZthhUXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729061142; c=relaxed/simple;
-	bh=oSDymd/H9f0BSefS46X3kDjbWgANSIiIaU3cmbWb+zk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KPa3OJ9CLN5IgUbOSSK3BGzmJd2dPLZMCnX39KnoY9wxynZ19+9eJnX699iubJKLwFwqjK49GJLV66J2RZNJRsCVsnGJTRPInJFH6jDtuKEuwYXBVNcBDaBhZXjzfrQFbIj0h5dnyLEcklZKee32u5SYOOPEadQOV2V1c4kIZk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P2VF0+RX; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-8354845c5dcso266997639f.0;
-        Tue, 15 Oct 2024 23:45:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729061140; x=1729665940; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oSDymd/H9f0BSefS46X3kDjbWgANSIiIaU3cmbWb+zk=;
-        b=P2VF0+RXW8XNuy4YXuSJ4onXtm4MTReR0b0sC2k4lHw9A+KFtiMpmuvpxa0slv0bYp
-         3iI9kMydnwdsTv2DjMVZgSH/lqWNDn8kSRnN8imbuaAPAa4FfUqlWIWXs7CI5ty1QbZQ
-         nzUmEtrWxdkL4jD/rry8LzLalkpHLcH2bpB5TRxmiCABp6x2/8vr0vHRAm1CVjsh6a2n
-         RrwoSu5/DZqWgCafqvidxO1NFK14LSApqWn+hN8IBIGQ9L6obJp90rPWR7Lk0/rSvGVM
-         HqMPPqZs1xLsn5yCCZbQ3x9ybjmaeshUF6De8TZjFY7AVoRBvhGwWXdpiPNDiKtK7xMi
-         rVBQ==
+	s=arc-20240116; t=1729061892; c=relaxed/simple;
+	bh=nKJfP3LmeT/Qx7oKj5HM871IgPtYRSHVMsPL1c0DDh4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kmn44vtBHcJXgd5BAUXT84fXU18X3uG9jm7o/jBkbSh3BaJ4vPwk1vANxtSyvhZhIcrcY489gaS0vaMa83cbBhVTCCQHBMLkwsSGzAPqmKJ3KKTMZGG0PIk5L1Hx0YNENo8ZdEXTjyaJmS5r7YEun7dU42gbyg/H5oDHl6YA9h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=faAgi0n+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729061889;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nKJfP3LmeT/Qx7oKj5HM871IgPtYRSHVMsPL1c0DDh4=;
+	b=faAgi0n+nbWHYJ4pDmHKIOAXnzZ19LFScJO289nhqxn51rHmnBrwc5qTlpbmCAiin+iS5E
+	eFQ2EeUBmDSaB5ATUx2+ha6H060UW6foeQ9yzW05yiP0Ae1JLq7a4ifOEAdMkXN/CRRhj+
+	q/4Ss0Ui80qpErz8YtHn3X3bqq1PsOg=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-497--rwDewsiOIaVMiAM9hednw-1; Wed, 16 Oct 2024 02:58:08 -0400
+X-MC-Unique: -rwDewsiOIaVMiAM9hednw-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b111381632so1218010885a.3
+        for <netdev@vger.kernel.org>; Tue, 15 Oct 2024 23:58:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729061140; x=1729665940;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oSDymd/H9f0BSefS46X3kDjbWgANSIiIaU3cmbWb+zk=;
-        b=fKVpdjeJcK8Fg3O9wO7RnbNilJjIDl+Y5ay1pMShnUy0xeYI/ABFtEOlmsXnuo8kFZ
-         U8wZzKx87cNd9RI/uIQcSuJRvNpxyKH/bwrPbFOllJ29q2A13ye3C0xYDAbQUZWU7Clg
-         dRYZrYuYl5Gt9zGZOM6qsHNUaMA4DMkGhrdwfcGYU6Dnca726Z3T34QLMNYTmcBUejY0
-         13W56n3E/Pyn+Uu4AeATzM22uqzWOur+f0MdeaZcIyVQkqSjZamyMBvvnd2r5EWJGeIR
-         +O5BGbq67aCcd/6ZmAwL2KgRHi/PWqLnConFrUda6uQ+nYKyokvCStwQdx8s1nfPhiDm
-         Sgfg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/y4jbH/wdMM3yYRvUyeNSrvLsPbBh1L0ucG1w0wiIjLY0i0rgSNQP1+513a+Up8I4FVUUJE9B@vger.kernel.org, AJvYcCXFn5L0Ab3hFKxD++hvYQSfkE2vZ2IQG1yM10Qpw9HSuF8+7EiJW7XV3UB12ciUKlRHnjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEP2h0Ci8Ud1/Cl5E2Ak2199zgygXnFl4N765XPRJpRRjQfS+c
-	dnz6+Zr+uJet90HAPtlPp6mD1ma6/3/32Dbkjjk7gDBNcMEOKESQxFOJUSX67bmI7f88GfAENAH
-	7mON0qG2FA0NBwgWKhp39wl2thTU=
-X-Google-Smtp-Source: AGHT+IElicXmF1lXRk1mDOq2/f6GFR9GDxeNlaVtgK4wko074sZk0NvO9jxG//ZbQ+ONd9rXHiGuUaKBYtXa1jRo/3A=
-X-Received: by 2002:a05:6e02:b26:b0:3a0:49da:8f6d with SMTP id
- e9e14a558f8ab-3a3dc4f640amr28938865ab.22.1729061140318; Tue, 15 Oct 2024
- 23:45:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729061887; x=1729666687;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nKJfP3LmeT/Qx7oKj5HM871IgPtYRSHVMsPL1c0DDh4=;
+        b=qkjND/9FdqrQOrXwvkQQmc7FWWV0F1yaWEBHQf6ZWamOp23Wkg20N4c8JHtbXvdye+
+         sLFUv9BPgG7ec7VHcrFUSnqFPeQBPCo+WOQDHLjyBohm7TCsXnU0k7ZIUriWcNkqJMmS
+         pzo0O4Q0wUp6GObGW3z8yhcVF7XRs/ySCvLG86hVkQ1PWYTbJdBVC0uONVr689vCuDNE
+         akZPtmTPGZXvqhrudd8aARpSyUMeT6+mG1gx3TXoQ2im5aIQPwBgPrU++ybVdLKoVpQK
+         0ug2rtLLEbwUMvpDycU7B955aWvsVIl3twopnmjZE/OfHMVrRgtLmUDyUa1/dN5tP/Um
+         FIxA==
+X-Forwarded-Encrypted: i=1; AJvYcCXF2J005E73oC3/masL4TvM61SiauwM5JhYf+Knfqlnmgm87SU9C6mSaXYzcGn6q5KJDN2hf6s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHDk1q5Q3mSPRqnecRdAd4q0CqAlrw6aKSxKvbvu15t4U8/hXE
+	HaQMvFP5898w9kEI/mDDT0B/tej6cfBc+uJIPJNSodEj+RL2DqpUoHFxylw8OPW2FHfHLe5Hwpu
+	W2CLy01VUg1xvGoj6kVuwBM0LmfIJYLYfjp1riYsHGrgh/gx7NH21oQ==
+X-Received: by 2002:a05:620a:400d:b0:7a1:62ad:9d89 with SMTP id af79cd13be357-7b14186f1c8mr461445385a.64.1729061887545;
+        Tue, 15 Oct 2024 23:58:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFcw8kz1/9R04Vwhhq2lqNVDk3gX6xFnXYOAV6a2cL/WNRAli0C59zaADhpNPO2+u1Q91URSw==
+X-Received: by 2002:a05:620a:400d:b0:7a1:62ad:9d89 with SMTP id af79cd13be357-7b14186f1c8mr461441885a.64.1729061887092;
+        Tue, 15 Oct 2024 23:58:07 -0700 (PDT)
+Received: from dhcp-64-113.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b136164dfbsm149785985a.21.2024.10.15.23.57.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 23:58:06 -0700 (PDT)
+Message-ID: <fc7244823a5665d3db40c94aea099a2973032a0b.camel@redhat.com>
+Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+ <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>,  Mario Limonciello
+ <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>,  Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>,  Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>,  Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
+ <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>, Ankit Agrawal
+ <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette Chatre
+ <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-input@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Wed, 16 Oct 2024 08:57:58 +0200
+In-Reply-To: <20241015135336.0de9795e.alex.williamson@redhat.com>
+References: <20241015185124.64726-1-pstanner@redhat.com>
+	 <20241015185124.64726-14-pstanner@redhat.com>
+	 <20241015135336.0de9795e.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-5-kerneljasonxing@gmail.com> <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
- <CAL+tcoBieZ3_ZX3PRY8k7-C6Rv2g=Mr1U1NAQkQpbHYYvtWpTQ@mail.gmail.com> <49a87125-d5bd-4b8d-964e-0d745e9e669b@linux.dev>
-In-Reply-To: <49a87125-d5bd-4b8d-964e-0d745e9e669b@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 16 Oct 2024 14:45:04 +0800
-Message-ID: <CAL+tcoC5QLfpAuJrZxUPbaaK68pGKD31vuohi=NcXghe+uRpZA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
- control the whole bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 16, 2024 at 2:31=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 10/15/24 6:04 PM, Jason Xing wrote:
-> > To be honest, I considered how to disable the static key. Like you
-> > said, I failed to find a good chance that I can accurately disable it.
->
-> It at least needs to be disabled whenever that bpf prog got detached.
->
-> >
-> >> The bpf prog may be detached also. (IF) it ends up staying with the
-> >> cgroup/sockops interface, it should depend on the existing static key =
-in
-> >> cgroup_bpf_enabled(CGROUP_SOCK_OPS) instead of adding another one.
->
-> > Are you suggesting that we need to remove the current static key? In
-> > the previous thread, the reason why Willem came up with this idea is,
-> > I think, to avoid affect the non-bpf timestamping feature.
->
-> Take a look at cgroup_bpf_enabled(CGROUP_SOCK_OPS). There is a static key=
-. I am
-> saying to use that existing key. afaict, the newly added bpf_tstamp_contr=
-ol key
-> is mainly an optimization. Yes, cgroup_bpf_enabled(CGROUP_SOCK_OPS) is le=
-ss
-> granular but it has the needed accounting to disable whenever the bpf pro=
-g got
-> detached, so better just reuse the cgroup_bpf_enabled(CGROUP_SOCK_OPS).
+On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
+> On Tue, 15 Oct 2024 20:51:23 +0200
+> Philipp Stanner <pstanner@redhat.com> wrote:
+>=20
+> > pci_intx() and its managed counterpart pcim_intx() only exist for
+> > older
+> > drivers which have not been ported yet for various reasons. Future
+> > drivers should preferably use pci_alloc_irq_vectors().
+> >=20
+> > Mark pci_intx() and pcim_intx() as deprecated and encourage usage
+> > of
+> > pci_alloc_irq_vectors() in its place.
+>=20
+> I don't really understand this.=C2=A0 As we've discussed previously
+> pci_alloc_irq_vectors() is, unsurprisingly, for allocating PCI IRQ
+> vectors while pci_intx() is for manipulating the INTx disable bit on
+> PCI devices.=C2=A0 The latter is a generic mechanism for preventing PCI
+> devices from generating INTx, regardless of whether there's a vector
+> allocated for it.=C2=A0 How does the former replace the latter and why do
+> we
+> feel the need to deprecate the latter?
+>=20
+> It feels like this fits some narrow narrative and makes all users of
+> these now deprecated functions second class citizens.=C2=A0 Why?=C2=A0 At=
+ it's
+> root these are simply providing mask and set or mask and clear
+> register
+> bit operations.=C2=A0 Thanks,
 
-Good suggestion. Good thing is that I don't need to figure out a
-proper place to disable it any more. I can directly use
-cgroup_bpf_enabled(CGROUP_SOCK_OPS) to test if the timestamp should be
-printed with BPF program loaded.
+I got the feeling from the RFC discussion that that was basically the
+consensus: people should use pci_alloc_irq_vectors(). Or did I
+misunderstand Andy and Heiner?
 
-BTW, I found that we don't implement how to disable the ip4_min_ttl
-static key. Sometimes, I'm confused whether we have to disable it at a
-certain time.
+I'm perfectly happy with dropping this patch and continue offering
+pci{m}_intx() to users, since after removing that hybrid hazzard I
+don't see any harm in them anymore.
 
-Thanks,
-Jason
+
+P.
+
+>=20
+> Alex
+> =C2=A0
+> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > ---
+> > =C2=A0drivers/pci/devres.c | 5 ++++-
+> > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0 | 5 ++++-
+> > =C2=A02 files changed, 8 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
+> > index 6f8f712fe34e..4c76fc063104 100644
+> > --- a/drivers/pci/devres.c
+> > +++ b/drivers/pci/devres.c
+> > @@ -435,7 +435,7 @@ static struct pcim_intx_devres
+> > *get_or_create_intx_devres(struct device *dev)
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0/**
+> > - * pcim_intx - managed pci_intx()
+> > + * pcim_intx - managed pci_intx() (DEPRECATED)
+> > =C2=A0 * @pdev: the PCI device to operate on
+> > =C2=A0 * @enable: boolean: whether to enable or disable PCI INTx
+> > =C2=A0 *
+> > @@ -443,6 +443,9 @@ static struct pcim_intx_devres
+> > *get_or_create_intx_devres(struct device *dev)
+> > =C2=A0 *
+> > =C2=A0 * Enable/disable PCI INTx for device @pdev.
+> > =C2=A0 * Restore the original state on driver detach.
+> > + *
+> > + * This function is DEPRECATED. Do not use it in new code.
+> > + * Use pci_alloc_irq_vectors() instead (there is no managed
+> > version, currently).
+> > =C2=A0 */
+> > =C2=A0int pcim_intx(struct pci_dev *pdev, int enable)
+> > =C2=A0{
+> > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> > index 7ce1d0e3a1d5..dc69e23b8982 100644
+> > --- a/drivers/pci/pci.c
+> > +++ b/drivers/pci/pci.c
+> > @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct pci_dev
+> > *dev)
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0/**
+> > - * pci_intx - enables/disables PCI INTx for device dev
+> > + * pci_intx - enables/disables PCI INTx for device dev
+> > (DEPRECATED)
+> > =C2=A0 * @pdev: the PCI device to operate on
+> > =C2=A0 * @enable: boolean: whether to enable or disable PCI INTx
+> > =C2=A0 *
+> > =C2=A0 * Enables/disables PCI INTx for device @pdev
+> > + *
+> > + * This function is DEPRECATED. Do not use it in new code.
+> > + * Use pci_alloc_irq_vectors() instead.
+> > =C2=A0 */
+> > =C2=A0void pci_intx(struct pci_dev *pdev, int enable)
+> > =C2=A0{
+>=20
+
 
