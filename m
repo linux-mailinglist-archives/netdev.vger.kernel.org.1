@@ -1,86 +1,89 @@
-Return-Path: <netdev+bounces-136135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 132C69A07FE
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 13:04:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6904D9A0802
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 13:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93E46B2267A
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:04:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 045A9B22B71
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 11:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E24E207208;
-	Wed, 16 Oct 2024 11:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AFF207210;
+	Wed, 16 Oct 2024 11:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbTnO6ig"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TrWFJ6/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702CA1CACDB;
-	Wed, 16 Oct 2024 11:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3168A1CACDB;
+	Wed, 16 Oct 2024 11:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729076686; cv=none; b=g0UK/WUM4JqwH7G4bYfT0SSBXGMmBdpiOOlzYDEhi2UEi7DG9BfnDqiHZg646PoY0aN1K3MC/Prf4FupLu4WtAJzsWUjSHStZCM6nSFvmzOjJq3U9SW68fs4aRCeNPoq3xt97eOaMGq6J3Lxrho60Pb3j6JAl1C8nJtfdU7zbto=
+	t=1729076754; cv=none; b=ckQWNu88fkHol67DECp4hylkMUwozRlO20d+wmAFzblJuvDUv5GrOB6wlfcAI192+snA+meMt/DFwqtjvrSbPWvQS+9zqELFmSKInxVoNaIYpwDwuGUGZuluySjn7DQkmUwqS6uhkfr2mDQNonMe87motF9bZb2PtJJt7EoAKWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729076686; c=relaxed/simple;
-	bh=/JTdtZ8yw6tvm9jNmB3rBmdMWwXa9IoO6v7YodFLaWA=;
-	h=From:Date:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TlTIatD/iWzPLWEcvuXLl89vQ9IJXztIEMrmoqlXGvp6RhOKYEXRp4snD4REOyCV9UYo1PsHmQKD2vmSVOtBqBZlL7Z43+NtNVJBY7t+25kWOfF27UgOouFPrM7fSKpyt1tpDUFJDE0rfDZgGaPny9S31Z5ohuP+QyzEfhS8YPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YbTnO6ig; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1729076754; c=relaxed/simple;
+	bh=LGP8XR63nNO5ElCIu/02JsR6KlPMp9Bah7/In8e+CR4=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=klCyDhnOGNNK7bgqTU+72CyUxVKl/wiahngPSm3VQvTVmgSXD6kvy3KJhRThAK7D0LpbajpSW3JGiqc/S+zCETMjBorEXu9l9LlM0sMqlYWH/t/ol1TbFvFJi6e7ktX0ZOLnrYBqiONJl/FVgNFDGN0YHWVZYTNmWP+U/irSKdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TrWFJ6/Z; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb501492ccso28741651fa.2;
-        Wed, 16 Oct 2024 04:04:44 -0700 (PDT)
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2fb5014e2daso32863611fa.0;
+        Wed, 16 Oct 2024 04:05:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729076682; x=1729681482; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729076751; x=1729681551; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NDbDctKYaoGebw4v3E0DI+6dZhiijtiLFfSf+SUecWQ=;
-        b=YbTnO6igDl3Osz/id9gmHd05VnChMBUfDPZaT48hQuAya7C5SHvPdZ8yofOlQtRNQ1
-         ct26DNF0Ibt1xU/8KElQjjY0Tp+jxDzpCfvHtpQj/yD81Eqv9shDFyXt8KpNItZ0SVsh
-         DbMAXhTkOJhhurP7rltIUQsQR0ldJAnsga0juFW4JjsgC4lmCiUx9XHBIUAtgH7JZrMZ
-         1dEKkN0BMQJ1nIVXGs19p0WNeaWYABxcgTI2lm8Hh3jr17VPZEWkj6cz+zGWb0aBLXXP
-         QnJQ/rnN+rn4EvPVznFHuUjK8+7TwtRnYOa4/C0E1xQhOrBmarMMxLZ+8VKwXsk8ienG
-         J2WA==
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=m4LueB2KQgGxlu12dfcJNaqU0W/5O88/vcQ/21eniVw=;
+        b=TrWFJ6/Z+Fu0IdUI7Du+sKW8No2SL5lWFZBZwV/HNv2YTYLV5cU9FS82feuG5fOymx
+         oVLePCZUW2Hk+VG0lxixlkZwnyhQbYRvW5/Nnx7bKhThBrMhtpiBk5138GmP6/mOisM6
+         lvUtniKNjpNWLblHHjj3CqMetwe1oKeZiDD7bPfm8DUufWv/gW6RPEjzesbLP7bZxPea
+         wxP1ER8zxipol276Rt2e1UpMa8lQKps96qROH70kEbcfRwNNs6lOizRYL3NQsmpjEPUn
+         ol8yrWG7syxjJN9BydyfVKLExv2cJSbsHlArex9VHF11d+oObhHZNlWi3+zU0UbjOfts
+         5Qnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729076682; x=1729681482;
+        d=1e100.net; s=20230601; t=1729076751; x=1729681551;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:date:from:x-gm-message-state:from:to:cc:subject:date
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NDbDctKYaoGebw4v3E0DI+6dZhiijtiLFfSf+SUecWQ=;
-        b=VdYuHmaPsWXulkT5TV2jdv1zdFt+AKB0cSWenm3k0beOMDBsVKsK7cMwFpIwMs0ikx
-         +f7jRPmLhz3Fjj5tOIbXI5dj0bwWs80j7pirfnXoq+7yhwfKs2dBzfhXanuieLl/WuHS
-         C1j62HwY/2lcZcrpwrhHUd/og11nclLwMonZcT/AjzvCy5Lyd8zT5tdz7ShqHdIAkGRM
-         Iqj1a7YO817fyER3UtOhmkN5wuLahegDu/M09SFdgwrRPN+PtuYrY6Myt9LPiIBl2jPt
-         oFwwjzK6zp5UmLsS2tFc5A8dL7H4NK/81FDOm4QdCDcXPWo1TuXAkypBTsb3M56hOvtr
-         eUwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwVeNlJChzPFmCaau3eJ7gJh8KxOtvY/NVF2qFooX9mw8OqkzUSoHLvhoRuyLDwOQBu8pg0QjJJo/akqjr7bw=@vger.kernel.org, AJvYcCV6bPAJLle3aIywtIgtZKwABIUNqyiAQ7n8yop9k3rHQJB8oOH3QVkFPpc0TeF6qkQQ0H7yYcrX@vger.kernel.org, AJvYcCWfR26NtCpHvnHRhI3Mu40pAdqmf1hLEaLBU7hKzOcd63f5/CQ48F4cgdaXYm7wdNlFwQNxbqiqW9RZZf1R@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ3leMRryA9y5OYBDiuxZ2JZC5uDdQYQS7fO/U9FMvKYmAd/Nr
-	4hemdWm9JzKprxqgpHghWhFeFbZfTFEKI5TtBHjeadHJf8QoQCJP
-X-Google-Smtp-Source: AGHT+IGfqoIo176A3Xc2Q2xeErsC3HAJJY4ekVVwX4mFx6IEqtAbOxCsr3LqgtbGCH29R44xS0WATQ==
-X-Received: by 2002:a2e:a541:0:b0:2fb:5b23:edba with SMTP id 38308e7fff4ca-2fb5b23f28cmr33996231fa.23.1729076682233;
-        Wed, 16 Oct 2024 04:04:42 -0700 (PDT)
+        bh=m4LueB2KQgGxlu12dfcJNaqU0W/5O88/vcQ/21eniVw=;
+        b=tWXq+qA33M35Ch7RKMEdDkTmu0u5veSVKP5aZJX//iFgp9zk2diwsqkjmFBSG82k0A
+         TdMZBQY1cJZc9DxvXnnD6zVEOOkrB+XrNHPMh3V0FC6Ga/HFY4MLzb52gGtENnuaXiZ1
+         eDrKF8yJucki43xRuU52VwrqDCZa+ipIerTbTpqBfwl7e1HcO0b6xNsTrsAAp1DM+fN0
+         XEJZSYLflV5365XUg7ZkpXk6OIS9iZYvXmhMf9SHbHCEnJhqIKh0oMZy7sU8g0u5a9/u
+         F6LVfVS2rKRR8CgtwAMweIQAa3UlwqNTz90r4m2sE8We8hg38Z7NaycusUzSbZRPXaz5
+         tkzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUd2CxHio63jL4QsHqxnzPCVTdi/nys6qhQGnb+Apn8R1q7P78k4i485+N3UbDiSGbK59kXaA4JyPGYZZsT@vger.kernel.org, AJvYcCWyB5HG4+0/WDxLQ4vxrlgAWzb9ncqejGSH9S4KKwoqJpZNn2KQvj3GP7M7MeX8pYBnb99NSZ4b4RQNlYoZqDg=@vger.kernel.org, AJvYcCXARFpT0CvOqG455+PwyAIweYxNnE+Z74YwEGqp0e7+j1hdLDwygeuR2KCHloSqkDUaqJsQXnKr@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWwX/ZFHUGeM1BaVCWLD6JDbM6sR3Q40hzj6TyQWzVlL6dtXwo
+	b43obZiAn9Ub2VRnE4n4wLrqp4l5fptWznskIT9v/4bh0yXZZKD6
+X-Google-Smtp-Source: AGHT+IGrcfyamzd6ykzuN6rZt6YTTc+0CMnG2WFlNB4kpaQ+AjqM8Bd8qcm/g39XHvVQSx6ZeTf34w==
+X-Received: by 2002:a2e:a990:0:b0:2fb:5a7e:504f with SMTP id 38308e7fff4ca-2fb5a7e5276mr37840231fa.35.1729076750886;
+        Wed, 16 Oct 2024 04:05:50 -0700 (PDT)
 Received: from pc636 (host-95-203-1-67.mobileonline.telia.com. [95.203.1.67])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb5d1a8590sm3863191fa.122.2024.10.16.04.04.40
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb5d1a82c3sm3949501fa.116.2024.10.16.04.05.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 04:04:41 -0700 (PDT)
+        Wed, 16 Oct 2024 04:05:50 -0700 (PDT)
 From: Uladzislau Rezki <urezki@gmail.com>
 X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Wed, 16 Oct 2024 13:04:39 +0200
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, kernel-janitors@vger.kernel.org,
-	vbabka@suse.cz, paulmck@kernel.org,
+Date: Wed, 16 Oct 2024 13:05:47 +0200
+To: Julia Lawall <Julia.Lawall@inria.fr>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	kernel-janitors@vger.kernel.org, vbabka@suse.cz, paulmck@kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/17] wireguard: allowedips: replace call_rcu by
- kfree_rcu for simple kmem_cache_free callback
-Message-ID: <Zw-dx50JDeenxwCr@pc636>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/17] xfrm6_tunnel: replace call_rcu by kfree_rcu for
+ simple kmem_cache_free callback
+Message-ID: <Zw-eC42Wd33HDoad@pc636>
 References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
- <20241013201704.49576-2-Julia.Lawall@inria.fr>
+ <20241013201704.49576-6-Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,9 +92,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241013201704.49576-2-Julia.Lawall@inria.fr>
+In-Reply-To: <20241013201704.49576-6-Julia.Lawall@inria.fr>
 
-On Sun, Oct 13, 2024 at 10:16:48PM +0200, Julia Lawall wrote:
+On Sun, Oct 13, 2024 at 10:16:52PM +0200, Julia Lawall wrote:
 > Since SLOB was removed and since
 > commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
 > it is not necessary to use call_rcu when the callback only performs
@@ -102,41 +105,35 @@ On Sun, Oct 13, 2024 at 10:16:48PM +0200, Julia Lawall wrote:
 > Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 > 
 > ---
->  drivers/net/wireguard/allowedips.c |    9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+>  net/ipv6/xfrm6_tunnel.c |    8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 > 
-> diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> index 4b8528206cc8..175b1ca4f66f 100644
-> --- a/drivers/net/wireguard/allowedips.c
-> +++ b/drivers/net/wireguard/allowedips.c
-> @@ -48,11 +48,6 @@ static void push_rcu(struct allowedips_node **stack,
->  	}
+> diff --git a/net/ipv6/xfrm6_tunnel.c b/net/ipv6/xfrm6_tunnel.c
+> index bf140ef781c1..c3c893ddb6ee 100644
+> --- a/net/ipv6/xfrm6_tunnel.c
+> +++ b/net/ipv6/xfrm6_tunnel.c
+> @@ -178,12 +178,6 @@ __be32 xfrm6_tunnel_alloc_spi(struct net *net, xfrm_address_t *saddr)
 >  }
+>  EXPORT_SYMBOL(xfrm6_tunnel_alloc_spi);
 >  
-> -static void node_free_rcu(struct rcu_head *rcu)
+> -static void x6spi_destroy_rcu(struct rcu_head *head)
 > -{
-> -	kmem_cache_free(node_cache, container_of(rcu, struct allowedips_node, rcu));
+> -	kmem_cache_free(xfrm6_tunnel_spi_kmem,
+> -			container_of(head, struct xfrm6_tunnel_spi, rcu_head));
 > -}
 > -
->  static void root_free_rcu(struct rcu_head *rcu)
+>  static void xfrm6_tunnel_free_spi(struct net *net, xfrm_address_t *saddr)
 >  {
->  	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = {
-> @@ -330,13 +325,13 @@ void wg_allowedips_remove_by_peer(struct allowedips *table,
->  			child = rcu_dereference_protected(
->  					parent->bit[!(node->parent_bit_packed & 1)],
->  					lockdep_is_held(lock));
-> -		call_rcu(&node->rcu, node_free_rcu);
-> +		kfree_rcu(node, rcu);
->  		if (!free_parent)
->  			continue;
->  		if (child)
->  			child->parent_bit_packed = parent->parent_bit_packed;
->  		*(struct allowedips_node **)(parent->parent_bit_packed & ~3UL) = child;
-> -		call_rcu(&parent->rcu, node_free_rcu);
-> +		kfree_rcu(parent, rcu);
->  	}
->  }
->  
+>  	struct xfrm6_tunnel_net *xfrm6_tn = xfrm6_tunnel_pernet(net);
+> @@ -200,7 +194,7 @@ static void xfrm6_tunnel_free_spi(struct net *net, xfrm_address_t *saddr)
+>  			if (refcount_dec_and_test(&x6spi->refcnt)) {
+>  				hlist_del_rcu(&x6spi->list_byaddr);
+>  				hlist_del_rcu(&x6spi->list_byspi);
+> -				call_rcu(&x6spi->rcu_head, x6spi_destroy_rcu);
+> +				kfree_rcu(x6spi, rcu_head);
+>  				break;
+>  			}
+>  		}
 > 
 > 
 Reviewed-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
