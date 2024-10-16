@@ -1,384 +1,245 @@
-Return-Path: <netdev+bounces-136067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F459A0346
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:56:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5EFC9A034D
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:57:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CF452877F8
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:56:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DC3D28880C
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5565D1D0E28;
-	Wed, 16 Oct 2024 07:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2C81D270A;
+	Wed, 16 Oct 2024 07:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+hrQnWh"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="P8u/fntn";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="OYWGw1sW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AA01B2193;
-	Wed, 16 Oct 2024 07:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729065309; cv=none; b=iQ/DsZfQweWekKgjINklkeHe5e2aBAYJ/EQvrFOQKU4cLJIKCQIOKXeAB1TaSxoiK8JjPRyKINyvu1kxM80skU78E96QX3ihxddDO33DgVyfTEEfZRODttyXoq5uwddEflBKLnC2D9bq9n/4mH+jk/RWfcAG95KR4AhR4W7S5z0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729065309; c=relaxed/simple;
-	bh=JzQAHU8yO5lgQ72/MlGdgHfxI7MVTV8H9aHa/WfaXfE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cx+kE1WD6ibiGs/cMEx3UZk8ZAj5gimdsghY4hqqR959+rPoAMbrW59Sf4HXcmNNqPVnqdmnsNN8S/tdWrBHkV8zpPWDHKnodIu97fkJcO1ypRmvfnH/Ylnsegoool8y+/IO4ZGaeO0gxVSyKmWIxDe6/xWQ5ioJd+NNAAQr7po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+hrQnWh; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-835496c8d6fso362470439f.0;
-        Wed, 16 Oct 2024 00:55:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF331D2708
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 07:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729065354; cv=fail; b=KRkOkHSokoP66t0COJdxSK0TE6V/v66O4PNqT3+tqz2m6HfDhaPpT8m0F1gcDc5/raV7rgMgWjwqPvr0N1vqGT3sknwcvWLtzapmoK2iWIvAHlG9jP+++3l5yZAdZOY41OmrrRHQBisWh5Di1J+okZQQUtvMViOSiYM2tqDQ9Nk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729065354; c=relaxed/simple;
+	bh=OKZdWNQXctKpdSgPf/JpNQtLt9/q7ijT14iHAxU/x4E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 Content-Type:MIME-Version; b=dpt7Sg6X4mCA62LPaB1NYm6VFEWiqgRpqXAiqrLyEXmAd1cz12GI67u10c2uJdYCWF9I0ut0DAfX4OOzJv6vpTzZaC9nJAcKXbc6ol2k2++nJYHXrbbjqvIjWVdS4OdjjGM5ah+yKPUc7L9Soj2ZoYU3KRRI8MJFOUToeJptNzc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=P8u/fntn; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=OYWGw1sW; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49G7fdlT008085;
+	Wed, 16 Oct 2024 07:55:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2023-11-20; bh=lMoQRL0/XC5950xhNs
+	pU3I7h4nDhprCPNSZTlzBk4+c=; b=P8u/fntnXDKk3bXXoW+uW0pihDOQMFNPtL
+	ZPivYDbMTR2Rj/Y15vTp20WpHppbkL7VAV19neKpPFuIT8O67RVTop7jprAQVKYR
+	hFgq4Z9dSwAhCTWeI0Rse/1fHjuCJuba0qV3b9yjPQcHquuzhSkmiMTsk3C/vNxY
+	lA6oSUpqpLJTL5Ytcv3zOLDcpGgWGpty552dHU7aHAj5KJoBVlIjcwxXp8m7suXo
+	8vPXRCCht+kv0srJP44HPVdZImlAW6lQW7+H1srnQGPcQdLlqKLqjWeGogGwdoZ/
+	I8G0VvkEyK4O5/wMsoAwkv7JpDzmqzCM6H+0mBa//gi/E5neBQtQ==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 427gqt33pf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Oct 2024 07:55:27 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49G6QZjM026407;
+	Wed, 16 Oct 2024 07:55:26 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 427fj8gjea-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Oct 2024 07:55:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=w09vS+miHL8HyZNQ++RjWxWRwSDWAK52lgYoHgeY4rBps/Y/Fc6vRxWSVWl5qMsQZghlvyO016K0IfmR2Vpe4vULjShEKg0edmm+2HfsX4OykoYFA+890v++RN+WscJhKAeKVwWuxSqWKA4a6tIGS+jkGpcOhSM8YBUJcOZtzVPhHnyhYdxOvsfHVoFmZFJU+U+nkDkKBotYefQF58gpWo6kUqvfDOlRTVRsP5wrQFXulCOgK9fTigEuwD/YtYLn8RhW3XvfzBDeg64IZpjAhawtLjGsvfH67dbEWRqjscNX/Xt3ila0DmpQFfF1L7IIjLaq6JqHFqJd74gqODPGxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lMoQRL0/XC5950xhNspU3I7h4nDhprCPNSZTlzBk4+c=;
+ b=euDVAWiq4axQNLXbEIaTiNAJqk2pLsEysa6U40OzhNatSTCmqnfManKXlopZqaUTIJcA6Fujl83vyU8Gp9ZJUOpKcKq6gUIfiIJtlu9Seegilj8jyK2HWzar+bA7eezyl28Iiubo3pcZ+UPKpWhitBjrDxTeW26xc+glPZYPq4jLR8XX9A3d0xQf335Hit/yes4aP5Q+h8pLmiim0phLtvXS0i+oUPdXnG54uvLF8mYl3bnWuf9oXTeMMBa6roiu9sIQYECa4K0wPDA6GmdOYUAqketgQ/6cnU0rroBUdBpYH/aeuuBTrZuRTAi8ALnUswbZG/Bl4QI12bXA9AuwDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729065306; x=1729670106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wMiQRc4iIxHuL6+J+86stU781d2Z3GirHXo0EgrbofQ=;
-        b=Q+hrQnWhbL6e3LtQuPZlPC+mAut7WMJEMHTOQ9SXS46dafImS1ShdRGiB/IBbLYD68
-         PDNw35bzz0HIxsLXBPTERkwN2dHlsQJhyt52ATDqFSJBar3/jd2jbhFsNzGjSdEUWv4t
-         vmNRYue2/59dN62RuG+SvqSuEpU3gpYJf/6TfCIXh0VVI00//W30RNn1Lo4yZzs9tQnK
-         KckhDKoDkYwloC7T9xrLS8H2AOfclSGNBUoizW+8BNasqORw08kIXSBQjYyKwnH/Vs7Z
-         44I7rt3R7xvQUYZWwrjoU+5HXgkOA+zXMESFcjEg1QuwrbdoJJw9QbNuGPnwPvRcbGg7
-         6E7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729065306; x=1729670106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wMiQRc4iIxHuL6+J+86stU781d2Z3GirHXo0EgrbofQ=;
-        b=CmtbMD24HlJRuky/muQLMgJYGrAr6PrKF4foFoyEwKghqLZG3Q9RSNTStNwc5topBB
-         Wnb4O9w4PKmYLusXnVcamTC5bsoctO/WGxmlu8/fO2RZc+QfRoaavcUTDiUbAaVWQjZE
-         geE33nmFMB4I8Czp6ngZAYqRbeVL46OPTiWAlYppv9ZrUTzy8n9ANsx/7j0+SQVmLaB6
-         kf/JkSn/rblP2/uiGljryNr4i8WRGQXDE7Rmrfro60rJl1Q1W7Z0vQpAPrgPq2tbUM79
-         VPnALK9rdYnGUN5WOqj6v2TTICyybWzZ+Hb2lJQDbXnmnVWhRPq4uoykbsp9KPo7KeSh
-         nHXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVi2wYfF7YQlPyPb0iR+w8/XHc0LBvfpJQPOgk7nZOaJ49XGC13eQmt4iS7xmGnRRFcIhg=@vger.kernel.org, AJvYcCWN15IOESGx1PbZ6qiOiyf07KJejGqWTpWXpSPiyke6AkPCSDGQqdEsuLWCgabYNUiPOi2A5lzA@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ8kd4EijL1bI+/BhqgjsD3bkeLHwST9MY537Sz67fgIVu/9E8
-	1T8DYpIwjjxptAtBeRk/kGsNfNorL+IJRCMqjApnio1V1FD516L+ELZ2NnkolrDaSzxOmZThFw+
-	1BjTKtMY2TY3YXDDkK5zgBJYkijc=
-X-Google-Smtp-Source: AGHT+IGECrgJZbderygCtHbwOoKb7a20tm5PG/ZGiQiniOq4lFp5OvepiYi1PylzlJulFfh+0VAQTa+BNbMNchKOa9g=
-X-Received: by 2002:a05:6e02:152d:b0:3a0:9cd5:931c with SMTP id
- e9e14a558f8ab-3a3bcdfded1mr126208595ab.20.1729065306203; Wed, 16 Oct 2024
- 00:55:06 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lMoQRL0/XC5950xhNspU3I7h4nDhprCPNSZTlzBk4+c=;
+ b=OYWGw1sWb/NkvaLs8dw8f2UL/Q0XIMZhL8iyBjXGuj66sczEqtwTroNOaz66Q/QfDy5TbiD9pLqiw9ULHs7Wi2cjmQRHIdP5yhVzbuDeQz1kCeB0JK6UgETm7+d7W/2sHDULlaGtmO2Gx52pyO3GQXon2ZMTdHewrNhATo0FT60=
+Received: from BN8PR10MB3508.namprd10.prod.outlook.com (2603:10b6:408:ae::32)
+ by SA1PR10MB6638.namprd10.prod.outlook.com (2603:10b6:806:2b9::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.26; Wed, 16 Oct
+ 2024 07:55:23 +0000
+Received: from BN8PR10MB3508.namprd10.prod.outlook.com
+ ([fe80::5938:7839:ff36:b916]) by BN8PR10MB3508.namprd10.prod.outlook.com
+ ([fe80::5938:7839:ff36:b916%4]) with mapi id 15.20.8069.016; Wed, 16 Oct 2024
+ 07:55:23 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+        Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        Eugenio
+ =?utf-8?Q?P=C3=A9rez?=
+ <eperezma@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev,
+        Si-Wei Liu
+ <si-wei.liu@oracle.com>
+Subject: Re: [PATCH 0/5] virtio_net: enable premapped mode by default
+In-Reply-To: <20241014005529-mutt-send-email-mst@kernel.org>
+References: <20241014031234.7659-1-xuanzhuo@linux.alibaba.com>
+ <20241014005529-mutt-send-email-mst@kernel.org>
+Date: Wed, 16 Oct 2024 08:55:21 +0100
+Message-ID: <m2bjzkeb2u.fsf@oracle.com>
+Content-Type: text/plain
+X-ClientProxiedBy: DU7P191CA0007.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:54e::32) To BN8PR10MB3508.namprd10.prod.outlook.com
+ (2603:10b6:408:ae::32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-5-kerneljasonxing@gmail.com> <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
- <CAL+tcoBieZ3_ZX3PRY8k7-C6Rv2g=Mr1U1NAQkQpbHYYvtWpTQ@mail.gmail.com>
- <CAL+tcoBXj=EO-sk-dS+dN-pCZf8OKeOZ4LXb9GZnja3EfOhXYg@mail.gmail.com>
- <9f050a5c-644f-4fbb-ac37-53edfd160edc@linux.dev> <CAL+tcoDyt=3hjwdx8Wk-abKg=qQsY=7UKu9=TU4iUAk5gMT2MQ@mail.gmail.com>
- <5398c020-e9b4-49d2-a5fa-dca047296ddd@linux.dev>
-In-Reply-To: <5398c020-e9b4-49d2-a5fa-dca047296ddd@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 16 Oct 2024 15:54:29 +0800
-Message-ID: <CAL+tcoDb84bgUUpK9PjijWDt+xw=u2nKkoWf1Gjvkjf--XJ6VA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
- control the whole bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
-	willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8PR10MB3508:EE_|SA1PR10MB6638:EE_
+X-MS-Office365-Filtering-Correlation-Id: e0e8b522-993e-44dc-5e7c-08dcedb7e3b4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Z7IGs/uQ5j9QU27ApdTCZt78rjJ4Z2KTEbEZ9nrJEsXp+aR3JSf45zoV1/e7?=
+ =?us-ascii?Q?S5dCLDsgqDRDOFMof4UhrAEMG6cWxg+0LaOL3FfPJfkAPcB96Fuifpt4eWvj?=
+ =?us-ascii?Q?3OfjsZt/D50qKPv3EdJEgxXPz9dduDVpIXO/z44ILY8kQQjpzUhgRcOOq9Hs?=
+ =?us-ascii?Q?WTSxY5F+LtSYOIgtG36HFM96k+d+sMoVX4lKTaJZZGmdkG7gelYqyaxRHMqz?=
+ =?us-ascii?Q?+MpLMekxkz2Ulx2hVa8evh4F4LNNg3NOR0dAUydr2f2FCKovZMhRfJmQmIoY?=
+ =?us-ascii?Q?SH50jIrGe78PvCLQkPSu62+Atrzl7qmzTcmRTey3J8kjqQDGtWzXujwk55Tw?=
+ =?us-ascii?Q?qMD7GmG7X/mFoYEztd7qQtevKRXycDQ/uVotu6BMWgKkIV9YmNXTS3CZ+K7h?=
+ =?us-ascii?Q?JtSF59KCFlVq2PfjfS+qcuomd+IgfhuCPccQM9An9x4zRARfcQw9ceTVF26R?=
+ =?us-ascii?Q?UC7PUdbRsq0CtVxTvkTlPNAQVt8LXaPTNG9zxy0mFTii00gB4f1oexld5N4k?=
+ =?us-ascii?Q?eXGLMd+uOBT3wDBsH/KQuka9R+fulm6oqjwQn2MqVeJ1wObzmZvg6tki2/Fp?=
+ =?us-ascii?Q?BC6cjdCg4+mp19GJt0Mi86uqRxC8g0meXWtVP2J7DpUIFhA7p7ROymDOYdzT?=
+ =?us-ascii?Q?rLCYHD07rq/A41sXXmwLb5HjtZNrCszVbsDg4qacEWGqDKFBtAkBbdjxdTrx?=
+ =?us-ascii?Q?6uZ8hCld5Jwdlu6i9i+G/+WrFAOmTwQWr61H7NOmicKmHK7VfV7X8ElcSOr0?=
+ =?us-ascii?Q?4YZsgVY29z7e2hMCDCSClJ8Lxd1VQzlUJIG4R/twKDXVlSBIP8WBkfP6VMt4?=
+ =?us-ascii?Q?ASubHUNKHVXMsh6a8Ssu0V9J2r9GLee/YWkoSL7NyiLLKELCiETAssQraeQA?=
+ =?us-ascii?Q?w43tjFqHHrrw6jOKw2pPrNejvjpoFtrZzYTr1WiXZW9ciyEVJE+gXdzycz1N?=
+ =?us-ascii?Q?8oMkaJbXNxow6D7I2QRuVclBO76GznbIXFowLWqujoqia3OOz8HX0bulO72k?=
+ =?us-ascii?Q?kHdXdwWJEQhTk9m1V1Y9j6k30dpdhqNYtuE1JcPj0oYU9JI+Tin1nNZuA+FH?=
+ =?us-ascii?Q?7ynXPRP24Fg5cWT1+G3JMCAHTVPz10f9Pn+Rs0ZzNSMA/l04ouHps1cais02?=
+ =?us-ascii?Q?owgmyaRbBdlWSgREm+njF236eW7z3yTHIm78OggmyM8N4gfjOAvYMiV/E1cz?=
+ =?us-ascii?Q?3fmhWdmivfveU/+d02OfnwqcC5NJe1ITjnkf7kItbbrumWKPfyXZK4xUlK41?=
+ =?us-ascii?Q?/ngtNV4GWZ/TO7q1E3kQ2x+6NbP0430mz4UDHGdiA+OeuLSwju3sgiZOU6+z?=
+ =?us-ascii?Q?PDI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR10MB3508.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?P5K0sOuzMb7KOw3y0/zNgIoxPnWyUKe8ZwwdlpXsBPJ8+m4C0EAwwUcIAPsJ?=
+ =?us-ascii?Q?M/gSiKvbr4P99eXVeWrwURcBwj3WzrB1g5yLSKmVOUoswiqrh/e4h46c+7ni?=
+ =?us-ascii?Q?XArkYcikTV3J/XY2OzfORoxlohniy3SobWZfMAKZTLBOpbdbY1FFTcsg+8Va?=
+ =?us-ascii?Q?QxwUMmdb+qejt2Y86E27bCFmlGqa0qB8PcL8vGOlELfAcVDcYQ5xZmyhIDEH?=
+ =?us-ascii?Q?027SbcDoqxj6k6j/mx1fLGNSM6njplIXNx2QTn+xDjC16nDaem/CGfAdKrme?=
+ =?us-ascii?Q?tyvwHP1jtsCJt/rKXyTMYK0eP+uXZsJkvh+DygxKeKnI39iOm5YhFJrM8+jR?=
+ =?us-ascii?Q?NvzZxDpIgDHjX7nr+TN5jS7/bSv+VG+dsSA58L28T6cEymtZGikE2iws4+Gj?=
+ =?us-ascii?Q?+euD0GHRJ4OvSBs3QdWFoTlP6SifiVJlveXk80Org+bG1UxbvEMRckA63dyW?=
+ =?us-ascii?Q?JEUv74O/9f3qdpMyosPeu8opDkhWb2DuxKzAMYp0hcj7NUAaY1u1p2QLXtGC?=
+ =?us-ascii?Q?lV8RWDFo+uEj4ASHxT3FNlAeDvhBY3dZnucaviupljulyk4cfD5ABZwNpOBn?=
+ =?us-ascii?Q?mGssdFjV/Aehx9zyaunAEhu69YGq9mK79Ghf0IjIqqjuqdoBor6GgHvBG+V6?=
+ =?us-ascii?Q?w0phamqyPsAkWa8dgbLNavRPPDyui/pV2//u2tFkxwMxTzKDkG/vpS2k+BY8?=
+ =?us-ascii?Q?ZrtYgyhniCHfjRUZw+Dq2gWVw5oc3RvzIACKMA3m5reS34WOvpdk7VtPV5WC?=
+ =?us-ascii?Q?qytyd06WKjFU2vz3vb9L7MHHQ7J/ARcVWREdaprpDSWDyLZpwLTc/7tlSM37?=
+ =?us-ascii?Q?gA2pvNkV6/MW1HiH+cTsMEy0LyeCdcfiouPG+U1WQd8DWjvO1W7G37ZoBgXL?=
+ =?us-ascii?Q?uqW+DZq7VNveCLSlRi3nrHcUq50cOvZ9HhCmCkWCGkWEJXvHPxemVYjqhDUN?=
+ =?us-ascii?Q?/vl1lx56hQix+wu66NRdX3Nwb6fUzgYkADyVYTjB8lZi7wX20/9XrQuOG3gj?=
+ =?us-ascii?Q?LpS6XRnYRfFnaCtPAFc+KMmfJWY1287/+jEvoA6qVOjSbx2ka1sbE+Y8yr4A?=
+ =?us-ascii?Q?4whg3uWjIRFCyckiZNvfK5SGypaUe5itSZSPakNetDjehlq/WN58+pW1E9/M?=
+ =?us-ascii?Q?Xjnr2ZQeEq25aAacW8CAF74OL/ZkV3G9WqLtnFVPyKafUNCEcWYO82Kg5Pl3?=
+ =?us-ascii?Q?jGqWVwVqtAdnK6qH498NRjJVr44TAiOHRqYavxtjhzj10zRYcP8ZDmFk9v9s?=
+ =?us-ascii?Q?7BXkM2Au7rKh+aFx92Ih+H4Ece7D4dbX1LFrSEhdyIV7/V6EbwkLbqhf6U8B?=
+ =?us-ascii?Q?X7YkRL4tSYcUlwFtv9d5G7Nu4n3J3uU93tfYcEoXO1O2wP9CZ6bI44catJbJ?=
+ =?us-ascii?Q?BPuOsX5DQTjEx4g8QashpTtlONo3m+/U81g56eH+FW70rxYeWm7EvmkcHtCN?=
+ =?us-ascii?Q?D4+0hmgusGRPF7xWUo6z+KnRVVcaBumIQNZAd8Ewrkli0swDgK8tWSDqwmQl?=
+ =?us-ascii?Q?qCopJe1aZ4y8opEhMNQyQHVy5Du2HpAZW6ddpm1FID1m7P2nNYis/MoMOzfE?=
+ =?us-ascii?Q?y4RyNZ6hVgua/YtWd+mmc0IeSZwK3kVFX4Zu+CQ5ELEUsTMwJehNmWQRhjxA?=
+ =?us-ascii?Q?fZE/f8nDwqi+fO2nFBCi5WJYxFfot/jz2hD0udQ8XENQn5/yVIy8bridpfH9?=
+ =?us-ascii?Q?MXmogQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	AZK+zsuJCTTYUygNTqiLnz4XRFSdIs47/nShNJ0nRscUcQ93O3Dhss7SRSVquK84y4XrVrcMUJk6pJaC9ToNmJppRTPK1ylsbEXk/OqsCE/wBrCBxyILE6q5HmUw7A5GC05DHzKr8idLawMlk9wU6EuKgciS7IOGCLkc2vfUJzkHtgo6FseEsK/8j3/Smld/v5Kb+7FGl469gfiuf91hy1pOO3HRJ+9SAtqYfEYZ1Qzx0hIdHp3WFMkak5Y5QGzlyxrhwychV/SSeQxHvC7rw0xL9sZxgtFiRdG7z7y0DiUzmazLzBaKmqagDvHHar4A1CMqzmlO5wI9UKlQ3h6Sua8CpPMqSd7uvWFl6P5AKw1aZf6d7J4KCeWBCJHkE6psLflp3tsFQjRp9y38cx7ZSya+i6Ecp7sg9GB9nnYagZW0F+s5Tt5rd2QEL9Hjp9creGn6hgJgAnwJbkrkXIHf9HpJTWcGVPa4K1NOHX30hW0Vqvyiv3p98ZsZLQ1PX3JMMR/Imm4JkhVhNVYk2xWCyCKyDuZq1jisg5o6e9EyFHjdevb8iatV21zi+hcyMWI9MB+GuUIU+j2yQ88inwXPPV+csTyGLeCdNBslEnnEtHo=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0e8b522-993e-44dc-5e7c-08dcedb7e3b4
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR10MB3508.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2024 07:55:23.6837
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Aefa3KTwP+R+Up7xIOdkz2U0fP8VZRP4TnNdbRlxNLmGYWZ6vhn03ErRhYqdP/OmpI2XyxV61QdWJW8tdCUi9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6638
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-16_05,2024-10-15_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
+ definitions=main-2410160051
+X-Proofpoint-GUID: cajSce4gOY3sRGuy6joez7HGXpc8CEef
+X-Proofpoint-ORIG-GUID: cajSce4gOY3sRGuy6joez7HGXpc8CEef
 
-On Wed, Oct 16, 2024 at 3:01=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
+Hi Michael,
+
+On Monday, 2024-10-14 at 00:57:41 -04, Michael S. Tsirkin wrote:
+> On Mon, Oct 14, 2024 at 11:12:29AM +0800, Xuan Zhuo wrote:
+>> In the last linux version, we disabled this feature to fix the
+>> regress[1].
+>> 
+>> The patch set is try to fix the problem and re-enable it.
+>> 
+>> More info: http://lore.kernel.org/all/20240820071913.68004-1-xuanzhuo@linux.alibaba.com
+>> 
+>> Thanks.
+>> 
+>> [1]: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
 >
-> On 10/15/24 11:30 PM, Jason Xing wrote:
-> > On Wed, Oct 16, 2024 at 2:13=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
-nux.dev> wrote:
-> >>
-> >> On 10/15/24 6:32 PM, Jason Xing wrote:
-> >>> On Wed, Oct 16, 2024 at 9:04=E2=80=AFAM Jason Xing <kerneljasonxing@g=
-mail.com> wrote:
-> >>>>
-> >>>> On Wed, Oct 16, 2024 at 8:10=E2=80=AFAM Martin KaFai Lau <martin.lau=
-@linux.dev> wrote:
-> >>>>>
-> >>>>> On 10/11/24 9:06 PM, Jason Xing wrote:
-> >>>>>> From: Jason Xing <kernelxing@tencent.com>
-> >>>>>>
-> >>>>>> Willem suggested that we use a static key to control. The advantag=
-e
-> >>>>>> is that we will not affect the existing applications at all if we
-> >>>>>> don't load BPF program.
-> >>>>>>
-> >>>>>> In this patch, except the static key, I also add one logic that is
-> >>>>>> used to test if the socket has enabled its tsflags in order to
-> >>>>>> support bpf logic to allow both cases to happen at the same time.
-> >>>>>> Or else, the skb carring related timestamp flag doesn't know which
-> >>>>>> way of printing is desirable.
-> >>>>>>
-> >>>>>> One thing important is this patch allows print from both applicati=
-ons
-> >>>>>> and bpf program at the same time. Now we have three kinds of print=
-:
-> >>>>>> 1) only BPF program prints
-> >>>>>> 2) only application program prints
-> >>>>>> 3) both can print without side effect
-> >>>>>>
-> >>>>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> >>>>>> ---
-> >>>>>>     include/net/sock.h |  1 +
-> >>>>>>     net/core/filter.c  |  3 +++
-> >>>>>>     net/core/skbuff.c  | 38 ++++++++++++++++++++++++++++++++++++++
-> >>>>>>     3 files changed, 42 insertions(+)
-> >>>>>>
-> >>>>>> diff --git a/include/net/sock.h b/include/net/sock.h
-> >>>>>> index 66ecd78f1dfe..b7c51b95c92d 100644
-> >>>>>> --- a/include/net/sock.h
-> >>>>>> +++ b/include/net/sock.h
-> >>>>>> @@ -2889,6 +2889,7 @@ static inline bool sk_dev_equal_l3scope(stru=
-ct sock *sk, int dif)
-> >>>>>>     void sock_def_readable(struct sock *sk);
-> >>>>>>
-> >>>>>>     int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_s=
-k);
-> >>>>>> +DECLARE_STATIC_KEY_FALSE(bpf_tstamp_control);
-> >>>>>>     void sock_set_timestamp(struct sock *sk, int optname, bool val=
-bool);
-> >>>>>>     int sock_get_timestamping(struct so_timestamping *timestamping=
-,
-> >>>>>>                           sockptr_t optval, unsigned int optlen);
-> >>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
-> >>>>>> index 996426095bd9..08135f538c99 100644
-> >>>>>> --- a/net/core/filter.c
-> >>>>>> +++ b/net/core/filter.c
-> >>>>>> @@ -5204,6 +5204,8 @@ static const struct bpf_func_proto bpf_get_s=
-ocket_uid_proto =3D {
-> >>>>>>         .arg1_type      =3D ARG_PTR_TO_CTX,
-> >>>>>>     };
-> >>>>>>
-> >>>>>> +DEFINE_STATIC_KEY_FALSE(bpf_tstamp_control);
-> >>>>>> +
-> >>>>>>     static int bpf_sock_set_timestamping(struct sock *sk,
-> >>>>>>                                      struct so_timestamping *times=
-tamping)
-> >>>>>>     {
-> >>>>>> @@ -5217,6 +5219,7 @@ static int bpf_sock_set_timestamping(struct =
-sock *sk,
-> >>>>>>                 return -EINVAL;
-> >>>>>>
-> >>>>>>         WRITE_ONCE(sk->sk_tsflags[BPFPROG_TS_REQUESTOR], flags);
-> >>>>>> +     static_branch_enable(&bpf_tstamp_control);
-> >>>>>
-> >>>>> Not sure when is a good time to do static_branch_disable().
-> >>>>
-> >>>> Thanks for the review.
-> >>>>
-> >>>> To be honest, I considered how to disable the static key. Like you
-> >>>> said, I failed to find a good chance that I can accurately disable i=
-t.
-> >>>>
-> >>>>>
-> >>>>> The bpf prog may be detached also. (IF) it ends up staying with the
-> >>>>> cgroup/sockops interface, it should depend on the existing static k=
-ey in
-> >>>>> cgroup_bpf_enabled(CGROUP_SOCK_OPS) instead of adding another one.
-> >>>>
-> >>>> Are you suggesting that we need to remove the current static key? In
-> >>>> the previous thread, the reason why Willem came up with this idea is=
-,
-> >>>> I think, to avoid affect the non-bpf timestamping feature.
-> >>>>
-> >>>>>
-> >>>>>>
-> >>>>>>         return 0;
-> >>>>>>     }
-> >>>>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> >>>>>> index f36eb9daa31a..d0f912f1ff7b 100644
-> >>>>>> --- a/net/core/skbuff.c
-> >>>>>> +++ b/net/core/skbuff.c
-> >>>>>> @@ -5540,6 +5540,29 @@ void skb_complete_tx_timestamp(struct sk_bu=
-ff *skb,
-> >>>>>>     }
-> >>>>>>     EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
-> >>>>>>
-> >>>>>> +static bool sk_tstamp_tx_flags(struct sock *sk, u32 tsflags, int =
-tstype)
-> >>>>>
-> >>>>> sk is unused.
-> >>>>
-> >>>> Thanks for the careful check.
-> >>>>
-> >>>>>
-> >>>>>> +{
-> >>>>>> +     u32 testflag;
-> >>>>>> +
-> >>>>>> +     switch (tstype) {
-> >>>>>> +     case SCM_TSTAMP_SCHED:
-> >>>>>
-> >>>>> Instead of doing this translation,
-> >>>>> is it easier to directly store the bpf prog desired ts"type" (i.e. =
-the
-> >>>>> SCM_TSTAMP_*) in the sk->sk_tsflags_bpf?
-> >>>>> or there is a specific need to keep the SOF_TIMESTAMPING_* value in
-> >>>>> sk->sk_tsflags_bpf?
-> >>>>
-> >>>> We have to reuse SOF_TIMESTAMPING_* because there are more flags, sa=
-y,
-> >>>> SOF_TIMESTAMPING_OPT_ID, that we need to support.
-> >>>>
-> >>>>>
-> >>>>>> +             testflag =3D SOF_TIMESTAMPING_TX_SCHED;
-> >>>>>> +             break;
-> >>>>>> +     case SCM_TSTAMP_SND:
-> >>>>>> +             testflag =3D SOF_TIMESTAMPING_TX_SOFTWARE;
-> >>>>>> +             break;
-> >>>>>> +     case SCM_TSTAMP_ACK:
-> >>>>>> +             testflag =3D SOF_TIMESTAMPING_TX_ACK;
-> >>>>>> +             break;
-> >>>>>> +     default:
-> >>>>>> +             return false;
-> >>>>>> +     }
-> >>>>>> +     if (tsflags & testflag)
-> >>>>>> +             return true;
-> >>>>>> +
-> >>>>>> +     return false;
-> >>>>>> +}
-> >>>>>> +
-> >>>>>>     static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
-> >>>>>>                                  const struct sk_buff *ack_skb,
-> >>>>>>                                  struct skb_shared_hwtstamps *hwts=
-tamps,
-> >>>>>> @@ -5558,6 +5581,9 @@ static void skb_tstamp_tx_output(struct sk_b=
-uff *orig_skb,
-> >>>>>>         if (!skb_may_tx_timestamp(sk, tsonly))
-> >>>>>>                 return;
-> >>>>>>
-> >>>>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
-> >>>>>
-> >>>>> This is a new test. tsflags is the sk->sk_tsflags here if I read it=
- correctly.
-> >>>>
-> >>>> This test will be used in bpf and non-bpf cases. Because of this, we
-> >>>> can support BPF extension. In this function, if skb has tsflags but =
-we
-> >>>> don't know which approach the user expects, sk_tstamp_tx_flags() can
-> >>>> help us.
-> >>>>
-> >>>>>
-> >>>>> My understanding is the sendmsg can provide SOF_TIMESTAMPING_* for =
-individual
-> >>>>> skb. Would it break?
-> >>>>
-> >>>> Oh, you're right. I didn't support cmsg mode...
-> >>>
-> >>> I think I only need to test if it's in the bpf mode, or else let the
-> >>> original way print the timestamp, which can solve the issue.
-> >>
-> >>   From looking at the existing "__skb_tstamp_tx(skb, NULL, NULL, skb->=
-sk,
-> >> SCM_TSTAMP_SCHED);":
-> >>
-> >> int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
-> >> {
-> >>          /* ... */
-> >>
-> >>          if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
-> >>                  __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_=
-SCHED);
-> >>
-> >>          /* ... */
-> >> }
-> >>
-> >> I am still puzzling how __skb_tstamp_tx() will be called if only bpf h=
-as enabled
-> >> the timestamping. I may have missed somewhere in the patch set that th=
-e skb's
-> >> tx_flags is changed by sk->sk_tsflags_bpf alone?
-> >
-> > If sk_tsflags_bpf is set, tcp_sendmsg() -> tcp_tx_timestamp() will be
-> > helpful, which initializes every last skb, please see patch [10/12].
+> Darren, you previously reported crashes with a patch very similar to 1/5.
+> Can you please test this patchset and report whether they
+> are still observed?
+> If yes, any data on how to reproduce would be very benefitial for Xuan
+> Zhuo.
 >
-> Ah. ok. It is the thing I missed. Thanks for the pointer.
->
-> >>
-> >> I think a skb tskey is still desired (?), so eventually we want some s=
-paces in
-> >
-> > tskey function is optional I think. It depends whether users want to
-> > use it or not. It can controlled by SOF_TIMESTAMPING_OPT_ID flag.
-> >
-> >> the skb for bpf. Jakub Sitnicki (cc-ed) has presented in LPC about ext=
-ending
-> >> skb->data_meta usage outside of xdp and tc. I think here we want to ha=
-ve it
-> >> available at the tx side to store the tx_flags and tskey but probably =
-want them
-> >> at a specific place/offset at the data_meta.
-> >
-> > If we have the plan to store extra information in data_meta, I can
-> > give it a try:)
-> >
-> >>
-> >> For now, is there thing we can explore to share in the skb_shared_info=
-?
-> >
-> > My initial thought is just to reuse these fields in skb. It can work
-> > without interfering one another.
->
-> After reading closer to patch 10, I am likely still missing something. Ho=
-w can
-> it tell if the tx_flags is set by the bpf or by the user space cmsg?
 
-If the skb carries the timestamp, there are three cases:
-1) non-bpf case and users uses setsockopt()
-2) cmsg case
-3) bpf case
-
-#1 and #2 are already handled well before this patch. I only need to
-test if sk_tsflags_bpf has those flags. If so, it means we hit #3, or
-else it could be #1 or #2, then we will let the old way print
-timestamps in __skb_tstamp_tx().
-
->
-> >
-> >> Can the "struct skb_shared_hwtstamps hwtstamps;" be used for the bpf t=
-x_flags and tskey
-> >> only at the "tx" side? There is already another union member.
-> >
-> > tskey is always used in the tx path.
-> >
-> > hwtstamps can be used in both rx and tx cases (please see
-> > tcp_update_recv_tstamps() and skb_tstamp_tx()).
->
-> hmm... we only need some where to store the bpf tx_flags and bpf tskey in=
- the
-> TX-ing skb.
-
-And there is one more field we have to take care of: txstamp_ack which
-indicates whether we print timestamp when the last skb is acked.
-Please see tcp_tx_timestamp().
-
-> You meant the hwtstamps of a Tx-ing skb is not empty?
-
-Sometimes, it's not empty if the hardware supports the timestamp
-feature and the user wants to see it (by enabling the
-SOF_TIMESTAMPING_TX_HARDWARE flag). As we can see, there are many
-callers calling skb_tstamp_tx().
-
->
-> At skb_tstamp_tx (TX side only?), the orig_skb's hwtstamps has not been w=
-ritten yet?
-
-I'm not that sure about the orig_skb. It seems no. I can see some
-callers reading ptp timestamp from the nic and pass the timestamp to
-skb_tstamp_tx().
+I aim to get to this in the next week, but I don't currently have
+access to a system to test it, it will take a few days at least before I
+can get one.
 
 Thanks,
-Jason
+
+Darren.
+
+
+>
+>> Xuan Zhuo (5):
+>>   virtio-net: fix overflow inside virtnet_rq_alloc
+>>   virtio_net: introduce vi->mode
+>>   virtio_net: big mode skip the unmap check
+>>   virtio_net: enable premapped mode for merge and small by default
+>>   virtio_net: rx remove premapped failover code
+>> 
+>>  drivers/net/virtio_net.c | 168 ++++++++++++++++++++++++---------------
+>>  1 file changed, 105 insertions(+), 63 deletions(-)
+>> 
+>> --
+>> 2.32.0.3.g01195cf9f
 
