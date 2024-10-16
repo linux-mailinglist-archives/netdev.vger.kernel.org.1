@@ -1,72 +1,226 @@
-Return-Path: <netdev+bounces-135924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0668999FCC7
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:06:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9456499FCCB
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37BEE1C23A62
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:06:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46321286B12
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530EAA31;
-	Wed, 16 Oct 2024 00:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B565F800;
+	Wed, 16 Oct 2024 00:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFqZDjiU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="okK7cxd+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2B14C91;
-	Wed, 16 Oct 2024 00:06:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631DC4430
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 00:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729037204; cv=none; b=KPdnvzjb7MKhaheCpcImNewUVp3F3oFBF70gTPc5hAocD5GqXFlEffWN21hbqdqOASvwafXY4ELDtyAfTWzNEbfufsT5MugBHkuppeG8yt7nr/uBfwg+d/RfVYBbwLUqflz/iz2vVXmY7yBLjnRPWxdseoDB+0WOXr6komCu6cE=
+	t=1729037409; cv=none; b=K6cVRC7mwwG/jvbwhUtiAkswDQkCo69Ll1uLGuRk2pmetXUhl/XEfMHmiiW8kRzvci/cFb8jd0Byo5YTgjJTDNkzxnz+QOoHw/W9IbW5Fn3yv59AxBh5qdprhJ1tyknqjtr1A37R9An5+L0OXW3G2//rm0WyU2XmPB7OFtnhNjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729037204; c=relaxed/simple;
-	bh=HG/5Lf4PN8ZwfOLHeb7Pqn9YbCXldMzqVdPyn+SXG4c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Js6w/xoZhg8SnsLnzclsF55UKpDPZ4y6uUeujpJk0vGVdykWMEKgrhLJT5Mhe8obQOA/qI7pB1vUj2PNw/vRwX4EJnrchYpovgWpwTItBvO/gE6pyTprEymVlMW12Y+anK4qijIUx9BMMwXz6r3You7jJGi6ND3SR6ukNpreVDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFqZDjiU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33946C4CECD;
-	Wed, 16 Oct 2024 00:06:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729037203;
-	bh=HG/5Lf4PN8ZwfOLHeb7Pqn9YbCXldMzqVdPyn+SXG4c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EFqZDjiUPmdkaOmaHtl1KJLKkq4CCKgPwYVv9MkOpp0V3JMEiY6VpF3iepC2+B/12
-	 Y63UobablX2Awm72leh+BhyHzZLO4lKgWzYkRe8tMI+C5sywkbItgXAxbtlZ/7QK1c
-	 JbRhc8tOm+W/Jb7nsWCKkwot4yqYqv+N2vCM4ZpKM835BMGJ2K8ih7GwAEr4ZU+qbR
-	 sPlya9WHXfC99BZ+GusLgCthJa9rpT05K6akJhNpFKcNEUdIaL0fyJTwt3dRxbrFYr
-	 iWHZHQ/KlAI6Gm2drwXTvBoERjdwqLp/xEw4SCj8c2Yb7Mfmf3JeaJK+07LcVrldJ3
-	 mHreeFIWIcmEQ==
-Date: Tue, 15 Oct 2024 17:06:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefan Wiehler <stefan.wiehler@nokia.com>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v5 00/10] Lock RCU before calling ip6mr_get_table()
-Message-ID: <20241015170642.190cf837@kernel.org>
-In-Reply-To: <20241014151247.1902637-1-stefan.wiehler@nokia.com>
-References: <20241014151247.1902637-1-stefan.wiehler@nokia.com>
+	s=arc-20240116; t=1729037409; c=relaxed/simple;
+	bh=p3bZseUDVA/nDqe1n2tXXoOhsEQBXev8IiHrPGGG05E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=swqunCIyhBP1YG/XfYhM8SnOVgjgcXn3fV5Lj4iTfEpk9oCVoFKzPusiP9Wi68t3bQxQKaEoXJqLy9O+fTtXx4V4T7uDEeUsa7N3OAtIKJFl6fcxLgqGiJbt3lQgKIXpxu4IkoZ9KfAEAu4hoAv0kZbar98wm/EdM5wKpQOMSlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=okK7cxd+; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729037405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RzvOFbzdSfD6Z9mVAB7PkbmqAiWN+492BN4iUDdHU9A=;
+	b=okK7cxd+vFjlgzPmhm1/ZuN26yx5A49IRNvX9wwM6PO1z1hdk1hA3hZNbXTto0k9jrdlrZ
+	unPJG/hmuaKkljdZ7n+PoKIYd4UJKrkDHJex7jRziZxu3ScFK+JiU+cBe01ormP65KtVAX
+	y3DgBnML1XAFep4UeKvciyWz+1gzsj0=
+Date: Tue, 15 Oct 2024 17:09:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
+ control the whole bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-5-kerneljasonxing@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241012040651.95616-5-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 14 Oct 2024 17:05:46 +0200 Stefan Wiehler wrote:
-> v2: https://patchwork.kernel.org/project/netdevbpf/patch/20241001100119.230711-2-stefan.wiehler@nokia.com/
->   - rebase on top of net tree
->   - add Fixes tag
->   - refactor out paths
+On 10/11/24 9:06 PM, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Willem suggested that we use a static key to control. The advantage
+> is that we will not affect the existing applications at all if we
+> don't load BPF program.
+> 
+> In this patch, except the static key, I also add one logic that is
+> used to test if the socket has enabled its tsflags in order to
+> support bpf logic to allow both cases to happen at the same time.
+> Or else, the skb carring related timestamp flag doesn't know which
+> way of printing is desirable.
+> 
+> One thing important is this patch allows print from both applications
+> and bpf program at the same time. Now we have three kinds of print:
+> 1) only BPF program prints
+> 2) only application program prints
+> 3) both can print without side effect
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>   include/net/sock.h |  1 +
+>   net/core/filter.c  |  3 +++
+>   net/core/skbuff.c  | 38 ++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 42 insertions(+)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 66ecd78f1dfe..b7c51b95c92d 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2889,6 +2889,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
+>   void sock_def_readable(struct sock *sk);
+>   
+>   int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_sk);
+> +DECLARE_STATIC_KEY_FALSE(bpf_tstamp_control);
+>   void sock_set_timestamp(struct sock *sk, int optname, bool valbool);
+>   int sock_get_timestamping(struct so_timestamping *timestamping,
+>   			  sockptr_t optval, unsigned int optlen);
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 996426095bd9..08135f538c99 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -5204,6 +5204,8 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
+>   	.arg1_type      = ARG_PTR_TO_CTX,
+>   };
+>   
+> +DEFINE_STATIC_KEY_FALSE(bpf_tstamp_control);
+> +
+>   static int bpf_sock_set_timestamping(struct sock *sk,
+>   				     struct so_timestamping *timestamping)
+>   {
+> @@ -5217,6 +5219,7 @@ static int bpf_sock_set_timestamping(struct sock *sk,
+>   		return -EINVAL;
+>   
+>   	WRITE_ONCE(sk->sk_tsflags[BPFPROG_TS_REQUESTOR], flags);
+> +	static_branch_enable(&bpf_tstamp_control);
 
-Please add the relevant info (from patch 2?) to the cover letter.
-Otherwise it's hard to figure out at a glance what this series is
-fixing.
+Not sure when is a good time to do static_branch_disable().
+
+The bpf prog may be detached also. (IF) it ends up staying with the 
+cgroup/sockops interface, it should depend on the existing static key in 
+cgroup_bpf_enabled(CGROUP_SOCK_OPS) instead of adding another one.
+
+>   
+>   	return 0;
+>   }
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index f36eb9daa31a..d0f912f1ff7b 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -5540,6 +5540,29 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
+>   }
+>   EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+>   
+> +static bool sk_tstamp_tx_flags(struct sock *sk, u32 tsflags, int tstype)
+
+sk is unused.
+
+> +{
+> +	u32 testflag;
+> +
+> +	switch (tstype) {
+> +	case SCM_TSTAMP_SCHED:
+
+Instead of doing this translation,
+is it easier to directly store the bpf prog desired ts"type" (i.e. the 
+SCM_TSTAMP_*) in the sk->sk_tsflags_bpf?
+or there is a specific need to keep the SOF_TIMESTAMPING_* value in
+sk->sk_tsflags_bpf?
+
+> +		testflag = SOF_TIMESTAMPING_TX_SCHED;
+> +		break;
+> +	case SCM_TSTAMP_SND:
+> +		testflag = SOF_TIMESTAMPING_TX_SOFTWARE;
+> +		break;
+> +	case SCM_TSTAMP_ACK:
+> +		testflag = SOF_TIMESTAMPING_TX_ACK;
+> +		break;
+> +	default:
+> +		return false;
+> +	}
+> +	if (tsflags & testflag)
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+>   static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>   				 const struct sk_buff *ack_skb,
+>   				 struct skb_shared_hwtstamps *hwtstamps,
+> @@ -5558,6 +5581,9 @@ static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>   	if (!skb_may_tx_timestamp(sk, tsonly))
+>   		return;
+>   
+> +	if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
+
+This is a new test. tsflags is the sk->sk_tsflags here if I read it correctly.
+
+My understanding is the sendmsg can provide SOF_TIMESTAMPING_* for individual 
+skb. Would it break? Is it the similar case on the skb tx_flags that Willem has 
+mentioned in the patch 0's thread?
+
+> +		return;
+> +
+>   	if (tsonly) {
+>   #ifdef CONFIG_INET
+>   		if ((tsflags & SOF_TIMESTAMPING_OPT_STATS) &&
+> @@ -5593,6 +5619,15 @@ static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>   	__skb_complete_tx_timestamp(skb, sk, tstype, opt_stats);
+>   }
+>   
+> +static void bpf_skb_tstamp_tx_output(struct sock *sk, int tstype)
+> +{
+> +	u32 tsflags;
+> +
+> +	tsflags = READ_ONCE(sk->sk_tsflags[BPFPROG_TS_REQUESTOR]);
+> +	if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
+> +		return;
+> +}
+> +
+>   void __skb_tstamp_tx(struct sk_buff *orig_skb,
+>   		     const struct sk_buff *ack_skb,
+>   		     struct skb_shared_hwtstamps *hwtstamps,
+> @@ -5601,6 +5636,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
+>   	if (!sk)
+>   		return;
+>   
+> +	if (static_branch_unlikely(&bpf_tstamp_control))
+> +		bpf_skb_tstamp_tx_output(sk, tstype);
+> +
+>   	skb_tstamp_tx_output(orig_skb, ack_skb, hwtstamps, sk, tstype);
+>   }
+>   EXPORT_SYMBOL_GPL(__skb_tstamp_tx);
+
 
