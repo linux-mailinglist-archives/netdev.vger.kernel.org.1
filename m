@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-135984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB88899FE4F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:31:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4EA99FE50
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97E201F2489A
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:31:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46219B22F43
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D450B282FA;
-	Wed, 16 Oct 2024 01:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5094879B;
+	Wed, 16 Oct 2024 01:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="paas4bPP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVQ4n/Rn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF93C433D9
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590AA433D9
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729042291; cv=none; b=Kgai7ZtPvj4t7rke30v6E9RPcT0BFWsP2HzhSyWBSH7fmWDPl3aPwJDhO6xEuWQ5n/97/JowvoPhSV3xW0fMlQZwc/czzGYwElvKUj82Wkf7jTe1HONER0175eQnr/X1FlXSmYq00kpwnhN14GGEyiw13qMw8k81CKjxGVLHUL8=
+	t=1729042343; cv=none; b=ZE4vcCWV+QdQCqwxgRlWkIOx+lJsfUWsISylWcTF6H36Uzp2hihRXXwa581FSeHg6CixV+FoSD63rF4thkFlS9GI5SRRjSUzNUqRhH4xJ8xVQjSEaZU+Q31xSJsBNORfjNLo8QUvHWYyuCmK5EV6dZ9oxk4AS0FP9fuzqAUR9gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729042291; c=relaxed/simple;
-	bh=hhIZNNhbRehK/fRlkWPT21p4C5bvD8ibmSfksXpEVZI=;
+	s=arc-20240116; t=1729042343; c=relaxed/simple;
+	bh=F4+kZIOHGDz90rPLH3tUDLhWrvicxsDAXc6JlpgLTjw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q4+QPGZmD3mJ+Y9xFU4beOOZYUh/gQH4g7OApH7SuyQNFUGypgdFxc90me+T1GD4RZhI6EO0tyE1XKP21CKHhBkTw1aCWc23OO6riZ53c3f4GozqdpKvYPDwVlKdBiFOinjPlqkA61v3j2qghJZwSuGoQ1sLMaFhn0ud/6qbVjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=paas4bPP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D9BEC4CEC6;
-	Wed, 16 Oct 2024 01:31:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mlUZp1rfjS/WlUzHUeH79YOHG4plr+Gm2FzbMtjfdbqIwib0WlpqahnINie02iSXmT0SmwXb+4iqUG3zSOQ5REbYnmT3BHSJ1R8jlDdTBHSCVJfN/JwVQ9MdrPY8D/SBeNEHUzII+Q9AIGqNBokK06zJgtP2ujBEKTcCf+f8Mnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVQ4n/Rn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 601C2C4CEC6;
+	Wed, 16 Oct 2024 01:32:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729042291;
-	bh=hhIZNNhbRehK/fRlkWPT21p4C5bvD8ibmSfksXpEVZI=;
+	s=k20201202; t=1729042342;
+	bh=F4+kZIOHGDz90rPLH3tUDLhWrvicxsDAXc6JlpgLTjw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=paas4bPPjm5aMP8ZzhN1Gw86PG/w/ymq5ja8k/LM524yNM/eTDi5rMGGtJ4ASK7u0
-	 yIq6xt8n8yX/y6CV7vLeSbJii9XEac3CGqwcPq5UG25jG1+P4iR9l6RItUjAj+rV5u
-	 oYpqz9TSB1zvK82/RwFEWIBPGPJqlG5ZkfNypEdUTFQ8vhdUQDLCmEwoQnLmOIfHXD
-	 5aiUmDvPUX+aQRCBqkwKPM9rTXhwB0hUmRiw7wdi43M7QTk1/TPYHsvEKRkGlJ6J2u
-	 pEtsjuK6h79hQv6TiRYthwQIZb+8EbalwVXhdaZwDLEebzunjVaPHOlH63BKv6C2R7
-	 nHRkp5HYXUc7w==
-Date: Tue, 15 Oct 2024 18:31:29 -0700
+	b=KVQ4n/RnUcUQKMFSh1nQrxUXeM6QYcE3JeCks132WeZdKdBLbvemv3UWK8qR+hvR0
+	 Rw7j03/G+RYOCwbQ1xMp2cotamLXEc/WiUTHOAkrAarUB6KnjEfpY/Tvj13u/kwatj
+	 vmOEJ5zFZnXvKvQoLsnntw/B4NIe7GqyjW9wuq2Xs2iF67rUzZiR9pfd3bLKWoGOp8
+	 u0TLUMSZaFxgNY34sDSV87xJQEkzmzjxkiYoso0yofmN3fKX21k0M98hfZr9i+w77z
+	 KLOP8qlMPtsmHJ1nvl2qCZ3mcksVbZm7FNxHToQJnQWOg/Mzenola+aoBtq7izVUNw
+	 foJiuDZslQ61g==
+Date: Tue, 15 Oct 2024 18:32:21 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: chia-yu.chang@nokia-bell-labs.com
 Cc: netdev@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
@@ -49,11 +49,11 @@ Cc: netdev@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
  ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
  cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
  vidhi_goel@apple.com
-Subject: Re: [PATCH net-next 09/44] gso: AccECN support
-Message-ID: <20241015183120.72eabc79@kicinski-fedora-PC1C0HJN>
-In-Reply-To: <20241015102940.26157-10-chia-yu.chang@nokia-bell-labs.com>
+Subject: Re: [PATCH net-next 22/44] tcp: accecn: AccECN option
+Message-ID: <20241015183216.6e0be5f2@kicinski-fedora-PC1C0HJN>
+In-Reply-To: <20241015102940.26157-23-chia-yu.chang@nokia-bell-labs.com>
 References: <20241015102940.26157-1-chia-yu.chang@nokia-bell-labs.com>
-	<20241015102940.26157-10-chia-yu.chang@nokia-bell-labs.com>
+	<20241015102940.26157-23-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,34 +63,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 15 Oct 2024 12:29:05 +0200 chia-yu.chang@nokia-bell-labs.com
+On Tue, 15 Oct 2024 12:29:18 +0200 chia-yu.chang@nokia-bell-labs.com
 wrote:
 > From: Ilpo J=C3=A4rvinen <ij@kernel.org>
 >=20
-> Handling the CWR flag differs between RFC 3168 ECN and AccECN.
-> With RFC 3168 ECN aware TSO (NETIF_F_TSO_ECN) CWR flag is cleared
-> starting from 2nd segment which is incompatible how AccECN handles
-> the CWR flag. Such super-segments are indicated by SKB_GSO_TCP_ECN.
-> With AccECN, CWR flag (or more accurately, the ACE field that also
-> includes ECE & AE flags) changes only when new packet(s) with CE
-> mark arrives so the flag should not be changed within a super-skb.
-> The new skb/feature flags are necessary to prevent such TSO engines
-> corrupting AccECN ACE counters by clearing the CWR flag (if the
-> CWR handling feature cannot be turned off).
+> The Accurate ECN allows echoing back the sum of bytes for
+> each IP ECN field value in the received packets using
+> AccECN option. This change implements AccECN option tx & rx
+> side processing without option send control related features
+> that are added by a later change.
 >=20
-> If NIC is completely unaware of RFC3168 ECN (doesn't support
-> NETIF_F_TSO_ECN) or its TSO engine can be set to not touch CWR flag
-> despite supporting also NETIF_F_TSO_ECN, TSO could be safely used
-> with AccECN on such NIC. This should be evaluated per NIC basis
-> (not done in this patch series for any NICs).
+> Based on specification:
+>   https://tools.ietf.org/id/draft-ietf-tcpm-accurate-ecn-28.txt
+> (Some features of the spec will be added in the later changes
+> rather than in this one).
+>=20
+> A full-length AccECN option is always attempted but if it does
+> not fit, the minimum length is selected based on the counters
+> that have changed since the last update. The AccECN option
+> (with 24-bit fields) often ends in odd sizes so the option
+> write code tries to take advantage of some nop used to pad
+> the other TCP options.
+>=20
+> The delivered_ecn_bytes pairs with received_ecn_bytes similar
+> to how delivered_ce pairs with received_ce. In contrast to
+> ACE field, however, the option is not always available to update
+> delivered_ecn_bytes. For ACK w/o AccECN option, the delivered
+> bytes calculated based on the cumulative ACK+SACK information
+> are assigned to one of the counters using an estimation
+> heuristic to select the most likely ECN byte counter. Any
+> estimation error is corrected when the next AccECN option
+> arrives. It may occur that the heuristic gets too confused
+> when there are enough different byte counter deltas between
+> ACKs with the AccECN option in which case the heuristic just
+> gives up on updating the counters for a while.
 
-net/ethtool/common.c:52:35: warning: initializer overrides prior initializa=
-tion of this subobject [-Winitializer-overrides]
-   52 |         [NETIF_F_FCOE_CRC_BIT] =3D         "tx-checksum-fcoe-crc",
-      |                                          ^~~~~~~~~~~~~~~~~~~~~~
-net/ethtool/common.c:35:30: note: previous initialization is here
-   35 |         [NETIF_F_GSO_ACCECN_BIT] =3D       "tx-tcp-accecn-segmentat=
-ion",
-      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~
+net/ipv4/tcp_output.c:922:5: warning: symbol 'synack_ecn_bytes' was not dec=
+lared. Should it be static?
 
