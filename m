@@ -1,151 +1,439 @@
-Return-Path: <netdev+bounces-136282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863D39A12E8
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 21:49:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1A39A12F3
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 21:53:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DB011C21F74
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 19:49:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91DC428705C
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 19:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0C12144B9;
-	Wed, 16 Oct 2024 19:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A22210C38;
+	Wed, 16 Oct 2024 19:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="D6Js3+/q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6949A210C38;
-	Wed, 16 Oct 2024 19:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23EF18C332
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 19:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729108167; cv=none; b=Hiz8s5/ICdMMxDk6V9ri3x90i1jf3rs5l48LYJvNoweU44gB7kNo//tjdsCl3uRsm1lY2bQhJMT5dXtdO/NyNfQIwwN9fOLMTXOYp6goPPaOlW2Ciw063vuRSFUyy1nH/YaEfHUdejrxYViIDLiRngaOSByTXAv952wTmc8TJg0=
+	t=1729108386; cv=none; b=ikgz9+uFpFWAnWk8TMFQ59pYQtOavHAvZ0tIjwgUduHxpNvLjwvpbBuCGT7Yzcr56hVoqcY6MnnGNqMzUsAFOSZ8C8/j6hi9LnAr3JLlQ3VMnQiE7mBrJaT3DzY99DQGMDjfduHQdmxKr0wPKxhjaplwe9jqqJ/LRNaWSX8nOZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729108167; c=relaxed/simple;
-	bh=+hjBrFzvOL6xiMBUlSJ3Kdsp5Thqjo/zuLD5y0FAQBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MfJiEO57BgMH1vOP9kbkhdyE6wVYRNA0EAChCwmOrJMsesA+1rN+3V/ISIlkVSX+qX2yhT6qRUwVfbAgxBZhTSman6HK2653d4D5eE5WuU0Qx1a4txdWdMmFVEKnywr2j889Wy5NJUUN+mc29A8ewGg4UplwNz4eg3oFXaRkjzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.102] (213.87.153.89) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 16 Oct
- 2024 22:49:04 +0300
-Message-ID: <a32f0891-936b-4cce-a874-78b1865717ae@omp.ru>
-Date: Wed, 16 Oct 2024 22:49:02 +0300
+	s=arc-20240116; t=1729108386; c=relaxed/simple;
+	bh=PVD3vQBvqK3yLV3/HxgWt7ydAM539Sp7SNNNn+o9hDA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BM4hxPankA1QMXlD5N5Q/ukSfZLOMF6WwuFHADtg3pp5DI+Bt01DLRZqLP6gWy4rJ8qX85xOBdvSMNqNKw3YwBYYIA6yeENJqMpuhWbdHsPOpsYvpPcbT/tzAoFMpdrLr6rxI0AKtZGL23U0Eok9dLe9zHr35Mag77zokFBIusw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=D6Js3+/q; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 49GJExwf001898;
+	Wed, 16 Oct 2024 12:52:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=xhjzJOuUjX/89ayE12
+	VVoPfaePWkJjHVwYk1b1mwHvo=; b=D6Js3+/q/MML7akXOQm1KMKcCkJz/hEMXc
+	XTB7smSa4tijRAbNJCp81Q2uIaHUkbCpYMqsSAUbUKSZkQ45lJm+SnWHGxQSjL+k
+	5zPmR0M6oI9toNEmDMdHo8qQbHgfFzP0TmxY7pqhMuWOLqM2cRRCvK6g+OB+nb8K
+	XjWdDqbuitiCWKS/6pTpAwL8w84obPQkaSm+KyFal2SKh9DU2TtthRHJ8/0eMdtB
+	jo9dQW6SzZN8Cen0Y6UpvHSfbGckDnjmz8LxSddqdk7BYYaP3HCdmGuVqhBThBYn
+	Ohl/Oa2pEGZoepvuhFkrWWzvAqdDuS2KV8k5TPKFBrnDzoxc2KaQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 42a8wm4gd5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 16 Oct 2024 12:52:47 -0700 (PDT)
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
+ 15.2.1544.11; Wed, 16 Oct 2024 19:52:44 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Michael Chan <michael.chan@broadcom.com>,
+        Edwin Peer
+	<edwin.peer@broadcom.com>,
+        Pavan Chebbi <pavan.chebbi@broadcom.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>,
+        Vadim Fedorenko <vadim.fedorenko@linux.dev>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+        "Vadim
+ Fedorenko" <vadfed@meta.com>
+Subject: [PATCH net v2] bnxt_en: replace ptp_lock with irqsave variant
+Date: Wed, 16 Oct 2024 12:52:34 -0700
+Message-ID: <20241016195234.2622004-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/13] ata: Use always-managed version of pci_intx()
-To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
-	<dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
-	<basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
-	<manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
-	<GR-Linux-NIC-Dev@marvell.com>, Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
-	Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
-	<Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
-	<dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
-	<bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>, Juergen
- Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela
-	<perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Chen Ni
-	<nichen@iscas.ac.cn>, Mario Limonciello <mario.limonciello@amd.com>, Ricky Wu
-	<ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
-	<leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>, Thomas Gleixner
-	<tglx@linutronix.de>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?=
-	<ilpo.jarvinen@linux.intel.com>, Andy Shevchenko
-	<andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Christian
- Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, Eric Auger
-	<eric.auger@redhat.com>, Reinette Chatre <reinette.chatre@intel.com>, Ye Bin
-	<yebin10@huawei.com>, =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
-	<marmarek@invisiblethingslab.com>, Pierre-Louis Bossart
-	<pierre-louis.bossart@linux.dev>, Peter Ujfalusi
-	<peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Kai Vehmanen
-	<kai.vehmanen@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>
-CC: <linux-ide@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-input@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <ntb@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<xen-devel@lists.xenproject.org>, <linux-sound@vger.kernel.org>
-References: <20241015185124.64726-1-pstanner@redhat.com>
- <20241015185124.64726-10-pstanner@redhat.com>
-Content-Language: en-US
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-In-Reply-To: <20241015185124.64726-10-pstanner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 10/16/2024 19:30:03
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 188488 [Oct 16 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 39 0.3.39
- e168d0b3ce73b485ab2648dd465313add1404cce
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.153.89 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.153.89 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.153.89
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 10/16/2024 19:34:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 10/16/2024 5:04:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Fo_Bz-qd4t32taxx8rz6tkP3GOVT61aP
+X-Proofpoint-ORIG-GUID: Fo_Bz-qd4t32taxx8rz6tkP3GOVT61aP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-On 10/15/24 9:51 PM, Philipp Stanner wrote:
+In netpoll configuration the completion processing can happen in hard
+irq context which will break with spin_lock_bh() for fullfilling RX
+timestamp in case of all packets timestamping. Replace it with
+spin_lock_irqsave() variant.
 
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> All users in ata enable their PCI-Device with pcim_enable_device(). Thus,
-> they need the always-managed version.
-> 
-> Replace pci_intx() with pcim_intx().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+Fixes: 7f5515d19cd7 ("bnxt_en: Get the RX packet timestamp")
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+v1 -> v2:
+- use insigned long for flags
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 22 +++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 70 +++++++++++--------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h | 12 ++--
+ 3 files changed, 63 insertions(+), 41 deletions(-)
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 6e422e24750a..99d025b69079 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -2254,10 +2254,11 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 
+ 			if (!bnxt_get_rx_ts_p5(bp, &ts, cmpl_ts)) {
+ 				struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
++				unsigned long flags;
+ 
+-				spin_lock_bh(&ptp->ptp_lock);
++				spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 				ns = timecounter_cyc2time(&ptp->tc, ts);
+-				spin_unlock_bh(&ptp->ptp_lock);
++				spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 				memset(skb_hwtstamps(skb), 0,
+ 				       sizeof(*skb_hwtstamps(skb)));
+ 				skb_hwtstamps(skb)->hwtstamp = ns_to_ktime(ns);
+@@ -2757,17 +2758,18 @@ static int bnxt_async_event_process(struct bnxt *bp,
+ 		case ASYNC_EVENT_CMPL_PHC_UPDATE_EVENT_DATA1_FLAGS_PHC_RTC_UPDATE:
+ 			if (BNXT_PTP_USE_RTC(bp)) {
+ 				struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
++				unsigned long flags;
+ 				u64 ns;
+ 
+ 				if (!ptp)
+ 					goto async_event_process_exit;
+ 
+-				spin_lock_bh(&ptp->ptp_lock);
++				spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 				bnxt_ptp_update_current_time(bp);
+ 				ns = (((u64)BNXT_EVENT_PHC_RTC_UPDATE(data1) <<
+ 				       BNXT_PHC_BITS) | ptp->current_time);
+ 				bnxt_ptp_rtc_timecounter_init(ptp, ns);
+-				spin_unlock_bh(&ptp->ptp_lock);
++				spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 			}
+ 			break;
+ 		}
+@@ -13494,9 +13496,11 @@ static void bnxt_force_fw_reset(struct bnxt *bp)
+ 		return;
+ 
+ 	if (ptp) {
+-		spin_lock_bh(&ptp->ptp_lock);
++		unsigned long flags;
++
++		spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 		set_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 	} else {
+ 		set_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+ 	}
+@@ -13561,9 +13565,11 @@ void bnxt_fw_reset(struct bnxt *bp)
+ 		int n = 0, tmo;
+ 
+ 		if (ptp) {
+-			spin_lock_bh(&ptp->ptp_lock);
++			unsigned long flags;
++
++			spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 			set_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+-			spin_unlock_bh(&ptp->ptp_lock);
++			spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 		} else {
+ 			set_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+ 		}
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index 37d42423459c..fa514be87650 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -62,13 +62,14 @@ static int bnxt_ptp_settime(struct ptp_clock_info *ptp_info,
+ 	struct bnxt_ptp_cfg *ptp = container_of(ptp_info, struct bnxt_ptp_cfg,
+ 						ptp_info);
+ 	u64 ns = timespec64_to_ns(ts);
++	unsigned long flags;
+ 
+ 	if (BNXT_PTP_USE_RTC(ptp->bp))
+ 		return bnxt_ptp_cfg_settime(ptp->bp, ns);
+ 
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	timecounter_init(&ptp->tc, &ptp->cc, ns);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 	return 0;
+ }
+ 
+@@ -100,13 +101,14 @@ static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp *sts,
+ static void bnxt_ptp_get_current_time(struct bnxt *bp)
+ {
+ 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
++	unsigned long flags;
+ 
+ 	if (!ptp)
+ 		return;
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	WRITE_ONCE(ptp->old_time, ptp->current_time);
+ 	bnxt_refclk_read(bp, NULL, &ptp->current_time);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ }
+ 
+ static int bnxt_hwrm_port_ts_query(struct bnxt *bp, u32 flags, u64 *ts,
+@@ -149,17 +151,18 @@ static int bnxt_ptp_gettimex(struct ptp_clock_info *ptp_info,
+ {
+ 	struct bnxt_ptp_cfg *ptp = container_of(ptp_info, struct bnxt_ptp_cfg,
+ 						ptp_info);
++	unsigned long flags;
+ 	u64 ns, cycles;
+ 	int rc;
+ 
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	rc = bnxt_refclk_read(ptp->bp, sts, &cycles);
+ 	if (rc) {
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 		return rc;
+ 	}
+ 	ns = timecounter_cyc2time(&ptp->tc, cycles);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 	*ts = ns_to_timespec64(ns);
+ 
+ 	return 0;
+@@ -177,6 +180,7 @@ void bnxt_ptp_update_current_time(struct bnxt *bp)
+ static int bnxt_ptp_adjphc(struct bnxt_ptp_cfg *ptp, s64 delta)
+ {
+ 	struct hwrm_port_mac_cfg_input *req;
++	unsigned long flags;
+ 	int rc;
+ 
+ 	rc = hwrm_req_init(ptp->bp, req, HWRM_PORT_MAC_CFG);
+@@ -190,9 +194,9 @@ static int bnxt_ptp_adjphc(struct bnxt_ptp_cfg *ptp, s64 delta)
+ 	if (rc) {
+ 		netdev_err(ptp->bp->dev, "ptp adjphc failed. rc = %x\n", rc);
+ 	} else {
+-		spin_lock_bh(&ptp->ptp_lock);
++		spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 		bnxt_ptp_update_current_time(ptp->bp);
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 	}
+ 
+ 	return rc;
+@@ -202,13 +206,14 @@ static int bnxt_ptp_adjtime(struct ptp_clock_info *ptp_info, s64 delta)
+ {
+ 	struct bnxt_ptp_cfg *ptp = container_of(ptp_info, struct bnxt_ptp_cfg,
+ 						ptp_info);
++	unsigned long flags;
+ 
+ 	if (BNXT_PTP_USE_RTC(ptp->bp))
+ 		return bnxt_ptp_adjphc(ptp, delta);
+ 
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	timecounter_adjtime(&ptp->tc, delta);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 	return 0;
+ }
+ 
+@@ -236,14 +241,15 @@ static int bnxt_ptp_adjfine(struct ptp_clock_info *ptp_info, long scaled_ppm)
+ 	struct bnxt_ptp_cfg *ptp = container_of(ptp_info, struct bnxt_ptp_cfg,
+ 						ptp_info);
+ 	struct bnxt *bp = ptp->bp;
++	unsigned long flags;
+ 
+ 	if (!BNXT_MH(bp))
+ 		return bnxt_ptp_adjfine_rtc(bp, scaled_ppm);
+ 
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	timecounter_read(&ptp->tc);
+ 	ptp->cc.mult = adjust_by_scaled_ppm(ptp->cmult, scaled_ppm);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 	return 0;
+ }
+ 
+@@ -251,12 +257,13 @@ void bnxt_ptp_pps_event(struct bnxt *bp, u32 data1, u32 data2)
+ {
+ 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+ 	struct ptp_clock_event event;
++	unsigned long flags;
+ 	u64 ns, pps_ts;
+ 
+ 	pps_ts = EVENT_PPS_TS(data2, data1);
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	ns = timecounter_cyc2time(&ptp->tc, pps_ts);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 
+ 	switch (EVENT_DATA2_PPS_EVENT_TYPE(data2)) {
+ 	case ASYNC_EVENT_CMPL_PPS_TIMESTAMP_EVENT_DATA2_EVENT_TYPE_INTERNAL:
+@@ -393,16 +400,17 @@ static int bnxt_get_target_cycles(struct bnxt_ptp_cfg *ptp, u64 target_ns,
+ {
+ 	u64 cycles_now;
+ 	u64 nsec_now, nsec_delta;
++	unsigned long flags;
+ 	int rc;
+ 
+-	spin_lock_bh(&ptp->ptp_lock);
++	spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 	rc = bnxt_refclk_read(ptp->bp, NULL, &cycles_now);
+ 	if (rc) {
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 		return rc;
+ 	}
+ 	nsec_now = timecounter_cyc2time(&ptp->tc, cycles_now);
+-	spin_unlock_bh(&ptp->ptp_lock);
++	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 
+ 	nsec_delta = target_ns - nsec_now;
+ 	*cycles_delta = div64_u64(nsec_delta << ptp->cc.shift, ptp->cc.mult);
+@@ -689,6 +697,7 @@ static int bnxt_stamp_tx_skb(struct bnxt *bp, int slot)
+ 	struct skb_shared_hwtstamps timestamp;
+ 	struct bnxt_ptp_tx_req *txts_req;
+ 	unsigned long now = jiffies;
++	unsigned long flags;
+ 	u64 ts = 0, ns = 0;
+ 	u32 tmo = 0;
+ 	int rc;
+@@ -702,9 +711,9 @@ static int bnxt_stamp_tx_skb(struct bnxt *bp, int slot)
+ 				     tmo, slot);
+ 	if (!rc) {
+ 		memset(&timestamp, 0, sizeof(timestamp));
+-		spin_lock_bh(&ptp->ptp_lock);
++		spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 		ns = timecounter_cyc2time(&ptp->tc, ts);
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 		timestamp.hwtstamp = ns_to_ktime(ns);
+ 		skb_tstamp_tx(txts_req->tx_skb, &timestamp);
+ 		ptp->stats.ts_pkts++;
+@@ -730,6 +739,7 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+ 	unsigned long now = jiffies;
+ 	struct bnxt *bp = ptp->bp;
+ 	u16 cons = ptp->txts_cons;
++	unsigned long flags;
+ 	u32 num_requests;
+ 	int rc = 0;
+ 
+@@ -757,9 +767,9 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+ 	bnxt_ptp_get_current_time(bp);
+ 	ptp->next_period = now + HZ;
+ 	if (time_after_eq(now, ptp->next_overflow_check)) {
+-		spin_lock_bh(&ptp->ptp_lock);
++		spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 		timecounter_read(&ptp->tc);
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 		ptp->next_overflow_check = now + BNXT_PHC_OVERFLOW_PERIOD;
+ 	}
+ 	if (rc == -EAGAIN)
+@@ -819,6 +829,7 @@ void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *bnapi,
+ 	u32 opaque = tscmp->tx_ts_cmp_opaque;
+ 	struct bnxt_tx_ring_info *txr;
+ 	struct bnxt_sw_tx_bd *tx_buf;
++	unsigned long flags;
+ 	u64 ts, ns;
+ 	u16 cons;
+ 
+@@ -833,9 +844,9 @@ void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *bnapi,
+ 				   le32_to_cpu(tscmp->tx_ts_cmp_flags_type),
+ 				   le32_to_cpu(tscmp->tx_ts_cmp_errors_v));
+ 		} else {
+-			spin_lock_bh(&ptp->ptp_lock);
++			spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 			ns = timecounter_cyc2time(&ptp->tc, ts);
+-			spin_unlock_bh(&ptp->ptp_lock);
++			spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 			timestamp.hwtstamp = ns_to_ktime(ns);
+ 			skb_tstamp_tx(tx_buf->skb, &timestamp);
+ 		}
+@@ -975,6 +986,7 @@ void bnxt_ptp_rtc_timecounter_init(struct bnxt_ptp_cfg *ptp, u64 ns)
+ int bnxt_ptp_init_rtc(struct bnxt *bp, bool phc_cfg)
+ {
+ 	struct timespec64 tsp;
++	unsigned long flags;
+ 	u64 ns;
+ 	int rc;
+ 
+@@ -993,9 +1005,9 @@ int bnxt_ptp_init_rtc(struct bnxt *bp, bool phc_cfg)
+ 		if (rc)
+ 			return rc;
+ 	}
+-	spin_lock_bh(&bp->ptp_cfg->ptp_lock);
++	spin_lock_irqsave(&bp->ptp_cfg->ptp_lock, flags);
+ 	bnxt_ptp_rtc_timecounter_init(bp->ptp_cfg, ns);
+-	spin_unlock_bh(&bp->ptp_cfg->ptp_lock);
++	spin_unlock_irqrestore(&bp->ptp_cfg->ptp_lock, flags);
+ 
+ 	return 0;
+ }
+@@ -1063,10 +1075,12 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
+ 	atomic64_set(&ptp->stats.ts_err, 0);
+ 
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+-		spin_lock_bh(&ptp->ptp_lock);
++		unsigned long flags;
++
++		spin_lock_irqsave(&ptp->ptp_lock, flags);
+ 		bnxt_refclk_read(bp, NULL, &ptp->current_time);
+ 		WRITE_ONCE(ptp->old_time, ptp->current_time);
+-		spin_unlock_bh(&ptp->ptp_lock);
++		spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+ 		ptp_schedule_worker(ptp->ptp_clock, 0);
+ 	}
+ 	ptp->txts_tmo = BNXT_PTP_DFLT_TX_TMO;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+index a9a2f9a18c9c..f322466ecad3 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+@@ -146,11 +146,13 @@ struct bnxt_ptp_cfg {
+ };
+ 
+ #if BITS_PER_LONG == 32
+-#define BNXT_READ_TIME64(ptp, dst, src)		\
+-do {						\
+-	spin_lock_bh(&(ptp)->ptp_lock);		\
+-	(dst) = (src);				\
+-	spin_unlock_bh(&(ptp)->ptp_lock);	\
++#define BNXT_READ_TIME64(ptp, dst, src)				\
++do {								\
++	unsigned long flags;					\
++								\
++	spin_lock_irqsave(&(ptp)->ptp_lock, flags);		\
++	(dst) = (src);						\
++	spin_unlock_irqrestore(&(ptp)->ptp_lock, flags);	\
+ } while (0)
+ #else
+ #define BNXT_READ_TIME64(ptp, dst, src)		\
+-- 
+2.43.5
 
 
