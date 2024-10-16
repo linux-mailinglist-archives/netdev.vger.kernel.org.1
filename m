@@ -1,127 +1,152 @@
-Return-Path: <netdev+bounces-136069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F3C9A035C
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:58:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F979A0363
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 09:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A1A41C280C7
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:58:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B232B21435
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7466F1CC14C;
-	Wed, 16 Oct 2024 07:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0483E1CB9F9;
+	Wed, 16 Oct 2024 07:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fE1nfrPW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h58LQTSX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2168F189F3F;
-	Wed, 16 Oct 2024 07:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB411C8FB4;
+	Wed, 16 Oct 2024 07:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729065499; cv=none; b=Fv08HjI1GUYpEaxSy2LECth8nogkuMOV02AEhSSqc6gg7JM+Mdqlsf9pONuXNFVjWmJkgt89fUHjtIFEQ9fOC6kAq3Z3FTw51ObQFmeotIBj1yHT09X3v3KtS1yxEzPDgWxBZmgEpPT+ud9WVznGSnx2edak+pVHKI1FBw9DkpU=
+	t=1729065538; cv=none; b=L4gZvAhnLVDbKhIV/nl5z+6SkhzkKJd10480LLyz/uCuhKvJSEE2WpwJXlYPtqD5KUr3zjvy/AKPI4f83Oa4x70kVcfFqo06bQeYh/CCX8cdTagb4QUfzz1pvbKIMtfV002QPGvaMbrtyi5GCKGLjLpxZCPYK56+SoZsYjIqDr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729065499; c=relaxed/simple;
-	bh=nsM60+cNuES1C+fqTbnc5ooJ0hP520KLGK9VFBCBDGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=drXepBJETda9u3LJedyxC6BqtTvNmAfhsSYOSPsjxAK99fQvg5ZNPqHEFYCgQ7XQe2Am7dcjou/AhHc/WrkaQLi5ShW4r/EQxpLckZ7YmVrsL2+ybbsSVeCx20UJGACV3TN+p7O4eDXe6V5E32Hw/VK8Kek8OGpjbIrvddYRheo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fE1nfrPW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D67C4CEC5;
-	Wed, 16 Oct 2024 07:58:11 +0000 (UTC)
+	s=arc-20240116; t=1729065538; c=relaxed/simple;
+	bh=n0pe026KdxnnfOE+FlZrG1ssjrpyt5lw8jYLE7L82Oo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j7vPQy7hAjd9PcsRasCE972cyC5K347YOgS8RHQ7HSvWtfLq29Y/ivE9tCKu2uGXzUOCeAta9NKnE8v4zQJtTh6rrWS2AZJkobag4wFAzppmqW0PLIlOGzJo3nYhMs1GI1M7QZ3kFglR2uW0GaV/kbzcV2+wnwHTefMxwNAOw+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h58LQTSX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F161CC4CEC5;
+	Wed, 16 Oct 2024 07:58:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729065498;
-	bh=nsM60+cNuES1C+fqTbnc5ooJ0hP520KLGK9VFBCBDGI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fE1nfrPWvmps83biOQkLKuOrEbyoX9F+oYZZR4MyCkhnTWXLfurI4YDDnEgp3i07b
-	 VRYqDkPXIU+qUtKDWJ717mNrRjaZqikw3+etM/jDuz+SlyxnvznHnDKrAlDX0CzJ7e
-	 fINBIZ+D9Zp09Ppusrp8Fb0ZqNgnLr3Jdt9Q8ncBHGtElLWB9ESeQ5b5BDNqyqrPHs
-	 CtV1sq/qM1ERfGyqIll+x8X3NR+ZGI4q/LTpO0Q+uyL0JEmPhyTYdi0Xyt3NDfgwb3
-	 N7NtwUeILsWm6XGFTmTz4KTjWwUil3aV5cQPTDvmG6RV280Yh47SXf5mfG97vA2mxx
-	 vkzZ51zg7DMLg==
-Date: Wed, 16 Oct 2024 08:58:08 +0100
-From: Lee Jones <lee@kernel.org>
-To: Sebastian Reichel <sebastian.reichel@collabora.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Macpaul Lin <macpaul.lin@mediatek.com>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sen Chu <sen.chu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-input@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Alexandre Mergnat <amergnat@baylibre.com>,
-	Bear Wang <bear.wang@mediatek.com>,
-	Pablo Sun <pablo.sun@mediatek.com>, Macpaul Lin <macpaul@gmail.com>,
-	Chris-qj chen <chris-qj.chen@mediatek.com>,
-	MediaTek Chromebook Upstream <Project_Global_Chrome_Upstream_Group@mediatek.com>,
-	Chen-Yu Tsai <wenst@chromium.org>
-Subject: Re: [PATCH v8 3/3] dt-bindings: mfd: mediatek: mt6397: Convert to DT
- schema format
-Message-ID: <20241016075808.GM8348@google.com>
-References: <20241001104145.24054-1-macpaul.lin@mediatek.com>
- <20241001104145.24054-3-macpaul.lin@mediatek.com>
- <5nvshurbpmjkqysphfrfxhekq3c6od6a2uqai4rfxns64mdvf7@ftjvgjnivr3k>
- <20241009155222.GB637580@google.com>
- <vb324yv7s7yew6m74lfvdv6wnuo6e4rxtiu2q7okypttw46ox2@lgfdkie6o3t2>
+	s=k20201202; t=1729065538;
+	bh=n0pe026KdxnnfOE+FlZrG1ssjrpyt5lw8jYLE7L82Oo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=h58LQTSXBO7TFxIcRIxyn7tPMldlpPkmAwe+whwRpjOWojf8K+wfGusrnQtpH8sUe
+	 efMlfgbA0UAMKqzMvCbkJvw36TbPC/yOFWsLgakqS+C1/oFmtuxkhcUYDJ5Rxe/wXF
+	 D1u0W6M0yJ+QpWgM0bn6p1+ou8fEoIsbSuUXEeoBlPTrd6pGN79JUaX6FLaR03J+wZ
+	 gnsuPHLVRPu8H5Qody9TwHMVm6/D+3Iqk95vK3BUeEAmb6bzwA2v6uPh6urPHg4dRh
+	 z+QL5I09eeChS5xImkWZVXJGu16lUVnbTcoiydISkG3GS7OmB3pJvGd6mgVBsK8xWP
+	 Ow1FFgnVgzCQA==
+Message-ID: <d4ba554d-213a-4961-a9f2-6582b38fc082@kernel.org>
+Date: Wed, 16 Oct 2024 09:58:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <vb324yv7s7yew6m74lfvdv6wnuo6e4rxtiu2q7okypttw46ox2@lgfdkie6o3t2>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nfc/nci: Fix uninit-value issue in nci_ntf_packet
+To: Qianqiang Liu <qianqiang.liu@163.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com,
+ syzbot+3f8fa0edaa75710cd66e@syzkaller.appspotmail.com
+References: <ZwqEijEvP7tGGZtW@fedora>
+ <670ab923.050a0220.3e960.0029.GAE@google.com> <ZwrENfTGYG9wnap0@fedora>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <ZwrENfTGYG9wnap0@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Oct 2024, Sebastian Reichel wrote:
-
-> Hi,
+On 12/10/2024 20:47, Qianqiang Liu wrote:
+> When an unsupported rf_tech_and_mode (0xe6) occurs in nci_rf_discover_ntf_packet,
+> the ntf.ntf_type may be assigned an uninitialized value.
 > 
-> On Wed, Oct 09, 2024 at 04:52:22PM +0100, Lee Jones wrote:
-> > On Wed, 02 Oct 2024, Krzysztof Kozlowski wrote:
-> > 
-> > > On Tue, Oct 01, 2024 at 06:41:45PM +0800, Macpaul Lin wrote:
-> > > > Convert the mfd: mediatek: mt6397 binding to DT schema format.
-> > > > 
-> > > > MT6323, MT6358, and MT6397 are PMIC devices with multiple function
-> > > > subdevices. They share a common PMIC design but have variations in
-> > > > subdevice combinations.
-> > > > 
-> > > > Key updates in this conversion:
-> > > > 
-> > > > 1. RTC:
-> > > >    - Convert rtc-mt6397.txt and merge into parent MT6397 PMIC DT schema.
-> > > 
-> > > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > 
-> > Everyone okay with me taking this without a pull-request?
+> To resolve this, use the __GFP_ZERO flag when calling alloc_skb(),
+> ensuring that skb->data is properly initialized.
 > 
-> Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+> Reported-by: syzbot+3f8fa0edaa75710cd66e@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3f8fa0edaa75710cd66e
+> Tested-by: syzbot+3f8fa0edaa75710cd66e@syzkaller.appspotmail.com
+> Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
 
-Thanks Sebastian.
+Do not attach (thread) your patchsets to some other threads (unrelated
+or older versions). This buries them deep in the mailbox and might
+interfere with applying entire sets.
 
-I have a bunch of things that depend on this, so I'm going to whip it in.
+> ---
+>  drivers/nfc/virtual_ncidev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+> index 6b89d596ba9a..31da26287327 100644
+> --- a/drivers/nfc/virtual_ncidev.c
+> +++ b/drivers/nfc/virtual_ncidev.c
+> @@ -117,7 +117,7 @@ static ssize_t virtual_ncidev_write(struct file *file,
+>  	struct virtual_nci_dev *vdev = file->private_data;
+>  	struct sk_buff *skb;
+>  
+> -	skb = alloc_skb(count, GFP_KERNEL);
+> +	skb = alloc_skb(count, GFP_KERNEL | __GFP_ZERO);
+>  	if (!skb)
+>  		return -ENOMEM;
 
--- 
-Lee Jones [李琼斯]
+Same comments as before:
+
+https://lore.kernel.org/all/20240803121817.383567-1-zhanghao1@kylinos.cn/
+
+Respond to existing feedback, please.
+
+Best regards,
+Krzysztof
+
 
