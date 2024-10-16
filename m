@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-136171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A999A0C5E
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:17:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C44409A0C7D
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:21:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B93571F2489A
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:17:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 418BEB21E16
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFB81D1740;
-	Wed, 16 Oct 2024 14:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F08A154454;
+	Wed, 16 Oct 2024 14:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Che9ZTe0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTno0WUw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59EB1494CC;
-	Wed, 16 Oct 2024 14:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A6C21E3C1;
+	Wed, 16 Oct 2024 14:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729088241; cv=none; b=tXCvPeDwEIQQDQxdk5Bba8i6LgRyJpUVse+Io9jXwezbvhGwbyIh8xi5vdpTIVaSPRwikgDgmIFjCINbWUnDNjVAcC/+e5UvL7sjxTklK/nGsCkTZxeqqkMSyfNj6LULdk6O8Prk6HrIgQkLxtNB8vJNuQMTgpD5qcsHN44R2zY=
+	t=1729088500; cv=none; b=Mu/18R4wwRMFEB6Zw4boc+fKcQPnq8HRzDEPMBijPNaWuCevzXOjgyhjZodP+5B50/ZUJGK3zBRbztyOp69f52vOgSBCT5GaeE58hikjFfdWB/zkrS4zsN74INuu188MJ/ELepSCOMINDladRggl/MErtpnuQDMGEGdpj7MggrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729088241; c=relaxed/simple;
-	bh=xvD0EGIlA23nJe+ETgrqTCv8spRK9sqdryQTaYwbPe4=;
+	s=arc-20240116; t=1729088500; c=relaxed/simple;
+	bh=b3gWtHA7mDXpJUaqEeJesA/LmRgKeKN78pjq9n5Clv8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pl9pSA3RGM+0gJEQDSELjyqarLfKTOw7n4EgW0N8ZmAMIc6f3zGdXcT64EBZiK4mh0qak4KxtqUuhSn+peyahY7W21xvpiarYTHpl4cTpfLww8FPaUdlNrRBy+i7lyvElfo0xpRhCKTmYqbFxiNOZcQHrypOQODEwRRjBX+tbmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Che9ZTe0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00EDEC4CEC5;
-	Wed, 16 Oct 2024 14:17:17 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=hIUsY2Esv9yPuPVysW5G8rVa1WnR7Rx3kwut581zSjwdqSoMfQA9l5rq0lVhdrHKa6vdSYNUiG9tR638Z1PrRvtZA+EaffGZvAx5pUgkqCaF/ugB82GrWrDLaiWI0OAmVPXW0Iw/pMenlqUX3jeVxtxN6fBGbZsIDaPseDo4Z4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTno0WUw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B103C4CEC5;
+	Wed, 16 Oct 2024 14:21:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729088240;
-	bh=xvD0EGIlA23nJe+ETgrqTCv8spRK9sqdryQTaYwbPe4=;
+	s=k20201202; t=1729088499;
+	bh=b3gWtHA7mDXpJUaqEeJesA/LmRgKeKN78pjq9n5Clv8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Che9ZTe0y868yFLJ7Yq2FLCfwnzruS+q+UMoHXrFDUL2yTI9P5tjg6MxCcayTTwVz
-	 JRihxVb/WGD25c/VayBpzr/R2no38EsBzMneisUa4g4gT/lLwmwuAjXaGU2kPDcSUj
-	 IULsR7ZSm4dSV0GLTLEft36j7i2pn5PV0OC/a9s79hRLEcsQMuHdHq9bFUQkrRrkAw
-	 tQ/aPVwNRLaw4ZCRprft1qx6CShDjpjdF0jRR5fIzaskNOsgB2iuMzHYLB7AOsti3+
-	 yfiRcZaW4WX2zy3iaHzURerzYv26CTuBeXV0lKCP6EkQFDFgDYFpf6OcI7A2V9MD7F
-	 ApPVP4W5IetiA==
-Date: Wed, 16 Oct 2024 15:17:15 +0100
+	b=pTno0WUwLTzeEItC6uZRkUnuICWr/hWEJt/cMOtzBjrDgaQ9Um8Vi1xuO5wMZr5Ce
+	 Db98CCgcp+jSKSUjOwnLjCVQJFcoQxfh5OGM19Tpvzhz/HlnGRKcYPZKTkfrLYc3YR
+	 TX+R//bvqmLFVs1lC9uW4eJrbgBs/0glG0X9NTzb5AZikApZiZO/j5+peZDKcoQ5ug
+	 zMeh7x6Wn3EQapZKrO1KuJptqclfrrhiBQb8yFedhYx+T/KO5Rgd6Aq2FDrhTNhzft
+	 o3Kxdw7/wWFTSE5c2hitjWpmLKDUPZz+rSFXOwWy8d/1i82SGM8UUBK3V55nYuWUK/
+	 xYUV3ZLlrKLXg==
+Date: Wed, 16 Oct 2024 15:21:35 +0100
 From: Simon Horman <horms@kernel.org>
-To: boehm.jakub@gmail.com
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH] net: plip: fix break; causing plip to never transmit
-Message-ID: <20241016141715.GH2162@kernel.org>
-References: <20241015-net-plip-tx-fix-v1-1-32d8be1c7e0b@gmail.com>
+To: Karan Sanghavi <karansanghvi98@gmail.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH v3] selftests: tc-testing: Fix spelling errors in
+ cgroup.json and flow.json
+Message-ID: <20241016142135.GI2162@kernel.org>
+References: <Zw6flhHF50_4jT4b@Emma>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,24 +61,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241015-net-plip-tx-fix-v1-1-32d8be1c7e0b@gmail.com>
+In-Reply-To: <Zw6flhHF50_4jT4b@Emma>
 
-On Tue, Oct 15, 2024 at 05:16:04PM +0200, Jakub Boehm via B4 Relay wrote:
-> From: Jakub Boehm <boehm.jakub@gmail.com>
+On Tue, Oct 15, 2024 at 05:00:06PM +0000, Karan Sanghavi wrote:
+> This patch corrects typographical errors in the "name" fields of
+> the JSON objects with IDs "4319" and "4341" in the tc-testing
+> selftests.
 > 
-> Since commit
->   71ae2cb30531 ("net: plip: Fix fall-through warnings for Clang")
+> - "diffferent" is corrected to "different".
+> - "muliple" is corrected to "multiple".
 > 
-> plip was not able to send any packets, this patch replaces one
-> unintended break; with fallthrough; which was originally missed by
-> commit 9525d69a3667 ("net: plip: mark expected switch fall-throughs").
+> Signed-off-by: Karan Sanghavi <karansanghvi98@gmail.com>
+> ---
 > 
-> I have verified with a real hardware PLIP connection that everything
-> works once again after applying this patch.
+> v3:
+> - Corrected the change logs to make it easy to understand. 
 > 
-> Fixes: 71ae2cb30531 ("net: plip: Fix fall-through warnings for Clang")
-> Signed-off-by: Jakub Boehm <boehm.jakub@gmail.com>
+> v2:
+> - Combine two earlier patches into one
+> - Links to v1 of each patch
+>   [1] https://lore.kernel.org/all/Zqp9asVA-q_OzDP-@Emma/
+>   [2] https://lore.kernel.org/all/Zqp92oXa9joXk4T9@Emma/
+> 
+>  tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json | 2 +-
+>  tools/testing/selftests/tc-testing/tc-tests/filters/flow.json   | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json b/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json
+> index 03723cf84..6897ff5ad 100644
+> --- a/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json
+> +++ b/tools/testing/selftests/tc-testing/tc-tests/filters/cgroup.json
+> @@ -1189,7 +1189,7 @@
+>      },
+>      {
+>          "id": "4319",
+> -        "name": "Replace cgroup filter with diffferent match",
+> +        "name": "Replace cgroup filter with different match",
+>          "category": [
+>              "filter",
+>              "cgroup"
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Karan,
 
+It seems that multiple is also misspelt several as miltiple in cgroup.json,
+basic.json and route.json. While you are fixing spelling here could you fix
+that too?
+
+> diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json b/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json
+> index 58189327f..996448afe 100644
+> --- a/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json
+> +++ b/tools/testing/selftests/tc-testing/tc-tests/filters/flow.json
+> @@ -507,7 +507,7 @@
+>      },
+>      {
+>          "id": "4341",
+> -        "name": "Add flow filter with muliple ops",
+> +        "name": "Add flow filter with multiple ops",
+>          "category": [
+>              "filter",
+>              "flow"
+> -- 
+> 2.43.0
+> 
+> 
 
