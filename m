@@ -1,167 +1,106 @@
-Return-Path: <netdev+bounces-136236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C889A11C8
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:38:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631F09A11CC
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:38:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE5A62836BC
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:38:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94F1D1C22044
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC6B215F62;
-	Wed, 16 Oct 2024 18:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E9A212F10;
+	Wed, 16 Oct 2024 18:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sT9hNur+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OVD3IEru"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DAF20E03F;
-	Wed, 16 Oct 2024 18:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D3F20F5D1;
+	Wed, 16 Oct 2024 18:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729103880; cv=none; b=irFoTemG3LLVFjKbpIAphXwiL7fl2ETGRg7+lkB7PFCUbPO8krWLwxiiqOxk/hJdfLv21D2PZk300AI0h/Uq8Mav2416QbEM5FjnagfzN/vf6UWVB/7AEPSJkQwgsfVJHPlmz9PZqRLQMDM/4fh3/QBa4FiqQKaZo+VytZW1wj4=
+	t=1729103923; cv=none; b=I5gJbo3Uhds6r6eaCiWJdvUpPaF92aNuDAwL36wO1gJDoKI8p24p56XJl5Yqds2JE0UPUrjFz00fB+q5jJp5Cwxekc7csIWMsNxa/Kd7xXjbaGhsD+HuJ6xhfOCApokmevb86DoJOV4ykxjRLKRsLcL2vhGI0Y0/hx8r5OQ30iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729103880; c=relaxed/simple;
-	bh=Ps8lfftrHz+eYH6LZ19tvlTQRIFQTkgYYQKUnOg+GN4=;
+	s=arc-20240116; t=1729103923; c=relaxed/simple;
+	bh=oEDn4K3a0qeagZHW5mDcN6tcq5ry+kcG1OZOwBLK9Mg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r7MeVFrcNjblzi0Sd6ljfgv18T0eaRnGK/LSBabrcm5fVHXSe8HWlpxAhVTHUgbykqLA1TGOkK0TGkmhp5mFB/Fyuyxe+ZIenh12KZmsYfXqVDr5cl0bkZ/9eFOIp5h67mVymydlUKwxMWAZV+tV+FR9aN30ueKqATUdSj8u3Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sT9hNur+; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49GIKaiw014368;
-	Wed, 16 Oct 2024 18:37:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=n/vzuDg8dd2cQXoLxVrojumWNLu2WM
-	5B0RoY9HpaMGo=; b=sT9hNur+tyId4zny3HFv9EI7qrEzLyi0aT91FIBs3if2Yi
-	o/syahTpiqPzsSeJZ9H9RQEUJjuoUaOU1dfPRpwribkx+uUlV0l9TcJ88kIUXiGy
-	KXRBdCUe/RBzrSjbRBohw9/Epd9sLk/Ut6J+7233zI+u7zbYv46mPrVwbGMm/lsO
-	B3wLxjQOSxG+snc1iLK7D80RcUdNISsRtdud38l/pX4u13BWWTMQbUB/Qn86MjDN
-	d5EqPK2IpF2FHzFceC1T1BEMRD6HD1XGSGI0l5PCzzy9fuJYjppuD+Lg9pGpsJz/
-	iCdQorV7onPm6XrxVSt9Pilj16j0ZT2wyedo25+A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42ajpc838e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 18:37:53 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49GIbqUP020563;
-	Wed, 16 Oct 2024 18:37:52 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42ajpc838b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 18:37:52 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49GFb4LE006666;
-	Wed, 16 Oct 2024 18:37:51 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4283es3569-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 18:37:51 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49GIbmuL29950600
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Oct 2024 18:37:48 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3CC6C20043;
-	Wed, 16 Oct 2024 18:37:48 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B2D7920040;
-	Wed, 16 Oct 2024 18:37:47 +0000 (GMT)
-Received: from osiris (unknown [9.171.30.171])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 16 Oct 2024 18:37:47 +0000 (GMT)
-Date: Wed, 16 Oct 2024 20:37:46 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Sven Schnelle <svens@linux.ibm.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Ricardo B. Marliere" <ricardo@marliere.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] s390/time: Add PtP driver
-Message-ID: <20241016183746.25478-A-hca@linux.ibm.com>
-References: <20241016115300.2657771-1-svens@linux.ibm.com>
- <20241016115300.2657771-3-svens@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tal54+KQXgivJEnqWFtu869wlljYJsO/0tMxq2WaQIJrTG1G4YGLtMZzGcQUlxb6ZoqPJ0MEe8blZoIDOUIY1QVs9vJLHL0jCJohDOadvz51cUokRe6TnJL2G4Dz7pTH6zF23kWPk2LdfJVpKxzr5PZS+OxHCiyh7NvxbEi7oE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OVD3IEru; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A9A3C4CEC5;
+	Wed, 16 Oct 2024 18:38:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729103923;
+	bh=oEDn4K3a0qeagZHW5mDcN6tcq5ry+kcG1OZOwBLK9Mg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OVD3IEruaWkVA4dqRzYwaaNT4kfkPzdP25GYhhdfPaRyTGk19CeRqStpKWX2sY5VG
+	 AtX0AO40lCeP24qT72/XEPHpWRb/8CgHp2yY5GXJlrrOUe63BoBscdu0BefNO4JvKA
+	 8KjCKQIvUSP9JLUwRTaSR58hg2oyEd8rLW8Aj9u3840OsP3Rjb0l1yKlSFgA4/vrMG
+	 2cPCT10zDdv6xqp2q+TWshfAXnTXVjCgcqewIkgm6X5xOEU/v59ji1e8i5Ft0JWFTU
+	 Fx1mOfWm2OJPEC5rvMWGoq7YPISj2T4Q8sDPdcMUCb1Mp02BBlkZpmm9Xq5dizCL3o
+	 Ei9gHbjldY4rg==
+Date: Wed, 16 Oct 2024 19:38:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	George McCollister <george.mccollister@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Breno Leitao <leitao@debian.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCHv7 net-next 0/6] ibm: emac: more cleanups
+Message-ID: <20241016183837.GK2162@kernel.org>
+References: <20241015200222.12452-1-rosenp@gmail.com>
+ <CAKxU2N_vK8WROUYdSRHnh_Y5tyW9dX+kk1BCTk-zU=pFH7HTwg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241016115300.2657771-3-svens@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: pVzF-2odreVl0wqk0ooc8vlnTOrWZ2ms
-X-Proofpoint-GUID: z1uE51r3gkr-F93r8IkbMaxIuhnvP6MY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- suspectscore=0 adultscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 spamscore=0 mlxlogscore=544 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410160118
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKxU2N_vK8WROUYdSRHnh_Y5tyW9dX+kk1BCTk-zU=pFH7HTwg@mail.gmail.com>
 
-On Wed, Oct 16, 2024 at 01:53:00PM +0200, Sven Schnelle wrote:
-> Add a small PtP driver which allows user space to get
-> the values of the physical and tod clock. This allows
-> programs like chrony to use STP as clock source and
-> steer the kernel clock. The physical clock can be used
-> as a debugging aid to get the clock without any additional
-> offsets like STP steering or LPAR offset.
-> 
-> Signed-off-by: Sven Schnelle <svens@linux.ibm.com>
-> ---
->  MAINTAINERS                   |   6 ++
->  arch/s390/include/asm/stp.h   |   1 +
->  arch/s390/include/asm/timex.h |   6 ++
->  arch/s390/kernel/time.c       |   6 ++
->  drivers/ptp/Kconfig           |  11 +++
->  drivers/ptp/Makefile          |   1 +
->  drivers/ptp/ptp_s390.c        | 129 ++++++++++++++++++++++++++++++++++
->  7 files changed, 160 insertions(+)
->  create mode 100644 drivers/ptp/ptp_s390.c
+On Wed, Oct 16, 2024 at 11:28:49AM -0700, Rosen Penev wrote:
+> On Tue, Oct 15, 2024 at 1:02 PM Rosen Penev <rosenp@gmail.com> wrote:
+> >
+> > Tested on Cisco MX60W.
+> >
+> > v2: fixed build errors. Also added extra commits to clean the driver up
+> > further.
+> > v3: Added tested message. Removed bad alloc_netdev_dummy commit.
+> > v4: removed modules changes from patchset. Added fix for if MAC not
+> > found.
+> > v5: added of_find_matching_node commit.
+> > v6: resend after net-next merge.
+> > v7: removed of_find_matching_node commit. Adjusted mutex_init patch.
+> >
+> > Rosen Penev (6):
+> >   net: ibm: emac: use netif_receive_skb_list
+> >   net: ibm: emac: remove custom init/exit functions
+> >   net: ibm: emac: use devm_platform_ioremap_resource
+> >   net: ibm: emac: use platform_get_irq
+> >   net: ibm: emac: use devm for mutex_init
+> >   net: ibm: emac: generate random MAC if not found
+> why is this set to changes requested?
 
-...
+That isn't clear to me either.
+Let's try this:
 
-> +static __always_inline unsigned long eitod_to_ns(u128 todval)
-> +{
-> +	return (todval * 125) >> 9;
-> +}
-
-This should return u128 so the caller gets a non-truncated return value.
-
-> +static struct timespec64 eitod_to_timespec64(union tod_clock *clk)
-> +{
-> +	return ns_to_timespec64(eitod_to_ns(clk->eitod) - TOD_UNIX_EPOCH);
-                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Misplaced braces. I guess you want:
-
-	return ns_to_timespec64(eitod_to_ns(clk->eitod - TOD_UNIX_EPOCH));
-
-> +static struct ptp_clock_info ptp_s390_stcke_info = {
-> +	.owner		= THIS_MODULE,
-> +	.name		= "IBM s390 STCKE Clock",
-
-Please, as written before make this simply "s390 STCKE Clock".
-
-> +static struct ptp_clock_info ptp_s390_qpt_info = {
-> +	.owner		= THIS_MODULE,
-> +	.name		= "IBM s390 Physical Clock",
-
-"s390 Physical Clock"
-
-> +MODULE_AUTHOR("Sven Schnelle <svens@linux.ibm.com>");
-> +MODULE_DESCRIPTION("S390 Physical/STCKE Clock PtP Driver");
-
-"s390 Physical/STCKE Clock PtP Driver"
+pw-bot: under-review
 
