@@ -1,74 +1,136 @@
-Return-Path: <netdev+bounces-136317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9D6A9A1513
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 23:43:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC3F9A152A
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 23:54:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ED8BB24E84
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 21:43:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DAB7B232D3
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 21:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF1E1D2B39;
-	Wed, 16 Oct 2024 21:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5TCosLKZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 007041D3656;
+	Wed, 16 Oct 2024 21:52:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1821D2B1A;
-	Wed, 16 Oct 2024 21:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5204A1D414F
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 21:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729115015; cv=none; b=Jo4FPFZRo07jYcozm3t+WRHf71xY2JMQ0YbsDD9KpMkeYzqu3P5FemrgZPHrUOWy7qycGbs7yaqMxZlzJCv3IwqWwPBmerAC2RlSDtZ9hQJNx/G4TatFiUezf1/ogZZn+LfAWxE0pX66grJw3CEcOUVuxActnfjkTIO8LK0SQqk=
+	t=1729115555; cv=none; b=FSHF/qk6kIz3DnRCk1Frx7/zZsOJB6ifmCUXy0hxz1JudGA92bcv8DpKYrEh62reX1cpaG+HMXE1Uu0LaOreBP/3rFDcWITOq3iajtKetJ7lsim5Cor0S2n1NyBOAJn6sdqvORKaQHA5q6z0/XUQozkoeILElz90dBdzJCx5JpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729115015; c=relaxed/simple;
-	bh=bH7qOTz2Vtn5WPBGUjm3xNk7i0lblsv+Dbj6Rl7u19k=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fawYPanBqkCrjaN6yWNpm5dY5FZQuPaR+TT7UspCqTxBrjLYcucuG8+Fq/0+DhDNWTSYPmyKHiVIF68GxqwIU/i9STRaDE70zFZxJzyjbzVUz5e4khiLchMBlVuv+UdRmZZJh6Ie5etK5MgnyhKSNFsz8CuObAZgt020++GiSmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5TCosLKZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TzUbIZ5MRR7xOv1V+9M4ay/12qz3H9aVPGhSUPM+3Wc=; b=5TCosLKZwsZHny66He7U7Z+vlr
-	3ItOH1Uog3IbfbpmgYhioCKubrSw1LRY2Xl5GJd5paoikRqSqbFnTSDLvCKdeVOnDbLNKLXu6nj0p
-	Y6f54Ym9Fu15sPytQLrqMpn77dARYc6jmGwxyDHh8jRCUD2RNKdmCVOpZoW4gr6ydHqo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t1Bnn-00ABw1-U5; Wed, 16 Oct 2024 23:43:31 +0200
-Date: Wed, 16 Oct 2024 23:43:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: micrel ksz8081 RMII phy and clause-22 broadcast
-Message-ID: <8bbe2e1a-3ff0-4cf2-8d46-5f806f112925@lunn.ch>
-References: <20241016-kissing-baffle-da66ca25d14a@thorsis.com>
+	s=arc-20240116; t=1729115555; c=relaxed/simple;
+	bh=zoqa4/qjUTosQu+UdqhFvWMUmsFqzpqM7mynr9fdngM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fCip/L/DnXqst8TBiCMeBobjdxvlU/FLIvo/0qBe+5zGiVZVFCVFWxDLJuq6xgeEk8yCn8MnhXbjJA+TCVC6LjXKfuxv9V0sBD5aceRdcH5stRou5zU+4airJYl6G7UPBJuvONzGjmCecgBJeSUsx92w8LkXSivgDCkaCv2ddBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t1BwO-0003Je-Ji
+	for netdev@vger.kernel.org; Wed, 16 Oct 2024 23:52:24 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t1BwN-002OPE-Cv
+	for netdev@vger.kernel.org; Wed, 16 Oct 2024 23:52:23 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 1A4613548C1
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 21:52:23 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id B77E0354878;
+	Wed, 16 Oct 2024 21:52:19 +0000 (UTC)
+Received: from [172.20.34.65] (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 7f775bdc;
+	Wed, 16 Oct 2024 21:52:18 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net-next 00/13] net: fec: cleanups, update quirk, update
+ IRQ naming
+Date: Wed, 16 Oct 2024 23:51:48 +0200
+Message-Id: <20241016-fec-cleanups-v1-0-de783bd15e6a@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241016-kissing-baffle-da66ca25d14a@thorsis.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHU1EGcC/x3MQQqDMBBG4avIrB1IQwJNryJd6PTXDpRREhVBv
+ HuDy2/x3kkFWVHo1ZyUsWvR2SoebUPy7W0C66eavPPBJR95hLD80Nu2FJY0xBjCIM8YqCZLxqj
+ HvevIsLLhWOl9XX8a8EwKaAAAAA==
+X-Change-ID: 20240925-fec-cleanups-c9b5544bc854
+To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+ Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
+Cc: imx@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
+ Marc Kleine-Budde <mkl@pengutronix.de>
+X-Mailer: b4 0.15-dev-dedf8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1763; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=zoqa4/qjUTosQu+UdqhFvWMUmsFqzpqM7mynr9fdngM=;
+ b=owGbwMvMwMWoYbHIrkp3Tz7jabUkhnQB0/IMITvTkurphZ7SLPePMr7m7roouuZH+K7Te+INS
+ 7LEGkQ7GY1ZGBi5GGTFFFkCHHa1PdjGcldzj108zCBWJpApDFycAjCRhG0cDNPbL09WqTb/ufil
+ 6yEPnTPZHxWF7sWZTpl49lhq59VqWdezXk+UQt91L3kR0/NQ/mjsvZXVU67p9x/oEmDI+x7uYr2
+ 69Z4us3DqrndVwbs/nZAP8eBjLa2I5Jkf4hTmfPrusiLf2e5Sc645rrvM0lWTW2icGz/L5l/Kta
+ z/zFMto85+zqkyOPtd0sVj450dWSbX+b4ITmLkWhR1jq8xV0qmSag4d2FXjeB9T58unro0ZRX9R
+ pV/8tUfdR4pT2eTP1iZ+PBh9odGtXS2da5mbE9aK/fOO/vob8qGhew+6y52XXlk9Dr/xeyr/nF6
+ LYZ2Uy9MMz3wcUe+w+5Ct9XGL43N51mn7FwaxnhI9JgCAA==
+X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
+ fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> Would be happy if anyone could suggest a path forward here?
+This series first cleans up the fec driver a bit (typos, obsolete
+comments, add missing header files, rename struct, replace magic
+number by defines).
 
-The hardware is different, so have a different dts file. You can then
-list the PHY at is real address, which will stop the phantom broadcast
-address PHY being created, and use a phy-handle to point to the real
-PHYs, so when the phantom broadcast PHY is disabled, it does not
-matter.
+The next 2 patches update the order of IRQs in the driver and gives
+them names that reflect their function.
 
-I would say that listing multiple PHYS is just an opportunistic hack,
-which might work for simple cases, but soon leads to difficulties as
-the situation gets complex.
+The last 5 patches clean up the fec_enet_rx_queue() function,
+including VLAN handling.
 
-	Andrew
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+Marc Kleine-Budde (13):
+      net: fec: fix typos found by codespell
+      net: fec: struct fec_enet_private: remove obsolete comment
+      net: fec: add missing header files
+      net: fec: rename struct fec_devinfo fec_imx6x_info -> fec_imx6sx_info
+      net: fec: fec_restart(): introduce a define for FEC_ECR_SPEED
+      net: fec: fec_restart(): make use of FEC_ECR_RESET
+      net: fec: fec_probe(): update quirk: bring IRQs in correct order
+      net: fec: fec_probe(): let IRQ name reflect its function
+      net: fec: fec_enet_rx_queue(): use same signature as fec_enet_tx_queue()
+      net: fec: fec_enet_rx_queue(): replace open coded cast by skb_vlan_eth_hdr()
+      net: fec: fec_enet_rx_queue(): reduce scope of data
+      net: fec: fec_enet_rx_queue(): move_call to _vlan_hwaccel_put_tag()
+      net: fec: fec_enet_rx_queue(): factor out VLAN handling into separate function fec_enet_rx_vlan()
+
+ drivers/net/ethernet/freescale/fec.h      | 35 ++++++++++---
+ drivers/net/ethernet/freescale/fec_main.c | 85 +++++++++++++++++--------------
+ drivers/net/ethernet/freescale/fec_ptp.c  |  9 ++--
+ 3 files changed, 81 insertions(+), 48 deletions(-)
+---
+base-commit: 53bac8330865417332d4cf80cb671b15956b049d
+change-id: 20240925-fec-cleanups-c9b5544bc854
+
+Best regards,
+-- 
+Marc Kleine-Budde <mkl@pengutronix.de>
+
+
 
