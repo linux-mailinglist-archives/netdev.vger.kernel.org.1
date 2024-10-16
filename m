@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-136018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D00D99FFA1
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:44:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB07A99FFB9
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:52:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E77571F21A6F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:44:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2958C1C23A74
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDF717BEC7;
-	Wed, 16 Oct 2024 03:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C2A17BEC7;
+	Wed, 16 Oct 2024 03:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JqdLQPKH"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vAcWlVyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EEC148FED;
-	Wed, 16 Oct 2024 03:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EF1157494;
+	Wed, 16 Oct 2024 03:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729050281; cv=none; b=kedo6D987Ioi3pCYuptL/iXZkkZM9goRKDNHt2b59q7X4sizenDoOsjs3QIAUj7KOxdmiE8tNZ1JBX/kY3fIA5A/Z/xFULPBf/RWkmvhBq51F7DmsNqOCVWl9SNAz8tS39+ypMVBLWqPw6a5buacmNgMENtOYDBaxAcOa2n5kO8=
+	t=1729050728; cv=none; b=Ztt3NGMl//8RgmCHrKnbRvQK9AHxwzeP97+xHaTxQn2Q/c0fcP7+9GALzR1MhUnVP/Xw+2TAP/NEcO+yxfGPbnhqn5oFgAuYn45e/LU4e+KdVxPXrfL/ZTvMf6/hb+jHZzHTV5Bsz3ioSCI5qBdzYsVIGRpbQuShrkYdZHhk9JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729050281; c=relaxed/simple;
-	bh=XKIX/PPjlVjz+E9X1RtcSZEjQ2SxFf5rGp/JXYet2g0=;
+	s=arc-20240116; t=1729050728; c=relaxed/simple;
+	bh=ziDJPavYcVsD1cgAGpvgxWlLcnRPyclAPryccHXqWhU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DVt1B4duxAYpDvF5IgFE04Etr/j9IvoeuWQguTlbLvkkUFBR/4dyAt0e8BfGIrhDX1nrjfRIny1SDscqrgTewmmfyeQUAjfN/i8J6L04uix90wqxkdEKRYeJsEyyT7JfRpugrGDDNpttQ+0elR3YNi4WZLrMWBrOtO7PRXJX23I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JqdLQPKH; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=rKr3dswJJs/+mRJePNH+wFRVAyBhYvYP1W7Nu8ngJ5jVWThGvdntVOOUlXbPrH/sKDf/RWzVHAMxhzIY4ydIyDuLWkEEvG33PpemiN6xeEewVN33/jDtds2WUKtGAmlZCcCh/OCflBJfg1V/ZhUgp0UfqnXhJaM4eN0l1FdW+vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vAcWlVyk; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729050280; x=1760586280;
+  t=1729050727; x=1760586727;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kTefGyhsaXlGrGMS7ueF3RA+bgVcym7IGr4Wg2bFR9I=;
-  b=JqdLQPKH73Q5WoRRI58pyV+H8jZVNqN6jZZ01l+Em7lpLkPkhIOpx2BV
-   s2XzaXqimlEvxV3ijWx3c5rZEEwnWS8x6RIpOZNF3DeHgcq4Cf4pr/x8D
-   l4H4KtCZqfibvzAHNKttIRCRzeG0AsKvS5yO77xJ3NNK1+rZbkbsmGwIA
-   g=;
+  bh=3DstIncm6J0HFT7bC1fzVupVBQQzm9pdIktli+aHGoc=;
+  b=vAcWlVyk+wAZtmpHe8v0tP6r7GOpE6twfMxuowcHXuBsX+Lonf5mV+Q7
+   Z1JcH4BC6vMu+KdzUluWwiDxG6iEM36+/PQD4QTaqC4PemUaS2ASqHwDP
+   AUvyUHcrX3z8IvpPQ9ggL6gjizPdVj029Ynr2Cl9OqD1JrwgOdFUt7N3Z
+   k=;
 X-IronPort-AV: E=Sophos;i="6.11,207,1725321600"; 
-   d="scan'208";a="343490900"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 03:44:38 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:55992]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
- id 70b42be6-3f9e-4b52-a24f-c1fbff175f87; Wed, 16 Oct 2024 03:44:37 +0000 (UTC)
-X-Farcaster-Flow-ID: 70b42be6-3f9e-4b52-a24f-c1fbff175f87
+   d="scan'208";a="687905674"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 03:52:03 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:13756]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
+ id 1c03cd7e-98db-4ed9-bf6a-a790882ad3a4; Wed, 16 Oct 2024 03:52:02 +0000 (UTC)
+X-Farcaster-Flow-ID: 1c03cd7e-98db-4ed9-bf6a-a790882ad3a4
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 16 Oct 2024 03:44:37 +0000
+ Wed, 16 Oct 2024 03:52:02 +0000
 Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 16 Oct 2024 03:44:33 +0000
+ Wed, 16 Oct 2024 03:51:59 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: <gustavoars@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kees@kernel.org>, <kuba@kernel.org>,
-	<linux-hardening@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>
-Subject: Re: [PATCH 4/5][next] uapi: net: arp: Avoid -Wflex-array-member-not-at-end warnings
-Date: Tue, 15 Oct 2024 20:44:29 -0700
-Message-ID: <20241016034429.90455-1-kuniyu@amazon.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kees@kernel.org>, <kuba@kernel.org>, <linux-hardening@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH 5/5][next] uapi: net: Avoid -Wflex-array-member-not-at-end warnings
+Date: Tue, 15 Oct 2024 20:51:54 -0700
+Message-ID: <20241016035154.91327-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <f04e61e1c69991559f5589080462320bf772499d.1729037131.git.gustavoars@kernel.org>
-References: <f04e61e1c69991559f5589080462320bf772499d.1729037131.git.gustavoars@kernel.org>
+In-Reply-To: <d64af418459145b7d8eb94cd300fb4b7d2659a3c.1729037131.git.gustavoars@kernel.org>
+References: <d64af418459145b7d8eb94cd300fb4b7d2659a3c.1729037131.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,89 +77,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
 From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Date: Tue, 15 Oct 2024 18:32:43 -0600
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
-> 
-> Address the following warnings by changing the type of the middle struct
-> members in a couple of composite structs, which are currently causing
-> trouble, from `struct sockaddr` to `struct sockaddr_legacy`. Note that
-> the latter struct doesn't contain a flexible-array member.
-> 
-> include/uapi/linux/if_arp.h:118:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:119:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:121:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:126:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:127:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> Also, update some related code, accordingly.
-> 
-> No binary differences are present after these changes.
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->  include/uapi/linux/if_arp.h | 18 +++++++++---------
->  net/ipv4/arp.c              |  2 +-
->  2 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/uapi/linux/if_arp.h b/include/uapi/linux/if_arp.h
-> index 4783af9fe520..cb6813f7783a 100644
-> --- a/include/uapi/linux/if_arp.h
-> +++ b/include/uapi/linux/if_arp.h
-> @@ -115,18 +115,18 @@
+Date: Tue, 15 Oct 2024 18:33:23 -0600
+> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+> index b068651984fe..aac82a4af36f 100644
+> --- a/net/appletalk/ddp.c
+> +++ b/net/appletalk/ddp.c
+> @@ -1832,7 +1832,7 @@ static int atalk_compat_routing_ioctl(struct sock *sk, unsigned int cmd,
+>  	struct rtentry rt;
 >  
->  /* ARP ioctl request. */
->  struct arpreq {
-> -	struct sockaddr	arp_pa;		/* protocol address		 */
-> -	struct sockaddr	arp_ha;		/* hardware address		 */
-> -	int		arp_flags;	/* flags			 */
-> -	struct sockaddr arp_netmask;    /* netmask (only for proxy arps) */
-> -	char		arp_dev[IFNAMSIZ];
-> +	struct sockaddr_legacy	arp_pa;		/* protocol address		 */
-> +	struct sockaddr_legacy	arp_ha;		/* hardware address		 */
-> +	int			arp_flags;	/* flags			 */
-> +	struct sockaddr_legacy	arp_netmask;    /* netmask (only for proxy arps) */
-> +	char			arp_dev[IFNAMSIZ];
->  };
+>  	if (copy_from_user(&rt.rt_dst, &ur->rt_dst,
+> -			3 * sizeof(struct sockaddr)) ||
+> +			3 * sizeof(struct sockaddr_legacy)) ||
+
+While at it, please fix the indent.
+
+
+>  	    get_user(rt.rt_flags, &ur->rt_flags) ||
+>  	    get_user(rt.rt_metric, &ur->rt_metric) ||
+>  	    get_user(rt.rt_mtu, &ur->rt_mtu) ||
+> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> index b24d74616637..75bd15d884e3 100644
+> --- a/net/ipv4/af_inet.c
+> +++ b/net/ipv4/af_inet.c
+> @@ -1021,7 +1021,7 @@ static int inet_compat_routing_ioctl(struct sock *sk, unsigned int cmd,
+>  	struct rtentry rt;
 >  
->  struct arpreq_old {
-> -	struct sockaddr	arp_pa;		/* protocol address		 */
-> -	struct sockaddr	arp_ha;		/* hardware address		 */
-> -	int		arp_flags;	/* flags			 */
-> -	struct sockaddr	arp_netmask;    /* netmask (only for proxy arps) */
-> +	struct sockaddr_legacy	arp_pa;		/* protocol address		 */
-> +	struct sockaddr_legacy	arp_ha;		/* hardware address		 */
-> +	int			arp_flags;	/* flags			 */
-> +	struct sockaddr		arp_netmask;    /* netmask (only for proxy arps) */
+>  	if (copy_from_user(&rt.rt_dst, &ur->rt_dst,
+> -			3 * sizeof(struct sockaddr)) ||
+> +			3 * sizeof(struct sockaddr_legacy)) ||
 
-I think we can use _legacy here too, 14 bytes are enough for ARP.
+Same here.
 
-But whichever is fine to me because arpreq_old is not used in
-kernel, so
+Otherwise looks good to me.
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
 
->  };
->  
->  /* ARP Flag values. */
-> diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-> index 11c1519b3699..3a97efe1587b 100644
-> --- a/net/ipv4/arp.c
-> +++ b/net/ipv4/arp.c
-> @@ -1185,7 +1185,7 @@ static int arp_req_get(struct net *net, struct arpreq *r)
->  
->  	read_lock_bh(&neigh->lock);
->  	memcpy(r->arp_ha.sa_data, neigh->ha,
-> -	       min(dev->addr_len, sizeof(r->arp_ha.sa_data_min)));
-> +	       min(dev->addr_len, sizeof(r->arp_ha.sa_data)));
->  	r->arp_flags = arp_state_to_flags(neigh);
->  	read_unlock_bh(&neigh->lock);
->  
-> -- 
-> 2.34.1
+>  	    get_user(rt.rt_flags, &ur->rt_flags) ||
+>  	    get_user(rt.rt_metric, &ur->rt_metric) ||
+>  	    get_user(rt.rt_mtu, &ur->rt_mtu) ||
 
