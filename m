@@ -1,92 +1,139 @@
-Return-Path: <netdev+bounces-136254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 578099A1205
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:55:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2A19A120B
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88D6A1C22AEF
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:55:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F6691F22B41
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25B72141CC;
-	Wed, 16 Oct 2024 18:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4D92139C9;
+	Wed, 16 Oct 2024 18:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWmGtJLB"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hzvG9Gox"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75B618DF97;
-	Wed, 16 Oct 2024 18:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FB8212EF5
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 18:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729104819; cv=none; b=TMR4FgjM45W1NXkf8qf2Bp8kIBKz5ER8MoKFLNmXe7pDu9PwTzK0szyd8uBGTaGEnJvWxNQXm66XJ5WtymecJQ3l2Vi4jzsFhSM9fWksGAeKXCCqRfS50VEkI4/VNjOEU5e578EMtg3t0FM9+rfSaix8dwBgFJ+qqZvlpC56K3k=
+	t=1729104859; cv=none; b=sjGjB29mUNCngbvH+Waqi9ADx8n/jNIjGAalc0WF/5ZjYxT0RUGrAg0eaGapE0lmnYpSku0J0ZyVKJVyvBYN+Lr+W90IV/wOMzGws9fTnDbJCc6b3pVGp75+5jUJKpHfYt71rug/U7aK3hAw3DoegPnJNjh4eNJdcto9XfLhj1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729104819; c=relaxed/simple;
-	bh=Y/Vqjn7AS4QmH95MO8AvZCxoQ6XG93780zk6JPh7v0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sjo6SV5QwZXd0OmOwH8AK68Uf/0PsZm8nVJr2kWPNCYREGP6hOkJFNWlQiBarr4tVI+mzzogyv2GTsB5Cn+8olXgsICyDnHNAhmS0s6p0EaD3QlcpxLm4+k7+p+0DT6kMV3cC7gA+ISVEuPgHGqLPh7qt5UwTuzcmpd0Bi8kpDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWmGtJLB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97651C4CEC5;
-	Wed, 16 Oct 2024 18:53:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729104819;
-	bh=Y/Vqjn7AS4QmH95MO8AvZCxoQ6XG93780zk6JPh7v0o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aWmGtJLBhHBuC2eGL/nM5trZ/bmISrffOYX6BavdrXMmlINXDYuD7mD1Tc6pesfvQ
-	 dsATNy1gjXju1TWzmTfXDRxjUHZCBmo2c8I2CrNi1KwaA6Awlzvbdl8MXH1iHoPPEX
-	 BBaZOkz0l6JoFNo24aP9x5NjSLK8NirkDhEboWCIMzDgam8Hby11CTM4OYB/00+bp3
-	 L4K4o6ibNgOA8v40bJYnnZJi5mJoZ6hjL20Uv6vboGNcBA+J1CNiU/E12sVnejkNKC
-	 1mox9Ytacs1U8LlFVAcPtAF1qEfUReXUV42WYuqkRIxugf0FoC1nScQToQ2jrZT48i
-	 aHEuW0W9yHvFQ==
-Date: Wed, 16 Oct 2024 19:53:33 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, vedang.patel@intel.com,
-	andre.guedes@intel.com, maciej.fijalkowski@intel.com,
-	jithu.joseph@intel.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH net] igc: Fix passing 0 to ERR_PTR in igc_xdp_run_prog()
-Message-ID: <20241016185333.GL2162@kernel.org>
-References: <20241016105310.3500279-1-yuehaibing@huawei.com>
+	s=arc-20240116; t=1729104859; c=relaxed/simple;
+	bh=CdzHBfZKBXjb8uk5BW4S5tntaB8Xbng6jedjQ/To4Ac=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hHp08qruZ8MyxfjUxK2ou+I7bRDAjJAHZG+aPAK/oMxxSHJzlydyzg8ENk1AvjGv0GvxBKkfvMWlXoD8kVopoWFZI9drWLxB5cS0qenGQQ8enWZqzuUZZGu3U7Lubn9DJgDuwAJT0t2wFq14ATeh+54twZbxfYeG6DCkP+3yB3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hzvG9Gox; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729104858; x=1760640858;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=S1gqLIxQS9lZ1eCaWIK9c/vwyzG1g+H/YM9ejPhG4fU=;
+  b=hzvG9Goxaq2h4o8XXfdDlhIfbvlRtrsaQnoW6z8LTbvIM4otM//GTl7/
+   tm87Jy+qHRSbfyxKkmGofd3rgNS9VZ15eNx1mTOlkHIsr6+RAmAuu0jHr
+   4soiv8QjTLUrMtA9BwLepq+tlsP4oPZhHTqSvvmu6sSFY6BdGwyoonIkb
+   4=;
+X-IronPort-AV: E=Sophos;i="6.11,208,1725321600"; 
+   d="scan'208";a="767178753"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 18:54:12 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:60084]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
+ id 319949c8-36e3-4a0a-973b-c050c62d6130; Wed, 16 Oct 2024 18:54:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 319949c8-36e3-4a0a-973b-c050c62d6130
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 16 Oct 2024 18:54:07 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.12) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 16 Oct 2024 18:54:04 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net-next 00/14] rtnetlink: Refactor rtnl_{new,del,set}link() for per-netns RTNL.
+Date: Wed, 16 Oct 2024 11:53:43 -0700
+Message-ID: <20241016185357.83849-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241016105310.3500279-1-yuehaibing@huawei.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, Oct 16, 2024 at 06:53:10PM +0800, Yue Haibing wrote:
-> Return NULL instead of passing to ERR_PTR while res is IGC_XDP_PASS,
-> which is zero, this fix smatch warnings:
-> drivers/net/ethernet/intel/igc/igc_main.c:2533
->  igc_xdp_run_prog() warn: passing zero to 'ERR_PTR'
-> 
-> Fixes: 26575105d6ed ("igc: Add initial XDP support")
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
->  drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 6e70bca15db1..c3d6e20c0be0 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -2530,7 +2530,7 @@ static struct sk_buff *igc_xdp_run_prog(struct igc_adapter *adapter,
->  	res = __igc_xdp_run_prog(adapter, prog, xdp);
->  
->  out:
-> -	return ERR_PTR(-res);
-> +	return res ? ERR_PTR(-res) : NULL;
+This is a prep for the next series where we will push RTNL down to
+rtnl_{new,del,set}link().
 
-I think this is what PTR_ERR_OR_ZERO() is for.
+That means, for example, __rtnl_newlink() is always under RTNL, but
+rtnl_newlink() has a non-RTNL section.
+
+As a prerequisite for per-netns RTNL, we will move netns validation
+(and RTNL-independent validations if possible) to that section.
+
+rtnl_link_ops and rtnl_af_ops will be protected with SRCU not to
+depend on RTNL.
+
+
+Changes:
+  v2:
+    * Add Eric's Reviewed-by to patch 1-4,6,8-11, (no tag on 5,7,12-14)
+    * Patch 7
+      * Handle error of init_srcu_struct().
+      * Call cleanup_srcu_struct() after synchronize_srcu().
+    * Patch 12
+      * Move put_net() before errorout label
+    * Patch 13
+      * Newly added as prep for patch 14
+    * Patch 14
+      * Handle error of init_srcu_struct().
+      * Call cleanup_srcu_struct() after synchronize_srcu().
+
+  v1: https://lore.kernel.org/netdev/20241009231656.57830-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (14):
+  rtnetlink: Allocate linkinfo[] as struct rtnl_newlink_tbs.
+  rtnetlink: Call validate_linkmsg() in do_setlink().
+  rtnetlink: Factorise do_setlink() path from __rtnl_newlink().
+  rtnetlink: Move simple validation from __rtnl_newlink() to
+    rtnl_newlink().
+  rtnetlink: Move rtnl_link_ops_get() and retry to rtnl_newlink().
+  rtnetlink: Move ops->validate to rtnl_newlink().
+  rtnetlink: Protect struct rtnl_link_ops with SRCU.
+  rtnetlink: Call rtnl_link_get_net_capable() in rtnl_newlink().
+  rtnetlink: Fetch IFLA_LINK_NETNSID in rtnl_newlink().
+  rtnetlink: Clean up rtnl_dellink().
+  rtnetlink: Clean up rtnl_setlink().
+  rtnetlink: Call rtnl_link_get_net_capable() in do_setlink().
+  rtnetlink: Return int from rtnl_af_register().
+  rtnetlink: Protect struct rtnl_af_ops with SRCU.
+
+ include/net/rtnetlink.h |  12 +-
+ net/bridge/br_netlink.c |   6 +-
+ net/core/rtnetlink.c    | 567 ++++++++++++++++++++++------------------
+ net/ipv4/devinet.c      |   3 +-
+ net/ipv6/addrconf.c     |   5 +-
+ net/mctp/device.c       |  16 +-
+ net/mpls/af_mpls.c      |   5 +-
+ 7 files changed, 351 insertions(+), 263 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
+
 
