@@ -1,216 +1,345 @@
-Return-Path: <netdev+bounces-136089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37439A0443
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:29:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9811B9A044A
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756BD288582
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502BD2837DF
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCED1D90BE;
-	Wed, 16 Oct 2024 08:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412DA1F80DD;
+	Wed, 16 Oct 2024 08:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R8u1dmxJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cmbWoCR0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777961D90B1
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43D91F80D8
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729067368; cv=none; b=S2Xx28y3BMdwDvotOamXIbgXbEUwHVOK7JfpTIda2QXxZEF5q2ElJEw8ywGugk9MnbVAKtcgp3kXXNU2yvMrJBWYwPe/KzSlVsrodJfjgOlNVYFdon7dVnV4U8CCQqGNH0l4diI6mCnYCsJixegymNw0mwKshR5vYc6n8Se+4uU=
+	t=1729067521; cv=none; b=HN0qLTpLrtjdijXE41aBxJgv+T+kFPQwxHPrHqL1H9ypmUMuR5AC+daODT+bS74yFxRqnpcEgNEPZnyhjKXeQLtGG/ihGRvpZ/4gQCXlZGKuiLgaFPm+KXr86xeI2oyGNlQelqftKTXqrpZ+2ox+F3qM4Miw7rpDh0jIRuS5Bm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729067368; c=relaxed/simple;
-	bh=6U/YYe3uj2oCorqVoEzUs7byRWbSLdPBdXWSj51N1Y0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UOw+KOudboXqUiTvNYQCKY94BiPSvUMfLe3RFycRZ6E2zpB8qyjPCHD8TstClYCIxowfZvJsCrwMCitm2fu2fJ9XCmQDgQRBuZigAUtAWD0s4ecY0RwS1I52GO2AbKiiMUjxFk0F1DChEooIdIYK6MJzNmty6B0XD4oHrBduIOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R8u1dmxJ; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43152b79d25so2693195e9.1
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:29:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729067365; x=1729672165; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qONR6PhzFfCaPdOjWZuY/fyEqCmza+5NO3GwnhyETRQ=;
-        b=R8u1dmxJUaCMiZQ2xCwdkkyMRe4t3L2Ho47a/fMni1r1/1cARNU+dUELJje1z07QeM
-         9MgEe3ydX0neAJ2X8BMRVT++PguvJuuQkffSz/FhS7IQ5BxDepHGell9ksepPlaCtnBD
-         y7pw56HZO4CT20BQR21OLJ/fJ8b4iuhjd9Cf9T9BpBeZsGNgmzHCIIdD0bmKl2F4iQEu
-         skqIk/xTSWreZHHlky0Cgf0TY0I5u10oP6x6neZhTzpHQ3oMmWB8ztlgQrol47PwET98
-         NI65QVNXX/3s7eGC9X0SO4x5b00COw4wxX3oeJyMaAykLgwMbU3XjA9HKj5PYWLzFRd6
-         pfcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729067365; x=1729672165;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qONR6PhzFfCaPdOjWZuY/fyEqCmza+5NO3GwnhyETRQ=;
-        b=QtBAhv/q6RKPm155AyaWROwWW5P7MBf0OpQootAzlpUQQPrRNhO1eQqs2arz14StXf
-         0dg839uX51ZwKWsMEmlJqN9/PJqlp49nACUjD1lvBICDIv5HeceB+NjpzRLe347hPmZv
-         Z2ilAjNwNZcvBBmLiJLIzETswOlo/9V70IreOpoFSZcso0qdcCVW0cEhMxY1Xwhtfqhu
-         BfrzDbza41om9RS4Diyj85TORzop2qAuQNa0QQ90KIdGDKuPOMPkRiokaAgFqzYFXe/M
-         ZbSji2keEBUo2MwFI3/ks/dPE/EKSL7TkkMDecke/HhGK17jKjN6ALalvHNfuuYDts2U
-         gZ6A==
-X-Gm-Message-State: AOJu0YwsQqvH2RnSbm0mkerwoqLgY9WHuS+HAIrwjJ0mf5njjrXI03ES
-	FnmWJKbCLuBmX7q/k3txd7QcFTFLbWtinfSdO9NxOhQHenW2LmjgXyB/eEMy550ift5FCCXyEtQ
-	qgjwYyGnc2wVQzi2ZhakRni+MYkM640UwtH6Z
-X-Google-Smtp-Source: AGHT+IFVaAHMcybvKte3ah0JD/NM2uJw5lDjEjl778BaNy/DBMka/sH24c3hWHtGm+Iuux1NFukr320AygGuKTrsbog=
-X-Received: by 2002:a05:600c:3b83:b0:426:6710:223c with SMTP id
- 5b1f17b1804b1-4311ded1fdfmr156216795e9.9.1729067364603; Wed, 16 Oct 2024
- 01:29:24 -0700 (PDT)
+	s=arc-20240116; t=1729067521; c=relaxed/simple;
+	bh=tROI3bah+krsLcG2f1qdU1xCWFygYtBlzuavQPiowf0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GpAl//w48PR2A7YWnYvT8+Bjh2QgbYdFksj/UPUBA1sEipKGBYXjAMUaMGqgLD5R8BgdzJgDPx/PwNWSr0GL1arodHRLN8D1EZGa7A9cIbj8cUadHfecdGu+xQJdlJP3GZxVurPIcfQR8Az7U1uH7/BtCQGU35tgdVafM9tmJr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cmbWoCR0; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c669769f-8437-46cc-95b4-d3f84c1c95b7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729067516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6be43xv2Svj+3BE1cQiOFuYI3VXwQJv9e0dPmIoBRzY=;
+	b=cmbWoCR0oFziiBtiEakVb8KPBXTTS8sjA0l2p0XhPm/m4jLY/pwnYeE0ES9CwAmrfCMtQG
+	QeE4J0maXiMX5oWCZW+FFHTLJ0qFOpH5egrTpecxOFyufHkoBOXfdg/OHjexUI73YSrb1x
+	3ovxexlGs26VvzL8ekpWZ1Xq2stKNf8=
+Date: Wed, 16 Oct 2024 01:31:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com> <20241016035214.2229-6-fujita.tomonori@gmail.com>
-In-Reply-To: <20241016035214.2229-6-fujita.tomonori@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 16 Oct 2024 10:29:12 +0200
-Message-ID: <CAH5fLgjTGmD0=9wJRP+aNtHC2ab7e9tuRwnPZZt8RN3wpmZHBg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 5/8] rust: time: Add wrapper for fsleep function
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
-	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
-	sboyd@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
+ control the whole bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+ willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-5-kerneljasonxing@gmail.com>
+ <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
+ <CAL+tcoBieZ3_ZX3PRY8k7-C6Rv2g=Mr1U1NAQkQpbHYYvtWpTQ@mail.gmail.com>
+ <CAL+tcoBXj=EO-sk-dS+dN-pCZf8OKeOZ4LXb9GZnja3EfOhXYg@mail.gmail.com>
+ <9f050a5c-644f-4fbb-ac37-53edfd160edc@linux.dev>
+ <CAL+tcoDyt=3hjwdx8Wk-abKg=qQsY=7UKu9=TU4iUAk5gMT2MQ@mail.gmail.com>
+ <5398c020-e9b4-49d2-a5fa-dca047296ddd@linux.dev>
+ <CAL+tcoDb84bgUUpK9PjijWDt+xw=u2nKkoWf1Gjvkjf--XJ6VA@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAL+tcoDb84bgUUpK9PjijWDt+xw=u2nKkoWf1Gjvkjf--XJ6VA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 16, 2024 at 5:54=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> Add a wrapper for fsleep, flexible sleep functions in
-> `include/linux/delay.h` which typically deals with hardware delays.
->
-> The kernel supports several `sleep` functions to handle various
-> lengths of delay. This adds fsleep, automatically chooses the best
-> sleep method based on a duration.
->
-> `sleep` functions including `fsleep` belongs to TIMERS, not
-> TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
-> abstraction for TIMEKEEPING. To make Rust abstractions match the C
-> side, add rust/kernel/time/delay.rs for this wrapper.
->
-> fsleep() can only be used in a nonatomic context. This requirement is
-> not checked by these abstractions, but it is intended that klint [1]
-> or a similar tool will be used to check it in the future.
->
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> Link: https://rust-for-linux.com/klint [1]
-> ---
->  rust/helpers/helpers.c    |  1 +
->  rust/helpers/time.c       |  8 ++++++++
->  rust/kernel/time.rs       |  4 +++-
->  rust/kernel/time/delay.rs | 31 +++++++++++++++++++++++++++++++
->  4 files changed, 43 insertions(+), 1 deletion(-)
->  create mode 100644 rust/helpers/time.c
->  create mode 100644 rust/kernel/time/delay.rs
->
-> diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-> index 30f40149f3a9..c274546bcf78 100644
-> --- a/rust/helpers/helpers.c
-> +++ b/rust/helpers/helpers.c
-> @@ -21,6 +21,7 @@
->  #include "slab.c"
->  #include "spinlock.c"
->  #include "task.c"
-> +#include "time.c"
->  #include "uaccess.c"
->  #include "wait.c"
->  #include "workqueue.c"
-> diff --git a/rust/helpers/time.c b/rust/helpers/time.c
-> new file mode 100644
-> index 000000000000..7ae64ad8141d
-> --- /dev/null
-> +++ b/rust/helpers/time.c
-> @@ -0,0 +1,8 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <linux/delay.h>
-> +
-> +void rust_helper_fsleep(unsigned long usecs)
-> +{
-> +       fsleep(usecs);
-> +}
-> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-> index 9b0537b63cf7..d58daff6f928 100644
-> --- a/rust/kernel/time.rs
-> +++ b/rust/kernel/time.rs
-> @@ -2,12 +2,14 @@
->
->  //! Time related primitives.
->  //!
-> -//! This module contains the kernel APIs related to time and timers that
-> +//! This module contains the kernel APIs related to time that
->  //! have been ported or wrapped for usage by Rust code in the kernel.
->  //!
->  //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.=
-h).
->  //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
->
-> +pub mod delay;
-> +
->  /// The number of nanoseconds per microsecond.
->  pub const NSEC_PER_USEC: i64 =3D bindings::NSEC_PER_USEC as i64;
->
-> diff --git a/rust/kernel/time/delay.rs b/rust/kernel/time/delay.rs
-> new file mode 100644
-> index 000000000000..dc7e2b3a0ab2
-> --- /dev/null
-> +++ b/rust/kernel/time/delay.rs
-> @@ -0,0 +1,31 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Delay and sleep primitives.
-> +//!
-> +//! This module contains the kernel APIs related to delay and sleep that
-> +//! have been ported or wrapped for usage by Rust code in the kernel.
-> +//!
-> +//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h).
-> +
-> +use crate::time;
-> +use core::ffi::c_ulong;
-> +
-> +/// Sleeps for a given duration at least.
-> +///
-> +/// Equivalent to the kernel's [`fsleep`], flexible sleep function,
-> +/// which automatically chooses the best sleep method based on a duratio=
-n.
-> +///
-> +/// `Delta` must be longer than one microsecond.
+On 10/16/24 12:54 AM, Jason Xing wrote:
+> On Wed, Oct 16, 2024 at 3:01 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 10/15/24 11:30 PM, Jason Xing wrote:
+>>> On Wed, Oct 16, 2024 at 2:13 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>>
+>>>> On 10/15/24 6:32 PM, Jason Xing wrote:
+>>>>> On Wed, Oct 16, 2024 at 9:04 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
+>>>>>>
+>>>>>> On Wed, Oct 16, 2024 at 8:10 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>>>>>
+>>>>>>> On 10/11/24 9:06 PM, Jason Xing wrote:
+>>>>>>>> From: Jason Xing <kernelxing@tencent.com>
+>>>>>>>>
+>>>>>>>> Willem suggested that we use a static key to control. The advantage
+>>>>>>>> is that we will not affect the existing applications at all if we
+>>>>>>>> don't load BPF program.
+>>>>>>>>
+>>>>>>>> In this patch, except the static key, I also add one logic that is
+>>>>>>>> used to test if the socket has enabled its tsflags in order to
+>>>>>>>> support bpf logic to allow both cases to happen at the same time.
+>>>>>>>> Or else, the skb carring related timestamp flag doesn't know which
+>>>>>>>> way of printing is desirable.
+>>>>>>>>
+>>>>>>>> One thing important is this patch allows print from both applications
+>>>>>>>> and bpf program at the same time. Now we have three kinds of print:
+>>>>>>>> 1) only BPF program prints
+>>>>>>>> 2) only application program prints
+>>>>>>>> 3) both can print without side effect
+>>>>>>>>
+>>>>>>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>>>>>>>> ---
+>>>>>>>>      include/net/sock.h |  1 +
+>>>>>>>>      net/core/filter.c  |  3 +++
+>>>>>>>>      net/core/skbuff.c  | 38 ++++++++++++++++++++++++++++++++++++++
+>>>>>>>>      3 files changed, 42 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/include/net/sock.h b/include/net/sock.h
+>>>>>>>> index 66ecd78f1dfe..b7c51b95c92d 100644
+>>>>>>>> --- a/include/net/sock.h
+>>>>>>>> +++ b/include/net/sock.h
+>>>>>>>> @@ -2889,6 +2889,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
+>>>>>>>>      void sock_def_readable(struct sock *sk);
+>>>>>>>>
+>>>>>>>>      int sock_bindtoindex(struct sock *sk, int ifindex, bool lock_sk);
+>>>>>>>> +DECLARE_STATIC_KEY_FALSE(bpf_tstamp_control);
+>>>>>>>>      void sock_set_timestamp(struct sock *sk, int optname, bool valbool);
+>>>>>>>>      int sock_get_timestamping(struct so_timestamping *timestamping,
+>>>>>>>>                            sockptr_t optval, unsigned int optlen);
+>>>>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
+>>>>>>>> index 996426095bd9..08135f538c99 100644
+>>>>>>>> --- a/net/core/filter.c
+>>>>>>>> +++ b/net/core/filter.c
+>>>>>>>> @@ -5204,6 +5204,8 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
+>>>>>>>>          .arg1_type      = ARG_PTR_TO_CTX,
+>>>>>>>>      };
+>>>>>>>>
+>>>>>>>> +DEFINE_STATIC_KEY_FALSE(bpf_tstamp_control);
+>>>>>>>> +
+>>>>>>>>      static int bpf_sock_set_timestamping(struct sock *sk,
+>>>>>>>>                                       struct so_timestamping *timestamping)
+>>>>>>>>      {
+>>>>>>>> @@ -5217,6 +5219,7 @@ static int bpf_sock_set_timestamping(struct sock *sk,
+>>>>>>>>                  return -EINVAL;
+>>>>>>>>
+>>>>>>>>          WRITE_ONCE(sk->sk_tsflags[BPFPROG_TS_REQUESTOR], flags);
+>>>>>>>> +     static_branch_enable(&bpf_tstamp_control);
+>>>>>>>
+>>>>>>> Not sure when is a good time to do static_branch_disable().
+>>>>>>
+>>>>>> Thanks for the review.
+>>>>>>
+>>>>>> To be honest, I considered how to disable the static key. Like you
+>>>>>> said, I failed to find a good chance that I can accurately disable it.
+>>>>>>
+>>>>>>>
+>>>>>>> The bpf prog may be detached also. (IF) it ends up staying with the
+>>>>>>> cgroup/sockops interface, it should depend on the existing static key in
+>>>>>>> cgroup_bpf_enabled(CGROUP_SOCK_OPS) instead of adding another one.
+>>>>>>
+>>>>>> Are you suggesting that we need to remove the current static key? In
+>>>>>> the previous thread, the reason why Willem came up with this idea is,
+>>>>>> I think, to avoid affect the non-bpf timestamping feature.
+>>>>>>
+>>>>>>>
+>>>>>>>>
+>>>>>>>>          return 0;
+>>>>>>>>      }
+>>>>>>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+>>>>>>>> index f36eb9daa31a..d0f912f1ff7b 100644
+>>>>>>>> --- a/net/core/skbuff.c
+>>>>>>>> +++ b/net/core/skbuff.c
+>>>>>>>> @@ -5540,6 +5540,29 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
+>>>>>>>>      }
+>>>>>>>>      EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+>>>>>>>>
+>>>>>>>> +static bool sk_tstamp_tx_flags(struct sock *sk, u32 tsflags, int tstype)
+>>>>>>>
+>>>>>>> sk is unused.
+>>>>>>
+>>>>>> Thanks for the careful check.
+>>>>>>
+>>>>>>>
+>>>>>>>> +{
+>>>>>>>> +     u32 testflag;
+>>>>>>>> +
+>>>>>>>> +     switch (tstype) {
+>>>>>>>> +     case SCM_TSTAMP_SCHED:
+>>>>>>>
+>>>>>>> Instead of doing this translation,
+>>>>>>> is it easier to directly store the bpf prog desired ts"type" (i.e. the
+>>>>>>> SCM_TSTAMP_*) in the sk->sk_tsflags_bpf?
+>>>>>>> or there is a specific need to keep the SOF_TIMESTAMPING_* value in
+>>>>>>> sk->sk_tsflags_bpf?
+>>>>>>
+>>>>>> We have to reuse SOF_TIMESTAMPING_* because there are more flags, say,
+>>>>>> SOF_TIMESTAMPING_OPT_ID, that we need to support.
+>>>>>>
+>>>>>>>
+>>>>>>>> +             testflag = SOF_TIMESTAMPING_TX_SCHED;
+>>>>>>>> +             break;
+>>>>>>>> +     case SCM_TSTAMP_SND:
+>>>>>>>> +             testflag = SOF_TIMESTAMPING_TX_SOFTWARE;
+>>>>>>>> +             break;
+>>>>>>>> +     case SCM_TSTAMP_ACK:
+>>>>>>>> +             testflag = SOF_TIMESTAMPING_TX_ACK;
+>>>>>>>> +             break;
+>>>>>>>> +     default:
+>>>>>>>> +             return false;
+>>>>>>>> +     }
+>>>>>>>> +     if (tsflags & testflag)
+>>>>>>>> +             return true;
+>>>>>>>> +
+>>>>>>>> +     return false;
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>>      static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>>>>>>>>                                   const struct sk_buff *ack_skb,
+>>>>>>>>                                   struct skb_shared_hwtstamps *hwtstamps,
+>>>>>>>> @@ -5558,6 +5581,9 @@ static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+>>>>>>>>          if (!skb_may_tx_timestamp(sk, tsonly))
+>>>>>>>>                  return;
+>>>>>>>>
+>>>>>>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
+>>>>>>>
+>>>>>>> This is a new test. tsflags is the sk->sk_tsflags here if I read it correctly.
+>>>>>>
+>>>>>> This test will be used in bpf and non-bpf cases. Because of this, we
+>>>>>> can support BPF extension. In this function, if skb has tsflags but we
+>>>>>> don't know which approach the user expects, sk_tstamp_tx_flags() can
+>>>>>> help us.
+>>>>>>
+>>>>>>>
+>>>>>>> My understanding is the sendmsg can provide SOF_TIMESTAMPING_* for individual
+>>>>>>> skb. Would it break?
+>>>>>>
+>>>>>> Oh, you're right. I didn't support cmsg mode...
+>>>>>
+>>>>> I think I only need to test if it's in the bpf mode, or else let the
+>>>>> original way print the timestamp, which can solve the issue.
+>>>>
+>>>>    From looking at the existing "__skb_tstamp_tx(skb, NULL, NULL, skb->sk,
+>>>> SCM_TSTAMP_SCHED);":
+>>>>
+>>>> int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+>>>> {
+>>>>           /* ... */
+>>>>
+>>>>           if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
+>>>>                   __skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHED);
+>>>>
+>>>>           /* ... */
+>>>> }
+>>>>
+>>>> I am still puzzling how __skb_tstamp_tx() will be called if only bpf has enabled
+>>>> the timestamping. I may have missed somewhere in the patch set that the skb's
+>>>> tx_flags is changed by sk->sk_tsflags_bpf alone?
+>>>
+>>> If sk_tsflags_bpf is set, tcp_sendmsg() -> tcp_tx_timestamp() will be
+>>> helpful, which initializes every last skb, please see patch [10/12].
+>>
+>> Ah. ok. It is the thing I missed. Thanks for the pointer.
+>>
+>>>>
+>>>> I think a skb tskey is still desired (?), so eventually we want some spaces in
+>>>
+>>> tskey function is optional I think. It depends whether users want to
+>>> use it or not. It can controlled by SOF_TIMESTAMPING_OPT_ID flag.
+>>>
+>>>> the skb for bpf. Jakub Sitnicki (cc-ed) has presented in LPC about extending
+>>>> skb->data_meta usage outside of xdp and tc. I think here we want to have it
+>>>> available at the tx side to store the tx_flags and tskey but probably want them
+>>>> at a specific place/offset at the data_meta.
+>>>
+>>> If we have the plan to store extra information in data_meta, I can
+>>> give it a try:)
+>>>
+>>>>
+>>>> For now, is there thing we can explore to share in the skb_shared_info?
+>>>
+>>> My initial thought is just to reuse these fields in skb. It can work
+>>> without interfering one another.
+>>
+>> After reading closer to patch 10, I am likely still missing something. How can
+>> it tell if the tx_flags is set by the bpf or by the user space cmsg?
+> 
+> If the skb carries the timestamp, there are three cases:
+> 1) non-bpf case and users uses setsockopt()
+> 2) cmsg case
+> 3) bpf case
+> 
+> #1 and #2 are already handled well before this patch. I only need to
+> test if sk_tsflags_bpf has those flags. If so, it means we hit #3, or
+> else it could be #1 or #2, then we will let the old way print
+> timestamps in __skb_tstamp_tx().
 
-Why is this required? Right now you just round up to one microsecond,
-which seems okay.
+hmm... I am still not sure I fully understand...but I think I may start getting it.
 
-> +/// This function can only be used in a nonatomic context.
-> +pub fn fsleep(delta: time::Delta) {
-> +    // SAFETY: FFI call.
-> +    unsafe {
-> +        // Convert the duration to microseconds and round up to preserve
-> +        // the guarantee; fsleep sleeps for at least the provided durati=
-on,
-> +        // but that it may sleep for longer under some circumstances.
-> +        bindings::fsleep(
-> +            ((delta.as_nanos() + time::NSEC_PER_USEC - 1) / time::NSEC_P=
-ER_USEC) as c_ulong,
+Is it the reason that the bpf_setsockopt() cannot clear the sk_tsflags_bpf once 
+it is set in patch 2? It is not a usable api tbh. It will be a surprise to many. 
+It has to be able to set and clear.
 
-You probably want this:
+Does it also mean either the bpf or the user space can enable the timetstamping 
+but not both? I don't think we can assume this also. It will be hard to deploy 
+the bpf prog in production to collect continuous data. The user space may have 
+some timestamping enabled but the bpf may want to do its parallel investigation 
+also. The user space may rollout timestamping in the future and suddenly break 
+the bpf prog.
 
-delta.as_nanos().saturating_add(time::NSEC_PER_USEC - 1) / time::NSEC_PER_U=
-SEC
+[ getting late here. will continue later. ]
 
-This would avoid a crash if someone passes i64::MAX nanoseconds and
-CONFIG_RUST_OVERFLOW_CHECKS is enabled.
+> 
+>>
+>>>
+>>>> Can the "struct skb_shared_hwtstamps hwtstamps;" be used for the bpf tx_flags and tskey
+>>>> only at the "tx" side? There is already another union member.
+>>>
+>>> tskey is always used in the tx path.
+>>>
+>>> hwtstamps can be used in both rx and tx cases (please see
+>>> tcp_update_recv_tstamps() and skb_tstamp_tx()).
+>>
+>> hmm... we only need some where to store the bpf tx_flags and bpf tskey in the
+>> TX-ing skb.
+> 
+> And there is one more field we have to take care of: txstamp_ack which
+> indicates whether we print timestamp when the last skb is acked.
+> Please see tcp_tx_timestamp().
+> 
+>> You meant the hwtstamps of a Tx-ing skb is not empty?
+> 
+> Sometimes, it's not empty if the hardware supports the timestamp
+> feature and the user wants to see it (by enabling the
+> SOF_TIMESTAMPING_TX_HARDWARE flag). As we can see, there are many
+> callers calling skb_tstamp_tx().
+> 
+>>
+>> At skb_tstamp_tx (TX side only?), the orig_skb's hwtstamps has not been written yet?
+> 
+> I'm not that sure about the orig_skb. It seems no. I can see some
+> callers reading ptp timestamp from the nic and pass the timestamp to
+> skb_tstamp_tx().
+> 
+> Thanks,
+> Jason
 
-Alice
 
