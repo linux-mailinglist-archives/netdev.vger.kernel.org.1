@@ -1,96 +1,87 @@
-Return-Path: <netdev+bounces-136075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E5759A03E2
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:15:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3508C9A03FD
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:17:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E831B28C81
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:15:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67D5C1C2A98C
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB591D27A7;
-	Wed, 16 Oct 2024 08:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FFB1D0F5F;
+	Wed, 16 Oct 2024 08:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXwmJQWu"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="e1t3Ajo7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D24D1D278B;
-	Wed, 16 Oct 2024 08:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934704C8C
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729066436; cv=none; b=h9b+Lln4fSGWK5fjNuOTMfmyZxqvGXxMaUni4hIpLrb60GfpAd32xdkOlRaouepPCpZfMpj+HrQ9ZKyIrggZ2eTZrrrXpRkAzRUdxM/P0XmXgeyBJuuY+sKlrjvpNTA/ThA8SS90qAXfllhq67gMVrGPLr6JMBsG2oL4JV0QyVE=
+	t=1729066642; cv=none; b=p5dxDc6PsMIVUgrxW3hLK4MxCHeME7Wnp3J4uhp6Xxm78hsD8ZYEbqD8bEFFhO8/DB0RzTR9suqP4EG7ujRBOUkZhJGF7eYOm9QaHOIYsKpO0zE67syVz2rRQiHCwi8ZCICIVgDYH+OPMBDzHcj134lDJFKmvIa8YkZi1GZwNlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729066436; c=relaxed/simple;
-	bh=VE234QWU2c0jg8Kgp1MC6oRd9f1i7/85eMkUYLWq/NQ=;
+	s=arc-20240116; t=1729066642; c=relaxed/simple;
+	bh=ZL5mlBP+qHkZzh0UJdUbcXObrSK8IIL0bmSB2IkLiUY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YeUT2EUgHSvE8z1Y/IgvbjgaOT+pFTQLku6WchrC6UduNhkR4dcr9zfpHdUucKL6dM9Om+Xk+czwY2JqMhI4biwUZrLmRNCrXEzrS/7Ah9ZiXth9IqA44eruGdjUROwqSVKshvy9sI9tM2QTbPF18/G72OZndME5QnEibsOdzsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BXwmJQWu; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20ca7fc4484so31229455ad.3;
-        Wed, 16 Oct 2024 01:13:54 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=SuaVuSWLPcrYxb70o6D5r8tbjFpWU5UsIf9LuOXvUS2hf4PuJSFzNrJB1/0I7dhfehsL+vwF8wWcGVnb534sXodJX1a/aWPVIl4hglJojR3UGglatUa+amy2nVnn6dsCb7XD12IOx99UJJhWpSxivW/RsbEdz79dtRx1qKslwz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=e1t3Ajo7; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-430576ff251so54432315e9.0
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:17:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729066434; x=1729671234; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1729066638; x=1729671438; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uxqG0B8mR4fzbFEa0w+VCmcvQKzrvGlEU7Guq/5xOqA=;
-        b=BXwmJQWuAS3Q+EWwEs/g95skiz55LvV8zFq66aJDow97VYVzSlj3oDeJCUXwedHHQ2
-         5CFWzq2r0UgDdcGP59LPy3vcX85a33XW73E0p0+e0BKsc+eX/z5ayIj5Rd68HrctWVtd
-         G8kXOCbz8WqOz4Sa77RYslb+X/+XL7aGV8OuAO4GdO9zOeo2ApcCRDDP5MOYcq38TSTr
-         Il5W7zxSffx02ejmmrLMJw1si6rvlDRWdocPnLgsFMb9+YPlhDo9KFxWDJoVf9m5PU+E
-         Nbu3xnxTjTMkDcyR34qNwJ9Lf5gj0sKYI83VFpoI7Bm6oVO9CCzFMjLEgsWFV19hOSH3
-         pq7g==
+        bh=tiIcPbVpgkm3vItrevKV80hT8yzWWkcV6bsqfy5TGjk=;
+        b=e1t3Ajo7/uoHAQ4CA31kc7K55ZWICV/JeF0lYkTQe8qlyG1AJ7iNRzcOLZXNK/tWvE
+         pr/l5v6IQqUb5SqKbRBH4G4ptLCK0eOA0plcakWp3Y1In0befLTB8IK8sehwF+SR6T8D
+         c2DNptTrtQCr6bj42xvarqYogh+fDZKVKntyiYfZUGKItp9VvWUPUUTsUHqVu4L7pg7Q
+         QDtAQ6S9QfQlImYWPvkTWILvG2WGFU/i+QElaTL+uh5mmj19Majj6KBGH5EmSlCJRPB1
+         6uAqQ9OjNrBdSs1bxmimfqjA1WAaYe+QH28D1FYAghK0ANRbh056tii2AQedpaZFgAxT
+         0goQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729066434; x=1729671234;
+        d=1e100.net; s=20230601; t=1729066638; x=1729671438;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uxqG0B8mR4fzbFEa0w+VCmcvQKzrvGlEU7Guq/5xOqA=;
-        b=iXwgdxC/9qz3zoxviP9bB4cJ9Vbnp19Gt24dbuer0jMpk1k7ChCqi3IfwzqxzCEqCd
-         aOYQADzUfcyrJgb4gjYGFyrhC5KgzxqjdYWxio9VqG9wihy9FwczoCtFSdnbsQQVYbvI
-         vUj7D4GutSPpLgafOVd9OYaJjdJBevH1mDVavNfBEZzVGOja8jBo7zBFidXhQFkPCs9a
-         hFX+KPZw61kVMdtJ6rfsMBs+Up9e6/tPV4/AH+/MqHzGZal73Bs880g7v6BQH0dG6gHu
-         tukGZ/iaBlVpIa74N91L3juImLFivxtdXnM0EpXqX+hKJvdA5evaVxsQy68sGNAA0m1I
-         jvDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUW7Pe3PN4uQbvRq8KDNXsfRYBa+7YaDiq1uKH4FEs5Lm/+ZBWP9w66Y1r5FYT9ivbzcXh2BdNnumED@vger.kernel.org, AJvYcCXiMraFCN/mJL8uPPqGbL68h2aaz4topguqGBIJVpK5uauiHKqP0hPVIv3o1LQfJHEiRDlI4EE0kWhyEhml@vger.kernel.org, AJvYcCXygih76EfIO4d5ad97lGKm5VlJemWs2HwF24BHbrycHJOQ1zZCFqR+uVCSDqBsdruBOTU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzteIDDW1YcM+vsi3hmh1QvxdJJQxBdhrTDZtWUzHK5KFEZpsBI
-	Y2NlShfudeUKcrm9w29FojOTZgPEosM1HX0ly7CRzgRyefweXZ2A
-X-Google-Smtp-Source: AGHT+IG6d27P9i5lG/uEayhLGFbXmAexef6ZEMQFrZoDVRNPG4gtPVA7uqXB7gWUqNXj/5nvzwaFUg==
-X-Received: by 2002:a17:903:2406:b0:20c:a8cf:fa19 with SMTP id d9443c01a7336-20cbb198f19mr230740795ad.22.1729066434256;
-        Wed, 16 Oct 2024 01:13:54 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d18036213sm23913525ad.168.2024.10.16.01.13.47
+        bh=tiIcPbVpgkm3vItrevKV80hT8yzWWkcV6bsqfy5TGjk=;
+        b=RFff5i4YqGrBrgouV4wG7K4//0E2TVfhETdlVOBblyEY6mFWiXrvHAQRdwEqk6rZUh
+         KfUp7iHGACb+DcnF+aaN/V9o/TrxqN4iXGr3bk5IZW+Mp4kd33kSBwywHOwXDY95zbuP
+         fL50k95lqEPtZd5vYN9exk0tijwAz35gZGvZLllNVZC5JSAOMVHpibcMnnAmTcgm+EmI
+         jpepmLw1V3qMjXFfBTfr53/qsZ+T/Q98wqhKxYlsD0vvnBs7UU3rWjRRmqDlz23EWJ98
+         MU23esmfM0tWeoraQcVx2mChdggW5r2iv1fWpkiV7ZRyW9eWW0rmDLRumwNPFjuTF1pj
+         Z2sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPTuGm0qAre8xsvrJtQ6hTRmPZJ80yo73ydI83KBLtU2EvrPt5YmN6QYYx7mpXfxza71ZZ3Ic=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykulrhI9IPv1igL1390FAo2il4G95tk7OnKo3pzvGVR8eGjAp8
+	OgOH6ndq3Fm5EKpIa9O5CojR4CPO12lpH5rhuY9DkQiMUU/bYdup/VeeCTnwDb8=
+X-Google-Smtp-Source: AGHT+IGZ6pLwdE3OFiD69ZsBTKLR3KHljqXCybBvV2v7DuGkhuozI2RBVsvUs+vryGktYLqsWPp2hw==
+X-Received: by 2002:a05:600c:5248:b0:42c:ae76:6cea with SMTP id 5b1f17b1804b1-4311ded433dmr158248115e9.9.1729066637709;
+        Wed, 16 Oct 2024 01:17:17 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fc11ff7sm3652597f8f.92.2024.10.16.01.17.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 01:13:53 -0700 (PDT)
-Date: Wed, 16 Oct 2024 08:13:44 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrii Nakryiko <andriin@fb.com>, Jussi Maki <joamaki@gmail.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] Documentation: bonding: add XDP support
- explanation
-Message-ID: <Zw91uKWJMT7YlKd0@fedora>
-References: <20241016031649.880-1-liuhangbin@gmail.com>
- <20241016031649.880-4-liuhangbin@gmail.com>
- <1e489737-fdd8-43a7-9abc-65599e1cfae1@blackwall.org>
+        Wed, 16 Oct 2024 01:17:17 -0700 (PDT)
+Date: Wed, 16 Oct 2024 10:17:13 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	donald.hunter@gmail.com, arkadiusz.kubalewski@intel.com,
+	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com
+Subject: Re: [PATCH net-next v3 1/2] dpll: add clock quality level attribute
+ and op
+Message-ID: <Zw92ibTX0kLzFFrS@nanopsycho.orion>
+References: <20241014081133.15366-1-jiri@resnulli.us>
+ <20241014081133.15366-2-jiri@resnulli.us>
+ <20241015072638.764fb0da@kernel.org>
+ <2ec44c11-8387-4c38-97f4-a1fbcb5e1a4e@linux.dev>
+ <Zw6Cg1giDaFwVCio@nanopsycho.orion>
+ <7934306e-08f9-478a-a218-1b03dbfa8a3b@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,21 +90,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1e489737-fdd8-43a7-9abc-65599e1cfae1@blackwall.org>
+In-Reply-To: <7934306e-08f9-478a-a218-1b03dbfa8a3b@linux.dev>
 
-On Wed, Oct 16, 2024 at 10:38:05AM +0300, Nikolay Aleksandrov wrote:
-> > +9.  What modes does bonding have native XDP support?
-> TBH this sounds strange and to be correct it probably needs
-> to end with "for" (What modes does bonding have native XDP support for), but
-> how about something straight-forward like:
-> 
->  What bonding modes have native XDP support?
-> 
-> or
-> 
->  What bonding modes support native XDP?
+Tue, Oct 15, 2024 at 05:01:12PM CEST, vadim.fedorenko@linux.dev wrote:
+>On 15/10/2024 15:56, Jiri Pirko wrote:
+>> Tue, Oct 15, 2024 at 04:50:41PM CEST, vadim.fedorenko@linux.dev wrote:
+>> > On 15/10/2024 15:26, Jakub Kicinski wrote:
+>> > > On Mon, 14 Oct 2024 10:11:32 +0200 Jiri Pirko wrote:
+>> > > > +    type: enum
+>> > > > +    name: clock-quality-level
+>> > > > +    doc: |
+>> > > > +      level of quality of a clock device. This mainly applies when
+>> > > > +      the dpll lock-status is not DPLL_LOCK_STATUS_LOCKED.
+>> > > > +      The current list is defined according to the table 11-7 contained
+>> > > > +      in ITU-T G.8264/Y.1364 document. One may extend this list freely
+>> > > > +      by other ITU-T defined clock qualities, or different ones defined
+>> > > > +      by another standardization body (for those, please use
+>> > > > +      different prefix).
+>> > > 
+>> > > uAPI extensibility aside - doesn't this belong to clock info?
+>> > > I'm slightly worried we're stuffing this attr into DPLL because
+>> > > we have netlink for DPLL but no good way to extend clock info.
+>> > 
+>> > There is a work going on by Maciek Machnikowski about extending clock
+>> > info. But the progress is kinda slow..
+>> 
+>> Do you have some info about this? A list of attrs at least would help.
+>
+>The mailing list conversation started in this thread:
+>https://lore.kernel.org/netdev/20240813125602.155827-1-maciek@machnikowski.net/
 
-Thanks, I will use this one.
+What's the relation to ptp? I'm missing something here.
 
-Hangbin
+>
+>But the idea was presented back at the latest Netdevconf:
+>https://netdevconf.org/0x18/sessions/tutorial/introduction-to-ptp-on-linux-apis.html
+>
+>> > 
+>> > > > +    entries:
+>> > > > +      -
+>> > > > +        name: itu-opt1-prc
+>> > > > +        value: 1
+>> > > > +      -
+>> > > > +        name: itu-opt1-ssu-a
+>> > > > +      -
+>> > > > +        name: itu-opt1-ssu-b
+>> > > > +      -
+>> > > > +        name: itu-opt1-eec1
+>> > > > +      -
+>> > > > +        name: itu-opt1-prtc
+>> > > > +      -
+>> > > > +        name: itu-opt1-eprtc
+>> > > > +      -
+>> > > > +        name: itu-opt1-eeec
+>> > > > +      -
+>> > > > +        name: itu-opt1-eprc
+>> > > > +    render-max: true
+>> > > 
+>> > > Why render max? Just to align with other unnecessary max defines in
+>> > > the file?
+>> > 
+>
 
