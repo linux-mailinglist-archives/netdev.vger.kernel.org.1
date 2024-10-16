@@ -1,74 +1,94 @@
-Return-Path: <netdev+bounces-136019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB07A99FFB9
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:52:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2A1F99FFBD
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2958C1C23A74
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:52:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96A812823AE
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C2A17BEC7;
-	Wed, 16 Oct 2024 03:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C2416630A;
+	Wed, 16 Oct 2024 03:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vAcWlVyk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJ4HGJTW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EF1157494;
-	Wed, 16 Oct 2024 03:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952231304BA;
+	Wed, 16 Oct 2024 03:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729050728; cv=none; b=Ztt3NGMl//8RgmCHrKnbRvQK9AHxwzeP97+xHaTxQn2Q/c0fcP7+9GALzR1MhUnVP/Xw+2TAP/NEcO+yxfGPbnhqn5oFgAuYn45e/LU4e+KdVxPXrfL/ZTvMf6/hb+jHZzHTV5Bsz3ioSCI5qBdzYsVIGRpbQuShrkYdZHhk9JY=
+	t=1729050819; cv=none; b=ucoz8lbWpLpiWdIVL7fvH3hZ/B8lp47ojZzkbjzXyBuRJ5t9TnDERU61EjLU/l33CP8O3ehwsgf/ye7XANU4oUlUhZPaezhtfVYeOuyy/L2GHiI4xCNKE5jr96C8MA/UGHxSUHqDd0wWDMW204BWGU3wrrDKDtSyyVcVYpL41aM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729050728; c=relaxed/simple;
-	bh=ziDJPavYcVsD1cgAGpvgxWlLcnRPyclAPryccHXqWhU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rKr3dswJJs/+mRJePNH+wFRVAyBhYvYP1W7Nu8ngJ5jVWThGvdntVOOUlXbPrH/sKDf/RWzVHAMxhzIY4ydIyDuLWkEEvG33PpemiN6xeEewVN33/jDtds2WUKtGAmlZCcCh/OCflBJfg1V/ZhUgp0UfqnXhJaM4eN0l1FdW+vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vAcWlVyk; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1729050819; c=relaxed/simple;
+	bh=w2ecT24Kyn76nmgnQevViwuwRFcLvtFR/VWNmAeR4AI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eHXOtmZNVZvoFJuJ36YNxQwFQkvYUdLkUcdTcu7leO6n3406PXJGy79L1vFwdQd76n14kkOwATkYIQwuNJNfcz2HqAStPFTgdAuff6fFLzP9uDWJCF9Qc6MBPmN5AQvOayMqjEnEwOIQEaFmERRzwSJdkGK69C6m9ZkBB/BAEOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJ4HGJTW; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e2dc61bc41so3919623a91.1;
+        Tue, 15 Oct 2024 20:53:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729050727; x=1760586727;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3DstIncm6J0HFT7bC1fzVupVBQQzm9pdIktli+aHGoc=;
-  b=vAcWlVyk+wAZtmpHe8v0tP6r7GOpE6twfMxuowcHXuBsX+Lonf5mV+Q7
-   Z1JcH4BC6vMu+KdzUluWwiDxG6iEM36+/PQD4QTaqC4PemUaS2ASqHwDP
-   AUvyUHcrX3z8IvpPQ9ggL6gjizPdVj029Ynr2Cl9OqD1JrwgOdFUt7N3Z
-   k=;
-X-IronPort-AV: E=Sophos;i="6.11,207,1725321600"; 
-   d="scan'208";a="687905674"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 03:52:03 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:13756]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
- id 1c03cd7e-98db-4ed9-bf6a-a790882ad3a4; Wed, 16 Oct 2024 03:52:02 +0000 (UTC)
-X-Farcaster-Flow-ID: 1c03cd7e-98db-4ed9-bf6a-a790882ad3a4
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 16 Oct 2024 03:52:02 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.100.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 16 Oct 2024 03:51:59 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <gustavoars@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kees@kernel.org>, <kuba@kernel.org>, <linux-hardening@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH 5/5][next] uapi: net: Avoid -Wflex-array-member-not-at-end warnings
-Date: Tue, 15 Oct 2024 20:51:54 -0700
-Message-ID: <20241016035154.91327-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <d64af418459145b7d8eb94cd300fb4b7d2659a3c.1729037131.git.gustavoars@kernel.org>
-References: <d64af418459145b7d8eb94cd300fb4b7d2659a3c.1729037131.git.gustavoars@kernel.org>
+        d=gmail.com; s=20230601; t=1729050817; x=1729655617; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xsDQGvqFbk9A8NMt3RcQDdNjWrv9GKnKY+O+O8W7yyI=;
+        b=aJ4HGJTWfCVVKEzs2D/zJZW7myebX74o1dsVycE42R2EVDDKdkWujyFGTvTXAdrQAS
+         D2ezr347q/olnBRZaQEZwg6DpUe51xzMbuMzmxRcHXSA6aducckj0wJEKB5Y5ARGKIYv
+         fVrQ7nkmIdhhyEhn4OeNOrjPLO70pQU5ShrOfuPnW7YK4jyvHcPmXAifzxDWjhCbELJz
+         ySIsGLmreUsrqoh+KN0BbtMH2Cf1r2ScTUjSpklOnCXRBPCrbydqRwpshyho8sG21oiu
+         KP4q1X422il/QlzyPf7+yx/BsGWoTl134lLT1kQV3W2+vSQjLlLfjT9QZWAwJeqyyALJ
+         MBfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729050817; x=1729655617;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xsDQGvqFbk9A8NMt3RcQDdNjWrv9GKnKY+O+O8W7yyI=;
+        b=ZGsf3bcBcWhtrEK3CUr6VkpMpG+sHo6iIILJJPoEehKQmlmTNzvsHZ0+oew79lcEd4
+         k7rSCZw8fEPT4GMAvKsi1+H6AVwGJG9G+/Tup9rsJdHt58otubi+cO2F/1LRKOhkPHQM
+         1l/Pu2V0JFeMxB2lnrwy8VVdZwwtTPelodLejUoSnZuTAwZ8o90fv8ANlpmsUMez4GIR
+         X57KK52OuB5ebrj3dHEXjiG/Z+Q+cLj9rMGyLxZOJSKuu2FRiSAK3izmsAMSH7OsiHaQ
+         BskyrIppXtBHkLEml/iavFWYcm9JCQbsjvK9UjD5eslIwsWRLmLvzhKh7tTOWzIrLzA3
+         5AGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWW4H+oOaHzmDhI6XcUxUe1VvrUr4aKSe96SJ+5NqrhEtZgZZ3P/9EnreB+7oCST/QRMPnh3fPzgNr6d7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDCszaI0DOdcFZnpTUKwJxm3QilKuHyBthi+5Y+wrvoVDntfwg
+	RDv3qtyky5A0qdozHDBnbpdWJOOiypJoiqbQjntuqytyVBrxqUW7BpUC7E7i
+X-Google-Smtp-Source: AGHT+IHC27WpHhPPnyuyQIiYpsCEcj3Vpq1+oLDHjIegNo5o8Qbn5NnGfSLpWWEMxFd+Cl+y7FDBtA==
+X-Received: by 2002:a17:90a:8a92:b0:2e2:e660:96d5 with SMTP id 98e67ed59e1d1-2e3152f4b3bmr17504386a91.24.1729050816524;
+        Tue, 15 Oct 2024 20:53:36 -0700 (PDT)
+Received: from mew.. (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e392ed1a4fsm2885691a91.17.2024.10.15.20.53.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 20:53:36 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	tmgross@umich.edu,
+	ojeda@kernel.org,
+	alex.gaynor@gmail.com,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me,
+	a.hindborg@samsung.com,
+	aliceryhl@google.com,
+	anna-maria@linutronix.de,
+	frederic@kernel.org,
+	tglx@linutronix.de,
+	arnd@arndb.de,
+	jstultz@google.com,
+	sboyd@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/8] rust: Add IO polling
+Date: Wed, 16 Oct 2024 12:52:05 +0900
+Message-ID: <20241016035214.2229-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,48 +96,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Date: Tue, 15 Oct 2024 18:33:23 -0600
-> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-> index b068651984fe..aac82a4af36f 100644
-> --- a/net/appletalk/ddp.c
-> +++ b/net/appletalk/ddp.c
-> @@ -1832,7 +1832,7 @@ static int atalk_compat_routing_ioctl(struct sock *sk, unsigned int cmd,
->  	struct rtentry rt;
->  
->  	if (copy_from_user(&rt.rt_dst, &ur->rt_dst,
-> -			3 * sizeof(struct sockaddr)) ||
-> +			3 * sizeof(struct sockaddr_legacy)) ||
+polls periodically until a condition is met or a timeout is reached.
+By using the function, the 8th patch fixes QT2025 PHY driver to sleep
+until the hardware becomes ready.
 
-While at it, please fix the indent.
+As a result of the past discussion, this introduces a new type
+representing a span of time instead of using core::time::Duration or
+time::Ktime.
+
+Unlike the old rust branch, This adds a wrapper for fsleep() instead
+of msleep(). fsleep() automatically chooses the best sleep method
+based on a duration.
+
+v3:
+- Update time::Delta methods (use i64 for everything)
+- Fix read_poll_timeout to show the proper debug info (file and line)
+- Move fsleep to rust/kernel/time/delay.rs
+- Round up delta for fsleep
+- Access directly ktime_t instead of using ktime APIs
+- Add Eq and Ord with PartialEq and PartialOrd
+v2: https://lore.kernel.org/lkml/20241005122531.20298-1-fujita.tomonori@gmail.com/
+- Introduce time::Delta instead of core::time::Duration
+- Add some trait to Ktime for calculating timeout
+- Use read_poll_timeout in QT2025 driver instead of using fsleep directly
+v1: https://lore.kernel.org/netdev/20241001112512.4861-1-fujita.tomonori@gmail.com/
+
+FUJITA Tomonori (8):
+  rust: time: Add PartialEq/Eq/PartialOrd/Ord trait to Ktime
+  rust: time: Introduce Delta type
+  rust: time: Change output of Ktime's sub operation to Delta
+  rust: time: Implement addition of Ktime and Delta
+  rust: time: Add wrapper for fsleep function
+  MAINTAINERS: rust: Add TIMEKEEPING and TIMER abstractions
+  rust: Add read_poll_timeout functions
+  net: phy: qt2025: Wait until PHY becomes ready
+
+ MAINTAINERS               |  2 +
+ drivers/net/phy/qt2025.rs | 10 +++-
+ rust/helpers/helpers.c    |  2 +
+ rust/helpers/kernel.c     | 13 +++++
+ rust/helpers/time.c       |  8 ++++
+ rust/kernel/error.rs      |  1 +
+ rust/kernel/io.rs         |  5 ++
+ rust/kernel/io/poll.rs    | 84 +++++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs        |  1 +
+ rust/kernel/time.rs       | 99 ++++++++++++++++++++++++++++++++++++---
+ rust/kernel/time/delay.rs | 31 ++++++++++++
+ 11 files changed, 249 insertions(+), 7 deletions(-)
+ create mode 100644 rust/helpers/kernel.c
+ create mode 100644 rust/helpers/time.c
+ create mode 100644 rust/kernel/io.rs
+ create mode 100644 rust/kernel/io/poll.rs
+ create mode 100644 rust/kernel/time/delay.rs
 
 
->  	    get_user(rt.rt_flags, &ur->rt_flags) ||
->  	    get_user(rt.rt_metric, &ur->rt_metric) ||
->  	    get_user(rt.rt_mtu, &ur->rt_mtu) ||
-> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index b24d74616637..75bd15d884e3 100644
-> --- a/net/ipv4/af_inet.c
-> +++ b/net/ipv4/af_inet.c
-> @@ -1021,7 +1021,7 @@ static int inet_compat_routing_ioctl(struct sock *sk, unsigned int cmd,
->  	struct rtentry rt;
->  
->  	if (copy_from_user(&rt.rt_dst, &ur->rt_dst,
-> -			3 * sizeof(struct sockaddr)) ||
-> +			3 * sizeof(struct sockaddr_legacy)) ||
+base-commit: 068f3b34c5c2be5fe7923a9966c1c16f992a2f9c
+-- 
+2.43.0
 
-Same here.
-
-Otherwise looks good to me.
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-
->  	    get_user(rt.rt_flags, &ur->rt_flags) ||
->  	    get_user(rt.rt_metric, &ur->rt_metric) ||
->  	    get_user(rt.rt_mtu, &ur->rt_mtu) ||
 
