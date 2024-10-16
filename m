@@ -1,133 +1,237 @@
-Return-Path: <netdev+bounces-136085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869509A042C
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:26:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D54FA9A0431
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47C622822EE
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:26:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CB1AB2750F
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E189F1D131D;
-	Wed, 16 Oct 2024 08:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB971D1738;
+	Wed, 16 Oct 2024 08:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ulGuSHs/"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fc+pDScL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BF11862AE
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6611C07E3
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 08:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729067171; cv=none; b=duCACEofSvwa6573MJdioryk2BMDatDvD22VQ76i/+pMpr8BJ0u9ij3uF3G3MIODri3QJumMVbOdIibctSStpwx0JEJJqfrjspIdVGE9iytkScyIrkHcGpBdWCykMBkGapPErZ8PQHqSWKTaA+G11JcanYpG2zaG1jqKkCFK3LE=
+	t=1729067252; cv=none; b=mY/REZEug9lTuICW5AsG5BdZsl7jAe4LcBLbLmRCi56S5j3YAaolBgP6RBXeInvPIxLu9DGEqEZQWnP3wvzTUHup7KXeLcTj3+3w+k0vljGsxVOZ79EBvJSQGWDDT5ecxPMI5wRBRVFXcwwehg6OvWH2R+OrNmk7wjvYC7IIuTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729067171; c=relaxed/simple;
-	bh=tygiRFqbv+djzCkWAvjrXrySmhBjmetaHW6CXjdEyUE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rXpBb5ufYmoMvbwR8rY+E5LfmwKEDXcUUpixH5ZakD1WFDb+962xXJYDmzifXD8EYj5ClUqTEDAaa6j7Lrj7NaSm7DqFqbXIz/lnPzufMBQQdDpEWFBqm6TWgk/RJ6LnQbphGi1Ht4SIV5fvC3XwraGfQoKDUgbRYChw0IBP2ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ulGuSHs/; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37d4ba20075so4143981f8f.0
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:26:10 -0700 (PDT)
+	s=arc-20240116; t=1729067252; c=relaxed/simple;
+	bh=PVa+FJXTDWZeoxAqKHBZCp7maASc8TfoL8hAtOc6GlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KVcAATNpfCdEGC3rmZIKF/zCVyU5ExABKLbO7AlZMabwfc2i48NZ1qdRUuhmjwuCNwO9ErcL90jO9Oa12p+/IAhDSbJBVVf5/saW/CweJ28IAoBuD5/WIc4DFhXYd6uH1oM/xWfCbvBOl0n6qeDm6V8UU33hd5WysjZ0Ny62XvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fc+pDScL; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4314fa33a35so5109725e9.1
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 01:27:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729067169; x=1729671969; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I+7LwnnrTbH3RKt7BRM7LcBiqKf9Vi4DwjUCj0Z2Cpc=;
-        b=ulGuSHs/Zgf6jxgwGsWmkoTkCwt/2B9NgJ87CrKY+390dJsev3nit0AVgnF+YGhFxA
-         XXI4pPseYdHmZ56BQvw1y0HpUbKAmtgwewC9E8UJnmoTYkgP+F4vVjMC4B0jXlt/QdZo
-         UnVmJWQDflxVlHN38kKjp+ngP3LZ+ZRLCn8vr7ntt2HzS46029vs0ZWM7R1co3s6I5uA
-         GvR8lG2yeAtsmp/XgT5P5lP5b7ZsjgX6gDRfjdn5FF3PxWL8Tcob7oFSMWIVC5rfSI92
-         /nUuNmzFyZFguapVJ9zzGeXJtiuzRAEw4GONVAofLwZ28xj+dBz+ouhnXmjt8qW4BD8k
-         80aw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1729067249; x=1729672049; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g28iCX0O5SYkdDCU+JsYvIfeHBkuIrm9r0ykt0NO+9k=;
+        b=fc+pDScL3abGiXe83W+w8fg/MkPF/zYvLkGkdEFW8s0DJVKIpsI0bTh64Mg1Jc5aSX
+         I3ixyF+LXBqW29D/5LFFfg19X6AXgQCowmDzsibLrowdCexaA3Bjoq9aM30grWFMVoAa
+         83MCYg/Tt/+NH04tX7iqt5GSk/uLyMut0HTvWIhvQL3+qE6tcYCk3UP/arzHiboKEKfI
+         ZnJnHuMJvHE0kvJP9aJ6o6Xj75b4PwIV2znhtUw4ZKd67RFPjshlLglLrIBifhzaD8xb
+         5Si4taiAfCOXgGcfEqPkzDS0fNRpMeHc/N77Vp5AQmvCWNc2erADVjGaMYjcWyYDTlXr
+         QAFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729067169; x=1729671969;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I+7LwnnrTbH3RKt7BRM7LcBiqKf9Vi4DwjUCj0Z2Cpc=;
-        b=rhiWQ3snIrmS+Eb1KqFrafiCFPjPk68684jfnhRSwegquKPXGoddvMSl17U6NHqCBe
-         eLpspmo/UagDQIRAJmVdGhsbgd5GRM9+KG+gF78Sal857kJtfKZCTYS9kj/VxEObQ6hY
-         QMc0ZdlznmV3qu6RnSRM1VrjMUhr4NYyHm40xsIlxwGJdsHqxL5juP61CzFu8brOpsrf
-         PYS79n3u2DgAvf7kE26nrWjAtfiE3hFvhetCoKjmktC5LTg69nQuXMDY5J0sb8afReDD
-         rINqaO1BtXltqxRjZsvEm+c8NaKOJVtbgT14VfMiQh1JZCtYwANvGTQawri/mEzRmF9l
-         yOWQ==
-X-Gm-Message-State: AOJu0YxDvHaIgxL9DIgzhueGVEY2XxVszSHdIIORciBDWV4ZeoxTOA9+
-	dvZAKzESvtKtMY0dax4ycVMjr49JW1O7letORHFNY95INx8NTR6a3zwj+ZwHwa70ou9GU05THib
-	53Y5HsewyDMB6rbQUyIVGvvE5QzbMNqubacch
-X-Google-Smtp-Source: AGHT+IG3IXPeMudvkdrtSejG9A2Vrc5kJHuxJRzENV1HoWLFGAnZtzhqRbbC+l/e1CT7Jq8syro7lAXEjkQOMCt5MBo=
-X-Received: by 2002:a5d:6b83:0:b0:37d:395a:bb7 with SMTP id
- ffacd0b85a97d-37d551fc5ffmr10919996f8f.31.1729067168659; Wed, 16 Oct 2024
- 01:26:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729067249; x=1729672049;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g28iCX0O5SYkdDCU+JsYvIfeHBkuIrm9r0ykt0NO+9k=;
+        b=WkTt97A340+t1dERClg29RwGJu/aLD4Wy1FScbo0KAP1q9HbScNc2T/hKIOYl/rz6f
+         FP28sayJ+wHMH1ufKhoeqpZQ7Guy9yPeKXuR9qVnhYx1z57+g7ucy41usfiHSNdgY7I1
+         pyvrLKU62cns8c0Rx2/7xhmBZnC2pY5/ISiv+moBcUf2zvgE/LtaRqubeKf8a7WwNAKw
+         miUXz5wtjzZex/p8I75Jw2AKjqx30tIYd84zNNBE30r0ULPSzv3kXLvG7WCYdhY/GIxN
+         PIE1rIemCr2FVNnIdA9dH416ANV7llLT9PhsP1V6ftSojm5n+RZV9wUGbodN8aIkwoiq
+         VIqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXorIO8thF4hdCx01l7pMS1bklFmvvhHkWJR/7lThqJqdFLUCa8xeWBKHHu/SfISHZLw5rde1k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU86UaUdqg6W6GKz090TFuD135zMW6XoOY4dh/gDZTkIrnveJh
+	z1BuhvYu+NEyytFO7B+mahOxa0A+b9B0jvI31RUlA431AaBTdBzia2WNnNYQu34=
+X-Google-Smtp-Source: AGHT+IERexqRaMF2wo6pgIqzaWfNekkvkAvO40P+daGklxVCAETU0FoDFC6Q5O/KGhVi2SAiAuuztQ==
+X-Received: by 2002:a05:600c:5122:b0:42f:8d36:855e with SMTP id 5b1f17b1804b1-4311deb5f47mr177561545e9.5.1729067248934;
+        Wed, 16 Oct 2024 01:27:28 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4314bf60fc4sm24841625e9.38.2024.10.16.01.27.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 01:27:28 -0700 (PDT)
+Date: Wed, 16 Oct 2024 10:27:24 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+	ryazanov.s.a@gmail.com, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	openvpn-devel@lists.sourceforge.net,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v9 04/23] ovpn: add basic interface
+ creation/destruction/management routines
+Message-ID: <Zw947Jb637o-I4RV@nanopsycho.orion>
+References: <20241016-b4-ovpn-v9-0-aabe9d225ad5@openvpn.net>
+ <20241016-b4-ovpn-v9-4-aabe9d225ad5@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com> <20241016035214.2229-5-fujita.tomonori@gmail.com>
-In-Reply-To: <20241016035214.2229-5-fujita.tomonori@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 16 Oct 2024 10:25:56 +0200
-Message-ID: <CAH5fLgjHtRJg9E7Xjxt+Xgt_0=7zk2jFYLiuzJSeibdx2yHrWQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/8] rust: time: Implement addition of Ktime
- and Delta
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
-	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
-	sboyd@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241016-b4-ovpn-v9-4-aabe9d225ad5@openvpn.net>
 
-On Wed, Oct 16, 2024 at 5:53=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
+Wed, Oct 16, 2024 at 03:03:04AM CEST, antonio@openvpn.net wrote:
+>Add basic infrastructure for handling ovpn interfaces.
 >
-> Implement Add<Delta> for Ktime to support the operation:
+>Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>---
+> drivers/net/ovpn/main.c       | 115 ++++++++++++++++++++++++++++++++++++++++--
+> drivers/net/ovpn/main.h       |   7 +++
+> drivers/net/ovpn/ovpnstruct.h |   8 +++
+> drivers/net/ovpn/packet.h     |  40 +++++++++++++++
+> include/uapi/linux/if_link.h  |  15 ++++++
+> 5 files changed, 180 insertions(+), 5 deletions(-)
 >
-> Ktime =3D Ktime + Delta
->
-> This is typically used to calculate the future time when the timeout
-> will occur.
->
-> timeout Ktime =3D current Ktime (via ktime_get()) + Delta;
-> // do something
-> if (ktime_get() > timeout Ktime) {
->     // timed out
+>diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>index d5bdb0055f4dd3a6e32dc6e792bed1e7fd59e101..eead7677b8239eb3c48bb26ca95492d88512b8d4 100644
+>--- a/drivers/net/ovpn/main.c
+>+++ b/drivers/net/ovpn/main.c
+>@@ -10,18 +10,52 @@
+> #include <linux/genetlink.h>
+> #include <linux/module.h>
+> #include <linux/netdevice.h>
+>+#include <linux/inetdevice.h>
+>+#include <net/ip.h>
+> #include <net/rtnetlink.h>
+>-#include <uapi/linux/ovpn.h>
+>+#include <uapi/linux/if_arp.h>
+> 
+> #include "ovpnstruct.h"
+> #include "main.h"
+> #include "netlink.h"
+> #include "io.h"
+>+#include "packet.h"
+> 
+> /* Driver info */
+> #define DRV_DESCRIPTION	"OpenVPN data channel offload (ovpn)"
+> #define DRV_COPYRIGHT	"(C) 2020-2024 OpenVPN, Inc."
+> 
+>+static void ovpn_struct_free(struct net_device *net)
+>+{
+>+}
+>+
+>+static int ovpn_net_open(struct net_device *dev)
+>+{
+>+	netif_tx_start_all_queues(dev);
+>+	return 0;
+>+}
+>+
+>+static int ovpn_net_stop(struct net_device *dev)
+>+{
+>+	netif_tx_stop_all_queues(dev);
+>+	return 0;
+>+}
+>+
+>+static const struct net_device_ops ovpn_netdev_ops = {
+>+	.ndo_open		= ovpn_net_open,
+>+	.ndo_stop		= ovpn_net_stop,
+>+	.ndo_start_xmit		= ovpn_net_xmit,
+>+};
+>+
+>+static const struct device_type ovpn_type = {
+>+	.name = OVPN_FAMILY_NAME,
+>+};
+>+
+>+static const struct nla_policy ovpn_policy[IFLA_OVPN_MAX + 1] = {
+>+	[IFLA_OVPN_MODE] = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_P2P,
+>+					    OVPN_MODE_MP),
+>+};
+>+
+> /**
+>  * ovpn_dev_is_valid - check if the netdevice is of type 'ovpn'
+>  * @dev: the interface to check
+>@@ -33,16 +67,76 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
+> 	return dev->netdev_ops->ndo_start_xmit == ovpn_net_xmit;
 > }
->
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> 
+>+static void ovpn_setup(struct net_device *dev)
+>+{
+>+	/* compute the overhead considering AEAD encryption */
+>+	const int overhead = sizeof(u32) + NONCE_WIRE_SIZE + 16 +
+>+			     sizeof(struct udphdr) +
+>+			     max(sizeof(struct ipv6hdr), sizeof(struct iphdr));
+>+
+>+	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
+>+				 NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
+>+				 NETIF_F_HIGHDMA;
+>+
+>+	dev->needs_free_netdev = true;
+>+
+>+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+>+
+>+	dev->netdev_ops = &ovpn_netdev_ops;
+>+
+>+	dev->priv_destructor = ovpn_struct_free;
+>+
+>+	dev->hard_header_len = 0;
+>+	dev->addr_len = 0;
+>+	dev->mtu = ETH_DATA_LEN - overhead;
+>+	dev->min_mtu = IPV4_MIN_MTU;
+>+	dev->max_mtu = IP_MAX_MTU - overhead;
+>+
+>+	dev->type = ARPHRD_NONE;
+>+	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
+>+	dev->priv_flags |= IFF_NO_QUEUE;
+>+
+>+	dev->lltx = true;
+>+	dev->features |= feat;
+>+	dev->hw_features |= feat;
+>+	dev->hw_enc_features |= feat;
+>+
+>+	dev->needed_headroom = OVPN_HEAD_ROOM;
+>+	dev->needed_tailroom = OVPN_MAX_PADDING;
+>+
+>+	SET_NETDEV_DEVTYPE(dev, &ovpn_type);
+>+}
+>+
+> static int ovpn_newlink(struct net *src_net, struct net_device *dev,
+> 			struct nlattr *tb[], struct nlattr *data[],
+> 			struct netlink_ext_ack *extack)
+> {
+>-	return -EOPNOTSUPP;
+>+	struct ovpn_struct *ovpn = netdev_priv(dev);
+>+	enum ovpn_mode mode = OVPN_MODE_P2P;
+>+
+>+	if (data && data[IFLA_OVPN_MODE]) {
+>+		mode = nla_get_u8(data[IFLA_OVPN_MODE]);
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Some sanity check perhaps? "validate" op is here for that purpose.
 
->  rust/kernel/time.rs | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-> index 8c00854db58c..9b0537b63cf7 100644
-> --- a/rust/kernel/time.rs
-> +++ b/rust/kernel/time.rs
-> @@ -155,3 +155,14 @@ pub fn as_secs(self) -> i64 {
->          self.nanos / NSEC_PER_SEC
->      }
->  }
-> +
-> +impl core::ops::Add<Delta> for Ktime {
-> +    type Output =3D Ktime;
-> +
-> +    #[inline]
-> +    fn add(self, delta: Delta) -> Ktime {
-> +        Ktime {
-> +            inner: self.inner + delta.as_nanos(),
 
-You don't want to do `delta.inner` here?
+>+		netdev_dbg(dev, "setting device mode: %u\n", mode);
+>+	}
+>+
+>+	ovpn->dev = dev;
+>+	ovpn->mode = mode;
+>+
+>+	/* turn carrier explicitly off after registration, this way state is
+>+	 * clearly defined
+>+	 */
+>+	netif_carrier_off(dev);
+>+
+>+	return register_netdevice(dev);
 
-Alice
+[...]
 
