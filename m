@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-135980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADA6E99FE45
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:30:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7986B99FE47
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 03:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5D3B1C234D9
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:30:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CDD51F24B29
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 01:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75DB74204D;
-	Wed, 16 Oct 2024 01:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0293139D1B;
+	Wed, 16 Oct 2024 01:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDTVw+3W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KK84ZwPu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3F74C81;
-	Wed, 16 Oct 2024 01:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878024C81;
+	Wed, 16 Oct 2024 01:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729042225; cv=none; b=Ll7N5Uosvr/HcNJ3TubmFP+nX8Sj/vi/++q/cuz/sPVEGqoTT09VWbjTb26UK62UF2Bc2gCsaf9PVjlX0FBlihJpc4j6ciUnO5uC2qPMSOc7CSAq3PsRy95EUNIs1C/FZ7IP5ZW4wWmB5NO0Mt3950UJX6R1YlLyiv/eeUiBtGo=
+	t=1729042228; cv=none; b=WzcRbFT8mfsB8kQePP3hv2juHIS7U9ICvwtnxM26sTyBvsxS6TRgfAPO6+00Ln3Cc0syw8gKbN+H4C3cF2/f3IyiqGnSAF6EUeCGPL1xOlYhMM4Hf8Wt1iky6dAL/vtUS+LGlWM8DmFtyoy7fGWWgeYrtxHQWTaKMHAB9/oVp3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729042225; c=relaxed/simple;
-	bh=ijlGRi12j4QC/i/oLZCV62W05SSVkdKRbD6WFDwql3k=;
+	s=arc-20240116; t=1729042228; c=relaxed/simple;
+	bh=Mb3XswMiy0p6l7SH0AA2U17JO4PZXn1SY2/vyBfRq8g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qDBoWhBSph/gZxP6+ntOAEEy/JFrHbOXq496a1cxq2x7cJUICJTi9D1tt74nZlCyqjYVyNlKckEstIIafxIJC3tywQxMwZMtyn2VhDhwwpahGpJTr56EZCJgbvdvRolMLDlpkYVWJ35x8sVGAfPQGF+b/A9h38y9fCV3ZiCZa/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dDTVw+3W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C04ECC4CEC6;
-	Wed, 16 Oct 2024 01:30:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uG7belY4EcRKZJXe9CDz5flIK2Xt3HCp7WxR/ZZiLG35AG2dSBuuOI48KaMFDACjelhGj2ZV4fFf5V9Bb4VP6lCYvGbwsFn3dXU3+39AndVEwpGX15c5Q+QLbCbneJ+8lzNuWWQMXMDhUPUZqMZLGwmF5Ch2uxNXJIVLx+jFNmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KK84ZwPu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 006EEC4CEC6;
+	Wed, 16 Oct 2024 01:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729042224;
-	bh=ijlGRi12j4QC/i/oLZCV62W05SSVkdKRbD6WFDwql3k=;
+	s=k20201202; t=1729042226;
+	bh=Mb3XswMiy0p6l7SH0AA2U17JO4PZXn1SY2/vyBfRq8g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dDTVw+3W9OcdpnVvGnlWoG9vR+31VP/SuxuekyAW/a1ZXMgvGknPMUQT81vd5t2ih
-	 fAHkSra1LkkV0lCwUTGlXTx7c1/kR+lrjIJt513dVFIIR6mMxE8fjnb8XwmDHyzi5c
-	 s9ACk/P2HWyHqI3ku0NTKLTMkmX1DyUO/ET27xmYj0OsoMW7rdciyphwHwDNDtviGx
-	 8VybKfBHFvWxNUK/+58UxAqcuUYmVMSdJReks+/t+gePk9UlbRNxpJaNCwG1EhiLwm
-	 MqSwPEZVyMeKQjBf47J5QhsBQTfRnlbCrVsqCkzB1A/+eRBPi4+vh9HuRR3K4SMxW6
-	 3VOPCLfuXDJgQ==
+	b=KK84ZwPu99VO3MqIoMiGmnYdwkvjVl/G8FNBAWrXML8ozA9S1fKmBV2y6u98jy+hu
+	 rI63X8sD5ahEKHyesEKr7nFB/+Jthnre3woIjvwqRTbtHLPrX/xyixjDT3+7Y1T28N
+	 LrZalt3gffAkCMJyx4zckBrodWRSLBzkuLG0Eo4zmitYTONGmmdPZvw5/w6XYWPCFU
+	 pX658uu5ASJyb6qgFjCr4NAw1MpVkBnSAkOEx4UUzzNfPR4p7XwZCbBio/+Y/Gq11d
+	 ZHtilDgEWdLgYJ9r+ilgDycC4xO+yVuclpcR+J8RfcXIiwifo85Wtrx9edXWk8whXn
+	 WrexabLupwQGw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3448A3809A8A;
-	Wed, 16 Oct 2024 01:30:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E443809A8A;
+	Wed, 16 Oct 2024 01:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] net: phy: mdio-bcm-unimac: Add BCM6846 variant
+Subject: Re: [PATCH net v2] udp: Compute L4 checksum as usual when not
+ segmenting the skb
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172904222974.1350766.8131356832857908071.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Oct 2024 01:30:29 +0000
-References: <20241012-bcm6846-mdio-v1-0-c703ca83e962@linaro.org>
-In-Reply-To: <20241012-bcm6846-mdio-v1-0-c703ca83e962@linaro.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: opendmb@gmail.com, florian.fainelli@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, rafal@milecki.pl, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, f.fainelli@gmail.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
+ <172904223125.1350766.14271955479803742951.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Oct 2024 01:30:31 +0000
+References: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+In-Reply-To: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, kernel-team@cloudflare.com, ivan@cloudflare.com,
+ stable@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 12 Oct 2024 22:35:21 +0200 you wrote:
-> As pointed out by Florian:
-> https://lore.kernel.org/linux-devicetree/b542b2e8-115c-4234-a464-e73aa6bece5c@broadcom.com/
+On Fri, 11 Oct 2024 14:17:30 +0200 you wrote:
+> If:
 > 
-> The BCM6846 has a few extra registers and cannot reuse the
-> compatible string from other variants of the Unimac
-> MDIO block: we need to be able to tell them apart.
+>   1) the user requested USO, but
+>   2) there is not enough payload for GSO to kick in, and
+>   3) the egress device doesn't offer checksum offload, then
+> 
+> we want to compute the L4 checksum in software early on.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] dt-bindings: net: brcm,unimac-mdio: Add bcm6846-mdio
-    https://git.kernel.org/netdev/net/c/6ed97afd75cc
-  - [2/2] net: phy: mdio-bcm-unimac: Add BCM6846 support
-    https://git.kernel.org/netdev/net/c/906b77ca91c7
+  - [net,v2] udp: Compute L4 checksum as usual when not segmenting the skb
+    https://git.kernel.org/netdev/net/c/d96016a764f6
 
 You are awesome, thank you!
 -- 
