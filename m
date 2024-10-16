@@ -1,132 +1,120 @@
-Return-Path: <netdev+bounces-136227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E769A1190
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:29:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA4DB9A11A3
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 20:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FEADB21107
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:29:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C078B21FD2
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAFF5212F19;
-	Wed, 16 Oct 2024 18:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA7E212F1E;
+	Wed, 16 Oct 2024 18:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSife03Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T46ZaHFZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5441B290F;
-	Wed, 16 Oct 2024 18:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECA118C33E;
+	Wed, 16 Oct 2024 18:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729103342; cv=none; b=aUTM1FIZnpvUtmuWWPrHLursxzHkMBBqzemIUHwcrYkhGMN3ZBWXnIC5spg0V/6tYrZnoKHZmzsseE97RYp5NPFETjffhAK4OYxPfwqBSo1eLXdB6OPHje+zo1hvNKokhBuZ5TdUQ/UbEhCarZXgPVN/Weo/lcCJ2q5m7pjjoW4=
+	t=1729103720; cv=none; b=Gct+xvq91Xz9EoG/XC2gYO2J27cuQvHhJ0vey3A+uUS4+cC1mejagGzBGhcvoJhy+p925SuGiCpfdgqMS1/1c8ecoBWAe+rye9auch/4nC90Weckn3mi0QzJtMxj4iVvmHxiUWSZegVpg2eOgH3YCoy/Umg/hrSLL8LSz9O6Pzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729103342; c=relaxed/simple;
-	bh=wT76ZREbVhLgdhwYV5Ta40j5tUwtnoktB2lVGI6sunc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IU3psT+uNTMliul8mVFZ9560VQAhxpLvA38AeOnnz1QWeMyLzXq8mtv43jl4nXn/p3mFdnS9qGsh/IC8k1ZoC40fo0nFqCxhK+qKPoRssfCeaaj32fElMj+QNnMXOSOIa1reifEZTGm9J/8sWYFhYvKHDSvO0mxexoKeOOD+bl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kSife03Z; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e29756dc019so78028276.3;
-        Wed, 16 Oct 2024 11:29:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729103340; x=1729708140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=21SqynB+ScB8hvflEvo8tHa/c4pVsZtnxN7DQ2/6UEY=;
-        b=kSife03ZCXdi2NDlp4m9hEoiU2Kdzia9nIPWDfP5UcV0NdzAgNL0S/+i6fZMlSofEP
-         hbzfaFjBDFmF3yVhmNZJ25PQi/RJ7P4e8/SRJ7TvfV4FkzNTAkY73GuZVuyn5EJLbhUE
-         xBcuJILAZOY4iK2TKlVw9VvkuapxNfSmFW5x/gjObTCIXJ1Uls3dKuFlOAYZUxDPhML/
-         dj9sQMSequvq5eY/K28Un+wg9wjR5EEhSB+ffMktq+W2mh1edYIFh2FMpZF+lKk0rCo6
-         MeIq7cGu7Ks9P6Eu18zgUFNsgY1LiHuSeIrCZC+vxVeoQ08D/IEnIwfbqYxayLzohMD5
-         jQtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729103340; x=1729708140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=21SqynB+ScB8hvflEvo8tHa/c4pVsZtnxN7DQ2/6UEY=;
-        b=KFC97mWrTg/6VGWZPVyBIpQmaYaeW42/TJ1Eapfaz37e2AYalSfVtwlP9yROVZ4jbV
-         M7g7BvT+hy0hedAVGykHWbJLB7Q5aUvOW2MKVMJmkOUldG+DKd2eHjzlNblRXKhYdlOk
-         jlVNtQnRBtM5AkEvreZjsTfSEYjJHeDUTGu0/v8nP/krckngDWfbjoeigJacJKeYW43d
-         /JCdTQ9mowAK2O/oBTcUSgqZ8YoEIFRWLNaQwMtvkTJEpEH+Zd//tzRM+WPCMoFSIlrV
-         Sqtsmqnb2VzBTNVGv2zTvSxG9oVRBjrnDReCii26givtAPwvxcYgo9V0tLkdbRkbHTfm
-         R9lA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9XihPpo9YdDzz1o6DBdYK+3jQ3MdFGL/l9rVzJBWvM+zFTBM1b8SZo64K++k+uMzzYaV3uaoE6Hq8T7WoyyXrs/A=@vger.kernel.org, AJvYcCXDYxlbM47vKWCKfe3B+gsiOo4YD1B57yzIKUdvKM4UxIbF8ZZmCymhvziqdPJZ8c3p1+xmvNvdXdlqUyg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEjsNPWNbC2hvs8ZVnFPzAs2J9H1P2Q29NpWkFy/U53O+bfvEn
-	jI56Yc1Dkh6RueayoZY3KwUnhFCnXo9PoieGVEjg7XHwiGYojXJP6uGcMwcNHyAuX7oQrzJ1539
-	rPAredr3bRaiihz7elvMmbWdI1nbPUfY6
-X-Google-Smtp-Source: AGHT+IEU3ihP93aNIqC4+yXcAUYTtJPME6PzwYuFlGtu8wik9S7SxgeyZOjY2Ju0o69ojWl4w55/OMGl/2JjhUIHu/c=
-X-Received: by 2002:a05:690c:dc6:b0:6e3:dbbe:2736 with SMTP id
- 00721157ae682-6e3dbbe2ec7mr38528907b3.32.1729103340172; Wed, 16 Oct 2024
- 11:29:00 -0700 (PDT)
+	s=arc-20240116; t=1729103720; c=relaxed/simple;
+	bh=Wbzx8WQNkx2LfwF5/9Fel6fTjsfrcYca5cm8SsQhTXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YkNGYjEPESvVsmW4jy+E2MGcm65uow+B5ExA1kA7qs6xazKq9mXoAp4EqD10LCEvaElfQaohEeLPi6U0kbmtGuB124nC5QipEkGLqJyOEZ5M1M4OFrLI17/m55e/gfx57v2yEL5YD3gHoE0gqhHLDkc7tRQQN6RksQYB8oTnG5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T46ZaHFZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC86EC4CEC5;
+	Wed, 16 Oct 2024 18:35:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729103720;
+	bh=Wbzx8WQNkx2LfwF5/9Fel6fTjsfrcYca5cm8SsQhTXM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T46ZaHFZPG8Y8J2eE5/mNSEyJWM+ipCnlZ1Fy/sZzxRhW1z/ybed5qvDEB14LbAfH
+	 iAMepQqhxQ9RePBIs11NLkMzD0oai4SAa25TAfvk63W5hnk5Se3rkDq6XOm5LAqgxY
+	 9KEAyPi8VjW0zvkRA132pYG7ngtotf/7r0IggB0vtd+gs+ZPyXuAMYqvC00X/XtbuF
+	 Riw0cALxO2a8aL9qBTMvmbTpU4+BP70ZOf+dJZOKmNf6jG7AfzZTCS5q3tFdjv+zOh
+	 8/Z+1QR3rGVKK9Hvz6menRdqzGue9K+wCjdOqem3m92jY1a9vqoXB4XssgPRKq1Aul
+	 34IOb030opWnw==
+Date: Wed, 16 Oct 2024 11:35:18 -0700
+From: Namhyung Kim <namhyung@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
+	Networking <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+Message-ID: <ZxAHZt8pFjxeOx-U@google.com>
+References: <20241016170542.7e22b03c@canb.auug.org.au>
+ <CAADnVQJ=Woq=82EDvMT1YRLLTvNgFVSbnZDiR5HUgEhcyBLW4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241015200222.12452-1-rosenp@gmail.com>
-In-Reply-To: <20241015200222.12452-1-rosenp@gmail.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Wed, 16 Oct 2024 11:28:49 -0700
-Message-ID: <CAKxU2N_vK8WROUYdSRHnh_Y5tyW9dX+kk1BCTk-zU=pFH7HTwg@mail.gmail.com>
-Subject: Re: [PATCHv7 net-next 0/6] ibm: emac: more cleanups
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kurt Kanzenbach <kurt@linutronix.de>, Woojung Huh <woojung.huh@microchip.com>, 
-	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	George McCollister <george.mccollister@gmail.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
-	Breno Leitao <leitao@debian.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQJ=Woq=82EDvMT1YRLLTvNgFVSbnZDiR5HUgEhcyBLW4Q@mail.gmail.com>
 
-On Tue, Oct 15, 2024 at 1:02=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wrot=
-e:
->
-> Tested on Cisco MX60W.
->
-> v2: fixed build errors. Also added extra commits to clean the driver up
-> further.
-> v3: Added tested message. Removed bad alloc_netdev_dummy commit.
-> v4: removed modules changes from patchset. Added fix for if MAC not
-> found.
-> v5: added of_find_matching_node commit.
-> v6: resend after net-next merge.
-> v7: removed of_find_matching_node commit. Adjusted mutex_init patch.
->
-> Rosen Penev (6):
->   net: ibm: emac: use netif_receive_skb_list
->   net: ibm: emac: remove custom init/exit functions
->   net: ibm: emac: use devm_platform_ioremap_resource
->   net: ibm: emac: use platform_get_irq
->   net: ibm: emac: use devm for mutex_init
->   net: ibm: emac: generate random MAC if not found
-why is this set to changes requested?
->
->  drivers/net/ethernet/ibm/emac/core.c  | 81 ++++++++-------------------
->  drivers/net/ethernet/ibm/emac/mal.c   | 10 +---
->  drivers/net/ethernet/ibm/emac/mal.h   |  4 --
->  drivers/net/ethernet/ibm/emac/rgmii.c | 10 +---
->  drivers/net/ethernet/ibm/emac/rgmii.h |  4 --
->  drivers/net/ethernet/ibm/emac/tah.c   | 10 +---
->  drivers/net/ethernet/ibm/emac/tah.h   |  4 --
->  drivers/net/ethernet/ibm/emac/zmii.c  | 10 +---
->  drivers/net/ethernet/ibm/emac/zmii.h  |  4 --
->  9 files changed, 27 insertions(+), 110 deletions(-)
->
-> --
-> 2.47.0
->
+On Wed, Oct 16, 2024 at 09:25:41AM -0700, Alexei Starovoitov wrote:
+> On Tue, Oct 15, 2024 at 11:05 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> >
+> > Hi all,
+> >
+> > After merging the bpf-next tree, today's linux-next build (arm64
+> > defconfig) failed like this:
+> >
+> > Building: arm64 defconfig
+> > In file included from arch/arm64/include/asm/thread_info.h:17,
+> >                  from include/linux/thread_info.h:60,
+> >                  from arch/arm64/include/asm/preempt.h:6,
+> >                  from include/linux/preempt.h:79,
+> >                  from include/linux/spinlock.h:56,
+> >                  from include/linux/mmzone.h:8,
+> >                  from include/linux/gfp.h:7,
+> >                  from include/linux/slab.h:16,
+> >                  from mm/slab_common.c:7:
+> > mm/slab_common.c: In function 'bpf_get_kmem_cache':
+> > arch/arm64/include/asm/memory.h:427:66: error: passing argument 1 of 'virt_to_pfn' makes pointer from integer without a cast [-Wint-conversion]
+> >   427 |         __is_lm_address(__addr) && pfn_is_map_memory(virt_to_pfn(__addr));      \
+> >       |                                                                  ^~~~~~
+> >       |                                                                  |
+> >       |                                                                  u64 {aka long long unsigned int}
+> > mm/slab_common.c:1260:14: note: in expansion of macro 'virt_addr_valid'
+> >  1260 |         if (!virt_addr_valid(addr))
+> >       |              ^~~~~~~~~~~~~~~
+> > arch/arm64/include/asm/memory.h:382:53: note: expected 'const void *' but argument is of type 'u64' {aka 'long long unsigned int'}
+> >   382 | static inline unsigned long virt_to_pfn(const void *kaddr)
+> >       |                                         ~~~~~~~~~~~~^~~~~
+> >
+> > Caused by commit
+> >
+> >   04b069ff0181 ("mm/bpf: Add bpf_get_kmem_cache() kfunc")
+> >
+> > I have reverted commit
+> >
+> >   08c837461891 ("Merge branch 'bpf-add-kmem_cache-iterator-and-kfunc'")
+> >
+> > for today.
+> 
+> Thanks for flagging.
+> Fixed and force pushed.
+
+Oops, thanks for fixing this.  The virt_addr_valid() was confusing
+whether it takes unsigned long or a pointer.  It seems each arch has
+different expectation.
+
+Thanks,
+Namhyung
+
 
