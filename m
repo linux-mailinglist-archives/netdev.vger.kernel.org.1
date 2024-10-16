@@ -1,78 +1,117 @@
-Return-Path: <netdev+bounces-135938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-135939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39A9E99FD5D
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:49:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7185399FD61
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 02:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB4C42865AC
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:49:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16BA31F25A7F
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 00:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B71A926;
-	Wed, 16 Oct 2024 00:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89563DDC7;
+	Wed, 16 Oct 2024 00:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwjDwLci"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1wBhvVF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08BB21E3C8
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 00:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1037A4C98;
+	Wed, 16 Oct 2024 00:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729039767; cv=none; b=YtSSRwvuqGvAwVl4YbKghSu641wnx4x5znetGtFfm/Cvlr1jb03m/qncnCxYq+bdEwMbRGmLUYGo0Osj6ynnw+y0wx4mqEtNwpilUq4NbxDCb6c26Yy3K2G8VfSTFk6WfF5WyRITVRkT/Z4prAONAbg9h3IDYZV6p7OKen0UCag=
+	t=1729039819; cv=none; b=W7y+iwAh0RcdzQSAn+jDLftbdFS//8jgDwU3Kju53ZzuAvqkh1aD/178EGaKGCmXPnfYFkqdcNBBQiBzTj/SJ7+4eo46j2mjfAFjJCYV11gAEhsL7bjgWyGpOa3BnlDCxlMBDxSvchNnivo2rx1NArkTF7yIjpHuPQVuBYRp6WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729039767; c=relaxed/simple;
-	bh=qNenrMhb0a9zh0xZIMofaeV1B9E5VQmkx8lfgNnIoow=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uzJuKoU/YjI3yp4qIjNn6kmiT3tptKa5iO0pah196paPQO1RuuYo8QIAv3SDGBx8oeF4oVJjbIP1rSww0+UlkSNzJ846Zhj8wwGa/o68cw2jqPIilREeezDMU2Po8HbuGfbcIoqtJumNa6u+RwqSKiBMy7ne3o4Jj45VvHRNVPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwjDwLci; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AFA1C4CEC6;
-	Wed, 16 Oct 2024 00:49:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729039765;
-	bh=qNenrMhb0a9zh0xZIMofaeV1B9E5VQmkx8lfgNnIoow=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XwjDwLciPlybKOtlas1HC+lBwxD9LbRFWbVJxu+DA7cGBMh7EKyCGKztLPHWKG2T0
-	 tJBf//Ag6RmbSbAJ8mKj2QiTj7A0YoyvHe6N/vVACkI85d2KxptUaexhG0882lKDA/
-	 gT0d4yzSrx7S0trbd7uDWg/MHXKsNkgkR1jEDYot2VPYAokIqNa38gM/6uy5P4zA3a
-	 bF5JtfOH6wsrgVhYLhhEBrxuhYufP6eXOj4OrmPd6zh0EN7J/SxVBY62XiwTOvX0Ky
-	 L0p7rw9KCXn3LWnMpXgh8Xw+EvTA9iqFr2gx+VMz0OeJbzsJX2b2u17iP5DVIz/XS4
-	 V8UE4PO40hUmA==
-Date: Tue, 15 Oct 2024 17:49:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Peter Rashleigh <peter@rashleigh.ca>
-Cc: andrew@lunn.ch, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Fix error when setting port
- policy on mv88e6393x
-Message-ID: <20241015174924.21725f5a@kernel.org>
-In-Reply-To: <CAOai=UuBxxfdu8HsnZi3CmWzZR=zBc_v0A624uTwfKUDRkrwiQ@mail.gmail.com>
-References: <CAOai=UuBxxfdu8HsnZi3CmWzZR=zBc_v0A624uTwfKUDRkrwiQ@mail.gmail.com>
+	s=arc-20240116; t=1729039819; c=relaxed/simple;
+	bh=O3NNg/PzOG51Ln5PrCGURwmsxk/4+4xtr1GKlqdQbbU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ra+1qjbFnHG23Wm7ULaMC+nlt+jCvK84ff/lWiwtITupN0TgzPRAiO50mmdcCOPyUucORDXwqqJjooNRXeJfMG433WR6bthS6YMBdL/j6njyQfirA0IRZ6M6HedAGYB+wjtIk0elC0cgjaOJSdu8vZv8eeZkLacmDcBXrYwFF94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1wBhvVF; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3a39f73a2c7so22903435ab.0;
+        Tue, 15 Oct 2024 17:50:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729039815; x=1729644615; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9eCEBFAX2TPTuZalR/ShAGJfx+bHE9c+qeKvlCzy+OY=;
+        b=Q1wBhvVFW3GLMExwT4JuksZKaIkR26wD+zvZfh50MgEClP2ae8R78TAMUqM03SmD36
+         s+56hyWdFrctUstlRAhUVGckv2yKMCcKhDoaer/HD18usx8WydtV7fzovRPq5ZOX4UhE
+         UiAx7pE609ng7f6MCFxaee0rKhqgf8ajjmz3aisAdAoolhs+pOsc5pM2uiZek/FN2zdP
+         HCg8+GAqVdl9ayXWiiW3gpOJr4I1a+H4FkgGxTj8b3IX/am3fI/qlU+NT9cRe4uBTaAA
+         /qzVlPKvoCD1kPpizEITBrhQFZ/+g+A9AxoxZSgZllwhvu4SMiQKqEoFlsbqsvuUlLtU
+         T9PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729039815; x=1729644615;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9eCEBFAX2TPTuZalR/ShAGJfx+bHE9c+qeKvlCzy+OY=;
+        b=VX3c2L5wh5v805UBVJxI6tkKWjpRnLkVjDFMMMX7Q4QoDddPbeJCZOblMo3wmimLMc
+         rd9361IhgpnkdzXY+27xIsAZlOi2qLIyP8plO9tIjVQ52pDep2DOXmohWyxgpy4IKqXS
+         WzLQI/BJ6T9NMq5s6lQXi25tS3WRLxMrS0GZDi8eiOhMDK6KujRXrdf2XmMJmd5/3K9m
+         2epqil/d/x5fdBcDqh+MviPMjxlHxOqESfyg4K3C8SP49EIL1KKghzWZPlanAdqEUK19
+         +8gvpQBXcDdr0mgxvRMJ70GzSttOlmv4VckCGGCBqlGghtrUCAPE30RcDMfOsMjEDNyx
+         e2Tg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPFSeL0ZZaCmDLrQ9xMZGSOkYHBl4QKeQX5L6D0dmE8QoJKWmBi3chLIm6WDCoryDjr8x/stAq@vger.kernel.org, AJvYcCVxj4G3A0MPu4sSNH5qxZZggy9brd+M+6CMC2kj3bhap2qqHDW9kbs6oF9lKt6vqCvf84M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwQT72zqgoaTxo9AfCTDC2BfJ7wISPX82l45q5ghFg9KO0CZSv
+	HN5hy37lSJPBponJVQBTrT3Wx1leSRxulosWt5As0aAFv/F7jELZTwkBm4COwheeyK2Lp7odGXv
+	+OjISeDM5a83+CD/RMOiQk8YdZYE=
+X-Google-Smtp-Source: AGHT+IHujDvH3avimFT6nNSasbCYaFKyJ5N8Gl6iOdtBE0j63lGo27frpflYVqywVH4vRkyazDiAOO5zqQFr/gSFfUE=
+X-Received: by 2002:a05:6e02:168e:b0:3a0:451b:ade3 with SMTP id
+ e9e14a558f8ab-3a3b5f6b26bmr151370705ab.10.1729039815366; Tue, 15 Oct 2024
+ 17:50:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-3-kerneljasonxing@gmail.com> <93fe5cf0-1e22-4036-a6da-b39e0046e16c@linux.dev>
+In-Reply-To: <93fe5cf0-1e22-4036-a6da-b39e0046e16c@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 16 Oct 2024 08:49:38 +0800
+Message-ID: <CAL+tcoDe7+wMk-LD-m2MLOzMcN8vQdVoL2s03fL5X5QJjOLo=g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 02/12] net-timestamp: open gate for bpf_setsockopt
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 14 Oct 2024 14:25:44 -0700 Peter Rashleigh wrote:
-> mv88e6393x_port_set_policy doesn't correctly shift the ptr value when
-> converting the policy format between the old and new styles, so the
-> target register ends up with the ptr being written over the data bits.
-> 
-> Shift the pointer to align with the format expected by
-> mv88e6393x_port_policy_write().
-> 
-> Fixes: 6584b26020fc ("net: dsa: mv88e6xxx: implement .port_set_policy
-> for Amethyst")
-> Signed-off-by: Peter Rashleigh <peter@rashleigh.ca>
+On Wed, Oct 16, 2024 at 7:54=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 10/11/24 9:06 PM, Jason Xing wrote:
+> > +static int bpf_sock_set_timestamping(struct sock *sk,
+> > +                                  struct so_timestamping *timestamping=
+)
+> > +{
+> > +     u32 flags =3D timestamping->flags;
+> > +
+> > +     if (flags & ~SOF_TIMESTAMPING_MASK)
+> > +             return -EINVAL;
+> > +
+> > +     if (!(flags & (SOF_TIMESTAMPING_TX_SCHED | SOF_TIMESTAMPING_TX_SO=
+FTWARE |
+> > +           SOF_TIMESTAMPING_TX_ACK)))
+>
+> hmm... Does it mean at least one of the bit must be set and cannot be com=
+pletely
+> cleared once it has been set before?
 
-the patch has been line-wrapped and whitespace corrupted by either your
-email client or server. Please resend.
--- 
-pw-bot: cr
+Yes. Because in the current BPF extension feature I don't support all
+the original SO_TIMESTAMPING flags (SOF_TIMESTAMPING_*) . When it
+comes to clearing flags, I cannot find a proper time/chance to clear
+them. That's the reason why I don't implement it.
 
