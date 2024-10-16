@@ -1,174 +1,130 @@
-Return-Path: <netdev+bounces-136196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B84B59A0F30
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:00:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D049A0F5B
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 18:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0E5A1C22CA2
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:00:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DBF21C22C31
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C88C20F5CE;
-	Wed, 16 Oct 2024 15:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Og2f0W1q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A3A20F5C6;
+	Wed, 16 Oct 2024 16:09:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D085C1384B3;
-	Wed, 16 Oct 2024 15:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8418720F5B0;
+	Wed, 16 Oct 2024 16:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729094396; cv=none; b=Ole9FQ3IqpT+m2RC5xR7Ym7MdshDCWDoG7ufjhpBk9NsQ1UdbFEoAKxhqGVkXsyqDENMd32ws0PR0Zd2/PZ2usOJu3t4bTiLpoTwGTk864AZs/caPWjfWXcaVOWuiUkSDTGQB//5qDxmi+Ce7kkbM7XiJavLLMv+piLYWkwdnhg=
+	t=1729094974; cv=none; b=m7LEjik0YK6vJVTWLC7gdggjTe41G3PARlzjlE5nZBp5Ek8SXR1QSQktvb9JvjpKYCFN74piIPcymOy7RmJ09MiygUmZ+lMCach7AF9bbodFZXl+6N63TW7+byXzgtL3La4QYkwmtA5uaeui58SlOx0sbT/lIizQlEsnYVOVfzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729094396; c=relaxed/simple;
-	bh=t9Pj6Lytp3o2TRKmx2LFg2KV8jy16bK0bFqodVcoKE0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTVbJ4+zwGG/8lijbgp0pAqy4KVWIbm9NTno3xNlLAZhKgCq9+PBVuWi9pTkSy1IOZoVBzH6K28HRRORYwIQsVdKPSdK5sGAthl5CHt13FU8dqZ5GDNSuJcsXm7Xzh+VYyyQdyPQfiFBba3ok47fECJomJPKQSdQN6Vbfhdfty4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Og2f0W1q; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1729094974; c=relaxed/simple;
+	bh=vSsZqDJWpQ20mq3tHE0Fb47pANLlhNT0u6UPTtuQgeg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DvD9Zz9FUYurKlthPzGGAOJT3xcymrWLyi8otLmb+zAotPMvX6v7CXvzb4MRqVc5LqLVKFQ/Cf2j492ug0Y3bym2NOkTV3J4BxYPk3E91AvG/DjMZqOrh+Z/HrAcSQ3sRxqGGNaAk8l6sMId/eJ3KGeLZGUd3/+BDaAtQvdtN+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a99eb8b607aso563473066b.2;
-        Wed, 16 Oct 2024 08:59:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729094393; x=1729699193; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mmj3m26uAVevKrLVIw7nRomm2+bj6OhZczGFx03aqgs=;
-        b=Og2f0W1qs4TMkFNEKbLXV+DI3JiGza0svZ0DjYQ4KpUHyS1yN6HAsCPdYGolglGfvx
-         ooMjL3fcFOuphi0EPF69OC20uY2J1YcNtWokK7KtR7i7Ngrd9QJgtSGdQrS442ozLI8r
-         u2BVWG87W0vaeSR86xuuw8Vr0XcjvHy3bXssKOYWQOFbttP0r6G/Kx6yaqypJDbztjsM
-         sPoePytuA3nIW86CnPId4vv+bmUWcV4hSqCiUu6LK9lbho6NWAGdHM0SGSxnPZbjGCN2
-         SRcYix2veq2slmxmy0trd85wx8IKUyVbGVJNbkn7Mx/E6n7VeLIE5aLbZ+GokWXd8FSX
-         FWHw==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a99ebb390a5so211609766b.1;
+        Wed, 16 Oct 2024 09:09:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729094393; x=1729699193;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mmj3m26uAVevKrLVIw7nRomm2+bj6OhZczGFx03aqgs=;
-        b=lgTtCxo9CLux3mTUsnlHe7vE1tLHN3zNmOSJ2xrNYa5G5HtyNXiAByAxXbajsalW1Q
-         u6qU6VF+NILUaSyrPK7AVwOrk2cXaxZRFNCiSkWufavHOlhdzEk6N78CsMK2oC3R4kyL
-         vn9qqNJUzRRNsj/U4P+XgoAcG62IrYDg4+VnbvoAnLpxloQyMP6+vHZrhMCjYRSBkD4y
-         TI+CJfceDo84RIc0lgwA+EbO2ZIq/1RatQWhOeMkD+QG2RjIPZcRKoch8faGB6LUSO+L
-         VxFtDa3rOpi3p00gkHrFiy58KJBoxzUnBW966LCoEmLN9aprYuNzdjNkyBksLRqe0i34
-         hEcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjz7xJo/QmFechWVoTMRi+k+OvRgQuwG8szzOQXO98oosIz/fMDrZxu3YZ0Xwccvg7/72b/gEb2qUcL91XeOb8@vger.kernel.org, AJvYcCXX/E2TQM6JVUD6iKPC9vRRPw6PTfaQBKcnyi+UCFtvK7xb28ZGHptY75ctBU2WX0kIPBZ08/eIBIAZ7rg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzplMfs6WIj5r6bsao3YGiVUKP6UM13/Q7UHYhPWQPXFeDX3Ddk
-	O+i5OnZ0mEuHtZCfxb1doFU/sM2wl6y0k2M6G+y53g49/P1ecUyt
-X-Google-Smtp-Source: AGHT+IEXjAEvk5CdHrK8htzjtcfYfdp/XWOG5TaTbOL8TmX4lMucUTmZkpPTZn1+9nd/fPfsH42SKg==
-X-Received: by 2002:a17:907:868d:b0:a99:4aa7:4d77 with SMTP id a640c23a62f3a-a9a34c83718mr303503266b.3.1729094392957;
-        Wed, 16 Oct 2024 08:59:52 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2989797fsm196863666b.196.2024.10.16.08.59.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 08:59:52 -0700 (PDT)
-Message-ID: <d7d48102-4c52-4161-a21c-4d5b42539fbb@gmail.com>
-Date: Wed, 16 Oct 2024 17:59:50 +0200
+        d=1e100.net; s=20230601; t=1729094971; x=1729699771;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OmTlR+mvqJAz1EmxrOCGVHDAWntliLwxpGc0qQgNhZ0=;
+        b=BKBgrMchnzIJR1QsHT5xqQm5vRmEKHqjlmjUdJUAWlRG5ENXRThrVZW1d0Y6H4qntH
+         OvsWH8Wm53XzS0auV83d/133kAl+1zSeynUW7KMZwNoPD6Ufa94pFwzSAd+tTIhMefUn
+         2YNCcnhVyPZhZcLqPkSxKkE45ISSnMZLEMRX5ozkM00rARajENkZLhCnFOZIoESDepCa
+         G3WHTecQFcOKbDnbx3lGpWqr+pZeC1t1bBuQCJEnRrWdK1UN6//U9Vg8zyfieGBuAMb2
+         wcNu1YD/0NjgMUQRAaMJ8R8fS/JPwXKDs7wroW2kuwfI0wHptCT/IXAgpMl1llKAAXrQ
+         pyrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUA/itMSQK3YLZHA7B/A1ouFG8upDJW7BZ8w7UgqSYitzHQazbyFJpnGOo6/gydHc0KMJRlKQZIN7vA@vger.kernel.org, AJvYcCWFYJUkMuw/gW3mlm7DpCw2QuKCSXsaD1X8et8AZZsssiVSSUhUZbNPn23miiv0DjKvZ5uyBFPgZX8COUvn@vger.kernel.org, AJvYcCWuURtGMF2+NNwKLujAi/9rJHJrKzfR1HehZ3SobMY9OnXmvDMg2rRI7JL7XKcrPybuFwgB26eXVf0l@vger.kernel.org, AJvYcCXUmbaom7v6kqmvhAyq3etLSTokpsNcty1kj8M4nZWAwpRhQwrtrgm6+TSNgaEW8suYbKoJxo53@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyrd3LFHHoElTHUxuRk2+s9MjvUnJaB5lSpnGfS1Vf9KkjxGX53
+	9qB2CqgKYq/vBK2BG1Q8iLI/sSF1x1XAYOE4ohYGzWFhmNG0gx07v3qBHPBQ5slDPkeFaF8EI4n
+	8+VByvHfhMGZLWzqXMRHYtfPUH40=
+X-Google-Smtp-Source: AGHT+IE59HHi6RfvNl0jd60GRp+Q4oTDVjpD1WxXKT5MU1/v8dV6ZpMG9trRhhhjywvzxGohJIOt3dIwrEjC1SoM+b8=
+X-Received: by 2002:a17:906:7308:b0:a9a:3df1:436a with SMTP id
+ a640c23a62f3a-a9a4c2f3ce7mr14608566b.8.1729094970681; Wed, 16 Oct 2024
+ 09:09:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
- improvements
-To: Felix Fietkau <nbd@nbd.name>, Nikolay Aleksandrov <razor@blackwall.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
- <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
- <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
- <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
- <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241015-topic-mcan-wakeup-source-v6-12-v4-0-fdac1d1e7aa6@baylibre.com>
+ <20241015-topic-mcan-wakeup-source-v6-12-v4-5-fdac1d1e7aa6@baylibre.com>
+ <CAMZ6Rq+NA9G=iON56vQcr5dxEMqn-FFzT5rdxc6XrtW+4ww1XQ@mail.gmail.com> <xiptvia2w5ocs7td2zgn3pueok2nzdslf7og4ekg3o6hdxus7r@quz2v54zmhyz>
+In-Reply-To: <xiptvia2w5ocs7td2zgn3pueok2nzdslf7og4ekg3o6hdxus7r@quz2v54zmhyz>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Thu, 17 Oct 2024 01:09:19 +0900
+Message-ID: <CAMZ6Rq+sWB_SV0gt6K8n0cw+PjoN_fifCUJXTxJ7Hp8FEAt7-w@mail.gmail.com>
+Subject: Re: [PATCH v4 5/9] can: m_can: Support pinctrl wakeup state
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, Vishal Mahaveer <vishalm@ti.com>, 
+	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+
+On Thu. 17 Oct. 2024 at 00:42, Markus Schneider-Pargmann
+<msp@baylibre.com> wrote:
+> Hi Vincent,
+>
+> On Wed, Oct 16, 2024 at 11:26:22PM GMT, Vincent MAILHOL wrote:
+> > Hi Markus,
+> >
+> > This is a nice improvement from the v3.
+> >
+> > On Wed. 16 Oct. 2024 at 04:19, Markus Schneider-Pargmann
+> > <msp@baylibre.com> wrote:
+> > > am62 requires a wakeup flag being set in pinctrl when mcan pins acts as
+> > > a wakeup source. Add support to select the wakeup state if WOL is
+> > > enabled.
+> > >
+> > > Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+
+(...)
+
+> > > +       class_dev->pinctrl_state_default =
+> > > +               pinctrl_lookup_state(class_dev->pinctrl, "default");
+> > > +       if (IS_ERR(class_dev->pinctrl_state_default)) {
+> > > +               ret = PTR_ERR(class_dev->pinctrl_state_default);
+> >
+> > Sorry if this is a silly question, but why aren't you doing the:
+> >
+> >                   class_dev->pinctrl_state_default = NULL;
+> >
+> >                   if (ret == -ENODEV)
+> >                           return 0;
+> >
+> > thing the same way you are doing it for the pinctrl and the
+> > pinctrl_state_wakeup?
+>
+> There are no silly questions.
+> The idea is that if the wakeup pinctrl state was already found, then the
+> default pinctrl state is required and not optional, so no check for
+> -ENODEV. Otherwise it doesn't make sense with the current binding or the
+> implementation of the driver.
+
+ACK. With this:
+
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+
+This concludes my review of your series. I am skipping the dt-bindings
+and the dts parts because I am not knowledgeable in those domains.
 
 
-
-On 10/15/24 9:44 PM, Felix Fietkau wrote:
-> On 15.10.24 15:32, Eric Woudstra wrote:
->>
->>
->> On 10/15/24 2:16 PM, Felix Fietkau wrote:
->>> Hi Eric,
->>>
->>> On 14.10.24 20:29, Eric Woudstra wrote:
->>>> It would be no problem for me to change the subject and body, if you
->>>> think that is better.
->>>>
->>>> The thing is, these patches actually make it possible to set up a fully
->>>> functional software fastpath between bridged interfaces. Only after the
->>>> software fastpath is set up and functional, it can be offloaded, which
->>>> happens to by my personal motivation to write this patch-set.
->>>>
->>>> If the offload flag is set in the flowtable, the software fastpath will
->>>> be offloaded. But in this patch-set, there is nothing that changes
->>>> anything there, the existing code is used unchanged.
->>>
->>> FWIW, a while back, I also wanted to add a software fast path for the
->>> bridge layer to the kernel, also with the intention of using it for
->>> hardware offload. It wasn't accepted back then, because (if I remember
->>> correctly) people didn't want any extra complexity in the network stack
->>> to make the bridge layer faster.
->>
->> Hello Felix,
->>
->> I think this patch-set is a clear showcase it is not very complex at
->> all. The core of making it possible only consists a few patches. Half of
->> this patch-set involves improvements that also apply to the
->> forward-fastpath.
-> 
-> It's definitely an interesting approach. How does it deal with devices
-> roaming from one bridge port to another? I couldn't find that in the code.
-
-It is handled in the same manner when dealing with the forward-fastpath,
-with the aid of conntrack. If roaming is problematic, then it would be
-for both the forward-fastpath and the bridge-fastpath. I have a topic on
-the banana-pi forum about this patch-set, so I think long discussions
-about additional details we could have there, keeping the mailing list
-more clean.
-
->>> Because of that, I created this piece of software:
->>> https://github.com/nbd168/bridger
->>>
->>> It uses an eBPF TC classifier for discovering flows and handling the
->>> software fast path, and also creates hardware offload rules for flows.
->>> With that, hardware offloading for bridged LAN->WLAN flows is fully
->>> supported on MediaTek hardware with upstream kernels.
->>>
->>> - Felix
->>
->> Thanks, I've seen that already. Nice piece of software, but I'm not
->> running openwrt. I would like to see a solution implemented in the
->> kernel, so any operating system can use it.
-> 
-> Makes sense. By the way, bridger can easily be built for non-OpenWrt
-> systems too. The only library that's actually needed is libubox - that
-> one is small and can be linked in statically. ubus support is fully
-> optional and not necessary for standard cases.
-> 
-> - Felix
+Yours sincerely,
+Vincent Mailhol
 
