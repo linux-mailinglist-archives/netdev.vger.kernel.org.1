@@ -1,117 +1,103 @@
-Return-Path: <netdev+bounces-136127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFCB69A06BF
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 12:12:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6064A9A07EA
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 12:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A311C208F5
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:12:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 002C3B2344B
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802AA206979;
-	Wed, 16 Oct 2024 10:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5442071F7;
+	Wed, 16 Oct 2024 10:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Tg5Ifmn6"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ABC20694A;
-	Wed, 16 Oct 2024 10:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3485F2076B1
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 10:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729073512; cv=none; b=OwZZjmiN9fWq4AmW34LStBWxTgnyel/iY8jdA9N0eOyM8lUkZ+ccVz7ZKHf+0cCYm6M/4Vyt54EtHWk3tQdO17HAKBrsGEJQoiX5FhdL44Gq+do9kMMhwAjIghcuYRpIxlDA5tf7lhCwY6HtP5bqaiR0nytnnuvR16CdqVQNHPs=
+	t=1729076282; cv=none; b=W98G/3GIQe+IJd1hEPl+EfAkycY8JQc2sVbLmuO6SDqieUbDYH0NohOdMblhdGZyhUzXaKnjcHeaCMb6E+3Zt9lB22wn29VYd17fPMZdQJx6hqjNKz/2/Oan38BAXRIhp33Di5JHGuymOITCe7GrMwS1ahWLQLtd9BuLjiGJxU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729073512; c=relaxed/simple;
-	bh=XgjoL1JGKiRYyCSWTxkTF2OWBUtB9joLuVL77iOB5jk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZJncaPafDdNlFN205YEqH0uXT7gPyg5vA7nMqaRwG3a2yHxji5xu8srZTs2XUxRPFQaJWVReV2WkIQLFkQU5dRv2SXLlqydnZiXK/lzBOF05jkk3akwRSNCZvBhmsL0gkU2EDAEkKXr3whlo8FyodaZNHd+9k42+019+Udg+8yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 37C6A201F78;
-	Wed, 16 Oct 2024 12:11:49 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 27BD7201F6F;
-	Wed, 16 Oct 2024 12:11:49 +0200 (CEST)
-Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 53259203E0;
-	Wed, 16 Oct 2024 12:11:49 +0200 (CEST)
-Date: Wed, 16 Oct 2024 12:11:49 +0200
-From: Jan Petrous <jan.petrous@oss.nxp.com>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v3 14/16] net: stmmac: dwmac-s32: add basic NXP S32G/S32R
- glue driver
-Message-ID: <Zw+RZQDt4lopPqFW@lsv051416.swis.nl-cdc01.nxp.com>
-References: <20241013-upstream_s32cc_gmac-v3-0-d84b5a67b930@oss.nxp.com>
- <20241013-upstream_s32cc_gmac-v3-14-d84b5a67b930@oss.nxp.com>
- <urxfash5qmvahjubhk5knrt53j2tw7hje35qyst3x3ltg4mpgo@dw73m73o36b3>
+	s=arc-20240116; t=1729076282; c=relaxed/simple;
+	bh=IMeAA6Z6OmV3xkxhs8q0OhNEiDxOqMCJjRd91kjtNYc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oWo+oOxd2Obztg2vbPxx11Fzctd2MmY37CZSv9x54wkdAxcqr31i0RVlPJuFbInttPX7iEWGhFHiOYa8PJTd43FhGitm5reNgS2dzv76j7sulyC+oWn+qx5bn5yKzsPweGHfZ3Vz8Jtr7rXi6wUMZoFedOHEfX7q3d3rSQky/24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Tg5Ifmn6; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1729076280; x=1760612280;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IMeAA6Z6OmV3xkxhs8q0OhNEiDxOqMCJjRd91kjtNYc=;
+  b=Tg5Ifmn6rhfPymEozv9I05C81pD0Q/XYRowzaGqfSMXqDU3+LbnGrxZb
+   zBngHxrey7WwLpAJD8tu3nUawlQxrTuEwwO8Js3LPPjBshrdIFgKkXhn/
+   htCDIthgXSArgDoNry/ZcsSDPI9enOpek7EfQRz+PKM65fBuVH3vyI20l
+   Zuy6cBuIP2OVbnVoqtg/IkeWuOyrIt6LtkvN2SFbNk4749jiq/ylYk/VT
+   IZ4QRbjXF1DsRkW5OFnd+z7b3ybp7eJBZet3/I9o5S3SlO67jwGQdfcTS
+   hz6U/dan5ArrYOGp71RvVvx4DqEwDnR8bdof9ApZj13TjraYEf6ZpkZRG
+   g==;
+X-CSE-ConnectionGUID: O4Pn7NtkT3uWy5mnoknAqA==
+X-CSE-MsgGUID: WeP10gc8QXSyZwp+e9FUsQ==
+X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
+   d="scan'208";a="32887428"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Oct 2024 03:57:53 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 16 Oct 2024 03:56:52 -0700
+Received: from nisar-OptiPlex-9020.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 16 Oct 2024 03:56:49 -0700
+From: Mohan Prasad J <mohan.prasad@microchip.com>
+To: <f.pfitzner@pengutronix.de>, <mkubecek@suse.cz>, <netdev@vger.kernel.org>,
+	<kory.maincent@bootlin.com>, <davem@davemloft.net>
+CC: <kuba@kernel.org>, <andrew@lunn.ch>, <Anbazhagan.Sakthivel@microchip.com>,
+	<Nisar.Sayed@microchip.com>, <mohan.prasad@microchip.com>
+Subject: [PATCH ethtool] netlink: settings: Fix for wrong auto-negotiation state
+Date: Wed, 16 Oct 2024 09:28:47 +0530
+Message-ID: <20241016035848.292603-1-mohan.prasad@microchip.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <urxfash5qmvahjubhk5knrt53j2tw7hje35qyst3x3ltg4mpgo@dw73m73o36b3>
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain
 
-On Wed, Oct 16, 2024 at 11:37:27AM +0200, Uwe Kleine-König wrote:
-> Hello,
-> 
-> On Sun, Oct 13, 2024 at 11:27:49PM +0200, Jan Petrous via B4 Relay wrote:
-> > +static struct platform_driver s32_dwmac_driver = {
-> > +	.probe		= s32_dwmac_probe,
-> > +	.remove_new	= stmmac_pltfr_remove,
-> > +	.driver		= {
-> > +			    .name		= "s32-dwmac",
-> > +			    .pm		= &stmmac_pltfr_pm_ops,
-> > +			    .of_match_table = s32_dwmac_match,
-> > +	},
-> > +};
-> > +module_platform_driver(s32_dwmac_driver);
-> 
-> After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
-> return void") .remove() is (again) the right callback to implement for
-> platform drivers. Please just drop "_new".
-> 
+Auto-negotiation state in json format showed the
+opposite state due to wrong comparison.
+Fix for returning the correct auto-neg state implemented.
 
-Thank you, I was not aware of it. Will be included in v4.
+Signed-off-by: Mohan Prasad J <mohan.prasad@microchip.com>
+---
+ netlink/settings.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-/Jan
+diff --git a/netlink/settings.c b/netlink/settings.c
+index dbfb520..a454bfb 100644
+--- a/netlink/settings.c
++++ b/netlink/settings.c
+@@ -546,7 +546,7 @@ int linkmodes_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+ 						(autoneg == AUTONEG_DISABLE) ? "off" : "on");
+ 		else
+ 			print_bool(PRINT_JSON, "auto-negotiation", NULL,
+-				   autoneg == AUTONEG_DISABLE);
++				   (autoneg == AUTONEG_DISABLE) ? false : true);
+ 	}
+ 	if (tb[ETHTOOL_A_LINKMODES_MASTER_SLAVE_CFG]) {
+ 		uint8_t val;
+-- 
+2.43.0
 
 
