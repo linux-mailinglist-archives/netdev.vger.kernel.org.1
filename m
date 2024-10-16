@@ -1,163 +1,128 @@
-Return-Path: <netdev+bounces-136032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47079A0066
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:06:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A190B9A008F
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 130381C230E4
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:06:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EA8CB255F2
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C2C187855;
-	Wed, 16 Oct 2024 05:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74315188013;
+	Wed, 16 Oct 2024 05:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KNRC5j4E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0722E14EC47;
-	Wed, 16 Oct 2024 05:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C921918B481;
+	Wed, 16 Oct 2024 05:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729055173; cv=none; b=kX7fzd4DHzxD8c57dPW1MTx3H1/ZYIYecLxDJfjwfzEjGE3QNOt9hUAdQ2e0M65MD0Zl+GuXqla0owafsMchIUCEvDUgk7MsNXq3ZZiYER0J00wbq2Iyf6Oh7JQToW5h3UfoQBmXX4zsCNwEmj6FdFfZCqpMGbH2AlIBigCgsI4=
+	t=1729056045; cv=none; b=DZ/LiCyZtk/Wcb8Ub4HL9US6DvU761Ad6EZmM+YURZqwwILemM6aPYkYMyf7JqyA/yMa1RcYlwMDGvtj2aW1q31shokqJw4QBzZSV9c9dBFn7X4Pno9V9g1j0/WDrCaHRl2fPZSOtYnNkJ6VZedylMP4M4gH/K5OwbNzKxqZKgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729055173; c=relaxed/simple;
-	bh=HKQvGwPYr1inwgwgCF3hWMFzy3rV5u7emolGbmj55I4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f4QbawLEtgsmFSl1xA7jmFZmV27nuH/Olkg1x8C2eHS62unGdFmu8SNpCnzOXg9efproxV4+fJjYFr5sHhcsO+YuNQHzgXR31QMczwerTK95k2hQlQPwV82i8fLzZuwbDHDxx45oRoj5+9ly3ZThmIh78vLlAx+iB66EkgRpMic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a99cc265e0aso654479866b.3;
-        Tue, 15 Oct 2024 22:06:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729055169; x=1729659969;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aJpmoZDHNXOCQ0hPtAG85Btn1S/XrnkL2QxgMJLjgU0=;
-        b=a/oMt7MoIsK8G3ahbTGmmbP+W15lj58WpYx63xhSFO6rVykKE5Ak0z7vRTAgQUi49/
-         6evokxNjleyXKfB+qKpsa0wJKXDUdZApLpgfXHqO7ZOM8eIP/b2+BRDhdKdVHONW0Ayz
-         k+hEirEqSZv7Tmaa78VyauZMhdgRKMqZI9ChB5NQlls2cJSMHc1Fc67Sz7gbSMAR6bll
-         iglcA++MMO3kDXWB3totRt8uWRR1aNFGM46ui1M/UusITxdaaNltSAW/Ijk09Biwcie4
-         uDw0dNIEAJDPDb+axoBQEtI3mIS1zLRbk5bspT8zCZAiCVxTQR0fzCjKRaOl/47MBi/F
-         lXKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYcVSDbtsTRM2i69ZCJCQbOp6xoBTuS6l5GhyICgEn5LQBa+tAbOeh4YBJXkYvkAAqCdspnXAx@vger.kernel.org, AJvYcCUy93uismFbHVCmOMjvcQ0vr14ysQYfYJV6G/ZWrzk2kiuzg5S5g0bqt53M8s6kZ6Q+P9q7FRFTCIEU@vger.kernel.org, AJvYcCVo+BcqV9fQKO99MYBd/2pQDw6vRFFxOsrmI1sFhd4jXT4ee2whkd0NuoRUx9S6xkY+MAkZ91rexZuQ@vger.kernel.org, AJvYcCX3te1Q2aIFoWCC0zUbysKa/drQRaFQarfvvriuaovIVjxgW+IJoZqbwivrQJfEY5MnGupYpGiRe5C+UDKn@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuG7sn1wE4eFY4TllGfc6EU8ohzBQq+twsjuojSM3YcCDVdDRs
-	h17BQoJYp3w7xXfT/PtUYg56hLeJy8Vl6ybI0gTrhPNOmY8xkAZnB77Q/+0F2ufJSFZvJz7wjPi
-	dzeTHNxMaUjUwUBxvum+RdZto7oU=
-X-Google-Smtp-Source: AGHT+IH74YJJx49nsFhkFyT1RiTJLRloxAcb38iBw6/nz//HY/ZNyBiPGvMCwwwDAg2enWh0s8igaco8Z4E7VnmPpHo=
-X-Received: by 2002:a17:907:e216:b0:a99:7c14:9197 with SMTP id
- a640c23a62f3a-a9a34e9b0a6mr190098066b.64.1729055169080; Tue, 15 Oct 2024
- 22:06:09 -0700 (PDT)
+	s=arc-20240116; t=1729056045; c=relaxed/simple;
+	bh=kY9s7ieYNFRf5vd6rWLrxX3RydNTXVEAmhHE6BU8hOw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ChuGa9mzkYEo4nBysalsNKeCKgcP9q4gZoWRSSPIQ97djRqMQxhYbobwB21HjDWzQ9X4705OyYqtTkJy5RQusYW0tGCeGf5AU7SR7uGEF5ZF9Es2LNSpJZzaSksNxebSvAZk10l2hRaHUC+HE0GXgnHZXntDutvODr/FhvUE3eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KNRC5j4E; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49G5FDnr012151;
+	Wed, 16 Oct 2024 05:20:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=93dRBASK2NX/nahhuRQA/0Vp278JrC
+	oL/iXOrYitZYw=; b=KNRC5j4Eux0ksx2ivs1VBB6Qq4jGgynlVzU50891JkkKfr
+	5e/KfQyhmFSJIxIM0JnPK7UAwGYnDnVw6jAiDSqiWzBRnQXbM08Z3Mg6QSMfm8hx
+	DjWWyopaFqI6AozMJ65yAbaoqJLivwLeZA1uAEKrO+WyMpVSFh+IT7FcqtdVDiHS
+	hOLobSnKfR4VT61S2zRWjsFcEZNRIf9lmfOiZZtqKvUoh/CueXSs4t1/8XrVtgku
+	XOyuZIw7wReaelRvbRkd7bR4Er+IPxeN3SLh+KWTJCcwQqgDE4/PVxjZdaPJEJmF
+	Q5bVWHiebCSrsbtGH9enXIqx3q9N+FKQXJ8jme6Q==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42a762r0gt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 05:20:30 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49G5KT0R021873;
+	Wed, 16 Oct 2024 05:20:29 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42a762r0gq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 05:20:29 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49G407VL004988;
+	Wed, 16 Oct 2024 05:20:28 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4285nj76ed-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 16 Oct 2024 05:20:28 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49G5KRdx55116116
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 16 Oct 2024 05:20:27 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8063420043;
+	Wed, 16 Oct 2024 05:20:24 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 607D120040;
+	Wed, 16 Oct 2024 05:20:24 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 16 Oct 2024 05:20:24 +0000 (GMT)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, linux-s390@vger.kernel.org,
+        Yangbo Lu
+ <yangbo.lu@nxp.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
+In-Reply-To: <Zw81Nlx9OF-PveY0@hoboy.vegasvil.org> (Richard Cochran's message
+	of "Tue, 15 Oct 2024 20:38:30 -0700")
+References: <20241015084728.1833876-1-svens@linux.ibm.com>
+	<20241015084728.1833876-3-svens@linux.ibm.com>
+	<c9c1c660-9278-426c-9290-b9b0cb76dcaf@lunn.ch>
+	<Zw81Nlx9OF-PveY0@hoboy.vegasvil.org>
+Date: Wed, 16 Oct 2024 07:20:24 +0200
+Message-ID: <yt9dr08gfwtj.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240922145151.130999-1-hal.feng@starfivetech.com>
- <20240922145151.130999-4-hal.feng@starfivetech.com> <CAMZ6Rq+EM37Gvx8bLEwvhn+kUC9yGDiapwD0KX31-x-e-Rm3yQ@mail.gmail.com>
- <EAC60558E0B6E4BB+e5384c3c-ba45-48f5-a86f-a74e84309a14@linux.starfivetech.com>
-In-Reply-To: <EAC60558E0B6E4BB+e5384c3c-ba45-48f5-a86f-a74e84309a14@linux.starfivetech.com>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Wed, 16 Oct 2024 14:05:57 +0900
-Message-ID: <CAMZ6RqLvzvttbCMFbZiY9v=nGcH+O3EV91c+x7GxTbkKhdTcwg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] can: Add driver for CAST CAN Bus Controller
-To: Hal Feng <hal.feng@linux.starfivetech.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
-	William Qiu <william.qiu@starfivetech.com>, devicetree@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Hal Feng <hal.feng@starfivetech.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IKpiQpf83eHtSz42-ABl1IBGWSOMLfov
+X-Proofpoint-ORIG-GUID: Zhwun_uNYFZouXgHlJPaKdU871Evb0Rw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=409 clxscore=1011 bulkscore=0 spamscore=0 priorityscore=1501
+ phishscore=0 malwarescore=0 adultscore=0 mlxscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410160031
 
-On Tue. 15 Oct. 2024 at 18:33, Hal Feng <hal.feng@linux.starfivetech.com> wrote:
-> On 9/23/2024 11:41 AM, Vincent MAILHOL wrote:
-> > Hi Hal,
-> >
-> > A few more comments on top of what Andrew already wrote.
-> >
-> > On Mon. 23 Sep. 2024 at 00:09, Hal Feng <hal.feng@starfivetech.com> wrote:
-> >> From: William Qiu <william.qiu@starfivetech.com>
-> >>
-> >> Add driver for CAST CAN Bus Controller used on
-> >> StarFive JH7110 SoC.
-> >>
-> >> Signed-off-by: William Qiu <william.qiu@starfivetech.com>
-> >> Co-developed-by: Hal Feng <hal.feng@starfivetech.com>
-> >> Signed-off-by: Hal Feng <hal.feng@starfivetech.com>
-> >> ---
+Richard Cochran <richardcochran@gmail.com> writes:
 
-(...)
-
-> >> +       stats->rx_packets++;
-> >> +       netif_receive_skb(skb);
-> >> +
-> >> +       return 1;
-> >
-> > Why return 1 on success and 0 on failure? The convention in the kernel
-> > is that 0 means success. If you really want to keep 0 for failure, at
-> > least make this return boolean true or boolean false, but overall, try
-> > to follow the return conventions.
+> On Tue, Oct 15, 2024 at 02:43:28PM +0200, Andrew Lunn wrote:
+>>  * @name:      A short "friendly name" to identify the clock and to
+>>  *             help distinguish PHY based devices from MAC based ones.
+>>  *             The string is not meant to be a unique id.
+>> 
+>> If the name is not unique, you probably should not be using it for
+>> udev naming.
 >
-> The return value here represents the number of successfully received packets.
-> It is used in ccan_rx_poll() for counting the number of successfully
-> received packets.
-
-Ack. I guess this will become more clear after you implement the queue logic.
-
-(...)
-
-> >> +
-> >> +       if (priv->cantype == CAST_CAN_TYPE_CANFD) {
-> >> +               priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK | CAN_CTRLMODE_FD;
-> >> +               priv->can.data_bittiming_const = &ccan_data_bittiming_const_canfd;
-> >> +       } else {
-> >> +               priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK;
-> >> +       }
-> >
-> > Nitpick, consider doing this:
-> >
-> >   priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK;
-> >   if (priv->cantype == CAST_CAN_TYPE_CANFD) {
-> >           priv->can.ctrlmode_supported |= CAN_CTRLMODE_FD;
-> >           priv->can.data_bittiming_const = &ccan_data_bittiming_const_canfd;
-> >   }
+> +1
 >
-> OK.
->
-> >
-> > Also, does you hardware support dlc greater than 8 (c.f.
-> > CAN_CTRLMODE_CC_LEN8_DLC)?
->
-> The class CAN (CC) mode does not support, but the CAN FD mode supports.
+> Maybe the name is unique for s390, but it will not be in general.
 
-So, CAN_CTRLMODE_CC_LEN8_DLC is a Classical CAN feature. Strictly
-speaking, this does not exist in CAN FD. Do you mean that only the
-CAST_CAN_TYPE_CANFD supports sending Classical CAN frames with a DLC
-greater than 8?
-
-If none of the Classical CAN or CAN FD variants of your device is able
-to send Classical CAN frames with a DLC greater than 8, then this is
-just not supported by your device.
-
-Could you share the datasheet so that I can double check this?
-
-(...)
-
-> Sorry for the late reply. Thank you for your detailed review.
-
-No problem, take your time!
-
-
-Yours sincerely,
-Vincent Mailhol
+As already written to Greg, i will drop this Patch. The name is unique,
+i was just not aware that the clock_name attribute is present in sysfs.
 
