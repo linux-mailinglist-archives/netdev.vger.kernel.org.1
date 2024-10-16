@@ -1,298 +1,223 @@
-Return-Path: <netdev+bounces-136173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE0F9A0C8C
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:24:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63A2A9A0C90
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 16:26:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A0211F22A76
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:24:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DC451C21319
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 14:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B421209F25;
-	Wed, 16 Oct 2024 14:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Gp2v7ciE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A24A20C029;
+	Wed, 16 Oct 2024 14:26:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9434207A11
-	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 14:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8787920ADDA;
+	Wed, 16 Oct 2024 14:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729088647; cv=none; b=tjZ5sx/WfktmbpnyKVy0k+7U12CosUb/cwLPBm9+dZACisz5+G/SC8aE62DxgVX25sDY3aCGmuMcE4lrydUCk54U/NK3kIXkMNFg28TG2WRP0qs0wAjEARiLvpt+cZCspl8gom3XX6x0x12wnOvhID5QvlF4Gs+7NSvJIKs/5xY=
+	t=1729088795; cv=none; b=mZWxJchGAV6tUH6/udX83KlWn2FCDfFIctpN0F6IBBXza9RDBSHlb0EWr+DCOe1TtMWWzX5XeCw8TFXJc5C3uXWFS/WyNyuxBnpTBSu2xQLHy0d3BGjuz4z2PRtPW9a+h/9iTvrUJEx++TyGQ1nYjCgKY1OZFGIdbT6x0r/cCio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729088647; c=relaxed/simple;
-	bh=vPgCKlp/fkdCqoo25YhOZH+lCfLuAqTff6zAEe4hdhc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eMWmtVd1Rk5CC0Z2zM6dCb6SXafKrH27a+IRatHgbLau3PDA+Ft0ud+dlUQH6ZjFdqcc0SjiibepqGP3R3NIssYdKysLcBMlh07x6R2g0uQrpAglxMvwoL03KVBnYHYVAQ+PZsB/cvACIRyMZvFa3FnZN8Fku3e0ySOUW167yk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Gp2v7ciE; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37d6a2aa748so2385094f8f.1
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 07:24:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1729088643; x=1729693443; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xqaxYfVYHtTEYM/dunJ7hIKbCemvQpX6A9xYcV7v7Jo=;
-        b=Gp2v7ciEJhLGDLCNQQnX820T1pHs4luaCKZcKeynI9F22H31VBG16c6Hoy4pKrywdF
-         TUFvDwc03mTdBtSwDX+m7x3LLJjgr+KPLCu0AUqgqJH8KldI5YauoBYFjUiIAdvc1kj2
-         48N3nh1njD+uL0uCFLc1iqGKuO//b+ywvgUuopL7x1eC1K7nGlCaeFN+ao4tcQhhtMZG
-         Jw8P6WZn9daE6w4i+03BJf/M2o7QFFeYUvzkCoWiE6SUw+MGtEn8F5KwzzMEj5nIP5cb
-         7PTT8txZpSBu+bHWSQ55g+QQI3iN2hdm45GzHpdME/6eE9OtKD4zhz1EGyNF6WTxJknp
-         xlzw==
+	s=arc-20240116; t=1729088795; c=relaxed/simple;
+	bh=BTpTIYQMDBwzjByt2BCxD0+WshTPDmkDdWMziv5LqKo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uMN/ZcBw42f6vRYlIMyVXP116/+0K8bYOFkITHyLl6kXyEapzrmZzERIIKzgH3G5GuGCbB/KBV8jaG13/KmVfbTbOzzC2onOeuXwM7I6/jalDy7YKck1UDB23ICQinuxKFmkmv/VFqoz0IWvF9tKWEAnYy5KgRibyp/RC5dAmW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9a0474e70eso568932366b.0;
+        Wed, 16 Oct 2024 07:26:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729088643; x=1729693443;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xqaxYfVYHtTEYM/dunJ7hIKbCemvQpX6A9xYcV7v7Jo=;
-        b=MwpMdkjpsRYEN2Y9sHZLs0lBKNAk3a1dt3S3By2BPjdlD7uPy28YYiIZe4V5cyst2+
-         zl1V/nlRhl/1DAyLi36y9w3z0OnRWlZ7KqtnmdLgJ+Qzqtfu8pUttEb0WigcqulFsEJ1
-         xMcMENOShwRSKtmjJf7rACCGU28YpaxrQI7aDrEDCPeh+uM3gGuJeXTEwymlKyOB4s+p
-         ka+W7h6T80VZtzi509mvVSX86HU4D9XJCdcf26zOwOvWNXdRrH8xLq4eiS8b7wePFNmh
-         6VvDV3Ek/H9/gij4TCX+WpgzZkazleeCYfgtM1QgUJAU+71nYBdq5ddIJnriJEW2mUNZ
-         xsxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVaMi9q92gdP0x2eZfTH9bgDZAOoXf8xSKtR+c/XVHkiwqKjbAmlUL2qItvGOeDx0yeLWYdkQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh6+r1tu6eN9kHP4wvenBpyH9QBrKgYtIGZuedBCPP1r/uv+mM
-	WA61qwjfQ9AO85ZCXlb7AhQ1XcuOQaRKI8cwxTBl3fLVlEUdyZnnFKNzS84dD+c=
-X-Google-Smtp-Source: AGHT+IFuG8N98Jj4LDTvTNhKOp3goLcQvvJir6NR+6bYYNpkfJTPphpDDkVGXyDbvEj0os7chUA1Sg==
-X-Received: by 2002:a5d:5310:0:b0:37d:481e:8e29 with SMTP id ffacd0b85a97d-37d5ff3020emr8831268f8f.25.1729088643169;
-        Wed, 16 Oct 2024 07:24:03 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:e5be:11e:5baa:6774? ([2001:67c:2fbc:1:e5be:11e:5baa:6774])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fbf819dsm4413626f8f.85.2024.10.16.07.24.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 07:24:02 -0700 (PDT)
-Message-ID: <e8e46092-c954-4579-9bdc-563bf30f68f5@openvpn.net>
-Date: Wed, 16 Oct 2024 16:24:09 +0200
+        d=1e100.net; s=20230601; t=1729088792; x=1729693592;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9kosQyuVWG39YynNEUKXJCBxsTPwg1HVhHQTa1Z8n7k=;
+        b=pi4EIQkJqvhlSSI4WnScMkTcxna2yU4iBbiEsoIQ8LWyXz++j2xxyt08cQVUmTC0pu
+         LX2oYqo38ZwgQ1NfXsRvrheYrLVcWzrY6v91poBnepI1O4Is6dYCmhpyXFaTDyhbMToq
+         ZZIpwaQ2lmbYjbYa9YovmTwVnvKQVTdXCs4JiN4GnxiKOVusUbkSvCdNYn2BzB6tE17L
+         yf0oy5I7O5lEs/+E0ziwgTNDgGNV/PMmpUOuyyzuXDcR5pL6uZHadScgKBFqzXyT6cqJ
+         PTnELi6aIlYTjBDTxJk4HOCWUcbdJX85oKBvXh7TNN17QbCOUJAOAJKwXnHVjcpqmtiH
+         8Mpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUM+SUdPcQ5xlhA9zFvqSC5ZbBSuJ81l1dGoPSNHHqLAztaNtt0Njc0yEyWR+5UpGu7KIqgOwyyppbpxahl@vger.kernel.org, AJvYcCV+m3439rIGQLhawzCEGRM5Ov3JPVZYjU+urI94bZyHSMXgZx18Ti0DMdPS0wbBuT3xYQrMtgdtgGsk@vger.kernel.org, AJvYcCWta3hkrRUgW6guxcJ4fbN1TKmqra/nagM/GWYazMmqpdOB3S8+eSnvKsVK3i1Sc+4X6ZeBCeQMAmL0@vger.kernel.org, AJvYcCX2g5lyaq6nXY0Lmy6tZFoWNhDekwr+6VHCG0b4N8r2YDarDL7ke/N9sQgro4UlNsJMwZWDNnam@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8xuq5RZ3RmbYpFGXsQ7TZ/USrw/N4jYcflwGr2Fl/ZYnrCJ74
+	oWuRtSgg3rg+UloZLd4nKaK7xVXtYENDHmIlI29ouXXvvv9vRxmpYzQO0UJ3zbzlT+vv/K6jSfD
+	HiX761qgCLaiFbahsaXKElp5bW3fPdJ+yYSo=
+X-Google-Smtp-Source: AGHT+IHxBPBf+m6UScPiP9T7rYboW+BUqS+rSedKKCFS0zaiDPv4D0O5W7BTwDQfrFhb1gdRSpU0fFSgNbjyzR/tOYY=
+X-Received: by 2002:a17:906:6a1e:b0:a99:f2bf:7c64 with SMTP id
+ a640c23a62f3a-a99f2bf8de2mr1100863466b.17.1729088791572; Wed, 16 Oct 2024
+ 07:26:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 04/23] ovpn: add basic interface
- creation/destruction/management routines
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241016-b4-ovpn-v9-0-aabe9d225ad5@openvpn.net>
- <20241016-b4-ovpn-v9-4-aabe9d225ad5@openvpn.net>
- <Zw947Jb637o-I4RV@nanopsycho.orion>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Zw947Jb637o-I4RV@nanopsycho.orion>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241015-topic-mcan-wakeup-source-v6-12-v4-0-fdac1d1e7aa6@baylibre.com>
+ <20241015-topic-mcan-wakeup-source-v6-12-v4-5-fdac1d1e7aa6@baylibre.com>
+In-Reply-To: <20241015-topic-mcan-wakeup-source-v6-12-v4-5-fdac1d1e7aa6@baylibre.com>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Wed, 16 Oct 2024 23:26:22 +0900
+Message-ID: <CAMZ6Rq+NA9G=iON56vQcr5dxEMqn-FFzT5rdxc6XrtW+4ww1XQ@mail.gmail.com>
+Subject: Re: [PATCH v4 5/9] can: m_can: Support pinctrl wakeup state
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, Vishal Mahaveer <vishalm@ti.com>, 
+	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 16/10/2024 10:27, Jiri Pirko wrote:
-> Wed, Oct 16, 2024 at 03:03:04AM CEST, antonio@openvpn.net wrote:
->> Add basic infrastructure for handling ovpn interfaces.
->>
->> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
->> ---
->> drivers/net/ovpn/main.c       | 115 ++++++++++++++++++++++++++++++++++++++++--
->> drivers/net/ovpn/main.h       |   7 +++
->> drivers/net/ovpn/ovpnstruct.h |   8 +++
->> drivers/net/ovpn/packet.h     |  40 +++++++++++++++
->> include/uapi/linux/if_link.h  |  15 ++++++
->> 5 files changed, 180 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
->> index d5bdb0055f4dd3a6e32dc6e792bed1e7fd59e101..eead7677b8239eb3c48bb26ca95492d88512b8d4 100644
->> --- a/drivers/net/ovpn/main.c
->> +++ b/drivers/net/ovpn/main.c
->> @@ -10,18 +10,52 @@
->> #include <linux/genetlink.h>
->> #include <linux/module.h>
->> #include <linux/netdevice.h>
->> +#include <linux/inetdevice.h>
->> +#include <net/ip.h>
->> #include <net/rtnetlink.h>
->> -#include <uapi/linux/ovpn.h>
->> +#include <uapi/linux/if_arp.h>
->>
->> #include "ovpnstruct.h"
->> #include "main.h"
->> #include "netlink.h"
->> #include "io.h"
->> +#include "packet.h"
->>
->> /* Driver info */
->> #define DRV_DESCRIPTION	"OpenVPN data channel offload (ovpn)"
->> #define DRV_COPYRIGHT	"(C) 2020-2024 OpenVPN, Inc."
->>
->> +static void ovpn_struct_free(struct net_device *net)
->> +{
->> +}
->> +
->> +static int ovpn_net_open(struct net_device *dev)
->> +{
->> +	netif_tx_start_all_queues(dev);
->> +	return 0;
->> +}
->> +
->> +static int ovpn_net_stop(struct net_device *dev)
->> +{
->> +	netif_tx_stop_all_queues(dev);
->> +	return 0;
->> +}
->> +
->> +static const struct net_device_ops ovpn_netdev_ops = {
->> +	.ndo_open		= ovpn_net_open,
->> +	.ndo_stop		= ovpn_net_stop,
->> +	.ndo_start_xmit		= ovpn_net_xmit,
->> +};
->> +
->> +static const struct device_type ovpn_type = {
->> +	.name = OVPN_FAMILY_NAME,
->> +};
->> +
->> +static const struct nla_policy ovpn_policy[IFLA_OVPN_MAX + 1] = {
->> +	[IFLA_OVPN_MODE] = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_P2P,
->> +					    OVPN_MODE_MP),
->> +};
->> +
->> /**
->>   * ovpn_dev_is_valid - check if the netdevice is of type 'ovpn'
->>   * @dev: the interface to check
->> @@ -33,16 +67,76 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
->> 	return dev->netdev_ops->ndo_start_xmit == ovpn_net_xmit;
->> }
->>
->> +static void ovpn_setup(struct net_device *dev)
->> +{
->> +	/* compute the overhead considering AEAD encryption */
->> +	const int overhead = sizeof(u32) + NONCE_WIRE_SIZE + 16 +
->> +			     sizeof(struct udphdr) +
->> +			     max(sizeof(struct ipv6hdr), sizeof(struct iphdr));
->> +
->> +	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
->> +				 NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
->> +				 NETIF_F_HIGHDMA;
->> +
->> +	dev->needs_free_netdev = true;
->> +
->> +	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
->> +
->> +	dev->netdev_ops = &ovpn_netdev_ops;
->> +
->> +	dev->priv_destructor = ovpn_struct_free;
->> +
->> +	dev->hard_header_len = 0;
->> +	dev->addr_len = 0;
->> +	dev->mtu = ETH_DATA_LEN - overhead;
->> +	dev->min_mtu = IPV4_MIN_MTU;
->> +	dev->max_mtu = IP_MAX_MTU - overhead;
->> +
->> +	dev->type = ARPHRD_NONE;
->> +	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
->> +	dev->priv_flags |= IFF_NO_QUEUE;
->> +
->> +	dev->lltx = true;
->> +	dev->features |= feat;
->> +	dev->hw_features |= feat;
->> +	dev->hw_enc_features |= feat;
->> +
->> +	dev->needed_headroom = OVPN_HEAD_ROOM;
->> +	dev->needed_tailroom = OVPN_MAX_PADDING;
->> +
->> +	SET_NETDEV_DEVTYPE(dev, &ovpn_type);
->> +}
->> +
->> static int ovpn_newlink(struct net *src_net, struct net_device *dev,
->> 			struct nlattr *tb[], struct nlattr *data[],
->> 			struct netlink_ext_ack *extack)
->> {
->> -	return -EOPNOTSUPP;
->> +	struct ovpn_struct *ovpn = netdev_priv(dev);
->> +	enum ovpn_mode mode = OVPN_MODE_P2P;
->> +
->> +	if (data && data[IFLA_OVPN_MODE]) {
->> +		mode = nla_get_u8(data[IFLA_OVPN_MODE]);
-> 
-> Some sanity check perhaps? "validate" op is here for that purpose.
+Hi Markus,
 
-Isn't the parsing happening here enough
+This is a nice improvement from the v3.
 
-https://elixir.bootlin.com/linux/v6.12-rc3/source/net/core/rtnetlink.c#L3659
+On Wed. 16 Oct. 2024 at 04:19, Markus Schneider-Pargmann
+<msp@baylibre.com> wrote:
+> am62 requires a wakeup flag being set in pinctrl when mcan pins acts as
+> a wakeup source. Add support to select the wakeup state if WOL is
+> enabled.
+>
+> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+> ---
+>  drivers/net/can/m_can/m_can.c | 68 +++++++++++++++++++++++++++++++++++++++++++
+>  drivers/net/can/m_can/m_can.h |  4 +++
+>  2 files changed, 72 insertions(+)
+>
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> index 5a4e0ad07e9ecc82de5f1f606707f3380d3679fc..c539375005f71c88fd1f7d1a885ce890ce0e9327 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -2196,6 +2196,7 @@ static void m_can_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+>  static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+>  {
+>         struct m_can_classdev *cdev = netdev_priv(dev);
+> +       struct pinctrl_state *new_pinctrl_state = NULL;
+>         bool wol_enable = !!(wol->wolopts & WAKE_PHY);
+>         int ret;
+>
+> @@ -2212,7 +2213,28 @@ static int m_can_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+>                 return ret;
+>         }
+>
+> +       if (wol_enable)
+> +               new_pinctrl_state = cdev->pinctrl_state_wakeup;
+> +       else
+> +               new_pinctrl_state = cdev->pinctrl_state_default;
+> +
+> +       if (IS_ERR_OR_NULL(new_pinctrl_state))
+> +               return 0;
+> +
+> +       ret = pinctrl_select_state(cdev->pinctrl, new_pinctrl_state);
+> +       if (ret) {
+> +               netdev_err(cdev->net, "Failed to select pinctrl state %pE\n",
+> +                          ERR_PTR(ret));
+> +               goto err_wakeup_enable;
+> +       }
+> +
+>         return 0;
+> +
+> +err_wakeup_enable:
+> +       /* Revert wakeup enable */
+> +       device_set_wakeup_enable(cdev->dev, !wol_enable);
+> +
+> +       return ret;
+>  }
+>
+>  static const struct ethtool_ops m_can_ethtool_ops_coalescing = {
+> @@ -2340,6 +2362,44 @@ int m_can_class_get_clocks(struct m_can_classdev *cdev)
+>  }
+>  EXPORT_SYMBOL_GPL(m_can_class_get_clocks);
+>
+> +static int m_can_class_setup_optional_pinctrl(struct m_can_classdev *class_dev)
+> +{
+> +       struct device *dev = class_dev->dev;
+> +       int ret;
+> +
+> +       class_dev->pinctrl = devm_pinctrl_get(dev);
+> +       if (IS_ERR(class_dev->pinctrl)) {
+> +               ret = PTR_ERR(class_dev->pinctrl);
+> +               class_dev->pinctrl = NULL;
+> +
+> +               if (ret == -ENODEV)
+> +                       return 0;
+> +
+> +               return dev_err_probe(dev, ret, "Failed to get pinctrl\n");
+> +       }
+> +
+> +       class_dev->pinctrl_state_wakeup =
+> +               pinctrl_lookup_state(class_dev->pinctrl, "wakeup");
+> +       if (IS_ERR(class_dev->pinctrl_state_wakeup)) {
+> +               ret = PTR_ERR(class_dev->pinctrl_state_wakeup);
+> +               class_dev->pinctrl_state_wakeup = NULL;
+> +
+> +               if (ret == -ENODEV)
+> +                       return 0;
+> +
+> +               return dev_err_probe(dev, ret, "Failed to lookup pinctrl wakeup state\n");
+> +       }
+> +
+> +       class_dev->pinctrl_state_default =
+> +               pinctrl_lookup_state(class_dev->pinctrl, "default");
+> +       if (IS_ERR(class_dev->pinctrl_state_default)) {
+> +               ret = PTR_ERR(class_dev->pinctrl_state_default);
 
-The IFINFO_DATA is parsed using the policy I provided (which comes with 
-limits for the mode attribute).
+Sorry if this is a silly question, but why aren't you doing the:
 
-Or am I misreading the code and I still need to provide an 
-implementation for .validate?
+                  class_dev->pinctrl_state_default = NULL;
 
-Regards,
+                  if (ret == -ENODEV)
+                          return 0;
 
-> 
-> 
->> +		netdev_dbg(dev, "setting device mode: %u\n", mode);
->> +	}
->> +
->> +	ovpn->dev = dev;
->> +	ovpn->mode = mode;
->> +
->> +	/* turn carrier explicitly off after registration, this way state is
->> +	 * clearly defined
->> +	 */
->> +	netif_carrier_off(dev);
->> +
->> +	return register_netdevice(dev);
-> 
-> [...]
+thing the same way you are doing it for the pinctrl and the
+pinctrl_state_wakeup?
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+> +               return dev_err_probe(dev, ret, "Failed to lookup pinctrl default state\n");
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
+>                                                 int sizeof_priv)
+>  {
+> @@ -2380,7 +2440,15 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
+>
+>         m_can_of_parse_mram(class_dev, mram_config_vals);
+>
+> +       ret = m_can_class_setup_optional_pinctrl(class_dev);
+> +       if (ret)
+> +               goto err_free_candev;
+> +
+>         return class_dev;
+> +
+> +err_free_candev:
+> +       free_candev(net_dev);
+> +       return ERR_PTR(ret);
+>  }
+>  EXPORT_SYMBOL_GPL(m_can_class_allocate_dev);
+>
+> diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+> index 92b2bd8628e6b31370f4accbc2e28f3b2257a71d..b75b0dd6ccc93973d0891daac07c92b61f81dc2a 100644
+> --- a/drivers/net/can/m_can/m_can.h
+> +++ b/drivers/net/can/m_can/m_can.h
+> @@ -126,6 +126,10 @@ struct m_can_classdev {
+>         struct mram_cfg mcfg[MRAM_CFG_NUM];
+>
+>         struct hrtimer hrtimer;
+> +
+> +       struct pinctrl *pinctrl;
+> +       struct pinctrl_state *pinctrl_state_default;
+> +       struct pinctrl_state *pinctrl_state_wakeup;
+>  };
+>
+>  struct m_can_classdev *m_can_class_allocate_dev(struct device *dev, int sizeof_priv);
 
