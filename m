@@ -1,167 +1,151 @@
-Return-Path: <netdev+bounces-136281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0149A12E1
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 21:47:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 863D39A12E8
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 21:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BF8F28312E
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 19:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DB011C21F74
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 19:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C101B6D0C;
-	Wed, 16 Oct 2024 19:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwc1ggj8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0C12144B9;
+	Wed, 16 Oct 2024 19:49:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7731125B9;
-	Wed, 16 Oct 2024 19:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6949A210C38;
+	Wed, 16 Oct 2024 19:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729108044; cv=none; b=drl/90Kz2djhtEHMmJhXEkCAwV4vS4FrEf8QtLMmwGhYfjUlIQ4MYcfO9j4APXuo53SbFt5s+f2N4rWhwyfvV/JUMkg9fdFXa/MHz54965dQdkjYBpVRTiftQsVgszVSNn8cKsPSZ6oqSjwZElKogDjXzdOUqR48/b5snB9hJU4=
+	t=1729108167; cv=none; b=Hiz8s5/ICdMMxDk6V9ri3x90i1jf3rs5l48LYJvNoweU44gB7kNo//tjdsCl3uRsm1lY2bQhJMT5dXtdO/NyNfQIwwN9fOLMTXOYp6goPPaOlW2Ciw063vuRSFUyy1nH/YaEfHUdejrxYViIDLiRngaOSByTXAv952wTmc8TJg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729108044; c=relaxed/simple;
-	bh=pmlNSljXEUqxAokNLwjXCDGzQ9J//4EAy+e28nbhgQI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mxl5LUpukAx5Kpsb1oA7ksDrAirMk+XBW7T28ybhDy00owgeuwWUvABOlzDnSrKy8RoYAJVGR87KcIrlLv+jFwAHwGLS4OhOk+R7y8e2WdpM77WMk4C5wIeG9pnwMTlkxlyjn2iXX2EXfLWPPQ1+i+WkBuxrWNE41jMRO/ur9aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cwc1ggj8; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-46045199e4dso1755251cf.3;
-        Wed, 16 Oct 2024 12:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729108041; x=1729712841; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=O7rveXr8EWQwBHFtL+vhmszoaVZ34wapFadx4cT7CFY=;
-        b=cwc1ggj8jvqe1du98tqYzP+BqPyJt1UjPu2d2aJdikWdke5gYWroif7tJ+QYQ5uQS9
-         1riQlNXgvQ1l8sfQb7N/5H2EN6AK0e49Hqoe0em6SUY/ePp3gk2bAxKVyGj6hnH3ieiF
-         B1FjmDZgigFbtRzIIiSsl8BjYBDaKB8eLS0tkEZyylUTNm/jaLXpfGaQmAuOjntt9OLy
-         3Eq17TWis4Ciwm1ISRI0zhZ2jINHO7Yivtx4sKIkMNp6Vj+3bup+Yx/PYoDhl4ZFvJUI
-         Mohtcg6NCXvx2W4TeyHte3tme0fjpNaL1qZUoisLVfToN6GqQaDLq2guBaEWmp+xH5dS
-         Jshg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729108041; x=1729712841;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O7rveXr8EWQwBHFtL+vhmszoaVZ34wapFadx4cT7CFY=;
-        b=H3RtngpdOKxoPbHZ5Ki0OOxsMXIT5GEKYIg9CGLsFDnCd/SwspAY9XUqtNEdpmYx/L
-         wV3YxV4KbquWQUAWkxywISCfIX1ic9ofjeV729nnqV7DkPLC938sPaRyFGoe0G+NFrOA
-         3lD1YPB8BlqHl2Cx2Qk2zRkHTNwz1NjoV3k1Nd8WHuXkrwHJXOzkYg9TbtptVuqQ9hVg
-         Pr4zFdM+OWELm+3Q5C/Z6DdYjL0bBBHqkicY0ncsC0l18K0XOQHo5YPw85DVpelRWDrb
-         1t/ZI6TOe6QLVUQoNdsUxnvCOq5JnHlZI1WQ651xI7GqXJ6lpfGUXi/opY2NtobsbM//
-         HmXg==
-X-Forwarded-Encrypted: i=1; AJvYcCW9vPgQS246OprFySsu9Od6XGfVDhKcdTrPSjx3pCPl6lWgD+XM2cO6LkTI583fUn9qZhD0+dnefdWn0MS07LA=@vger.kernel.org, AJvYcCX678lnsKlO+OA7aLybnLQqXkcL+WND3J/SLKgGzBruYfm58xWgcSnmR/QYz0ia5ivbwbPE0foK@vger.kernel.org, AJvYcCXL9a9j9CdaINI0XnDtcBYjTNJ6OumU21IiV/DQALMxgmEiBRNLOwMRyBNf6d5ysHmNzh1TzKrLiEbemEY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAT3hmPtFtwxmYmtAQTnileozk2XuLdJqGp8lXhFZxUp0Rtmyo
-	78ZYSLmPYsqMhfz0zuZmBSe1exjhcxjNaS2C6CkybNRi/XEuxM6Y
-X-Google-Smtp-Source: AGHT+IF6xCUs696kKcIN/z9eOsuC12fgOayKojaZu5+rDeH8ru39YGtHJA6fE30edqk6BU/Nb7r3kg==
-X-Received: by 2002:a05:622a:1245:b0:460:8d74:3cb4 with SMTP id d75a77b69052e-4608d743f44mr65230681cf.17.1729108041450;
-        Wed, 16 Oct 2024 12:47:21 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4608d335c82sm12806331cf.67.2024.10.16.12.47.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 12:47:20 -0700 (PDT)
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 2E4121200071;
-	Wed, 16 Oct 2024 15:47:20 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Wed, 16 Oct 2024 15:47:20 -0400
-X-ME-Sender: <xms:SBgQZ1hFZppSlJDQAXCKMwaiTs7lokKpe4XZUx8q2rtXpo3z7P44Xg>
-    <xme:SBgQZ6Cy7iThFSdFGsKZrhgSMEgyNxsboVFJGln0EaKgYzclvPhHD4_Rj8CXxr6DE
-    K-UEg_LxriQtj6eNA>
-X-ME-Received: <xmr:SBgQZ1Em_pBCjEseJiXGKpOpUzh7d7cn1IBQHhk6jyeO-zlp-DBlHkwrcqI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdegledgudegvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
-    jeenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeevgffhueevkedutefgveduuedujeefledt
-    hffgheegkeekiefgudekhffggeelfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
-    lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
-    hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepvddupdhm
-    ohguvgepshhmthhpohhuthdprhgtphhtthhopegrlhhitggvrhihhhhlsehgohhoghhlvg
-    drtghomhdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhisehgmhgrihhlrdgt
-    ohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllh
-    ifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuhhmihgt
-    hhdrvgguuhdprhgtphhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopegrlhgvgidrghgrhihnohhrsehgmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:SBgQZ6SCMujHgZmCytZNQeJDYBMiHTmIj5l69Z8lEhBX-dOR8rCD5Q>
-    <xmx:SBgQZyy8VCLYUNxwe2c_Fd_L39BCmRTpaVzjaIOkoZJsmEWb8cyiSw>
-    <xmx:SBgQZw5DmuADSNR47wUsovCloNytT-5CsrVZf7ooaQGeBs1wmqRjiA>
-    <xmx:SBgQZ3yycqF25PyMSc3dJH_LVQM34pepH8-Jjs3CUSKmg5lhVMdxvw>
-    <xmx:SBgQZ6gzMuWDhUdryhkIL23OeCeBFIhhdiVixoFfyZ3FwIdtC2KmRpnn>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 16 Oct 2024 15:47:19 -0400 (EDT)
-Date: Wed, 16 Oct 2024 12:47:18 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/8] rust: time: Change output of Ktime's sub
- operation to Delta
-Message-ID: <ZxAYRthmAIHfW5c2@Boquns-Mac-mini.local>
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-4-fujita.tomonori@gmail.com>
- <CAH5fLgjKH_mQcAjwtAWAxnFYXvL6z24=Zcp-ou188-c=eQwPBw@mail.gmail.com>
+	s=arc-20240116; t=1729108167; c=relaxed/simple;
+	bh=+hjBrFzvOL6xiMBUlSJ3Kdsp5Thqjo/zuLD5y0FAQBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MfJiEO57BgMH1vOP9kbkhdyE6wVYRNA0EAChCwmOrJMsesA+1rN+3V/ISIlkVSX+qX2yhT6qRUwVfbAgxBZhTSman6HK2653d4D5eE5WuU0Qx1a4txdWdMmFVEKnywr2j889Wy5NJUUN+mc29A8ewGg4UplwNz4eg3oFXaRkjzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.153.89) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 16 Oct
+ 2024 22:49:04 +0300
+Message-ID: <a32f0891-936b-4cce-a874-78b1865717ae@omp.ru>
+Date: Wed, 16 Oct 2024 22:49:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH5fLgjKH_mQcAjwtAWAxnFYXvL6z24=Zcp-ou188-c=eQwPBw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/13] ata: Use always-managed version of pci_intx()
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+	<dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+	<basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+	<manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+	<GR-Linux-NIC-Dev@marvell.com>, Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+	Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+	<Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+	<dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+	<bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>, Juergen
+ Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela
+	<perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Chen Ni
+	<nichen@iscas.ac.cn>, Mario Limonciello <mario.limonciello@amd.com>, Ricky Wu
+	<ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
+	<leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>, Thomas Gleixner
+	<tglx@linutronix.de>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?=
+	<ilpo.jarvinen@linux.intel.com>, Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Christian
+ Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, Eric Auger
+	<eric.auger@redhat.com>, Reinette Chatre <reinette.chatre@intel.com>, Ye Bin
+	<yebin10@huawei.com>, =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
+	<marmarek@invisiblethingslab.com>, Pierre-Louis Bossart
+	<pierre-louis.bossart@linux.dev>, Peter Ujfalusi
+	<peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
+	<maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+	<kai.vehmanen@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>
+CC: <linux-ide@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-input@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-wireless@vger.kernel.org>, <ntb@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<xen-devel@lists.xenproject.org>, <linux-sound@vger.kernel.org>
+References: <20241015185124.64726-1-pstanner@redhat.com>
+ <20241015185124.64726-10-pstanner@redhat.com>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20241015185124.64726-10-pstanner@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 10/16/2024 19:30:03
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188488 [Oct 16 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 39 0.3.39
+ e168d0b3ce73b485ab2648dd465313add1404cce
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.153.89 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.153.89 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.153.89
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/16/2024 19:34:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/16/2024 5:04:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, Oct 16, 2024 at 10:25:11AM +0200, Alice Ryhl wrote:
-> On Wed, Oct 16, 2024 at 5:53 AM FUJITA Tomonori
-> <fujita.tomonori@gmail.com> wrote:
-> >
-> > Change the output type of Ktime's subtraction operation from Ktime to
-> > Delta. Currently, the output is Ktime:
-> >
-> > Ktime = Ktime - Ktime
-> >
-> > It means that Ktime is used to represent timedelta. Delta is
-> > introduced so use it. A typical example is calculating the elapsed
-> > time:
-> >
-> > Delta = current Ktime - past Ktime;
-> >
-> > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> 
-> So this means that you are repurposing Ktime as a replacement for
-> Instant rather than making both a Delta and Instant type? Okay. That
-> seems reasonable enough.
-> 
+On 10/15/24 9:51 PM, Philipp Stanner wrote:
 
-I think it's still reasonable to introduce a `Instant<ClockSource>` type
-(based on `Ktime`) to avoid some mis-uses, but we can do that in the
-future.
-
-Regards,
-Boqun
-
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> pci_intx() is a hybrid function which can sometimes be managed through
+> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> port users to either an always-managed or a never-managed version.
 > 
-> Alice
+> All users in ata enable their PCI-Device with pcim_enable_device(). Thus,
+> they need the always-managed version.
 > 
+> Replace pci_intx() with pcim_intx().
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+MBR, Sergey
+
 
