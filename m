@@ -1,128 +1,155 @@
-Return-Path: <netdev+bounces-136033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A190B9A008F
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:20:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC4C9A009B
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 07:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EA8CB255F2
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:20:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D49BDB2418D
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 05:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74315188013;
-	Wed, 16 Oct 2024 05:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KNRC5j4E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D448B16A94A;
+	Wed, 16 Oct 2024 05:28:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C921918B481;
-	Wed, 16 Oct 2024 05:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FDF188013
+	for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 05:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729056045; cv=none; b=DZ/LiCyZtk/Wcb8Ub4HL9US6DvU761Ad6EZmM+YURZqwwILemM6aPYkYMyf7JqyA/yMa1RcYlwMDGvtj2aW1q31shokqJw4QBzZSV9c9dBFn7X4Pno9V9g1j0/WDrCaHRl2fPZSOtYnNkJ6VZedylMP4M4gH/K5OwbNzKxqZKgI=
+	t=1729056506; cv=none; b=ocrLX4zB3ZVZQNax5GCOJaL9ZGV4iPyt0RYUaK1Pj9MAw/T3iPuMs58dVTJYyq3kDkvLWYbnwJN34UHNTi4s50RYK4zSyTZ5azPoa3Yz+fpEkvVPDXkRJVAsOYxSBflek+dSZaNq2p/kCfaFqS0/66xsQxDfSY/uBe6RvKeFU7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729056045; c=relaxed/simple;
-	bh=kY9s7ieYNFRf5vd6rWLrxX3RydNTXVEAmhHE6BU8hOw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ChuGa9mzkYEo4nBysalsNKeCKgcP9q4gZoWRSSPIQ97djRqMQxhYbobwB21HjDWzQ9X4705OyYqtTkJy5RQusYW0tGCeGf5AU7SR7uGEF5ZF9Es2LNSpJZzaSksNxebSvAZk10l2hRaHUC+HE0GXgnHZXntDutvODr/FhvUE3eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KNRC5j4E; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49G5FDnr012151;
-	Wed, 16 Oct 2024 05:20:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=93dRBASK2NX/nahhuRQA/0Vp278JrC
-	oL/iXOrYitZYw=; b=KNRC5j4Eux0ksx2ivs1VBB6Qq4jGgynlVzU50891JkkKfr
-	5e/KfQyhmFSJIxIM0JnPK7UAwGYnDnVw6jAiDSqiWzBRnQXbM08Z3Mg6QSMfm8hx
-	DjWWyopaFqI6AozMJ65yAbaoqJLivwLeZA1uAEKrO+WyMpVSFh+IT7FcqtdVDiHS
-	hOLobSnKfR4VT61S2zRWjsFcEZNRIf9lmfOiZZtqKvUoh/CueXSs4t1/8XrVtgku
-	XOyuZIw7wReaelRvbRkd7bR4Er+IPxeN3SLh+KWTJCcwQqgDE4/PVxjZdaPJEJmF
-	Q5bVWHiebCSrsbtGH9enXIqx3q9N+FKQXJ8jme6Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42a762r0gt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 05:20:30 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49G5KT0R021873;
-	Wed, 16 Oct 2024 05:20:29 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42a762r0gq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 05:20:29 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49G407VL004988;
-	Wed, 16 Oct 2024 05:20:28 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4285nj76ed-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 05:20:28 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49G5KRdx55116116
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Oct 2024 05:20:27 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8063420043;
-	Wed, 16 Oct 2024 05:20:24 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 607D120040;
-	Wed, 16 Oct 2024 05:20:24 +0000 (GMT)
-Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 16 Oct 2024 05:20:24 +0000 (GMT)
-From: Sven Schnelle <svens@linux.ibm.com>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, linux-s390@vger.kernel.org,
-        Yangbo Lu
- <yangbo.lu@nxp.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] ptp: Add clock name to uevent
-In-Reply-To: <Zw81Nlx9OF-PveY0@hoboy.vegasvil.org> (Richard Cochran's message
-	of "Tue, 15 Oct 2024 20:38:30 -0700")
-References: <20241015084728.1833876-1-svens@linux.ibm.com>
-	<20241015084728.1833876-3-svens@linux.ibm.com>
-	<c9c1c660-9278-426c-9290-b9b0cb76dcaf@lunn.ch>
-	<Zw81Nlx9OF-PveY0@hoboy.vegasvil.org>
-Date: Wed, 16 Oct 2024 07:20:24 +0200
-Message-ID: <yt9dr08gfwtj.fsf@linux.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1729056506; c=relaxed/simple;
+	bh=o1XhTxj3dSEFMKnpxv/1tMNeP8mQmYquEo9yEEL8Zpc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XwTlG8ePTKCq87wvOoKjkoAA8zruj8/bdhh9lTcEMDpCm7XNZaRU7AhrrC50q3yNk08ujhLnl5WMRHSWqka4450pdXOsD5zKiBZajgmZDtQIVGrYCmGGhTbO3C7qsWx3NE4IQ/X9K5K5BIPUM8XGN0ympEKenxVsIgqamONBl/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5ae84f.dynamic.kabel-deutschland.de [95.90.232.79])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5115E61E5FE05;
+	Wed, 16 Oct 2024 07:28:05 +0200 (CEST)
+Message-ID: <054b84a1-fd70-4abe-b1aa-18c0882c05f5@molgen.mpg.de>
+Date: Wed, 16 Oct 2024 07:28:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IKpiQpf83eHtSz42-ABl1IBGWSOMLfov
-X-Proofpoint-ORIG-GUID: Zhwun_uNYFZouXgHlJPaKdU871Evb0Rw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=409 clxscore=1011 bulkscore=0 spamscore=0 priorityscore=1501
- phishscore=0 malwarescore=0 adultscore=0 mlxscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410160031
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] i40e: fix "Error
+ I40E_AQ_RC_ENOSPC adding RX filters on VF" issue
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: Anthony L Nguyen <anthony.l.nguyen@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20241015070450.1572415-1-aleksandr.loktionov@intel.com>
+ <011cfa1f-d7df-4d38-ba5d-7820176ebf8b@molgen.mpg.de>
+ <SJ0PR11MB586684C1B9995B605D83CF71E5452@SJ0PR11MB5866.namprd11.prod.outlook.com>
+ <4435dade-5c41-43a1-aeab-58e2d262545f@molgen.mpg.de>
+ <SJ0PR11MB5866C7F03A6F794EEDC2295BE5452@SJ0PR11MB5866.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <SJ0PR11MB5866C7F03A6F794EEDC2295BE5452@SJ0PR11MB5866.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Richard Cochran <richardcochran@gmail.com> writes:
+Dear Aleksandr,
 
-> On Tue, Oct 15, 2024 at 02:43:28PM +0200, Andrew Lunn wrote:
->>  * @name:      A short "friendly name" to identify the clock and to
->>  *             help distinguish PHY based devices from MAC based ones.
->>  *             The string is not meant to be a unique id.
->> 
->> If the name is not unique, you probably should not be using it for
->> udev naming.
+
+Am 15.10.24 um 13:05 schrieb Aleksandr Loktionov:
+
+>> -----Original Message-----
+>> From: Paul Menzel <pmenzel@molgen.mpg.de>
+>> Sent: Tuesday, October 15, 2024 12:33 PM
+
+[…]
+
+>> Am 15.10.24 um 11:45 schrieb Loktionov, Aleksandr:
+>>
+>>>> -----Original Message-----
+>>>> From: Paul Menzel <pmenzel@molgen.mpg.de>
+>>>> Sent: Tuesday, October 15, 2024 10:24 AM
+>>
+>>>> Thank you for your patch. For the summary I’d make it more about the
+>>>> action of the patch like “Add intermediate filter to …”.
+>>>
+>>> Sorry, I don't get your point. This patch fixes bug that can stop
+>>> vfs to receive any traffic making them useless. The first and most
+>>> visible effect of the bug is a lot of "Error I40E_AQ_RC_ENOSPC
+>>> adding RX filters on VF XX,..." errors from F/W complaining to add
+>>> MAC/VLAN filter. So I've mentioned it in the title to be easy found.
+>>> I don't add any filter in the driver, we have to add one more
+>>> intermediate state of the filter to avoid the race condition.
+>>
+>> In my opinion, having the log in the body is good enough for search
+>> engines and the summary should be optimized for `git log --oneline`
+>> consumption. I am sorry about the confusion with my example. Maybe:
+>>
+>> Add intermediate sync state to fix race condition
 >
-> +1
->
-> Maybe the name is unique for s390, but it will not be in general.
+> I just wonder why do you insist on "ADD" which usually means
+> implementing a new feature. When this patch FIXes the bug?
 
-As already written to Greg, i will drop this Patch. The name is unique,
-i was just not aware that the clock_name attribute is present in sysfs.
+Some projects use this interpretation/structure, but to my knowledge not 
+the Linux kernel.
+
+> If I'd want to add a new feature I'd rather send my patch to net-next,
+> isn't it?
+
+*Add*, how I used it, does not imply a new feature addition.
+
+> For me 'fix race condition by adding filter's intermediate sync
+> state'
+> Can you explain your strong argument for the Add?
+I am fine with your suggestion, and do not oppose to start with *Fix*. 
+Also, thank you for your elaborate answer, so I could understand the 
+point of view you came from.
+>>>> Am 15.10.24 um 09:04 schrieb Aleksandr Loktionov:
+>>>>> Fix a race condition in the i40e driver that leads to MAC/VLAN filters
+>>>>> becoming corrupted and leaking. Address the issue that occurs under
+>>>>> heavy load when multiple threads are concurrently modifying MAC/VLAN
+>>>>> filters by setting mac and port VLAN.
+>>>>>
+>>>>> 1. Thread T0 allocates a filter in i40e_add_filter() within
+>>>>>            i40e_ndo_set_vf_port_vlan().
+>>>>> 2. Thread T1 concurrently frees the filter in __i40e_del_filter() within
+>>>>>            i40e_ndo_set_vf_mac().
+>>>>> 3. Subsequently, i40e_service_task() calls i40e_sync_vsi_filters(), which
+>>>>>            refers to the already freed filter memory, causing corruption.
+>>>>>
+>>>>> Reproduction steps:
+>>>>> 1. Spawn multiple VFs.
+>>>>> 2. Apply a concurrent heavy load by running parallel operations to change
+>>>>>            MAC addresses on the VFs and change port VLANs on the host.
+>>>>
+>>>> It’d be great if you shared your commands.
+>>
+>>> Sorry, I'm pretty sure it's quite impossible to reproduce the issue
+>>> with bash scripts /*I've tried really hard*/. Reproduction is
+>>> related to user-space/kernel code which might be not open-sourced.
+>>> So as I've explained in the commit title the race condition
+>>> possibility that was introduced from the very beginning.
+>>
+>> Could you please ask to get clearance to publish it. My naive view
+>> wonders, why legal(?) should oppose publication.
+> 
+> Simply the defect can come from development tools or from external
+> customer. And being tract as a commercial secret, which even doesn't
+> belong to Intel sometimes.
+I know, that these are general problems. But in this specific case you 
+should know the circumstances, and be able to document it in the commit 
+message, why a test case cannot be published.
+
+
+Kind regards,
+
+Paul
 
