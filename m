@@ -1,111 +1,123 @@
-Return-Path: <netdev+bounces-136098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E98F9A04CD
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:56:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3DFA9A04D9
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 10:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E46C1287F1D
-	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:56:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 020B41C22EBA
+	for <lists+netdev@lfdr.de>; Wed, 16 Oct 2024 08:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBFF204F7C;
-	Wed, 16 Oct 2024 08:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AFD20370F;
+	Wed, 16 Oct 2024 08:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iqhy/7mI"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="sXGqCQ5k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF27B204959;
-	Wed, 16 Oct 2024 08:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807531F80D7;
+	Wed, 16 Oct 2024 08:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729068954; cv=none; b=Fl1I6jOk+i0BwRVmQH6gq4wce0rhlwtvqxIP465zRBDPoKZyCuDs68i+F1toZBTOCdbxt0SKF4ip9tKQVei/Pym7ToMiPGNdPV53Qwzy6nqHa1fSRLluMa+AHJ0x4ouHdWSOvnoywx/7L2gxVVV83LXIWR+pQnEPPc2dcLJ2v14=
+	t=1729069015; cv=none; b=VYgkXxx3JHz/1flDW1x8ea9OPZ2kj0bJr7uNyNp7PZhn7wsAxhwLGQNBGite5NdlyySATWT5/aep8oXz4jzmfKM44MmKb6GELCmmEPAA8+offqRkdzTJfZ67VdkcTpqQoCWQeHVaVpmJGTUOK/QdHc7Q93QVuBYoLuW+MJvo+IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729068954; c=relaxed/simple;
-	bh=4Djsh/XKHn1ysqUqOiytXqTEGO8sI6c/hzSMgetUGcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hiS70Fv4GbYaXCX+4GOpRs76Uf59V4jQC4CMKzhXqyZkRwR6X3S9WpDbvk5IScqh2gGKpjQrbMl3CIFDu+U8A1WWqjzzF1dYYt2P7Q743N+6ZttWg+LoUvIdGF3DZ9tYUeKPgYn47100dOEDNgYLX/JCNzkFwag0AsftQX+Ustw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iqhy/7mI; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729068953; x=1760604953;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4Djsh/XKHn1ysqUqOiytXqTEGO8sI6c/hzSMgetUGcs=;
-  b=iqhy/7mI79SMFSvf/aAVLapQzrPhIgj2YPMLeUS2CATamLeKkvb1MiM+
-   VwqP0H23Wcp3nHjV2PTAZygBgGqy0HOJjBAJzW43QC6OfB2EQh0e/NtSx
-   WR+uxb0Tt5FwAZAZrBap5QsOSFqWL3JV3Uxk4hn3hQily+uYELb9nQB2E
-   ayG21boNsElkJD8tBewzDgCbm+zNJ2kk07W9RdhRNdNvD4Y03/b6eQhqQ
-   xTqUVH+Z20ruQUlfX4CDtxDmJQ0yE6Jl+LpTHe/zl29vkh5oeZ+FZhBxb
-   TZ62TdW5BLvCEZdyUJGF1MH4kDB2D6GJWkXi+P/GEbbmlZhcoiPUiASqm
-   Q==;
-X-CSE-ConnectionGUID: VwjCpZ60Q5OdXjeJOqSYjg==
-X-CSE-MsgGUID: jgdRF/GKRPChgs2h1aLocQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="39893813"
-X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
-   d="scan'208";a="39893813"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 01:55:52 -0700
-X-CSE-ConnectionGUID: dUhHDUN1SvSt8subDfpfWw==
-X-CSE-MsgGUID: 39KKPkUnQnub3BYDZ5vfEg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
-   d="scan'208";a="78618168"
-Received: from smile.fi.intel.com ([10.237.72.154])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 01:55:50 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1t0zop-00000003hJ6-2Ws1;
-	Wed, 16 Oct 2024 11:55:47 +0300
-Date: Wed, 16 Oct 2024 11:55:47 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] tg3: Increase buffer size for IRQ label
-Message-ID: <Zw9_kzsxy5npUNXk@smile.fi.intel.com>
-References: <20241014103810.4015718-1-andriy.shevchenko@linux.intel.com>
- <20241015081621.7bea8cd7@kernel.org>
+	s=arc-20240116; t=1729069015; c=relaxed/simple;
+	bh=22B7n2tEpTaog8YTqPjwr1prW1s7g6l0XYXO/2g84aA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HFCenU7ZEYu1W2nbtKlyXajYQjr5GMA+XaXCVhRBvwvBgoIvgxcJo+ZhuNfBkJVbXCDj3c6a7Mhgk5iRomcjHwblSLPjd9DtNrO8llXW2EJof5nRNnsCi6N62mK20M6MmxXJsySDfLPLDiUnNvYz1UayWQ+aCaFPUQL6jQbR2k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=sXGqCQ5k; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=I98jfzHhq9YBAqa3c7f1CrjuxTK1ORerQc0awb8MEq4=;
+	t=1729069013; x=1730278613; b=sXGqCQ5kLiTMeb971Ix84uGveqGLd09e/VCODexsIYL10JX
+	HfVxbR8pipnuEBO9w2QVVxhjWIWgxknfpvnmiTXSq8IWSMTiM34B2RRQLO1qJjCCqe65EzebafNi+
+	AC+1d5COU/fFAsSTkdwaiQSINz8FAv8q/1wnerxrgLlnevxR/xHSWv2BQOSZZerSUeJMn7i5hDck5
+	iZF2Cda2FvJ5cwGwb+CcuglQD0dQCUe3f6/AhsBNRfp9vSvsyRWB9ey2FkRdOrwDOIoli9XFbLIIs
+	K6UJ99fjMX6u6gROH9E3gz5cXa3B5z5YkEKS5T8nu5vgEpEPVt3nUCNfl/+XmW3Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1t0zpk-0000000CiMw-3wpx;
+	Wed, 16 Oct 2024 10:56:45 +0200
+Message-ID: <f677361da9e1e4bb032e62301255ab705252e016.camel@sipsolutions.net>
+Subject: Re: [PATCH v1 wl-next 1/3] wifi: wext: Move wext_nlevents to
+ net->gen[].
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexandre.ferrieux@gmail.com, kuni1840@gmail.com, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Date: Wed, 16 Oct 2024 10:56:44 +0200
+In-Reply-To: <20241016004956.74702-1-kuniyu@amazon.com>
+References: 
+	<2d4bc83dffef3b773312aa08d55bb310f2dcead9.camel@sipsolutions.net>
+	 <20241016004956.74702-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241015081621.7bea8cd7@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-malware-bazaar: not-scanned
 
-On Tue, Oct 15, 2024 at 08:16:21AM -0700, Jakub Kicinski wrote:
-> On Mon, 14 Oct 2024 13:38:10 +0300 Andy Shevchenko wrote:
-> > While at it, move the respective buffer out from the structure as
-> > it's used only in one caller. This also improves memory footprint
-> > of struct tg3_napi.
-> 
-> It's passed to request_irq(), I thought request_irq() dups the string
-> but I can't see it now. So please include in the commit message a
-> reference to the function where the strdup (or such) of name happens 
-> in the request_irq() internals.
++netdev, I think we're starting to discuss more general things :)
 
-Hmm... you are right, the name should be kept as long as device instance alive
-(more precisely till calling free_irq() for the IRQ handler in question).
+On Tue, 2024-10-15 at 17:49 -0700, Kuniyuki Iwashima wrote:
+> From: Johannes Berg <johannes@sipsolutions.net>
+> Date: Tue, 15 Oct 2024 08:36:24 +0200
+> > On Mon, 2024-10-14 at 13:55 -0700, Kuniyuki Iwashima wrote:
+> > > CONFIG_WEXT_CORE cannot be built as a module
+> >=20
+> > Isn't that precisely an argument for _not_ using net->gen[] with all th=
+e
+> > additional dynamic allocations that implies?
+>=20
+> Exactly...
+>=20
+> Recently I was thinking most of the structs in struct net (except for
+> first-class citizens like ipv4/ipv6) should use net->gen[] given the
+> distro kernel enables most configs.
 
-I will redo this part (currently I'm choosing between leaving the name in the
-structure or using devm_kasprintf()for it, I'll check which one looks better
-at the end).
+Wait I'm confused, to me it seems you're contradicting yourself? :)
 
--- 
-With Best Regards,
-Andy Shevchenko
+If we agree that making it use net->gen[] is more overhead since it
+requires additional allocations (which necessarily require more memory
+due to alignment etc., but even without that because now you needed
+wext_net->net too) ...
 
+Then why do you think more should use net->gen[] if it's built-in?
 
+> But yes, WEXT is always built-in.
+
+I can see an argument for things that aren't always present, obviously,
+like bonding and pktgen, but I don't see much of an argument for things
+like wext that are either present or not?
+
+> Probably because wext_nlevents was just before a cacheline
+> on my setup ?
+>=20
+> $ pahole -EC net vmlinux | grep net_generic -C 30
+> ...
+> 	} wext_nlevents; /*  2536    24 */
+> 	/* --- cacheline 40 boundary (2560 bytes) --- */
+> 	struct net_generic *       gen;                                         =
+         /*  2560     8 */
+
+I'd argue that doesn't really mean it makes sense to pull it into
+net->gen (where it gets accessed via two indirect pointers)?
+
+That's an argument for reordering things there perhaps, but in struct
+net that's probably not too much of an issue unless it shares a
+cacheline with something that's used all the time?
+
+johannes
 
