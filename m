@@ -1,118 +1,167 @@
-Return-Path: <netdev+bounces-136610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14CCE9A24DD
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:20:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A475D9A24E7
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:22:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469D31C20CB6
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:20:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F62B28B6D8
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960691DE894;
-	Thu, 17 Oct 2024 14:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJPU1l5K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C09E1DE892;
+	Thu, 17 Oct 2024 14:21:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4141DDA24;
-	Thu, 17 Oct 2024 14:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F881DE3AC
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 14:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729174803; cv=none; b=AhLeotwwISopy5qsbBvl1Anh+uiFjE0Md4AEPBwrjmRTodMwcm7S0MDwn4OY1H3DJboFn5bN+e/8PrT4kZQvz7GXCTYG1G1BskrUW2MZ1XPGyiYefgxjDBfDpKG4dDmIoEewLMyxs0qKr3KhezOUEUH6EumPVcvAoP9lxZWND00=
+	t=1729174918; cv=none; b=VGpxQlLoNVqe8Pu5Xtx1vVOTJ3FzQG443t1O1GzId9Hr4MIiqLJr0L+6+ZuAl/1AiXbhmA/a5bdOlJ3dEEe6PCj8bS5tfeF9GiTLZUdDrR8kasxEkclcmj15NybgjbgeIrZCgZipwBY/AbESsojwOE6NxkkJLU1wNKxFpFGwvQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729174803; c=relaxed/simple;
-	bh=GLCrs3Dovv1NiZDErsK/6Wy5iJ7ydSzeUdxuxMzzEbc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=NgzOwb45mQG5PO3HA1c58AGE4SKtGW0TQ19UOrTY6Z5Yj/Fo0yCR/IDE79NylduH9ozl4i207Xo283Z41mFlLjenZW6ohF6Cprl29NSHT7TqZHQbnaumokOmJXwzpaG5r08ixKt+mGXUEaLEEY7IttzH0OScR7aYVOFI9dLVrVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJPU1l5K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 855DFC4CEC7;
-	Thu, 17 Oct 2024 14:19:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729174803;
-	bh=GLCrs3Dovv1NiZDErsK/6Wy5iJ7ydSzeUdxuxMzzEbc=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=cJPU1l5Kps56v8mtpHDahoOu/sesVEsbfkxPxTBjZJUFVPTfhquqJmMWgfV57Mzxr
-	 g1rd1vIx0qWhbCmkzM6IbOU0nOCP1F0T68LieQMKCfZIshfUbktERB0aoZhno+uJIB
-	 A5o+vNmH35gCfzcJ1QOdrFU13evRECzSwE6VGCf7j0zJO0BnRmoebOmEkEyOrIn/Fv
-	 R89L1k8bbBzfwhnKPHRNxgVxbKJcHvuhl0Yv/hVpD8djyoy1qYZwYfCn3aQs2Yl9av
-	 VvVxXTl2yNmlJn7lkLhFj8V6hfAEtpxPJ6+iyN7zNxSED2vaeBmgGrG4sDBsIoQhrm
-	 +AHc8oQp8Nn9g==
-From: Mark Brown <broonie@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>, 
- Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>, 
- Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Peter Zijlstra <peterz@infradead.org>, SeongJae Park <sj@kernel.org>, 
- Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev, 
- linux-mm@kvack.org, Arnd Bergmann <arnd@arndb.de>, 
- linux-arch@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Andy Whitcroft <apw@canonical.com>, 
- Joe Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>, 
- Liam Girdwood <lgirdwood@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
- netdev@vger.kernel.org, linux-sound@vger.kernel.org, 
- Michael Ellerman <mpe@ellerman.id.au>, Nathan Lynch <nathanl@linux.ibm.com>, 
- linuxppc-dev@lists.ozlabs.org, Mauro Carvalho Chehab <mchehab@kernel.org>, 
- linux-media@vger.kernel.org
-In-Reply-To: <20240904-devel-anna-maria-b4-timers-flseep-v1-0-e98760256370@linutronix.de>
-References: <20240904-devel-anna-maria-b4-timers-flseep-v1-0-e98760256370@linutronix.de>
-Subject: Re: (subset) [PATCH 00/15] timers: Cleanup delay/sleep related
- mess
-Message-Id: <172917479725.89568.14288418643818666155.b4-ty@kernel.org>
-Date: Thu, 17 Oct 2024 15:19:57 +0100
+	s=arc-20240116; t=1729174918; c=relaxed/simple;
+	bh=zBt6/1o7agVZSX+rWNtucjO/KuWPeQZtxmwFF6XugPc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YghT5cfgSZ966Vb2AOVQHX0ROqqFLJBbLcdWnsEFEBhspzLwZ1vjhUlMiXkglHCaNTts+yPx7rm54d0Tr+/J8TEnERBz0cJet14j52rTrhkgc2zUY7Xl2cXJP/dnIgMUQYojSEbEKxG4XAzByfZNVCyguFUcmmwGe9LV3iA7xHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t1RNf-0000d3-6B; Thu, 17 Oct 2024 16:21:35 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t1RNe-0003nc-02;
+	Thu, 17 Oct 2024 16:21:34 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id A246B355320;
+	Thu, 17 Oct 2024 14:21:33 +0000 (UTC)
+Date: Thu, 17 Oct 2024 16:21:33 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: RE: RE: [PATCH net-next 07/13] net: fec: fec_probe(): update
+ quirk: bring IRQs in correct order
+Message-ID: <20241017-rainbow-nifty-gazelle-9acee4-mkl@pengutronix.de>
+References: <20241016-fec-cleanups-v1-0-de783bd15e6a@pengutronix.de>
+ <20241016-fec-cleanups-v1-7-de783bd15e6a@pengutronix.de>
+ <PAXPR04MB85103D3E433F3FBE5DDFA15C88472@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20241017-affable-impartial-rhino-a422ec-mkl@pengutronix.de>
+ <PAXPR04MB8510149D0E8AC39E048941F988472@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20241017-manipulative-dove-of-renovation-88d00b-mkl@pengutronix.de>
+ <ZxEZR2lmIbX6+xX2@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-9b746
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="qjhlnbg5enicegfn"
+Content-Disposition: inline
+In-Reply-To: <ZxEZR2lmIbX6+xX2@lizhi-Precision-Tower-5810>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, 04 Sep 2024 15:04:50 +0200, Anna-Maria Behnsen wrote:
-> a question about which sleeping function should be used in acpi_os_sleep()
-> started a discussion and examination about the existing documentation and
-> implementation of functions which insert a sleep/delay.
-> 
-> The result of the discussion was, that the documentation is outdated and
-> the implemented fsleep() reflects the outdated documentation but doesn't
-> help to reflect reality which in turns leads to the queue which covers the
-> following things:
-> 
-> [...]
 
-Applied to
+--qjhlnbg5enicegfn
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git for-next
+On 17.10.2024 10:03:51, Frank Li wrote:
+> > > > Yes, that is IMHO the correct description of the IP core, but the
+> > > > i.MX8M/N/Q DTS have the wrong order of IRQs. And for compatibility
+> > > > reasons (fixed DTS with old driver) it's IMHO not possible to chang=
+e the
+> > > > DTS.
+> > > >
+> > >
+> > > I don't think it is a correct behavior for old drivers to use new DTB=
+s or new
+> > > drivers to use old DTBs. Maybe you are correct, Frank also asked the =
+same
+> > > question, let's see how Frank responded.
+> >
+> > DTBs should be considered stable ABI.
+> >
+>=20
+> ABI defined at binding doc.
+>   interrupt-names:
+>     oneOf:
+>       - items:
+>           - const: int0
+>       - items:
+>           - const: int0
+>           - const: pps
+>       - items:
+>           - const: int0
+>           - const: int1
+>           - const: int2
+>       - items:
+>           - const: int0
+>           - const: int1
+>           - const: int2
+>           - const: pps
+>=20
+> DTB should align binding doc. There are not 'descriptions' at 'interrupt',
+> which should match 'interrupt-names'. So IMX8MP dts have not match ABI,
+> which defined by binding doc. So it is DTS implement wrong.
 
-Thanks!
+I follow your conclusion. But keep in mind, fixing the DTB would break
+compatibility. The wrong DTS looks like this:
 
-[11/15] regulator: core: Use fsleep() to get best sleep mechanism
-        commit: f20669fbcf99d0e15e94fb50929bb1c41618e197
+- const: int1
+- const: int2
+- const: int0
+- const: pps
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
+Currently we have broken DTS on the i.MX8M* and the
+FEC_QUIRK_WAKEUP_FROM_INT2 that "fixes" this.
 
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
+This patch uses this quirk to correct the IRQ <-> queue assignment in
+the driver.
 
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
+Marc
 
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Thanks,
-Mark
+--qjhlnbg5enicegfn
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcRHWoACgkQKDiiPnot
+vG/STwgAhj7R/YH7PoO9JfIBXoNwyrWTFyN4vrRAwH4MyRPDxByKlcyaZq0Gmmwd
+njOY6aiDDTcEiQTn9lq1LYOJlSfq1zxLh8vY9t9WmX3Sm6YdqnYNmwLqFbhe9vLM
+qdpaxRL0ZqLNFjgzlduaBjEuTjC9AMoaXBGb5U6KJgMBvnrij6ubgNKk9qIzihhS
+XKQ/eiVd0Vx8yydq2/7+YWJzOxK/zQli3G0/a9QTYyEfh6InIBvkLhbiL48Bw7PO
+8ZfJN4W6Yf+IiCN6Ru6dmvomgGNUIE0Iptm06XRW5y5YMKjNX1EtVBLZjBey0Y6c
+6O6KLb8atwIgdsjp0EdKAKqwLPSYig==
+=dEJL
+-----END PGP SIGNATURE-----
+
+--qjhlnbg5enicegfn--
 
