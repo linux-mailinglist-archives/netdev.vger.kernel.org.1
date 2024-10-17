@@ -1,145 +1,130 @@
-Return-Path: <netdev+bounces-136534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 992969A2087
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 13:04:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120D79A209B
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 13:06:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46E19288354
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:04:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85A08B24E45
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B431DBB03;
-	Thu, 17 Oct 2024 11:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mFuj+u2O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978161DBB0C;
+	Thu, 17 Oct 2024 11:06:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF0F1DBB0D
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 11:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136AB1D3566;
+	Thu, 17 Oct 2024 11:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729163059; cv=none; b=Y9Z+IJVUGQaLzVf9J7c+oy6ToxFOjZJ1B7/hbFx9aGOs4kOoN8MYMgKWT6EagwB+IXmoMxwweAA78JPZzX9SyW3TCe9PwGYXaqAOuhV8P7s/E3b0h38Art9/bGkY+JrDj9KyLLh1kOzfW7FMaBaDl5FGsxu2C9uNxlj94I76Tp8=
+	t=1729163163; cv=none; b=c2Atdkv9HWZ+URmwPQaoTaKBU+hiRLu1UsvEAOwxTlagihbQTEVrLb00sA9u0INp9AxTGSqgoIWXvfZ/zqi32HE3kwEQwKkjN5RcePRpsooknxYy8oTcYc971o0QGVlZOStucG+9Rm4ep/SxdWOg92+xWok6PhXcSIrDs7o9sy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729163059; c=relaxed/simple;
-	bh=taufqpI73+kpr0Ades0/aP6u1dipBaCN0nx2Z+dJKsM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vFTGUY4Bq3ur2/cObmxhn0Uofl0RIhCLJpzP+cmjo6sSvQ/hNoVn+nv/Z10mm0c7G3dNk36VqJ7KoMTpBO2elQSblAl7rrPv7tkGwlm1WQtnJyVvoH8CB1zMxTmMRtImre4iX7VfVomKSt53HAO/fEe02/oXtc47NDjk/TVKIrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mFuj+u2O; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539e66ba398so23073e87.0
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 04:04:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729163054; x=1729767854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xhSgMw/IF59qkvvEibQnpN4brZ6Rd7pimetak8BWaqs=;
-        b=mFuj+u2OBbuhIek+p5HTlzxd0rInAbNOlzrAqoOvBJXQRkCnctFhMk0YNKmjIfCAJO
-         RuJYuei4ekCtG29lbAjc1F/cAPwbRGk0PhkHnjF/xpD3hCk7VSeldhevY4j52aQfMj1+
-         DZUEeAFFaAJnVvvM/SqaZj9oR4dAD4vtdDPyWf7jwwOMpUyp/4FH75CLVzqEgjXYKrEg
-         rUks6WQ3A3WqezfJT10w45h9LkgH9DXVK6zlZxwC7+vEsLMB5GD+RXOZcom/3VnfGMG0
-         E/7SLf1dsZqg+7UFbkpm4dAY+9MlJtOFmzVwcilCfZqxbzFo5W44Ofg2D4dXBcFfEfob
-         WbDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729163054; x=1729767854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xhSgMw/IF59qkvvEibQnpN4brZ6Rd7pimetak8BWaqs=;
-        b=wllNMPIMW0dorOmUJZu/Ae22vzXKf06e1BvBAqMQmAO8EpjAIPG9QRl/co1Xq9RXBl
-         oGrMnVHLyVQGjGSjj/ayA2UdsdevI7no3Mjs+2Tzu+8zWgEqjWe33kEaWnU+8fZukc5B
-         VVv+rJ8Ui4iLdd3APXWVlLbtyiO3l3CUYNZHHV1H2T2Z80cHMlzxJoOWtgfpBR/rOllU
-         ClI4ZfZda0Vof2TlLHaQQLOsPea01otL7qLQ9ZMoth/ngXqqjYlk4mgMgczBfmrkkhFk
-         yYWNXWxLIlVqBMofXoGCk4932b3imDFNx1hQ0/yfUjBmomV3h7fPlIaE3XRr0TT60zrL
-         H8mg==
-X-Gm-Message-State: AOJu0YzKd85vH4YhmhkBI1qO3vbUPzovcTZj2cEzosA2my+CeDkLy4Ho
-	EOMW4M68pX+qIVo/neS+4vf6WcuZozAWhI4nGbLriKeI6ARhUhsnI0JUBLrXAvgAxIZzg9YBtEp
-	xY3rTimQVE1qI278cSuklnv1nvY6MuNo1OQT8
-X-Google-Smtp-Source: AGHT+IHcz3uoXkkXHaV2C8zXH5/MeVYWSXCYVKatTeRbFdahiI5uvrYww63i8awkMqWZn+QTudgiNvlmTE6fO4S1hLk=
-X-Received: by 2002:a05:6512:a8b:b0:533:49ab:780e with SMTP id
- 2adb3069b0e04-53a0ce58e4cmr425311e87.2.1729163053576; Thu, 17 Oct 2024
- 04:04:13 -0700 (PDT)
+	s=arc-20240116; t=1729163163; c=relaxed/simple;
+	bh=Y26YuhEeOV5g2D/6jd/R/t6rMuzkgD6XOXI9VxnJb7s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sxX97Oo8W7PwaaXoWciG/pqyxAX7XVjzmB0M2iCAXboDlwgn/IG0lRazGtlzEp+D9WbPY2F14BchYzB/pjkncL1SqGXnbfKqK+Amm1jinmfRpc/5pJBAUOSnq2wODjTuBXQzhQ3/SGJmN8rQG7IjBltMxRR+tUrCRO9WJ4ScpGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XTlMQ6WL9z2DdSM;
+	Thu, 17 Oct 2024 19:04:02 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 698F61A0188;
+	Thu, 17 Oct 2024 19:05:18 +0800 (CST)
+Received: from mscphis02103.huawei.com (10.123.65.215) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 17 Oct 2024 19:05:16 +0800
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>, <gnoack@google.com>
+CC: <willemdebruijn.kernel@gmail.com>, <matthieu@buffet.re>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+Subject: [RFC PATCH v2 0/8] Fix non-TCP restriction and inconsistency of TCP errors
+Date: Thu, 17 Oct 2024 19:04:46 +0800
+Message-ID: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241017094315.6948-1-fw@strlen.de> <CANP3RGeeR9vso0MyjRhFuTmx5K7ttt0bisHucce0ONeJotXOZw@mail.gmail.com>
- <20241017105251.GA12005@breakpoint.cc>
-In-Reply-To: <20241017105251.GA12005@breakpoint.cc>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Thu, 17 Oct 2024 13:03:57 +0200
-Message-ID: <CANP3RGcWhTKOgNsCEb8bMNhktgdzXH+00s5zTKU3=iVocT5rqw@mail.gmail.com>
-Subject: Re: [PATCH ipsec] xfrm: migrate: work around 0 if_id on migrate
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Nathan Harold <nharold@google.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Yan Yan <evitayan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-On Thu, Oct 17, 2024 at 12:52=E2=80=AFPM Florian Westphal <fw@strlen.de> wr=
-ote:
->
-> Maciej =C5=BBenczykowski <maze@google.com> wrote:
-> > > +found:
-> > >         /* Stage 2 - find and update state(s) */
-> > >         for (i =3D 0, mp =3D m; i < num_migrate; i++, mp++) {
-> > >                 if ((x =3D xfrm_migrate_state_find(mp, net, if_id))) =
-{
-> > > --
-> > > 2.45.2
-> > >
-> >
-> > Q: Considering the performance impact... would it make sense to hide
-> > this behind a sysctl or a kconfig?
->
-> Kconfig?  I don't think so, all distros except Android would turn it on.
->
-> > Yan Yan: Also, while I know we found this issue in Android... do we
-> > actually need the fix?  Wasn't the adjustment to netd sufficient?
-> > Android <16 doesn't support >6.6 anyway, and Android 16 should already
-> > have the netd fix...
->
-> ... seems you already fixed this, so I suspect this slowpath won't ever
-> run in your case.
->
-> Following relevant cases exist:
-> 1. Userspace asks to migrate existing policy, provides if_id > 0.
->    -> slowpath is elided.
->
-> 2. Userspace asks to migrate existing policy, the policy is NOT for
->    xfrm_interface, -> slowpath is also elided because first attempt
->    finds the if_id 0 policy.
->
-> 3. Like 1, but userspace does not set the if_id.
->    -> slowpath runs, BUT without it migration would not work.
->
-> 4. Like 2, but the policy doesn't exist.
->    -> slowpath runs and slows things down for no reason.
->
-> For 1 and 2 even sysctl knob is irrelevant.
->
-> For 3, sysctl knob is *technically* irrelevant, either migrate is
-> broken (sysctl off) or its on and policy migrate will work.
-> This also hints we'd have to turn such sysctl on by default...
->
-> For 4, sysctl could be used to disable/avoid such slowdown.
-> But I'm not sure this is a relevant scenario in practice, aside
-> from fuzzers, AND it breaks 3) again if its off.
->
-> So I don't see a need to provide a config knob or a sysctl
-> that would have to be on by default...
->
-> If you think a Kconfig knob makes sense for Android sake I can respin
-> with such a knob, but I think I'd have to make it default-y.
+Hello!
+This patchset provides two general fixes for TCP Landlock hooks:
 
-I'll trust your judgment.  I thought we could maybe eventually
-deprecate and delete this, but it sounds like that isn't going to be
-the case...
+First one fixes incorrect restriction of non-TCP bind/connect actions.
+There is two commits related to testing MPTCP and SCTP protocols which were
+incorrectly restricted. SCTP implementation has invalid check for minimal
+address length in bind(2) call [1], therefore commit with SCTP testing can be
+applied later after necessary SCTP fixes.
+
+[1] https://lore.kernel.org/all/20241004.Hohpheipieh2@digikod.net/
+Closes: https://github.com/landlock-lsm/linux/issues/40
+
+Second one fixes inconsistency of errors in bind and connect hooks for
+TCP sockets. It provides per-operation helpers, which consist of a set
+of checks from the TCP network stack. Due to TCP connect(2) implementation
+it's not possible to obtain full consistency, but the unhandled cases are
+rather special scenarios that should almost should not normally appear.
+Two new tests were implemented to validate errors consistency.
+
+Diffs of second and third commits were unreadable, so I've decided to
+rewrite net.c file to simplify reviewing process.
+
+Code coverage
+=============
+Code coverage(gcov) report with the launch of net_test selftest:
+ * security/landlock/net.c:
+lines......: 98.8% (79 of 80 lines)
+functions..: 100% (8 of 8 functions)
+
+One uncovered line is documented in check_tcp_connect_consistency_and_get_port().
+
+General changes
+===============
+ * Rebases on current linux-mic/next (based on Linux v6.12-rc3)
+ * Fixes inconsistency of TCP actions errors and implements two related
+   tests.
+ * Removes SMC test suits.
+ * Adds separate commit for SCTP test suits.
+ * Adds test suits of protocol fixture for sockets created with
+   protocol=IPPROTO_TCP (C.f. socket(2)).
+
+Previous versions
+=================
+v1: https://lore.kernel.org/all/20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com/
+
+Mikhail Ivanov (8):
+  landlock: Fix non-TCP sockets restriction
+  landlock: Make network stack layer checks explicit for each TCP action
+  landlock: Fix inconsistency of errors for TCP actions
+  selftests/landlock: Test TCP accesses with protocol=IPPROTO_TCP
+  selftests/landlock: Test that MPTCP actions are not restricted
+  selftests/landlock: Test consistency of errors for TCP actions
+  landlock: Add note about errors consistency in documentation
+  selftests/landlock: Test that SCTP actions are not restricted
+
+ Documentation/userspace-api/landlock.rst    |   3 +-
+ security/landlock/net.c                     | 501 +++++++++++-------
+ tools/testing/selftests/landlock/common.h   |   1 +
+ tools/testing/selftests/landlock/config     |   4 +
+ tools/testing/selftests/landlock/net_test.c | 532 ++++++++++++++++++--
+ 5 files changed, 825 insertions(+), 216 deletions(-)
+ rewrite security/landlock/net.c (36%)
+
+
+base-commit: fe76bd133024aaef12d12a7d58fa3e8d138d3bf3
+-- 
+2.34.1
+
 
