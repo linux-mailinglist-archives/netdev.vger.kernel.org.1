@@ -1,193 +1,304 @@
-Return-Path: <netdev+bounces-136751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2489A2E5A
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 22:20:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6F29A2E70
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 22:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B464284021
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:20:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F239B1C21A94
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F14E21A6FE;
-	Thu, 17 Oct 2024 20:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KtsXeuYb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F4F1DFE2A;
+	Thu, 17 Oct 2024 20:23:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15C52281DC
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 20:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB11B1E0DF4
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 20:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729196434; cv=none; b=CTWkG10+M8QNmeknTwR1ap8khCPV2fJaxLiRcPEq0/41puVGVtu2dl2+H2t7B36xufqx0Y78am7uis+/xmemdr2ryWLlh1HLmSQ2Jv3DOmvdVvmbTYqULXsrsZw09l7ewbjXLsaL98o0/rqWgivgC0jwcX1b0ed8rxzGswZCHN0=
+	t=1729196622; cv=none; b=K8pbHN8uID2Z2bcvLTVK9xj8Q0m8h8se0XnZGgCsnbKqP1v3RHldTKdxdXlGTbxUaTlqoHBOe/lz9q91SM47WLOPxRqzlBrcJMUcLsfnhXl26Dr+T0+W/FlyZPy5+Cbc3IcPv12Ydc/l9YK0GlZuFQgygujF/dMNiJG9lNrIKBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729196434; c=relaxed/simple;
-	bh=4bHiAcmpmJaEZ/6JyICLXEOA3J8FN4bGdFi17a9IHPI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ONZv2su+F/yjjOfCC0baqCZfdkgtLZ8glZ8zCTt38knwOypXZsQcBJUvyqr5jSKkY6sYrvQmPd2goZoX1ideDKKZZVBrysEl9DNJF0aGqTY/gxoqKYMCJ3sZ6ZK2woBCQEHnC6mW2OHH1ZeH4JvYaGFqI8PNAquDuT01aZllaeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KtsXeuYb; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-539e1543ab8so2451731e87.2
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 13:20:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729196426; x=1729801226; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h+lLSVJDLeSkVSD4JaLLw0mh/GqPvD/iR54O84egAsg=;
-        b=KtsXeuYbQUkeIuXkB1SJFDh5175nLl+L5sZkdC+LP8PbimXAhHAdvGIGCzoI7z4l4x
-         pAt1wFCBAXUtRlPhquBOJdEUFokUpd2UeMzDNJrQQKbECL57EwDtRtifIhjkHIMKXlg6
-         Zm4ultYyJAhJw2s1/xlrx9rFa1+n4FqlZ2gRhg7uWOZCCaFbHkEWHv7yCSeSGn7LVHEG
-         z3RzQzI4nrzbY05pGhIMQzfMQxy5I5CK1ZEcxPoNk544GO3gC97cvxFXxsKa//hPrc4C
-         GG9PXWR9XZuvyr3fDjlCJ/8Ha8r63zTmcoEUhCQMof7TpaWIMqudq0sC32jNhLFxCL/7
-         nRTA==
+	s=arc-20240116; t=1729196622; c=relaxed/simple;
+	bh=bo8l9jK+K6SXdujD2QzQ2NmX/YLcQyCI+tR2gj2FHIc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=mBn1LqWRh30cjaI7h4sZ60vxFtoT+NSR8yiBt4wAM5jUMp9d0BCdItFtWKXce2Cfw0XnSXjM+zXJsyO9xwN+vTJ5XJRUXtL2RhS40xDCPsCQbFqeI02BzlOFiKdydoFL4Jrbj1uEyVb/5gs34X86dn2tTT0xBMySX8CynpTXvYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a3ae775193so16182635ab.1
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 13:23:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729196426; x=1729801226;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h+lLSVJDLeSkVSD4JaLLw0mh/GqPvD/iR54O84egAsg=;
-        b=YgtcJ6LvzWYHG8xclEi7cqkIau2SRqnM00S+JjWA9pYbILrFzJPjkLbvHNc52ROWGe
-         CoKXeSdUl1BVv8XXcBW7xz3rxiYbKof5yzU1kkAgH2TKLx6XkEA5OjB9d+UYSklCq3xG
-         7b0XDJzvRGcY8EsNOJs/TMTElC1zfjqbmywdEoj2kXh0wnbHp8oKx2NAR1G0BRBA/+eU
-         seTXMRF7ZGYg93isrqMlbfafVnSU97W2o6JNfDzdFyByjr0/unoC6hZiqqACjOx3kuOI
-         +UELK/aAXvcKGsZhQbWF32E15rQx7BT6uGkLK5lltphDnFkZLsvSMMJEeMpeGXkwDf1i
-         nLVw==
-X-Gm-Message-State: AOJu0YxIxidR4sT5CzKHCRgGU5v7aRWSysMyksBoybFIJ8ZvGlEUTPY3
-	0AOUH3KGjwVcBtEYAjHzzooCsm7IetHPj2pRvbu4ct9Gdlnb2sBRcbuzgKbk2oL6kr4p8YBGkon
-	hURbvuC8p0Zj8zxbveNEet0Z6FxOZxrFqddBD
-X-Google-Smtp-Source: AGHT+IFui/hNaJtzBBshxQmG7kcnixdOWrxF54utRM8cgSbOrzez4CCUme1clquWTU5EDdlQY8+hRitBZSedrIGYESY=
-X-Received: by 2002:a05:6512:3a8d:b0:539:9720:99dc with SMTP id
- 2adb3069b0e04-53a154c9f51mr120153e87.46.1729196425667; Thu, 17 Oct 2024
- 13:20:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729196617; x=1729801417;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PkmIBheTvejxuymwXP9T0lCMzGXKi43b+vMHN+w3DcQ=;
+        b=W96+EGCYY68hzpDgVGWgOyn6gimVobHs1VJVkxyw41jq4u0fmUtdSd5I+Asc2RWE7U
+         JFjDRI8GmjSFfe6b+E9Z7sfAG4Ocep+Qe2jJ2HjVYu/VTJ8Pa/xwbvGn4/6Tp2zEtk6P
+         3elG+PKEg7emoWRE+uOOtLH/fJXpi4c+Z/VCi8Kq16b4wSlu0gC/JyrchFfEIg/xn9gC
+         ujqWCSMY285CeOxz4l50/ideg6zfamyOYJmt9kWQg+DZ0bO7cVeGinZM5iLszH5qlHlS
+         1EzNqET2393GDfZerhZyggyG78nRrUCkQqRY9QXo9/JrbXGJpbyZMlgVnk2yZUlt5koH
+         XiSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmpkaFe21fHgjeMSO7syZqKsoWaynXsefziDPCL4malN898WUgMCWxhPwX4I5vZcfo9Yeq9lM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXfq7/ESv9zyPQHRN8oZXeVhVixSxx2SDOnQ1/1e6v5IxnhE7W
+	uyqTE4lSi5OPZhQKZNANYsKdQWGNReP6SK37ZSxzuPDox52waOeD0rl6FWRMCDcB/420sc1EeSt
+	5/cDi9wo6/Ij0k5tORRw0l6L5NEuKtYylf/7FqsKivoFQw9t2wA4XfKs=
+X-Google-Smtp-Source: AGHT+IHBO8Iem+HVTBGX8UopCRd61J5CA8NZRybZ5cUmxoJhdC326po+WOwNsq5hxdd7xmyd1z/ciNiUbN/swxjs2nNE206SXbiQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014202108.1051963-1-pkaligineedi@google.com>
- <20241014202108.1051963-3-pkaligineedi@google.com> <89d7ce83-cc1d-4791-87b5-6f7af29a031d@huawei.com>
- <CA+f9V1MZWkWmVHruHgJC1hqepi-CTLDvGjtkd3CGaCiUR-kF5Q@mail.gmail.com> <e9c92aab-16bc-4814-8902-7796b9d29826@huawei.com>
-In-Reply-To: <e9c92aab-16bc-4814-8902-7796b9d29826@huawei.com>
-From: Praveen Kaligineedi <pkaligineedi@google.com>
-Date: Thu, 17 Oct 2024 13:20:14 -0700
-Message-ID: <CA+f9V1N2H5_uWQ4eVa7r3Gv1JA=AW_VZu4vpC-Th8rujgpKTQA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] gve: adopt page pool for DQ RDA mode
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, jeroendb@google.com, 
-	shailend@google.com, hramamurthy@google.com, ziweixiao@google.com, 
-	shannon.nelson@amd.com, jacob.e.keller@intel.com
+X-Received: by 2002:a05:6e02:1988:b0:3a0:8d60:8ba7 with SMTP id
+ e9e14a558f8ab-3a3f4073bcdmr643415ab.14.1729196616853; Thu, 17 Oct 2024
+ 13:23:36 -0700 (PDT)
+Date: Thu, 17 Oct 2024 13:23:36 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67117248.050a0220.10f4f4.0001.GAE@google.com>
+Subject: [syzbot] [wireless?] KASAN: slab-use-after-free Write in kvfree_call_rcu
+From: syzbot <syzbot+36218cddfd84b5cc263e@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Thanks Yunsheng for the clarification. It makes sense to me now. We
-will send a patch calling page_pool_put_full_page instead of
-page_pool_put_page.
+Hello,
 
---Praveen
+syzbot found the following issue on:
 
-On Thu, Oct 17, 2024 at 2:40=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2024/10/17 3:43, Praveen Kaligineedi wrote:
-> > Thanks Yunsheng. One thing that's not clear to me - the GVE driver
-> > does not call page_pool_put_page with dma_sync_size of 0 anywhere. Is
-> > this still an issue in that case?
->
-> It depends on what's value of 'dma_sync_size', as the value of the
-> below 'page_info.buf_size' seems to be the size of one fragment, so
-> it might end up only doing the dma_sync operation for the first fragment,
-> and what we want might be to dma sync all the fragments in the same page.
->
-> The doc about that in Documentation/networking/page_pool.rst seems a
-> little outdated, but what it meant is still true as my understanding:
->
-> https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/networking/=
-page_pool.rst#L101
->
-> >
-> > Thanks,
-> > Praveen
-> >
-> >
-> > On Wed, Oct 16, 2024 at 2:21=E2=80=AFAM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
-> >>
-> >> On 2024/10/15 4:21, Praveen Kaligineedi wrote:
-> >>
-> >> ...
-> >>
-> >>> +void gve_free_to_page_pool(struct gve_rx_ring *rx,
-> >>> +                        struct gve_rx_buf_state_dqo *buf_state,
-> >>> +                        bool allow_direct)
-> >>> +{
-> >>> +     struct page *page =3D buf_state->page_info.page;
-> >>> +
-> >>> +     if (!page)
-> >>> +             return;
-> >>> +
-> >>> +     page_pool_put_page(page->pp, page, buf_state->page_info.buf_siz=
-e,
-> >>> +                        allow_direct);
-> >>
-> >> page_pool_put_full_page() might be a better option here for now when
-> >> page_pool is created with PP_FLAG_DMA_SYNC_DEV flag and frag API like
-> >> page_pool_alloc() is used in gve_alloc_from_page_pool(), as explained
-> >> in below:
-> >>
-> >> https://lore.kernel.org/netdev/20241014143542.000028dc@gmail.com/T/#md=
-aba23284a37affc2c46ef846674ae6aa49f8f04
-> >>
-> >>
-> >>> +     buf_state->page_info.page =3D NULL;
-> >>> +}
-> >>> +
-> >>> +static int gve_alloc_from_page_pool(struct gve_rx_ring *rx,
-> >>> +                                 struct gve_rx_buf_state_dqo *buf_st=
-ate)
-> >>> +{
-> >>> +     struct gve_priv *priv =3D rx->gve;
-> >>> +     struct page *page;
-> >>> +
-> >>> +     buf_state->page_info.buf_size =3D priv->data_buffer_size_dqo;
-> >>> +     page =3D page_pool_alloc(rx->dqo.page_pool,
-> >>> +                            &buf_state->page_info.page_offset,
-> >>> +                            &buf_state->page_info.buf_size, GFP_ATOM=
-IC);
-> >>> +
-> >>> +     if (!page)
-> >>> +             return -ENOMEM;
-> >>> +
-> >>> +     buf_state->page_info.page =3D page;
-> >>> +     buf_state->page_info.page_address =3D page_address(page);
-> >>> +     buf_state->addr =3D page_pool_get_dma_addr(page);
-> >>> +
-> >>> +     return 0;
-> >>> +}
-> >>> +
-> >>> +struct page_pool *gve_rx_create_page_pool(struct gve_priv *priv,
-> >>> +                                       struct gve_rx_ring *rx)
-> >>> +{
-> >>> +     u32 ntfy_id =3D gve_rx_idx_to_ntfy(priv, rx->q_num);
-> >>> +     struct page_pool_params pp =3D {
-> >>> +             .flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-> >>> +             .order =3D 0,
-> >>> +             .pool_size =3D GVE_PAGE_POOL_SIZE_MULTIPLIER * priv->rx=
-_desc_cnt,
-> >>> +             .dev =3D &priv->pdev->dev,
-> >>> +             .netdev =3D priv->dev,
-> >>> +             .napi =3D &priv->ntfy_blocks[ntfy_id].napi,
-> >>> +             .max_len =3D PAGE_SIZE,
-> >>> +             .dma_dir =3D DMA_FROM_DEVICE,
-> >>> +     };
-> >>> +
-> >>> +     return page_pool_create(&pp);
-> >>> +}
-> >>> +
+HEAD commit:    36c254515dc6 Merge tag 'powerpc-6.12-4' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1427e440580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=667b897270c8ae6
+dashboard link: https://syzkaller.appspot.com/bug?extid=36218cddfd84b5cc263e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-36c25451.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0a357f9d2448/vmlinux-36c25451.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/fba8311d450b/bzImage-36c25451.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+36218cddfd84b5cc263e@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in kvfree_call_rcu+0xb99/0xbe0 kernel/rcu/tree.c:3819
+Write of size 8 at addr ffff888062198808 by task kworker/u32:11/1199
+
+CPU: 1 UID: 0 PID: 1199 Comm: kworker/u32:11 Not tainted 6.12.0-rc2-syzkaller-00307-g36c254515dc6 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: netns cleanup_net
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0xc3/0x620 mm/kasan/report.c:488
+ kasan_report+0xd9/0x110 mm/kasan/report.c:601
+ kvfree_call_rcu+0xb99/0xbe0 kernel/rcu/tree.c:3819
+ _cfg80211_unregister_wdev+0x38c/0x7f0 net/wireless/core.c:1238
+ ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2300
+ ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1669
+ mac80211_hwsim_del_radio+0x268/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:5625
+ hwsim_exit_net+0x33f/0x6d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6505
+ ops_exit_list+0xb0/0x180 net/core/net_namespace.c:173
+ cleanup_net+0x5b7/0xb40 net/core/net_namespace.c:626
+ process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 5898:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:257 [inline]
+ __do_kmalloc_node mm/slub.c:4264 [inline]
+ __kmalloc_noprof+0x1e8/0x410 mm/slub.c:4276
+ kmalloc_noprof include/linux/slab.h:882 [inline]
+ kzalloc_noprof include/linux/slab.h:1014 [inline]
+ nl80211_set_cqm_rssi net/wireless/nl80211.c:13107 [inline]
+ nl80211_set_cqm+0xa19/0x1780 net/wireless/nl80211.c:13174
+ genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x165/0x410 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg net/socket.c:744 [inline]
+ ____sys_sendmsg+0x9ae/0xb40 net/socket.c:2607
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2661
+ __sys_sendmsg+0x117/0x1f0 net/socket.c:2690
+ do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+ __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+Freed by task 112:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:2342 [inline]
+ slab_free mm/slub.c:4579 [inline]
+ kfree+0x14f/0x4b0 mm/slub.c:4727
+ kvfree+0x47/0x50 mm/util.c:701
+ kvfree_rcu_list+0xf5/0x2c0 kernel/rcu/tree.c:3423
+ kvfree_rcu_drain_ready kernel/rcu/tree.c:3563 [inline]
+ kfree_rcu_monitor+0x503/0x8b0 kernel/rcu/tree.c:3632
+ kfree_rcu_shrink_scan+0x245/0x3a0 kernel/rcu/tree.c:3966
+ do_shrink_slab+0x44f/0x11c0 mm/shrinker.c:435
+ shrink_slab+0x32b/0x12a0 mm/shrinker.c:662
+ shrink_one+0x47e/0x7b0 mm/vmscan.c:4818
+ shrink_many mm/vmscan.c:4879 [inline]
+ lru_gen_shrink_node mm/vmscan.c:4957 [inline]
+ shrink_node+0x2452/0x39d0 mm/vmscan.c:5937
+ kswapd_shrink_node mm/vmscan.c:6765 [inline]
+ balance_pgdat+0xc19/0x18f0 mm/vmscan.c:6957
+ kswapd+0x5ea/0xbf0 mm/vmscan.c:7226
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Last potentially related work creation:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ __kasan_record_aux_stack+0xba/0xd0 mm/kasan/generic.c:541
+ kvfree_call_rcu+0x74/0xbe0 kernel/rcu/tree.c:3810
+ _cfg80211_unregister_wdev+0x38c/0x7f0 net/wireless/core.c:1238
+ ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2300
+ ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1669
+ mac80211_hwsim_del_radio+0x268/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:5625
+ hwsim_exit_net+0x33f/0x6d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6505
+ ops_exit_list+0xb0/0x180 net/core/net_namespace.c:173
+ cleanup_net+0x5b7/0xb40 net/core/net_namespace.c:626
+ process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ __kasan_record_aux_stack+0xba/0xd0 mm/kasan/generic.c:541
+ kvfree_call_rcu+0x74/0xbe0 kernel/rcu/tree.c:3810
+ _cfg80211_unregister_wdev+0x38c/0x7f0 net/wireless/core.c:1238
+ cfg80211_netdev_notifier_call+0xa5c/0x1160 net/wireless/core.c:1494
+ notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
+ call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1996
+ call_netdevice_notifiers_extack net/core/dev.c:2034 [inline]
+ call_netdevice_notifiers net/core/dev.c:2048 [inline]
+ __dev_change_net_namespace+0x44f/0x12a0 net/core/dev.c:11583
+ dev_change_net_namespace include/linux/netdevice.h:3932 [inline]
+ cfg80211_switch_netns+0x11e/0x690 net/wireless/core.c:169
+ nl80211_wiphy_netns+0x134/0x2b0 net/wireless/nl80211.c:12364
+ genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x165/0x410 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg net/socket.c:744 [inline]
+ ____sys_sendmsg+0x9ae/0xb40 net/socket.c:2607
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2661
+ __sys_sendmsg+0x117/0x1f0 net/socket.c:2690
+ do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+ __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+The buggy address belongs to the object at ffff888062198800
+ which belongs to the cache kmalloc-64 of size 64
+The buggy address is located 8 bytes inside of
+ freed 64-byte region [ffff888062198800, ffff888062198840)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x62198
+anon flags: 0x4fff00000000000(node=1|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 04fff00000000000 ffff88801ac428c0 ffffea00017aef40 dead000000000005
+raw: 0000000000000000 0000000000200020 00000001f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52c40(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5424, tgid 5424 (syz-executor), ts 49927932309, free_ts 0
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1537
+ prep_new_page mm/page_alloc.c:1545 [inline]
+ get_page_from_freelist+0x101e/0x3070 mm/page_alloc.c:3457
+ __alloc_pages_noprof+0x223/0x25a0 mm/page_alloc.c:4733
+ alloc_pages_mpol_noprof+0x2c9/0x610 mm/mempolicy.c:2265
+ alloc_slab_page mm/slub.c:2412 [inline]
+ allocate_slab mm/slub.c:2578 [inline]
+ new_slab+0x2ba/0x3f0 mm/slub.c:2631
+ ___slab_alloc+0xd1d/0x16f0 mm/slub.c:3818
+ __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3908
+ __slab_alloc_node mm/slub.c:3961 [inline]
+ slab_alloc_node mm/slub.c:4122 [inline]
+ __do_kmalloc_node mm/slub.c:4263 [inline]
+ __kmalloc_noprof+0x379/0x410 mm/slub.c:4276
+ kmalloc_noprof include/linux/slab.h:882 [inline]
+ kmalloc_array_noprof include/linux/slab.h:923 [inline]
+ security_inode_init_security+0x140/0x390 security/security.c:1825
+ shmem_symlink+0x138/0x6a0 mm/shmem.c:3814
+ vfs_symlink fs/namei.c:4615 [inline]
+ vfs_symlink+0x3e8/0x660 fs/namei.c:4599
+ do_symlinkat+0x263/0x310 fs/namei.c:4641
+ __do_sys_symlinkat fs/namei.c:4657 [inline]
+ __se_sys_symlinkat fs/namei.c:4654 [inline]
+ __ia32_sys_symlinkat+0x93/0xc0 fs/namei.c:4654
+ do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+ __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff888062198700: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888062198780: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+>ffff888062198800: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+                      ^
+ ffff888062198880: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888062198900: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
