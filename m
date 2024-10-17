@@ -1,84 +1,59 @@
-Return-Path: <netdev+bounces-136603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 285049A2486
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:07:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D09F9A248E
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:10:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D79FA28A290
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:07:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3F4B1F2403F
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673C91DE4D0;
-	Thu, 17 Oct 2024 14:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9331DE884;
+	Thu, 17 Oct 2024 14:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juMTZLP0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZRbgCPLS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098261DE2D7;
-	Thu, 17 Oct 2024 14:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386551DE4F9;
+	Thu, 17 Oct 2024 14:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729174008; cv=none; b=qKdZ2Avwp7X5D9Gd5p+D+Sbol+Gxut/08BGqvOvebW/kmzoiVNkqzDdbFu/gT0L65IJiq9ysGmIzI1BKgOU+MlzRXct1ewRKhi71ftIioT59i/xllXc1QxPr9wOUV3KJQ7atqWIS+xx8KCX4ztJRPh8SxD6NTFwIfA02hCGrDSs=
+	t=1729174190; cv=none; b=FdojNotR495S15/K7ieH2TBF4Qo9px+4GTMjfmgUWR0s9ROy2c9XdMOWbWH53E4i0n1mEpdNl2JVXb7jBXwBoxpf8AWZreo+D+WCbL8dC2xVtJcQOBpAjvjrMl0AFixceGbub4RqKXC8AgAo3+vLxM8HO8symVX1lV96tJKE44w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729174008; c=relaxed/simple;
-	bh=WX1AoS3d5If/wj1YU6S8DtGrKd076jNdTMfVeiprVUQ=;
+	s=arc-20240116; t=1729174190; c=relaxed/simple;
+	bh=Gv76g9oSJk6TLFlf5zNV7oL9lqSYwyx7xDbQpCSzHcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZghoP2ANfYvX9MhlgVz5InFXWzBQuG2ajn78LYkUwW968ZCTLwb3YctPkbkzO7lUVt9jrAH/8SuxGnXaEOfuNARcGC0EloQcswlSz/IeqZP2/qgahZaRhjB719FTYleyQkz5WGFrcwJawaqCEu8+UiNOt6BmTr/jJHPNjMj21bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=juMTZLP0; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-208cf673b8dso10705875ad.3;
-        Thu, 17 Oct 2024 07:06:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729174005; x=1729778805; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6gQdWouXs827SNDWHd0ds2A8+zPo3SHvKW2FhzP8Dss=;
-        b=juMTZLP02edC7yFMl/ZFCCiw0A1k/if9FDx0fzTkhBcq+p2FRh388F3edVDFKbulZO
-         cViWc2uTXkcAkFxDNNSPYZq0llgy4Q+wqbLdMzJZOH7FRCfHN+Rv8ccOHmnc4CO10DXf
-         oTjymzqSTGsEIL0OJKW7RJNfGQoLkg5WnxcdnxO6vq3o5L1MKL33442VfFmB0gldHGjU
-         u0f5YNVSzt/R4PeRzwNXh69X/OhGv2TdmlVkgrbHi/NKo6oaqYcu/xjF86kFN0fKb3dq
-         8gnhPHm6P4J/OAGnFO2e3Uuvk4vv72PpQUHLJOcdXcoAJ3g0v3pNKmRf9GiAqJNrJIwp
-         KgQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729174005; x=1729778805;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6gQdWouXs827SNDWHd0ds2A8+zPo3SHvKW2FhzP8Dss=;
-        b=Z++c2lSW9sSX97Yr7BV5OwTmsNPNGiEnSDHgfHg6J6Psny1W9velx2RmrfWAFkxXpi
-         IQZh7hCeQXxlGKBbp1Mh2E45jkpWBmkXyNv+gyz+GGyeJBfGTNkO4zulvkb4vs9U6PBV
-         M9BR4dw8Sr7KIOlTaRATK8fn3mMqdtcvTmJ57LZ4kj85LYjXkK22jK39SuoKxMVb7GHa
-         1sQPkznubjCZJyOcI+jnLFwbSMsvGRIuejMJKMKg1VsN4gatE1hxBnIkZQFrM5x4gxCD
-         L6rRBodqxvOEhf004sakmPiJ34DpQlhnzPgjMb5X16y+uDefw9DUxRfq47Tv+5QMbWp+
-         Ny8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUeeTN3TZe0J8YWpwS6U8Uw0QehdIupSEJJ48IgM7wqqao15WsT4BCzj2R9GzaUeVmZVpZY5r2P@vger.kernel.org, AJvYcCUfCEXcIGeyrdRgMhjYArdaiQRMdKkmjNK4apkB2hUViszAthEi9NOuAmptVeDpG6FF2rxEc+Ji0UcESD8=@vger.kernel.org, AJvYcCUiCRIVWuBN7b2wxW29ue1pDq84aMblM2bLW3YYRxYmjftgP2TzfsapdK1muxJ9w/R7tJFg2688fHzPzA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YznovT8zRGHhBOywjC2sgGK2/ZRH4Gi6e4JGrNBrMoO9qxO0zNt
-	p9RbinNbNQ6JlkJ279bQU9HzkShaVKgT4PytGIIUfQ2CtD7d9b7Adn0RpYWv
-X-Google-Smtp-Source: AGHT+IGSc2kVhRP9r0cXbDlgeaG302x+d6kUWor6x8foYTNrGEaT9uZnOKGyAbkXPfOfqnyPxksO/Q==
-X-Received: by 2002:a17:902:ce8f:b0:20c:9c09:8280 with SMTP id d9443c01a7336-20d27f404admr123437015ad.54.1729174005288;
-        Thu, 17 Oct 2024 07:06:45 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d1804b2e4sm44933655ad.182.2024.10.17.07.06.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2024 07:06:44 -0700 (PDT)
-Date: Thu, 17 Oct 2024 07:06:42 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Sven Schnelle <svens@linux.ibm.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] PtP driver for s390 clocks
-Message-ID: <ZxEZ8n23MIc0tv5K@hoboy.vegasvil.org>
-References: <20241017060749.3893793-1-svens@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZ3D+6qzoSxUbhm4f8RR4Aw6wrEX+Xy1FmzW3OvNoGJMyqc8XzyMT6ArqbkVryu7jUEG9XtMxqlBTYChNzzWwJvsavsPQHfYfXbn22bZUIzwInktRJwxq4Ja11O8V2ddlmT3Uz1E8RWRcjfjh0Liyp7kNLvtPTFoVewXa4VZu7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZRbgCPLS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B65F3C4CEC3;
+	Thu, 17 Oct 2024 14:09:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729174189;
+	bh=Gv76g9oSJk6TLFlf5zNV7oL9lqSYwyx7xDbQpCSzHcI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZRbgCPLStmiQrYDaJ8hLo06ockOMlMVxGuP5F3hc+BSJ0j0S7bvQtxOvILuO9IsFn
+	 Om0Tt0qE2wSagqY2Wft0N1W+PPKZLB3OVQk7Ie/dcSs5bCXiwIMyTDA9vjYk0HfAKR
+	 PBeUJFMmFltp//I9L8w8ZOiGVo66YTh8MjxoJ0/8YKAdcvkAIGFK1+gBjGutDKZTOo
+	 fDBgy1eZBdyqMyg1s7hwWJdYgfgfDK89udTjIcOZiSEDfq7IHb7eIYNXYmcwSegU8o
+	 j8ENTeSiIP+qoddv5ps0vsL3qLSghtpPuSutJ9izBWlo3xLb9S72fqLHL3ws2FMFba
+	 mHmkdmkgiAVsg==
+Date: Thu, 17 Oct 2024 15:09:45 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lftan.linux@gmai.com
+Subject: Re: [PATCH net v2 0/4] net: stmmac: dwmac4: Fixes bugs in dwmac4
+Message-ID: <20241017140945.GN1697@kernel.org>
+References: <20241016031832.3701260-1-leyfoon.tan@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,16 +62,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241017060749.3893793-1-svens@linux.ibm.com>
+In-Reply-To: <20241016031832.3701260-1-leyfoon.tan@starfivetech.com>
 
-On Thu, Oct 17, 2024 at 08:07:47AM +0200, Sven Schnelle wrote:
-> Hi,
+On Wed, Oct 16, 2024 at 11:18:28AM +0800, Ley Foon Tan wrote:
+> This patch series fix the bugs in dwmac4 drivers.
 > 
-> these patches add support for using the s390 physical and TOD clock as ptp
-> clock. To do so, the first patch adds a clock id to the s390 TOD clock,
-> while the second patch adds the PtP driver itself.
+> Changes since v1:
+> - Removed empty line between Fixes and Signoff
+> - Rebased to https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
+> - Updated git commit description for patch 4/4
+> 
+> History:
+> v1: https://patchwork.kernel.org/project/netdevbpf/cover/20241015065708.3465151-1-leyfoon.tan@starfivetech.com/
 
-For the series:
+Hi,
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+Thanks for the update and sorry for not providing more timely feedback.
+
+I think that the code changes themselves look fine. However,
+as a rule of thumb, fixes for net should resolve user-visible problems.
+I see that is the case for patch 4/4, but it is less clear to me
+for the other 3 patches. If it is indeed then I think it would be good
+to explain that more clearly in their patch descriptions.
+
+If not, perhaps they should be submitted to net-next without Fixes tags
+while patch 4 and any others that are still fixes resubmitted as a smaller
+v3 patch-set for net.
+
+...
 
