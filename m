@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-136389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848FB9A1946
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 05:22:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F6BB9A1948
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 05:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0487DB23392
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 03:22:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 105B51F219BC
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 03:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7956141C6C;
-	Thu, 17 Oct 2024 03:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00D07DA8C;
+	Thu, 17 Oct 2024 03:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="A9tS89uK"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="b/8moZRD"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E634B8F6C;
-	Thu, 17 Oct 2024 03:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF648F6C;
+	Thu, 17 Oct 2024 03:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729135348; cv=none; b=Evqi95gK+r7DFcI9P8S0EST2V9iVOpvXwUzvhEa/qXl/YU2Oe5xMRKRiAU1/BzuMclLThfVHrAeCkYRHvNspjw9osbwVR6yGT0J13drUOtUDvrNZQyXJJzZJrEDZfJvJza4+J+hYUpizVrpDYIJcCS1OxTZiSqGVV7c1QkUC890=
+	t=1729135429; cv=none; b=F0aslqerfDCmn2akkYRXIdeTs7v7tP5TB4D6oPKU71sEnwq+Fls7BGaF0bOJJv3z1G4k67EwtoQp2oHP/kJwCJFt5UhxTmmOVOhi+C3gHA8Mcwk0ZyqNGdHhhCnsd0JGAVkK2cajfi4f0d56YlX28PxS4WFIJ66HehyMLIPN6IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729135348; c=relaxed/simple;
-	bh=+FfOI+6NdKQeHVzhoSsNoT6JFv7rnLMQOOT6MbdQ/xc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WFESSWBBtllGLKkRmrC1c4Ao8s9IDW4nFtz0B6H83ibuwKypBBdbNVuwviFOV2DMBBnI2N2i6mYhLSXa7aPqn7S+Id+infrNijXcEgftPXVvmjVSD5HEiDPx1gp/drpCn50kFX1CytdxIswRe5y427/X9PBwdQhPySFMjMBM3Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=A9tS89uK; arc=none smtp.client-ip=210.61.82.184
+	s=arc-20240116; t=1729135429; c=relaxed/simple;
+	bh=aYQwESRD5PaOmKwSR79uheSGI8CKWqP1RPQxcab3XS8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ASBx4DwPfn2MTvpJXxYs9UckCJAf/fIsxzs6ldVDu5zQ5OzIx7py2jTQ9NtwN9RfYK1XiWaL0JH/jYgG8phzPFdJ5+jHT0lugMZZkyteIsAQwyRiV96NON6aT11AnrlAsfQkgAkVxJqU+6/ydDTZvf8ZgupaE9iG5D55BdCjw+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=b/8moZRD; arc=none smtp.client-ip=210.61.82.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 040e814e8c3711efbd192953cf12861f-20241017
+X-UUID: 351be22c8c3711efbd192953cf12861f-20241017
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=xEZ+LwBUCV79LCq35La2F6jUeHl/a28MFnYkiN7pkkQ=;
-	b=A9tS89uKRi1DuY0tMXKh5a4818i3z7gSqxPJUzNXAZ2HgrREmYEZ+JfUuC7J3qG4Jo2BJF4hmFy5JR6SfXGskdDrLgP2bUodabWbq2LOkxBdRkdNeoiR8qN2sYvTeSeIHn3Cm7Qrw1ie5KgiocXtBkP8nVdk4QmlPlYMhv9gAgg=;
+	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=Xk9gQgIOw8bIX1bgWb0fp2SygNjhJrI5pOG2gW4Mk1g=;
+	b=b/8moZRDNR6NRcZ1jdYrNBshpeLhkWNz/9qTehKrLS8sSzkPxMl749rqb545cdkMN9tnwgs4A9bROl18Fv1A7yM1Vjq0ifjiGYTX4Swgp5lmsnJXIlYtNxg/b4rskqVH0Ovu2SuXBnavo/vaAILR7/9fcGXy6eCbTlEMhu7cxOo=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:258c7b4d-646b-469c-81a6-5e2c3b935365,IP:0,U
-	RL:0,TC:0,Content:41,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:41
-X-CID-META: VersionHash:6dc6a47,CLOUDID:6bac6241-8751-41b2-98dd-475503d45150,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:3,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-O-INFO: VERSION:1.1.41,REQID:5987d67c-2cc1-4b8c-a48d-dcd7fc30df43,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:6dc6a47,CLOUDID:197fea06-3d5c-41f6-8d90-a8be388b5b5b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 0
 X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 040e814e8c3711efbd192953cf12861f-20241017
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 351be22c8c3711efbd192953cf12861f-20241017
 Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw02.mediatek.com
 	(envelope-from <skylake.huang@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 477280595; Thu, 17 Oct 2024 11:22:19 +0800
+	with ESMTP id 1304705406; Thu, 17 Oct 2024 11:23:41 +0800
 Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 17 Oct 2024 11:22:15 +0800
+ 15.2.1118.26; Thu, 17 Oct 2024 11:23:40 +0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
  mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Thu, 17 Oct 2024 11:22:15 +0800
+ 15.2.1118.26 via Frontend Transport; Thu, 17 Oct 2024 11:23:40 +0800
 From: Sky Huang <SkyLake.Huang@mediatek.com>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>, "David S. Miller"
@@ -64,16 +65,18 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
 	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
 	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Simon
- Horman" <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Simon
+ Horman <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-mediatek@lists.infradead.org>
 CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
 	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v2 0/3] net: phy: Refactor mediatek-ge-soc.c for clarity and correctness
-Date: Thu, 17 Oct 2024 11:22:10 +0800
-Message-ID: <20241017032213.22256-1-SkyLake.Huang@mediatek.com>
+Subject: [PATCH net-next v2 1/3] net: phy: mediatek-ge-soc: Fix coding style
+Date: Thu, 17 Oct 2024 11:22:11 +0800
+Message-ID: <20241017032213.22256-2-SkyLake.Huang@mediatek.com>
 X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20241017032213.22256-1-SkyLake.Huang@mediatek.com>
+References: <20241017032213.22256-1-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,42 +84,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--3.424900-8.000000
-X-TMASE-MatchedRID: NJitR9TboxyxxK6sBu9wbjPDkSOzeDWWpmFKNfn3zvqvloAnGr4qhgsp
-	V4Rw6UcDTyYk6EbjbakrQIMF24cmclxxDx5qbkR9FEUknJ/kEl5jFT88f69nG/oLR4+zsDTt9xS
-	3mVzWUuCMx6OO8+QGvo0CcEBNsKjT7Jh/mb/5GwpZ2gLfD/Jnn00q3uacyXFBeAj59SFC260HRR
-	KnqfqqUZkyQcsvHZ56x8NgR4aMEWtB+RoVxwyzrnmVKZusLp922v9OjYWA2uMMswg45VMfPadst
-	5iAforfVlxr1FJij9s=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--3.424900-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: DDE2CE34B4A85491DA0C020F95E0AF2C4B528F136A20B9556CB3D39366A7E3E12000:8
 X-MTK: N
 
 From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
-This patch is derived from patch 8/9 of Message ID:
-20241004102413.5838-9-SkyLake.Huang@mediatek.com.
-This patch does some simple clean-ups, however, this is necessary
-because the rest patches in
-"20241004102413.5838-9-SkyLake.Huang@mediatek.com" rely on this.
+This patch fixes spelling errors, re-arrange vars with
+reverse Xmas tree and remove unnecessary parens in
+mediatek-ge-soc.c.
 
 Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
 ---
-Changes in v2:
-Split into 3 patches for reviewing.
----
-SkyLake.Huang (3):
-  net: phy: mediatek-ge-soc: Fix coding style
-  net: phy: mediatek-ge-soc: Shrink line wrapping to 80 characters
-  net: phy: mediatek-ge-soc: Propagate error code correctly in
-    cal_cycle()
+ drivers/net/phy/mediatek-ge-soc.c | 36 ++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 17 deletions(-)
 
- drivers/net/phy/mediatek-ge-soc.c | 169 ++++++++++++++++++++----------
- 1 file changed, 112 insertions(+), 57 deletions(-)
-
+diff --git a/drivers/net/phy/mediatek-ge-soc.c b/drivers/net/phy/mediatek-ge-soc.c
+index f4f9412..e9c422f 100644
+--- a/drivers/net/phy/mediatek-ge-soc.c
++++ b/drivers/net/phy/mediatek-ge-soc.c
+@@ -408,16 +408,17 @@ static int tx_offset_cal_efuse(struct phy_device *phydev, u32 *buf)
+ 
+ static int tx_amp_fill_result(struct phy_device *phydev, u16 *buf)
+ {
+-	int i;
+-	int bias[16] = {};
+-	const int vals_9461[16] = { 7, 1, 4, 7,
+-				    7, 1, 4, 7,
+-				    7, 1, 4, 7,
+-				    7, 1, 4, 7 };
+ 	const int vals_9481[16] = { 10, 6, 6, 10,
+ 				    10, 6, 6, 10,
+ 				    10, 6, 6, 10,
+ 				    10, 6, 6, 10 };
++	const int vals_9461[16] = { 7, 1, 4, 7,
++				    7, 1, 4, 7,
++				    7, 1, 4, 7,
++				    7, 1, 4, 7 };
++	int bias[16] = {};
++	int i;
++
+ 	switch (phydev->drv->phy_id) {
+ 	case MTK_GPHY_ID_MT7981:
+ 		/* We add some calibration to efuse values
+@@ -1069,10 +1070,10 @@ static int start_cal(struct phy_device *phydev, enum CAL_ITEM cal_item,
+ 
+ static int mt798x_phy_calibration(struct phy_device *phydev)
+ {
++	struct nvmem_cell *cell;
+ 	int ret = 0;
+-	u32 *buf;
+ 	size_t len;
+-	struct nvmem_cell *cell;
++	u32 *buf;
+ 
+ 	cell = nvmem_cell_get(&phydev->mdio.dev, "phy-cal-data");
+ 	if (IS_ERR(cell)) {
+@@ -1210,14 +1211,15 @@ static int mt798x_phy_led_brightness_set(struct phy_device *phydev,
+ 	return mt798x_phy_hw_led_on_set(phydev, index, (value != LED_OFF));
+ }
+ 
+-static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
+-						 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
+-						 BIT(TRIGGER_NETDEV_LINK)        |
+-						 BIT(TRIGGER_NETDEV_LINK_10)     |
+-						 BIT(TRIGGER_NETDEV_LINK_100)    |
+-						 BIT(TRIGGER_NETDEV_LINK_1000)   |
+-						 BIT(TRIGGER_NETDEV_RX)          |
+-						 BIT(TRIGGER_NETDEV_TX));
++static const unsigned long supported_triggers =
++	BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
++	BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
++	BIT(TRIGGER_NETDEV_LINK)        |
++	BIT(TRIGGER_NETDEV_LINK_10)     |
++	BIT(TRIGGER_NETDEV_LINK_100)    |
++	BIT(TRIGGER_NETDEV_LINK_1000)   |
++	BIT(TRIGGER_NETDEV_RX)          |
++	BIT(TRIGGER_NETDEV_TX);
+ 
+ static int mt798x_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
+ 					  unsigned long rules)
+@@ -1415,7 +1417,7 @@ static int mt7988_phy_probe_shared(struct phy_device *phydev)
+ 	 * LED_C and LED_D respectively. At the same time those pins are used to
+ 	 * bootstrap configuration of the reference clock source (LED_A),
+ 	 * DRAM DDRx16b x2/x1 (LED_B) and boot device (LED_C, LED_D).
+-	 * In practise this is done using a LED and a resistor pulling the pin
++	 * In practice this is done using a LED and a resistor pulling the pin
+ 	 * either to GND or to VIO.
+ 	 * The detected value at boot time is accessible at run-time using the
+ 	 * TPBANK0 register located in the gpio base of the pinctrl, in order
 -- 
 2.45.2
 
