@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-136496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C449A1EF9
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:51:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B356E9A1EFC
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 717D61F22391
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:51:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4EBD1C211A3
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3F61D9A59;
-	Thu, 17 Oct 2024 09:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07BA1DA61E;
+	Thu, 17 Oct 2024 09:50:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DD8165F08;
-	Thu, 17 Oct 2024 09:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CD71D958B;
+	Thu, 17 Oct 2024 09:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729158653; cv=none; b=jKSKe9gsV9vU+u2uLWBWbuHB8Ep6KG1m+7VGgAgja9LHF92Yy28dp6pWcxRvHvRnWBpZz4/GzuNCFYKx91C1cen9TCwf1k6s97yUthjSnGMb0oJYWVxfFvWYyHI1VpdkDOea9/I+Ou49wSTy2AjNAc5ifeO/KdkSPE+JGmwKh08=
+	t=1729158654; cv=none; b=L2NAZ4Oz0aA4NqYqB0jHo5/k1XG1jzZEl8pt1DuglYzrrMrhQD1UkVkfOINHFnBo3/WAKJGQl6vMXybT4qNDlKXFfGgGsI1W2w8zw3kaS3sCqUlOKg6TVG9EVhA9+T9KSsPMZ6cqWFY+/r+/dWDGRnXaqgOqlLu7ovpXqIx5L3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729158653; c=relaxed/simple;
-	bh=L2iZyYNzU5n0vMmFAaG9I2sAgUj6MrJPfvyqjwuin7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MTVL3hr/RSIC5/XhXdmlHRq42LNpqABoz/8ikHkXWyEcjqKo/kiASMNDEOijaZj3R1ZPc8nrbCbJbJeiKrFPB7lbUrAuISM6wJxaQ0SUitktiviiAm7CxAHiefQ2UZFloZde+eLzcfJkKU8R/I5sMcxkYby4pplZwV4gvYd1paI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.174
+	s=arc-20240116; t=1729158654; c=relaxed/simple;
+	bh=13oDv9K/TtdANIFyDZPCtxSwGQD8SejAzD84rs210cs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hT4hsCSk4vGwXaAsvBCXCsPWWtGpX29141bdcGd1Tgqf+roJ58VZrGz90dxpJnmOlSvTvg+mvCvvZducLGXvAHWdaC5l4x6CYFdhI4dhtOhiJeHAw+x6pfMf7UifqCZTBT1wIR8Tzmt0M10SJv3vulMDDFm5UePUUTTWufqQpFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2fb498a92f6so9616881fa.1;
-        Thu, 17 Oct 2024 02:50:51 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c94c4ad9d8so1141251a12.2;
+        Thu, 17 Oct 2024 02:50:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729158650; x=1729763450;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+YH0bb/VsAy0uWyC1771z0ENOP+IISgwLjVL9e394kY=;
-        b=f/kVzsJWTq+koF+G2uoHXXNzPj6F9fi47CFJnMIXjGplNFN2QLRt0ZAlD1Yxqdmwwo
-         6MGAIiIyOFxqmbnI1o4JJwIkXJoqcqN+l2PXK7pcglb7J405JdTeGCY/PaoTqxn3cZQM
-         AVNvXP2xDXPVgq+B9rt1B1N9HJg15FuBiwSQ6lpQZlotLRlSaJs2Ja5nFqOPyCq60aAe
-         kVokQ/QTiZb/OLpmlYwzClG6Ei3YJayM6/HWzWTzhywiW4iPlouYyzeCFcr663AEzskm
-         yAhAmjziKrRHTZWOOoYG6NZ6I3AEkuzU6Y1JjTgVOHUfuH4m1N1110eWcR2l8IL51v0p
-         /SQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVivILWr3yAypfQCcD/yYqbUA+yrvYe+BnXcF9w6ep+ktRxGlgG6ZuS+4T03M9IYL40vBIfzd1lAneIKac=@vger.kernel.org, AJvYcCXcVcoV0rxvJlQlAdQZh4xQobItuZrVv+9U3ns6j5D5QoHOnUH+fgdZMkd5nYtNrQNB6gx/P8eV@vger.kernel.org
-X-Gm-Message-State: AOJu0YylHbl5cP0KtFFNKgDW1gOnzKncQKAUMILM3TDz4dhlf9wMFr92
-	zpYmGyPv6Km/ZQ0EJUkUB3+xyzaK46gWqp5QHw1M/1vPb0GSf540
-X-Google-Smtp-Source: AGHT+IH8PD+FFVnvIIekbt1so5+Oy8KFjqg+MMuqSzWgVmFRB18TwVY3j69Rj2toznWO1qA3NwCmRw==
-X-Received: by 2002:a2e:a9a1:0:b0:2fb:5bb8:7c23 with SMTP id 38308e7fff4ca-2fb61b8a505mr40422181fa.26.1729158649349;
-        Thu, 17 Oct 2024 02:50:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729158651; x=1729763451;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lUKUh9/c0jcVOB7NUuvJ159i2bkxlfNZskS7vvZp3VY=;
+        b=IZSxLZVEhnwNoiX35QnbONPr8jm6AIZ6bGpOK+PDChGij8h+iaJmqmxO7ylQrTS/Z+
+         zc4ScUZ1iH58yJE9LCMH0BtLi2OB4mowHzojBhmpFNBbPg3nIVG4QCVwoMFIPKVH8FwK
+         prIlTYi8+zKUWiRUr0qVlzIhoyaQCq/FDuGhkKjcFai7r66vhGo97GmmjLFsaibI8RwF
+         OBuzCGGMcFEcBNUrjbdz2SlnRuUMUrb+GIqY1ekur/hXy1XCjiYqnXpEq1zl8kKoX+sA
+         GneH1URlXyDd9PTMrsZ1/yJQWCP+tKEPOhT0W3o4Jc23ecRAKEbqYJE6qEmjdTzLXyJp
+         2rog==
+X-Forwarded-Encrypted: i=1; AJvYcCUeUcJEJ+PEHRUHgnngHaqPkOu+sQLMP+/NFgisCSQ//GS+IezDsQFUfpn6FZg1we4r8s/U28BnxsstGwM=@vger.kernel.org, AJvYcCVqdzq5HuTjxpsLI6jOK6bEi+7wiVEMNYEQ1lMIAIJjWbRvI+1K+qQcg6JZwNvuSaTg3OBj3qoZ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+VA8erZ+2GGcLuY6KQ4CB0El0+KLV/mgbQBVMCIzJGH16lkFw
+	1mmnDkzPgk46PGjZB5oLN5nwMKfPLTs1sO24/28inGNHWQKZRoIg
+X-Google-Smtp-Source: AGHT+IGVu/dn/BdzmKxCnSpXlj5OYTnfNLE1a7yozVN6WAea37Uafy7xqpmHbejXysCYEp+ETifmwQ==
+X-Received: by 2002:a05:6402:254f:b0:5c9:7f8b:4e49 with SMTP id 4fb4d7f45d1cf-5c97f8b4f3bmr10148558a12.25.1729158651099;
+        Thu, 17 Oct 2024 02:50:51 -0700 (PDT)
 Received: from localhost (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d4d6269sm2605245a12.2.2024.10.17.02.50.48
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d7b7da0sm2548486a12.95.2024.10.17.02.50.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2024 02:50:48 -0700 (PDT)
+        Thu, 17 Oct 2024 02:50:50 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -65,107 +66,51 @@ Cc: thepacketgeek@gmail.com,
 	vlad.wing@gmail.com,
 	max@kutsevol.com,
 	kernel-team@meta.com
-Subject: [PATCH net-next v5 0/9] net: netconsole refactoring and warning fix
-Date: Thu, 17 Oct 2024 02:50:15 -0700
-Message-ID: <20241017095028.3131508-1-leitao@debian.org>
+Subject: [PATCH net-next v5 1/9] net: netconsole: remove msg_ready variable
+Date: Thu, 17 Oct 2024 02:50:16 -0700
+Message-ID: <20241017095028.3131508-2-leitao@debian.org>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241017095028.3131508-1-leitao@debian.org>
+References: <20241017095028.3131508-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The netconsole driver was showing a warning related to userdata
-information, depending on the message size being transmitted:
+Variable msg_ready is useless, since it does not represent anything. Get
+rid of it, using buf directly instead.
 
-	------------[ cut here ]------------
-	WARNING: CPU: 13 PID: 3013042 at drivers/net/netconsole.c:1122 write_ext_msg+0x3b6/0x3d0
-	 ? write_ext_msg+0x3b6/0x3d0
-	 console_flush_all+0x1e9/0x330
-	 ...
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/netconsole.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Identifying the cause of this warning proved to be non-trivial due to:
-
- * The write_ext_msg() function being over 100 lines long
- * Extensive use of pointer arithmetic
- * Inconsistent naming conventions and concept application
-
-The send_ext_msg() function grew organically over time:
-
- * Initially, the UDP packet consisted of a header and body
- * Later additions included release prepend and userdata
- * Naming became inconsistent (e.g., "body" excludes userdata, "header"
-   excludes prepended release)
-
-This lack of consistency made investigating issues like the above warning
-more challenging than what it should be.
-
-To address these issues, the following steps were taken:
-
- * Breaking down write_ext_msg() into smaller functions with clear scopes
- * Improving readability and reasoning about the code
- * Simplifying and clarifying naming conventions
-
-Warning Fix
------------
-
-The warning occurred when there was insufficient buffer space to append
-userdata. While this scenario is acceptable (as userdata can be sent in a
-separate packet later), the kernel was incorrectly raising a warning.  A
-one-line fix has been implemented to resolve this issue.
-
-The fix was already sent to net, and is already available in net-next
-also.
-
-Changelog:
-
-v5:
- * Exact same version as v4, except that the last patch from v4 
-  ("net: netconsole: fix wrong warning") was already landed into
-  netnext, so, dropping it from v5.
-
-v4:
- * Pass NULL to userdata in patch 08 ("net: netconsole: do not pass
-   userdata up to the tail") (Simon)
- * Do not try to read nt->userdata_length outside
-   CONFIG_NETCONSOLE_DYNAMIC in patch 3 ("net: netconsole: separate
-   fragmented message handling in send_ext_msg") (Jakub)
- * Improve msgbody_written assignment in patch 6 ("net: netconsole:
-   track explicitly if msgbody was written to buffer") (Jakub)
- * https://lore.kernel.org/all/20240930131214.3771313-1-leitao@debian.org/
-
-v3:
- * Fix variable definition to an earlier patch (Simon)
-   * Same final code.
- * https://lore.kernel.org/all/20240910100410.2690012-1-leitao@debian.org/
-
-v2:
- * Separated the userdata variable move to the tail function into a
-   separated fix (Simon)
- * Reformated the patches to fit in 80-lines. Only one not respecting
-   this is a copy from previous commit.
- * https://lore.kernel.org/all/20240909130756.2722126-1-leitao@debian.org/
-
-v1:
- * https://lore.kernel.org/all/20240903140757.2802765-1-leitao@debian.org/
-
-Breno Leitao (9):
-  net: netconsole: remove msg_ready variable
-  net: netconsole: split send_ext_msg_udp() function
-  net: netconsole: separate fragmented message handling in send_ext_msg
-  net: netconsole: rename body to msg_body
-  net: netconsole: introduce variable to track body length
-  net: netconsole: track explicitly if msgbody was written to buffer
-  net: netconsole: extract release appending into separate function
-  net: netconsole: do not pass userdata up to the tail
-  net: netconsole: split send_msg_fragmented
-
- drivers/net/netconsole.c | 197 ++++++++++++++++++++++++++-------------
- 1 file changed, 132 insertions(+), 65 deletions(-)
-
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index de20928f7402..a006507c92c6 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1075,7 +1075,6 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	const char *header, *body;
+ 	int offset = 0;
+ 	int header_len, body_len;
+-	const char *msg_ready = msg;
+ 	const char *release;
+ 	int release_len = 0;
+ 	int userdata_len = 0;
+@@ -1105,8 +1104,7 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 					     MAX_PRINT_CHUNK - msg_len,
+ 					     "%s", userdata);
+ 
+-		msg_ready = buf;
+-		netpoll_send_udp(&nt->np, msg_ready, msg_len);
++		netpoll_send_udp(&nt->np, buf, msg_len);
+ 		return;
+ 	}
+ 
 -- 
 2.43.5
 
