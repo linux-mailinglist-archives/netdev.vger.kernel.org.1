@@ -1,156 +1,374 @@
-Return-Path: <netdev+bounces-136753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363FE9A2E79
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 22:27:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598309A2F00
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 22:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DD6D1C220BA
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:27:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99209B24133
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6B622739A;
-	Thu, 17 Oct 2024 20:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD413DAC0A;
+	Thu, 17 Oct 2024 20:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/BO19bb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TMifkkxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213522194BF
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 20:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C813E22910B
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 20:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729196869; cv=none; b=CwWdLe88BI6siOtZua68keL5FpH+ajQjSvNiYs72r8OzP1uqWhSErKMo2SjidUcIw38bn/GlkZ8LZKsXfeQQ9UYFPjaOTyWfa3YR56wBO4F0vGzEigPvgRmIYtegwT9+J7zeIR/ExGmyUoO6N9oM9DioFpVv1S4+0HqwoGiRCyA=
+	t=1729197821; cv=none; b=Fyzde2mxTM7qHwNgw0whss47qv/N2JhhYYcJzQ21oi0ajsHl0rtJwmn3CXiLMuVt8VSFYjK74j4mmukg1kmhBKeMvtUjJmfiwGJ5N5q6SXFYaKNAqfjDSILmQ48S1BKdgT+MEHq+jJxg0tXeUe65Dp8Dn9TVrLr3iY6S4GK1a+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729196869; c=relaxed/simple;
-	bh=h+mEbdIxWNPOE5C/gvdKJoACRR53P939lqrjCpA9X1A=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=IxppmpiELsnUQPT8VBhOzA0tkVauPKhxKwNiiFFoYwV4PkhNRGfiite2myt9CplCja9Dhz+y/qBUZASeMPJx6uUhF6EV0MmSeGy8jkg8CQEeTKQ6hs/YnOpqu5jeVAr7TaOP6XZ9Nryz2aujD84Uo8N8P+8GKN9hdfRzCKQmAgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/BO19bb; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9a4031f69fso188322566b.0
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 13:27:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729196866; x=1729801666; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+yGIyAJqSSzyPaWg3xMiwAnX3UIWDz1sLK04n7fF2dI=;
-        b=N/BO19bb3Te3rRhKWdN99kXIvIiAKshpdTN0/jFBlQ/5lYu9F4i+6mGMvEXyzU9o4v
-         /juEKmYcCIZ0Ti3sS5LZ3rCz7ttVhlgm+HUjRRu8L5mIB87OU3CuQkqPy9mCMXpME6sD
-         QQfn3beysYJ/klvn1mMeXZwbyBSrLZia+J12g5VM12LpiKUwXeH/DpLyhOdWHu7hbQTe
-         ZvShDk2hbNB9OJSy9RXAd8Twq3HpAdBMN+UY0nJWJH2rUUEdxknm2h/wdpT30tqRHVL3
-         1ZJhhtaN+7jCNoBgrK1XKdXqAgmCIOqROf1cjlM6ZSbKiFdLkmQUdFVntPNbbX6HmIyp
-         4hiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729196866; x=1729801666;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+yGIyAJqSSzyPaWg3xMiwAnX3UIWDz1sLK04n7fF2dI=;
-        b=m622gxc0wfovZOtTxJLnTL7XsPRioiH/tR/K4wmGyenqqTk5m0VwUBi0J0uR3DeAxt
-         Go9MkPHCkiDspYPC4ZcZkrlcJJRKG/hx9M4lQL1rrZhbT1/2YQJoBYO4wWZ+NOVXIknK
-         V6tdxJLjp7M9wrLS6VKrxljp+rz4f2D+dDrOSRcEvaXuI3c5bQmH0GPis/irL+t7gZd0
-         Xx01/UxAT5G2LztX2QudYOXBbbq102T91qkMvqq65aGnZsOCho1NrY32arvZ2JML8Tuj
-         6x5gp8wxgFT6XvP5HKqlMgQa82BMMnRFSCexVN5RKyU6SLvNEv83bPb3KDUrrkkaEASj
-         zjwA==
-X-Gm-Message-State: AOJu0YydNYLtI/xfOdLYUcFlLM6/Qz3IMtxLoedEXxgwf87A82aoHYQO
-	I0Vg9hjMJ5IUv4Qv7V8oqLiYcY4POI+X6acb9RSDI+B9WlsA4fso
-X-Google-Smtp-Source: AGHT+IHHrLK+5NTLntjxzvx1KUvCryM5btTSgeQpvesAu8kls/URbKJtCM6TTjmQDxSfgweMPS6xmg==
-X-Received: by 2002:a17:907:2d9e:b0:a99:ffef:aec5 with SMTP id a640c23a62f3a-a9a69a80a24mr4131966b.23.1729196865938;
-        Thu, 17 Oct 2024 13:27:45 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:b38a:4000:88d:c0e7:13bb:6384? (dynamic-2a02-3100-b38a-4000-088d-c0e7-13bb-6384.310.pool.telefonica.de. [2a02:3100:b38a:4000:88d:c0e7:13bb:6384])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9a68ae545esm9901566b.67.2024.10.17.13.27.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2024 13:27:45 -0700 (PDT)
-Message-ID: <95dd5a0c-09ea-4847-94d9-b7aa3063e8ff@gmail.com>
-Date: Thu, 17 Oct 2024 22:27:44 +0200
+	s=arc-20240116; t=1729197821; c=relaxed/simple;
+	bh=tMm7xy8L2IkmHQdL1eD1YWOFVRhjX3YAFqy4Ta9wKUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qLvzkviOpIHMX4f+Lzl4axxS1GG9eRqnmVBWCC5UyEzv3N7Yfaap3ZpCZsXLd1dYGlGcIdRMGdtpjufFTsXgbI6IyjUGRwYhyCzT6TvQMX9a/RwnS0M0WHWdjad4Xhmf+JOEmx09nNqTBNnUSPi8myp73edLMmTeZOAmLz9ipbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TMifkkxV; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <95f10d3d-8bed-46ea-852c-791592e67070@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729197812;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/GWZGVpgNnNX+/6bs8uzatYA7LCL+Ql1FgsqDg2sAZ8=;
+	b=TMifkkxVZTi97W4TXAh0KEliihPUvQ6pFLuMjzoNnl5AZR5Y6Ye7uxUVLvU+mFubvVTUIp
+	jEiI/gJKLUSMF5ZCCHhi5YD0SLkYshtDk0nXpoxJkmylQio354CpTYevhuKmgDx9DlNJeD
+	3V6ERlTNELY3OqzLiTEd+TpkLBByUsc=
+Date: Thu, 17 Oct 2024 13:43:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
+ control the whole bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+ willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-5-kerneljasonxing@gmail.com>
+ <dbddb085-183e-47bf-8bc7-ec6eac4d877f@linux.dev>
+ <CAL+tcoBieZ3_ZX3PRY8k7-C6Rv2g=Mr1U1NAQkQpbHYYvtWpTQ@mail.gmail.com>
+ <CAL+tcoBXj=EO-sk-dS+dN-pCZf8OKeOZ4LXb9GZnja3EfOhXYg@mail.gmail.com>
+ <9f050a5c-644f-4fbb-ac37-53edfd160edc@linux.dev>
+ <CAL+tcoDyt=3hjwdx8Wk-abKg=qQsY=7UKu9=TU4iUAk5gMT2MQ@mail.gmail.com>
+ <5398c020-e9b4-49d2-a5fa-dca047296ddd@linux.dev>
+ <CAL+tcoDb84bgUUpK9PjijWDt+xw=u2nKkoWf1Gjvkjf--XJ6VA@mail.gmail.com>
+ <c669769f-8437-46cc-95b4-d3f84c1c95b7@linux.dev>
+ <CAL+tcoD-fzq7dSwkM4nRE8vF-y=+RO1y8X=95+D8Gv3QXTRWCA@mail.gmail.com>
+ <095d241a-44d5-461f-8d64-356676a44e8b@linux.dev>
+ <CAL+tcoDKuomdJVYo6FVNH60NojYRNp3zjNyt8Tr8Od1Fp2BfWA@mail.gmail.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: enable EEE at 2.5G per default on RTL8125B
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAL+tcoDKuomdJVYo6FVNH60NojYRNp3zjNyt8Tr8Od1Fp2BfWA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Register a6d/12 is shadowing register MDIO_AN_EEE_ADV2. So this line
-disables advertisement of EEE at 2.5G. Latest vendor driver r8125
-doesn't do this (any longer?), so this mode seems to be safe.
-EEE saves quite some energy, therefore enable this mode per default.
+On 10/16/24 7:28 PM, Jason Xing wrote:
+> On Thu, Oct 17, 2024 at 8:48 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 10/16/24 3:36 AM, Jason Xing wrote:
+>>>>> If the skb carries the timestamp, there are three cases:
+>>>>> 1) non-bpf case and users uses setsockopt()
+>>>>> 2) cmsg case
+>>>>> 3) bpf case
+>>
+>> These should have tests in the selftests/bpf/ sooner than later. (More below).
+>>
+>>>>>
+>>>>> #1 and #2 are already handled well before this patch. I only need to
+>>>>> test if sk_tsflags_bpf has those flags. If so, it means we hit #3, or
+>>>>> else it could be #1 or #2, then we will let the old way print
+>>>>> timestamps in __skb_tstamp_tx().
+>>>>
+>>>> hmm... I am still not sure I fully understand...but I think I may start getting it.
+>>>
+>>> Sorry, my bad. I gave the wrong answer...
+>>>
+>>> It should be:
+>>> Testing if if sk_tsflags has SOF_TIMESTAMPING_SOFTWARE flag should
+>>
+>> You meant adding SOF_TIMESTAMPING_SOFTWARE test to the sk_tstamp_tx_flags()?
+> 
+> Yep.
+> 
+>>
+>> Before any bpf changes, if I read __skb_tstamp_tx() correctly, the current
+>> behavior is to just queue to the sk_error_queue as long as there is
+>> "SOF_TIMESTAMPING_TX_*" set in the skb's tx_flags and it is regardless of the
+>> sk_tsflags. This will eventually get ignored when user read it from the error
+>> queue because the SOF_TIMESTAMPING_SOFTWARE is not set in sk_tsflags?
+> 
+> Totally correct. SOF_TIMESTAMPING_SOFTWARE is a report flag while
+> SOF_TIMESTAMPING_TX_* are generation flags. Without former, users can
+> read the skb from the errqueue but are not able to parse the
+> timestamps. Please see
+> tcp_recvmsg()->inet_recv_error()->ip_recv_error()->sock_recv_timestamp()->__sock_recv_timestamp():
+> if ((tsflags & SOF_TIMESTAMPING_SOFTWARE...
+>         ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_phy_config.c | 1 -
- 1 file changed, 1 deletion(-)
+afaict, __sock_recv_timestamp does not put the timestamp cmsg but ip_recv_error 
+still returns the skb to the user.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index cf29b1208..d504abba7 100644
---- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-+++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -99,7 +99,6 @@ static void rtl8125a_config_eee_phy(struct phy_device *phydev)
- 
- static void rtl8125b_config_eee_phy(struct phy_device *phydev)
- {
--	phy_modify_paged(phydev, 0xa6d, 0x12, 0x0001, 0x0000);
- 	phy_modify_paged(phydev, 0xa6d, 0x14, 0x0010, 0x0000);
- 	phy_modify_paged(phydev, 0xa42, 0x14, 0x0080, 0x0000);
- 	phy_modify_paged(phydev, 0xa4a, 0x11, 0x0200, 0x0000);
--- 
-2.47.0
+I suspect we are talking the same thing. When SOF_TIMESTAMPING_SOFTWARE is not 
+set in sk and SOF_TIMESTAMPING_TX_* is set in cmsg, the existing (aka 
+traditional) way is that the generated skb will still be queued in the error 
+queue. The user space can still read it but just won't have the timestamp cmsg.
+
+If I understand how the v3 may look like, the skb will not be queued in the 
+error queue at all because the sk has no SOF_TIMESTAMPING_SOFTWARE. The user 
+space won't get it from the error queue which is a change of behavior. I was 
+saying I am fine but not sure if someone depends on this behavior.
+
+I think we start talking pass each other on this. I will wait for the code on 
+this part and the selftest first.
+
+> 
+>> I suspect
+>> the user space will still read something from the error queue unless there is
+>> SOF_TIMESTAMPING_OPT_TSONLY but it won't have the tstamp cmsg.
+> 
+> No, please see above.
+> 
+>>
+>> Adding SOF_TIMESTAMPING_SOFTWARE test to the sk_tstamp_tx_flags() will stop it
+>> from even queuing to the error queue? I think it is ok but I am not sure if
+>> anyone is depending on the above behavior.
+> 
+> SOF_TIMESTAMPING_SOFTWARE is only used in traditional SO_TIMESTAMPING
+
+Got it. This part is now understood.
+
+It is one of the reasons for my earlier question on which SOF_* that bpf needs 
+to support. I want to simplify the naming part of the SOF_* in bpf_sesockopt but 
+lets leave these nits for a little later.
+
+However, it will be very useful to highlight which SOF_* will never be used in 
+bpf in v3.
+
+> features including cmsg mode. But it will not be used in bpf mode. So
+> the test statement is enough to divided those three cases into two
+> groups.
+
+> 
+>>
+>>> work fine. If it has the flag, we could use skb_tstamp_tx_output() to
+>>> print based on patch [4/12]; if not, we will use
+>>> bpf_skb_tstamp_tx_output() to print.
+>>>
+>>> If users use traditional ways of deploying SO_TIMESTAMPING, sk_tsflags
+>>> always has SOF_TIMESTAMPING_SOFTWARE which is a software report flag
+>>> (please see Documentation/networking/timestamping.rst). We can see a
+>>> good example on how to use in
+>>> tools/testing/selftests/net/txtimestamp.c:
+>>> do_test()
+>>> {
+>>>           sock_opt = SOF_TIMESTAMPING_SOFTWARE |
+>>>           ...
+>>>           if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING,
+>>>                                 (char *) &sock_opt, sizeof(sock_opt)))
+>>> }
+>>>
+>>>>
+>>>> Is it the reason that the bpf_setsockopt() cannot clear the sk_tsflags_bpf once
+>>>> it is set in patch 2? It is not a usable api tbh. It will be a surprise to many.
+>>>> It has to be able to set and clear.
+>>>
+>>> I cannot find a good time to clear all the sockets which are set
+>>> through the BPF program. If we detach the BPF program, it will not
+>>> print of course. Does it really matter if we don't clear the
+>>> sk_tsflags_bpf?
+>>
+>> Yes, it matters. The same reason goes for why the existing bpf prog can clear
+>> the tp->bpf_sock_ops_cb_flags. Yes, detach will automatically not taking the
+>> timestamp. For sockops program that stays forever, not all usages expect to do
+>> timestamping for the whole lifetime of the connection. If there is a way for the
+>> prog to turn it on, it should have a way for the prog to turn it off.
+> 
+> I see what you meant here. If we don't clear sk_tsflags_bpf, after we
+> detach the bpf program, it will do nothing in __skb_tstamp_tx() and
+> return earlier. It is almost equal to the effect of turning off. It is
+> why I don't handle clearing the flag.
+> 
+>>
+>> What is the concern of allowing the bpf prog to disable something that it has
+>> enabled before?
+> 
+> Let me give one instance:
+> If one socket is established and stays idle, how can the bpf program
+> clear the tsflags from that socket? I have no idea.
+
+bpf_tcp_iter prog can. That said, the idle connection example is too carry away 
+as an excuse that bpf_setsockopt does not need to support turning-off. Sure, 
+idle connection is as good as off. and yes, detach is as good as off also.
+
+I am now acting as a broken clock repeating myself that not all use cases run 
+for 5 mins and then detach, so I need to be specific here that bpf_setsockopt 
+not supporting off is a nack. There are many use cases in production that the 
+bpf prog runs forever and wants to turn it on-and-off.
+
+Again, bpf sockops prog is not the only one can bpf_setsockopt(). bpf-tcp-cc 
+that runs forever can also bpf_setsockopt to ask the sockops bpf prog to do 
+periodic timestamping when needed. bpf_tcp_iter can also bpf_setsockopt to turn 
+it off if needed.
+
+I am not asking to clear the sk_tsflags_bpf when the bpf prog is detached. I am 
+asking to support clearing the sk_tsflags_bpf in bpf_setsockopt().
+
+I have still yet heard a technical reason why bpf_setsockopt cannot clear the bits.
+
+> 
+>>
+>> While we are on bpf_sock_ops_cb_flags, the
+>> BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG addition is mostly a dup of whatever in
+>> the new sk_tsflags_bpf. It is something we need to clean up later when we decide
+>> what interface to use for bpf timestamping.
+> 
+> I'm not sure if I understand correctly. I mimicked the use of
+> BPF_SOCK_OPS_RTO_CB_FLAG. Do you mean we can remove the use of
+> bpf_sock_ops_cb_flags_set() in BPF program?
+
+In patch 5, I meant the BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG is redundant. 
+It is as good as testing and setting sk_tsflags_bpf alone.
+
+This could be some cleanup for the later stage of the set.
+
+ > >>
+>>>
+>>>>
+>>>> Does it also mean either the bpf or the user space can enable the timetstamping
+>>>> but not both? I don't think we can assume this also. It will be hard to deploy
+>>>> the bpf prog in production to collect continuous data. The user space may have
+>>>> some timestamping enabled but the bpf may want to do its parallel investigation
+>>>> also. The user space may rollout timestamping in the future and suddenly break
+>>>> the bpf prog.
+>>>
+>>> Well, IIUC, it's also the basic idea from the current series which
+>>> allows both happening at the same time. Let us put it in a simple way,
+>>> I hope that if the app uses the SO_TIMESTAMPING feature already, then
+>>> one admin deploys the BPF program, that app should be traced both in
+>>> bpf and non-bpf ways.
+>>>
+>>> But Willem doesn't agree about this approach[1] because of hard to debug.
+>>>
+>>> [1]: https://lore.kernel.org/all/670dda9437147_2e6c4029461@willemb.c.googlers.com.notmuch/
+>>> Regarding to this link, I have a few more words to say: the socket
+>>> could be set through bpf_setsockopt() in different phases not like
+>>> setsockopt(), so in some cases we cannot make setsockopt hard failed.
+>>>
+>>> After rethinking this point more, I still reckon that letting BPF
+>>> program trace timestamping parallelly without caring whether the
+>>> socket is set to the SO_TIMESTAMPING feature through setsockopt()
+>>
+>> I am afraid having both work in parallel is needed. Otherwise, it will be very
+>> hard to deploy a bpf prog to run continuously in scale. Being able to collect
+>> timestamp without worrying about application changes/updates/downgrades is
+>> important. e.g. App changes from no time stamping to time stamping
+> 
+> Sorry, I didn't make myself clear. Yesterday, I said I agreed with you
+> :) So let me keep the current logic of printing (see the
+> __skb_tstamp_tx() function in patch [04/12]) in the next version. Then
+> I don't need to add some test statements to distinguish which way of
+> printing.
+> 
+>>
+>> Please help to add selftests to show how the above cases (1), (2), (3), and
+>> other tsflags/txflags sharing cases will work. This should not be delayed until
+>> the discussion is done. It is needed sooner or later to prove both bpf and
+>> non-bpf ways can work at the same time. It will help the reviewer and also help
+>> to think about the design with a real use case in bpf prog.
+> 
+> Got it. But I'm not sure where I should put those test cases? Could
+> you help me point out a good example that I can follow?
+
+Have you looked at the selftests/bpf directory?
+
+prog_tests/setget_sockopt.c may be something closer to what you need.
+
+There is a recent one in the mailing list also:
+
+https://lore.kernel.org/all/20241016-syncookie-v1-0-3b7a0de12153@bootlin.com/
+
+The expectation is to be able to run the test like this: ./test_progs -t 
+setget_sockopt
+
+> 
+>>
+>> The example in patch 0 only prints the reported tstamp, can you share how it
+>> will be used to investigate issue?
+> 
+> No problem. Please see chapter 3 about "goal" in
+> https://netdev.bots.linux.dev/netconf/2024/jason_xing.pdf.
+
+Thanks.
+
+> 
+>> Is it also useful to know when the skb is
+>> written to the kernel during sendmsg()?
+> 
+> You are right. Before this patch, normally applications will record an
+> accurate timestamp before do sendmsg().
+> 
+> After you remind me of this, I feel that we can add the timestamp
+> print in the future for bpf use.
+
+Yes, please add the sendmsg timestamp capturing in the selftest. It is useful.
+
+> 
+>>
+>> Regarding the bpf_setsockopt() can be called in different phase,
+>> bpf_setsockopt() is not limited to sockops program. e.g. it can also be called
+>> from a bpf-tcp-cc (congestion control). Not a tcp-cc expert but I won't be
+>> surprised people will try to trigger some on-and-off timestamping from
+>> bpf-tcp-cc to measure some delay.
+>>
+>>
+>> More about bpf_setsockopt() in different phase, understand that UDP is not your
+>> priority. However, it needs to have some clarity on how UDP will work and how to
+>> enable it. UDP usually has no connect/established phase.
+> 
+> For now, I don't expect an extension for UDP because it will bring too
+> much extra work. Could we discuss this later? I mean, after we finish
+> the basic bpf extension :)
+
+Later is fine but before this set lands. I am not asking a full UDP 
+implementation but need ideas on how that may look like. We need some clarity on 
+how UDP will work and also how much new sockops API extension will be needed to 
+decide if sockops is the correct one going forward. I don't want to end up tcp 
+is in sockops and UDP (and others) is non sockops.
+
+That said, the current priority is to get bpf prog and user space work without 
+stepping on each other first.
+
+> 
+>>
+>> Regarding the SOF_TIMESTAMPING_* support, can you list out what else you are
+>> planning to support in the future. You mentioned the SOF_TIMESTAMPING_TX_ACK in
+>> another thread. What else?
+> 
+> In this patch series, I support
+> SOF_TIMESTAMPING_TX_SCHED|SOF_TIMESTAMPING_TX_ACK|SOF_TIMESTAMPING_TX_SOFTWARE,
+> which you've already noticed from the BPF example in patch [0/12].
+> They all come from the original design of SO_TIMESTAMPING feature.
+> 
+> The question you proposed is what I am willing to implement in the
+> future, like adding one hook in tcp_write_xmit()? It's part of my
+> plans to extend in the future, not be included in this series.
 
 
