@@ -1,135 +1,157 @@
-Return-Path: <netdev+bounces-136477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62EEC9A1E7A
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BABCA9A1E98
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2270B207E3
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:33:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56412B25E44
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05D31D88C2;
-	Thu, 17 Oct 2024 09:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e/m8G4ny"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838601D90BD;
+	Thu, 17 Oct 2024 09:40:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E901D8A16
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 09:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35224762E0
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 09:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729157606; cv=none; b=cyDlwLOFZAn1qAbhok4p8tbMfbfXEpRfH78HnLobYUroDLpAL1juZPPQzogvbpFvCeZ5tbSvah4bVDwPEQrbEIWptmBTl31VPGM1lM+SQm/Peh+IgngAdPH45Gjeey+CLRe2Cr+igSrCD2veaHXG4ZdQaSzbyBkMnLfHF8RaOjg=
+	t=1729158012; cv=none; b=AWJ2IRpNh7j2xJxo/vdtAtrbdmaDsBuAcNYrSQNb5IL/1Gvp36KqLJnHXCkxPvPS8RxveXkmPhIWUGThZWSrM+cAjS0SnfMkJKaYU3Cn+E6coJf2REUMEsipe8deoPl4wG0SGfmus5gVdBRkE4uLEYoxth0VlNbpJFqc2zHvbgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729157606; c=relaxed/simple;
-	bh=eAO4OpzJK+ZqOZ8YhgV52/JYGCtHP8kWPtUgBTS6oeE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N/qnOthfv7p5y71JDVw3PKRXucq2G38uPdipuWPeRKR/gHaKylfh1KFLdTifY7Enw6jKfs9nyE0jgZWUvDR1dWWfSGAUIEJwFzcm+LdzAxClgXNhepsS9Bbami82uelHJUV77lesC+wlemUhMgsoi4ArB4zmp0nb17IxPVINgl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e/m8G4ny; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d325beee2so352174f8f.2
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 02:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729157601; x=1729762401; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3aCF8qbJBg1Dps0D/CUhTqVXgsROfsWWZhphpElZXnQ=;
-        b=e/m8G4nyU4TsNR1qulWewsFaJGWpMoB7aH5atbHjthLH6OlnpVqp3NmhvMeJXMEJGQ
-         plPTfTX70h6xxcla4GqpiVZ4A8vI6xwHyON3ilDPSvDdqs0V8DeV+7v+nkExsJKFkfyc
-         e9t91EXQM0ksoEof04C0IVXmAEwLXbO9fVDNP1CTvAxdTrTwbCkM/cSUgLZkyBFcrm8/
-         hh6kT9kpeW5VMgi/c1E1bxz32yi4nVhaHfAbGlI2cPHMuq76vPjggBRfxnyjV+pL1z7e
-         84kI1NKpxmle4e/m9FmjjcqYqxQsoH+Y040iM7v7SI4sFcvoy1jaOieU0NaK298H9tus
-         kN8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729157601; x=1729762401;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3aCF8qbJBg1Dps0D/CUhTqVXgsROfsWWZhphpElZXnQ=;
-        b=qopQhjc/HoT/byB4WrCfJv/lcSTGY0C1Rxrrq0kJux+I8+lU9YIdPC3+rYehUYPd/n
-         CpUIBW4W/3cYFqRQW+yQHSiXQMhMIAujLhOAJlW0SIDpDZwF/QwUY29UIpPrL/4z6PSA
-         Or0YWvhP62CB6vYCaQoKN7fnGhywzyyEV4r5BbyNNDZyOTtRaC+rFecCVDcpJA8Ui15G
-         yOkpbK0gQzLhIiM4qFaen2FjqoXCmFjIxGao37FB/dyPHExv/J8eQXNyib1wnJcPWxFE
-         ZFBNBNxmhOMwZYyKFsR7s1zk+Ad/RGx2zt7NoMre2CBx6EELAztsj2XtMv/A9XDZjYzf
-         Upjw==
-X-Forwarded-Encrypted: i=1; AJvYcCWt0sFJyoyEuNler8lM6szWfZmKVOCHOtQjBnCtLTcyBdWYi8bH/1HAyqSqujU+SjwaLBwW4sk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGNY0eW5w3LpdDRuCpQZOgqOJpg9ZYjWYMH94qHOH6nBJtiYDL
-	ZowqHu9+IGj8b6TioGFlQV5JEZPafckDh1m+HMi606ubsczzX9NeT2nIU2ShfvWhNs/Sq9tcyk2
-	g6eogmcR2vNw6mArgzIgDSXos2FYb6xsxUxgg
-X-Google-Smtp-Source: AGHT+IGrjgb4tg9+baFKcG84sjc0/H/bT6AHZ0SjBlystoLYnCAsWx0ASGEVpLgSEq/buwud93hxrF4rLN4G3ObBMe4=
-X-Received: by 2002:adf:f9c8:0:b0:37d:415c:f27c with SMTP id
- ffacd0b85a97d-37d5ffb9969mr11235445f8f.38.1729157601306; Thu, 17 Oct 2024
- 02:33:21 -0700 (PDT)
+	s=arc-20240116; t=1729158012; c=relaxed/simple;
+	bh=HfbRrUrWeLWP6xolSgeEuOauGNhfwmJjuvBcMtLuU4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IIAo6n8Jn55JS+egAqsuPxEzznGDdxxPZ6FxRgWcYDBkbZcl+x+uNvEWKg6rhtxill5VWiBIHNTlpM5nhVQ6YQ8TmE3KDteDsghAUv0Kujvo1iTeIc6RUYhp1K6dxTvuOF9VoshoNP2tLWeEWWlbpZKWBubjMmwNfDQaaXQ47nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XTjT52232z1SCl6;
+	Thu, 17 Oct 2024 17:38:49 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4FC731A016C;
+	Thu, 17 Oct 2024 17:40:05 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 17 Oct 2024 17:40:05 +0800
+Message-ID: <e9c92aab-16bc-4814-8902-7796b9d29826@huawei.com>
+Date: Thu, 17 Oct 2024 17:40:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-5-fujita.tomonori@gmail.com> <ZxAZ36EUKapnp-Fk@Boquns-Mac-mini.local>
- <20241017.183141.1257175603297746364.fujita.tomonori@gmail.com>
-In-Reply-To: <20241017.183141.1257175603297746364.fujita.tomonori@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Thu, 17 Oct 2024 11:33:09 +0200
-Message-ID: <CAH5fLgjHf3Z5HHOLnzZkk-Q5MOwz_57LQc6scr9yDy1j89HSCw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/8] rust: time: Implement addition of Ktime
- and Delta
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: boqun.feng@gmail.com, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
-	linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/3] gve: adopt page pool for DQ RDA mode
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <willemb@google.com>,
+	<jeroendb@google.com>, <shailend@google.com>, <hramamurthy@google.com>,
+	<ziweixiao@google.com>, <shannon.nelson@amd.com>, <jacob.e.keller@intel.com>
+References: <20241014202108.1051963-1-pkaligineedi@google.com>
+ <20241014202108.1051963-3-pkaligineedi@google.com>
+ <89d7ce83-cc1d-4791-87b5-6f7af29a031d@huawei.com>
+ <CA+f9V1MZWkWmVHruHgJC1hqepi-CTLDvGjtkd3CGaCiUR-kF5Q@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CA+f9V1MZWkWmVHruHgJC1hqepi-CTLDvGjtkd3CGaCiUR-kF5Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Thu, Oct 17, 2024 at 11:31=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> On Wed, 16 Oct 2024 12:54:07 -0700
-> Boqun Feng <boqun.feng@gmail.com> wrote:
->
-> >> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-> >> index 8c00854db58c..9b0537b63cf7 100644
-> >> --- a/rust/kernel/time.rs
-> >> +++ b/rust/kernel/time.rs
-> >> @@ -155,3 +155,14 @@ pub fn as_secs(self) -> i64 {
-> >>          self.nanos / NSEC_PER_SEC
-> >>      }
-> >>  }
-> >> +
-> >> +impl core::ops::Add<Delta> for Ktime {
-> >> +    type Output =3D Ktime;
-> >> +
-> >> +    #[inline]
-> >> +    fn add(self, delta: Delta) -> Ktime {
-> >> +        Ktime {
-> >> +            inner: self.inner + delta.as_nanos(),
-> >
-> > What if overflow happens in this addition? Is the expectation that user
-> > should avoid overflows?
->
-> Yes, I'll add a comment.
->
-> > I asked because we have ktime_add_safe() which saturate at
-> > KTIME_SEC_MAX.
->
-> We could add the Rust version of add_safe method. But looks like
-> ktime_add_safe() is used by only some core systems so we don't need to
-> add it now?
+On 2024/10/17 3:43, Praveen Kaligineedi wrote:
+> Thanks Yunsheng. One thing that's not clear to me - the GVE driver
+> does not call page_pool_put_page with dma_sync_size of 0 anywhere. Is
+> this still an issue in that case?
 
-I think it makes sense to follow the standard Rust addition
-conventions here. Rust normally treats + as addition that BUGs on
-overflow (with the appropriate configs set), and then there's a
-saturating_add function for when you want it to saturate.
+It depends on what's value of 'dma_sync_size', as the value of the
+below 'page_info.buf_size' seems to be the size of one fragment, so
+it might end up only doing the dma_sync operation for the first fragment,
+and what we want might be to dma sync all the fragments in the same page.
 
-Alice
+The doc about that in Documentation/networking/page_pool.rst seems a
+little outdated, but what it meant is still true as my understanding:
+
+https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/networking/page_pool.rst#L101
+
+> 
+> Thanks,
+> Praveen
+> 
+> 
+> On Wed, Oct 16, 2024 at 2:21 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/10/15 4:21, Praveen Kaligineedi wrote:
+>>
+>> ...
+>>
+>>> +void gve_free_to_page_pool(struct gve_rx_ring *rx,
+>>> +                        struct gve_rx_buf_state_dqo *buf_state,
+>>> +                        bool allow_direct)
+>>> +{
+>>> +     struct page *page = buf_state->page_info.page;
+>>> +
+>>> +     if (!page)
+>>> +             return;
+>>> +
+>>> +     page_pool_put_page(page->pp, page, buf_state->page_info.buf_size,
+>>> +                        allow_direct);
+>>
+>> page_pool_put_full_page() might be a better option here for now when
+>> page_pool is created with PP_FLAG_DMA_SYNC_DEV flag and frag API like
+>> page_pool_alloc() is used in gve_alloc_from_page_pool(), as explained
+>> in below:
+>>
+>> https://lore.kernel.org/netdev/20241014143542.000028dc@gmail.com/T/#mdaba23284a37affc2c46ef846674ae6aa49f8f04
+>>
+>>
+>>> +     buf_state->page_info.page = NULL;
+>>> +}
+>>> +
+>>> +static int gve_alloc_from_page_pool(struct gve_rx_ring *rx,
+>>> +                                 struct gve_rx_buf_state_dqo *buf_state)
+>>> +{
+>>> +     struct gve_priv *priv = rx->gve;
+>>> +     struct page *page;
+>>> +
+>>> +     buf_state->page_info.buf_size = priv->data_buffer_size_dqo;
+>>> +     page = page_pool_alloc(rx->dqo.page_pool,
+>>> +                            &buf_state->page_info.page_offset,
+>>> +                            &buf_state->page_info.buf_size, GFP_ATOMIC);
+>>> +
+>>> +     if (!page)
+>>> +             return -ENOMEM;
+>>> +
+>>> +     buf_state->page_info.page = page;
+>>> +     buf_state->page_info.page_address = page_address(page);
+>>> +     buf_state->addr = page_pool_get_dma_addr(page);
+>>> +
+>>> +     return 0;
+>>> +}
+>>> +
+>>> +struct page_pool *gve_rx_create_page_pool(struct gve_priv *priv,
+>>> +                                       struct gve_rx_ring *rx)
+>>> +{
+>>> +     u32 ntfy_id = gve_rx_idx_to_ntfy(priv, rx->q_num);
+>>> +     struct page_pool_params pp = {
+>>> +             .flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+>>> +             .order = 0,
+>>> +             .pool_size = GVE_PAGE_POOL_SIZE_MULTIPLIER * priv->rx_desc_cnt,
+>>> +             .dev = &priv->pdev->dev,
+>>> +             .netdev = priv->dev,
+>>> +             .napi = &priv->ntfy_blocks[ntfy_id].napi,
+>>> +             .max_len = PAGE_SIZE,
+>>> +             .dma_dir = DMA_FROM_DEVICE,
+>>> +     };
+>>> +
+>>> +     return page_pool_create(&pp);
+>>> +}
+>>> +
 
