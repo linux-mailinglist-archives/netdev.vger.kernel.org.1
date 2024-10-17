@@ -1,48 +1,53 @@
-Return-Path: <netdev+bounces-136735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8720D9A2C43
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:36:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D29E9A2C53
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A21C1F21200
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:36:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F25D1C2102F
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D8318BC28;
-	Thu, 17 Oct 2024 18:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374BB1FC7C3;
+	Thu, 17 Oct 2024 18:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvZ3a4xE"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="N5VrXGkg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11182188731
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 18:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315451FBC89;
+	Thu, 17 Oct 2024 18:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729190209; cv=none; b=WQ7YLuOVD85KzEdHD3inTKqcLAQvE5X8sRJU4OPjcZ/wfmU2Q+xDqcpYsahfRKcfMwKOPjq8RBsXZWiMvgMQa2njgBOqSQjRnJGTnSlvrqNT/KxJahlk6TkOTuq20Jvx8J5jgJ3d340kWMOEZzv0YvrVJeqJzxfcDEK3W7wqbhc=
+	t=1729190376; cv=none; b=VvNvuRyfa53aaWGWuFJoZNAP7o0QPCgsj50YzPsrRssF8dJyvP4+kdDgGP9QRiAmOGf6g5eW2zKk3zOtqAcQYI2wUKP5+Vtgnjjqhlk81zQUAijadWMdKHZ5B3GTvXNv98/cCtWFeV8iBTJvWzOT6fiz7587T58A72mNyxtHCPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729190209; c=relaxed/simple;
-	bh=CnZOBThXjx5SD28J11hFNtXSWTTAjhOtDnYRBQFfw30=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=N+pB0tkgF40TLI0kT4fL5WubJ1SfxNjlQPTlNnK9vMgZi8/30y+joGqBPrP+UVGqXR9/mpK+VUZd8elApAAG0BbKW80LmQg8f9xaHY8fP4wXsqCnZxqq8oAOuAe+q/k6ONe5+nBesH65IDM5hxk4SFvZflx31Mbwq4Rc5VPMVWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvZ3a4xE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B117C4CEC3;
-	Thu, 17 Oct 2024 18:36:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729190208;
-	bh=CnZOBThXjx5SD28J11hFNtXSWTTAjhOtDnYRBQFfw30=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=hvZ3a4xEtRIDIuQwpedVeYiXUJWw51NFss/2j3wDVI8t6e0I2iWimdpYFWAOdr1JL
-	 R5WvPWPLzwjEGwgGbLEUVGOeonV/ra3s3oWHLsaa48CTx/v0s8lF+JV4dTbv6QHZiC
-	 /2XvdzDoQJxWpHAfqvxrE0dZVCEASq0kSJ7Nd3MaaDcvAkEOSlKFbAkaGV7CIbsI/L
-	 Th6RArJhgHyqaUDV9CUeGS56dqnQTDC9IsfNIJy2u+7+SrJ5CB+qgWlJXnrXsEsw7W
-	 6620c4HQx0h044V7aWEIiAfBdiJOBhr+HWUGIrOtYegj6AHy/AvN0OYkXrqscfVS/l
-	 N2kuuzeQ11Frw==
-Message-ID: <61184cdf-6afc-4b9b-a3d2-b5f8478e3cbb@kernel.org>
-Date: Thu, 17 Oct 2024 12:36:47 -0600
+	s=arc-20240116; t=1729190376; c=relaxed/simple;
+	bh=FxmywgkNUlS99u+UKR5DQby5kzi44L1odyhv89Zm1SU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aemz0/NQCOEMW16h2YaGaJfkv4o6JgP6ffaJOE5O7B7mZsGOs7QdOLXavJm2nGfXDFC+LiMcRPFGr3su81UErRSo8adnyd35pBwN9/5V7mX8cOgdQRj+1YXTUdP3z2QCAG6y8d/tos8/ZPdqh1hDgF1qFh0uK8Um8DGCxNSArqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=N5VrXGkg; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pXm+8IBFvz1ujYC5/BdUieoeB4O8UBo9KmKYceLh5ts=; b=N5VrXGkgAWFovrbKgWzKyOBDom
+	d46SQYNLOSfMSOWuHmaIHAObkvJwCWdni6bSN1N8KpOLojafzKd21+7Ys++FKchnkzKicr/jZeVOE
+	AB5cuhC6sIIQGfik6tREtlG4yFK3VUEAilMGd9OUAz7A0au20F+kOiUsxFf7OBUtPyU4=;
+Received: from p4ff13b65.dip0.t-ipconnect.de ([79.241.59.101] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1t1VP4-00AwP2-1f;
+	Thu, 17 Oct 2024 20:39:18 +0200
+Message-ID: <b78b8659-d89d-4fd4-b922-f3c24b705deb@nbd.name>
+Date: Thu, 17 Oct 2024 20:39:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,50 +55,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: yaml gen NL families support in iproute2?
+Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
+ improvements
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Eric Woudstra <ericwouds@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+ <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
+ <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
+ <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
+ <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
+ <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
+ <d7d48102-4c52-4161-a21c-4d5b42539fbb@gmail.com>
+ <b5739f78-9cd5-4fd0-ae63-d80a5a37aaf0@nbd.name> <ZxEFdX1uoBYSFhBF@calendula>
+ <eb9006ae-4ded-4249-ad0e-cf5b3d97a4cb@nbd.name> <ZxFS7XBgFXsqUlkO@calendula>
+From: Felix Fietkau <nbd@nbd.name>
 Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>,
- Stephen Hemminger <stephen@networkplumber.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <ce719001-3b87-4556-938d-17b4271e1530@redhat.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <ce719001-3b87-4556-938d-17b4271e1530@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <ZxFS7XBgFXsqUlkO@calendula>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/17/24 11:41 AM, Paolo Abeni wrote:
-> Hi all,
+On 17.10.24 20:09, Pablo Neira Ayuso wrote:
+> On Thu, Oct 17, 2024 at 07:06:51PM +0200, Felix Fietkau wrote:
+>> On 17.10.24 14:39, Pablo Neira Ayuso wrote:
+>> > On Thu, Oct 17, 2024 at 11:17:09AM +0200, Felix Fietkau wrote:
+>> > [...]
+>> > > By the way, based on some reports that I received, I do believe that the
+>> > > existing forwarding fastpath also doesn't handle roaming properly.
+>> > > I just didn't have the time to properly look into that yet.
+>> > 
+>> > I think it should work for the existing forwarding fastpath.
+>> > 
+>> > - If computer roams from different port, packets follow classic path,
+>> >    then new flow entry is created. The flow old entry expires after 30
+>> >    seconds.
+>> > - If route is stale, flow entry is also removed.
+>> > 
+>> > Maybe I am missing another possible scenario?
+>> 
+>> I'm mainly talking about the scenario where a computer moves to a different
+>> switch port on L2 only, so all routes remain the same.
+>> 
+>> I haven't fully analyzed the issue, but I did find a few potential issues
+>> with what you're describing.
+>> 
+>> 1. Since one direction remains the same when a computer roams, a new flow
+>> entry would probably fail to be added because of an existing entry in the
+>> flow hash table.
 > 
-> please allow me to [re?]start this conversation.
-> 
-> I think it would be very useful to bring yaml gennl families support in
-> iproute2, so that end-users/admins could consolidated
-> administration/setup in a single tool - as opposed to current status
-> where something is only doable with iproute2 and something with the
-> yml-cli tool bundled in the kernel sources.
-> 
-> Code wise it could be implemented extending a bit the auto-generated
-> code generation to provide even text/argument to NL parsing, so that the
-> iproute-specific glue (and maintenance effort) could be minimal.
-> 
-> WDYT?
-> 
+> I don't think so, hash includes iifidx.
 
-I would like to see the yaml files integrated into iproute2, but I have
-not had time to look into doing it.
+I'm talking about the side where the input ifindex remains the same, but 
+the output interface doesn't.
 
-I have been using the cli.py tool a lot in the past few months and I
-have it klunky and hard to use - especially around valid options for get
-and dump requests.
+>> 2. Even with that out of the way, the MTK hardware offload currently does
+>> not support matching the incoming switch/ethernet port.
+>> So even if we manage to add an updated entry, the old entry could still be
+>> kept alive by the hardware.
+> 
+> OK, that means probably driver needs to address the lack of iifidx in
+> the matching by dealling with more than one single flow entry to point
+> to one single hardware entry (refcounting?).
 
-Coping yaml files into iproute2 is the trivial part; we already do that
-for uapi header files. The harder part is properly integrating the
-commands into the package. To me requirements are along the lines of:
-- aligning with iproute2 style of commands,
-- a man page per command,
-- proper help options to guide users
+If we have multiple colliding entries, I think a more reasonable 
+behavior would be allowing the newer flow to override the older one.
 
-The last 2 should include attributes that can be added to get and dump
-requests.
+>> The issues I found probably wouldn't cause connection hangs in pure L3
+>> software flow offload, since it will use the bridge device for xmit instead
+>> of its members. But since hardware offload needs to redirect traffic to
+>> individual bridge ports, it could cause connection hangs with stale flow
+>> entries.
+> 
+> I would not expect a hang, packets will just flow over classic path
+> for a little while for the computer that is roaming until the new flow
+> entry is added.
+
+If the hardware still handles traffic, but redirects it to the wrong 
+destination port, the connection will hang.
+
+- Felix
 
 
