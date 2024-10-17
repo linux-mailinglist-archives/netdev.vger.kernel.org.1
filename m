@@ -1,85 +1,118 @@
-Return-Path: <netdev+bounces-136609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C0F9A24DA
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:20:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14CCE9A24DD
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED28E1F22E49
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:20:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469D31C20CB6
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50881DE4C8;
-	Thu, 17 Oct 2024 14:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960691DE894;
+	Thu, 17 Oct 2024 14:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsRsfTdQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJPU1l5K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1EC1DDA09;
-	Thu, 17 Oct 2024 14:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4141DDA24;
+	Thu, 17 Oct 2024 14:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729174799; cv=none; b=Pvgo5g7CoymgF7du6IXMzz/k+3jVFZi5mFwfPXGr4KAA1TFWco6KSpCSpbjYaHhWMrYa/Qubu7WCJKqm9xSRdrbIuv5mkVlEmVLzTs0yE7wWWFt1oBOfO+x8M+Ja5XSE+ZPv9ouaP5fiH8CgT4ydBjnJd2W1umilKTOWO4BR+wk=
+	t=1729174803; cv=none; b=AhLeotwwISopy5qsbBvl1Anh+uiFjE0Md4AEPBwrjmRTodMwcm7S0MDwn4OY1H3DJboFn5bN+e/8PrT4kZQvz7GXCTYG1G1BskrUW2MZ1XPGyiYefgxjDBfDpKG4dDmIoEewLMyxs0qKr3KhezOUEUH6EumPVcvAoP9lxZWND00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729174799; c=relaxed/simple;
-	bh=dgAWsGv9y58h9ooyR9zbl/FfGLR8dAyl+LlCxHpse6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E+zczboesaaZ+pZlrI6TOYDlwPewNQ9xTM9NkeYQB0AAwxnKyA5a8C3N11Ca8gRAgKc9k6NexKvEvFu4nYeWD/MEjTMq5oxx+rBlQLmu7chqTclYeajKUQkNTLJvXAO/Kjz5E1eDQeGBcygEA+idRNcvhz6MFyqQbCqV+0PC20g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsRsfTdQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42969C4CEC3;
-	Thu, 17 Oct 2024 14:19:56 +0000 (UTC)
+	s=arc-20240116; t=1729174803; c=relaxed/simple;
+	bh=GLCrs3Dovv1NiZDErsK/6Wy5iJ7ydSzeUdxuxMzzEbc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=NgzOwb45mQG5PO3HA1c58AGE4SKtGW0TQ19UOrTY6Z5Yj/Fo0yCR/IDE79NylduH9ozl4i207Xo283Z41mFlLjenZW6ohF6Cprl29NSHT7TqZHQbnaumokOmJXwzpaG5r08ixKt+mGXUEaLEEY7IttzH0OScR7aYVOFI9dLVrVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJPU1l5K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 855DFC4CEC7;
+	Thu, 17 Oct 2024 14:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729174799;
-	bh=dgAWsGv9y58h9ooyR9zbl/FfGLR8dAyl+LlCxHpse6c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GsRsfTdQZzaXZxB/Xc9T4upHZgJ0ERByj7F60SeY8LkmC1BGL+WvhOGgkl1EUcIfs
-	 8t/ALceDwrMsyz3j7TFn42QWH9wd4EzeWydEHVSgos7agEMZyL6M/Ybynjylw/vh9v
-	 ZOFCnkV3a5gh7VtZoABm424C1QI58Zpab8cjpXVCLmnqf429PvHgJRPGJ/i0UdU76i
-	 xDPy0ZPDZir/BsJZ5TlrMOd7oTZctb6KriTjKY89Pw4XX//HnEYiCUJ/+nd9ZFnHHx
-	 di6WxoxnCWiZi73sj687qZypmFVCy7xJOu+pjV0rB7hBzOKsRrqoBwPGLr8cyIe6Sv
-	 ebOAwZtmcoOQA==
-Date: Thu, 17 Oct 2024 15:19:54 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek-ge-soc: Propagate
- error code correctly in cal_cycle()
-Message-ID: <20241017141954.GR1697@kernel.org>
-References: <20241017032213.22256-1-SkyLake.Huang@mediatek.com>
- <20241017032213.22256-4-SkyLake.Huang@mediatek.com>
+	s=k20201202; t=1729174803;
+	bh=GLCrs3Dovv1NiZDErsK/6Wy5iJ7ydSzeUdxuxMzzEbc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=cJPU1l5Kps56v8mtpHDahoOu/sesVEsbfkxPxTBjZJUFVPTfhquqJmMWgfV57Mzxr
+	 g1rd1vIx0qWhbCmkzM6IbOU0nOCP1F0T68LieQMKCfZIshfUbktERB0aoZhno+uJIB
+	 A5o+vNmH35gCfzcJ1QOdrFU13evRECzSwE6VGCf7j0zJO0BnRmoebOmEkEyOrIn/Fv
+	 R89L1k8bbBzfwhnKPHRNxgVxbKJcHvuhl0Yv/hVpD8djyoy1qYZwYfCn3aQs2Yl9av
+	 VvVxXTl2yNmlJn7lkLhFj8V6hfAEtpxPJ6+iyN7zNxSED2vaeBmgGrG4sDBsIoQhrm
+	 +AHc8oQp8Nn9g==
+From: Mark Brown <broonie@kernel.org>
+To: Frederic Weisbecker <frederic@kernel.org>, 
+ Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>, 
+ Anna-Maria Behnsen <anna-maria@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Peter Zijlstra <peterz@infradead.org>, SeongJae Park <sj@kernel.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev, 
+ linux-mm@kvack.org, Arnd Bergmann <arnd@arndb.de>, 
+ linux-arch@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Andy Whitcroft <apw@canonical.com>, 
+ Joe Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>, 
+ Liam Girdwood <lgirdwood@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+ netdev@vger.kernel.org, linux-sound@vger.kernel.org, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nathan Lynch <nathanl@linux.ibm.com>, 
+ linuxppc-dev@lists.ozlabs.org, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+ linux-media@vger.kernel.org
+In-Reply-To: <20240904-devel-anna-maria-b4-timers-flseep-v1-0-e98760256370@linutronix.de>
+References: <20240904-devel-anna-maria-b4-timers-flseep-v1-0-e98760256370@linutronix.de>
+Subject: Re: (subset) [PATCH 00/15] timers: Cleanup delay/sleep related
+ mess
+Message-Id: <172917479725.89568.14288418643818666155.b4-ty@kernel.org>
+Date: Thu, 17 Oct 2024 15:19:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241017032213.22256-4-SkyLake.Huang@mediatek.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-9b746
 
-On Thu, Oct 17, 2024 at 11:22:13AM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+On Wed, 04 Sep 2024 15:04:50 +0200, Anna-Maria Behnsen wrote:
+> a question about which sleeping function should be used in acpi_os_sleep()
+> started a discussion and examination about the existing documentation and
+> implementation of functions which insert a sleep/delay.
 > 
-> This patch propagates error code correctly in cal_cycle()
-> and improve with FIELD_GET().
+> The result of the discussion was, that the documentation is outdated and
+> the implemented fsleep() reflects the outdated documentation but doesn't
+> help to reflect reality which in turns leads to the queue which covers the
+> following things:
 > 
-> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Applied to
+
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git for-next
+
+Thanks!
+
+[11/15] regulator: core: Use fsleep() to get best sleep mechanism
+        commit: f20669fbcf99d0e15e94fb50929bb1c41618e197
+
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
+
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
+
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
+
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
+
+Thanks,
+Mark
 
 
