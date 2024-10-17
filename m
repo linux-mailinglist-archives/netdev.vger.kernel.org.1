@@ -1,191 +1,118 @@
-Return-Path: <netdev+bounces-136354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257C29A175F
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 02:58:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 476539A1773
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 03:04:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E3EEB23D80
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 00:58:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05889282D95
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 01:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F5B1E517;
-	Thu, 17 Oct 2024 00:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B8614F98;
+	Thu, 17 Oct 2024 01:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="d1Gjzb85"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DagClQuC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123611CD1F
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 00:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163EC14287;
+	Thu, 17 Oct 2024 01:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729126674; cv=none; b=pw7dtF3cz3s1vVEilNIsIpRbEex4WA5ByLNtMbFehVudgsoJnMBU+UxJ5nfB+YW6DsnyibI+Kb/E9ZGJ58zWUDxXbueN81XeZa7gbe1Rcg1Z9jqy/pwqrEc/1frtfYFyzdKxHf1RgtbcRli5E+2kb9AeXVETp6aWmQzunDwIL18=
+	t=1729127073; cv=none; b=Y/8SuI/i4Iy/d4gFws8ji2TkqSjmviBRryA+QSsY/uUCvCIRhxlHffmf+qgvPnwk6OGJCbQb4uNFic0MeDC/+5tLked8KNSKuZ8XTtdXcdpUp/kwwq1KvyIhk3olpobCIXKOuDyFW0+wwcCmHB54+cuu4qCHFpX2Ow8MUblQd3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729126674; c=relaxed/simple;
-	bh=er7gn+9qtnqKtk/zsO18B6Kbt/ktvMPPY9dwl/7TEsM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kqbr04jTj3lBLLw3AMVrQemi0mtnwMVGSyxmtHqqj19EOQ/eu9QqWRVDNnaJKNAagWkrx4VDF1TLwvSRGrcQylDB5yFOszODMqwCo7U//cFo32PnFibkq22UkOFVVQAdsxRwsnLK/a8269xJpSIztZT4I52SkL2qVddFq7MQGaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=d1Gjzb85; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7a9c3a4e809so32796085a.2
-        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 17:57:52 -0700 (PDT)
+	s=arc-20240116; t=1729127073; c=relaxed/simple;
+	bh=TbLQf7CSlSZzGt+kzv8SANOQQcKWIB1TQsVyrZtb6Ak=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xh78HXl+FRF6rOoPV4jG+DIZDC9LlrtvfAXQMMZ5O4BSf0cuI3wvzXmm/GEyAUbPYlwmlFKke6ZbqVhBqVEX/4rElmGlRr02CacZc331gpDVNRj3KhPNFmpMyH3TgFjme4d4+4mU43a4ay4BwnEKG4R0RRfCoT58hN+fnv0Wtsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DagClQuC; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20c7edf2872so12215565ad.1;
+        Wed, 16 Oct 2024 18:04:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1729126672; x=1729731472; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2NtcrI2eXbw87V4TzBkXNzP43wWWtbiCvAle8aiM7Xo=;
-        b=d1Gjzb85GrSUdLctI6+KO9Tc5jsr9nEXF7R8KnF/ijY3TynsxpQ0yfsAUU7pk9kvhG
-         RRVEa10RODPV57MPUCVaCVko+8WbVVgiYOm5MkcLhcYvnPjIQoqegHue8C4voZHaEpHy
-         Ir9zYX9naX8w8crD4FG2QkF3RtPwgwHWk1s6RnIo4XYNvFMEbEvpWd5ljUZw5UOy+crq
-         TnQKzETz279hzeCsjHFTy/6Dfb3CO4OYqSgyVcZ7U5iGiHJcMD0iha25XX6RfdCAWoXO
-         AhM+do+Iqy0jOS//u+fGm38MStV0ADsrdMe/EU+lKJwzf4eSm0q5T/k1Sn5JP0/8Cm8T
-         ik/w==
+        d=gmail.com; s=20230601; t=1729127071; x=1729731871; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mw9X4Cnv9XyDq5Ozk5VQUjC9kvC7gYUadRA/A1iUmsY=;
+        b=DagClQuCGn5VT+Qo7Fd2ddap7JyUqyZA1XuDIbITMByxyvAEX2VOo2z/nQpEkjpbs7
+         Y20SoCMEH/LlYJ5wJQDwWe+TGbOleiKt+hqQYtNWQtIXt0EqSyveFZx/2IjyBrHGtx+U
+         5fws7FrRjH0ex3qSpeTgLwb9BAkR1+Ei3+hl0bQ5oSQ3rlAgQZBidRcNTOIF3RuASxRe
+         wrmxDLc/X3KxMzYikWvwu/35g7GbdkjM8UTyyEBea3ku1bNRk7IZaZ7QfF/Sys4iK8OU
+         ivzOkFkZwc0+1PWRVJX9tVX13zzc8eT7nHITtphUL9SEamo/JjvJy2bnsHVO3jRiUuhm
+         p8oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729126672; x=1729731472;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2NtcrI2eXbw87V4TzBkXNzP43wWWtbiCvAle8aiM7Xo=;
-        b=B5JpqG9PX8iV7LQA2VHRBceBmozISKukBNNujXuE7BIlC60kStjHa2NEuuWIEeDlsL
-         X0BaKknu7292OU4tN7gv8icfW7Ev2VcTOnJ1KltIXR+gPpsiqSBvtYK9x7Rrrmm5Q4Of
-         J9HisUoqrUnvyzbcm96FT/nFIxB4nVzYTutDkB9ukmm8MgQEzdy4ElV5+YleP4g/E7/l
-         D2v7T8F8U7uziGZdGpILr+iFtiXn5Iv79kmZdrcEnxG0IgAOtfjy+kHTKoErtk3oEI9M
-         TAXHazuuKYrMBh7LsXFpeZ51GR2i4fhg/SmiqIVaBjO7/qC+qXfUHfQ7m/yBE/s6eFKF
-         da/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWbATY8gZvyY2yZSThXvZeBtZaU8UIKYzublKh5u72WARqHA0k6kHwvV72tcR/V6G8CS7RcdWc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCGDZ2DH+qUmnLI3SC7B0kxSStCcn8+6WKWe4k3iae8PaWFejP
-	qJBSYKZMgfvQfouGJBPbJwlYfUIWsPGuDb/SyNO7zzSmf5hxBe6TTXu9UilLj7w=
-X-Google-Smtp-Source: AGHT+IE+cHydkaERdSD+wRFQhHGrAS7bLwqT2iHcE1mxpJnlcyNLvPzueWZ8aAMjYSwm9joVel+kjw==
-X-Received: by 2002:a05:620a:470d:b0:7a9:a1f4:d4e1 with SMTP id af79cd13be357-7b120fcfe30mr2263816385a.39.1729126671812;
-        Wed, 16 Oct 2024 17:57:51 -0700 (PDT)
-Received: from n191-036-066.byted.org ([130.44.212.94])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b13617a23esm242466685a.60.2024.10.16.17.57.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 17:57:50 -0700 (PDT)
-From: zijianzhang@bytedance.com
-To: bpf@vger.kernel.org
-Cc: john.fastabend@gmail.com,
-	jakub@cloudflare.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org,
-	cong.wang@bytedance.com,
-	zijianzhang@bytedance.com
-Subject: [PATCH bpf 2/2] tcp_bpf: add sk_rmem_alloc related logic for ingress redirection
-Date: Thu, 17 Oct 2024 00:57:42 +0000
-Message-Id: <20241017005742.3374075-3-zijianzhang@bytedance.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20241017005742.3374075-1-zijianzhang@bytedance.com>
-References: <20241017005742.3374075-1-zijianzhang@bytedance.com>
+        d=1e100.net; s=20230601; t=1729127071; x=1729731871;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mw9X4Cnv9XyDq5Ozk5VQUjC9kvC7gYUadRA/A1iUmsY=;
+        b=L6IDXKLgDORmz4PQI4qRCcpmRFR6LkHf7dyrj/jeomLERnFlcUC8XM188Baoj1H9Tm
+         4HKCw+CXOOIkuCvNeJ3kXC8PqF2iPzq5DjORn4s00mp3rHdypYbaj/n0EWP3d3fZPo/J
+         /10CUKRLCoxcfXIJ+erNxdRboHVfw3nT5DbXEQhAU+4c/RrM+i9yMToMgqtmtR5iVM3R
+         3ViYnq73DIFBqE5dxO8soyobo+XzDpkxavuSa4N7X0KqrvnSIRE0enbyPtSr8gpambuE
+         jlWCK9aBUykLXsbrcAGDm/QU35oXmWMEsqIbp6hV0Xedc2oGcJE1+AWViLjLhbDMntH8
+         qsCA==
+X-Forwarded-Encrypted: i=1; AJvYcCU991uiF3/A0lDNk/NMWGXRdF4vTJQOowSuKWyAbcCZPBjp9dbQ4lfptBRGu3cHrI25H/3y+s1UHhlB3kM1LERR@vger.kernel.org, AJvYcCUDISfa7C+E68ii2wkjyO9ERXRK6bpYTBNj/Hy+Yy1fDaQNOvyNtL10BmolfMxFNRSxF41F3X7c@vger.kernel.org, AJvYcCVnrtDv1ASUZXUsYX05HkOj/HbKxVHvAaMsyrmt5x/GTtRKYUcP2ERr96uK1xd22jL3giOv60T4LJA/4MM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1h/7mb1cqeDFDKxD6aIbRjDDT8lYF6YSPzSEybIG8X0Hu502U
+	/RKwRlM1hZeN7bUTr+AowZoddC4gfO3gOWQv85NL+nC5ngZgWUxeLl70wLFU32ft+Hh7fhB7Xsg
+	R5QdcRokV5DvXQyyhD3qYdYLJj60=
+X-Google-Smtp-Source: AGHT+IFgXKpvr5EG6U69UyMZTkscTSL9KQXC9nJe2KZ3Jbc8IbNcSYnzF3O+/v4sRRazW4ZONf+6MCWrtYbIXSrq8pI=
+X-Received: by 2002:a17:90b:305:b0:2c9:6abd:ca64 with SMTP id
+ 98e67ed59e1d1-2e3dc27805emr2220713a91.9.1729127071320; Wed, 16 Oct 2024
+ 18:04:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241016055823.21299-1-leocstone@gmail.com>
+In-Reply-To: <20241016055823.21299-1-leocstone@gmail.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Thu, 17 Oct 2024 02:04:19 +0100
+Message-ID: <CAJwJo6awAk0tG7RmorUBCTdnHx48Kdmztr=q_AgfhzBKox-zwA@mail.gmail.com>
+Subject: Re: [PATCH v2] selftest/tcp-ao: Add filter tests
+To: Leo Stone <leocstone@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, rdunlap@infradead.org, 
+	mnassiri@ciena.com, jiapeng.chong@linux.alibaba.com, colin.i.king@gmail.com, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Zijian Zhang <zijianzhang@bytedance.com>
+On Wed, 16 Oct 2024 at 06:59, Leo Stone <leocstone@gmail.com> wrote:
+>
+> Add tests that check if getsockopt(TCP_AO_GET_KEYS) returns the right
+> keys when using different filters.
+>
+> Sample output:
+>
+> > # ok 114 filter keys: by sndid, rcvid, address
+> > # ok 115 filter keys: by is_current
+> > # ok 116 filter keys: by is_rnext
+> > # ok 117 filter keys: by sndid, rcvid
+> > # ok 118 filter keys: correct nkeys when in.nkeys < matched_keys
+>
+> Signed-off-by: Leo Stone <leocstone@gmail.com>
 
-Although we sk_rmem_schedule and add sk_msg to the ingress_msg of sk_redir
-in bpf_tcp_ingress, we do not update sk_rmem_alloc. As a result, except
-for the global memory limit, the rmem of sk_redir is nearly unlimited.
+LGTM, thank you!
 
-Thus, add sk_rmem_alloc related logic to limit the recv buffer.
+Acked-by: Dmitry Safonov <0x7f454c46@gmail.com>
 
-Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
----
- include/linux/skmsg.h | 11 ++++++++---
- net/core/skmsg.c      |  6 +++++-
- net/ipv4/tcp_bpf.c    |  4 +++-
- 3 files changed, 16 insertions(+), 5 deletions(-)
+> ---
+> Changes in v2:
+> - Changed 2 unnecessary test_error calls to test_fail
+> - Added another test to make sure getsockopt returns the right nkeys
+>   value when the input nkeys is smaller than the number of matching keys
+> - Removed the TODO that this patch addresses
+>
+> Thank you for your feedback.
+[..]
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index d9b03e0746e7..2cbe0c22a32f 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -317,17 +317,22 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
- 	kfree_skb(skb);
- }
- 
--static inline void sk_psock_queue_msg(struct sk_psock *psock,
-+static inline bool sk_psock_queue_msg(struct sk_psock *psock,
- 				      struct sk_msg *msg)
- {
-+	bool ret;
-+
- 	spin_lock_bh(&psock->ingress_lock);
--	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
-+	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
- 		list_add_tail(&msg->list, &psock->ingress_msg);
--	else {
-+		ret = true;
-+	} else {
- 		sk_msg_free(psock->sk, msg);
- 		kfree(msg);
-+		ret = false;
- 	}
- 	spin_unlock_bh(&psock->ingress_lock);
-+	return ret;
- }
- 
- static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index b1dcbd3be89e..110ee0abcfe0 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -445,8 +445,10 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 			if (likely(!peek)) {
- 				sge->offset += copy;
- 				sge->length -= copy;
--				if (!msg_rx->skb)
-+				if (!msg_rx->skb) {
- 					sk_mem_uncharge(sk, copy);
-+					atomic_sub(copy, &sk->sk_rmem_alloc);
-+				}
- 				msg_rx->sg.size -= copy;
- 
- 				if (!sge->length) {
-@@ -772,6 +774,8 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
- 
- 	list_for_each_entry_safe(msg, tmp, &psock->ingress_msg, list) {
- 		list_del(&msg->list);
-+		if (!msg->skb)
-+			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
- 		sk_msg_free(psock->sk, msg);
- 		kfree(msg);
- 	}
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index 48c412744f77..39155bec746f 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -56,6 +56,7 @@ static int bpf_tcp_ingress(struct sock *sk, struct sk_psock *psock,
- 		}
- 
- 		sk_mem_charge(sk, size);
-+		atomic_add(size, &sk->sk_rmem_alloc);
- 		sk_msg_xfer(tmp, msg, i, size);
- 		copied += size;
- 		if (sge->length)
-@@ -74,7 +75,8 @@ static int bpf_tcp_ingress(struct sock *sk, struct sk_psock *psock,
- 
- 	if (!ret) {
- 		msg->sg.start = i;
--		sk_psock_queue_msg(psock, tmp);
-+		if (!sk_psock_queue_msg(psock, tmp))
-+			atomic_sub(copied, &sk->sk_rmem_alloc);
- 		sk_psock_data_ready(sk, psock);
- 	} else {
- 		sk_msg_free(sk, tmp);
--- 
-2.20.1
-
+Thanks,
+             Dmitry
 
