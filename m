@@ -1,175 +1,107 @@
-Return-Path: <netdev+bounces-136558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D3BA9A2103
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 13:35:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2119A2158
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 13:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 857EF289070
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:35:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E08CE1C2185D
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46EA1D517F;
-	Thu, 17 Oct 2024 11:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E51F1DB34E;
+	Thu, 17 Oct 2024 11:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfjypMXQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90D6146013;
-	Thu, 17 Oct 2024 11:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1201B1922CF;
+	Thu, 17 Oct 2024 11:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729164915; cv=none; b=SNc31HYBHo2IJiWZX1BYcBu9fL2ClZZDSRij0W2t3n+YoXktb+YIXSQlFrLmQZwG9/4uj1M+qUknWJvHkMU1ggK+n8yu5TOMLdPq+SxxZPbZz0dw7fLilEPdBnNXKubglw4Hhbfcqdr8Vsqncn+jWwCjvTSkweqJcWf7/2NNOL4=
+	t=1729165390; cv=none; b=jiVJ3kKMG6av7DV5Naapk8StJesfWAq7z+dE8eI/0yxAMabQRietR61xohKzw9WO1Mf3GtQgJ3uOFLuOLQHpgjI9R7RM/FyLNRh9mvOTVjBofVx59tWaiqrIehA6nRf5mAfDP9yNexMHTgKtQ2zupO6Nv7oY0BrwBjjEqlVMXhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729164915; c=relaxed/simple;
-	bh=hAFU5l7k4ClRGk/Sg1df0qnoBYW+9Do6OoxNSsxBaEg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=O2V9oJNcN6S2MCQcmorjN/jtAWhKQtHM7wezNXCI9LOwdgoEdO0yB115LvftO74mgvVzmRHhPQe8l2pIKo0t4QR/J3DlO5oP8AanGsj1dCyXHrBFgWVuv1B5aAacrOwfndVZTUeq1ZQjslOH/0U5AxrXZBEE4I/B5rdT7JaNIao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XTm1r1V3sz2Ddcb;
-	Thu, 17 Oct 2024 19:33:52 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id B8B56180019;
-	Thu, 17 Oct 2024 19:35:07 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 17 Oct 2024 19:35:03 +0800
-Message-ID: <a68a9e2c-fb2c-3cd7-c076-ecf95e94606d@huawei-partners.com>
-Date: Thu, 17 Oct 2024 14:34:59 +0300
+	s=arc-20240116; t=1729165390; c=relaxed/simple;
+	bh=puN6p+bMjYJtsrg56y32J8yDB4IjMscvJ6LWf1rgN+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=np55jNy1gK1LkDcVeu1bSmvH3I6Rm8+eNqEucL8EEOV+lYLaKy5XKx3NOXua8hfkboedYp2mVE04TN1nHfRX3NMXF+7r882gvGEXCrVfjyPtE+a+7RMHRo8rUW9uA5ujdUg6/UdqJxwSi8azy6lOw+u4W0uSUhOF31HSXJSM1FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfjypMXQ; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20c6f492d2dso10378885ad.0;
+        Thu, 17 Oct 2024 04:43:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729165388; x=1729770188; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=puN6p+bMjYJtsrg56y32J8yDB4IjMscvJ6LWf1rgN+k=;
+        b=GfjypMXQUC66WwQ+T8cKp+b5Lu+EOsaXSMSmv7uXNPXbHlPvzUFSntdpTfSKSUVJoI
+         FIqgETsfGQUoONt9KBzyFrFxTCOVWiBWWMPE3E1R29z1KsRiVFRDNwJwu4b7TB76ZEv4
+         s7uvDTAb7PUD5dl9XUphHpYecIw4b3tIBWJ1HMVfm9PztD4JPA+ShpRSwjp/lOQbWWDY
+         5n6F9fXcDTnAVTOH1dERLHutrmncFsPluxOT+4piVICkGKKgOSOIIERYfJi9LmcQIrla
+         oJSvG58a219O2UWP3ETS6lBJhRTVh5/wtMyEUAOdAaAcyGldUDBnuBuff4INS9UQwRUi
+         eG6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729165388; x=1729770188;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=puN6p+bMjYJtsrg56y32J8yDB4IjMscvJ6LWf1rgN+k=;
+        b=ojEc0PGqzSOMl7WNEEGpuz95Vp4ZsagoLqlVz91xP/1T+f56grd2CFRTuXYQdFHVfJ
+         E1Ry+Y2Uxl5y3kPG4tHQmDVfUkwBEqnUdsOCWI8MoFJSPnIjqwmIZQBUqw77MIFHLslQ
+         qk1kQLT+9+n3bogBH0wORezaZARJkFdySnhf0QuhJTUX8niE8VzNbYj1ZXuehmJPvthe
+         npi4LoGCV6OU3z96cvb7PiJBtqdu2LfV6fjpwyjoEQ+8zWv2GuKtz9nV59x4zQ+AJ1eR
+         8D4R7tKkf8Fi723SB2ggGFumcd0clKudTkxvcsDLf3lVXz92Fr5jAXx4xKcCE3+jevyF
+         je0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUalxaRD0GdmCPlucycL+QkDtvrNBgfCMJ643Q1Nz72gkZIK0jkVI5hg8jYKUklwdeupUKFtOGIsCtn1OM=@vger.kernel.org, AJvYcCXmDGBWmD+qoN2NA3uMavIfWjTMre9mkgtlKp/zLbmmKp251lFxBIicjo0PIYIGQTF9QjJ/9Vlt@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjsYVQYb6X39VySQebpcHG22kNkhEuGi+S5o9UWI31Hl14I1IL
+	CjeFD+aD23LPTGeJV55RNouHmSU2Ja9XnQdA7TQbl7KZCJWFTeEQ
+X-Google-Smtp-Source: AGHT+IHJunnh0cmVmNuXc+ArxYGx076cO6tNN4BAqDDpgEMgZwnt3Rmb/lhQ7qL4SW+VAkF2w9+WzQ==
+X-Received: by 2002:a17:903:22d1:b0:20c:a498:1e4d with SMTP id d9443c01a7336-20cbb2afd17mr267223905ad.60.1729165388225;
+        Thu, 17 Oct 2024 04:43:08 -0700 (PDT)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20d1804b2d9sm42705255ad.184.2024.10.17.04.43.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 04:43:07 -0700 (PDT)
+Date: Thu, 17 Oct 2024 19:42:58 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney
+ <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>, <kernel@quicinc.com>
+Subject: Re: [PATCH v3] net: stmmac: allocate separate page for buffer
+Message-ID: <20241017194258.000044b3@gmail.com>
+In-Reply-To: <20241015121009.3903121-1-quic_jsuraj@quicinc.com>
+References: <20241015121009.3903121-1-quic_jsuraj@quicinc.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 3/8] landlock: Fix inconsistency of errors for TCP
- actions
-Content-Language: ru
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-To: <mic@digikod.net>, <gnoack@google.com>
-CC: <willemdebruijn.kernel@gmail.com>, <matthieu@buffet.re>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-4-ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241017110454.265818-4-ivanov.mikhail1@huawei-partners.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- kwepemj200016.china.huawei.com (7.202.194.28)
 
-On 10/17/2024 2:04 PM, Mikhail Ivanov wrote:
+Hi Suraj,
 
-[...]
+Thanks for this fix.
 
-> +static int
-> +check_tcp_connect_consistency_and_get_port(struct socket *const sock,
-> +					   struct sockaddr *const address,
-> +					   const int addrlen, __be16 *port)
-> +{
-> +	int err = 0;
-> +	struct sock *const sk = sock->sk;
-> +
-> +	/* Cf. __inet_stream_connect(). */
-> +	lock_sock(sk);
-> +	switch (sock->state) {
-> +	default:
-> +		err = -EINVAL;
-> +		break;
-> +	case SS_CONNECTED:
-> +		err = -EISCONN;
-> +		break;
-> +	case SS_CONNECTING:
-> +		/*
-> +		 * Calling connect(2) on nonblocking socket with SYN_SENT or SYN_RECV
-> +		 * state immediately returns -EISCONN and -EALREADY (Cf. __inet_stream_connect()).
-> +		 *
-> +		 * This check is not tested with kselftests.
-> +		 */
-> +		if ((sock->file->f_flags & O_NONBLOCK) &&
-> +		    ((1 << sk->sk_state) & (TCPF_SYN_SENT | TCPF_SYN_RECV))) {
-> +			if (inet_test_bit(DEFER_CONNECT, sk))
-> +				err = -EISCONN;
-> +			else
-> +				err = -EALREADY;
-> +			break;
-> +		}
-> +
-> +		/*
-> +		 * Current state is possible in two cases:
-> +		 * 1. connect(2) is called upon nonblocking socket and previous
-> +		 *    connection attempt was closed by RST packet (therefore socket is
-> +		 *    in TCP_CLOSE state). In this case connect(2) calls
-> +		 *    sk_prot->disconnect(), changes socket state and increases number
-> +		 *    of disconnects.
-> +		 * 2. connect(2) is called twice upon socket with TCP_FASTOPEN_CONNECT
-> +		 *    option set. If socket state is TCP_CLOSE connect(2) does the
-> +		 *    same logic as in point 1 case. Otherwise connect(2) may freeze
-> +		 *    after inet_wait_for_connect() call since SYN was never sent.
-> +		 *
-> +		 * For both this cases Landlock cannot provide error consistency since
-> +		 * 1. Both cases involve executing some network stack logic and changing
-> +		 *    the socket state.
-> +		 * 2. It cannot omit access check and allow network stack handle error
-> +		 *    consistency since socket can change its state to SS_UNCONNECTED
-> +		 *    before it will be locked again in inet_stream_connect().
-> +		 *
-> +		 * Therefore it is only possible to return 0 and check access right with
-> +		 * check_access_port() helper.
-> +		 */
-> +		release_sock(sk);
-> +		return 0;
+I tested your patch on XGMAC 3.20a, all goes well, except a performance
+drop of ~10%
+Like Jakub Kicinski said in V2, this involves more dma_map() and does add
+overhead :-/
 
-Returning 0 is incorrect since port was not extracted yet. Last two
-lines should be replaced with a "break" to let further switch safely
-extract a port.
+I might have a better fix for this, I will send to review and CC it to you.
 
-This also requires fix in tcp_errors_consistency.connect kselftest.
-
-> +	case SS_UNCONNECTED:
-> +		if (sk->sk_state != TCP_CLOSE)
-> +			err = -EISCONN;
-> +		break;
-> +	}
-> +	release_sock(sk);
-> +
-> +	if (err)
-> +		return err;
-> +
-> +	/* IPV6_ADDRFORM can change sk->sk_family under us. */
-> +	switch (READ_ONCE(sk->sk_family)) {
-> +	case AF_INET:
-> +		/* Cf. tcp_v4_connect(). */
-> +		if (addrlen < sizeof(struct sockaddr_in))
-> +			return -EINVAL;
-> +		if (address->sa_family != AF_INET)
-> +			return -EAFNOSUPPORT;
-> +
-> +		*port = ((struct sockaddr_in *)address)->sin_port;
-> +		break;
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	case AF_INET6:
-> +		/* Cf. tcp_v6_connect(). */
-> +		if (addrlen < SIN6_LEN_RFC2133)
-> +			return -EINVAL;
-> +		if (address->sa_family != AF_INET6)
-> +			return -EAFNOSUPPORT;
-> +
-> +		*port = ((struct sockaddr_in6 *)address)->sin6_port;
-> +		break;
-> +#endif /* IS_ENABLED(CONFIG_IPV6) */
-> +	default:
-> +		WARN_ON_ONCE(0);
-> +		return -EACCES;
-> +	}
-> +
-> +	return 0;
-> +}
+Thanks.
 
