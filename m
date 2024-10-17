@@ -1,117 +1,126 @@
-Return-Path: <netdev+bounces-136739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 636929A2CE4
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:59:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D58AA9A2CE8
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27805281E74
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:59:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF301F23315
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5E6219C85;
-	Thu, 17 Oct 2024 18:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A87A219492;
+	Thu, 17 Oct 2024 18:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PDv/vi6s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPjTIZQQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A2E1DED44;
-	Thu, 17 Oct 2024 18:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958131DED44;
+	Thu, 17 Oct 2024 18:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729191543; cv=none; b=VCTpjZv3NGk8ICKaATOfKUTBOYc5vM86Fcb1R0CVKAEq/jzypemokT41ngdgBaAUtBEV65VAjr3xhZ+QimEUuwIkFfko8FkqdcGYSs2/jGGHRgIiNvR0sp04F0FghDwBzlVE9wuBcAV+sHlAThJ8/iNg+gPl7Tiw29zD3HtiEag=
+	t=1729191549; cv=none; b=gpVwC4MQCDTp+3EyIfxLN1qvWrEk0rcfs5SdIYJrDCVXGxhz2sAHDylRHnSJfrFGVizfl5TPj3l61b5s6wIJZYg4/Bc7mzYF4vVWmLjaYrme6boAXTSHxsNzpsu3hhK64eLt7z8d3Tr1EZCZxtU00evg28XXUkvb2RfHEyw4OOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729191543; c=relaxed/simple;
-	bh=FvGY+kyegglu6hHgiHzS/jYFOrhlp2cqld43oO903Ew=;
+	s=arc-20240116; t=1729191549; c=relaxed/simple;
+	bh=qxt62waTB3PDSo3NWAZ+qP15HTZ0l5O0d2ezGw66NBQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q+arJ3ysCO6HgUUNDIBTxOhqK16h9K3K22Ftjz9P9p5hJPba/CG6lk3zuCh59w2fSgm9m+u+CZlHQmLnWfOeYiQ8IceEfCROkrZuGj46WVXn4YiG2P9ofsJiIr2mZIqf7qVsoTUd+kKtEXPljx9KkBpW5t1Q9Sol5gEoW6if8J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PDv/vi6s; arc=none smtp.client-ip=209.85.214.181
+	 To:Cc:Content-Type; b=WLeXxrsLIDTt6oq0OgsA3o37N7WC8Tu+AnwPC9pqQnGP9Pe/x7GISSYq6T5kqO89EXfDGklAxmHgVYDM5Kms8I1YyA3JDUvzlMBmrf9R2I1xJToJVgSk0SNZh3MkDq6lxwzKDSrhuO2lyWaCuiHlHWuMKPMA/uCU0uoA07/x5dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KPjTIZQQ; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20cb14ed25fso1071505ad.1;
-        Thu, 17 Oct 2024 11:59:01 -0700 (PDT)
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-50d5795c0f8so361349e0c.1;
+        Thu, 17 Oct 2024 11:59:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729191541; x=1729796341; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FvGY+kyegglu6hHgiHzS/jYFOrhlp2cqld43oO903Ew=;
-        b=PDv/vi6sxXzhN9ahPxDQLxAMOtpWunKh85j4HQyW2NX+wbdMQSqu42UP4ymHeNzX5C
-         QLQbhAFWATeOr1BjRde+mj/3ssYiEOg9ketQ72Q9x5poBUxcWA+N65nxZcBTGHtfvf7z
-         KSbg1F7eDrtqfPt939VdpHFEE3o2D34F2zxvAw0TYl1faFhWv5PBeLlwV1DEaciC19Hq
-         CtJZJ64mShali452u1ariizMgtDGHTHMk4fq9H5+FPqpdqi8V0sYsrjv1DKXDyvSBb+9
-         wNLXe8w8hEWgnN5DommIKWSd0vMCr7TOqLNccvI+1PXG1kEMjCRmY7j8yf/vOio3Xl+D
-         2KhA==
+        d=gmail.com; s=20230601; t=1729191546; x=1729796346; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/c4INpe+MfVSEagif+BSPExCJb+0PZ6F2m37aPw+1c8=;
+        b=KPjTIZQQRhS3Pz7/PB2MEfxXQvGpAYDi5eMCiMz5mR+nxtF/oUQgqtVIMRXnrjY991
+         iRnL0CbUU7ZyufYCwBaWCcUYF8cGCVvNtqqBSFdMQlTfO/B0YhFfLUmzmjb66ZeKj2Rb
+         T8isv5YfZ/M5t5gUqPG3VT7A5i3pEHus4ewR5JfF2q0ORnF771Jvi8pXw801bVz/B1gU
+         utkdRYbFaWkyHXrjZsdp890D4BzWO9hcwCBN2YMDYht2i5IdQSMuBINcT7itdxjqFsog
+         BR46CdYCd8Qh4hsNdny2wRywLkj5b8mdFcqMtgPSk/eg/3rnN8y1Ou5j2sInNsA1GsWc
+         iP+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729191541; x=1729796341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FvGY+kyegglu6hHgiHzS/jYFOrhlp2cqld43oO903Ew=;
-        b=AAPoRwaS7FX5psZG2s2PhhpWah0eJL9mIoE5jaursaT0wVp9+KgYbGmBXvuhitatiK
-         rtw/rC4Sf9nvXGnKoekWc8FYeJQOY1cr5bIOhrWra5BI8y0tHPvkAjBB/9BaOkbJqfnY
-         Q4ZuBkAgTLEv59rKuhOi+P41EdAjUMigOrgHCsffTitTwc4E1gJC0t3NqlNLeyB6cItZ
-         g6PAh6Cb8YLfxH0G1d0BmTE5B/N8uwEkVfbmkVcESFgwbYJ+wVj8hYaRTWou7YQh0z+Z
-         bnkV4SP6Decr6VAEspuEO9aF/J8BGixzQAgvbmIm8a3Q+MAzYWnG47kVPmT9D/jIGwE5
-         ewgA==
-X-Forwarded-Encrypted: i=1; AJvYcCVm6Xpeb4k6MvBjnLl4IdcXCimkDU4LcSy/YfDDXbCh5O18QgpAHOqZfwNBa32ggtQDnQgbX0dwz7UVAHE=@vger.kernel.org, AJvYcCWPPU3BdIuiJhV7pDY7l1VyjoWY16bNCFpFcEAQXJwshtT1ey6dIiegqcl013yJaoUUuXhACAsXVK0eQJQnOW4=@vger.kernel.org, AJvYcCWmmpPFkNxQ1gEzP9ojsZpJP5qmwasrisVKpxz+s2jdEnDzl/uOE3zShJM3QnIxeU0UD2PAAZhw@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRhS1RteL8P6iX34y7bCMSf4hriLRNbqs7PBsxdlvdEBvP2Qqf
-	mhQmUVOUjC+sjFZghAFzJgRTDHrWIiQ9UPPnSse+EP5GNgSxqtpuCalMx6SXacJPtkrb5zJ7cl3
-	GCno16NziatiK2hovSyKTl+66KJE=
-X-Google-Smtp-Source: AGHT+IHqAEd+Z6vKcj/6y+M0+t6z5K+Qjjlna7RDsLyicLo8lYc+R09lYvrvCbCMvnZS5ZFGsgZUiq2sEfR5pcCWwSU=
-X-Received: by 2002:a17:90b:249:b0:2e3:1af7:6ead with SMTP id
- 98e67ed59e1d1-2e55dd1f397mr215856a91.5.1729191541074; Thu, 17 Oct 2024
- 11:59:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729191546; x=1729796346;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/c4INpe+MfVSEagif+BSPExCJb+0PZ6F2m37aPw+1c8=;
+        b=F/XNxuZ4vk9o0rf4wKxnLBFHY/CzDPVz8cMkxhr6dgoSkKLf7AZxFlj7T0RhtyMfgN
+         GojV3LRtkwDM3UzJJJAkG9VKEgxq3su+yz6sCrMSneX+i4n9YkLrIgRWX7mSd8dgWxDK
+         fy7ftioq9Qk9xecTZgDOitw/HvQqC7pbu9JGsmYEa44rfUb0+QqIedTGXA5XFlT6jM0U
+         bcjCrGc8B7ULUgvafOdIyNtdnHo3bEMsUqHXNIXQ3hiUjNn2M3zB6hMn2lWulr8HvBOH
+         tIF6HWTEwmgK4HIhE+csQL3nhIOSi89DjxZ8F/tTi69rKkuzjFEK9c696Wln58GsKNsS
+         Qv8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWhAViKh+cWa9ub22QwcJFVbFH3RSXooGPeq0zlOXxVmPhuxzvB/72uj6MF2cwjBgu0PltBQydN@vger.kernel.org, AJvYcCXBhtIuW4fNczNnlT9TBxMegDo0V15ASD9n13JCKNx/J/MmY0uv03va9l+8fR9tQTRWde1Z94ISyqH34mM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcr9QY16l8oqdZK9pTWP6ihkciBY677bA97CBeQa9wfg/fNYN1
+	814gMniSSVArQ65QhKjQ4O4WdRSgHYv/Vk6L33u80ZpnwF1fodZIS5zK3OtR1Swmy96zuv5lkKz
+	6gs1qMlAkJ27/JrJhqFzpEAU9wFM=
+X-Google-Smtp-Source: AGHT+IGjhrP0HcKSp+hcs9KUfIwkUCljEr0RJ7I1+/iVXuotSqh/+b0bPduJ8iGUe/rQCda6dzcwbJ6xxoIKdwavjDY=
+X-Received: by 2002:a05:6122:4592:b0:4fc:e3c2:2c71 with SMTP id
+ 71dfb90a1353d-50d8d2122f9mr6769677e0c.2.1729191546334; Thu, 17 Oct 2024
+ 11:59:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-5-fujita.tomonori@gmail.com> <ZxAZ36EUKapnp-Fk@Boquns-Mac-mini.local>
- <20241017.183141.1257175603297746364.fujita.tomonori@gmail.com>
- <CANiq72mbWVVCA_EjV_7DtMYHH_RF9P9Br=sRdyLtPFkythST1w@mail.gmail.com> <ZxFDWRIrgkuneX7_@boqun-archlinux>
-In-Reply-To: <ZxFDWRIrgkuneX7_@boqun-archlinux>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 17 Oct 2024 20:58:48 +0200
-Message-ID: <CANiq72kWH8dGfnzB-wKk93NJY+k3vFSz-Z+bkPCdoehqEzFojA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/8] rust: time: Implement addition of Ktime
- and Delta
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org, 
-	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20241017185116.32491-1-kdipendra88@gmail.com> <20241017185636.32583-1-kdipendra88@gmail.com>
+In-Reply-To: <20241017185636.32583-1-kdipendra88@gmail.com>
+From: Dipendra Khadka <kdipendra88@gmail.com>
+Date: Fri, 18 Oct 2024 00:43:55 +0545
+Message-ID: <CAEKBCKPmRnpNGGws2FvmGCw5wnK+OvkyQzYYRJ+3JypuLp7OWA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_common.c
+To: Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.cocdm>, 
+	pabeni@redhat.com
+Cc: horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 17, 2024 at 7:03=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
-rote:
++pabeni@redhat.com
+
+On Fri, 18 Oct 2024 at 00:41, Dipendra Khadka <kdipendra88@gmail.com> wrote:
 >
-> but one thing I'm not sure is since it looks like saturating to
-> KTIME_SEC_MAX is the current C choice, if we want to do the same, should
-> we use the name `add_safe()` instead of `saturating_add()`? FWIW, it
-> seems harmless to saturate at KTIME_MAX to me. So personally, I like
-
-Wait -- `ktime_add_safe()` calls `ktime_set(KTIME_SEC_MAX, 0)` which
-goes into the conditional that returns `KTIME_MAX`, not `KTIME_SEC_MAX
-* NSEC_PER_SEC` (which is what I guess you were saying).
-
-So I am confused -- it doesn't saturate to `KTIME_SEC_MAX` (scaled)
-anyway. Which is confusing in itself.
-
-In fact, it means that `ktime_add_safe()` allows you to get any value
-whatsoever as long as you don't overflow, but `ktime_set` does not
-allow you to -- unless you use enough nanoseconds to get you there
-(i.e. over a second in nanoseconds).
-
-Cheers,
-Miguel
+> Add error pointer check after calling otx2_mbox_get_rsp().
+>
+> Fixes: ab58a416c93f ("octeontx2-pf: cn10k: Get max mtu supported from admin function")
+> Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+> ---
+> v4:
+>  - Sent for patch version consistency.
+> v3:https://lore.kernel.org/all/20241006164018.1820-1-kdipendra88@gmail.com/
+>  - Included in the patch set
+>  - Changed the patch subject
+> v2: https://lore.kernel.org/all/20240923161738.4988-1-kdipendra88@gmail.com/
+>  - Added Fixes: tag.
+>  - Changed the return logic to follow the existing return path.
+> v1: https://lore.kernel.org/all/20240923110633.3782-1-kdipendra88@gmail.com/
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> index 87d5776e3b88..7510a918d942 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> @@ -1837,6 +1837,10 @@ u16 otx2_get_max_mtu(struct otx2_nic *pfvf)
+>         if (!rc) {
+>                 rsp = (struct nix_hw_info *)
+>                        otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
+> +               if (IS_ERR(rsp)) {
+> +                       rc = PTR_ERR(rsp);
+> +                       goto out;
+> +               }
+>
+>                 /* HW counts VLAN insertion bytes (8 for double tag)
+>                  * irrespective of whether SQE is requesting to insert VLAN
+> --
+> 2.43.0
+>
 
