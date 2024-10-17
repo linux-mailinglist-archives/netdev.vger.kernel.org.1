@@ -1,181 +1,261 @@
-Return-Path: <netdev+bounces-136408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5770C9A1AAF
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:31:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB459A1AC4
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30A5A1F21C2C
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 06:31:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A15A1C20A0D
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 06:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BCC18E04C;
-	Thu, 17 Oct 2024 06:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF051917E5;
+	Thu, 17 Oct 2024 06:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b="U24sDLE7"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="m4n1nSte"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.183.29.33])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECBC158205
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 06:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.29.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729146708; cv=fail; b=uHK1BusqCR773RVrILnPO3s/qmMjtqOOYWWTxdNR2Ro3A8MyhireetoH6SLXXdkDsvszvomy4Dskmo8k5DJd45UfjPP+nEqOGY2PVev/oDb8xuoKuMl/S3LDxeF+ORscB1ltLpBjQbZAvMaf3sliR4WPQjGH6yFoQdwpidEAn9w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729146708; c=relaxed/simple;
-	bh=gUKEX32dAm0NaSS25uwYkTFRf2Xym5x8Xif8iRTqhqQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ekrf02XDNkzsjT9wQJ7CbiHvI8lqGIHtNl4ypAzv9ei5CA7qVWjRhVjMIneT4UvdISI2TDRsThjPsTUyvRhmrQI13FGcXt8kUIGA9chzKsVxn5DRMqKwo/kttXhpuwz7B44lPjE+s1lyDUVuRsmb97zPVV7bb+Aa9APAUYWi2LE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com; spf=pass smtp.mailfrom=drivenets.com; dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b=U24sDLE7; arc=fail smtp.client-ip=185.183.29.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=drivenets.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03lp2173.outbound.protection.outlook.com [104.47.51.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id A1AE1480058;
-	Thu, 17 Oct 2024 06:31:37 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B5Ramzeec9hZfCffzmZD1nPformGg/wTaqdAnD3G/hB2kPuwnqOZGYJLPNTlQZDxQXI06zLpxSQRHVDcX7cJriDbM1HLK/0RQCWcn6uXVm6pgsjEri95r8r45qa3HQ2rgTlJkj3eVF4cegTrh2G2qWIfLmi8Pb+CQSA53SH1oN2Z/A3HBlXo/S61MFbiThfKbIXo7SrWfPgoorRn+MZfOoHjMLWwnDqyuhnkKenR5Vmvy7ZNsuP5oUUyl4ohc94w7WL/alCxgzSr2cyH1azfR5NA3CNPTaNSnsxIANTogDC1V4RMCIwzK8yNJD4vYLAdAMM1c1j51Wy9yAGdm+8kfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gUKEX32dAm0NaSS25uwYkTFRf2Xym5x8Xif8iRTqhqQ=;
- b=E2RhAbgbLzdQSvDeb1w1GBDhODzlJq3YsnG847sKPuXA1jH9/P4/nvOYGH+n1IrxFpFtsuOgPpWgfapaVWQeJNYD38TZBqYQI6gQ0MoZ3y5GYHFbJImnfbMT9HUYfkcHQiH0p3G/thPcXWOMImcTe3jSYjNpCji4CaKGd8e7qUuCgtK09bFgDR3auNRpMx3oO56Ewtfyt2R6m7arFxAOJw7rFM237CLTDa9TdEN4t0OEhm86lW5xkFd5oVpVIFHO1c2VAXyJ+TJjn8sOrI+Hcd427XFFViIA3ryD8Q+3b7D7P5ph2+OVTiwT9AYNvHse9lWgNFoDyOIJNYkWvDFf1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=drivenets.com; dmarc=pass action=none
- header.from=drivenets.com; dkim=pass header.d=drivenets.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1300B21E3AF
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 06:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729147156; cv=none; b=JkvrnQdPvL30r6XE9wQrk2RRi7dVopnnaczNOa025Nyw3rnFrgwntEKHq4LFC5Y7a6XomgCz/REQ38Ex/ASEPIUf8sy8jYi76zs31VpZ9oICyvNIU0qM64hJJPWoTbmlJOJaFmrMv7CkqIFejIvwP02/ZUIQNLD3COZtADmkSFk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729147156; c=relaxed/simple;
+	bh=YxGBP5qB28KyXHJhHR0stIVif08BwaeJD4A4swWc/xQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nPHAhsImbOvX5DSRy7uHKLa4o87TW24pYwpFf1DBD62A74fJ2BtgYUZFT3BP9YEZVCkyzcLmNp6XQrh313g4frhkwWl+le+rLLHXeMnK+VBb9yoqFNG30C4ztO5YVYwOz9/6jl4/Jl+xHueC47McRT7uOX32Ur6Resvvo6OlXuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=m4n1nSte; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1e63so534677a12.0
+        for <netdev@vger.kernel.org>; Wed, 16 Oct 2024 23:39:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=drivenets.onmicrosoft.com; s=selector2-drivenets-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gUKEX32dAm0NaSS25uwYkTFRf2Xym5x8Xif8iRTqhqQ=;
- b=U24sDLE7l1vGKyjv+fqLzZlhBjfudJj7poPwHtI7G3GzV1knc2EDSM6lLReJXXE0GVtG09eZHD+4LhjlmHU7B94Reu7QQeTl0pBS2o+6VrHqOfz5zjPKcl4A7yVBuFRWHQfQv7UpEgb5crDwl5kAlpXbfm4JZ3Rue0rZXUt6moE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=drivenets.com;
-Received: from DB8PR08MB5388.eurprd08.prod.outlook.com (2603:10a6:10:11c::7)
- by AS8PR08MB9695.eurprd08.prod.outlook.com (2603:10a6:20b:615::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Thu, 17 Oct
- 2024 06:31:34 +0000
-Received: from DB8PR08MB5388.eurprd08.prod.outlook.com
- ([fe80::29dd:6773:4977:dc4e]) by DB8PR08MB5388.eurprd08.prod.outlook.com
- ([fe80::29dd:6773:4977:dc4e%5]) with mapi id 15.20.8069.019; Thu, 17 Oct 2024
- 06:31:34 +0000
-From: Gilad Naaman <gnaaman@drivenets.com>
-To: kuniyu@amazon.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	gnaaman@drivenets.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v4 3/6] Convert neigh_* seq_file functions to use hlist
-Date: Thu, 17 Oct 2024 06:31:26 +0000
-Message-ID: <20241017063126.3890888-1-gnaaman@drivenets.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241016205437.12812-1-kuniyu@amazon.com>
-References: <20241016205437.12812-1-kuniyu@amazon.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P265CA0045.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ac::21) To DB8PR08MB5388.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::7)
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1729147151; x=1729751951; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=csfDmDQkSk7HpYvIcRc6H5/F/K1BFuuble0kVC6M8WI=;
+        b=m4n1nSteyrIdVJGYxg5ptJaOq+ERMIRNh+rrQJt0BOvDwVvbQFHBPKgTSGF50eU0U4
+         DxCKhpVYdrN/zzksou9aI3dnMWlc6mcZW6WYXxOdWSeF510AzVrJY2em20Fyltzksu3q
+         uPiGSCQ5JK8Kde+DNJsDAmM/dvc9z29B2PzyfQGyfaUuvqu1F51FBwEox7ewU8/SBDqT
+         VrTXO45ZDmPraTKudRsFjKXzVPHlLHk/XC08fxBrrU3TVRps0svNVlpzFP5pMBt2CJTy
+         v5fMckEkil39cPwfSkyvhZ7oxLp39+E/0REIzG3sRxYvJBPULl8onk7cl5RhwQyu6Ar6
+         +IGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729147151; x=1729751951;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=csfDmDQkSk7HpYvIcRc6H5/F/K1BFuuble0kVC6M8WI=;
+        b=HczTXEjhGz5KccNmwlDSLcaa7mxnLkk402BT+534gf6ibh2k55ulPMHbCudypSUWqQ
+         n164RvJWZKCCielKLO9643ladETXM7Hi9Jjjf+Sjjs9qiT2KF2wpUfROkqp3OKAVUnYy
+         V+bEgWK4xI0vaGbN61tiIU74bI2j8ezYG6QwWz/ttdSkzyfgfHoUiKMeI6dFCYb8RhCq
+         9zL59fzNssq9NDyRJpuaAc/XD8LBoctFCAIIeGdbfHUALhCMK39KXT/DnpMHQgj+OyuN
+         jzEojr45a+B2YeDg5fVdag1gEnIgNIp4jdmObxInIaPTR3q15Biitj+ACCj5j7Sk9jz2
+         7wiw==
+X-Forwarded-Encrypted: i=1; AJvYcCWA1HaFlNBgLdy/co69/3wpfbAQniBYbCv2Qs+ZspdIlVs8skHg1hsKnLWdNEJkmRyzNFT2JLo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKG1dHKsmYhI6VPyQEXOGtglEPAjqF9sw8qjsfsTJ+QtSh186S
+	WdbPVVRyCj2LXuihYsHa7MEDvTYa3Kd0u46Vg9Dxodos7ABQziLJcxZpb2loXMg=
+X-Google-Smtp-Source: AGHT+IElBcfw3tI4eq3ZHM3Z9QnLO8XAdmnOWoe0Rm9oJOi1mRnmmfzhfzgTZCfMbAetS9aN/n/qrw==
+X-Received: by 2002:a05:6402:2551:b0:5c9:7cd8:7aef with SMTP id 4fb4d7f45d1cf-5c97cd8bb8emr7950835a12.9.1729147150953;
+        Wed, 16 Oct 2024 23:39:10 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d4f8b92sm2341206a12.27.2024.10.16.23.39.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 23:39:08 -0700 (PDT)
+Date: Thu, 17 Oct 2024 08:39:04 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+	ryazanov.s.a@gmail.com, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v9 04/23] ovpn: add basic interface
+ creation/destruction/management routines
+Message-ID: <ZxCxCJk6RFtc-g0F@nanopsycho.orion>
+References: <20241016-b4-ovpn-v9-0-aabe9d225ad5@openvpn.net>
+ <20241016-b4-ovpn-v9-4-aabe9d225ad5@openvpn.net>
+ <Zw947Jb637o-I4RV@nanopsycho.orion>
+ <e8e46092-c954-4579-9bdc-563bf30f68f5@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB8PR08MB5388:EE_|AS8PR08MB9695:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9fe6fbb4-d4d8-4257-f449-08dcee755850
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?K8tMtIZ0O/kFoS7Y2GXCK5bJSut2gkl8VUDQjxGZco5cvU/WxIBBXKU0ldiy?=
- =?us-ascii?Q?rjgKO+6uwOLqXqNG9T5S4ez7F0BzDo5glhKFCYM3YRq86MAuT5Y5aquNcHSA?=
- =?us-ascii?Q?8TbOehJLlwbTZL1U8/q4SdEztJLswTyK0BvTSGnfpw/r8UdKZcNckI2GcbSp?=
- =?us-ascii?Q?R/ynGFLF2Emp+/Z5TNplyyr+JaFqrcT2rcHnexE37i+8PqUhU2AVI+kIL5I1?=
- =?us-ascii?Q?Ttj4iwh93avVToqnsLqzxjHmVqwplIZmE2pYwDLfO8pCNp4pxNcgmfKF16ck?=
- =?us-ascii?Q?WZEFHawIO4BlKH8Sdblt1abBTdCsgVjtF/kVCDnn4C4b63AYY8kPIP/4qVaT?=
- =?us-ascii?Q?k2XvN4MToeUZOAZPJl2+9qaFMwGWKxanujntZ39wo5iZ1NsJ0r8C2G5FTWnU?=
- =?us-ascii?Q?8v1cK7LQNTMQi0FT8XQTnUKRS/O+o53Surqgm9eH/6PsCl4+r4vzqjQkMJns?=
- =?us-ascii?Q?MkLKtmNlN4cJVJ4Mv5OXa1nQiRnTdiZo5CwaU3hijrRZFf9eWokqX9uP1ZgE?=
- =?us-ascii?Q?/SaVYxA5AsVj4p05DzAfUU4PVgx81w+RU3RGufWPxgNawL2CEnGUhZn7ymZW?=
- =?us-ascii?Q?OGK+ctZpiHDkJcVRSkjF0TEDofnQKH2bFx/IUnrctKoZzdWxew2ANWy58Qfb?=
- =?us-ascii?Q?2dGhAy8hpXTzVaxjHAfFfmM3GcXFLBO0N04x71kjoFEpx1U7xQpz+cTJb0l2?=
- =?us-ascii?Q?SuNYbV+H3i5b0kcWQdiuUIFMyt97mZ1ORgRE5vXm/rqp6YU68rbAc4piagBl?=
- =?us-ascii?Q?snHpcue0GLs+KNPbER2g8U4jB4pmCbt36KarXjW8Hn68vGhlMOxDstrgCFHR?=
- =?us-ascii?Q?X4uWo44JMWYOVunAQfZFpiFBv3cYCDo5FzB/P13OGIPzbqRx9hDiQlo8GiNb?=
- =?us-ascii?Q?CGMkCvxJcuXkHjflqRes1PyzgSIE1+BNQpCArTXNOPh6qDox2nHbDfehJuYA?=
- =?us-ascii?Q?KUdPolKDQ92saGtCdkCVztDwEee9up3QJihuqsOq6rNL/OHu7VnL7/PhP5Gm?=
- =?us-ascii?Q?bhZMWu918zcq3IrD+DCDC0DFpYL47Xs7DT3FWwhz/janPX+QnZpuIpAC0TiY?=
- =?us-ascii?Q?KB0Yv8LZifJLKFP3sekLuS2zT7RQTf5NphwRYl7gWBn6+zJcVVxsOawzjOA9?=
- =?us-ascii?Q?9ClvwNDtObbMCE2AEqCNJ4wOiN2cN5gxqIyIV6kORYJU2Piku3v25spRiEg4?=
- =?us-ascii?Q?qI6ALDzuJ4tME1MZ5u6ZE/ODMIbNg99EJB8q/NF2aBQaiugo/Vzhfh0SYvgX?=
- =?us-ascii?Q?N8L3qDKbvtF6sROlM7ZquxRydLEfTEo4FpJXJFd5JT2jvkd9RNmvPHO/QrVA?=
- =?us-ascii?Q?4cbg1qtHzFP7uw6y4FZ0W+lnNig46k2KUoV0FBNCFqPsH1jq14OMBLACHL+T?=
- =?us-ascii?Q?LjU9q2I=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR08MB5388.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Yfj0vWqIWBhtE8zBdY6Pef9NLmpw6vGdaDZJFlaPcFPi5NFnaMIMHaQuoiqC?=
- =?us-ascii?Q?uH3WzC8SkG+Ka7unNIJmA70hwizACpJ2OkbEC4ivl1ufpiUVqlq7yTJSe8CW?=
- =?us-ascii?Q?HGoGjpyVzUwEGKtXK4Ba6ZQYFjvZ/sO/yTak8SSWgWgZLL4YfGt2X666Gzyj?=
- =?us-ascii?Q?TULwMVoyesqqm8VmDT8cqwKrjUdEwnzNBTMw3RMjrki+66r9n7o7PI/490T4?=
- =?us-ascii?Q?9ZMboldWfnuhdrhp0VrRfUtXZibvWfhkszW3I/yOtZDdCm1NaIoWL5IN5vZK?=
- =?us-ascii?Q?1qgAVo0Bfm5p/gaqQcU2ZAixC9nRh7WWtF1L5mys5eIqVgDpTRsDCbstbBkr?=
- =?us-ascii?Q?SJBiO7BZYhCQypMZT2uz9lOPgRtYOx9XW6COhlhrATKoDMDH6c4YxUL9/Wqv?=
- =?us-ascii?Q?Mw8st/w0YUTVybM+heo7njmWjGV812OZVJzvuy561pPQqAaPNGhRYP21eIBd?=
- =?us-ascii?Q?RWqwwPjgkJ5PlwBCauzdGMR4LUeJJ5qRjzzdu93iBWgJxfmphfCQ6LNNo+N0?=
- =?us-ascii?Q?llmjaiYCjboxoJaL2szVbw+XhZR8dnK2+PsHqzkTzxc85LU4UCq9gxk8Qagm?=
- =?us-ascii?Q?SWnEQPJLYb5aSKnv0wOccX8Ti/opmlXy5oyF8eqUk84EMx2QFga7mo1ePG8U?=
- =?us-ascii?Q?Qhw7C/n/H3Vb2k7VMl2i9dUmTiIiteizOw12NaEcWS4/ImnakGXSj82TIxXQ?=
- =?us-ascii?Q?rlI/+6TeO33CVTraW+jBaIYTDcHYx97/2ZHmP0aFLKyd00/UCXbqpaP70Pck?=
- =?us-ascii?Q?TdPKy9UI51kz9MmxblpMGFseRGUPjopqdMbNYNa/1Pe6RflpGUkuQup8Tkhe?=
- =?us-ascii?Q?1k6MLhlhfi7xnTW8orJep8uf+9cLGjjgEMJ93oq/jTJmc39hR/fkaWor3c3R?=
- =?us-ascii?Q?60Ulc1i05oMvtf++F0U6XvdZ3RZ3udW2e6zaAedt69wkqradWDcCCVRP8Upd?=
- =?us-ascii?Q?diguYiRQaJc6zEvFgdUt/Dkz0M7UfXtds+VGtS7AQl58PAhzyE/wkXsbMHaf?=
- =?us-ascii?Q?1PVHRq1bmAkCfQjj79t6QNOHt1JdV2F5ZkJpWV/l4j3lAyMI5K2m0ZUast0i?=
- =?us-ascii?Q?+aPClHfHDlsKrj2Y185JEOua3IoFvqvg7Ap/vOxHU1g1iG0lKNoPI/Lh9CcY?=
- =?us-ascii?Q?ipPKRSCIXDiOv8vveYuLCvobQ6aFlrHmqNLSS/eEXqgOAcO1G5Ca/3tYEUIK?=
- =?us-ascii?Q?AsfNNTFSisTQcicRFf4uaQjzABPuRfR0Ua/ktcGNcyZnDSttdcRNj33ROcku?=
- =?us-ascii?Q?7pfTaUzkVcW+9r2QAoDuIpEDKyXlN43v8uY5E8UMogJoCeGNBh0NfhvrFsar?=
- =?us-ascii?Q?QYCEYXYqzWu1EJOKsXpLAqecMIDJ2aOyWRlMS5feA0gRynD7zhSf/orhaJR+?=
- =?us-ascii?Q?GelQhO/OsaNXa1Loue6hl61wdhNU9xJe7d3dKD/buzUkz7iec+If7WRXf845?=
- =?us-ascii?Q?BQ7DJQYI5D/ZIgA1VnQHQA1K8tW9XkHu1LiQIfSUil+Fn/kKJBKreCEehYVu?=
- =?us-ascii?Q?ZSZIzjxrt911JeMNP3GO+FMH4jDjppT2yN+cQSlC6/feBKUSNmTVYxB+/sNj?=
- =?us-ascii?Q?vd8stonOancPgCrcL5+JYoYn5RgU8qeruVxEOOz9?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	gSaIrAWG0m5FoqMKxPRcKMq0RPL2GrrnyqRQfx0c09umlLSHawVQoXCsU/WuWgPQAYpQoNtxWvuwRT1GpUz6fDunwnZWoolyBPa4OSyZKmSjaKXVEH4ZTjhzW6qVHN1HUOjO76oc2vUFArQdUr4vtAnE3gv0zooSoukP7hIxNCIuNXJr8q+0x8FPfW47Gzk8fl9tDcFRXcDKPuLtqLwE6n+HpN5+ZxuzcWkf93Hgf7yi1dA8eRmUIEw1yWzaQIu2PUgUuf2i9RlWttzv0VSEMmesK+bc1sqQCJO9DiQq1jq+wv8mdTemKqTqD1R5NcvzTccENKIoU9jChcJGDnBoJzyn8ifrB+BtKsrO+eDFSgVTwf9ypelrTXRgRKeA2EoW2zO6fryCfddk85Q2crrbujZLlzS8wwQcxIqYB2o3p5hBk3j3NldWjtvtbntt2f7+f+I2eFHrY5yZEvOwPr4l+fYqLlMKpJMZGSsaUMwnTy/U4BeOkXaBB/TZj4dF0uRIri8rrNJkGdSaH+YhNjKU4ci5rXgacD07Ph1oSr20OBWFpl7nT14NJAe8MSBDI46htj4jPa8eHBKu40Y3pbdWuxy/OlG3+TqXPkpBcrbOKWECxpTtUDfis9CDrYqXbDKi
-X-OriginatorOrg: drivenets.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9fe6fbb4-d4d8-4257-f449-08dcee755850
-X-MS-Exchange-CrossTenant-AuthSource: DB8PR08MB5388.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2024 06:31:34.2581
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 662f82da-cf45-4bdf-b295-33b083f5d229
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CzjJjO23NtanXJBvf+sE63wQfLtznRT+2GHoWhwYBPrG1QSuyQceDXRF/HR8aI1hO45udL7l2PfYLi1p0k4R9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9695
-X-MDID: 1729146699-M4owFtmQ-hHy
-X-MDID-O:
- eu1;ams;1729146699;M4owFtmQ-hHy;<gnaaman@drivenets.com>;495c1e7a27a6c3e35a5fabc922783896
-X-PPE-TRUSTED: V=1;DIR=OUT;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e8e46092-c954-4579-9bdc-563bf30f68f5@openvpn.net>
 
+Wed, Oct 16, 2024 at 04:24:09PM CEST, antonio@openvpn.net wrote:
+>On 16/10/2024 10:27, Jiri Pirko wrote:
+>> Wed, Oct 16, 2024 at 03:03:04AM CEST, antonio@openvpn.net wrote:
+>> > Add basic infrastructure for handling ovpn interfaces.
+>> > 
+>> > Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>> > ---
+>> > drivers/net/ovpn/main.c       | 115 ++++++++++++++++++++++++++++++++++++++++--
+>> > drivers/net/ovpn/main.h       |   7 +++
+>> > drivers/net/ovpn/ovpnstruct.h |   8 +++
+>> > drivers/net/ovpn/packet.h     |  40 +++++++++++++++
+>> > include/uapi/linux/if_link.h  |  15 ++++++
+>> > 5 files changed, 180 insertions(+), 5 deletions(-)
+>> > 
+>> > diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>> > index d5bdb0055f4dd3a6e32dc6e792bed1e7fd59e101..eead7677b8239eb3c48bb26ca95492d88512b8d4 100644
+>> > --- a/drivers/net/ovpn/main.c
+>> > +++ b/drivers/net/ovpn/main.c
+>> > @@ -10,18 +10,52 @@
+>> > #include <linux/genetlink.h>
+>> > #include <linux/module.h>
+>> > #include <linux/netdevice.h>
+>> > +#include <linux/inetdevice.h>
+>> > +#include <net/ip.h>
+>> > #include <net/rtnetlink.h>
+>> > -#include <uapi/linux/ovpn.h>
+>> > +#include <uapi/linux/if_arp.h>
+>> > 
+>> > #include "ovpnstruct.h"
+>> > #include "main.h"
+>> > #include "netlink.h"
+>> > #include "io.h"
+>> > +#include "packet.h"
+>> > 
+>> > /* Driver info */
+>> > #define DRV_DESCRIPTION	"OpenVPN data channel offload (ovpn)"
+>> > #define DRV_COPYRIGHT	"(C) 2020-2024 OpenVPN, Inc."
+>> > 
+>> > +static void ovpn_struct_free(struct net_device *net)
+>> > +{
+>> > +}
+>> > +
+>> > +static int ovpn_net_open(struct net_device *dev)
+>> > +{
+>> > +	netif_tx_start_all_queues(dev);
+>> > +	return 0;
+>> > +}
+>> > +
+>> > +static int ovpn_net_stop(struct net_device *dev)
+>> > +{
+>> > +	netif_tx_stop_all_queues(dev);
+>> > +	return 0;
+>> > +}
+>> > +
+>> > +static const struct net_device_ops ovpn_netdev_ops = {
+>> > +	.ndo_open		= ovpn_net_open,
+>> > +	.ndo_stop		= ovpn_net_stop,
+>> > +	.ndo_start_xmit		= ovpn_net_xmit,
+>> > +};
+>> > +
+>> > +static const struct device_type ovpn_type = {
+>> > +	.name = OVPN_FAMILY_NAME,
+>> > +};
+>> > +
+>> > +static const struct nla_policy ovpn_policy[IFLA_OVPN_MAX + 1] = {
+>> > +	[IFLA_OVPN_MODE] = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_P2P,
+>> > +					    OVPN_MODE_MP),
+>> > +};
+>> > +
+>> > /**
+>> >   * ovpn_dev_is_valid - check if the netdevice is of type 'ovpn'
+>> >   * @dev: the interface to check
+>> > @@ -33,16 +67,76 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
+>> > 	return dev->netdev_ops->ndo_start_xmit == ovpn_net_xmit;
+>> > }
+>> > 
+>> > +static void ovpn_setup(struct net_device *dev)
+>> > +{
+>> > +	/* compute the overhead considering AEAD encryption */
+>> > +	const int overhead = sizeof(u32) + NONCE_WIRE_SIZE + 16 +
+>> > +			     sizeof(struct udphdr) +
+>> > +			     max(sizeof(struct ipv6hdr), sizeof(struct iphdr));
+>> > +
+>> > +	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
+>> > +				 NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
+>> > +				 NETIF_F_HIGHDMA;
+>> > +
+>> > +	dev->needs_free_netdev = true;
+>> > +
+>> > +	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+>> > +
+>> > +	dev->netdev_ops = &ovpn_netdev_ops;
+>> > +
+>> > +	dev->priv_destructor = ovpn_struct_free;
+>> > +
+>> > +	dev->hard_header_len = 0;
+>> > +	dev->addr_len = 0;
+>> > +	dev->mtu = ETH_DATA_LEN - overhead;
+>> > +	dev->min_mtu = IPV4_MIN_MTU;
+>> > +	dev->max_mtu = IP_MAX_MTU - overhead;
+>> > +
+>> > +	dev->type = ARPHRD_NONE;
+>> > +	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
+>> > +	dev->priv_flags |= IFF_NO_QUEUE;
+>> > +
+>> > +	dev->lltx = true;
+>> > +	dev->features |= feat;
+>> > +	dev->hw_features |= feat;
+>> > +	dev->hw_enc_features |= feat;
+>> > +
+>> > +	dev->needed_headroom = OVPN_HEAD_ROOM;
+>> > +	dev->needed_tailroom = OVPN_MAX_PADDING;
+>> > +
+>> > +	SET_NETDEV_DEVTYPE(dev, &ovpn_type);
+>> > +}
+>> > +
+>> > static int ovpn_newlink(struct net *src_net, struct net_device *dev,
+>> > 			struct nlattr *tb[], struct nlattr *data[],
+>> > 			struct netlink_ext_ack *extack)
+>> > {
+>> > -	return -EOPNOTSUPP;
+>> > +	struct ovpn_struct *ovpn = netdev_priv(dev);
+>> > +	enum ovpn_mode mode = OVPN_MODE_P2P;
+>> > +
+>> > +	if (data && data[IFLA_OVPN_MODE]) {
+>> > +		mode = nla_get_u8(data[IFLA_OVPN_MODE]);
+>> 
+>> Some sanity check perhaps? "validate" op is here for that purpose.
+>
+>Isn't the parsing happening here enough
+>
+>https://elixir.bootlin.com/linux/v6.12-rc3/source/net/core/rtnetlink.c#L3659
+>
+>The IFINFO_DATA is parsed using the policy I provided (which comes with
+>limits for the mode attribute).
 
-> How about factorising the operations inside loops and use
-> hlist_for_each_entry_continue() and call neigh_get_first()
-> in neigh_get_next() ?
+You are right, that seems enough for mode.
 
-Yes, this works.
-(Just had to initialize buckets to `-1` since `neigh_get_first` always
-advances it, and otherwise the first bucket would have been skipped)
+>
+>Or am I misreading the code and I still need to provide an implementation for
+>.validate?
+>
+>Regards,
+>
+>> 
+>> 
+>> > +		netdev_dbg(dev, "setting device mode: %u\n", mode);
+>> > +	}
+>> > +
+>> > +	ovpn->dev = dev;
+>> > +	ovpn->mode = mode;
+>> > +
+>> > +	/* turn carrier explicitly off after registration, this way state is
+>> > +	 * clearly defined
+>> > +	 */
+>> > +	netif_carrier_off(dev);
+>> > +
+>> > +	return register_netdevice(dev);
+>> 
+>> [...]
+>
+>-- 
+>Antonio Quartulli
+>OpenVPN Inc.
+>
 
