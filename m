@@ -1,71 +1,85 @@
-Return-Path: <netdev+bounces-136585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6BBC9A237A
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 15:19:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2CB79A2387
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 15:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0681C26C50
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 13:19:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EA5E1F2889F
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 13:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5120F1DE3AA;
-	Thu, 17 Oct 2024 13:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D4D1DD886;
+	Thu, 17 Oct 2024 13:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YC2wW3zF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J4dxnMUK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3665C1DE3B8
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 13:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E03B1DD54E
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 13:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729171052; cv=none; b=MdEgRm/ZEWcFYYVXHd8PxRWPFbaztkG8Ejf4zYlISDHYmrPeM8xenQ1Te+oXnx3+7q47iEgRJL3YDisBVjO2SnM7RxjLi3HcocqCa3+0TipDw0gee0vLyHt2vZ1ttBhbstRd6N8RatHK/M7FFkkHW2MeWCAvjduPjvwZyUCGBQ8=
+	t=1729171232; cv=none; b=Eoq/+TyYJkXtKGrTAz4fi1IrH4SYfGcoQn2x2QkI4/K+s3S1q1IqXYbi8dNDn/sBS5PQHjARQv/wZk0XJEuIRdIFwV4B5Q4MTUW4+TJ4eqfr5gXih6oZ6KAYQnK4l6D0TsUZHyRPoRVoFKg2OFpemDIyIdWjB0ZSDNWiFKIn2Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729171052; c=relaxed/simple;
-	bh=TSsJRxTFhMnR2Ul85U/r44h3fkZ46hqg3hxm5eFochk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UH0sOW+uto9Ur0j0QsasVClOmQqKAjee8VMgqAKrlQb+zgvzIB9UKSqckBHeWPXxkBq5nBVgKXjMZWZmZ0zhpqzEY1dCHMM+luHAUc30iyEBq+dr+sDQdOzyH3sNQv81tXeTUxQ+AxV45g5GKOaJ5RODV5Z3DYrPvP2ey7G6ZcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YC2wW3zF; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729171049; x=1760707049;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=TSsJRxTFhMnR2Ul85U/r44h3fkZ46hqg3hxm5eFochk=;
-  b=YC2wW3zFuHjrDqMRuqxHQntFtGpEuvvAPwk7pHgnVueezUIGl9wZD/hW
-   OtOyUeJlNAR4gm7LHp1trq5ESEKr40XStHzcmMkvGTQB8SPNT7z8e7vzv
-   EusJP9uEFkiGTPi1+GHqRLwOS73oxZRApXeMD3QrecxrYWM8DPtJ6qk1D
-   GISiaKHHu3NfJwXiNkJhMry+cQTCGH6Rzo3afwpQYgrz2xlG4rtYqFppx
-   6xjLheGAjkhqPymGdUESI6FTLVpohZYxqE6YU2DAQTEaaBAvpZCitxTar
-   Rte1+L7dM97eYGujUr8EnyeVLCDfIaDvT9/62F+9+eAPRi1SHwmuvZX5V
-   g==;
-X-CSE-ConnectionGUID: sjqHG6rSQMuMro3UV00GWQ==
-X-CSE-MsgGUID: iEoexvfSSfCyFJDZPLNJvg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11227"; a="32453078"
-X-IronPort-AV: E=Sophos;i="6.11,210,1725346800"; 
-   d="scan'208";a="32453078"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2024 06:17:26 -0700
-X-CSE-ConnectionGUID: tjlaU8kaQ7CFl30esPy92w==
-X-CSE-MsgGUID: XZ1qXVFGRAasQBeKG5zFkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,210,1725346800"; 
-   d="scan'208";a="83316809"
-Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.246.19.66])
-  by orviesa005.jf.intel.com with ESMTP; 17 Oct 2024 06:17:25 -0700
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next 2/2] ixgbevf: Add support for Intel(R) E610 device
-Date: Thu, 17 Oct 2024 15:17:22 +0200
-Message-ID: <20241017131722.4270-1-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1729171232; c=relaxed/simple;
+	bh=Y1MyfbaSvo3UpadiZG1QVQRivbd4tAGDPLTAaVua4+E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RI9xGbfL7nk7HDkFU3jJhAQTGeb2Fm2QGHll0SBMF0Zgdgo4Mcd+s0gBe39NFx0osLf4Qe2X5iMiOmfdpC8/WDs1ZvtY/sAiVLrlga7Ctc+B6AC/ohfVccJ+p98azUYsqJQGEGHISefxFGPXTfzwkewZiN+kWJUUEOJuOtuXXts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J4dxnMUK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729171229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9w2pDQq7fJ7XpgU7d/9o8+BozWN2Ms9tCiu8Uq3bgLo=;
+	b=J4dxnMUKet8p1YavVVjZYS/izSsOfqwnTMVqYJdoaa7Hih0W0lugYb2Ei+OtBy179hOd9x
+	l4P31gd8GT6lbAt5sMqg6t0kpaogfh/YwMYD3LcqGPynn0e/cu+vpYfJtJ8m8vWt50wvlB
+	hifyEZ1rqWWfwUoG4iJzd8biHr097Lk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-zDuCCtzFMMmgMY70bu6VEg-1; Thu, 17 Oct 2024 09:20:27 -0400
+X-MC-Unique: zDuCCtzFMMmgMY70bu6VEg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d533a484aso986491f8f.0
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 06:20:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729171226; x=1729776026;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9w2pDQq7fJ7XpgU7d/9o8+BozWN2Ms9tCiu8Uq3bgLo=;
+        b=NQBhpsBDIYK3mX69wjsNOsrPqxb3NXtCS63mzzcM9Mo0D+c/m/YfdMY6WDEFyQLoEj
+         O1oUjiZgJDQ6OW0TMAGEby02lfjUPq7PH499N785dn8TOG+uIK3EJvTEJjwquQWbREcL
+         aM71ZLKjXMRzOJwvsLMNXjJxiEKz3aLUj4M8s0kmKuV3gYhIHCCVFrsVRZWUk//0IFZN
+         8BCxVvS0A6HOU/AWZEGXjnpSueQU0CSQGlgAY3wZ9j1031Ub/iPG4cLFwbB4KNvW4F95
+         pFmbFMqbC4lVCcpg+9R9gwxFPeonNuNmd3Uvq3RydwBlcNwfM/7IByg1GLOp5iyRNlbk
+         l2bg==
+X-Gm-Message-State: AOJu0Yz9bqTFQMZZQCuxOGfCsoSmeEavVidDtnkYoZHVkvwBpiMNe2un
+	ysr4OKL1tKbXd3Renbt2Zr04RrtOE9paORbUqcwVwdCADSzjyzS6GxE/GnUKw2SYBt5GugArNnY
+	+1UB2oCFywzA6iY+Mpdjir48I1TsaKi8AHQk8Xk56e+6LFazsmd9ijXpAZMdK0McK4om7IUW7Zu
+	a5DVlL+nAT1tpQSJh08Is1kk2pPhoXFBkRf5NRww==
+X-Received: by 2002:a05:6000:144:b0:374:cd3c:db6d with SMTP id ffacd0b85a97d-37d93d43e12mr2023077f8f.6.1729171226329;
+        Thu, 17 Oct 2024 06:20:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0RybWHnXYRiEPGB/nFOfbI2sIKqI/Yx9D1OMnzhbcbS3ynaJVg1g68vnP34Hz7Za68w6KHQ==
+X-Received: by 2002:a05:6000:144:b0:374:cd3c:db6d with SMTP id ffacd0b85a97d-37d93d43e12mr2023046f8f.6.1729171225802;
+        Thu, 17 Oct 2024 06:20:25 -0700 (PDT)
+Received: from fedora.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa87c7dsm7195789f8f.42.2024.10.17.06.20.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 06:20:25 -0700 (PDT)
+From: Ales Nezbeda <anezbeda@redhat.com>
+To: netdev@vger.kernel.org
+Cc: sd@queasysnail.net,
+	kuba@kernel.org,
+	Ales Nezbeda <anezbeda@redhat.com>
+Subject: [PATCH net-next v2] netdevsim: macsec: pad u64 to correct length in logs
+Date: Thu, 17 Oct 2024 15:19:33 +0200
+Message-ID: <20241017131933.136971-1-anezbeda@redhat.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,170 +88,253 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for Intel(R) E610 Series of network devices. The E610
-is based on X550 but adds firmware managed link, enhanced security
-capabilities and support for updated server manageability
+Commit 02b34d03a24b ("netdevsim: add dummy macsec offload") pads u64
+number to 8 characters using "%08llx" format specifier.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Changing format specifier to "%016llx" ensures that no matter the value
+the representation of number in log is always the same length.
+
+Before this patch, entry in log for value '1' would say:
+    removing SecY with SCI 00000001 at index 2
+After this patch is applied, entry in log will say:
+    removing SecY with SCI 0000000000000001 at index 2
+
+Signed-off-by: Ales Nezbeda <anezbeda@redhat.com>
 ---
- drivers/net/ethernet/intel/ixgbevf/defines.h      |  5 ++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf.h      |  6 +++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 12 ++++++++++--
- drivers/net/ethernet/intel/ixgbevf/vf.c           | 12 +++++++++++-
- drivers/net/ethernet/intel/ixgbevf/vf.h           |  4 +++-
- 5 files changed, 33 insertions(+), 6 deletions(-)
+v2
+  - Remove fixes tag and post against net-next
+  - v1 ref: https://lore.kernel.org/netdev/20241015110943.94217-1-anezbeda@redhat.com/
+---
+ drivers/net/netdevsim/macsec.c | 56 +++++++++++++++++-----------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/defines.h b/drivers/net/ethernet/intel/ixgbevf/defines.h
-index 5f08779..368d514 100644
---- a/drivers/net/ethernet/intel/ixgbevf/defines.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/defines.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+diff --git a/drivers/net/netdevsim/macsec.c b/drivers/net/netdevsim/macsec.c
+index aa007b1e4b78..bdc8020d588e 100644
+--- a/drivers/net/netdevsim/macsec.c
++++ b/drivers/net/netdevsim/macsec.c
+@@ -46,7 +46,7 @@ static int nsim_macsec_add_secy(struct macsec_context *ctx)
+ 		return -ENOSPC;
+ 	}
  
- #ifndef _IXGBEVF_DEFINES_H_
- #define _IXGBEVF_DEFINES_H_
-@@ -16,6 +16,9 @@
- #define IXGBE_DEV_ID_X550_VF_HV		0x1564
- #define IXGBE_DEV_ID_X550EM_X_VF_HV	0x15A9
+-	netdev_dbg(ctx->netdev, "%s: adding new secy with sci %08llx at index %d\n",
++	netdev_dbg(ctx->netdev, "%s: adding new secy with sci %016llx at index %d\n",
+ 		   __func__, sci_to_cpu(ctx->secy->sci), idx);
+ 	ns->macsec.nsim_secy[idx].used = true;
+ 	ns->macsec.nsim_secy[idx].nsim_rxsc_count = 0;
+@@ -63,12 +63,12 @@ static int nsim_macsec_upd_secy(struct macsec_context *ctx)
  
-+#define IXGBE_DEV_ID_E610_VF		0x57AD
-+#define IXGBE_SUBDEV_ID_E610_VF_HV	0x0001
-+
- #define IXGBE_VF_IRQ_CLEAR_MASK		7
- #define IXGBE_VF_MAX_TX_QUEUES		8
- #define IXGBE_VF_MAX_RX_QUEUES		8
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-index 130cb86..9b37f35 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
  
- #ifndef _IXGBEVF_H_
- #define _IXGBEVF_H_
-@@ -418,6 +418,8 @@ enum ixgbevf_boards {
- 	board_X550EM_x_vf,
- 	board_X550EM_x_vf_hv,
- 	board_x550em_a_vf,
-+	board_e610_vf,
-+	board_e610_vf_hv,
- };
+-	netdev_dbg(ctx->netdev, "%s: updating secy with sci %08llx at index %d\n",
++	netdev_dbg(ctx->netdev, "%s: updating secy with sci %016llx at index %d\n",
+ 		   __func__, sci_to_cpu(ctx->secy->sci), idx);
  
- enum ixgbevf_xcast_modes {
-@@ -434,11 +436,13 @@ extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_info;
- extern const struct ixgbe_mbx_operations ixgbevf_mbx_ops;
- extern const struct ixgbe_mbx_operations ixgbevf_mbx_ops_legacy;
- extern const struct ixgbevf_info ixgbevf_x550em_a_vf_info;
-+extern const struct ixgbevf_info ixgbevf_e610_vf_info;
+ 	return 0;
+@@ -81,12 +81,12 @@ static int nsim_macsec_del_secy(struct macsec_context *ctx)
  
- extern const struct ixgbevf_info ixgbevf_82599_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
-+extern const struct ixgbevf_info ixgbevf_e610_vf_hv_info;
- extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
  
- /* needed by ethtool.c */
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 149911e..9eb25a1 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+-	netdev_dbg(ctx->netdev, "%s: removing SecY with SCI %08llx at index %d\n",
++	netdev_dbg(ctx->netdev, "%s: removing SecY with SCI %016llx at index %d\n",
+ 		   __func__, sci_to_cpu(ctx->secy->sci), idx);
  
- /******************************************************************************
-  Copyright (c)2006 - 2007 Myricom, Inc. for some LRO specific code
-@@ -39,7 +39,7 @@ static const char ixgbevf_driver_string[] =
- 	"Intel(R) 10 Gigabit PCI Express Virtual Function Network Driver";
+ 	ns->macsec.nsim_secy[idx].used = false;
+@@ -104,7 +104,7 @@ static int nsim_macsec_add_rxsc(struct macsec_context *ctx)
  
- static char ixgbevf_copyright[] =
--	"Copyright (c) 2009 - 2018 Intel Corporation.";
-+	"Copyright (c) 2009 - 2024 Intel Corporation.";
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+@@ -122,7 +122,7 @@ static int nsim_macsec_add_rxsc(struct macsec_context *ctx)
+ 		netdev_err(ctx->netdev, "%s: nsim_rxsc_count not full but all RXSCs used\n",
+ 			   __func__);
  
- static const struct ixgbevf_info *ixgbevf_info_tbl[] = {
- 	[board_82599_vf]	= &ixgbevf_82599_vf_info,
-@@ -51,6 +51,8 @@ static const struct ixgbevf_info *ixgbevf_info_tbl[] = {
- 	[board_X550EM_x_vf]	= &ixgbevf_X550EM_x_vf_info,
- 	[board_X550EM_x_vf_hv]	= &ixgbevf_X550EM_x_vf_hv_info,
- 	[board_x550em_a_vf]	= &ixgbevf_x550em_a_vf_info,
-+	[board_e610_vf]         = &ixgbevf_e610_vf_info,
-+	[board_e610_vf_hv]      = &ixgbevf_e610_vf_hv_info,
- };
+-	netdev_dbg(ctx->netdev, "%s: adding new rxsc with sci %08llx at index %d\n",
++	netdev_dbg(ctx->netdev, "%s: adding new rxsc with sci %016llx at index %d\n",
+ 		   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
+ 	secy->nsim_rxsc[idx].used = true;
+ 	secy->nsim_rxsc[idx].sci = ctx->rx_sc->sci;
+@@ -139,7 +139,7 @@ static int nsim_macsec_upd_rxsc(struct macsec_context *ctx)
  
- /* ixgbevf_pci_tbl - PCI Device ID Table
-@@ -71,6 +73,9 @@ static const struct pci_device_id ixgbevf_pci_tbl[] = {
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_X_VF), board_X550EM_x_vf },
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_X_VF_HV), board_X550EM_x_vf_hv},
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_A_VF), board_x550em_a_vf },
-+	{PCI_VDEVICE_SUB(INTEL, IXGBE_DEV_ID_E610_VF,
-+			 IXGBE_SUBDEV_ID_E610_VF_HV), board_e610_vf_hv},
-+	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_E610_VF), board_e610_vf},
- 	/* required last entry */
- 	{0, }
- };
-@@ -4693,6 +4698,9 @@ static int ixgbevf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	case ixgbe_mac_X540_vf:
- 		dev_info(&pdev->dev, "Intel(R) X540 Virtual Function\n");
- 		break;
-+	case ixgbe_mac_e610_vf:
-+		dev_info(&pdev->dev, "Intel(R) E610 Virtual Function\n");
-+		break;
- 	case ixgbe_mac_82599_vf:
- 	default:
- 		dev_info(&pdev->dev, "Intel(R) 82599 Virtual Function\n");
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index 1641d00..da7a72e 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+@@ -147,12 +147,12 @@ static int nsim_macsec_upd_rxsc(struct macsec_context *ctx)
  
- #include "vf.h"
- #include "ixgbevf.h"
-@@ -1076,3 +1076,13 @@ const struct ixgbevf_info ixgbevf_x550em_a_vf_info = {
- 	.mac = ixgbe_mac_x550em_a_vf,
- 	.mac_ops = &ixgbevf_mac_ops,
- };
-+
-+const struct ixgbevf_info ixgbevf_e610_vf_info = {
-+	.mac                    = ixgbe_mac_e610_vf,
-+	.mac_ops                = &ixgbevf_mac_ops,
-+};
-+
-+const struct ixgbevf_info ixgbevf_e610_vf_hv_info = {
-+	.mac            = ixgbe_mac_e610_vf,
-+	.mac_ops        = &ixgbevf_hv_mac_ops,
-+};
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.h b/drivers/net/ethernet/intel/ixgbevf/vf.h
-index b4eef5b..2d791bc 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
+ 	idx = nsim_macsec_find_rxsc(secy, ctx->rx_sc->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
+ 			   __func__, sci_to_cpu(ctx->rx_sc->sci));
+ 		return -ENOENT;
+ 	}
  
- #ifndef __IXGBE_VF_H__
- #define __IXGBE_VF_H__
-@@ -54,6 +54,8 @@ enum ixgbe_mac_type {
- 	ixgbe_mac_X550_vf,
- 	ixgbe_mac_X550EM_x_vf,
- 	ixgbe_mac_x550em_a_vf,
-+	ixgbe_mac_e610,
-+	ixgbe_mac_e610_vf,
- 	ixgbe_num_macs
- };
+-	netdev_dbg(ctx->netdev, "%s: updating RXSC with sci %08llx at index %d\n",
++	netdev_dbg(ctx->netdev, "%s: updating RXSC with sci %016llx at index %d\n",
+ 		   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
  
+ 	return 0;
+@@ -166,7 +166,7 @@ static int nsim_macsec_del_rxsc(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+@@ -174,12 +174,12 @@ static int nsim_macsec_del_rxsc(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_rxsc(secy, ctx->rx_sc->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
+ 			   __func__, sci_to_cpu(ctx->rx_sc->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: removing RXSC with sci %08llx at index %d\n",
++	netdev_dbg(ctx->netdev, "%s: removing RXSC with sci %016llx at index %d\n",
+ 		   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
+ 
+ 	secy->nsim_rxsc[idx].used = false;
+@@ -197,7 +197,7 @@ static int nsim_macsec_add_rxsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+@@ -205,12 +205,12 @@ static int nsim_macsec_add_rxsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
+ 			   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
++	netdev_dbg(ctx->netdev, "%s: RXSC with sci %016llx, AN %u\n",
+ 		   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
+ 
+ 	return 0;
+@@ -224,7 +224,7 @@ static int nsim_macsec_upd_rxsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+@@ -232,12 +232,12 @@ static int nsim_macsec_upd_rxsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
+ 			   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
++	netdev_dbg(ctx->netdev, "%s: RXSC with sci %016llx, AN %u\n",
+ 		   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
+ 
+ 	return 0;
+@@ -251,7 +251,7 @@ static int nsim_macsec_del_rxsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+@@ -259,12 +259,12 @@ static int nsim_macsec_del_rxsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in RXSC table\n",
+ 			   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
++	netdev_dbg(ctx->netdev, "%s: RXSC with sci %016llx, AN %u\n",
+ 		   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
+ 
+ 	return 0;
+@@ -277,12 +277,12 @@ static int nsim_macsec_add_txsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
++	netdev_dbg(ctx->netdev, "%s: SECY with sci %016llx, AN %u\n",
+ 		   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
+ 
+ 	return 0;
+@@ -295,12 +295,12 @@ static int nsim_macsec_upd_txsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
++	netdev_dbg(ctx->netdev, "%s: SECY with sci %016llx, AN %u\n",
+ 		   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
+ 
+ 	return 0;
+@@ -313,12 +313,12 @@ static int nsim_macsec_del_txsa(struct macsec_context *ctx)
+ 
+ 	idx = nsim_macsec_find_secy(ns, ctx->secy->sci);
+ 	if (idx < 0) {
+-		netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++		netdev_err(ctx->netdev, "%s: sci %016llx not found in secy table\n",
+ 			   __func__, sci_to_cpu(ctx->secy->sci));
+ 		return -ENOENT;
+ 	}
+ 
+-	netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
++	netdev_dbg(ctx->netdev, "%s: SECY with sci %016llx, AN %u\n",
+ 		   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
+ 
+ 	return 0;
 -- 
-2.43.0
+2.46.2
 
 
