@@ -1,117 +1,116 @@
-Return-Path: <netdev+bounces-136416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7796E9A1B21
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:57:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 561C69A1B33
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA0151C21F46
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 06:57:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DBEB1F28AC0
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 07:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CA81B0F3D;
-	Thu, 17 Oct 2024 06:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B854E1514FE;
+	Thu, 17 Oct 2024 07:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGzF6u1h"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EF5199954
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 06:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8115C13AD06
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 07:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729148222; cv=none; b=F+XpBzS/NAHf+voatlqOTSRaq48A/Pk/S/7hcsA58Egm/yJUugcBXuCj4yWcjoCUcSmw+R9aO6BjkzYFVj1tObNbxTaDk7FsvMT2i5QGFc6j7ydNk19dh92MERTrNjXNzfLupU6EbxC+FZhsZgDdSv4QYrI/R/mo3+TXAtBuDac=
+	t=1729148435; cv=none; b=OCzsGSwxLFmsIMMsu+oOelAOg3dPHhTJGpTElJh92ViNh4qQiG6BNyGxT4jnfcbmOikHepD1icI3FVHiMir6j2Q+Vl0iEyjx8pTCUU38sA2DoOoz8H/DolT3JUQJuIRYJTpCHKry4SonjQ8wIn0fjNfcbxFLbgxhrDJaKTeRQF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729148222; c=relaxed/simple;
-	bh=onTEonaeYEpZro6UsJq7dadqTmNvlqp2QMesb4huUro=;
+	s=arc-20240116; t=1729148435; c=relaxed/simple;
+	bh=zVB7MIjt8E1rol1MkI6iFH9vfznyNP4ye47V8aOwr0E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PTG8dwvdiFN4W9HLtKLhjl03ANqAKTKMprz+f4jyZMrqluviiEMJYD1ztYueI0l+TI7ny//PEnn1+ktvRiItRGwqfTZTvhN4NlPkeKCuBhdJU6Z3noAqTX6OkZpufRe2IB19/h2e+N/d2uOUPtV0RK3zXt41RFMux+QKCcrIKk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t1KRD-0008WM-25; Thu, 17 Oct 2024 08:56:47 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t1KRC-002U8F-HB; Thu, 17 Oct 2024 08:56:46 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 35C1B354D7E;
-	Thu, 17 Oct 2024 06:56:46 +0000 (UTC)
-Date: Thu, 17 Oct 2024 08:56:46 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, imx@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 06/13] net: fec: fec_restart(): make use of
- FEC_ECR_RESET
-Message-ID: <20241017-adept-coot-of-recreation-96c1d9-mkl@pengutronix.de>
-References: <20241016-fec-cleanups-v1-0-de783bd15e6a@pengutronix.de>
- <20241016-fec-cleanups-v1-6-de783bd15e6a@pengutronix.de>
- <ZxBxSNZk2Ls7p4wL@lizhi-Precision-Tower-5810>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CkAaz9MKIk+JD3NEu+Ze0k66aQ1crIrYX/kldsEAakMGz2/Tt7/naY0gfWNhJmqz/M4YgChqtJ2oGzjAytpACsoN2WXIVkGRGFjKukG+bOy2wJZLqGmmo3sGtF/jRx/bTPbFx6mxhfbW6S3yEzEJ0hdbRw8qPNO6//dcLSD1IaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AGzF6u1h; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9a04210826so12798666b.3
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 00:00:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729148431; x=1729753231; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V/QR0p9lG25pQUZZGyopS3hBl+uwDPRWgXalwipVrlw=;
+        b=AGzF6u1hbBaJE70rAtrCwubKMl9lGyJSb/sKAC6AeY0PQr7q/4bctbeMWyDFnKdJjD
+         J6IeZjB5+HZ16yKNn9MQIMRn2uCTgRxHt3JeksWF0D0l7v8VroKwmJZetCuTIh7GhvdV
+         gQD7Ubtd/lQ08GlRajxMwa5Cz338J4eWDpokYeeHzX1WxAGMo+G1+JQMGE+wi48vjFa/
+         ujvYd/bDyxHrCJUVFuPQTBiEBLvaSTB3n+6zeoWYSu/aJFvycmUzJyjtdCS/HAsaM1pz
+         5Q3iSMTOMAVfQZJLdZhudiKwYdfgLpHj8Sba5utg2JMR9eBw5MoUACPXVJiyt9Pl6ahr
+         /ALw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729148431; x=1729753231;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V/QR0p9lG25pQUZZGyopS3hBl+uwDPRWgXalwipVrlw=;
+        b=C9WuN+UVo6mTiIvnHYXlOkB+hkTDibl7jCCMvNKcNBZCnIGLQsIUcNRijCCKEms/PC
+         QaVM93ZOS7Uvy/wzQW/Fder323XSmlOQBRMmLbyBHxxSpgvsHJixXZyd9c0KFqqvGhY5
+         I6RQDMRmmRIGqo8WrAUZ62u4HQddMhK7JNPR2PCh8ZIzcJRUzUTt4q50fawLrBc8HcOT
+         M5OABhR7s0pRS/LEeU9w9qujwJ3TQ5cx7bohrdnMW49Veu5yJxsLdJFMFYWz+YYZ+FVQ
+         99bdDQVKGRwAuSG0T6uY5xE+n39/ooOiFbmpX0Ut/U/nWOBc2MIyquFEI8jDHGs8Pl4H
+         2+fw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXLf/PlLid/kitFZjCcgXKauTTdO0Q+0Is2AZH4d11xg2/O4eDX4NsH6EFZA0mzsS0TNU5wmM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygTukCaywAv7YlsyJAjePym3MZh/o90MxB2pcEwiijO9rEpMk+
+	Qtse0yGkDywApAoUCghBp2bWb72WioAwLoCEgKcwMRvUbaq/D0FM
+X-Google-Smtp-Source: AGHT+IE6VaR1EYVUDvRBSIOs9IrZ+LncOGzJe1aBzRjtFMXZusFajEbqduuy9wblaid9znfy79cFag==
+X-Received: by 2002:a17:907:9485:b0:a9a:3c91:5e2d with SMTP id a640c23a62f3a-a9a4ebb33f5mr81195466b.1.1729148430151;
+        Thu, 17 Oct 2024 00:00:30 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2988c500sm253567366b.203.2024.10.17.00.00.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 00:00:29 -0700 (PDT)
+Date: Thu, 17 Oct 2024 10:00:27 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 3/5] net: phylink: allow mac_select_pcs() to
+ remove a PCS
+Message-ID: <20241017070027.3vt5eydezrx5d6ke@skbuf>
+References: <Zw-OCSv7SldjB7iU@shell.armlinux.org.uk>
+ <Zw-OCSv7SldjB7iU@shell.armlinux.org.uk>
+ <E1t10na-000AWc-M6@rmk-PC.armlinux.org.uk>
+ <E1t10na-000AWc-M6@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wq3uuabso3end65v"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZxBxSNZk2Ls7p4wL@lizhi-Precision-Tower-5810>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <E1t10na-000AWc-M6@rmk-PC.armlinux.org.uk>
+ <E1t10na-000AWc-M6@rmk-PC.armlinux.org.uk>
 
+On Wed, Oct 16, 2024 at 10:58:34AM +0100, Russell King (Oracle) wrote:
+> phylink has historically not permitted a PCS to be removed. An attempt
+> to permit this with phylink_set_pcs() resulted in comments indicating
+> that there was no need for this. This behaviour has been propagated
+> forward to the mac_select_pcs() approach as it was believed from these
+> comments that changing this would be NAK'd.
+> 
+> However, with mac_select_pcs(), it takes more code and thus complexity
+> to maintain this behaviour, which can - and in this case has - resulted
+> in a bug. If mac_select_pcs() returns NULL for a particular interface
+> type, but there is already a PCS in-use, then we skip the pcs_validate()
+> method, but continue using the old PCS. Also, it wouldn't be expected
+> behaviour by implementers of mac_select_pcs().
+> 
+> Allow this by removing this old unnecessary restriction.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
---wq3uuabso3end65v
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 16.10.2024 22:07:04, Frank Li wrote:
-> On Wed, Oct 16, 2024 at 11:51:54PM +0200, Marc Kleine-Budde wrote:
-> > Replace the magic number "1" by the already existing define
-> > FEC_ECR_RESET.
->=20
-> nit: wrap at 75 char.
-> Reviewed-by: Frank Li <Frank.Li@nxp.com>
-
-Fixed,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---wq3uuabso3end65v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcQtSsACgkQKDiiPnot
-vG/X9Qf/eF0MZQ1xxfJN4bAn30ffkPyXD0UHPaO8y8+E2eobhhXOcfbfkZ+y5Vl0
-WO1spc6SYzpn/BB//bSIzA+SWbn2vVycZdOwSBaec+2nfwqCiTUj3HHyNgL8JHnx
-rPjo/xRih/aIn/b2WUKpnLU0YJzL2v3KtmLGuW1KnNWcZA3wu+CEJ9Dkdv8dp56Z
-4r094oglTVbMl9K5MEjpox7+s1qcqWEBeX7VcD9DJo2Drlx9gywqGgEVD48uS5In
-TatA9clcrjhRd5VVqbmaPzHQtaq/m0sXIZt0iNjGnT3/Re5s9GutJWFxYCVqJ+PR
-9deFXbMFJ6fk34KomV5q/AAPPvd1oQ==
-=edBP
------END PGP SIGNATURE-----
-
---wq3uuabso3end65v--
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
