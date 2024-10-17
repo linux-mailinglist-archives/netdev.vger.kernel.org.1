@@ -1,109 +1,195 @@
-Return-Path: <netdev+bounces-136531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 809309A205A
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:53:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F259A205C
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36F611F2200F
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:53:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC4001F276B2
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3A01DA10B;
-	Thu, 17 Oct 2024 10:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886581DA632;
+	Thu, 17 Oct 2024 10:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="tUvW5+k9"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B450E1CCB44
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 10:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F985478E;
+	Thu, 17 Oct 2024 10:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729162376; cv=none; b=HZbSOaW840Vpy0oSBSEHGfG7nTtj7nnscqnFHwKq0oYPi+hXl4MkIETI4vgmFtGs+BVbh8S7x+5OOGJ6/K47c5WI3HFp2SqCiIs9Nigh/e9j0XvMYuAGFEgrz5BhfECaWJVs+/HiBwDCejQEL++fBuHfAcYABETd+WfcxtlzM+o=
+	t=1729162540; cv=none; b=oLAIAeKyLfeZdhGg/WqE9oZZ2SiD8xWHOrBMl+RU1XphGw8UCKj2Ao0Lw/HzzDD67Pq1SIkvO0g3n0pvpKOf00a3aTOBkI8Y8EmZ53tA4dsItDWQKVBBQpK+3AUIv/OpmDxyDY4ez3VPFoE4jtJnyTMauGQiJkP44sCfX7FakPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729162376; c=relaxed/simple;
-	bh=17MQUER8QgGTyR06qrhxdiu3GAKRSs1Qf6LTI48a4Cc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W5Yg6u8xZaVg/xpm3dyn2bQ2VcO2CoVFbeOfRrN/vySpyirZtIBInC3jDjfSqSbubq8K9pyoQY3awGvF32l9ueYJw+uY9f3bTG4VWIT8ddDBMv03PbGiNAiqaIv7V4pa49PtiO4CFI9enUyawBPj20Yza1//ddNzggRMCfnHodw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1t1O7f-0003Cv-Qp; Thu, 17 Oct 2024 12:52:51 +0200
-Date: Thu, 17 Oct 2024 12:52:51 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	Nathan Harold <nharold@google.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Yan Yan <evitayan@google.com>
-Subject: Re: [PATCH ipsec] xfrm: migrate: work around 0 if_id on migrate
-Message-ID: <20241017105251.GA12005@breakpoint.cc>
-References: <20241017094315.6948-1-fw@strlen.de>
- <CANP3RGeeR9vso0MyjRhFuTmx5K7ttt0bisHucce0ONeJotXOZw@mail.gmail.com>
+	s=arc-20240116; t=1729162540; c=relaxed/simple;
+	bh=UpKFrmYGllYrsyMM/1lD6FUUlil9xbypcgaoXpIa9rM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=TjSrI+zAZwfXJ7V0oTwYuENzufcShCsBY9TxibX9h57n1yMXJDGRpCHAPRAVTilaicwF0ISAzUIIGAyB5qSFF0J83VcGN61Sv6WLPQEMwK2Xk0d5TxA/iRoHhhfc8qBCxs0a81vY0lP3JOee9KCU04tf2nsVZjTxwEGC+NW4cIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=tUvW5+k9; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 1B71C100009;
+	Thu, 17 Oct 2024 13:55:17 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1729162517; bh=+QOrfWCVTQRkFZFpeklgdTnpXjePxMpWDQdvvcusiSs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=tUvW5+k9qGoxLAcOAI1xJWl5fV2ilztGDXtq/ogzAnlzb1et9+EBPypzEA4DOCDE3
+	 te/lIhEtjbS7cV9YCTYCgtmmbyLTN538c9X714J/DDdO8NHlgub/JnJpoX13YB+86M
+	 hyx8HtjvRUD5Q0bugZ29pcqgEVkEn2p/iRFqtAqGobt33jsAb+Z5zXTr7IVAWIQ7Oc
+	 kOnkkz6VzZpjAWNOWFh7HYEeuFgnvLipmfc8gWKHXzyhT90TGla+q4UJ1oFQNxluwJ
+	 s9coMtWPa9RkHfLKUfrtbG3NWEei7gO97bwd0sR+HiPZ152RJIp0PXKoJXLCHJj2nT
+	 lpfINW8PKdLRg==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Thu, 17 Oct 2024 13:53:58 +0300 (MSK)
+Received: from [172.17.44.122] (172.17.44.122) by ta-mail-02 (172.17.13.212)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 17 Oct
+ 2024 13:53:37 +0300
+Message-ID: <72a4d2b0-3faf-46a3-84f2-fc93bdf19104@t-argos.ru>
+Date: Thu, 17 Oct 2024 13:53:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] fsl/fman: Fix refcount handling of fman-related
+ devices
+To: Paolo Abeni <pabeni@redhat.com>, Igal Liberman
+	<igal.liberman@freescale.com>
+CC: Simon Horman <horms@kernel.org>, Madalin Bucur <madalin.bucur@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+References: <20241015060122.25709-1-amishin@t-argos.ru>
+ <20241015060122.25709-3-amishin@t-argos.ru>
+ <a0aec660-c18b-4d85-b85b-58fce3668e64@redhat.com>
+Content-Language: ru
+From: Aleksandr Mishin <amishin@t-argos.ru>
+In-Reply-To: <a0aec660-c18b-4d85-b85b-58fce3668e64@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANP3RGeeR9vso0MyjRhFuTmx5K7ttt0bisHucce0ONeJotXOZw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: ta-mail-01.ta.t-argos.ru (172.17.13.211) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 188507 [Oct 17 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 39 0.3.39 e168d0b3ce73b485ab2648dd465313add1404cce, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;t-argos.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/10/17 09:58:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/10/17 05:21:00 #26765332
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Maciej Żenczykowski <maze@google.com> wrote:
-> > +found:
-> >         /* Stage 2 - find and update state(s) */
-> >         for (i = 0, mp = m; i < num_migrate; i++, mp++) {
-> >                 if ((x = xfrm_migrate_state_find(mp, net, if_id))) {
-> > --
-> > 2.45.2
-> >
-> 
-> Q: Considering the performance impact... would it make sense to hide
-> this behind a sysctl or a kconfig?
 
-Kconfig?  I don't think so, all distros except Android would turn it on.
+On 17.10.2024 13:01, Paolo Abeni wrote:
+> On 10/15/24 08:01, Aleksandr Mishin wrote:
+>> In mac_probe() there are multiple calls to of_find_device_by_node(),
+>> fman_bind() and fman_port_bind() which takes references to of_dev->dev.
+>> Not all references taken by these calls are released later on error path
+>> in mac_probe() and in mac_remove() which lead to reference leaks.
+>>
+>> Add references release.
+>>
+>> Fixes: 3933961682a3 ("fsl/fman: Add FMan MAC driver")
+>> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+>> ---
+>> Compile tested only.
+>>
+>>   drivers/net/ethernet/freescale/fman/mac.c | 62 +++++++++++++++++------
+>>   1 file changed, 47 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/freescale/fman/mac.c 
+>> b/drivers/net/ethernet/freescale/fman/mac.c
+>> index 9b863db0bf08..11da139082e1 100644
+>> --- a/drivers/net/ethernet/freescale/fman/mac.c
+>> +++ b/drivers/net/ethernet/freescale/fman/mac.c
+>> @@ -204,7 +204,7 @@ static int mac_probe(struct platform_device 
+>> *_of_dev)
+>>       if (err) {
+>>           dev_err(dev, "failed to read cell-index for %pOF\n", 
+>> dev_node);
+>>           err = -EINVAL;
+>> -        goto _return_of_node_put;
+>> +        goto _return_dev_put;
+>
+> We are after a succesful of_find_device_by_node and prior to 
+> fman_bind(), mac_dev->fman_dev refcount is 1
 
-> Yan Yan: Also, while I know we found this issue in Android... do we
-> actually need the fix?  Wasn't the adjustment to netd sufficient?
-> Android <16 doesn't support >6.6 anyway, and Android 16 should already
-> have the netd fix...
 
-... seems you already fixed this, so I suspect this slowpath won't ever
-run in your case.
+Indeed. refcounts = 1.
 
-Following relevant cases exist:
-1. Userspace asks to migrate existing policy, provides if_id > 0.
-   -> slowpath is elided.
 
-2. Userspace asks to migrate existing policy, the policy is NOT for
-   xfrm_interface, -> slowpath is also elided because first attempt
-   finds the if_id 0 policy.
+>
+>> @@ -213,40 +213,51 @@ static int mac_probe(struct platform_device 
+>> *_of_dev)
+>>       if (!priv->fman) {
+>>           dev_err(dev, "fman_bind(%pOF) failed\n", dev_node);
+>>           err = -ENODEV;
+>> -        goto _return_of_node_put;
+>> +        goto _return_dev_put;
+>>       }
 
-3. Like 1, but userspace does not set the if_id.
-   -> slowpath runs, BUT without it migration would not work.
 
-4. Like 2, but the policy doesn't exist.
-   -> slowpath runs and slows things down for no reason.
+refcounts: 1 + 1 = 2.
 
-For 1 and 2 even sysctl knob is irrelevant.
 
-For 3, sysctl knob is *technically* irrelevant, either migrate is
-broken (sysctl off) or its on and policy migrate will work.
-This also hints we'd have to turn such sysctl on by default...
+>>   +    /* Two references have been taken in of_find_device_by_node()
+>> +     * and fman_bind(). Release one of them here. The second one
+>> +     * will be released in mac_remove().
+>> +     */
+>> +    put_device(mac_dev->fman_dev);
 
-For 4, sysctl could be used to disable/avoid such slowdown.
-But I'm not sure this is a relevant scenario in practice, aside
-from fuzzers, AND it breaks 3) again if its off.
 
-So I don't see a need to provide a config knob or a sysctl
-that would have to be on by default...
+refcounts: 2 - 1 = 1.
 
-If you think a Kconfig knob makes sense for Android sake I can respin
-with such a knob, but I think I'd have to make it default-y.
+
+>>       of_node_put(dev_node);
+>> +    dev_node = NULL;
+>>         /* Get the address of the memory mapped registers */
+>>       mac_dev->res = platform_get_mem_or_io(_of_dev, 0);
+>>       if (!mac_dev->res) {
+>>           dev_err(dev, "could not get registers\n");
+>> -        return -EINVAL;
+>> +        err = -EINVAL;
+>> +        goto _return_dev_put;
+>
+> Here we are after a successful fman_bind(), mac_dev->fman_dev refcount 
+> is 2. _return_dev_put will drop a single reference, this error path 
+> looks buggy.
+
+
+We released 1 reference above with "put_device(mac_dev->fman_dev);".
+
+
+>
+> Similar issue for the _return_dev_arr_put error path below.
+
+
+Similar situation: we release 1 reference with 
+"put_device(mac_dev->fman_port_devs[i]);".
+
+
+>
+> Cheers,
+>
+> Paolo
+>
+-- 
+Kind regards
+Aleksandr
+
 
