@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-136395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79C2A9A1980
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 05:51:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E6C9A1989
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 05:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EC0F28766F
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 03:51:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43EB01C218DE
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 03:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B2A13A878;
-	Thu, 17 Oct 2024 03:51:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F14E13AD06;
+	Thu, 17 Oct 2024 03:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F022D05E;
-	Thu, 17 Oct 2024 03:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E533A25776;
+	Thu, 17 Oct 2024 03:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729137113; cv=none; b=CCxvFb0j3vzK1BKxaszOc5a4wRD2gwrEaG7s6Pm7lupkzCcO80Te+uQ2LDhCWRspJ0Niaz2fYKd0slx1wePn5nsLCfTZVdugFGmztOqk6FJaQPbGKcbgaUG4U7ERjgif2H8iQaJ23wlPovEjytbpNzJ1d/4UhNAK+o7Tsy+xQ2Q=
+	t=1729137319; cv=none; b=WsSXxDw6ec9NFyQwcxVM35qh2hw99tiYjiJlZfM46+XNIhUzotgVEpAC26DSnqx/w/y8stsLVEhO1RV4Zvb3zkj6B57ZOYxwWW4ILVxIjFOZ/H0TAEsSY5LyYt+evkM3+IodmdWAu6M/BbxVIQ92wGDmZzZ+HBp81+bZUiXNkoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729137113; c=relaxed/simple;
-	bh=KBSmgoKWd/GgRU0uLa3i0Dqsp9OYyeb7JKqvvVU6VAg=;
+	s=arc-20240116; t=1729137319; c=relaxed/simple;
+	bh=i30bdzC0Bo+H5ag6jocBGrL1o6fX5L0Ua8W4osd85yM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Btgt+SU9GPgJZyil0hw7evkZxcRbW+6ZkXRNlqOq4kkg42qKfSUmuIRzpB9HdqWCd9x9fVLZvCoFUJBoMbD+aiEiPdkCV99tgTflZCsMrqwK2qhYhfK2NcmJwpQm8SsWlJUy89N7yBDtG2rchaTm363HQ8cK2l1DxDkPvXViOy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 In-Reply-To:Content-Type; b=kRXS494StWs4PbzsA1FsVLbhJrjjXarb4Fze8lr4oIwKovI4YE89S/P1f5U5Cae/XhZuMOuGqcDm4YFof6fd3UnBcVpBocNhxBGASWYubH+09Y0RSRseHxwrT7mvD3d9Zy2L5oEWHfpaT3GalCvat2nLIlkzOeSdpjjnyVmOVEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XTYlC605hz1j9v8;
-	Thu, 17 Oct 2024 11:50:31 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XTYqf2y2Lz20qSw;
+	Thu, 17 Oct 2024 11:54:22 +0800 (CST)
 Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id C47291A0188;
-	Thu, 17 Oct 2024 11:51:46 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 56AF41400CF;
+	Thu, 17 Oct 2024 11:55:07 +0800 (CST)
 Received: from [10.174.179.113] (10.174.179.113) by
  dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 17 Oct 2024 11:51:45 +0800
-Message-ID: <4d80b2fd-17d8-a7bd-0e80-7d33c9764810@huawei.com>
-Date: Thu, 17 Oct 2024 11:51:45 +0800
+ 15.2.1544.11; Thu, 17 Oct 2024 11:55:06 +0800
+Message-ID: <672730fc-2224-d5fe-87d0-7dc9b00bf207@huawei.com>
+Date: Thu, 17 Oct 2024 11:55:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -132,10 +132,12 @@ On 2024/10/17 7:12, Jacob Keller wrote:
 > Indeed, this SKB error stuff was added by 26575105d6ed ("igc: Add
 > initial XDP support") which claims to be aligning with other Intel drivers.
 > 
+
+Thanks for review，maybe can fix this as commit 12738ac4754e ("i40e: Fix sparse errors in i40e_txrx.c")?
+
 > But the other Intel drivers just have a function that returns the xdp
 > result and checks it directly.
->Thanks for review，maybe can fix this as commit 12738ac4754e ("i40e: Fix sparse errors in i40e_txrx.c")?
-
+> 
 > Perhaps this is due to the way that the igc driver shares rings between
 > XDP and the regular path?
 > 
