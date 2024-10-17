@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-136705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB4B9A2B3D
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 19:43:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1A79A2B40
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 19:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3D6F1F22288
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 17:43:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 244EF28821E
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 17:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64961E0DEF;
-	Thu, 17 Oct 2024 17:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2531E0B64;
+	Thu, 17 Oct 2024 17:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="MjXcuti1"
+	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="fOlz/VKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2074.outbound.protection.outlook.com [40.107.249.74])
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2077.outbound.protection.outlook.com [40.107.241.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788711E0B7F;
-	Thu, 17 Oct 2024 17:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551761E0DE5;
+	Thu, 17 Oct 2024 17:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.77
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729186938; cv=fail; b=tKm1a2ADtRxlD1f0klF7s7BRc47APup5dpX9RwYDdaTe9s1U8PHbOXMAzFAoVxkp72eBI70au0snEJSOaVb+rV+AA/vtp2N0mrjQQR9U3fM8GaUD7cZfhoIPqel2P5052/ATPxtL5T/lmwOTrt5Ies/AFP+KVrkUxt1bkfn+ohw=
+	t=1729186943; cv=fail; b=T5GWVdVx8qH4DNUVZipAmQPJadZh4hGeg8mUq4Kr6wfPR/bYwzYi01/FLKtuAhw/H97ZAo/MwjbTqjEch/dvKOCFrBUVHJre+LOYXMzQhJrfpzr8Mrea/7UksEzzV5wH6aH+PXYp8J1Gfed+wUHx7dPo2/hJiLQSLi5RflvJ3Ss=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729186938; c=relaxed/simple;
-	bh=iaXMrJ0vaF2emybVkxW//Ik8cBssajZPiz9MRv/G1zM=;
+	s=arc-20240116; t=1729186943; c=relaxed/simple;
+	bh=oagg/QKxHvgPVqHwmV1uYjqfAE2MWo1gIE8DBlOU7aE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WwVcczmpSVqEEe1PL/1O+0WLTPmyK+r93zwPolyBltFVMR0R73fNRAE6gIt/Kg1Mn2fPvxpIjmzYohLsrFHSi20sHMzyBsAVFstsgD0rw9CHwxNn5OhQT9qFLn5uQSB0s34NIcYyWuAkO1S4fZ+lxboMqgm0sGJciROzyB9xjyM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=MjXcuti1; arc=fail smtp.client-ip=40.107.249.74
+	 Content-Type:MIME-Version; b=gMZe3g9ObdGeTl9vN7l+HMdnkRDN/4XtDbcJROy1+Zk3iYScVCFuvXdPk6JYh5lVCOM9wFgHEk1NxxAf2EAfkHHuV8ojHu97n9BAGGNRLjmJKk19flgbyH24opBNokK79uDGWkQviQNO9kERJqlzKJY15kO7Z387ckQwa6oDwyU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=fOlz/VKw; arc=fail smtp.client-ip=40.107.241.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pBannn/5EDennmA8QSnKAi8nwqJKzD9F/NnBlisPUzcSCQEI8DI2EhgTUymhqGzeG0nrj3fjlxk/nXiKzqFEccSjEJ+ELaJaiv+S1YZGCNFa/5vaIgCdjMm2VjY2YY5CTEfX+aIIPSYT93PhwHcwWOAJ5i4sBoN7G18o0SFRqKDU3yTlx8vFUdue1vRMkAG3Hv/fGgsXaj2qLToGuO2204VkSfBJARHiXSbE97yZ2TZssVCfUcpHRYrOGnTQy7MSDKJi+UXXgtM5rFXXyJNfgSy21spSzsmmbERl3O041nXEQTdryqDjVypdzlg/CVZy2/I2GYYyd7RY6tUXEQH1KQ==
+ b=XrwjqQjS1HiwcnH5QV+quMK1N+YgvpcsLsUAMxKLisgqwJFedmQQA2L1CNdRFJSAD/YJtjpoblqbHTBs54EpWblCXPubrJJ/GEmHDyy+79gexBbXcpsWCXLjGkjBbZ/k8s+DVG/0Vf9nms/bxrX/YfEfrTpfQPykt3DYYeD7FkKksPXg4mtkFCfE3V1LK0h7vFURs8aqZEsYTby3CePmfhDGnlTkvCdUWYROFlyHXGEV218O4VjcC4CMNZQMC3sgP+2fuPL+yASeH4PDhxi9XdcnHd1+uPhTS61VirBVGMGIf3KObaXKFobkKDix/apsa2ZANOTO+1GtA7833AnD+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ReSQj0l6DZ/BD4r3nkGqyXuyPDGJTmJHtKrO8kW7Hi4=;
- b=suagHEI805rfnShrABbRK27s7bhv8VgRO9r3Eze3ExZKUKauk2PsFMpEt2Xvgu3xsW3QLtQkugn9NoPWesa678olIs7FH59GByxUowGQN2Z2iclzvtMnTgS0IoN64xwUv1gzs5xKSt+7sRUYXbqa4nZw1kDiuOutKK9yOtDA50/mVHc/FmK8Dp33OgY443/9zbOgQb9RBxfVBp/Ua7ulRNWu0E8VRVUDA8aCboPCqp+uq/qZODNbCXJp4gkpnJTUdliqK+ntrB8pepkELmUjusFuNQ/RbZiO1bqTfw0uB3+q4eIq71m+jjtoDJ84c5fDppE+fazMsddHf4qchIHU8w==
+ bh=+2XYd+ef4QXPkhNAZAaNzaPV6vCmrjU3M3yiht1TQP4=;
+ b=pQyMHn2X+cVH83v+clfwac7tzLX83Kf2kCUSGLbxmWtAEjkto3n/TMITiIb/+ofu9A4m1VJ8JVgkOswlM9/BsUUCq9vkyohwqYr+CulV636hZuTFw8KG3dPceHsyzUde6+brV0qr0D9f6ZHd8oX/TRDM14h+V8jbjQotujwOO9OP7dRRAT2iQoHfrAqpA5sxD4W5Mh7nVAVPewiZb3ZDSb8DfLRNdYaML6YHPZhvkpVcR36kSjpjiizDi/xzjzbuTZEygWhWt5Y6vF89aQhBCSeLxnDBdFrqTLGxdvtmI+08yvx6FzPe/izNvRh6R6GDRfgzmawLFczv07VX5RK6bA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
  dkim=pass header.d=nokia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ReSQj0l6DZ/BD4r3nkGqyXuyPDGJTmJHtKrO8kW7Hi4=;
- b=MjXcuti1ibgX6z/9hCMfmTD0yc5P+JIG6Pj6O1O4xfclDkXzkiNmmSTCaAdEYz+OtuGLDEht7k/v3jYQwf7mE2nyLZozErICsTaHzFi6V7dd1iF+//c025U2ZEviSHZjdsbf34WWDFC0bijK3MIwsAHM1MrbRl4M4TvUt9L8pILH37lf+88oyzTgeqVAOWiFRkkBP2vZkczZm9sAIXxNBB5nLVeLYha5zRfsm5Nj2143fEjer568AooJGTTsI1vvvXNA4LjACCZpz0nWlMTtmYTjEyNpdSbluam8BAAp4FsqVutWfI6aWmTtKSgzoPY1sVLqesYtM4fgAIVwyyQjzA==
+ bh=+2XYd+ef4QXPkhNAZAaNzaPV6vCmrjU3M3yiht1TQP4=;
+ b=fOlz/VKwe11/FbbL6iSn2P21kSHI7LdgI3Di1ybufPxa7Rps1ff3L3X9VT8Ev7MCKuq4tE1ouWwgH2m1CZy5w3FYAN9pidiS3Xyqut8bO3oDqXAXj+DOUSJE3TwlqJ81nM8gKpw9CbwBGYYb6WxG+dY1ebCg8eCvrNTPzlSOl+SX2QwW9Nqe63GNleKxVcdSZruWjFosHrFanbbgq//Nlxt4Vg7S0xp3dULw53Y/w+Ip6/0wQM2UbXs6AeEvFQiaxkPBfVxG7s+9jW08wtQ7GtFC0fIGIZJsCfxztagnRHR4Q02mJuW0/N2xSz26MxygBm97XShxQ0PMpoHqJQwBUw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nokia.com;
 Received: from PAWPR07MB9688.eurprd07.prod.outlook.com (2603:10a6:102:383::17)
@@ -66,9 +66,9 @@ To: "David S . Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Stefan Wiehler <stefan.wiehler@nokia.com>
-Subject: [PATCH net v6 06/10] ip6mr: Lock RCU before ip6mr_get_table() call in ip6mr_mfc_seq_start()
-Date: Thu, 17 Oct 2024 19:37:48 +0200
-Message-ID: <20241017174109.85717-7-stefan.wiehler@nokia.com>
+Subject: [PATCH net v6 07/10] ip6mr: Lock RCU before ip6mr_get_table() call in ip6_mroute_setsockopt()
+Date: Thu, 17 Oct 2024 19:37:49 +0200
+Message-ID: <20241017174109.85717-8-stefan.wiehler@nokia.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20241017174109.85717-1-stefan.wiehler@nokia.com>
 References: <20241017174109.85717-1-stefan.wiehler@nokia.com>
@@ -85,133 +85,346 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAWPR07MB9688:EE_|GV2PR07MB9009:EE_
-X-MS-Office365-Filtering-Correlation-Id: dbc3efb5-138a-4153-482f-08dceed2f707
+X-MS-Office365-Filtering-Correlation-Id: 8b78e508-c36c-4788-42d7-08dceed2f735
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3enHzkiBNbRhFMdgzsOEsMbZJQUtmbhGHwvhfG4Q+k5khty4fTzm/+lCA3/j?=
- =?us-ascii?Q?FA6oKxqQIIOE7IkVL9PpTmvFb5v+QYqAZqKqqIMxukVmGmEFF73HhfmSdejQ?=
- =?us-ascii?Q?FfmUkHc5oSbG4rYGtT4Al/j/CRVyAR/GGE6xFKhvi31snVLoQ4kzNT0zjCgD?=
- =?us-ascii?Q?2kCu2GEnbB14iL1+uHYmnL0L4P0bkAnmbWnailVzwTx+vMbNfge9EhLMODDJ?=
- =?us-ascii?Q?fzqrx+u84D/XtFk8cJVi5e/QA7GhXYiIXZ2WfDSOqKM7BchSXADr7kc4xEhl?=
- =?us-ascii?Q?VaHsoiI7WDwtQE5o4CyqaAMbq6clzrmdW/uP2/1QVhFi0yDWL43jIurrs6v/?=
- =?us-ascii?Q?b+cKPweqy2VJ553G5vYHccJPRN6IXpwCeeatZXUVIhQua/SHaULt0vBBBAh5?=
- =?us-ascii?Q?33jlSSkUNeBHgViPKJSePfE7oRbocB2o75Jqrwl3ZqljIHOpS3DkUaZKr04n?=
- =?us-ascii?Q?DyDf4fvF9W8njZfibZFTC8ROlgSo1EUW05ErB3AaqFavAoVZkuJCxHDCULyO?=
- =?us-ascii?Q?1wKKZ1RAlzctOaqNudHun8yKT0TTbvLpH15xQB41gc8M/J90nh5mnzRigrGv?=
- =?us-ascii?Q?D6WuV1ukHVcjeGyeZKuPupTpjGrHy8B/kvrmEf9uScT7V8uPdiKiaJ80Paaj?=
- =?us-ascii?Q?SnsvKVDchvlRdyBjaIvpyYhOLYkPH3vWQZLd4kzoKP4NZa1qSRHC8+XTAaxh?=
- =?us-ascii?Q?66kaYQ725e5yQrGlyPFr4MYj5XOO6tyr1FI1HMDwJk/PMMY0gQPSR54e3iYm?=
- =?us-ascii?Q?REIQHMKhl95y9Mr3pKE21mrjaR6m7+VUKgz+6QVLnRI66wxdSuzwL1LS6I+r?=
- =?us-ascii?Q?Uu/kTxfE5lzPl7ifeobmfgPLuR45W7jN99SZHmmfaEyhiguQo/q8P3iK5MbM?=
- =?us-ascii?Q?+s7k4tUwyi/7iowe1phBqNdK42Vj6rGqq3+ogXKCMsRsXZBNXmQXHD3wNT9a?=
- =?us-ascii?Q?oXb6FP1Z8mNW/UtCycMxxgoiq9j0Qk31hmn8LYXy0gdBs07UeDWwOTqCvI7P?=
- =?us-ascii?Q?VTH4TObcIvLqnfaA/Gyq8OeEjbKXmSDZA1kFG29Pvy4WNBWOHZAwjXulYzVo?=
- =?us-ascii?Q?q+ltZ6advSUPzvEjguoI8+pf+tFft01Gez2XWG8u+ymAZTxdxmK9Rt3aBFHz?=
- =?us-ascii?Q?hzxfBbXhEGPy7iai+E8SrE5ZtzGnBblMeRLx2KzE771ZeQEY8NyX0fN2gpq8?=
- =?us-ascii?Q?x0Ro4WEJIWutndue3wQdItbOSWUtLxHBfJIak0ej+gSMlVTQHppLwEFJguCl?=
- =?us-ascii?Q?apThuK/vj8b9LestHv2wYMdokCT9aT6DYFQadMF/Gcazge/WD79yopmBLYlT?=
- =?us-ascii?Q?tDY3PGsYBTzFqUzIPgLkf4Mj23RN3dAyUtAq3ggVkXAlqWtWigrgvpj/0qKE?=
- =?us-ascii?Q?c9gi2xo=3D?=
+	=?us-ascii?Q?N1+lTCVvyHZK0ugfchn6UWlWllz0cDTK74Rr7Gsjv0PkdXyccUR0z9snmwtA?=
+ =?us-ascii?Q?xM+WARMColTa4Ot/ktG3G8p/WCGop9YAl6haqce29aBnbETJIn3c5AMzBvyn?=
+ =?us-ascii?Q?2CDITNWXPi5gmfGJte/1iIob1PIoid+bHCGUrnGKBp+9OBDq2CY7804zjGW4?=
+ =?us-ascii?Q?fYoe0QUi+UAq8tjurkosMoabmxEfK/ZZPJWFxjRwdV0GcszGbK7Eo5eGS4HD?=
+ =?us-ascii?Q?4lIFRdINsUmNKF6c4tpnB/5doO0KQ7mRf6OJsl/iVBGxnZ1IMS4nqFlHrHDo?=
+ =?us-ascii?Q?PZfTvgSdO4A4HrN2cNQ6f/c/fPv2gqpvyFgnMiUv53fKctC8Zs0flkVJt+bb?=
+ =?us-ascii?Q?g/QV/otjEhbIj0JWe5urqubO19wZfeOclO8wqjJnmNsGgHe0a8htC14PTXZj?=
+ =?us-ascii?Q?BKFOXdZmU5xb1mYf5e6ncYxIuToRCZpu1OZ6h+3G8zjq6QyV0lIrPa5PBRFp?=
+ =?us-ascii?Q?znBWg/QVkhurUU218SLVifdnJSlivRPoBxaFaJ1YakA5KAdCRJ02tHX5a65M?=
+ =?us-ascii?Q?SIFpcXLoHfPsizsPtiT6nFXW+YWlqw3fI+vWpJhh/yn0V/mI4t3WLqsP5PSu?=
+ =?us-ascii?Q?AuRZKKS62HROmZuvIgLX8TR4OzSloq7tdpNiB85VGrJiBdmJ8bdSUitXhtnU?=
+ =?us-ascii?Q?ywK5l6UU1Dbt9hhLZOTjzAdw6R/CM+6i72TPBlicZeDOGtp/8i7nn0/goaz4?=
+ =?us-ascii?Q?3hDy8SPdJPFmgq1s/TeiRT8dTcINzE77diCw1WGsvIe4jJEVzQ7NsUAh+j2b?=
+ =?us-ascii?Q?m3bEtIPFZX/7tBPCcrgdOWtXHMLQgDWOBYU3aJwelXwvEpx5MEduPxpfsZK3?=
+ =?us-ascii?Q?TpOart/gO0gBuUyJ7IWCNR2yYT5J7SDG7bNuuzTJdEky0zfFypo9LRgBCI+A?=
+ =?us-ascii?Q?UrpTvVq3Ww5ljofAx1jemf2X5kW0H90O8cgIedeCUMHuwJSYKB7NBwzQcUCA?=
+ =?us-ascii?Q?RcLoozoA/5EIisiUTBMesdjQkHSC12XZzrBZ9qzsE+9jJ3SM5CkmN/qZW/u6?=
+ =?us-ascii?Q?5hghfp6LyaN0E1HsFCY9Rqk8zWEZK740W74V1pbJg5txF1YlrOTQNvKxPzzE?=
+ =?us-ascii?Q?GwgA0m8wCzdoEpMBVPrwerOcjlr0DqnEsz2JZc70hxwoz0/mb6XzB4xoNmTn?=
+ =?us-ascii?Q?k3+EB5f2W0Yp25V92hcV3vQWzwqsMz6V0IRhEcLCZUDf5WS/vkQRw9WqYWp/?=
+ =?us-ascii?Q?H9rUBMrgwVAS2Q/oBLpQESxwApIuY44FeKvWLClaxhF3RfUTPa++3FZtApgX?=
+ =?us-ascii?Q?fB+B7+f1JlXVxwSmDWhF+ZU2gUFCWKaWArzEH8arnhn8ppS+Z2yIONeP//l+?=
+ =?us-ascii?Q?ZkiprwMSfB5lEDakz4eKtrnDAIRCq85FoEzGZRwX0utk2685R2jdiXLecc+3?=
+ =?us-ascii?Q?U1tJIWA=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR07MB9688.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?kjAcMKmaw4dg76UfklTPaQVh/IkvGAVIrTz28qM+zmvq6tNUc1cdQ8SkWW1e?=
- =?us-ascii?Q?SEYFOmBpNjVsHX8eWdV0/zT8LSX1HGb4ugh/qAyQN4ujmu4LlrlS+Yrzt8/J?=
- =?us-ascii?Q?d7wnwz+uib9aykIaLz2bjAy+4hdffMJZElClugQQ3oVwJiK1xE+ZwhHJ5Xfn?=
- =?us-ascii?Q?TNahX5G/rsXUwzy+WU+fT3/egianGngvZj4Pf7KoV+4cUO5HHJcrRCS3+kAg?=
- =?us-ascii?Q?fY3HCjmC+AyCDhz0u7xhO6hmAFDAdGAo4YRCn1QfF98B/U1jqTEhFxFy29f4?=
- =?us-ascii?Q?MlHG/TI16wQEhg+VRVQ8i+dxhcwWcX+p/Q9yYZtwwWdvz3z2xvHvOxsPevzq?=
- =?us-ascii?Q?YgP0DlhLdZqWpsMgapugTsRaTK3rK9I0pJF4DlcwZ1Meev7oo5w7KAhu3ZEQ?=
- =?us-ascii?Q?0xKdY63EGdGUx4Rhj/yIsE4PHALjEL6CnpKjEUhcssr0/SsnE7WzLPBtWrF8?=
- =?us-ascii?Q?BsOiAytaPVKNNXEigHydPmHYFeh3MeQ5wqtaQdmZ+M5Xf6PLXCZvLnKIkWGq?=
- =?us-ascii?Q?keqKOx8qeZwB4ZGeod0UMxVVV1JqJZaKTsPB86NQnvXIzFMbjeCG8LJ1FUyW?=
- =?us-ascii?Q?gkVawUy54s2y4Xqb6m1TZbb9sMr2rXRMFhUpLZA5fSAUZlICSFYlWbJJEEsY?=
- =?us-ascii?Q?tVoCXuNolGFzweLVWU9E6sTQBXHcYsyURPf1bp8xROSf6TuQ41Arsck1ltr0?=
- =?us-ascii?Q?Ya+/LfivBhZOBnem3ydgEPP2zk7csgFOuuPgkC5TKa6JsZQRPpGHUZoJANfF?=
- =?us-ascii?Q?dL6SrOQXiJs/4RrC2weUYd9PyGKsL8jj/0jBX94FzI4bawWw3v4q1zXfMxVm?=
- =?us-ascii?Q?E5f2FuF/JvnFJBHARaxL2Hg8F4VyJc/rYK0uqhef/4q4Ll/jmnZwXEsYNvCn?=
- =?us-ascii?Q?7xdh01bknfOGEuoncXOVzGF18EkSzbjK09tfxxTxbE1zyboBklhfjdSqaTPk?=
- =?us-ascii?Q?9yDTgw+nLEKu1rHtl2eA8GtOau6pPgLIDdnTKWqKYpTiNXOqziz5aAYg+kUB?=
- =?us-ascii?Q?dBBGwodyMYgdnQ0acoY5EI9zI1XrzmHfpGX3WdkBd5zKbu4W3QtGyxO8qn/J?=
- =?us-ascii?Q?+t6PUnKGCdPHZpLFSLb/CyI9Jr/aW+/IA9SoxfKzJkRTfQ2OPsg9UwcVuOP/?=
- =?us-ascii?Q?AUTSoIVi+iv3rtM9UH79leZFju4jWAn7Caarwc6M8BQ9lw/B8oFdtugigPgm?=
- =?us-ascii?Q?1xW5h/i27sYtTCX12GSddtDvr2KmRlchUfvHd7BqaTz5kbLH2qE8hisPwKZS?=
- =?us-ascii?Q?PVf/gZ1tRXrLYY2+jZJjyfLVeeUmC0KBwxWRT4PDGUwUfUYboiR61oB8SWDc?=
- =?us-ascii?Q?X/43YhZSsUuQfEDlcX4AFDUzrbTpiGchE631ivE8lKEqGh84YU+L3kP34aqN?=
- =?us-ascii?Q?OaigDZL/BN839lbgmnwmRl3cCRu+zEsSrjaHsf3PjxI98ePePZHi5SMf/CsG?=
- =?us-ascii?Q?JBIoi2+e/BxbVgBtac1arH2BVQnLrkWhIADlnO67NcG4HH7ElhLkgUq0Jchw?=
- =?us-ascii?Q?7MFBZ43kxrz2j2xQ6kIi3Uxbv3zkYYLfBJyxv6sGL8ZJTLFr9yaZKcWDpLq2?=
- =?us-ascii?Q?/meZOn96JLsfwon5zCzSEnX/4fELqCHAXQN/R0BAvxqxF2iNDnLzP5Qc6C3W?=
- =?us-ascii?Q?5g=3D=3D?=
+	=?us-ascii?Q?tS/ZARH1LtQ8WwVnnuy9yJfEUtfrxaFKy5KJxhcN2tRhGv+bCBvYqanoT4ju?=
+ =?us-ascii?Q?3Y7rt7vtb2QW5mIY2aJ9L0iPj3nTsQ6St3K0NxmpkSjs2m3tHlGHf4aPEF28?=
+ =?us-ascii?Q?hmZbo4PqVpz+U3i/y3bScrZ65JZOYMbH4u8q/niXLqpjtTEyF4N30mgxHhl9?=
+ =?us-ascii?Q?1yO7sAMWWM3nRmiTg4sLpY1fwM271EGLYGXcmzwixIrqiaAEar7MrV06LUOy?=
+ =?us-ascii?Q?YhstMpUkb1vW8b5Wz58G9b/LH8pR42wawXzl2bGJindjVU6j2jvNEfY2mYkb?=
+ =?us-ascii?Q?igK43Pc4Jd9/Mup1Fi+nXnjnaekiGizZakrNYp6IqEg1faOvQE3sZvkZ7g0j?=
+ =?us-ascii?Q?C9Zzpf4fJLtoRZRgvR/CgNEVgXQmfzYugOALqI4YyexdAuDdziy6Nfa0vKnu?=
+ =?us-ascii?Q?eG9Vz82hP4gEwhbBukVP12eL439oNRwsOMThUN+Rme+aQek2evk32HRLlLsJ?=
+ =?us-ascii?Q?hzGLHMCQRGJ+jUNRASl+Kdun5YsQsARgx/0GYyLPggwCq15aVlpWEXuP3mPq?=
+ =?us-ascii?Q?bmL+ptb322/QMfZVTJhZpTPgI5exVar6i5ACIItGeMe64YgqOUJPXIFNUGk6?=
+ =?us-ascii?Q?Piv1G3+fdNcL+X4GJ3fwLvjOmV5uGXiPT1NE/RtrZEHWX5SRYCAFz5XCp8Ja?=
+ =?us-ascii?Q?qn90uiERYGKdfeistLN31fa94YHxj8slEBTPx2m9gTPLGE2Cmt4hfbMqjp2n?=
+ =?us-ascii?Q?tTpY7EIJkFPCy3mRUJZVYGS4j+zFgl2BC4ykDlOw0eC63uwqoaoXCv2BetZv?=
+ =?us-ascii?Q?p4woMJQ9nEufe2gYIzHe7bFEYuPSrL9u/bV1Des8MtbJaph0xFNzhGDb0U2p?=
+ =?us-ascii?Q?Yx0P00UxCpDXWCO0pO/e/PiHp6KO0R5HbpZbE/KO0ER94YPQ0ZpVMA8d+2xm?=
+ =?us-ascii?Q?HhzZrHlwIGAwqkm7UWPOZVPJciRwT7fvF7gTzM6pHKqawVNaRSzo+9EVXauz?=
+ =?us-ascii?Q?eE2UjhZ9+MHILkwV5l0H6GGyjL/gcQc0XNLhmSpQLeiK9f2zC3V5jC69+nCn?=
+ =?us-ascii?Q?iEBfL/WypmUQWJkpwaEoT35/GDr41EcO8lGcKML9uxGEXZYf+qzN2T4Mjlyg?=
+ =?us-ascii?Q?lHP3AcxODp3r3LlwskpnX0hWvdot5pKmM8YstwwHeRUUx5KLl2H4QhhcNH9/?=
+ =?us-ascii?Q?ryVzxdcg9zHB30Tfd9PEU2K8iX/ZAGGbe+FdKWdW8WNiRFiMaeV60xahZQew?=
+ =?us-ascii?Q?1FhhU9g6LAsI8dGvoLBhJD3MOh1pmPelWoKsIyA0L5sxUPI6tdPFQeOjVF1+?=
+ =?us-ascii?Q?p+9sscD4wikqEtgk1/cg0LpxP3hKQtfVwNSNFIdWt3C1Jg9POp/A682Bt2Ow?=
+ =?us-ascii?Q?2hSOJyMZ1Ew8BqgVgl3wIIMAGzSCWKeKFg1p/pKY/mdl6m9aTVuNHUvqBR6c?=
+ =?us-ascii?Q?Jdydqa9yPpzC9j3DBenNpaeimRbwtFijpeT2AGwk64gQ0TUEjSk8M/l52E5p?=
+ =?us-ascii?Q?+bK3P5HzoJhGdK5P/VfS441V7JMBjLj60ha6yKapPMloFRgF4h/dLcBQ43Da?=
+ =?us-ascii?Q?VIC0Y0qELbtltSkXXmQbgPohAvrhzZwtwBMPmtuLOfW75gVzyYq8BS3FsKTD?=
+ =?us-ascii?Q?nE2Mqa1LRi9mNcP46zMs+pPHdqZbU0jAJM/0seLQtKbjaeOtzwC5FrVXsjO9?=
+ =?us-ascii?Q?Xw=3D=3D?=
 X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbc3efb5-138a-4153-482f-08dceed2f707
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b78e508-c36c-4788-42d7-08dceed2f735
 X-MS-Exchange-CrossTenant-AuthSource: PAWPR07MB9688.eurprd07.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2024 17:41:43.5504
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2024 17:41:43.8603
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aBsosIXbds60+Mfy2PJcFasXR60GqjlgWVWpa1s/eVzgdCE8jSwE8prZy43yH7LFSiStN7wmVIRsONR/Pwh9ZqdKDGtvc9MFNfZ5Lob1ARo=
+X-MS-Exchange-CrossTenant-UserPrincipalName: Y73rTUYzb7mln5O4ZfC54Xkt6PZ+vfUfXlyAtNlqa3/tyuS5pzNJA/21y9cuZJ/qI4+MeAyFwwbb7LapRSVl1W/JWbDgrTp2xor9xYOzfzc=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR07MB9009
 
 When IPV6_MROUTE_MULTIPLE_TABLES is enabled, multicast routing tables
 must be read under RCU or RTNL lock.
 
-In case ip6mr_mfc_seq_start() fails with an error (currently not
-possible, as RT6_TABLE_DFLT always exists, ip6mr_get_table() cannot fail
-in this case), ip6mr_mfc_seq_stop() would be called and release the RCU
-lock.
-
 Fixes: d1db275dd3f6 ("ipv6: ip6mr: support multiple tables")
 Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
 ---
- net/ipv6/ip6mr.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ net/ipv6/ip6mr.c | 165 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 95 insertions(+), 70 deletions(-)
 
 diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 9bf42aafc7f0..90d0f09cdd4e 100644
+index 90d0f09cdd4e..4726b9e156c7 100644
 --- a/net/ipv6/ip6mr.c
 +++ b/net/ipv6/ip6mr.c
-@@ -464,10 +464,12 @@ static const struct seq_operations ip6mr_vif_seq_ops = {
- };
- 
- static void *ipmr_mfc_seq_start(struct seq_file *seq, loff_t *pos)
-+	__acquires(RCU)
+@@ -1667,7 +1667,7 @@ EXPORT_SYMBOL(mroute6_is_socket);
+ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 			  unsigned int optlen)
  {
- 	struct net *net = seq_file_net(seq);
- 	struct mr_table *mrt;
+-	int ret, parent = 0;
++	int ret, flags, v, parent = 0;
+ 	struct mif6ctl vif;
+ 	struct mf6cctl mfc;
+ 	mifi_t mifi;
+@@ -1678,48 +1678,103 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 	    inet_sk(sk)->inet_num != IPPROTO_ICMPV6)
+ 		return -EOPNOTSUPP;
  
++	switch (optname) {
++	case MRT6_ADD_MIF:
++		if (optlen < sizeof(vif))
++			return -EINVAL;
++		if (copy_from_sockptr(&vif, optval, sizeof(vif)))
++			return -EFAULT;
++		break;
++
++	case MRT6_DEL_MIF:
++		if (optlen < sizeof(mifi_t))
++			return -EINVAL;
++		if (copy_from_sockptr(&mifi, optval, sizeof(mifi_t)))
++			return -EFAULT;
++		break;
++
++	case MRT6_ADD_MFC:
++	case MRT6_DEL_MFC:
++	case MRT6_ADD_MFC_PROXY:
++	case MRT6_DEL_MFC_PROXY:
++		if (optlen < sizeof(mfc))
++			return -EINVAL;
++		if (copy_from_sockptr(&mfc, optval, sizeof(mfc)))
++			return -EFAULT;
++		break;
++
++	case MRT6_FLUSH:
++		if (optlen != sizeof(flags))
++			return -EINVAL;
++		if (copy_from_sockptr(&flags, optval, sizeof(flags)))
++			return -EFAULT;
++		break;
++
++	case MRT6_ASSERT:
++#ifdef CONFIG_IPV6_PIMSM_V2
++	case MRT6_PIM:
++#endif
++#ifdef CONFIG_IPV6_MROUTE_MULTIPLE_TABLES
++	case MRT6_TABLE:
++#endif
++		if (optlen != sizeof(v))
++			return -EINVAL;
++		if (copy_from_sockptr(&v, optval, sizeof(v)))
++			return -EFAULT;
++		break;
++	/*
++	 *	Spurious command, or MRT6_VERSION which you cannot
++	 *	set.
++	 */
++	default:
++		return -ENOPROTOOPT;
++	}
++
 +	rcu_read_lock();
- 	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
- 	if (!mrt)
- 		return ERR_PTR(-ENOENT);
-@@ -475,6 +477,12 @@ static void *ipmr_mfc_seq_start(struct seq_file *seq, loff_t *pos)
- 	return mr_mfc_seq_start(seq, pos, mrt, &mfc_unres_lock);
+ 	mrt = ip6mr_get_table(net, raw6_sk(sk)->ip6mr_table ? : RT6_TABLE_DFLT);
+-	if (!mrt)
+-		return -ENOENT;
++	if (!mrt) {
++		ret = -ENOENT;
++		goto out;
++	}
+ 
+ 	if (optname != MRT6_INIT) {
+ 		if (sk != rcu_access_pointer(mrt->mroute_sk) &&
+-		    !ns_capable(net->user_ns, CAP_NET_ADMIN))
+-			return -EACCES;
++		    !ns_capable(net->user_ns, CAP_NET_ADMIN)) {
++			ret = -EACCES;
++			goto out;
++		}
+ 	}
+ 
+ 	switch (optname) {
+ 	case MRT6_INIT:
+-		if (optlen < sizeof(int))
+-			return -EINVAL;
++		if (optlen < sizeof(int)) {
++			ret = -EINVAL;
++			goto out;
++		}
+ 
+-		return ip6mr_sk_init(mrt, sk);
++		ret = ip6mr_sk_init(mrt, sk);
++		goto out;
+ 
+ 	case MRT6_DONE:
+-		return ip6mr_sk_done(sk);
++		ret = ip6mr_sk_done(sk);
++		goto out;
+ 
+ 	case MRT6_ADD_MIF:
+-		if (optlen < sizeof(vif))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&vif, optval, sizeof(vif)))
+-			return -EFAULT;
+-		if (vif.mif6c_mifi >= MAXMIFS)
+-			return -ENFILE;
++		if (vif.mif6c_mifi >= MAXMIFS) {
++			ret = -ENFILE;
++			goto out;
++		}
+ 		rtnl_lock();
+ 		ret = mif6_add(net, mrt, &vif,
+ 			       sk == rtnl_dereference(mrt->mroute_sk));
+ 		rtnl_unlock();
+-		return ret;
++		goto out;
+ 
+ 	case MRT6_DEL_MIF:
+-		if (optlen < sizeof(mifi_t))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&mifi, optval, sizeof(mifi_t)))
+-			return -EFAULT;
+ 		rtnl_lock();
+ 		ret = mif6_delete(mrt, mifi, 0, NULL);
+ 		rtnl_unlock();
+-		return ret;
++		goto out;
+ 
+ 	/*
+ 	 *	Manipulate the forwarding caches. These live
+@@ -1731,10 +1786,6 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 		fallthrough;
+ 	case MRT6_ADD_MFC_PROXY:
+ 	case MRT6_DEL_MFC_PROXY:
+-		if (optlen < sizeof(mfc))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&mfc, optval, sizeof(mfc)))
+-			return -EFAULT;
+ 		if (parent == 0)
+ 			parent = mfc.mf6cc_parent;
+ 		rtnl_lock();
+@@ -1746,47 +1797,27 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 					    rtnl_dereference(mrt->mroute_sk),
+ 					    parent);
+ 		rtnl_unlock();
+-		return ret;
++		goto out;
+ 
+ 	case MRT6_FLUSH:
+-	{
+-		int flags;
+-
+-		if (optlen != sizeof(flags))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&flags, optval, sizeof(flags)))
+-			return -EFAULT;
+ 		rtnl_lock();
+ 		mroute_clean_tables(mrt, flags);
+ 		rtnl_unlock();
+-		return 0;
+-	}
++		ret = 0;
++		goto out;
+ 
+ 	/*
+ 	 *	Control PIM assert (to activate pim will activate assert)
+ 	 */
+ 	case MRT6_ASSERT:
+-	{
+-		int v;
+-
+-		if (optlen != sizeof(v))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&v, optval, sizeof(v)))
+-			return -EFAULT;
+ 		mrt->mroute_do_assert = v;
+-		return 0;
+-	}
++		ret = 0;
++		goto out;
+ 
+ #ifdef CONFIG_IPV6_PIMSM_V2
+ 	case MRT6_PIM:
+ 	{
+ 		bool do_wrmifwhole;
+-		int v;
+-
+-		if (optlen != sizeof(v))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&v, optval, sizeof(v)))
+-			return -EFAULT;
+ 
+ 		do_wrmifwhole = (v == MRT6MSG_WRMIFWHOLE);
+ 		v = !!v;
+@@ -1798,24 +1829,21 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 			mrt->mroute_do_wrvifwhole = do_wrmifwhole;
+ 		}
+ 		rtnl_unlock();
+-		return ret;
++		goto out;
+ 	}
+ 
+ #endif
+ #ifdef CONFIG_IPV6_MROUTE_MULTIPLE_TABLES
+ 	case MRT6_TABLE:
+-	{
+-		u32 v;
+-
+-		if (optlen != sizeof(u32))
+-			return -EINVAL;
+-		if (copy_from_sockptr(&v, optval, sizeof(v)))
+-			return -EFAULT;
+ 		/* "pim6reg%u" should not exceed 16 bytes (IFNAMSIZ) */
+-		if (v != RT_TABLE_DEFAULT && v >= 100000000)
+-			return -EINVAL;
+-		if (sk == rcu_access_pointer(mrt->mroute_sk))
+-			return -EBUSY;
++		if (v != RT_TABLE_DEFAULT && v >= 100000000) {
++			ret = -EINVAL;
++			goto out;
++		}
++		if (sk == rcu_access_pointer(mrt->mroute_sk)) {
++			ret = -EBUSY;
++			goto out;
++		}
+ 
+ 		rtnl_lock();
+ 		ret = 0;
+@@ -1825,16 +1853,13 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
+ 		else
+ 			raw6_sk(sk)->ip6mr_table = v;
+ 		rtnl_unlock();
+-		return ret;
+-	}
++		goto out;
+ #endif
+-	/*
+-	 *	Spurious command, or MRT6_VERSION which you cannot
+-	 *	set.
+-	 */
+-	default:
+-		return -ENOPROTOOPT;
+ 	}
++
++out:
++	rcu_read_unlock();
++	return ret;
  }
  
-+static void ipmr_mfc_seq_stop(struct seq_file *seq, void *v)
-+	__releases(RCU)
-+{
-+	rcu_read_unlock();
-+}
-+
- static int ipmr_mfc_seq_show(struct seq_file *seq, void *v)
- {
- 	int n;
-@@ -520,7 +528,7 @@ static int ipmr_mfc_seq_show(struct seq_file *seq, void *v)
- static const struct seq_operations ipmr_mfc_seq_ops = {
- 	.start = ipmr_mfc_seq_start,
- 	.next  = mr_mfc_seq_next,
--	.stop  = mr_mfc_seq_stop,
-+	.stop  = ipmr_mfc_seq_stop,
- 	.show  = ipmr_mfc_seq_show,
- };
- #endif
+ /*
 -- 
 2.42.0
 
