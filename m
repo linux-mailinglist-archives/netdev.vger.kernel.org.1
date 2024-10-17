@@ -1,92 +1,50 @@
-Return-Path: <netdev+bounces-136746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563619A2D90
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 21:16:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A319A2DAB
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 21:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C2BA1F2169B
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 19:16:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BC06281D7D
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 19:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C5D227377;
-	Thu, 17 Oct 2024 19:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0B5227B89;
+	Thu, 17 Oct 2024 19:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lsInjQeD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rtCnrJ5z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3FA17D366;
-	Thu, 17 Oct 2024 19:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CCA227386;
+	Thu, 17 Oct 2024 19:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729192592; cv=none; b=LFzl/kkZ7fo7eP64gfFG9Vnr+VRXM7o4CK5eJH7Q89QlVgsy+Q/ZX6ql3a4xj2GavfBBjxybLdWB33LzDSQqP/YisOdn76uCeYXAwFN7aTIMQyuX6Pajpgxh8vvV35HPN5b7cv3dJvDJavzoJvZMPHutsHxs/XLfPTwAsh7s/Sw=
+	t=1729192824; cv=none; b=Of3ye80dIyx95TWGsOqftpUtFVYMW4GKsglEmi9cUcuOgSlMd8w6mhXBmmPIbViWpR+oAiDrBvH7sMDZcU8ccXbx8vZuacyBKmoe4jfyQm/fMa379r+rDgMYW8YmRsEMhb3FE3l9+cSMIikLyooFODdYlhapURIPXqbmCtifdPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729192592; c=relaxed/simple;
-	bh=Zy0KeOH3rfx0NRa+0mQP3NWmpLl47s0dJOyjL7Tjpkg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kqs+f+kx/FIeBBkstKGnkSbdbuqajZwQcDkVgeuLJVEmx4i0u8mCiUp/f7qKbD5TLWQ3E27OtdqaTnj46er2Nc1DZ3sZAKjwR2P/JgAsggyKZhP1W6fISU1ugcQij56OugRebXGq/CbvkXBO7ojzb2Nr6b629gZi+sXaYbBY07Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lsInjQeD; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2e28b75dbd6so982602a91.0;
-        Thu, 17 Oct 2024 12:16:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729192590; x=1729797390; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DyFF8AVZvYcYdFwhR+QVeVGuJ37N0O1GZiqzyAabKk4=;
-        b=lsInjQeDvPI9O/34jLSJIr2ud6Fjqi0PzxBnSBcRwFc1polSh5zRs1xPf4bqkK58z7
-         02Sd9wqMoBXbn4K+BQrpkmQeMQEjzBqkZR9Q8xAjFSE+d/T2rSiQDJOKGuViJvoTAdNn
-         4M3v+GKto3Vv/YkAA9n/FVzJORUtd6c5ERqrApvw9xYfPlUQyIz0vSPtTyjFx7XddlfA
-         KELcoyN3CcHlSkI74AYd3B8v/pOkEbpceyzC64YV10sLzGoIKjyecmMT2T8nCsjIt571
-         GFNROPWgh5vqc6p25q5xdnxk49Yr9Llt7uGDVk3vO2jansg9EiiZ8yz5izCr4LXy3Bzh
-         qXUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729192590; x=1729797390;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DyFF8AVZvYcYdFwhR+QVeVGuJ37N0O1GZiqzyAabKk4=;
-        b=Vi7+opQoRfPDdXTIOG1XvIZXIkhYysmcOY40bYwsnD5VvAcRkTdlekxtM3/cBREkXp
-         /eLlVb3xv1NhBiHKxuArpbxEMEQaRnnKAP2bGgOlicViInaKOUQW2EeizZLeNTctQ3a8
-         wJqaiunAgLVReWbzqd8HR8W0yrnsc6o+03Wc+T8Na9k7gmry63LvGgpQS8BzqWCvfva7
-         Bc/KFWPgG4BB5+AH2QU+Aoy7wjTHp7GrlYd+TNOOcl6HG+7LtHqklkr+7WUT1cONdFeB
-         lvKAVeKvV4sbIJMZdLnIqSwoW1FOCg4oq0mpguUlSya6PoFoOlDUD228nVP0cTS5ROuk
-         oqjA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/TuyNzfYvzFwbOzfF0GqtSJrqfD+5x2APc/1Jn9oF8EXqn/SIkHbnDvPqSADHV1QxuqaavNGPXqDHJWs=@vger.kernel.org, AJvYcCV4diOAZ3ErJ43esHaGG78YqSltn4wXK2G+vLDXr9hVkb18QXxIYN0rhjGwi0dKb2Jp12zDq2Hg@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHR4183ys+9RBFZTJFKEToI6y02gtBXua9k18NW3bfdrYE0OA9
-	MVPprcXl257ooBANEOsZq9FD5wzJp+WFJ6ZmmXON8WgZD7SseAyp
-X-Google-Smtp-Source: AGHT+IHDnFUtJu9IEcK0BaHoH2ChfojrCgVLmLF5pqkq/68tai2SKRJRr1qbAC75er/m5ilFpnZ4gg==
-X-Received: by 2002:a17:90a:a897:b0:2e2:b64e:f506 with SMTP id 98e67ed59e1d1-2e5616e6fb2mr47298a91.13.1729192590517;
-        Thu, 17 Oct 2024 12:16:30 -0700 (PDT)
-Received: from ubuntu.worldlink.com.np ([27.34.65.170])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e55da3d512sm228127a91.41.2024.10.17.12.16.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2024 12:16:30 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 6/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dcbnl.c
-Date: Thu, 17 Oct 2024 19:16:16 +0000
-Message-ID: <20241017191620.33047-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241017185116.32491-1-kdipendra88@gmail.com>
-References: 
+	s=arc-20240116; t=1729192824; c=relaxed/simple;
+	bh=7lWdHql5SUu+8IwydD7nTStu28/fGPd9HlS22/z+zpo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rN+Fd+ZVSnqrgDcSkIOg66YPbK4Fdkou1fd9RpoQCgGEr0443gmkiHl8T5o6NaVR3mhcOS7k7ZgkxYaX+ljKvsftsoJTnK8ZhF/vDeaSBfr0CPAXJ1ZqtitjauEi4pZ/EqIumKq2CtypvmAt0iAl6o/92aqJRTR+VJCIhn4Y4CY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rtCnrJ5z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A9A5C4CEC3;
+	Thu, 17 Oct 2024 19:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729192823;
+	bh=7lWdHql5SUu+8IwydD7nTStu28/fGPd9HlS22/z+zpo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rtCnrJ5zpcRduumR1kHCrBBwwuh66+liYqiATRIoSH0suHVHaQwF94mIPzsaeK5OD
+	 3Z29sRICJOLskSBikFpE9gC7JzkDtxYi44GNwfDkYCEU16DI9z646xOB+J5YPfNgpm
+	 8smL1q/tiDF+zrdjET8VYAE2OjsbWY15PyagZsCCs0F08bLK1ib67o9/iSpPJTOTJ8
+	 5c0b0PbamOdqtz8Mva53L4w7t2DiGnNVhHVWWFHKYc4f7DDU0V2Epq6tQtR6hAOP7f
+	 glzeYU2S+hbY80L3H6WjDnxxEYilgV2EhnhF3xjOc+1+RMIdWN+z4JC4W/jr5mVsCw
+	 sOlcU6tiQHpiA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340463809A8A;
+	Thu, 17 Oct 2024 19:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,35 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-rc] rdma: Fix help information of 'rdma resource'
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172919282900.2582447.15957239975820790666.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Oct 2024 19:20:29 +0000
+References: <20241016093526.2106051-1-huangjunxian6@hisilicon.com>
+In-Reply-To: <20241016093526.2106051-1-huangjunxian6@hisilicon.com>
+To: Junxian Huang <huangjunxian6@hisilicon.com>
+Cc: larrystevenwise@gmail.com, leon@kernel.org, dsahern@gmail.com,
+ stephen@networkplumber.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org
 
-Add error pointer check after calling otx2_mbox_get_rsp().
+Hello:
 
-Fixes: 8e67558177f8 ("octeontx2-pf: PFC config support with DCBx")
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
----
-v4:
- - Changed Fixes commit has to 12 count.
-v3: https://lore.kernel.org/all/20241006164703.2177-1-kdipendra88@gmail.com/
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-index aa01110f04a3..294fba58b670 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
-@@ -315,6 +315,11 @@ int otx2_config_priority_flow_ctrl(struct otx2_nic *pfvf)
- 	if (!otx2_sync_mbox_msg(&pfvf->mbox)) {
- 		rsp = (struct cgx_pfc_rsp *)
- 		       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
-+		if (IS_ERR(rsp)) {
-+			err = PTR_ERR(rsp);
-+			goto unlock;
-+		}
-+
- 		if (req->rx_pause != rsp->rx_pause || req->tx_pause != rsp->tx_pause) {
- 			dev_warn(pfvf->dev,
- 				 "Failed to config PFC\n");
+On Wed, 16 Oct 2024 17:35:26 +0800 you wrote:
+> From: wenglianfa <wenglianfa@huawei.com>
+> 
+> 'rdma resource show cq' supports object 'dev' but not 'link', and
+> doesn't support device name with port.
+> 
+> Fixes: b0b8e32cbf6e ("rdma: Add CQ resource tracking information")
+> Signed-off-by: wenglianfa <wenglianfa@huawei.com>
+> Signed-off-by: Junxian Huang <huangjunxian6@hisilicon.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [iproute2-rc] rdma: Fix help information of 'rdma resource'
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=bea332466d29
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
