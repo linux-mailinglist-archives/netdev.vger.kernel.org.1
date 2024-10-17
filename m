@@ -1,114 +1,109 @@
-Return-Path: <netdev+bounces-136887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006CE9A37FD
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:06:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B836A9A3AD7
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:06:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 985181F23AF6
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 08:06:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6DFD1C20E20
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91BF18C91B;
-	Fri, 18 Oct 2024 08:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="E9wltJqq";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iPAq467j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5E0201001;
+	Fri, 18 Oct 2024 10:06:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F0B13C816;
-	Fri, 18 Oct 2024 08:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from cmccmta1.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA06200CB1;
+	Fri, 18 Oct 2024 10:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729238798; cv=none; b=SSs9yCSZ7+327yIdtegDxO/H3qhcJs1q7WHJNUS0xCsu87yS/cAQaKguaIRs3V1RRZqNCwiflR8F3Se0dCiYlGfbxI/K7+YGpeQ3Vm95FfuV+BxlUQ3xbKcN1fMFNkyAkjSyH+ty/yi5mUGlNdTxs1nkzuSwSCkPvAGYI38NpfM=
+	t=1729245975; cv=none; b=k2baaYHB+TjSnV6gBL0IKHLsBjR5BiLRghoWAfd/68mDs3dYOcodrxN2McbeURMklGxLIu7tzFjqh60OPw2K/gYhuMtQEhb0kJk5JYa3cE0m4ohcg+oG4+V11a+tArjTWL+zupFOzr6iILF74uvtSRWfa01vDD4+OLytXJv8Xjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729238798; c=relaxed/simple;
-	bh=ANf6BuYGKL8opnpub7chBIoyi0bE06rU2iYJHMT6R38=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:MIME-Version:
-	 Content-Type; b=ECPOqgOqEwR0ok5oAtxXRkjsm8UeHhIzD313FyCPw86DnflWFY4/P/NxYrbdTEWI2o6Pgyx9GZO0kTb94HgOe9foOnRA2yXYZxaZulbDLJxZofqu8+QfCOeJJIshtnNk8ky4bd2EKviYd16oZBBi7sdfTa7ixbbyTUcqN7oJ+Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=E9wltJqq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iPAq467j; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Anna-Maria Behnsen <anna-maria@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1729238795;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=9qhF6W1c/3/sG23aEO9tLagb3+CHQYJpHJvqkXIB/Ps=;
-	b=E9wltJqqE4fpTBnohMvI18TXh8lPPJ1Xtmu5Vy77l1LIB2eppmb7XTrSNgkqxY1J9iGgqY
-	deOgqo2bNx19ak+L55Px9Y/RlpgE9brajnjSPWAch6FhSgDdXA0XSXbigUYjFSoDA1KsiZ
-	dKPei3MRJhYXcAULfdZSikT4LhmtMgU8R9M4Oi4eL+Z9Aile6jBfvdzz+oYC0RK6Vg2KPC
-	9YE4ulAzTbxmThmqCQJV8lSNJ/lrVSaiVCgYpflQMZSBmx39XQRZgN2lEmgM0VYUOhCFX1
-	Vw6CZAE5hDi7XGzEKarvxVV3Zor6oqprypgIZgO3XRZwjK6ixSnNNUBkzWDlDg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1729238795;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to; bh=9qhF6W1c/3/sG23aEO9tLagb3+CHQYJpHJvqkXIB/Ps=;
-	b=iPAq467jfirDKuvqaYCqXV9px/5Hu6TKGIkeCKSsovGUgr3GHHObss64N8oXRTuUbh1ytG
-	POelUJ7DqUtCAHAA==
-To: Mark Brown <broonie@kernel.org>, Frederic Weisbecker
- <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Jonathan
- Corbet <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, "Rafael
- J. Wysocki" <rafael@kernel.org>, rust-for-linux@vger.kernel.org, Alice
- Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Miguel Ojeda <ojeda@kernel.org>, Andrew
- Morton <akpm@linux-foundation.org>, damon@lists.linux.dev,
- linux-mm@kvack.org, SeongJae Park <sj@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, linux-arch@vger.kernel.org, Heiner Kallweit
- <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Andy
- Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, Dwaipayan
- Ray <dwaipayanray1@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- netdev@vger.kernel.org, linux-sound@vger.kernel.org, Michael Ellerman
- <mpe@ellerman.id.au>, Nathan Lynch <nathanl@linux.ibm.com>,
- linuxppc-dev@lists.ozlabs.org, Mauro Carvalho Chehab <mchehab@kernel.org>,
- linux-media@vger.kernel.org, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Subject: Re: (subset) [PATCH v3 00/16] timers: Cleanup delay/sleep related mess
-In-Reply-To: <172892295715.1548.770734377772758528.b4-ty@kernel.org>
-Date: Fri, 18 Oct 2024 10:06:33 +0200
-Message-ID: <877ca5al86.fsf@somnus>
+	s=arc-20240116; t=1729245975; c=relaxed/simple;
+	bh=3iXNkN+muYWd12s6ZYLKS7emj/P3LYE6I00jYi0PHow=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Dz3fqn0Hd1RfwbxIJyRecc2qbClOuizhTnD1HObe8/e8dZ+Qlt9HyRq0+eBSaseYRZ0VGneltQilWjE8EnT+OMHKYYe+B1Cg0YIPZp/nfnLdAHWs8w1a0PEIj+j95qkoyA8x5LuRf1BHx8Mj9rjMFtDrZtOkwfVq22+RUoVnC64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app01-12001 (RichMail) with SMTP id 2ee16712330afd5-118e4;
+	Fri, 18 Oct 2024 18:06:02 +0800 (CST)
+X-RM-TRANSID:2ee16712330afd5-118e4
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from localhost.localdomain.localdomain (unknown[10.55.1.69])
+	by rmsmtp-syy-appsvr04-12004 (RichMail) with SMTP id 2ee46712330915d-b9138;
+	Fri, 18 Oct 2024 18:06:02 +0800 (CST)
+X-RM-TRANSID:2ee46712330915d-b9138
+From: Liu Jing <liujing@cmss.chinamobile.com>
+To: pablo@netfilter.org
+Cc: kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Liu Jing <liujing@cmss.chinamobile.com>
+Subject: [PATCH] selftests: netfilter: remove unused rplnlh parameter
+Date: Thu, 17 Oct 2024 15:25:34 +0800
+Message-Id: <20241017072534.127519-1-liujing@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Hi Mark,
+The rplnlh parameter is not used in many functions, so delete it.
 
-Mark Brown <broonie@kernel.org> writes:
+Signed-off-by: Liu Jing <liujing@cmss.chinamobile.com>
+---
+ tools/testing/selftests/net/netfilter/conntrack_dump_flush.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> On Mon, 14 Oct 2024 10:22:17 +0200, Anna-Maria Behnsen wrote:
->> a question about which sleeping function should be used in acpi_os_sleep()
->> started a discussion and examination about the existing documentation and
->> implementation of functions which insert a sleep/delay.
->> 
->> The result of the discussion was, that the documentation is outdated and
->> the implemented fsleep() reflects the outdated documentation but doesn't
->> help to reflect reality which in turns leads to the queue which covers the
->> following things:
->> 
->> [...]
->
-> Applied to
->
->    https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git for-next
->
+diff --git a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+index bd9317bf5ada..e03ddc60b5d4 100644
+--- a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
++++ b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+@@ -96,7 +96,6 @@ static int conntrack_data_insert(struct mnl_socket *sock, struct nlmsghdr *nlh,
+ 				 uint16_t zone)
+ {
+ 	char buf[MNL_SOCKET_BUFFER_SIZE];
+-	struct nlmsghdr *rplnlh;
+ 	unsigned int portid;
+ 	int err, ret;
+ 
+@@ -212,7 +211,7 @@ static int count_entries(const struct nlmsghdr *nlh, void *data)
+ static int conntracK_count_zone(struct mnl_socket *sock, uint16_t zone)
+ {
+ 	char buf[MNL_SOCKET_BUFFER_SIZE];
+-	struct nlmsghdr *nlh, *rplnlh;
++	struct nlmsghdr *nlh;
+ 	struct nfgenmsg *nfh;
+ 	struct nlattr *nest;
+ 	unsigned int portid;
+@@ -259,7 +258,7 @@ static int conntracK_count_zone(struct mnl_socket *sock, uint16_t zone)
+ static int conntrack_flush_zone(struct mnl_socket *sock, uint16_t zone)
+ {
+ 	char buf[MNL_SOCKET_BUFFER_SIZE];
+-	struct nlmsghdr *nlh, *rplnlh;
++	struct nlmsghdr *nlh;
+ 	struct nfgenmsg *nfh;
+ 	struct nlattr *nest;
+ 	unsigned int portid;
+-- 
+2.27.0
 
-Would it be ok for you, if the patch is routed through tip tree? kernel
-test robot triggers a warning for htmldoc that there is a reference to
-the no longer existing file 'timer-howto.rst':
 
-  https://lore.kernel.org/r/202410161059.a0f6IBwj-lkp@intel.com
 
-Thanks,
-
-	Anna-Maria
 
