@@ -1,184 +1,243 @@
-Return-Path: <netdev+bounces-136515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742789A1F7D
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:10:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D369A1F6C
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ED792891AE
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:10:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9C31C24930
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1651DA0FE;
-	Thu, 17 Oct 2024 10:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555AD1D958E;
+	Thu, 17 Oct 2024 10:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="TY/gR5yr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5bHAQ1v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6921DA109;
-	Thu, 17 Oct 2024 10:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAEA1CCB44
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 10:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729159792; cv=none; b=nXojA7L3TXvhIsQnAZhGD8hHdqa7pmKvmN1iINvvP534hzQCMue4+O7LrBkvv47usqoOsyvKtyDQg90anxydA1oyc2saOByJ5GIuUuL9JnCByXNsxcMUxCPJT8pZTPej+wS6gBxbf/M6p+lM2h5mbpLXvqRGrgHFpOgEKgMYLkA=
+	t=1729159623; cv=none; b=BzZkJn7I2fnJULaAGL8OiojpCiA7KpDGDAMN+iDMI4WHEiSuGb03xzxQufY5njFhAUDgOeJlgjp2SWfuTW0nW6vBjjzuSVh5C4b8Jf6XgGvxi/vDoPn9UO32Dkx7tHt1EnJCQUJc0cQcOR0RN/53CQOw0TR5foufRUvBNKDln+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729159792; c=relaxed/simple;
-	bh=+bhHXwcb55SnWiF8KaDD5/LiMHXYDze02UDytzKIZZw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nfiHB7HBD2CVpR5cMDoUNHrpZZTKhb8IYHyAp1U0Nf1FgtnfMTFAWOYc7cduQl8G+lVqur3TH3H1I5LcDjwj0ECPAkIp5CQ2+/hE8ilUcuzEhNFMZemdUMMfLu8V+YekzSnT4WId5eLohkI/jaZ/56zpzXxYxAZWXskVqVFq4RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=TY/gR5yr; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id 67F1D100009;
-	Thu, 17 Oct 2024 13:09:32 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1729159772; bh=YIV/RAinDIcXSNrlNeJ40M/saxtLocKX7l7RCOBaBMs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=TY/gR5yr9kFqEDR7u185e1fpuS6dOrN0VWtxKK+OLNJrTEeURJzFUZZxk12Hwe6X7
-	 Sxm8HYaA9GpE8zJ3zNDf9eGLfBLJ/rmGp6vmNtIXmMH10aAYb6CQFpc52hGhU2ip5t
-	 F4DucqmOPukENxNiutu3joLqvXxZG5KCURrC8SwEKzskZTDM5EmbAeyFS4WznvmGbw
-	 JIxxp4nusDpepsEcfRMyB9RNO5nU7x+Hw4CkDN4LuufToss2+PNeBSSrDRlugSciRS
-	 HC8DiLXSIMHDZwDAB6QCdgLa16f35SDtYoh08ZLLHtmFkBoR2YxzdzWW5sNwiWDtxh
-	 i1r9S27UT/+FQ==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Thu, 17 Oct 2024 13:08:30 +0300 (MSK)
-Received: from Comp.ta.t-argos.ru (172.17.44.124) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 17 Oct
- 2024 13:07:05 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Veerasenareddy Burru <vburru@marvell.com>, Abhijit Ayarekar
-	<aayarekar@marvell.com>, Satananda Burla <sburla@marvell.com>, Sathesh Edara
-	<sedara@marvell.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH net v5 2/2] octeon_ep: Add SKB allocation failures handling in __octep_oq_process_rx()
-Date: Thu, 17 Oct 2024 13:06:51 +0300
-Message-ID: <20241017100651.15863-3-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241017100651.15863-1-amishin@t-argos.ru>
-References: <20241017100651.15863-1-amishin@t-argos.ru>
+	s=arc-20240116; t=1729159623; c=relaxed/simple;
+	bh=YBkxxstuUuf5CLdZWYU59di/a9T0f/45jEPdXIIjQnA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lmhq/qo4z0wroBCYPz22NUzHwd1t6qF1JaKQNDHRjOh3PYqx6gW4E2bPdoDcKLmsWkT4407JblUhZ+jVMPMdhs1wz4mGutIzQTAi90JnbuxG8/9mPOqnZANViVQZCI70xM3x3wXiSqMx/9ok4HJ5seF8xXF2Eibx0pJgKec8BtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5bHAQ1v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BD0EC4CEC3;
+	Thu, 17 Oct 2024 10:07:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729159622;
+	bh=YBkxxstuUuf5CLdZWYU59di/a9T0f/45jEPdXIIjQnA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e5bHAQ1vwmQYbcHlq+dDEFuUA/WDDRObnFq7f1E1szmDJq63GJ3X9HsSWfbo+NOTN
+	 U6pEH0oUahvD0CLsbs9hqjzLF5dPGJto4ZaBGA0RuJFVI6aVTekIGWS3L6CGZo5/QY
+	 h40jab6SjO2/SFpOuoLYndl1f8O4KjylfawNA4q2rdeQlm1QGt+fJBbWsPZic+HAhQ
+	 hDVuOqjq69SpH1xL+TPRwyTyllE7PuY4KKyPxwedD0m2TIauxxpltJqcZ4oHddl7Xk
+	 V3J+Yy8poRbKDTBfuxvywwvXiPB8wop2ORpVE1DqyeAkLXjFvro92P6ldpQdSJXj7Y
+	 Jy8R+K0crQuqg==
+Date: Thu, 17 Oct 2024 11:06:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Dan Nowlin <dan.nowlin@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH iwl-next v2 1/2] ice: refactor "last" segment of DDP pkg
+Message-ID: <20241017100659.GD1697@kernel.org>
+References: <20241003001433.11211-4-przemyslaw.kitszel@intel.com>
+ <20241003001433.11211-5-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 188506 [Oct 17 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 39 0.3.39 e168d0b3ce73b485ab2648dd465313add1404cce, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1;mx1.t-argos.ru.ru:7.1.1;t-argos.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/10/17 09:58:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/10/17 05:21:00 #26765332
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003001433.11211-5-przemyslaw.kitszel@intel.com>
 
-build_skb() returns NULL in case of a memory allocation failure so handle
-it inside __octep_oq_process_rx() to avoid NULL pointer dereference.
+On Thu, Oct 03, 2024 at 02:10:31AM +0200, Przemek Kitszel wrote:
+> Add ice_ddp_send_hunk() that buffers "sent FW hunk" calls to AQ in order
+> to mark the "last" one in more elegant way. Next commit will add even
+> more complicated "sent FW" flow, so it's better to untangle a bit before.
+> 
+> Note that metadata buffers were not skipped for NOT-@indicate_last
+> segments, this is fixed now.
+> 
+> Minor:
+>  + use ice_is_buffer_metadata() instead of open coding it in
+>    ice_dwnld_cfg_bufs();
+>  + ice_dwnld_cfg_bufs_no_lock() + dependencies were moved up a bit to have
+>    better git-diff, as this function was rewritten (in terms of git-blame)
+> 
+> CC: Paul Greenwalt <paul.greenwalt@intel.com>
+> CC: Dan Nowlin <dan.nowlin@intel.com>
+> CC: Ahmed Zaki <ahmed.zaki@intel.com>
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-__octep_oq_process_rx() is called during NAPI polling by the driver. If
-skb allocation fails, keep on pulling packets out of the Rx DMA queue: we
-shouldn't break the polling immediately and thus falsely indicate to the
-octep_napi_poll() that the Rx pressure is going down. As there is no
-associated skb in this case, don't process the packets and don't push them
-up the network stack - they are skipped.
+Hi Przemek,
 
-Helper function is implemented to unmmap/flush all the fragment buffers
-used by the dropped packet. 'alloc_failures' counter is incremented to
-mark the skb allocation error in driver statistics.
+Some minor feedback from my side.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> ---
+> git: --inter-hunk-context=6
+> 
+> v2: fixed one kdoc warning
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ddp.c | 280 ++++++++++++-----------
+>  1 file changed, 145 insertions(+), 135 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> index 016fcab6ba34..a2bb8442f281 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> @@ -1210,6 +1210,127 @@ ice_aq_download_pkg(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
+>  	return status;
+>  }
+>  
+> +/**
+> + * ice_is_buffer_metadata - determine if package buffer is a metadata buffer
+> + * @buf: pointer to buffer header
+> + * Return: whether given @buf is a metadata one.
+> + */
+> +static bool ice_is_buffer_metadata(struct ice_buf_hdr *buf)
+> +{
+> +	return le32_to_cpu(buf->section_entry[0].type) & ICE_METADATA_BUF;
 
-Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
-Compile tested only.
+I see this is moving existing logic around.
+And I see that this is a no-op on LE systems.
+But it might be nicer to perform the byte-order conversion on the constant.
 
-v5:
-  - Update helper as suggested by Paolo
-    (https://lore.kernel.org/all/cf656975-69b4-427e-8769-d16575774bba@redhat.com/)
-v4: https://lore.kernel.org/all/20241012094950.9438-1-amishin@t-argos.ru/
-  - Split patch up as suggested by Jakub
-    (https://lore.kernel.org/all/20241004073311.223efca4@kernel.org/)
-v3: https://lore.kernel.org/all/20240930053328.9618-1-amishin@t-argos.ru/
-  - Optimize helper as suggested by Paolo
-    (https://lore.kernel.org/all/b9ae8575-f903-425f-aa42-0c2a7605aa94@redhat.com/)
-  - v3 has been reviewed-by Simon Horman
-    (https://lore.kernel.org/all/20240930162622.GF1310185@kernel.org/)
-v2: https://lore.kernel.org/all/20240916060212.12393-1-amishin@t-argos.ru/
-  - Implement helper instead of adding multiple checks for '!skb' and
-    remove 'rx_bytes' increasing in case of packet dropping as suggested
-    by Paolo
-    (https://lore.kernel.org/all/ba514498-3706-413b-a09f-f577861eef28@redhat.com/)
-v1: https://lore.kernel.org/all/20240906063907.9591-1-amishin@t-argos.ru/
+> +}
+> +
+> +/**
+> + * struct ice_ddp_send_ctx - sending context of current DDP segment
+> + * @hw: pointer to the hardware struct
+> + *
+> + * Keeps current sending state (header, error) for the purpose of proper "last"
+> + * bit settting in ice_aq_download_pkg(). Use via calls to ice_ddp_send_hunk().
 
- .../net/ethernet/marvell/octeon_ep/octep_rx.c | 27 +++++++++++++++++++
- 1 file changed, 27 insertions(+)
+setting
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-index a889c1510518..8af75cb37c3e 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-@@ -360,6 +360,27 @@ static void octep_oq_next_pkt(struct octep_oq *oq,
- 		*read_idx = 0;
- }
- 
-+/**
-+ * octep_oq_drop_rx() - Free the resources associated with a packet.
-+ *
-+ * @oq: Octeon Rx queue data structure.
-+ * @buff_info: Current packet buffer info.
-+ * @read_idx: Current packet index in the ring.
-+ * @desc_used: Current packet descriptor number.
-+ *
-+ */
-+static void octep_oq_drop_rx(struct octep_oq *oq,
-+			     struct octep_rx_buffer *buff_info,
-+			     u32 *read_idx, u32 *desc_used)
-+{
-+	int data_len = buff_info->len - oq->max_single_buffer_size;
-+
-+	while (data_len > 0) {
-+		octep_oq_next_pkt(oq, buff_info, read_idx, desc_used);
-+		data_len -= oq->buffer_size;
-+	};
-+}
-+
- /**
-  * __octep_oq_process_rx() - Process hardware Rx queue and push to stack.
-  *
-@@ -419,6 +440,12 @@ static int __octep_oq_process_rx(struct octep_device *oct,
- 		octep_oq_next_pkt(oq, buff_info, &read_idx, &desc_used);
- 
- 		skb = build_skb((void *)resp_hw, PAGE_SIZE);
-+		if (!skb) {
-+			octep_oq_drop_rx(oq, buff_info,
-+					 &read_idx, &desc_used);
-+			oq->stats.alloc_failures++;
-+			continue;
-+		}
- 		skb_reserve(skb, data_offset);
- 
- 		rx_bytes += buff_info->len;
--- 
-2.30.2
+> + */
+> +struct ice_ddp_send_ctx {
+> +	struct ice_hw *hw;
+> +/* private: only for ice_ddp_send_hunk() */
+> +	struct ice_buf_hdr *hdr;
+> +	int err;
+> +};
+> +
+> +/**
+> + * ice_ddp_send_hunk - send one hunk of data to FW
+> + * @ctx - current segment sending context
+> + * @hunk - next hunk to send, size is always ICE_PKG_BUF_SIZE
 
+Tooling seems to expect the following syntax.
+
+ * @ctx: ...
+ * @hunk: ...
+
+> + *
+> + * Send the next hunk of data to FW, retrying if needed.
+> + *
+> + * Notice: must be called once more with a NULL @hunk to finish up; such call
+> + * will set up the "last" bit of an AQ request. After such call @ctx.hdr is
+> + * cleared, @hw is still valid.
+> + *
+> + * Return: %ICE_DDP_PKG_SUCCESS if there were no problems; a sticky @err
+> + *         otherwise.
+> + */
+> +static enum ice_ddp_state ice_ddp_send_hunk(struct ice_ddp_send_ctx *ctx,
+> +					    struct ice_buf_hdr *hunk)
+
+...
+
+> +/**
+> + * ice_dwnld_cfg_bufs_no_lock
+> + * @ctx: context of the current buffers section to send
+> + * @bufs: pointer to an array of buffers
+> + * @start: buffer index of first buffer to download
+> + * @count: the number of buffers to download
+> + *
+> + * Downloads package configuration buffers to the firmware. Metadata buffers
+> + * are skipped, and the first metadata buffer found indicates that the rest
+> + * of the buffers are all metadata buffers.
+> + */
+> +static enum ice_ddp_state
+> +ice_dwnld_cfg_bufs_no_lock(struct ice_ddp_send_ctx *ctx, struct ice_buf *bufs,
+> +			   u32 start, u32 count)
+> +{
+> +	struct ice_buf_hdr *bh;
+> +	enum ice_ddp_state err;
+> +
+> +	if (!bufs || !count) {
+> +		ctx->err = ICE_DDP_PKG_ERR;
+> +		return ctx->err;
+> +	}
+> +
+> +	bufs += start;
+> +	bh = (struct ice_buf_hdr *)bufs;
+
+Again I see that, to some extent, this is moving existing logic around.
+But as bh is set in each loop iteration does it also need to be set here?
+
+> +
+> +	for (int i = 0; i < count; i++, bufs++) {
+> +		bh = (struct ice_buf_hdr *)bufs;
+> +		/* Metadata buffers should not be sent to FW,
+> +		 * their presence means "we are done here".
+> +		 */
+> +		if (ice_is_buffer_metadata(bh))
+> +			break;
+> +
+> +		err = ice_ddp_send_hunk(ctx, bh);
+> +		if (err)
+> +			return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * ice_get_pkg_seg_by_idx
+>   * @pkg_hdr: pointer to the package header to be searched
+
+...
+
+> @@ -1454,17 +1459,16 @@ ice_dwnld_sign_and_cfg_segs(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr,
+>  	}
+>  
+>  	count = le32_to_cpu(seg->signed_buf_count);
+> -	state = ice_download_pkg_sig_seg(hw, seg);
+> +	state = ice_download_pkg_sig_seg(ctx, seg);
+>  	if (state || !count)
+>  		goto exit;
+>  
+>  	conf_idx = le32_to_cpu(seg->signed_seg_idx);
+>  	start = le32_to_cpu(seg->signed_buf_start);
+>  
+> -	state = ice_download_pkg_config_seg(hw, pkg_hdr, conf_idx, start,
+> -					    count);
+> -
+> +	return ice_download_pkg_config_seg(ctx, pkg_hdr, conf_idx, start, count);
+
+This changes the conditions under which this function sets
+ctx->err, which is then changed again by the following patch.
+Is that intentional?
+
+>  exit:
+> +	ctx->err = state;
+>  	return state;
+>  }
+
+...
 
