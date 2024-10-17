@@ -1,74 +1,80 @@
-Return-Path: <netdev+bounces-136439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6946B9A1C16
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:57:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FBAF9A1C8E
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2762228997B
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 07:57:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92ABAB2734F
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BCF1D1E64;
-	Thu, 17 Oct 2024 07:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802F71D3194;
+	Thu, 17 Oct 2024 08:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ZOpD3ak3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzV7CLmf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8084B1CDFA3
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 07:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED25B1D2F62
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 08:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729151817; cv=none; b=uzhOiOapF80fFJtIGapTzRLX/kuZpzVm40LJ0vxhR9cHbo1wr+S2IS5QmxQShWeshfA0jWicNEo/1YeRWX3MHHtcbAZz61KZA9u+5lTXwUejv3xUd6nksFrhXJRSP0LKFZtQwgfYPBQRbdqBVEd3Ew4bDxk0IEqhFcG5Uz2nL5s=
+	t=1729152262; cv=none; b=kW2ynEFuuv7qZNXS4NqZrViwg36dzozcgw8BeNlHy6+hTqqR4oirikP4GMh7jOzNRzFny3SstS4wnr3fhhMOTEFtmBI3RVEkQxl18NIzEntihGwfjaZSLtyZbDTBOtMbHHPD5ok73gW4QyItFo/0zuuRXdWEzZtb8DhvQe5RDGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729151817; c=relaxed/simple;
-	bh=LeMQF2sFlDmaRyjomEJWKN/yS9Hkx5TlIwL5RqL9+2Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jMhzjngvZnwUhZwVJErwYr1sG1DzLeQ+17PIHftlicLv3tdh9/GJUr7JiD71obaPFb1mFVWpm5GvXLTsjpBP+soTQd7UgulGATK84OrNX5Ii+vteqwTGT1WSYvJ8LOpZO+H+RTeF0c+IskjPTdT5v6Ne8rdI31t6V28MR7tPSFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ZOpD3ak3; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-430576ff251so6537865e9.0
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 00:56:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1729151812; x=1729756612; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=y/rTfYOYXtcL3NaveLZQOsVTZ7xFjeiUA02E/0hWcpg=;
-        b=ZOpD3ak3BCJsXWhfBZ7Zlgh63oIxR8cqF+nykH1VHOVPNtu5atZW05U4cpmeE9xZc8
-         F1NTHjsXTDGFlJux4xVyCfjJwUftm3hPTpBrZGRqCDx18Tyjj8risvkbTbWbRG1Lt15f
-         m1zt6ReQLXuN+kilOQSM4T9+TFlAMxJtuxoOIRAWkEnb4yYcw4SDSVRXoch5S+trTCKi
-         xdgrzjntASg7jdswkXpz1jR5bvTpo8DDyHd2NyiIhKj75hC9YlKaJt4QYoX6Y+0Ia3cr
-         Tw0ZxkWH549wN++qSYEvGNKapJVhcAOc4brLp+4n8P1YQuxb+3vR4K0UiYo8wwiCcI56
-         pw7Q==
+	s=arc-20240116; t=1729152262; c=relaxed/simple;
+	bh=gtaBUmgxl2HdEconv9lj1dXNVhYyJlwHFuoeJGtu7m4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=eufk0aNG7Z9jMAF/i6yaf6THc0aiDX/38HJcsbFkePTk174koOlLWXs65WSeaqWGCm3quYgngfRRxi5AlbIBfb3canzdBDfG1CnxTFg4QxnwXBr8Isu0LxGhJ/V7inmnJZDWrSzw7FwZUWq4tbxnLHR7FTSm/ZMBNj6nd8Uo1pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DzV7CLmf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729152259;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZO8UCuKbSZt+/BzvbR8aK7OxMm4lkhtuT9Fr8MXR7Uk=;
+	b=DzV7CLmfm6VmFqJssE4euGq2IDtta+nC30NBPj6xBRc04PqdjOoOlUBEq3TqcGm0mKAK2a
+	EwwOm/m1nGpjZKU7D7dPPSJ2+VEKBUbNuwu07IBjnuqHiLfMi7u8jKLzKfYWxMqRnletsb
+	+X5MbGeN5QsdjPz4qM+g64TD85kvB2s=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-202-cVjK1GSpNRGwZE6t8sksYw-1; Thu, 17 Oct 2024 04:04:17 -0400
+X-MC-Unique: cVjK1GSpNRGwZE6t8sksYw-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-539ea0fcd4bso467919e87.2
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 01:04:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729151812; x=1729756612;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y/rTfYOYXtcL3NaveLZQOsVTZ7xFjeiUA02E/0hWcpg=;
-        b=Sow7YS0j123GpxhiGlbu2JclbducCPTgW9jITFhfH3b/oyNHdLwULgftFIgOTMT+In
-         TqQQSuBWv38uEy7tjKWrRWUH7abm0Cd5W3g0SIdfIFCkEhYuOYnpxFX5qZjAHiSGOeFB
-         UHYCYh1UwTIXdj7dqJcZJh2CwrnEDTH1Rymm/ctXi2k1siitdK18fN8/AplI13VNhtD6
-         d3sgVqa0mLH2/TLoMnu32Wb5akN+huGFjCKL4I6XWgoZ8tVXttnprxzM1kURVZG1EBW/
-         TUQff2bHAaU67dR5OBkOeObsYCH3aa32P89G2EqOP7tOibD4jyUZvNRofvYpC/qSCLdJ
-         jfJw==
-X-Gm-Message-State: AOJu0YzQ5CpJmXHvm0liOtwlQVtJWddBRgmxR6Olns5hxby6bGjUPznV
-	NnXLi2GTpYSczyULLQWzSBrelMxI06Ty/c2wDDfI6k1XhvpgYYKQwjp7yZ3DBy4=
-X-Google-Smtp-Source: AGHT+IHMW7wK0jw0Eqvlr2MnIiwP3BToh8kiTRm+CSXGNU/Ho41fPMwC7+n32MetigPZzVnD3588Dg==
-X-Received: by 2002:a05:600c:4c94:b0:431:52b7:a485 with SMTP id 5b1f17b1804b1-43152b7a7e3mr33361755e9.19.1729151811727;
-        Thu, 17 Oct 2024 00:56:51 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:bf6c:6ec4:d449:2088? ([2001:67c:2fbc:1:bf6c:6ec4:d449:2088])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43158c38b39sm17728305e9.6.2024.10.17.00.56.50
+        d=1e100.net; s=20230601; t=1729152256; x=1729757056;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZO8UCuKbSZt+/BzvbR8aK7OxMm4lkhtuT9Fr8MXR7Uk=;
+        b=U5xvQgiER74dhgrsMOQh18O4FzPFT+ijzBqD4CNbC9LAClMvZxtwfodAP6nOxg75GD
+         HxNdC/ptSmh7hSRuOJCGKpWtSkROpLXBDKiceSGAp61Pzq4mkUNxJGngcIq+OXDVAPis
+         Uh90uV78Ciu6WvHkZgbIHsKdg3z2bppzLwdhII+grw644V18J4CO6bCyPB14022uz8ZV
+         g5P4n4lFH5JiU5zIpAyfhylw16Zc6psJVsaZ1FeZJ6epoSARKKueVhWiMvTs+lCONPv1
+         sDU5KNWOC6AQDva0Y8xBp0kAGmrqnzGrr8KwcZyqbRKEYLOzKdAVOkQ4CEUT0PHLqOk7
+         pXMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8DRxGOklfJAagg80h7lt1r+/5D9cp2NZIj6e9gw2wY/ZoAGKVGlWlNJRwubGMg7JqMGs74Pg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yym2ByAcD5LrKq1LQoI1jcyVBIJc9uOeM+hvv+5zhwv9f+61+9p
+	OS3ENMf2GDRdwRXq5DqGpdxiZ3JyfveOv9k5f/GoiErTG3ayS1VmjoYUW8tP4gR3Tw38nYzgEKc
+	26VWukhnrWc6zQ4NUz+4gef20IaZ4TSskgKGrAk0TZ3vbRRY/nxmCzg==
+X-Received: by 2002:a05:6512:33c8:b0:53a:bb7:ed77 with SMTP id 2adb3069b0e04-53a0bb7ee58mr1677323e87.14.1729152255772;
+        Thu, 17 Oct 2024 01:04:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBPfQRYMHFp3GTkkzKGNINwnC6QE2O6rfOaHgOQa9hVwPABw61gd5NSheFE2souMGZG1P13w==
+X-Received: by 2002:a05:6512:33c8:b0:53a:bb7:ed77 with SMTP id 2adb3069b0e04-53a0bb7ee58mr1677302e87.14.1729152255318;
+        Thu, 17 Oct 2024 01:04:15 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43158c4dc29sm17967385e9.36.2024.10.17.01.04.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2024 00:56:51 -0700 (PDT)
-Message-ID: <17a138ee-bdf8-467d-8f48-17e8a42d1ce2@openvpn.net>
-Date: Thu, 17 Oct 2024 09:56:58 +0200
+        Thu, 17 Oct 2024 01:04:14 -0700 (PDT)
+Message-ID: <53cd75e3-79c3-42ed-9fb5-4d7258d9bffb@redhat.com>
+Date: Thu, 17 Oct 2024 10:04:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,109 +82,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 23/23] testing/selftest: add test tool and
- scripts for ovpn module
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- openvpn-devel@lists.sourceforge.net, linux-kselftest@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>
-References: <20241016-b4-ovpn-v9-0-aabe9d225ad5@openvpn.net>
- <20241016-b4-ovpn-v9-23-aabe9d225ad5@openvpn.net>
- <a86855c4-3724-43e8-9bdf-fb53743cd723@linuxfoundation.org>
+Subject: Re: [PATCH v1 RESEND] net: sfp: change quirks for Alcatel Lucent
+ G-010S-P
+To: Shengyu Qu <wiagn233@outlook.com>, linux@armlinux.org.uk, andrew@lunn.ch,
+ hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <TYCPR01MB84373677E45A7BFA5A28232C98792@TYCPR01MB8437.jpnprd01.prod.outlook.com>
 Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <a86855c4-3724-43e8-9bdf-fb53743cd723@linuxfoundation.org>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <TYCPR01MB84373677E45A7BFA5A28232C98792@TYCPR01MB8437.jpnprd01.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16/10/2024 23:14, Shuah Khan wrote:
-> On 10/15/24 19:03, Antonio Quartulli wrote:
->> The ovpn-cli tool can be compiled and used as selftest for the ovpn
->> kernel module.
->>
->> It implements the netlink API and can thus be integrated in any
->> script for more automated testing.
->>
->> Along with the tool, 2 scripts are added that perform basic
->> functionality tests by means of network namespaces.
->>
->> The scripts can be performed in sequence by running run.sh
->>
->> Cc: shuah@kernel.org
->> Cc: linux-kselftest@vger.kernel.org
->> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+On 10/11/24 19:39, Shengyu Qu wrote:
+> Seems Alcatel Lucent G-010S-P also have the same problem that it uses
+> TX_FAULT pin for SOC uart. So apply sfp_fixup_ignore_tx_fault to it.
 > 
-> I almost gave my Reviewed-by when I saw the very long argument parsing
-> in the main() - please see comment below under main().
-> 
-> Let's simply the logic using getopt() - it is way too long and
-> complex.
-> 
+> Signed-off-by: Shengyu Qu <wiagn233@outlook.com>
+It would be great if a 3rd party could actually test this.
 
-[...]
+Leaving the patch pending a little more for such goal.
 
-> 
-> This is loooong arguments parsing. What's the reason to not use getopt()
-> Doesn't it simplify all ofthie logic?
-> 
-> I would like to see it simplified for maintainability.
+Thanks,
 
-This tool was originally very simple...then...this happened :-D
-
-I agree getopt() could help making this whole function easier to read 
-and maintain.
-
-I will include this change in v10.
-
-Thanks!
-
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+Paolo
 
 
