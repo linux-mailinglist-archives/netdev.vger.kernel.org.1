@@ -1,110 +1,100 @@
-Return-Path: <netdev+bounces-136454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBAF9A1C8E
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:08:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A833A9A1C9C
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:10:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92ABAB2734F
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:08:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 610CA1F272D8
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802F71D3194;
-	Thu, 17 Oct 2024 08:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3290A1D799E;
+	Thu, 17 Oct 2024 08:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzV7CLmf"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="c1Vu56Og"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED25B1D2F62
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 08:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5F71D7E47;
+	Thu, 17 Oct 2024 08:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729152262; cv=none; b=kW2ynEFuuv7qZNXS4NqZrViwg36dzozcgw8BeNlHy6+hTqqR4oirikP4GMh7jOzNRzFny3SstS4wnr3fhhMOTEFtmBI3RVEkQxl18NIzEntihGwfjaZSLtyZbDTBOtMbHHPD5ok73gW4QyItFo/0zuuRXdWEzZtb8DhvQe5RDGU=
+	t=1729152372; cv=none; b=ZaDhi+hs9T/FgS3qv26jZ7iEh/EJEBp81j0fWhbbHQl7NCl+3WemT9d1cormpXpfldh9f9rjWaTb5Dp44qLZS3RVQfV3ErYiH1jZvWraek4A8772PMU4mCwOykVrp63ZTqsBknGwT1Sg2hWWqhMH0Xf4oo9ggLhDyJnNBdlnWI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729152262; c=relaxed/simple;
-	bh=gtaBUmgxl2HdEconv9lj1dXNVhYyJlwHFuoeJGtu7m4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eufk0aNG7Z9jMAF/i6yaf6THc0aiDX/38HJcsbFkePTk174koOlLWXs65WSeaqWGCm3quYgngfRRxi5AlbIBfb3canzdBDfG1CnxTFg4QxnwXBr8Isu0LxGhJ/V7inmnJZDWrSzw7FwZUWq4tbxnLHR7FTSm/ZMBNj6nd8Uo1pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DzV7CLmf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729152259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZO8UCuKbSZt+/BzvbR8aK7OxMm4lkhtuT9Fr8MXR7Uk=;
-	b=DzV7CLmfm6VmFqJssE4euGq2IDtta+nC30NBPj6xBRc04PqdjOoOlUBEq3TqcGm0mKAK2a
-	EwwOm/m1nGpjZKU7D7dPPSJ2+VEKBUbNuwu07IBjnuqHiLfMi7u8jKLzKfYWxMqRnletsb
-	+X5MbGeN5QsdjPz4qM+g64TD85kvB2s=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-202-cVjK1GSpNRGwZE6t8sksYw-1; Thu, 17 Oct 2024 04:04:17 -0400
-X-MC-Unique: cVjK1GSpNRGwZE6t8sksYw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-539ea0fcd4bso467919e87.2
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 01:04:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729152256; x=1729757056;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZO8UCuKbSZt+/BzvbR8aK7OxMm4lkhtuT9Fr8MXR7Uk=;
-        b=U5xvQgiER74dhgrsMOQh18O4FzPFT+ijzBqD4CNbC9LAClMvZxtwfodAP6nOxg75GD
-         HxNdC/ptSmh7hSRuOJCGKpWtSkROpLXBDKiceSGAp61Pzq4mkUNxJGngcIq+OXDVAPis
-         Uh90uV78Ciu6WvHkZgbIHsKdg3z2bppzLwdhII+grw644V18J4CO6bCyPB14022uz8ZV
-         g5P4n4lFH5JiU5zIpAyfhylw16Zc6psJVsaZ1FeZJ6epoSARKKueVhWiMvTs+lCONPv1
-         sDU5KNWOC6AQDva0Y8xBp0kAGmrqnzGrr8KwcZyqbRKEYLOzKdAVOkQ4CEUT0PHLqOk7
-         pXMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8DRxGOklfJAagg80h7lt1r+/5D9cp2NZIj6e9gw2wY/ZoAGKVGlWlNJRwubGMg7JqMGs74Pg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym2ByAcD5LrKq1LQoI1jcyVBIJc9uOeM+hvv+5zhwv9f+61+9p
-	OS3ENMf2GDRdwRXq5DqGpdxiZ3JyfveOv9k5f/GoiErTG3ayS1VmjoYUW8tP4gR3Tw38nYzgEKc
-	26VWukhnrWc6zQ4NUz+4gef20IaZ4TSskgKGrAk0TZ3vbRRY/nxmCzg==
-X-Received: by 2002:a05:6512:33c8:b0:53a:bb7:ed77 with SMTP id 2adb3069b0e04-53a0bb7ee58mr1677323e87.14.1729152255772;
-        Thu, 17 Oct 2024 01:04:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHBPfQRYMHFp3GTkkzKGNINwnC6QE2O6rfOaHgOQa9hVwPABw61gd5NSheFE2souMGZG1P13w==
-X-Received: by 2002:a05:6512:33c8:b0:53a:bb7:ed77 with SMTP id 2adb3069b0e04-53a0bb7ee58mr1677302e87.14.1729152255318;
-        Thu, 17 Oct 2024 01:04:15 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-22-245.dyn.eolo.it. [146.241.22.245])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43158c4dc29sm17967385e9.36.2024.10.17.01.04.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2024 01:04:14 -0700 (PDT)
-Message-ID: <53cd75e3-79c3-42ed-9fb5-4d7258d9bffb@redhat.com>
-Date: Thu, 17 Oct 2024 10:04:12 +0200
+	s=arc-20240116; t=1729152372; c=relaxed/simple;
+	bh=6pcCCpe8Vn1r9JfblpBBw9bgqc9ZlKKQPhCtJn1Um0Y=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QQlVUY7JHMPc6hJ+IqurV2/y6xSYlPiqBJizwTbwiBLr7X7OFSPrXspxOcfUVoo2fSGBcRxHDt94EWYVSMV4UwIfwLEUFs/XQQ2EV6KFZYqOw5NedZ+nhTqOQhAAvuSvB2ZoymuhxXw092VM8zRHtwDnvVdlW/IVBsDm8Eko47U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=c1Vu56Og; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=6pcCCpe8Vn1r9JfblpBBw9bgqc9ZlKKQPhCtJn1Um0Y=;
+	t=1729152370; x=1730361970; b=c1Vu56OgEaxDf7Qfh4ZopfRvWW8sges9Cb+nrrmdpZBlmaY
+	WcbZ81ZKdpp84huy4g77r5oc1EOfP7PVPyjRME2FmuDa/lWSjuvUNxXTrOS99iS2YPlbYmzyj7rns
+	q20/ytY+DYHhA81x5ssOY5QrwJIv7MW1t+G2Dj9NEH74FWl2YEerI0RveRzT4X+VrBhJi+PDH+1Qx
+	1yE30Q1vkPOfLjPCUk2zrBJ5vjzKN54GCkJdGWC4jZ1MeKRygKYtZK8ykiimPlaRHfLW4PjGFnz+4
+	4a4xIBW9vWcOMXwzFk87RXSFG5jv3pCHzLbqq9j5c+A+8d/mHJ/3rm5Iecf5CliQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1t1LWI-0000000Dnhb-3AtF;
+	Thu, 17 Oct 2024 10:06:06 +0200
+Message-ID: <a4e27207087bc94ce120a1e1c54742f97c9ad046.camel@sipsolutions.net>
+Subject: Re: [PATCH v1 wl-next 1/3] wifi: wext: Move wext_nlevents to
+ net->gen[].
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexandre.ferrieux@gmail.com, kuni1840@gmail.com, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Date: Thu, 17 Oct 2024 10:06:06 +0200
+In-Reply-To: <20241016235850.29495-1-kuniyu@amazon.com>
+References: 
+	<f677361da9e1e4bb032e62301255ab705252e016.camel@sipsolutions.net>
+	 <20241016235850.29495-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 RESEND] net: sfp: change quirks for Alcatel Lucent
- G-010S-P
-To: Shengyu Qu <wiagn233@outlook.com>, linux@armlinux.org.uk, andrew@lunn.ch,
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <TYCPR01MB84373677E45A7BFA5A28232C98792@TYCPR01MB8437.jpnprd01.prod.outlook.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <TYCPR01MB84373677E45A7BFA5A28232C98792@TYCPR01MB8437.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 
-On 10/11/24 19:39, Shengyu Qu wrote:
-> Seems Alcatel Lucent G-010S-P also have the same problem that it uses
-> TX_FAULT pin for SOC uart. So apply sfp_fixup_ignore_tx_fault to it.
-> 
-> Signed-off-by: Shengyu Qu <wiagn233@outlook.com>
-It would be great if a 3rd party could actually test this.
+On Wed, 2024-10-16 at 16:58 -0700, Kuniyuki Iwashima wrote:
+>=20
+> Btw, why WEXT cannot be module ?
 
-Leaving the patch pending a little more for such goal.
+TBH, I don't remember well. I feel like I may have tried ~20 years ago,
+but hit issues, and just made the built-in parts minimal. Might've been
+we didn't have net->gen yet (did we? I don't recall), but I wouldn't be
+surprised if there are other issues with it as well with ioctl linkage
+and /proc and whatever else it does.
 
-Thanks,
+Not sure it's worth trying, WEXT really ought to be on the way out now,
+and with WiFi7 (and higher) devices it's completely disabled.
 
-Paolo
 
+
+Btw, if you really wanted to, I suspect you _could_ use net->gen[], make
+the .size only a pointer size and then allocate the real data only if a
+wireless capable device shows up in the namespace? Then that'd actually
+be a win (vs. the other discussion we just had above) since wireless
+devices are probably almost never in a netns. Not sure you'd be able to
+easily free it when the last wifi capable devices leaves a netns, but
+that probably also doesn't matter.
+
+I don't know though how much the size of the netns matters for the
+scalability issue you have in mind, seems the O(N) time behaviour here
+is more problematic than a handful of bytes.
+
+johannes
 
