@@ -1,92 +1,137 @@
-Return-Path: <netdev+bounces-136605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA869A249F
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:12:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 109C09A24BC
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8568B1C25596
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:12:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70603B21F4F
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C047C1DE4CA;
-	Thu, 17 Oct 2024 14:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CC81DE3A4;
+	Thu, 17 Oct 2024 14:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KfWEeMq4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iEFDhw4Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED161DDA39
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 14:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888781DDA24;
+	Thu, 17 Oct 2024 14:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729174226; cv=none; b=YxTlgeX7fb7KxEvxxc6TnUBw8DzOqQDZ1SDwVY44FMcsSngNt2b8TFHMPRrwxEpTD56suP1xvedDZO8T3NwpSCWcn6n940N8m2OJE5MPJi9nLOiD1jKKEv04VhAFbldrtxBGdGyoPLSMiAjUMgjmPpBRdY+bE57hzev5uI21UhU=
+	t=1729174590; cv=none; b=i2MPPzyruRW5pDzrA8XlU0v5jp15UmIAwMB1RKDeCfjFQmyjG7+dmHXLDTLLtl09IwDbfXveYtDvh/uHWa3lF2PuZMguq7unr3sLf0UkB2ZunzRLmLd5LLSLVd9JXUwJKrIZmv2AS+q+RVgnEg/x5Mmei6tD/EWSx+smmLR9JD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729174226; c=relaxed/simple;
-	bh=48mkEYsKPXARWbX5mxqgcg6pF32D4Igwmby21c8YqX4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YVTBIVFttZ37byTQbQyPp+TiQ/SiXJq2vc7sJyeD6sGorSOvFijJBckFAq2jyE+aloao8BRZ6+S2qZwZJdZIOwk7fExgr9kEzH6MCDYz85uVyjPKpaxcPoDTPD6JzFjkVgFdwzj5iAQRTPDFDtH1T1KTARGwGKgKYw9LR5pyUho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfWEeMq4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F2CC4CEC7;
-	Thu, 17 Oct 2024 14:10:25 +0000 (UTC)
+	s=arc-20240116; t=1729174590; c=relaxed/simple;
+	bh=Gjd358NdN1FC5NF7qKwHKj4oavoCBNSLL7Qo72hpwmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GCfuPosRpklPAqmnXPtvY49bzCcrIqcOMUVdKEVuMjZIgcJ7i7k2bWwh6k4IScTfRvG1ZOjgX95wV8fwuvaPE1d9H6+s6Iota2OmWNMCYux49achDELZ7idIRPo4eEVATrIaq7VpO2gCyxezbfE6p/8XL6w9txbzye3GsVgM+2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iEFDhw4Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B259DC4CEC3;
+	Thu, 17 Oct 2024 14:16:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729174225;
-	bh=48mkEYsKPXARWbX5mxqgcg6pF32D4Igwmby21c8YqX4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KfWEeMq4dUAF6gIGcBHXLYSg15JyJpouL0uhqF9Ns4CDxk7/DJD6jdtJ2PWgFnx1H
-	 o1nptMpIFypeZ2ftAWpcjurYGMmTVbkz8ArYsgeNX3BnTgGczZwh2c41EGWUe6owfJ
-	 9fFKlM4pj6eAr0r73pnu6CABC4/2uGzIqkrHXMPzfitaxKPxNEChOfxUMp6s3ftHJp
-	 IN26kgd3YtFTBUD9Kpj6ejTYGztSIuv4k08jDXcCnSkTWFwTvjxjldwe5UoOimPY1O
-	 rvsZrZai+aLa3JRK7iLapE+0ll1dSsfMjeNeXsL19FuFoLltaihn+ZUzNFQdDH2GrZ
-	 phSYId5wyJCYg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCF03809A8A;
-	Thu, 17 Oct 2024 14:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1729174590;
+	bh=Gjd358NdN1FC5NF7qKwHKj4oavoCBNSLL7Qo72hpwmg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iEFDhw4QSPb/UP/iSVNDln8sDERMgECcDFGfbozJO3x3fYWOcTwHktH1Uy3TSilNx
+	 Lfh8vIZGIdwI5sNQMzGUS2LBtAybjWYldLWUX+79J27rI+eg1aKNZVinfvTDVrBVTk
+	 /tdSYD2SpNSTPK32H6D8gLsU92p72IN3v/TZEXSClLKu1rGBaycEzBl1+6MsaZ2qTI
+	 Qaw7iE25YEG7seXmuo0c3PYZ7s5VjuLIAwzjai9VgZl+4R6DrwsNx8p2D6SfvIMJDI
+	 cND52m8HtNrqHT+h1CghLurFWm6PukkfadjY0rg4OwVDfVJid2tG10ClYkZcyDbcG/
+	 2qvzQoztLzu+Q==
+Date: Thu, 17 Oct 2024 15:16:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Yue Haibing <yuehaibing@huawei.com>, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, vedang.patel@intel.com,
+	andre.guedes@intel.com, maciej.fijalkowski@intel.com,
+	jithu.joseph@intel.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net] igc: Fix passing 0 to ERR_PTR in
+ igc_xdp_run_prog()
+Message-ID: <20241017141624.GO1697@kernel.org>
+References: <20241016105310.3500279-1-yuehaibing@huawei.com>
+ <20241016185333.GL2162@kernel.org>
+ <8e4ef7f6-1d7d-45dc-b26e-4d9bc37269de@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: realtek: merge the drivers for internal
- NBase-T PHY's
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172917423052.2482559.8249995086553964074.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Oct 2024 14:10:30 +0000
-References: <c57081a6-811f-4571-ab35-34f4ca6de9af@gmail.com>
-In-Reply-To: <c57081a6-811f-4571-ab35-34f4ca6de9af@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, linux@armlinux.org.uk, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8e4ef7f6-1d7d-45dc-b26e-4d9bc37269de@intel.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 15 Oct 2024 07:47:14 +0200 you wrote:
-> The Realtek RTL8125/RTL8126 NBase-T MAC/PHY chips have internal PHY's
-> which are register-compatible, at least for the registers we use here.
-> So let's use just one PHY driver to support all of them.
-> These internal PHY's exist also as external C45 PHY's, but on the
-> internal PHY's no access to MMD registers is possible. This can be
-> used to differentiate between the internal and external version.
+On Wed, Oct 16, 2024 at 04:06:34PM -0700, Jacob Keller wrote:
 > 
-> [...]
+> 
+> On 10/16/2024 11:53 AM, Simon Horman wrote:
+> > On Wed, Oct 16, 2024 at 06:53:10PM +0800, Yue Haibing wrote:
+> >> Return NULL instead of passing to ERR_PTR while res is IGC_XDP_PASS,
+> >> which is zero, this fix smatch warnings:
+> >> drivers/net/ethernet/intel/igc/igc_main.c:2533
+> >>  igc_xdp_run_prog() warn: passing zero to 'ERR_PTR'
+> >>
+> >> Fixes: 26575105d6ed ("igc: Add initial XDP support")
+> >> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> >> ---
+> >>  drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> >> index 6e70bca15db1..c3d6e20c0be0 100644
+> >> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> >> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> >> @@ -2530,7 +2530,7 @@ static struct sk_buff *igc_xdp_run_prog(struct igc_adapter *adapter,
+> >>  	res = __igc_xdp_run_prog(adapter, prog, xdp);
+> >>  
+> >>  out:
+> >> -	return ERR_PTR(-res);
+> >> +	return res ? ERR_PTR(-res) : NULL;
+> > 
+> > I think this is what PTR_ERR_OR_ZERO() is for.
+> 
+> Not quite. PTR_ERR_OR_ZERO is intended for the case where you are
+> extracting an error from a pointer. This is converting an error into a
+> pointer.
 
-Here is the summary with links:
-  - [net-next] net: phy: realtek: merge the drivers for internal NBase-T PHY's
-    https://git.kernel.org/netdev/net-next/c/f87a17ed3b51
+Yes, silly me.
 
-You are awesome, thank you!
+> I am not sure what is really expected here. If res is zero, shouldn't we
+> be returning an skb pointer and not NULL?
+
+Right. I think the whole point of the cited warning is that it highlights
+code that is often buggy. I think I may have tried to address it in the
+past, but if so unsuccessfully. In any case, I do think it would be good to
+dig into this and either fix it properly (or understand why it is correct
+and note that somewhere.
+
+> 
+> Why does igc_xdp_run_prog even return a sk_buff pointer at all? It never
+> actually returns an skb...
+> 
+> This feels like the wrong fix entirely.
+> 
+> __igc_xdp_run_prog returns a custom value for the action, between
+> IGC_XDP_PASS, IGC_XDP_TX, IGC_XDP_REDIRECT, or IGC_XDP_CONSUMED.
+> 
+> This function is called by igc_xdp_run_prog which converts this to a
+> negative error code with the sk_buff pointer type.
+> 
+> All so that we can assign a value to the skb pointer in
+> ice_clean_rx_irq, and check it with IS_ERR
+> 
+> I don't like this fix, I think we could drop the igc_xdp_run_prog
+> wrapper, call __igc_xdp_run_prog directly and check its return value
+> instead of this method of using an error pointer.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: changes-requested
 
