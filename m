@@ -1,115 +1,100 @@
-Return-Path: <netdev+bounces-136599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D52A9A2471
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:02:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086689A2472
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 426A82863EB
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 298CA1C22997
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3872B1DDC11;
-	Thu, 17 Oct 2024 14:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81361DE2CF;
+	Thu, 17 Oct 2024 14:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fo+eB0Hv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nC55YWZx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C8639FE5
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 14:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1991DDA39
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 14:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729173724; cv=none; b=NUdFrpojRshj6OsPOKTf6c+Wbb5fY3wQavj0K+UONEZMOH51/ZLdm88R4Lys07Pxfms8NdZnmymoxeFD9Vw24fFTdUluddBfdFliM+YZssu/XQWbTIicG1FhvTEAN7lIXtpquVXT4YDgGY9qHsqyntiRkFcOG3zLZ4j/10HoeTI=
+	t=1729173792; cv=none; b=Wa98lYrb28xwRv1lvrovg0KXrDnoeQXezPHKW1DlaG9Uva+MjyTYYrCDWKj5RrHuQcECiQv4RCkX8G1mUkpV6CvKHixPLFjXEqvuy/dJYIU3d4PbOKPudSC4/SubINGp8ZqGCcSuGCJA2ZnpMBHmfhddNygb1ichAi7L+ugQcpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729173724; c=relaxed/simple;
-	bh=pLt4qtrvN+Wt60ikm10Xa1vqgY/lQUmiZwndPnYxBeo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pCMEQYdZhF01bU+eqNZ3/3k7aZjZXcYToc6eHALuAcBbb+7FoVtv+cXqf72hSpxoe4TULUyGaSnQdtq21ma1oxXRFquCQrLZVC2r4ROzmboJsTWwOTR+wkmgrDbSfqX0X5j9QatXgX+91Qrx180bo+/ZK693y0TUTQMzG6/X5GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fo+eB0Hv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A260C4CEC3;
-	Thu, 17 Oct 2024 14:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729173723;
-	bh=pLt4qtrvN+Wt60ikm10Xa1vqgY/lQUmiZwndPnYxBeo=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Fo+eB0Hv88wp/+U3UCLqtvYrXW+UX4BcvoIgFm+If1ksawMPOXxeKkkMw3bjQmdrD
-	 RsbybO+udVFCkvTo3PJDMSmPyzsTFGOcbQQbynI9fVjqgobIeregdV4HGYJYpS9ZHr
-	 06VRQfetPT/Aw/pK/n3XQlgiTZ6MSMgIVyi7LKmNWwEXSsGC7qHpqE6Kj59tZn313c
-	 mEb4ZwzbeSBa37fdfa01kNeTHnjzdHI4T8frf8DvIQTaXEUBDSsUtgW+AApgqcct6c
-	 NnR/IlAnFC9dX6TxrDzoa45IyJ0aMCsaTFcReHagYxotKHPA1PT13+qgV9EcdV/P/1
-	 nl67WMN4/w/rg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 17 Oct 2024 16:01:41 +0200
-Subject: [PATCH net-next] net: airoha: Reset BQL stopping the netdevice
+	s=arc-20240116; t=1729173792; c=relaxed/simple;
+	bh=+FFSy9efMPz+Q41rKxQztvgrmi06idCSUyvQPHkUOj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a47XpiPwoxqTmMU15qz2qJ/F96JEYD9uPwlh7sGg2lrhVWT8v4HCeTQdcxPu6t5YHCT7ndBPR58mPaOzg/YjE+bRRnfLUh/uStMczYrG86KISM07HZqyXVcHVdwRSVo9QfFJZPEcnMXRSS8ECVloOuAjV1vjW3lh8We3kok1nSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nC55YWZx; arc=none smtp.client-ip=209.85.210.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7157c2aca3eso501303a34.0
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 07:03:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729173790; x=1729778590; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+FFSy9efMPz+Q41rKxQztvgrmi06idCSUyvQPHkUOj8=;
+        b=nC55YWZxjQwfYg1sC0ClvhjFJm9/ZbKpsLg8YkC+hqaSkQDvnq5E8lH3FQ9o/EUMWJ
+         1UWUb3kwBHoIvUpIzcfMMVXwLWUES+vXH7UqJiDXhaQhfuhbv5xmoegtADpwZbMKtkw1
+         cMsBYmXPnbGMCh7w2qU1AKjJyUpCEoe/jV/hIfp2mnE9K5RBI3+tfKkFanMKBJiPqz+Q
+         YXojxD8Hgp1HkvN92w7Bvq276wheiVm2rdJBvzqiHz51bxj+GuvhVTAVQDOGXHWvUTBW
+         IZjreh2leCu9vAQriIv5DTSgDnLCcuyEwOi0TjvHM5ifKuRVwMOQluIifRc/8P7k+10k
+         Egcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729173790; x=1729778590;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+FFSy9efMPz+Q41rKxQztvgrmi06idCSUyvQPHkUOj8=;
+        b=Ni2pHF2pinKAAx4DdfrOuOcark/HGKx9YXdXpMmoGadgK3hu+vl35Lo2j0NcTt6Oo2
+         XQ/vrF7CWBjOIYx2F+Z6aHyrLHCErDRhQt5J+b7i+yJ+P7utP92nf6+awmcuek4vLwIF
+         9E/+b/Jo82LhQl7+y3c8ilaP9GXmjKTRHyUJKeLdcJYM4QHKTRX+KdIngFeurk81WnAP
+         Ldp1p1pF/6DLxOt1yyQ+ZolwE2qn3tKKAEoE2f+sZ3gdbS60Oo2OVBvJhOLWMblQIAI+
+         Jzv8hgY6/eefrQdZ9jwkyao62Vt2+Q13zXzR0SghTgTqDdGXWVpO6iusCqzNKkEmHwyz
+         omNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNZrdMH7DN2ega3tjRlIRxpO5/mXkcBlrrr01WjorhZxlkAn9pt9TMuiHkSAh9rQJq8hyLMF4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqWYBCVngiQuMcLSw9nQnAQsrhR8oSq3XqcB/8uMgAxTUVNgxV
+	XgSRAvI3FFMAOof8tjJhryGHCX8N/F1qvbchPIZP80PzZXmniDMO
+X-Google-Smtp-Source: AGHT+IGqwiGxNzMY2aov/Fi6O6O/sfi8OPg3uvEuxFQq6gNQdCJWx4W9v8bMe0DM1Lu1z/SP5rlV/Q==
+X-Received: by 2002:a05:6830:6f89:b0:717:d48c:593 with SMTP id 46e09a7af769-718034971bdmr6743230a34.10.1729173790349;
+        Thu, 17 Oct 2024 07:03:10 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7181582a096sm73006a34.18.2024.10.17.07.03.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 07:03:09 -0700 (PDT)
+Date: Thu, 17 Oct 2024 07:03:07 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Mahesh Bandewar <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Mahesh Bandewar <mahesh@bandewar.net>
+Subject: Re: [PATCHv2 net-next 0/3] add gettimex64() support for mlx4
+Message-ID: <ZxEZG-sPkXP2br2V@hoboy.vegasvil.org>
+References: <20241012114744.2508483-1-maheshb@google.com>
+ <5b614738-31e8-4070-9517-5523b555106e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241017-airoha-en7581-reset-bql-v1-1-08c0c9888de5@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAMQYEWcC/x3MQQrCMBBG4auUWXcgExIqXkVcJM2vHZBUJ6UIp
- Xc3uPwW7x3UYIpG1+Egw65N19oh40DzkuoTrKWbvPNBnEyc1NYlMeoUL8KGho3z58UhIuQSZ++
- KUK/fhod+/+fb/Tx/kguGa2kAAAA=
-X-Change-ID: 20241017-airoha-en7581-reset-bql-45e4bd5c20d1
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
- Mark Lee <Mark-MC.Lee@mediatek.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b614738-31e8-4070-9517-5523b555106e@redhat.com>
 
-Run airoha_qdma_cleanup_tx_queue() in ndo_stop callback in order to
-unmap pending skbs. Moreover, reset BQL txq state stopping the netdevice,
+On Thu, Oct 17, 2024 at 11:22:12AM +0200, Paolo Abeni wrote:
+> Additionally please fix you git configuration; you should set
+> format.thread=shallow
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/airoha_eth.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Yes, this ^^^ makes review much easier for us.
 
-diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 836a957aad77bec972c536567a4ee7d304ac7b52..23905f54f991fc8062542b890fbf002154676612 100644
---- a/drivers/net/ethernet/mediatek/airoha_eth.c
-+++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -2341,7 +2341,7 @@ static int airoha_dev_stop(struct net_device *dev)
- {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
--	int err;
-+	int i, err;
- 
- 	netif_tx_disable(dev);
- 	err = airoha_set_gdm_ports(qdma->eth, false);
-@@ -2352,6 +2352,14 @@ static int airoha_dev_stop(struct net_device *dev)
- 			  GLOBAL_CFG_TX_DMA_EN_MASK |
- 			  GLOBAL_CFG_RX_DMA_EN_MASK);
- 
-+	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
-+		if (!qdma->q_tx[i].ndesc)
-+			continue;
-+
-+		airoha_qdma_cleanup_tx_queue(&qdma->q_tx[i]);
-+		netdev_tx_reset_subqueue(dev, i);
-+	}
-+
- 	return 0;
- }
- 
-
----
-base-commit: e60fa8ebc2af54c2f62cc4ed63b85894dabf9101
-change-id: 20241017-airoha-en7581-reset-bql-45e4bd5c20d1
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+Thanks,
+Richard
 
