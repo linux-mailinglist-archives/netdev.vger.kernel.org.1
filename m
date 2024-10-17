@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-136503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE949A1F09
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:53:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F10119A1F0C
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2D81C25DCB
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:53:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A32F0286138
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4461DDA2E;
-	Thu, 17 Oct 2024 09:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCC81DDA14;
+	Thu, 17 Oct 2024 09:51:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A71DD86C;
-	Thu, 17 Oct 2024 09:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD8D1DDA1E;
+	Thu, 17 Oct 2024 09:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729158667; cv=none; b=RAldMvEqWyjobQvCY6JASqURDwfQKXvIUcVIw7CmIzvcMysqBCcz+C1pXdgXNEpwCKMc6fOtjIBZuxiUEodI4qX6E9w4aFb3zts1ntQlELWizNHfMEEQW+AQAYtZQb2NvjHXyWoSoP9hSGejkZkL78nSqHOdOI2yelhPiaNtyPY=
+	t=1729158668; cv=none; b=JKPruj7+AwbaQDPapEtI8uvpKBb5OaoQq5ve9gc0we8w+s/1aZX8Eel88KU2eCBff2gxTsx17rIbYYOUgl/tU5a1my5aYKFt69FqQLcnd55sKi/TXiCmafcCQRvEFvS98EDDwZZZQbpCtU0WF2LvU1pzDwyADzFv34WVXIg+bYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729158667; c=relaxed/simple;
-	bh=mQpC7YgB+kq1ZruSzdGLaLBqEEwfjlPwVeWJnpWWNoE=;
+	s=arc-20240116; t=1729158668; c=relaxed/simple;
+	bh=CK6YVX7DrhvqsRMXrMk7N8jXqOjvz5bNUqayjvuoHek=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oa9IQEA93bw9JBdCPTcwpFGnLhYqGReCvC4lXxXz21HXr5zStNTuvZsc0rDEBia9aEvYq9DDAwQ2YCpu06IocvZzBe05SaBcF81UnruZ1kA0lzl1UuwRkio2Ir+OFG7ZPYD/RVQHnIFYLsnK2zZLZLbDQYnfYEgqrYM/1jx/ep8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.173
+	 MIME-Version; b=PqAWxMF4FOnIKt4y/1gzb8+zktnZ7IBN1IM+WLYkhtvQU2jpHaxTyJqx04nAJr1Ev6QeX2m0xPSWxQcjCZv1cBRtJhjCBSeZ/5RnJYglT2yumh7MsYzaxMEDzUGvjSjydP3hTk5IBvFYK4AOeU2etl1Gw9FfXDeQn9BpCINfkM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb561f273eso7160071fa.2;
-        Thu, 17 Oct 2024 02:51:05 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a99cc265e0aso90655866b.3;
+        Thu, 17 Oct 2024 02:51:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729158664; x=1729763464;
+        d=1e100.net; s=20230601; t=1729158665; x=1729763465;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hn3d5DrrbfnZw+8+PLA51MpHzKJn4lcgJlRW9cmouQs=;
-        b=ugT7DMAkLUcbCbEYht7jJagYR+3s4b66IUwRjw5y9LogOH8RoUElgKUjrt4ApqH6q8
-         KbnI8br7kyQAgwiYWPgBnSHYaLpyqCxrCwAu3b5qrjOojHU5kgaHyj+fDQcPcFj/m6Qr
-         Bh69u9M0LEirAPb8LMgXr1eW8XslgwH11QYzhkYn5EJHi389D2xgxn7w42kLwF5e8Y9t
-         Y58qPYQzbMmPKWPh+8vmzaXCzNRhjooxdtSiRszrJ3z6WNynqBMDM5Xgr94PlRcjRgXa
-         7L9BRyd6NdwiRYGkfSZhb2AnUpkULWoWxVjx2yTgzgGIIm/0us4RBSWPav6+fEoxKs3T
-         q1dA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEgFxt5lp/yjEwmulWXIazEGm8pTMrpSDPmFQaKFNGDKwdYhFiKTDSWvN1lzZhJ2zPEvoxzwz6DS2t1tw=@vger.kernel.org, AJvYcCWlRMnr/JikpXlvaGOW8Xi4+dZP7zQUIa88R+ZKOgVO9YFbaSHvETXsOO77SV4CyLSPMVph3Kxb@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKiXB6gdoi1gRFVW6Zd6iq3ra4uInC7m7imFlNhLLqveY+wFGp
-	Xv3mo4z9lBfXikDTGLQzLhXFRt7IJ63lddIobIl+McsgphoPrlhR
-X-Google-Smtp-Source: AGHT+IFa3YWVHSYU+4G/aPkDrpr5t2bDTp/QkCYC8GdBQSYAJJmQiHsb+dlsWyXpknKVHapSBkUzMQ==
-X-Received: by 2002:a2e:a986:0:b0:2fb:4c5c:3f7d with SMTP id 38308e7fff4ca-2fb4c5c40e0mr84002081fa.5.1729158663573;
-        Thu, 17 Oct 2024 02:51:03 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c98d4f9416sm2557858a12.35.2024.10.17.02.51.02
+        bh=DMa9T4GRybMuiSZbSNjPfnUtfOBoz1IdxikzoXqbnME=;
+        b=UY05XAXtbWz5ie5RJqovrwP7LotZphMB8U3FpTxQchBtRoBs+SAd6vHiYXCOWEjS7q
+         6PxBMg5BGkA84QvFqoeVlo7sHHsVvixcFl3NkG80u3CDHvK2X2FfVdfrNPLqLRkseiqI
+         V208cvZGhGXh6Z4vRU7XzpFwsPy45zqQx2mJGOsL0uoYXnGj2Lcb629lWs7qsdGP4T2n
+         aRvUyG9C8SKbWJK85vXT/4p0yu6aqB1KqIYebyz0V85E4ccwKEjwWZHpqFiVGPeFIozh
+         /JJMdpO+UieROfjhlu0lUFoXw1GFQyuo4UMld/CftjaoU6fjOBHOue5osVY9KHDHCeUg
+         8T4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUi3nYrWkTqeF8jo4Mkeorxe3f592uDX3Mcl3t2yTK71zYPmTufBQqKfxZReLRvw4zr17PGTYIm@vger.kernel.org, AJvYcCVdybOj2cOI0WuT5vEbrjOSWZp0thsHP1ciZw/0LlP7ErikR92VxjSG1FrH+6iWqNkBBwbcwnOJn2FUkZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQyH/i+OlDmhrzcMdOjDMeBw/quhVJzugU9mPFpsdy6pTthyKT
+	IZL3qa1oqh6s8AoOd7bubt1J8wgWR+eWXvXK9dXl8izquIfdarYp
+X-Google-Smtp-Source: AGHT+IEBJWX1Qsqdjfs5888W8eeR8qgYZe5327bEqWvzvSaplKe63qpSpB17OPBrqaeBMG9Z4E8tAA==
+X-Received: by 2002:a17:907:3f9e:b0:a86:8e3d:86e2 with SMTP id a640c23a62f3a-a9a34c8357fmr582735066b.11.1729158665339;
+        Thu, 17 Oct 2024 02:51:05 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a2971b0bfsm279935166b.10.2024.10.17.02.51.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2024 02:51:03 -0700 (PDT)
+        Thu, 17 Oct 2024 02:51:04 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -66,9 +66,9 @@ Cc: thepacketgeek@gmail.com,
 	vlad.wing@gmail.com,
 	max@kutsevol.com,
 	kernel-team@meta.com
-Subject: [PATCH net-next v5 7/9] net: netconsole: extract release appending into separate function
-Date: Thu, 17 Oct 2024 02:50:22 -0700
-Message-ID: <20241017095028.3131508-8-leitao@debian.org>
+Subject: [PATCH net-next v5 8/9] net: netconsole: do not pass userdata up to the tail
+Date: Thu, 17 Oct 2024 02:50:23 -0700
+Message-ID: <20241017095028.3131508-9-leitao@debian.org>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241017095028.3131508-1-leitao@debian.org>
 References: <20241017095028.3131508-1-leitao@debian.org>
@@ -80,58 +80,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Refactor the code by extracting the logic for appending the
-release into the buffer into a separate function.
+Do not pass userdata to send_msg_fragmented, since we can get it later.
 
-The goal is to reduce the size of send_msg_fragmented() and improve
-code readability.
+This will be more useful in the next patch, where send_msg_fragmented()
+will be split even more, and userdata is only necessary in the last
+function.
 
+Suggested-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Breno Leitao <leitao@debian.org>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/netconsole.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ drivers/net/netconsole.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 9a5cca4ee8b8..e86a857bc166 100644
+index e86a857bc166..b04d86fcea8f 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -1084,6 +1084,14 @@ static void send_msg_no_fragmentation(struct netconsole_target *nt,
- 	netpoll_send_udp(&nt->np, buf, msg_len);
- }
+@@ -1060,13 +1060,17 @@ static struct notifier_block netconsole_netdev_notifier = {
  
-+static void append_release(char *buf)
-+{
-+	const char *release;
+ static void send_msg_no_fragmentation(struct netconsole_target *nt,
+ 				      const char *msg,
+-				      const char *userdata,
+ 				      int msg_len,
+ 				      int release_len)
+ {
+ 	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
++	const char *userdata = NULL;
+ 	const char *release;
+ 
++#ifdef CONFIG_NETCONSOLE_DYNAMIC
++	userdata = nt->userdata_complete;
++#endif
 +
-+	release = init_utsname()->release;
-+	scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
-+}
-+
+ 	if (release_len) {
+ 		release = init_utsname()->release;
+ 
+@@ -1094,7 +1098,6 @@ static void append_release(char *buf)
+ 
  static void send_msg_fragmented(struct netconsole_target *nt,
  				const char *msg,
- 				const char *userdata,
-@@ -1094,7 +1102,6 @@ static void send_msg_fragmented(struct netconsole_target *nt,
+-				const char *userdata,
+ 				int msg_len,
+ 				int release_len)
+ {
+@@ -1102,10 +1105,11 @@ static void send_msg_fragmented(struct netconsole_target *nt,
  	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
  	int offset = 0, userdata_len = 0;
  	const char *header, *msgbody;
--	const char *release;
++	const char *userdata = NULL;
  
  #ifdef CONFIG_NETCONSOLE_DYNAMIC
- 	if (userdata)
-@@ -1115,10 +1122,8 @@ static void send_msg_fragmented(struct netconsole_target *nt,
- 	 * Transfer multiple chunks with the following extra header.
- 	 * "ncfrag=<byte-offset>/<total-bytes>"
- 	 */
--	if (release_len) {
--		release = init_utsname()->release;
--		scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
--	}
-+	if (release_len)
-+		append_release(buf);
+-	if (userdata)
+-		userdata_len = nt->userdata_length;
++	userdata = nt->userdata_complete;
++	userdata_len = nt->userdata_length;
+ #endif
  
- 	/* Copy the header into the buffer */
- 	memcpy(buf + release_len, header, header_len);
+ 	/* need to insert extra header fields, detect header and msgbody */
+@@ -1208,12 +1212,10 @@ static void send_msg_fragmented(struct netconsole_target *nt,
+ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 			     int msg_len)
+ {
+-	char *userdata = NULL;
+ 	int userdata_len = 0;
+ 	int release_len = 0;
+ 
+ #ifdef CONFIG_NETCONSOLE_DYNAMIC
+-	userdata = nt->userdata_complete;
+ 	userdata_len = nt->userdata_length;
+ #endif
+ 
+@@ -1221,10 +1223,9 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 		release_len = strlen(init_utsname()->release) + 1;
+ 
+ 	if (msg_len + release_len + userdata_len <= MAX_PRINT_CHUNK)
+-		return send_msg_no_fragmentation(nt, msg, userdata, msg_len,
+-						 release_len);
++		return send_msg_no_fragmentation(nt, msg, msg_len, release_len);
+ 
+-	return send_msg_fragmented(nt, msg, userdata, msg_len, release_len);
++	return send_msg_fragmented(nt, msg, msg_len, release_len);
+ }
+ 
+ static void write_ext_msg(struct console *con, const char *msg,
 -- 
 2.43.5
 
