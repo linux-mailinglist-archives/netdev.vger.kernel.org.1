@@ -1,174 +1,128 @@
-Return-Path: <netdev+bounces-136736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D29E9A2C53
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:39:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D4C09A2C9B
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 20:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F25D1C2102F
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:39:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581DE2816E8
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374BB1FC7C3;
-	Thu, 17 Oct 2024 18:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D520219C95;
+	Thu, 17 Oct 2024 18:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="N5VrXGkg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dj/0uObG"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315451FBC89;
-	Thu, 17 Oct 2024 18:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1EA219C89;
+	Thu, 17 Oct 2024 18:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729190376; cv=none; b=VvNvuRyfa53aaWGWuFJoZNAP7o0QPCgsj50YzPsrRssF8dJyvP4+kdDgGP9QRiAmOGf6g5eW2zKk3zOtqAcQYI2wUKP5+Vtgnjjqhlk81zQUAijadWMdKHZ5B3GTvXNv98/cCtWFeV8iBTJvWzOT6fiz7587T58A72mNyxtHCPA=
+	t=1729191110; cv=none; b=WfHgoNFbFaytN5x52EJ/Ldwxf70RqS0QC9LGAlH2XxrY4ogCSI4tXNS7OsDeQHfgov4Y70CzGHs07XRUjXTTuv3NU8SJN9t6weJIenkSIjDE4GduvVOWyn8vsAfxRSFGxYBYoHdNpLnG+X5CGF/m5NMCvDhSI2Zb5/gL73pgTHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729190376; c=relaxed/simple;
-	bh=FxmywgkNUlS99u+UKR5DQby5kzi44L1odyhv89Zm1SU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aemz0/NQCOEMW16h2YaGaJfkv4o6JgP6ffaJOE5O7B7mZsGOs7QdOLXavJm2nGfXDFC+LiMcRPFGr3su81UErRSo8adnyd35pBwN9/5V7mX8cOgdQRj+1YXTUdP3z2QCAG6y8d/tos8/ZPdqh1hDgF1qFh0uK8Um8DGCxNSArqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=N5VrXGkg; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pXm+8IBFvz1ujYC5/BdUieoeB4O8UBo9KmKYceLh5ts=; b=N5VrXGkgAWFovrbKgWzKyOBDom
-	d46SQYNLOSfMSOWuHmaIHAObkvJwCWdni6bSN1N8KpOLojafzKd21+7Ys++FKchnkzKicr/jZeVOE
-	AB5cuhC6sIIQGfik6tREtlG4yFK3VUEAilMGd9OUAz7A0au20F+kOiUsxFf7OBUtPyU4=;
-Received: from p4ff13b65.dip0.t-ipconnect.de ([79.241.59.101] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1t1VP4-00AwP2-1f;
-	Thu, 17 Oct 2024 20:39:18 +0200
-Message-ID: <b78b8659-d89d-4fd4-b922-f3c24b705deb@nbd.name>
-Date: Thu, 17 Oct 2024 20:39:17 +0200
+	s=arc-20240116; t=1729191110; c=relaxed/simple;
+	bh=MytL9dZuLmcigO7X20aTVU/bR0ZbWa6DjLVO56fxOjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C/IsXuaLx8832FL9epsnEueOz69VvtJvwGP4NU9YyhtvJC4XyhB65G4EuBUwiX+mnqAjqt8mOUrpvEBt2ktxzhsMpkyt4/r2T90XIv3tec+b8fkgA1o0G3jq2IQZwDcC/0VL0XRIxJcm3GVOK5eb+xUbogPd6bA47SJQtCQIE90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dj/0uObG; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a3a5cd2a3bso5600835ab.3;
+        Thu, 17 Oct 2024 11:51:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729191108; x=1729795908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hepi8wQtRl7njWAnSjPP92GtTeGsPlBM34ad5OO8k7k=;
+        b=Dj/0uObGM3ZKfU/tBqLT3DAuQLoXEDzjETzKUBy/9NXNC4HmQiuc4qP/ypzXX5tywm
+         c/q8Scqj6ez9gAzncnysm2u+56SYyvcsjXdzkfM5Xp6LZZMsuGZ8/s1y/mi4dKstOa2b
+         1OWeNU3cktzgkjcd5De6kjegLmh8ZcsEXSc3ddM2oe89qVi36Z4a9ecFonS91L/2Dne3
+         RAwQTz+rKQ7Xiiz1ELFAhF2qvo5aGo4VypNKhMTHOCQiSMJjJqWUHdkTHtgZSuxLKBS+
+         tEUWTmiOcxetUG3RbO1BSVa7LBvdtdabqnbg37+GuX0txS5S7isaTYU/EgZzCIbtRzHx
+         u3Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729191108; x=1729795908;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Hepi8wQtRl7njWAnSjPP92GtTeGsPlBM34ad5OO8k7k=;
+        b=hh2MneiJXPRllsQ8SwwdqrSyXUtrdwQU7Mz+jzUCawlsJ4v5mC5lMNx5/lZXt5dSvg
+         IMRIsEZ+DlPnUIrYR2mBDrT+S2yzLUrN7rxRRmhkZrLwCwUEviS2WZJPLhiD6JcDP6jN
+         3hpCObB4AwDgH/smJcvUHjgOEAsnbfBBw30iPjRzlGPnL3597BbNIu3z/RbAes++1P8U
+         koFcwiY3QpNomvKcB2Gi24+AIVm0YX/wbbSqFil7KKtSbo1MTvzXLWnqg+J4hd7a/rV2
+         lShivITmS4KgkSIXfeLR/niYWwLiXJIO9xEbJnINLft90OnfbNSB3GaGb/GwglWVGgoC
+         gQKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJq8g34CEMhBnvZSN3bUAg+r8ch2SfCxSd+chANteF1obCzAjnAd1YzRBJ3H989QhVi6GCMTsX5+J7kS4=@vger.kernel.org, AJvYcCUdBmdvn1txPFiFCQZDF2alXoFogaVi4YyPZR7VK+rSUIA+Gt5yrlsZXyKBNpQcuSJhiBVNNdKR@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEkOiPmk6CdRfD4QDm/qq/bG/IyIWqfROTih8dnp+WL052ei7o
+	0GnRZVkNK7yl7qgmhYsH5wX3LrhVhar2ZxAWXWuG0XoubA6ntelx
+X-Google-Smtp-Source: AGHT+IGsEWxwCngvHMMpKuZbpcfUdCmpBi35XioejXQh1Q1m1gMgIgjlonjAbhIM6BhmsPMpv5elNg==
+X-Received: by 2002:a05:6e02:1fef:b0:3a3:b4ec:b400 with SMTP id e9e14a558f8ab-3a3dc4f0a80mr91223895ab.17.1729191107650;
+        Thu, 17 Oct 2024 11:51:47 -0700 (PDT)
+Received: from ubuntu.worldlink.com.np ([27.34.65.170])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea9c72427esm5217854a12.94.2024.10.17.11.51.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 11:51:47 -0700 (PDT)
+From: Dipendra Khadka <kdipendra88@gmail.com>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Dipendra Khadka <kdipendra88@gmail.com>,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/6] octeontx2-pf: handle otx2_mbox_get_rsp errors
+Date: Thu, 17 Oct 2024 18:51:15 +0000
+Message-ID: <20241017185116.32491-1-kdipendra88@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
- improvements
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Eric Woudstra <ericwouds@gmail.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
- <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
- <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
- <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
- <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
- <d7d48102-4c52-4161-a21c-4d5b42539fbb@gmail.com>
- <b5739f78-9cd5-4fd0-ae63-d80a5a37aaf0@nbd.name> <ZxEFdX1uoBYSFhBF@calendula>
- <eb9006ae-4ded-4249-ad0e-cf5b3d97a4cb@nbd.name> <ZxFS7XBgFXsqUlkO@calendula>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <ZxFS7XBgFXsqUlkO@calendula>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 17.10.24 20:09, Pablo Neira Ayuso wrote:
-> On Thu, Oct 17, 2024 at 07:06:51PM +0200, Felix Fietkau wrote:
->> On 17.10.24 14:39, Pablo Neira Ayuso wrote:
->> > On Thu, Oct 17, 2024 at 11:17:09AM +0200, Felix Fietkau wrote:
->> > [...]
->> > > By the way, based on some reports that I received, I do believe that the
->> > > existing forwarding fastpath also doesn't handle roaming properly.
->> > > I just didn't have the time to properly look into that yet.
->> > 
->> > I think it should work for the existing forwarding fastpath.
->> > 
->> > - If computer roams from different port, packets follow classic path,
->> >    then new flow entry is created. The flow old entry expires after 30
->> >    seconds.
->> > - If route is stale, flow entry is also removed.
->> > 
->> > Maybe I am missing another possible scenario?
->> 
->> I'm mainly talking about the scenario where a computer moves to a different
->> switch port on L2 only, so all routes remain the same.
->> 
->> I haven't fully analyzed the issue, but I did find a few potential issues
->> with what you're describing.
->> 
->> 1. Since one direction remains the same when a computer roams, a new flow
->> entry would probably fail to be added because of an existing entry in the
->> flow hash table.
-> 
-> I don't think so, hash includes iifidx.
+This patch series improves error handling in the Marvell OcteonTX2
+NIC driver. Specifically, it adds error pointer checks after
+otx2_mbox_get_rsp() to ensure the driver handles error cases more
+gracefully.
 
-I'm talking about the side where the input ifindex remains the same, but 
-the output interface doesn't.
+Changes in v4:
+- Patch series thrading fixed.
+- Error handling changed in otx2_flows.c.
+- Used correct To: and CC:
 
->> 2. Even with that out of the way, the MTK hardware offload currently does
->> not support matching the incoming switch/ethernet port.
->> So even if we manage to add an updated entry, the old entry could still be
->> kept alive by the hardware.
-> 
-> OK, that means probably driver needs to address the lack of iifidx in
-> the matching by dealling with more than one single flow entry to point
-> to one single hardware entry (refcounting?).
+Changes in v3:
+- Created a patch-set as per the feedback
+- Corrected patch subject
+- Added error handling in the new files
 
-If we have multiple colliding entries, I think a more reasonable 
-behavior would be allowing the newer flow to override the older one.
+Dipendra Khadka (6):
+  octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_common.c
+  octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_ethtool.c
+  octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_flows.c
+  octeontx2-pf: handle otx2_mbox_get_rsp errors in cn10k.c
+  octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dmac_flt.c
+  octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dcbnl.c
 
->> The issues I found probably wouldn't cause connection hangs in pure L3
->> software flow offload, since it will use the bridge device for xmit instead
->> of its members. But since hardware offload needs to redirect traffic to
->> individual bridge ports, it could cause connection hangs with stale flow
->> entries.
-> 
-> I would not expect a hang, packets will just flow over classic path
-> for a little while for the computer that is roaming until the new flow
-> entry is added.
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c     |  5 +++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_common.c   |  4 ++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c    |  5 +++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_dmac_flt.c |  9 +++++++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c  | 10 ++++++++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c    | 10 ++++++++++
+ 6 files changed, 43 insertions(+)
 
-If the hardware still handles traffic, but redirects it to the wrong 
-destination port, the connection will hang.
-
-- Felix
+--
+2.43.0
 
 
