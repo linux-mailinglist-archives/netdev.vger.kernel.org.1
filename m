@@ -1,114 +1,97 @@
-Return-Path: <netdev+bounces-136652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F6DC9A2969
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:46:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A55639A297D
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 18:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40D0F1C269B3
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:46:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D76161C27CE2
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 16:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8C41DF98E;
-	Thu, 17 Oct 2024 16:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BD41DF73C;
+	Thu, 17 Oct 2024 16:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxDbWaMY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmrPRy/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5EE1DEFE2;
-	Thu, 17 Oct 2024 16:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489F61DED5B;
+	Thu, 17 Oct 2024 16:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729183530; cv=none; b=Qv9PCAvqPlex1cNKCVcN2dXbmZZGKRHO0TfJUO+RLYDQqY34lOOFc0ZzzqKY5JIylm8iVsYoMQorpc4LpzzV/uFDfvK5YUKm7MKApGbhaBWBO1j+z9ESah+OMriPji8cBsIWmUgydn/yhlH1gchYQ+LD5NaUwA4mJqL0dx+iU3I=
+	t=1729183685; cv=none; b=VulxWPzMPDSOiKtqMMR9/z33Ka4ZC5jmTLo+f1yf4Al+WpkoZVxR2KhwRWpNaLLrji6Rvb2S0QzTcfXahQevCCayomh8NoSYW9UZkcuHgsJ7RF93Qsd2ht9F4F8Rqtezf/F1ojhN90tFA2pD0Ds21aeNUf8CXJ7TZ2+0yPtFC9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729183530; c=relaxed/simple;
-	bh=mcCUzeXXlnqf/limPhOzfBMV01vv91GtjVpxLhxy9oA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YC7nftq7I4VvVAmzBkw71bcKa7DPhOgIoskozOcXpkY64/SLMke5cdUkEQD7T8u2RaGM39y7h5yF4g8PEnVJPilOCuEMy1GFLKUuJYTvhT0QFYLlB0Cxim8yYLxYMqdRKq0T7QptC+b+cOuDdgpWFDtSieh1jVPrI2GlDa9HIlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VxDbWaMY; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2e29497f11cso178302a91.2;
-        Thu, 17 Oct 2024 09:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729183525; x=1729788325; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mcCUzeXXlnqf/limPhOzfBMV01vv91GtjVpxLhxy9oA=;
-        b=VxDbWaMYHoPkxrwN735s0Cr7pKRaDjPI4wLrCkeEk9u2BGJiUvBwHzb9XT9Zotozkx
-         nDqTH/lFtf5kNV1KXb2G9zoGcH1dqx6AaF7m548Jqxso3Kk+MGswVH6Y5fMw0K6RauTu
-         sKR9deOHxVWcifN9y7d7VY3KVltWoDgHhCbExf1am/id5FSOLowfnFeptftSDYM8ssNg
-         K7SUr5ZtP63266q/cwiazIiLnCV+7QdSu6N+CdbyhKFPFYIYd2o166quREpAVMwqdbal
-         IT5iPPisUkUNHDmablBF27SRkqdQi7mhVmpCHNfzg4IFUHMEnwz6zW/V6yXEjmPeGKuG
-         ZuRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729183525; x=1729788325;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mcCUzeXXlnqf/limPhOzfBMV01vv91GtjVpxLhxy9oA=;
-        b=clsWhPAXznEy0wymfxPTA5kY0vjeBKjBFc0KCkr7KIB7IAvmiP3ewhWFU1AQQD0CfW
-         0Ed14Kdmo/dKdIwmhM51QSvTFsHRqH1iCxE8iBG5PmV/HWgIyF/2JAOBodMuSQcjJ+ap
-         IXXJn/C1HITY3ioPZO+kNOmNRiV63gda/iNmDSELvSy+qjg/2ePwRPyuhIw5txQTlf+G
-         2VwWLzbw03Kyh4Wz+DJbPwm4hbYxXWgAijrCswp4mDeUkCHj3GapeM6mDlBscU3hgGAN
-         ymM3IPqgGE+u/iusWQ/4TQvOaUMGReP/Y8ETgjg7LAnEOi7zMNp2P6rTF9lcSsAF+RY+
-         yC8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVG1wOk0k1YCSa7+vrmNhgyOhEMsmXCsRIJH5HXQBGVOzHLMlm1OF4y19pe5uCihsAmhbIZxinZAoJl/tY4qfQ=@vger.kernel.org, AJvYcCWP1IDPXnP3EXj3JFMuXWG6SfPe1Dl80oy00+2UwU3RP8UPdxkJpvoxwUAfzAtdIjXhQn+8JVtc577gu+c=@vger.kernel.org, AJvYcCXCN3lCfLEVXl/5AQPAAdXJ9q5r0jKiPDsPC+VTzJFB3lBPqdo/I/g+w/SSS9XWwr30lMdC1XWo@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp0MjV7MTflgUkBROKPAwEJXwWSAbC4JW+raBSSm7MelVd9uu4
-	FoRcfinS+98e+e/MfhJkg5ke9cDPMcrFqpFVMxtEEW5ZVnjF22lzXyOJb6vUxKuloebIJD/cmjR
-	S80YecBCaRfJm+3i/Lch7wBsKpLd6VhyM
-X-Google-Smtp-Source: AGHT+IEZ/ui/WWQTx0Ex+vbnYBARRrpyCEM94UWKhfXvnrgnk5ObXl96Hg+jcwk/C2LmKNJtaLaQdYsLROOoM7IM0lU=
-X-Received: by 2002:a17:90b:1c8d:b0:2db:60b:eec with SMTP id
- 98e67ed59e1d1-2e3dc294eb7mr2032178a91.7.1729183525086; Thu, 17 Oct 2024
- 09:45:25 -0700 (PDT)
+	s=arc-20240116; t=1729183685; c=relaxed/simple;
+	bh=1lxOlYEcYOR8eSfFluOEN1NiPrjmOzuMGs0H0pgeIuI=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=tsSIFCh+0zkUDC7FFjpOWk6fmpN5Xy8rhATA70ZhcqhrI/M2FxTm9tVntETvao3MMNHEQv4cI8R6nkTzKOB2FPLPVch/5Vjo/s4E1KrLKZoWYkCp/6Hu7DFQTNlzZv94r3LMKzCNKc3QZ+01s54pBjhpPtVBQT+Y9p/0Rom+Vwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmrPRy/B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FB28C4CEC3;
+	Thu, 17 Oct 2024 16:48:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729183684;
+	bh=1lxOlYEcYOR8eSfFluOEN1NiPrjmOzuMGs0H0pgeIuI=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=SmrPRy/B7ogdyZ6IDnLACoZecv9uC4jXbGQuxsDdhe9mG+sGQptUjaxEs9MSKkvn7
+	 zLUPyzThXEyMNbwpUJr89T4LEd5JbWD/jQeWkQF+OqJRaiwt+ICUWsbDeAP/ptzFso
+	 IjyE+Wbu0EvHEhR8LwXXc8Od7HLbPhj2A8ObNrp8j6ZnrSRp6HeKVEdlBqMnQ67wjw
+	 5C+ndzVSfUDzegddcBcFL5HZE3i80nmsmdr3zXyofwWnUsPp1cBJ/KUi+6peHzYuIA
+	 h939D1L35OmMxasGtkLYwRnldFkU3AmtjDhsBiGNLmCVs6+IerXQ3OsKFvNQbl5Swl
+	 GSwAiBrvsFkiQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-4-fujita.tomonori@gmail.com> <CAH5fLgjKH_mQcAjwtAWAxnFYXvL6z24=Zcp-ou188-c=eQwPBw@mail.gmail.com>
- <20241017.161050.543382913045883751.fujita.tomonori@gmail.com>
-In-Reply-To: <20241017.161050.543382913045883751.fujita.tomonori@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 17 Oct 2024 18:45:13 +0200
-Message-ID: <CANiq72nGoT9DxLwDbg8gZVxk0ba=KqvXLAVz=hRNFMqtCeGNvg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/8] rust: time: Change output of Ktime's sub
- operation to Delta
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: aliceryhl@google.com, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v8 1/7] dt-bindings: wireless: wilc1000: Document WILC3000
+ compatible string
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20241004114551.40236-1-marex@denx.de>
+References: <20241004114551.40236-1-marex@denx.de>
+To: Marek Vasut <marex@denx.de>
+Cc: linux-wireless@vger.kernel.org, Marek Vasut <marex@denx.de>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <172918367985.970100.15233672330515513203.kvalo@kernel.org>
+Date: Thu, 17 Oct 2024 16:48:01 +0000 (UTC)
 
-On Thu, Oct 17, 2024 at 9:11=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> Surely, we could create both Delta and Instant. What is Ktime used
-> for? Both can simply use bindings::ktime_t like the followings?
+Marek Vasut <marex@denx.de> wrote:
 
-I think it may help having 2 (public) types, rather than reusing the
-`Ktime` name for one of them, because people may associate several
-concepts to `ktime_t` which is what they know already, but I would
-suggest mentioning in the docs clearly that these maps to usecase
-subsets of `ktime_t` (whether we mention or not that they are
-supposed to be `ktime_t`s is another thing, even if they are).
+> Document compatible string for the WILC3000 chip. The chip is similar
+> to WILC1000, except that the register layout is slightly different and
+> it does not support WPA3/SAE.
+> 
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Marek Vasut <marex@denx.de>
 
-Whether we have a third private type internally for `Ktime` or not
-does not matter much, so whatever is best for implementation purposes.
-And if we do have a private `Ktime`, I would avoid making it public
-unless there is a good reason for doing so.
+7 patches applied to wireless-next.git, thanks.
 
-Cheers,
-Miguel
+1b292a161cfb dt-bindings: wireless: wilc1000: Document WILC3000 compatible string
+719e469eb9a2 wifi: wilc1000: Clean up usage of wilc_get_chipid()
+0a6ea2e235ef wifi: wilc1000: Fold chip_allow_sleep()/chip_wakeup() into wlan.c
+1241c5650ff7 wifi: wilc1000: Fill in missing error handling
+577c04fc3b8e wifi: wilc1000: Fold wilc_create_wiphy() into cfg80211.c
+fbdf0c5248dc wifi: wilc1000: Register wiphy after reading out chipid
+e1408c115ef9 wifi: wilc1000: Add WILC3000 support
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/patch/20241004114551.40236-1-marex@denx.de/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+
 
