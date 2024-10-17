@@ -1,71 +1,55 @@
-Return-Path: <netdev+bounces-136467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F029A1DB7
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:59:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F729A1DCD
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98BBE1F222D7
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 08:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEF02283422
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5182F1D79A0;
-	Thu, 17 Oct 2024 08:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1791D86E6;
+	Thu, 17 Oct 2024 09:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iwjWpD/3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBhsGYDE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252AE1D7996;
-	Thu, 17 Oct 2024 08:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED76B1D7996
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 09:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729155540; cv=none; b=iTYvVdnOFE3NOUSsktbTuU+cG7gJpeeoEgZGQHelVUBMpzGDON39Lci+DYnWuOl2TgUZJoF+TYt1Xo1/ghDt2hoGn1UqQtCtzwxNGHAF/2/2CBnFohta2cgKXYFa+CcpnJPXrV1tnOkzAedCnJoKct5S7xDEaGB7VpOsax8dT7E=
+	t=1729155872; cv=none; b=hpE8Q8kBua1h5bREcM/L28Yftu0PS5vmLUtAzceqM/IszJlZtf7IRn0ExIa6XOXEhKLKrAVm+CGML1Ba9Jt26YLE+CfLjebp8/fudVTrr0uK9cval6kEXkZtnEZhnoejx2IUZk/iERyKK9XsY4QepPkhQGFGvRpTYlqjjSIw8qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729155540; c=relaxed/simple;
-	bh=l32QBf7Ydpv0UfOXGtjji83gO7qLXEQRgzkYtcP6NUE=;
+	s=arc-20240116; t=1729155872; c=relaxed/simple;
+	bh=d5kqO4Bh9+2mLG4iFeXcX1lSGbbJ2UL2sLpOF4R3KX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i3Pj3QUKeJMdIj+fgMddKzxyyklNid9NGZVOms9gTj0lOvuz5K2JPpdUzXz4cLTQ1A6BJgQqD6nz/uUDQKH0DY/rauEDCayjr7r8qtiy+DfKl7y36BHskSNw6fvIkcRtPZjIeOdo85jcVsX4PnwvjpiDw8lcKuaUpjI4pkkDoFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iwjWpD/3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EECCEC4CEC3;
-	Thu, 17 Oct 2024 08:58:55 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=lG3U+YcLyx8wBt/IK/C257CnHYqt3MSMggCYgJVp2Q+PiP4brbzz/tHEyc4wvYiqmmTS3/dgpFt40GsBsZDOCFXp80T9VSKwuQGyrcZgt4S4I8WoRUjAjmqsMSpqs19ZxGAlijRw2FZTAFos+8qAf8HHtANShYP1Kc9OmgtIPRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBhsGYDE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F9EDC4CEC3;
+	Thu, 17 Oct 2024 09:04:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729155539;
-	bh=l32QBf7Ydpv0UfOXGtjji83gO7qLXEQRgzkYtcP6NUE=;
+	s=k20201202; t=1729155871;
+	bh=d5kqO4Bh9+2mLG4iFeXcX1lSGbbJ2UL2sLpOF4R3KX4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iwjWpD/3D7bKZljV7PRHcYswQ0aitCyhZdLuPmfjBLQXh9+8GlXzTTY6MMiqPxmLs
-	 5s8staspLLj9ygOzBDONUxmj9mcB+rHeOeRmVSAJRIwtnxbU7dLEDoh8H0Hz8jVlQc
-	 U0oypsIzTOysdbQoED44fttLaijGShvXB9zF0CM/npocXCQmC6A8kGo6FjvBcTcSpr
-	 qkoqIuXGR/O83Hl3bPKx9qUFup2Hd/zrhAhbKrt0CzstORt8zgdETLVj5p7Z6P20J1
-	 urlF86LAjX30mUtweec72UxFfYmDrS0FD4RQYrm/9H2XiuMGpPG0gj7QNt11j/8FuF
-	 po7OmiHpS8rKg==
-Date: Thu, 17 Oct 2024 09:58:53 +0100
+	b=fBhsGYDEZBWr9wfeIkUXehVLJCt/J7hM7gGxAJdLccpuNX1U0hYNC98bIGTWzqhbk
+	 Llp/chNtnicm3xiUxDYY3lzr8qQCNeMOFl18oJG8nKQV39Bb/EEPGXF+MKusJ9giUK
+	 +OXz5msY94POZSBJ07Qrs67baL//sIQppD6TSL0XiTGLC13ic+f/gOkTIiRld18t0w
+	 9cSsx4UmItjp6pz3VDPgF42dQqMuxOkjJ0jAaHc+ticCg8mxqCtnR5c7/Qshp2noxH
+	 QFNCK8Oyh64BQx8AlnEbq2LktCJKdDgpnypgCG5Uz20x2yk9yOk7p3/DKY8bVrQ+/y
+	 ypcvstjsXz0Fg==
+Date: Thu, 17 Oct 2024 10:04:28 +0100
 From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>,
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	George McCollister <george.mccollister@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Breno Leitao <leitao@debian.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCHv7 net-next 6/6] net: ibm: emac: generate random MAC if
- not found
-Message-ID: <20241017085853.GR2162@kernel.org>
-References: <20241015200222.12452-1-rosenp@gmail.com>
- <20241015200222.12452-8-rosenp@gmail.com>
+To: Joshua Hay <joshua.a.hay@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, aleksander.lobakin@intel.com,
+	madhu.chittim@intel.com, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan][PATCH iwl-net] idpf: set completion tag for
+ "empty" bufs associated with a packet
+Message-ID: <20241017090428.GS2162@kernel.org>
+References: <20241007202435.664345-1-joshua.a.hay@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,20 +58,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241015200222.12452-8-rosenp@gmail.com>
+In-Reply-To: <20241007202435.664345-1-joshua.a.hay@intel.com>
 
-On Tue, Oct 15, 2024 at 01:02:21PM -0700, Rosen Penev wrote:
-> On this Cisco MX60W, u-boot sets the local-mac-address property.
-> Unfortunately by default, the MAC is wrong and is actually located on a
-> UBI partition. Which means nvmem needs to be used to grab it.
+On Mon, Oct 07, 2024 at 01:24:35PM -0700, Joshua Hay wrote:
+> Commit d9028db618a6 ("idpf: convert to libeth Tx buffer completion")
+> inadvertently removed code that was necessary for the tx buffer cleaning
+> routine to iterate over all buffers associated with a packet.
 > 
-> In the case where that fails, EMAC fails to initialize instead of
-> generating a random MAC as many other drivers do.
+> When a frag is too large for a single data descriptor, it will be split
+> across multiple data descriptors. This means the frag will span multiple
+> buffers in the buffer ring in order to keep the descriptor and buffer
+> ring indexes aligned. The buffer entries in the ring are technically
+> empty and no cleaning actions need to be performed. These empty buffers
+> can precede other frags associated with the same packet. I.e. a single
+> packet on the buffer ring can look like:
 > 
-> Match behavior with other drivers to have a working ethernet interface.
+> 	buf[0]=skb0.frag0
+> 	buf[1]=skb0.frag1
+> 	buf[2]=empty
+> 	buf[3]=skb0.frag2
 > 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> The cleaning routine iterates through these buffers based on a matching
+> completion tag. If the completion tag is not set for buf2, the loop will
+> end prematurely. Frag2 will be left uncleaned and next_to_clean will be
+> left pointing to the end of packet, which will break the cleaning logic
+> for subsequent cleans. This consequently leads to tx timeouts.
+> 
+> Assign the empty bufs the same completion tag for the packet to ensure
+> the cleaning routine iterates over all of the buffers associated with
+> the packet.
+> 
+> Fixes: d9028db618a6 ("idpf: convert to libeth Tx buffer completion")
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> Acked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Madhu chittim <madhu.chittim@intel.com>
+
+Thanks for the detailed description.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
