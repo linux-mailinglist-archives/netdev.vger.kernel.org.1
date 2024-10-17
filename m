@@ -1,96 +1,80 @@
-Return-Path: <netdev+bounces-136574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316189A228C
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:40:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 977799A2291
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 14:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB410B21137
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:40:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32984B26063
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485451DD88F;
-	Thu, 17 Oct 2024 12:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A593C1DDC2E;
+	Thu, 17 Oct 2024 12:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIh2Bk/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEDF1DD862;
-	Thu, 17 Oct 2024 12:39:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB661DD9AB;
+	Thu, 17 Oct 2024 12:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729168770; cv=none; b=s9b/5KD3yAI5cKijS/DfRITI1sgwJOOPg04JHPFZT+NsL8M/91AB2j/tsbWzRKdTLa2H0b2I51UVixvYyM2wgANsUbvItQk5ei3DCktzYFsdCLxdWS34crekaKxAWiwpaHcKf2tlAkGZRZINthe4W4eFQCNJRxogqCKyzhVGH+s=
+	t=1729168776; cv=none; b=YzK8eV+BuwogmdezgDou0oTZF92GYzoeDH9HW5Fw24OpGM5XyLkp/4m83XUBq60hArmpV9t/tdzeoKDdzONRk1L/GvztDZNUtfQadbwmwWWxWNQlLWWFuFBYFuysItNKlUMX+txlV7eO9/cz4M6uaBUcFyVj7+TXVBemjFfD8Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729168770; c=relaxed/simple;
-	bh=58ZH9EysMGctJs6VFMx8+biSi2sHaIk63WBGxe5Y220=;
+	s=arc-20240116; t=1729168776; c=relaxed/simple;
+	bh=hSORhyt+r5npsU5xYPFuTfyRV44mxPLdfFMXv659EYs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kfDoTLgVwiw3CPOXBfT1YqVUlJ2LFw2yS0huVGzuxQyGX6rYRzyV3VuYQu6fD/TZs6VP13dkDOipPUVsze/Nt4vr0BJ5w9oJbS74NvUR0D4o/1DIeRAXLPC3k9VlpkjqAOg5L+CxTeez+OrGT3Xr0iqNhx3x6MuC6/7gGk3az8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=43634 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1t1Pmg-00Eunf-4s; Thu, 17 Oct 2024 14:39:20 +0200
-Date: Thu, 17 Oct 2024 14:39:17 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Felix Fietkau <nbd@nbd.name>
-Cc: Eric Woudstra <ericwouds@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=tfI1HJid1tG+BoZlhsO1SbtlsYZPPOJ3h6sDZKHz8k6qcvSNc1/5T2I/9B55BdST3tQUyBguHV9eS9q5NUTbO8yl20qgyXI8jyo2uMklteB4eqhb1IW62ZJfrsHOiqsFxpMOFDUcRMMt4RRAX2CHTNyc3VzjIS2GzKAVrW7GLyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIh2Bk/6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 289DDC4CEC3;
+	Thu, 17 Oct 2024 12:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729168776;
+	bh=hSORhyt+r5npsU5xYPFuTfyRV44mxPLdfFMXv659EYs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vIh2Bk/65/4iHX3VqrTQxeEUOsCFVEADFVv3DpQ46Tpd4lXvW345wAks6Z94pbdrC
+	 0BCgSJgrTilpkLNXVy+aC5quvFBeIKMc5kly7xhmJOougC6B4vsP4KBITLDxvhCZDe
+	 IneHt2zwg4vpaRvwSiNjbjxTm1w96gMZmZwg+03npU7hRtODP+Hc6gnkvZ0RVgLFA1
+	 BXJHR4RlnMfaG0buh+v/mk9y72sLKs4vT139Umb9PIC9vNlJEf/zO2aAxuTBSvPgyh
+	 ndviIYzWCD6g565f1aZO+ygQhQpBTH5k4nLkRYq2ifLecID97AZ2XYObZlU9mOc0M3
+	 v15lLlb/Z3o+A==
+Date: Thu, 17 Oct 2024 13:39:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC v1 net-next 00/12] bridge-fastpath and related
- improvements
-Message-ID: <ZxEFdX1uoBYSFhBF@calendula>
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <9f9f3cf0-7a78-40f1-b8d5-f06a2d428210@blackwall.org>
- <a07cadd3-a8ff-4d1c-9dca-27a5dba907c3@gmail.com>
- <0b0a92f2-2e80-429c-8fcd-d4dc162e6e1f@nbd.name>
- <137aa23a-db21-43c2-8fb0-608cfe221356@gmail.com>
- <a7ab80d5-ff49-4277-ba73-db46547a8a8e@nbd.name>
- <d7d48102-4c52-4161-a21c-4d5b42539fbb@gmail.com>
- <b5739f78-9cd5-4fd0-ae63-d80a5a37aaf0@nbd.name>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v1 1/5] net: stmmac: Introduce separate files
+ for FPE implementation
+Message-ID: <20241017123931.GG1697@kernel.org>
+References: <cover.1728980110.git.0x1207@gmail.com>
+ <e4bfea2845a0f6fafb2e6db539292510b494372b.1728980110.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b5739f78-9cd5-4fd0-ae63-d80a5a37aaf0@nbd.name>
-X-Spam-Score: -1.9 (-)
+In-Reply-To: <e4bfea2845a0f6fafb2e6db539292510b494372b.1728980110.git.0x1207@gmail.com>
 
-On Thu, Oct 17, 2024 at 11:17:09AM +0200, Felix Fietkau wrote:
-[...]
-> By the way, based on some reports that I received, I do believe that the
-> existing forwarding fastpath also doesn't handle roaming properly.
-> I just didn't have the time to properly look into that yet.
+On Tue, Oct 15, 2024 at 05:09:22PM +0800, Furong Xu wrote:
+> By moving FPE related code info separate files, FPE implementation
+> becomes a separate module initially.
+> No functional change intended.
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
 
-I think it should work for the existing forwarding fastpath.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-- If computer roams from different port, packets follow classic path,
-  then new flow entry is created. The flow old entry expires after 30
-  seconds.
-- If route is stale, flow entry is also removed.
-
-Maybe I am missing another possible scenario?
-
-Thanks.
 
