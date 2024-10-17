@@ -1,169 +1,70 @@
-Return-Path: <netdev+bounces-136489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5055D9A1ED7
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:48:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442279A1EC8
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 11:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 497CAB265E4
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:47:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C6B71C24947
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 09:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4221DA103;
-	Thu, 17 Oct 2024 09:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197781D9586;
+	Thu, 17 Oct 2024 09:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="N23q9ZA6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qQreREBH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866581D9662;
-	Thu, 17 Oct 2024 09:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AF61D9329
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 09:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729158462; cv=none; b=gsN43iMW0sirX+5VAxOe3IXey6/H7KaDC8vRqAYoUf+Lt5X0fk0bECeIChiC+koIn6wO3tXWaRIrX7YLsTubz3b9Xx9oNIKIUcyDY1L/1U+f2vUZ2nOvnX/Iu7ADpVzV0z73D27+mCj9ROZoNxQT5M5iU7d4MrK10nQ1dZxRcuE=
+	t=1729158430; cv=none; b=RFgI+xfoB0KJWyW11pFEFaFrP17/BvEgYhBOmEy6PoIRIds7UGn6nRfNIlvwOKvFpqk8sl+T1L/ZGjDRMuSh/AtycQ2SMotkV+KnZZN5k5RQxWcnGmqTU5XVhxWqp1htXnFoVpp1YRUj4lVhBN6rXWdouBcvKGHMnpRcey+3COA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729158462; c=relaxed/simple;
-	bh=rlctYl5U8K1DKzy7dCypquZqcKDhUvVVu5KxJ9C02oU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pqo9WK54RToGBc18m4xkJtZCcCtY3HJbv0JlSLW20/SNPDTXPZgoRnkVTQyLS1rbUZNo/+MmW+zjPPcLghOFAHw0PQj6kmNUMHt64Xz96PsosAaxkwFSW51iVPQR2ULNHa5GEm5bM+uIXgfsubz7CKSMBRGPktWaZrgxu72iNqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=N23q9ZA6; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1729158456;
-	bh=rlctYl5U8K1DKzy7dCypquZqcKDhUvVVu5KxJ9C02oU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=N23q9ZA6sy1EIr9zwziOQpOWGgVq4gSDunvu2KNPq1DvM4JLlga80RaIaK2DPcWLa
-	 z8W7K8POX+fMP1iW/5DP3vIY5bXfY06hJZHByxQRmCISoixHSyQST/C4Qt8j+k5akx
-	 57ghcd4hofmJiw0loyLmuP9qATpwglBV1tljXYfcpQPPbHzuLn3uRm1hBGu0Jk0SkB
-	 qw10i8YPymETDrghCmMCL/5DReXGhJKOdqqK159JOFdyIrz/E6B9SuZXVhBVBvPlsR
-	 ellZI5htKVyRoKt6kLFPxgj9xb6fDrw0i9MbWe+KKb7wLNMVvPqPrwOePYZLs9ivp1
-	 sI924R2d6HEAw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id F41A7600C4;
-	Thu, 17 Oct 2024 09:47:11 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id 1CB8A2039AA; Thu, 17 Oct 2024 09:47:08 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	David Ahern <dsahern@kernel.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] tools: ynl-gen: use big-endian netlink attribute types
-Date: Thu, 17 Oct 2024 09:47:02 +0000
-Message-ID: <20241017094704.3222173-1-ast@fiberby.net>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1729158430; c=relaxed/simple;
+	bh=MiPUNWCleeiUeLWg7A/InmEPhEz/OV1p/R+auYubiso=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GGhAoOcZ8F4XR7W3J5F9a0OGhGC8iODU247wU/4VaWYuCVGuup/7g2L/mldkT7ipT2VEGuNCUH0jaM0AztFMuw6CayX4K0DtBcd2+CHy1HiyCyWgKgBiU3j6Q/X2TPxeJ4pwn8qjh3IlkpYDCa9m0f21xoqRy7XoIYaZJ/0Vj14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qQreREBH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4222C4CEC3;
+	Thu, 17 Oct 2024 09:47:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729158429;
+	bh=MiPUNWCleeiUeLWg7A/InmEPhEz/OV1p/R+auYubiso=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qQreREBH47sjAdgaljKiVE2KlTqCEd2rMHl4+WfYBCeLHFUAqUomnIr6CTm9CLVek
+	 k65w9TZEEJkV5D+xcc5VgRB2OwaNXDDheevt2tJGW8RlLAqBXarvmRe7NsRlKeshS4
+	 5HoPAuWJBzFXXK6Web01MqcY9/EF6kXSA5Tdqp9Kz0K9jgzSCPUv2cDO/3YlwFU+hu
+	 pN7oqrHps21CVFklH02NS4HNPt3Gss+Basus9tiPO8AyNNTKj1Br8/ZxGSTvuXjDSg
+	 DUp9aOl14SB2Q7CPBBGf5K2lexizHOmGDy9k5PIfgSwTT9i+5fg/2GVJ3Oo0YgPjKz
+	 qq+p2dBjd5UZA==
+Date: Thu, 17 Oct 2024 10:47:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v9 5/7] ixgbe: Add ixgbe_x540 multiple header
+ inclusion protection
+Message-ID: <20241017094706.GC1697@kernel.org>
+References: <20241003141650.16524-1-piotr.kwapulinski@intel.com>
+ <20241003141650.16524-6-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003141650.16524-6-piotr.kwapulinski@intel.com>
 
-Change ynl-gen-c.py to use NLA_BE16 and NLA_BE32 types to represent
-big-endian u16 and u32 ynl types.
+On Thu, Oct 03, 2024 at 04:16:48PM +0200, Piotr Kwapulinski wrote:
+> Required to adopt x540 specific functions by E610 device.
+> 
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 
-Doing this enables those attributes to have range checks applied, as
-the validator will then convert to host endianness prior to validation.
-
-The autogenerated kernel/uapi code have been regenerated by running:
-  ./tools/net/ynl/ynl-regen.sh -f
-
-This changes the policy types of the following attributes:
-
-  FOU_ATTR_PORT (NLA_U16 -> NLA_BE16)
-  FOU_ATTR_PEER_PORT (NLA_U16 -> NLA_BE16)
-    These two are used with nla_get_be16/nla_put_be16().
-
-  MPTCP_PM_ADDR_ATTR_ADDR4 (NLA_U32 -> NLA_BE32)
-    This one is used with nla_get_in_addr/nla_put_in_addr(),
-    which uses nla_get_be32/nla_put_be32().
-
-IOWs the generated changes are AFAICT aligned with their implementations.
-
-The generated userspace code remains identical, and have been verified
-by comparing the output generated by the following command:
-  make -C tools/net/ynl/generated
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-
----
-Changelog:
-
-v2:
-- Re-implement to avoid adding a new Type attribute (Requested by Jakub).
-
-v1: https://lore.kernel.org/netdev/20240913085555.134788-1-ast@fiberby.net/
----
- net/ipv4/fou_nl.c          | 4 ++--
- net/mptcp/mptcp_pm_gen.c   | 2 +-
- tools/net/ynl/ynl-gen-c.py | 5 ++++-
- 3 files changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/fou_nl.c b/net/ipv4/fou_nl.c
-index 98b90107b5ab..3d9614609b2d 100644
---- a/net/ipv4/fou_nl.c
-+++ b/net/ipv4/fou_nl.c
-@@ -12,7 +12,7 @@
- 
- /* Global operation policy for fou */
- const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
--	[FOU_ATTR_PORT] = { .type = NLA_U16, },
-+	[FOU_ATTR_PORT] = { .type = NLA_BE16, },
- 	[FOU_ATTR_AF] = { .type = NLA_U8, },
- 	[FOU_ATTR_IPPROTO] = { .type = NLA_U8, },
- 	[FOU_ATTR_TYPE] = { .type = NLA_U8, },
-@@ -21,7 +21,7 @@ const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
- 	[FOU_ATTR_LOCAL_V6] = { .len = 16, },
- 	[FOU_ATTR_PEER_V4] = { .type = NLA_U32, },
- 	[FOU_ATTR_PEER_V6] = { .len = 16, },
--	[FOU_ATTR_PEER_PORT] = { .type = NLA_U16, },
-+	[FOU_ATTR_PEER_PORT] = { .type = NLA_BE16, },
- 	[FOU_ATTR_IFINDEX] = { .type = NLA_S32, },
- };
- 
-diff --git a/net/mptcp/mptcp_pm_gen.c b/net/mptcp/mptcp_pm_gen.c
-index c30a2a90a192..5a6b2b4510d3 100644
---- a/net/mptcp/mptcp_pm_gen.c
-+++ b/net/mptcp/mptcp_pm_gen.c
-@@ -14,7 +14,7 @@
- const struct nla_policy mptcp_pm_address_nl_policy[MPTCP_PM_ADDR_ATTR_IF_IDX + 1] = {
- 	[MPTCP_PM_ADDR_ATTR_FAMILY] = { .type = NLA_U16, },
- 	[MPTCP_PM_ADDR_ATTR_ID] = { .type = NLA_U8, },
--	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_U32, },
-+	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_BE32, },
- 	[MPTCP_PM_ADDR_ATTR_ADDR6] = NLA_POLICY_EXACT_LEN(16),
- 	[MPTCP_PM_ADDR_ATTR_PORT] = { .type = NLA_U16, },
- 	[MPTCP_PM_ADDR_ATTR_FLAGS] = { .type = NLA_U32, },
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index d64cb2b49c44..1a825b4081b2 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -167,7 +167,10 @@ class Type(SpecAttr):
-         return '{ .type = ' + policy + ', }'
- 
-     def attr_policy(self, cw):
--        policy = c_upper('nla-' + self.attr['type'])
-+        policy = f'NLA_{c_upper(self.type)}'
-+        if self.attr.get('byte-order') == 'big-endian':
-+            if self.type in {'u16', 'u32'}:
-+                policy = f'NLA_BE{self.type[1:]}'
- 
-         spec = self._attr_policy(policy)
-         cw.p(f"\t[{self.enum_name}] = {spec},")
--- 
-2.45.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
