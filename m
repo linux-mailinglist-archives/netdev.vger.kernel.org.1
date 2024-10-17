@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-136620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D840D9A2679
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 17:24:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1F69A267D
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 17:24:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E319282EEE
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 15:24:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1DB1F22F82
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 15:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514821DED51;
-	Thu, 17 Oct 2024 15:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EE51DED79;
+	Thu, 17 Oct 2024 15:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7kwpetA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gCaGz+jo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6081DED4D
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 15:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA101DED76
+	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 15:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729178669; cv=none; b=Q7oPO2dBCUAHhlZ1uLR3C0IrU9h4z60g4AkXYoh81Qsm0rOk1AWMl/GehMZ9RDGKxwaQI24taOsqJHpFTwHJ1aXDwTxcpDPt6P74XzZMqv3YkjWWWA162cKiuY2sgFKrDJA4BUMONHegYO3t7ptKsICYUq20ELmZHxx+aoa+SJA=
+	t=1729178672; cv=none; b=NhW50ziqbAc+O70liMyLh9ZlRGBYDlxKRwLJ3k0ZnPUJSHKuTb+jSsjTgR5Z1+4k+HO8//OmjUnZHvUoTQ3Pcqf2Qsh/zCh8n2nebdslwYUdMv7bgckQmyUj3HI137XYjAuuXM1bOUnw7HzkPo7rm3NqxyHaZejZhWbYWawzBr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729178669; c=relaxed/simple;
-	bh=OykKxKwP0lrkTqzkAJtCbXaqTh7JZLgsk0rcLfNzoow=;
+	s=arc-20240116; t=1729178672; c=relaxed/simple;
+	bh=vddhhLfJFoNR/Pudv6TWiHyZGFLfBiLpicAF55+Y+o4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u9y/nHShY7Ag5iAti8gBxjRicjLg2NmdxuVaj/bmyYxEUBDjzBmSw2PgsRjO+I8RxfIT85V6e5YtKp618fSMP5wPWQgIKfqijj/INOC8MkaUsTodEec1r1O0uW/hfnJZWRO7IRAljNGM9lIVhzfEle4dipyucUr1NC/xyGTabyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7kwpetA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AD9EC4CEC3;
-	Thu, 17 Oct 2024 15:24:28 +0000 (UTC)
+	 MIME-Version; b=uh8XkWB7SYULYHoUfLaZnoJGE/7iS0i5gU1f/4FnhQLbuku0P8uH2fB9wyo+P0z+8u8yYuLbXwXDww1YKJEe0WtQFbqaqXvlD6iC+JwK1iDURTQm2IgSaF3wmbpMYqaOEQEsd2mfyv0yoIA3ODGjOJAX/yrA4oLKjYrJOk/oOdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gCaGz+jo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 699E3C4CECD;
+	Thu, 17 Oct 2024 15:24:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729178668;
-	bh=OykKxKwP0lrkTqzkAJtCbXaqTh7JZLgsk0rcLfNzoow=;
+	s=k20201202; t=1729178671;
+	bh=vddhhLfJFoNR/Pudv6TWiHyZGFLfBiLpicAF55+Y+o4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o7kwpetA0lX81KRkcc3HZzVPO2iHq3m6YcUqeD9+yiEzPIviJ5YSbA7YUW+FlwoN9
-	 Gn+powb5iWFi73S3d5v3zxYiBvdNxa1/wRU5cSraYgFd4snggOxPyOC/zJmQk4j0sF
-	 x3SZS5l3a+4GGNTxAXMGpI62miL2mfrkIzi4yL1FbpqCg3sQ/2gKUXuHmGKTpZx7NL
-	 /ygYxm6a1qDoEm92ktKcMg0Zh3kKspEFhSzqOqVQe6DWacNoMTL1EquWb6Wh9CeTg9
-	 lAO3TciNpEEj5uAZkwAiOia1H0vL29Pz49r20ZUYBHIvwmlyobjflkKQ5QgatKyNHE
-	 7JLUHyoqkkfaQ==
+	b=gCaGz+jomWGz32HCS5UZGFVM9ueBGgbjE3iUCl6OpgBEC5Zppy+KIytIgOIqsQJgI
+	 SgM5SITMfkmDPYpaG76O7KccLKKlaOOtfOH3Cnzgi3aIKyzXc0m1n3OJ34/VGcplVr
+	 WdJXtC0FqpeYEqJxgE4/fDSgwzqvWPovGuv2ok+HaILqnqZJ0scRRxlCyVcw6DrALJ
+	 MNhLv8fhW7OeHpfcZu9b+uffubr+9sj715sNQCcYzkCjHMtR0kXYZHNsbs+kO0CzmO
+	 romxaIp5ZP651pap3QPioIXDa+lxa7ZDu6mFbzNwpOmsSewAseRr09CFlAmWzo0en1
+	 soIoyGmsbIB+A==
 From: Antoine Tenart <atenart@kernel.org>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -48,9 +48,9 @@ To: davem@davemloft.net,
 	edumazet@google.com
 Cc: Antoine Tenart <atenart@kernel.org>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 1/3] net: sysctl: remove always-true condition
-Date: Thu, 17 Oct 2024 17:24:17 +0200
-Message-ID: <20241017152422.487406-2-atenart@kernel.org>
+Subject: [PATCH net-next 2/3] net: sysctl: do not reserve an extra char in dump_cpumask temporary buffer
+Date: Thu, 17 Oct 2024 17:24:18 +0200
+Message-ID: <20241017152422.487406-3-atenart@kernel.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241017152422.487406-1-atenart@kernel.org>
 References: <20241017152422.487406-1-atenart@kernel.org>
@@ -62,46 +62,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Before adding a new line at the end of the temporary buffer in
-dump_cpumask, a length check is performed to ensure there is space for
-it.
-
-  len = min(sizeof(kbuf) - 1, *lenp);
-  len = scnprintf(kbuf, len, ...);
-  if (len < *lenp)
-          kbuf[len++] = '\n';
-
-Note that the check is currently logically wrong, the written length is
-compared against the output buffer, not the temporary one. However this
-has no consequence as this is always true, even if fixed: scnprintf
-includes a null char at the end of the buffer but the returned length do
-not include it and there is always space for overriding it with a
-newline.
-
-Remove the condition.
+When computing the length we'll be able to use out of the buffers, one
+char is removed from the temporary one to make room for a newline. It
+should be removed from the output buffer length too, but in reality this
+is not needed as the later call to scnprintf makes sure a null char is
+written at the end of the buffer which we override with the newline.
 
 Signed-off-by: Antoine Tenart <atenart@kernel.org>
 ---
- net/core/sysctl_net_core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/core/sysctl_net_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index b60fac380cec..e7c0121dfaa1 100644
+index e7c0121dfaa1..8dc07f7b1772 100644
 --- a/net/core/sysctl_net_core.c
 +++ b/net/core/sysctl_net_core.c
-@@ -69,8 +69,10 @@ static void dump_cpumask(void *buffer, size_t *lenp, loff_t *ppos,
+@@ -62,7 +62,7 @@ static void dump_cpumask(void *buffer, size_t *lenp, loff_t *ppos,
  		return;
  	}
  
--	if (len < *lenp)
--		kbuf[len++] = '\n';
-+	/* scnprintf writes a trailing null char not counted in the returned
-+	 * length, override it with a newline.
-+	 */
-+	kbuf[len++] = '\n';
- 	memcpy(buffer, kbuf, len);
- 	*lenp = len;
- 	*ppos += len;
+-	len = min(sizeof(kbuf) - 1, *lenp);
++	len = min(sizeof(kbuf), *lenp);
+ 	len = scnprintf(kbuf, len, "%*pb", cpumask_pr_args(mask));
+ 	if (!len) {
+ 		*lenp = 0;
 -- 
 2.47.0
 
