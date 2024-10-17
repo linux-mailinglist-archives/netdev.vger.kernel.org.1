@@ -1,174 +1,139 @@
-Return-Path: <netdev+bounces-136521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6999A1FA3
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:21:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C18229A1FF1
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 12:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 588651F22CF2
-	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:21:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7790D1F230CD
+	for <lists+netdev@lfdr.de>; Thu, 17 Oct 2024 10:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7EB1DA113;
-	Thu, 17 Oct 2024 10:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DCF1DC054;
+	Thu, 17 Oct 2024 10:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kElxpw21"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDF31D935A
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 10:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDBF1DB940;
+	Thu, 17 Oct 2024 10:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729160491; cv=none; b=flEwlnWXbKGQOwglCE92waqSrFTZqCM7qFe6uNu95X5x7/Eh8ijBuDiiqexfStP9hGqwH6dn98MICereNUb8RsZmcaCXZSqIFu6Q9dzeq/Ae0cSXN/53oMmzNfkSB/kc/Z/TErHJ3wQ7Dw/GQnOYKifS5LG2ltMslM9nUiwu/Pw=
+	t=1729160883; cv=none; b=pje3OIMHAbliSMSDc7QBcW9EkPeT1pkJsR0hFJg6c0ovKcAYryS9DbMRPSJOrl8TF1QQqyH/A/kEy2Mst0LZKk8K2Xc1jBAddrZ7Nj4/01G2NUez+I+0Sil0tTX1SLGqwPiJl2u+1jgyJvx2mkqHH0Id+VLmjFll4X3ROSwHSu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729160491; c=relaxed/simple;
-	bh=+MgRCFw9CRBVNuLmPgQwbgWY4iaSOd6df9Y5vpQXJtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WjivPUuGrZjinCZ8xJn6zpUkz6dYr/I9DqEp7PvZZX1hpawqUJ12W+4jHORuD09R3+HFiR+rLaHOs8XMEb1d8fk3tNyhlDd9i33p8DB/CCDyLhHKLIU4uU7EBl7+EfrO1xcgtYM9w+lmDf/0rarWPQjgxxgZc2PROd06gHXVWtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t1Nd2-00043j-Kv; Thu, 17 Oct 2024 12:21:12 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t1Nd0-002WRC-W2; Thu, 17 Oct 2024 12:21:11 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id A3C39355053;
-	Thu, 17 Oct 2024 10:21:10 +0000 (UTC)
-Date: Thu, 17 Oct 2024 12:21:10 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kernel@pengutronix.de" <kernel@pengutronix.de>
-Subject: Re: RE: RE: [PATCH net-next 07/13] net: fec: fec_probe(): update
- quirk: bring IRQs in correct order
-Message-ID: <20241017-manipulative-dove-of-renovation-88d00b-mkl@pengutronix.de>
-References: <20241016-fec-cleanups-v1-0-de783bd15e6a@pengutronix.de>
- <20241016-fec-cleanups-v1-7-de783bd15e6a@pengutronix.de>
- <PAXPR04MB85103D3E433F3FBE5DDFA15C88472@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20241017-affable-impartial-rhino-a422ec-mkl@pengutronix.de>
- <PAXPR04MB8510149D0E8AC39E048941F988472@PAXPR04MB8510.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1729160883; c=relaxed/simple;
+	bh=vHxOPdb7E+AmmVdo6npuKzs2hcgBYcF6BG7HiCbCLCg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IcPZZlo07ATtcOdOxdKBD1mlq1iuJY4iibF1aRK2iNRINJJE38p6TwVGkFglDjwFYaVZtpqxRJIn3OE8ZiJ6pvg8hSRhRmepxQlTPBKXB9RGVLgTdLbBhWeHDth84mm6GXllm8CnGhhq+XgwLpJdi4+Z+ngDU4DmFo9REzOrnL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kElxpw21; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49HAMfAD019911;
+	Thu, 17 Oct 2024 10:27:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=wTCH1XG8cJWfXcNjT1fyem
+	Cv6FwsrZJWCjKcm5NJ3w4=; b=kElxpw21fWNu2YZ+M9M5RjNZH6lPulQdIvalCA
+	9fsuAco+KFh3wj8w1q6xV6VF4oSguz+pDhnTlTYKKARiWCjnJGTReVzeShZJETYx
+	jaVo95DXiSbK57JuAtSu9Ze6PSzBPEfJQiWWueIVYXAkx/eyU8MXl6tVT5U7LxMl
+	hLrunfwuq/skJyx0juNM4ZqObIq2aNraJI6WDgdc5jAsLOhkad0PSlPADXAecpim
+	3r0VIAbL4RmL9MmXe/aVuIxt7z4ySFLdzG4a3EUp31bpzgqlX5k1PBXs720NA+XU
+	pbSuusVixeNzgeD2cbsUo7Gpx1eP6prMjpzZosOPBhQKEmIA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42b0rx00f9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 10:27:42 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49HARfca007402
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 10:27:41 GMT
+Received: from yijiyang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 17 Oct 2024 03:27:37 -0700
+From: YijieYang <quic_yijiyang@quicinc.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>
+CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>,
+        Yijie Yang
+	<quic_yijiyang@quicinc.com>
+Subject: [PATCH v2 0/5] Enable ethernet for qcs8300
+Date: Thu, 17 Oct 2024 18:27:23 +0800
+Message-ID: <20241017102728.2844274-1-quic_yijiyang@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="if6uf6fuhmiren6s"
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB8510149D0E8AC39E048941F988472@PAXPR04MB8510.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: X4Wb4XEFg3bRkg6WGgIr_pvyrZG4mG-Y
+X-Proofpoint-ORIG-GUID: X4Wb4XEFg3bRkg6WGgIr_pvyrZG4mG-Y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ mlxscore=0 priorityscore=1501 spamscore=0 suspectscore=0 impostorscore=0
+ mlxlogscore=877 malwarescore=0 lowpriorityscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410170071
+
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+
+Add dts nodes to enable ethernet interface on qcs8300-ride and
+Rev 2 platforms.
+The EMAC, SerDes and EPHY version are the same as those in sa8775p.
+
+Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+---
+This patch series depends on below patch series:
+https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/
+https://lore.kernel.org/all/20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com/
+
+Changes in v2:
+- Detect rename and rewrite of changes, and break down changes for easier understanding
+- Document the difference between qcs8300 ride and revision 2 in commit message
+- Link to v1: https://lore.kernel.org/r/20241010-dts_qcs8300-v1-0-bf5acf05830b@quicinc.com
+
+Yijie Yang (5):
+  dt-bindings: arm: qcom: add qcs8300-ride Rev 2
+  arm64: dts: qcom: qcs8300: add the first 1Gb ethernet
+  arm64: dts: qcom: qcs8300-ride: enable ethernet0
+  arm64: dts: qcom: move common parts for qcs8300-ride variants into a
+    .dtsi
+  arm64: dts: qcom: qcs8300-ride-r2: add new board file
+
+ .../devicetree/bindings/arm/qcom.yaml         |   1 +
+ arch/arm64/boot/dts/qcom/Makefile             |   1 +
+ arch/arm64/boot/dts/qcom/qcs8300-ride-r2.dts  |  33 ++
+ arch/arm64/boot/dts/qcom/qcs8300-ride.dts     | 299 ++----------------
+ .../{qcs8300-ride.dts => qcs8300-ride.dtsi}   | 107 ++++++-
+ arch/arm64/boot/dts/qcom/qcs8300.dtsi         |  43 +++
+ 6 files changed, 212 insertions(+), 272 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/qcom/qcs8300-ride-r2.dts
+ rewrite arch/arm64/boot/dts/qcom/qcs8300-ride.dts (95%)
+ copy arch/arm64/boot/dts/qcom/{qcs8300-ride.dts => qcs8300-ride.dtsi} (78%)
 
 
---if6uf6fuhmiren6s
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+base-commit: cea5425829f77e476b03702426f6b3701299b925
+-- 
+2.34.1
 
-On 17.10.2024 07:43:55, Wei Fang wrote:
-> > > > Subject: [PATCH net-next 07/13] net: fec: fec_probe(): update quirk=
-: bring
-> > IRQs
-> > > > in correct order
-> > > >
-> > > > With i.MX8MQ and compatible SoCs, the order of the IRQs in the devi=
-ce
-> > > > tree is not optimal. The driver expects the first three IRQs to mat=
-ch
-> > > > their corresponding queue, while the last (fourth) IRQ is used for =
-the
-> > > > PPS:
-> > > >
-> > > > - 1st IRQ: "int0": queue0 + other IRQs
-> > > > - 2nd IRQ: "int1": queue1
-> > > > - 3rd IRQ: "int2": queue2
-> > > > - 4th IRQ: "pps": pps
-> > > >
-> > > > However, the i.MX8MQ and compatible SoCs do not use the
-> > > > "interrupt-names" property and specify the IRQs in the wrong order:
-> > > >
-> > > > - 1st IRQ: queue1
-> > > > - 2nd IRQ: queue2
-> > > > - 3rd IRQ: queue0 + other IRQs
-> > > > - 4th IRQ: pps
-> > > >
-> > > > First rename the quirk from FEC_QUIRK_WAKEUP_FROM_INT2 to
-> > > > FEC_QUIRK_INT2_IS_MAIN_IRQ, to better reflect it's functionality.
-> > > >
-> > > > If the FEC_QUIRK_INT2_IS_MAIN_IRQ quirk is active, put the IRQs back
-> > > > in the correct order, this is done in fec_probe().
-> > > >
-> > >
-> > > I think FEC_QUIRK_INT2_IS_MAIN_IRQ or FEC_QUIRK_WAKEUP_FROM_INT2
-> > > is *NO* needed anymore. Actually, INT2 is also the main IRQ for i.MX8=
-QM
-> > and
-> > > its compatible SoCs, but i.MX8QM uses a different solution. I don't k=
-now
-> > why
-> > > there are two different ways of doing it, as I don't know the history=
-=2E But you
-> > can
-> > > refer to the solution of i.MX8QM, which I think is more suitable.
-> > >
-> > > See arch/arm64/boot/dts/freescale/imx8-ss-conn.dtsi, the IRQ 258 is
-> > > placed first.
-> >=20
-> > Yes, that is IMHO the correct description of the IP core, but the
-> > i.MX8M/N/Q DTS have the wrong order of IRQs. And for compatibility
-> > reasons (fixed DTS with old driver) it's IMHO not possible to change the
-> > DTS.
-> >=20
->=20
-> I don't think it is a correct behavior for old drivers to use new DTBs or=
- new
-> drivers to use old DTBs. Maybe you are correct, Frank also asked the same
-> question, let's see how Frank responded.
-
-DTBs should be considered stable ABI.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---if6uf6fuhmiren6s
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcQ5RMACgkQKDiiPnot
-vG+R0Qf/dzxXVRvh+Z9JPr2Jdy5B8+osttD+2QGvftI+k1uNHix9NpNYeAK+sngy
-wOxHzaLOwFbKujUDkS+DkmRNuwS1V2Tdq2vvNX+lmV+ZYF3QMHijcc+yrW+gN91X
-R1WNoO3k/VyGOWfQhAHlZAXz97lqSB95CJC1CjlyDjxrs9n0kxft2L8SSCs3Wgyp
-siN/4e5zwil2CGggMsipL6gmtv6UnloCQSWRBRZgy915QuiON+RKhF3fmJKX1+Zi
-FvYJ8yWCCEMZHp/lNr1xrstYq6ciw4vLImp8NqVS5wEx8hzb01HXkKemVyuSstPa
-/DsvlxWa60Ri1dcosipadLBLp2j1Qw==
-=0KhN
------END PGP SIGNATURE-----
-
---if6uf6fuhmiren6s--
 
