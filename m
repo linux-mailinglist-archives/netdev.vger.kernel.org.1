@@ -1,55 +1,62 @@
-Return-Path: <netdev+bounces-137024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C433D9A40A1
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:05:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AAD59A40A6
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6751B280FAE
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:05:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CB5F1F22B5D
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4837603A;
-	Fri, 18 Oct 2024 14:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74CA1DA2FE;
+	Fri, 18 Oct 2024 14:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2KrzJFd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JkgqFFyS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BA06F2FE
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 14:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB69D1D7E3D;
+	Fri, 18 Oct 2024 14:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729260311; cv=none; b=gidtGz/4Ufc0kSV9VYo6Leq4CS/kRNQ3fAD0gh4XoaYcGK1Lt9UMtA/+zBuAw8Sa7b+nNWFxd8MPG54qWuzD3OoT049nBoYkqjybPH+hDzpgCjqtVstxt/39wnhj24yAsc8YOGk5uYuY7ELG+UwAC0U89eK+wQbUJyssvSRHY3E=
+	t=1729260347; cv=none; b=n+ENY5YnYS8fDyjaaaEgYPSTc/MGEbyLPL7PC5LYyMdYLaVfBx8X7kAWPgEMEkMujr8CrkTu/ztO7s7Yf5TKilum7AS22ILAIAj71X3PH4ZHyMzJXyvs3CrcweG2R1vkvoWY5aX10xx6JlXK4g04CZpKLicRhvOYe+iwi0NKi8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729260311; c=relaxed/simple;
-	bh=R9lWypop9CYn5IZM0AimYM8p1o0ocB7VwyHTdtaK9+U=;
+	s=arc-20240116; t=1729260347; c=relaxed/simple;
+	bh=+RCB/8imlMP7I0R5+dLbRC2pOf22HBd0bzGYlLVD34w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AAbn7VmwpfdwvkZ47yOBkM77/+KyUQsfnJab4YeKIdoAIvN+e6YXA9ypgdSPPUO0uv8F32kV30yNxrh4IZ4Gi+r1JmF39kASo3H7vPDEGQYxpsCUkzkwbRsNdchKYBmhtXRhewMvUos05YDWDW/YZTGxNZO7UtFxv7VmQ3d7jSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A2KrzJFd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0C73C4CEC7;
-	Fri, 18 Oct 2024 14:05:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729260310;
-	bh=R9lWypop9CYn5IZM0AimYM8p1o0ocB7VwyHTdtaK9+U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A2KrzJFdyx5Q0fLbzBijSTvTKJjEyGrD0KPVXKVairUmKL/Z7emdKCg5bg4mSc2VA
-	 4RPZuU34JPA81MBh4RBYqodOKLMNEydrYnu4E5rGOaMiuenijw83y6WtSVMKWhaFcQ
-	 yja93tki8oHsnmL2CJNnI6wrCv2bwUoWcylpglxIivnK6ZjytmPujveLygXv7yhX0o
-	 IPdXpbrUtv6oU7UsPuIfhhUOfZa5trhlQogI9zpCF4bV3YCS0k4IHnbtJQra6mnEgL
-	 RZQD1FqcZ5ErZOqdTnS9R7UC3pHxN18ECgakW1vKD5hdaq4Yr+2+rrQhJCq/qL0uW0
-	 IUdcHz9CqXXRA==
-Date: Fri, 18 Oct 2024 15:05:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: sysctl: remove always-true condition
-Message-ID: <20241018140507.GM1697@kernel.org>
-References: <20241017152422.487406-1-atenart@kernel.org>
- <20241017152422.487406-2-atenart@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tGAvlmM3y39qFkeC+4cqBID1ZWqj/jb1sCtPduGthPGNeVTAO5xbSpQWSXO0stt3+EVTG6npBdb1/BAcU2dbNdaMz4msGjK8cfkeCburZoMgMSqoIhX5dwDPQUVJqhOa8t1MmkZoYgaaquke/RQlcsKoK4xzZ7bhNhW4/SxxJxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JkgqFFyS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9xModl0LXKR97D6bTC1dOF0MC+8n7lokOrXW7ATMYxc=; b=JkgqFFyS99QUgDr4rm8w6lew7p
+	aboc3E6bt0G5NM5qv/32E/rRv0wVI/+yspOhXMrD5lwreXPsg2GJoNkPWQkiUlmW95/6fMgObZ6I8
+	kHxLgWGBysCX2uFuqtL1ER2HOGpOePi+HEeT7Jlpu9EMefe9UrkNw8YoGD/Jwr3sXIE8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t1nbc-00AXbU-7a; Fri, 18 Oct 2024 16:05:28 +0200
+Date: Fri, 18 Oct 2024 16:05:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me, a.hindborg@samsung.com,
+	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com,
+	sboyd@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 5/8] rust: time: Add wrapper for fsleep
+ function
+Message-ID: <e08ce8e2-a44a-425a-aef7-b9fd046970aa@lunn.ch>
+References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
+ <20241016035214.2229-6-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,32 +65,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241017152422.487406-2-atenart@kernel.org>
+In-Reply-To: <20241016035214.2229-6-fujita.tomonori@gmail.com>
 
-On Thu, Oct 17, 2024 at 05:24:17PM +0200, Antoine Tenart wrote:
-> Before adding a new line at the end of the temporary buffer in
-> dump_cpumask, a length check is performed to ensure there is space for
-> it.
-> 
->   len = min(sizeof(kbuf) - 1, *lenp);
->   len = scnprintf(kbuf, len, ...);
->   if (len < *lenp)
->           kbuf[len++] = '\n';
-> 
-> Note that the check is currently logically wrong, the written length is
-> compared against the output buffer, not the temporary one. However this
-> has no consequence as this is always true, even if fixed: scnprintf
-> includes a null char at the end of the buffer but the returned length do
-> not include it and there is always space for overriding it with a
-> newline.
-> 
-> Remove the condition.
-> 
-> Signed-off-by: Antoine Tenart <atenart@kernel.org>
+> +/// This function can only be used in a nonatomic context.
+> +pub fn fsleep(delta: time::Delta) {
+> +    // SAFETY: FFI call.
+> +    unsafe {
+> +        // Convert the duration to microseconds and round up to preserve
+> +        // the guarantee; fsleep sleeps for at least the provided duration,
+> +        // but that it may sleep for longer under some circumstances.
+> +        bindings::fsleep(
+> +            ((delta.as_nanos() + time::NSEC_PER_USEC - 1) / time::NSEC_PER_USEC) as c_ulong,
 
-Thanks for separating out this and patch 2/3.
-It makes it much easier to reason with these changes.
+You add a as_sec() helper, but then don't use it? If the helper does
+not do what you want, maybe the helper is wrong? This is part of why
+we say all APIs should have a user.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+	Andrew
 
