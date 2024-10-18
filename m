@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-137021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0012D9A408E
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 15:57:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB26A9A408F
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 15:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CED6B207C6
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 13:57:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F838280C20
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 13:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0844B558BB;
-	Fri, 18 Oct 2024 13:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D5F18E025;
+	Fri, 18 Oct 2024 13:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YEDOE2IN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ChDbFg/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37C2F9E6
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 13:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38CA42A97
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 13:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729259828; cv=none; b=fW50lhBVkCpWH599vjnTdBJajwo4/usmaBG0Phbq2n2hE/MrKBrZhyDUUOc9ftRUtYBkL+fm6ziSC3Fu8j5ADPq/80ZdK9Hi/39H/TGtdol75vSJCrsJ+j6OXYlANIBlzDsMPVYE4gS9sS6zGthEAILBfKKxpTD/68AELBR67gk=
+	t=1729259856; cv=none; b=PynSI3HBeuTiCrcT1+fzF6uYHWUQ4f8UwdvRhdDIfbyNiw7kPhLk+ceaANs+h1eWDVVJNEJNREHLA2wf2pPCB+OrDo6Ma5Qei8cF9BrlSP8XAz5klhYF/as8PDZ+liVF2iI/PPZLQQmn/HQmd4MqXPYh72k15m1fR7sYbErnKkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729259828; c=relaxed/simple;
-	bh=M81mLAjwj5aDRsz+qEeQsnrsJ6Dkptv6/3sdnEN9asg=;
+	s=arc-20240116; t=1729259856; c=relaxed/simple;
+	bh=ipVkCSb2KEjAp0Xk5vtq9y226WzcE+K0GEN4bl+/mSw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Exz8SLIlMNFEAjATbD9nBcI00IBFTgP72aPhg8UYwoDITmzIAdWIt6Wyw4uQKfJWV6QSWIFp6sTQGxYllxcC7R1gwG9EpcpgdLkfp1MBO65ZkeyXvEHTZ++5jVCDa33APiqYcM4CKHLGSuwNDgMF8kNFo2y/XmFMUS2GFm+Wc50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YEDOE2IN; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=LLBWhnzlVjxmHHBJa38I8S32V45EZ8JQMn5uE6bYLrPejyAemegZUPP9ZZDbpjjzFD+Lxm3Cjecx1AIEBUF7KN8NDtPFRcW1U5tYgPGrDoTacpfGr5HdCK3TRzKUBTPXW0TpLK9EH2WqeQq1J0pUWbiXSGtHE08yr4NEWDm2ulI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ChDbFg/u; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c960af31daso2439083a12.3
-        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 06:57:06 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c94dd7e1c0so2718717a12.0
+        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 06:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729259825; x=1729864625; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1729259853; x=1729864653; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M81mLAjwj5aDRsz+qEeQsnrsJ6Dkptv6/3sdnEN9asg=;
-        b=YEDOE2IN6pbOBZWgvyj5sC0/DfNFovSY9jbEq5ASL86NmbI4oRsDOkvHgyNAX/T5wv
-         G0VzAzmge9zv/KwuJgosbF9HrWBNjIhk3Zth/W/L+jdHqKuDLru4nNAsb76bpUf3LaHt
-         6H3gUZBX2MUvRliWBF2CqTemzfBE5G6pD7ixwRDAlzaPiAxlBw93fhK1tgKVT2weTlJc
-         0SLTw4DDfrS6nSJAfoxMmwPZ+lZB4+gHCbzVZTBk2ydwFcGeqc+J3BXDOiUZGNTfAHFG
-         409YTu2RBepBdP1zi3UvZ3Hz33hg6LnmhmKoIzxT/r+pnpKfzin3fEQJvQpulJquO543
-         MUdw==
+        bh=ipVkCSb2KEjAp0Xk5vtq9y226WzcE+K0GEN4bl+/mSw=;
+        b=ChDbFg/uIuU5yPTrEJXorOH7BZLqbv0OcxDu7mqKNv5tL8GgbV+VcmA8FFY01pA/Ur
+         fR39qDHC6V7rrsDakgu1fcQmtkgTISaDaOG7dxGdBmn05VE8Nx6SxCtX12X1eQjGhIoX
+         E2/AtgCLlW5U7QVE/jqxbOcsfsG0fYzavAHsrXwH9rmwmzFCHQGjo+5evCobWQgiYcXX
+         D7lUFN2erpCqSNGYKtYsw9Ak9i8ulxNBeusdQl8PljVwST+2m89D97BtogaVEXNjqlrW
+         GXZgTFe27XbpH6I4g4Opnns7pxnNWFpU9CDr+38YQyvcEi+wqWCfaKy5INHotJsBvSvX
+         0k+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729259825; x=1729864625;
+        d=1e100.net; s=20230601; t=1729259853; x=1729864653;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M81mLAjwj5aDRsz+qEeQsnrsJ6Dkptv6/3sdnEN9asg=;
-        b=w+Sm2u8FXnMUKl/1wpWKMX8Nxd0UhWtCOawzmR4awb97a15CHuA+REn3akA3ibKO6W
-         Q8XFMvL9lWwySs5mjyUltivue2rcbRrUro/MwJw9aZ28V0aVQDA6EgUt+rsxVKak6jvf
-         2NE7mRVH+b1zNIZsly4wwvjdcpxlnxeycwaTDs+SGBAYW/t9BoblUbhUw6pZHJ8dPr9r
-         0QanLp2iZvLuJfihEnTePuPpA0YwisbnEc1azoHakRXkhDdvdNtxe/UBMp3IhhMUr/TH
-         otSqr6gchiVYiP8Hb0FBadkinNIj24Zh9RivKYcLvCq0504RmR53/eZowRqapKGPUWDE
-         iGBA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5QHB4t38pycDMHPn384sGipNUVwbwa6ZLSFlKcTv9wNywISP/39RaqqErJbY+DXJton8s0zQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+SwR4IMYdwIeWIpX7uhWHBnBQaU+gaTjx4EAc42RVkOYPAU2F
-	nKJJ7AYGLyOqSIn+apNKyb6n/tF8kPvymSv+CpOAmeu7snJkVlpsi5vOJoEFx5RLOljIKcEnJ9Y
-	5WSmh4lcvqbb5o4blO3xbwWRCkijKG5NKCZg1IdvRuVcdoDpk2F60
-X-Google-Smtp-Source: AGHT+IGxwRMA8SekD6/ww0ImNltMsB6fMY6lyE/kD6ViYkPQs8/pMNHv3RyDFMsnGHClaGPglJ+sd5SmUdVlAP91amo=
-X-Received: by 2002:a05:6402:358a:b0:5c9:7dd9:3eda with SMTP id
- 4fb4d7f45d1cf-5ca0ac442a2mr2079719a12.5.1729259824936; Fri, 18 Oct 2024
- 06:57:04 -0700 (PDT)
+        bh=ipVkCSb2KEjAp0Xk5vtq9y226WzcE+K0GEN4bl+/mSw=;
+        b=nCCy3Bo53YG4YXQu0O0zhRVT9hB3hLKreOz4ZtGAIY7JuHZaHPSL+2REQ5iDMNIH11
+         thrJJ2nFbEFq/C4xOGGDnTjZc/brKUuKlaEMSJ4/KTCdU/XQT99VzNgwwXU+ZsJXqXAp
+         Ma/52bNO40J2TqwXNeozrEnjXrVJjvxhVPMWHyDvFwr3nbMhZbPetowuTTGX2R55FlTZ
+         9dXXzmIjnY27cemGHuKOwAhbsHkNOO7FnJ3smXg+Kynkwu+vNtSAmPd3sozH00WX+zpk
+         rTvU2vzSyqgkaAp5XqWsAsiaXWO6XyuVggAm9mPl9xU07fe/gp7JoQ84LXlgXq2qn+Po
+         dOSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWW+AVoCSS8s5mUMRC5s1Z9EOIdaKbg4foipjXi0fV+ov+ylJI3a2nfhbRpZbac5VvF3v0z5Iw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySNkjd83QkFH51WtlUFBQsJCXFnvcu6/F0BblAFcjBSwv4FNh6
+	IBDdsofk0VINolGrE/0O/ZoRjjUYpe++u8JxApb9af08sKHej8s4uWcjzj2CpEiSyTzR+BcA6Fj
+	aZ8NjHRU4LCvWyi33a/D+GyZqy3vZPMNox9slhWe3whJZKjwO30e8
+X-Google-Smtp-Source: AGHT+IEbqvbRyzpq87xGk5ZQBUUYhqR3Y9fZSKRaEKzo52T4mtFd5s7SVqUTB0fOv3TM2uqt+CideEcVaEbo3Evnym4=
+X-Received: by 2002:a05:6402:d07:b0:5c9:85e8:e866 with SMTP id
+ 4fb4d7f45d1cf-5ca0ae85af4mr1891934a12.22.1729259852615; Fri, 18 Oct 2024
+ 06:57:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241018012225.90409-1-kuniyu@amazon.com> <20241018012225.90409-11-kuniyu@amazon.com>
-In-Reply-To: <20241018012225.90409-11-kuniyu@amazon.com>
+References: <20241018012225.90409-1-kuniyu@amazon.com> <20241018012225.90409-12-kuniyu@amazon.com>
+In-Reply-To: <20241018012225.90409-12-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 18 Oct 2024 15:56:53 +0200
-Message-ID: <CANn89iLzD21j3sQS24Db_YBrd5N2OEAAXrR03g+pHRfTXY5yEA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 10/11] ipv4: Convert devinet_ioctl() to
- per-netns RTNL except for SIOCSIFFLAGS.
+Date: Fri, 18 Oct 2024 15:57:21 +0200
+Message-ID: <CANn89iJDz4j3NaUEKDA87oRC6WSiv9W=uLWV6w-P4L0AbJTF1w@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 11/11] ipv4: Convert devinet_ioctl to
+ per-netns RTNL.
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
@@ -85,19 +85,12 @@ Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 18, 2024 at 3:25=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+On Fri, Oct 18, 2024 at 3:26=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
 m> wrote:
 >
-> Basically, devinet_ioctl() operates on a single netns.
+> ioctl(SIOCGIFCONF) calls dev_ifconf() that operates on the current netns.
 >
-> However, ioctl(SIOCSIFFLAGS) will trigger the netdev notifier
-> that could touch another netdev in different netns.
->
-> Let's use per-netns RTNL helper in devinet_ioctl() and place
-> ASSERT_RTNL() for SIOCSIFFLAGS.
->
-> We will remove ASSERT_RTNL() once RTM_SETLINK and RTM_DELLINK
-> are converted.
+> Let's use per-netns RTNL helpers in dev_ifconf() and inet_gifconf().
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
