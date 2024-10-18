@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-137108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1339A464C
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7DD9A4652
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FC121F242CF
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:55:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4151F245C4
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E37C204013;
-	Fri, 18 Oct 2024 18:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E352040BF;
+	Fri, 18 Oct 2024 18:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="sZGQoEts"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8p/V7BV"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DA6202F71
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 18:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E10820400F;
+	Fri, 18 Oct 2024 18:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729277728; cv=none; b=biP5PACDnCquEVsKftyaK/88yCgg8lAWfZXf1UXOD56efugOfPXyy0qO4pDOVJrxN41LHkfcYtU7kQfutiXItjDzJIFh4+xYaQNY9Z91/jqoTPIcS3fquJe82SNRdYLcWFGhz6430JwaIzswVeSIksC9FodQEMUj5J6s1BJ004E=
+	t=1729277855; cv=none; b=r6V3/SAcKP0i31sAnUExDMRtuaU0IeT0aXc+/i5kkHsyCejQWcw5iQPbVDyaaUgNkU0NGbXgJhLamPKi5o+9Dl8/+GsSCl7YGdyLvS0KTKRyBEwwh0pOPkIJiNnYh5Z8Of15KcQNBcaFJQO1gFPvH92UUcA/b4x8MNTuMep9Mw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729277728; c=relaxed/simple;
-	bh=FyxG8L0kTeJMBvFZ2TqpR7bCfzlRoydYJ1KvWJsuPAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=emOWlrWZi0MFI+9SaJI4ObIeF50XmtTWUwA3uStG+EF+CvVqCy4CiIY/391r1rJVBDL3g02UC3pVRp+gDpWu3r3tBUc5ctAiAh8QnIlBisc5XPrlENnnc8H76Xeh0fGommq7Yz+ClpFrW/5VhVs8AB3TjlmoihG/KuwGi/CIHd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=sZGQoEts; arc=none smtp.client-ip=35.89.44.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-5009a.ext.cloudfilter.net ([10.0.29.176])
-	by cmsmtp with ESMTPS
-	id 1pKptBKJ0qvuo1s88tuTQE; Fri, 18 Oct 2024 18:55:20 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id 1s86t6cFpGNqB1s87t6kGa; Fri, 18 Oct 2024 18:55:19 +0000
-X-Authority-Analysis: v=2.4 cv=cqidkU4i c=1 sm=1 tr=0 ts=6712af17
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=OKg9RQrQ6+Y1xAlsUndU0w==:17
- a=IkcTkHD0fZMA:10 a=DAUX931o1VcA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
- a=1cCw6Q031rO_cLs8eM8A:9 a=QEXdDO2ut3YA:10 a=Xt_RvD8W3m28Mn_h3AK8:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=KrrHr3IraN34Z7RX5pMYVY2PbGjQrd0P+774MqXGDuM=; b=sZGQoEtsG0vy1dYKYMPwugisEF
-	6RFiB5MLfeCqdEgdeLf6elPw+zhdYUUFYR7g2xW7vi6MIQvzvngqrEHhEKC1yHicB+fqEKOsh2HYK
-	zdyy/Cv6DxRnSNE7mdCF0KJKfkDRalzdRGW3AGAx91xeMnX36z59pq+9b9jDaUKiaxowEoSEW+6HB
-	RGqUzVywxRLkD/4HbdA7eStG/bze7zndB8rWKS902vb1aGeoLxIC7DXv6RAdwal1S2OP286Qf5+Eq
-	cLg5LZQQKACAOHMTnjyx6fOMbl52j32doIYDiQeXbXHEaRDhbLFL2TPS8frIVVE1hrWKuLBHk1m9h
-	41rQWJ3g==;
-Received: from [201.172.173.7] (port=46946 helo=[192.168.15.5])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1t1s84-001YNE-32;
-	Fri, 18 Oct 2024 13:55:16 -0500
-Message-ID: <7bef8129-55b4-40e4-80c2-d319b8d6c251@embeddedor.com>
-Date: Fri, 18 Oct 2024 12:55:10 -0600
+	s=arc-20240116; t=1729277855; c=relaxed/simple;
+	bh=USwZBd/rmQ4xGvXvT/P1fJ09lLr7kVzbXZdNBQ3+LQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHqtc6u0dyn0WgwdephNSfPCt8N2YMHDYqfmSF1WCTYuoTRhAOlKyKWCVoUrKRaBHCQV+xL+nxFySHI5ul9hGNLU/bTCIh4S7YrNMr6E9T9Cw02A5VHJUraW9EyJLtWifWecHmzW5LpfJbOGdZWba3vN1x4NJe/+XApvnsPm/6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8p/V7BV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E839C4CED4;
+	Fri, 18 Oct 2024 18:57:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729277854;
+	bh=USwZBd/rmQ4xGvXvT/P1fJ09lLr7kVzbXZdNBQ3+LQ4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d8p/V7BV9R5bv/BfDflLo5c3tZfdN++v+8FDLdPwvRIUNhpVdCKrwfx3ZhzYIBBoL
+	 0ysAxmqq6VxKdnMDowczfEE4iLFgRsjBQ2sg7WpucVGrtlDKJF0dDwHAJstYJYOyrU
+	 DwG9HYrZlXnxXvd17vXwqMU5sBdF4IuvNJKEFJq2BTtGPe2hPSji38r6iqSmctgecG
+	 gekuuMP9GT54JXpLCT/hfZ0YED63bGLsxe+SCoelsauWdYjywYupTIiojk1hK7yABg
+	 pvsG3iqbQ42lBLN/swfRU9WaiT3IwJcXkruF3m/hBbMZWz6fGlPM68cvZL0eb7Q52Y
+	 exWIiOd0e8KhA==
+Date: Fri, 18 Oct 2024 19:57:25 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Anna-Maria Behnsen <anna-maria@linutronix.de>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	Len Brown <len.brown@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	rust-for-linux@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Miguel Ojeda <ojeda@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev,
+	linux-mm@kvack.org, SeongJae Park <sj@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	netdev@vger.kernel.org, linux-sound@vger.kernel.org,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nathan Lynch <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	linux-media@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: (subset) [PATCH v3 00/16] timers: Cleanup delay/sleep related
+ mess
+Message-ID: <104a3bf5-97ee-4c48-832f-df6c6e219576@sirena.org.uk>
+References: <172892295715.1548.770734377772758528.b4-ty@kernel.org>
+ <877ca5al86.fsf@somnus>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5][next] uapi: net: arp: Avoid
- -Wflex-array-member-not-at-end warnings
-To: Kees Cook <kees@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Johannes Berg <johannes@sipsolutions.net>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <cover.1729037131.git.gustavoars@kernel.org>
- <f04e61e1c69991559f5589080462320bf772499d.1729037131.git.gustavoars@kernel.org>
- <ac2ea738-09fb-4d03-b91c-d54bcfb893c6@lunn.ch>
- <202410160942.000495E@keescook>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <202410160942.000495E@keescook>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.173.7
-X-Source-L: No
-X-Exim-ID: 1t1s84-001YNE-32
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.5]) [201.172.173.7]:46946
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfIv/rnccsWrQzLqG8/cJas91WBR9v8E6LXbHMACYvNm5Bbkt6b/npavcfCO4++oya5b/F3meBo2P/0q0t0gsZ6iugwx+W67qO8CM6VQkDOFnhRyW7sd2
- ojkhFmwLSTAjUKc9yo0Ij/sQLymbRezMqPxT9W0q+aKw998hTYDI6wa6y46W93fylrFaUufel+7Zi1osrMQhhfBhyLf6gWjr4Mk=
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="0RRAV7MzKbX8/czK"
+Content-Disposition: inline
+In-Reply-To: <877ca5al86.fsf@somnus>
+X-Cookie: What is the sound of one hand clapping?
 
 
->> These are clearly UAPI files. It would be good to state in the commit
->> message why this is a safe change, at the source level.
+--0RRAV7MzKbX8/czK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Yes, I'll update it!
+On Fri, Oct 18, 2024 at 10:06:33AM +0200, Anna-Maria Behnsen wrote:
 
-> 
-> I think we can avoid complicating UAPI by doing something like this in
-> include/uapi/linux/socket.h:
-> 
-> #ifdef __KERNEL__
-> #define __kernel_sockaddr_legacy        sockaddr_legacy
-> #else
-> #define __kernel_sockaddr_legacy        sockaddr
-> #endif
-> 
-> And then the UAPI changes can use __kernel_sockaddr_legacy and userspace
-> will resolve to sockaddr (unchanged), and the kernel internals will
-> resolve to sockaddr_legacy (fixing the warnings).
+> Would it be ok for you, if the patch is routed through tip tree? kernel
+> test robot triggers a warning for htmldoc that there is a reference to
+> the no longer existing file 'timer-howto.rst':
 
-Here are a couple of test patches (Don't mind the changelog text):
+>   https://lore.kernel.org/r/202410161059.a0f6IBwj-lkp@intel.com
 
-https://git.kernel.org/pub/scm/linux/kernel/git/gustavoars/linux.git/commit/?h=testing/wfamnae-next20241015-2&id=c3b631a5036cbf45b3308d563bf74a518490f3e6
-https://git.kernel.org/pub/scm/linux/kernel/git/gustavoars/linux.git/commit/?h=testing/wfamnae-next20241015-2&id=66db096a530b95ce0ac33f9fdec66401ec5f2204
+It should be fine, worst case we just get a duplicate patch which
+doesn't super matter.
 
-__kernel_sockaddr_legacy seems a bit too long, but at the same time
-it makes it quite clear what's going on.
+--0RRAV7MzKbX8/czK
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks
---
-Gustavo
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcSr5QACgkQJNaLcl1U
+h9C6LAf/Qbwvy9NL2Gez+H9VVFae3GlPM9asUcMBaxp+uO7dhCUt0jnpy4Rf+uhV
+aRnDHjTLb+zTbBwpy96DsJWJPVsRkJobSsCa/FwibRcFeIheFZBo0REddV9DuMst
+/au9J4kG1E1c34bFhrulonNSkF8ebaVYLPfMH69+35eENFwXmFho5dT5usAsr/oP
+vDK6Dll8oW1XdvTqbw3CPv8TCPLze4UN799DWoWtS96MCxKR7lNOI0X01GsSUMl5
+GrYacHh5QPJICOAGcu7hqSds9wsAGz3zMSAQ9lrX+bZAOiCoDk0KcyIKLF3Pg7de
+RcnbwA6aEI+sETc/tSshLKzUVeX5FQ==
+=Qqcc
+-----END PGP SIGNATURE-----
+
+--0RRAV7MzKbX8/czK--
 
