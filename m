@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-137014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538EC9A4068
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 15:51:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B169A4069
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 15:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 813861C20A81
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 13:51:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4071F2B751
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 13:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892A3433B5;
-	Fri, 18 Oct 2024 13:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEF7558BB;
+	Fri, 18 Oct 2024 13:52:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eZ4/rGI0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hPgeJAzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750E0134AC
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 13:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D15F9E6
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 13:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729259488; cv=none; b=lujZm/aNyF7EIHwaaKshA1MoG1W1rxk9FewnsBM2dzVaEJVXOiEz1+e0obJNWMZ72k4Knn90Kj6dVXSFL6nKiuUgw8Bg4JEpbydWcRKzz/fSicRYiWFYMA52sUns48YSZfISWqo3PApQrNy8QF0fMcgu5c0Z/VLJq+LSBwhk6Ew=
+	t=1729259525; cv=none; b=BbOGUQLRCwRMxOEpWXD4SSIr7/jfFUgLRjGp5D6klEVWnZB7LlclBEsSuLExJDBwHph0NtulrAVvRj+gWp2XZ4llmB/UQi+HlcvbhQqUM2TOaP+aLdxVNB6vmkoNEceHyM/63bQlY4raj7YSB5AF0nqUHzVLZSaeFh9yNNhYRkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729259488; c=relaxed/simple;
-	bh=exv1BTy98sa1y/lvuA8F2fs9zUiP0rkkEeMaJqR9BE4=;
+	s=arc-20240116; t=1729259525; c=relaxed/simple;
+	bh=el9EnV5tR8IyqHsDDftWMdZhXlm1uAW7qaN02V0/wzM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KDkrPtiV+Oe4cR1FaS/Q4QdwEkDbYd8r/rNQBAGQQxnl7WUsdqKZ1RM/8yIkiyuNAuP5RE4FtWqcnfUIHWD7KKfous6boEyzGYeNkpq1QNrMNnz4hYgUI3cx69hQPIUkcRhWGNP3a4o+nnF+xLXMlaYELCuSrgZrDWJNqLoaQTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eZ4/rGI0; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=a37TxZlzr+oXIi5Bl2UOiKAcQT0nhJ9HxoTeWrkxg54WSFO5Ec5Nx1qYtmvAUDWViWYiBQan075BwKTlzjunIgRefuULqS0quobV+BENBYWcsxLV4plVvz9Xy0wB/twOqMUThPPXvzZPUzCG9tfs/FrOEN9xUiVTpVDo+baR9Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hPgeJAzI; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2fb5638dd57so24997051fa.0
-        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 06:51:26 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c9709c9b0cso2628112a12.1
+        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 06:52:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729259484; x=1729864284; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1729259521; x=1729864321; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7oGOELg0HkqjvEjXJZWT8W42hTSmZ6DSm6t/xkBqV7U=;
-        b=eZ4/rGI0TQ3p1pbJFB2QG94QsPvvpKcazaabaW8KF9+EldLSDNlix1CMHdTX6jy2Nz
-         8zl54gviJSr74+bqCbGRVgIdLXn07/yXdznTgF5gFa2efxDqljTr+TKTl/uoDRm5DXdz
-         3ohgI/jYRjG6QM18m4Az321abkiNTxpRMAOi/KAiIptRTxUlEH+dQ4LA+cLfnBS6lrp+
-         gLjyjMlthZ51N6bRyShsycxX6YHuLkE77dyJZhKvQAJXcGgUG46gRLUfbOxE2rEU2ApO
-         nsmMMLt5A6A5LeqnhemkFbpniYoT1pfzzjw1VRgd3Cie3q3EpdOZvu6/wHgqlrF0hjhO
-         eDEg==
+        bh=el9EnV5tR8IyqHsDDftWMdZhXlm1uAW7qaN02V0/wzM=;
+        b=hPgeJAzIPIJIlzRnTR54QoQWm+QpOrUMOHkoSOvONNsTvzyyNWB00C8xtuCwzW/HOm
+         Zxgrj7fVE6kuVniidR6erYyDC30VF3eDxc8Aqaqonb4+W6iueA12bFE3p8Kxh+XOXaqN
+         cu+GsgC4W5osCvYm0W5X4dubmftgxdtj8CQapQ5Yxxzit9/SNoEbBDE13Belb7b2hd8o
+         JRnXm/JRjQo+htjmRRIlDtMiFk0hdixovk+laAcVsiuBabstGfqge4hHVd3y0USLQAPs
+         dyzbHeFAeG67/KizCHCLROh0m03zOlZP3zR68erVsgEHxxqrexS+PkvWHF13S/8LkZEQ
+         H/yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729259484; x=1729864284;
+        d=1e100.net; s=20230601; t=1729259521; x=1729864321;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7oGOELg0HkqjvEjXJZWT8W42hTSmZ6DSm6t/xkBqV7U=;
-        b=Tx/EFFgGIQNRCz40SDEUS+hBip17pE6SapF8pAMn5pCbDbZ01/HlsLEHYBrjXd0eU1
-         tehzg4Q6dNk8hWTqHx9OuFidUpc+Y+zuziKKjxTh2ycnOpeTwYYBCC0Vl8wfy6orqyj/
-         hLF9hh7m9/hBQXkv6soV3CNhjgFLele4ECy4wUK1jgb4vbmxqS9yMhstAelAf/lYgRAQ
-         D7n58A4dsDCNXBQUITGcTUeqlf6qycXmAsP3Bcul8oGJ8d+jZHehhmMzQZIVLT5p5BoE
-         p56Bz3t/xiauB+ZE4Kl0M9CBSl3x0BmJK0WyDoXKydsJWXWNUWqaNn9SBmQ8/1FcMEy9
-         8Gxw==
-X-Forwarded-Encrypted: i=1; AJvYcCW94DeMhMRn6Y5gf/Y7pfsSIcMVEib5CSI0ASm6MP8ZPjO7wGb/AFrvFKhp3php9vAtnDWwD3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1hxv4TESSkEHB6p1PHKFd38hKTMEyJlK/DQQPgzX1gR+IrZLK
-	47/dyfJTc4vMxT2OlGZNWFDkaWbXbT9I0YY48jt073xuA2RXVN+qZkZkUtsTNc/Y6DQaxcEPFIW
-	rCXcv8LhSXrnsv8WpNyly9dJj8hSG/QiLQyZZ
-X-Google-Smtp-Source: AGHT+IE5VAn6ABOKKaNwRCen6TFqgIVntGzwdu/403lclJv6MfpiI8yEO/nJ4AVGwvWgJDpOqacKOh27eOWHupEwysU=
-X-Received: by 2002:a2e:a987:0:b0:2fa:ddb5:77f4 with SMTP id
- 38308e7fff4ca-2fb832221e7mr11369641fa.38.1729259484252; Fri, 18 Oct 2024
- 06:51:24 -0700 (PDT)
+        bh=el9EnV5tR8IyqHsDDftWMdZhXlm1uAW7qaN02V0/wzM=;
+        b=ou1vWrPfmXebrwuIqUnkn4l0gGltsolHy0T1K/0LwZ8LdZOOjwo3IoPWoxlRJuUlHU
+         eKtRUR0hhfgTXI+rdUc1iDzLgYhSbeZwrNK1trzp16sizpVELkcZ2+7Kxf3txbYacSka
+         6Z94JlLaqI38pQTWygd16zRDneM3vje2boX/LLXcst2EcwEgn1dHb7wmE8sJqvTC1ZJL
+         CDw9ycUIEfPLj4CYvTKnlt4TOyap/sMTbXrEgl3MqctW8FFYC6fuJSYdMnvNPttm0BZj
+         OKBvtawprpBO9ri40w3ol+HoiB7WdbMCgOYhA9xyFER3cnLqE8zioSffGuLrigb3KFqz
+         nTAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRyetTZQYzcMuXgIywoV0OlZm41jPpvBWmBTzRqkePJcTvpgTfy0ST9+T0Y/WfmETXDzLeh0k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPRVHNUhcmrkVb2KImSzkdqblUjWCNMU8KrY4MThll4l5XsQQ1
+	TinPPWQgFV0+r4qAAVzOAT+ZZnm7q0UCmH4qjbjJlf7JFmj8cf/RoGV2Ajt3kRCzysIa2ZSz8Jn
+	xfMUtWZK7HFydDQ6+rjJvDNmze0IYniti6XOo
+X-Google-Smtp-Source: AGHT+IE/36dv0Zb5ZP0wUKkbOg7CuJxGTrKajlekWGrQm1C0D3nZxIeqh5gFfCXf7Hh1u3wVkCE7R6tIH9IKdwkej2Q=
+X-Received: by 2002:a05:6402:538b:b0:5c8:8ede:b6c2 with SMTP id
+ 4fb4d7f45d1cf-5ca0ac668bamr1646838a12.21.1729259521207; Fri, 18 Oct 2024
+ 06:52:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241018012225.90409-1-kuniyu@amazon.com> <20241018012225.90409-4-kuniyu@amazon.com>
-In-Reply-To: <20241018012225.90409-4-kuniyu@amazon.com>
+References: <20241018012225.90409-1-kuniyu@amazon.com> <20241018012225.90409-5-kuniyu@amazon.com>
+In-Reply-To: <20241018012225.90409-5-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 18 Oct 2024 15:51:12 +0200
-Message-ID: <CANn89iJjVwaHOUXDVyaPOHjpkpY+EowKHcVubzbCT=T6ZBvMcw@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 03/11] ipv4: Don't allocate ifa for 0.0.0.0 in inet_rtm_newaddr().
+Date: Fri, 18 Oct 2024 15:51:50 +0200
+Message-ID: <CANn89iJrb-_xSvpoHUPut7e2r=WC64V-4wrqF5xbw4qf5e55Xw@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 04/11] ipv4: Convert RTM_NEWADDR to per-netns RTNL.
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
@@ -84,20 +84,12 @@ Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 18, 2024 at 3:23=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+On Fri, Oct 18, 2024 at 3:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
 m> wrote:
 >
-> When we pass 0.0.0.0 to __inet_insert_ifa(), it frees ifa and returns 0.
+> The address hash table and GC are already namespacified.
 >
-> We can do this check much earlier for RTM_NEWADDR even before allocating
-> struct in_ifaddr.
->
-> Let's move the validation to
->
->   1. inet_insert_ifa() for ioctl()
->   2. inet_rtm_newaddr() for RTM_NEWADDR
->
-> Now, we can remove the same check in find_matching_ifa().
+> Let's push down RTNL into inet_rtm_newaddr() as rtnl_net_lock().
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
