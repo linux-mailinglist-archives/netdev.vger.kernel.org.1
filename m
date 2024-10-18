@@ -1,106 +1,123 @@
-Return-Path: <netdev+bounces-136855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614659A3431
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 07:23:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120EC9A3436
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 07:28:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 178B51F2462E
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 05:23:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0CCE281C6B
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 05:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D2817279E;
-	Fri, 18 Oct 2024 05:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0EF17B505;
+	Fri, 18 Oct 2024 05:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0gyRDEUX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P6s7q19J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E6F20E30D
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 05:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E4915CD74
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 05:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729228996; cv=none; b=HZJvHXRlYrMfsTHWvMQ/RTqYnADmE/nVeTne338G9FUXECdE1WG3n6ALLMMTFMC51s/ZN2HClWq1oEo79VRW5+R2CZoarD5YVYFjdhTNFVNanHV/CezfSH0GbWItbwj/XcjuvIrO8ehpcCV/AJlPuRx+wFLG9VSDaBOICxm3BPM=
+	t=1729229322; cv=none; b=pNX7iQJF70ypWlQce8qJPR4eJoQGo0X375zlKqg1oUF804ynVrn2DPrpnhwkD8nNmxDHuRH4AhJ645i0Ys7WfoC8JzHH1n5rJOMJdCHDBvPhkTCUt9zWEpcwxh0rT3KOJl/nat0CeyUZoZEKgIuHJBqdkayDXKZiwGH2hxcwRWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729228996; c=relaxed/simple;
-	bh=5Z0fpYosQpDIgVSx6Tn1NacK0QkzRgp4LS96LTiFp/g=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l66x0aKfKA43x9ab4Iw4H1fWjxZo4SYCLcZdkI45zgv+uBt2Z7tCGo6DKRSCka4JHBxkjMSMIpHiPhTQ9h3TpUZ3dRdncLaW3t1RfPPQw4rgnvrXng8S2pBWGUkPmt8lc43q7sr70Wf8V6N1q2GReY6lrj4UO/V9WKY/+XAW6Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0gyRDEUX; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1729229322; c=relaxed/simple;
+	bh=FUBu0uSe7dtrYqWQgUfWvdaCCPAC4msyF9IgfwxdcFU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ScSrF5sc15yC4iI/iXwghs0ZRwi9eL8GKYEPfZPdUt87uqTnY2PwEgoAUArDNxUlXiFaN/o7nnHOy9ltTeGBtTNGv+VvRIlffXkaBQcDiIon/gQWRu3SCVbCwIfu0kPvMoR3NR+ZATT/I/kzBjC5c7LaGAofqlIQE4FRavkk1wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P6s7q19J; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3d6713619so32306097b3.2
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 22:23:14 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2fb4af0b6beso27960521fa.3
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 22:28:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729228994; x=1729833794; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=afscFukNlKoZsqHEdG35fKXHbYNW9PwkOErpOv0CumI=;
-        b=0gyRDEUXX6+AZSd2iNdn5jADhU2oi10/OdyqgI7KbdoOepBX+FKhnKanSe3bobonoS
-         veZHExnwYe2gjyJjsTLAvg9en5xQmG4upJ4qpXAbIyU6ZTYkjYrytNk3lmD4KiffYlKW
-         RKT9bg4omchayOO00hsb6JiYH+CV84nLq0AB3Aw8U/SdoUvQSPnwoEpDVQ6Ed2upXj58
-         yGJV5gNoRhCFIhfP2JFx+KUgvYNwXA7//gxpWjtUU6xRbhtV9jX3R4CYQLOBnrYVGqLN
-         3/CjrLb4J2Zh6QbHUS24s9No/4zAk1uVTZBE3wU2RyOzjsBopGrzv+wgg+vbs4aoDaH5
-         84Hg==
+        d=google.com; s=20230601; t=1729229319; x=1729834119; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FUBu0uSe7dtrYqWQgUfWvdaCCPAC4msyF9IgfwxdcFU=;
+        b=P6s7q19JxJmciH5Dg6MblRq2uBoAuCasH8H1NWE9p5NMwBf1c8ER5OPvh0f9u9XQfh
+         8cMoAss8EimRAKxj//oF6+HiZ3KF6757VDZ7x9Bu29k4mGtTqfTEeeDbYeK8wg8NXdYS
+         QzMhyQcoOVD9nl6O36pt/hEfwkaXVF3tXPJSrwMFEoYlJctXgAdDW/CQUPCxdxSkoH0l
+         uT8fgFI/wEJrs8Yjgl1GnN9T4GBWdh/WPVkcHsTVlVfMpBfFc1L343nBzl0DHnF3ms0H
+         Y5rWIPc1HMr2ckLbjQIOemylXHg+EFHhI5d5caL6QzezeMLxBSgA/GF1CT1lA483WMpf
+         zV+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729228994; x=1729833794;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=afscFukNlKoZsqHEdG35fKXHbYNW9PwkOErpOv0CumI=;
-        b=h2ByZNfwdBBoYOpfexLJmXzrEsBtj9vL8KFDx88Im7IxxIFCUUeB5ResfsPdNCIxJ+
-         YIu+A9uO944zapn1StiSiyX1BylOAIdtS9Xm4AfqtkCOJoffuOi2VRiBFlRerTjlj8vh
-         Il2hFGYbG6OedIIzKK6zEKrqsskDplbFVeQsLykPAuClCDZB3wo5El2lVPsx21iByVFb
-         YQGKKeFGt2K8jDjM+ZwHIXJysMlPHkmO3hWOez9VzOz0ldP9uZoaOdqUogAnlOd1R3uM
-         V9R/y41dFbnkUZ+HwldaI4kNeNrdtCaFZMM8E8w/SH+5DQv2RJgoOk/rTU+ZBL3syYoQ
-         jinQ==
-X-Gm-Message-State: AOJu0Yy9f+KnpWoru9OUw3FSR8VJ4wLlZBKLc8h+zc560FomSakeKcfg
-	eV2alM5O/hTrWaCTbwNwYnzyxu+a0zlItrRQ5IeMFviXwZx1hsOjloZzsnpzGOy5bt2Enk77DXL
-	Dwf81x6TMLQ==
-X-Google-Smtp-Source: AGHT+IF3sBRtUZUboQJ1x6fLIU0TkD9005+Ncaci94ZTO/wqrTBLSkeaQcLCVMGZ8pdr9+XWPunSyvLOMn2nzg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:690c:4292:b0:6e3:3407:8575 with SMTP
- id 00721157ae682-6e5bfd8ec7cmr40157b3.8.1729228993919; Thu, 17 Oct 2024
- 22:23:13 -0700 (PDT)
-Date: Fri, 18 Oct 2024 05:23:10 +0000
+        d=1e100.net; s=20230601; t=1729229319; x=1729834119;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FUBu0uSe7dtrYqWQgUfWvdaCCPAC4msyF9IgfwxdcFU=;
+        b=n6iAFPUdIlUjnbjtFHOUiU1WRALrxy3CdJhsI9SWLE63GJeS4Gs1vcUpnKyzbSzIbn
+         7d42TMRuezntpjTa/8mboyQNbNXzD/JC1/juBwwxN8zxjKDbOc3up+pAH9Q4NGEer/ST
+         w+1lQCm4w4WxnPCN0ofCeMWVZfQCz5AbV9SuduvsmmSUKdOoHESQ/3Z0jkHZOOw+nYpD
+         5mxHAk6xQMQ7nmVGDqUI/XsAOxCQxgN43jOUoPfmy2QiHptHklL04eJe0pHupR0WZexb
+         ODeGnmsD8Mwilr4/7Cpk86yvuEJsUB41jz3/cusupHZPdIsMdOhRhvSWy6RArGYTtYEp
+         5p5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUOC5PuIa6S8w1t/0lJaBWlcsiYIuxSrTiRDQUBJHxNpk8PTMCAyXXrIFFjT/LEdd3nnAX03q0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSQA2/k6jqgYkvo+60GXQ8WWZ5Y9OYRtDSkWWmIrD45A2OPrtu
+	TBokL6KdZD+YgRr69dlbsY/E9kk1l09faHr7/WplcuC2LHwp02FutC1xvXmTHfz7kNkyghwpBx3
+	m/eIlYDFdPtDK40LK+OcIf7vRu/6PQPbvoZJ4
+X-Google-Smtp-Source: AGHT+IHFW0M46iTYCmRbTPAVvDQ+/CG88AupRx/LApXaVk5JDq6cn0l9i8Fn9SMcUzYkUpIiWbSsI+izNFRrGa1Kzqw=
+X-Received: by 2002:a2e:8ecd:0:b0:2fb:4f8e:efd with SMTP id
+ 38308e7fff4ca-2fb831ef969mr5355631fa.32.1729229318625; Thu, 17 Oct 2024
+ 22:28:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241018052310.2612084-1-edumazet@google.com>
-Subject: [PATCH net-next] net: netdev_tx_sent_queue() small optimization
+MIME-Version: 1.0
+References: <CA+nYHL_BrPZY1KHiFoC5YRYw0D5_5Gyn8XHxgtAijc7-RiLnBA@mail.gmail.com>
+In-Reply-To: <CA+nYHL_BrPZY1KHiFoC5YRYw0D5_5Gyn8XHxgtAijc7-RiLnBA@mail.gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+Date: Fri, 18 Oct 2024 07:28:27 +0200
+Message-ID: <CANn89iL9KHquUS=bUu1EtEnjhLPOpMZePihf1pejy94i3cPiTw@mail.gmail.com>
+Subject: Re: KASAN: use-after-free Read in tipc_udp_send_msg
+To: Xia Chu <jiangmo9@gmail.com>
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	syzkaller@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Change smp_mb() imediately following a set_bit()
-with smp_mb__after_atomic().
+On Fri, Oct 18, 2024 at 7:00=E2=80=AFAM Xia Chu <jiangmo9@gmail.com> wrote:
+>
+> Hi,
+>
+> We would like to report the following bug which has been found by our mod=
+ified version of syzkaller.
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> description: KASAN: use-after-free Read in tipc_udp_send_msg
+> affected file: net/tipc/udp_media.c
+> kernel version: 4.20.0-rc6
+> kernel commit: f5d582777bcb1c7ff19a5a2343f66ea01de401c6
+> git tree: upstream
+> kernel config: attached
+> crash reproducer: attached
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> Crash log:
+> BUG: KASAN: use-after-free in atomic_read include/asm-generic/atomic-inst=
+rumented.h:21 [inline]
+> BUG: KASAN: use-after-free in refcount_read include/linux/refcount.h:43 [=
+inline]
+> BUG: KASAN: use-after-free in skb_unref include/linux/skbuff.h:969 [inlin=
+e]
+> BUG: KASAN: use-after-free in kfree_skb+0xb1/0x430 net/core/skbuff.c:655
+> Read of size 4 at addr ffff88804efd5ba4 by task syz-executor.6/14936
+>
+> CPU: 0 PID: 14936 Comm: syz-executor.6 Not tainted 4.20.0-rc6+ #1
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/netdevice.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is an old version of linux, not supported.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 86a0b7eb9461433822996d3f6374cca8ec5a85b9..bbd30f3c5d290f323394d9f6f9b668f4d87ae042 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3517,7 +3517,7 @@ static inline void netdev_tx_sent_queue(struct netdev_queue *dev_queue,
- 	 * because in netdev_tx_completed_queue we update the dql_completed
- 	 * before checking the XOFF flag.
- 	 */
--	smp_mb();
-+	smp_mb__after_atomic();
- 
- 	/* check again in case another CPU has just made room avail */
- 	if (unlikely(dql_avail(&dev_queue->dql) >= 0))
--- 
-2.47.0.rc1.288.g06298d1525-goog
-
+What do you expect from us ?
 
