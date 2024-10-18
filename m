@@ -1,148 +1,188 @@
-Return-Path: <netdev+bounces-137106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47F09A463A
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:47:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DFC09A4645
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 029B31C23FB5
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:47:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0572820B9
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA1B205148;
-	Fri, 18 Oct 2024 18:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1401865F3;
+	Fri, 18 Oct 2024 18:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QVZn3ssY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+jYa6wI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CA520492A
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 18:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A2120E319;
+	Fri, 18 Oct 2024 18:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729277166; cv=none; b=IbX0LDimYQMVbEXvHmP9D07RgwIqUeTohNwpu3jZel5SaJ8W78H1QRn6enlVvhLlAY6Gu7IFA+Uj+ySIXlAVrw5/Ht+2uQaKQVhhQxkicY+v9odIuyCH4C6D/FUHPXr02eVbSJE/GliLl3GUrPsO+v0DC3A4JhPNabfUZAQoMJY=
+	t=1729277620; cv=none; b=Er+lF951nbFmI28oFnCv1w2sJirxDQKwI+8hM1oUnuCW7CLY64jSX3FnHZtYnJCG0yPWRXXVfpbUB3HcV8Hc+m3sqsga+8I0Ibe6FkzWH8TIqKuTtlVYnoG+LZHXNHUvB3QdM/5MpBiTA6M1ow2+ZpNUfcf+K7OEVA6/LaabhjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729277166; c=relaxed/simple;
-	bh=hhnA/YPn+ZYS6jHFvDtwSH23zI1zQIo3jP9zrP6+kWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kMEGO2C5h99yxTYxEZlrA5/EMBhqbSipAlNKOje5KW205FTm6RHtFmjjyLSSFkzY8JEo3zFAEZXfj1CGI99hn3xYhIFH2jvjKbzupb9/0Z5O9ZcZ45GLn5s8PIY7U5RaenmC0lWADohzig06iO8PS+474W2YvQuOiSfhLtL1nmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QVZn3ssY; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729277165; x=1760813165;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hhnA/YPn+ZYS6jHFvDtwSH23zI1zQIo3jP9zrP6+kWo=;
-  b=QVZn3ssYCHz1fC8Fok6fJpfjTKeMLcPbQP4xFplnMpnoK80TICvTWFbD
-   Gxh1WNxf99HYrGu/vYDs9xJg6HgQYmWqIAqWgB4gMyJz+bsvqS3QA/xCu
-   /Dy323jTC/alM3Tnzvf7h5F+eM/upPoL5HzRG9hyTveb/4pGX3tw9HHmt
-   X7G9XdpMKblRXmvzgGvirECC6LsgNxk7L0TovnxodObwLGiEdjMv6ytST
-   IYQ4ChOhO5o/tvATKeAZiZS3kmndqRgIro+bdKBKIJyTYjlxsVIsbSXOv
-   ICngLtNPQQ2A/dcNK/CPJVCV4erIxU0ETL8Nw4x3oCTsBHjyEaMYA2Ne3
-   w==;
-X-CSE-ConnectionGUID: RGf1K4qESZylz6JV6BwnjA==
-X-CSE-MsgGUID: VrSvoaN/QZaDRomd45Pcvg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11229"; a="40182411"
-X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
-   d="scan'208";a="40182411"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 11:46:02 -0700
-X-CSE-ConnectionGUID: rTaJe69eTFeoS9dDHVIEqw==
-X-CSE-MsgGUID: aF8o4rsESfiI8g3cWEwhag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
-   d="scan'208";a="83571245"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Oct 2024 11:45:57 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t1rz1-000OBl-1s;
-	Fri, 18 Oct 2024 18:45:55 +0000
-Date: Sat, 19 Oct 2024 02:45:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org, ij@kernel.org,
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Olga Albisser <olga@albisser.org>,
-	Olivier Tilmans <olivier.tilmans@nokia.com>,
-	Henrik Steen <henrist@henrist.net>,
-	Bob Briscoe <research@bobbriscoe.net>,
-	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: Re: [PATCH net-next 1/1] sched: Add dualpi2 qdisc
-Message-ID: <202410190238.xwFjIctf-lkp@intel.com>
-References: <20241018021004.39258-2-chia-yu.chang@nokia-bell-labs.com>
+	s=arc-20240116; t=1729277620; c=relaxed/simple;
+	bh=wfRkbDUEGNL++oybIfRhyLJViztO7ln5vIkSu4O5LH4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kpl3MoErRyx7BMfZ+uK/1LwmDqVpW4B8oIixrlkw3Yby8bMh3+W+1c7l8GMuJ2zoW2E7g8st+2bMkPwUN9uKWwSS//91H09vNSZhB79cSTtotnPappvFbuQsGb9RCkLjwB2aBJsyBCFCNvyEl9n5vt7FAa9b7YDdzHubDKiIIms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+jYa6wI; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539f4d8ef84so2787645e87.0;
+        Fri, 18 Oct 2024 11:53:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729277616; x=1729882416; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N+C37RFzcILnMsZFYBuRVkaO1NAcl0ehLYM/0ikIXvM=;
+        b=m+jYa6wIG3NKSZ1FOWqroxGNQ5c2zusFJMmzoFyCR0pH7YHzvB0WYhLShIQxcM5gLI
+         3yyZePuEJAJcXyXrtSIZ3iTd+F9R1EKX6j2HQwDAFoTwHZzaWhNFL4m7QaMhkR3TOisd
+         0t0Uazp/kvEI7wfq5I7xk2m65dELxOQX2m0/nCLsUkfMEJoUbfkw5I/oSnu6RihrQaZw
+         3IXL7sxmrJcQ07klDseAqQSeXzlY06gLJjQnwFT4yzEKZMEfi+TRvSUFczOxCvZgEi2V
+         6EdhUNd34Mt1xm+BrRvWvbGltGzqbKtuIhn+hTjAbmx5Onk/YZYsukJTV8iUWRW2X41/
+         C3sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729277616; x=1729882416;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N+C37RFzcILnMsZFYBuRVkaO1NAcl0ehLYM/0ikIXvM=;
+        b=J4v8l28uS9hADn4A6MVtIMd9iu7Xy/Fqpz07v8ChmGl/c15+S07NMWD1m4eCdwiwqR
+         DkwYbjtsIOdVLO3P9DR3OcbHg+JhliXMhXS3xp5apLh6rCTEG0ILAhAs9nRaO/VpSc3x
+         TvcYFbFbDbFkI615R58RvLm0uV97GCvFeTeQbTeurC2iuU6UWt5vKM4o/Lnw0kmDqAnK
+         90B7uvGIye6o+/m5/Rdv1rT38+P75nr2hdktZHyarplqnQhALNdChuyhFhEjHsf9i84C
+         KKETg+tk7ng/eo++R0DT6LYsTCj+9S7awPaNRhXlCTdMLdOBTyCncbOr7iPvoW1moHcO
+         +qiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrHHxhYlg8sl3w9ogsDff/HSnkmMP0oU+ogN+KyrNSQBFd29y1qoy7P147bfhUxl/4MjHnrv+I@vger.kernel.org, AJvYcCWEiTRBg8d/VhRXgUOg00ayR/SbgNWQ0SENcAKE5nGZE4kdlCaEo9kJZi+rOnVcEPBtr9vubTCKXN70u2c=@vger.kernel.org, AJvYcCWo5OtvZfP1dZI1Zrah0QYPisIOUHEtRWcW40zvGBN6Tl2a753hprj/qKBmNpkgTGQuIbzcBkKJjqun+UqXyo62@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz507ricOuiXZiLdIAzCiUPVF7+V5LDU5EHgM/YxNocCOA1PWaf
+	oOsftE5jGh6918fQfE1rQEX1xhH2SxMIm4kFwMLJ6+EUbE4qEt1A
+X-Google-Smtp-Source: AGHT+IFTECmpui4bEAd6LfXlK56bk60zCpZroN7QeGRG8HvefwSVsCLjpZDdolPkBbtIu2/ZZR22ag==
+X-Received: by 2002:a05:6512:2352:b0:539:fc45:a292 with SMTP id 2adb3069b0e04-53a154fa754mr2044964e87.43.1729277616138;
+        Fri, 18 Oct 2024 11:53:36 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ca0b08c3easm1036170a12.50.2024.10.18.11.53.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Oct 2024 11:53:35 -0700 (PDT)
+Message-ID: <56c3d435-e93c-405c-9bf5-e9ea9c038d13@gmail.com>
+Date: Fri, 18 Oct 2024 20:53:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241018021004.39258-2-chia-yu.chang@nokia-bell-labs.com>
-
-Hi,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/chia-yu-chang-nokia-bell-labs-com/sched-Add-dualpi2-qdisc/20241018-101154
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241018021004.39258-2-chia-yu.chang%40nokia-bell-labs.com
-patch subject: [PATCH net-next 1/1] sched: Add dualpi2 qdisc
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20241019/202410190238.xwFjIctf-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410190238.xwFjIctf-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410190238.xwFjIctf-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/sched/sch_dualpi2.c:536:12: error: call to undeclared function 'skb_sojourn_time'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     536 |                 qdelay = skb_sojourn_time(skb, now);
-         |                          ^
-   1 error generated.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 net-next 02/12] netfilter: bridge: Add conntrack
+ double vlan and pppoe
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+ <20241013185509.4430-3-ericwouds@gmail.com>
+ <20241018131754.ikrrnsspjsu5ppfz@skbuf>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20241018131754.ikrrnsspjsu5ppfz@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-vim +/skb_sojourn_time +536 net/sched/sch_dualpi2.c
 
-   527	
-   528	static int do_step_aqm(struct dualpi2_sched_data *q, struct sk_buff *skb,
-   529			       u64 now)
-   530	{
-   531		u64 qdelay = 0;
-   532	
-   533		if (q->step.in_packets)
-   534			qdelay = qdisc_qlen(q->l_queue);
-   535		else
- > 536			qdelay = skb_sojourn_time(skb, now);
-   537	
-   538		if (dualpi2_skb_cb(skb)->apply_step && qdelay > q->step.thresh) {
-   539			if (!dualpi2_skb_cb(skb)->ect)
-   540				/* Drop this non-ECT packet */
-   541				return 1;
-   542			if (dualpi2_mark(q, skb))
-   543				++q->step_marks;
-   544		}
-   545		qdisc_bstats_update(q->l_queue, skb);
-   546		return 0;
-   547	}
-   548	
+On 10/18/24 3:17 PM, Vladimir Oltean wrote:
+> On Sun, Oct 13, 2024 at 08:54:58PM +0200, Eric Woudstra wrote:
+>> This adds the capability to conntrack 802.1ad, QinQ, PPPoE and PPPoE-in-Q
+>> packets that are passing a bridge.
+>>
+>> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+>> ---
+> 
+> Whatever you choose to do forward with these patches, please squash this
+> build fix here (you can drop my authorship info and commit message):
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks, I had already fixed the errors from patchwork.kernel.org->checks
+for the next version of the rfc patch. This is indeed one of them.
+
+> From e73315196c3143de2af2fe39e3b0e95391849d6c Mon Sep 17 00:00:00 2001
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Date: Fri, 18 Oct 2024 13:59:27 +0300
+> Subject: [PATCH] netfilter: bridge: fix build failures in nf_ct_bridge_pre()
+> 
+> clang-16 fails to build, stating:
+> 
+> net/bridge/netfilter/nf_conntrack_bridge.c:257:3: error: expected expression
+>                 struct ppp_hdr {
+>                 ^
+> net/bridge/netfilter/nf_conntrack_bridge.c:262:20: error: use of undeclared identifier 'ph'
+>                 data_len = ntohs(ph->hdr.length) - 2;
+>                                  ^
+> net/bridge/netfilter/nf_conntrack_bridge.c:262:20: error: use of undeclared identifier 'ph'
+> net/bridge/netfilter/nf_conntrack_bridge.c:262:20: error: use of undeclared identifier 'ph'
+> net/bridge/netfilter/nf_conntrack_bridge.c:262:20: error: use of undeclared identifier 'ph'
+> net/bridge/netfilter/nf_conntrack_bridge.c:265:11: error: use of undeclared identifier 'ph'
+>                 switch (ph->proto) {
+>                         ^
+> 
+> net/bridge/netfilter/nf_conntrack_bridge.c:278:3: error: expected expression
+>                 struct vlan_hdr *vhdr = (struct vlan_hdr *)(skb->data);
+>                 ^
+> net/bridge/netfilter/nf_conntrack_bridge.c:283:17: error: use of undeclared identifier 'vhdr'
+>                 inner_proto = vhdr->h_vlan_encapsulated_proto;
+>                               ^
+> 
+> One cannot have variable declarations placed this way in a switch/case
+> statement, a new scope must be opened.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  net/bridge/netfilter/nf_conntrack_bridge.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bridge/netfilter/nf_conntrack_bridge.c b/net/bridge/netfilter/nf_conntrack_bridge.c
+> index fb2f79396aa0..31e2bcd71735 100644
+> --- a/net/bridge/netfilter/nf_conntrack_bridge.c
+> +++ b/net/bridge/netfilter/nf_conntrack_bridge.c
+> @@ -253,7 +253,7 @@ static unsigned int nf_ct_bridge_pre(void *priv, struct sk_buff *skb,
+>  		return NF_ACCEPT;
+>  
+>  	switch (skb->protocol) {
+> -	case htons(ETH_P_PPP_SES):
+> +	case htons(ETH_P_PPP_SES): {
+>  		struct ppp_hdr {
+>  			struct pppoe_hdr hdr;
+>  			__be16 proto;
+> @@ -273,7 +273,8 @@ static unsigned int nf_ct_bridge_pre(void *priv, struct sk_buff *skb,
+>  			return NF_ACCEPT;
+>  		}
+>  		break;
+> -	case htons(ETH_P_8021Q):
+> +	}
+> +	case htons(ETH_P_8021Q): {
+>  		struct vlan_hdr *vhdr = (struct vlan_hdr *)(skb->data);
+>  
+>  		data_len = 0xffffffff;
+> @@ -281,6 +282,7 @@ static unsigned int nf_ct_bridge_pre(void *priv, struct sk_buff *skb,
+>  		outer_proto = skb->protocol;
+>  		inner_proto = vhdr->h_vlan_encapsulated_proto;
+>  		break;
+> +	}
+>  	default:
+>  		data_len = 0xffffffff;
+>  		break;
 
