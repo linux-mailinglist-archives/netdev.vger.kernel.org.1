@@ -1,246 +1,171 @@
-Return-Path: <netdev+bounces-137153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5A099A49B1
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 00:34:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 844A19A49BF
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 00:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 318661F24DB3
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:34:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D5C2841F0
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3835A190664;
-	Fri, 18 Oct 2024 22:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jSyG+1Gn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8937190058;
+	Fri, 18 Oct 2024 22:48:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from trager.us (trager.us [52.5.81.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227D6190486
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 22:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729290867; cv=fail; b=UHsPGwEjAAAkcoI9BAXmPpRX/gwdjNOa6bl+3fUX0UT8Ij7s4g4eCatre3ICbvvbQPeKgkdnEqPejq1iDBUxyZsPU6gPBPcKMJNdVRSgF8U38xhht971Tklf0NnTHdMJ4raZhbKCYkfD9wPWokc+yMEvUJuhrmrnnL0RGZNJK70=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729290867; c=relaxed/simple;
-	bh=dn8Vn7woSG31zZdlGJ1q55DosYsExlRFVTj6GlAdpNo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GB0XCJGPtTTn25xsW951RTMrEM6v2C9P9YoyWB1dagmVijxCrm6wue2vz5Puqb+89lK5AkhDjZe3LUFp+KAAdm8uHEisqBNKry9Xq0/krq7uk5cQJMsDPBwk0Q+17CglB8OdFgpf/h0bl3RhmC2TX7k5v9B86mNGkSwzTqZTtg0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jSyG+1Gn; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729290865; x=1760826865;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=dn8Vn7woSG31zZdlGJ1q55DosYsExlRFVTj6GlAdpNo=;
-  b=jSyG+1GnmsX4IfQjwMI9ALcVEXH80pGloE/gfN/RFCfPWzalMHejwZHk
-   eIjji4H+DBgF3nc63VbqspcrRYNvE7qbppL39NLOp51pKPzKKiNAblRkY
-   5IeEwnP/eN5Ir+oVAoGKswjoudYsLPaEWEMya0Po+EC9ixcNWYYEoyHig
-   kkP4d5nMYSrFTJyP6a57FRSrr6A4KBvRdS5AaR5tZK5rjx8jgI6gybRJk
-   e9y6wesBSOfnTJR28DIxUwf2gQkvQI57fPZnZuIndyNSmvYJInL6ajJLq
-   eGFR6Jj3psk+5BoAqE1e28R8B1QFOkXECuzB00uGlp+rJ9vzLVglGUfdN
-   Q==;
-X-CSE-ConnectionGUID: hSoJQAz7RECSXMtsw00bSA==
-X-CSE-MsgGUID: jvxDJL+1QJ2uXIROzXExfw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11229"; a="46334904"
-X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
-   d="scan'208";a="46334904"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 15:34:24 -0700
-X-CSE-ConnectionGUID: zp4Z2/AoSJWnnGf/IAA/vQ==
-X-CSE-MsgGUID: OP0O0+PjT0aeE8twdCarMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
-   d="scan'208";a="109817098"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2024 15:34:24 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 18 Oct 2024 15:34:23 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 18 Oct 2024 15:34:23 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.41) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 18 Oct 2024 15:34:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Y1fcytWQ0f66xzQL+i/C0St2Mz33J+aJB3knbeb+aqPBtLq5xa76TNS+uAJl4GScUtiTcyKk+Y+UMgaLQ/USBXvVQENovDukQS4sJm7jv/LgwvwAz01SEeiPuz6wxeYdO3rFSU8ianrvJH0VDl/I/uJQQ1FskLqWr2xSQzO/5v4XYR6wEDN8UamtE6SydvxVn2+8I5kCccgjctRsEX/I/ISd3X0+XetsoU9bYJIYVIFC+AnQlmU0wJWA+XRTCCcLMABf+IouVxC08BcuN4vSeTfKqQIgMZArPkeZd6SsHxN3cL68Mn8Cb3Ze6UFlKUxd7kFxGmkAbGhzvQBSvUodXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oZAuuUob0WORbiayLnAj6XE8wz4BHOYzsTF6kZC6B4w=;
- b=wfYLiznzSce4Qg5AOOVG80yuB4AJ7VlTbmlrq61lMd6NMYFiZ7rLYYbRy9llFVfqN0tN1gjAqcZgfPFSBwuo75FQG3OEge9tXmW02ShzQQR6vfrudO7MAu3tHTmEvFXuCTggdlxPJcMvxYw7/MH3B+Ujj3r1uWwp3HIWcbO8R1N7u8DcNWEt3AfuRzUNeqMC1beQk1yaXhe2ZU63Ydr+wm3jMxGjCjgxerqQB4GCnbZ4dEZxoAJYJ853wBSzP6MXPEAlpH4nwro/jygx/iMqc+adm8T4x1Tbutd2OI/rT1+rc1h3h7sc4fwDnbbeess6kon0XiBuZaS0mXvLKswHRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CH3PR11MB8140.namprd11.prod.outlook.com (2603:10b6:610:15b::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.17; Fri, 18 Oct
- 2024 22:34:20 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8069.019; Fri, 18 Oct 2024
- 22:34:20 +0000
-Message-ID: <ae6c51ea-3479-4be2-b955-10895a8f8a38@intel.com>
-Date: Fri, 18 Oct 2024 15:34:18 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v11 00/14] Add support for Rx
- timestamping for both ice and iavf drivers
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <aleksander.lobakin@intel.com>
-CC: <netdev@vger.kernel.org>
-References: <20241013154415.20262-1-mateusz.polchlopek@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20241013154415.20262-1-mateusz.polchlopek@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0064.namprd13.prod.outlook.com
- (2603:10b6:a03:2c4::9) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B7D17C7CA;
+	Fri, 18 Oct 2024 22:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729291735; cv=none; b=BlNGsFwapvgEyfPR8b/s4/MqIXLjeG59of8roYZDG7OQNMllRIo266DEzU/eY3zmKn4O3eFYT8GSY/DeVCwF4Yx/Ay4WaGiZrfJwpFxQdyK69GuVRJM/vQ8d3wIMdsr7hr532cjLWjRs9e5fG5+4tTglorH7GqHP/RhXeW6pSXQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729291735; c=relaxed/simple;
+	bh=0Da96HRJeN9ktw0gyUG3jlCYvRusTcxVT6BOX6TImn0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uIhtBqgsW3i7tGIW8iGO/B9r4AY3OGTtgSe6PHZuvG+AD2NQchSq81ZgPBee0BgdnFjDPoPQ6tiXI9MnWzzwjcGPQPjp+otV6Q+/AVcw5aa71XZ/RfIEwyWbJjr6FDIJMq4kYGI35ScmW9TlMq63l8Jh+jV2m0ZKT66BZQpz+nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
+Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=[192.168.1.226])
+	by trager.us with esmtpsa (TLSv1.3:TLS_AES_128_GCM_SHA256:128)
+	(Exim 4.92.3)
+	(envelope-from <lee@trager.us>)
+	id 1t1vlp-0007L3-P2; Fri, 18 Oct 2024 22:48:33 +0000
+Message-ID: <61e80187-49d0-4ad8-a66a-0c3901963201@trager.us>
+Date: Fri, 18 Oct 2024 15:48:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH3PR11MB8140:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce7eb5ca-7b7f-499a-fb8b-08dcefc5025c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Wno3endsMzdYOWJPNkI1Z1p2VnVmNUJnaXNEam1WT2I1dGRGc1pWeXYrRUNp?=
- =?utf-8?B?K1QySWtMT0d2TWh4Lzhmc1loek8vemRnNDVyMEZYSEY2MktjaDRiZTRBTlk5?=
- =?utf-8?B?elRIbmZublluZDZHcFVwZlJyYUh3STh4VzhwMkZCdlcyUlI0UWxaTEU3ek4v?=
- =?utf-8?B?TXZpNmJNVld3cWF0SzU4ancxMzdyTmg1dW41TlROOW5vajVnTUViaGszOGxr?=
- =?utf-8?B?aVViRUowaFloN0ordzJJWit5bmpnUStyQjBqMjZEaytkV1dnTFdqSTIvNFhm?=
- =?utf-8?B?cWpKVVl1VnVUczVNK1lMZGFvWmh5VXNLY1VEL3RTUW51bTM2OFdiMnp5YmdC?=
- =?utf-8?B?dkkramNjS1hFSTVjRmR6QnlNOHNVN0tablNPOG1QWlFqT3ZCUHhISlFiSEtI?=
- =?utf-8?B?WkhjQzAvWlh2YkxkdEZ0YnFXUzN5UjgwMGl1MStJSmQra0x2Vys4NmtPbVln?=
- =?utf-8?B?cmpCYk00NFlwTDdhcVpyYitTYWZjRnZPVG1uSUFiSHVJTHQzRmkrdVBrQzdy?=
- =?utf-8?B?Mkh5TjNNNmFKTEJvMlJVZURKTU1wdEZDbkp3c0hjbjlZS1JvY2xHWmdXMHBJ?=
- =?utf-8?B?Z0R3bm9rMjJLdXgzNlRrY3Exc2dWaHc1TE5GSXhKWWpVVUgzNm5FRlZYV3VJ?=
- =?utf-8?B?YW4yTFc1TUpDWTA5YzdFWitnOFZ0QXFMaU54M0dtWFJJaC9ubGpQRTBWdFhH?=
- =?utf-8?B?QUpkMWJ3ajVvdHhTOUVtRCtYSUZOWk41OEtNUHVDYWMxT2VPRndPWG9henJB?=
- =?utf-8?B?NW82cnNaY3FaeHRId2VtWnBCenlYc0wvTGMzQTBaTWdPS3krdTU0SUdtZW5T?=
- =?utf-8?B?dHNvc3JsZVBxd2FsdmxqM0tmY3hQbG5sVkxuK3ZGa1B5aWdTNVp3VW9vWTB2?=
- =?utf-8?B?S0FkWnAwTldWYjQ4cU0yZ2QzcndLTTEvdUxNaHlpRUE4TzlrWVJ4OWZmQWJF?=
- =?utf-8?B?UjNYTm1pNDBvMWFFS2hSZmtKSDM5Q1lHZXRoamhkNlA3NnZGSUxWWUZzcXFD?=
- =?utf-8?B?citMYVVaSzJrY2J3NEs5YWd2dXo4cEozeDdQS0NKbHBzaUtxK3lVU0ZQUDBC?=
- =?utf-8?B?QWIzazVkVmZDbGhrVktJTS9UQ1VFR1Y0QUxWU08wRzlDZTd4cHhSUFU5V1pV?=
- =?utf-8?B?VGZnaUZxalZPd043R0FTUG9pN2pwN25jdXRVcmtqOFY4Q2dFeDNDRE1DM1pp?=
- =?utf-8?B?NUEzRis3T2hucHBZZjhOTjlpRHVjbnBTMTJMZGtpRnhtbjIxRHlNZXM2U2k0?=
- =?utf-8?B?WlJRa0RmYWRXb0dCb1lSK0lqMkk0aGxBbjdCelJ0NVcwOFFmTjB6Q2RnUEtJ?=
- =?utf-8?B?M0Ixcjc4YXRtSmE5YmhvSkUzV3Q2M2oxVWhhVWRpOStLRmpqSE9WcDFMMTFL?=
- =?utf-8?B?d1oxUzhOelRza1oxTlhmRVkxeC9ZV3RjdWVNczNqTnIyaTVuNFYyZ2dydnlN?=
- =?utf-8?B?K0ZDTEhhYkFvcWN4MUpMSmkzUHFDMTBGdkthbkVIbUJoc2dXZDU0SUxwcHQ1?=
- =?utf-8?B?cHJUMXlCd3JibTEza2tUc0VaMTlSMXRDSHVHOTZOdG1SQ1RTRll2ZVJqUmRz?=
- =?utf-8?B?dnFhTHBVcVVXSHdMa2w2RkRiK1Jzbi80L1QveTBqSkt4S0tpMmdGTGt2aHhy?=
- =?utf-8?B?R3N2VVFJT1NRUW93ZFpINFhVQkQybXBNUlpPQ3AvN3F0S3VIUzRNQ0hPeWhF?=
- =?utf-8?B?amY5aVVyL2NvL09TUHR4S3psK3daNGJMbHFFREVmbnd2N0RJczZqRTJQSDZR?=
- =?utf-8?Q?zPfaXPtqQh+VeuItn0=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?emlSTFVQWkdZa2k5VzhlZzE2TmNyRFVmMEhJYWdRa2VFTkNGZ2prcEU1a0Ir?=
- =?utf-8?B?cUhlRzZrbkRyV1YzK3h6bG5idE04MmlLSkFmMDUxR3Z3OXhkUFp1TTVXTmtE?=
- =?utf-8?B?YXErbkZVYkE2SmZscjBuaFJuQTdXWUhYVG84VGpYc24wMzhvZlVINkI3RlYy?=
- =?utf-8?B?ZThVRWsrRmx6YWdySGQvekxzbG9vbVR1L1A2bE9aZDM4c0llK3NVRWVhaWVE?=
- =?utf-8?B?RnpiemF6R3NVbHhNSENqNEtZalBaQWZlVWw4ck1HK3Bnd0xzTStQS0NYblBJ?=
- =?utf-8?B?Uy9PeHRDc1puRFp2RnRKYTBlNGFRaFFickZ0L2hIeTJidHRBZ0FEd2w0Z2hC?=
- =?utf-8?B?WklnY00xck1oZ1ljV1JJekN4UmVnUVpsbkhJWS9CUkVhVjhBQkVXNGVRRkh3?=
- =?utf-8?B?Mm53Z3FjQTh2UGNnTnNUdzhUblVJWXQ4anpEaEs5UCtmVWJVaDNMZmtEOWw1?=
- =?utf-8?B?cThBejNxTk1GZlRBQkMrb0xlRDh3emxidGJCdXM0SXhNUVFlL0RhcnB3USs1?=
- =?utf-8?B?aThYWVp1VEpxVEFVS3RZekdOSWx1cUgzMDV2RU14QTFnMm1DdzBlTUVMb2V3?=
- =?utf-8?B?YzU2S2hBVXpXY2I4K3Z4N1R2cnNVRzdGdXROQjZRd25sSWIxT0cxa0RyZTVI?=
- =?utf-8?B?SXMzckpsS3h3MTI4cjNmVE9NS1FRdUsvenpvSW9GcmZ4OVNvK1RsdU9NQVZy?=
- =?utf-8?B?UWtna0ZkL0Zic2UwRW8zQncvVVB0QUVLbXN4NzJNUW9xc05GR2VrMmh4emlB?=
- =?utf-8?B?NlBNODhMWDFFbkJaT1FFU1kxb1BxTU44VVFnRjdlOFNkTHVFYjYyZkRyNnVn?=
- =?utf-8?B?VnBibU1BY1d6anhIdWc1N3JFd1VNbWpTcGFrSUl1blNNRExSVDYyOEhDOGo2?=
- =?utf-8?B?ZFg2WGdQdFQ0Y3FHemJlRmc5UlpJNjFqNHJmbHdWZThUUnlRMUVmSkREK1Nh?=
- =?utf-8?B?RHFQU0NTOWhxTExaQzFIdEUxcEd3UTBySUI5K1VHekZyM1NOSWRCWUpxY0Yr?=
- =?utf-8?B?dzFneWJiUStrUGphUmlyZUs0Z3lXTVdNY3dSWnhiaGVJWFMraE5PUm83LzFI?=
- =?utf-8?B?b2REK1pLWldBaGZNdzc4dzNqOUthekZYcHRWTzJTd0tTbTZUUUtjV2lzTGdI?=
- =?utf-8?B?S05BdzlEaWtpRGpaV3JUL3BMelQ4NW1SbXlJK1FicWorZm5YZmFaYjBweUN5?=
- =?utf-8?B?My9HNzNQOVM4aDY4Ukd0SksyaUtKTUhCRlZSeVFhOXBCQmNYM1FGV2UvbWVa?=
- =?utf-8?B?a3BoTUVxTXVvVkF0RUdjNG4yZVljanpnNG5RZ1FSRHFHOGFqdDlFOXlVOU4x?=
- =?utf-8?B?cUxkMFZEcmw4cTBaV0gwUnVhaTgrSFpTRm5odDBNL0gydnZNODRUcUFaUHdl?=
- =?utf-8?B?bFNCbkRNd1lhVmZXTmVZUHU2WGVEYmkvYTUrcVpBczRzM2gxOWhlSmhrVHNy?=
- =?utf-8?B?amVUaGlQMzRvQ2NUNitCYlNCYjZnYUVxZVhKa3hxM2Qra05jRTloUVliWTNz?=
- =?utf-8?B?U2tlVlN0dXpSalFUdUtkZE1VaW1yUTExQTVZTUZoL1JjRmQ0NWtFdDhtMEpu?=
- =?utf-8?B?RnlTVTArR2d5RUlZRGlLekhpMXVJRnc4RjYxeWtkWDMrN21zY1JTWXJqeWtv?=
- =?utf-8?B?dy9SV3NCTVFid3NlNlNjY3pWNjAzQ09scUtkV09qQ1hsMXVZYmR3OHBvNnYr?=
- =?utf-8?B?N01tOC9EMllpUmxwc0RuNGRLVUZNdVNXSmdGV2JaV3NhcVhvc2lLZnY4MkZp?=
- =?utf-8?B?aklDN3RWK2F5SDZZMVFMZ1dFSVd0N0xhNVZPYkhWc3dpSXVDOUptczNiRjFX?=
- =?utf-8?B?cXJwWlFobXRZWW1QN3pnTEtwUGE3aFc0emZRaTJEY1JkNmUyUFZtKzYyS3hk?=
- =?utf-8?B?eHFKN2E4ZmJsV25WN2pJMk5RWGhQQXBka25JRkJzSjdPSGlPSldiZXdiSGFx?=
- =?utf-8?B?VCtTaDFBL3BMK3pZSHBySWNod0lvd21NZ0tUYUtwcTY2dTNJZTV5aWlvUXZF?=
- =?utf-8?B?MVhlZGVjNXNSa2pNNVQ2eFVwb0N6QWs0Q1JnMVBCdzlYNTdKVzBHRjRYdVFB?=
- =?utf-8?B?NUJGTE9UbTVDMWRKQWlhN3NHZEJJV2hoeFpzZkFTSFplK01iSERmNElvSTF1?=
- =?utf-8?B?eVZhUkd3ZEhVNGRZdXpKRjVSOE9ONU5USE1RZjRjc29kMXJPZ1g4bGpsc1Br?=
- =?utf-8?B?OWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce7eb5ca-7b7f-499a-fb8b-08dcefc5025c
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2024 22:34:20.8067
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P41Kc607z10jokKAhUQIIWouEz9+2gLsUyLWzDAEsGJovwsIaVgpJYRhEf4qRcutM/F5dl1TmAjrO59FwkC6lIVSTuSogMXLv8zKNmg7r70=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8140
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] eth: fbnic: Add devlink dev flash support
+To: Simon Horman <horms@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Alexander Duyck <alexanderduyck@fb.com>, Jakub Kicinski
+ <kuba@kernel.org>, kernel-team@meta.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>,
+ Sanman Pradhan <sanmanpradhan@meta.com>, Al Viro <viro@zeniv.linux.org.uk>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241012023646.3124717-1-lee@trager.us>
+ <20241012023646.3124717-3-lee@trager.us>
+ <8502a496-f83d-470c-a84d-081a7c7e2cae@linux.dev>
+ <20241015104353.GC569285@kernel.org>
+Content-Language: en-US
+From: Lee Trager <lee@trager.us>
+In-Reply-To: <20241015104353.GC569285@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+On 10/15/24 3:43 AM, Simon Horman wrote:
+
+> On Mon, Oct 14, 2024 at 12:18:36PM +0100, Vadim Fedorenko wrote:
+>> On 12/10/2024 03:34, Lee Trager wrote:
+>>> fbnic supports updating firmware using a PLDM image signed and distributed
+>>> by Meta. PLDM images are written into stored flashed. Flashing does not
+>>> interrupt operation.
+>>>
+>>> On host reboot the newly flashed UEFI driver will be used. To run new
+>>> control or cmrt firmware the NIC must be power cycled.
+>>>
+>>> Signed-off-by: Lee Trager <lee@trager.us>
+> ...
+>
+>>> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+> ...
+>
+>>> +/**
+>>> + * fbnic_send_component_table - Send PLDM component table to the firmware
+>>> + * @context: PLDM FW update structure
+>>> + * @component: The component to send
+>>> + * @transfer_flag: Flag indication location in component tables
+>>> + *
+>>> + * Read relevant data from component table and forward it to the firmware.
+>>> + * Check response to verify if the firmware indicates that it wishes to
+>>> + * proceed with the update.
+>>> + *
+>>> + * Return: zero on success
+>>> + *	    negative error code on failure
+>>> + */
+>>> +static int fbnic_send_component_table(struct pldmfw *context,
+>>> +				      struct pldmfw_component *component,
+>>> +				      u8 transfer_flag)
+>>> +{
+>>> +	struct device *dev = context->dev;
+>>> +	u16 id = component->identifier;
+>>> +	u8 test_string[80];
+>>> +
+>>> +	switch (id) {
+>>> +	case QSPI_SECTION_CMRT:
+>>> +	case QSPI_SECTION_CONTROL_FW:
+>>> +	case QSPI_SECTION_OPTION_ROM:
+>>> +		break;
+>>> +	default:
+>>> +		dev_err(dev, "Unknown component ID %u\n", id);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	dev_dbg(dev, "Sending PLDM component table to firmware\n");
+>>> +
+>>> +	/* Temp placeholder */
+>>> +	memcpy(test_string, component->version_string,
+>>> +	       min_t(u8, component->version_len, 79));
+>>> +	test_string[min_t(u8, component->version_len, 79)] = 0;
+>> Looks like this construction can be replaced with strscpy().
+>> There were several patchsets in the tree to use strscpy(), let's follow
+>> the pattern.
+> While looking at these lines, I'm unsure why min_t() is being used
+> instead of min() here. As version_len is unsigned and 79 is a positive
+> constant, I believe min() should be fine here.
+
+clang complains if I'm not explicit with the type by using min_t()
 
 
+/home/ltrager/fbnic/src/fbnic_devlink.c:194:3: warning: comparison of 
+distinct pointer types ('typeof (component->version_len) *' (aka 
+'unsigned char *') and 'typeof (79) *' (aka 'int *')) 
+[-Wcompare-distinct-pointer-types]
 
-On 10/13/2024 8:44 AM, Mateusz Polchlopek wrote:
-> Initially, during VF creation it registers the PTP clock in
-> the system and negotiates with PF it's capabilities. In the
-> meantime the PF enables the Flexible Descriptor for VF.
-> Only this type of descriptor allows to receive Rx timestamps.
-> 
-> Enabling virtual clock would be possible, though it would probably
-> perform poorly due to the lack of direct time access.
-> 
-> Enable timestamping should be done using userspace tools, e.g.
-> hwstamp_ctl -i $VF -r 14
-> 
-> In order to report the timestamps to userspace, the VF extends
-> timestamp to 40b.
-> 
-> To support this feature the flexible descriptors and PTP part
-> in iavf driver have been introduced.
-> 
-> Side notes:
-> Wojtek did great job handling this series during my vacations. Thanks!
-> ---
-> v11:
-> - addressed all comments from v10 done by Alexander L. Short list: changed some
->   logging functions (like pci_warn instead of dev_warn), fix RCT, fix indentation,
->   remove unnecessary comments and casts, change error codes where applicable,
->   remove ptp.initialized field in struct (now check for ptp.clock as Olek
->   suggested), invert condition in few places to avoid +1 indent level, function
->   iavf_ptp_do_aux_work made as static, add more descriptive kdoc for libeth
->   struct fields, restore ptype as a field in libeth struct, remove unused
->   defines, pass to specific functions quad word of descriptor instead of pass
->   rx_desc, add asserts to structs where applicable, return from fields extracting
->   functions when !fields.eop, refactor get VLAN tags, remove unnecessary empty
->   initialization of structs and few more. Please see v10 to compare all changes.
-> 
-Unfortunately, v11 doesn't compile. Can you please address that in a
-v12? While at it, please also address the concern about the post_ts
-calls in the .gettimex implementation.
+   194 | min(component->version_len, 79));
 
-Thanks,
-Jake
+       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+./include/linux/minmax.h:45:19: note: expanded from macro 'min'
+
+    45 | #define min(x, y) __careful_cmp(x, y, <)
+
+       | ^~~~~~~~~~~~~~~~~~~~~~
+
+./include/linux/minmax.h:36:24: note: expanded from macro '__careful_cmp'
+
+    36 | __builtin_choose_expr(__safe_cmp(x, y), \
+
+       | ^~~~~~~~~~~~~~~~
+
+./include/linux/minmax.h:26:4: note: expanded from macro '__safe_cmp'
+
+    26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
+
+       |                  ^~~~~~~~~~~~~~~~~
+
+./include/linux/minmax.h:20:28: note: expanded from macro '__typecheck'
+
+    20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+
+       |                    ~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~
+
+1 warning generated.
+
+>>> +	dev_info(dev, "PLDMFW: Component ID: %u version %s\n",
+>>> +		 id, test_string);
+>>> +
+>>> +	return 0;
+>>> +}
 
