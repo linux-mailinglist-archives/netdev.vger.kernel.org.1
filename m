@@ -1,160 +1,244 @@
-Return-Path: <netdev+bounces-136881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01AC99A3794
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:49:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764109A3795
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EF13B21ADB
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 07:49:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FD9F1C24A26
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 07:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D925818C035;
-	Fri, 18 Oct 2024 07:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC7218C037;
+	Fri, 18 Oct 2024 07:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AqD4yZL0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFmZHO+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4327E189BA2
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 07:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89C018B482;
+	Fri, 18 Oct 2024 07:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729237735; cv=none; b=cN7dxD4iMrLT1o2dqYI5HpL9XZhkptrRI8WsJ6Uf7Qr+d5zxKWooBPdaRuyLU+4PC4dyv3v54+M0nJQ8ylm3Jwuv3IolYRHycA8SpCvXjI8WNS8ilxePNKTfwrG+EaXcX0V11vPyd149W7Z6+VvmFmWxqQUe5ssdfBF9dNypE54=
+	t=1729237776; cv=none; b=p5rOEc1Uv1eAKkm9092A6HPnqvOC7NmUv5G/uXXsoS0+03Xvd+XB/R7jHq+Q9DxsbR2Vpeo+89FjVI/gi+8nphKv43mR2U1xlwpG3hVkPnwfVeKla7SVrdg40CgNaAiI+G0R8crES7doEjl2XRPhcF8sZxJ/bYsNOiIIr2a3FIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729237735; c=relaxed/simple;
-	bh=7WIKQZ3bFs31Lm3+ADlRBG9/mPugYP9lIP5utWTpFkE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fXJUK+zCYxgYvAQiv3FrEluad1QVzUbu9nU4IWXKcINjYq3L9YpgDn0ndIVdt779arLa+cG64ddzSOIzyPu7nBcfhm+fQkyGBd2LU3Ancc2uYSfmDz9CvLiUNVIIZy3W1+Ut+7RGUMzyBUQq7OlPOA4wNV6WeXrU54dnzPyMRKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AqD4yZL0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729237733;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XWwqDCRQRriv7iO+TF5BdNeT3COFjejJcbVDi7gJc3s=;
-	b=AqD4yZL0ta7mX15ivnC36+uLz7nB05x5qSiCXwS6Smue5KmetZ7nEeorHVtnlUTld2NH5e
-	u/DcQOlrHa1klLB3W/dLsKRDnBqG5rBPbQCdaYJV5VQypTI/a4TJ2RwwpfEN3tJ1b9upke
-	tn7IrD6U68nX7MOXWt10Xk5mG43RTs4=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-9RANddoOMjuaHDoDRjs20Q-1; Fri, 18 Oct 2024 03:48:51 -0400
-X-MC-Unique: 9RANddoOMjuaHDoDRjs20Q-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-71e578061ffso2127458b3a.1
-        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 00:48:51 -0700 (PDT)
+	s=arc-20240116; t=1729237776; c=relaxed/simple;
+	bh=Rc4qEXMa0QYjvHOp4pyZqLnpUr0nGSD3dQ+U4hdNEaM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xzw2NnVxbLjpZuffaA0GGy9YuC+fSikaKo8LIuvAiLGRDe7OWofZVEiWBGkuAQq8l2zWu/NAZPnyq2KU5GqGghH/hA329PBC8r3qt4OgVfEoBhZ332sIFZVudLQbMzFdyif3j3MJQi9CPtRhkZ1EBOJTeRwiQyy43bVOqhbWHOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFmZHO+r; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7ea7e250c54so1274776a12.0;
+        Fri, 18 Oct 2024 00:49:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729237774; x=1729842574; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1isxM+T848GFvJvzymmh7gVtU9Db8eItqMO8i4yplDI=;
+        b=TFmZHO+rzhekS1sK7U/n79AZfhaP5ISKJMry1cgHQkKH5PgZluPuOO6HNKRg7rTr/g
+         gz/Gc9sQNL9JmoEOi4R92FKJJQYKXEoSIWfjb1lKschWwqCipAr05IZoVH4Kp56zw8aZ
+         nq6Sw3MrtCHNA4if2/4BnVNNP5qAZd524K63lafqtjO79zhejqMb82pvnHslZlKjbdp6
+         0kXV+Mpct7Tr+nFndnJR0tATVly2mR34hqgjMOYwPq7x4fTAsE8czv+iLvAfv4joIY0n
+         ulm0+2+HiWOtc1di7mlm7EpmSoVCtCVimpVW0G/iSC7sBaucxCUy2tRU5R34lcGn67GB
+         ajHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729237731; x=1729842531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XWwqDCRQRriv7iO+TF5BdNeT3COFjejJcbVDi7gJc3s=;
-        b=IE1csWpa+bw9rVvupHcB8a1R8o23XnwFdnUoDl4gg3l48BsL5h2VhoknxUF3oUqDv1
-         sWHD5Ix1E25lG6XizkRG5z37n46FmPtX2lZB8Pmsx1y/sC1K7uu3MhfjWF/T74ZLO/bN
-         ifk9NmLA24mqrjvVzqeTcISa4tS9oT3fnkcQLzo57ETqVoFWWLDMsGWd1nItg9oYzaBm
-         /3mHxUrhEEMiJ0gYSRLNBIDYPupjevXuIF2baYatqGURJUMdXNlKgzAPkj+8aKg+N7FD
-         EKDZB3xac0/DEJdnadne5XQVq/XJNeAlTMFYjNgEqsxdh9NmL5miicZ+SHw5Ye9j0iNu
-         RWog==
-X-Gm-Message-State: AOJu0YxQ44sL+o/sPlJXnUnUkx6bbcH9hT8jGte4iBGLAobznSXWercQ
-	pTKJzGS3feHTIS/X+QbAkA0ViIorUh1YKUy29wLs/o14BJtk1Q9Njc8UUeJ/ika78vC8ZjLirJF
-	rpch1OPmvblpVeouMlsml0hEIQKKGu14sDpIkw7uAZLucd6El4XPBlrTjUrz684cqygQIE4Vicf
-	IhzsUAjy70tvjj6uLj84AfiOluicbr
-X-Received: by 2002:a05:6a00:148a:b0:71e:702c:a680 with SMTP id d2e1a72fcca58-71ea333bb6cmr1958809b3a.26.1729237730769;
-        Fri, 18 Oct 2024 00:48:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEeq5/l12Y0xHoQ3SV0L8TPnM1KncduSW3O8hgGIChJWyNDBJxrvC/Uq2wMVQQ5ibg2nGFEaa+jRg9RDh7D9SI=
-X-Received: by 2002:a05:6a00:148a:b0:71e:702c:a680 with SMTP id
- d2e1a72fcca58-71ea333bb6cmr1958774b3a.26.1729237729975; Fri, 18 Oct 2024
- 00:48:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729237774; x=1729842574;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1isxM+T848GFvJvzymmh7gVtU9Db8eItqMO8i4yplDI=;
+        b=GPE+z8slCZvAMvN2CJF6emKWUVeA/iM6alg53FMzF7KCHmgykIFCxkuPmg6J5HoS7I
+         Qm4U/IfDy9fG1Hyk/d16zVXpBd9VYfoiXpcbEJn56QuEutYConOal/Pz+ZMWibk1W6CJ
+         Kd2r6kD/REeQQu1s4ggIHJAYq3GybQM2xj0hJHEKme0BWh+OIp5i/YFSPTYugaUhv8Lf
+         l3ttr8eKUJk5c0ZnwPuBuazS5Tp6XL+7I8d4LChdbRkhFW6y+pLoQhE0MwbQ9oPovwb0
+         1ctGnGMnwWkXe+9JcpD3WE0vpRu1F+WMmqo9u1vKHpUudk8V5YWRDM11KChDqq3obQEL
+         yFSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFUdBgJFFDGfFFkIffjhpDK41H6nb/ckefMdTGNcvj61B7w3/tB+n1qSp6anEKAafgC0+cVh4toeo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4r3181Ie2PQUVOLtydFAEEgooLw7jtPChQqAHzDr9q95QuYqH
+	PW6zuKsisDpGmgVMsRjhYuG16GA2i3ivRbq/HZzdD5lZ/UfIo3phxwxds2kJ
+X-Google-Smtp-Source: AGHT+IGq9xXBjZ7B+bmpZuX1zHoZ3akorwGczXJzcLA0dPqp+H4yvzKs0UT4OCM9H+bsNsIXFm5osw==
+X-Received: by 2002:a05:6a21:3a94:b0:1d9:282f:3d16 with SMTP id adf61e73a8af0-1d92c56cad7mr2315018637.32.1729237773888;
+        Fri, 18 Oct 2024 00:49:33 -0700 (PDT)
+Received: from localhost ([2402:7500:479:5c7a:4a5c:7794:109d:58b])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e5a8d674asm7346715ad.169.2024.10.18.00.49.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 00:49:33 -0700 (PDT)
+From: wojackbb@gmail.com
+To: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Cc: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	angelogioacchino.delregno@collabora.com,
+	linux-mediatek@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	johan@kernel.org,
+	Jack Wu <wojackbb@gmail.com>
+Subject: [PATCH 1/2] [net,v3] net: wwan: t7xx: add PM_AUTOSUSPEND_MS_BY_DW5933E for Dell DW5933e
+Date: Fri, 18 Oct 2024 15:48:41 +0800
+Message-Id: <20241018074841.23546-1-wojackbb@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014031234.7659-1-xuanzhuo@linux.alibaba.com> <20241014031234.7659-3-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20241014031234.7659-3-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 18 Oct 2024 15:48:38 +0800
-Message-ID: <CACGkMEvP99H0qEUsgkznS6brMbJcwV8BP37Fht28G2KtP-PLow@mail.gmail.com>
-Subject: Re: [PATCH 2/5] virtio_net: introduce vi->mode
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 14, 2024 at 11:12=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
->
-> Now, if we want to judge the rx work mode, we have to use such codes:
->
-> 1. merge mode: vi->mergeable_rx_bufs
-> 2. big mode:   vi->big_packets && !vi->mergeable_rx_bufs
-> 3. small:     !vi->big_packets && !vi->mergeable_rx_bufs
->
-> This is inconvenient and abstract, and we also have this use case:
->
-> if (vi->mergeable_rx_bufs)
->     ....
-> else if (vi->big_packets)
->     ....
-> else
->
-> For this case, I think switch-case is the better choice.
->
-> So here I introduce vi->mode to record the virtio-net work mode.
-> That is helpful to judge the work mode and choose the branches.
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 61 +++++++++++++++++++++++++++++++---------
->  1 file changed, 47 insertions(+), 14 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 59a99bbaf852..14809b614d62 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -385,6 +385,12 @@ struct control_buf {
->         virtio_net_ctrl_ack status;
->  };
->
-> +enum virtnet_mode {
-> +       VIRTNET_MODE_SMALL,
-> +       VIRTNET_MODE_MERGE,
-> +       VIRTNET_MODE_BIG
-> +};
+From: Jack Wu <wojackbb@gmail.com>
 
-I'm not sure if this can ease or not.
+Because optimizing the power consumption of Dell DW5933e,
+Add a new auto suspend time for Dell DW5933e.
 
-[...]
+The Tests uses a small script to loop through the power_state
+of Dell DW5933e.
+(for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
 
-> +       if (vi->mergeable_rx_bufs)
-> +               vi->mode =3D VIRTNET_MODE_MERGE;
-> +       else if (vi->big_packets)
-> +               vi->mode =3D VIRTNET_MODE_BIG;
+* If Auto suspend is 20 seconds,
+  test script show power_state have 5% of the time was in D3 state
+  when host don't have data packet transmission.
 
-Maybe we can just say big_packets doesn't mean big mode.
+* Changed auto suspend time to 5 seconds,
+  test script show power_state have 50% of the time was in D3 state
+  when host don't have data packet transmission.
 
-> +       else
-> +               vi->mode =3D VIRTNET_MODE_SMALL;
-> +
->         if (vi->any_header_sg)
->                 dev->needed_headroom =3D vi->hdr_len;
+Signed-off-by: Jack Wu <wojackbb@gmail.com>
+---
+V3:
+ * supplementary commit information
+V2:
+ * Fix code style error
+---
+---
+ drivers/net/wwan/t7xx/t7xx_pci.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Anyhow this seems not a fix so it should be a separate series than patch 1?
+diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
+index e556e5bd49ab..ec567153ea6e 100644
+--- a/drivers/net/wwan/t7xx/t7xx_pci.c
++++ b/drivers/net/wwan/t7xx/t7xx_pci.c
+@@ -49,6 +49,7 @@
+ #define PM_SLEEP_DIS_TIMEOUT_MS		20
+ #define PM_ACK_TIMEOUT_MS		1500
+ #define PM_AUTOSUSPEND_MS		20000
++#define PM_AUTOSUSPEND_MS_BY_DW5933E 5000
+ #define PM_RESOURCE_POLL_TIMEOUT_US	10000
+ #define PM_RESOURCE_POLL_STEP_US	100
+ 
+@@ -174,7 +175,7 @@ static int t7xx_wait_pm_config(struct t7xx_pci_dev *t7xx_dev)
+ 	return ret;
+ }
+ 
+-static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
++static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev, int pm_autosuspend_ms)
+ {
+ 	struct pci_dev *pdev = t7xx_dev->pdev;
+ 
+@@ -191,7 +192,7 @@ static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
+ 				DPM_FLAG_NO_DIRECT_COMPLETE);
+ 
+ 	iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) + DISABLE_ASPM_LOWPWR);
+-	pm_runtime_set_autosuspend_delay(&pdev->dev, PM_AUTOSUSPEND_MS);
++	pm_runtime_set_autosuspend_delay(&pdev->dev, pm_autosuspend_ms);
+ 	pm_runtime_use_autosuspend(&pdev->dev);
+ 
+ 	return 0;
+@@ -824,7 +825,13 @@ static int t7xx_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	IREG_BASE(t7xx_dev) = pcim_iomap_table(pdev)[T7XX_PCI_IREG_BASE];
+ 	t7xx_dev->base_addr.pcie_ext_reg_base = pcim_iomap_table(pdev)[T7XX_PCI_EREG_BASE];
+ 
+-	ret = t7xx_pci_pm_init(t7xx_dev);
++	if (id->vendor == 0x14c0 && id->device == 0x4d75) {
++		/* Dell DW5933e */
++		ret = t7xx_pci_pm_init(t7xx_dev, PM_AUTOSUSPEND_MS_BY_DW5933E);
++	} else {
++		/* Other devices */
++		ret = t7xx_pci_pm_init(t7xx_dev, PM_AUTOSUSPEND_MS);
++	}
+ 	if (ret)
+ 		return ret;
+ 
+-- 
+2.34.1
 
-Thanks
 
->
-> --
-> 2.32.0.3.g01195cf9f
->
+From cd3c4bb25637348806e92e2fe9d51a05c5ddbafd Mon Sep 17 00:00:00 2001
+From: Jack Wu <wojackbb@gmail.com>
+Date: Fri, 18 Oct 2024 15:44:11 +0800
+Subject: [PATCH 2/2] Add support for Sierra Wireless EM86xx with USB-id
+ 0x1199:0x90e5 & 0x1199:0x90e4.
+
+It is 0x1199:0x90e5
+T:  Bus=03 Lev=01 Prnt=01 Port=05 Cnt=01 Dev#= 14 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=1199 ProdID=90e5 Rev= 5.15
+S:  Manufacturer=Sierra Wireless, Incorporated
+S:  Product=Semtech EM8695 Mobile Broadband Adapter
+S:  SerialNumber=004403161882339
+C:* #Ifs= 6 Cfg#= 1 Atr=a0 MxPwr=500mA
+A:  FirstIf#=12 IfCount= 2 Cls=02(comm.) Sub=0e Prot=00
+I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=qcserial
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=usbfs
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=qcserial
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 4 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=85(I) Atr=03(Int.) MxPS=  64 Ivl=32ms
+I:* If#=12 Alt= 0 #EPs= 1 Cls=02(comm.) Sub=0e Prot=00 Driver=cdc_mbim
+E:  Ad=87(I) Atr=03(Int.) MxPS=  64 Ivl=32ms
+I:  If#=13 Alt= 0 #EPs= 0 Cls=0a(data ) Sub=00 Prot=02 Driver=cdc_mbim
+I:* If#=13 Alt= 1 #EPs= 2 Cls=0a(data ) Sub=00 Prot=02 Driver=cdc_mbim
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+
+It is 0x1199:0x90e4
+T:  Bus=03 Lev=01 Prnt=01 Port=05 Cnt=01 Dev#= 16 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1199 ProdID=90e4 Rev= 0.00
+S:  Manufacturer=Sierra Wireless, Incorporated
+S:  SerialNumber=004403161882339
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=  2mA
+I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=10 Driver=qcserial
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+
+Signed-off-by: JackBB Wu <wojackbb@gmail.com>
+---
+ drivers/usb/serial/qcserial.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/usb/serial/qcserial.c b/drivers/usb/serial/qcserial.c
+index 703a9c563557..bd0768e61b26 100644
+--- a/drivers/usb/serial/qcserial.c
++++ b/drivers/usb/serial/qcserial.c
+@@ -168,6 +168,8 @@ static const struct usb_device_id id_table[] = {
+ 	{DEVICE_SWI(0x1199, 0x90d2)},	/* Sierra Wireless EM9191 QDL */
+ 	{DEVICE_SWI(0x1199, 0xc080)},	/* Sierra Wireless EM7590 QDL */
+ 	{DEVICE_SWI(0x1199, 0xc081)},	/* Sierra Wireless EM7590 */
++	{DEVICE_SWI(0x1199, 0x90e4)},	/* Sierra Wireless EM86xx QDL*/
++	{DEVICE_SWI(0x1199, 0x90e5)},	/* Sierra Wireless EM86xx */
+ 	{DEVICE_SWI(0x413c, 0x81a2)},	/* Dell Wireless 5806 Gobi(TM) 4G LTE Mobile Broadband Card */
+ 	{DEVICE_SWI(0x413c, 0x81a3)},	/* Dell Wireless 5570 HSPA+ (42Mbps) Mobile Broadband Card */
+ 	{DEVICE_SWI(0x413c, 0x81a4)},	/* Dell Wireless 5570e HSPA+ (42Mbps) Mobile Broadband Card */
+-- 
+2.34.1
 
 
