@@ -1,120 +1,79 @@
-Return-Path: <netdev+bounces-137110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43E3B9A4657
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:58:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7F29A467E
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:08:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0559228196E
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:58:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A3381C21609
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BCE20492A;
-	Fri, 18 Oct 2024 18:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BCE204093;
+	Fri, 18 Oct 2024 19:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLMksYF2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMrTvcup"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409121865F3;
-	Fri, 18 Oct 2024 18:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFAB17DFF2;
+	Fri, 18 Oct 2024 19:08:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729277902; cv=none; b=Dhv3a85JWQHWHzwetQFcFCAPH43a9wNZSwnpo4EtJ5dCnXlOE+m1znveL7bBxCVZf5yFojkGkxNez2c8NQw1+Sf8Gt/H+jFPPZPXgG2hDfd7rxR9rQRrqZA/PGfWlnk2gJJg5TKG4q0iGVW+5hcgaTuK9zdKuGYF1D0JIFDiJS4=
+	t=1729278533; cv=none; b=uSc12KoOkS/HiuIVOHuzUqxhwhyopVlJ9uKP0GhxFXgsQGOtVCktRgTMBSDUsLPRMC4hTyUJcvkkNgXbDdPydBcsbsX9HQZjtCYNjJRTlUlwAPuuRflrP0l68jNkhB8xq2yZkrIRTafWRTirjVzGiV9Qfjhz0zVQ9Yyvy/JA8rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729277902; c=relaxed/simple;
-	bh=uNlY1sb7BVVXCcsMVu8Ynjn1FGT7oBovqYRNZBeSUEk=;
+	s=arc-20240116; t=1729278533; c=relaxed/simple;
+	bh=Y4tR5vgsgDYFizqilswwrpfpQhq/06nvxX1UE0BDJwM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GsBrc4mTr3xJ2uTLyvctdCdAENE6yoQt4xogmbp79/fhnxQNHfqVjvrM96B2ce73l9y0TdV9fzX02eaCzFCykVkgSDp6KSS8K/ID03h1MfQuTKgirOVFDwsxWMjaZhs5tHe+qwfPgKDlCaoQEYJQ6SYaPok2Y+1hX3Rk2yylx74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLMksYF2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 212B1C4CEC3;
-	Fri, 18 Oct 2024 18:58:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ECNSr+uYDIpEM4au4Ms1Jp/A9NqxzXDygZwXk7Y1vvB8gkzyQHdilD2rHXoCdLjVSPj07sTMOOkyA3mMseaV6bMPM83AvfBKNVt9/Hk7RPXHzkPv8m+SXvX8uAXVR2FJ++TPiLmk0q3AU7+8obDknyXLMowmMgTaDaAMt7Er+94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMrTvcup; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35F8FC4CEC3;
+	Fri, 18 Oct 2024 19:08:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729277901;
-	bh=uNlY1sb7BVVXCcsMVu8Ynjn1FGT7oBovqYRNZBeSUEk=;
+	s=k20201202; t=1729278532;
+	bh=Y4tR5vgsgDYFizqilswwrpfpQhq/06nvxX1UE0BDJwM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eLMksYF2A44sAVvXMLLc1QTO05aMjS+OBbVmUBAl+DMijULjAXZurx2DG/2ulaJIR
-	 JoRrmGIMHs433yhhly72II6CWLzqRAVpX7aKU1mtpg6T0fpj7F2CGdBFMTHC73KR0M
-	 8F7jBP38fFa63M2huQVX1hUtG6EE6PmoyBn8r99Au5V51HZQG1wKGt+XBJra9oGAv2
-	 SEVoy+pa4Wl38FEIXcpvG6eG7DIbtbR/zHF0Hi6hn5WADwn4Sigjjt6iAGl732xv2+
-	 HCewKfZmlZHMdZYDLFUn/NN8FFYPEobIhZ6ZTRSLzI73wByX7vcPT488drJ+4JFOBO
-	 GIYxXYQDKHcTw==
-Date: Fri, 18 Oct 2024 19:58:12 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	Len Brown <len.brown@intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	rust-for-linux@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Miguel Ojeda <ojeda@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev,
-	linux-mm@kvack.org, SeongJae Park <sj@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	netdev@vger.kernel.org, linux-sound@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nathan Lynch <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	linux-media@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: (subset) [PATCH v3 00/16] timers: Cleanup delay/sleep related
- mess
-Message-ID: <8e079f25-658e-4671-9b3e-c3e46f36405b@sirena.org.uk>
-References: <172892295715.1548.770734377772758528.b4-ty@kernel.org>
- <877ca5al86.fsf@somnus>
+	b=vMrTvcupWKpzuVmmJyeuMRXgQb0fXoAmk1MGKfqhh0xtod5C1loEoWU8Px7z2aqsT
+	 mO/oSgu3QAxoS3AcoUyapKfqGtn6WlmA7J6xy96YoOBiN/+ZoEbSyUr9PbmF4y5qRM
+	 Ks3HNsqQU1TaLzh2a2TFYEp58z05pyDsC4vYOvh56ZWxzLfMCnDu2mP9JaOt47Gdm6
+	 Ou431ohaRUTppTUN8qW9MfGHAflqnbs1wgJ8evw3gqX7KDMRHoKM+ja0DRaARkul2R
+	 fQWRom5UTEZ2M+LFlBnumH/4RvK/IjklToLxQdrV+4ssx117qP0qsYNzwLjVxj+aBc
+	 pN7cP+mxsQfGg==
+Date: Fri, 18 Oct 2024 20:08:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dipendra Khadka <kdipendra88@gmail.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.cocdm>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in
+ otx2_common.c
+Message-ID: <20241018190847.GS1697@kernel.org>
+References: <20241017185116.32491-1-kdipendra88@gmail.com>
+ <20241017185636.32583-1-kdipendra88@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="P8JRaMzcXswSHEtS"
-Content-Disposition: inline
-In-Reply-To: <877ca5al86.fsf@somnus>
-X-Cookie: What is the sound of one hand clapping?
-
-
---P8JRaMzcXswSHEtS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20241017185636.32583-1-kdipendra88@gmail.com>
 
-On Fri, Oct 18, 2024 at 10:06:33AM +0200, Anna-Maria Behnsen wrote:
+On Thu, Oct 17, 2024 at 06:56:33PM +0000, Dipendra Khadka wrote:
+> Add error pointer check after calling otx2_mbox_get_rsp().
+> 
+> Fixes: ab58a416c93f ("octeontx2-pf: cn10k: Get max mtu supported from admin function")
+> Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
 
-> Would it be ok for you, if the patch is routed through tip tree? kernel
-> test robot triggers a warning for htmldoc that there is a reference to
-> the no longer existing file 'timer-howto.rst':
+Reviewed-by: Simon Horman <horms@kernel.org>
 
->   https://lore.kernel.org/r/202410161059.a0f6IBwj-lkp@intel.com
-
-Oh, and for that:
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---P8JRaMzcXswSHEtS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcSr8MACgkQJNaLcl1U
-h9DpWgf/c8OCSZtN0/AmetsDqa/zvYT//zsqcY10Jl3YSsQgCEAIwkc0GWEdl0Bv
-mAY3s/r8vi5dSXK1YARWoSlvYA0h0R7ysi9oKy/2HyZ4fo6uVT/S95tSH90rL8UD
-IUtMu6N43Pak52+2hhGl4glVX5yDjXT4+8rMZjL8G9F07fXblzftyGP2G/HfkuJS
-FJ36afHCl/AMmoe1TkGpHHOaOXVbPlukUtX6ZQFepWJjUiv/4YgoFxH8SVoyqP8W
-ROEq86SWvagekQ5nzr8Jgn2DaWiFSN/e520uN6Qz8kELdR+fV/NquTsUmszeaZ+z
-tnB/CGQgVUWV17Pn7WAs3w+eDCRuVQ==
-=RPH6
------END PGP SIGNATURE-----
-
---P8JRaMzcXswSHEtS--
 
