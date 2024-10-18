@@ -1,206 +1,240 @@
-Return-Path: <netdev+bounces-137171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789129A4A04
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 01:22:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124759A4A39
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 01:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 363492840D6
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3122F1C2142D
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EF0192B9D;
-	Fri, 18 Oct 2024 23:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05B31917DD;
+	Fri, 18 Oct 2024 23:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="PxnvI+85"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evtxctpR"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2073.outbound.protection.outlook.com [40.107.20.73])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3901192B81
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 23:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729293641; cv=fail; b=ihZMQEQPlZZYnKS3wkIpx3WKL0zQSE72lQIKDhEDTQu9m4cJI6aiRHUz+u10fTwZS0tJjVhFzY3UCsxocC5HSXX4bPq3XnSwlxu0okcZLuvgY83K9CfZVFFuYscjwRyfdpSB5tygmPIGFDSnwRCT6rwLdyGJzo5+4ZmRM61RCIE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729293641; c=relaxed/simple;
-	bh=gRq09LiTvCqu77G3UmHFbQ+dx7jyMQRVGfRk6XwUonA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gLtyEXXwoeeyrZfHqwVftWH/rjfsvyTvsfssq3isW42V0ItjegofOP9gUVlXUOhcEkmxcCNwyr1EhjGxD3e25UQvHiGBa9qqOH6aFeQaH+4QB8zOSY7Cyc8DRitNjGyJN3CPs+TYAS23424siJ3RQj7GyFM5b5ILD/fC0r+K7WM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=PxnvI+85; arc=fail smtp.client-ip=40.107.20.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EQrBr0DG5iCZIUVZtizDGycS5ZsjZXkZK11gFJxCCzyAWcTtLJ4NoHJcq0TXIVSSb3Mv1O/1n0zGvjOE/2NqwjzD3K1to6d8ky7CwRtZziFWE6DHrIvgn4FGD9hQDWfGEfculyF12K1tX/4dX3umCd4a4ZdC+tp6f2EDh3ztwxyjwRuZCfMtYOHHXOU4KLXOYIDvVIrQcq4CxYrVqR4aJOVvSvHGEO1u4q5J4N61XZ8JjvHO91B6iy58aP+ytIPdiZ+OZUA4qc9hYe9vsl1rzCZ+Vx6SaMi2u83/MBDa2dR9Ly3i0ItOw3R+lqMYDX/dAcQbNXMragfLbwxfpopOiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=anYE30uqxh8PVEBZAC+XD5FOG2Mh8l8iyfB2oxTXqwk=;
- b=nYmxYZyv0NOsWOJIHePe1rkTP7xOMt2HWjdikEcJ+kAv34/IrJv55nrs+m/9wTIPI0oyKk2NVNRp/sZcbb5AR9ZBGngHB+U4L61WhBuese1uQB04ndhu22Ky5T+vDOLRa7v3artGJfpvTmsWDfjLp5nqMSLNNY986AReRYR8MlavUUuox5nMMjEspZMco3ZMxDPYB7qrFY9a0dBhuLvnHnmrElfXBga1SWFzjbuCpEVxt8cJn4rWOD4OD/aFBxDojbKHv1o/fH/agQ0C3cCFKLVfQL7XQ4zKGgyAk8oVZQyuBIdk7ew4OWwNcTO/4RcmOEI+9d0AaGnH2xS8FQkZLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.6.100) smtp.rcpttodomain=nokia-bell-labs.com
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=anYE30uqxh8PVEBZAC+XD5FOG2Mh8l8iyfB2oxTXqwk=;
- b=PxnvI+8562+16QCmG04O19wXu5T722l5gEkc2l/D4Zfz6X/yF9kG7dKJz0RorSH0QFs3tcQCzOwaFUuWD0ESlSSKD9TcRYwqcf111DgZqzlWCPmkshujguB8uqJwMIh9ox9jihyMfb8DPeF8cd3FEOx1Jk/JQMRmX6de/yk3fjomF9+mKSGt6OwCvv3v3WpC4DQ68D9Irtra7TrhaeVmu6I0we3vup2fk4a57qHG+FgDGXEcfEU0ws0ZJp6bVXNA6VNRpecRk9J/mpxKm1TZSl0dPNHedpfvqP3XmwP8WZz8/cO7zglPmXMhMP/wqGA/EWc8pK//OJsAi6BcZvshLA==
-Received: from AM6PR0502CA0063.eurprd05.prod.outlook.com
- (2603:10a6:20b:56::40) by DU2PR07MB9434.eurprd07.prod.outlook.com
- (2603:10a6:10:495::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Fri, 18 Oct
- 2024 23:20:36 +0000
-Received: from AM2PEPF0001C70F.eurprd05.prod.outlook.com
- (2603:10a6:20b:56:cafe::34) by AM6PR0502CA0063.outlook.office365.com
- (2603:10a6:20b:56::40) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.23 via Frontend
- Transport; Fri, 18 Oct 2024 23:20:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.100)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.6.100 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.6.100;
- helo=fr711usmtp2.zeu.alcatel-lucent.com; pr=C
-Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
- AM2PEPF0001C70F.mail.protection.outlook.com (10.167.16.203) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8069.17 via Frontend Transport; Fri, 18 Oct 2024 23:20:36 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fr711usmtp2.zeu.alcatel-lucent.com (GMO) with ESMTP id 49INKJJd010239;
-	Fri, 18 Oct 2024 23:20:34 GMT
-From: chia-yu.chang@nokia-bell-labs.com
-To: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, ij@kernel.org,
-        ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
-        g.white@CableLabs.com, ingemar.s.johansson@ericsson.com,
-        mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
-        Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v3 net-next 14/14] net: sysctl: introduce sysctl SYSCTL_FIVE
-Date: Sat, 19 Oct 2024 01:20:17 +0200
-Message-Id: <20241018232017.46833-15-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241018232017.46833-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20241018232017.46833-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75011817;
+	Fri, 18 Oct 2024 23:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729295139; cv=none; b=OmiOMG8Lys/smUXmH59CeiZe0fgD2Tu+J9+rCerZ5N3b5erD1Op3kUalu3z0Iaj+gyPrvqpNYBZYSXiLCT0BAvCoiZqVrZEZIid2W3b0oSzrOXEbfcRZW/7+jCk2j16fEts/ibTfYGKnJ8stHR6bpx+RszoKeFHZPY74/5IB9hg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729295139; c=relaxed/simple;
+	bh=lFZnjV8RlVPG6PrVOgGg9hgB2Ob3uus6nsFdYXxg0xQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=TcCmc9xGp5zi+KyatlAp1nCUjrl7OhoX5KPxHwT9SPd8wUmeRdsJZPurUONEIEzZVv+xr1UyvGmyQwPFvFT0EvQU8PUS0O/FqQ1v46ZBKds9MxQuwhAx6v8esadfO+poUJaiyGyCccxH4pzs9jmkIdmJwzVeUdMTjrOARFzipLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evtxctpR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6996C4CEC3;
+	Fri, 18 Oct 2024 23:45:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729295139;
+	bh=lFZnjV8RlVPG6PrVOgGg9hgB2Ob3uus6nsFdYXxg0xQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=evtxctpRyaoTSOigJT5cFz8FlzinZ4CiqIbWurTmKrRfQkXyPwANmEAW+wstE4BGx
+	 TIN4rKkxFq5bRqf1RYbu8X5+GaKP8PCUkJCSI7XdnVuPyggqqCKegX2g9xYIK1RWWo
+	 +b0kx6X/7xFOXGXdvbNco/L2DpCtD2beey4jXYhDZqcjQ6tHOX7X1U5wq38aQ9bZXw
+	 j4FYzQwUpZeifU9a96tVVuahIFbm86NthAcccPlNw2GRZ0nybq3IyuM42izSzAVkj8
+	 T19Q5jWyld7A4Ht/0K1UYHtBeST5LII4RfUrhhhbZUkSRif8tr3x1ApUVAUGVSTvJT
+	 Ma/8xyjaHk33A==
+Date: Fri, 18 Oct 2024 18:45:37 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Chen Ni <nichen@iscas.ac.cn>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Yi Liu <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Ye Bin <yebin10@huawei.com>,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Rui Salvaterra <rsalvaterra@gmail.com>, linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
+Message-ID: <20241018234537.GA770692@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM2PEPF0001C70F:EE_|DU2PR07MB9434:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: eb5a53f8-288a-479c-91cd-08dcefcb78b9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5AC2hR6akY5lkIfUL7LxfOVDil3M5YA9i1oLi5B5+25jGQVjKvLjkbnlztRG?=
- =?us-ascii?Q?NQ9PmiWn1uQ1TrC4o14qjmAY86fX9fagLQksG+K+QzqgtI7wzEO5Mjf9my/A?=
- =?us-ascii?Q?gSAcLRci1Als4lb0ShWHZoDge1Uaoxg9j+f4V38sUg+PBV4VF055aajLTbqz?=
- =?us-ascii?Q?0zIbtfo425j63ly3IQj4ILBn9ofgKG0dh8/NKairh0ND5I+3GvqWBbi0BNyO?=
- =?us-ascii?Q?zOTzQUhiLBoREmoIDOwvTwO5TNdI9k2gLPQX61yOA6semsqnxWx975QqlUxD?=
- =?us-ascii?Q?E4gE27I5GAKR2jNmQnNl+zOePKz0ez0F3bK6kBrfnICiWn5niRD5XUGFdwb9?=
- =?us-ascii?Q?GVg77fwS1WPoU4KYum9B/aPDsIo8J7bT3GTg3qwSIvgwWxzxIv6uaC/Ax83+?=
- =?us-ascii?Q?nsqJBvfFUTnp2EY7Qw8a6E/4j7moPczvd8BPf+Llz/UnT+6X94Ze9iiRZvUx?=
- =?us-ascii?Q?3Yvflqw9G/zRHsW5vqSW97pA3qDSR5zL8h2PSKqFXCU/KuXLZbjBfeI1paN+?=
- =?us-ascii?Q?VSwRu7l0vaDKwrK7vRbMGP1aeXKgLI5FCjItCmovwTn0e9Sc0Dw6hhenmIl6?=
- =?us-ascii?Q?Mtb0rI7XkNzCiRzzn+ZqiIsO/0ncf0vvfT+egGj4InqltKnV9Wm5kmusTMGA?=
- =?us-ascii?Q?Ukwz7Y1MoeLcjRu/CEyk0CKw89ZbP5KyXVr2hBEOaAvMXfRIIng6cwyDV56r?=
- =?us-ascii?Q?MTVwIuAFQENW7bCwHiPckwyRJ3ic2cJRFFWagzdXIN6ekXjKyVXz2LD3pIiw?=
- =?us-ascii?Q?1xjUnAoyUrrZcVo02m5wLRDVOTyZIxUwg3Q8h6OYSYRZGk2ul/naXwTRLe5J?=
- =?us-ascii?Q?38WIo9hwWOK+qvBITkNWWYLGACSFDE5CZa8qRm0pRraDN38ZCFdyyybAeY+G?=
- =?us-ascii?Q?9xYhPG15cuv2Mf52ghVt7qQBYo+Lzui+ukNdv9fMXxr9zQXDQIjKJNJ2/D3D?=
- =?us-ascii?Q?fi9IBk239NKcDMKE6wO1DWpi2FpA30KK7Ta5lyrQ+a0WolcEMYc/IDAFoXat?=
- =?us-ascii?Q?J1blZF6nCCAb82NzRtjXsRJTfqt1OSewznxn1beHEaED28CZjutPpcKYbJVt?=
- =?us-ascii?Q?v35EEC59aslYP6MYUIYFaFFjLPAZNjdo0FNQpJ9If/+n3qTjOD/2BLX90wil?=
- =?us-ascii?Q?pKZIJcEUH1A3/BfGeFlQfUdOtetRdXaUvjomh0vcT2C9paV/wOldJsH6lflI?=
- =?us-ascii?Q?yr6TrHTyCfyD5WHHTZqkM9mC08i68XyOQ470yszD2dJI04zUDAXZrilxlxdw?=
- =?us-ascii?Q?xc72JO+V/EDDcCDGVeTUPWtxMTM9kOZP73Zs5yB3rGc9XArEOyAJE990oSFX?=
- =?us-ascii?Q?RKwCT4ut2YXYxS8h05fFDVEZwzjBMENMM2bu27/GxlXpOn/qzuCxA1KWlTo1?=
- =?us-ascii?Q?JSOILmslzTqChUDiV+J8zKMLnxAC2ql4fnOmBxvIsK6/0lLrvRyyL3XrPaCt?=
- =?us-ascii?Q?h7DqWHKy5zo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2024 23:20:36.1032
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb5a53f8-288a-479c-91cd-08dcefcb78b9
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM2PEPF0001C70F.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR07MB9434
+In-Reply-To: <f871a77fb51e54332886882e8ecb1a4a5f5d296b.camel@redhat.com>
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Wed, Oct 16, 2024 at 10:53:16AM +0200, Philipp Stanner wrote:
+> On Wed, 2024-10-16 at 10:43 +0200, Heiner Kallweit wrote:
+> > On 16.10.2024 08:57, Philipp Stanner wrote:
+> > > On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
+> > > > On Tue, 15 Oct 2024 20:51:23 +0200
+> > > > Philipp Stanner <pstanner@redhat.com> wrote:
+> > > > 
+> > > > > pci_intx() and its managed counterpart pcim_intx() only exist
+> > > > > for
+> > > > > older
+> > > > > drivers which have not been ported yet for various reasons.
+> > > > > Future
+> > > > > drivers should preferably use pci_alloc_irq_vectors().
+> > > > > 
+> > > > > Mark pci_intx() and pcim_intx() as deprecated and encourage
+> > > > > usage
+> > > > > of
+> > > > > pci_alloc_irq_vectors() in its place.
+> > > > 
+> > > > I don't really understand this.  As we've discussed previously
+> > > > pci_alloc_irq_vectors() is, unsurprisingly, for allocating PCI
+> > > > IRQ
+> > > > vectors while pci_intx() is for manipulating the INTx disable bit
+> > > > on
+> > > > PCI devices.  The latter is a generic mechanism for preventing
+> > > > PCI
+> > > > devices from generating INTx, regardless of whether there's a
+> > > > vector
+> > > > allocated for it.  How does the former replace the latter and why
+> > > > do
+> > > > we
+> > > > feel the need to deprecate the latter?
+> > > > 
+> > > > It feels like this fits some narrow narrative and makes all users
+> > > > of
+> > > > these now deprecated functions second class citizens.  Why?  At
+> > > > it's
+> > > > root these are simply providing mask and set or mask and clear
+> > > > register
+> > > > bit operations.  Thanks,
+> > > 
+> > > I got the feeling from the RFC discussion that that was basically
+> > > the
+> > > consensus: people should use pci_alloc_irq_vectors(). Or did I
+> > > misunderstand Andy and Heiner?
+> > > 
+> > I think there are two different use cases for pci_intx().
+> > At first there are several drivers where the direct usage of
+> > pci_intx()
+> > can be eliminated by switching to the pci_alloc_irq_vectors() API.
+> > 
+> > And then there's usage of pci_intx() in
+> > drivers/vfio/pci/vfio_pci_intrs.c
+> > drivers/xen/xen-pciback/conf_space_header.c
+> > There we have to keep the (AFAICS unmanaged) pci_intx() calls.
+> 
+> There is also the usage within PCI itself, in MSI. Patch №8 touches
+> that.
+> 
+> It's why I think this series should land before anyone should port
+> direct pci_intx() users to the irq vectors function, because the latter
+> also uses pci_intx() and its own devres, which sounds explosive to me.
+>
+> > > I'm perfectly happy with dropping this patch and continue offering
+> > > pci{m}_intx() to users, since after removing that hybrid hazzard I
+> > > don't see any harm in them anymore.
 
-Add SYSCTL_FIVE for new AccECN feedback modes of net.ipv4.tcp_ecn.
+So is the bottom line that we should drop *this* patch and apply the
+rest of the series?
 
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
----
- include/linux/sysctl.h | 17 +++++++++--------
- kernel/sysctl.c        |  2 +-
- 2 files changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-index aa4c6d44aaa0..37c95a70c10e 100644
---- a/include/linux/sysctl.h
-+++ b/include/linux/sysctl.h
-@@ -37,21 +37,22 @@ struct ctl_table_root;
- struct ctl_table_header;
- struct ctl_dir;
- 
--/* Keep the same order as in fs/proc/proc_sysctl.c */
-+/* Keep the same order as in kernel/sysctl.c */
- #define SYSCTL_ZERO			((void *)&sysctl_vals[0])
- #define SYSCTL_ONE			((void *)&sysctl_vals[1])
- #define SYSCTL_TWO			((void *)&sysctl_vals[2])
- #define SYSCTL_THREE			((void *)&sysctl_vals[3])
- #define SYSCTL_FOUR			((void *)&sysctl_vals[4])
--#define SYSCTL_ONE_HUNDRED		((void *)&sysctl_vals[5])
--#define SYSCTL_TWO_HUNDRED		((void *)&sysctl_vals[6])
--#define SYSCTL_ONE_THOUSAND		((void *)&sysctl_vals[7])
--#define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[8])
--#define SYSCTL_INT_MAX			((void *)&sysctl_vals[9])
-+#define SYSCTL_FIVE			((void *)&sysctl_vals[5])
-+#define SYSCTL_ONE_HUNDRED		((void *)&sysctl_vals[6])
-+#define SYSCTL_TWO_HUNDRED		((void *)&sysctl_vals[7])
-+#define SYSCTL_ONE_THOUSAND		((void *)&sysctl_vals[8])
-+#define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[9])
-+#define SYSCTL_INT_MAX			((void *)&sysctl_vals[10])
- 
- /* this is needed for the proc_dointvec_minmax for [fs_]overflow UID and GID */
--#define SYSCTL_MAXOLDUID		((void *)&sysctl_vals[10])
--#define SYSCTL_NEG_ONE			((void *)&sysctl_vals[11])
-+#define SYSCTL_MAXOLDUID		((void *)&sysctl_vals[11])
-+#define SYSCTL_NEG_ONE			((void *)&sysctl_vals[12])
- 
- extern const int sysctl_vals[];
- 
-diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-index 79e6cb1d5c48..a922b44eaddd 100644
---- a/kernel/sysctl.c
-+++ b/kernel/sysctl.c
-@@ -82,7 +82,7 @@
- #endif
- 
- /* shared constants to be used in various sysctls */
--const int sysctl_vals[] = { 0, 1, 2, 3, 4, 100, 200, 1000, 3000, INT_MAX, 65535, -1 };
-+const int sysctl_vals[] = { 0, 1, 2, 3, 4, 5, 100, 200, 1000, 3000, INT_MAX, 65535, -1 };
- EXPORT_SYMBOL(sysctl_vals);
- 
- const unsigned long sysctl_long_vals[] = { 0, 1, LONG_MAX };
--- 
-2.34.1
-
+> > > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > > > > ---
+> > > > >  drivers/pci/devres.c | 5 ++++-
+> > > > >  drivers/pci/pci.c    | 5 ++++-
+> > > > >  2 files changed, 8 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
+> > > > > index 6f8f712fe34e..4c76fc063104 100644
+> > > > > --- a/drivers/pci/devres.c
+> > > > > +++ b/drivers/pci/devres.c
+> > > > > @@ -435,7 +435,7 @@ static struct pcim_intx_devres
+> > > > > *get_or_create_intx_devres(struct device *dev)
+> > > > >  }
+> > > > >  
+> > > > >  /**
+> > > > > - * pcim_intx - managed pci_intx()
+> > > > > + * pcim_intx - managed pci_intx() (DEPRECATED)
+> > > > >   * @pdev: the PCI device to operate on
+> > > > >   * @enable: boolean: whether to enable or disable PCI INTx
+> > > > >   *
+> > > > > @@ -443,6 +443,9 @@ static struct pcim_intx_devres
+> > > > > *get_or_create_intx_devres(struct device *dev)
+> > > > >   *
+> > > > >   * Enable/disable PCI INTx for device @pdev.
+> > > > >   * Restore the original state on driver detach.
+> > > > > + *
+> > > > > + * This function is DEPRECATED. Do not use it in new code.
+> > > > > + * Use pci_alloc_irq_vectors() instead (there is no managed
+> > > > > version, currently).
+> > > > >   */
+> > > > >  int pcim_intx(struct pci_dev *pdev, int enable)
+> > > > >  {
+> > > > > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> > > > > index 7ce1d0e3a1d5..dc69e23b8982 100644
+> > > > > --- a/drivers/pci/pci.c
+> > > > > +++ b/drivers/pci/pci.c
+> > > > > @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct pci_dev
+> > > > > *dev)
+> > > > >  }
+> > > > >  
+> > > > >  /**
+> > > > > - * pci_intx - enables/disables PCI INTx for device dev
+> > > > > + * pci_intx - enables/disables PCI INTx for device dev
+> > > > > (DEPRECATED)
+> > > > >   * @pdev: the PCI device to operate on
+> > > > >   * @enable: boolean: whether to enable or disable PCI INTx
+> > > > >   *
+> > > > >   * Enables/disables PCI INTx for device @pdev
+> > > > > + *
+> > > > > + * This function is DEPRECATED. Do not use it in new code.
+> > > > > + * Use pci_alloc_irq_vectors() instead.
+> > > > >   */
+> > > > >  void pci_intx(struct pci_dev *pdev, int enable)
+> > > > >  {
+> > > > 
+> > > 
+> > > 
+> > 
+> 
 
