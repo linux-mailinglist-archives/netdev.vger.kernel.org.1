@@ -1,99 +1,116 @@
-Return-Path: <netdev+bounces-137048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A749A4204
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 17:12:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C3E99A4222
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 17:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5011A28A1CE
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 15:12:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C19951C226D9
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 15:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C409720010F;
-	Fri, 18 Oct 2024 15:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0008200C83;
+	Fri, 18 Oct 2024 15:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcn0AAZs"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="BiQHe7Ip"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9525A16BE3A;
-	Fri, 18 Oct 2024 15:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EDD1F4264;
+	Fri, 18 Oct 2024 15:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729264343; cv=none; b=NsLidQWFbKeA9t35bBzQ2XiI2Z3cFU7YMtyyAXQPEMv33vfi96rYi3anKOAnEL/R1hoGvwZ0l5DBjcMkFYjxnMvgJ5UC25gGIYmzkGTn6zbC/DerTzSOkBMW0gtDVwXJcdcZaD3u2BpeKdQxfo4MRZldJ+zzyw5vvuKQkkjf280=
+	t=1729264757; cv=none; b=rCNU7nxnSQk+jb12W1tBd3nQ2olWTxy51VdSACQZtYtPiFgJJ7zUF9NwQ0S2O8BBcs/G5M16YPU4Hr7WY7WQ1EI3gakDbqv45hDPLwzCYq5CWCXImD2R/ZzbFzNX0ntDpek0w6mNJL4nvRoajqg+7aFszqSYdfx3/mYHkrA8dJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729264343; c=relaxed/simple;
-	bh=W1Y5OK/NY7K9m461uBKMk468dZHpDUW5Foz6lCJa0Gk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IZh+qx8gPneoaCtzny5J61yX9Yx8M28U/Tst0s0ipmnORQSFWAB5Qm1RSYk4eyT0+hiR2igDQK+UnuaBxAdXzGG/p+z2ZbfeRsWYD0gHhmXdZ6fI0jZIOOOQJck90UvsM2sM5cEBKP0VzucDc6FQBiNjkN0AZLgCCM+j2GtXzgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcn0AAZs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649B8C4CEC3;
-	Fri, 18 Oct 2024 15:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729264343;
-	bh=W1Y5OK/NY7K9m461uBKMk468dZHpDUW5Foz6lCJa0Gk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=lcn0AAZsD7toXxaY4C6Q6zLbhLYNaYscIBQuhZtqo7dXj2ymsphuZmlVCFtId664c
-	 prY6s0r3UJYbxI5vieHUEqK6DXmStZ0XsLuYaCk+NGqlB3GYkQD4otK2P8YQHFTiJT
-	 VHQ1PCsWg45UIyFmDgSUnzOLXJhlSyKVuXdZncqj6Ri9iPfXFj6BSSOt8DBtjSoG8l
-	 dZWMT89U/IBvM3RwEINHoKwClharcgqsnvUSaxgsX/Pcgl2ppWCDrlKbsW4rG7cNDJ
-	 1OU1GIS0UM2T/J7ouiAf31jV1FNBUwNNAfO/13GUQuWFayt3BDSfYedyCKjum1aS+l
-	 QlPMJq9SShqIw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Li Zetao <lizetao1@huawei.com>,
-	Kunwu Chan <chentao@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ipmr: Don't mark ip6mr_rtnl_msg_handlers as __initconst
-Date: Fri, 18 Oct 2024 15:12:14 +0000
-Message-Id: <20241018151217.3558216-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1729264757; c=relaxed/simple;
+	bh=UwPMKCaQO5+n3ciIjqo+WINUTZDFj4k3xLL2XjGRbos=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ihcF7CxjIfLCUrPPoqchg3ol4qK23heVzyR0ZQTDMB0qSNmC7u9W8ewgTs6Jx/qLbz+NiDyEc03MVqiw5PTmIxqNL8rW3+jKARp5FJuLVMXCPuKtTOAAREhA1dCHdd3QEUMG0+p7VVaI7u99CrSlxVdH8NjLWMDGpE2j8aTQyDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=BiQHe7Ip; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1729264746;
+	bh=UwPMKCaQO5+n3ciIjqo+WINUTZDFj4k3xLL2XjGRbos=;
+	h=From:Subject:Date:To:Cc:From;
+	b=BiQHe7IpC/W859WGSqcVMCN+JhALi2oC/xaRLcHyMyChZv/CZfybHqHs1NWRhtFVB
+	 sGhV1+PFan29sig7N9qI9T+URF6PA3CVby+Po1CNB88AixI89bso8fR2gPsnnyAGAf
+	 kyBYHiO5fu7c41By8SWRxnSMF7LPccxkz3sX+/Im/iArhNxYlU3q8vVVGzq2iyNqLA
+	 nAmtD7TUSIsxPSwjg2s4/2ST1iFXAAWQ8j5RlVAfvcqLsAMOyeF8FWgVdOSEjYJzBQ
+	 ERHksr5zQ/OJihw4ufVGFGO6n00bvhi87z3G2m/EOxsgggBDD2lwVr3OSExHHQ4DFF
+	 /RuELhFsBc6Jw==
+Received: from [192.168.1.218] (pool-100-2-116-133.nycmny.fios.verizon.net [100.2.116.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: nfraprado)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5DF1117E361A;
+	Fri, 18 Oct 2024 17:19:04 +0200 (CEST)
+From: =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>
+Subject: [PATCH v2 0/2] Enable Ethernet on the Genio 700 EVK board
+Date: Fri, 18 Oct 2024 11:19:01 -0400
+Message-Id: <20241018-genio700-eth-v2-0-f3c73b85507b@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAGV8EmcC/3XMQQ7CIBCF4as0sxYDlIK68h6mC6TTMkmFBppG0
+ 3B3sXuX/0vet0PGRJjh1uyQcKNMMdSQpwact2FCRkNtkFwqwUXHJgwUDecMV89kJ1uuBmu0dlA
+ vS8KR3gf36Gt7ymtMn0PfxG/9A22CcSa0Fe5q2osb1d3FebbPmOzZxRf0pZQviR7OJ6wAAAA=
+X-Change-ID: 20241015-genio700-eth-252304da766c
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Richard Cochran <richardcochran@gmail.com>
+Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>, 
+ Jianguo Zhang <jianguo.zhang@mediatek.com>, 
+ Macpaul Lin <macpaul.lin@mediatek.com>, 
+ Hsuan-Yu Lin <shane.lin@canonical.com>, Pablo Sun <pablo.sun@mediatek.com>, 
+ fanyi zhang <fanyi.zhang@mediatek.com>
+X-Mailer: b4 0.14.2
 
-From: Arnd Bergmann <arnd@arndb.de>
+The patches in this series add the ethernet node on mt8188 and enable it
+on the Genio 700 EVK board.
 
-This gets referenced by the ip6_mr_cleanup function, so it must not be
-discarded early:
+The changes were picked up from the downstream branch at
+https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-mtk/+git/jammy,
+cleaned up and split into two commits.
 
-WARNING: modpost: vmlinux: section mismatch in reference: ip6_mr_cleanup+0x14 (section: .exit.text) -> ip6mr_rtnl_msg_handlers (section: .init.rodata)
-ERROR: modpost: Section mismatches detected.
-Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.
-
-Fixes: 3ac84e31b33e ("ipmr: Use rtnl_register_many().")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
 ---
- net/ipv6/ip6mr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v2:
+- Moved mdio bus to mt8188.dtsi
+- Changed phy-mode: rgmii-rxid -> rgmii-id
+- Removed mediatek,tx-delay-ps
+- style: Reordered vendor properties alphabetically 
+- style: Used fewer lines for clock-names
+- Fixed typo in commit message: 1000 Gbps -> 1000 Mbps
+- Link to v1: https://lore.kernel.org/r/20241015-genio700-eth-v1-0-16a1c9738cf4@collabora.com
 
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 437a9fdb67f5..f7892afba980 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -1367,7 +1367,7 @@ static struct pernet_operations ip6mr_net_ops = {
- 	.exit_batch = ip6mr_net_exit_batch,
- };
- 
--static const struct rtnl_msg_handler ip6mr_rtnl_msg_handlers[] __initconst_or_module = {
-+static const struct rtnl_msg_handler ip6mr_rtnl_msg_handlers[] = {
- 	{.owner = THIS_MODULE, .protocol = RTNL_FAMILY_IP6MR,
- 	 .msgtype = RTM_GETROUTE,
- 	 .doit = ip6mr_rtm_getroute, .dumpit = ip6mr_rtm_dumproute},
+---
+Nícolas F. R. A. Prado (2):
+      arm64: dts: mediatek: mt8188: Add ethernet node
+      arm64: dts: mediatek: mt8390-genio-700-evk: Enable ethernet
+
+ arch/arm64/boot/dts/mediatek/mt8188.dtsi           | 97 ++++++++++++++++++++++
+ .../boot/dts/mediatek/mt8390-genio-700-evk.dts     | 20 +++++
+ 2 files changed, 117 insertions(+)
+---
+base-commit: 7f773fd61baa9b136faa5c4e6555aa64c758d07c
+change-id: 20241015-genio700-eth-252304da766c
+
+Best regards,
 -- 
-2.39.5
+Nícolas F. R. A. Prado <nfraprado@collabora.com>
 
 
