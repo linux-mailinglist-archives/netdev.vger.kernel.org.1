@@ -1,171 +1,240 @@
-Return-Path: <netdev+bounces-136909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BCB69A3970
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:08:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5F89A39A1
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8AC21C21C93
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:08:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8A171C20D9A
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BAD2190074;
-	Fri, 18 Oct 2024 09:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBD71A255C;
+	Fri, 18 Oct 2024 09:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WyIw3AhI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAny8PnY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D27F190068
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 09:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB801922D7;
+	Fri, 18 Oct 2024 09:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729242499; cv=none; b=Q6QAvCnVGq+9Pn2xgtKBatDTiXZavLjBjCvW3e7AaXQPuIc0UGaNAAHF4Rxp30WcM/29gTMK9HZG9RoNjtEXWqDTDXvj7lwzsbzXOgbsecDxRUOu70MrEX07E87vp4v46SShcwCehYq2hClTJvQ6KfuFK+0xsYENKhUr487muc8=
+	t=1729242809; cv=none; b=H5Di43jZJ+u4n09DQ1eyOwXQtjm/QUe6ZyMYoccNc0iQxViuSAnUL8/ROcdTgexvgiBKBl+H1yVI62TsOfP0kn0qK3rhF+V2XAvYHk15VBo34ND6a8Cfat4033fLiEBAXjZRMMHecPl22DBANmJ8Vr/XoDWXo8cRyrwcF+FnreU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729242499; c=relaxed/simple;
-	bh=LcHAdCybw/fjwzbew5Jw64RnRcRhrc7I7Nf7WZMg/QA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=O6NWncuV9gkHt27kN7SA8sp6o8k0fGHPx7q0zMPh2KkjR1AGCGazldBkQehfAqMFY6RV4PIMBnAu34cmykoceH69C2U0oJzUIZDee9foP2A/gLWMpLtyPlET6rFODP0kL+fzZWDumqWn6naPrunoRkCSo/VR3OiqZ4ExXcxD9nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WyIw3AhI; arc=none smtp.client-ip=209.85.167.54
+	s=arc-20240116; t=1729242809; c=relaxed/simple;
+	bh=d8/uewxz1rX7hFNqb/Dbg4Fk7DVOYvvbbo+Pp/+kU+E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rWLuDzkDbCByNKU9p59GZ5fx4MQ86OUq9WYx66g51SEYnYj3dd55gDdXTqOwEE+skjCA8TARUSrLGAlnOzdZdXD5BnC4Ol/BPAHpF9lPWHVzXBHmMHlU2D9ory9m4BRENunJebaPxKIXGvPJDSyxKLg+JLz6M9jnxpCnhDI4BVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAny8PnY; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539f58c68c5so3059058e87.3
-        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 02:08:17 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4314e64eba4so2449905e9.2;
+        Fri, 18 Oct 2024 02:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729242495; x=1729847295; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0YviJx7PbBluFkbPiXDoDQhgCb0ejDqVQ4MfY4nmrHs=;
-        b=WyIw3AhI5TXp8tViivP3o9hXs5vs2F3DXTNtTfRzhQH0ejp/gvdF+FwFfjHjWt4hBb
-         bAhT8zlMQKnKF/kgUYF7HTC4TXQVlSeGmjOWq0JtmtAwY6q1XziCSyEAiCoEjK92rWt+
-         TNBsfHCw8gEzGsxoHhA4EyQz0YnCp/1ubHZ842sXRF64sYsSlZY5BSNd4w+iFcqkK/zD
-         5frczz3YRJyBnJQIX4WLnL0bR26vimeGX2J5uhIEWE7GFMoxLtxxSisOULjMRRFJcNQd
-         0clXd+zG4OzGaCZzFwjKClFPJK6r6u3KqeSh8K9eksk2FOHp6AISJOt9YdVnpJRJALKj
-         etdg==
+        d=gmail.com; s=20230601; t=1729242805; x=1729847605; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8tIONkOU5igwAxCn5UCajWfFUel0FYfEBCQ6gdqF4Io=;
+        b=EAny8PnYZ1fOdE7liG5TE4S/mAIcUgN43GRFbUfbK32erfoOF1kNnXcMRpR+8iayQj
+         RT7AveUTmUNRfjqMKxcXCJnVNuiCzZsuGpENkaKiGRzWkoj5O9c+da/ujFQrIyLXBWZg
+         0sbcypybT+MpMFjO+CksVz8/IEyn8VjLXQKKrV8Lxo8/t7iSQmqGnOcaJpy4NruTE/sS
+         fPs424w1Q5o4qA4zG6M6O145XbnmMyoQa+JDHvNyPfMTk3psF0u8q0SaCNCe7FM8ksPV
+         +JePB3s4NFCcw/f89yM4VyXybfUCeZjv1aKoPnqel/kQ7Jqh7FKVGpdDuCP1DKvRKIV8
+         iBAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729242495; x=1729847295;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0YviJx7PbBluFkbPiXDoDQhgCb0ejDqVQ4MfY4nmrHs=;
-        b=dpcLZpERzff10u55aV2fVhMwt1KhOcUskPd3PM9a0yYs5Jzp3+e9kXqftrl3ejIGWb
-         1RHnEEUVplR+cxN5fAdb2mobUx0qaorcbBrk77MBnA4o/NUrB4O+s4nakE5ECSrOiDu6
-         YX8fM2JYqPfACdEVTW/0briDRmsquwnQTXWtRL+ppmC2hJ1ku6VIqe9JfMmHtvZppALs
-         nqRHxp6RzmGOXKzuGmlM7RWp5Q+apeVBRpNDc4lk66MBqtVT0BhXT1kUJvr3xvBHtKno
-         Oq1SZXyld8D/ZRxFGM6mg5Mgm6Llxm38PN+sQoc+UFcO7j8P9bZvX+twYH3GxoaqlB2e
-         AFMg==
-X-Gm-Message-State: AOJu0YzcPd/5VfexoAmgOvBcnT1NV3u1aTRrZStIUGwgOaqCcaVdmLgr
-	hGnvS8C8H10drbIdZvXHDEEgpHBjSrm+mpPxw0A8TWOk3lKtoZeA
-X-Google-Smtp-Source: AGHT+IFSLrAtKfg5sJ+TXJS5hxuM3lomBEn4dmd5zq+5VS7vfxvWN0vX8Wac/b567o31ZI/VmWcbwQ==
-X-Received: by 2002:a05:6512:281e:b0:533:4505:5b2a with SMTP id 2adb3069b0e04-53a15469bc3mr1582587e87.28.1729242495073;
-        Fri, 18 Oct 2024 02:08:15 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:b04f:2200:a42d:40b4:fdfc:821f? (dynamic-2a02-3100-b04f-2200-a42d-40b4-fdfc-821f.310.pool.telefonica.de. [2a02:3100:b04f:2200:a42d:40b4:fdfc:821f])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9a68a92159sm67388366b.25.2024.10.18.02.08.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Oct 2024 02:08:14 -0700 (PDT)
-Message-ID: <78e2f535-438f-4212-ad94-a77637ac6c9c@gmail.com>
-Date: Fri, 18 Oct 2024 11:08:16 +0200
+        d=1e100.net; s=20230601; t=1729242805; x=1729847605;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8tIONkOU5igwAxCn5UCajWfFUel0FYfEBCQ6gdqF4Io=;
+        b=Cn313fcTBoMmDkI8P9ksSmA00wGnaKDpnZfJWUoB1pwQT93+wKMTP5HGwOjOAiH3cp
+         Q4NMh9s30keo9BLw1pVJiY059Eo2eztZLRd2M4pEEBQYOnXSCzgiRgIgiHk+5dnaxluX
+         ukBP+isV+aSaOXgJA5uXvLoytLl8Gpy18FafBF0p/eP6tBKerX+JH8YS2+v2xDLJGsx9
+         /mKq7RPkO0E5e5KJ/FeVJedksGRikRlJ0Zg/52XD1YHtVcUvD3fl3N5yAWbJZStKYxxu
+         /HVSsn7yFMnnPCR98tcMUWNyELQhaqdqUrnTCWcHV/t30flFZok61bYEtVC1LXfDBBW3
+         4izg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrgax37G2fbK58AkLIeFQTPS53EXWT1GeeZXOf7alBrCaOcBTxRIePTJURZwl64c4wxwjLkbhJJUNz/dU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm1lEhAkMpFtTjWXtruqTHzhqmLnRn36uJJEY8YuysOo8VXdDA
+	6wl23ElwofyuWjXdm/Bo3gZW4Y+5b20NL+mBXc7u/GfFjind7/3vVhbX9A==
+X-Google-Smtp-Source: AGHT+IHs8ZRNnUB0mkW6u0KW5Jl1JQyFwugKrrmDLohyc9r6cBPtRmLmpi4K7SO+2fw+W3rbF75b2g==
+X-Received: by 2002:a05:600c:3b9b:b0:42c:ba83:3f08 with SMTP id 5b1f17b1804b1-431616236d2mr5834455e9.2.1729242804722;
+        Fri, 18 Oct 2024 02:13:24 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431606d622esm21740095e9.45.2024.10.18.02.13.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 02:13:24 -0700 (PDT)
+Date: Fri, 18 Oct 2024 12:13:21 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v2 7/8] net: stmmac: xgmac: Complete FPE support
+Message-ID: <20241018091321.gfsdx7qzl4yoixgb@skbuf>
+References: <cover.1729233020.git.0x1207@gmail.com>
+ <1776606b2eda8430077551ca117b035f987b5b70.1729233020.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net v2] r8169: avoid unsolicited interrupts
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Francois Romieu <romieu@fr.zoreil.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1776606b2eda8430077551ca117b035f987b5b70.1729233020.git.0x1207@gmail.com>
 
-It was reported that after resume from suspend a PCI error is logged
-and connectivity is broken. Error message is:
-PCI error (cmd = 0x0407, status_errs = 0x0000)
-The message seems to be a red herring as none of the error bits is set,
-and the PCI command register value also is normal. Exception handling
-for a PCI error includes a chip reset what apparently brakes connectivity
-here. The interrupt status bit triggering the PCI error handling isn't
-actually used on PCIe chip versions, so it's not clear why this bit is
-set by the chip. Fix this by ignoring this bit on PCIe chip versions.
+On Fri, Oct 18, 2024 at 02:39:13PM +0800, Furong Xu wrote:
+> Implement the necessary stmmac_fpe_ops function callbacks for xgmac.
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> ---
+>  .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 77 +++++++++++++++++++
+>  1 file changed, 77 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+> index dfe911b3f486..c90ed7c1279d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+> @@ -373,6 +373,78 @@ static void dwxgmac3_fpe_configure(void __iomem *ioaddr,
+>  			     &dwxgmac3_fpe_info);
+>  }
+>  
+> +static int dwxgmac3_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
+> +{
+> +	return common_fpe_irq_status(ioaddr + XGMAC_MAC_FPE_CTRL_STS, dev);
+> +}
+> +
+> +static void dwxgmac3_fpe_send_mpacket(void __iomem *ioaddr,
+> +				      struct stmmac_fpe_cfg *cfg,
+> +				      enum stmmac_mpacket_type type)
+> +{
+> +	common_fpe_send_mpacket(ioaddr + XGMAC_MAC_FPE_CTRL_STS, cfg, type);
+> +}
+> +
+> +static int dwxgmac3_fpe_get_add_frag_size(const void __iomem *ioaddr)
+> +{
+> +	return FIELD_GET(FPE_MTL_ADD_FRAG_SZ,
+> +			 readl(ioaddr + XGMAC_MTL_FPE_CTRL_STS));
+> +}
+> +
+> +static void dwxgmac3_fpe_set_add_frag_size(void __iomem *ioaddr,
+> +					   u32 add_frag_size)
+> +{
+> +	u32 value;
+> +
+> +	value = readl(ioaddr + XGMAC_MTL_FPE_CTRL_STS);
+> +	writel(u32_replace_bits(value, add_frag_size, FPE_MTL_ADD_FRAG_SZ),
+> +	       ioaddr + XGMAC_MTL_FPE_CTRL_STS);
+> +}
+> +
+> +static int dwxgmac3_fpe_map_preemption_class(struct net_device *ndev,
+> +					     struct netlink_ext_ack *extack,
+> +					     u32 pclass)
+> +{
+> +	u32 val, offset, count, preemptible_txqs = 0;
+> +	struct stmmac_priv *priv = netdev_priv(ndev);
+> +	u32 num_tc = ndev->num_tc;
+> +
+> +	if (!num_tc) {
+> +		/* Restore default TC:Queue mapping */
+> +		for (u32 i = 0; i < priv->plat->tx_queues_to_use; i++) {
+> +			val = readl(priv->ioaddr + XGMAC_MTL_TXQ_OPMODE(i));
+> +			writel(u32_replace_bits(val, i, XGMAC_Q2TCMAP),
+> +			       priv->ioaddr + XGMAC_MTL_TXQ_OPMODE(i));
+> +		}
+> +	}
+> +
+> +	/* Synopsys Databook:
+> +	 * "All Queues within a traffic class are selected in a round robin
+> +	 * fashion (when packets are available) when the traffic class is
+> +	 * selected by the scheduler for packet transmission. This is true for
+> +	 * any of the scheduling algorithms."
+> +	 */
+> +	for (u32 tc = 0; tc < num_tc; tc++) {
+> +		count = ndev->tc_to_txq[tc].count;
+> +		offset = ndev->tc_to_txq[tc].offset;
+> +
+> +		if (pclass & BIT(tc))
+> +			preemptible_txqs |= GENMASK(offset + count - 1, offset);
+> +
+> +		for (u32 i = 0; i < count; i++) {
+> +			val = readl(priv->ioaddr + XGMAC_MTL_TXQ_OPMODE(offset + i));
+> +			writel(u32_replace_bits(val, tc, XGMAC_Q2TCMAP),
+> +			       priv->ioaddr + XGMAC_MTL_TXQ_OPMODE(offset + i));
+> +		}
+> +	}
+> +
+> +	val = readl(priv->ioaddr + XGMAC_MTL_FPE_CTRL_STS);
+> +	writel(u32_replace_bits(val, preemptible_txqs, FPE_MTL_PREEMPTION_CLASS),
+> +	       priv->ioaddr + XGMAC_MTL_FPE_CTRL_STS);
+> +
+> +	return 0;
+> +}
+> +
+>  const struct stmmac_fpe_ops dwmac5_fpe_ops = {
+>  	.fpe_configure = dwmac5_fpe_configure,
+>  	.fpe_send_mpacket = dwmac5_fpe_send_mpacket,
+> @@ -384,4 +456,9 @@ const struct stmmac_fpe_ops dwmac5_fpe_ops = {
+>  
+>  const struct stmmac_fpe_ops dwxgmac_fpe_ops = {
+>  	.fpe_configure = dwxgmac3_fpe_configure,
+> +	.fpe_send_mpacket = dwxgmac3_fpe_send_mpacket,
+> +	.fpe_irq_status = dwxgmac3_fpe_irq_status,
+> +	.fpe_get_add_frag_size = dwxgmac3_fpe_get_add_frag_size,
+> +	.fpe_set_add_frag_size = dwxgmac3_fpe_set_add_frag_size,
+> +	.fpe_map_preemption_class = dwxgmac3_fpe_map_preemption_class,
+>  };
 
-Fixes: 0e4851502f84 ("r8169: merge with version 8.001.00 of Realtek's r8168 driver")
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=219388
-Tested-by: Atlas Yu <atlas.yu@canonical.com>
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-v2:
-- choose alternative approach because v1 brakes connection under heavy load
----
- drivers/net/ethernet/realtek/r8169_main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+This is much better in terms of visibility into the change.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 4166f1ab8..79e7b223b 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4749,7 +4749,9 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
- 	if ((status & 0xffff) == 0xffff || !(status & tp->irq_mask))
- 		return IRQ_NONE;
- 
--	if (unlikely(status & SYSErr)) {
-+	/* At least RTL8168fp may unexpectedly set the SYSErr bit */
-+	if (unlikely(status & SYSErr &&
-+	    tp->mac_version <= RTL_GIGA_MAC_VER_06)) {
- 		rtl8169_pcierr_interrupt(tp->dev);
- 		goto out;
- 	}
--- 
-2.47.0
+Though I cannot stop thinking that this implementation design:
 
+stmmac_fpe_configure()
+-> stmmac_do_void_callback()
+   -> fpe_ops->fpe_configure()
+      /                    \
+     /                      \
+    v                        v
+dwmac5_fpe_configure   dwxgmac3_fpe_configure
+     \                      /
+      \                    /
+       v                  v
+       common_fpe_configure()
+
+is, pardon the expression, stuffy.
+
+If you aren't very opposed to the idea of having struct stmmac_fpe_ops
+contain a mix of function pointers and integer constants, I would
+suggest removing:
+
+	.fpe_configure()
+	.fpe_send_mpacket()
+	.fpe_irq_status()
+	.fpe_get_add_frag_size()
+	.fpe_set_add_frag_size()
+
+and just keeping a single function pointer, .fpe_map_preemption_class(),
+inside stmmac_fpe_ops. Only that is sufficiently different to warrant a
+completely separate implementation. Then move all current struct
+stmmac_fpe_configure_info to struct stmmac_fpe_ops, and reimplement
+stmmac_fpe_configure() directly like common_fpe_configure(),
+stmmac_fpe_send_mpacket() directly like common_fpe_send_mpacket(), etc etc.
+This lets us avoid the antipattern of calling a function pointer (hidden
+by an opaque macro) from common code, only to gather some parameters to
+call again a common implementation.
+
+I know this is a preposterous and heretic thing to suggest, but a person
+who isn't knee-deep in stmmac has a very hard time locating himself in
+space due to the unnecessarily complex layering. If that isn't something
+that is important, feel free to ignore.
 
