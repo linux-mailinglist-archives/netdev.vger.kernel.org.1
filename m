@@ -1,177 +1,120 @@
-Return-Path: <netdev+bounces-137126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A6E09A4742
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:43:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 709D49A47A0
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 595E82844D3
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:43:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7628B2300E
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F66205ACE;
-	Fri, 18 Oct 2024 19:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679B61DA0EB;
+	Fri, 18 Oct 2024 20:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="FLB3+9vS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GDeFzvJF"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6677318786A;
-	Fri, 18 Oct 2024 19:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63C8136341;
+	Fri, 18 Oct 2024 20:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729280579; cv=none; b=eXQZqYSifih7H/BNfVtWpqVqDHPCc358skeVCgKwPlImXJUB9cDolaco6M3WLs59Hvbwrfz2xhMXy1XliwyFt/Alc/ED25lIWOrgyfYcPf2xvQGZhNcvxaKwCEEGTy4rLKYtXGIXNc6vO7GW4bH9HisDIYY43AUQex8gRcTdfkQ=
+	t=1729281927; cv=none; b=L3XDoFCGrGuATiZID8c952Xfi40Shoi1VUaYT0AaOeOoifHvGm6waQqLM3QbXm3y21pgFBT3v3xOQWmjKZNwCVz9A9j2tILTls7v1j0WHc42XGg7wwiNDitffKR5IfYh0ysb+O0u3coRvNbVY1LIclyR3xAy1ye3Wbc26Lp/844=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729280579; c=relaxed/simple;
-	bh=Gpuxf7aeuuzqmzhp63zYCRRpmPtiuiFGFtvbgMIYt9Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jlp2WGlySjRmJnZ5SxVwOEC71beOo7lBdwuy4SbBKowTcOht2MRWSxcBXta3wWp3SqDPV48zTRKcOLBMS5NEfI604b/9Cswa2l+O3iXV2VJV6FhqvOdivt5BpFfmBiP2utWReb2soeIZQq6oVa9QwSIEf/Er3H16ZxS6GWM12MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=FLB3+9vS; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 5DBA188A0E;
-	Fri, 18 Oct 2024 21:42:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1729280575;
-	bh=5zSJJrhTq//NrW8OCQxS0nkzbZo5tl0gZe9uSnXIa48=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FLB3+9vSianCeYmV9Od/b2APXn596aSKEbVfzgyT9Z885pV91FVJfpTeOcJ5m/2+e
-	 P7pEuM9ni/5fEGnYBSVIURb5MOWbuQdkiKu6Mcizz//MNYg6jxZXed/spUgjmyBnPj
-	 FDbZgP9ak7D60KfMhLjFVKINF5FCq5O0KPLuGIoPsPsZKwQ/l/kpJhanXD4gkSipOd
-	 fP5o1r0YoIL5kQaeXiYoM3q+87xWmNGqd1ith68a7NqWimSHX06j5q2NTykFfMI8EL
-	 KlCXiRqGNyPYaZVeOmd0UVh/AZ+7rKfzTIG5DgaAOu8TgYgQHfejTV8c2lXZmI32M7
-	 RklBwEVAKkvzA==
-From: Marek Vasut <marex@denx.de>
-To: linux-wireless@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
+	s=arc-20240116; t=1729281927; c=relaxed/simple;
+	bh=M6Qw0hensInEvU8qqsRIko64nHxLMINN0V3biCVjq+M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZTJ67dX/Q4mtt8UyHOsa4uNRxQGaPJ044iKXKyi6s/Sz/yOz+4jA9hyRgmiArLV0YQDnjKvaGTP47SBuoXF83PceFc5ex1nF9vQwT7/jkokaviLZayILx20p5jKTl3VeezsF5o4lplxdxR5AaOvzYEHRYnGMZfMuS+pmIkBxgFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GDeFzvJF; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20cbcd71012so23323355ad.3;
+        Fri, 18 Oct 2024 13:05:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729281925; x=1729886725; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UxlZvp9Wi25P9voOrnrR/TE75KeagoCWsKqvLGdRZjw=;
+        b=GDeFzvJFJDer+3uSXMUH15C4UkcYbwe4Q3yOwgU4EcYM4xuLggPSk5FvCP987tdggj
+         dmTaHMvenTtMOoz2nVzdRl+tKKYhI9w4ueEIFmepBnc4Kkqo/PbjqtCpi8U6GLZ/MY6/
+         /Ha4TqdVV68T/baY5Rdat1Yt+MQOtApsgpMltkqfohRKOkYncqBQFhpO2z7x58qbBZCh
+         s9epUdT67et8iHJ0OD1UZIWyfwPzjVPZXotPJSIMh8YdnThLdki/opbFo751fVSbuFhV
+         SWlrylkdOjo7dh1YGhGMu2jIUky3A3yVkpcVEeduMc0Y1asrnXZgBcJ7lvwzGU8RSuuD
+         2uyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729281925; x=1729886725;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UxlZvp9Wi25P9voOrnrR/TE75KeagoCWsKqvLGdRZjw=;
+        b=sOtYZgJdHcWXmBkOufdk5KQ0gy67mRm8RuXn02ONWWmDnrkCGvwydPIMk4ALkNcUYl
+         4MzSW6Y5jQ636/+zsRw1Y0ZoXsPyOztS2kcvl9BPieM4nfeOzBpwaGYcNZqzt6jdIgzI
+         KaTZhGi0OVO7z0o4JHEAtB3r9U5JF6roRgd1gBAvOsfcWk2o6I6K8zI3+dh+U7IaNhir
+         Lr1cIEXvhDU850jR0+ktjEimxt8ODpfwdBtAtAAC3o5xiS64XOdSRM7V/zoQNcTtaCDl
+         /A9xr3lP0RFAbU6nAJ8rrNhVeVQQUFlPbUYAAqi+Dg3qkx2BqSuOI2EH8SSZDaED0qQn
+         CxqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcR4iNT486gvJG/XSAWUTYHq+d46BDonRhjpcWsrRIaJ/Z4QmDy9RjpOhu+a/wNdu5RoyN+kal7XVx0W0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye7vGR7gUzXPnCWh1Gnk8XwSnAjh6GI+wS+05Am8u8zWdEiTs2
+	HV3P4ttaD3PpHE+0CssL//3G6I79tyFpicGQVUMMJ5KLGt9g9MO4zHRWRQ==
+X-Google-Smtp-Source: AGHT+IFijJxG1EEv3N6T0D/QUuWjjL9BwDpqYNHyAhqzL/F8lTjXxHKnZfAIc6Mk8dfNTuweK8zvXQ==
+X-Received: by 2002:a17:902:f641:b0:20b:6918:30b5 with SMTP id d9443c01a7336-20e5a90624cmr50152535ad.41.1729281924569;
+        Fri, 18 Oct 2024 13:05:24 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e5a8f98b2sm16432065ad.209.2024.10.18.13.05.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 13:05:24 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Adham Abozaeid <adham.abozaeid@microchip.com>,
-	Ajay Singh <ajay.kathat@microchip.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Conor Dooley <conor+dt@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] wifi: wilc1000: Add proper error handling for remaining CMD52
-Date: Fri, 18 Oct 2024 21:41:57 +0200
-Message-ID: <20241018194244.280322-1-marex@denx.de>
-X-Mailer: git-send-email 2.45.2
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: mv643xx: use ethtool_puts
+Date: Fri, 18 Oct 2024 13:05:22 -0700
+Message-ID: <20241018200522.12506-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
-A few of the CMD52 calls did not have any error handling, add it.
-This prevents odd errors like "Unexpected interrupt (1) int=nnn"
-when the CMD52 fails just above in the IRQ handler and the CMD52
-error code is ignored by the driver. Fill the error handling in.
-Sort the variables in those affected functions while at it. Note
-that the error code itself is already printed in wilc_sdio_cmd52().
+Allows simplifying get_strings and avoids manual pointer manipulation.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
-Cc: Ajay Singh <ajay.kathat@microchip.com>
-Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Kalle Valo <kvalo@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
- .../net/wireless/microchip/wilc1000/sdio.c    | 27 ++++++++++++++-----
- 1 file changed, 21 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/marvell/mv643xx_eth.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/wireless/microchip/wilc1000/sdio.c b/drivers/net/wireless/microchip/wilc1000/sdio.c
-index 5262c8846c13d..170470d1c2092 100644
---- a/drivers/net/wireless/microchip/wilc1000/sdio.c
-+++ b/drivers/net/wireless/microchip/wilc1000/sdio.c
-@@ -769,8 +769,10 @@ static int wilc_sdio_init(struct wilc *wilc, bool resume)
- 
- static int wilc_sdio_read_size(struct wilc *wilc, u32 *size)
+diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
+index 4abd3ebcdbd6..a06048719e84 100644
+--- a/drivers/net/ethernet/marvell/mv643xx_eth.c
++++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
+@@ -1698,13 +1698,9 @@ static void mv643xx_eth_get_strings(struct net_device *dev,
  {
--	u32 tmp;
-+	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
- 	struct sdio_cmd52 cmd;
-+	u32 tmp;
-+	int ret;
+ 	int i;
  
- 	/**
- 	 *      Read DMA count in words
-@@ -780,12 +782,20 @@ static int wilc_sdio_read_size(struct wilc *wilc, u32 *size)
- 	cmd.raw = 0;
- 	cmd.address = WILC_SDIO_INTERRUPT_DATA_SZ_REG;
- 	cmd.data = 0;
--	wilc_sdio_cmd52(wilc, &cmd);
-+	ret = wilc_sdio_cmd52(wilc, &cmd);
-+	if (ret) {
-+		dev_err(&func->dev, "Fail cmd 52, set DATA_SZ[0] register...\n");
-+		return ret;
-+	}
- 	tmp = cmd.data;
+-	if (stringset == ETH_SS_STATS) {
+-		for (i = 0; i < ARRAY_SIZE(mv643xx_eth_stats); i++) {
+-			memcpy(data + i * ETH_GSTRING_LEN,
+-				mv643xx_eth_stats[i].stat_string,
+-				ETH_GSTRING_LEN);
+-		}
+-	}
++	if (stringset == ETH_SS_STATS)
++		for (i = 0; i < ARRAY_SIZE(mv643xx_eth_stats); i++)
++			ethtool_puts(&data, mv643xx_eth_stats[i].stat_string);
+ }
  
- 	cmd.address = WILC_SDIO_INTERRUPT_DATA_SZ_REG + 1;
- 	cmd.data = 0;
--	wilc_sdio_cmd52(wilc, &cmd);
-+	ret = wilc_sdio_cmd52(wilc, &cmd);
-+	if (ret) {
-+		dev_err(&func->dev, "Fail cmd 52, set DATA_SZ[1] register...\n");
-+		return ret;
-+	}
- 	tmp |= (cmd.data << 8);
- 
- 	*size = tmp;
-@@ -796,9 +806,10 @@ static int wilc_sdio_read_int(struct wilc *wilc, u32 *int_status)
- {
- 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
- 	struct wilc_sdio *sdio_priv = wilc->bus_data;
--	u32 tmp;
--	u8 irq_flags;
- 	struct sdio_cmd52 cmd;
-+	u8 irq_flags;
-+	u32 tmp;
-+	int ret;
- 
- 	wilc_sdio_read_size(wilc, &tmp);
- 
-@@ -817,7 +828,11 @@ static int wilc_sdio_read_int(struct wilc *wilc, u32 *int_status)
- 	cmd.raw = 0;
- 	cmd.read_write = 0;
- 	cmd.data = 0;
--	wilc_sdio_cmd52(wilc, &cmd);
-+	ret = wilc_sdio_cmd52(wilc, &cmd);
-+	if (ret) {
-+		dev_err(&func->dev, "Fail cmd 52, set IRQ_FLAG register...\n");
-+		return ret;
-+	}
- 	irq_flags = cmd.data;
- 
- 	if (sdio_priv->irq_gpio)
+ static void mv643xx_eth_get_ethtool_stats(struct net_device *dev,
 -- 
-2.45.2
+2.47.0
 
 
