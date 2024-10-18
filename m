@@ -1,121 +1,503 @@
-Return-Path: <netdev+bounces-137079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A4CF9A4470
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:16:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9DDB9A4472
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:17:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E70A6B2258E
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 17:16:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F331B226CE
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 17:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7DA82488;
-	Fri, 18 Oct 2024 17:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D9F201271;
+	Fri, 18 Oct 2024 17:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HiH9c4m1"
+	dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b="mZI0fZUx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from mx.dolansoft.org (s2.dolansoft.org [212.51.146.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE8F20E312
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 17:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F5A257D;
+	Fri, 18 Oct 2024 17:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.51.146.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729271801; cv=none; b=EXbcItSaDaBkF6acb59VZV7SEh+KAx7cbjdovFlUzn3cOeURkna4WUffBv9P4ixtZ+i9xJf2rTQ2yavE70q9eOnTJAfzCMhb4RYUWfqaEkTRl7LP9OQLVvOLumR15SQFEGQ2brn8mWXP8lpmAFMNkkXYITRsfWbiIoprM+pyPj0=
+	t=1729271855; cv=none; b=H3XPr+JtddhSsuele1B5ykLCNYX6CAwKdjgrpQ2XSBWJAGDHz95QWXzPYJ9TasVWyhFJcnhAfVExFVaUDYMQswRMOhhBteWvRI1iILFGIMIW9uyHH1nL3TUjaehz7zsvo4HYvFQZEt9KForL6uvN1PGfylpgKllcyEHYEJzuOnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729271801; c=relaxed/simple;
-	bh=FCzib0r1Tbuf5gZAYxHppM561CNDVEk/n/1lZWjReB4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hT1/0UXGVl5dqdMs+oz+6EsCSvE6xrhFZ+QiJBe/GFIVWV1VdHkj4Zc39CTeFSasisR1aTSDchpdqudJ69TyvjsF799gfvIpZj4oU2nHoQvhkUhwZMTx8Lpz2mv4kxjEcwbRuSFUs6f0VqQNb27tlW4PCAkbcUDn7i6Rl0rUrhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HiH9c4m1; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729271799; x=1760807799;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pkKSB7wm0fqKdkit5Ok8L3c8oy5p2fmz+di5tCD+ZfA=;
-  b=HiH9c4m1g5OV8TO7iVji6+HaRP1RXTfwt25jaevc+OTWTulT8QEbUQfA
-   kta0xuHjIH2VoaB9fYxaskQ99oVW4bOOeWM5G8Ws/jW3ovnrrKlCFFq2A
-   n8dE1W1hGhXhNzcJvZ0l2coDs9k2AUgOT84JzvJYzVW2gTc4KiKbY7kr3
-   0=;
-X-IronPort-AV: E=Sophos;i="6.11,214,1725321600"; 
-   d="scan'208";a="344314648"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 17:16:34 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:15686]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
- id 76ec3339-75bd-445c-9e9e-f1e33a33b320; Fri, 18 Oct 2024 17:16:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 76ec3339-75bd-445c-9e9e-f1e33a33b320
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 18 Oct 2024 17:16:33 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 18 Oct 2024 17:16:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <remi@remlab.net>
-CC: <kuni1840@gmail.com>, <netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net-next 5/9] phonet: Don't hold RTNL for getaddr_dumpit().
-Date: Fri, 18 Oct 2024 10:16:29 -0700
-Message-ID: <20241018171629.92709-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <2341285.ElGaqSPkdT@basile.remlab.net>
-References: <2341285.ElGaqSPkdT@basile.remlab.net>
+	s=arc-20240116; t=1729271855; c=relaxed/simple;
+	bh=tM3gMcktJXYPUgeMHLLMREePvoDWIkPdkFDbsFGKDT4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cu0X4C8SNAcsul8zcOP87YvHj5wO1X6WygcZf5Ce79Fo3Ypq7HvaRlSx1XdTm26DFDSFM4erZ+1U0laU/EOYYEloU72oeSEnhPZpi8Rg0DdfgERWWciWV46lqlsJV2+ybRKJhEXq87SVcvL3rVC6sFIWGU4iwaDDHyZnq5MlADQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one; spf=pass smtp.mailfrom=brun.one; dkim=pass (2048-bit key) header.d=brun.one header.i=@brun.one header.b=mZI0fZUx; arc=none smtp.client-ip=212.51.146.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=brun.one
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=brun.one
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=brun.one;
+	s=s1; h=MIME-Version:Message-ID:Date:Subject:Cc:To:From:In-Reply-To:
+	References:From:To:Subject:Date:Message-ID:Reply-To;
+	bh=+GoB+Q92kXj6/k8rRUxv9gn/gz6jX68vUkQpCtZJLXQ=; b=mZI0fZUxsOZcQaDGpibILXau17
+	8LFgFNmbbt2T+33KpunFFjMrHsiGOGgRELJQEngh0tOykgCWew5hjLjqAvrNa92Qu92AAzvc7BXdb
+	MEX4EevGwjoP+RhOJ8tIDn8BmdJPey+hex9O9gQwbuvIy+sS5OUy2OCv7SuT7Xj7uPbAmXwrAn1xm
+	v3FdBKcunXLtO18KVHGUxk6FLr+TAr19U2slCcUrtNTf5Iw8YgbOw7Cx9Vp8xATnG+ps/Xl7TEHul
+	9JJ6J+K3b7VbxdtixiKpuNKMbfJ/xmd1sqPyNuz8pi8qVQKrNYrHVa/aeH5Gaxbpsp4ZSBRRJHbi2
+	SbG6JHcQ==;
+Received: from [212.51.153.89] (helo=localhost.localdomain)
+	by mx.dolansoft.org with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <lorenz@dolansoft.org>)
+	id 1t1qbP-00000000EFP-1AKY;
+	Fri, 18 Oct 2024 17:17:27 +0000
+From: Lorenz Brun <lorenz@brun.one>
+To: Igor Russkikh <irusskikh@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Lorenz Brun <lorenz@brun.one>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net: atlantic: support reading SFP module info
+Date: Fri, 18 Oct 2024 19:17:18 +0200
+Message-ID: <20241018171721.2577386-1-lorenz@brun.one>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Sender: lorenz@dolansoft.org
 
-From: "Rémi Denis-Courmont" <remi@remlab.net>
-Date: Thu, 17 Oct 2024 21:49:18 +0300
-> > diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-> > index 5996141e258f..14928fa04675 100644
-> > --- a/net/phonet/pn_netlink.c
-> > +++ b/net/phonet/pn_netlink.c
-> > @@ -127,14 +127,17 @@ static int fill_addr(struct sk_buff *skb, u32 ifindex,
-> > u8 addr,
-> > 
-> >  static int getaddr_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-> > {
-> > +	int addr_idx = 0, addr_start_idx = cb->args[1];
-> > +	int dev_idx = 0, dev_start_idx = cb->args[0];
-> >  	struct phonet_device_list *pndevs;
-> >  	struct phonet_device *pnd;
-> > -	int dev_idx = 0, dev_start_idx = cb->args[0];
-> > -	int addr_idx = 0, addr_start_idx = cb->args[1];
-> > +	int err = 0;
-> > 
-> >  	pndevs = phonet_device_list(sock_net(skb->sk));
-> > +
-> >  	rcu_read_lock();
-> >  	list_for_each_entry_rcu(pnd, &pndevs->list, list) {
-> > +		DECLARE_BITMAP(addrs, 64);
-> >  		u8 addr;
-> > 
-> >  		if (dev_idx > dev_start_idx)
-> > @@ -143,23 +146,26 @@ static int getaddr_dumpit(struct sk_buff *skb, struct
-> > netlink_callback *cb) continue;
-> > 
-> >  		addr_idx = 0;
-> > -		for_each_set_bit(addr, pnd->addrs, 64) {
-> > +		memcpy(addrs, pnd->addrs, sizeof(pnd->addrs));
-> 
-> Is that really safe? Are we sure that the bit-field writers are atomic w.r.t. 
-> memcpy() on all platforms? If READ_ONCE is needed for an integer, using 
-> memcpy() seems sketchy, TBH.
+Add support for reading SFP module info and digital diagnostic
+monitoring data if supported by the module. The only Aquantia
+controller without an integrated PHY is the AQC100 which belongs to
+the B0 revision, that's why it's only implemented there.
 
-I think bit-field read/write need not be atomic here because even
-if a data-race happens, for_each_set_bit() iterates each bit, which
-is the real data, regardless of whether data-race happened or not.
+The register information was extracted from a diagnostic tool made
+publicly available by Dell, but all code was written from scratch by me.
+
+This has been tested to work with a variety of both optical and direct
+attach modules I had lying around and seems to work fine with all of
+them, including the diagnostics if supported by an optical module.
+All tests have been done with an AQC100 on an TL-NT521F card on firmware
+version 3.1.121 (current at the time of this patch).
+
+Signed-off-by: Lorenz Brun <lorenz@brun.one>
+---
+No content changes, thus resent as v3 with just the target tree changed.
+---
+ .../ethernet/aquantia/atlantic/aq_ethtool.c   |  73 ++++++++++
+ .../ethernet/aquantia/atlantic/aq_ethtool.h   |   8 ++
+ .../net/ethernet/aquantia/atlantic/aq_hw.h    |   3 +
+ .../aquantia/atlantic/hw_atl/hw_atl_b0.c      | 132 ++++++++++++++++++
+ .../aquantia/atlantic/hw_atl/hw_atl_llh.c     |  43 ++++++
+ .../aquantia/atlantic/hw_atl/hw_atl_llh.h     |  21 +++
+ .../atlantic/hw_atl/hw_atl_llh_internal.h     |  32 +++++
+ 7 files changed, 312 insertions(+)
+
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+index 440ff4616fec..6fef47ba0a59 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+@@ -15,6 +15,7 @@
+ #include "aq_macsec.h"
+ #include "aq_main.h"
+ 
++#include <linux/ethtool.h>
+ #include <linux/linkmode.h>
+ #include <linux/ptp_clock_kernel.h>
+ 
+@@ -977,6 +978,76 @@ static int aq_ethtool_set_phy_tunable(struct net_device *ndev,
+ 	return err;
+ }
+ 
++static int aq_ethtool_get_module_info(struct net_device *ndev,
++				      struct ethtool_modinfo *modinfo)
++{
++	struct aq_nic_s *aq_nic = netdev_priv(ndev);
++	u8 compliance_val, dom_type;
++	int err;
++
++	/* Module EEPROM is only supported for controllers with external PHY */
++	if (aq_nic->aq_nic_cfg.aq_hw_caps->media_type != AQ_HW_MEDIA_TYPE_FIBRE ||
++	    !aq_nic->aq_hw_ops->hw_read_module_eeprom)
++		return -EOPNOTSUPP;
++
++	err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++		SFF_8472_ID_ADDR, SFF_8472_COMP_ADDR, 1, &compliance_val);
++	if (err)
++		return err;
++
++	err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++		SFF_8472_ID_ADDR, SFF_8472_DOM_TYPE_ADDR, 1, &dom_type);
++	if (err)
++		return err;
++
++	if (dom_type & SFF_8472_ADDRESS_CHANGE_REQ_MASK || compliance_val == 0x00) {
++		modinfo->type = ETH_MODULE_SFF_8079;
++		modinfo->eeprom_len = ETH_MODULE_SFF_8079_LEN;
++	} else {
++		modinfo->type = ETH_MODULE_SFF_8472;
++		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
++	}
++	return 0;
++}
++
++static int aq_ethtool_get_module_eeprom(struct net_device *ndev,
++					struct ethtool_eeprom *ee, unsigned char *data)
++{
++	struct aq_nic_s *aq_nic = netdev_priv(ndev);
++	unsigned int first, last, len;
++	int err;
++
++	if (!aq_nic->aq_hw_ops->hw_read_module_eeprom)
++		return -EOPNOTSUPP;
++
++	first = ee->offset;
++	last = ee->offset + ee->len;
++
++	if (first < ETH_MODULE_SFF_8079_LEN) {
++		len = min(last, ETH_MODULE_SFF_8079_LEN);
++		len -= first;
++
++		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++			SFF_8472_ID_ADDR, first, len, data);
++		if (err)
++			return err;
++
++		first += len;
++		data += len;
++	}
++	if (first < ETH_MODULE_SFF_8472_LEN && last > ETH_MODULE_SFF_8079_LEN) {
++		len = min(last, ETH_MODULE_SFF_8472_LEN);
++		len -= first;
++		first -= ETH_MODULE_SFF_8079_LEN;
++
++		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
++			SFF_8472_DIAGNOSTICS_ADDR, first, len, data);
++		if (err)
++			return err;
++	}
++	return 0;
++}
++
+ const struct ethtool_ops aq_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+@@ -1014,4 +1085,6 @@ const struct ethtool_ops aq_ethtool_ops = {
+ 	.get_ts_info         = aq_ethtool_get_ts_info,
+ 	.get_phy_tunable     = aq_ethtool_get_phy_tunable,
+ 	.set_phy_tunable     = aq_ethtool_set_phy_tunable,
++	.get_module_info     = aq_ethtool_get_module_info,
++	.get_module_eeprom   = aq_ethtool_get_module_eeprom,
+ };
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h
+index 6d5be5ebeb13..f26fe1a75539 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.h
+@@ -14,4 +14,12 @@
+ extern const struct ethtool_ops aq_ethtool_ops;
+ #define AQ_PRIV_FLAGS_MASK   (AQ_HW_LOOPBACK_MASK)
+ 
++#define SFF_8472_ID_ADDR 0x50
++#define SFF_8472_DIAGNOSTICS_ADDR 0x51
++
++#define SFF_8472_COMP_ADDR	0x5e
++#define SFF_8472_DOM_TYPE_ADDR	0x5c
++
++#define SFF_8472_ADDRESS_CHANGE_REQ_MASK 0x4
++
+ #endif /* AQ_ETHTOOL_H */
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
+index f010bda61c96..42c0efc1b455 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
+@@ -340,6 +340,9 @@ struct aq_hw_ops {
+ 	int (*hw_set_loopback)(struct aq_hw_s *self, u32 mode, bool enable);
+ 
+ 	int (*hw_get_mac_temp)(struct aq_hw_s *self, u32 *temp);
++
++	int (*hw_read_module_eeprom)(struct aq_hw_s *self, u8 dev_addr,
++				     u8 reg_start_addr, int len, u8 *data);
+ };
+ 
+ struct aq_fw_ops {
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c
+index 56c46266bb0a..493432d036b9 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c
+@@ -1654,6 +1654,137 @@ static int hw_atl_b0_get_mac_temp(struct aq_hw_s *self, u32 *temp)
+ 	return 0;
+ }
+ 
++#define START_TRANSMIT 0x5001
++#define START_READ_TRANSMIT 0x5101
++#define STOP_TRANSMIT 0x3001
++#define REPEAT_TRANSMIT 0x1001
++#define REPEAT_NACK_TRANSMIT 0x1011
++
++static int hw_atl_b0_smb0_wait_result(struct aq_hw_s *self, bool expect_ack)
++{
++	int err;
++	u32 val;
++
++	err = readx_poll_timeout(hw_atl_smb0_byte_transfer_complete_get,
++				 self, val, val == 1, 100U, 10000U);
++	if (err)
++		return err;
++	if (hw_atl_smb0_receive_acknowledged_get(self) != expect_ack)
++		return -EIO;
++	return 0;
++}
++
++/* Starts an I2C/SMBUS write to a given address. addr is in 7-bit format,
++ * the read/write bit is not part of it.
++ */
++static int hw_atl_b0_smb0_start_write(struct aq_hw_s *self, u32 addr)
++{
++	hw_atl_smb0_tx_data_set(self, (addr << 1) | 0);
++	hw_atl_smb0_provisioning2_set(self, START_TRANSMIT);
++	return hw_atl_b0_smb0_wait_result(self, 0);
++}
++
++/* Writes a single byte as part of an ongoing write started by start_write. */
++static int hw_atl_b0_smb0_write_byte(struct aq_hw_s *self, u32 data)
++{
++	hw_atl_smb0_tx_data_set(self, data);
++	hw_atl_smb0_provisioning2_set(self, REPEAT_TRANSMIT);
++	return hw_atl_b0_smb0_wait_result(self, 0);
++}
++
++/* Starts an I2C/SMBUS read to a given address. addr is in 7-bit format,
++ * the read/write bit is not part of it.
++ */
++static int hw_atl_b0_smb0_start_read(struct aq_hw_s *self, u32 addr)
++{
++	int err;
++
++	hw_atl_smb0_tx_data_set(self, (addr << 1) | 1);
++	hw_atl_smb0_provisioning2_set(self, START_READ_TRANSMIT);
++	err = hw_atl_b0_smb0_wait_result(self, 0);
++	if (err)
++		return err;
++	if (hw_atl_smb0_repeated_start_detect_get(self) == 0)
++		return -EIO;
++	return 0;
++}
++
++/* Reads a single byte as part of an ongoing read started by start_read. */
++static int hw_atl_b0_smb0_read_byte(struct aq_hw_s *self)
++{
++	int err;
++
++	hw_atl_smb0_provisioning2_set(self, REPEAT_TRANSMIT);
++	err = hw_atl_b0_smb0_wait_result(self, 0);
++	if (err)
++		return err;
++	return hw_atl_smb0_rx_data_get(self);
++}
++
++/* Reads the last byte of an ongoing read. */
++static int hw_atl_b0_smb0_read_byte_nack(struct aq_hw_s *self)
++{
++	int err;
++
++	hw_atl_smb0_provisioning2_set(self, REPEAT_NACK_TRANSMIT);
++	err = hw_atl_b0_smb0_wait_result(self, 1);
++	if (err)
++		return err;
++	return hw_atl_smb0_rx_data_get(self);
++}
++
++/* Sends a stop condition and ends a transfer. */
++static void hw_atl_b0_smb0_stop(struct aq_hw_s *self)
++{
++	hw_atl_smb0_provisioning2_set(self, STOP_TRANSMIT);
++}
++
++static int hw_atl_b0_read_module_eeprom(struct aq_hw_s *self, u8 dev_addr,
++					u8 reg_start_addr, int len, u8 *data)
++{
++	int i, b;
++	int err;
++	u32 val;
++
++	/* Wait for SMBUS0 to be idle */
++	err = readx_poll_timeout(hw_atl_smb0_bus_busy_get, self,
++				 val, val == 0, 100U, 10000U);
++	if (err)
++		return err;
++
++	err = hw_atl_b0_smb0_start_write(self, dev_addr);
++	if (err)
++		goto out;
++
++	err = hw_atl_b0_smb0_write_byte(self, reg_start_addr);
++	if (err)
++		goto out;
++
++	err = hw_atl_b0_smb0_start_read(self, dev_addr);
++	if (err)
++		goto out;
++
++	for (i = 0; i < len - 1; i++) {
++		b = hw_atl_b0_smb0_read_byte(self);
++		if (b < 0) {
++			err = b;
++			goto out;
++		}
++		data[i] = (u8)b;
++	}
++
++	b = hw_atl_b0_smb0_read_byte_nack(self);
++	if (b < 0) {
++		err = b;
++		goto out;
++	}
++	data[i] = (u8)b;
++
++out:
++	hw_atl_b0_smb0_stop(self);
++	return err;
++}
++
+ const struct aq_hw_ops hw_atl_ops_b0 = {
+ 	.hw_soft_reset        = hw_atl_utils_soft_reset,
+ 	.hw_prepare           = hw_atl_utils_initfw,
+@@ -1712,4 +1843,5 @@ const struct aq_hw_ops hw_atl_ops_b0 = {
+ 	.hw_set_fc               = hw_atl_b0_set_fc,
+ 
+ 	.hw_get_mac_temp         = hw_atl_b0_get_mac_temp,
++	.hw_read_module_eeprom   = hw_atl_b0_read_module_eeprom,
+ };
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
+index 7b67bdd8a258..d07af1271d59 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.c
+@@ -57,6 +57,49 @@ u32 hw_atl_ts_data_get(struct aq_hw_s *aq_hw)
+ 				  HW_ATL_TS_DATA_OUT_SHIFT);
+ }
+ 
++u32 hw_atl_smb0_bus_busy_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_BUS_BUSY_ADR,
++				HW_ATL_SMB0_BUS_BUSY_MSK,
++				HW_ATL_SMB0_BUS_BUSY_SHIFT);
++}
++
++u32 hw_atl_smb0_byte_transfer_complete_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_ADR,
++				HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_MSK,
++				HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_SHIFT);
++}
++
++u32 hw_atl_smb0_receive_acknowledged_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_RX_ACKNOWLEDGED_ADR,
++				HW_ATL_SMB0_RX_ACKNOWLEDGED_MSK,
++				HW_ATL_SMB0_RX_ACKNOWLEDGED_SHIFT);
++}
++
++u32 hw_atl_smb0_repeated_start_detect_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg_bit(aq_hw, HW_ATL_SMB0_REPEATED_START_DETECT_ADR,
++				HW_ATL_SMB0_REPEATED_START_DETECT_MSK,
++				HW_ATL_SMB0_REPEATED_START_DETECT_SHIFT);
++}
++
++u32 hw_atl_smb0_rx_data_get(struct aq_hw_s *aq_hw)
++{
++	return aq_hw_read_reg(aq_hw, HW_ATL_SMB0_RECEIVED_DATA_ADR);
++}
++
++void hw_atl_smb0_tx_data_set(struct aq_hw_s *aq_hw, u32 data)
++{
++	return aq_hw_write_reg(aq_hw, HW_ATL_SMB0_TRANSMITTED_DATA_ADR, data);
++}
++
++void hw_atl_smb0_provisioning2_set(struct aq_hw_s *aq_hw, u32 data)
++{
++	return aq_hw_write_reg(aq_hw, HW_ATL_SMB0_PROVISIONING2_ADR, data);
++}
++
+ /* global */
+ void hw_atl_reg_glb_cpu_sem_set(struct aq_hw_s *aq_hw, u32 glb_cpu_sem,
+ 				u32 semaphore)
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h
+index 58f5ee0a6214..5fd506acacb5 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh.h
+@@ -34,6 +34,27 @@ u32 hw_atl_ts_ready_latch_high_get(struct aq_hw_s *aq_hw);
+ /* get temperature sense data */
+ u32 hw_atl_ts_data_get(struct aq_hw_s *aq_hw);
+ 
++/* SMBUS0 bus busy */
++u32 hw_atl_smb0_bus_busy_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 byte transfer complete */
++u32 hw_atl_smb0_byte_transfer_complete_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 receive acknowledged */
++u32 hw_atl_smb0_receive_acknowledged_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 set transmitted data (only leftmost byte of data valid) */
++void hw_atl_smb0_tx_data_set(struct aq_hw_s *aq_hw, u32 data);
++
++/* SMBUS0 provisioning2 command register */
++void hw_atl_smb0_provisioning2_set(struct aq_hw_s *aq_hw, u32 data);
++
++/* SMBUS0 repeated start detect */
++u32 hw_atl_smb0_repeated_start_detect_get(struct aq_hw_s *aq_hw);
++
++/* SMBUS0 received data register */
++u32 hw_atl_smb0_rx_data_get(struct aq_hw_s *aq_hw);
++
+ /* global */
+ 
+ /* set global microprocessor semaphore */
+diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h
+index 4a6467031b9e..fce30d90b6cb 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_llh_internal.h
+@@ -42,6 +42,38 @@
+ #define HW_ATL_TS_DATA_OUT_SHIFT 0
+ #define HW_ATL_TS_DATA_OUT_WIDTH 12
+ 
++/* SMBUS0 Received Data register */
++#define HW_ATL_SMB0_RECEIVED_DATA_ADR 0x00000748
++/* SMBUS0 Transmitted Data register */
++#define HW_ATL_SMB0_TRANSMITTED_DATA_ADR 0x00000608
++
++/* SMBUS0 Global Provisioning 2 register */
++#define HW_ATL_SMB0_PROVISIONING2_ADR 0x00000604
++
++/* SMBUS0 Bus Busy Bitfield Definitions */
++#define HW_ATL_SMB0_BUS_BUSY_ADR 0x00000744
++#define HW_ATL_SMB0_BUS_BUSY_MSK 0x00000080
++#define HW_ATL_SMB0_BUS_BUSY_SHIFT 7
++#define HW_ATL_SMB0_BUS_BUSY_WIDTH 1
++
++/* SMBUS0 Byte Transfer Complete Bitfield Definitions */
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_ADR 0x00000744
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_MSK 0x00000002
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_SHIFT 1
++#define HW_ATL_SMB0_BYTE_TRANSFER_COMPLETE_WIDTH 1
++
++/* SMBUS0 Receive Acknowledge Bitfield Definitions */
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_ADR 0x00000744
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_MSK 0x00000100
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_SHIFT 8
++#define HW_ATL_SMB0_RX_ACKNOWLEDGED_WIDTH 1
++
++/* SMBUS0 Repeated Start Detect Bitfield Definitions */
++#define HW_ATL_SMB0_REPEATED_START_DETECT_ADR 0x00000744
++#define HW_ATL_SMB0_REPEATED_START_DETECT_MSK 0x00000004
++#define HW_ATL_SMB0_REPEATED_START_DETECT_SHIFT 2
++#define HW_ATL_SMB0_REPEATED_START_DETECT_WIDTH 1
++
+ /* global microprocessor semaphore  definitions
+  * base address: 0x000003a0
+  * parameter: semaphore {s} | stride size 0x4 | range [0, 15]
+-- 
+2.44.1
+
 
