@@ -1,128 +1,190 @@
-Return-Path: <netdev+bounces-136872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67BA9A35AE
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 08:42:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 488029A362C
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 08:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE5131C20F56
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 06:42:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77C3B1C23535
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 06:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6481188733;
-	Fri, 18 Oct 2024 06:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9386717DFEB;
+	Fri, 18 Oct 2024 06:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGspe9SQ"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="WbUjGBPN";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="dDDvIocM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D56818C93C;
-	Fri, 18 Oct 2024 06:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85FB175D5F;
+	Fri, 18 Oct 2024 06:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729233632; cv=none; b=aPgac4fq9OpAF4kyBhQODgHcY29FlFfpxOuNhPYgOB3b7JhbCe0XiozbeClATW3uO6yZaBjhAgHBwD1yutRMtrBvk3ZZSbh0BVS2v9O0Wp8SY+rqkpB8tYs9qOhgm9eAhxQJaTjto78bwiXieD62GmeCtt5UJnpGaJ9jmjFxE2I=
+	t=1729234389; cv=none; b=ScuHE5uvHG1y6n1Qsk5jIjpqaQoD/mGKzi1Tf7rQaK4bEWeqeedNwOaMVESx3RuRqbTm1DjH1uODKWsYOg5ACdFVmnvSmcdz9GWZyENadiL55i+rRePDDmA+d/k6+2f4Gp5z5UOZ0GoJGNmkvJLuylLzFhTGkbrnZEdffo7RFvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729233632; c=relaxed/simple;
-	bh=udSu0PifOzRa5GkWP7sFryWEU4fALlPs0aaNg1SJDJs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bRbtvd4PzSi7YP1UII6Uw6kHxFne/PROSMYABfFr2E0a/OfipTzI87Fcti/rmKYKRW2IyJaifccft06BRp+4YTcm05LaoXbNdXkv9W7Ajb7PbNzSu5KxsYRprcVfX9VbY8TG2iuj8Yk3Kcar4sGHMJT3MZbD0GOkwqRBeCWkX4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MGspe9SQ; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c8c50fdd9so19163175ad.0;
-        Thu, 17 Oct 2024 23:40:31 -0700 (PDT)
+	s=arc-20240116; t=1729234389; c=relaxed/simple;
+	bh=dd79JXjqD2Inpu0DT31fpEk2eIY2MmSwqg8qI66yzgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HEEwUIda5b+0byuAjwS+ej8YLYQ7oANH6zMHv43So2s9zqx9VZTd+OxFYnSC1SThUQ1baVol8s1LyNg09flNCebio5oM8q46dkPrnvp4HP2W4kphFLZVVXGc9/10mY9/m8Qm0nV/UoLgsn2b+Amq9NWmO+YxfKpB8K6NSkW0PD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=WbUjGBPN; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=dDDvIocM reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729233630; x=1729838430; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XZgSPrHkP+5PHa4TM3CPdf/GMcXQ4aZTX0bTblaWKZw=;
-        b=MGspe9SQdinHzlmPs9lVi2FgsIoYgtjpuLUJQDxlM0ThcDNcN/L1mWjlAF+K9EmtfO
-         ODgI7XdzuHPkV36UA6F58b77DSYudLhW0dEEIaKvPFOJoYUwpPYfGj9JCPXw5ExankQn
-         j9eFgKy9I9Q4JEf+RjwPjtNZ1GC8RHEAas4u35RNUTw/AsMKly5tL2C0aQqu85rtqjoY
-         /I0lu4l080ZOWKhQaG3j0AYPP3aGHjA0zhkI6qCsBsQ7K2vEpLvmzkcnRCvzZ+xc5Nlm
-         V1TUcnJBVvhqz5isxZSvXg31A0LXkCkQyZbtY3G1rvAhXF10zQ+Y/Dx7bIp5Ko2IuNOy
-         rRWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729233630; x=1729838430;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XZgSPrHkP+5PHa4TM3CPdf/GMcXQ4aZTX0bTblaWKZw=;
-        b=I5mmbi82p7q+Uw0MAiC6vOcSffIffPWTnmr0zcshLIXqWtLP49YizOm4ep2L3trIQh
-         79H3yr5eo5KCq6NpEr63SUcTPTOs6NLWc9x9VedsWAYzIWGfqdtNuHhGKDKZk9H4CLXI
-         QbkUoEJDKb4VxZ+jm7AELU5p0RYsRQLZAqYvl4EMdlTpsfmMtgWyBHQ0Du0FMj+YYI12
-         AffdLma6riADNW7Te0OCxQcOJ1TsHswy/GD+qtDfNFln50+QDhvw7K1kimfBvSVZqiOI
-         e/ZF8md8zmPHPOscKHYo2cHf3kXkvY3sxy6eADUEywJltPwXfuY8AwOeVKX2RmDiQb9o
-         vD7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVL1iumVJisrmKFTEE6f7ePecSzal28sPPJDqkkU1LPCyBDD0ML9iorkpUeiY2ZbSPzkmQB+BjlZEwFMNI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc6IheHd0E+Cmaq9JSRDhDE536buFFA+Rt9Xxw3HIKNJfMAw71
-	WAP7AXN5n+XvUudMpEkZwtDyZWilwKlmd2D5Jx3p4jpwNQrncld0Gs/leQ==
-X-Google-Smtp-Source: AGHT+IESugbPIpWfbBYQesKtzI8163cWBzPYauR2huuOlT53gaEAxREbyE0/wzo69ZzWjSymRoyEzg==
-X-Received: by 2002:a17:902:c94c:b0:20c:f261:24f3 with SMTP id d9443c01a7336-20d47928b66mr91420885ad.17.1729233629882;
-        Thu, 17 Oct 2024 23:40:29 -0700 (PDT)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20e5a74766fsm6285455ad.73.2024.10.17.23.40.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2024 23:40:29 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v2 8/8] net: stmmac: xgmac: Enable FPE for tc-mqprio/tc-taprio
-Date: Fri, 18 Oct 2024 14:39:14 +0800
-Message-Id: <947ce15f80c474be286b3f969f21a74b017b89e4.1729233020.git.0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1729233020.git.0x1207@gmail.com>
-References: <cover.1729233020.git.0x1207@gmail.com>
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1729234386; x=1760770386;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AOulUfPRBlXnZ1KIBNZoiOR6DzCBisOIaMADQx53Pk8=;
+  b=WbUjGBPN6EY1UmqisPrmo2wQHdtWWLjMOmSd+kzOWx0y9JjVgku+7CaZ
+   SNDqWRnhkO0TpznFlAk3e3eg2NKJUUoFw/PleNOdHKOTu6A3ahaSm+HRX
+   98jH7tKNlS79/IxMfQneEM4C/+NKBuhRlAbfOAg3W+ZLFR11x/fFkctGu
+   q3c6RjlZ8M5pluzmcOwvo8mYt7h+HfGrQoKWRewLZpc5zGdPgyHKa9xmN
+   8HXOtuXCO+IwmE2G2x7eJEkJIaCUPm5ZRTIiqyobYHV6Xq1zloIqk2oYf
+   GlRhcLz/c+VsREWbhV1KoWWkPcaAHaubYKBYKm7hlT/ogNFWy2P/5ykXl
+   Q==;
+X-CSE-ConnectionGUID: R/jNJlE+S46o+UEHtedAiQ==
+X-CSE-MsgGUID: kAkKmz8cSJmj4GNr4Mj4qA==
+X-IronPort-AV: E=Sophos;i="6.11,212,1725314400"; 
+   d="scan'208";a="39533507"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 18 Oct 2024 08:53:03 +0200
+X-CheckPoint: {671205CF-B-69FF9A8E-EE9CEDAF}
+X-MAIL-CPID: B5F18021BCC74157624FFD4DB3589D2D_0
+X-Control-Analysis: str=0001.0A682F1B.671205CF.0082,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3588816A505;
+	Fri, 18 Oct 2024 08:52:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1729234378;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=AOulUfPRBlXnZ1KIBNZoiOR6DzCBisOIaMADQx53Pk8=;
+	b=dDDvIocMcwuq7gjz2SZ8X4aCFesIG/2l7z2zp0RNsE3xB87lvFsvG363AIiMYJJzmEAFex
+	l9Toa6J/9fwbyrZsIjz6hhD9ll1QCvrAKQcmonbRljTZ6gZTbqqkK8IQ0+rm7QYqqs3DIl
+	OjCOtN445vhYDrr3A1qMwE8nU84x7ISVMKI79KJFmBPIoMQikjFwXQQxs7KFtdr7k/PjET
+	T7ghFp32zR0NBuiLqqm7MCUpq1rROCOD8XXF0Us+DFNbwQpEx/6hll48p45Hq2vjh+gxyF
+	pE96m4L/HVFVrGSDrOqbIShZkWG23RWTOgWlNkK91HlNE084TQZmIhQWNCumEw==
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: Frank Li <frank.li@nxp.com>, Wei Fang <wei.fang@nxp.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "bhelgaas@google.com" <bhelgaas@google.com>, "horms@kernel.org" <horms@kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
+Subject: Re: [PATCH v3 net-next 02/13] dt-bindings: net: add i.MX95 ENETC support
+Date: Fri, 18 Oct 2024 08:52:55 +0200
+Message-ID: <3657116.R56niFO833@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <PAXPR04MB851058F40F264FA9D20F385888402@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20241017074637.1265584-1-wei.fang@nxp.com> <ZxE56eMyN791RsgK@lizhi-Precision-Tower-5810> <PAXPR04MB851058F40F264FA9D20F385888402@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Last-TLS-Session-Version: TLSv1.3
 
-The FPE on XGMAC is ready, it is time to update dwxgmac_tc_ops to
-let user configure FPE via tc-mqprio/tc-taprio.
+Hi,
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Am Freitag, 18. Oktober 2024, 03:20:55 CEST schrieb Wei Fang:
+> > -----Original Message-----
+> > From: Frank Li <frank.li@nxp.com>
+> > Sent: 2024=E5=B9=B410=E6=9C=8818=E6=97=A5 0:23
+> > To: Wei Fang <wei.fang@nxp.com>
+> > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org;
+> > conor+dt@kernel.org; Vladimir Oltean <vladimir.oltean@nxp.com>; Claudiu
+> > Manoil <claudiu.manoil@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>;
+> > christophe.leroy@csgroup.eu; linux@armlinux.org.uk; bhelgaas@google.com;
+> > horms@kernel.org; imx@lists.linux.dev; netdev@vger.kernel.org;
+> > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-pci@vger.kernel.org
+> > Subject: Re: [PATCH v3 net-next 02/13] dt-bindings: net: add i.MX95 ENE=
+TC
+> > support
+> >=20
+> > On Thu, Oct 17, 2024 at 03:46:26PM +0800, Wei Fang wrote:
+> > > The ENETC of i.MX95 has been upgraded to revision 4.1, and the vendor
+> > > ID and device ID have also changed, so add the new compatible strings
+> > > for i.MX95 ENETC. In addition, i.MX95 supports configuration of RGMII
+> > > or RMII reference clock.
+> > >
+> > > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > > ---
+> > > v2: Remove "nxp,imx95-enetc" compatible string.
+> > > v3:
+> > > 1. Add restriction to "clcoks" and "clock-names" properties and rename
+> > > the clock, also remove the items from these two properties.
+> > > 2. Remove unnecessary items for "pci1131,e101" compatible string.
+> > > ---
+> > >  .../devicetree/bindings/net/fsl,enetc.yaml    | 22 ++++++++++++++++-=
+=2D-
+> > >  1 file changed, 19 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> > > b/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> > > index e152c93998fe..e418c3e6e6b1 100644
+> > > --- a/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/fsl,enetc.yaml
+> > > @@ -20,10 +20,13 @@ maintainers:
+> > >
+> > >  properties:
+> > >    compatible:
+> > > -    items:
+> > > +    oneOf:
+> > > +      - items:
+> > > +          - enum:
+> > > +              - pci1957,e100
+> > > +          - const: fsl,enetc
+> > >        - enum:
+> > > -          - pci1957,e100
+> > > -      - const: fsl,enetc
+> > > +          - pci1131,e101
+> > >
+> > >    reg:
+> > >      maxItems: 1
+> > > @@ -40,6 +43,19 @@ required:
+> > >  allOf:
+> > >    - $ref: /schemas/pci/pci-device.yaml
+> > >    - $ref: ethernet-controller.yaml
+> > > +  - if:
+> > > +      properties:
+> > > +        compatible:
+> > > +          contains:
+> > > +            enum:
+> > > +              - pci1131,e101
+> > > +    then:
+> > > +      properties:
+> > > +        clocks:
+> > > +          maxItems: 1
+> > > +          description: MAC transmit/receiver reference clock
+> > > +        clock-names:
+> > > +          const: ref
+> >=20
+> > Did you run CHECK_DTBS for your dts file? clocks\clock-names should be =
+under
+> > top 'properties" firstly. Then use 'if' restrict it. But I am not sure =
+for that. only
+> > dt_binding_check is not enough because your example have not use clocks=
+ and
+> > clok-names.
+> >=20
+>=20
+> I have run dtbs_check and dt_binding_check in my local env. there were no
+> warnings and errors.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 75ad2da1a37f..6a79e6a111ed 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -1290,8 +1290,8 @@ const struct stmmac_tc_ops dwxgmac_tc_ops = {
- 	.setup_cls_u32 = tc_setup_cls_u32,
- 	.setup_cbs = tc_setup_cbs,
- 	.setup_cls = tc_setup_cls,
--	.setup_taprio = tc_setup_taprio_without_fpe,
-+	.setup_taprio = tc_setup_taprio,
- 	.setup_etf = tc_setup_etf,
- 	.query_caps = tc_query_caps,
--	.setup_mqprio = tc_setup_mqprio_unimplemented,
-+	.setup_mqprio = tc_setup_dwmac510_mqprio,
- };
--- 
-2.34.1
+Is there already the DT part somewhere? Do you mind sharing it?
+
+Best regards,
+Alexander
+=2D-=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+http://www.tq-group.com/
+
 
 
