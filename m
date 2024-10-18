@@ -1,161 +1,120 @@
-Return-Path: <netdev+bounces-137143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189829A4891
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:54:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093059A48B9
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 417B41C22581
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:54:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A96291F25B26
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABADC2071FD;
-	Fri, 18 Oct 2024 20:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845CC18E37B;
+	Fri, 18 Oct 2024 21:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cCfO/fPY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GCC/aZR8"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.209])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE5718D650;
-	Fri, 18 Oct 2024 20:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C909F18E341;
+	Fri, 18 Oct 2024 21:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729284827; cv=none; b=eGZRatEDcPusxrqIDBo0X3gaSNhTdGYMkQ87r1diV6/i6i3lKxjwCPyrQuvDaUisIvHIx7rt0WXPFUIjT+tgZsd5w6+7kfMCFcksf4rd0zfeMpD2VhP799PoITMCssIoksfrG2JQKjaJj1dN3zmfpyf+vqEqRJYyRsKolpKE6n4=
+	t=1729285811; cv=none; b=XZ7B3s2F82906VDpAUmizgkNSbfNUhvPPpRmgQ+aI/dFzqWKPjy90bFeGgvJc47ZF6sV8//qVatXB9Nl7sli6afoqVVWx1SLCbPVm88JU59I4L8Z3VksNLGtWYp1Do15ofG4PRgWP64EwywLe+0h3HECkXHDjsEeN9kutJVyA2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729284827; c=relaxed/simple;
-	bh=B5pHMQe6V0dWAA56a9Ep6qiKIoCxDAhjKJta+dS+6/0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LOgFj9SQAXv/QqOddeyI0RMyQGr3pZkH9/3oZMqJrjTnVR9yA5Df5xZl3g/TB3r9fmMwMPEiwqkx4g4Eg1dFSpTXn/iQtTgnnSKwQ1K8l+5oEMk+zgGsW4k1Iz2X7DC1UK4NnGMlSo8udE05ePMT1Z95PmZzV6hsQo452s7Y3+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cCfO/fPY; arc=none smtp.client-ip=192.19.144.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 3294FC003ABA;
-	Fri, 18 Oct 2024 13:53:39 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 3294FC003ABA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1729284819;
-	bh=B5pHMQe6V0dWAA56a9Ep6qiKIoCxDAhjKJta+dS+6/0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cCfO/fPYCA+519rhhFetz0g8qOyEBrpselvj9Vya4G5HLdPoRUb6GNOiofUN8PBVq
-	 g2RIeSpWbGC++rs6YCe3bETjhxo3+vi0uvy/ie/jy6hHh0UIT/HknNEc100fKOq2Xm
-	 7Hptqwh1ZypKP97gKNhC0TSyp+qhVhrLTfbdMO8E=
-Received: from pcie-dev03.dhcp.broadcom.net (pcie-dev03.dhcp.broadcom.net [10.59.171.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 80F5818041CAC6;
-	Fri, 18 Oct 2024 13:53:38 -0700 (PDT)
-From: jitendra.vegiraju@broadcom.com
-To: netdev@vger.kernel.org
-Cc: alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	jitendra.vegiraju@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	richardcochran@gmail.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	fancer.lancer@gmail.com,
-	rmk+kernel@armlinux.org.uk,
-	ahalaney@redhat.com,
-	xiaolei.wang@windriver.com,
-	rohan.g.thomas@intel.com,
-	Jianheng.Zhang@synopsys.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	bpf@vger.kernel.org,
-	andrew@lunn.ch,
-	linux@armlinux.org.uk,
-	horms@kernel.org,
-	florian.fainelli@broadcom.com,
-	quic_abchauha@quicinc.com
-Subject: [PATCH net-next v6 5/5] net: stmmac: Add BCM8958x driver to build system
-Date: Fri, 18 Oct 2024 13:53:32 -0700
-Message-Id: <20241018205332.525595-6-jitendra.vegiraju@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
-References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+	s=arc-20240116; t=1729285811; c=relaxed/simple;
+	bh=hQ0DG6/Eb3j0prKHYX364xskTLEd+9vKpIg1xcOPcDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxxOBegOZrX3Dfm9/r/tfspMHt2SJNwdCgDvIwFEoOhgXXqbBXrqpY7hmhp5kAenC/djxkZ4wiOzPti2U/Rt06Fg6xPI14dfyhVbH8iyu+TlXYCotDbIVqldYCH0SNvrKG/pawp8F8uLPiDi2PfvtxmzEyinmNzyP41xVgbbBSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GCC/aZR8; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729285809; x=1760821809;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hQ0DG6/Eb3j0prKHYX364xskTLEd+9vKpIg1xcOPcDw=;
+  b=GCC/aZR8vwcft9DKreLN/fmFJWkpkZJFH67WpSDHNksW/CR04ZaKyeWL
+   XtoZtoCtFYtmcegKvkavN+KJGVxCjzqAhdXbd+IOOezcGUxYRgKG+kMbb
+   xQAYv8nfmcqKBuL0PvyKpfNP6vX9UeHUun1IeLr+j7jsejyAHejBEg/tT
+   s16Q+FTgxKC0wfRkNfHwQWmF7NPSlPljsyZ789mZrfGKSamDYzSLkMm8y
+   KtP6Yza+q5j5uz+ift8Tp9tKB45O2JaoAIcvYkYlpHFTGrcFA2Cp6MUp4
+   QCHIHtEr9tqwvVvFf4T9CQFxMMesDXYZZQ5B3/anHpvfvyAoXOs6vFg0M
+   Q==;
+X-CSE-ConnectionGUID: V2vtrIvqQPKeQ+r6dTJnFg==
+X-CSE-MsgGUID: Zp44uaT9Rnizfp3w3Th97w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28993129"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="28993129"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 14:10:08 -0700
+X-CSE-ConnectionGUID: dr8iIfhTSkuHbpup6ssh2A==
+X-CSE-MsgGUID: zkUFIu82SCqVszaErv+rJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
+   d="scan'208";a="78938262"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 18 Oct 2024 14:10:02 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t1uES-000OJS-0e;
+	Fri, 18 Oct 2024 21:10:00 +0000
+Date: Sat, 19 Oct 2024 05:09:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, imx@lists.linux.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 06/13] net: enetc: build enetc_pf_common.c as
+ a separate module
+Message-ID: <202410190431.wiCDZy8G-lkp@intel.com>
+References: <20241017074637.1265584-7-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241017074637.1265584-7-wei.fang@nxp.com>
 
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Hi Wei,
 
-Add PCI driver for BCM8958x to the linux build system and
-update MAINTAINERS file.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
----
- MAINTAINERS                                  |  8 ++++++++
- drivers/net/ethernet/stmicro/stmmac/Kconfig  | 11 +++++++++++
- drivers/net/ethernet/stmicro/stmmac/Makefile |  1 +
- 3 files changed, 20 insertions(+)
+[auto build test ERROR on net-next/main]
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d678a58c0205..f5ded80446d0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4464,6 +4464,14 @@ N:	brcmstb
- N:	bcm7038
- N:	bcm7120
- 
-+BROADCOM BCM8958X ETHERNET DRIVER
-+M:	Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-+R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/stmicro/stmmac/dw25gmac.*
-+F:	drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
-+
- BROADCOM BCMBCA ARM ARCHITECTURE
- M:	William Zhang <william.zhang@broadcom.com>
- M:	Anand Gore <anand.gore@broadcom.com>
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 05cc07b8f48c..47c9db123b03 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -298,6 +298,17 @@ config DWMAC_LOONGSON
- 	  This selects the LOONGSON PCI bus support for the stmmac driver,
- 	  Support for ethernet controller on Loongson-2K1000 SoC and LS7A1000 bridge.
- 
-+config DWMAC_BRCM
-+	tristate "Broadcom XGMAC support"
-+	depends on STMMAC_ETH && PCI
-+	depends on COMMON_CLK
-+	help
-+	  Support for ethernet controllers on Broadcom BCM8958x SoCs.
-+
-+	  This selects Broadcom XGMAC specific PCI bus support for the
-+	  stmmac driver. This driver provides the glue layer on top of the
-+	  stmmac driver required for the Broadcom BCM8958x SoC devices.
-+
- config STMMAC_PCI
- 	tristate "STMMAC PCI bus support"
- 	depends on STMMAC_ETH && PCI
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index 967e8a9aa432..517981b9e93a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -41,4 +41,5 @@ dwmac-altr-socfpga-objs := dwmac-socfpga.o
- obj-$(CONFIG_STMMAC_PCI)	+= stmmac-pci.o
- obj-$(CONFIG_DWMAC_INTEL)	+= dwmac-intel.o
- obj-$(CONFIG_DWMAC_LOONGSON)	+= dwmac-loongson.o
-+obj-$(CONFIG_DWMAC_BRCM)	+= dwmac-brcm.o
- stmmac-pci-objs:= stmmac_pci.o
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Fang/dt-bindings-net-add-compatible-string-for-i-MX95-EMDIO/20241017-160848
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241017074637.1265584-7-wei.fang%40nxp.com
+patch subject: [PATCH v3 net-next 06/13] net: enetc: build enetc_pf_common.c as a separate module
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20241019/202410190431.wiCDZy8G-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410190431.wiCDZy8G-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410190431.wiCDZy8G-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+ERROR: modpost: "__delay" [drivers/net/mdio/mdio-cavium.ko] undefined!
+>> ERROR: modpost: "enetc_set_ethtool_ops" [drivers/net/ethernet/freescale/enetc/nxp-enetc-pf-common.ko] undefined!
+ERROR: modpost: "devm_of_clk_add_hw_provider" [drivers/media/i2c/tc358746.ko] undefined!
+ERROR: modpost: "devm_clk_hw_register" [drivers/media/i2c/tc358746.ko] undefined!
+ERROR: modpost: "of_clk_hw_simple_get" [drivers/media/i2c/tc358746.ko] undefined!
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
