@@ -1,93 +1,95 @@
-Return-Path: <netdev+bounces-136832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EA19A32E5
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:31:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6FE89A32EA
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:33:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 231351F24972
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49902B21778
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E3E16A956;
-	Fri, 18 Oct 2024 02:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F570381C4;
+	Fri, 18 Oct 2024 02:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMyOgszB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E5MpfvRy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1561684A5;
-	Fri, 18 Oct 2024 02:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638172CA5;
+	Fri, 18 Oct 2024 02:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729218634; cv=none; b=tLhyRyC/zBfnN6SzaekqR6+rUs1D9UDQkq8HfgH4S5j3WFpu/Af8rcbJhPXFiaSM8gKv+RY+AEvyS39YeMFvcQpu9jJ3iU95Blx8xlkxPSMno0sXG6BphjwH20S3j/zP6lJTvH/UEQ4/F94X3Euf32uH8K4ooY9X/2CTfW827oA=
+	t=1729218797; cv=none; b=baMn0AcG46tfpGYCNoN0Cql0nqqz/mxIjvyGA87EKMxiDYoOEM4VgBuLL4hLZ/VjDhJXVC6nrRbLOjbXxcUfPSei8hP3X8DQiPfNkH0QbsksxRkljOowk9T9QktkPHWu4FQWQvPKAWp9aYcSZ3gHTuQF7gy+ofTETzEIBzP6KG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729218634; c=relaxed/simple;
-	bh=G2dxA7eNuln26z0toyzSDHedyLi6+2/h+7lBjXqDVBE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YMw3O11ppnTPG53AnFpiBxUnPBCkEM3G54NAlFgq0fGSUjnwafrm99L7Cam1Me5pKDG4lys0xj2mRIyVRtBx/i3LMlkta81x9BaUkuYfwiOFZ2YiTiwoMrpVDNzrbWUPbvBlyF6rrJBM98UR8/rcBBsVCwzzvy5AqHYMSuNDDo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMyOgszB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAD1DC4CECD;
-	Fri, 18 Oct 2024 02:30:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729218634;
-	bh=G2dxA7eNuln26z0toyzSDHedyLi6+2/h+7lBjXqDVBE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pMyOgszBZ8FHCg3AWs678vOAkaI4W3l50pXdgu8tf6VBX7WCCBfXpNF3whahJkMW7
-	 yo94hv0cXOtoAYoiAxbc6GI6Ydz+KT8BbSxhbVlTdj9LJo6ufN0/bZrJAOdMlExPLH
-	 k+NredPwjGThyVcZ4xGYoAL61D9AruiA/knMRNYLTLJcfl61MoehVDQW9ljQXo8Uj9
-	 Pgs+OqNq93Llv2WOPlmy0gzS+8toPNqzK4GDMRE0XhpkHInmO92KbQM4fpgyDRDzQR
-	 kajHdKtaJ+5Tx4Fuz6RSGtM/vIn5vtGPs0ghZrfRLNG73G2KPRtKrADES2AjbNley5
-	 8PSBfX1dIOgHQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71E573809A8A;
-	Fri, 18 Oct 2024 02:30:41 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729218797; c=relaxed/simple;
+	bh=U7+lIfcx743bjmHl2HiphHVyK9Nmc5jiCxeFyXuSLMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D+t8fr1jUERysnboBwZTs/MU0SUjAgRwurBq3eqTpfpH2jCQ/jeSRQ7tibRBJGd7I0k14GTW4uhpX8MWsDn6JUXQas1+BlvsoE0zrn1Btl2ORHve7/VvctYSVrq6r0HqgvjDgVEAOfkYPP9WIyTdB9Xzr3vZ0jdHF2mXQnRCekM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E5MpfvRy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FDJn4XXIjtyq1C4WRBOEnHEbGl9tvoFq7BB0FTlNUn4=; b=E5MpfvRyOOAbCVMvQjDs7hrWjD
+	B6mlxRZ8DnBTSxKsn/lH+6wCOcSDhKUIjNwent6D9SpdmpbOY8sJp960hsjO1pIshOGLW7eZjM6TE
+	uNZIttKZmebHFASK7dFjRgJsfBXy7lSTAUvJdNBW64ydSibRSIBJMIhErJyv1dRmaNpI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t1cnR-00AJ0Z-VP; Fri, 18 Oct 2024 04:32:57 +0200
+Date: Fri, 18 Oct 2024 04:32:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Prasad Sodagudi <psodagud@quicinc.com>,
+	Andrew Halaney <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>,
+	kernel@quicinc.com
+Subject: Re: [PATCH v3] net: stmmac: allocate separate page for buffer
+Message-ID: <8677a11c-8735-43c7-ae5b-6dc894d94677@lunn.ch>
+References: <20241015121009.3903121-1-quic_jsuraj@quicinc.com>
+ <20241017194258.000044b3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 1/1] tg3: Increase buffer size for IRQ label
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172921863999.2663866.2502282067699380467.git-patchwork-notify@kernel.org>
-Date: Fri, 18 Oct 2024 02:30:39 +0000
-References: <20241016090647.691022-1-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20241016090647.691022-1-andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- pavan.chebbi@broadcom.com, mchan@broadcom.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241017194258.000044b3@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Andrew Lunn <andrew@lunn.ch>:
-
-On Wed, 16 Oct 2024 12:05:54 +0300 you wrote:
-> GCC is not happy with the current code, e.g.:
+On Thu, Oct 17, 2024 at 07:42:58PM +0800, Furong Xu wrote:
+> Hi Suraj,
 > 
-> .../tg3.c:11313:37: error: ‘-txrx-’ directive output may be truncated writing 6 bytes into a region of size between 1 and 16 [-Werror=format-truncation=]
-> 11313 |                                  "%s-txrx-%d", tp->dev->name, irq_num);
->       |                                     ^~~~~~
-> .../tg3.c:11313:34: note: using the range [-2147483648, 2147483647] for directive argument
-> 11313 |                                  "%s-txrx-%d", tp->dev->name, irq_num);
+> Thanks for this fix.
 > 
-> [...]
+> I tested your patch on XGMAC 3.20a, all goes well, except a performance
+> drop of ~10%
+> Like Jakub Kicinski said in V2, this involves more dma_map() and does add
+> overhead :-/
+> 
+> I might have a better fix for this, I will send to review and CC it to you.
 
-Here is the summary with links:
-  - [net-next,v2,1/1] tg3: Increase buffer size for IRQ label
-    https://git.kernel.org/netdev/net-next/c/abb7c98b99f6
+Lets mark this as changed-requested, due to the performance drop
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It also introduces one more kdoc warning.
 
 
+    Andrew
+
+---
+pw-bot: cr
 
