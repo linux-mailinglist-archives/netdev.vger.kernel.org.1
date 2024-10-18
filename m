@@ -1,193 +1,139 @@
-Return-Path: <netdev+bounces-137034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9960C9A40F2
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:18:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC7859A40FF
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:21:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9B1F1C20C8B
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:18:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D2A4289834
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CFE1EE002;
-	Fri, 18 Oct 2024 14:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121621991C3;
+	Fri, 18 Oct 2024 14:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D5QjhqDn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DzgiulS2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984C31D3182
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 14:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85386BFCA;
+	Fri, 18 Oct 2024 14:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729261116; cv=none; b=Hbq3yBR5VIRKuqFqSYFZ1rzdE12/wUHoFdbLbJc7QIeSuidWX1KW8y6eARlfchN9vtJtxA+vsGpuBJkN9+IStyswcMLvwgjNdayCpWnQHTPNiOAl8RDzdg1dEUYIHmod2KtI9dV0LwXm5e71/YYgjWFwhiP4huhHEsolr7/VHvY=
+	t=1729261272; cv=none; b=jo/qCOJ9aUUuWeyCFHK0EGI4qnVfTTA4F/6VGnMIHqqFnQcgXDNSwCBoIeKRpzzE4q1oWhyYkRQqA576i49GbS0oO1ey4CZ9PXkJ6Irz+JorQUn47JcP1njxikoYw98wGUBeuXyFW/q5gMMGYw4JtA1yOEQbnJ7JPQtqg9Jswsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729261116; c=relaxed/simple;
-	bh=YwRF5hN8LiWMHJW+vgahFBnhO7gtBweNzskldU/Lyg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nelyOAnIaq5AHHqeGjkwYUH0or3t8cHu/KBY+lNaNdREBmCn1y7DO6vCIkKiZOZqbLHJBMpytFTngmi195dvv9C0b5lK4r0dxEQKelvEtxHpkz2VGFz7kPBSfaY9tc2IEOh1Z7ssmnwoI2ursFIc5d+OHk+hmXvt/VtZ617vT5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D5QjhqDn; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729261115; x=1760797115;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YwRF5hN8LiWMHJW+vgahFBnhO7gtBweNzskldU/Lyg4=;
-  b=D5QjhqDnKCwUA7oTLnq4uESYBpZkT7x02KBx0N3g2xGnr556ieuh6x2+
-   SlEizS0Fu/vZowfgII62Ax5+KWYhIEnasOjSGnYwpNktGypx1SRubA/pT
-   3lKmvsLKnt/SFnn9r2H6E7zLE6C5CtySRgjEFjvG5o3ODTHjQLZyHIKSH
-   OKASSvHIWy0NKzhEHCSMjRC8xAvL+T1PhVMkSRAGD18601OuVIIwZhzpk
-   ybqhn7yMyIOeS9vhyRCrCTns9e6G5OwkGqsPxCWGEwAAMaenNgvTP9Dlw
-   TFshVtFmOgY/GFP5+hUCHsdYkMcowvi49ioTdsvpW+b3b13vRKA9CfXs8
-   g==;
-X-CSE-ConnectionGUID: y2+U/XDQTqGsFb2KyWnUyw==
-X-CSE-MsgGUID: pv0sJJ12RAWejczcV98Xvw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11229"; a="46293165"
-X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="46293165"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 07:18:34 -0700
-X-CSE-ConnectionGUID: XzIAdjJ4QiCcmKcyoKoefw==
-X-CSE-MsgGUID: G++cKWF7ROSHu7a6XlkMzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="78929748"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa008.fm.intel.com with ESMTP; 18 Oct 2024 07:18:32 -0700
-Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.186])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id DE4FC2FC66;
-	Fri, 18 Oct 2024 15:18:29 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Dan Nowlin <dan.nowlin@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH iwl-next v3 2/2] ice: support optional flags in signature segment header
-Date: Fri, 18 Oct 2024 16:17:37 +0200
-Message-ID: <20241018141823.178918-6-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241018141823.178918-4-przemyslaw.kitszel@intel.com>
-References: <20241018141823.178918-4-przemyslaw.kitszel@intel.com>
+	s=arc-20240116; t=1729261272; c=relaxed/simple;
+	bh=ECioSBta/T4Mm2R7F7k6DzVa2u7XNruvIlcI8+i/QpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZMqT4bjXYd/2DH41AO0E0C+zdQoLA9u/ScUKEcTs5EUyn92sJgZRSA4aGktj6D3JNNqCQrVuiutB0w1UUReG4JVT2+0NBIzkfTDOe5pqGn4vI50MtwbTfxAOeQxvoMcXf3/SeIFKNez/zWBFi1MO5c4QMCaDE5nZ3ZtoRX2EgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DzgiulS2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13439C4CEC3;
+	Fri, 18 Oct 2024 14:21:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729261271;
+	bh=ECioSBta/T4Mm2R7F7k6DzVa2u7XNruvIlcI8+i/QpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DzgiulS2sJiiET79pCk8UL6iUrgtZJKNk5FGkDO/3047qLeVO2618KzPRpD6KtVb5
+	 J0XNeo/tcmc6lvSkyRWzfa4w3KGfY7vn/Wn/lncrbFK1Kx/en1kHTQ9TmevfTqOI7l
+	 2MT4zu/Omkc06EzF2Z628YPpCiLUdcczFXr+stzg/QoUTMsBtHpCpUmTeua5sM1gRP
+	 X9FgZuhtQ8twS2+B+KCEEBDc0pHhO3knrJtUPVkkSliMcfdwCH05Jp7sIbktyFrCN2
+	 kbkaPfJnmgPAx/8qjKsBd1CTye84JBGP3HgMyQbm/0+P1iASjnEO8RMkc2XsjxEELD
+	 Xip+3Zsd1kVqA==
+Date: Fri, 18 Oct 2024 15:21:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrii Nakryiko <andriin@fb.com>, Jussi Maki <joamaki@gmail.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCHv2 net-next 2/3] bonding: use correct return value
+Message-ID: <20241018142104.GP1697@kernel.org>
+References: <20241017020638.6905-1-liuhangbin@gmail.com>
+ <20241017020638.6905-3-liuhangbin@gmail.com>
+ <878qumzszs.fsf@toke.dk>
+ <ZxGv2s4bl5VQV4g-@fedora>
+ <20241018094139.GD1697@kernel.org>
+ <87o73hy7hh.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <87o73hy7hh.fsf@toke.dk>
 
-An optional flag field has been added to the signature segment header.
-The field contains two flags, a "valid" bit, and a "last segment" bit
-that indicates whether the segment is the last segment that will be
-sent to firmware.
+On Fri, Oct 18, 2024 at 01:29:30PM +0200, Toke Høiland-Jørgensen wrote:
+> Simon Horman <horms@kernel.org> writes:
+> 
+> > On Fri, Oct 18, 2024 at 12:46:18AM +0000, Hangbin Liu wrote:
+> >> On Thu, Oct 17, 2024 at 04:47:19PM +0200, Toke Høiland-Jørgensen wrote:
+> >> > > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> >> > > index f0f76b6ac8be..6887a867fe8b 100644
+> >> > > --- a/drivers/net/bonding/bond_main.c
+> >> > > +++ b/drivers/net/bonding/bond_main.c
+> >> > > @@ -5699,7 +5699,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+> >> > >  		if (dev_xdp_prog_count(slave_dev) > 0) {
+> >> > >  			SLAVE_NL_ERR(dev, slave_dev, extack,
+> >> > >  				     "Slave has XDP program loaded, please unload before enslaving");
+> >> > > -			err = -EOPNOTSUPP;
+> >> > > +			err = -EEXIST;
+> >> > 
+> >> > Hmm, this has been UAPI since kernel 5.15, so can we really change it
+> >> > now? What's the purpose of changing it, anyway?
+> >> 
+> >> I just think it should return EXIST when the error is "Slave has XDP program
+> >> loaded". No special reason. If all others think we should not change it, I
+> >> can drop this patch.
+> >
+> > Hi Toke,
+> >
+> > Could you add some colour to what extent user's might rely on this error code?
+> >
+> > Basically I think that if they do then we shouldn't change this.
+> 
+> Well, that's the trouble with UAPI, we don't really know. In libxdp and
+> xdp-tools we look at the return code to provide a nicer error message,
+> like:
+> 
+> https://github.com/xdp-project/xdp-tools/blob/master/lib/libxdp/libxdp.c#L615
+> 
+> and as a signal to fall back to loading the programme without a dispatcher:
+> 
+> https://github.com/xdp-project/xdp-tools/blob/master/lib/libxdp/libxdp.c#L1824
+> 
+> Both of these cases would be unaffected (or even improved) by this
+> patch, so in that sense I don't have a concrete objection, just a
+> general "userspace may react to this". In other words, my concern is
+> more of a general "we don't know, so this seems risky". If any of you
+> have more information about how bonding XDP is generally used, that may
+> help get a better idea of this?
 
-If the flag field's valid bit is NOT set, then as was done before,
-assume that this is the last segment being downloaded.
+Yes, that is the trouble with the UAPI. I was hoping you might be able to
+provide the clarity you ask for above. But alas, things are as clear as
+mud.
 
-However, if the flag field's valid bit IS set, then use the last segment
-flag to determine if this segment is the last segment to download.
+In lieu of more information I suggest caution and dropping this change for
+now.
 
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Co-developed-by: Dan Nowlin <dan.nowlin@intel.com>
-Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-v2: co/- authorship change
----
- drivers/net/ethernet/intel/ice/ice_ddp.h |  5 ++++-
- drivers/net/ethernet/intel/ice/ice_ddp.c | 21 +++++++++++++++------
- 2 files changed, 19 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.h b/drivers/net/ethernet/intel/ice/ice_ddp.h
-index 79551da2a4b0..8a2d57fc5dae 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.h
-@@ -181,7 +181,10 @@ struct ice_sign_seg {
- 	__le32 signed_seg_idx;
- 	__le32 signed_buf_start;
- 	__le32 signed_buf_count;
--#define ICE_SIGN_SEG_RESERVED_COUNT	44
-+#define ICE_SIGN_SEG_FLAGS_VALID	0x80000000
-+#define ICE_SIGN_SEG_FLAGS_LAST		0x00000001
-+	__le32 flags;
-+#define ICE_SIGN_SEG_RESERVED_COUNT	40
- 	u8 reserved[ICE_SIGN_SEG_RESERVED_COUNT];
- 	struct ice_buf_table buf_tbl;
- };
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-index 3e1173ef4b5c..5a70854b0ca2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-@@ -1438,23 +1438,27 @@ ice_download_pkg_config_seg(struct ice_ddp_send_ctx *ctx,
- 	return ice_dwnld_cfg_bufs_no_lock(ctx, bufs->buf_array, start, count);
- }
- 
-+static bool ice_is_last_sign_seg(u32 flags)
-+{
-+	return !(flags & ICE_SIGN_SEG_FLAGS_VALID) /* behavior prior to valid */
-+	       || (flags & ICE_SIGN_SEG_FLAGS_LAST);
-+}
-+
- /**
-  * ice_dwnld_sign_and_cfg_segs - download a signing segment and config segment
-  * @ctx: context of the current buffers section to send
-  * @pkg_hdr: pointer to package header
-  * @idx: segment index (must be a signature segment)
-  *
-  * Note: idx must reference a signature segment
-  */
- static enum ice_ddp_state
- ice_dwnld_sign_and_cfg_segs(struct ice_ddp_send_ctx *ctx,
- 			    struct ice_pkg_hdr *pkg_hdr, u32 idx)
- {
-+	u32 conf_idx, start, count, flags;
- 	enum ice_ddp_state state;
- 	struct ice_sign_seg *seg;
--	u32 conf_idx;
--	u32 start;
--	u32 count;
- 
- 	seg = (struct ice_sign_seg *)ice_get_pkg_seg_by_idx(pkg_hdr, idx);
- 	if (!seg) {
-@@ -1473,6 +1477,13 @@ ice_dwnld_sign_and_cfg_segs(struct ice_ddp_send_ctx *ctx,
- 
- 	state = ice_download_pkg_config_seg(ctx, pkg_hdr, conf_idx, start,
- 					    count);
-+
-+	/* finish up by sending last hunk with "last" flag set if requested by
-+	 * DDP content */
-+	flags = le32_to_cpu(seg->flags);
-+	if (ice_is_last_sign_seg(flags))
-+		state = ice_ddp_send_hunk(ctx, NULL);
-+
- 	return state;
- }
- 
-@@ -1548,9 +1559,7 @@ ice_download_pkg_with_sig_seg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
- 						    hw->pkg_sign_type))
- 			continue;
- 
--		ice_dwnld_sign_and_cfg_segs(&ctx, pkg_hdr, i);
--		/* finish up by sending last hunk with "last" flag set */
--		state = ice_ddp_send_hunk(&ctx, NULL);
-+		state = ice_dwnld_sign_and_cfg_segs(&ctx, pkg_hdr, i);
- 		if (state)
- 			break;
- 	}
 -- 
-2.46.0
-
+pw-bot: cr
 
