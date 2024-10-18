@@ -1,293 +1,179 @@
-Return-Path: <netdev+bounces-137082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033B29A4494
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:27:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 447B99A4520
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 241201C22C69
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 17:27:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D711C2308E
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 17:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E5A204013;
-	Fri, 18 Oct 2024 17:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D58A20403F;
+	Fri, 18 Oct 2024 17:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLQv6oP2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aHxk4GJq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2937714F136;
-	Fri, 18 Oct 2024 17:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B8A2040A7;
+	Fri, 18 Oct 2024 17:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729272448; cv=none; b=avlDEd+ztIns8ZZrDeNR+47zn6fLeDMNXqJ3YCcEIwUmJ68pKLLCReuvDkCXYUzEwiXa2Z1H2idOscKKqyP93wRvAbmmNy9rWJ364L6KwyRBfRvm/k9lcfWrtvwuk9kyxqs/Hzd2ozRwdFe37e2+Gyu2AXv0ssrdKt5O/A6qYDY=
+	t=1729273183; cv=none; b=hJJQo0IlEFhVXF8G5vqizr9lUynzllEnzWyw8+fGq4P5ekH12TrHMOCNDQvsvQTaspABCepUiA0lPZhzkFfn2n16oR2CWI4KCzeJ036+Qysut3F/+e4YkAJIYcFRmmCx4hwxEnkpO/IpggJgfuu+dowoUWA80FNE03VxvJiUvqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729272448; c=relaxed/simple;
-	bh=VlIfCeOCYHviD838Htt2ZFgVvGpRFb064P8wHF6L5ks=;
+	s=arc-20240116; t=1729273183; c=relaxed/simple;
+	bh=yUJF5lQ/HksuBemm3uZw6pkqyzUQSmaorwLeuiHQFlU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hBBNh3eEL/rlZytubeylQF8WgyB3pIf+POgLs5dnrKb0yGHQk9eEJ+yk13ZSSnlIJvOCma+Vf+MPRgQLC5OIYLUuE151FoS0F7yAoDeFsL4qMr/5jPR0cmkLuRNz8pqHhWv5LYu67c837nmqyNxWKHHNlrGFCAM4jJCA10lYnqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DLQv6oP2; arc=none smtp.client-ip=209.85.221.49
+	 To:Cc:Content-Type; b=TLKCw16GKaJ6+PLF6+y5i3ICX680KTHQEcAfEyyb8p0m2roYusiUk4mAZG//+6UZpqlmyy9pWSvO0XRgBrCE1EflQ90TmJFQwj+PqS8ZyU4nG02Xy/2D4Lek6RfCadIpyfNDzB9T/mM1JNn4ETR8CNT1F4Ne27g5v1NKOxnCXuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aHxk4GJq; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37d4ac91d97so2350173f8f.2;
-        Fri, 18 Oct 2024 10:27:25 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-431195c3538so21731165e9.3;
+        Fri, 18 Oct 2024 10:39:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729272444; x=1729877244; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729273179; x=1729877979; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=92JIeKcyj6DKUiC6YryG10zMLa3wiMB0RTYm/202bFU=;
-        b=DLQv6oP2phwUNkMgjc7hnTXY5MQUkjD7ut+6Qq+6xqYI8SXAvpVRvFQsgg+S8WvoqT
-         4jVLCbNpvozlMWtJx7Npg731KWina8YJ56fbijrM0f2KfoVpnklnjbkonkm4NzH3LJky
-         Q7AGdXnKxotZ0W1bXZSSzOWEdVxaafkejYFSLpac5fF12NDZ3KQWmMOehoiPZXX1OHBu
-         m/3CusamSa9thZgDmvpYct4VG87H68gC6t6LelATtPz7EDVy2qT0UXor19L3V5/TZ/7C
-         6z5FAZ9nwAuxnsP1IHrCqw0QloPs+R2j6bpgMBhTzxX+ke7kP++JGFdqzxb6DI0C0mRo
-         R1VQ==
+        bh=gJoEoIi8PCw2HyhDJP4sL8slKSJjLQ+CubKYpgJKLQE=;
+        b=aHxk4GJqdAU5RavPuQy+h1/qn2g9zcKdMAtyHn9Z/6vNWfvOnq/52euGUXboSUdUm8
+         DV4TvXToRJTIkcndPr8+MuzvQDH70cuuZXpeyv+vbKeUQ8hQK4x8IL75PNLVt7T1YogX
+         au8LL2AwgBZ5AR040wyoCk3rJBjpA6ekAly80DYeLUnY+ULD+XRYJXUDT06CI28gpMVK
+         nZm3NXwxjKUyCwZI3OlVAb/ajLZf+C75gJ/42nRgt5vAVJhSuladalA4kR7vcP3hBYbl
+         fbzBB1sRP6jxQpQikl+h0GFOJImTkF61cNeqWzim5hQA7MOVamOr+Pe24lAzjLK/pnhs
+         Jjxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729272444; x=1729877244;
+        d=1e100.net; s=20230601; t=1729273179; x=1729877979;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=92JIeKcyj6DKUiC6YryG10zMLa3wiMB0RTYm/202bFU=;
-        b=RxjSHvpCgDA+rihvjz2u9PYw96Jw3jvn+jAH1Em0dxaLD9Wu5Un8wj490q9BRtvumy
-         +l8f8ubnVp2KKCvuWii1uVr1yOYazblWKZhS4y1C0ZXdHB/Ec/31V82paPAv2hPcw+Jt
-         KBlV2HO2VGltO7Vp0J0sgGvlinhg/UFsjnhm4Cd7su+HnwuzUJsMxqRB/97uvh8GFq0n
-         0MWloayCruP1BT75uGYarPw4w+iKALa8HVKjlS+NyDbQ1abs00UCUXE6LVKxPDAr9W8v
-         UhAVKdHi1R7Bkyt1jz2uCJGkPgy7dv8q5clTVIrkXKAjlWFYrMCU/X7jL8MjqUYHqhuq
-         7iOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUvLD6cUWld2v+AG+y9fkzEzSqUX3jJsP92huK5z9phm7e1uBdkHo/0dXAPrkwnoFFmwNDJMHrv@vger.kernel.org, AJvYcCW8s6HndM8tkfnaRkvVY7xrlUW86okgJiNtIcnd/Up2L1Efoh3rytFzviqGR+/Rt+Dp8CfY1TDKSIEiOOA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBV/HUIeQbhJZmfa2tN9MNFxU1jgOY18wnBH0vawBhTFgeHMu6
-	7X705Eu4dPC1+PfYtuWUQARsteErK9YRNaBrgU34lo7T/Ihx787Ajg/EeYNXi+1PRxtSSVDicw6
-	fEbveBuHrGMlieg/RwjG707EoDKU=
-X-Google-Smtp-Source: AGHT+IGys2BLDgm2mjdEHNZ6Cc0H/aMWsKZJ9DL+zpQUKfQJKUmosmgEMX9Iuu36JZigYsTfGl8dSriYMsqkkLs2r2s=
-X-Received: by 2002:a5d:4308:0:b0:37d:4619:f975 with SMTP id
- ffacd0b85a97d-37ea21d8b00mr2875211f8f.19.1729272443899; Fri, 18 Oct 2024
- 10:27:23 -0700 (PDT)
+        bh=gJoEoIi8PCw2HyhDJP4sL8slKSJjLQ+CubKYpgJKLQE=;
+        b=dhRaEy9exf19m5fiNN0Hyx+YJYqkck44OAuIjZgll8mzoBuOm7NBEEdD7qShCzlGt/
+         jB9WM0h5Dd4mXB/bCpebA8PWW9+A0Xda7VAGbfqyd4Q6g5tn8x2PqJAElLKWprbcm9ia
+         A8s9Lp9MLbECNFA0sURjSHuLMw7V+8HOl9POiTJP+GppHPdPCwFb1qBm0ltQ0HpuMrXI
+         NfCizqemPp5MrmkZ7ZDu3vI2VKZx6szhdUSEzlwCCfuWK/VT2XLhdC1xHytQ7x0H293i
+         JdiSmBv4IYMYoeXOJU4eT/xoA9khCPFKbSvMPplY/w5iLiYpM/hd2PvZb2edd/F6nRPG
+         OMLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVA32vQ+xBmOInIDgOrMkKkhNbitn5pMldyNgWmikMP+COpysABF8FCZX9CevN/BBQ/AYm2iylt@vger.kernel.org, AJvYcCW07Em0gMI/iCyFviL0Bw5MUiDOzKw2/vSlm+MUigNrQZEbT1B7GjigoXx6z4w7JLRl8tFbHHriIL3CceU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTfLg2Bu5LUVNX5pDCLuFWuyWpy2C0oV56k0aZVdd5Ev+75RlQ
+	lmuyPCBodmUAA3qqiDZyjqym6ARjM/vKFzOoZ0ItRx0Y/adVD30efrYzgffRPtVaIU6/wn8PW4A
+	jYmSXMAyffEnGnIJtn3KVfrjb8Sk=
+X-Google-Smtp-Source: AGHT+IHWLp+B1UjmgXd+KI44SKKzL6vpcvzDVhwqnh8ZXuHdNSpF5VtKvJi95ezinOvIFYvB92b9N56AVNtHJmhbClg=
+X-Received: by 2002:a5d:5e04:0:b0:37e:d715:3f39 with SMTP id
+ ffacd0b85a97d-37ed7154007mr247491f8f.10.1729273177846; Fri, 18 Oct 2024
+ 10:39:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241018105351.1960345-1-linyunsheng@huawei.com> <20241018105351.1960345-8-linyunsheng@huawei.com>
-In-Reply-To: <20241018105351.1960345-8-linyunsheng@huawei.com>
+References: <20241018105351.1960345-1-linyunsheng@huawei.com>
+In-Reply-To: <20241018105351.1960345-1-linyunsheng@huawei.com>
 From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 18 Oct 2024 10:26:47 -0700
-Message-ID: <CAKgT0UcBveXG3D9aHHADHn3yAwA6mLeQeSqoyP+UwyQ3FDEKGw@mail.gmail.com>
-Subject: Re: [PATCH net-next v22 07/14] mm: page_frag: some minor refactoring
- before adding new API
+Date: Fri, 18 Oct 2024 10:39:01 -0700
+Message-ID: <CAKgT0Uft5Ga0ub_Fj6nonV6E0hRYcej8x_axmGBBX_Nm_wZ_8w@mail.gmail.com>
+Subject: Re: [PATCH net-next v22 00/14] Replace page_frag with page_frag_cache
+ for sk_page_frag()
 To: Yunsheng Lin <linyunsheng@huawei.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+	Shuah Khan <skhan@linuxfoundation.org>, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Oct 18, 2024 at 4:00=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
 m> wrote:
 >
-> Refactor common codes from __page_frag_alloc_va_align() to
-> __page_frag_cache_prepare() and __page_frag_cache_commit(),
-> so that the new API can make use of them.
+> After [1], there are still two implementations for page frag:
 >
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  include/linux/page_frag_cache.h | 36 +++++++++++++++++++++++++++--
->  mm/page_frag_cache.c            | 40 ++++++++++++++++++++++++++-------
->  2 files changed, 66 insertions(+), 10 deletions(-)
+> 1. mm/page_alloc.c: net stack seems to be using it in the
+>    rx part with 'struct page_frag_cache' and the main API
+>    being page_frag_alloc_align().
+> 2. net/core/sock.c: net stack seems to be using it in the
+>    tx part with 'struct page_frag' and the main API being
+>    skb_page_frag_refill().
 >
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> index 41a91df82631..feed99d0cddb 100644
-> --- a/include/linux/page_frag_cache.h
-> +++ b/include/linux/page_frag_cache.h
-> @@ -5,6 +5,7 @@
+> This patchset tries to unfiy the page frag implementation
+> by replacing page_frag with page_frag_cache for sk_page_frag()
+> first. net_high_order_alloc_disable_key for the implementation
+> in net/core/sock.c doesn't seems matter that much now as pcp
+> is also supported for high-order pages:
+> commit 44042b449872 ("mm/page_alloc: allow high-order pages to
+> be stored on the per-cpu lists")
 >
->  #include <linux/bits.h>
->  #include <linux/log2.h>
-> +#include <linux/mmdebug.h>
->  #include <linux/mm_types_task.h>
->  #include <linux/types.h>
+> As the related change is mostly related to networking, so
+> targeting the net-next. And will try to replace the rest
+> of page_frag in the follow patchset.
 >
-> @@ -39,8 +40,39 @@ static inline bool page_frag_cache_is_pfmemalloc(struc=
-t page_frag_cache *nc)
+> After this patchset:
+> 1. Unify the page frag implementation by taking the best out of
+>    two the existing implementations: we are able to save some space
+>    for the 'page_frag_cache' API user, and avoid 'get_page()' for
+>    the old 'page_frag' API user.
+> 2. Future bugfix and performance can be done in one place, hence
+>    improving maintainability of page_frag's implementation.
 >
->  void page_frag_cache_drain(struct page_frag_cache *nc);
->  void __page_frag_cache_drain(struct page *page, unsigned int count);
-> -void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int f=
-ragsz,
-> -                             gfp_t gfp_mask, unsigned int align_mask);
-> +void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int=
- fragsz,
-> +                               struct page_frag *pfrag, gfp_t gfp_mask,
-> +                               unsigned int align_mask);
-> +unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
-> +                                           struct page_frag *pfrag,
-> +                                           unsigned int used_sz);
-> +
-> +static inline unsigned int __page_frag_cache_commit(struct page_frag_cac=
-he *nc,
-> +                                                   struct page_frag *pfr=
-ag,
-> +                                                   unsigned int used_sz)
-> +{
-> +       VM_BUG_ON(!nc->pagecnt_bias);
-> +       nc->pagecnt_bias--;
-> +
-> +       return __page_frag_cache_commit_noref(nc, pfrag, used_sz);
-> +}
-> +
-> +static inline void *__page_frag_alloc_align(struct page_frag_cache *nc,
-> +                                           unsigned int fragsz, gfp_t gf=
-p_mask,
-> +                                           unsigned int align_mask)
-> +{
-> +       struct page_frag page_frag;
-> +       void *va;
-> +
-> +       va =3D __page_frag_cache_prepare(nc, fragsz, &page_frag, gfp_mask=
-,
-> +                                      align_mask);
-> +       if (unlikely(!va))
-> +               return NULL;
-> +
-> +       __page_frag_cache_commit(nc, &page_frag, fragsz);
+> Kernel Image changing:
+>     Linux Kernel   total |      text      data        bss
+>     ------------------------------------------------------
+>     after     45250307 |   27274279   17209996     766032
+>     before    45254134 |   27278118   17209984     766032
+>     delta        -3827 |      -3839        +12         +0
+>
+> Performance validation:
+> 1. Using micro-benchmark ko added in patch 1 to test aligned and
+>    non-aligned API performance impact for the existing users, there
+>    is no notiable performance degradation. Instead we seems to have
+>    some major performance boot for both aligned and non-aligned API
+>    after switching to ptr_ring for testing, respectively about 200%
+>    and 10% improvement in arm64 server as below.
+>
+> 2. Use the below netcat test case, we also have some minor
+>    performance boot for replacing 'page_frag' with 'page_frag_cache'
+>    after this patchset.
+>    server: taskset -c 32 nc -l -k 1234 > /dev/null
+>    client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | tasks=
+et -c 1 nc 127.0.0.1 1234
+>
+> In order to avoid performance noise as much as possible, the testing
+> is done in system without any other load and have enough iterations to
+> prove the data is stable enough, complete log for testing is below:
+>
+> perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=3D16 test_po=
+p_cpu=3D17 test_alloc_len=3D12 nr_test=3D51200000
+> perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=3D16 test_po=
+p_cpu=3D17 test_alloc_len=3D12 nr_test=3D51200000 test_align=3D1
+> taskset -c 32 nc -l -k 1234 > /dev/null
+> perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc =
+127.0.0.1 1234
+>
+> *After* this patchset:
+>
 
-Minor nit here. Rather than if (!va) return I think it might be better
-to just go with if (likely(va)) __page_frag_cache_commit.
+So I still think this set should be split in half in order to make
+this easier to review. The ones I have provided a review-by for so far
+seem fine to me. I really think if you just submitted that batch first
+we can get that landed and let them stew in the kernel for a bit to
+make sure we didn't miss anything there.
 
-> +
-> +       return va;
-> +}
->
->  static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
->                                           unsigned int fragsz, gfp_t gfp_=
-mask,
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index a36fd09bf275..a852523bc8ca 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -90,9 +90,31 @@ void __page_frag_cache_drain(struct page *page, unsign=
-ed int count)
->  }
->  EXPORT_SYMBOL(__page_frag_cache_drain);
->
-> -void *__page_frag_alloc_align(struct page_frag_cache *nc,
-> -                             unsigned int fragsz, gfp_t gfp_mask,
-> -                             unsigned int align_mask)
-> +unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
-> +                                           struct page_frag *pfrag,
-> +                                           unsigned int used_sz)
-> +{
-> +       unsigned int orig_offset;
-> +
-> +       VM_BUG_ON(used_sz > pfrag->size);
-> +       VM_BUG_ON(pfrag->page !=3D encoded_page_decode_page(nc->encoded_p=
-age));
-> +       VM_BUG_ON(pfrag->offset + pfrag->size >
-> +                 (PAGE_SIZE << encoded_page_decode_order(nc->encoded_pag=
-e)));
-> +
-> +       /* pfrag->offset might be bigger than the nc->offset due to align=
-ment */
-> +       VM_BUG_ON(nc->offset > pfrag->offset);
-> +
-> +       orig_offset =3D nc->offset;
-> +       nc->offset =3D pfrag->offset + used_sz;
-> +
-> +       /* Return true size back to caller considering the offset alignme=
-nt */
-> +       return nc->offset - orig_offset;
-> +}
-> +EXPORT_SYMBOL(__page_frag_cache_commit_noref);
-> +
+As far as the others there is a bunch there for me to try and chew
+through. A bunch of that is stuff not related necessarily to my
+version of the page frag stuff that I did so merging the two is a bit
+less obvious to me. The one thing I am wondering about is the behavior
+for why we are pulling apart the logic with this "commit" approach
+that is deferring the offset update which seems to have to happen
+unless we need to abort.
 
-I have a question. How often is it that we are committing versus just
-dropping the fragment? It seems like this approach is designed around
-optimizing for not commiting the page as we are having to take an
-extra function call to commit the change every time. Would it make
-more sense to have an abort versus a commit?
+My review time is going to be limited for the next several weeks. As
+such I will likely not be able to get to a review until Friday or
+Saturday each week so sending out updates faster than that will not
+get you any additional reviews from me.
 
-> +void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int=
- fragsz,
-> +                               struct page_frag *pfrag, gfp_t gfp_mask,
-> +                               unsigned int align_mask)
->  {
->         unsigned long encoded_page =3D nc->encoded_page;
->         unsigned int size, offset;
-> @@ -114,6 +136,8 @@ void *__page_frag_alloc_align(struct page_frag_cache =
-*nc,
->                 /* reset page count bias and offset to start of new frag =
-*/
->                 nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
->                 nc->offset =3D 0;
-> +       } else {
-> +               page =3D encoded_page_decode_page(encoded_page);
->         }
->
->         size =3D PAGE_SIZE << encoded_page_decode_order(encoded_page);
+Thanks,
 
-This makes no sense to me. Seems like there are scenarios where you
-are grabbing the page even if you aren't going to use it? Why?
-
-I think you would be better off just waiting to the end and then
-fetching it instead of trying to grab it and potentially throw it away
-if there is no space left in the page. Otherwise what you might do is
-something along the lines of:
-pfrag->page =3D page ? : encoded_page_decode_page(encoded_page);
-
-
-> @@ -132,8 +156,6 @@ void *__page_frag_alloc_align(struct page_frag_cache =
-*nc,
->                         return NULL;
->                 }
->
-> -               page =3D encoded_page_decode_page(encoded_page);
-> -
->                 if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
->                         goto refill;
->
-> @@ -148,15 +170,17 @@ void *__page_frag_alloc_align(struct page_frag_cach=
-e *nc,
->
->                 /* reset page count bias and offset to start of new frag =
-*/
->                 nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> +               nc->offset =3D 0;
->                 offset =3D 0;
->         }
->
-> -       nc->pagecnt_bias--;
-> -       nc->offset =3D offset + fragsz;
-> +       pfrag->page =3D page;
-> +       pfrag->offset =3D offset;
-> +       pfrag->size =3D size - offset;
-
-I really think we should still be moving the nc->offset forward at
-least with each allocation. It seems like you end up doing two flavors
-of commit, one with and one without the decrement of the bias. So I
-would be okay with that being pulled out into some separate logic to
-avoid the extra increment in the case of merging the pages. However in
-both cases you need to move the offset, so I would recommend keeping
-that bit there as it would allow us to essentially call this multiple
-times without having to do a commit in between to keep the offset
-correct. With that your commit logic only has to verify nothing
-changes out from underneath us and then update the pagecnt_bias if
-needed.
-
->
->         return encoded_page_decode_virt(encoded_page) + offset;
->  }
-> -EXPORT_SYMBOL(__page_frag_alloc_align);
-> +EXPORT_SYMBOL(__page_frag_cache_prepare);
->
->  /*
->   * Frees a page fragment allocated out of either a compound or order 0 p=
-age.
-> --
-> 2.33.0
->
+- Alex
 
