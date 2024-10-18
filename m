@@ -1,180 +1,79 @@
-Return-Path: <netdev+bounces-136799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD949A3254
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 03:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DB199A31A2
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E748A1F23E1A
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 01:57:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C89601F23DA3
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 00:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672395103F;
-	Fri, 18 Oct 2024 01:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462312A1CF;
+	Fri, 18 Oct 2024 00:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lQRSf1Qp"
 X-Original-To: netdev@vger.kernel.org
-Received: from 19.mo582.mail-out.ovh.net (19.mo582.mail-out.ovh.net [188.165.56.177])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BFD39FD9
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 01:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.56.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A08C20E338;
+	Fri, 18 Oct 2024 00:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729216655; cv=none; b=cNx8qbiIaSQrf/gd6j42E0LP64lhgR9zZqeHbZEFsNxckp0m3ZiDMUnmYZo2MufTyG7mIYOGHKcRIx6h1QAdlGX0ikT6ZImBJJLuAcWEZr9cmEOD4nPgEmQ04672K8o9lVnnyIfCtN8hdal2jSIg0irezQ6aIDw7YWfJJ/ypaac=
+	t=1729210768; cv=none; b=OGnOZMuUc8qpbsx6UWvv4FyjBZim4xkPIle/kNKkTXyxwdleVaec+RSjlbfe8j9I3BjcBFWyal1Pj4dmMuBec9ouUoCdce5f7g6YQl3Z5bdtN62P231FCqxJuvJQa91WLTroJme6TmnC7s2fv8br/hawvGT7BaXjAWDguepHLU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729216655; c=relaxed/simple;
-	bh=RGmjlpPYW3PehpB2Eo8mGnj6MiAhOAViHDIbdb3PKDA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kIhO6UgfFUU0Kp2aUoGCewcsI0jrCVeMztd3KfkBKtb6sC482lQwqxa84/X9NrtR2ROHUHLrgQrmiu5Iwiq+lk1zOcwh65yvvs4k1DT4K6a1Ej7xwolVTm/ZHXvGX6+wqjEN+m03Kt6QWJmcmgnaZBcDqDbGMj0V+K8AIy8+hLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net; spf=pass smtp.mailfrom=remlab.net; arc=none smtp.client-ip=188.165.56.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=remlab.net
-Received: from director3.ghost.mail-out.ovh.net (unknown [10.108.25.16])
-	by mo582.mail-out.ovh.net (Postfix) with ESMTP id 4XTxhJ2r2Mz1R3K
-	for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 18:49:20 +0000 (UTC)
-Received: from ghost-submission-5b5ff79f4f-697w8 (unknown [10.110.113.13])
-	by director3.ghost.mail-out.ovh.net (Postfix) with ESMTPS id E246F1FDDD;
-	Thu, 17 Oct 2024 18:49:19 +0000 (UTC)
-Received: from courmont.net ([37.59.142.103])
-	by ghost-submission-5b5ff79f4f-697w8 with ESMTPSA
-	id KWQrLS9cEWdT4gAAMCyPwA
-	(envelope-from <remi@remlab.net>); Thu, 17 Oct 2024 18:49:19 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-103G005c882a681-abc3-40c2-bb92-d2742f8ba979,
-                    F36AD18FB65E1C038B7E86C1D349DB2E61484AA3) smtp.auth=postmaster@courmont.net
-X-OVh-ClientIp:87.92.194.88
-From: =?ISO-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>
-To: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject:
- Re: [PATCH v1 net-next 5/9] phonet: Don't hold RTNL for getaddr_dumpit().
-Date: Thu, 17 Oct 2024 21:49:18 +0300
-Message-ID: <2341285.ElGaqSPkdT@basile.remlab.net>
-Organization: Remlab
-In-Reply-To: <20241017183140.43028-6-kuniyu@amazon.com>
-References:
- <20241017183140.43028-1-kuniyu@amazon.com>
- <20241017183140.43028-6-kuniyu@amazon.com>
+	s=arc-20240116; t=1729210768; c=relaxed/simple;
+	bh=rTqcUNGVnfj9W6FUophQNbie137j2/eeYAwVzYg9QPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EGhefjO47btiwfi4TFdE4vMUdyCGVZP3JLE9prAFQR9pHxHSBFppyH4I7aQMt/73v74WFm2h1UPA8f6XfjBecoTAkXv3wOWQexzcttCfKq/GzZ6JcUeg4JVCRSonDEBbHqeUvRCNj2F7MkhsgYQY0Ybc4mUgW96OxJSwnwteX3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lQRSf1Qp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Y0dnA1gSsLh5bqvzMpUelAFboX+XZi2X6NulmPdY1Oo=; b=lQRSf1Qp0P/y5rcbkZGEChUJ/l
+	1Uc9j4cwA2TslWBh1lY9Ay6vPbSK/+uQOeUk14RnyNLXMxEba1X+p24kmKef7z1NCst8z7XwuYtgw
+	wfGIOqhNBRe4yrnLhlK6nHaocP9N3+cK0gKpmZlTQoiGZ1P4joeCoIX0nOGTkjT+JoEs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t1ahv-00AI3Z-BN; Fri, 18 Oct 2024 02:19:07 +0200
+Date: Fri, 18 Oct 2024 02:19:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Paul Davey <Paul.Davey@alliedtelesis.co.nz>
+Cc: "daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: aquantia: Add mdix config and
+ reporting
+Message-ID: <ec453754-3474-4824-b4e3-e26603e2e1d8@lunn.ch>
+References: <20241017015407.256737-1-paul.davey@alliedtelesis.co.nz>
+ <ZxD69GqiPcqOZK2w@makrotopia.org>
+ <4e8d02f84d1ae996f6492f9c53bf90a6cc6ad32e.camel@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-Ovh-Tracer-Id: 6642809453094115703
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehuddgudefvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkohgjfhgggfgtsehtqhertddttdejnecuhfhrohhmpeftrohmihcuffgvnhhishdqvehouhhrmhhonhhtuceorhgvmhhisehrvghmlhgrsgdrnhgvtheqnecuggftrfgrthhtvghrnhepffegtdfhgeevfefhhfffhedvtddvtefgleevueeukeekteevgfdtgfffvdfhgeevnecuffhomhgrihhnpehrvghmlhgrsgdrnhgvthenucfkphepuddvjedrtddrtddruddpkeejrdelvddrudelgedrkeekpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpehrvghmihesrhgvmhhlrggsrdhnvghtpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehkedvpdhmohguvgepshhmthhpohhuth
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e8d02f84d1ae996f6492f9c53bf90a6cc6ad32e.camel@alliedtelesis.co.nz>
 
-Le torstaina 17. lokakuuta 2024, 21.31.36 EEST Kuniyuki Iwashima a =C3=A9cr=
-it :
-> getaddr_dumpit() already relies on RCU and does not need RTNL.
->=20
-> Let's use READ_ONCE() for ifindex and register getaddr_dumpit()
-> with RTNL_FLAG_DUMP_UNLOCKED.
->=20
-> While at it, the retval of getaddr_dumpit() is changed to combine
-> NLMSG_DONE and save recvmsg() as done in 58a4ff5d77b1 ("phonet: no
-> longer hold RTNL in route_dumpit()").
->=20
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/phonet/pn_netlink.c | 24 +++++++++++++++---------
->  1 file changed, 15 insertions(+), 9 deletions(-)
->=20
-> diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-> index 5996141e258f..14928fa04675 100644
-> --- a/net/phonet/pn_netlink.c
-> +++ b/net/phonet/pn_netlink.c
-> @@ -127,14 +127,17 @@ static int fill_addr(struct sk_buff *skb, u32 ifind=
-ex,
-> u8 addr,
->=20
->  static int getaddr_dumpit(struct sk_buff *skb, struct netlink_callback *=
-cb)
-> {
-> +	int addr_idx =3D 0, addr_start_idx =3D cb->args[1];
-> +	int dev_idx =3D 0, dev_start_idx =3D cb->args[0];
->  	struct phonet_device_list *pndevs;
->  	struct phonet_device *pnd;
-> -	int dev_idx =3D 0, dev_start_idx =3D cb->args[0];
-> -	int addr_idx =3D 0, addr_start_idx =3D cb->args[1];
-> +	int err =3D 0;
->=20
->  	pndevs =3D phonet_device_list(sock_net(skb->sk));
-> +
->  	rcu_read_lock();
->  	list_for_each_entry_rcu(pnd, &pndevs->list, list) {
-> +		DECLARE_BITMAP(addrs, 64);
->  		u8 addr;
->=20
->  		if (dev_idx > dev_start_idx)
-> @@ -143,23 +146,26 @@ static int getaddr_dumpit(struct sk_buff *skb, stru=
-ct
-> netlink_callback *cb) continue;
->=20
->  		addr_idx =3D 0;
-> -		for_each_set_bit(addr, pnd->addrs, 64) {
-> +		memcpy(addrs, pnd->addrs, sizeof(pnd->addrs));
+> Due to this I wonder whether the mdix configuration should reject
+> ETH_TP_MDI_AUTO if auto-negotiation is disabled?
 
-Is that really safe? Are we sure that the bit-field writers are atomic w.r.=
-t.=20
-memcpy() on all platforms? If READ_ONCE is needed for an integer, using=20
-memcpy() seems sketchy, TBH.
+How does MDIX actually work? Is there anything in 802.3?
 
-> +
-> +		for_each_set_bit(addr, addrs, 64) {
->  			if (addr_idx++ < addr_start_idx)
->  				continue;
->=20
-> -			if (fill_addr(skb, pnd->netdev->ifindex, addr=20
-<< 2,
-> -					 NETLINK_CB(cb-
->skb).portid,
-> -					cb->nlh->nlmsg_seq,=20
-RTM_NEWADDR) < 0)
-> +			err =3D fill_addr(skb, READ_ONCE(pnd->netdev-
->ifindex),
-> +					addr << 2,=20
-NETLINK_CB(cb->skb).portid,
-> +					cb->nlh->nlmsg_seq,=20
-RTM_NEWADDR);
-> +			if (err < 0)
->  				goto out;
->  		}
->  	}
-> -
->  out:
->  	rcu_read_unlock();
-> +
->  	cb->args[0] =3D dev_idx;
->  	cb->args[1] =3D addr_idx;
->=20
-> -	return skb->len;
-> +	return err;
->  }
->=20
->  /* Routes handling */
-> @@ -298,7 +304,7 @@ static const struct rtnl_msg_handler
-> phonet_rtnl_msg_handlers[] __initdata_or_mo {.owner =3D THIS_MODULE,
-> .protocol =3D PF_PHONET, .msgtype =3D RTM_DELADDR, .doit =3D addr_doit, .=
-flags =3D
-> RTNL_FLAG_DOIT_UNLOCKED},
->  	{.owner =3D THIS_MODULE, .protocol =3D PF_PHONET, .msgtype =3D=20
-RTM_GETADDR,
-> -	 .dumpit =3D getaddr_dumpit},
-> +	 .dumpit =3D getaddr_dumpit, .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
->  	{.owner =3D THIS_MODULE, .protocol =3D PF_PHONET, .msgtype =3D=20
-RTM_NEWROUTE,
->  	 .doit =3D route_doit},
->  	{.owner =3D THIS_MODULE, .protocol =3D PF_PHONET, .msgtype =3D=20
-RTM_DELROUTE,
+For 10BaseT, one pair Rx, one pair Tx, i guess you can find out by
+just looking at the signal. But for 4 pairs?
 
+    Andrew
 
-=2D-=20
-R=C3=A9mi Denis-Courmont
-http://www.remlab.net/
-
-
-
+---
+pw-bot: cr
 
