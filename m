@@ -1,105 +1,110 @@
-Return-Path: <netdev+bounces-137041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46049A4136
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:32:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C559A4146
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 339CF1F24BD4
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6C2F1F241F4
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921261EE03F;
-	Fri, 18 Oct 2024 14:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FFC16B391;
+	Fri, 18 Oct 2024 14:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="COTMlYc7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FVYtLXQB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D872A18643;
-	Fri, 18 Oct 2024 14:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C103C17
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 14:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729261911; cv=none; b=cDmxjX91vQqZyRSO9bM/i6P0uSIKRtAMswgBZ53LfaEELJFedOJazkSGGK+o0QcXcbRSpcNS+b3hQAQWpM80yxJf+BDPJbTzOJHGfMonSHmI5EW99zYaAok0NBV8TOHo0Q61qStWCBGb9m9mTvsV16DR0e801dKCbQYhAQViyuM=
+	t=1729262182; cv=none; b=pzcLlWWTDkN2Pob7w0tYVJTpRHR6HV/M1EgTP9P1NpedIebrfi+HT9MoxZtw/X4kmGmlCwQQyWYx5yckdw8xxVuMnItHnrg4uAvz7xlZPqF5aD2/MCjGJJCw3khUBiqI0IRWc6URVSRHGqxjyChMGdFSH3IvO7u9CoeNsQU3k14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729261911; c=relaxed/simple;
-	bh=lk6+DyuoaJPZ7YVCRmtl2RgXqLNl2sAFoVc2fJS/8uk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L6CG/fOG7/rlPDseBjnByQvwngxLXKh3eTj/cICVzsh3p6UcearWtYOG9czzR86c7vfGLRLGXZa1EOcOG9WBEjaEcJdrpIaOvQP26VmqNYsypPFGvAoFJN0L6wrEneXaYxfeos7pSDI4j0AM8zLH6sX/Bg75SZjJlh7XV2U9GFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=COTMlYc7; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e3c0d1ccc6so241156a91.3;
-        Fri, 18 Oct 2024 07:31:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729261909; x=1729866709; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lk6+DyuoaJPZ7YVCRmtl2RgXqLNl2sAFoVc2fJS/8uk=;
-        b=COTMlYc7EAAdkT+eIVzw7O8ymxdaIon8VzXPoMuR9xCMOOYoDeXzwkLxBfDX2JZ+fE
-         XyrM9fL5nmRxT/vK51gRxqsd7+ATyxHrJJEj1xbmOm3K2EFhKB1uVeb/0un+CfO+2U1W
-         FsJbccl2+z7f5QyeqyS5ivgdirqpmNjPuZyYc4Z6/JG7t/DU9MeKfisLqeDRfrXzrbeO
-         kKmCehGDFLv8DQKurgG7m0XZAxQnbo+ZLHywcoZpr64xL09jkRawnImujYiUj4VJbHpJ
-         opHoKNtZvsyup5mi5FPPPgGX610rK+VMDauXN0r3vptxkWphY9+ab1ql2KQ1dTRyJ/Am
-         9yGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729261909; x=1729866709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lk6+DyuoaJPZ7YVCRmtl2RgXqLNl2sAFoVc2fJS/8uk=;
-        b=E0sJtnHOLOTX80fLJuyfS6BPCdUa693jPNELWUZwT7cMa1C944HyRZekMCYS+iKlVC
-         eDNjSGuq6LGaPt2rxEIo8FBJuDXLHe23/tGfoLmvNu1JWmH1FAKTxrld35+sn3gZ+NqC
-         y5MiE4Y/Vc+R1skrwbCUMde3e9VJbQ0Fk/58xBxhU6q6t6kohT88Vf0n3glyYhOXl7pn
-         pJNKCaM5gOUrt5gwz6Dz5+XVx6dMRAzONkpPtmuOp5Onv6dTS3/Px3i7ehtVQfXR+CEA
-         Ak3g15GxHZ6tOYvmlj2p9jlffqs5QhnJh7dXYqe6965gawYz2s6cc/rxmSf+8IG8k6kE
-         5Zsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjsorKrcj9vrzIGd+g7K9BUWWi+VKEH5/0e1LupsuM39Qf+cDskFA2alk2Y4QmeXeuzQ2PfqIl64/67L9bsz0=@vger.kernel.org, AJvYcCVtR+rBwhWENrI22/nefLBwM6RNpNBB43nuWUeDKs4OkhdW7Gt4ljkCT+RjfLJhKLkl+ypCUNWT@vger.kernel.org, AJvYcCWm5G/goUOhh0jNZ5fZaMerA9fNwzuYem6p3TJ/Cy9/uSuPmIAvW0vE3ELQEtz0d88HCS/FpFojDmVwtBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHNBwV5LABu8LAY35SPdkSalUVJHGl9K/Hipvqq/Wg6buGK0wD
-	CMe3A3wKwNH6DUplW9XO5W0Gj4he3gn8A+tcgxXHaXrKV7qT+iwfimWLQH+ZoNol24xHKFAvD6t
-	SIpWZjzCIDD+CY6Q0rslAQ2twnSbMaMI7
-X-Google-Smtp-Source: AGHT+IE6AwVCtS8wCr7hW9IxbnDDZwoHZNPMOUU43Die0A8kevsXu3rEj4UHploq8tNCukIU1YN3JW+Iii5mbXoy/WM=
-X-Received: by 2002:a17:90b:538f:b0:2e2:da8c:3fb8 with SMTP id
- 98e67ed59e1d1-2e56172b2d8mr1472322a91.6.1729261907506; Fri, 18 Oct 2024
- 07:31:47 -0700 (PDT)
+	s=arc-20240116; t=1729262182; c=relaxed/simple;
+	bh=wPuR21ClbW8Xi//YoTjn/Kd+BNGyFAgQlcDIkSuCMYU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dM/DMk3W440BT2mXxw3X9wiYb5HG2CZMA0Tz5Wo+SLC7vPgymnGzfNWw4LvfnPk4A/rxjeoTiiSjvHnsHbPtfG8RMk1TdvtV9bMHvN9KwKDltzzSCeNHs2ebJrIxOM5lczuu79RoDZGqj855Hb0BFtr8LqpOEgF47lR++dFTuOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FVYtLXQB; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 10BE2C0003;
+	Fri, 18 Oct 2024 14:36:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1729262171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/fFWn83Pg6BvGewuIo3d4T/1Ho7wC4ifedJDVSkBFS0=;
+	b=FVYtLXQBSm6nRHK88oUHZJHxSmGZsRvIkGI+z570aXbjxKVyvz+Lgn4XwoDiAtVAYRLjym
+	Ru2x7AwzhzjTZjvL6WJ/UaTxmXWY6PoIrre0jr3RRN1fE/oiQXfJKDsmvNh1M7KbwI/gHM
+	Us0VMqd6K0rUyoeZo6caEg/HD8caoiE1UFfmhL1dMFpVSz1diFClgv+aKKV0PQk44YGnPZ
+	qePst4SUdBckPj9dIv7b0BiELsQxtVqpwWYwITv4hXvZX76JBrTlINM4YmReeQfoZFOjqk
+	/e2oFrdKMHAlepGZ62wYZ5/Ent5V6OYz7cec1fNvLL80Hz3RufY12Wt71QUMtA==
+Date: Fri, 18 Oct 2024 16:36:10 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1] tools/net/ynl: improve async notification
+ handling
+Message-ID: <20241018163610.4b4152ec@kmaincent-XPS-13-7390>
+In-Reply-To: <20241018093228.25477-1-donald.hunter@gmail.com>
+References: <20241018093228.25477-1-donald.hunter@gmail.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-3-fujita.tomonori@gmail.com> <6bc68839-a115-467f-b83e-21be708f78d7@lunn.ch>
-In-Reply-To: <6bc68839-a115-467f-b83e-21be708f78d7@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 18 Oct 2024 16:31:34 +0200
-Message-ID: <CANiq72=_9cxkife3=b7acM7LbmwTLcXMX9LZpDP2JMvy=z3qkA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/8] rust: time: Introduce Delta type
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu, 
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org, 
-	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Fri, Oct 18, 2024 at 3:50=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> Wasn't there a comment that the code should always round up? Delaying
-> for 0 uS is probably not what the user wants.
+On Fri, 18 Oct 2024 10:32:28 +0100
+Donald Hunter <donald.hunter@gmail.com> wrote:
 
-This is not delaying, though, so I don't see why a method with this
-name should return a rounded up value.
+> The notification handling in ynl is currently very simple, using sleep()
+> to wait a period of time and then handling all the buffered messages in
+> a single batch.
+>=20
+> This patch changes the notification handling so that messages are
+> processed as they are received. This makes it possible to use ynl as a
+> library that supplies notifications in a timely manner.
+>=20
+> - Change check_ntf() to be a generator that yields 1 notification at a
+>   time and blocks until a notification is available.
+> - Use the --sleep parameter to set an alarm and exit when it fires.
+>=20
+> This means that the CLI has the same interface, but notifications get
+> printed as they are received:
+>=20
+> ./tools/net/ynl/cli.py --spec <SPEC> --subscribe <TOPIC> [ --sleep <SECS>=
+ ]
+>=20
+> Here is an example python snippet that shows how to use ynl as a library
+> for receiving notifications:
+>=20
+>     ynl =3D YnlFamily(f"{dir}/rt_route.yaml")
+>     ynl.ntf_subscribe('rtnlgrp-ipv4-route')
+>=20
+>     for event in ynl.check_ntf():
+>         handle(event)
 
-Moreover, `ktime_to_us` doesn't round up. The standard library one
-doesn't, either.
+Tested-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Cheers,
-Miguel
+Thank you!
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
