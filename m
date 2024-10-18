@@ -1,168 +1,169 @@
-Return-Path: <netdev+bounces-137150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF00E9A499C
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 00:24:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10A619A49A8
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 00:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 562271F24B4A
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:24:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56E49B228EC
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A25718DF78;
-	Fri, 18 Oct 2024 22:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4BC190667;
+	Fri, 18 Oct 2024 22:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oeP4fcHr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TgTGP/U7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA3320E33E
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 22:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B1218CBF5;
+	Fri, 18 Oct 2024 22:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729290276; cv=none; b=TRLcTRCNUdmW7Z7/2+mnAlWdbreEgqFzhsDgkptloLcofAjwpdbTLcko1lQ+lNB8pSIKmWxQCusCZ/Re2sFrZ5hsS3HOmGuEfejNmpLdwQ7ts9rkhSqyEeypC76+KhNGKaFAZ0ufaFdHcV3tqAC6qHoVj0Exib0Dux6GBaBMrJc=
+	t=1729290533; cv=none; b=XbVA/gzCiXgedhg0uV8PkR0WG2Y+5fYGb/k674ud9qpG6K9RPJLUQnG47F59tDKR8n9ZRDrOqV/yezC99bGfgoeGA0sLQX99xCVLVyBoZ1ge7qGNQvbdrvETjTJdDnmwSqAS7mram8+EGUnkBwe06V86TQiWHHsOsdcN6zN9Yc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729290276; c=relaxed/simple;
-	bh=vxZcH5rIBYgjyxT1GmU2qDI5uEdaUNWYxojiDonAAHg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ne/7vOB5q7LwWFGMGybmvvK63BPiH5lf0g/aQHBqjGsj3G0QA7ftY2ko46pCahEsjOpN0zwuSNIG/ZbE+0C0JFGLQrHqupsFM0G3i/he8rYxJ7InBN4usL97/ZsyuRuqf3QL1gZW3p2gIOyQFcUO1v8rYpLI+yUVGTTI/sQx5b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oeP4fcHr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49IEujid029139;
-	Fri, 18 Oct 2024 22:24:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=+cvx4qwwpEYQSvlp4LPY7BsXeKTPSa227I6
-	SuDbe0Vc=; b=oeP4fcHro0l87PCo/izzH8ZHfdO+rnqc3FfWhzNc6gOlxC7vUcQ
-	dOUg/mF32RRryVsz4/9LMLhFJplNWDmnSyQb4JWAQGyvfBEY+0iscZloMPv2Oza5
-	6cRfBY90z7x4o4qUc11HopmzdXTm7WS1jIrukc9FnukKlWsCr+Bea98ZHrXTj68v
-	MFMvcSuth0JouE8NFdztYCYYYSh56Lh1KxuMSfdugVWjmo4VobwvxaYVE12FaAeO
-	/pF25Fi+seNJp3MReqHM7jlbJ7q3shUzyQSqX0L0TB/zeNWOvPOsRkQ7u/vkdAwx
-	/YHwAQXS5jSdWOOGjEpIlflF7xDBRbbVnCA==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42bhbqapss-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 22:24:09 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA05.qualcomm.com [127.0.0.1])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 49IMK8kv013073;
-	Fri, 18 Oct 2024 22:24:08 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA05.qualcomm.com (PPS) with ESMTPS id 42bphq4mt1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 22:24:08 +0000
-Received: from NALASPPMTA05.qualcomm.com (NALASPPMTA05.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 49IMNNIW016809;
-	Fri, 18 Oct 2024 22:24:08 GMT
-Received: from hu-devc-lv-u20-c-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.47.232.24])
-	by NALASPPMTA05.qualcomm.com (PPS) with ESMTPS id 49IMO8Hw017547
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 22:24:08 +0000
-Received: by hu-devc-lv-u20-c-new.qualcomm.com (Postfix, from userid 214165)
-	id 034BA22064; Fri, 18 Oct 2024 15:24:07 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>,
-        Jon Hunter <jonathanh@nvidia.com>
-Cc: kernel@quicinc.com
-Subject: [PATCH net v1] net: stmmac: Disable PCS Link and AN interrupt when PCS AN is disabled
-Date: Fri, 18 Oct 2024 15:24:07 -0700
-Message-Id: <20241018222407.1139697-1-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1729290533; c=relaxed/simple;
+	bh=G7Ash0PGoqdQ1AiafmIA65zN/S2zqb3jjZ3jwkABAmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=J/h+5MnbWEJ2cEmbXFbc3MLoVuAJGfvQaja0GbOUfVHWmChsxkTb6lBwQeg9g9URq6yLOliakZKlllA2ivEY1IecO7MZjWa06ylCPhkwVfxv7yM8WpIAJY54uaga++uU+JVotcw1FyN2snqnmrXNnW6CspTGOI8qvKfthIavcFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TgTGP/U7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83466C4CEC3;
+	Fri, 18 Oct 2024 22:28:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729290532;
+	bh=G7Ash0PGoqdQ1AiafmIA65zN/S2zqb3jjZ3jwkABAmI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=TgTGP/U7RKKcvPPDH/bduN4P+U9gnrm0Owu3NhDvqbrFzpKYGJofveh67iMhF47gx
+	 DxVHWjcKgwrn0iaN76NwGiQWk7/xxcY4rQ+L7pp1Nd2Kkk8TtzJo0YFYXbvIMxdEF0
+	 J98vlhBXDMn0lJZ7WllGBfhRVDNosEI0FDeDXB/ThdbS9hWCIKjA2foUu2K9he0EGJ
+	 S+NQxiL+7x4VLYidgjOMEj9kW0pDFYr1mO2ilHgqV71iwnLywxOWjlcAupEJSfjrS9
+	 2j1cm0fzRHFBQBJ78vHz0A0bjwC5hD5OBpJSPRFaKgLnRJcC4ltNXYLLZf1cuA+LuL
+	 BJ2cjkBNl6jwg==
+Date: Fri, 18 Oct 2024 17:28:50 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>, Lizhi Hou <lizhi.hou@amd.com>
+Subject: Re: [PATCH 03/11] PCI: of_property: Sanitize 32 bit PCI address
+ parsed from DT
+Message-ID: <20241018222850.GA766393@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: nw6KsqhYcNVQIR2DbZb4gluPPVHacxjE
-X-Proofpoint-GUID: nw6KsqhYcNVQIR2DbZb4gluPPVHacxjE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 phishscore=0 mlxscore=0 bulkscore=0
- clxscore=1015 suspectscore=0 mlxlogscore=979 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410180143
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZxJXZ9R-Qp9CNmJk@apocalypse>
 
-Currently we disable PCS ANE when the link speed is 2.5Gbps.
-mac_link_up callback internally calls the fix_mac_speed which internally
-calls stmmac_pcs_ctrl_ane to disable the ANE for 2.5Gbps.
+On Fri, Oct 18, 2024 at 02:41:11PM +0200, Andrea della Porta wrote:
+> On 20:08 Mon 07 Oct     , Bjorn Helgaas wrote:
+> ... 
 
-We observed that the CPU utilization is pretty high. That is because
-we saw that the PCS interrupt status line for Link and AN always remain
-asserted. Since we are disabling the PCS ANE for 2.5Gbps it makes sense
-to also disable the PCS link status and AN complete in the interrupt
-enable register.
+> > Yes, this is exactly the problem.  The pci@0 parent and child
+> > addresses in "ranges" are both in the PCI address space.  But we
+> > start with pdev->resource[N], which is a CPU address.  To get the PCI
+> > address, we need to apply pci_bus_address().  If the host bridge
+> > windows are set up correctly, the window->offset used in
+> > pcibios_resource_to_bus() should yield the PCI bus address.
+> 
+> You mean something like this, I think:
+> 
+> @@ -129,7 +129,7 @@ static int of_pci_prop_ranges(struct pci_dev *pdev, struct of_changeset *ocs,
+>                 if (of_pci_get_addr_flags(&res[j], &flags))
+>                         continue;
+>  
+> -               val64 = res[j].start;
+> +               val64 = pci_bus_address(pdev, &res[j] - pdev->resource);
+>                 of_pci_set_address(pdev, rp[i].parent_addr, val64, 0, flags,
+>                                    false);
+>                 if (pci_is_bridge(pdev)) {
 
-Interrupt storm Issue:-
-[   25.465754][    C2] stmmac_pcs: Link Down
-[   25.469888][    C2] stmmac_pcs: Link Down
-[   25.474030][    C2] stmmac_pcs: Link Down
-[   25.478164][    C2] stmmac_pcs: Link Down
-[   25.482305][    C2] stmmac_pcs: Link Down
-[   25.486441][    C2] stmmac_pcs: Link Down
-[   25.486635][    C4] watchdog0: pretimeout event
-[   25.490585][    C2] stmmac_pcs: Link Down
-[   25.499341][    C2] stmmac_pcs: Link Down
-[   25.503484][    C2] stmmac_pcs: Link Down
-[   25.507619][    C2] stmmac_pcs: Link Down
-[   25.511760][    C2] stmmac_pcs: Link Down
-[   25.515897][    C2] stmmac_pcs: Link Down
-[   25.520038][    C2] stmmac_pcs: Link Down
-[   25.524174][    C2] stmmac_pcs: Link Down
-[   25.528316][    C2] stmmac_pcs: Link Down
-[   25.532451][    C2] stmmac_pcs: Link Down
-[   25.536591][    C2] stmmac_pcs: Link Down
-[   25.540724][    C2] stmmac_pcs: Link Down
-[   25.544866][    C2] stmmac_pcs: Link Down
+Yes.
 
-Once we disabled PCS ANE and Link Status interrupt issue
-disappears.
+> > I think it should look like this:
+> > 
+> >   pci@0: <0x82000000 0x0 0x00000000 0x82000000 0x0 0x00000000 0x0 0x600000>;
+> 
+> indeed, with the above patch applied, the result is exactly as you expected.
+> ...
 
-Fixes: a818bd12538c ("net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII")
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+> > > > But I don't think it works in general because there's no
+> > > > requirement that the host bridge address translation be that
+> > > > simple.  For example, if we have two host bridges, and we want
+> > > > each to have 2GB of 32-bit PCI address space starting at 0x0,
+> > > > it might look like this:
+> > > > 
+> > > >   0x00000002_00000000 -> PCI 0x00000000 (subtract 0x00000002_00000000)
+> > > >   0x00000002_80000000 -> PCI 0x00000000 (subtract 0x00000002_80000000)
+> > > > 
+> > > > In this case simply ignoring the high 32 bits of the CPU
+> > > > address isn't the correct translation for the second host
+> > > > bridge.  I think we should look at each host bridge's
+> > > > "ranges", find the difference between its parent and child
+> > > > addresses, and apply the same difference to everything below
+> > > > that bridge.
+> > > 
+> > > Not sure I've got this scenario straight: can you please provide
+> > > the topology and the bit setting (32/64 bit) for those ranges?
+> > > Also, is this scenario coming from a real use case or is it
+> > > hypothetical?
+> > 
+> > This scenario is purely hypothetical, but it's a legal topology
+> > that we should handle correctly.  It's two host bridges, with
+> > independent PCI hierarchies below them:
+> > 
+> >   Host bridge A: [mem 0x2_00000000-0x2_7fffffff window] (bus address 0x00000000-0x7fffffff)
+> >   Host bridge B: [mem 0x2_80000000-0x2_ffffffff window] (bus address 0x00000000-0x7fffffff)
+> > 
+> > Bridge A has an MMIO aperture at CPU addresses
+> > 0x2_00000000-0x2_7fffffff, and when it initiates PCI transactions on
+> > its secondary side, the PCI address is CPU_addr - 0x2_00000000.
+> > 
+> > Similarly, bridge B has an MMIO aperture at CPU addresses 
+> > 0x2_80000000-0x2_ffffffff, and when it initiates PCI transactions on 
+> > its secondary side, the PCI address is CPU_addr - 0x2_80000000.
+> > 
+> > Both hierarchies use PCI bus addresses in the 0x00000000-0x7fffffff
+> > range.  In a topology like this, you can't convert a bus address back
+> > to a CPU address unless you know which hierarchy it's in.
+> > pcibios_bus_to_resource() takes a pci_bus pointer, which tells you
+> > which hierarchy (and which host bridge address translation) to use.
+> 
+> Agreed. While I think about how to adjust that specific patch,i
+> let's drop it from this patchset since the aforementioned change is
+> properly fixing the translation issue.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-index e65a65666cc1..db77d07af9fe 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-@@ -751,7 +751,16 @@ static void dwmac4_flow_ctrl(struct mac_device_info *hw, unsigned int duplex,
- static void dwmac4_ctrl_ane(void __iomem *ioaddr, bool ane, bool srgmi_ral,
- 			    bool loopback)
- {
-+	u32 intr_mask = readl(ioaddr + GMAC_INT_EN);
-+
- 	dwmac_ctrl_ane(ioaddr, GMAC_PCS_BASE, ane, srgmi_ral, loopback);
-+
-+	if (!ane)
-+		intr_mask &= ~(GMAC_INT_PCS_LINK | GMAC_INT_PCS_ANE);
-+	else
-+		intr_mask |= (GMAC_INT_PCS_LINK | GMAC_INT_PCS_ANE);
-+
-+	writel(intr_mask, ioaddr + GMAC_INT_EN);
- }
- 
- static void dwmac4_get_adv_lp(void __iomem *ioaddr, struct rgmii_adv *adv)
--- 
-2.25.1
+OK.  I assume you mean to drop the "PCI: of_property: Sanitize 32 bit
+PCI address parsed from DT" patch?  Or replace it with the
+pci_bus_address() addition above?
 
+Bjorn
 
