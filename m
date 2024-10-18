@@ -1,84 +1,109 @@
-Return-Path: <netdev+bounces-136997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A579A9A3E5A
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D759F9A3E6C
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B46285530
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119661C252E9
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653EE1CABA;
-	Fri, 18 Oct 2024 12:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6089C24A08;
+	Fri, 18 Oct 2024 12:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sdomi.pl header.i=@sdomi.pl header.b="W2uTPuKF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DtzUUyeC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.sakamoto.pl (mail.sakamoto.pl [185.236.240.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C8F8F6B
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 12:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.236.240.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E38CF9F8;
+	Fri, 18 Oct 2024 12:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729254516; cv=none; b=AgC1QgReae+QgDy6MzjJzCbmwm48FvRgAlh9Xo2hy8sAxsOWeCKmi9Y5LZtjAogWiX1jfJxehYjpSZo9NhwWl38RHh35TnC93kx4xEQCzBNW8BLP4Iyfh3sZ1Wzodv9TzYHemHzbL+HEWMK8y6V2OddDTqBkVdIkM6wLlS1gxnQ=
+	t=1729254599; cv=none; b=sC/OeJiQsM2sIZwWNQcjAWkGNoQC/YMneNgskVs7Al9hb7i18NlRb3wK8YyTJfKWvsqd21f1vd5Rw6UqjdmAHEOKqPlFF/CnKsy2O6nvlHK6tlFgn2yt3O+qv9MN7OddKMZojfNShsot67Z17YEnSjAdMIkwgmXql/tHsrh0PFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729254516; c=relaxed/simple;
-	bh=P6IsbH+nZkv6eZ26hDpz1oRZ+3Cmmi3ObKHQv6Ej3CU=;
-	h=MIME-Version:Date:From:To:Subject:Message-ID:Content-Type; b=j3Kks0D5/KcciCSLdpt9A9GdE4xOiVAreBtTqDZD7N9CP+TF4rAF6+qVhudoWj0IIY+ZhSkXAyZUAVmneVbD7J/EAG2/uZoB+U6jUtPiaeCtcpB2ZQSYHYkCWFmu6HFt8y0N4aaRC5wf35HTPuiyuyZ9VjTsYUssugcwDr54/f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sdomi.pl; spf=pass smtp.mailfrom=sdomi.pl; dkim=pass (2048-bit key) header.d=sdomi.pl header.i=@sdomi.pl header.b=W2uTPuKF; arc=none smtp.client-ip=185.236.240.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sdomi.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sdomi.pl
-Authentication-Results: mail.sakamoto.pl;
-	auth=pass (login)
+	s=arc-20240116; t=1729254599; c=relaxed/simple;
+	bh=HLjQKmdaYxfy+8LnQVOaIQoMvuAC/MShmNTH0mnP6Gc=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=Vc09TVFW5YC/CEvtPwL1uK0uE0B6NtsZi8NiScVvXEiUiJdWykpstpmfYWlrrqfbTVw3OoWE/j72haPFRulvLOxEVLEvqaSrm7c97gT3AL7bjkYPg9Od5M5bWkO3FldjplPk+1pnD3/DhbVzUTk5YS/urDX+6wQ5gfOMrOzuG6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DtzUUyeC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36102C4CEC3;
+	Fri, 18 Oct 2024 12:29:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729254598;
+	bh=HLjQKmdaYxfy+8LnQVOaIQoMvuAC/MShmNTH0mnP6Gc=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=DtzUUyeC51vOuVASHib2mwMSVPbHWlCu+bBFYRxWb4UZ1KQfm2d7Uc5EDuyXxLlKY
+	 iiLRvAjSAO5ved8NR3eTX6agpPgc8YjkaoYEawUOJ/ovaSQkN/lWu9WPorgJbRnLji
+	 xTz6mqx+/CIeqgQzqKAfN9IscOMwO5hqOBvGu/k4gmDezNkBYmfn+ea7h1bZJpCPiK
+	 gL2ZgrBirQSNz0fMyZC1jMDDxGJqnbICpLBQfIqcXbfV59+Uv5u/e2OF2Nv/yqBtJP
+	 Unur8Md4EKLJyTdEfN+udx93z9JLR6JILhEJh8RkoLU8AFBIZ1PP5FQiog/cdl9kJr
+	 QmFHozuTcbQGg==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 18 Oct 2024 13:27:26 +0100
-From: sdomi <ja@sdomi.pl>
-To: netdev@vger.kernel.org
-Subject: iproute2: unexpected expansion of IPv4 addresses
-Message-ID: <8c354331845a3ac599e84c3759da5944@sdomi.pl>
-X-Sender: ja@sdomi.pl
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Received: from localhost (Unknown [127.0.0.1])
-	by mail.sakamoto.pl (Haraka/3.0.3) with ESMTPSA id 90D2A1BB-332C-4916-9A38-C47D9C39EE8F.1
-	envelope-from <ja@sdomi.pl>
-	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
-	Fri, 18 Oct 2024 14:27:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=sdomi.pl; s=s20200821613;
-	h=from:subject:date:message-id:to:mime-version;
-	bh=P6IsbH+nZkv6eZ26hDpz1oRZ+3Cmmi3ObKHQv6Ej3CU=;
-	b=W2uTPuKF1QRBroAkWxzAWUYeuuPwAx+8NZmr+b0sfjxyipgOac/Usk1Vb2gvKXVl8TFjUuDhXJ
-	5vJcIxRykYZJQdAEbqT9lNLJkJcXI/8QhLztt0odyHCormbeib5lQRzoMn+sS9Amc6n9OYUryfX8
-	JzlfOVFrlINShmWDc3udGyBi/wpC40RRnDytUxhynPdOnIn5NtHLAv/QHzByyok77OAJq1da+QeB
-	VJ9SkKCtnMlJ4/+x+s7N+6jRb6N/C1RjZKGkG4Hch9INtsXMteDbqULac3uFf+BqM0lbSye919GS
-	8qhj6I6dnfFlbSLuTvQhkBOOZaPNbboMW0SNDAjg==
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241017072534.127519-1-liujing@cmss.chinamobile.com>
+References: <20241017072534.127519-1-liujing@cmss.chinamobile.com>
+Subject: Re: [PATCH] selftests: netfilter: remove unused rplnlh parameter
+From: Antoine Tenart <atenart@kernel.org>
+Cc: kadlec@netfilter.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Liu Jing <liujing@cmss.chinamobile.com>
+To: Liu Jing <liujing@cmss.chinamobile.com>, pablo@netfilter.org
+Date: Fri, 18 Oct 2024 14:29:54 +0200
+Message-ID: <172925459485.589680.8839743987026835475@kwain.local>
 
-Hi,
+Quoting Liu Jing (2024-10-17 09:25:34)
+> The rplnlh parameter is not used in many functions, so delete it.
+>=20
+> Signed-off-by: Liu Jing <liujing@cmss.chinamobile.com>
+> ---
+>  tools/testing/selftests/net/netfilter/conntrack_dump_flush.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c=
+ b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+> index bd9317bf5ada..e03ddc60b5d4 100644
+> --- a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+> +++ b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+> @@ -96,7 +96,6 @@ static int conntrack_data_insert(struct mnl_socket *soc=
+k, struct nlmsghdr *nlh,
+>                                  uint16_t zone)
+>  {
+>         char buf[MNL_SOCKET_BUFFER_SIZE];
+> -       struct nlmsghdr *rplnlh;
+>         unsigned int portid;
+>         int err, ret;
 
-I'm running iproute2-6.10.0 (from Alpine edge repositories), and I 
-noticed that when manipulating the routes using short-hand addresses, 
-the expansion is conducted in an unusual manner:
+While at it, it seems 'err' is not used as well. In the two other
+functions as well.
 
-`ip r a 1.1 via 127.1` will result in `1.1.0.0 via 127.1.0.0 dev lo`, 
-while I'd expect it to be equivalent to `ip r a 1.0.0.1 via 127.0.0.1`.
+Thanks!
+Antoine
 
-The same issue is present when manipulating addresses (e.g. `ip a a 
-127.1.1 dev lo` results in `127.1.1.0` instead of `127.1.0.1`)
-
-FWIW, I wasn't able to find an RFC which specified how this should be 
-implemented, and the deeper I look into it, the more it feels like a 
-40-year old BSD4.2 quirk that somehow lives on. Nonetheless, I think it 
-would be nice to either validate against using shorthands (as it can 
-cause confusion), or mimic what `ping` and other such utilities do.
-
-~sdomi
+> @@ -212,7 +211,7 @@ static int count_entries(const struct nlmsghdr *nlh, =
+void *data)
+>  static int conntracK_count_zone(struct mnl_socket *sock, uint16_t zone)
+>  {
+>         char buf[MNL_SOCKET_BUFFER_SIZE];
+> -       struct nlmsghdr *nlh, *rplnlh;
+> +       struct nlmsghdr *nlh;
+>         struct nfgenmsg *nfh;
+>         struct nlattr *nest;
+>         unsigned int portid;
+> @@ -259,7 +258,7 @@ static int conntracK_count_zone(struct mnl_socket *so=
+ck, uint16_t zone)
+>  static int conntrack_flush_zone(struct mnl_socket *sock, uint16_t zone)
+>  {
+>         char buf[MNL_SOCKET_BUFFER_SIZE];
+> -       struct nlmsghdr *nlh, *rplnlh;
+> +       struct nlmsghdr *nlh;
+>         struct nfgenmsg *nfh;
+>         struct nlattr *nest;
+>         unsigned int portid;
 
