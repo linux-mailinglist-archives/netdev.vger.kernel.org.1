@@ -1,56 +1,75 @@
-Return-Path: <netdev+bounces-136939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB549A3B47
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:21:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E39C9A3B55
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7274B2732C
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:20:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C83231F282CB
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831FA204928;
-	Fri, 18 Oct 2024 10:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4F620110F;
+	Fri, 18 Oct 2024 10:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f9xc7MGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787802038C9;
-	Fri, 18 Oct 2024 10:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6D3201103
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 10:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729246654; cv=none; b=Ua3IcCvO6jYGcDt5BMRcqds5+mpbpc8+NC7Law703CpVZjBpt2ru1RhFnznZVyZe/OUeQOasaOkITukODFbNxHUwttZeRRWxedB22hsbg8f3oBpVjAVZsThEXa3MpYR8uuvuNfENa3dO8AWkQYY1vUzkgWQlFiQ4+VYe5M8W1wU=
+	t=1729246835; cv=none; b=Wz0KSSfgtAfneZuayAPtSm6EQQzQXJMM8sMgV7Y9y5aYhlbTs/5AVnUvz4wnDo6pXCbSvDPtuhE5vb1CE45R2L8Xb42JymDku+527z3SrOfLovcsBMMOjIZWBGVVME++IH23WP5HKXcRibWSXrJrJGE/tqkKo9TNc97YdYoluAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729246654; c=relaxed/simple;
-	bh=eMbUoafWMeG/UhqmuGxOmA4MhgwPVoTSzE/aWUVtWgc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=emwrdojHmNIaTYQ2/PmUAY8lzGw63X/bg3ROM5EkDBzYLtFlOpYpxqZPvVhclMDhKqKzcKQv9e7SnuTsNmIN1YsA4rlQsokYxLUuSWUsWdIZKbSo7wMPLi8HSO4geA39syJR32uBl7D9URSxpxzYmr7FAWBzYs92KbRCJSSakBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XVLHN3rHsz1ynL4;
-	Fri, 18 Oct 2024 18:17:36 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 445691A0188;
-	Fri, 18 Oct 2024 18:17:30 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 18 Oct 2024 18:17:29 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <salil.mehta@huawei.com>
-CC: <liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
-	<shaojijie@huawei.com>, <lanhao@huawei.com>, <chenhao418@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V2 net 9/9] net: hns3: fix kernel crash when 1588 is sent on HIP08 devices
-Date: Fri, 18 Oct 2024 18:10:59 +0800
-Message-ID: <20241018101059.1718375-10-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241018101059.1718375-1-shaojijie@huawei.com>
-References: <20241018101059.1718375-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1729246835; c=relaxed/simple;
+	bh=e9uLaKTheKL5xtL5zMJo5ZwoczWkxk2mcJeLnAVKWi0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cDQ038LKN1XntkDE4M/nyTYf/M3bjUH3TIWQ8SPScp0y8ecRr4/y/pWJhXuU5D+ig+7RwScc6ocdzR5o7wpdoZItZ3XXTY+W5aaYqSX/1ladMftxghJBvYHdXcGjZK+Pj2Y/rkHP0/RR9wktPCv74WV95LYk6MWFfNxSF1E/XZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f9xc7MGD; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729246834; x=1760782834;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=e9uLaKTheKL5xtL5zMJo5ZwoczWkxk2mcJeLnAVKWi0=;
+  b=f9xc7MGDMPcHDhNCy33W++8mX5X8Z6Clo38Ed/SxXEVCHfzSVpy3HIsP
+   JHguiGCZlpfKIa1PgU8/SWRD7mHsTk289RJb4SMW23VCTVSVfrkuJRaRN
+   CEXsIQptEgoqQAkPDq0kfys3ne1AlWgGoWyOxdjvFX2Nx7Y2yRAeXli6M
+   eyWzdpSrO1ZqJl69yqFoWw5v0ucHswetNGFVkCtbjHqA24OD8RjNjw4e8
+   Km1yTcbau+AwVHzRwCG8q2IU4yetA2yqIfHu5GuWcVfsbQdwTv1/xOA38
+   2GjsQNrdTc0MJwBgd5pcIdPJ3d/2T2tz3DLSAdu346+/jVi5qpmK2vlW2
+   A==;
+X-CSE-ConnectionGUID: GmwVddUrTHeiGUlV5pCAKA==
+X-CSE-MsgGUID: dxfhr+ezRVa3NJAbweGWXQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11228"; a="39401215"
+X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
+   d="scan'208";a="39401215"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 03:20:33 -0700
+X-CSE-ConnectionGUID: AkCUAiSKT96+p5vuywZvfA==
+X-CSE-MsgGUID: zZdlBW+WTCyt38neif+FQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
+   d="scan'208";a="78789295"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa010.jf.intel.com with ESMTP; 18 Oct 2024 03:20:31 -0700
+Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.186])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id CBAA827BCC;
+	Fri, 18 Oct 2024 11:20:29 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH v1 0/7] devlink: minor cleanup
+Date: Fri, 18 Oct 2024 12:18:29 +0200
+Message-ID: <20241018102009.10124-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,95 +77,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000007.china.huawei.com (7.193.23.189)
 
-From: Jie Wang <wangjie125@huawei.com>
+(Patch 1, 2) Add one helper shortcut to put u64 values into skb.
+(Patch 3, 4) Minor cleanup for error codes.
+(Patch 5, 6, 7) Remove some devlink_resource_*() usage and functions
+		itself via replacing devlink_* variants by devl_* ones.
 
-Currently, HIP08 devices does not register the ptp devices, so the
-hdev->ptp is NULL. But the tx process would still try to set hardware time
-stamp info with SKBTX_HW_TSTAMP flag and cause a kernel crash.
+Przemek Kitszel (7):
+  devlink: introduce devlink_nl_put_u64()
+  devlink: use devlink_nl_put_u64() helper
+  devlink: devl_resource_register(): differentiate error codes
+  devlink: region: snapshot IDs: consolidate error values
+  net: dsa: replace devlink resource registration calls by devl_
+    variants
+  devlink: remove unused devlink_resource_occ_get_register() and
+    _unregister()
+  devlink: remove unused devlink_resource_register()
 
-[  128.087798] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000018
-...
-[  128.280251] pc : hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
-[  128.286600] lr : hclge_ptp_set_tx_info+0x20/0x140 [hclge]
-[  128.292938] sp : ffff800059b93140
-[  128.297200] x29: ffff800059b93140 x28: 0000000000003280
-[  128.303455] x27: ffff800020d48280 x26: ffff0cb9dc814080
-[  128.309715] x25: ffff0cb9cde93fa0 x24: 0000000000000001
-[  128.315969] x23: 0000000000000000 x22: 0000000000000194
-[  128.322219] x21: ffff0cd94f986000 x20: 0000000000000000
-[  128.328462] x19: ffff0cb9d2a166c0 x18: 0000000000000000
-[  128.334698] x17: 0000000000000000 x16: ffffcf1fc523ed24
-[  128.340934] x15: 0000ffffd530a518 x14: 0000000000000000
-[  128.347162] x13: ffff0cd6bdb31310 x12: 0000000000000368
-[  128.353388] x11: ffff0cb9cfbc7070 x10: ffff2cf55dd11e02
-[  128.359606] x9 : ffffcf1f85a212b4 x8 : ffff0cd7cf27dab0
-[  128.365831] x7 : 0000000000000a20 x6 : ffff0cd7cf27d000
-[  128.372040] x5 : 0000000000000000 x4 : 000000000000ffff
-[  128.378243] x3 : 0000000000000400 x2 : ffffcf1f85a21294
-[  128.384437] x1 : ffff0cb9db520080 x0 : ffff0cb9db500080
-[  128.390626] Call trace:
-[  128.393964]  hclge_ptp_set_tx_info+0x2c/0x140 [hclge]
-[  128.399893]  hns3_nic_net_xmit+0x39c/0x4c4 [hns3]
-[  128.405468]  xmit_one.constprop.0+0xc4/0x200
-[  128.410600]  dev_hard_start_xmit+0x54/0xf0
-[  128.415556]  sch_direct_xmit+0xe8/0x634
-[  128.420246]  __dev_queue_xmit+0x224/0xc70
-[  128.425101]  dev_queue_xmit+0x1c/0x40
-[  128.429608]  ovs_vport_send+0xac/0x1a0 [openvswitch]
-[  128.435409]  do_output+0x60/0x17c [openvswitch]
-[  128.440770]  do_execute_actions+0x898/0x8c4 [openvswitch]
-[  128.446993]  ovs_execute_actions+0x64/0xf0 [openvswitch]
-[  128.453129]  ovs_dp_process_packet+0xa0/0x224 [openvswitch]
-[  128.459530]  ovs_vport_receive+0x7c/0xfc [openvswitch]
-[  128.465497]  internal_dev_xmit+0x34/0xb0 [openvswitch]
-[  128.471460]  xmit_one.constprop.0+0xc4/0x200
-[  128.476561]  dev_hard_start_xmit+0x54/0xf0
-[  128.481489]  __dev_queue_xmit+0x968/0xc70
-[  128.486330]  dev_queue_xmit+0x1c/0x40
-[  128.490856]  ip_finish_output2+0x250/0x570
-[  128.495810]  __ip_finish_output+0x170/0x1e0
-[  128.500832]  ip_finish_output+0x3c/0xf0
-[  128.505504]  ip_output+0xbc/0x160
-[  128.509654]  ip_send_skb+0x58/0xd4
-[  128.513892]  udp_send_skb+0x12c/0x354
-[  128.518387]  udp_sendmsg+0x7a8/0x9c0
-[  128.522793]  inet_sendmsg+0x4c/0x8c
-[  128.527116]  __sock_sendmsg+0x48/0x80
-[  128.531609]  __sys_sendto+0x124/0x164
-[  128.536099]  __arm64_sys_sendto+0x30/0x5c
-[  128.540935]  invoke_syscall+0x50/0x130
-[  128.545508]  el0_svc_common.constprop.0+0x10c/0x124
-[  128.551205]  do_el0_svc+0x34/0xdc
-[  128.555347]  el0_svc+0x20/0x30
-[  128.559227]  el0_sync_handler+0xb8/0xc0
-[  128.563883]  el0_sync+0x160/0x180
+ include/net/devlink.h       |  13 -----
+ net/devlink/devl_internal.h |   5 ++
+ net/devlink/dev.c           |  12 ++---
+ net/devlink/dpipe.c         |  18 +++----
+ net/devlink/health.c        |  25 ++++-----
+ net/devlink/rate.c          |   8 +--
+ net/devlink/region.c        |  15 +++---
+ net/devlink/resource.c      | 101 +++++-------------------------------
+ net/devlink/trap.c          |  34 +++++-------
+ net/dsa/devlink.c           |  23 +++++---
+ 10 files changed, 83 insertions(+), 171 deletions(-)
 
-Fixes: 0bf5eb788512 ("net: hns3: add support for PTP")
-Signed-off-by: Jie Wang <wangjie125@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-index 5505caea88e9..bab16c2191b2 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c
-@@ -58,6 +58,9 @@ bool hclge_ptp_set_tx_info(struct hnae3_handle *handle, struct sk_buff *skb)
- 	struct hclge_dev *hdev = vport->back;
- 	struct hclge_ptp *ptp = hdev->ptp;
- 
-+	if (!ptp)
-+		return false;
-+
- 	if (!test_bit(HCLGE_PTP_FLAG_TX_EN, &ptp->flags) ||
- 	    test_and_set_bit(HCLGE_STATE_PTP_TX_HANDLING, &hdev->state)) {
- 		ptp->tx_skipped++;
+base-commit: f87a17ed3b51fba4dfdd8f8b643b5423a85fc551
 -- 
-2.33.0
+2.46.0
 
 
