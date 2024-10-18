@@ -1,144 +1,177 @@
-Return-Path: <netdev+bounces-137125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD7169A473A
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:42:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6E09A4742
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 583EE1F24BDB
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:42:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 595E82844D3
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C106204F86;
-	Fri, 18 Oct 2024 19:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F66205ACE;
+	Fri, 18 Oct 2024 19:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RovpV3QQ"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="FLB3+9vS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9810A205AB5;
-	Fri, 18 Oct 2024 19:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6677318786A;
+	Fri, 18 Oct 2024 19:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729280507; cv=none; b=pLUjJsB1/D5RIFVDZBnUY5lqUjO1j+wYH5Kc4XuxTOSYAmmYC3LX5GFamcKCF/pIndsYJ2if7CNcMiSYwG6ertwr1CEbynMUTU/mzpFSw4uyTin29zqx0OaUlfFqMQm1mZr5kEqzu0Hl1stqCiQ/Zv6agfXfcwnEqEfQ+MEnKR0=
+	t=1729280579; cv=none; b=eXQZqYSifih7H/BNfVtWpqVqDHPCc358skeVCgKwPlImXJUB9cDolaco6M3WLs59Hvbwrfz2xhMXy1XliwyFt/Alc/ED25lIWOrgyfYcPf2xvQGZhNcvxaKwCEEGTy4rLKYtXGIXNc6vO7GW4bH9HisDIYY43AUQex8gRcTdfkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729280507; c=relaxed/simple;
-	bh=F/JtaEEVdC/F/NroJYqYLyX8iXArt+1Ut6xhbumr9E8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=S+GsVFvrR+G6xQBS5MgjhhY61046gp0xxrAW/LFYiLnHZRiQqS9n3Lq/v4Iwie1/ODlej2v8LPaL3KlT9Xh3gFux67vQuwhegVHR4XQh2YKNUMbw3qqCQYmOp2IizMTKU43gZ8YXwnOMTIx5S5SzqJmPKRydWyESIlWJ4ONNedI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RovpV3QQ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49IExEW2006854;
-	Fri, 18 Oct 2024 19:41:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	rKJiqFun/k8Ka7jbC/YfTlCs0RA8jmsEnP0viN4Wx0s=; b=RovpV3QQvcBcsxoo
-	UxRWHGW6nKbUyawkYZotb5flQG8eKHyDXJPdaAV4eZiw6egkQw5qIj+qNUwub3On
-	S3nliyHKSZ3TRtoGfFbxRqD8bB4crSvCOZvf2iUuW4VW3AIrgFNnffVRNGBlTFud
-	IQQoqtH1UaBjoY10cUnVs/2Xw5hANYIfKhA2MRpz2/u+V/v01eqZunwihvzSrx0u
-	sH7LrHoSaDqbQh/KBvFpEDI+QI0NzIUbEco8LwkZjfnt0iOqlx4WZUKf31XWGQVV
-	sSwdK60JdLqKniqVmR0RLmjA0ZGO8bqX4RB1sNKmGEPpn7qvDhYXRJT2C5OQc4ga
-	bNTP0A==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42b5hsvbcj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 19:41:25 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49IJfOdn007992
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 18 Oct 2024 19:41:24 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 18 Oct
- 2024 12:41:22 -0700
-Message-ID: <aa5078d8-ac2f-1124-03f8-0d37d4c15005@quicinc.com>
-Date: Fri, 18 Oct 2024 13:41:22 -0600
+	s=arc-20240116; t=1729280579; c=relaxed/simple;
+	bh=Gpuxf7aeuuzqmzhp63zYCRRpmPtiuiFGFtvbgMIYt9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jlp2WGlySjRmJnZ5SxVwOEC71beOo7lBdwuy4SbBKowTcOht2MRWSxcBXta3wWp3SqDPV48zTRKcOLBMS5NEfI604b/9Cswa2l+O3iXV2VJV6FhqvOdivt5BpFfmBiP2utWReb2soeIZQq6oVa9QwSIEf/Er3H16ZxS6GWM12MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=FLB3+9vS; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 5DBA188A0E;
+	Fri, 18 Oct 2024 21:42:54 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1729280575;
+	bh=5zSJJrhTq//NrW8OCQxS0nkzbZo5tl0gZe9uSnXIa48=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FLB3+9vSianCeYmV9Od/b2APXn596aSKEbVfzgyT9Z885pV91FVJfpTeOcJ5m/2+e
+	 P7pEuM9ni/5fEGnYBSVIURb5MOWbuQdkiKu6Mcizz//MNYg6jxZXed/spUgjmyBnPj
+	 FDbZgP9ak7D60KfMhLjFVKINF5FCq5O0KPLuGIoPsPsZKwQ/l/kpJhanXD4gkSipOd
+	 fP5o1r0YoIL5kQaeXiYoM3q+87xWmNGqd1ith68a7NqWimSHX06j5q2NTykFfMI8EL
+	 KlCXiRqGNyPYaZVeOmd0UVh/AZ+7rKfzTIG5DgaAOu8TgYgQHfejTV8c2lXZmI32M7
+	 RklBwEVAKkvzA==
+From: Marek Vasut <marex@denx.de>
+To: linux-wireless@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Adham Abozaeid <adham.abozaeid@microchip.com>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] wifi: wilc1000: Add proper error handling for remaining CMD52
+Date: Fri, 18 Oct 2024 21:41:57 +0200
+Message-ID: <20241018194244.280322-1-marex@denx.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH net-next 3/3] accel/qaic: Pass string literal as format
- argument of alloc_workqueue()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jiawen Wu
-	<jiawenwu@trustnetic.com>,
-        Mengyuan Lou <mengyuanlou@net-swift.com>,
-        "Nathan
- Chancellor" <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>,
-        "Carl Vanderlip" <quic_carlv@quicinc.com>,
-        Oded Gabbay <ogabbay@kernel.org>, <UNGLinuxDriver@microchip.com>,
-        <netdev@vger.kernel.org>, <llvm@lists.linux.dev>,
-        <linux-arm-msm@vger.kernel.org>, <dri-devel@lists.freedesktop.org>
-References: <20241011-string-thing-v1-0-acc506568033@kernel.org>
- <20241011-string-thing-v1-3-acc506568033@kernel.org>
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <20241011-string-thing-v1-3-acc506568033@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: WjxzQ8x_dk83izjS8xoIbU8AG9AJDY9c
-X-Proofpoint-ORIG-GUID: WjxzQ8x_dk83izjS8xoIbU8AG9AJDY9c
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxscore=0 malwarescore=0 mlxlogscore=999 spamscore=0 adultscore=0
- lowpriorityscore=0 suspectscore=0 bulkscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410180125
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 10/11/2024 3:57 AM, Simon Horman wrote:
-> Recently I noticed that both gcc-14 and clang-18 report that passing
-> a non-string literal as the format argument of alloc_workqueue()
-> is potentially insecure.
-> 
-> E.g. clang-18 says:
-> 
-> .../qaic_drv.c:61:23: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
->     61 |         wq = alloc_workqueue(fmt, WQ_UNBOUND, 0);
->        |                              ^~~
-> .../qaic_drv.c:61:23: note: treat the string as an argument to avoid this
->     61 |         wq = alloc_workqueue(fmt, WQ_UNBOUND, 0);
->        |                              ^
->        |                              "%s",
-> 
-> It is always the case where the contents of fmt is safe to pass as the
-> format argument. That is, in my understanding, it never contains any
-> format escape sequences.
-> 
-> But, it seems better to be safe than sorry. And, as a bonus, compiler
-> output becomes less verbose by addressing this issue as suggested by
-> clang-18.
-> 
-> Also, change the name of the parameter of qaicm_wq_init from
-> fmt to name to better reflect it's purpose.
-> 
-> Compile tested only.
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+A few of the CMD52 calls did not have any error handling, add it.
+This prevents odd errors like "Unexpected interrupt (1) int=nnn"
+when the CMD52 fails just above in the IRQ handler and the CMD52
+error code is ignored by the driver. Fill the error handling in.
+Sort the variables in those affected functions while at it. Note
+that the error code itself is already printed in wilc_sdio_cmd52().
 
-Applied to drm-misc-next
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
+Cc: Ajay Singh <ajay.kathat@microchip.com>
+Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Kalle Valo <kvalo@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+ .../net/wireless/microchip/wilc1000/sdio.c    | 27 ++++++++++++++-----
+ 1 file changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/wireless/microchip/wilc1000/sdio.c b/drivers/net/wireless/microchip/wilc1000/sdio.c
+index 5262c8846c13d..170470d1c2092 100644
+--- a/drivers/net/wireless/microchip/wilc1000/sdio.c
++++ b/drivers/net/wireless/microchip/wilc1000/sdio.c
+@@ -769,8 +769,10 @@ static int wilc_sdio_init(struct wilc *wilc, bool resume)
+ 
+ static int wilc_sdio_read_size(struct wilc *wilc, u32 *size)
+ {
+-	u32 tmp;
++	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
+ 	struct sdio_cmd52 cmd;
++	u32 tmp;
++	int ret;
+ 
+ 	/**
+ 	 *      Read DMA count in words
+@@ -780,12 +782,20 @@ static int wilc_sdio_read_size(struct wilc *wilc, u32 *size)
+ 	cmd.raw = 0;
+ 	cmd.address = WILC_SDIO_INTERRUPT_DATA_SZ_REG;
+ 	cmd.data = 0;
+-	wilc_sdio_cmd52(wilc, &cmd);
++	ret = wilc_sdio_cmd52(wilc, &cmd);
++	if (ret) {
++		dev_err(&func->dev, "Fail cmd 52, set DATA_SZ[0] register...\n");
++		return ret;
++	}
+ 	tmp = cmd.data;
+ 
+ 	cmd.address = WILC_SDIO_INTERRUPT_DATA_SZ_REG + 1;
+ 	cmd.data = 0;
+-	wilc_sdio_cmd52(wilc, &cmd);
++	ret = wilc_sdio_cmd52(wilc, &cmd);
++	if (ret) {
++		dev_err(&func->dev, "Fail cmd 52, set DATA_SZ[1] register...\n");
++		return ret;
++	}
+ 	tmp |= (cmd.data << 8);
+ 
+ 	*size = tmp;
+@@ -796,9 +806,10 @@ static int wilc_sdio_read_int(struct wilc *wilc, u32 *int_status)
+ {
+ 	struct sdio_func *func = dev_to_sdio_func(wilc->dev);
+ 	struct wilc_sdio *sdio_priv = wilc->bus_data;
+-	u32 tmp;
+-	u8 irq_flags;
+ 	struct sdio_cmd52 cmd;
++	u8 irq_flags;
++	u32 tmp;
++	int ret;
+ 
+ 	wilc_sdio_read_size(wilc, &tmp);
+ 
+@@ -817,7 +828,11 @@ static int wilc_sdio_read_int(struct wilc *wilc, u32 *int_status)
+ 	cmd.raw = 0;
+ 	cmd.read_write = 0;
+ 	cmd.data = 0;
+-	wilc_sdio_cmd52(wilc, &cmd);
++	ret = wilc_sdio_cmd52(wilc, &cmd);
++	if (ret) {
++		dev_err(&func->dev, "Fail cmd 52, set IRQ_FLAG register...\n");
++		return ret;
++	}
+ 	irq_flags = cmd.data;
+ 
+ 	if (sdio_priv->irq_gpio)
+-- 
+2.45.2
+
 
