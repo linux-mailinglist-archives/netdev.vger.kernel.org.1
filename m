@@ -1,147 +1,170 @@
-Return-Path: <netdev+bounces-136926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E25E9A3AB1
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:00:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 990C39A3ACF
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:05:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF11289205
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5239E286756
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68D9190497;
-	Fri, 18 Oct 2024 10:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987E120103B;
+	Fri, 18 Oct 2024 10:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9q8Eih0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYHt83gy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A9B20E31C;
-	Fri, 18 Oct 2024 10:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D781201030;
+	Fri, 18 Oct 2024 10:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729245636; cv=none; b=CYjIlAb/zrEqTUERdnzbuxAwM8+7MfhMrIp1lnKuBSbBmM0p6snY0qAk++MjdYgpjxFBFvqjalBw3bFaJmgdiTFPUcRVaf3yMhPs4Qfwwks1qKhsj/jHpDUWn5yLt0BlomY0GGXCPSQSs80f9zvgErVJXyxaz+9yvgJTwGWaMlU=
+	t=1729245887; cv=none; b=QzPfY1A7MeKzClzXfqJ4p2gc/E60wFCaOzlu7Yj4OXLs0XR1mbXoH84N23Afvmc4i9/3kfUqoKwdyCabUN7cWizhN/g//w3o3sDy9dAbAo6cvcLvs3y7YSXsYplAmR91x2kBplHhf7PhSnPrnladFN3aC6SJxyXLeqwsI2qMM3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729245636; c=relaxed/simple;
-	bh=FW4aQWEvArHEKkA8fQ+kXYU10rHyGFQtsjKYYYgCvOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oO3BOJWmN4gDNq5qyYgjrskJlZN/1ueOEK/XYFEXqqA9SqhjbEeAtOT27/CqFKEtrdvf7A9SuKTjUXUriUvNBpLgwQ05+Fca8GjQ5knD8UThRum9Yn6j3xT2NImdZ9ReuidVpynut1IlzWiQTWRygW5IsLcOGiQloWDAHpQFdEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9q8Eih0; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20e6981ca77so1450175ad.2;
-        Fri, 18 Oct 2024 03:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729245635; x=1729850435; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f5lubNeeLRmHthC4s9tNZn8PtHhfCx2MwTc3L+mSp18=;
-        b=X9q8Eih0P+qh5rdP5pM2zGy3FwxNQDIjXrSai3ri2sBW50mtdoE7PRebsJZU0Ij1QF
-         OVadSx0KLJ/uj8xIppveCN/Uf3dxhU7Lwc2+5ThCqT+7w0NuistiBuGhZQRc5PNvYE7L
-         6ng20pOmHvfKa42zfCJVoOkU4ksloCbrCkxWMr4u8PRpzODQ4xjZis34EJJy+1Lu/w2s
-         BfjquVLSPMuIUfRxY3/WxmWxHtHsJPfjQvUgqaER82sS8oKxZj+xnRXY7HfY04k9YiKc
-         XM3Z9pUpPFPdXeSHWkslFhIEUPuG/XdYOS25pbkIALYBtTWhP2KyPByFLz72B5C1sFyI
-         0LGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729245635; x=1729850435;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f5lubNeeLRmHthC4s9tNZn8PtHhfCx2MwTc3L+mSp18=;
-        b=xPeeYLlpXVws3fExzvNhTXX791LLt4F98TFP9+z4LSsVXROnYhakjfwt/nwHVmd/wh
-         awQwS1C/9g341vjSnKQLFjzT85Ng0d74tJ9BnT1DArCG6uueG57sZ6oxBnXKI+cnTWFa
-         mEjKip6tFzeonJZ1RcDN4iJFk7pzmnr/P59VRdmgec1lBbxyJYdd1D1JWyk6ZVfmLbyP
-         S08SLlGfNRQyhvOcNTCf0GrYQS0uni9KLFuACIt/grIu7oMtVq1jdZN8POuRa5T42JMf
-         EX5XqTj08tKZAE7DWpvDNdS6SxdK8mCdbc0t7QJun+f+QYQ3K5JenehHlqaDfVZDzVLx
-         NT6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhEGbjFV9me0U23V59WzGkYujyboGeJlbUBR29OTBoqwV5qyDnrtEB8tuFV42cCY/OUiIzuFo6JEY/wSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw02MlYVdYRSVY0KovjjETZzD+3UkVUtabQiz+HlIdpXrj9uyes
-	GHeYggqBNUA5uk4TZdEFId2Eqoo4i/TuM6kEEhGnZELNdThCEBuI
-X-Google-Smtp-Source: AGHT+IFR6ppSFGXKnbyyRbTLquP9bQee0BM/QDbaB/L3oOWSNl9Ejff+zHPGZ4gjWD8RwNrZRPZWrQ==
-X-Received: by 2002:a17:902:f60e:b0:20b:ab4b:5432 with SMTP id d9443c01a7336-20e5a70d59amr22619825ad.12.1729245634446;
-        Fri, 18 Oct 2024 03:00:34 -0700 (PDT)
-Received: from localhost ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e5a8d6cd6sm9343225ad.131.2024.10.18.03.00.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Oct 2024 03:00:34 -0700 (PDT)
-Date: Fri, 18 Oct 2024 18:00:23 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Andrew
- Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Serge Semin
- <fancer.lancer@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- xfr@outlook.com
-Subject: Re: [PATCH net-next v2 7/8] net: stmmac: xgmac: Complete FPE
- support
-Message-ID: <20241018180023.000045d8@gmail.com>
-In-Reply-To: <20241018091321.gfsdx7qzl4yoixgb@skbuf>
-References: <cover.1729233020.git.0x1207@gmail.com>
-	<1776606b2eda8430077551ca117b035f987b5b70.1729233020.git.0x1207@gmail.com>
-	<20241018091321.gfsdx7qzl4yoixgb@skbuf>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1729245887; c=relaxed/simple;
+	bh=XlqX620mv1+3TxjbnqU6cqutUY30PUf1MS0RFO7eNFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HGJSTFuV2OgD4IK5j9fFpvGaaQHWKGAHz6Lv7akKHqF2WWfhbBDtnhxjvyH9Ez4Ac+aTmSrBqGY5EmrYhz4oFJLtMtSf5he3d1NHHGl4RofjYUi3/vfe9IxGsFEm0TeJk4pUuv98w5CuUZOYuiXP9RxBy2RPYlp/dm9LVU83TQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYHt83gy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FD21C4CEC3;
+	Fri, 18 Oct 2024 10:04:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729245887;
+	bh=XlqX620mv1+3TxjbnqU6cqutUY30PUf1MS0RFO7eNFs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rYHt83gyEPN94gmmQ4zd/8t9/jKaZnTiARIk3mpDHxmWsnCg9XCCAaaoTDSD9ocHi
+	 DZObaLtkYZugfCrN1oL/cjterNn7qzh0Gw1IfQvrxqUeT5Fi91Ez8TLkHiHF78QBmC
+	 BGCZ+XFMDRdHYECp0DeXWgYWg0+7lcT+9t8sUCzHdsACCPgF7A5ZYEfLgJncqbUUqd
+	 8+tTEeay1ByOcKpO6FzzdgG40YD9OywSgQm4fsRU84bzPArc6RnEggyFjOFYaUF0ud
+	 1TcsTAQxM454aw6/oec9YjRdgw8EJI+Xx/zlp3uW/0PbGzALfukveZOOhTFpeny2hn
+	 KTollB6GuUsNA==
+Date: Fri, 18 Oct 2024 11:04:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+Cc: davem@davemloft.net, Liam.Howlett@oracle.com, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mingo@redhat.com,
+	peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, jiri@resnulli.us, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, akpm@linux-foundation.org, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, peili.io@oracle.com
+Subject: Re: [PATCH net-next v5 3/3] connector/cn_proc: Selftest for threads
+Message-ID: <20241018100440.GF1697@kernel.org>
+References: <20241017181436.2047508-1-anjali.k.kulkarni@oracle.com>
+ <20241017181436.2047508-4-anjali.k.kulkarni@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241017181436.2047508-4-anjali.k.kulkarni@oracle.com>
 
-On Fri, 18 Oct 2024 12:13:21 +0300, Vladimir Oltean <olteanv@gmail.com> wrote:
+On Thu, Oct 17, 2024 at 11:14:36AM -0700, Anjali Kulkarni wrote:
+> Test to check if setting PROC_CN_MCAST_NOTIFY in proc connector API, allows
+> a thread's non-zero exit status to be returned to proc_filter.
+> 
+> The threads.c program creates 2 child threads. 1st thread handles signal
+> SIGSEGV, and 2nd thread needs to indicate some error condition (value 1)
+> to the kernel, instead of using pthread_exit() with 1.
+> 
+> In both cases, child sends notify_netlink_thread_exit(exit_code) to kernel,
+> to let kernel know it has exited abnormally with exit_code.
+> 
+> Compile:
+>     make thread
+>     make proc_filter
+> Run:
+>     ./threads
+> 
+> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+> ---
+>  tools/testing/selftests/connector/Makefile    |  23 +-
+>  .../testing/selftests/connector/proc_filter.c |  34 ++-
+>  tools/testing/selftests/connector/thread.c    | 232 ++++++++++++++++++
+>  .../selftests/connector/thread_filter.c       |  96 ++++++++
+>  4 files changed, 378 insertions(+), 7 deletions(-)
+>  create mode 100644 tools/testing/selftests/connector/thread.c
+>  create mode 100644 tools/testing/selftests/connector/thread_filter.c
+> 
+> diff --git a/tools/testing/selftests/connector/Makefile b/tools/testing/selftests/connector/Makefile
+> index 92188b9bac5c..bf335826bc3b 100644
+> --- a/tools/testing/selftests/connector/Makefile
+> +++ b/tools/testing/selftests/connector/Makefile
+> @@ -1,5 +1,26 @@
+>  # SPDX-License-Identifier: GPL-2.0
+> -CFLAGS += -Wall $(KHDR_INCLUDES)
+> +KERNEL="../../../.."
+> +
+> +CFLAGS += -Wall $(KHDR_INCLUDES) -I $(KERNEL)/include/uapi -I $(KERNEL)/include
+> +
+> +proc_filter: proc_filter.o
+> +	cc proc_filter.o -o proc_filter
+> +
+> +proc_filter.o: proc_filter.c
+> +	cc -c proc_filter.c -o proc_filter.o $(CFLAGS)
+> +
+> +thread: thread.o thread_filter.o
+> +	cc thread.o thread_filter.o -o thread
+> +
+> +thread.o: thread.c $(DEPS)
+> +		cc -c thread.c -o thread.o $(CFLAGS)
+> +
+> +thread_filter.o: thread_filter.c
+> +		cc -c thread_filter.c -o thread_filter.o $(CFLAGS)
+> +
+> +define EXTRA_CLEAN
+> +	rm *.o thread
+> +endef
+>  
+>  TEST_GEN_PROGS = proc_filter
+>  
 
-> This is much better in terms of visibility into the change.
-> 
-> Though I cannot stop thinking that this implementation design:
-> 
-> stmmac_fpe_configure()
-> -> stmmac_do_void_callback()
->    -> fpe_ops->fpe_configure()  
->       /                    \
->      /                      \
->     v                        v
-> dwmac5_fpe_configure   dwxgmac3_fpe_configure
->      \                      /
->       \                    /
->        v                  v
->        common_fpe_configure()
-> 
-> is, pardon the expression, stuffy.
-> 
-> If you aren't very opposed to the idea of having struct stmmac_fpe_ops
-> contain a mix of function pointers and integer constants, I would
-> suggest removing:
-> 
-> 	.fpe_configure()
-> 	.fpe_send_mpacket()
-> 	.fpe_irq_status()
-> 	.fpe_get_add_frag_size()
-> 	.fpe_set_add_frag_size()
-> 
-> and just keeping a single function pointer, .fpe_map_preemption_class(),
-> inside stmmac_fpe_ops. Only that is sufficiently different to warrant a
-> completely separate implementation. Then move all current struct
-> stmmac_fpe_configure_info to struct stmmac_fpe_ops, and reimplement
-> stmmac_fpe_configure() directly like common_fpe_configure(),
-> stmmac_fpe_send_mpacket() directly like common_fpe_send_mpacket(), etc etc.
-> This lets us avoid the antipattern of calling a function pointer (hidden
-> by an opaque macro) from common code, only to gather some parameters to
-> call again a common implementation.
-> 
-> I know this is a preposterous and heretic thing to suggest, but a person
-> who isn't knee-deep in stmmac has a very hard time locating himself in
-> space due to the unnecessarily complex layering. If that isn't something
-> that is important, feel free to ignore.
+I am a little confused by this, as it seems to result in user-space
+code using kernel headers. Is that expected?
 
-In fact, I can drop the stmmac_fpe_ops at all, avoid the antipattern of
-calling a function pointer for good.
-Since this is a new module, we can try something new ;)
-Thanks.
+$ make -C tools/testing/selftests/connector
+...
+cc -c proc_filter.c -o proc_filter.o -Wall -isystem /home/horms/projects/linux/linux/tools/testing/selftests/../../../usr/include -I "../../../.."/include/uapi -I "../../../.."/include -D_GNU_SOURCE=
+In file included from ../../../../include/uapi/linux/netlink.h:7,
+                 from proc_filter.c:11:
+../../../../include/uapi/linux/types.h:10:2: warning: #warning "Attempt to use kernel headers from user space, see https://kernelnewbies.org/KernelHeaders" [-Wcpp]
+   10 | #warning "Attempt to use kernel headers from user space, see https://kernelnewbies.org/KernelHeaders"
+      |  ^~~~~~~
+...
+
+> diff --git a/tools/testing/selftests/connector/thread.c b/tools/testing/selftests/connector/thread.c
+
+...
+
+> +static inline void init_threads(pthread_attr_t *attr)
+
+Please don't use inline in .c files unless there is a demonstrable,
+usually performance, reason to do so.
+
+Likewise twice more in this patch and once in patch 1/3.
+
+> +{
+> +	int ret;
+> +
+> +	ret = pthread_attr_init(attr);
+> +	if (ret != 0) {
+> +		perror("pthread_attr_init failed");
+> +		exit(ret);
+> +	}
+> +
+> +	ret = pthread_attr_setdetachstate(attr, PTHREAD_CREATE_DETACHED);
+> +	if (ret != 0) {
+> +		perror("pthread_attr_setdetachstate failed");
+> +		exit(ret);
+> +	}
+> +}
+
+...
 
