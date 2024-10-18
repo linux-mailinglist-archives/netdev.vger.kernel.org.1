@@ -1,129 +1,97 @@
-Return-Path: <netdev+bounces-136835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99FC39A32FF
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:50:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 228199A3301
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DA92281341
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:50:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD4131F2327F
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22C5C7DA66;
-	Fri, 18 Oct 2024 02:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22ABA56B81;
+	Fri, 18 Oct 2024 02:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="xnAu5Yq/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t82sFMyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00450126C07
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 02:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D5F51C4A
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 02:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729219804; cv=none; b=c+QK/qnEN/KK7uD6iK/5qf4WXZfqy54uCQNeVDXLIm2vtPaHcXa4IiVXuffjJ+DdaK/vwxUYqXyc0S9FnsMWpcoAO78onzIqN4l7voexhedlfwKn9VzyvRceqfPR5EV6nlq7haPWP/3fXHPGrYVpTsnp0oUmzPM5TeMLww1jVkE=
+	t=1729219825; cv=none; b=uNweUvPjksYr3rqD2B4J8/VC3Cd+yQUzdbYZjesBwQbJ5v6sN8aDRZp+KbBgry7djlcMWiySEngz7CUuT1nkO4hy2dOGhDBC9rSlHttkSzfj0+8EL1OUrrb4yO/sYmjOE1sZ8Jdu8R7rmPvoSAa0X1WYo+cBwOZmf8m9jLyWawo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729219804; c=relaxed/simple;
-	bh=pAfnonRQHebo5e9mghmYAi18qXw4bWXMOCZ9zJIhxUk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=t5MARcMOXPYFfbUBt+W8DJHADT0ReSWCPj8EAG/Gr1wHLBsuoJnlmeiTfRx6PQsOupB7aEnngzLS+InmHNXDTCQrRbyiVy8X0Z3bW8+elVHmO26MpO/t1/TI9bxi1eJ8UD/iNe+Zk3Gqf4PQeP1w4X/mlVrpuYpJTHmwjplCsBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=xnAu5Yq/; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 1B4302C011D;
-	Fri, 18 Oct 2024 15:49:53 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1729219793;
-	bh=pAfnonRQHebo5e9mghmYAi18qXw4bWXMOCZ9zJIhxUk=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=xnAu5Yq/IHOQCVxlWYnh0nKtPOB2vR7gBX4YeEkkXpW2pKhRm522vGjvHwzR4t945
-	 m15eFOQHv3jdofeufn3Wlk4q5HHIuLsg5TKbKiqZ/XhXQ3nDlv0xS7PeZtnjQ3Itsa
-	 RiiQow0EosHzNm3lKnuJr2ZEq3vjtTsIqgFYr+KLFPt1VdykZweLwAN7nttSmhggTx
-	 D8tBpWsuH2UsSpFyp2BjEOdgvElimEbw/cuaSgBSIB/YA0b86ac/2Qn5YJGl6P2r8d
-	 6lrQJCRwnjIvdjwan/xQYLgx0SBFvqhTAvwZZGCVP6uwgOwkEHnGUmBnYuASZPlhqC
-	 tGgzeo9urO8+Q==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B6711ccd00001>; Fri, 18 Oct 2024 15:49:52 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 18 Oct 2024 15:49:52 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.011; Fri, 18 Oct 2024 15:49:52 +1300
-From: Paul Davey <Paul.Davey@alliedtelesis.co.nz>
-To: "andrew@lunn.ch" <andrew@lunn.ch>
-CC: "daniel@makrotopia.org" <daniel@makrotopia.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: aquantia: Add mdix config and
- reporting
-Thread-Topic: [PATCH net-next] net: phy: aquantia: Add mdix config and
- reporting
-Thread-Index: AQHbIDd1vnPqHtWCDUqpqXlBKr+obbKJ/EYAgADIhgCAAAeHgIAAKh8A
-Date: Fri, 18 Oct 2024 02:49:52 +0000
-Message-ID: <858331af57bd1d9ab478c3ec6f5ecd19dcd205ef.camel@alliedtelesis.co.nz>
-References: <20241017015407.256737-1-paul.davey@alliedtelesis.co.nz>
-	 <ZxD69GqiPcqOZK2w@makrotopia.org>
-	 <4e8d02f84d1ae996f6492f9c53bf90a6cc6ad32e.camel@alliedtelesis.co.nz>
-	 <ec453754-3474-4824-b4e3-e26603e2e1d8@lunn.ch>
-In-Reply-To: <ec453754-3474-4824-b4e3-e26603e2e1d8@lunn.ch>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
+	s=arc-20240116; t=1729219825; c=relaxed/simple;
+	bh=TV2vZOfHCYzI29IT082PlVZm8+DxBeGHheYHxpV28A8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=u6uMidPXhYOvYXyOs5uZTRjHbeGhBpro+MWTbxlwFXkfIFituKnExkuTjTJ2T3G05QmPt5/y30NtUuc9rjQOvWZiS6nJqxpyOYbhRFBG2me/uxPQxhy56yxzKXv8QnsK5PfktQHJm6rauIUhhw7Y6777+Z80O1DVFfX+1rHedpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t82sFMyk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FBD2C4CEC3;
+	Fri, 18 Oct 2024 02:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729219824;
+	bh=TV2vZOfHCYzI29IT082PlVZm8+DxBeGHheYHxpV28A8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t82sFMykzQEpfZSeeZ4n5Y1mqB6qfrEIeJXvvgb6lbSlVKYd5rnZybsbO5QnltehT
+	 ZWhy20eaCmRX8zoqo+W/xN0vRdF8W3X/FyI30DD7f7LpJOryIsLkinUO2biOl4vGFH
+	 K219DWkcucAVMyR/dPnmPBD54aOiEt/TJXPb74Not+fcdsU/uaLZscyzmUMHQlOSJs
+	 G+tyuS1fD8iny7GzrsF79V8vF7v3akUjzLcrZshtDNtBsKXT7ovrTXV6uw/+Wfi5Lk
+	 8bq/Ij4IuLYbA+83Q35LMEAopVXgUIQmRSi8hqm2qPga2pnFMsLUnsckXw4kqPE0zR
+	 5sao5WktngWXg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CBC3809A8A;
+	Fri, 18 Oct 2024 02:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <732484395BDCD84893D1FC36BFD63E39@atlnz.lc>
-Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=ca1xrWDM c=1 sm=1 tr=0 ts=6711ccd1 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=3pNRdvVr4ggA:10 a=IkcTkHD0fZMA:10 a=DAUX931o1VcA:10 a=PFUYQPNK4-5iWQNOrAEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: airoha: Fix typo in REG_CDM2_FWD_CFG
+ configuration
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172921983001.2667083.1676500266510353428.git-patchwork-notify@kernel.org>
+Date: Fri, 18 Oct 2024 02:50:30 +0000
+References: <20241015-airoha-eth-cdm2-fixes-v1-1-9dc6993286c3@kernel.org>
+In-Reply-To: <20241015-airoha-eth-cdm2-fixes-v1-1-9dc6993286c3@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, chihwei.cheng@airoha.com
 
-T24gRnJpLCAyMDI0LTEwLTE4IGF0IDAyOjE5ICswMjAwLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
-PiBEdWUgdG8gdGhpcyBJIHdvbmRlciB3aGV0aGVyIHRoZSBtZGl4IGNvbmZpZ3VyYXRpb24gc2hv
-dWxkIHJlamVjdA0KPiA+IEVUSF9UUF9NRElfQVVUTyBpZiBhdXRvLW5lZ290aWF0aW9uIGlzIGRp
-c2FibGVkPw0KPiANCj4gSG93IGRvZXMgTURJWCBhY3R1YWxseSB3b3JrPyBJcyB0aGVyZSBhbnl0
-aGluZyBpbiA4MDIuMz8NCj4gDQo+IEZvciAxMEJhc2VULCBvbmUgcGFpciBSeCwgb25lIHBhaXIg
-VHgsIGkgZ3Vlc3MgeW91IGNhbiBmaW5kIG91dCBieQ0KPiBqdXN0IGxvb2tpbmcgYXQgdGhlIHNp
-Z25hbC4gQnV0IGZvciA0IHBhaXJzPw0KPiANCjgwMi4zIENsYXVzZSA0MC40LjQgQXV0b21hdGlj
-IE1ESS9NREktWCBDb25maWd1cmF0aW9uIHNwZWNpZmllcyBzb21lDQphc3BlY3RzIG9mIGhvdyBB
-dXRvIE1ESS9NREktWCBjcm9zc292ZXIgZGV0ZWN0aW9uIHdvcmtzIGZvciAxMDAwQkFTRS1UDQoN
-CkZvciAxMDAwQkFTRS1UIChhbmQgYWJvdmUpIHdpdGggNCBwYWlycyB0aGUgTURJLVggc3RhdGUg
-Y3Jvc3NlcyBvdmVyDQpib3RoIHBhaXJzIEEvQiBhbmQgcGFpcnMgQy9ELiAgVGhvdWdoIHNvbWUg
-UEhZcyBoYXZlIHN1cHBvcnQgZm9yDQpkZXRlY3RpbmcgcGFydGlhbCBjcm9zc292ZXIuDQoNClRo
-ZSBjcm9zc292ZXIgaXMgcmVxdWlyZWQgZm9yIGF1dG8tbmVnb3RpYXRpb24gdG8gY29tcGxldGUg
-c28gdGhlDQpBdXRvbWF0aWMgTURJL01ESS1YIHJlc29sdXRpb24gaGFzIHRvIG9jY3VyIHByaW9y
-IHRvIGF1dG8tbmVnb3RpYXRpb24uDQoNCkkgYmVsaWV2ZSB0aGUgZGV0ZWN0aW9uIHdvcmtzIGJ5
-IHNlbGVjdGluZyBhIHByb3Bvc2VkIGNyb3Nzb3ZlciBjb25maWcsDQp0aGVuIHdhaXRpbmcgYSBw
-ZXJpb2QgdG8gZGV0ZWN0IGVpdGhlciBhdXRvLW5lZ290aWF0aW9uIGZhc3QgbGluaw0KcHVsc2Vz
-IG9yIGFuIFJYIGxpbmsgZGV0ZWN0aW9uLiBJZiBpdCBkb2Vzbid0IGZpbmQgb25lIGl0IHVzZXMg
-YQ0KcHNldWRvcmFuZG9tIHByb2Nlc3MgKGFuIExGU1IgSSBiZWxpZXZlKSB0byBkZWNpZGUgd2hl
-dGhlciBpdCBzaG91bGQNCnN3YXAgdG8gdGhlIG90aGVyIGNyb3Nzb3ZlciBzdGF0ZSBvciByZW1h
-aW4gaW4gdGhlIGN1cnJlbnQgb25lLiAgVGhpcw0KaXMgdG8gZW5zdXJlIHR3byBsaW5rIHBhcnRu
-ZXJzIHBlcmZvcm1pbmcgdGhpcyBwcm9jZXNzIGRvIG5vdCBnZXQgc3R1Y2sNCmJvdGggdHJ5aW5n
-IHRoZSB3cm9uZyBjcm9zc292ZXIgYW5kIHRoZW4gc3dhcHBpbmcgYXQgdGhlIHNhbWUgdGltZSB0
-bw0KdGhlIG90aGVyIGNyb3Nzb3Zlci4gIEZyb20gdGhlIHN0YXRlIG1hY2hpbmUgZGlhZ3JhbXMg
-aXQgYXBwZWFycyB0aGUNCmluaXRpYWwgY3Jvc3NvdmVyIGNvbmZpZyBpcyBNREkuDQoNCkFzIGF1
-dG8tbmVnb3RpYXRpb24gaXMgcmVxdWlyZWQgZm9yIDEwMDBCQVNFLVQgKGFuZCBoaWdoZXIgc3Bl
-ZWQNCnR3aXN0ZWQgcGFpciBtb2RlcykgdGhlIHF1ZXN0aW9uIG9mIHdoZXRoZXIgQXV0byBNREkv
-TURJLVggZGV0ZWN0aW9uDQpvY2N1cnMgd2hlbiBhdXRvLW5lZ290aWF0aW9uIGlzIHR1cm5lZCBv
-ZmYgaXMgb25seSByZWFsbHkgcmVsZXZhbnQgZm9yDQoxMEJBU0UtVCBhbmQgMTAwQkFTRS1UIGJl
-aW5nIGZvcmNlZC4NCg0KV2hlbiBJIHdhcyB3b25kZXJpbmcgaWYgbWRpeF9jdHJsIGJlaW5nIHNl
-dCB0byBFVEhfVFBfTURJX0FVVE8gc2hvdWxkDQpiZSByZWplY3RlZCBpZiBhdXRvLW5lZ290aWF0
-aW9uIGlzIGRpc2FibGVkIEkgbWVhbnQgZm9yIHRoaXMgc3BlY2lmaWMNClBIWSBkcml2ZXIgYXMg
-aXQgZGVmaW5pdGVseSBkb2VzIG5vdCBhcHBlYXIgdG8gcGVyZm9ybSB0aGUgQXV0bw0KTURJL01E
-SS1YIHJlc29sdXRpb24gc28gaWYgdGhlIHdpcmluZy9jYWJsaW5nIGJldHdlZW4gYW5kL29yIGNv
-bmZpZyBvbg0KdGhlIGxpbmsgcGFydG5lciBkb2VzIG5vdCBtYXRjaCB0aGUgZGVmYXVsdCAoTURJ
-IEkgdGhpbmsgZm9yIHRoZSBBUVIpDQp0aGVuIHRoZSBsaW5rIHdpbGwgbm90IGVzdGFibGlzaC4N
-Cg0KVGhhbmtzLA0KUGF1bA0K
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Andrew Lunn <andrew@lunn.ch>:
+
+On Tue, 15 Oct 2024 09:58:09 +0200 you wrote:
+> Fix typo in airoha_fe_init routine configuring CDM2_OAM_QSEL_MASK field
+> of REG_CDM2_FWD_CFG register.
+> This bug is not introducing any user visible problem since Frame Engine
+> CDM2 port is used just by the second QDMA block and we currently enable
+> just QDMA1 block connected to the MT7530 dsa switch via CDM1 port.
+> 
+> Introduced by commit 23020f049327 ("net: airoha: Introduce ethernet
+> support for EN7581 SoC")
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: airoha: Fix typo in REG_CDM2_FWD_CFG configuration
+    https://git.kernel.org/netdev/net-next/c/30d9d8f6a2d7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
