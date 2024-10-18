@@ -1,123 +1,119 @@
-Return-Path: <netdev+bounces-137003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466079A3EAF
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:48:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ECF49A3EF9
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 14:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 526E71C236B2
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:48:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301EA1C2561C
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA0B26ACC;
-	Fri, 18 Oct 2024 12:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CCC43AB0;
+	Fri, 18 Oct 2024 12:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="esY8MAuP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hzc7VlZD"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BBE168BD;
-	Fri, 18 Oct 2024 12:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4B6F9DF
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 12:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729255717; cv=fail; b=rzLzTusCreYFxVtRIChyv7euLpFvFnxcPrnMZZP9AcwQP8OVEzaVTXQ4rKz8RR6u4p1FjfB9iWROGo7/RT7g8eHvOzOoPns7D751O+aQg/oHTMgaxogYWSa7JS22D1Q/o21YzIeiXyFSy+4pO77AHXXkOEBHpAvpaEYCrSu6obQ=
+	t=1729256268; cv=fail; b=hQvpHW6pGvAKkmVrWbNT9pD2fPs52PDUlo9CdQC5orst55KH06bCIpXNA3dMXdroQFgEbaicLtZXO7R23t6rCrqokO25ZQvY66C04ap04TYtSFyEQrBKtvVJuRPzOKhnDhhNUtY8fIeUgszqh12F24cSgtiqBN5gBI7fsUKazmY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729255717; c=relaxed/simple;
-	bh=MYPUsikWj7/RbrCXioY67PI1k4bEV6VgHqjPIqaPI74=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=gF4O8k+qNIuR9uxrexDRnOVFR++s3NFZ2t26v+4gtXWPK6Antqy4+c6aY3A6sydafJdEbYjrREMF7WLAoq8dK2n/oazTqrlpj59muidHFuJ0IBEIYcdtcpZ/TESEQEEwOZIdr2ZcsXo+KI9dm9bV1VDEv3aaqqrlUds0o6OlaIY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=esY8MAuP; arc=fail smtp.client-ip=198.175.65.18
+	s=arc-20240116; t=1729256268; c=relaxed/simple;
+	bh=8JfltRDNekD2g3ybmmOliwsUqmYjQdGD9Td7EWLD/N8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=q2/7gtM+/r7DzLzsxMHDIjqSjO0XFj/77JBxWdQoUuALliF9YBrVVEBEWr8FPpRfeLBlJp9bBK8AzeqinCgu3KWywLpMLwdLBDv0V8DaTMQ/4kyc/neO32jYpw+DUAiTTzbsU4BHfReScgjw7KxthSDfxmtMFxbioDhY/Oh9P38=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hzc7VlZD; arc=fail smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729255715; x=1760791715;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=MYPUsikWj7/RbrCXioY67PI1k4bEV6VgHqjPIqaPI74=;
-  b=esY8MAuP7RpBn595Iw1XoVmaTwEJ4I36D+l7Eu5YR3wcQMavLRJwUMd1
-   ZdkpTgu+lNMDlXXLlH/n6lvK3Ps6FoRsp6igOcKjqaemD+uYmTJSZVHKt
-   gSZpuYAP+jqwhJap/z8QU3kZawad6v1VOFg7jhQ57ThgAJwT3JWrFKSct
-   gY9L4OZYLYjiiEYGOcfP7CNFWRDHB0xMdWwcFvudQDMWPobyPmOWK7x55
-   G5axo6RUnrPWDay5Ix2Zp0ms5fBzIf2fCFVyC5I+Vuzm7VgzTrP5E1O+7
-   gi/57jGMlPim3PI96wy+XAouRU2r+xMKm4TWwgbLCEOR3B03t6W4o1szK
-   w==;
-X-CSE-ConnectionGUID: rWf+gH5mS3qQCE1maI27dw==
-X-CSE-MsgGUID: 81JejMRhQBO97yKA4MRzTw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28943114"
+  t=1729256267; x=1760792267;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=8JfltRDNekD2g3ybmmOliwsUqmYjQdGD9Td7EWLD/N8=;
+  b=Hzc7VlZD/A2DcZKYsQHmNsvUcSkMYPZXkPj4H8CYSgI84XPD0O6E/F/x
+   v08ucVM5edzNEU1e/EPqxDjdJwLTQo5S3lDDLgNaUP5izHiainbjR5you
+   MnrFKn87kHsQ2AuvPR/Z2ROp+j9jfa2rYcy+T9qG9Gn9muiJEvSm60vMY
+   IStwxhuGqF0SyEUjYpDBNZXDtaNMS4GUOEwIV0mKFxKesZ5fFXVsBkXPB
+   kL6hCJ8EXMl1SKkwbnspxIewU86ph0SgjYJWCsopZfdjfz06XdTogje6t
+   QWFomeS/KZ/OvtqgjTkh7z7L+O4/x5dSEew2tt+Qd5ceAKqRPnR0GymJB
+   g==;
+X-CSE-ConnectionGUID: YD2hoRuqQju0Gv0rGy9gDQ==
+X-CSE-MsgGUID: MStSDiVeTmKCf+p/kxL5hw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28944883"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="28943114"
+   d="scan'208";a="28944883"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 05:48:34 -0700
-X-CSE-ConnectionGUID: Wefmje0iQpuhZbac3C1CCQ==
-X-CSE-MsgGUID: Bp6bYPdhShmE4Rzu+pvxoA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 05:57:46 -0700
+X-CSE-ConnectionGUID: 3EkVc+8MT0GXcquUjKerkQ==
+X-CSE-MsgGUID: N5Q3jqx3Qt6JxY/hkVQwMQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="109682179"
+   d="scan'208";a="109686089"
 Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2024 05:48:34 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2024 05:57:46 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
  ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 18 Oct 2024 05:48:33 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ 15.1.2507.39; Fri, 18 Oct 2024 05:57:45 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 18 Oct 2024 05:48:33 -0700
+ 15.1.2507.39; Fri, 18 Oct 2024 05:57:45 -0700
 Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 18 Oct 2024 05:48:33 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.49) by
+ 15.1.2507.39 via Frontend Transport; Fri, 18 Oct 2024 05:57:45 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.46) by
  edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 18 Oct 2024 05:48:33 -0700
+ 15.1.2507.39; Fri, 18 Oct 2024 05:57:45 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q9ZAZZMY+EdnAUEYaTnWUFSI6Pgy1W9E1cZyRzlfsTg8TMuK1Wk6OX6fVeNJPCJe9SgNqfYqRGLG0rWxwianPbJLCISzg4eHMYXJFWWhzgfyO7JpNKFmxUeH+XRASMwt8pClIUYp28cuFA7jTfclJgDtNIU/5m9LP921LQ+zxL3QLfDafCDZJZKDNH8BTyONTEVIkMQzVC4MrAeJyvSocKVa+5gIDi/KKD8yuhQ6Kk9lRddFr7ygpSJpJrz1XpySvlTvTdQv+NOHz19+6T14wRu8+bdlS7labnGKbuycUo2sg+qYDl84XszDH0DQ4DmTJh6fsxavagcYF9cqloLojg==
+ b=U8NXD+b528BAoVzSJzBUzJ0Fd9z7gRuh5hLbyvgLc+1dy6yGDDChfUHeHJ7VQpSBtXQopdnV3vvzLUy0STw1ehhVNLf3SnNarKo2AAxmFhDI2tOpHMthH6eK8x2dv5WFqCrm65x/MMN/CYKSaN9nUgEy0ZoG502fVYHi3pOUw7VhryuRkESTAty0KzwPQ9vN0fcMR8Jcz4gxtEmu0LH/nEZQ4NVZfpup17Og0n7nrkvhmutB+UMwKVyp6U0Wk58Ol+7YkgRTOpTz1tyAOgeaHMPIw/W6EghoefKmAAA5frtFZEsGTF5jQ98Vc0+gRUaIu9R6l1qFiONU/64RzlQiCQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8r39drF1Q0hr6MZpS2R/QsIMtA7DSHih13E9hu9Ct78=;
- b=p3ZBEtC2io2iW5qHGmvZRe1CbNDMa3hsPYS5SisFRqQsNU8WncmxB7noDh/S+9PdXOjKt7/28vbFCKP3YudVRIDkoFAZ4x+OVTpppyvL1uvz/HVTULlS8kvKgszOViKZv+aYdXPPpEDgiC8ohJKYCfIZOiJtaEh/OFTr17sSL09RYFEM6jB67NNsfR0s9Qg3R9Sn+ssGsl0sGM3sdwrItNyi7Q7LlAt1miIlCHdUi+4OyZqqTbf7UDBzLDPWDf/g0kno0esx0hMYjpRbllkLBQ3Gpdcp5RxpLdTUq4ShYk41m/pWFd11hXsExWkn0StV20nb1UDVo2/OzOr3/ye4/A==
+ bh=Ai/jXLbtwmnEbHxuMtyVkvOKxLoSmF2T5BBsbmuwl2w=;
+ b=IMvuyy1fCoiydGXym4mfLgP35CzBvennWrVzBQemfa/eiOKkbN1aovM5K5j6xXbgiMTUGrnwNAGRtShnHYq/XWhxWi89jXbdtmj9B2Er/uYLk+4C2VAH9YVLkLCPjbBSrcly+BocHZ4DyrhSOfnB17IWwDALsKe2mu7spWP4zv7lfcihiL7nFeLi7PHEP/A9Ay24dVVyEQTkLkndP+G7XkHifcfu9TDxvZmKUild7WOtGFi8dRU0auL6aWYxsAUFwq22aRbwWwvakf7OMGiGwPUPaLOCGzyruhHPAjWpdibLdnHCwY+pV3yALqTAVvWBjEAexbrGDJS6pjtJ+tfujA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH8PR11MB6927.namprd11.prod.outlook.com (2603:10b6:510:225::10) with
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH7PR11MB7643.namprd11.prod.outlook.com (2603:10b6:510:27c::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Fri, 18 Oct
- 2024 12:48:30 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%5]) with mapi id 15.20.8048.020; Fri, 18 Oct 2024
- 12:48:30 +0000
-Date: Fri, 18 Oct 2024 14:48:18 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?=
-	<toke@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, "Andrii
- Nakryiko" <andrii@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, "Magnus
- Karlsson" <magnus.karlsson@intel.com>,
-	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 15/18] xsk: add generic XSk &xdp_buff -> skb
- conversion
-Message-ID: <ZxJZEn43W4y8EwsD@boxer>
-References: <20241015145350.4077765-1-aleksander.lobakin@intel.com>
- <20241015145350.4077765-16-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241015145350.4077765-16-aleksander.lobakin@intel.com>
-X-ClientProxiedBy: WA2P291CA0036.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1f::9) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.19; Fri, 18 Oct
+ 2024 12:57:41 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8069.016; Fri, 18 Oct 2024
+ 12:57:41 +0000
+Message-ID: <a1f5838c-8452-48f6-a6b1-e8940270d010@intel.com>
+Date: Fri, 18 Oct 2024 14:57:36 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] virtchnl: fix m68k build.
+To: Paolo Abeni <pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>, Wenjun Wu
+	<wenjun1.wu@intel.com>, Jakub Kicinski <kuba@kernel.org>
+References: <e45d1c9f17356d431b03b419f60b8b763d2ff768.1729000481.git.pabeni@redhat.com>
+ <98b5bef5-d5a8-45d5-8fe8-f9c34eb5ab84@intel.com>
+ <fee3fe99-14bf-486e-b12e-5088d17a095a@redhat.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <fee3fe99-14bf-486e-b12e-5088d17a095a@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZR0P278CA0124.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:20::21) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -125,271 +121,147 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH8PR11MB6927:EE_
-X-MS-Office365-Filtering-Correlation-Id: 88d8a784-2629-471a-d2c1-08dcef732b54
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB7643:EE_
+X-MS-Office365-Filtering-Correlation-Id: a7bdcf85-3c57-44b5-d5e6-08dcef74739f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?WHRdFGy45uOe4Tr/apW0IGZdNKTtQ+eEEbsfnjpZeEYUDp0DRBCXotFsQYz1?=
- =?us-ascii?Q?6iNVjLu0/ww75Qzs4p1pkQ+fdnOajRXf8pkUkUcWVPhmsWEh4WJf0YDlvMFo?=
- =?us-ascii?Q?0HvXDii4+bXT2saed7EGRxX7CjwFpWaTfd9eGdR4F8gos+WwjRuP6M5vC15H?=
- =?us-ascii?Q?oqy7xfwh2/zk2IHGx6qh+H4Qe5Umcf2nCavAVUdtcR8VXEPNLcrNncPCC1zc?=
- =?us-ascii?Q?HD0vj5lN8ruKckXxCc5jpMDvFc7ZFWvlX/jy13Hp8cPg2/33MDolfaZ0t9LX?=
- =?us-ascii?Q?Jezq9sFRZOt7Xt0m3NzqGNoUhkgiaWjeEohXOrgTf1C3FrezamJ1ppHiGWa5?=
- =?us-ascii?Q?3dnNp3dScoLMcWuKfXw8vhOuV54WFafofx5Ee6a58xBI8KVuzVpUY+EkRDzC?=
- =?us-ascii?Q?yO7UAUuYz2UJSfaW4k+I1Skx5zhnp53acbO34UvqxZU2uT/00MBpw6tDRbPr?=
- =?us-ascii?Q?xQzX1F4RrL0B0DBgGc0kE3YT+KiIoUJ1R2b5r0/6rfat7/Z9NJvyPo2Tgcb0?=
- =?us-ascii?Q?WbMVoddEXWf7TDGBKSv+243rD7v/THQWzYXfdjXvCIH8vpcuhL2lFFXXiRsm?=
- =?us-ascii?Q?63ztLH/ZSbPzEYL1GNa3fy8Qq34VD3sx4TL0l8rEFBGDxLN5mkL3eHeEhkU/?=
- =?us-ascii?Q?G+g71Pt9j2XsE2ry7M37vTcdXqpkC7kPM2opSbtBw68SnNDoJqPGIa68LeZ6?=
- =?us-ascii?Q?iY/HBMbkMWnipXDm2nnLUdl5bdJrwR4y6NMOOpYgoSjD9h+/nTxgpgExx0Bd?=
- =?us-ascii?Q?s2I+oLkxLtY61md5PN7mbmiyY957Q3mhnCcXqGY8A3eQVRy0pMXBjjeL2/1n?=
- =?us-ascii?Q?C5yQ2TXveDncDz1yO26C7owjX+KKx/aGpBcteLFW42vrJ5AgWFkJ/X/b3cTw?=
- =?us-ascii?Q?2SeFa6Y8nQeKyMnkaY4B0xWhLtBij8cl+eQw/fYPsQts+aDvK+1YEttGXZgi?=
- =?us-ascii?Q?FZrjFN3BMFQVvm/FRWGGctAlnSrOPwYVM48VE9S6SP1XsjDLN0aUHgaGmwS1?=
- =?us-ascii?Q?SPO2+M570pimj+xBEpFy1/bKlfWvtag+Aqtsr0W+O1KUeQ9Ta/JBm4sPHfZ7?=
- =?us-ascii?Q?5XYgMJI01Yftz2zOGxe4KkJcQU1xEr38qzpW9XfPhtyZr0S+ZNNhh/5X34oG?=
- =?us-ascii?Q?rF+DXwlc9CEd98Xp1gPu20XfiFm+mp76U/U6p7zvCs1nn8BycDmUNbJipj8A?=
- =?us-ascii?Q?h6qWn7E5l/utKJqveKX3FUvPIt+5yuZBXHWZgR0Sm1JQ35ScCaHYDPYWaYFj?=
- =?us-ascii?Q?zNNs1Lwwr0re28XA0UXyXgJ+osXVuIwHkPTG1jSXfepk7eUIjFoyCEoGkO17?=
- =?us-ascii?Q?yMnH2GzIqPPIsvpantM570qI?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RGJKMUFNOGFMVUNxeEpRdjU5MytmOC91M204MVlld3dKRnZZOWwxM3NnN09D?=
+ =?utf-8?B?Z2J0a1FPRHJKVEEvTHk4NEhBd1RDa2RjL2JoWDVSRXBRK01PWVdtOEF1eGIy?=
+ =?utf-8?B?a3pIRkJwa2o3N3UzNUpZY3JlR2dEd01icC9UU0NWeElGNFl2Y0w5SllWTVdx?=
+ =?utf-8?B?Y0ZSS3ptQnEvRHNsakdOTUhyMzhsemluMy93NXcwMWtxYTl5NGFDRVBaWnh4?=
+ =?utf-8?B?Z2phZTArRkhKRlpMZUswUk52ZG5hQzAycFdSMWd1eTdWL3dOSi9LMlRzVUNt?=
+ =?utf-8?B?bU1PMWFkbm1Sd3QzbE1QWGRnZEhvTXBFU1plOFA4L1llNW90SlJmc3FQbnha?=
+ =?utf-8?B?UmFBcXhkVVlWdjdVMnBUaEFveGNuSEpCYWxEZDBGdTBKcHpjbWRtNWJoWWox?=
+ =?utf-8?B?TFJaYS9QdmRzbXlnYUw3THArRmxobFRpRGIwbEFnK1ViZTdrd2kyZDBjajNX?=
+ =?utf-8?B?M0xoVVh3TnhvZzlFQkNmaTRaR1U0bENiY2orNGw0eWJsYzBldzlZWGtvcTdS?=
+ =?utf-8?B?TWRzV2pHTDE5TVU5cXF1MEJCeVB2MDhic1J3VjZsOERuKzVsbWwwb0p6RC9M?=
+ =?utf-8?B?cEpQN2JNZUp2bFp2TjZtbnZKM2Y1ZFlpbW1pY3JxK0Z0MjFmUHB5N2dURjRX?=
+ =?utf-8?B?c2FuQ1BvT2Q1Rnh6dVFRbXJYbmZQb0xKQ1FWcXhueTFvNS9ONUdGYWg3RFg5?=
+ =?utf-8?B?VXZyMXowU0RPdGt6WXFDVzJtU2FiL0JjL29BQTVYN1JKTUxjRjV1bitNa2ph?=
+ =?utf-8?B?T3p4SlpGOFRIYXBhWm5wSm9UVzFzR0JGSFQ1TTRadFh6Y09WaW0zT0d3M0VP?=
+ =?utf-8?B?alE3ZWRLTzRaMktlZ0EvdWpNVmV3S2hTQUcrMGxpYnZKbEw4WkxkNVBMNDBx?=
+ =?utf-8?B?WmNBVDRJRUI3Q3V3aHY3YkdLSmNoZjNZeDNJblZKREwvY1Z6TXpyVnVkcENo?=
+ =?utf-8?B?K3oxeEhzQjRmcmd4U1NtbGpaWUZUY0FlOUtrRjVGbnJPcDQ0Ny9PYmhkSVBm?=
+ =?utf-8?B?NzIraDB5UVZkT0FncUwvQm9xWmY1bjhMeTQ3NkRBNXhQMjRDbGdGcjM1YVhi?=
+ =?utf-8?B?VkZBaC9oNGU1UVJaR2xHdGM5YThKRXhBQlFtTzNidWRPRkJJY2NMNEJ5Ylkx?=
+ =?utf-8?B?RkhVSUJEQ1lEOEo1b0ZiTXpGZmRLTTRvNGtFTWJYN0VPdmk2VlFVOTByNVZJ?=
+ =?utf-8?B?emJEN2QvZ0lwcmZuNlZxSjlBY3RvVVc0VWtDblNBWStWblhmTnFOOExLaUd4?=
+ =?utf-8?B?T2NBNUY5d3NkTnhUbjM5T1FXVVJwTi9sbzZxeVZwR2ZCQkNuMkNaN2FrNFVk?=
+ =?utf-8?B?UmpHU3JhWW13MHpCOVpWODdTcjBJL0FyM3duaURRSUF5bUsxVEVERzlXcG1F?=
+ =?utf-8?B?ZW85WFVDc3AzVXg5a3h2L0NDcEdqUkJnN0U1SEtkUGVSUm9qaGVReGljTGdM?=
+ =?utf-8?B?Q3Z2RExFQkwwZE1sT3hiSmpNY1IzV25WR1FadjBPYXhFOTF1dEVkZWl6L09R?=
+ =?utf-8?B?VmYwQldwRHpDeWJNcnR3UHdHRFA1MGhaeWNGT0JPMFVUZlpsbFpxTk0vcFNv?=
+ =?utf-8?B?WldUZEVMZ3ZoV0xTbStXaUJtb3FUc2QyL2dCRFdsUldUUEtUR3A4cUtYVU5U?=
+ =?utf-8?B?UjB6eUVNTnJoMC9wc09hZlR5VzR6N3hjOXNrdHhiVkMxZ3B3SWtlM2ZVbXlp?=
+ =?utf-8?B?czZjcHlIRmdid2t0OEF0bjhXZHR2djZhSUJ6NXI0M0JFSmYxTjFuV0xLK3Ex?=
+ =?utf-8?Q?meOrX7yRSqJbThmmbIIH3oH/F5QMoCxFHFs3TrK?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?prv2Mfv2RCAK21DftbEI1vJ+Ih04uGqsFGR5dibSaAR+cm5sXgsKxIoE6ibm?=
- =?us-ascii?Q?tsCiumtDJVrcNj8B4ylwEIiQry4PRqgoD3gBmjFWcT8B4hCSjfDiK6avfEfO?=
- =?us-ascii?Q?q71QNL3b0d4oGiED4WhL00zvXj392qeS7vciNm6e00MCaOD3M4HYR6mexO8P?=
- =?us-ascii?Q?4ctio4LqtmAQIUaKNFu8c0kwz5BboqXXC/NpjT0h5rviPQFRv1vCSM1jmaUd?=
- =?us-ascii?Q?dQFRV9lHZWpbUd9i9a2iBe8/TAp446zMnzpnzHDWjDSXe7tX9mX3s90EzJQp?=
- =?us-ascii?Q?p69YfU/yYwfYl6dDmat+9vp+dUHujd5NxT6mf20pJ5GnNROSDAuii7P0tgt0?=
- =?us-ascii?Q?iursVs1ch998qoha7ZH+EfxQmD1MdKSP8SovVI56j4TJc0GwAa5ZkrlAbr/K?=
- =?us-ascii?Q?28D38GcdIdOMpRnb30yOuMxZ3iTH70OPAFndh3ldnpoNb6eHBkYmAZQoLFxw?=
- =?us-ascii?Q?mjJTM3g55R+nN/EnWYYqWasiVOdjAfMbIGI8aSINiEJcL/C0wKtf/YPPpuNf?=
- =?us-ascii?Q?WsZnldJ9/MfZsi6Mv7AZmH0yAoQHI254DV0cfLWadE66ZOs5FLIqQpWKGA6V?=
- =?us-ascii?Q?O4YuUGGo3W4BNRLsK+eyIIe1sF26EITG6S/Bs5962R5C9yYx4PFHTFV+WULs?=
- =?us-ascii?Q?p7Wf7sjDhWALQRcpfEnUyexp5ooO4l/qcTDZuRLP1iialC8hLWdTxVi9BMNw?=
- =?us-ascii?Q?+S5vaPvk8MBtXizsyzwkRyW85uvuYHsfVp3xAHzviLUYLF1MA5KKcvB3/H4Y?=
- =?us-ascii?Q?ZWl/2FRrZJlWZkVgHHICFIgB+HAIrxOE+pU+WL7XNrisYJdha4Z5+NkoiGQx?=
- =?us-ascii?Q?fQjmdlhtcJYLMca7iwRbE2nYr1otSzoY7mv9z1j6wK9N70EpL/39mvU7o7u1?=
- =?us-ascii?Q?sSM88yse8/Vjm22DHVRTCj/Z1CxskSSG2O/maNcg7gu1RX9PkL3OQTSki6qo?=
- =?us-ascii?Q?wN6F8J1eyaGgTjMzjrdYZzgqUoHV4ilNOgEB//BeIFppR0yPZpKUmuFe+/Xz?=
- =?us-ascii?Q?MtgtwhIUD/RBs2roMWQ9eOqhmawv7e3Zg170gW3hUJRszoRyPjqA3b+6Xowu?=
- =?us-ascii?Q?snYjkvfMrmHz1/gv3iFzoVBJW7Rzr3sC9VNggt3MFsPb00vGQMaooOZKN2Kh?=
- =?us-ascii?Q?twcqk3FlRkz4J4US0vnzP9jvIfbDkBAto0Y6it9azqR1TFnP5KoEGI6iQwZL?=
- =?us-ascii?Q?eF8i+RllsKCeSN2fXLoZwpSU2maO8fd+DMILDCkJaocHCXnLhxFFaaUZPj2l?=
- =?us-ascii?Q?Q/neX4ACgMR2Y7Lx8NoazqNVWdLQoMNodJ56ZA47PjMZyEdgjjN++hBAV5BW?=
- =?us-ascii?Q?RDGUdBcwonxS3k+RVGl+5P7e31gyYpNk7P3dVEvnOQCbF4UVndE4vFJeNDa6?=
- =?us-ascii?Q?zR/OZ6KzhqQIT8gV2FXaQGk109Hv8uX2/Jas+XKpz8uq+QvvobURxsua6YSk?=
- =?us-ascii?Q?scnfhdlMhMWUeFgzuPsusEYHEWn8S3cVByz4opFgHCn4gUf0U4vmpmdATvt9?=
- =?us-ascii?Q?n5VKBhONWibh4JNHJpURiWf5STMZT6tW/w3Wwbui/q4ZjO0UoMS11/kv5b5w?=
- =?us-ascii?Q?kjvWpUDEVyM28mdMuBywRdiLRBBwsXuXhOgXMM3bu7oFEsIbBqZE1ysSvJvb?=
- =?us-ascii?Q?DQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88d8a784-2629-471a-d2c1-08dcef732b54
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZDRxQWtnR2pBWGdOUW5weVlqR0VWdDJoNEtzd3VTWlhlME9ITEZodjM3ZXFU?=
+ =?utf-8?B?K0U1UkE4Y3RNbFVkOTFxbEZTeWNJaHFwZzloaVBoZndUbFBhMHQzNE5zb29T?=
+ =?utf-8?B?TjIrRmZWQm9NK2VySkNPNXJ0ZmRkQU9iRDNMOVB3bTVLYk9Pck05WkZiK1dr?=
+ =?utf-8?B?NmJZaG5VQ2FtaVVnUG14ZS95ZlBVNWllL1RDVEVvSytqcVJYMTRCQ1JDVmh2?=
+ =?utf-8?B?RXMyVVpyaTRaU2dsSURUUEU4MmNUbXJuZHc4OW5zOTZoclpOZ2U4Q1EvSWoy?=
+ =?utf-8?B?L3BtcUNreVlWTGFoVHhnUldZL3U4S2hoWTc3K3FVNXlCUXRONFVZQ1hYdTll?=
+ =?utf-8?B?V1c0QW1JN05sMDhkMDRITFJsUG5RSGxKMkNLQkZ4d1R6RWdwcGg2NkV0YVVq?=
+ =?utf-8?B?MFhQVFFXK0U5aG9QZTVXWWJuMXFTazgwRDI3TjRQeUpnaUhtNVg3K3JUVWRM?=
+ =?utf-8?B?VlVVOHc0S3M5TjZQWC8zZnBJaUZVZFowaGI1VEVrZWxhTW53RS85MUZicGZQ?=
+ =?utf-8?B?V1RXaDBtcGplOGZ3OGczTmljTElMQjdvcVRoOVl3ZUVLWlZKUlpVZU11VVVF?=
+ =?utf-8?B?bXZnWSs0ZngvVkU5Qmo1L0txUWgyalMwSW4xSzJKeEVMZktTaUFQaVJDQ0xP?=
+ =?utf-8?B?cER2SUR4aWZsZlFMMVdFOEl3bFp1SzlEdjdjMFdyQ1dTWjNMVDBvRU95ZVQy?=
+ =?utf-8?B?aVA2ZTBCMCtkeC9vVlhsNVFNYlRudHlnYkMvNlFUNmVOZE1mRTlqU0ZkVU05?=
+ =?utf-8?B?SUFyTmxlRTluSnVjQWdKbkNVT3ZjS1daWjJ4SnNNTkJnYzhrTmROWmZjRHVn?=
+ =?utf-8?B?bHIwNG04SWxMZURzc0RJbVNyVC9TVnFhV3ExNEpyR3E5YWZVbS9teWh5MDRR?=
+ =?utf-8?B?UXdqdFpHTCswMjZHQ01EajlsR3lEalQwREJDd1pvcmVpZ1g2dzk5YXBkak5a?=
+ =?utf-8?B?MEVCMCs0bGYrbE5ZRGRmbGhMOHFQaWpaMFBwQ2U4cVlZc2NaMlRwZkZIT093?=
+ =?utf-8?B?blZFUlIrbldTVGVzQm50TFlXN0FVaW13SU4wNXNheEY3blVBNXlTYnNBNmdY?=
+ =?utf-8?B?MTNWRnpWL1NCcmZFTEE3ZHJjbVA0TWlqOGo3dnc3eVBEVGhMQ1NrNVV5Ungv?=
+ =?utf-8?B?VlFoVFVnT0thblNRYVNORTVTZHlvaXF1aVJERVNPUnhHNXprRXRueldXY2t6?=
+ =?utf-8?B?ZVVRaHNJZ2Y1SVRMWURkQzBEV0FHNCtLUUVESVN1Ykt3UUhZTjRIMDJPeDJH?=
+ =?utf-8?B?YVlzWVRuV0xpeTQ3eFV1a1JzNlUwcmFQVmZOV2pRYWs1NVArUUk4b2hrbWVV?=
+ =?utf-8?B?MC9YUlpVQm9yRStBT241eThLcHVJOG1YVm0vaVprbUtOZlh1WnUwZytDNEVW?=
+ =?utf-8?B?VG02ZHRhZjFSR1p4NUF1cXpuYmg2dWMzb3NTSmpYNGRuR3pwdFJsL2tJZXZW?=
+ =?utf-8?B?dThEZDFYeDRJRHdXWWRMZ054amFnV0g5NG1IRy9IZ1UyM01oRXRlelFxeTVW?=
+ =?utf-8?B?dXRrek4vTHJXZTl2VUwxbUdVNmd6VDZKeXoxYzBobDBQY0Y5Y3dTYk90Vk5v?=
+ =?utf-8?B?MHJMelVjcitvZVpiYXVwRXVvWC9KdTZYeDhLTTNNRUhHOWZQbExaOGNrWENa?=
+ =?utf-8?B?Z1k2N3hhQ2lMMHlSUlQ2ZzlZdjQ1VFFWaDVjaVlwRlNLaTlSNTEyb3BieThH?=
+ =?utf-8?B?N3dNdGFSeWVJNUFNS2xjalhJR0cwSyt0aExQTUJ3WXFMT1ZjR2N1LzN2T0VO?=
+ =?utf-8?B?RXRNcHZhbXBmZ296WEZqcDdEcDNjaFh6Ym1kbG56Qkdscy9TOXJwR3J0Z2Uz?=
+ =?utf-8?B?OFh3QWg2SUpZTHBRYk5YbUZFRm11NmZpNGlxQWJMQkR3ckh3YUkwRE9rQWtk?=
+ =?utf-8?B?N3QzUXlxVTJENHVBNkhqMWVqajIwWVFjQzdxcVZIQUdVODBrWk1KNGdmUUtC?=
+ =?utf-8?B?aEYrMjlYWHRjQzR4ekFWNkN6SnMvSVpYeXkyQWNYS2Z2cHV3SVV0MDZhNzh2?=
+ =?utf-8?B?YXZnS1RoWC9nTXlVbC83cmwrS3dyMlhVNUc3WGVKQ1hwRHNpUXFoVWkxYTl6?=
+ =?utf-8?B?c3dPQVJTZTg4aXM0LzJiamVXcDZsMzdmZTNtY3JRZEpPZCtNVDQwdWpZemJr?=
+ =?utf-8?B?S3JQb2N4ejdGdzlGaGp3aDZ5OFZNdDB4YnRpOGhjRGdpWWE3di9OeGJLcjFO?=
+ =?utf-8?B?cXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7bdcf85-3c57-44b5-d5e6-08dcef74739f
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2024 12:48:30.8050
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2024 12:57:41.6206
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Eonigm0CL4dOVUBKaLgd4euHp7OxknyN9bPS4UcJwjs6YWHPnQWE8z3wWbsYmAY3cU04iUECSXGbKCtmXYSA4O/ObUY2D3XCybwdKo3In40=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6927
+X-MS-Exchange-CrossTenant-UserPrincipalName: bIFkn2+eqD01DYkqQ8VAzhx25nnCG1VQv+XV0Amnrucq+2c3cuNuTT2Q1deQaQUEVXUkJ9O0FGzXA3vgLOSd8hiIumkrVeoqz1f0vSfHkXA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7643
 X-OriginatorOrg: intel.com
 
-On Tue, Oct 15, 2024 at 04:53:47PM +0200, Alexander Lobakin wrote:
-> Same as with converting &xdp_buff to skb on Rx, the code which allocates
-> a new skb and copies the XSk frame there is identical across the
-> drivers, so make it generic. This includes copying all the frags if they
-> are present in the original buff.
-> System percpu Page Pools help here a lot: when available, allocate pages
-> from there instead of the MM layer. This greatly improves XDP_PASS
-> performance on XSk: instead of page_alloc() + page_free(), the net core
-> recycles the same pages, so the only overhead left is memcpy()s.
-> Note that the passed buff gets freed if the conversion is done w/o any
-> error, assuming you don't need this buffer after you convert it to an
-> skb.
-
-AFAICT looks good.
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-
-I have to switch the context now so I'll finish reviewing the remainder of
-this set on monday.
-
- 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/net/xdp.h |   1 +
->  net/core/xdp.c    | 138 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 139 insertions(+)
+On 10/17/24 08:39, Paolo Abeni wrote:
+> On 10/17/24 00:49, Jacob Keller wrote:
+>> On 10/15/2024 6:56 AM, Paolo Abeni wrote:
+>>> The kernel test robot reported a build failure on m68k in the intel
+>>> driver due to the recent shapers-related changes.
+>>>
+>>> The mentioned arch has funny alignment properties, let's be explicit
+>>> about the binary layout expectation introducing a padding field.
+>>>
+>>> Fixes: 608a5c05c39b ("virtchnl: support queue rate limit and quanta 
+>>> size configuration")
+>>> Reported-by: kernel test robot <lkp@intel.com>
+>>> Closes: https://lore.kernel.org/oe-kbuild-all/202410131710.71Wt6LKO- 
+>>> lkp@intel.com/
+>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>>> ---
+>>>   include/linux/avf/virtchnl.h | 1 +
+>>>   1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
+>>> index 223e433c39fe..13a11f3c09b8 100644
+>>> --- a/include/linux/avf/virtchnl.h
+>>> +++ b/include/linux/avf/virtchnl.h
+>>> @@ -1499,6 +1499,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(8, 
+>>> virtchnl_queue_chunk);
+>>>   struct virtchnl_quanta_cfg {
+>>>       u16 quanta_size;
+>>> +    u16 pad;
+>>>       struct virtchnl_queue_chunk queue_select;
+>>
+>> There's a hidden 2 byte padding because queue_select requires 4-byte
+>> alignment. We assume this, as the VIRTCHNL_CHECK_STRUCT_LEN for this
+>> structure is 12 bytes.
+>>
+>> On mk68k, we must not be adding this padding, which results in a 10 byte
+>> structure, failing the size check for VIRTCHNL_CHECK_STRUCT_LEN,
+>> resulting in the compilation error?
 > 
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index 83e3f4648caa..69728b2d75d5 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -331,6 +331,7 @@ void xdp_warn(const char *msg, const char *func, const int line);
->  #define XDP_WARN(msg) xdp_warn(msg, __func__, __LINE__)
->  
->  struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp);
-> +struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp);
->  struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp);
->  struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
->  					   struct sk_buff *skb,
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index 371c26c203b2..116153b88d26 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -22,6 +22,8 @@
->  #include <trace/events/xdp.h>
->  #include <net/xdp_sock_drv.h>
->  
-> +#include "dev.h"
-> +
->  #define REG_STATE_NEW		0x0
->  #define REG_STATE_REGISTERED	0x1
->  #define REG_STATE_UNREGISTERED	0x2
-> @@ -682,6 +684,142 @@ struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
->  }
->  EXPORT_SYMBOL_GPL(xdp_build_skb_from_buff);
->  
-> +/**
-> + * xdp_copy_frags_from_zc - copy the frags from an XSk buff to an skb
-> + * @skb: skb to copy frags to
-> + * @xdp: XSk &xdp_buff from which the frags will be copied
-> + * @pp: &page_pool backing page allocation, if available
-> + *
-> + * Copy all frags from an XSk &xdp_buff to an skb to pass it up the stack.
-> + * Allocate a new page / page frag for each frag, copy it and attach to
-> + * the skb.
-> + *
-> + * Return: true on success, false on page allocation fail.
-> + */
-> +static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
-> +					    const struct xdp_buff *xdp,
-> +					    struct page_pool *pp)
-> +{
-> +	const struct skb_shared_info *xinfo;
-> +	struct skb_shared_info *sinfo;
-> +	u32 nr_frags, ts;
-> +
-> +	xinfo = xdp_get_shared_info_from_buff(xdp);
-> +	nr_frags = xinfo->nr_frags;
-> +	sinfo = skb_shinfo(skb);
-> +
-> +#if IS_ENABLED(CONFIG_PAGE_POOL)
-> +	ts = 0;
-> +#else
-> +	ts = xinfo->xdp_frags_truesize ? : nr_frags * xdp->frame_sz;
-> +#endif
-> +
-> +	for (u32 i = 0; i < nr_frags; i++) {
-> +		u32 len = skb_frag_size(&xinfo->frags[i]);
-> +		void *data;
-> +#if IS_ENABLED(CONFIG_PAGE_POOL)
-> +		u32 truesize = len;
-> +
-> +		data = page_pool_dev_alloc_va(pp, &truesize);
-> +		ts += truesize;
-> +#else
-> +		data = napi_alloc_frag(len);
-> +#endif
-> +		if (unlikely(!data))
-> +			return false;
-> +
-> +		memcpy(data, skb_frag_address(&xinfo->frags[i]),
-> +		       LARGEST_ALIGN(len));
-> +		__skb_fill_page_desc(skb, sinfo->nr_frags++,
-> +				     virt_to_page(data),
-> +				     offset_in_page(data), len);
-> +	}
-> +
-> +	xdp_update_skb_shared_info(skb, nr_frags, xinfo->xdp_frags_size,
-> +				   ts, false);
-> +
-> +	return true;
-> +}
-> +
-> +/**
-> + * xdp_build_skb_from_zc - create an skb from an XSk &xdp_buff
-> + * @xdp: source XSk buff
-> + *
-> + * Similar to xdp_build_skb_from_buff(), but for XSk frames. Allocate an skb
-> + * head, new page for the head, copy the data and initialize the skb fields.
-> + * If there are frags, allocate new pages for them and copy.
-> + * If Page Pool is available, the function allocates memory from the system
-> + * percpu pools to try recycling the pages, otherwise it uses the NAPI page
-> + * frag caches.
-> + * If new skb was built successfully, @xdp is returned to XSk pool's freelist.
-> + * On error, it remains untouched and the caller must take care of this.
-> + *
-> + * Return: new &sk_buff on success, %NULL on error.
-> + */
-> +struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
-> +{
-> +	const struct xdp_rxq_info *rxq = xdp->rxq;
-> +	u32 len = xdp->data_end - xdp->data_meta;
-> +	struct page_pool *pp;
-> +	struct sk_buff *skb;
-> +	int metalen;
-> +#if IS_ENABLED(CONFIG_PAGE_POOL)
-> +	u32 truesize;
-> +	void *data;
-> +
-> +	pp = this_cpu_read(system_page_pool);
-> +	truesize = xdp->frame_sz;
-> +
-> +	data = page_pool_dev_alloc_va(pp, &truesize);
-> +	if (unlikely(!data))
-> +		return NULL;
-> +
-> +	skb = napi_build_skb(data, truesize);
-> +	if (unlikely(!skb)) {
-> +		page_pool_free_va(pp, data, true);
-> +		return NULL;
-> +	}
-> +
-> +	skb_mark_for_recycle(skb);
-> +	skb_reserve(skb, xdp->data_meta - xdp->data_hard_start);
-> +#else /* !CONFIG_PAGE_POOL */
-> +	struct napi_struct *napi;
-> +
-> +	pp = NULL;
-> +	napi = napi_by_id(rxq->napi_id);
-> +	if (likely(napi))
-> +		skb = napi_alloc_skb(napi, len);
-> +	else
-> +		skb = __netdev_alloc_skb_ip_align(rxq->dev, len,
-> +						  GFP_ATOMIC | __GFP_NOWARN);
-> +	if (unlikely(!skb))
-> +		return NULL;
-> +#endif /* !CONFIG_PAGE_POOL */
-> +
-> +	memcpy(__skb_put(skb, len), xdp->data_meta, LARGEST_ALIGN(len));
-> +
-> +	metalen = xdp->data - xdp->data_meta;
-> +	if (metalen > 0) {
-> +		skb_metadata_set(skb, metalen);
-> +		__skb_pull(skb, metalen);
-> +	}
-> +
-> +	skb_record_rx_queue(skb, rxq->queue_index);
-> +
-> +	if (unlikely(xdp_buff_has_frags(xdp)) &&
-> +	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
-> +		napi_consume_skb(skb, true);
-> +		return NULL;
-> +	}
-> +
-> +	xsk_buff_free(xdp);
-> +
-> +	skb->protocol = eth_type_trans(skb, rxq->dev);
-> +
-> +	return skb;
-> +}
-> +EXPORT_SYMBOL_GPL(xdp_build_skb_from_zc);
-> +
->  struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
->  					   struct sk_buff *skb,
->  					   struct net_device *dev)
-> -- 
-> 2.46.2
+> Exactly!
 > 
+>> Adding the explicit size aligns with the actual expected layout and size
+>> for this structure, fixing mk68k without affecting the other 
+>> architectures.
+>>
+>> Ok.
+>>
+>> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> Thanks,
+> 
+> Please LMK if you prefer/agree to have this one applied directly on net- 
+> next, to reduce build issues spawning around ASAP.
+> 
+> Paolo
+> 
+
+Would be convenient, no objections!
 
