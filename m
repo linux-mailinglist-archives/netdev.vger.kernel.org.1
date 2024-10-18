@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-136853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D6AE9A3422
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 07:21:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 614659A3431
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 07:23:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49EC3B20D44
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 05:21:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 178B51F2462E
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 05:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BAE17279E;
-	Fri, 18 Oct 2024 05:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D2817279E;
+	Fri, 18 Oct 2024 05:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b4ojSMh0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0gyRDEUX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D77152E12
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 05:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E6F20E30D
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 05:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729228873; cv=none; b=tgxTnYoSPiV7zoabJWjSd+vl4syouEqwhEIcEMA9WDkb5rn/txxKTdc3UbGT5HxfCKPDzlFoU8tAgLcOacjQR9NPceE01zzEV766eH7txHLnm6X6wrIEJBozMWJ9TYmUHqIIbJsQPnjuCuDcDK3nGidPOUKkgehguBV5NC7l3oU=
+	t=1729228996; cv=none; b=HZJvHXRlYrMfsTHWvMQ/RTqYnADmE/nVeTne338G9FUXECdE1WG3n6ALLMMTFMC51s/ZN2HClWq1oEo79VRW5+R2CZoarD5YVYFjdhTNFVNanHV/CezfSH0GbWItbwj/XcjuvIrO8ehpcCV/AJlPuRx+wFLG9VSDaBOICxm3BPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729228873; c=relaxed/simple;
-	bh=J/f1uA2chu/qI4cVVXLm4mJDhaT+EZ5fucnUD/1Ig7k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Yk+PkdWEds9oS1u5cAaNwbnfhLJw9J0iyGRoMe/y2IBCrOZkbGMjC/b8NdLVoQABEqwnDdbLSbE8DLTYUqggWG5Br868SXqXqcumeFCf6H/4lgoZBN0mCqZazC/86RpJ5Xxic52p1893GzRWts9dz/3H7hNHpHfZ+1gxqbLyTQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b4ojSMh0; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1729228996; c=relaxed/simple;
+	bh=5Z0fpYosQpDIgVSx6Tn1NacK0QkzRgp4LS96LTiFp/g=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l66x0aKfKA43x9ab4Iw4H1fWjxZo4SYCLcZdkI45zgv+uBt2Z7tCGo6DKRSCka4JHBxkjMSMIpHiPhTQ9h3TpUZ3dRdncLaW3t1RfPPQw4rgnvrXng8S2pBWGUkPmt8lc43q7sr70Wf8V6N1q2GReY6lrj4UO/V9WKY/+XAW6Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0gyRDEUX; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e31e5d1739so29416957b3.1
-        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 22:21:12 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3d6713619so32306097b3.2
+        for <netdev@vger.kernel.org>; Thu, 17 Oct 2024 22:23:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729228871; x=1729833671; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1729228994; x=1729833794; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=fPkDC3Enb0xgXPmzj9uS+PkCITtpS9EpYmFVpWq2P1M=;
-        b=b4ojSMh0dY9Cy7Af236ga8sVjzNJ8VEXUCNHqlrKRX6FgNxTqho8SWBTLUGVSBRGMi
-         H4GMcgd+WYj2bW/UHA4UBMWMAfhBWL7AL6LslDNtDXAUcBS20QrgDM3+xL+ptGMVbvbj
-         osjVgY3yhjMlNYPkZxM+RNv6v3bSguUVY50EJAMmSyIxsGNl5UWuURrnLHXOsL7v2k2t
-         Q/w0ZrQOU5SHB3U8kQjFxo+S9+bIHVeaZRR/uu6IYD+oB4igu4LRbB5whXI150AZF8lf
-         vOhN6gGZEwDNA4sdR2+lljgDsLPzV8C7Fd3eCwWb9oeFUl6k7qxplK/jS/Jqm5YO+RXT
-         XPrw==
+        bh=afscFukNlKoZsqHEdG35fKXHbYNW9PwkOErpOv0CumI=;
+        b=0gyRDEUXX6+AZSd2iNdn5jADhU2oi10/OdyqgI7KbdoOepBX+FKhnKanSe3bobonoS
+         veZHExnwYe2gjyJjsTLAvg9en5xQmG4upJ4qpXAbIyU6ZTYkjYrytNk3lmD4KiffYlKW
+         RKT9bg4omchayOO00hsb6JiYH+CV84nLq0AB3Aw8U/SdoUvQSPnwoEpDVQ6Ed2upXj58
+         yGJV5gNoRhCFIhfP2JFx+KUgvYNwXA7//gxpWjtUU6xRbhtV9jX3R4CYQLOBnrYVGqLN
+         3/CjrLb4J2Zh6QbHUS24s9No/4zAk1uVTZBE3wU2RyOzjsBopGrzv+wgg+vbs4aoDaH5
+         84Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729228871; x=1729833671;
+        d=1e100.net; s=20230601; t=1729228994; x=1729833794;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=fPkDC3Enb0xgXPmzj9uS+PkCITtpS9EpYmFVpWq2P1M=;
-        b=aQVv8l+khJJF496CLQxRFZS+fICWdmSo/UmZBu+peZCcn6vq7MM/+10FFBrYHWSMxE
-         cmRfLIAcy5GgXflOEelPEOWaEM9E7Qe7khMrkHWW/TOc1JKxywgI7vqw8avhSBd4JEG3
-         2nfhaoITg9LWV3JjlJnAmbRdAG03hDbzxhx6dJ/yM1rLRVnwyVQTXL8IVPkqL79ln853
-         A4BlhoqKks2C4JV9ncZqj6aopgK+vkm5DiunozCLjZ+V6aX8AmYSg2tMFFgbdHV0DAsQ
-         xGzkem7WWFbnVKfiAclPAXaZkdO5IkDDCxgOG+oCVMtuQrtf0ka38njBCjSTQ3EDvOfU
-         p+Ng==
-X-Gm-Message-State: AOJu0Yxng9o7yVU9r2yIrfheNjvE7M5YeEC140N49AM7iWV2VSyySD7l
-	CfnDyw3pg/SBj9qWifVYSG/ICeiquiUazCY3uQVZkXpeVRa3ZfZD6Xmt3qdczxjCZFTlrI+xRZJ
-	vkmZTsh6fXA==
-X-Google-Smtp-Source: AGHT+IHqa4dNMponANTnODtZDu6EGlVgMaADr6YyeTSWEYoTzDFn7N/DC0yxHtkGV+gl+GyODKSD8KrWHo7qqw==
+        bh=afscFukNlKoZsqHEdG35fKXHbYNW9PwkOErpOv0CumI=;
+        b=h2ByZNfwdBBoYOpfexLJmXzrEsBtj9vL8KFDx88Im7IxxIFCUUeB5ResfsPdNCIxJ+
+         YIu+A9uO944zapn1StiSiyX1BylOAIdtS9Xm4AfqtkCOJoffuOi2VRiBFlRerTjlj8vh
+         Il2hFGYbG6OedIIzKK6zEKrqsskDplbFVeQsLykPAuClCDZB3wo5El2lVPsx21iByVFb
+         YQGKKeFGt2K8jDjM+ZwHIXJysMlPHkmO3hWOez9VzOz0ldP9uZoaOdqUogAnlOd1R3uM
+         V9R/y41dFbnkUZ+HwldaI4kNeNrdtCaFZMM8E8w/SH+5DQv2RJgoOk/rTU+ZBL3syYoQ
+         jinQ==
+X-Gm-Message-State: AOJu0Yy9f+KnpWoru9OUw3FSR8VJ4wLlZBKLc8h+zc560FomSakeKcfg
+	eV2alM5O/hTrWaCTbwNwYnzyxu+a0zlItrRQ5IeMFviXwZx1hsOjloZzsnpzGOy5bt2Enk77DXL
+	Dwf81x6TMLQ==
+X-Google-Smtp-Source: AGHT+IF3sBRtUZUboQJ1x6fLIU0TkD9005+Ncaci94ZTO/wqrTBLSkeaQcLCVMGZ8pdr9+XWPunSyvLOMn2nzg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:9e0c:0:b0:e28:e6a1:fc53 with SMTP id
- 3f1490d57ef6-e2bb1308c20mr1377276.5.1729228870501; Thu, 17 Oct 2024 22:21:10
- -0700 (PDT)
-Date: Fri, 18 Oct 2024 05:21:08 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:690c:4292:b0:6e3:3407:8575 with SMTP
+ id 00721157ae682-6e5bfd8ec7cmr40157b3.8.1729228993919; Thu, 17 Oct 2024
+ 22:23:13 -0700 (PDT)
+Date: Fri, 18 Oct 2024 05:23:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,8 +70,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241018052108.2610827-1-edumazet@google.com>
-Subject: [PATCH net-next] netpoll: remove ndo_netpoll_setup() second argument
+Message-ID: <20241018052310.2612084-1-edumazet@google.com>
+Subject: [PATCH net-next] net: netdev_tx_sent_queue() small optimization
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -79,127 +79,27 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-npinfo is not used in any of the ndo_netpoll_setup() methods.
+Change smp_mb() imediately following a set_bit()
+with smp_mb__after_atomic().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/bonding/bond_main.c | 2 +-
- drivers/net/macvlan.c           | 2 +-
- drivers/net/team/team_core.c    | 3 +--
- include/linux/netdevice.h       | 3 +--
- net/8021q/vlan_dev.c            | 2 +-
- net/bridge/br_device.c          | 2 +-
- net/core/netpoll.c              | 2 +-
- net/dsa/user.c                  | 3 +--
- 8 files changed, 8 insertions(+), 11 deletions(-)
+ include/linux/netdevice.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index b1bffd8e9a958fb1b0e7f965c6fea5bc844f9c07..3928287f58653bf9737653af94e57cb903daf429 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1476,7 +1476,7 @@ static void bond_netpoll_cleanup(struct net_device *bond_dev)
- 			slave_disable_netpoll(slave);
- }
- 
--static int bond_netpoll_setup(struct net_device *dev, struct netpoll_info *ni)
-+static int bond_netpoll_setup(struct net_device *dev)
- {
- 	struct bonding *bond = netdev_priv(dev);
- 	struct list_head *iter;
-diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
-index cf18e66de142c9a19b8b169c26a62137118e3e41..edbd5afcec4129e09f771c96b423d2eac030bb82 100644
---- a/drivers/net/macvlan.c
-+++ b/drivers/net/macvlan.c
-@@ -1117,7 +1117,7 @@ static void macvlan_dev_poll_controller(struct net_device *dev)
- 	return;
- }
- 
--static int macvlan_dev_netpoll_setup(struct net_device *dev, struct netpoll_info *npinfo)
-+static int macvlan_dev_netpoll_setup(struct net_device *dev)
- {
- 	struct macvlan_dev *vlan = netdev_priv(dev);
- 	struct net_device *real_dev = vlan->lowerdev;
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 18191d5a8bd4d37000fcbae27ab6bb26802762a3..a1b27b69f010533d4bbd4d7f1e314d2582eb8133 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1946,8 +1946,7 @@ static void team_netpoll_cleanup(struct net_device *dev)
- 	mutex_unlock(&team->lock);
- }
- 
--static int team_netpoll_setup(struct net_device *dev,
--			      struct netpoll_info *npifo)
-+static int team_netpoll_setup(struct net_device *dev)
- {
- 	struct team *team = netdev_priv(dev);
- 	struct team_port *port;
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 8feaca12655ef8e3e9349e78768788ae50ed41e7..86a0b7eb9461433822996d3f6374cca8ec5a85b9 100644
+index 86a0b7eb9461433822996d3f6374cca8ec5a85b9..bbd30f3c5d290f323394d9f6f9b668f4d87ae042 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -1425,8 +1425,7 @@ struct net_device_ops {
- 						        __be16 proto, u16 vid);
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	void                    (*ndo_poll_controller)(struct net_device *dev);
--	int			(*ndo_netpoll_setup)(struct net_device *dev,
--						     struct netpoll_info *info);
-+	int			(*ndo_netpoll_setup)(struct net_device *dev);
- 	void			(*ndo_netpoll_cleanup)(struct net_device *dev);
- #endif
- 	int			(*ndo_set_vf_mac)(struct net_device *dev,
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 458040e8a0e0be007012fd25499405e89799de00..91d134961357c4737e6d53f801a2f5ffa778a002 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -725,7 +725,7 @@ static void vlan_dev_poll_controller(struct net_device *dev)
- 	return;
- }
+@@ -3517,7 +3517,7 @@ static inline void netdev_tx_sent_queue(struct netdev_queue *dev_queue,
+ 	 * because in netdev_tx_completed_queue we update the dql_completed
+ 	 * before checking the XOFF flag.
+ 	 */
+-	smp_mb();
++	smp_mb__after_atomic();
  
--static int vlan_dev_netpoll_setup(struct net_device *dev, struct netpoll_info *npinfo)
-+static int vlan_dev_netpoll_setup(struct net_device *dev)
- {
- 	struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
- 	struct net_device *real_dev = vlan->real_dev;
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index 26b79feb385d2daea3bf9c63772a566cdd621476..0ab4613aa07ad61784806e20d18836307bc33feb 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -328,7 +328,7 @@ int br_netpoll_enable(struct net_bridge_port *p)
- 	return __br_netpoll_enable(p);
- }
- 
--static int br_netpoll_setup(struct net_device *dev, struct netpoll_info *ni)
-+static int br_netpoll_setup(struct net_device *dev)
- {
- 	struct net_bridge *br = netdev_priv(dev);
- 	struct net_bridge_port *p;
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index aa49b92e9194babab17b2e039daf092a524c5b88..94b7f07a952fff3358cc609fb29de33ae8ae8626 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -641,7 +641,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
- 
- 		ops = ndev->netdev_ops;
- 		if (ops->ndo_netpoll_setup) {
--			err = ops->ndo_netpoll_setup(ndev, npinfo);
-+			err = ops->ndo_netpoll_setup(ndev);
- 			if (err)
- 				goto free_npinfo;
- 		}
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 64f660d2334b77fa97e7d6d586a021d63ac5f6e2..91a1fa5f8ab0ef386059a81914dd27242c209b5b 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1308,8 +1308,7 @@ static int dsa_user_set_pauseparam(struct net_device *dev,
- }
- 
- #ifdef CONFIG_NET_POLL_CONTROLLER
--static int dsa_user_netpoll_setup(struct net_device *dev,
--				  struct netpoll_info *ni)
-+static int dsa_user_netpoll_setup(struct net_device *dev)
- {
- 	struct net_device *conduit = dsa_user_to_conduit(dev);
- 	struct dsa_user_priv *p = netdev_priv(dev);
+ 	/* check again in case another CPU has just made room avail */
+ 	if (unlikely(dql_avail(&dev_queue->dql) >= 0))
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
