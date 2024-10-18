@@ -1,169 +1,142 @@
-Return-Path: <netdev+bounces-136952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1179A3B9E
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:33:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A6EC9A3BAA
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 12:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B3EEB24476
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:33:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 003021F20F1A
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 10:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBAA2022F0;
-	Fri, 18 Oct 2024 10:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F3C20103E;
+	Fri, 18 Oct 2024 10:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YwLpEOAD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-out.aladdin-rd.ru (mail-out.aladdin-rd.ru [91.199.251.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53E320127B;
-	Fri, 18 Oct 2024 10:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.199.251.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B9B17E00F
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 10:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729247578; cv=none; b=ePd1xm/qu+jUiWiDqnLO40hiLuofz7zo+XKx3atZm9W/AwGuv162HFnjsvgzxXx+GwozDzwq94/hE6WFJB0P89p1Ntj6voe6h3+fwZli2xOz57jpxKMmW/w+q8v2elabv2eF52GiJgsLQtwvBneY6hZvB9WYOv3bcorlja6su6o=
+	t=1729247757; cv=none; b=RkR1E+6ty23iTZcdE7tr90F3Kd15bmPrzTFUxk5KlOy9ZVblB/6nrmDpV7zVizW7SgeCPipJ4BuSmyAEMmdzBNav9FIibQ0c384MVCW7g69auVxyKzQ/rBdUt2ontLESeE/f9DdWhgue7P/tdQOxLNuD6W1H/bkCgSMzDrmKrv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729247578; c=relaxed/simple;
-	bh=3mz4MUIU0xE0dIGnAS6LgmmKdoQPtlgIXHC/oaFPm/s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PQSygmWeKZS0oe5gcAjdgbC8PjrlykXIg6aLabsvv3OkAxjptd3oHfLqK11clraFzy93wLjPcUoWumbOqbBiyDgK241GzIIww1ITNYhrD1PPzZ69VvIM4hOhBZUNTDsMnYubyd6TrzyVCOkuBpb5cmtGZR0Spk9tu2uvaQ/0eVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru; spf=pass smtp.mailfrom=aladdin.ru; arc=none smtp.client-ip=91.199.251.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aladdin.ru
-From: Daniil Dulov <d.dulov@aladdin.ru>
-To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Daniil Dulov <d.dulov@aladdin.ru>, Jes Sorensen <Jes.Sorensen@gmail.com>,
-	Kalle Valo <kvalo@codeaurora.org>, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, <linux-wireless@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, Zheyu Ma <zheyuma97@gmail.com>, Kalle Valo
-	<kvalo@kernel.org>
-Subject: [PATCH 5.10 1/1] wifi: rtl8xxxu: Fix the error handling of the probe function
-Date: Fri, 18 Oct 2024 13:32:30 +0300
-Message-ID: <20241018103230.437496-2-d.dulov@aladdin.ru>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241018103230.437496-1-d.dulov@aladdin.ru>
-References: <20241018103230.437496-1-d.dulov@aladdin.ru>
+	s=arc-20240116; t=1729247757; c=relaxed/simple;
+	bh=MYW6dbPyv1LA2KO8BAnlhzC9LvUw5Q9ucfBBjD7XiEY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HkiEj1V56QmBWSZeSxgPsknoa3S1GHLZQr1qplt6wwtncrIFRM5FzhYdlVSktfSNpRSy06cZ2mojgEg8GvdFyIFKVjTT/QHrs2B57A0N2fAMBZabHoDHcuQHbACFWE5cBg6j50JzAFY0nyNRWcfdBeOGtB0Egb9zVSmIeHfwbH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YwLpEOAD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729247755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HrTOHGvby1w1ZPMwlyiQRBjU/VK2YYsb8ixcq/NW7Fo=;
+	b=YwLpEOADa1wTKcJ0kupaZOLeZjr6MaBKm70SeJMrbnYeP8darKY/rXlUWynWYm8D2/Ze/F
+	YCEKdFq/+SMPkz2g1f8sMK1asFFftcVO9ODcMnApcpf3l2yn+DQtf9pZ6u0yJI/YDQmr+u
+	ZhCnbwsaaOMrCW4IobU2mmnsGpi+U/I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-138-y3tX5gL_Pg6JcS-UWt2U_Q-1; Fri, 18 Oct 2024 06:35:54 -0400
+X-MC-Unique: y3tX5gL_Pg6JcS-UWt2U_Q-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43154a0886bso12637955e9.0
+        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 03:35:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729247753; x=1729852553;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HrTOHGvby1w1ZPMwlyiQRBjU/VK2YYsb8ixcq/NW7Fo=;
+        b=PFJxdayzRtiXclqZmXKUnaq3CHYOR69kYR0AqkE4m+wKFj/KkZEtybgGGhJWPgJ4Xr
+         KeyFUDqVO6mg2Tc7wsQJFP0JFkfq9jjgP494uhgRSyPdlvtauvZHXczQgRNA+/mGnBaE
+         5PWQ5A+0c5NKrqymV6wxCgje7N4SUNbqoyLo/3DllucByJOAhriNCnB7bgc5/4LS8I+9
+         QCX7KbIPng1PUuDkIfKdvUbwMz3Na5HpjgJ+gF71TeW/q0dAYGsKXgwv9FPvSwzui7Cn
+         xLwqRHwvjdvNZ6wTzg7JxLd5+/e4cGb39ZRFepYvtLkrF1ULO5dGJ6ITum3572nwCcAv
+         YQrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXT4g6bue/QZafsAdkEfXLNA3IgzTz5+VJsek2PI4w1T2D5N4yRvn5nhoBSgDbqFs/QrQt4Yns=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzINIlPq5WwoulFrrusDGy3AUfB6rh5pTFTCqAjjR9lrzRZlldv
+	XQGF0F7NLuUdl5J7XPz/B5FL0xF6PZLYUBOXE1qaQ/38UoTyZSwn5e26Em7voQ7ieWMvsY2kO99
+	Y4rmzRlIj4YTYiutFl1iiSeUsnV3EWqu+7tYBVCl5KsareYrQHStuWA==
+X-Received: by 2002:a05:6000:c81:b0:37d:52fc:edf1 with SMTP id ffacd0b85a97d-37eab6ec059mr1250835f8f.58.1729247752870;
+        Fri, 18 Oct 2024 03:35:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFugxrw1zdOmWyzIUEN18vLVXOK89+UGpHiLlPe5ww0HM+JYH2Pkhn6/X2q66XMH9V2lOuQLQ==
+X-Received: by 2002:a05:6000:c81:b0:37d:52fc:edf1 with SMTP id ffacd0b85a97d-37eab6ec059mr1250799f8f.58.1729247752374;
+        Fri, 18 Oct 2024 03:35:52 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ecf06922dsm1569144f8f.40.2024.10.18.03.35.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 03:35:51 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 97D28160ACB6; Fri, 18 Oct 2024 12:35:50 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Simon Horman <horms@kernel.org>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
+ Justin Stitt <justinstitt@google.com>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ llvm@lists.linux.dev
+Subject: Re: [PATCH nf-next] netfilter: bpf: Pass string literal as format
+ argument of request_module()
+In-Reply-To: <20241018-nf-mod-fmt-v1-1-b5a275d6861c@kernel.org>
+References: <20241018-nf-mod-fmt-v1-1-b5a275d6861c@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 18 Oct 2024 12:35:50 +0200
+Message-ID: <87ttd9y9yx.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-2016-04.aladdin.ru (192.168.1.104) To
- EXCH-2016-02.aladdin.ru (192.168.1.102)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Zheyu Ma <zheyuma97@gmail.com>
+Simon Horman <horms@kernel.org> writes:
 
-commit 13876f2a087ad352bf640a7a0a4a4229ea6e9e4f upstream.
+> Both gcc-14 and clang-18 report that passing a non-string literal as the
+> format argument of request_module() is potentially insecure.
+>
+> E.g. clang-18 says:
+>
+> .../nf_bpf_link.c:46:24: warning: format string is not a string literal (=
+potentially insecure) [-Wformat-security]
+>    46 |                 err =3D request_module(mod);
+>       |                                      ^~~
+> .../kmod.h:25:55: note: expanded from macro 'request_module'
+>    25 | #define request_module(mod...) __request_module(true, mod)
+>       |                                                       ^~~
+> .../nf_bpf_link.c:46:24: note: treat the string as an argument to avoid t=
+his
+>    46 |                 err =3D request_module(mod);
+>       |                                      ^
+>       |                                      "%s",
+> .../kmod.h:25:55: note: expanded from macro 'request_module'
+>    25 | #define request_module(mod...) __request_module(true, mod)
+>       |                                                       ^
+>
+> It is always the case where the contents of mod is safe to pass as the
+> format argument. That is, in my understanding, it never contains any
+> format escape sequences.
+>
+> But, it seems better to be safe than sorry. And, as a bonus, compiler
+> output becomes less verbose by addressing this issue as suggested by
+> clang-18.
+>
+> No functional change intended.
+> Compile tested only.
+>
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
-When the driver fails at ieee80211_alloc_hw() at the probe time, the
-driver will free the 'hw' which is not allocated, causing a bug.
-
-The following log can reveal it:
-
-[   15.981294] BUG: KASAN: user-memory-access in mutex_is_locked+0xe/0x40
-[   15.981558] Read of size 8 at addr 0000000000001ab0 by task modprobe/373
-[   15.982583] Call Trace:
-[   15.984282]  ieee80211_free_hw+0x22/0x390
-[   15.984446]  rtl8xxxu_probe+0x3a1/0xab30 [rtl8xxxu]
-
-Fix the bug by changing the order of the error handling.
-
-Signed-off-by: Zheyu Ma <zheyuma97@gmail.com>
-Signed-off-by: Kalle Valo <kvalo@kernel.org>
-Link: https://lore.kernel.org/r/20220716130444.2950690-1-zheyuma97@gmail.com
-Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
----
- .../wireless/realtek/rtl8xxxu/rtl8xxxu_core.c | 21 ++++++++++---------
- 1 file changed, 11 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu_core.c b/drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu_core.c
-index 5b27c22e7e58..f26b515764b0 100644
---- a/drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu_core.c
-+++ b/drivers/net/wireless/realtek/rtl8xxxu/rtl8xxxu_core.c
-@@ -6641,7 +6641,7 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
- 	if (!hw) {
- 		ret = -ENOMEM;
- 		priv = NULL;
--		goto exit;
-+		goto err_put_dev;
- 	}
- 
- 	priv = hw->priv;
-@@ -6664,24 +6664,24 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
- 
- 	ret = rtl8xxxu_parse_usb(priv, interface);
- 	if (ret)
--		goto exit;
-+		goto err_set_intfdata;
- 
- 	ret = rtl8xxxu_identify_chip(priv);
- 	if (ret) {
- 		dev_err(&udev->dev, "Fatal - failed to identify chip\n");
--		goto exit;
-+		goto err_set_intfdata;
- 	}
- 
- 	ret = rtl8xxxu_read_efuse(priv);
- 	if (ret) {
- 		dev_err(&udev->dev, "Fatal - failed to read EFuse\n");
--		goto exit;
-+		goto err_set_intfdata;
- 	}
- 
- 	ret = priv->fops->parse_efuse(priv);
- 	if (ret) {
- 		dev_err(&udev->dev, "Fatal - failed to parse EFuse\n");
--		goto exit;
-+		goto err_set_intfdata;
- 	}
- 
- 	rtl8xxxu_print_chipinfo(priv);
-@@ -6689,12 +6689,12 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
- 	ret = priv->fops->load_firmware(priv);
- 	if (ret) {
- 		dev_err(&udev->dev, "Fatal - failed to load firmware\n");
--		goto exit;
-+		goto err_set_intfdata;
- 	}
- 
- 	ret = rtl8xxxu_init_device(hw);
- 	if (ret)
--		goto exit;
-+		goto err_set_intfdata;
- 
- 	hw->wiphy->max_scan_ssids = 1;
- 	hw->wiphy->max_scan_ie_len = IEEE80211_MAX_DATA_LEN;
-@@ -6744,12 +6744,12 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
- 	if (ret) {
- 		dev_err(&udev->dev, "%s: Failed to register: %i\n",
- 			__func__, ret);
--		goto exit;
-+		goto err_set_intfdata;
- 	}
- 
- 	return 0;
- 
--exit:
-+err_set_intfdata:
- 	usb_set_intfdata(interface, NULL);
- 
- 	if (priv) {
-@@ -6757,9 +6757,10 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
- 		mutex_destroy(&priv->usb_buf_mutex);
- 		mutex_destroy(&priv->h2c_mutex);
- 	}
--	usb_put_dev(udev);
- 
- 	ieee80211_free_hw(hw);
-+err_put_dev:
-+	usb_put_dev(udev);
- 
- 	return ret;
- }
--- 
-2.25.1
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
 
