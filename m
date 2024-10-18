@@ -1,356 +1,163 @@
-Return-Path: <netdev+bounces-137085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C4519A4565
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:03:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C8A9A456B
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 453BF281EFD
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:03:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E36E285F58
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF8520403F;
-	Fri, 18 Oct 2024 18:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B05204092;
+	Fri, 18 Oct 2024 18:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CqYy/M64"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="LQd7RQqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-bc0b.mail.infomaniak.ch (smtp-bc0b.mail.infomaniak.ch [45.157.188.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731AA20264A;
-	Fri, 18 Oct 2024 18:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16AD204037
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 18:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729274624; cv=none; b=mRuizrsv34FizkjuBVQ0V2zhjDTwNub+3Ex+H1RIopq4DevXNxRoQMJRq2tpkJLB/ajqTZs24kLBm3EhvOyT/rW40g289tVy/Pqw2Gd4W70VV2b7JMedTSz65eHlp/3keqqjNgiUGBCaM3fVeb7Rj4O6jEUTVumgIzWa8AbGugU=
+	t=1729274904; cv=none; b=aLS7d4wb9JrWgKzhToawFIWAdOMVX/J/U7A5/LrFuOne0rR8WOVkVHbnbD5R/8mCcze8v0KKglWK9vZI1MXyrPDpLiOmIPC/9yR1G5PeSYnO/G2tLAciyfy2qg//Pq4vNVJnxvprJyXLlLamMemH8tIxq/5YxgL/JBVEwaskyw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729274624; c=relaxed/simple;
-	bh=lAq2B0GvCFBF3V9+QW5Jia+LxcIEjnw82vPSQ1vinIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ori0/4kwyDJlIl93IRQlUykZGEQhx827rvbHlozcNIqlGcT9Y46XDnr8+6KIW44Ihc5uyJflx6B57P2Jt5khf2CaY47FjJzz6KmEXD84EwfT/ELXCsNTG71U/5pIr59THVvuhjfTCrL+KEFKiBMQci/+E907Ia6xwKOd0pbHZEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CqYy/M64; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-431548bd1b4so21652825e9.3;
-        Fri, 18 Oct 2024 11:03:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729274621; x=1729879421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vTl/hUSj/UfTQkYKvku3PzPI4RSkWnNGUZziFInNPIM=;
-        b=CqYy/M6486B6XQyMcxSY5YMGJcigTY0YWNvbEBD3/LFv6gqSXcVujbLstjodj4H9dU
-         YYWEujqkRXo2Bpv4Fh3GPV9K7NyLbpFX7r9tWv1EX5D5/lXBI/huws06lOjxmgLDzvV3
-         u7u/b29TcJWNmS+QN+bHexTmqJ2RccJG/fDW1QTc8YJXBULOinJoPm22v1diVQuwraw0
-         8aqu19iPwRTFr9yERDVpKVRLw0MFp6q9YeZjwUrVSOVQp1bdv5VK3rubqQGa/lUWFm4k
-         1N4HR/4/Tj7QIm+CiAKtQRGHYZHpszpXyJVrrY3vsn4tQCMBoC+4QPzO65iup6Z1K/gJ
-         LVzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729274621; x=1729879421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vTl/hUSj/UfTQkYKvku3PzPI4RSkWnNGUZziFInNPIM=;
-        b=BQJAMlfpeomCIRf+K25q4vpsC8e5AIgN8nvCRVcYcuB+38nSHYcpbTq1waj0s4nXPM
-         TR7ZWKUtW4Gu9feGHsiaw2LRqcD9G2ncz2T68iqE48594L5PqERi4Qp0AbEen9qfoJsO
-         Xt+McwC1N99RLYTgiXxLhi5ORQP7hKf9eXE0OF4g/cGsocJJo/FEeechTn03wrUsMfdA
-         HEN05EMZNquIiUoVoGhnjx0N3S+dHz9bK9CqwsPBQoi/WuwSRikUE4RN5sbj16az75c+
-         o6tyKgEaPtZZX4aCGm/b7yYsif3PVL+c6ZNn1i4w+X0AgVloH2SB0VCRKgvTVE2DnFrg
-         UGnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0n9vb6zqGX66VPckGjm3gk7B29i3RxFjIIRoL4H0jLihElCO3ed1JkbNayh1vmMWoq+R72cxE17nHytU=@vger.kernel.org, AJvYcCXISw1TiA7j7KkcmoZOwVKEjrVc1PutNYQ/1Cae2rXrNmGXQpIyV/BhMoxjodYr6FXQgemJwZnp@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfX80ptnS5IR+Ssn2x2NwDE2SrzBryvXoxN0EnmwIpzxZxHLqJ
-	VI7o0v0G1Yw2mkzID08L8nAI6Xfq0zkO5369CBY7Rt4qfIC9qKazCTgzMPmz8ZOec2ykhXLBEMR
-	lYkpCzqzfslVYD4t7EPEHtJYA0vU=
-X-Google-Smtp-Source: AGHT+IE53tP/trlIJhSThzo1jS5+hYd/nfh5lSF33/o7kCnAusq4BXbw0lmSqvYd8tM3bVJv0VSKJ2Rfe3i2z4xiiiI=
-X-Received: by 2002:a5d:6892:0:b0:37d:890c:f485 with SMTP id
- ffacd0b85a97d-37ea21949e5mr2865340f8f.25.1729274620408; Fri, 18 Oct 2024
- 11:03:40 -0700 (PDT)
+	s=arc-20240116; t=1729274904; c=relaxed/simple;
+	bh=b8RDOb0eqMg8kr7/h2Rvqmv6d6GX6jwaOxyJBbHi39I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iG+ufM2snF6unXOP+tStjM83XO71WkWFlQqR3jawHM+9lqnWIKVpw/IlbJzow08b7IYQUY5TJok+YRx7RBEkRKt+CCnUjv3cAMjCbqr31KJajmmmKSBpG+8yan4VzDjHz17g5AsALbnu0p84Vq4DN8MNMZq29DHOwrbm9GPzTlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=LQd7RQqY; arc=none smtp.client-ip=45.157.188.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XVXkN3lLNzgmj;
+	Fri, 18 Oct 2024 20:08:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1729274892;
+	bh=KEYQT5PqdF1JYcj4P2uuZFLVTpuMdKZe8EXn59nZbKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LQd7RQqYMPUrGzcA8/jm7IUkseYIIA4NA3fGRyC88MUo4RLMBFuOy9CF+h9Qo28BY
+	 YXzwwHFm83C5dE6Apmzy8vTi9G2x973pxxtpoBYKF3UoyjpqhZL8xZfMx7VQ3TpOKO
+	 DNyZgWtvPR7IKd5ONkSyZYCd/9tb+XO7BmARcaeI=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XVXkL6rspzLv4;
+	Fri, 18 Oct 2024 20:08:10 +0200 (CEST)
+Date: Fri, 18 Oct 2024 20:08:10 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
+	gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	MPTCP Linux <mptcp@lists.linux.dev>
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Message-ID: <20241018.Kahdeik0aaCh@digikod.net>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241018105351.1960345-1-linyunsheng@huawei.com> <20241018105351.1960345-11-linyunsheng@huawei.com>
-In-Reply-To: <20241018105351.1960345-11-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 18 Oct 2024 11:03:03 -0700
-Message-ID: <CAKgT0UcrbmhJCm4=30Y12ZX9bWD_ChTn5vqHxKdTrGBP-FLk5w@mail.gmail.com>
-Subject: Re: [PATCH net-next v22 10/14] mm: page_frag: introduce
- prepare/probe/commit API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+X-Infomaniak-Routing: alpha
 
-On Fri, Oct 18, 2024 at 4:00=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> There are many use cases that need minimum memory in order
-> for forward progress, but more performant if more memory is
-> available or need to probe the cache info to use any memory
-> available for frag caoleasing reason.
->
-> Currently skb_page_frag_refill() API is used to solve the
-> above use cases, but caller needs to know about the internal
-> detail and access the data field of 'struct page_frag' to
-> meet the requirement of the above use cases and its
-> implementation is similar to the one in mm subsystem.
->
-> To unify those two page_frag implementations, introduce a
-> prepare API to ensure minimum memory is satisfied and return
-> how much the actual memory is available to the caller and a
-> probe API to report the current available memory to caller
-> without doing cache refilling. The caller needs to either call
-> the commit API to report how much memory it actually uses, or
-> not do so if deciding to not use any memory.
->
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  include/linux/page_frag_cache.h | 130 ++++++++++++++++++++++++++++++++
->  mm/page_frag_cache.c            |  21 ++++++
->  2 files changed, 151 insertions(+)
->
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> index feed99d0cddb..1c0c11250b66 100644
-> --- a/include/linux/page_frag_cache.h
-> +++ b/include/linux/page_frag_cache.h
-> @@ -46,6 +46,10 @@ void *__page_frag_cache_prepare(struct page_frag_cache=
- *nc, unsigned int fragsz,
->  unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
->                                             struct page_frag *pfrag,
->                                             unsigned int used_sz);
-> +void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
-> +                                          unsigned int fragsz,
-> +                                          struct page_frag *pfrag,
-> +                                          unsigned int align_mask);
->
->  static inline unsigned int __page_frag_cache_commit(struct page_frag_cac=
-he *nc,
->                                                     struct page_frag *pfr=
-ag,
-> @@ -88,6 +92,132 @@ static inline void *page_frag_alloc(struct page_frag_=
-cache *nc,
->         return __page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
->  }
->
-> +static inline bool __page_frag_refill_align(struct page_frag_cache *nc,
-> +                                           unsigned int fragsz,
-> +                                           struct page_frag *pfrag,
-> +                                           gfp_t gfp_mask,
-> +                                           unsigned int align_mask)
-> +{
-> +       if (unlikely(!__page_frag_cache_prepare(nc, fragsz, pfrag, gfp_ma=
-sk,
-> +                                               align_mask)))
-> +               return false;
-> +
-> +       __page_frag_cache_commit(nc, pfrag, fragsz);
-> +       return true;
-> +}
-> +
-> +static inline bool page_frag_refill_align(struct page_frag_cache *nc,
-> +                                         unsigned int fragsz,
-> +                                         struct page_frag *pfrag,
-> +                                         gfp_t gfp_mask, unsigned int al=
-ign)
-> +{
-> +       WARN_ON_ONCE(!is_power_of_2(align));
-> +       return __page_frag_refill_align(nc, fragsz, pfrag, gfp_mask, -ali=
-gn);
-> +}
-> +
-> +static inline bool page_frag_refill(struct page_frag_cache *nc,
-> +                                   unsigned int fragsz,
-> +                                   struct page_frag *pfrag, gfp_t gfp_ma=
-sk)
-> +{
-> +       return __page_frag_refill_align(nc, fragsz, pfrag, gfp_mask, ~0u)=
-;
-> +}
-> +
-> +static inline bool __page_frag_refill_prepare_align(struct page_frag_cac=
-he *nc,
-> +                                                   unsigned int fragsz,
-> +                                                   struct page_frag *pfr=
-ag,
-> +                                                   gfp_t gfp_mask,
-> +                                                   unsigned int align_ma=
-sk)
-> +{
-> +       return !!__page_frag_cache_prepare(nc, fragsz, pfrag, gfp_mask,
-> +                                          align_mask);
-> +}
-> +
-> +static inline bool page_frag_refill_prepare_align(struct page_frag_cache=
- *nc,
-> +                                                 unsigned int fragsz,
-> +                                                 struct page_frag *pfrag=
-,
-> +                                                 gfp_t gfp_mask,
-> +                                                 unsigned int align)
-> +{
-> +       WARN_ON_ONCE(!is_power_of_2(align));
-> +       return __page_frag_refill_prepare_align(nc, fragsz, pfrag, gfp_ma=
-sk,
-> +                                               -align);
-> +}
-> +
-> +static inline bool page_frag_refill_prepare(struct page_frag_cache *nc,
-> +                                           unsigned int fragsz,
-> +                                           struct page_frag *pfrag,
-> +                                           gfp_t gfp_mask)
-> +{
-> +       return __page_frag_refill_prepare_align(nc, fragsz, pfrag, gfp_ma=
-sk,
-> +                                               ~0u);
-> +}
-> +
-> +static inline void *__page_frag_alloc_refill_prepare_align(struct page_f=
-rag_cache *nc,
-> +                                                          unsigned int f=
-ragsz,
-> +                                                          struct page_fr=
-ag *pfrag,
-> +                                                          gfp_t gfp_mask=
-,
-> +                                                          unsigned int a=
-lign_mask)
-> +{
-> +       return __page_frag_cache_prepare(nc, fragsz, pfrag, gfp_mask, ali=
-gn_mask);
-> +}
-> +
-> +static inline void *page_frag_alloc_refill_prepare_align(struct page_fra=
-g_cache *nc,
-> +                                                        unsigned int fra=
-gsz,
-> +                                                        struct page_frag=
- *pfrag,
-> +                                                        gfp_t gfp_mask,
-> +                                                        unsigned int ali=
-gn)
-> +{
-> +       WARN_ON_ONCE(!is_power_of_2(align));
-> +       return __page_frag_alloc_refill_prepare_align(nc, fragsz, pfrag,
-> +                                                     gfp_mask, -align);
-> +}
-> +
-> +static inline void *page_frag_alloc_refill_prepare(struct page_frag_cach=
-e *nc,
-> +                                                  unsigned int fragsz,
-> +                                                  struct page_frag *pfra=
-g,
-> +                                                  gfp_t gfp_mask)
-> +{
-> +       return __page_frag_alloc_refill_prepare_align(nc, fragsz, pfrag,
-> +                                                     gfp_mask, ~0u);
-> +}
-> +
-> +static inline void *page_frag_alloc_refill_probe(struct page_frag_cache =
-*nc,
-> +                                                unsigned int fragsz,
-> +                                                struct page_frag *pfrag)
-> +{
-> +       return __page_frag_alloc_refill_probe_align(nc, fragsz, pfrag, ~0=
-u);
-> +}
-> +
-> +static inline bool page_frag_refill_probe(struct page_frag_cache *nc,
-> +                                         unsigned int fragsz,
-> +                                         struct page_frag *pfrag)
-> +{
-> +       return !!page_frag_alloc_refill_probe(nc, fragsz, pfrag);
-> +}
-> +
-> +static inline void page_frag_commit(struct page_frag_cache *nc,
-> +                                   struct page_frag *pfrag,
-> +                                   unsigned int used_sz)
-> +{
-> +       __page_frag_cache_commit(nc, pfrag, used_sz);
-> +}
-> +
-> +static inline void page_frag_commit_noref(struct page_frag_cache *nc,
-> +                                         struct page_frag *pfrag,
-> +                                         unsigned int used_sz)
-> +{
-> +       __page_frag_cache_commit_noref(nc, pfrag, used_sz);
-> +}
-> +
+On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
+> Hi Mikhail and Landlock maintainers,
+> 
+> +cc MPTCP list.
 
-Not a huge fan of introducing a ton of new API calls and then having
-to have them all applied at once in the follow-on patches. Ideally the
-functions and the header documentation for them would be introduced in
-the same patch as well as examples on how it would be used.
+Thanks, we should include this list in the next series.
 
-I really think we should break these up as some are used in one case,
-and others in another and it is a pain to have a pile of abstractions
-that are all using these functions in different ways.
+> 
+> On 17/10/2024 13:04, Mikhail Ivanov wrote:
+> > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
+> > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
+> > should not restrict bind(2) and connect(2) for non-TCP protocols
+> > (SCTP, MPTCP, SMC).
+> 
+> Thank you for the patch!
+> 
+> I'm part of the MPTCP team, and I'm wondering if MPTCP should not be
+> treated like TCP here. MPTCP is an extension to TCP: on the wire, we can
+> see TCP packets with extra TCP options. On Linux, there is indeed a
+> dedicated MPTCP socket (IPPROTO_MPTCP), but that's just internal,
+> because we needed such dedicated socket to talk to the userspace.
+> 
+> I don't know Landlock well, but I think it is important to know that an
+> MPTCP socket can be used to discuss with "plain" TCP packets: the kernel
+> will do a fallback to "plain" TCP if MPTCP is not supported by the other
+> peer or by a middlebox. It means that with this patch, if TCP is blocked
+> by Landlock, someone can simply force an application to create an MPTCP
+> socket -- e.g. via LD_PRELOAD -- and bypass the restrictions. It will
+> certainly work, even when connecting to a peer not supporting MPTCP.
+> 
+> Please note that I'm not against this modification -- especially here
+> when we remove restrictions around MPTCP sockets :) -- I'm just saying
+> it might be less confusing for users if MPTCP is considered as being
+> part of TCP. A bit similar to what someone would do with a firewall: if
+> TCP is blocked, MPTCP is blocked as well.
 
-> +static inline void page_frag_alloc_abort(struct page_frag_cache *nc,
-> +                                        unsigned int fragsz)
-> +{
-> +       VM_BUG_ON(fragsz > nc->offset);
-> +
-> +       nc->pagecnt_bias++;
-> +       nc->offset -=3D fragsz;
-> +}
-> +
+Good point!  I don't know well MPTCP but I think you're right.  Given
+it's close relationship with TCP and the fallback mechanism, it would
+make sense for users to not make a difference and it would avoid bypass
+of misleading restrictions.  Moreover the Landlock rules are simple and
+only control TCP ports, not peer addresses, which seems to be the main
+evolution of MPTCP.
 
-We should probably have the same checks here you had on the earlier
-commit. We should not be allowing blind changes. If we are using the
-commit or abort interfaces we should be verifying a page frag with
-them to verify that the request to modify this is legitimate.
+> 
+> I understand that a future goal might probably be to have dedicated
+> restrictions for MPTCP and the other stream protocols (and/or for all
+> stream protocols like it was before this patch), but in the meantime, it
+> might be less confusing considering MPTCP as being part of TCP (I'm not
+> sure about the other stream protocols).
 
->  void page_frag_free(void *addr);
->
->  #endif
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index f55d34cf7d43..5ea4b663ab8e 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -112,6 +112,27 @@ unsigned int __page_frag_cache_commit_noref(struct p=
-age_frag_cache *nc,
->  }
->  EXPORT_SYMBOL(__page_frag_cache_commit_noref);
->
-> +void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
-> +                                          unsigned int fragsz,
-> +                                          struct page_frag *pfrag,
-> +                                          unsigned int align_mask)
-> +{
-> +       unsigned long encoded_page =3D nc->encoded_page;
-> +       unsigned int size, offset;
-> +
-> +       size =3D PAGE_SIZE << encoded_page_decode_order(encoded_page);
-> +       offset =3D __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
-> +       if (unlikely(!encoded_page || offset + fragsz > size))
-> +               return NULL;
-> +
-> +       pfrag->page =3D encoded_page_decode_page(encoded_page);
-> +       pfrag->size =3D size - offset;
-> +       pfrag->offset =3D offset;
-> +
-> +       return encoded_page_decode_virt(encoded_page) + offset;
-> +}
-> +EXPORT_SYMBOL(__page_frag_alloc_refill_probe_align);
-> +
+We need to take a closer look at the other stream protocols indeed.
 
-If I am not mistaken this would be the equivalent of allocating a size
-0 fragment right? The only difference is that you are copying out the
-"remaining" size, but we could get that from the offset if we knew the
-size couldn't we? Would it maybe make sense to look at limiting this
-to PAGE_SIZE instead of passing the size of the actual fragment?
+> 
+> 
+> > sk_is_tcp() is used for this to check address family of the socket
+> > before doing INET-specific address length validation. This is required
+> > for error consistency.
+> > 
+> > Closes: https://github.com/landlock-lsm/linux/issues/40
+> > Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
+> 
+> I don't know how fixes are considered in Landlock, but should this patch
+> be considered as a fix? It might be surprising for someone who thought
+> all "stream" connections were blocked to have them unblocked when
+> updating to a minor kernel version, no?
 
->  void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int=
- fragsz,
->                                 struct page_frag *pfrag, gfp_t gfp_mask,
->                                 unsigned int align_mask)
-> --
-> 2.33.0
->
+Indeed.  The main issue was with the semantic/definition of
+LANDLOCK_ACCESS_FS_NET_{CONNECT,BIND}_TCP.  We need to synchronize the
+code with the documentation, one way or the other, preferably following
+the principle of least astonishment.
+
+> 
+> (Personally, I would understand such behaviour change when upgrading to
+> a major version, and still, maybe only if there were alternatives to
+
+This "fix" needs to be backported, but we're not clear yet on what it
+should be. :)
+
+> continue having the same behaviour, e.g. a way to restrict all stream
+> sockets the same way, or something per stream socket. But that's just me
+> :) )
+
+The documentation and the initial idea was to control TCP bind and
+connect.  The kernel implementation does more than that, so we need to
+synthronize somehow.
+
+> 
+> Cheers,
+> Matt
+> -- 
+> Sponsored by the NGI0 Core fund.
+> 
+> 
 
