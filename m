@@ -1,121 +1,100 @@
-Return-Path: <netdev+bounces-137060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC65D9A43C6
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:25:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F337C9A43D2
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 18:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D09581C23C44
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:25:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF8EF28397C
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 16:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1D6202F8D;
-	Fri, 18 Oct 2024 16:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915C6202F71;
+	Fri, 18 Oct 2024 16:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RjVsYvhM"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="I4ohWXCs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1754201273
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 16:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63AC2022F5
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 16:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729268729; cv=none; b=pdPiW/NIhupTYLfpk+FdIWXAkvlxNyJCMudGJp7AFTIwJPShTZreBdgFvnlDiv7SItZvyy/V2WphGkxjC8b+8JiuuSLgT30iSX8UoF/a/MeBYre+NBdxtRfgDG+gAfIwtR8mlBAEw6rGE4nVTd9YgROKe3IMTFzyqJZOWpKPiNk=
+	t=1729268795; cv=none; b=OvQ6gQhaUs4KVT9YR9WTnOWXVTkg9s+kzt8xc+2sK3YBFVOc3+VWJ0ieAxU6cDvDJvmj0lpqGRnmU8hXjloicE0nOW+XVfq+xTJUbIG7o+oO4gE4ySdVJzT/p70s6Q8rjFIYN/SzgEUt2qk+wY4+vWkdkK9wBh0uI5W9s2xC4UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729268729; c=relaxed/simple;
-	bh=Qm8FJuHRRwls/WqAeoFpruf5JFERUa8R5bqjrs0EgM8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p19spOX3oqn8l/EavnNpcnB6aWBukro0Wwl/qcTrKD6uLnubOwdzLLPE4+4gRWI+24hMaElCkSnu00MUR9/RIFNt3brtJT3BwcCFMI215EYY1K+aj+2deOf6DGKP5tt0v5wzP3siAcW8xbm8rdeuxZOZsQVF63X5pK8XS3xb0Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=RjVsYvhM; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4315839a7c9so23829765e9.3
-        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 09:25:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1729268724; x=1729873524; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ch5DeSK41qqOXt5fRprznhl/8uUUV8RtaTKJ1Y7/r7I=;
-        b=RjVsYvhM3Mc6wlYizbegi02tKxbPVH4ARBoMpGYGbVcZ1PlKTvAi2NItrmqbIMoHRx
-         6SkYNKF4XlL1UjxyZdBzoOC+ncnsXvti806U2Qy0yO2DDvRa4qMpobeBvcyautEay/AC
-         r1uMxur7+sjjXazk+pHhaPuFW/iQmCc588iLHCJbpuuvYlfRZo1X6I4Jt/nFH2w2C6Qj
-         aFxIwhlvVoQxWEh9tb3YlOhLvS13KKb6qnvxnGFsa5ELOHwvrMrQzlVGcbcVJfXTt3y/
-         mSWpgsCQjWOL+3SZtcf4l3I3s6TUUCCuIV9xPAbOUkg5CgdIedd5twRP8WEaNPTkM4pZ
-         ZTCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729268724; x=1729873524;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ch5DeSK41qqOXt5fRprznhl/8uUUV8RtaTKJ1Y7/r7I=;
-        b=gKUjK153XumqXozGiF26qzyRA07DjHAS4fWixqAlfrUixdfc3oKk8/vrHp7Nc+5l4N
-         X+Qr4I3GBHwrsC2OSn0e+wwLlAgcuk4DTO9xzCYiQjf1b4MvztsWnplL20vnUF/ZAGcl
-         Fli5J26UCYrZqsn+jzCE749R8f7FEHRyqMjbeKcJhwqI33mLoy+Qr7GgQpnwnQB9O+Me
-         VjQqqGb3MIRg6NBPy2oXHZSMJWNfwvnras4sWDOUHuKerrrH2bULhKxqijBhW4Qf3equ
-         0HlGgG9BgpDdSaQpxGk28dLVGo6ii8FwIAObw9dZmqtFZ3SYtol8b7YK085Af7gT2gk8
-         W7RA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTzf1c6dH3kDZrh8LwlHQEvuuQPM9PAKRnLlDYO8mhdaQmVtkphMRXV9jVVePkANjPHKjwHs0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLw9ucCiYm7PkxEkTD7dF8Pa3KkTaLxvQDs+v1TIOmWxF8dxqB
-	CtJ/Cvg+LzOiDA5P0Y66h0/88HUc3As74Pw/MWNhS07Rl89Z6YIUIn3ZOw765DM=
-X-Google-Smtp-Source: AGHT+IG55NayxS0oQBlxGjkszsHyKw5MDiOhDqS4zbVLWOMuBB2ZIxTPFLk3EVur+Ss+hgvqAJlzvw==
-X-Received: by 2002:a05:600c:3553:b0:426:647b:1bfc with SMTP id 5b1f17b1804b1-431616a0b1emr25002345e9.30.1729268723752;
-        Fri, 18 Oct 2024 09:25:23 -0700 (PDT)
-Received: from localhost.localdomain ([104.28.214.4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431606c64b8sm31178715e9.38.2024.10.18.09.25.21
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 18 Oct 2024 09:25:23 -0700 (PDT)
-From: Ignat Korchagin <ignat@cloudflare.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Westphal <fw@strlen.de>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: kernel-team@cloudflare.com,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] netfilter: xtables: fix a bad copypaste in xt_nflog module
-Date: Fri, 18 Oct 2024 17:25:17 +0100
-Message-Id: <20241018162517.39154-1-ignat@cloudflare.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1729268795; c=relaxed/simple;
+	bh=dS6yaL6xz/usLMXdOoZh1NDiGr93N7hjr7UlSsCnKn4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u/B1w6Gt6bV6ktHfRRJZE1G7PwSt1SvXMAI+4JDZYu3o9SwU/QbWIVWNpykcgNbmwkBCsnmXtgCq/5dEzM9OQMuSCZwZKtGeIOQ6cl3MNFF//UtO3bSOQcJNN3OnezDOPWuqIHxWPvfbS9FOv+ur0HpThxJPFVJTB+j7UuKMSAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=I4ohWXCs; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49I9TAXU013017;
+	Fri, 18 Oct 2024 09:26:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=0yLvsGtan4odMmzXY1KXVWoCB
+	MZEVVD5cqw7V/ISgcI=; b=I4ohWXCsSIjRmtvDQUYrIIhmIBaqxVZJ1X6CBvcTz
+	kj1GBfW9RlprXk7SZvTH4/p6bk8ym7r7Yb5sgyX6NEHJgbD7yQVw+uXWftFTMEJ0
+	i4rNrww4GttR5EqJQvrS4WmcLSi8kvFUN809u96JRwKGjr3qJN8hUKelxzuxQdHD
+	wfpUZ82pRpwLXlHEIU3Z03KNtR7j4A5Fd9aPULhiGAsyyzC2WYX7ak8O9qyPVUV6
+	PHxhjqLEN//3I074FatO44ikScXuZn5S2jMXQqik8X13lTwasIvjwH5xOyLmbX1A
+	fkoelF5x6mvzWM0+xcVz82rUl1/88MPqD2H+asGdbfj9A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42bm18h130-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 18 Oct 2024 09:26:09 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 18 Oct 2024 09:26:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Fri, 18 Oct 2024 09:26:09 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 2FAF33F7068;
+	Fri, 18 Oct 2024 09:26:04 -0700 (PDT)
+Date: Fri, 18 Oct 2024 21:56:04 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+CC: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+        Mark Lee
+	<Mark-MC.Lee@mediatek.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: airoha: Reset BQL stopping the netdevice
+Message-ID: <ZxKMHFYr2QJXlxFl@test-OptiPlex-Tower-Plus-7010>
+References: <20241017-airoha-en7581-reset-bql-v1-1-08c0c9888de5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241017-airoha-en7581-reset-bql-v1-1-08c0c9888de5@kernel.org>
+X-Proofpoint-GUID: 4-6DMuTv2nkYEwRRsc_Wc3L9qDA2DYaB
+X-Proofpoint-ORIG-GUID: 4-6DMuTv2nkYEwRRsc_Wc3L9qDA2DYaB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-For the nflog_tg_reg struct under the CONFIG_IP6_NF_IPTABLES switch
-family should probably be NFPROTO_IPV6
-
-Fixes: 0bfcb7b71e73 ("netfilter: xtables: avoid NFPROTO_UNSPEC where needed")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
----
- net/netfilter/xt_NFLOG.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netfilter/xt_NFLOG.c b/net/netfilter/xt_NFLOG.c
-index d80abd6ccaf8..6dcf4bc7e30b 100644
---- a/net/netfilter/xt_NFLOG.c
-+++ b/net/netfilter/xt_NFLOG.c
-@@ -79,7 +79,7 @@ static struct xt_target nflog_tg_reg[] __read_mostly = {
- 	{
- 		.name       = "NFLOG",
- 		.revision   = 0,
--		.family     = NFPROTO_IPV4,
-+		.family     = NFPROTO_IPV6,
- 		.checkentry = nflog_tg_check,
- 		.destroy    = nflog_tg_destroy,
- 		.target     = nflog_tg,
--- 
-2.39.5
-
+On 2024-10-17 at 19:31:41, Lorenzo Bianconi (lorenzo@kernel.org) wrote:
+> Run airoha_qdma_cleanup_tx_queue() in ndo_stop callback in order to
+> unmap pending skbs. Moreover, reset BQL txq state stopping the netdevice,
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
 
