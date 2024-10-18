@@ -1,99 +1,119 @@
-Return-Path: <netdev+bounces-137121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C87E9A46B0
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:16:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F1459A46E7
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E78A61F22088
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:16:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DBEE2879F8
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 19:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A7E18E37A;
-	Fri, 18 Oct 2024 19:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D1A205AB5;
+	Fri, 18 Oct 2024 19:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1pJU95M"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="f8+ZPzDJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A9F16EB4C;
-	Fri, 18 Oct 2024 19:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB89204F84;
+	Fri, 18 Oct 2024 19:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729278968; cv=none; b=pIEJXAFuArMZ7I+CozKgvaQaCYP01Dv+q8sRmsQsdmVuvZC169B6yUpTG11CaOTcJ1RFObHzBcicVX4yJ1oBcxuNBwAvT+KN/n3PJObA1k2u8uMCS7MmvK/AEfGBUmqQXEda1DLsFHH+NYWcfiwyYTKo72Cv9WbW0cs9DY+9JlM=
+	t=1729279077; cv=none; b=HCV8Zml1K3ozMAUR5YhYiD7yaevMGYs7ZQ01CAgOG4sCkIB3ndAb9BT2swcSSU8D7P1vAvjmmSe2acbr9Gcgcn+Jv8aPtNpd4rSsIVl1TCs/d/+MVe9HkB6aMoYdSn/OkfZmM0jnFqhEnLef88BrCQ84cm2MHXJ5jX5Vdna1MBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729278968; c=relaxed/simple;
-	bh=xYNvEAnbruKmoDP7ruTSaK5ufdaOcVknSAix/ef+r18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gm0NJwWbMPHGwTtX3vBhK3rChWdMOd5OeaCVwrtSqqRRz6s8QgxdxKaJwPrXjayzb/TeM8lhWI94UImLXlEXAcqbY4aVDtkioIZo8LoOV/X5qXHe/eB8aYjtCD3oDDFDUI4fRIOB3FV9vdF6VBpQkjXgIgXEexf8v+OZGoof00I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1pJU95M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72AD6C4CEC3;
-	Fri, 18 Oct 2024 19:16:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729278968;
-	bh=xYNvEAnbruKmoDP7ruTSaK5ufdaOcVknSAix/ef+r18=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y1pJU95MTDQzWNjwBOGBqSBSc88jyOcaXW+B8btrDam5hYaxxwALh1I8mrN4YGae6
-	 JZZSZWz4GlaCN8MUEIHo/OuEjdN61Hc4f8aOT4Dap12KKOtHqTUybZeteKpXaPk2ca
-	 5snSdEhdbRJEb4jNzlFqJF2IX1uD1Yu/wbl344qlY34u8VGaWA1TuBtrmV+gIzGakM
-	 wjM94j2TUNLOxfKOH7yxwe6H3HW+lkeJBzZbWnLKj7iNwf4OSIRC89WH5jFtGH04Qx
-	 /+xqRy67uVAr4JTtV6fHlCAo6KJ5mv5c64paVHipX0UHnWLwAg8FHVr1VPybaB5Tl4
-	 Y2neu3CE10B6A==
-Date: Fri, 18 Oct 2024 20:16:03 +0100
-From: Simon Horman <horms@kernel.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-Subject: Re: [PATCH net-next v1 4/5] net: stmmac: xgmac: Rename XGMAC_RQ to
- XGMAC_FPRQ
-Message-ID: <20241018191603.GA1697@kernel.org>
-References: <cover.1728980110.git.0x1207@gmail.com>
- <cover.1728980110.git.0x1207@gmail.com>
- <4557515b4df0ebe7fb8c1fd8b3725386bf77d1a4.1728980110.git.0x1207@gmail.com>
- <4557515b4df0ebe7fb8c1fd8b3725386bf77d1a4.1728980110.git.0x1207@gmail.com>
- <20241017171852.fwomny3wedypybhx@skbuf>
+	s=arc-20240116; t=1729279077; c=relaxed/simple;
+	bh=9wmi1++gLyD9c4Qhq6GUv2Qa4vbusylvVCEK1uU3+HM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k36OIPTf30PsxgAYHfXiXRDVfQZGw4hsj6JcrtfNISWjoxXv5fOXW5oKTu0aIv8IlW9ZkrplD6zydoP0K5+6gG3ZHRk3JeOkUvJJ6nYzBNA8HY4vj0v6+l36DbsgMO0vhRd+HNTRAd1Tz+heQ870OWfVdDbOjJNUE/SV8A/eYHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=f8+ZPzDJ; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729279076; x=1760815076;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Ey17rZoH9y6E2Ela+RNm9BlTZQ3RB/m4P97zQHBlUHg=;
+  b=f8+ZPzDJMdvPLLenz2oYiH20L5Q5K9yKMkHqLo5mPVvTxVN0wWyiQxsC
+   fKbKnK2xjAbmd+GtKDGOsuN730e3OjZRDOaKkcb0+UwYcYigUH7eKywPd
+   8X7EItfyXoIUMsNINVr6HiaP1fIxegQNnKLBA1DcgH31LcFVf7kkqYVsC
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.11,214,1725321600"; 
+   d="scan'208";a="768128763"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 19:17:48 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:56867]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.95:2525] with esmtp (Farcaster)
+ id 7fede503-0b3c-4511-a057-d77f5c88d405; Fri, 18 Oct 2024 19:17:48 +0000 (UTC)
+X-Farcaster-Flow-ID: 7fede503-0b3c-4511-a057-d77f5c88d405
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 18 Oct 2024 19:17:45 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 18 Oct 2024 19:17:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <arnd@arndb.de>
+CC: <aleksander.lobakin@intel.com>, <arnd@kernel.org>, <chentao@kylinos.cn>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<lizetao1@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH] ipmr: Don't mark ip6mr_rtnl_msg_handlers as __initconst
+Date: Fri, 18 Oct 2024 12:17:39 -0700
+Message-ID: <20241018191739.5158-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <95170855-21fc-45b4-a393-176883f7dd52@app.fastmail.com>
+References: <95170855-21fc-45b4-a393-176883f7dd52@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241017171852.fwomny3wedypybhx@skbuf>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Oct 17, 2024 at 08:18:52PM +0300, Vladimir Oltean wrote:
-> On Tue, Oct 15, 2024 at 05:09:25PM +0800, Furong Xu wrote:
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > index 917796293c26..c66fa6040672 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > @@ -84,8 +84,8 @@
-> >  #define XGMAC_MCBCQEN			BIT(15)
-> >  #define XGMAC_MCBCQ			GENMASK(11, 8)
-> >  #define XGMAC_MCBCQ_SHIFT		8
-> > -#define XGMAC_RQ			GENMASK(7, 4)
-> > -#define XGMAC_RQ_SHIFT			4
-> > +#define XGMAC_FPRQ			GENMASK(7, 4)
-> > +#define XGMAC_FPRQ_SHIFT		4
+From: "Arnd Bergmann" <arnd@arndb.de>
+Date: Fri, 18 Oct 2024 19:09:10 +0000
+> On Fri, Oct 18, 2024, at 16:31, Kuniyuki Iwashima wrote:
+> > From: Arnd Bergmann <arnd@kernel.org>
+> > Date: Fri, 18 Oct 2024 15:12:14 +0000
+> >> From: Arnd Bergmann <arnd@arndb.de>
+> >> 
+> >> This gets referenced by the ip6_mr_cleanup function, so it must not be
+> >> discarded early:
+> >> 
+> >> WARNING: modpost: vmlinux: section mismatch in reference: ip6_mr_cleanup+0x14 (section: .exit.text) -> ip6mr_rtnl_msg_handlers (section: .init.rodata)
+> >> ERROR: modpost: Section mismatches detected.
+> >> Set CONFIG_SECTION_MISMATCH_WARN_ONLY=y to allow them.
+> >> 
+> >> Fixes: 3ac84e31b33e ("ipmr: Use rtnl_register_many().")
+> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> >
+> > Hi,
+> >
+> > I posted this yesterday.
+> > https://lore.kernel.org/netdev/20241017174732.39487-1-kuniyu@amazon.com/
 > 
-> If you made use of FIELD_PREP(), you would not need the _SHIFT variant at all
-> (though that would be a separate logical change).
+> Right, your may be better then. I was confused by the
+> function name suggesting that this would be called in the
+> module_exit path, but I now see that it is only called
+> at init time, so that works.
 
-+1
+Since the commit below, IPv6 has lost unloadability, and such cleanup
+functions are only called from init path now.
 
-> >  #define XGMAC_UPQ			GENMASK(3, 0)
-> >  #define XGMAC_UPQ_SHIFT			0
-> >  #define XGMAC_RXQ_CTRL2			0x000000a8
-> 
+
+commit 8ce440610357b77587433d0df647cea69a6890a8
+Author: Cong Wang <amwang@redhat.com>
+Date:   Sat Sep 21 11:12:21 2013 +0800
+
+    ipv6: do not allow ipv6 module to be removed
 
