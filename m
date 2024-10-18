@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-136793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55FCF9A320A
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 03:25:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258E49A320E
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 03:26:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11DCC280CD9
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 01:25:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFBF31F23DA1
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 01:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB98C3BBC5;
-	Fri, 18 Oct 2024 01:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6067D56742;
+	Fri, 18 Oct 2024 01:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sShjd+Kc"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ctk4octt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566AF3A1CD
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 01:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF0C3A1CD
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 01:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729214749; cv=none; b=GpZ4P9v4nk4bA4PXWq0wTA3JGyFdaIxwLqVhfDbF1I9T/LfBuZiiYjS+gjYGD4bl69LYikvTPgqUrXuKjoAwlL2kUbsbBrLh3CL/xidhv/O5L+tv9krifG4X+tKPJVEPczwufKVaSlq11nDPR9TsWkoH9QTBHNCZQVahgvNhWzM=
+	t=1729214769; cv=none; b=CkvEBzprp9SKKuW0SB4G6wIMUtEw9Jltx1/C4qSuHzO06J7uvgloQ+dAmsw8l0lOdpg0zEv5vlwIYan6axb+d4rixtXwknvwc2X0igxIA977Vf3Ud0xwkv7FD5bmNXq/eUCF1zZwRrYjbzyUlTUWDFjkhYv6DyA6SllcYJs7GZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729214749; c=relaxed/simple;
-	bh=NMQ+tuCz34oZ9i6Z4626257yr8c1nB13ngA8kcB1zDA=;
+	s=arc-20240116; t=1729214769; c=relaxed/simple;
+	bh=HMJTkltv2UwLf0V9YV8sMNSWOJgBQlatcilxiBYcPis=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TfdugXLROtHVBityEtvK3xSYDlrKRWDR0j2+2KSchYB2GyA5YnYfj0sdZtNH2OTi+thIg58EGocyfZ8sO8sMoeZP+JC53VfI6QD6igzILTzYNTGAcd7BXpsL6d4iUYHdY+K3rmlJYH4KWpIfUG8PyyZX3cScvApT5ePrAojVI7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=sShjd+Kc; arc=none smtp.client-ip=99.78.197.220
+	 MIME-Version:Content-Type; b=l87DVzlERmrTqhnDfl7Fj3w38kVSe9OkXNUk2wkiPFgPL73luzQhtg4CrKYF5fhhhdk0Exo+yDs4Xg9r83o44lYkdcNv6WJC9ZH7GaVZGmk6nJ5yFqQ7UqAXtvmegGcB8g/rTQouec35XELduBA79eKO2zwOu4LbjwdO+wy7U2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ctk4octt; arc=none smtp.client-ip=99.78.197.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729214748; x=1760750748;
+  t=1729214768; x=1760750768;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hM4vD1dcp/yNwrTBoFt4N9cdNsXwJYuIwbSSLNj0C34=;
-  b=sShjd+KcO4oHXle0YQE2JolEjNYiXfL/DXpdVBuz3NAGBTv/hof4xpgH
-   05IdnaQ8jR++kIJ5U/2kfHIqFlTIY2S38ZbRpzbY9mcmInsGWKsgkas1E
-   Mn6fQ528aU8jvsV7gpWeBw5va2vKHCgOFL0dg25pALwBSaY2bxxH1aynV
-   s=;
+  bh=TJL29utz64qzJ9xtZk76SMLkqq2Z5VJtGd2PG9x+OZU=;
+  b=ctk4octt/dZ/xVUWSaiFCjP9P2MjmNLNltKe/wYU1AQxB/oQzx5TyC2A
+   TRj+eSzJzL1SQ5chO9n/uI7HE6dCxub07jTOxgwLgDrlmkxnylA0mXz1V
+   XgjBExx3e1dNTN1EsjB4ZR6Ajl6OcKE1UParGfzcMHHZ98zywAdXxK0Fi
+   w=;
 X-IronPort-AV: E=Sophos;i="6.11,212,1725321600"; 
-   d="scan'208";a="139029170"
+   d="scan'208";a="344036693"
 Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 01:25:47 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:45698]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
- id 0211ab50-450d-4f04-a11c-3a372c53ef83; Fri, 18 Oct 2024 01:25:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 0211ab50-450d-4f04-a11c-3a372c53ef83
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 01:26:06 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:7633]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
+ id 10ca9530-6db6-4750-95c9-be53796b6679; Fri, 18 Oct 2024 01:26:05 +0000 (UTC)
+X-Farcaster-Flow-ID: 10ca9530-6db6-4750-95c9-be53796b6679
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 18 Oct 2024 01:25:46 +0000
+ Fri, 18 Oct 2024 01:26:05 +0000
 Received: from 6c7e67c6786f.amazon.com (10.187.171.30) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 18 Oct 2024 01:25:44 +0000
+ Fri, 18 Oct 2024 01:26:03 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 10/11] ipv4: Convert devinet_ioctl() to per-netns RTNL except for SIOCSIFFLAGS.
-Date: Thu, 17 Oct 2024 18:22:24 -0700
-Message-ID: <20241018012225.90409-11-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 11/11] ipv4: Convert devinet_ioctl to per-netns RTNL.
+Date: Thu, 17 Oct 2024 18:22:25 -0700
+Message-ID: <20241018012225.90409-12-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241018012225.90409-1-kuniyu@amazon.com>
 References: <20241018012225.90409-1-kuniyu@amazon.com>
@@ -77,95 +77,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
+X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Basically, devinet_ioctl() operates on a single netns.
+ioctl(SIOCGIFCONF) calls dev_ifconf() that operates on the current netns.
 
-However, ioctl(SIOCSIFFLAGS) will trigger the netdev notifier
-that could touch another netdev in different netns.
-
-Let's use per-netns RTNL helper in devinet_ioctl() and place
-ASSERT_RTNL() for SIOCSIFFLAGS.
-
-We will remove ASSERT_RTNL() once RTM_SETLINK and RTM_DELLINK
-are converted.
+Let's use per-netns RTNL helpers in dev_ifconf() and inet_gifconf().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/devinet.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ net/core/dev_ioctl.c | 6 +++---
+ net/ipv4/devinet.c   | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 1cc2c2b4a10a..f4790859ea69 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -574,9 +574,7 @@ static int inet_insert_ifa(struct in_ifaddr *ifa)
- 
- static int inet_set_ifa(struct net_device *dev, struct in_ifaddr *ifa)
- {
--	struct in_device *in_dev = __in_dev_get_rtnl(dev);
--
--	ASSERT_RTNL();
-+	struct in_device *in_dev = __in_dev_get_rtnl_net(dev);
- 
- 	ipv4_devconf_setall(in_dev);
- 	neigh_parms_data_state_setall(in_dev->arp_parms);
-@@ -1114,7 +1112,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 		goto out;
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index 473c437b6b53..46d43b950471 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -64,7 +64,7 @@ int dev_ifconf(struct net *net, struct ifconf __user *uifc)
  	}
  
+ 	/* Loop over the interfaces, and write an info block for each. */
 -	rtnl_lock();
 +	rtnl_net_lock(net);
- 
- 	ret = -ENODEV;
- 	dev = __dev_get_by_name(net, ifr->ifr_name);
-@@ -1124,7 +1122,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 	if (colon)
- 		*colon = ':';
- 
--	in_dev = __in_dev_get_rtnl(dev);
-+	in_dev = __in_dev_get_rtnl_net(dev);
- 	if (in_dev) {
- 		if (tryaddrmatch) {
- 			/* Matthias Andree */
-@@ -1134,7 +1132,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 			   This is checked above. */
- 
- 			for (ifap = &in_dev->ifa_list;
--			     (ifa = rtnl_dereference(*ifap)) != NULL;
-+			     (ifa = rtnl_net_dereference(net, *ifap)) != NULL;
- 			     ifap = &ifa->ifa_next) {
- 				if (!strcmp(ifr->ifr_name, ifa->ifa_label) &&
- 				    sin_orig.sin_addr.s_addr ==
-@@ -1148,7 +1146,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 		   comparing just the label */
- 		if (!ifa) {
- 			for (ifap = &in_dev->ifa_list;
--			     (ifa = rtnl_dereference(*ifap)) != NULL;
-+			     (ifa = rtnl_net_dereference(net, *ifap)) != NULL;
- 			     ifap = &ifa->ifa_next)
- 				if (!strcmp(ifr->ifr_name, ifa->ifa_label))
- 					break;
-@@ -1190,6 +1188,9 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 				inet_del_ifa(in_dev, ifap, 1);
- 			break;
+ 	for_each_netdev(net, dev) {
+ 		if (!pos)
+ 			done = inet_gifconf(dev, NULL, 0, size);
+@@ -72,12 +72,12 @@ int dev_ifconf(struct net *net, struct ifconf __user *uifc)
+ 			done = inet_gifconf(dev, pos + total,
+ 					    len - total, size);
+ 		if (done < 0) {
+-			rtnl_unlock();
++			rtnl_net_unlock(net);
+ 			return -EFAULT;
  		}
-+
-+		/* NETDEV_UP/DOWN/CHANGE could touch a peer dev */
-+		ASSERT_RTNL();
- 		ret = dev_change_flags(dev, ifr->ifr_flags, NULL);
- 		break;
- 
-@@ -1291,7 +1292,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 		break;
+ 		total += done;
  	}
- done:
 -	rtnl_unlock();
 +	rtnl_net_unlock(net);
- out:
- 	return ret;
+ 
+ 	return put_user(total, &uifc->ifc_len);
  }
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index f4790859ea69..6089d9255d31 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -1299,7 +1299,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
+ 
+ int inet_gifconf(struct net_device *dev, char __user *buf, int len, int size)
+ {
+-	struct in_device *in_dev = __in_dev_get_rtnl(dev);
++	struct in_device *in_dev = __in_dev_get_rtnl_net(dev);
+ 	const struct in_ifaddr *ifa;
+ 	struct ifreq ifr;
+ 	int done = 0;
+@@ -1310,7 +1310,7 @@ int inet_gifconf(struct net_device *dev, char __user *buf, int len, int size)
+ 	if (!in_dev)
+ 		goto out;
+ 
+-	in_dev_for_each_ifa_rtnl(ifa, in_dev) {
++	in_dev_for_each_ifa_rtnl_net(dev_net(dev), ifa, in_dev) {
+ 		if (!buf) {
+ 			done += size;
+ 			continue;
 -- 
 2.39.5 (Apple Git-154)
 
