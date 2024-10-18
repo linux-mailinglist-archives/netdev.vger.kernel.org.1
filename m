@@ -1,240 +1,79 @@
-Return-Path: <netdev+bounces-137173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124759A4A39
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 01:45:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E939A4A41
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 01:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3122F1C2142D
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:45:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 490C1B21E79
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05B31917DD;
-	Fri, 18 Oct 2024 23:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A9D19149E;
+	Fri, 18 Oct 2024 23:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evtxctpR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WcKl0SIk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75011817;
-	Fri, 18 Oct 2024 23:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09EF152E12;
+	Fri, 18 Oct 2024 23:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729295139; cv=none; b=OmiOMG8Lys/smUXmH59CeiZe0fgD2Tu+J9+rCerZ5N3b5erD1Op3kUalu3z0Iaj+gyPrvqpNYBZYSXiLCT0BAvCoiZqVrZEZIid2W3b0oSzrOXEbfcRZW/7+jCk2j16fEts/ibTfYGKnJ8stHR6bpx+RszoKeFHZPY74/5IB9hg=
+	t=1729295226; cv=none; b=gAGXu61RZqMplIzHz2DF7N10CKLLf+76521MiJm2nhea27jDAoG06Lk4aW+eVpyob9yiAgXesMuJkrPuHQx7cCeFkEX3XT6qa45rXXoucPrPG4FFYwmU1kuCk3nll12XeZwXObfOW2lA+n/ATgO0laHA7n3X+9G84/b/8Y83u5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729295139; c=relaxed/simple;
-	bh=lFZnjV8RlVPG6PrVOgGg9hgB2Ob3uus6nsFdYXxg0xQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=TcCmc9xGp5zi+KyatlAp1nCUjrl7OhoX5KPxHwT9SPd8wUmeRdsJZPurUONEIEzZVv+xr1UyvGmyQwPFvFT0EvQU8PUS0O/FqQ1v46ZBKds9MxQuwhAx6v8esadfO+poUJaiyGyCccxH4pzs9jmkIdmJwzVeUdMTjrOARFzipLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evtxctpR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6996C4CEC3;
-	Fri, 18 Oct 2024 23:45:38 +0000 (UTC)
+	s=arc-20240116; t=1729295226; c=relaxed/simple;
+	bh=0ufzcRrsmb21/qrwoVKV9ZRAr/nCyaaGpsRJ41J3u6A=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jH/i9Bh0Cby79k0Xmukza36JO5jgJ/GOiQ+E/WXiYK5QWJUbEFs+dmDkAJxo3v7MQI9mPowWAnxcLfLZL4sHxhbhCpSMUs6mKq94hls8UhYCx3znAA/lWaAoJpllZPiV25W4xzfFZU2Tcig2pZqGYnd2C6QSm4k0LQOG3ftb2Io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WcKl0SIk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93144C4CEC3;
+	Fri, 18 Oct 2024 23:47:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729295139;
-	bh=lFZnjV8RlVPG6PrVOgGg9hgB2Ob3uus6nsFdYXxg0xQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=evtxctpRyaoTSOigJT5cFz8FlzinZ4CiqIbWurTmKrRfQkXyPwANmEAW+wstE4BGx
-	 TIN4rKkxFq5bRqf1RYbu8X5+GaKP8PCUkJCSI7XdnVuPyggqqCKegX2g9xYIK1RWWo
-	 +b0kx6X/7xFOXGXdvbNco/L2DpCtD2beey4jXYhDZqcjQ6tHOX7X1U5wq38aQ9bZXw
-	 j4FYzQwUpZeifU9a96tVVuahIFbm86NthAcccPlNw2GRZ0nybq3IyuM42izSzAVkj8
-	 T19Q5jWyld7A4Ht/0K1UYHtBeST5LII4RfUrhhhbZUkSRif8tr3x1ApUVAUGVSTvJT
-	 Ma/8xyjaHk33A==
-Date: Fri, 18 Oct 2024 18:45:37 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Chen Ni <nichen@iscas.ac.cn>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
-	Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Yi Liu <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Ye Bin <yebin10@huawei.com>,
-	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
-	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
-Message-ID: <20241018234537.GA770692@bhelgaas>
+	s=k20201202; t=1729295226;
+	bh=0ufzcRrsmb21/qrwoVKV9ZRAr/nCyaaGpsRJ41J3u6A=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=WcKl0SIkuJ8dDBQ8VXsPni3ZpQFxpyRZfmSMULricHefYhAZ+xF47mt8KEMAlX1Ck
+	 wPUyZhsk500vj0TQw+2R+VzQCxZ6Kuewa44040kjkfbo1sRNa/4oq1aiPASgiiIKRt
+	 dlLF6OYa+3XYV34D1Bs8aJ9jLaAhLDfkUTzHIgqczs5LO4oJsrGGx/HDUza6bq6IG5
+	 e5J3efeDXADXoHAhKcodxSw9/M9aE6BtoB03cFCMN6W0HlOQMwx7QkfOlZuNG2qDEb
+	 jZz2nP5ZmI0F4rbzYJngMD9hULD3C0ll7fSdTzsC5j7WS3ocI+gl/BmdiH7rz6GXiN
+	 GuuOK4FfnbZKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FF23805CC0;
+	Fri, 18 Oct 2024 23:47:13 +0000 (UTC)
+Subject: Re: [GIT PULL] bpf for v6.12-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20241018202420.17746-1-daniel@iogearbox.net>
+References: <20241018202420.17746-1-daniel@iogearbox.net>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20241018202420.17746-1-daniel@iogearbox.net>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
+X-PR-Tracked-Commit-Id: 5ac9b4e935dfc6af41eee2ddc21deb5c36507a9f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3d5ad2d4eca337e80f38df77de89614aa5aaceb9
+Message-Id: <172929523208.3295109.5294002829281223394.pr-tracker-bot@kernel.org>
+Date: Fri, 18 Oct 2024 23:47:12 +0000
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: torvalds@linux-foundation.org, bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org, martin.lau@kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f871a77fb51e54332886882e8ecb1a4a5f5d296b.camel@redhat.com>
 
-On Wed, Oct 16, 2024 at 10:53:16AM +0200, Philipp Stanner wrote:
-> On Wed, 2024-10-16 at 10:43 +0200, Heiner Kallweit wrote:
-> > On 16.10.2024 08:57, Philipp Stanner wrote:
-> > > On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
-> > > > On Tue, 15 Oct 2024 20:51:23 +0200
-> > > > Philipp Stanner <pstanner@redhat.com> wrote:
-> > > > 
-> > > > > pci_intx() and its managed counterpart pcim_intx() only exist
-> > > > > for
-> > > > > older
-> > > > > drivers which have not been ported yet for various reasons.
-> > > > > Future
-> > > > > drivers should preferably use pci_alloc_irq_vectors().
-> > > > > 
-> > > > > Mark pci_intx() and pcim_intx() as deprecated and encourage
-> > > > > usage
-> > > > > of
-> > > > > pci_alloc_irq_vectors() in its place.
-> > > > 
-> > > > I don't really understand this.  As we've discussed previously
-> > > > pci_alloc_irq_vectors() is, unsurprisingly, for allocating PCI
-> > > > IRQ
-> > > > vectors while pci_intx() is for manipulating the INTx disable bit
-> > > > on
-> > > > PCI devices.  The latter is a generic mechanism for preventing
-> > > > PCI
-> > > > devices from generating INTx, regardless of whether there's a
-> > > > vector
-> > > > allocated for it.  How does the former replace the latter and why
-> > > > do
-> > > > we
-> > > > feel the need to deprecate the latter?
-> > > > 
-> > > > It feels like this fits some narrow narrative and makes all users
-> > > > of
-> > > > these now deprecated functions second class citizens.  Why?  At
-> > > > it's
-> > > > root these are simply providing mask and set or mask and clear
-> > > > register
-> > > > bit operations.  Thanks,
-> > > 
-> > > I got the feeling from the RFC discussion that that was basically
-> > > the
-> > > consensus: people should use pci_alloc_irq_vectors(). Or did I
-> > > misunderstand Andy and Heiner?
-> > > 
-> > I think there are two different use cases for pci_intx().
-> > At first there are several drivers where the direct usage of
-> > pci_intx()
-> > can be eliminated by switching to the pci_alloc_irq_vectors() API.
-> > 
-> > And then there's usage of pci_intx() in
-> > drivers/vfio/pci/vfio_pci_intrs.c
-> > drivers/xen/xen-pciback/conf_space_header.c
-> > There we have to keep the (AFAICS unmanaged) pci_intx() calls.
-> 
-> There is also the usage within PCI itself, in MSI. Patch №8 touches
-> that.
-> 
-> It's why I think this series should land before anyone should port
-> direct pci_intx() users to the irq vectors function, because the latter
-> also uses pci_intx() and its own devres, which sounds explosive to me.
->
-> > > I'm perfectly happy with dropping this patch and continue offering
-> > > pci{m}_intx() to users, since after removing that hybrid hazzard I
-> > > don't see any harm in them anymore.
+The pull request you sent on Fri, 18 Oct 2024 22:24:20 +0200:
 
-So is the bottom line that we should drop *this* patch and apply the
-rest of the series?
+> https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
 
-> > > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > > > > ---
-> > > > >  drivers/pci/devres.c | 5 ++++-
-> > > > >  drivers/pci/pci.c    | 5 ++++-
-> > > > >  2 files changed, 8 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-> > > > > index 6f8f712fe34e..4c76fc063104 100644
-> > > > > --- a/drivers/pci/devres.c
-> > > > > +++ b/drivers/pci/devres.c
-> > > > > @@ -435,7 +435,7 @@ static struct pcim_intx_devres
-> > > > > *get_or_create_intx_devres(struct device *dev)
-> > > > >  }
-> > > > >  
-> > > > >  /**
-> > > > > - * pcim_intx - managed pci_intx()
-> > > > > + * pcim_intx - managed pci_intx() (DEPRECATED)
-> > > > >   * @pdev: the PCI device to operate on
-> > > > >   * @enable: boolean: whether to enable or disable PCI INTx
-> > > > >   *
-> > > > > @@ -443,6 +443,9 @@ static struct pcim_intx_devres
-> > > > > *get_or_create_intx_devres(struct device *dev)
-> > > > >   *
-> > > > >   * Enable/disable PCI INTx for device @pdev.
-> > > > >   * Restore the original state on driver detach.
-> > > > > + *
-> > > > > + * This function is DEPRECATED. Do not use it in new code.
-> > > > > + * Use pci_alloc_irq_vectors() instead (there is no managed
-> > > > > version, currently).
-> > > > >   */
-> > > > >  int pcim_intx(struct pci_dev *pdev, int enable)
-> > > > >  {
-> > > > > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> > > > > index 7ce1d0e3a1d5..dc69e23b8982 100644
-> > > > > --- a/drivers/pci/pci.c
-> > > > > +++ b/drivers/pci/pci.c
-> > > > > @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct pci_dev
-> > > > > *dev)
-> > > > >  }
-> > > > >  
-> > > > >  /**
-> > > > > - * pci_intx - enables/disables PCI INTx for device dev
-> > > > > + * pci_intx - enables/disables PCI INTx for device dev
-> > > > > (DEPRECATED)
-> > > > >   * @pdev: the PCI device to operate on
-> > > > >   * @enable: boolean: whether to enable or disable PCI INTx
-> > > > >   *
-> > > > >   * Enables/disables PCI INTx for device @pdev
-> > > > > + *
-> > > > > + * This function is DEPRECATED. Do not use it in new code.
-> > > > > + * Use pci_alloc_irq_vectors() instead.
-> > > > >   */
-> > > > >  void pci_intx(struct pci_dev *pdev, int enable)
-> > > > >  {
-> > > > 
-> > > 
-> > > 
-> > 
-> 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3d5ad2d4eca337e80f38df77de89614aa5aaceb9
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
