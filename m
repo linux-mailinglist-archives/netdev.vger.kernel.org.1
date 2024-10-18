@@ -1,260 +1,228 @@
-Return-Path: <netdev+bounces-136914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E53D9A39AD
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:15:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88DF19A39C8
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0000282DD1
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:15:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAD531C220AC
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFDA1E32A3;
-	Fri, 18 Oct 2024 09:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE681FF7C4;
+	Fri, 18 Oct 2024 09:17:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC481E2303;
-	Fri, 18 Oct 2024 09:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843821FF7B6
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 09:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729242865; cv=none; b=sLo2w8Bnyus+qpcMvBYPwn2/++x+ykSO77/L9/NIzu4vmqviZtqZF+vNslR1L8jePSOm9qiiST84CD6tVNOwnmGAintE8yeqZ5QPK5+gfBWNUMGf6cvraL3TJpTU3+qU2Re3hqMO+mZ68oQtB67Gu7cg4CejPkN1Xt+0x/TDZfA=
+	t=1729243025; cv=none; b=hNViBtS68P+2NQ/no6JGeuRc25FkbowTZ+mvDNl4imRE9Wpg6OYGJECLHiA/XdCjtVRedk/Fk/pU3yWA/mhdQ3GFhBEp3hSTu2tD4Poc4e1v70nHNEFxgD36vTynyL7de8/aeK1wX9imr+2YbOTOTd6krrI/7ByE4+S9dK2K+bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729242865; c=relaxed/simple;
-	bh=ObmZm9SWgwAXOCoJix+m53ErQSZCmmvZ/mzHD2RA8gU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CA3tgiq1vLGvO8UDpTNgByD8lXG9bcIoEYOdQpDqMhOyUtCXDwLXj9NuZuBa+lv5+uYfAT8gO5Cu8IeEuY/94kQKjqOvT32TrZlQx5m28i/oP2hUl2k2lzZNDFIb70Wx2zgqtMRTRSS71plgf2yRF+oUDpKxCHnk5w8B1kIw1OY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XVJrt42MKz1SC9k;
-	Fri, 18 Oct 2024 17:13:02 +0800 (CST)
-Received: from dggpemf500014.china.huawei.com (unknown [7.185.36.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id D1D621A016C;
-	Fri, 18 Oct 2024 17:14:19 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpemf500014.china.huawei.com
- (7.185.36.43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 18 Oct
- 2024 17:14:18 +0800
-From: Muyang Tian <tianmuyang@huawei.com>
-To: <bpf@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>, Magnus Karlsson
-	<magnus.karlsson@intel.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<yanan@huawei.com>, <xiesongyang@huawei.com>, <wuchangye@huawei.com>,
-	<liuxin350@huawei.com>, <zhangmingyi5@huawei.com>, <liwei883@huawei.com>,
-	<tianmuyang@huawei.com>
-Subject: [PATCH bpf-next v2 3/3] xsk: Add Tx GSO type and size offload support
-Date: Fri, 18 Oct 2024 17:15:02 +0800
-Message-ID: <20241018091502.411513-4-tianmuyang@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20241018091502.411513-1-tianmuyang@huawei.com>
-References: <20241018091502.411513-1-tianmuyang@huawei.com>
+	s=arc-20240116; t=1729243025; c=relaxed/simple;
+	bh=rzkEdXf9tnVWOIhcsEoK9mKCEw0k2o0GdcuNOkBNxmM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NKVirmr37Stuu/btacOs/ID02G5ivN8Oexhf3sO45Kk6T4WtfIqSW1iCtu6NPzt9wZvLTvg1ah7ggH4R6jUJbm3j+4TuTljqe4NQdWAuFctQZ/IYfUI7aARrNNYKvbBcC+TDS5/stBC4iZuoH1hAxEpkQHgB9UJSZ17qoBa5T38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t1j6G-0004by-1v; Fri, 18 Oct 2024 11:16:48 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t1j6E-000Bd1-2i;
+	Fri, 18 Oct 2024 11:16:46 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 7CFAF357AF1;
+	Fri, 18 Oct 2024 09:16:46 +0000 (UTC)
+Date: Fri, 18 Oct 2024 11:16:46 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: RE: RE: [PATCH net-next 07/13] net: fec: fec_probe(): update
+ quirk: bring IRQs in correct order
+Message-ID: <20241018-black-dormouse-of-exercise-f7fed0-mkl@pengutronix.de>
+References: <20241016-fec-cleanups-v1-0-de783bd15e6a@pengutronix.de>
+ <20241016-fec-cleanups-v1-7-de783bd15e6a@pengutronix.de>
+ <PAXPR04MB85103D3E433F3FBE5DDFA15C88472@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20241017-affable-impartial-rhino-a422ec-mkl@pengutronix.de>
+ <PAXPR04MB8510149D0E8AC39E048941F988472@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20241017-manipulative-dove-of-renovation-88d00b-mkl@pengutronix.de>
+ <ZxEZR2lmIbX6+xX2@lizhi-Precision-Tower-5810>
+ <20241017-rainbow-nifty-gazelle-9acee4-mkl@pengutronix.de>
+ <ZxEtpRWsi+QiYsFh@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf500014.china.huawei.com (7.185.36.43)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5ozr2uxsly64lqtk"
+Content-Disposition: inline
+In-Reply-To: <ZxEtpRWsi+QiYsFh@lizhi-Precision-Tower-5810>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This change extends the xsk_tx_metadata struct with
-GSO type and size fields.
-A new offload XDP_TX_METADATA_GSO is defined, which
-offloads gso_type and gso_size in skb_shared_info to XDP.
 
-Signed-off-by: Muyang Tian <tianmuyang@huawei.com>
----
- Documentation/netlink/specs/netdev.yaml |  4 ++++
- include/net/xdp_sock.h                  |  8 ++++++++
- include/net/xdp_sock_drv.h              |  1 +
- include/uapi/linux/if_xdp.h             | 11 +++++++++++
- include/uapi/linux/netdev.h             |  2 ++
- net/xdp/xsk.c                           |  5 +++++
- tools/include/uapi/linux/if_xdp.h       | 11 +++++++++++
- tools/include/uapi/linux/netdev.h       |  2 ++
- 8 files changed, 44 insertions(+)
+--5ozr2uxsly64lqtk
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 5beee7c8e7cf..f4aa04eba54c 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -78,6 +78,10 @@ definitions:
-         name: tx-checksum
-         doc:
-           L3 checksum HW offload is supported by the driver.
-+      -
-+        name: tx-gso
-+        doc:
-+          GSO type and size is supported by the driver.
-   -
-     name: queue-type
-     type: enum
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index bfe625b55d55..e5acb27c3e07 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -110,11 +110,14 @@ struct xdp_sock {
-  *     indicates position where checksumming should start.
-  *     csum_offset indicates position where checksum should be stored.
-  *
-+ * void (*tmo_request_gso)(u32 gso_type, u16 gso_size, void *priv)
-+ *     Called when AF_XDP frame requested GSO info.
-  */
- struct xsk_tx_metadata_ops {
- 	void	(*tmo_request_timestamp)(void *priv);
- 	u64	(*tmo_fill_timestamp)(void *priv);
- 	void	(*tmo_request_checksum)(u16 csum_start, u16 csum_offset, void *priv);
-+	void	(*tmo_request_gso)(u32 gso_type, u16 gso_size, void *priv);
- };
- 
- #ifdef CONFIG_XDP_SOCKETS
-@@ -170,6 +173,11 @@ static inline void xsk_tx_metadata_request(const struct xsk_tx_metadata *meta,
- 		if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM)
- 			ops->tmo_request_checksum(meta->request.csum_start,
- 						  meta->request.csum_offset, priv);
-+
-+	if (ops->tmo_request_gso)
-+		if (meta->flags & XDP_TXMD_FLAGS_GSO)
-+			ops->tmo_request_gso(meta->request.gso_type,
-+						  meta->request.gso_size, priv);
- }
- 
- /**
-diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-index 0a5dca2b2b3f..b192dab2b835 100644
---- a/include/net/xdp_sock_drv.h
-+++ b/include/net/xdp_sock_drv.h
-@@ -198,6 +198,7 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
- #define XDP_TXMD_FLAGS_VALID ( \
- 		XDP_TXMD_FLAGS_TIMESTAMP | \
- 		XDP_TXMD_FLAGS_CHECKSUM | \
-+		XDP_TXMD_FLAGS_GSO | \
- 	0)
- 
- static inline bool xsk_buff_valid_tx_metadata(struct xsk_tx_metadata *meta)
-diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
-index 42ec5ddaab8d..c3ea368bf613 100644
---- a/include/uapi/linux/if_xdp.h
-+++ b/include/uapi/linux/if_xdp.h
-@@ -127,6 +127,11 @@ struct xdp_options {
-  */
- #define XDP_TXMD_FLAGS_CHECKSUM			(1 << 1)
- 
-+/* Request transmit GSO info. GSO type and size are communicated via
-+ * csum_start and csum_offset fields of struct xsk_tx_metadata.
-+ */
-+#define XDP_TXMD_FLAGS_GSO				(1 << 2)
-+
- /* AF_XDP offloads request. 'request' union member is consumed by the driver
-  * when the packet is being transmitted. 'completion' union member is
-  * filled by the driver when the transmit completion arrives.
-@@ -142,6 +147,12 @@ struct xsk_tx_metadata {
- 			__u16 csum_start;
- 			/* Offset from csum_start where checksum should be stored. */
- 			__u16 csum_offset;
-+
-+			/* XDP_TXMD_FLAGS_GSO */
-+			/* Identical to skb_shared_info.gso_type*/
-+			__u32 gso_type;
-+			/* Identical to skb_shared_info.gso_size*/
-+			__u16 gso_size;
- 		} request;
- 
- 		struct {
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 1e711d6a4c6b..bd175afb3c6b 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -65,10 +65,12 @@ enum netdev_xdp_rx_metadata {
-  *   by the driver.
-  * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-  *   driver.
-+ * @NETDEV_XSK_FLAGS_TX_GSO: GSO type and size is supported by the driver.
-  */
- enum netdev_xsk_flags {
- 	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
- 	NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
-+	NETDEV_XSK_FLAGS_TX_GSO = 4,
- };
- 
- enum netdev_queue_type {
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 1140b2a120ca..5a19edfce16c 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -745,6 +745,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 						goto free_err;
- 				}
- 			}
-+
-+			if (meta->flags & XDP_TXMD_FLAGS_GSO) {
-+				skb_shinfo(skb)->gso_type = meta->request.gso_type;
-+				skb_shinfo(skb)->gso_size = meta->request.gso_size;
-+			}
- 		}
- 	}
- 
-diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
-index 2f082b01ff22..5714d0be8c53 100644
---- a/tools/include/uapi/linux/if_xdp.h
-+++ b/tools/include/uapi/linux/if_xdp.h
-@@ -127,6 +127,11 @@ struct xdp_options {
-  */
- #define XDP_TXMD_FLAGS_CHECKSUM			(1 << 1)
- 
-+/* Request transmit GSO info. GSO type and size are communicated via
-+ * csum_start and csum_offset fields of struct xsk_tx_metadata.
-+ */
-+#define XDP_TXMD_FLAGS_GSO				(1 << 2)
-+
- /* AF_XDP offloads request. 'request' union member is consumed by the driver
-  * when the packet is being transmitted. 'completion' union member is
-  * filled by the driver when the transmit completion arrives.
-@@ -142,6 +147,12 @@ struct xsk_tx_metadata {
- 			__u16 csum_start;
- 			/* Offset from csum_start where checksum should be stored. */
- 			__u16 csum_offset;
-+
-+			/* XDP_TXMD_FLAGS_GSO */
-+			/* Identical to skb_shared_info.gso_type*/
-+			__u32 gso_type;
-+			/* Identical to skb_shared_info.gso_size*/
-+			__u16 gso_size;
- 		} request;
- 
- 		struct {
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 1e711d6a4c6b..bd175afb3c6b 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -65,10 +65,12 @@ enum netdev_xdp_rx_metadata {
-  *   by the driver.
-  * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-  *   driver.
-+ * @NETDEV_XSK_FLAGS_TX_GSO: GSO type and size is supported by the driver.
-  */
- enum netdev_xsk_flags {
- 	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
- 	NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
-+	NETDEV_XSK_FLAGS_TX_GSO = 4,
- };
- 
- enum netdev_queue_type {
--- 
-2.41.0
+On 17.10.2024 11:30:45, Frank Li wrote:
+> On Thu, Oct 17, 2024 at 04:21:33PM +0200, Marc Kleine-Budde wrote:
+> > On 17.10.2024 10:03:51, Frank Li wrote:
+> > > > > > Yes, that is IMHO the correct description of the IP core, but t=
+he
+> > > > > > i.MX8M/N/Q DTS have the wrong order of IRQs. And for compatibil=
+ity
+> > > > > > reasons (fixed DTS with old driver) it's IMHO not possible to c=
+hange the
+> > > > > > DTS.
+> > > > > >
+> > > > >
+> > > > > I don't think it is a correct behavior for old drivers to use new=
+ DTBs or new
+> > > > > drivers to use old DTBs. Maybe you are correct, Frank also asked =
+the same
+> > > > > question, let's see how Frank responded.
+> > > >
+> > > > DTBs should be considered stable ABI.
+> > > >
+> > >
+> > > ABI defined at binding doc.
+> > >   interrupt-names:
+> > >     oneOf:
+> > >       - items:
+> > >           - const: int0
+> > >       - items:
+> > >           - const: int0
+> > >           - const: pps
+> > >       - items:
+> > >           - const: int0
+> > >           - const: int1
+> > >           - const: int2
+> > >       - items:
+> > >           - const: int0
+> > >           - const: int1
+> > >           - const: int2
+> > >           - const: pps
+> > >
+> > > DTB should align binding doc. There are not 'descriptions' at 'interr=
+upt',
+> > > which should match 'interrupt-names'. So IMX8MP dts have not match AB=
+I,
+> > > which defined by binding doc. So it is DTS implement wrong.
+> >
+> > I follow your conclusion. But keep in mind, fixing the DTB would break
+> > compatibility. The wrong DTS looks like this:
+> >
+> > - const: int1
+> > - const: int2
+> > - const: int0
+> > - const: pps
+> >
+> > Currently we have broken DTS on the i.MX8M* and the
+> > FEC_QUIRK_WAKEUP_FROM_INT2 that "fixes" this.
+> >
+> > This patch uses this quirk to correct the IRQ <-> queue assignment in
+> > the driver.
+>=20
+> This current code
+>=20
+> for (i =3D 0; i < irq_cnt; i++) {
+>                 snprintf(irq_name, sizeof(irq_name), "int%d", i);
+>                 irq =3D platform_get_irq_byname_optional(pdev, irq_name);
+> 		      ^^^^^^^^^^^^^^^^^^^^^
+>=20
+> You just need add interrupt-names at imx8mp dts and reorder it to pass
+> DTB check.
 
+ACK
+
+>=20
+>                 if (irq < 0)
+>                         irq =3D platform_get_irq(pdev, i);
+>                 if (irq < 0) {
+>                         ret =3D irq;
+>                         goto failed_irq;
+>                 }
+>                 ret =3D devm_request_irq(&pdev->dev, irq, fec_enet_interr=
+upt,
+>                                        0, pdev->name, ndev);
+>                 if (ret)
+>                         goto failed_irq;
+>=20
+>                 fep->irq[i] =3D irq;
+>         }
+>=20
+> All irq handle by the same fec_enet_interrupt().  Change dts irq orders
+> doesn't broken compatiblity.
+
+I'm sorry, but this is not 100% correct. Changing the _order_ of IRQs
+does break compatibility. New DT (with changed IRQ order) with old
+driver breaks wakeup functionality.
+
+Have a look at b7cdc9658ac8 ("net: fec: add WoL support for i.MX8MQ"),
+but keep in mind the patch description is not 100% correct:
+
+| By default FEC driver treat irq[0] (i.e. int0 described in dt-binding)
+| as wakeup interrupt, but this situation changed on i.MX8M serials, SoC
+| integration guys mix wakeup interrupt signal into int2 interrupt line.
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This statement is wrong. The SoC integration is correct, the DT is
+wrong.
+
+| This patch introduces FEC_QUIRK_WAKEUP_FROM_INT2 to indicate int2 as
+| wakeup interrupt for i.MX8MQ.
+
+> "pre-equeue" irq is new features. You can enable this feature only
+> when "interrupt-names" exist in future.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--5ozr2uxsly64lqtk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcSJ3sACgkQKDiiPnot
+vG9DXwgAnWJD0+pgpUJwVQfqSiGkWkMe5M6qtIWo09HfS9/N5262P2ixUjv5KrFo
+IzsTY4+y4EJquuMsX1nIxJhLIEM+GqN6m+Tan1IH9wNdvvAhAE/GJYDc3imzsKsC
+3gATfbC7NZ6kjf/v9/b7mgwelkL6Xogc4aQwvQvTRdVQgIW+BqW2VpGfPHQieW25
+henGvWDOBvWUFIQLhQYPzf20bq1VVxekaFHZe+PIr6uf7h/aCr3FVYyiHSVVx2+V
+iW4WjZkIQozCNneQ3MHq6u20f94gItt1bFuBqKhrYDSgIe+Tj7Bt1n35dtJoGUQv
+jTI3ADivQ7SoRYabV2mXTVhbq3xxTQ==
+=SR5D
+-----END PGP SIGNATURE-----
+
+--5ozr2uxsly64lqtk--
 
