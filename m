@@ -1,77 +1,58 @@
-Return-Path: <netdev+bounces-136918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8669A3A01
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:31:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 041CF9A3A06
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:32:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F34A21F25DF3
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:31:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B86D428885A
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AC91E1C2C;
-	Fri, 18 Oct 2024 09:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472171FF7C3;
+	Fri, 18 Oct 2024 09:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VY0r10MX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnvMho5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6188139587;
-	Fri, 18 Oct 2024 09:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5441FF7BB;
+	Fri, 18 Oct 2024 09:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729243888; cv=none; b=Vl+j3z9xzpKSMCJ/3krR64TzmE77qtb3ctDt9mdipdyD/LtH1sWmA+MLnl/98k0BzDij0B5gb+MJjtveykLapjbo+L3hjhw/T/Wvzd4zcBJHi2aQtxjGohjLZ0Snp1s2ToqcoLi15p5srkC/m56olbuzcHX5hwjEtCnJg3yYUXI=
+	t=1729243930; cv=none; b=ouxhIGNZrsZL0fumAYtvV8FmS6JcQRW5OOou9sTvbm9fNfuNGzoliLBZOuWQmb4Q+fRwWMpkPZUEQrtHgxwJERoiHARd2dOqWWy91YhesM3U5a6279PeEvUtwXSjAXuxJrSzmdGCNhrKfS/R7d98fqBcHGqbq4yq6yrl3GTYwM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729243888; c=relaxed/simple;
-	bh=i84Dwx1LB+rx8YIkwJVd9wiv9YsBexsdaLeMN5EpINw=;
+	s=arc-20240116; t=1729243930; c=relaxed/simple;
+	bh=AQ6fEYmJFBibrj9Gjf/7IjfPAPF78a/92tXhWW6r9J0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kEUcCDUDBrgeWmMogrYEilZUARd/PzJoanza7gJWelqxoz3/93XsY9bXGwLqBYuyb3Fn5z0VbtAUSxhf9rrC7sAgkN0c43Doucpx/gAwJ5E7E6dHB9dJQ7kvLEIWRYirKaCiHQN7dXRsmvHRgOSsLZYdcdEAhqAifYpKpp2Nutc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VY0r10MX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HlrpvQzAD74zpG/3GIoBLA8kbr31aQNRFZQK4Fk73F0=; b=VY0r10MXrN9/KTibX/0cBxVUqD
-	VE7/7B1MR1tbT7/Pcc6fy4ctLa4apyToKbk7KUgbAK3ty6xImf+4Fs7iUDx0zdcDiqEYscfpLAUlq
-	l4ISDQ1SCiH1lHe1wSCvfPNevz/NKTjejdFlv2KMUeKW230U59ityrajHFLBOiwwfJCczuLOEAZD4
-	9ppriVgwcREP5pDdYtF34873tqElPSSBPE1v1F3t4uzl0rQDjgz/qfOt/YB6D+2rWQyW6zzoDUq8r
-	AVUmN/eolaBrZ0LtcLwDq4MpH9+GBzUNB5czbNrMqE/B5XAjsHpWnkoH7jJMm7BnZdfRCe5vFrWkE
-	Ps44qxUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47696)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t1jKI-0007uY-0V;
-	Fri, 18 Oct 2024 10:31:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t1jKD-00077F-35;
-	Fri, 18 Oct 2024 10:31:13 +0100
-Date: Fri, 18 Oct 2024 10:31:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-Subject: Re: [PATCH net-next v2 7/8] net: stmmac: xgmac: Complete FPE support
-Message-ID: <ZxIq4Q3GqdCEkK9D@shell.armlinux.org.uk>
-References: <cover.1729233020.git.0x1207@gmail.com>
- <1776606b2eda8430077551ca117b035f987b5b70.1729233020.git.0x1207@gmail.com>
- <20241018091321.gfsdx7qzl4yoixgb@skbuf>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KHK8hxrxNA3l0RpfbavcS1Cn5PPm5Vp7gRNHD3dFpCGMI2TMWkNMaxkgXcbH8ezzpKYhoucrIFeMeC/0PIN8b3WNZ8zkET7sCxarzDozVTm1AnCa8xJoZF3Afg84xPBpAS1Ip/f4JEUzMo/+YfVAlkeEaee9EgLj9UGl0ME139s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FnvMho5b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9328C4CEC7;
+	Fri, 18 Oct 2024 09:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729243929;
+	bh=AQ6fEYmJFBibrj9Gjf/7IjfPAPF78a/92tXhWW6r9J0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FnvMho5bIKzDyOJ43+p9GMEDwTt+923TPizzzgoqnTHxYp4WmHANrPwth7C9MRwHZ
+	 YTXnQKYEHNKtHoarVKJURoQ1YdI3TL/OH3l6QrETFjjlNqyWFDoGtbz3WQUrhPW2Sr
+	 jeVlkVi8PmL95I+ECMkuFbU8yq5RlOnRbUzVoanPyjzQ15iSHvFjOHKtuT2ub3z9AU
+	 TM6BgXIV92ztwBADSXfYWZsOe9YyITPQFEgd9V1jdoaXGRxDlfS7LRplP+62y7Awuj
+	 LytB4f3ZZTvwQUCPTAI4Em8X+VI+WhSHq0yzFa7ejaW1MuNb2/3gPMx2fSfQmgAgwu
+	 xq3sVmNEncHWw==
+Date: Fri, 18 Oct 2024 10:32:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Leo Stone <leocstone@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, 0x7f454c46@gmail.com,
+	rdunlap@infradead.org, mnassiri@ciena.com,
+	jiapeng.chong@linux.alibaba.com, colin.i.king@gmail.com,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] selftest/tcp-ao: Add filter tests
+Message-ID: <20241018093204.GC1697@kernel.org>
+References: <20241016055823.21299-1-leocstone@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,27 +61,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241018091321.gfsdx7qzl4yoixgb@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241016055823.21299-1-leocstone@gmail.com>
 
-On Fri, Oct 18, 2024 at 12:13:21PM +0300, Vladimir Oltean wrote:
-> I know this is a preposterous and heretic thing to suggest, but a person
-> who isn't knee-deep in stmmac has a very hard time locating himself in
-> space due to the unnecessarily complex layering. If that isn't something
-> that is important, feel free to ignore.
+On Tue, Oct 15, 2024 at 10:51:52PM -0700, Leo Stone wrote:
+> Add tests that check if getsockopt(TCP_AO_GET_KEYS) returns the right
+> keys when using different filters.
+> 
+> Sample output:
+> 
+> > # ok 114 filter keys: by sndid, rcvid, address
+> > # ok 115 filter keys: by is_current
+> > # ok 116 filter keys: by is_rnext
+> > # ok 117 filter keys: by sndid, rcvid
+> > # ok 118 filter keys: correct nkeys when in.nkeys < matched_keys
+> 
+> Signed-off-by: Leo Stone <leocstone@gmail.com>
+> ---
+> Changes in v2:
+> - Changed 2 unnecessary test_error calls to test_fail
+> - Added another test to make sure getsockopt returns the right nkeys
+>   value when the input nkeys is smaller than the number of matching keys
+> - Removed the TODO that this patch addresses
+> 
+> Thank you for your feedback.
+> ---
+>  .../selftests/net/tcp_ao/setsockopt-closed.c  | 180 +++++++++++++++++-
+>  1 file changed, 175 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+> index 084db4ecdff6..4bfa76c28e4e 100644
+> --- a/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+> +++ b/tools/testing/selftests/net/tcp_ao/setsockopt-closed.c
+> @@ -6,6 +6,8 @@
+>  
+>  static union tcp_addr tcp_md5_client;
+>  
+> +#define FILTER_TEST_NKEYS 16
+> +
+>  static int test_port = 7788;
+>  static void make_listen(int sk)
+>  {
+> @@ -813,23 +815,191 @@ static void duplicate_tests(void)
+>  	setsockopt_checked(sk, TCP_AO_ADD_KEY, &ao, EEXIST, "duplicate: SendID differs");
+>  }
+>  
+> +
+> +static void fetch_all_keys(int sk, struct tcp_ao_getsockopt *keys)
+> +{
+> +	socklen_t optlen = sizeof(struct tcp_ao_getsockopt);
+> +
+> +	memset(keys, 0, sizeof(struct tcp_ao_getsockopt) * FILTER_TEST_NKEYS);
+> +	keys[0].get_all = 1;
+> +	keys[0].nkeys = FILTER_TEST_NKEYS;
+> +	if (getsockopt(sk, IPPROTO_TCP, TCP_AO_GET_KEYS, &keys[0], &optlen))
+> +		test_error("getsockopt");
+> +}
+> +
+> +static int prepare_test_keys(struct tcp_ao_getsockopt *keys)
+> +{
+> +	struct tcp_ao_add test_ao[FILTER_TEST_NKEYS];
+> +	u8 rcvid = 100, sndid = 100;
+> +	const char *test_password = "Test password number ";
+> +	char test_password_scratch[64] = {};
+> +	int sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
 
-That is driven by Serge, who seems to be driven by wanting the smallest
-code possible with function pointers to abstract the minutest detail.
-Like you, I disagree with this approach because it makes following the
-code incredibly difficult unless one is constantly looking at it.
+Hi Leo,
 
-Serge wanted to do that to my PCS patches, and when I disagreed, he
-stated basically that he'd convert the code after my patches were
-merged to his style. So I deleted the patches from my tree. I've also
-asked that stmmac removes its use of phylink because stmmac abuses
-phylink and with Serge's attitude, it effectively makes it unfixable.
+In Networking code it is preferred to arrange local variables in
+reverse xmas tree order. In this case I think that could be as
+follows (completely untested!).
+
+Also, as the sk needs to be checked for errors, I would
+separate it's assignment form it's declaration
+
+	const char *test_password = "Test password number ";
+	struct tcp_ao_add test_ao[FILTER_TEST_NKEYS];
+	char test_password_scratch[64] = {};
+	u8 rcvid = 100, sndid = 100;
+	int sk;
+
+	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
+	if (sk < 0)
+		test_error("socket()");
+
+This tool can be of assistance here:
+https://github.com/ecree-solarflare/xmastree
+
+> +
+> +	if (sk < 0)
+> +		test_error("socket()");
+> +
+> +	for (int i = 0; i < FILTER_TEST_NKEYS; i++) {
+> +		snprintf(test_password_scratch, 64, "%s %d", test_password, i);
+> +		test_prepare_key(&test_ao[i], DEFAULT_TEST_ALGO, this_ip_dest, false, false,
+> +				 DEFAULT_TEST_PREFIX, 0, sndid++, rcvid++, 0, 0,
+> +				 strlen(test_password_scratch), test_password_scratch);
+
+Likewise, in Networking code it is still preferred to keep lines at or
+below 80 columns wide, where it can trivially be achieved: don't split
+strings across or otherwise make the code less readable because of this
+guideline.
+
+		test_prepare_key(&test_ao[i], DEFAULT_TEST_ALGO, this_ip_dest,
+				 false, false, DEFAULT_TEST_PREFIX, 0, sndid++,
+				 rcvid++, 0, 0, strlen(test_password_scratch),
+				 test_password_scratch);
+
+You can check for this using:
+./scripts/checkpatch.pl --strict --max-line-length=80
+
+I think it would be good if you could do a pass over this patch with the
+above in mind.
+
+Lastly, please include the target tree, net or net-next, in the subject
+when posting patches for Networking.
+
+	Subject: [PATCH net-next] ...
+
+More information on processes for netdev can be found here:
+https://docs.kernel.org/process/maintainer-netdev.html
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+pw-bot: changes-requested
 
