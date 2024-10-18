@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-136829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95319A32DE
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:30:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5593A9A32E0
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D6B7280EFD
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:30:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 190B4280E11
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D801459EA;
-	Fri, 18 Oct 2024 02:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC3815573F;
+	Fri, 18 Oct 2024 02:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyJ3Jmly"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMreIVId"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AD6558BA;
-	Fri, 18 Oct 2024 02:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BE8154C05;
+	Fri, 18 Oct 2024 02:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729218629; cv=none; b=GPbmjIF59xCvY51bAi6/pm/GxC50hpoj13ei8ZzUylT6JK9msdOajH0vlpBcH1aF4IHrzkkenhlRIvJd1uZsl7ig5HNM8H2JX9w+g1O4gE8dHliZYMkbnDv7ITSkXZj2F5c5mOHyjIdQxpXZ7qmleD1xm+Fq3lvK+fU6yCD7EUw=
+	t=1729218630; cv=none; b=Nl9bfNg1+zYGp18/f3aXV83rdXpi0OsUKP1Y+bDlKJ3u/Bb8XgUyrzfcYn20k8anMtFzP+wqBXu+NOA+YlOaDvJ8gQbUzHZflOrEc2/Nb3xCBIAjdcJJ+iecswQG9HFgQjEkAntf8Imt7InvylpNTOgnUE2smgYSKa9Aawq2RaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729218629; c=relaxed/simple;
-	bh=CKe5O12E+humFBuot3Y+NbiGJaEHz5Dd8obSMaCzwqs=;
+	s=arc-20240116; t=1729218630; c=relaxed/simple;
+	bh=lFMFUY3CTFJtcrIk50sjUgdCVM4UQPSg/6YKHVeAc48=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XR+zBHguz+ivEzrT2ktlxBWy+eL26B+W4iPoeFg3FrW6n8Kmgh285hZQ1xXmMKHvMrZ3sIH526Ee9S5h50iP070B0f0glljbNgiUb9sVPY0PMfathtkZGZmsncyZpVJDv/7Wb0Yzh/Mi2sYwFYp18vVxTodcgt1OElJWLMh1qOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyJ3Jmly; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72097C4CECD;
-	Fri, 18 Oct 2024 02:30:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=P9+CGvpaWmkpywGBchnowVIa5MCi6SR9LrTn1j7F5/OrBtx+YzHNaZVeQs+ujvNCjIRI13EZLD3PZqaHtAqoVpceCxcLMDKXorCwNL4rLS/NlET7SOXDmBucqoC8QTbZ67wQbA4oxWE1HSLejW+omq/qVYdBBue4iiOyR/nW1mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMreIVId; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E53C4CEC3;
+	Fri, 18 Oct 2024 02:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729218628;
-	bh=CKe5O12E+humFBuot3Y+NbiGJaEHz5Dd8obSMaCzwqs=;
+	s=k20201202; t=1729218630;
+	bh=lFMFUY3CTFJtcrIk50sjUgdCVM4UQPSg/6YKHVeAc48=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PyJ3Jmly5PnCTONLmmk4tAfS+c0H+t12KYVT1b13rzVOD/fskZsic9Lpi5xfRozRq
-	 bvN85LnqQz+M2ggaWnQ849XOw/X1YbygVEN/B2cE2jKLEnTEI78wO0eyAdr3dkt51D
-	 TuikhmRt70Nyd4ozVOxO/g6iA8Bn2E5aITqk3N4nQaExYUf3Hft6UGB7/l68p+yUkb
-	 Md5at39W5IeEljKeCX/M7RIp2sht1eJK8FESpP2EdbvkBF6CamqTELaSPBVsIuKz1Y
-	 8G6FsHwmap2rCsRnleNGcRbKMm8Q69+orT5mCRxoX2x+pI9Inhr/Lceg86nxeedQIb
-	 s7B7269yOFP2g==
+	b=lMreIVIdGwN9ObVxHW+umWNsnmsmyOw0jwNBCbUiDe3UBCxkj+EkWHhE4tdGPhBR5
+	 ydisxnpXNJ1x3GQQqCf3ZelaH4H+C7nq2ikF1kYmOP27wx0iqCkIDiyXjfJ6nCSyMd
+	 7w4qE2ZJccqkY9B5Z2QktI2SnaY1r7B9rjkj4PAnPjABvhUbKqEAsGQ9JZoY6+infj
+	 9+zpnqLX4xGGIW0wHWVPnIPsU06lfw5oaFRTbBm5Yn0/V5sC0MKmRtbv9TUq1lvtm5
+	 VkvvjN0ykUh13KtPxh79moJBwmQTLDdemYOz0NnUTD9Oth0wehzhtSeGCqNdJano1i
+	 dqLKnrbvBf6Ow==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CFF3809A8A;
-	Fri, 18 Oct 2024 02:30:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1243809A8A;
+	Fri, 18 Oct 2024 02:30:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,58 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH v2 00/10] Extend GbEth checksum offload support to
- VLAN/IPv6 packets
+Subject: Re: [PATCH net-next] net: usb: sr9700: only store little-endian values
+ in __le16 variable
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172921863374.2663866.18249824814360801095.git-patchwork-notify@kernel.org>
-Date: Fri, 18 Oct 2024 02:30:33 +0000
-References: <20241015133634.193-1-paul.barker.ct@bp.renesas.com>
-In-Reply-To: <20241015133634.193-1-paul.barker.ct@bp.renesas.com>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, geert+renesas@glider.be,
- niklas.soderlund+renesas@ragnatech.se, biju.das.jz@bp.renesas.com,
- claudiu.beznea.uj@bp.renesas.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172921863525.2663866.240523041455432199.git-patchwork-notify@kernel.org>
+Date: Fri, 18 Oct 2024 02:30:35 +0000
+References: <20241016-blackbird-le16-v1-1-97ba8de6b38f@kernel.org>
+In-Reply-To: <20241016-blackbird-le16-v1-1-97ba8de6b38f@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Andrew Lunn <andrew@lunn.ch>:
 
-On Tue, 15 Oct 2024 14:36:24 +0100 you wrote:
-> The GbEth IP found in Renesas RZ/G2L, RZ/G3S and related SoCs supports
-> hardware checksum offload for packets in the following cases:
+On Wed, 16 Oct 2024 15:31:14 +0100 you wrote:
+> In sr_mdio_read() the local variable res is used to store both
+> little-endian and host byte order values. This prevents Sparse
+> from helping us by flagging when endian miss matches occur - the
+> detection process hinges on the type of variables matching the
+> byte order of values stored in them.
 > 
->  - there are zero or one VLAN headers with TPID=0x8100
->  - the network protocol is IPv4 or IPv6
->  - the transport protocol is TCP, UDP or ICMP
->  - the packet is not fragmented
+> Address this by adding a new local variable, word, to store little-endian
+> values; change the type of res to int, and use it to store host-byte
+> order values.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/10] net: ravb: Factor out checksum offload enable bits
-    https://git.kernel.org/netdev/net-next/c/8e3037924a36
-  - [net-next,v2,02/10] net: ravb: Disable IP header RX checksum offloading
-    https://git.kernel.org/netdev/net-next/c/c4e347a02b14
-  - [net-next,v2,03/10] net: ravb: Drop IP protocol check from RX csum verification
-    https://git.kernel.org/netdev/net-next/c/8d2109c1a515
-  - [net-next,v2,04/10] net: ravb: Combine if conditions in RX csum validation
-    https://git.kernel.org/netdev/net-next/c/5a2d973e3606
-  - [net-next,v2,05/10] net: ravb: Simplify types in RX csum validation
-    https://git.kernel.org/netdev/net-next/c/faacdbba0180
-  - [net-next,v2,06/10] net: ravb: Disable IP header TX checksum offloading
-    https://git.kernel.org/netdev/net-next/c/4574ba5b711d
-  - [net-next,v2,07/10] net: ravb: Simplify UDP TX checksum offload
-    https://git.kernel.org/netdev/net-next/c/e63b5fd02a00
-  - [net-next,v2,08/10] net: ravb: Enable IPv6 RX checksum offloading for GbEth
-    https://git.kernel.org/netdev/net-next/c/59cceae40c67
-  - [net-next,v2,09/10] net: ravb: Enable IPv6 TX checksum offload for GbEth
-    https://git.kernel.org/netdev/net-next/c/85c171509821
-  - [net-next,v2,10/10] net: ravb: Add VLAN checksum support
-    https://git.kernel.org/netdev/net-next/c/546875ccba93
+  - [net-next] net: usb: sr9700: only store little-endian values in __le16 variable
+    https://git.kernel.org/netdev/net-next/c/4b726103796a
 
 You are awesome, thank you!
 -- 
