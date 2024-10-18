@@ -1,103 +1,115 @@
-Return-Path: <netdev+bounces-136974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F209A3CBA
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 13:07:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44BCC9A3C80
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 13:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3A6F1C25986
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:07:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFBB91F23324
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3CE213EF2;
-	Fri, 18 Oct 2024 11:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81793202650;
+	Fri, 18 Oct 2024 10:56:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A46B20C03D;
-	Fri, 18 Oct 2024 11:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62583204086
+	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 10:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729249251; cv=none; b=bXFiT5ljqfuElN9/VTbkwURzJf+0pB/qXjGHsOlBSnau6B9E/H9yE5mOQDaVIG43phKperpehKjQ59XY1nvwLDHh8zKp2GWZaIM5OELSyXuucfXRHdugctAAuiwe6jcsOr63whicffsiM+gt04GHNkdc9WxYdxFWyR/m2vQJno0=
+	t=1729248973; cv=none; b=XVvtHx9aVB/fmjD3hKi14/fH9NGubeWBIRjj+eJYIPPqmEbellhtX4dHna8wMNLccejAngjsQ/Dh2205yl9fq+E9mPoKKZ+ahXAnmv9JEGbyobs9tr3vUxpf54mu78dr0bXIDrM3hETL0S9O9Rl7FbxBxKwy5ntu/1sNVmfHIu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729249251; c=relaxed/simple;
-	bh=cVZ7NFy3OBcd/C13X6qA1/JTkhrRA0UcwtkZcVFgmfE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=urHvm9BaC4doITZ5b06zrlsvYUHEjPzHMmPmZBePK85rcCF0y0Pluz2IaCHdifyepXXdOyqeOutq9RWRvZebrGf5mWyNJ5kLXufMuy+pyYzmS8yLFZCsB/xtU0O8mNkvrCsf8pmq8Hza71sHQfZ3e6xKnBjrhY5ChKWGkW/xZWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XVMBw19BZzpX4V;
-	Fri, 18 Oct 2024 18:58:48 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 298F61400DC;
-	Fri, 18 Oct 2024 19:00:46 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 18 Oct 2024 19:00:45 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>
-Subject: [PATCH net-next v22 14/14] mm: page_frag: add an entry in MAINTAINERS for page_frag
-Date: Fri, 18 Oct 2024 18:53:51 +0800
-Message-ID: <20241018105351.1960345-15-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241018105351.1960345-1-linyunsheng@huawei.com>
-References: <20241018105351.1960345-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1729248973; c=relaxed/simple;
+	bh=aJG+Ja2ZNr4mHW6ZV8ImBlNkGhYf60iO1OTwLhQu1HM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q1Q/ZqSJ9mwyNSUO5oitOR72sjmWAPquIbM0WOUO9Dgn/tgfZFGFU0Xbs9JYLdmSGWSVBs1AHKi6fpcrqbWWbP229kJCObqtvW/hD4PXm9XT+iLV2LHkFHvvTPhFIUqi5AjUX4CSdUdmUm1RIS8PViNZJaXBG7WOTb2WjFY3Og0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-182-x-zVYiU6ONGlk7XkK1l39w-1; Fri,
+ 18 Oct 2024 06:56:06 -0400
+X-MC-Unique: x-zVYiU6ONGlk7XkK1l39w-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B1641955EA8;
+	Fri, 18 Oct 2024 10:56:04 +0000 (UTC)
+Received: from hog.localdomain (unknown [10.39.192.7])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E9C4F300019D;
+	Fri, 18 Oct 2024 10:56:01 +0000 (UTC)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: tls: add a selftest for wrapping rec_seq
+Date: Fri, 18 Oct 2024 12:55:58 +0200
+Message-ID: <20775fcfd0371422921ee60a42de170c0398ac10.1729244987.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
 
-After this patchset, page_frag is a small subsystem/library
-on its own, so add an entry in MAINTAINERS to indicate the
-new subsystem/library's maintainer, maillist, status and file
-lists of page_frag.
+Set the initial rec_seq to 0xffffffffffffffff so that it wraps
+immediately. The send() call should fail with EBADMSG.
 
-Alexander is the original author of page_frag, add him in the
-MAINTAINERS too.
+A bug in this code was fixed in commit cfaa80c91f6f ("net/tls: do not
+free tls_rec on async operation in bpf_exec_tx_verdict()").
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- MAINTAINERS | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ tools/testing/selftests/net/tls.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d678a58c0205..df02346483ed 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17512,6 +17512,18 @@ F:	mm/page-writeback.c
- F:	mm/readahead.c
- F:	mm/truncate.c
- 
-+PAGE FRAG
-+M:	Alexander Duyck <alexander.duyck@gmail.com>
-+M:	Yunsheng Lin <linyunsheng@huawei.com>
-+L:	linux-mm@kvack.org
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/mm/page_frags.rst
-+F:	include/linux/page_frag_cache.h
-+F:	mm/page_frag_cache.c
-+F:	tools/testing/selftests/mm/page_frag/
-+F:	tools/testing/selftests/mm/test_page_frag.sh
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/ne=
+t/tls.c
+index f27a12d2a2c9..1a706d03bb6b 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -266,6 +266,25 @@ TEST_F(tls_basic, bad_cipher)
+ =09EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, sizeof(struct t=
+ls12_crypto_info_aes_gcm_128)), -1);
+ }
+=20
++TEST_F(tls_basic, recseq_wrap)
++{
++=09struct tls_crypto_info_keys tls12;
++=09char const *test_str =3D "test_read";
++=09int send_len =3D 10;
 +
- PAGE POOL
- M:	Jesper Dangaard Brouer <hawk@kernel.org>
- M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
--- 
-2.33.0
++=09if (self->notls)
++=09=09SKIP(return, "no TLS support");
++
++=09tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_GCM_128, &tls12);
++=09memset(&tls12.aes128.rec_seq, 0xff, sizeof(tls12.aes128.rec_seq));
++
++=09ASSERT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), 0);
++=09ASSERT_EQ(setsockopt(self->cfd, SOL_TLS, TLS_RX, &tls12, tls12.len), 0)=
+;
++
++=09EXPECT_EQ(send(self->fd, test_str, send_len, 0), -1);
++=09EXPECT_EQ(errno, EBADMSG);
++}
++
+ FIXTURE(tls)
+ {
+ =09int fd, cfd;
+--=20
+2.47.0
 
 
