@@ -1,110 +1,256 @@
-Return-Path: <netdev+bounces-137147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A715A9A48A4
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:00:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 015839A488B
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 22:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3557AB25939
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 21:00:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847F51F23803
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 20:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386EB13A244;
-	Fri, 18 Oct 2024 21:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF4D18DF8B;
+	Fri, 18 Oct 2024 20:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arcor.de header.i=@arcor.de header.b="oaXNByba"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="G2nLdEvu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mr6.vodafonemail.de (mr6.vodafonemail.de [145.253.228.166])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE7113541B
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 21:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.253.228.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD67818D63A;
+	Fri, 18 Oct 2024 20:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729285241; cv=none; b=JEDCOxhkWk7ghBo7MZPq6LukpBPuwMxtI8V44S4/thzDWdydseGsJsxaHL7XaePcFyBbLdw4LR7D+tVxxB5KGOjUk2OUtSnjq+FcrVtx+knlBc5v9TVC+RaFy0MwT/v73rjbydU1pFayX04F95NvLzMnM8oeGOFqn2R4YhaaL4M=
+	t=1729284825; cv=none; b=FlZH2YfZTh7M2TU43d1dFbmTccERdEnRtfXzWmmz17QqI0t/dDHRUGignW1lgaC/3qDHP8HCmemQforlBlUu3E2ZuxyYlUcH49CSwkneBlh03tTsvY0lGIba/BTVIb3K/A5zFkKFNkGdRdGvgNzpZPp3b/Z4hyVhNXbKI0B9lY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729285241; c=relaxed/simple;
-	bh=8yyEQPEvcp+uKeTIuPrtdLHzesVPgcJDLghlRdXeFcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=DyA1Ayp1eyD5YRc+hqnxUAeH15bY4Q/X8rKBTy9z2pmW/fnr+Xa/chJ4qLIdZ0YFrM2xUYow/sEPOL9OcGjeoM6PmZzajytyEWhppyQ4zxUCcjpG2aIj7Dg9Z9AZkQA+Mj9HQ3UJjnhJM35zs2VotDx0F0okd2N31re298Q3YAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arcor.de; spf=pass smtp.mailfrom=arcor.de; dkim=pass (1024-bit key) header.d=arcor.de header.i=@arcor.de header.b=oaXNByba; arc=none smtp.client-ip=145.253.228.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arcor.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arcor.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arcor.de;
-	s=vfde-mb-mr2-23sep; t=1729284789;
-	bh=VoVdNNVHVJpt/Owiv/iaXaFegg43e8vAYF2kWmMJAh8=;
-	h=Date:From:To:Subject:Message-ID:Content-Type:From;
-	b=oaXNBybaFJJHIy6Y7PB4imQwttlOLp+RLpuw1Cds8g+pFjfQ3b2oZ7LW+yUUaQt+g
-	 7V/9VjntwknlEijAOqYJiGiBYI8SX80AqmblRGWMPvxsXcEaNkIkAuiwOq84Br8xfH
-	 g5ebIml8dfngvW9+dg+hdsXnVWzW2gz9DTh11kRE=
-Received: from smtp.vodafone.de (unknown [10.0.0.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
+	s=arc-20240116; t=1729284825; c=relaxed/simple;
+	bh=E32FNLwNzXYMQ3dmaZfd1kvawf2GCQDTG/nAJ32na8Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GXx9YZpPfEMCHE0Svt2//vTYNOKDoPmTvKZLQ8FCJVIaxKNCqqDYX1nhNmYRB8yjoUjQzKUSh4FvU14j3Ha7Qens2lw7y+l35jculZKT4AgKy71tjfC97W7fZsPhPx6UiYdQfa0NI4lbITu7zEYdw3QJXHHbOfUq4arJrrgHg9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=G2nLdEvu; arc=none smtp.client-ip=192.19.144.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id BA48CC003AD0;
+	Fri, 18 Oct 2024 13:53:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com BA48CC003AD0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1729284816;
+	bh=E32FNLwNzXYMQ3dmaZfd1kvawf2GCQDTG/nAJ32na8Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=G2nLdEvungefKYlYXOKwOHxCESGaGntxOj88OSeI8oaPtf85XN6VP4KruSAd38Bc0
+	 i2nydnjmlXh88DhMrAEk00YkICn/kaG2Sih56WrRy7woLO9Tli2Rng1oEPjcIqWLGd
+	 z3YVor/GtKVDVOMDTxD36tFxkR+n7dnF0RsDxWMY=
+Received: from pcie-dev03.dhcp.broadcom.net (pcie-dev03.dhcp.broadcom.net [10.59.171.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mr6.vodafonemail.de (Postfix) with ESMTPS id 4XVcNj2Lbxz1xqh;
-	Fri, 18 Oct 2024 20:53:09 +0000 (UTC)
-Received: from arcor.de (p57a23786.dip0.t-ipconnect.de [87.162.55.134])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.vodafone.de (Postfix) with ESMTPSA id 4XVcNY6ZtBz8sWp;
-	Fri, 18 Oct 2024 20:52:58 +0000 (UTC)
-Date: Fri, 18 Oct 2024 22:52:55 +0200
-From: Reinhard Speyerer <rspmn@arcor.de>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: netdev@vger.kernel.org
-Subject: [PATCH] net: usb: qmi_wwan: add Fibocom FG132 0x0112 composition
-Message-ID: <ZxLKp5YZDy-OM0-e@arcor.de>
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 17D4D18041CAC6;
+	Fri, 18 Oct 2024 13:53:36 -0700 (PDT)
+From: jitendra.vegiraju@broadcom.com
+To: netdev@vger.kernel.org
+Cc: alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	jitendra.vegiraju@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	richardcochran@gmail.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	fancer.lancer@gmail.com,
+	rmk+kernel@armlinux.org.uk,
+	ahalaney@redhat.com,
+	xiaolei.wang@windriver.com,
+	rohan.g.thomas@intel.com,
+	Jianheng.Zhang@synopsys.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	bpf@vger.kernel.org,
+	andrew@lunn.ch,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	florian.fainelli@broadcom.com,
+	quic_abchauha@quicinc.com
+Subject: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for BCM8958x
+Date: Fri, 18 Oct 2024 13:53:27 -0700
+Message-Id: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-size: 1890
-X-purgate-ID: 155817::1729284785-067F349E-D2D93735/0/0
+Content-Transfer-Encoding: 8bit
 
-Add Fibocom FG132 0x0112 composition:
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
 
-T:  Bus=03 Lev=02 Prnt=06 Port=01 Cnt=02 Dev#= 10 Spd=12   MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=2cb7 ProdID=0112 Rev= 5.15
-S:  Manufacturer=Fibocom Wireless Inc.
-S:  Product=Fibocom Module
-S:  SerialNumber=xxxxxxxx
-C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=01(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=03(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
-E:  Ad=86(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+This patchset adds basic PCI ethernet device driver support for Broadcom
+BCM8958x Automotive Ethernet switch SoC devices.
 
-Signed-off-by: Reinhard Speyerer <rspmn@arcor.de>
----
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 4823dbdf5465..f137c82f1c0f 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1426,6 +1426,7 @@ static const struct usb_device_id products[] = {
- 	{QMI_FIXED_INTF(0x2c7c, 0x0296, 4)},	/* Quectel BG96 */
- 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x030e, 4)},	/* Quectel EM05GV2 */
- 	{QMI_QUIRK_SET_DTR(0x2cb7, 0x0104, 4)},	/* Fibocom NL678 series */
-+	{QMI_QUIRK_SET_DTR(0x2cb7, 0x0112, 0)},	/* Fibocom FG132 */
- 	{QMI_FIXED_INTF(0x0489, 0xe0b4, 0)},	/* Foxconn T77W968 LTE */
- 	{QMI_FIXED_INTF(0x0489, 0xe0b5, 0)},	/* Foxconn T77W968 LTE with eSIM support*/
- 	{QMI_FIXED_INTF(0x2692, 0x9025, 4)},    /* Cellient MPL200 (rebranded Qualcomm 05c6:9025) */
+This SoC device has PCIe ethernet MAC attached to an integrated ethernet
+switch using XGMII interface. The PCIe ethernet controller is presented to
+the Linux host as PCI network device.
+
+The following block diagram gives an overview of the application.
+             +=================================+
+             |       Host CPU/Linux            |
+             +=================================+
+                        || PCIe
+                        ||
+        +==========================================+
+        |           +--------------+               |
+        |           | PCIE Endpoint|               |
+        |           | Ethernet     |               |
+        |           | Controller   |               |
+        |           |   DMA        |               |
+        |           +--------------+               |
+        |           |   MAC        |   BCM8958X    |
+        |           +--------------+   SoC         |
+        |               || XGMII                   |
+        |               ||                         |
+        |           +--------------+               |
+        |           | Ethernet     |               |
+        |           | switch       |               |
+        |           +--------------+               |
+        |             || || || ||                  |
+        +==========================================+
+                      || || || || More external interfaces
+
+The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
+MAC IP introduces new DMA architecture called Hyper-DMA for virtualization
+scalability.
+
+Driver functionality specific to new MAC (DW25GMAC) is implemented in
+new file dw25gmac.c.
+
+Management of integrated ethernet switch on this SoC is not handled by
+the PCIe interface.
+This SoC device has PCIe ethernet MAC directly attached to an integrated
+ethernet switch using XGMII interface.
+
+v5->v6:
+   Change summary to address comments/suggestions by Serge Semin.
+   Patch1:
+     Removed the comlexity of hdma mapping in previous patch series and
+     use static DMA mapping.
+     Renamed plat_stmmacenet_data::snps_dev_id as dev_id and moved to
+     the beginning of the struct.
+   Patch2:
+     Added dw25gmac_get_hw_feature() for dw25gmac.
+     Use static one-to-one VDMA-TC-PDMA mapping.
+   Patch4:
+     Remove usage of plat_stmmacenet_data::msi_*_vec variables for
+     interrupt vector initialization.
+     Change phy_interface type to XGMII.
+     Cleanup unused macros.
+     
+v4->v5:
+   Summary of changes in this patch series:
+   As suggested by Serge Semin, defined common setup function for dw25gmac.
+   To accommodate early adopter DW25GMAC used in BCM8958x device, provide
+   a mechanism to override snps_id and snps_dev_id used for driver entry
+   matching in hwif.c
+
+   Patch1:
+     Added plat_stmmacenet_data::snps_id,snps_dev_id fields - Serge Semin
+   Patch2:
+     Define common setup function for dw25gmac_setup() - Serge Semin
+     Support DW25GMAC IPs with varying VDMA/PDMA count - Abhishek Chauhan
+     Allocate and initialize hdma mapping configuration data dynamically
+     based on device's VDMA/PDMA feature capabilities in dw25gmac_setup().
+     Spelling errors in commit log, lower case 0x for hex -Amit Singh Tomar
+   Patch3:
+     Glue support in hwif.c for DW25GMAC in hwif.c - Serge Semin
+     Provide an option to override snps_id and snps_dev_id when the device
+     reports version info not conformant with driver's expectations as is
+     the case with BCM8958x device. - Serge Semin
+   Patch4:
+     Remove setup function in the glue driver - Serge Semin
+     Remove unnecessary calls pci_enable_device() and pci_set_master()
+     in dwxgmac_brcm_pci_resume() - Jakub Kicinski
+     Merge variable definitions to single line - Amit Singh Tomar
+    https://lore.kernel.org/netdev/20240904054815.1341712-1-jitendra.vegiraju@broadcom.com/
+   
+v3->v4:
+   Based on Serge's questions, received a confirmation from Synopsys that
+   the MAC IP is indeed the new 25GMAC design.
+   Renamed all references of XGMAC4 to 25GMAC.
+   The patch series is rearranged slightly as follows.
+   Patch1 (new): Define HDMA mapping data structure in kernel's stmmac.h
+   Patch2 (v3 Patch1): Adds dma_ops for dw25gmac in stmmac core
+       Renamed new files dwxgmac4.* to dw25gmac.* - Serge Semin
+       Defined new Synopsis version and device id macros for DW25GMAC.
+       Converted bit operations to FIELD_PREP macros - Russell King
+       Moved hwif.h to this patch, Sparse flagged warning - Simon Horman
+       Defined macros for hardcoded values TDPS etc - Serge Semin
+       Read number of PDMAs/VDMAs from hardware - Serge Semin
+   Patch3 (v3 Patch2): Hooks in hardware interface handling for dw25gmac
+       Resolved user_version quirks questions - Serge, Russell, Andrew
+       Added new stmmac_hw entry for DW25GMAC. - Serge
+       Added logic to override synopsis_dev_id by glue driver.
+   Patch4 (v3 Patch3): Adds PCI driver for BCM8958x device
+       Define bitmmap macros for hardcoded values - Andrew Lunn
+       Added per device software node - Andrew Lunn
+   Patch5(new/split): Adds BCM8958x driver to build system
+   https://lore.kernel.org/netdev/20240814221818.2612484-1-jitendra.vegiraju@broadcom.com/
+
+v2->v3:
+   Addressed v2 comments from Andrew, Jakub, Russel and Simon.
+   Based on suggestion by Russel and Andrew, added software node to create
+   phylink in fixed-link mode.
+   Moved dwxgmac4 specific functions to new files dwxgmac4.c and dwxgmac4.h
+   in stmmac core module.
+   Reorganized the code to use the existing glue logic support for xgmac in
+   hwif.c and override ops functions for dwxgmac4 specific functions.
+   The patch is split into three parts.
+     Patch#1 Adds dma_ops for dwxgmac4 in stmmac core
+     Patch#2 Hooks in the hardware interface handling for dwxgmac4
+     Patch#3 Adds PCI driver for BCM8958x device
+   https://lore.kernel.org/netdev/20240802031822.1862030-1-jitendra.vegiraju@broadcom.com/
+
+v1->v2:
+   Minor fixes to address coding style issues.
+   Sent v2 too soon by mistake, without waiting for review comments.
+   Received feedback on this version.
+   https://lore.kernel.org/netdev/20240511015924.41457-1-jitendra.vegiraju@broadcom.com/
+
+v1:  
+   https://lore.kernel.org/netdev/20240510000331.154486-1-jitendra.vegiraju@broadcom.com/
+
+Jitendra Vegiraju (5):
+  Add snps_id, dev_id to struct plat_stmmacenet_data
+  Add basic dw25gmac support in stmmac core
+  Integrate dw25gmac into stmmac hwif handling
+  Add PCI driver support for BCM8958x
+  Add BCM8958x driver to build system
+
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   3 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   4 +
+ .../net/ethernet/stmicro/stmmac/dw25gmac.c    | 161 ++++++
+ .../net/ethernet/stmicro/stmmac/dw25gmac.h    |  92 ++++
+ .../net/ethernet/stmicro/stmmac/dwmac-brcm.c  | 478 ++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |   1 +
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  42 ++
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  52 ++
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  26 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |   1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  26 +
+ include/linux/stmmac.h                        |   2 +
+ 14 files changed, 905 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dw25gmac.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dw25gmac.h
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
+
+-- 
+2.34.1
+
 
