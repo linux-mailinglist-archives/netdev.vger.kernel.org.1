@@ -1,98 +1,104 @@
-Return-Path: <netdev+bounces-136911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D01B9A39A3
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:14:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597279A39A5
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 11:14:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 433501C2139B
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:14:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B0372818C8
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 09:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBD01E105D;
-	Fri, 18 Oct 2024 09:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DE51E1C3B;
+	Fri, 18 Oct 2024 09:14:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6111E0B9A
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 09:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D7D192D80;
+	Fri, 18 Oct 2024 09:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729242841; cv=none; b=l5MJGAr58UngCTDn3QVL+tNq2AGMUqhjCpmFzR1hdjJtMod3U5UJrNIdABFhUkTrtlm26tCAFGCG2snUT80VQiFnxP2F4jyQUDZiahuP3WQ04b/v81Rbexkz10jRLfz6zh/sX75ToqUS8n8JnMxGzyEshrl9mqyBgapfmeRPbDg=
+	t=1729242863; cv=none; b=rjicACsWzxL+RQOy8OrBxlMnT0YBdfsMg8swVvZ9SdTouiYKSQsLYlj30HtN7r2ioUS2UdrdW3p8VX9wyFeGWJURW43oXyDXzy82fZGDt9aejD/7iI52WeSUkZBIr2oW9XxA9uvXd71h3tA9uU5m+DruKgZD1ATeB3VzJhT2qsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729242841; c=relaxed/simple;
-	bh=inVU4dG3fTX/R20n0uIiKB5x0WUNokqg6yeO8w9PEwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=n3Ry10iY2PlIvckfVvT5YR2cY1hHNo3bsox31Z+75pUjxAhmxVUfu6xryEl6DBtoft5dxtL6GlxsYidTFHCXtPAKUxty1Nw6BlgAwJg8ZvBtql44kodLDwZmLDXmQUuQD9xL42RbV6evfxim/nAFsKfllMSQD1PRNo/DEJAfToM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-306-ZmxhOMlZNOa-udqcvQQr-g-1; Fri,
- 18 Oct 2024 05:13:48 -0400
-X-MC-Unique: ZmxhOMlZNOa-udqcvQQr-g-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C8D91956089;
-	Fri, 18 Oct 2024 09:13:46 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 11CE119560A2;
-	Fri, 18 Oct 2024 09:13:44 +0000 (UTC)
-Date: Fri, 18 Oct 2024 11:13:42 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Ales Nezbeda <anezbeda@redhat.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org
-Subject: Re: [PATCH net-next v2] netdevsim: macsec: pad u64 to correct length
- in logs
-Message-ID: <ZxImxuVhz6LjOVSs@hog>
-References: <20241017131933.136971-1-anezbeda@redhat.com>
+	s=arc-20240116; t=1729242863; c=relaxed/simple;
+	bh=sxJTYdwiUkQgirXxvXiZJib9YBozDbvx+lFRQ/cdd1Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WeVgY4dq+ZcPpY42uxBw5cT+2xOQKwp8jjFLLjdQZ/MyGrkoJwdWjBbCkwkxqTn0V4AhaeD6xKkZN8u7joBqNeVLi0Gs0g2P4OA19+NYzYbrFuuwRVP6LrI94EMsnOxjtA/fg2sFhRPKX3A2edOcDsyuAIWhc98goCOeFosYIys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XVJrf5vGczyTWQ;
+	Fri, 18 Oct 2024 17:12:50 +0800 (CST)
+Received: from dggpemf500014.china.huawei.com (unknown [7.185.36.43])
+	by mail.maildlp.com (Postfix) with ESMTPS id D01D614011A;
+	Fri, 18 Oct 2024 17:14:16 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpemf500014.china.huawei.com
+ (7.185.36.43) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 18 Oct
+ 2024 17:14:15 +0800
+From: Muyang Tian <tianmuyang@huawei.com>
+To: <bpf@vger.kernel.org>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>, Magnus Karlsson
+	<magnus.karlsson@intel.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<yanan@huawei.com>, <xiesongyang@huawei.com>, <wuchangye@huawei.com>,
+	<liuxin350@huawei.com>, <zhangmingyi5@huawei.com>, <liwei883@huawei.com>,
+	<tianmuyang@huawei.com>
+Subject: [PATCH bpf-next v2 0/3] XDP metadata: Rx checksum/GSO hint; Tx GSO offload
+Date: Fri, 18 Oct 2024 17:14:59 +0800
+Message-ID: <20241018091502.411513-1-tianmuyang@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241017131933.136971-1-anezbeda@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf500014.china.huawei.com (7.185.36.43)
 
-2024-10-17, 15:19:33 +0200, Ales Nezbeda wrote:
-> Commit 02b34d03a24b ("netdevsim: add dummy macsec offload") pads u64
-> number to 8 characters using "%08llx" format specifier.
->=20
-> Changing format specifier to "%016llx" ensures that no matter the value
-> the representation of number in log is always the same length.
->=20
-> Before this patch, entry in log for value '1' would say:
->     removing SecY with SCI 00000001 at index 2
-> After this patch is applied, entry in log will say:
->     removing SecY with SCI 0000000000000001 at index 2
->=20
-> Signed-off-by: Ales Nezbeda <anezbeda@redhat.com>
-> ---
-> v2
->   - Remove fixes tag and post against net-next
->   - v1 ref: https://lore.kernel.org/netdev/20241015110943.94217-1-anezbed=
-a@redhat.com/
-> ---
->  drivers/net/netdevsim/macsec.c | 56 +++++++++++++++++-----------------
->  1 file changed, 28 insertions(+), 28 deletions(-)
+This series introduce XDP metadata functionality, including Rx checksum/GSO hint
+and Tx GSO offload. This is aimed to transfer control fields when processing jumbo
+frames between VMs.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+v1:
+https://lore.kernel.org/all/20241017135430.51655-1-tianmuyang@huawei.com/
 
-Thanks Ales.
+Changes since v1:
+- add reference to previous work[1] in patch 1/3
 
---=20
-Sabrina
+[1] https://lore.kernel.org/bpf/20230811161509.19722-13-larysa.zaremba@intel.com/
+
+Muyang Tian (3):
+  xdp: Add Rx checksum hint
+  xdp: Add Rx GSO hint
+  xsk: Add Tx GSO type and size offload support
+
+ Documentation/netlink/specs/netdev.yaml      | 12 +++++
+ Documentation/networking/xdp-rx-metadata.rst |  6 +++
+ include/net/xdp.h                            | 50 ++++++++++++++++++++
+ include/net/xdp_sock.h                       |  8 ++++
+ include/net/xdp_sock_drv.h                   |  1 +
+ include/uapi/linux/if_xdp.h                  | 11 +++++
+ include/uapi/linux/netdev.h                  |  8 ++++
+ net/core/xdp.c                               | 41 ++++++++++++++++
+ net/xdp/xsk.c                                |  5 ++
+ tools/include/uapi/linux/if_xdp.h            | 11 +++++
+ tools/include/uapi/linux/netdev.h            |  8 ++++
+ 11 files changed, 161 insertions(+)
+
+-- 
+2.41.0
 
 
