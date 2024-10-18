@@ -1,62 +1,76 @@
-Return-Path: <netdev+bounces-136803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-136827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF539A326B
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:12:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B54029A32CF
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 04:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 440C51F20FF0
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:12:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D87C61C24766
+	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 02:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7395E13FD99;
-	Fri, 18 Oct 2024 02:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D805C15532E;
+	Fri, 18 Oct 2024 02:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="YF1aWB9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F323C466;
-	Fri, 18 Oct 2024 02:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C774F1552E3;
+	Fri, 18 Oct 2024 02:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729217515; cv=none; b=Mpr5aiTTZhWIiRPxuGvVEi/GC1BTKpNdGKXVGvM7YCbXT9MZSdtNMH0PBOJbnK5pQDWCQpNf0WJH1JEovg4XJ8uCfBiuoTvT9VEycmXTzbeT+wgTuIQ7sC9h05nkEskp72AiYn9PZrQgZqSHodtcddF626j0+EPXi81CC+2zQ5A=
+	t=1729218208; cv=none; b=MCp4sH3EaUKmtmTFkJL8AsaxBLSFSYlBGGCPPuema8STrUqpff3NRCkhs9oySTwdnJ/y8g+4Xium8kbNn/CzCL4scpxCnEjVjyFBtirlnyC9OWqYrw0O8pL5R91scdISQgPrB6lxqnQb6A+bFRzXyb2jvW+xxl1K0PwGeFGcDfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729217515; c=relaxed/simple;
-	bh=Tj/tKyJPMhb1CaFlHl7vpQi6VQrw6dIc6BuUMFP1ILM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HodJqaZB+Sw1zj2cOU15+VLnjoLduWY22qMKoNN5mkLz/vBADAdSRp1Q5y6DGmo+iTxJHsKA188IUN8Dlhacx0RWOdzH72D3zu+0/0pqHnG73UEBslhIRYnJAh8A9NeHmO5KESosrwQvbJtqpyhpCEy2CTHnEHbZWx0BODG0QU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XV7W024hVz1yn82;
-	Fri, 18 Oct 2024 10:11:56 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1B5B71A016C;
-	Fri, 18 Oct 2024 10:11:50 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 18 Oct
- 2024 10:11:49 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<maciej.fijalkowski@intel.com>, <vedang.patel@intel.com>,
-	<jithu.joseph@intel.com>, <andre.guedes@intel.com>, <horms@kernel.org>,
-	<jacob.e.keller@intel.com>, <sven.auhagen@voleatech.de>,
-	<alexander.h.duyck@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net 1/4] igc: Fix passing 0 to ERR_PTR in igc_xdp_run_prog()
-Date: Fri, 18 Oct 2024 10:29:23 +0800
-Message-ID: <20241018022926.1911257-2-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241018022926.1911257-1-yuehaibing@huawei.com>
-References: <20241018022926.1911257-1-yuehaibing@huawei.com>
+	s=arc-20240116; t=1729218208; c=relaxed/simple;
+	bh=O4uT707Tv/lIfQv6cblxhA6wLHdiMJE58k2jil6dDIE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fRh/xkR+qdx+GvXlem2qaWTe/rrMcQz2HRaQa8cFx59ZPzhwucu9ygf4lhDqQbJ6LO+qjIe9ITqi5PU32HmNAzrW5fmgf3fYw1ixfpBNBc8N+tckEuXhCGN8eZMTgU3DCCbP+uTH2ua2axYOX9QpYAAANqBIZm2D5qDWXQgaSlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=YF1aWB9S; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1729217974;
+	bh=Ki0z6CTdVTpppMdLs2s6QNtb9P/mdMmiW9dRytEzdzM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=YF1aWB9SNHjxY9ILwki4UVo60mCmQDZnvJ7BXARAX8pOJtrDUnllbmJxWjB2Ov+WP
+	 vdXy54qGGt7kvSnbMR8CfceWpGbeBAb1rC0d4EfoGmaIe+R1WwN0oRB8E7VFhNO+4b
+	 U4L4sQapyJY/1L1GVwV+ke/tKypEQV5kMieEqR00=
+X-QQ-mid: bizesmtpsz3t1729217955tkprubm
+X-QQ-Originating-IP: 428xufKTZI5Xo6kHFcuyAGYJM5mAD4lY95RzwD1mDpc=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 18 Oct 2024 10:19:13 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3988907893277172996
+From: WangYuli <wangyuli@uniontech.com>
+To: michael.chan@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pavan.chebbi@broadcom.com,
+	mchan@broadcom.com,
+	jdmason@kudzu.us,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mcarlson@broadcom.com,
+	benli@broadcom.com,
+	sbaddipa@broadcom.com,
+	linas@austin.ibm.com,
+	Ramkrishna.Vepa@neterion.com,
+	raghavendra.koushik@neterion.com,
+	wenxiong@us.ibm.com,
+	jeff@garzik.org,
+	vasundhara-v.volam@broadcom.com,
+	WangYuli <wangyuli@uniontech.com>
+Subject: [PATCH] eth: Fix typo 'accelaration'. 'exprienced' and 'rewritting'
+Date: Fri, 18 Oct 2024 10:19:10 +0800
+Message-ID: <90D42CB167CA0842+20241018021910.31359-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,100 +78,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: M4+GqYRlc6iCCZMTMoiAff7mKh2ed6eK76kNLXe/7ZObDRtwylQAsDgI
+	ye3sef2HhqTdOPG0BFF7a96y8ZdDxKDn3QQQOJ3ZeyPVGjGj/mWk5ad1rpB0JyGvtTFuVpg
+	KVMJzO5OWMqyGL9KUNSFETk0I8ojEZNeiwFOdT1BU9ZuoWxm8Fu0r12M8ds/qJaandk+wR4
+	tkjEzIxPMlGya+p17j5vgHLyYHHTX2VjacDY0swklsrdLmUh+20Fo8pr3fT3E/Eh9ePSSj6
+	cuZ51NrFDBsnTZCb7hMWcTFPnDf9l00W1lLUnD+HR9Qbnt8FCziroWHK6RBq7lc6HNd+H6c
+	VqPBoD1pu2YJPKEB3+hcLh+HTM+6krrqNmBYRdQK/NL1PDuA/5om6TC5kr879YXM5x/3LR0
+	3Ia/qQH7res4VECnpXg+EpWo5YpoU5HocEubgKn0JhUgJwg4fpjSieEnb77vlIFSAR/Hv+n
+	6smW66ieBrzIzdJIrAaN9zITgz5g1GMv5ugxPtnMEJRM0Za5huif1zzChcvCeL6EoKm+Fy3
+	ekZ1t9J1DGjPB4PhAB5yNYsaBVR4jMOZYcTuArPnjAHGq3rByse3tOfxJIPRz+HB8BB+8C8
+	1RB3+Pg1rrdE/YhqkqoGal0EGoSr4MmnH8Hazo1YL9G+f/tcqnSj952wzdmUOdpLaLcC0jG
+	7DmvNV3o1F3rsVJp1TNQVFJdThfHBOdWDAFmS6CIyMxYx+b4eHObnGd9dh00t5He+Z9GUr7
+	QIk1KHTkZxmgRwaywVMZbJfsIbUOJiVyZAnySNrEoy9w738VuowihvuXMUJOOQLZpEpiBGp
+	musGcitUg97AXrTFPNMyOV03q1l6IS3VsGDzpLcZ4Ki7iOXGAdMeS8a5FQxaLmBN6m9LIuA
+	TpzBXAOTBbS0dkiVpH41mYp/jZvyrYcavUx2nA0YFVVTB8kFZINlzaA1e9EpIHZ8ie4w/i/
+	LG1IVGFMtpPkDslKV3GEjhMP8JKobOQmE+3cYKdUIRGNDoQ==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-igc_xdp_run_prog() converts customed xdp action to a negative error code
-with the sk_buff pointer type which be checked with IS_ERR in
-igc_clean_rx_irq(). Remove this error pointer handing instead use plain
-int return value to fix this smatch warnings:
+There are some spelling mistakes of 'accelaration', 'exprienced' and
+'rewritting' in comments which should be 'acceleration', 'experienced'
+and 'rewriting'.
 
-drivers/net/ethernet/intel/igc/igc_main.c:2533
- igc_xdp_run_prog() warn: passing zero to 'ERR_PTR'
-
-Fixes: 26575105d6ed ("igc: Add initial XDP support")
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+Suggested-by: Simon Horman <horms@kernel.org>
+Link: https://lore.kernel.org/all/20241017162846.GA51712@kernel.org/
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++---
+ drivers/net/ethernet/broadcom/tg3.c       | 2 +-
+ drivers/net/ethernet/neterion/s2io.c      | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 6e70bca15db1..5e44c2546a12 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -2123,10 +2123,6 @@ static bool igc_cleanup_headers(struct igc_ring *rx_ring,
- 				union igc_adv_rx_desc *rx_desc,
- 				struct sk_buff *skb)
- {
--	/* XDP packets use error pointer so abort at this point */
--	if (IS_ERR(skb))
--		return true;
--
- 	if (unlikely(igc_test_staterr(rx_desc, IGC_RXDEXT_STATERR_RXE))) {
- 		struct net_device *netdev = rx_ring->netdev;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index f5da2dace982..bda3742d4e32 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -12881,7 +12881,7 @@ static netdev_features_t bnxt_fix_features(struct net_device *dev,
+ 	if (features & NETIF_F_GRO_HW)
+ 		features &= ~NETIF_F_LRO;
  
-@@ -2515,8 +2511,7 @@ static int __igc_xdp_run_prog(struct igc_adapter *adapter,
- 	}
- }
- 
--static struct sk_buff *igc_xdp_run_prog(struct igc_adapter *adapter,
--					struct xdp_buff *xdp)
-+static int igc_xdp_run_prog(struct igc_adapter *adapter, struct xdp_buff *xdp)
- {
- 	struct bpf_prog *prog;
- 	int res;
-@@ -2530,7 +2525,7 @@ static struct sk_buff *igc_xdp_run_prog(struct igc_adapter *adapter,
- 	res = __igc_xdp_run_prog(adapter, prog, xdp);
- 
- out:
--	return ERR_PTR(-res);
-+	return res;
- }
- 
- /* This function assumes __netif_tx_lock is held by the caller. */
-@@ -2585,6 +2580,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
- 	struct sk_buff *skb = rx_ring->skb;
- 	u16 cleaned_count = igc_desc_unused(rx_ring);
- 	int xdp_status = 0, rx_buffer_pgcnt;
-+	int xdp_res = 0;
- 
- 	while (likely(total_packets < budget)) {
- 		struct igc_xdp_buff ctx = { .rx_ts = NULL };
-@@ -2630,12 +2626,10 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
- 			xdp_buff_clear_frags_flag(&ctx.xdp);
- 			ctx.rx_desc = rx_desc;
- 
--			skb = igc_xdp_run_prog(adapter, &ctx.xdp);
-+			xdp_res = igc_xdp_run_prog(adapter, &ctx.xdp);
- 		}
- 
--		if (IS_ERR(skb)) {
--			unsigned int xdp_res = -PTR_ERR(skb);
--
-+		if (xdp_res) {
- 			switch (xdp_res) {
- 			case IGC_XDP_CONSUMED:
- 				rx_buffer->pagecnt_bias++;
-@@ -2657,7 +2651,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
- 			skb = igc_construct_skb(rx_ring, rx_buffer, &ctx);
- 
- 		/* exit if we failed to retrieve a buffer */
--		if (!skb) {
-+		if (!xdp_res && !skb) {
- 			rx_ring->rx_stats.alloc_failed++;
- 			rx_buffer->pagecnt_bias++;
- 			set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
-@@ -2672,7 +2666,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
- 			continue;
- 
- 		/* verify the packet layout is correct */
--		if (igc_cleanup_headers(rx_ring, rx_desc, skb)) {
-+		if (xdp_res || igc_cleanup_headers(rx_ring, rx_desc, skb)) {
- 			skb = NULL;
- 			continue;
- 		}
+-	/* Both CTAG and STAG VLAN accelaration on the RX side have to be
++	/* Both CTAG and STAG VLAN acceleration on the RX side have to be
+ 	 * turned on or off together.
+ 	 */
+ 	vlan_features = features & BNXT_HW_FEATURE_VLAN_ALL_RX;
+@@ -16131,7 +16131,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
+  * @pdev: Pointer to PCI device
+  *
+  * Restart the card from scratch, as if from a cold-boot.
+- * At this point, the card has exprienced a hard reset,
++ * At this point, the card has experienced a hard reset,
+  * followed by fixups by BIOS, and has its config space
+  * set up identically to what it was at cold boot.
+  */
+@@ -16159,7 +16159,7 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
+ 		pci_set_master(pdev);
+ 		/* Upon fatal error, our device internal logic that latches to
+ 		 * BAR value is getting reset and will restore only upon
+-		 * rewritting the BARs.
++		 * rewriting the BARs.
+ 		 *
+ 		 * As pci_restore_state() does not re-write the BARs if the
+ 		 * value is same as saved value earlier, driver needs to
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index d5916bbc1b3a..08d2ba3c758e 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -18276,7 +18276,7 @@ static pci_ers_result_t tg3_io_error_detected(struct pci_dev *pdev,
+  * @pdev: Pointer to PCI device
+  *
+  * Restart the card from scratch, as if from a cold-boot.
+- * At this point, the card has exprienced a hard reset,
++ * At this point, the card has experienced a hard reset,
+  * followed by fixups by BIOS, and has its config space
+  * set up identically to what it was at cold boot.
+  */
+diff --git a/drivers/net/ethernet/neterion/s2io.c b/drivers/net/ethernet/neterion/s2io.c
+index f235e76e4ce9..f8016dc25e0a 100644
+--- a/drivers/net/ethernet/neterion/s2io.c
++++ b/drivers/net/ethernet/neterion/s2io.c
+@@ -8523,7 +8523,7 @@ static pci_ers_result_t s2io_io_error_detected(struct pci_dev *pdev,
+  * @pdev: Pointer to PCI device
+  *
+  * Restart the card from scratch, as if from a cold-boot.
+- * At this point, the card has exprienced a hard reset,
++ * At this point, the card has experienced a hard reset,
+  * followed by fixups by BIOS, and has its config space
+  * set up identically to what it was at cold boot.
+  */
 -- 
-2.34.1
+2.45.2
 
 
