@@ -1,60 +1,82 @@
-Return-Path: <netdev+bounces-137205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFD629A4CA7
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 11:35:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 368929A4CB3
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 11:44:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 728A52858E5
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 09:35:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3CA92851CD
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 09:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753EF1DE4EE;
-	Sat, 19 Oct 2024 09:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0481DF997;
+	Sat, 19 Oct 2024 09:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s/0wf9ED"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MOg1sR9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4402318D64B;
-	Sat, 19 Oct 2024 09:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5CE1DF74B;
+	Sat, 19 Oct 2024 09:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729330545; cv=none; b=l+5MtcJFZc8gngDcfTFxgcX/FSl6RJA3A/HmOCobt6GAT48YVXu5otiQGSP9CbBnREUKVcBkQup9BUXYiK376d/9nFjFLdWpqcLL0GqGzNNJpc2/xqYSZZ4S0WvDT/IkV9cx6mUs1kv0v5uAmNLxqanwM5JIGKpyzocV0NJefp0=
+	t=1729331077; cv=none; b=PXnaTjk677dcEPy+pNNDyba8S305vvEvQyjtKSYU+VlAuSkFqypjrStMmFla+m97QE1+N5vavYHrj3O3tpsvEVW87gO/LdXvzPvHK/UPhsrX1ucWwPhUPNKoFZshtlRpW83wg+I0SNXTVgCPtEvCxdNqpI60TlGUHm75Q1d2NTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729330545; c=relaxed/simple;
-	bh=omrmyMvs4J2wamb0uo/g9R8M2pRLvsLgIyu+q4hZwhI=;
+	s=arc-20240116; t=1729331077; c=relaxed/simple;
+	bh=8JKQHEed5f/WTiLw6VZKnZcCY2h2Gs+L+t+SxwiypVI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QuO3mLDa3riClYJ+pqVLb6ZnHrvaqOWaqXBgs7Psj0jxPaJndYQYmSxBY+F6w8BIPfjZqk//i5iGcAOWhmM0DXz2uB5x6OpQean8GHN5KK7J+hgjmeGqDmKmvW1GPzaV8OOcAtz/LTMRqBbCS92Y4wRKoFPHILdroGaIUN0V1Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s/0wf9ED; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0431C4CEC5;
-	Sat, 19 Oct 2024 09:35:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729330544;
-	bh=omrmyMvs4J2wamb0uo/g9R8M2pRLvsLgIyu+q4hZwhI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s/0wf9EDJAN1kYOqI0LnAm0pch20QJOLJm2hj8SrvYDSDBOAuvHxLXjoqFPKJiwOu
-	 l/zlYBp0QIdEcXRc41P3F4D8G9Hlo9u/Ayhp/FEoj8zXqI2S/ASHF0PKBEgJvCXvAQ
-	 ie92m01/VOOGH5qtHCG70l24WepjRcc97eYEB9CMCjbpCn3N9qVjQnAkBw/7AgNX5k
-	 FYfYAqEx62h5l++T/+0pWeuex4nAkX6aInr5RbYVK7JvKOaX7C/Ni7MgjQQzup1KSP
-	 k4XthNh9Twg6Fg7kIyqwJW+oHyyiKZCTRLcbTkwoCt8IGlrOIs7hLrAywL/99BDIB3
-	 iqn2aiTx4NaDA==
-Date: Sat, 19 Oct 2024 10:35:40 +0100
-From: Simon Horman <horms@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Wang Hai <wanghai38@huawei.com>, justin.chen@broadcom.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, zhangxiaoxu5@huawei.com,
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net] net: bcmasp: fix potential memory leak in
- bcmasp_xmit()
-Message-ID: <20241019093540.GU1697@kernel.org>
-References: <20241015143424.71543-1-wanghai38@huawei.com>
- <20241017135417.GM1697@kernel.org>
- <d496a4dd-14be-428d-853f-785cf6200360@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bInJ+2Qx+BwQR25IB0H1FiW56i5o3DmnoGG/31SN3mdR4NJ67KA0XeKlnGMlR7RFuKSJJuLzffa+n5R6Do1kva/kLiVYz87oMu/d6trJXUluiirNNNmXN5dzNTALNGCsxBNApEaosZOcdQ75X2R5tw7olKQnuJBUAsaoCm1IvNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MOg1sR9B; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729331076; x=1760867076;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8JKQHEed5f/WTiLw6VZKnZcCY2h2Gs+L+t+SxwiypVI=;
+  b=MOg1sR9BxCy/3od0ljh0pQj1Yw2NIa+wczzGJ4v22KT4Te6OBkUnksel
+   0XSmk5ebPn3PS908x0+7UlAW1YrqL2X1ozirGdaICtK1j5kYvjDd1bv5H
+   6d5ZcMu+9mf5MMFVAzJ0sJBu780T7yEsDJsDCaL9E010oJkw9IGTKRDje
+   MHiwfXSymWjQ8HcfTTBiyB6qE56gV456Q7tBYiWdm+DOie9VQ7hm5K7mO
+   67tLQfAf73y4hlAUOvRYvRqjzhPwsxAdubtQIGuLuRxnuc5NC3cwS5nyU
+   JVJJyq/ncwh1nWZRENbYWus4PiFsfD2rseahfFtj2qfCr+VrzB5INKCjI
+   Q==;
+X-CSE-ConnectionGUID: rzH9TSsMSDuGph5uGy2EcA==
+X-CSE-MsgGUID: 9J0JqVt4SSCWXUkaPeAQQw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11229"; a="28995780"
+X-IronPort-AV: E=Sophos;i="6.11,215,1725346800"; 
+   d="scan'208";a="28995780"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2024 02:44:32 -0700
+X-CSE-ConnectionGUID: BACNGPuUQ1WafYM+UNO0rg==
+X-CSE-MsgGUID: OQg0m7ppRs2uezzrmdjyyg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,215,1725346800"; 
+   d="scan'208";a="79145234"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 19 Oct 2024 02:44:28 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t260X-000OsF-20;
+	Sat, 19 Oct 2024 09:44:25 +0000
+Date: Sat, 19 Oct 2024 17:43:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, imx@lists.linux.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 06/13] net: enetc: build enetc_pf_common.c as
+ a separate module
+Message-ID: <202410191715.TQmESUy9-lkp@intel.com>
+References: <20241017074637.1265584-7-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,48 +85,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d496a4dd-14be-428d-853f-785cf6200360@broadcom.com>
+In-Reply-To: <20241017074637.1265584-7-wei.fang@nxp.com>
 
-On Fri, Oct 18, 2024 at 11:18:51AM -0700, Florian Fainelli wrote:
-> 
-> 
-> On 10/17/2024 6:54 AM, Simon Horman wrote:
-> > On Tue, Oct 15, 2024 at 10:34:24PM +0800, Wang Hai wrote:
-> > > The bcmasp_xmit() returns NETDEV_TX_OK without freeing skb
-> > > in case of mapping fails, add dev_consume_skb_any() to fix it.
-> > > 
-> > > Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-> > > Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> > 
-> > There seems to be some confusion over in the thread for v1 of this patchset.
-> > Perhaps relating to several similar patches being in-flight at the same
-> > time.
-> > 
-> > 1. Changes were requested by Florian
-> > 2. Jakub confirmed this concern
-> > 3. Florian Acked v1 patch
-> > 4. The bot sent a notificaiton that v1 had been applied
-> > 
-> > But v1 is not in net-next.
-> > And I assume that 3 was intended for v2.
-> > 
-> >  From my point of view v2 addresses the concerns raised by Florian wrt v1.
-> > And, moreover, I agree this fix is correct.
-> > 
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > 
-> > v2 is marked as Changes Requested in patchwork.
-> > But I suspect that is due to confusion around v1 as summarised above.
-> > So I am (hopefully) moving it back to Under Review.
-> > 
-> 
-> v1 was applied already, which, per the discussion on the systemport driver
-> appears to be the correct way to go about:
-> 
-> https://git.kernel.org/netdev/net/c/fed07d3eb8a8
+Hi Wei,
 
-Thanks, it seems that it is me who was confused.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Fang/dt-bindings-net-add-compatible-string-for-i-MX95-EMDIO/20241017-160848
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241017074637.1265584-7-wei.fang%40nxp.com
+patch subject: [PATCH v3 net-next 06/13] net: enetc: build enetc_pf_common.c as a separate module
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20241019/202410191715.TQmESUy9-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410191715.TQmESUy9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410191715.TQmESUy9-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   m68k-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_pf_common.o: in function `enetc_pf_netdev_setup':
+>> enetc_pf_common.c:(.text+0x55e): undefined reference to `enetc_set_ethtool_ops'
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [y]:
+   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
 
 -- 
-pw-bot: not-applicable
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
