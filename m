@@ -1,178 +1,141 @@
-Return-Path: <netdev+bounces-137188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF1CB9A4B51
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 07:37:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D085F9A4BBB
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 09:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFC711C212BC
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 05:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 849C5284B99
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 07:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EDC187848;
-	Sat, 19 Oct 2024 05:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298B51D7E50;
+	Sat, 19 Oct 2024 07:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mvista.com header.i=@mvista.com header.b="Cb1qTBbq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mH+E7fWv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050A8EEB9
-	for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 05:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEC91D7E5B;
+	Sat, 19 Oct 2024 07:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729316220; cv=none; b=i2aRr3BM25AthC2Bhcy+6VTBFFoWTBGVLSl3xo0rDLpAiV+fDr5e2S6Mvobeprc4FY9cDTV6z+ALpHX1GoxxeDQCkt81OvlK3yfkRB/H8IBljYM3UQbu8tupYW95VL6ytWFZvK1mizw9pKbSvEzckz/OUcueXUkXkZawY9Atc/k=
+	t=1729321915; cv=none; b=ZJt7hFPS3Pt4ArXL0+0/JGonaeHv/zLtsihAydmXwFG+IG5xWv8mCV6hPA9wJtWc7RBHE/QKRYiKd/i5mTgw4c98lONT0igoZP+f8JUq2oGSVCWr13qYzLKaEuxbjIOjlrniGhFuWGkRJ/0z28+6g0mWWgg+3Ad/nXrihcjj0X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729316220; c=relaxed/simple;
-	bh=S1PxwZrn7qHGDRfhZS3BcE39HVJJf/8ayElZRXlYghc=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=QKb7bOUsDl/LHsz8Pn/nw1oKYPjKBpplckGkG3tSN64ROf0JTidBRbIVwbin+ekLyQaYLWdXwlL45uPEUECBY25YfMLT58Hr60Dj6IFxzsX2303+QH4leRLbmplWBBUqv/JYc3gfFDTZqN/twZISyZgyFf7wcX5eI5fixI8icRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mvista.com; spf=pass smtp.mailfrom=mvista.com; dkim=pass (1024-bit key) header.d=mvista.com header.i=@mvista.com header.b=Cb1qTBbq; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mvista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mvista.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7ea7ad1e01fso1974493a12.0
-        for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 22:36:58 -0700 (PDT)
+	s=arc-20240116; t=1729321915; c=relaxed/simple;
+	bh=gyYDzQGKOqgYMYaJdzUg3i6tJ8ixJ54mQLbSTkrE1/Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ss1rlZKfLSuwgEGQLDP/zNYNx9IFqCqQXzT88d0igCfmR1wirYs3uiOWvx5G7kfZzggdsrIbnTcHKDghst2R+uJ3wr877Ct1p7ikdFNA+7I1ioxyEFv5O0rVBTbHpPY46zzh81du/dINYUZB0jqqi7V7WD8gI8b/Gq3rqXWtsMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mH+E7fWv; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20c77459558so25624925ad.0;
+        Sat, 19 Oct 2024 00:11:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mvista.com; s=google; t=1729316218; x=1729921018; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XvyeG0sMGLIPDJGO5fTlUoNdyS3Nb/+jzs6l/Ql3K1U=;
-        b=Cb1qTBbqH/+9XOpmMgLL02WuOQo9Bm9/9ITcBRDoE1LD/5twSfVO1r4M/ei8MD0cpS
-         6YSlndXLXysp0nDVKkEIsm/ygIA142wniM2286hLQv82YWBIpIsDPcNhftWO19f7BEaG
-         sp1+8/6yw9HMjcW5hUlpowOcOK7PNQFzkv5zY=
+        d=gmail.com; s=20230601; t=1729321912; x=1729926712; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Gn+yGZNlg35IH0UZAn+lxJ6+L1bLg4klZElPzwowdU=;
+        b=mH+E7fWvdqEoGZRLaRghNCw5mMVBNrSbww20HRsh3eSZaxfxPv+pfyOzVXrtggf/Ip
+         NJUSNLNHzdKcZsYXhRh1XLK5iA2hWpiFirXV8QD7qXXT5zcnCb4of6sdNOMOrf5hacUn
+         j3WfXmzKR7JXh0chK7kvoeqvLeh44utWMvq+4bRdaRx/Ulaa8v0wv68vsnuTtWtg+627
+         PvNJIoRj/jG2ysowVW7EN4rdxibLHQSDPRI4B62Xa+yDGY9tnoS050h0QJvX1y94xUh3
+         EGX+9PUqSYbmcVU1xkkIHbzvxqVebA1jlP4NeFGpQpzH43kR1djVirmKA6pU576+TkZI
+         CCcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729316218; x=1729921018;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XvyeG0sMGLIPDJGO5fTlUoNdyS3Nb/+jzs6l/Ql3K1U=;
-        b=cwoqnhVYQPwgaS6jSZtgCge7IbBRLfswrY6J/qO55ymM0mBujwTtnOX9s+Qc33Za1C
-         zV6qKXgKStO3aL8AN0P4Fq96piQHXhd5rX+Vo6vW43ev/4QfS+nYiILlZHbH9etCf5JR
-         Aw9xuKeyhLNZs5K22kOTE5O3Zo0NrTqm0wXpBON9CN+b34QmYifQYMzQmTbQLQlNefTg
-         D9SAZ/A6NGHj7mX3NDngi/lkUabc2mlDvdbooDxjUwxlfyYieF+xxaK1VVFfdnq2Zcn8
-         R+92yYNefzFGL59SONg9JwhJV9cP6g7Z0LQEOwMWn/QgbrxPl9o+Kur27sjTeZywsOOd
-         IHig==
-X-Gm-Message-State: AOJu0YxfDFBU4fEkI+X0V2fqI5MTBuzqHjZ/uL9i5VwwvEYUOwU8Z2o2
-	PeaOCMtcYaKLOS71dYeftqVIMi7+9lcLtm1x5GNs3rNhzw5bYnjxXqiRsVoGrT4=
-X-Google-Smtp-Source: AGHT+IEt5HjmxdM79D9u6pDGmB8BmmjITVgsn3cTA5mvnMfSA50vSYGZj4YkEv3qeaDep5emWIB4bg==
-X-Received: by 2002:a05:6300:668c:b0:1d9:dc8:b80d with SMTP id adf61e73a8af0-1d92cb56801mr6034991637.20.1729316218163;
-        Fri, 18 Oct 2024 22:36:58 -0700 (PDT)
-Received: from jupiter.mvista.com ([182.74.28.237])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ea3311f51sm2395825b3a.36.2024.10.18.22.36.54
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Oct 2024 22:36:57 -0700 (PDT)
-From: Hardik Gohil <hgohil@mvista.com>
-To: stable@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Kenton Groombridge <concord@gentoo.org>,
-	Kees Cook <kees@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Xiangyu Chen <xiangyu.chen@windriver.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Hardik Gohil <hgohil@mvista.com>
-Subject: [PATCH v5.10.277] wifi: mac80211: Avoid address calculations via out of bounds array indexing
-Date: Sat, 19 Oct 2024 11:06:40 +0530
-Message-Id: <1729316200-15234-1-git-send-email-hgohil@mvista.com>
-X-Mailer: git-send-email 2.7.4
+        d=1e100.net; s=20230601; t=1729321912; x=1729926712;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7Gn+yGZNlg35IH0UZAn+lxJ6+L1bLg4klZElPzwowdU=;
+        b=dDGg1JdVIjcwZfRCUBoLjpXgBht+3PDPle37tA7CHkhv1MKCMFAEmVEac0YHAYTwvx
+         fYoYzC5Fwtq7Qi/JtMTqu1JIP8ltcFlHpo5omDnE/zdrZtD9qsQ7C3znZJkiu7SXy3ZN
+         FGsJqPuYX2NHDlJgdbQ+h7MvdhuRP4eaUSwp0XX18GSaRISu0LlyEyFnF1nYyswK5IxP
+         Av2GMWViXiN5gXKt+vvKvsVJ3vVtOMSIrZUKfC77e5wtLT7K9TiHE5omeMCHpLa0bDfm
+         YewWHs3dO3VmPrB+eDU3xH4ouiLjs396/kcVLP1dJqaASI+84nRAkYckdQa6r9TaNM6k
+         ZWBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqw7Q9bBFcYN9NYuqGkuUVR6nuMl8Rve9sohItPj+A8DIEX+zOOZn6LObmbD1j4Knh8yk=@vger.kernel.org, AJvYcCXd1K8rPoJ3HPoC3KYI9wEL6C8Rtu2d73CiaES4AZI9cDg1rb5U2Y5vJ1HLqHKm57Ruj0tEmmV0JoUM7mgT@vger.kernel.org, AJvYcCXsFSAUIsKCKG/zpBXoMuFxFpDV9Uv+R7oKwGew49gqz72JATZyTE+rGof7a8wtU+QmapWjtvfo@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjfLhK1uQeWdGJ5CWEMF/bang3Bqb1kI+tFPW8OsfD4zZhPwzI
+	qExVqOEc4/K9EsR3Be42z1H9T2Kc0JSi+mAYK2GdByQ/oiGS56+rVnbDJQmhh9g=
+X-Google-Smtp-Source: AGHT+IE/SkDlNN6p0OGPS3TeQrfyaFsGLBzlRh1iKulhu+uDf+sHLST8POK39eHc2Pb5oKWkazqeww==
+X-Received: by 2002:a17:903:1c7:b0:20d:2ce5:750d with SMTP id d9443c01a7336-20e5a725bfbmr72473375ad.12.1729321912151;
+        Sat, 19 Oct 2024 00:11:52 -0700 (PDT)
+Received: from debian.resnet.ucla.edu (s-169-232-97-87.resnet.ucla.edu. [169.232.97.87])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20e5a8d6408sm22609135ad.166.2024.10.19.00.11.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Oct 2024 00:11:51 -0700 (PDT)
+From: Daniel Yang <danielyangkang@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org (open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)),
+	netdev@vger.kernel.org (open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Daniel Yang <danielyangkang@gmail.com>,
+	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Subject: [PATCH net] Drop packets with invalid headers to prevent KMSAN infoleak
+Date: Sat, 19 Oct 2024 00:11:39 -0700
+Message-Id: <20241019071149.81696-1-danielyangkang@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Kenton Groombridge <concord@gentoo.org>
+KMSAN detects uninitialized memory stored to memory by
+bpf_clone_redirect(). Adding a check to the transmission path to find
+malformed headers prevents this issue. Specifically, we check if the length
+of the data stored in skb is less than the minimum device header length.
+If so, drop the packet since the skb cannot contain a valid device header.
+Also check if mac_header_len(skb) is outside the range provided of valid
+device header lengths.
 
-[ Upstream commit 2663d0462eb32ae7c9b035300ab6b1523886c718 ]
+Testing this patch with syzbot removes the bug.
 
-req->n_channels must be set before req->channels[] can be used.
-
-This patch fixes one of the issues encountered in [1].
-
-[   83.964255] UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:364:4
-[   83.964258] index 0 is out of range for type 'struct ieee80211_channel *[]'
-[...]
-[   83.964264] Call Trace:
-[   83.964267]  <TASK>
-[   83.964269]  dump_stack_lvl+0x3f/0xc0
-[   83.964274]  __ubsan_handle_out_of_bounds+0xec/0x110
-[   83.964278]  ieee80211_prep_hw_scan+0x2db/0x4b0
-[   83.964281]  __ieee80211_start_scan+0x601/0x990
-[   83.964291]  nl80211_trigger_scan+0x874/0x980
-[   83.964295]  genl_family_rcv_msg_doit+0xe8/0x160
-[   83.964298]  genl_rcv_msg+0x240/0x270
-[...]
-
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=218810
-
-Co-authored-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Kees Cook <kees@kernel.org>
-Signed-off-by: Kenton Groombridge <concord@gentoo.org>
-Link: https://msgid.link/20240605152218.236061-1-concord@gentoo.org
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-[Xiangyu: Modified to apply on 6.1.y and 6.6.y]
-Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Signed-off-by: Hardik Gohil <hgohil@mvista.com>
+Fixes: 88264981f208 ("Merge tag 'sched_ext-for-6.12' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/sched_ext")
+Reported-by: syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
+Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
 ---
- net/mac80211/scan.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ net/core/filter.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index be5d02c..bcbbb9f 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -351,7 +351,8 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
- 	struct cfg80211_scan_request *req;
- 	struct cfg80211_chan_def chandef;
- 	u8 bands_used = 0;
--	int i, ielen, n_chans;
-+	int i, ielen;
-+	u32 *n_chans;
- 	u32 flags = 0;
- 
- 	req = rcu_dereference_protected(local->scan_req,
-@@ -361,34 +362,34 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
- 		return false;
- 
- 	if (ieee80211_hw_check(&local->hw, SINGLE_SCAN_ON_ALL_BANDS)) {
-+		local->hw_scan_req->req.n_channels = req->n_channels;
-+
- 		for (i = 0; i < req->n_channels; i++) {
- 			local->hw_scan_req->req.channels[i] = req->channels[i];
- 			bands_used |= BIT(req->channels[i]->band);
- 		}
--
--		n_chans = req->n_channels;
- 	} else {
- 		do {
- 			if (local->hw_scan_band == NUM_NL80211_BANDS)
- 				return false;
- 
--			n_chans = 0;
-+			n_chans = &local->hw_scan_req->req.n_channels;
-+			*n_chans = 0;
- 
- 			for (i = 0; i < req->n_channels; i++) {
- 				if (req->channels[i]->band !=
- 				    local->hw_scan_band)
- 					continue;
--				local->hw_scan_req->req.channels[n_chans] =
-+				local->hw_scan_req->req.channels[(*n_chans)++] =
- 							req->channels[i];
--				n_chans++;
-+
- 				bands_used |= BIT(req->channels[i]->band);
- 			}
- 
- 			local->hw_scan_band++;
--		} while (!n_chans);
-+		} while (!*n_chans);
+diff --git a/net/core/filter.c b/net/core/filter.c
+index cd3524cb3..92d8f2098 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2191,6 +2191,13 @@ static int __bpf_redirect_common(struct sk_buff *skb, struct net_device *dev,
+ 		return -ERANGE;
  	}
  
--	local->hw_scan_req->req.n_channels = n_chans;
- 	ieee80211_prepare_scan_chandef(&chandef, req->scan_width);
- 
- 	if (req->flags & NL80211_SCAN_FLAG_MIN_PREQ_CONTENT)
++	if (unlikely(skb->len < dev->min_header_len ||
++		     skb_mac_header_len(skb) < dev->min_header_len ||
++		     skb_mac_header_len(skb) > dev->hard_header_len)) {
++		kfree_skb(skb);
++		return -ERANGE;
++	}
++
+ 	bpf_push_mac_rcsum(skb);
+ 	return flags & BPF_F_INGRESS ?
+ 	       __bpf_rx_skb(dev, skb) : __bpf_tx_skb(dev, skb);
 -- 
-2.7.4
+2.39.2
 
 
