@@ -1,133 +1,149 @@
-Return-Path: <netdev+bounces-137215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B0629A4DC5
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 14:22:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC5659A4DD1
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 14:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93AC6286930
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 12:22:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51E4D1F264C6
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 12:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAD81DFE2B;
-	Sat, 19 Oct 2024 12:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFED51DE4EE;
+	Sat, 19 Oct 2024 12:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsHQ165N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+xnowLF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8530A1E4A4;
-	Sat, 19 Oct 2024 12:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31722629D
+	for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 12:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729340520; cv=none; b=BP6w4EkFcX+KyTh6NYlfnxDKsSdvndBKtWJyIGXi5xFFMsOM9AHz2YrRChDQb9QMSj7BidyyJY2HJVWT3P/93O2SIr/cmKw9NvIjozO1EM5PQai8OGKpnXNaU/OXZkRqCEMiHfDaQoG1hbapfBBQ4WL+n88IHEiFsx6NNmvAAC0=
+	t=1729341612; cv=none; b=J6PHjDlOkuIs1XkV1KwpHGi0bfA7DqAwAE3K5PQI1ItFnhpDmrcb6B7yBe6Uc9YPqEeyruGFHEgVSr1m80+NepGc+gQmq3IHoYKQsAPfsAb1aI3D+Re+4F2n07h+4rkakwMDiSGGHSbBchulfUdtdHrVXLSLYgxfxuoQo3C6ttQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729340520; c=relaxed/simple;
-	bh=g82XPKrPt2WZCw67QoEdhYkGQe9x2UxkBDSl2UO7qp4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cNIGWJ2sr2UW85G0sd2WE6koDbx2YiNb/txI1/I5MfQ8CsGRQolZUWnW+b7oqFyiOVxfggPBxdKWt2aDcdSX47mGchvszs4cinIiPiI/iTO0XTjbl2mNxeb+ty8qtyF4K5gT8GXRcE8GVjkp5MldULTTjhY21Qeb4gWnIIzpAHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BsHQ165N; arc=none smtp.client-ip=209.85.216.43
+	s=arc-20240116; t=1729341612; c=relaxed/simple;
+	bh=UVid1VDk7pD0527fHY7tDklEnM7TnMQtWmeCEV26pks=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=l2zsnN3nxQ1wjdj2UEkrgi8OvRIvCfUgE7SKqSBzAkroE2UWzfa0iFQhc8r8c7hRXRgN0BrTI4cQ/W2ww0+/VvGbq596AknbjhYkXmvOvnWrPssUhaI+xAFhc4Lye6Lgo8RhG4VlwADvZ/ffEnYRdos4NERgRl89u5uAY2G7vlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l+xnowLF; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e2d1b7bd57so385439a91.1;
-        Sat, 19 Oct 2024 05:21:58 -0700 (PDT)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a99c0beaaa2so485478066b.1
+        for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 05:40:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729340518; x=1729945318; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g82XPKrPt2WZCw67QoEdhYkGQe9x2UxkBDSl2UO7qp4=;
-        b=BsHQ165NiGzafabYIHrpm2IWZ0P6iXkKxDmWFgljWrJNNSu4wqg3Wl+y2EESipP2F4
-         OFMJkkc2Y/pqJbTR4UgWJIj9h2nC6c05MRfkKWvSpoP3djXgjMPArMtEH/ECgSup3WUh
-         6Tgl8GEAhS5LAH1kvguD8rv8r7S93+iwMbskX26JR61vr0Tr1i5pZmqSZQU3x3Tt9srO
-         0YvZx8d6WJc/u6WoJkM3fiOL3W/Lwrpnr9wjtnvKPIYiXwC5YrZahbu7NDE8gvDdrWLM
-         fByHXPsz13lLuGQT00hoyQsuCTHWGqXApXy4KnMBJb79jps/7UwxU4TSdG2LA4as3SIe
-         SBmQ==
+        d=gmail.com; s=20230601; t=1729341609; x=1729946409; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UVid1VDk7pD0527fHY7tDklEnM7TnMQtWmeCEV26pks=;
+        b=l+xnowLFgsXICwP6qPhB3OciTTQ+WhQyjRlAcbsF5JeYaEWilsdJSpoos+FqhRAt/z
+         qRUuoDVedMfZzXDA/7LuWjVoAhWJhRQWKT3dfgL98/d3KdcVmY904iNLwmfQ8mKQbB3q
+         jfU9cXVQfRrb4FawOIEtVY1CAc8I4UyH//I593XlMayiI6mFtdjr4N5mE8N8c0qrhFue
+         zR9ONFohGJn/zgd87j2XouGULwx5t9daMBpJiPIJkTVYYcRY+kbuZ/hyYpQ9Bd17mVmM
+         lYuZNUaT7R+oZy8STCDkqfurh4+T1AEi4JPIyAnSvSusPk7xVSS0944ESYMHXiNR7zIj
+         lXXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729340518; x=1729945318;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g82XPKrPt2WZCw67QoEdhYkGQe9x2UxkBDSl2UO7qp4=;
-        b=lLm78RGnKU10CFeAtgpxyI//LbUKWZ0Kw9efzDus1kTSXPPBwUvuHoS6Il50hFV3hP
-         PxXoW7mNT8q1Q8ELCsBH0pyiCUYhv71jRv2KT5T8pcZ535Q+tN7A4ll5GpNJG+OE7dTa
-         zCSJ9xrWqv+I+B6qztBFGK3CDNi187rz7Us7Rz8oSxWR4zK+rBuuLvLJ+sce5KXdM8NJ
-         HAuTF4BnyFq10wzmgHWVYcW4izUB11Mq+jRxGnf0J8u18H0dZqeUuJjDJEi70A9vUAo+
-         P45/7QQMD9gDIjHl63MCAOz9sprR1amzWlweykN64opPBdFMeeYIODV6tHTb8tgPhgyq
-         Dy3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWHUnF+FLE1RzAHV3IxLRE0Af3X8PutXJ43pl3gkvr2t8TNu7EPqxqfqniyD7uVEt+ArHsSfT+g@vger.kernel.org, AJvYcCWcXB4SWqIoaFBbb3X7OrwqgxQHs9W1kfZ4D4cUYqWCW0BJhnmcrWULpT5QvlrvHAcBVfCXf9po45HDALE=@vger.kernel.org, AJvYcCWiAo2WZRH+mcKfAOGLkClylA234yJjoEGFpfgKfIyG+yizSV6mSa2kTiY5dOdFJwLAFU+Dq1D70BoCfoYZH/w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/w817nGwaOm+aw2waa+WVerGNAtAmATd0xXaX2dOwpj4cIyyw
-	0JX9XIw6pi8swFytVouKi3mkF6rE78C4OywNT9y77rc9X+tG/lCYilrUP58DlocHkmuDAfXylro
-	ZLh4AGKmZ/ldZGtZ83vZ8eH3NTX4dErAWyhM=
-X-Google-Smtp-Source: AGHT+IFFqwJLcPci0kpV0Imx3Ln/B3dSXfPj/0iC5TweuZvhfmptPyQqgtA5en8HG1zvaJMlB9eo5nCaEmBFelgnT60=
-X-Received: by 2002:a17:90b:3846:b0:2e0:9d55:3784 with SMTP id
- 98e67ed59e1d1-2e56144249cmr2953182a91.0.1729340517661; Sat, 19 Oct 2024
- 05:21:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729341609; x=1729946409;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UVid1VDk7pD0527fHY7tDklEnM7TnMQtWmeCEV26pks=;
+        b=oFgyd3cMm8JHbyycEdin+PtqJzwupfW8QVpLwd+zAQfMjCGR2r1tkQKL3RjemxflHX
+         h3GD68J1QT5Pbhz6aqnpc6t3fWpw4R32eE57OOoMuJ8ssBP3hJk1sMKFrFlMgma3zsfI
+         wNQ7dBs8nC9aoC7LD1rG4zVg0yAYbpJ0cwjB/qfXyMV6sMAtH4+UuoeNvwqDokQtPk+/
+         j+dp1hnqlKCvNa3xxeCmKLMtLxGYymwK8zFQvofiW1ARjH4ftKub0pXFP0vILEOVkel2
+         YkLCE5sBhfw0CS/NwhIqZtXPLTF9vBygc2Rsq2Ku6COdpmrvEaFsokKTlxbaeIqCtN2P
+         ViEQ==
+X-Gm-Message-State: AOJu0YxjYN5pCoaIIDlEhi9LzaWKUqTQnCnUSrJK0Nb49Cr7PNHTXyJD
+	fnpx9fU3ZCQuqYqkeU/9dNkfVcMoDtDwhvH7Z+ITanfd5PxhYpRfSEPh+I24fK1XOxkdFKBENN/
+	zoyhK875+xMZgbJKTGZGxx4aibJgluu6g
+X-Google-Smtp-Source: AGHT+IEWy3wr1Ir6MciVYNaLHjZbsRMFQkWofyWykpblTsTeNqdDxTSiX8/zYKsLAmod9DPR/Aihg04ReVwleZQ23BY=
+X-Received: by 2002:a17:907:7e9e:b0:a9a:161:8da4 with SMTP id
+ a640c23a62f3a-a9a69cdd435mr533515766b.55.1729341609022; Sat, 19 Oct 2024
+ 05:40:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-3-fujita.tomonori@gmail.com> <6bc68839-a115-467f-b83e-21be708f78d7@lunn.ch>
- <CANiq72=_9cxkife3=b7acM7LbmwTLcXMX9LZpDP2JMvy=z3qkA@mail.gmail.com> <940d2002-650e-4e56-bc12-1aac2031e827@lunn.ch>
-In-Reply-To: <940d2002-650e-4e56-bc12-1aac2031e827@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 19 Oct 2024 14:21:45 +0200
-Message-ID: <CANiq72nV2+9cWd1pjjpfr_oG_mQQuwkLaoya9p5uJ4qJ2wS_mw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/8] rust: time: Introduce Delta type
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu, 
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org, 
-	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
-	linux-kernel@vger.kernel.org
+From: Stefan Dimitrov <stefan.k.dimitrov@gmail.com>
+Date: Sat, 19 Oct 2024 15:39:58 +0300
+Message-ID: <CAE8EbV3aruDHKrBezSLg_hy0XZG2Dr1pkzvXVVTj0QpNpH86nw@mail.gmail.com>
+Subject: igb driver: i210 (8086:1533) very bad SNR performance
+To: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 18, 2024 at 6:55=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> Did you see my other comment, about not actually using these helpers?
-> I _guess_ it was not used because it does not in fact round up. So at
-> least for this patchset, the helpers are useless. Should we be adding
-> useless helpers? Or should we be adding useful helpers? Maybe these
-> helpers need a different name, and do actually round up?
+Hello All,
 
-Yeah, I saw that -- if I understand you correctly, you were asking why
-`as_nanos()` is used and not `as_secs()` directly (did you mean
-`as_micros()`?) by adding rounding on `Delta`'s `as_*()` methods.
+I am reporting the problem only, because the exact same
+environment/setup is working perfectly in Win7 with Intel driver
+version 12.13.27.0 from 7/8/2019 (I guess that is the latest driver
+version for Win7 as it is not supported for years, but it's the only
+Windows version I had during my tests).
 
-So my point here was that a method with a name like `as_*()` has
-nothing to do with rounding, so I wouldn't add rounding here (it would
-be misleading).
+So, in very short: the same 20-25m of UTP cable, works perfectly in
+Win7 and not at all in Linux with i210/igb driver and my best guess is
+PHY initialization in the Linux driver compared to the one in Win7
+drivers somehow reduces dramatically the Signal-to-Noise performance.
 
-Now, we can of course have rounding methods in `Delta` for convenience
-if that is something commonly needed by `Delta`'s consumers like
-`fsleep()`, that is fine, but those would need to be called
-differently, e.g. `to_micros_ceil`: `to_` since it is not "free"
-(following e.g. `to_radians`) and + `_ceil` to follow `div_ceil` from
-the `int_roundings` feature (and shorter than something like
-`_rounded_up`).
+(the UTP cable is of unknown type, because it's a preexisting
+installation in the walls of the building, I guesstimated it's 20-25m
+of length based on the walls it passes and there are not any markings
+on the cable, at least on the portions of it that I can see, i.e. that
+are not inside the walls, but what I can at least tell is that it's
+solid copper wires when look at its wires in the RJ45 plugs)
 
-In other words, I think you see these small `as_*()` functions as
-"helpers" to do something else, and thus why you say we should provide
-those that we need (only) and make them do what we need (the
-rounding). That is fair.
+in other words, the problem is:
 
-However, another way of viewing these is as typical conversion methods
-of `Delta`, i.e. the very basic interface for a type like this. Thus
-Tomonori implemented the very basic interface, and since there was no
-rounding, then he added it in `fsleep()`.
+* in Win7: i210 with the above aforementioned driver version, the Link
+connects as 1Gbps, I see no issues at all on 24/7 basis, it's running
+with no connection drops, it just seems perfectly working
 
-I agree having rounding methods here could be useful, but I am
-ambivalent as to whether following the "no unused code" rule that far
-as to remove very basic APIs for a type like this.
+* in Linux: i210 with the in kernel 'igb' driver the Link cannot
+connect even as 10Mbps. when I force it to 100Mbps, it connects for a
+very short moment and then it disconnects and that repeats endlessly,
+I observed no connection at all when set to 1Gbps.
 
-Cheers,
-Miguel
+Initially, I thought it's some issue between Linux i210/igb and the
+other end device, but no - I can reproduce the problem with 3 other
+1gbps switches (2 netgear and 1 cisco) that I own (and are not
+property of the building) connected to the other end of the cable.
+
+So, it turns out the only thing that makes difference for i210/igb in
+Linux is the UTP cable itself - I bought 20m of branded and supposedly
+high-quality UTP cat6a cable and use those 3 switches that I own to
+simulate a test-environment.
+
+that makes me believe Sound-to-Noise ration performance of i210/igb is
+really very bad compared to Win7 driver (i.e. something in the PHY
+initialization), considering the same UTP cable gives 1gbps in Win7
+and cannot even connect to 10Mbps in Linux - that is like at least 100
+times worse performance if we look at it as Link speed. Also, maybe
+the length is at play, because I am guesstimating about 25m of the
+building UTP cable, and I tested with only 20m - the length of the one
+I bought. so, I don't exclude even with the branded cable I bought if
+it has length of 25m or more the problem will not arise again.
+
+Anyway, the main point I guess is that in Win7 same (bad) UTP cable
+works perfectly. unfortunately, I doubt that is an easy problem for
+someone familiar with i210/igb driver to investigate, because I guess
+it's not that easy to reproduce (otherwise they will be similar
+reports already or maybe it's very uncommon those ethernet adapters to
+be used with such long UTP cables, maybe most desktop machines using
+them are connected with very short cable to an active device like
+switch, etc and that masks the problem) - again I guess some special
+test equipment is necessary that can inject control amount of noise
+over the UTP cable and that way compare the threshold between Win7 and
+Linux to prove the problem when exact difference in SNR performance is
+measured.
+
+I still hope someone will have some idea, because it's such big
+difference between Win7 driver and Linux igb driver...
+
+P.S. it seems i217 (8086:153a and 8086:153b) is also affected, at
+least based on my very short and not extensive tests I did today.
+
+thanks,
+stefan
 
