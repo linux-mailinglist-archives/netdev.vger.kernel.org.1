@@ -1,175 +1,138 @@
-Return-Path: <netdev+bounces-137222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA4A9A4E6C
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 15:55:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CFC59A4EE2
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 16:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 581E71C219C3
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 13:55:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64D851C23E9A
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 14:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83D32770E;
-	Sat, 19 Oct 2024 13:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A32814D71E;
+	Sat, 19 Oct 2024 14:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEmR7A/0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X+1FPevQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944331E48A;
-	Sat, 19 Oct 2024 13:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90DF148301;
+	Sat, 19 Oct 2024 14:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729346116; cv=none; b=fMJAdwJGsfsTl0SyKSTLLNjIkfTSVa5dxvV2PX8Dd5PzpZY/2VXqETqHa+z/kPPI1zdP08N1mQGlHcR93VYXMTgpFdflsW6IJyvzg21nY8RREL/OuPbFxhQ83Qr0RV37+SfWY5eoMmUtjMGhu5vZfODhPrNGzDmKIitPxqj6AB0=
+	t=1729349744; cv=none; b=KizxYkN9KJ7w/hJkKp0mWZwDgmlYK3Al0IlxoPqQEkrCghC/B732zhfL2peXKCOa4evCi921zkX6ocHKHBaRATr5TldLz8wQ6UUD1pqsMEWClNEukeDTf64tqYWlcS1jWWdgzCUuzndPFvsDhUTFbRmMzPUHvwsAL4c+nxkRoIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729346116; c=relaxed/simple;
-	bh=IrgiAjib0KZYOu+o4DmsmotW6DwjJuvMhmIahAtPlKE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Np+3IQNAmoQP0hICELv0SD0nzSlBHd8bDKAjOMbqX9N/k/cJ6Wa/TCJuovNGt/E8pqLi/x2lGISbi81I0l/Xq6JqbX5gmH6unz1r5VjVkHg3EPNYMSIVEif+93nikmLGiZ4tMi9wU10tkBDUE4SlyRt975/R1zvgqm574xS2VVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mEmR7A/0; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c941623a5aso7005153a12.0;
-        Sat, 19 Oct 2024 06:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729346113; x=1729950913; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IrgiAjib0KZYOu+o4DmsmotW6DwjJuvMhmIahAtPlKE=;
-        b=mEmR7A/0E3PRHPrl4Ya4AmkN+vb6lNXrFHHGo0K6vHlveRawigDRduPOyXTM72EKQW
-         K1X32dDNSggxR43RzYOIIci2qZ/Ii3Rm7yd9CXQwvZtzln8j6QfFEnssAxa/cXxPL+95
-         ZLdFVmvYKbJcc4qw1rzBn9yrno0L6PQfakUwB9RiYDosy7ys0ZJZXyXYU1RyUB7z+FG6
-         lL1xDhQwnPTFNpl3493Z1JFgAmdeTiv4WAMGfVnOwFXwP5ErupgTJ1CquHRyFfNOoIlw
-         Swg6KEcVlsv5B4ciMcCoPff6qPNyfQv6rUXEeR0h2PuZC+VDjJkr2xQY15Ri8rg30FAX
-         WFXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729346113; x=1729950913;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IrgiAjib0KZYOu+o4DmsmotW6DwjJuvMhmIahAtPlKE=;
-        b=hsnFFREIhXgFufKLvz5ErWNN/55mJBK/G7REQo7L5RwpuelQdac6arR+p832xshZ3v
-         Lw33BmYq4O8PuawYBKnofsT3aaWdFp6lb5VtGeeSUhRPP0i6Rl9VnjSFzXUhK3D+phfp
-         Z+D8m1ZYya6dHV/i3xI9eT537hVjfK/cVJ85aKOeAoPH8XYCW/jmg26eqTB9cJJlEfWy
-         EusdiDPn4aJ7rtR42AnkWaF510C8GMKN9SKj5kY7BE749mwYJ2a/JClddvN3DBUqL9wa
-         Dbe4IgtEMtgaegVSsJDsERsMfwbuisHL87VjFYnp7u9cJ+dAbZJ/s33spPPakVO4/Gz2
-         n3UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+4eq3z+dB016P6vl9u4TrfqeGmdd4VQMYu0ESemr5yDFCf/B2+emgbIowxz+K0bYHq8MgUnH4Qpg=@vger.kernel.org, AJvYcCWxc1Rjn3ilbfmF1qeuGHJJp3ABGKs7RDv2KS7vMQv5wBT8AUqDWgUeaarATZv6S1tnVvx+FnFX@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHAMI80zjDrXb41hcdVBZhO+blqSu/OOaFwS+uFZHqrYMOWkFt
-	gSkbQ2EIqPyLYzQH46SSP78us+KnA1K3JVLd04OONdGw5I3aF0VMH8wFR0SrxAOnUM/SwAhHxQ5
-	ADkpTAszqYjUYD6ZhEqlL7SQLtP8=
-X-Google-Smtp-Source: AGHT+IGk5LXxDFSADfMP53rSfYNysnQY2zGTq15dY7QMdU7dpyMwa998PnEDbnAom3DOUfWh4ru8WcsxeBqvmG1FcKo=
-X-Received: by 2002:a05:6402:2748:b0:5c9:60a:5025 with SMTP id
- 4fb4d7f45d1cf-5ca0b0b7e8dmr6139274a12.9.1729346112520; Sat, 19 Oct 2024
- 06:55:12 -0700 (PDT)
+	s=arc-20240116; t=1729349744; c=relaxed/simple;
+	bh=xLGc/fkE70XqNDOSKMtczAKjs2MSYYL8whgVc/JqJSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GP00JXEYoMou8q7hSJyv/1tIE/93FIDZKy+BAGB3vgt6nBkZxWx1/ExElDgTIQJOcrWrCDYHtonHDLkwEQkrNfa0K/yqyjw7W9sPGHKhuXfaoCoXGqu1VBY2nzX3X1TLK+YJXen8Ft65H4dIANyWz/7AFcCYKkhrHl2lztpcUCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X+1FPevQ; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729349742; x=1760885742;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xLGc/fkE70XqNDOSKMtczAKjs2MSYYL8whgVc/JqJSY=;
+  b=X+1FPevQuefMM3I5xUf9am9hCfof/dN76iH5q/xTPm9zVdS9ns4BO76q
+   Bg+sqQz4zj5iTx51KxQQ+GfeGH9Ic4+/OzSnEkV5MU2QGZ/RL7AIKFr3D
+   YuYtrPK/d3eFZxZv9phqliO0QnSzwk1h5eM89/1UJ62qprhJZmvweTYT2
+   iksyqmEjcUEVfa/rHG2qG0ipp3PrHfFhxc4iiH5S0ylz3t/O3bcGdYt5n
+   aDdXUj4wdZQPuRF7xb32BHPMSl0Old507TupXaVUPLF0J52YJu/gQbPhZ
+   lo36+EkOV9GqokTt35zpq5JawLpqDsBm7Xk0X+HJ8/6Fy9T5UKg49rcN4
+   A==;
+X-CSE-ConnectionGUID: nLnZzuUfSLKq2tCYTvfLWQ==
+X-CSE-MsgGUID: hleZ16COSMeYuwroX4oOMQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11230"; a="32790397"
+X-IronPort-AV: E=Sophos;i="6.11,216,1725346800"; 
+   d="scan'208";a="32790397"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2024 07:55:41 -0700
+X-CSE-ConnectionGUID: 6uBQQkNuRlm0VF+g8SreCg==
+X-CSE-MsgGUID: uulSNiABQ7uT9RqAe/UI2Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,216,1725346800"; 
+   d="scan'208";a="79046680"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 19 Oct 2024 07:55:36 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t2Are-000P5z-0k;
+	Sat, 19 Oct 2024 14:55:34 +0000
+Date: Sat, 19 Oct 2024 22:54:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	George McCollister <george.mccollister@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rosen Penev <rosenp@gmail.com>, Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv7 net-next 2/6] net: ibm: emac: remove custom init/exit
+ functions
+Message-ID: <202410192213.VVMV5TxH-lkp@intel.com>
+References: <20241015200222.12452-4-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008125023.7fbc1f64@kernel.org> <CAMArcTWVrQ7KWPt+c0u7X=jvBd2VZGVLwjWYCjMYhWZTymMRTg@mail.gmail.com>
- <20241009170102.1980ed1d@kernel.org> <CAHS8izMwd__+RkW-Nj3r3uG4gmocJa6QEqeHChzNXux1cbSS=w@mail.gmail.com>
- <20241010183440.29751370@kernel.org> <CAHS8izPuWkSmp4VCTYm93JB9fEJyUTztcT5u3UMX4b8ADWZGrA@mail.gmail.com>
- <20241011234227.GB1825128@ziepe.ca> <CAHS8izNzK4=6AMdACfn9LWqH9GifCL1vVxH1y2DmF9mFZbB72g@mail.gmail.com>
- <20241014171636.3b5b7383@kernel.org> <CAHS8izOVzOetQH5Dr6sJzRpO6Bihv=66Z2OttGS7vU7xjC=POw@mail.gmail.com>
- <20241015124455.GH1825128@ziepe.ca> <CAHS8izPLyTa=rUbFo0B29HWHdmLV4rF4q3qC6XkgksGMSFxjyA@mail.gmail.com>
-In-Reply-To: <CAHS8izPLyTa=rUbFo0B29HWHdmLV4rF4q3qC6XkgksGMSFxjyA@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sat, 19 Oct 2024 22:55:00 +0900
-Message-ID: <CAMArcTWcc6KaBkV1ozxCMmBzHF4tNTv+Khr1=Tfi+JSgdN08PQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory tcp
-To: Mina Almasry <almasrymina@google.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, davem@davemloft.net, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015200222.12452-4-rosenp@gmail.com>
 
-On Fri, Oct 18, 2024 at 5:25=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> On Tue, Oct 15, 2024 at 3:44=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wr=
-ote:
-> >
-> > On Tue, Oct 15, 2024 at 04:10:44AM +0300, Mina Almasry wrote:
-> > > On Tue, Oct 15, 2024 at 3:16=E2=80=AFAM Jakub Kicinski <kuba@kernel.o=
-rg> wrote:
-> > > >
-> > > > On Tue, 15 Oct 2024 01:38:20 +0300 Mina Almasry wrote:
-> > > > > Thanks Jason. In that case I agree with Jakub we should take in h=
-is change here:
-> > > > >
-> > > > > https://lore.kernel.org/netdev/20241009170102.1980ed1d@kernel.org=
-/
-> > > > >
-> > > > > With this change the driver would delegate dma_sync_for_device to=
- the
-> > > > > page_pool, and the page_pool will skip it altogether for the dma-=
-buf
-> > > > > memory provider.
-> > > >
-> > > > And we need a wrapper for a sync for CPU which will skip if the pag=
-e
-> > > > comes from an unreadable pool?
-> > >
-> > > This is where it gets a bit tricky, no?
-> > >
-> > > Our production code does a dma_sync_for_cpu but no
-> > > dma_sync_for_device. That has been working reliably for us with GPU
-> >
-> > Those functions are all NOP on systems you are testing on.
-> >
->
-> OK, thanks. This is what I wanted to confirm. If you already know this
-> here then there is no need to wait for me to confirm.
->
-> > The question is what is correct to do on systems where it is not a
-> > NOP, and none of this is really right, as I explained..
-> >
-> > > But if you or Jason think that enforcing the 'no dma_buf_sync_for_cpu=
-'
-> > > now is critical, no problem. We can also provide this patch, and seek
-> > > to revert it or fix it up properly later in the event it turns out it
-> > > causes issues.
-> >
-> > What is important is you organize things going forward to be able to
-> > do this properly, which means the required sync type is dependent on
-> > the actual page being synced and you will eventually somehow learn
-> > which is required from the dmabuf.
-> >
-> > Most likely nobody will ever run this code on system where dma_sync is
-> > not a NOP, but we should still use the DMA API properly and things
-> > should make architectural sense.
-> >
->
-> Makes sense. OK, we can do what Jakub suggested in the thread earlier.
-> I.e. likely some wrapper which skips the dma_sync_for_cpu if the
-> netmem is unreadable.
->
+Hi Rosen,
 
-Thanks a lot for confirmation about it.
-I will pass the PP_FLAG_ALLOW_UNREADABLE_NETMEM flag
-regardless of enabling/disabling devmem TCP in a v4 patch.
-The page_pool core logic will handle flags properly.
+kernel test robot noticed the following build errors:
 
-I think patches for changes of page_pool are worked on by Mina,
-so I will not include changes for page_pool in a v4 patch.
+[auto build test ERROR on net-next/main]
 
-If you think I missed something, please let me know :)
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-ibm-emac-use-netif_receive_skb_list/20241016-040516
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241015200222.12452-4-rosenp%40gmail.com
+patch subject: [PATCHv7 net-next 2/6] net: ibm: emac: remove custom init/exit functions
+config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20241019/202410192213.VVMV5TxH-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410192213.VVMV5TxH-lkp@intel.com/reproduce)
 
-Thanks a lot!
-Taehee Yoo
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410192213.VVMV5TxH-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/core.o: in function `emac_init':
+>> core.c:(.init.text+0x8): multiple definition of `init_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.init.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/core.o: in function `emac_exit':
+   core.c:(.exit.text+0x8): multiple definition of `cleanup_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.exit.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/zmii.o: in function `zmii_driver_init':
+   zmii.c:(.init.text+0x8): multiple definition of `init_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.init.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/zmii.o: in function `zmii_driver_exit':
+   zmii.c:(.exit.text+0x8): multiple definition of `cleanup_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.exit.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/rgmii.o: in function `rgmii_driver_init':
+   rgmii.c:(.init.text+0x8): multiple definition of `init_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.init.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/rgmii.o: in function `rgmii_driver_exit':
+   rgmii.c:(.exit.text+0x8): multiple definition of `cleanup_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.exit.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/tah.o: in function `tah_driver_init':
+   tah.c:(.init.text+0x8): multiple definition of `init_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.init.text+0x8): first defined here
+   powerpc64-linux-ld: drivers/net/ethernet/ibm/emac/tah.o: in function `tah_driver_exit':
+   tah.c:(.exit.text+0x8): multiple definition of `cleanup_module'; drivers/net/ethernet/ibm/emac/mal.o:mal.c:(.exit.text+0x8): first defined here
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
