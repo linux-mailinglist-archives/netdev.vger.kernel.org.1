@@ -1,107 +1,58 @@
-Return-Path: <netdev+bounces-137199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D559A4C1C
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 10:46:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5091A9A4C70
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 10:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9520B22835
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 08:46:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06CEE1F23BAC
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 08:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194AA1DE88E;
-	Sat, 19 Oct 2024 08:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E8B1DE8B8;
+	Sat, 19 Oct 2024 08:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CfZ/vSMV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gnKMz2fR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544DF1DDC26
-	for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 08:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDCE1DE8A1;
+	Sat, 19 Oct 2024 08:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729327603; cv=none; b=G3A57z86Opp1CMYwihxSLg5QHMp0bkWDhgYaRZNNBSZOKmLF2npuF8zPFtTi7wedwAy2gc4YfQ8IoeilJQk4OlBBVFSpWutujzlodsrhnh2EPaVFq9LFn6pxd08plAyGkxCV4rTEJgJPCcFcaXidwdF3+eNpScJQG0b/G/9qLMU=
+	t=1729328241; cv=none; b=emuk8vF2NWiTQXej9GVLEcWmYVbcxduxb61ZlX/0kuodyGIVyATUhx6hSgzNFVfQT5R9wdC3xKkCUeLY7tNgAGEtL6GGYZ4cV6D9i0GYKLzqRGnCgGrFjKbEFhMKwATNW0FJ52tCJVoNZKlVDQtFxowDe+P6Cu2u2WaQWJSrT2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729327603; c=relaxed/simple;
-	bh=gNbr23i1Y7tru0e0VyGj6/FwF2Lx5ttC9gneh6Z0QG0=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WIajDfJrl5sRR/pWnL9cLcerrUOG+JWRSfPscHmF1kUuBC4dRBDDvxxLqYyAndMkxqnouiqoS9h1j9TLIcs9T6y95s/33dk4/QAKn/oeAEAVOVyNFhAtnnPxaVA3tBH/vMEZRrY9YXdXJQW/H47ppVODmntDYH4QqQ8beIIkVFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CfZ/vSMV; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9a0c40849cso421393066b.3
-        for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 01:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1729327598; x=1729932398; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=goIM8l9m337Jc/qmGgmMN6cGaQgYnCJzJED4V8yFMUM=;
-        b=CfZ/vSMVPZo5AOU7tR2WJsdndqZveDhhHDl8Sp3gAcT3KjLdU3NAGex8ZSl+j9E1ZW
-         eNw3cpBh6HGxBM9O5oFJTvLWdG8C5D4sZEqpE9gZOtyAGvjTTNg5xwsXa07fhOxM1r5C
-         NRW2EGJjiony3JqOHYSe0kazfJu4Jh3kdV3QRswniXXZB6F5j61hwixdpZcAwyXyI6D7
-         cyDZt/A5L/mEqB3bqd+XBI1OvpYDIA+yfBV5qbxlxTzx3ixEYn/jP54tn8TU+0pGnTBQ
-         GyTlnoY/veeg2tiSnUZYHMP7zuZRZs9c8U+QM4lElzJ5QHGHkQ0Zw+WZQajLOtlOWzQ6
-         HWgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729327598; x=1729932398;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=goIM8l9m337Jc/qmGgmMN6cGaQgYnCJzJED4V8yFMUM=;
-        b=OptA+tbZbSE8BRHA//htEXUsYYG1dnvlNP90+UfdtTDywOwj247hG95we4UXnq/P34
-         eGGM2xYA9pM+VDkenjGC72GgSx3kh6+oLqQt8FlAYRzdvBoL9ly9Ia3QK1HQ4JYDm6xz
-         OfW+3vCj8Td/vFKYQWQWHd3i7EV8W8T5mWCpCfw4bFk6TBLuU/BQmGjxg7tEwiNqxwUT
-         G6Qhepret8ThDOz3B4kk+4LsE6WhM4vTAl947pUJxqMHP3RJQopr7pItpc83s3Bm366C
-         Of7S2K94Dp/DIEq/7s2xw6+ohTc86QtC6ku4tSxq66oIsxEih1JisltZdnhXc0WCrOIH
-         FISg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbToIkKxFhme/Gx/OTLHE2pcHmSjIiSh3cdxXD5XsbTfwbU6VMqZau3Fto2Y4vDZn674AcCTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMGv+ppocbxMwNhJePgBow0X5177GQsyI3VP8EOx1oC4+Tqiot
-	I8DivFEUNMJDh0d+V3AObMekSMuFlGiU8SrA1MsD0Lo9GzAibxhNop7/y9LQzgc=
-X-Google-Smtp-Source: AGHT+IE6LjBSGzuHopccP4572hv/igYqTjW1d9uem80OwOh8YbiNrdYIuLnJQku+pZ2TZlmLJ4YdEQ==
-X-Received: by 2002:a17:907:705:b0:a99:36ab:d843 with SMTP id a640c23a62f3a-a9a69baadbbmr400539166b.38.1729327598506;
-        Sat, 19 Oct 2024 01:46:38 -0700 (PDT)
-Received: from localhost (host-95-234-228-50.retail.telecomitalia.it. [95.234.228.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a68bf7a19sm190806966b.168.2024.10.19.01.46.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Oct 2024 01:46:37 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Sat, 19 Oct 2024 10:46:58 +0200
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	s=arc-20240116; t=1729328241; c=relaxed/simple;
+	bh=DQI1BZ82X1qvkfe8/9xAeqxLhRhAUAQM/tO3lG8ZXVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJDkANHSyePqoy0aaSdf1Vw2SEShTIAJb4Pw0mf/EzfYXp+D/KelxhXezbn6yrzozxOyWoEU/F6RD64qlbgGlFjz30F3e7RYzVgUHCSKAb5X3cllY4ymnnpXBW9+Nw5RaDK7QsiwkWBWz9vTqtJFwxwBfNrebEXeCtwActc+Ouc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gnKMz2fR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20E91C4CEC5;
+	Sat, 19 Oct 2024 08:57:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729328240;
+	bh=DQI1BZ82X1qvkfe8/9xAeqxLhRhAUAQM/tO3lG8ZXVo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gnKMz2fRZF1YMptvv7pZHMSCki6tAm9A0gdGsDwjTgJ/Uwfe/Um27LUKK7dK5qRVQ
+	 NtwqKZ43xsVJ/gycsV+7otkLp2pSgoDHT1vsWbuxKAP6yNyefRGeW1mDpJydQbK32v
+	 md6kMsVcwY0jattMmiUU3iDnAa57u9uORBbgaegcKyPDQvnUY33js8SMsiAaydx34b
+	 jc+BTyu9IacQRuLdCA5FufTbYAOdRn3DI7IdgHGCgEAeC+1mWR5I+4bWuGFq4YEk4o
+	 9d0JsBv7j5epK7Yg37ms5saETKfdtjWNPlIT5TT52qHlCfzG+1WZ8uqTEDL804Axd/
+	 3iFRtL1eowJrw==
+Date: Sat, 19 Oct 2024 09:57:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenz Brun <lorenz@brun.one>
+Cc: Igor Russkikh <irusskikh@marvell.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>, Lizhi Hou <lizhi.hou@amd.com>
-Subject: Re: [PATCH 03/11] PCI: of_property: Sanitize 32 bit PCI address
- parsed from DT
-Message-ID: <ZxNyAuaOy6DE8sH-@apocalypse>
-References: <ZxJXZ9R-Qp9CNmJk@apocalypse>
- <20241018222850.GA766393@bhelgaas>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: atlantic: support reading SFP module
+ info
+Message-ID: <20241019085716.GP1697@kernel.org>
+References: <20241018171721.2577386-1-lorenz@brun.one>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,101 +61,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241018222850.GA766393@bhelgaas>
+In-Reply-To: <20241018171721.2577386-1-lorenz@brun.one>
 
-Hi Bjorn,
+On Fri, Oct 18, 2024 at 07:17:18PM +0200, Lorenz Brun wrote:
+> Add support for reading SFP module info and digital diagnostic
+> monitoring data if supported by the module. The only Aquantia
+> controller without an integrated PHY is the AQC100 which belongs to
+> the B0 revision, that's why it's only implemented there.
+> 
+> The register information was extracted from a diagnostic tool made
+> publicly available by Dell, but all code was written from scratch by me.
+> 
+> This has been tested to work with a variety of both optical and direct
+> attach modules I had lying around and seems to work fine with all of
+> them, including the diagnostics if supported by an optical module.
+> All tests have been done with an AQC100 on an TL-NT521F card on firmware
+> version 3.1.121 (current at the time of this patch).
+> 
+> Signed-off-by: Lorenz Brun <lorenz@brun.one>
+> ---
+> No content changes, thus resent as v3 with just the target tree changed.
 
-On 17:28 Fri 18 Oct     , Bjorn Helgaas wrote:
-> On Fri, Oct 18, 2024 at 02:41:11PM +0200, Andrea della Porta wrote:
-> > On 20:08 Mon 07 Oct     , Bjorn Helgaas wrote:
-> > ... 
-> 
-> > > Yes, this is exactly the problem.  The pci@0 parent and child
-> > > addresses in "ranges" are both in the PCI address space.  But we
-> > > start with pdev->resource[N], which is a CPU address.  To get the PCI
-> > > address, we need to apply pci_bus_address().  If the host bridge
-> > > windows are set up correctly, the window->offset used in
-> > > pcibios_resource_to_bus() should yield the PCI bus address.
-> > 
-> > You mean something like this, I think:
-> > 
-> > @@ -129,7 +129,7 @@ static int of_pci_prop_ranges(struct pci_dev *pdev, struct of_changeset *ocs,
-> >                 if (of_pci_get_addr_flags(&res[j], &flags))
-> >                         continue;
-> >  
-> > -               val64 = res[j].start;
-> > +               val64 = pci_bus_address(pdev, &res[j] - pdev->resource);
-> >                 of_pci_set_address(pdev, rp[i].parent_addr, val64, 0, flags,
-> >                                    false);
-> >                 if (pci_is_bridge(pdev)) {
-> 
-> Yes.
-> 
-> > > I think it should look like this:
-> > > 
-> > >   pci@0: <0x82000000 0x0 0x00000000 0x82000000 0x0 0x00000000 0x0 0x600000>;
-> > 
-> > indeed, with the above patch applied, the result is exactly as you expected.
-> > ...
-> 
-> > > > > But I don't think it works in general because there's no
-> > > > > requirement that the host bridge address translation be that
-> > > > > simple.  For example, if we have two host bridges, and we want
-> > > > > each to have 2GB of 32-bit PCI address space starting at 0x0,
-> > > > > it might look like this:
-> > > > > 
-> > > > >   0x00000002_00000000 -> PCI 0x00000000 (subtract 0x00000002_00000000)
-> > > > >   0x00000002_80000000 -> PCI 0x00000000 (subtract 0x00000002_80000000)
-> > > > > 
-> > > > > In this case simply ignoring the high 32 bits of the CPU
-> > > > > address isn't the correct translation for the second host
-> > > > > bridge.  I think we should look at each host bridge's
-> > > > > "ranges", find the difference between its parent and child
-> > > > > addresses, and apply the same difference to everything below
-> > > > > that bridge.
-> > > > 
-> > > > Not sure I've got this scenario straight: can you please provide
-> > > > the topology and the bit setting (32/64 bit) for those ranges?
-> > > > Also, is this scenario coming from a real use case or is it
-> > > > hypothetical?
-> > > 
-> > > This scenario is purely hypothetical, but it's a legal topology
-> > > that we should handle correctly.  It's two host bridges, with
-> > > independent PCI hierarchies below them:
-> > > 
-> > >   Host bridge A: [mem 0x2_00000000-0x2_7fffffff window] (bus address 0x00000000-0x7fffffff)
-> > >   Host bridge B: [mem 0x2_80000000-0x2_ffffffff window] (bus address 0x00000000-0x7fffffff)
-> > > 
-> > > Bridge A has an MMIO aperture at CPU addresses
-> > > 0x2_00000000-0x2_7fffffff, and when it initiates PCI transactions on
-> > > its secondary side, the PCI address is CPU_addr - 0x2_00000000.
-> > > 
-> > > Similarly, bridge B has an MMIO aperture at CPU addresses 
-> > > 0x2_80000000-0x2_ffffffff, and when it initiates PCI transactions on 
-> > > its secondary side, the PCI address is CPU_addr - 0x2_80000000.
-> > > 
-> > > Both hierarchies use PCI bus addresses in the 0x00000000-0x7fffffff
-> > > range.  In a topology like this, you can't convert a bus address back
-> > > to a CPU address unless you know which hierarchy it's in.
-> > > pcibios_bus_to_resource() takes a pci_bus pointer, which tells you
-> > > which hierarchy (and which host bridge address translation) to use.
-> > 
-> > Agreed. While I think about how to adjust that specific patch,i
-> > let's drop it from this patchset since the aforementioned change is
-> > properly fixing the translation issue.
-> 
-> OK.  I assume you mean to drop the "PCI: of_property: Sanitize 32 bit
-> PCI address parsed from DT" patch?  Or replace it with the
-> pci_bus_address() addition above?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-I'm planning to replace that patch with the above mentioned pci_bus_address()
-addition. However, I think the 32 bit sanitization is still useful to prevent
-wrongly encoded address to linger around, but I defer it to a subsequent standalone
-patch, after figuring out the dual bridge scenario that you proposed.
-
-> 
-> Bjorn
-
-Many thanks,
-Andrea
 
