@@ -1,86 +1,80 @@
-Return-Path: <netdev+bounces-137229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BABDC9A5038
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 20:10:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 617769A5040
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 20:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B8B82844E1
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 18:10:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A80B285977
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 18:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D51018E340;
-	Sat, 19 Oct 2024 18:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA0A18D649;
+	Sat, 19 Oct 2024 18:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KL1/g2JU"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2122D8BEC;
-	Sat, 19 Oct 2024 18:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DF479D2;
+	Sat, 19 Oct 2024 18:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729361446; cv=none; b=H1+Fcxg+ADhPzZB0Tun2EjxaQgX9JYFPlbAeqYmKS+iNI6nPQGVTV1OLmY47Adt9zE9GpFPeFgATEasTgIaoQT96+CtzazmhTE2R0mt6pDyigWonY5SG/PQTS1P0XAOOPh+2J9NYacvEoNnb6yoOguKHMhBe6D8b+KLFPhACydQ=
+	t=1729361848; cv=none; b=Ja10Qp/Kf79dJVOZOU4X2tacIBvO0So+TKkz6KMZRItTVRyGOcXBE/NqaWGXUR81Kr7Ej120gA02u+pt8qVXxvQLyCE8AXoOux1VP3RUOi7obc3Cz+949cTcnb4fs309rf5QiziU1OqyYt/hdsRNPURHWbBZTBIdZ1mW9R9sM24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729361446; c=relaxed/simple;
-	bh=e1kwW6oqJtPR3kUxGh9gF7pabWu8VMmDmw978jmL250=;
+	s=arc-20240116; t=1729361848; c=relaxed/simple;
+	bh=OjfRNG+8+VXyvc/ydeEaopvwIQezxqX7F7mkQOYQPa4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fvYf7KDXr+BuSz1rpAoRlikBobI2xTjVl36qyusekdqWuJOB4pNcB4c5qI5KfiGk84b3o/pdVqPHwZQvqky7H4lzkiOx2uGRsBpr7cmHYws94b3kisp7Vychp8uhyxwG6L5nRx4o9BzvJ/B2oA4/MjaImxd3XMNEvSsSVudbGsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=46366 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1t2DuI-004JIk-QF; Sat, 19 Oct 2024 20:10:33 +0200
-Date: Sat, 19 Oct 2024 20:10:29 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Ilya Katsnelson <me@0upti.me>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Westphal <fw@strlen.de>, Sasha Levin <sashal@kernel.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	ignat@cloudflare.com, Phil Sutter <phil@nwl.cc>
-Subject: Re: [PATCH v2] netfilter: xtables: fix typo causing some targets to
- not load on IPv6
-Message-ID: <ZxP2FUVCmettzj7B@calendula>
-References: <20241019-xtables-typos-v2-1-6b8b1735dc8e@0upti.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AsvLS6EvIT2Rl3SsLdQps2dlrSmVpEfHnRlF3EG0VJjIgB6bysehNzqnhcG72q1539827zTkATOpcbX9kpKw7jlI1YLOrO9D0SYZSSXMG5WFeju37OamA/Sf4oD0V3wWTtwFMlUKNkAR2FLtTwwbrRj9+JZ5pGSqCf67lkzDqYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KL1/g2JU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7F01C4CEC5;
+	Sat, 19 Oct 2024 18:17:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729361847;
+	bh=OjfRNG+8+VXyvc/ydeEaopvwIQezxqX7F7mkQOYQPa4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KL1/g2JU6oOG/pSe8bdjey/XWgdJf6llUp3HVG0C/QbMTZ3p3gNDb2u6+oipbtOQF
+	 6XxUzQRe2u/OHmNAylz7Zk7RAUXNjQQuLzSl8llJroTUvXCyFxKuS7b8hrdLX4dnfU
+	 6IrNnt3grvQrREPFUE63HASAVc6a8a7BoI3Tk9vLtLzt/MHm+8pIxgPS5/FY/4iC4h
+	 lJ2DeOgkXjKS93fTrxEYOAO4Y1J7H70xLt27X51E2az8JUppYBm2uQy3v/sH1ErNHX
+	 8N0jTPj3VVAAPH19fkqaOu9cI5WWjDFS02az2dutth/jWNwjx11qAfniFrNc4f3kqY
+	 62AlMCxUN5suw==
+Date: Sat, 19 Oct 2024 19:17:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Karan Sanghavi <karansanghvi98@gmail.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Anup <anupnewsmail@gmail.com>
+Subject: Re: [PATCH] selftests: tc-testing: Fixed typo error
+Message-ID: <20241019181723.GV1697@kernel.org>
+References: <20241019-multiple_spell_error-v1-1-facff43b5610@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241019-xtables-typos-v2-1-6b8b1735dc8e@0upti.me>
-X-Spam-Score: -1.9 (-)
+In-Reply-To: <20241019-multiple_spell_error-v1-1-facff43b5610@gmail.com>
 
-Hi,
+On Sat, Oct 19, 2024 at 11:52:21AM +0000, Karan Sanghavi wrote:
+> Corrected the multiple and different typo errors in json files
+> 
+> - "diffferent" is corrected to "different".
+> - "muliple" and "miltiple" is corrected to "multiple".
+> 
+> Signed-off-by: Karan Sanghavi <karansanghvi98@gmail.com>
 
-Thanks for your patch.
+Thanks,
 
-On Sat, Oct 19, 2024 at 08:05:07AM +0300, Ilya Katsnelson wrote:
-> These were added with the wrong family in 4cdc55e, which seems
-> to just have been a typo, but now ip6tables rules with --set-mark
-> don't work anymore, which is pretty bad.
+This addresses all the spelling errors in these files that
+I see flagged by codespell.
 
-There is at least one more issue, TRACE is missing this chunk:
-
-diff --git a/net/netfilter/xt_TRACE.c b/net/netfilter/xt_TRACE.c
-index f3fa4f11348c..a642ff09fc8e 100644
---- a/net/netfilter/xt_TRACE.c
-+++ b/net/netfilter/xt_TRACE.c
-@@ -49,6 +49,7 @@ static struct xt_target trace_tg_reg[] __read_mostly = {
-                .target         = trace_tg,
-                .checkentry     = trace_tg_check,
-                .destroy        = trace_tg_destroy,
-+               .me             = THIS_MODULE,
-        },
- #endif
- };
+Reviewed-by: Simon Horman <horms@kernel.org>
 
