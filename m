@@ -1,66 +1,60 @@
-Return-Path: <netdev+bounces-137204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F8E09A4CA3
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 11:34:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD629A4CA7
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 11:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6BDE1F2367C
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 09:34:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 728A52858E5
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 09:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7E71DE4F3;
-	Sat, 19 Oct 2024 09:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753EF1DE4EE;
+	Sat, 19 Oct 2024 09:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iO/gYTPn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s/0wf9ED"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1340920E30B;
-	Sat, 19 Oct 2024 09:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4402318D64B;
+	Sat, 19 Oct 2024 09:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729330448; cv=none; b=QENPJOQ0LO61ZKrPfyC0KUPCjCdBs5kXx1tbI9LlVw1TKjrFyMGsaYJQ4CYPdcd51dYeb0/Agl+RTxbKnIMY0DGtgeda9I21HEAu4m1EOOhDIGcGNWCbfFT+IXk15SKJUTxxMyd6bZDAry5foBy3S8Z9REmPPYz/Afjws0F8Fzg=
+	t=1729330545; cv=none; b=l+5MtcJFZc8gngDcfTFxgcX/FSl6RJA3A/HmOCobt6GAT48YVXu5otiQGSP9CbBnREUKVcBkQup9BUXYiK376d/9nFjFLdWpqcLL0GqGzNNJpc2/xqYSZZ4S0WvDT/IkV9cx6mUs1kv0v5uAmNLxqanwM5JIGKpyzocV0NJefp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729330448; c=relaxed/simple;
-	bh=wIgGqw4Rh+8ZoDZH34lbZQsu5hpqUW78taz2QwcuK04=;
+	s=arc-20240116; t=1729330545; c=relaxed/simple;
+	bh=omrmyMvs4J2wamb0uo/g9R8M2pRLvsLgIyu+q4hZwhI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kOcgoMx7gU7qV1Y7NbQYemvRPkWsItknAAbUrBR/ODidqL3mPnHBR/JP0fs0S64fhaatNuxSBAjqGkdRt0sAKdH5YAlx4DtuQygMkqi/h2OkhQN6q0MTskyCfYwCsBNRBbbEOjYCgEuqzKrEBP5NwH/XJ+Xmd/7vUYFMPuBFsmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iO/gYTPn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C87FEC4CEC5;
-	Sat, 19 Oct 2024 09:34:04 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuO3mLDa3riClYJ+pqVLb6ZnHrvaqOWaqXBgs7Psj0jxPaJndYQYmSxBY+F6w8BIPfjZqk//i5iGcAOWhmM0DXz2uB5x6OpQean8GHN5KK7J+hgjmeGqDmKmvW1GPzaV8OOcAtz/LTMRqBbCS92Y4wRKoFPHILdroGaIUN0V1Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s/0wf9ED; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0431C4CEC5;
+	Sat, 19 Oct 2024 09:35:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729330447;
-	bh=wIgGqw4Rh+8ZoDZH34lbZQsu5hpqUW78taz2QwcuK04=;
+	s=k20201202; t=1729330544;
+	bh=omrmyMvs4J2wamb0uo/g9R8M2pRLvsLgIyu+q4hZwhI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iO/gYTPnRsZlVSlDPmGKyKBKJDXLwXwJZHGmSV2wE0SxOg1QcPqL9QYGBq4c+AvMz
-	 Ix4aJlEQpMjnwuYbyaMgshn04Y657USw75kIWd08/bDasGpKtcpA8NZeQVnxllgeJA
-	 NhBOS3R1WmtLCX80QxpZosaUheW2z6jCN/MHQdBdJKPnmr5NRdXpY+YAml8/tqeBcw
-	 BzZh1tzfVGwy9XIfim6fVERWlAgNUgg2wNSd3tBRd3H6MvD9XOQ5oTpH7ewzR/SZ2Y
-	 a5wsiafOGaM4etd5rDcVhJiSUvQ6wTtMPNpfZlUSgXDm3ZCfVJb1CPFHEhDwi3MKSj
-	 CtzgEFdUT4/XA==
-Date: Sat, 19 Oct 2024 10:34:02 +0100
+	b=s/0wf9EDJAN1kYOqI0LnAm0pch20QJOLJm2hj8SrvYDSDBOAuvHxLXjoqFPKJiwOu
+	 l/zlYBp0QIdEcXRc41P3F4D8G9Hlo9u/Ayhp/FEoj8zXqI2S/ASHF0PKBEgJvCXvAQ
+	 ie92m01/VOOGH5qtHCG70l24WepjRcc97eYEB9CMCjbpCn3N9qVjQnAkBw/7AgNX5k
+	 FYfYAqEx62h5l++T/+0pWeuex4nAkX6aInr5RbYVK7JvKOaX7C/Ni7MgjQQzup1KSP
+	 k4XthNh9Twg6Fg7kIyqwJW+oHyyiKZCTRLcbTkwoCt8IGlrOIs7hLrAywL/99BDIB3
+	 iqn2aiTx4NaDA==
+Date: Sat, 19 Oct 2024 10:35:40 +0100
 From: Simon Horman <horms@kernel.org>
-To: Lee Trager <lee@trager.us>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Sanman Pradhan <sanmanpradhan@meta.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] eth: fbnic: Add devlink dev flash support
-Message-ID: <20241019093402.GT1697@kernel.org>
-References: <20241012023646.3124717-1-lee@trager.us>
- <20241012023646.3124717-3-lee@trager.us>
- <8502a496-f83d-470c-a84d-081a7c7e2cae@linux.dev>
- <20241015104353.GC569285@kernel.org>
- <61e80187-49d0-4ad8-a66a-0c3901963201@trager.us>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Wang Hai <wanghai38@huawei.com>, justin.chen@broadcom.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, zhangxiaoxu5@huawei.com,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: bcmasp: fix potential memory leak in
+ bcmasp_xmit()
+Message-ID: <20241019093540.GU1697@kernel.org>
+References: <20241015143424.71543-1-wanghai38@huawei.com>
+ <20241017135417.GM1697@kernel.org>
+ <d496a4dd-14be-428d-853f-785cf6200360@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,74 +63,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <61e80187-49d0-4ad8-a66a-0c3901963201@trager.us>
+In-Reply-To: <d496a4dd-14be-428d-853f-785cf6200360@broadcom.com>
 
-On Fri, Oct 18, 2024 at 03:48:26PM -0700, Lee Trager wrote:
-> On 10/15/24 3:43 AM, Simon Horman wrote:
+On Fri, Oct 18, 2024 at 11:18:51AM -0700, Florian Fainelli wrote:
 > 
-> > On Mon, Oct 14, 2024 at 12:18:36PM +0100, Vadim Fedorenko wrote:
-> > > On 12/10/2024 03:34, Lee Trager wrote:
-> > > > fbnic supports updating firmware using a PLDM image signed and distributed
-> > > > by Meta. PLDM images are written into stored flashed. Flashing does not
-> > > > interrupt operation.
-> > > > 
-> > > > On host reboot the newly flashed UEFI driver will be used. To run new
-> > > > control or cmrt firmware the NIC must be power cycled.
-> > > > 
-> > > > Signed-off-by: Lee Trager <lee@trager.us>
-> > ...
-> > 
-> > > > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-> > ...
-> > 
-> > > > +/**
-> > > > + * fbnic_send_component_table - Send PLDM component table to the firmware
-> > > > + * @context: PLDM FW update structure
-> > > > + * @component: The component to send
-> > > > + * @transfer_flag: Flag indication location in component tables
-> > > > + *
-> > > > + * Read relevant data from component table and forward it to the firmware.
-> > > > + * Check response to verify if the firmware indicates that it wishes to
-> > > > + * proceed with the update.
-> > > > + *
-> > > > + * Return: zero on success
-> > > > + *	    negative error code on failure
-> > > > + */
-> > > > +static int fbnic_send_component_table(struct pldmfw *context,
-> > > > +				      struct pldmfw_component *component,
-> > > > +				      u8 transfer_flag)
-> > > > +{
-> > > > +	struct device *dev = context->dev;
-> > > > +	u16 id = component->identifier;
-> > > > +	u8 test_string[80];
-> > > > +
-> > > > +	switch (id) {
-> > > > +	case QSPI_SECTION_CMRT:
-> > > > +	case QSPI_SECTION_CONTROL_FW:
-> > > > +	case QSPI_SECTION_OPTION_ROM:
-> > > > +		break;
-> > > > +	default:
-> > > > +		dev_err(dev, "Unknown component ID %u\n", id);
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +
-> > > > +	dev_dbg(dev, "Sending PLDM component table to firmware\n");
-> > > > +
-> > > > +	/* Temp placeholder */
-> > > > +	memcpy(test_string, component->version_string,
-> > > > +	       min_t(u8, component->version_len, 79));
-> > > > +	test_string[min_t(u8, component->version_len, 79)] = 0;
-> > > Looks like this construction can be replaced with strscpy().
-> > > There were several patchsets in the tree to use strscpy(), let's follow
-> > > the pattern.
-> > While looking at these lines, I'm unsure why min_t() is being used
-> > instead of min() here. As version_len is unsigned and 79 is a positive
-> > constant, I believe min() should be fine here.
 > 
-> clang complains if I'm not explicit with the type by using min_t()
+> On 10/17/2024 6:54 AM, Simon Horman wrote:
+> > On Tue, Oct 15, 2024 at 10:34:24PM +0800, Wang Hai wrote:
+> > > The bcmasp_xmit() returns NETDEV_TX_OK without freeing skb
+> > > in case of mapping fails, add dev_consume_skb_any() to fix it.
+> > > 
+> > > Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
+> > > Signed-off-by: Wang Hai <wanghai38@huawei.com>
+> > 
+> > There seems to be some confusion over in the thread for v1 of this patchset.
+> > Perhaps relating to several similar patches being in-flight at the same
+> > time.
+> > 
+> > 1. Changes were requested by Florian
+> > 2. Jakub confirmed this concern
+> > 3. Florian Acked v1 patch
+> > 4. The bot sent a notificaiton that v1 had been applied
+> > 
+> > But v1 is not in net-next.
+> > And I assume that 3 was intended for v2.
+> > 
+> >  From my point of view v2 addresses the concerns raised by Florian wrt v1.
+> > And, moreover, I agree this fix is correct.
+> > 
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> > 
+> > v2 is marked as Changes Requested in patchwork.
+> > But I suspect that is due to confusion around v1 as summarised above.
+> > So I am (hopefully) moving it back to Under Review.
+> > 
+> 
+> v1 was applied already, which, per the discussion on the systemport driver
+> appears to be the correct way to go about:
+> 
+> https://git.kernel.org/netdev/net/c/fed07d3eb8a8
 
-Thanks, and sorry for not checking what clang says.
-That is a good enough reason for this for me.
+Thanks, it seems that it is me who was confused.
 
-...
+-- 
+pw-bot: not-applicable
 
