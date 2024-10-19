@@ -1,56 +1,54 @@
-Return-Path: <netdev+bounces-137191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D3AB9A4BF4
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 10:03:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B5E9A4BF7
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 10:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 855FA1F23125
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 08:03:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CED4B222C7
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 08:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDE01DE2DD;
-	Sat, 19 Oct 2024 08:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC21D1DD0DE;
+	Sat, 19 Oct 2024 08:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kCjUPH15"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVOPbAfp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD2D1DDA32;
-	Sat, 19 Oct 2024 08:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29612032A
+	for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 08:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729324991; cv=none; b=iOlOyrJKYV/XdL2554tjRPhzTb8v9k/YR2Z0V8A6v2oG3jP57DLcxhgMLvQZDaSEoD2biHuFd3YWIB5bTsMIjZG+4tN76pJ/uRCg7rlJ8/05Fqs7ts2+ws5lFZ5KQQLLuU60BTyfv77vQ9FR7p7xt5u5JNqbG/52pPq7cDbgSVk=
+	t=1729325516; cv=none; b=hNqYHIAnILJlSlVtfRFrUhaZtzFXpOz7+V0aCBBzlQj0ORB8UBsh7/GxTYYuVWf6w4MTkWDtAr59xaLuJRRiQDT1tjILYdRVAuheOxmrEZMbkeYbRK7EALtv9nNEqCWStoSsfdK/9kcSg1RLKOS7RiGc+MY9BXgMRwlmQi0qB8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729324991; c=relaxed/simple;
-	bh=e/17Q2uqoKFVKpY5kK/k0yzZsTlFKko2EGJtXwjkM9E=;
+	s=arc-20240116; t=1729325516; c=relaxed/simple;
+	bh=QmK0ulrEPKUfiR3BuJg+I7mX6gD2ELUneUo+Z2GLeqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sis4oSAI/vNCfmoVLSibxOIZ60onhZwt83kPzZjEXwllmflKXI9X6uaI/jRn+aktM5VAJLqqQuEVfVfxLlWe5nWjLxNbBVa3NCqcGY/Oc8B5yP1GtZhbRpOvFpX+vqWUb0BNtbIxEfJ50n4jDecr9A7/antMRscU7apPpECJ8eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kCjUPH15; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7C8C4CEC7;
-	Sat, 19 Oct 2024 08:03:09 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hm9+goqTjHorIV7hJtGdCRCh3FVLevWtHa3vaJIp7G9Kp7FuRaGw59M8l8IRTCxCZG4iw2D+cYf2V4YwdwAabfCA/pV8lTZIWVA3j0I+S8Z9t+OA1TdkORFCL4eHQNYj4/gFEPb3Hk+ixKJUtqPuNUj/bgykoWNg0J9gJwbayWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVOPbAfp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25E1DC4CEC5;
+	Sat, 19 Oct 2024 08:11:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729324991;
-	bh=e/17Q2uqoKFVKpY5kK/k0yzZsTlFKko2EGJtXwjkM9E=;
+	s=k20201202; t=1729325516;
+	bh=QmK0ulrEPKUfiR3BuJg+I7mX6gD2ELUneUo+Z2GLeqE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kCjUPH15QVOAeHsRciWHQybs8Lh1N/m6CapEO3VSwc7WI/LfJvZwZxyMPKJB4qWp9
-	 OEcsSOowcE2ku/4gXL4TNhx397FrU9ZeSFPysMraXlWVf4lvQNqqRWfIogXG3vSMsj
-	 JfPPyEIu5nqElcrERvd0ocJBKGg7kfxXFBpkXaByREqs7NgMjGkBNOg/T0KNqH95QE
-	 ThANrcXLGX8IbPj1ahtWCnRubzr2kGFLbW7BBeV8yNcFXrzNCNpCQv+3uN4O/T9RG8
-	 KkJhXww1JGU0Q10DDPjfFUBJ/g2waIljE4UOdRWv2Xaiaw+lEvKe/cih0DRhtwX0P1
-	 BMVUQkZ5VxREg==
-Date: Sat, 19 Oct 2024 09:03:07 +0100
+	b=BVOPbAfpee01UvI712jROprLeQKgwR05F/bIXLFNs2dtDxmGi3PE5E2toswXowAn2
+	 6mtFhx3NUHvY9DehFnDzId3VfdGaOH4cpHOulCjZkPmVlYHxwzMFbZUVefyIAsFRPK
+	 3Npo1XWQM06UNh5UcvPPXk6tCOmrLkGH7GUpOHEn0wN4EVkps66mTRMTxAiIGalulZ
+	 nSHgJa2NIOYI+5/oo/DTipPc4e7A2Y4DXFTKisjip9MS/yScepP5IIRXfFqWyr6+XG
+	 3v1EERhLxMwIBr0S9FjRsTCPlC6+yorfe7srW1e76tqKEvmYgcaBnXltf3tPVQ+MtQ
+	 ZnrB5Pv5iFz8g==
+Date: Sat, 19 Oct 2024 09:11:52 +0100
 From: Simon Horman <horms@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests: tls: add a selftest for wrapping
- rec_seq
-Message-ID: <20241019080307.GG1697@kernel.org>
-References: <20775fcfd0371422921ee60a42de170c0398ac10.1729244987.git.sd@queasysnail.net>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	brett.creeley@amd.com, mateusz.polchlopek@intel.com
+Subject: Re: [iwl-next v1] ice: only allow Tx promiscuous for multicast
+Message-ID: <20241019081152.GH1697@kernel.org>
+References: <20241017070816.189630-1-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,16 +57,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20775fcfd0371422921ee60a42de170c0398ac10.1729244987.git.sd@queasysnail.net>
+In-Reply-To: <20241017070816.189630-1-michal.swiatkowski@linux.intel.com>
 
-On Fri, Oct 18, 2024 at 12:55:58PM +0200, Sabrina Dubroca wrote:
-> Set the initial rec_seq to 0xffffffffffffffff so that it wraps
-> immediately. The send() call should fail with EBADMSG.
+On Thu, Oct 17, 2024 at 09:08:16AM +0200, Michal Swiatkowski wrote:
+> From: Brett Creeley <brett.creeley@intel.com>
 > 
-> A bug in this code was fixed in commit cfaa80c91f6f ("net/tls: do not
-> free tls_rec on async operation in bpf_exec_tx_verdict()").
+> Currently when any VF is trusted and true promiscuous mode is enabled on
+> the PF, the VF will receive all unicast traffic directed to the device's
+> internal switch. This includes traffic external to the NIC and also from
+> other VSI (i.e. VFs). This does not match the expected behavior as
+> unicast traffic should only be visible from external sources in this
+> case. Disable the Tx promiscuous mode bits for unicast promiscuous mode.
 > 
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
+
 
