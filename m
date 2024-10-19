@@ -1,289 +1,292 @@
-Return-Path: <netdev+bounces-137194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DBC9A4BFE
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 10:30:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9849A4C08
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 10:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A26501C215A8
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 08:30:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8914E284796
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 08:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6B11DE8B0;
-	Sat, 19 Oct 2024 08:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6CE1DE3B8;
+	Sat, 19 Oct 2024 08:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxqmJfLz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRX+1TLo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A26F1DE4F3;
-	Sat, 19 Oct 2024 08:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE9512B17C;
+	Sat, 19 Oct 2024 08:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729326605; cv=none; b=WpsgDY+hFyjkfRCuosIHEUuQ0FfTPI3xqpmT85jozegvw4S408QFqi13PbQ9RXr5KAqM/iuROd/LUGeGXp/JTDoBjyd7TbaudrHW0WNtdSZcZCffjD12afQCHZqmhwPpYtC7jUGfyPndzkb85Et0XY5+3KOQ2O1c/u0qvSmoC1U=
+	t=1729326644; cv=none; b=Na0dtS1VzzKJHIMQ7Iwb0KyxHNLp3OsA+oM2QcuEip4m3VqXu4Vn8CK/TE9LXleMsE/mw0rAKD/+WFPUStzDvecYWqpPh+4Ixg1YrD+I89cot2A+gRu6iu6mmTr6T40/Eh6kCihu/fBFnDSWuXs7wuJDHVHGpeZDekWcEzPhuXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729326605; c=relaxed/simple;
-	bh=zx9vPQgWkXXWYTv84mZMOqTzzv53ixUHwXL4v1sVSBE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b1rUkIiohPLYLCvnI+gu5iwjHdf8/UwCyf2MAlhYyhipMVmlQKh0Jgq6jLUdHfwk12WXj9cxcYrBIWqfrT1PFkHUqTG4VRyNtO5u3srz/+KPX4K7EY3fr2Q7gWlbnhfXg2d0rZReg7bDUgiy9vigRqCOAmi0XSyvGbo0usOW/uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JxqmJfLz; arc=none smtp.client-ip=209.85.210.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-71e585ef0b3so2333301b3a.1;
-        Sat, 19 Oct 2024 01:30:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729326602; x=1729931402; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ypk+z+xRcTBWV1V15b0w7hLYpsbWMpsZnUP5WJHs+kk=;
-        b=JxqmJfLzP3nBCA65I85qF3BgkPoATSueCLGhUWT9ZlM0Rdh3hi5az3OYw8hf7nup32
-         xwgevVG0Uk7I+MaUgtaimNO/uYqKEdXH8drt6ifqJS8OIwxyNFMCcynra1G9m6WWSQJu
-         l340vw2hNvHX53x75J3l0dactVSbrVFhUhtHytHAkmpdDEvylKHC16+d7QDOcGBqxp7m
-         utsDsA6mE0NrQoeJ9L/4zG+rGZOspluP/y2flEwWbeCuq3bboAc45sbzR4ZzBlLJgfiS
-         kcPUAI4lSM/6F3zYTFGs5/89Wf+tis1EHeRcVmi2SJtmJR8YSO9pmfe2csJgaR9xUKyK
-         rtkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729326602; x=1729931402;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ypk+z+xRcTBWV1V15b0w7hLYpsbWMpsZnUP5WJHs+kk=;
-        b=YnUahX6sWDZq1ozTlaFmebLvp42nplm46EYRhdrvS1mDrR4uyoi07r4i1Qmh5EtchC
-         vxhahtjj9LOAs1/Z2u8QP9+g5IlYNCL+GZiSIHN+86epNEwZo9nYylQFUX9lJ8Qk608T
-         cpfe47cflKUhGqPQMZlA/7A1s8PnlgSDgXGFwKQ82er8njrPx0Miy2IhH5F/Jrj1u+cG
-         0hBGoIbMh2gtzqpNXnZXNP8Y5UgyBo9giCW9GrChZmMuiHAVtcTMQ6wrqrd61iPbrf1I
-         NGbpVleWmgD8TPK/38gAjZeY/rNczQCUD4oqXLMsUokqMawaxt6L9qpzz0OPq7WsQoCl
-         HNqA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5Ohf3SsHp7dVNoW34cY0dfnszXtON9C1XR/SU9+Q8ezPf72R/iNOMw5Iqg7JEBqTBOZjZyIc1@vger.kernel.org, AJvYcCXxQHqr8TaGe0c/kbIs6S18GlXKFb9QHWtzEvf3pkkRRlcxTRgbxGi+3IbwQZFEXo7K7dlFlA0a3mpBouM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8mNJW9FHWw0lTCPHNICJsQ18iHo81K0hAeOoQU7ZoE4JyIIpc
-	CB+7eZMJClfRtVYTsiRwgKQUWti4b7pOLXXm4GGR8eZNZ3rD36Io
-X-Google-Smtp-Source: AGHT+IGIVncmZLdglbYL5/bB7UPtwsZkuk61GpwBSnZML5xru3zyieLSJxiHelgOV1+GXlMGsZ7Z0g==
-X-Received: by 2002:a05:6a00:190c:b0:71e:75c0:2552 with SMTP id d2e1a72fcca58-71ea30284f0mr7454212b3a.0.1729326602344;
-        Sat, 19 Oct 2024 01:30:02 -0700 (PDT)
-Received: from ?IPV6:2409:8a55:301b:e120:79c0:453d:47b6:bbf5? ([2409:8a55:301b:e120:79c0:453d:47b6:bbf5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ea3314192sm2660952b3a.41.2024.10.19.01.30.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 19 Oct 2024 01:30:01 -0700 (PDT)
-Message-ID: <e38cc22e-afbc-445e-b986-9ab31c799a09@gmail.com>
-Date: Sat, 19 Oct 2024 16:29:55 +0800
+	s=arc-20240116; t=1729326644; c=relaxed/simple;
+	bh=i88wpcZPo7AneGKUWcwyca6Z4rUOqTyjuBUMHJFJ4Lw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dtAkpde7XWyCOvLv62x3Y5bIWytxXi/Xsu/I5VNNaie4YR85CIUQImf3/JM3NjVlZJy0UTnbh54Vc0ibxJLRkse62eC5rFCUmdh0oAPDwhmjkg8Sd1mc9DqzvaRH8oP5RMsb/rE7q5RNUjQ2VYgM96oAiFhIx0w5b3SYjaR4ZdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRX+1TLo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 666AAC4CEC5;
+	Sat, 19 Oct 2024 08:30:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729326644;
+	bh=i88wpcZPo7AneGKUWcwyca6Z4rUOqTyjuBUMHJFJ4Lw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SRX+1TLoTldHw4iCZcKFxbAjkBl9XYAQTjLSR1qCOt17D0pVZDnh9CJ1rdKLn/GJV
+	 CDmyUFUnB5gqmDmSmAC7obpH/Om+5PiqFIYKpLadZ+ZnEG5Cf7o5mNF0xkxsiesE7R
+	 BEz98oEsfXmsgx4/3KIz7MlYW96guBdkj/RFzZp1+SaLv1WUKeaPzYMJajcNPIq0kF
+	 G6I5Z4VSek9xK0ymLIxN8/KlREjMsSsmZxLPQV0gTXIAgbDzuSr/bP9Ta4mxDi8YYE
+	 cFKAEt8z3Gl8VF1pRYB9CAhzlqK9BtfgzWXO0fBgKF7ELfSz6nvECs1UkM9qV+ueez
+	 sBktwICsJ4VuA==
+Date: Sat, 19 Oct 2024 09:30:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Ido Schimmel <idosch@idosch.org>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: Re: [PATCH v3 net-next] net: vlan: Use vlan_prio instead of vlan_qos
+ in mapping
+Message-ID: <20241019083040.GI1697@kernel.org>
+References: <20241018141233.2568-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v22 07/14] mm: page_frag: some minor refactoring
- before adding new API
-To: Alexander Duyck <alexander.duyck@gmail.com>,
- Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-References: <20241018105351.1960345-1-linyunsheng@huawei.com>
- <20241018105351.1960345-8-linyunsheng@huawei.com>
- <CAKgT0UcBveXG3D9aHHADHn3yAwA6mLeQeSqoyP+UwyQ3FDEKGw@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <CAKgT0UcBveXG3D9aHHADHn3yAwA6mLeQeSqoyP+UwyQ3FDEKGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018141233.2568-1-yajun.deng@linux.dev>
 
-On 10/19/2024 1:26 AM, Alexander Duyck wrote:
++ Ido and Guilliame
 
-...
-
->> +static inline void *__page_frag_alloc_align(struct page_frag_cache *nc,
->> +                                           unsigned int fragsz, gfp_t gfp_mask,
->> +                                           unsigned int align_mask)
->> +{
->> +       struct page_frag page_frag;
->> +       void *va;
->> +
->> +       va = __page_frag_cache_prepare(nc, fragsz, &page_frag, gfp_mask,
->> +                                      align_mask);
->> +       if (unlikely(!va))
->> +               return NULL;
->> +
->> +       __page_frag_cache_commit(nc, &page_frag, fragsz);
+On Fri, Oct 18, 2024 at 10:12:33PM +0800, Yajun Deng wrote:
+> The vlan_qos member is used to save the vlan qos, but we only save the
+> priority. Also, we will get the priority in vlan netlink and proc.
+> We can just save the vlan priority using vlan_prio, so we can use vlan_prio
+> to get the priority directly.
 > 
-> Minor nit here. Rather than if (!va) return I think it might be better
-> to just go with if (likely(va)) __page_frag_cache_commit.
-
-Ack.
-
+> For flexibility, we introduced vlan_dev_get_egress_priority() helper
+> function. After this patch, we will call vlan_dev_get_egress_priority()
+> instead of vlan_dev_get_egress_qos_mask() in irdma.ko and rdma_cm.ko.
+> Because we don't need the shift and mask operations anymore.
 > 
->> +
->> +       return va;
->> +}
->>
->>   static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
->>                                            unsigned int fragsz, gfp_t gfp_mask,
->> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
->> index a36fd09bf275..a852523bc8ca 100644
->> --- a/mm/page_frag_cache.c
->> +++ b/mm/page_frag_cache.c
->> @@ -90,9 +90,31 @@ void __page_frag_cache_drain(struct page *page, unsigned int count)
->>   }
->>   EXPORT_SYMBOL(__page_frag_cache_drain);
->>
->> -void *__page_frag_alloc_align(struct page_frag_cache *nc,
->> -                             unsigned int fragsz, gfp_t gfp_mask,
->> -                             unsigned int align_mask)
->> +unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
->> +                                           struct page_frag *pfrag,
->> +                                           unsigned int used_sz)
->> +{
->> +       unsigned int orig_offset;
->> +
->> +       VM_BUG_ON(used_sz > pfrag->size);
->> +       VM_BUG_ON(pfrag->page != encoded_page_decode_page(nc->encoded_page));
->> +       VM_BUG_ON(pfrag->offset + pfrag->size >
->> +                 (PAGE_SIZE << encoded_page_decode_order(nc->encoded_page)));
->> +
->> +       /* pfrag->offset might be bigger than the nc->offset due to alignment */
->> +       VM_BUG_ON(nc->offset > pfrag->offset);
->> +
->> +       orig_offset = nc->offset;
->> +       nc->offset = pfrag->offset + used_sz;
->> +
->> +       /* Return true size back to caller considering the offset alignment */
->> +       return nc->offset - orig_offset;
->> +}
->> +EXPORT_SYMBOL(__page_frag_cache_commit_noref);
->> +
+> There is no functional changes.
 > 
-> I have a question. How often is it that we are committing versus just
-> dropping the fragment? It seems like this approach is designed around
-> optimizing for not commiting the page as we are having to take an
-> extra function call to commit the change every time. Would it make
-> more sense to have an abort versus a commit?
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
 
-Before this patch, page_frag_alloc() related API seems to be mostly used
-for skb data or frag for rx part, see napi_alloc_skb() or some drivers
-like e1000, but with more drivers using the page_pool for skb rx frag,
-it seems skb data for tx is the main usecase.
+Hi Ido and Guilliame,
 
-And the prepare and commit API added in the patchset seems to be mainly
-used for skb frag for tx part except af_packet.
+I'm wondering if you could take a look over this and provide
+any feedback you might have.
 
-It seems it is not very clear which is mostly used one, mostly likely
-the prepare and commit API might be the mostly used one if I have to
-guess as there might be more memory needed for skb frag than skb data.
+Thanks!
 
+> ---
+> v3: Remove the restriction that the maximum vlan priority is 7.
+> v2: Add more detailed comments and tests.
+
+v2 is here: https://lore.kernel.org/netdev/20241012132826.2224-1-yajun.deng@linux.dev/
+
+> v1: https://lore.kernel.org/all/20241009132302.2902-1-yajun.deng@linux.dev/
+> ---
+>  include/linux/if_vlan.h  | 26 +++++++++++++++++++-------
+>  net/8021q/vlan.h         |  4 ++--
+>  net/8021q/vlan_dev.c     | 23 ++++++++++++-----------
+>  net/8021q/vlan_netlink.c |  4 ++--
+>  net/8021q/vlanproc.c     |  4 ++--
+>  5 files changed, 37 insertions(+), 24 deletions(-)
 > 
->> +void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
->> +                               struct page_frag *pfrag, gfp_t gfp_mask,
->> +                               unsigned int align_mask)
->>   {
->>          unsigned long encoded_page = nc->encoded_page;
->>          unsigned int size, offset;
->> @@ -114,6 +136,8 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>                  /* reset page count bias and offset to start of new frag */
->>                  nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
->>                  nc->offset = 0;
->> +       } else {
->> +               page = encoded_page_decode_page(encoded_page);
->>          }
->>
->>          size = PAGE_SIZE << encoded_page_decode_order(encoded_page);
+> diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
+> index c1645c86eed9..7cc36853c017 100644
+> --- a/include/linux/if_vlan.h
+> +++ b/include/linux/if_vlan.h
+> @@ -150,12 +150,12 @@ extern __be16 vlan_dev_vlan_proto(const struct net_device *dev);
+>  /**
+>   *	struct vlan_priority_tci_mapping - vlan egress priority mappings
+>   *	@priority: skb priority
+> - *	@vlan_qos: vlan priority: (skb->priority << 13) & 0xE000
+> + *	@vlan_prio: vlan priority
+>   *	@next: pointer to next struct
+>   */
+>  struct vlan_priority_tci_mapping {
+>  	u32					priority;
+> -	u16					vlan_qos;
+> +	u8					vlan_prio;
+>  	struct vlan_priority_tci_mapping	*next;
+>  };
+>  
+> @@ -204,8 +204,8 @@ static inline struct vlan_dev_priv *vlan_dev_priv(const struct net_device *dev)
+>  	return netdev_priv(dev);
+>  }
+>  
+> -static inline u16
+> -vlan_dev_get_egress_qos_mask(struct net_device *dev, u32 skprio)
+> +static inline u8
+> +vlan_dev_get_egress_priority(struct net_device *dev, u32 skprio)
+>  {
+>  	struct vlan_priority_tci_mapping *mp;
+>  
+> @@ -214,15 +214,21 @@ vlan_dev_get_egress_qos_mask(struct net_device *dev, u32 skprio)
+>  	mp = vlan_dev_priv(dev)->egress_priority_map[(skprio & 0xF)];
+>  	while (mp) {
+>  		if (mp->priority == skprio) {
+> -			return mp->vlan_qos; /* This should already be shifted
+> -					      * to mask correctly with the
+> -					      * VLAN's TCI */
+> +			return mp->vlan_prio;
+>  		}
+>  		mp = mp->next;
+>  	}
+>  	return 0;
+>  }
+>  
+> +static inline u16
+> +vlan_dev_get_egress_qos_mask(struct net_device *dev, u32 skprio)
+> +{
+> +	u8 vlan_prio = vlan_dev_get_egress_priority(dev, skprio);
+> +
+> +	return (vlan_prio << VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK;
+> +}
+> +
+>  extern bool vlan_do_receive(struct sk_buff **skb);
+>  
+>  extern int vlan_vid_add(struct net_device *dev, __be16 proto, u16 vid);
+> @@ -269,6 +275,12 @@ static inline __be16 vlan_dev_vlan_proto(const struct net_device *dev)
+>  	return 0;
+>  }
+>  
+> +static inline u8 vlan_dev_get_egress_priority(struct net_device *dev,
+> +					      u32 skprio)
+> +{
+> +	return 0;
+> +}
+> +
+>  static inline u16 vlan_dev_get_egress_qos_mask(struct net_device *dev,
+>  					       u32 skprio)
+>  {
+> diff --git a/net/8021q/vlan.h b/net/8021q/vlan.h
+> index 5eaf38875554..b28875c4ac86 100644
+> --- a/net/8021q/vlan.h
+> +++ b/net/8021q/vlan.h
+> @@ -126,9 +126,9 @@ void vlan_filter_drop_vids(struct vlan_info *vlan_info, __be16 proto);
+>  
+>  /* found in vlan_dev.c */
+>  void vlan_dev_set_ingress_priority(const struct net_device *dev,
+> -				   u32 skb_prio, u16 vlan_prio);
+> +				   u32 skb_prio, u8 vlan_prio);
+>  int vlan_dev_set_egress_priority(const struct net_device *dev,
+> -				 u32 skb_prio, u16 vlan_prio);
+> +				 u32 skb_prio, u8 vlan_prio);
+>  void vlan_dev_free_egress_priority(const struct net_device *dev);
+>  int vlan_dev_change_flags(const struct net_device *dev, u32 flag, u32 mask);
+>  void vlan_dev_get_realdev_name(const struct net_device *dev, char *result,
+> diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
+> index 458040e8a0e0..5d153f1a7963 100644
+> --- a/net/8021q/vlan_dev.c
+> +++ b/net/8021q/vlan_dev.c
+> @@ -155,35 +155,36 @@ static int vlan_dev_change_mtu(struct net_device *dev, int new_mtu)
+>  }
+>  
+>  void vlan_dev_set_ingress_priority(const struct net_device *dev,
+> -				   u32 skb_prio, u16 vlan_prio)
+> +				   u32 skb_prio, u8 vlan_prio)
+>  {
+>  	struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
+>  
+> -	if (vlan->ingress_priority_map[vlan_prio & 0x7] && !skb_prio)
+> +	vlan_prio = vlan_prio & 0x7;
+> +	if (vlan->ingress_priority_map[vlan_prio] && !skb_prio)
+>  		vlan->nr_ingress_mappings--;
+> -	else if (!vlan->ingress_priority_map[vlan_prio & 0x7] && skb_prio)
+> +	else if (!vlan->ingress_priority_map[vlan_prio] && skb_prio)
+>  		vlan->nr_ingress_mappings++;
+>  
+> -	vlan->ingress_priority_map[vlan_prio & 0x7] = skb_prio;
+> +	vlan->ingress_priority_map[vlan_prio] = skb_prio;
+>  }
+>  
+>  int vlan_dev_set_egress_priority(const struct net_device *dev,
+> -				 u32 skb_prio, u16 vlan_prio)
+> +				 u32 skb_prio, u8 vlan_prio)
+>  {
+>  	struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
+>  	struct vlan_priority_tci_mapping *mp = NULL;
+>  	struct vlan_priority_tci_mapping *np;
+> -	u32 vlan_qos = (vlan_prio << VLAN_PRIO_SHIFT) & VLAN_PRIO_MASK;
+>  
+> +	vlan_prio = vlan_prio & 0x7;
+>  	/* See if a priority mapping exists.. */
+>  	mp = vlan->egress_priority_map[skb_prio & 0xF];
+>  	while (mp) {
+>  		if (mp->priority == skb_prio) {
+> -			if (mp->vlan_qos && !vlan_qos)
+> +			if (mp->vlan_prio && !vlan_prio)
+>  				vlan->nr_egress_mappings--;
+> -			else if (!mp->vlan_qos && vlan_qos)
+> +			else if (!mp->vlan_prio && vlan_prio)
+>  				vlan->nr_egress_mappings++;
+> -			mp->vlan_qos = vlan_qos;
+> +			mp->vlan_prio = vlan_prio;
+>  			return 0;
+>  		}
+>  		mp = mp->next;
+> @@ -197,14 +198,14 @@ int vlan_dev_set_egress_priority(const struct net_device *dev,
+>  
+>  	np->next = mp;
+>  	np->priority = skb_prio;
+> -	np->vlan_qos = vlan_qos;
+> +	np->vlan_prio = vlan_prio;
+>  	/* Before inserting this element in hash table, make sure all its fields
+>  	 * are committed to memory.
+>  	 * coupled with smp_rmb() in vlan_dev_get_egress_qos_mask()
+>  	 */
+>  	smp_wmb();
+>  	vlan->egress_priority_map[skb_prio & 0xF] = np;
+> -	if (vlan_qos)
+> +	if (vlan_prio)
+>  		vlan->nr_egress_mappings++;
+>  	return 0;
+>  }
+> diff --git a/net/8021q/vlan_netlink.c b/net/8021q/vlan_netlink.c
+> index cf5219df7903..f62d8320c5b4 100644
+> --- a/net/8021q/vlan_netlink.c
+> +++ b/net/8021q/vlan_netlink.c
+> @@ -261,11 +261,11 @@ static int vlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
+>  		for (i = 0; i < ARRAY_SIZE(vlan->egress_priority_map); i++) {
+>  			for (pm = vlan->egress_priority_map[i]; pm;
+>  			     pm = pm->next) {
+> -				if (!pm->vlan_qos)
+> +				if (!pm->vlan_prio)
+>  					continue;
+>  
+>  				m.from = pm->priority;
+> -				m.to   = (pm->vlan_qos >> 13) & 0x7;
+> +				m.to   = pm->vlan_prio;
+>  				if (nla_put(skb, IFLA_VLAN_QOS_MAPPING,
+>  					    sizeof(m), &m))
+>  					goto nla_put_failure;
+> diff --git a/net/8021q/vlanproc.c b/net/8021q/vlanproc.c
+> index fa67374bda49..a5a5b8fbb054 100644
+> --- a/net/8021q/vlanproc.c
+> +++ b/net/8021q/vlanproc.c
+> @@ -266,8 +266,8 @@ static int vlandev_seq_show(struct seq_file *seq, void *offset)
+>  		const struct vlan_priority_tci_mapping *mp
+>  			= vlan->egress_priority_map[i];
+>  		while (mp) {
+> -			seq_printf(seq, "%u:%d ",
+> -				   mp->priority, ((mp->vlan_qos >> 13) & 0x7));
+> +			seq_printf(seq, "%u:%u ",
+> +				   mp->priority, mp->vlan_prio);
+>  			mp = mp->next;
+>  		}
+>  	}
+> -- 
+> 2.25.1
 > 
-> This makes no sense to me. Seems like there are scenarios where you
-> are grabbing the page even if you aren't going to use it? Why?
 > 
-> I think you would be better off just waiting to the end and then
-> fetching it instead of trying to grab it and potentially throw it away
-> if there is no space left in the page. Otherwise what you might do is
-> something along the lines of:
-> pfrag->page = page ? : encoded_page_decode_page(encoded_page);
-
-But doesn't that mean an additional checking is needed to decide if we
-need to grab the page?
-
-But the './scripts/bloat-o-meter' does show some binary size shrink
-using the above.
-
-> 
-> 
->> @@ -132,8 +156,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>                          return NULL;
->>                  }
->>
->> -               page = encoded_page_decode_page(encoded_page);
->> -
->>                  if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
->>                          goto refill;
->>
->> @@ -148,15 +170,17 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>
->>                  /* reset page count bias and offset to start of new frag */
->>                  nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
->> +               nc->offset = 0;
->>                  offset = 0;
->>          }
->>
->> -       nc->pagecnt_bias--;
->> -       nc->offset = offset + fragsz;
->> +       pfrag->page = page;
->> +       pfrag->offset = offset;
->> +       pfrag->size = size - offset;
-> 
-> I really think we should still be moving the nc->offset forward at
-> least with each allocation. It seems like you end up doing two flavors
-> of commit, one with and one without the decrement of the bias. So I
-> would be okay with that being pulled out into some separate logic to
-> avoid the extra increment in the case of merging the pages. However in
-> both cases you need to move the offset, so I would recommend keeping
-> that bit there as it would allow us to essentially call this multiple
-> times without having to do a commit in between to keep the offset
-> correct. With that your commit logic only has to verify nothing
-> changes out from underneath us and then update the pagecnt_bias if
-> needed.
-
-The problem is that we don't really know how much the nc->offset
-need to be moved forward to and the caller needs the original offset
-for skb_fill_page_desc() related calling when prepare API is used as
-an example in 'Preparation & committing API' section of patch 13:
-
-+Preparation & committing API
-+----------------------------
-+
-+.. code-block:: c
-+
-+    struct page_frag page_frag, *pfrag;
-+    bool merge = true;
-+    void *va;
-+
-+    pfrag = &page_frag;
-+    va = page_frag_alloc_refill_prepare(nc, 32U, pfrag, GFP_KERNEL);
-+    if (!va)
-+        goto wait_for_space;
-+
-+    copy = min_t(unsigned int, copy, pfrag->size);
-+    if (!skb_can_coalesce(skb, i, pfrag->page, pfrag->offset)) {
-+        if (i >= max_skb_frags)
-+            goto new_segment;
-+
-+        merge = false;
-+    }
-+
-+    copy = mem_schedule(copy);
-+    if (!copy)
-+        goto wait_for_space;
-+
-+    err = copy_from_iter_full_nocache(va, copy, iter);
-+    if (err)
-+        goto do_error;
-+
-+    if (merge) {
-+        skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1], copy);
-+        page_frag_commit_noref(nc, pfrag, copy);
-+    } else {
-+        skb_fill_page_desc(skb, i, pfrag->page, pfrag->offset, copy);
-+        page_frag_commit(nc, pfrag, copy);
-+    }
-
 
