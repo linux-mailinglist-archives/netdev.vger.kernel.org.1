@@ -1,83 +1,95 @@
-Return-Path: <netdev+bounces-137239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22339A5107
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 23:59:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7DDE9A5129
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 00:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CDB61F213DE
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 21:59:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC8081C21820
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 22:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC991922FB;
-	Sat, 19 Oct 2024 21:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kclr9u9f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1A4191F74;
+	Sat, 19 Oct 2024 22:03:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C6F155398;
-	Sat, 19 Oct 2024 21:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43BA156C6A
+	for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 22:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729375154; cv=none; b=qnIA9UTAV6IC8Welmrps6UYk4VNBn39hNka7d+3tikA3LVyKwRwLA8cBe4YtUfp5TvyStK/ZJ5JVRG0f36K8jpDX3/3YrOGdDra+gcn0mYm5a+7fm41cxcG2fAoOuJHvfPZ3vM+TrCla6UEkCcB/Fev2S28w2cWVM2kqklKkKBE=
+	t=1729375385; cv=none; b=EqTDoRrqGrTFmzGQv1p61UoecIJAZviqHa9JHDyeh673pJCpVvrCZ2eYZEgdz5i4JN37iNZP8oKgyRIjmBJ8D82BxU4fIQXKXuKTiipbfU/VOhfbNGStESbR0aHMRlLTIW4PFPiPt8uuHYYIcbIj5blSuBV5xmfsMSNGvYaacpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729375154; c=relaxed/simple;
-	bh=yrD63VfEdcugHgSz6cVE0wf++PA5YPtODa3BZ4NeTlY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F3Hyp6Loo3NU2NLWKJ/JNfiLZE9b3bqecMz0dOCry6agg+YycxdPRHNuUr4i7biWkBQn1rqMbcbJnWqpPK49CzFwV/w1kTwujLp8O9qwmuBHddLSyZ2xnsZ39H0LeP6+DtMh5El3UeQ3D1iwXkjS0pSZeu/iRuyr69D+wx1SQfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kclr9u9f; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aVSnEAGht9JOBvdyIP8ZOD2Yn+/la9YFQuf3QOiYD7s=; b=kclr9u9fiD7knSA3p8YbbED/9R
-	Z921HGax6acRFNM7cEr9cBnTGxZTkeH9iKa61ezAHFLB8h8Z60FDu7t7DUHEWn5w1dkX2piDJuVg2
-	FrZ0n7iQKaSIMhbyoYC+hZaEkydv4SBSAo7Q2e3zNaycYP/yWEX96nO79Vq1GBbNvqmY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t2HTS-00AcgD-IQ; Sat, 19 Oct 2024 23:59:02 +0200
-Date: Sat, 19 Oct 2024 23:59:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: fix unreleased
- fwnode_handle in setup_port()
-Message-ID: <11c644b5-e6e5-4c4c-9398-7a8e59519370@lunn.ch>
-References: <20241019-mv88e6xxx_chip-fwnode_handle_put-v1-1-fc92c4f16831@gmail.com>
+	s=arc-20240116; t=1729375385; c=relaxed/simple;
+	bh=4r/dnSU2iv58zYZkcF3J2NBOOcfh+f3piDebouy/9IA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Oc9JFjDx2RYRDNdoa8sxKvo6hn+AsqSaI5TjxxILdecbEa9iyzgHqIOcy/AkXWzlnOcZOkheKAokndyv7ZTR7Buc1tzJfhgac0078IHckVriUMbYMBwH6CUa1p83VNJlrIG8U5d8UssH23NASwlecIK/Bl7aghkL12lzFu6mScY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83ac0354401so135474039f.3
+        for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 15:03:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729375383; x=1729980183;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7RLqbF/44Rgljiqe7gmVwXbfdAgdxhslKmNZMh8Pfbw=;
+        b=xNIE+R+541IVyeISXH73gRD/x1obepL0+icrGj+2QMLuX2DDhv/RK6FN6VmoefvXuL
+         raf1u7OB83a3Pc8trpPyGw91yT8eIszb8inTd2XmAFUKLZcuC/l5ph6i0tofJdTXnoJn
+         IoWGWsAowFcbsu3A49HgwvIAWN8p10PCXTQZ0CP3obavn3ah68r2zU80MUxR0w7I7/0l
+         vFEKKf4zDns7wlQ/UQK10/cFjdPMG4/9qEfCo5R/jiCAm8w7+NKtBCcZ0JW4PSm9yPVE
+         /kcYxskM/ek6UKadinFGsT1kC/CuydqH3X80/nJ5DYUJgSNIXIaUn6p6V29vnIhQIuuC
+         DVSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDDlEV1BOlcva4aiGSAKXKajqfZuhSkmyJaEbPfrPMCt34mLOwT0Dot+gYb1NbkyI3A9aJ+90=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUXCTN59e7JXwVv24MYhZ2kpHhDuOqLzpunOsWUmKS27ZIQDgu
+	IJAjwbLyXygYGnWK7QDpC/xMqY7WSAqA0HN01T7yVNtWrEqzxh7heqQ7a2TJXKF1ZQt5dpwkCAD
+	165DwRO8SvRR6dxsESgxOzuIzaVR6S52sOSk4TSxc3MArPDEFiqLiQWY=
+X-Google-Smtp-Source: AGHT+IE96T6mtPOXUI/WweupFLsfamKoYzsTZ0Bbhwr3/cBXtjGsDjI/N0hiSqdkU1zKkxy1ivao0cGe6sBEuVvyhhqrBErxxqXc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241019-mv88e6xxx_chip-fwnode_handle_put-v1-1-fc92c4f16831@gmail.com>
+X-Received: by 2002:a05:6e02:18c6:b0:3a0:8c5f:90c0 with SMTP id
+ e9e14a558f8ab-3a3f4054723mr65915665ab.10.1729375382809; Sat, 19 Oct 2024
+ 15:03:02 -0700 (PDT)
+Date: Sat, 19 Oct 2024 15:03:02 -0700
+In-Reply-To: <00000000000087e83e061dd271bd@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67142c96.050a0220.10f4f4.0021.GAE@google.com>
+Subject: Re: [syzbot] [kernfs?] INFO: task hung in eventpoll_release_file (2)
+From: syzbot <syzbot+63ab1a905aebbf410bb7@syzkaller.appspotmail.com>
+To: brauner@kernel.org, gregkh@linuxfoundation.org, isdn@linux-pingi.de, 
+	jack@suse.cz, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tj@kernel.org, 
+	viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Oct 19, 2024 at 10:16:49PM +0200, Javier Carrasco wrote:
-> 'ports_fwnode' is initialized via device_get_named_child_node(), which
-> requires a call to fwnode_handle_put() when the variable is no longer
-> required to avoid leaking memory.
-> 
-> Add the missing fwnode_handle_put() after 'ports_fwnode' has been used
-> and is no longer required.
+syzbot suspects this issue was fixed by commit:
 
-As you point out, the handle is obtained with
-device_get_named_child_node(). It seems odd to use a fwnode_ function
-not a device_ function to release the handle. Is there a device_
-function?
+commit 0023d340ba86cfe50b935829a73adea57ec2c629
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Tue Sep 10 14:22:36 2024 +0000
 
-	Andrew
+    Bluetooth: CMTP: Mark BT_CMTP as DEPRECATED
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1594c430580000
+start commit:   b31c44928842 Merge tag 'linux_kselftest-kunit-fixes-6.11-r..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=58a85aa6925a8b78
+dashboard link: https://syzkaller.appspot.com/bug?extid=63ab1a905aebbf410bb7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10662bc7980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137bba00580000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: Bluetooth: CMTP: Mark BT_CMTP as DEPRECATED
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
