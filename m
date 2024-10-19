@@ -1,152 +1,118 @@
-Return-Path: <netdev+bounces-137231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 770839A5045
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 20:19:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB19E9A5053
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 20:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07C3EB211BA
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 18:19:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51B431F23569
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 18:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C36F18E37C;
-	Sat, 19 Oct 2024 18:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFB018EFD2;
+	Sat, 19 Oct 2024 18:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=0upti.me header.i=@0upti.me header.b="hspbFWW3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PMj8F01/"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward204a.mail.yandex.net (forward204a.mail.yandex.net [178.154.239.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093862772A;
-	Sat, 19 Oct 2024 18:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4352E320E;
+	Sat, 19 Oct 2024 18:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729361960; cv=none; b=THCOuHvbe+WUQERdcdADNnqcOAAfaPbehPeGqmlovUTvr/DeNDIKSpUaklIA1tfL26bZejNCdYWAgWZ+GAjsrT3d8PCYKx+cW/FAc5246lO7zj97H26yBIDrRDlW4/LiDozL0mT5vZj8XaQUA9fsbK6NB0Cg0uNiQe3QpUZ8JuA=
+	t=1729363039; cv=none; b=A51cURbAKK5nyEBQCiUXGSwyQjCSdSrkjhCqAexvzVF15mLCbXPNuZ30+Yik2x4j/eJ9y4jEWtXCyC4tXylBsbSOQx+xvrj0D05la7/IsqM/jyk96Lq97FUQv6F83mYkpACbIjPkC4kMEhJvaJX6ry+iZ3AvipQshhb6j3QM4Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729361960; c=relaxed/simple;
-	bh=ba0PMHBh4hhco6hEKIyZrHz4w5DvWH+aoE7VQQbkzKg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Vb51JJwCxNmg8NSTKTTxK36h8b4E/9oEaEfs1drPJz+avJFcLabcJKAbIcvmNDbcJWAEDrqB8uvvO90tpC0eWb2oHbq3sRXKr+y4QI+LUUV4bjqEkbMp6MMxL3E9r3VkSARPMif9DDa6s1UEkYEp4xHtDch+zNrJ0KndRVJde4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=0upti.me; spf=pass smtp.mailfrom=0upti.me; dkim=pass (1024-bit key) header.d=0upti.me header.i=@0upti.me header.b=hspbFWW3; arc=none smtp.client-ip=178.154.239.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=0upti.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0upti.me
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
-	by forward204a.mail.yandex.net (Yandex) with ESMTPS id 613E865EE3;
-	Sat, 19 Oct 2024 21:19:09 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net [IPv6:2a02:6b8:c2b:1d5:0:640:773e:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id 1A62F60929;
-	Sat, 19 Oct 2024 21:19:01 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id uIUibWLNqCg0-ix3uVImu;
-	Sat, 19 Oct 2024 21:19:00 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=0upti.me; s=mail;
-	t=1729361940; bh=g4i8i7ZDRuEetTlOlV3vjQxEOMpZ2Ny6wy/nHvTRQm4=;
-	h=Cc:Message-Id:To:From:Date:Subject;
-	b=hspbFWW3Hfj+Oqqfwyt4M1RRpSmBWI1Gr1jrsh/L4Xnn9Dcc6HrfvqT+R1ajeKAqv
-	 6uaL/0zR5uWLoOuJ1bzyAFMiM+tCg4chxKnppDdfZ5PwZR/TiDNEfjwE8uD9PS8l/z
-	 xOtNBKx/PKbz/mZtuv/CI9U2ecXeanP/83Utl9y4=
-Authentication-Results: mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net; dkim=pass header.i=@0upti.me
-From: Ilya Katsnelson <me@0upti.me>
-Date: Sat, 19 Oct 2024 21:18:38 +0300
-Subject: [PATCH v3] netfilter: xtables: fix a bunch of typos causing some
- targets to not load on IPv6
+	s=arc-20240116; t=1729363039; c=relaxed/simple;
+	bh=f2raWUzbwuynpcQFtcZA6RIABMKNwsByHhYe8vTxMso=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=EqXMrjaht3OI4SOJmmXHiICUMJuNvyEjn9s3VtxMse3lgeIE/mvyBAxCNxVvPRPsyleA9aAUNXEh+ZWO7L+JzrYn3I05NlV8sGX4m+TOB264XhDPa1FWjEiDVYeHhRDsT+MO4lSQwXb/EHcExJUeFvVcQiMWhfZgtW4PPxc80NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PMj8F01/; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7c1324be8easo3089474a12.1;
+        Sat, 19 Oct 2024 11:37:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729363037; x=1729967837; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zanKzOorteppgez4TRhIZl5bp9bo2C4LWtEvlOPyEhY=;
+        b=PMj8F01/N5hnKM6G1qfMH9zz144fuszVbAJsdsDseKKH5PO4XNWBdw2uov32exufEy
+         JgqRIcfm+g/PUdF939jFbJf9ixxWX4BWxuZXFlj5QwE2Tq2RA9OkWu5BniyA9F8GWLml
+         cDWmHFZnQmlgqKvDQN3RkHSFNwlgShJ5kx2+WJjKvQfen6Ylk3eGgwt6WTbOAB1YEvrg
+         pJZficog9C8fl2FPREtFPeyL2rlgZIYk7vlWBiPX0E1auBibmoFDZiE6TmvCSbcR9CHt
+         bKbBF/VQ6a133Yjsmj9DqK9rZBEt/olSwnlUzWnXa16mOtsv54im5nUSX5LUUvrai1Ya
+         MeTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729363037; x=1729967837;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zanKzOorteppgez4TRhIZl5bp9bo2C4LWtEvlOPyEhY=;
+        b=CwxRscCHN1nbnXTuXIvxiL/LFuhb5AylfewIgoYxtV49ekLoNPwpnb2yT2kFHOu4HU
+         /ZdnWiL/oJdRxKUTQkYK+/FhLM0eU1LNph62m2MbK9/MfPBMj3g36mMiYtk2hOU5znYV
+         19uCXhWnFVusuHNTlA7dJ1pNYGAZqmeZh3qEetL65OWyPlkXXrxUJhLgK75AE3aSwnEP
+         1rmEBsylLEq0b7oi3BG0RlDkCCu1ArdSzKBD1q3+tGHIyz/VTh/UlH3fuANj8YZ3GcNo
+         fr6Dymf3A/V0nCovG7DqVTk60e1V6VFyDhAjMo70dZKeqp9415RPEaVeV/L48VsKrQeh
+         Z74Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWCnFVoSPlDjpekzLN1NuTyLT2I7XTt1ItiyXQaUdJBqNa0JjDv+VU/nEkyTFPQUv4mrM9nKgbo@vger.kernel.org, AJvYcCXldt6dvrSPAouIFIrUGfQTyPLQ1I03cgQbMCoy3g1AIlyz25ic5ANmaqPHtpOWTDN4UvmSdy7WvV8qXiw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCWeoIEQ0Xxnx5KuV2UeJvLTYvTHssI2usdWT5V5rTafSJZ325
+	7LRpl9bVSihe4YFkkgtSshLqRriT1QhOxyhiocuminInw16KJQxixgy/RfuJXvikdozHlwJWUzz
+	jGlcapCbtKX2vI7B1e1eNU1kNjse5ynS5Fs4=
+X-Google-Smtp-Source: AGHT+IG63gEpPr+N0wBA7B6sdGV88dKu+f6xrgCLnnvuxg03L9kjYV8IdCPsqwlRLhjq93W2DUlPKeyK7OxsjxgD5KE=
+X-Received: by 2002:a17:90a:17e4:b0:2d8:9fbe:6727 with SMTP id
+ 98e67ed59e1d1-2e564499702mr8875243a91.4.1729363037388; Sat, 19 Oct 2024
+ 11:37:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241019-xtables-typos-v3-1-66dd2eaacf2f@0upti.me>
-X-B4-Tracking: v=1; b=H4sIAP33E2cC/3WOwQqDMBAFf0Vybko21ho99T9KDzFZ60KrkqRBE
- f+90ZMUepwHM7yFeXSEntXZwhxG8jT0CfJTxkyn+ydysomZFPICAhSfgm5e6HmYx8Fz26K2jWp
- ASsuSMzpsadp790fijnwY3LznI2zrv1IEDlxIXUCpKiPQ3MRnDHR+I9tCUR7l6leWSb5uP8q8s
- EbhQV7X9Qufs1Yc5gAAAA==
-X-Change-ID: 20241018-xtables-typos-dfeadb8b122d
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Florian Westphal <fw@strlen.de>, Sasha Levin <sashal@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ignat@cloudflare.com, 
- stable@vger.kernel.org, Phil Sutter <phil@nwl.cc>, 
- Ilya Katsnelson <me@0upti.me>
-X-Mailer: b4 0.14.2
-X-Yandex-Filter: 1
+From: Benjamin Grosse <ste3ls@gmail.com>
+Date: Sat, 19 Oct 2024 19:37:06 +0100
+Message-ID: <CAPvBWb=L6FVwSk7iZX21Awez+dwhLMAoGe39f__VC=g7g6H2+g@mail.gmail.com>
+Subject: [PATCH] drivers/net/usb: Lenovo Mini Dock, add support for new USB
+ device ID 0x17EF:0x3098 for the r8152 driver
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The xt_NFLOG and xt_MARK changes were added with the wrong family
-in 0bfcb7b71e73, which seems to just have been a typo,
-but now ip6tables rules with --set-mark don't work anymore,
-which is pretty bad.
+From 7a75dea5721225f4280be53996421962af430c8b Mon Sep 17 00:00:00 2001
+From: =3D?UTF-8?q?Benjamin=3D20Gro=3DC3=3D9Fe?=3D <ste3ls@gmail.com>
+Date: Sat, 19 Oct 2024 10:05:29 +0100
+Subject: [PATCH] usb: add support for new USB device ID 0x17EF:0x3098 for t=
+he
+ r8152 driver
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
 
-Pablo spotted another typo introduced in the same commit in xt_TRACE.
+This patch adds support for another Lenovo Mini dock 0x17EF:0x3098 to the
+r8152 driver. The device has been tested on NixOS, hotplugging and sleep
+included.
 
-Fixes: 0bfcb7b71e73 ("netfilter: xtables: avoid NFPROTO_UNSPEC where needed")
-Reviewed-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Ilya Katsnelson <me@0upti.me>
+Signed-off-by: Benjamin Gro=C3=9Fe <ste3ls@gmail.com>
 ---
-Changes in v3:
-- Fix another typo spotted by Pablo, adjust text accordingly.
-- CCing stable because it's a pretty bad regression.
-- Link to v2: https://lore.kernel.org/r/20241019-xtables-typos-v2-1-6b8b1735dc8e@0upti.me
+ drivers/net/usb/r8152.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes in v2:
-- Fixed a typo in the commit message (that's karma).
-- Replaced a reference to backport commit.
-- Link to v1: https://lore.kernel.org/r/20241018-xtables-typos-v1-1-02a51789c0ec@0upti.me
----
- net/netfilter/xt_NFLOG.c | 2 +-
- net/netfilter/xt_TRACE.c | 1 +
- net/netfilter/xt_mark.c  | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/xt_NFLOG.c b/net/netfilter/xt_NFLOG.c
-index d80abd6ccaf8f71fa70605fef7edada827a19ceb..6dcf4bc7e30b2ae364a1cd9ac8df954a90905c52 100644
---- a/net/netfilter/xt_NFLOG.c
-+++ b/net/netfilter/xt_NFLOG.c
-@@ -79,7 +79,7 @@ static struct xt_target nflog_tg_reg[] __read_mostly = {
- 	{
- 		.name       = "NFLOG",
- 		.revision   = 0,
--		.family     = NFPROTO_IPV4,
-+		.family     = NFPROTO_IPV6,
- 		.checkentry = nflog_tg_check,
- 		.destroy    = nflog_tg_destroy,
- 		.target     = nflog_tg,
-diff --git a/net/netfilter/xt_TRACE.c b/net/netfilter/xt_TRACE.c
-index f3fa4f11348cd8ad796ce94f012cd48aa7a9020f..2a029b4adbcadf95e493b153f613a210624a9101 100644
---- a/net/netfilter/xt_TRACE.c
-+++ b/net/netfilter/xt_TRACE.c
-@@ -49,6 +49,7 @@ static struct xt_target trace_tg_reg[] __read_mostly = {
- 		.target		= trace_tg,
- 		.checkentry	= trace_tg_check,
- 		.destroy	= trace_tg_destroy,
-+		.me         = THIS_MODULE,
- 	},
- #endif
- };
-diff --git a/net/netfilter/xt_mark.c b/net/netfilter/xt_mark.c
-index f76fe04fc9a4e19f18ac323349ba6f22a00eafd7..65b965ca40ea7ea5d9feff381b433bf267a424c4 100644
---- a/net/netfilter/xt_mark.c
-+++ b/net/netfilter/xt_mark.c
-@@ -62,7 +62,7 @@ static struct xt_target mark_tg_reg[] __read_mostly = {
- 	{
- 		.name           = "MARK",
- 		.revision       = 2,
--		.family         = NFPROTO_IPV4,
-+		.family         = NFPROTO_IPV6,
- 		.target         = mark_tg,
- 		.targetsize     = sizeof(struct xt_mark_tginfo2),
- 		.me             = THIS_MODULE,
-
----
-base-commit: 75aa74d52f43e75d0beb20572f98529071b700e5
-change-id: 20241018-xtables-typos-dfeadb8b122d
-
-Best regards,
--- 
-Ilya Katsnelson <me@0upti.me>
-
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index a5612c799..468c73974 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -10069,6 +10069,7 @@ static const struct usb_device_id rtl8152_table[] =
+=3D {
+     { USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
+     { USB_DEVICE(VENDOR_ID_LENOVO,  0x3069) },
+     { USB_DEVICE(VENDOR_ID_LENOVO,  0x3082) },
++    { USB_DEVICE(VENDOR_ID_LENOVO,  0x3098) },
+     { USB_DEVICE(VENDOR_ID_LENOVO,  0x7205) },
+     { USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
+     { USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
+--=20
+2.44.1
 
