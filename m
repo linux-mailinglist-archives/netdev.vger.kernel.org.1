@@ -1,165 +1,181 @@
-Return-Path: <netdev+bounces-137175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46289A4A59
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 01:57:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3BA59A4A78
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 02:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BE8C1F23C24
-	for <lists+netdev@lfdr.de>; Fri, 18 Oct 2024 23:57:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 652C4B21BB6
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 00:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5951917FD;
-	Fri, 18 Oct 2024 23:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C76929CF6;
+	Sat, 19 Oct 2024 00:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YkdOtbVo"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MV1ZB5l/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7388D1917E9
-	for <netdev@vger.kernel.org>; Fri, 18 Oct 2024 23:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F237BEED6;
+	Sat, 19 Oct 2024 00:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729295856; cv=none; b=m0KkRkw7J4+GrjAVe3mA3UsqjM+C0+gxDvh++PtxD+XdHFXfLvun87+JeUlAKQCL0VzYvSudNSk1/VAKokHEeP3849gPJae8A0JVwOL7JGSbgMwPW83VLLqXgEAKr1vSl3EL6yTE5+ZHsKK2vl6EChDPkeYRjVvDFwaG7vyIF1U=
+	t=1729297366; cv=none; b=F1i/HTG93QXAs0+VhS8mhZItTjj+zFYLZKyqsRBwU9SGoxJ46nVoVePFZYFlyXHG6njauoxY9mcLYFW4nED1i6TuAz5SxHlMM/LHlNnWqXaibzRhw8QzM+4vjY68ICEzivh6rc91287dKXC9kbnHVPGcd2wh6usue3H4KKx3wOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729295856; c=relaxed/simple;
-	bh=/LHSdJHkp1l77T+lIpZRGhDuFNKfe0atYWZA1rVZ40s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZFzbhX/LcbDRcpF2Np87nb1DLiXZgIOtPSRMGMqTNpsImzy5npwDzaPm2yGCum7KuvNZWtLpJvdNCIZxL6PrdDB37liqIskUY8l+ShQrLg0QA4Emy8yLzA51nCJNXeXJ8/1I5OVDcVHWlOIDL+zY6XvY7wajXsYM9prDRgUrkM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YkdOtbVo; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <18cb274a-a214-42c0-bcec-cbda34703893@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729295852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=amGDfV5HdFNuReXcjkk4EaaJ7Bh/Ri0Tvnzi7osykXQ=;
-	b=YkdOtbVocWMr74bXPrrLp9BXcB80E0e5dh/zolhPL4gFKP1jxrWrisN/Xcmy2DHXt5jvcY
-	2vCJQMHWqVSCTDu2oqd+UWEY/gJy/Y3KRsG6aRqAY0m8jYcLpyGDWTvuOPzF7iRMeGmhKB
-	C4twQLIBTLFaAYtP4NjNTPvkMeW5hOg=
-Date: Fri, 18 Oct 2024 16:57:20 -0700
+	s=arc-20240116; t=1729297366; c=relaxed/simple;
+	bh=OjwqcLjusCuMEujKAIY1zbhzHKZz5/39jsD/YDCvrOw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kk6E3GAo8syZJjuwcr0FCWmbIyFNE7h6LPu200ev6c6cQDegwG5rXTehn0QcbUv63YZUFqNYKUJkJhSoFq9kNbgnKjbfv+O/dDnLG0RgTtATzXr+EjTIlp4h/aZtSfi1duOnvDdBNtzJeHIXw8KhnufW+PpcrZnbIZsO1jnyv1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MV1ZB5l/; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729297364; x=1760833364;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YkFWxEAH8ig0VPlLUWEewmJ7RrvUMzN5ZoJU/RdWdBU=;
+  b=MV1ZB5l/pcvNHUsSj2IPRHhN9t1rIocw0FxbzBPE9SDPHbtrzsXe4INY
+   0MNwq+tsAHFz1E+2Bfe8Rdh313Cm7bay4Nxw3fntasmlnBegLEhTfHR2k
+   A4YMTsTRviW2V6N+Hg9EAjXxBYlqi6/J5mBq4NFDM6qghV3LkJrIh/dIi
+   E=;
+X-IronPort-AV: E=Sophos;i="6.11,214,1725321600"; 
+   d="scan'208";a="240571657"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2024 00:22:40 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:49767]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
+ id 8dcfac51-37b9-4a09-8c82-c69ae0a4798c; Sat, 19 Oct 2024 00:22:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 8dcfac51-37b9-4a09-8c82-c69ae0a4798c
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sat, 19 Oct 2024 00:22:39 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Sat, 19 Oct 2024 00:22:35 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <denkenz@gmail.com>
+CC: <agross@kernel.org>, <almasrymina@google.com>, <asml.silence@gmail.com>,
+	<axboe@kernel.dk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<krisman@suse.de>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<manivannan.sadhasivam@linaro.org>, <marcel@holtmann.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [RFC PATCH v1 04/10] net: qrtr: Report sender endpoint in aux data
+Date: Fri, 18 Oct 2024 17:22:32 -0700
+Message-ID: <20241019002232.43313-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241018181842.1368394-5-denkenz@gmail.com>
+References: <20241018181842.1368394-5-denkenz@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 2/6] selftests/bpf: add missing ns cleanups in
- btf_skc_cls_ingress
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?=
- <alexis.lothore@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- ebpf@linuxfoundation.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Lorenz Bauer <lmb@cloudflare.com>, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241016-syncookie-v1-0-3b7a0de12153@bootlin.com>
- <20241016-syncookie-v1-2-3b7a0de12153@bootlin.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20241016-syncookie-v1-2-3b7a0de12153@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 10/16/24 11:35 AM, Alexis Lothoré (eBPF Foundation) wrote:
-> btf_skc_cls_ingress.c currently runs two subtests, and create a
-> dedicated network namespace for each, but never cleans up the created
-> namespace once the test has ended.
-> 
-> Add missing namespace cleanup after each namespace to avoid accumulating
-> namespaces for each new subtest. While at it, switch namespace
-> management to netns_{new,free}
-> 
-> Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
-> ---
->   .../selftests/bpf/prog_tests/btf_skc_cls_ingress.c | 31 ++++++++++++++--------
->   1 file changed, 20 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/btf_skc_cls_ingress.c b/tools/testing/selftests/bpf/prog_tests/btf_skc_cls_ingress.c
-> index 5d8d7736edc095b647ca3fbc12cac0440b60140e..8d1fa8806cdda088d264b44104f7c80726b025e2 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/btf_skc_cls_ingress.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/btf_skc_cls_ingress.c
-> @@ -17,32 +17,34 @@
->   #include "test_progs.h"
->   #include "test_btf_skc_cls_ingress.skel.h"
->   
-> +#define TEST_NS "skc_cls_ingress"
+From: Denis Kenzior <denkenz@gmail.com>
+Date: Fri, 18 Oct 2024 13:18:22 -0500
+> @@ -1234,6 +1247,78 @@ static int qrtr_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+>  	return rc;
+>  }
+>  
+> +static int qrtr_setsockopt(struct socket *sock, int level, int optname,
+> +			   sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct qrtr_sock *ipc = qrtr_sk(sock->sk);
+> +	struct sock *sk = sock->sk;
+> +	unsigned int val = 0;
+> +	int rc = 0;
 > +
->   static struct test_btf_skc_cls_ingress *skel;
->   static struct sockaddr_in6 srv_sa6;
->   static __u32 duration;
->   
-> -static int prepare_netns(void)
-> +static struct netns_obj *prepare_netns(void)
->   {
->   	LIBBPF_OPTS(bpf_tc_hook, qdisc_lo, .attach_point = BPF_TC_INGRESS);
->   	LIBBPF_OPTS(bpf_tc_opts, tc_attach,
->   		    .prog_fd = bpf_program__fd(skel->progs.cls_ingress));
-> +	struct netns_obj *ns = NULL;
->   
-> -	if (CHECK(unshare(CLONE_NEWNET), "create netns",
-> -		  "unshare(CLONE_NEWNET): %s (%d)",
-> -		  strerror(errno), errno))
-> -		return -1;
-> +	ns = netns_new(TEST_NS, true);
-> +	if (!ASSERT_OK_PTR(ns, "create and join netns"))
-> +		return ns;
->   
->   	if (CHECK(system("ip link set dev lo up"),
->   		  "ip link set dev lo up", "failed\n"))
-
-nit. netns_new() takes care of "lo up" also, so the above can be removed.
-
-test_progs.c has restore_netns() after each test, so the netns was not cleaned 
-up. The second unshare should have freed the earlier netns also.
-
-Using netns_new() removed the boiler plate codes. It is nice to see this change 
-here regardless.
-
-> -		return -1;
-> +		goto free_ns;
->   
->   	qdisc_lo.ifindex = if_nametoindex("lo");
->   	if (!ASSERT_OK(bpf_tc_hook_create(&qdisc_lo), "qdisc add dev lo clsact"))
-> -		return -1;
-> +		goto free_ns;
->   
->   	if (!ASSERT_OK(bpf_tc_attach(&qdisc_lo, &tc_attach),
->   		       "filter add dev lo ingress"))
-> -		return -1;
-> +		goto free_ns;
->   
->   	/* Ensure 20 bytes options (i.e. in total 40 bytes tcp header) for the
->   	 * bpf_tcp_gen_syncookie() helper.
-> @@ -50,9 +52,13 @@ static int prepare_netns(void)
->   	if (write_sysctl("/proc/sys/net/ipv4/tcp_window_scaling", "1") ||
->   	    write_sysctl("/proc/sys/net/ipv4/tcp_timestamps", "1") ||
->   	    write_sysctl("/proc/sys/net/ipv4/tcp_sack", "1"))
-> -		return -1;
-> +		goto free_ns;
+> +	if (level != SOL_QRTR)
+> +		return -ENOPROTOOPT;
 > +
-> +	return ns;
->   
-> -	return 0;
-> +free_ns:
-> +	netns_free(ns);
-> +	return NULL;
->   }
+> +	if (optlen >= sizeof(val) &&
+> +	    copy_from_sockptr(&val, optval, sizeof(val)))
+> +		return -EFAULT;
+> +
+> +	lock_sock(sk);
+
+This seems unnecessary to me.
+
+sk_setsockopt(), do_ip_setsockopt(), and do_ipv6_setsockopt() do not
+hold lock_sock() for assign_bit().
+
+Also, QRTR_BIND_ENDPOINT in a later patch will not need lock_sock()
+neither.  The value is u32, so you can use WRITE_ONCE() here and
+READ_ONCE() in getsockopt().
 
 
+> +
+> +	switch (optname) {
+> +	case QRTR_REPORT_ENDPOINT:
+> +		assign_bit(QRTR_F_REPORT_ENDPOINT, &ipc->flags, val);
+> +		break;
+> +	default:
+> +		rc = -ENOPROTOOPT;
+> +	}
+> +
+> +	release_sock(sk);
+> +
+> +	return rc;
+> +}
+> +
+> +static int qrtr_getsockopt(struct socket *sock, int level, int optname,
+> +			   char __user *optval, int __user *optlen)
+> +{
+> +	struct qrtr_sock *ipc = qrtr_sk(sock->sk);
+> +	struct sock *sk = sock->sk;
+> +	unsigned int val;
+> +	int len;
+> +	int rc = 0;
+> +
+> +	if (level != SOL_QRTR)
+> +		return -ENOPROTOOPT;
+> +
+> +	if (get_user(len, optlen))
+> +		return -EFAULT;
+> +
+> +	if (len < sizeof(val))
+> +		return -EINVAL;
+> +
+> +	lock_sock(sk);
+
+Same remark.
+
+
+> +
+> +	switch (optname) {
+> +	case QRTR_REPORT_ENDPOINT:
+> +		val = test_bit(QRTR_F_REPORT_ENDPOINT, &ipc->flags);
+> +		break;
+> +	default:
+> +		rc = -ENOPROTOOPT;
+> +	}
+> +
+> +	release_sock(sk);
+> +
+> +	if (rc)
+> +		return rc;
+> +
+> +	len = sizeof(int);
+> +
+> +	if (put_user(len, optlen) ||
+> +	    copy_to_user(optval, &val, len))
+> +		rc = -EFAULT;
+> +
+> +	return rc;
+> +}
+> +
+>  static int qrtr_release(struct socket *sock)
+>  {
+>  	struct sock *sk = sock->sk;
 
