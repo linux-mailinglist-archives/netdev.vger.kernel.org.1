@@ -1,104 +1,213 @@
-Return-Path: <netdev+bounces-137217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771829A4DD3
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 14:41:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3809A4DD8
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 14:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01B272868BE
-	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 12:41:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ADEA1C231D1
+	for <lists+netdev@lfdr.de>; Sat, 19 Oct 2024 12:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336D41DFDBF;
-	Sat, 19 Oct 2024 12:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B8A1E0B7E;
+	Sat, 19 Oct 2024 12:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B4oaRV1Z"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YxPX3zU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B7E1E4A4;
-	Sat, 19 Oct 2024 12:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FEB22629D;
+	Sat, 19 Oct 2024 12:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729341682; cv=none; b=m/F4I+cfinCAh1kP8P99hKgB0lfDMQet83OUDCrmG2rdHTwd6H+g24/K0m9mfFmwIO7LaKIvsutXhf8iNHwWa6OMnYFo5YFIqgZDXxViM2JI5qY51ZlYQSEROptYCgLK87grsl+LEkTAc85p8c931uRUe1REiFS5x5sSZua2MNg=
+	t=1729341807; cv=none; b=TJXCdgmFZKm6n2Fvq8ynpqiCcpN5XWAvr+Q3vfxH7niZTWs9oLIyzk49xK67HUixW279UhrSXI9sRh01xDRY6ryJwO2c35480rjHabZv38oo9iYctGQDC/7TRxhn7D1Hy+gO1XTx0O/F7QUhIRWwo+HgsmLUxbkugoyaBZWQRMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729341682; c=relaxed/simple;
-	bh=pDRq5XUeT1FKJulbVFabG+bdLxp/YKnBhoGRLsjHd9k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tjXNNKDcTsSb+x3Yjvw73bfQsMjxRmvpYAeF6GhWAdTRl3y25AKOILU2Wde27c3bz1WkqVSHMvEdKdJIdfcCUPaVhV+2HqvEK33+sL8y2B4GwtrjYdKyeE7auqE9/8v0bzuA930NZZ4gRk6p+PA0pxlYnDpcFF+fQcDzxHWm/Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B4oaRV1Z; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e2b720a0bbso556097a91.1;
-        Sat, 19 Oct 2024 05:41:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729341679; x=1729946479; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pDRq5XUeT1FKJulbVFabG+bdLxp/YKnBhoGRLsjHd9k=;
-        b=B4oaRV1ZPiUztkGjps8xtjhqmaqXhFCPmmT8auKTc1Ew6Mfi/Xc1aIPX0sWSqmmF3X
-         CiaVy2rWj74Hbee1zG4FsWqqHX0KZD3QdeyXHd9SngyDH0rKNgR2R0zXN5znYFrOpsrW
-         Mui0uOrWW1XnUN97X+fC4wqsFUC/oobE9yYUD6tVpFjivhGzvzz0zGuSf2ZWnWQjfT6z
-         Qe0NehvwgnCVKG4rOucN6tkCCqg1FcSps+IgjBYVbpozZ2pGSpq0tdpnGH8w+o0KfL5a
-         7Y/0jKIYnluPFlc/3Ce3HqfjQ/41Ue8boWi2Rql10zv6i6DOe1s4vRKq3+B2/LfRngBL
-         bXKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729341679; x=1729946479;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pDRq5XUeT1FKJulbVFabG+bdLxp/YKnBhoGRLsjHd9k=;
-        b=LLljfw44ph8vEDZy6qgU0nLJgYxb6XJJaWGo9uFP6vydX8sTgfP+r8mwww37vxojfp
-         JYzjsJEsWp6fbPJW8s5PLGcDiWWEz94KlWPsXHAz9yuPdjxQIruzdbW4A4BzZ067RWYL
-         2EhOHDm1sPe+1UyQhvXsq5d7oFf5uUnTwwM6jA5eRBR6uktJ0NKTuQRXoAVCUUdY4uJB
-         2X3fGItnnP1Cbpl+Aeg2oaAITp9AlHWkG4brC1fZIi+w7ShBygXVXLpya2PePWsyTEH8
-         uaJ7d5/Z6r/6RasLeQc/lVh22psjHf6fCzwU5mmV5R76j+5GTRnFe+fG35Hu8L6gNJNR
-         WAEw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0VXiTKPQyC7vmsdIuw3VzY7FXMLh1RhRSzBeNGyIk3zDD4iAH34lrnIWgq1ZRDwOW142l818q@vger.kernel.org, AJvYcCVYXJwp+SYrZ6zxa6UP40Q+hk9JJ9NuucreqnOPatkM6QMYrCL8LCEBSz1VGD2nbEEE/EM8gNkcX2rxFSgLyiQ=@vger.kernel.org, AJvYcCW7p03gup4Kdfgdsx5D2qlBTU3U1fT0rS5Le4A3AXFO5PFA6XYQ/eW2azVUHzYIenJO/WH8RmriAC2Dbk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLl1ZOXPcLoooxxEGxmLsxlE7vbe9v9Lnirm9rr5kai5kXE+ZL
-	m8yneLi2m8tPS7++yp8zrsmgeJAAg3J0awDdwMt5XfXPzCwbEUKC//H+o/Alqrlb62s+Tw3Sf3f
-	6+S/7GOIALQ8H7S5NrBu5LbCBVAQ=
-X-Google-Smtp-Source: AGHT+IFfblkHjtkpy89oqgoQVHtlbxXiTCQwLk37nU1+Im4GK/deocfjEDtgV7/8pSS3SaHG8xGssNNgpDF2aImWS8k=
-X-Received: by 2002:a17:90a:f485:b0:2d8:9f4e:1c3d with SMTP id
- 98e67ed59e1d1-2e5618efbaemr2720209a91.5.1729341679619; Sat, 19 Oct 2024
- 05:41:19 -0700 (PDT)
+	s=arc-20240116; t=1729341807; c=relaxed/simple;
+	bh=MCECID1mMns7JnFmuQsykWtjlGQqgJ0LlFwOWLuAAgw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dYwcsPI50cDAFr/zVyzZolsaRWH3UYyXst5c3D4fyvEeQsq+zt4HxfdkFctRjifvOAsOGRON3SEM+4Avt6SN/GJWmnVg+drge7NU9tpr4zMZPBm4ffw3HdToOI0QfT0XXdaBROqyeYpisZjHWK8LlOH/GpD/Lr3ED6or5DmkdSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YxPX3zU+; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BAE5E1BF203;
+	Sat, 19 Oct 2024 12:43:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1729341801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WLdd6Is6r9a0Ysxdr4jYilHpYOiFvt9fjYlY3rJCk0o=;
+	b=YxPX3zU+8ZH3tnMKQuGaMji+D3DkUhBuB/iWLf6UE7m7h/TL/IfOfFF4DVrMR499UtZyxc
+	OmHbIxa/UEccD3UWZYO/+BfqIwF5TfYG21E284NfQUUeexdkyG2IysofXVXaE4xmeeNfKj
+	e/9JmD0oFTRg8mY2bIcGJxgz+NZta0UEO9JPf+xdNGW6KAfLRB8d9vQFGZt/VBN+XLFuIO
+	ek8+KIFbla/OXUmOR3jxm6a2fQ6hKhT+FAov726T1ZdO+B/CF8PZaXLNi6+W5U+U7JaNwp
+	pAg4NWCQl2iz2X1GpboOs+0XjFZuvWC6v0kjEMPwjy6U5PfDbdfx5Y7hs7cXgw==
+Message-ID: <b9f7bf76-d58f-4e65-82e7-551464b6b7df@bootlin.com>
+Date: Sat, 19 Oct 2024 14:43:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016035214.2229-1-fujita.tomonori@gmail.com>
- <20241016035214.2229-3-fujita.tomonori@gmail.com> <6bc68839-a115-467f-b83e-21be708f78d7@lunn.ch>
- <CANiq72=_9cxkife3=b7acM7LbmwTLcXMX9LZpDP2JMvy=z3qkA@mail.gmail.com>
- <940d2002-650e-4e56-bc12-1aac2031e827@lunn.ch> <CANiq72nV2+9cWd1pjjpfr_oG_mQQuwkLaoya9p5uJ4qJ2wS_mw@mail.gmail.com>
-In-Reply-To: <CANiq72nV2+9cWd1pjjpfr_oG_mQQuwkLaoya9p5uJ4qJ2wS_mw@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 19 Oct 2024 14:41:07 +0200
-Message-ID: <CANiq72=SDN89a8erzWdFG4nekGie3LomA73=OEM8W7DJPQFj0g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/8] rust: time: Introduce Delta type
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu, 
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org, 
-	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 4/6] selftests/bpf: add ipv4 and dual ipv4/ipv6
+ support in btf_skc_cls_ingress
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ ebpf@linuxfoundation.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Lorenz Bauer <lmb@cloudflare.com>, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241016-syncookie-v1-0-3b7a0de12153@bootlin.com>
+ <20241016-syncookie-v1-4-3b7a0de12153@bootlin.com>
+ <43f0d39a-b353-4f38-85f7-e0a557f911f9@linux.dev>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <43f0d39a-b353-4f38-85f7-e0a557f911f9@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Sat, Oct 19, 2024 at 2:21=E2=80=AFPM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> differently, e.g. `to_micros_ceil`: `to_` since it is not "free"
+On 10/19/24 02:30, Martin KaFai Lau wrote:
+> On 10/16/24 11:35 AM, Alexis Lothoré (eBPF Foundation) wrote:
 
-Well, it is sufficiently free, I guess, considering other methods. I
-noticed `as_*()` in this patch take `self` rather than `&self`, though.
+[...]
 
-Cheers,
-Miguel
+>>   +    switch (ip_mode) {
+>> +    case TEST_MODE_IPV4:
+>> +        sock_family = AF_INET;
+>> +        srv_addr = SERVER_ADDR_IPV4;
+>> +        addr = (struct sockaddr_storage *)&srv_sa4;
+>> +        addr_len = sizeof(srv_sa4);
+>> +        break;
+>> +    case TEST_MODE_IPV6:
+>> +        opts.post_socket_cb = v6only_true;
+>> +        sock_family = AF_INET6;
+>> +        srv_addr = SERVER_ADDR_IPV6;
+>> +        addr = (struct sockaddr_storage *)&srv_sa6;
+>> +        addr_len = sizeof(srv_sa6);
+>> +        break;
+>> +    case TEST_MODE_DUAL:
+>> +        opts.post_socket_cb = v6only_false;
+>> +        sock_family = AF_INET6;
+>> +        srv_addr = SERVER_ADDR_DUAL;
+>> +        addr = (struct sockaddr_storage *)&srv_sa6;
+>> +        addr_len = sizeof(srv_sa6);
+>> +        break;
+>> +    default:
+>> +            break;
+> 
+> nit. indentation is off.
+
+True, and for some reason checkpatch does not raise any warning here. This will
+be fixed in v2 for all switch cases
+
+> better directly "return;", in case future something complains vars are not init.
+
+ACK. I'll also add a PRINT_FAIL call in those default statements.
+
+> 
+>> +    }
+>> +
+>>       if (write_sysctl("/proc/sys/net/ipv4/tcp_syncookies", tcp_syncookies))
+>>           return;
+>>   -    listen_fd = start_server(AF_INET6, SOCK_STREAM, "::1", 0, 0);
+>> +    listen_fd = start_server_str(sock_family, SOCK_STREAM, srv_addr,  0,
+>> +                     &opts);
+>>       if (!ASSERT_OK_FD(listen_fd, "start server"))
+>>           return;
+>>   -    err = getsockname(listen_fd, (struct sockaddr *)&srv_sa6, &addrlen);
+>> +    err = getsockname(listen_fd, (struct sockaddr *)addr, &addr_len);
+>>       if (!ASSERT_OK(err, "getsockname(listen_fd)"))
+>>           goto done;
+>> -    memcpy(&skel->bss->srv_sa6, &srv_sa6, sizeof(srv_sa6));
+>> -    srv_port = ntohs(srv_sa6.sin6_port);
+>> +
+>> +    switch (ip_mode) {
+>> +    case TEST_MODE_IPV4:
+>> +        memcpy(&skel->bss->srv_sa4, &srv_sa4, sizeof(srv_sa4));
+>> +        srv_port = ntohs(srv_sa4.sin_port);
+>> +        break;
+>> +    case TEST_MODE_IPV6:
+>> +    case TEST_MODE_DUAL:
+>> +        memcpy(&skel->bss->srv_sa6, &srv_sa6, sizeof(srv_sa6));
+>> +        srv_port = ntohs(srv_sa6.sin6_port);
+>> +        break;
+>> +    default:
+>> +            break;
+> 
+> indentation off. also "goto done;"
+
+I can add the goto done as a safety net (eg in case someone modifies the test
+later and miss some details), but with the return added on the switch above
+(also done on ip_mode), the goto should never be executed.
+
+[...]
+
+>>   -static int handle_ip6_tcp(struct ipv6hdr *ip6h, struct __sk_buff *skb)
+>> +static int handle_ip_tcp(struct ethhdr *eth, struct __sk_buff *skb)
+>>   {
+>> -    struct bpf_sock_tuple *tuple;
+>> +    struct bpf_sock_tuple *tuple = NULL;
+>> +    unsigned int tuple_len = 0;
+>>       struct bpf_sock *bpf_skc;
+>> -    unsigned int tuple_len;
+>> +    struct ipv6hdr *ip6h;
+>> +    void *iphdr = NULL;
+>> +    int iphdr_size = 0;
+>> +    struct iphdr *ip4h;
+> 
+> nit. All new "= 0;" and "= NULL;" init should not be needed.
+
+I added those "by default" because my last series raised some build errors with
+clang while building fine with gcc (but in the end, there was indeed code paths
+possibly using those variables uninitialized). ACK, I'll remove those initializers.
+
+[...]
+
+>> +    }
+>>   -    /* Is it the testing traffic? */
+>> -    if (th->dest != srv_sa6.sin6_port)
+>> +    if (!tuple) {
+> 
+> !tuple should not be possible. can be removed.
+
+I initially added that check because of the verifier complained about tuple
+being scalar. But I have checked and removed it again and it is now... accepted
+? I guess I was still missing some other parts when I got this error, very
+likely the `return TC_ACT_OK` in the default case. I'll then remove this check
+in v2.
+
+[...]
+
+>>   -    if (ip6h->nexthdr == IPPROTO_TCP)
+>> -        return handle_ip6_tcp(ip6h, skb);
+>> +    return handle_ip_tcp(eth, skb);
+>>         return TC_ACT_OK;
+> 
+> The last double return should have been removed also.
+
+That's indeed a miss, I'll remove it.
+
+Thanks,
+
+Alexis
+
+
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
