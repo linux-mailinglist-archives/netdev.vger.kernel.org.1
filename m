@@ -1,140 +1,73 @@
-Return-Path: <netdev+bounces-137252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73629A52A6
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 07:30:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CDA79A52DD
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 08:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58808B25D88
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 05:30:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74CE01C210C9
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 06:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8D51465BB;
-	Sun, 20 Oct 2024 05:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E970414A85;
+	Sun, 20 Oct 2024 06:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="FzsUprEn"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DGXmEkBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-hyfv10021501.me.com (pv50p00im-hyfv10021501.me.com [17.58.6.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FEC1C6B8
-	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 05:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BD11078F;
+	Sun, 20 Oct 2024 06:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729402142; cv=none; b=YMlEGzqmOgVFSSQc/De11iNSXToZ/a8p/Raz3dW8AxazwsMwGlAIiS1J9UCDDBKNagefCZUbcA70oq5iktkrUwkwXfId6RlQ6mXZS62YDntOAThY3gdMhgZXKxlrdMcIiJj3FUeelmxQB2kn3QK7fQjnryPQKtmV+4eDDmQ1qHE=
+	t=1729405068; cv=none; b=McooZtWt7wAyoSs/Zk+X5pUomDtCxtvYs8dHygZRPf1CtevcCQxRuKpt4LsB3J565jnndnTsyBJWdC4Si+acxHjxj2WexLWsq1kBvxEqu4JNqSuqo716+HcjOg6wJ0ZL2Yip+wIvQOK3YRBK89qdFig3KOr/IlTmG1JxsCz3rxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729402142; c=relaxed/simple;
-	bh=KAQIPjHa1pT2Qv7ml02HoE4WShDt3Q6Tb2e8TvTKe6g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nVi0Aehgj6vn0KCuSVBR6cHLQCMvBkw+Hg91e2LeJ8bCACPxnMacdZfWiDY0hzD94haPMoISocnl0T7txBrgbNfynNxX1WMUu4x++1CuVOZUN0L8ZS7c7Wf7KZraUKs4F1z9oK+0Sd4Tp4f8Y0czA3yNLDVUqu6cw6EnB6FTPqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=FzsUprEn; arc=none smtp.client-ip=17.58.6.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1729402140;
-	bh=Pzj4HJoWnL6JTLVf/LzhBRoFLqsQjjCajmU0HHRJmCM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To;
-	b=FzsUprEnaIdjyWcgh24n4owqgCzwCEevOvHP5TBSaiI+GpFyVFF48q7MSLp5srmER
-	 49VkFoBQ5XoQpE1j98Fz9ev9yh+BpUPjVvlh2BafPiLQAfKq2SsJQ07ku9Ojbg/XP2
-	 qQjJHhxdEPOqQNcrLMXTrx5ZDPZaVo46b169DrWuHQ7/ae1Hvj/yoA0J4KYc6WN3H5
-	 jtMwQfYBRhwhSywsNxKuMi4qXJ3zMT5IUD10mNexJhH0YpjHb6B0tjQL/CKMBbFHoH
-	 a5N7/J7iztEt7vk1VaMooWxFcs+nn+rmK9i3u80xPHGABylS8yFXBCxdO4oGvU8vqs
-	 Vz/Asg70Uh8Zg==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-hyfv10021501.me.com (Postfix) with ESMTPSA id 24D4C2C0141;
-	Sun, 20 Oct 2024 05:28:54 +0000 (UTC)
-From: Zijun Hu <zijun_hu@icloud.com>
-Date: Sun, 20 Oct 2024 13:27:51 +0800
-Subject: [PATCH 6/6] phy: core: Simplify API of_phy_simple_xlate()
- implementation
+	s=arc-20240116; t=1729405068; c=relaxed/simple;
+	bh=G/1xgmvmCVD6P5EbRSlcwDqkGQuE6FYxtj7EawHoTsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rvyh4xaE4D2AQgqzKov0w88SkvHp9qJD1f2kRNTpUquJD06uhzpCd+Jpr09x04zdwGqSr4pJy/+NXbSHc9x7hi0GRlFayBakWtX89hX+ujENnXVwYtbU9g+a+wtmX+TL2Hw1YJUZHixFojgGZPGRBnnE4aYPdV7CA9thPYv4TSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DGXmEkBb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A48F8C4CEC6;
+	Sun, 20 Oct 2024 06:17:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1729405068;
+	bh=G/1xgmvmCVD6P5EbRSlcwDqkGQuE6FYxtj7EawHoTsc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DGXmEkBbSpYbw68XATKUIDRmjQGkZR1iz9ATYk7/MLr1cQ1brWvo1c169o9PyERpm
+	 HWLfaqaorf1UNxw2Wah4bwXJYMjCLl0wBybH0jRKNm8Uc6S0ay2yu0ItVQluOwhCcY
+	 QcCE4g+HK9LcOOTa6CZhk1ohm3ejp6mZ+YEXRm1w=
+Date: Sun, 20 Oct 2024 08:17:44 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Benjamin Grosse <ste3ls@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers/net/usb: Lenovo Mini Dock, add support for new
+ USB device ID 0x17EF:0x3098 for the r8152 driver
+Message-ID: <2024102028-postnasal-cruelty-8da9@gregkh>
+References: <CAPvBWb=L6FVwSk7iZX21Awez+dwhLMAoGe39f__VC=g7g6H2+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241020-phy_core_fix-v1-6-078062f7da71@quicinc.com>
-References: <20241020-phy_core_fix-v1-0-078062f7da71@quicinc.com>
-In-Reply-To: <20241020-phy_core_fix-v1-0-078062f7da71@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, 
- Kishon Vijay Abraham I <kishon@kernel.org>, Felipe Balbi <balbi@ti.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
- Lee Jones <lee@kernel.org>
-Cc: Zijun Hu <zijun_hu@icloud.com>, stable@vger.kernel.org, 
- linux-phy@lists.infradead.org, netdev@vger.kernel.org, 
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Zijun Hu <quic_zijuhu@quicinc.com>
-X-Mailer: b4 0.14.1
-X-Proofpoint-ORIG-GUID: 0V1SomLf6-r1ySnqSOHR_zWePw_E5J9r
-X-Proofpoint-GUID: 0V1SomLf6-r1ySnqSOHR_zWePw_E5J9r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-20_02,2024-10-17_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 spamscore=0
- malwarescore=0 phishscore=0 mlxscore=0 adultscore=0 bulkscore=0
- mlxlogscore=999 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2308100000 definitions=main-2410200032
-X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPvBWb=L6FVwSk7iZX21Awez+dwhLMAoGe39f__VC=g7g6H2+g@mail.gmail.com>
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+On Sat, Oct 19, 2024 at 07:37:06PM +0100, Benjamin Grosse wrote:
+> >From 7a75dea5721225f4280be53996421962af430c8b Mon Sep 17 00:00:00 2001
+> From: =?UTF-8?q?Benjamin=20Gro=C3=9Fe?= <ste3ls@gmail.com>
+> Date: Sat, 19 Oct 2024 10:05:29 +0100
+> Subject: [PATCH] usb: add support for new USB device ID 0x17EF:0x3098 for the
+>  r8152 driver
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=UTF-8
+> Content-Transfer-Encoding: 8bit
 
-Simplify of_phy_simple_xlate() implementation by API
-class_find_device_by_of_node() which is also safer since it
-subsys_get() @phy_class subsystem firstly then iterates devices.
-
-Also comment its parameter @dev with unused in passing since the parameter
-provides no available input info but acts as an auto variable.
-
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- drivers/phy/phy-core.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
-index 24bd619a33dd..102fc6b6ff71 100644
---- a/drivers/phy/phy-core.c
-+++ b/drivers/phy/phy-core.c
-@@ -748,7 +748,7 @@ EXPORT_SYMBOL_GPL(devm_phy_put);
- 
- /**
-  * of_phy_simple_xlate() - returns the phy instance from phy provider
-- * @dev: the PHY provider device
-+ * @dev: the PHY provider device unused
-  * @args: of_phandle_args (not used here)
-  *
-  * Intended to be used by phy provider for the common case where #phy-cells is
-@@ -759,20 +759,13 @@ EXPORT_SYMBOL_GPL(devm_phy_put);
- struct phy *of_phy_simple_xlate(struct device *dev,
- 				const struct of_phandle_args *args)
- {
--	struct phy *phy;
--	struct class_dev_iter iter;
--
--	class_dev_iter_init(&iter, &phy_class, NULL, NULL);
--	while ((dev = class_dev_iter_next(&iter))) {
--		phy = to_phy(dev);
--		if (args->np != phy->dev.of_node)
--			continue;
-+	struct device *target_dev;
- 
--		class_dev_iter_exit(&iter);
--		return phy;
-+	target_dev = class_find_device_by_of_node(&phy_class, args->np);
-+	if (target_dev) {
-+		put_device(target_dev);
-+		return to_phy(target_dev);
- 	}
--
--	class_dev_iter_exit(&iter);
- 	return ERR_PTR(-ENODEV);
- }
- EXPORT_SYMBOL_GPL(of_phy_simple_xlate);
-
--- 
-2.34.1
+Something went wrong, this shouldn't be in your changelog text :(
 
 
