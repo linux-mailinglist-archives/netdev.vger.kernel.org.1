@@ -1,221 +1,228 @@
-Return-Path: <netdev+bounces-137244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821AC9A51F5
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 03:47:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 253659A5206
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 05:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0D291C2132E
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 01:47:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C9862827AC
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 03:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBD1747F;
-	Sun, 20 Oct 2024 01:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0388A440C;
+	Sun, 20 Oct 2024 03:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KhHioePn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail03.siengine.com (mail03.siengine.com [43.240.192.165])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329DA7464
-	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 01:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.240.192.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA52E3D6B
+	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 03:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729388854; cv=none; b=L8N3p26J+BH/cXei4ItRSNOS5foU48+SrbOEtYD/j1VXjJBJ6KW/5tw26/e6Zsi00u5Z2bO7hZ1OKeEakVg2qXeAZ5YEH3C2AIG1iD8r2X9bpQzPbjouQ+88QMSw175STW6tPKk9vQPzqcmV1biZPyHpFIXM25N06klldAH3j7o=
+	t=1729393696; cv=none; b=RxHoYIuOlJuQuHw+Q6UQ/kLGVtfs0V/UtzCjiKDkCQhriL732l4gs1D/zwLESVlDIzHoe+wrHaTpKNh592WPNjsFV7xuIUJKOkJHrP1g/11izB/lKYdjo5R2CjuShb+csplWE5fdFSJ3y3tm7nfWX/R3Mc4CUGteVqZ2zhf9mJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729388854; c=relaxed/simple;
-	bh=BujBYmnRAJp3XmojequG3tFaoSP+SIJxRFdXh3/k5SU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NIHY2GT1qyTlyaQF8nPyvhJOMAHluYPl8ZQSQruJ9RceckjOD3SC2amOuV1xf+lGYzpXuvqAijqtBqMSuLALlDCyM5ACZ/JRs/Zy12Ont9Mo8CDxBPwoMQ4SW0YzFpLxWoRkxrcbd+brII0bxTixYxAhjbzaWbT4lyDxYlP4TWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=siengine.com; spf=pass smtp.mailfrom=siengine.com; arc=none smtp.client-ip=43.240.192.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=siengine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siengine.com
-Received: from dsgsiengine01.siengine.com ([10.8.1.61])
-	by mail03.siengine.com with ESMTPS id 49K1jhgY057326
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 20 Oct 2024 09:45:43 +0800 (+08)
-	(envelope-from hailong.fan@siengine.com)
-Received: from SEEXMB03-2019.siengine.com (SEEXMB03-2019.siengine.com [10.8.1.33])
-	by dsgsiengine01.siengine.com (SkyGuard) with ESMTPS id 4XWLqp1QtLz7ZMSJ;
-	Sun, 20 Oct 2024 09:45:42 +0800 (CST)
-Received: from SEEXMB05-2019.siengine.com (10.8.1.153) by
- SEEXMB03-2019.siengine.com (10.8.1.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1544.11; Sun, 20 Oct 2024 09:45:42 +0800
-Received: from SEEXMB03-2019.siengine.com (10.8.1.33) by
- SEEXMB05-2019.siengine.com (10.8.1.153) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1544.9; Sun, 20 Oct 2024 09:45:41 +0800
-Received: from SEEXMB03-2019.siengine.com ([fe80::23e0:1bbb:3ec9:73fe]) by
- SEEXMB03-2019.siengine.com ([fe80::23e0:1bbb:3ec9:73fe%16]) with mapi id
- 15.02.1544.011; Sun, 20 Oct 2024 09:45:41 +0800
-From: =?utf-8?B?RmFuIEhhaWxvbmcv6IyD5rW36b6Z?= <hailong.fan@siengine.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Simon Horman <horms@kernel.org>, "2694439648@qq.com" <2694439648@qq.com>,
-        "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-        "joabreu@synopsys.com" <joabreu@synopsys.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: =?utf-8?B?5Zue5aSNOiDlm57lpI06IFtQQVRDSF0gbmV0OiBzdG1tYWM6IGVuYWJsZSBN?=
- =?utf-8?Q?AC_after_MTL_configuring?=
-Thread-Topic: =?utf-8?B?5Zue5aSNOiBbUEFUQ0hdIG5ldDogc3RtbWFjOiBlbmFibGUgTUFDIGFmdGVy?=
- =?utf-8?Q?_MTL_configuring?=
-Thread-Index: AQHbHfwmUFDRUPAmP0Op3UD8MH3slLKKOd6AgAF8NlCAAJYugIACmsmw
-Date: Sun, 20 Oct 2024 01:45:41 +0000
-Message-ID: <daf687938ae1413bbc556134b47d0629@siengine.com>
-References: <tencent_6BF819F333D995B4D3932826194B9B671207@qq.com>
- <20241017101857.GE1697@kernel.org>
- <bd7a1be5cec348dab22f7d0c2552967d@siengine.com>
- <9a11c47e-0cd6-4741-a25b-68538763110a@lunn.ch>
-In-Reply-To: <9a11c47e-0cd6-4741-a25b-68538763110a@lunn.ch>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator:
-Content-Type: multipart/mixed;
-	boundary="_002_daf687938ae1413bbc556134b47d0629sienginecom_"
+	s=arc-20240116; t=1729393696; c=relaxed/simple;
+	bh=QPgWS4lMtZvAEVX6HvEVtO7MZw8iCYgJoBHYExlFH6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p7DdxpT/RuFOlF3NvO4RjCFBEgDSxCpHjyDyAJ+cQxZd9T0IIZv3l+/32TUCMpiBUqlSxLDdc6c1u0+fvOmZ+WiMnPRgYpKOCTSi+OFh6FPvpwQ3/kIUyYe8WZoKvsSq+G2sPVSEt0ypgv43izw8BTXjli0YJsRz3fmp6mDjNSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KhHioePn; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729393695; x=1760929695;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QPgWS4lMtZvAEVX6HvEVtO7MZw8iCYgJoBHYExlFH6E=;
+  b=KhHioePnIxEhs1Lx3KJbjZCs7M+KI+QaxjnA09PG7mKBeT5kv4lXUbcz
+   HPEsLslUmkZFQkx4F3oJ5rikQ+15dzgdw2Z8Y/ltvtnPlh+F790WoC/RZ
+   z3/po3lxjx80yJccCSNy7qKnRiGsejIpA5ao6yW0SzFXGpo9Ae1SQS6u3
+   d/aWJePtlGEhnsyE7jE4ZwP0knRfcyX1w86kZXelhUDuHpKK/3fOsWgEH
+   uHB8ChG16xn5Zrr1r05wL68Z7SMgydC86hecK3b+pDB7KOObGNH1vkJps
+   Dn2i64bKIEdOtcjElCheGLk9lh2csVD+1EHKOC0SXvaKfr9tMenXe/Rfo
+   w==;
+X-CSE-ConnectionGUID: xdokhVtoSPG5VwtpCTBDSA==
+X-CSE-MsgGUID: owBJ4HbnSbqfOjG6OBCEIQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39442882"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="39442882"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2024 20:08:14 -0700
+X-CSE-ConnectionGUID: MdjTsAKQQnyxHlxAZJYBCA==
+X-CSE-MsgGUID: hr4+EkSsTbSJEgiov9URhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,217,1725346800"; 
+   d="scan'208";a="79167636"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 19 Oct 2024 20:08:12 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t2MIc-000Pod-03;
+	Sun, 20 Oct 2024 03:08:10 +0000
+Date: Sun, 20 Oct 2024 11:07:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 11/11] ipv4: Convert devinet_ioctl to
+ per-netns RTNL.
+Message-ID: <202410201022.bZkEgzK5-lkp@intel.com>
+References: <20241018012225.90409-12-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-DKIM-Results: [10.8.1.61]; dkim=none;
-X-DNSRBL: 
-X-SPAM-SOURCE-CHECK: pass
-X-MAIL:mail03.siengine.com 49K1jhgY057326
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018012225.90409-12-kuniyu@amazon.com>
 
---_002_daf687938ae1413bbc556134b47d0629sienginecom_
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Hi Kuniyuki,
 
-SGkgDQoNClBsZWFzZSBmaW5kIG5ldyBwYXRjaCBpbiBhdHRhY2htZW50cywgdGhhbmtzLg0KDQoN
-Ci0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujogQW5kcmV3IEx1bm4gPGFuZHJld0Bs
-dW5uLmNoPiANCuWPkemAgeaXtumXtDogMjAyNOW5tDEw5pyIMTnml6UgMTo1Nw0K5pS25Lu25Lq6
-OiBGYW4gSGFpbG9uZy/ojIPmtbfpvpkgPGhhaWxvbmcuZmFuQHNpZW5naW5lLmNvbT4NCuaKhOmA
-gTogU2ltb24gSG9ybWFuIDxob3Jtc0BrZXJuZWwub3JnPjsgMjY5NDQzOTY0OEBxcS5jb207IGFs
-ZXhhbmRyZS50b3JndWVAZm9zcy5zdC5jb207IGpvYWJyZXVAc3lub3BzeXMuY29tOyBkYXZlbUBk
-YXZlbWxvZnQubmV0OyBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7IHBhYmVu
-aUByZWRoYXQuY29tOyBtY29xdWVsaW4uc3RtMzJAZ21haWwuY29tOyBuZXRkZXZAdmdlci5rZXJu
-ZWwub3JnOyBsaW51eC1zdG0zMkBzdC1tZC1tYWlsbWFuLnN0b3JtcmVwbHkuY29tOyBsaW51eC1h
-cm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
-cmcNCuS4u+mimDogUmU6IOWbnuWkjTogW1BBVENIXSBuZXQ6IHN0bW1hYzogZW5hYmxlIE1BQyBh
-ZnRlciBNVEwgY29uZmlndXJpbmcNCg0KT24gRnJpLCBPY3QgMTgsIDIwMjQgYXQgMDE6MTU6MzBB
-TSArMDAwMCwgRmFuIEhhaWxvbmcv6IyD5rW36b6ZIHdyb3RlOg0KPiBIaQ0KPiANCj4gRm9yIGV4
-YW1wbGUsIEVUSCBpcyBkaXJlY3RseSBjb25uZWN0ZWQgdG8gdGhlIHN3aXRjaCwgd2hpY2ggbmV2
-ZXIgcG93ZXIgZG93biBhbmQgc2VuZHMgYnJvYWRjYXN0IHBhY2tldHMgYXQgcmVndWxhciBpbnRl
-cnZhbHMuIA0KPiBEdXJpbmcgdGhlIHByb2Nlc3Mgb2Ygb3BlbmluZyBFVEgsIGRhdGEgbWF5IGZs
-b3cgaW50byB0aGUgTVRMIEZJRk8sIG9uY2UgTUFDIFJYIGlzIGVuYWJsZWQuDQo+IGFuZCB0aGVu
-LCBNVEwgd2lsbCBiZSBzZXQsIHN1Y2ggYXMgRklGTyBzaXplLiANCj4gT25jZSBlbmFibGUgRE1B
-LCBUaGVyZSBpcyBhIGNlcnRhaW4gcHJvYmFiaWxpdHkgdGhhdCBETUEgd2lsbCByZWFkIGluY29y
-cmVjdCBkYXRhIGZyb20gTVRMIEZJRk8sIGNhdXNpbmcgRE1BIHRvIGhhbmcgdXAuIA0KPiBCeSBy
-ZWFkIERNQV9EZWJ1Z19TdGF0dXMsIHlvdSBjYW4gYmUgb2JzZXJ2ZWQgdGhhdCB0aGUgUlBTIHJl
-bWFpbnMgYXQgYSBjZXJ0YWluIHZhbHVlIGZvcmV2ZXIuIA0KPiBUaGUgY29ycmVjdCBwcm9jZXNz
-IHNob3VsZCBiZSB0byBjb25maWd1cmUgTUFDL01UTC9ETUEgYmVmb3JlIGVuYWJsaW5nIERNQS9N
-QUMNCg0KV2hhdCBTaW1vbiBpcyBhc2tpbmcgZm9yIGlzIHRoYXQgdGhpcyBpcyBwYXJ0IG9mIHRo
-ZSBjb21taXQgbWVzc2FnZS4NCg0KUGxlYXNlIGFsc28gZG9uJ3QgdG9wIHBvc3QuDQoNCiAgICBB
-bmRyZXcNCg0KLS0tDQpwdy1ib3Q6IGNyDQo=
+kernel test robot noticed the following build warnings:
 
---_002_daf687938ae1413bbc556134b47d0629sienginecom_
-Content-Type: application/octet-stream;
-	name="0001-net-stmmac-enable-MAC-after-MTL-configuring.patch"
-Content-Description: 0001-net-stmmac-enable-MAC-after-MTL-configuring.patch
-Content-Disposition: attachment;
-	filename="0001-net-stmmac-enable-MAC-after-MTL-configuring.patch"; size=4554;
-	creation-date="Sun, 20 Oct 2024 01:43:57 GMT";
-	modification-date="Sun, 20 Oct 2024 01:42:30 GMT"
-Content-Transfer-Encoding: base64
+[auto build test WARNING on net-next/main]
 
-RnJvbSA1N2M5MzQ2M2NmNmJlM2ZkMDMwOTE4ZDg0NmVmM2Q2NWM3NTRkMjAxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiAiaGFpbG9uZy5mYW4iIDxoYWlsb25nLmZhbkBzaWVuZ2luZS5j
-b20+CkRhdGU6IE1vbiwgMTQgT2N0IDIwMjQgMTE6MTk6MTYgKzA4MDAKU3ViamVjdDogW1BBVENI
-XSBuZXQ6IHN0bW1hYzogZW5hYmxlIE1BQyBhZnRlciBNVEwgY29uZmlndXJpbmcKCkRNQSBtYXli
-ZSBibG9jayB3aGlsZSBFVEggaXMgb3BlbmluZywKQWRqdXN0IHRoZSBlbmFibGUgc2VxdWVuY2Us
-IHB1dCB0aGUgTUFDIGVuYWJsZSBsYXN0CgpGb3IgZXhhbXBsZSwgRVRIIGlzIGRpcmVjdGx5IGNv
-bm5lY3RlZCB0byB0aGUgc3dpdGNoLAp3aGljaCBuZXZlciBwb3dlciBkb3duIGFuZCBzZW5kcyBi
-cm9hZGNhc3QgcGFja2V0cyBhdCByZWd1bGFyIGludGVydmFscy4KRHVyaW5nIHRoZSBwcm9jZXNz
-IG9mIG9wZW5pbmcgRVRILCBkYXRhIG1heSBmbG93IGludG8gdGhlIE1UTCBGSUZPLApvbmNlIE1B
-QyBSWCBpcyBlbmFibGVkLiBhbmQgdGhlbiwgTVRMIHdpbGwgYmUgc2V0LCBzdWNoIGFzIEZJRk8g
-c2l6ZS4KT25jZSBlbmFibGUgRE1BLCBUaGVyZSBpcyBhIGNlcnRhaW4gcHJvYmFiaWxpdHkgdGhh
-dCBETUEgd2lsbCByZWFkCmluY29ycmVjdCBkYXRhIGZyb20gTVRMIEZJRk8sIGNhdXNpbmcgRE1B
-IHRvIGhhbmcgdXAuCkJ5IHJlYWQgRE1BX0RlYnVnX1N0YXR1cywgeW91IGNhbiBiZSBvYnNlcnZl
-ZCB0aGF0IHRoZSBSUFMgcmVtYWlucyBhdAphIGNlcnRhaW4gdmFsdWUgZm9yZXZlci4gVGhlIGNv
-cnJlY3QgcHJvY2VzcyBzaG91bGQgYmUgdG8gY29uZmlndXJlCk1BQy9NVEwvRE1BIGJlZm9yZSBl
-bmFibGluZyBETUEvTUFDCgpTaWduZWQtb2ZmLWJ5OiBoYWlsb25nLmZhbiA8aGFpbG9uZy5mYW5A
-c2llbmdpbmUuY29tPgotLS0KIGRyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL2R3
-bWFjNF9saWIuYyAgIHwgIDggLS0tLS0tLS0KIGRyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8v
-c3RtbWFjL2R3eGdtYWMyX2RtYS5jIHwgMTIgLS0tLS0tLS0tLS0tCiBkcml2ZXJzL25ldC9ldGhl
-cm5ldC9zdG1pY3JvL3N0bW1hYy9zdG1tYWNfbWFpbi5jICB8ICA2ICsrKy0tLQogMyBmaWxlcyBj
-aGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDIzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL2R3bWFjNF9saWIuYyBiL2RyaXZlcnMv
-bmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL2R3bWFjNF9saWIuYwppbmRleCAwZDE4NWU1NGUu
-LjkyNDQ4ZDg1OCAxMDA2NDQKLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1t
-YWMvZHdtYWM0X2xpYi5jCisrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFj
-L2R3bWFjNF9saWIuYwpAQCAtNTAsMTAgKzUwLDYgQEAgdm9pZCBkd21hYzRfZG1hX3N0YXJ0X3R4
-KHN0cnVjdCBzdG1tYWNfcHJpdiAqcHJpdiwgdm9pZCBfX2lvbWVtICppb2FkZHIsCiAKIAl2YWx1
-ZSB8PSBETUFfQ09OVFJPTF9TVDsKIAl3cml0ZWwodmFsdWUsIGlvYWRkciArIERNQV9DSEFOX1RY
-X0NPTlRST0woZHdtYWM0X2FkZHJzLCBjaGFuKSk7Ci0KLQl2YWx1ZSA9IHJlYWRsKGlvYWRkciAr
-IEdNQUNfQ09ORklHKTsKLQl2YWx1ZSB8PSBHTUFDX0NPTkZJR19URTsKLQl3cml0ZWwodmFsdWUs
-IGlvYWRkciArIEdNQUNfQ09ORklHKTsKIH0KIAogdm9pZCBkd21hYzRfZG1hX3N0b3BfdHgoc3Ry
-dWN0IHN0bW1hY19wcml2ICpwcml2LCB2b2lkIF9faW9tZW0gKmlvYWRkciwKQEAgLTc3LDEwICs3
-Myw2IEBAIHZvaWQgZHdtYWM0X2RtYV9zdGFydF9yeChzdHJ1Y3Qgc3RtbWFjX3ByaXYgKnByaXYs
-IHZvaWQgX19pb21lbSAqaW9hZGRyLAogCXZhbHVlIHw9IERNQV9DT05UUk9MX1NSOwogCiAJd3Jp
-dGVsKHZhbHVlLCBpb2FkZHIgKyBETUFfQ0hBTl9SWF9DT05UUk9MKGR3bWFjNF9hZGRycywgY2hh
-bikpOwotCi0JdmFsdWUgPSByZWFkbChpb2FkZHIgKyBHTUFDX0NPTkZJRyk7Ci0JdmFsdWUgfD0g
-R01BQ19DT05GSUdfUkU7Ci0Jd3JpdGVsKHZhbHVlLCBpb2FkZHIgKyBHTUFDX0NPTkZJRyk7CiB9
-CiAKIHZvaWQgZHdtYWM0X2RtYV9zdG9wX3J4KHN0cnVjdCBzdG1tYWNfcHJpdiAqcHJpdiwgdm9p
-ZCBfX2lvbWVtICppb2FkZHIsCmRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1p
-Y3JvL3N0bW1hYy9kd3hnbWFjMl9kbWEuYyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8v
-c3RtbWFjL2R3eGdtYWMyX2RtYS5jCmluZGV4IDc4NDBiYzQwMy4uY2JhMTJlZGMxIDEwMDY0NAot
-LS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1hYy9kd3hnbWFjMl9kbWEuYwor
-KysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1hYy9kd3hnbWFjMl9kbWEuYwpA
-QCAtMjg4LDEwICsyODgsNiBAQCBzdGF0aWMgdm9pZCBkd3hnbWFjMl9kbWFfc3RhcnRfdHgoc3Ry
-dWN0IHN0bW1hY19wcml2ICpwcml2LAogCXZhbHVlID0gcmVhZGwoaW9hZGRyICsgWEdNQUNfRE1B
-X0NIX1RYX0NPTlRST0woY2hhbikpOwogCXZhbHVlIHw9IFhHTUFDX1RYU1Q7CiAJd3JpdGVsKHZh
-bHVlLCBpb2FkZHIgKyBYR01BQ19ETUFfQ0hfVFhfQ09OVFJPTChjaGFuKSk7Ci0KLQl2YWx1ZSA9
-IHJlYWRsKGlvYWRkciArIFhHTUFDX1RYX0NPTkZJRyk7Ci0JdmFsdWUgfD0gWEdNQUNfQ09ORklH
-X1RFOwotCXdyaXRlbCh2YWx1ZSwgaW9hZGRyICsgWEdNQUNfVFhfQ09ORklHKTsKIH0KIAogc3Rh
-dGljIHZvaWQgZHd4Z21hYzJfZG1hX3N0b3BfdHgoc3RydWN0IHN0bW1hY19wcml2ICpwcml2LCB2
-b2lkIF9faW9tZW0gKmlvYWRkciwKQEAgLTMwMiwxMCArMjk4LDYgQEAgc3RhdGljIHZvaWQgZHd4
-Z21hYzJfZG1hX3N0b3BfdHgoc3RydWN0IHN0bW1hY19wcml2ICpwcml2LCB2b2lkIF9faW9tZW0g
-KmlvYWRkciwKIAl2YWx1ZSA9IHJlYWRsKGlvYWRkciArIFhHTUFDX0RNQV9DSF9UWF9DT05UUk9M
-KGNoYW4pKTsKIAl2YWx1ZSAmPSB+WEdNQUNfVFhTVDsKIAl3cml0ZWwodmFsdWUsIGlvYWRkciAr
-IFhHTUFDX0RNQV9DSF9UWF9DT05UUk9MKGNoYW4pKTsKLQotCXZhbHVlID0gcmVhZGwoaW9hZGRy
-ICsgWEdNQUNfVFhfQ09ORklHKTsKLQl2YWx1ZSAmPSB+WEdNQUNfQ09ORklHX1RFOwotCXdyaXRl
-bCh2YWx1ZSwgaW9hZGRyICsgWEdNQUNfVFhfQ09ORklHKTsKIH0KIAogc3RhdGljIHZvaWQgZHd4
-Z21hYzJfZG1hX3N0YXJ0X3J4KHN0cnVjdCBzdG1tYWNfcHJpdiAqcHJpdiwKQEAgLTMxNiwxMCAr
-MzA4LDYgQEAgc3RhdGljIHZvaWQgZHd4Z21hYzJfZG1hX3N0YXJ0X3J4KHN0cnVjdCBzdG1tYWNf
-cHJpdiAqcHJpdiwKIAl2YWx1ZSA9IHJlYWRsKGlvYWRkciArIFhHTUFDX0RNQV9DSF9SWF9DT05U
-Uk9MKGNoYW4pKTsKIAl2YWx1ZSB8PSBYR01BQ19SWFNUOwogCXdyaXRlbCh2YWx1ZSwgaW9hZGRy
-ICsgWEdNQUNfRE1BX0NIX1JYX0NPTlRST0woY2hhbikpOwotCi0JdmFsdWUgPSByZWFkbChpb2Fk
-ZHIgKyBYR01BQ19SWF9DT05GSUcpOwotCXZhbHVlIHw9IFhHTUFDX0NPTkZJR19SRTsKLQl3cml0
-ZWwodmFsdWUsIGlvYWRkciArIFhHTUFDX1JYX0NPTkZJRyk7CiB9CiAKIHN0YXRpYyB2b2lkIGR3
-eGdtYWMyX2RtYV9zdG9wX3J4KHN0cnVjdCBzdG1tYWNfcHJpdiAqcHJpdiwgdm9pZCBfX2lvbWVt
-ICppb2FkZHIsCmRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1h
-Yy9zdG1tYWNfbWFpbi5jIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvc3Rt
-bWFjX21haW4uYwppbmRleCBlMjE0MDQ4MjIuLmMxOWNhNjJhNCAxMDA2NDQKLS0tIGEvZHJpdmVy
-cy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvc3RtbWFjX21haW4uYworKysgYi9kcml2ZXJz
-L25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1hYy9zdG1tYWNfbWFpbi5jCkBAIC0zNDM3LDkgKzM0
-MzcsNiBAQCBzdGF0aWMgaW50IHN0bW1hY19od19zZXR1cChzdHJ1Y3QgbmV0X2RldmljZSAqZGV2
-LCBib29sIHB0cF9yZWdpc3RlcikKIAkJcHJpdi0+aHctPnJ4X2NzdW0gPSAwOwogCX0KIAotCS8q
-IEVuYWJsZSB0aGUgTUFDIFJ4L1R4ICovCi0Jc3RtbWFjX21hY19zZXQocHJpdiwgcHJpdi0+aW9h
-ZGRyLCB0cnVlKTsKLQogCS8qIFNldCB0aGUgSFcgRE1BIG1vZGUgYW5kIHRoZSBDT0UgKi8KIAlz
-dG1tYWNfZG1hX29wZXJhdGlvbl9tb2RlKHByaXYpOwogCkBAIC0zNTIzLDYgKzM1MjAsOSBAQCBz
-dGF0aWMgaW50IHN0bW1hY19od19zZXR1cChzdHJ1Y3QgbmV0X2RldmljZSAqZGV2LCBib29sIHB0
-cF9yZWdpc3RlcikKIAkvKiBTdGFydCB0aGUgYmFsbCByb2xsaW5nLi4uICovCiAJc3RtbWFjX3N0
-YXJ0X2FsbF9kbWEocHJpdik7CiAKKwkvKiBFbmFibGUgdGhlIE1BQyBSeC9UeCAqLworCXN0bW1h
-Y19tYWNfc2V0KHByaXYsIHByaXYtPmlvYWRkciwgdHJ1ZSk7CisKIAlzdG1tYWNfc2V0X2h3X3Zs
-YW5fbW9kZShwcml2LCBwcml2LT5odyk7CiAKIAlyZXR1cm4gMDsKLS0gCjIuMzQuMQoK
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/rtnetlink-Define-RTNL_FLAG_DOIT_PERNET-for-per-netns-RTNL-doit/20241018-092802
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241018012225.90409-12-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 11/11] ipv4: Convert devinet_ioctl to per-netns RTNL.
+config: x86_64-randconfig-122-20241019 (https://download.01.org/0day-ci/archive/20241020/202410201022.bZkEgzK5-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241020/202410201022.bZkEgzK5-lkp@intel.com/reproduce)
 
---_002_daf687938ae1413bbc556134b47d0629sienginecom_--
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410201022.bZkEgzK5-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+   net/ipv4/devinet.c:674:47: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu * @@
+   net/ipv4/devinet.c:674:47: sparse:     expected void *p
+   net/ipv4/devinet.c:674:47: sparse:     got struct in_ifaddr [noderef] __rcu *
+   net/ipv4/devinet.c:775:65: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu * @@
+   net/ipv4/devinet.c:775:65: sparse:     expected void *p
+   net/ipv4/devinet.c:775:65: sparse:     got struct in_ifaddr [noderef] __rcu *
+   net/ipv4/devinet.c:783:73: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu * @@
+   net/ipv4/devinet.c:783:73: sparse:     expected void *p
+   net/ipv4/devinet.c:783:73: sparse:     got struct in_ifaddr [noderef] __rcu *
+   net/ipv4/devinet.c:945:9: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu *ifa_list @@
+   net/ipv4/devinet.c:945:9: sparse:     expected void *p
+   net/ipv4/devinet.c:945:9: sparse:     got struct in_ifaddr [noderef] __rcu *ifa_list
+   net/ipv4/devinet.c:945:9: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu *ifa_next @@
+   net/ipv4/devinet.c:945:9: sparse:     expected void *p
+   net/ipv4/devinet.c:945:9: sparse:     got struct in_ifaddr [noderef] __rcu *ifa_next
+   net/ipv4/devinet.c:1135:63: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu * @@
+   net/ipv4/devinet.c:1135:63: sparse:     expected void *p
+   net/ipv4/devinet.c:1135:63: sparse:     got struct in_ifaddr [noderef] __rcu *
+   net/ipv4/devinet.c:1149:63: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu * @@
+   net/ipv4/devinet.c:1149:63: sparse:     expected void *p
+   net/ipv4/devinet.c:1149:63: sparse:     got struct in_ifaddr [noderef] __rcu *
+   net/ipv4/devinet.c:1313:9: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu *ifa_list @@
+   net/ipv4/devinet.c:1313:9: sparse:     expected void *p
+   net/ipv4/devinet.c:1313:9: sparse:     got struct in_ifaddr [noderef] __rcu *ifa_list
+>> net/ipv4/devinet.c:1313:9: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_ifaddr [noderef] __rcu *const ifa_next @@
+   net/ipv4/devinet.c:1313:9: sparse:     expected void *p
+   net/ipv4/devinet.c:1313:9: sparse:     got struct in_ifaddr [noderef] __rcu *const ifa_next
+   net/ipv4/devinet.c: note: in included file:
+   include/linux/inetdevice.h:261:54: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void *p @@     got struct in_device [noderef] __rcu *const ip_ptr @@
+   include/linux/inetdevice.h:261:54: sparse:     expected void *p
+   include/linux/inetdevice.h:261:54: sparse:     got struct in_device [noderef] __rcu *const ip_ptr
+   net/ipv4/devinet.c: note: in included file (through include/linux/inetdevice.h):
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+   include/linux/rtnetlink.h:153:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   include/linux/rtnetlink.h:153:16: sparse:    void [noderef] __rcu *
+   include/linux/rtnetlink.h:153:16: sparse:    void *
+
+vim +1313 net/ipv4/devinet.c
+
+  1299	
+  1300	int inet_gifconf(struct net_device *dev, char __user *buf, int len, int size)
+  1301	{
+  1302		struct in_device *in_dev = __in_dev_get_rtnl_net(dev);
+  1303		const struct in_ifaddr *ifa;
+  1304		struct ifreq ifr;
+  1305		int done = 0;
+  1306	
+  1307		if (WARN_ON(size > sizeof(struct ifreq)))
+  1308			goto out;
+  1309	
+  1310		if (!in_dev)
+  1311			goto out;
+  1312	
+> 1313		in_dev_for_each_ifa_rtnl_net(dev_net(dev), ifa, in_dev) {
+  1314			if (!buf) {
+  1315				done += size;
+  1316				continue;
+  1317			}
+  1318			if (len < size)
+  1319				break;
+  1320			memset(&ifr, 0, sizeof(struct ifreq));
+  1321			strcpy(ifr.ifr_name, ifa->ifa_label);
+  1322	
+  1323			(*(struct sockaddr_in *)&ifr.ifr_addr).sin_family = AF_INET;
+  1324			(*(struct sockaddr_in *)&ifr.ifr_addr).sin_addr.s_addr =
+  1325									ifa->ifa_local;
+  1326	
+  1327			if (copy_to_user(buf + done, &ifr, size)) {
+  1328				done = -EFAULT;
+  1329				break;
+  1330			}
+  1331			len  -= size;
+  1332			done += size;
+  1333		}
+  1334	out:
+  1335		return done;
+  1336	}
+  1337	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
