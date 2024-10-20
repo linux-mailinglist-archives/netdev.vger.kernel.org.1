@@ -1,107 +1,95 @@
-Return-Path: <netdev+bounces-137274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 830729A548E
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 16:47:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D7B49A5493
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 16:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E4FF1C20FFA
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:47:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE5B31C2103B
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E961925B8;
-	Sun, 20 Oct 2024 14:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D93192B99;
+	Sun, 20 Oct 2024 14:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2q6StgT1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0v1s0QmU"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B042209B;
-	Sun, 20 Oct 2024 14:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF4A1925B8;
+	Sun, 20 Oct 2024 14:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729435646; cv=none; b=nBo0QNW3NCdGI7eh5rGOLoXjiCXxVgfPK3fDfWKSKRG9PLWpqGhFBpfBHgCIqVJC0Pq2byEb1KYRQf/P6QO+zxZT6HalYIesRxAhLulhEpZeb9Jiw3+2Em0Ms7c8wOdDSJLdjnx/KMRRsPBs0grt3VF9/xKchsEKbcwdw1OWEDI=
+	t=1729435816; cv=none; b=lUhbYaw3WsWRYh/g7gTveCkbQ/y8Y5l8Lkc9KMjD4CenH3STegE0aOjDIK1PE4hrr4LAqyiL8XParhnz+qHelvl9Kan5Lukh63jqtoE52ftnuZGvZ/aDZWriUjH4ko+1cfbDbROlTdkBHf7eNGqTHgR4Hh9bqXx9nS6xnTkRH2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729435646; c=relaxed/simple;
-	bh=bdHe8oVf66Ft+GmEmF4nt9Sks7q1UbxWLdKl81fEQ1U=;
+	s=arc-20240116; t=1729435816; c=relaxed/simple;
+	bh=AVfTH01SvlduefmUhsSdFUoQPyygoRL2NA627woyiEg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=csOGLYQPeXd1jKhQU+JsG/eUqKXuJBGaeCWgN3ZKNL9vBgntWN8eMnMQfD06GFw2xghj3VJUsklxp3LhR1golkEzskCPBps03hVPFklrjob0hDb7AycAX5ukTzLo2U3kvUEZN00a7CMhD3SdVchXDuHhHahf4eK7hK+PKaUwygw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2q6StgT1; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KaD6h4hNVfyBD5srgbLa91tRD6XhclmXoicdauqSVlscXPwfeEeWxrgSHJPqMjdNg+zXG8cJCg6aeLRN5+BQ3DsUhemCTfGIEWg7p2MN+y/Sa9mMeLkGbC5XWLy6jlUMkPxdH97cunjxW6gxKpT+2dR9YBfsPW6gp6/E/Cs3qY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0v1s0QmU; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Zmyo1fTWbthMVmNxF8nKhGsgsGfAfxJZkUfU7Y5L4X8=; b=2q6StgT1ePMGCGk9pFg3okb6/v
-	KU0nneBoZwQWzTg2s12nlTNyNhQSFRV5GmT6zXZSbAyVL10DQHJnnrKGP19XYsWvC6HlMzNdP/ydQ
-	b6m/1jvXX5vZ59lNVdglNcmZ2J5h7+5R7Q1klB7Moql5qRLCqsOIYnUy2GrMomhm1tks=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=8zSrv9jMkJqjVhr6qHqhDSITJsgarczXcoOi1N3rASw=; b=0v
+	1s0QmUx9NfH7UbqmHsqHUILQYfngh/pdwOJtpC2seEo0UECRM+MMTJKK4uAYWgong3kB/iIr23Vmo
+	ZB+geJc8FywMWksxBRHgGO6ZYOq0IleJVmNIBHxQiQqKrAheyOwN0t17Rl30PNpCmEAhnCBjzVCD/
+	6T5qdsV5pLThyv8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t2XD1-00AeUw-TC; Sun, 20 Oct 2024 16:47:07 +0200
-Date: Sun, 20 Oct 2024 16:47:07 +0200
+	id 1t2XFU-00AeVi-UT; Sun, 20 Oct 2024 16:49:40 +0200
+Date: Sun, 20 Oct 2024 16:49:40 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: fix unreleased
- fwnode_handle in setup_port()
-Message-ID: <612445d2-d7c8-4bda-a070-e2c0ebbf3d4e@lunn.ch>
-References: <20241019-mv88e6xxx_chip-fwnode_handle_put-v1-1-fc92c4f16831@gmail.com>
- <11c644b5-e6e5-4c4c-9398-7a8e59519370@lunn.ch>
- <f148a61d-4ad5-4f62-b1f0-d216e1873067@gmail.com>
+To: Fan =?utf-8?B?SGFpbG9uZy/ojIPmtbfpvpk=?= <hailong.fan@siengine.com>
+Cc: Simon Horman <horms@kernel.org>,
+	"2694439648@qq.com" <2694439648@qq.com>,
+	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
+	"joabreu@synopsys.com" <joabreu@synopsys.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: =?utf-8?B?5Zue5aSNOiDlm57lpI0=?= =?utf-8?Q?=3A?= [PATCH] net:
+ stmmac: enable MAC after MTL configuring
+Message-ID: <ecc1aaf4-8676-453f-93bc-fd93d121b694@lunn.ch>
+References: <tencent_6BF819F333D995B4D3932826194B9B671207@qq.com>
+ <20241017101857.GE1697@kernel.org>
+ <bd7a1be5cec348dab22f7d0c2552967d@siengine.com>
+ <9a11c47e-0cd6-4741-a25b-68538763110a@lunn.ch>
+ <daf687938ae1413bbc556134b47d0629@siengine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <f148a61d-4ad5-4f62-b1f0-d216e1873067@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <daf687938ae1413bbc556134b47d0629@siengine.com>
 
-On Sun, Oct 20, 2024 at 12:21:07AM +0200, Javier Carrasco wrote:
-> On 19/10/2024 23:59, Andrew Lunn wrote:
-> > On Sat, Oct 19, 2024 at 10:16:49PM +0200, Javier Carrasco wrote:
-> >> 'ports_fwnode' is initialized via device_get_named_child_node(), which
-> >> requires a call to fwnode_handle_put() when the variable is no longer
-> >> required to avoid leaking memory.
-> >>
-> >> Add the missing fwnode_handle_put() after 'ports_fwnode' has been used
-> >> and is no longer required.
-> > 
-> > As you point out, the handle is obtained with
-> > device_get_named_child_node(). It seems odd to use a fwnode_ function
-> > not a device_ function to release the handle. Is there a device_
-> > function?
-> > 
-> > 	Andrew
+On Sun, Oct 20, 2024 at 01:45:41AM +0000, Fan Hailong/范海龙 wrote:
+> Hi 
 > 
-> 
-> Hi Andrew,
-> 
-> device_get_named_child_node() receives a pointer to a *device*, and
-> returns a child node (a pointer to an *fwnode_handle*). That is what has
-> to be released, and therefore fwnode_handle_put() is the right one.
-> 
-> Note that device_get_named_child_node() documents how to release the
-> fwnode pointer:
-> 
-> "The caller is responsible for calling fwnode_handle_put() on the
-> returned fwnode pointer."
+> Please find new patch in attachments, thanks.
 
-O.K. I just don't like asymmetric APIs. They often lead to bugs, just
-look wrong, and make reviewers ask questions...
+Please read
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+https://docs.kernel.org/process/submitting-patches.html
 
-    Andrew
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Attachments are not accepted.
+
+	Andrew
 
