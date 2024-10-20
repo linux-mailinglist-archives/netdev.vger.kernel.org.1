@@ -1,109 +1,131 @@
-Return-Path: <netdev+bounces-137268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149019A53B5
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 13:23:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C6F9A541F
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C141C20A17
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 11:23:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B97B3B21AD7
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 12:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2EF1917E7;
-	Sun, 20 Oct 2024 11:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14995192B84;
+	Sun, 20 Oct 2024 12:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J8ufdvJy"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Ie1r24x0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-27.smtpout.orange.fr [80.12.242.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28073EAF1
-	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 11:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D522DEAF1;
+	Sun, 20 Oct 2024 12:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729423411; cv=none; b=BW+CBo76lqB1s7MKLnlLoa2cB11JAdG91mUv1K45HVvPNMKZBuuNsw1FojutJ8XRbfk8bT2XajHkYUU4zHcD2DCe1Rr6WTRBkY/bgTyXd1eMvZrbg3yNZBWMlUx2CcMMSoYO0X3SYYGKugRPJJLHrYb+ocA83vWBhEts13UbnOs=
+	t=1729428712; cv=none; b=MzOJc3uPPb4WDGvYaryT0/+sZC2lp/RjkhTcR92h/4Xbm9iJYfd0z3muuzczIWTU9ctMUw0WDkfFXc/LDAmePzNAfIEgW1wFc/SYOd+RXv6wCI+gAzdIc7jCiT58f8xj8J6kT8fpkvl1xd4xGCuenAcRtqOYGtxvkfu6cnmuBHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729423411; c=relaxed/simple;
-	bh=7ab6qhqpOr1ssykYDytup+FJiV1Hjtf3sZnKjdc3abA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XFxSvCwPjivUMEERjsUVVi5Tl2D0q6QvFfZGmPP2FEquGNIjjHNHQrgruaKLIkgAsGBRHOYZFmelmT6CzC529VijFanCMoi3KNjc+p+Z4H+VMVx+yK36O8MiJsj5IvZstQLHFKSAAXTBD8YARQbNNkvCnckE52yC2DfHq4UDNtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J8ufdvJy; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729423406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HakpnS82zsiPFFcOCMvXL4ULTEn0kEgh+KDi+4EqXVQ=;
-	b=J8ufdvJyDC5yOgEJbbgu29wPam8PL+9XepPZ6/m109PAPFElp48Kt2Jx4qmn6f1GFCXRMX
-	hvOnqBxl7LaHUfnDXp1PbjQadEbwSZlOZ+r0u2z/cggVTwOJXPCLBJvWyfUSNz6K7k1GhX
-	6xh3rdo5x+8wKwvW7wnn1MAni4FQIN8=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] ieee802154: Replace BOOL_TO_STR() with str_true_false()
-Date: Sun, 20 Oct 2024 13:23:13 +0200
-Message-ID: <20241020112313.53174-2-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1729428712; c=relaxed/simple;
+	bh=JKADh7kj1lQp1aoQuZiY6EwB94qTgxyXD3rmimFM6SU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hNBwduZfAbtxu6IhfMbbuM0DxCRsoZfUdDSg6WjAH+zJtQxC7CQayebYoM7Fv7ogQ0DzuroWB8kGr+DYC9twwuglxTXO/vGhFhrz2AWgZTC9Cd/YawicLgTDhNB0VIfckCt3YiwCUSFdR4MP8/Q1R3VIx69zX3JW4kTG0I64hBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Ie1r24x0; arc=none smtp.client-ip=80.12.242.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id 2QHmtx47CqSl42QHmtsEdU; Sun, 20 Oct 2024 09:23:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1729409020;
+	bh=TMmAAHQKed3UL+28kOhhlB2nfADOlaN6TyUGoxjD1dQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Ie1r24x01qWEkuD/Qx0FQAQSKlXSuVZw8nrURubilzSq6qoeJbvFDsMEYUkdFxHL3
+	 yoDJbP2i+9JAcdEJ65msWctHUlW264cTvB/qtOtqQm8Sy5NB3MPIk2Lkes5TmAwtrR
+	 t6cFlSMeW72ir7hedjuCZd8ciIK6n+8FNQBu6QkLS2rpVmvPAzJ5GjqbJJWMOdFR+L
+	 FNEKvhFVKt4xzTe08tBjCFJ2dGk7r75hwhWUg+QHrB+rnCEg672swd84R+iOcy9rS1
+	 9iB2JcUcHcYt9Gt3UVZZAhRaDQvNxIZeZ/HJO/Qqo1EMXOzUUg7tMc/v2y6m8ptHW9
+	 auryByRv/vB/A==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Sun, 20 Oct 2024 09:23:40 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <5e828a43-9365-4ac5-b411-0be7188ab8f2@wanadoo.fr>
+Date: Sun, 20 Oct 2024 09:23:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/6] phy: core: Add missing of_node_put() in
+ of_phy_provider_lookup()
+To: Zijun Hu <zijun_hu@icloud.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Felipe Balbi <balbi@ti.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Lee Jones <lee@kernel.org>
+Cc: stable@vger.kernel.org, linux-phy@lists.infradead.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241020-phy_core_fix-v1-0-078062f7da71@quicinc.com>
+ <20241020-phy_core_fix-v1-5-078062f7da71@quicinc.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20241020-phy_core_fix-v1-5-078062f7da71@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Replace the custom BOOL_TO_STR() macro with the str_true_false() helper
-function and remove the macro.
+Le 20/10/2024 à 07:27, Zijun Hu a écrit :
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> The for_each_child_of_node() macro automatically decrements the child
+> refcount at the end of every iteration. On early exits, of_node_put()
+> must be used to manually decrement the refcount and avoid memory leaks.
+> 
+> The macro called by of_phy_provider_lookup() has such early exit, but
+> it does not call of_node_put() before early exit.
+> 
+> Fixed by adding missing of_node_put() in of_phy_provider_lookup().
+> 
+> Fixes: 2a4c37016ca9 ("phy: core: Fix of_phy_provider_lookup to return PHY provider for sub node")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> ---
+> The impact of this change is wide since of_phy_provider_lookup()
+> is indirectly called by APIs phy_get(), of_phy_get(), and
+> devm_of_phy_get_by_index().
+> 
+> The following kernel mainline commit has similar fix:
+> Commit: b337cc3ce475 ("backlight: lm3509_bl: Fix early returns in for_each_child_of_node()")
+> ---
+>   drivers/phy/phy-core.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
+> index 967878b78797..24bd619a33dd 100644
+> --- a/drivers/phy/phy-core.c
+> +++ b/drivers/phy/phy-core.c
+> @@ -143,10 +143,11 @@ static struct phy_provider *of_phy_provider_lookup(struct device_node *node)
+>   	list_for_each_entry(phy_provider, &phy_provider_list, list) {
+>   		if (phy_provider->dev->of_node == node)
+>   			return phy_provider;
+> -
+>   		for_each_child_of_node(phy_provider->children, child)
+> -			if (child == node)
+> +			if (child == node) {
+> +				of_node_put(child);
+>   				return phy_provider;
+> +			}
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- net/ieee802154/trace.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
-index 591ce0a16fc0..284b63a0834e 100644
---- a/net/ieee802154/trace.h
-+++ b/net/ieee802154/trace.h
-@@ -35,8 +35,6 @@
- #define WPAN_CCA_PR_FMT	"cca_mode: %d, cca_opt: %d"
- #define WPAN_CCA_PR_ARG __entry->cca_mode, __entry->cca_opt
- 
--#define BOOL_TO_STR(bo) (bo) ? "true" : "false"
--
- /*************************************************************
-  *			rdev->ops traces		     *
-  *************************************************************/
-@@ -273,7 +271,7 @@ TRACE_EVENT(802154_rdev_set_lbt_mode,
- 	),
- 	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT
- 		", lbt mode: %s", WPAN_PHY_PR_ARG,
--		WPAN_DEV_PR_ARG, BOOL_TO_STR(__entry->mode))
-+		WPAN_DEV_PR_ARG, str_true_false(__entry->mode))
- );
- 
- TRACE_EVENT(802154_rdev_set_ackreq_default,
-@@ -292,7 +290,7 @@ TRACE_EVENT(802154_rdev_set_ackreq_default,
- 	),
- 	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT
- 		", ackreq default: %s", WPAN_PHY_PR_ARG,
--		WPAN_DEV_PR_ARG, BOOL_TO_STR(__entry->ackreq))
-+		WPAN_DEV_PR_ARG, str_true_false(__entry->ackreq))
- );
- 
- TRACE_EVENT(802154_rdev_trigger_scan,
--- 
-2.47.0
+Maybe for_each_child_of_node_scoped() to slightly simplify things at the 
+same time?
+
+>   	}
+>   
+>   	return ERR_PTR(-EPROBE_DEFER);
+> 
 
 
