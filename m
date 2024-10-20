@@ -1,73 +1,146 @@
-Return-Path: <netdev+bounces-137253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CDA79A52DD
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 08:17:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 172449A52E6
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 08:38:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74CE01C210C9
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 06:17:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC9BE28272C
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 06:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E970414A85;
-	Sun, 20 Oct 2024 06:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184E3FC12;
+	Sun, 20 Oct 2024 06:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DGXmEkBb"
+	dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b="J0MbgVZ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BD11078F;
-	Sun, 20 Oct 2024 06:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFAA79D2
+	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 06:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729405068; cv=none; b=McooZtWt7wAyoSs/Zk+X5pUomDtCxtvYs8dHygZRPf1CtevcCQxRuKpt4LsB3J565jnndnTsyBJWdC4Si+acxHjxj2WexLWsq1kBvxEqu4JNqSuqo716+HcjOg6wJ0ZL2Yip+wIvQOK3YRBK89qdFig3KOr/IlTmG1JxsCz3rxI=
+	t=1729406333; cv=none; b=JFA/+cGjZl8hYdHIp+r1169WnJxNqsSdVHt0NWi16SaZD1nOqvlFS8rk4Tb4OckE7yNBTcO6FDvMswpbQTYhOK0NQnVzxjnDN9Qvg3qCRd/6OyycNrDSRWUXK0UULqq90fZzskveyvuJ98HTE7G5XxM6LAZl8VNho6DgXnc4DY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729405068; c=relaxed/simple;
-	bh=G/1xgmvmCVD6P5EbRSlcwDqkGQuE6FYxtj7EawHoTsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rvyh4xaE4D2AQgqzKov0w88SkvHp9qJD1f2kRNTpUquJD06uhzpCd+Jpr09x04zdwGqSr4pJy/+NXbSHc9x7hi0GRlFayBakWtX89hX+ujENnXVwYtbU9g+a+wtmX+TL2Hw1YJUZHixFojgGZPGRBnnE4aYPdV7CA9thPYv4TSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DGXmEkBb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A48F8C4CEC6;
-	Sun, 20 Oct 2024 06:17:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1729405068;
-	bh=G/1xgmvmCVD6P5EbRSlcwDqkGQuE6FYxtj7EawHoTsc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DGXmEkBbSpYbw68XATKUIDRmjQGkZR1iz9ATYk7/MLr1cQ1brWvo1c169o9PyERpm
-	 HWLfaqaorf1UNxw2Wah4bwXJYMjCLl0wBybH0jRKNm8Uc6S0ay2yu0ItVQluOwhCcY
-	 QcCE4g+HK9LcOOTa6CZhk1ohm3ejp6mZ+YEXRm1w=
-Date: Sun, 20 Oct 2024 08:17:44 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Benjamin Grosse <ste3ls@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] drivers/net/usb: Lenovo Mini Dock, add support for new
- USB device ID 0x17EF:0x3098 for the r8152 driver
-Message-ID: <2024102028-postnasal-cruelty-8da9@gregkh>
-References: <CAPvBWb=L6FVwSk7iZX21Awez+dwhLMAoGe39f__VC=g7g6H2+g@mail.gmail.com>
+	s=arc-20240116; t=1729406333; c=relaxed/simple;
+	bh=z1NWtZoqk+cAT6rHeYSYSkrsw1S2GOFf39qVMH0yqDw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G7lBpyEmM8NzoLMt90wslZSybdwXmHEGuO+Lxh5ifWmdnsGnh6bGGB2FdwTkTiBDZB4WLUGTFTXGcTft+f+bp/AKs6QxCNi3tcGGwXi+fap98sGtOJSx94nU41UPTke/2ZKpXlCL5M/Cx+7TzXSowa7TYQmxlUI4Bi16WsM3R6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info; spf=pass smtp.mailfrom=shenghaoyang.info; dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b=J0MbgVZ+; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shenghaoyang.info
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2e2b720a0bbso678258a91.1
+        for <netdev@vger.kernel.org>; Sat, 19 Oct 2024 23:38:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shenghaoyang.info; s=google; t=1729406330; x=1730011130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i503jibShokyzKgJRjluslQgf/GXzJZnNEpbSYQCOuk=;
+        b=J0MbgVZ+X4ANUTBLEy+Qw8V5i498Q3cOZ4sY5hIgYasSuPj2tqlgkV14RxKJQgHG+Z
+         65pTPidoSmSI8tXSWC9eynm24awgeBuulk73Tv7p3uyk3tIbET9NjQCIYaF9HBruPPpq
+         CRzvVBK2k39Bk08wAFOUqkyrvMCauqXE8R9nqJ8FN/sRA+0byubzv4aHZ43UvBj4lOBc
+         BTv6xKumSYsZA1TYovj3r7g3paCvlBaeETT+eams+hFnq0lan3a1Cs0syDtxwPRgCkIf
+         S7fbVB10rl8miiMfCPCBWcOjTJscWyffW4eP8B/DhQb4Wcahc/TKQ1r8HClIPC4LvOf4
+         SBxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729406330; x=1730011130;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i503jibShokyzKgJRjluslQgf/GXzJZnNEpbSYQCOuk=;
+        b=Ai19rItJEHQyqsBnW5Ej+bUt6qWpGW0+Pj3yABmaNTGDHjJDj4GwaD+2WL4z6yy6mU
+         jU4z0weQRD0cjytwGLBgy2TqrNfV1jQ6LhjoKEt0vNnjzjFiQfoTpQjTwYFrLT/kpt1S
+         WrqTNR9oh1Yqv/FMuL0zXuL27Y90y1mPs8uC8I0IbbNFnbWVRyEBmftvYWkgMvCqsuZj
+         HzymqGKims0YnD1zblPqml4DBNGwp7EbIIt6xuWho1TtNQITddekX+a9X7P4fWIVnDhV
+         Z7tvYWf82LNX6MCDKthOZFO2TdHwSgaexCMHt/cvAlrcwtrSSBpDjEk033MaSe1Cb6GV
+         qUTw==
+X-Gm-Message-State: AOJu0YzcbAA22W2heM5breCv/9rd3p5hzOnPrPojQE4IXU77eje2uS2y
+	2hhrZJTo5+1YUfcR+rnbC0lP2f+upL1PSDK5xP2Xiver9MxwWLyhF+l2M9Acgwqmy8Om3zZVAJC
+	W0wM=
+X-Google-Smtp-Source: AGHT+IHFX+rspk0TJCyu2wNA7g544rqoY1uyUeTZ0L8BKsldY5n6Fs8I+LybZm5ovO9CZoGnUqkHwA==
+X-Received: by 2002:a05:6a20:6a10:b0:1cf:35db:2c3c with SMTP id adf61e73a8af0-1d92c4bac8emr4867191637.3.1729406329929;
+        Sat, 19 Oct 2024 23:38:49 -0700 (PDT)
+Received: from localhost ([132.147.84.99])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-71ec1312dffsm691987b3a.15.2024.10.19.23.38.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 19 Oct 2024 23:38:49 -0700 (PDT)
+From: Shenghao Yang <me@shenghaoyang.info>
+To: netdev@vger.kernel.org
+Cc: Shenghao Yang <me@shenghaoyang.info>,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	pavana.sharma@digi.com,
+	ashkan.boldaji@digi.com,
+	kabel@kernel.org,
+	andrew@lunn.ch,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	kuba@kernel.org
+Subject: [PATCH net v3 0/3] net: dsa: mv88e6xxx: fix MV88E6393X PHC frequency on internal clock
+Date: Sun, 20 Oct 2024 14:38:27 +0800
+Message-ID: <20241020063833.5425-1-me@shenghaoyang.info>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPvBWb=L6FVwSk7iZX21Awez+dwhLMAoGe39f__VC=g7g6H2+g@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 19, 2024 at 07:37:06PM +0100, Benjamin Grosse wrote:
-> >From 7a75dea5721225f4280be53996421962af430c8b Mon Sep 17 00:00:00 2001
-> From: =?UTF-8?q?Benjamin=20Gro=C3=9Fe?= <ste3ls@gmail.com>
-> Date: Sat, 19 Oct 2024 10:05:29 +0100
-> Subject: [PATCH] usb: add support for new USB device ID 0x17EF:0x3098 for the
->  r8152 driver
-> MIME-Version: 1.0
-> Content-Type: text/plain; charset=UTF-8
-> Content-Transfer-Encoding: 8bit
+The MV88E6393X family of switches can additionally run their cycle
+counters using a 250MHz internal clock instead of the usual 125MHz
+external clock [1].
 
-Something went wrong, this shouldn't be in your changelog text :(
+The driver currently assumes all designs utilize that external clock,
+but MikroTik's RB5009 uses the internal source - causing the PHC to be
+seen running at 2x real time in userspace, making synchronization
+with ptp4l impossible.
+
+This series adds support for reading off the cycle counter frequency
+known to the hardware in the TAI_CLOCK_PERIOD register and picking an
+appropriate set of scaling coefficients instead of using a fixed set
+for each switch family.
+
+Patch 1 groups those cycle counter coefficients into a new structure to
+make it easier to pass them around.
+
+Patch 2 modifies PTP initialization to probe TAI_CLOCK_PERIOD and
+use an appropriate set of coefficients.
+
+Patch 3 adds support for 4000ps cycle counter periods.
+
+Changes since v2 [2]:
+
+- Patch 1: "net: dsa: mv88e6xxx: group cycle counter coefficients"
+  - Moved declaration of mv88e6xxx_cc_coeffs to avoid moving that in
+    Patch 2.
+
+- Patch 2: "net: dsa: mv88e6xxx: read cycle counter period from hardware"
+  - Removed move of mv88e6xxx_cc_coeffs declaration.
+
+- Patch 3: "net: dsa: mv88e6xxx: support 4000ps cycle counter periods"
+  - No change.
+
+Thanks,
+
+Shenghao
+
+[1] https://lore.kernel.org/netdev/d6622575-bf1b-445a-b08f-2739e3642aae@lunn.ch/
+[2] https://lore.kernel.org/netdev/20241006145951.719162-1-me@shenghaoyang.info/
+
+Shenghao Yang (3):
+  net: dsa: mv88e6xxx: group cycle counter coefficients
+  net: dsa: mv88e6xxx: read cycle counter period from hardware
+  net: dsa: mv88e6xxx: support 4000ps cycle counter period
+
+ drivers/net/dsa/mv88e6xxx/chip.h |   6 +-
+ drivers/net/dsa/mv88e6xxx/ptp.c  | 108 +++++++++++++++++++++----------
+ 2 files changed, 77 insertions(+), 37 deletions(-)
+
+-- 
+2.47.0
 
 
