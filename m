@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-137323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FDEB9A56CD
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 22:57:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499CE9A56D3
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 22:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B66441F20FF0
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 20:57:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DFA5B22C8C
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 20:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E419199230;
-	Sun, 20 Oct 2024 20:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12F4199FAD;
+	Sun, 20 Oct 2024 20:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MG4G0Vse"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STqoUV4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4E11990AE;
-	Sun, 20 Oct 2024 20:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42017198A0F;
+	Sun, 20 Oct 2024 20:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729457820; cv=none; b=UJZ1/2AUtg/QxpDv0GfdBSzheWUoPeeRckgsB/cmF+m9PEqgD48pzDxC13+joD0AFAfHphjMDTfYEPPsyGFM/gdn5QU+KwYCmY/OGtAtkWUa+flXTjW8ZWWSm3N3vimS16jhyBJhNRQa/Kmw5FqviYU8Qd2N2E3OILuzvBRzYBs=
+	t=1729457825; cv=none; b=GJ/KpNC7NUUsz7cc23E/VLQa3NRatO5GG4Y7W7Kwjg4YHVj83NHut2BNhLhgkVkaRPMJTioQVlIuiAjlnavOuYyzPS+SWIqYPL3gE66Gy9zscVYtYMdSkkRaGViMrvhgITDvOp7Plrt4ZpBJ9gshH9fD9c215pB+rKi/yHbvFoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729457820; c=relaxed/simple;
-	bh=1P0mvejUHUh05yOmiNhx6KZdO0LKH7k4ejVE8CyoO68=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lZTwXW6zmkAw83bv/tFvJLsH+swwc62LJ7kxnC1fJ32aHMMV9ui0LN8d5626hVsziu8K9GOs+Ir9CkNVaLSs/xkEbaMbbiPvL/JtcJaozTi/XXSlxNeV9noPS7UgJ44Woihx2vFgNGnbt/Aor4Jj7hqk8jx1yk8fDahJKfrEsYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MG4G0Vse; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1729457825; c=relaxed/simple;
+	bh=AdqYORKqhScmeHeYNSD/MJ6rhroWSE8tdow1UEXHFNE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=os9lHvqqNgPTo+Cv4OB7ukZpv7kAxcigPnHWGYKnCtXsgu5U/9GNbyoRLpc10Uf/H9mS9eBtdeLF623++u3ReTzILOy3ttwpSwY0AU4WUzp+vOLfHlmwjcWUH7w+Fm95mPpNFWZBm8HwmOpOpdFxoq3JnAiKIeQtBySV8T5LQZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=STqoUV4P; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a9a3dc089d8so524298866b.3;
-        Sun, 20 Oct 2024 13:56:57 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a99f629a7aaso673301066b.1;
+        Sun, 20 Oct 2024 13:57:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729457815; x=1730062615; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LPIXr1KQ2BwKIpE8FpDOMVjF3+IVdXE9OSCBYHyQV0s=;
-        b=MG4G0VselVNtv5vgnMisGXTqK7VPTlZ6Ih3+QoIYAOBEWySlBZ5lb9TkDWcol9opQc
-         coi71BPrfM4k5VYHOsc9W91ZnJncWoseF+BryoeKJhH7KfTOviq4u3xjKXK3xowAKagZ
-         +8mI8QkVdB0SZ//9C2PxCApxcl7QuKiU8QSs5V+ujK7MQZTwcM3332Q4A7Cfnet3J0eQ
-         1xyQO6Vdn/2qwsKlDkhjMDLrl++1su0gGDEe4kfOC2yEWJPv9y32U4PM/Ch9BZ1TDNU2
-         DLXBIGGkUL7pMRHi8Jsb2cRTdtF+B4F9zMbs61vT9efN4mGV3FnlR+6AOPOW7TAsND2r
-         De7g==
+        d=gmail.com; s=20230601; t=1729457821; x=1730062621; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9oVLv8Vu4ZHXQDXrxYkhAbVdIKoCOwOdtS+wCj0vhdU=;
+        b=STqoUV4P7ajex16K1RsDAPmypgtEyGB2wuXTclLj/QOiodzuhUT3yLO+7oMYQlamYp
+         ajyyEThN4FFDU/4YbtESOHdlkdCXREOzwrznYBn0B9CT7F/7it1wcL9rDsrIfcMcUlTi
+         DfTSz4g8ANcxw18n5nj9Z9n5GMoriO0OJzY3777tdaeeitqRPX8lg2y4mvyZ+p4GC6Wk
+         ZFy2BY7AY82oEyh/qyuMryUtqsPSha5RvrzH5c7J1GS0Qyy+1y2UME6FCzXiaFtl6aPo
+         1qzG2O4/4USByOeCo58mz1g6Ha+/32DYCOMqAsig8s8uDOAy5kjDPxSZ2soebmEQJla6
+         Apaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729457815; x=1730062615;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LPIXr1KQ2BwKIpE8FpDOMVjF3+IVdXE9OSCBYHyQV0s=;
-        b=uHdFNc+Zz2Ifk9OoeRLs8VjP+94TrAOlKHJz5Em1CBkUlqEJfEeRQs9+Rj6lY8+gx+
-         BCJroZ1y6E5mci9Vqos9n4L63zFV4hwmax6twPeL/JVX2heu2+HB/wIM5UGjgd+Ul5lL
-         8YZP2EqQXzQZ0y6woP6Gk9fvewi56vTeWejPyWMLlxYK62ORQlTHyWS3xywaBEQsGF4z
-         kdoF2z6ji6SLsOZKysfBIyY1kiKEdhjmuTt2u8L+Jrj3tMNqbZ9F4Ey+7IVx+S1gOW+D
-         TDqG4z37QeQcSOozqMj/5iHKrOSKKiBkGpK1WrnYpryWDvqNDTq15tpyv8YTBASJyHGk
-         2nXw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlVhc65yIGi4Pw2r3II6Xry6N3ckVjfSsV8g0LcAPzB6nN7HAQ+oRHCUmB5RFCE5tbL6vHZD309nN2aIc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQnMb4vdDUv28ijBTHdzhEnliiNHi1BiClwojYLr7MiVZIyYcz
-	WWja2JhCdNAigvZ8tp3zz16yBMU2fjn/BUx3ixJ+c1oPYPUHNo4vHQRJZp22
-X-Google-Smtp-Source: AGHT+IG0awhuIDMFItmD6QJkGqGK9F8mLp6gKZkB746KOUtol1a3tvtYlxGxtrp0XRPlXCs4E4rz7g==
-X-Received: by 2002:a17:906:6a1e:b0:a9a:1115:486e with SMTP id a640c23a62f3a-a9a69c6a83emr1030634066b.45.1729457815273;
-        Sun, 20 Oct 2024 13:56:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729457821; x=1730062621;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9oVLv8Vu4ZHXQDXrxYkhAbVdIKoCOwOdtS+wCj0vhdU=;
+        b=T8edcLhAeWcc+D3dBK/FMEOqhlbnJEOsav7N6C2yGwcUXTRBPT+VpQjFwr40iKOFaZ
+         b8duCx4a1T2fhVfBW6SVHmP5Zvl0W8RlIj4sSOWHhm6mPJO20re7QNLBX+ijpzCitOxd
+         447yPzHkRX8QGvtuny6aioNDR6zjDo+GYScOnVpZj8XFMz9u53NGDKJoDrpxsHZWKN3Q
+         1XsjMMpYcDw+AFC4fEmqEGB1ZOTRTHrNTSsfVWToqzsB+B8YChWeVXucRR5hZeZunvvS
+         ZXhPBDbvbQ/J6uKcyo+6cMwvnAXOewN8PU1QiytiOYEEQ9izUGG/GaqAj8x+5q65I5/W
+         oknw==
+X-Forwarded-Encrypted: i=1; AJvYcCVch3ZgD2IBc/Aso5Ir1ytKFdTmbIqSRk7MZzseXc92i4yWzp/VzkCBoQ+SvqpFHCiaqPJjHpwuy0orw7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdXcoUvWaZtKkBfdk7aZyv7xPGdpbM65mRIPAOfIbyTV1O96v+
+	bSizcybHCgVuXhLJO8i/318+FNbOhGP9xlktYVG3EgEjgrOB5tzfx1Sqeffa
+X-Google-Smtp-Source: AGHT+IGDXsiFmy9S2334vw44am/sCgznLYLI2wFZIGi7GDSoqTDGdYuNC3C7h8pDIBY0fWaTEu468g==
+X-Received: by 2002:a17:907:d16:b0:a99:5f65:fd9a with SMTP id a640c23a62f3a-a9a4cc3c202mr1567023166b.21.1729457821064;
+        Sun, 20 Oct 2024 13:57:01 -0700 (PDT)
 Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a912edc07sm125135966b.69.2024.10.20.13.56.54
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a912edc07sm125135966b.69.2024.10.20.13.57.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Oct 2024 13:56:54 -0700 (PDT)
+        Sun, 20 Oct 2024 13:57:00 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Linus Walleij <linus.walleij@linaro.org>,
@@ -77,10 +79,12 @@ Cc: Linus Walleij <linus.walleij@linaro.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/3] net: dsa: vsc73xx: implement transmit via control interface
-Date: Sun, 20 Oct 2024 22:54:50 +0200
-Message-Id: <20241020205452.2660042-1-paweldembicki@gmail.com>
+Subject: [PATCH net-next 2/3] net: dsa: vsc73xx: implement packet reception via control interface
+Date: Sun, 20 Oct 2024 22:54:51 +0200
+Message-Id: <20241020205452.2660042-2-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241020205452.2660042-1-paweldembicki@gmail.com>
+References: <20241020205452.2660042-1-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,401 +97,284 @@ Some types of packets can be forwarded only to and from the PI/SI
 interface. For more information, see Chapter 2.7.1 (CPU Forwarding) in
 the datasheet.
 
-This patch implements the routines required for link-local transmission.
+This patch implements the routines required for link-local reception.
 This kind of traffic can't be transferred through the RGMII interface in
 vsc73xx.
 
-It uses a method similar to the sja1005 driver, where the DSA tagger
-checks if the packet is link-local and uses a special deferred transmit
-route for that kind of packet.
-
-The vsc73xx uses an "Internal Frame Header" (IFH) in communication via the
-PI/SI interface. Every packet must be prefixed with an IFH. The hardware
-fixes the checksums, so there's no need to calculate the FCS in the
-driver.
+The packet receiver poller uses a kthread worker, which checks if a packet
+has arrived in the CPU buffer. If the header is valid, the packet is
+transferred to the correct DSA conduit interface.
 
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 ---
- drivers/net/dsa/vitesse-vsc73xx-core.c | 172 +++++++++++++++++++++++++
- drivers/net/dsa/vitesse-vsc73xx.h      |   1 +
- include/linux/dsa/vsc73xx.h            |  20 +++
- net/dsa/tag_vsc73xx_8021q.c            |  73 +++++++++++
- 4 files changed, 266 insertions(+)
- create mode 100644 include/linux/dsa/vsc73xx.h
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 174 +++++++++++++++++++++++++
+ drivers/net/dsa/vitesse-vsc73xx.h      |   4 +
+ 2 files changed, 178 insertions(+)
 
 diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index f18aa321053d..21ab3f214490 100644
+index 21ab3f214490..596b11c4d672 100644
 --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
 +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -73,6 +73,9 @@
- #define VSC73XX_CAT_PR_USR_PRIO	0x75
- #define VSC73XX_CAT_VLAN_MISC	0x79
- #define VSC73XX_CAT_PORT_VLAN	0x7a
-+#define VSC73XX_CPUTXDAT	0xc0
-+#define VSC73XX_MISCFIFO	0xc4
-+#define VSC73XX_MISCSTAT	0xc8
- #define VSC73XX_Q_MISC_CONF	0xdf
+@@ -45,6 +45,15 @@
+ #define VSC73XX_BLOCK_MII_INTERNAL	0x0 /* Internal MDIO subblock */
+ #define VSC73XX_BLOCK_MII_EXTERNAL	0x1 /* External MDIO subblock */
  
- /* MAC_CFG register bits */
-@@ -166,6 +169,14 @@
- #define VSC73XX_CAT_PORT_VLAN_VLAN_USR_PRIO GENMASK(14, 12)
- #define VSC73XX_CAT_PORT_VLAN_VLAN_VID GENMASK(11, 0)
++/* CAPTURE Block subblock */
++#define VSC73XX_BLOCK_CAPT_FRAME0	0x0 /* Frame 0 subblock */
++#define VSC73XX_BLOCK_CAPT_FRAME1	0x1 /* Frame 1 subblock */
++#define VSC73XX_BLOCK_CAPT_FRAME2	0x2 /* Frame 2 subblock */
++#define VSC73XX_BLOCK_CAPT_FRAME3	0x3 /* Frame 3 subblock */
++#define VSC73XX_BLOCK_CAPT_Q0		0x4 /* Queue 0 subblock */
++#define VSC73XX_BLOCK_CAPT_Q1		0x6 /* Queue 0 subblock */
++#define VSC73XX_BLOCK_CAPT_RST		0x7 /* Capture reset subblock */
++
+ #define CPU_PORT	6 /* CPU port */
+ #define VSC73XX_NUM_FDB_ROWS	2048
+ #define VSC73XX_NUM_BUCKETS	4
+@@ -244,6 +253,13 @@
+ #define VSC73XX_MACTINDX_BUCKET_MSK		GENMASK(12, 11)
+ #define VSC73XX_MACTINDX_INDEX_MSK		GENMASK(10, 0)
  
-+/* MISCFIFO Miscellaneous Control Register */
-+#define VSC73XX_MISCFIFO_REWIND_CPU_TX	BIT(1)
-+#define VSC73XX_MISCFIFO_CPU_TX		BIT(0)
++#define VSC73XX_CAPENAB_IPMC			BIT(20)
++#define VSC73XX_CAPENAB_ARPBC			BIT(19)
++#define VSC73XX_CAPENAB_IGMP			BIT(18)
++#define VSC73XX_CAPENAB_ALLBRIDGE		BIT(17)
++#define VSC73XX_CAPENAB_BPDU			BIT(16)
++#define VSC73XX_CAPENAB_GARP			GENMASK(15, 0)
 +
-+/* MISCSTAT Miscellaneous Status */
-+#define VSC73XX_MISCSTAT_CPU_TX_DATA_PENDING	BIT(8)
-+#define VSC73XX_MISCSTAT_CPU_TX_DATA_OVERFLOW	BIT(7)
+ #define VSC73XX_MACACCESS_CPU_COPY		BIT(14)
+ #define VSC73XX_MACACCESS_FWD_KILL		BIT(13)
+ #define VSC73XX_MACACCESS_IGNORE_VLAN		BIT(12)
+@@ -297,6 +313,13 @@
+ 
+ #define VSC73XX_MII_STAT_BUSY	BIT(3)
+ 
++/* Capture block 4 registers */
++#define VSC73XX_CAPT_FRAME_DATA		0x0
++#define VSC73XX_CAPT_FRAME_DATA_MAX	0xff
++#define VSC73XX_CAPT_CAPREADP		0x0
++#define VSC73XX_CAPT_CAPWRP		0x3
++#define VSC73XX_CAPT_CAPRST		0xff
 +
- /* Frame analyzer block 2 registers */
- #define VSC73XX_STORMLIMIT	0x02
- #define VSC73XX_ADVLEARN	0x03
-@@ -363,6 +374,9 @@
+ /* Arbiter block 5 registers */
+ #define VSC73XX_ARBEMPTY		0x0c
+ #define VSC73XX_ARBDISC			0x0e
+@@ -316,6 +339,7 @@
+ #define VSC73XX_ICPU_MBOX_SET		0x16
+ #define VSC73XX_ICPU_MBOX_CLR		0x17
+ #define VSC73XX_CHIPID			0x18
++#define VSC73XX_CAPCTRL			0x31
+ #define VSC73XX_GPIO			0x34
+ 
+ #define VSC73XX_GMIIDELAY_GMII0_GTXDELAY_NONE	0
+@@ -364,6 +388,24 @@
+ 				 VSC73XX_ICPU_CTRL_CLK_EN | \
+ 				 VSC73XX_ICPU_CTRL_SRST)
+ 
++#define VSC73XX_CAPCTRL_QUEUE1_READY		BIT(31)
++#define VSC73XX_CAPCTRL_QUEUE0_READY		BIT(30)
++#define VSC73XX_CAPCTRL_ARPBC_Q			BIT(18)
++#define VSC73XX_CAPCTRL_IPMC_Q			BIT(17)
++#define VSC73XX_CAPCTRL_IGMP_Q			BIT(16)
++#define VSC73XX_CAPCTRL_ALLBRIDGE_Q		BIT(15)
++#define VSC73XX_CAPCTRL_GARP_Q			BIT(14)
++#define VSC73XX_CAPCTRL_BPDU_Q			BIT(13)
++#define VSC73XX_CAPCTRL_FIFO_MODE		BIT(12)
++#define VSC73XX_CAPCTRL_QUEUE1_ENA		BIT(11)
++#define VSC73XX_CAPCTRL_Q1_IRQ_EN		BIT(6)
++#define VSC73XX_CAPCTRL_Q0_IRQ_EN		BIT(5)
++#define VSC73XX_CAPCTRL_Q1_IRQ_PIN		BIT(4)
++#define VSC73XX_CAPCTRL_Q0_IRQ_PIN		BIT(3)
++#define VSC73XX_CAPCTRL_LEARN_TRUNCATE		BIT(2)
++#define VSC73XX_CAPCTRL_LEARN_Q			BIT(1)
++#define VSC73XX_CAPCTRL_MACB_Q			BIT(0)
++
+ #define IS_7385(a) ((a)->chipid == VSC73XX_CHIPID_ID_7385)
+ #define IS_7388(a) ((a)->chipid == VSC73XX_CHIPID_ID_7388)
+ #define IS_7395(a) ((a)->chipid == VSC73XX_CHIPID_ID_7395)
+@@ -373,6 +415,7 @@
+ #define VSC73XX_POLL_SLEEP_US		1000
  #define VSC73XX_MDIO_POLL_SLEEP_US	5
  #define VSC73XX_POLL_TIMEOUT_US		10000
++#define VSC73XX_RCV_POLL_INTERVAL	100
  
-+#define VSC73XX_IFH_MAGIC		0x52
-+#define VSC73XX_IFH_SIZE		8
-+
- struct vsc73xx_counter {
- 	u8 counter;
- 	const char *name;
-@@ -375,6 +389,31 @@ struct vsc73xx_fdb {
- 	bool valid;
- };
- 
-+/* Internal frame header structure */
-+struct vsc73xx_ifh {
-+	union {
-+		u32 datah;
-+		struct {
-+		u32 wt:1, /* Frame was tagged but tag has removed from frame */
-+		    : 1,
-+		    frame_length:14, /* Frame Length including CRC */
-+		    : 11,
-+		    port:5; /* SRC port of switch */
-+		};
-+	};
-+	union {
-+		u32 datal;
-+		struct {
-+		u32 vid:16, /* VLAN ID */
-+		    : 3,
-+		    magic:9, /* IFH magic field */
-+		    lpa:1, /* SMAC is subject of learning */
-+		    : 1,
-+		    priority:2; /* Switch categorizer assigned priority */
-+		};
-+	};
-+};
-+
- /* Counters are named according to the MIB standards where applicable.
-  * Some counters are custom, non-standard. The standard counters are
-  * named in accordance with RFC2819, RFC2021 and IEEE Std 802.3-2002 Annex
-@@ -683,6 +722,133 @@ static int vsc73xx_phy_write(struct dsa_switch *ds, int phy, int regnum,
- 	return 0;
+ #define VSC73XX_IFH_MAGIC		0x52
+ #define VSC73XX_IFH_SIZE		8
+@@ -834,6 +877,115 @@ static void vsc73xx_deferred_xmit(struct kthread_work *work)
+ 	kfree(xmit_work);
  }
  
-+static int vsc73xx_tx_fifo_busy_check(struct vsc73xx *vsc, int port)
++static void vsc73xx_polled_rcv(struct kthread_work *work)
 +{
-+	int ret, err;
-+	u32 val;
++	struct vsc73xx *vsc = container_of(work, struct vsc73xx, dwork.work);
++	u16 ptr = VSC73XX_CAPT_FRAME_DATA;
++	struct dsa_switch *ds = vsc->ds;
++	int ret, buf_len, len, part;
++	struct vsc73xx_ifh ifh;
++	struct net_device *dev;
++	struct dsa_port *dp;
++	struct sk_buff *skb;
++	u32 val, *buf;
++	u16 count;
 +
-+	ret = read_poll_timeout(vsc73xx_read, err,
-+				err < 0 ||
-+				!(val & VSC73XX_MISCSTAT_CPU_TX_DATA_PENDING),
-+				VSC73XX_POLL_SLEEP_US,
-+				VSC73XX_POLL_TIMEOUT_US, false, vsc,
-+				VSC73XX_BLOCK_MAC, port, VSC73XX_MISCSTAT,
-+				&val);
++	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_CAPCTRL, &val);
 +	if (ret)
-+		return ret;
-+	return err;
-+}
++		goto queue;
 +
-+static int
-+vsc73xx_write_tx_fifo(struct vsc73xx *vsc, int port, u32 data0, u32 data1)
-+{
-+	vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CPUTXDAT, data0);
-+	vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CPUTXDAT, data1);
++	if (!(val & VSC73XX_CAPCTRL_QUEUE0_READY))
++		/* No frame to read */
++		goto queue;
 +
-+	return vsc73xx_tx_fifo_busy_check(vsc, port);
-+}
++	/* Initialise reading */
++	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE, VSC73XX_BLOCK_CAPT_Q0,
++			   VSC73XX_CAPT_CAPREADP, &val);
++	if (ret)
++		goto queue;
 +
-+static int
-+vsc73xx_inject_frame(struct vsc73xx *vsc, int port, struct sk_buff *skb)
-+{
-+	struct vsc73xx_ifh *ifh;
-+	u32 length, i, count;
-+	u32 *buf;
-+	int ret;
++	/* Get internal frame header */
++	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
++			   VSC73XX_BLOCK_CAPT_FRAME0, ptr++, &ifh.datah);
++	if (ret)
++		goto queue;
 +
-+	if (skb->len + VSC73XX_IFH_SIZE < 64)
-+		length = 64;
-+	else
-+		length = skb->len + VSC73XX_IFH_SIZE;
++	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
++			   VSC73XX_BLOCK_CAPT_FRAME0, ptr++, &ifh.datal);
++	if (ret)
++		goto queue;
 +
-+	count = DIV_ROUND_UP(length, 8);
-+	buf = kzalloc(count * 8, GFP_KERNEL);
-+	memset(buf, 0, sizeof(buf));
++	if (ifh.magic != VSC73XX_IFH_MAGIC) {
++		/* Something goes wrong with buffer. Reset capture block */
++		vsc73xx_write(vsc, VSC73XX_BLOCK_CAPTURE,
++			      VSC73XX_BLOCK_CAPT_RST, VSC73XX_CAPT_CAPRST, 1);
++		goto queue;
++	}
 +
-+	ifh = (struct vsc73xx_ifh *)buf;
-+	ifh->frame_length = skb->len;
-+	ifh->magic = VSC73XX_IFH_MAGIC;
++	if (!dsa_is_user_port(ds, ifh.port))
++		goto release_frame;
 +
-+	skb_copy_and_csum_dev(skb, (u8 *)(buf + 2));
++	dp = dsa_to_port(ds, ifh.port);
++	dev = dp->user;
++	if (!dev)
++		goto release_frame;
 +
-+	for (i = 0; i < count; i++) {
-+		ret = vsc73xx_write_tx_fifo(vsc, port, buf[2 * i],
-+					    buf[2 * i + 1]);
-+		if (ret) {
-+			/* Clear buffer after error */
-+			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-+					    VSC73XX_MISCFIFO,
-+					    VSC73XX_MISCFIFO_REWIND_CPU_TX,
-+					    VSC73XX_MISCFIFO_REWIND_CPU_TX);
-+			goto err;
++	count = (ifh.frame_length + 7 + VSC73XX_IFH_SIZE - ETH_FCS_LEN) >> 2;
++
++	skb = netdev_alloc_skb(dev, len);
++	if (unlikely(!skb)) {
++		netdev_err(dev, "Unable to allocate sk_buff\n");
++		goto release_frame;
++	}
++
++	buf_len = ifh.frame_length - ETH_FCS_LEN;
++	buf = (u32 *)skb_put(skb, buf_len);
++	len = 0;
++	part = 0;
++
++	while (ptr < count) {
++		ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
++				   VSC73XX_BLOCK_CAPT_FRAME0 + part, ptr++,
++				   buf + len);
++		if (ret)
++			goto free_skb;
++		len++;
++		if (ptr > VSC73XX_CAPT_FRAME_DATA_MAX &&
++		    count != VSC73XX_CAPT_FRAME_DATA_MAX) {
++			ptr = VSC73XX_CAPT_FRAME_DATA;
++			part++;
++			count -= VSC73XX_CAPT_FRAME_DATA_MAX;
 +		}
 +	}
 +
-+	vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MISCFIFO,
-+		      VSC73XX_MISCFIFO_CPU_TX);
++	/* Get FCS */
++	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
++			   VSC73XX_BLOCK_CAPT_FRAME0, ptr++, &val);
++	if (ret)
++		goto free_skb;
 +
-+	skb_tx_timestamp(skb);
-+
-+	skb->dev->stats.tx_packets++;
-+	skb->dev->stats.tx_bytes += skb->len;
-+err:
-+	kfree(buf);
-+	return ret;
-+}
-+
-+#define work_to_xmit_work(w) \
-+		container_of((w), struct vsc73xx_deferred_xmit_work, work)
-+
-+static void vsc73xx_deferred_xmit(struct kthread_work *work)
-+{
-+	struct vsc73xx_deferred_xmit_work *xmit_work = work_to_xmit_work(work);
-+	struct dsa_switch *ds = xmit_work->dp->ds;
-+	struct sk_buff *skb = xmit_work->skb;
-+	int port = xmit_work->dp->index;
-+	struct vsc73xx *vsc = ds->priv;
-+	int ret;
-+
-+	if (vsc73xx_tx_fifo_busy_check(vsc, port)) {
-+		dev_err(vsc->dev, "port %d failed to inject skb\n",
-+			port);
-+
-+		/* Clear buffer after error */
-+		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-+				    VSC73XX_MISCFIFO,
-+				    VSC73XX_MISCFIFO_REWIND_CPU_TX,
-+				    VSC73XX_MISCFIFO_REWIND_CPU_TX);
-+
-+		kfree_skb(skb);
-+		return;
-+	}
-+
-+	ret = vsc73xx_inject_frame(vsc, port, skb);
-+
-+	if (ret) {
-+		dev_err(vsc->dev, "port %d failed to inject skb\n",
-+			port);
-+		return;
-+	}
-+
-+	consume_skb(skb);
-+	kfree(xmit_work);
-+}
-+
-+static int
-+vsc73xx_connect_tag_protocol(struct dsa_switch *ds, enum dsa_tag_protocol proto)
-+{
-+	struct vsc73xx_8021q_tagger_data *tagger_data;
-+
-+	switch (proto) {
-+	case DSA_TAG_PROTO_VSC73XX_8021Q:
-+		tagger_data = ds->tagger_data;
-+		tagger_data->xmit_work_fn = vsc73xx_deferred_xmit;
-+		return 0;
-+	default:
-+		return -EPROTONOSUPPORT;
-+	}
-+}
-+
- static enum dsa_tag_protocol vsc73xx_get_tag_protocol(struct dsa_switch *ds,
- 						      int port,
- 						      enum dsa_tag_protocol mp)
-@@ -1026,6 +1192,11 @@ static void vsc73xx_init_port(struct vsc73xx *vsc, int port)
- 		      VSC73XX_CAT_DROP,
- 		      VSC73XX_CAT_DROP_FWD_PAUSE_ENA);
- 
-+	/* Allow switch to recalculate CRC of CPU packets */
-+	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG,
-+			    VSC73XX_TXUPDCFG_TX_UPDATE_CRC_CPU_ENA,
-+			    VSC73XX_TXUPDCFG_TX_UPDATE_CRC_CPU_ENA);
-+
- 	/* Clear all counters */
- 	vsc73xx_write(vsc, VSC73XX_BLOCK_MAC,
- 		      port, VSC73XX_C_RX0, 0);
-@@ -2217,6 +2388,7 @@ static const struct phylink_mac_ops vsc73xx_phylink_mac_ops = {
- 
- static const struct dsa_switch_ops vsc73xx_ds_ops = {
- 	.get_tag_protocol = vsc73xx_get_tag_protocol,
-+	.connect_tag_protocol = vsc73xx_connect_tag_protocol,
- 	.setup = vsc73xx_setup,
- 	.teardown = vsc73xx_teardown,
- 	.phy_read = vsc73xx_phy_read,
-diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
-index 3c30e143c14f..bf55a20f07f3 100644
---- a/drivers/net/dsa/vitesse-vsc73xx.h
-+++ b/drivers/net/dsa/vitesse-vsc73xx.h
-@@ -2,6 +2,7 @@
- #include <linux/device.h>
- #include <linux/etherdevice.h>
- #include <linux/gpio/driver.h>
-+#include <linux/dsa/vsc73xx.h>
- 
- /* The VSC7395 switch chips have 5+1 ports which means 5 ordinary ports and
-  * a sixth CPU port facing the processor with an RGMII interface. These ports
-diff --git a/include/linux/dsa/vsc73xx.h b/include/linux/dsa/vsc73xx.h
-new file mode 100644
-index 000000000000..901eeb1da120
---- /dev/null
-+++ b/include/linux/dsa/vsc73xx.h
-@@ -0,0 +1,20 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ * Copyright (c) 2024, Pawel Dembicki <paweldembicki@gmail.com>
-+ */
-+
-+/* Included by drivers/net/dsa/vitesse-vsc73xx.h and net/dsa/tag_vsc73xx_8021q.c */
-+
-+#ifndef _NET_DSA_VSC73XX_H
-+#define _NET_DSA_VSC73XX_H
-+
-+struct vsc73xx_deferred_xmit_work {
-+	struct dsa_port *dp;
-+	struct sk_buff *skb;
-+	struct kthread_work work;
-+};
-+
-+struct vsc73xx_8021q_tagger_data {
-+	void (*xmit_work_fn)(struct kthread_work *work);
-+};
-+
-+#endif /* _NET_DSA_VSC73XX_H */
-diff --git a/net/dsa/tag_vsc73xx_8021q.c b/net/dsa/tag_vsc73xx_8021q.c
-index af121a9aff7f..d1d7a860a76e 100644
---- a/net/dsa/tag_vsc73xx_8021q.c
-+++ b/net/dsa/tag_vsc73xx_8021q.c
-@@ -2,20 +2,61 @@
- /* Copyright (C) 2024 Pawel Dembicki <paweldembicki@gmail.com>
-  */
- #include <linux/dsa/8021q.h>
-+#include <linux/dsa/vsc73xx.h>
- 
- #include "tag.h"
- #include "tag_8021q.h"
- 
- #define VSC73XX_8021Q_NAME "vsc73xx-8021q"
- 
-+struct vsc73xx_8021q_tagger_private {
-+	struct vsc73xx_8021q_tagger_data data; /* Must be first */
-+	struct kthread_worker *xmit_worker;
-+};
-+
-+static struct sk_buff *vsc73xx_defer_xmit(struct dsa_port *dp, struct sk_buff *skb)
-+{
-+	struct vsc73xx_8021q_tagger_private *priv = dp->ds->tagger_data;
-+	struct vsc73xx_8021q_tagger_data *data = &priv->data;
-+	void (*xmit_work_fn)(struct kthread_work *work);
-+	struct vsc73xx_deferred_xmit_work *xmit_work;
-+	struct kthread_worker *xmit_worker;
-+
-+	xmit_work_fn = data->xmit_work_fn;
-+	xmit_worker = priv->xmit_worker;
-+
-+	if (!xmit_work_fn || !xmit_worker)
-+		return NULL;
-+
-+	xmit_work = kzalloc(sizeof(*xmit_work), GFP_ATOMIC);
-+	if (!xmit_work)
-+		return NULL;
-+
-+	/* Calls vsc73xx_port_deferred_xmit in vitesse-vsc73xx-core.c */
-+	kthread_init_work(&xmit_work->work, xmit_work_fn);
-+	/* Increase refcount so the kfree_skb in dsa_slave_xmit
-+	 * won't really free the packet.
++	/* Everything we see on an interface that is in the HW bridge
++	 * has already been forwarded.
 +	 */
-+	xmit_work->dp = dp;
-+	xmit_work->skb = skb_get(skb);
++	if (dp->bridge)
++		skb->offload_fwd_mark = 1;
 +
-+	kthread_queue_work(xmit_worker, &xmit_work->work);
++	skb->protocol = eth_type_trans(skb, dev);
 +
-+	return NULL;
++	netif_rx(skb);
++	goto release_frame;
++
++free_skb:
++	kfree_skb(skb);
++release_frame:
++	/* Release the frame from internal buffer */
++	vsc73xx_write(vsc, VSC73XX_BLOCK_CAPTURE, VSC73XX_BLOCK_CAPT_Q0,
++		      VSC73XX_CAPT_CAPREADP, 0);
++queue:
++	kthread_queue_delayed_work(vsc->rcv_worker, &vsc->dwork,
++				   msecs_to_jiffies(VSC73XX_RCV_POLL_INTERVAL));
 +}
 +
- static struct sk_buff *
- vsc73xx_xmit(struct sk_buff *skb, struct net_device *netdev)
+ static int
+ vsc73xx_connect_tag_protocol(struct dsa_switch *ds, enum dsa_tag_protocol proto)
  {
- 	struct dsa_port *dp = dsa_user_to_port(netdev);
- 	u16 queue_mapping = skb_get_queue_mapping(skb);
- 	u16 tx_vid = dsa_tag_8021q_standalone_vid(dp);
-+	struct ethhdr *hdr = eth_hdr(skb);
- 	u8 pcp;
+@@ -1111,14 +1263,36 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+ 	ret = dsa_tag_8021q_register(ds, htons(ETH_P_8021Q));
+ 	rtnl_unlock();
  
-+	if (is_link_local_ether_addr(hdr->h_dest))
-+		return vsc73xx_defer_xmit(dp, skb);
++	/* Reset capture block */
++	vsc73xx_write(vsc, VSC73XX_BLOCK_CAPTURE, VSC73XX_BLOCK_CAPT_RST,
++		      VSC73XX_CAPT_CAPRST, 1);
 +
- 	if (skb->offload_fwd_mark) {
- 		unsigned int bridge_num = dsa_port_bridge_num_get(dp);
- 		struct net_device *br = dsa_port_bridge_dev_get(dp);
-@@ -52,11 +93,43 @@ vsc73xx_rcv(struct sk_buff *skb, struct net_device *netdev)
- 	return skb;
++	/* Capture BPDU frames */
++	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_CAPENAB,
++		      VSC73XX_CAPENAB_BPDU);
++
++	vsc->rcv_worker = kthread_create_worker(0, "vsc73xx_rcv");
++	if (IS_ERR(vsc->rcv_worker))
++		return PTR_ERR(vsc->rcv_worker);
++
++	kthread_init_delayed_work(&vsc->dwork, vsc73xx_polled_rcv);
++
++	kthread_queue_delayed_work(vsc->rcv_worker, &vsc->dwork,
++				   msecs_to_jiffies(VSC73XX_RCV_POLL_INTERVAL));
++
+ 	return ret;
  }
  
-+static void vsc73xx_disconnect(struct dsa_switch *ds)
-+{
-+	struct vsc73xx_8021q_tagger_private *priv = ds->tagger_data;
+ static void vsc73xx_teardown(struct dsa_switch *ds)
+ {
++	struct vsc73xx *vsc = ds->priv;
 +
-+	kthread_destroy_worker(priv->xmit_worker);
-+	kfree(priv);
-+	ds->tagger_data = NULL;
-+}
+ 	rtnl_lock();
+ 	dsa_tag_8021q_unregister(ds);
+ 	rtnl_unlock();
 +
-+static int vsc73xx_connect(struct dsa_switch *ds)
-+{
-+	struct vsc73xx_8021q_tagger_private *priv;
-+	int err;
-+
-+	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	priv->xmit_worker = kthread_create_worker(0, "vsc73xx_xmit");
-+	if (IS_ERR(priv->xmit_worker)) {
-+		err = PTR_ERR(priv->xmit_worker);
-+		kfree(priv);
-+		return err;
-+	}
-+
-+	ds->tagger_data = priv;
-+
-+	return 0;
-+}
-+
- static const struct dsa_device_ops vsc73xx_8021q_netdev_ops = {
- 	.name			= VSC73XX_8021Q_NAME,
- 	.proto			= DSA_TAG_PROTO_VSC73XX_8021Q,
- 	.xmit			= vsc73xx_xmit,
- 	.rcv			= vsc73xx_rcv,
-+	.connect		= vsc73xx_connect,
-+	.disconnect		= vsc73xx_disconnect,
- 	.needed_headroom	= VLAN_HLEN,
- 	.promisc_on_conduit	= true,
++	kthread_cancel_delayed_work_sync(&vsc->dwork);
++	kthread_destroy_worker(vsc->rcv_worker);
+ }
+ 
+ static void vsc73xx_init_port(struct vsc73xx *vsc, int port)
+diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
+index bf55a20f07f3..5dd458793741 100644
+--- a/drivers/net/dsa/vitesse-vsc73xx.h
++++ b/drivers/net/dsa/vitesse-vsc73xx.h
+@@ -47,6 +47,8 @@ struct vsc73xx_portinfo {
+  *	every vlan configured in port vlan operation. It doesn't cover tag_8021q
+  *	vlans.
+  * @fdb_lock: Mutex protects fdb access
++ * @rcv_worker: Kthread worker struct for packet reciver poller
++ * @dwork: Work struct for scheduling work to the packet reciver poller
+  */
+ struct vsc73xx {
+ 	struct device			*dev;
+@@ -60,6 +62,8 @@ struct vsc73xx {
+ 	struct vsc73xx_portinfo		portinfo[VSC73XX_MAX_NUM_PORTS];
+ 	struct list_head		vlans;
+ 	struct mutex			fdb_lock;
++	struct kthread_worker		*rcv_worker;
++	struct kthread_delayed_work	dwork;
  };
+ 
+ /**
 -- 
 2.34.1
 
