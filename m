@@ -1,107 +1,218 @@
-Return-Path: <netdev+bounces-137310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF64C9A5551
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 19:16:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92AD19A555B
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 19:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27747B218F4
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 17:16:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 152581F217D7
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 17:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAEB193419;
-	Sun, 20 Oct 2024 17:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z/2C3++t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F788194091;
+	Sun, 20 Oct 2024 17:31:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8387464
-	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 17:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAFA320E
+	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 17:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729444607; cv=none; b=h2s9orJiwkUzR/ZhN+9q4wO3HyJwwhvwanUXcBrsXJqkQfwMoHyZbvx8cq+lPUwstZSRBuYSZ3uoRAHUh0KaQwDrCGHzzd2tVwAErwstsLlQHzPStc0EmB2QDR4vhru8iY0wNh4jdLPFPFwYnmwCBqE1NebozzOI1UlSczUvGZ0=
+	t=1729445495; cv=none; b=INbeIpg6SlCowBzsFcOLCqPgeurmrWgSws0XSrOFzPrwEn/NFgwQSIf3vKKzOd9arbwFncEzWhyHOqZtst9A1js6OaopyDYYgSSkQTQcL+VLfPo5zR+z6iug5hf7LSkjGbhfcijTrNof5blmk0SYuhsfDcuUo7fA3ILR68yegFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729444607; c=relaxed/simple;
-	bh=I6V8NQTEyfLTTEBu8Sn6bgUyr3ui4C1po8Bgpjc1aIE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YeidcVmr/ucTsN2o60PnN6Hr++Pqv9Lek7XZ4M73jpY1/n3ng5k6Lpat4n+dPrXTj+938ZM7J0QLR0GqlQdn1OX2/KkA0TVeKubbJkvqDNO1n5yU9YvUmxhzzp63/mMSbiVTro1BN9NWWtoXwuZI5dTrrBXIRdWpwDLGQfiemrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z/2C3++t; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so4124547e87.1
-        for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 10:16:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729444603; x=1730049403; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I6V8NQTEyfLTTEBu8Sn6bgUyr3ui4C1po8Bgpjc1aIE=;
-        b=Z/2C3++t5QXX7Pk7dXd3W/jDl3pnzJIRzPPVmlsOZYdiHnWtz9J1BOjTCAPYMkEFDH
-         wrVzqsjU/kEjUQ9T7aGcdLUoj3XguyjyAH01Ot+AGI3mAlZP8k3alx0leDjUqb+tZeX3
-         tjhU6Y4j6pAc0w/xQ9hk7lKy2WuJsTtTwyTzdtugPnwTltJPrFItj/JFNgAQqLs6NjCY
-         pjAy0VWmtdOasnJmQjQLRdTLsz8f7kZwnUo+Tiz8644LBbRH1ppPzrcsm895hDzfeq1w
-         cCXpfsWpwqpBgZP9WXQHfFIbGFk34zhxWFn8pn8vanL/MuoYERQg4DsZ4TCIRyzuNMuO
-         mGwA==
+	s=arc-20240116; t=1729445495; c=relaxed/simple;
+	bh=9hKdqgeJDJCuOcBei7hsYCz+qsa7iZAapvAOJwGGIuM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=bqjbuHiOTDiLZmwO+qiOEMXlJ8kB08pA5mUX8DqubTdo9QveZu+KCcgI/R/uw6dzQ2eAI0yqSpc0ZIp/z1WiYAV7+69eovLUu0eMkLGcxiJcX7w1ZH3h26z+CFoKwdyrwU6ahS6s2RceLPqjfIZgJXI+BfuzM/4NzM1ZQAK/e7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a3c8853d76so39516225ab.2
+        for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 10:31:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729444603; x=1730049403;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I6V8NQTEyfLTTEBu8Sn6bgUyr3ui4C1po8Bgpjc1aIE=;
-        b=Zhtt7NFdFCYLueSTBibqkBw3J/n8OmrKeX7W/JPxQcdzhmkSqgaODClCDv8UQSdWKF
-         EJfwpDz8BUX+fLYUFVWXLjr6Z4UtWnGUDjfDSLZ5r/M+KweiMO7d/UsSn/0MxiDN+oea
-         pYTvhLt/RU1mA0vk68ynxtxwMwDW94JhbvOjZztqFyEjpX5AuiYDw0yJE53TTGIe6Kp5
-         v46Eaco/CdHLegCSf2Jo6mtLkFgERs5HN26v1j0c6p3yn7872VJpxjHu25WbbBgRoC1Q
-         dkJiRTt5hU8AkqpYVQcygICAirwPxzBtuPTGwFnWUBVnWSluXDpDMVd/D5rgUy6S5i3A
-         xk8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWEF5hD4T8SUzBUwzq4ciFNcDVK8nXsezptaQo4uSSnSgyHXbvmFsIo+Up8T17M2UrEjPVOFiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbfP02lPHEwt7nyu5w1Tw8UywP4+98S/T0+647euS2rVSOZCPu
-	kDEiwS6NVe6BriAZTxx9Ci/5EVfgJneUpsG/KFjyEen3Is9BCH2S7H9tz6X7HqQjPu7djUpn2tN
-	o2+EkVU8JzY8DZt8K1byXnvVnhhKcsoyxHBpfHA==
-X-Google-Smtp-Source: AGHT+IH2AqgSuWpQlh9ompn1q5wHaPZ1qFxrrbdVL9MqfxAkitzPq4pNAZ4XtjqY2wjU946yO1MA+AFW4BI1c8+w6HQ=
-X-Received: by 2002:ac2:4c48:0:b0:539:f699:4954 with SMTP id
- 2adb3069b0e04-53a1546ca04mr4715042e87.58.1729444603333; Sun, 20 Oct 2024
- 10:16:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729445492; x=1730050292;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iQIh6BYWEDQVGkT8omPhhBP+AcZOobW8LWB5GcTjMwY=;
+        b=r1HPpzhOtwyLZh826fQHi+1J9SesODekFU8cAqy0EBEkmcY8f9iHEYLeiZQ9VFO5Ek
+         336OYyyN6UAiLI8DNv1Ax/y0wXuhWaBu1PBamR4WFf+r3NW15dPsOcqOVXTaURzQOfhR
+         dhxIwPZYZjwOSbocnEHuLU3Cqw8vPMf6h1Kgc5DMCYUciYiIPBbhIq6XHU9crNrwGVPL
+         TZ9aA9S2iMFWEr9MAsySrMiKDDa8HgtiqlHeJpoVweYXubgXX9mQfPosyIVT1GbEsxNF
+         srV9oRxlXe9Kac8+DBq/u8Pgj1QttFwCB6L5xO6Bze2v3kP5tIFpx44FQbwo0fijh9iA
+         vzXg==
+X-Forwarded-Encrypted: i=1; AJvYcCVuRsVP7HwHQWhVHAlnPpgnbZAupB6HrUbzlFO1zyQHO3Ckw0i2EQlnhxIOB664yKb6TWnQPYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1slns7Grpt1QPrYUWQfBCEAw2W9bZKKdQfvKWK03mxaOnCQR8
+	bdy90PziQiM+61BWvZWuHg/imh4fNz4/7tiFt2mG+Qx0iX1GJOkILnUMGZRu1R8R9EBwx62sgkv
+	Cur2zGp01XS8fUANSl7s+fukNmf4XHMBK6b8awD6PKLbURRPtRD6X2Jw=
+X-Google-Smtp-Source: AGHT+IE+30P0kfox4ZfqTO46KDXioj/OiMVWC/USDwWvtOpKEVp+dOA+nxcE8Dk/yOhulJUX17+SIs/XGM77vWL31TpPueNKW8rv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241019-mv88e6xxx_chip-fwnode_handle_put-v1-1-fc92c4f16831@gmail.com>
-In-Reply-To: <20241019-mv88e6xxx_chip-fwnode_handle_put-v1-1-fc92c4f16831@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 20 Oct 2024 19:16:31 +0200
-Message-ID: <CACRpkdY9jaXDoFzCC0ejLZPbbJ+QAgsb+QE29sDEw0Htgej1HQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: dsa: mv88e6xxx: fix unreleased
- fwnode_handle in setup_port()
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6e02:1a83:b0:3a0:c23f:9647 with SMTP id
+ e9e14a558f8ab-3a3f4046c67mr76366855ab.1.1729445492417; Sun, 20 Oct 2024
+ 10:31:32 -0700 (PDT)
+Date: Sun, 20 Oct 2024 10:31:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67153e74.050a0220.3d9749.000c.GAE@google.com>
+Subject: [syzbot] [netfilter?] INFO: task hung in do_arpt_get_ctl (2)
+From: syzbot <syzbot+47dcc37219cf4421eec6@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 19, 2024 at 10:16=E2=80=AFPM Javier Carrasco
-<javier.carrasco.cruz@gmail.com> wrote:
+Hello,
 
-> 'ports_fwnode' is initialized via device_get_named_child_node(), which
-> requires a call to fwnode_handle_put() when the variable is no longer
-> required to avoid leaking memory.
->
-> Add the missing fwnode_handle_put() after 'ports_fwnode' has been used
-> and is no longer required.
->
-> Fixes: 94a2a84f5e9e ("net: dsa: mv88e6xxx: Support LED control")
-> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+syzbot found the following issue on:
 
-I was as puzzled as Andrew but I buy the explanation.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+HEAD commit:    2f87d0916ce0 Merge tag 'trace-ringbuffer-v6.12-rc3' of git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13d23887980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cfbd94c114a3d407
+dashboard link: https://syzkaller.appspot.com/bug?extid=47dcc37219cf4421eec6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103b7727980000
 
-Yours,
-Linus Walleij
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-2f87d091.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2704ba6867a8/vmlinux-2f87d091.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9f7121fd532b/bzImage-2f87d091.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+47dcc37219cf4421eec6@syzkaller.appspotmail.com
+
+INFO: task syz-executor:5236 blocked for more than 143 seconds.
+      Not tainted 6.12.0-rc3-syzkaller-00044-g2f87d0916ce0 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:20608 pid:5236  tgid:5236  ppid:5230   flags:0x00000000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5322 [inline]
+ __schedule+0x1895/0x4b30 kernel/sched/core.c:6682
+ __schedule_loop kernel/sched/core.c:6759 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6774
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6831
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
+ xt_find_table_lock+0x4c/0x3b0 net/netfilter/x_tables.c:1243
+ xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
+ get_info net/ipv4/netfilter/arp_tables.c:808 [inline]
+ do_arpt_get_ctl+0x904/0x16b0 net/ipv4/netfilter/arp_tables.c:1452
+ nf_getsockopt+0x299/0x2c0 net/netfilter/nf_sockopt.c:116
+ ip_getsockopt+0x222/0x2e0 net/ipv4/ip_sockglue.c:1777
+ tcp_getsockopt+0x163/0x1c0 net/ipv4/tcp.c:4670
+ do_sock_getsockopt+0x3c4/0x7e0 net/socket.c:2396
+ __sys_getsockopt+0x267/0x330 net/socket.c:2425
+ __do_sys_getsockopt net/socket.c:2435 [inline]
+ __se_sys_getsockopt net/socket.c:2432 [inline]
+ __x64_sys_getsockopt+0xb5/0xd0 net/socket.c:2432
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f766ed7fd3a
+RSP: 002b:00007ffc9412c6b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f766ed7fd3a
+RDX: 0000000000000060 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 00007ffc9412c6d0 R08: 00007ffc9412c6cc R09: 00007ffc9412cab7
+R10: 00007ffc9412c6d0 R11: 0000000000000246 R12: 00007ffc9412c6cc
+R13: 00000000000481ce R14: 00000000000481a7 R15: 00007ffc9412cdf0
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/25:
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
+1 lock held by kswapd0/79:
+1 lock held by klogd/4585:
+ #0: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #0: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+1 lock held by dhcpcd/4810:
+ #0: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #0: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+2 locks held by getty/4897:
+ #0: ffff88801ebb90a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000039b2f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
+2 locks held by syz-execprog/5134:
+ #0: ffff88803e1ae8a8 (mapping.invalidate_lock){++++}-{3:3}, at: filemap_invalidate_lock_shared include/linux/fs.h:870 [inline]
+ #0: ffff88803e1ae8a8 (mapping.invalidate_lock){++++}-{3:3}, at: filemap_fault+0xd54/0x1950 mm/filemap.c:3350
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+1 lock held by syz-executor/5126:
+ #0: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #0: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+2 locks held by syz-executor/5231:
+ #0: ffff8880006f29b8 (&vma->vm_lock->lock){++++}-{3:3}, at: vma_start_read include/linux/mm.h:704 [inline]
+ #0: ffff8880006f29b8 (&vma->vm_lock->lock){++++}-{3:3}, at: lock_vma_under_rcu+0x34b/0x790 mm/memory.c:6228
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+1 lock held by syz-executor/5232:
+ #0: ffff88801bba2458 (&xt[i].mutex){+.+.}-{3:3}, at: xt_find_table_lock+0x4c/0x3b0 net/netfilter/x_tables.c:1243
+2 locks held by syz-executor/5233:
+ #0: ffff88801198f220 (&vma->vm_lock->lock){++++}-{3:3}, at: vma_start_read include/linux/mm.h:704 [inline]
+ #0: ffff88801198f220 (&vma->vm_lock->lock){++++}-{3:3}, at: lock_vma_under_rcu+0x34b/0x790 mm/memory.c:6228
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+2 locks held by syz-executor/5234:
+ #0: ffff88801bba2458 (&xt[i].mutex){+.+.}-{3:3}, at: xt_find_table_lock+0x4c/0x3b0 net/netfilter/x_tables.c:1243
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+2 locks held by syz-executor/5235:
+ #0: ffff88803c3ac808 (&vma->vm_lock->lock){++++}-{3:3}, at: vma_start_read include/linux/mm.h:704 [inline]
+ #0: ffff88803c3ac808 (&vma->vm_lock->lock){++++}-{3:3}, at: lock_vma_under_rcu+0x34b/0x790 mm/memory.c:6228
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __perform_reclaim mm/page_alloc.c:3907 [inline]
+ #1: ffffffff8ea37160 (fs_reclaim){+.+.}-{0:0}, at: __alloc_pages_direct_reclaim+0xd4/0x3c0 mm/page_alloc.c:3932
+1 lock held by syz-executor/5236:
+ #0: ffff88801bba2458 (&xt[i].mutex){+.+.}-{3:3}, at: xt_find_table_lock+0x4c/0x3b0 net/netfilter/x_tables.c:1243
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 25 Comm: khungtaskd Not tainted 6.12.0-rc3-syzkaller-00044-g2f87d0916ce0 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
+ watchdog+0xff4/0x1040 kernel/hung_task.c:379
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
