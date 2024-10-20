@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-137278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871719A5498
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 16:50:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 906269A549A
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 16:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 483182829F2
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:50:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 369721F2280D
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406B2194123;
-	Sun, 20 Oct 2024 14:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E641946BC;
+	Sun, 20 Oct 2024 14:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNTDckWX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFt01F8U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1062C19342B;
-	Sun, 20 Oct 2024 14:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A0B194091;
+	Sun, 20 Oct 2024 14:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729435831; cv=none; b=In07Gd8G2f5icuuSQioJxwp8yXtpmkq2VfRWF4v/Wv1ujqmN8iRCFUondeFdb4y24snDCtnVKauVsZfmIYuJL8K/MLTuX6SPuN0Bt3JlAqMJxd1bRQPQGuLI+VwaESTm38EceY29mx4ZgcQ0SyZiZN0voGIe9j1gbU2rrdrC/ak=
+	t=1729435832; cv=none; b=Kj5WYUj4YQO74yhV/G/LAJax42sNH4Xw5GrMa0dPtDTv7guSCgOtoFpuVUDmjVOXKqoFAUW9u/K3657xgPgHrqmwMhuj3ljH8Va4mab6hpDKwZIX4RxxQEfGl676MFiPs9Aic7btVs3r6u08IKIrXpawta5OzRXlJleDZJqABL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729435831; c=relaxed/simple;
-	bh=Y8Slu9wrylwB33Nz7+0pf64zgrLIw+qrVV6xYJbcOo4=;
+	s=arc-20240116; t=1729435832; c=relaxed/simple;
+	bh=rs6TExETk20NHciXuxN3N0VZQcIms36qRvEpTZHilhg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eJgDSrsjFxUgB0pd9ZWfrh8BHSL2Oj3OmxjAnYG1REHhgrX0q5jffMUzl8ubQm9pmxqQFK3SkzPMQpH50y3QEd+JYLRd/a0gBkYFLc1gazqmcRsIEKR4ibkZCaA9a5MxoGxFJLKte09zQBDKOK8ZwNN+IYH7fjaDn8Ap+THkIAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNTDckWX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B3A1C4CEC7;
-	Sun, 20 Oct 2024 14:50:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ZL4JyJACCMTaijbR/YscBMkYbSIGEXkqFCwhobIhhiBj/Hq189VMqzJxqW2cytDFesNKT4m3QUX50TXtUWGYKT9bmbPXpvxCCb6axA6NqldF/F+JmQiBHarFSwQ3dS6eoZIN9pKDmKzjXrR29xvPRlghqJQV8sT2vRfldbQZfps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFt01F8U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F28DC4CEEA;
+	Sun, 20 Oct 2024 14:50:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729435830;
-	bh=Y8Slu9wrylwB33Nz7+0pf64zgrLIw+qrVV6xYJbcOo4=;
+	s=k20201202; t=1729435832;
+	bh=rs6TExETk20NHciXuxN3N0VZQcIms36qRvEpTZHilhg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PNTDckWX487PmCr9KNKFaaDVKuvqMwRmn3EuQy/pDAvIIMTWIovkSyPJ2i1vbVnPT
-	 5wWeAihsByZUtvfr0USc2bPuA51mJc/mue+JONcyeTUR1+4Y8XwEfv2YlGZMRuNkRM
-	 gxRWQmqdZjC3VsTHF9iNXAKc1GVUTHS+FsUTHHlvqfmrXn2pveDzTm9gu8Da+bCsGY
-	 SP7EZh8fedH56bcDit1yn8EVIvxoobd7UwNWnsBRPkWMiCiU9P+oYUq1rlxOUw+x/F
-	 H0bNf+RbqQv65PU7yUWjVFhgk3ijtDMw1W9SFKyMzB8pksc/k7GpeFghHte4yFjHMZ
-	 DCz9l6PFe9dCQ==
+	b=JFt01F8Uyz6Dmxy6QVuBbqiMicLbJFlWcfoYr+ZqqH+ID/CXn4M8NHQ+XOsXB0NQk
+	 MD3PeatlqDX4ShrEW8yrhUYdilFv9J6bihjNrG/2CLOIPguoV4vo3If1z1690Yh029
+	 kXgLPMNPwpneiCv2dE7XFMRa1igF94KwtVWvCxWdpYe6mUk5qbw5TIa0f9qFwLoCQN
+	 YdWPU09IuHTiBCVbeAeheCTNTNzfuHSkvSxJsepiqUH2nN9xwChX8oEF8TAO1AbUfO
+	 SOvZQOueBKRGADvQdFdOxy3EnA/hAST3zUHpbcL+38DKmSb2CscP9Gv8KyNMguMxxW
+	 rRRlIRYBbS+XA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1123805CC0;
-	Sun, 20 Oct 2024 14:50:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EDE3805CC0;
+	Sun, 20 Oct 2024 14:50:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv2 net] MAINTAINERS: add samples/pktgen to NETWORKING [GENERAL]
+Subject: Re: [PATCH net v5 0/2] octeon_ep: Add SKB allocation failures handling in
+ __octep_oq_process_rx()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172943583625.3593495.15746793954676692659.git-patchwork-notify@kernel.org>
-Date: Sun, 20 Oct 2024 14:50:36 +0000
-References: <20241018005301.10052-1-liuhangbin@gmail.com>
-In-Reply-To: <20241018005301.10052-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, haokexin@gmail.com,
- Ilia.Gavrilov@infotecs.ru, linux-kernel@vger.kernel.org, atenart@kernel.org
+ <172943583774.3593495.10822250778855720731.git-patchwork-notify@kernel.org>
+Date: Sun, 20 Oct 2024 14:50:37 +0000
+References: <20241017100651.15863-1-amishin@t-argos.ru>
+In-Reply-To: <20241017100651.15863-1-amishin@t-argos.ru>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: vburru@marvell.com, aayarekar@marvell.com, sburla@marvell.com,
+ sedara@marvell.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Andrew Lunn <andrew@lunn.ch>:
 
-On Fri, 18 Oct 2024 00:53:01 +0000 you wrote:
-> samples/pktgen is missing in the MAINTAINERS file.
+On Thu, 17 Oct 2024 13:06:49 +0300 you wrote:
+> __octep_oq_process_rx() is called during NAPI polling by the driver and
+> calls build_skb() which may return NULL as skb pointer in case of memory
+> allocation error. This pointer is dereferenced later without checking for
+> NULL.
 > 
-> Suggested-by: Antoine Tenart <atenart@kernel.org>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> v2: fix alphabetical order, make patch target to net (Simon Horman)
+> In this series, we introduce two helpers to make the fix more readable and
+> avoid code duplication. Also we handle build_skb() errors inside
+> __octep_oq_process_rx() to avoid NULL pointer dereference.
 > 
 > [...]
 
 Here is the summary with links:
-  - [PATCHv2,net] MAINTAINERS: add samples/pktgen to NETWORKING [GENERAL]
-    https://git.kernel.org/netdev/net/c/3b05b9c36ddd
+  - [net,v5,1/2] octeon_ep: Implement helper for iterating packets in Rx queue
+    https://git.kernel.org/netdev/net/c/bd28df26197b
+  - [net,v5,2/2] octeon_ep: Add SKB allocation failures handling in __octep_oq_process_rx()
+    https://git.kernel.org/netdev/net/c/eb592008f79b
 
 You are awesome, thank you!
 -- 
