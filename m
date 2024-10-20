@@ -1,131 +1,124 @@
-Return-Path: <netdev+bounces-137272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C6F9A541F
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:52:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A9879A5404
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 14:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B97B3B21AD7
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 12:51:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D764E2825E8
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 12:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14995192B84;
-	Sun, 20 Oct 2024 12:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B30191F60;
+	Sun, 20 Oct 2024 12:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Ie1r24x0"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W7OxQxO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-27.smtpout.orange.fr [80.12.242.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D522DEAF1;
-	Sun, 20 Oct 2024 12:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265961F5FD;
+	Sun, 20 Oct 2024 12:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729428712; cv=none; b=MzOJc3uPPb4WDGvYaryT0/+sZC2lp/RjkhTcR92h/4Xbm9iJYfd0z3muuzczIWTU9ctMUw0WDkfFXc/LDAmePzNAfIEgW1wFc/SYOd+RXv6wCI+gAzdIc7jCiT58f8xj8J6kT8fpkvl1xd4xGCuenAcRtqOYGtxvkfu6cnmuBHE=
+	t=1729427368; cv=none; b=mrr14WHo1Q5PCERUKf/VTXxzk58Fz5ENRK5vK7YLePNyu7bqwKbdzc2qI7D8bH+JcnwCKWVlMxc8BVYtje9X4jsoyskSWvKN25E0+dwpgikACffWHntZ+Wh0CbehP7CZL7bUBTtj0/dmFCKnlIoXgdyd6l1jERC2AM7Gl62Q+vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729428712; c=relaxed/simple;
-	bh=JKADh7kj1lQp1aoQuZiY6EwB94qTgxyXD3rmimFM6SU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hNBwduZfAbtxu6IhfMbbuM0DxCRsoZfUdDSg6WjAH+zJtQxC7CQayebYoM7Fv7ogQ0DzuroWB8kGr+DYC9twwuglxTXO/vGhFhrz2AWgZTC9Cd/YawicLgTDhNB0VIfckCt3YiwCUSFdR4MP8/Q1R3VIx69zX3JW4kTG0I64hBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Ie1r24x0; arc=none smtp.client-ip=80.12.242.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id 2QHmtx47CqSl42QHmtsEdU; Sun, 20 Oct 2024 09:23:40 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1729409020;
-	bh=TMmAAHQKed3UL+28kOhhlB2nfADOlaN6TyUGoxjD1dQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Ie1r24x01qWEkuD/Qx0FQAQSKlXSuVZw8nrURubilzSq6qoeJbvFDsMEYUkdFxHL3
-	 yoDJbP2i+9JAcdEJ65msWctHUlW264cTvB/qtOtqQm8Sy5NB3MPIk2Lkes5TmAwtrR
-	 t6cFlSMeW72ir7hedjuCZd8ciIK6n+8FNQBu6QkLS2rpVmvPAzJ5GjqbJJWMOdFR+L
-	 FNEKvhFVKt4xzTe08tBjCFJ2dGk7r75hwhWUg+QHrB+rnCEg672swd84R+iOcy9rS1
-	 9iB2JcUcHcYt9Gt3UVZZAhRaDQvNxIZeZ/HJO/Qqo1EMXOzUUg7tMc/v2y6m8ptHW9
-	 auryByRv/vB/A==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Sun, 20 Oct 2024 09:23:40 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <5e828a43-9365-4ac5-b411-0be7188ab8f2@wanadoo.fr>
-Date: Sun, 20 Oct 2024 09:23:32 +0200
+	s=arc-20240116; t=1729427368; c=relaxed/simple;
+	bh=oK7VZ748YZzPlvjiEAflfk6kW/AiZBAXdWoti14V2vY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEtQE9hEOAb2lV8Iv6JyHKTVFHIKSGJC9zeDibISEigKt3Hy2F0DcobHoLON+ZmLdqTlLJwgUKAF4kggZij2QeeqcDmiXx5Q1QeJWLgIH6jZm32yg9W0ikvKH0YSTn0pey2PZP74p0JVL/uHULlsr63C6amekYaZFVrZUlLc5Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W7OxQxO+; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfout.phl.internal (Postfix) with ESMTP id 3C59A13801ED;
+	Sun, 20 Oct 2024 08:29:25 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-07.internal (MEProxy); Sun, 20 Oct 2024 08:29:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1729427365; x=1729513765; bh=7c9ju46R6QyN1443WbFxMita+e/d
+	5Edr3KeaNQmPjnE=; b=W7OxQxO+xOboy1uFXuZt2v+1seC0HNg3SRuRcZNc36jq
+	5d6mnAKCmacchvOl/4B72UcDq04TK9SVJ1CgPCAeAGb6LoVGYLCIzEhLynbRqQk3
+	tm+7vZZoRvGQ1raM8oweINlbXX/mEW3ZDJ0yJDZIWdleRPXT0b3zp2lsnd04ty+L
+	fYtYVo6LaXqwpqbTgD6qqJbGkgZhqO8QTYedYOgZnERHBcBM3sOugkVGnSMz5JNY
+	+nT0sziXuGQGsYgtV5hps7d+4vLkOuwboUytdhCE6DywMJIl+YOw5duODT9zxgEJ
+	YKJLRkigN6qy7y1y9LMN+FZoB2RXpeGiXDSSlfA3uw==
+X-ME-Sender: <xms:pPcUZ2ohHBgPVbNDkRas89oib3d_T5avJbotJYTEXCFPDQHstJlQlQ>
+    <xme:pPcUZ0qSrYukrOGqhSPBzqu8NdY8VVYOwrVa8qX5yuY5GTxtD4UANJIuBYxt17t7H
+    tz1LkVwmyvOplg>
+X-ME-Received: <xmr:pPcUZ7Md7mlMwrUXvBdK2hHF9RD1aK22deRLMH02guxXqro315hIQY8nWUq_>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehjedghedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
+    hrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieef
+    gfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthht
+    ohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephigrjhhunhdruggvnhhgse
+    hlihhnuhigrdguvghvpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:pPcUZ17j-OjwnTlDTEARwMnKh6-kwLfbxEYMd4cql93xeiKC3rCaNg>
+    <xmx:pPcUZ14HKylRg_RrD98elqCKoyC_waYN1l-p-HU3RNDHQsxPxCj12g>
+    <xmx:pPcUZ1gzf__nwf3M1zHVIzZ2i3iBjSaIWyftKr9JLNsdLAg6zyUDqw>
+    <xmx:pPcUZ_59Bylivw0nDTWr2J_jtHQa_OZm0487qguo9rfgnGHNCFMcfg>
+    <xmx:pfcUZyu13OZx96y9wyeYADZCbf5HXTagqdd6OOn22WzJtv-It-3IY3-1>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 20 Oct 2024 08:29:23 -0400 (EDT)
+Date: Sun, 20 Oct 2024 15:29:21 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 net-next] net: vlan: Use vlan_prio instead of vlan_qos
+ in mapping
+Message-ID: <ZxT3oVQ27erIoTVz@shredder.mtl.com>
+References: <20241018141233.2568-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] phy: core: Add missing of_node_put() in
- of_phy_provider_lookup()
-To: Zijun Hu <zijun_hu@icloud.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Felipe Balbi <balbi@ti.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Rob Herring <robh@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Lee Jones <lee@kernel.org>
-Cc: stable@vger.kernel.org, linux-phy@lists.infradead.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241020-phy_core_fix-v1-0-078062f7da71@quicinc.com>
- <20241020-phy_core_fix-v1-5-078062f7da71@quicinc.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241020-phy_core_fix-v1-5-078062f7da71@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018141233.2568-1-yajun.deng@linux.dev>
 
-Le 20/10/2024 à 07:27, Zijun Hu a écrit :
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
+On Fri, Oct 18, 2024 at 10:12:33PM +0800, Yajun Deng wrote:
+> The vlan_qos member is used to save the vlan qos, but we only save the
+> priority. Also, we will get the priority in vlan netlink and proc.
+> We can just save the vlan priority using vlan_prio, so we can use vlan_prio
+> to get the priority directly.
 > 
-> The for_each_child_of_node() macro automatically decrements the child
-> refcount at the end of every iteration. On early exits, of_node_put()
-> must be used to manually decrement the refcount and avoid memory leaks.
+> For flexibility, we introduced vlan_dev_get_egress_priority() helper
+> function. After this patch, we will call vlan_dev_get_egress_priority()
+> instead of vlan_dev_get_egress_qos_mask() in irdma.ko and rdma_cm.ko.
+> Because we don't need the shift and mask operations anymore.
 > 
-> The macro called by of_phy_provider_lookup() has such early exit, but
-> it does not call of_node_put() before early exit.
-> 
-> Fixed by adding missing of_node_put() in of_phy_provider_lookup().
-> 
-> Fixes: 2a4c37016ca9 ("phy: core: Fix of_phy_provider_lookup to return PHY provider for sub node")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> ---
-> The impact of this change is wide since of_phy_provider_lookup()
-> is indirectly called by APIs phy_get(), of_phy_get(), and
-> devm_of_phy_get_by_index().
-> 
-> The following kernel mainline commit has similar fix:
-> Commit: b337cc3ce475 ("backlight: lm3509_bl: Fix early returns in for_each_child_of_node()")
-> ---
->   drivers/phy/phy-core.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
-> index 967878b78797..24bd619a33dd 100644
-> --- a/drivers/phy/phy-core.c
-> +++ b/drivers/phy/phy-core.c
-> @@ -143,10 +143,11 @@ static struct phy_provider *of_phy_provider_lookup(struct device_node *node)
->   	list_for_each_entry(phy_provider, &phy_provider_list, list) {
->   		if (phy_provider->dev->of_node == node)
->   			return phy_provider;
-> -
->   		for_each_child_of_node(phy_provider->children, child)
-> -			if (child == node)
-> +			if (child == node) {
-> +				of_node_put(child);
->   				return phy_provider;
-> +			}
+> There is no functional changes.
 
-Hi,
+Not sure I understand the motivation.
 
-Maybe for_each_child_of_node_scoped() to slightly simplify things at the 
-same time?
+IIUC, currently, struct vlan_priority_tci_mapping::vlan_qos is shifted
+and masked in the control path (vlan_dev_set_egress_priority) so that
+these calculations would not need to be performed in the data path where
+the VLAN header is constructed (vlan_dev_hard_header /
+vlan_dev_hard_start_xmit).
 
->   	}
->   
->   	return ERR_PTR(-EPROBE_DEFER);
-> 
+This patch seems to move these calculations to the data path so that
+they would not need to be performed in the control path when dumping the
+priority mapping via netlink / proc.
 
+Why is it a good trade-off?
 
