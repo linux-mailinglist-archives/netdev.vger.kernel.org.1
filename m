@@ -1,133 +1,134 @@
-Return-Path: <netdev+bounces-137259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8B29A5313
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 10:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7AF9A532D
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 10:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41FFE1F21E56
-	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 08:18:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F06D31F211DB
+	for <lists+netdev@lfdr.de>; Sun, 20 Oct 2024 08:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1566441C85;
-	Sun, 20 Oct 2024 08:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="jo2crYfQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A6378C76;
+	Sun, 20 Oct 2024 08:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mr85p00im-ztdg06011801.me.com (mr85p00im-ztdg06011801.me.com [17.58.23.199])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354F11078F
-	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 08:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9600614A90
+	for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 08:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729412296; cv=none; b=Sfgu46lGysHN7zNZTfUYe/1zFZFifzef3tpbQ2VLKPFmhP8ZzVq5HGBY5jfKrKeGkSrwLQt5qxgBgi+EQJqMKtW1oHNA/ZuDJb6AajcLoJXluE18LNhBLLb/wK+dKpHaC54kt08tOVFc7B3WUZcYHTLIxE+MDJv2iu5raBO1UHQ=
+	t=1729413868; cv=none; b=eoTNtIPsEwgi2r/Zsk+vR9YXFVZPvWhnXlA+j8SJuE8Y8N2PT4suvPktRayggC2YRg00VU+RCzsZ2BkbJeIPvL8f0KGlQ6WAMHGXYJKTcVnbFXHTzfE/M9i1jdRz1fPO+BWvQYGvP38do/y+oLOQEfyNWvbnC4b4FyhjG1G4cU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729412296; c=relaxed/simple;
-	bh=4rRN2upErJXwVYOa3zXJGtjNIRKub+rjNK9urqCnwp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=glFX+KfnpDIIxtA3c0qt3ovDJDJ3f/RkHGbiYV1BOYu0X3XICfYAwKx+NjQeYKS2GMvz4epT2H997Lw7CrFJUBNY9CbqAZIwC/NnxotUWKkLkTUa08HlXRhk/Oy7YV1V3vt2qp4AXDY8SqI8lNeiwSrUPXEYskO9oOrramcViUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=jo2crYfQ; arc=none smtp.client-ip=17.58.23.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1729412292;
-	bh=+UZzz+z7p55a5+mo6TK6JWnhlOW39+wGGfYZPaGJKtY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=jo2crYfQmO8Gv4wwWh41gOlsWA5WRua3SyRkVzwCl9CHc41gRxVeoXCAUKr4xLXMp
-	 VSWgVsmXvAfAZDXbWaMXKu9GNy6QDSIM+DyoRwPaZOFhRKGxIG54rfMmdgec2yGWlR
-	 44WLL6D+j7r548/avuiEpX1yZSN5XIWsAe7FuX18jUHLN5ZbFEc3kMY6B/iAklUUX3
-	 OT++rFGJwxAR96T3RliTcxgfTiBadAXXlATuxaPLYRDvh7bKy4DQF1ESQVYD3gsitN
-	 dtxkkdPztAgqkaRaDK+mK3bPfXui3gsZt6eDYdb+gj6b9JuvIA85Hbc4sG5EG2PGup
-	 6aiekBiHLHDCw==
-Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06011801.me.com (Postfix) with ESMTPSA id 0679AAC56DC;
-	Sun, 20 Oct 2024 08:18:08 +0000 (UTC)
-Message-ID: <e165fb81-8d96-49dc-9bfd-85ae79ef4f64@icloud.com>
-Date: Sun, 20 Oct 2024 16:18:03 +0800
+	s=arc-20240116; t=1729413868; c=relaxed/simple;
+	bh=+stGq4nb8akwH6Nh93GfnKJT4y3xPhzx01jTDLNF/xc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uP/up9mwx6Cxwytk8Yp4LkCqXFIQAQ8N/T6Ee5JTJQmZb3/yGkV5pUfX4nadN07ZXLU3By/u19CgIlKTjifBZQAvs9TH6/EJUCsOF4p0Dvm5ryV70xlHZJ+PZsGZH8r96DtobRtpWqfUdev03XD6DmBeVjdUN3RLoc5xtBRVx5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t2RXh-0000gK-OY; Sun, 20 Oct 2024 10:44:05 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t2RXg-000VCp-03;
+	Sun, 20 Oct 2024 10:44:04 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t2RXf-003vtG-2w;
+	Sun, 20 Oct 2024 10:44:03 +0200
+Date: Sun, 20 Oct 2024 10:44:03 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Tim Harvey <tharvey@gateworks.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4] net: dsa: microchip: disable EEE for
+ KSZ879x/KSZ877x/KSZ876x
+Message-ID: <ZxTC006I-AWuJ3Ru@pengutronix.de>
+References: <20241018160658.781564-1-tharvey@gateworks.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] phy: core: Add missing of_node_put() in
- of_phy_provider_lookup()
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Felipe Balbi <balbi@ti.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Rob Herring <robh@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Lee Jones <lee@kernel.org>
-Cc: stable@vger.kernel.org, linux-phy@lists.infradead.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241020-phy_core_fix-v1-0-078062f7da71@quicinc.com>
- <20241020-phy_core_fix-v1-5-078062f7da71@quicinc.com>
- <5e828a43-9365-4ac5-b411-0be7188ab8f2@wanadoo.fr>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <5e828a43-9365-4ac5-b411-0be7188ab8f2@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 6BrM4yrglDgG8u6czpMYQdRccmjjapAH
-X-Proofpoint-GUID: 6BrM4yrglDgG8u6czpMYQdRccmjjapAH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-20_05,2024-10-17_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 adultscore=0
- malwarescore=0 spamscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2410200052
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241018160658.781564-1-tharvey@gateworks.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 2024/10/20 15:23, Christophe JAILLET wrote:
-> Le 20/10/2024 à 07:27, Zijun Hu a écrit :
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
-
-[snip]
-
->> ---
->>   drivers/phy/phy-core.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/phy/phy-core.c b/drivers/phy/phy-core.c
->> index 967878b78797..24bd619a33dd 100644
->> --- a/drivers/phy/phy-core.c
->> +++ b/drivers/phy/phy-core.c
->> @@ -143,10 +143,11 @@ static struct phy_provider
->> *of_phy_provider_lookup(struct device_node *node)
->>       list_for_each_entry(phy_provider, &phy_provider_list, list) {
->>           if (phy_provider->dev->of_node == node)
->>               return phy_provider;
->> -
->>           for_each_child_of_node(phy_provider->children, child)
->> -            if (child == node)
->> +            if (child == node) {
->> +                of_node_put(child);
->>                   return phy_provider;
->> +            }
+On Fri, Oct 18, 2024 at 09:06:58AM -0700, Tim Harvey wrote:
+> The well-known errata regarding EEE not being functional on various KSZ
+> switches has been refactored a few times. Recently the refactoring has
+> excluded several switches that the errata should also apply to.
 > 
-> Hi,
+> Disable EEE for additional switches with this errata and provide
+> additional comments referring to the public errata document.
 > 
-> Maybe for_each_child_of_node_scoped() to slightly simplify things at the
-> same time?
+> The original workaround for the errata was applied with a register
+> write to manually disable the EEE feature in MMD 7:60 which was being
+> applied for KSZ9477/KSZ9897/KSZ9567 switch ID's.
 > 
-
-thank you for code review.
-
-it does not use _scoped() since for_each_child_of_node() usage here is
-very simple and only has one early exit, _scoped() normally is for
-complex case.
-
-i maybe use _scoped() in next revision if one more reviewer also prefers
-it.
-
-thank you.
-
->>       }
->>         return ERR_PTR(-EPROBE_DEFER);
->>
+> Then came commit 26dd2974c5b5 ("net: phy: micrel: Move KSZ9477 errata
+> fixes to PHY driver") and commit 6068e6d7ba50 ("net: dsa: microchip:
+> remove KSZ9477 PHY errata handling") which moved the errata from the
+> switch driver to the PHY driver but only for PHY_ID_KSZ9477 (PHY ID)
+> however that PHY code was dead code because an entry was never added
+> for PHY_ID_KSZ9477 via MODULE_DEVICE_TABLE.
 > 
+> This was apparently realized much later and commit 54a4e5c16382 ("net:
+> phy: micrel: add Microchip KSZ 9477 to the device table") added the
+> PHY_ID_KSZ9477 to the PHY driver but as the errata was only being
+> applied to PHY_ID_KSZ9477 it's not completely clear what switches
+> that relates to.
+> 
+> Later commit 6149db4997f5 ("net: phy: micrel: fix KSZ9477 PHY issues
+> after suspend/resume") breaks this again for all but KSZ9897 by only
+> applying the errata for that PHY ID.
+> 
+> Following that this was affected with commit 08c6d8bae48c("net: phy:
+> Provide Module 4 KSZ9477 errata (DS80000754C)") which removes
+> the blatant register write to MMD 7:60 and replaces it by
+> setting phydev->eee_broken_modes = -1 so that the generic phy-c45 code
+> disables EEE but this is only done for the KSZ9477_CHIP_ID (Switch ID).
+> 
+> Lastly commit 0411f73c13af ("net: dsa: microchip: disable EEE for
+> KSZ8567/KSZ9567/KSZ9896/KSZ9897.") adds some additional switches
+> that were missing to the errata due to the previous changes.
+> 
+> This commit adds an additional set of switches.
+> 
+> Fixes: 0411f73c13af ("net: dsa: microchip: disable EEE for KSZ8567/KSZ9567/KSZ9896/KSZ9897.")
+> Signed-off-by: Tim Harvey <tharvey@gateworks.com>
 
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+Thank you!
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
