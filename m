@@ -1,111 +1,101 @@
-Return-Path: <netdev+bounces-137516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3CF39A6BC8
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:12:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADCBB9A6BE7
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A562B2811AE
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:12:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31370B279FB
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A971F940F;
-	Mon, 21 Oct 2024 14:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986B91F8F1E;
+	Mon, 21 Oct 2024 14:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="r4kvZTeQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LUDqdu88"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6451F427B;
-	Mon, 21 Oct 2024 14:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B216138DE0
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 14:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729519900; cv=none; b=EsUnpJFl2UkbSJbvVSJnVlLDrVQy34nMwDqqVZFOR0oelBbRsNRqj8tFpLtgkN1jm/TiRBUymLZA4zVwzHu7HIlVnVOnRrLPU+djSzG7VcOmUD28mDy/i0RavxTgX8Kl9eauPqe8HUpU0ZuLJKfGt6PuVnhq+q5N80PnLhegOEQ=
+	t=1729519841; cv=none; b=H5VAxG+up1+tyBPRlBLcyMqKz2MdksUSA2HMY2iPrbNG/FdO4yDnvjRsjcmLWn+GjjH6jGe/QhatkY2jx9pwfyAlAq5KGrUTdbkSbZr9goQDDnflRZ7J9WTgMBb/zDh7Gl9k3B0kH4Z/AU6fqWQ7I5Nnj0TGepkMlksw6LSEj3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729519900; c=relaxed/simple;
-	bh=r12XCv7wGjmgJ0EEIi5AyKG2WXF2DeRO+CdRaxJvlks=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NhgZnEmp4s0J3azxZ9InIUgrIhgmwkOelg4i0ESFnzAyHqHx/CgQrKVTs1N0dMPE2BWxuVfOV6rEQsBqXf5uzH8PRX+xXa6TDhYiqt0O64C+Itdr7hYAfz5G8kA+QaRe8yYWbSNZRD0YKAZtIhrMbLplhU+FzzmhkvBJy/YJeTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=r4kvZTeQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7K5v5ZY4zeUHGzQFv6PebieE5LwgNrwfdhsPGijF2ik=; b=r4kvZTeQKPzFsBGVTHgUYy+0YZ
-	ppHjYn/ra/ADYAFKKcXttGtKerJ0yHoFkifnPIDSWcbYyen3gPlZEsb5pfadAclUgpZ1S95wWPp5z
-	zj7eCkHk3gGPdtKeWXF8Bjt3ZQlZwk49URuG9iBm0VgI7/SL01YYkxBB9gIBq+elopD0mm1bsY4qn
-	U4445THvEsbgpn7Chu5aBzbbLF6/eebtS7EgN1cYHd4nhjss5Ciz02OPw27K9nRAROvjEfhflzDGf
-	0/2yiYpzzn7ho0MMzChf6ErEfEy4i8V7vZP44n2tOY5LNEGmufxRddaadDF70Ebglscw59n6xN6pT
-	RGK1uTPQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51242)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t2t7w-0003V4-0Z;
-	Mon, 21 Oct 2024 15:11:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t2t7p-0001n9-0G;
-	Mon, 21 Oct 2024 15:11:13 +0100
-Date: Mon, 21 Oct 2024 15:11:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH 0/4] net: dsa: Add Airoha AN8855 support
-Message-ID: <ZxZhADBe6UtdCTsu@shell.armlinux.org.uk>
-References: <20241021130209.15660-1-ansuelsmth@gmail.com>
- <20241021133605.yavvlsgp2yikeep4@skbuf>
+	s=arc-20240116; t=1729519841; c=relaxed/simple;
+	bh=ZtzulUMRK2VFZqKs17vJAxZiX7pJDX5n/6suEZFdky8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qUEgK/TpUPqdOsZ48bnqQKn08jI3ybDQv1/EvuFgMk5eYx5XMYbW+6DvLXF4DW5xpJHHDd/+m7KI6q+ZV8Qucmjur37WDuQD8CKYRxwL9X8I5+1/iemgJEUoOmHU/7DrWbeZQvdA1zbm/T6xK8xSeRLMkOgyCh089X4mjgV2yfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LUDqdu88; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7b14554468fso376856185a.1
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 07:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729519838; x=1730124638; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pn+sN5qx63MI1q4XiUg2OyfXRGcuw7GeyXe44oSUQ8I=;
+        b=LUDqdu88nyq/30Lj+2l24r6DyL2UxJKyHSUXEQjPhIDj7wCwORrAYSW+yidX/7FcE9
+         2qS6H7Q6b7ImN/jbVv/v1bdAPiqMfVsaUZO57apoFVlBcuDNvp7+oOP3T+nw77LzCruw
+         6WVFvwGkbSSG2d30HobnaLTQMWIn31o5MzGlsPm/VTBTCIXDsda7zhh8hwd/SjtBlFMF
+         8JcIswqEtNPWgfDpGSo4J9WALT0NboLilu5jnRIRDVK4xs58nwo0GrOuPPJn00Qa2LXN
+         G0WxrHecnoZriRSq9GJxQPwSq8Xd+cx4Zzbp5g3AKXO0Ookv2zSAmhJ4SGjebDGJP9eQ
+         Hg6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729519838; x=1730124638;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pn+sN5qx63MI1q4XiUg2OyfXRGcuw7GeyXe44oSUQ8I=;
+        b=gbtQpW+Gs9Cmuxz4+tfuuqH0qbKWuFmOj3EwE00Ygz9mRYGktxTfW1HdN6vJDg9pf/
+         rgbLv4BUeppFH1jo0EeSdo+vISjYPpvKqdnxqcg56B6ljLXkn+C+VvvBhOAtIIWebvnJ
+         zdUpNcdUsCchJXe/yUMZJUNPwOpIdM8AXabErWNUTLNUWSPB7XUZKzZkys7hl4DE3mpK
+         04OXeK57a4ANtOiM9pqENFpYYAGSedtrYyzeKptz9ahcFQ2zTlulwTIOW2g2pVJNs+Os
+         6Y2UyB37LZj5X+yJAmXRNcwyU/nmRIjrsBqGA9ySxj+l12zz8ORguchpRdQFk0As1Pd5
+         PNNQ==
+X-Gm-Message-State: AOJu0Yy1YmSyr1kJQE1DkBsMd6Jr7j7aaZ1eUxSyMAyQYt+htTgs5SUw
+	7+LneOhDJwLO+zbTCpyvpUymiquTyCzap3i3WeVfQI9NWCBBCjAI
+X-Google-Smtp-Source: AGHT+IGkb1PfCEOsO85EF89LWIbUF8KSmBaduVoLD57/jKHZUTkUuNZZIufOwkdgJwPJYSUGKLBEDA==
+X-Received: by 2002:a05:6214:3c9d:b0:6cb:2f11:6b9 with SMTP id 6a1803df08f44-6cde15272aamr209550196d6.23.1729519838247;
+        Mon, 21 Oct 2024 07:10:38 -0700 (PDT)
+Received: from [192.168.1.155] (pool-98-116-165-200.nycmny.fios.verizon.net. [98.116.165.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce009fd21asm17461046d6.133.2024.10.21.07.10.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 07:10:37 -0700 (PDT)
+Message-ID: <f0d2811d-e69f-4ef4-bf0f-21ab9c5a8b36@gmail.com>
+Date: Mon, 21 Oct 2024 10:10:37 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021133605.yavvlsgp2yikeep4@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC ethtool] ethtool: mock JSON output for --module-info
+To: Danielle Ratson <danieller@nvidia.com>,
+ "mkubecek@suse.cz" <mkubecek@suse.cz>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Ido Schimmel <idosch@nvidia.com>
+References: <7d3b3d56-b3cf-49aa-9690-60d230903474@gmail.com>
+ <DM6PR12MB451628E919440310BC5726E5D8422@DM6PR12MB4516.namprd12.prod.outlook.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <DM6PR12MB451628E919440310BC5726E5D8422@DM6PR12MB4516.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 21, 2024 at 04:36:05PM +0300, Vladimir Oltean wrote:
-> On Mon, Oct 21, 2024 at 03:01:55PM +0200, Christian Marangi wrote:
-> > It's conceptually similar to mediatek switch but register and bits
-> > are different.
-> 
-> Is it impractical to use struct regmap_field to abstract those
-> differences away and reuse the mt7530 driver's control flow? What is the
-> relationship between the Airoha and Mediatek IP anyway? The mt7530
-> maintainers should also be consulted w.r.t. whether code sharing is in
-> the common interest (I copied them).
 
-That thought crossed my mind while reviewing patch 3. I compared the
-PMCR and PMSR, a lot of the bits are in completely different places
-between the two. I didn't check further, but I got the feeling that
-would invite more complexity.
+On 10/20/24 6:42 AM, Danielle Ratson wrote:
+> Hi Daniel,
+>
+> I started to work on this feature myself lately, how far along did you advance with the coding?
+> If you are in advanced stages, I guess you'll prefer to finish, but if not maybe I can do it, according to the below RFC and my comments, please see them below.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I have not started coding. That would be awesome if you can post code! 
+The changes proposed in your comments LGTM.
+
 
