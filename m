@@ -1,121 +1,108 @@
-Return-Path: <netdev+bounces-137514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B809A6BE2
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:16:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5EBC9A6C05
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:24:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6A90B2AC7F
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:11:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8687E2826AE
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75FAE1F4721;
-	Mon, 21 Oct 2024 14:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703E51F8EEE;
+	Mon, 21 Oct 2024 14:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cv3o7Rbd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XNPmoe+3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1D31E9088;
-	Mon, 21 Oct 2024 14:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE521D1E88;
+	Mon, 21 Oct 2024 14:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729519857; cv=none; b=WjLVTPkcycL1fJwqMVVRGTE20qWoaJz64XcVBOEh9Tj2V9bQsP/zXPsOQV7GG2EKMfwZ7all8RfZkCFz/sHRoaL/p4uX1Gjud1AIVi092l515JiXETD5zW3COzrsxGaEAnZ5YiysUo+TdASuTDwdqoTkw2w+iHwv8RcpUwqq0Mk=
+	t=1729520684; cv=none; b=JP/QNiG32smsfTdf2Rxf+lxq4MmjrbARvgCnKT00Rvzc1xAFj6Pni3jY9pL2+/kvyZVi59B3vbbxT5Cuv3+pKGVfYeh6eSgrKKONG5wY6owD9HHV5XraMS4KCHkYw/JM7ObAUnqSGT1ety7874tZszVvHyGokwANCl6CTLP7Z7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729519857; c=relaxed/simple;
-	bh=ywPxwrQ3WMCAWOXBI+Iovk6vz3ND8BMHXIVu/d9A7Nc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u7Re8NRnRCfHRU6GMvIZXNF4X46Q7KahvBGOQC2RefPZcbczkEUJpmEb3U19CR89qNhdORzj6eCGXqPA+9WvQanC5sq9j8PCwRlX8NeKsW5afO6ADMeF7J5lWp4dzWcr87Hg7JFElglX2o2U/AiwX2Va9EFNTvIRvPoxmIG7svY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cv3o7Rbd; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539e6c754bdso4335403e87.2;
-        Mon, 21 Oct 2024 07:10:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729519853; x=1730124653; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Iv9JIm7M2nlW6QHznXyOtj86osaLzEdLfgINuaCED0o=;
-        b=cv3o7RbdH5RamjQSxmccQ9VdbDjoRkyieO5jbrtd9HTHmB2EASE9YMyh0afkNFSz9Q
-         WYG4bt2SaAkI5XG8BAVtvyjG0laeycsSZE7FUJFieQRfoe9tzaxoEz+7c+CKZ82lE24h
-         vrvIFpQbWj/9BWp6Gv4oLxZyQVopJ4Qc9nxVjcCNsvzyh714cGGcWHoYpCyIEdqKoEna
-         DY+5M8QjvYNE/UvL9oEbb8ROl5JN5qtCgCOVEWxYcmBTIgiN4A1/Jzf/S4AJFgigzaPc
-         J8yzce4wOQw76JNzYnmoPX1LwQ9akDxb3azTOK4YlTuKhl10daw2jaOPde5NMZiC1sty
-         EcpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729519853; x=1730124653;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Iv9JIm7M2nlW6QHznXyOtj86osaLzEdLfgINuaCED0o=;
-        b=GZlfcne2Nb7d0ZLlB2UHATUa9zD8vUeGFcZcfXyfotkdrBjBmyyy03s/RGPtX+hxw2
-         isQ5pC30sNhFSZbhPXDrErZt4DFJup1A0zs+GeyIaq/TvafrGY6HKHamkpehnIC7/5qr
-         lQt4tX8gMn5Y7RDCZn133Kbhc0IGJ4aNbaGf1NDgxapSNU0/XDP+ObHhzOVmOrUaAqLx
-         KCI3e/iQBf6zEJeXE1XCCglimcYrkDllft/JzvPextA0nqPxy+kKvsryF+2u8gNjoMAS
-         kBGp8mpCy6GVl+pxl65uJxL0KGgVZ41tY4zL71aLkFS/is3CgwiTPbhJXWgF7ryxZTqp
-         XGxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUdHO52kcite4XfYz4sheUke/pKgLLtr8cJhEBGbL8X255adis8RRPJB/mkDx1a8DjCk8BccBHNmNoFiILa@vger.kernel.org, AJvYcCVACTx7gv2fgi7zAZcMISDCJBoR2DGdVxy18m8MscwyokacfPoOoBHHrn34cLZXNJPwUstgyWZbm1k=@vger.kernel.org, AJvYcCWgG1wgA/t92I2/ka0Wycf8F940b31f2QiSNRtdhq6aaafReugWzQo1f7VuNL4Z6AHjAkdl36KFJHo=@vger.kernel.org, AJvYcCXr4efLNuv52a66uCIxyrYNda1zAE6S2bAQWnqH/9mqiebgsH39XwicHF2WOzm/DtHl9TGl2Mxk@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoEBVEBFDwK/UD0xRcilqi9CP4F9ekbL8smNzaTJCcBZPE9M7k
-	XfpDQLIgd8trjW1ElfN8bRB000gSXbzu1TBbEsLenXLd6jHhNZ2/
-X-Google-Smtp-Source: AGHT+IFbMOYW8mIYZdgTyVvEF4hCBFDSD2rXlBWz4xlZGRwXWxzGa7WFqQ1JnKXCjVtq6ut+LZDx9Q==
-X-Received: by 2002:a05:6512:39cd:b0:535:699b:b076 with SMTP id 2adb3069b0e04-53a15467b88mr6259027e87.16.1729519853059;
-        Mon, 21 Oct 2024 07:10:53 -0700 (PDT)
-Received: from ?IPV6:2a00:1fa0:4321:8ef5:e514:855b:c891:f732? ([2a00:1fa0:4321:8ef5:e514:855b:c891:f732])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53a223f0007sm491492e87.91.2024.10.21.07.10.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 07:10:51 -0700 (PDT)
-Message-ID: <45ec2815-274f-4da6-8257-290fa7a4a642@gmail.com>
-Date: Mon, 21 Oct 2024 17:10:49 +0300
+	s=arc-20240116; t=1729520684; c=relaxed/simple;
+	bh=pc4NBde+fXjBXx1YyOAYXQyIKmBbSnOydn+XQMOwhH4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jxkhVg9L2gONpaOiNG6gtzW8DzcMu6X7FWSzjOSS5dbeKOcnfdjcxd99UM8t4/mfgRyDfCTh2PQXIafzR5HuZ7EGrIo4L6qlicwRsst4tDq5Rb29Mzi1s4rWQBRhwgo6PkPza9AmFKEhqabJ6Z0IimQ01HYl0xIzNxOF7rldmOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XNPmoe+3; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729520682; x=1761056682;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pc4NBde+fXjBXx1YyOAYXQyIKmBbSnOydn+XQMOwhH4=;
+  b=XNPmoe+3EmHGOOJxVFhlOIpQupAY9fIKLa+0hmKiFVXSY3g3KVyUY0TR
+   Rs6RcYFbyR4XCglaXe74pOCJ2s3jupwX+DtW9uQ9602xC68nfsTVmkXnn
+   2cH/CO4wKwC/+mLmrP2Ork9XaHUUoBTKdD+8UL+JOFfmDK4hKQ9I2tcgB
+   AAoXbQH5RmqNOk3FiOhNDmB46FWic9cgltin6PdHbQIdQ6Sq2ftUeZcam
+   GGMCt1n3m+lAMAcW9KUtGmPO3AcOWi+I9yBdk40jOB0/k0H1gu6NRmL5Z
+   nY+Aad8I5ursvQBRsU6yHwpkkT5Tde2o7+p4CfurDEFZbKVnOgDuo4Zdc
+   w==;
+X-CSE-ConnectionGUID: n+Q1AmMOSu2busVmZqNUrQ==
+X-CSE-MsgGUID: gIT3QhIyTfC3YC6Au5au3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28781472"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="28781472"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 07:24:40 -0700
+X-CSE-ConnectionGUID: K/mVzZNPTeyWcbXabMW+6w==
+X-CSE-MsgGUID: RNR/rDYxRJCBtdFcUPU2Kw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
+   d="scan'208";a="102857310"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by fmviesa002.fm.intel.com with ESMTP; 21 Oct 2024 07:24:38 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next 0/2] ptp: add control over HW timestamp latch point
+Date: Mon, 21 Oct 2024 16:19:53 +0200
+Message-Id: <20241021141955.1466979-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH/RFC] MAINTAINERS: Re-add cancelled Renesas driver sections
-To: Geert Uytterhoeven <geert+renesas@glider.be>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Paul Barker <paul.barker.ct@bp.renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
-Content-Language: en-US
-From: Sergei Shtylyov <sergei.shtylyov@gmail.com>
-In-Reply-To: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/21/24 2:56 PM, Geert Uytterhoeven wrote:
+HW support of PTP/timesync solutions in network PHY chips can be
+achieved with two different approaches, the timestamp maybe latched
+either in the beginning or after the Start of Frame Delimiter (SFD) [1].
 
-> Removing full driver sections also removed mailing list entries, causing
-> submitters of future patches to forget CCing these mailing lists.
-> 
-> Fixes: 6e90b675cf942e50 ("MAINTAINERS: Remove some entries due to various compliance requirements.")
+Allow ptp device drivers to provide user with control over the timestamp
+latch point.
 
-   It looks like nobody had seen this one before merging... :-/
+[1] https://www.ieee802.org/3/cx/public/april20/tse_3cx_01_0420.pdf
 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Arkadiusz Kubalewski (2):
+  ptp: add control over HW timestamp latch point
+  ice: ptp: add control over HW timestamp latch point
 
-   Thank you for informing me of the situation and fixing up Greg's patch!
+ Documentation/ABI/testing/sysfs-ptp         | 12 +++++
+ drivers/net/ethernet/intel/ice/ice_ptp.c    | 46 +++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 57 +++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  2 +
+ drivers/ptp/ptp_sysfs.c                     | 44 ++++++++++++++++
+ include/linux/ptp_clock_kernel.h            | 29 +++++++++++
+ 6 files changed, 190 insertions(+)
 
-> ---
-> Anyone who wants to take over maintenance for these drivers?
-
-   I could use my Gmail address again (I did use it back in 2020 for some time)
-but looking at the removed Baikal entries, this probably is not going to fly...
-   BTW, OMP is not interested in the Renesas drivers or the PATA drivers
-themselves; they were interested in hiring an official maintainer/reviewer
-like me... :-)
-
-[...]
-MBR, Sergey
+-- 
+2.38.1
 
 
