@@ -1,126 +1,100 @@
-Return-Path: <netdev+bounces-137445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36039A66CE
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:40:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 799FF9A66DD
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:43:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5672B1F20FD9
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:40:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F300B282484
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D313A1E573D;
-	Mon, 21 Oct 2024 11:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A641E5716;
+	Mon, 21 Oct 2024 11:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="krz3+XtH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3wb6XlN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE65946C
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 11:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013021E1C22;
+	Mon, 21 Oct 2024 11:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729510827; cv=none; b=Knbr3tYIrPOTWbw1bl6snMPLZ2FtrkeUHAqWIIptXzaNggyjDbHJ6pR7sC8CRNGln1B/B4+K4yzzhyYar6HYvkTy+M17r/ntHZbXba6Jf3sRf7B3YrZmWC/fn0qKPO5TUEHELB4jnZiAswGNNJAz9bVv4Qf9wzwJETDHWTxm/oc=
+	t=1729510979; cv=none; b=W0P1Ji8uXCfsVnOO5JLtZrglBhcCvOr8uKr66tTyH7TOUgIGgm9YhaCKPgauNZk6Q0w4LubZb1pw+Y04UkRv0Kd0GDT+VBCIW2k6+CfSHkg9o/87UFT/R54dy2pwYu3iNLVP/L6VQG2k1FylVSWVIiw8nfUokXW8pQl1cacpXEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729510827; c=relaxed/simple;
-	bh=vVXBLxkgZyd7Z0vP1IDBYt5ljH396jGE5scFQj6+2BM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Sno2/XcCOgwjx80GTncQAXOovJQOYrFzR6E71dT0qXY8gYGeLgezV0L6YXPu4y4sC1+MP/8DIWnZZc2vdT83Ir4bScBYSO4FxBT9T65TNmtnWB1a6EdBjWJuUSKHY6Mm9KV0lVrKmAZkBR937njun5/FSSUlJMr/Qn1xTcCgiOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=krz3+XtH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 444EBC4CEC3;
-	Mon, 21 Oct 2024 11:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729510827;
-	bh=vVXBLxkgZyd7Z0vP1IDBYt5ljH396jGE5scFQj6+2BM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=krz3+XtHcncjjGJcqwfXLtwr0McSl6dVdZEwEF8p0SOpBnhcxkdf1bEWI7jKYgTjU
-	 Pe0PlvOFe3jnCKcVmxTlvN1gwMmz8lDaGOhrcvkT2shhmAmDpKor9v8be7zmVh58Gt
-	 13ghrjmzbk9KTJdeqPLPmM0RmnVu1NeOTXJyOT8z/4HnRSNfsYY+P+T3wK/cY+waC2
-	 h1DDL+bKlYhZ0QABnoRuIVd67mVeZc4yppGoYPLwKKNM42xIJ359BUDMq2i30mOC1C
-	 5y5eEVI4ipSTMJR/8VRRcrdybtWlcEJnT9Sy045cLxhUBFiIODa1GcIuIoMN54K9d9
-	 L0cSa8M8acoFA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DB53809A8A;
-	Mon, 21 Oct 2024 11:40:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729510979; c=relaxed/simple;
+	bh=Xlpe+4NZVygqUfAYbeG1l2q/sC9oUMjZlGGCCv2/+1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AYSCcV11LhL9mkUkX6B3o2lcbzYifl4CRGHd+NPtRj1Z2phh5MPRU23uOJIcOcCKylUVnj3GRcoCGIlNXiYyn5UTsB6c86EByY8XOXVwqDUnv3PSzmcotRi+ps+IFYEPUv2CdvSq3bqB2FK42/ij5N4GnT4TIpx99FQ6cv4ae70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3wb6XlN; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c9589ba577so636575a12.1;
+        Mon, 21 Oct 2024 04:42:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729510976; x=1730115776; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xlpe+4NZVygqUfAYbeG1l2q/sC9oUMjZlGGCCv2/+1k=;
+        b=M3wb6XlNydL/oKvhnuXEZqYP1066z5Zjz01xjMZ+/aMf1/8orcWRMH5R754O0PEN/6
+         PzKFW3Ny7ZPg4Gs15V3yTlctrYiNJkvKAJGcPwwmqFlCVWFp8fRUagWaKhUBU0hsGd5n
+         uf2VbCM34JHTlPD3z4oXsiWQbVaDoRNcNTqCJfnWbWZQJRdUfaAm0huXqJlPNczrzbtd
+         V52ziZQcFoTNC2L+8sD4U5EC3KZXAWQCCwXGv27mY8akEGIfbpTraytpZNL84XPQT70h
+         lbr0N73+Gs/1WTzOaJTv1/by3SxmhL9lCW9AsK6P6mS+3dyHv65bbF8BHRrqQZym8vMX
+         F2vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729510976; x=1730115776;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xlpe+4NZVygqUfAYbeG1l2q/sC9oUMjZlGGCCv2/+1k=;
+        b=EAjeR1b9AGn8Aq57l6S6GDdvO1KBUKB4IzgPDp84bZDtsbavFE0fL0hZI2davJIn6V
+         k7tsD1bQzFLwFrnT9FkwraadeoFU/BVJLFibQSr+js9y/ob+91cHqFby0YxgbB64p6DB
+         3V0NTJ/RzCvSaLIZDziWnL3srvWT8tzIK93+bZ4U2eudXatjsvmBAhXiy2zqeYtMn3Ui
+         5mop8qzxWAB2ysnDdLfIEi1LmzyiHsPHTtQdOrK1e/1Beqku7JK1xpIr0TncXdjG/Ces
+         oJIj3it9e3V0CDYHQCotf1LNdcwweqjy4P8GgLtFuikkox13sCYBFXBLWGhpBGfU3bEh
+         jslg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTzIoHDBt2+RrbvIKScA4r/bKN+wDTLR9AFjXiSkGBAK1vtBcspHqOnly0VIysm28PQqjUkmLtMxzyARQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsKzkDb0zlwZXK/5PXksvqIuCC32POafVx/oc7gNuanSQdNThP
+	I+MZzgh0+J1EkVlypTL5xLqMeUkF2G+M78VXkZrGJayua0VbzvE8
+X-Google-Smtp-Source: AGHT+IFteQ1L5ugUmQsKdOnz02qLtbs55pYvogPiCLx1JZQY/ANGN4EUXz2/F9lCZQtJtBH6UE3U+Q==
+X-Received: by 2002:a05:6402:3585:b0:5c9:7f8b:4fcf with SMTP id 4fb4d7f45d1cf-5ca0ae8753cmr4060146a12.6.1729510976024;
+        Mon, 21 Oct 2024 04:42:56 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66c6b4e4sm1818093a12.61.2024.10.21.04.42.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 04:42:55 -0700 (PDT)
+Date: Mon, 21 Oct 2024 14:42:52 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: dsa: vsc73xx: implement packet
+ reception via control interface
+Message-ID: <20241021114252.u6wa2eqj4bv5fv55@skbuf>
+References: <20241020205452.2660042-1-paweldembicki@gmail.com>
+ <20241020205452.2660042-2-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V3 00/15] net/mlx5: Refactor esw QoS to support
- generalized operations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172951083326.225670.2525365154552729942.git-patchwork-notify@kernel.org>
-Date: Mon, 21 Oct 2024 11:40:33 +0000
-References: <20241016173617.217736-1-tariqt@nvidia.com>
-In-Reply-To: <20241016173617.217736-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, cjubran@nvidia.com, cratiu@nvidia.com,
- horms@kernel.org, daniel.machon@microchip.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241020205452.2660042-2-paweldembicki@gmail.com>
 
-Hello:
+On Sun, Oct 20, 2024 at 10:54:51PM +0200, Pawel Dembicki wrote:
+> The packet receiver poller uses a kthread worker, which checks if a packet
+> has arrived in the CPU buffer. If the header is valid, the packet is
+> transferred to the correct DSA conduit interface.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 16 Oct 2024 20:36:02 +0300 you wrote:
-> Hi,
-> 
-> This patch series from the team to mlx5 core driver consists of one main
-> QoS part followed by small misc patches.
-> 
-> This main part (patches 1 to 11) by Carolina refactors the QoS handling
-> to generalize operations on scheduling groups and vports. These changes
-> are necessary to support new features that will extend group
-> functionality, introduce new group types, and support deeper
-> hierarchies.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,V3,01/15] net/mlx5: Refactor QoS group scheduling element creation
-    https://git.kernel.org/netdev/net-next/c/700814fa41ce
-  - [net-next,V3,02/15] net/mlx5: Introduce node type to rate group structure
-    https://git.kernel.org/netdev/net-next/c/4235fe2cb8e9
-  - [net-next,V3,03/15] net/mlx5: Add parent group support in rate group structure
-    https://git.kernel.org/netdev/net-next/c/54200dbc685c
-  - [net-next,V3,04/15] net/mlx5: Restrict domain list insertion to root TSAR ancestors
-    https://git.kernel.org/netdev/net-next/c/24e54e870d11
-  - [net-next,V3,05/15] net/mlx5: Rename vport QoS group reference to parent
-    https://git.kernel.org/netdev/net-next/c/72a1d121fa6b
-  - [net-next,V3,06/15] net/mlx5: Introduce node struct and rename group terminology to node
-    https://git.kernel.org/netdev/net-next/c/1c25d4388ba6
-  - [net-next,V3,07/15] net/mlx5: Refactor vport scheduling element creation function
-    https://git.kernel.org/netdev/net-next/c/88d5fbcb7ba0
-  - [net-next,V3,08/15] net/mlx5: Refactor vport QoS to use scheduling node structure
-    https://git.kernel.org/netdev/net-next/c/045815fe329a
-  - [net-next,V3,09/15] net/mlx5: Remove vport QoS enabled flag
-    https://git.kernel.org/netdev/net-next/c/ebecc37befb1
-  - [net-next,V3,10/15] net/mlx5: Simplify QoS scheduling element configuration
-    https://git.kernel.org/netdev/net-next/c/70744a46aabf
-  - [net-next,V3,11/15] net/mlx5: Generalize QoS operations for nodes and vports
-    https://git.kernel.org/netdev/net-next/c/a1903bf50f2e
-  - [net-next,V3,12/15] net/mlx5: Add sync reset drop mode support
-    https://git.kernel.org/netdev/net-next/c/b37f3f2be0f4
-  - [net-next,V3,13/15] net/mlx5: Only create VEPA flow table when in VEPA mode
-    https://git.kernel.org/netdev/net-next/c/f0ac6209460e
-  - [net-next,V3,14/15] net/mlx5: fs, rename packet reformat struct member action
-    https://git.kernel.org/netdev/net-next/c/1715f0a73233
-  - [net-next,V3,15/15] net/mlx5: fs, rename modify header struct member action
-    https://git.kernel.org/netdev/net-next/c/7b919caaeb18
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+s/conduit/user/
 
