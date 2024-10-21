@@ -1,291 +1,244 @@
-Return-Path: <netdev+bounces-137376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BE19A5AEA
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 08:50:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE26C9A5CAC
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:22:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04154B2395A
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 06:50:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A033286A47
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DF31DFDA3;
-	Mon, 21 Oct 2024 06:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC6A1D172C;
+	Mon, 21 Oct 2024 07:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6yyz7ZQ"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fnxRFywd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851C11DF732
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 06:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F701D14E2;
+	Mon, 21 Oct 2024 07:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729493277; cv=none; b=cLTO0RRa69OohVy0tSUkSSg6LkZaDCLNs3q4KCVECMcKzYl2CFEtWNKyhH0+KD84nUdoQ9SdHiOqAj7oO1RSqFr1KbkRpMGdmy4tg9ktGkywujFBLaUNaUySKNXFGzVK6vik1mNCmmENeUSt8QYRC8IWqsk4JLh/I1HuAVdtRVI=
+	t=1729495374; cv=none; b=Dh8fFtrBg3Dik2vI0cihZ7LO8/tH3OifSyD125DPeXLAMTAmUmMcJh9gZl7P95I+mAqL6aC/CWMhgg7VXsd47CiFoTHrvha6EtCHw0YlcoM/FlZrYzUBWCg/43dRqJZMXp3yICktTUOoc6WJgRXmJg5+folyUJix3HfiUYg337g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729493277; c=relaxed/simple;
-	bh=teyMIfpNNQjSsb5MbXyVqzP1VIlH5kdTfogRdrP4p8U=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=X6P+QYHeUQL0vS2YcVsvbYL79H0PbLueski8yWVjSySOY7rzi9mHi2bFoQ2RvvyFDC7/nVeLdSR0MH0q3vh8J8o+IlAFpVINjpIo/5qZvxwyIP0Lc/qL72yxJQMSVMR1aorOfS73t01bTOL+3ma2mJHwVc0SufCjZlKRm/NNDcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H6yyz7ZQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729493274;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=teyMIfpNNQjSsb5MbXyVqzP1VIlH5kdTfogRdrP4p8U=;
-	b=H6yyz7ZQHfOJWxDQybm0UBGe0/oNi9DhJrT6zT7tpjtTexTcwOt0JzQY8Amy4NLVvnVbjA
-	Xi2DatgmBicfvR3VXskiKwJhoV3hy3sOnt5UHDm3IIVCiL+6grEtWOk5WBE54nubgIXcXi
-	QBWW19Wvy8uPGrR8ZoWXTz7SD4722Ao=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-G-rxa3oyPEaXDkWRozuwRw-1; Mon, 21 Oct 2024 02:47:50 -0400
-X-MC-Unique: G-rxa3oyPEaXDkWRozuwRw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315c1b5befso28952895e9.1
-        for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 23:47:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729493269; x=1730098069;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=teyMIfpNNQjSsb5MbXyVqzP1VIlH5kdTfogRdrP4p8U=;
-        b=P7tZy3OIcnDyrnWVaRulhquJghTp50QmB2cWWiZrYWpct4j0A0WklcFoywHupCknwM
-         xOTckEHrWhEuw0ESUfJ/KAaBXsW7bPnzT308048tQqUjUIYY/Db2BUm2FZ+egq+5DJOg
-         cRHqd/joYuh/GVHFYsMNLt2JHba7doQltETgTUttBjnrepsddft39OCC1UfMgZOKBh2x
-         eSQ36yzhMz9AJtx7meXQa8u+Ek+sXBjatO8L51pNaNj6/LhrqF5MtJvkvJSHuqAQWyFi
-         L75vPOlne/T8KJJU/rmpgWIzdMcFvIEpmIZO3OeuPjDkhxZlGbQYfMQNs/9UB8v9RR/7
-         r3OA==
-X-Forwarded-Encrypted: i=1; AJvYcCXADIrctpYBoWgMpWy4huNmHYdDyTGV4f2SZUaS5wbJjrI0H9jTqcGBjthB+ykko8CijJYulXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFYZDGnP8UrYqB0bwqt+NjkYNBR2B2/yTRg9WE2S0eUr9Iwbox
-	oxDhG5Nz4j46neRryRjVBNMm/+xGpb3NZC6WsoExpnAYho5uF406Zr70SqUw2yQkeF3KYv168sk
-	XED/dN8pKkadzVMNG0JMjUW/WIJx4iyR9tOW29TSOpAw+4Q6ufQkarw==
-X-Received: by 2002:a05:600c:3591:b0:431:4c14:abf4 with SMTP id 5b1f17b1804b1-4316163a1b2mr84025925e9.14.1729493269436;
-        Sun, 20 Oct 2024 23:47:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFVZgn1S+/IbVUHVqZogTbkz5rvgpgAowACslYYkYZ99T9pAyCEi5NExPZQP+nHcWcbmjh9Bw==
-X-Received: by 2002:a05:600c:3591:b0:431:4c14:abf4 with SMTP id 5b1f17b1804b1-4316163a1b2mr84025225e9.14.1729493268971;
-        Sun, 20 Oct 2024 23:47:48 -0700 (PDT)
-Received: from eisenberg.fritz.box (200116b82d449800aee93296d73e68da.dip.versatel-1u1.de. [2001:16b8:2d44:9800:aee9:3296:d73e:68da])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f570f89sm45821675e9.7.2024.10.20.23.47.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Oct 2024 23:47:48 -0700 (PDT)
-Message-ID: <1f90d885f0e8dc2e8d9b2b7e88700b4cdb19d84c.camel@redhat.com>
-Subject: Re: [PATCH 13/13] PCI: Deprecate pci_intx(), pcim_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Alex Williamson
- <alex.williamson@redhat.com>, Damien Le Moal <dlemoal@kernel.org>, Niklas
- Cassel <cassel@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj
- Natikar <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,
- Benjamin Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
- <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
- <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>,  Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>,  Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>,  Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>,  Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>,  Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
- <yi.l.liu@intel.com>, Christian Brauner <brauner@kernel.org>, Ankit Agrawal
- <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette Chatre
- <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Mon, 21 Oct 2024 08:47:46 +0200
-In-Reply-To: <20241018234537.GA770692@bhelgaas>
-References: <20241018234537.GA770692@bhelgaas>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1729495374; c=relaxed/simple;
+	bh=j2o9aZZ2MpjYuhcSr3OChzYTBDv4hplxBC14TRULQI8=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=TtEU88xkeZM8Ji4n2xNUCZ+Nflh+Sw85TbE+szClsz59bDv20jWDu7s5mhSteReZh6dYN83sEGFZv4CV9gnWURdcySOuPXQWJEcCfFMgsdaL6+Kb27WnWIg1yhXNzwB9B9EaGNNFqiQnK5ZSRtt3lLTWVxRZAnED57ACA6yj8Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=fnxRFywd; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20241021072248euoutp0154700447ddf6f2066342e26bab501df4~AZt-x-Amy0550305503euoutp01m;
+	Mon, 21 Oct 2024 07:22:48 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20241021072248euoutp0154700447ddf6f2066342e26bab501df4~AZt-x-Amy0550305503euoutp01m
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1729495369;
+	bh=7Vo8bdrcTD2TExgOyGSaPfXGd7Aa+ItF6FSKHNsruAQ=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=fnxRFywdKm9yix+Os5AePl5xtBGH7BesiJShYmaisTyJZ/AS4iGDhbklMvt9x1kEM
+	 zPaQ2OJJ4T/lPQNPh4sf7AiPbu0Wstfk081wl8KgWVn05dVgeJ49CYQ0zb3V+7tuzC
+	 yr4G/XvCuCQv+r4PENRyJdNjfV8WfhOtwbvyeYMs=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20241021072248eucas1p1ac0b469a13d7941e669de1fa2b7f0fa0~AZt-gjzjO2488824888eucas1p1n;
+	Mon, 21 Oct 2024 07:22:48 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges2new.samsung.com (EUCPMTA) with SMTP id 69.14.20409.84106176; Mon, 21
+	Oct 2024 08:22:48 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20241021072248eucas1p127c01b427e01c363b0425b9f5e130811~AZt-DOXgy2553825538eucas1p17;
+	Mon, 21 Oct 2024 07:22:48 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241021072248eusmtrp2bc9e687864d5b91d6aadf0c7c223c017~AZt-BmeZp2870628706eusmtrp22;
+	Mon, 21 Oct 2024 07:22:48 +0000 (GMT)
+X-AuditID: cbfec7f4-c0df970000004fb9-92-671601482b13
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 05.B1.19654.74106176; Mon, 21
+	Oct 2024 08:22:47 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20241021072247eusmtip2b1ef0deb415b435079661bd6a9f0346a~AZt_l4KqO0165901659eusmtip2t;
+	Mon, 21 Oct 2024 07:22:47 +0000 (GMT)
+Received: from localhost (106.110.32.107) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Mon, 21 Oct 2024 08:22:46 +0100
+Date: Mon, 21 Oct 2024 09:22:45 +0200
+From: Joel Granados <j.granados@samsung.com>
+To: Kaixiong Yu <yukaixiong@huawei.com>
+CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>, <ysato@users.osdn.me>,
+	<dalias@libc.org>, <glaubitz@physik.fu-berlin.de>, <luto@kernel.org>,
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <viro@zeniv.linux.org.uk>,
+	<brauner@kernel.org>, <jack@suse.cz>, <kees@kernel.org>,
+	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
+	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
+	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
+	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
+	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
+	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
+	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
+	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
+	<wangkefeng.wang@huawei.com>, <sunnanyong@huawei.com>
+Subject: Re: [PATCH v3 -next 00/15] sysctl: move sysctls from vm_table into
+ its own files
+Message-ID: <ngknhtecptqk56gtiikvb5mdujhtxdyngzndiaz7ifslzrki7q@4wcykosdnsna>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241010152215.3025842-1-yukaixiong@huawei.com>
+X-ClientProxiedBy: CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TeUxUVxTGc986YLHDItwMiBaENqQsNiYeKza1rfWVRkvqVjVFpvIymALS
+	GbCWLgFZBRkREBSQpRLZhsWBIKtQrSDbDC2iWOvSiahldwAtjAwdeNj633fOd373nu8mV0Ra
+	dbES0aGQMF4eIg1yYsyp2rYZjTuHbGVehS9WQU6lioHY+nkK5pvbEIxNRsBklZGB4at6BPN3
+	HxOQ93M1AwUzszQ8qYpHkKONoWC6cpaEnqFzLIwdM1Aw2KZjIXvcGUZqSkgoU2+DjIt2kJ0Z
+	TcDMhVIWKirPE1AxqqWht1ZJw6XIByw0NXdQ0NeQw8A91bzJaO2iYeKEjoGcF+kkdGSVUKBt
+	KKdhIGUQwe+t+QQ050VS0JZvC6mP9Cw86xpB0DnzA9xJzaQgrvAiAScaTyPQ9mpYGFc2ERCl
+	SiLhtvYhA9Xq0yR0znYSoD9npCE7Somg55iKBu1cOw1Rk/cRGP4xbZJc2MGark4zPUbLcwbK
+	5mtIuDHYS73vzT2PVVKcKleFuPw7n3JXR8ZJrqbkNsHlq8O5m417uZhfR2luqv4k4qqL3bjz
+	TX8TnLr0OMOp9aksp8meoLgxjYblrp8xUL5v7DP3DuCDDh3h5Z7v+ZsHJvam06EDK4+Wnxih
+	I9G4TSIyE2HxOjx3/BabiMxFVuJihHWzKUgophBOfVRICsUkwuml/cxLJO3JGCEYRQh3x5Yz
+	/03dKile4msQ1hcZ6AWEErvgSGUPtaAZ8dtYO/InuaBtxG/iR+M9izQpblyGz55qXjSsxftx
+	382cRcBCvA3PXeulBW2JO84+XOyTpoPyG/UmWGTS9rjIKFqQZuJNuH5WImzqhPtT7lKC/hE3
+	R7cuBsXiY6/hqrxYVjA+woaoNlLQ1niovWap74Dn6/MIAUhDuMU4sUSXIXwhapoQpjbimBsP
+	l4jNuDM6GS1sgcXL8cCopbDncpxam0kKbQucEGclTLvisnsjVApyznolWdYrybL+T5aPyFJk
+	x4crgmW84p0Q/lsPhTRYER4i8zh4OFiNTP+ty9g+VYeKhp56XEGECF1BWEQ62Vg4ha2QWVkE
+	SL+L4OWHD8jDg3jFFWQvopzsLFwCVvFWYpk0jP+a50N5+UuXEJlJIomtvn6OH9pteGBfF/jx
+	bytXLyua8lnPtv3yeIPhoJnuTtal2e5QdDnxOrPCVeO7qtJDl5tzbbNO0mE7mqlqeWvt/bg/
+	jmzcWG8f5RfySaGxoMZVdqpBs166+/PpOuwRN+Syu3vHqN83Ljurk9Ren63p3jWk/PKr/Z3D
+	vnXJ3cjRLWDa+obDyjnJC52PrVfYsGT7lsoI26sVElm8ZkuCdcaeMM+BGHdf/czeYN3lA6E7
+	g+f+GgS3nzrd8hwb/ZOednv6vG7f51iYy21aF2Gw7H9wm0zvO9wf+32yrPjMasUX209qvBQF
+	7xrcd+2R73D4oEnpP+6cERP/THLUqG/PhX0JpZZrMrydKEWgdK0bKVdI/wXyI7Kl3gQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0yTZxTGfb9bi46kXNRvXCLWuCXIKgXKDhs4nX/sC85ly2IWvAw77MBR
+	wLSFVKdZuc1xGSKiDCiW4WUDKki5iYXJgOEKgdahjLsLEXBYWiigo2hZoS7zv+fNc57fe3Jy
+	Dht3naI82MfjZSJJvFDMpdYT3ba7Y299gDZF+7fcCgFltZqC9KYVAlZaOhGY5k/B/E0bBU/a
+	LQhWRqcwUJXVUvDjkpWExzfPIlDq0whYrLbi0DNdwgJTyjIBE53jLCg2bwNjXTkOlZr9cKlm
+	MxQXpGKwdL2CBVXVVzComtGTYGjIIaFR8RcLmlt0BPTdVlIwpl6xG63dJMxmj1OgfJ6Pg66o
+	nAD97RskDOROIPijtRSDFpWCgM7STZA3aWHB024jgq6l0zCcV0DAt1drMMjWXkSgN/SywJzT
+	jEGyOguHQf0jCmo1F3HosnZhYCmxkVCcnIOgJ0VNgv7FXRKS5x8iWP7H3sn3V3Us+9cX7MO4
+	84yCypU6HO5PGIjdocyz9ByCUV9WI6Z0eB/TbjTjTF35IMaUahKZfm0Ek9YxQzILTecQU/uz
+	L3Ol+W+M0VRkUIzGksdieotnCcbU28tifv9hmfh460FeqCQhUSbyiUmQysK4h/gQwOOHAC8g
+	KITHD3z7yDsBAu7OXaHHROLjSSLJzl1HeTGZhnzyxIC3/Ea2kVQgs3smcmLTnCD6wmMTlonW
+	s1051xCt0C6xHIYXXbPwgHRoN/p5fyblKJpD9PCTEdLxqEP0ZFoltVpFcLbTipweYlVTHD9a
+	bxzBV7U750160tyzlsY52g104fmWNcONc4ju61euBZw5++kXvxleUnMRbZsbfWm40LrCR2sa
+	t1NLtRY7iW3XnvRPNvaqdOKE0U1WD0enXPpBriNJc87QGdPdVC5yK3oFVPQKqOh/UCnCK5C7
+	KFEaFx0nDeBJhXHSxPhoXlRCnAbZN76hc6nuFiqfnuO1IYyN2hDNxrnuzlzZxmhX52PCk6dE
+	koRISaJYJG1DAvsozuMeG6MS7CcTL4vkB/sL+EHBIf6CkOBA7mZn6r7+S1dOtFAmihWJTogk
+	/+UwtpOHAlMxh9NdI6as+jvys25cWdK9vfE6T1ty6OI2vNhTOvzLYLsyTGMouvRReJbFrCpq
+	DOw2HS0Xf9NQ/53nhjw2e2xP7IiO2H2knr2uNyN1MGO+PWJ8ct2svF4a5JoVTn7xKTWY9dWK
+	8l6fT7+VHhAslry/5GbxKvORjUpC/2zxde4cKtg+V+vSLn/vDYE2aW8YHrul6zM94SMQS4rP
+	dHjv8fu6pmZh3n98KLfjYOTl4En9zI7UiEYXT9Un7uFphg8PDD1N1UdtPQmGw3G4d9mo3PQw
+	heM38K7SeGC0zetXj/y86+KqgWprkxPK+vw1Ve4OaJVvqQ4716Pqep2VYTx9rZBLSGOEfF9c
+	IhX+C6gKfYZ6BAAA
+X-CMS-MailID: 20241021072248eucas1p127c01b427e01c363b0425b9f5e130811
+X-Msg-Generator: CA
+X-RootMTR: 20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd
+References: <CGME20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd@eucas1p1.samsung.com>
+	<20241010152215.3025842-1-yukaixiong@huawei.com>
 
-On Fri, 2024-10-18 at 18:45 -0500, Bjorn Helgaas wrote:
-> On Wed, Oct 16, 2024 at 10:53:16AM +0200, Philipp Stanner wrote:
-> > On Wed, 2024-10-16 at 10:43 +0200, Heiner Kallweit wrote:
-> > > On 16.10.2024 08:57, Philipp Stanner wrote:
-> > > > On Tue, 2024-10-15 at 13:53 -0600, Alex Williamson wrote:
-> > > > > On Tue, 15 Oct 2024 20:51:23 +0200
-> > > > > Philipp Stanner <pstanner@redhat.com> wrote:
-> > > > >=20
-> > > > > > pci_intx() and its managed counterpart pcim_intx() only
-> > > > > > exist
-> > > > > > for
-> > > > > > older
-> > > > > > drivers which have not been ported yet for various reasons.
-> > > > > > Future
-> > > > > > drivers should preferably use pci_alloc_irq_vectors().
-> > > > > >=20
-> > > > > > Mark pci_intx() and pcim_intx() as deprecated and encourage
-> > > > > > usage
-> > > > > > of
-> > > > > > pci_alloc_irq_vectors() in its place.
-> > > > >=20
-> > > > > I don't really understand this.=C2=A0 As we've discussed
-> > > > > previously
-> > > > > pci_alloc_irq_vectors() is, unsurprisingly, for allocating
-> > > > > PCI
-> > > > > IRQ
-> > > > > vectors while pci_intx() is for manipulating the INTx disable
-> > > > > bit
-> > > > > on
-> > > > > PCI devices.=C2=A0 The latter is a generic mechanism for
-> > > > > preventing
-> > > > > PCI
-> > > > > devices from generating INTx, regardless of whether there's a
-> > > > > vector
-> > > > > allocated for it.=C2=A0 How does the former replace the latter an=
-d
-> > > > > why
-> > > > > do
-> > > > > we
-> > > > > feel the need to deprecate the latter?
-> > > > >=20
-> > > > > It feels like this fits some narrow narrative and makes all
-> > > > > users
-> > > > > of
-> > > > > these now deprecated functions second class citizens.=C2=A0 Why?=
-=C2=A0
-> > > > > At
-> > > > > it's
-> > > > > root these are simply providing mask and set or mask and
-> > > > > clear
-> > > > > register
-> > > > > bit operations.=C2=A0 Thanks,
-> > > >=20
-> > > > I got the feeling from the RFC discussion that that was
-> > > > basically
-> > > > the
-> > > > consensus: people should use pci_alloc_irq_vectors(). Or did I
-> > > > misunderstand Andy and Heiner?
-> > > >=20
-> > > I think there are two different use cases for pci_intx().
-> > > At first there are several drivers where the direct usage of
-> > > pci_intx()
-> > > can be eliminated by switching to the pci_alloc_irq_vectors()
-> > > API.
-> > >=20
-> > > And then there's usage of pci_intx() in
-> > > drivers/vfio/pci/vfio_pci_intrs.c
-> > > drivers/xen/xen-pciback/conf_space_header.c
-> > > There we have to keep the (AFAICS unmanaged) pci_intx() calls.
-> >=20
-> > There is also the usage within PCI itself, in MSI. Patch =E2=84=968 tou=
-ches
-> > that.
-> >=20
-> > It's why I think this series should land before anyone should port
-> > direct pci_intx() users to the irq vectors function, because the
-> > latter
-> > also uses pci_intx() and its own devres, which sounds explosive to
-> > me.
-> >=20
-> > > > I'm perfectly happy with dropping this patch and continue
-> > > > offering
-> > > > pci{m}_intx() to users, since after removing that hybrid
-> > > > hazzard I
-> > > > don't see any harm in them anymore.
->=20
-> So is the bottom line that we should drop *this* patch and apply the
-> rest of the series?
+On Thu, Oct 10, 2024 at 11:22:00PM +0800, Kaixiong Yu wrote:
+> This patch series moves sysctls of vm_table in kernel/sysctl.c to
+> places where they actually belong, and do some related code clean-ups.
+> After this patch series, all sysctls in vm_table have been moved into its
+> own files, meanwhile, delete vm_table.
+> 
+> All the modifications of this patch series base on
+> linux-next(tags/next-20241010). To test this patch series, the code was
+> compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
+> x86_64 architectures. After this patch series is applied, all files
+> under /proc/sys/vm can be read or written normally.
+> 
+> Changes in v3:
+>  - change patch1~10, patch14 title suggested by Joel Granados
+>  - change sysctl_stat_interval to static type in patch1
+>  - add acked-by from Paul Moore in patch7
+>  - change dirtytime_expire_interval to static type in patch9
+>  - add acked-by from Anna Schumaker in patch11
+> 
+> Changes in v2:
+>  - fix sysctl_max_map_count undeclared issue in mm/nommu.c for patch6
+>  - update changelog for patch7/12, suggested by Kees/Paul
+>  - fix patch8, sorry for wrong changes and forget to built with NOMMU
+>  - add reviewed-by from Kees except patch8 since patch8 is wrong in v1
+>  - add reviewed-by from Jan Kara, Christian Brauner in patch12
+> 
+> Kaixiong Yu (15):
+>   mm: vmstat: move sysctls to mm/vmstat.c
+>   mm: filemap: move sysctl to mm/filemap.c
+>   mm: swap: move sysctl to mm/swap.c
+>   mm: vmscan: move vmscan sysctls to mm/vmscan.c
+>   mm: util: move sysctls to mm/util.c
+>   mm: mmap: move sysctl to mm/mmap.c
+>   security: min_addr: move sysctl to security/min_addr.c
+>   mm: nommu: move sysctl to mm/nommu.c
+>   fs: fs-writeback: move sysctl to fs/fs-writeback.c
+>   fs: drop_caches: move sysctl to fs/drop_caches.c
+>   sunrpc: use vfs_pressure_ratio() helper
+>   fs: dcache: move the sysctl to fs/dcache.c
+>   x86: vdso: move the sysctl to arch/x86/entry/vdso/vdso32-setup.c
+>   sh: vdso: move the sysctl to arch/sh/kernel/vsyscall/vsyscall.c
+>   sysctl: remove unneeded include
+> 
+>  arch/sh/kernel/vsyscall/vsyscall.c |  14 ++
+>  arch/x86/entry/vdso/vdso32-setup.c |  16 ++-
+>  fs/dcache.c                        |  21 ++-
+>  fs/drop_caches.c                   |  23 ++-
+>  fs/fs-writeback.c                  |  30 ++--
+>  include/linux/dcache.h             |   7 +-
+>  include/linux/mm.h                 |  23 ---
+>  include/linux/mman.h               |   2 -
+>  include/linux/swap.h               |   9 --
+>  include/linux/vmstat.h             |  11 --
+>  include/linux/writeback.h          |   4 -
+>  kernel/sysctl.c                    | 221 -----------------------------
+>  mm/filemap.c                       |  18 ++-
+>  mm/internal.h                      |  10 ++
+>  mm/mmap.c                          |  54 +++++++
+>  mm/nommu.c                         |  15 +-
+>  mm/swap.c                          |  16 ++-
+>  mm/swap.h                          |   1 +
+>  mm/util.c                          |  67 +++++++--
+>  mm/vmscan.c                        |  23 +++
+>  mm/vmstat.c                        |  44 +++++-
+>  net/sunrpc/auth.c                  |   2 +-
+>  security/min_addr.c                |  11 ++
+>  23 files changed, 330 insertions(+), 312 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
+General comment for the patchset in general. I would consider making the
+new sysctl tables const. There is an effort for doing this and it has
+already lanted in linux-next. So if you base your patch from a recent
+next release, then it should just work. If you *do* decide to add a
+const qualifier, then note that you will create a dependency with the
+sysctl patchset currently in next and that will have to go in before.
 
-Yes Sir, that's the idea
+Best
 
-Regards,
-P.
+-- 
 
->=20
-> > > > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > > > > > ---
-> > > > > > =C2=A0drivers/pci/devres.c | 5 ++++-
-> > > > > > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0 | 5 ++++-
-> > > > > > =C2=A02 files changed, 8 insertions(+), 2 deletions(-)
-> > > > > >=20
-> > > > > > diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-> > > > > > index 6f8f712fe34e..4c76fc063104 100644
-> > > > > > --- a/drivers/pci/devres.c
-> > > > > > +++ b/drivers/pci/devres.c
-> > > > > > @@ -435,7 +435,7 @@ static struct pcim_intx_devres
-> > > > > > *get_or_create_intx_devres(struct device *dev)
-> > > > > > =C2=A0}
-> > > > > > =C2=A0
-> > > > > > =C2=A0/**
-> > > > > > - * pcim_intx - managed pci_intx()
-> > > > > > + * pcim_intx - managed pci_intx() (DEPRECATED)
-> > > > > > =C2=A0 * @pdev: the PCI device to operate on
-> > > > > > =C2=A0 * @enable: boolean: whether to enable or disable PCI INT=
-x
-> > > > > > =C2=A0 *
-> > > > > > @@ -443,6 +443,9 @@ static struct pcim_intx_devres
-> > > > > > *get_or_create_intx_devres(struct device *dev)
-> > > > > > =C2=A0 *
-> > > > > > =C2=A0 * Enable/disable PCI INTx for device @pdev.
-> > > > > > =C2=A0 * Restore the original state on driver detach.
-> > > > > > + *
-> > > > > > + * This function is DEPRECATED. Do not use it in new code.
-> > > > > > + * Use pci_alloc_irq_vectors() instead (there is no
-> > > > > > managed
-> > > > > > version, currently).
-> > > > > > =C2=A0 */
-> > > > > > =C2=A0int pcim_intx(struct pci_dev *pdev, int enable)
-> > > > > > =C2=A0{
-> > > > > > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> > > > > > index 7ce1d0e3a1d5..dc69e23b8982 100644
-> > > > > > --- a/drivers/pci/pci.c
-> > > > > > +++ b/drivers/pci/pci.c
-> > > > > > @@ -4477,11 +4477,14 @@ void pci_disable_parity(struct
-> > > > > > pci_dev
-> > > > > > *dev)
-> > > > > > =C2=A0}
-> > > > > > =C2=A0
-> > > > > > =C2=A0/**
-> > > > > > - * pci_intx - enables/disables PCI INTx for device dev
-> > > > > > + * pci_intx - enables/disables PCI INTx for device dev
-> > > > > > (DEPRECATED)
-> > > > > > =C2=A0 * @pdev: the PCI device to operate on
-> > > > > > =C2=A0 * @enable: boolean: whether to enable or disable PCI INT=
-x
-> > > > > > =C2=A0 *
-> > > > > > =C2=A0 * Enables/disables PCI INTx for device @pdev
-> > > > > > + *
-> > > > > > + * This function is DEPRECATED. Do not use it in new code.
-> > > > > > + * Use pci_alloc_irq_vectors() instead.
-> > > > > > =C2=A0 */
-> > > > > > =C2=A0void pci_intx(struct pci_dev *pdev, int enable)
-> > > > > > =C2=A0{
-> > > > >=20
-> > > >=20
-> > > >=20
-> > >=20
-> >=20
->=20
-
+Joel Granados
 
