@@ -1,156 +1,124 @@
-Return-Path: <netdev+bounces-137352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5305C9A58F9
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 04:38:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC969A590C
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 04:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82B9B1C210DA
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 02:38:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924F51C20C17
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 02:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEBF2030A;
-	Mon, 21 Oct 2024 02:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8B82EB02;
+	Mon, 21 Oct 2024 02:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SfuT9TCH"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="Anz6nZFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE86347C7
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 02:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9CFA92F;
+	Mon, 21 Oct 2024 02:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729478287; cv=none; b=UhFwUw/lRcsTsihN5pRLhKPM8MoxKA8NnWEt7b/CCxBNqIKisGQcC7bnrRhE2hKeC6RajFz7EQlKX2sVY+pLpu+ivFZVul7boVpEPuhXsKC30myQedJ3L0z3QSwU5nWMEwUCq3hr1+vG1ANhIipfcgdfjrdVQejCExPeVrwn+S8=
+	t=1729479490; cv=none; b=XvI0F0otKtAon0wK06DoiBcf0214yOSWKCdRufVL5oi+JhXC7IJhEFmT7JB1NiAjAh4+Qooml97zKzFn1Y9U+qrtl1X1RwQimDf1VBollfop0BrMCBT6bHLQ0zOMwy4StEcw+/le7uRQNH4FHMHwptyq0xYhQMHGzpG9Lyqrapo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729478287; c=relaxed/simple;
-	bh=2QBcb1zKoy6oeZMi9qiu2KzvCBJinh7RFbYThfC1g/Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CORChrT7d9W/gWkSZGEw9ZUALsiwHL7ivWRvr1Mt8aGTCeMRzoZeo0JnqCkF0ltThUQHv3fxYOMch3a/h/N6yL8dqOlAYuQw4IptCT3dc0Wv5MahqV5Fq87HHh0ObPCfs6xtEj89EZfydYGbdccQprXLgPe3nm4Ain6DITtNGo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SfuT9TCH; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-83a9be2c0e6so168961039f.2
-        for <netdev@vger.kernel.org>; Sun, 20 Oct 2024 19:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729478284; x=1730083084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KSRDUJE2sN+JOhUsMJh13VEW5h0PQQtkvxqT2sfTDCY=;
-        b=SfuT9TCH1rM3F/+tNOEQpzLYWXGeOD48+ditZAFjgKQ33O4sCCa4wvqIqNFuL+Uq8O
-         3DrHK+MMxmv3jtHI32bRR3xOgEZd077n4B0iJNSvqE5PgIIhDmStM0KzcdK/ExCfx7RP
-         dUFEtIEIT9L5sBnKmBTjl/SWReE+JSTn5+8sCcH98+UBn4o08fgdBfe0eMgVumTsJX5g
-         OaxipyR9CJpdIUgJemwN93yM7TXoQ/JSLKaKZcGeg+E8zks0Qom3WsutD2JDN+SvFKVl
-         mCllL0EpKHJbqJunCGig3Ep/ahDMPPvJp+7J/4zlAy9SOCmac6Gq6tskjno32HiEF6JW
-         6deg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729478284; x=1730083084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KSRDUJE2sN+JOhUsMJh13VEW5h0PQQtkvxqT2sfTDCY=;
-        b=BXrko2YZehNiGH2Th25NPiDZ1aeVlyoFN6/JPassyrbTywLD80Ut8Q15IqAB3fxwJh
-         bBQJNf9BVXNuwi6jX7V9QiaMz92kx+e0QUlxXr3XX4K+qC/qvmOzYHbmQ/VGyQZy4vyL
-         ktbQb7l0kKJNemhKretqfzUBkl9AJLs4YWd6cy3IvfBe/3MJ/9SdjEs6+7WMPEyKKMVG
-         H9hWaKh7sEOF1zJqmcn/266kMHnZ0OPmST4TXCKBWwQVMV+AHzfiqIrtN42OkJ6AJg80
-         zhoSZ6IXOvw2PsekCLGCdj0k1sOC7XxpYvUTuQXdH+X1+rkAM1gPkz6c95gxRfNbScFD
-         F3Ng==
-X-Gm-Message-State: AOJu0YzzrK1GJaTJ6yxGFpvBJmnTEkUDlXG+K8eiPCBKRxNL2tfFUdf4
-	UBeHbaNLfOqMhQ/wn3hY7wlCV/Qby0V53tQhOmZtOTiaJukWaHK9k3yvL8RKv58g1zgoAOcFGTg
-	iUdhr2MDXGHPQpeDucdJraqEM8Z8=
-X-Google-Smtp-Source: AGHT+IFS0oie8ZUCppP1dQFfEDy6xHUzOglby7UYogm7hEDGFCBXFf1cno6/Ep+ye5SiFiQL1FfWAXBGEnIdbhTLi2A=
-X-Received: by 2002:a05:6e02:1c8d:b0:3a0:98b2:8f3b with SMTP id
- e9e14a558f8ab-3a3f405445emr82402145ab.7.1729478284267; Sun, 20 Oct 2024
- 19:38:04 -0700 (PDT)
+	s=arc-20240116; t=1729479490; c=relaxed/simple;
+	bh=gvnhP3QR2v/zK5Lm6aagczIw/TFzfWmYcKiZFGwl2KI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ld32+tHT/qF33LGYsfJ3sYOd5d0fAY428uI4LTdQkxN1JXY/jbo+rs9p2yBJCs15ndHIbu4SWeMCMHS4TAFgr7NFsVzSpiyJEAE2QXAxFMijSEV7XvfW1dizYgHmM43s6xZehSQoFhp420eV+Zx5oN3lw1RC/jmiqA9PgEVz+Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=Anz6nZFF; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 49L2vmNd024121
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 21 Oct 2024 04:57:50 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1729479472; bh=3wqb91UsdampFD5fRrQ9mHDNugrdeONpWtaLAOGbpjA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To;
+	b=Anz6nZFF/IQ8xBjeZY+43+whTOWA2tUxLwdHaPJ1Bnqrmam2pKR6c5GtIO5AVBFoe
+	 mW55AKn1qGT/ssnmnwzlHy7WEqMA90p5IGYjjeJcof42dCTRSuPI7eT+D6SSAknsEF
+	 mrOAqsl1R88OVqeEzJWUY9YdSfu6b1e3IbC7cBIY=
+Message-ID: <74317861-2cff-424b-a3db-8b214cec5f70@ans.pl>
+Date: Sun, 20 Oct 2024 19:57:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241020145029.27725-1-kerneljasonxing@gmail.com> <20241020145029.27725-3-kerneljasonxing@gmail.com>
-In-Reply-To: <20241020145029.27725-3-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 21 Oct 2024 10:37:28 +0800
-Message-ID: <CAL+tcoAr7RHhaZGV12wYDcPPPaubAqdxMCmy7Jujtr8b3+bY=w@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] tcp: add more warn of socket in tcp_send_loss_probe()
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, ncardwell@google.com
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: 6.6.57-stable regression: "netfilter: xtables: avoid
+ NFPROTO_UNSPEC where needed" broke NFLOG on IPv6
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+To: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ilya Katsnelson <me@0upti.me>, Phil Sutter <phil@nwl.cc>
+Cc: stable@vger.kernel.org, netfilter-devel
+ <netfilter-devel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <8eb81c74-4311-4d87-9c13-be6a99c94e2f@ans.pl>
+Content-Language: en-US
+In-Reply-To: <8eb81c74-4311-4d87-9c13-be6a99c94e2f@ans.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 20, 2024 at 10:50=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Add two fields to print in the helper which here covers tcp_send_loss_pro=
-be().
->
-> Link: https://lore.kernel.org/all/5632e043-bdba-4d75-bc7e-bf58014492fd@re=
-dhat.com/
-> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> Cc: Neal Cardwell <ncardwell@google.com>
-> ---
->  include/net/tcp.h     | 5 ++++-
->  net/ipv4/tcp_output.c | 4 +---
->  2 files changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index cac7bbff61ce..68eb03758950 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -2434,14 +2434,17 @@ static inline void tcp_warn_once(const struct soc=
-k *sk, bool cond, const char *s
->  {
->         WARN_ONCE(cond,
->                   "%s"
-> +                 "cwnd:%u "
->                   "out:%u sacked:%u lost:%u retrans:%u "
->                   "tlp_high_seq:%u sk_state:%u ca_state:%u "
-> -                 "advmss:%u mss_cache:%u pmtu:%u\n",
-> +                 "mss:%u advmss:%u mss_cache:%u pmtu:%u\n",
->                   str,
-> +                 tcp_snd_cwnd(tcp_sk(sk)),
->                   tcp_sk(sk)->packets_out, tcp_sk(sk)->sacked_out,
->                   tcp_sk(sk)->lost_out, tcp_sk(sk)->retrans_out,
->                   tcp_sk(sk)->tlp_high_seq, sk->sk_state,
->                   inet_csk(sk)->icsk_ca_state,
-> +                 tcp_current_mss((struct sock *)sk),
->                   tcp_sk(sk)->advmss, tcp_sk(sk)->mss_cache,
->                   inet_csk(sk)->icsk_pmtu_cookie);
->  }
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 054244ce5117..295bc0741772 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -2954,9 +2954,7 @@ void tcp_send_loss_probe(struct sock *sk)
->         }
->         skb =3D skb_rb_last(&sk->tcp_rtx_queue);
->         if (unlikely(!skb)) {
-> -               WARN_ONCE(tp->packets_out,
-> -                         "invalid inflight: %u state %u cwnd %u mss %d\n=
-",
-> -                         tp->packets_out, sk->sk_state, tcp_snd_cwnd(tp)=
-, mss);
-> +               tcp_warn_once(sk, tp->packets_out, NULL);
+On 19.10.2024 at 22:22, Krzysztof Olędzki wrote:
+> Hi,
+> 
+> After upgrading to 6.6.57 I noticed that my IPv6 firewall config failed to load.
+> 
+> Quick investigation flagged NFLOG to be the issue:
+> 
+> # ip6tables -I INPUT -j NFLOG
+> Warning: Extension NFLOG revision 0 not supported, missing kernel module?
+> ip6tables: No chain/target/match by that name.
+> 
+> The regression is caused by the following commit:
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit/?h=linux-6.6.y&id=997f67d813ce0cf5eb3cdb8f124da68141e91b6c
+> 
+> More precisely, the bug is in the change below:
+> 
+> +#if IS_ENABLED(CONFIG_IP6_NF_IPTABLES)
+> +	{
+> +		.name       = "NFLOG",
+> +		.revision   = 0,
+> +		.family     = NFPROTO_IPV4,
+> +		.checkentry = nflog_tg_check,
+> +		.destroy    = nflog_tg_destroy,
+> +		.target     = nflog_tg,
+> +		.targetsize = sizeof(struct xt_nflog_info),
+> +		.me         = THIS_MODULE,
+> +	},
+> +#endif
+> 
+> Replacing NFPROTO_IPV4 with NFPROTO_IPV6 fixed the issue.
+> 
+> Looking at the commit, it seems that at least one more target (MARK) may be also impacted:
+> 
+> +#if IS_ENABLED(CONFIG_IP6_NF_IPTABLES)
+> +	{
+> +		.name           = "MARK",
+> +		.revision       = 2,
+> +		.family         = NFPROTO_IPV4,
+> +		.target         = mark_tg,
+> +		.targetsize     = sizeof(struct xt_mark_tginfo2),
+> +		.me             = THIS_MODULE,
+> +	},
+> +#endif
+> 
+> The same errors seem to be present in the main tree:
+>  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0bfcb7b71e735560077a42847f69597ec7dcc326
+> 
+> I also suspect other -stable trees may be impacted by the same issue.
 
-Sorry, I noticed the warning:
-In function =E2=80=98tcp_warn_once=E2=80=99,
-    inlined from =E2=80=98tcp_send_loss_probe=E2=80=99 at ../net/ipv4/tcp_o=
-utput.c:2957:3:
-../include/net/tcp.h:2436:19: warning: =E2=80=98%s=E2=80=99 directive argum=
-ent is null
-[-Wformat-overflow=3D]
- 2436 |                   "%s"
-      |                   ^~~~
+Seems like this is already being taken care of:
 
-I think It should be:
-tcp_warn_once(sk, tp->packets_out, "");
+https://lore.kernel.org/netdev/ZxT8ow0auDTe-TDA@calendula/T/#t
 
-Will handle this soon.
+Krzysztof
 
