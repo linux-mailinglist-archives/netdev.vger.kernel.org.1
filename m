@@ -1,43 +1,74 @@
-Return-Path: <netdev+bounces-137550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2BA49A6E48
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:35:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9AD59A6E4A
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42E441F231A6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:35:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23BA31C220D6
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741451C3F0E;
-	Mon, 21 Oct 2024 15:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A081C3F04;
+	Mon, 21 Oct 2024 15:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GpFzOkUj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9919F1C3F12;
-	Mon, 21 Oct 2024 15:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87A01C32EC
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729524898; cv=none; b=QYQ+GbfWmY95hGZB+A3DUfKXdnUkP2k37hap9RhnAM1rJh5BdSA8g4tp1fy6YyJvJooh49Op/ohqDBsM86NdETknDiif306q+va6dVIkb4aGqf4+LeFUATNdqQqNknop4cpcEHTt4EyynMH2oY7ANQvyqiWWkBm2tTVm6V/6u34=
+	t=1729524930; cv=none; b=ranEeSiqkVyAtEerKBZVQepQTWBWZ83bD4eA8BZQCj8FwVGOre+yVLv9g6m2YemMV4+a2ka1ltt0oJHKY3C4dUE9xbtNyemU/I1n6/eUp07lQ9Jj1CciqDxChxCByZAChfuQyW4PWigYa1wmbvpcrpappxYkeU4RK+6K/IBA4jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729524898; c=relaxed/simple;
-	bh=Iujc4jVi0X8OhToUuIrWzld03JXUBjAQrBk43JukXbE=;
+	s=arc-20240116; t=1729524930; c=relaxed/simple;
+	bh=S3cnEiKuSXDoDPWcsKn3JHJUkNp9+UlxxK4fNUsaiVs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZW7MSgLZVcMhFTEn5oUw0/rZRL4i/pNsCUEudJuC1irhmmiuOWcQb6wrT+/bPvKlmrzZ+WwCfmJAeZMsuvO9JslFUks/NqvDSZz6SzNj6kIkb/OwUzYL1XFvb/4NYTEx5+o+UqupINkw6tgxgCD3vbof6M+nabiQNfrx+JQ7VBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 68A4161E5FE05;
-	Mon, 21 Oct 2024 17:34:21 +0200 (CEST)
-Message-ID: <421389ef-f5f4-4e92-b963-c6de1cc12506@molgen.mpg.de>
-Date: Mon, 21 Oct 2024 17:34:21 +0200
+	 In-Reply-To:Content-Type; b=CqEU6EpBmJN5iakAt8lMHKK4LQXdSYb6pPLGMOWQUsGhqRYs0yvqQSIUnh5inqYB22GlR6X6bwifuuHrL42xIykJvMHrcEmeWfwFmAC+1ASGSct6KUs5WHp4+uOJH+Zulu2RY0MKw4GgafYK5CCxPZx0WiR/wOEYlruIW8KQrd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GpFzOkUj; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-83aacecc8efso144057539f.0
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 08:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729524928; x=1730129728; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KyCrG1BXzXCwPHMGuiXYVs/HDSOGt/9byltcE0gxiPg=;
+        b=GpFzOkUjjhKxESS4EHrzA2DfWP0kWOrZhtDb80Pfd5TENDWUt7Y8YOm78YzrBqmp2u
+         ouDDiGrpTYrOqdDPIkmdAQ5PrPntSJFMNBjIq2HL7hbSoEYyYD6MIbAZkttODfTVCL2u
+         SxLKiG7KoNKofj1dVRCuAJUyhbthkDOtJg/AtfeQpkUv9s9T9gVJ3goZKvIl7nK7hJxm
+         +vvXozLfv5U7W89HxtijKml6YYHxuXurAGHmYUyxEW3ODmNWtcAshBBLeKKIT6JbPu1K
+         KfyuzJSFtMuSpKp8LHo6oHiUqXtAtXwD2e4tfvSVr5CT3RjGlR26v+ao/hISC313ZGTY
+         7AvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729524928; x=1730129728;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KyCrG1BXzXCwPHMGuiXYVs/HDSOGt/9byltcE0gxiPg=;
+        b=keRGfK7iNwNZ4nVlXm9rLUUEwAcZ/OFkzlzBpMSQcFTP8pz8l6oL4XYJ3KbyvH+3kz
+         ZszpCLA60dLVUokKlwihlY9lGMkk8riHeszHkVuSgo178RvXJ+k1zfkNONSqJE1CZRFN
+         NfKFj5LVkjdIkgtzUTf8NYGVFMCPtWPs2U7LRQi2iCgaX1TR8GM+cl43rZQJZzzd4V4j
+         9Ni7hsz2Dp8/xTaNXv94UdFwe4sJwG4IxC4GYqit+/mJjPIOx7BPLxOt2fvWkZ6EEKRG
+         scMQTFSzEKT07KAgCngFe04Tlwse31c/7xxX8DgeCLdDI6jT0Q1A93Ofp/z+HnVAzZhl
+         h2kw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxd/mJhMo+8Ji8QoNWAIAUYTrea6ojzhlznA2EzcLQMaQqZhItTu2IxOLbbAB3WqSiVW/APlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUBRvjbbiZKXZ6IkkeIYcS2Zp58jNGf3Lnj/DI8QW7bQYsPYyR
+	Qd6bD/8tmeB0yVTxLTl/sTWsK1Rwct5wM1GPl9HkNeHIoJCNGPclVXlpxa21biQ=
+X-Google-Smtp-Source: AGHT+IHjjsjV6Hvo9fVu9LoWE/+ASFLQTTdX9GhzG00bjcTZgOJOifnxEQxa33cxgijQgsWue3nSbg==
+X-Received: by 2002:a05:6e02:12c5:b0:3a0:9f36:6bf1 with SMTP id e9e14a558f8ab-3a4cc28d350mr72255ab.9.1729524927705;
+        Mon, 21 Oct 2024 08:35:27 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a400a7bdb8sm11907715ab.5.2024.10.21.08.35.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 08:35:27 -0700 (PDT)
+Message-ID: <3aebbd91-6f2f-4c8c-82db-4d09e39e7946@kernel.dk>
+Date: Mon, 21 Oct 2024 09:35:26 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,192 +76,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next 2/2] ice: ptp: add control over
- HW timestamp latch point
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-References: <20241021141955.1466979-1-arkadiusz.kubalewski@intel.com>
- <20241021141955.1466979-3-arkadiusz.kubalewski@intel.com>
+Subject: Re: [PATCH v6 10/15] io_uring/zcrx: add io_zcrx_area
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241016185252.3746190-1-dw@davidwei.uk>
+ <20241016185252.3746190-11-dw@davidwei.uk>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241021141955.1466979-3-arkadiusz.kubalewski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241016185252.3746190-11-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Dear Arkadiusz,
-
-
-Thank you for the patch.
-
-Am 21.10.24 um 16:19 schrieb Arkadiusz Kubalewski:
-> Allow user to control the latch point of ptp HW timestamps in E825
-> devices.
-
-Please give an example how to configure it.
-
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_ptp.c    | 46 +++++++++++++++++
->   drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 57 +++++++++++++++++++++
->   drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  2 +
->   3 files changed, 105 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index a999fface272..47444412ed9a 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -2509,6 +2509,50 @@ static int ice_ptp_parse_sdp_entries(struct ice_pf *pf, __le16 *entries,
->   	return 0;
->   }
->   
-> +/**
-> + * ice_get_ts_point - get the tx timestamp latch point
-> + * @info: the driver's PTP info structure
-> + * @point: return the configured tx timestamp latch point
-> + *
-> + * Return: 0 on success, negative on failure.
-> + */
-> +static int
-> +ice_get_ts_point(struct ptp_clock_info *info, enum ptp_ts_point *point)
+On 10/16/24 12:52 PM, David Wei wrote:
+> +static int io_zcrx_create_area(struct io_ring_ctx *ctx,
+> +			       struct io_zcrx_ifq *ifq,
+> +			       struct io_zcrx_area **res,
+> +			       struct io_uring_zcrx_area_reg *area_reg)
 > +{
-> +	struct ice_pf *pf = ptp_info_to_pf(info);
-> +	struct ice_hw *hw = &pf->hw;
-> +	bool sfd_ena;
-> +	int ret;
+> +	struct io_zcrx_area *area;
+> +	int i, ret, nr_pages;
+> +	struct iovec iov;
 > +
-> +	ice_ptp_lock(hw);
-> +	ret = ice_ptp_hw_ts_point_get(hw, &sfd_ena);
-> +	ice_ptp_unlock(hw);
-> +	if (!ret)
-> +		*point = sfd_ena ? PTP_TS_POINT_SFD : PTP_TS_POINT_POST_SFD;
-> +
-> +	return ret;
-> +}
-> +
-> +/**
-> + * ice_set_ts_point - set the tx timestamp latch point
-> + * @info: the driver's PTP info structure
-> + * @point: requested tx timestamp latch point
-> + */
-> +static int
-> +ice_set_ts_point(struct ptp_clock_info *info, enum ptp_ts_point point)
-> +{
-> +	bool sfd_ena = point == PTP_TS_POINT_SFD ? true : false;
-> +	struct ice_pf *pf = ptp_info_to_pf(info);
-> +	struct ice_hw *hw = &pf->hw;
-> +	int ret;
-> +
-> +	ice_ptp_lock(hw);
-> +	ret = ice_ptp_hw_ts_point_set(hw, sfd_ena);
-> +	ice_ptp_unlock(hw);
-> +
-> +	return ret;
-> +}
-> +
->   /**
->    * ice_ptp_set_funcs_e82x - Set specialized functions for E82X support
->    * @pf: Board private structure
-> @@ -2529,6 +2573,8 @@ static void ice_ptp_set_funcs_e82x(struct ice_pf *pf)
->   	if (ice_is_e825c(&pf->hw)) {
->   		pf->ptp.ice_pin_desc = ice_pin_desc_e825c;
->   		pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e825c);
-> +		pf->ptp.info.set_ts_point = ice_set_ts_point;
-> +		pf->ptp.info.get_ts_point = ice_get_ts_point;
->   	} else {
->   		pf->ptp.ice_pin_desc = ice_pin_desc_e82x;
->   		pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e82x);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> index da88c6ccfaeb..d81525bc8a16 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> @@ -6303,3 +6303,60 @@ int ice_cgu_get_output_pin_state_caps(struct ice_hw *hw, u8 pin_id,
->   
->   	return 0;
->   }
-> +
-> +/**
-> + * ice_ptp_hw_ts_point_get - check if tx timestamping is latched on/post SFD
-> + * @hw: pointer to the HW struct
-> + * @sfd_ena: on success true if tx timestamping latched at beginning of SFD,
-> + *	false if post sfd
-> + *
-> + * Verify if HW timestamping point is configured to measure at the beginning or
-> + * post of SFD (Start of Frame Delimiter)
-> + *
-> + * Return: 0 on success, negative on error
-> + */
-> +int ice_ptp_hw_ts_point_get(struct ice_hw *hw, bool *sfd_ena)
-> +{
-> +	u8 port = hw->port_info->lport;
-> +	u32 val;
-> +	int err;
-> +
-> +	err = ice_read_mac_reg_eth56g(hw, port, PHY_MAC_XIF_MODE, &val);
-> +	if (err)
-> +		return err;
-> +	if (val | PHY_MAC_XIF_TS_SFD_ENA_M)
-> +		*sfd_ena = true;
-> +	else
-> +		*sfd_ena = false;
-
-Use ternary operator?
-
-> +
-> +	return err;
-
-As the function returns `int`, use integers (macros) instead of boolean?
-
-> +}
-> +
-> +/**
-> + * ice_ptp_hw_ts_point_set - configure timestamping on/post SFD
-> + * @hw: pointer to the HW struct
-> + * @sfd_ena: true to enable timestamping at beginning of SFD, false post sfd
-> + *
-> + * Configure timestamping to measure at the beginning/post SFD (Start of Frame
-> + * Delimiter)
-> + *
-> + * Return: 0 on success, negative on error
-> + */
-> +int ice_ptp_hw_ts_point_set(struct ice_hw *hw, bool sfd_ena)
-> +{
-> +	u8 port = hw->port_info->lport;
-> +	int err, val;
-> +
-> +	err = ice_read_mac_reg_eth56g(hw, port, PHY_MAC_XIF_MODE, &val);
-> +	if (err)
-> +		return err;
-> +	if ((val | PHY_MAC_XIF_TS_SFD_ENA_M && sfd_ena) ||
-> +	    (!(val | PHY_MAC_XIF_TS_SFD_ENA_M) && !sfd_ena))
+> +	if (area_reg->flags || area_reg->rq_area_token)
 > +		return -EINVAL;
-> +	if (sfd_ena)
-> +		val |= PHY_MAC_XIF_TS_SFD_ENA_M;
-> +	else
-> +		val &= ~PHY_MAC_XIF_TS_SFD_ENA_M;
+> +	if (area_reg->__resv1 || area_reg->__resv2[0] || area_reg->__resv2[1])
+> +		return -EINVAL;
+> +	if (area_reg->addr & ~PAGE_MASK || area_reg->len & ~PAGE_MASK)
+> +		return -EINVAL;
 > +
-> +	return ice_write_mac_reg_eth56g(hw, port, PHY_MAC_XIF_MODE, val);
+> +	iov.iov_base = u64_to_user_ptr(area_reg->addr);
+> +	iov.iov_len = area_reg->len;
+> +	ret = io_buffer_validate(&iov);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = -ENOMEM;
+> +	area = kzalloc(sizeof(*area), GFP_KERNEL);
+> +	if (!area)
+> +		goto err;
+> +
+> +	area->pages = io_pin_pages((unsigned long)area_reg->addr, area_reg->len,
+> +				   &nr_pages);
+> +	if (IS_ERR(area->pages)) {
+> +		ret = PTR_ERR(area->pages);
+> +		area->pages = NULL;
+> +		goto err;
+> +	}
+> +	area->nia.num_niovs = nr_pages;
+> +
+> +	area->nia.niovs = kvmalloc_array(nr_pages, sizeof(area->nia.niovs[0]),
+> +					 GFP_KERNEL | __GFP_ZERO);
+> +	if (!area->nia.niovs)
+> +		goto err;
+> +
+> +	area->freelist = kvmalloc_array(nr_pages, sizeof(area->freelist[0]),
+> +					GFP_KERNEL | __GFP_ZERO);
+> +	if (!area->freelist)
+> +		goto err;
+> +
+> +	for (i = 0; i < nr_pages; i++) {
+> +		area->freelist[i] = i;
+> +	}
+> +
+> +	area->free_count = nr_pages;
+> +	area->ifq = ifq;
+> +	/* we're only supporting one area per ifq for now */
+> +	area->area_id = 0;
+> +	area_reg->rq_area_token = (u64)area->area_id << IORING_ZCRX_AREA_SHIFT;
+> +	spin_lock_init(&area->freelist_lock);
+> +	*res = area;
+> +	return 0;
+> +err:
+> +	if (area)
+> +		io_zcrx_free_area(area);
+> +	return ret;
 > +}
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> index 656daff3447e..cefedd01479a 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> @@ -348,6 +348,8 @@ void ice_ptp_init_hw(struct ice_hw *hw);
->   int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready);
->   int ice_ptp_one_port_cmd(struct ice_hw *hw, u8 configured_port,
->   			 enum ice_ptp_tmr_cmd configured_cmd);
-> +int ice_ptp_hw_ts_point_get(struct ice_hw *hw, bool *sfd_ena);
-> +int ice_ptp_hw_ts_point_set(struct ice_hw *hw, bool sfd_ena);
->   
->   /* E822 family functions */
->   int ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val);
 
+Minor nit, but I think this would be nicer returning area and just using
+ERR_PTR() for the errors.
 
-Kind regards,
+Outside of that:
 
-Paul
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+
+-- 
+Jens Axboe
 
