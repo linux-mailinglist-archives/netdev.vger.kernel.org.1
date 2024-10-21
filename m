@@ -1,240 +1,129 @@
-Return-Path: <netdev+bounces-137426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218B49A62D2
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:28:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 213C99A63F0
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D16EA282260
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 10:28:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5097F1C21F16
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 10:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B341E6DC0;
-	Mon, 21 Oct 2024 10:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78491EF925;
+	Mon, 21 Oct 2024 10:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="RuCp/aVa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyZ/zI/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80AE1E47C9
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 10:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729506401; cv=none; b=XNKxuI350fr2/Facnop/Aj1Qty2lyRPY/XMt8J7Fb+iQBZIF40UQv6maA513zt4ex0h0ez6bVD1V7sM79swTLzoUiScyqHfmztIDg8CkAJn9KPuOGJ+G6cUn7ZrR/sLdFkWHn+5PuZYE8eJIlmg65nR0g26B03c/kAnEs11cfDY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729506401; c=relaxed/simple;
-	bh=E7VKrqv0adoPjG9DIf0lsHdFk0cfFJ+l4WaW1k/o1YY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ekIOHtYmXXDzndYit8oaGyhBGvIA6wCdcD9/N/Gg4X3LhCXw/u1nYnE4ZfbYi8y34YkspNZYucZC3gue1ZtPXbhANFpropkOYLoLZHe1LuWprtAIjEfpxIDdpM3twxoE+YYz/iICODoEPRTa5rB6tsammXuGffZquFi2qfBdSg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=RuCp/aVa; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 94350205CD;
-	Mon, 21 Oct 2024 12:26:36 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CIhp2a-hy_6k; Mon, 21 Oct 2024 12:26:35 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id C354D20758;
-	Mon, 21 Oct 2024 12:26:35 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com C354D20758
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1729506395;
-	bh=vgi1+KRBbHkeCoQHa3jb7Qa/cewHJFr9xoAsQOd+VC0=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=RuCp/aVacoWNgV72a6EV5H29V1ifBjGDevvtnbt+bwq7X+l4iqdeFgM2KAsbQ++4S
-	 Fi6LeoJuLMqsvmiwl/UtR3mydkSdytPACw1QwW3IQmGx4MEqjXxGi0I5EkquNDTIoG
-	 dzOkjm1ZV5FMjTPUQvRWHEyEa9s8u2aMWiB5yEbuxk/I+7A3432AbWjdpEMp34j5Nu
-	 xeM55ZABS8YX/WX6gEwSaV00VFT/hHNiCNWCnSY05w2nyVA2KWneM2BzwXKodPXwBA
-	 d61Dkf2SFoGFDy1QLFovDEKV9hrPO5aVfcSeas8zSy6Vj55HNcEdOF2SQ75L/dZeNm
-	 gqznjwV2WZGrw==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 21 Oct 2024 12:26:35 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Oct
- 2024 12:26:34 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id B512331819D0; Mon, 21 Oct 2024 12:26:34 +0200 (CEST)
-Date: Mon, 21 Oct 2024 12:26:34 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Christian Hopps <chopps@chopps.org>
-CC: <devel@linux-ipsec.org>, <netdev@vger.kernel.org>, Florian Westphal
-	<fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
-	<horms@kernel.org>, Antony Antony <antony@phenome.org>, Christian Hopps
-	<chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v12 12/16] xfrm: iptfs: handle received
- fragmented inner packets
-Message-ID: <ZxYsWnWKPYyaoX79@gauss3.secunet.de>
-References: <20241007135928.1218955-1-chopps@chopps.org>
- <20241007135928.1218955-13-chopps@chopps.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053831EF0BD;
+	Mon, 21 Oct 2024 10:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729507009; cv=none; b=Ewj1ubZWBOaFD9DA9S9sKhlBZMvohR6X0xbGbjd0hAQdrrtLyDgcOTlB6s40m/S7L1J9qI/Kb9o/2NZusEnBDeS2ZiXQiQSSerHbamcWjPcp+mPyivQpWuRCWuaBRPuEMPe2cfmTThTO96FnbH9Rpvc/7YfgqIgUEI6uAp5tpaQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729507009; c=relaxed/simple;
+	bh=7cBYiwiUKiiQ768DaSB+W9Lzw7c8XLHhwRx684F+EQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f8jXwnjjKDFYhej+6goc+hpLF2OpGZSIIbilAnsevXxstNMO9UOttrytewFLTEoUQBuzBtXPKUWXBASOtrQU4qW8aHFWJM2mwBI5YVb9mWGiFgkQDV48SLB9FtU1wY1W88qzbnZsfi+R8r4n882q/Bd7WCPfB6jC+LpaFvg6WtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyZ/zI/v; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71e49ef3b2bso3037506b3a.2;
+        Mon, 21 Oct 2024 03:36:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729507007; x=1730111807; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h3w+t/hy92F7//9WIWnn/8qnkcbEZ1S9KDEWZUEAsd8=;
+        b=dyZ/zI/vJeWVun/u1BZS9KaXp1ijqWLQQeDYdxsfufoq457ETYM9Psf9O4D5QL2stn
+         GzE+cbUk3p47aw23Mj+ev242ZwW2XKRtDh3ga0pbEqjtqRl9iC8JhLs8kn74Rm8gM+Ao
+         lnPPZh3rWwBxnLuCyv8HZbCTVTFGVVuFUlxSqXBZzjk8vZYv0NqBOVRdEzPa0EEDxAec
+         4ROnxB/tirU/XEmLo03rc1xM2bjRA3zB6OFjmici+s2vkBoYhUvdSwdgqekGKrCV2n7I
+         ZGtnws834jqWdpTLxNWBwK6vgb217sMMZ0CBX16Do9FAcATaLu/iX90xHah7sj3we08T
+         DHzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729507007; x=1730111807;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h3w+t/hy92F7//9WIWnn/8qnkcbEZ1S9KDEWZUEAsd8=;
+        b=EcarXu2CyskwtN9o6IA6+ADDEreaJOgIy9IQFBwM/wipaa9seIPIO6JSxFzzOfxfwV
+         IrE0HiQPw/zRWapssWrntICnE0rDM+JIRa+cCzFoUKjp+HtPYVQj2pZria7/oqlzm2e8
+         0C3fm1SsdbY8MKJm6N8dMT6uTFwzYQtWslv61JqC+Ck6DqicptQmsx+26u65tyhd/yKK
+         DdHSvL+ItwmmXZeFXih1ENCYluKtjcJc6gBZrkcfzVLeOc+AdWH+9rT5tP/Zc7I1bzg3
+         YVEN/ik/K2sGruf8j/+7gZkwWQIKiscrtNHcykPsQDVpSM9jmH9D5uNg0gjUcloG204f
+         PJ8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVDi4R18mnioTwkjOd0ciJZCX1QREB3RqhsCPRis7vFiiZrsyQNVRYstU3YPiQl3MJ5Zsv8bJ9Oucto@vger.kernel.org, AJvYcCXPVG1X+aCcTBzc9dlAsym8RmlI6k3kVocyTmlgfCMbJxmAs8PsBWZ0zhRT0Cw1dNy/LKGRefwZ7YbxGbTg@vger.kernel.org, AJvYcCXxcrQHdHJh7EcaaZhUWc5QHdNF0NWMTUDGOvcoHAwKf980ut4RXp/syyW4FQY6OFR7+/rYjUiG@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvcw+h3kcmTZpno68uqlPc497f/Ljl8XgDzGg28eqrt3uoU4RH
+	T3O9kZcvlnP8eFjeN5dHY2dnPi+lUGudEv8pp1eGAAvhkBrZq0jE
+X-Google-Smtp-Source: AGHT+IElGNzKYcyHQUiYzNuX8VzKK9Yqlu7dfkHxfLYn3GyJigsTd7wxPDUfyzl4ltkknkIdKtCRXQ==
+X-Received: by 2002:a05:6a21:710a:b0:1d9:1aa0:10b6 with SMTP id adf61e73a8af0-1d92c4baa97mr14744680637.3.1729507007228;
+        Mon, 21 Oct 2024 03:36:47 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e5ad3677efsm3354501a91.17.2024.10.21.03.36.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 03:36:46 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Chen Wang <unicorn_wang@outlook.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Inochi Amaoto <inochiama@outlook.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: Yixun Lan <dlan@gentoo.org>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH 0/4] riscv: sophgo: Add ethernet support for SG2044
+Date: Mon, 21 Oct 2024 18:36:13 +0800
+Message-ID: <20241021103617.653386-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241007135928.1218955-13-chopps@chopps.org>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 07, 2024 at 09:59:24AM -0400, Christian Hopps wrote:
-> From: Christian Hopps <chopps@labn.net>
-> 
-> +
-> +/**
-> + * __iptfs_iphlen() - return the v4/v6 header length using packet data.
-> + * @data: pointer at octet with version nibble
-> + *
-> + * The version data is expected to be valid (i.e., either 4 or 6).
-> + *
-> + * Return: the IP header size based on the IP version.
-> + */
-> +static u32 __iptfs_iphlen(u8 *data)
-> +{
-> +	struct iphdr *iph = (struct iphdr *)data;
-> +
-> +	if (iph->version == 0x4)
-> +		return sizeof(*iph);
-> +	WARN_ON_ONCE(iph->version != 0x6);
-> +	return sizeof(struct ipv6hdr);
+The ethernet controller of SG2044 is Synopsys DesignWare IP with
+custom clock. Add glue layer for it.
 
-Better to return an error if this is not IPv6
+Inochi Amaoto (4):
+  dt-bindings: net: snps,dwmac: Add dwmac-5.30a version
+  dt-bindings: net: Add support for Sophgo SG2044 dwmac
+  net: stmmac: platform: Add snps,dwmac-5.30a IP compatible string
+  net: stmmac: Add glue layer for Sophgo SG2044 SoC
 
-> +}
-> +
-> +/**
-> + * __iptfs_iplen() - return the v4/v6 length using packet data.
-> + * @data: pointer to ip (v4/v6) packet header
-> + *
-> + * Grab the IPv4 or IPv6 length value in the start of the inner packet header
-> + * pointed to by `data`. Assumes data len is enough for the length field only.
-> + *
-> + * The version data is expected to be valid (i.e., either 4 or 6).
-> + *
-> + * Return: the length value.
-> + */
-> +static u32 __iptfs_iplen(u8 *data)
-> +{
-> +	struct iphdr *iph = (struct iphdr *)data;
-> +
-> +	if (iph->version == 0x4)
-> +		return ntohs(iph->tot_len);
-> +	WARN_ON_ONCE(iph->version != 0x6);
-> +	return ntohs(((struct ipv6hdr *)iph)->payload_len) +
-> +	       sizeof(struct ipv6hdr);
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   4 +
+ .../bindings/net/sophgo,sg2044-dwmac.yaml     | 145 ++++++++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 132 ++++++++++++++++
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |   3 +-
+ 6 files changed, 295 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
 
-Same here.
-
-> +
-> +		/* We have enough data to get the ip length value now,
-> +		 * allocate an in progress skb
-> +		 */
-> +		ipremain = __iptfs_iplen(xtfs->ra_runt);
-> +		if (ipremain < sizeof(xtfs->ra_runt)) {
-> +			/* length has to be at least runtsize large */
-> +			XFRM_INC_STATS(xs_net(xtfs->x),
-> +				       LINUX_MIB_XFRMINIPTFSERROR);
-> +			goto abandon;
-> +		}
-> +
-> +		/* For the runt case we don't attempt sharing currently. NOTE:
-> +		 * Currently, this IPTFS implementation will not create runts.
-> +		 */
-> +
-> +		newskb = iptfs_alloc_skb(skb, ipremain, false);
-
-As mentioned above, __iptfs_iplen needs error handling. Otherwise
-you might alocate a random amount of data here.
-
-> +		if (!newskb) {
-> +			XFRM_INC_STATS(xs_net(xtfs->x), LINUX_MIB_XFRMINERROR);
-> +			goto abandon;
-> +		}
-> +		xtfs->ra_newskb = newskb;
-> +
-> +		/* Copy the runt data into the buffer, but leave data
-> +		 * pointers the same as normal non-runt case. The extra `rrem`
-> +		 * recopied bytes are basically cacheline free. Allows using
-> +		 * same logic below to complete.
-> +		 */
-> +		memcpy(skb_put(newskb, runtlen), xtfs->ra_runt,
-> +		       sizeof(xtfs->ra_runt));
-> +	}
-> +
-> +	/* Continue reassembling the packet */
-> +	ipremain = __iptfs_iplen(newskb->data);
-> +	iphlen = __iptfs_iphlen(newskb->data);
-> +
-> +	/* Sanity check, we created the newskb knowing the IP length so the IP
-> +	 * length can't now be shorter.
-> +	 */
-> +	WARN_ON_ONCE(newskb->len > ipremain);
-> +
-> +	ipremain -= newskb->len;
-> +	if (blkoff < ipremain) {
-> +		/* Corrupt data, we don't have enough to complete the packet */
-> +		XFRM_INC_STATS(xs_net(xtfs->x), LINUX_MIB_XFRMINIPTFSERROR);
-> +		goto abandon;
-> +	}
-> +
-> +	/* We want the IP header in linear space */
-> +	if (newskb->len < iphlen) {
-> +		iphremain = iphlen - newskb->len;
-> +		if (blkoff < iphremain) {
-> +			XFRM_INC_STATS(xs_net(xtfs->x),
-> +				       LINUX_MIB_XFRMINIPTFSERROR);
-> +			goto abandon;
-> +		}
-> +		fraglen = min(blkoff, remaining);
-> +		copylen = min(fraglen, iphremain);
-> +		WARN_ON_ONCE(skb_tailroom(newskb) < copylen);
-
-This is also something that needs error handling. This WARN_ON_ONCE
-does not make much sense, as the next line will crash the machine
-anyway if this condition is true.
-
-This is also a general thing, there are a lot of WARN_ON_ONCE
-and you just continue after the warning. Whenever such a warn
-condition can happen, it needs audit why it can happen. Usually
-it can be either fixed or catched with an error. Warnings
-should be used very rarely.
-
-In this case you can either make sure to allocate the correct amount
-of data or extend the tailroom with pskb_expand_head().
-
-No need to crash the machine here :)
-
-Please audit your WARN_ON_ONCE calls, I guess most are either not
-needed or the condition can be handled otherwise somehow.
-
-> +		if (skb_copy_seq_read(st, data, skb_put(newskb, copylen),
-> +				      copylen)) {
-> +			XFRM_INC_STATS(xs_net(xtfs->x),
-> +				       LINUX_MIB_XFRMINBUFFERERROR);
-> +			goto abandon;
-> +		}
-
-> @@ -1286,7 +1729,11 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
->  	int ret = 0;
->  	u64 q;
->  
-> -	if (x->dir == XFRM_SA_DIR_OUT) {
-> +	if (x->dir == XFRM_SA_DIR_IN) {
-> +		q = xtfs->drop_time_ns;
-> +		(void)do_div(q, NSECS_IN_USEC);
-
-This cast is not needed.
+--
+2.47.0
 
 
