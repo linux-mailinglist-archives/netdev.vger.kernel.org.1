@@ -1,117 +1,108 @@
-Return-Path: <netdev+bounces-137404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E639A605A
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:41:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE8329A6086
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:46:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17750B215BC
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:41:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5042DB2719B
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B411E32A4;
-	Mon, 21 Oct 2024 09:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S41S/vky"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81331E32C2;
+	Mon, 21 Oct 2024 09:45:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB518198837;
-	Mon, 21 Oct 2024 09:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13F4199E9D;
+	Mon, 21 Oct 2024 09:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729503682; cv=none; b=jVbyxAP7BakwiHli+XVW9xiMXOo4qFA9Q8ZwkWlGSRqAtqajDOYCp9dR2zUZsZqwxVf1r0O6JqiSYidaehhuR+Tkn/6HSB0pmUqjzfA8INGBxHxOQ01/MjN/UjGsdVItGjRgIAA8troc1V+aW5fmfU3DBG+8mtIzjaY75LrCBYY=
+	t=1729503945; cv=none; b=hYUuUoCfR9hWL1F/k4kgRllMNJcCPC//qF5niUALD/H4kdS9+pslhG4CI/476h+EmTNMpbmMNTbNvO6DGVLdc10qLHsDVtIeFhl9pWA9lJ2f1QetpCNEEk2TD3lSroeOLSMFV96olxUkTSBViM3mkwAAGdQlirYhar4TSstsExA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729503682; c=relaxed/simple;
-	bh=6rptqk1yjX88puhYrwkZuZq14mYGXe2ZwC+jebh3JSY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CCHzHfnGrZI4nLe3MeVx39e/d61pwV0qnKSdKQQ741jjC3Tm0y7mNr0fb6Gg0vVSbH5ZXlzlPwHWcFdq6b3IgF22sXfBjrhGDrUCYk65BNTbuqTPUWMMLadpHy0AJO9PgDSYW0q2m/YqQ2m3HBClCEtlchWZ2qE0OCDwiZGWiBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S41S/vky; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575AAC4CEC7;
-	Mon, 21 Oct 2024 09:41:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729503682;
-	bh=6rptqk1yjX88puhYrwkZuZq14mYGXe2ZwC+jebh3JSY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=S41S/vkyRGKEeA2C28ygl8O6TszptYIZciX2hVi0K6ajaT1IUs8nB3sssIhzZ3iro
-	 5MgcWeFSicjmCjP2JHwfuTKfaT8K94xIY5xyrx6cVkBijHnEH94Bgywcvo1tlAIo8C
-	 tYbTfIoC16G59ZkYXOTJ3WWaiT6kyiwmlRU9GozUx1ode9Km/A5eR5/ogC8TvLzTRv
-	 //boFiV114+ULueUV+g7fYKYnYJC/ntsQbIyQ9fo3HLo4SxHw8282MDQIugyY5zeg0
-	 IqwpMyqcWCJMQJemvOEK377iHALkawjauBChannsK/rQnwcdOzuPCRrMwm29hrnU/9
-	 z3VQc3xBKI59g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DC93809A8A;
-	Mon, 21 Oct 2024 09:41:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729503945; c=relaxed/simple;
+	bh=bsuomyKkcsdQyL3/0slJ0YBalreYwaoNGDT48Yv2awE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=e6DwZYF9GrEwt/QbHWzdKMjYewE4VTPDdhmsc92TtJhbnW6a7o51pMr0qfobDet57H/LV5uvxtOAU0rbmjop94Vt/u0JPDrSLQ8T9850AibIkMAtiqgN46Vo9s1RC1o+VBFALmx8sUJCIE9VSBv4DXI++WX4dvoGe4GtExMV1pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 0/2] Netfilter fixes for net (v2)
+Date: Mon, 21 Oct 2024 11:45:34 +0200
+Message-Id: <20241021094536.81487-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V12 RESEND net-next 00/10] Add support of HIBMCGE Ethernet
- Driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172950368799.187649.5504292717467642283.git-patchwork-notify@kernel.org>
-Date: Mon, 21 Oct 2024 09:41:27 +0000
-References: <20241015123516.4035035-1-shaojijie@huawei.com>
-In-Reply-To: <20241015123516.4035035-1-shaojijie@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com,
- liuyonglong@huawei.com, chenhao418@huawei.com, sudongming1@huawei.com,
- xujunsheng@huawei.com, shiyongbang@huawei.com, libaihan@huawei.com,
- andrew@lunn.ch, jdamato@fastly.com, horms@kernel.org,
- kalesh-anakkur.purayil@broadcom.com, christophe.jaillet@wanadoo.fr,
- jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
- salil.mehta@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+This is a v2 including a extended PR with one more fix.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+-o-
 
-On Tue, 15 Oct 2024 20:35:06 +0800 you wrote:
-> This patch set adds the support of Hisilicon BMC Gigabit Ethernet Driver.
-> 
-> This patch set includes basic Rx/Tx functionality. It also includes
-> the registration and interrupt codes.
-> 
-> This work provides the initial support to the HIBMCGE and
-> would incrementally add features or enhancements.
-> 
-> [...]
+Hi,
 
-Here is the summary with links:
-  - [V12,RESEND,net-next,01/10] net: hibmcge: Add pci table supported in this module
-    https://git.kernel.org/netdev/net-next/c/a95ac4f92aa6
-  - [V12,RESEND,net-next,02/10] net: hibmcge: Add read/write registers supported through the bar space
-    https://git.kernel.org/netdev/net-next/c/fc1992bad7da
-  - [V12,RESEND,net-next,03/10] net: hibmcge: Add mdio and hardware configuration supported in this module
-    https://git.kernel.org/netdev/net-next/c/a239b2b1dee2
-  - [V12,RESEND,net-next,04/10] net: hibmcge: Add interrupt supported in this module
-    https://git.kernel.org/netdev/net-next/c/4d089035fa19
-  - [V12,RESEND,net-next,05/10] net: hibmcge: Implement some .ndo functions
-    https://git.kernel.org/netdev/net-next/c/ff4edac6e9bd
-  - [V12,RESEND,net-next,06/10] net: hibmcge: Implement .ndo_start_xmit function
-    https://git.kernel.org/netdev/net-next/c/40735e7543f9
-  - [V12,RESEND,net-next,07/10] net: hibmcge: Implement rx_poll function to receive packets
-    https://git.kernel.org/netdev/net-next/c/f72e25594061
-  - [V12,RESEND,net-next,08/10] net: hibmcge: Implement some ethtool_ops functions
-    https://git.kernel.org/netdev/net-next/c/e8d13548bd08
-  - [V12,RESEND,net-next,09/10] net: hibmcge: Add a Makefile and update Kconfig for hibmcge
-    https://git.kernel.org/netdev/net-next/c/81e176de6ad4
-  - [V12,RESEND,net-next,10/10] net: hibmcge: Add maintainer for hibmcge
-    https://git.kernel.org/netdev/net-next/c/f9a002a13054
+This patchset contains Netfilter fixes for net:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1) syzkaller managed to triger UaF due to missing reference on netns in
+   bpf infrastructure, from Florian Westphal.
 
+2) Fix incorrect conversion from NFPROTO_UNSPEC to NFPROTO_{IPV4,IPV6}
+   in the following xtables targets: MARK and NFLOG. Moreover, add
+   missing
 
+I have my half share in this mistake, I did not take the necessary time
+to review this: For several years I have been struggling to keep working
+on Netfilter, juggling a myriad of side consulting projects to stop
+burning my own savings.
+
+I have extended the iptables-tests.py test infrastructure to improve the
+coverage of ip6tables and detect similar problems in the future.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-10-21
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit cb560795c8c2ceca1d36a95f0d1b2eafc4074e37:
+
+  Merge branch 'mlx5-misc-fixes-2024-10-15' (2024-10-17 12:14:11 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-10-21
+
+for you to fetch changes up to 306ed1728e8438caed30332e1ab46b28c25fe3d8:
+
+  netfilter: xtables: fix typo causing some targets not to load on IPv6 (2024-10-21 11:31:26 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-10-21
+
+----------------------------------------------------------------
+Florian Westphal (1):
+      netfilter: bpf: must hold reference on net namespace
+
+Pablo Neira Ayuso (1):
+      netfilter: xtables: fix typo causing some targets not to load on IPv6
+
+ net/netfilter/nf_bpf_link.c | 4 ++++
+ net/netfilter/xt_NFLOG.c    | 2 +-
+ net/netfilter/xt_TRACE.c    | 1 +
+ net/netfilter/xt_mark.c     | 2 +-
+ 4 files changed, 7 insertions(+), 2 deletions(-)
 
