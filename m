@@ -1,120 +1,96 @@
-Return-Path: <netdev+bounces-137393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B02B49A5FD8
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:20:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA399A5FD5
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A2832820A6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:20:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 031311F218FD
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA401E25EC;
-	Mon, 21 Oct 2024 09:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6D31E1027;
+	Mon, 21 Oct 2024 09:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="A5c9JpQg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TUlgG2kK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C753194A54
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 09:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C395198E6F;
+	Mon, 21 Oct 2024 09:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729502447; cv=none; b=lFttZvjwqsYrDGJoZCX3YuBz3LAeV4aqavmzt2qrNugrnMjpcc9DvwKTBZ2FzttviSdLr9QP3kFxXyMNJhUngDxh1h2/gPzCJHcIRsImRbblm+sLzeuS1MiBIbcwHI3EOe9GMDc9PAxXA0H5iikfqH9mTDFgXz2v4LbKfGYN/b4=
+	t=1729502423; cv=none; b=GZtPhRn/68ihMdm0hqLxRNbVDLUFkTmm1J/wlUABdyxF7yzIwvt1NIDpIfZyzEgYiC3xALABdPw/r5bVv1JceT7E3//d1ghwMR5MiZ+Tv2z86+xKvotFpaSekENfqDvQ+5mcdgUHOkgVLaaR9v3L5V/OGJ7ACZtJp/cX4+YS5tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729502447; c=relaxed/simple;
-	bh=hyHsuLMfw92Hr+xUde2x2tu2e6PgGrP9m3SxsiMwqq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HYkuKI+XChBY6McJxDttI91XJ8xv/zKgcN9tsqgrSNWOc8sehS0zaVXOD8MS9GzwEBNdt8csPGaBecTk0CcdvgHct4+QChTKpHmHDdn3fJmGtnA/OqTifkmBbZ/dDh1UoqL/4LuCwo9cBOy0KM/teqtDL4noKDyMwQac1/pJf6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=A5c9JpQg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qqjoCgvG5CCB6J/vMfx+zCiOUsVg3KVV8Hr8F4GQT38=; b=A5c9JpQgO4zzYKGKMeXHuxCord
-	k3nZiSRM1eEz9U74AgcejarJlEJaa+W03r9U+vtw217OPrydOc9zTTWE1IOuJQPnj1rFO33hCJgj+
-	8isEA7lVWI++f8/UQX7GA9xH4xjx/91HpFkd3jx3mlPeA7P/hb6gTdLQudyutGUOmkbEAzcXU/QOm
-	niAcdnIXbFZz3uSo/1c6QQKS7uXc5CF9P5n85VBxzm87f5LiJ/CuD1xRRylwiqxmlAvusiOcMVyr3
-	c7bKY8BbgopPIuazalh/ZURXHHQKodZfDgCO21p1DlXWpz07YTu3BjpVSW+SL3Yu5tNXjhzSTxHXw
-	3UhN2kWQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54450)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t2oaU-000352-2T;
-	Mon, 21 Oct 2024 10:20:31 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t2oaP-0001cT-0A;
-	Mon, 21 Oct 2024 10:20:25 +0100
-Date: Mon, 21 Oct 2024 10:20:24 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
-	kernel@quicinc.com
-Subject: Re: [PATCH net v1] net: stmmac: Disable PCS Link and AN interrupt
- when PCS AN is disabled
-Message-ID: <ZxYc2I9vgVL8i4Dz@shell.armlinux.org.uk>
-References: <20241018222407.1139697-1-quic_abchauha@quicinc.com>
- <60119fa1-e7b1-4074-94ee-7e6100390444@lunn.ch>
+	s=arc-20240116; t=1729502423; c=relaxed/simple;
+	bh=seaquORoS5AkXRzcY9g8QWa1F9h31Z6RPMQ3WgHrMiA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ns+v9zPt07XhV3oI7ry0faEYjUGrn+u3u851Iz0bbZ7Zcpl+lnE/NGFecad/t+0cn+d4SR//U3Lf8+tz0jvDMzFzEc9M3SoOfyhU1mvxF2JuoOpcBlh0o6cCaSLonkaDvtuw7jEe0xonn3QJtmK1w/oz8Hdthx0+DKmbJcVHkMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TUlgG2kK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE5EC4CEC3;
+	Mon, 21 Oct 2024 09:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729502423;
+	bh=seaquORoS5AkXRzcY9g8QWa1F9h31Z6RPMQ3WgHrMiA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TUlgG2kKSv+XmpQ9nNGpsgj4Jc0kb0Yzoal/B9zJ4v0eX4+sTghSx/Ty8XtgQkAEB
+	 BTaoI+RL4NqZI7m8SPhLWThU+Oo0M0T2gC+ldh9w8/31nDbGIndLSiSfDUGBALS5kY
+	 TrMJ5lSQRs9bbG+ygFMiL1xqq6Ww5XKR2NDhm8ly+6Me+L659GJ5Y9V/VdiudNyw7A
+	 dhL8iSK/sfM8khnAQPkcznLsQggC0uNrxCRBPUBMCzuI4uEQ/zQN4D6zbO0mxblpD6
+	 2U+sYKjmuoPrQIZcGemYK9RStY5J45ndvx75j9sTuRpcrWOugo7g+HsZFieThRUk93
+	 DnXlnFteOxAIg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DFF3809A8A;
+	Mon, 21 Oct 2024 09:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <60119fa1-e7b1-4074-94ee-7e6100390444@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] fsl/fman: Fix refcount handling of fman-related
+ devices
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172950242900.181020.3714375774039373979.git-patchwork-notify@kernel.org>
+Date: Mon, 21 Oct 2024 09:20:29 +0000
+References: <20241015060122.25709-1-amishin@t-argos.ru>
+In-Reply-To: <20241015060122.25709-1-amishin@t-argos.ru>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: igal.liberman@freescale.com, horms@kernel.org, madalin.bucur@nxp.com,
+ sean.anderson@seco.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 
-On Sat, Oct 19, 2024 at 04:45:16AM +0200, Andrew Lunn wrote:
-> On Fri, Oct 18, 2024 at 03:24:07PM -0700, Abhishek Chauhan wrote:
-> > Currently we disable PCS ANE when the link speed is 2.5Gbps.
-> > mac_link_up callback internally calls the fix_mac_speed which internally
-> > calls stmmac_pcs_ctrl_ane to disable the ANE for 2.5Gbps.
-> > 
-> > We observed that the CPU utilization is pretty high. That is because
-> > we saw that the PCS interrupt status line for Link and AN always remain
-> > asserted. Since we are disabling the PCS ANE for 2.5Gbps it makes sense
-> > to also disable the PCS link status and AN complete in the interrupt
-> > enable register.
-> > 
-> > Interrupt storm Issue:-
-> > [   25.465754][    C2] stmmac_pcs: Link Down
-> > [   25.469888][    C2] stmmac_pcs: Link Down
-> > [   25.474030][    C2] stmmac_pcs: Link Down
-> > [   25.478164][    C2] stmmac_pcs: Link Down
-> > [   25.482305][    C2] stmmac_pcs: Link Down
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 15 Oct 2024 09:01:20 +0300 you wrote:
+> The series is intended to fix refcount handling for fman-related "struct
+> device" objects - the devices are not released upon driver removal or in
+> the error paths during probe. This leads to device reference leaks.
 > 
-> I don't know this code, so i cannot really comment if not enabling the
-> interrupt is the correct fix or not. But generally an interrupt storm
-> like this is cause because you are not acknowledging the interrupt
-> correctly to clear its status. So rather than not enabling it, maybe
-> you should check what is the correct way to clear the interrupt once
-> it happens?
+> The device pointers are now saved to struct mac_device and properly handled
+> in the driver's probe and removal functions.
+> 
+> [...]
 
-stmmac PCS support is total crap and shouldn't be used, or stmmac
-should not be using phylink. It's one or the other. Blame Serge for
-this mess.
+Here is the summary with links:
+  - [net,1/2] fsl/fman: Save device references taken in mac_probe()
+    https://git.kernel.org/netdev/net/c/efeddd552ec6
+  - [net,2/2] fsl/fman: Fix refcount handling of fman-related devices
+    https://git.kernel.org/netdev/net/c/1dec67e0d9fb
 
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
