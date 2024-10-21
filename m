@@ -1,284 +1,176 @@
-Return-Path: <netdev+bounces-137535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 594A39A6DA2
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C149A6DB5
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:11:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D14031F21BE1
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:06:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4D8B1F22577
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD11E4779F;
-	Mon, 21 Oct 2024 15:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44DD1F6681;
+	Mon, 21 Oct 2024 15:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nACCaDFD"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="bxVeQI8k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA96433BB;
-	Mon, 21 Oct 2024 15:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C831E7677
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729523185; cv=none; b=IsdyvOf/TVAFdsKzeCcQ5kAyvoWJuQJ0ZTFZpAuIzfQB63WB5InAmZqFC+r98I5sbSS3RYZpQ5fa8kbTYvh9OPIZki4nFqCqj7M3qluFixs4W60kQFt8FyH//Zq8Xjhjk2HrMTiOVrdEJrHGlGCjZVgSrZ5ev74Panz/6VIKvNs=
+	t=1729523460; cv=none; b=rahnxocwddfh3dMcqg2n6YpDqeVCNzL0K53px72O8F1NEzmN7XL/sHX5askGDRxe0aBBp3ErcREhmKlRzS5KZtV76DUUMAiFs7/VWQNYXyc47kwcPuwlceDqPOsk6SiA6dSVmusut5ldKDirPgLocKYI+C7nhvdWDSKnD3ZwYe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729523185; c=relaxed/simple;
-	bh=V13/+obv5LvCt5d9iEA9QL8fn6rmDWQcKKjiWDuQrzw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KX6BMMSnTHOeXOl4ha7XnVEuk+pGI9HNxSQFlwfipIU0XcsvMK+vLI7i/kTJDxlNofvXaeMR9Pdw2E+RoLZ0hfkoD9CQNdMTdQTQhrIN0WZ1/IrenWWkuYd9GCJ5dIHPHLLXRvLab5/+mvrqh9UtoMLoO/lq92hJpbuoDVf/c1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nACCaDFD; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-83abe4524ccso120466739f.1;
-        Mon, 21 Oct 2024 08:06:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729523183; x=1730127983; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R0vwS8TpTa7jxGqaCR9ZH5Z5mqMAXfgVdBA8IJC8KeM=;
-        b=nACCaDFDHJPT13tqOlyZJcFon0f3TQX2Er+O7GIEewYsRTzjJz+u6u3iYMSbueRs11
-         Q4d8STuIYx5HQgoqUkFtNHIZs/QjPreG+zb0rknt48fTzqHBhGcuVzYQ2m1WwZb0fDiD
-         wtOx9Okt9HMZCXZO69Z14ooWz4N1oKryqnnwa8yPRkkx0tWUT76t/JQ0xs5o8wvMmjHY
-         wF2nVTYyet+lUyVc3/ojdIJqCDRS0MLsLcrxN7a58eAJb7PeOzxQogHWwMbq+lIWgBwR
-         gDUmz+D76MjcVU2UjH+DgdBiO2QJ0eEA1UMNYMKTV8islwOHuoY+gyAjsKjPi6g/LfYt
-         b++w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729523183; x=1730127983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R0vwS8TpTa7jxGqaCR9ZH5Z5mqMAXfgVdBA8IJC8KeM=;
-        b=SyX0JcSJWTdimoyE9BB0MprhXQ1Ugsie4Xg/cDSUboMSrLrCqkkgv8CEgtIlIfuJmd
-         tO9Zo4rIGcWR8KxLaqPFqOhRzRg+tuSGpEOzQIjtpej2/W9mJWsiP4PtianLf6Ds6Rnm
-         +YvhBAl9gzn1lRdZeQHsKUWuGkjeNs05cAW0xmG2x/cB+EMomj2ewD2epeCSKKIha2lm
-         ajd1A1B/vuvcgdeU5SjyxgoZp6WnQxPj1G6rVli9qlkzQ+E3q0kTCLAIgEqCniMkMDKi
-         wNvfZ3ez89QJ7SJMvIgkXsbPi0N3E/288f7JzwnLngbws+xvMr136aPcef9pd9aVtAL2
-         Y5+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUgIDR9Pz6AdS0Ysl3AmiW6/Mqmz6v3qTelY3KIAyC771JxGsgjtURUbEi4kr+qILQf0qE=@vger.kernel.org, AJvYcCUpSwf2DfglM2DQ1fZPTK5t+Voc9/jgoxyAgU7sTvjXDnMFRY+F+nFcRrPMfw7rhWpbcPvkV0iD@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIvebEc/pAZk/El/+wDwq3GcN54UUw3oX5tJks6SBsvPj/ZP/R
-	3AA3HQWNNe2Z/1pyzusU8bLETz/2X6qz545id871wpu5cLTpyUlL/WbuX3Igf4NQCyM2FmnjxhC
-	nBrLzquVhGy6HvdXBRU1pQzQ8yIo=
-X-Google-Smtp-Source: AGHT+IG0xzVL1nH4resXkL2n8I9TEFN6tXbVysu5Dp0bp21oCmQshX9KbwfvaBIs7+e39CUntO0f3wOzKpYIwJjf9B4=
-X-Received: by 2002:a05:6e02:144c:b0:39f:60d7:813b with SMTP id
- e9e14a558f8ab-3a3f40bab4cmr102183565ab.22.1729523182390; Mon, 21 Oct 2024
- 08:06:22 -0700 (PDT)
+	s=arc-20240116; t=1729523460; c=relaxed/simple;
+	bh=Yp3ahvRK9rZJXVNdeAKZeTjjTMS91yuFzxZtZugh9Ss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cxYZdhnYUjwnspHk+klLzJgs7SAyw+AFP7wANXxkT30dgNJOjSQkRdCal0ResBkf14/BBXJ3fnf5yfCc09LAApVyk2HW2qqu9UuUVMw08WY3v/r8TuB63nzpDvYe5yquOEiCVKhunZaIS88BMCYi3kVhcay50YR1SsAoTB2AxAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=bxVeQI8k; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49L9v1Cw027533;
+	Mon, 21 Oct 2024 15:10:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	RnGid0+oHf+nzyErAkR4GoXKCWblfnUFKaeagu594Y4=; b=bxVeQI8kPeBu62eX
+	YqHDvrTfLINI1sRnSR0uEcV2q92vgQxtcbdY2WZUKbgCTziif7guGTXAw3Cs7bgw
+	aVDcpqsHqy5fb73X2clY+9rri32DB6aHwGmiv6swMAoHsrmIKahq0Xj5zaqWa3Xk
+	A2SoQijJZXTSvSF9EcBasjpRhkP1Ew/WjrUYrRepbMfGlLD0jTMfggUFQ1c0J/gF
+	fQq97FKB9/4V008VZsZl1erp1b2waXg0qsAN9b56B/ZVf8Ck6vAvXHGtgz8UC2Lr
+	/+hPv4AjPEXcoeVM/+cqudg1GnVgBRSp7j9md6TQv5LLTzLB9u+O2miYNlZPFo8Z
+	BSWTBw==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42c6vxw7k2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 15:10:04 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49LFA3Qr005165
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 21 Oct 2024 15:10:03 GMT
+Received: from [10.110.122.237] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 21 Oct
+ 2024 08:09:59 -0700
+Message-ID: <89f188d2-2d4e-43bf-98f3-aae7e9d68cab@quicinc.com>
+Date: Mon, 21 Oct 2024 08:09:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-5-kerneljasonxing@gmail.com> <67157b7ec615_14e1829490@willemb.c.googlers.com.notmuch>
- <CAL+tcoD5TiaRZgW10tt8jc9srQTbaszs_o2z=Yf-bzO0Kp-vLA@mail.gmail.com> <67166a0997028_42f03294e7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67166a0997028_42f03294e7@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 21 Oct 2024 23:05:46 +0800
-Message-ID: <CAL+tcoCfokXGfKN0fT8LMHY=+-bzJD=3nY2guPV=fjxGbiALEw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
- control the whole bpf extension
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] net: stmmac: Disable PCS Link and AN interrupt
+ when PCS AN is disabled
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn
+	<andrew@lunn.ch>, Serge Semin <fancer.lancer@gmail.com>
+CC: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jon Hunter <jonathanh@nvidia.com>, <kernel@quicinc.com>
+References: <20241018222407.1139697-1-quic_abchauha@quicinc.com>
+ <60119fa1-e7b1-4074-94ee-7e6100390444@lunn.ch>
+ <ZxYc2I9vgVL8i4Dz@shell.armlinux.org.uk>
+ <ZxYfmtPYd0yL51C5@shell.armlinux.org.uk>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <ZxYfmtPYd0yL51C5@shell.armlinux.org.uk>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Vmv6XxUVYZXB7EqspC_EZu4cGnW4ZVwO
+X-Proofpoint-GUID: Vmv6XxUVYZXB7EqspC_EZu4cGnW4ZVwO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ clxscore=1011 malwarescore=0 mlxlogscore=491 bulkscore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410210108
 
-On Mon, Oct 21, 2024 at 10:49=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Mon, Oct 21, 2024 at 5:52=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Willem suggested that we use a static key to control. The advantage
-> > > > is that we will not affect the existing applications at all if we
-> > > > don't load BPF program.
-> > > >
-> > > > In this patch, except the static key, I also add one logic that is
-> > > > used to test if the socket has enabled its tsflags in order to
-> > > > support bpf logic to allow both cases to happen at the same time.
-> > > > Or else, the skb carring related timestamp flag doesn't know which
-> > > > way of printing is desirable.
-> > > >
-> > > > One thing important is this patch allows print from both applicatio=
-ns
-> > > > and bpf program at the same time. Now we have three kinds of print:
-> > > > 1) only BPF program prints
-> > > > 2) only application program prints
-> > > > 3) both can print without side effect
-> > > >
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Getting back to this thread. It is long, instead of responding to
-> > > multiple messages, let me combine them in a single response.
-> >
-> > Thank you so much!
-> >
-> > >
-> > >
-> > > * On future extensions:
-> > >
-> > > +1 that the UDP case, and datagrams more broadly, must have a clear
-> > > development path, before we can merge TCP.
-> > >
-> > > Similarly, hardware timestamps need not be supported from the start,
-> > > but must clearly be supportable.
-> >
-> > Agreed. Using the standalone sk_tsflags_bpf and tskey_bpf and removing
-> > the TCP bpf test logic(say, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)
-> > could work well for both protos. Let me give it a try first.
->
-> Great, thanks.
->
-> > >
-> > >
-> > > * On queueing packets to userspace:
-> > >
-> > > > > the current behavior is to just queue to the sk_error_queue as lo=
-ng
-> > > > > as there is "SOF_TIMESTAMPING_TX_*" set in the skb's tx_flags and=
- it
-> > > > > is regardless of the sk_tsflags. "
-> > >
-> > > > Totally correct. SOF_TIMESTAMPING_SOFTWARE is a report flag while
-> > > > SOF_TIMESTAMPING_TX_* are generation flags. Without former, users c=
-an
-> > > > read the skb from the errqueue but are not able to parse the
-> > > > timestamps
-> >
-> > Above is what I tried to explain how the application timestamping
-> > feature works, not what I tried to implement for the BPF extension.
-> >
-> > >
-> > > Before queuing a packet to userspace on the error queue, the relevant
-> > > reporting flag is always tested. sock_recv_timestamp has:
-> > >
-> > >         /*
-> > >          * generate control messages if
-> > >          * - receive time stamping in software requested
-> > >          * - software time stamp available and wanted
-> > >          * - hardware time stamps available and wanted
-> > >          */
-> > >         if (sock_flag(sk, SOCK_RCVTSTAMP) ||
-> > >             (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE) ||
-> > >             (kt && tsflags & SOF_TIMESTAMPING_SOFTWARE) ||
-> > >             (hwtstamps->hwtstamp &&
-> > >              (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)))
-> > >                 __sock_recv_timestamp(msg, sk, skb);
-> > >
-> > > Otherwise applications could get error messages queued, and
-> > > epoll/poll/select would unexpectedly behave differently.
-> >
-> > Right. And I have no intention to use the SOF_TIMESTAMPING_SOFTWARE
-> > flag for BPF.
->
-> Can you elaborate on this? This sounds like it would go against the
-> intent to have the two versions of the API (application and BPF) be
-> equivalent.
 
-Oh, I see what you mean here. I have no preference. Well, I can add
-this report flag into the BPF extension like how application
-timestamping works.
 
->
-> > >
-> > > > SOF_TIMESTAMPING_SOFTWARE is only used in traditional SO_TIMESTAMPI=
-NG
-> > > > features including cmsg mode. But it will not be used in bpf mode.
-> > >
-> > > For simplicity, the two uses of the API are best kept identical. If
-> > > there is a technical reason why BPF has to diverge from established
-> > > behavior, this needs to be explicitly called out in the commit
-> > > message.
-> > >
-> > > Also, if you want to extend the API for BPF in the future, good to
-> > > call this out now and ideally extensions will apply to both, to
-> > > maintain a uniform API.
-> >
-> > As you said, I also agree on "two uses of the API are best kept identic=
-al".
-> >
-> > >
-> > >
-> > > * On extra measurement points, at sendmsg or tcp_write_xmit:
-> > >
-> > > The first is interesting. For application timestamping, this was
-> > > never needed, as the application can just call clock_gettime before
-> > > sendmsg.
-> >
-> > Yes, we could add it after we finish the current series. I'm going to
-> > write it down on my todo list.
-> >
-> > >
-> > > In general, additional measurement points are not only useful if the
-> > > interval between is not constant. So far, we have seen no need for
-> > > any additional points.
-> >
-> > Taking a snapshot of tcp_write_xmit() could be useful especially when
-> > the skb is not transmitted due to nagle algorithm.
-> >
-> > >
-> > >
-> > > * On skb state:
-> > >
-> > > > > For now, is there thing we can explore to share in the skb_shared=
-_info?
-> > >
-> > > skb_shinfo space is at a premium. I don't think we can justify two
-> > > extra fields just for this use case.
-> > >
-> > > > My initial thought is just to reuse these fields in skb. It can wor=
-k
-> > > > without interfering one another.
-> > >
-> > > I'm skeptical that two methods can work at the same time. If they are
-> > > started at different times, their sk_tskey will be different, for one=
-.
-> >
-> > Right, sk_tskey is the only special one that I will take care of.
-> > Others like tx_flags or txstamp_ack from struct tcp_skb_cb can be
-> > reused.
-> >
-> > >
-> > > There may be workarounds. Maybe BPF can store its state in some BPF
-> > > specific field, indeed. Or perhaps it can store per-sk shadow state
-> > > that resolves the conflict. For instance, the offset between sk_tskey
-> > > and bpf_tskey.
-> >
-> > Things could get complicated in the future if we want to unified the
-> > final tskey value for all the cases. Since 1) the value of
-> > shinfo->tskey depends on skb seq and len, 2) the final tskey output is
-> > the diff between sk_tskey and shinfo->tskey, can I add a bpf_tskey in
-> > struct sock and related output logic for bpf without caring if it's
-> > the same as sk_tskey.
->
-> I think we can add fields to struct sock without too much concern.
-> Adding fields to sk_buff or skb_shared_info would be more difficult.
+On 10/21/2024 2:32 AM, Russell King (Oracle) wrote:
+> On Mon, Oct 21, 2024 at 10:20:24AM +0100, Russell King (Oracle) wrote:
+>> On Sat, Oct 19, 2024 at 04:45:16AM +0200, Andrew Lunn wrote:
+>>> On Fri, Oct 18, 2024 at 03:24:07PM -0700, Abhishek Chauhan wrote:
+>>>> Currently we disable PCS ANE when the link speed is 2.5Gbps.
+>>>> mac_link_up callback internally calls the fix_mac_speed which internally
+>>>> calls stmmac_pcs_ctrl_ane to disable the ANE for 2.5Gbps.
+>>>>
+>>>> We observed that the CPU utilization is pretty high. That is because
+>>>> we saw that the PCS interrupt status line for Link and AN always remain
+>>>> asserted. Since we are disabling the PCS ANE for 2.5Gbps it makes sense
+>>>> to also disable the PCS link status and AN complete in the interrupt
+>>>> enable register.
+>>>>
+>>>> Interrupt storm Issue:-
+>>>> [   25.465754][    C2] stmmac_pcs: Link Down
+>>>> [   25.469888][    C2] stmmac_pcs: Link Down
+>>>> [   25.474030][    C2] stmmac_pcs: Link Down
+>>>> [   25.478164][    C2] stmmac_pcs: Link Down
+>>>> [   25.482305][    C2] stmmac_pcs: Link Down
+>>>
+>>> I don't know this code, so i cannot really comment if not enabling the
+>>> interrupt is the correct fix or not. But generally an interrupt storm
+>>> like this is cause because you are not acknowledging the interrupt
+>>> correctly to clear its status. So rather than not enabling it, maybe
+>>> you should check what is the correct way to clear the interrupt once
+>>> it happens?
+>>
+>> stmmac PCS support is total crap and shouldn't be used, or stmmac
+>> should not be using phylink. It's one or the other. Blame Serge for
+>> this mess.
+> 
+> Seriously, we could've had this fixed had the patch set I was working
+> on that fixed stmmac's _bad_ _conversion_ to phylink progressed to the
+> point of being merged.
+> 
+> The whole stmmac PCS support is broken, bypassing phylink.
+> 
+> This series also contained bug fixes for stuff like this interrupt
+> storm after Serge tested it. However, Serge wanted to turn my series
+> into his maze of indirect function pointers approach that I disagreed
+> with, and he wouldn't change his mind on that, so I deleted the series.
+> 
+> As I keep saying - either stmmac uses phylink *properly* and gets its
+> PCS hacks sorted out, or it does not use phylink *at* *all*. It's one
+> or the other.
+> 
+> I am not going to patch stmmac for any future phylink changes, and if
+> it breaks, then I'll just say "oh that's a shame, not my problem."
+> Blame Serge for that. I've had it with the pile of crap that is
+> stmmac.
+> 
+Thanks Andrew and Russell for you review comments. 
 
-Got it:)
+Adding Serge here. 
 
->
-> > That said, the outputs from two methods differ. Do you think it is
-> > acceptable? It could be simpler and easier if we keep them identical.
->
-> Since we can only have one skb_shared_info.tskey, if both user and bpf
-> request OPT_ID, starting at different times, then we will have two
-> bases against which to compute the difference. Having two fields in
-> struct sock should suffice.
+Lets take a step back and see how i can help here to make sure 
+we can get things merged and the discussion proceeds. 
 
-Exactly! I will do it.
+Serge please help if can here. Thanks! 
 
-Thanks,
-Jason
+
+
+
 
