@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-137670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750229A9420
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:26:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 092D79A9421
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20EA5B20E7B
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 23:26:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9824BB21361
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 23:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A321FE110;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12661FF041;
 	Mon, 21 Oct 2024 23:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Udel3NJH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fR47LIds"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10B1170A3D
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 23:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B3E1FDFA7
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 23:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729553193; cv=none; b=GAKMz4+zeKe0kYMPWopomskUBWXG2fBOLn1cFF0WegOYgQlAdAS/YtrEbUl5gNLhEpQ6WxoC/MWte4DbSNjGlkUKwb+lJPd0yxL5oCpUzF4scC1pT6PFbU+7ad19WzBzf7KlD5gv+37dwbopv0h91hBYWP40Tuqu/zYHJQl8D2g=
+	t=1729553193; cv=none; b=ikadgV1Ua9bw+x8LHrH3eG1yU1RqjTJTGmYqkkuZW6Ac1eFinPPuStQg68hXuwTByl++/nvOkbziGJyKHsZfdW16BqNqaumPHxDn9btCw+ma0PxmEfpIiYj+fmeX8dY25FC7nFoxTg6sEyd+JsbNrs888ydxE48sZN/Eeo5Flz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729553193; c=relaxed/simple;
-	bh=bc30A0giA7Y+mXMMSipCppervGsDyYdn84KYmI7tK/c=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RrJvPJsFvMqMm5UyW0HExVG7FUquyNZAAvn6jcvOA6PXvocFWKQYgAMuvnk8hJ77FjREI8tbITyVXdsnbrLp6Y3iQ7+gqI+TRk4FTfgONHHWZh2Xv7xv4ee/IPTlZ+t53MqDBvDqCzT8kW+zis9CMr5ZqdhQ9EVLZ3WuQZmbz0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Udel3NJH; arc=none smtp.client-ip=192.198.163.13
+	bh=T6Xdhp+QGxzi75hIfIiSpf5fDPg8pdEiGB00dxKLu0Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=lE8I9LpQvgJmyMvC2ibw0eD70071qu9McNzUL7WZTb4NuVNcZ6UIcGKWcATQUb9VCzrLlR7HKQ8E20jmWW+8WrAk1z2OKSp6YSrxaemXaCycqz91VASkvsWEbpwfROjqRoLxRupTQom4vF/bX1WvVxNyFYSkb/N2z4Qshn4MFyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fR47LIds; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729553190; x=1761089190;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=bc30A0giA7Y+mXMMSipCppervGsDyYdn84KYmI7tK/c=;
-  b=Udel3NJHo6JN6g1MQ5TkupHsEFIlu1+61v1gUFoc1l8YuA83OAuGbAk4
-   a60ZXxxAtrpE59WhD61oElQOeYBcF0tCcnHsMSzoBwhSuIgLv1KnWrNRl
-   WiEkZ9kQGlFN17iRs/5vCEZ6FdWRnEQ/keubBHVB9gnAgPcF//XI18yaF
-   ZUPAe+yMyHU4KM+O1QGUPQ/ngHOkp+K3g+y94lsWyPBeEyyqNJU7vSPSK
-   RLTIzdnI2Ra7t/pzkLap1bKpKY65fl61gUPLJ43GhWxPUDvKF3SoqOs1I
-   T/p7vefLgzCJaSirGmwZmM1xMzoltCHgVPa0k57YGIhwwEzJfWzk490P+
-   Q==;
-X-CSE-ConnectionGUID: 2b1XzKUkT0mELtiDsJzsNw==
-X-CSE-MsgGUID: EuE+Q8aoTASCUX0jJnj/OA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="31927032"
+  t=1729553192; x=1761089192;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=T6Xdhp+QGxzi75hIfIiSpf5fDPg8pdEiGB00dxKLu0Q=;
+  b=fR47LIdsZaVf8/Jq84Dnpb9EvqcNwo2SaIwZI7KY3tf+53IC1T7abKbj
+   DE8M3OUEBpjx6n9ejxmYfXvVgYf18QD+UiC2dFDYDnj86A3M7LaCxI1k2
+   WSQ5Gmj0fbj7nvzpt62THR3aGQWuaLSnHZrMr2f/LH9xFLhqGucfQk1ht
+   sZmk6ye5w7p3dnbzfjVWkRPtsu68VAaH3p0m5d7zyI2Gj8qFiWU8ljnJY
+   D6k0EGZCQ6UWglIMoLyNmmICX1OOxOiKgEip4TNx+vYLGPGCiVBQyA9C2
+   DnyA/bj8C5iK3+UzTk19uNXHaoP1FRJdwRB/f/l0xWA6vKEQfR44Mmxd+
+   A==;
+X-CSE-ConnectionGUID: wyGbaRAiTyizm/BK2dK4+A==
+X-CSE-MsgGUID: w5JYx9oqR4G+Wi9LczfVBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="31927041"
 X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="31927032"
+   d="scan'208";a="31927041"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 16:26:30 -0700
-X-CSE-ConnectionGUID: 8qRwh1wQSgO2LyGKfe+v6A==
-X-CSE-MsgGUID: SBEHcaI2QJ+ZZUcwoOLO7A==
+X-CSE-ConnectionGUID: U8jrkRCvRsSRsFd3DYn2ZA==
+X-CSE-MsgGUID: uJ8yYuQ/TD2Xi3OJ1vPceA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="79761738"
+   d="scan'208";a="79761741"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 16:26:29 -0700
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 16:26:30 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net 0/3] Intel Wired LAN Driver Fixes 2024-10-21 (igb, ice)
-Date: Mon, 21 Oct 2024 16:26:23 -0700
-Message-Id: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-0-a50cb3059f55@intel.com>
+Date: Mon, 21 Oct 2024 16:26:24 -0700
+Subject: [PATCH net 1/3] igb: Disable threaded IRQ for igb_msix_other
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,9 +69,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAB/jFmcC/y3M0QqDMAyF4VeRXC/QhA6dryK7cGuqAanSDhXEd
- 182vPw4h/+AIlmlQFsdkGXVonMy0K2C99inQVCDGdixJ8eEuk34A5LDi0k+GHWXguybl+/rGPj
- +AEssWf6DFTqwGzzP8wshgNGHcwAAAA==
+Message-Id: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-1-a50cb3059f55@intel.com>
+References: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-0-a50cb3059f55@intel.com>
+In-Reply-To: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-0-a50cb3059f55@intel.com>
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -86,46 +86,77 @@ To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
  netdev <netdev@vger.kernel.org>
 Cc: Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, 
  Wander Lairson Costa <wander@redhat.com>, Yuying Ma <yuma@redhat.com>, 
- Rafal Romanowski <rafal.romanowski@intel.com>, 
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
- Karol Kolacinski <karol.kolacinski@intel.com>, 
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+ Rafal Romanowski <rafal.romanowski@intel.com>
 X-Mailer: b4 0.14.1
 
-This series includes fixes for the ice and igb drivers.
+From: Wander Lairson Costa <wander@redhat.com>
 
-Wander fixes an issue in igb when operating on PREEMPT_RT kernels due to
-the PREEMPT_RT kernel switching IRQs to be threaded by default.
+During testing of SR-IOV, Red Hat QE encountered an issue where the
+ip link up command intermittently fails for the igbvf interfaces when
+using the PREEMPT_RT variant. Investigation revealed that
+e1000_write_posted_mbx returns an error due to the lack of an ACK
+from e1000_poll_for_ack.
 
-Michal fixes the ice driver to block subfunction port creation when the PF
-is operating in legacy (non-switchdev) mode.
+The underlying issue arises from the fact that IRQs are threaded by
+default under PREEMPT_RT. While the exact hardware details are not
+available, it appears that the IRQ handled by igb_msix_other must
+be processed before e1000_poll_for_ack times out. However,
+e1000_write_posted_mbx is called with preemption disabled, leading
+to a scenario where the IRQ is serviced only after the failure of
+e1000_write_posted_mbx.
 
-Arkadiusz fixes a crash when loading the ice driver on an E810 LOM which
-has DPLL enabled.
+To resolve this, we set IRQF_NO_THREAD for the affected interrupt,
+ensuring that the kernel handles it immediately, thereby preventing
+the aforementioned error.
 
+Reproducer:
+
+    #!/bin/bash
+
+    # echo 2 > /sys/class/net/ens14f0/device/sriov_numvfs
+    ipaddr_vlan=3
+    nic_test=ens14f0
+    vf=${nic_test}v0
+
+    while true; do
+	    ip link set ${nic_test} mtu 1500
+	    ip link set ${vf} mtu 1500
+	    ip link set $vf up
+	    ip link set ${nic_test} vf 0 vlan ${ipaddr_vlan}
+	    ip addr add 172.30.${ipaddr_vlan}.1/24 dev ${vf}
+	    ip addr add 2021:db8:${ipaddr_vlan}::1/64 dev ${vf}
+	    if ! ip link show $vf | grep 'state UP'; then
+		    echo 'Error found'
+		    break
+	    fi
+	    ip link set $vf down
+    done
+
+Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+Fixes: 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet driver")
+Reported-by: Yuying Ma <yuma@redhat.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
-Arkadiusz Kubalewski (1):
-      ice: fix crash on probe for DPLL enabled E810 LOM
+ drivers/net/ethernet/intel/igb/igb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Michal Swiatkowski (1):
-      ice: block SF port creation in legacy mode
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index f1d088168723..b83df5f94b1f 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -907,7 +907,7 @@ static int igb_request_msix(struct igb_adapter *adapter)
+ 	int i, err = 0, vector = 0, free_vector = 0;
+ 
+ 	err = request_irq(adapter->msix_entries[vector].vector,
+-			  igb_msix_other, 0, netdev->name, adapter);
++			  igb_msix_other, IRQF_NO_THREAD, netdev->name, adapter);
+ 	if (err)
+ 		goto err_out;
+ 
 
-Wander Lairson Costa (1):
-      igb: Disable threaded IRQ for igb_msix_other
-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h        |  1 +
- .../net/ethernet/intel/ice/devlink/devlink_port.c  |  6 ++
- drivers/net/ethernet/intel/ice/ice_dpll.c          | 70 ++++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c        | 21 ++++++-
- drivers/net/ethernet/intel/igb/igb_main.c          |  2 +-
- 5 files changed, 97 insertions(+), 3 deletions(-)
----
-base-commit: d95d9a31aceb2021084bc9b94647bc5b175e05e7
-change-id: 20241021-iwl-2024-10-21-iwl-net-fixes-248b4a7fd259
-
-Best regards,
 -- 
-Jacob Keller <jacob.e.keller@intel.com>
+2.47.0.265.g4ca455297942
 
 
