@@ -1,142 +1,329 @@
-Return-Path: <netdev+bounces-137397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC839A601C
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 320BA9A601E
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FDEEB28F95
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:33:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B293B28F7A
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF001E283D;
-	Mon, 21 Oct 2024 09:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TkGTYQCA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059B51E3771;
+	Mon, 21 Oct 2024 09:32:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AF11E376B
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 09:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B511E376B;
+	Mon, 21 Oct 2024 09:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729503145; cv=none; b=UGRjREc26kx+SZP0gjwU/KmI8cTztcixUcbseBYS6xYrvu6M3OYzuqnR2j0N8dmoER1JaF2vAlr7UxsvrQcmiANCcgsKpLowBVO6iGszsydnIPqanTi3AGbg7NyD8TgWt5Bi96rUmeLDFb7FiT3zbtuWJgOvgihwGqFzBSwNxEw=
+	t=1729503166; cv=none; b=MJ8tSAJFf88srdNoEuErvHzv1GhbgN01CcFRSlL9kJ4xaCwhFmyE6yOUhH0fVheTfPw/BKpcnD6kjUBmEy9qkG0WG00hpqrqIcaBI+TXJNb5BS7h4tGlbvZIiagNggDUswOObLy1GECdoSKnAegY4eKJqAVq/8NrAhPSlXKB7TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729503145; c=relaxed/simple;
-	bh=bHBnj7aalHoMpR9kA+VKgi+0Z5JXwcrHUySWI+hUFA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VgktBVIxxkQ9oWkh16BLBbhPE3iezvdnps55NiWbPUHkGFb/B34ow06eGhNtXQIsO7A7kM3teEHzD6MzCB/jEPqH+mpcOHRT9UoUi9MsMEdVwn0GxqOIYgTjnWuS0ABEMrWw8pT2gr/GZw1LxNSW0Ya9dPplJRyQ+PrGjghPuZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TkGTYQCA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=e2KtIWZwoHWCmTSFbig/OZ/NTIZfLZGMEI1bMNZEUZk=; b=TkGTYQCA+UZmqCOZR1JF4Qfbly
-	v3XOILld5vEHYr7KxT7Ep/yazSha/UjtnegV0rTVdQy6tO+eZCITIrGnImOoEYEUsJqbrdqpClAPQ
-	Qq9YkU4SgSiP8q5pfKPCCX8EtBXwG7v6ssXItO3dY00XmlMuNIyUGNv9BVUhU56hq0QN0hX2yHfqd
-	S1MdYIva2r0GxOyHcg3+CDlrxQvDJVBBjsfibdfJVfYWAPkYFFpGH5k1AIvGaWaFwm+0aNavwmgBN
-	J4BtQi3jxTKEtS/baRRI40zIQ89CoLZOS6Q0S4X32uxtAIhAhacGFcASpWxHVEW3UCq5Nh8337wYK
-	8LiyspaQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33768)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t2olp-00036U-1s;
-	Mon, 21 Oct 2024 10:32:14 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t2olm-0001ct-2b;
-	Mon, 21 Oct 2024 10:32:10 +0100
-Date: Mon, 21 Oct 2024 10:32:10 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
-	kernel@quicinc.com
-Subject: Re: [PATCH net v1] net: stmmac: Disable PCS Link and AN interrupt
- when PCS AN is disabled
-Message-ID: <ZxYfmtPYd0yL51C5@shell.armlinux.org.uk>
-References: <20241018222407.1139697-1-quic_abchauha@quicinc.com>
- <60119fa1-e7b1-4074-94ee-7e6100390444@lunn.ch>
- <ZxYc2I9vgVL8i4Dz@shell.armlinux.org.uk>
+	s=arc-20240116; t=1729503166; c=relaxed/simple;
+	bh=eIUXnt/ABmUvP35d3vsYEMPzCW8J7Xh+nToDlaB4hK4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UxTpUholZvo/pdFwROE7m9YX0+r7wR2B0E3oNxt+D86sMqiSafraynwuBeXhplpnKhjvZ+4xtL8ctd3d/ODvZIugun3jjeK1Xv2EPcCa/2Xzgvuct7ELuZ9rM9CDw7M3S4P/5Ez1mHiPiWVrSVRpBPbTNQgleXo+kUN1aeWCYeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XX96L50bSzyTNV;
+	Mon, 21 Oct 2024 17:31:06 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id F327F1800DB;
+	Mon, 21 Oct 2024 17:32:35 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 21 Oct 2024 17:32:35 +0800
+Message-ID: <6f9840b3-66c4-485e-b6bb-baeaa641e720@huawei.com>
+Date: Mon, 21 Oct 2024 17:32:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZxYc2I9vgVL8i4Dz@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v22 13/14] mm: page_frag: update documentation
+ for page_frag
+To: Bagas Sanjaya <bagasdotme@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-doc@vger.kernel.org>,
+	<linux-mm@kvack.org>
+References: <20241018105351.1960345-1-linyunsheng@huawei.com>
+ <20241018105351.1960345-14-linyunsheng@huawei.com>
+ <ZxTVRRecKRpna6Aj@archie.me>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <ZxTVRRecKRpna6Aj@archie.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Mon, Oct 21, 2024 at 10:20:24AM +0100, Russell King (Oracle) wrote:
-> On Sat, Oct 19, 2024 at 04:45:16AM +0200, Andrew Lunn wrote:
-> > On Fri, Oct 18, 2024 at 03:24:07PM -0700, Abhishek Chauhan wrote:
-> > > Currently we disable PCS ANE when the link speed is 2.5Gbps.
-> > > mac_link_up callback internally calls the fix_mac_speed which internally
-> > > calls stmmac_pcs_ctrl_ane to disable the ANE for 2.5Gbps.
-> > > 
-> > > We observed that the CPU utilization is pretty high. That is because
-> > > we saw that the PCS interrupt status line for Link and AN always remain
-> > > asserted. Since we are disabling the PCS ANE for 2.5Gbps it makes sense
-> > > to also disable the PCS link status and AN complete in the interrupt
-> > > enable register.
-> > > 
-> > > Interrupt storm Issue:-
-> > > [   25.465754][    C2] stmmac_pcs: Link Down
-> > > [   25.469888][    C2] stmmac_pcs: Link Down
-> > > [   25.474030][    C2] stmmac_pcs: Link Down
-> > > [   25.478164][    C2] stmmac_pcs: Link Down
-> > > [   25.482305][    C2] stmmac_pcs: Link Down
-> > 
-> > I don't know this code, so i cannot really comment if not enabling the
-> > interrupt is the correct fix or not. But generally an interrupt storm
-> > like this is cause because you are not acknowledging the interrupt
-> > correctly to clear its status. So rather than not enabling it, maybe
-> > you should check what is the correct way to clear the interrupt once
-> > it happens?
+On 2024/10/20 18:02, Bagas Sanjaya wrote:
+
+Thanks, will try my best to not miss any 'alloc' typo for doc patch
+next version:(
+
+> On Fri, Oct 18, 2024 at 06:53:50PM +0800, Yunsheng Lin wrote:
+>> diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
+>> index 503ca6cdb804..7fd9398aca4e 100644
+>> --- a/Documentation/mm/page_frags.rst
+>> +++ b/Documentation/mm/page_frags.rst
+>> @@ -1,3 +1,5 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>>  ==============
+>>  Page fragments
+>>  ==============
+>> @@ -40,4 +42,176 @@ page via a single call.  The advantage to doing this is that it allows for
+>>  cleaning up the multiple references that were added to a page in order to
+>>  avoid calling get_page per allocation.
+>>  
+>> -Alexander Duyck, Nov 29, 2016.
+>> +
+>> +Architecture overview
+>> +=====================
+>> +
+>> +.. code-block:: none
+>> +
+>> +                      +----------------------+
+>> +                      | page_frag API caller |
+>> +                      +----------------------+
+>> +                                  |
+>> +                                  |
+>> +                                  v
+>> +    +------------------------------------------------------------------+
+>> +    |                   request page fragment                          |
+>> +    +------------------------------------------------------------------+
+>> +             |                                 |                     |
+>> +             |                                 |                     |
+>> +             |                          Cache not enough             |
+>> +             |                                 |                     |
+>> +             |                         +-----------------+           |
+>> +             |                         | reuse old cache |--Usable-->|
+>> +             |                         +-----------------+           |
+>> +             |                                 |                     |
+>> +             |                             Not usable                |
+>> +             |                                 |                     |
+>> +             |                                 v                     |
+>> +        Cache empty                   +-----------------+            |
+>> +             |                        | drain old cache |            |
+>> +             |                        +-----------------+            |
+>> +             |                                 |                     |
+>> +             v_________________________________v                     |
+>> +                              |                                      |
+>> +                              |                                      |
+>> +             _________________v_______________                       |
+>> +            |                                 |              Cache is enough
+>> +            |                                 |                      |
+>> + PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE         |                      |
+>> +            |                                 |                      |
+>> +            |               PAGE_SIZE >= PAGE_FRAG_CACHE_MAX_SIZE    |
+>> +            v                                 |                      |
+>> +    +----------------------------------+      |                      |
+>> +    | refill cache with order > 0 page |      |                      |
+>> +    +----------------------------------+      |                      |
+>> +      |                    |                  |                      |
+>> +      |                    |                  |                      |
+>> +      |              Refill failed            |                      |
+>> +      |                    |                  |                      |
+>> +      |                    v                  v                      |
+>> +      |      +------------------------------------+                  |
+>> +      |      |   refill cache with order 0 page   |                  |
+>> +      |      +----------------------------------=-+                  |
+>> +      |                       |                                      |
+>> + Refill succeed               |                                      |
+>> +      |                 Refill succeed                               |
+>> +      |                       |                                      |
+>> +      v                       v                                      v
+>> +    +------------------------------------------------------------------+
+>> +    |             allocate fragment from cache                         |
+>> +    +------------------------------------------------------------------+
+>> +
+>> +API interface
+>> +=============
+>> +As the design and implementation of page_frag API implies, the allocation side
+>> +does not allow concurrent calling. Instead it is assumed that the caller must
+>> +ensure there is not concurrent alloc calling to the same page_frag_cache
+>> +instance by using its own lock or rely on some lockless guarantee like NAPI
+>> +softirq.
+>> +
+>> +Depending on different aligning requirement, the page_frag API caller may call
+>> +page_frag_*_align*() to ensure the returned virtual address or offset of the
+>> +page is aligned according to the 'align/alignment' parameter. Note the size of
+>> +the allocated fragment is not aligned, the caller needs to provide an aligned
+>> +fragsz if there is an alignment requirement for the size of the fragment.
+>> +
+>> +Depending on different use cases, callers expecting to deal with va, page or
+>> +both va and page for them may call page_frag_alloc, page_frag_refill, or
+>> +page_frag_alloc_refill API accordingly.
+>> +
+>> +There is also a use case that needs minimum memory in order for forward progress,
+>> +but more performant if more memory is available. Using page_frag_*_prepare() and
+>> +page_frag_commit*() related API, the caller requests the minimum memory it needs
+>> +and the prepare API will return the maximum size of the fragment returned. The
+>> +caller needs to either call the commit API to report how much memory it actually
+>> +uses, or not do so if deciding to not use any memory.
+>> +
+>> +.. kernel-doc:: include/linux/page_frag_cache.h
+>> +   :identifiers: page_frag_cache_init page_frag_cache_is_pfmemalloc
+>> +		  __page_frag_alloc_align page_frag_alloc_align page_frag_alloc
+>> +		 __page_frag_refill_align page_frag_refill_align
+>> +		 page_frag_refill __page_frag_refill_prepare_align
+>> +		 page_frag_refill_prepare_align page_frag_refill_prepare
+>> +		 __page_frag_alloc_refill_prepare_align
+>> +		 page_frag_alloc_refill_prepare_align
+>> +		 page_frag_alloc_refill_prepare page_frag_alloc_refill_probe
+>> +		 page_frag_refill_probe page_frag_commit
+>> +		 page_frag_commit_noref page_frag_alloc_abort
+>> +
+>> +.. kernel-doc:: mm/page_frag_cache.c
+>> +   :identifiers: page_frag_cache_drain page_frag_free
+>> +		 __page_frag_alloc_refill_probe_align
+>> +
+>> +Coding examples
+>> +===============
+>> +
+>> +Initialization and draining API
+>> +-------------------------------
+>> +
+>> +.. code-block:: c
+>> +
+>> +   page_frag_cache_init(nc);
+>> +   ...
+>> +   page_frag_cache_drain(nc);
+>> +
+>> +
+>> +Allocation & freeing API
+>> +------------------------
+>> +
+>> +.. code-block:: c
+>> +
+>> +    void *va;
+>> +
+>> +    va = page_frag_alloc_align(nc, size, gfp, align);
+>> +    if (!va)
+>> +        goto do_error;
+>> +
+>> +    err = do_something(va, size);
+>> +    if (err) {
+>> +        page_frag_abort(nc, size);
+>> +        goto do_error;
+>> +    }
+>> +
+>> +    ...
+>> +
+>> +    page_frag_free(va);
+>> +
+>> +
+>> +Preparation & committing API
+>> +----------------------------
+>> +
+>> +.. code-block:: c
+>> +
+>> +    struct page_frag page_frag, *pfrag;
+>> +    bool merge = true;
+>> +    void *va;
+>> +
+>> +    pfrag = &page_frag;
+>> +    va = page_frag_alloc_refill_prepare(nc, 32U, pfrag, GFP_KERNEL);
+>> +    if (!va)
+>> +        goto wait_for_space;
+>> +
+>> +    copy = min_t(unsigned int, copy, pfrag->size);
+>> +    if (!skb_can_coalesce(skb, i, pfrag->page, pfrag->offset)) {
+>> +        if (i >= max_skb_frags)
+>> +            goto new_segment;
+>> +
+>> +        merge = false;
+>> +    }
+>> +
+>> +    copy = mem_schedule(copy);
+>> +    if (!copy)
+>> +        goto wait_for_space;
+>> +
+>> +    err = copy_from_iter_full_nocache(va, copy, iter);
+>> +    if (err)
+>> +        goto do_error;
+>> +
+>> +    if (merge) {
+>> +        skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1], copy);
+>> +        page_frag_commit_noref(nc, pfrag, copy);
+>> +    } else {
+>> +        skb_fill_page_desc(skb, i, pfrag->page, pfrag->offset, copy);
+>> +        page_frag_commit(nc, pfrag, copy);
+>> +    }
 > 
-> stmmac PCS support is total crap and shouldn't be used, or stmmac
-> should not be using phylink. It's one or the other. Blame Serge for
-> this mess.
-
-Seriously, we could've had this fixed had the patch set I was working
-on that fixed stmmac's _bad_ _conversion_ to phylink progressed to the
-point of being merged.
-
-The whole stmmac PCS support is broken, bypassing phylink.
-
-This series also contained bug fixes for stuff like this interrupt
-storm after Serge tested it. However, Serge wanted to turn my series
-into his maze of indirect function pointers approach that I disagreed
-with, and he wouldn't change his mind on that, so I deleted the series.
-
-As I keep saying - either stmmac uses phylink *properly* and gets its
-PCS hacks sorted out, or it does not use phylink *at* *all*. It's one
-or the other.
-
-I am not going to patch stmmac for any future phylink changes, and if
-it breaks, then I'll just say "oh that's a shame, not my problem."
-Blame Serge for that. I've had it with the pile of crap that is
-stmmac.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Looks good.
+> 
+>> +/**
+>> + * page_frag_cache_is_pfmemalloc() - Check for pfmemalloc.
+>> + * @nc: page_frag cache from which to check
+>> + *
+>> + * Used to check if the current page in page_frag cache is allocated from the
+> "Check if ..."
+>> + * pfmemalloc reserves. It has the same calling context expectation as the
+>> + * allocation API.
+>> + *
+>> + * Return:
+>> + * true if the current page in page_frag cache is allocated from the pfmemalloc
+>> + * reserves, otherwise return false.
+>> + */
+>> <snipped>...
+>> +/**
+>> + * page_frag_alloc() - Allocate a page fragment.
+>> + * @nc: page_frag cache from which to allocate
+>> + * @fragsz: the requested fragment size
+>> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+>> + *
+>> + * Alloc a page fragment from page_frag cache.
+> "Allocate a page fragment ..."
+>> + *
+>> + * Return:
+>> + * virtual address of the page fragment, otherwise return NULL.
+>> + */
+>>  static inline void *page_frag_alloc(struct page_frag_cache *nc,
+>> <snipped>...
+>> +/**
+>> + * __page_frag_refill_prepare_align() - Prepare refilling a page_frag with
+>> + * aligning requirement.
+>> + * @nc: page_frag cache from which to refill
+>> + * @fragsz: the requested fragment size
+>> + * @pfrag: the page_frag to be refilled.
+>> + * @gfp_mask: the allocation gfp to use when cache need to be refilled
+>> + * @align_mask: the requested aligning requirement for the fragment
+>> + *
+>> + * Prepare refill a page_frag from page_frag cache with aligning requirement.
+> "Prepare refilling ..."
+>> + *
+>> + * Return:
+>> + * True if prepare refilling succeeds, otherwise return false.
+>> + */
+>> <snipped>...
+>> +/**
+>> + * __page_frag_alloc_refill_probe_align() - Probe allocing a fragment and
+>> + * refilling a page_frag with aligning requirement.
+>> + * @nc: page_frag cache from which to allocate and refill
+>> + * @fragsz: the requested fragment size
+>> + * @pfrag: the page_frag to be refilled.
+>> + * @align_mask: the requested aligning requirement for the fragment.
+>> + *
+>> + * Probe allocing a fragment and refilling a page_frag from page_frag cache with
+> "Probe allocating..."
+>> + * aligning requirement.
+>> + *
+>> + * Return:
+>> + * virtual address of the page fragment, otherwise return NULL.
+>> + */
+> 
+> Thanks.
+> 
 
