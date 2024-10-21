@@ -1,147 +1,149 @@
-Return-Path: <netdev+bounces-137485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD209A6AD6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:45:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ECF99A6AEB
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:47:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4350D1F236B6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:45:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3F881C2345D
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94F81F9A8C;
-	Mon, 21 Oct 2024 13:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E391F7090;
+	Mon, 21 Oct 2024 13:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="kQJRBMun"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0PWyLVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C331EBA0C;
-	Mon, 21 Oct 2024 13:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119C4282FE;
+	Mon, 21 Oct 2024 13:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729518260; cv=none; b=BSTcl/4Bp97yA/Mrc6yZTpfdJS5JK5kiqyz1qfUzfGs1BBVOy0uKvcUsLQj2dryW0vc35MiTQKBQV2pUVm+Xw+dzlt6Y3xprzqo4d/QqDElg7MHNgrjIZDO4Seh2DkP6ZdNUwyC7UrpJFC107Wk/wFkjObrYzMGBnAvCz2/oOyI=
+	t=1729518454; cv=none; b=Xu9x5sCvK6olabs3LS81LiC+Rab7q69aZF5GDTD+8yr2oWGa4vhQGoBW7qSNlhvV8aJty79J8sM2ZzMkny/vo2dSbf3B0dud3hiz+EHcZbWVdSsimkQh+PYAUqjSPAV8yeinQSbjhOM1Cvj9abvXYBn9xuyNO5HN9t0NqS2Ar3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729518260; c=relaxed/simple;
-	bh=liTRGYlRc717InXeZAtv9VrW7r2Qb9eu5JQUYjBMHXo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=enKVKDHAa/jmSMWwiI8t0kqQJCKiX/nHKmB5u08Grhvd7VU9wA07uO+U3wJvW798gxNQTDukV2xkpqtyH01/KfIaupeBWdyQC02dNAGmEtBAvZo1icpLWyH2dkokvb65YWMTz570VAGBFNd8NdUDPa+tkmFjq8b5y2x7Z4aT3Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=kQJRBMun; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:To:Subject:MIME-Version:Date:Message-ID:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=y+Y9nxqb7MUw+8wRiEISWftttGVhoETI2tIwPaiu6aE=; b=kQJRBMunyNqlXywJI4gHCUsYlQ
-	4rqTfym7NBYpo0GxWijp4w9fZ52NSJNjHL1XYkGPPgHqDCrHUNFGsyVS7hOt1Ah9TVAWsCM2bfva3
-	0yh86XUKjhg8+u1O6VomzGJbnnbMaxiArTsS8oPr46j5LUixXBWBStdKVGLh+myMIFvW8jY2EvsSQ
-	YftXj4Y0ezXhb/Q6XDwM3PVsyf3D1XJhD13UtFX06f6/Bi8zCobPzixGnfO30/WyHxte4c7UtYtp7
-	5x8aRRhUHheqOfKGF20PcgJxxcoWUac86MmecK+/DXt4I0/IJVRWVpDZEQHT70q67JnOburTdU4AG
-	jnQ6iGPA==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1t2shg-0009F5-JX; Mon, 21 Oct 2024 15:44:12 +0200
-Received: from [178.197.248.43] (helo=[192.168.1.114])
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1t2she-0009xA-2x;
-	Mon, 21 Oct 2024 15:44:10 +0200
-Message-ID: <c661ee63-bcd9-49b0-917f-7eb4bc0d262d@iogearbox.net>
-Date: Mon, 21 Oct 2024 15:44:09 +0200
+	s=arc-20240116; t=1729518454; c=relaxed/simple;
+	bh=pZC3YbqyBViAPdxBqxiw35UgPV0nDZR5cXq4uA20i5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bB4c6OykYfcOBEf47DuZAduFs+qMdHQnABNFdDwA+po7ufjCw5bYwW0bwkTVrLrEVVvbnBQMPOu++xKr+g2RQLCS0tg0i5noroTczhq++lt9MEJOwyMFJ4HM52CrDX+AysjSs2wRtc/MxNAE6AEymsYsKkvHMnS/9eIpoFfpeJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M0PWyLVo; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a99f9fa66fdso50435866b.0;
+        Mon, 21 Oct 2024 06:47:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729518450; x=1730123250; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L0PguM/y3AdR81087UZxaCc/iTHakbzKnJWRYI0kM+s=;
+        b=M0PWyLVoIDwyPdP0bxZgNWzrX42vE0+QYoj2stRvDspSjsVcTVzisFZdRw5nsgrs80
+         dHgRzZX0xGkqtLfwWyektp0iZ8A9Fr93xlhuwH562DrUQLZpTk/5RtxPUcjn1wIr0YKP
+         1BaS4txAvRi4m0c9LItavDmpZmRpXLlRY7kUCGWFOVMqRLIvyZKs0PVKCwev46NTzRFM
+         YuW9MVfdZCpto9OTMjsrGrVEgc/1wyQBgBB83mQ+0HnCJe9A2/kMWZIe+lgZR3TxrtMk
+         vRX3P4w0Es7OGSWv1hDWTyomT/lm99q4CncaGdUJsjLi6LcTs/XQcf6mRFcd4YS71ZJz
+         8gyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729518450; x=1730123250;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L0PguM/y3AdR81087UZxaCc/iTHakbzKnJWRYI0kM+s=;
+        b=uD7ashQ6pc3PrXpBv0MbGB7Gul7rjzmABOKZUg/zbxhLN2e+Tv/r87Sgnq4enqxr18
+         CQrugf7XaLMdvle2qOB8gOmWNcS1VWAC8dcGaENJ7YtxgHmhnGwazgfMI5hCUlPUKIfS
+         bAk71bZiBdrweZDMf//x1EaTCUjU3Y/HgJvU6WE1TEOVgmtkyzUsHZxbC90/KIDBgkDx
+         fldcIYuBgZlxHJt2jon9lsC7tGADV3VlMcPbyu2Dg+tnHvUid5XhTYONsmpYcmPTEeyA
+         ds3AyQUCkqOIWY6Fcs9jT0n7Kt0Q8HKnREdoU8tRSgel6iSxx9XU57VBKbrjq02nrTc+
+         S1cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSe1Z/a+e480ozo1W96qip1L5VXo0xt9hb3JqCe0VlL+pqkMgQJ8QYc+ye2EvmhCl6pMPOTPkwU0saof1O8l/L@vger.kernel.org, AJvYcCWV2jbg3AkCcIZB32mAXq+hnHePOgW4ywgRgKBneH+cSdu8hgUbHnHhQ2v8/6hdCZI4e1yAOA24@vger.kernel.org, AJvYcCX2jVA7xlWW3g7p9x+CF4HKEYXtfIEMlip9g8GrAK2rTVdH9cHTa1vawJepGSRk5BQcP+GP9twF1jfs24g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx811PpiVlWgGjY1cvAHXnKz5CZ/y3gQbYxrpdgwX0ZJK4QPzSr
+	5taiGfllE4wk0Cst8Xz5jCVcSW0sFhgfi5Q9dDzjnXiYRE8FEqLX
+X-Google-Smtp-Source: AGHT+IHllwIsaig8SX4FhN+AvinTZ5nJRChFYQ0yBVkHaCSnwF1lUgDNNoWUZkrrdij66hbn5eP8Xg==
+X-Received: by 2002:a17:906:6a26:b0:a9a:5b78:cee5 with SMTP id a640c23a62f3a-a9a69c685d4mr437986966b.9.1729518449909;
+        Mon, 21 Oct 2024 06:47:29 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a91370e54sm204503966b.102.2024.10.21.06.47.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 06:47:29 -0700 (PDT)
+Date: Mon, 21 Oct 2024 16:47:26 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH RFC v1 net-next 11/12] bridge:
+ br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
+Message-ID: <20241021134726.dzfz5uu2peyin3kk@skbuf>
+References: <20241013185509.4430-1-ericwouds@gmail.com>
+ <20241013185509.4430-12-ericwouds@gmail.com>
+ <281cce27-c832-41c8-87d0-fbac05b8e802@blackwall.org>
+ <6209405e-7100-43f9-b415-3be8fbcc6352@blackwall.org>
+ <20241014144613.mkc62dvfzp3vr7rj@skbuf>
+ <b919a6b1-1c07-4fc9-b3dc-a7ac2f3645bf@gmail.com>
+ <785f6b7a-1de1-46fe-aa6f-9b20feee5973@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 5/5] selftests/bpf: Add a selftest for
- bpf_csum_diff()
-To: Puranjay Mohan <puranjay@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexei Starovoitov <ast@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eduard Zingerman
- <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Hao Luo <haoluo@google.com>, Helge Deller <deller@gmx.de>,
- Jakub Kicinski <kuba@kernel.org>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, linux-kernel@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
- Martin KaFai Lau <martin.lau@linux.dev>, Mykola Lysenko <mykolal@fb.com>,
- netdev@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Abeni <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Puranjay Mohan <puranjay12@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Yonghong Song <yonghong.song@linux.dev>
-References: <20241021122112.101513-1-puranjay@kernel.org>
- <20241021122112.101513-6-puranjay@kernel.org>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20241021122112.101513-6-puranjay@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27434/Mon Oct 21 10:49:31 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <785f6b7a-1de1-46fe-aa6f-9b20feee5973@gmail.com>
 
-On 10/21/24 2:21 PM, Puranjay Mohan wrote:
-> Add a selftest for the bpf_csum_diff() helper. This selftests runs the
-> helper in all three configurations(push, pull, and diff) and verifies
-> its output. The correct results have been computed by hand and by the
-> helper's older implementation.
+On Sun, Oct 20, 2024 at 11:23:18AM +0200, Eric Woudstra wrote:
+> So after doing some more reading, at creation of the code using
+> BR_VLFLAG_ADDED_BY_SWITCHDEV would have been without problems.
 > 
-> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
+> After the switchdev was altered so that objects from foreign devices can
+> be added, it is problematic in br_vlan_fill_forward_path_mode(). I have
+> tested and indeed any foreign device does have this problem.
+> 
+> So we need a way to distinguish in br_vlan_fill_forward_path_mode()
+> whether or not we are dealing with a (dsa) foreign device on the switchdev.
+> 
+> I have come up with something, but this is most likely to crude to be
+> accepted, but for the sake of 'rfc' discussing it may lead to a proper
+> solution. So what does work is the following patch, so that
+> netif_has_dsa_foreign_vlan() can be used inside
+> br_vlan_fill_forward_path_mode().
+> 
+> Any suggestions on how this could be implemented properly would be
+> greatly appreciated.
 
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+I don't know nearly enough about the netfilter flowtable to even
+understand exactly the problem you're describing and are trying to solve.
+I've started to read up on things, but plenty of concepts are new and
+I'm mixing this with plenty of other activities. If you could share some
+commands to build a test setup so I could form my own independent
+opinion of what is going on, it would be great as it would speed up that
+process.
+
+With respect to the patch you've posted, it doesn't look exactly great.
+One would need to make a thorough analysis of the bridge's use of
+BR_VLFLAG_ADDED_BY_SWITCHDEV, of whether it still makes sense in today's
+world where br_switchdev_vlan_replay() is a thing (a VLAN that used to
+not be "added by switchdev" can become "added by switchdev" after a
+replay, but this flag will remain incorrectly unset), of whether VLANs on
+foreign DSA interfaces should even have this flag set, and on whether
+your flowtable forwarding path patches are conceptually using it correctly.
+There's a lot to think about, and if somebody doesn't have the big picture,
+I'm worried that a wrong decision will be taken.
 
