@@ -1,128 +1,186 @@
-Return-Path: <netdev+bounces-137466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9019A685F
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:28:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 688A69A68C8
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8F6284763
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:28:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 737A0B29550
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540E91F8936;
-	Mon, 21 Oct 2024 12:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10FD1F12F6;
+	Mon, 21 Oct 2024 12:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HlF6z4iS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNy8Cw1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259CC1E908A;
-	Mon, 21 Oct 2024 12:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE2D1EBFFC;
+	Mon, 21 Oct 2024 12:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729513566; cv=none; b=kn6mFcPGWVKP0K080F3J+YypSvQyiGksIenKxGwt1+EyjYQlE+t0K3/+fmuOXCNno50lLStooWxp9KUPNbccRXzx2OOFetEdxUv2RLwVyHjBY7kZRSlcXoLylfyPG1CRl0WcakxmsABdaAjXnp65B3NrYXxGlr+UmkIFPyQeIVg=
+	t=1729514136; cv=none; b=tPG8uhXvzu5JbggnLcgib5B/pFWfzhhbLqlreUVoBCpfivDxL/fSNrRwT1a5jpQirinelThvOaTMiWKoGDy7IjDN830cJ8aDw0XU5AKP402qkrAgOyMziEkC5NKBQKvtYa18hatd4HZZSH00IqP+OksTR+QUAdEmIYQUKF/3T0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729513566; c=relaxed/simple;
-	bh=cx/tLvH9CPRgHxEav9sPf4o/gHFa4lb5PR3fe7KBDA0=;
+	s=arc-20240116; t=1729514136; c=relaxed/simple;
+	bh=ryJesFhPuWpmoKJ2oG3ambIjEDeppljJufZmd9Iqq7M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pY6CAl9W/BWYRSUSOt5fVrAizfMff3rRAG4k/kZV55w9lA8cUE/UuAhK/iQPL7lG4YxXG5RDx+7OGPcjC6xAFJ5KeOc+zyNoNY6leoZYjNR6dsJEO2qL12FQGSxzlND6K3MRjnIkMd7tYQbDAvYhJV/R3h3UkLd+iit7qAnn624=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HlF6z4iS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15F5EC4CEC3;
-	Mon, 21 Oct 2024 12:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729513565;
-	bh=cx/tLvH9CPRgHxEav9sPf4o/gHFa4lb5PR3fe7KBDA0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HlF6z4iSE4m4KO6vx5hubfGjBlUBCwj1PXsxIH+/Xcop+vfX86LaDkpRtod2cq+MH
-	 xH+iCQ7icStQOSTZEWdc7fwJ2/vdFJWRYkY8zGc56jciyDi9wjqf3ULXVX0bpDynPR
-	 TABkMjgXNxkDAXPztzvpPj4Y0rCfErFGxe9c9p5bryS3zWbd8G4u9ot6FCw+FIbdfv
-	 Pi3m1RlJ4bGU9Z8TSdjIx1fidU6H8IECafN4z0VFaBT+I+dzNoeq1cC5K/+tD2XSYa
-	 CY3zwTqSII+OWs2FChK3B0e9JOcWROv1/xtstboToEqnH7FR+5JCEpEFWZpZ1FpbJG
-	 deqz1OZtUifHg==
-Date: Mon, 21 Oct 2024 13:26:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Furong Xu <0x1207@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bJKxMYXddIuDQW95YP17/J5aW0JySN1Pg1N0CanWZwxb8s02Wfqve6RyZzn4IdrTsIITJFe7d0kNd+MTr5l6O74uP9+RNhGUbgZCOHK5QUWXCfkFl7v9hWSRJgyk4J8t0XtaDIn7Z4X8SMhD3OsPTQpSJmXs2AL3TBDam6Ivbhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bNy8Cw1s; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20c805a0753so37211375ad.0;
+        Mon, 21 Oct 2024 05:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729514134; x=1730118934; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t8DKm0b75v2mFIzfoBXeqnQ9qh0nJB5sh3E9iN+6t+g=;
+        b=bNy8Cw1sqIm69N1+sHJuBTeFam+//c3uXd+8rc65PgnVuCKSqcDPXYL1YqEUhiIEiH
+         Ypd/xnecxfHRUcCNic69/5lx2L3ReB1t//7jFkCbBjhSjXVa1E4qZzy7sFqI97EQ9PuA
+         yxGEcEPiXU8OAPyxRUoSiF4Q8k8G90xPTuQitC7hmpEKQ6gDMIHppIR1zM0eKj6GfaYY
+         VR2qTAvcvXMgVRnqtGTsk45i9+g/h8oE8qdovqr5KfLcUD/0shZztl3pk0gaQikgMheh
+         wbTV5mLnKXxTHQ3BqobLbPh9VZU3NUh5qpr3K8U5+SvWV5A7vfgHrsajMojah1UiyQQd
+         Pzdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729514134; x=1730118934;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t8DKm0b75v2mFIzfoBXeqnQ9qh0nJB5sh3E9iN+6t+g=;
+        b=uQKyDiphpEi5FBlxipBxsAIpG0hu9KB19FJ7ORSkEonYu79tgLO4xLs7Q/3Y3uUON7
+         QN7oeJAkm7u0DlHMp8xVPs5YujONLLmBji8suKr/ZWztm1YMYYB/NLos6OcfLANqJWB1
+         vUgGsbgiynGZYsjcWgswHOfsA7a33JdQCLqSsj1RVCY7Yt7HgKGZVN1qyVTuMwjqr6+9
+         xgcXFSRqpedvL2OxWeH/RGGdvs4hk3jeLrmnJFDKsxZLUB1oqSkaGkSRNMQBwY5SvNj9
+         jjmbarWeCWsW5kCp8x7dAnHbDheyb44E7loejuFP6yOVYUcJoFhJj8PAfdqGNCXejyER
+         toQw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/G1o7d9pQFvNOH74Jxm9G4fbNmgukqcLwJn+XkwKYBW6dhLB4MaopBd5Y1XSbatR0QLNJN9UG@vger.kernel.org, AJvYcCWpIbV7r5rF7yTefi+oNgmif/IcyHXU4xzwaI5lriwk7EPlDqOyl5LoD9mah4vr6RTFch3uUTMKWTFcOzCB@vger.kernel.org, AJvYcCWrO3THSaFfkmSJyvbqZdmE8CREGOsI+25PYTg+sdvxewMD2xBituqjQ40rRsJVHdxkhqTPMmwTwwY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFhvr5g/CF35VmCfFC1Q8iKRCL6xRmvrKtEmtJKk3xIiC8hHq4
+	vzWz0/W4QtcfyVwBAYStXz5VqGoV+j3oMPEWh71eFv3K9fP12CrO
+X-Google-Smtp-Source: AGHT+IElQp2jbvDwNPhXh8KEAqGQrnmUUZt2ln5wHHczzuKnRlmUEXTQ8p2RFA8arvER0DAUg18+Vw==
+X-Received: by 2002:a17:902:e543:b0:20c:e65c:8c6c with SMTP id d9443c01a7336-20e5a75a817mr138288505ad.19.1729514133834;
+        Mon, 21 Oct 2024 05:35:33 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0de266sm24821415ad.210.2024.10.21.05.35.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 05:35:32 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id A8139438F146; Mon, 21 Oct 2024 19:35:29 +0700 (WIB)
+Date: Mon, 21 Oct 2024 19:35:29 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Breno Leitao <leitao@debian.org>, Akinobu Mita <akinobu.mita@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Subject: Re: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap
- for non-paged SKB data
-Message-ID: <20241021122601.GI402847@kernel.org>
-References: <20241021061023.2162701-1-0x1207@gmail.com>
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: kernel-team@meta.com, Pavel Begunkov <asml.silence@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v3] net: Implement fault injection forcing skb
+ reallocation
+Message-ID: <ZxZKkY8U4jndx8no@archie.me>
+References: <20241014135015.3506392-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="BJ7jF2OE9XMZw2nO"
 Content-Disposition: inline
-In-Reply-To: <20241021061023.2162701-1-0x1207@gmail.com>
+In-Reply-To: <20241014135015.3506392-1-leitao@debian.org>
 
-On Mon, Oct 21, 2024 at 02:10:23PM +0800, Furong Xu wrote:
-> In case the non-paged data of a SKB carries protocol header and protocol
-> payload to be transmitted on a certain platform that the DMA AXI address
-> width is configured to 40-bit/48-bit, or the size of the non-paged data
-> is bigger than TSO_MAX_BUFF_SIZE on a certain platform that the DMA AXI
-> address width is configured to 32-bit, then this SKB requires at least
-> two DMA transmit descriptors to serve it.
-> 
-> For example, three descriptors are allocated to split one DMA buffer
-> mapped from one piece of non-paged data:
->     dma_desc[N + 0],
->     dma_desc[N + 1],
->     dma_desc[N + 2].
-> Then three elements of tx_q->tx_skbuff_dma[] will be allocated to hold
-> extra information to be reused in stmmac_tx_clean():
->     tx_q->tx_skbuff_dma[N + 0],
->     tx_q->tx_skbuff_dma[N + 1],
->     tx_q->tx_skbuff_dma[N + 2].
-> Now we focus on tx_q->tx_skbuff_dma[entry].buf, which is the DMA buffer
-> address returned by DMA mapping call. stmmac_tx_clean() will try to
-> unmap the DMA buffer _ONLY_IF_ tx_q->tx_skbuff_dma[entry].buf
-> is a valid buffer address.
-> 
-> The expected behavior that saves DMA buffer address of this non-paged
-> data to tx_q->tx_skbuff_dma[entry].buf is:
->     tx_q->tx_skbuff_dma[N + 0].buf = NULL;
->     tx_q->tx_skbuff_dma[N + 1].buf = NULL;
->     tx_q->tx_skbuff_dma[N + 2].buf = dma_map_single();
-> Unfortunately, the current code misbehaves like this:
->     tx_q->tx_skbuff_dma[N + 0].buf = dma_map_single();
->     tx_q->tx_skbuff_dma[N + 1].buf = NULL;
->     tx_q->tx_skbuff_dma[N + 2].buf = NULL;
-> 
-> On the stmmac_tx_clean() side, when dma_desc[N + 0] is closed by the
-> DMA engine, tx_q->tx_skbuff_dma[N + 0].buf is a valid buffer address
-> obviously, then the DMA buffer will be unmapped immediately.
-> There may be a rare case that the DMA engine does not finish the
-> pending dma_desc[N + 1], dma_desc[N + 2] yet. Now things will go
-> horribly wrong, DMA is going to access a unmapped/unreferenced memory
-> region, corrupted data will be transmited or iommu fault will be
-> triggered :(
-> 
-> In contrast, the for-loop that maps SKB fragments behaves perfectly
-> as expected, and that is how the driver should do for both non-paged
-> data and paged frags actually.
-> 
-> This patch corrects DMA map/unmap sequences by fixing the array index
-> for tx_q->tx_skbuff_dma[entry].buf when assigning DMA buffer address.
-> 
-> Tested and verified on DWXGMAC CORE 3.20a
-> 
-> Reported-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-> Fixes: f748be531d70 ("stmmac: support new GMAC4")
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
 
-Thanks for the very thorough explanation, much appreciated.
+--BJ7jF2OE9XMZw2nO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Mon, Oct 14, 2024 at 06:50:00AM -0700, Breno Leitao wrote:
+> +  To select the interface to act on, write the network name to the follo=
+wing file:
+> +  `/sys/kernel/debug/fail_net_force_skb_realloc/devname`
+"... write the network name to /sys/kernel/debug/fail_net_force_skb_realloc=
+/devname."
+> +  If this field is left empty (which is the default value), skb realloca=
+tion
+> +  will be forced on all network interfaces.
+> +
+> <snipped>...
+> +- /sys/kernel/debug/fail_net_force_skb_realloc/devname:
+> +
+> +        Specifies the network interface on which to force SKB reallocati=
+on.  If
+> +        left empty, SKB reallocation will be applied to all network inte=
+rfaces.
+> +
+> +        Example usage:
+> +        # Force skb reallocation on eth0
+> +        echo "eth0" > /sys/kernel/debug/fail_net_force_skb_realloc/devna=
+me
+> +
+> +        # Clear the selection and force skb reallocation on all interfac=
+es
+> +        echo "" > /sys/kernel/debug/fail_net_force_skb_realloc/devname
+
+The examples rendered as normal paragraph instead (and look like long-runni=
+ng
+sentences) so I wrap them in literal code blocks:
+
+---- >8 ----
+diff --git a/Documentation/fault-injection/fault-injection.rst b/Documentat=
+ion/fault-injection/fault-injection.rst
+index bb19638d53171b..b2bf3afd16d144 100644
+--- a/Documentation/fault-injection/fault-injection.rst
++++ b/Documentation/fault-injection/fault-injection.rst
+@@ -243,12 +243,13 @@ configuration of fault-injection capabilities.
+         Specifies the network interface on which to force SKB reallocation=
+=2E  If
+         left empty, SKB reallocation will be applied to all network interf=
+aces.
+=20
+-        Example usage:
+-        # Force skb reallocation on eth0
+-        echo "eth0" > /sys/kernel/debug/fail_net_force_skb_realloc/devname
++        Example usage::
+=20
+-        # Clear the selection and force skb reallocation on all interfaces
+-        echo "" > /sys/kernel/debug/fail_net_force_skb_realloc/devname
++          # Force skb reallocation on eth0
++          echo "eth0" > /sys/kernel/debug/fail_net_force_skb_realloc/devna=
+me
++
++          # Clear the selection and force skb reallocation on all interfac=
+es
++          echo "" > /sys/kernel/debug/fail_net_force_skb_realloc/devname
+=20
+ Boot option
+ ^^^^^^^^^^^
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--BJ7jF2OE9XMZw2nO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZxZKjQAKCRD2uYlJVVFO
+oytEAP9YGfemitFbC/0IE8EMIUwGjw3v2h/G+ciXGgCKgTo1FAD+K60aXWnG72RM
+nv5CO9xfc9eGfkA4nyrWVrnDX5vS5Ag=
+=5vQ6
+-----END PGP SIGNATURE-----
+
+--BJ7jF2OE9XMZw2nO--
 
