@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-137505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38DD59A6B67
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:03:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F44E9A6B6B
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:03:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0061F20F07
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:03:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF8E281CF9
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA671FCC7A;
-	Mon, 21 Oct 2024 14:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326CD1FDFAB;
+	Mon, 21 Oct 2024 14:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="gb8kvIxg"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kSztVMiR"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4595E1FBF72;
-	Mon, 21 Oct 2024 14:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F331FCF43;
+	Mon, 21 Oct 2024 14:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729519220; cv=none; b=mksd2psacdy4S0QRoUjT+e2/mMn+pmVd1O897o6B2Dv3C4vxXa5qPt/Ty4m0IyBGSVDIvMUC6RuKbeOCsHZGc77l0PYTXJWyFzUEDV5wmmGhTgUzN4jxhbswr4l9ZrFbHCJ8VimozxQTMoAO74a9cyXOCo0CSAahHc4gdF4Kl6U=
+	t=1729519223; cv=none; b=AHQlc4+vnZrtu6DEaxwn6EEvCpjZDa4DC8oiULkJBvYA3AF6+VSHpwe6N3GDkGbeerPoeTY614H6do7z7uxY1cepLV2DDAyPzs5Qwe8eJUXHYvmeo4CKwCdiOdGZwiBzfy/TmvetbkwOuD4SgtPe0HVEOTZqQVQBbcT/Jt3XrAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729519220; c=relaxed/simple;
-	bh=aY0YypQAngRekw2GELmtGYkeTWjSw4VkDJVyIfxc2hA=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=r/I/7+Oh6vCG/QX1MdMKT8gq9349goTY/cLPrvapI3cMU+n9P0nFDq6pbrAFtbT4wmXdjJWz7GWADB+Q+RdyQ7kNikBAF4tz9WS85QxV05mjq/ogOoIsoagtFZCVYdDmgEGbsUvdX43w93plsJjcSAsnOwPa0ole3Kxft9PSSmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=gb8kvIxg; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1729519223; c=relaxed/simple;
+	bh=rwABD1s3aZAVELHR4mcTO5PabHV2RCqxETCwT5w+7vE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=Bu1RbWgiZq26ijkkJ8LEA7kYMLUANlNU3KUHLRTOxcc4Jt8EWuAB1i+2vw1xs/qdblwRDhvQypcfgyE+H7gn0bjoRTCrMRSxVmYYcx8IpTy4lrkaUi9KKb96Aet8NV/av2+ESx2zeGKVTCdYiAbJEMXcRE/esKmpsqfIBDA4W+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kSztVMiR; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729519218; x=1761055218;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=aY0YypQAngRekw2GELmtGYkeTWjSw4VkDJVyIfxc2hA=;
-  b=gb8kvIxgzLXDVvHAB7c8RiMhfiqqH4gVtP8Qlbox3IvBLhe7y58u3sF9
-   R4hR3ruPHKs/DwTbxHnuecUVbmVMqB6ISm9JygohtBX3zgL+LDzxc5MOt
-   ZSWCCM5OO8pQPw5qqtQm6nzkV/YWcpklMggVxjpveotmV4QeqIcCjAQL0
-   dQtjqLvDOuAABdbzXDr5QgZe9yUp3yEthtk4kJ+tKJO2D9XCWHVaVwKLW
-   6TtMyPBncnCJFtJ+iScCnBpHVQqRMO8EGj4h9rJgiJYqWIXFjsmM2o5tU
-   Km/d42dbZAlzICmYG+0vgTH5xaHNMsCuUYCNo5N9pqq/erCzki1v0yG/L
-   A==;
+  t=1729519220; x=1761055220;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=rwABD1s3aZAVELHR4mcTO5PabHV2RCqxETCwT5w+7vE=;
+  b=kSztVMiRDang9uHjMN4eKVuCumZbejrgN83+01l/a0+UZ29hzlWRruiR
+   F+EB2dzJ8g9u5pVncmIpAHrnA5ASG7NslPfAtFLuNlcU+eVXSUUNqiFZI
+   DdNEi03GNKAcrv2GRNZeUzknSFh+8lUcUL1qbvRGdu74anO1TQSpPscfI
+   R6s0cmqFxjT4kVG2Esr0hWoTyHO6i6bhgHtcYrbj1HWPEpRrT56dQEDO0
+   cxKp7FfPmKbvQ/6pWMSBFAoTaTV+lcGIGIxbbRpe0BBQa90z3JaMRnIdr
+   2QLQbkHQJ8zbOE9hV1TbWvkF8apthFx2V8i8KodWl3VSBtjAjtF6vlKBO
+   Q==;
 X-CSE-ConnectionGUID: Ky42XnPuQxK/Okp36Nw4mA==
-X-CSE-MsgGUID: bBh1YTz8SNKwmHppzXUp1A==
+X-CSE-MsgGUID: e2olz952RPOhnmGGDiB9GQ==
 X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="200707744"
+   d="scan'208";a="200707747"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Oct 2024 06:59:14 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 21 Oct 2024 06:58:54 -0700
+ 15.1.2507.35; Mon, 21 Oct 2024 06:58:58 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 21 Oct 2024 06:58:50 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 21 Oct 2024 06:58:54 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Subject: [PATCH net-next 00/15] net: sparx5: add support for lan969x switch
- device
-Date: Mon, 21 Oct 2024 15:58:37 +0200
-Message-ID: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
+Date: Mon, 21 Oct 2024 15:58:38 +0200
+Subject: [PATCH net-next 01/15] net: sparx5: add support for lan969x SKU's
+ and core clock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,9 +70,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAA1eFmcC/x2NQQqDMBAAvyJ77oLGRk2/Ij3EuNaFdiubYAPi3
- 5v2OAzMHBBJmSLcqgOUdo78lgLNpYKwenkQ8lwYTG2uTd10GDev2eLTi+tcxvjhFFaclXdSNNg
- HWqzth9a1A5TIprRw/g9GEEoolBPci5l8JJzUS1h/g5dngfP8AhHsB92RAAAA
+Message-ID: <20241021-sparx5-lan969x-switch-driver-2-v1-1-c8c49ef21e0f@microchip.com>
+References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
+In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <andrew@lunn.ch>, Lars Povlsen
@@ -88,146 +88,165 @@ CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<steen.hegelund@microchip.com>, <devicetree@vger.kernel.org>
 X-Mailer: b4 0.14-dev
 
-== Description:
+In preparation for lan969x, add lan969x SKU's (Stock Keeping Unit) to
+sparx5_target_chiptype and set the core clock frequency for these
+throughout. Lan969x only supports a core clock frequency of 328MHz.
 
-This series is the second of a multi-part series, that prepares and adds
-support for the new lan969x switch driver.
-
-The upstreaming efforts is split into multiple series (might change a
-bit as we go along):
-
-        1) Prepare the Sparx5 driver for lan969x (merged)
-
-    --> 2) add support lan969x (same basic features as Sparx5
-           provides excl. FDMA and VCAP).
-
-        3) Add support for lan969x VCAP, FDMA and RGMII
-
-== Lan969x in short:
-
-The lan969x Ethernet switch family [1] provides a rich set of
-switching features and port configurations (up to 30 ports) from 10Mbps
-to 10Gbps, with support for RGMII, SGMII, QSGMII, USGMII, and USXGMII,
-ideal for industrial & process automation infrastructure applications,
-transport, grid automation, power substation automation, and ring &
-intra-ring topologies. The LAN969x family is hardware and software
-compatible and scalable supporting 46Gbps to 102Gbps switch bandwidths.
-
-== Preparing Sparx5 for lan969x:
-
-The main preparation work for lan969x has already been merged [1]. 
-
-After this series is applied, lan969x will have the same functionality
-as Sparx5, except for VCAP and FDMA support. QoS features that requires
-the VCAP (e.g. PSFP, port mirroring) will obviously not work until VCAP
-support is added later.
-
-== Patch breakdown:
-
-Patch #1-#4  do some preparation work for lan969x
-
-Patch #5     adds new registers required by lan969x
-
-Patch #6     adds initial match data for lan969x
-
-Patch #7     defines the lan969x register differences
-
-Patch #8     adds lan969x constants to match data
-
-Patch #9     adds some lan969x ops in bulk
-
-Patch #10    adds PTP function to ops
-
-Patch #11    adds lan969x_calendar.c for calculating the calendar
-
-Patch #12    makes additional use of the is_sparx5() macro to branch out
-             in certain places.
-
-Patch #13    documents lan969x in the dt-bindings
-
-Patch #14    introduces new concept of devicetree target
-
-Patch #15    introduces new concept of per-SKU features
-
-[1] https://lore.kernel.org/netdev/20241004-b4-sparx5-lan969x-switch-driver-v2-0-d3290f581663@microchip.com/
-
-To: David S. Miller <davem@davemloft.net>
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-To: andrew@lunn.ch
-To: Lars Povlsen <lars.povlsen@microchip.com>
-To: Steen Hegelund <Steen.Hegelund@microchip.com>
-To: horatiu.vultur@microchip.com
-To: jensemil.schulzostergaard@microchip.com
-To: Parthiban.Veerasooran@microchip.com
-To: Raju.Lakkaraju@microchip.com
-To: UNGLinuxDriver@microchip.com
-To: Richard Cochran <richardcochran@gmail.com>
-To: Rob Herring <robh@kernel.org>
-To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-To: Conor Dooley <conor+dt@kernel.org>
-To: jacob.e.keller@intel.com
-To: ast@fiberby.net
-To: maxime.chevallier@bootlin.com
-Cc: netdev@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Cc: Steen Hegelund <steen.hegelund@microchip.com>
-Cc: devicetree@vger.kernel.org
-
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
-Daniel Machon (15):
-      net: sparx5: add support for lan969x SKU's and core clock
-      net: sparx5: change spx5_wr to spx5_rmw in cal update()
-      net: sparx5: change frequency calculation for SDLB's
-      net: sparx5: add sparx5 context pointer to a few functions
-      net: sparx5: add registers required by lan969x
-      net: lan969x: add match data for lan969x
-      net: lan969x: add register diffs to match data
-      net: lan969x: add constants to match data
-      net: lan969x: add lan969x ops to match data
-      net: lan969x: add PTP handler function
-      net: lan969x: add function for calculating the DSM calendar
-      net: sparx5: use is_sparx5() macro throughout
-      dt-bindings: net: add compatible strings for lan969x SKU's
-      net: sparx5: add compatible strings for lan969x and verify the target
-      net: sparx5: add feature support
+ .../ethernet/microchip/sparx5/sparx5_calendar.c    | 17 +++++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_main.c    | 14 +++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    | 35 +++++++++++++++-------
+ drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |  6 ++++
+ 4 files changed, 62 insertions(+), 10 deletions(-)
 
- .../bindings/net/microchip,sparx5-switch.yaml      |  17 +-
- MAINTAINERS                                        |   7 +
- drivers/net/ethernet/microchip/Kconfig             |   1 +
- drivers/net/ethernet/microchip/Makefile            |   1 +
- drivers/net/ethernet/microchip/lan969x/Kconfig     |   5 +
- drivers/net/ethernet/microchip/lan969x/Makefile    |  13 +
- drivers/net/ethernet/microchip/lan969x/lan969x.c   | 349 +++++++++++++++++++++
- drivers/net/ethernet/microchip/lan969x/lan969x.h   |  56 ++++
- .../ethernet/microchip/lan969x/lan969x_calendar.c  | 190 +++++++++++
- .../net/ethernet/microchip/lan969x/lan969x_regs.c  | 223 +++++++++++++
- drivers/net/ethernet/microchip/sparx5/Makefile     |   1 +
- .../ethernet/microchip/sparx5/sparx5_calendar.c    |  72 +++--
- .../net/ethernet/microchip/sparx5/sparx5_fdma.c    |   2 +-
- .../net/ethernet/microchip/sparx5/sparx5_main.c    | 272 +++++++++++++++-
- .../net/ethernet/microchip/sparx5/sparx5_main.h    |  76 ++++-
- .../ethernet/microchip/sparx5/sparx5_main_regs.h   | 132 ++++++++
- .../net/ethernet/microchip/sparx5/sparx5_mirror.c  |  10 +-
- .../net/ethernet/microchip/sparx5/sparx5_netdev.c  |  26 +-
- .../net/ethernet/microchip/sparx5/sparx5_packet.c  |  16 +-
- .../net/ethernet/microchip/sparx5/sparx5_port.c    |  46 +++
- drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |  13 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_qos.c |   3 +-
- .../net/ethernet/microchip/sparx5/sparx5_regs.c    |   5 +-
- .../net/ethernet/microchip/sparx5/sparx5_regs.h    |   5 +-
- .../net/ethernet/microchip/sparx5/sparx5_sdlb.c    |  10 +-
- .../ethernet/microchip/sparx5/sparx5_tc_flower.c   |   5 +
- 26 files changed, 1471 insertions(+), 85 deletions(-)
----
-base-commit: 30d9d8f6a2d7e44a9f91737dd409dbc87ac6f6b7
-change-id: 20241016-sparx5-lan969x-switch-driver-2-7cef55783938
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c b/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
+index b2a8d04ab509..1ae56194637f 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
+@@ -53,6 +53,22 @@ static u32 sparx5_target_bandwidth(struct sparx5 *sparx5)
+ 	case SPX5_TARGET_CT_7558:
+ 	case SPX5_TARGET_CT_7558TSN:
+ 		return 201000;
++	case SPX5_TARGET_CT_LAN9691VAO:
++		return 46000;
++	case SPX5_TARGET_CT_LAN9694RED:
++	case SPX5_TARGET_CT_LAN9694TSN:
++	case SPX5_TARGET_CT_LAN9694:
++		return 68000;
++	case SPX5_TARGET_CT_LAN9696RED:
++	case SPX5_TARGET_CT_LAN9696TSN:
++	case SPX5_TARGET_CT_LAN9692VAO:
++	case SPX5_TARGET_CT_LAN9696:
++		return 88000;
++	case SPX5_TARGET_CT_LAN9698RED:
++	case SPX5_TARGET_CT_LAN9698TSN:
++	case SPX5_TARGET_CT_LAN9693VAO:
++	case SPX5_TARGET_CT_LAN9698:
++		return 101000;
+ 	default:
+ 		return 0;
+ 	}
+@@ -74,6 +90,7 @@ static u32 sparx5_clk_to_bandwidth(enum sparx5_core_clockfreq cclock)
+ {
+ 	switch (cclock) {
+ 	case SPX5_CORE_CLOCK_250MHZ: return 83000; /* 250000 / 3 */
++	case SPX5_CORE_CLOCK_328MHZ: return 109375; /* 328000 / 3 */
+ 	case SPX5_CORE_CLOCK_500MHZ: return 166000; /* 500000 / 3 */
+ 	case SPX5_CORE_CLOCK_625MHZ: return  208000; /* 625000 / 3 */
+ 	default: return 0;
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+index d1e9bc030c80..f48b5769e1b3 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+@@ -475,6 +475,20 @@ static int sparx5_init_coreclock(struct sparx5 *sparx5)
+ 		else if (sparx5->coreclock == SPX5_CORE_CLOCK_250MHZ)
+ 			freq = 0; /* Not supported */
+ 		break;
++	case SPX5_TARGET_CT_LAN9694:
++	case SPX5_TARGET_CT_LAN9691VAO:
++	case SPX5_TARGET_CT_LAN9694TSN:
++	case SPX5_TARGET_CT_LAN9694RED:
++	case SPX5_TARGET_CT_LAN9696:
++	case SPX5_TARGET_CT_LAN9692VAO:
++	case SPX5_TARGET_CT_LAN9696TSN:
++	case SPX5_TARGET_CT_LAN9696RED:
++	case SPX5_TARGET_CT_LAN9698:
++	case SPX5_TARGET_CT_LAN9693VAO:
++	case SPX5_TARGET_CT_LAN9698TSN:
++	case SPX5_TARGET_CT_LAN9698RED:
++		freq = SPX5_CORE_CLOCK_328MHZ;
++		break;
+ 	default:
+ 		dev_err(sparx5->dev, "Target (%#04x) not supported\n",
+ 			sparx5->target_ct);
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+index 364ae92969bc..f117cf65cf8c 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+@@ -26,16 +26,28 @@
+ 
+ /* Target chip type */
+ enum spx5_target_chiptype {
+-	SPX5_TARGET_CT_7546    = 0x7546,  /* SparX-5-64  Enterprise */
+-	SPX5_TARGET_CT_7549    = 0x7549,  /* SparX-5-90  Enterprise */
+-	SPX5_TARGET_CT_7552    = 0x7552,  /* SparX-5-128 Enterprise */
+-	SPX5_TARGET_CT_7556    = 0x7556,  /* SparX-5-160 Enterprise */
+-	SPX5_TARGET_CT_7558    = 0x7558,  /* SparX-5-200 Enterprise */
+-	SPX5_TARGET_CT_7546TSN = 0x47546, /* SparX-5-64i Industrial */
+-	SPX5_TARGET_CT_7549TSN = 0x47549, /* SparX-5-90i Industrial */
+-	SPX5_TARGET_CT_7552TSN = 0x47552, /* SparX-5-128i Industrial */
+-	SPX5_TARGET_CT_7556TSN = 0x47556, /* SparX-5-160i Industrial */
+-	SPX5_TARGET_CT_7558TSN = 0x47558, /* SparX-5-200i Industrial */
++	SPX5_TARGET_CT_7546       = 0x7546,  /* SparX-5-64  Enterprise */
++	SPX5_TARGET_CT_7549       = 0x7549,  /* SparX-5-90  Enterprise */
++	SPX5_TARGET_CT_7552       = 0x7552,  /* SparX-5-128 Enterprise */
++	SPX5_TARGET_CT_7556       = 0x7556,  /* SparX-5-160 Enterprise */
++	SPX5_TARGET_CT_7558       = 0x7558,  /* SparX-5-200 Enterprise */
++	SPX5_TARGET_CT_7546TSN    = 0x47546, /* SparX-5-64i Industrial */
++	SPX5_TARGET_CT_7549TSN    = 0x47549, /* SparX-5-90i Industrial */
++	SPX5_TARGET_CT_7552TSN    = 0x47552, /* SparX-5-128i Industrial */
++	SPX5_TARGET_CT_7556TSN    = 0x47556, /* SparX-5-160i Industrial */
++	SPX5_TARGET_CT_7558TSN    = 0x47558, /* SparX-5-200i Industrial */
++	SPX5_TARGET_CT_LAN9694    = 0x9694,  /* lan969x-40 */
++	SPX5_TARGET_CT_LAN9691VAO = 0x9691,  /* lan969x-40-VAO */
++	SPX5_TARGET_CT_LAN9694TSN = 0x9695,  /* lan969x-40-TSN */
++	SPX5_TARGET_CT_LAN9694RED = 0x969A,  /* lan969x-40-RED */
++	SPX5_TARGET_CT_LAN9696    = 0x9696,  /* lan969x-60 */
++	SPX5_TARGET_CT_LAN9692VAO = 0x9692,  /* lan969x-65-VAO */
++	SPX5_TARGET_CT_LAN9696TSN = 0x9697,  /* lan969x-60-TSN */
++	SPX5_TARGET_CT_LAN9696RED = 0x969B,  /* lan969x-60-RED */
++	SPX5_TARGET_CT_LAN9698    = 0x9698,  /* lan969x-100 */
++	SPX5_TARGET_CT_LAN9693VAO = 0x9693,  /* lan969x-100-VAO */
++	SPX5_TARGET_CT_LAN9698TSN = 0x9699,  /* lan969x-100-TSN */
++	SPX5_TARGET_CT_LAN9698RED = 0x969C,  /* lan969x-100-RED */
+ };
+ 
+ enum sparx5_port_max_tags {
+@@ -192,6 +204,7 @@ struct sparx5_port {
+ enum sparx5_core_clockfreq {
+ 	SPX5_CORE_CLOCK_DEFAULT,  /* Defaults to the highest supported frequency */
+ 	SPX5_CORE_CLOCK_250MHZ,   /* 250MHZ core clock frequency */
++	SPX5_CORE_CLOCK_328MHZ,   /* 328MHZ core clock frequency */
+ 	SPX5_CORE_CLOCK_500MHZ,   /* 500MHZ core clock frequency */
+ 	SPX5_CORE_CLOCK_625MHZ,   /* 625MHZ core clock frequency */
+ };
+@@ -641,6 +654,8 @@ static inline u32 sparx5_clk_period(enum sparx5_core_clockfreq cclock)
+ 	switch (cclock) {
+ 	case SPX5_CORE_CLOCK_250MHZ:
+ 		return 4000;
++	case SPX5_CORE_CLOCK_328MHZ:
++		return 3048;
+ 	case SPX5_CORE_CLOCK_500MHZ:
+ 		return 2000;
+ 	case SPX5_CORE_CLOCK_625MHZ:
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c b/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c
+index 9b15e44f9e64..a511f14312f1 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c
+@@ -38,6 +38,9 @@ static u64 sparx5_ptp_get_1ppm(struct sparx5 *sparx5)
+ 	case SPX5_CORE_CLOCK_250MHZ:
+ 		res = 2301339409586;
+ 		break;
++	case SPX5_CORE_CLOCK_328MHZ:
++		res = 1756832768924;
++		break;
+ 	case SPX5_CORE_CLOCK_500MHZ:
+ 		res = 1150669704793;
+ 		break;
+@@ -60,6 +63,9 @@ static u64 sparx5_ptp_get_nominal_value(struct sparx5 *sparx5)
+ 	case SPX5_CORE_CLOCK_250MHZ:
+ 		res = 0x1FF0000000000000;
+ 		break;
++	case SPX5_CORE_CLOCK_328MHZ:
++		res = 0x18604697DD0F9B5B;
++		break;
+ 	case SPX5_CORE_CLOCK_500MHZ:
+ 		res = 0x0FF8000000000000;
+ 		break;
 
-Best regards,
 -- 
-Daniel Machon <daniel.machon@microchip.com>
+2.34.1
 
 
