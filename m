@@ -1,296 +1,194 @@
-Return-Path: <netdev+bounces-137673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBFA9A9423
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:26:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7952E9A942A
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 707841F22ADB
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 23:26:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D45D4B20F08
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 23:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCEED1FF617;
-	Mon, 21 Oct 2024 23:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DB91FF02E;
+	Mon, 21 Oct 2024 23:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TciH5guy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHnrkhqa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018111FF046
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 23:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283D31E3766;
+	Mon, 21 Oct 2024 23:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729553195; cv=none; b=VAEgT/cUEg9ARcYTC6Q1B82qtjOt795W1iR9jFsP3X+KNHu3+tSc7jv7oOz1jaeINxUf6+AbdBwHLA/XLdijtxecMgQdcFLUocIGXDVeAGKP1uUGI+nHPotAR9W9voo62Jsgpw8+u+nR4Kd4eQx+sDdI9SlAQdEde/B6fcLjdJw=
+	t=1729553342; cv=none; b=UNu707iSgTnL+Lijpil9+ciz5wLi/n/AD8UuDRWSHNfNximYpWhJ1iCaI21Z0BK0/1HZqQvnTutiXhk95h1/5Zd5VSz2+lzuq+CaGGT2pYQgtmHGDErdJ3OFbIUY8A5UMv84Sgo0zloc7N+jGlrGmX9UQSLjgG+tujb+dndlCiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729553195; c=relaxed/simple;
-	bh=t0aZDrMKR9fhSGCmN4/snndHXV50BQv4sq+97NN4zv0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aMuzVKOEctl5g1YZALQHPLFsXV2l+hGzIBvy0c9QLhuzE6Wn6YHln9r6BKSqZPKGjIMmkKB9buM5es27HP0+HyQTGePISabJ+hDqg9VR2x9VAho6pxWRaKRU+Yla1IChRVzWbfbZv/bAifiYjfCb8mbTzUMjCoqPleV0gwcT3Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TciH5guy; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729553194; x=1761089194;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=t0aZDrMKR9fhSGCmN4/snndHXV50BQv4sq+97NN4zv0=;
-  b=TciH5guyk2pokhCNV6nXo30Nl0UY5ug3JjVney0TDl4PqdUslKyf7Obs
-   JAzuaSN9nrOpMmSN0lQaVD2882T7yi+w3yFXBliPCcjiMUACGOcOmGaXQ
-   td4POo30m1bMzhPXLHnYOJRYVudE+zn1c3n2CHWWktt5P7pOnMSpC+8lu
-   8+SCkxsPbUV9vQB5xMPf93NzBuOSuh4T1BnEUb8xvx+sdmktXzlZf6SZM
-   QcQaj0YrWEV1ANHujmjL+aXeiHNobQNp614080gboQ42R+e8yAEPyhubp
-   OQQy3pge8XrOYrXGmTiTSJXmCw44qw9O8qqPWlMT/WouS+D0AHV5QtJhu
-   A==;
-X-CSE-ConnectionGUID: JZoHDU1QTNKEBcf+HZYVjg==
-X-CSE-MsgGUID: wTiZjs6NRyaDHSM5qjktLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="31927060"
-X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="31927060"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 16:26:31 -0700
-X-CSE-ConnectionGUID: JQLhjrj/RiaOlzHdHYeWnA==
-X-CSE-MsgGUID: 9oHYaSWfTnOqJ0/bw+hyYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="79761750"
-Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 16:26:31 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 21 Oct 2024 16:26:26 -0700
-Subject: [PATCH net 3/3] ice: fix crash on probe for DPLL enabled E810 LOM
+	s=arc-20240116; t=1729553342; c=relaxed/simple;
+	bh=x2H3ahgB5xIvSFbzpAzCQsUV4OlJPhvj2R6p1tI+K3U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d3P+gpF4s4MAHw7K6KPHEWFB32ruagV8b148R/yQ8vqOQ3sLXMfunV8CTTgLNUG4PDFGK60b287J+ZX9LWdJgCLjmbieOey8k1EE07lWXgciNWzAr3WXH75AyAfgiRC7csKAeSjQFQZm24gDhx9wANmxBnOpyHilNiavIrJZ/Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHnrkhqa; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71e57d89ffaso3887027b3a.1;
+        Mon, 21 Oct 2024 16:29:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729553340; x=1730158140; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b0ab/y3NIxWQ5IPwf4tlrWjgA/VWZRdS/usp1PdmtaA=;
+        b=iHnrkhqap5K634mmOogO0j3ONfofIj8H1Zg6CY7vmc35bA5Q5FmfDB7OlT3BwC5dx0
+         yYvExBpIE5OWte4BY0BwHL4DxIU2JcQX6CnMQygmW1QJAv+zC83xakHDlovIioKO0+ol
+         XwDodasG7zJbRBP7a3EO0/UC7ChV9aXLFm/Q/ksIX+EADzxCwEZAvT14m9WrNiTpJHPJ
+         lu6/MkPQJv8QwpKjHpcKpt1Sfu2e0zST4gxsXJTLxE/xB4TwlqLBd5cXUNsP+kgggf1t
+         958jFLmoKKdOUuVfWJHMKXVCuL3Wck5xaR1K9wV3ySs+ejeVhDy/TQ7zwYdt3Z+29jnT
+         oUbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729553340; x=1730158140;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b0ab/y3NIxWQ5IPwf4tlrWjgA/VWZRdS/usp1PdmtaA=;
+        b=VLG1pjUbMBVaX1Akq7Hp/Y5wz4V7UcDCpIZ119jpfgE2ZdxPnHvFojtfumEP4kIbGH
+         cUQDzreyYkvnisT8BWoYgWzp4d9kB+Lye3TiZ+LaaYi0kbG4u/HoRsrcH3X7NWyfjgvR
+         lH/4ECIwWD5vIgQDsHAVB4J9oougHEA97Sqpz6pgk/q5QVsioe50H0I6XH6l01Xis3xZ
+         j7Lf0eFhKxyrCqATG0c88G+1r1R9SV0nSmQXRF3nzDV1ospz6Ao4dSwLrRl19w0Je1Pj
+         CcqwRdk8Hzhywp2k289sIhw9fWHVoLVDoU95QxWncs7NUfoJe/L3b4sRLL0unG7SlNx5
+         FJMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYZGOHTsIkyMkc/Ht40QHVeXmMPrWXBcK5TGbRcXcf3zmMuTUyXcf7tAkfzkG3UvM3eCYpSiks+BjaLlKO@vger.kernel.org, AJvYcCVxvZ/8cLLLru0tHcs52qHUKO/ppxGI/eIbr2CJLGwhj3o5kzNAFS+H0XZVwfqjjpGd9eg=@vger.kernel.org, AJvYcCWuM8s4qDk+ZLfJO7dIX8zkxxyk7MqX/G5bEoHArLlRklQeRqFA5gS5iQQwD4MesL94faWVkD5a@vger.kernel.org, AJvYcCX6fk1U/ZPewCJ7rlevci7cEhSnJtfwLAjvEfHyIhtzqzJHJPnfyeoe+RVqAdJ/onRLqTdlbjdZ651hkdPV@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhPVSX6MiEBBrOcAWtvywYj/2UmTa9wGfJMfmpMLCWQ62qP6iU
+	c7nppeMrm/4GBJP/uWagxUqwfrIGyjFZYOR6c7RqPyNdXK1yarc5FqYr64CyAQQjN7p+4WSic0H
+	LQMTcstJWsfLPuWuATyaSwKdIBQc=
+X-Google-Smtp-Source: AGHT+IE+UiBdod8YrP4CWXmEaQOA8OoWyHHG8IWleRCcBhZxXsjPZXGjvcba7orZTZIub5J+BX3UYq9GPtRAU8ZvLAE=
+X-Received: by 2002:a05:6a00:9282:b0:71e:587d:f268 with SMTP id
+ d2e1a72fcca58-71edbbc153bmr2117649b3a.4.1729553340212; Mon, 21 Oct 2024
+ 16:29:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-3-a50cb3059f55@intel.com>
-References: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-0-a50cb3059f55@intel.com>
-In-Reply-To: <20241021-iwl-2024-10-21-iwl-net-fixes-v1-0-a50cb3059f55@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jeff Garzik <jgarzik@redhat.com>, 
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
- Piotr Raczynski <piotr.raczynski@intel.com>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Milena Olech <milena.olech@intel.com>, 
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
- Michal Michalik <michal.michalik@intel.com>, 
- netdev <netdev@vger.kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, 
- Karol Kolacinski <karol.kolacinski@intel.com>, 
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-X-Mailer: b4 0.14.1
+References: <20241021122112.101513-1-puranjay@kernel.org> <20241021122112.101513-5-puranjay@kernel.org>
+In-Reply-To: <20241021122112.101513-5-puranjay@kernel.org>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 21 Oct 2024 16:28:47 -0700
+Message-ID: <CAEf4BzY1LgCF1VOoAQkMdDTx87C0mfyftMvhvVU4GpsFc6fw5g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 4/5] selftests/bpf: Add benchmark for
+ bpf_csum_diff() helper
+To: Puranjay Mohan <puranjay@kernel.org>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, 
+	Helge Deller <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Puranjay Mohan <puranjay12@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Yonghong Song <yonghong.song@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+On Mon, Oct 21, 2024 at 5:22=E2=80=AFAM Puranjay Mohan <puranjay@kernel.org=
+> wrote:
+>
+> Add a microbenchmark for bpf_csum_diff() helper. This benchmark works by
+> filling a 4KB buffer with random data and calculating the internet
+> checksum on different parts of this buffer using bpf_csum_diff().
+>
+> Example run using ./benchs/run_bench_csum_diff.sh on x86_64:
+>
+> [bpf]$ ./benchs/run_bench_csum_diff.sh
+> 4                    2.296 =C2=B1 0.066M/s (drops 0.000 =C2=B1 0.000M/s)
+> 8                    2.320 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000M/s)
+> 16                   2.315 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+> 20                   2.318 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+> 32                   2.308 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000M/s)
+> 40                   2.300 =C2=B1 0.029M/s (drops 0.000 =C2=B1 0.000M/s)
+> 64                   2.286 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+> 128                  2.250 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+> 256                  2.173 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+> 512                  2.023 =C2=B1 0.055M/s (drops 0.000 =C2=B1 0.000M/s)
 
-The E810 Lan On Motherboard (LOM) design is vendor specific. Intel
-provides the reference design, but it is up to vendor on the final
-product design. For some cases, like Linux DPLL support, the static
-values defined in the driver does not reflect the actual LOM design.
-Current implementation of dpll pins is causing the crash on probe
-of the ice driver for such DPLL enabled E810 LOM designs:
+you are not benchmarking bpf_csum_diff(), you are benchmarking how
+often you can call bpf_prog_test_run(). Add some batching on the BPF
+side, these numbers tell you that there is no difference between
+calculating checksum for 4 bytes and for 512, that didn't seem strange
+to you?
 
-WARNING: (...) at drivers/dpll/dpll_core.c:495 dpll_pin_get+0x2c4/0x330
-...
-Call Trace:
- <TASK>
- ? __warn+0x83/0x130
- ? dpll_pin_get+0x2c4/0x330
- ? report_bug+0x1b7/0x1d0
- ? handle_bug+0x42/0x70
- ? exc_invalid_op+0x18/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? dpll_pin_get+0x117/0x330
- ? dpll_pin_get+0x2c4/0x330
- ? dpll_pin_get+0x117/0x330
- ice_dpll_get_pins.isra.0+0x52/0xe0 [ice]
-...
+pw-bot: cr
 
-The number of dpll pins enabled by LOM vendor is greater than expected
-and defined in the driver for Intel designed NICs, which causes the crash.
+>
+> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
+> ---
+>  tools/testing/selftests/bpf/Makefile          |   2 +
+>  tools/testing/selftests/bpf/bench.c           |   4 +
+>  .../selftests/bpf/benchs/bench_csum_diff.c    | 164 ++++++++++++++++++
+>  .../bpf/benchs/run_bench_csum_diff.sh         |  10 ++
+>  .../selftests/bpf/progs/csum_diff_bench.c     |  25 +++
+>  5 files changed, 205 insertions(+)
+>  create mode 100644 tools/testing/selftests/bpf/benchs/bench_csum_diff.c
+>  create mode 100755 tools/testing/selftests/bpf/benchs/run_bench_csum_dif=
+f.sh
+>  create mode 100644 tools/testing/selftests/bpf/progs/csum_diff_bench.c
+>
 
-Prevent the crash and allow generic pin initialization within Linux DPLL
-subsystem for DPLL enabled E810 LOM designs.
+[...]
 
-Newly designed solution for described issue will be based on "per HW
-design" pin initialization. It requires pin information dynamically
-acquired from the firmware and is already in progress, planned for
-next-tree only.
+> +
+> +static void csum_diff_setup(void)
+> +{
+> +       int err;
+> +       char *buff;
+> +       size_t i, sz;
+> +
+> +       sz =3D sizeof(ctx.skel->rodata->buff);
+> +
+> +       setup_libbpf();
+> +
+> +       ctx.skel =3D csum_diff_bench__open();
+> +       if (!ctx.skel) {
+> +               fprintf(stderr, "failed to open skeleton\n");
+> +               exit(1);
+> +       }
+> +
+> +       srandom(time(NULL));
+> +       buff =3D ctx.skel->rodata->buff;
+> +
+> +       /*
+> +        * Set first 8 bytes of buffer to 0xdeadbeefdeadbeef, this is lat=
+er used to verify the
+> +        * correctness of the helper by comparing the checksum result for=
+ 0xdeadbeefdeadbeef that
+> +        * should be 0x3b3b
+> +        */
+> +
+> +       *(u64 *)buff =3D 0xdeadbeefdeadbeef;
+> +
+> +       for (i =3D 8; i < sz; i++)
+> +               buff[i] =3D '1' + random() % 9;
 
-Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
-Reviewed-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  1 +
- drivers/net/ethernet/intel/ice/ice_dpll.c   | 70 +++++++++++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 21 ++++++++-
- 3 files changed, 90 insertions(+), 2 deletions(-)
+so, you only generate 9 different values for bytes, why? Why not full
+byte range?
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 0852a34ade91..6cedc1a906af 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -404,6 +404,7 @@ int ice_read_sma_ctrl_e810t(struct ice_hw *hw, u8 *data);
- int ice_write_sma_ctrl_e810t(struct ice_hw *hw, u8 data);
- int ice_read_pca9575_reg_e810t(struct ice_hw *hw, u8 offset, u8 *data);
- bool ice_is_pca9575_present(struct ice_hw *hw);
-+int ice_cgu_get_num_pins(struct ice_hw *hw, bool input);
- enum dpll_pin_type ice_cgu_get_pin_type(struct ice_hw *hw, u8 pin, bool input);
- struct dpll_pin_frequency *
- ice_cgu_get_pin_freq_supp(struct ice_hw *hw, u8 pin, bool input, u8 *num);
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 74c0e7319a4c..d5ad6d84007c 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -10,6 +10,7 @@
- #define ICE_DPLL_PIN_IDX_INVALID		0xff
- #define ICE_DPLL_RCLK_NUM_PER_PF		1
- #define ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT	25
-+#define ICE_DPLL_PIN_GEN_RCLK_FREQ		1953125
- 
- /**
-  * enum ice_dpll_pin_type - enumerate ice pin types:
-@@ -2063,6 +2064,73 @@ static int ice_dpll_init_worker(struct ice_pf *pf)
- 	return 0;
- }
- 
-+/**
-+ * ice_dpll_init_info_pins_generic - initializes generic pins info
-+ * @pf: board private structure
-+ * @input: if input pins initialized
-+ *
-+ * Init information for generic pins, cache them in PF's pins structures.
-+ *
-+ * Return:
-+ * * 0 - success
-+ * * negative - init failure reason
-+ */
-+static int ice_dpll_init_info_pins_generic(struct ice_pf *pf, bool input)
-+{
-+	struct ice_dpll *de = &pf->dplls.eec, *dp = &pf->dplls.pps;
-+	static const char labels[][sizeof("99")] = {
-+		"0", "1", "2", "3", "4", "5", "6", "7", "8",
-+		"9", "10", "11", "12", "13", "14", "15" };
-+	u32 cap = DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
-+	enum ice_dpll_pin_type pin_type;
-+	int i, pin_num, ret = -EINVAL;
-+	struct ice_dpll_pin *pins;
-+	u32 phase_adj_max;
-+
-+	if (input) {
-+		pin_num = pf->dplls.num_inputs;
-+		pins = pf->dplls.inputs;
-+		phase_adj_max = pf->dplls.input_phase_adj_max;
-+		pin_type = ICE_DPLL_PIN_TYPE_INPUT;
-+		cap |= DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE;
-+	} else {
-+		pin_num = pf->dplls.num_outputs;
-+		pins = pf->dplls.outputs;
-+		phase_adj_max = pf->dplls.output_phase_adj_max;
-+		pin_type = ICE_DPLL_PIN_TYPE_OUTPUT;
-+	}
-+	if (pin_num > ARRAY_SIZE(labels))
-+		return ret;
-+
-+	for (i = 0; i < pin_num; i++) {
-+		pins[i].idx = i;
-+		pins[i].prop.board_label = labels[i];
-+		pins[i].prop.phase_range.min = phase_adj_max;
-+		pins[i].prop.phase_range.max = -phase_adj_max;
-+		pins[i].prop.capabilities = cap;
-+		pins[i].pf = pf;
-+		ret = ice_dpll_pin_state_update(pf, &pins[i], pin_type, NULL);
-+		if (ret)
-+			break;
-+		if (input && pins[i].freq == ICE_DPLL_PIN_GEN_RCLK_FREQ)
-+			pins[i].prop.type = DPLL_PIN_TYPE_MUX;
-+		else
-+			pins[i].prop.type = DPLL_PIN_TYPE_EXT;
-+		if (!input)
-+			continue;
-+		ret = ice_aq_get_cgu_ref_prio(&pf->hw, de->dpll_idx, i,
-+					      &de->input_prio[i]);
-+		if (ret)
-+			break;
-+		ret = ice_aq_get_cgu_ref_prio(&pf->hw, dp->dpll_idx, i,
-+					      &dp->input_prio[i]);
-+		if (ret)
-+			break;
-+	}
-+
-+	return ret;
-+}
-+
- /**
-  * ice_dpll_init_info_direct_pins - initializes direct pins info
-  * @pf: board private structure
-@@ -2101,6 +2169,8 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 	default:
- 		return -EINVAL;
- 	}
-+	if (num_pins != ice_cgu_get_num_pins(hw, input))
-+		return ice_dpll_init_info_pins_generic(pf, input);
- 
- 	for (i = 0; i < num_pins; i++) {
- 		caps = 0;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 3a33e6b9b313..ec8db830ac73 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -34,7 +34,6 @@ static const struct ice_cgu_pin_desc ice_e810t_sfp_cgu_inputs[] = {
- 		ARRAY_SIZE(ice_cgu_pin_freq_common), ice_cgu_pin_freq_common },
- 	{ "GNSS-1PPS",	  ZL_REF4P, DPLL_PIN_TYPE_GNSS,
- 		ARRAY_SIZE(ice_cgu_pin_freq_1_hz), ice_cgu_pin_freq_1_hz },
--	{ "OCXO",	  ZL_REF4N, DPLL_PIN_TYPE_INT_OSCILLATOR, 0, },
- };
- 
- static const struct ice_cgu_pin_desc ice_e810t_qsfp_cgu_inputs[] = {
-@@ -52,7 +51,6 @@ static const struct ice_cgu_pin_desc ice_e810t_qsfp_cgu_inputs[] = {
- 		ARRAY_SIZE(ice_cgu_pin_freq_common), ice_cgu_pin_freq_common },
- 	{ "GNSS-1PPS",	  ZL_REF4P, DPLL_PIN_TYPE_GNSS,
- 		ARRAY_SIZE(ice_cgu_pin_freq_1_hz), ice_cgu_pin_freq_1_hz },
--	{ "OCXO",	  ZL_REF4N, DPLL_PIN_TYPE_INT_OSCILLATOR, },
- };
- 
- static const struct ice_cgu_pin_desc ice_e810t_sfp_cgu_outputs[] = {
-@@ -5964,6 +5962,25 @@ ice_cgu_get_pin_desc(struct ice_hw *hw, bool input, int *size)
- 	return t;
- }
- 
-+/**
-+ * ice_cgu_get_num_pins - get pin description array size
-+ * @hw: pointer to the hw struct
-+ * @input: if request is done against input or output pins
-+ *
-+ * Return: size of pin description array for given hw.
-+ */
-+int ice_cgu_get_num_pins(struct ice_hw *hw, bool input)
-+{
-+	const struct ice_cgu_pin_desc *t;
-+	int size;
-+
-+	t = ice_cgu_get_pin_desc(hw, input, &size);
-+	if (t)
-+		return size;
-+
-+	return 0;
-+}
-+
- /**
-  * ice_cgu_get_pin_type - get pin's type
-  * @hw: pointer to the hw struct
+> +
+> +       ctx.skel->rodata->buff_len =3D args.buff_len;
+> +
+> +       err =3D csum_diff_bench__load(ctx.skel);
+> +       if (err) {
+> +               fprintf(stderr, "failed to load skeleton\n");
+> +               csum_diff_bench__destroy(ctx.skel);
+> +               exit(1);
+> +       }
+> +}
+> +
 
--- 
-2.47.0.265.g4ca455297942
-
+[...]
 
