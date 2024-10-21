@@ -1,232 +1,121 @@
-Return-Path: <netdev+bounces-137435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383B79A648E
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:48:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BC9D9A64C3
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E81FF280E60
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 10:48:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3599D1F211C5
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 10:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B8C1F7062;
-	Mon, 21 Oct 2024 10:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AC21F8913;
+	Mon, 21 Oct 2024 10:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHpCrYBm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WOD5v52F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C4F1F1306;
-	Mon, 21 Oct 2024 10:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A6B1F81B5
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 10:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729507349; cv=none; b=pu0IHQwtlcbq001JidDI9tJlNkWzRqBsPrjwhwBb15Ngw5gUyS5OtxMmjRd0bv686sPlzFDtFA3N1cLsoQSwHHLHPtHdKL86kNryMKiY+HWPKd7Hu/hoJy/1W5Dofm4uKPDsDjpIKxrrFQmsCLa3hpgfkMNPBFmKu44LfMZW+Zk=
+	t=1729507475; cv=none; b=F8y2gHgKmfCNW2fBzPGc8RnV8FQtKSS8a3uEUoIUKbI36L02HZH9Ttk3Z9wKrt6ayoGL99dB/k8KParyaxDbQ3y0860hfTauktlrmq9dCCGMMuKeEKBHmAeDBt32jWeEZCZ2dYbMy8BzR9x9Vmw9oSlai0GqUfddQywRhK//brM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729507349; c=relaxed/simple;
-	bh=kk5ERdXa6RnKmIBP1ElSg2khKqiXcvPAlSRRS7M+dbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ipgh/x2AFIrVLhSZY0emJlqWngyfGPyGz1/8ujp023TK9G0zHbt8b5o9Kk7c6sl3yUB1wNNRH6KE9uJxeFzAaoMXnO7jgVs+RFxj5/N3zJgX6l4l+Xe2NQlH6Njsg6vUaUb0CK4eKTjGT/GtQfdh0DkL1eWmaGJe19s+t4871hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHpCrYBm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1E6C4CEC3;
-	Mon, 21 Oct 2024 10:42:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729507349;
-	bh=kk5ERdXa6RnKmIBP1ElSg2khKqiXcvPAlSRRS7M+dbM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uHpCrYBmW9XdrWMffJCzDEHYWeBxvvY6s19dpu4KOjnV96nbJ9LEQA8iIaF3DMMdk
-	 q69/7tTtoQ8v/Stf0ntrhyHtCTGWI/GYsE3T0bxYCdHaLi/+4MQ91glyLd+G0n+V0S
-	 oqNG0VV3QlukjMnRR6UKjR0zsymqNZSMTzRargWvoIwXFCt5GZRGs+Rh5Cv9em95RI
-	 1+aTLBal3slzWx8JlqXMh+5OLD2Dgr9+DAxDNoBpYi3bW3hOn0WxLh4vWP1PRHYT/f
-	 PZvaLB7TTVS533qkxP0MSN+YzQDZUv65Njjm9B7WqkER8ewOUdweKLWSYDLr6lE7l6
-	 Q+2gaOIyvUsIg==
-Date: Mon, 21 Oct 2024 11:42:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] net: dsa: vsc73xx: implement packet
- reception via control interface
-Message-ID: <20241021104224.GE402847@kernel.org>
-References: <20241020205452.2660042-1-paweldembicki@gmail.com>
- <20241020205452.2660042-2-paweldembicki@gmail.com>
+	s=arc-20240116; t=1729507475; c=relaxed/simple;
+	bh=QszUSC+eDikLq/z2gASxiOYZierjrRupuXUewlv1aoA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fS03F3DFhQDFBl3fJGJeSnJCMbCRLhI6dOJenaNP/Ds+Q4K+GSMEOkaAvNYelpiiDG24CFAiPO78MM+gOV/R9fypIJaSVvGtgdC8j0lGove3Gox64HQhpGP+vhe06XESqWi0Rz7aHAamvbXJQxz0OCgFw3sUvSgzLu/0oJ51RsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WOD5v52F; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729507471;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ESVSTYYZIF0hJLrudzMovh5iFWIQNUs6HLNbYhgpPLs=;
+	b=WOD5v52FaTR+5/VQVjJ7ldayZ2sCfn+cIhbFLeZRjAut1WEzX9ghu0Y2VWdVY3PzrT1Gdv
+	1tsFdddnHe7Ml4tRpRBZiEy6RJkLB8X96cCN2DuUQQfZxY7cfBUYViXLiSTGBGcdIyQTtt
+	HvXTVC9XtxqZz6IhWEID7g6zwNXVdmI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-147-5CyeM0XnNbqibtFON5gnYQ-1; Mon, 21 Oct 2024 06:44:30 -0400
+X-MC-Unique: 5CyeM0XnNbqibtFON5gnYQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d504759d0so2690229f8f.0
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 03:44:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729507469; x=1730112269;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ESVSTYYZIF0hJLrudzMovh5iFWIQNUs6HLNbYhgpPLs=;
+        b=Q7Nj3MfkQn5Wyyg2cA8mvrKg+M7SwM6p2VTh9i7jHQPB5akZKTpFsA4J7BhD0qRrzC
+         r7uBor0qR2NjCXwjVYNKu5e8Qo4FtlcuZNQw7087ldM8vfVSVqW4/0Y6zTiqEEpooVi7
+         vJsqNJavttgeItdy8BUXnQwxltptZ20YSR1WjIyjfo6BbzCBWZjviOfxS132jdRBA7Ra
+         Pgeu8uYJwqfany1y4irvp8yeUxs4Lv/IwPc7BVvWP6IS0l8JKVSVHnyYwtXG47VhWhAt
+         b4a5nN7n5FqPbx8CfY6oljW6yZWx6IxGFOyg2bbaq6Lt9pyAsL7ACiUuyxRNpleNvJ8a
+         ewEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVB5CgafAIJz1x82xbIwbll55qej4E0+PLcakxjDk8QFMIuQ5xSPmmG1lwKELSRtFf8AgIH7OA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrGYrtChSY1J1nL0OaMNS3zyB7sXqgVF4ZqyzQ9e1EBdiiuowf
+	FxfqbucBkrd+poIsfavl8oZaXrUm41XC98jD2qqFktshbEF7im7ZTceZDdwWyTdIWpT3UUZ/fky
+	QsEt5ib3BZQb4KDN+QqF09QDIYcVaF2jTW8SFVQ74onVA0ZaBEmQPduJ4FcC1s3eV
+X-Received: by 2002:adf:e005:0:b0:37d:5042:c8de with SMTP id ffacd0b85a97d-37ea21d960cmr9407828f8f.22.1729507469424;
+        Mon, 21 Oct 2024 03:44:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEjJ5g1Du8OWB8p2Bdce9qpXw/gQOJX9TgsNNH+Knj/WJjb8z0dN/BAeiBh4kBOoGsx2V9lw==
+X-Received: by 2002:adf:e005:0:b0:37d:5042:c8de with SMTP id ffacd0b85a97d-37ea21d960cmr9407810f8f.22.1729507469018;
+        Mon, 21 Oct 2024 03:44:29 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a37b07sm4049451f8f.1.2024.10.21.03.44.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 03:44:28 -0700 (PDT)
+Message-ID: <c6e8f053-32bb-4ebd-871b-af416d0b0531@redhat.com>
+Date: Mon, 21 Oct 2024 12:44:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241020205452.2660042-2-paweldembicki@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 07/10] net: ip: make ip_route_input_noref()
+ return drop reasons
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ dsahern@kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+ roopa@nvidia.com, razor@blackwall.org, gnault@redhat.com,
+ bigeasy@linutronix.de, idosch@nvidia.com, ast@kernel.org,
+ dongml2@chinatelecom.cn, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev, bpf@vger.kernel.org
+References: <20241015140800.159466-1-dongml2@chinatelecom.cn>
+ <20241015140800.159466-8-dongml2@chinatelecom.cn>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241015140800.159466-8-dongml2@chinatelecom.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Oct 20, 2024 at 10:54:51PM +0200, Pawel Dembicki wrote:
-> Some types of packets can be forwarded only to and from the PI/SI
-> interface. For more information, see Chapter 2.7.1 (CPU Forwarding) in
-> the datasheet.
-> 
-> This patch implements the routines required for link-local reception.
-> This kind of traffic can't be transferred through the RGMII interface in
-> vsc73xx.
-> 
-> The packet receiver poller uses a kthread worker, which checks if a packet
-> has arrived in the CPU buffer. If the header is valid, the packet is
-> transferred to the correct DSA conduit interface.
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+On 10/15/24 16:07, Menglong Dong wrote:
+> diff --git a/net/core/lwt_bpf.c b/net/core/lwt_bpf.c
+> index e0ca24a58810..a4652f2a103a 100644
+> --- a/net/core/lwt_bpf.c
+> +++ b/net/core/lwt_bpf.c
+> @@ -98,6 +98,7 @@ static int bpf_lwt_input_reroute(struct sk_buff *skb)
+>  		skb_dst_drop(skb);
+>  		err = ip_route_input_noref(skb, iph->daddr, iph->saddr,
+>  					   ip4h_dscp(iph), dev);
+> +		err = err ? -EINVAL : 0;
 
-Hi Pawel,
+Please introduce and use a drop_reason variable here instead of 'err',
+to make it clear the type conversion.
 
-This is not a full review, but I noticed a problem that I wanted to bring
-to your attention. Please wait a day or so for others to provide a proper
-review before posting a v2.
+Thanks,
 
-Thanks!
+Paolo
 
-> ---
->  drivers/net/dsa/vitesse-vsc73xx-core.c | 174 +++++++++++++++++++++++++
->  drivers/net/dsa/vitesse-vsc73xx.h      |   4 +
->  2 files changed, 178 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-
-...
-
-> @@ -373,6 +415,7 @@
->  #define VSC73XX_POLL_SLEEP_US		1000
->  #define VSC73XX_MDIO_POLL_SLEEP_US	5
->  #define VSC73XX_POLL_TIMEOUT_US		10000
-> +#define VSC73XX_RCV_POLL_INTERVAL	100
->  
->  #define VSC73XX_IFH_MAGIC		0x52
->  #define VSC73XX_IFH_SIZE		8
-> @@ -834,6 +877,115 @@ static void vsc73xx_deferred_xmit(struct kthread_work *work)
->  	kfree(xmit_work);
->  }
->  
-> +static void vsc73xx_polled_rcv(struct kthread_work *work)
-> +{
-> +	struct vsc73xx *vsc = container_of(work, struct vsc73xx, dwork.work);
-> +	u16 ptr = VSC73XX_CAPT_FRAME_DATA;
-> +	struct dsa_switch *ds = vsc->ds;
-> +	int ret, buf_len, len, part;
-> +	struct vsc73xx_ifh ifh;
-> +	struct net_device *dev;
-> +	struct dsa_port *dp;
-> +	struct sk_buff *skb;
-> +	u32 val, *buf;
-> +	u16 count;
-> +
-> +	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_CAPCTRL, &val);
-> +	if (ret)
-> +		goto queue;
-> +
-> +	if (!(val & VSC73XX_CAPCTRL_QUEUE0_READY))
-> +		/* No frame to read */
-> +		goto queue;
-> +
-> +	/* Initialise reading */
-> +	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE, VSC73XX_BLOCK_CAPT_Q0,
-> +			   VSC73XX_CAPT_CAPREADP, &val);
-> +	if (ret)
-> +		goto queue;
-> +
-> +	/* Get internal frame header */
-> +	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
-> +			   VSC73XX_BLOCK_CAPT_FRAME0, ptr++, &ifh.datah);
-> +	if (ret)
-> +		goto queue;
-> +
-> +	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
-> +			   VSC73XX_BLOCK_CAPT_FRAME0, ptr++, &ifh.datal);
-> +	if (ret)
-> +		goto queue;
-> +
-> +	if (ifh.magic != VSC73XX_IFH_MAGIC) {
-> +		/* Something goes wrong with buffer. Reset capture block */
-> +		vsc73xx_write(vsc, VSC73XX_BLOCK_CAPTURE,
-> +			      VSC73XX_BLOCK_CAPT_RST, VSC73XX_CAPT_CAPRST, 1);
-> +		goto queue;
-> +	}
-> +
-> +	if (!dsa_is_user_port(ds, ifh.port))
-> +		goto release_frame;
-> +
-> +	dp = dsa_to_port(ds, ifh.port);
-> +	dev = dp->user;
-> +	if (!dev)
-> +		goto release_frame;
-> +
-> +	count = (ifh.frame_length + 7 + VSC73XX_IFH_SIZE - ETH_FCS_LEN) >> 2;
-> +
-> +	skb = netdev_alloc_skb(dev, len);
-
-len does not appear to be initialised here.
-
-Flagged by W=1 builds.
-
-> +	if (unlikely(!skb)) {
-> +		netdev_err(dev, "Unable to allocate sk_buff\n");
-> +		goto release_frame;
-> +	}
-> +
-> +	buf_len = ifh.frame_length - ETH_FCS_LEN;
-> +	buf = (u32 *)skb_put(skb, buf_len);
-> +	len = 0;
-> +	part = 0;
-> +
-> +	while (ptr < count) {
-> +		ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
-> +				   VSC73XX_BLOCK_CAPT_FRAME0 + part, ptr++,
-> +				   buf + len);
-> +		if (ret)
-> +			goto free_skb;
-> +		len++;
-> +		if (ptr > VSC73XX_CAPT_FRAME_DATA_MAX &&
-> +		    count != VSC73XX_CAPT_FRAME_DATA_MAX) {
-> +			ptr = VSC73XX_CAPT_FRAME_DATA;
-> +			part++;
-> +			count -= VSC73XX_CAPT_FRAME_DATA_MAX;
-> +		}
-> +	}
-> +
-> +	/* Get FCS */
-> +	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_CAPTURE,
-> +			   VSC73XX_BLOCK_CAPT_FRAME0, ptr++, &val);
-> +	if (ret)
-> +		goto free_skb;
-> +
-> +	/* Everything we see on an interface that is in the HW bridge
-> +	 * has already been forwarded.
-> +	 */
-> +	if (dp->bridge)
-> +		skb->offload_fwd_mark = 1;
-> +
-> +	skb->protocol = eth_type_trans(skb, dev);
-> +
-> +	netif_rx(skb);
-> +	goto release_frame;
-> +
-> +free_skb:
-> +	kfree_skb(skb);
-> +release_frame:
-> +	/* Release the frame from internal buffer */
-> +	vsc73xx_write(vsc, VSC73XX_BLOCK_CAPTURE, VSC73XX_BLOCK_CAPT_Q0,
-> +		      VSC73XX_CAPT_CAPREADP, 0);
-> +queue:
-> +	kthread_queue_delayed_work(vsc->rcv_worker, &vsc->dwork,
-> +				   msecs_to_jiffies(VSC73XX_RCV_POLL_INTERVAL));
-> +}
-
-...
-
--- 
-pw-bot: changes-requested
 
