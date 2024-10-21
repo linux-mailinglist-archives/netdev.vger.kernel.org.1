@@ -1,205 +1,192 @@
-Return-Path: <netdev+bounces-137368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2919A59B1
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:20:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F519A59D4
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 023ACB21A79
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 05:20:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6647B22B24
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 05:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E51F156C63;
-	Mon, 21 Oct 2024 05:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FC31946C9;
+	Mon, 21 Oct 2024 05:42:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NhcC6fQZ"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Jbs5GuSg";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/penghOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C7B192B79
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 05:20:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7912209B;
+	Mon, 21 Oct 2024 05:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729488049; cv=none; b=l5Jt5RyP/1rgUy90BGPuC5jjoZqPCrgl1EuOQLNVTTJA04c8p77KKZ6bvLmId6lZhSi1+v387KaLFuHIM3TWuxuxOQYplimHB0wZ1IKctDZdJ9yEWd5smCH7/9xd378ZwqmbXzkB16u57CGjaFO0T24o2Xe9YvAPs3yFdyfjLO8=
+	t=1729489335; cv=none; b=sanElxSxAep278Y+3i5KeFoUldVxEG5Y9wb6J458T1fsSx4r27pDRK8E+wtjIFuC7zPOSDryGUuJtXLiHuVFzzvZUyU3Wh4d2pZpPqfKn5v67ledxYNxm3AL6DZViL8vIfkQZz2AeB8ok6RX5FIJlHBZfRe4uatYc4L4oDw+klc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729488049; c=relaxed/simple;
-	bh=SlySsxs0PeqXFlnOM9toTTm/y5eLSftJ+IY7NhLmb/Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AD+EoIiaHixNqykR9pupKhaWI1kPjJeacrDunQVQ5EkjuGsmq2V/sz56II+Bs+V5v2hFEQ4E06Ygf3ghm7Io4ri/fVWsV/nmUk3hroaNsjU0vgxam/Kd0oXyc0lsMogOviFCV3PjYopYNRNus+v+M6PTDlnmGVT4NmI4ugnEO2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NhcC6fQZ; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729488048; x=1761024048;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TAb7n2c6VPnHQXZYngRL94UCUlpjV3XmVg7OEIVa4bY=;
-  b=NhcC6fQZRy3UuP+OPMjVhHLTcShwYRuwJJ6/pq6+0ki55K1RibLSSuxf
-   PeqcIVg/l8HtbnWT79hNnBmRjOFq74L7bzVj3gAkSWdMsId5j/xiKIBrd
-   +v3PHE4+HoB/7ROVelWKOjHxiOcpPhEOdgyovHtuOsb7uXCM3bybUr9Ep
-   g=;
-X-IronPort-AV: E=Sophos;i="6.11,220,1725321600"; 
-   d="scan'208";a="433170489"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 05:20:46 +0000
-Received: from EX19MTAUEA002.ant.amazon.com [10.0.0.204:29853]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.51.223:2525] with esmtp (Farcaster)
- id 3d5b3624-778a-4698-9b9e-47d32b67e28e; Mon, 21 Oct 2024 05:20:45 +0000 (UTC)
-X-Farcaster-Flow-ID: 3d5b3624-778a-4698-9b9e-47d32b67e28e
-Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEA002.ant.amazon.com (10.252.134.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 21 Oct 2024 05:20:42 +0000
-Received: from EX19MTAUEB002.ant.amazon.com (10.252.135.47) by
- EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 21 Oct 2024 05:20:42 +0000
-Received: from email-imr-corp-prod-pdx-all-2c-d1311ce8.us-west-2.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.135.97) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Mon, 21 Oct 2024 05:20:42 +0000
-Received: from HFA15-G9FV5D3.amazon.com (unknown [10.85.143.175])
-	by email-imr-corp-prod-pdx-all-2c-d1311ce8.us-west-2.amazon.com (Postfix) with ESMTP id 4B559404EA;
-	Mon, 21 Oct 2024 05:20:36 +0000 (UTC)
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>
-Subject: [PATCH v1 net-next 3/3] net: ena: Add PHC documentation
-Date: Mon, 21 Oct 2024 08:20:11 +0300
-Message-ID: <20241021052011.591-4-darinzon@amazon.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241021052011.591-1-darinzon@amazon.com>
-References: <20241021052011.591-1-darinzon@amazon.com>
+	s=arc-20240116; t=1729489335; c=relaxed/simple;
+	bh=nqU2AdQPtpXBQBywDKE615SxVcwqLzweuXJzCTdK2Wc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=H6TTNkPLOp6hAPAtckKT9hsTiQDgm/VQtBHd3irsLNODF4ynrcHDNhMWG+yjbpgjhNU9RHb9KwD8bv5qHMpfXQpjwWsdvG+Rer7FeqKe2p3loCXdjvilrXng2hFItIBcsOdlODLZE+1pErU85txff6+cjWhrrxDbgcmNc2CSbRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Jbs5GuSg; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/penghOD; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1729489324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IwN2APzuoMR+7fgmrER77l2eiOhN6doSytLMUFLsLt4=;
+	b=Jbs5GuSgoz06Yo6+KGN33AGlwU6bVgUJfxbq4ZyoTWGHQHxTJPHtRbfcDi31UU7CBUFGX5
+	AWhXWkF2ii5GnuIRehHb8djQEXETXZQEQez9hU3zVJIAi//Qi1nqqNjMoSWaD32/vDIly2
+	sMm4YmzsMNUPvHUzUxgXxTNCwgC5EEDpW2oIefWHHcDa0HwLaH7VQlxRUcHGthr0p4EGIH
+	DdDdpZkbwkFJ1OcNV6OLq8vdud/oiawaxlWvPSTImEudNlqZ6RmQYwqWHHJ8ZiMInKmUgr
+	Wppd4iKQ0wrpyKcCKAgw4ORLQ+pzC6kYy4jVaBb71VP/xAyd7UGazAan14tCTw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1729489324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IwN2APzuoMR+7fgmrER77l2eiOhN6doSytLMUFLsLt4=;
+	b=/penghODChhNiRRbiTNwutaWjk3kpVXgV5wGXUvxA8y0WgJlfcblrQay4QSk/3pGM/X9il
+	piF30ZLsitnXklAw==
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, vinicius.gomes@intel.com, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, "moderated
+ list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
+ <linux-kernel@vger.kernel.org>, "open list:XDP (eXpress Data Path)"
+ <bpf@vger.kernel.org>
+Subject: Re: [RFC net-next v2 2/2] igc: Link queues to NAPI instances
+In-Reply-To: <ZxKVI_DvFWBvRMaf@LQ3V64L9R2>
+References: <20241014213012.187976-1-jdamato@fastly.com>
+ <20241014213012.187976-3-jdamato@fastly.com>
+ <87h69d3bm2.fsf@kurt.kurt.home> <ZxKVI_DvFWBvRMaf@LQ3V64L9R2>
+Date: Mon, 21 Oct 2024 07:42:02 +0200
+Message-ID: <87o73e2es5.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
 Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Provide the relevant information and guidelines
-about the feature support in the ENA driver.
+On Fri Oct 18 2024, Joe Damato wrote:
+> On Tue, Oct 15, 2024 at 12:27:01PM +0200, Kurt Kanzenbach wrote:
+>> On Mon Oct 14 2024, Joe Damato wrote:
+>
+> [...]
+>
+>> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/e=
+thernet/intel/igc/igc_main.c
+>> > index 7964bbedb16c..59c00acfa0ed 100644
+>> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
+>> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+>> > @@ -4948,6 +4948,47 @@ static int igc_sw_init(struct igc_adapter *adap=
+ter)
+>> >  	return 0;
+>> >  }
+>> >=20=20
+>> > +void igc_set_queue_napi(struct igc_adapter *adapter, int q_idx,
+>> > +			struct napi_struct *napi)
+>> > +{
+>> > +	if (adapter->flags & IGC_FLAG_QUEUE_PAIRS) {
+>> > +		netif_queue_set_napi(adapter->netdev, q_idx,
+>> > +				     NETDEV_QUEUE_TYPE_RX, napi);
+>> > +		netif_queue_set_napi(adapter->netdev, q_idx,
+>> > +				     NETDEV_QUEUE_TYPE_TX, napi);
+>> > +	} else {
+>> > +		if (q_idx < adapter->num_rx_queues) {
+>> > +			netif_queue_set_napi(adapter->netdev, q_idx,
+>> > +					     NETDEV_QUEUE_TYPE_RX, napi);
+>> > +		} else {
+>> > +			q_idx -=3D adapter->num_rx_queues;
+>> > +			netif_queue_set_napi(adapter->netdev, q_idx,
+>> > +					     NETDEV_QUEUE_TYPE_TX, napi);
+>> > +		}
+>> > +	}
+>> > +}
+>>=20
+>> In addition, to what Vinicius said. I think this can be done
+>> simpler. Something like this?
+>>=20
+>> void igc_set_queue_napi(struct igc_adapter *adapter, int vector,
+>> 			struct napi_struct *napi)
+>> {
+>> 	struct igc_q_vector *q_vector =3D adapter->q_vector[vector];
+>>=20
+>> 	if (q_vector->rx.ring)
+>> 		netif_queue_set_napi(adapter->netdev, vector, NETDEV_QUEUE_TYPE_RX, na=
+pi);
+>>=20
+>> 	if (q_vector->tx.ring)
+>> 		netif_queue_set_napi(adapter->netdev, vector, NETDEV_QUEUE_TYPE_TX, na=
+pi);
+>> }
+>
+> I tried this suggestion but this does not result in correct output
+> in the case where IGC_FLAG_QUEUE_PAIRS is disabled.
+>
+> The output from netlink:
+>
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                              --dump queue-get --json=3D'{"ifindex": 2}'
+>
+> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+>  {'id': 0, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 1, 'ifindex': 2, 'type': 'tx'}]
+>
+> Note the lack of a napi-id for the TX queues. This typically happens
+> when the linking is not done correctly; netif_queue_set_napi should
+> take a queue id as the second parameter.
+>
+> I believe the suggested code above should be modified to be as
+> follows to use ring->queue_index:
+>
+>   if (q_vector->rx.ring)
+>     netif_queue_set_napi(adapter->netdev,
+>                          q_vector->rx.ring->queue_index,
+>                          NETDEV_QUEUE_TYPE_RX, napi);
+>=20=20=20
+>   if (q_vector->tx.ring)
+>     netif_queue_set_napi(adapter->netdev,
+>                          q_vector->tx.ring->queue_index,
+>                          NETDEV_QUEUE_TYPE_TX, napi);
 
-Signed-off-by: Amit Bernstein <amitbern@amazon.com>
-Signed-off-by: David Arinzon <darinzon@amazon.com>
----
- .../device_drivers/ethernet/amazon/ena.rst    | 78 +++++++++++++++++++
- 1 file changed, 78 insertions(+)
+LGTM. Thanks.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 4561e8ab..9f490bb8 100644
---- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-+++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -56,6 +56,7 @@ ena_netdev.[ch]     Main Linux kernel driver.
- ena_ethtool.c       ethtool callbacks.
- ena_xdp.[ch]        XDP files
- ena_pci_id_tbl.h    Supported device IDs.
-+ena_phc.[ch]        PTP hardware clock infrastructure (see `PHC`_ for more info)
- =================   ======================================================
- 
- Management Interface:
-@@ -221,6 +222,83 @@ descriptor it was received on would be recycled. When a packet smaller
- than RX copybreak bytes is received, it is copied into a new memory
- buffer and the RX descriptor is returned to HW.
- 
-+.. _`PHC`:
-+
-+PTP Hardware Clock (PHC)
-+======================
-+.. _`ptp-userspace-api`: https://docs.kernel.org/driver-api/ptp.html#ptp-hardware-clock-user-space-api
-+.. _`testptp`: https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/ptp/testptp.c
-+
-+ENA Linux driver supports PTP hardware clock providing timestamp reference to achieve nanosecond accuracy.
-+
-+**PHC support**
-+
-+PHC depends on the PTP module, which needs to be either loaded as a module or compiled into the kernel.
-+
-+Verify if the PTP module is present:
-+
-+.. code-block:: shell
-+
-+  grep -w '^CONFIG_PTP_1588_CLOCK=[ym]' /boot/config-`uname -r`
-+
-+- If no output is provided, the ENA driver cannot be loaded with PHC support.
-+
-+- ``CONFIG_PTP_1588_CLOCK=y``: the PTP module is already compiled and loaded inside the kernel binary file.
-+
-+- ``CONFIG_PTP_1588_CLOCK=m``: the PTP module needs to be loaded prior to loading the ENA driver:
-+
-+Load PTP module:
-+
-+.. code-block:: shell
-+
-+  sudo modprobe ptp
-+
-+All available PTP clock sources can be tracked here:
-+
-+.. code-block:: shell
-+
-+  ls /sys/class/ptp
-+
-+PHC support and capabilities can be verified using ethtool:
-+
-+.. code-block:: shell
-+
-+  ethtool -T <interface>
-+
-+**PHC timestamp**
-+
-+To retrieve PHC timestamp, use `ptp-userspace-api`_, usage example using `testptp`_:
-+
-+.. code-block:: shell
-+
-+  testptp -d /dev/ptp$(ethtool -T <interface> | awk '/PTP Hardware Clock:/ {print $NF}') -k 1
-+
-+PHC get time requests should be within reasonable bounds,
-+avoid excessive utilization to ensure optimal performance and efficiency.
-+The ENA device restricts the frequency of PHC get time requests to a maximum
-+of 125 requests per second. If this limit is surpassed, the get time request
-+will fail, leading to an increment in the phc_err statistic.
-+
-+**PHC statistics**
-+
-+PHC can be monitored using :code:`ethtool -S` counters:
-+
-+=================   ======================================================
-+**phc_cnt**         Number of successful retrieved timestamps (below expire timeout).
-+**phc_exp**         Number of expired retrieved timestamps (above expire timeout).
-+**phc_skp**         Number of skipped get time attempts (during block period).
-+**phc_err**         Number of failed get time attempts (entering into block state).
-+=================   ======================================================
-+
-+PHC timeouts:
-+
-+=================   ======================================================
-+**expire**          Max time for a valid timestamp retrieval, passing this threshold will fail
-+                    the get time request and block new requests until block timeout.
-+**block**           Blocking period starts once get time request expires or fails, all get time
-+                    requests during block period will be skipped.
-+=================   ======================================================
-+
- Statistics
- ==========
- 
--- 
-2.40.1
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcV6aoTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgkotD/0X5UYHEhJgqmCt6kB/HHS4YFUODWTi
+XbRxhEARJl+qKt6TMqywibxifqVHp9hL08AWuXp5kBQWw9Sc2e6KfG6TfoIBtdM3
+7nR6+Wk/CrMZhZVKbNjEQrfmcZAdl3Sk44DPaXhfqU0jCbgj0sj3zpoZU5q8UXT0
+8E5kkrPY1a98ufweoCnYSmdvLmqUXXgHeBWyoFgOdxeN2jIY1azZrgQucmdYsgYt
+g9Lprnp3euz/7UrAJhTgxjq7/klCKC0x2Sg0xmeKoNJ0aZC5zppsBZXJrWTlZElh
+zgwiV0Vc3aEWCRIoOVudj1GjSEug6w/fJWBO6gP+5EZ1N6XfQG7MOzuW07G47ubm
+8qX7JRjVyaNZAwX1wy69KZv/NVNUuPxJrdVMxPoV7HAZtZfQl5TA6aE3aBOvkO2q
+gsSU0cR2fk4Ac2YLbKcZNwrxzg8gsnhPrdPJw0EWmCvaAIzxFnYW+lPdV0SDiHnc
+e4kXClZjVramUW4cP3B9ZJ4krrXMNYQxnVfFSR55H+LwL0vKxqNNiRd3rNTpl4CL
+HcfYg6wvKulCvJZ31QwpeovA4K5BdCDd1JH/PkHLVSdM1sUWtDE3pRRnFk+sUG+S
+T8GqcYGHs4f6Ee2bYhHTFN5hOGRmcD+gM/9vdjAGqE4teIS/RhZDe7IoN0A/4gwP
+2wWE6IMegLnsZQ==
+=LURd
+-----END PGP SIGNATURE-----
+--=-=-=--
 
