@@ -1,150 +1,250 @@
-Return-Path: <netdev+bounces-137542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BCF9A6DD6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:15:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E60949A6DFC
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:21:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39440280BE2
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:15:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11A4282B78
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBA71FBC81;
-	Mon, 21 Oct 2024 15:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6dBmo4B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CC9126BF7;
+	Mon, 21 Oct 2024 15:21:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A681C1F9EA4;
-	Mon, 21 Oct 2024 15:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284EE7FBC2;
+	Mon, 21 Oct 2024 15:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729523680; cv=none; b=EqRvD+u7/Et8DDcQNEKZdgh74vbtymbOPAfemlALvI9x64UrPYGkekp8QY9XIGRpOX5mDya8TO8EIWxJHvOpRy8pfUcB3YETWUCImae+npoKOJ962JZjMrh6Gm4XjkL+Yvu7faa7qaQpnm34/p/JPBPLMZCs29gfBk2BDjMxIWE=
+	t=1729524105; cv=none; b=BoHlg/UKhxFI7DZuTvo30tPsBMn0IxWd9Aak96rCSpaalkNKVL5sjv0yk6FPPXuSgoheu5a2uqaKrcYXzcEC4bJCZnyqTZ98pz1jaknwDbFlEwuyGpUjTKHslU9uZzoEWQpUEPEqBU2CVc6w0z8Vy9xlpa77PGfXvQsMACuVyp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729523680; c=relaxed/simple;
-	bh=4sqNqcl6enA2uep5yPbqNRkltc0niKW2hhqA/FLbO5s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=U80xk8svMVm76zPkjC5wRCxGTdsccJR4IlzMwHec0h04wd++K4oKzmVj04/Ha2omHQg1+2KqGtMTph9NXdU6rkPQsS8JBgrDvb0sREiHcE86ygz8bvY7FxGHJgbMpcpMrme55ahOL21l1h4fMcFkBb/cUPNpMZK2xSNCkyt7pAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6dBmo4B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C6FC4CEE6;
-	Mon, 21 Oct 2024 15:14:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729523680;
-	bh=4sqNqcl6enA2uep5yPbqNRkltc0niKW2hhqA/FLbO5s=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=H6dBmo4Bul+vk/CYUyLi43MWU4cp9Ypmuvx6iBWBdhcgBtV392XpeR1MX6qXFtJOb
-	 oyChvjaLNC/fMTa3CJwzSolCXx7skGo/RfJPst8dASmnVWpaIb6Yl46Qi9xgb1O7Gb
-	 47oSYZi6WgrxEZOGxYYNaKlJIzRgbfgrTxnKMkR4qxudgC38zQu+Oh5inTu2ELrA4B
-	 3fuPetX1ZYUHEXclM0K/ZVVT5x5nJaqgMhe5UUjdTCAYRiimh1Z37Gt8DlgnCJhm6O
-	 YlKTFOjQymuKAXFv7JD/hoiQBUJc5NeqpisuBk59SCQhIbv9EKmWVdjVy1GgZAyIyI
-	 FBtV6EAEUK/XA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 21 Oct 2024 17:14:06 +0200
-Subject: [PATCH net-next 4/4] mptcp: use "middlebox interference" RST when
- no DSS
+	s=arc-20240116; t=1729524105; c=relaxed/simple;
+	bh=XCrL4izJIy9UyUFs1AzO/wmPMPe0z9HyOj9uoklY+iw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GtRFBKDEkI1SgbH+Mkk11IHiOtlzQ2N8nwmvP96PD9AM+Gw2zneFg6WxVyxr669vOLiFNf4IVRdg7WfyzS4qxJ3Xls9Y1M52TpTLhiNeSucA2qHBpKmDAkpMQ6YNajJwskCtOVy3WvOYoH04aLHDZNuWlNNG6F/dSVsfeW4XgH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 75FC461E5FE05;
+	Mon, 21 Oct 2024 17:20:59 +0200 (CEST)
+Message-ID: <15688d2d-b3a0-4730-9cee-15bb6c7f78fb@molgen.mpg.de>
+Date: Mon, 21 Oct 2024 17:20:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241021-net-next-mptcp-misc-6-13-v1-4-1ef02746504a@kernel.org>
-References: <20241021-net-next-mptcp-misc-6-13-v1-0-1ef02746504a@kernel.org>
-In-Reply-To: <20241021-net-next-mptcp-misc-6-13-v1-0-1ef02746504a@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Davide Caratti <dcaratti@redhat.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2222; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=kl9DK7HD7r1EeUzN5KT2dnyn50jJCyFp2AMSo9gs1og=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnFm/TO9aj5czQ2jOGmTdUgveys84TK2SLiS6BN
- 8U7BbZRd3OJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZxZv0wAKCRD2t4JPQmmg
- c3nCEACyOlH8DW5LM8a1tjOtVTJFSV8slTWiHnS/Rr+DiPD206bxZCOhH5QLBp4HRezF3NZh5LB
- lDq0+XMAwJ39M4AIm5W0YDPlTk2pN5WvM3P41iKFoy2Yn3M1BLm4lv7GYq9tHYj1YUVjJifmowM
- McGAMmBANwz5iZ2gbLolwPXZVpAJutMYRb3enPAgEJKKQVq6HeL46eiS1qS5yylIWP6aZBd/Lib
- Rf3Mjf3Vtv3KJQ/luPGNIVgHrGQ8NzkZc0bJbGUKJxPx/AZtYayJ6y6PAyO0sAc2sT+u5Ksl0Fg
- oF9waAxr6JJM+2Va2DMLFvPIfbvd28CCdY10r4AAYG+PxfBoSMHctGE6oW8aW67OZBTKUvqox+k
- O0/Mg/KznETAbfF55G/67iYBn1kx6AgTVgFWfPx2kpYw4FOQMKgsAtTbE1poPK3ei7lprFQ1Izp
- jZGFbpMwfmozqMqgFTmkDD+KONkqTq0b+Vt4LbOplklaFox5+zonvCShoVYRFJWN38tRpa+yy6e
- lg7gOv63KhC/jivoKDkXp1FiQZapvk0ygawmp1vF72qBo3xcuW7tO3XZn+SeA9+um7L4S6isF+n
- 5qtt3SSP24woGDN2h23KOJO0SPd89dxnCBYwiYjarfQZnxsmCRB3ZuFJoK47Msx48c49ejk9Tl3
- wp6F3x6Ou17Hr2A==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 1/2] ptp: add control over HW
+ timestamp latch point
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20241021141955.1466979-1-arkadiusz.kubalewski@intel.com>
+ <20241021141955.1466979-2-arkadiusz.kubalewski@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241021141955.1466979-2-arkadiusz.kubalewski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Davide Caratti <dcaratti@redhat.com>
+Dear Arkadiusz,
 
-RFC8684 suggests use of "Middlebox interference (code 0x06)" in case of
-fully established subflow that carries data at TCP level with no DSS
-sub-option.
 
-This is generally the case when mpext is NULL or mpext->use_map is 0:
-use a dedicated value of 'mapping_status' and use it before closing the
-socket in subflow_check_data_avail().
+Thank you for your patch.
 
-Link: https://github.com/multipath-tcp/mptcp_net-next/issues/518
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/subflow.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Am 21.10.24 um 16:19 schrieb Arkadiusz Kubalewski:
+> Currently HW support of PTP/timesync solutions in network PHY chips can be
+> implemented with two different approaches, the timestamp maybe latched
+> either at the beginning or after the Start of Frame Delimiter (SFD) [1].
+> 
+> Allow ptp device drivers to provide user with control over the HW
+> timestamp latch point with ptp sysfs ABI.
 
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 860903e0642255cf9efb39da9e24c39f6547481f..07352b15f145832572a4203ab4d0427c37675e94 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -971,7 +971,8 @@ enum mapping_status {
- 	MAPPING_EMPTY,
- 	MAPPING_DATA_FIN,
- 	MAPPING_DUMMY,
--	MAPPING_BAD_CSUM
-+	MAPPING_BAD_CSUM,
-+	MAPPING_NODSS
- };
- 
- static void dbg_bad_map(struct mptcp_subflow_context *subflow, u32 ssn)
-@@ -1128,8 +1129,9 @@ static enum mapping_status get_mapping_status(struct sock *ssk,
- 			return MAPPING_EMPTY;
- 		}
- 
-+		/* If the required DSS has likely been dropped by a middlebox */
- 		if (!subflow->map_valid)
--			return MAPPING_INVALID;
-+			return MAPPING_NODSS;
- 
- 		goto validate_seq;
- 	}
-@@ -1343,7 +1345,7 @@ static bool subflow_check_data_avail(struct sock *ssk)
- 		status = get_mapping_status(ssk, msk);
- 		trace_subflow_check_data_avail(status, skb_peek(&ssk->sk_receive_queue));
- 		if (unlikely(status == MAPPING_INVALID || status == MAPPING_DUMMY ||
--			     status == MAPPING_BAD_CSUM))
-+			     status == MAPPING_BAD_CSUM || status == MAPPING_NODSS))
- 			goto fallback;
- 
- 		if (status != MAPPING_OK)
-@@ -1396,7 +1398,9 @@ static bool subflow_check_data_avail(struct sock *ssk)
- 			 * subflow_error_report() will introduce the appropriate barriers
- 			 */
- 			subflow->reset_transient = 0;
--			subflow->reset_reason = MPTCP_RST_EMPTCP;
-+			subflow->reset_reason = status == MAPPING_NODSS ?
-+						MPTCP_RST_EMIDDLEBOX :
-+						MPTCP_RST_EMPTCP;
- 
- reset:
- 			WRITE_ONCE(ssk->sk_err, EBADMSG);
+Please describe, that it’s done using `/sys` filesystem.
 
--- 
-2.45.2
+How can this be tested?
 
+> [1] https://www.ieee802.org/3/cx/public/april20/tse_3cx_01_0420.pdf
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> ---
+>   Documentation/ABI/testing/sysfs-ptp | 12 ++++++++
+>   drivers/ptp/ptp_sysfs.c             | 44 +++++++++++++++++++++++++++++
+>   include/linux/ptp_clock_kernel.h    | 29 +++++++++++++++++++
+>   3 files changed, 85 insertions(+)
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-ptp b/Documentation/ABI/testing/sysfs-ptp
+> index 9c317ac7c47a..a0d89e0fd72e 100644
+> --- a/Documentation/ABI/testing/sysfs-ptp
+> +++ b/Documentation/ABI/testing/sysfs-ptp
+> @@ -140,3 +140,15 @@ Description:
+>   		PPS events to the Linux PPS subsystem. To enable PPS
+>   		events, write a "1" into the file. To disable events,
+>   		write a "0" into the file.
+> +
+> +What:		/sys/class/ptp/ptp<N>/ts_point
+> +Date:		October 2024
+> +Contact:	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> +Description:
+> +		This file provides control over the point in time in
+> +		which the HW timestamp is latched. As specified in IEEE
+> +		802.3cx, the latch point can be either at the beginning
+> +		or after the end of Start of Frame Delimiter (SFD).
+> +		Value "0" means the timestamp is latched at the
+> +		beginning of the SFD. Value "1" means that timestamp is
+> +		latched after the end of SFD.
+
+Would it make sense to let it be configured by strings, so it’s clear, 
+what the values mean?
+
+1.  beginning_of_sfd
+2.  end_of_sfd
+
+> diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
+> index 6b1b8f57cd95..7e9f6ef368b6 100644
+> --- a/drivers/ptp/ptp_sysfs.c
+> +++ b/drivers/ptp/ptp_sysfs.c
+> @@ -28,6 +28,46 @@ static ssize_t max_phase_adjustment_show(struct device *dev,
+>   }
+>   static DEVICE_ATTR_RO(max_phase_adjustment);
+>   
+> +static ssize_t ts_point_show(struct device *dev, struct device_attribute *attr,
+> +			     char *page)
+> +{
+> +	struct ptp_clock *ptp = dev_get_drvdata(dev);
+> +	enum ptp_ts_point point;
+> +	int err;
+> +
+> +	if (!ptp->info->get_ts_point)
+> +		return -EOPNOTSUPP;
+> +	err = ptp->info->get_ts_point(ptp->info, &point);
+> +	if (err)
+> +		return err;
+> +
+> +	return sysfs_emit(page, "%d\n", point);
+> +}
+> +
+> +static ssize_t ts_point_store(struct device *dev, struct device_attribute *attr,
+> +			      const char *buf, size_t count)
+> +{
+> +	struct ptp_clock *ptp = dev_get_drvdata(dev);
+> +	enum ptp_ts_point point;
+> +	int err;
+> +	u8 val;
+> +
+> +	if (!ptp->info->set_ts_point)
+> +		return -EOPNOTSUPP;
+> +	if (kstrtou8(buf, 0, &val))
+> +		return -EINVAL;
+> +	if (val > PTP_TS_POINT_MAX)
+> +		return -EINVAL;
+> +	point = val;
+> +
+> +	err = ptp->info->set_ts_point(ptp->info, point);
+> +	if (err)
+> +		return err;
+> +
+> +	return count;
+> +}
+> +static DEVICE_ATTR_RW(ts_point);
+> +
+>   #define PTP_SHOW_INT(name, var)						\
+>   static ssize_t var##_show(struct device *dev,				\
+>   			   struct device_attribute *attr, char *page)	\
+> @@ -335,6 +375,7 @@ static struct attribute *ptp_attrs[] = {
+>   	&dev_attr_pps_enable.attr,
+>   	&dev_attr_n_vclocks.attr,
+>   	&dev_attr_max_vclocks.attr,
+> +	&dev_attr_ts_point.attr,
+>   	NULL
+>   };
+>   
+> @@ -363,6 +404,9 @@ static umode_t ptp_is_attribute_visible(struct kobject *kobj,
+>   	} else if (attr == &dev_attr_max_phase_adjustment.attr) {
+>   		if (!info->adjphase || !info->getmaxphase)
+>   			mode = 0;
+> +	} else if (attr == &dev_attr_ts_point.attr) {
+> +		if (!info->get_ts_point && !info->set_ts_point)
+> +			mode = 0;
+>   	}
+>   
+>   	return mode;
+> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+> index c892d22ce0a7..921d6615bd39 100644
+> --- a/include/linux/ptp_clock_kernel.h
+> +++ b/include/linux/ptp_clock_kernel.h
+> @@ -55,6 +55,23 @@ struct ptp_system_timestamp {
+>   	clockid_t clockid;
+>   };
+>   
+> +/**
+> + * enum ptp_ts_point - possible timestamp latch points (IEEE 802.3cx)
+> + * @PTP_TS_POINT_SFD:      timestamp latched at the beginning of sending Start
+
+The alignment of the start of the description looks strange with the 
+second line being further right.
+
+> + *			   of Frame Delimiter (SFD)
+> + * @PTP_TS_POINT_POST_SFD: timestamp latched after the end of sending Start
+> + *			   of Frame Delimiter (SFD)
+> + */
+> +enum ptp_ts_point {
+> +	PTP_TS_POINT_SFD,
+> +	PTP_TS_POINT_POST_SFD,
+> +
+> +	/* private: */
+> +	__PTP_TS_POINT_MAX
+> +};
+> +
+> +#define PTP_TS_POINT_MAX (__PTP_TS_POINT_MAX - 1)
+> +
+>   /**
+>    * struct ptp_clock_info - describes a PTP hardware clock
+>    *
+> @@ -159,6 +176,14 @@ struct ptp_system_timestamp {
+>    *                scheduling time (>=0) or negative value in case further
+>    *                scheduling is not required.
+>    *
+> + * @set_ts_point: Request change of timestamp latch point, as the timestamp
+> + *                could be latched at the beginning or after the end of start
+> + *                frame delimiter (SFD), as described in IEEE 802.3cx
+> + *                specification.
+> + *
+> + * @get_ts_point: Obtain the timestamp measurement latch point, counterpart of
+> + *                .set_ts_point() for getting currently configured value.
+> + *
+>    * Drivers should embed their ptp_clock_info within a private
+>    * structure, obtaining a reference to it using container_of().
+>    *
+> @@ -195,6 +220,10 @@ struct ptp_clock_info {
+>   	int (*verify)(struct ptp_clock_info *ptp, unsigned int pin,
+>   		      enum ptp_pin_function func, unsigned int chan);
+>   	long (*do_aux_work)(struct ptp_clock_info *ptp);
+> +	int (*set_ts_point)(struct ptp_clock_info *ptp,
+> +			    enum ptp_ts_point point);
+> +	int (*get_ts_point)(struct ptp_clock_info *ptp,
+> +			    enum ptp_ts_point *point);
+>   };
+>   
+>   struct ptp_clock;
+
+
+Kind regards,
+
+Paul
 
