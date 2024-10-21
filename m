@@ -1,162 +1,123 @@
-Return-Path: <netdev+bounces-137553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 072BF9A6E5C
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:38:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14869A6E65
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AFF91C229B6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:38:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CE59B21059
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461751C3F2F;
-	Mon, 21 Oct 2024 15:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F581C3F29;
+	Mon, 21 Oct 2024 15:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ydb0uuoX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="crN4GJzR"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2040.outbound.protection.outlook.com [40.107.223.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416AB1C3F04;
-	Mon, 21 Oct 2024 15:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729525128; cv=fail; b=YHkwZjtWEBUZDvfeCCjaD/Pyxrtp09gyNhe8rC2GMpztiWo7TJYdI7rcrU04D64Vz3PFtxt61oneCx09yh1FL2xB1/eVpXIa27g+wjYN/7BGVry92qeLPKfLBq/ZrB7sW2dbmLrtIkhu5v1sWmT+sYpX4nKVTDvjP+9f6dtGivU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729525128; c=relaxed/simple;
-	bh=bmMo/WwssY9VPEMhQRl7DyYzDOFY+fARG557iHd5QFQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QctgAuDAzYvZkNds9DMIYrdIlwefvbTKZU2dLzYUjzHh61fVG/mEhowiKMdlbA+hth1brjZAIE4/CcnMxslr+fmBy38A45TK4HuByskt0jWOshkugCQh20vwBTAX5Tr4tOsS0boTvsWJsaWDrxX8K+YA9gyBxGQ+4/R2ZCNziJI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ydb0uuoX; arc=fail smtp.client-ip=40.107.223.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aTSAQvITDMDlLgYzIaF4rbF0ygY/SHeFBw9B40GoibOWb4gQRJX/33N6YHkk9YPTzOeBKF7rTgQABBdzigfEnmNdujrUecTLPee0QC9d3scRo5bKo0WeSx7IjuGGj5zJII2V4H7lNC4CPJkfzrG8HdtcmS8AtvAbcyGsaCUhEP7GXVxuKQtdYwBCJx7gW4nmuaHmssO/notG1duoUcXzhgu96Er75AftWmzfEgNaZ9gVXjo/DBrr4fKL0oFTDC6TqxHTOGRYyABTuzgi8kENh25WsTt889P2BIHKdXY/U3hHQglC9rRB4F3w6TeFdKFd9SCMv+EL11YxqXA5EbWdPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vymOa0AVPibzDaSwui/HpdAq0FjPYO888VY3BViZRyY=;
- b=Twg9emj3NMGM63cui6GsrxlAgrJjJJvwiExTX+b+n9mnRlmGwieTaTjnY38TjKy/aB33qNRcbM+NMj99F92QCs+Wh+Ra0uI7by0PSPzu1BF24EoyiwaVNm6gUC4kxuhqut6l3mRJER8I5jwHFhhtrkkLRyY71MVYJWRUs6ty6XyE207BEtF5edY4PaBhGjpcCgkg4vvxlOIzrE4L4VUpvjzAoZrSZzHLTgQaUYNSALuOHPlbMHe1/DHZkvEQGqhPM2KPJMPlGZCUDxvphWRt3Aq+lw6+5/I6AxTWn/TVpnvZeNsuuAs7V39IgnpFaAyNFl3upYlbqS7GLwSRLNFQzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vymOa0AVPibzDaSwui/HpdAq0FjPYO888VY3BViZRyY=;
- b=Ydb0uuoXOkbDapMR6mxTwoXGcXDNOkQ5xvaRqfS1l0fSoIHuXZ8MVTMDq5jp3T5tGIM9PPxVVJrjG2GIRyMdgOfzPYuv5CcEn9QlN3vq5jcEPwJ/wV0oub3VYub5ccmKcif78ExiL5EeAKz1sXaJBl4958OBoSVk+MddjJCC2cw=
-Received: from BN1PR12CA0001.namprd12.prod.outlook.com (2603:10b6:408:e1::6)
- by MN2PR12MB4421.namprd12.prod.outlook.com (2603:10b6:208:26c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.29; Mon, 21 Oct
- 2024 15:38:38 +0000
-Received: from BL02EPF0001A0FE.namprd03.prod.outlook.com
- (2603:10b6:408:e1:cafe::e6) by BN1PR12CA0001.outlook.office365.com
- (2603:10b6:408:e1::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28 via Frontend
- Transport; Mon, 21 Oct 2024 15:38:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0001A0FE.mail.protection.outlook.com (10.167.242.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8093.14 via Frontend Transport; Mon, 21 Oct 2024 15:38:37 +0000
-Received: from purico-9eb2host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Oct
- 2024 10:38:35 -0500
-From: Yazen Ghannam <yazen.ghannam@amd.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Yazen Ghannam
-	<yazen.ghannam@amd.com>
-Subject: [PATCH net-next] net: amd8111e: Remove duplicate definition of PCI_VENDOR_ID_AMD
-Date: Mon, 21 Oct 2024 15:38:25 +0000
-Message-ID: <20241021153825.2536819-1-yazen.ghannam@amd.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC44131182;
+	Mon, 21 Oct 2024 15:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729525245; cv=none; b=F1rVvFtnyqJKU5qL0RtVSV0g9yhGjB5vImFkRC9Am7YW2nOjsYZnJ23N7waLWwAXVFU5W1hWs0DNFC29GRwVP9PWXdQK/LRaN+yKRCkowwdNxZxjm2dRGXmDDXhal4uAaRTuLH9Vg5uVC9PAccHpxvhDXf+GqAjLD5NBJlAgBKQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729525245; c=relaxed/simple;
+	bh=ifLaVKX5f4pjIkahfUVbVfbWhI693YQo3t5omuqgSrg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uld2efJgr+wz9/wKoUkJ5ENiJD7Od54FkAsExypu/maCrfCKcn+8L98G6iOPY65O8mA5YB7O0bdnhhf+Zd4yA8j+w6Tl6+T42+3eW80A52hF2O5T4Q+RReybkWfRUAQXHAD68IR8DdFnjTPxhDytiBfX0yjgX+xW1M3KrzRwl3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=crN4GJzR; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fb3110b964so40579041fa.1;
+        Mon, 21 Oct 2024 08:40:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729525241; x=1730130041; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Kv5UT6mtcpe+cnb4k9m/wVUK0gKv8OfPDi6E9+ZSQzA=;
+        b=crN4GJzRmMhRb0cwNbbtntzmSaMrDdpRBzDDGZLXRi1FB0IK1z3T3po6G3jTZU6Gtf
+         GXid8DqM1p6NSjKpefxt/X7w4OBIdtuTdBOzm8WMnFCwAqY4fJdUvcXvSGO4/s6MehBQ
+         YEWKMwiH02iOT5pb1f9bl0OZpp7sWnz24AUmcKLqoWtmGpMfBUEDOiFZzALBY/THaix5
+         P6dpQ92w+Cbq/XAkQhyW2OYZW8FCMF8jRRqdDYBIhtuiEvQ7oEAPCuPT6Fre+CoPD9Mn
+         sBawzPccDdH3bfX0wgKPd4CpC1kfMdbzDIVsfgLeN0RYzBfmvKGNa8JwRLlQmxi0qyog
+         aRyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729525241; x=1730130041;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kv5UT6mtcpe+cnb4k9m/wVUK0gKv8OfPDi6E9+ZSQzA=;
+        b=p3KGqgD76Oej5kvu+6+CX77DyopDwtObxFaJ1LZzBJFSNgo3JmQ8WzYsZ1xnMaLZe6
+         ZGZPtFprASh1emBvQsjBKEYLhXPECGPI200nFkNQgyw09ldAySDLszsi7zY5UzwV6GQS
+         nB2/rOayUlpnbiAS0ciqGoiNIUS8coWou9HAKeIWETBi/5srmiNo5kQlU2ZQK65zq1yk
+         McxVHoB4fhf2tVxblgglKNigya18NGTKr5Kt0+D37efsDK/VOCuZs/n4taNRw7LRLB0A
+         KAqNX3JLHj/gYFcoGvN1HD3b97GeZhTmzPWvmM1bcss7qC9PEgB/BPrBYh+dYAeL/LwL
+         jPfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVD2GJ+bhtCFTr6Gt3+Kic6XSdypPwo5UcP5J6+5DDYnBFOkC8f0oJKYmOBwPbOuqasMy+ToQclzBI=@vger.kernel.org, AJvYcCVNIhl4FcoAoAEvJUYV5njKavwQ2VsmnILwRdKwuiq5BO9NpAvJqyfSb3gXpCaaqhYnln/3FZa1fiw6j7YgkZ21/JM=@vger.kernel.org, AJvYcCVz2EInZg/sbml2FfFgxHYY8gQ96MWASxIOta/+G9P1EQg9V/0Qrm0p7NVkGuKBixnT/eyTi89c@vger.kernel.org, AJvYcCXL+uCYV3lYjyUZr8w9bB4N7HSctXn+NruB+EKXkOM7l086/XOO64cgS+gLE4OM6o21YdRQsAp9VtY=@vger.kernel.org, AJvYcCXXxDNwk7bxVhb6IiGV6pxNvI55TUawgg0lUlo2X8LAs9ND1r355SsmHFm9TIpfSswuvSF1maRjYvnopinA@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzeH1tihXGA7VDx3gHnyUfhromGW0umIz8ell9pUUrKF1zVVPJ
+	K3wl2f+UEcFYOrm/tSfPO0C4GVa05ONI6WDch4XV/y6uXx6m4mOU8BS0og==
+X-Google-Smtp-Source: AGHT+IFkQVd4FvCnjeIZN1QcmBJUx78OKRBL8umpe0S6Nsvo84HcjKcLxgJwz2/j/IsIFpL/2Eq0jg==
+X-Received: by 2002:a05:651c:1541:b0:2f7:65c5:c92 with SMTP id 38308e7fff4ca-2fb82eaf006mr44503811fa.20.1729525241030;
+        Mon, 21 Oct 2024 08:40:41 -0700 (PDT)
+Received: from ?IPV6:2a00:1fa0:4321:8ef5:e514:855b:c891:f732? ([2a00:1fa0:4321:8ef5:e514:855b:c891:f732])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb9ae12273sm5218741fa.115.2024.10.21.08.40.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 08:40:39 -0700 (PDT)
+Message-ID: <2b8dc3a4-5017-4028-89a0-7267ff3b48a1@gmail.com>
+Date: Mon, 21 Oct 2024 18:40:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH/RFC] MAINTAINERS: Re-add cancelled Renesas driver sections
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>,
+ Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Paul Barker <paul.barker.ct@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
+ <20241021150447.GC4176464@ragnatech.se>
+Content-Language: en-US
+From: Sergei Shtylyov <sergei.shtylyov@gmail.com>
+In-Reply-To: <20241021150447.GC4176464@ragnatech.se>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FE:EE_|MN2PR12MB4421:EE_
-X-MS-Office365-Filtering-Correlation-Id: 982b1628-0be0-4889-7f2f-08dcf1e66e83
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bBf4sDlpAick4p4uLdYKY221y/Uqj7et75YFdZOx45ZnHxKGXYO8eEfAAZnX?=
- =?us-ascii?Q?H5demwNivA87gQ8ohZiXlCN48VAy7tk0402jOsloo/Qb5txlnCmmeu/t4I6d?=
- =?us-ascii?Q?T+CsCyKpgcXnquWJNftU0gM0bwU4Rp2qkoq7JVe4faer0Xl+2U59jQnv5dSX?=
- =?us-ascii?Q?CRcjUHA3ugtb62bb6Qdt0D7k9VYtWzrP09qx+aotJ70aHbzppzsh4qaWooFb?=
- =?us-ascii?Q?bNoegQjB8c9vSHMwsSl8j5MK+zmfLrwfM6cg/uEeNr+OIUgS4/0zJzEjqABN?=
- =?us-ascii?Q?yADwlW9xKvXxa92NGvhaJnhsf+zT3H3dUlg7Oe3jYGQBUXEWBkAP6gtVtaMS?=
- =?us-ascii?Q?FKaf6QTLQ+blsD/GN0l8Ll3s1b4+IFVC+A0AvAdqqkJFpwjdcLKecyDmOkxA?=
- =?us-ascii?Q?Wt9V1yc4kIJb9FFr33vU3AS7WdmWyNAscKEqYGj8+6gIpMQTI5W5/gNssnk8?=
- =?us-ascii?Q?L+ueTRkMmyuCLUwXKL5/uFIQnTv4BVEVN3Zq3Wu4mSIOuu6jSTo7Qeebq7u6?=
- =?us-ascii?Q?zArfoOZtqlJWPDY4QwwTbMzI2jA7RezIaIHgTUmcDqoDT2HbY/59OejZEZ7y?=
- =?us-ascii?Q?dSoy7ezkcQowlNxxw3DgZ4NYqSyq2T1EJ8lQWVv6bn/xJC5FwdI5BvqkDehD?=
- =?us-ascii?Q?umzDU/xwO7ME3ZDi7XoCfB9sYBcyJs4U+NdoFlBCZiUpNPnfqCV2LiwLIXb2?=
- =?us-ascii?Q?tlnS3Ra8G04wT91pnzaEamoiuNsXeBOxWD/4EoiQyXH+YRAn4SGAUrZnUvUN?=
- =?us-ascii?Q?Wluuk4XYJvCSeBW6OKB5WPJRU8dpBXDTaKUd1F6fWG98JWh3FndaB8y4MZO8?=
- =?us-ascii?Q?m6/xUPpoBttQU2lXroasTHL72ogDusJ1NL9O67tUrk85+B4/P2+uximvzDDl?=
- =?us-ascii?Q?5xlcu25AVLAYJU+AMOFua3QXqBY+pxr6Nih4/BS75mrgFsGVxP0dpB7bCt0U?=
- =?us-ascii?Q?W8UpvJIZGhL0557D6j75jfDPUoIzH8pClo4d/z38jkJYMWwfcN1W2086Q+8m?=
- =?us-ascii?Q?ydCD5u44Yz508XPsB0CwvNUeq/2sc8nN8fhtJSajRT1fpnrt7EGTexjHv33o?=
- =?us-ascii?Q?ZBrpmb5oFcVWkRhjS6KyxjFi/K+w9cH3aYxKXPTbEUAG4+WIOKr/j0W04wk0?=
- =?us-ascii?Q?GmH6FsqRj04LBSign1pB7M4CNJrl/KgRKKNhGWMnshPxs6/swna9X9MtOMZv?=
- =?us-ascii?Q?TdWkaioSG3ri5USXwJFnJ4tqee84ZigsK9WxW/37Txq+jrbkEXu3X4O41ran?=
- =?us-ascii?Q?JKmiozjJEAPCqZ8CQc+koDsTsJNEOoYE2Kn1BcXY77144ovub3T4YNLkt+4p?=
- =?us-ascii?Q?u/oS8tglFlZvTOUBPr1wafvTGgBok5XIF3v15H6/GySi1Yg+DhurF5RPnViY?=
- =?us-ascii?Q?4YPClj8ywN0xbFVTXdoNyW8ks9QpqfKzFbHw/Lc6SF5QA0USKg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 15:38:37.8026
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 982b1628-0be0-4889-7f2f-08dcf1e66e83
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A0FE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4421
 
-The AMD PCI vendor ID is already defined in <linux/pci_ids.h>.
+On 10/21/24 6:04 PM, Niklas Söderlund wrote:
+[...]
 
-Remove this local definition as it is not needed.
+>> Removing full driver sections also removed mailing list entries, causing
+>> submitters of future patches to forget CCing these mailing lists.
+>>
+>> Fixes: 6e90b675cf942e50 ("MAINTAINERS: Remove some entries due to various compliance requirements.")
+>> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+>> ---
+>> Anyone who wants to take over maintenance for these drivers?
+> 
+> In case Sergei is not interested to keep looking after the RAVB and/or 
+> SUPERH Ethernet drivers I would be happy to do so.
 
-Signed-off-by: Yazen Ghannam <yazen.ghannam@amd.com>
----
- drivers/net/ethernet/amd/amd8111e.h | 1 -
- 1 file changed, 1 deletion(-)
+   I am still interested, of course... but looks like I'm not allowed to anymore. :-/
 
-diff --git a/drivers/net/ethernet/amd/amd8111e.h b/drivers/net/ethernet/amd/amd8111e.h
-index 305232f5476d..e4ee4c28800c 100644
---- a/drivers/net/ethernet/amd/amd8111e.h
-+++ b/drivers/net/ethernet/amd/amd8111e.h
-@@ -550,7 +550,6 @@ typedef enum {
- 
- /* Driver definitions */
- 
--#define	 PCI_VENDOR_ID_AMD		0x1022
- #define  PCI_DEVICE_ID_AMD8111E_7462	0x7462
- 
- #define MAX_UNITS			8 /* Maximum number of devices possible */
--- 
-2.43.0
+> In either case should not the maintainer entry in the bindings documents
+> also be updated?
+
+   These still have my Gmail address... I'm not sure yet what to do with it...
+
+[...]
+
+MBR, Sergey
 
 
