@@ -1,114 +1,96 @@
-Return-Path: <netdev+bounces-137406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA0009A6081
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:46:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016FE9A60A1
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FAE71C21D9D
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:46:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A36481F2251C
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFF11E3DEF;
-	Mon, 21 Oct 2024 09:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C061E3DE5;
+	Mon, 21 Oct 2024 09:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qb57PkJ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7789D79CC;
-	Mon, 21 Oct 2024 09:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A9F1E32AC;
+	Mon, 21 Oct 2024 09:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729503946; cv=none; b=k4oTO3GsrHZumyFGHR0ugXcrlKBDBZtTK1l4xwfyd9pCwkZjfTZTAXuXB5csppa8a3s3DlKGFcoCSzVD72aD4HW/zvQ5QpsVeK2LoPMISrs3OTvkcJjxrKlAUhA/2B7SMsR9cnAPVelx9k9/wjIuzPdlYzvimZS8cmFCEggmiMs=
+	t=1729504223; cv=none; b=D3gBzYnzRL8Ps5CC3kzeYxb9keus08biZUXTRts8XqKm1I3i42n/pQnVhW+PkeRZdmUgjeBg9f/+OVwrgN4OVWWhgmq9TJVVdJOX+2N9fi22Xtmc0YpQPPOtwPSjFBvJzimrUV0d+DK5DW281e5Oq9qqprb33y0NMAVh3RAHdr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729503946; c=relaxed/simple;
-	bh=sC1Noah5XIo9ITK3vhr9wTJ8moZWb+tjbb2GJg03WW8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k+2pmGhcTR+Piyhpt2kj7Rvsn5fFBbebYWsfxee1ae0VHJwVzrBvuqreJmKvYvtehvbHawlYqIaOgP0SdtxioC1aiJ3P6n52NGtKmVE6MaYvDZTP0kIStG7xnduzGJaQBAWXgQt/KT0pVosFGjc5J9d4bDQFNOfHJvIVH/+ArrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 2/2] netfilter: xtables: fix typo causing some targets not to load on IPv6
-Date: Mon, 21 Oct 2024 11:45:36 +0200
-Message-Id: <20241021094536.81487-3-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241021094536.81487-1-pablo@netfilter.org>
-References: <20241021094536.81487-1-pablo@netfilter.org>
+	s=arc-20240116; t=1729504223; c=relaxed/simple;
+	bh=EINqetAsJIKGinGmMOLN93gzlHvmLn/CfhjxCi/PMAI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uBWIvWZFVw7UknlHEsznDx5/TFV9QoRhLCOofn2L8JG4I42VQ6IUSjYD3mECbxYaeMfK6GCkt1Lcu6fyurvZXbGVsMrLsqKwTEEh7FdOBm7XPCg920th/Gea0x3FSWeNMLVb3UBbQoDIa+d04Vt7z4v03vEDo2V6/E3puJ76V9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qb57PkJ3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46496C4CEC3;
+	Mon, 21 Oct 2024 09:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729504223;
+	bh=EINqetAsJIKGinGmMOLN93gzlHvmLn/CfhjxCi/PMAI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qb57PkJ3oAu1jPezwGNmdx8iAUb/e4kzDPSkZy9xZbhn9g2OsimK27K33bUcEXvfX
+	 p2fzO3JlMBGA6lPV7hjPuwMn1OGOow2Yis+hxsSbniZ9fflpKplahq6iAsn+vEo0qQ
+	 2DF0lRHPZrokkAbYzwLnazD2ZsaQhqyy3PaCun9PH3sKiy9+aTt7AMZy3nxbmiWzS7
+	 mla3baFHGr1R5xGFM31dCqB2hNrvhXfL8ddKXLIIzTHn43UbuzRJkxiuaaUwK19N4x
+	 dH3myWYf1sF4L6gwTzIQYaRBa1yjfBf/0mUBCGf/opbbnfLA8vGN1iMQ1NVM8DemmT
+	 e2H0clFWsxwKg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DEA3809A8A;
+	Mon, 21 Oct 2024 09:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] net: wwan: fix global oob in wwan_rtnl_policy
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172950422926.192458.11194707436275183429.git-patchwork-notify@kernel.org>
+Date: Mon, 21 Oct 2024 09:50:29 +0000
+References: <20241015131621.47503-1-linma@zju.edu.cn>
+In-Reply-To: <20241015131621.47503-1-linma@zju.edu.cn>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-- There is no NFPROTO_IPV6 family for mark and NFLOG.
-- TRACE is also missing module autoload with NFPROTO_IPV6.
+Hello:
 
-This results in ip6tables failing to restore a ruleset. This issue has been
-reported by several users providing incomplete patches.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Very similar to Ilya Katsnelson's patch including a missing chunk in the
-TRACE extension.
+On Tue, 15 Oct 2024 21:16:21 +0800 you wrote:
+> The variable wwan_rtnl_link_ops assign a *bigger* maxtype which leads to
+> a global out-of-bounds read when parsing the netlink attributes. Exactly
+> same bug cause as the oob fixed in commit b33fb5b801c6 ("net: qualcomm:
+> rmnet: fix global oob in rmnet_policy").
+> 
+> ==================================================================
+> BUG: KASAN: global-out-of-bounds in validate_nla lib/nlattr.c:388 [inline]
+> BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+> Read of size 1 at addr ffffffff8b09cb60 by task syz.1.66276/323862
+> 
+> [...]
 
-Fixes: 0bfcb7b71e73 ("netfilter: xtables: avoid NFPROTO_UNSPEC where needed")
-Reported-by: Ignat Korchagin <ignat@cloudflare.com>
-Reported-by: Ilya Katsnelson <me@0upti.me>
-Reported-by: Krzysztof Olędzki <ole@ans.pl>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/xt_NFLOG.c | 2 +-
- net/netfilter/xt_TRACE.c | 1 +
- net/netfilter/xt_mark.c  | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
+Here is the summary with links:
+  - [net,v1] net: wwan: fix global oob in wwan_rtnl_policy
+    https://git.kernel.org/netdev/net/c/47dd5447cab8
 
-diff --git a/net/netfilter/xt_NFLOG.c b/net/netfilter/xt_NFLOG.c
-index d80abd6ccaf8..6dcf4bc7e30b 100644
---- a/net/netfilter/xt_NFLOG.c
-+++ b/net/netfilter/xt_NFLOG.c
-@@ -79,7 +79,7 @@ static struct xt_target nflog_tg_reg[] __read_mostly = {
- 	{
- 		.name       = "NFLOG",
- 		.revision   = 0,
--		.family     = NFPROTO_IPV4,
-+		.family     = NFPROTO_IPV6,
- 		.checkentry = nflog_tg_check,
- 		.destroy    = nflog_tg_destroy,
- 		.target     = nflog_tg,
-diff --git a/net/netfilter/xt_TRACE.c b/net/netfilter/xt_TRACE.c
-index f3fa4f11348c..a642ff09fc8e 100644
---- a/net/netfilter/xt_TRACE.c
-+++ b/net/netfilter/xt_TRACE.c
-@@ -49,6 +49,7 @@ static struct xt_target trace_tg_reg[] __read_mostly = {
- 		.target		= trace_tg,
- 		.checkentry	= trace_tg_check,
- 		.destroy	= trace_tg_destroy,
-+		.me		= THIS_MODULE,
- 	},
- #endif
- };
-diff --git a/net/netfilter/xt_mark.c b/net/netfilter/xt_mark.c
-index f76fe04fc9a4..65b965ca40ea 100644
---- a/net/netfilter/xt_mark.c
-+++ b/net/netfilter/xt_mark.c
-@@ -62,7 +62,7 @@ static struct xt_target mark_tg_reg[] __read_mostly = {
- 	{
- 		.name           = "MARK",
- 		.revision       = 2,
--		.family         = NFPROTO_IPV4,
-+		.family         = NFPROTO_IPV6,
- 		.target         = mark_tg,
- 		.targetsize     = sizeof(struct xt_mark_tginfo2),
- 		.me             = THIS_MODULE,
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
