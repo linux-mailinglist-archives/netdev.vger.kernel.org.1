@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-137609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038DC9A726D
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:34:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5195F9A726E
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66594282028
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D22E1C21BE5
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436501F9EAD;
-	Mon, 21 Oct 2024 18:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E5F1F9AB1;
+	Mon, 21 Oct 2024 18:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vjiRYOUj"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DNFX3306"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0E5194AF9
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 18:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB03A41
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 18:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729535687; cv=none; b=tUZE5sf0zxDnHdyW3IYGKrUouyY5a8/tfCXnKc31nk0U7Iz+5yO7piO0PrFOA9Ud4PIxlrKLlZJGLABT2st2pIKIUPgEZMcWhg8RSsd1wRsllB28xymESeNkgoie71RVNcuUqtDGDTooq0x1agDn1rdY1Ag/5XbfA6uzoTQgBGA=
+	t=1729535704; cv=none; b=jEhh0e5tTyZCk8+65ybdnGOAVvSD6rjyasUBzIeKDcpILpTFsJJG45XhPCmAxhGv5AvvsYT3u84dZiMPAEtRH/K+mZHUyHjD1KdEVSB/RwTAp2L9V/XU8AUfkp3IL3m+1e21G/RQKxSTWBmJsUDYwRNvFQyWkJiTCB8/7iESGXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729535687; c=relaxed/simple;
-	bh=gVyj8q2F5fTHdtkH4HVKPsDpqau3QoGPppORTMvwm4M=;
+	s=arc-20240116; t=1729535704; c=relaxed/simple;
+	bh=lm+ItdEShmtD0dsOS8gUASXHw8vfmgMO7v/ygzcD0GI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=exVhkvXGfXTxNLCDnI0wi2Osb5b9jGF3npcOsYtKeVvF2sWYNlUa22juOR9/DZ//ougYcUtf7nol6ea9H/X+TjxMe3jXHYE0zQM47E7zjwc/wrq0FlCzYPj5gfdUOoAmoUz1sPLftA7wJrN9Rdwn7+MS02LvUqWTdkS2dr4a2fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vjiRYOUj; arc=none smtp.client-ip=52.119.213.150
+	 MIME-Version:Content-Type; b=LQakcgI5yAjkYXLq4Xi8YNXADeQ3RFaTZp+8gzPs1GBZJ431egiBqhatvH7ecLFiZBnG4Wek+Q+nyODpX9LIKEfc+AIpRW/7gX8dOZMa8/epnj2LVibMjBf3j0XTayiaYotKRqUEPeTnN1Vbm5GX/gCqsL9ZGr0gEtYggX9Bt40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DNFX3306; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729535686; x=1761071686;
+  t=1729535703; x=1761071703;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/eP36B/Shb0sXOy4S1qQH+ZVe3G7dEPQcDZBmD9DSzc=;
-  b=vjiRYOUjIndB6Sk1ccu7xHF3aS7IFQy0uSUJMagRc9ooZxVWZL+kxfRT
-   +yQnqhGHKlNL/oYHGcUHMXNKR+EByWwBoeVGUwvf/DdTgNoYc6s9IG1R9
-   ak+mddL3t7+1dqolDL4VbpMrv0qWGLbhOYep9Ce/H8x6AdePI2j7iG5xy
-   k=;
+  bh=prSrnDCmntYuYVZsK85uDPqZ+IrVK1VCdsgGcKczyPc=;
+  b=DNFX3306xnLjD3YLspNWSSbYffvKUTFwGQlFVASMrreErVnmwTldr/BI
+   G1R5dmFBqfYCBV38XSujd0gxhpgEAKQlbYXysHw7r9OD3mZJFcyiNPQdL
+   KQNbofID6+yMQgRZ/8ZuipdOphltlzhWsvuPbspFaClmDOuWwelyiAbJQ
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.11,221,1725321600"; 
-   d="scan'208";a="668014424"
+   d="scan'208";a="668014541"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 18:34:42 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:58195]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.124:2525] with esmtp (Farcaster)
- id c01c37e7-63d6-4736-90a6-a0381eb2c17c; Mon, 21 Oct 2024 18:34:41 +0000 (UTC)
-X-Farcaster-Flow-ID: c01c37e7-63d6-4736-90a6-a0381eb2c17c
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 18:35:01 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:63038]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.192:2525] with esmtp (Farcaster)
+ id 02fcacca-4860-47a9-a8bf-f25e702e3817; Mon, 21 Oct 2024 18:34:59 +0000 (UTC)
+X-Farcaster-Flow-ID: 02fcacca-4860-47a9-a8bf-f25e702e3817
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 21 Oct 2024 18:34:39 +0000
+ Mon, 21 Oct 2024 18:34:59 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.222.5) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 21 Oct 2024 18:34:37 +0000
+ Mon, 21 Oct 2024 18:34:56 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 06/12] ipv4: Use per-netns RTNL helpers in inet_rtm_newaddr().
-Date: Mon, 21 Oct 2024 11:32:33 -0700
-Message-ID: <20241021183239.79741-7-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 07/12] ipv4: Convert RTM_DELADDR to per-netns RTNL.
+Date: Mon, 21 Oct 2024 11:32:34 -0700
+Message-ID: <20241021183239.79741-8-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241021183239.79741-1-kuniyu@amazon.com>
 References: <20241021183239.79741-1-kuniyu@amazon.com>
@@ -77,89 +77,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+X-ClientProxiedBy: EX19D033UWA001.ant.amazon.com (10.13.139.103) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-inet_rtm_to_ifa() and find_matching_ifa() are called
-under rtnl_net_lock().
+Let's push down RTNL into inet_rtm_deladdr() as rtnl_net_lock().
 
-__in_dev_get_rtnl() and in_dev_for_each_ifa_rtnl() there
-can use per-netns RTNL helpers.
-
-Let's define and use __in_dev_get_rtnl_net() and
-in_dev_for_each_ifa_rtnl_net().
+Now, ip_mc_autojoin_config() is always called under per-netns RTNL,
+so ASSERT_RTNL() can be replaced with ASSERT_RTNL_NET().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/inetdevice.h | 9 +++++++++
- net/ipv4/devinet.c         | 8 ++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ net/ipv4/devinet.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/inetdevice.h b/include/linux/inetdevice.h
-index d9c690c8c80b..5730ba6b1cfa 100644
---- a/include/linux/inetdevice.h
-+++ b/include/linux/inetdevice.h
-@@ -226,6 +226,10 @@ static __inline__ bool bad_mask(__be32 mask, __be32 addr)
- 	for (ifa = rtnl_dereference((in_dev)->ifa_list); ifa;	\
- 	     ifa = rtnl_dereference(ifa->ifa_next))
- 
-+#define in_dev_for_each_ifa_rtnl_net(net, ifa, in_dev)			\
-+	for (ifa = rtnl_net_dereference(net, (in_dev)->ifa_list); ifa;	\
-+	     ifa = rtnl_net_dereference(net, ifa->ifa_next))
-+
- #define in_dev_for_each_ifa_rcu(ifa, in_dev)			\
- 	for (ifa = rcu_dereference((in_dev)->ifa_list); ifa;	\
- 	     ifa = rcu_dereference(ifa->ifa_next))
-@@ -252,6 +256,11 @@ static inline struct in_device *__in_dev_get_rtnl(const struct net_device *dev)
- 	return rtnl_dereference(dev->ip_ptr);
- }
- 
-+static inline struct in_device *__in_dev_get_rtnl_net(const struct net_device *dev)
-+{
-+	return rtnl_net_dereference(dev_net(dev), dev->ip_ptr);
-+}
-+
- /* called with rcu_read_lock or rtnl held */
- static inline bool ip_ignore_linkdown(const struct net_device *dev)
- {
 diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index d5050c1bf157..96f6592740c6 100644
+index 96f6592740c6..db56c1e16f65 100644
 --- a/net/ipv4/devinet.c
 +++ b/net/ipv4/devinet.c
-@@ -901,7 +901,7 @@ static struct in_ifaddr *inet_rtm_to_ifa(struct net *net, struct nlmsghdr *nlh,
- 		goto errout;
+@@ -645,7 +645,7 @@ static int ip_mc_autojoin_config(struct net *net, bool join,
+ 	struct sock *sk = net->ipv4.mc_autojoin_sk;
+ 	int ret;
+ 
+-	ASSERT_RTNL();
++	ASSERT_RTNL_NET(net);
+ 
+ 	lock_sock(sk);
+ 	if (join)
+@@ -671,22 +671,24 @@ static int inet_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct in_ifaddr *ifa;
+ 	int err;
+ 
+-	ASSERT_RTNL();
+-
+ 	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFA_MAX,
+ 				     ifa_ipv4_policy, extack);
+ 	if (err < 0)
+-		goto errout;
++		goto out;
+ 
+ 	ifm = nlmsg_data(nlh);
++
++	rtnl_net_lock(net);
++
+ 	in_dev = inetdev_by_index(net, ifm->ifa_index);
+ 	if (!in_dev) {
+ 		NL_SET_ERR_MSG(extack, "ipv4: Device not found");
+ 		err = -ENODEV;
+-		goto errout;
++		goto unlock;
  	}
  
--	in_dev = __in_dev_get_rtnl(dev);
-+	in_dev = __in_dev_get_rtnl_net(dev);
- 	err = -ENOBUFS;
- 	if (!in_dev)
- 		goto errout;
-@@ -948,12 +948,12 @@ static struct in_ifaddr *inet_rtm_to_ifa(struct net *net, struct nlmsghdr *nlh,
- 	return ERR_PTR(err);
+-	for (ifap = &in_dev->ifa_list; (ifa = rtnl_dereference(*ifap)) != NULL;
++	for (ifap = &in_dev->ifa_list;
++	     (ifa = rtnl_net_dereference(net, *ifap)) != NULL;
+ 	     ifap = &ifa->ifa_next) {
+ 		if (tb[IFA_LOCAL] &&
+ 		    ifa->ifa_local != nla_get_in_addr(tb[IFA_LOCAL]))
+@@ -702,13 +704,16 @@ static int inet_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 
+ 		if (ipv4_is_multicast(ifa->ifa_address))
+ 			ip_mc_autojoin_config(net, false, ifa);
++
+ 		__inet_del_ifa(in_dev, ifap, 1, nlh, NETLINK_CB(skb).portid);
+-		return 0;
++		goto unlock;
+ 	}
+ 
+ 	NL_SET_ERR_MSG(extack, "ipv4: Address not found");
+ 	err = -EADDRNOTAVAIL;
+-errout:
++unlock:
++	rtnl_net_unlock(net);
++out:
+ 	return err;
  }
  
--static struct in_ifaddr *find_matching_ifa(struct in_ifaddr *ifa)
-+static struct in_ifaddr *find_matching_ifa(struct net *net, struct in_ifaddr *ifa)
- {
- 	struct in_device *in_dev = ifa->ifa_dev;
- 	struct in_ifaddr *ifa1;
- 
--	in_dev_for_each_ifa_rtnl(ifa1, in_dev) {
-+	in_dev_for_each_ifa_rtnl_net(net, ifa1, in_dev) {
- 		if (ifa1->ifa_mask == ifa->ifa_mask &&
- 		    inet_ifa_match(ifa1->ifa_address, ifa) &&
- 		    ifa1->ifa_local == ifa->ifa_local)
-@@ -989,7 +989,7 @@ static int inet_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto unlock;
- 	}
- 
--	ifa_existing = find_matching_ifa(ifa);
-+	ifa_existing = find_matching_ifa(net, ifa);
- 	if (!ifa_existing) {
- 		/* It would be best to check for !NLM_F_CREATE here but
- 		 * userspace already relies on not having to provide this.
+@@ -2832,7 +2837,8 @@ static struct rtnl_af_ops inet_af_ops __read_mostly = {
+ static const struct rtnl_msg_handler devinet_rtnl_msg_handlers[] __initconst = {
+ 	{.protocol = PF_INET, .msgtype = RTM_NEWADDR, .doit = inet_rtm_newaddr,
+ 	 .flags = RTNL_FLAG_DOIT_PERNET},
+-	{.protocol = PF_INET, .msgtype = RTM_DELADDR, .doit = inet_rtm_deladdr},
++	{.protocol = PF_INET, .msgtype = RTM_DELADDR, .doit = inet_rtm_deladdr,
++	 .flags = RTNL_FLAG_DOIT_PERNET},
+ 	{.protocol = PF_INET, .msgtype = RTM_GETADDR, .dumpit = inet_dump_ifaddr,
+ 	 .flags = RTNL_FLAG_DUMP_UNLOCKED | RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
+ 	{.protocol = PF_INET, .msgtype = RTM_GETNETCONF,
 -- 
 2.39.5 (Apple Git-154)
 
