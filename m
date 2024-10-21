@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-137471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B699A697F
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:03:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 604DD9A6984
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49DC91F22CFE
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:03:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21EA2284547
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B0B1F81BA;
-	Mon, 21 Oct 2024 13:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522FC1F8EF8;
+	Mon, 21 Oct 2024 13:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBbjOS2r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNGss+1r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01691E1C3B;
-	Mon, 21 Oct 2024 13:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A7F1F80B8;
+	Mon, 21 Oct 2024 13:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729515762; cv=none; b=in6tJo0TRMMWx6PtIeJfj/KdIpnJtjV+0DH8+lGa3lBYPwKWFDFqRx4ACbuIZCTAZWq9qgQ7/l8RsMUqWdtonJSIKK4Lmf4lzC63g8UYU8A9X36P58UbY62Z8IiYWRk6LKY3lgsnjpy/4hoUEyeVXwpL3ShYxu/QN2m/0rq7aiY=
+	t=1729515764; cv=none; b=nO/IgvG1aQOqdG7o6FPxAb9dDL/b/LDWnswt+6MUrB62A2E4voJ0LI0z5x4aouKxCVLJ8B2onSYIPYIxbwsARa8iI08x0HzBIvTexRNGWDSI6LTZ/dI1bOlvpyM38JKBM3I+wBPULIiuZx0yLl2tBabdxFQGRfNliT0wyVuwe9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729515762; c=relaxed/simple;
-	bh=4ZZXfEX4GV9IDBhS1AYZHvuhi8EIoqvqAsSYWPfhfI0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=thTU1DrNEFpkFYb1naPbT/ygH9dFHRA2XqeUa0PrwtVqi6jLP+SIS0dNoq9QwfSjEmjJQMMhE6BJgyPLdmP8Aak5a5FMJaeyimm35OdiToI4KhunW47batCGf/NLA3KxOaej3aMIfkILszCeJ3lOy+3b++rDHOXnq3QnYWVbR34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GBbjOS2r; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1729515764; c=relaxed/simple;
+	bh=0ujrSrrsk4eEz6QYJ+XA1EBRhjgv4z3AQ64pKfocAWU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AImayr0AJcNIUfPu2vsiwEd6OdwQH144WdiaSnI3vfOWqrp1okVKZNBES/IYdub8A367wq0CMz9OKY0ubVR87H4BNmg+HzyYpqmawy49zp8nLTOR5rohBn08/bXtQ33t7DUQzlfa680msJiEAeK/t2BGRwwk+tzIP/wlg4nCVHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNGss+1r; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37d4b0943c7so3279285f8f.1;
-        Mon, 21 Oct 2024 06:02:40 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d5689eea8so2984729f8f.1;
+        Mon, 21 Oct 2024 06:02:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729515759; x=1730120559; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=00l+jC2uOyTPd/aiRiRrvwlSjWFTQ2XPXmYmaLpqa4g=;
-        b=GBbjOS2rlDnWmGb3hKZerI5YlBlQ+pNoP+mEPYArLYSsvoBFdacCvE+3ylVSSieUWQ
-         jidx4O4DgtTwrDsgSfX7hStz0BrIGaFuKbZxRfbHv9p5/8DBG1SzZboWtAq2RXj1rAGi
-         sxhGi4gejrAklUum0vzI7OhxyNJoN6GLrTRgBCSXkd1IILXJhxvtV8isZjJW3KUBdiSt
-         1CyqOIqmm73qu5sVcUfZxdWYfW1MgWSY0W7xFN2gDu3InWJR+Mm5/1dgV8ea6ENk1dD+
-         NpmgEduwfOo74tl1O72vxmmGvs0nMAgRlCqp2cEyj4pdjLVIesVyljJ0C/vDAeRScKM/
-         YT8Q==
+        d=gmail.com; s=20230601; t=1729515760; x=1730120560; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lfnoFTnTvSIM1scMxITWklvMR7Mwt4ccSZX9oAqnsCk=;
+        b=BNGss+1rGIP2roeyO1PNItkZYpsaD37ShDo7VuHMhRjFfb2XXuXsdQpEU4DN/wy0hv
+         UtoFPLPU+3YNNWzz+5n4r5RneGrgR5Z7ffa4FQjytVGDvt/OyyEvUWeRXZ85KBlMxG/R
+         VzgSURYYNo8r0dXVEgYfSjDkJnsxMR4G8ghB7zqHEjq/BKfm7nuv3KLvsYmktMvt5ZEh
+         fx1NqyqDnAX3AHZnrflTKAC856kda4h9A3PXjXR9PXyF4Qi0waUnTpZa78bnDEHnMZix
+         R48bxyOw96pN4hsK+wj1/KAFonTYcPSoDrReSqrE4MTw2KzkftIl9OKNTlHorqoHuDP6
+         0BRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729515759; x=1730120559;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=00l+jC2uOyTPd/aiRiRrvwlSjWFTQ2XPXmYmaLpqa4g=;
-        b=iZaLuw7mKP2eL8QPfOjY6v0cDxOYS4VJKuYLZYutBYHxmMy4QmcI5SjboH5meObdWE
-         qdAMft73pqLfmvM8u1p5vc1CI0dYsh9Ofw+DUBRS8YV2rO2zx/Z/5OTKVN6clRz+OjsN
-         GVtqWXZXshLDxYum/fvjvR+7LcOYb2HRbUqgT1WlcN0pSYRyqne4tgr4ZQqcjxRpQozC
-         QRY/Hx55UAn4iDnMc/3nuJkMMWsCeqdCOtZaHVJ5LYyUrrIHbHrrFFYTPy4v0G2wPbsX
-         5zUCYmHTIGG48ElPnB+knO9NhGsMV6JANeILgTMwUZODdHzEbjhyPa5cWmSDSdqRbISg
-         Cawg==
-X-Forwarded-Encrypted: i=1; AJvYcCUr+ZQJp3sAliC8OGGxeFsuNDSqfgcdHSUJn7XPSFVkHNPBhzdoijTccD3sdIPCKk0iDXyNVEdj@vger.kernel.org, AJvYcCVIOijuQVc27XgEj1yJmhveqA5F/NL5AAhqwrwQLAfIMmjGyTmxMY42kLt8v6V9lXpNEZ2mNOR+bK8c@vger.kernel.org, AJvYcCXWhko5c0DvpTYqaO6SJ783m+2DgFkrYLVBI6no23ivvyZcCO+V0O3/End52AXTygYWY3iqpYUg9Plsr3N2@vger.kernel.org
-X-Gm-Message-State: AOJu0Yylbzp8Kfb6dA6aseGrsXaMDP0hwytFcRiylx+v8FEsAYm2sGrK
-	8jDkTkrxG4jVqgt1qGbTHhs21KzPTMcxoIhdxAyajLxA3K3GWGYW
-X-Google-Smtp-Source: AGHT+IGi4EkVtSyQblvOmjpA4U0smdp9GUxWtw3ocNzEwJ6qTkiBx4UYhqSXBsqxX8gq/Uv/AK3uRQ==
-X-Received: by 2002:adf:e787:0:b0:37d:5436:4a1 with SMTP id ffacd0b85a97d-37eab727771mr6738850f8f.3.1729515758667;
-        Mon, 21 Oct 2024 06:02:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729515760; x=1730120560;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lfnoFTnTvSIM1scMxITWklvMR7Mwt4ccSZX9oAqnsCk=;
+        b=tpbAIuCftlvWEVIzjhPvkOJ8Y7HOACeiEFzXIZD0osFh9UG0CkkHtMCuVUPpUAJg0D
+         rCfW3G+cCUfsU52DymwYua8nVgWQDKU+9YmAepiVEO8cKISBIjvODACGnyHHhKJrOp6m
+         LOguAuVgStUilsKsUjl38Yu76s81y4hFY5f1sXG2p/ZS9mQLYuP2KQ0UiPTdLtNm4Z/U
+         lidiRqXLkOpVMNlOLqsEY6Q5EYbjUssjQ5DihSxj26kdtPow1tATaSDGGK465K0lNrQJ
+         nv3AqMgDZODALbbzJUFOVHlrx3SWvJJwYk98luFrPPkkLu+WjE92sxUK6Jb1TluswN/k
+         9p8A==
+X-Forwarded-Encrypted: i=1; AJvYcCURhmjn5kgwmbglDn78JLGTQKhUhzkXXNgEI9xvHsdcUnQVgNRRyS2cIys86nXHpVJ/XBmayvbf9CI6@vger.kernel.org, AJvYcCVJvtEw8Ow1MfgkSAPx/gCK0WnTxyh6Uua3T/1VxjtoC4RVjdG1PxyiNquQKtRa+OdXKAAMHYzA5ff8rXmB@vger.kernel.org, AJvYcCWOb9K2fx4VxY/cchJTC8g70ocpXND2okCmyoacszltBaHeiUR6FhcUIsU1paEmaL4fMs9fMjf9@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKRSZj4n9RvBabH2qp67Xuw6r0CY5YNRkpzGDFqZQwZR7XGoC4
+	ii73Yl6rZWVa+gw2IgVIL740B/ayIJqXFfAEJOz0bLp8udhkbpzG1nQuxw==
+X-Google-Smtp-Source: AGHT+IGB42B4JCPKbsU6DhqCcHXmAdx8avXYx3w3bO1ep1Vh+9tpxQ/1zXAJPC8GmiQYGfm7GeIHiw==
+X-Received: by 2002:adf:f781:0:b0:37d:46a8:ad4e with SMTP id ffacd0b85a97d-37eab6da681mr7028762f8f.15.1729515759989;
+        Mon, 21 Oct 2024 06:02:39 -0700 (PDT)
 Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37ee0b9bcfdsm4295329f8f.103.2024.10.21.06.02.37
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37ee0b9bcfdsm4295329f8f.103.2024.10.21.06.02.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2024 06:02:38 -0700 (PDT)
+        Mon, 21 Oct 2024 06:02:39 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -85,10 +88,12 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next RFC PATCH 0/4] net: dsa: Add Airoha AN8855 support
-Date: Mon, 21 Oct 2024 15:01:55 +0200
-Message-ID: <20241021130209.15660-1-ansuelsmth@gmail.com>
+Subject: [net-next RFC PATCH 1/4] net: mdio: implement mdio_mutex_nested guard() variant
+Date: Mon, 21 Oct 2024 15:01:56 +0200
+Message-ID: <20241021130209.15660-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241021130209.15660-1-ansuelsmth@gmail.com>
+References: <20241021130209.15660-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,52 +102,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This small series add the initial support for the Airoha AN8855 Switch.
+Implement mdio_mutex_nested guard() variant.
 
-It's a 5 port Gigabit Switch with SGMII/HSGMII upstream port.
+guard() comes from the cleanup.h API that defines handy class to
+handle the lifecycle of a critical section.
 
-This is starting to get in the wild and there are already some router
-having this switch chip.
+Several drivers use of the mutex_lock_nested()/mutex_unlock() function
+call pair hence it is sensible to provide a variant of the generic
+guard(mutex), guard(mdio_mutex_nested) so that drivers can be better
+supported with the call variant "mutex_lock_nested(..., MDIO_MUTEX_NESTED)"
 
-It's conceptually similar to mediatek switch but register and bits
-are different. And there is that massive Hell that is the PCS
-configuration.
-Saddly for that part we have absolutely NO documentation currently.
+Example usage:
 
-There is this special thing where PHY needs to be calibrated with values
-from the switch efuse. (the thing have a whole cpu timer and MCU)
+guard(mutex_lock_nested)(&bus->mdio_lock)
+scoped_guard(mutex_lock_nested, &bus->mdio_lock) { ... }
 
-Some cleanup API are used and one extra patch for mdio_mutex_nested is
-introduced. As suggested some time ago, the use of such API is limited
-to scoped variants and not the guard ones.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ include/linux/mdio.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Posting as RFC as I expect in later version to add additional feature
-but this is already working and upstream-ready. So this is really to
-have a review of the very basic features and if I missed anything in
-recent implementation of DSA.
-
-Christian Marangi (4):
-  net: mdio: implement mdio_mutex_nested guard() variant
-  dt-bindings: net: dsa: Add Airoha AN8855 Gigabit Switch documentation
-  net: dsa: Add Airoha AN8855 5-Port Gigabit DSA Switch driver
-  net: phy: Add Airoha AN8855 Internal Switch Gigabit PHY
-
- .../bindings/net/dsa/airoha,an8855.yaml       |  146 ++
- MAINTAINERS                                   |   11 +
- drivers/net/dsa/Kconfig                       |    9 +
- drivers/net/dsa/Makefile                      |    1 +
- drivers/net/dsa/an8855.c                      | 2008 +++++++++++++++++
- drivers/net/dsa/an8855.h                      |  492 ++++
- drivers/net/phy/Kconfig                       |    5 +
- drivers/net/phy/Makefile                      |    1 +
- drivers/net/phy/air_an8855.c                  |  187 ++
- include/linux/mdio.h                          |    4 +
- 10 files changed, 2864 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/dsa/airoha,an8855.yaml
- create mode 100644 drivers/net/dsa/an8855.c
- create mode 100644 drivers/net/dsa/an8855.h
- create mode 100644 drivers/net/phy/air_an8855.c
-
+diff --git a/include/linux/mdio.h b/include/linux/mdio.h
+index efeca5bd7600..3f0691dee46a 100644
+--- a/include/linux/mdio.h
++++ b/include/linux/mdio.h
+@@ -8,6 +8,7 @@
+ 
+ #include <uapi/linux/mdio.h>
+ #include <linux/bitfield.h>
++#include <linux/mutex.h>
+ #include <linux/mod_devicetable.h>
+ 
+ struct gpio_desc;
+@@ -25,6 +26,9 @@ enum mdio_mutex_lock_class {
+ 	MDIO_MUTEX_NESTED,
+ };
+ 
++DEFINE_GUARD(mdio_mutex_nested, struct mutex *,
++	     mutex_lock_nested(_T, MDIO_MUTEX_NESTED), mutex_unlock(_T))
++
+ struct mdio_device {
+ 	struct device dev;
+ 
 -- 
 2.45.2
 
