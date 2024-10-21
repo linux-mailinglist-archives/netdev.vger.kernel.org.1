@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-137335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390819A5882
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 03:25:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E8E9A5895
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 03:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC93282472
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 01:25:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A72E71F21E56
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 01:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8C010A1E;
-	Mon, 21 Oct 2024 01:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45B212E7E;
+	Mon, 21 Oct 2024 01:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QGhDscV+"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="dc1bdN8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130A1BE65;
-	Mon, 21 Oct 2024 01:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9B610A3E;
+	Mon, 21 Oct 2024 01:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729473912; cv=none; b=cjOxZsZ7iR5TvMMnxDe5RoWFIbjTy+ORhQmCRI0upUezcnavsH59OHcpXNCf7q+xgZxVvoaGGp9U47Tj4oMKtklP4Qzl2hBWsVQYRzfUxpQXYbtmdbHZaVvJPbmw3bNYTKFKxcO4lWGfXK88Vp8EOfackcX91+Djyb7eks8hmc4=
+	t=1729474685; cv=none; b=l+2SLK9x/M/mM6ad8GQuWsfJET8jVWx0wtNswcBbbnITQKivt0ws5eojuHxXxludotSbcIWh6qjzELwYfH0VFeVCEPxxskozZWV8vxwB0HS2jtkzADJn0DMZ1oIhrwngsTcBH753VKeupwA9aSqJbPE6GwDOGi9Epf2E3FxqSzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729473912; c=relaxed/simple;
+	s=arc-20240116; t=1729474685; c=relaxed/simple;
 	bh=bxM0ZLnlcZakhZciREqbmanZ3MijgpsLdgCyFRhr840=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lj8e4Ucdy3wf0J5dyi4e50UjnY7XLn66NLiYINISe6LyTLq52dhRG1xjjCghwEyZp4GmT1in9d53N/xsZKhbLZf+h8eNHHM0LW6lY60VM7QY+qW2pzFU/KpJyyd9GYF/+6d2e3/2Zeg7cxOn2d8XsC+KebxLvanlo2BOEymTTH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=QGhDscV+; arc=none smtp.client-ip=117.135.210.3
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hybb4iDSaplTyMVeFvR6gjHmomRtdALDJaxr1cVyTqFGu1d/cZa6eGkWwPeTyw6Rw/I1meMYmr+evZ0FE+HhcEdwn1a/694HdWNpLkWbcxPKpOd1wtWgo8d8YLz8ijDOPkQQdOAKSdOegKXw4bhJAkz3GGcXwBAPW3fh03Q70OQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=dc1bdN8V; arc=none smtp.client-ip=220.197.31.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=upPl/
-	vJF+V+jNENLlbjlbuE9AJVSMOuiWd7sj3jAOxE=; b=QGhDscV+vj963g1cbCiGu
-	uXSrELipg7iz94YU5jr7oScPeEyC/mAR0PuLN0mOBuNnPc7cDfHDYsJi0BL+zZDb
-	dsFr03iEjAaPHKrvjjlSQFeuPnw3HaHrIO2fAjrGKKBwGR9aoV8USd63gbH/rXpX
-	wY63N6y4m2N3uxWqBOZ6rY=
+	vJF+V+jNENLlbjlbuE9AJVSMOuiWd7sj3jAOxE=; b=dc1bdN8VSSUJMIstf7spe
+	RtDvdUWoIw0tzK7f3d3vWbPZ619PuH9MIac0NX0Z8kzhXY9wk44nrc46O20ZIYDs
+	tIYvO28vHdciTxftiSySrGpXU9BPRHsZGXKxlaku9tOsjbMo2aMFG3vMpJqrQ7KO
+	6oKLeFWFyqkY0h4BddFgKA=
 Received: from localhost.localdomain (unknown [47.252.33.72])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wBHz+NDrRVnf9t6CQ--.41457S2;
-	Mon, 21 Oct 2024 09:24:24 +0800 (CST)
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wCHr_VEsBVn0pyDCQ--.33600S2;
+	Mon, 21 Oct 2024 09:37:13 +0800 (CST)
 From: mrpre <mrpre@163.com>
 To: edumazet@google.com,
 	jakub@cloudflare.com,
@@ -45,12 +45,12 @@ To: edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
-	bpf@vger.kernel.orgc,
+	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: mrpre <mrpre@163.com>
 Subject: [PATCH] bpf: fix filed access without lock
-Date: Mon, 21 Oct 2024 09:24:09 +0800
-Message-ID: <20241021012409.14084-1-mrpre@163.com>
+Date: Mon, 21 Oct 2024 09:37:05 +0800
+Message-ID: <20241021013705.14105-1-mrpre@163.com>
 X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,12 +59,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBHz+NDrRVnf9t6CQ--.41457S2
+X-CM-TRANSID:_____wCHr_VEsBVn0pyDCQ--.33600S2
 X-Coremail-Antispam: 1Uf129KBjvJXoW7Kr1rCFy7Ar1fKr4rKw48Zwb_yoW8GFyrpF
 	y7Cw109a1qyFWDAr4vyFWkJF13W3ySka4Uurn5W3y3Arsrur13tFWkKw4YyF1F9Fs2yF4a
 	qrWjgF1jka1DCwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piuyIUUUUUU=
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDxl-p2cVqsZQ3AAAsc
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDwl-p2cVqsaoXQAAs1
 
 The tcp_bpf_recvmsg_parser() function, running in user context,
 retrieves seq_copied from tcp_sk without holding the socket lock, and
