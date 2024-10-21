@@ -1,243 +1,308 @@
-Return-Path: <netdev+bounces-137531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E09339A6CB9
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:51:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC81B9A6CAE
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:49:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BE7A280DA4
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:51:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6787B280A7C
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CD11E9074;
-	Mon, 21 Oct 2024 14:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747D11F9A9A;
+	Mon, 21 Oct 2024 14:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IAop/KfH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6wgFBJY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB8B1DE88C
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 14:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10CC1F891E;
+	Mon, 21 Oct 2024 14:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729522259; cv=none; b=OXXdCwtI1CS5fiZ33TkVSO+qYA380qdw7CvIMq3bH8MXkiZjCtJorHgokcrhPvq7y56xzATQseA7ANkMPl/TllUYYffQZqMw7UMKOtHSwilld6TARVf3m51Uq4vvPZBX3OIzPqnFSQbF9RpqQ8ZPmKEo5einU303u7mVeK5R9Hw=
+	t=1729522190; cv=none; b=BZjPTu8gXFZ7Tc7vQWWn9jGV6u3VyXFyihnHBPQSO0+15FULqtOBzFRq0OcmpQMXfSLGFn8Z+GRTeE5Ys3SmYBF38Cbc5DviJLd+jQYYLbNC14LZ5T6g1ZNmZkdvr8knLcUwE5Y7NeG2LKS16uBd/HYvQzQGSawjbCrO7F3bMds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729522259; c=relaxed/simple;
-	bh=m4KNzbG/ZQpZhCQ3XsQ/I1ca3IyouIoCTbBeLkhGQng=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KIzcwAC/ZYq47XPyWN3hzWj4AMg/go4qb8WcQpLp3GaJtBzOXgUZ7SlfSngNO9+cSnc9whT3xck8SBBo2h2vZ0WscujI/mALcVIuCulBwOOdU/VfDcuf56Aqq9+nu4ImSGB8c1Yqygpl2C7084IsQ3/ObcpegRib7gMO4WssZFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IAop/KfH; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729522257; x=1761058257;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=m4KNzbG/ZQpZhCQ3XsQ/I1ca3IyouIoCTbBeLkhGQng=;
-  b=IAop/KfHO1n4bWpZr5Jy3dPfR8a1TQLUQSaoZTUO7u2j9T4BwU6qZcsH
-   WOa7CrTlIWg9C+s7o59MAK9hm+U2U2QPQZ23hZLL0uBmd6p63RemAQrwW
-   pZNe5asMBoqOenh+KtR9e38U24cgz6RGexll8kVuh1mqy5VNcGiox1puy
-   VUMAVvzNtwlj2kQaEoWzBXoiXcgLzgC9unxJus6EnIv8EZMqSC2qx82HI
-   TZtKRc1YAtjXseXJu/gvEvaoDPTHVFCxnAPhUPVLg4/YQ7a9tzzN1Imt8
-   YkVLqY/RfzShmvC8+zLnSDLE0Ds+cmkLEi1egF31gscpUgroGopCigWiF
-   A==;
-X-CSE-ConnectionGUID: POvdNrV+SM+qofxJ0YC/BQ==
-X-CSE-MsgGUID: 2IpK71qPTmuaQoMY9B/4gA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="39598572"
-X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="39598572"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 07:50:57 -0700
-X-CSE-ConnectionGUID: PdJin0YbQ7KAxJYGJdt/ow==
-X-CSE-MsgGUID: 457wREENTJO+6Rx4RwgtJg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="110305906"
-Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.246.19.66])
-  by fmviesa001.fm.intel.com with ESMTP; 21 Oct 2024 07:50:55 -0700
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v2 2/2] ixgbevf: Add support for Intel(R) E610 device
-Date: Mon, 21 Oct 2024 16:48:41 +0200
-Message-ID: <20241021144841.5476-1-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1729522190; c=relaxed/simple;
+	bh=hRiJWkhCjaxIknTyGTSFGJY5nAxV3+531Mlfz5dkFE0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IX7+idN4+hxAkvI+6DG4OHu6okgUsIcqt1vatNzBdBHgRdtAO1jFb29BpuCUQRX78BfwJASJztCHVx2FIQNgpEvcSc5ajWTObABEQ/oPqgU1oq/lq2P8xzRI2BfcMWncOwdJ5HxOp/nSZfMaJatacNkN3BZ7uDn711uUG1V/OZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y6wgFBJY; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6cb97afcec9so31319836d6.2;
+        Mon, 21 Oct 2024 07:49:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729522186; x=1730126986; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=84lL9admtSqwLpg7VH6pZR2Jg/MCV+HcnAoSWzVcOks=;
+        b=Y6wgFBJYKugF39mHrlpcGwLKJBsKtWI8Z182Ge9P02QwD29cPwuw8QJ2RyGFXL2N3B
+         Wk0+/ees7f6zojjEIlh6X7eLVHaD2/GY6zBe1THhNttfMXkNjyuO0Bc9KZfap5qgV/+F
+         atb58iyWxVPozoKH+qoVZE/fLH5n7fOGPI0ykYfSssAlS5Y3jXwyYMSbnn8jknFn+3Hw
+         5f+xdwjRR/ZIqlPLrmPmbyjugVTkMEebdcb5U1VKWCh8dLu+2HOejy/GvUR9Id7vIcu4
+         f/vdPHzbXGniq87P9dGW58hlTRZYARJmH5eorGIDNFCEglWNuAoHTGQqe70DQjwmRCBb
+         osjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729522186; x=1730126986;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=84lL9admtSqwLpg7VH6pZR2Jg/MCV+HcnAoSWzVcOks=;
+        b=f7c44QRSKOTe7ZHwZpXdWK24eUjptm3qd1pVg+RalSzJFBdYa8wilPMatbjZT35u7s
+         juVfkdk09t1X3Ljrqo/RMoABP4DGVlJWwnqvUBIwp/qG5Sk/VULIrN/ZJkO97PbeLMpN
+         qHZCfRdTx3TTz+X5oyVGoCNK3K+0iWB0pKBzBYU6oiVm4C3f1R89+NKpSLxplNj7dr2V
+         b7lwqiQKRQXaKyxnzSx23ygRGcLcsXsCoGZAGN4apFbFxUmdaDSn9fFTM9BGy2/dIcwG
+         6qGlFV0KU2RplYmNDMxb7Zs/w4Q/kd7kVQgZ+77FQWvSGsGURmbyzo9cGSZsWH1qyy+w
+         GEJA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3OECeYrnJ3nf+1RBMp8PSLD+ti38PFZNn0oMKreVEbnYvLFulJatoTn4K4BCXkNE8oPwwRKnq@vger.kernel.org, AJvYcCXVaGNtlgDlWrFghMIT6BBjn+eLLUb7xS4zRMZdQVGP+5Dltsfz3rjPQ2PJ5bOCAaVVzt4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyntA3ACELRsUc6DDiCjg37ouNdQDWrjSP5bPbmd47PQO+dKz0A
+	eFcdO2WHVpApKSFAQsb9D+AM1ZUn5Scaylbh6yhJSLNeHByYvs0v
+X-Google-Smtp-Source: AGHT+IFSAu4RiEwfz/Pzl76eMYM0Wt3Oe3iUs+8/4/lZxGzXvE3tYe/jH4LjsAj75B1uwcR5SKrVeA==
+X-Received: by 2002:a05:6214:328e:b0:6cb:f40c:b868 with SMTP id 6a1803df08f44-6cde163399emr194619986d6.46.1729522186499;
+        Mon, 21 Oct 2024 07:49:46 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce0099a79fsm17697386d6.90.2024.10.21.07.49.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 07:49:45 -0700 (PDT)
+Date: Mon, 21 Oct 2024 10:49:45 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemb@google.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <67166a0997028_42f03294e7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoD5TiaRZgW10tt8jc9srQTbaszs_o2z=Yf-bzO0Kp-vLA@mail.gmail.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-5-kerneljasonxing@gmail.com>
+ <67157b7ec615_14e1829490@willemb.c.googlers.com.notmuch>
+ <CAL+tcoD5TiaRZgW10tt8jc9srQTbaszs_o2z=Yf-bzO0Kp-vLA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
+ control the whole bpf extension
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Add support for Intel(R) E610 Series of network devices. The E610
-is based on X550 but adds firmware managed link, enhanced security
-capabilities and support for updated server manageability
+Jason Xing wrote:
+> On Mon, Oct 21, 2024 at 5:52=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > Willem suggested that we use a static key to control. The advantage=
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
----
- drivers/net/ethernet/intel/ixgbevf/defines.h      |  5 ++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf.h      |  6 +++++-
- drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 12 ++++++++++--
- drivers/net/ethernet/intel/ixgbevf/vf.c           | 12 +++++++++++-
- drivers/net/ethernet/intel/ixgbevf/vf.h           |  4 +++-
- 5 files changed, 33 insertions(+), 6 deletions(-)
+> > > is that we will not affect the existing applications at all if we
+> > > don't load BPF program.
+> > >
+> > > In this patch, except the static key, I also add one logic that is
+> > > used to test if the socket has enabled its tsflags in order to
+> > > support bpf logic to allow both cases to happen at the same time.
+> > > Or else, the skb carring related timestamp flag doesn't know which
+> > > way of printing is desirable.
+> > >
+> > > One thing important is this patch allows print from both applicatio=
+ns
+> > > and bpf program at the same time. Now we have three kinds of print:=
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/defines.h b/drivers/net/ethernet/intel/ixgbevf/defines.h
-index 5f08779..368d514 100644
---- a/drivers/net/ethernet/intel/ixgbevf/defines.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/defines.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- #ifndef _IXGBEVF_DEFINES_H_
- #define _IXGBEVF_DEFINES_H_
-@@ -16,6 +16,9 @@
- #define IXGBE_DEV_ID_X550_VF_HV		0x1564
- #define IXGBE_DEV_ID_X550EM_X_VF_HV	0x15A9
- 
-+#define IXGBE_DEV_ID_E610_VF		0x57AD
-+#define IXGBE_SUBDEV_ID_E610_VF_HV	0x0001
-+
- #define IXGBE_VF_IRQ_CLEAR_MASK		7
- #define IXGBE_VF_MAX_TX_QUEUES		8
- #define IXGBE_VF_MAX_RX_QUEUES		8
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-index 130cb86..9b37f35 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- #ifndef _IXGBEVF_H_
- #define _IXGBEVF_H_
-@@ -418,6 +418,8 @@ enum ixgbevf_boards {
- 	board_X550EM_x_vf,
- 	board_X550EM_x_vf_hv,
- 	board_x550em_a_vf,
-+	board_e610_vf,
-+	board_e610_vf_hv,
- };
- 
- enum ixgbevf_xcast_modes {
-@@ -434,11 +436,13 @@ extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_info;
- extern const struct ixgbe_mbx_operations ixgbevf_mbx_ops;
- extern const struct ixgbe_mbx_operations ixgbevf_mbx_ops_legacy;
- extern const struct ixgbevf_info ixgbevf_x550em_a_vf_info;
-+extern const struct ixgbevf_info ixgbevf_e610_vf_info;
- 
- extern const struct ixgbevf_info ixgbevf_82599_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X540_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550_vf_hv_info;
- extern const struct ixgbevf_info ixgbevf_X550EM_x_vf_hv_info;
-+extern const struct ixgbevf_info ixgbevf_e610_vf_hv_info;
- extern const struct ixgbe_mbx_operations ixgbevf_hv_mbx_ops;
- 
- /* needed by ethtool.c */
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-index 149911e..2829bac 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- /******************************************************************************
-  Copyright (c)2006 - 2007 Myricom, Inc. for some LRO specific code
-@@ -39,7 +39,7 @@ static const char ixgbevf_driver_string[] =
- 	"Intel(R) 10 Gigabit PCI Express Virtual Function Network Driver";
- 
- static char ixgbevf_copyright[] =
--	"Copyright (c) 2009 - 2018 Intel Corporation.";
-+	"Copyright (c) 2009 - 2024 Intel Corporation.";
- 
- static const struct ixgbevf_info *ixgbevf_info_tbl[] = {
- 	[board_82599_vf]	= &ixgbevf_82599_vf_info,
-@@ -51,6 +51,8 @@ static const struct ixgbevf_info *ixgbevf_info_tbl[] = {
- 	[board_X550EM_x_vf]	= &ixgbevf_X550EM_x_vf_info,
- 	[board_X550EM_x_vf_hv]	= &ixgbevf_X550EM_x_vf_hv_info,
- 	[board_x550em_a_vf]	= &ixgbevf_x550em_a_vf_info,
-+	[board_e610_vf]         = &ixgbevf_e610_vf_info,
-+	[board_e610_vf_hv]      = &ixgbevf_e610_vf_hv_info,
- };
- 
- /* ixgbevf_pci_tbl - PCI Device ID Table
-@@ -71,6 +73,9 @@ static const struct pci_device_id ixgbevf_pci_tbl[] = {
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_X_VF), board_X550EM_x_vf },
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_X_VF_HV), board_X550EM_x_vf_hv},
- 	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_X550EM_A_VF), board_x550em_a_vf },
-+	{PCI_VDEVICE_SUB(INTEL, IXGBE_DEV_ID_E610_VF, PCI_ANY_ID,
-+			 IXGBE_SUBDEV_ID_E610_VF_HV), board_e610_vf_hv},
-+	{PCI_VDEVICE(INTEL, IXGBE_DEV_ID_E610_VF), board_e610_vf},
- 	/* required last entry */
- 	{0, }
- };
-@@ -4693,6 +4698,9 @@ static int ixgbevf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	case ixgbe_mac_X540_vf:
- 		dev_info(&pdev->dev, "Intel(R) X540 Virtual Function\n");
- 		break;
-+	case ixgbe_mac_e610_vf:
-+		dev_info(&pdev->dev, "Intel(R) E610 Virtual Function\n");
-+		break;
- 	case ixgbe_mac_82599_vf:
- 	default:
- 		dev_info(&pdev->dev, "Intel(R) 82599 Virtual Function\n");
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index 1641d00..da7a72e 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- #include "vf.h"
- #include "ixgbevf.h"
-@@ -1076,3 +1076,13 @@ const struct ixgbevf_info ixgbevf_x550em_a_vf_info = {
- 	.mac = ixgbe_mac_x550em_a_vf,
- 	.mac_ops = &ixgbevf_mac_ops,
- };
-+
-+const struct ixgbevf_info ixgbevf_e610_vf_info = {
-+	.mac                    = ixgbe_mac_e610_vf,
-+	.mac_ops                = &ixgbevf_mac_ops,
-+};
-+
-+const struct ixgbevf_info ixgbevf_e610_vf_hv_info = {
-+	.mac            = ixgbe_mac_e610_vf,
-+	.mac_ops        = &ixgbevf_hv_mac_ops,
-+};
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.h b/drivers/net/ethernet/intel/ixgbevf/vf.h
-index b4eef5b..2d791bc 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.h
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.h
-@@ -1,5 +1,5 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--/* Copyright(c) 1999 - 2018 Intel Corporation. */
-+/* Copyright(c) 1999 - 2024 Intel Corporation. */
- 
- #ifndef __IXGBE_VF_H__
- #define __IXGBE_VF_H__
-@@ -54,6 +54,8 @@ enum ixgbe_mac_type {
- 	ixgbe_mac_X550_vf,
- 	ixgbe_mac_X550EM_x_vf,
- 	ixgbe_mac_x550em_a_vf,
-+	ixgbe_mac_e610,
-+	ixgbe_mac_e610_vf,
- 	ixgbe_num_macs
- };
- 
--- 
-2.43.0
+> > > 1) only BPF program prints
+> > > 2) only application program prints
+> > > 3) both can print without side effect
+> > >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> >
+> > Getting back to this thread. It is long, instead of responding to
+> > multiple messages, let me combine them in a single response.
+> =
 
+> Thank you so much!
+> =
+
+> >
+> >
+> > * On future extensions:
+> >
+> > +1 that the UDP case, and datagrams more broadly, must have a clear
+> > development path, before we can merge TCP.
+> >
+> > Similarly, hardware timestamps need not be supported from the start,
+> > but must clearly be supportable.
+> =
+
+> Agreed. Using the standalone sk_tsflags_bpf and tskey_bpf and removing
+> the TCP bpf test logic(say, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)
+> could work well for both protos. Let me give it a try first.
+
+Great, thanks.
+
+> >
+> >
+> > * On queueing packets to userspace:
+> >
+> > > > the current behavior is to just queue to the sk_error_queue as lo=
+ng
+> > > > as there is "SOF_TIMESTAMPING_TX_*" set in the skb's tx_flags and=
+ it
+> > > > is regardless of the sk_tsflags. "
+> >
+> > > Totally correct. SOF_TIMESTAMPING_SOFTWARE is a report flag while
+> > > SOF_TIMESTAMPING_TX_* are generation flags. Without former, users c=
+an
+> > > read the skb from the errqueue but are not able to parse the
+> > > timestamps
+> =
+
+> Above is what I tried to explain how the application timestamping
+> feature works, not what I tried to implement for the BPF extension.
+> =
+
+> >
+> > Before queuing a packet to userspace on the error queue, the relevant=
+
+> > reporting flag is always tested. sock_recv_timestamp has:
+> >
+> >         /*
+> >          * generate control messages if
+> >          * - receive time stamping in software requested
+> >          * - software time stamp available and wanted
+> >          * - hardware time stamps available and wanted
+> >          */
+> >         if (sock_flag(sk, SOCK_RCVTSTAMP) ||
+> >             (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE) ||
+> >             (kt && tsflags & SOF_TIMESTAMPING_SOFTWARE) ||
+> >             (hwtstamps->hwtstamp &&
+> >              (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)))
+> >                 __sock_recv_timestamp(msg, sk, skb);
+> >
+> > Otherwise applications could get error messages queued, and
+> > epoll/poll/select would unexpectedly behave differently.
+> =
+
+> Right. And I have no intention to use the SOF_TIMESTAMPING_SOFTWARE
+> flag for BPF.
+
+Can you elaborate on this? This sounds like it would go against the
+intent to have the two versions of the API (application and BPF) be
+equivalent.
+ =
+
+> >
+> > > SOF_TIMESTAMPING_SOFTWARE is only used in traditional SO_TIMESTAMPI=
+NG
+> > > features including cmsg mode. But it will not be used in bpf mode.
+> >
+> > For simplicity, the two uses of the API are best kept identical. If
+> > there is a technical reason why BPF has to diverge from established
+> > behavior, this needs to be explicitly called out in the commit
+> > message.
+> >
+> > Also, if you want to extend the API for BPF in the future, good to
+> > call this out now and ideally extensions will apply to both, to
+> > maintain a uniform API.
+> =
+
+> As you said, I also agree on "two uses of the API are best kept identic=
+al".
+> =
+
+> >
+> >
+> > * On extra measurement points, at sendmsg or tcp_write_xmit:
+> >
+> > The first is interesting. For application timestamping, this was
+> > never needed, as the application can just call clock_gettime before
+> > sendmsg.
+> =
+
+> Yes, we could add it after we finish the current series. I'm going to
+> write it down on my todo list.
+> =
+
+> >
+> > In general, additional measurement points are not only useful if the
+> > interval between is not constant. So far, we have seen no need for
+> > any additional points.
+> =
+
+> Taking a snapshot of tcp_write_xmit() could be useful especially when
+> the skb is not transmitted due to nagle algorithm.
+> =
+
+> >
+> >
+> > * On skb state:
+> >
+> > > > For now, is there thing we can explore to share in the skb_shared=
+_info?
+> >
+> > skb_shinfo space is at a premium. I don't think we can justify two
+> > extra fields just for this use case.
+> >
+> > > My initial thought is just to reuse these fields in skb. It can wor=
+k
+> > > without interfering one another.
+> >
+> > I'm skeptical that two methods can work at the same time. If they are=
+
+> > started at different times, their sk_tskey will be different, for one=
+.
+> =
+
+> Right, sk_tskey is the only special one that I will take care of.
+> Others like tx_flags or txstamp_ack from struct tcp_skb_cb can be
+> reused.
+> =
+
+> >
+> > There may be workarounds. Maybe BPF can store its state in some BPF
+> > specific field, indeed. Or perhaps it can store per-sk shadow state
+> > that resolves the conflict. For instance, the offset between sk_tskey=
+
+> > and bpf_tskey.
+> =
+
+> Things could get complicated in the future if we want to unified the
+> final tskey value for all the cases. Since 1) the value of
+> shinfo->tskey depends on skb seq and len, 2) the final tskey output is
+> the diff between sk_tskey and shinfo->tskey, can I add a bpf_tskey in
+> struct sock and related output logic for bpf without caring if it's
+> the same as sk_tskey.
+
+I think we can add fields to struct sock without too much concern.
+Adding fields to sk_buff or skb_shared_info would be more difficult.
+
+> That said, the outputs from two methods differ. Do you think it is
+> acceptable? It could be simpler and easier if we keep them identical.
+
+Since we can only have one skb_shared_info.tskey, if both user and bpf
+request OPT_ID, starting at different times, then we will have two
+bases against which to compute the difference. Having two fields in
+struct sock should suffice.=
 
