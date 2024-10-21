@@ -1,148 +1,106 @@
-Return-Path: <netdev+bounces-137544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8359A6E0A
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:25:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED999A6E19
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21B541F22EEE
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3924282DFA
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362FE12F588;
-	Mon, 21 Oct 2024 15:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934D7136328;
+	Mon, 21 Oct 2024 15:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.fr header.i=benoit.monin@gmx.fr header.b="Sh0R6xTu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DP5o9aBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68968BE5;
-	Mon, 21 Oct 2024 15:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C533D68
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729524354; cv=none; b=X3Yr4YzGsLMnSFbGoFRo/lY6OEozJu/sSlN25jS9wRslFUcvDr6AEG65sno5V+QAP+2R/tTDm5TWcg7v1NLVv23J1EblEnFVkh3sSrRHTpIdHE7uAheqL3po5xseWsv7M6Xze034VFaEsHoDPkVqohu9ka5uwA+1cTzz5e+Ielo=
+	t=1729524483; cv=none; b=YAODWRMPl1PjxpLERZIoZvhfB3qykwd5oHZ8mmwezRpkP5JVLGONm2gjqYWerDdDV528F9Xg9WlG8NQqXzqxd5esQoB1kDkKJvZ3SpIyMow5jZWtkDqAEMjmgqFmJ86cyu0HiLpqMqe36veboh2mvbAefJEB3zPZfGx7gyZTklA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729524354; c=relaxed/simple;
-	bh=vIwIavf4ScAQVzdq4hZstzaeo0UwWL3Q5dmfrvtSX6M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=arBY74bOruuEbUD2OH4YL4GMWS+7hPlMOMNy4+VZPxJfc66QRzku9lwagFGnkewOGIxXzo25Te5zgaG+hO3LAVFcmqI8OwBFeOSS8iz6fNBlfLcRz8NeDbwDtz4mCS46p5khJO1T2AwCUXwZfiwr5FZzQke6DT1QW0ceU4F58DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.fr; spf=pass smtp.mailfrom=gmx.fr; dkim=pass (2048-bit key) header.d=gmx.fr header.i=benoit.monin@gmx.fr header.b=Sh0R6xTu; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.fr;
-	s=s31663417; t=1729524327; x=1730129127; i=benoit.monin@gmx.fr;
-	bh=yUuthWwupxa6phQatChwq29DzW+mOPO/hf6lg0/2bCI=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:Content-Type:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=Sh0R6xTuBYMutY9IJT/WiQX12yaK3SDBCHpJW+GhXgRw5ri9ZtAtZJwqRKDoILk0
-	 WVbm2keRLhHsRQbl/xqEq/G/3HIOx9f9ULRraOqxHbA0cHEbquqA74z13GuJphyiN
-	 ftrcnMoQqNUcYtiiYXL+HAZAF4sd4W4r0dBfM4OhfIwRQI+7nn/xwJ9ouL/i+vfsV
-	 xSxERnxh8PsZxcxHE+AmDxZsUCndTLtJL0tKZcqmSfKuhi9MjjNqtFcVGaWN4R360
-	 BupW5eADZD32HQ7nft/HpBpB1uQvi6XVx2rJdYGkblIqcTKTE5HcARntsXp6WqPp0
-	 d7RRaBy1IGXEI8Yb0w==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from pianobar.pianonet ([176.145.30.241]) by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1M7b6l-1szsYE2dMz-00DSyS; Mon, 21
- Oct 2024 17:25:27 +0200
-From: =?UTF-8?B?QmVub8OudA==?= Monin <benoit.monin@gmx.fr>
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH net-next] net: skip offload for NETIF_F_IPV6_CSUM if ipv6 header
- contains extension
-Date: Mon, 21 Oct 2024 17:25:26 +0200
-Message-ID: <2704514.lGaqSPkdTl@benoit.monin>
-In-Reply-To: <4411734.UPlyArG6xL@benoit.monin>
-References:
- <0dc0c2af98e96b1df20bd36aeaed4eb4e27d507e.1728056028.git.benoit.monin@gmx.fr>
- <6704483c31f9c_1635eb294a0@willemb.c.googlers.com.notmuch>
- <4411734.UPlyArG6xL@benoit.monin>
+	s=arc-20240116; t=1729524483; c=relaxed/simple;
+	bh=nv2ti2VLDg35idg6XZbkZTZ7JN7/mw/x6VHeFJLQSwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iPSROEmqL8F+ZXQeAn7SQOB8wekw2XNltF83w3RFYLoNgtegJ9FLdtGDf1gQrjduvRmmkYLDofbxXyGo6bAZ9zKGtEiQUnF49MwU5nFVRfjYlt8o+qq++Y9hrp5E10F5rGp+s/82HxMzkyzgTtN3BBMZFEpdk0a0n9uUhiY5pKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DP5o9aBW; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-83ab6cbd8b1so156442239f.1
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 08:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729524480; x=1730129280; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XjWBqmqjt2x2Uv9XbFQatXnQGGyRKjtoeD2ucKh9A0s=;
+        b=DP5o9aBWUiNS6wy3ojk6UdhcypMYfdtCXHL8pqyavtZF243vh44YeZn2B0Lj6QCu09
+         NS5brzHqBWuQc1Bms3JAq/5jD+oK32UN44KO+3YZD9aYH6579mgHoVwSuhPG9lRO55Qa
+         8sApUFkGd1zPZtUXrpbQCdKy33ejwt4RQTO0BvwkdgAml1Sey5BuZm5igugOo0/WhOdw
+         FiayEUKTKOdcM9AThG9Xssv4FwQpZUH13gb6wW5nUiHagbp/eMn2YEvvxfInHPVAXN9E
+         Xd76zkU45+Gsx8H9hzQsBa74f9VEbSVGSNkylS2S5nkXloTKPU71ULAMKZPHvRzrNnzi
+         v89w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729524480; x=1730129280;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjWBqmqjt2x2Uv9XbFQatXnQGGyRKjtoeD2ucKh9A0s=;
+        b=t3YAlNWng6GCOv/WgEBN4D3Uu/B2zl1b6LV5qh8fhHnVoz3ra5O8IxXFUNv7vol3Zz
+         9LnT9ejVKKTo7johpg+NAc3Vumo1R6fo4FXUW/Eky4cQpixC+9uegQyHtGYMEWCj70UP
+         Mdg2o2OZkz0+me8PTB+CMDWz4gI8I4LxVCQo94KtAoKF6hAP23qg5KkZ0EJCMTzOtA+7
+         SClyyVL6iUy+i2TzSigKWFAxliMhx1KjJL7NOnS+ITmJqE0hL4glVesYfA7u4d9Ri7dr
+         Ngr+RlGOdr/ej0Cz84kQ5hRAVwMB+IdPzAIgevgzYusJep527b3gSDujw4rKmYWXL636
+         P3Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeMBgU9wjvddUy89woDhQETrMS/nA82Qy2XpSdX7Uwz54YA+Gobmj5X4wMfQ83JmP0J/OORhg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw10Ipo4Q6R3XXY3eCHPj0u6ktnn0aLCQaIGV3w8hURO9+oeGkn
+	5lals41eESBcaIy3UkZgjPybt/l0EdGU3x7me/+WbDoV5GRtKkUcYJi3ZNS2Qkqxj1y+YXXPhX3
+	d
+X-Google-Smtp-Source: AGHT+IHIl3pXKp/ZTWv1FpdI6p8zUnVKGDFvh6+mFBdKBn3nyEcQ6Xcc2f8ypADoA/1gPUu6YAyPsg==
+X-Received: by 2002:a05:6602:1549:b0:83a:b33a:5e0a with SMTP id ca18e2360f4ac-83aba5c5755mr953616139f.4.1729524480134;
+        Mon, 21 Oct 2024 08:28:00 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a586cf2sm1025441173.75.2024.10.21.08.27.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 08:27:59 -0700 (PDT)
+Message-ID: <55423797-8362-41fa-99f8-58017aa43e52@kernel.dk>
+Date: Mon, 21 Oct 2024 09:27:58 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Provags-ID: V03:K1:xIsSPC2hBvp0nuXoFbb+mszY6SyXceaFWDrxVgC9w6etN7OX5gT
- wJLMEKOFL3aCf1aihm26sHADEauIWgCPdAkrcrSIA//J0zyqmXHiu/O192u3kTwITSzAiNL
- XD7b7AzXh9pzByI4UGMwLDiThILkKFTgTGZD9StgTRMGekM+8Fnq5n5lHXN9phKAW0oZaUy
- 5+ka+EEfkMfwxsZh1y7Zw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Ap+ixU/B5qE=;Ng7MCYlJz/Pr1QDD1m60+tbcr17
- dvixiU9xj+VvDmy1rOX2dGBrpG2hWwa9UTOQ8bZJH2lQSYUMoPdHIX5PUHiKXj5lV1Oo2rqBd
- sqX2F6siWkxQmMt6Yx4ipPHSxw9jtZDd2P0xNQPXkQdiLIG0W2RMUYBHyrVc45SAVzL2+t8BT
- SNilpL1LFYk6PQH9OGVLuOeSnrHP8PziHjAg0Polh4BUD3ZyLm0PNgwokbfhMlTUavymSuBnJ
- tSe/xn2Qxz78dxeA22N9I0qUsgdB4YJUnt7HuxPWlGnnHPmfhnDKm6Rk3ss3s5KlW7zCsIKYQ
- YpuG39mtyHuawTcw8nkXHO97fUPCoA7Cv0sP3AXn9NyuFeqyNxHjbGcMfVvwKnadvUMoT6jUT
- QizUuARWmTXrri7Nt7ApugjQrC2GFIZg4eNG6EeQF8ArOOjzEAEoocfI9QfdNHAy/FmEDAin1
- s9zB+TOZ8umJ72Z7UajMd3TKp4vaILvENhZNNt/2ra9eJCXzJ0UlbjVsUNXVEw2tT2t9kM/Zv
- h3quUzZMHWtk3zU3stnBJwPKTwW7wQa7xTxsKSr1bOX7VGT9uUyPKyX3q+mpfQ33LUFR+xQGb
- Ekd7dQkHxbj/8kPMvHAZ29yMqX1iFtdAR0DmeoFF+jDXcnYrS9CL45eqA8TXItW6plB5l5L4H
- IrFsvarfxo97iU2u8mdT8xlC9ZDEzW6GxgqVjCxRCGi3FCtuswHJsyzgOxFNai52GwRCOIFTN
- spmQPUig6cmE9aGVw8Iemgecet6ehqTuSWpRjjK34HBoYpYXYoyrSlEjAmokZqp0QcMO6zopG
- DS96Rn+WnRvqJqk6efh28rvthT9U3QB4fb53Cscre3rcg=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/15] io_uring zero copy rx
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241016185252.3746190-1-dw@davidwei.uk>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241016185252.3746190-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-10/10/2024 Beno=C3=AEt Monin wrote:
-> 07/10/2024 Willem de Bruijn wrote:
-> > Beno=C3=AEt Monin wrote:
-> > > 07/10/2024 Willem de Bruijn wrote :
-> > > > Beno=C3=AEt Monin wrote:
-[...]
-> > > > > Signed-off-by: Beno=C3=AEt Monin <benoit.monin@gmx.fr>
-> > > > > ---
-> > > > >  net/core/dev.c | 4 ++++
-> > > > >  1 file changed, 4 insertions(+)
-> > > > >=20
-> > > > > diff --git a/net/core/dev.c b/net/core/dev.c
-> > > > > index ea5fbcd133ae..199831d86ec1 100644
-> > > > > --- a/net/core/dev.c
-> > > > > +++ b/net/core/dev.c
-> > > > > @@ -3639,6 +3639,9 @@ int skb_csum_hwoffload_help(struct sk_buff =
-*skb,
-> > > > >  		return 0;
-> > > > >=20
-> > > > >  	if (features & (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM)) {
-> > > > > +		if (ip_hdr(skb)->version =3D=3D 6 &&
-> > > > > +		    skb_network_header_len(skb) !=3D sizeof(struct ipv6hdr))
-> > > > > +			goto sw_checksum;
-> >=20
-> > This check depends on skb->transport_header and skb->network_header
-> > being set. This is likely true for all CHECKSUM_PARTIAL packets that
-> > originate in the local stack. As well as for the injected packets and
-> > forwarded packets, as far as I see, so Ack.
-> >=20
-> > Access to the network header at this point likely requires
-> > skb_header_pointer, however. As also used in qdisc_pkt_len_init called
-> > from the same __dev_queue_xmit_nit.
-> >=20
-> > Perhaps this test should be in can_checksum_protocol, which already
-> > checks that the packet is IPv6 when testing NETIF_F_IPV6_CSUM.
-> >=20
-> You're right, moving this to can_checksum_protocol() makes more sense. I =
-will=20
-> do that, retest and post a new version of the patch.
->=20
-Looking more into it, can_checksum_protocol() is called from multiple place=
-s=20
-where network header length cannot easily extracted, in particular from=20
-vxlan_features_check().
+Hi,
 
-How about keeping the length check in skb_csum_hwoffload_help() but using=20
-vlan_get_protocol() to check for IPv6 instead of ip_hdr(skb)->version?
+Ran some quick testing with the updated series, on top of 6.12-rc4 and
+netdev-next. Still works fine for me, didn't see any hickups and
+performance is still where it was with the previous series (eg perfectly
+stellar).
 
-=2D-=20
-Beno=C3=AEt
-
-
+-- 
+Jens Axboe
 
