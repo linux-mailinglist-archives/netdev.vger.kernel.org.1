@@ -1,75 +1,80 @@
-Return-Path: <netdev+bounces-137545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED999A6E19
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:28:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92BD89A6E20
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3924282DFA
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:28:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C119B1C21A2B
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934D7136328;
-	Mon, 21 Oct 2024 15:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEF61865F0;
+	Mon, 21 Oct 2024 15:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DP5o9aBW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7mXt33i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C533D68
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7402418453F
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729524483; cv=none; b=YAODWRMPl1PjxpLERZIoZvhfB3qykwd5oHZ8mmwezRpkP5JVLGONm2gjqYWerDdDV528F9Xg9WlG8NQqXzqxd5esQoB1kDkKJvZ3SpIyMow5jZWtkDqAEMjmgqFmJ86cyu0HiLpqMqe36veboh2mvbAefJEB3zPZfGx7gyZTklA=
+	t=1729524574; cv=none; b=XBHW3Fb9tGx85jSwXupQWfk/4KCX8hMUha2gYOsIu/ztwh8/fA1UVxHktnc9rfTfYuckefdvlqQfMyaLNExywi6ujjWPs/HhZpy19lpFOTYoQmJ1I+1fYqt03DebFzV7tYRaQlizPw+nyhRwaZJxL3WNWNqPI7/0+GNzdNr9DEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729524483; c=relaxed/simple;
-	bh=nv2ti2VLDg35idg6XZbkZTZ7JN7/mw/x6VHeFJLQSwA=;
+	s=arc-20240116; t=1729524574; c=relaxed/simple;
+	bh=iWtNGW5Lv+npAxLvYrzDrlBlld7h6q5Bl55LXxDdRso=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iPSROEmqL8F+ZXQeAn7SQOB8wekw2XNltF83w3RFYLoNgtegJ9FLdtGDf1gQrjduvRmmkYLDofbxXyGo6bAZ9zKGtEiQUnF49MwU5nFVRfjYlt8o+qq++Y9hrp5E10F5rGp+s/82HxMzkyzgTtN3BBMZFEpdk0a0n9uUhiY5pKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DP5o9aBW; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-83ab6cbd8b1so156442239f.1
-        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 08:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729524480; x=1730129280; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XjWBqmqjt2x2Uv9XbFQatXnQGGyRKjtoeD2ucKh9A0s=;
-        b=DP5o9aBWUiNS6wy3ojk6UdhcypMYfdtCXHL8pqyavtZF243vh44YeZn2B0Lj6QCu09
-         NS5brzHqBWuQc1Bms3JAq/5jD+oK32UN44KO+3YZD9aYH6579mgHoVwSuhPG9lRO55Qa
-         8sApUFkGd1zPZtUXrpbQCdKy33ejwt4RQTO0BvwkdgAml1Sey5BuZm5igugOo0/WhOdw
-         FiayEUKTKOdcM9AThG9Xssv4FwQpZUH13gb6wW5nUiHagbp/eMn2YEvvxfInHPVAXN9E
-         Xd76zkU45+Gsx8H9hzQsBa74f9VEbSVGSNkylS2S5nkXloTKPU71ULAMKZPHvRzrNnzi
-         v89w==
+	 In-Reply-To:Content-Type; b=PJASahEfz86KAL7f3PNqRHkYo/hFZ3iKRWCEGtK+wqdfaJ9+rDjTB0FqQSwbzW0cc2nwPbC8yheO5rkg/ZayT4jB3kooni+RflZHrEJXPsEZ52dT9swfDleDRBHlRnIaNusElfAiQRmDYMcTMNQWPe8ZfT2IVTA6nrn49OmatqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V7mXt33i; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729524571;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O6AOTgcFjOO6pusSxpBSQAWFHjn8ww3tmBzZVY0f3ik=;
+	b=V7mXt33iBsCWvZrWtCw/vRifvWrDxvHjULE7gKuPN8+US517C8paT1uEURlEdDM1KTqKf+
+	eQI+quqWF4tgpCZLpBLt48nhdgR97HDM2ei3gzt+DwltZMVBXUlUwC/BSEFBDaQ6sMimzk
+	ge5QMS5KoMQkFav/lUvHfGmt8VoH/A8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-yiIEqylrOU27ZiR36LUlrA-1; Mon, 21 Oct 2024 11:29:29 -0400
+X-MC-Unique: yiIEqylrOU27ZiR36LUlrA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4314f023f55so37658235e9.2
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 08:29:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729524480; x=1730129280;
+        d=1e100.net; s=20230601; t=1729524568; x=1730129368;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XjWBqmqjt2x2Uv9XbFQatXnQGGyRKjtoeD2ucKh9A0s=;
-        b=t3YAlNWng6GCOv/WgEBN4D3Uu/B2zl1b6LV5qh8fhHnVoz3ra5O8IxXFUNv7vol3Zz
-         9LnT9ejVKKTo7johpg+NAc3Vumo1R6fo4FXUW/Eky4cQpixC+9uegQyHtGYMEWCj70UP
-         Mdg2o2OZkz0+me8PTB+CMDWz4gI8I4LxVCQo94KtAoKF6hAP23qg5KkZ0EJCMTzOtA+7
-         SClyyVL6iUy+i2TzSigKWFAxliMhx1KjJL7NOnS+ITmJqE0hL4glVesYfA7u4d9Ri7dr
-         Ngr+RlGOdr/ej0Cz84kQ5hRAVwMB+IdPzAIgevgzYusJep527b3gSDujw4rKmYWXL636
-         P3Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCVeMBgU9wjvddUy89woDhQETrMS/nA82Qy2XpSdX7Uwz54YA+Gobmj5X4wMfQ83JmP0J/OORhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw10Ipo4Q6R3XXY3eCHPj0u6ktnn0aLCQaIGV3w8hURO9+oeGkn
-	5lals41eESBcaIy3UkZgjPybt/l0EdGU3x7me/+WbDoV5GRtKkUcYJi3ZNS2Qkqxj1y+YXXPhX3
-	d
-X-Google-Smtp-Source: AGHT+IHIl3pXKp/ZTWv1FpdI6p8zUnVKGDFvh6+mFBdKBn3nyEcQ6Xcc2f8ypADoA/1gPUu6YAyPsg==
-X-Received: by 2002:a05:6602:1549:b0:83a:b33a:5e0a with SMTP id ca18e2360f4ac-83aba5c5755mr953616139f.4.1729524480134;
-        Mon, 21 Oct 2024 08:28:00 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a586cf2sm1025441173.75.2024.10.21.08.27.58
+        bh=O6AOTgcFjOO6pusSxpBSQAWFHjn8ww3tmBzZVY0f3ik=;
+        b=qx8tsUdo3FuLKzmiX2FQeDkFiLWinSYfF02LDVNOynH8BDSbZaPlXWjHlXXKUt271f
+         HL4jwvlXzcJTMcP1nYlGALzO8MdmAxhCGXj/Lv4BoJ68rphS7VnP0RkgZLPQO+xUPgrL
+         OXo5G5xq+07+LhJT3yuAL/Grw+KeCTWHMXJFY1LtTao9B6RcEUiiLcnZLYWjh3x49Gbi
+         jrxhxslnrzvv/GjObKjxfT30QskJGLK8exf09wSfxmJ/9QWtHJaozohA4M1XK8NQCel7
+         R9Ph1TM5X0VvaQOnxc5AmEgkDb4G52T+BCl7wPh2VxaU1zHks+l5gwE11BC7o7QJWsIU
+         NYfw==
+X-Forwarded-Encrypted: i=1; AJvYcCXTpvfVW4ZkW5Rlx0q9MJDquc09YQWv7mpdeVK9kyagcHu6yBQ9u/HF3N/OGRgF/mgHuwVVmxU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWH0WKlbKdoKhshPW70HFQkYG1uTw8yizvJTx9T3h9WBSGlf9E
+	J5F/DjSitB41sKS7oKarvva9lC7YtsRVnqVfYEqyrhHB3gtWbQxoBohz2+S8YX2NruLi0h+e0f3
+	letPeKugvKffwXmZ7JlHH0snP+dQtZ1pe+SD6wTCh6btZ+g+oWvk4Ag==
+X-Received: by 2002:a05:600c:34cc:b0:426:627e:37af with SMTP id 5b1f17b1804b1-4316163330bmr91910255e9.3.1729524568389;
+        Mon, 21 Oct 2024 08:29:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IET+SVD6cbZPCbhAIxGjhJyIGRpEiTOiTUfwm0zjdZFXEhVQsAXQnRDfXRtvoOHzmodD7KyJA==
+X-Received: by 2002:a05:600c:34cc:b0:426:627e:37af with SMTP id 5b1f17b1804b1-4316163330bmr91910075e9.3.1729524568028;
+        Mon, 21 Oct 2024 08:29:28 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f570d49sm61532135e9.7.2024.10.21.08.29.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 08:27:59 -0700 (PDT)
-Message-ID: <55423797-8362-41fa-99f8-58017aa43e52@kernel.dk>
-Date: Mon, 21 Oct 2024 09:27:58 -0600
+        Mon, 21 Oct 2024 08:29:27 -0700 (PDT)
+Message-ID: <be9ead27-bd67-49a8-a311-a7ce5e82d4fa@redhat.com>
+Date: Mon, 21 Oct 2024 17:29:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,30 +82,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/15] io_uring zero copy rx
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241016185252.3746190-1-dw@davidwei.uk>
+Subject: Re: pull request: bluetooth 2024-10-16
+To: Thorsten Leemhuis <regressions@leemhuis.info>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Linux kernel regressions list <regressions@lists.linux.dev>,
+ Eric Dumazet <edumazet@google.com>
+References: <20241016204258.821965-1-luiz.dentz@gmail.com>
+ <4e1977ca-6166-4891-965e-34a6f319035f@leemhuis.info>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241016185252.3746190-1-dw@davidwei.uk>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <4e1977ca-6166-4891-965e-34a6f319035f@leemhuis.info>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
+On 10/18/24 07:30, Thorsten Leemhuis wrote:
+> [CCing Linus, the two other -net maintainers, and the regressions lists]
+> 
+> On 16.10.24 22:42, Luiz Augusto von Dentz wrote:
+>> The following changes since commit 11d06f0aaef89f4cad68b92510bd9decff2d7b87:
+>>
+>>   net: dsa: vsc73xx: fix reception from VLAN-unaware bridges (2024-10-15 18:41:52 -0700)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-16
+> 
+> FWIW, from my point of view it would be nice if these changes could make
+> it to mainline this week. I know, they missed the weekly -net merge,
+> despite the quoted PR being sent on Wednesday (I assume it was too late
+> in the day). 
 
-Ran some quick testing with the updated series, on top of 6.12-rc4 and
-netdev-next. Still works fine for me, didn't see any hickups and
-performance is still where it was with the previous series (eg perfectly
-stellar).
+The net PR is prepared and sent on Thursday morning - either European
+Time or West Cost, depending on who actually is cooking it.
 
--- 
-Jens Axboe
+Wednesday is usually/nearly always a good time for PR to be send on
+netdev to land into the next 'net' PR, but due to some unfortunate
+scheduling, we are lagging behind the netdev ML traffic - to the point
+that I'm processing this email only now.
+
+The limited capacity will last for all the current week, but we should
+come back to speed from the next one.
+
+Cheers,
+
+Paolo
+
 
