@@ -1,115 +1,117 @@
-Return-Path: <netdev+bounces-137532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570D79A6D61
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:57:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6227A9A6D86
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:03:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8609B1C2208C
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:57:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D190E1F21BE1
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313D61F8EEE;
-	Mon, 21 Oct 2024 14:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frkN6YdF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B6A537F8;
+	Mon, 21 Oct 2024 15:02:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0B41EABDC;
-	Mon, 21 Oct 2024 14:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1635F46447
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729522632; cv=none; b=sfftRdgc1ksWlxjNObhxg34Z5dGpm3Xb4p8bZv/th53AGjkGYXZma6sdZV+Cu2iY96AYSXH8AxMMe3tLOMfwV+RFEfLY2bUJcyn/Wyy3lQeGadcDYC7gINcECeLsCKPtmUv+UnKTTyFOTOW6L9TpN+G9wQduLpZ2N83nhVVA6+8=
+	t=1729522978; cv=none; b=b+2Ka2dxfOuwdJDmmvis7qZpu2onp8qgUVuajj96vbgrHfQ09VtN7kZuFa7cWpCfnvoz+NdTNnbyutK1JSyzLJgm83wzIstUMt/8pKzfCVGHEB0iRJxk4XY0MT7ogbePmeSiFBYfwyaojcCOwI/xMkz0WSwIYBkEoJp0mb7JirU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729522632; c=relaxed/simple;
-	bh=XF2XWkvfGVbXYyXVhinJFu1m7SQIWE+VULOwx5F/dq4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=sv5KxJHM7IAWyBdeyelNn+2TByFNOMB35+28KyHWCSP5RjFbMbeVHXFU61q9vMNBfvLSzhNX0Nsy9Xkl4LrvlkCxeRfnOwa33duIl2+j48H2Ff/xlq/n+sOZvZPBtvhLSxEhdZUpLncx8SJJTvQ2PUWT4LR8adjJII0obj6gatU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frkN6YdF; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6cc250bbc9eso33479456d6.2;
-        Mon, 21 Oct 2024 07:57:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729522629; x=1730127429; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NEbezSYTuof1BOLKPVcrMzA3XBTu7g/yrGOgRxbf9/8=;
-        b=frkN6YdFy62Gfw8W1S0RKDrdTKztVcEcNBnaGzyeZygsjRxb0U8WG0Vh+puEC+v619
-         aNh7VfPWL3cZD8Tis5I2ZBwYTqUEPCWx36pRHdfzlo5P2B0R9LYfIM9Pcf8wwr7OiH76
-         y2W2sP+JG35ZMKuzTY9r657Lpo2cGdUkvziS8RJUitGf/ZpObTscbRptZpBpjQdqbX8c
-         cUj4Znu2LhIAroabJa5/BNBHc98F7bScly5sZk4Ta7qxhvhqOw6mEkIr8BrsKx6j5D9+
-         Fg6KPULkD6YbkfGb4YfXQeSTAIOxXwQS7tIcQ5BF5z71mCAfRPNe4Fobd9YS8GgfWV1T
-         vd7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729522629; x=1730127429;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NEbezSYTuof1BOLKPVcrMzA3XBTu7g/yrGOgRxbf9/8=;
-        b=TyEuZHgQocxnArgwcXuunipTh1Pr/0JIxw0opqJ8vZpzQfi4baY3DrytLdq0HsTa4v
-         6beaIJHhHPEM9Z0+gqJF3iKG6wDMWfthMPL4OgeC3nZRlLo14wuEaQKrE9EfOgYFEAfD
-         CdS+EmniOPoa4TEOEJcxzdgnGwNtZbgl7livVhMNwNtvTOMFaJqgVU9XJz5X30ct1DtF
-         PbLHgvvdu3kkyEW/c3Tk1EZEXRekxqPSxvNdkXpPRjqxkDKuH3HvK3sPTpk7VuKGKsSK
-         Xhjx30i1R3bDDA6vUMpTpxAUjc2jB4I3y6QkkK4n/V+pH1hXd5tAPrgPFn3loh4Op2DU
-         FMRA==
-X-Forwarded-Encrypted: i=1; AJvYcCU8amdAX19xsdmxFx2FwAiJxShHBo4j9gOlAX/luupV/0e/2No6LRagk+badc99n7Yw3mgwSJtKO28=@vger.kernel.org, AJvYcCUUghySoTRcN5Y7wMULu1DD4nHRg+A7xEjxR6HSkUWYvJc2fc4lIGdmcqApAoDojIWwhmGq+g23PpoYXzQ4@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUZmyPIc48NCUTfIyd4VvtsFZfdiarPKPqTvmvYbkBZqYdriCY
-	yKdyBqSHE47lCAemjoXPz7bRREbWV2YFJNI46nfRVXDq9mfJVkXMmCck6g==
-X-Google-Smtp-Source: AGHT+IHynfpi2UqtXTEDhAhXbSVrM1sWFE9vREPEGJSwrTg8//GGN5l5unzLUpM7R45sDk62UJbJfA==
-X-Received: by 2002:a05:6214:4698:b0:6cb:eb66:c37a with SMTP id 6a1803df08f44-6cde163b093mr173326586d6.53.1729522629096;
-        Mon, 21 Oct 2024 07:57:09 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce0099eaefsm17600426d6.101.2024.10.21.07.57.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2024 07:57:08 -0700 (PDT)
-Date: Mon, 21 Oct 2024 10:57:08 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: netdev@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Levi Zim <rsworktech@outlook.com>
-Message-ID: <67166bc43e131_42f032948d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241021-packet_mmap_fix_link-v1-1-dffae4a174c0@outlook.com>
-References: <20241021-packet_mmap_fix_link-v1-1-dffae4a174c0@outlook.com>
-Subject: Re: [PATCH net] docs: networking: packet_mmap: replace dead links
- with archive.org links
+	s=arc-20240116; t=1729522978; c=relaxed/simple;
+	bh=4QR0dzeIZVGa4RUzjY0+2JEeA1HBDNYiBXB6f3WnsEg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZIfIpwUj8RHvzYwRWW6v+jWeU6R74XbwcLc7tXGcnIFKcTu2tfjHDh2stZvBqx8jY1H/XKELNETUax31XijBiaqoX95JwTV5ROdUOezruozFhiT6XHvs5yjVA1htMlrHnmo+JATi7NCPPjqMqO+aT3Gvsjte4qa9eit6VsHqI+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1t2tvO-0007bh-B3; Mon, 21 Oct 2024 17:02:26 +0200
+Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1t2tvM-000iMa-1g;
+	Mon, 21 Oct 2024 17:02:24 +0200
+Received: from pza by lupine with local (Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1t2tvM-000J6d-1K;
+	Mon, 21 Oct 2024 17:02:24 +0200
+Message-ID: <f85a263ed5290fc999d04521f4e70f4c698d9bd3.camel@pengutronix.de>
+Subject: Re: [PATCH v10 0/6] Add support for the LAN966x PCI device using a
+ DT overlay
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, Simon
+ Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Lars Povlsen
+ <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>,  Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Saravana Kannan <saravanak@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew
+ Lunn <andrew@lunn.ch>,  devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>,  Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Date: Mon, 21 Oct 2024 17:02:24 +0200
+In-Reply-To: <20241021164135.494c8ff6@bootlin.com>
+References: <20241014124636.24221-1-herve.codina@bootlin.com>
+	 <20241021164135.494c8ff6@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Levi Zim via B4 Relay wrote:
-> From: Levi Zim <rsworktech@outlook.com>
-> 
-> The original link returns 404 now. This commit replaces the dead google
-> site link with archive.org link.
-> 
-> Signed-off-by: Levi Zim <rsworktech@outlook.com>
+Hi Herv=C3=A9,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Mo, 2024-10-21 at 16:41 +0200, Herve Codina wrote:
+> Hi Greg, Philip, Maintainers,
+>=20
+> On Mon, 14 Oct 2024 14:46:29 +0200
+> Herve Codina <herve.codina@bootlin.com> wrote:
+>=20
+> > Hi,
+> >=20
+> > This series adds support for the LAN966x chip when used as a PCI
+> > device.
+> >=20
+> ...
+>=20
+> All patches have received an 'Acked-by' and I didn't receive any
+> feedback on this v10.
+>
+> Is there anything that blocks the whole series merge?
+>=20
+> Let me know if I need to do something else to have the series applied.
 
-Thanks for catching this.
+Not that I am aware of. If there are no objections, I'll interpret the
+Acked-bys on patch 1 as permission to merge the whole series into
+reset/next.
 
-The original links are mainly useful for historical reasons.
-
-I'll take a look at whether this documentation needs a more full
-revision. But making sure that it works as originally intended is
-a important for now. Agreed on approach.
+regards
+Philipp
 
