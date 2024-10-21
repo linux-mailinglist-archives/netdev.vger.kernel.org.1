@@ -1,382 +1,183 @@
-Return-Path: <netdev+bounces-137676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22989A9466
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:55:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B37FF9A9483
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 02:08:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5ED141F22F95
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 23:55:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B561F22AAF
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1051E765C;
-	Mon, 21 Oct 2024 23:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AB0EC2;
+	Tue, 22 Oct 2024 00:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RnHvrijI"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="GJuCSWv1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from sonic315-22.consmr.mail.bf2.yahoo.com (sonic315-22.consmr.mail.bf2.yahoo.com [74.6.134.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C3A10A3E;
-	Mon, 21 Oct 2024 23:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC9917993
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 00:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.134.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729554940; cv=none; b=sMojsqnzUbMjCIAaB2sYflJb1Di77Hp807kj250/oJyaq9alHm0kglUhag3XQ94/yWJEKYchYD4U0KpHfUqnY63pTGz/EkryzEm2Hv/vJqo8EoCaB8p1LQDchwZ6lELizw7OapGOaGwaR9MGFYfO2sGMqFg/9gCju+R+rFpXPXE=
+	t=1729555703; cv=none; b=pNQLW2dO8vVHnl8XRl8x6r2ghLaUJWFNtNTi29YqQyms1paVo01RWqLXgoZ4t6WJ0m0y57z+HSEJ6ka8gqZiDAeduAFuoaLmq5xUIa1gpTfTxrcuCPU6n9vBbe+B3ZQLAZ9u849azRAe9CHj7OtkEgpgSZ5oeKRDAInPX0VmPf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729554940; c=relaxed/simple;
-	bh=kHchKKJlQi83/Y4nDX+r2HVsGrvX8n9SYUcfCXlNHTI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VdeXlWSo57/wNk9SLJB46jqcgPIoHKtnmHmQNvyEdqq5u1Mmg79LxNz9/krZuyoceLWU/D/q9d7PJkvoQ7zqtEVzxCfwBJ6MH0COzcf/URe/Ev9sotcOJxXN4Vs7YDW8QWLodDPlTu5saKnSR+fdQItNcZB7Yhue0kwoYmvad2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RnHvrijI; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20cdb889222so48564385ad.3;
-        Mon, 21 Oct 2024 16:55:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729554938; x=1730159738; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DuuhmRbY1uh3nX9bYiXwiBnaI3gOHstjeTKguk6ETx8=;
-        b=RnHvrijIeZ/79MJJd5gzUobdvTXyHvfnL2h3XWEwLK0cEAyorHgzLuWJzM2C5w41Nu
-         e6hxKCyGlVAguxgRTBZ0yogEAMKOccUWBbpQYGsVmD8owFMLTYKrVZ6lo7awdMXOnn37
-         2/LhPWdxR9lA8I+KlhBgV+iybcaMGpBk3S6S6frJufZjCzQ9mev4Zpra23Vp0wkUdwL2
-         WNNVDls1Xi+GIGLZH1KtuJzCdB3DRXUhKp21wg0+0rwbVuMZ+dufV7S/zYnAfsQODD09
-         8bJK3ZlzdOmG6iJlaNNoXYJXKa0iyQmZbP5RXZSfUDPLyJNYcO9jboxfvTNNh5mVIAFg
-         ZiwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729554938; x=1730159738;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DuuhmRbY1uh3nX9bYiXwiBnaI3gOHstjeTKguk6ETx8=;
-        b=tPSsHH73TE8764AVPwED3kmi2ApUXSg5ve5ncpO8G7R1HJJ45kiXmymRzW8g7Zxogv
-         /p8eq78WZW45pLalwAdYxcW6Iv7tv0i+Xazg6INXJZjj2TbOMNzEeiTYJJStrbOsNNpf
-         La2y2phWziFVxTvJt/kjUuAV4p8yLs1B8ntzAijqifKD/27Lk8iLMb4bpjfEYC3tV51f
-         If1WGmPi83lSylwlvgwjdQpIG79j1alJul69ijE5vLGs2SeHzpFdiCftZFUsP0Lxwag+
-         T5wPCK+emaDrJ9BW8z0nMRfb8Tm2oVp1dEh6n0qRAABMNcLdcQbyDVYnCu9mKdcvtBuE
-         kLwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIt3DZyOOppqIcKyiUjos1gd+4gh6GR3G2weK6zRqjX/AZTkIvw026IZRi7y8IQrbXJVvHUjxFegVo6Us=@vger.kernel.org, AJvYcCX5e5qcBkMqT3wuSIHFUdwKY4z7tel0+J8Rbc9UnihBEuDuOwPLDY+VYYm+uroBc9N3TokWxO4daTU7w0AL0YB1OHA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbtirZjkdL19/wbmJ05zsALMa7/awoDyNHIFz8KCdul4q2Vz1V
-	zJfONf6Hhhyy8aEg9ncPNvOxOMl5RQ4Elj2NT9+InzFsSUxthkDLOk5LqCn7
-X-Google-Smtp-Source: AGHT+IGZQ85vTN1DEpM5ct443DOIRJsbP5TPhCwmaqsizASA3oM8uOXRnruFRfkpB4T5fTBDmjIRYQ==
-X-Received: by 2002:a17:902:dacb:b0:20b:5645:d860 with SMTP id d9443c01a7336-20e984b664emr13148935ad.36.1729554938008;
-        Mon, 21 Oct 2024 16:55:38 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0f32f0sm31556075ad.249.2024.10.21.16.55.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2024 16:55:37 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com (maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER),
-	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	George McCollister <george.mccollister@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
-Subject: [PATCH net-next] net: dsa: use ethtool string helpers
-Date: Mon, 21 Oct 2024 16:55:35 -0700
-Message-ID: <20241021235535.603253-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1729555703; c=relaxed/simple;
+	bh=z181btsfxt9PDb/yCV5oeTIzDXg22ExnqXko3wxsUyw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NWm87cKZBeYcu/H8SN44OjRt/djntDC0cDGY+GU9isaD3Q+JAPqErsd88d2t96CbdGEuVsUdfvMR5jqyJGLhBng1RfQU1Uho589/muwhT6dyBT+qcOdd2XBNH3mLZTJzbL35xw4fZGpdXcUqMdsfpd9fFWF9oXeNG8tNNfKCYUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=GJuCSWv1; arc=none smtp.client-ip=74.6.134.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1729555698; bh=jDj5CXvHcjdpLFA63d1hBsH/DNQTd4LCrH9oYp0BA9k=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=GJuCSWv1VgKKXc/SBN3S/q+UIeuIbjYNdho/8boe9jUIERnf/6Ia469uq+/ZA9y2UoVqngyjMY9pnzzi0QqAPfMMMpC/7HbqwhkEyTzSbYgM4kM7h2rZJUdMKbo2uOctSYf7+4I6Q0UkITiCl2Yro2NZxn1muQ3UBINqr2bA/RNzvWB1eGAQmueVL4fK8dlsDyDXkNcLwEcbL0/+/oK7WBc25TmBDW3qBhIboj3W8P6I79/dGv365YSwMsRsx5yRHluz/4wWDoxwemE2YTsMwKEydF9XUFAJxXV5pcJKmdVQf7m0K7+EAPEj0SbYqN8EHz0uJChcM7ckf6gc7I7/Vg==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1729555698; bh=+VtFrvvrvtLO936qv8w/dRDMMdXUJ6TlJldREJyEYKT=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=HmxpSaOFZ1jpoxm8AbvMI8WkHf9+zLzUd8lduM7xumi6rYpZpMaynFJd9cQfCWjK/EKZfs9mCR9N30kn/YW0MhtQbpoEQpErw5bcj5XMd+tWieXZJbFJ9jLe6afxuMpRr0x/7GuJ2GklnOO6N34oBxUvnfc0kfjQ6bcis8F5LxKwNc57OJufzdWheDYU2NJiqgPFjR212yZHPUvM60zuzkVQ8dqZd4yak3baxA/sYf5ncl+Yx+5/+1wMHioOj/RMA09TFInm7Fdjsgs1wYpokVHqWnaDydJlQDd592TqmXEK0DewA29HwuNhJ86+Cue78HNvUiyk5QzEEC6HzNgzyg==
+X-YMail-OSG: b2yzTPoVM1kqh1.EwrToqFS8bYbeVZJNIjI.Kk2vyBkUxMzHeh2OGEfb.5M_G8a
+ caYx0blk.h1r1bV4YN_OAoE.IRzvTTXTSnzCQcSU4gtvFBzTeaIXywdXu3HJvLOkV6XCtldVVxMw
+ dgZgB0Znesy6Kk7kvD3MqKSrrIyiwQ3cJ4kna6ET5IenSIlkAFwnUvqJylv8Y8A4172ukwZRHIDP
+ O8kjM_UFJDE.dIcxB2sq24l4kwFCQjsHBscxni9ro49CXe_pSgqLY.UJs5y8lqrcdG6qT.8oIDt3
+ bd60la9XrBPhj6d2wxs1AOnmDmU6Hw7eJlaT4fwZsg6bYnBVFMZgaHwfuZapCOcgGQHItOw.s6z9
+ xPCRVh_QEWMzImhe3Sgl.AW2izuJOCcL7kWi7cFmChg9QvKK5XHEmkG1rCKZcvr.vm_bFUvpxSci
+ OZdSXuuiXCBLAsrOfNu5aMCjKOqAisnoh8h7lSl2quSXTG9cr9rloQk_CkZFZvQOmNakT2Kw7osG
+ P62ZFlIXjRNZy7fAv7NOAZtv3MMRzoPrF5quf6WMkB2yIOX6c8zdba8ntmtAYMHazHV3VHXF5U3k
+ TBMgF4OWBKzt4qpHwdrr_C6Z5lose0Kn9KqWcQCnj79YQISGUare7Lo8Lj.RoPpg5QEQISK.zHt3
+ Ealo9KLhdGrO0HOTinQPZw0.HMFDoWc7Co6II5n7MzACbpfkP1SPTHZqdDLl4SpdvbaM6TYcIvor
+ raXui3x0PS71vF8wCCjqdP4uQqvXy5uOtOB.wyGMRm67OBWTbimO6ICTnn2EbYfjx5cpNs0My9G.
+ 3faeKmhxtcoczYAlsQK3a.DKLnwzXH2gNSRtSJb6rfxriY8umm48IZyuEEFFvZeFGDmIEyFck_pl
+ PdDlIg5zg0Lkr8LqRj_lvaYVwQU6CQHP1zQ_InT9vh8q9VmVuLNS_9TVDICqdTllwzHMAx4HBkVG
+ 3yrf2gaoX3s2PkG_f.CwCU.nYqpuzAqLDoopDjuW45swdLM3DKLXZIe_mzxNIorFwglH2.umXl8c
+ mJ4mkmzdb0ZgWLiL8jDSfvkwpO7avdLs_EZ.943h8W4k_n2PZtMZYIEB7qwkyrRaadyTGhFFknMs
+ URDcXkqTv5SvQXHgQNdz2UNoghYU4DUIMp2dkvazE51Scp5aAOxUSH0ORelHdxkPu4DufgDoBa.o
+ a_kNSxDe2Lp4VuxlcCSnvYR4E6wp5RvxtV.Mikmd86gJaJIRs8nUbHOHiCyHekqeCICgsQddoHHA
+ gd1K.AsqyVYWOeb7BhqoOd3ZuLhVIOCCvvqwKME9zQ.STxPA7OV7T43W1w7HIrwwaGZe7JiWnawQ
+ Qf2R.v.EaagLQKnXMmwp5uWv1u0kh2dXVRjxhj6t8QLRb8zo._P2CaZ8uD_4TZu9Qk72aioNrWS2
+ 5tzPDjDQs1bXUdHGhvswSIE7djPKNymNXwNoM46ACuK0iF2ppF_DH.y_q_J6nPDiXQNmZeEMAYjL
+ 2Z58Dg.KGOX.p_FOsGyfY8Gh07TZpmGo5UPapi6zkiAX4seqINgb3uOc7MkrrXAECitfBInCkl0R
+ rXHPhhFYvcMqpz0I4qMb9CoXhHI7uQOliNHhVlYL4yHzxN65qMToiUmXtH0pVgKr7VowTtKKwsOY
+ OzoFXMrsdUfwTRaU52Ysas4nBYQKAIp6vHDIUkdd9kDRXC2VxcJ5De_IWKvGJmkpW4nK0RoSL_K6
+ JMggscSlleLiK5xRebHR7MkrF2igdFjl5ZvS5heKDjJbd1RHVxO0_xMLSx.yjhyaJh_hZvLGn0lv
+ dhQy8ZEDKaKL_QmZZY41yzgqqWM1nKs0iW2Cx_GLMM6jg4Gw11KEXx_J4GA6QhAFx32m9UCkttRF
+ naUnX8zIROEMipfwIhxc281.PAW3jWAkJ6Dd2vPtZv7weIlzC_DWv_H6dKUuKGxDNDcc9WSeApAX
+ KRt46ho9Ab9_BikIZBuhgOvCVPk3wllK_c1z8zofi8DjYTWVe2SgR0yY5IwGwB9tzKHzRXxSTBU3
+ ezmeEKMQUB0EyCFORAkAlIvFW3uUWKjGvILbXUMCIzvNOBO4h_uCKx5JeMkr4By_ARrcO6p3vBas
+ 5K.ZVQV5CV8RouHp1aOSwKFnIxEtGqE0lcvyLMpt5v9kzB1sdOEXTEGj8jtmQZ1dCEfKZLqT3tGy
+ RRsWhT5xtuMj1lvqhpMGUcQ7quw5.wa.0m5Tr54JbUrJash0lGewbia0MKOph4atefNKA6yoILiM
+ 9mnk.K7PwUuQskT01Azw8gox3.k1FXnJ1GAvd3.8NzBKBPUqR9OxLCBoCXp5kqaii5fIjiGkkVbB
+ U.5Ict_X.wZNL6_d6IqPOaA--
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 566483e5-b146-4668-90c8-890eb38b538e
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.bf2.yahoo.com with HTTP; Tue, 22 Oct 2024 00:08:18 +0000
+Received: by hermes--production-gq1-5dd4b47f46-wrqn7 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID c72af3b73ce19b5992080d7cc4add89a;
+          Mon, 21 Oct 2024 23:58:10 +0000 (UTC)
+Message-ID: <bab1de2e-0205-40dd-af3e-5956ff349948@schaufler-ca.com>
+Date: Mon, 21 Oct 2024 16:58:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/6] LSM: Ensure the correct LSM context releaser
+To: Paul Moore <paul@paul-moore.com>, linux-security-module@vger.kernel.org
+Cc: jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
+ john.johansen@canonical.com, penguin-kernel@i-love.sakura.ne.jp,
+ stephen.smalley.work@gmail.com, linux-kernel@vger.kernel.org,
+ selinux@vger.kernel.org, mic@digikod.net, linux-integrity@vger.kernel.org,
+ netdev@vger.kernel.org, audit@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ Todd Kjos <tkjos@google.com>, Casey Schaufler <casey@schaufler-ca.com>
+References: <20241014151450.73674-2-casey@schaufler-ca.com>
+ <dad74779768e7c00d2a3c9bf8c60045d@paul-moore.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <dad74779768e7c00d2a3c9bf8c60045d@paul-moore.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.22806 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-These are the preferred way to copy ethtool strings.
+On 10/21/2024 4:39 PM, Paul Moore wrote:
+> On Oct 14, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
+>> Add a new lsm_context data structure to hold all the information about a
+>> "security context", including the string, its size and which LSM allocated
+>> the string. The allocation information is necessary because LSMs have
+>> different policies regarding the lifecycle of these strings. SELinux
+>> allocates and destroys them on each use, whereas Smack provides a pointer
+>> to an entry in a list that never goes away.
+>>
+>> Update security_release_secctx() to use the lsm_context instead of a
+>> (char *, len) pair. Change its callers to do likewise.  The LSMs
+>> supporting this hook have had comments added to remind the developer
+>> that there is more work to be done.
+>>
+>> The BPF security module provides all LSM hooks. While there has yet to
+>> be a known instance of a BPF configuration that uses security contexts,
+>> the possibility is real. In the existing implementation there is
+>> potential for multiple frees in that case.
+>>
+>> Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
+>> Cc: linux-integrity@vger.kernel.org
+>> Cc: netdev@vger.kernel.org
+>> Cc: audit@vger.kernel.org
+>> Cc: netfilter-devel@vger.kernel.org
+>> To: Pablo Neira Ayuso <pablo@netfilter.org>
+>> Cc: linux-nfs@vger.kernel.org
+>> Cc: Todd Kjos <tkjos@google.com>
+>> Reviewed-by: Serge Hallyn <sergeh@kernel.org>
+>> ---
+>>  drivers/android/binder.c                | 24 ++++++-------
+>>  fs/ceph/xattr.c                         |  6 +++-
+>>  fs/nfs/nfs4proc.c                       |  8 +++--
+>>  fs/nfsd/nfs4xdr.c                       |  8 +++--
+>>  include/linux/lsm_hook_defs.h           |  2 +-
+>>  include/linux/security.h                | 35 +++++++++++++++++--
+>>  include/net/scm.h                       | 11 +++---
+>>  kernel/audit.c                          | 30 ++++++++---------
+>>  kernel/auditsc.c                        | 23 +++++++------
+>>  net/ipv4/ip_sockglue.c                  | 10 +++---
+>>  net/netfilter/nf_conntrack_netlink.c    | 10 +++---
+>>  net/netfilter/nf_conntrack_standalone.c |  9 +++--
+>>  net/netfilter/nfnetlink_queue.c         | 13 ++++---
+>>  net/netlabel/netlabel_unlabeled.c       | 45 +++++++++++--------------
+>>  net/netlabel/netlabel_user.c            | 11 +++---
+>>  security/apparmor/include/secid.h       |  2 +-
+>>  security/apparmor/secid.c               | 11 ++++--
+>>  security/security.c                     |  8 ++---
+>>  security/selinux/hooks.c                | 11 ++++--
+>>  19 files changed, 167 insertions(+), 110 deletions(-)
+> ..
+>
+>> diff --git a/net/netlabel/netlabel_unlabeled.c b/net/netlabel/netlabel_unlabeled.c
+>> index 1bc2d0890a9f..8303bbcfc543 100644
+>> --- a/net/netlabel/netlabel_unlabeled.c
+>> +++ b/net/netlabel/netlabel_unlabeled.c
+>> @@ -1127,14 +1122,14 @@ static int netlbl_unlabel_staticlist_gen(u32 cmd,
+>>  		secid = addr6->secid;
+>>  	}
+>>  
+>> -	ret_val = security_secid_to_secctx(secid, &secctx, &secctx_len);
+>> +	ret_val = security_secid_to_secctx(secid, &ctx.context, &ctx.len);
+>>  	if (ret_val != 0)
+>>  		goto list_cb_failure;
+>>  	ret_val = nla_put(cb_arg->skb,
+>>  			  NLBL_UNLABEL_A_SECCTX,
+>> -			  secctx_len,
+>> -			  secctx);
+>> -	security_release_secctx(secctx, secctx_len);
+>> +			  ctx.len,
+>> +			  ctx.context);
+> Nitpicky alignment issue; please keep the arguments aligned as they
+> are currently.
 
-Avoids incrementing pointers all over the place.
+Not a problem, although it looks like it's correct to me. I'll check to make sure.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/dsa/b53/b53_common.c          |  3 +--
- drivers/net/dsa/bcm_sf2.c                 |  5 +----
- drivers/net/dsa/bcm_sf2_cfp.c             | 17 +++++------------
- drivers/net/dsa/dsa_loop.c                |  3 +--
- drivers/net/dsa/hirschmann/hellcreek.c    |  8 ++------
- drivers/net/dsa/microchip/ksz_common.c    |  3 +--
- drivers/net/dsa/mv88e6xxx/chip.c          | 17 ++---------------
- drivers/net/dsa/mv88e6xxx/serdes.c        |  6 ++----
- drivers/net/dsa/rzn1_a5psw.c              |  3 +--
- drivers/net/dsa/sja1105/sja1105_ethtool.c |  7 ++-----
- drivers/net/dsa/xrs700x/xrs700x.c         |  6 ++----
- net/dsa/user.c                            | 13 +++++--------
- 12 files changed, 25 insertions(+), 66 deletions(-)
-
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index c39cb119e760..285785c942b0 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -989,8 +989,7 @@ void b53_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- 
- 	if (stringset == ETH_SS_STATS) {
- 		for (i = 0; i < mib_size; i++)
--			strscpy(data + i * ETH_GSTRING_LEN,
--				mibs[i].name, ETH_GSTRING_LEN);
-+			ethtool_puts(&data, mibs[i].name);
- 	} else if (stringset == ETH_SS_PHY_STATS) {
- 		phydev = b53_get_phy_device(ds, port);
- 		if (!phydev)
-diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-index 9201f07839ad..2bb1832d21bc 100644
---- a/drivers/net/dsa/bcm_sf2.c
-+++ b/drivers/net/dsa/bcm_sf2.c
-@@ -1180,11 +1180,8 @@ static const struct b53_io_ops bcm_sf2_io_ops = {
- static void bcm_sf2_sw_get_strings(struct dsa_switch *ds, int port,
- 				   u32 stringset, uint8_t *data)
- {
--	int cnt = b53_get_sset_count(ds, port, stringset);
--
- 	b53_get_strings(ds, port, stringset, data);
--	bcm_sf2_cfp_get_strings(ds, port, stringset,
--				data + cnt * ETH_GSTRING_LEN);
-+	bcm_sf2_cfp_get_strings(ds, port, stringset, data);
- }
- 
- static void bcm_sf2_sw_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/bcm_sf2_cfp.c b/drivers/net/dsa/bcm_sf2_cfp.c
-index c88ee3dd4299..8ba23e643a42 100644
---- a/drivers/net/dsa/bcm_sf2_cfp.c
-+++ b/drivers/net/dsa/bcm_sf2_cfp.c
-@@ -1284,22 +1284,15 @@ void bcm_sf2_cfp_get_strings(struct dsa_switch *ds, int port,
- {
- 	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
- 	unsigned int s = ARRAY_SIZE(bcm_sf2_cfp_stats);
--	char buf[ETH_GSTRING_LEN];
--	unsigned int i, j, iter;
-+	unsigned int i, j;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (i = 1; i < priv->num_cfp_rules; i++) {
--		for (j = 0; j < s; j++) {
--			snprintf(buf, sizeof(buf),
--				 "CFP%03d_%sCntr",
--				 i, bcm_sf2_cfp_stats[j].name);
--			iter = (i - 1) * s + j;
--			strscpy(data + iter * ETH_GSTRING_LEN,
--				buf, ETH_GSTRING_LEN);
--		}
--	}
-+	for (i = 1; i < priv->num_cfp_rules; i++)
-+		for (j = 0; j < s; j++)
-+			ethtool_sprintf(&data, "CFP%03d_%sCntr", i,
-+					bcm_sf2_cfp_stats[j].name);
- }
- 
- void bcm_sf2_cfp_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
-index c70ed67cc188..adbab544c60f 100644
---- a/drivers/net/dsa/dsa_loop.c
-+++ b/drivers/net/dsa/dsa_loop.c
-@@ -121,8 +121,7 @@ static void dsa_loop_get_strings(struct dsa_switch *ds, int port,
- 		return;
- 
- 	for (i = 0; i < __DSA_LOOP_CNT_MAX; i++)
--		memcpy(data + i * ETH_GSTRING_LEN,
--		       ps->ports[port].mib[i].name, ETH_GSTRING_LEN);
-+		ethtool_puts(&data, ps->ports[port].mib[i].name);
- }
- 
- static void dsa_loop_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-index d798f17cf7ea..283ec5a6e23c 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek.c
-@@ -294,12 +294,8 @@ static void hellcreek_get_strings(struct dsa_switch *ds, int port,
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i) {
--		const struct hellcreek_counter *counter = &hellcreek_counter[i];
--
--		strscpy(data + i * ETH_GSTRING_LEN,
--			counter->name, ETH_GSTRING_LEN);
--	}
-+	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i)
-+		ethtool_puts(&data, hellcreek_counter[i].name);
- }
- 
- static int hellcreek_get_sset_count(struct dsa_switch *ds, int port, int sset)
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 4e8710c7cb7b..408ccb1f012e 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2113,8 +2113,7 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
- 		return;
- 
- 	for (i = 0; i < dev->info->mib_cnt; i++) {
--		memcpy(buf + i * ETH_GSTRING_LEN,
--		       dev->info->mib_names[i].string, ETH_GSTRING_LEN);
-+		ethtool_puts(&buf, dev->info->mib_names[i].string);
- 	}
- }
- 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 4f5193d86e65..1893fed00467 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -1162,8 +1162,7 @@ static int mv88e6xxx_stats_get_strings(struct mv88e6xxx_chip *chip,
- 	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
- 		stat = &mv88e6xxx_hw_stats[i];
- 		if (stat->type & types) {
--			memcpy(data + j * ETH_GSTRING_LEN, stat->string,
--			       ETH_GSTRING_LEN);
-+			ethtool_puts(&data, stat->string);
- 			j++;
- 		}
- 	}
-@@ -1204,31 +1203,19 @@ static void mv88e6xxx_atu_vtu_get_strings(uint8_t *data)
- 	unsigned int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(mv88e6xxx_atu_vtu_stats_strings); i++)
--		strscpy(data + i * ETH_GSTRING_LEN,
--			mv88e6xxx_atu_vtu_stats_strings[i],
--			ETH_GSTRING_LEN);
-+		ethtool_puts(&data, mv88e6xxx_atu_vtu_stats_strings[i]);
- }
- 
- static void mv88e6xxx_get_strings(struct dsa_switch *ds, int port,
- 				  u32 stringset, uint8_t *data)
- {
- 	struct mv88e6xxx_chip *chip = ds->priv;
--	int count = 0;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
- 	mv88e6xxx_reg_lock(chip);
- 
--	if (chip->info->ops->stats_get_strings)
--		count = chip->info->ops->stats_get_strings(chip, data);
--
--	if (chip->info->ops->serdes_get_strings) {
--		data += count * ETH_GSTRING_LEN;
--		count = chip->info->ops->serdes_get_strings(chip, port, data);
--	}
--
--	data += count * ETH_GSTRING_LEN;
- 	mv88e6xxx_atu_vtu_get_strings(data);
- 
- 	mv88e6xxx_reg_unlock(chip);
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-index 01ea53940786..327831d2b547 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.c
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-@@ -144,8 +144,7 @@ int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 
- 	for (i = 0; i < ARRAY_SIZE(mv88e6352_serdes_hw_stats); i++) {
- 		stat = &mv88e6352_serdes_hw_stats[i];
--		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
--		       ETH_GSTRING_LEN);
-+		ethtool_puts(&data, stat->string);
- 	}
- 	return ARRAY_SIZE(mv88e6352_serdes_hw_stats);
- }
-@@ -405,8 +404,7 @@ int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 
- 	for (i = 0; i < ARRAY_SIZE(mv88e6390_serdes_hw_stats); i++) {
- 		stat = &mv88e6390_serdes_hw_stats[i];
--		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
--		       ETH_GSTRING_LEN);
-+		ethtool_puts(&data, stat->string);
- 	}
- 	return ARRAY_SIZE(mv88e6390_serdes_hw_stats);
- }
-diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
-index 1135a32e4b7e..b3e127f64b08 100644
---- a/drivers/net/dsa/rzn1_a5psw.c
-+++ b/drivers/net/dsa/rzn1_a5psw.c
-@@ -803,8 +803,7 @@ static void a5psw_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- 		return;
- 
- 	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++) {
--		memcpy(data + u * ETH_GSTRING_LEN, a5psw_stats[u].name,
--		       ETH_GSTRING_LEN);
-+		ethtool_puts(&data, a5psw_stats[u].name);
- 	}
- }
- 
-diff --git a/drivers/net/dsa/sja1105/sja1105_ethtool.c b/drivers/net/dsa/sja1105/sja1105_ethtool.c
-index decc6c931dc1..2ea64b1d026d 100644
---- a/drivers/net/dsa/sja1105/sja1105_ethtool.c
-+++ b/drivers/net/dsa/sja1105/sja1105_ethtool.c
-@@ -586,7 +586,6 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
- {
- 	struct sja1105_private *priv = ds->priv;
- 	enum sja1105_counter_index max_ctr, i;
--	char *p = data;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
-@@ -597,10 +596,8 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
- 	else
- 		max_ctr = __MAX_SJA1105PQRS_PORT_COUNTER;
- 
--	for (i = 0; i < max_ctr; i++) {
--		strscpy(p, sja1105_port_counters[i].name, ETH_GSTRING_LEN);
--		p += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < max_ctr; i++)
-+		ethtool_puts(&data, sja1105_port_counters[i].name);
- }
- 
- int sja1105_get_sset_count(struct dsa_switch *ds, int port, int sset)
-diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
-index de3b768f2ff9..4dbcc49a9e52 100644
---- a/drivers/net/dsa/xrs700x/xrs700x.c
-+++ b/drivers/net/dsa/xrs700x/xrs700x.c
-@@ -91,10 +91,8 @@ static void xrs700x_get_strings(struct dsa_switch *ds, int port,
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++) {
--		strscpy(data, xrs700x_mibs[i].name, ETH_GSTRING_LEN);
--		data += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++)
-+		ethtool_puts(&data, xrs700x_mibs[i].name);
- }
- 
- static int xrs700x_get_sset_count(struct dsa_switch *ds, int port, int sset)
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 64f660d2334b..697e73494175 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1042,15 +1042,12 @@ static void dsa_user_get_strings(struct net_device *dev,
- 	struct dsa_switch *ds = dp->ds;
- 
- 	if (stringset == ETH_SS_STATS) {
--		int len = ETH_GSTRING_LEN;
--
--		strscpy_pad(data, "tx_packets", len);
--		strscpy_pad(data + len, "tx_bytes", len);
--		strscpy_pad(data + 2 * len, "rx_packets", len);
--		strscpy_pad(data + 3 * len, "rx_bytes", len);
-+		ethtool_puts(&data, "tx_packets");
-+		ethtool_puts(&data, "tx_bytes");
-+		ethtool_puts(&data, "rx_packets");
-+		ethtool_puts(&data, "rx_bytes");
- 		if (ds->ops->get_strings)
--			ds->ops->get_strings(ds, dp->index, stringset,
--					     data + 4 * len);
-+			ds->ops->get_strings(ds, dp->index, stringset, data);
- 	} else if (stringset ==  ETH_SS_TEST) {
- 		net_selftest_get_strings(data);
- 	}
--- 
-2.47.0
-
+>
+>> +	security_release_secctx(&ctx);
+>>  	if (ret_val != 0)
+>>  		goto list_cb_failure;
+>>  
+> --
+> paul-moore.com
+>
 
