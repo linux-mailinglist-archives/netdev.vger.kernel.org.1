@@ -1,138 +1,152 @@
-Return-Path: <netdev+bounces-137395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3636B9A5FE1
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:24:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F039A6006
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BE471C21594
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:24:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 711DAB28734
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0C61E2824;
-	Mon, 21 Oct 2024 09:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1DB194C79;
+	Mon, 21 Oct 2024 09:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNhjluE9"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="MxhXQr2D"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E861E32CA
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 09:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D81D531
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 09:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729502624; cv=none; b=DhmJwwENo2hdmL9VdsOPvfo5Sr4K1z49JNwtTc3309IjmcG2+T2i9XoRmxs8tc+fq5Jikcvtvu4gbR9F2H/Ffs8+kUQGgg5Pivc9kqK2xcC0B/AsI9Nf4sBD3PYG/rZWhlaw3lmna7DZSzMNwHO8mZ7fBDE7paQH62nXjku0ZPg=
+	t=1729503026; cv=none; b=kjNm13jJ9OpcU834mtmLxfqlLhv/TC5uEd7/vlkqUk1tG+ZTaDefyZXgrPvOPkBBN9nn94DWG2W6KCYIJJnZoXg6hJGal3Q9dFjg0VlVvfBfg30xKW+B2BLChxdcK+31vX/GAyIAdPMXVwJshHyJNuhnmURXL6RwVU87cFZRcLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729502624; c=relaxed/simple;
-	bh=XAazZYLkwAGGoZZOx7JUiyLm2ipHe+8hLTq1JrfcDJ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VGCTWCqgNChWQIfDo4IJnjf9xTeQsrIeuWsxiXm/95X8qC9o+hoy1eL7XKX+ZxFOf/vDg8yzNJq0zXs91NAe8LvzTUsa7IUxnrmiEKxwGZO7gLpIJK9t+l1e2IKFIuCbiyrBjNDnnviEuDfWoHXYBtaLLy1+DcdbpX7aTYteQ1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SNhjluE9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729502621;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZOPzM8nTUFqwLn8ohf0g1jVEfJikuSPUMDsCZxkKDsM=;
-	b=SNhjluE9FVyBzX2V8kO/9R0rhp4H+mZCg2Y6mDktaQYBdc8BymrhnoKkMR7UuCSwi4UiH4
-	k2th9grbdLxKW+2Bov6boZBBc7LwAC9zBUKEm1EbnLeJR+5wR8KnIKDA+0HFzsDBKY0mg5
-	ATSgepVKc8QbC9IBOCtU++uXD/Bix3s=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-5iA86wRSOYSmUk-0LZs7nw-1; Mon, 21 Oct 2024 05:23:40 -0400
-X-MC-Unique: 5iA86wRSOYSmUk-0LZs7nw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d603515cfso1883077f8f.1
-        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 02:23:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729502619; x=1730107419;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOPzM8nTUFqwLn8ohf0g1jVEfJikuSPUMDsCZxkKDsM=;
-        b=lh8Zmz7RX+Nw7Cp5zkJ/0+G9nEoTayWGff6CR+utOX6dho18+tGXY4xJoLDLULepXg
-         vM3qVMQMhZi6eyBL0qq4p/nqQQmVG26JFAhl40z2+7SqYKSZ5xPnGTaJBKX+K3+FwJaG
-         ywvB5VgaU0hf8pAooTplA4xhm4UxZMYu7Wftt1kF3XiZ7ZG6zYctyh6MS2fNxsmy2EOx
-         jrgDLYqmq8NzzUpVUYT3QBLkBQZxZCJ4RbdaL3X3JufYStDtu73jyb24qV0z6KD/fcjG
-         I/E+HvLL+KZfccUunV28VQmZyijHC1zWDcPztrBrblHH/YdOJpLoNX7ovrEEy7QadVM9
-         HNmw==
-X-Gm-Message-State: AOJu0YycPKoLzffxLAjnM5fiYGuXGSV2zyuT6gDzBaj4qFe1GiI086fi
-	kqfpATk01DMJp+GOK0gsXpAkQynXJ1YcBnDBVsKb8oxlrkxMD22/C/A4Kh7qq3IeblR46msLmNG
-	H8Vj7e+/HgL+vL3p4/5FGqXRke99eAc5SzQN3wifAOKrwmlWbMmgUIg==
-X-Received: by 2002:adf:f591:0:b0:37d:39df:8658 with SMTP id ffacd0b85a97d-37eab72a94dmr6219402f8f.58.1729502619021;
-        Mon, 21 Oct 2024 02:23:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHysyLKLLu8ecA+EiDeIyFSZdEdGbiDbJIKLmvhlv8Jpyw7lbNkChKbBAKP5wBfWcUaSVANmA==
-X-Received: by 2002:adf:f591:0:b0:37d:39df:8658 with SMTP id ffacd0b85a97d-37eab72a94dmr6219383f8f.58.1729502618678;
-        Mon, 21 Oct 2024 02:23:38 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f5cbe7dsm51045765e9.39.2024.10.21.02.23.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 02:23:38 -0700 (PDT)
-Message-ID: <6b95c3c9-3b8b-4db3-b755-a3652c1a59cc@redhat.com>
-Date: Mon, 21 Oct 2024 11:23:36 +0200
+	s=arc-20240116; t=1729503026; c=relaxed/simple;
+	bh=PyCx5vnfW1+bXSxbUibXQPTrgTOZtFw3+1JXRe/JuFY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H1s44B5ggJCGECI9a7czSwuK7fk2/cnP8JVFiOB8lCOJ/6lThIecxFx/V3ZLRMEa+MQ+gFe0zQkcm53LpByCUrctOxYkWZYx7X2+rOqqdp8z2xurECzJKf90gk4cG6iumM/Cgff8nqhm67QW7CqNa7iXSbGcAD1pvSzoQNCX8gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=MxhXQr2D; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id A4F53201AA;
+	Mon, 21 Oct 2024 11:30:21 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id d8X1o4rZowtn; Mon, 21 Oct 2024 11:30:21 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 1D24520184;
+	Mon, 21 Oct 2024 11:30:21 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 1D24520184
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1729503021;
+	bh=rIv4EQITWJFHOmq6nEtKJA+fKOIB4yEgaJ7xuI1UMU0=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=MxhXQr2DJkZ/c8nOEyKBCbSDtxZnpL7BUJ3ZbPpere2+eKFji48m4ROUVBzBhjsve
+	 eJV2IVKL0sldASEqgZju6MX+yrftISHC9fGp5BHpzu7LYX00upxFFyRAiA3HJM9OWI
+	 +D8ociOVlX2f+QLS2lrQ3JyM8u2wIZnHaD1+M74mEJGUywtHAJ0Ctsgu4b+w2F93DX
+	 GORjwsyTSqHtblmQ4/likkmx4Fus3PFcplUHD3oMS92g8aWFfIZpLGC9WnB5+WXwYD
+	 jfuA1nCuUia17pJdk5XRnwT8OUwRMv+mtVk0rFRY39MHXxgTn9fbLg/VFJBQmQFQef
+	 SJZb82EzytkEA==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 21 Oct 2024 11:30:20 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 21 Oct
+ 2024 11:30:20 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 9CF133184C85; Mon, 21 Oct 2024 11:30:20 +0200 (CEST)
+Date: Mon, 21 Oct 2024 11:30:20 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Christian Hopps <chopps@chopps.org>
+CC: <devel@linux-ipsec.org>, <netdev@vger.kernel.org>, Florian Westphal
+	<fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
+	<horms@kernel.org>, Antony Antony <antony@phenome.org>, Christian Hopps
+	<chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v12 08/16] xfrm: iptfs: add user packet
+ (tunnel ingress) handling
+Message-ID: <ZxYfLMIahzR9cpMw@gauss3.secunet.de>
+References: <20241007135928.1218955-1-chopps@chopps.org>
+ <20241007135928.1218955-9-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] net: ethernet: mtk_eth_soc: optimize dma
- ring address/index calculation
-To: Felix Fietkau <nbd@nbd.name>, Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20241015110940.63702-1-nbd@nbd.name>
- <20241015110940.63702-4-nbd@nbd.name>
- <e67883e3-b278-4052-849c-8a9a8ef145f0@lunn.ch>
- <695421bb-6f31-4bae-8c8c-6d4fccf1b497@nbd.name>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <695421bb-6f31-4bae-8c8c-6d4fccf1b497@nbd.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241007135928.1218955-9-chopps@chopps.org>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On 10/15/24 15:07, Felix Fietkau wrote:
-> On 15.10.24 14:54, Andrew Lunn wrote:
->> On Tue, Oct 15, 2024 at 01:09:38PM +0200, Felix Fietkau wrote:
->>> Since DMA descriptor sizes are all power of 2, we can avoid costly integer
->>> division in favor or simple shifts.
->>
->> Could a BUILD_BUG_ON() be added to validate this?
-> 
-> Not sure if that would be useful. I can't put the BUILD_BUG_ON in the 
-> initializer macro, so I could only add it for the individual dma 
-> descriptor structs.
-> Since the size of those structs will not be changed (otherwise it would 
-> immediately visibly break with existing hw), the remaining possibility 
-> would be adding new structs that violate this expectation. However, 
-> those would then not be covered by the BUILD_BUG_ON.
-> 
->> Do you have some benchmark data for this series? It would be good to
->> add to a patch 0/4.
-> 
-> No, I just ran basic tests that everything still works well and looked 
-> at the assembly diff to ensure that the generated code seems sane.
+On Mon, Oct 07, 2024 at 09:59:20AM -0400, Christian Hopps wrote:
+> From: Christian Hopps <chopps@labn.net>
+> @@ -77,8 +609,11 @@ static int iptfs_user_init(struct net *net, struct xfrm_state *x,
+>  {
+>  	struct xfrm_iptfs_data *xtfs = x->mode_data;
+>  	struct xfrm_iptfs_config *xc;
+> +	u64 q;
+>  
+>  	xc = &xtfs->cfg;
+> +	xc->max_queue_size = IPTFS_DEFAULT_MAX_QUEUE_SIZE;
+> +	xtfs->init_delay_ns = IPTFS_DEFAULT_INIT_DELAY_USECS * NSECS_IN_USEC;
+>  
+>  	if (attrs[XFRMA_IPTFS_PKT_SIZE]) {
+>  		xc->pkt_size = nla_get_u32(attrs[XFRMA_IPTFS_PKT_SIZE]);
+> @@ -92,6 +627,17 @@ static int iptfs_user_init(struct net *net, struct xfrm_state *x,
+>  			return -EINVAL;
+>  		}
+>  	}
+> +	if (attrs[XFRMA_IPTFS_MAX_QSIZE])
+> +		xc->max_queue_size = nla_get_u32(attrs[XFRMA_IPTFS_MAX_QSIZE]);
+> +	if (attrs[XFRMA_IPTFS_INIT_DELAY])
+> +		xtfs->init_delay_ns =
+> +			(u64)nla_get_u32(attrs[XFRMA_IPTFS_INIT_DELAY]) *
+> +			NSECS_IN_USEC;
+> +
+> +	q = (u64)xc->max_queue_size * 95;
+> +	(void)do_div(q, 100);
 
-Since this series is about performances, some related quick figures
-would be really a plus.
+This cast is not need.
 
-At least we need a cover-letter to try to keep the git log history
-clean. Otherwise cooking the net-next PR at the end of the cycle will be
-a 10w worth task;)
+> +	xtfs->ecn_queue_size = (u32)q;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -101,8 +647,11 @@ static unsigned int iptfs_sa_len(const struct xfrm_state *x)
+>  	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+>  	unsigned int l = 0;
+>  
+> -	if (x->dir == XFRM_SA_DIR_OUT)
+> +	if (x->dir == XFRM_SA_DIR_OUT) {
+> +		l += nla_total_size(sizeof(u32)); /* init delay usec */
+> +		l += nla_total_size(sizeof(xc->max_queue_size));
+>  		l += nla_total_size(sizeof(xc->pkt_size));
+> +	}
+>  
+>  	return l;
+>  }
+> @@ -112,9 +661,22 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
+>  	struct xfrm_iptfs_data *xtfs = x->mode_data;
+>  	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+>  	int ret = 0;
+> +	u64 q;
+> +
+> +	if (x->dir == XFRM_SA_DIR_OUT) {
+> +		q = xtfs->init_delay_ns;
+> +		(void)do_div(q, NSECS_IN_USEC);
 
-Please re-send with a cover letter.
-Thanks,
-
-Paolo
+Same here.
 
 
