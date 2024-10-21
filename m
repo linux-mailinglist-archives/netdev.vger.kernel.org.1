@@ -1,145 +1,120 @@
-Return-Path: <netdev+bounces-137602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657CD9A725F
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:31:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D10859A7264
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 226BF1C22C03
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:31:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C64C1C22ABB
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5A71946CF;
-	Mon, 21 Oct 2024 18:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BED1F9428;
+	Mon, 21 Oct 2024 18:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="DxHqz2iY"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XB+KDvAT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33291A41
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 18:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69653A41
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 18:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729535510; cv=none; b=u7H/yruBqHGzpp1Tiwpe65A9+P4KxC4X4keCdVz2hZcempjVG8shelNeO7sMkKXfce4d1eG4ElQkuReNq0YlX3Kl7haJFeuJYGaUsDBFtmdfSjFfTR456NPBLQVSf6Rmo2vV9U/Eged9I9B3KKeVoD23uyujPrScfs0VDhGl53Q=
+	t=1729535586; cv=none; b=a/LmuJPiBICG24g1JMJYvhzNLpgCsa6dCRpldEnTITMb80tUHc6y/RMxbZ42YbJszA/J40CZxm06H0nSEL09fjELQr9A+tZXXqTAbo6sk2oxSClhFdIZBwURDee+Ic5r+tnshyz9MgUQIK5ZfrUvUierqCiZYOQcJ10RdKfiCp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729535510; c=relaxed/simple;
-	bh=jC0DkXntGiZLd0To46e4yNwT0r9WH91SeNws8hipw7s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j2oYOCUqrjBaguUYXQ0c56Cnb6FtMtUfUzJ+p8lTE45Ycyfy0/M8zXlD5+rRsEHdB1swVcYsyRDreYeHEsjmSwyaEmuYIPUrBxOjGyYyrdawonda3zq/bNQPEkVFiRdikBVxsh7nRhKc8xECNKuR62xvaXMmuPJitiTrjywMFe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=DxHqz2iY; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20c693b68f5so51150125ad.1
-        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 11:31:47 -0700 (PDT)
+	s=arc-20240116; t=1729535586; c=relaxed/simple;
+	bh=a1xyOXu5df84wWVlaWmZ1lLTFVjmRH9oDVLRvJWVDOs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Pu7qdukpOOIHs/yxOaS2A/TEZDnDC74WqfO2tlqWcDl10G83HFl8vxAq9T39vZkcnQlrGPeEolFLEut1p0YjEiNW00AAV1LV1ev9xaxVE0CDpq6LwZsm3V+IuuxHRoTHphsZ5+vXbHAlN/WLJoL/SkkYR/35QEqMbFtXcXoTVio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XB+KDvAT; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1729535506; x=1730140306; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7/EgoAZFIh9BoVeqC6+Fs1CWcfsi8BdDAV/4Dy94O54=;
-        b=DxHqz2iYxM22M4a/6LO0FSkUTveJGJKc+r4B9erElcI3zMzSCiLPgOy7pBPlgAxzB0
-         NxjOPWUUNRNG5x2x2lGYIkpwEccsfr9CDXCruLXe8R4+Q1ytSTQKo4bd6Koi0sHuXhFa
-         qDpPE1QWc06tPOEgAAMG0krwb13MtWFXgLyhHZgo0Ff9KDs4VLKipFXLw06yKz9NbY8B
-         FqeqdgRgH27u9f5f9YXHdfIAPvJI+SdgtVfemew270tCqgvA/A6nNJgZaxscAoJDRUJl
-         lH3CUxUFmt5v1WIf2CKrvnSiemFUYdpgAAN28po+nTqEpNBDCpTl9ese1z5OM/G2kRMt
-         V3xQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729535506; x=1730140306;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/EgoAZFIh9BoVeqC6+Fs1CWcfsi8BdDAV/4Dy94O54=;
-        b=DwjHv8mi1di7ka7Zar9M9A8e1FtU3nASuArUcBKRHAfYEJToo/ldL7FvX8XDoa9Bpr
-         cgEJbctrzWSILPCCjkZSxRhTBXU0KoSmQIu/+kOIxGnNYTR+HPwQdTEss0tUj/9/oiVd
-         jqMg7rng+zfZ+9LC08Pe7NX7cA4Csyf3jMkxY2UlutY47XP4aBPdBoq2QUnNCkR45Rub
-         Qg2GCa+DM0YdsRhORhaIQPtN8sBpqyMMWZLjfq4Tv3nQ54tZ0dq4uWbtEWfga7WKlVEx
-         IBF3EdSx+zHmjcq4QTzVYmILdybbJT7WEiNaG3kPntuB01h3S3cavtB0lyKOU6PCn79k
-         Cyzg==
-X-Forwarded-Encrypted: i=1; AJvYcCViMZkpPs9UMIUacgYBdGvi1AxVKU5uOyvq+q4bl0gmHsYTuCes1sqeugV9f+oIc+yyPQh5C4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSFnsf9+cCzQycarXOW/4PGH/LHU0blfzRgkTwkKB99qUhvV8X
-	9xNrf29RTfk6DEiHlepkls8wS1DuUVGL3VMhtA9JYpO+7YBbbDlRS8zLSpuLNdw=
-X-Google-Smtp-Source: AGHT+IEKCdDY85XBnBi2dTM20VjDzCW8X0a7Prx3JPE6BkBcJycnaU/w3jYmmnA8gx8vGc+Oi5wT2g==
-X-Received: by 2002:a17:902:e849:b0:20c:83e7:ca54 with SMTP id d9443c01a7336-20e984aadf8mr1138275ad.27.1729535506379;
-        Mon, 21 Oct 2024 11:31:46 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1256:1:80c:c984:f4f1:951f? ([2620:10d:c090:500::6:d291])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7ef1a953sm29269815ad.112.2024.10.21.11.31.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 11:31:45 -0700 (PDT)
-Message-ID: <32ca8ddf-2116-43b9-b434-d8393cdbdde1@davidwei.uk>
-Date: Mon, 21 Oct 2024 11:31:42 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729535584; x=1761071584;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m3E5BP0XBDZnWoBqpKPV7REejm2AMpHJL8XpocIc/fs=;
+  b=XB+KDvATg+84WvHYCXj0Ygwtc+xyWiySf6VaxshwrWF5B5umvuQH+v65
+   0Dv9qzHJ30ezhU/h240ZoViaCNhuU7NZ/GseRL/TtI8+sonmKmaRzOvcu
+   2EVg9hx15PL3cylt3RtnTuI9lOGSJAAWkavRcsiWjODFp98EKG03p7Xh1
+   o=;
+X-IronPort-AV: E=Sophos;i="6.11,221,1725321600"; 
+   d="scan'208";a="768996922"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 18:32:55 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:61152]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.189:2525] with esmtp (Farcaster)
+ id a2593c8c-6c58-49d5-baf6-1242584f3ace; Mon, 21 Oct 2024 18:32:46 +0000 (UTC)
+X-Farcaster-Flow-ID: a2593c8c-6c58-49d5-baf6-1242584f3ace
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 21 Oct 2024 18:32:46 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.222.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 21 Oct 2024 18:32:43 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 00/12] ipv4: Convert RTM_{NEW,DEL}ADDR and more to per-netns RTNL.
+Date: Mon, 21 Oct 2024 11:32:27 -0700
+Message-ID: <20241021183239.79741-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 14/15] io_uring/zcrx: add copy fallback
-Content-Language: en-GB
-To: Paolo Abeni <pabeni@redhat.com>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241016185252.3746190-1-dw@davidwei.uk>
- <20241016185252.3746190-15-dw@davidwei.uk>
- <4f61bdef-69d0-46df-abd7-581a62142986@redhat.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <4f61bdef-69d0-46df-abd7-581a62142986@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 2024-10-21 07:40, Paolo Abeni wrote:
-> On 10/16/24 20:52, David Wei wrote:
->> @@ -540,6 +562,34 @@ static const struct memory_provider_ops io_uring_pp_zc_ops = {
->>  	.scrub			= io_pp_zc_scrub,
->>  };
->>  
->> +static void io_napi_refill(void *data)
->> +{
->> +	struct io_zc_refill_data *rd = data;
->> +	struct io_zcrx_ifq *ifq = rd->ifq;
->> +	netmem_ref netmem;
->> +
->> +	if (WARN_ON_ONCE(!ifq->pp))
->> +		return;
->> +
->> +	netmem = page_pool_alloc_netmem(ifq->pp, GFP_ATOMIC | __GFP_NOWARN);
->> +	if (!netmem)
->> +		return;
->> +	if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
->> +		return;
->> +
->> +	rd->niov = netmem_to_net_iov(netmem);
->> +}
->> +
->> +static struct net_iov *io_zc_get_buf_task_safe(struct io_zcrx_ifq *ifq)
->> +{
->> +	struct io_zc_refill_data rd = {
->> +		.ifq = ifq,
->> +	};
->> +
->> +	napi_execute(ifq->napi_id, io_napi_refill, &rd);
-> 
-> Under UDP flood the above has unbounded/unlimited execution time, unless
-> you set NAPI_STATE_PREFER_BUSY_POLL. Is the allocation schema here
-> somehow preventing such unlimited wait?
+The IPv4 address hash table and GC are already namespacified.
 
-Hi Paolo. Do you mean that under UDP flood, napi_execute() will have
-unbounded execution time because napi_state_start_busy_polling() and
-need_resched() will always return false? My understanding is that
-need_resched() will eventually kick the caller task out of
-napi_execute().
+This series converts RTM_NEWADDR/RTM_DELADDR and some more
+RTNL users to per-netns RTNL.
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
+
+Changes:
+  v2:
+    * Add patch 1 to address sparse warning for CONFIG_DEBUG_NET_SMALL_RTNL=n
+    * Add Eric's tags to patch 2-12
+
+  v1: https://lore.kernel.org/netdev/20241018012225.90409-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (12):
+  rtnetlink: Make per-netns RTNL dereference helpers to macro.
+  rtnetlink: Define RTNL_FLAG_DOIT_PERNET for per-netns RTNL doit().
+  ipv4: Factorise RTM_NEWADDR validation to inet_validate_rtm().
+  ipv4: Don't allocate ifa for 0.0.0.0 in inet_rtm_newaddr().
+  ipv4: Convert RTM_NEWADDR to per-netns RTNL.
+  ipv4: Use per-netns RTNL helpers in inet_rtm_newaddr().
+  ipv4: Convert RTM_DELADDR to per-netns RTNL.
+  ipv4: Convert check_lifetime() to per-netns RTNL.
+  rtnetlink: Define rtnl_net_trylock().
+  ipv4: Convert devinet_sysctl_forward() to per-netns RTNL.
+  ipv4: Convert devinet_ioctl() to per-netns RTNL except for
+    SIOCSIFFLAGS.
+  ipv4: Convert devinet_ioctl to per-netns RTNL.
+
+ include/linux/inetdevice.h |   9 ++
+ include/linux/rtnetlink.h  |  25 +++--
+ include/net/rtnetlink.h    |   1 +
+ net/core/dev_ioctl.c       |   6 +-
+ net/core/rtnetlink.c       |  11 +++
+ net/ipv4/devinet.c         | 190 +++++++++++++++++++++----------------
+ 6 files changed, 143 insertions(+), 99 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
+
 
