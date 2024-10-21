@@ -1,194 +1,150 @@
-Return-Path: <netdev+bounces-137374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D35159A5A30
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 08:11:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 317A79A5A3C
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 08:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3C801C210A6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 06:10:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA2B31F2174F
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 06:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E9E1CF292;
-	Mon, 21 Oct 2024 06:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V2e3+F64"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCAB1946A4;
+	Mon, 21 Oct 2024 06:22:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2103.outbound.protection.partner.outlook.cn [139.219.146.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5C31946D0;
-	Mon, 21 Oct 2024 06:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729491047; cv=none; b=hAndFI9eR+aRjjdeJDNAJVlEXNnHzhBFyUpHLGT/RBjsLruEnMmvswrXIuh0B5MxkCjmo/Rl5eVrJaZZdWvuvzgYHuzsYEmCTv9priOzvm5drm0wdXsu15IqdzkhCfDDnoA1sahNUK6lUjS1L7FG6eHVKkWWqdhWANaMj5s+o5U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729491047; c=relaxed/simple;
-	bh=fc+HEIHCLf3cvwkrzW93vSxGWX+d0v9vT2JlNhSi5h4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F2HL/QKXMR6o8zNPFwF6kJYVxZNIdnWKxXCaNMKN62Eej9+lsal3VexjORouS5iC17xp2qPQAf4XOMAgCCCUQdl+AZsDdHRHzNX6Ylw5dabkqku8raf8pgqthI7GtJFKeMfO4CwPT6A1BcfUeEjXh6Kerjn2SxpZDAHaTGuvCE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V2e3+F64; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71e61b47c6cso3199841b3a.2;
-        Sun, 20 Oct 2024 23:10:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729491044; x=1730095844; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iQESqJ9aYfd46Wdo01VIZ5qOywZL6bQHldy6wnuTUU8=;
-        b=V2e3+F64zVJHXF4Gb7sE+JZQ9YBasSkHxFlietCqTDT3J+5nEdmad+D+AbT3xNGV2X
-         nZ9B1blDfFlS0faFdlQfRvMR0GJdjRWqmlAhusIpmNxZL6pCLAZtOzpmuKhTUL5tdqhL
-         YGFjyH9N9f1etxXxlsCmATkpf65Vhgvn96sqkobr6HKMo1q3NSFXdDxWXtrQYA2F+4N0
-         qABvZQMHSvD8COf3o1QeMaSWshcomOA6n+qQV6v2gb4kDfvi4lFc84nxO7MxRO4DhLPg
-         WzT4oeu+gshl2d7hJsRq34Fivqlp+0o8ziB3kGCCjjD/TL+SZTLVvPTHvSESPdFHRg3S
-         Mbdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729491044; x=1730095844;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iQESqJ9aYfd46Wdo01VIZ5qOywZL6bQHldy6wnuTUU8=;
-        b=dKFcLiTGjdI2/mVcvt+99T41bEORN+pW5ItLOxmPIwPYl0ToCxmi8IBEG1iqMd/Vd5
-         YEyJ7igCa/Z/UjWJ4U/bIJXkyiiKXg0lnYO/QjqNgPKNnmrCKUvoKvITBngsFfpeN1Q7
-         VuDoG68ngvAUmAoV+rDoOb77bZ+Cn7XDPgz93WRpL5QcUjoL8D+VpFYKAUIH+X0XPMxD
-         kipoSdfM5aQ4ufaDQ9BiiSwfJ5R5urMYlMO3YwiZ8gm0/Ch4H7CwuUkoC83nLEJW6YwO
-         bhHds8Lf9HeviqllvOiwZphXtxpEvsnM6CF913I2namyFbsN1mUJupyeJ0xxJ9EYZ6qx
-         Lqjw==
-X-Forwarded-Encrypted: i=1; AJvYcCUd9RAdN9/ANQ69zl3AwSMEpEBtEO47v2hb8SvVEjTd+7RVas3d6rneIdU0rSc6dFsqGd5InpiI0i3Uxlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzADeuMH5cYTE4f5cdqx7Q7Gr0W2Iej9SJny83GKf1UvqcnyQgH
-	n6HSvgxPi4+POjhVAopgnhVVRTSlmOvNvXhpoMGU4q+j5JjA1EBcmi2n8g==
-X-Google-Smtp-Source: AGHT+IFfcM3mmxhkbfvMBoyB5bFdlWr6KbbE9WM+AEcGbqCxvjfTNgq2Enq1ESlcFgxrfwc/MvRFcQ==
-X-Received: by 2002:a05:6a00:3d15:b0:71e:79a9:ec47 with SMTP id d2e1a72fcca58-71ea3118addmr16050357b3a.6.1729491043923;
-        Sun, 20 Oct 2024 23:10:43 -0700 (PDT)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71ec13d7422sm2145735b3a.97.2024.10.20.23.10.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Oct 2024 23:10:43 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270E2BA27;
+	Mon, 21 Oct 2024 06:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.103
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729491740; cv=fail; b=mvPbEbdgwWhcchYSg1z3wBUjrW1nd9g3RwWizNaqxe1uS5YE0X9VhaATwlVtcC1NqdR+HyOpGWr1g8OmTbQv0LvdWKEnz+8XOXMYmJ7GuGPf+1zA8QdBFgCKbqhiC17sN5thKKd4ShxJB4bxBFbBjsKmX6ULIdMhBzFZoH7T6Ms=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729491740; c=relaxed/simple;
+	bh=nrhVvbhQ4Cid68XoDalOXADlRjCYvC9AZABxfoQeVgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NKwKQbeUjAh6HbOs+stpFc9vUZAAp2UuAhUe7RQe3AxbBmHvwVZSx8NbR4ENW+7zrQYPh+2dW6NmCjji6cDAQOUZhHwLy5q8yLKm2+NgjcO4AjRdW8I/S+ajyQssR28i94u/v0MoFAy00UnkCd1Y/X5v/C5Cf690sn0eWEk7LF8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.103
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y2Nxcd/QBKuschKDf7fUmp3agsH8y9fmhcGS8yebA9kuYzGmkyXlnrBDuTAbg+XBbEmNE0h96hF03e54gIzzIqR2J7vd+i2QagK928GJH6A8kDSzrtZ3JBIyeTxuL3qHIjdXNIGMfpkUDnFahyNx21QcHry6CXiEPvYmXO5HcbohHs1mAUy3yFUSRioX7eEogKAjwUQWJkKAQMu2kUf/Zc4Rh772v5G2HDp4wDd1DbTM/VKFgJCDiS/yZnpBMeX/sHzKdrdEp1VCfKPB+y+lbYJzJISiHTfwfZOut6+M4xNJJA+eSmQgM4a4yDmRVdV/l9KuiGpPET/fw3490V5/1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xAnb4E5HUG15fezuefi26RFzij2OA0OrVaxlJZDy8iw=;
+ b=E/KoaWItpjG/Ke3beTQNgaDs7wEE7vVKOD0j+zJGIDIkpJxiKXxPpX2kiaMk0DTR4PVeiXhnafjgf/yphcHZJVFuipYAE/GnA+bhXjopD1pY1prrIYiuGdKguch+i0ci5ZfWZVAzhR2iLelazT9iJO0nxt7Oc3+S/idCbNbWShvrxt/W0xqfqjvinXlI9pobrLMb5AQHbVgGmCTusxGIGdhOOrYx0TcqvhqDB10M28uMZZoheyfg13RqEIfRMN5xq2tW6hz3RINct2fScj9iuHt2tPKUwa7cLn9fb54QOdRMrQFvq4jHkWu5F7i15FUP4ZUiVjHLaHScmZuZYswiuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12) by ZQZPR01MB0996.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:a::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.20; Mon, 21 Oct
+ 2024 05:49:10 +0000
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ ([fe80::617c:34a2:c5bf:8095]) by
+ ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn ([fe80::617c:34a2:c5bf:8095%4])
+ with mapi id 15.20.8069.016; Mon, 21 Oct 2024 05:49:10 +0000
+From: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Subject: [PATCH net v1] net: stmmac: TSO: Fix unbalanced DMA map/unmap for non-paged SKB data
-Date: Mon, 21 Oct 2024 14:10:23 +0800
-Message-Id: <20241021061023.2162701-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lftan.linux@gmail.com,
+	leyfoon.tan@starfivetech.com
+Subject: [PATCH net-next, v1 0/3] net: stmmac: dwmac4: Fixes bugs in dwmac4
+Date: Mon, 21 Oct 2024 13:48:45 +0800
+Message-ID: <20241021054849.1801838-1-leyfoon.tan@starfivetech.com>
+X-Mailer: git-send-email 2.46.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: NT0PR01CA0028.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c510:c::15) To ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: ZQZPR01MB0979:EE_|ZQZPR01MB0996:EE_
+X-MS-Office365-Filtering-Correlation-Id: cca46268-b624-4387-020f-08dcf19415ff
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|1800799024|366016|41320700013|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	wW3mFeqOVrKd0waebQlb9TTUP1/4hbnUwqJ6nnzoG6OEjHTkICuWvbuGe9RBIL7QIhaqWSb4Og8CDXhE92MfyvwZkEXoYR7R7gUoQZ6fi+A2JjuE3h1SN0n8zhJInywBzKomJS/M4pPikQ4Kwb/0HZUuTW/ANCK/Fysjh7Vn42+F5vpVn+1hn1976TAl1ifahbNa/SNlzeBSTTSC2QqI37Wj5WPdE3HAp+UfaWTZLKHH9yKpfxEPnzekXP43dnhcsX0N0eFpSTZQ+Zuo5TYVh/1t8/tCTYp+n6DSFRiZssipPLk3u7w3jXiGtFOaqNmPYAmiLIqsvsEHcENdH09VPE+TbPj/MVkpZUjLQYt7KpUj94Z7pvGzzxAVZvQin4DYN5vGtoqfNwr2WHNu+mDyr2hQnGTt/MoD7sY66xPDqF3lGYfPBvS1HK1biktuwpOgNwbeMI4I0aeOm0WWZb4s7FMBrCNN0zmzHoi2Myb3U6wqyNuUcL2g9YHN8Q3BwEzB5fZ4UYMik8QR7qYwj3nalzexaGrEw9fXQGlegr/VrGk4XiYVBKqRQoBKN216CypN29xaZVf0aNJYs1HwKzbiCGNRdtGT4INQ7u4hr5XOqz9JwJ66RhOmOB+prW+Q6waJ
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(366016)(41320700013)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cGgClt8UGKAfCDugPH4VPFAiXYTaAsVqyl003yUxTu74uV40h53XNOneTm6w?=
+ =?us-ascii?Q?H96hggYdn4b3WztEgtJZ10DU4M5B1TLbUjQbG4cpZzIUMnkqSKs0rh8oz4o1?=
+ =?us-ascii?Q?/1Ztwn7BK5Fb+BXE+hdgZadgIXNrokMXZgtFPhO7epevx1VSccz4J8KFMtQY?=
+ =?us-ascii?Q?KVB17xR12RCpzNkhHvOrT9b1ARUm6io/bYfs4uXfulHQ6/9aLb3Q4lmz13vf?=
+ =?us-ascii?Q?d0xatSl9V9UdVsu7FuxWaIVGsQV2ZHBnh5DqcEcW1t39X1IVaccaeQD4A8jA?=
+ =?us-ascii?Q?A4619G4g+Us6592g/c+D3GCHnN0TV03LIurF2e4pz5ZDtnT6aGD9hnV/F6mK?=
+ =?us-ascii?Q?FWbWxN1MCE5kLHFpIX2XM5Pn6azRZTJljQvAN1kQXkRK9IsdgX5ufKfA77Ty?=
+ =?us-ascii?Q?sVtLuiWLyc1JcmhZOmlDEJvXs8bv4B+EcwkXIYan8gphRCbvqMtuQ8NVgndy?=
+ =?us-ascii?Q?5bkbNX1UllITVoC9FpymCUYqw9dfz0I/gvRR5hVD6B158ZCMXX6V7ifUZ2jh?=
+ =?us-ascii?Q?wWYysCU4B1y7uRzWU7G/P8hrOaeZ432jkUU5W7AaZhUBzMqRXW4ZMqa/GzgT?=
+ =?us-ascii?Q?U9lv/BEbD2FQ7EQupVELLyXF+mVdddPCSbKI5fBd1S9L1wYgV0zfcXh4+1as?=
+ =?us-ascii?Q?FfikR8vfq2egDvKF2bSNjkPqZ1gokaMh8q2VGlxyIl/hUgayyzC2mfzLbIJf?=
+ =?us-ascii?Q?Tt+RjNd5KFAAnkCLhOoawfYUScPszwwit7n7aPidRtOFaMOUeCrDbTdnOnvv?=
+ =?us-ascii?Q?Bzp+CQGaKvM7r/LUksqxznZV6CHxah/DemkhX8RL5BwA2HPfKSyYXlH1+73x?=
+ =?us-ascii?Q?+4MzSPp3JCY6ah57+NyyNz0e3Ng33OnlFxg+SYdTfLoZ1XsB63sMHGJSmC87?=
+ =?us-ascii?Q?RUM8gh9rkCUEbyLitcOil4tC7PTLZeWY2c9kT9dnOCPAgaBQkrvXDAlq7aXx?=
+ =?us-ascii?Q?ZcZpHEMDXmgt8/KRVd2jUB40mFaC322gbVQNhFFfXpJw++iZwVirLghk1y67?=
+ =?us-ascii?Q?ulR60KAwkuX0zQMy+vjuoNcYw7y7hz9lQ1nFg/DVOIFc86VOnZpsH9y9DzEv?=
+ =?us-ascii?Q?48Vwf485/QkcY2U6dTAaXW+L1FmTCVdv0Z7j+cg+sx3+ZLPOkM/7RsCN7ErG?=
+ =?us-ascii?Q?dGfKviXaQiAQ4eMD9gb04ns8vZRKCTZw36g+2lPri+x0FAIffQYQ0W1mbu0j?=
+ =?us-ascii?Q?m6l1SX2+pF1OZW6apLqqRa/TZrvNN1pObMkmSnsH4vhnQdkih9wFQcQRNufK?=
+ =?us-ascii?Q?5kuR21ucHCsg1j2fDDGuYVHlmROAsSqV7k6wagF1eWxWX/1q+xrC4s9dsOua?=
+ =?us-ascii?Q?ru86GDMqBLLofTV5zlUjXu8Rp80meDYWtIXSo3oX5Tk1Pcj4AysYNtUDW6HB?=
+ =?us-ascii?Q?sd56Z9QDMZBPM48HK7Ut3HiTpSJAv3Ie3f4C+27jWC/a4N/Z1mPiOBvofxok?=
+ =?us-ascii?Q?nrq/a+FDx6WO5SYQAibPiGcG34fM+suUcdGX9QfP6ocZMD4ts8a1O+MyGsEd?=
+ =?us-ascii?Q?hdepMBpgMH0y79haTsZXkRQsNWf0JOnLCZSZNMe5+w3H6LuJNZ9ZBc1NkHqd?=
+ =?us-ascii?Q?DljagyIpuAMpkQK4xtdarPLrtKiF1HVh4jxWYw7r5RFrb82k7EhLAuJgcKEQ?=
+ =?us-ascii?Q?6g=3D=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cca46268-b624-4387-020f-08dcf19415ff
+X-MS-Exchange-CrossTenant-AuthSource: ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 05:49:10.8263
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tKqYHPpXYDT83HkK5aNCh4H/TbofP4E/7V9yydML8ledUxUWvckpCvbY5CSH9cl+Bs9eUOLAY/DKrspMJKVFZ/ysVPJz1LioSnrMw39tDk0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQZPR01MB0996
 
-In case the non-paged data of a SKB carries protocol header and protocol
-payload to be transmitted on a certain platform that the DMA AXI address
-width is configured to 40-bit/48-bit, or the size of the non-paged data
-is bigger than TSO_MAX_BUFF_SIZE on a certain platform that the DMA AXI
-address width is configured to 32-bit, then this SKB requires at least
-two DMA transmit descriptors to serve it.
+This patch series fixes the bugs in the dwmac4 drivers.
 
-For example, three descriptors are allocated to split one DMA buffer
-mapped from one piece of non-paged data:
-    dma_desc[N + 0],
-    dma_desc[N + 1],
-    dma_desc[N + 2].
-Then three elements of tx_q->tx_skbuff_dma[] will be allocated to hold
-extra information to be reused in stmmac_tx_clean():
-    tx_q->tx_skbuff_dma[N + 0],
-    tx_q->tx_skbuff_dma[N + 1],
-    tx_q->tx_skbuff_dma[N + 2].
-Now we focus on tx_q->tx_skbuff_dma[entry].buf, which is the DMA buffer
-address returned by DMA mapping call. stmmac_tx_clean() will try to
-unmap the DMA buffer _ONLY_IF_ tx_q->tx_skbuff_dma[entry].buf
-is a valid buffer address.
+Based on the feedback in [1], split the patch series into net and net-next,
+and resubmit these three patches to net-next.
 
-The expected behavior that saves DMA buffer address of this non-paged
-data to tx_q->tx_skbuff_dma[entry].buf is:
-    tx_q->tx_skbuff_dma[N + 0].buf = NULL;
-    tx_q->tx_skbuff_dma[N + 1].buf = NULL;
-    tx_q->tx_skbuff_dma[N + 2].buf = dma_map_single();
-Unfortunately, the current code misbehaves like this:
-    tx_q->tx_skbuff_dma[N + 0].buf = dma_map_single();
-    tx_q->tx_skbuff_dma[N + 1].buf = NULL;
-    tx_q->tx_skbuff_dma[N + 2].buf = NULL;
+[1] https://patchwork.kernel.org/project/netdevbpf/cover/20241016031832.3701260-1-leyfoon.tan@starfivetech.com/
 
-On the stmmac_tx_clean() side, when dma_desc[N + 0] is closed by the
-DMA engine, tx_q->tx_skbuff_dma[N + 0].buf is a valid buffer address
-obviously, then the DMA buffer will be unmapped immediately.
-There may be a rare case that the DMA engine does not finish the
-pending dma_desc[N + 1], dma_desc[N + 2] yet. Now things will go
-horribly wrong, DMA is going to access a unmapped/unreferenced memory
-region, corrupted data will be transmited or iommu fault will be
-triggered :(
+Ley Foon Tan (3):
+  net: stmmac: dwmac4: Fix MTL_OP_MODE_RTC mask and shift macros
+  net: stmmac: dwmac4: Fix the MTL_OP_MODE_*_MASK operation
+  net: stmmac: dwmac4: Receive Watchdog Timeout is not in abnormal
+    interrupt summary
 
-In contrast, the for-loop that maps SKB fragments behaves perfectly
-as expected, and that is how the driver should do for both non-paged
-data and paged frags actually.
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h     | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c | 6 ++++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-This patch corrects DMA map/unmap sequences by fixing the array index
-for tx_q->tx_skbuff_dma[entry].buf when assigning DMA buffer address.
-
-Tested and verified on DWXGMAC CORE 3.20a
-
-Reported-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Fixes: f748be531d70 ("stmmac: support new GMAC4")
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 22 ++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index d3895d7eecfc..208dbc68aaf9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4304,11 +4304,6 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (dma_mapping_error(priv->device, des))
- 		goto dma_map_err;
- 
--	tx_q->tx_skbuff_dma[first_entry].buf = des;
--	tx_q->tx_skbuff_dma[first_entry].len = skb_headlen(skb);
--	tx_q->tx_skbuff_dma[first_entry].map_as_page = false;
--	tx_q->tx_skbuff_dma[first_entry].buf_type = STMMAC_TXBUF_T_SKB;
--
- 	if (priv->dma_cap.addr64 <= 32) {
- 		first->des0 = cpu_to_le32(des);
- 
-@@ -4327,6 +4322,23 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
- 
-+	/* In case two or more DMA transmit descriptors are allocated for this
-+	 * non-paged SKB data, the DMA buffer address should be saved to
-+	 * tx_q->tx_skbuff_dma[].buf corresponding to the last descriptor,
-+	 * and leave the other tx_q->tx_skbuff_dma[].buf as NULL to guarantee
-+	 * that stmmac_tx_clean() does not unmap the entire DMA buffer too early
-+	 * since the tail areas of the DMA buffer can be accessed by DMA engine
-+	 * sooner or later.
-+	 * By saving the DMA buffer address to tx_q->tx_skbuff_dma[].buf
-+	 * corresponding to the last descriptor, stmmac_tx_clean() will unmap
-+	 * this DMA buffer right after the DMA engine completely finishes the
-+	 * full buffer transmission.
-+	 */
-+	tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = des;
-+	tx_q->tx_skbuff_dma[tx_q->cur_tx].len = skb_headlen(skb);
-+	tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = false;
-+	tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
-+
- 	/* Prepare fragments */
- 	for (i = 0; i < nfrags; i++) {
- 		const skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
 -- 
 2.34.1
 
