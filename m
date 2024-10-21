@@ -1,197 +1,284 @@
-Return-Path: <netdev+bounces-137534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF569A6D97
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:05:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 594A39A6DA2
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 17:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C034B282075
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:05:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D14031F21BE1
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6A11FAC28;
-	Mon, 21 Oct 2024 15:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD11E4779F;
+	Mon, 21 Oct 2024 15:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="n/xWsOaU";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gfwwMOiL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nACCaDFD"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386121F471B;
-	Mon, 21 Oct 2024 15:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA96433BB;
+	Mon, 21 Oct 2024 15:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729523096; cv=none; b=mDTMezP+7nyQp9Tf18pDRbT+52GJaLmlbz/JIdI6hA6JNeQV5bkE1lfUhGY3+Nx5PwsMoZ74ZzH4TQV2hZ/NBhxUjdT2BQEItCCekkRinlud8STmS4MbglpFE2TIR19F4CzLZ71jj/EekKH78HjdNVPjkwOMTSEn46kLBkZrUKo=
+	t=1729523185; cv=none; b=IsdyvOf/TVAFdsKzeCcQ5kAyvoWJuQJ0ZTFZpAuIzfQB63WB5InAmZqFC+r98I5sbSS3RYZpQ5fa8kbTYvh9OPIZki4nFqCqj7M3qluFixs4W60kQFt8FyH//Zq8Xjhjk2HrMTiOVrdEJrHGlGCjZVgSrZ5ev74Panz/6VIKvNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729523096; c=relaxed/simple;
-	bh=iQfDtg2p5AMivEvH8CrFMlmxSZNZUVXwuwIjk3mYFyM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FF4JDYfUDkfWvwd3faxWZeXvHjkFpx1c6wEEZyADO9GXMWBnGb+MGoxYFZCSH6w9m69wvpvuQw+cZsF4Hhst9s7AqHsz0UcUjfp/JZXvIPpICENJY5Bi9PZGT+QakWGgujMK6v4uDhu81jafsM1WzGdWIVqTVFu9nX/qC/eQr10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=n/xWsOaU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gfwwMOiL; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfout.stl.internal (Postfix) with ESMTP id 0642C11400D2;
-	Mon, 21 Oct 2024 11:04:51 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Mon, 21 Oct 2024 11:04:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1729523091;
-	 x=1729609491; bh=8CAPBjyRnLmuZKLSE6H2/t3gLJQuCsE4bcXXKOoW3qE=; b=
-	n/xWsOaUVOqBxSxURFQx7JkbX8dUdqe0xnvYLW3/GHTnpTWdWWTOORq9kiYywIXi
-	vaoqG4N8/UqhYJUOjihYFopjt+rigx37hpwemQyNMvWVpen+pmnLzzkVFkPkFhIu
-	WyqVeDJfFWmuU/RQbJROjavNBLjH2kd9oGi4nvcS5H23vRzvWfajfv0aJVichOEi
-	+X2v6R0FQw1UEqA3qfwgnQABUOoJaiXb6iMm1ugdXGoBJT0APMjKYIEa3KtaDoSm
-	fpAJXPqwSrF6NMQO8Cek6HY7WEGuDyYsx4mn8paQe7cdGdtQhrztkmhaZ637jeiD
-	9wiEz00B/hxVSoBUe18TjA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1729523091; x=
-	1729609491; bh=8CAPBjyRnLmuZKLSE6H2/t3gLJQuCsE4bcXXKOoW3qE=; b=g
-	fwwMOiLj/7PIHm15oVum/qkM/Y69+4iF5sJX0iiuNRTLSOrZura7ZlhKU8i6HlMP
-	rmPUZouZ0eoWmqWU0uaaTRqIut39gpibGFPqU2O4aIXXFbUFxfILGuIicO5IMH9U
-	sBwcqFSRffSclS0pgDYTH15Vgctk+QSv/hLjCrvPnmwmQroKc672SnzU8ieHQC4N
-	EKzNGNS351hwn3K2ZmvCs0MG/XfGOXD0ZHDOX/YO93XrIrhGA1BOljP1GojJhLm5
-	RqQjnlyCjPNFKqTOZM2H2uj8lcH4c8+Xq0QxZM5Yvx/mgJXpM1F25ide6YSjKt0q
-	Gno7Mym4QwFY1VYYtboCQ==
-X-ME-Sender: <xms:km0WZ2pV9M6Eh51WhzfCGsMTrpEHlrNiLA4NftGolXZ4sBblyqf_GA>
-    <xme:km0WZ0q2c5Q-O_rqE-gIDlN2ltFnDjgBK_bspTIKoNOD7SbnfALlzZzUr9zQcrv7r
-    ROWCym-G2gqHxtDxD8>
-X-ME-Received: <xmr:km0WZ7Nxo1q4MbklRdvzqB65GbI4ubctIp0f8E4kvSeAGdoFj5Ryz1F6fLoeTcN9fKbL_r0JzSExZyMVrEkcdZVwqVb5vOqztg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehledgkeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
-    gvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrght
-    thgvrhhnpeefhfellefhffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvd
-    elieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehn
-    ihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrsh
-    gvpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
-    ghgvvghrthdorhgvnhgvshgrshesghhlihguvghrrdgsvgdprhgtphhtthhopehgrhgvgh
-    hkhheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopegtlhgruhgu
-    ihhurdgsvgiinhgvrgdruhhjsegsphdrrhgvnhgvshgrshdrtghomhdprhgtphhtthhope
-    hprghulhdrsggrrhhkvghrrdgtthessghprdhrvghnvghsrghsrdgtohhmpdhrtghpthht
-    ohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehrvghnvghsrghsrdgtohhmpd
-    hrtghpthhtoheplhhinhhugidqrhgvnhgvshgrshdqshhotgesvhhgvghrrdhkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopehlihhnuhigqdhiuggvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtoheplhhinhhugidqshhhsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:km0WZ16npb8c9tj51zfs0I7ofSlxi1gSQdM6qWCzw7VGnUsG6Tt35w>
-    <xmx:km0WZ1570njkw9o0y2U4gz1HBSKL-ytFPPnhcwvB4dVU5ESBVWYRVA>
-    <xmx:km0WZ1iXA0yUFwWjMBm7teeehH91sW25vTO6sEcRQHiw2rAwXgV7fw>
-    <xmx:km0WZ_4RPt_2jKnZ2InZ0ZITOY8cZEvm49Q_P4bncc7-Uiw3Rtawiw>
-    <xmx:k20WZyyhZgkX8E3aoPGS4nBFSJE-PwMa79KfupL-sGe1sQiyZO5-u7V_>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 21 Oct 2024 11:04:50 -0400 (EDT)
-Date: Mon, 21 Oct 2024 17:04:47 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH/RFC] MAINTAINERS: Re-add cancelled Renesas driver sections
-Message-ID: <20241021150447.GC4176464@ragnatech.se>
-References: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
+	s=arc-20240116; t=1729523185; c=relaxed/simple;
+	bh=V13/+obv5LvCt5d9iEA9QL8fn6rmDWQcKKjiWDuQrzw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KX6BMMSnTHOeXOl4ha7XnVEuk+pGI9HNxSQFlwfipIU0XcsvMK+vLI7i/kTJDxlNofvXaeMR9Pdw2E+RoLZ0hfkoD9CQNdMTdQTQhrIN0WZ1/IrenWWkuYd9GCJ5dIHPHLLXRvLab5/+mvrqh9UtoMLoO/lq92hJpbuoDVf/c1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nACCaDFD; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-83abe4524ccso120466739f.1;
+        Mon, 21 Oct 2024 08:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729523183; x=1730127983; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R0vwS8TpTa7jxGqaCR9ZH5Z5mqMAXfgVdBA8IJC8KeM=;
+        b=nACCaDFDHJPT13tqOlyZJcFon0f3TQX2Er+O7GIEewYsRTzjJz+u6u3iYMSbueRs11
+         Q4d8STuIYx5HQgoqUkFtNHIZs/QjPreG+zb0rknt48fTzqHBhGcuVzYQ2m1WwZb0fDiD
+         wtOx9Okt9HMZCXZO69Z14ooWz4N1oKryqnnwa8yPRkkx0tWUT76t/JQ0xs5o8wvMmjHY
+         wF2nVTYyet+lUyVc3/ojdIJqCDRS0MLsLcrxN7a58eAJb7PeOzxQogHWwMbq+lIWgBwR
+         gDUmz+D76MjcVU2UjH+DgdBiO2QJ0eEA1UMNYMKTV8islwOHuoY+gyAjsKjPi6g/LfYt
+         b++w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729523183; x=1730127983;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R0vwS8TpTa7jxGqaCR9ZH5Z5mqMAXfgVdBA8IJC8KeM=;
+        b=SyX0JcSJWTdimoyE9BB0MprhXQ1Ugsie4Xg/cDSUboMSrLrCqkkgv8CEgtIlIfuJmd
+         tO9Zo4rIGcWR8KxLaqPFqOhRzRg+tuSGpEOzQIjtpej2/W9mJWsiP4PtianLf6Ds6Rnm
+         +YvhBAl9gzn1lRdZeQHsKUWuGkjeNs05cAW0xmG2x/cB+EMomj2ewD2epeCSKKIha2lm
+         ajd1A1B/vuvcgdeU5SjyxgoZp6WnQxPj1G6rVli9qlkzQ+E3q0kTCLAIgEqCniMkMDKi
+         wNvfZ3ez89QJ7SJMvIgkXsbPi0N3E/288f7JzwnLngbws+xvMr136aPcef9pd9aVtAL2
+         Y5+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUgIDR9Pz6AdS0Ysl3AmiW6/Mqmz6v3qTelY3KIAyC771JxGsgjtURUbEi4kr+qILQf0qE=@vger.kernel.org, AJvYcCUpSwf2DfglM2DQ1fZPTK5t+Voc9/jgoxyAgU7sTvjXDnMFRY+F+nFcRrPMfw7rhWpbcPvkV0iD@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIvebEc/pAZk/El/+wDwq3GcN54UUw3oX5tJks6SBsvPj/ZP/R
+	3AA3HQWNNe2Z/1pyzusU8bLETz/2X6qz545id871wpu5cLTpyUlL/WbuX3Igf4NQCyM2FmnjxhC
+	nBrLzquVhGy6HvdXBRU1pQzQ8yIo=
+X-Google-Smtp-Source: AGHT+IG0xzVL1nH4resXkL2n8I9TEFN6tXbVysu5Dp0bp21oCmQshX9KbwfvaBIs7+e39CUntO0f3wOzKpYIwJjf9B4=
+X-Received: by 2002:a05:6e02:144c:b0:39f:60d7:813b with SMTP id
+ e9e14a558f8ab-3a3f40bab4cmr102183565ab.22.1729523182390; Mon, 21 Oct 2024
+ 08:06:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-5-kerneljasonxing@gmail.com> <67157b7ec615_14e1829490@willemb.c.googlers.com.notmuch>
+ <CAL+tcoD5TiaRZgW10tt8jc9srQTbaszs_o2z=Yf-bzO0Kp-vLA@mail.gmail.com> <67166a0997028_42f03294e7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67166a0997028_42f03294e7@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 21 Oct 2024 23:05:46 +0800
+Message-ID: <CAL+tcoCfokXGfKN0fT8LMHY=+-bzJD=3nY2guPV=fjxGbiALEw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
+ control the whole bpf extension
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Geert,
+On Mon, Oct 21, 2024 at 10:49=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Mon, Oct 21, 2024 at 5:52=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > Willem suggested that we use a static key to control. The advantage
+> > > > is that we will not affect the existing applications at all if we
+> > > > don't load BPF program.
+> > > >
+> > > > In this patch, except the static key, I also add one logic that is
+> > > > used to test if the socket has enabled its tsflags in order to
+> > > > support bpf logic to allow both cases to happen at the same time.
+> > > > Or else, the skb carring related timestamp flag doesn't know which
+> > > > way of printing is desirable.
+> > > >
+> > > > One thing important is this patch allows print from both applicatio=
+ns
+> > > > and bpf program at the same time. Now we have three kinds of print:
+> > > > 1) only BPF program prints
+> > > > 2) only application program prints
+> > > > 3) both can print without side effect
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > Getting back to this thread. It is long, instead of responding to
+> > > multiple messages, let me combine them in a single response.
+> >
+> > Thank you so much!
+> >
+> > >
+> > >
+> > > * On future extensions:
+> > >
+> > > +1 that the UDP case, and datagrams more broadly, must have a clear
+> > > development path, before we can merge TCP.
+> > >
+> > > Similarly, hardware timestamps need not be supported from the start,
+> > > but must clearly be supportable.
+> >
+> > Agreed. Using the standalone sk_tsflags_bpf and tskey_bpf and removing
+> > the TCP bpf test logic(say, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)
+> > could work well for both protos. Let me give it a try first.
+>
+> Great, thanks.
+>
+> > >
+> > >
+> > > * On queueing packets to userspace:
+> > >
+> > > > > the current behavior is to just queue to the sk_error_queue as lo=
+ng
+> > > > > as there is "SOF_TIMESTAMPING_TX_*" set in the skb's tx_flags and=
+ it
+> > > > > is regardless of the sk_tsflags. "
+> > >
+> > > > Totally correct. SOF_TIMESTAMPING_SOFTWARE is a report flag while
+> > > > SOF_TIMESTAMPING_TX_* are generation flags. Without former, users c=
+an
+> > > > read the skb from the errqueue but are not able to parse the
+> > > > timestamps
+> >
+> > Above is what I tried to explain how the application timestamping
+> > feature works, not what I tried to implement for the BPF extension.
+> >
+> > >
+> > > Before queuing a packet to userspace on the error queue, the relevant
+> > > reporting flag is always tested. sock_recv_timestamp has:
+> > >
+> > >         /*
+> > >          * generate control messages if
+> > >          * - receive time stamping in software requested
+> > >          * - software time stamp available and wanted
+> > >          * - hardware time stamps available and wanted
+> > >          */
+> > >         if (sock_flag(sk, SOCK_RCVTSTAMP) ||
+> > >             (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE) ||
+> > >             (kt && tsflags & SOF_TIMESTAMPING_SOFTWARE) ||
+> > >             (hwtstamps->hwtstamp &&
+> > >              (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)))
+> > >                 __sock_recv_timestamp(msg, sk, skb);
+> > >
+> > > Otherwise applications could get error messages queued, and
+> > > epoll/poll/select would unexpectedly behave differently.
+> >
+> > Right. And I have no intention to use the SOF_TIMESTAMPING_SOFTWARE
+> > flag for BPF.
+>
+> Can you elaborate on this? This sounds like it would go against the
+> intent to have the two versions of the API (application and BPF) be
+> equivalent.
 
-On 2024-10-21 13:56:51 +0200, Geert Uytterhoeven wrote:
-> Removing full driver sections also removed mailing list entries, causing
-> submitters of future patches to forget CCing these mailing lists.
-> 
-> Fixes: 6e90b675cf942e50 ("MAINTAINERS: Remove some entries due to various compliance requirements.")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> Anyone who wants to take over maintenance for these drivers?
+Oh, I see what you mean here. I have no preference. Well, I can add
+this report flag into the BPF extension like how application
+timestamping works.
 
-In case Sergei is not interested to keep looking after the RAVB and/or 
-SUPERH Ethernet drivers I would be happy to do so.
+>
+> > >
+> > > > SOF_TIMESTAMPING_SOFTWARE is only used in traditional SO_TIMESTAMPI=
+NG
+> > > > features including cmsg mode. But it will not be used in bpf mode.
+> > >
+> > > For simplicity, the two uses of the API are best kept identical. If
+> > > there is a technical reason why BPF has to diverge from established
+> > > behavior, this needs to be explicitly called out in the commit
+> > > message.
+> > >
+> > > Also, if you want to extend the API for BPF in the future, good to
+> > > call this out now and ideally extensions will apply to both, to
+> > > maintain a uniform API.
+> >
+> > As you said, I also agree on "two uses of the API are best kept identic=
+al".
+> >
+> > >
+> > >
+> > > * On extra measurement points, at sendmsg or tcp_write_xmit:
+> > >
+> > > The first is interesting. For application timestamping, this was
+> > > never needed, as the application can just call clock_gettime before
+> > > sendmsg.
+> >
+> > Yes, we could add it after we finish the current series. I'm going to
+> > write it down on my todo list.
+> >
+> > >
+> > > In general, additional measurement points are not only useful if the
+> > > interval between is not constant. So far, we have seen no need for
+> > > any additional points.
+> >
+> > Taking a snapshot of tcp_write_xmit() could be useful especially when
+> > the skb is not transmitted due to nagle algorithm.
+> >
+> > >
+> > >
+> > > * On skb state:
+> > >
+> > > > > For now, is there thing we can explore to share in the skb_shared=
+_info?
+> > >
+> > > skb_shinfo space is at a premium. I don't think we can justify two
+> > > extra fields just for this use case.
+> > >
+> > > > My initial thought is just to reuse these fields in skb. It can wor=
+k
+> > > > without interfering one another.
+> > >
+> > > I'm skeptical that two methods can work at the same time. If they are
+> > > started at different times, their sk_tskey will be different, for one=
+.
+> >
+> > Right, sk_tskey is the only special one that I will take care of.
+> > Others like tx_flags or txstamp_ack from struct tcp_skb_cb can be
+> > reused.
+> >
+> > >
+> > > There may be workarounds. Maybe BPF can store its state in some BPF
+> > > specific field, indeed. Or perhaps it can store per-sk shadow state
+> > > that resolves the conflict. For instance, the offset between sk_tskey
+> > > and bpf_tskey.
+> >
+> > Things could get complicated in the future if we want to unified the
+> > final tskey value for all the cases. Since 1) the value of
+> > shinfo->tskey depends on skb seq and len, 2) the final tskey output is
+> > the diff between sk_tskey and shinfo->tskey, can I add a bpf_tskey in
+> > struct sock and related output logic for bpf without caring if it's
+> > the same as sk_tskey.
+>
+> I think we can add fields to struct sock without too much concern.
+> Adding fields to sk_buff or skb_shared_info would be more difficult.
 
-In either case should not the maintainer entry in the bindings documents
-also be updated?
+Got it:)
 
-> Thanks in advance!
-> ---
->  MAINTAINERS | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f04cba42a59301fa..97a23cea2729942e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -19521,6 +19521,14 @@ S:	Supported
->  F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
->  F:	drivers/i2c/busses/i2c-emev2.c
->  
-> +RENESAS ETHERNET AVB DRIVER
-> +L:	netdev@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +F:	Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-> +F:	drivers/net/ethernet/renesas/Kconfig
-> +F:	drivers/net/ethernet/renesas/Makefile
-> +F:	drivers/net/ethernet/renesas/ravb*
-> +
->  RENESAS ETHERNET SWITCH DRIVER
->  R:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
->  L:	netdev@vger.kernel.org
-> @@ -19570,6 +19578,13 @@ F:	Documentation/devicetree/bindings/i2c/renesas,rmobile-iic.yaml
->  F:	drivers/i2c/busses/i2c-rcar.c
->  F:	drivers/i2c/busses/i2c-sh_mobile.c
->  
-> +RENESAS R-CAR SATA DRIVER
-> +L:	linux-ide@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +S:	Supported
-> +F:	Documentation/devicetree/bindings/ata/renesas,rcar-sata.yaml
-> +F:	drivers/ata/sata_rcar.c
-> +
->  RENESAS R-CAR THERMAL DRIVERS
->  M:	Niklas Söderlund <niklas.soderlund@ragnatech.se>
->  L:	linux-renesas-soc@vger.kernel.org
-> @@ -19645,6 +19660,15 @@ S:	Supported
->  F:	Documentation/devicetree/bindings/i2c/renesas,rzv2m.yaml
->  F:	drivers/i2c/busses/i2c-rzv2m.c
->  
-> +RENESAS SUPERH ETHERNET DRIVER
-> +L:	netdev@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +F:	Documentation/devicetree/bindings/net/renesas,ether.yaml
-> +F:	drivers/net/ethernet/renesas/Kconfig
-> +F:	drivers/net/ethernet/renesas/Makefile
-> +F:	drivers/net/ethernet/renesas/sh_eth*
-> +F:	include/linux/sh_eth.h
-> +
->  RENESAS USB PHY DRIVER
->  M:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
->  L:	linux-renesas-soc@vger.kernel.org
-> -- 
-> 2.34.1
-> 
+>
+> > That said, the outputs from two methods differ. Do you think it is
+> > acceptable? It could be simpler and easier if we keep them identical.
+>
+> Since we can only have one skb_shared_info.tskey, if both user and bpf
+> request OPT_ID, starting at different times, then we will have two
+> bases against which to compute the difference. Having two fields in
+> struct sock should suffice.
 
--- 
-Kind Regards,
-Niklas Söderlund
+Exactly! I will do it.
+
+Thanks,
+Jason
 
