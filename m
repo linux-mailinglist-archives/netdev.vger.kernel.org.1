@@ -1,224 +1,241 @@
-Return-Path: <netdev+bounces-137504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6314B9A6B62
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:02:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1249A6B77
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:05:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD6F1F22455
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:02:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91FCE1F2175B
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70131F9AB9;
-	Mon, 21 Oct 2024 14:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F0C1F9A9D;
+	Mon, 21 Oct 2024 14:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="c3SH5BR+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JPO0EOc5"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82B81E7C09;
-	Mon, 21 Oct 2024 14:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729519217; cv=none; b=rM8CjgD/MG4gI2IkYzAfWv3s49Zks9xinUtVGAAq+pllqvPk9WSy0YkZE4x7n2J8aPKKkj4ohUipoG4a9J6wvnYMFT4/hI/8PIxLME1FGuJjhBL/mY2Z7tpfNlH72Gt63ably2b4ilnSOZic7petExdTzr1Fer72wriZQCKQVaU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729519217; c=relaxed/simple;
-	bh=MGtHqjnJHsWdHgeNRtIE41YoumSd7sY+lNNdVHYmShs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=LAty3esh9NrkNPFhdISRk+o1bmZi9wuiccCghglNNIGpe0/f5CwGimLtuHV2XPJUixgkvm8QJOaGRLIE1k7uHY/fbh2QPd9uXTAcdKsoq+0zzz/yR4yxbFYYLiOUatjZ69VLBpuhJpoGL05T6vevvkwSjSUOMMRYctV+L5BzYCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=c3SH5BR+; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B9B1E5705;
+	Mon, 21 Oct 2024 14:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729519301; cv=fail; b=b3HCe42N5g7XI+FwIb81kryhfAmcGQ4ViP3IvXi6PS6VdL/RxQEfd5pg4YyS4nVlIa8VzUyxhAOh98sir943wqygjbYPO6x+87ZFcWbcUXqyvn3oXjgz1PgX1BZPrN6uTfr8C+gnRd0G+cc14x2PhtX5c+TjY1umFVzIBJ3sPCE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729519301; c=relaxed/simple;
+	bh=0xO0GRELvq2GRX4+uq0YmnT5Xuel/BTMcRIfume+H2c=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=AmS5cWpx0ttXw9Hn/jLa6JOBfMnnTsEObKAc/BJzADAzo2ooC1HaqMf5k9D2v1DBnGmjdGPmMrgc/PR9j2gmGTZaZ5ANqVUoW6QgvqDl3yVn/K+OIxXFZ+a9oUw382yZopW8LwPgRQW94Aesxr9tMKK973I0vPBPUT2dP1E0Zbs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JPO0EOc5; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729519216; x=1761055216;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=MGtHqjnJHsWdHgeNRtIE41YoumSd7sY+lNNdVHYmShs=;
-  b=c3SH5BR+TunEQXAzwIK4hDeeqrQnZAKRo3iUEhIAYs8QqLH9IicbPY33
-   3wBRlSZxRBaWOn/zrMk/g0WEmoMX55X0bdt3Yj9rCBijhFb2DYODN2hi+
-   TZLKr61E4svQH2tRCVHaE4Kfj4el0b23IQ7uz9Ib0T6oMGOfNad1CjVfC
-   X3ND91yfIwaNf6Vl1ik8Rkez54muCnoJNNHl+j9pLSGLMXcgYuxBqSO/7
-   7FLULzqFNvYKmDzS5F9dzQwgjBZ09w1PwJwHdsduwH/LHfWJJ3DXNYw7/
-   g0iqe7vlf1n82qSNMUWOnEHnUvxFAk2LEEO3Kmeja31Y4gzG67FJ/uHW0
-   g==;
-X-CSE-ConnectionGUID: wjlJ/ymcRaqntxTcHXMHhA==
-X-CSE-MsgGUID: I0v9UrQkSW+g6ZlCutcotw==
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729519299; x=1761055299;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0xO0GRELvq2GRX4+uq0YmnT5Xuel/BTMcRIfume+H2c=;
+  b=JPO0EOc5mnhV6Cvmv8dq51imDVPUGWvMzkS3XRH9I4jMhdnHZUL4RLeM
+   YoiYSDD+OrlIp2m1BrbvvKlQZfgIrbBMAYcih5MCPoE2saDxU4gjwnGGl
+   gU6rrqZo9zL7olEFhSSHAv+D/oOe8beK1xZgCfK8COgY3kL2Dm2KuUyIS
+   Gej44qUQPfr7mX3V8xLJyhHifAfxLEyFuFQc5ztZkxoOPzjgEE9zhui7o
+   vAeNBULRz7xs8e/gUmvcnqosp5ZjUr97+9G7FF65Wjx9roM2HhvLFgkDY
+   NhoXUf7ILEtJGaqJjFvbPaT8HHTFmt3QhlX7LH4F+EKM0VIBqmCh4rJO5
+   Q==;
+X-CSE-ConnectionGUID: KTvXeTTxQ2GZLTXrXMMhlA==
+X-CSE-MsgGUID: xD0TktOaQuy45pLN+3O2dw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="51550238"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="51550238"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 07:01:37 -0700
+X-CSE-ConnectionGUID: Jz42PffuSTS0vRr4ypFQTQ==
+X-CSE-MsgGUID: 2u0wd4K+RGyzaPMEc1EIIg==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="33285734"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Oct 2024 07:00:13 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+   d="scan'208";a="84596034"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Oct 2024 07:01:37 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 21 Oct 2024 06:59:56 -0700
-Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 21 Oct 2024 06:59:52 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Mon, 21 Oct 2024 15:58:52 +0200
-Subject: [PATCH net-next 15/15] net: sparx5: add feature support
+ 15.1.2507.39; Mon, 21 Oct 2024 07:01:36 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 21 Oct 2024 07:01:36 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.48) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 21 Oct 2024 07:01:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=R1fnmajEcinoXcQTBAIrAT9nkgpaCQYY6sCqpZ/9+07uyIXsASV0u5oyyILy1I1qpDCoreXe17gHcTVb1sxG9QpRKl38KQvjViQzQv0JcVkKl4gv6Md/KNN5i/4v9/Y+4WU/0bmrRoX9Jjbk9UPaqRTGP+jCBy49dL3W5Bmf7ZHaH8MgwPY6tkx40+UH7kf/nATOoip4Oljz/PE20m6qngfUq74gCL2NKnlZwN8Ntg/HVdM8mWcVhOBAixrwpR4UNxVkuypyrFBtMiScY2Y02mQenjS6HBE2OVIICqxQqJkxa9EfSHB1MlxKoGwVJmLU4TtNoPhj0lmZZQ4+m3ABmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DzP8R6o6TKsXh9qOGTT1GoAGmS9YwsWc1LN6cztODcw=;
+ b=yXhHq7oGmfcxdCHxvsYOkDZeCRquQ9+UCCZdznn6Kn1EehZbIf80Yo5elrA0hZ0FjnOrQtPRkH8uSedizXa06yGp2pFtOGVeR1EpisNFHKdgtIUkacazOhXzJXLK00jAx6MMB0nWdd6VR/e2xrAjlRAo0e+N+cNxrq2kbFNJ6087hcjcOZKAk2/FJ/nTKAB21elBBTR6JZmR70jUQ22PuIg1lWzhTVUI3cJh3Sm0ppn5KJ+asAmO0DaxwZN22hn/3EWnj+qqp/2HMLSXfFSFltT25DILKRMmdAuhK0eG++DTKhpwkhmK/Gc9oiQW/L8L18b74uTaf4cdQMAEQUfTWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CY5PR11MB6234.namprd11.prod.outlook.com (2603:10b6:930:25::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Mon, 21 Oct
+ 2024 14:01:26 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8069.027; Mon, 21 Oct 2024
+ 14:01:26 +0000
+Message-ID: <6935ab95-c723-4abe-9143-1e7665190b83@intel.com>
+Date: Mon, 21 Oct 2024 16:00:46 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 07/18] net: Register system page pool as an
+ XDP memory model
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+	<toke@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, "Andrii
+ Nakryiko" <andrii@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, "Magnus
+ Karlsson" <magnus.karlsson@intel.com>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20241015145350.4077765-1-aleksander.lobakin@intel.com>
+ <20241015145350.4077765-8-aleksander.lobakin@intel.com>
+ <ZxD1s0UOJy11wt55@boxer>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <ZxD1s0UOJy11wt55@boxer>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU2PR04CA0336.eurprd04.prod.outlook.com
+ (2603:10a6:10:2b4::15) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20241021-sparx5-lan969x-switch-driver-2-v1-15-c8c49ef21e0f@microchip.com>
-References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
-In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <andrew@lunn.ch>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<horatiu.vultur@microchip.com>, <jensemil.schulzostergaard@microchip.com>,
-	<Parthiban.Veerasooran@microchip.com>, <Raju.Lakkaraju@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, <jacob.e.keller@intel.com>,
-	<ast@fiberby.net>, <maxime.chevallier@bootlin.com>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, Steen Hegelund
-	<steen.hegelund@microchip.com>, <devicetree@vger.kernel.org>
-X-Mailer: b4 0.14-dev
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CY5PR11MB6234:EE_
+X-MS-Office365-Filtering-Correlation-Id: e387ea82-a304-433a-5659-08dcf1d8daa7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UnRQQ1dDUVFaelVRdmJmQWt5am5kODNMMk9HYVBsbWg3YmdTSVFSVWxDM0tQ?=
+ =?utf-8?B?QXMrYjVTZk1tbnBhZFJ5d3U1cU5kK2Jud3h5U1BRc0VkZHF0bkp0SWhMUEVI?=
+ =?utf-8?B?Ry82WkI4TWRwUUh2UGxVR1lTSDV5YXpxQkJzTTZRdXp3RGZRbWJnOGx5WUhJ?=
+ =?utf-8?B?NWlWMHRGcE02N29aaTdJdEM4cE9PTlNKa29HU3pINXRQbHA0TkY1dUJpNmVQ?=
+ =?utf-8?B?SUZ2eVY4Yjdud3hnejd1bGpuYTU2SHpheWtwQVhmZmlMM0RCbDhobHU5dzhC?=
+ =?utf-8?B?WStCb1hueExlWWZ2SG1CcHFTaG5lL2Zld0taVWdUZ2x5MzdhZkF3S0pHQWRD?=
+ =?utf-8?B?ZzJwakZrL213NnRKSkdueDA4ZDNnNEt5Wi90QzErdGsxbis2THBsbWFXT25N?=
+ =?utf-8?B?SkNmUTFkd3BmNmJZZnQ3YUtsekxFVGN6eUwwbFdSQlpOSUxCcHpNY2k5TVl1?=
+ =?utf-8?B?dXJUT2lwTTNYaFd3MkgrejlMUUJYeWQvTEEzWVVsLzBuYkRwZ3FYZnZkSG1N?=
+ =?utf-8?B?UjA1aXI4MHFMbWV6ZFJEUTN2M1R2NDIxbXVuUXp0TEl3cm85U1d5bVI1U0dl?=
+ =?utf-8?B?dDJFbXpWbENOTkE5UWVieEdYMVo1bURhN0tGRFFsSW1rYi9TdWhVd0Y0NDFN?=
+ =?utf-8?B?QUViVEhOSnhOd3dFRFUzV2s1YlVDUWFrNStlVlAreWlMSjhOaUlTYThmUDdm?=
+ =?utf-8?B?dGZ5ZmpGSm5xb0x6V0FrRHoyT2dtaU1YWmswWGpvTEx5MWRQZHJUVE9ocDNl?=
+ =?utf-8?B?blVIWml3NmdFaTJHRGFXL09PcjlGbUExU3grSDFCWU8xWGxVR0RmblFWdDZ6?=
+ =?utf-8?B?aGpoZElaODVldUw5Ukp5WW1sa0trZGFBa2swZmpQSnVwQ3ZiYWRDeFBsMjli?=
+ =?utf-8?B?cEZDb1AzOG9PK2IrdCtsV2kzNDVGYnYvMy9wSVN4N3pjNUFnVno3YVlieWVO?=
+ =?utf-8?B?YmR1RDcrWVBwTTFRRCtNTHcreDVTM1ZncWlzRzhHaDJnTmdmc2VrZ1BBdy9Z?=
+ =?utf-8?B?QlBjVFZHTk5hUGlha2VNamovTGw5Wm1xQVFoeWdwK3RqTXFwNFN1bWtkN0VZ?=
+ =?utf-8?B?QVorcExvaFFVNURoR29PcGRteTkwdWNwSytYRXlidXorY0p5OCtQOW5jdDMr?=
+ =?utf-8?B?eUcvOEFPMnpuOXgxTVp4d3diNXJGYUsrQmVqRWtqV1RoUktYWGJ5QUZYdUsv?=
+ =?utf-8?B?NkFUS2RZNUhLc1U2ci9jbzB2aE5zcmt5bWNEa0VVeEoyZ1RPM0RxcTV2cnVF?=
+ =?utf-8?B?Z1J2dWVrOENqbzBQcWZyVzVmZnJlRTlDVEJuQy9rVjQ0SzhCR1RsUjloNDA1?=
+ =?utf-8?B?a29WaEw4c0R0aEhOdHBmbFpOQ2lUaWFJaXhIQnVYUElURkUvVkhHQnc2SGdM?=
+ =?utf-8?B?OEdiajBKSU5kblp0bkJzYklTWUlIYnNSenFHVlZiZ2czaWJraDlaenR1NDJm?=
+ =?utf-8?B?L0hIZC91cGFUTGNqVG5TSWlQNDJ2a3lYeWc5RVdrd0NWZ3VFRWlBU1lpcUhY?=
+ =?utf-8?B?RXdTRUZ1MVlZb2dQaU9NZG5XMFcyZGttbzVkK2Fsd2tCTlFFakFNQVdVTWN6?=
+ =?utf-8?B?bHUxQVNzakFmeWhacVZ3aDVxMnh6eVkxTkt0a3ZHOE9MUkJsM2M0bVlKNjM4?=
+ =?utf-8?B?M0t0dVpOcFByWnRRM3VVK1dRY2xHN29OR2owbDBKU2l3cmxIV0N0dWMxdEZl?=
+ =?utf-8?B?Tit2SHNuZ0Jjelh5eXJSYSsxK2t1dXBFUUVrSHBYN0c4REZjOUlyRjhhVnhq?=
+ =?utf-8?Q?RBL9TNI91CinU/dqEbrV/3QJYVsh92OEn9Zyn+w?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RkhzQkgrbFk4YUJ0aUNUcFpQOUt6eUpyVmlZUDl1SlRmR0VUamhaN0JkajZU?=
+ =?utf-8?B?U2p1RXRBWDNveEZkbFBkMHdxSVN3SThhK2x5NHU1VkpRTVdRQWgrVFpUWmd5?=
+ =?utf-8?B?d3FOYnhTTzlQWkZvQ01wdHBzQldOYlNuc3lkWXJ6enZnWEpQVXJvcWlpcEZF?=
+ =?utf-8?B?eTZhR0dGazhCTm5obmlpT3RMc1lvZ3RpYmtXOFBmWHVqNFBtRGVnZlAwUHpO?=
+ =?utf-8?B?MDZqT1IrMFdDV0dGWnMxMWNvWjBma0lsdWhLM2xpcWJsSVlkcDM2MGFQMndI?=
+ =?utf-8?B?NzVYaWtXenNwN3pKZ0lmL0dCa1A1NnZnaWU4WlB2alpJYzg0V1NtZHFmeS9G?=
+ =?utf-8?B?N21EUUdteEsvZmlCYUR0NnRwSXZPU0ZFeU5LRWRxN2RoNWVwKytiaEZXTE5I?=
+ =?utf-8?B?OW1pTkRwa2U3M1kxeUtUaERXRFBlcHl3ZWJETSsxMThyM3Q4b1pTTzhqdWVN?=
+ =?utf-8?B?WXM4YXMwK1g5QlpyQlVlVVZ2K3pleUlNVVIrNUc1UlpQZmFweTlSekl5QkVt?=
+ =?utf-8?B?KzNhRm5Ddm9VUEpzbjBMWThYd1UyTVpLSnJGd1hVUWFuRjZheHNvZnBvU1hW?=
+ =?utf-8?B?Uk5rQmdLMDNCbVE1WUhkenBLRE9OTytWN1VsNUQ2R3pLd2QrdUtJM3hUT2JH?=
+ =?utf-8?B?aitWRFQ0alFPVVo1S0NXcDduWS9CMFh3UThtdkF0dXByL1NPbEhtbldlYXo2?=
+ =?utf-8?B?RHhDTmtvUEo5VTJXWnlSc3R0T1hISnRhQ0JBaXdFdG9aMGh4MHNZZWFzZXJP?=
+ =?utf-8?B?c01hRFlRSnFQamRyQ29QYzV0UlpzK3RqbUNFQThUT1pzTUFJL2Nydnp5VHJt?=
+ =?utf-8?B?UFZnb2h0dk1lUTU4b1hVZUJwU1M1aGZqWjdjdnJTZFA4c1A3THJGZzFpY28z?=
+ =?utf-8?B?eEZsSGs3UlI1RjNnbUw1KzBlV3Z0YUg1RVBQaVNXNGMwRk9WM0w0Rzlpc1VO?=
+ =?utf-8?B?b0ZDM3BQTUhxMG41K0RDOTJ2a3U1em1lY0pjVzVTVW41UTJZK3NHZ01rSjJn?=
+ =?utf-8?B?Z2UxQkFCRVZTY1MvV0VRUHJXbHNlbGl1SExpb2FKNFJnOWVleVFSUmJKRGZN?=
+ =?utf-8?B?Q1VrYTQzREJTMjA1Ukt1eTlGOVZTUTBLc1piaDdtQlJaSHZWUlY0OU52bEtj?=
+ =?utf-8?B?Z0p4RFFIMUpqU1pFZklidkxZTTY5Tm9WZGtkNXNRdE5WZjUrc3JDZEdVcGRT?=
+ =?utf-8?B?SzhvOFl1SlMvNHowWFhRTG8yV3ROdUJidjZxd2FvZHNMQkRVMU1HbTE0ZFhQ?=
+ =?utf-8?B?aUUzOGZSQ3J0MTkyRHBSTTcxOUdXL0gvNUszVE9OMFI5WVFxVDRoZU1GSVJh?=
+ =?utf-8?B?ZU1JUUNMS0lsK1lYQitlR0puNEFIcWRvbDdjUU9iOHFmTU9nUEZzRnJjUFk3?=
+ =?utf-8?B?Ti95TVhUOXNwbVdaQUlVTGhPV0hQdCsvcXhyMDJiMENrZ2hhZVhoOHd4Y3RJ?=
+ =?utf-8?B?UENCQnVrMFBNNjRxN2VQRW44aCt1WUFuWTRQeXpMaFp4eVFDRnd5OTg0bVd2?=
+ =?utf-8?B?ajgxRXR5SGszYk1CemNjOWF3NjNiTTZWVDhlKzdIRUtGU1duWjJBTlVUbEM4?=
+ =?utf-8?B?cHBxS1NMeWpDK3lhNlpIUTMxNzExNUNiSnZyYk5BL1dEaGxrK1pXc3hGMjNk?=
+ =?utf-8?B?UWpEWE1SemJCL0F3U2NrelhzVHAwcGU1MHQ0NDhMUC9qK20xQXZ0Z0kzUjJ4?=
+ =?utf-8?B?OElIeXNpR0VZSlNRNEVzTnJOekhzNGFETFRuUlhFN1d1NWxFUDBoRDlKUFY4?=
+ =?utf-8?B?OWlHeFh3dm5Od0RrMXRSNlNmRTBCbFVjTlJIUmlhYUt5OEE0TlZERlA4OU93?=
+ =?utf-8?B?eVBuNnZlQXdDL2tMdjZQSUhaVnN5UjhSYkdOUzdXYVRyNE5FSDIrWWZYcnVI?=
+ =?utf-8?B?by9seFQ1OHFDM2I3NEtUMzlIV2xyNlRCaWptWHhOSFc2MU5qdHlsVlhhUDNz?=
+ =?utf-8?B?eUluaWpLeU1nWWxxWmwycTFmTnhLN1hRSXNoQmFVVGhyWEIxUXZjRWU0SHc5?=
+ =?utf-8?B?WGlremZ3anlaSjdSdEVoRjVvZlRxK0pOQU10QVF6dEhDaCszTWp1MVVXenZ4?=
+ =?utf-8?B?YXdadlpOWStiWWdkbk96QlkrWjZ0MlhtS0xNUW54ay84OGlzOGtyVFNFSi9y?=
+ =?utf-8?B?Z255TWhmZENoVUpwMnZJN05weS9ROVUvSnBQODUxZW1UUU4xQjB1NUVEWW9r?=
+ =?utf-8?B?K0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e387ea82-a304-433a-5659-08dcf1d8daa7
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 14:01:26.6294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: b/6Zrh373qOcYdwwdBrldNppeqzJ6oQSeqFto1KwGNfH0VZjXVGHFKdr9q7/qgVCJ4pNdElSVbBF2FHuUhYH3hgAEp+pvllrsrnWL7BXjDY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6234
+X-OriginatorOrg: intel.com
 
-Lan969x supports a number of different features, depending on the SKU
-(Stock Keeping Unit, see [1] for details). Add new field
-sparx5->features and initialize the features based on the target. Also
-add the function sparx5_has_feature() and use it throughout. For now, we
-only need to handle features: PSFP and PTP - more will come in the
-future.
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Date: Thu, 17 Oct 2024 13:32:03 +0200
 
-[1] https://www.microchip.com/en-us/product/lan9698
+> On Tue, Oct 15, 2024 at 04:53:39PM +0200, Alexander Lobakin wrote:
+>> From: Toke Høiland-Jørgensen <toke@redhat.com>
+>>
+>> To make the system page pool usable as a source for allocating XDP
+>> frames, we need to register it with xdp_reg_mem_model(), so that page
+>> return works correctly. This is done in preparation for using the system
+>> page pool for the XDP live frame mode in BPF_TEST_RUN; for the same
+>> reason, make the per-cpu variable non-static so we can access it from
+>> the test_run code as well.
+> 
+> Again, to me BPF_TEST_RUN has nothing to do with libeth/idpf XDP support
+> :<
 
-Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
----
- .../net/ethernet/microchip/sparx5/sparx5_main.c    | 40 +++++++++++++++++++++-
- .../net/ethernet/microchip/sparx5/sparx5_main.h    |  7 ++++
- .../ethernet/microchip/sparx5/sparx5_tc_flower.c   |  5 +++
- 3 files changed, 51 insertions(+), 1 deletion(-)
+Sorry, I forgot to adjust the commit message =\
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-index edbe639d98c5..ecec93625d37 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-@@ -267,6 +267,40 @@ static int sparx5_set_target_dt(struct sparx5 *sparx5)
- 	return 0;
- }
- 
-+static void sparx5_init_features(struct sparx5 *sparx5)
-+{
-+	switch (sparx5->target_dt) {
-+	case SPX5_TARGET_CT_7546:
-+	case SPX5_TARGET_CT_7549:
-+	case SPX5_TARGET_CT_7552:
-+	case SPX5_TARGET_CT_7556:
-+	case SPX5_TARGET_CT_7558:
-+	case SPX5_TARGET_CT_7546TSN:
-+	case SPX5_TARGET_CT_7549TSN:
-+	case SPX5_TARGET_CT_7552TSN:
-+	case SPX5_TARGET_CT_7556TSN:
-+	case SPX5_TARGET_CT_7558TSN:
-+	case SPX5_TARGET_CT_LAN9691VAO:
-+	case SPX5_TARGET_CT_LAN9694TSN:
-+	case SPX5_TARGET_CT_LAN9694RED:
-+	case SPX5_TARGET_CT_LAN9692VAO:
-+	case SPX5_TARGET_CT_LAN9696TSN:
-+	case SPX5_TARGET_CT_LAN9696RED:
-+	case SPX5_TARGET_CT_LAN9693VAO:
-+	case SPX5_TARGET_CT_LAN9698TSN:
-+	case SPX5_TARGET_CT_LAN9698RED:
-+		sparx5->features = (SPX5_FEATURE_PSFP | SPX5_FEATURE_PTP);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+bool sparx5_has_feature(struct sparx5 *sparx5, enum sparx5_feature feature)
-+{
-+	return sparx5->features & feature;
-+}
-+
- /* Compare the devicetree target with the chip target.
-  * Make sure the chip target supports the features and bandwidth requested
-  * from the devicetree target.
-@@ -934,7 +968,8 @@ static int sparx5_start(struct sparx5 *sparx5)
- 		sparx5->xtr_irq = -ENXIO;
- 	}
- 
--	if (sparx5->ptp_irq >= 0) {
-+	if (sparx5->ptp_irq >= 0 &&
-+	    sparx5_has_feature(sparx5, SPX5_FEATURE_PTP)) {
- 		err = devm_request_threaded_irq(sparx5->dev, sparx5->ptp_irq,
- 						NULL, ops->ptp_irq_handler,
- 						IRQF_ONESHOT, "sparx5-ptp",
-@@ -1088,6 +1123,9 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
- 	if (err)
- 		goto cleanup_config;
- 
-+	/* Initialize the features based on the devicetree target */
-+	sparx5_init_features(sparx5);
-+
- 	/* Initialize Switchcore and internal RAMs */
- 	err = sparx5_init_switchcore(sparx5);
- 	if (err) {
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-index 8a2b74d0bd35..5163e26a28b4 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-@@ -75,6 +75,11 @@ enum sparx5_cal_bw {
- 	SPX5_CAL_SPEED_12G5 = 7
- };
- 
-+enum sparx5_feature {
-+	SPX5_FEATURE_PSFP = BIT(0),
-+	SPX5_FEATURE_PTP  = BIT(1),
-+};
-+
- #define SPX5_PORTS             65
- #define SPX5_PORTS_ALL         70 /* Total number of ports */
- 
-@@ -338,6 +343,7 @@ struct sparx5 {
- 	u32 chip_id;
- 	enum spx5_target_chiptype target_ct;
- 	enum spx5_target_chiptype target_dt; /* target from devicetree */
-+	u32 features;
- 	void __iomem *regs[NUM_TARGETS];
- 	int port_count;
- 	struct mutex lock; /* MAC reg lock */
-@@ -405,6 +411,7 @@ struct sparx5 {
- 
- /* sparx5_main.c */
- bool is_sparx5(struct sparx5 *sparx5);
-+bool sparx5_has_feature(struct sparx5 *sparx5, enum sparx5_feature feature);
- 
- /* sparx5_switchdev.c */
- int sparx5_register_notifier_blocks(struct sparx5 *sparx5);
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-index c3bbed140554..4dc1ebd5d510 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.c
-@@ -1284,6 +1284,11 @@ static int sparx5_tc_flower_replace(struct net_device *ndev,
- 
- 	/* Setup PSFP */
- 	if (tc_sg_idx >= 0 || tc_pol_idx >= 0) {
-+		if (!sparx5_has_feature(sparx5, SPX5_FEATURE_PSFP)) {
-+			err = -EOPNOTSUPP;
-+			goto out;
-+		}
-+
- 		err = sparx5_tc_flower_psfp_setup(sparx5, vrule, tc_sg_idx,
- 						  tc_pol_idx, &sg, &fm, &sf);
- 		if (err)
+Registering system page_pools as memory models is needed to introduce
+generic XSk buff -> skb conversion (patch 15).
 
--- 
-2.34.1
+> 
+>>
+>> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
+Thanks,
+Olek
 
