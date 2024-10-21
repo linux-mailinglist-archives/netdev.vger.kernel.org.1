@@ -1,279 +1,164 @@
-Return-Path: <netdev+bounces-137664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6E29A935C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:31:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A7F9A9360
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 638C2B22396
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 22:31:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33F5C283F24
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 22:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9955D1E0DE9;
-	Mon, 21 Oct 2024 22:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8AE91FDFB1;
+	Mon, 21 Oct 2024 22:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zex/ABjZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dcVxStV8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2111C9ECE;
-	Mon, 21 Oct 2024 22:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729549883; cv=fail; b=Gld+9c9vCkQfRueLSnAhbZ0BvER6ewFmoNYRc1ao7HgNW/C79tQV/7Fdtw/hfKWdPurm5VEaZNTmtJVQmjlUVQYWnIf/Al7vpY4Fibhh5aqUV5eELs0eML+pZIFKMeq3WzJIEtH2qvLkPo62GLxDAxoANhD/3Fo0H8Fxy35v2C0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729549883; c=relaxed/simple;
-	bh=ZzyhWeltwjtQj3KCyu8sWiu5vndSyFdTp251W0zsu6Y=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RjfdKOhaIFLdNihgTxESHHYRO985kubpUrDUqCje+LfRcD5uZgw5IL7s/+mmtfVTiaaM642V9dKrylRLvn8CCelBcDYukFiHaYSNFlFR27mHdawO8u7PcXAYy0jsozBolL0BudRGWmZ9lpbnW+ypqEsIKDcX2T1F0cvAwLloEPQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zex/ABjZ; arc=fail smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897761FDF98;
+	Mon, 21 Oct 2024 22:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729549980; cv=none; b=FksWQ28auqyN8nXhXxgrM9hwYhgsElGJuS0Mobo3fM7M8SnMmAAQaJuLCJ4PDHAdJmNxozuWvsqbZAa4T2hrGhAsva1GiSTJWjevxWgyc3vtxyFultb4HjOvwrifO6nCb3DwIAr9QKcPfHYTRZ3B3i2jr69Iw+JXynwBcvpBHnY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729549980; c=relaxed/simple;
+	bh=xcaPgMt6Eh+JAUE6Xnkx1fugjyKVgIbuhtZ3W6j70r8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tZj0CLt6RYSXEuTtiwNTf0KejZNrRUFvAQuEge/WyjCb8agiipPBOcp4ictC3/Efrv0RcLQ2BA35N2UdHdlgiuVfV5Jkw5RAgIIom50VWtvnlqD0pB+wrKnSPIPvCHLFN8lZHKnjEfev5z0qwtXVvbKUouxDFgF16/ImniL3uAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dcVxStV8; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729549881; x=1761085881;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZzyhWeltwjtQj3KCyu8sWiu5vndSyFdTp251W0zsu6Y=;
-  b=Zex/ABjZRez4LYS+4RZiINlbVAVH1CNRh9Vqus1VPnr53IGslunYqx3W
-   QR2RqI2+HQXRaKcOsN6hQfx+OqUwkQIY9JskQWQaHBc7lMfqQeT1jptWb
-   mtARUTe7sSrUjZf6ZypjXtdqbLRIau6DKkhssE2507IrUpfLvi4y7z0yq
-   DGMmYMvor78mAFuhowEQWB3zy0Q0mNHv41xtJ4aMejFahgCB0SYRnAVmo
-   03LtU4xR13MkZVL/yWBXsa4rVqi+VorPme/xVRAkNMLV8cBbZA7a183YT
-   5r5guVNa68tuvdRXPiyTw46oXfQWJW9t1JBnyF+HVip+EJhr9ZCnXV1n+
+  t=1729549977; x=1761085977;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xcaPgMt6Eh+JAUE6Xnkx1fugjyKVgIbuhtZ3W6j70r8=;
+  b=dcVxStV8w8ybzYVAafiPFbmIwWZb2HG8jZ1AS0yE+yKHFNiT9PeYQkZa
+   EZIccRs/NKZXIvyRXjcFdNiQCmSRcvysSn6+TWwS90DZUWnJcCyUXYLc+
+   7ZCn9b1sbSaQTOHyM34qd8KYQ+6GZKvXFE+wo/b16y9sOzz0m0b0FReLf
+   VvpftDluQSYt3hO0plACV8T5YKPx+6lTmGeNjW4MQHxwZ2VA0BWS/ei/J
+   Oa6ou9UTZMGl2sZLSv45U19KGmbu6E9z+81snLx5La+MDSlytZTNZI8Qi
+   BrWxsY3WVVR/r3ZYRvCH8w3nAxZKbn7AW4TZgm1Lsw2ggwbas/9ccRdin
    Q==;
-X-CSE-ConnectionGUID: yRFmnHQuTCStngOkBwRpJg==
-X-CSE-MsgGUID: Lyqw880KQvOudyiqAn9lsQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="54462863"
+X-CSE-ConnectionGUID: QARMfs6lSxiOS466upMKGA==
+X-CSE-MsgGUID: 5hgfkNcUSoOmrzPXu/ddGw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="54463005"
 X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="54462863"
+   d="scan'208";a="54463005"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 15:31:20 -0700
-X-CSE-ConnectionGUID: MB+WgDwPQFO2p/i7ukAs8g==
-X-CSE-MsgGUID: oYiqGeiQTv65l2HAMuk7aA==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 15:32:56 -0700
+X-CSE-ConnectionGUID: ncZ4DteBTZmTJNx2lCew7g==
+X-CSE-MsgGUID: Wi6SHKTgRaS5AI7x27aXWA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="80068318"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Oct 2024 15:31:21 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 21 Oct 2024 15:31:20 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 21 Oct 2024 15:31:20 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 21 Oct 2024 15:31:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=boXFOCj72+VjTHoIq71og2OaMBOzrmUuRnq26+m+XKawu2yOJUtREcL2aBThJ5cRLdiVz2yuslpakhP9PjO/j6MIxAhnbh/ljNlbnxeKO4gsTS9zu5aYXapo4hFfJ/xHrq5n51SOoMIsg0GfNN3VBNA1XnpzIrpQcwWOwPXORSemH2X3ZBg8tls54AmrrxoVVrQRNAkz54m3Kyh3uBudsaVEsbh4rq+IsJsgl4VZr8I7UjE8g+Vzkb/Gc01r3Z5sRiU6g/eOVdw6oo+pKdQGTxOhaqtRmqFFvSHdj63/EbAARscnblt50U/9O7jtihd1paq2yEalMjDudRx8FZ2K+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ISoHoz+v5L3vyUN90USS9jR0KWt6+oAwmuiu4yNl+5g=;
- b=FOvc6Zpm+CpCDebZ5omqtPeWQZlBKqNY7UU0/EkLGq5+u1uJ1h1kZsadPYqHVLxZWKwaAXGi4G72CVVf6X+INJ/Ycxj1IXVY9p2mwIl9seLG2WPcaUVc4n00/o7+gH6EUygrLMUxSepYBbzN6tWHuVOHJgufJmbqpeKgvs8pbCRRKdBW0Gg4kHcE4c2J6nXyrwI7ONnj/OsuzgoqKEO/crn9hh65MGMkX+ngtJQ3NIvgDma7Yinuk41/LIXjHWpS7XTMW5yxlRyv9n41Vo3RI6234ZUFKRNEeuHTnHriDeS2Fu4Q5hG2EUEJv3tUyaylBOxBlg+qE6cwRMmxwaMwkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CH3PR11MB8520.namprd11.prod.outlook.com (2603:10b6:610:1af::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.29; Mon, 21 Oct
- 2024 22:31:18 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8069.027; Mon, 21 Oct 2024
- 22:31:18 +0000
-Message-ID: <07bb7025-633a-479e-a45c-f07346b14d0d@intel.com>
-Date: Mon, 21 Oct 2024 15:31:16 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next 1/2] ptp: add control over HW
- timestamp latch point
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>
-References: <20241021141955.1466979-1-arkadiusz.kubalewski@intel.com>
- <20241021141955.1466979-2-arkadiusz.kubalewski@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20241021141955.1466979-2-arkadiusz.kubalewski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0116.namprd05.prod.outlook.com
- (2603:10b6:a03:334::31) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+   d="scan'208";a="80068730"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 21 Oct 2024 15:32:54 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t30xH-000Sgw-1b;
+	Mon, 21 Oct 2024 22:32:51 +0000
+Date: Tue, 22 Oct 2024 06:32:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Matt Johnston <matt@codeconstruct.com.au>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Wolfram Sang <wsa-dev@sang-engineering.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Dung Cao <dung@os.amperecomputing.com>
+Subject: Re: [PATCH net v2] mctp i2c: handle NULL header address
+Message-ID: <202410220659.hh4B9jRO-lkp@intel.com>
+References: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH3PR11MB8520:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4d9729f3-2815-4d0b-bf9d-08dcf22014ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?REZPUkVQcVFia1VPYUFUcVZMUlFQTVhlcnhtc0dLdklqNmhjenRNVWYrSjJy?=
- =?utf-8?B?bzdPUHBScGQ0SlRFV3FCZ29RQjlVOG9lM1NjM3EybTU1VjNRK2R4ejFlbkV0?=
- =?utf-8?B?QVdkckc1a29lQW1hQy8rZ0Erb2tvMjduVTA2RnhKUFdrWUZGY1F1WnVzcmEw?=
- =?utf-8?B?dm56VE1JMnl1bXdnUFFiaFZWdW5yKy9LWUNST1p3YTJvOEFvbGwzcE1OSWZu?=
- =?utf-8?B?cGhXU1ZHcWg1QkZlM0NDTW51RlZ2WjBMaVRtSTl5SU8vam55eE5zQ2FSWmUv?=
- =?utf-8?B?SmNMZHo4UFQvRklza1ZoWVBBVEwxUnhvcXkvYXRwS1pyQ1g3a3BidmN0L1pW?=
- =?utf-8?B?TElEcS94ZHJBODJqbWJYWjl6V2JvNWJ1SHBnWmIxZTFGVEhxTWIxdmdUL0ky?=
- =?utf-8?B?NWViaGR5bEdGc2YxWGZVRDJGWFh4YWVpWGdyVWk5WjB4cDM3VGRYNkkxaE1F?=
- =?utf-8?B?RHRoRURvQkppcHVIemI2YnBKVkVya3ViWWVWVGlSMXZwMGR2ZksrK3VYOHZl?=
- =?utf-8?B?VEx0dW1CZC9naW5iNGZjOFNEdDdjZkduVER0N3p5NkNra0FqUnpkMTl2MmRY?=
- =?utf-8?B?TXBlMzZ4ZkN5SG51QXYxbFpuUWJEN0RGN3N2bXRjWThOSGE5QnBkZnByYUlN?=
- =?utf-8?B?ajd0cGtzVkp0WEJ2Mklmb0Z2NklkNjRFamNHZlFiNVQyZTV5ai82K2IzTHk3?=
- =?utf-8?B?Z0hMVXRrdHNhcmNvTjBLUUpqcnNSSllRclU1VmlFMm9Pd2N2REN6cndqV05G?=
- =?utf-8?B?NjB2aU5hNTdFK2xZTmE2Q1JzUWhIM3JocU5zY3V5RzRwNCtPOUlVd0x5MGxK?=
- =?utf-8?B?ZllBK0s4dG9yK0NmWXV3N0ZQMXZXeEM4WS9tYjI4L0l0WVdWREI4L1FTamZR?=
- =?utf-8?B?d1kxT1c5Z3BxZDBXcUtzTDBNZUJwZTNWNCt2a01UUDZZTTVITklWazV0b21C?=
- =?utf-8?B?d2xxYkQrM3ZVOGRSTlY3Z0ZhYXNSeEZSWW1pZHpPZDFZdFdwOUplMFhQb24w?=
- =?utf-8?B?RkJxcVY1bktPZGtuWWJ6YUFKaGtkOXFiRDBDd096TnlUa3NCVUx6SDZkb2VT?=
- =?utf-8?B?YTkvZjloOWs5Y0VNL1dsc3M3OUN2djFOQ09rSU9IQTlqVWh3aUd6ZmhlYUNI?=
- =?utf-8?B?YVNPK3pPTUdyblA1bUMzY2psejRmd1VxSzNPZXcrRmt0cWRNUFhqRGszWGE2?=
- =?utf-8?B?N0ZkOHBiVVBxTldjVGZyRHBXSENGcXdYZTVLb0Y2NW40ZkxhakU4SnQwL2lT?=
- =?utf-8?B?T3o4WGwyc2ZFREtrQThTTllya29OVXM2dTZpU3o1WllNZXhkVXl2Um83ZlVx?=
- =?utf-8?B?ZWJBYVFHTFJ0RUpRZXpGcHplZ096WTNQbmwyRDV5bm9iUFFhemRpVERiYldH?=
- =?utf-8?B?ZUR2b0pTR3N5MmxXOG5mZnE3cmFxSE5rRHJJbFEwRHdKcE0zUThNTlVEc2pF?=
- =?utf-8?B?TXRIZ2huNXZwNDJJOW1ORFN3SEdQbU9YMzU2MGNnWVlsYVhwSW45bmNMSzYx?=
- =?utf-8?B?NzIxRU14VS9xWEwxeHhvQkpUc0NieUNUbkVERzEwOVo4TCtLTTdEZU9CRHVw?=
- =?utf-8?B?a1EyZ2pyQ2txSHlOZXFTa3RMZnZFb3VuOXgzemJ1MHFLanRzdlVmOGsxVzZy?=
- =?utf-8?B?bWlzS2ZEUFViU1dzVVY5b05OWjhnNkw1TUd4UGJCNzNMVDRFZS9vNjU1VHdo?=
- =?utf-8?Q?Qshy8OmjxPEG1jjFxEfx?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VllLS2VrODR0UXFldW04OHV4ZVgzaTZlV0lncGF2R0l3MjlyMy9lWnhseVJP?=
- =?utf-8?B?bnlJSHdkNDFyQlJZQjc4MFFtbzVyY0UyT2wvT283ZGRXMzJlRi9ENmRpMFFI?=
- =?utf-8?B?QTVmMFdUbnIzREVUZHc4MzNsbVQxa09YTE1ZbGN3Z0txSGQ4YlR6dXdDVVRM?=
- =?utf-8?B?WmZXQWN5RFlkV0FvcXRaRjczSk0yWFRmbXpHT3pDa3FhYnJOMWdldnNCQmRD?=
- =?utf-8?B?Z2VxdXFpU1Z4L05EWDJSYWViYzlDNEt0dS9qTjIrbHp3NVArL09UOW1lcHAy?=
- =?utf-8?B?ek5uQjl3akhQbEphTW5HOXBCOHFSMUFwYVNIUDVJUWk2QXAvWGFNTzNkZE53?=
- =?utf-8?B?cUtOSjdrazFPM0dCQWRldWZqT0Q5TlhDYWhuams4aDFGN2xUNjBXMkpqY0Mx?=
- =?utf-8?B?dUN2Mmxpdk92NlUxTGIrdnlnVkR6ZGxQTE1kL2VIRWN4L1BTd1ErQVNYQ3E2?=
- =?utf-8?B?bzNnVEpjTnFaMWo3ekRwTnhhcWk0d3cybjEzSmt0L3ZRcDdhL043UEx6RG1I?=
- =?utf-8?B?THVNMm9JUjM3Qzd2STRWNXhYcm5FV0pzbXF6VmVZTDJzcjdKcWYyVmZCWGQx?=
- =?utf-8?B?ck95ZWZCMTFDa2EwaERkSUd6aVhFcG8wRncwaldjaW56SkVwQjF1S1FnSm11?=
- =?utf-8?B?TDZ2RStaRm1FWjE4ckdKWFM4RnNBQkZ2NWZTTThsRWl3bk0rbnh3cXp4UStW?=
- =?utf-8?B?NTRIdHA4cGdLTXRWSUdxSGozbFRXbHNoc3ZZNXYxNjl5ajYxWkhMUXdOTWo0?=
- =?utf-8?B?OVFqUXVxaEpWMGZhRDlmSkhTc2diMnI4VVZCVzQ0bXJSNXgwckRUaHFwbDZW?=
- =?utf-8?B?R0VKdmpKNW1FcTVkVUtYWEdOVWhVRW1TbENtM05FVVVuM2xBRHc3cDFkWm0w?=
- =?utf-8?B?T1Rwa2Y1SEZHcXRETlJmT1NjKzFHeFhpUXluSEs5WDFGZHFHeC80Yzg3MlNr?=
- =?utf-8?B?KzBWWEtFbHVKbVlqblRFQk1pNXNJUW15Y01kYi96aDVITXVrQXNnTzB0SzFY?=
- =?utf-8?B?TWtWODFTVm9HamQ4WXlHbHJTTDBZeVdBR3VwNExMd2VrQi91NGZRQ0JVWVF5?=
- =?utf-8?B?ODI0OGlIUHJJNDBKVzN0d3R5c2FROGQzTnk3aFBWWDR3aGt0L0tESFNZaVdS?=
- =?utf-8?B?Zlhib2kyS3RvNWxUcVpaSUhYaWpWcHdjYUxsWTlzWnI0NURxTXkwRFBvWFl1?=
- =?utf-8?B?bTNKbXJ0ZzFlZFNXS3JsOUd3WXNNejJjZnZIQ05YSjZjaDhnOVZjcnBUV3NP?=
- =?utf-8?B?UDVObDBWTmtZRWNTUHdPdzlPNHhCZDRHSTA0WStTUmtSNTlvUG0xem94bUJ6?=
- =?utf-8?B?RUdueWxLS0J6dVRBdDVyVVVIanlBeUdqYXdKY0p2TkVIQU5UZXlmdml0bDNv?=
- =?utf-8?B?cUlBTXY0bENvK1cxZHd1VFhaV3RzNmJpZ3ZQWDJMSlR0RXViNUY3OGkrT3U4?=
- =?utf-8?B?WWNzK005eDNPejVMOFVvclE1RVVSZ0VNenc3Z3I1R3ZlSFUrNHl3N0tYSWFH?=
- =?utf-8?B?ZU0veVcwS1MzTzZjcFdsM2lyT3hQbzJFVzB6dnVLNnk0UUJKUWxLY2pUVjU1?=
- =?utf-8?B?cFUxYmRiNmlXRUpCQVUwR2FhdHB5V0V3VkQ1T1FhMGJ1MWhGdmpkRm1vTS8v?=
- =?utf-8?B?NzJmWCtQOHpuYmViell3U213bFlvaWNINy9oRnVQSmt5OHFka0R3SmhFZlFx?=
- =?utf-8?B?NU45WGFRZFVrY0h3RVBLRXppRkZFMS9LdS9zeU9XbmNKUjdKb2l5MmVaYjVs?=
- =?utf-8?B?Z0lRYi9MS0NENnl5L3NiczlVWDlnMW5nSEZQa2xZT0dYckZmOU94NGxyaFVU?=
- =?utf-8?B?Rkt5cW9tZEZ0R1FiUS9hOERZQys5UHZGeEJrNFQvN0V2dTVwaUtyNDVxU1hD?=
- =?utf-8?B?QUU2b1FCd2tyT1YySlFXQU9SbjlNcExyMWlvbGNDYlVlcjdsc3BiTjhGMUpY?=
- =?utf-8?B?c2pWTEJCNTlMcVMzRWcvSXQ1OTliSFUzVmNCVTdiMmpycEVUSjd4UG5BY1ZY?=
- =?utf-8?B?NnZsZXRZUm5DNUpVNHlmMWpQNmJUMnVFQ2dUZVVWUWNiWEJBb2FqelgxcjBo?=
- =?utf-8?B?WlVROWRuQ1JGOU0yK0gveXZ1TE0wUnZxR2ZMU3d3MXRWa2p1S0ZoRWZrdHM1?=
- =?utf-8?B?NnlyY0JJWjhRZnAzV3JOcmFTKzhZVllWMGw2T1UyZWxLblFJVkI4aGEweU91?=
- =?utf-8?B?WHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d9729f3-2815-4d0b-bf9d-08dcf22014ad
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 22:31:18.3403
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lYisRuzdGVT6ZOPuzlJxZQtspgJ2zN9NH1VHzj47KQZSBaMQJdycDt9DshWxWSn7m8bKWKBYag2XGei/ITdBHSpS7NM6svhZxEGxZ1QzoVE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8520
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+
+Hi Matt,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on cb560795c8c2ceca1d36a95f0d1b2eafc4074e37]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Matt-Johnston/mctp-i2c-handle-NULL-header-address/20241021-123741
+base:   cb560795c8c2ceca1d36a95f0d1b2eafc4074e37
+patch link:    https://lore.kernel.org/r/20241021-mctp-i2c-null-dest-v2-1-4503e478517c%40codeconstruct.com.au
+patch subject: [PATCH net v2] mctp i2c: handle NULL header address
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241022/202410220659.hh4B9jRO-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241022/202410220659.hh4B9jRO-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410220659.hh4B9jRO-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/mctp/mctp-i2c.c: In function 'mctp_i2c_header_create':
+>> drivers/net/mctp/mctp-i2c.c:599:23: error: assignment to 'u8' {aka 'unsigned char'} from 'const unsigned char *' makes integer from pointer without a cast [-Wint-conversion]
+     599 |                 llsrc = dev->dev_addr;
+         |                       ^
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [m]:
+   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
 
 
+vim +599 drivers/net/mctp/mctp-i2c.c
 
-On 10/21/2024 7:19 AM, Arkadiusz Kubalewski wrote:
-> Currently HW support of PTP/timesync solutions in network PHY chips can be
-> implemented with two different approaches, the timestamp maybe latched
-> either at the beginning or after the Start of Frame Delimiter (SFD) [1].
-> 
-> Allow ptp device drivers to provide user with control over the HW
-> timestamp latch point with ptp sysfs ABI.
-> 
-> [1] https://www.ieee802.org/3/cx/public/april20/tse_3cx_01_0420.pdf
-> 
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> ---
->  Documentation/ABI/testing/sysfs-ptp | 12 ++++++++
->  drivers/ptp/ptp_sysfs.c             | 44 +++++++++++++++++++++++++++++
->  include/linux/ptp_clock_kernel.h    | 29 +++++++++++++++++++
->  3 files changed, 85 insertions(+)
-> 
-> diff --git a/Documentation/ABI/testing/sysfs-ptp b/Documentation/ABI/testing/sysfs-ptp
-> index 9c317ac7c47a..a0d89e0fd72e 100644
-> --- a/Documentation/ABI/testing/sysfs-ptp
-> +++ b/Documentation/ABI/testing/sysfs-ptp
-> @@ -140,3 +140,15 @@ Description:
->  		PPS events to the Linux PPS subsystem. To enable PPS
->  		events, write a "1" into the file. To disable events,
->  		write a "0" into the file.
-> +
-> +What:		/sys/class/ptp/ptp<N>/ts_point
-> +Date:		October 2024
-> +Contact:	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> +Description:
-> +		This file provides control over the point in time in
-> +		which the HW timestamp is latched. As specified in IEEE
-> +		802.3cx, the latch point can be either at the beginning
-> +		or after the end of Start of Frame Delimiter (SFD).
-> +		Value "0" means the timestamp is latched at the
-> +		beginning of the SFD. Value "1" means that timestamp is
-> +		latched after the end of SFD.
-> diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-> index 6b1b8f57cd95..7e9f6ef368b6 100644
-> --- a/drivers/ptp/ptp_sysfs.c
-> +++ b/drivers/ptp/ptp_sysfs.c
-> @@ -28,6 +28,46 @@ static ssize_t max_phase_adjustment_show(struct device *dev,
->  }
->  static DEVICE_ATTR_RO(max_phase_adjustment);
->  
-> +static ssize_t ts_point_show(struct device *dev, struct device_attribute *attr,
-> +			     char *page)
-> +{
-> +	struct ptp_clock *ptp = dev_get_drvdata(dev);
-> +	enum ptp_ts_point point;
-> +	int err;
-> +
-> +	if (!ptp->info->get_ts_point)
-> +		return -EOPNOTSUPP;
-> +	err = ptp->info->get_ts_point(ptp->info, &point);
-> +	if (err)
-> +		return err;
-> +
-> +	return sysfs_emit(page, "%d\n", point);
-> +}
-> +
+   579	
+   580	static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
+   581					  unsigned short type, const void *daddr,
+   582					  const void *saddr, unsigned int len)
+   583	{
+   584		struct mctp_i2c_hdr *hdr;
+   585		struct mctp_hdr *mhdr;
+   586		u8 lldst, llsrc;
+   587	
+   588		if (len > MCTP_I2C_MAXMTU)
+   589			return -EMSGSIZE;
+   590	
+   591		if (daddr)
+   592			lldst = *((u8 *)daddr);
+   593		else
+   594			return -EINVAL;
+   595	
+   596		if (saddr)
+   597			llsrc = *((u8 *)saddr);
+   598		else
+ > 599			llsrc = dev->dev_addr;
+   600	
+   601		skb_push(skb, sizeof(struct mctp_i2c_hdr));
+   602		skb_reset_mac_header(skb);
+   603		hdr = (void *)skb_mac_header(skb);
+   604		mhdr = mctp_hdr(skb);
+   605		hdr->dest_slave = (lldst << 1) & 0xff;
+   606		hdr->command = MCTP_I2C_COMMANDCODE;
+   607		hdr->byte_count = len + 1;
+   608		hdr->source_slave = ((llsrc << 1) & 0xff) | 0x01;
+   609		mhdr->ver = 0x01;
+   610	
+   611		return sizeof(struct mctp_i2c_hdr);
+   612	}
+   613	
 
-Ok, so if the driver doesn't support this API, we just return EOPNOTSUPP
-and don't support the API then.
-
-Presumably hardware which doesn't timestamp according to this standard
-would then simply not support the API?
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
