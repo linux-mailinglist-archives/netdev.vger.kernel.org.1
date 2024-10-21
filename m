@@ -1,134 +1,96 @@
-Return-Path: <netdev+bounces-137619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD139A72B6
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:57:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 094C29A72C9
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 21:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 169461C217DB
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:57:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3815F1C218DA
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 19:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E7A1FB3D4;
-	Mon, 21 Oct 2024 18:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410AC1CF7DE;
+	Mon, 21 Oct 2024 19:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEzT7DIO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LNoQXODq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1342C1FB3E7;
-	Mon, 21 Oct 2024 18:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942E2209B;
+	Mon, 21 Oct 2024 19:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729537024; cv=none; b=NHYAL85y9ZkWMRy3t73EB/8pDI7bmI9ouyoYvGevbTugK4+XjnyJO3ipqrzwL3/oNKh55t06chZG2YQiC61tjpkLJSY1eGrppCN5chjVbjItcUdLAnt1q8X0mgXIMiCXH+ccXv8IS+yAHC3SZ/k8dX5M0wpS8g12CqMinC6Yd9o=
+	t=1729537281; cv=none; b=nzb1MFECNCq/qdYP5Z/t7cZDGASwPGupqKWHOVNpFfshj/OWC1YHpWLkRWU34P+A0q1tNKI6mRyuT8mO6iVhzDVq5xgdZgI/y47ojFFW1aUxFe06lCEYN89c2ghA8iS5Iu8A2XirvA31PjvJqofLvu2cQ9yrP9l59Gz/1FTAeOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729537024; c=relaxed/simple;
-	bh=THJwr5sx8e739yZL2Rlpxvug2E6+/wO+QEtS/NLOe7c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bb29h2YcjsECm4fUuzpndm/JKJK4OyqcXzBAsrCLH9yPAaX6FFEzhIr30PmXFJ3oYM9Q3K8Rm3U4R35voQ9OhNwpSHCDji4osEgIy3asF8IGLypogm9KpU9h0bOYGPvgGz+1jyXv5804tgp1lwOEENy3VY8PWMupK2HQNb9Ju8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEzT7DIO; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6e35f08e23eso44260007b3.2;
-        Mon, 21 Oct 2024 11:56:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729537018; x=1730141818; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Of83tGxq8wRCfjGC40ujhPw8LktJT4+EXoa6bRqngi4=;
-        b=dEzT7DIO7MRX50NZo01DbXnSYhyDLTh8JOBSBGe8zfT3uj1Ey97xSt976psAeI9DRU
-         PNcF5nKQ3qFg07JisBuvxM1MVYkTmmKvhQz+Mde6eX63rtUFTRAdexAAQ+IbupkUqlWh
-         y43gNVUBfCCanmDOKINDm+xX4vG+Qs0hI3DKXjsa3qg7nV2yhE+dxuqqX0Wctl9ujoaf
-         jODM+JwRAZfguoVf2xxbkVB1cgHAu/nAsKRHbvZVP4ekOTWlytlU++7oot69O+7UfCaa
-         wZbraCSMndocWQaZCrznREgj6733Igg8ZfPdNERx4IRhoFUupCg/6iKFlhbT0ZVgrA9F
-         HRzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729537018; x=1730141818;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Of83tGxq8wRCfjGC40ujhPw8LktJT4+EXoa6bRqngi4=;
-        b=sBB1LMsbSaVg4gEbm8CvwBoIwGYQzNvWDFbMojNGkaxLJ/M+IjwRSp2p6UE2iOQbzn
-         cL3SVszvEHpLq1uvRb53WNNnb4fp0ugyh0jnih4+q04Ne9CasauDQbDbVCHkpC3IJ8/z
-         gw/RaGbVzH1iuo+RB8kE4C86fpvEsm84HJsciiWfeMn7OjQMSK5UqFyi8Tw+DhGAmNoc
-         xJdmwegDW3NU85/Xbk1u0gI7PiAnG03R97Ygjg9nC262nTU63OCE6k2BFkPZjAU5il4O
-         LoV5Ytrh0ylvxEV4DJkJmab4Nj3+bbhyAl5awiuk8aaEhLg4F9igiGW2ZXMkYPsF4MPU
-         P7EQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXc3Swgzy41w9L44mD+QfN/i0SelG2XLvrLorcNzva+yLuouk0X7DXLnrmyEIy4YezrbQnoYb84IaBtzbY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw26JEwt+d9DU85KeLH3RzBuhRQaH9Ya2c4kiNQ1xbn40j3Syoa
-	/J5DF68FpQ5GPOCQAy73UCGuPswBrasau59VCyHzNyY0wGsIZpK9lfuYkid2D+YNZGvYPiYcUhg
-	Ww2mVSOEDeSF+zEYCpeYRqrUMODs=
-X-Google-Smtp-Source: AGHT+IEL+tOG+slMvBGBsTtbnqFqwHmEYxC7PGmgfa0W/ZmcZvBpyCvHP+2uE6BeH76l3CMgN7pXlxzFDgh5f7Pedx4=
-X-Received: by 2002:a05:690c:4907:b0:6e5:de2d:39e0 with SMTP id
- 00721157ae682-6e5de2d5659mr89905677b3.42.1729537017987; Mon, 21 Oct 2024
- 11:56:57 -0700 (PDT)
+	s=arc-20240116; t=1729537281; c=relaxed/simple;
+	bh=a7MLIhvKgoWca20O9T3j25ODuB5cY2LujuRS+d01lbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=hnw7sRv1bnL5fjMKJZGmESPxc5W0nV4PP7lerlnLu7QOVyiPqpIG7IpJ8y1B6Z/4CeRFJjDFZRjW/WUSKN7Mw8bW2sEDFVX1Aibo2ztW1vhy3ddG7Mp2A0XN3ndemw6cfohSdEEtC4Ea0+yN8+SKsSeIcSdxYlqBn2JZkmIi4YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LNoQXODq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6925C4CEC3;
+	Mon, 21 Oct 2024 19:01:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729537280;
+	bh=a7MLIhvKgoWca20O9T3j25ODuB5cY2LujuRS+d01lbc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=LNoQXODqoaS8EqOShuwAx1DeqlhL0BlHuPpvCVpmQNiRqIkZpzEEhvm3ZZuAgo6lu
+	 HMX7HjLCsrQV8vyNhUnqSlXI1Dp05iziWn5aDvE8jMWvw5U3YgePLbyie/DdIXT883
+	 eovrShQ7fIIH9Ti9qyo3ckfhZ9Hy/OvPB34KDs31iUlMuSXN67UND26XEK7dlODg3M
+	 AE+3WV23vVkUvgIydc23hyp3rnXz/2eulL8Xci5xKC776y5f5OaXPJj5IOMV36pKcA
+	 m0P+pgW0B/wv/afgALNMTGZAOv0hHkwwXaCvcrMIXgL4s48ddHd6VKstOJL6KPcxZR
+	 mIYSJ6PEhomXA==
+Date: Mon, 21 Oct 2024 13:01:17 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Christian Benvenuti <benve@cisco.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Manish Chopra <manishc@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH 0/2][next] UAPI: net/ethtool: Avoid thousands of
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <cover.1729536776.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021010652.4944-1-rosenp@gmail.com> <CAH-L+nN0W_BffMR6s6Je9LufSs5ZtSHm13_O1aGhDnTjPNqouw@mail.gmail.com>
-In-Reply-To: <CAH-L+nN0W_BffMR6s6Je9LufSs5ZtSHm13_O1aGhDnTjPNqouw@mail.gmail.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Mon, 21 Oct 2024 11:56:47 -0700
-Message-ID: <CAKxU2N9JGwfg37Qoj=gLj0_f+cd1dN_ek+GT402xOe-Y2M0xtg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: mv88e6xxx: use ethtool_puts
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Mon, Oct 21, 2024 at 9:27=E2=80=AFAM Kalesh Anakkur Purayil
-<kalesh-anakkur.purayil@broadcom.com> wrote:
->
-> On Mon, Oct 21, 2024 at 6:37=E2=80=AFAM Rosen Penev <rosenp@gmail.com> wr=
-ote:
-> >
-> > Allows simplifying get_strings and avoids manual pointer manipulation.
-Looking more at these files, I see further pointer manipulation later
-on. Specifically I have this change locally:
+Small patch series aimed at fixing thousands of -Wflex-array-member-not-at-end
+warnings by creating a new tagged struct within a flexible structure. We then
+use this new struct type to fix problematic middle-flex-array declarations in
+multiple composite structs, as well as to update the type of some variables in
+various functions.
 
- static void mv88e6xxx_get_strings(struct dsa_switch *ds, int port,
-                                  u32 stringset, uint8_t *data)
- {
-        struct mv88e6xxx_chip *chip =3D ds->priv;
--       int count =3D 0;
+Gustavo A. R. Silva (2):
+  UAPI: ethtool: Use __struct_group() in struct ethtool_link_settings
+  net: ethtool: Avoid thousands of -Wflex-array-member-not-at-end
+    warnings
 
-        if (stringset !=3D ETH_SS_STATS)
-                return;
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  6 ++--
+ .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    |  4 +--
+ .../ethernet/chelsio/cxgb4vf/cxgb4vf_main.c   |  2 +-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |  2 +-
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  4 +--
+ include/linux/ethtool.h                       |  2 +-
+ include/uapi/linux/ethtool.h                  | 33 ++++++++++---------
+ net/ethtool/ioctl.c                           |  2 +-
+ net/ethtool/linkinfo.c                        |  8 ++---
+ net/ethtool/linkmodes.c                       | 14 ++++----
+ 10 files changed, 40 insertions(+), 37 deletions(-)
 
-        mv88e6xxx_reg_lock(chip);
+-- 
+2.34.1
 
--       if (chip->info->ops->stats_get_strings)
--               count =3D chip->info->ops->stats_get_strings(chip, data);
--
--       if (chip->info->ops->serdes_get_strings) {
--               data +=3D count * ETH_GSTRING_LEN;
--               count =3D chip->info->ops->serdes_get_strings(chip, port, d=
-ata);
--       }
--
--       data +=3D count * ETH_GSTRING_LEN;
-        mv88e6xxx_atu_vtu_get_strings(data);
-
-        mv88e6xxx_reg_unlock(chip);
-Do you guys think a v2 is in order?
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
->
-> LGTM
-> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
->
->
-> --
-> Regards,
-> Kalesh A P
 
