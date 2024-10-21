@@ -1,164 +1,250 @@
-Return-Path: <netdev+bounces-137665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A7F9A9360
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:33:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A75119A9371
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:36:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33F5C283F24
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 22:33:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3613D1F2225F
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 22:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8AE91FDFB1;
-	Mon, 21 Oct 2024 22:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D2C1FEFAC;
+	Mon, 21 Oct 2024 22:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dcVxStV8"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gcqgyi0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897761FDF98;
-	Mon, 21 Oct 2024 22:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182641E2839
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 22:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729549980; cv=none; b=FksWQ28auqyN8nXhXxgrM9hwYhgsElGJuS0Mobo3fM7M8SnMmAAQaJuLCJ4PDHAdJmNxozuWvsqbZAa4T2hrGhAsva1GiSTJWjevxWgyc3vtxyFultb4HjOvwrifO6nCb3DwIAr9QKcPfHYTRZ3B3i2jr69Iw+JXynwBcvpBHnY=
+	t=1729550159; cv=none; b=eSFi3w/KCD3I9TOeuY+CTMmxqdQz0/LeiBuk96KN6QfyTSeCj8krRv5Ct6SNDL7koVvRTgd7NfurkH9YhgVj747dO4EbELqNW6D4ufVXj0R2kZTXP0lc6Cu/fhc1sTeonRcabdcB+X9fsrkmgpc/8PPGo+NGFWvi6fq98btj+dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729549980; c=relaxed/simple;
-	bh=xcaPgMt6Eh+JAUE6Xnkx1fugjyKVgIbuhtZ3W6j70r8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZj0CLt6RYSXEuTtiwNTf0KejZNrRUFvAQuEge/WyjCb8agiipPBOcp4ictC3/Efrv0RcLQ2BA35N2UdHdlgiuVfV5Jkw5RAgIIom50VWtvnlqD0pB+wrKnSPIPvCHLFN8lZHKnjEfev5z0qwtXVvbKUouxDFgF16/ImniL3uAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dcVxStV8; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729549977; x=1761085977;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xcaPgMt6Eh+JAUE6Xnkx1fugjyKVgIbuhtZ3W6j70r8=;
-  b=dcVxStV8w8ybzYVAafiPFbmIwWZb2HG8jZ1AS0yE+yKHFNiT9PeYQkZa
-   EZIccRs/NKZXIvyRXjcFdNiQCmSRcvysSn6+TWwS90DZUWnJcCyUXYLc+
-   7ZCn9b1sbSaQTOHyM34qd8KYQ+6GZKvXFE+wo/b16y9sOzz0m0b0FReLf
-   VvpftDluQSYt3hO0plACV8T5YKPx+6lTmGeNjW4MQHxwZ2VA0BWS/ei/J
-   Oa6ou9UTZMGl2sZLSv45U19KGmbu6E9z+81snLx5La+MDSlytZTNZI8Qi
-   BrWxsY3WVVR/r3ZYRvCH8w3nAxZKbn7AW4TZgm1Lsw2ggwbas/9ccRdin
-   Q==;
-X-CSE-ConnectionGUID: QARMfs6lSxiOS466upMKGA==
-X-CSE-MsgGUID: 5hgfkNcUSoOmrzPXu/ddGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="54463005"
-X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="54463005"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 15:32:56 -0700
-X-CSE-ConnectionGUID: ncZ4DteBTZmTJNx2lCew7g==
-X-CSE-MsgGUID: Wi6SHKTgRaS5AI7x27aXWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,221,1725346800"; 
-   d="scan'208";a="80068730"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 21 Oct 2024 15:32:54 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t30xH-000Sgw-1b;
-	Mon, 21 Oct 2024 22:32:51 +0000
-Date: Tue, 22 Oct 2024 06:32:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Matt Johnston <matt@codeconstruct.com.au>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
+	s=arc-20240116; t=1729550159; c=relaxed/simple;
+	bh=aIEngXYITkGtYVSWyQd/A3vL4a+XE2IDgBQVcNr076o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nRO2YtA+CibESVYacDS3EdZA4ddrjqU79KQ3qPHIBNiyfrw4l6S/r0X/0S16kPwIglTEcqbGe32EMmZ4IJxDH54mcJ0d3HPiU34aUa3ZQupGtWdRHNWJelwNw5bTaBtjiWFHgnnSQn4dtZTL7dN7tU/5uGdR0wf06HkuI4xF4ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gcqgyi0V; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20c8b557f91so50131215ad.2
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 15:35:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1729550157; x=1730154957; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R+21hon7jB7Ze6MH6lzU0hyrhZwk9Xet7rRe7hsDfrQ=;
+        b=gcqgyi0V1wI/J375rCzXF9Yeib/ALbUGFtM9jVZ7tMtUyZHeL1XpqJqYbJYQKFruk6
+         OaSQcroxdPUaB7bAHTz/sWk9jbzQzhFwmDR5l99jK0AeFfmGlXylR7v1uWjQZzTiZn3B
+         HTIkpZdeLi4QyCmu1uPTqDtIz08hzv52fj3pE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729550157; x=1730154957;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R+21hon7jB7Ze6MH6lzU0hyrhZwk9Xet7rRe7hsDfrQ=;
+        b=mxcleRUU/fcHciUdduWKrpLGhsDb5Zh0sDDSZpSlSVqEhlTd3QBzXa6mkS7YgEtSPR
+         /3wkHwJB1pSuBny+fWLmW2HOHKyaI4WGKJBJbC/ckXv+IdapjQpydzWYMgH9aZTpxMul
+         qlRq0Ez/l+QNPSz2pGUVxjbwgkdTHinoZC+n1X9BS9f+abJzEJrCxQbrPG7hbpU9+OhR
+         am6PEUbIYjBH2cCPwKhPO6SmRmzqCn95Czjgt2Sy1gaXn1XiXi4XdhuGcney5VJAwlDK
+         AwW1e5IpAMds4PxWDKGEDic+TNC9L4/CYDCH021i3o3HuMNOTfDUV7WFbbwSu+PKe1kJ
+         dJjg==
+X-Gm-Message-State: AOJu0YzuUhqKulmnzhWUo9U/sehhfuMF0jP8bjLY0RNV3vDCbliGu3In
+	XH2pYlo91JiHrll0QI2Rtozj4uTazf7t8HknISeEhZr/g+WS8mIRUuib5RGIAJ2VqQiX03rTs/S
+	A8W+Yf7z2bOKIqmp/PZ/84dA6uKOSQgl2CifYVPGh8UWU+7jrChZrsTCRMdbV3oULmF0BMAJka1
+	F+M1hAwPzFHBXF3giH5/PD42tjc89/pjEHbic=
+X-Google-Smtp-Source: AGHT+IF3piS/fRA42347FWj61Lwbz0hs9de6WGfsiJ7XbyQ5WMZ9MBPYLBRxKS5gnyUcXdhPwbfDCA==
+X-Received: by 2002:a17:902:d48e:b0:20c:f39e:4c25 with SMTP id d9443c01a7336-20e5a707c78mr214083015ad.8.1729550156983;
+        Mon, 21 Oct 2024 15:35:56 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0db2desm30897655ad.203.2024.10.21.15.35.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 15:35:56 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: Joe Damato <jdamato@fastly.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Wolfram Sang <wsa-dev@sang-engineering.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Dung Cao <dung@os.amperecomputing.com>
-Subject: Re: [PATCH net v2] mctp i2c: handle NULL header address
-Message-ID: <202410220659.hh4B9jRO-lkp@intel.com>
-References: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH intel-next] ice: Add support for persistent NAPI config
+Date: Mon, 21 Oct 2024 22:35:51 +0000
+Message-Id: <20241021223551.508030-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+Content-Transfer-Encoding: 8bit
 
-Hi Matt,
+Use netif_napi_add_config to assign persistent per-NAPI config when
+initializing NAPIs. This preserves NAPI config settings when queue
+counts are adjusted.
 
-kernel test robot noticed the following build errors:
+Tested with an E810-2CQDA2 NIC.
 
-[auto build test ERROR on cb560795c8c2ceca1d36a95f0d1b2eafc4074e37]
+Begin by setting the queue count to 4:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Matt-Johnston/mctp-i2c-handle-NULL-header-address/20241021-123741
-base:   cb560795c8c2ceca1d36a95f0d1b2eafc4074e37
-patch link:    https://lore.kernel.org/r/20241021-mctp-i2c-null-dest-v2-1-4503e478517c%40codeconstruct.com.au
-patch subject: [PATCH net v2] mctp i2c: handle NULL header address
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241022/202410220659.hh4B9jRO-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241022/202410220659.hh4B9jRO-lkp@intel.com/reproduce)
+$ sudo ethtool -L eth4 combined 4
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410220659.hh4B9jRO-lkp@intel.com/
+Check the queue settings:
 
-All errors (new ones prefixed by >>):
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 4}'
+[{'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8452,
+  'ifindex': 4,
+  'irq': 2782},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8451,
+  'ifindex': 4,
+  'irq': 2781},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8450,
+  'ifindex': 4,
+  'irq': 2780},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8449,
+  'ifindex': 4,
+  'irq': 2779}]
 
-   drivers/net/mctp/mctp-i2c.c: In function 'mctp_i2c_header_create':
->> drivers/net/mctp/mctp-i2c.c:599:23: error: assignment to 'u8' {aka 'unsigned char'} from 'const unsigned char *' makes integer from pointer without a cast [-Wint-conversion]
-     599 |                 llsrc = dev->dev_addr;
-         |                       ^
+Now, set the queue with NAPI ID 8451 to have a gro-flush-timeout of
+1111:
 
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [m]:
-   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
+$ sudo ./tools/net/ynl/cli.py \
+            --spec Documentation/netlink/specs/netdev.yaml \
+            --do napi-set --json='{"id": 8451, "gro-flush-timeout": 1111}'
+None
 
+Check that worked:
 
-vim +599 drivers/net/mctp/mctp-i2c.c
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 4}'
+[{'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8452,
+  'ifindex': 4,
+  'irq': 2782},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 1111,
+  'id': 8451,
+  'ifindex': 4,
+  'irq': 2781},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8450,
+  'ifindex': 4,
+  'irq': 2780},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8449,
+  'ifindex': 4,
+  'irq': 2779}]
 
-   579	
-   580	static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
-   581					  unsigned short type, const void *daddr,
-   582					  const void *saddr, unsigned int len)
-   583	{
-   584		struct mctp_i2c_hdr *hdr;
-   585		struct mctp_hdr *mhdr;
-   586		u8 lldst, llsrc;
-   587	
-   588		if (len > MCTP_I2C_MAXMTU)
-   589			return -EMSGSIZE;
-   590	
-   591		if (daddr)
-   592			lldst = *((u8 *)daddr);
-   593		else
-   594			return -EINVAL;
-   595	
-   596		if (saddr)
-   597			llsrc = *((u8 *)saddr);
-   598		else
- > 599			llsrc = dev->dev_addr;
-   600	
-   601		skb_push(skb, sizeof(struct mctp_i2c_hdr));
-   602		skb_reset_mac_header(skb);
-   603		hdr = (void *)skb_mac_header(skb);
-   604		mhdr = mctp_hdr(skb);
-   605		hdr->dest_slave = (lldst << 1) & 0xff;
-   606		hdr->command = MCTP_I2C_COMMANDCODE;
-   607		hdr->byte_count = len + 1;
-   608		hdr->source_slave = ((llsrc << 1) & 0xff) | 0x01;
-   609		mhdr->ver = 0x01;
-   610	
-   611		return sizeof(struct mctp_i2c_hdr);
-   612	}
-   613	
+Now reduce the queue count to 2, which would destroy the queue with NAPI
+ID 8451:
 
+$ sudo ethtool -L eth4 combined 2
+
+Check the queue settings, noting that NAPI ID 8451 is gone:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 4}'
+[{'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8450,
+  'ifindex': 4,
+  'irq': 2780},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8449,
+  'ifindex': 4,
+  'irq': 2779}]
+
+Now, increase the number of queues back to 4:
+
+$ sudo ethtool -L eth4 combined 4
+
+Dump the settings, expecting to see the same NAPI IDs as above and for
+NAPI ID 8451 to have its gro-flush-timeout set to 1111:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 4}'
+[{'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8452,
+  'ifindex': 4,
+  'irq': 2782},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 1111,
+  'id': 8451,
+  'ifindex': 4,
+  'irq': 2781},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8450,
+  'ifindex': 4,
+  'irq': 2780},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 8449,
+  'ifindex': 4,
+  'irq': 2779}]
+
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ drivers/net/ethernet/intel/ice/ice_base.c | 3 ++-
+ drivers/net/ethernet/intel/ice/ice_lib.c  | 6 ++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 3a8e156d7d86..82a9cd4ec7ae 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -156,7 +156,8 @@ static int ice_vsi_alloc_q_vector(struct ice_vsi *vsi, u16 v_idx)
+ 	 * handler here (i.e. resume, reset/rebuild, etc.)
+ 	 */
+ 	if (vsi->netdev)
+-		netif_napi_add(vsi->netdev, &q_vector->napi, ice_napi_poll);
++		netif_napi_add_config(vsi->netdev, &q_vector->napi,
++				      ice_napi_poll, v_idx);
+ 
+ out:
+ 	/* tie q_vector and VSI together */
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index d4e74f96a8ad..a7d45a8ce7ac 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2777,8 +2777,10 @@ void ice_napi_add(struct ice_vsi *vsi)
+ 		return;
+ 
+ 	ice_for_each_q_vector(vsi, v_idx)
+-		netif_napi_add(vsi->netdev, &vsi->q_vectors[v_idx]->napi,
+-			       ice_napi_poll);
++		netif_napi_add_config(vsi->netdev,
++				      &vsi->q_vectors[v_idx]->napi,
++				      ice_napi_poll,
++				      v_idx);
+ }
+ 
+ /**
+
+base-commit: 6f07cd8301706b661776074ddc97c991d107cc91
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
 
