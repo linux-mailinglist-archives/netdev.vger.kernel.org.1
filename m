@@ -1,104 +1,289 @@
-Return-Path: <netdev+bounces-137564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355AF9A6F06
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:04:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D86C9A6F0A
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:05:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA26D284358
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:04:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74E961C2030F
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 16:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8C21E7C32;
-	Mon, 21 Oct 2024 16:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD4D1CFEC1;
+	Mon, 21 Oct 2024 16:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WnzhvlNU"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="vxQ5XsXo";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="F8uPGvKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BB31E47AD;
-	Mon, 21 Oct 2024 16:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D5F1CBEA1;
+	Mon, 21 Oct 2024 16:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729526667; cv=none; b=puGfucJNNcNDqWVA0yISee0uKeeXOgcvPil2Liz2RfuzZXppBo7AEAGLbEItUmNvq4CsrYpdw1G0dOGF/8FIZdjZMJcY2zttvDXkCkrAgDU3EAiGwHjUbGIBVZRvAD2Qjqjdt8WP8R+63e4HLdQqP/7f+GpVtt4EZwcYOZLhWS8=
+	t=1729526719; cv=none; b=ZmwJ2LnzD/Y9hHfIZCnhVbTjRvUTJQsOWYqZxLMm3WPPAsaax6oAmccGyjQU5NpaIfR+F6TntMKgOWdDz5oU7g13HjtnW0jepXmcegmMYsW/dPWVsCCXbKGUURHxZrQoPes+Uuy2TkTt9mY18yzje25177slokYjpH2KGbd+hkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729526667; c=relaxed/simple;
-	bh=NL+4/LzqhG5DQhyBo4s8Tz4jSgHK8KIC8B9jAve3quc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IOq45cbL/7IZouneX3CvLLS1oej5kYXXTWjtck5kD33DlDu5po5s55tX3UMrGh6EdDcV2a3jJ+jUcS/A+2ofxLxDn+hehc6CnvOMnCZW0WvfatGVEvE54LpLdle0zZVYoO6w4QCn1NMZw5TjF4xUGgjgHvz9mAl0Z/lrtypNHbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WnzhvlNU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=f9aYH+x6gNVLLNdDAZPgbvN0mWCyYxKH2GG7iO1Wl7Y=; b=WnzhvlNUN6sZc9f1yvS/HqH8Yp
-	p/EFSUsHn8p2P1NpBFy6xghFT86CX9gMKiDmW585mguvwZMd95YWSdgO1xjGQVxkKSjRtd8o+wv0T
-	YIm+hoGfhVZvnHw4iPGUzCkdbqZ7CAX/UAJhkBullDrH25afPXu0xcT4Iz0Q+yl0Co50=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t2utJ-00AkNI-TR; Mon, 21 Oct 2024 18:04:21 +0200
-Date: Mon, 21 Oct 2024 18:04:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jingyi Wang <quic_jingyw@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	quic_tengfan@quicinc.com, linux-arm-msm@vger.kernel.org,
-	linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	quic_tingweiz@quicinc.com, quic_aiquny@quicinc.com,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v3 0/2] pinctrl: qcom: Introduce Pinctrl for QCS8300
-Message-ID: <1e73d96c-6a60-4bd7-87bf-4af4956aea7e@lunn.ch>
-References: <20241018-qcs8300_tlmm-v3-0-8b8d3957cf1a@quicinc.com>
- <f9dace93-f6c7-40c2-a6d2-60ce8043aa72@lunn.ch>
- <5fa2080a-f59e-405e-ba52-69d7293e2739@quicinc.com>
- <145d9036-6cd8-4aeb-80d0-b3d86b84f2cf@quicinc.com>
+	s=arc-20240116; t=1729526719; c=relaxed/simple;
+	bh=bwYkQ3sWDCi32JQEcQ6eLwG1gLM9hPV5hAJeIZmKDcE=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=uSBpsS2ZkeG926KvE9TukR5bz6ACJfviaH8m2q+RoDD9zBjgs0LlyMjrXzLbHt2WiGkzH1S+c1rzABoSZkqsvu7hQc3MAp4icMGTUCh8qxDqhCC3r7fz8lCfWyMwnmzuTEDZhIph2xJOFqfgQdyP+P53GCR0RWFspOJuPILh52Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=vxQ5XsXo; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=F8uPGvKK; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 9AF1A11400C8;
+	Mon, 21 Oct 2024 12:05:15 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 21 Oct 2024 12:05:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1729526715; x=1729613115; bh=+BVtPjQ3pduOT1KYrMmhkoLb12zHyfqI
+	06iQvVn/JV4=; b=vxQ5XsXo5BQQPOpRDIcpPBEfW8yeOboeRW4tHiJZqYoJAOy4
+	zDGGmbOC5wAmK1W7QlXz5PTgGTVjq51O9UuTK+wEF5Tm1iymSJKKo7pDndlA+TN4
+	YXPcGVtT3bnkADERD5hTQYhFu25WnB+y1Wkg8fvRI4fUn2RandHQev4pDvH1JABT
+	iTZL/gR2iwB8JX1mkSyfSqGgZnPXANnVaIvjV0FQEbZeESZjWEprV5xdlfn51tck
+	AgFYk+rseMFyqXEmXm6+Z1ypj4ZGjg4bGKK+fW8gMQfvIytpgpsDGPDZZyxUp1kd
+	sMYI1XwJCrgnkBgYRsXuRE8yn+t+4Xg1MrKmvA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1729526715; x=
+	1729613115; bh=+BVtPjQ3pduOT1KYrMmhkoLb12zHyfqI06iQvVn/JV4=; b=F
+	8uPGvKKy7SyE8HfcJ688Fa126xdBhq+jNNgCuShBg83Y7Dyl7T5vKyoeTfkBm2VT
+	Cdn1trxVr0W1LVycuzD9Km4XHSRBAMELguXTH5/il7OQB8LtGwfSOJQE9PPazGcR
+	/hNyOclP17uxtkEPGy7G+goS/oVvUCnUJLvQzl3B/itnF3VpRjWUgBz7Fdgtwtlf
+	hWafKWtQ/bpDR+9HK9Rfdao6UhVSdhTYQrAabBEOrhHcRyuxqHdeoUiwI1u4XHd5
+	iTbNB366KEGeb9dsslh3dSNq/6YV7I4SWXX+vaQc56OTMuZScP743k7yNsHg2E5O
+	ytvgiYl4YzfhBjdq7ryqg==
+X-ME-Sender: <xms:unsWZ-1Umi3dWC0GTA0i7W3RqJk7ASsOdVco1Qvq70RjJKNwFQMwGg>
+    <xme:unsWZxEzdSvV6_CoxCUlckmIOxsZZs4JsghiwqQrhNxVpP4mFuga5ovwS5zgBBYwN
+    j7UrwFLm9OSKVVbBiQ>
+X-ME-Received: <xmr:unsWZ25c1JUKY-CPn6kh-zvB7f_TIjpiJbbhFvohffiD09CZ8DovVpKGtDm3iNugurryo-0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehledgleejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhephffvvefujghfofggtgfgfffksehtqhertdertdej
+    necuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnh
+    gvtheqnecuggftrfgrthhtvghrnhepgeefgffhgffhhfejgfevkefhueekvefftefhgfdt
+    uddtfeffueehleegleeiuefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthho
+    pedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgriihorhessghlrggtkh
+    ifrghllhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
+    pdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
+    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegrnhguhiesghhr
+    vgihhhhouhhsvgdrnhgvthdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
+    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:u3sWZ_2awXR6lRVDtC07vkDFoJ4bFdsjg46IgCMemdfYPVpN4TpGHA>
+    <xmx:u3sWZxEQLiuh127m3nc0Df0HllU2xVQbFUKFYgKQwtYuLxzi73yyYQ>
+    <xmx:u3sWZ4-5ntMsNQMcEvfHIAKa7WLbPsJqlaCMWnlFy7oORPGCUppSRA>
+    <xmx:u3sWZ2kNvTkl4FML3z2Rsy1x68Aq8SCz2jdGgJRBOWSL98tYDCduLg>
+    <xmx:u3sWZ5_I7IrhMKwyk91mcB23WCZoW6_cUtI1X2iRLFFkAcHbeIrMb4qT>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 21 Oct 2024 12:05:14 -0400 (EDT)
+Received: by vermin.localdomain (Postfix, from userid 1000)
+	id 7173C1C0461; Mon, 21 Oct 2024 09:05:11 -0700 (PDT)
+Received: from vermin (localhost [127.0.0.1])
+	by vermin.localdomain (Postfix) with ESMTP id 70B2E1C00DD;
+	Mon, 21 Oct 2024 18:05:11 +0200 (CEST)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: add ns target multicast address to slave device
+In-reply-to: <20241021083052.2865-1-liuhangbin@gmail.com>
+References: <20241021083052.2865-1-liuhangbin@gmail.com>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Mon, 21 Oct 2024 08:30:52 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <145d9036-6cd8-4aeb-80d0-b3d86b84f2cf@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Oct 2024 18:05:11 +0200
+Message-ID: <58777.1729526711@vermin>
 
-On Mon, Oct 21, 2024 at 12:27:36PM +0800, Jingyi Wang wrote:
-> 
-> 
-> On 10/21/2024 10:32 AM, Jingyi Wang wrote:
-> > 
-> > 
-> > On 10/19/2024 2:08 AM, Andrew Lunn wrote:
-> >> On Fri, Oct 18, 2024 at 11:19:30AM +0800, Jingyi Wang wrote:
-> >>> Introduce Top Level Mode Multiplexer dt-binding and driver for Qualcomm
-> >>> QCS8300 SoC.
-> >>>
-> >>> Signed-off-by: Jingyi Wang <quic_jingyw@quicinc.com>
-> >>
-> >> I'm curious why you are Cc: netdev for a pin controller patch?  Did
-> >> ./scripts/get_maintainer.pl say you should?
-> >>
-> > The cc list was generated by the b4 tools.
-> 
-> double checked with ./scripts/get_maintainer.pl, also get the list:
-> netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
-> 
-> I think the list should be added for keyword match in the driver.
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-I assume this is a PTP pin probably a 1 pps output, not an actual PTP
-driver hidden within the pinctrl? If so, please edit the list and
-remove netdev and Richard. You might want to review the other emails
-and see if they all make sense.
+>Commit 4598380f9c54 ("bonding: fix ns validation on backup slaves")
+>tried to resolve the issue where backup slaves couldn't be brought up when
+>receiving IPv6 Neighbor Solicitation (NS) messages. However, this fix only
+>worked for drivers that receive all multicast messages, such as the veth
+>interface.
+>
+>For standard drivers, the NS multicast message is silently dropped because
+>the slave device is not a member of the NS target multicast group.
+>
+>To address this, we need to make the slave device join the NS target
+>multicast group, ensuring it can receive these IPv6 NS messages to validate
+>the slave=E2=80=99s status properly.
+>
+>Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+>Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-	Andrew
+	This seems fairly involved; would it be simpler to have
+bond_hw_addr_swap() and/or bond_change_active_slave() insure that the
+MAC multicast list is configured in the backup interface if arp_validate
+is set appropriately and there's a NS target configured?  That will make
+the MAC multicast list more inclusive than necessary, but I think the
+implementation will be much less involved.
+
+	-J
+
+>---
+>Another way is to set IFF_ALLMULTI flag for slaves. But I think that
+>would affect too much.
+>---
+> drivers/net/bonding/bond_main.c    | 11 ++++++++
+> drivers/net/bonding/bond_options.c | 44 +++++++++++++++++++++++++++++-
+> include/net/bond_options.h         |  2 ++
+> 3 files changed, 56 insertions(+), 1 deletion(-)
+>
+>diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
+in.c
+>index b1bffd8e9a95..04ccbd41fb0c 100644
+>--- a/drivers/net/bonding/bond_main.c
+>+++ b/drivers/net/bonding/bond_main.c
+>@@ -2350,6 +2350,11 @@ int bond_enslave(struct net_device *bond_dev, struc=
+t net_device *slave_dev,
+> 	if (bond_mode_can_use_xmit_hash(bond))
+> 		bond_update_slave_arr(bond, NULL);
+>=20
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+	if (slave_dev->flags & IFF_MULTICAST)
+>+		/* set target NS maddrs for new slave */
+>+		slave_set_ns_maddr(bond, slave_dev, true);
+>+#endif
+>=20
+> 	if (!slave_dev->netdev_ops->ndo_bpf ||
+> 	    !slave_dev->netdev_ops->ndo_xdp_xmit) {
+>@@ -2503,6 +2508,12 @@ static int __bond_release_one(struct net_device *bo=
+nd_dev,
+> 	/* recompute stats just before removing the slave */
+> 	bond_get_stats(bond->dev, &bond->bond_stats);
+>=20
+>+#if IS_ENABLED(CONFIG_IPV6)
+>+	if (slave_dev->flags & IFF_MULTICAST)
+>+		/* clear all target NS maddrs */
+>+		slave_set_ns_maddr(bond, slave_dev, false);
+>+#endif
+>+
+> 	if (bond->xdp_prog) {
+> 		struct netdev_bpf xdp =3D {
+> 			.command =3D XDP_SETUP_PROG,
+>diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond=
+_options.c
+>index 95d59a18c022..823cb93d2853 100644
+>--- a/drivers/net/bonding/bond_options.c
+>+++ b/drivers/net/bonding/bond_options.c
+>@@ -1234,17 +1234,41 @@ static int bond_option_arp_ip_targets_set(struct b=
+onding *bond,
+> }
+>=20
+> #if IS_ENABLED(CONFIG_IPV6)
+>+/* convert IPv6 address to link-local solicited-node multicast mac addres=
+s */
+>+static void ipv6_addr_to_solicited_mac(const struct in6_addr *addr,
+>+				       unsigned char mac[ETH_ALEN])
+>+{
+>+	mac[0] =3D 0x33;
+>+	mac[1] =3D 0x33;
+>+	mac[2] =3D 0xFF;
+>+	mac[3] =3D addr->s6_addr[13];
+>+	mac[4] =3D addr->s6_addr[14];
+>+	mac[5] =3D addr->s6_addr[15];
+>+}
+>+
+> static void _bond_options_ns_ip6_target_set(struct bonding *bond, int slo=
+t,
+> 					    struct in6_addr *target,
+> 					    unsigned long last_rx)
+> {
+>+	unsigned char target_maddr[ETH_ALEN], slot_maddr[ETH_ALEN];
+> 	struct in6_addr *targets =3D bond->params.ns_targets;
+> 	struct list_head *iter;
+> 	struct slave *slave;
+>=20
+>+	if (!ipv6_addr_any(target))
+>+		ipv6_addr_to_solicited_mac(target, target_maddr);
+> 	if (slot >=3D 0 && slot < BOND_MAX_NS_TARGETS) {
+>-		bond_for_each_slave(bond, slave, iter)
+>+		if (!ipv6_addr_any(&targets[slot]))
+>+			ipv6_addr_to_solicited_mac(&targets[slot], slot_maddr);
+>+		bond_for_each_slave(bond, slave, iter) {
+> 			slave->target_last_arp_rx[slot] =3D last_rx;
+>+			/* remove the previous maddr on salve */
+>+			if (!ipv6_addr_any(&targets[slot]))
+>+				dev_mc_del(slave->dev, slot_maddr);
+>+			/* add new maddr on slave if target is set */
+>+			if (!ipv6_addr_any(target))
+>+				dev_mc_add(slave->dev, target_maddr);
+>+		}
+> 		targets[slot] =3D *target;
+> 	}
+> }
+>@@ -1290,6 +1314,24 @@ static int bond_option_ns_ip6_targets_set(struct bo=
+nding *bond,
+>=20
+> 	return 0;
+> }
+>+
+>+void slave_set_ns_maddr(struct bonding *bond, struct net_device *slave_de=
+v,
+>+			bool add)
+>+{
+>+	struct in6_addr *targets =3D bond->params.ns_targets;
+>+	unsigned char slot_maddr[ETH_ALEN];
+>+	int i;
+>+
+>+	for (i =3D 0; i < BOND_MAX_NS_TARGETS; i++) {
+>+		if (!ipv6_addr_any(&targets[i])) {
+>+			ipv6_addr_to_solicited_mac(&targets[i], slot_maddr);
+>+			if (add)
+>+				dev_mc_add(slave_dev, slot_maddr);
+>+			else
+>+				dev_mc_del(slave_dev, slot_maddr);
+>+		}
+>+	}
+>+}
+> #else
+> static int bond_option_ns_ip6_targets_set(struct bonding *bond,
+> 					  const struct bond_opt_value *newval)
+>diff --git a/include/net/bond_options.h b/include/net/bond_options.h
+>index 473a0147769e..c6c5c1333f37 100644
+>--- a/include/net/bond_options.h
+>+++ b/include/net/bond_options.h
+>@@ -160,6 +160,8 @@ static inline void __bond_opt_init(struct bond_opt_val=
+ue *optval,
+> void bond_option_arp_ip_targets_clear(struct bonding *bond);
+> #if IS_ENABLED(CONFIG_IPV6)
+> void bond_option_ns_ip6_targets_clear(struct bonding *bond);
+>+void slave_set_ns_maddr(struct bonding *bond, struct net_device *slave_de=
+v,
+>+			bool add);
+> #endif
+>=20
+> #endif /* _NET_BOND_OPTIONS_H */
+>--=20
+>2.46.0
+>
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
