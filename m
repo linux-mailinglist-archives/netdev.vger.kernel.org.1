@@ -1,71 +1,75 @@
-Return-Path: <netdev+bounces-137603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D10859A7264
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:33:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A339A7265
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 20:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C64C1C22ABB
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:33:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEF2A281CFA
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 18:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BED1F9428;
-	Mon, 21 Oct 2024 18:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8690A1F9AB4;
+	Mon, 21 Oct 2024 18:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XB+KDvAT"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="H+zckunK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69653A41
-	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 18:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604941F9AB1
+	for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 18:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729535586; cv=none; b=a/LmuJPiBICG24g1JMJYvhzNLpgCsa6dCRpldEnTITMb80tUHc6y/RMxbZ42YbJszA/J40CZxm06H0nSEL09fjELQr9A+tZXXqTAbo6sk2oxSClhFdIZBwURDee+Ic5r+tnshyz9MgUQIK5ZfrUvUierqCiZYOQcJ10RdKfiCp0=
+	t=1729535591; cv=none; b=iVXx3KfqbJ4Glu1tzKjHvCtsm994aYCwHSeH4Ewyar4ME9jPKkjpycqJt/WIoev6OzAMOZfM0RKv5RgAJotJsD1ql5ybb4xQM3QmvCE8cuoY95K6VQoR4Umn6M5cFdcCMicuh3j1nOfCfOrXSRkkmtJks/MQLxUbDgQ5VTev8+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729535586; c=relaxed/simple;
-	bh=a1xyOXu5df84wWVlaWmZ1lLTFVjmRH9oDVLRvJWVDOs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Pu7qdukpOOIHs/yxOaS2A/TEZDnDC74WqfO2tlqWcDl10G83HFl8vxAq9T39vZkcnQlrGPeEolFLEut1p0YjEiNW00AAV1LV1ev9xaxVE0CDpq6LwZsm3V+IuuxHRoTHphsZ5+vXbHAlN/WLJoL/SkkYR/35QEqMbFtXcXoTVio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XB+KDvAT; arc=none smtp.client-ip=207.171.188.206
+	s=arc-20240116; t=1729535591; c=relaxed/simple;
+	bh=7tP5PYf7ym+mdgfNXUzCUt8AZvaclDZzA0il9MkBV00=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FMjtUeCu4ohK6pkNP6M1Rdjyx8u5NLGJoU2KvMoskxehULTCZoiq1+iahkcjiv9ad2tm9khz6/9tuYrdjh6fg7Zw2ZzuZ3NFiRddcI/SA+zH9xLJQiT0VTRVUACLz2mtuWIiqQjiXFT31+7CG97+Kz9JFu2mtUVC9SphbkmOWOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=H+zckunK; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729535584; x=1761071584;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=m3E5BP0XBDZnWoBqpKPV7REejm2AMpHJL8XpocIc/fs=;
-  b=XB+KDvATg+84WvHYCXj0Ygwtc+xyWiySf6VaxshwrWF5B5umvuQH+v65
-   0Dv9qzHJ30ezhU/h240ZoViaCNhuU7NZ/GseRL/TtI8+sonmKmaRzOvcu
-   2EVg9hx15PL3cylt3RtnTuI9lOGSJAAWkavRcsiWjODFp98EKG03p7Xh1
-   o=;
+  t=1729535589; x=1761071589;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0AecA/gX3pBxT0tBzVfIB+2jl7iiXBAo+MRFT+7Jv/Q=;
+  b=H+zckunKjTzcX/854zumgnKHH6FjuEYyaonwFqtbuSSwWBn2TtcdyT3l
+   oZPPUFEI7CWGnyx0x7WzC1/3KTSrTZsoaOa7H4TfQcSI6Ug3zHI4ssjC5
+   OWS4NeYBCAgN1lU+jSpgyPUCjE1i4ssPBMpAInSKxj+UA4bubHomFcbvQ
+   4=;
 X-IronPort-AV: E=Sophos;i="6.11,221,1725321600"; 
-   d="scan'208";a="768996922"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 18:32:55 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:61152]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.189:2525] with esmtp (Farcaster)
- id a2593c8c-6c58-49d5-baf6-1242584f3ace; Mon, 21 Oct 2024 18:32:46 +0000 (UTC)
-X-Farcaster-Flow-ID: a2593c8c-6c58-49d5-baf6-1242584f3ace
+   d="scan'208";a="241197147"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 18:33:06 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:21701]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
+ id 19c65a6a-63f5-4b8b-ac0d-61a49e5273c4; Mon, 21 Oct 2024 18:33:05 +0000 (UTC)
+X-Farcaster-Flow-ID: 19c65a6a-63f5-4b8b-ac0d-61a49e5273c4
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 21 Oct 2024 18:32:46 +0000
+ Mon, 21 Oct 2024 18:33:05 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.222.5) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 21 Oct 2024 18:32:43 +0000
+ Mon, 21 Oct 2024 18:33:02 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 00/12] ipv4: Convert RTM_{NEW,DEL}ADDR and more to per-netns RTNL.
-Date: Mon, 21 Oct 2024 11:32:27 -0700
-Message-ID: <20241021183239.79741-1-kuniyu@amazon.com>
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, kernel test robot
+	<lkp@intel.com>
+Subject: [PATCH v1 net-next 01/12] rtnetlink: Make per-netns RTNL dereference helpers to macro.
+Date: Mon, 21 Oct 2024 11:32:28 -0700
+Message-ID: <20241021183239.79741-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241021183239.79741-1-kuniyu@amazon.com>
+References: <20241021183239.79741-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,46 +78,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The IPv4 address hash table and GC are already namespacified.
+When CONFIG_DEBUG_NET_SMALL_RTNL is off, rtnl_net_dereference() is the
+static inline wrapper of rtnl_dereference() returning a plain (void *)
+pointer to make sure net is always evaluated as requested in [0].
 
-This series converts RTM_NEWADDR/RTM_DELADDR and some more
-RTNL users to per-netns RTNL.
+But, it makes sparse complain [1] when the pointer has __rcu annotation:
 
+  net/ipv4/devinet.c:674:47: sparse: warning: incorrect type in argument 2 (different address spaces)
+  net/ipv4/devinet.c:674:47: sparse:    expected void *p
+  net/ipv4/devinet.c:674:47: sparse:    got struct in_ifaddr [noderef] __rcu *
 
-Changes:
-  v2:
-    * Add patch 1 to address sparse warning for CONFIG_DEBUG_NET_SMALL_RTNL=n
-    * Add Eric's tags to patch 2-12
+Also, if we evaluate net as (void *) in a macro, then the compiler
+in turn fails to build due to -Werror=unused-value.
 
-  v1: https://lore.kernel.org/netdev/20241018012225.90409-1-kuniyu@amazon.com/
+  #define rtnl_net_dereference(net, p)                  \
+        ({                                              \
+                (void *)net;                            \
+                rtnl_dereference(p);                    \
+        })
 
+  net/ipv4/devinet.c: In function ‘inet_rtm_deladdr’:
+  ./include/linux/rtnetlink.h:154:17: error: statement with no effect [-Werror=unused-value]
+    154 |                 (void *)net;                            \
+  net/ipv4/devinet.c:674:21: note: in expansion of macro ‘rtnl_net_dereference’
+    674 |              (ifa = rtnl_net_dereference(net, *ifap)) != NULL;
+        |                     ^~~~~~~~~~~~~~~~~~~~
 
-Kuniyuki Iwashima (12):
-  rtnetlink: Make per-netns RTNL dereference helpers to macro.
-  rtnetlink: Define RTNL_FLAG_DOIT_PERNET for per-netns RTNL doit().
-  ipv4: Factorise RTM_NEWADDR validation to inet_validate_rtm().
-  ipv4: Don't allocate ifa for 0.0.0.0 in inet_rtm_newaddr().
-  ipv4: Convert RTM_NEWADDR to per-netns RTNL.
-  ipv4: Use per-netns RTNL helpers in inet_rtm_newaddr().
-  ipv4: Convert RTM_DELADDR to per-netns RTNL.
-  ipv4: Convert check_lifetime() to per-netns RTNL.
-  rtnetlink: Define rtnl_net_trylock().
-  ipv4: Convert devinet_sysctl_forward() to per-netns RTNL.
-  ipv4: Convert devinet_ioctl() to per-netns RTNL except for
-    SIOCSIFFLAGS.
-  ipv4: Convert devinet_ioctl to per-netns RTNL.
+Let's go back to the original simplest macro.
 
- include/linux/inetdevice.h |   9 ++
- include/linux/rtnetlink.h  |  25 +++--
- include/net/rtnetlink.h    |   1 +
- net/core/dev_ioctl.c       |   6 +-
- net/core/rtnetlink.c       |  11 +++
- net/ipv4/devinet.c         | 190 +++++++++++++++++++++----------------
- 6 files changed, 143 insertions(+), 99 deletions(-)
+Note that checkpatch complains about this approach, but it's one-shot and
+less noisy than the other two.
 
+  WARNING: Argument 'net' is not used in function-like macro
+  #76: FILE: include/linux/rtnetlink.h:142:
+  +#define rtnl_net_dereference(net, p)			\
+  +	rtnl_dereference(p)
+
+Fixes: 844e5e7e656d ("rtnetlink: Add assertion helpers for per-netns RTNL.")
+Link: https://lore.kernel.org/netdev/20241004132145.7fd208e9@kernel.org/ [0]
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202410200325.SaEJmyZS-lkp@intel.com/ [1]
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/linux/rtnetlink.h | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
+
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index 8468a4ce8510..0e62918de63b 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -137,21 +137,12 @@ static inline void ASSERT_RTNL_NET(struct net *net)
+ 	ASSERT_RTNL();
+ }
+ 
+-static inline void *rcu_dereference_rtnl_net(struct net *net, void *p)
+-{
+-	return rcu_dereference_rtnl(p);
+-}
+-
+-static inline void *rtnl_net_dereference(struct net *net, void *p)
+-{
+-	return rtnl_dereference(p);
+-}
+-
+-static inline void *rcu_replace_pointer_rtnl_net(struct net *net,
+-						 void *rp, void *p)
+-{
+-	return rcu_replace_pointer_rtnl(rp, p);
+-}
++#define rcu_dereference_rtnl_net(net, p)		\
++	rcu_dereference_rtnl(p)
++#define rtnl_net_dereference(net, p)			\
++	rtnl_dereference(p)
++#define rcu_replace_pointer_rtnl_net(net, rp, p)	\
++	rcu_replace_pointer_rtnl(rp, p)
+ #endif
+ 
+ static inline struct netdev_queue *dev_ingress_queue(struct net_device *dev)
 -- 
 2.39.5 (Apple Git-154)
 
