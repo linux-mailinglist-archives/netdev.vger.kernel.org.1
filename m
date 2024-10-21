@@ -1,139 +1,147 @@
-Return-Path: <netdev+bounces-137363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D5A9A5993
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 06:36:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32AE99A59A3
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BF4E280F35
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 04:36:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71264B221C3
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 05:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63223193432;
-	Mon, 21 Oct 2024 04:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79079192D77;
+	Mon, 21 Oct 2024 05:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Twem3gfa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNAxcD9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0322C95;
-	Mon, 21 Oct 2024 04:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95ACD629;
+	Mon, 21 Oct 2024 05:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729485364; cv=none; b=WOA1i/1aM21yHkuH2gKv3nBnnUyYaZeUFgyXI5z3ifuXCLplcYqYu87zMxM1UeOLPoQWRMReKDuf/MRpqhRln9W6dpDy4l6ZqlSzPjnn+BmiU2nSHsNA0akaTXkloQn9svHGzYjt0Iyu7TjUFDKF6NYltSXppigbEJyw5BZKeeM=
+	t=1729487167; cv=none; b=hlg1JQCmxW3b/TMYjCZnRPar5oxyjvbZ9NchWbR/OY8aHxOIqCEWX+Er1Zny2GmAnFcq85utMncHJsbtRc9Ks9AgNxhtR09Pm2jKochLS6Ct2M/G+fx8KhjIzWpyDV1igARs/LdpNjERa4TlLUAkRSRPLwNT5IEGEr5sTfSkJQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729485364; c=relaxed/simple;
-	bh=kfyBl89qi07l58LqgOVh/E+t7hT9q6eZ/J9aUMqlDdU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sJ/GT4iZ4kOQV/GJe2HVQLsQ9RmU78aNybGbzY2jLgPNXYigi51qGTdpGYLnarhsFtaRXVlsNUVfkmCj0sqCHNJ8zhb1rNU4gv2cU24Rd2c/ChS2o8C4fLmLGn19vaH9WPxhJRiHfJaK2yPzBMQDYVdOWginGdkRoEMmvxpaRT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Twem3gfa; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1729487167; c=relaxed/simple;
+	bh=MgRSmbWGUnNutfhDtyB3M+teZjGQysKDhFqGvpIwpzQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eWdHY0RscfAOwrJqO1+AxM48R0LTRUTcuUsnCZ7s56iIeOnhUQLBcHOczruEKK1IMnVgsWh+a7ezRiVeNMB1M6dYwZBeTSWHOmFs2aQj0vxjGfIYGmikExWKezQpqoT5HjFCmAQxk6PDrQ3Pc9o3QANam4ZygT7OLw08lOfIH4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RNAxcD9o; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20cceb8d8b4so22714145ad.1;
+        Sun, 20 Oct 2024 22:06:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1729485353;
-	bh=SWW3lLflcZSTt/7kAMirXY1p2/5OZLkG+On5G9EG8/A=;
-	h=From:Date:Subject:To:Cc;
-	b=Twem3gfa9XF7vZ9+LBBoBs/KVaTjd5iDwmUpGIHcQHNvjpk+k42dMqotBhFknCfC/
-	 tn1EeUwJY4ONJGbsmFGyMCpXAV6hf4cnVktpwRPC/KL6ht8Y4KjXFHbWKKgwRgApbj
-	 9JjEIBPUbnh+ikgxFIx8xvHYlfpthwrGsMKpq908znJ991vx8KhJhnDM9P//cerDbr
-	 IloAw5RWtSw6n2iYsC1Wl0TAA3ChCf8jQ4DFJ+21o7HWP4LGL/CP2YkmN8vN9E0q/S
-	 okSsvfRvgA9arsO3NPMcA1BnMHHwweMgMocF8imL0QKUgIhVdf0OqISw+kCZO4YpA9
-	 pAKVP50bRZ5Ag==
-Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id D2D4368607; Mon, 21 Oct 2024 12:35:53 +0800 (AWST)
-From: Matt Johnston <matt@codeconstruct.com.au>
-Date: Mon, 21 Oct 2024 12:35:26 +0800
-Subject: [PATCH net v2] mctp i2c: handle NULL header address
+        d=gmail.com; s=20230601; t=1729487165; x=1730091965; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ia8mDRf0t3XivCUQZ/+4vX8Trnl04korBJf9mPFCzns=;
+        b=RNAxcD9o7CokhfFKsHFvkwListPmP5KySgJvbHlWKW6byTniknv2jnGS012+CQ7ygU
+         CLg4MomHGVE3hJkoWArQS8H3ZzeSlslLzDitvV+28o9RWzPXwUvLhRJDlWm9yVEXmXjL
+         KahLk5wegdGGqL3jS8ju9Ya9Mnb9tUO/DfUjuxrjgAJn4QVDpGIFV3FxEHrJhqkZxHts
+         BA4CV5k/QvEilPILujpAUWWGhs9LDn5RLVBAQC2X2qWiZc0BqiX6Jxji9sZP4Pcp+0CZ
+         IsZpReoAFL2EKZ3uYk81vM/naFaHE2VOfZdyf8yRhUmGujcHYiuPkQaIxLWEj8JCiV8e
+         dgeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729487165; x=1730091965;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ia8mDRf0t3XivCUQZ/+4vX8Trnl04korBJf9mPFCzns=;
+        b=FScn7Vm1iVXc2w4f/FFoGIiEfxLp5bkwwBqxV7xnFI7aikAHdWhFW714JMd3mXBzQn
+         ksPjEDpehWH1feqaH3Ov/dPbB8E2onwJZiBL0+P3KBKbR+Wlif0Q6YcSJU+zOHwKn+pF
+         zZyol6+hU6rnMYdTwgxrMfgGIBJlyI8CiG/e7HLdu+PHL7794I09n/MQIcCUjxqUjqDX
+         c13n7g0sgdmLk02UL3CxdWM7WeWAdUZruHQ3+VNUAGEC+Turg+lNSzUir4RNKo9/VEdJ
+         w+4DgZXr3OMqlfQfOVxBi9EbnbO5uKUswC5/pygks0yaAo7KxHPDl0lb/VHeYbfodyYT
+         t6Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCU35rlx6ZsK5Ltp4w1y3c7WCrclhwnVkH0vfe7/ttu4EkPSlYKXooA72b6Jn0Gnt9BdJpfWCTnuQMLxYZQ=@vger.kernel.org, AJvYcCXLNgxVrP59PxKaW3dnG+SitgQbaArOZB23b02FrHLVV+x4o3/EzKNFOcPvokXvAxK16h8dCfzi@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEW2HHazzNGJuMQEghJhRl2TP+OrtnIlz6X9QAxdac0pir9hFq
+	VuX5wyTDVB014KRso/vh5SqBvrRUQD1p2X799jxyj1ajChGYnEcb
+X-Google-Smtp-Source: AGHT+IFduHHYOeGnIjHKPhqSRTid9Q8opnKcs7z5l4h7HwBhUORtSS/HEc6X+MCCWiyS/K7HSNxigA==
+X-Received: by 2002:a17:903:244c:b0:20c:f39e:4c04 with SMTP id d9443c01a7336-20d471ec6ddmr224478475ad.2.1729487164568;
+        Sun, 20 Oct 2024 22:06:04 -0700 (PDT)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0e1ba7sm17686565ad.238.2024.10.20.22.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Oct 2024 22:06:04 -0700 (PDT)
+Date: Mon, 21 Oct 2024 13:05:54 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: 2694439648@qq.com
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ hailong.fan@siengine.com
+Subject: Re: [PATCH v1] net: stmmac: enable MAC after MTL configuring
+Message-ID: <20241021130554.00005cf5@gmail.com>
+In-Reply-To: <tencent_CCC29C4F562F2DEFE48289DB52F4D91BDE05@qq.com>
+References: <tencent_CCC29C4F562F2DEFE48289DB52F4D91BDE05@qq.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIAA3aFWcC/32NQQqDMBBFryKz7kgSrNWueo/iIo7TOqCJJFFax
- Ls3eIAu3//893eIHIQj3IsdAm8SxbsM5lIAjda9GWXIDEaZSivd4ExpQTGEbp0mHDgmtKq35qZ
- ZUdVAHi6BX/I5pU9wnKDL4Sgx+fA9jzZ9Vv+cm0aNvdW2v5q2rrl9kB+YvIsprJRK8nNpV+iO4
- /gBy/ICRcQAAAA=
-X-Change-ID: 20241018-mctp-i2c-null-dest-a0ba271e0c48
-To: Jeremy Kerr <jk@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matt Johnston <matt@codeconstruct.com.au>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Wolfram Sang <wsa@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Dung Cao <dung@os.amperecomputing.com>
-X-Mailer: b4 0.15-dev-cbbb4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1729485352; l=2035;
- i=matt@codeconstruct.com.au; s=20241018; h=from:subject:message-id;
- bh=kfyBl89qi07l58LqgOVh/E+t7hT9q6eZ/J9aUMqlDdU=;
- b=g8pthMSNyYuR426kRcv+rNB5vPq1JTxfSaNyB/pLReNKQr30VxaDqtwxBo/x6cHU755b1KqIm
- NS1QpeuuzdbDZMqYl6SqN+gNnn/6WS1F7p8opuPbPhlo58ziKBBOG/3
-X-Developer-Key: i=matt@codeconstruct.com.au; a=ed25519;
- pk=exersTcCYD/pEBOzXGO6HkLd6kKXRuWxHhj+LXn3DYE=
 
-daddr can be NULL if there is no neighbour table entry present,
-in that case the tx packet should be dropped.
+On Mon, 21 Oct 2024 09:03:05 +0800, 2694439648@qq.com wrote:
 
-saddr will normally be set by MCTP core, but in case it is NULL it
-should be set to the device address.
+> From: "hailong.fan" <hailong.fan@siengine.com>
+> 
+> DMA maybe block while ETH is opening,
+> Adjust the enable sequence, put the MAC enable last
+> 
+> For example, ETH is directly connected to the switch,
+> which never power down and sends broadcast packets at regular intervals.
+> During the process of opening ETH, data may flow into the MTL FIFO,
+> once MAC RX is enabled. and then, MTL will be set, such as FIFO size.
+> Once enable DMA, There is a certain probability that DMA will read
+> incorrect data from MTL FIFO, causing DMA to hang up.
+> By read DMA_Debug_Status, you can be observed that the RPS remains at
+> a certain value forever. The correct process should be to configure
+> MAC/MTL/DMA before enabling DMA/MAC
+> 
+> Signed-off-by: hailong.fan <hailong.fan@siengine.com>
+> 
 
-Incorrect indent of the function arguments is also fixed.
+A Fixes: tag should be added.
 
-Fixes: f5b8abf9fc3d ("mctp i2c: MCTP I2C binding driver")
-Cc: stable@vger.kernel.org
-Reported-by: Dung Cao <dung@os.amperecomputing.com>
-Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
----
-Changes in v2:
-- Set saddr to device address if NULL, mention in commit message
-- Fix patch prefix formatting
-- Link to v1: https://lore.kernel.org/r/20241018-mctp-i2c-null-dest-v1-1-ba1ab52966e9@codeconstruct.com.au
----
- drivers/net/mctp/mctp-i2c.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+>  static void dwxgmac2_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index e21404822..c19ca62a4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3437,9 +3437,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+>  		priv->hw->rx_csum = 0;
+>  	}
+>  
+> -	/* Enable the MAC Rx/Tx */
+> -	stmmac_mac_set(priv, priv->ioaddr, true);
+> -
+>  	/* Set the HW DMA mode and the COE */
+>  	stmmac_dma_operation_mode(priv);
+>  
+> @@ -3523,6 +3520,9 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+>  	/* Start the ball rolling... */
+>  	stmmac_start_all_dma(priv);
+>  
+> +	/* Enable the MAC Rx/Tx */
+> +	stmmac_mac_set(priv, priv->ioaddr, true);
+> +
 
-diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
-index 4dc057c121f5d0fb9c9c48bf16b6933ae2f7b2ac..c909254e03c21518c17daf8b813e610558e074c1 100644
---- a/drivers/net/mctp/mctp-i2c.c
-+++ b/drivers/net/mctp/mctp-i2c.c
-@@ -579,7 +579,7 @@ static void mctp_i2c_flow_release(struct mctp_i2c_dev *midev)
- 
- static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
- 				  unsigned short type, const void *daddr,
--	   const void *saddr, unsigned int len)
-+				  const void *saddr, unsigned int len)
- {
- 	struct mctp_i2c_hdr *hdr;
- 	struct mctp_hdr *mhdr;
-@@ -588,8 +588,15 @@ static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
- 	if (len > MCTP_I2C_MAXMTU)
- 		return -EMSGSIZE;
- 
--	lldst = *((u8 *)daddr);
--	llsrc = *((u8 *)saddr);
-+	if (daddr)
-+		lldst = *((u8 *)daddr);
-+	else
-+		return -EINVAL;
-+
-+	if (saddr)
-+		llsrc = *((u8 *)saddr);
-+	else
-+		llsrc = dev->dev_addr;
- 
- 	skb_push(skb, sizeof(struct mctp_i2c_hdr));
- 	skb_reset_mac_header(skb);
+This sequence fix should be applied to stmmac_xdp_open() too.
 
----
-base-commit: cb560795c8c2ceca1d36a95f0d1b2eafc4074e37
-change-id: 20241018-mctp-i2c-null-dest-a0ba271e0c48
+>  	stmmac_set_hw_vlan_mode(priv, priv->hw);
+>  
+>  	return 0;
 
-Best regards,
--- 
-Matt Johnston <matt@codeconstruct.com.au>
-
+It is better to split this patch into individual patches, since you are
+trying to fix an issue related to several previous commits:
+dwmac4, dwxgmac2, stmmac_hw_setup() and stmmac_xdp_open()
 
