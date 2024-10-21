@@ -1,124 +1,127 @@
-Return-Path: <netdev+bounces-137353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC969A590C
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 04:58:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC239A5922
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 05:12:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924F51C20C17
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 02:58:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36F54B21D1C
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 03:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8B82EB02;
-	Mon, 21 Oct 2024 02:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EB81CEEBB;
+	Mon, 21 Oct 2024 03:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="Anz6nZFF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOgCYaeN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9CFA92F;
-	Mon, 21 Oct 2024 02:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEFB171CD;
+	Mon, 21 Oct 2024 03:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729479490; cv=none; b=XvI0F0otKtAon0wK06DoiBcf0214yOSWKCdRufVL5oi+JhXC7IJhEFmT7JB1NiAjAh4+Qooml97zKzFn1Y9U+qrtl1X1RwQimDf1VBollfop0BrMCBT6bHLQ0zOMwy4StEcw+/le7uRQNH4FHMHwptyq0xYhQMHGzpG9Lyqrapo=
+	t=1729480352; cv=none; b=uOAOjXy/xrDrDOPHsihhxhpkkXxwGY3p5EHjosuiWhpKsezKIaGuGHnkDM3xDLi5sylHgKhgmEg3MH/s2Ss2hgvFt4A5VSFLb0nfnPfcQtaae0JFwnA1PhjJ0mUyI7PiIWFPMPXQo35eilvhrJfM1kdahpp7LsCjQWVHGIBZXg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729479490; c=relaxed/simple;
-	bh=gvnhP3QR2v/zK5Lm6aagczIw/TFzfWmYcKiZFGwl2KI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ld32+tHT/qF33LGYsfJ3sYOd5d0fAY428uI4LTdQkxN1JXY/jbo+rs9p2yBJCs15ndHIbu4SWeMCMHS4TAFgr7NFsVzSpiyJEAE2QXAxFMijSEV7XvfW1dizYgHmM43s6xZehSQoFhp420eV+Zx5oN3lw1RC/jmiqA9PgEVz+Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=Anz6nZFF; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 49L2vmNd024121
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 21 Oct 2024 04:57:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1729479472; bh=3wqb91UsdampFD5fRrQ9mHDNugrdeONpWtaLAOGbpjA=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=Anz6nZFF/IQ8xBjeZY+43+whTOWA2tUxLwdHaPJ1Bnqrmam2pKR6c5GtIO5AVBFoe
-	 mW55AKn1qGT/ssnmnwzlHy7WEqMA90p5IGYjjeJcof42dCTRSuPI7eT+D6SSAknsEF
-	 mrOAqsl1R88OVqeEzJWUY9YdSfu6b1e3IbC7cBIY=
-Message-ID: <74317861-2cff-424b-a3db-8b214cec5f70@ans.pl>
-Date: Sun, 20 Oct 2024 19:57:47 -0700
+	s=arc-20240116; t=1729480352; c=relaxed/simple;
+	bh=XPClw1EkUaCYvB49Dunbu6bS1sg4lNSa8+skiZQbTuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e7lDNTCM270gJJNaWPuBeYGuYRfR/1t1J5HE/p1y5cp3SZQbrYXzxaVMtDvkEVd8vaMFvuMMfTUsLickVMvhL7LqUjUNoCJ84TOKPfU1fMk1YNMDE1zAIGfTjBH2vFQFOvrUnZN2SFGnnkCFd4uFZDohZFNssUX9upm54HBpMCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOgCYaeN; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e3d523a24dso2889325a91.0;
+        Sun, 20 Oct 2024 20:12:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729480348; x=1730085148; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e5LuOh/rn5jw2USTpFPLEXHxUFS/M0lHLEDz3q66OdQ=;
+        b=kOgCYaeNGp8fOMS2HyyPMVbdMQG6HsKNcaVBR8e0z6EOlMQnYX8ggV61UEyoYSXL2l
+         C5zt8FvIRBMKgrqmxBAjJqmd1zXCj2RE1fI0Ke8BVC4RlN6PWO3XV2+Gbpb4JUxPULQK
+         7P6yGDbFSo1u7d7+WzUSwZuMgBpoGL/ADdzC93vShm/yyyGATJYC3i3WI4kteyyxct79
+         BG0WtsmYGYK6bEo6+hqQw7eNI/oKBkRWbkPO6OpIh9SXrZJlX+A371aRgdkHROA06i6c
+         WIDIBtW7dSxnHtlZnm4nBWic/7i8kbrer5i5cGSh1hsy4EQtvun5hYXcmPARjQqL/tci
+         Rzrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729480348; x=1730085148;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e5LuOh/rn5jw2USTpFPLEXHxUFS/M0lHLEDz3q66OdQ=;
+        b=ac+pv8RzRDooBLZL8/hcKrKVKAXwXhjcAZnPAG5SRll5q4Sutgd3CrJISvsK81JETL
+         apET9dEyT7I6ruV/CV/0k++A2UybitOn/jwwag+Z4VLeD2tc5FUoOyKDK83n5Weos0/Q
+         aOLqRKR+CcIz/1HU38eKZW4Z/ulcFVGvuJsw43Pm4RQziT2zDNksrn6dXqLf6rZ8NT3E
+         sSsXk02tTnT+qDB6QY1m7G9cLttlgi3fBUsnKAfegslh4IfKKCpw9+ZLbNCSYe8pSUE+
+         sIar85rbwx4FfhbYGU4QJ5rs1IYvr3ftuahdNWJNqwAECjYeDnIdvDWluRAdmP392pma
+         FYdg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwkHy1gRqutUGTiQhr2w8f7OtXaHfUP1IzV60qkC8MPn5Dy7KvuQY6sxPuycxLLp4a/x8iKAOxzeC/@vger.kernel.org, AJvYcCVY3K3ChIW7qa3jUTuVSJuTtbmvcHIj00esK9NPguv3nyeIC62RJMs4YlSZwvyT+OX8wHsj9Ld3gmAOVfYl@vger.kernel.org, AJvYcCWcPLYJQYIMSMaoViVACDosA2nRHCs8KV+OBemOb+9Yig2A1LYt8pZYxis6qg/LrCAH7Hk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXfarNj2sYll9P32Mbb3BNyfhlzWJZ9Cw3a81+jiVe3nXDoDM/
+	hBpPIl2rXWRwZ18++iS1qbY9t018D1Mj23eITNKBUfY70hg/VV77MrMuoG1qUpw=
+X-Google-Smtp-Source: AGHT+IG8V+B74M/AcZzbX5wyQnZOR31Yw/bTJyVewRkfJvdQ0Eh1MGiz9Rk/P6YLntko9JuvWikwKw==
+X-Received: by 2002:a17:90b:f87:b0:2e2:d821:1b77 with SMTP id 98e67ed59e1d1-2e5616509b4mr12108170a91.24.1729480348375;
+        Sun, 20 Oct 2024 20:12:28 -0700 (PDT)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7eee658esm16377845ad.13.2024.10.20.20.12.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Oct 2024 20:12:26 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrii Nakryiko <andriin@fb.com>,
+	Jussi Maki <joamaki@gmail.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 0/2] Bonding: returns detailed error about XDP failures
+Date: Mon, 21 Oct 2024 03:12:09 +0000
+Message-ID: <20241021031211.814-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: 6.6.57-stable regression: "netfilter: xtables: avoid
- NFPROTO_UNSPEC where needed" broke NFLOG on IPv6
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-To: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ilya Katsnelson <me@0upti.me>, Phil Sutter <phil@nwl.cc>
-Cc: stable@vger.kernel.org, netfilter-devel
- <netfilter-devel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <8eb81c74-4311-4d87-9c13-be6a99c94e2f@ans.pl>
-Content-Language: en-US
-In-Reply-To: <8eb81c74-4311-4d87-9c13-be6a99c94e2f@ans.pl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 19.10.2024 at 22:22, Krzysztof Olędzki wrote:
-> Hi,
-> 
-> After upgrading to 6.6.57 I noticed that my IPv6 firewall config failed to load.
-> 
-> Quick investigation flagged NFLOG to be the issue:
-> 
-> # ip6tables -I INPUT -j NFLOG
-> Warning: Extension NFLOG revision 0 not supported, missing kernel module?
-> ip6tables: No chain/target/match by that name.
-> 
-> The regression is caused by the following commit:
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit/?h=linux-6.6.y&id=997f67d813ce0cf5eb3cdb8f124da68141e91b6c
-> 
-> More precisely, the bug is in the change below:
-> 
-> +#if IS_ENABLED(CONFIG_IP6_NF_IPTABLES)
-> +	{
-> +		.name       = "NFLOG",
-> +		.revision   = 0,
-> +		.family     = NFPROTO_IPV4,
-> +		.checkentry = nflog_tg_check,
-> +		.destroy    = nflog_tg_destroy,
-> +		.target     = nflog_tg,
-> +		.targetsize = sizeof(struct xt_nflog_info),
-> +		.me         = THIS_MODULE,
-> +	},
-> +#endif
-> 
-> Replacing NFPROTO_IPV4 with NFPROTO_IPV6 fixed the issue.
-> 
-> Looking at the commit, it seems that at least one more target (MARK) may be also impacted:
-> 
-> +#if IS_ENABLED(CONFIG_IP6_NF_IPTABLES)
-> +	{
-> +		.name           = "MARK",
-> +		.revision       = 2,
-> +		.family         = NFPROTO_IPV4,
-> +		.target         = mark_tg,
-> +		.targetsize     = sizeof(struct xt_mark_tginfo2),
-> +		.me             = THIS_MODULE,
-> +	},
-> +#endif
-> 
-> The same errors seem to be present in the main tree:
->  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0bfcb7b71e735560077a42847f69597ec7dcc326
-> 
-> I also suspect other -stable trees may be impacted by the same issue.
+Based on discussion[1], this patch set returns detailed error about XDP
+failures. And update bonding document about XDP supports.
 
-Seems like this is already being taken care of:
+v3: drop patch that modified the return value (Toke Høiland-Jørgensen)
+    drop the sentence that repeat title (Nikolay Aleksandrov)
+v2: update the title in the doc (Nikolay Aleksandrov)
 
-https://lore.kernel.org/netdev/ZxT8ow0auDTe-TDA@calendula/T/#t
+[1]
+https://lore.kernel.org/netdev/8088f2a7-3ab1-4a1e-996d-c15703da13cc@blackwall.org/o
+Hangbin Liu (2):
+  bonding: return detailed error when loading native XDP fails
+  Documentation: bonding: add XDP support explanation
 
-Krzysztof
+ Documentation/networking/bonding.rst | 11 +++++++++++
+ drivers/net/bonding/bond_main.c      |  5 ++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+-- 
+2.46.0
+
 
