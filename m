@@ -1,83 +1,113 @@
-Return-Path: <netdev+bounces-137382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D449A5D60
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:44:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9B09A5E01
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 10:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90BDA1C23608
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:44:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49A451F23D03
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 08:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032831E0DDD;
-	Mon, 21 Oct 2024 07:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cdUIg4em"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31221E1C1E;
+	Mon, 21 Oct 2024 08:05:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B721E0DD4;
-	Mon, 21 Oct 2024 07:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from cmccmta3.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC56C1E1A23;
+	Mon, 21 Oct 2024 08:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729496654; cv=none; b=XSSqYGhWhMg+1622uLc0411jvDUscAhfMVQU2kCny+QsFB49emuyEU5cY8CjFMYz7lEmEPI0wYZqGivFZQpSaKpe8ert+bM6aPLZRk1UJXeZsAef/rL2Fq7SELKUiovCIAWyj+FJlagj8+j927DY7k6EmQvS9DZZLAqKaVzAzDY=
+	t=1729497903; cv=none; b=JfEUUDx907jwMNfS6QjFahPl2JBAyhp420LZ/yv+vCQZb/d4vWhrZidCVEz/7cdLcNaxDxum2qlXqYB9caUXgzznmj/1poTgcldexz8o5cjrKipWMWs+kKQKEnEYGUoB+fev2kUlOQDiBp2Scm3RmHHFYOHyrkvpTUaDvOHnph0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729496654; c=relaxed/simple;
-	bh=dmEkpj1SX2e3mHQUhOKtpvrPvJet0vNsLVPj9d+IIGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NoD5JOQduKijBnH8WerH/3x1RkcAGxMrI6T6RybSLUwRx+SrQfS3ULNFLRR4bQ3h76zSk9FiKcSnNJRMhqbsZDQg/gr4qonHu+aji17a6JO2WdDPZwdj6QT7CGW8i3iSGNPJWICvo9GW/i80xfOXk3Y1biLHR/iN5K0J/ap0+vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cdUIg4em; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C041BC4CEC3;
-	Mon, 21 Oct 2024 07:44:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1729496654;
-	bh=dmEkpj1SX2e3mHQUhOKtpvrPvJet0vNsLVPj9d+IIGQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cdUIg4emr5YXIh+f3xr5HDRub4+1C+zEb6YP7bg9qG9t/RYh6BfGLFtrnnw8s18/l
-	 CQ/e5Ex/ebMSaMtO6xFM/5fv9w4D9uSVuYQ8UDXTKAyPqPmpkKbavrQKR2xeLlc8ak
-	 S86PAlvWrebXu7QbPEe8z9HVlkYnk0JaoN/tSOf8=
-Date: Mon, 21 Oct 2024 09:44:11 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	Linux kernel regressions list <regressions@lists.linux.dev>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: Pls pick up two bluetooth fixes
-Message-ID: <2024102100-spongy-etching-0695@gregkh>
-References: <2fad9d09-c328-4353-be0b-cfcfef33ed01@leemhuis.info>
+	s=arc-20240116; t=1729497903; c=relaxed/simple;
+	bh=LGbII50R6hgO8HmPvsf0+iBOEdW4TEQSRo59AZhEgqI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cRy2bGnBo99Vg9tHPno7u0jCoEJqe//apmKNru3nEF0mV0TIp5c5jMU1B5t6FxcGfIAdBfnbSJPEyFJnSMmwvqUp4TcgyA/coZi0iwu3hQTJvubny8ZKC2LMO/fTcZmnUT81rjOWORrhjhKvIQGS8jT2zPnMV1c6PkRgHMk2wvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app09-12009 (RichMail) with SMTP id 2ee967160b21ee4-59ef1;
+	Mon, 21 Oct 2024 16:04:49 +0800 (CST)
+X-RM-TRANSID:2ee967160b21ee4-59ef1
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from localhost.localdomain.localdomain (unknown[10.55.1.70])
+	by rmsmtp-syy-appsvr02-12002 (RichMail) with SMTP id 2ee267160b20724-4b70c;
+	Mon, 21 Oct 2024 16:04:49 +0800 (CST)
+X-RM-TRANSID:2ee267160b20724-4b70c
+From: Liu Jing <liujing@cmss.chinamobile.com>
+To: pablo@netfilter.org
+Cc: kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Liu Jing <liujing@cmss.chinamobile.com>
+Subject: [PATCH] selftests: netfilter: remove unused parameter
+Date: Mon, 21 Oct 2024 16:04:47 +0800
+Message-Id: <20241021080447.2918-1-liujing@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2fad9d09-c328-4353-be0b-cfcfef33ed01@leemhuis.info>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 21, 2024 at 05:28:25AM +0200, Thorsten Leemhuis wrote:
-> Hi Greg! Please consider picking up the following two bluetooth fixes
-> for the next round of stable updates, they fix problems quite a few
-> users hit in various stable series due to backports:
-> 
-> 4084286151fc91 ("Bluetooth: btusb: Fix not being able to reconnect after
-> suspend") [v6.12-rc4] for 6.11.y
-> 
-> and
-> 
-> 2c1dda2acc4192 ("Bluetooth: btusb: Fix regression with fake CSR
-> controllers 0a12:0001") [v6.12-rc4] for 5.10.y and later
-> 
-> For details see also:
-> https://lore.kernel.org/all/CABBYNZL0_j4EDWzDS=kXc1Vy0D6ToU+oYnP_uBWTKoXbEagHhw@mail.gmail.com/
+Signed-off-by: Liu Jing <liujing@cmss.chinamobile.com>
 
-Now picked up, thanks!  Hopefully this fixes the bluetooth regression on
-my new laptop, I haven't had the time to bisect it yet...
+---
+V1 -> V2:  Delete more unused parameters, such as err, v1 only deleted rplnlh parameter
 
-greg k-h
+Signed-off-by: Liu Jing <liujing@cmss.chinamobile.com>
+---
+ .../testing/selftests/net/netfilter/conntrack_dump_flush.c  | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+index e03ddc60b5d4..63ae49f166a1 100644
+--- a/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
++++ b/tools/testing/selftests/net/netfilter/conntrack_dump_flush.c
+@@ -97,7 +97,7 @@ static int conntrack_data_insert(struct mnl_socket *sock, struct nlmsghdr *nlh,
+ {
+ 	char buf[MNL_SOCKET_BUFFER_SIZE];
+ 	unsigned int portid;
+-	int err, ret;
++	int ret;
+ 
+ 	portid = mnl_socket_get_portid(sock);
+ 
+@@ -215,7 +215,7 @@ static int conntracK_count_zone(struct mnl_socket *sock, uint16_t zone)
+ 	struct nfgenmsg *nfh;
+ 	struct nlattr *nest;
+ 	unsigned int portid;
+-	int err, ret;
++	int ret;
+ 
+ 	portid = mnl_socket_get_portid(sock);
+ 
+@@ -262,7 +262,7 @@ static int conntrack_flush_zone(struct mnl_socket *sock, uint16_t zone)
+ 	struct nfgenmsg *nfh;
+ 	struct nlattr *nest;
+ 	unsigned int portid;
+-	int err, ret;
++	int ret;
+ 
+ 	portid = mnl_socket_get_portid(sock);
+ 
+-- 
+2.27.0
+
+
+
 
