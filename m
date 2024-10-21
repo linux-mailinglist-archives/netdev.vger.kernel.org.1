@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-137400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37FE59A6034
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:35:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2E89A603B
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 11:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B022F1F2256D
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:35:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB2A287121
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B561E377E;
-	Mon, 21 Oct 2024 09:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1491E201D;
+	Mon, 21 Oct 2024 09:36:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BF91E2608;
-	Mon, 21 Oct 2024 09:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4631E1A33;
+	Mon, 21 Oct 2024 09:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729503291; cv=none; b=I0gpBB2R4Kg1Gs5HO8JDUC9yX8QU+8B98ckR+PQreu5zxxANI6L/6W/1l2uLbyXVF3GpMtFvgCBkWslteJ+/NoCJ/hlM2+YOeSa08Ry4znVonlCf39IL/BJrqCIfEQOXTEECwex38J6pRzDPYhmevvgFgBvNgs19GW8G8wTorCM=
+	t=1729503382; cv=none; b=hdjMYaAyecrymb8c5XdZ0g5ApABjxpc31Mu8o2uThGOJxqKWpGJ3AyjGpp31Co81PFHdHatDiJ3FSubCGsNtvMM9uumuiQFEwYGxkAklqu1xqcJky8iwo+YOrf3sJcmZh/C/XKJyWujmEmad2TBBAKuFEEDdbxLX/E7/8VNDjAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729503291; c=relaxed/simple;
-	bh=PgC55g+yMmrhDOSgWrJWXqM7B3dU93ySEhXl827HqHg=;
+	s=arc-20240116; t=1729503382; c=relaxed/simple;
+	bh=3QOK3FoGMVlLE3F7suimpJKsWNhVhCDUbbenGFL4/Xc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TZarhKVDxvNHlU1gd24VJ+GTOrjVRd+fbBieuxTC5RIW8oIIhsWLTI/h8UO9SfEgrEtHLkTtlimmCpJQ9F1njJdwTJmMiiCVhw/euNtVWtk9kaoOpU6QKzp1wTaKmf9yIhAX50M+A4VNz0fINu62A0ASLnUiyf/ExXJ+gpCiTJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 In-Reply-To:Content-Type; b=aJf3mAm8yIvNklaZtp7/ccAw+T7p7jKpZREnYGdq0YWxJnHaPJ76rE7is/zL7wzCKHNjlb39ye4pbEfkNh6n5QPqZGhry/VOt/buIXxoJN340ZXJoPBFDX9pVwHfQdhPF3pXKS5bPkXtA9lBIxssJujgRNceCM62aDxmOygMLuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XX99156Nrz1jB8L;
-	Mon, 21 Oct 2024 17:33:25 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XX9CM6bZMz20qbV;
+	Mon, 21 Oct 2024 17:35:27 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 17D84140360;
-	Mon, 21 Oct 2024 17:34:46 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 716661401F1;
+	Mon, 21 Oct 2024 17:36:17 +0800 (CST)
 Received: from [10.67.120.129] (10.67.120.129) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 21 Oct 2024 17:34:45 +0800
-Message-ID: <32e73dd8-5cc8-4211-ab5f-ab10281902e6@huawei.com>
-Date: Mon, 21 Oct 2024 17:34:45 +0800
+ 15.2.1544.11; Mon, 21 Oct 2024 17:36:17 +0800
+Message-ID: <a18b54d5-648a-4369-893c-2c4f2c68e1c4@huawei.com>
+Date: Mon, 21 Oct 2024 17:36:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,132 +48,234 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v22 07/14] mm: page_frag: some minor refactoring
- before adding new API
+Subject: Re: [PATCH net-next v22 10/14] mm: page_frag: introduce
+ prepare/probe/commit API
 To: Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin
 	<yunshenglin0825@gmail.com>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
 	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
 References: <20241018105351.1960345-1-linyunsheng@huawei.com>
- <20241018105351.1960345-8-linyunsheng@huawei.com>
- <CAKgT0UcBveXG3D9aHHADHn3yAwA6mLeQeSqoyP+UwyQ3FDEKGw@mail.gmail.com>
- <e38cc22e-afbc-445e-b986-9ab31c799a09@gmail.com>
- <CAKgT0UeM15+HZor5_woJ4Fd_YrHVgrMM86wD4o5xGczQXC2aOg@mail.gmail.com>
+ <20241018105351.1960345-11-linyunsheng@huawei.com>
+ <CAKgT0UcrbmhJCm4=30Y12ZX9bWD_ChTn5vqHxKdTrGBP-FLk5w@mail.gmail.com>
+ <a6703e66-a8bc-43c9-a2b9-08f2a849c4ff@gmail.com>
+ <CAKgT0UdawPJgh-J266cpRqNvCHFT=X=OM3CVBorBT0mTEGVpeg@mail.gmail.com>
 Content-Language: en-US
 From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UeM15+HZor5_woJ4Fd_YrHVgrMM86wD4o5xGczQXC2aOg@mail.gmail.com>
+In-Reply-To: <CAKgT0UdawPJgh-J266cpRqNvCHFT=X=OM3CVBorBT0mTEGVpeg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2024/10/20 23:45, Alexander Duyck wrote:
-
-...
-
-> 
->>>
->>>
->>>> @@ -132,8 +156,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>>>                          return NULL;
->>>>                  }
->>>>
->>>> -               page = encoded_page_decode_page(encoded_page);
->>>> -
->>>>                  if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
->>>>                          goto refill;
->>>>
->>>> @@ -148,15 +170,17 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->>>>
->>>>                  /* reset page count bias and offset to start of new frag */
->>>>                  nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
->>>> +               nc->offset = 0;
->>>>                  offset = 0;
->>>>          }
->>>>
->>>> -       nc->pagecnt_bias--;
->>>> -       nc->offset = offset + fragsz;
->>>> +       pfrag->page = page;
->>>> +       pfrag->offset = offset;
->>>> +       pfrag->size = size - offset;
->>>
->>> I really think we should still be moving the nc->offset forward at
->>> least with each allocation. It seems like you end up doing two flavors
->>> of commit, one with and one without the decrement of the bias. So I
->>> would be okay with that being pulled out into some separate logic to
->>> avoid the extra increment in the case of merging the pages. However in
->>> both cases you need to move the offset, so I would recommend keeping
->>> that bit there as it would allow us to essentially call this multiple
->>> times without having to do a commit in between to keep the offset
->>> correct. With that your commit logic only has to verify nothing
->>> changes out from underneath us and then update the pagecnt_bias if
->>> needed.
+On 2024/10/21 0:04, Alexander Duyck wrote:
+> On Sat, Oct 19, 2024 at 1:33 AM Yunsheng Lin <yunshenglin0825@gmail.com> wrote:
 >>
->> The problem is that we don't really know how much the nc->offset
->> need to be moved forward to and the caller needs the original offset
->> for skb_fill_page_desc() related calling when prepare API is used as
->> an example in 'Preparation & committing API' section of patch 13:
+>> On 10/19/2024 2:03 AM, Alexander Duyck wrote:
+>>
+>>>
+>>> Not a huge fan of introducing a ton of new API calls and then having
+>>> to have them all applied at once in the follow-on patches. Ideally the
+>>> functions and the header documentation for them would be introduced in
+>>> the same patch as well as examples on how it would be used.
+>>>
+>>> I really think we should break these up as some are used in one case,
+>>> and others in another and it is a pain to have a pile of abstractions
+>>> that are all using these functions in different ways.
+>>
+>> I am guessing this patch may be split into three parts to make it more
+>> reviewable and easier to discuss here:
+>> 1. Prepare & commit related API, which is still the large one.
+>> 2. Probe API related API.
 > 
-> The thing is you really have 2 different APIs. You have one you were
-> doing which was a alloc/abort approach and another that is a
-> probe/commit approach. I think for the probe/commit you could probably
-> get away with using an "alloc" type approach with a size of 0 which
-> would correctly set the start of your offset and then you would need
-> to update it later once you know the total size for your commit. For
+> In my mind the first two listed here are much more related to each
+> other than this abort api.
+> 
+>> 3. Abort API.
+> 
+> I wonder if we couldn't look at introducing this first as it is
+> actually closer to the existing API in terms of how you might use it.
+> The only spot of commonality I can think of in terms of all these is
+> that we would need to be able to verify the VA, offset, and size. I
+> partly wonder if for our page frag API we couldn't get away with
+> passing a virtual address instead of a page for the page frag. It
+> would save us having to do the virt_to_page or page_to_virt when
+> trying to verify a commit or a revert.
 
-It seems there are some issues with the above approach as below as I
-can see for now:
-1. when nc->encoded_page is 0, Calling the "alloc" type API with
-fragsz being zero may still allocate a new page from allocator, which
-seems to against the purpose of probe API, right?
-
-2. It doesn't allow the caller to specify a fragsz for probing, instead
-   it rely on the caller to check if the size of probed fragment is bigger
-   enough for its use case.
-
-> the probe/commit we could use the nc->offset as a kind of cookie to
-> verify we are working with the expected page and offset.
-
-I am not sure if I am following the above, but I should mention that
-nc->offset is not updated for prepare/probe API because the original
-offset might be used for calculating the truesize of the fragment
-when commit API is called, and the offset returned to the caller might
-need to be updated according to alignment requirement, so I am not sure
-how nc->offset can be used to verify the exact offset here.
-
-If it is realy about catching misuse of the page_frag API, it might be
-better to add something like nc->last_offset to record the offset of
-allocated fragment under some config like PAGE_FRAG_DEBUG, as there
-are other ways that the caller might mess up here like messing up the
-allocation context assumtion.
+Perhaps break this patch into the more patches as the order like below?
+mm: page_frag: introduce page_frag_alloc_abort() API
+mm: page_frag: introduce refill prepare & commit API
+mm: page_frag: introduce alloc_refill prepare & commit API
+mm: page_frag: introduce probe related API
 
 > 
-> For the alloc/abort it would be something similar but more the
-> reverse. With that one we would need to have the size + offset and
-> then verify the current offset is equal to that before we allow
-> reverting the previous nc->offset update. The current patch set is a
-> bit too permissive on the abort in my opinion and should be verifying
-> that we are updating the correct offset.
+> 
+>> And it is worthing mentioning that even if this patch is split into more
+>> patches, it seems impossible to break patch 12 up as almost everything
+>> related to changing "page_frag" to "page_frag_cache" need to be one
+>> patch to avoid compile error.
+> 
+> That is partly true. One issue is that there are more changes there
+> than just changing out the page APIs. It seems like you went in
+> performing optimizations as soon as you were changing out the page
+> allocation method used. For example one thing that jumps out at me was
+> the removal of linear_to_page and its replacement with
+> spd_fill_linear_page which seems to take on other pieces of the
+> function as well as you made it a return path of its own when that
+> section wasn't previously.
 
-I am not sure if I understand what is your idea about how to do an
-exact verifying for abort API here.
-For abort API, it seems we can do an exact verifying if the 'va' is
-also passed to the abort API as the nc->offset is already updated,
-something like below:
+The reason for the new spd_fill_linear_page() is that the reference
+counting in spd_fill_page() is not longer reusable for new API, which
+uses page_frag_commit() and page_frag_commit_noref(), instead of using
+get_page() in spd_fill_page().
 
-static inline void page_frag_alloc_abort(struct page_frag_cache *nc,
-					 void *va, unsigned int fragsz)
-{
-        VM_BUG_ON((nc->offset - fragsz) !=
-		  (encoded_page_decode_virt(nc->encoded_page) - va));
+> 
+> Ideally changing out the APIs used should be more about doing just
+> that and avoiding additional optimization or deviations from the
+> original coded path if possible.
 
-        nc->pagecnt_bias++;
-        nc->offset -= fragsz;
-}
+Yes, we can always do better, I am just not sure if it is worthing it.
 
-But it also might mean we need to put page_frag_alloc_abort() in
-page_frag_cache.c instead of a inline helper in page_frag_cache.h, as
-the encoded_page_decode_virt() is a static function in c file. Or put
-encoded_page_decode_virt() in the h file.
+> 
+>>>
+>>>> +static inline void page_frag_alloc_abort(struct page_frag_cache *nc,
+>>>> +                                        unsigned int fragsz)
+>>>> +{
+>>>> +       VM_BUG_ON(fragsz > nc->offset);
+>>>> +
+>>>> +       nc->pagecnt_bias++;
+>>>> +       nc->offset -= fragsz;
+>>>> +}
+>>>> +
+>>>
+>>> We should probably have the same checks here you had on the earlier
+>>> commit. We should not be allowing blind changes. If we are using the
+>>> commit or abort interfaces we should be verifying a page frag with
+>>> them to verify that the request to modify this is legitimate.
+>>
+>> As an example in 'Preparation & committing API' section of patch 13, the
+>> abort API is used to abort the operation of page_frag_alloc_*() related
+>> API, so 'page_frag' is not available for doing those checking like the
+>> commit API. For some case without the needing of complicated prepare &
+>> commit API like tun_build_skb(), the abort API can be used to abort the
+>> operation of page_frag_alloc_*() related API when bpf_prog_run_xdp()
+>> returns XDP_DROP knowing that no one else is taking extra reference to
+>> the just allocated fragment.
+>>
+>> +Allocation & freeing API
+>> +------------------------
+>> +
+>> +.. code-block:: c
+>> +
+>> +    void *va;
+>> +
+>> +    va = page_frag_alloc_align(nc, size, gfp, align);
+>> +    if (!va)
+>> +        goto do_error;
+>> +
+>> +    err = do_something(va, size);
+>> +    if (err) {
+>> +        page_frag_alloc_abort(nc, size);
+>> +        goto do_error;
+>> +    }
+>> +
+>> +    ...
+>> +
+>> +    page_frag_free(va);
+>>
+>>
+>> If there is a need to abort the commit API operation, we probably call
+>> it something like page_frag_commit_abort()?
+> 
+> I would argue that using an abort API in such a case is likely not
+> valid then. What we most likely need to be doing is passing the va as
+> a part of the abort request. With that we should be able to work our
+> way backwards to get back to verifying the fragment came from the
+> correct page before we allow stuffing it back on the page.
+
+How about something like below mentioned in the previous comment:
+page_frag_alloc_abort(nc, va, size);
+
+> 
+>>>
+>>>>   void page_frag_free(void *addr);
+>>>>
+>>>>   #endif
+>>>> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+>>>> index f55d34cf7d43..5ea4b663ab8e 100644
+>>>> --- a/mm/page_frag_cache.c
+>>>> +++ b/mm/page_frag_cache.c
+>>>> @@ -112,6 +112,27 @@ unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
+>>>>   }
+>>>>   EXPORT_SYMBOL(__page_frag_cache_commit_noref);
+>>>>
+>>>> +void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
+>>>> +                                          unsigned int fragsz,
+>>>> +                                          struct page_frag *pfrag,
+>>>> +                                          unsigned int align_mask)
+>>>> +{
+>>>> +       unsigned long encoded_page = nc->encoded_page;
+>>>> +       unsigned int size, offset;
+>>>> +
+>>>> +       size = PAGE_SIZE << encoded_page_decode_order(encoded_page);
+>>>> +       offset = __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
+>>>> +       if (unlikely(!encoded_page || offset + fragsz > size))
+>>>> +               return NULL;
+>>>> +
+>>>> +       pfrag->page = encoded_page_decode_page(encoded_page);
+>>>> +       pfrag->size = size - offset;
+>>>> +       pfrag->offset = offset;
+>>>> +
+>>>> +       return encoded_page_decode_virt(encoded_page) + offset;
+>>>> +}
+>>>> +EXPORT_SYMBOL(__page_frag_alloc_refill_probe_align);
+>>>> +
+>>>
+>>> If I am not mistaken this would be the equivalent of allocating a size
+>>> 0 fragment right? The only difference is that you are copying out the
+>>> "remaining" size, but we could get that from the offset if we knew the
+>>> size couldn't we? Would it maybe make sense to look at limiting this
+>>> to PAGE_SIZE instead of passing the size of the actual fragment?
+>>
+>> I am not sure if I understand what does "limiting this to PAGE_SIZE"
+>> mean here.
+> 
+> Right now you are returning pfrag->size = size - offset. I am
+> wondering if we should be returning something more like "pfrag->size =
+> PAGE_SIZE - (offset % PAGE_SIZE)".
+
+Doesn't doing above defeat the purpose of the 'performant' part mentioned
+in the commit log? With above, I would say the new page_frag API is not
+providing the expected semantic of skb_page_frag_refill() as the caller
+can use up the whole order-3 page by accessing pfrag->size directly.
+
+"There are many use cases that need minimum memory in order
+for forward progress, but more performant if more memory is
+available"
+
+> 
+>> I probably should mention the usecase of probe API here. For the usecase
+>> of mptcp_sendmsg(), the minimum size of a fragment can be smaller when
+>> the new fragment can be coalesced to previous fragment as there is an
+>> extra memory needed for some header if the fragment can not be coalesced
+>> to previous fragment. The probe API is mainly used to see if there is
+>> any memory left in the 'page_frag_cache' that can be coalesced to
+>> previous fragment.
+> 
+> What is the fragment size we are talking about? In my example above we
+
+I am talking about the minimum fragment size required by the caller, if
+there is more space, the caller can decide how much it will use by using
+the commit API passing the 'used_sz' parameter.
+
+We only need to limit the caller not to pass a fragsz larger than
+PAGE_SIZE when calling a prepare API, but not when calling commit API.
+
+> would basically be looking at rounding the page off to the nearest
+> PAGE_SIZE block before we would have to repeat the call to grab the
+> next PAGE_SIZE block. Since the request size for the page frag alloc
+> API is supposed to be limited to 4K or less it would make sense to
+> limit the probe API similarly.
+It is partly true for prepare/commit API, as it is true for prepare API,
+but not true for commit API.
 
