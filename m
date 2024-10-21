@@ -1,112 +1,83 @@
-Return-Path: <netdev+bounces-137381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748CE9A5D3B
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:37:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60D449A5D60
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 09:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A46621C21BBA
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:37:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90BDA1C23608
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD271E009B;
-	Mon, 21 Oct 2024 07:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032831E0DDD;
+	Mon, 21 Oct 2024 07:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nR/GULq/"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cdUIg4em"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459F31DE4D9;
-	Mon, 21 Oct 2024 07:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B721E0DD4;
+	Mon, 21 Oct 2024 07:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729496245; cv=none; b=fMTAQuTDWEPTU1lPxLOiPpbXPCtIcRs+VGNJfmV0FjS4YANAokcY7vp82YIBGp5SW0Lj707z86gqi2ObdrG9XWjMFQg1o/UGaEPwx8kHda1uyivL6G0VDyY7fAmjUGmkDI3LB9koa9fAwkptBbJGR93oTSEpIiEpS6mJ41u4NdU=
+	t=1729496654; cv=none; b=XSSqYGhWhMg+1622uLc0411jvDUscAhfMVQU2kCny+QsFB49emuyEU5cY8CjFMYz7lEmEPI0wYZqGivFZQpSaKpe8ert+bM6aPLZRk1UJXeZsAef/rL2Fq7SELKUiovCIAWyj+FJlagj8+j927DY7k6EmQvS9DZZLAqKaVzAzDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729496245; c=relaxed/simple;
-	bh=2gy3du6vsKAJ+C9iOq3ZQ9oB1KOFdx7EruIwXtjFbKQ=;
+	s=arc-20240116; t=1729496654; c=relaxed/simple;
+	bh=dmEkpj1SX2e3mHQUhOKtpvrPvJet0vNsLVPj9d+IIGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ph01wnaGQIUxeII6sgr5LBO9ctGEfoCszW7FXHKYs4JATW2ynNB0tZAVq61Tw64eu+TUqp3sdAE9rE/hJQof+5dv3fR2MJoSolXjBG2Phge8zXXxikPar3kpZlSGRqQmaO9jnuSVQ7YsdZLqIACu4ijiiqpMvkspmOq3FIB7pxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nR/GULq/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5693BC4CEC3;
-	Mon, 21 Oct 2024 07:37:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729496245;
-	bh=2gy3du6vsKAJ+C9iOq3ZQ9oB1KOFdx7EruIwXtjFbKQ=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=NoD5JOQduKijBnH8WerH/3x1RkcAGxMrI6T6RybSLUwRx+SrQfS3ULNFLRR4bQ3h76zSk9FiKcSnNJRMhqbsZDQg/gr4qonHu+aji17a6JO2WdDPZwdj6QT7CGW8i3iSGNPJWICvo9GW/i80xfOXk3Y1biLHR/iN5K0J/ap0+vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cdUIg4em; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C041BC4CEC3;
+	Mon, 21 Oct 2024 07:44:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1729496654;
+	bh=dmEkpj1SX2e3mHQUhOKtpvrPvJet0vNsLVPj9d+IIGQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nR/GULq/+kGrI0Fv7mYTKOVQ46vxfvEI40yJL7e5Y4YTVk114dLmmXRkMfSMvlaCR
-	 jm/AZdEUwHMvpq16IG2LtxPx0XPUPadQkx4hs7KFD1dcgtrGAk4KxZNvUtr5G6ATYt
-	 IzYlpv6Dx6yHHVfT39ni80lFapHZcVaeqckYZSUjYgudsEzuUAQ0U89Onr3P9z2SY/
-	 ZFD2sy/o5pf+DGgj3ZPpqk255+EpxbmExaksbrK0jGq2Zcg4hIrrozf/aO3A0qefT5
-	 fuiXwVnEBbZOOOt9kGN9BIFlWjZzP36rs2TeCYlLSgxW18YgdchDgR3AflfX2PcK0q
-	 0+y21zYamQkSw==
-Date: Mon, 21 Oct 2024 09:37:21 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Drew Fustini <dfustini@tenstorrent.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>, Jisheng Zhang <jszhang@kernel.org>, Guo Ren <guoren@kernel.org>, 
-	Fu Wei <wefu@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Drew Fustini <drew@pdp7.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next v4 1/3] dt-bindings: net: Add T-HEAD dwmac
- support
-Message-ID: <bv2ao6oxrpbg3hihe6lb66h7bf2d47pg3dcv4c7mrfue26s7br@hsnqynh2ujyj>
-References: <20241020-th1520-dwmac-v4-0-c77acd33ccef@tenstorrent.com>
- <20241020-th1520-dwmac-v4-1-c77acd33ccef@tenstorrent.com>
+	b=cdUIg4emr5YXIh+f3xr5HDRub4+1C+zEb6YP7bg9qG9t/RYh6BfGLFtrnnw8s18/l
+	 CQ/e5Ex/ebMSaMtO6xFM/5fv9w4D9uSVuYQ8UDXTKAyPqPmpkKbavrQKR2xeLlc8ak
+	 S86PAlvWrebXu7QbPEe8z9HVlkYnk0JaoN/tSOf8=
+Date: Mon, 21 Oct 2024 09:44:11 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Linux kernel regressions list <regressions@lists.linux.dev>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Pls pick up two bluetooth fixes
+Message-ID: <2024102100-spongy-etching-0695@gregkh>
+References: <2fad9d09-c328-4353-be0b-cfcfef33ed01@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241020-th1520-dwmac-v4-1-c77acd33ccef@tenstorrent.com>
+In-Reply-To: <2fad9d09-c328-4353-be0b-cfcfef33ed01@leemhuis.info>
 
-On Sun, Oct 20, 2024 at 07:36:00PM -0700, Drew Fustini wrote:
-> From: Jisheng Zhang <jszhang@kernel.org>
+On Mon, Oct 21, 2024 at 05:28:25AM +0200, Thorsten Leemhuis wrote:
+> Hi Greg! Please consider picking up the following two bluetooth fixes
+> for the next round of stable updates, they fix problems quite a few
+> users hit in various stable series due to backports:
 > 
-> Add documentation to describe the DesginWare-based GMAC controllers in
-> the T-HEAD TH1520 SoC.
+> 4084286151fc91 ("Bluetooth: btusb: Fix not being able to reconnect after
+> suspend") [v6.12-rc4] for 6.11.y
 > 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-> [drew: rename compatible, add apb registers as second reg of gmac node,
->        add clocks and interrupts poroperties]
-> Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
+> and
+> 
+> 2c1dda2acc4192 ("Bluetooth: btusb: Fix regression with fake CSR
+> controllers 0a12:0001") [v6.12-rc4] for 5.10.y and later
+> 
+> For details see also:
+> https://lore.kernel.org/all/CABBYNZL0_j4EDWzDS=kXc1Vy0D6ToU+oYnP_uBWTKoXbEagHhw@mail.gmail.com/
 
-...
+Now picked up, thanks!  Hopefully this fixes the bluetooth regression on
+my new laptop, I haven't had the time to bisect it yet...
 
-> +  interrupts:
-> +    items:
-> +      - description: Combined signal for various interrupt events
-> +
-> +  interrupt-names:
-> +    items:
-> +      - const: macirq
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +  - interrupts
-> +  - interrupt-names
-
-I asked to drop these, because referenced schema already requires these.
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
-
+greg k-h
 
