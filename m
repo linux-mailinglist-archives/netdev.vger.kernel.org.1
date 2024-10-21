@@ -1,103 +1,97 @@
-Return-Path: <netdev+bounces-137486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECF99A6AEB
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:47:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06349A6AF9
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 15:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3F881C2345D
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:47:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE4612847A7
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 13:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E391F7090;
-	Mon, 21 Oct 2024 13:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE731F1301;
+	Mon, 21 Oct 2024 13:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0PWyLVo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SM/1J1Xq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119C4282FE;
-	Mon, 21 Oct 2024 13:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D071DC04C;
+	Mon, 21 Oct 2024 13:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729518454; cv=none; b=Xu9x5sCvK6olabs3LS81LiC+Rab7q69aZF5GDTD+8yr2oWGa4vhQGoBW7qSNlhvV8aJty79J8sM2ZzMkny/vo2dSbf3B0dud3hiz+EHcZbWVdSsimkQh+PYAUqjSPAV8yeinQSbjhOM1Cvj9abvXYBn9xuyNO5HN9t0NqS2Ar3s=
+	t=1729518607; cv=none; b=ir4GB8nV3MXWftL71c+SFqJWCuaGZm9Td5+w/lucic+mXP4jJcltEtotflY3ZAux8atnHktrQN8ZG9t/iPlW1BTts9U/bXBqHecVnq354nHZCaXNQ2C+KlA5bcb9H7jaJONSoOikQiR4yfUYM/A5oA40WxjxZOYiGLJLKrZTec8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729518454; c=relaxed/simple;
-	bh=pZC3YbqyBViAPdxBqxiw35UgPV0nDZR5cXq4uA20i5g=;
+	s=arc-20240116; t=1729518607; c=relaxed/simple;
+	bh=KtprUJLXkjuzcGdoL/QA73UOT8briZQ69IS5tC6po2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bB4c6OykYfcOBEf47DuZAduFs+qMdHQnABNFdDwA+po7ufjCw5bYwW0bwkTVrLrEVVvbnBQMPOu++xKr+g2RQLCS0tg0i5noroTczhq++lt9MEJOwyMFJ4HM52CrDX+AysjSs2wRtc/MxNAE6AEymsYsKkvHMnS/9eIpoFfpeJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M0PWyLVo; arc=none smtp.client-ip=209.85.218.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=oHlwTysnRHOLdK5hRO3YlJr7qFi4bZjk2eED9F/vDol4Vlj74517ZbH4mSvkm3DfOcajHktzbU68Y4JuST7Tf2KAP0ywmc53W6LReWk158MrUC9FbAGYQvVsSt2gFgo5/9eQ/101ZFAGEogUFZpPgUMWlY9hgTCP97cnDyQkvvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SM/1J1Xq; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a99f9fa66fdso50435866b.0;
-        Mon, 21 Oct 2024 06:47:31 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a9a68480e3eso38993066b.1;
+        Mon, 21 Oct 2024 06:50:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729518450; x=1730123250; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729518604; x=1730123404; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L0PguM/y3AdR81087UZxaCc/iTHakbzKnJWRYI0kM+s=;
-        b=M0PWyLVoIDwyPdP0bxZgNWzrX42vE0+QYoj2stRvDspSjsVcTVzisFZdRw5nsgrs80
-         dHgRzZX0xGkqtLfwWyektp0iZ8A9Fr93xlhuwH562DrUQLZpTk/5RtxPUcjn1wIr0YKP
-         1BaS4txAvRi4m0c9LItavDmpZmRpXLlRY7kUCGWFOVMqRLIvyZKs0PVKCwev46NTzRFM
-         YuW9MVfdZCpto9OTMjsrGrVEgc/1wyQBgBB83mQ+0HnCJe9A2/kMWZIe+lgZR3TxrtMk
-         vRX3P4w0Es7OGSWv1hDWTyomT/lm99q4CncaGdUJsjLi6LcTs/XQcf6mRFcd4YS71ZJz
-         8gyA==
+        bh=xvZACKQE5A63kgrvXCHxaARVoSrgC3Hgpn7T6LENiug=;
+        b=SM/1J1XqvtyC7BlhgZGc81QbYYXwv5gl2buh4SwiEWUFMt85wvq1Tky70mAhH8aI7o
+         AwQPV54a+chnZnbcUbsv3tCxiUtMXcFkt5foORtf14+ZdOVjRYDb+adeIVBxjfgOC7Wy
+         7sB/FWfF4gpmWhj9lQQgwejWwFjiAy1QRGF3BQ7y3USNIraR+C5gEQbY/FUJNK1F+AHo
+         UrrrPqV6V/k4m1BMMwZ6TShGlJbNVgTDZy+7ZlyrQddrXnGYdxomntzaP9srEY2mjGyg
+         Hpgzme6u1O0P/8kJlXucqO94oXxTi1VGnNUOD4AZIbAMpn+pJf7L0LmCzg8r0ciqGRxq
+         3WJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729518450; x=1730123250;
+        d=1e100.net; s=20230601; t=1729518604; x=1730123404;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=L0PguM/y3AdR81087UZxaCc/iTHakbzKnJWRYI0kM+s=;
-        b=uD7ashQ6pc3PrXpBv0MbGB7Gul7rjzmABOKZUg/zbxhLN2e+Tv/r87Sgnq4enqxr18
-         CQrugf7XaLMdvle2qOB8gOmWNcS1VWAC8dcGaENJ7YtxgHmhnGwazgfMI5hCUlPUKIfS
-         bAk71bZiBdrweZDMf//x1EaTCUjU3Y/HgJvU6WE1TEOVgmtkyzUsHZxbC90/KIDBgkDx
-         fldcIYuBgZlxHJt2jon9lsC7tGADV3VlMcPbyu2Dg+tnHvUid5XhTYONsmpYcmPTEeyA
-         ds3AyQUCkqOIWY6Fcs9jT0n7Kt0Q8HKnREdoU8tRSgel6iSxx9XU57VBKbrjq02nrTc+
-         S1cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSe1Z/a+e480ozo1W96qip1L5VXo0xt9hb3JqCe0VlL+pqkMgQJ8QYc+ye2EvmhCl6pMPOTPkwU0saof1O8l/L@vger.kernel.org, AJvYcCWV2jbg3AkCcIZB32mAXq+hnHePOgW4ywgRgKBneH+cSdu8hgUbHnHhQ2v8/6hdCZI4e1yAOA24@vger.kernel.org, AJvYcCX2jVA7xlWW3g7p9x+CF4HKEYXtfIEMlip9g8GrAK2rTVdH9cHTa1vawJepGSRk5BQcP+GP9twF1jfs24g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx811PpiVlWgGjY1cvAHXnKz5CZ/y3gQbYxrpdgwX0ZJK4QPzSr
-	5taiGfllE4wk0Cst8Xz5jCVcSW0sFhgfi5Q9dDzjnXiYRE8FEqLX
-X-Google-Smtp-Source: AGHT+IHllwIsaig8SX4FhN+AvinTZ5nJRChFYQ0yBVkHaCSnwF1lUgDNNoWUZkrrdij66hbn5eP8Xg==
-X-Received: by 2002:a17:906:6a26:b0:a9a:5b78:cee5 with SMTP id a640c23a62f3a-a9a69c685d4mr437986966b.9.1729518449909;
-        Mon, 21 Oct 2024 06:47:29 -0700 (PDT)
+        bh=xvZACKQE5A63kgrvXCHxaARVoSrgC3Hgpn7T6LENiug=;
+        b=WFjzgnfDqONMPtQV8dF5YFIBwG/xPOni1YRrvuTgV5+XMMoX8qYHN6dpzWtElFHiCp
+         mHRkNipkgW0O6sHSQJI/Re8+cpIdEK4ExqtySNwVwiziqgyCxrwYFCgglUXbPYF6D6H3
+         wgTcxp7zE1raroQUC1RcinS3uRVftYva4/KZJTYwC9q5rp4cF75dCpCDX1KjH0FR36Y6
+         L292/OYv1WJ6ro3x4iLtjxVc807+dl3/ZcdbQz7BhiYxMimBYP47CybI6NdRF+mSXUja
+         ClGqoNF5D+CcMNfejI6htwlk4Tr7rgOVN4T5NFjxwb0CW8SdQv9sa+BaQGxlCCu/e3/5
+         v84A==
+X-Forwarded-Encrypted: i=1; AJvYcCULYTk8ZnqUwZq1IbuRdUit9IXUKtp53GpixG045uIG2qvsg/czLsl/giPurgsaq5J9xkBUuu6eeTwj@vger.kernel.org, AJvYcCUQOTl/jBARKzNzrrinAwWCWNPhq3z7Vcg4sybRnJ2IbNViB4naWAFrrME+qZ2TNvopxbtBW2xmNp/zuL3P@vger.kernel.org, AJvYcCVaAezqflFHRFQ636PdPKB4rvYDVAVF1uJ4CkPliXg4Tsexj6ICg8IlPMAyfDbW3yX+xwAKRLDw@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKlNIGPJyUxYaiBp6FBbuk7Nx8OJouKTjMjVAcFSQQSyDH667q
+	iuNfKUADEbpzyGok9ty9gx8ATFNb4PgYVR1r0VdJ94qtfwh//AFl
+X-Google-Smtp-Source: AGHT+IFkvdi1xXb440X3ZM1lEN+rP4lRDSyWGbbS/gXXJfBpY4FWgfR+FUuyyXY5eiShRJa3bmU8Tg==
+X-Received: by 2002:a17:906:7951:b0:a9a:6700:1ee5 with SMTP id a640c23a62f3a-a9a69a7b2efmr420841666b.5.1729518603659;
+        Mon, 21 Oct 2024 06:50:03 -0700 (PDT)
 Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a91370e54sm204503966b.102.2024.10.21.06.47.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a9137060fsm205673366b.103.2024.10.21.06.50.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2024 06:47:29 -0700 (PDT)
-Date: Mon, 21 Oct 2024 16:47:26 +0300
+        Mon, 21 Oct 2024 06:50:03 -0700 (PDT)
+Date: Mon, 21 Oct 2024 16:50:00 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
 	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH RFC v1 net-next 11/12] bridge:
- br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
-Message-ID: <20241021134726.dzfz5uu2peyin3kk@skbuf>
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <20241013185509.4430-12-ericwouds@gmail.com>
- <281cce27-c832-41c8-87d0-fbac05b8e802@blackwall.org>
- <6209405e-7100-43f9-b415-3be8fbcc6352@blackwall.org>
- <20241014144613.mkc62dvfzp3vr7rj@skbuf>
- <b919a6b1-1c07-4fc9-b3dc-a7ac2f3645bf@gmail.com>
- <785f6b7a-1de1-46fe-aa6f-9b20feee5973@gmail.com>
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH 0/4] net: dsa: Add Airoha AN8855 support
+Message-ID: <20241021135000.ygele6x64xvfzntl@skbuf>
+References: <20241021130209.15660-1-ansuelsmth@gmail.com>
+ <20241021133605.yavvlsgp2yikeep4@skbuf>
+ <67165992.df0a0220.170dc.b117@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,44 +100,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <785f6b7a-1de1-46fe-aa6f-9b20feee5973@gmail.com>
+In-Reply-To: <67165992.df0a0220.170dc.b117@mx.google.com>
 
-On Sun, Oct 20, 2024 at 11:23:18AM +0200, Eric Woudstra wrote:
-> So after doing some more reading, at creation of the code using
-> BR_VLFLAG_ADDED_BY_SWITCHDEV would have been without problems.
+On Mon, Oct 21, 2024 at 03:39:26PM +0200, Christian Marangi wrote:
+> On Mon, Oct 21, 2024 at 04:36:05PM +0300, Vladimir Oltean wrote:
+> > On Mon, Oct 21, 2024 at 03:01:55PM +0200, Christian Marangi wrote:
+> > > It's conceptually similar to mediatek switch but register and bits
+> > > are different.
+> > 
+> > Is it impractical to use struct regmap_field to abstract those
+> > differences away and reuse the mt7530 driver's control flow? What is the
+> > relationship between the Airoha and Mediatek IP anyway? The mt7530
+> > maintainers should also be consulted w.r.t. whether code sharing is in
+> > the common interest (I copied them).
 > 
-> After the switchdev was altered so that objects from foreign devices can
-> be added, it is problematic in br_vlan_fill_forward_path_mode(). I have
-> tested and indeed any foreign device does have this problem.
+> Some logic are similar for ATU or VLAN handling but then they added bits
+> in the middle of the register and moved some in other place.
 > 
-> So we need a way to distinguish in br_vlan_fill_forward_path_mode()
-> whether or not we are dealing with a (dsa) foreign device on the switchdev.
+> Happy of being contradicted but from what I checked adapting the mtk
+> code would introduce lots of condition and wrapper and I feel it would
+> be actually worse than keeping the 2 codebase alone.
 > 
-> I have come up with something, but this is most likely to crude to be
-> accepted, but for the sake of 'rfc' discussing it may lead to a proper
-> solution. So what does work is the following patch, so that
-> netif_has_dsa_foreign_vlan() can be used inside
-> br_vlan_fill_forward_path_mode().
-> 
-> Any suggestions on how this could be implemented properly would be
-> greatly appreciated.
+> Would love some help by mt7530 to catch some very common case.
 
-I don't know nearly enough about the netfilter flowtable to even
-understand exactly the problem you're describing and are trying to solve.
-I've started to read up on things, but plenty of concepts are new and
-I'm mixing this with plenty of other activities. If you could share some
-commands to build a test setup so I could form my own independent
-opinion of what is going on, it would be great as it would speed up that
-process.
-
-With respect to the patch you've posted, it doesn't look exactly great.
-One would need to make a thorough analysis of the bridge's use of
-BR_VLFLAG_ADDED_BY_SWITCHDEV, of whether it still makes sense in today's
-world where br_switchdev_vlan_replay() is a thing (a VLAN that used to
-not be "added by switchdev" can become "added by switchdev" after a
-replay, but this flag will remain incorrectly unset), of whether VLANs on
-foreign DSA interfaces should even have this flag set, and on whether
-your flowtable forwarding path patches are conceptually using it correctly.
-There's a lot to think about, and if somebody doesn't have the big picture,
-I'm worried that a wrong decision will be taken.
+As long as the control flow is reasonably similar, the REG_FIELD() macro
+is able to deal with register fields which have moved from one place to
+another between hardware variants.
 
