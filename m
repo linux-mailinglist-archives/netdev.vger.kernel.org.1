@@ -1,136 +1,136 @@
-Return-Path: <netdev+bounces-137449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA529A6769
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:00:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0FF9A6786
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 14:05:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66CEB2827BA
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:00:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 409E628397C
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 12:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E77C1E9098;
-	Mon, 21 Oct 2024 11:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9ED1EABBC;
+	Mon, 21 Oct 2024 12:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9TgoNEQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENifHDuC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56CD41D7E5B;
-	Mon, 21 Oct 2024 11:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD66A1E7677;
+	Mon, 21 Oct 2024 12:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729511918; cv=none; b=Qxkp9us1b9/RepWHFGFRMbcde3ehP1pACWojbal8KMLVzp8amMDSKyhKiDCH2UgFXGghQ1J6fmRR1iQEjAxOpiEzc+e0D3wVKfU5Em0dJhOs4Q67iecckNh1WkNcfCx9nqhizGcfls8QBubQCaRxF0C7qIhGqvL/m152CHC+mDg=
+	t=1729512297; cv=none; b=Lexoks2kj7AR+iJz+gRVCXr6JRNibIhE7oZa9GQR0R+xW2GeDTDwEQF+tbyfIrVID9cL+FyNMvUW9ghOUqPbvsZC8I1oHTBiBmCV6lq4c1GfYCDc6/0yP+DLQyMsittF97iCY5dhY4R5crsBAqwr2+lnNc33OjmCNC61ZeeQhYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729511918; c=relaxed/simple;
-	bh=9a5VFldN6zVh/rUpVFfhNFaXH3Rcgz+fBDNfZCeivAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXJNbcBxr+uvsr7/1Oh9Jmy8PWYT76Fa/2j2EaU+MxV3G93L/JUWDSmAnQbFkQHKXqfy0rPGzzw+oFhcKPl/G5nh8lQyPk2EJHDYLSkwbzam6zntp+Ll/WZF0t6nOcl1bMYCCTJayemm1/X+3fVfF/ZIgjM9xVXprwDTPpo3U7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9TgoNEQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 911EEC4CEE4;
-	Mon, 21 Oct 2024 11:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729511917;
-	bh=9a5VFldN6zVh/rUpVFfhNFaXH3Rcgz+fBDNfZCeivAM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t9TgoNEQ2vEfk8EA7n/XJotulaqvMrlvm4VbZ5QYar3HxoJzzwQpG4YE8Dud+vadN
-	 OuoGnJGtzjc4Rpobz2+ib1g/CaqKBw8Cjy2VqqWummqVBobVsGh8dPs+80qJBJs0Ft
-	 AlUONhHl2G8/cEDuaQ4aESXZR1BvTJb3hw0/ydlJlvsWOq8pPbNEyBUVng9n2+TLGh
-	 Iw0xgMsmuwk3EazIX6hmnqNzMbbsqKPPhLQ2LJbPKodXB0K83hEH+SJgoibU+hcZPh
-	 HIwe7iwpf11BUJmqyVfndbiwSGqZIRVADmkdfftlFnpj5eUHgMPpQX+Kwkpbw4lITC
-	 PVXkRhVflHhqg==
-Date: Mon, 21 Oct 2024 12:58:33 +0100
-From: Simon Horman <horms@kernel.org>
-To: Matt Johnston <matt@codeconstruct.com.au>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Wolfram Sang <wsa@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Dung Cao <dung@os.amperecomputing.com>
-Subject: Re: [PATCH net v2] mctp i2c: handle NULL header address
-Message-ID: <20241021115833.GG402847@kernel.org>
-References: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+	s=arc-20240116; t=1729512297; c=relaxed/simple;
+	bh=PW+3diJ4pRiPVR1qpZLntdXib++X/EHvjrDncNf4l00=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f9WAyyjncWRvZkUb8OG39sJki+OWlmWd+9g0noqaDv9lDhcNTDjvLgx1QMvwsh5RBski4l4KOTPp7yOy1tgROioEHxdsuYoZkg1xmb/nJYX7oXIcjwq0BJVKYmLuAuHe43Tdy2PwoM893z629OsMfRRqntKCUV/oeryryAM3d7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENifHDuC; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6cbce9e4598so26436856d6.2;
+        Mon, 21 Oct 2024 05:04:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729512295; x=1730117095; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Trwc8ZxRfLUos5ROh0Aw8LjBkdhyf7Np4u6v5DWo6j4=;
+        b=ENifHDuCtKWP/eeAkZj5muCNJHktQL8wxI593nkFTY+kXjJ4wsSJkHVuShCiT49v6J
+         Z8rcD2Lo1LDlBB0bMnhxGL+j7XyhbGNiMW/+96bU2x04JFJ37g0dG9wZtP48lSy86xbY
+         +C5ngBhjBPfCZ9YfQvndM3VW8bcCyHrPNaGDRZemBmVxsNvs8aAp1L594rnqVbrFQXus
+         9KGQFIcfpdsrYMTqqIMsQu9pgV9e23w/rIKcpkGqz8TSnJkpOCkaLK/vg7y6I3HmY7lC
+         URNjrnsUL4B1q2tT3HXZOJ2ZYDNTGwbect6xWFBuv8e3iDVO0+Qg4gwUoTnjwS0evwQl
+         HAEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729512295; x=1730117095;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Trwc8ZxRfLUos5ROh0Aw8LjBkdhyf7Np4u6v5DWo6j4=;
+        b=EFMpcVMvrDlaZglNIuXZZgspZM48Ybhb6EjJL4Lkpf4hWyz9jy2QE1/SOOHlGf1JX7
+         owQUKkvJ1gDxKcs5hbmBTe+GVrv4ts60V8akKOZOEwJwI4aI+6NdFuzOYosYrl1wJh8m
+         2lnhxBwn+rojt357hG57b8v6Td98HhEsFqPlxx0K1Ok/slsowx39yhIZsekohQYi4rOb
+         yoyd3rMitDUFR+z5LQJW6CJwxMUSG/CJwP77Sx2X8F4m4veeZ1bYEy0rb0RgAIKEzmwr
+         6YCmCh3e3MCB+BzrzGTjivH6Uh6Wx7H993oYJLLVV4BQCEp5n7tdAMOe01FcO220Zqda
+         HaLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUETkc9tnDuk+9EMbomyAc1jk0nG+27VF2yEYBTMJwUR3W6u5jOdzzG5zE2O3yG8h+czvX+pnt2@vger.kernel.org, AJvYcCX+mBw/U4gHTcDl4pYg69rlQ/vboaVuuPNfhQnzflGv8Mu2YpHzokZGP0cLCJlyOKpnFSyeyOxDcB50akpx@vger.kernel.org, AJvYcCX4undm8NoKxhVp9zsL6MtnCH1BX06FFqbCdKyjJTIiV57/LYggpQpwKCCm2oGVhJ+N0NREgVhcWa+2@vger.kernel.org, AJvYcCXsUrdCiSXL4B2cMaH1kIGo6gd0SiyFH9Ya3BtvWE0Zt9uRyMaIVVuMpw3cvkI9PHKZkdQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDvRxhL7OA2ME9TFw/CzIo2184j3ZMfouzBwBNszqfuz7nHPxJ
+	q5aeMuzkCRHsWq7oeEDD4Me4YYQp6UEb79EtmV7eHixThDQXZhbTZzyvJDAjtqkumYMQet/th/9
+	uPx9qeeooIJskNCRBV9R//qctc1I=
+X-Google-Smtp-Source: AGHT+IE+2A+2GtLwpn5vTpkyyLklTLFCJaFPXBnb9GHSF70FZ1PogmV+ZpXiADUYMFP6yMXIDElgCBpPCnzunP/snnY=
+X-Received: by 2002:a05:6214:33c2:b0:6cd:3a48:5767 with SMTP id
+ 6a1803df08f44-6cde151b8e9mr190999206d6.18.1729512294672; Mon, 21 Oct 2024
+ 05:04:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+References: <20241018091502.411513-1-tianmuyang@huawei.com>
+ <ZxKPXdYjwPnpq95V@mini-arch> <67156d3447444_14e182944b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67156d3447444_14e182944b@willemb.c.googlers.com.notmuch>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Mon, 21 Oct 2024 14:04:43 +0200
+Message-ID: <CAJ8uoz0FcDP_ox_sRbG7ZJ=F70uJsALF-fGzW6snTQPXez_PXw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 0/3] XDP metadata: Rx checksum/GSO hint; Tx
+ GSO offload
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, Muyang Tian <tianmuyang@huawei.com>, bpf@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, yanan@huawei.com, 
+	xiesongyang@huawei.com, wuchangye@huawei.com, liuxin350@huawei.com, 
+	zhangmingyi5@huawei.com, liwei883@huawei.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 21, 2024 at 12:35:26PM +0800, Matt Johnston wrote:
-> daddr can be NULL if there is no neighbour table entry present,
-> in that case the tx packet should be dropped.
-> 
-> saddr will normally be set by MCTP core, but in case it is NULL it
-> should be set to the device address.
-> 
-> Incorrect indent of the function arguments is also fixed.
-> 
-> Fixes: f5b8abf9fc3d ("mctp i2c: MCTP I2C binding driver")
-> Cc: stable@vger.kernel.org
-> Reported-by: Dung Cao <dung@os.amperecomputing.com>
-> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-> ---
-> Changes in v2:
-> - Set saddr to device address if NULL, mention in commit message
-> - Fix patch prefix formatting
-> - Link to v1: https://lore.kernel.org/r/20241018-mctp-i2c-null-dest-v1-1-ba1ab52966e9@codeconstruct.com.au
-> ---
->  drivers/net/mctp/mctp-i2c.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
-> index 4dc057c121f5d0fb9c9c48bf16b6933ae2f7b2ac..c909254e03c21518c17daf8b813e610558e074c1 100644
-> --- a/drivers/net/mctp/mctp-i2c.c
-> +++ b/drivers/net/mctp/mctp-i2c.c
-> @@ -579,7 +579,7 @@ static void mctp_i2c_flow_release(struct mctp_i2c_dev *midev)
->  
->  static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
->  				  unsigned short type, const void *daddr,
-> -	   const void *saddr, unsigned int len)
-> +				  const void *saddr, unsigned int len)
->  {
->  	struct mctp_i2c_hdr *hdr;
->  	struct mctp_hdr *mhdr;
+On Sun, 20 Oct 2024 at 22:51, Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Stanislav Fomichev wrote:
+> > On 10/18, Muyang Tian wrote:
+> > > This series introduce XDP metadata functionality, including Rx checksum/GSO hint
+> > > and Tx GSO offload. This is aimed to transfer control fields when processing jumbo
+> > > frames between VMs.
+> >
+> > Ideally, the series should also have the implementation of these hints
+> > for a couple of devices and appropriate selftest updates to exercise
+> > them.
+>
+> +1
 
-Hi Matt,
+Larysa had one implementation for ice [0]. Ask her if she can update
+and contribute that one. Then add one yourself and there are two
+implementations which would hopefully make the case.
 
-I think you should drop this hunk.
-While it's nice to clean things up, in the context of other work [1],
-this isn't really appropriate as part of a fix for net.
+[0] https://lore.kernel.org/bpf/20230811161509.19722-1-larysa.zaremba@intel.com/
 
-[1] https://docs.kernel.org/process/maintainer-netdev.html#clean-up-patches
-
-> @@ -588,8 +588,15 @@ static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
->  	if (len > MCTP_I2C_MAXMTU)
->  		return -EMSGSIZE;
->  
-> -	lldst = *((u8 *)daddr);
-> -	llsrc = *((u8 *)saddr);
-> +	if (daddr)
-> +		lldst = *((u8 *)daddr);
-> +	else
-> +		return -EINVAL;
-> +
-> +	if (saddr)
-> +		llsrc = *((u8 *)saddr);
-> +	else
-> +		llsrc = dev->dev_addr;
-
-This last line doesn't seem right, as llsrc is a u8,
-while dev->dev_addr is a pointer to unsigned char.
-
->  
->  	skb_push(skb, sizeof(struct mctp_i2c_hdr));
->  	skb_reset_mac_header(skb);
-
--- 
-pw-bot: changes-requested
+> > For GSO, CC Willem going forward (I don't think I understand why
+> > we want to have gso_type in the TX hint; something like header_len
+> > seems like a better fit).
+>
+> GSO on Tx makes sense. To be able to program hardware USO, say.
+>
+> GSO on Rx is less obvious. Is this for HW-GRO? In general, some usage
+> context will be helpful.
+>
+> Two implementation questions:
+>
+> - why define an XDP specific type for checksum types, but reuse the
+>   netdev type for gso_type?
+> - why u32 gso_type, when it is a u8 in skb_shared_info?
+>
+> > Please also don't post v3 yet and allow at least a week for the initial
+> > reviewers to catch up..
+>
+>
+>
 
