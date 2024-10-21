@@ -1,192 +1,192 @@
-Return-Path: <netdev+bounces-137369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F519A59D4
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 07:42:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 451849A5A18
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 08:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6647B22B24
-	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 05:42:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BADAF1F20EFA
+	for <lists+netdev@lfdr.de>; Mon, 21 Oct 2024 06:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FC31946C9;
-	Mon, 21 Oct 2024 05:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Jbs5GuSg";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/penghOD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92D820309;
+	Mon, 21 Oct 2024 06:02:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2123.outbound.protection.partner.outlook.cn [139.219.146.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7912209B;
-	Mon, 21 Oct 2024 05:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729489335; cv=none; b=sanElxSxAep278Y+3i5KeFoUldVxEG5Y9wb6J458T1fsSx4r27pDRK8E+wtjIFuC7zPOSDryGUuJtXLiHuVFzzvZUyU3Wh4d2pZpPqfKn5v67ledxYNxm3AL6DZViL8vIfkQZz2AeB8ok6RX5FIJlHBZfRe4uatYc4L4oDw+klc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729489335; c=relaxed/simple;
-	bh=nqU2AdQPtpXBQBywDKE615SxVcwqLzweuXJzCTdK2Wc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=H6TTNkPLOp6hAPAtckKT9hsTiQDgm/VQtBHd3irsLNODF4ynrcHDNhMWG+yjbpgjhNU9RHb9KwD8bv5qHMpfXQpjwWsdvG+Rer7FeqKe2p3loCXdjvilrXng2hFItIBcsOdlODLZE+1pErU85txff6+cjWhrrxDbgcmNc2CSbRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Jbs5GuSg; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/penghOD; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1729489324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IwN2APzuoMR+7fgmrER77l2eiOhN6doSytLMUFLsLt4=;
-	b=Jbs5GuSgoz06Yo6+KGN33AGlwU6bVgUJfxbq4ZyoTWGHQHxTJPHtRbfcDi31UU7CBUFGX5
-	AWhXWkF2ii5GnuIRehHb8djQEXETXZQEQez9hU3zVJIAi//Qi1nqqNjMoSWaD32/vDIly2
-	sMm4YmzsMNUPvHUzUxgXxTNCwgC5EEDpW2oIefWHHcDa0HwLaH7VQlxRUcHGthr0p4EGIH
-	DdDdpZkbwkFJ1OcNV6OLq8vdud/oiawaxlWvPSTImEudNlqZ6RmQYwqWHHJ8ZiMInKmUgr
-	Wppd4iKQ0wrpyKcCKAgw4ORLQ+pzC6kYy4jVaBb71VP/xAyd7UGazAan14tCTw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1729489324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IwN2APzuoMR+7fgmrER77l2eiOhN6doSytLMUFLsLt4=;
-	b=/penghODChhNiRRbiTNwutaWjk3kpVXgV5wGXUvxA8y0WgJlfcblrQay4QSk/3pGM/X9il
-	piF30ZLsitnXklAw==
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, vinicius.gomes@intel.com, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
- <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, "moderated
- list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
- <linux-kernel@vger.kernel.org>, "open list:XDP (eXpress Data Path)"
- <bpf@vger.kernel.org>
-Subject: Re: [RFC net-next v2 2/2] igc: Link queues to NAPI instances
-In-Reply-To: <ZxKVI_DvFWBvRMaf@LQ3V64L9R2>
-References: <20241014213012.187976-1-jdamato@fastly.com>
- <20241014213012.187976-3-jdamato@fastly.com>
- <87h69d3bm2.fsf@kurt.kurt.home> <ZxKVI_DvFWBvRMaf@LQ3V64L9R2>
-Date: Mon, 21 Oct 2024 07:42:02 +0200
-Message-ID: <87o73e2es5.fsf@kurt.kurt.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8569EDF49;
+	Mon, 21 Oct 2024 06:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.123
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729490552; cv=fail; b=vFfu7VSDrXxPiUyUBSwv8BtOR5WxJO35Z0CLgBvLMdtDZ6vCu43xSyaftmoOp/K3Eg7iljBid8a1IccCEHWWVHXMH45WL/5hFSvRIQUH+gD0bNJncx0lZ1rn+AIJtXTLyVQfpJb5eaX5TAz30UJhn1h/afp/MY3Gcy7SwEo1xGg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729490552; c=relaxed/simple;
+	bh=wgoiEgcO+qbznC3CaeAHqEAsbECjEHqD1UGQHABpUo0=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=UdMUiOXGspP5gzNl1HPQ6wwr/knQ1TQ9VRV2cN98E9Y7GMzVEPfPBpa2AlswSP7rsDVvVdijc5uZNvnW+iPXwWg2X8uzALFY0vCgThbFBTgYnf7Yjo1LsXKqAtGUYoAgJ3gPob+Qqcf4tFqZjqyHx61aEfNFdcKIVIMlMJxSGJQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P+48SacHmXmhkI4tQoyopOV/aZ2k1ofdyqPfcMyseNdERDhxDmR0JXTsz59XN/hVU93bwJlj8neGyb0evSUZCErGNam/1qEPQGuig/JWCH3cPPdr4vjx5M591384Dgce2jYcbCB1MJhBaA3f5uSS4Pq8cRR6R0LgsRUTcHUMdabthEempBmDPppO4B99M9ickQFX0fvRgU/kImeJB8iCIl8JQQtWECGuD90ypd2SLsY3nceczYedK9uWNAU3tiCEsyRp5wItXQB+JfGTZK+D4DNvxbYHMnWsIBXcyySKI4eGuj5y1LrAAfiV9MYG9UV9kpoJPZMeZV+UJ2zC5KKHcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tyEHvfDYeuxuqDTcz2aB0yeN4MWNx6MzARP0SqH10nY=;
+ b=iVta9K67zZC5ULZD2rQ8SK+KoApyw29YafU6Dp99fR1JSmbk7/rTsEfP0BN6c8616FRDrJZeJn5qSWuV3GSvVxKvi2nX7B299TOXSj4adLUpOttWyZdc5KnJVZR64GOGhxgJle97dLUOqcPYYtM0O5vuWAl0kT3uhU+wKWG28Zm07+iBFkZSuQqtkn+y/1EmSHVj2m5iyMrfdGWMp916r2VgC48xET4MIhVElO64GmUHnwZcft3RWwwrhTqkmmyi1HyIBXRj/T5ZmjEiGJK2lHcQmCkq7BB96Y+3b4xzxxn7j0mw5mawvwJgs/+tF64Uy+jM2Ps0jeaN7fFsaivYAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12) by ZQZPR01MB1089.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:9::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.27; Mon, 21 Oct
+ 2024 05:46:47 +0000
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ ([fe80::617c:34a2:c5bf:8095]) by
+ ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn ([fe80::617c:34a2:c5bf:8095%4])
+ with mapi id 15.20.8069.016; Mon, 21 Oct 2024 05:46:47 +0000
+From: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lftan.linux@gmai.com
+Subject: [PATCH net v3] net: stmmac: dwmac4: Fix high address display by updating reg_space[] from register values
+Date: Mon, 21 Oct 2024 13:46:25 +0800
+Message-ID: <20241021054625.1791965-1-leyfoon.tan@starfivetech.com>
+X-Mailer: git-send-email 2.46.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ZQ0PR01CA0005.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:5::11) To ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: ZQZPR01MB0979:EE_|ZQZPR01MB1089:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e8c7189-f81d-447b-a9c9-08dcf193c0ad
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|41320700013|366016|52116014|1800799024|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	tjloJrbylN2lZ6UQy38YvJykgmMI5EYrnPIi4HoRk5RGoMA76OARMEDUC3Sfo1oP98ozw6cQaxG914jlnbrzSEgI4zmPh0uZpFl1ykpuud+J/EbsAAoAkU9HbF2wxFvvL36K2iGeQkssqhcjWJdEQAqp6hq05NuYBo/Ll3SoEUtWR6GxdiKkJioKfvMN6Or0cNatEl1dll9RtCriNtoAnsOaRhXE56w2nuTxF84/Zk7u5gARfzvSHAwkws6slPuI8mCVqao4IFxMfaLv9PKTpXAjcVOzIG6rDseaFTgXC1xUJh4IG5TG8V2fEVKBxrZBkj1AfOzLsEyEPIyVJsZYx12Sd898tgmQKLpeEJGNC3Jge3SNc7h1KQ61/h7Rdd1OejBLMiWRmGCCJE7Wfb1we/NsaPgB1qQS1fkXvEekAC3Tvh69S57Tsm0LCNx9+vyHUlZzF0alqKuSSV5GMb9s/t6KDy6ZWz91ouJbsYjb/mzlvsVR8WhGECDuFzDSWLvf9SCoCljyNdNt31IF0CSmy9P3550RNFJBmjG/T5g1/m5Ac7P5HwPwpwhYDVji7OHaX6yGT4FipmUvYrnGOCFRu/QRkZhae4FjrZ0P02bqOc0/yW122JrsvzC7wCCX2ADw
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(41320700013)(366016)(52116014)(1800799024)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NR3qmbefBsRmDaOTRnaQpuqSc32wfdtqad1NlQx9G4/PgotNYSglnOwGQ5Us?=
+ =?us-ascii?Q?0tU1G3qMRj7BPwUjbJpBZjUK0ekdqUq/KnMyScaHBvd+CIk3xHZglJcJ+m16?=
+ =?us-ascii?Q?8U4lEIxVMkxseh+BM6INXtrhkY0pI85umVVHitmGbv2WpKhBMNuhf4PUyMsv?=
+ =?us-ascii?Q?wiCrIPoS8H0X8xGkwwmGhDJB+5m3L8hLZVkWeg9fw7lp0JuIXhebcMSJ+VrA?=
+ =?us-ascii?Q?d3pSZR/6m30Fez6/bc+ixPY2R03wO+jumEQnM05GNHQyDL8lDNmubPxFSYRj?=
+ =?us-ascii?Q?DiRLyVvMqdhS6bgv1oSyV/i5QA3SH1LZ5MLiW/tvu2q792mKhlLBH45OGnFq?=
+ =?us-ascii?Q?QizcpzmuzzTsqCq7lwilKTO7U0uNPthWzjKCnVrYkTaIyJjPMHFy+vhWtwXe?=
+ =?us-ascii?Q?euqZ9kuyFeLP4SzFIR8Wu4Cvn783nmEZ8K8weVrdCVFsVUAP0R4k6cGaUu3F?=
+ =?us-ascii?Q?PtNb7XsLH03OEyRMu3WiHpaYJkBnl21FWbXjynujWFWwu2rHtuzoykjEuhJt?=
+ =?us-ascii?Q?9/mW0ooCmRQTsPqHNTkbz3McWlC4/5mHm8KX6MSP1OfeFxMNyr0SrKOU6pT1?=
+ =?us-ascii?Q?p0OXi/a+YATr7ZlvRMK1Ttptl/9n7A6XeLYlrbBXEcuK8Tp3Kg/9ayOD1hDB?=
+ =?us-ascii?Q?VfkKVBICaYpp6JlafssbGobnKyHUwj7OxcbGGWfIQz9Ri9cSHCaKU2lya5Rf?=
+ =?us-ascii?Q?GEvZFAWAHsUFSEw52V4B3b9r+bXd0r84jsdzr9/pi2EW3jMCeGNFDkrtwuce?=
+ =?us-ascii?Q?HjiHKMdFiOmULs9f9B6PcqUL/tYi0MUVT3UZXM0a3sKxTbGtiVmQo7EJY9rt?=
+ =?us-ascii?Q?n6TQ9StOyRHwU8LGyPJMeJTs8Cu7T/lA2KQDPP5AwnW3b13lldpmVz2ZsCAZ?=
+ =?us-ascii?Q?xP0R/g0BnSmzV9rCCYeJif4p/RqQah3GzUWBX9QrXQPWvFvNullj59fW2R4V?=
+ =?us-ascii?Q?/MVoqR/BsgNb7GGz8ETaRnW3LUGSsyCQAXvZyCjArScYUG2KKDCDj4hnvIjP?=
+ =?us-ascii?Q?8JHqu+DC3BD2wi/EAs3xfzrAlgfmOyN3bfSuX4oKp5qFfqvaec0mW+rNqZ//?=
+ =?us-ascii?Q?0m1TtugY6glCLWz2EuV3rG+JHiovoz5o5mnmEorU8VTqrIO+vmB+bTIxaTvJ?=
+ =?us-ascii?Q?8oAZksjGXBNcH28MaKHGANcav5Fp4cysR3sV7zgCscJvjHwR3sPXAU3szM2u?=
+ =?us-ascii?Q?fWWkVIgfN09ID2wkz4AekSa3cgvasbRsNgP8ebugrH8S2LvVSYCymmUIJAVZ?=
+ =?us-ascii?Q?i8ObpooH2UIrNmc8UOQ3/uznkrnQBgmJP6WYLLxNrZHqwncDTFlkfUS9ue5p?=
+ =?us-ascii?Q?2yPAhFrLwUKYOFZH9td4PSXzMvoxp+CuvVDuHkDLM1vmLcMX+g0l8QavbiCD?=
+ =?us-ascii?Q?1WshkLdeoou7IxpU7cALmX2VUPYHq06pAj+128ZS6phXokQvxPJ8poEhtyuu?=
+ =?us-ascii?Q?/I46EU6zKkWrAmGqGWufUPsA6HeX7oX8b+Pi9xr8urwStqKzJZr52MJCapKQ?=
+ =?us-ascii?Q?LTak9If253fU0wmee5PGi8+DkXurFrmBHAK8ayK4gQZY3CLDUwcEU6U2rupA?=
+ =?us-ascii?Q?Ahg7yRPRSW5CJ5vdbfrSSoEmlal59bGug3NLxR2vRVhuAseh2K8ILkX2d/D/?=
+ =?us-ascii?Q?bQ=3D=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e8c7189-f81d-447b-a9c9-08dcf193c0ad
+X-MS-Exchange-CrossTenant-AuthSource: ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2024 05:46:47.6636
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pa/IRbXEAn2vCKYPSOvkYstyX6JiFLSWFRvmUaBJdKmsTO6mzNQfNCpNBVHICAgqUZ+/ugwLIQ24LQVGlh/Lsman9Ur0D8XSRmzI845x7ZA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQZPR01MB1089
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+The high address will display as 0 if the driver does not set the
+reg_space[]. To fix this, read the high address registers and
+update the reg_space[] accordingly.
 
-On Fri Oct 18 2024, Joe Damato wrote:
-> On Tue, Oct 15, 2024 at 12:27:01PM +0200, Kurt Kanzenbach wrote:
->> On Mon Oct 14 2024, Joe Damato wrote:
->
-> [...]
->
->> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/e=
-thernet/intel/igc/igc_main.c
->> > index 7964bbedb16c..59c00acfa0ed 100644
->> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
->> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
->> > @@ -4948,6 +4948,47 @@ static int igc_sw_init(struct igc_adapter *adap=
-ter)
->> >  	return 0;
->> >  }
->> >=20=20
->> > +void igc_set_queue_napi(struct igc_adapter *adapter, int q_idx,
->> > +			struct napi_struct *napi)
->> > +{
->> > +	if (adapter->flags & IGC_FLAG_QUEUE_PAIRS) {
->> > +		netif_queue_set_napi(adapter->netdev, q_idx,
->> > +				     NETDEV_QUEUE_TYPE_RX, napi);
->> > +		netif_queue_set_napi(adapter->netdev, q_idx,
->> > +				     NETDEV_QUEUE_TYPE_TX, napi);
->> > +	} else {
->> > +		if (q_idx < adapter->num_rx_queues) {
->> > +			netif_queue_set_napi(adapter->netdev, q_idx,
->> > +					     NETDEV_QUEUE_TYPE_RX, napi);
->> > +		} else {
->> > +			q_idx -=3D adapter->num_rx_queues;
->> > +			netif_queue_set_napi(adapter->netdev, q_idx,
->> > +					     NETDEV_QUEUE_TYPE_TX, napi);
->> > +		}
->> > +	}
->> > +}
->>=20
->> In addition, to what Vinicius said. I think this can be done
->> simpler. Something like this?
->>=20
->> void igc_set_queue_napi(struct igc_adapter *adapter, int vector,
->> 			struct napi_struct *napi)
->> {
->> 	struct igc_q_vector *q_vector =3D adapter->q_vector[vector];
->>=20
->> 	if (q_vector->rx.ring)
->> 		netif_queue_set_napi(adapter->netdev, vector, NETDEV_QUEUE_TYPE_RX, na=
-pi);
->>=20
->> 	if (q_vector->tx.ring)
->> 		netif_queue_set_napi(adapter->netdev, vector, NETDEV_QUEUE_TYPE_TX, na=
-pi);
->> }
->
-> I tried this suggestion but this does not result in correct output
-> in the case where IGC_FLAG_QUEUE_PAIRS is disabled.
->
-> The output from netlink:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                              --dump queue-get --json=3D'{"ifindex": 2}'
->
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'type': 'tx'}]
->
-> Note the lack of a napi-id for the TX queues. This typically happens
-> when the linking is not done correctly; netif_queue_set_napi should
-> take a queue id as the second parameter.
->
-> I believe the suggested code above should be modified to be as
-> follows to use ring->queue_index:
->
->   if (q_vector->rx.ring)
->     netif_queue_set_napi(adapter->netdev,
->                          q_vector->rx.ring->queue_index,
->                          NETDEV_QUEUE_TYPE_RX, napi);
->=20=20=20
->   if (q_vector->tx.ring)
->     netif_queue_set_napi(adapter->netdev,
->                          q_vector->tx.ring->queue_index,
->                          NETDEV_QUEUE_TYPE_TX, napi);
+Fixes: fbf68229ffe7 ("net: stmmac: unify registers dumps methods")
+Signed-off-by: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+---
+- Split the patch series to net and net-next. Submit this patch for net.
+- Rebased to net https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
 
-LGTM. Thanks.
+v2: https://patchwork.kernel.org/project/netdevbpf/cover/20241016031832.3701260-1-leyfoon.tan@starfivetech.com/
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c | 8 ++++++++
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h | 2 ++
+ 2 files changed, 10 insertions(+)
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+index e0165358c4ac..77b35abc6f6f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+@@ -203,8 +203,12 @@ static void _dwmac4_dump_dma_regs(struct stmmac_priv *priv,
+ 		readl(ioaddr + DMA_CHAN_TX_CONTROL(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_RX_CONTROL(default_addrs, channel) / 4] =
+ 		readl(ioaddr + DMA_CHAN_RX_CONTROL(dwmac4_addrs, channel));
++	reg_space[DMA_CHAN_TX_BASE_ADDR_HI(default_addrs, channel) / 4] =
++		readl(ioaddr + DMA_CHAN_TX_BASE_ADDR_HI(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_TX_BASE_ADDR(default_addrs, channel) / 4] =
+ 		readl(ioaddr + DMA_CHAN_TX_BASE_ADDR(dwmac4_addrs, channel));
++	reg_space[DMA_CHAN_RX_BASE_ADDR_HI(default_addrs, channel) / 4] =
++		readl(ioaddr + DMA_CHAN_RX_BASE_ADDR_HI(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_RX_BASE_ADDR(default_addrs, channel) / 4] =
+ 		readl(ioaddr + DMA_CHAN_RX_BASE_ADDR(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_TX_END_ADDR(default_addrs, channel) / 4] =
+@@ -225,8 +229,12 @@ static void _dwmac4_dump_dma_regs(struct stmmac_priv *priv,
+ 		readl(ioaddr + DMA_CHAN_CUR_TX_DESC(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_CUR_RX_DESC(default_addrs, channel) / 4] =
+ 		readl(ioaddr + DMA_CHAN_CUR_RX_DESC(dwmac4_addrs, channel));
++	reg_space[DMA_CHAN_CUR_TX_BUF_ADDR_HI(default_addrs, channel) / 4] =
++		readl(ioaddr + DMA_CHAN_CUR_TX_BUF_ADDR_HI(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_CUR_TX_BUF_ADDR(default_addrs, channel) / 4] =
+ 		readl(ioaddr + DMA_CHAN_CUR_TX_BUF_ADDR(dwmac4_addrs, channel));
++	reg_space[DMA_CHAN_CUR_RX_BUF_ADDR_HI(default_addrs, channel) / 4] =
++		readl(ioaddr + DMA_CHAN_CUR_RX_BUF_ADDR_HI(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_CUR_RX_BUF_ADDR(default_addrs, channel) / 4] =
+ 		readl(ioaddr + DMA_CHAN_CUR_RX_BUF_ADDR(dwmac4_addrs, channel));
+ 	reg_space[DMA_CHAN_STATUS(default_addrs, channel) / 4] =
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+index 17d9120db5fe..4f980dcd3958 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+@@ -127,7 +127,9 @@ static inline u32 dma_chanx_base_addr(const struct dwmac4_addrs *addrs,
+ #define DMA_CHAN_SLOT_CTRL_STATUS(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x3c)
+ #define DMA_CHAN_CUR_TX_DESC(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x44)
+ #define DMA_CHAN_CUR_RX_DESC(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x4c)
++#define DMA_CHAN_CUR_TX_BUF_ADDR_HI(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x50)
+ #define DMA_CHAN_CUR_TX_BUF_ADDR(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x54)
++#define DMA_CHAN_CUR_RX_BUF_ADDR_HI(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x58)
+ #define DMA_CHAN_CUR_RX_BUF_ADDR(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x5c)
+ #define DMA_CHAN_STATUS(addrs, x)	(dma_chanx_base_addr(addrs, x) + 0x60)
+ 
+-- 
+2.34.1
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcV6aoTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgkotD/0X5UYHEhJgqmCt6kB/HHS4YFUODWTi
-XbRxhEARJl+qKt6TMqywibxifqVHp9hL08AWuXp5kBQWw9Sc2e6KfG6TfoIBtdM3
-7nR6+Wk/CrMZhZVKbNjEQrfmcZAdl3Sk44DPaXhfqU0jCbgj0sj3zpoZU5q8UXT0
-8E5kkrPY1a98ufweoCnYSmdvLmqUXXgHeBWyoFgOdxeN2jIY1azZrgQucmdYsgYt
-g9Lprnp3euz/7UrAJhTgxjq7/klCKC0x2Sg0xmeKoNJ0aZC5zppsBZXJrWTlZElh
-zgwiV0Vc3aEWCRIoOVudj1GjSEug6w/fJWBO6gP+5EZ1N6XfQG7MOzuW07G47ubm
-8qX7JRjVyaNZAwX1wy69KZv/NVNUuPxJrdVMxPoV7HAZtZfQl5TA6aE3aBOvkO2q
-gsSU0cR2fk4Ac2YLbKcZNwrxzg8gsnhPrdPJw0EWmCvaAIzxFnYW+lPdV0SDiHnc
-e4kXClZjVramUW4cP3B9ZJ4krrXMNYQxnVfFSR55H+LwL0vKxqNNiRd3rNTpl4CL
-HcfYg6wvKulCvJZ31QwpeovA4K5BdCDd1JH/PkHLVSdM1sUWtDE3pRRnFk+sUG+S
-T8GqcYGHs4f6Ee2bYhHTFN5hOGRmcD+gM/9vdjAGqE4teIS/RhZDe7IoN0A/4gwP
-2wWE6IMegLnsZQ==
-=LURd
------END PGP SIGNATURE-----
---=-=-=--
 
