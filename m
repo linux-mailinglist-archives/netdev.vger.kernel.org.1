@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-137691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FBE9A955F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:19:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006109A957D
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:38:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 571D3B212C2
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:19:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B5EA1C229B9
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C8C84D0D;
-	Tue, 22 Oct 2024 01:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9CD84FAD;
+	Tue, 22 Oct 2024 01:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HgCOkLf+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CnEb5BFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3893326281;
-	Tue, 22 Oct 2024 01:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EEB80025;
+	Tue, 22 Oct 2024 01:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729559945; cv=none; b=GUlzbvCPh5BP6AJAOjjHtgM8F87ydgGI2be109B/Xx2pSMePQlqlNBr/kOZ8V3rLYBqKDR+BOefxJfozh2tdrcUCWG/g49+GfQdmqMRrVx8y+xDl65TKOApEnUpJLIHmgr/dvlkZMjesD/wdJH2X4htMMBrQy9MeiKk/y2P0gcA=
+	t=1729561076; cv=none; b=cvmUJzhhz25LWkA+c5Melp63YiNk56ZXbINEYRQXaOzl5F8IXIlrATsozabaWMK0koBDPQDUtemmbWf0atFfg65rysByURLdwjwyFWfdACO8JQf1ckcRF23f41I9SlYVc1YwEzlV89I/AiXPGQz/qgBRl+zhRGyF/6SyBCGRQ24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729559945; c=relaxed/simple;
-	bh=yEDPlRP4Zj2HkaRjjpu9urRnnUFC3BzEpEjII9ko2Y8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bEJKwIi0+n2C5l16QQSG1eTlZfdGr8FAq6yuzmHB7VeLrxVqahK7kHDFrO+Y5Bxd/CJ4e1utxT+jrutnlaJkLmjSUw/3PVkk+qzru/vLeK3f7aAq+dxvS0WBgdEKojYAyAluiUZ+7PjVRoKMgoRMdUwa8lU1fMQ7LPUqzjSzooY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HgCOkLf+; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1729561076; c=relaxed/simple;
+	bh=NDJLk7xkPiU48e/PSsaR3uNMu9+RXCrTo/wdzd/6Vts=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OsmANnnWvI9NZyt4PqZkfGlP04IY37WD7ak+F6MnTTB1wY5LPNTB4vn264mEca3OWC2s9zAEya9aahPDQEj/I3fpnIGGUx3rk3rs07YucyJcacdwMc30YlV0dM01ZWN+ZSKqwE73Aqme/LDeZZ0jYLu4xjwJ0KXg7j1hZ2BVTEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnEb5BFn; arc=none smtp.client-ip=209.85.128.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20cceb8d8b4so28817135ad.1;
-        Mon, 21 Oct 2024 18:19:03 -0700 (PDT)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6e2f4c1f79bso41758207b3.1;
+        Mon, 21 Oct 2024 18:37:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729559943; x=1730164743; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Udq7Pu1p+Owher5kcrl4GtXAZn/1l1iX1dmy+iMLMoM=;
-        b=HgCOkLf+wAarOjxWUE3NsBM57mfFZXBMDFmmS7RUqEmgblRLmUSdWRVs2a3bMM7eOI
-         HnCPFYZg9Bah1bYMxQ5ch3eQb20rE4bDnkNJMl4xu4JbO2qQPW/duVcIHMF5OnmdsPm9
-         bQhZTqkuVej3nYNgTMUIarbR/oTYMWmJht0sdOH8w+A8k6XxeWXuNv9aY00c4L0Xu3m/
-         zMrEz19PkABhBvQyjx1Rb0xHyL6iU4UQU4hb+V7wRTdljNMfLonWzz+uHKP0L33xLeUR
-         7liWitIML0pRBCzPHUGKF6B/IqIg15IpXuxe9bbT7SZkRzEZGXhynq91YjlOv7sU9WCp
-         8TWw==
+        d=gmail.com; s=20230601; t=1729561074; x=1730165874; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=NDJLk7xkPiU48e/PSsaR3uNMu9+RXCrTo/wdzd/6Vts=;
+        b=CnEb5BFnjhBQbcZghV0O8QO/n7o4aJfb4ZTElX0odhBZQbZfh0i0m9L6bxxtDQLto9
+         nKpDYGTvijC7a1Z9eHOhbEftcSaEZ9CqM9tup9cShd7m/PdMB3izG0c4xLr0ItgkXMm3
+         ZizjhdgPwEySlNen9IPZ6ZbwLmbULNMYuK4dQs1i0KO4vGxyK6dXVyWxJ7ZPTefMLk8c
+         dqxF8AoJ9fntE0UEfjd9YPnoIhCdcpXStOOJtbqjSElqlVN5ZnD8BiQ0vJYWOKBLWhL6
+         p42lCwC8rcEiB7PiBU4bA0POVPc8IE1QKpg58+9Ym+qNf+AEikOMuuhHQdUPMSVHhXVQ
+         mGvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729559943; x=1730164743;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Udq7Pu1p+Owher5kcrl4GtXAZn/1l1iX1dmy+iMLMoM=;
-        b=rGERJPQYkt8rvtDN/swlsCjnFRllcaEwYy+WxvYUnHqrLB8rPM4UujLkxrlZEULp5A
-         qHFmvIW8Z2RkJU3SnJGd3eMm2/bLdPSnwmxBccXTfBGhBHRrExTsFMADbfTsfqzSDHue
-         svaY8XMgngP2mAj2nXw8dX/JsdBM0cqSTgtb3YgWwzWqcOWLzkc7oVVLEGPPFA/m60iN
-         t3NHCglgdwPd9W3ATM80AHrsGgPFp6R4i6RhmDmVjpHGKUNydKsnVixYC6+9TE7lM4JD
-         rypB64R5d7ezlWkYpoKdRKhCxlBhcr4x/d9VjMiyJ1/zwMiGHnN2OST1dPkIpK4aKmnk
-         s3MQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxxIBOYqqp1EDGbL3PrAfGH3UyKBiNNCd6Rpw3MVY/6nu9m8+BtUtIShn0tvvZN7n8MX50WmNKR6dFc60=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw/EfXmXF/rId7nt2uwrLpa3OoB7oBdEmnNpbRaVlLFTGAKK1/
-	0G2sda50JCqlZ7uyoeBl1vNTecINHfl2FCOhav090W2LSSiWumGy
-X-Google-Smtp-Source: AGHT+IGvblNQVsQOPVgmT1x2wm7zqYjNUuoqztt7cfO8OQ+0Fg+y5/stRxfdy1AblmI2Ld1bmpRAfQ==
-X-Received: by 2002:a17:902:d2d1:b0:205:5d71:561e with SMTP id d9443c01a7336-20e970d57e0mr22078415ad.26.1729559943396;
-        Mon, 21 Oct 2024 18:19:03 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f12ea2csm32077375ad.62.2024.10.21.18.18.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2024 18:19:02 -0700 (PDT)
-Date: Tue, 22 Oct 2024 01:18:56 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] bonding: add ns target multicast address to slave
- device
-Message-ID: <Zxb9gD7bc9v4OPE1@fedora>
-References: <20241021083052.2865-1-liuhangbin@gmail.com>
- <58777.1729526711@vermin>
+        d=1e100.net; s=20230601; t=1729561074; x=1730165874;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NDJLk7xkPiU48e/PSsaR3uNMu9+RXCrTo/wdzd/6Vts=;
+        b=VUib7ReMfLIJZFRA0IpJeFFmLSB9kwgLDkE0GNnaPIrfpYS9YfjUKM1YtYmFI44EOi
+         77FFRuXLp/TZ1HGUOFV5ikKwnuNLXfyfOX2cMawugsUmD9CjSg2hAg1q+R308ulv3CoS
+         5JXuwoRq3MJ39E7cLugCCyiIU3DAqOkeNJtSY6xrC3nhBHd64cIxB6kRcz2yC2AaJTLE
+         IOWy2dnqFenhqP2C2+YLJN5J5LshL+SK6uYGXLgO9rk1zEfQh+s+3AJjvgfDeCHKFwHu
+         Vdxe8wMocfJ75FfEdsUMvDRYppEgZzL6yYTyz1LASXviVccdvXCisy/44vMxLuzLR3yc
+         EJfw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9qKlieFNoBAbqrS/f0LWjuJCRwr4fOZ74yeNkzfNF0jOSmwnMhk/4rQzOwPFPfQslhZuqr5Z7@vger.kernel.org, AJvYcCW4RJS86EzbI51r2DG1vPXC/75GYLMCPWZiTc2uRhRGLu7GJATpqBpZt1wrKfOvHuwUDqA=@vger.kernel.org, AJvYcCXWh8aio4rjTD2avFOkJUiJisEJFHyslwo7zZ/5f3bQsEmu74IdK87n/GZwJYP+5CyUsjAZ31fi1LtBSj0j@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOLgSCYoE2+gUwIZ0p3nTfKmL6sJAsTDNAtqDJcUN5niCXXKXU
+	mlDv0lRAfeUs89COsAfqIxe9eh2h7nOJk4wXh+qfY9VPoej1Uk5WGVUoK7MsDbxH9Tfzbb2rxzi
+	MWmLX3VHCdUOWvMW4tOwjPT1oibk=
+X-Google-Smtp-Source: AGHT+IH/tKqA6Ex8XzzdbDrWfvqDknkowK08soSRE5a9PRlkAj9ON17Z/foKz0LOaGN255PnB9CXz+3HOizL5IJ0yLo=
+X-Received: by 2002:a05:690c:39b:b0:6d3:4c37:d652 with SMTP id
+ 00721157ae682-6e7d8256f38mr10799427b3.24.1729561074147; Mon, 21 Oct 2024
+ 18:37:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <58777.1729526711@vermin>
+References: <20241019071149.81696-1-danielyangkang@gmail.com> <c7d0503b-e20d-4a6d-aecf-2bd7e1c7a450@linux.dev>
+In-Reply-To: <c7d0503b-e20d-4a6d-aecf-2bd7e1c7a450@linux.dev>
+From: Daniel Yang <danielyangkang@gmail.com>
+Date: Mon, 21 Oct 2024 18:37:01 -0700
+Message-ID: <CAGiJo8R2PhpOitTjdqZ-jbng0Yg=Lxu6L+6FkYuUC1M_d10U2Q@mail.gmail.com>
+Subject: Re: [PATCH net] Drop packets with invalid headers to prevent KMSAN infoleak
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <bpf@vger.kernel.org>, 
+	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Oct 21, 2024 at 06:05:11PM +0200, Jay Vosburgh wrote:
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
-> 
-> >Commit 4598380f9c54 ("bonding: fix ns validation on backup slaves")
-> >tried to resolve the issue where backup slaves couldn't be brought up when
-> >receiving IPv6 Neighbor Solicitation (NS) messages. However, this fix only
-> >worked for drivers that receive all multicast messages, such as the veth
-> >interface.
-> >
-> >For standard drivers, the NS multicast message is silently dropped because
-> >the slave device is not a member of the NS target multicast group.
-> >
-> >To address this, we need to make the slave device join the NS target
-> >multicast group, ensuring it can receive these IPv6 NS messages to validate
-> >the slave’s status properly.
-> >
-> >Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
-> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> 
-> 	This seems fairly involved; would it be simpler to have
-> bond_hw_addr_swap() and/or bond_change_active_slave() insure that the
-> MAC multicast list is configured in the backup interface if arp_validate
-> is set appropriately and there's a NS target configured?  That will make
-> the MAC multicast list more inclusive than necessary, but I think the
-> implementation will be much less involved.
+> A test in selftests/bpf is needed to reproduce and better understand this.
+I don't know much about self tests but I've just been using the syzbot
+repro and #syz test at the link in the patch:
+https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090. Testing
+the patch showed that the uninitialized memory was not getting written
+to memory.
 
-You are right. Limit the mcast list only on backup salve would be less
-involved.
+> Only bpf_clone_redirect() is needed to reproduce or other bpf_skb_*() helpers calls
+> are needed to reproduce?
 
-So I will do:
+From what I can see in the crash report here:
+https://syzkaller.appspot.com/text?tag=CrashReport&x=10ba3ca9980000,
+only bpf_clone_redirect() is needed to trigger this issue. The issue
+seems to be that bpf_try_make_head_writable clones the skb and creates
+uninitialized memory but __bpf_tx_skb() gets called and the ethernet
+header never got written, resulting in the skb having a data section
+without a proper mac header. Current check:
 
-1. Add mcast list to all backup salves when setting NS targets.
-2. Add mcast to new backup slave, remove the list on new active slave on
-   bond_hw_addr_swap()
-3. Remove all mcast list when release slave
-4. All the changed need to be with arp_validate and NS targets configured.
+if (unlikely(skb->mac_header >= skb->network_header || skb->len == 0))
+{
+**drop packet**
+}
 
-Thanks
-Hangbin
+in __bpf_redirect_common() is insufficient since it only checks if the
+mac header is misordered or if the data length is 0. So, any packet
+with a malformed MAC header that is not 14 bytes but is not 0 doesn't
+get dropped. Adding bounds checks for mac header size should fix this.
+And from what I see in the syz test of this patch, it does.
+
+Are there any possible unexpected issues that can be caused by this?
 
