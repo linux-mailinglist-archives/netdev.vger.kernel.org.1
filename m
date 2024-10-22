@@ -1,196 +1,112 @@
-Return-Path: <netdev+bounces-137888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7150B9AB010
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:51:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 071229AB00D
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91B381C22209
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 13:51:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B087C1F219E0
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 13:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC37A19F116;
-	Tue, 22 Oct 2024 13:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD7619F416;
+	Tue, 22 Oct 2024 13:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U4TYgQMN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGw0RzMw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA96919EED2;
-	Tue, 22 Oct 2024 13:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895DB19F406;
+	Tue, 22 Oct 2024 13:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729605050; cv=none; b=a6fOr+L+1d5yaBOlevW/d98wbGI2IOFN99VIPk/JNQi/GcB87a983MKVaf2V4zthkxS/iSzifA8pt7IdKdfvZNp33Q242rxnndXmuj/4iMGowFSx/Fp5nxQRXFzsF7IOh/6RfSH6JLmnYWxdDlWS8xDAxQ+aT/1OBb1DakaRXBY=
+	t=1729605031; cv=none; b=BSWP1vVtuI7YhNpyz8As7208KT/YCb4ugQoZj0xwEQvAdUB9WnwH8U8bGmZdP29ZvoH6vJ611nQnGAPl7FHkXjcOFDwY2eLAVLB0wAFczkviJdiIzi9X9jAx6ga4aVrmqHy2uXFW3+ALRVSkwqHBe2ksQM54VUEid1+M+cHeFRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729605050; c=relaxed/simple;
-	bh=epoMaoM6MMwh/KBGwPkmJaakzhozvJct5sHt4yT4Z9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gp65WTpa6TGGkQoyByK+Z2nr+Wf8x46d7sDgA5txXbPXYiL2R6qkzi9XZd9YhrQ7imBBdZCfGmfWjiSzBdfm+VcO7sCEOsNRa/IvzbayKf4a4xAAhelFQGFgrL9ntIad3NyBoYRTnaCyR4DDLTbuIhqwzZO02bxd0gl+tbwqAB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U4TYgQMN; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729605049; x=1761141049;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=epoMaoM6MMwh/KBGwPkmJaakzhozvJct5sHt4yT4Z9s=;
-  b=U4TYgQMN7o+rXv0y0pJv7HQEgnjo/B38pkJ0c5I4QKjSGi4hYJRLOYB7
-   6gP4sevSyF5mBrcuN9ZzTiyBFvsB37xi7VFT9s/uUuj0Xp+LJgv9NYy6h
-   tO2wyABY+5DyuXTNxGysnelvNB4c40+RW9CV8+ltslpPy0U2mUGQImWV3
-   bXdMeXfZEpkySPOevdIAUmFEgZNhbxc6wMgdV54Gj7ZSE541popMQTs0j
-   bseCD/77V3vfNWI/Ocj+TTba26FMlK8v9h3xTUXvt6Pvur1BxtVcE/7ND
-   Xs1LJDAtUf3LeFOKWJe30ORr5HWo7JlytwCIoXLKKqMDTCRUGgggaBXSQ
-   A==;
-X-CSE-ConnectionGUID: 4P+BpasQRxWdd9E9CO+Sxg==
-X-CSE-MsgGUID: MKYeqabVSQiWkbyj+v4HhQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="40531462"
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="40531462"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 06:50:47 -0700
-X-CSE-ConnectionGUID: WQvPy/wOQryWrGcK4sqBHA==
-X-CSE-MsgGUID: cHeUKNTnTiqUvliz9qbK9Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="80694139"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 22 Oct 2024 06:50:40 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t3FHS-000Tdu-0u;
-	Tue, 22 Oct 2024 13:50:38 +0000
-Date: Tue, 22 Oct 2024 21:50:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Puranjay Mohan <puranjay@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Helge Deller <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Shuah Khan <skhan@linuxfoundation.org>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next 1/5] net: checksum: move from32to16() to generic
- header
-Message-ID: <202410222149.3FVJFYYy-lkp@intel.com>
-References: <20241021122112.101513-2-puranjay@kernel.org>
+	s=arc-20240116; t=1729605031; c=relaxed/simple;
+	bh=7DhO+XcQtbQ7x3y0dr4Vob6lgsBvWAhZ/wmsNaotVAk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XgIPBTaihHT9k38fFYTBOIDLdX6/2oLlFDYzhtuSOR8rXbuyuAOneO7UP0JlNoqZP+fy4JruPh9vyUOcHMRjbwdBGW7P96HYVxjjvGG44+k5hmG8xElR9RYeDkwv4rch+9rVYy3r52UOIznTIqgY5wP+H/T47exf0UClIDIlLhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGw0RzMw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10494C4CEEB;
+	Tue, 22 Oct 2024 13:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729605031;
+	bh=7DhO+XcQtbQ7x3y0dr4Vob6lgsBvWAhZ/wmsNaotVAk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eGw0RzMwpUKQxnr06SubuZYaJdrSyxq2mYhqsDVIC8UZpKl3S+Ikq9pPLa6t91V74
+	 qpp6iPh3YhQf5FfJB8Ty8mRMn4tTiAByXum1BMOw7XFa2y/s6xTYItLaRFKjwLYNkc
+	 gm0e4rREcmnpVhhcWJnCOlEcDvRSPob8FIwGJ2o7hvQ/ogd3sb4OPly+AX8+anlZSH
+	 RgMFbAtiw0hq1yhVE5HSw9CO1fVuInPbjetQU2igiEY+c6aSkeZj8Avs5Z61SCXS7u
+	 PjC7NdEJ+0Zzt9gtaDbPNqeuHCl6EAPfA+8p87Cdc0CSDZe/k26S8uHtxSevueYLJ9
+	 XUpwHPPQkH+Pg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7118A3822D22;
+	Tue, 22 Oct 2024 13:50:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021122112.101513-2-puranjay@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/9] net: netconsole refactoring and warning fix
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172960503726.970813.1989936598226724092.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Oct 2024 13:50:37 +0000
+References: <20241017095028.3131508-1-leitao@debian.org>
+In-Reply-To: <20241017095028.3131508-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, thepacketgeek@gmail.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ davej@codemonkey.org.uk, vlad.wing@gmail.com, max@kutsevol.com,
+ kernel-team@meta.com
 
-Hi Puranjay,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-[auto build test WARNING on bpf-next/master]
+On Thu, 17 Oct 2024 02:50:15 -0700 you wrote:
+> The netconsole driver was showing a warning related to userdata
+> information, depending on the message size being transmitted:
+> 
+> 	------------[ cut here ]------------
+> 	WARNING: CPU: 13 PID: 3013042 at drivers/net/netconsole.c:1122 write_ext_msg+0x3b6/0x3d0
+> 	 ? write_ext_msg+0x3b6/0x3d0
+> 	 console_flush_all+0x1e9/0x330
+> 	 ...
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Puranjay-Mohan/net-checksum-move-from32to16-to-generic-header/20241021-202707
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20241021122112.101513-2-puranjay%40kernel.org
-patch subject: [PATCH bpf-next 1/5] net: checksum: move from32to16() to generic header
-config: x86_64-randconfig-122-20241022 (https://download.01.org/0day-ci/archive/20241022/202410222149.3FVJFYYy-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241022/202410222149.3FVJFYYy-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next,v5,1/9] net: netconsole: remove msg_ready variable
+    https://git.kernel.org/netdev/net-next/c/ab49de0f7a08
+  - [net-next,v5,2/9] net: netconsole: split send_ext_msg_udp() function
+    https://git.kernel.org/netdev/net-next/c/e7650d8d475c
+  - [net-next,v5,3/9] net: netconsole: separate fragmented message handling in send_ext_msg
+    https://git.kernel.org/netdev/net-next/c/e1e1ea2e78e8
+  - [net-next,v5,4/9] net: netconsole: rename body to msg_body
+    https://git.kernel.org/netdev/net-next/c/e1fa5d23b2c0
+  - [net-next,v5,5/9] net: netconsole: introduce variable to track body length
+    https://git.kernel.org/netdev/net-next/c/606994ad2695
+  - [net-next,v5,6/9] net: netconsole: track explicitly if msgbody was written to buffer
+    https://git.kernel.org/netdev/net-next/c/b8dee8ed13b8
+  - [net-next,v5,7/9] net: netconsole: extract release appending into separate function
+    https://git.kernel.org/netdev/net-next/c/684dce1f9984
+  - [net-next,v5,8/9] net: netconsole: do not pass userdata up to the tail
+    https://git.kernel.org/netdev/net-next/c/144d57360f5e
+  - [net-next,v5,9/9] net: netconsole: split send_msg_fragmented
+    https://git.kernel.org/netdev/net-next/c/60be416c6380
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410222149.3FVJFYYy-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> lib/checksum.c:84:34: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected restricted __wsum [usertype] sum @@     got unsigned int [assigned] result @@
-   lib/checksum.c:84:34: sparse:     expected restricted __wsum [usertype] sum
-   lib/checksum.c:84:34: sparse:     got unsigned int [assigned] result
->> lib/checksum.c:84:16: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned int [assigned] result @@     got restricted __sum16 @@
-   lib/checksum.c:84:16: sparse:     expected unsigned int [assigned] result
-   lib/checksum.c:84:16: sparse:     got restricted __sum16
-
-vim +84 lib/checksum.c
-
-    35	
-    36	#ifndef do_csum
-    37	static unsigned int do_csum(const unsigned char *buff, int len)
-    38	{
-    39		int odd;
-    40		unsigned int result = 0;
-    41	
-    42		if (len <= 0)
-    43			goto out;
-    44		odd = 1 & (unsigned long) buff;
-    45		if (odd) {
-    46	#ifdef __LITTLE_ENDIAN
-    47			result += (*buff << 8);
-    48	#else
-    49			result = *buff;
-    50	#endif
-    51			len--;
-    52			buff++;
-    53		}
-    54		if (len >= 2) {
-    55			if (2 & (unsigned long) buff) {
-    56				result += *(unsigned short *) buff;
-    57				len -= 2;
-    58				buff += 2;
-    59			}
-    60			if (len >= 4) {
-    61				const unsigned char *end = buff + ((unsigned)len & ~3);
-    62				unsigned int carry = 0;
-    63				do {
-    64					unsigned int w = *(unsigned int *) buff;
-    65					buff += 4;
-    66					result += carry;
-    67					result += w;
-    68					carry = (w > result);
-    69				} while (buff < end);
-    70				result += carry;
-    71				result = (result & 0xffff) + (result >> 16);
-    72			}
-    73			if (len & 2) {
-    74				result += *(unsigned short *) buff;
-    75				buff += 2;
-    76			}
-    77		}
-    78		if (len & 1)
-    79	#ifdef __LITTLE_ENDIAN
-    80			result += *buff;
-    81	#else
-    82			result += (*buff << 8);
-    83	#endif
-  > 84		result = csum_from32to16(result);
-    85		if (odd)
-    86			result = ((result >> 8) & 0xff) | ((result & 0xff) << 8);
-    87	out:
-    88		return result;
-    89	}
-    90	#endif
-    91	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
