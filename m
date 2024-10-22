@@ -1,153 +1,388 @@
-Return-Path: <netdev+bounces-138007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C199D9AB751
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:01:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67F189AB78A
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5451CB231BF
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:01:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB03C1F23344
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9D7153828;
-	Tue, 22 Oct 2024 20:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117D41A0BF8;
+	Tue, 22 Oct 2024 20:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="CUx72Qx/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7QPoJxN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EB713AA2B
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 20:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425C45A79B;
+	Tue, 22 Oct 2024 20:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729627254; cv=none; b=mtgau4SPFpgeFE4WrGKlj6k5uUrKF4bMuvYQyrX6EKwPZfVi+8+dZ/a8ihtFzoAvQq/6U1OUOZ7s3IKnmFkK9qGIf11kaG88PHeQvNc734yDy8pPBoGcEimqZVff3h9c20G1tqAagiAeFaq8cE4E52yzkw22+8EqIJLYvb0x4/A=
+	t=1729628195; cv=none; b=bdzQ+vTfq9cvkqaKW7qK4Y2ajHD5Vd0smUHOTBpzNaA/oZM48FNXUpiO0fjX163VjtsP5frdMiGMwL+VdeEqN8MeuBNqxoxLQku+qq8g4M+WZIQ8Erv/qVuzE/ca7mcRypg1kt9HFQM9ijXiOruHvvA0GUmeuubmvf+qaiC0Mxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729627254; c=relaxed/simple;
-	bh=R0HHZZkkZmBHPKqt4D7wfQOkyAXUc9i0cW8k6fPcLfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JfKiX1ZQZ5V2PURfgCm94D47Q97UKGXN2HVHyPsrWbowLdCIADvhYugtpmMpnThaidXtRHzBSVy91swOIdw8/Rpn+KXm+os/mJWJ6ZSygUFeBrfgkgbhegr3SObsMHeh8Ya5wB7uIrOJLcOpCWP81on5L1908zMDGPLWZS4RgbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=CUx72Qx/; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20caccadbeeso66032625ad.2
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 13:00:52 -0700 (PDT)
+	s=arc-20240116; t=1729628195; c=relaxed/simple;
+	bh=npKCql1gTkKQ8u0oyH23Y+Nb4Kb778MtDPkELasbbdk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PRdMffBanLuJ/7avFnW9RvdRpccfKHkRYNUpwXYkPiWM7DJWjgg9dO9yKUKycZgxfGayw25qyomlDIQqwOASp13Oq1NUC1DYGmcmCeUKcLGYaSzUqYvXoPRo0xYOEinT+vD3UBRZcIYpFSHYfBm2lg6fxsPjmECzmXEB/61c1WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7QPoJxN; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71e49ef3bb9so143866b3a.1;
+        Tue, 22 Oct 2024 13:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1729627252; x=1730232052; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cf57IdvfhRrsCh7RnxCCaHPG51VLTTsW/2BLHH3AQ0E=;
-        b=CUx72Qx/sLUGECyNTGJFdTKHsJkefyqud698DJnjA5HqGqXhL+oMijxGs27VeTCAte
-         opR02CVRn54NsyRB55ZM7D+lqrgBEQ/6YV8FaESwsFmmafQVZZi0VQQD+B2JUW8+EFUJ
-         O2F3/9kIpEQ//xyVHVcCFLPez4jGldC0uasj4=
+        d=gmail.com; s=20230601; t=1729628192; x=1730232992; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gB14F/a1LUamFMOcc37piKTi2MrjcGPFagP7mGf27wU=;
+        b=E7QPoJxNR59I7LDEI4THy4ZXwfVtVxrrrD5hfLcI68GU6qa03ngPdRCxuTyZPSPxxP
+         EhTRAxFcIa9vI6Fpl/RqAK40BkHgMeUPOLpKiZIrfvf9dwNUwE4yrmQw19pQbJjN/inO
+         BmK/j7Py25b3EvhJZ3a9pg1oAPSEBN67UO2kRTPa+vHuRZxHgpLRIGl2AldIwyDzokE9
+         yWLjCRQT0IHrR5+agOhAhMpXTIT8ssXEVkPDVP2YD26P3YYSqy0ltzikGNT5JjsvK95W
+         EUKD2Aof3HQLTpie1hpDNZKgi4QPSZudsU6hrBTsICtjlMeBLsXMHrxIoAwijVm0yrUx
+         6Jcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729627252; x=1730232052;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cf57IdvfhRrsCh7RnxCCaHPG51VLTTsW/2BLHH3AQ0E=;
-        b=PMGgHUq5HOyWXMwP8f99rS2xJQ2VzXmW6wtVpLZ1a4PuFRXf8JnhuhlYyr48tpvTeK
-         fAv3OMTeH3Dj6yGeb33O+2X3FhiUU3ks5cuIkMYpz0EHr0LcU0OceGJ9mFtG30RmlFls
-         xRxdL1t/WSrbjl+oaHpJrt0FlrdPRbeTgkHWOAP21uQMpycsckh5MjJI/RRTEzJwywGZ
-         YAHqS/Eru3Hi7BmczEenBkIQXUd0szR9uIGPQOfXJshSAB08gHzVtYFS1b9Vwip1DJSM
-         dPv4WmlyT+bVeZ6K8S9NB77908hHJo+crn5FpNa78HAoNslPlCjnr9Dxl98vGGQhovwG
-         6nwQ==
-X-Gm-Message-State: AOJu0YyIVU5ek3iz4gKE3FTUmgjKmfzQgi7r0pH6Neepp7wOrnzrU0DA
-	rgNdYN583i2sXj97/4+lqHtaIrc+qFVsdySPo6wWQp2FbSIK3XmzCIi4YLEzBZ+eKLDuDhBXCj0
-	ktdFYqEDMgaGkWu49wdW/j88FWg18FUyC2ONnu2hvz2WNlefEAG8QgisZNZmYshwdNlUa5n38hO
-	OaleDezicJwedXWbQHbE+woyDlcTqIZvaWidI=
-X-Google-Smtp-Source: AGHT+IHAhsM57JFqrnl5WExxOcZT26xz5WKpMt8kr/USHG17C5v6KjFuSb/JdmQAVaMNBs5fRvraBw==
-X-Received: by 2002:a17:90a:b383:b0:2e2:b2ce:e41e with SMTP id 98e67ed59e1d1-2e76b5dde2dmr122577a91.13.1729627251084;
-        Tue, 22 Oct 2024 13:00:51 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e5ad368b25sm6662797a91.24.2024.10.22.13.00.49
+        d=1e100.net; s=20230601; t=1729628192; x=1730232992;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gB14F/a1LUamFMOcc37piKTi2MrjcGPFagP7mGf27wU=;
+        b=QyZtXQ81ptyOZi6QeyvVdA24WWAiuEVAiPG59iSUPafKcG/mjauylaHwOrzIGsIsFd
+         ajSppZvFt3dIJ9lkuz6Rk0AEJlJ+tqLJHPzDGe6wNInpCbGk6+XBPaanMsukej8M7br6
+         /0EyHrTk9sFzjBJ73YhIJhPunad5xvZ75X5L7qsUzyFriIRHiPov7CcdOWw0Bb/M33Ql
+         dzWLh+DU47m11zMDIXjW+LX0TTUAJC9VHq+v4GftJc2dr4qd0pSXtT0awzkl0J5o96cs
+         uBIcWW8SUmhfp/N3bA7UszH6EzWnQvB2vqj7Jr0xYszpEpYnwEE7UuzFk9FNbVFU8rCv
+         Swdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbRKp/iGUwCDvKRfN2T5b5uYmm7hg6LitKo9CV0zD2fDCYg+KkcmTFwpTG0ye3UUfnFQhvd6lgrsTAutg=@vger.kernel.org, AJvYcCVUaw7SeXrBNzDuazhZ2aoduN1I1Ao7XX1IjzFMMO/wU7P3qjXvLKVk9IrJFCS+EzyFJc0dmVsQCPW3pc//2uC5YZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1xYSE51MkUKDUnohH3u5wrwECpgp9WgmjWPwxKbp83mt8Pn1C
+	WdTExyHIUrKCpZQ25WY66aGS5cyv/hEopYz/fLUxe436Fcw1I3CPGeerx0Fe
+X-Google-Smtp-Source: AGHT+IFK8UnuUY6S0dV6mpuDMHpwvUq8V9yzyDQ3B2tJZboD7ScbY8qp/lcbfPBTEG9DY63eIwWzSA==
+X-Received: by 2002:aa7:8003:0:b0:71e:427e:e679 with SMTP id d2e1a72fcca58-71edc146704mr6597496b3a.4.1729628192136;
+        Tue, 22 Oct 2024 13:16:32 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1312e7dsm5309557b3a.11.2024.10.22.13.16.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 13:00:50 -0700 (PDT)
-Date: Tue, 22 Oct 2024 13:00:47 -0700
-From: Joe Damato <jdamato@fastly.com>
+        Tue, 22 Oct 2024 13:16:31 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
-Cc: dmantipov@yandex.ru, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com (maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER),
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	George McCollister <george.mccollister@gmail.com>,
 	Simon Horman <horms@kernel.org>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC iwl-net] e1000: Hold RTNL when e1000_down can be called
-Message-ID: <ZxgEb0N0cJt1BRte@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
-	dmantipov@yandex.ru, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241022172153.217890-1-jdamato@fastly.com>
+	linux-kernel@vger.kernel.org (open list),
+	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
+Subject: [PATCHv2 net-next] net: dsa: use ethtool string helpers
+Date: Tue, 22 Oct 2024 13:16:29 -0700
+Message-ID: <20241022201629.139244-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241022172153.217890-1-jdamato@fastly.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 22, 2024 at 05:21:53PM +0000, Joe Damato wrote:
-> e1000_down calls netif_queue_set_napi, which assumes that RTNL is held.
-> 
-> There are a few paths for e1000_down to be called in e1000 where RTNL is
-> not currently being held:
->   - e1000_shutdown (pci shutdown)
->   - e1000_suspend (power management)
->   - e1000_reinit_locked (via e1000_reset_task delayed work)
-> 
-> Hold RTNL in two places to fix this issue:
->   - e1000_reset_task
->   - __e1000_shutdown (which is called from both e1000_shutdown and
->     e1000_suspend).
+These are the prefered way to copy ethtool strings.
 
-It looks like there's one other spot I missed:
+Avoids incrementing pointers all over the place.
 
-e1000_io_error_detected (pci error handler) which should also hold
-rtnl_lock:
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+---
+ v2: remove curly braces from rzn1_a5psw.c
+ drivers/net/dsa/b53/b53_common.c          |  3 +--
+ drivers/net/dsa/bcm_sf2.c                 |  5 +----
+ drivers/net/dsa/bcm_sf2_cfp.c             | 18 +++++-------------
+ drivers/net/dsa/dsa_loop.c                |  3 +--
+ drivers/net/dsa/hirschmann/hellcreek.c    |  8 ++------
+ drivers/net/dsa/microchip/ksz_common.c    |  3 +--
+ drivers/net/dsa/mv88e6xxx/chip.c          | 17 ++---------------
+ drivers/net/dsa/mv88e6xxx/serdes.c        |  6 ++----
+ drivers/net/dsa/rzn1_a5psw.c              |  6 ++----
+ drivers/net/dsa/sja1105/sja1105_ethtool.c |  7 ++-----
+ drivers/net/dsa/xrs700x/xrs700x.c         |  6 ++----
+ net/dsa/user.c                            | 13 +++++--------
+ 12 files changed, 26 insertions(+), 69 deletions(-)
 
-+       if (netif_running(netdev)) {
-+               rtnl_lock();
-                e1000_down(adapter);
-+               rtnl_unlock();
-+       }
-
-I can send that update in the v2, but I'll wait to see if Intel has suggestions
-on the below.
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index c39cb119e760..285785c942b0 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -989,8 +989,7 @@ void b53_get_strings(struct dsa_switch *ds, int port, u32 stringset,
  
-> The other paths which call e1000_down seemingly hold RTNL and are OK:
->   - e1000_close (ndo_stop)
->   - e1000_change_mtu (ndo_change_mtu)
-> 
-> I'm submitting this is as an RFC because:
->   - the e1000_reinit_locked issue appears very similar to commit
->     21f857f0321d ("e1000e: add rtnl_lock() to e1000_reset_task"), which
->     fixes a similar issue in e1000e
-> 
-> however
-> 
->   - adding rtnl to e1000_reinit_locked seemingly conflicts with an
->     earlier e1000 commit b2f963bfaeba ("e1000: fix lockdep warning in
->     e1000_reset_task").
-> 
-> Hopefully Intel can weigh in and shed some light on the correct way to
-> go.
-> 
-> Fixes: 8f7ff18a5ec7 ("e1000: Link NAPI instances to queues and IRQs")
-> Reported-by: Dmitry Antipov <dmantipov@yandex.ru>
-> Closes: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
+ 	if (stringset == ETH_SS_STATS) {
+ 		for (i = 0; i < mib_size; i++)
+-			strscpy(data + i * ETH_GSTRING_LEN,
+-				mibs[i].name, ETH_GSTRING_LEN);
++			ethtool_puts(&data, mibs[i].name);
+ 	} else if (stringset == ETH_SS_PHY_STATS) {
+ 		phydev = b53_get_phy_device(ds, port);
+ 		if (!phydev)
+diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
+index 9201f07839ad..2bb1832d21bc 100644
+--- a/drivers/net/dsa/bcm_sf2.c
++++ b/drivers/net/dsa/bcm_sf2.c
+@@ -1180,11 +1180,8 @@ static const struct b53_io_ops bcm_sf2_io_ops = {
+ static void bcm_sf2_sw_get_strings(struct dsa_switch *ds, int port,
+ 				   u32 stringset, uint8_t *data)
+ {
+-	int cnt = b53_get_sset_count(ds, port, stringset);
+-
+ 	b53_get_strings(ds, port, stringset, data);
+-	bcm_sf2_cfp_get_strings(ds, port, stringset,
+-				data + cnt * ETH_GSTRING_LEN);
++	bcm_sf2_cfp_get_strings(ds, port, stringset, data);
+ }
+ 
+ static void bcm_sf2_sw_get_ethtool_stats(struct dsa_switch *ds, int port,
+diff --git a/drivers/net/dsa/bcm_sf2_cfp.c b/drivers/net/dsa/bcm_sf2_cfp.c
+index c88ee3dd4299..93cb43ed6e61 100644
+--- a/drivers/net/dsa/bcm_sf2_cfp.c
++++ b/drivers/net/dsa/bcm_sf2_cfp.c
+@@ -1283,23 +1283,15 @@ void bcm_sf2_cfp_get_strings(struct dsa_switch *ds, int port,
+ 			     u32 stringset, uint8_t *data)
+ {
+ 	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
+-	unsigned int s = ARRAY_SIZE(bcm_sf2_cfp_stats);
+-	char buf[ETH_GSTRING_LEN];
+-	unsigned int i, j, iter;
++	unsigned int i, j;
+ 
+ 	if (stringset != ETH_SS_STATS)
+ 		return;
+ 
+-	for (i = 1; i < priv->num_cfp_rules; i++) {
+-		for (j = 0; j < s; j++) {
+-			snprintf(buf, sizeof(buf),
+-				 "CFP%03d_%sCntr",
+-				 i, bcm_sf2_cfp_stats[j].name);
+-			iter = (i - 1) * s + j;
+-			strscpy(data + iter * ETH_GSTRING_LEN,
+-				buf, ETH_GSTRING_LEN);
+-		}
+-	}
++	for (i = 1; i < priv->num_cfp_rules; i++)
++		for (j = 0; j < ARRAY_SIZE(bcm_sf2_cfp_stats); j++)
++			ethtool_sprintf(&data, "CFP%03d_%sCntr", i,
++					bcm_sf2_cfp_stats[j].name);
+ }
+ 
+ void bcm_sf2_cfp_get_ethtool_stats(struct dsa_switch *ds, int port,
+diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
+index c70ed67cc188..adbab544c60f 100644
+--- a/drivers/net/dsa/dsa_loop.c
++++ b/drivers/net/dsa/dsa_loop.c
+@@ -121,8 +121,7 @@ static void dsa_loop_get_strings(struct dsa_switch *ds, int port,
+ 		return;
+ 
+ 	for (i = 0; i < __DSA_LOOP_CNT_MAX; i++)
+-		memcpy(data + i * ETH_GSTRING_LEN,
+-		       ps->ports[port].mib[i].name, ETH_GSTRING_LEN);
++		ethtool_puts(&data, ps->ports[port].mib[i].name);
+ }
+ 
+ static void dsa_loop_get_ethtool_stats(struct dsa_switch *ds, int port,
+diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
+index d798f17cf7ea..283ec5a6e23c 100644
+--- a/drivers/net/dsa/hirschmann/hellcreek.c
++++ b/drivers/net/dsa/hirschmann/hellcreek.c
+@@ -294,12 +294,8 @@ static void hellcreek_get_strings(struct dsa_switch *ds, int port,
+ {
+ 	int i;
+ 
+-	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i) {
+-		const struct hellcreek_counter *counter = &hellcreek_counter[i];
+-
+-		strscpy(data + i * ETH_GSTRING_LEN,
+-			counter->name, ETH_GSTRING_LEN);
+-	}
++	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i)
++		ethtool_puts(&data, hellcreek_counter[i].name);
+ }
+ 
+ static int hellcreek_get_sset_count(struct dsa_switch *ds, int port, int sset)
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 4e8710c7cb7b..408ccb1f012e 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2113,8 +2113,7 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
+ 		return;
+ 
+ 	for (i = 0; i < dev->info->mib_cnt; i++) {
+-		memcpy(buf + i * ETH_GSTRING_LEN,
+-		       dev->info->mib_names[i].string, ETH_GSTRING_LEN);
++		ethtool_puts(&buf, dev->info->mib_names[i].string);
+ 	}
+ }
+ 
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 4f5193d86e65..1893fed00467 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -1162,8 +1162,7 @@ static int mv88e6xxx_stats_get_strings(struct mv88e6xxx_chip *chip,
+ 	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
+ 		stat = &mv88e6xxx_hw_stats[i];
+ 		if (stat->type & types) {
+-			memcpy(data + j * ETH_GSTRING_LEN, stat->string,
+-			       ETH_GSTRING_LEN);
++			ethtool_puts(&data, stat->string);
+ 			j++;
+ 		}
+ 	}
+@@ -1204,31 +1203,19 @@ static void mv88e6xxx_atu_vtu_get_strings(uint8_t *data)
+ 	unsigned int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(mv88e6xxx_atu_vtu_stats_strings); i++)
+-		strscpy(data + i * ETH_GSTRING_LEN,
+-			mv88e6xxx_atu_vtu_stats_strings[i],
+-			ETH_GSTRING_LEN);
++		ethtool_puts(&data, mv88e6xxx_atu_vtu_stats_strings[i]);
+ }
+ 
+ static void mv88e6xxx_get_strings(struct dsa_switch *ds, int port,
+ 				  u32 stringset, uint8_t *data)
+ {
+ 	struct mv88e6xxx_chip *chip = ds->priv;
+-	int count = 0;
+ 
+ 	if (stringset != ETH_SS_STATS)
+ 		return;
+ 
+ 	mv88e6xxx_reg_lock(chip);
+ 
+-	if (chip->info->ops->stats_get_strings)
+-		count = chip->info->ops->stats_get_strings(chip, data);
+-
+-	if (chip->info->ops->serdes_get_strings) {
+-		data += count * ETH_GSTRING_LEN;
+-		count = chip->info->ops->serdes_get_strings(chip, port, data);
+-	}
+-
+-	data += count * ETH_GSTRING_LEN;
+ 	mv88e6xxx_atu_vtu_get_strings(data);
+ 
+ 	mv88e6xxx_reg_unlock(chip);
+diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
+index 01ea53940786..327831d2b547 100644
+--- a/drivers/net/dsa/mv88e6xxx/serdes.c
++++ b/drivers/net/dsa/mv88e6xxx/serdes.c
+@@ -144,8 +144,7 @@ int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
+ 
+ 	for (i = 0; i < ARRAY_SIZE(mv88e6352_serdes_hw_stats); i++) {
+ 		stat = &mv88e6352_serdes_hw_stats[i];
+-		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
+-		       ETH_GSTRING_LEN);
++		ethtool_puts(&data, stat->string);
+ 	}
+ 	return ARRAY_SIZE(mv88e6352_serdes_hw_stats);
+ }
+@@ -405,8 +404,7 @@ int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
+ 
+ 	for (i = 0; i < ARRAY_SIZE(mv88e6390_serdes_hw_stats); i++) {
+ 		stat = &mv88e6390_serdes_hw_stats[i];
+-		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
+-		       ETH_GSTRING_LEN);
++		ethtool_puts(&data, stat->string);
+ 	}
+ 	return ARRAY_SIZE(mv88e6390_serdes_hw_stats);
+ }
+diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
+index 1135a32e4b7e..66974379334a 100644
+--- a/drivers/net/dsa/rzn1_a5psw.c
++++ b/drivers/net/dsa/rzn1_a5psw.c
+@@ -802,10 +802,8 @@ static void a5psw_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+ 	if (stringset != ETH_SS_STATS)
+ 		return;
+ 
+-	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++) {
+-		memcpy(data + u * ETH_GSTRING_LEN, a5psw_stats[u].name,
+-		       ETH_GSTRING_LEN);
+-	}
++	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++)
++		ethtool_puts(&data, a5psw_stats[u].name);
+ }
+ 
+ static void a5psw_get_ethtool_stats(struct dsa_switch *ds, int port,
+diff --git a/drivers/net/dsa/sja1105/sja1105_ethtool.c b/drivers/net/dsa/sja1105/sja1105_ethtool.c
+index decc6c931dc1..2ea64b1d026d 100644
+--- a/drivers/net/dsa/sja1105/sja1105_ethtool.c
++++ b/drivers/net/dsa/sja1105/sja1105_ethtool.c
+@@ -586,7 +586,6 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
+ {
+ 	struct sja1105_private *priv = ds->priv;
+ 	enum sja1105_counter_index max_ctr, i;
+-	char *p = data;
+ 
+ 	if (stringset != ETH_SS_STATS)
+ 		return;
+@@ -597,10 +596,8 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
+ 	else
+ 		max_ctr = __MAX_SJA1105PQRS_PORT_COUNTER;
+ 
+-	for (i = 0; i < max_ctr; i++) {
+-		strscpy(p, sja1105_port_counters[i].name, ETH_GSTRING_LEN);
+-		p += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < max_ctr; i++)
++		ethtool_puts(&data, sja1105_port_counters[i].name);
+ }
+ 
+ int sja1105_get_sset_count(struct dsa_switch *ds, int port, int sset)
+diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
+index de3b768f2ff9..4dbcc49a9e52 100644
+--- a/drivers/net/dsa/xrs700x/xrs700x.c
++++ b/drivers/net/dsa/xrs700x/xrs700x.c
+@@ -91,10 +91,8 @@ static void xrs700x_get_strings(struct dsa_switch *ds, int port,
+ 	if (stringset != ETH_SS_STATS)
+ 		return;
+ 
+-	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++) {
+-		strscpy(data, xrs700x_mibs[i].name, ETH_GSTRING_LEN);
+-		data += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++)
++		ethtool_puts(&data, xrs700x_mibs[i].name);
+ }
+ 
+ static int xrs700x_get_sset_count(struct dsa_switch *ds, int port, int sset)
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index 64f660d2334b..697e73494175 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -1042,15 +1042,12 @@ static void dsa_user_get_strings(struct net_device *dev,
+ 	struct dsa_switch *ds = dp->ds;
+ 
+ 	if (stringset == ETH_SS_STATS) {
+-		int len = ETH_GSTRING_LEN;
+-
+-		strscpy_pad(data, "tx_packets", len);
+-		strscpy_pad(data + len, "tx_bytes", len);
+-		strscpy_pad(data + 2 * len, "rx_packets", len);
+-		strscpy_pad(data + 3 * len, "rx_bytes", len);
++		ethtool_puts(&data, "tx_packets");
++		ethtool_puts(&data, "tx_bytes");
++		ethtool_puts(&data, "rx_packets");
++		ethtool_puts(&data, "rx_bytes");
+ 		if (ds->ops->get_strings)
+-			ds->ops->get_strings(ds, dp->index, stringset,
+-					     data + 4 * len);
++			ds->ops->get_strings(ds, dp->index, stringset, data);
+ 	} else if (stringset ==  ETH_SS_TEST) {
+ 		net_selftest_get_strings(data);
+ 	}
+-- 
+2.47.0
+
 
