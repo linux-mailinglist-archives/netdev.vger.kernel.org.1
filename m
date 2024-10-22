@@ -1,141 +1,125 @@
-Return-Path: <netdev+bounces-137965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBBBB9AB43C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:40:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4F6A9AB481
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9356F281758
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:40:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2C5285B52
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEF11BBBF7;
-	Tue, 22 Oct 2024 16:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2221B654C;
+	Tue, 22 Oct 2024 16:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qya/+fTR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+0poDUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f194.google.com (mail-qt1-f194.google.com [209.85.160.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D581474C9;
-	Tue, 22 Oct 2024 16:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE464256D
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 16:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729615220; cv=none; b=tl0vTYit0NabNu1Qg3ecmn/o1rad9QNKJj1C2BED9I3R/HX/Uf3bdqNp1KSjzAYshywl9Wi7wGRZPW908ipbrYwga/ObXYerrkj7eEsrksoeKvVj6xxok3VSs16Y1TuiTKSh9AfBbIgSDEglCZhJaLO1lebDlDGyvLahTGYGwnw=
+	t=1729616249; cv=none; b=PPLG5ox1HbEbSLC/fmjbuse/PKoBFA6snvj70ScQwSJZIU6BMyeJs7bjhi7HHgXfKINCaxBd/8y1dvSO3RLH7DOL+hYe7771PrjwbfiZHzPIxxW+a8r0eKjSd0RacWzNOOiZLn6f2izIwLu9djG+UFB0zozVIS8IWrhv4RVAcpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729615220; c=relaxed/simple;
-	bh=dzLcXD+156SYMA3WB6A3WMf+G11daZvhn9a/x7sleuw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BVbY4E1yTwea59b9omFgi52q29gO23SoxzQn86uVhh4HmE6783Tmj5+O8xj0qgvdt8baJwxNLROImSV/MhpfukWGSYlUjviEC5N/13ZRqX3RRZKS0Bq2hUt5RnqmLrOkc68oSGFvqg/fwNrfoEAMABkNnpUFnsmVyiX5tvD5n0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qya/+fTR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4339C4CEE3;
-	Tue, 22 Oct 2024 16:40:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729615218;
-	bh=dzLcXD+156SYMA3WB6A3WMf+G11daZvhn9a/x7sleuw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qya/+fTRh7iRS0fsWNpvNM4fOZ9LEm97jSTasjbGio+K0xA9SHfTW2zGT+kMVIzUP
-	 BdfIwCsJL54BhfdrJRzgB4j8pS1X/n/5alm850QyNO4HeMAhgJqSRcWqU0tkUQugzq
-	 Clse6h50LyituelUmqyAjyyv5yIkPpegtIyXxd1piO1Ly3v2le//1T3MLllSir4d4n
-	 /Wp3smiVKNdUUKIvjKz0q90TmEzjAoqa14PtnXHuBDb/FgO3Aoe4rRaqfQ4XCFwCrC
-	 GLqERWKqEkTFNd6/39D57n2/i0Ow7P3LP4T+trFPvP7oYRLMt7XttHI15VYz3gN2F6
-	 wN3bx7QpOcJtA==
-Date: Tue, 22 Oct 2024 17:40:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	zhangkun09@huawei.com, fanghaiqing@huawei.com,
-	liuyonglong@huawei.com, Robin Murphy <robin.murphy@arm.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	IOMMU <iommu@lists.linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
- has already unbound
-Message-ID: <20241022164013.GI402847@kernel.org>
-References: <20241022032214.3915232-1-linyunsheng@huawei.com>
- <20241022032214.3915232-4-linyunsheng@huawei.com>
+	s=arc-20240116; t=1729616249; c=relaxed/simple;
+	bh=iufFbICdqJF6m1zyI2SMlCLECYvQAXdZI5A3s/y0h9o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CKXaZeC0MU7ynSfuxQwx5ls0fKBNMYBeJ4m9mq+BncCun+SnrXCYLjV6UeJKcNdHb2K2snhun3hZqL3hdhnWV+JER4Vd82wqLDgg1aYSVocoYZh9TnEInpFLjAdWTtm3g16N3Dio4bgXM+fyM68VVJw9xFPKqdWnqDPKkdEs11A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+0poDUi; arc=none smtp.client-ip=209.85.160.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f194.google.com with SMTP id d75a77b69052e-4603d3e4552so47282301cf.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:57:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729616245; x=1730221045; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oUUTPVaPMeKSDCJ9oFRfYJvG5DbG1YpEZmMBBeHmzVg=;
+        b=Q+0poDUin/HqBD+qm+6NY/wD3ZXvISI7HlK7APPCFnv73ZqR8t6a/u5OWlRY/luh69
+         rf8PTicGF0Nx2+8E1Wc4wK6a55cxz8FQh5jZzH5utrDCoDSlYJSNBQcpZScZV+SDDtwe
+         fEod+6dyPcawTn0Yce0BJYUWswIF4r4wWzexv4g5t2O0Al7N4wRnElbEq+mWlqH+kMZW
+         lW4YHC4UDMRaNTu04W6cD5vvMLw5D3hGqD+aWKR0/Av7Ru2DHGcGK3kEjc3weerdRU1a
+         UY3vohnn9vc+jwxZ/BF9fr4DTp66VXfRjXSnakk5cm2n9RwrVjUsZtJMvVfiUU54052X
+         SF1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729616245; x=1730221045;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oUUTPVaPMeKSDCJ9oFRfYJvG5DbG1YpEZmMBBeHmzVg=;
+        b=K5fqSh8wujngtkjH7AXttAHSxlJDxW58kD/v6caGDBisLhprKu5IJHvMzHbkAnm3qO
+         wCyWcaTHgvBaAKFXv/rOCXUryzmqW+tRzDuCTM7izlyXc1+2rTHnqshcJEDPmUP8kp9D
+         +R3g/tTuHFpBwMHVFUwHJvbSOarjU0XPv47bMo9rrBBfWTDlAzMHmWnChPjn6T0D2V5s
+         ttIxdCOQl8MVbVmGb6CVDxkYCm17klQ6EfRO5wMGRYKz/7/PqQXxRv/c1Ur8jzGSsA34
+         JGTEg1MZY7md/vFzZpg4trOTUD9fdHrhDvF8iwJ7HZJdF62J5RdKlhsy4z2S3fYZBEhf
+         GuRg==
+X-Gm-Message-State: AOJu0YyrmX21I+REvswmNLb5RdMJt9b8VSv3c50YpfX90E9Xtq8+nOsF
+	4WT9D++/QBrEaMCgJ5Tro2SmQQK8Aul6B0rjn/p+kQIDJRb6cOOI
+X-Google-Smtp-Source: AGHT+IGKOSeREJ3My4kgsyV9fpLn0g3ILK1AsPV+EZGBTn1qmRFik2b37XShK3kv8+jxni14CI6DIw==
+X-Received: by 2002:ac8:7e81:0:b0:460:9b8a:d02f with SMTP id d75a77b69052e-461130d0703mr2788801cf.51.1729616245409;
+        Tue, 22 Oct 2024 09:57:25 -0700 (PDT)
+Received: from localhost.localdomain (host-36-27.ilcul54.champaign.il.us.clients.pavlovmedia.net. [68.180.36.27])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3c3fe1csm30866411cf.10.2024.10.22.09.57.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2024 09:57:24 -0700 (PDT)
+From: Gax-c <zichenxie0106@gmail.com>
+To: kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	petrm@nvidia.com,
+	idosch@nvidia.com
+Cc: netdev@vger.kernel.org,
+	zzjas98@gmail.com,
+	chenyuan0y@gmail.com,
+	Zichen Xie <zichenxie0106@gmail.com>
+Subject: [PATCH] netdevsim: Add trailing zero to terminate the string in nsim_nexthop_bucket_activity_write()
+Date: Tue, 22 Oct 2024 11:57:13 -0500
+Message-Id: <20241022165712.8425-1-zichenxie0106@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241022032214.3915232-4-linyunsheng@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 22, 2024 at 11:22:13AM +0800, Yunsheng Lin wrote:
-> Networking driver with page_pool support may hand over page
-> still with dma mapping to network stack and try to reuse that
-> page after network stack is done with it and passes it back
-> to page_pool to avoid the penalty of dma mapping/unmapping.
-> With all the caching in the network stack, some pages may be
-> held in the network stack without returning to the page_pool
-> soon enough, and with VF disable causing the driver unbound,
-> the page_pool does not stop the driver from doing it's
-> unbounding work, instead page_pool uses workqueue to check
-> if there is some pages coming back from the network stack
-> periodically, if there is any, it will do the dma unmmapping
-> related cleanup work.
-> 
-> As mentioned in [1], attempting DMA unmaps after the driver
-> has already unbound may leak resources or at worst corrupt
-> memory. Fundamentally, the page pool code cannot allow DMA
-> mappings to outlive the driver they belong to.
-> 
-> Currently it seems there are at least two cases that the page
-> is not released fast enough causing dma unmmapping done after
-> driver has already unbound:
-> 1. ipv4 packet defragmentation timeout: this seems to cause
->    delay up to 30 secs.
-> 2. skb_defer_free_flush(): this may cause infinite delay if
->    there is no triggering for net_rx_action().
-> 
-> In order not to do the dma unmmapping after driver has already
-> unbound and stall the unloading of the networking driver, add
-> the pool->items array to record all the pages including the ones
-> which are handed over to network stack, so the page_pool can
-> do the dma unmmapping for those pages when page_pool_destroy()
-> is called. As the pool->items need to be large enough to avoid
-> performance degradation, add a 'item_full' stat to indicate the
-> allocation failure due to unavailability of pool->items.
-> 
-> Note, the devmem patchset seems to make the bug harder to fix,
-> and may make backporting harder too. As there is no actual user
-> for the devmem and the fixing for devmem is unclear for now,
-> this patch does not consider fixing the case for devmem yet.
-> 
-> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-> 
-> Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Tested-by: Yonglong Liu <liuyonglong@huawei.com>
-> CC: Robin Murphy <robin.murphy@arm.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: IOMMU <iommu@lists.linux.dev>
+From: Zichen Xie <zichenxie0106@gmail.com>
 
-...
+This was found by a static analyzer.
+We should not forget the trailing zero after copy_from_user()
+if we will further do some string operations, sscanf() in this
+case. Adding a trailing zero will ensure that the function
+performs properly.
 
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index c022c410abe3..194006d2930f 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -102,6 +102,7 @@ struct page_pool_params {
->   * @refill:	an allocation which triggered a refill of the cache
->   * @waive:	pages obtained from the ptr ring that cannot be added to
->   *		the cache due to a NUMA mismatch
-> + * @item_full	items array is full
+Fixes: c6385c0b67c5 ("netdevsim: Allow reporting activity on nexthop buckets")
+Signed-off-by: Zichen Xie <zichenxie0106@gmail.com>
+---
+ drivers/net/netdevsim/fib.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-No need to block progress because of this, but the correct syntax is:
+diff --git a/drivers/net/netdevsim/fib.c b/drivers/net/netdevsim/fib.c
+index 41e80f78b316..dbb11cd46a86 100644
+--- a/drivers/net/netdevsim/fib.c
++++ b/drivers/net/netdevsim/fib.c
+@@ -1377,10 +1377,11 @@ static ssize_t nsim_nexthop_bucket_activity_write(struct file *file,
+ 
+ 	if (pos != 0)
+ 		return -EINVAL;
+-	if (size > sizeof(buf))
++	if (size > sizeof(buf) - 1)
+ 		return -EINVAL;
+ 	if (copy_from_user(buf, user_buf, size))
+ 		return -EFAULT;
++	buf[size] = 0;
+ 	if (sscanf(buf, "%u %hu", &nhid, &bucket_index) != 2)
+ 		return -EINVAL;
+ 
+-- 
+2.34.1
 
-  * @item_full: ...
-
-Flagged by ./scripts/kernel-doc -none
-
-...
 
