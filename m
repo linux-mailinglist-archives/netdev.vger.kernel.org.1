@@ -1,180 +1,106 @@
-Return-Path: <netdev+bounces-138029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C1B29AB936
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 00:00:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC2109AB9DD
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 01:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82AFDB222C5
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:00:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51121B21A64
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D521CB31A;
-	Tue, 22 Oct 2024 22:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0D91CDFDC;
+	Tue, 22 Oct 2024 23:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XNjmof6p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hbuuya35"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E245619D075
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 22:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A48174EFC;
+	Tue, 22 Oct 2024 23:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729634430; cv=none; b=s0Fass7C1lJLPLf7kKl8zgauRPHjEHIjyqVrPKi3HudXxxiQDyi4whRxPE2p9qNhxQrW5sDIPwvNNBoyBvKqT93btbdzmTGcmX3ryPSvJtxrhaCypYUH1giIo+gMLAdPROmOOtDEU539UFdZLrUkSIvd4htfdwWXex2YpcgbKEQ=
+	t=1729638630; cv=none; b=OA6EPy+lJ/TUOO2lb5JKLPh9Y/zSCMZRosrxI1ezUI/c6JqyB/kqbpBJhzhOkdDD9qpEZ4A+7PJ2I0/ZucUkfQuUecYJaVsWE/Umpq96SMaN9PW/8E684F+GJHfvHCjpaka0P7dSY7HLSnarBKs69w6EmMECXD7X/sxY1N+Lm0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729634430; c=relaxed/simple;
-	bh=1gFaULt8kX/l8gmPfBc4H/ZqQrDRKkDXi/G2EVk9c1k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NJwvoRb/cRdBXvwKcvU3myPkjYu+HRY9HmvCWW17iPX6+wxiZ7ZHVPhhrCmZDVpsi9KP6VB7NspK0v5OzgQHNdoLBiPtbtWr71SwGiWpzEDeIBipfPeXRO1AhMIsiVLX613OJ/Lfn3JjCjTBSZitvlpp5LOBZEXCgwyJG5lMQjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XNjmof6p; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c962c3e97dso7339382a12.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 15:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1729634427; x=1730239227; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAEY1QFlJQjNx7hV/0pEbIhG5Oh8SGShL3ntI2CQaVM=;
-        b=XNjmof6pw7tJ8bhOe2LwKrOmJortwNOYs9/S/HzyCdfcR9QbBO4QeibqWu8CKaTJ3U
-         IBuX3yUSMwVRJj96QC4yiixYXfnwk06Bg4uhGV7HYH/Ne66vpM4aHT8CUPeEZTKR03FB
-         8pryMXAOjtwhMjGrsvewEpK9DlYWk1GW00Pr4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729634427; x=1730239227;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZAEY1QFlJQjNx7hV/0pEbIhG5Oh8SGShL3ntI2CQaVM=;
-        b=pvvtLG2aMfGt5U1nhWrvAzNP3W2jBzenLn225vfKYxJafa9/M/wP7VAklDNb+hyvt7
-         dt6kqB9DcuogP8rq+I3DBaedSrv8Fpktw6VCZq0QpTs6dnPjV26pSz/IlclMvb+/zRHC
-         lMOf0XlpSsZ9HYyShOBT5CN/tdkjMrzxw/VQRvIfeKrOd2BGMf63zrEoLb0OSHLl+0su
-         CpyuUIvViHerApXmeYFxbJaZdH0X4i5UwO/abcvK3wtoSfPqgWD99rGwcYnxc2LRGSZP
-         RhkF8J9DkeEinT3j6u1fknSEd1uWVAlrXXf0Ummrd4Vn7eeGbR5I93kGzSyMQg5qs3kL
-         u+Ow==
-X-Gm-Message-State: AOJu0YxmHvZOWKA8+GC1W/lWKNKDeywx/hcap9zsJaLNtZnwhnXmuiL0
-	4x8bp4AhK5am1pGfeSiq3OWjpFuu4hQKoSkULUHP3YpN6q3wa30Tr5nITtY5nqkzUCd8Y4qANfd
-	jmJGjUke2H9kAw3N0o6VJAigPClU1iC8hf9Sk
-X-Google-Smtp-Source: AGHT+IHojRstBwPL0h0Z/5KAtyGa3KUz9U6BqC2WvzaMh9E0NJhENMwQBQ9kHz4WC3qGUamJJ+yrBxOkhCA3LHW/f0E=
-X-Received: by 2002:a05:6402:40c4:b0:5c9:3389:bdc3 with SMTP id
- 4fb4d7f45d1cf-5cb8aa14a6fmr437527a12.0.1729634427205; Tue, 22 Oct 2024
- 15:00:27 -0700 (PDT)
+	s=arc-20240116; t=1729638630; c=relaxed/simple;
+	bh=oIY+Jejd6DvtwoQcBrHvHivyMxddJJ/0ErQ5Nt9+1Cw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aYZ9BSITdMa+UK2PumurlGEV863faHL1pKuoz580hMQD+qt1TlBWFqQGwepYcvi5qp4hxisYvslHgA0o6sf4I0s3oqsQwHeVkIQVRfRmpSPhHI1yZoPHaLDJZK/4hkjrx0h5KFf8Zat13wPVOsebejGtizWgQT82CDYsMUa3JYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hbuuya35; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E964BC4CEC3;
+	Tue, 22 Oct 2024 23:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729638630;
+	bh=oIY+Jejd6DvtwoQcBrHvHivyMxddJJ/0ErQ5Nt9+1Cw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Hbuuya35Eze7JoArtWtg4fNliHbkr3mHe3PTrAGpANa+xfw8mlxLUCbwl2pcOPFl5
+	 mVC6yRJhn4+0sN4uRKkTasJfHebAsRU9+TFp6eS9bTZStGyxpb+hZSl3p7bL7VqRe4
+	 cW2JKdprPIkfaoJgDbTAcWsIYpeOVynOd7soot1c6q4vJGjCaLr3EaaruSHHme4h+O
+	 PiNmn8pr0bn4JCnAGRlql+ANBuXwxToldYzu20UKXCWCWVqZrrcT5Ob2N2xDMXXDRP
+	 v2ay+fzybc02Tg7jxoG1vPQCzRmr0/lN466MKAWAL4aMORr5mgLjU3DtlyAFXPzX3i
+	 11ZBw9TARW+6g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D2D3822D22;
+	Tue, 22 Oct 2024 23:10:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022193737.123079-1-rosenp@gmail.com>
-In-Reply-To: <20241022193737.123079-1-rosenp@gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 22 Oct 2024 15:00:14 -0700
-Message-ID: <CACKFLintCqn6-kJgDEBL2X9_zm+x2TUh73iLQiOGoh_T5GLbVw@mail.gmail.com>
-Subject: Re: [PATCHv2 net-next] net: bnxt: use ethtool string helpers
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a59928062517e590"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 0/6] octeontx2-pf: handle otx2_mbox_get_rsp errors
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172963863599.1106081.17720892184473562602.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Oct 2024 23:10:35 +0000
+References: <20241017185116.32491-1-kdipendra88@gmail.com>
+In-Reply-To: <20241017185116.32491-1-kdipendra88@gmail.com>
+To: Dipendra Khadka <kdipendra88@gmail.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
---000000000000a59928062517e590
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-On Tue, Oct 22, 2024 at 12:37=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wro=
-te:
->
-> Avoids having to use manual pointer manipulation.
->
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  v2: use extra variable to avoid line length issues
+This series was applied to netdev/net-next.git (main)
+by Andrew Lunn <andrew@lunn.ch>:
 
-Thanks.
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+On Thu, 17 Oct 2024 18:51:15 +0000 you wrote:
+> This patch series improves error handling in the Marvell OcteonTX2
+> NIC driver. Specifically, it adds error pointer checks after
+> otx2_mbox_get_rsp() to ensure the driver handles error cases more
+> gracefully.
+> 
+> Changes in v4:
+> - Patch series thrading fixed.
+> - Error handling changed in otx2_flows.c.
+> - Used correct To: and CC:
+> 
+> [...]
 
---000000000000a59928062517e590
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Here is the summary with links:
+  - [v4,1/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_common.c
+    https://git.kernel.org/netdev/net-next/c/0fbc7a5027c6
+  - [v4,2/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_ethtool.c
+    https://git.kernel.org/netdev/net-next/c/e26f8eac6bb2
+  - [v4,3/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_flows.c
+    https://git.kernel.org/netdev/net-next/c/bd3110bc102a
+  - [v4,4/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in cn10k.c
+    https://git.kernel.org/netdev/net-next/c/ac9183023b6a
+  - [v4,5/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dmac_flt.c
+    https://git.kernel.org/netdev/net-next/c/f5b942e6c54b
+  - [v4,6/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dcbnl.c
+    https://git.kernel.org/netdev/net-next/c/69297b0d3369
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEy86MqasOPiC3Cdp2MWnTnXZErVYExp
-wbZcvLL0a1iqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAy
-MjIyMDAyN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAJOWxpaTb6fgGzli2k8ACz6Hh/uHzjCulkccVgOUrzTg94toMh
-yrTNIcCh5SRMmzSl0hk0VAaaKcgXHqVH4/Ue8LNRKOt5+E2b58JikKZpRes6/rXajQO/QPd2W01F
-PV/X50vD5O9JQcWv0WXawHIVd1NnljEF6I3Ic3+DuXJUsLRGo2eIZ8RrJ7JJIVXYa9SeSGury73s
-c/YaxuSoyWedU+F75t8uVUh2qHPNVzh7LxuejWW1RqcbHYlJ7XebmLRJuvQbOnzBYY/1Rw58vJn0
-VnVXXpFRfRiUmFxLH8KVVRf4f3bGZIuUvuATrHa0GGYlYkjydOtUNUMn9jl5FbI/
---000000000000a59928062517e590--
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
