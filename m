@@ -1,63 +1,48 @@
-Return-Path: <netdev+bounces-137922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624FC9AB1CA
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:14:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 625A59AB1E9
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:24:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 165121F22710
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:14:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B55F282986
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E631A38C4;
-	Tue, 22 Oct 2024 15:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KP2N7bjN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193F41A2562;
+	Tue, 22 Oct 2024 15:23:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2DA1A38EC;
-	Tue, 22 Oct 2024 15:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D031B19C547;
+	Tue, 22 Oct 2024 15:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729610067; cv=none; b=uFIT+aUIAdnSbbJ4zZ4Nyw2ONS1qeOXYFkt6D2bMUW8PtCt5bE7mLr3zjBm5gwHh81yGcI7qFheX7/54sH+KK3TI3EsXjtqdP6PHfYtm7sYsJrb+wLmWoN3KzoagSITR3gexSXlk6Bucmr9aQI3JSi9Bzv17BV+/GvHmp3mOISw=
+	t=1729610639; cv=none; b=XwFsC7XOYBz4jGgBoa11FAA2tGeRs8LISOjgMSdaGckBlR9xiS4kopCBvG5VdHAI5mz3vLf0m2yF8UpZNfdjHlAi/NP6SbYuT0GXZCuBhUGmRWFBpNCHhOYxc7t76r9z7k3NZd6IENvLA35O4+Le6rsLE+h1ZA75JRC1CRPXs8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729610067; c=relaxed/simple;
-	bh=2j66laylThSRY13caSNR6w/TLOJUvqt5xCyMELBnxMQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NErzhVe7f548TyC9dwGLeehqdNyvLtkmnu63E92bFvHI5hcS6yW2wC1Kl2foMjg1M02xBLDBHanBl+qDnVQHp+ek+h7QmJPC2O463tk+LOGTiff6EpknYPKZVbYn8rxU99nmSTvP24E9aUW5kHQ0gGcm2tjF6Ow8h74vdW2kQRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KP2N7bjN; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CE9B740003;
-	Tue, 22 Oct 2024 15:14:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1729610063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WMZuGFEss8a90h3z7j9YoEt5zJ2q0/R63SAnfi2dgzk=;
-	b=KP2N7bjNOUyEX8AzFe46XyJDvejdaYA9l2TVWQH7fymxQlLJkiIzmXYfGpbsT1e0iUcSDU
-	sYTNpkdFMmcUPPVDLKG4IQOFBDIRNMgvEkvn/ikupnYYwHXnjfW1AT6q+YuEzrxPqtOuV2
-	eWbz+GQBfSMQEjMPTQluqkDJxPrh9+zZ5V9odcnXSl1U1nsH1AH4szHFqvFr5Ab/y87sIp
-	6oiH4SrD1WEc1RCmt5mxnKEsaajRi+3pdmkmKf/tMksIAGWJe3iDy0rGQjxamJTcTTLe4e
-	Vgsp1Jlsf9H8Y//luk0EA+7raPsVPblaVEWgyAx7c2gkIpMIjF0bI9Qg07nr7Q==
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	thomas.petazzoni@bootlin.com,
+	s=arc-20240116; t=1729610639; c=relaxed/simple;
+	bh=OTodVjqQkcoVjtPea+cWFU6tnjAm1M+tQr7XzBI+L+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XTSwpzPk1cwjxEEtnRRmmMJ/pNcNTvy6ylq/PhCvv5TO53JBpt6zrV8qhqIaPa/ARVM4EfgJVbACR7V+8KtIqti56iusgeVLxmvaKGTO35q7sjQ+Hu2FM0LDbL7B9DU1cDnpkWEegsz88KY1BDvTNBBh1RoHsC0Zorr1AuQxc/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1t3GjV-0001du-LL; Tue, 22 Oct 2024 17:23:41 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next] netlink: specs: Add missing phy-ntf command to ethtool spec
-Date: Tue, 22 Oct 2024 17:14:18 +0200
-Message-Id: <20241022151418.875424-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	<netfilter-devel@vger.kernel.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net] selftests: netfilter: nft_flowtable.sh: make first pass deterministic
+Date: Tue, 22 Oct 2024 17:23:18 +0200
+Message-ID: <20241022152324.13554-1-fw@strlen.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,29 +50,147 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: kory.maincent@bootlin.com
 
-ETHTOOL_MSG_PHY_NTF description is missing in the ethtool netlink spec.
-Add it to the spec.
+The CI occasionaly encounters a failing test run.  Example:
+ # PASS: ipsec tunnel mode for ns1/ns2
+ # re-run with random mtus: -o 10966 -l 19499 -r 31322
+ # PASS: flow offloaded for ns1/ns2
+[..]
+ # FAIL: ipsec tunnel ... counter 1157059 exceeds expected value 878489
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+This script will re-exec itself, on the second run, random MTUs are
+chosen for the involved links.  This is done so we can cover different
+combinations (large mtu on client, small on server, link has lowest
+mtu, etc).
+
+Furthermore, file size is random, even for the first run.
+
+Rework this script and always use the same file size on initial run so
+that at least the first round can be expected to have reproducible
+behavior.
+
+Second round will use random mtu/filesize.
+
+Raise the failure limit to that of the file size, this should avoid all
+errneous test errors.  Currently, first fin will remove the offload, so if
+one peer is already closing remaining data is handled by classic path,
+which result in larger-than-expected counter and a test failure.
+
+Given packet path also counts tcp/ip headers, in case offload is
+completely broken this test will still fail (as expected).
+
+The test counter limit could be made more strict again in the future
+once flowtable can keep a connection in offloaded state until FINs
+in both directions were seen.
+
+Signed-off-by: Florian Westphal <fw@strlen.de>
 ---
- Documentation/netlink/specs/ethtool.yaml | 4 ++++
- 1 file changed, 4 insertions(+)
+ If you prefer you can also apply this to net-next instead.
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index f6c5d8214c7e..93369f0eb816 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1956,3 +1956,7 @@ operations:
-             - upstream-sfp-name
-             - downstream-sfp-name
-       dump: *phy-get-op
-+    -
-+      name: phy-ntf
-+      doc: Notification for change in PHY devices.
-+      notify: phy-get
+ .../selftests/net/netfilter/nft_flowtable.sh  | 39 ++++++++++---------
+ 1 file changed, 21 insertions(+), 18 deletions(-)
+
+diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+index b3995550856a..a4ee5496f2a1 100755
+--- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
++++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+@@ -71,6 +71,8 @@ omtu=9000
+ lmtu=1500
+ rmtu=2000
+ 
++filesize=$((2 * 1024 * 1024))
++
+ usage(){
+ 	echo "nft_flowtable.sh [OPTIONS]"
+ 	echo
+@@ -81,12 +83,13 @@ usage(){
+ 	exit 1
+ }
+ 
+-while getopts "o:l:r:" o
++while getopts "o:l:r:s:" o
+ do
+ 	case $o in
+ 		o) omtu=$OPTARG;;
+ 		l) lmtu=$OPTARG;;
+ 		r) rmtu=$OPTARG;;
++		s) filesize=$OPTARG;;
+ 		*) usage;;
+ 	esac
+ done
+@@ -217,18 +220,10 @@ ns2out=$(mktemp)
+ 
+ make_file()
+ {
+-	name=$1
+-
+-	SIZE=$((RANDOM % (1024 * 128)))
+-	SIZE=$((SIZE + (1024 * 8)))
+-	TSIZE=$((SIZE * 1024))
+-
+-	dd if=/dev/urandom of="$name" bs=1024 count=$SIZE 2> /dev/null
++	name="$1"
++	sz="$2"
+ 
+-	SIZE=$((RANDOM % 1024))
+-	SIZE=$((SIZE + 128))
+-	TSIZE=$((TSIZE + SIZE))
+-	dd if=/dev/urandom conf=notrunc of="$name" bs=1 count=$SIZE 2> /dev/null
++	head -c "$sz" < /dev/urandom > "$name"
+ }
+ 
+ check_counters()
+@@ -246,18 +241,18 @@ check_counters()
+ 	local fs
+ 	fs=$(du -sb "$nsin")
+ 	local max_orig=${fs%%/*}
+-	local max_repl=$((max_orig/4))
++	local max_repl=$((max_orig))
+ 
+ 	# flowtable fastpath should bypass normal routing one, i.e. the counters in forward hook
+ 	# should always be lower than the size of the transmitted file (max_orig).
+ 	if [ "$orig_cnt" -gt "$max_orig" ];then
+-		echo "FAIL: $what: original counter $orig_cnt exceeds expected value $max_orig" 1>&2
++		echo "FAIL: $what: original counter $orig_cnt exceeds expected value $max_orig, reply counter $repl_cnt" 1>&2
+ 		ret=1
+ 		ok=0
+ 	fi
+ 
+ 	if [ "$repl_cnt" -gt $max_repl ];then
+-		echo "FAIL: $what: reply counter $repl_cnt exceeds expected value $max_repl" 1>&2
++		echo "FAIL: $what: reply counter $repl_cnt exceeds expected value $max_repl, original counter $orig_cnt" 1>&2
+ 		ret=1
+ 		ok=0
+ 	fi
+@@ -455,7 +450,7 @@ test_tcp_forwarding_nat()
+ 	return $lret
+ }
+ 
+-make_file "$nsin"
++make_file "$nsin" "$filesize"
+ 
+ # First test:
+ # No PMTU discovery, nsr1 is expected to fragment packets from ns1 to ns2 as needed.
+@@ -664,8 +659,16 @@ if [ "$1" = "" ]; then
+ 	l=$(((RANDOM%mtu) + low))
+ 	r=$(((RANDOM%mtu) + low))
+ 
+-	echo "re-run with random mtus: -o $o -l $l -r $r"
+-	$0 -o "$o" -l "$l" -r "$r"
++	MINSIZE=$((2 *  1000 * 1000))
++	MAXSIZE=$((64 * 1000 * 1000))
++
++	filesize=$(((RANDOM * RANDOM) % MAXSIZE))
++	if [ "$filesize" -lt "$MINSIZE" ]; then
++		filesize=$((filesize+MINSIZE))
++	fi
++
++	echo "re-run with random mtus and file size: -o $o -l $l -r $r -s $filesize"
++	$0 -o "$o" -l "$l" -r "$r" -s "$filesize"
+ fi
+ 
+ exit $ret
 -- 
-2.34.1
+2.45.2
 
 
