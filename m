@@ -1,458 +1,403 @@
-Return-Path: <netdev+bounces-137693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 052099A9584
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:39:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A2A9A959B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:44:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C2B8B229C0
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:39:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CB8D1F20933
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5DE4126BF2;
-	Tue, 22 Oct 2024 01:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Ly//Vwyk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D85126BF2;
+	Tue, 22 Oct 2024 01:44:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from trager.us (trager.us [52.5.81.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D28E1E51D;
-	Tue, 22 Oct 2024 01:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFB284D29;
+	Tue, 22 Oct 2024 01:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729561159; cv=none; b=JZxxOOOg6IRDqQxSpv9dyoo3Mpz5MCKUm5ueuKukNO4/1yvNDtjR3upZBLwTET09mN8aFhOMJJT8CyMupJVHrRM9KNmTQnNy6PVCtbZV8NvbPOxexprHGuNv9B/ClUPbPwnfAqq3Fnbe8ehuYaaKzdw+kpoRaJwxkmxr7wvgrOE=
+	t=1729561461; cv=none; b=c3ehO7sPzDvKFDk3BOLL50DYnu4upwWGrQznB6cypMbRZw1MBBBJ2KEUmzjY3jwvX2C1q2AKkDNrheyaRE/nEiH4h4UsO67rZZHsvK9ff7+ZeiVuEml59yZWCtYYrWXzljSBQECNcxAOF6X7IgJtHLo+QiDWT+hH9YYFHnQlg5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729561159; c=relaxed/simple;
-	bh=5VGAlu4YyUebKfzZAuthgq9erMAm+idSUcwP00Fw5AE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DqUBMBQCQyvutiyLBHjwpdW6xGelCKz2DpiG2i2lyppDCf3YEaI4kIWYdXXhOm5dH8xDcNLFp497VzE0K62uuGJM1kyrX34zDTdcbn6QksN6Vtl8VUgVBOZWWFH4Aws8Lu5+pGEl7NRHfwpjzuLUbGkPLZ4tV760DgI6utrGe98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Ly//Vwyk; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id CCDC988E2D;
-	Tue, 22 Oct 2024 03:39:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1729561155;
-	bh=PdFaC/G6iZ1RQdAuey40UHp3c7tb8pGLPgi/DqOUWMk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Ly//Vwykt5mr9ngYIIV90LHN9/T9CphtCg7H5B40NzG3D30sOdWTj5/QFfFFLSU+4
-	 7cb/sXtpVBjOybVo0ZST1VSmdQkefF4gh+ejIwhk3B42ySNJRn/e90VfK5IkDGIIn5
-	 +7VR2LBncxvt3O15Jzky/wypJfrOQAiM1P9REy17HwURzD4ACiodrwjZ004WWn1BGt
-	 t2qOVgPueax7Un0e5DFNBN8qJ0tlkK+AwN7tC/HrgP/0MywclD4NjZwYVydKMxYIJY
-	 ibeVIZqjaieL1Bd2ywBJiDwVdt8wka0alxBoeoWEDJfErLaz0V8C5X7oulu6uyiQ1a
-	 l6D+oqrDig8Qg==
-From: Marek Vasut <marex@denx.de>
-To: linux-wireless@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Adham Abozaeid <adham.abozaeid@microchip.com>,
-	Ajay Singh <ajay.kathat@microchip.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1729561461; c=relaxed/simple;
+	bh=6Z+AxkKR9zlrGHBwt2JjK+ih49DyBUV8ksoi07TJ5Tc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=r0OR8zkeqtOUqJF8PSn1+40qzBSSXnmfXVkWgDt585jl+2ASKmroQTdum1NRovBLs65z5VyXFKzkDsO9Lc5FW2M1l+zT1j5KTzfAHMQ4GZTx8iSSj6/Tq5YmHM9zql/zIijlL6eWdsy9cYEtuEmmgGxtLjH66O7kHT8pcC7GCQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
+Received: from [163.114.132.6] (helo=localhost)
+	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92.3)
+	(envelope-from <lee@trager.us>)
+	id 1t33wQ-0003yc-CK; Tue, 22 Oct 2024 01:44:10 +0000
+From: Lee Trager <lee@trager.us>
+To: Alexander Duyck <alexanderduyck@fb.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	kernel-team@meta.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] wifi: wilc1000: Rework bus locking
-Date: Tue, 22 Oct 2024 03:38:31 +0200
-Message-ID: <20241022013855.284783-1-marex@denx.de>
-X-Mailer: git-send-email 2.45.2
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Lee Trager <lee@trager.us>,
+	Sanman Pradhan <sanmanpradhan@meta.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 2/2] eth: fbnic: Add devlink dev flash support
+Date: Mon, 21 Oct 2024 18:42:24 -0700
+Message-ID: <20241022014319.3791797-1-lee@trager.us>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241012023646.3124717-1-lee@trager.us>
+References: <20241012023646.3124717-1-lee@trager.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
-The bus locking in this driver is broken and produces subtle race
-condition with ksdioirqd and its mmc_claim_host()/mmc_release_host()
-usage in case of SDIO bus. Rework the locking to avoid this race
-condition.
+fbnic supports updating firmware using a PLDM image signed and distributed
+by Meta. PLDM images are written into stored flashed. Flashing does not
+interrupt operation.
 
-The problem is the hif_cs mutex used in acquire_bus()/release_bus(),
-which makes it look like calling acquire_bus() results in exclusive
-access to the bus, but that is not true for SDIO bus. For SDIO bus,
-to obtain exclusive access (any access, really), it is necessary to
-call sdio_claim_host(), which is a wrapper around mmc_claim_host(),
-which does its own locking. The acquire_bus() does not do that, but
-the SDIO interface implementation does call sdio_claim_host() and
-sdio_release_host() every single command, which is problematic. To
-make things worse, wilc_sdio_interrupt() implementation called from
-ksdioirqd first calls sdio_release_host(), then interrupt handling
-and finally sdio_claim_host().
+On host reboot the newly flashed UEFI driver will be used. To run new
+control or cmrt firmware the NIC must be power cycled.
 
-The core problem is that sdio_claim_host() cannot be done per command,
-but has to be done per register/data IO which consists of multiple
-commands. Usually the WILC register read/write consists of 3x CMD52
-to push in CSA pointer address and 1x CMD53 to read/write data to that
-address. Most other accesses are also composed of multiple commands.
-
-Currently, if ksdioirqd wakes up and attempts to read SDIO_CCCR_INTx
-to get pending SDIO IRQs in sdio_get_pending_irqs(), it can easily
-perform that transfer between two consecutive CMD52 which are pushing
-in the CSA pointer address and possibly disrupt the WILC operation.
-This is undesired behavior.
-
-Rework the locking.
-
-Introduce new .hif_claim/.hif_release callbacks which implement bus
-specific locking. Lock/unlock SDIO bus access using sdio_claim_host()
-and sdio_release_host(), lock/unlock SPI bus access using the current
-hif_cs mutex moved purely into the spi.c interface. Make acquire_bus()
-and release_bus() call the .hif_claim/.hif_release() callbacks and do
-not access the hif_cs mutex from there at all.
-
-Remove any SDIO bus locking used directly in commands and the broken
-SDIO bus unlocking in wilc_sdio_interrupt(), this is no longer needed.
-Fix up SDIO initialization code which newly needs sdio_claim_host()
-and sdio_release_host(), since it cannot depend on the locking being
-done per-command anymore.
-
-Signed-off-by: Marek Vasut <marex@denx.de>
+Signed-off-by: Lee Trager <lee@trager.us>
 ---
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
-Cc: Ajay Singh <ajay.kathat@microchip.com>
-Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Kalle Valo <kvalo@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
-NOTE: I only tested the SDIO part
----
- .../wireless/microchip/wilc1000/cfg80211.c    |  2 -
- .../net/wireless/microchip/wilc1000/netdev.c  |  2 -
- .../net/wireless/microchip/wilc1000/netdev.h  |  3 --
- .../net/wireless/microchip/wilc1000/sdio.c    | 40 ++++++++++++-------
- drivers/net/wireless/microchip/wilc1000/spi.c | 15 +++++++
- .../net/wireless/microchip/wilc1000/wlan.c    | 30 ++++++++++----
- .../net/wireless/microchip/wilc1000/wlan.h    |  2 +
- 7 files changed, 65 insertions(+), 29 deletions(-)
+ .../device_drivers/ethernet/meta/fbnic.rst    |  11 +
+ drivers/net/ethernet/meta/Kconfig             |   1 +
+ .../net/ethernet/meta/fbnic/fbnic_devlink.c   | 269 +++++++++++++++++-
+ 3 files changed, 280 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/wireless/microchip/wilc1000/cfg80211.c b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
-index b0dae6f7c633b..9a9fc8e8c8354 100644
---- a/drivers/net/wireless/microchip/wilc1000/cfg80211.c
-+++ b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
-@@ -1730,7 +1730,6 @@ static const struct cfg80211_ops wilc_cfg80211_ops = {
- 
- static void wlan_init_locks(struct wilc *wl)
- {
--	mutex_init(&wl->hif_cs);
- 	mutex_init(&wl->rxq_cs);
- 	mutex_init(&wl->cfg_cmd_lock);
- 	mutex_init(&wl->vif_mutex);
-@@ -1748,7 +1747,6 @@ static void wlan_init_locks(struct wilc *wl)
- 
- void wlan_deinit_locks(struct wilc *wilc)
- {
--	mutex_destroy(&wilc->hif_cs);
- 	mutex_destroy(&wilc->rxq_cs);
- 	mutex_destroy(&wilc->cfg_cmd_lock);
- 	mutex_destroy(&wilc->txq_add_to_head_cs);
-diff --git a/drivers/net/wireless/microchip/wilc1000/netdev.c b/drivers/net/wireless/microchip/wilc1000/netdev.c
-index 7e84fc0fd9118..22c91a0b9b648 100644
---- a/drivers/net/wireless/microchip/wilc1000/netdev.c
-+++ b/drivers/net/wireless/microchip/wilc1000/netdev.c
-@@ -468,9 +468,7 @@ static void wilc_wlan_deinitialize(struct net_device *dev)
- 
- 		if (!wl->dev_irq_num &&
- 		    wl->hif_func->disable_interrupt) {
--			mutex_lock(&wl->hif_cs);
- 			wl->hif_func->disable_interrupt(wl);
--			mutex_unlock(&wl->hif_cs);
- 		}
- 		complete(&wl->txq_event);
- 
-diff --git a/drivers/net/wireless/microchip/wilc1000/netdev.h b/drivers/net/wireless/microchip/wilc1000/netdev.h
-index 95bc8b8fe65a5..8bdc27edf00af 100644
---- a/drivers/net/wireless/microchip/wilc1000/netdev.h
-+++ b/drivers/net/wireless/microchip/wilc1000/netdev.h
-@@ -240,9 +240,6 @@ struct wilc {
- 	/* protect rxq_entry_t receiver queue */
- 	struct mutex rxq_cs;
- 
--	/* lock to protect hif access */
--	struct mutex hif_cs;
--
- 	struct completion cfg_event;
- 	struct completion sync_event;
- 	struct completion txq_event;
-diff --git a/drivers/net/wireless/microchip/wilc1000/sdio.c b/drivers/net/wireless/microchip/wilc1000/sdio.c
-index 170470d1c2092..0796e2ccfe32e 100644
---- a/drivers/net/wireless/microchip/wilc1000/sdio.c
-+++ b/drivers/net/wireless/microchip/wilc1000/sdio.c
-@@ -56,11 +56,23 @@ struct sdio_cmd53 {
- 
- static const struct wilc_hif_func wilc_hif_sdio;
- 
--static void wilc_sdio_interrupt(struct sdio_func *func)
-+static void wilc_sdio_claim(struct wilc *wilc)
-+{
-+	struct sdio_func *func = container_of(wilc->dev, struct sdio_func, dev);
+diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+index 32ff114f5c26..d6726c254818 100644
+--- a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
++++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+@@ -27,3 +27,14 @@ driver takes over.
+ devlink dev info provides version information for all three components. In
+ addition to the version the hg commit hash of the build is included as a
+ separate entry.
 +
-+	sdio_claim_host(func);
-+}
++Upgrading Firmware
++------------------
 +
-+static void wilc_sdio_release(struct wilc *wilc)
- {
-+	struct sdio_func *func = container_of(wilc->dev, struct sdio_func, dev);
++fbnic supports upgrading firmware using devlink dev flash. Firmware images
++are signed and distributed by Meta. All firmware is bundled into a single
++PLDM image which is written into stored flash. Flashing firmware does not
++interrupt operation.
 +
- 	sdio_release_host(func);
-+}
-+
-+static void wilc_sdio_interrupt(struct sdio_func *func)
-+{
- 	wilc_handle_isr(sdio_get_drvdata(func));
--	sdio_claim_host(func);
- }
- 
- static int wilc_sdio_cmd52(struct wilc *wilc, struct sdio_cmd52 *cmd)
-@@ -69,8 +81,6 @@ static int wilc_sdio_cmd52(struct wilc *wilc, struct sdio_cmd52 *cmd)
- 	int ret;
- 	u8 data;
- 
--	sdio_claim_host(func);
--
- 	func->num = cmd->function;
- 	if (cmd->read_write) {  /* write */
- 		if (cmd->raw) {
-@@ -85,8 +95,6 @@ static int wilc_sdio_cmd52(struct wilc *wilc, struct sdio_cmd52 *cmd)
- 		cmd->data = data;
- 	}
- 
--	sdio_release_host(func);
--
- 	if (ret)
- 		dev_err(&func->dev, "%s..failed, err(%d)\n", __func__, ret);
- 	return ret;
-@@ -99,8 +107,6 @@ static int wilc_sdio_cmd53(struct wilc *wilc, struct sdio_cmd53 *cmd)
- 	struct wilc_sdio *sdio_priv = wilc->bus_data;
- 	u8 *buf = cmd->buffer;
- 
--	sdio_claim_host(func);
--
- 	func->num = cmd->function;
- 	func->cur_blksize = cmd->block_size;
- 	if (cmd->block_mode)
-@@ -128,8 +134,6 @@ static int wilc_sdio_cmd53(struct wilc *wilc, struct sdio_cmd53 *cmd)
- 			memcpy(cmd->buffer, buf, size);
- 	}
- out:
--	sdio_release_host(func);
--
- 	if (ret)
- 		dev_err(&func->dev, "%s..failed, err(%d)\n", __func__,  ret);
- 
-@@ -180,9 +184,11 @@ static int wilc_sdio_probe(struct sdio_func *func,
- 		goto dispose_irq;
- 	}
- 
-+	wilc_sdio_claim(wilc);
- 	wilc_sdio_init(wilc, false);
- 
- 	ret = wilc_get_chipid(wilc);
-+	wilc_sdio_release(wilc);
- 	if (ret)
- 		goto dispose_irq;
- 
-@@ -196,7 +202,9 @@ static int wilc_sdio_probe(struct sdio_func *func,
- 		goto dispose_irq;
- 	}
- 
-+	wilc_sdio_claim(wilc);
- 	wilc_sdio_deinit(wilc);
-+	wilc_sdio_release(wilc);
- 
- 	vif = wilc_netdev_ifc_init(wilc, "wlan%d", WILC_STATION_MODE,
- 				   NL80211_IFTYPE_STATION, false);
-@@ -258,9 +266,9 @@ static int wilc_sdio_enable_interrupt(struct wilc *dev)
- 	struct sdio_func *func = container_of(dev->dev, struct sdio_func, dev);
- 	int ret = 0;
- 
--	sdio_claim_host(func);
-+	wilc_sdio_claim(dev);
- 	ret = sdio_claim_irq(func, wilc_sdio_interrupt);
--	sdio_release_host(func);
-+	wilc_sdio_release(dev);
- 
- 	if (ret < 0) {
- 		dev_err(&func->dev, "can't claim sdio_irq, err(%d)\n", ret);
-@@ -274,11 +282,11 @@ static void wilc_sdio_disable_interrupt(struct wilc *dev)
- 	struct sdio_func *func = container_of(dev->dev, struct sdio_func, dev);
- 	int ret;
- 
--	sdio_claim_host(func);
-+	wilc_sdio_claim(dev);
- 	ret = sdio_release_irq(func);
- 	if (ret < 0)
- 		dev_err(&func->dev, "can't release sdio_irq, err(%d)\n", ret);
--	sdio_release_host(func);
-+	wilc_sdio_release(dev);
- }
- 
- /********************************************
-@@ -1013,6 +1021,8 @@ static const struct wilc_hif_func wilc_hif_sdio = {
- 	.disable_interrupt = wilc_sdio_disable_interrupt,
- 	.hif_reset = wilc_sdio_reset,
- 	.hif_is_init = wilc_sdio_is_init,
-+	.hif_claim = wilc_sdio_claim,
-+	.hif_release = wilc_sdio_release,
- };
- 
- static int wilc_sdio_suspend(struct device *dev)
-@@ -1053,7 +1063,9 @@ static int wilc_sdio_resume(struct device *dev)
- 	if (!IS_ERR(wilc->rtc_clk))
- 		clk_prepare_enable(wilc->rtc_clk);
- 
-+	wilc_sdio_claim(wilc);
- 	wilc_sdio_init(wilc, true);
-+	wilc_sdio_release(wilc);
- 	wilc_sdio_enable_interrupt(wilc);
- 
- 	return host_wakeup_notify(wilc);
-diff --git a/drivers/net/wireless/microchip/wilc1000/spi.c b/drivers/net/wireless/microchip/wilc1000/spi.c
-index ce2a9cdd6aa78..7af25ea6068f4 100644
---- a/drivers/net/wireless/microchip/wilc1000/spi.c
-+++ b/drivers/net/wireless/microchip/wilc1000/spi.c
-@@ -50,6 +50,9 @@ struct wilc_spi {
- 		struct gpio_desc *enable;	/* ENABLE GPIO or NULL */
- 		struct gpio_desc *reset;	/* RESET GPIO or NULL */
- 	} gpios;
-+
-+	/* lock to protect hif access */
-+	struct mutex hif_cs;
- };
- 
- static const struct wilc_hif_func wilc_hif_spi;
-@@ -1105,6 +1108,15 @@ static int wilc_spi_write(struct wilc *wilc, u32 addr, u8 *buf, u32 size)
-  *      Bus interfaces
-  *
-  ********************************************/
-+static void wilc_spi_claim(struct wilc *wilc)
-+{
-+	mutex_lock(&wilc->hif_cs);
-+}
-+
-+static void wilc_spi_release(struct wilc *wilc)
-+{
-+	mutex_unlock(&wilc->hif_cs);
-+}
- 
- static int wilc_spi_reset(struct wilc *wilc)
- {
-@@ -1132,6 +1144,7 @@ static int wilc_spi_deinit(struct wilc *wilc)
- 
- 	spi_priv->isinit = false;
- 	wilc_wlan_power(wilc, false);
-+	mutex_destroy(&wilc->hif_cs);
++On host reboot the newly flashed UEFI driver will be used. To run new control
++or cmrt firmware the NIC must be power cycled.
+diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
+index 831921b9d4d5..3ba527514f1e 100644
+--- a/drivers/net/ethernet/meta/Kconfig
++++ b/drivers/net/ethernet/meta/Kconfig
+@@ -27,6 +27,7 @@ config FBNIC
+ 	select NET_DEVLINK
+ 	select PAGE_POOL
+ 	select PHYLINK
++	select PLDMFW
+ 	help
+ 	  This driver supports Meta Platforms Host Network Interface.
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+index 0072d612215e..bd718b3e314b 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+@@ -3,6 +3,7 @@
+
+ #include <linux/unaligned.h>
+ #include <linux/pci.h>
++#include <linux/pldmfw.h>
+ #include <linux/types.h>
+ #include <net/devlink.h>
+
+@@ -109,8 +110,274 @@ static int fbnic_devlink_info_get(struct devlink *devlink,
  	return 0;
  }
- 
-@@ -1140,6 +1153,8 @@ static int wilc_spi_init(struct wilc *wilc, bool resume)
- 	struct wilc_spi *spi_priv = wilc->bus_data;
- 	int ret;
- 
-+	mutex_init(&spi->hif_cs);
+
++/**
++ * fbnic_send_package_data - Send record package data to firmware
++ * @context: PLDM FW update structure
++ * @data: pointer to the package data
++ * @length: length of the package data
++ *
++ * Send a copy of the package data associated with the PLDM record matching
++ * this device to the firmware.
++ *
++ * Return: zero on success
++ *	    negative error code on failure
++ */
++static int fbnic_send_package_data(struct pldmfw *context, const u8 *data,
++				   u16 length)
++{
++	struct device *dev = context->dev;
 +
- 	if (spi_priv->isinit) {
- 		/* Confirm we can read chipid register without error: */
- 		if (wilc_validate_chipid(wilc) == 0)
-diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.c b/drivers/net/wireless/microchip/wilc1000/wlan.c
-index 9d80adc45d6be..b149734f19a05 100644
---- a/drivers/net/wireless/microchip/wilc1000/wlan.c
-+++ b/drivers/net/wireless/microchip/wilc1000/wlan.c
-@@ -767,25 +767,37 @@ static int chip_wakeup(struct wilc *wilc)
- 
- static inline int acquire_bus(struct wilc *wilc, enum bus_acquire acquire)
- {
--	int ret = 0;
-+	const struct wilc_hif_func *hif_func = wilc->hif_func;
-+	int ret;
- 
--	mutex_lock(&wilc->hif_cs);
--	if (acquire == WILC_BUS_ACQUIRE_AND_WAKEUP && wilc->power_save_mode) {
--		ret = chip_wakeup(wilc);
--		if (ret)
--			mutex_unlock(&wilc->hif_cs);
--	}
-+	hif_func->hif_claim(wilc);
-+
-+	if (!wilc->power_save_mode)
-+		return 0;
- 
-+	if (acquire != WILC_BUS_ACQUIRE_AND_WAKEUP)
-+		return 0;
-+
-+	ret = chip_wakeup(wilc);
-+	if (ret)
-+		goto err;
++	/* Temp placeholder required by devlink */
++	dev_info(dev,
++		 "Sending %u bytes of PLDM record package data to firmware\n",
++		 length);
 +
 +	return 0;
++}
 +
-+err:
-+	hif_func->hif_release(wilc);
- 	return ret;
- }
- 
- static inline int release_bus(struct wilc *wilc, enum bus_release release)
- {
-+	const struct wilc_hif_func *hif_func = wilc->hif_func;
- 	int ret = 0;
- 
- 	if (release == WILC_BUS_RELEASE_ALLOW_SLEEP && wilc->power_save_mode)
- 		ret = chip_allow_sleep(wilc);
--	mutex_unlock(&wilc->hif_cs);
++/**
++ * fbnic_send_component_table - Send PLDM component table to the firmware
++ * @context: PLDM FW update structure
++ * @component: The component to send
++ * @transfer_flag: Flag indication location in component tables
++ *
++ * Read relevant data from component table and forward it to the firmware.
++ * Check response to verify if the firmware indicates that it wishes to
++ * proceed with the update.
++ *
++ * Return: zero on success
++ *	    negative error code on failure
++ */
++static int fbnic_send_component_table(struct pldmfw *context,
++				      struct pldmfw_component *component,
++				      u8 transfer_flag)
++{
++	struct device *dev = context->dev;
++	u16 id = component->identifier;
++	u8 test_string[80];
 +
-+	hif_func->hif_release(wilc);
- 
- 	return ret;
- }
-@@ -1447,7 +1459,9 @@ void wilc_wlan_cleanup(struct net_device *dev)
- 	wilc->rx_buffer = NULL;
- 	kfree(wilc->tx_buffer);
- 	wilc->tx_buffer = NULL;
-+	acquire_bus(wilc, WILC_BUS_ACQUIRE_AND_WAKEUP);
- 	wilc->hif_func->hif_deinit(wilc);
-+	release_bus(wilc, WILC_BUS_RELEASE_ALLOW_SLEEP);
- }
- 
- static int wilc_wlan_cfg_commit(struct wilc_vif *vif, int type,
-diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.h b/drivers/net/wireless/microchip/wilc1000/wlan.h
-index b9e7f9222eadd..ade2db95e8a0f 100644
---- a/drivers/net/wireless/microchip/wilc1000/wlan.h
-+++ b/drivers/net/wireless/microchip/wilc1000/wlan.h
-@@ -403,6 +403,8 @@ struct wilc_hif_func {
- 	void (*disable_interrupt)(struct wilc *nic);
- 	int (*hif_reset)(struct wilc *wilc);
- 	bool (*hif_is_init)(struct wilc *wilc);
-+	void (*hif_claim)(struct wilc *wilc);
-+	void (*hif_release)(struct wilc *wilc);
++	switch (id) {
++	case QSPI_SECTION_CMRT:
++	case QSPI_SECTION_CONTROL_FW:
++	case QSPI_SECTION_OPTION_ROM:
++		break;
++	default:
++		dev_err(dev, "Unknown component ID %u\n", id);
++		return -EINVAL;
++	}
++
++	dev_dbg(dev, "Sending PLDM component table to firmware\n");
++
++	/* Temp placeholder */
++	strscpy(test_string, component->version_string,
++		min_t(u8, component->version_len, 79));
++	dev_info(dev, "PLDMFW: Component ID: %u version %s\n",
++		 id, test_string);
++
++	return 0;
++}
++
++/**
++ * fbnic_flash_component - Flash a component of the QSPI
++ * @context: PLDM FW update structure
++ * @component: The component table to send to FW
++ *
++ * Map contents of component and make it available for FW to download
++ * so that it can update the contents of the QSPI Flash.
++ *
++ * Return: zero on success
++ *	    negative error code on failure
++ */
++static int fbnic_flash_component(struct pldmfw *context,
++				 struct pldmfw_component *component)
++{
++	const u8 *data = component->component_data;
++	u32 size = component->component_size;
++	struct fbnic_fw_completion *fw_cmpl;
++	struct device *dev = context->dev;
++	struct pci_dev *pdev = to_pci_dev(dev);
++	u16 id = component->identifier;
++	const char *component_name;
++	int retries = 2;
++	int err;
++
++	struct devlink *devlink;
++	struct fbnic_dev *fbd;
++
++	switch (id) {
++	case QSPI_SECTION_CMRT:
++		component_name = "boot1";
++		break;
++	case QSPI_SECTION_CONTROL_FW:
++		component_name = "boot2";
++		break;
++	case QSPI_SECTION_OPTION_ROM:
++		component_name = "option-rom";
++		break;
++	default:
++		dev_err(dev, "Unknown component ID %u\n", id);
++		return -EINVAL;
++	}
++
++	fw_cmpl = kzalloc(sizeof(*fw_cmpl), GFP_KERNEL);
++	if (!fw_cmpl)
++		return -ENOMEM;
++
++	pdev = to_pci_dev(dev);
++	fbd = pci_get_drvdata(pdev);
++	devlink = priv_to_devlink(fbd);
++
++	/* Initialize completion and queue it for FW to process */
++	fw_cmpl->msg_type = FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ;
++	init_completion(&fw_cmpl->done);
++
++	fw_cmpl->fw_update.last_offset = 0;
++	fw_cmpl->fw_update.data = data;
++	fw_cmpl->fw_update.size = size;
++
++	err = fbnic_fw_xmit_fw_start_upgrade(fbd, fw_cmpl, id, size);
++	if (err)
++		goto cmpl_free;
++
++	/* Monitor completions and report status of update */
++	while (fw_cmpl->fw_update.data) {
++		u32 offset = fw_cmpl->fw_update.last_offset;
++
++		devlink_flash_update_status_notify(devlink, "Flashing",
++						   component_name, offset,
++						   size);
++
++		/* Allow 5 seconds for reply, resend and try up to 2 times */
++		if (wait_for_completion_timeout(&fw_cmpl->done, 5 * HZ)) {
++			reinit_completion(&fw_cmpl->done);
++			/* If we receive a reply, reinit our retry counter */
++			retries = 2;
++		} else if (--retries == 0) {
++			dev_err(fbd->dev, "Timed out waiting on update\n");
++			err = -ETIMEDOUT;
++			goto cmpl_cleanup;
++		}
++	}
++
++	err = fw_cmpl->result;
++	if (err)
++		goto cmpl_cleanup;
++
++	devlink_flash_update_status_notify(devlink, "Flashing",
++					   component_name, size, size);
++
++cmpl_cleanup:
++	fbd->cmpl_data = NULL;
++cmpl_free:
++	kfree(fw_cmpl);
++
++	return err;
++}
++
++/**
++ * fbnic_finalize_update - Perform last steps to complete device update
++ * @context: PLDM FW update structure
++ *
++ * Notify FW that update is complete and that it can take any actions
++ * needed to finalize the FW update.
++ *
++ * Return: zero on success
++ *	    negative error code on failure
++ */
++static int fbnic_finalize_update(struct pldmfw *context)
++{
++	struct device *dev = context->dev;
++
++	/* Temp placeholder required by devlink */
++	dev_info(dev, "PLDMFW: Finalize update\n");
++
++	return 0;
++}
++
++static const struct pldmfw_ops fbnic_pldmfw_ops = {
++	.match_record = pldmfw_op_pci_match_record,
++	.send_package_data = fbnic_send_package_data,
++	.send_component_table = fbnic_send_component_table,
++	.flash_component = fbnic_flash_component,
++	.finalize_update = fbnic_finalize_update,
++};
++
++static void fbnic_devlink_flash_update_report_err(struct fbnic_dev *fbd,
++						  struct devlink *devlink,
++						  const char *err_msg,
++						  int err)
++{
++	char err_str[128];
++
++	snprintf(err_str, sizeof(err_str),
++		 "Failed to flash PLDM Image: %s (error: %d)",
++		 err_msg, err);
++	devlink_flash_update_status_notify(devlink, err_str, NULL, 0, 0);
++	dev_err(fbd->dev, "%s\n", err_str);
++}
++
++static int
++fbnic_devlink_flash_update(struct devlink *devlink,
++			   struct devlink_flash_update_params *params,
++			   struct netlink_ext_ack *extack)
++{
++	struct fbnic_dev *fbd = devlink_priv(devlink);
++	const struct firmware *fw = params->fw;
++	struct device *dev = fbd->dev;
++	struct pldmfw context;
++	char *err_msg;
++	int err;
++
++	if (!fw || !fw->data || !fw->size)
++		return -EINVAL;
++
++	devlink_flash_update_status_notify(devlink, "Preparing to flash",
++					   NULL, 0, 0);
++
++	context.ops = &fbnic_pldmfw_ops;
++	context.dev = dev;
++
++	err = pldmfw_flash_image(&context, fw);
++	if (err) {
++		switch (err) {
++		case -EINVAL:
++			err_msg = "Invalid image";
++			break;
++		case -EOPNOTSUPP:
++			err_msg = "Unsupported image";
++			break;
++		case -ENOMEM:
++			err_msg = "Out of memory";
++			break;
++		case -EFAULT:
++			err_msg = "Invalid header";
++			break;
++		case -ENOENT:
++			err_msg = "No matching record";
++			break;
++		case -ENODEV:
++			err_msg = "No matching device";
++			break;
++		case -ETIMEDOUT:
++			err_msg = "Timed out waiting for reply";
++			break;
++		default:
++			err_msg = "Unknown error";
++			break;
++		}
++		fbnic_devlink_flash_update_report_err(fbd, devlink,
++						      err_msg, err);
++	} else {
++		devlink_flash_update_status_notify(devlink, "Flashing done",
++						   NULL, 0, 0);
++	}
++
++	return err;
++}
++
+ static const struct devlink_ops fbnic_devlink_ops = {
+-	.info_get = fbnic_devlink_info_get,
++	.info_get	= fbnic_devlink_info_get,
++	.flash_update	= fbnic_devlink_flash_update,
  };
- 
- #define WILC_MAX_CFG_FRAME_SIZE		1468
--- 
-2.45.2
 
+ void fbnic_devlink_free(struct fbnic_dev *fbd)
+--
+2.43.5
 
