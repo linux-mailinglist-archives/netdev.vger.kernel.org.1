@@ -1,83 +1,55 @@
-Return-Path: <netdev+bounces-137959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FBF49AB3FD
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:29:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A279C9AB41B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:35:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2601D1F2142C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:29:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6322A28443C
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811781BB6B3;
-	Tue, 22 Oct 2024 16:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8EB6136345;
+	Tue, 22 Oct 2024 16:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KtLtxRl4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aeuQWrNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053F4139CE2
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 16:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A322E1A4F1B
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 16:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729614572; cv=none; b=t1xi3zQoarTngeDJfxGjF9DnvpCPKbYkuLTcuCpVeJThH0YQA0a0MkvJQkNkZH+GdoYddr6l9kOA5SVKg6wrRFLpWqgOgZxC9QNoRUudKrpo2MRTPdUGz6IdfIifYASTASPAVekg7POv5AfvuH/hvg6mTH2doTFRHQs9EdsQtiY=
+	t=1729614949; cv=none; b=YiIwgW0qX1r+zsNpQmMbidsoiIK3ArJFCzi+wz7mOu+GgrCgVHtu9ZCbXh873iguK/cZJB7yuTlCHMDaDQ0ov1BUvBnEGAuPdipT8JkJyH91FQGwSy9zAn+rsNgvP/T8595KnzBLgS+HLgPu/5aiEykk1bjLMQ4L+678Ugk+IDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729614572; c=relaxed/simple;
-	bh=7Qks6CvcAy08IF1VTlIFn6216CCNKaqgBBA3HhKb7e4=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vcr020/ALuNGeS54QC4ZrHBYQGFBPVP1teFWqFZiUzOBzFaD9aMMu2cO5u2eyX+86bwop6PvseLpdRrhGVRwUnnXb7haZcpWV1+FAl9xNgWG1e5WWhl1Q7k4Ae6rYRDNYmwqn99rN8APO8ETWrc2r2tipGTrKuvT/Fibg82iFSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KtLtxRl4; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20c805a0753so50684545ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:29:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1729614570; x=1730219370; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JNlvlgl/Xa91pa5IYvLtXjUZAW4lPaTIhmUIGbxaIFU=;
-        b=KtLtxRl46tlPX2lvwYDEIk84G5lEmowTncPDGrthgNnVKQdfbXhgQNW1nz3nYNXawG
-         HPMYwdqEtjA3ajeN0OxqLkVp3Z+U+6uaEK4HFncn4tQm/weHtECQ/AwZyxAFFAxRzVv1
-         8rUWaPpXeL6uHXGEx4ZNI1CX53YWR88Dl3C/w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729614570; x=1730219370;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JNlvlgl/Xa91pa5IYvLtXjUZAW4lPaTIhmUIGbxaIFU=;
-        b=QIFC0tfCsC25k/P2dGtoYj1C6DX1ypn0N45X/5Zu4U9dJVdd+N2oBNya1Oi1GRXEHa
-         6ioi6LND6qSQ/DP9fwVwVFBAH7zYViPhG0uqA1D69s8R69UT3OOYLgT3gXImXpClj7px
-         ixBhGXHlQKradXmS1J1NtCnMPVEoTMTAGFnZkoTOM5lTSXkhlX/pziPgqVhtZMiFP+i5
-         MD9hbsQ+22NDCNWF6znH4OekHyEelEjOlJ/jNll0UM5h2GNtFLPYKNkVcKd+ElCVR/Vq
-         lWvCdJ+pOkLb52+81Nfe4wDzkKalxyskuYgq1ZhivqkzeOeL+tpwxhB5hLAsSuQ4rl+v
-         ncUA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3zYFaC4RMAyHA6Pug7x/zek4UD+X0p+Z1SCc5IEjZLf/sVk4gQlByeeKJc+NOu867FR4KeJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzidYVpg26cosiKvCx4Oo4pnQFFlGC9TJin/t15L4A6QG7qBPyD
-	rQz6JoW1CcGNpXlV5AGY9Kpb7RMgXv/Q+HEWnBYkXlspwf65V9nHHJ9tab9bDxM=
-X-Google-Smtp-Source: AGHT+IGB9Eu+yasVM5qJT8Dk7DAQSznFZAQokHV0j8rclm5i4zN6QwRxYWiSlJxTR5Gh9ZzMb7LHLQ==
-X-Received: by 2002:a17:902:ecc9:b0:20d:27f8:d72a with SMTP id d9443c01a7336-20e5a955803mr206681125ad.61.1729614570260;
-        Tue, 22 Oct 2024 09:29:30 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0de25bsm44897315ad.231.2024.10.22.09.29.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 09:29:29 -0700 (PDT)
-Date: Tue, 22 Oct 2024 09:29:27 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Dmitry Antipov <dmantipov@yandex.ru>, Simon Horman <horms@kernel.org>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: RTNL: assertion failed at net/core/dev.c
-Message-ID: <ZxfS5-HHcbMsjc_I@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	Simon Horman <horms@kernel.org>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru>
- <ZxfSV66cYq7N6i5H@LQ3V64L9R2>
+	s=arc-20240116; t=1729614949; c=relaxed/simple;
+	bh=Ipo3RTH/frIFdnabEoFZ8Njj6Gbl6avpAc/hKaRMyPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFhLKYmGVqTtennHNsrhtqsWhywQtRXIP1u0DU+iRl2G/sBgXlOfRVoRz7HC8Fn6kNIXldu3AzHj2pJHfPXNb677zYiP+Ku2w8fXsbDa9ywpCaKx08j0zcqvWnDP+dtcS4cNVcLhBbAwmOr23icw7AmeAvjcQSs9h2jJElGCLrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aeuQWrNZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3685BC4CEC3;
+	Tue, 22 Oct 2024 16:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729614949;
+	bh=Ipo3RTH/frIFdnabEoFZ8Njj6Gbl6avpAc/hKaRMyPw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aeuQWrNZGY8rmAqAZpW3XzNeI4Lw/yZgY5cjE8j0cblzlNDjDEYW2/QThBAow2h27
+	 9Bx+dcXkc0vBBf5OywNTBjBD8ZPwcZXIph9TBWrQhPPfGXbnk+MoPILL+/qJFVk0cH
+	 9ayhnUoeyaZAoLdvbZTOek9AEI5Hz3TKZKVS3a/strggqQiG9T9+hUBCfpo09P+E8T
+	 nWXRwspqBHxFpfr/EV3+gtZKHSoEcQowofYySdAGllh62CTpb2dLu7cnlfUrp3aeui
+	 UUqkQzRboUedgyTMPKfcs2x01vXkzVx61oBFMlBm+dlO/V1pbDEtH63/9ghhiWzhEj
+	 MFLtY7LR6k0nQ==
+Date: Tue, 22 Oct 2024 17:35:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Nelson Escobar <neescoba@cisco.com>
+Cc: netdev@vger.kernel.org, satishkh@cisco.com, johndale@cisco.com
+Subject: Re: [Patch net-next 1/5] enic: Create enic_wq/rq structures to
+ bundle per wq/rq data
+Message-ID: <20241022163546.GD402847@kernel.org>
+References: <20241022041707.27402-1-neescoba@cisco.com>
+ <20241022041707.27402-2-neescoba@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,40 +58,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZxfSV66cYq7N6i5H@LQ3V64L9R2>
+In-Reply-To: <20241022041707.27402-2-neescoba@cisco.com>
 
-On Tue, Oct 22, 2024 at 09:27:03AM -0700, Joe Damato wrote:
-> On Tue, Oct 22, 2024 at 11:24:45AM +0300, Dmitry Antipov wrote:
-> > Hello,
-> > 
-> > running around https://syzkaller.appspot.com/bug?extid=b390c8062d8387b6272a
-> > with net-next and linux-next, I've noticed the following:
+On Mon, Oct 21, 2024 at 09:17:03PM -0700, Nelson Escobar wrote:
+> Bundling the wq/rq specific data into dedicated enic_wq/rq structures
+> cleans up the enic structure and simplifies future changes related to
+> wq/rq.
+> 
+> Signed-off-by: Nelson Escobar <neescoba@cisco.com>
+> Signed-off-by: John Daley <johndale@cisco.com>
+> Signed-off-by: Satish Kharat <satishkh@cisco.com>
 
-[...]
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> 
-> Thanks for reporting this.
-> 
-> The issue is that in the path highlighted above, rtnl is not held
-> before e1000_down is called.
-> 
-> I believe this will fix the issue you are seeing, but I am not sure
-> if a similar change needs to be added for power management's suspend
-> (which also eventually calls e1000_down):
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-> index 4de9b156b2be..ebbd3fa3a5c8 100644
-> --- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-> +++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-> @@ -5074,7 +5074,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
->                         usleep_range(10000, 20000);
-> 
->                 WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
-> +               rtnl_lock()
-
-As you can see, I didn't compile test this as I'm missing a
-semicolon (sorry).
-
-I am still reading through the source to see what other spots may
-need rtnl_lock.
+In future please use ./scripts/get_maintainer.pl FILE.patch
+to generate the CC list for a patch. Likewise for this
+entire patchset. b4 can help with this.
 
