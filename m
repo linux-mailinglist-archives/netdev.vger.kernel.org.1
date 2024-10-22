@@ -1,112 +1,93 @@
-Return-Path: <netdev+bounces-137894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D6D9AB0A3
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:17:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349579AB0A8
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:18:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD0651F24062
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:17:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9B15283A6F
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40A5199EA2;
-	Tue, 22 Oct 2024 14:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE211A00F2;
+	Tue, 22 Oct 2024 14:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="b4XxTD53"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UUMAtAOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9A219D88F
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D1D199EA2;
+	Tue, 22 Oct 2024 14:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729606654; cv=none; b=VS6tcSCcL/t33wm/xkUEVquH2nWRkrLMuSdwQv+aM+M6qJsKCRbJ7rtt5ZYd3f/ndh0vTvo6wcDJTnLDbINW+U029EhWF/9+NgRAPkntqDlA0IsoxuN/0MnX8+RRVzOBzFnryR0BWLc/t+7Fo5hyJ8nJKGIUfLiK1iRelxOCHa0=
+	t=1729606731; cv=none; b=K3e6Xk8HCujnBXVRSQN9o3f4ElqTVaMLUa4MR59KgNhdoRmH5VFF70IIYwCDyaZCqVDqaxStzmmR2Uee6Y2WzWlTGwpVq6CgNiJQU9JTojdXXZpKzgexecuRqdbmyinBu7HengL9hbx4hYPfRZxZo9qkp8O+Lst1Jk3W7fw1XYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729606654; c=relaxed/simple;
-	bh=C2xFePEtwfUlIpNAcsA+dMrSjTesOW7WcmWL/PUmvew=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JPeRzKRISbD0nuGtQCRx0Ta11XkrsNg3nNTQViuFZhhaE4jli5+rpS5ikZ9WIIVX6eZCe/Bnw19nBxB+GVdSm0LBe3MDKjukC4TQC7s5+1VXvzhcbD5h468H2B/C9FbBgXRS0lqJO0QrvxAn4zRdfdhysrB1/moEOUvx3ieP7Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=b4XxTD53; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729606653; x=1761142653;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=C2xFePEtwfUlIpNAcsA+dMrSjTesOW7WcmWL/PUmvew=;
-  b=b4XxTD53yzOpQzW7+1ZTdwFNQTJEXwhP/dgDsxDBcorpzuqUUjmn9deY
-   Fy2i639ypndLDi2PMz9v5UWg6JReMG6js6JljcJDEkE22+AGuATvS/0cs
-   7JIyyFimG+scdMBGJWmg8Bnl1WJdG4a22D4MvfSCisNrJpMLh0rQGEVgy
-   A=;
-X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
-   d="scan'208";a="140606111"
-Subject: RE: [PATCH v1 net-next 3/3] net: ena: Add PHC documentation
-Thread-Topic: [PATCH v1 net-next 3/3] net: ena: Add PHC documentation
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 14:17:31 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:4209]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.20.75:2525] with esmtp (Farcaster)
- id dbe9bd66-3dd0-482c-bac6-4c07cbcb53b5; Tue, 22 Oct 2024 14:17:30 +0000 (UTC)
-X-Farcaster-Flow-ID: dbe9bd66-3dd0-482c-bac6-4c07cbcb53b5
-Received: from EX19D011EUA004.ant.amazon.com (10.252.50.46) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:17:30 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D011EUA004.ant.amazon.com (10.252.50.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:17:29 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 22 Oct 2024 14:17:29 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: David Woodhouse <dwmw2@infradead.org>, David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky, Zorik"
-	<zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, "Bshara,
- Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori,
- Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel"
-	<netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt,
- Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir"
-	<ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>
-Thread-Index: AQHbI3j6/gWuVA+BA0SdZ8txTotu87KRZG8AgAFs5bA=
-Date: Tue, 22 Oct 2024 14:17:29 +0000
-Message-ID: <07a168fb44ac4c3a897678ac86893429@amazon.com>
-References: <20241021052011.591-1-darinzon@amazon.com>
-	 <20241021052011.591-4-darinzon@amazon.com>
- <5f469c57a34c0a2a76b6f8c4517a0e4b7c038e8b.camel@infradead.org>
-In-Reply-To: <5f469c57a34c0a2a76b6f8c4517a0e4b7c038e8b.camel@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1729606731; c=relaxed/simple;
+	bh=kSy/v9zsfg+uchR+oZgQGS8E9s2D6ymYvJFZLCaTfa8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1eP1qZBjX0nsF29M75DsTKN2nlf64ifUIT1w8eRf9XpE56H0cgUNR8xQ36Bpkvsy3ady/OvtYf+pc7lsmWsd8YTe9mdoyXZHnYhiAB763IphQofQPLjPZPM+KMnRbLDfSSeBVXhJgNnqEQ3z/zP2KSqjFYRgq3mHPwxss/dXTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UUMAtAOe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C4C9C4CEC3;
+	Tue, 22 Oct 2024 14:18:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729606730;
+	bh=kSy/v9zsfg+uchR+oZgQGS8E9s2D6ymYvJFZLCaTfa8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UUMAtAOe/7jErEnEwy4C5P8AzfM8Jm+XyKKU479VR9/+EIPyEfTRzYa1Vdpusj3PF
+	 U/2LaeLFCoAfnZFw2JswMx9NVFrFidCEJGbSg5ToVhV8qm6Xbizr+HoQAWBgREcDlK
+	 NqZEVJ9S0XG7KdK+LXB6A50eATww+OSZZGOyz92juzuNZ9SAJvwqzlttivja+WBlRJ
+	 v2NTMImDteJ643cXx8/89wWAppyClzovyOjvkbIQIywu8RZkzI5tmbDBbLt+oJu4Yk
+	 WTHTqs7Op5riRXT79yie5gAVHm2j3BqIKR0YuCMqm69TadsGM+RGns+44Hwg+alIuD
+	 XPOUpqXUCHIpQ==
+Date: Tue, 22 Oct 2024 15:18:45 +0100
+From: Simon Horman <horms@kernel.org>
+To: Matt Johnston <matt@codeconstruct.com.au>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Wolfram Sang <wsa@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Dung Cao <dung@os.amperecomputing.com>
+Subject: Re: [PATCH net v3] mctp i2c: handle NULL header address
+Message-ID: <20241022141845.GV402847@kernel.org>
+References: <20241022-mctp-i2c-null-dest-v3-1-e929709956c5@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022-mctp-i2c-null-dest-v3-1-e929709956c5@codeconstruct.com.au>
 
-PiA+ICvCoCB0ZXN0cHRwIC1kIC9kZXYvcHRwJChldGh0b29sIC1UIDxpbnRlcmZhY2U+IHwgYXdr
-ICcvUFRQIEhhcmR3YXJlDQo+IENsb2NrOi8ge3ByaW50ICRORn0nKSAtayAxDQo+ID4gKw0KPiAN
-Cj4gRG9lcyB1ZGV2IGNyZWF0ZSBhIHN0YWJsZSBzeW1saW5rIGZvciB0aGlzLCBsaWtlIGl0IGRv
-ZXMgZm9yIGUuZy4NCj4gL2Rldi9wdHBfa3ZtID8NCj4gDQoNClllcywgeW91IGNhbiBhZGQgYSBz
-cGVjaWZpYyBydWxlIGZvciB0aGUgZW5hIHB0cCBkZXZpY2UNCg0KU1VCU1lTVEVNPT0icHRwIiwg
-QVRUUntjbG9ja19uYW1lfT09ImVuYS1wdHAtKiIsIFNZTUxJTksgKz0gImVuYS1wdHAiDQoNCj4g
-SSBub3RlIHRoZSBFQzIgZG9jdW1lbnRhdGlvbiAqc3RpbGwqIHRlbGxzIHVzZXJzIHRvIHVzZSAv
-ZGV2L3B0cDANCj4gd2l0aG91dCBldmVuIGNoZWNraW5nIHdoaWNoIGRldmljZSB0aGF0IGlzLCBz
-byB0aGV5IGNvdWxkIGdldCBzb21ldGhpbmcNCj4gKnZlcnkqIGRpZmZlcmVudCB0byB3aGF0IHRo
-ZXkgZXhwZWN0LCBpZiB0aGV5IGFjY2lkZW50YWxseSBzdGFydCB1c2luZw0KPiB0aGUgS1ZNIFBU
-UCBjbG9jayBpbnN0ZWFkIQ0K
+On Tue, Oct 22, 2024 at 06:25:14PM +0800, Matt Johnston wrote:
+> daddr can be NULL if there is no neighbour table entry present,
+> in that case the tx packet should be dropped.
+> 
+> saddr will usually be set by MCTP core, but check for NULL in case a
+> packet is transmitted by a different protocol.
+> 
+> Fixes: f5b8abf9fc3d ("mctp i2c: MCTP I2C binding driver")
+> Cc: stable@vger.kernel.org
+> Reported-by: Dung Cao <dung@os.amperecomputing.com>
+> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
+> ---
+> Changes in v3:
+> - Revert to simpler saddr check of v1, mention in commit message
+> - Revert whitespace change from v2
+> - Link to v2: https://lore.kernel.org/r/20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au
+> 
+> Changes in v2:
+> - Set saddr to device address if NULL, mention in commit message
+> - Fix patch prefix formatting
+> - Link to v1: https://lore.kernel.org/r/20241018-mctp-i2c-null-dest-v1-1-ba1ab52966e9@codeconstruct.com.au
+
+Thanks for the updates Matt.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
