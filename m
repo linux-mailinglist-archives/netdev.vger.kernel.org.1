@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-137896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83BAD9AB0B4
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:22:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A49D19AB0B7
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1978B2313F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:22:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D37E71C20ABD
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0291A072A;
-	Tue, 22 Oct 2024 14:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6C719F424;
+	Tue, 22 Oct 2024 14:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="c4TogT6B"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UNFI7uZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646FA19D060
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4900B19DFB5
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729606921; cv=none; b=WU0uBLKxlW9YFlrKpulX6Cygm5lEvW1FsnUEbKmKg29J3HMCW0ZO6GfU5uSq5B1aOggdkArHYa/GTvOsjcJYntAHOam304lPPyV059MecpEEua8I0NdlzYjXCcHKCt8zlJrSP+5CoRuBtAgsuWYCn5y61xyg9VbJKXI4If0Go4s=
+	t=1729606970; cv=none; b=W40adloQlHxiDz9MNnP9Gnl+bBClRQb6lqxSaSSB/8i0iHuriLw3QXxNNaKef9YHmiq7Dc7z4ewJJs8udWL9e7VxFHpzpZkBdbxH3OzRvcf+dNEpOSeTzD7vsz/d4jlsWaXzoV7qEZzzOLchPWAVW8rQmSLDg13vttva+SqPVC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729606921; c=relaxed/simple;
-	bh=GWBC6LuThuKXO7C/FoUYH7ORe0m+DdAelIXGBflxS/c=;
+	s=arc-20240116; t=1729606970; c=relaxed/simple;
+	bh=WwoCZ5X1zwsoptZ1KZXHMR/BmT4oKY/vHDjW7LyRTKw=;
 	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MUe9tHl2rst40tIRE16XcSqVzyDOHxM987BNsQMpmgRfA9pDFq+ThJgVpGtxvLYBgJUDR9rb5G1FytVYlY1vwmTEiLypGrvftUlZ0t9E2/BLIBF763O8NJvKj1qA5hpXCRjKXPfE8AUdaJaplfMUku/L3PflE5VxHwMfRUqGQu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=c4TogT6B; arc=none smtp.client-ip=52.119.213.154
+	 Content-Type:MIME-Version; b=LEQEnUuJ5CcqPA/NM/QcKFxHLW9wkzAhm7mlxFz0vDkM/QYq6aWI8pK3u6t+kP3RpVJtR2b/1/pAwWpOPPT2kw5Ue9OrZLlbWI9HCZesSRTvTOv8hT5xGpc81bI4nCzlfBc6em5QCbFPCPSII6g9Cxt1P4Xqfrg54f+zT+LI/YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UNFI7uZZ; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729606920; x=1761142920;
+  t=1729606969; x=1761142969;
   h=from:to:cc:date:message-id:references:in-reply-to:
    content-transfer-encoding:mime-version:subject;
-  bh=vRDqs0taNTOyWCgtDD8wgVuViY/PROuFC8vYwxJ2f7Y=;
-  b=c4TogT6BvZkKobZkHeAHg4hKeU5l3sJvV7s7mA0EvQDV8k3Gv/jLW2vD
-   4WZNPpMrJ/OyIWO7dAcaztHEHdtSZqrTQ1WTIh7r9ZGDKzkeq462QiK4b
-   hx+HecU3I8EKLaIUjxwVRg5MpKNve4Vt+h3hkrdF+eX1YMkk9qZlUBaMw
-   Y=;
+  bh=WwoCZ5X1zwsoptZ1KZXHMR/BmT4oKY/vHDjW7LyRTKw=;
+  b=UNFI7uZZvm3oEFIsyn/hrjI6h3MC2YBPtqd7oH+k5F6gUuJrZss2GQ+h
+   qYe0pvTa1OG3uKRMC+dm5suJ4k5bTQbcU+7U9Fe1v89EiTEOkICyJHpLb
+   G/Hv7AvDL9CvVf9PyYOrOUDiby5eMNIjLSbrUvzhqH8AJoWK+F66eBxh8
+   g=;
 X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
-   d="scan'208";a="241441141"
-Subject: RE: [PATCH v1 net-next 0/3] PHC support in ENA driver
-Thread-Topic: [PATCH v1 net-next 0/3] PHC support in ENA driver
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 14:21:53 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:19090]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.10.171:2525] with esmtp (Farcaster)
- id e1ea76f2-1da9-4132-9c18-f76455baa511; Tue, 22 Oct 2024 14:21:52 +0000 (UTC)
-X-Farcaster-Flow-ID: e1ea76f2-1da9-4132-9c18-f76455baa511
-Received: from EX19D006EUA002.ant.amazon.com (10.252.50.65) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
+   d="scan'208";a="442941800"
+Subject: RE: [PATCH v1 net-next 1/3] net: ena: Add PHC support in the ENA driver
+Thread-Topic: [PATCH v1 net-next 1/3] net: ena: Add PHC support in the ENA driver
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 14:22:43 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:62492]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.35.143:2525] with esmtp (Farcaster)
+ id 6d516c9e-eaea-4b7b-8bfe-f14983496f48; Tue, 22 Oct 2024 14:22:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 6d516c9e-eaea-4b7b-8bfe-f14983496f48
+Received: from EX19D010EUA004.ant.amazon.com (10.252.50.94) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:21:52 +0000
+ Tue, 22 Oct 2024 14:22:31 +0000
 Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D006EUA002.ant.amazon.com (10.252.50.65) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 22 Oct 2024 14:21:52 +0000
+ EX19D010EUA004.ant.amazon.com (10.252.50.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 22 Oct 2024 14:22:30 +0000
 Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
  EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 22 Oct 2024 14:21:52 +0000
+ 15.02.1258.035; Tue, 22 Oct 2024 14:22:30 +0000
 From: "Arinzon, David" <darinzon@amazon.com>
-To: Andrew Lunn <andrew@lunn.ch>
+To: Simon Horman <horms@kernel.org>
 CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
 	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David"
@@ -77,12 +77,13 @@ CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
 	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
  Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>
-Thread-Index: AQHbI3juB2QkHj71fkKLdcQlFPb6DLKRYMkAgAFzggA=
-Date: Tue, 22 Oct 2024 14:21:51 +0000
-Message-ID: <5e5b4202280a4306a2d5c3847c6706bd@amazon.com>
+Thread-Index: AQHbI3jyHzM+s43mz0CcBaQPZI77TrKRaMWAgAFrxkA=
+Date: Tue, 22 Oct 2024 14:22:30 +0000
+Message-ID: <cd78a56636034961997214e418747d77@amazon.com>
 References: <20241021052011.591-1-darinzon@amazon.com>
- <1e127d15-2826-496a-8834-cd98861eabb3@lunn.ch>
-In-Reply-To: <1e127d15-2826-496a-8834-cd98861eabb3@lunn.ch>
+ <20241021052011.591-2-darinzon@amazon.com>
+ <20241021163955.GL402847@kernel.org>
+In-Reply-To: <20241021163955.GL402847@kernel.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -96,16 +97,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-> > This patchset adds the support for PHC (PTP Hardware Clock) in the ENA
-> > driver. The documentation part of the patchset includes additional
-> > information, including statistics, utilization and invocation examples
-> > through the testptp utility.
+> > The ENA driver will be extended to support the new PHC feature using
+> > ptp_clock interface [1]. this will provide timestamp reference for
+> > user space to allow measuring time offset between the PHC and the
+> > system clock in order to achieve nanosecond accuracy.
+> >
+> > [1] - https://www.kernel.org/doc/html/latest/driver-api/ptp.html
+> >
+> > Signed-off-by: Amit Bernstein <amitbern@amazon.com>
+> > Signed-off-by: David Arinzon <darinzon@amazon.com>
 >=20
-> I _think_ you missed Cc: the PTP Maintainer, although he could be hiding
-> somewhere in that long list of Amazon people. Do they all need Cc:ing?
+> Hi David,
 >=20
->         Andrew
+> As it looks like there will be a v2 anyway, please consider running this =
+series,
+> and in particular this patch, through:
+>=20
+> ./scripts/checkpatch.pl --strict --max-line-length=3D80 --codespell
+>=20
+> And please fix warnings it emits where that can be done without reducing
+> readability and clarity. E.g. please don't split string literals across m=
+ore than
+> one line just to make lines short.
+>=20
+> Thanks!
 
-Thanks Andrew,
-I will identify and add the relevant maintainers to the next patchset
+Thanks Simon,
+We'll resolve the issues in the next patchset.
 
