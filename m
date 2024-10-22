@@ -1,122 +1,149 @@
-Return-Path: <netdev+bounces-137811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6989A9E6B
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:24:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E799A9E71
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49C3A1F21592
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF8CA28254C
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C51D1991C2;
-	Tue, 22 Oct 2024 09:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57DC5198A22;
+	Tue, 22 Oct 2024 09:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BupHsRmK"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XocN0tUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974DE1991B5
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98823146017;
+	Tue, 22 Oct 2024 09:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729589019; cv=none; b=QiXv2IxUAj0GVGurXFxmtlhYwdBXi6OPxsTcAg9nFL8WJVWtpEdu+QRHPc9AejzVsxJRiBiRKpTvSLiEhfk0APRka0CL3wZnMKfT6ZnOw5cgVKOIyiobPyfT6E2klpiIf6xgcWnvAoN7sfRn6VMZlR0lBU7aE/LoeDIlabVCnnA=
+	t=1729589125; cv=none; b=h2hgGWYXrWgeQEBzBeSgL8JY21idkoqqj1rPe4O7KRQj7VnhU4iCxoEqHhfyd8oyks/5FV+Z99Iv3l7xgu5itrigLRWrSrLAezOmJmlE3EZeUJriZMoGHPjg5LQLSdJBrpanpKu2+KwINb2dqCYYE7KwBg/NXfOadAIsVVAjpkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729589019; c=relaxed/simple;
-	bh=BwvEDWO2ONrOGKBDpF/Y9LOF59H0FbsJzedCitZn2iQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZrKFbH/XEBpwVIVXQjNBpymRmXiqewQzRXa9nQ0KI4i6qY8uERsItUdXdOBuDaiUKzxmm3LpbEllle4bPxnwZuDi+RAh9xqvIqpi2IJ7RlX/znHB1Np3y76r1SN3yQdbBoJ7Z0hJWsmGmuGUr7VnRM/VALyocT3JgBihaPL/Q5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BupHsRmK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729589016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lwaG/c5R9PyY0LVwY5/sfl7H0UKEAwsoDPRTXGHqXbk=;
-	b=BupHsRmKnb1iupyi8QPsUTHvzOR/4ubko1awq/QnmEaaHwOH4S42eeCHGLqBXMFo8HlytW
-	OFX2gUjs/hipyUcYufnLXjpNYVTKgcz5I24odDL3uSXUFdchl2r9BGij75VGIWFO3JrGwb
-	+4GzELSTHf45Fjy7JgEcq2hdvKrDYeA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-zNOEOpF1Mfuu5d58PEkMpA-1; Tue, 22 Oct 2024 05:23:34 -0400
-X-MC-Unique: zNOEOpF1Mfuu5d58PEkMpA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d4922d8c7so2844811f8f.1
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:23:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729589014; x=1730193814;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lwaG/c5R9PyY0LVwY5/sfl7H0UKEAwsoDPRTXGHqXbk=;
-        b=RBSepUfZNTZBHgsM+QWUd5JBgbGpH9dqQMgPTUPPqm0LcFjKoxIbhaq1qQY1pjh3k3
-         hnLN4u+gswEIXUwM9ZWjk8s03lY2oh1JTeiK8W2xL9RJiQ7xu25TEz3o1lEzg8ZI9lSA
-         VzBaC7fVHa/X0KPoIItR0DMOrLORinx17Z+FyksFK+nvrahD5GAliZcWo6k60SxrXhOg
-         a+fo9lgYaVrJuXiaA90bqrNaXoJ+NV9G5ArphKWwOIW4CIsFo1AcaD8zlHyFR5hMdGuc
-         Mkt9n45i2yKfJwdF5vUQkpr3BvPHG5xNHq/hrQ0QgoI1LGp6nudnM0JDEEXXa4nZFNKS
-         o9Jg==
-X-Forwarded-Encrypted: i=1; AJvYcCWzOrr3UYtx4c7wPOPpJ9ZSKt1XlSEMlzdRy7nd+d6112ULKN9ufSPu+UNKAfea3YzFqzZ4Lag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUOIl0fE+hbVyEnTcE967a3ymePWMiLFhbyy8bmL0SwV2ZhOw0
-	qYyD3VKPUjuHP0bY9XhBBlKPLMfh8t3bGr6+nNBF479ZQN8aShmHjUT70Xag/N/fiwZJlzaidHx
-	4SWEBmHw0yxJ4cC6Iy36lHHWcj6NcoR92EjGwzWhq2IzNp5/JjXsbZQ==
-X-Received: by 2002:a5d:58d2:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-37ea21370eamr9413743f8f.9.1729589013600;
-        Tue, 22 Oct 2024 02:23:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGABcPaq8PgmpfrgbIv7V6Y5QW9A/aP7VQTgUwLfJqvVEOm2uyGhoErcFVMPcfpZBwcFX8SYQ==
-X-Received: by 2002:a5d:58d2:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-37ea21370eamr9413732f8f.9.1729589013212;
-        Tue, 22 Oct 2024 02:23:33 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9b076sm6176529f8f.90.2024.10.22.02.23.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 02:23:32 -0700 (PDT)
-Message-ID: <e5aefe89-ef71-4e50-ab3a-ac0e72b99fa7@redhat.com>
-Date: Tue, 22 Oct 2024 11:23:30 +0200
+	s=arc-20240116; t=1729589125; c=relaxed/simple;
+	bh=rAuyPr2cU6+++tAkhBZnCcAnNxu7b2cgu47Ggioiw44=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NnhVHltVrwaXKNChqIc1V6s9I3MY1wMZfwy2GrTLYem/nsZpffB8uI5mr5VUm/iE/ol8F5YbmUYCqJr3euVpR+3qca7ySDZU6LCjppzYrMjQ10sfE8KvDJl/zyDyhU+jFeF1LMjL9idD81AKuVGClYxW+pP4Vye4B8xysFDKxBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XocN0tUl; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49M4MGGG008286;
+	Tue, 22 Oct 2024 09:25:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=RknAiKzQML312t9LVvS8jFmWO33Sb6NWhE5vNMHCU
+	A8=; b=XocN0tUls/MWEYzXQGNxPBZ5YtaIp8Zvb5V5jsJysd+z6u8+fXiR+TY3c
+	vLV5lfPRBoEn0AnbLUjhyLd9QxB1UMRQ6xJzArNIuwuaxOdCeSQQuPlzMHNLsRBF
+	0ARoXpkXlMcEaigzPOojlEV39rr4fejLKv++MLO4p6DeQiRf//lhhpce8QTgAOuk
+	T22+MReaOk05VnJH0V4UAXGZn0+ZjT81MrtAFRbalgoHh1HzmWx63y7nQyhtFOOH
+	JggTo46b7QTmDXdL5LlqJUHBDucieTbHOxWart1K/RhFVuHOWYFjs5a1ZD0aInKs
+	ixDn2gFPH8nGQGFXr2j2ldWpDsXCA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42e4xfh1nc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 09:25:12 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49M9PBPB029632;
+	Tue, 22 Oct 2024 09:25:11 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42e4xfh1n8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 09:25:11 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49M9I6nj009296;
+	Tue, 22 Oct 2024 09:25:11 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42cr3mthb6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 09:25:11 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49M9P77Y22216980
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 22 Oct 2024 09:25:07 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 073F12004D;
+	Tue, 22 Oct 2024 09:25:07 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E7E0820043;
+	Tue, 22 Oct 2024 09:25:06 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 22 Oct 2024 09:25:06 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55390)
+	id 7E152E04BB; Tue, 22 Oct 2024 11:25:06 +0200 (CEST)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Ricardo B. Marliere" <ricardo@marliere.net>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH net-next v3 0/2] PtP driver for s390 clocks
+Date: Tue, 22 Oct 2024 11:24:56 +0200
+Message-ID: <20241022092458.2793331-1-svens@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/7] net: pcs: xpcs: yet more cleanups
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jose Abreu <Jose.Abreu@synopsys.com>, netdev@vger.kernel.org
-References: <ZxD6cVFajwBlC9eN@shell.armlinux.org.uk>
- <ZxdpicVgg8F3beow@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <ZxdpicVgg8F3beow@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LxYvC16q5DK5fCGxYCjH2SdjX4SZEfCM
+X-Proofpoint-ORIG-GUID: 3dxSI1RSc6N0lZPaORDFdzN7dDz0JQge
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ clxscore=1015 bulkscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ adultscore=0 mlxlogscore=994 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2410220057
 
-On 10/22/24 10:59, Russell King (Oracle) wrote:
-> I see patchwork has failed again. It claims this series does not have a
-> cover letter, but it does, and lore has it:
-> 
-> https://lore.kernel.org/all/ZxD6cVFajwBlC9eN@shell.armlinux.org.uk/
-> 
-> vs
-> 
-> https://patchwork.kernel.org/project/netdevbpf/patch/E1t1P3X-000EJx-ES@rmk-PC.armlinux.org.uk/
-> 
-> I guess the kernel.org infrastructure has failed in some way to deliver
-> the cover message to patchwork.
+Hi,
 
-Thanks for the head-up!
+these patches add support for using the s390 physical and TOD clock as ptp
+clock. To do so, the first patch adds a clock id to the s390 TOD clock,
+while the second patch adds the PtP driver itself.
 
-I can't investigate the issue any deeper than you, lacking permissions
-on the relevant hosts, but I verified that the merged script fetch the
-cover letter correctly, so no need to repost just for that.
+Changes in v3:
+- drop 'IBM' from clock names
+- use u128 as return type of eitod_to_ns()
+- fix calculation in eitod_to_timespec64()
 
-Cheers,
+Changes in v2:
+- add missing MODULE_DESCRIPTION()
+- drop udev event patch
+- simplify eitod_to_ns()
+- use store_tod_clock_ext() instead of store_tod_clock_ext_cc()
+- move stp_enabled() declaration to stp.h
+- use s390 instead of 'Z' in clock names
+- defconfig symbol should be default-n
 
-Paolo
+Sven Schnelle (2):
+  s390/time: Add clocksource id to TOD clock
+  s390/time: Add PtP driver
+
+ MAINTAINERS                     |   6 ++
+ arch/s390/include/asm/stp.h     |   1 +
+ arch/s390/include/asm/timex.h   |   6 ++
+ arch/s390/kernel/time.c         |   7 ++
+ drivers/ptp/Kconfig             |  11 +++
+ drivers/ptp/Makefile            |   1 +
+ drivers/ptp/ptp_s390.c          | 129 ++++++++++++++++++++++++++++++++
+ include/linux/clocksource_ids.h |   1 +
+ 8 files changed, 162 insertions(+)
+ create mode 100644 drivers/ptp/ptp_s390.c
+
+-- 
+2.43.0
 
 
