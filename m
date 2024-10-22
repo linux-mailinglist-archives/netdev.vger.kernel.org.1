@@ -1,130 +1,146 @@
-Return-Path: <netdev+bounces-137790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53EB9A9D67
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:49:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C97429A9D6C
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D37941C21BAD
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:49:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A37E2833E8
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312BF18859B;
-	Tue, 22 Oct 2024 08:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1076A15574A;
+	Tue, 22 Oct 2024 08:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KH+gtNEB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFIKab7B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f193.google.com (mail-lj1-f193.google.com [209.85.208.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9C227735;
-	Tue, 22 Oct 2024 08:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64571A269;
+	Tue, 22 Oct 2024 08:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729586988; cv=none; b=P/8STgMGl4wOgIDo+lalhVh1Nc5zv63UN+oModqqIhQHiHnTdoZyG2oWNAftJ65Spl4upWoV5yBIm3p1anSHB937/+8baW3UWn4O7cd71dTN+w2kp3MqmtA+upDDajiJXFBR9SvqPhshu11P/B0d7kekkx1bie6upmL+phz8SlE=
+	t=1729587058; cv=none; b=Xb2UL2859TQvzAVhaAZZxy3hqd3HMSLjMbB2WZxCvKPJ+PK+gzDv0F8r9bEqTzROSZaMz3O/xOThsEtaWYwR7ypNYSoCxP+LlZqP59dlZrCY1RERsu+z1hu94JtC9o/BlZlodn76VEgaZWBs8dOIouHcRNuouOTa7Fs0vbAy75I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729586988; c=relaxed/simple;
-	bh=VmBJLc5YwrovcjmjVJSAnkQ1H6CTGhFHDhc1H9J1qnU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WNse9aV1A0TexPZf/oz3iMiosbon8zuTPy1JWifAE1bGf6g8k/dwYrsHZccZtizKKwcgFAWkd1n2Li9ePgxR/6BdeeWPY9WZ/6xAP95a8tg6bYE2PtfMvcPfRLreMw/6/GG2BqO7fuO4yx9WGsy/g/SS9NsvHi1pRUcfIEJK1nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KH+gtNEB; arc=none smtp.client-ip=209.85.208.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f193.google.com with SMTP id 38308e7fff4ca-2fb6110c8faso54618921fa.1;
-        Tue, 22 Oct 2024 01:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729586985; x=1730191785; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+pOfCiSieyO3TQ+yRCELl0+ufCyFVvkQ7MbO+0NA5No=;
-        b=KH+gtNEB9F/H4FQCBqEL6IqGlNuUtGHYFthtwOh36G3fe8X+kXPB+HkS8V81vEu2tH
-         EN6IGmkMcQgC55LnaOkaKV4Fx7Cnc0MzuUtHX8UI6baDB8zAnXbTTZH0ZT0b6pITcHC7
-         6zGE3lkQLVifL33X5T1y/iA4UuxVSN1/n6XITI/0q3p4uxFXn6vC5VFlzwGLrQO72PVd
-         wkSK2Y3VIi/9Ief1sJA+pIuOYE6Cz20tXDic7PObmXwldKfOqf1HRqJtqfMf8g1scMkj
-         nfANKpIlLLrZDbGFOxbxzubnU20iShjowSCFvpbjkunjfO5n1ei9bRu0QGOWihx0VWXD
-         NE2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729586985; x=1730191785;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+pOfCiSieyO3TQ+yRCELl0+ufCyFVvkQ7MbO+0NA5No=;
-        b=L10HK4Grj61ZAC9N9UpNI1jTIS/nUlZZuYTrf7wRE52atsb7B49FEGnLqdKNkMtznb
-         +ygZBvZaAr+wm33PJyOf+1i94iKiWfIHqUnZ1lkjHlEQZWITGHpEXw3mYDlMpbXicBJM
-         PGvXu+Gd4cNHXjuoIsLeSo3ybW6TELXhkz5pjaA165egM6Vgt8QdBdiwSWEWvVLrTp8C
-         OzKUTOtOSgftg/6cXCqJMGtUp4Gi3R0Xx2M5iW7XTeuk/9CV+odNqSnU2HBm3SFFtMrb
-         LDCPb2nn4Kb4GuanNacUTHE41mNebDf47kugjTvl+ciFYiDOChnjIT1RLSG2wrmwwLLM
-         +/9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUPR6Xxd54en/oOGZt3EwpJWtoYvmYrqQkCyM/o2zhWKEOHFvp8HyycTsNU71UjOlzz9E2+npoR@vger.kernel.org, AJvYcCUsFyYtIwudtD6eIuWctLziRVMGfWXGQC2sK8dwPUyAaioiiUrn3C8ZR2Om519Vbfi3Y0r/CwMgdT63rfQC15CA@vger.kernel.org, AJvYcCWD7l+gvpC7KtokH1wsBx5xICGMk7Z6g+5Um5/DlJxvfXrf6BQ9DpZW8i6ERImDUs0BuJg=@vger.kernel.org, AJvYcCXEq8CfcL4Uw7N8RvJ0NdnqH8yjkbsbhLifUecHRnBSnTsX9dAwfiEFw+3PX3jP4sDY3OF/6yyLeKXyoEY2@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfIS+YJ3kVwBIi0RCQj229MBu0AJmtCAxyFdouF+TDmiE9pOqz
-	YGgnPyWwsdOk83fu6N0me/1i5pNb3n5KvWLD4xlJjUzcLNxDCnd7Nv9u5hh2khRKLxJ1TdyWpEX
-	SCldNJfw9wLFH2z9ncyfxpFXUeNE=
-X-Google-Smtp-Source: AGHT+IFKl3tfsMju7iYF30A7gBpjOZyrqMNthNqd+kPzl1ymRdMCkJ/IFXR1TES+Mv3Jjwg/Hwd37FmQx1Tu4AZ9ptg=
-X-Received: by 2002:a2e:be87:0:b0:2fb:55b2:b199 with SMTP id
- 38308e7fff4ca-2fb83281b86mr72476071fa.37.1729586982785; Tue, 22 Oct 2024
- 01:49:42 -0700 (PDT)
+	s=arc-20240116; t=1729587058; c=relaxed/simple;
+	bh=fm1oRh5NlgVhUYLPOZQY6fogvHoAk2YRBlpCZbweQm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q3j3ArJx0usQeBoe97X8Q0d4fJmpVL9/DveCv/g4XcvElQI9gA6Z+B7xpks/rvISXI4p6oaE/cwojpKKlJq4Cx3JzWAvNU3hZYQaxxHEhTcpIT5JLY6yzZ7QspXchh9i152TKG2fceCPlptODJnVMK0nNzo35RsVcp4tbpIR0YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFIKab7B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F517C4CEC3;
+	Tue, 22 Oct 2024 08:50:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729587057;
+	bh=fm1oRh5NlgVhUYLPOZQY6fogvHoAk2YRBlpCZbweQm0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EFIKab7BVyKXUC4F09Yh6Y9TCEYlpySqN9HecAkPf4+ACQ3ki3lfPdCtxKeJWk/+f
+	 MQw8fXHFcwQyaTux60ySQkDvwH8jqKxjbNVoWp2OLURd7WUJU9mqQBYcFK8Lb1gnJA
+	 94aHkOtZJu956dt3W//NeAHynXXCA5bPjKZjVE7bRAbp6AYEVBY5BUC4eAwf/fhM7I
+	 iLoGLdh1uV2+iUyHVLtzxydgqRO/PSwQ8pUvsLXzqZOTwdFk1SouMG6yl41Z2YJPs0
+	 HqUR61LVIJ6bVehl/xr4KNmvO9AjOVI9FlNkCM52szYnIn6A73vrc9gCBSEaIBBcaA
+	 rYKmLEkRvnwvw==
+Date: Tue, 22 Oct 2024 09:50:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	andrew@lunn.ch, Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	horatiu.vultur@microchip.com,
+	jensemil.schulzostergaard@microchip.com,
+	Parthiban.Veerasooran@microchip.com, Raju.Lakkaraju@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com,
+	ast@fiberby.net, maxime.chevallier@bootlin.com,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 14/15] net: sparx5: add compatible strings for
+ lan969x and verify the target
+Message-ID: <20241022085050.GQ402847@kernel.org>
+References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
+ <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241015140800.159466-1-dongml2@chinatelecom.cn>
- <20241015140800.159466-6-dongml2@chinatelecom.cn> <20d9ed5f-abde-43ee-854f-48a9f69e9c04@redhat.com>
-In-Reply-To: <20d9ed5f-abde-43ee-854f-48a9f69e9c04@redhat.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Tue, 22 Oct 2024 16:50:36 +0800
-Message-ID: <CADxym3atdr5Rm1CU8_AU1XaczraYN7ihTJWQiqxaStmD4iETog@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 05/10] net: ip: make ip_route_input_slow()
- return drop reasons
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	dsahern@kernel.org, pablo@netfilter.org, kadlec@netfilter.org, 
-	roopa@nvidia.com, razor@blackwall.org, gnault@redhat.com, 
-	bigeasy@linutronix.de, idosch@nvidia.com, ast@kernel.org, 
-	dongml2@chinatelecom.cn, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	bridge@lists.linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
 
-On Mon, Oct 21, 2024 at 6:52=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 10/15/24 16:07, Menglong Dong wrote:
-> > @@ -2316,19 +2327,25 @@ static int ip_route_input_slow(struct sk_buff *=
-skb, __be32 daddr, __be32 saddr,
-> >               err =3D -EHOSTUNREACH;
-> >               goto no_route;
-> >       }
-> > -     if (res->type !=3D RTN_UNICAST)
-> > +     if (res->type !=3D RTN_UNICAST) {
-> > +             reason =3D SKB_DROP_REASON_IP_INVALID_DEST;
-> >               goto martian_destination;
-> > +     }
-> >
-> >  make_route:
-> >       err =3D ip_mkroute_input(skb, res, in_dev, daddr, saddr, dscp, fl=
-keys);
-> > -out: return err;
-> > +     if (!err)
-> > +             reason =3D SKB_NOT_DROPPED_YET;
-> > +
-> > +out: return reason;
->
-> Since you are touching this line, please rewrite the code with a more
-> natural indentation:
->
-> out:
->         return reason;
->
+On Mon, Oct 21, 2024 at 03:58:51PM +0200, Daniel Machon wrote:
+> Add compatible strings for the twelve lan969x SKU's (Stock Keeping Unit)
+> that we support, and verify that the devicetree target is supported by
+> the chip target.
+> 
+> Each SKU supports different bandwidths and features (see [1] for
+> details). We want to be able to run a SKU with a lower bandwidth and/or
+> feature set, than what is supported by the actual chip. In order to
+> accomplish this we:
+> 
+>     - add new field sparx5->target_dt that reflects the target from the
+>       devicetree (compatible string).
+> 
+>     - compare the devicetree target with the actual chip target. If the
+>       bandwidth and features provided by the devicetree target is
+>       supported by the chip, we approve - otherwise reject.
+> 
+>     - set the core clock and features based on the devicetree target
+> 
+> [1] https://www.microchip.com/en-us/product/lan9698
+> 
+> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> ---
+>  drivers/net/ethernet/microchip/sparx5/Makefile     |   1 +
+>  .../net/ethernet/microchip/sparx5/sparx5_main.c    | 194 ++++++++++++++++++++-
+>  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   1 +
+>  3 files changed, 193 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/sparx5/Makefile b/drivers/net/ethernet/microchip/sparx5/Makefile
+> index 3435ca86dd70..8fe302415563 100644
+> --- a/drivers/net/ethernet/microchip/sparx5/Makefile
+> +++ b/drivers/net/ethernet/microchip/sparx5/Makefile
+> @@ -19,3 +19,4 @@ sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o
+>  # Provide include files
+>  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/vcap
+>  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
+> +ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/lan969x
+> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> index 5c986c373b3e..edbe639d98c5 100644
+> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> @@ -24,6 +24,8 @@
+>  #include <linux/types.h>
+>  #include <linux/reset.h>
+>  
+> +#include "lan969x.h" /* lan969x_desc */
+> +
 
-Okay!
+Hi Daniel,
 
-> Thanks,
->
-> Paolo
->
+Perhaps this will change when Krzysztof's comment elsewhere in this thread
+is addressed. But as it stands the construction in the above two hunks
+appears to cause a build failure.
+
+  CC      drivers/net/ethernet/microchip/sparx5/sparx5_main.o
+In file included from drivers/net/ethernet/microchip/sparx5/sparx5_main.c:27:
+./drivers/net/ethernet/microchip/lan969x/lan969x.h:10:10: fatal error: sparx5_main.h: No such file or directory
+   10 | #include "sparx5_main.h"
+      |          ^~~~~~~~~~~~~~~
+
+My preference would be to move away from adding -I directives and, rather,
+use relative includes as is common practice in Networking drivers (at least).
+
+...
+
+-- 
+pw-bot: changes-requested
 
