@@ -1,156 +1,131 @@
-Return-Path: <netdev+bounces-137792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5ADA9A9D79
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:53:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F1F9A9D7B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6048928318F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:53:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96D64B211C1
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83FB1188704;
-	Tue, 22 Oct 2024 08:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20508188CB5;
+	Tue, 22 Oct 2024 08:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KA7dZCr/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LltE9fh+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F9A1917C8
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 08:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C7518859B
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 08:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729587183; cv=none; b=BmZrOjBUdEt26emvnwz/IjAAgqKS4JtPCQJQg1GJWVOdL5gI+e+EgoQJmpgWY9ywuALg0/lWyKISKSfxrwlGXtJr2Glv3+yfPGSUWy3NKkTEdNEWoqsK9WGEthxJ1bS5b5moawdR0XvEiAd5i8R0JCnjwXmP2M9sYU5M8fFvHsk=
+	t=1729587220; cv=none; b=GwFQq5jPUl46rN6RfCXmzi1wJUUk+7BG9263jHgwPA6l4g+FfwGjkCXMa3kMCi7yw8dFXOQCBqw87ud0Fi5dXkDb4vas12oVA0z2v6HqZ/T+Whbzr7JDRLmuug2Ar83w4VyJ0XbvIWa2rAD9PNRnVnOqQx6aB5INx7PsqugGke4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729587183; c=relaxed/simple;
-	bh=854v+rtx3vuJ3B0OwYddESJ7z9HjkPSM3IByHYpBUW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=a6ClxW22US9XJoTsSKhGRLlVhr/8twXMCVJ5B2yr5rTVTq2t5fya5sWPnIOq9xMAQQ5esmoiaGKABJwGwqbscgYlFNx0P/JiqQiHbGEdyyoknZmqdboQBeFbYmWleAlRjZp2xgMdmzK+JYPIusDMNtfxROuNyLoQV0pBBBTWBkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KA7dZCr/; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37d461162b8so3586909f8f.1
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 01:53:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729587180; x=1730191980; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ehh67ak1ioateKr68RZqUNIbd4XGcxrlqGgTaUiYc1U=;
-        b=KA7dZCr/T8JpCpS/3/XBgqY8MuvTYP9mJ/KfYCrj2Uzhb1LefS2+lP8WLSbTzhGzaD
-         8RiFNiEREZAL9PRolRVMivCgMc0EDa4wUqqNlQqdGGBn6bcG394Ts5vZWmIrHe1fV4IB
-         YXXJhfoZG91r9jp7T6DUpJRGZ51tO2hHM91RUYuNLt6SG+4DQaMRxF7O6KX/gy2H+2dh
-         i1KrEpVXHHuCdFbutOIDAC+ZuUBBXhzRrdbF9E4ztJEbEwMSBBorGdBxqJUysiCvRMJy
-         08XYrI65TCw+EVCEcczyQwBPdDGHlqKMhdUKXjQ6P0Pf7fCq3jyHsz9hkJdVz4H8G4gi
-         wM8w==
+	s=arc-20240116; t=1729587220; c=relaxed/simple;
+	bh=cKtXFYPVfhBJOy6EHknIwPU0b2HCujr8GrXpYY+I2kY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q2bZRlgD49Ms6La/ZeYkpxHZlbxBUq15/fDy9FNvjUf5WJjq4sBXpdS5V2HxxfgbDX1G8a4BICgXc5Z2AcJklFGC+m0tZzfoDAenEhKTMOopZpUdXznnLcLIVW2VeCZNAqMXfFsH0A4/Lm2Ezj3CB4b43zWK3T0QVKVEImoFjgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LltE9fh+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729587217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GSwxcd394RFwa4Hfv38biRG3d2Xti1xiJnOygZU8iaI=;
+	b=LltE9fh+ovl6Quro2JT0u7ecl7yZFX8ZeY/V2aO7nQIogll3gwfkC8sLAbRDSnZHPxgN/x
+	VDKOv/JHM3NtZZokWT2ej0uK5eFf52WOuncTTyYDlOEMCjKltJnpuUBzW9D24v3t4H/6mu
+	Fa+Cbb9o8NidLhBzK+ABJV7peIXL43M=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-439-fvFiwK4AMMCfCMvninXiew-1; Tue, 22 Oct 2024 04:53:36 -0400
+X-MC-Unique: fvFiwK4AMMCfCMvninXiew-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d67f4bf98so3211297f8f.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 01:53:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729587180; x=1730191980;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1729587215; x=1730192015;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ehh67ak1ioateKr68RZqUNIbd4XGcxrlqGgTaUiYc1U=;
-        b=t6qB/DMXb0vMQVg+ZupIpqANQS4Y9/E/dQXLFP88cpBSXIx1XaTG7zxhXxXtS2H99f
-         B6J3/cdW3bZT8yikPUo/wlvf3fbnSdr1wPlrGKKXeZ2OklMbwXbieOwJyjr08Gu2T092
-         dECY38XbvNPZ3g+rFYaFfxiTXayj7gZV9JXkmUqv9ZfPrJ1vt7oQsvGeagaImLSNmK3y
-         UGYt/VeAOFKfdgSecuym2Yw27g5GFiJj481/oaa5RCNf5CrbHBPV6cIEJJe9cKxVmcOe
-         2PoVvrSvAZypzjBpbD8+XuixgW3hjD9wUeb383sdAQZVsWteep5nfE39W+WQfO/Uu/Hx
-         Zfmg==
-X-Gm-Message-State: AOJu0YzOFZw/rFjspns4figw58WHrejNdF4ExT50PFXwlGYIOliMy4c/
-	GFgRHqirFclWn4N7Uod/sSe2VIp3ItFMvHsbS+DqxOLO5MoAmvf2Da89CeM7xis=
-X-Google-Smtp-Source: AGHT+IEeYb2A3jr8YqrdcjMC3mNyRHfBT44BG5gmG0lVPBwfaz1SoYJI3Boer2F4765XuLo98da9Kw==
-X-Received: by 2002:adf:f7cb:0:b0:37d:4a7b:eeb2 with SMTP id ffacd0b85a97d-37ea21cce0emr8687474f8f.35.1729587179847;
-        Tue, 22 Oct 2024 01:52:59 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b93f92sm6083113f8f.76.2024.10.22.01.52.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 01:52:59 -0700 (PDT)
-Date: Tue, 22 Oct 2024 11:52:55 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Russell King <rmk+kernel@armlinux.org.uk>
-Cc: netdev@vger.kernel.org
-Subject: [bug report] net: phylink: add mac_select_pcs() method to
- phylink_mac_ops
-Message-ID: <ef3eed0e-a4d8-41a5-888a-5333b340c37e@stanley.mountain>
+        bh=GSwxcd394RFwa4Hfv38biRG3d2Xti1xiJnOygZU8iaI=;
+        b=QkE1QGKG6Fz4QkCvwc/w/LTI7nsO9WkuQr22CUf6OjpRj+l/HrBc9eKuegqnASH6LB
+         VrgxtoaJBEqEdOdIZSImgqTjKHM9nbUqpeN4i6pXWYbLbHYUQTm6QcJPya+KYT08k/K6
+         3MLPpKwopO3Ek4EipyAk/5KYT5BFkvX3XKoxKtw8NQ8/2AccWINMkdcXczkPgDEVtLdg
+         xq3BYS4aWJPo45yNMa/C5gce+8STIVaxFRjC7i7QhdzdQty+HLika+6JGOemnzrxeEOe
+         21/C7+r0i/By6S/BD30t7qre/8LALWpPZfhxU9/5yPN9v4mLd9ufnFEoKc0bB1+/i9l0
+         3Ocg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2bTOzVztyMLU/3uytl1EgukOB8MtAC0/tNquNxzuEUVFqA6SwjgCxUVquYeK58k7ig7+ry58=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd0wXa7l6ia5JJz5Lkk/lRrVADcDgHi4OSJmeLIZUPxL33fTNK
+	ItlCm3EDH4cBHT07Q7USVCXEZt07X3SEXmXxbg+5zcRSKSk8Cs8MFg2xtfSQS71mYuG6Vi1al26
+	es06GY8paW+P1+by9UBkRX9+YM7hyunDmB+Xue72Jh/PrvQhqRNc5uQ==
+X-Received: by 2002:a5d:45cd:0:b0:37d:39c1:4d3 with SMTP id ffacd0b85a97d-37ea21de065mr10182749f8f.6.1729587214818;
+        Tue, 22 Oct 2024 01:53:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpFYWJ+H8xIygZdpC++Yhhy91R5G3vLOyR0VBobgOhf0o3ovJvhIc/FdR1JA1y/U5eZ6oSjw==
+X-Received: by 2002:a5d:45cd:0:b0:37d:39c1:4d3 with SMTP id ffacd0b85a97d-37ea21de065mr10182724f8f.6.1729587214488;
+        Tue, 22 Oct 2024 01:53:34 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a37b5asm6116473f8f.10.2024.10.22.01.53.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2024 01:53:34 -0700 (PDT)
+Message-ID: <ec78e7dd-a0c4-45e3-afe6-604308f7240e@redhat.com>
+Date: Tue, 22 Oct 2024 10:53:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 13/14] rtnetlink: Return int from
+ rtnl_af_register().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ David Ahern <dsahern@kernel.org>, Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>
+References: <20241016185357.83849-1-kuniyu@amazon.com>
+ <20241016185357.83849-14-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241016185357.83849-14-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Russell King (Oracle),
+On 10/16/24 20:53, Kuniyuki Iwashima wrote:
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index 445e6ffed75e..70b663aca209 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -686,11 +686,13 @@ static const struct rtnl_af_ops *rtnl_af_lookup(const int family)
+>   *
+>   * Returns 0 on success or a negative error code.
+>   */
+> -void rtnl_af_register(struct rtnl_af_ops *ops)
+> +int rtnl_af_register(struct rtnl_af_ops *ops)
+>  {
+>  	rtnl_lock();
+>  	list_add_tail_rcu(&ops->list, &rtnl_af_ops);
+>  	rtnl_unlock();
+> +
+> +	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(rtnl_af_register);
 
-Commit d1e86325af37 ("net: phylink: add mac_select_pcs() method to
-phylink_mac_ops") from Dec 15, 2021 (linux-next), leads to the
-following Smatch static checker warning:
+kdoc complains about the missing description for the return value. You
+need to replace 'Returns' with '@return'.
 
-	drivers/net/phy/phylink.c:1208 phylink_major_config()
-	error: potential NULL/IS_ERR bug 'pcs'
+Not blocking, but please follow-up.
 
-drivers/net/phy/phylink.c
-    1160 static void phylink_major_config(struct phylink *pl, bool restart,
-    1161                                   const struct phylink_link_state *state)
-    1162 {
-    1163         struct phylink_pcs *pcs = NULL;
-    1164         bool pcs_changed = false;
-    1165         unsigned int rate_kbd;
-    1166         unsigned int neg_mode;
-    1167         int err;
-    1168 
-    1169         phylink_dbg(pl, "major config %s\n", phy_modes(state->interface));
-    1170 
-    1171         pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
-    1172                                                 state->interface,
-    1173                                                 state->advertising);
-    1174 
-    1175         if (pl->mac_ops->mac_select_pcs) {
-    1176                 pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-There are two places where this function pointer is called and they both check
-for error pointers.  However these functions never return error pointers, they
-return NULL.
+Thanks!
 
-    1177                 if (IS_ERR(pcs)) {
-    1178                         phylink_err(pl,
-    1179                                     "mac_select_pcs unexpectedly failed: %pe\n",
-    1180                                     pcs);
-    1181                         return;
-    1182                 }
-    1183 
-    1184                 pcs_changed = pl->pcs != pcs;
-    1185         }
-    1186 
-    1187         phylink_pcs_poll_stop(pl);
-    1188 
-    1189         if (pl->mac_ops->mac_prepare) {
-    1190                 err = pl->mac_ops->mac_prepare(pl->config, pl->cur_link_an_mode,
-    1191                                                state->interface);
-    1192                 if (err < 0) {
-    1193                         phylink_err(pl, "mac_prepare failed: %pe\n",
-    1194                                     ERR_PTR(err));
-    1195                         return;
-    1196                 }
-    1197         }
-    1198 
-    1199         /* If we have a new PCS, switch to the new PCS after preparing the MAC
-    1200          * for the change.
-    1201          */
-    1202         if (pcs_changed) {
-    1203                 phylink_pcs_disable(pl->pcs);
-    1204 
-    1205                 if (pl->pcs)
-    1206                         pl->pcs->phylink = NULL;
-    1207 
---> 1208                 pcs->phylink = pl;
-                         ^^^^^^^^^^^^
-Potential NULL dereference?
+Paolo
 
-    1209 
-    1210                 pl->pcs = pcs;
-    1211         }
-
-regards,
-dan carpenter
 
