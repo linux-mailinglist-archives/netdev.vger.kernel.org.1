@@ -1,71 +1,73 @@
-Return-Path: <netdev+bounces-138019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54B159AB826
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:03:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0498D9AB83E
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1510B2845B4
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:03:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D033284857
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA701C9EB3;
-	Tue, 22 Oct 2024 21:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207EC1CB306;
+	Tue, 22 Oct 2024 21:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="p3E+C+9l"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="b39Dyxyt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E2B13AD2A
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 21:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A959E18DF6B
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 21:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729631017; cv=none; b=Di05aw337Vcb/RtaTZZdOW5pxjU61QTTnFki4T3+r/zevh7ueqmFYV16HJYO+0Smr/fjyMZrcOkUJu2s2NLlVGBXxqcfQ8u1qBwiN18IkJ4Vd84jJvP2C6tVpv8W6qyDSGIyqi/njlrr6sAnjsksI00tlEKEbk6AkGc+IOAQiCo=
+	t=1729631521; cv=none; b=OZVUa8zT4YM6I6IoOkJS7Ldo7oHR+Ar32Vjha+bMvl4tR94bdB2h2GxxS26gvPAPkxy6hwmFzCK56li1HJnrP8rpgEghrP5uG61FnHrkI09VP3Wr6HlkPaRKR8uEXwLexk8wXXD2KE+8d98V0RAOhEwpR+BAWPJ0FPLjUan8P+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729631017; c=relaxed/simple;
-	bh=uA5yjTR63PNSWMpsHnRtZDY7s4TjvvFGrrkVDhjkbJ8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BPeyXzykMu/n65CAlgqwSFtoKlupneRar0XUzFpyKi33VTeA7fy743y1WIxAjg0+7ou/agKncfr/8qe+NQs+mBCP94fN4718tOWXnBxpOtEY/ZVIVLy+IcQOBh5uEZDXJw16TilFauGQeZd8UEHzDYurKJmhlzD6JyuqXzLM8Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=p3E+C+9l; arc=none smtp.client-ip=207.171.184.29
+	s=arc-20240116; t=1729631521; c=relaxed/simple;
+	bh=iUakCUqWNgCwHIgGJjcw+q8KDQDWA6ZvqyI1yJPkpqU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C8KFG1IiX646hePGHAwqr6grOydTOcaoxuruHCJnSJG+ZelM6WiWHFVQAKTu5e8ObrLYAhmJF+nq7sramf6in1KOs6j4YcqO6lZ04AZy8pLph1y/3YSry1KCeKZ182HYteDq+bIi4BFGDQrbvKNg2RgHMr+I8dDLoXiFulWS4PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=b39Dyxyt; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729631016; x=1761167016;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OUjYVkjamefnSf+/Cpkocl5tRdkoJ0UWeCiOeBifDk8=;
-  b=p3E+C+9ly4dmjIFh33CE8a1A/OEc8nyuiNiZqeS5jzTLIquI/8GS29Si
-   kVdAXg7zyrHBVO7Medrv3f9330jl3qpLsp/0c7zPwhjpK3Mq9ATLSKD74
-   7IXTz+HzVdwGmtj5H54GiXDDsfDP0aytSPO4nEOesLaqeSpJ1reLYcIL3
-   g=;
+  t=1729631519; x=1761167519;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=UUKl8jB1lfHVkSNyYZtp3bgEH8g9o7d9aI0q0eI9yxE=;
+  b=b39DyxytKj2oGE5tKRXrMBr33Ftkcbx/QSdPpIf/InI9y+hSwjpUF0ZE
+   PA23Pkt5dCxNc0xjWD6CaSmZxQDBc35cbet9BmgoC+yraeyL/3R37N9uX
+   0raqOKQ2JT6aF02faHy0XH8ZMbdu0AIT73XRI0Mz0LhMicjIkvw+H2Pe/
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
-   d="scan'208";a="463687017"
+   d="scan'208";a="463689431"
 Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 21:03:29 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:32340]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.247:2525] with esmtp (Farcaster)
- id f3f9fcf4-e1ad-48c8-9d60-cdbed0f04f30; Tue, 22 Oct 2024 21:03:29 +0000 (UTC)
-X-Farcaster-Flow-ID: f3f9fcf4-e1ad-48c8-9d60-cdbed0f04f30
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 21:11:59 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:32596]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.58:2525] with esmtp (Farcaster)
+ id 7f6b1091-a19b-4805-af7a-b228a6efc287; Tue, 22 Oct 2024 21:11:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 7f6b1091-a19b-4805-af7a-b228a6efc287
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 21:03:29 +0000
+ Tue, 22 Oct 2024 21:11:58 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.219.31) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 22 Oct 2024 21:03:27 +0000
+ Tue, 22 Oct 2024 21:11:56 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next] rtnetlink: Fix kdoc of rtnl_af_register().
-Date: Tue, 22 Oct 2024 14:03:20 -0700
-Message-ID: <20241022210320.86111-1-kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <gnaaman@drivenets.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>, "Kuniyuki
+ Iwashima" <kuniyu@amazon.com>
+Subject: Re: [PATCH net-next] neighbour: use kvzalloc()/kvfree()
+Date: Tue, 22 Oct 2024 14:11:52 -0700
+Message-ID: <20241022211152.88270-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241022150059.1345406-1-edumazet@google.com>
+References: <20241022150059.1345406-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,32 +76,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB003.ant.amazon.com (10.13.138.93) To
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The cited commit made rtnl_af_register() return int again,
-and kdoc needs to be fixed up.
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Oct 2024 15:00:59 +0000
+> mm layer is providing convenient functions, we do not have
+> to work around old limitations.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Gilad Naaman <gnaaman@drivenets.com>
 
-Fixes: 26eebdc4b005 ("rtnetlink: Return int from rtnl_af_register().")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/core/rtnetlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index dda8230fdfd4..b70f90b98714 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -708,7 +708,7 @@ static void rtnl_af_put(struct rtnl_af_ops *ops, int srcu_index)
-  * rtnl_af_register - Register rtnl_af_ops with rtnetlink.
-  * @ops: struct rtnl_af_ops * to register
-  *
-- * Returns 0 on success or a negative error code.
-+ * Return: 0 on success or a negative error code.
-  */
- int rtnl_af_register(struct rtnl_af_ops *ops)
- {
--- 
-2.39.5 (Apple Git-154)
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
