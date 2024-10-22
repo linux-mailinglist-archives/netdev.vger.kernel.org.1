@@ -1,132 +1,111 @@
-Return-Path: <netdev+bounces-137718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83219A97DA
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 06:28:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15C5D9A9822
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9478D28499F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 04:28:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C197B1F235F4
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 05:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A2F84A40;
-	Tue, 22 Oct 2024 04:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEEC80C13;
+	Tue, 22 Oct 2024 05:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="epkaEALl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7Gbq3NS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C776D38B;
-	Tue, 22 Oct 2024 04:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B98312C522;
+	Tue, 22 Oct 2024 05:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729571292; cv=none; b=F4x5NnzSuryBkZTiJphmSWreMHcInbAQ0VzCYZBsOAkg8PQv59qJJ9MzIi+pCXo11icVXos2jFwFzHervDgIh2L14yJNW3xi989nL4sCv2f1Ze7F2wSzECNs68h0WdImNQxjijJv7koSux7oTxuIlgnBuL+R2ZdnKRV1y3rxcx8=
+	t=1729573921; cv=none; b=IYZxv7awz1a0Zw8BxM6O5Jn35/C7/mJBB9oF6WZAyvQdp0fHkvoi+wXbdcPTiyYzybqaO/nJE90/mwYmoVe+K4g+vaKJLePAB8aVC/+qscw0pKOVOi2Zw53rUkn/CZRq8Y8QZVsL1pYap62jNYyADpWj8cDbzMnCyNINGxvjDvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729571292; c=relaxed/simple;
-	bh=/6p8OCVcO+gIXZx1F2+JRJBOXU+Z42uZ2miXaSD7HWk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QEf243ThtMAGsrizUWZ1mU7QFAAamcvs2vjX8h5PczOdMTdfatzPnNBazvMp9BNHkhCwfiPeSoKfntYvrpdyPpv4e+WszuGEeUZautqjhCIVnhCA67Ycg49pyycHvM5IbKUwNpdCjJZNhPHKQ8Q2XX773DZAmSpIveYCsUivFZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=epkaEALl; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49LGh4u8014396;
-	Tue, 22 Oct 2024 04:27:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	sZQJydqzyBYO4LTOnUq2YaDuPWUvzok2FaxTJUJZILI=; b=epkaEALl72JjuqP2
-	O5mG6/vdK7Gd+XqyP/qIymUQ/x7ckHKtBuQcvAzHODcNa1ymsx8dgPdGIeVPH7KV
-	NgYbLfBt6/+zpmhs2Id5akfAzI/qoHSSaEyAH0z1nBnziMIcMZeA7/i+lPWidO5Y
-	WsxS5BHQPUIXfQSDwvh/07vIipUdyNaTtmKBQbzH8g1Ra2IHXt6P2iUoAD+48lG4
-	3tjn2rCeIuuq0GVhZ0G4Bu8ydlGeXBxVtBdcBU37tjKnolvPkGKwUpLsTTVlBNgY
-	3rQHF7tEQPft8wX10xR90p8S2ZJIYQXtT1dYuUCGibszQvOCcTTa7m+k1rBtMOYP
-	tl+azw==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42dkhd31u0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Oct 2024 04:27:58 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49M4RubU009917
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 22 Oct 2024 04:27:56 GMT
-Received: from [10.110.108.212] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 21 Oct
- 2024 21:27:56 -0700
-Message-ID: <82f296f8-9538-4c89-952f-ff8768c5a0b7@quicinc.com>
-Date: Mon, 21 Oct 2024 21:27:55 -0700
+	s=arc-20240116; t=1729573921; c=relaxed/simple;
+	bh=6nL3F0+rXvu/ufwo6ILRxMgK5uGgnngX3VW9rqLR2cI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jJIpTq/icyRW0cA/hioFV932fuymwI68jfcLgOZe8Vazjkn8Uajb463/hb/u3G1q5aVDPoPFZaD94n2tLUPlmogNqx1apC8oQk6bY/9hL7y8RNnHpRjS0n5RTuIZxtCZ9/CMoiMRPQCrO6LGdWaLD7UCoVRiVIw7Oi0WTbP9B8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U7Gbq3NS; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20c693b68f5so55562675ad.1;
+        Mon, 21 Oct 2024 22:11:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729573919; x=1730178719; darn=vger.kernel.org;
+        h=content-disposition:content-description:mime-version:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKMBsCanZz1Gh8n+AXUDeahzWcX6egHuFJT38KRlsqs=;
+        b=U7Gbq3NSUCTWk9aoGgC3vkORAN4WO/65FMpR9u7w/ny/Jze3lZvd0RswgDvD5Nj/9T
+         VlMoxZ/rumAG/7W6tX943EIx4P5IRZz0xpTLOB60zJdGiK4uyYt5XMzWJh6W1l4SrLg/
+         K3bQ9iT3gTwgAPvfIZZrtDXVExwMSOsuFuJPlYw1pWChup5cb1MtYMbf4cuMCCHWMqks
+         tCxG2PDPEYIR0nLKVkPbA8DL/zZdtkbo9gkRIOFg8I0q027IUV0L3QfA4eCi/HNEGll+
+         ETaefy5aWpyfteZyW3KDhy1IMnGiAyPrEft1xW3EMdsudNzTwHrnrDH64b+h17NMfiPn
+         2GmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729573919; x=1730178719;
+        h=content-disposition:content-description:mime-version:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cKMBsCanZz1Gh8n+AXUDeahzWcX6egHuFJT38KRlsqs=;
+        b=qNxYZS+XK8SMhtdPBCcBSR2leXHpsqQ69DtRFqBolO7xayrJ/89uETRqXl7YW2zS9/
+         mX9vMS7tHgkQ3GRgTDaVENJWBDnq90F2MR4YtOQY+SSM5cBBY1en72wNYQ/1GVcAnOrQ
+         mv2Gi3YvSQFO7SFgPTAX2PGoO2FpikQjARC6ERG6GdIp62VA9Nu/JB01C050nbNeKcQo
+         kzl94DM9nk2FMGYZl080gGXshHmedsZB5vRIBJ9qfVMLLomrMdvJTKBildjo6dJf+myQ
+         Q5aFPg2lw7MbB8lcdsb05xbvnbICqI/s4/6xuHzDOtcQsnlSe6u6QZUOHAAYpyXPC0tC
+         86Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4ew3arVYQfKXMbV/iZIiF+B9+fjjAfCP42L7qUYm5IQJE1OLTNgNKS0mxSmrOvzz0XckeA/zyQUuDVYTR@vger.kernel.org, AJvYcCUCTi0NA9rBSx+CC5RuM7pHNX3i8kO4ZMrGlwQG/Lc6RR6XtTf60lD0w9hDr1WgZu55QT/QUA4pp/ce9sqhS1I=@vger.kernel.org, AJvYcCVLLcfNmB0dCy1GjrAJguImSCbo7QD1mIcDvR5JrzDvpsB7eysfgNJ2cNtoA/RHPgCBt9nxPXPo@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM83+bzzumhZtWzd6gNdz+J9Bx8sKWx46R4um4hNC8/yGnN4Yz
+	GcqVrdXDUUtLp4lFebW1Q/JoSKftByjkUzoBPccAxT13DtWAmsft
+X-Google-Smtp-Source: AGHT+IFa0NskIKUN1a+IaBC/kiN3u+O4oI32iW4jSozQeLQ+HEEZ9YiELB5Tn/cEBttmtLXKufCSSw==
+X-Received: by 2002:a17:903:2306:b0:205:3e6d:9949 with SMTP id d9443c01a7336-20e98596fc9mr18662135ad.52.1729573919236;
+        Mon, 21 Oct 2024 22:11:59 -0700 (PDT)
+Received: from Fantasy-Ubuntu ([2001:56a:7eb6:f700:f589:b8ad:400:2216])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0f3665sm34705005ad.271.2024.10.21.22.11.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 22:11:58 -0700 (PDT)
+Date: Mon, 21 Oct 2024 23:11:56 -0600
+From: Johnny Park <pjohnny0508@gmail.com>
+To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] [net-next] igb: Fix spelling "intialize"->"initialize"
+Message-ID: <Zxc0HP27kcMwGyaa@Fantasy-Ubuntu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 01/10] net: qrtr: ns: validate msglen before
- ctrl_pkt use
-To: Denis Kenzior <denkenz@gmail.com>, <netdev@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20241018181842.1368394-1-denkenz@gmail.com>
- <20241018181842.1368394-2-denkenz@gmail.com>
-Content-Language: en-US
-From: Chris Lew <quic_clew@quicinc.com>
-In-Reply-To: <20241018181842.1368394-2-denkenz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: IwWmkNDphKe3_1OaA83gaVu0u4W_uQXI
-X-Proofpoint-GUID: IwWmkNDphKe3_1OaA83gaVu0u4W_uQXI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- phishscore=0 spamscore=0 clxscore=1011 priorityscore=1501 impostorscore=0
- mlxscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=721
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410220028
+Content-Type: text/plain; charset=us-ascii
+Content-Description: Typo fix "intialize" -> "initialize"
+Content-Disposition: inline
 
+Simple patch that fixes the spelling mistake "intialize" in igb_main.c
 
+Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 10/18/2024 11:18 AM, Denis Kenzior wrote:
-> The qrtr_ctrl_pkt structure is currently accessed without checking
-> if the received payload is large enough to hold the structure's fields.
-> Add a check to ensure the payload length is sufficient.
-> 
-> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
-> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
-> Reviewed-by: Andy Gross <agross@kernel.org>
-> ---
->   net/qrtr/ns.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
-> index 3de9350cbf30..6158e08c0252 100644
-> --- a/net/qrtr/ns.c
-> +++ b/net/qrtr/ns.c
-> @@ -619,6 +619,9 @@ static void qrtr_ns_worker(struct work_struct *work)
->   			break;
->   		}
->   
-> +		if ((size_t)msglen < sizeof(pkt))
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 1ef4cb871452..ad091179872b 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -1204,7 +1204,7 @@ static int igb_alloc_q_vector(struct igb_adapter *adapter,
+ 	/* initialize pointer to rings */
+ 	ring = q_vector->ring;
+ 
+-	/* intialize ITR */
++	/* initialize ITR */
+ 	if (rxr_count) {
+ 		/* rx or rx/tx vector */
+ 		if (!adapter->rx_itr_setting || adapter->rx_itr_setting > 3)
+-- 
+2.43.0
 
-sizeof(*pkt)?
-
-> +			break;
-> +
->   		pkt = recv_buf;
->   		cmd = le32_to_cpu(pkt->cmd);
->   		if (cmd < ARRAY_SIZE(qrtr_ctrl_pkt_strings) &&
 
