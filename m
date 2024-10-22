@@ -1,113 +1,214 @@
-Return-Path: <netdev+bounces-137904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF7D9AB105
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:39:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DE09AB10B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:40:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A1A51F242A9
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0BBD1C21541
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF481A0B0C;
-	Tue, 22 Oct 2024 14:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A410A1A01AB;
+	Tue, 22 Oct 2024 14:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XuFOwYaF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4OF9J0eK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B45119DF66
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D27B199248
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729607958; cv=none; b=Vcm9w9z5bmRAkyBqvYu2t226uirX4jyVfff9XbL6Lu23e5bhloAEvXcFM4UOVk8x6b3s5lTDrpn76B+U/F+OZAbe0rI4Zaewa7/8lgXFfizIppGOXLbNFxsh52OldoSpX5ko3knlyh+UBIO7h84gyk0TMcl17EG+CDwJPx2BTZ8=
+	t=1729608054; cv=none; b=tlO2nlmv+R0SOgdo2aCoPybhOZypkMDQnQhh4EQma4ZOTA4azbN9o/D+KlZhMk9o9mGvzncX+77t+fpP+r1ozzJ8/g/CvaHjk1x3i7JStARXKFzw/W254AOdZVkOcB78iMrkvqMQNEbWGlLN/DwkfQye4AiUE+kp6vN6dIqbY8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729607958; c=relaxed/simple;
-	bh=WnzSU2OtzmtdRGHf36Rspsk8545Y20fvQKFYS0uYVY0=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZExTDMxcUZ0YD08X8GjlWEjw/Aoh1tdjtQaXCH4cgN+gt7vwIe04YAC7CGOADeZKuMFX9Xt7FrMYGzd0XNiZGTbHqg6fr/N+L3jdlYVnpBNBvbc7Oj49XQ8hokHAmY0MPgWInAH+fhuUP2hUHu5bmPqbRBN6QlB6+RkE9YjnPis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XuFOwYaF; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1729608054; c=relaxed/simple;
+	bh=tzv4J5uMUVcj2p/Vy4ziRnBKCWsp//HKLfztq97SFuc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X0RXrKC9/foUo8+4Grki48SKjzcdDRu5AfmUVURQL4741ZJ/3qGMP9PWMP3mqWBo78gf5vXm0S98IossBs4Zh2l9/+Fa2VGU1gjO86f/vCnK1tIde9bHL13wcCk3q62Y/hTGgjHybmhRoj5AqnqOLQguZ6BQlLgTWD6qxhDmPjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4OF9J0eK; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a3b63596e0so16797815ab.0
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 07:40:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729607957; x=1761143957;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=WnzSU2OtzmtdRGHf36Rspsk8545Y20fvQKFYS0uYVY0=;
-  b=XuFOwYaFf/xAfb9LyUxHXCsR3wJuHq+2oeETMATY2mIOwlerochbedm5
-   RBQkDe6rk5nQTE2HNRjtZUIGhzxjQgmop0aJhyZRSNjvofZijhKFYrCQw
-   zRsPzQ9EWawvmlZvQh3BW4cI21LK9UJ0ozcah1653EnY8h+OWMVKAZpHj
-   o=;
-X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
-   d="scan'208";a="140614062"
-Subject: RE: [PATCH v1 net-next 3/3] net: ena: Add PHC documentation
-Thread-Topic: [PATCH v1 net-next 3/3] net: ena: Add PHC documentation
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 14:39:15 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.10.100:53663]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.10.171:2525] with esmtp (Farcaster)
- id bd5a6ba9-a5a8-4fe4-9588-a64676bd565a; Tue, 22 Oct 2024 14:39:14 +0000 (UTC)
-X-Farcaster-Flow-ID: bd5a6ba9-a5a8-4fe4-9588-a64676bd565a
-Received: from EX19D022EUA004.ant.amazon.com (10.252.50.82) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:39:14 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D022EUA004.ant.amazon.com (10.252.50.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:39:14 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 22 Oct 2024 14:39:14 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: David Woodhouse <dwmw2@infradead.org>, David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>
-Thread-Index: AQHbI3j6/gWuVA+BA0SdZ8txTotu87KRZG8AgAFs5bCAAAQUAIAAAkZg
-Date: Tue, 22 Oct 2024 14:39:13 +0000
-Message-ID: <448a2aca058d4aeabb39a01e1b56d51e@amazon.com>
-References: <20241021052011.591-1-darinzon@amazon.com>
-	 <20241021052011.591-4-darinzon@amazon.com>
-	 <5f469c57a34c0a2a76b6f8c4517a0e4b7c038e8b.camel@infradead.org>
-	 <07a168fb44ac4c3a897678ac86893429@amazon.com>
- <cf2e768830c0950e2de375ed057c5b8eb104b62d.camel@infradead.org>
-In-Reply-To: <cf2e768830c0950e2de375ed057c5b8eb104b62d.camel@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        d=google.com; s=20230601; t=1729608052; x=1730212852; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mctwXks0vml/CVmKaQAWDXHguHAc6gYQrcNKV/VH6AI=;
+        b=4OF9J0eKLAzCZwRMNBMmSdXiNS27Iz5TlAW5k4UpTRJME7qa78eyxOmdWJYOzHjBmR
+         m2L3r4iHb3AlIt2mXovNDX/LM1ud7fWFTSbmSdm1gF+Fgvhvm4pa7sM7Yf8rBDPuJLF3
+         tFvR4jyupX2tSMeIRg1ptwe79l1huU+ICv1xdFW5IvZR9IFVYnS3C12oElXWQlTZwSEV
+         rNgPlHpNmRZMiGpz6J6RIn2hHF+JhWWuu8jJgUZI177qstNSFTBuINeZbYzqZZNxjss3
+         ED133z8gplv4sKuslFUJe8Re+LqkX1W8ovcuoRl7ZqVgkOGD7QxtXHrkBnwtveYbDsdf
+         KpJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729608052; x=1730212852;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mctwXks0vml/CVmKaQAWDXHguHAc6gYQrcNKV/VH6AI=;
+        b=P6ZZFDDnL0ZWk1LmbVGRkdNwC6jlpYJ+zn6KHYPcZlxp2k5y9Rii5H0C8VuP3wTKSA
+         SPsFd08m0qIarPR+NN8L4yX32he/bTV6po7skWPw1QOcHGgKsueaVw2rTWgprw+yn5S8
+         uf4ZIQ//2v/hCUI2ew3IRDc9IpklB89iDbOniVYmkSVgcS22lqsoAWPAS2GnEDYPAhDm
+         XFZHHvohiRERw+9NT+6p688234oEy/gld9/UkGCtkFcbt+jheJkNShfag2mDWa6NMCQz
+         wOL8PxXfywYhKLPC5gO2Ia8sYSM4GiO7BSfIxE/Q6dMYYvBZozkMstcgOHiJqN/xNE13
+         +qvg==
+X-Gm-Message-State: AOJu0YxDp0Fvs4+3ICoPqUJn953pQyOh3EX8r/zs/Wis30V7LFOM69BH
+	f8orSQQkIFQ+PLjqg+uKBC+/B6CbZIl70GBM4JkWu9mLjgLaBpZvXLbDWjZO1g8zEgiLbtt/KIU
+	mUp6JoufJNWXDl8YlZEMRadIZpZImRXwf1ira
+X-Google-Smtp-Source: AGHT+IHn1Rapcv0EOeFh39bTptIpoERNIB+OpZSimn9nvwlXEIy6/PeVTwzIhkIghkZoIcuXi1wJQWvVsK563s88cSk=
+X-Received: by 2002:a05:6e02:1e07:b0:3a0:ce5a:1817 with SMTP id
+ e9e14a558f8ab-3a4cbe359demr23860955ab.0.1729608048669; Tue, 22 Oct 2024
+ 07:40:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20241022134343.3354111-1-gnaaman@drivenets.com> <20241022134343.3354111-2-gnaaman@drivenets.com>
+In-Reply-To: <20241022134343.3354111-2-gnaaman@drivenets.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Oct 2024 16:40:34 +0200
+Message-ID: <CANn89iKGa9TWnGZJJZAL-B-onmJ7gRXQsWxy=7FvwJr+Y2DuCg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 1/6] neighbour: Add hlist_node to struct neighbour
+To: Gilad Naaman <gnaaman@drivenets.com>
+Cc: netdev <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiA+ID4gPiArwqAgdGVzdHB0cCAtZCAvZGV2L3B0cCQoZXRodG9vbCAtVCA8aW50ZXJmYWNlPiB8
-IGF3ayAnL1BUUA0KPiA+ID4gPiBIYXJkd2FyZQ0KPiA+ID4gQ2xvY2s6LyB7cHJpbnQgJE5GfScp
-IC1rIDENCj4gPiA+ID4gKw0KPiA+ID4NCj4gPiA+IERvZXMgdWRldiBjcmVhdGUgYSBzdGFibGUg
-c3ltbGluayBmb3IgdGhpcywgbGlrZSBpdCBkb2VzIGZvciBlLmcuDQo+ID4gPiAvZGV2L3B0cF9r
-dm0gPw0KPiA+ID4NCj4gPg0KPiA+IFllcywgeW91IGNhbiBhZGQgYSBzcGVjaWZpYyBydWxlIGZv
-ciB0aGUgZW5hIHB0cCBkZXZpY2UNCj4gPg0KPiA+IFNVQlNZU1RFTT09InB0cCIsIEFUVFJ7Y2xv
-Y2tfbmFtZX09PSJlbmEtcHRwLSoiLCBTWU1MSU5LICs9ICJlbmEtDQo+IHB0cCINCj4gDQo+IEkg
-ZG9uJ3Qgc2VlIGl0IGhlcmUgeWV0IHRob3VnaDoNCj4gDQo+IGh0dHBzOi8vZ2l0aHViLmNvbS9z
-eXN0ZW1kL3N5c3RlbWQvYmxvYi9tYWluL3J1bGVzLmQvNTAtdWRldi0NCj4gZGVmYXVsdC5ydWxl
-cy5pbiNMMzMNCg0KV2Ugd2lsbCBhZGQgYSBwdWxsIHJlcXVlc3QgdG8gc3lzdGVtZCB3aGljaCBh
-ZGRzIHRoZSBhYm92ZSBzdWdnZXN0ZWQgcnVsZS4NCg==
+On Tue, Oct 22, 2024 at 3:44=E2=80=AFPM Gilad Naaman <gnaaman@drivenets.com=
+> wrote:
+>
+> Add a doubly-linked node to neighbours, so that they
+> can be deleted without iterating the entire bucket they're in.
+>
+> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
+> ---
+>  include/net/neighbour.h |  2 ++
+>  net/core/neighbour.c    | 40 ++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 40 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+> index 3887ed9e5026..0402447854c7 100644
+> --- a/include/net/neighbour.h
+> +++ b/include/net/neighbour.h
+> @@ -136,6 +136,7 @@ struct neigh_statistics {
+>
+>  struct neighbour {
+>         struct neighbour __rcu  *next;
+> +       struct hlist_node       hash;
+>         struct neigh_table      *tbl;
+>         struct neigh_parms      *parms;
+>         unsigned long           confirmed;
+> @@ -191,6 +192,7 @@ struct pneigh_entry {
+>
+>  struct neigh_hash_table {
+>         struct neighbour __rcu  **hash_buckets;
+> +       struct hlist_head       *hash_heads;
+>         unsigned int            hash_shift;
+>         __u32                   hash_rnd[NEIGH_NUM_HASH_RND];
+>         struct rcu_head         rcu;
+> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> index 395ae1626eef..7df4cfc0ac9a 100644
+> --- a/net/core/neighbour.c
+> +++ b/net/core/neighbour.c
+> @@ -217,6 +217,7 @@ static bool neigh_del(struct neighbour *n, struct nei=
+ghbour __rcu **np,
+>                 neigh =3D rcu_dereference_protected(n->next,
+>                                                   lockdep_is_held(&tbl->l=
+ock));
+>                 rcu_assign_pointer(*np, neigh);
+> +               hlist_del_rcu(&n->hash);
+>                 neigh_mark_dead(n);
+>                 retval =3D true;
+>         }
+> @@ -403,6 +404,7 @@ static void neigh_flush_dev(struct neigh_table *tbl, =
+struct net_device *dev,
+>                         rcu_assign_pointer(*np,
+>                                    rcu_dereference_protected(n->next,
+>                                                 lockdep_is_held(&tbl->loc=
+k)));
+> +                       hlist_del_rcu(&n->hash);
+>                         write_lock(&n->lock);
+>                         neigh_del_timer(n);
+>                         neigh_mark_dead(n);
+> @@ -530,27 +532,47 @@ static void neigh_get_hash_rnd(u32 *x)
+>
+>  static struct neigh_hash_table *neigh_hash_alloc(unsigned int shift)
+>  {
+> +       size_t hash_heads_size =3D (1 << shift) * sizeof(struct hlist_hea=
+d);
+>         size_t size =3D (1 << shift) * sizeof(struct neighbour *);
+> -       struct neigh_hash_table *ret;
+>         struct neighbour __rcu **buckets;
+> +       struct hlist_head *hash_heads;
+> +       struct neigh_hash_table *ret;
+>         int i;
+>
+> +       hash_heads =3D NULL;
+> +
+>         ret =3D kmalloc(sizeof(*ret), GFP_ATOMIC);
+>         if (!ret)
+>                 return NULL;
+>         if (size <=3D PAGE_SIZE) {
+>                 buckets =3D kzalloc(size, GFP_ATOMIC);
+> +
+> +               if (buckets) {
+> +                       hash_heads =3D kzalloc(hash_heads_size, GFP_ATOMI=
+C);
+> +                       if (!hash_heads)
+> +                               kfree(buckets);
+> +               }
+
+Oh well, I strongly suggest we first switch to kvzalloc() and
+kvfree(), instead of copy/pasting old work arounds...
+
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 395ae1626eef2f22f5b81051671371ed67eb5943..a44511218a600ff55513a7255e9=
+0641cd7c2e983
+100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -538,14 +538,7 @@ static struct neigh_hash_table
+*neigh_hash_alloc(unsigned int shift)
+        ret =3D kmalloc(sizeof(*ret), GFP_ATOMIC);
+        if (!ret)
+                return NULL;
+-       if (size <=3D PAGE_SIZE) {
+-               buckets =3D kzalloc(size, GFP_ATOMIC);
+-       } else {
+-               buckets =3D (struct neighbour __rcu **)
+-                         __get_free_pages(GFP_ATOMIC | __GFP_ZERO,
+-                                          get_order(size));
+-               kmemleak_alloc(buckets, size, 1, GFP_ATOMIC);
+-       }
++       buckets =3D kvzalloc(size, GFP_ATOMIC);
+        if (!buckets) {
+                kfree(ret);
+                return NULL;
+@@ -562,15 +555,8 @@ static void neigh_hash_free_rcu(struct rcu_head *head)
+        struct neigh_hash_table *nht =3D container_of(head,
+                                                    struct neigh_hash_table=
+,
+                                                    rcu);
+-       size_t size =3D (1 << nht->hash_shift) * sizeof(struct neighbour *)=
+;
+-       struct neighbour __rcu **buckets =3D nht->hash_buckets;
+
+-       if (size <=3D PAGE_SIZE) {
+-               kfree(buckets);
+-       } else {
+-               kmemleak_free(buckets);
+-               free_pages((unsigned long)buckets, get_order(size));
+-       }
++       kvfree(nht->hash_buckets);
+        kfree(nht);
+ }
 
