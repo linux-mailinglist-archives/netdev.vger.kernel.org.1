@@ -1,403 +1,158 @@
-Return-Path: <netdev+bounces-137696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A2A9A959B
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:44:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9216A9A95AD
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:48:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CB8D1F20933
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:44:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A952846C0
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D85126BF2;
-	Tue, 22 Oct 2024 01:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F3613A256;
+	Tue, 22 Oct 2024 01:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ky+N3LX9"
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFB284D29;
-	Tue, 22 Oct 2024 01:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E739136330
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 01:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729561461; cv=none; b=c3ehO7sPzDvKFDk3BOLL50DYnu4upwWGrQznB6cypMbRZw1MBBBJ2KEUmzjY3jwvX2C1q2AKkDNrheyaRE/nEiH4h4UsO67rZZHsvK9ff7+ZeiVuEml59yZWCtYYrWXzljSBQECNcxAOF6X7IgJtHLo+QiDWT+hH9YYFHnQlg5g=
+	t=1729561692; cv=none; b=RTIGBqJkW+gncS7qNuuLMdM9QVsofQld2uZZzUp7k1nBfw1o8wH5lKYmMvNug2KrEpH+vowV3/hgYVGStaolfWzufwmbsnO9LDwYlmWyD3qDI1sjTH7W4wH/iTvVGthCv/Slog07ptoCkyCRZilKsHZGe/GvL9R74+PzXLK4rjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729561461; c=relaxed/simple;
-	bh=6Z+AxkKR9zlrGHBwt2JjK+ih49DyBUV8ksoi07TJ5Tc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r0OR8zkeqtOUqJF8PSn1+40qzBSSXnmfXVkWgDt585jl+2ASKmroQTdum1NRovBLs65z5VyXFKzkDsO9Lc5FW2M1l+zT1j5KTzfAHMQ4GZTx8iSSj6/Tq5YmHM9zql/zIijlL6eWdsy9cYEtuEmmgGxtLjH66O7kHT8pcC7GCQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
-Received: from [163.114.132.6] (helo=localhost)
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1t33wQ-0003yc-CK; Tue, 22 Oct 2024 01:44:10 +0000
-From: Lee Trager <lee@trager.us>
-To: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	kernel-team@meta.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Lee Trager <lee@trager.us>,
-	Sanman Pradhan <sanmanpradhan@meta.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] eth: fbnic: Add devlink dev flash support
-Date: Mon, 21 Oct 2024 18:42:24 -0700
-Message-ID: <20241022014319.3791797-1-lee@trager.us>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241012023646.3124717-1-lee@trager.us>
-References: <20241012023646.3124717-1-lee@trager.us>
+	s=arc-20240116; t=1729561692; c=relaxed/simple;
+	bh=J2ule95uDA2lxZeFteLQ1CcacbCf1RwSzS2Cn3CQpuM=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=Xah5CZ5FZkvXtLNXVOmVSGqDDIjiLJk1YyjMpsQATA8cJtswrTc4VT3ksS+zludzph8ENaQT5ZGBDUWDOP4XoXnNjf58AE4ymv1Zc5thgwlRFcwxIHKNMqH0zkBxZU/5QLJIG93t8/2yoMO1G4JjjeX7tjqw5oLjTagPyoNw7RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ky+N3LX9; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729561687;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4eiZ6r3xpWFSBdkJCU0cQjDHtryYalZj0OvrUsR7hSE=;
+	b=ky+N3LX9IeLVQ+qmbPb47voiVKu56MJtKGKIfPPdF5UU3pn3SxeUqT0q5R2MtdA4/g9X71
+	I3tZEH7GHsxSEWC3oCUo4stbNQkO83kbxzxyTaemLv2QrCLAE7VA8He0rF0O0gk3cD48cC
+	0Si8daj92f412lgLUCMQf5vb+R7/89g=
+Date: Tue, 22 Oct 2024 01:48:03 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Yajun Deng" <yajun.deng@linux.dev>
+Message-ID: <4275a6d14b8e209331251fa7a3a1f3094ee60915@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH v3 net-next] net: vlan: Use vlan_prio instead of vlan_qos
+ in mapping
+To: "Guillaume Nault" <gnault@redhat.com>, "Ido Schimmel" <idosch@idosch.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <ZxaA/6zaqgbrcHX/@debian>
+References: <20241018141233.2568-1-yajun.deng@linux.dev>
+ <ZxT3oVQ27erIoTVz@shredder.mtl.com> <ZxaA/6zaqgbrcHX/@debian>
+X-Migadu-Flow: FLOW_OUT
 
-fbnic supports updating firmware using a PLDM image signed and distributed
-by Meta. PLDM images are written into stored flashed. Flashing does not
-interrupt operation.
+October 22, 2024 at 12:27 AM, "Guillaume Nault" <gnault@redhat.com> wrote=
+:
 
-On host reboot the newly flashed UEFI driver will be used. To run new
-control or cmrt firmware the NIC must be power cycled.
 
-Signed-off-by: Lee Trager <lee@trager.us>
----
- .../device_drivers/ethernet/meta/fbnic.rst    |  11 +
- drivers/net/ethernet/meta/Kconfig             |   1 +
- .../net/ethernet/meta/fbnic/fbnic_devlink.c   | 269 +++++++++++++++++-
- 3 files changed, 280 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-index 32ff114f5c26..d6726c254818 100644
---- a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-+++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-@@ -27,3 +27,14 @@ driver takes over.
- devlink dev info provides version information for all three components. In
- addition to the version the hg commit hash of the build is included as a
- separate entry.
-+
-+Upgrading Firmware
-+------------------
-+
-+fbnic supports upgrading firmware using devlink dev flash. Firmware images
-+are signed and distributed by Meta. All firmware is bundled into a single
-+PLDM image which is written into stored flash. Flashing firmware does not
-+interrupt operation.
-+
-+On host reboot the newly flashed UEFI driver will be used. To run new control
-+or cmrt firmware the NIC must be power cycled.
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-index 831921b9d4d5..3ba527514f1e 100644
---- a/drivers/net/ethernet/meta/Kconfig
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -27,6 +27,7 @@ config FBNIC
- 	select NET_DEVLINK
- 	select PAGE_POOL
- 	select PHYLINK
-+	select PLDMFW
- 	help
- 	  This driver supports Meta Platforms Host Network Interface.
+>=20
+>=20On Sun, Oct 20, 2024 at 03:29:21PM +0300, Ido Schimmel wrote:
+>=20
+>=20>=20
+>=20> On Fri, Oct 18, 2024 at 10:12:33PM +0800, Yajun Deng wrote:
+> >=20
+>=20>  The vlan_qos member is used to save the vlan qos, but we only save=
+ the
+> >=20
+>=20>  priority. Also, we will get the priority in vlan netlink and proc.
+> >=20
+>=20>  We can just save the vlan priority using vlan_prio, so we can use =
+vlan_prio
+> >=20
+>=20>  to get the priority directly.
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  For flexibility, we introduced vlan_dev_get_egress_priority() help=
+er
+> >=20
+>=20>  function. After this patch, we will call vlan_dev_get_egress_prior=
+ity()
+> >=20
+>=20>  instead of vlan_dev_get_egress_qos_mask() in irdma.ko and rdma_cm.=
+ko.
+> >=20
+>=20>  Because we don't need the shift and mask operations anymore.
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  There is no functional changes.
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  Not sure I understand the motivation.
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  IIUC, currently, struct vlan_priority_tci_mapping::vlan_qos is shi=
+fted
+> >=20
+>=20>  and masked in the control path (vlan_dev_set_egress_priority) so t=
+hat
+> >=20
+>=20>  these calculations would not need to be performed in the data path=
+ where
+> >=20
+>=20>  the VLAN header is constructed (vlan_dev_hard_header /
+> >=20
+>=20>  vlan_dev_hard_start_xmit).
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  This patch seems to move these calculations to the data path so th=
+at
+> >=20
+>=20>  they would not need to be performed in the control path when dumpi=
+ng the
+> >=20
+>=20>  priority mapping via netlink / proc.
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  Why is it a good trade-off?
+> >=20
+>=20
+> I agree with Ido. The commit description doesn't explain why these
+>=20
+>=20changes are made and I also can't see how this patch can improve
+>=20
+>=20performances.
+>=20
+>=20If it's about code readability, why not just add a helper that gets a
+>=20
+>=20struct vlan_priority_tci_mapping pointer as input and returns a __u8
+>=20
+>=20corresponding to the priority? This way, the /proc and netlink handle=
+rs
+>=20
+>=20(and other potential users) wouldn't have to do the bit shifting and
+>=20
+>=20masking manually.
+>
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-index 0072d612215e..bd718b3e314b 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-@@ -3,6 +3,7 @@
-
- #include <linux/unaligned.h>
- #include <linux/pci.h>
-+#include <linux/pldmfw.h>
- #include <linux/types.h>
- #include <net/devlink.h>
-
-@@ -109,8 +110,274 @@ static int fbnic_devlink_info_get(struct devlink *devlink,
- 	return 0;
- }
-
-+/**
-+ * fbnic_send_package_data - Send record package data to firmware
-+ * @context: PLDM FW update structure
-+ * @data: pointer to the package data
-+ * @length: length of the package data
-+ *
-+ * Send a copy of the package data associated with the PLDM record matching
-+ * this device to the firmware.
-+ *
-+ * Return: zero on success
-+ *	    negative error code on failure
-+ */
-+static int fbnic_send_package_data(struct pldmfw *context, const u8 *data,
-+				   u16 length)
-+{
-+	struct device *dev = context->dev;
-+
-+	/* Temp placeholder required by devlink */
-+	dev_info(dev,
-+		 "Sending %u bytes of PLDM record package data to firmware\n",
-+		 length);
-+
-+	return 0;
-+}
-+
-+/**
-+ * fbnic_send_component_table - Send PLDM component table to the firmware
-+ * @context: PLDM FW update structure
-+ * @component: The component to send
-+ * @transfer_flag: Flag indication location in component tables
-+ *
-+ * Read relevant data from component table and forward it to the firmware.
-+ * Check response to verify if the firmware indicates that it wishes to
-+ * proceed with the update.
-+ *
-+ * Return: zero on success
-+ *	    negative error code on failure
-+ */
-+static int fbnic_send_component_table(struct pldmfw *context,
-+				      struct pldmfw_component *component,
-+				      u8 transfer_flag)
-+{
-+	struct device *dev = context->dev;
-+	u16 id = component->identifier;
-+	u8 test_string[80];
-+
-+	switch (id) {
-+	case QSPI_SECTION_CMRT:
-+	case QSPI_SECTION_CONTROL_FW:
-+	case QSPI_SECTION_OPTION_ROM:
-+		break;
-+	default:
-+		dev_err(dev, "Unknown component ID %u\n", id);
-+		return -EINVAL;
-+	}
-+
-+	dev_dbg(dev, "Sending PLDM component table to firmware\n");
-+
-+	/* Temp placeholder */
-+	strscpy(test_string, component->version_string,
-+		min_t(u8, component->version_len, 79));
-+	dev_info(dev, "PLDMFW: Component ID: %u version %s\n",
-+		 id, test_string);
-+
-+	return 0;
-+}
-+
-+/**
-+ * fbnic_flash_component - Flash a component of the QSPI
-+ * @context: PLDM FW update structure
-+ * @component: The component table to send to FW
-+ *
-+ * Map contents of component and make it available for FW to download
-+ * so that it can update the contents of the QSPI Flash.
-+ *
-+ * Return: zero on success
-+ *	    negative error code on failure
-+ */
-+static int fbnic_flash_component(struct pldmfw *context,
-+				 struct pldmfw_component *component)
-+{
-+	const u8 *data = component->component_data;
-+	u32 size = component->component_size;
-+	struct fbnic_fw_completion *fw_cmpl;
-+	struct device *dev = context->dev;
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	u16 id = component->identifier;
-+	const char *component_name;
-+	int retries = 2;
-+	int err;
-+
-+	struct devlink *devlink;
-+	struct fbnic_dev *fbd;
-+
-+	switch (id) {
-+	case QSPI_SECTION_CMRT:
-+		component_name = "boot1";
-+		break;
-+	case QSPI_SECTION_CONTROL_FW:
-+		component_name = "boot2";
-+		break;
-+	case QSPI_SECTION_OPTION_ROM:
-+		component_name = "option-rom";
-+		break;
-+	default:
-+		dev_err(dev, "Unknown component ID %u\n", id);
-+		return -EINVAL;
-+	}
-+
-+	fw_cmpl = kzalloc(sizeof(*fw_cmpl), GFP_KERNEL);
-+	if (!fw_cmpl)
-+		return -ENOMEM;
-+
-+	pdev = to_pci_dev(dev);
-+	fbd = pci_get_drvdata(pdev);
-+	devlink = priv_to_devlink(fbd);
-+
-+	/* Initialize completion and queue it for FW to process */
-+	fw_cmpl->msg_type = FBNIC_TLV_MSG_ID_FW_WRITE_CHUNK_REQ;
-+	init_completion(&fw_cmpl->done);
-+
-+	fw_cmpl->fw_update.last_offset = 0;
-+	fw_cmpl->fw_update.data = data;
-+	fw_cmpl->fw_update.size = size;
-+
-+	err = fbnic_fw_xmit_fw_start_upgrade(fbd, fw_cmpl, id, size);
-+	if (err)
-+		goto cmpl_free;
-+
-+	/* Monitor completions and report status of update */
-+	while (fw_cmpl->fw_update.data) {
-+		u32 offset = fw_cmpl->fw_update.last_offset;
-+
-+		devlink_flash_update_status_notify(devlink, "Flashing",
-+						   component_name, offset,
-+						   size);
-+
-+		/* Allow 5 seconds for reply, resend and try up to 2 times */
-+		if (wait_for_completion_timeout(&fw_cmpl->done, 5 * HZ)) {
-+			reinit_completion(&fw_cmpl->done);
-+			/* If we receive a reply, reinit our retry counter */
-+			retries = 2;
-+		} else if (--retries == 0) {
-+			dev_err(fbd->dev, "Timed out waiting on update\n");
-+			err = -ETIMEDOUT;
-+			goto cmpl_cleanup;
-+		}
-+	}
-+
-+	err = fw_cmpl->result;
-+	if (err)
-+		goto cmpl_cleanup;
-+
-+	devlink_flash_update_status_notify(devlink, "Flashing",
-+					   component_name, size, size);
-+
-+cmpl_cleanup:
-+	fbd->cmpl_data = NULL;
-+cmpl_free:
-+	kfree(fw_cmpl);
-+
-+	return err;
-+}
-+
-+/**
-+ * fbnic_finalize_update - Perform last steps to complete device update
-+ * @context: PLDM FW update structure
-+ *
-+ * Notify FW that update is complete and that it can take any actions
-+ * needed to finalize the FW update.
-+ *
-+ * Return: zero on success
-+ *	    negative error code on failure
-+ */
-+static int fbnic_finalize_update(struct pldmfw *context)
-+{
-+	struct device *dev = context->dev;
-+
-+	/* Temp placeholder required by devlink */
-+	dev_info(dev, "PLDMFW: Finalize update\n");
-+
-+	return 0;
-+}
-+
-+static const struct pldmfw_ops fbnic_pldmfw_ops = {
-+	.match_record = pldmfw_op_pci_match_record,
-+	.send_package_data = fbnic_send_package_data,
-+	.send_component_table = fbnic_send_component_table,
-+	.flash_component = fbnic_flash_component,
-+	.finalize_update = fbnic_finalize_update,
-+};
-+
-+static void fbnic_devlink_flash_update_report_err(struct fbnic_dev *fbd,
-+						  struct devlink *devlink,
-+						  const char *err_msg,
-+						  int err)
-+{
-+	char err_str[128];
-+
-+	snprintf(err_str, sizeof(err_str),
-+		 "Failed to flash PLDM Image: %s (error: %d)",
-+		 err_msg, err);
-+	devlink_flash_update_status_notify(devlink, err_str, NULL, 0, 0);
-+	dev_err(fbd->dev, "%s\n", err_str);
-+}
-+
-+static int
-+fbnic_devlink_flash_update(struct devlink *devlink,
-+			   struct devlink_flash_update_params *params,
-+			   struct netlink_ext_ack *extack)
-+{
-+	struct fbnic_dev *fbd = devlink_priv(devlink);
-+	const struct firmware *fw = params->fw;
-+	struct device *dev = fbd->dev;
-+	struct pldmfw context;
-+	char *err_msg;
-+	int err;
-+
-+	if (!fw || !fw->data || !fw->size)
-+		return -EINVAL;
-+
-+	devlink_flash_update_status_notify(devlink, "Preparing to flash",
-+					   NULL, 0, 0);
-+
-+	context.ops = &fbnic_pldmfw_ops;
-+	context.dev = dev;
-+
-+	err = pldmfw_flash_image(&context, fw);
-+	if (err) {
-+		switch (err) {
-+		case -EINVAL:
-+			err_msg = "Invalid image";
-+			break;
-+		case -EOPNOTSUPP:
-+			err_msg = "Unsupported image";
-+			break;
-+		case -ENOMEM:
-+			err_msg = "Out of memory";
-+			break;
-+		case -EFAULT:
-+			err_msg = "Invalid header";
-+			break;
-+		case -ENOENT:
-+			err_msg = "No matching record";
-+			break;
-+		case -ENODEV:
-+			err_msg = "No matching device";
-+			break;
-+		case -ETIMEDOUT:
-+			err_msg = "Timed out waiting for reply";
-+			break;
-+		default:
-+			err_msg = "Unknown error";
-+			break;
-+		}
-+		fbnic_devlink_flash_update_report_err(fbd, devlink,
-+						      err_msg, err);
-+	} else {
-+		devlink_flash_update_status_notify(devlink, "Flashing done",
-+						   NULL, 0, 0);
-+	}
-+
-+	return err;
-+}
-+
- static const struct devlink_ops fbnic_devlink_ops = {
--	.info_get = fbnic_devlink_info_get,
-+	.info_get	= fbnic_devlink_info_get,
-+	.flash_update	= fbnic_devlink_flash_update,
- };
-
- void fbnic_devlink_free(struct fbnic_dev *fbd)
---
-2.43.5
+Okay, that's a better way.
 
