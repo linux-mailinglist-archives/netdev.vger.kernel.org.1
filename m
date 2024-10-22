@@ -1,127 +1,264 @@
-Return-Path: <netdev+bounces-137827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30BA9A9F4C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:55:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E7F89A9F76
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 12:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 528ADB2301B
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:55:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 358A5283AD6
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F73199FC2;
-	Tue, 22 Oct 2024 09:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F8C195962;
+	Tue, 22 Oct 2024 10:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TbLJuePj"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lVU+EmLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B604155330
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D80146580;
+	Tue, 22 Oct 2024 10:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729590939; cv=none; b=TYUgpVR0+l7JfiCJ1Sz2qS4mOZaDXD/FiRwA9et/gsb25/Z5JOGPhSWPwXi/ToJ1FkF7l7VqbFd1asdHCjwtnNZKP59E8sT5CxmGsB6ThnD1aAMljSpJWx0hC0k1NcGwNJejeCM//VUKmCwjxzASp30PePOJ2RZLbguxLXX4WNw=
+	t=1729591237; cv=none; b=Jp10nXcgpCbcg+HKP3WTacelObtXryDgrwOEvtcbNXfrvNoaGuOtR0fhiL3vJWwScFQ35OFo+ryNNiyZX7mApBoi0CGqwX8E2/xzS0iCBzfm9ZIa7AxPaem8VYcjiwK2PYfkMt4PV8ADUeTJRmK4s+/dGsKVKdSq6j011MI4NsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729590939; c=relaxed/simple;
-	bh=ib0DWrahXU+UyLhjJUyjqhEX8gbxfkcMrsQFOh4hUoo=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=TJWoPauA+O3nhXW0ymEv/FXghPD1NpN1kEn8IDTkvM1CUxD48dm7B7QlEIHwh7jBQtRLqFCRLleBH7iasqHhUK8OgmlfOy75JKsLeH8KIWfQimLuDqniWyaWQOWyYWypKvN2CJD9OGEuwoAjS7tVqRVs7bF+Uimvmza2JljLkkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TbLJuePj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729590936;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ib0DWrahXU+UyLhjJUyjqhEX8gbxfkcMrsQFOh4hUoo=;
-	b=TbLJuePjYlu20NEG+69gzGvscslMzPN/6tyM1tpgytys6/l3m2GIOhqF6wvZDhuTSuNl99
-	A+klR4f1Zszh9NCHA29dYGXuZNJg1vOdxPi3VtzuFMHKoOyYdFHWRYZngnd6uyq7V+gGUY
-	GqCJGTlZ4l887MVtefdL407xn9ecyvw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-Bn-Jl0GENF-G__IhM7NbUg-1; Tue, 22 Oct 2024 05:55:34 -0400
-X-MC-Unique: Bn-Jl0GENF-G__IhM7NbUg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4316ac69e6dso23040075e9.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:55:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729590933; x=1730195733;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ib0DWrahXU+UyLhjJUyjqhEX8gbxfkcMrsQFOh4hUoo=;
-        b=lySt6iXUJGMkC/aui5Qp8TchdtSpK2U4BRbnEGJ4+nzoiqH5QtnDMWwn7CAhehWtbg
-         tZAVR/pJINf2IsDIuDjIf5/Q9jDBDinnH/+AcGQFYbyxr7XuzUbrP0VtZ/+jWWsqPrPi
-         04tF1CfSw238mp6J4EkVziznNrIoPTL4fyDKaDK0DqVGy8hAUiM0ZrEFAI6UI4ZdvNNP
-         Y1D/YUQnI9smomM5/xe+yyISj3b9vc9xxEUI26Y2t0RFoKajJhSZPn6yekExRiUsGFFQ
-         mCyMQPn5ScR+G5hNeY3nlv0Wdoo6o3ep2P8LURcFD80vL9j/p26k5axzKMY6D+P+Rf6d
-         uJwg==
-X-Forwarded-Encrypted: i=1; AJvYcCWkll9IGXlgmrNQWn4872vpfOtSlbxwDAkqa912BbESzeAl77z33MDFadWy6Xy0Sb7wT/MIbrM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/kDXYypiFuZrrEVN0fdtGpRki9huiMML3MCz++7ggSF+sZp3i
-	NjVydiQLaG4vNLdoCPWm0emxBrqIdhCQQP0T7e+IuKxJ2csvZG5alxQeh5TK0dScmDXZbpcb5nR
-	5DyI/CHX3/akY/OMqrt3o+vtn8MHHvG2/cF5Gux/tJKvlNb1I31zixg==
-X-Received: by 2002:a05:600c:5124:b0:431:40ca:ce44 with SMTP id 5b1f17b1804b1-43161691682mr122114245e9.30.1729590933373;
-        Tue, 22 Oct 2024 02:55:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHgyq6n+8jcts2tjTo5SADW9rqMjfT6xN3E7y9DOoeJqaiyEJ0e6Yke+AVbsNQve6hNbgctXw==
-X-Received: by 2002:a05:600c:5124:b0:431:40ca:ce44 with SMTP id 5b1f17b1804b1-43161691682mr122113835e9.30.1729590932884;
-        Tue, 22 Oct 2024 02:55:32 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b93ea6sm6296161f8f.84.2024.10.22.02.55.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 02:55:32 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id DAE67160B2D3; Tue, 22 Oct 2024 11:55:31 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Puranjay Mohan <puranjay@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexei Starovoitov <ast@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>,
- bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, "David S.
- Miller" <davem@davemloft.net>, Eduard Zingerman <eddyz87@gmail.com>, Eric
- Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, Helge Deller
- <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Jiri Olsa <jolsa@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
- linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>,
- Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, Palmer Dabbelt
- <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Puranjay Mohan <puranjay12@gmail.com>,
- Puranjay Mohan <puranjay@kernel.org>, Shuah Khan <shuah@kernel.org>, Song
- Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song
- <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf-next 3/5] selftests/bpf: don't mask result of
- bpf_csum_diff() in test_verifier
-In-Reply-To: <20241021122112.101513-4-puranjay@kernel.org>
-References: <20241021122112.101513-1-puranjay@kernel.org>
- <20241021122112.101513-4-puranjay@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 22 Oct 2024 11:55:31 +0200
-Message-ID: <871q08ihrg.fsf@toke.dk>
+	s=arc-20240116; t=1729591237; c=relaxed/simple;
+	bh=E/PyuqWigmmkv0b74BSfKVB++IVYH1zXU+xcp9MeEfY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=i82FtHuunIz7is81p+D/i+H8w+78Vf75YDj6S7IS9ZefzHssaXO+qYiSOQQlWFG87/R8yccRJHKRUe9YR63Wf9/8nDA43PGPm5G2pCm3GUBlEehjzZ0Ky+PM7//150bgX4P2OUhboZX2iQin1/0qXwHfP2awxAyk8jaCMEHYXro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lVU+EmLY; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49M2YCv8024145;
+	Tue, 22 Oct 2024 10:00:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ViTJw+DuVNGpPUo56wn0ST7i6MXX2hfRDsBBf6zEB9M=; b=lVU+EmLY446P8JOA
+	QYIxZH40hQvhQIuvQabX+DWjLC9vg5Ci5KD46jCQQW8W6pPgV/GAvKS+SRTCwmKQ
+	5dpoB38Wx8Ma0gqTP4Lv81csiUZt6fyM1xV5SbBI4M7KkFJt/1ITocTNBKxehgvp
+	K53m+9Ttc1s60i6XeUCsCimY2EMwszcR30pi94oMMK+YI19MYCnplyQy4t/KRu20
+	UCh55m236o5g+0bGu/XhveM8vkr9T6C20ipPT6BpHa06jVz42kueOxic/risck6/
+	n6/Dmjx4ZA3VepBpK4txdJPeRxIFJIP1AsNIwAfeFSZzagGp+ChoGUTugZuN6Xod
+	RCPXlA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42e3cgh5wb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 10:00:05 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49MA04t9012945
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 10:00:04 GMT
+Received: from [10.50.13.1] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 22 Oct
+ 2024 02:59:56 -0700
+Message-ID: <ba1bf2a6-76b7-4e82-b192-86de9a8b8012@quicinc.com>
+Date: Tue, 22 Oct 2024 15:29:53 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>,
+        Andy Gross
+	<agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
+        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
+        <john@phrozen.org>, Luo Jie <quic_luoj@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>,
+        "Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+        "Lei Wei (QUIC)"
+	<quic_leiwei@quicinc.com>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+ <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
+In-Reply-To: <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 7Qid-fCyf9ps8S6kkkk1UdboHGTp5c4S
+X-Proofpoint-ORIG-GUID: 7Qid-fCyf9ps8S6kkkk1UdboHGTp5c4S
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ spamscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
+ phishscore=0 clxscore=1011 impostorscore=0 suspectscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410220064
 
-Puranjay Mohan <puranjay@kernel.org> writes:
 
-> The bpf_csum_diff() helper has been fixed to return a 16-bit value for
-> all archs, so now we don't need to mask the result.
->
-> This commit is basically reverting the below:
->
-> commit 6185266c5a85 ("selftests/bpf: Mask bpf_csum_diff() return value
-> to 16 bits in test_verifier")
->
-> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+On 10/4/2024 7:54 PM, Russell King (Oracle) wrote:
+> On Thu, Oct 03, 2024 at 11:20:03PM +0530, Kiran Kumar C.S.K wrote:
+>>>>          +---------+
+>>>>          |  48MHZ  |
+>>>>          +----+----+
+>>>>               |(clock)
+>>>>               v
+>>>>          +----+----+
+>>>>   +------| CMN PLL |
+>>>>   |      +----+----+
+>>>>   |           |(clock)
+>>>>   |           v
+>>>>   |      +----+----+           +----+----+  clock   +----+----+
+>>>>   |  +---|  NSSCC  |           |   GCC   |--------->|   MDIO  |
+>>>>   |  |   +----+----+           +----+----+          +----+----+
+>>>>   |  |        |(clock & reset)      |(clock & reset)
+>>>>   |  |        v                     v
+>>>>   |  |   +-----------------------------+----------+----------+---------+
+>>>>   |  |   |       +-----+               |EDMA FIFO |          | EIP FIFO|
+>>>>   |  |   |       | SCH |               +----------+          +---------+
+>>>>   |  |   |       +-----+                      |               |        |
+>>>>   |  |   |  +------+   +------+            +-------------------+       |
+>>>>   |  |   |  |  BM  |   |  QM  |            | L2/L3 Switch Core |       |
+>>>>   |  |   |  +------+   +------+            +-------------------+       |
+>>>>   |  |   |                                   |                         |
+>>>>   |  |   | +-------+ +-------+ +-------+ +-------+ +-------+ +-------+ |
+>>>>   |  |   | |  MAC0 | |  MAC1 | |  MAC2 | |  MAC3 | | XGMAC4| |XGMAC5 | |
+>>>>   |  |   | +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ |
+>>>>   |  |   |     |         |         |         |         |         |     |
+>>>>   |  |   +-----+---------+---------+---------+---------+---------+-----+
+>>>>   |  |         |         |         |         |         |         |
+>>>>   |  |     +---+---------+---------+---------+---+ +---+---+ +---+---+
+>>>>   +--+---->|             PCS0                    | |  PCS1 | | PCS2  |
+>>>>   | clock  +---+---------+---------+---------+---+ +---+---+ +---+---+
+>>>>   |            |         |         |         |         |         |
+>>>>   |        +---+---------+---------+---------+---+ +---+---+ +---+---+
+>>>>   | clock  +----------------+                    | |       | |       |
+>>>>   +------->|Clock Controller|   4-port Eth PHY   | | PHY4  | | PHY5  |
+>>>>            +----------------+--------------------+ +-------+ +-------+
+> ...
+>>>> 3) PCS driver patch series:
+>>>>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
+>>>>         be enabled in drivers/net/pcs/
+>>>> 	Dependent on NSS CC patch series (2).
+>>>
+>>> I assume this dependency is pure at runtime? So the code will build
+>>> without the NSS CC patch series?
+>>
+>> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
+>> PCS's MII channels. To represent this in the DTS, the PCS node in the
+>> DTS is configured with the MII Rx/Tx clock that it consumes, using
+>> macros for clocks which are exported from the NSS CC driver in a header
+>> file. So, there will be a compile-time dependency for the dtbindings/DTS
+>> on the NSS CC patch series. We will clearly call out this dependency in
+>> the cover letter of the PCS driver. Hope that this approach is ok.
+> 
+> Please distinguish between the clocks that are part of the connection
+> between the PCS and PHY and additional clocks.
+> 
+> For example, RGMII has its own clocks that are part of the RGMII
+> interface. Despite DT having a way to describe clocks, these clocks
+> are fundamental to the RGMII interface and are outside of the scope
+> of DT to describe. Their description is implicit in the relationship
+> between the PHY and network driver.
+> 
+> Also, the PCS itself is a subset of the network driver, and we do
+> not (as far as I know) ever describe any kind of connection between
+> a PCS and PHY. That would be madness when we have situations where
+> the PHY can change its serdes mode, causing the MAC to switch
+> between several PCS - which PCS would one associate the PHY with in
+> DT when the "mux" is embedded in the ethernet driver and may be
+> effectively transparent?
+> 
 
+Apologies for the delay in response. I understand that the PCS<->PHY
+clocks may be out of the scope of PCS DT due to the reasons you mention.
+However would like to clarify that the MII clocks referred to here, are
+part of the connection between the MAC and PCS and not between PCS and PHY.
+
+Below is a diagram that shows the sub-blocks inside the 'UNIPHY' block
+of IPQ9574 which houses the PCS and the serdes, along with the clock
+connectivity. The MII Rx/Tx clocks are supplied from the NSS CC, to the
+GMII channels between PCS and MAC. So, it seemed appropriate to have
+these clocks described as part of the PCS DT node.
+
+              +-------+ +---------+  +-------------------------+
+   -----------|CMN PLL| |  GCC    |  |   NSSCC (Divider)       |
+   |25/50mhz  +----+--+ +----+----+  +--+-------+--------------+
+   |clk            |         |          ^       |
+   |       31.25M  |  SYS/AHB|clk  RX/TX|clk    +------------+
+   |       ref clk |         |          |       |            |
+   |               |         v          | MII RX|TX clk   MAC| RX/TX clk
+   |            +--+---------+----------+-------+---+      +-+---------+
+   |            |  |   +----------------+       |   |      | |     PPE |
+   v            |  |   |     UNIPHY0            V   |      | V         |
+  +-------+     |  v   |       +-----------+ (X)GMII|      |           |
+  |       |     |  +---+---+   |           |--------|------|-- MAC0    |
+  |       |     |  |       |   |           | (X)GMII|      |           |
+  |  Quad |     |  |SerDes |   |  (X)PCS   |--------|------|-- MAC1    |
+  |       +<----+  |       |   |           | (X)GMII|      |           |
+  |(X)GPHY|     |  |       |   |           |--------|------|-- MAC2    |
+  |       |     |  |       |   |           | (X)GMII|      |           |
+  |       |     |  +-------+   |           |--------|------|-- MAC3    |
+  +-------+     |              |           |        |      |           |
+                |              +-----------+        |      |           |
+                +-----------------------------------+      |           |
+                +--+---------+----------+-------+---+      |           |
+  +-------+     |            UNIPHY1                |      |           |
+  |       |     |              +-----------+        |      |           |
+  |(X)GPHY|     | +-------+    |           | (X)GMII|      |           |
+  |       +<----+ |SerDes |    |   (X)PCS  |--------|------|- MAC4     |
+  |       |     | |       |    |           |        |      |           |
+  +-------+     | +-------+    |           |        |      |           |
+                |              +-----------+        |      |           |
+                +-----------------------------------+      |           |
+                +--+--------+-----------+-------+---+      |           |
+  +-------+     |           UNIPHY2                 |      |           |
+  |       |     |              +-----------+        |      |           |
+  |(X)GPHY|     | +-------+    |           | (X)GMII|      |           |
+  |       +<----+ |SerDes |    |   (X)PCS  |--------|------|- MAC5     |
+  |       |     | |       |    |           |        |      |           |
+  +-------+     | +-------+    |           |        |      |           |
+                |              +-----------+        |      |           |
+                +-----------------------------------+      +-----------+
+
+
+We had one other question on the approach used in the driver for PCS
+clocks, could you please provide your comments.
+
+As we can see from the above diagram, each serdes in the UNIPHY block
+provides the clocks to the NSSCC, and the PCS block consumes the MII
+Rx/Tx clocks. In our current design, the PCS/UNIPHY driver registers a
+provider driver for the clocks that the serdes supplies to the NSS CC.
+It also enables the MII Rx/Tx clocks which are supplied to the PCS from
+the NSS CC. Would this be an acceptable design to have the PCS driver
+register the clock provider driver and also consume the MII Rx/Tx
+clocks? It may be worth noting that the serdes and PCS are part of the
+same UNIPHY block and also share same register region.
+
+Thank you.
 
