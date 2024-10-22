@@ -1,172 +1,357 @@
-Return-Path: <netdev+bounces-137928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A61E09AB246
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:39:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4CA99AB252
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C71491C2232C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:39:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 744731F21D52
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CA41A00D2;
-	Tue, 22 Oct 2024 15:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91881A3BDA;
+	Tue, 22 Oct 2024 15:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yg5GZziJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S52lKPhH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EA419D06D
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 15:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729611560; cv=none; b=GPOz+y0EDKaNWavimi3OgXrwgVTgVj9yPOglbnEO4P40XIW8u6vs/9cf8sP8n4GsLfcJCbbZxdCXvKEDDytarclWFMSDbPbsk6FD7WycnLMP/jlbL+CnFPwoOQgZo+7hWzxaUP+v6aCCgS2enWZHQZ7uYQDuE2Mjy048DUafzGA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729611560; c=relaxed/simple;
-	bh=KyehdRFnOqClt4ckcijRDX2btN2UgjYXojkVtGk19rM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RMnV/XbBAt6u8gY3EgqQXX8WY8M6w9B25WJfO06tKOyQgmFtO22Lw2qditZpQTcTDyARy82GHdHn/totExYwly/fLKnWWd9qXvAxLynaTLESIwV0RmcB+8ZL5jTWtZdfYpyhfA6hCEvHsHttbH+Gt3kWzkIILogvRpGfzLOxMSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yg5GZziJ; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e983487a1so4140015b3a.2
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 08:39:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729611558; x=1730216358; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4UhBP+lxA4PuI1pN/Opr4ffBjn9LJSMHIGdfxJak84M=;
-        b=yg5GZziJfv9IcGwyz9GmsygvMkwdTDM0Aq0gC0AKOdl2ULRcJ9GDmP8Nuqe1cTrPIw
-         HMxDuMZ8vAaydUl0x3S1a6vUZqsSf7p2I4mZ9Yx8tjUZD05LwqIFMJdz0pWRryXpcIcQ
-         P7boRmE4/VKE+vzBBq9mhpEWNPpqXzQXmHRwReZV5iWpgCJOkUGG5K8r0tJTQS9bTVoc
-         1WgbsrSUQTkwd1Ep7L9ogrKB/8ezpckhSnRVWCVh7THK/xDwp8kY3mX9KN4aKNiJv9PM
-         UCqooa0kkBwE3/5TqoMArdcEMk8tPlYI8wCckpifSZearmcaQI2nEL0sWC696yp+2yi5
-         4I6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729611558; x=1730216358;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4UhBP+lxA4PuI1pN/Opr4ffBjn9LJSMHIGdfxJak84M=;
-        b=jaE7g7pobAagfurTF+V1N3a28WSLXzaT9kVCYM2Nj8deLBYcCF9v/Fgtr1RpyDkVkC
-         tBZCIPldXPXvTAD2F2732LL1FG9966MYAEu+ydejjLUQrleF4ob6IRaua4Emo3V0zH6b
-         D7veY1xqyPHLvbF7nm+vOozeCF7iMh+eLYAMfNtvbKJ0diFG+mD4DXwob7wvgDg3lSTP
-         BYtUiZ92baEZ1i85Avmpqv4uJIFasBinzZaBIhXhAFTQ3qBBpYGf0ZsYFtRna5EudkeZ
-         xvXH5hHGqXCwL4OVTdlyF4CcBLSs7sT54aZhQTxjkzBRkGWd+PfxnWLIPqZvXDU0fcGm
-         4ZNw==
-X-Gm-Message-State: AOJu0YwCnJpqsBT4T3DA0ZbkwBddHcqIuZdZpWCF6BXCQ6cbpmFllsDg
-	e93yJuoP9L8fC/UugiByP3FB/bgxfNMGKen76PxegLWdzl9cGDiqMPwkJBHK/g==
-X-Google-Smtp-Source: AGHT+IHTLfLxPFhRlrarKiYn46g4SklVOs57wHpWONQ2VMauVhk6JqEzb66pf6djTsJvgzguysbpeQ==
-X-Received: by 2002:a05:6a00:318f:b0:71e:60fc:ad11 with SMTP id d2e1a72fcca58-71ee4b07d49mr2955925b3a.16.1729611558265;
-        Tue, 22 Oct 2024 08:39:18 -0700 (PDT)
-Received: from thinkpad ([36.255.17.224])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13eb0c8sm4889990b3a.182.2024.10.22.08.39.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 08:39:17 -0700 (PDT)
-Date: Tue, 22 Oct 2024 21:09:12 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Denis Kenzior <denkenz@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v1 00/10] QRTR Multi-endpoint support
-Message-ID: <20241022153912.hoa2wbqtkvwjzuyo@thinkpad>
-References: <20241018181842.1368394-1-denkenz@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10ED1A3A8F;
+	Tue, 22 Oct 2024 15:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729611753; cv=fail; b=ESBamJgMzGLt9KhqFgaIa47fAguKdvTf38/5EUtuQag+NuI0qa6+fdL/C8tapJbRhSdU64tdlq8UKPEGWjAlvNFXOPWIwcLmB/iyUSvVE4Uj4b6GPvsaClMVKFG/vPwf86FnDvBFgvJqYcO2u11tcb9bMsUbyxsInEWrcXw8yfY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729611753; c=relaxed/simple;
+	bh=p8znTkWCOTMsMEuq5NaDiVSXvx3tT+CA4lrCkFYdpio=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MIWM8MbslpD5FH/bNS1KsO/XTl4tgLAyC8MOeE9RjR4b3Mg5maXJwqg0psNBXtyIhBzNVPM3LiC2kiEpBESEaOeAH/8UOEDR6v7ffdWfDxdamS1SMet4ljGsyT/5qnSf1UjOkaN6QAxHRHXMF3DHx6kQxefDw202djfmWlbYZjo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S52lKPhH; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729611751; x=1761147751;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=p8znTkWCOTMsMEuq5NaDiVSXvx3tT+CA4lrCkFYdpio=;
+  b=S52lKPhHrjRbl6W+F/+hfcYGT/re/nW49skK0yj0T6cM4zCjY62KgAak
+   CRyvvdG97E/z8V9JnpBC2w6ioeqIB2XQrBTXujozMh2Yt2kSJpP9gsi/G
+   aUquYGBIC0XtsVLS0KtiYGepJfclgDwPbI/XPbevosZMM/SeRbhqsGaQq
+   NXnCTN2FSe2XDagbqWTloyrCRth5gIM2PIqx6pNXzvaghOSx1XhWZ5LMs
+   jrYx9qtmb2h3Jy+Ht/2b8G48bm6AkeowEp0/LqgxJmKO5eYlQ51rZBJwf
+   lDVTnqSu0ePLOOPPWa2+rIRlUMwzeKMj65f0Pq5kvPSYrdob/fUJqV4j1
+   w==;
+X-CSE-ConnectionGUID: hx5+9RdGQZiH8PEV0MyIFg==
+X-CSE-MsgGUID: 3m9urmScTqGHV+BLvtfXOg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="28592822"
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="28592822"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 08:42:31 -0700
+X-CSE-ConnectionGUID: UmZS/91VS/23PubkN403tg==
+X-CSE-MsgGUID: rZDe9wGORaq+vXeMRHpZ0Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="79831450"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Oct 2024 08:42:31 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 22 Oct 2024 08:42:30 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 22 Oct 2024 08:42:30 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 22 Oct 2024 08:42:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FlsjWmp+37vW8dQ5TYRc/75smWXmkTIw+e0RfvDsGzVjDP/O/5ad8f3ME6pzaZ6R8lbFJMiKahFzy3LcZNfz9cmxJl9oFyT9AKkyBGtJRofPJZ9DI9AG2StjEZBgkx1oxYlsyW9H/t8WgO1obElhbJSdGhoEmdKxPNM4kqG0M5pReoXyHETWV9M8bMsYpDdC8b7d4tQEYqBXc2+Vt2ckU86OkFzUpoddh1skqdQoxtJYq96zZO7WJL5ci6oFSvEWvm7prifefui+7qTMWiuwQDlSyRPeUKWJ5izoPN3c7sWovhfJch5YPGmiwW/NmzbRzY0jSJzgs95IoMZwSm7Wmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=65ilzUApj7HEXT8ZlLLW4eZ1tcySdfzas5MCd5DEr7k=;
+ b=XgEkZ5/9A+fLbtIVD8b3RSlCI3A6lBxpxsrIYT2ou/gGEnFz7kFkjUDC7Q8fVAuwJAntSDkbt9GisY0XZ7VGqi4rOourAmWQOJFjSCI1pQPx945lQIPpAtMYWX1udmo8k3Znq5WxaU9CMBZ5FMNLdsBFRDrrYvEWR7jkpiPVZcOCk+IRlQyxs5PPWzDKpgZgPqNJPHTOoDcuJtmeh9q7hCA3d6BIBpv5OCmRg7mDw1GYy0T+9Hpwvt13nLattbMlEew9ELMZZceaWSPsam+ijUwjUfRM0xtQBEZEiklPtky8Av1rjqOvWjzoIt2KY/NtD+ZtImfd5IBxCYMgPz3IzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ DM4PR11MB8092.namprd11.prod.outlook.com (2603:10b6:8:184::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8093.16; Tue, 22 Oct 2024 15:42:26 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%5]) with mapi id 15.20.8093.014; Tue, 22 Oct 2024
+ 15:42:26 +0000
+Date: Tue, 22 Oct 2024 17:42:13 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?=
+	<toke@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, "Andrii
+ Nakryiko" <andrii@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, "Magnus
+ Karlsson" <magnus.karlsson@intel.com>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 16/18] xsk: add helper to get &xdp_desc's DMA
+ and meta pointer in one go
+Message-ID: <ZxfH1VmjcVdLeKUo@boxer>
+References: <20241015145350.4077765-1-aleksander.lobakin@intel.com>
+ <20241015145350.4077765-17-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241015145350.4077765-17-aleksander.lobakin@intel.com>
+X-ClientProxiedBy: VI1PR07CA0137.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::24) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241018181842.1368394-1-denkenz@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DM4PR11MB8092:EE_
+X-MS-Office365-Filtering-Correlation-Id: e34b68c2-9c2f-4141-a8f5-08dcf2b02142
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?+c7ct68Rvn2NiQ5+7ty2GxB2F5sVrxDhEo7zkIDOaKb6y7h4Z1ExzRdYTH2E?=
+ =?us-ascii?Q?kHSX7ZxkAYIWwbxbA9aG/PLGHaVBMINPcJKk24JmtfqwgC9wI3lbH2vYAkzd?=
+ =?us-ascii?Q?S4vjzKxoj9ngy7g0RPYzEgrhR0Svl932fIAHb5MmuE3zPc3elkrlgrFCoFyb?=
+ =?us-ascii?Q?ownG/bjO22cN00K/x2Sc50tRb6X9bODA1n8UUkJ7hwog7BlLYJn+0b8eAhl3?=
+ =?us-ascii?Q?UbPl+CtGGU2CL+DhmVdhJ98cudN7Qj9gplBcV5CjgOFtaUnagvfDGfwPqNPp?=
+ =?us-ascii?Q?eBXYLu79QfPvS1LXpSRMmDVdudAExNNyJmgSFPB7DEuh/1zMy7VBDUXjD2xu?=
+ =?us-ascii?Q?leENZvATbbXrz1owuZAxWjLmKhMeE27mMPehlRPKJmArKu4x6nLXXvXDgKJZ?=
+ =?us-ascii?Q?lIjYfSxGr4cQTsuUipmu6FL10NfJY8L5ylPCehw4mjiWCS89FZp2Vjm9HwdJ?=
+ =?us-ascii?Q?zcEmToCHp/SjzEAoJraqmq1YiTiaO5AChPREjRSLt2NwKelhXFBYqaQRu1fL?=
+ =?us-ascii?Q?DGpiG+vNtlRGCEERVPRWUnGjT54Q3wGM+47pZmW5KN8r1NteYDw3PBPZ/8tg?=
+ =?us-ascii?Q?jE0EbvVmVBX/iEKfOHRgESDuL+ia7OSFmXRNqlAA/qsmYeRQODbBJqj0mygz?=
+ =?us-ascii?Q?Xjtf3WG9bbziv9+PV4Sa6YYkuvezUXjwjfRLjkz+LE0ObJ70qZ0FqSpfwHgv?=
+ =?us-ascii?Q?ZkHhIJqGnQ0oX2EV4VKrjjOdCV/YhvZcVzp3EQO8HQGWQ9Otb8Ssea7zdC0m?=
+ =?us-ascii?Q?7vuhjR5gUYAQzmFHKocnFs8yyRRdaFJbDZvbBxox4wwBXyDvGmEgmOg6KPVd?=
+ =?us-ascii?Q?pABvF8bLU1Iiw70h6AC4bDy9aqKX2sffsCDWvibMW2eSceQWeihpA/Pm2vp9?=
+ =?us-ascii?Q?nZ/zC0gJOQTM6d7OpCTpLhxcCE7GHfda0eFK4Bu7QLcLGdC5URSVO5WZkDqs?=
+ =?us-ascii?Q?4cGLxcmPQ+My8CrMK01oEOT05sQHLrzKxRcz6UzkA4//ufCM75ipl53kKqDm?=
+ =?us-ascii?Q?MSfwUiFwy691nQnNSfe+l6RQQxAeJYYwLSccQ06vX7x8xFgtBbQeDVHLbUNW?=
+ =?us-ascii?Q?+Cvnyp0FxUQSS94ZbjGIuPldhkSOiQIAtrFEv9UClWwmPmbunVAFTEc/7CIq?=
+ =?us-ascii?Q?Z8zIc3MopPC1ZJykfxrzsY4+Sv+DFF3bNWrhTAGPtlH6+2KbFYimKwk6uyNr?=
+ =?us-ascii?Q?L0ZzDwCco2p4J1zULG2nTMXQyHPTZVaQwTdNsS019TQyPo8AeRpoxZuOyrFp?=
+ =?us-ascii?Q?e67j17l+sjT7m8c6FwbUrB+WXm1lZPVz5YBIPtsRKmgX1ynLHn3iTbBVzfdu?=
+ =?us-ascii?Q?b/U=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VHIYy9p1MsGeMUBDd4dDXC7CkUfik36sOMXgrjD92l1ce6rz5Ffzg+V6JKri?=
+ =?us-ascii?Q?4/heVP7kp0QtJeLOTXMXkImhifmycVQ1EFVYDpfAwxctdAilRJITqLWKym45?=
+ =?us-ascii?Q?jG9/hl7UcBxtPIR2sGpR6WSqNfGTPcsF2eXHzfOE1t89PAALhcYubLy5/5pD?=
+ =?us-ascii?Q?tIRgsiYVKi0VZoGl7Nq8kJnUnzQ5azni76Gr+yptogt4/Lniij7VzTb0S+4r?=
+ =?us-ascii?Q?fIL9iaaedzPOJgsMfYOyu8ve+btYKWF4Pl1nRsf2rbLgNduOZnD51iAG3xRH?=
+ =?us-ascii?Q?cpYii8MhXyAILhDd+NjpHbrcDIEIpd/JNezWm7+hpO5Ef4qHaQPnbRrGJ+Iy?=
+ =?us-ascii?Q?D1CAtgfSOwuEIDFVcmIX+vfpcHts+6RSSN+XNig7iV3WtKGd52wgPTntgSMZ?=
+ =?us-ascii?Q?1DnXrzTS/SKuUu6mALJ/QS5J0+MmA1tX5M3FBqc6WJL6ybVUoY84Pl+uy4Ga?=
+ =?us-ascii?Q?DMItFU1cYVIg2pBjJHFADayt9IFPcOdk9Kjp2/f/yIyKLXE8CMKT+2/AUKip?=
+ =?us-ascii?Q?iEsC3mz3jiVash9AXY+66tRNjvii2MKfqlUx9haR3Ku9i+S8P8RkWDDtBKk8?=
+ =?us-ascii?Q?DWM1RGb4mEepCoQvJ1+TR1h9F+FwYoJnFge4hxhZb81hrYH1JsOZYrbM0RD9?=
+ =?us-ascii?Q?VygoChJDcOU9JWPQkUiTrs1lD58tgpoPH9XKhBYVr0nD5zwxF3Ovc2qqSuH5?=
+ =?us-ascii?Q?6+FopAM6yGDNMt0ztc8ebrAsQByO5bLXbD9X2M1ujyfqbl3M+bfw+q476Dzo?=
+ =?us-ascii?Q?JBuqIU0BnaEBlSn/pRzFMjZl4+2YdizBqPC2nPrh2I6sUjhE6a1cOGC6wXNF?=
+ =?us-ascii?Q?sRrGDi61fJ7Oo3x9ZatW1agQ6OWs3fs1oOQzHriQHJx6xvRLIkTDxHIM5IA0?=
+ =?us-ascii?Q?0MQYssT3FLMAIKeoY+hVXwprydjqH+sZ1Mo+wSR81NQHEnMb7AUooVDkCCVA?=
+ =?us-ascii?Q?cRFv0ly6LaAaD79j1R+TR0/q7EEy5sLJOxgBnsh11Ke859egObXcHAJMWuOs?=
+ =?us-ascii?Q?DYqz7bGXGkxG96en2U/dOQi6y1wQpO2PMcNvkEV2pHC75HN2MysFSVmrX8N/?=
+ =?us-ascii?Q?jZH0bmxd8urX72tIR5CWutkkI4GWcwgkIl2OI7s1kx/OIqgL3uZnQs+KBBy+?=
+ =?us-ascii?Q?UFGV6xunBBNflhcatDX6ORRMk9vMy4iRMPI0uMuSWXUmYK55I8Fy7uk4Lqu6?=
+ =?us-ascii?Q?SfV2dHeb8ziUGoRihgeIf0FQnGKg38eE0rBZ7HOM9VOK13/NsGtmZAcI/Kv7?=
+ =?us-ascii?Q?PfT0FzceVeEenOmGGlYmizFDj9ORT0IjWFqllI4SIR5rNbVM9dyJsaacGmXR?=
+ =?us-ascii?Q?84mx/xdk/Rru1Y8/Jddr7eAcZLVWnDLcpJTj9RD6Ub6SYjE5JRXicrqfVp1z?=
+ =?us-ascii?Q?uRX2BWpIMhardlR8AS4zE4G/6thx0sF0RXvDaaJWMJgv9RPXzu+4zzO+pVGH?=
+ =?us-ascii?Q?tjVwX4vGaKfpSVxDOuZ04sliBEC6NaFi13HyO23OAZ84EHJ5Wx5IrqM6kjyJ?=
+ =?us-ascii?Q?fE+QnhFSx66pP2lDoQ9jy/wo7jieR455duJfB4Vk3GvnxMeuu3JeMeyhF0MX?=
+ =?us-ascii?Q?8arOe/FHY9CS2hcbB8M4dn9P/2c79X29zFDcqooxhQTCCTejLbLO+FnYqblv?=
+ =?us-ascii?Q?/A=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e34b68c2-9c2f-4141-a8f5-08dcf2b02142
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2024 15:42:26.7612
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bxfneScIiLCPV4b8ptmzvdldGLwBmTzZZ+flrIaew9V62f2EdJhH7eRJFPs2fR9N1s45jVeE7BFJOmeZCeNJx/mQ4IrBNsAl63DtdW/LjjQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8092
+X-OriginatorOrg: intel.com
 
-On Fri, Oct 18, 2024 at 01:18:18PM -0500, Denis Kenzior wrote:
-> The current implementation of QRTR assumes that each entity on the QRTR
-> IPC bus is uniquely identifiable by its node/port combination, with
-> node/port combinations being used to route messages between entities.
-> 
-> However, this assumption of uniqueness is problematic in scenarios
-> where multiple devices with the same node/port combinations are
-> connected to the system.  A practical example is a typical consumer PC
-> with multiple PCIe-based devices, such as WiFi cards or 5G modems, where
-> each device could potentially have the same node identifier set.  In
-> such cases, the current QRTR protocol implementation does not provide a
-> mechanism to differentiate between these devices, making it impossible
-> to support communication with multiple identical devices.
-> 
-> This patch series addresses this limitation by introducing support for
-> a concept of an 'endpoint.' Multiple devices with conflicting node/port
-> combinations can be supported by assigning a unique endpoint identifier
-> to each one.  Such endpoint identifiers can then be used to distinguish
-> between devices while sending and receiving messages over QRTR sockets.
-> 
+On Tue, Oct 15, 2024 at 04:53:48PM +0200, Alexander Lobakin wrote:
+> Currently, when you send an XSk frame without metadata, you need to do
 
-Thanks for your work on this! I'm yet to look into the details but wondering how
-all the patches have Reviewed-by tags provided that this series is 'RFC v1'.
-Also, it is quite surprising to see the review tag from Andy Gross who quit Qcom
-quite a while ago and I haven't seen him reviewing any Qcom patches for so long.
+you meant *with* metadata?
 
-- Mani
+> the following:
+> 
+> * call external xsk_buff_raw_get_dma();
+> * call inline xsk_buff_get_metadata(), which calls external
+>   xsk_buff_raw_get_data() and then do some inline checks.
+> 
+> This effectively means that the following piece:
+> 
+> addr = pool->unaligned ? xp_unaligned_add_offset_to_addr(addr) : addr;
+> 
+> is done twice per frame, plus you have 2 external calls per frame, plus
+> this:
+> 
+> 	meta = pool->addrs + addr - pool->tx_metadata_len;
+> 	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
+> 
+> is always inlined, even if there's no meta or it's invalid.
 
-> The patch series maintains backward compatibility with existing clients:
-> the endpoint concept is added using auxiliary data that can be added to
-> recvmsg and sendmsg system calls.  The QRTR socket interface is extended
-> as follows:
+when there is no meta you bail out early in xsk_buff_get_metadata() as
+tx_metadata_len was not set, no?
+
 > 
-> - Adds QRTR_ENDPOINT auxiliary data element that reports which endpoint
->   generated a particular message.  This auxiliary data is only reported
->   if the socket was explicitly opted in using setsockopt, enabling the
->   QRTR_REPORT_ENDPOINT socket option.  SOL_QRTR socket level was added
->   to facilitate this.  This requires QRTR clients to be updated to use
->   recvmsg instead of the more typical recvfrom() or recv() use.
+> Add xsk_buff_raw_get_ctx() (xp_raw_get_ctx() to be precise) to do that
+> in one go. It returns a small structure with 2 fields: DMA address,
+> filled unconditionally, and metadata pointer, valid only if it's
+> present. The address correction is performed only once and you also
+> have only 1 external call per XSk frame, which does all the calculations
+> and checks outside of your hotpath. You only need to check
+> `if (ctx.meta)` for the metadata presence.
+
+IMHO adding this might confuse future users which approach should be
+preferred.
+
+Thinking out loud...couldn't we export address correction logic and pass
+the corrected addr to xsk_buff_get_metadata and then add it to
+pool->addrs. But that would require modifying existing callsites +
+addressing xp_raw_get_dma() as well :<
+
+Standard question - any perf improvement when micro benchmarking? :P
+
 > 
-> - Similarly, QRTR_ENDPOINT auxiliary data element can be included in
->   sendmsg() requests.  This will allow clients to route QRTR messages
->   to the desired endpoint, even in cases of node/port conflict between
->   multiple endpoints.
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  include/net/xdp_sock_drv.h  | 23 +++++++++++++++++++++
+>  include/net/xsk_buff_pool.h |  8 ++++++++
+>  net/xdp/xsk_buff_pool.c     | 40 +++++++++++++++++++++++++++++++++++++
+>  3 files changed, 71 insertions(+)
 > 
-> - Finally, QRTR_BIND_ENDPOINT socket option is introduced.  This allows
->   clients to bind to a particular endpoint (such as a 5G PCIe modem) if
->   they're only interested in receiving or sending messages to this
->   device.
-> 
-> NOTE: There is 32-bit unsafe use of radix_tree_insert in this patch set.
-> This follows the existing usage inside net/qrtr/af_qrtr.c in
-> qrtr_tx_wait(), qrtr_tx_resume() and qrtr_tx_flow_failed().  This was
-> done deliberately in order to keep the changes as minimal as possible
-> until it is known whether the approach outlined is generally acceptable.
-> 
-> Denis Kenzior (10):
->   net: qrtr: ns: validate msglen before ctrl_pkt use
->   net: qrtr: allocate and track endpoint ids
->   net: qrtr: support identical node ids
->   net: qrtr: Report sender endpoint in aux data
->   net: qrtr: Report endpoint for locally generated messages
->   net: qrtr: Allow sendmsg to target an endpoint
->   net: qrtr: allow socket endpoint binding
->   net: qrtr: Drop remote {NEW|DEL}_LOOKUP messages
->   net: qrtr: ns: support multiple endpoints
->   net: qrtr: mhi: Report endpoint id in sysfs
-> 
->  include/linux/socket.h    |   1 +
->  include/uapi/linux/qrtr.h |   7 +
->  net/qrtr/af_qrtr.c        | 297 +++++++++++++++++++++++++++++++------
->  net/qrtr/mhi.c            |  14 ++
->  net/qrtr/ns.c             | 299 +++++++++++++++++++++++---------------
->  net/qrtr/qrtr.h           |   4 +
->  6 files changed, 459 insertions(+), 163 deletions(-)
-> 
+> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+> index 6aae95b83645..324a4bb04431 100644
+> --- a/include/net/xdp_sock_drv.h
+> +++ b/include/net/xdp_sock_drv.h
+> @@ -205,6 +205,23 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
+>  	return xp_raw_get_data(pool, addr);
+>  }
+>  
+> +/**
+> + * xsk_buff_raw_get_ctx - get &xdp_desc context
+> + * @pool: XSk buff pool desc address belongs to
+> + * @addr: desc address (from userspace)
+> + *
+> + * Wrapper for xp_raw_get_ctx() to be used in drivers, see its kdoc for
+> + * details.
+> + *
+> + * Return: new &xdp_desc_ctx struct containing desc's DMA address and metadata
+> + * pointer, if it is present and valid (initialized to %NULL otherwise).
+> + */
+> +static inline struct xdp_desc_ctx
+> +xsk_buff_raw_get_ctx(const struct xsk_buff_pool *pool, u64 addr)
+> +{
+> +	return xp_raw_get_ctx(pool, addr);
+> +}
+> +
+>  #define XDP_TXMD_FLAGS_VALID ( \
+>  		XDP_TXMD_FLAGS_TIMESTAMP | \
+>  		XDP_TXMD_FLAGS_CHECKSUM | \
+> @@ -402,6 +419,12 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
+>  	return NULL;
+>  }
+>  
+> +static inline struct xdp_desc_ctx
+> +xsk_buff_raw_get_ctx(const struct xsk_buff_pool *pool, u64 addr)
+> +{
+> +	return (struct xdp_desc_ctx){ };
+> +}
+> +
+>  static inline bool xsk_buff_valid_tx_metadata(struct xsk_tx_metadata *meta)
+>  {
+>  	return false;
+> diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+> index 3832997cc605..6c540696a299 100644
+> --- a/include/net/xsk_buff_pool.h
+> +++ b/include/net/xsk_buff_pool.h
+> @@ -141,6 +141,14 @@ u32 xp_alloc_batch(struct xsk_buff_pool *pool, struct xdp_buff **xdp, u32 max);
+>  bool xp_can_alloc(struct xsk_buff_pool *pool, u32 count);
+>  void *xp_raw_get_data(struct xsk_buff_pool *pool, u64 addr);
+>  dma_addr_t xp_raw_get_dma(struct xsk_buff_pool *pool, u64 addr);
+> +
+> +struct xdp_desc_ctx {
+> +	dma_addr_t dma;
+> +	struct xsk_tx_metadata *meta;
+> +};
+> +
+> +struct xdp_desc_ctx xp_raw_get_ctx(const struct xsk_buff_pool *pool, u64 addr);
+> +
+>  static inline dma_addr_t xp_get_dma(struct xdp_buff_xsk *xskb)
+>  {
+>  	return xskb->dma;
+> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> index ae71da7d2cd6..02c42caec9f4 100644
+> --- a/net/xdp/xsk_buff_pool.c
+> +++ b/net/xdp/xsk_buff_pool.c
+> @@ -715,3 +715,43 @@ dma_addr_t xp_raw_get_dma(struct xsk_buff_pool *pool, u64 addr)
+>  		(addr & ~PAGE_MASK);
+>  }
+>  EXPORT_SYMBOL(xp_raw_get_dma);
+> +
+> +/**
+> + * xp_raw_get_ctx - get &xdp_desc context
+> + * @pool: XSk buff pool desc address belongs to
+> + * @addr: desc address (from userspace)
+> + *
+> + * Helper for getting desc's DMA address and metadata pointer, if present.
+> + * Saves one call on hotpath, double calculation of the actual address,
+> + * and inline checks for metadata presence and sanity.
+> + * Please use xsk_buff_raw_get_ctx() in drivers instead.
+> + *
+> + * Return: new &xdp_desc_ctx struct containing desc's DMA address and metadata
+> + * pointer, if it is present and valid (initialized to %NULL otherwise).
+> + */
+> +struct xdp_desc_ctx xp_raw_get_ctx(const struct xsk_buff_pool *pool, u64 addr)
+> +{
+> +	struct xsk_tx_metadata *meta;
+> +	struct xdp_desc_ctx ret;
+> +
+> +	addr = pool->unaligned ? xp_unaligned_add_offset_to_addr(addr) : addr;
+> +	ret = (typeof(ret)){
+> +		/* Same logic as in xp_raw_get_dma() */
+> +		.dma	= (pool->dma_pages[addr >> PAGE_SHIFT] &
+> +			   ~XSK_NEXT_PG_CONTIG_MASK) + (addr & ~PAGE_MASK),
+> +	};
+> +
+> +	if (!pool->tx_metadata_len)
+> +		goto out;
+> +
+> +	/* Same logic as in xp_raw_get_data() + xsk_buff_get_metadata() */
+> +	meta = pool->addrs + addr - pool->tx_metadata_len;
+> +	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
+> +		goto out;
+> +
+> +	ret.meta = meta;
+> +
+> +out:
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(xp_raw_get_ctx);
 > -- 
-> 2.45.2
+> 2.46.2
 > 
-
--- 
-மணிவண்ணன் சதாசிவம்
 
