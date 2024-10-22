@@ -1,296 +1,210 @@
-Return-Path: <netdev+bounces-137983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7A8E9AB5C5
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:10:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF889AB5CB
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B664B23940
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:10:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABD6DB2353E
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC101C9EB8;
-	Tue, 22 Oct 2024 18:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C7F1C9DE6;
+	Tue, 22 Oct 2024 18:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XKCnXBZt"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dHkIGz66"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931E81C9DFA;
-	Tue, 22 Oct 2024 18:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8CA1BDA84
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 18:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729620604; cv=none; b=PH/UfDnJKLwk4wNHHsI2w7YUO1XwM9QXLzCqpbvHZ5HbiPe6JpBbv/dUqqxNSnp3OQCd1eHq2EQWslmgfDI5HnRkcrz/qWeBG6vD0evkopHkzVhcWR/TUz8SiaRBiNNNrtUYShrsU+6kUGGi2M6gULv4Q7dHe9QPeNnu1kOa9oM=
+	t=1729620690; cv=none; b=pIGpNUQTJO4KEOoDfcoxG2m0Tbimyv/xKPygEa9z0wK2RpTKcpkQIwkDaPF+Ge7XgE3BLqB7HQuVQjq5CSxXLDK3OZlynFiadcDNmHLQIhCaIcJ7DihVN/UYaLkwzN6bQj4q3md/UOE4Lkh/UhVNRU+Z1eHJzOvKYN5YZjvGirw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729620604; c=relaxed/simple;
-	bh=Nq8Jdmiwq7WCGmATlFb2otP/fjTsQuLclZaTiLGwKYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SC1L+B01LYYB92I1BE9khhGUaMK3OYPDUWmtl2Zkuoiy7eDtKviFKRJHpG3NQAKPkvBXoChgDVtr1zrHREh4YD2auX1lzWpmo2nkc5KcrwyzbKSbLqdtJK3c02IQKbXNQwlLEaSqNSglI56o9s6g47PRsg+hNDnBHw6DfC8yRY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XKCnXBZt; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729620601; x=1761156601;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Nq8Jdmiwq7WCGmATlFb2otP/fjTsQuLclZaTiLGwKYY=;
-  b=XKCnXBZtpLTHZT8jq+00LbbLAWqqk2rI9fJycfUj1G+ez+6Wsb9Uhgkr
-   yWH17FvdI8cYE8556sjVdk67z3JOp74LPin2beUgfF1+hyuikIiP8NNQO
-   ovkr4uGZTsyP2LPsAOwQZipnSiyWMzy7nABCOFzhOUwVUP8Rl5oSJvRSa
-   qbLUxTMTd3Riz3ybGJtTN0otvKkSE7EkUljc1GdIaN3J4RUAOVGz52PO/
-   kcJPOL5kLyI1QlHjnDkZ/JKsTHXKGnWz8N0NMbUXiNIr7tIhAJOSXKa7f
-   xTdk4O0fSjRALpR8TO5W8mnx1gdAbV3hhVB+ZbQSAuTf4jGeM+Hmi9qyK
-   w==;
-X-CSE-ConnectionGUID: Udw4PVERQVygKmYsM6hPFg==
-X-CSE-MsgGUID: wcAYjCzlS+SVS10yQyNl4g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="32869503"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="32869503"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 11:10:01 -0700
-X-CSE-ConnectionGUID: GwlngA8XStyXbJqz5y0+2w==
-X-CSE-MsgGUID: Ol9EXL3fTwC9YvdVrBc0Mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
-   d="scan'208";a="80363724"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 22 Oct 2024 11:09:54 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t3JKJ-000TvD-1K;
-	Tue, 22 Oct 2024 18:09:51 +0000
-Date: Wed, 23 Oct 2024 02:09:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Puranjay Mohan <puranjay@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Helge Deller <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Shuah Khan <skhan@linuxfoundation.org>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next 2/5] bpf: bpf_csum_diff: optimize and homogenize
- for all archs
-Message-ID: <202410230122.BYZLEUHz-lkp@intel.com>
-References: <20241021122112.101513-3-puranjay@kernel.org>
+	s=arc-20240116; t=1729620690; c=relaxed/simple;
+	bh=4fUh/Y5Wu/2hZYMxBvSfyM0BJWo+IgP4cjxDEkuvIoU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JHGW8fI2yk9eA0U9bFrrNBuf3aFQ77+KTxACrVZ7zNoLgaitat1MKZGfh9skHBZGBgFPEbb7OByvK1i6Z6ECgsZ/QkI++pXESpeO/uG2VYTk2e5Soi1aMhQRwzh0ZSvvWrtS3W9+hxXJ5yS7voXkivEsUXdbm4sMsg0odWniYFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dHkIGz66; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so65488161fa.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 11:11:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1729620685; x=1730225485; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IxX9XE7Bu14uzEO7ETrCqQQOfswrKYUdi+DacsDonWk=;
+        b=dHkIGz66Sk5RVXqU9GtKEEbIkDoPNIcM1t4xOqc87L7BK9MrAgeNq5AhuRsQJYUrDq
+         /cjoROwOTrL1Wbx7rIEW9lUXLrdktqmDkcLLD2USfv3oJSKF5cGtHwK0yQOCjUJL7siR
+         NKs9XrWy6rw3x/CwIvo2UsOcrP10nexVX2vak=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729620685; x=1730225485;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IxX9XE7Bu14uzEO7ETrCqQQOfswrKYUdi+DacsDonWk=;
+        b=LIJAY2/3UZlH8trQv8SZlYwRPUW+AnV2wyeqmH8VsIDA/gZXR7jLsn0pN2+0YdNBxe
+         R28WskhTB+o+UXGpv9+fTfHWRM38oM8AmkzSgGDk12W9NjKVutu116sG5ITZ83IHT1gn
+         mOEOqFqviEbi8V1uEQZR6eDqEStCZUfZROFeRXi9q8eNwxSQQx1Vk1Yc5Ja0KB8ZE2ah
+         M0LuOwlusFyh1hob0XRvS96el96/u/aMwomFH6ogH5t20WQqOpuYZPeIfYuO+thlQDrj
+         i9qrNbKlQHsMHf3nW6lcuqGdFedHcT28oE98cjMQ+IJoqT090ianMaRkPdl3RTnfx+0g
+         Qo5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWIFhYZ/DOzkeNGVHHf2WKiUEHQ7crenyCz8PArYZUlfsZA9X3WDLJIRFpDSDel6yJYoiThyLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAZaL4mDx+QfMdpMZfZs37DIvO83FAFhTjBmAxG1h85XhZIi+g
+	eCwXNsfSnf6xeCmUd+I6KidsncfuB37SuWpiZ/eicsWPksGMUH0KLiA6mdyd53FzIEYWALLopt/
+	3pdL0+7W6uO0/3p4w2XaeTQZI6UkZwNDoONUW
+X-Google-Smtp-Source: AGHT+IF1lvYbetIHrryAdh+jmeC5rJO5rAiidyzmaALJvxxCwL4J2paIXfTnO/FOGo6ANr8RE57YXdoA+RN0fF/TxZw=
+X-Received: by 2002:a05:651c:2112:b0:2fb:6169:c42a with SMTP id
+ 38308e7fff4ca-2fc93341785mr21602731fa.30.1729620684671; Tue, 22 Oct 2024
+ 11:11:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021122112.101513-3-puranjay@kernel.org>
+References: <20241021191233.1334897-1-dualli@chromium.org> <20241021191233.1334897-2-dualli@chromium.org>
+ <20241022170625.GJ402847@kernel.org>
+In-Reply-To: <20241022170625.GJ402847@kernel.org>
+From: Li Li <dualli@chromium.org>
+Date: Tue, 22 Oct 2024 11:11:13 -0700
+Message-ID: <CANBPYPh97difTKrD=a6A-0sOVwZS28K=BvH37-62Z5FUO+kNUg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/1] binder: report txn errors via generic netlink (genl)
+To: Simon Horman <horms@kernel.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
+	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
+	brauner@kernel.org, cmllamas@google.com, surenb@google.com, arnd@arndb.de, 
+	masahiroy@kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, hridya@google.com, smoreland@google.com, 
+	kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Puranjay,
+On Tue, Oct 22, 2024 at 10:06=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Mon, Oct 21, 2024 at 12:12:33PM -0700, Li Li wrote:
+> > + * @pid:     the target process
+> > + * @flags:   the flags to set
+> > + *
+> > + * If pid is 0, the flags are applied to the whole binder context.
+> > + * Otherwise, the flags are applied to the specific process only.
+> > + */
+> > +static int binder_genl_set_report(struct binder_context *context, u32 =
+pid, u32 flags)
+>
+> ...
+>
+> >  static int __init init_binder_device(const char *name)
+> >  {
+> >       int ret;
+> > @@ -6920,6 +7196,11 @@ static int __init init_binder_device(const char =
+*name)
+>
+> The code above this hunk looks like this:
+>
+>
+>         ret =3D misc_register(&binder_device->miscdev);
+>         if (ret < 0) {
+>                 kfree(binder_device);
+>                 return ret;
+>         }
+>
+> >
+> >       hlist_add_head(&binder_device->hlist, &binder_devices);
+> >
+> > +     binder_device->context.report_seq =3D (atomic_t)ATOMIC_INIT(0);
+> > +     ret =3D binder_genl_init(&binder_device->context.genl_family, nam=
+e);
+> > +     if (ret < 0)
+> > +             kfree(binder_device);
+>
+> So I think that binder_device->miscdev needs to be misc_deregister'ed
+> if we hit this error condition.
+>
+> > +
+> >       return ret;
+>
+> Probably adding an unwind ladder like this makes sense (completely untest=
+ed!):
+>
+>         ret =3D misc_register(&binder_device->miscdev);
+>         if (ret < 0)
+>                 goto err_misc_deregister;
+>
+>         hlist_add_head(&binder_device->hlist, &binder_devices);
+>
+>         binder_device->context.report_seq =3D (atomic_t)ATOMIC_INIT(0);
+>         ret =3D binder_genl_init(&binder_device->context.genl_family, nam=
+e);
+>         if (ret < 0);
+>                 goto err_misc_deregister;
+>
+>         return 0;
+>
+> err_misc_deregister:
+>         misc_deregister(&binder_device->miscdev);
+> err_free_dev:
+>         kfree(binder_device);
+>         return ret;
+>
 
-kernel test robot noticed the following build warnings:
+Good catch! Will fix it in the next revision.
 
-[auto build test WARNING on bpf-next/master]
+> ...
+>
+> > diff --git a/drivers/android/binder_genl.h b/drivers/android/binder_gen=
+l.h
+>
+> Perhaps it is because of a different version of net-next,
+> but with this patch applied on top of the current head commit
+> 13feb6074a9f ("binder: report txn errors via generic netlink (genl)")
+> I see:
+>
+> $ ./tools/net/ynl/ynl-regen.sh -f
+> $ git diff
+>
+> diff --git a/include/uapi/linux/android/binder_genl.h b/include/uapi/linu=
+x/android/binder_genl.h
+> index ef5289133be5..93e58b370420 100644
+> --- a/include/uapi/linux/android/binder_genl.h
+> +++ b/include/uapi/linux/android/binder_genl.h
+> @@ -3,12 +3,17 @@
+>  /*     Documentation/netlink/specs/binder_genl.yaml */
+>  /* YNL-GEN uapi header */
+>
+> -#ifndef _UAPI_LINUX_BINDER_GENL_H
+> -#define _UAPI_LINUX_BINDER_GENL_H
+> +#ifndef _UAPI_LINUX_ANDROID/BINDER_GENL_H
+> +#define _UAPI_LINUX_ANDROID/BINDER_GENL_H
+>
+>  #define BINDER_GENL_FAMILY_NAME                "binder_genl"
+>  #define BINDER_GENL_FAMILY_VERSION     1
+>
+> +/**
+> + * enum binder_genl_flag - Used with "set" and "reply" command below, de=
+fining
+> + *   what kind \ of binder transactions should be reported to the user s=
+pace \
+> + *   administration process.
+> + */
+>  enum binder_genl_flag {
+>         BINDER_GENL_FLAG_FAILED =3D 1,
+>         BINDER_GENL_FLAG_DELAYED =3D 2,
+> @@ -34,4 +39,4 @@ enum {
+>         BINDER_GENL_CMD_MAX =3D (__BINDER_GENL_CMD_MAX - 1)
+>  };
+>
+> -#endif /* _UAPI_LINUX_BINDER_GENL_H */
+> +#endif /* _UAPI_LINUX_ANDROID/BINDER_GENL_H */
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Puranjay-Mohan/net-checksum-move-from32to16-to-generic-header/20241021-202707
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20241021122112.101513-3-puranjay%40kernel.org
-patch subject: [PATCH bpf-next 2/5] bpf: bpf_csum_diff: optimize and homogenize for all archs
-config: x86_64-randconfig-122-20241022 (https://download.01.org/0day-ci/archive/20241023/202410230122.BYZLEUHz-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241023/202410230122.BYZLEUHz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410230122.BYZLEUHz-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
-   net/core/filter.c:1423:39: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sock_filter const *filter @@     got struct sock_filter [noderef] __user *filter @@
-   net/core/filter.c:1423:39: sparse:     expected struct sock_filter const *filter
-   net/core/filter.c:1423:39: sparse:     got struct sock_filter [noderef] __user *filter
-   net/core/filter.c:1501:39: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sock_filter const *filter @@     got struct sock_filter [noderef] __user *filter @@
-   net/core/filter.c:1501:39: sparse:     expected struct sock_filter const *filter
-   net/core/filter.c:1501:39: sparse:     got struct sock_filter [noderef] __user *filter
-   net/core/filter.c:2321:45: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] daddr @@     got unsigned int [usertype] ipv4_nh @@
-   net/core/filter.c:2321:45: sparse:     expected restricted __be32 [usertype] daddr
-   net/core/filter.c:2321:45: sparse:     got unsigned int [usertype] ipv4_nh
-   net/core/filter.c:10993:31: sparse: sparse: symbol 'sk_filter_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11000:27: sparse: sparse: symbol 'sk_filter_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11004:31: sparse: sparse: symbol 'tc_cls_act_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11013:27: sparse: sparse: symbol 'tc_cls_act_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11017:31: sparse: sparse: symbol 'xdp_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11029:31: sparse: sparse: symbol 'cg_skb_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11035:27: sparse: sparse: symbol 'cg_skb_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11039:31: sparse: sparse: symbol 'lwt_in_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11045:27: sparse: sparse: symbol 'lwt_in_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11049:31: sparse: sparse: symbol 'lwt_out_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11055:27: sparse: sparse: symbol 'lwt_out_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11059:31: sparse: sparse: symbol 'lwt_xmit_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11066:27: sparse: sparse: symbol 'lwt_xmit_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11070:31: sparse: sparse: symbol 'lwt_seg6local_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11076:27: sparse: sparse: symbol 'lwt_seg6local_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11079:31: sparse: sparse: symbol 'cg_sock_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11085:27: sparse: sparse: symbol 'cg_sock_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11088:31: sparse: sparse: symbol 'cg_sock_addr_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11094:27: sparse: sparse: symbol 'cg_sock_addr_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11097:31: sparse: sparse: symbol 'sock_ops_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11103:27: sparse: sparse: symbol 'sock_ops_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11106:31: sparse: sparse: symbol 'sk_skb_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11113:27: sparse: sparse: symbol 'sk_skb_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11116:31: sparse: sparse: symbol 'sk_msg_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11123:27: sparse: sparse: symbol 'sk_msg_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11126:31: sparse: sparse: symbol 'flow_dissector_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11132:27: sparse: sparse: symbol 'flow_dissector_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11460:31: sparse: sparse: symbol 'sk_reuseport_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:11466:27: sparse: sparse: symbol 'sk_reuseport_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11668:27: sparse: sparse: symbol 'sk_lookup_prog_ops' was not declared. Should it be static?
-   net/core/filter.c:11672:31: sparse: sparse: symbol 'sk_lookup_verifier_ops' was not declared. Should it be static?
-   net/core/filter.c:1931:43: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __wsum [usertype] diff @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1931:43: sparse:     expected restricted __wsum [usertype] diff
-   net/core/filter.c:1931:43: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1934:36: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be16 [usertype] old @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:1934:36: sparse:     expected restricted __be16 [usertype] old
-   net/core/filter.c:1934:36: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:1934:42: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be16 [usertype] new @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1934:42: sparse:     expected restricted __be16 [usertype] new
-   net/core/filter.c:1934:42: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1937:36: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] from @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:1937:36: sparse:     expected restricted __be32 [usertype] from
-   net/core/filter.c:1937:36: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:1937:42: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] to @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1937:42: sparse:     expected restricted __be32 [usertype] to
-   net/core/filter.c:1937:42: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1982:59: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __wsum [usertype] diff @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1982:59: sparse:     expected restricted __wsum [usertype] diff
-   net/core/filter.c:1982:59: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1985:52: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be16 [usertype] from @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:1985:52: sparse:     expected restricted __be16 [usertype] from
-   net/core/filter.c:1985:52: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:1985:58: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted __be16 [usertype] to @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1985:58: sparse:     expected restricted __be16 [usertype] to
-   net/core/filter.c:1985:58: sparse:     got unsigned long long [usertype] to
-   net/core/filter.c:1988:52: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] from @@     got unsigned long long [usertype] from @@
-   net/core/filter.c:1988:52: sparse:     expected restricted __be32 [usertype] from
-   net/core/filter.c:1988:52: sparse:     got unsigned long long [usertype] from
-   net/core/filter.c:1988:58: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted __be32 [usertype] to @@     got unsigned long long [usertype] to @@
-   net/core/filter.c:1988:58: sparse:     expected restricted __be32 [usertype] to
-   net/core/filter.c:1988:58: sparse:     got unsigned long long [usertype] to
->> net/core/filter.c:2023:39: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __sum16 @@
-   net/core/filter.c:2023:39: sparse:     expected unsigned long long
-   net/core/filter.c:2023:39: sparse:     got restricted __sum16
-   net/core/filter.c:2026:39: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __sum16 @@
-   net/core/filter.c:2026:39: sparse:     expected unsigned long long
-   net/core/filter.c:2026:39: sparse:     got restricted __sum16
-   net/core/filter.c:2029:39: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __sum16 @@
-   net/core/filter.c:2029:39: sparse:     expected unsigned long long
-   net/core/filter.c:2029:39: sparse:     got restricted __sum16
->> net/core/filter.c:2031:16: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __wsum [usertype] seed @@
-   net/core/filter.c:2031:16: sparse:     expected unsigned long long
-   net/core/filter.c:2031:16: sparse:     got restricted __wsum [usertype] seed
-   net/core/filter.c:2053:35: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __wsum [usertype] csum @@
-   net/core/filter.c:2053:35: sparse:     expected unsigned long long
-   net/core/filter.c:2053:35: sparse:     got restricted __wsum [usertype] csum
-
-vim +2023 net/core/filter.c
-
-  1956	
-  1957	BPF_CALL_5(bpf_l4_csum_replace, struct sk_buff *, skb, u32, offset,
-  1958		   u64, from, u64, to, u64, flags)
-  1959	{
-  1960		bool is_pseudo = flags & BPF_F_PSEUDO_HDR;
-  1961		bool is_mmzero = flags & BPF_F_MARK_MANGLED_0;
-  1962		bool do_mforce = flags & BPF_F_MARK_ENFORCE;
-  1963		__sum16 *ptr;
-  1964	
-  1965		if (unlikely(flags & ~(BPF_F_MARK_MANGLED_0 | BPF_F_MARK_ENFORCE |
-  1966				       BPF_F_PSEUDO_HDR | BPF_F_HDR_FIELD_MASK)))
-  1967			return -EINVAL;
-  1968		if (unlikely(offset > 0xffff || offset & 1))
-  1969			return -EFAULT;
-  1970		if (unlikely(bpf_try_make_writable(skb, offset + sizeof(*ptr))))
-  1971			return -EFAULT;
-  1972	
-  1973		ptr = (__sum16 *)(skb->data + offset);
-  1974		if (is_mmzero && !do_mforce && !*ptr)
-  1975			return 0;
-  1976	
-  1977		switch (flags & BPF_F_HDR_FIELD_MASK) {
-  1978		case 0:
-  1979			if (unlikely(from != 0))
-  1980				return -EINVAL;
-  1981	
-  1982			inet_proto_csum_replace_by_diff(ptr, skb, to, is_pseudo);
-  1983			break;
-  1984		case 2:
-> 1985			inet_proto_csum_replace2(ptr, skb, from, to, is_pseudo);
-  1986			break;
-  1987		case 4:
-  1988			inet_proto_csum_replace4(ptr, skb, from, to, is_pseudo);
-  1989			break;
-  1990		default:
-  1991			return -EINVAL;
-  1992		}
-  1993	
-  1994		if (is_mmzero && !*ptr)
-  1995			*ptr = CSUM_MANGLED_0;
-  1996		return 0;
-  1997	}
-  1998	
-  1999	static const struct bpf_func_proto bpf_l4_csum_replace_proto = {
-  2000		.func		= bpf_l4_csum_replace,
-  2001		.gpl_only	= false,
-  2002		.ret_type	= RET_INTEGER,
-  2003		.arg1_type	= ARG_PTR_TO_CTX,
-  2004		.arg2_type	= ARG_ANYTHING,
-  2005		.arg3_type	= ARG_ANYTHING,
-  2006		.arg4_type	= ARG_ANYTHING,
-  2007		.arg5_type	= ARG_ANYTHING,
-  2008	};
-  2009	
-  2010	BPF_CALL_5(bpf_csum_diff, __be32 *, from, u32, from_size,
-  2011		   __be32 *, to, u32, to_size, __wsum, seed)
-  2012	{
-  2013		/* This is quite flexible, some examples:
-  2014		 *
-  2015		 * from_size == 0, to_size > 0,  seed := csum --> pushing data
-  2016		 * from_size > 0,  to_size == 0, seed := csum --> pulling data
-  2017		 * from_size > 0,  to_size > 0,  seed := 0    --> diffing data
-  2018		 *
-  2019		 * Even for diffing, from_size and to_size don't need to be equal.
-  2020		 */
-  2021	
-  2022		if (from_size && to_size)
-> 2023			return csum_from32to16(csum_sub(csum_partial(to, to_size, seed),
-  2024							csum_partial(from, from_size, 0)));
-  2025		if (to_size)
-  2026			return csum_from32to16(csum_partial(to, to_size, seed));
-  2027	
-  2028		if (from_size)
-  2029			return csum_from32to16(~csum_partial(from, from_size, ~seed));
-  2030	
-> 2031		return seed;
-  2032	}
-  2033	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The patch was based on the top of Linus's tree instead of net-next.
+I'll investigate this difference.
 
