@@ -1,163 +1,122 @@
-Return-Path: <netdev+bounces-137804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8559A9E62
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:23:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6989A9E6B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF5D28212F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:23:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49C3A1F21592
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805B3198833;
-	Tue, 22 Oct 2024 09:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C51D1991C2;
+	Tue, 22 Oct 2024 09:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BupHsRmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A49198E7F;
-	Tue, 22 Oct 2024 09:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974DE1991B5
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729588984; cv=none; b=cnBcdD7cOY4VWxdy054jvRBkSaxRuX/fxAWJ6mZ+X54ggY3Z+xGY+IAEFcDIRwU30gJpud4RTo/cHpdlXmbMSvCpbo+lp9F+AyLbyRY+tdrW1Yb4H/g/AIoQS7f1wHQNgwsudwDpuFTZgn1ofGdM3f2WJ6P9V2uTq4clnzgz/gQ=
+	t=1729589019; cv=none; b=QiXv2IxUAj0GVGurXFxmtlhYwdBXi6OPxsTcAg9nFL8WJVWtpEdu+QRHPc9AejzVsxJRiBiRKpTvSLiEhfk0APRka0CL3wZnMKfT6ZnOw5cgVKOIyiobPyfT6E2klpiIf6xgcWnvAoN7sfRn6VMZlR0lBU7aE/LoeDIlabVCnnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729588984; c=relaxed/simple;
-	bh=kJ2S20Sg7oN3zYohr7hzpWZrhh5+78y+mYTmv+AwEIY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rBRdnlMEOOY1x6yx7iqdkBqVlT3TI3Ae3DU5SfqqLsVVeTa2WMSsawKjCELysQUq2kdPVdOVQ8MQOmYTMU5DvFwppLqV1j4FoUbq7b70i7/+mAS2XM88+HUVPLNpFz/avBhV3BLLD1EmbkHnzQJdyK6nyROp98v2YDARaUvuGE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XXmrB3N3Pz10N0G;
-	Tue, 22 Oct 2024 17:20:58 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0E0C4140360;
-	Tue, 22 Oct 2024 17:22:59 +0800 (CST)
-Received: from [10.174.179.113] (10.174.179.113) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 22 Oct 2024 17:22:58 +0800
-Message-ID: <8ab6afec-b021-5327-9be4-c58c1e29b874@huawei.com>
-Date: Tue, 22 Oct 2024 17:22:57 +0800
+	s=arc-20240116; t=1729589019; c=relaxed/simple;
+	bh=BwvEDWO2ONrOGKBDpF/Y9LOF59H0FbsJzedCitZn2iQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZrKFbH/XEBpwVIVXQjNBpymRmXiqewQzRXa9nQ0KI4i6qY8uERsItUdXdOBuDaiUKzxmm3LpbEllle4bPxnwZuDi+RAh9xqvIqpi2IJ7RlX/znHB1Np3y76r1SN3yQdbBoJ7Z0hJWsmGmuGUr7VnRM/VALyocT3JgBihaPL/Q5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BupHsRmK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729589016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lwaG/c5R9PyY0LVwY5/sfl7H0UKEAwsoDPRTXGHqXbk=;
+	b=BupHsRmKnb1iupyi8QPsUTHvzOR/4ubko1awq/QnmEaaHwOH4S42eeCHGLqBXMFo8HlytW
+	OFX2gUjs/hipyUcYufnLXjpNYVTKgcz5I24odDL3uSXUFdchl2r9BGij75VGIWFO3JrGwb
+	+4GzELSTHf45Fjy7JgEcq2hdvKrDYeA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-zNOEOpF1Mfuu5d58PEkMpA-1; Tue, 22 Oct 2024 05:23:34 -0400
+X-MC-Unique: zNOEOpF1Mfuu5d58PEkMpA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d4922d8c7so2844811f8f.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:23:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729589014; x=1730193814;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lwaG/c5R9PyY0LVwY5/sfl7H0UKEAwsoDPRTXGHqXbk=;
+        b=RBSepUfZNTZBHgsM+QWUd5JBgbGpH9dqQMgPTUPPqm0LcFjKoxIbhaq1qQY1pjh3k3
+         hnLN4u+gswEIXUwM9ZWjk8s03lY2oh1JTeiK8W2xL9RJiQ7xu25TEz3o1lEzg8ZI9lSA
+         VzBaC7fVHa/X0KPoIItR0DMOrLORinx17Z+FyksFK+nvrahD5GAliZcWo6k60SxrXhOg
+         a+fo9lgYaVrJuXiaA90bqrNaXoJ+NV9G5ArphKWwOIW4CIsFo1AcaD8zlHyFR5hMdGuc
+         Mkt9n45i2yKfJwdF5vUQkpr3BvPHG5xNHq/hrQ0QgoI1LGp6nudnM0JDEEXXa4nZFNKS
+         o9Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzOrr3UYtx4c7wPOPpJ9ZSKt1XlSEMlzdRy7nd+d6112ULKN9ufSPu+UNKAfea3YzFqzZ4Lag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUOIl0fE+hbVyEnTcE967a3ymePWMiLFhbyy8bmL0SwV2ZhOw0
+	qYyD3VKPUjuHP0bY9XhBBlKPLMfh8t3bGr6+nNBF479ZQN8aShmHjUT70Xag/N/fiwZJlzaidHx
+	4SWEBmHw0yxJ4cC6Iy36lHHWcj6NcoR92EjGwzWhq2IzNp5/JjXsbZQ==
+X-Received: by 2002:a5d:58d2:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-37ea21370eamr9413743f8f.9.1729589013600;
+        Tue, 22 Oct 2024 02:23:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGABcPaq8PgmpfrgbIv7V6Y5QW9A/aP7VQTgUwLfJqvVEOm2uyGhoErcFVMPcfpZBwcFX8SYQ==
+X-Received: by 2002:a5d:58d2:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-37ea21370eamr9413732f8f.9.1729589013212;
+        Tue, 22 Oct 2024 02:23:33 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9b076sm6176529f8f.90.2024.10.22.02.23.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2024 02:23:32 -0700 (PDT)
+Message-ID: <e5aefe89-ef71-4e50-ab3a-ac0e72b99fa7@redhat.com>
+Date: Tue, 22 Oct 2024 11:23:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/7] net: pcs: xpcs: yet more cleanups
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jose Abreu <Jose.Abreu@synopsys.com>, netdev@vger.kernel.org
+References: <ZxD6cVFajwBlC9eN@shell.armlinux.org.uk>
+ <ZxdpicVgg8F3beow@shell.armlinux.org.uk>
 Content-Language: en-US
-To: Dong Chenchen <dongchenchen2@huawei.com>, <pablo@netfilter.org>,
-	<kadlec@netfilter.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <fw@strlen.de>, <kuniyu@amazon.com>
-CC: <netfilter-devel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241022085753.2069639-1-dongchenchen2@huawei.com>
-From: Yue Haibing <yuehaibing@huawei.com>
-In-Reply-To: <20241022085753.2069639-1-dongchenchen2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZxdpicVgg8F3beow@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf500002.china.huawei.com (7.185.36.57)
 
-On 2024/10/22 16:57, Dong Chenchen wrote:
-> ip6table_nat module unload has refcnt warning for UAF. call trace is:
+On 10/22/24 10:59, Russell King (Oracle) wrote:
+> I see patchwork has failed again. It claims this series does not have a
+> cover letter, but it does, and lore has it:
 > 
-> WARNING: CPU: 1 PID: 379 at kernel/module/main.c:853 module_put+0x6f/0x80
-> Modules linked in: ip6table_nat(-)
-> CPU: 1 UID: 0 PID: 379 Comm: ip6tables Not tainted 6.12.0-rc4-00047-gc2ee9f594da8-dirty #205
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:module_put+0x6f/0x80
-> Call Trace:
->  <TASK>
->  get_info+0x128/0x180
->  do_ip6t_get_ctl+0x6a/0x430
->  nf_getsockopt+0x46/0x80
->  ipv6_getsockopt+0xb9/0x100
->  rawv6_getsockopt+0x42/0x190
->  do_sock_getsockopt+0xaa/0x180
->  __sys_getsockopt+0x70/0xc0
->  __x64_sys_getsockopt+0x20/0x30
->  do_syscall_64+0xa2/0x1a0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> https://lore.kernel.org/all/ZxD6cVFajwBlC9eN@shell.armlinux.org.uk/
 > 
-> Concurrent execution of module unload and get_info() trigered the warning.
-> The root cause is as follows:
+> vs
 > 
-> cpu0				      cpu1
-> module_exit
-> //mod->state = MODULE_STATE_GOING
->   ip6table_nat_exit
->     xt_unregister_template
->     //remove table from templ list
-> 				      getinfo()
-> 					  t = xt_find_table_lock
-> 						list_for_each_entry(tmpl, &xt_templates[af]...)
-> 							if (strcmp(tmpl->name, name))
-> 								continue;  //table not found
-> 							try_module_get
-> 						list_for_each_entry(t, &xt_net->tables[af]...)
-> 							return t;  //not get refcnt
-> 					  module_put(t->me) //uaf
->     unregister_pernet_subsys
->     //remove table from xt_net list
+> https://patchwork.kernel.org/project/netdevbpf/patch/E1t1P3X-000EJx-ES@rmk-PC.armlinux.org.uk/
 > 
-> While xt_table module was going away and has been removed from
-> xt_templates list, we couldnt get refcnt of xt_table->me. Skip
-> the re-traversal of xt_net->tables list to fix it.
-> 
-> Fixes: c22921df777d ("netfilter: iptables: Fix potential null-ptr-deref in ip6table_nat_table_init().")
+> I guess the kernel.org infrastructure has failed in some way to deliver
+> the cover message to patchwork.
 
-This should be
-Fixes: fdacd57c79b7 ("netfilter: x_tables: never register tables by default")
+Thanks for the head-up!
 
-> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
-> ---
->  net/netfilter/x_tables.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
-> index da5d929c7c85..359c880ecb07 100644
-> --- a/net/netfilter/x_tables.c
-> +++ b/net/netfilter/x_tables.c
-> @@ -1239,6 +1239,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
->  	struct module *owner = NULL;
->  	struct xt_template *tmpl;
->  	struct xt_table *t;
-> +	int err = -ENOENT;
->  
->  	mutex_lock(&xt[af].mutex);
->  	list_for_each_entry(t, &xt_net->tables[af], list)
-> @@ -1247,8 +1248,6 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
->  
->  	/* Table doesn't exist in this netns, check larval list */
->  	list_for_each_entry(tmpl, &xt_templates[af], list) {
-> -		int err;
-> -
->  		if (strcmp(tmpl->name, name))
->  			continue;
->  		if (!try_module_get(tmpl->me))
-> @@ -1267,6 +1266,9 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
->  		break;
->  	}
->  
-> +	if (err < 0)
-> +		goto out;
-> +
->  	/* and once again: */
->  	list_for_each_entry(t, &xt_net->tables[af], list)
->  		if (strcmp(t->name, name) == 0)
-> @@ -1275,7 +1277,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
->  	module_put(owner);
->   out:
->  	mutex_unlock(&xt[af].mutex);
-> -	return ERR_PTR(-ENOENT);
-> +	return ERR_PTR(err);
->  }
->  EXPORT_SYMBOL_GPL(xt_find_table_lock);
->  
+I can't investigate the issue any deeper than you, lacking permissions
+on the relevant hosts, but I verified that the merged script fetch the
+cover letter correctly, so no need to repost just for that.
+
+Cheers,
+
+Paolo
+
 
