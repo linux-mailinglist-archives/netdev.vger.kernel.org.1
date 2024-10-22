@@ -1,195 +1,185 @@
-Return-Path: <netdev+bounces-137763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11EC49A9AED
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:26:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06609A9AF7
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DAC7B23CAF
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:26:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52478B24494
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F6414F124;
-	Tue, 22 Oct 2024 07:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E562C15250F;
+	Tue, 22 Oct 2024 07:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DqBLPZtM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rW5Jha/0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE6914A4F0;
-	Tue, 22 Oct 2024 07:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1642E1494BF
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 07:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729581944; cv=none; b=Jk6KtcYnOiVGd1dio/QeYjZYsCc6ZXIV4EVjI7PwGA6dgnEY1Kyhb4eqb9MG1Ajp79HhkM4FYyzIPU0If2noR/p3vW1X7czuu/hWIjKT80fXvOGVS7zK5Ujv4ECEruqfj3eoyz7/G01vIeD5Q+zRr/rDxlPH2Zl59uFwy4UL4C0=
+	t=1729581987; cv=none; b=Nuov1K325FpM/uTD1kdo5QhpHi0SlG//WTBsvndNoYk8ua3Li9a2I/2DUnvNnAJOIc8Ymzd2ovMoOU4JbjA4V4tbtwrhv0l42lE8y2rIpQByyfgLU68lUKXEY1QhM4egZAsnHKaKr98IoduREZz5sqMFlhUhreEstfswq7fynus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729581944; c=relaxed/simple;
-	bh=RPBvFd0csLQUXJSE14s/so+mpDpWxuoXRgoonDdlEEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i4gTd4QZFwuzzE41us3pkfs5pf8UhP0LQgE7kaVaqPviDxuwinO5lPVT4OlaKGErZS+tKI+7QSwts5Su6d3WVfIOGFecn8Mm9cHEnqqFaOYvqu0FxeQmEYCH4dTG9pfX8NZXDHDzT6l1G0moLJGV/GHg2HJiaA0NylTW3qHhW/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DqBLPZtM; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9932aa108cso784929966b.2;
-        Tue, 22 Oct 2024 00:25:42 -0700 (PDT)
+	s=arc-20240116; t=1729581987; c=relaxed/simple;
+	bh=QXftKrPb3VEFG7E4D13QJJzYRnaqeJinmUo5nLfm0nk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TKxtZt8/pxo9yTeTFyWnDK5HUdUV5u7bN5HwDVtnozuBkAJ3ynDRhn+tnH1+9EeMEfaHui/XGvgLgyfgROFK5LKy+6s/tEEJifq8woJiPX4hps2RGr4pKxdGNHXVLlwv5n5jr0PLQANqwAGhN/mWp3rOs1SwFMV5/Wy/0pTMZzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rW5Jha/0; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5cb615671acso1649664a12.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 00:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729581941; x=1730186741; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RPBvFd0csLQUXJSE14s/so+mpDpWxuoXRgoonDdlEEs=;
-        b=DqBLPZtMJSnCdh5DdJxF9VP2/VvWUARqX5G8V5K90RqMBI7B4iVZ9Z2CAwOxxj6ZUi
-         MQG9J3VNRxaAgTHgLdswumJ4RAr2oPPbutlOFThK65blf9o9MszQEVlQe6QUKWcqscK/
-         jOfcC0p4QWmRnm2bLN1I/0z+S5Jf5RoE9pOdY+KMCaYnbmtqdtEhMxvPUzML/+vdT/hG
-         h7ML/9GwmcNlowoC4Vk7UNoKJJdhy573YfP/df1sG+PtObdLOcpZW4+EJpKSm+4WnSNs
-         vvk7Dr7a4yI5KFfsEoHftvw1LfejRVKs0c5gp9fD+r/WHPR/2Zvy4juP/FAHCsW/Pmyg
-         4BYg==
+        d=google.com; s=20230601; t=1729581984; x=1730186784; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uXO/MgMISfZY587Sbu/ZaG0vtXKQF5OZjUxTzgJg378=;
+        b=rW5Jha/0yvZiYRnmltP30zFmrVKKxFhpNvQrbckZ+FBKWWFYO9xu6cJMN/cwsjQPF5
+         Gj5g8x537LAnUfwKRJ7ny/xqM6nXnnda9vZOAML+b6hB7hzSszeZiydbHsI5Fs4GPPcR
+         WiBRi7j7Dpygbrv+B9tLMc/yPeCV0qwHPaTcASCJErFHd7+z4QaSTu6PkvMX1ehic7jd
+         KwMGRNZNZyan+MCyCOxdgmwrF3xAu/ALr5EKnF/8FZCLOJ5Cke0SaKVnvFpCLZQl14xY
+         uP9fhPz73KG2+6qcujFK0rULXVdHVp7j6lQuPJm8QMz53Z9WRZhX1VTLUJ8Xfgu4kdQ2
+         IejA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729581941; x=1730186741;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RPBvFd0csLQUXJSE14s/so+mpDpWxuoXRgoonDdlEEs=;
-        b=ne4N3brIx0a0AUr2VYEsiZlvHUwet+HmfaMoQ7K95mpHm49BDrUxN0dg8WMkTylSyF
-         Qq2adEPotz7AVF92Re2D3S7YdHh6YdwBAloLmoNcfrixuiSXNcCGvfVKC3zkUk52bBce
-         DExpru1yLZ1s5xw0YGPzBY6Qvhu/kl6Yg54GjoR5JMMA+0vn6lfA3sbdXOT3vcrszvh3
-         6T7dlKFOH0ETvtoLl1vWbPu/hRp0QSGAtgVj2m5PoXU6CzHpeM7N/vGjluq6m2oun6MP
-         JwOuSutb2QR0iOnLKj7esbTpFvMbRpd0uRlz9wvnH0TA04RrCqnXhq+FbRJrDB5iHT45
-         GCRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlk6rD1taEVzUSVXHDE2yZ3p870p5rAOWgsmYjsMkwncrlzC8Zw8MRDhUN+NJYcgNcbKNWvxv0w8mw+GDTpY/x@vger.kernel.org, AJvYcCX++1rUgVBQCn0XkNUVvvk+/8lzrK82HQAaAVj/uYUDlr6luV9zPVaYZvOH+QzF5StReh4srma8L+RuZlg=@vger.kernel.org, AJvYcCXpiPVvVKvTSd1RHrY5k3r+zpDXlvota8Hky+RiWY0BubKTEHv1j7LJpZEYAu1++MrEu2JUhe1M@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR2UfkLBwZvORopkbC8A2IwQYL5xsXBHgIUx5GBY7ypAVxg3JC
-	mx1HraepgtYaXBLWuZ0mGICQ04nHKWV1+ZCTPUP3S8Y549mkzFjr
-X-Google-Smtp-Source: AGHT+IFgOViCVHZGVqc02ueX63hUlO23JFELymqv7xnRaAD5bkA+z0a7m5o4etcnJkf9oA9PvbTbqg==
-X-Received: by 2002:a17:906:730d:b0:a99:e850:deb3 with SMTP id a640c23a62f3a-a9aace512d4mr147614666b.18.1729581940590;
-        Tue, 22 Oct 2024 00:25:40 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a91572575sm299075866b.156.2024.10.22.00.25.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 00:25:40 -0700 (PDT)
-Message-ID: <540a623c-3e7c-40a7-ae77-6833e81fa11e@gmail.com>
-Date: Tue, 22 Oct 2024 09:25:38 +0200
+        d=1e100.net; s=20230601; t=1729581984; x=1730186784;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uXO/MgMISfZY587Sbu/ZaG0vtXKQF5OZjUxTzgJg378=;
+        b=bXLFr9zEeUo503XkFu1UlGMHcY1ZX5oeFagBGis7hoVAB0durJvPJ2gQvIzksmzVk+
+         H1/MBUpDULvcpf9oujrwZmH9FE49tUOAE35Vf07Crx8235grnrVyMPcpt9uvnj2sn3X6
+         Gj2CyrM3bJXrDgcLMqteJlSRGO2bFTQqYKwh5+Y6kt1Z8JO41/DSLOX6oajzXJ7f2oDa
+         ZOhCJ7nX1qFcQKd9jXO1XzNRrGVzu/hcpBHF9Rlp4PeBrCX3SMC2SS/2nfupK+lb0B86
+         tvaLzoB+GgGESqE3glZJEQNKy5ggTminNS2I71in99Xs5ukjUv5sJ8K8pExtZWIPaX6g
+         pL6g==
+X-Gm-Message-State: AOJu0Yw5ChbSeko7XatWXT+XGz0CsooAyLPrn+cCad522Lp2uXULYzgj
+	HDfEEmXJVtzEy8wRye83sPLBnBnzKa3s+PpTndUv4ubJH5GiggQhRy0STfuENdpkAUWtxWsANhL
+	WXI2h8uU4Xmh9rJeSVTrMNwt6IkggyZlLsMxF
+X-Google-Smtp-Source: AGHT+IGvIFh3aWOCyffW3tOLWj8o8Nt4Oixx2u7dI6KxZ+6OvwMBz0qnU6pi3n3wcPOKWJ4HeBky9A0NRbL5VogVr90=
+X-Received: by 2002:a05:6402:2548:b0:5c7:202f:ec9b with SMTP id
+ 4fb4d7f45d1cf-5ca0ac61ec7mr14570189a12.16.1729581983971; Tue, 22 Oct 2024
+ 00:26:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 net-next 11/12] bridge:
- br_vlan_fill_forward_path_mode no _UNTAG_HW for dsa
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>
-References: <20241013185509.4430-1-ericwouds@gmail.com>
- <20241013185509.4430-12-ericwouds@gmail.com>
- <281cce27-c832-41c8-87d0-fbac05b8e802@blackwall.org>
- <6209405e-7100-43f9-b415-3be8fbcc6352@blackwall.org>
- <20241014144613.mkc62dvfzp3vr7rj@skbuf>
- <b919a6b1-1c07-4fc9-b3dc-a7ac2f3645bf@gmail.com>
- <785f6b7a-1de1-46fe-aa6f-9b20feee5973@gmail.com>
- <20241021134726.dzfz5uu2peyin3kk@skbuf>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <20241021134726.dzfz5uu2peyin3kk@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241022070921.468895-1-idosch@nvidia.com>
+In-Reply-To: <20241022070921.468895-1-idosch@nvidia.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Oct 2024 09:26:11 +0200
+Message-ID: <CANn89iLHV5NqHPjRp6W77c1DFtOBDmBs1sWR5+W_405NvOBs7g@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: ip_tunnel: Fix suspicious RCU usage warning in ip_tunnel_find()
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, pshelar@nicira.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Oct 22, 2024 at 9:10=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> The per-netns IP tunnel hash table is protected by the RTNL mutex and
+> ip_tunnel_find() is only called from the control path where the mutex is
+> taken.
+>
+> Convert hlist_for_each_entry_rcu() in ip_tunnel_find() to
+> hlist_for_each_entry() to avoid the suspicious RCU usage warning [1] and
+> add an assertion to make sure the RTNL mutex is held when the function
+> is called.
+>
+> [1]
+> WARNING: suspicious RCU usage
+> 6.12.0-rc3-custom-gd95d9a31aceb #139 Not tainted
+> -----------------------------
+> net/ipv4/ip_tunnel.c:221 RCU-list traversed in non-reader section!!
+>
+> other info that might help us debug this:
+>
+> rcu_scheduler_active =3D 2, debug_locks =3D 1
+> 1 lock held by ip/362:
+>  #0: ffffffff86fc7cb0 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x3=
+77/0xf60
+>
+> stack backtrace:
+> CPU: 12 UID: 0 PID: 362 Comm: ip Not tainted 6.12.0-rc3-custom-gd95d9a31a=
+ceb #139
+> Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0xba/0x110
+>  lockdep_rcu_suspicious.cold+0x4f/0xd6
+>  ip_tunnel_find+0x435/0x4d0
+>  ip_tunnel_newlink+0x517/0x7a0
+>  ipgre_newlink+0x14c/0x170
+>  __rtnl_newlink+0x1173/0x19c0
+>  rtnl_newlink+0x6c/0xa0
+>  rtnetlink_rcv_msg+0x3cc/0xf60
+>  netlink_rcv_skb+0x171/0x450
+>  netlink_unicast+0x539/0x7f0
+>  netlink_sendmsg+0x8c1/0xd80
+>  ____sys_sendmsg+0x8f9/0xc20
+>  ___sys_sendmsg+0x197/0x1e0
+>  __sys_sendmsg+0x122/0x1f0
+>  do_syscall_64+0xbb/0x1d0
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  net/ipv4/ip_tunnel.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+> index d591c73e2c0e..a93c402f573e 100644
+> --- a/net/ipv4/ip_tunnel.c
+> +++ b/net/ipv4/ip_tunnel.c
+> @@ -218,7 +218,9 @@ static struct ip_tunnel *ip_tunnel_find(struct ip_tun=
+nel_net *itn,
+>
+>         ip_tunnel_flags_copy(flags, parms->i_flags);
+>
+> -       hlist_for_each_entry_rcu(t, head, hash_node) {
+> +       ASSERT_RTNL();
+> +
+> +       hlist_for_each_entry(t, head, hash_node) {
+>                 if (local =3D=3D t->parms.iph.saddr &&
+>                     remote =3D=3D t->parms.iph.daddr &&
+>                     link =3D=3D READ_ONCE(t->parms.link) &&
+> --
+> 2.47.0
+>
 
+I was looking at this recently, and my thinking is the following :
 
-On 10/21/24 3:47 PM, Vladimir Oltean wrote:
-> On Sun, Oct 20, 2024 at 11:23:18AM +0200, Eric Woudstra wrote:
->> So after doing some more reading, at creation of the code using
->> BR_VLFLAG_ADDED_BY_SWITCHDEV would have been without problems.
->>
->> After the switchdev was altered so that objects from foreign devices can
->> be added, it is problematic in br_vlan_fill_forward_path_mode(). I have
->> tested and indeed any foreign device does have this problem.
->>
->> So we need a way to distinguish in br_vlan_fill_forward_path_mode()
->> whether or not we are dealing with a (dsa) foreign device on the switchdev.
->>
->> I have come up with something, but this is most likely to crude to be
->> accepted, but for the sake of 'rfc' discussing it may lead to a proper
->> solution. So what does work is the following patch, so that
->> netif_has_dsa_foreign_vlan() can be used inside
->> br_vlan_fill_forward_path_mode().
->>
->> Any suggestions on how this could be implemented properly would be
->> greatly appreciated.
+1) ASSERT_RTNL() is adding code even on non debug kernels.
 
+2) It does not check if the current thread is owning the RTNL mutex,
+only that _some_ thread is owning it.
 
-> I don't know nearly enough about the netfilter flowtable to even
-> understand exactly the problem you're describing and are trying to solve.
-> I've started to read up on things, but plenty of concepts are new and
+I would think that using lockdep_rtnl_is_held() would be better ?
 
-Another way of shortly describing it, considering the software fastpath,
-only there it is a problem:
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index d591c73e2c0e53efefb8fb9262610cbbd1dd71ea..25505f9b724c33d2c3ec2fca535=
+5d7fdd4e01c14
+100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -218,7 +218,7 @@ static struct ip_tunnel *ip_tunnel_find(struct
+ip_tunnel_net *itn,
 
-Same case #1:
-When looking at the ingress hook of the fastpath for a bridged
-switchdev-port (non-dsa) with PVID set, the existing code is written so
-that the flowtuple needs to match the packet INcluding the PVID.
+        ip_tunnel_flags_copy(flags, parms->i_flags);
 
-Same case #2:
-When considering the ingress hook of the fastpath of a bridged device
-that is not part of a switchdev at all and there is no dsa on the bridge
-(so it is not a foreign device), the existing code is written so that
-the flowtuple needs to match the packet EXcluding the PVID.
-
-When looking at the diagram of this patch, wlan1 would stand for any
-foreign device. Because of the use of BR_VLFLAG_ADDED_BY_SWITCHDEV, case
-#1 is applied, instead of case #2.
-
-> I'm mixing this with plenty of other activities. If you could share some
-> commands to build a test setup so I could form my own independent
-> opinion of what is going on, it would be great as it would speed up that
-> process.
-
-I've only setup the bridged part with systemd-networkd. When trying to
-re-create, it will only happen if the total action of the bridge,
-towards the foreign port, is:
-
-ingress + egress = untagging
-
-So in the forward-fastpath, tagging in the forward path is done by a
-vlan-device and untagging is done in the forward path of the bridge.
-
-> With respect to the patch you've posted, it doesn't look exactly great.
-
-Agreed. I was experimenting now with having br_switchdev_port_vlan_add()
-first to try it only for non-foreign ports. If not successful, then try
-it with foreign ports. This way the calling function will know if the
-port is a foreign port. Therefore, no need for the switchdev driver to
-communicate back to upper layers.
-
-> One would need to make a thorough analysis of the bridge's use of
-> BR_VLFLAG_ADDED_BY_SWITCHDEV, of whether it still makes sense in today's
-> world where br_switchdev_vlan_replay() is a thing (a VLAN that used to
-> not be "added by switchdev" can become "added by switchdev" after a
-> replay, but this flag will remain incorrectly unset), of whether VLANs on
-> foreign DSA interfaces should even have this flag set, and on whether
-> your flowtable forwarding path patches are conceptually using it correctly.
-> There's a lot to think about, and if somebody doesn't have the big picture,
-> I'm worried that a wrong decision will be taken.
-
-The entire usage BR_VLFLAG_ADDED_BY_SWITCHDEV does need a careful review.
-
-I also realize my patch-set needs to do more with the switchdev and vlan
-combination, then it does now. So for now I will leave it as RFC, as it
-will not work properly with switchdevs other the dsa.
+-       hlist_for_each_entry_rcu(t, head, hash_node) {
++       hlist_for_each_entry_rcu(t, head, hash_node, lockdep_rtnl_is_held()=
+) {
+                if (local =3D=3D t->parms.iph.saddr &&
+                    remote =3D=3D t->parms.iph.daddr &&
+                    link =3D=3D READ_ONCE(t->parms.link) &&
 
