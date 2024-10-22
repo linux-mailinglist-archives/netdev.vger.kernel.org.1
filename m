@@ -1,178 +1,161 @@
-Return-Path: <netdev+bounces-137705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4ACF9A968F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 05:12:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C3989A96F1
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 05:23:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE2F928345D
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:12:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D75571F26EA5
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D84D13A256;
-	Tue, 22 Oct 2024 03:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797FD14B092;
+	Tue, 22 Oct 2024 03:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dLcX4Qe3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W2KKWHav"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45828E8;
-	Tue, 22 Oct 2024 03:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D549713B297
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 03:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729566734; cv=none; b=XUxj2yoX+iA4382rZExWHIiyOsCUurKY5RD3WKPo7Fuwo/39sRzZrOq5tUFxqwlk8/wXJUuYu9pR7JaQcr2AaTqtqrEigRCeCCAyDyuZQFvtVcEqKaliI6WKfJUWg8s2Y26WdtX1D63T08nVk7q2ToneDWnXwVucaEO1nTo3svA=
+	t=1729567019; cv=none; b=EmTYyoDT0igfXFfiDsBAQdQ+2LurJUqQI/ZtQix/AUuhXPpogcG05mwHh3GqdIvfiPepj4+kKd5kCwnXZMctL07pquvkske2KxbPS0qy091DscGU0kkiY872qRSCp3W73yDz5lEm26wbcMmDPqyfTlCoZTBAYlPyYn/FVm6wXiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729566734; c=relaxed/simple;
-	bh=3YHkXyk0hl2jqIBCwCWhBOAYI/fCkzb2NdRgpLLCU5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HMj75lPwmzJRePg7m/Xod5WXBe7i9KOLCOiu1bjKwI0c5l5hhzZz+fTWoB8tb6mcUkbglHn6QUUPVwdBs5FQxevABBblBFkCIqBCnjAx043dE8l+v38jWEUICgh+vgEhIgem+qQP5WRN8rE8BLbzkKcBaYwL6afzLuu+UuFyflA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dLcX4Qe3; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729566733; x=1761102733;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3YHkXyk0hl2jqIBCwCWhBOAYI/fCkzb2NdRgpLLCU5Q=;
-  b=dLcX4Qe3T27mS9qDsMSyWCHuafBfO1MN0ORHc/1Pub+B/MyvtIzdBnL2
-   78pkaG/ig8KbTCgPPVZDc5eW4f2xXqDHfT/h+dL/OGP4FQ0xu4YD4FCdZ
-   ix6xxTXogC81uUkqM3MbtD8IiAxGQhXM5lfTQ+BxZTvtR6ZKL2vD0mzAh
-   B6xCc4upQfOxS3eJpuuSPrgcKfO/iasVqwefhI7e3/2v58X8W/CPTfWTI
-   RJQ0UOn3J+Nw5RURHIEzbHKTAbmh8I5/85xMWAKsGq7u3VMvLPd0OzXZE
-   DWyE9A+9qlH2D3kaF8/A6aHOuUHerVbrcrTTRBqRy3aTYgX9Z8fzvG0T2
-   g==;
-X-CSE-ConnectionGUID: VSrXkCD4RZChtE/HVp1aQQ==
-X-CSE-MsgGUID: yE/SnpRBTGe5NfAqpzvUag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="40466009"
-X-IronPort-AV: E=Sophos;i="6.11,222,1725346800"; 
-   d="scan'208";a="40466009"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2024 20:12:12 -0700
-X-CSE-ConnectionGUID: zsn6Wc6LS9eHXrxUcRxjlg==
-X-CSE-MsgGUID: r+4nQiC/R4m76eLBFmS8XA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,222,1725346800"; 
-   d="scan'208";a="80082482"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 21 Oct 2024 20:12:08 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t35JW-000Syw-2R;
-	Tue, 22 Oct 2024 03:12:06 +0000
-Date: Tue, 22 Oct 2024 11:11:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Linus Walleij <linus.walleij@linaro.org>,
-	Pawel Dembicki <paweldembicki@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: dsa: vsc73xx: implement transmit via
- control interface
-Message-ID: <202410221001.KrzTEU3A-lkp@intel.com>
-References: <20241020205452.2660042-1-paweldembicki@gmail.com>
+	s=arc-20240116; t=1729567019; c=relaxed/simple;
+	bh=OEmfwiAkoZN1ST5JdtiQAcgQq190u8l5XLy4d0qXCzM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eVdhbJHdo/ZnQsaYQAe7zlPtSXALTjCDLMmN053ywYK7rMlIGHMYtESmm+G05E6PS/dX2lfop1mva9GClrgiDVfZfI5QIgD1CTRYIgmomFbTQgiI2V+jj6gaBXVSndz8s7zh5syeEBNQgMahGoO7HTEgGJ3+dWejIKGaChy4oqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W2KKWHav; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6e39bf12830so36039547b3.1
+        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 20:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729567017; x=1730171817; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z/cn0iNCyYAWaqDPrWymeoJ6QjtEh5iPBAJ25ZQN+F4=;
+        b=W2KKWHavr0eeteka2CtXuIWga5kauzxcisbSFCiIa4aLAeCxS673CNNzDfwJvi2lbQ
+         OsrTg/gXhEYi7sy6jgSROoBIw334g23jVR8WupajHb4G3ruFGx/v9Yh1SUeTLXBLwnJZ
+         TTKWX0bxRLRhFh40qYdPEhdybDfARbanQBpOfwZ9XbfcFpcPBvocyrEO0CpawEO8XZx0
+         eROMuvZpqEGI0YaH5dCufF30pQ5BlFm1ppJ6mO9NKnkFRcq5nGdVMPYjbc7fTef7enbg
+         kV6GqDuULQc3768YpU3lAeOf47K3j80nmhznPhmn6J0s8f672w7uKoJhnoPDeDuq71rA
+         OebQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729567017; x=1730171817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z/cn0iNCyYAWaqDPrWymeoJ6QjtEh5iPBAJ25ZQN+F4=;
+        b=Hw7diWIucTvUUCJoIE5JjY1ExzDWVsiwHGorPOwBPuF30qEfxdinUL8md6h+01UNcj
+         xsEaJtep+NiJ07hdHwN3L5opdsfOuqBxzWs45Dv7lSrPkDWzOoaJVoLWsF5sdZFThe/7
+         egReg0+kuSkp5hyG/ZCl5dJhCqLdZeHA8OE4uS8BQ9mqYWYgfTyXhYy+sx4A10ygwR8o
+         iTNHdP5+xUYOaTiXlU+9tVnIqqNx4NUg4vfl7f+VxP0+/q9sk7qFEy9qeCuiNm7TgHfn
+         5xZvqj/gg3TlGYci/hy6eRFleoYfZL/6Vw4c4pzhWWkNfXiy9GV1B6EIAATATWWB6F7Z
+         eZPw==
+X-Gm-Message-State: AOJu0Yyx53ObGuApUdL5PMW7PDllvKD0/xsn83qupPfFb7JrGTWYwn3r
+	ZcI8LTvQGfoh8Cp6RzceUD+UOfj062/9w+WCZbRbOdImwPDGCe61d6qW4HftkuquKh6byWueZyH
+	6lsAQfS1Dt5l7KvigyFs3tSkPbmw=
+X-Google-Smtp-Source: AGHT+IFRk9XzxSsT9ULI+6gld1WMI5Vz5Pn3tTaPjwiKTRyp8Y0VIg3sDi0/mu/fTFHvTtDvWOp3qtiKrMy6jdISIr4=
+X-Received: by 2002:a05:690c:b9c:b0:6dd:c619:4cb1 with SMTP id
+ 00721157ae682-6e7d4334d5amr16437527b3.0.1729567016653; Mon, 21 Oct 2024
+ 20:16:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241020205452.2660042-1-paweldembicki@gmail.com>
+References: <20240930031624.2116592-1-wojackbb@gmail.com> <e2f390c7-4d58-47fb-ba86-b1e5ccd6e546@lunn.ch>
+ <CAAQ7Y6Z2xkgxv36=WOxbUArCw3eBeY0nx_7nAH36+Wicjs_fPg@mail.gmail.com> <562c8ee8-7ce3-4343-9d93-b01be1235954@lunn.ch>
+In-Reply-To: <562c8ee8-7ce3-4343-9d93-b01be1235954@lunn.ch>
+From: =?UTF-8?B?5ZCz6YC86YC8?= <wojackbb@gmail.com>
+Date: Tue, 22 Oct 2024 11:16:44 +0800
+Message-ID: <CAAQ7Y6aqLJoScfVD3NMyw_0r42qYS2BCCWa5iRDaM8h1EKwwkg@mail.gmail.com>
+Subject: Re: [PATCH] [net,v2] net: wwan: t7xx: add PM_AUTOSUSPEND_MS_BY_DW5933E
+ for Dell DW5933e
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com, 
+	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com, 
+	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com, 
+	loic.poulain@linaro.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-arm-kernel@lists.infradead.org, angelogioacchino.delregno@collabora.com, 
+	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Pawel,
+Andrew Lunn <andrew@lunn.ch> =E6=96=BC 2024=E5=B9=B410=E6=9C=8815=E6=97=A5 =
+=E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=888:09=E5=AF=AB=E9=81=93=EF=BC=9A
 
-kernel test robot noticed the following build warnings:
+>
+> On Tue, Oct 15, 2024 at 10:48:15AM +0800, =E5=90=B3=E9=80=BC=E9=80=BC wro=
+te:
+> > Hi Andrew,
+> >
+> > We have a power test that uses a small script to loop through the power=
+_state
+> > of Dell DW5933e.(/sys/bus/pci/devices/..../power_state)
+> >
+> > We expect that PCIE can enter the D3 state when Host don;t have data pa=
+cket
+> > transmission,
+> > but the experimental result of the small script test is that it is only=
+ in the
+> > D3 state about 5% of the time.
+> >
+> > We analyze logs to found that Dell DW5933e occasionally sends signal ch=
+ange
+> > notifications, and ModemManager occasionally captures Modem status.
+> > Although these situations are not very frequent,
+> > However, since the default auto suspend time is 20 seconds, the chance =
+of PCIE
+> > being able to enter the D3 state is very small.
+> >
+> > After we changed auto suspend to 5 seconds, PCIE have 50% of the time w=
+as in D3
+> > state, which met Dell's requirements.
+>
+> So you answered some of my questions. But missed:
+>
+> What makes this machine special?
+>
+> It is maybe because this machine occasionally sends signal change
+> notifications? There are modem status changes?
+>
+> Have you compared this to other machines with the same hardware? Do
+> they do the same? Or is this Dell special? If it is special, why is it
+> special?
+>
+>         Andrew
 
-[auto build test WARNING on net-next/main]
+Hi Andrew,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pawel-Dembicki/net-dsa-vsc73xx-implement-packet-reception-via-control-interface/20241021-050041
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241020205452.2660042-1-paweldembicki%40gmail.com
-patch subject: [PATCH net-next 1/3] net: dsa: vsc73xx: implement transmit via control interface
-config: openrisc-allyesconfig (https://download.01.org/0day-ci/archive/20241022/202410221001.KrzTEU3A-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241022/202410221001.KrzTEU3A-lkp@intel.com/reproduce)
+The chip of Fibocom FM350 is MTK T7XX,
+It is the same chip as our device.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410221001.KrzTEU3A-lkp@intel.com/
+We tested the Fibocom FM350 and It had the same issue as our device.
+The following tests use the same environment and steps:
+a. Make data call to connect Internet
+b. No data is transferred to the Internet and wait one minute.
+c. use test script to capture and count power_state until one minute.
 
-All warnings (new ones prefixed by >>):
+Result:
+1. When autosuspend_delay_ms is 20000,
+Our device's d3_cold time is 0%
+Fibocom FM350's d3_cold time 0%
 
-   drivers/net/dsa/vitesse-vsc73xx-core.c: In function 'vsc73xx_inject_frame':
->> drivers/net/dsa/vitesse-vsc73xx-core.c:766:30: warning: argument to 'sizeof' in 'memset' call is the same expression as the destination; did you mean to dereference it? [-Wsizeof-pointer-memaccess]
-     766 |         memset(buf, 0, sizeof(buf));
-         |                              ^
+2. When autosuspend_delay_ms is 5000,
+Our device's d3_cold time is 80%
+Fibocom FM350's d3_cold time 60%
 
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [y]:
-   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
+So this problem is a common problem.
+Should I remove PM_AUTOSUSPEND_MS_BY_DW5933E,
+and modify PM_AUTOSUSPEND_MS to 5000 at my patch?
 
-
-vim +766 drivers/net/dsa/vitesse-vsc73xx-core.c
-
-   750	
-   751	static int
-   752	vsc73xx_inject_frame(struct vsc73xx *vsc, int port, struct sk_buff *skb)
-   753	{
-   754		struct vsc73xx_ifh *ifh;
-   755		u32 length, i, count;
-   756		u32 *buf;
-   757		int ret;
-   758	
-   759		if (skb->len + VSC73XX_IFH_SIZE < 64)
-   760			length = 64;
-   761		else
-   762			length = skb->len + VSC73XX_IFH_SIZE;
-   763	
-   764		count = DIV_ROUND_UP(length, 8);
-   765		buf = kzalloc(count * 8, GFP_KERNEL);
- > 766		memset(buf, 0, sizeof(buf));
-   767	
-   768		ifh = (struct vsc73xx_ifh *)buf;
-   769		ifh->frame_length = skb->len;
-   770		ifh->magic = VSC73XX_IFH_MAGIC;
-   771	
-   772		skb_copy_and_csum_dev(skb, (u8 *)(buf + 2));
-   773	
-   774		for (i = 0; i < count; i++) {
-   775			ret = vsc73xx_write_tx_fifo(vsc, port, buf[2 * i],
-   776						    buf[2 * i + 1]);
-   777			if (ret) {
-   778				/* Clear buffer after error */
-   779				vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-   780						    VSC73XX_MISCFIFO,
-   781						    VSC73XX_MISCFIFO_REWIND_CPU_TX,
-   782						    VSC73XX_MISCFIFO_REWIND_CPU_TX);
-   783				goto err;
-   784			}
-   785		}
-   786	
-   787		vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MISCFIFO,
-   788			      VSC73XX_MISCFIFO_CPU_TX);
-   789	
-   790		skb_tx_timestamp(skb);
-   791	
-   792		skb->dev->stats.tx_packets++;
-   793		skb->dev->stats.tx_bytes += skb->len;
-   794	err:
-   795		kfree(buf);
-   796		return ret;
-   797	}
-   798	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks.
 
