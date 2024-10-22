@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-137953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 764869AB3D6
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:25:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43EDB9AB3D8
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5C381C20FF1
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:25:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FCAC1C21998
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154501B141D;
-	Tue, 22 Oct 2024 16:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2FA51A264C;
+	Tue, 22 Oct 2024 16:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aMAyNY2W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8LFsSCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A691136345;
-	Tue, 22 Oct 2024 16:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4601A4F2B;
+	Tue, 22 Oct 2024 16:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729614302; cv=none; b=iNGwbFRddEdsaRC3t+keijqfnCfAhW/PWzrdiFKk58tsdX0BTXLNf6BSeomAeidLrCgiqvwfd4NOxXjEXFQZpRcPzKihEEArdYnqWWrwqahObeS9gXzPm/KV7KLaJeL9GJ37agah9sDgzDFmksNI+2sepcb1AENv6i3Fa81UEeM=
+	t=1729614310; cv=none; b=MQEhf0U7ud6afK0K8zNGkmGNDKWSL0vP9FoELs6qsdPls66NrYR0hCywKfrwOXv/+caU0NzGC58c6XoifrDJ0+pxAn90xIgopeUrRc8jj6IyxcgqfPMyUDQFbg5WugS0gDuXNt9CgwN7ryrQSiC4OI/41ipAI4v8T+uLv+P/uA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729614302; c=relaxed/simple;
-	bh=K7SuixB6Td6IPfBM3xqtDEm+YY7FsppOYwBMl4zeyPs=;
+	s=arc-20240116; t=1729614310; c=relaxed/simple;
+	bh=sQCtlCATXqz81JNEmuLIhiRGCe+8jLrO8vl3W1Y8Im8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=O9Zk2V76ZO0kNMPZRvIdrzcNBpH8DizVWfYCtB98ha85bAS9qNRgzPsRTeG4m7znoBVwQFaA958qOdi3qmei9qbgjVanuS+17Fj3O3NrSjUuDmc/8ZJ8vnC+32wEfWGYn1v9IpsR1+ASrL5p5y+zMod/nK9W6Dr2HwzoBjmbWuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aMAyNY2W; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=opWFoxagAxokIjo6QckTWHktalC44g0py1OvwqOVIAwdXXF6DgrKFoHKF6cXFreHV7gmEoagA6mlses9Z1ticSQOasTCuUl+8GZDk63r2Vh+93cwoKZKYKhBriRGuV9FuWLAQfYV0bifXeQkTchbhUeAnxFJcQil/Af/E2rP3iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8LFsSCz; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20cbb1cf324so51701035ad.0;
-        Tue, 22 Oct 2024 09:25:00 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20cdbe608b3so48166835ad.1;
+        Tue, 22 Oct 2024 09:25:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729614300; x=1730219100; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729614309; x=1730219109; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s6B6qLaEz37RxKySIXA3GdJc2yXpIMxvmLdcDYXmM+E=;
-        b=aMAyNY2WJll8SGs9rFS0lBrIjSI+7O/Txg+3kpmoAPencIW7jzJEAkKwhiQOq4yYQz
-         9wrsZecwJwLRxYLixr6b0NTF/tDF3a68O8efa4BGIWZTLlE3LK/2NKixqJESa7nuISpB
-         Mqft2nif+LkgrYLiaytseRZtKepZZt26GIjSHJuaza8GlI6zgosg0pdFVINFw5DzQHNH
-         Wr61AA+5D0A8FedFZaH0VpQqERaJqvaVgGvUJD4mnT65IQj3nSWU4/yakw4RQhnJnY6u
-         7cXsq8b4qxhlbcvB+YQ5L0n/p6XI5WvrcdaHw4bYHj2BfUt93sGrqqtc33k8hMd1lePq
-         dq7w==
+        bh=uOwBPPS/0whvsnaM8DpV5hy0fk/olDaACqNimxXbEC0=;
+        b=e8LFsSCzJCLq0nhPZceyC8+zaAyp+mJ0WkZXmXhZUYwRF2uRHt5ONX0RYrgEmq/LNr
+         xhJXZjUIoBylFAIKH5rBAfMPplpsM2iUOB2HuYx9YGgsThjz6Cb+YvGfPKZuEdZWFMFZ
+         rx1vrSmmTmWw3FgZnPYS8l76cUaz1jU6QDOeSmZZhx02eQI1gB5+cCxtt2/tbfeQa4xR
+         P7wxSrbSL5j6fsyxAvHGCVCBa6WyP3kMrLab0bZmWv1nW4bnvD5hOJC8EJ/XZd2Hi7AO
+         9n5M6vsujhPHMG1/b4w4IMmW5mlrS1Qa298Hx7NIHk+LGn49EYg+mHb9gWAxsw6G7t7g
+         sC9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729614300; x=1730219100;
+        d=1e100.net; s=20230601; t=1729614309; x=1730219109;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s6B6qLaEz37RxKySIXA3GdJc2yXpIMxvmLdcDYXmM+E=;
-        b=HeoOao7u2zl5gWwJtlxR0PeIP7DZ2+FtvDdRTJ7y0BkG46cWSzFkChJMvEKv/teCf9
-         BwWFfEXSWqGssHWvJQqqDSiAaPLSrywi89Lop+06IiHWw0sO20Cfav4WnMEop7o54g3b
-         ToyyCBckD2a6D7RL5zFTal5ioIY1yuPs2KbLoqhLDxfnNWAoaqleOlDfWhn6NzogjO0J
-         /m/4InNxK/L7ENlFgLrMuLyMOTpd2YA6/z4nwzuG8eWdypF3PRVcoCW6AxW1WjX4cmhk
-         eavzhHbZEGXYi9aWc6eXY4Ss3FC+V3idI6nbGL53cNy06i6unSXVlRuw6zF76xGWA8FB
-         sMsg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/nggMnXZQMuxhorTXpZ1eMatZ1gXL8rClNdsb3ylo/ZTZztQwvk1G5yW09oAlp9TJqoXGgqurmOo=@vger.kernel.org, AJvYcCUXn7fUsPJCkq529x56VIi07tb5K8lYO5Lm8/3XhsWE/DnL88etKmGJL2YmvvYTLq8G+lT6nqYd@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxLwHknTSZh5PKZrPXot8dKDWcFU6/fX97yEydJNdXxrGFTOyw
-	04u+OTKa9Jw6I+CV/7DyNZI8wVMBf4yMXAn6MYrCkx/VlowUXLBk
-X-Google-Smtp-Source: AGHT+IGlSI3igwuCqufO9cr87MQb6+l8BwBs9XyLC/TNIxYDUcWYKtiyghkAB0xCes9pH/vW7qVgQQ==
-X-Received: by 2002:a17:903:41cb:b0:20c:d93c:440 with SMTP id d9443c01a7336-20e5a8a9c53mr231486415ad.35.1729614299885;
-        Tue, 22 Oct 2024 09:24:59 -0700 (PDT)
+        bh=uOwBPPS/0whvsnaM8DpV5hy0fk/olDaACqNimxXbEC0=;
+        b=j9eYn8BEpFeewdQRoTlWgT/LQO8SqD2q56FVkSV2KbrUF6OMQ9zPhV/enmRxsXnP04
+         awVYNwrliVZyOdC8HvTcdWK3CG0Upfap9NTgHEQZSv0cfp+BQpqb7cDbb2vFRIbD+A0W
+         aqF/HjzziJMO3GCldnJAkEAqfUap4WFVQdNkrhMe2RIFSj0xGpI5qHDT6ghX3WnzIFr6
+         0NQEk4FtwPayAPZ5+m8A44uPwb4G0oAmn5DpFsfszMbkgEvQ618QUKlkDz8IpJ/qewqd
+         bkkCI69sZrgdKYd7taHCbhhUKnhYH9sK0cJ0q2Vzd5Hx46n6amx4uOX9qigm5i6uuOOz
+         O8/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUFzJ84Kbp2xDauyZgq5ZmuCnmS72QtgskS8bfu/OGUH5qCjRwiYlQ1AotMpC4O28VW/IgeYiErlBo=@vger.kernel.org, AJvYcCX5KCZVaSYzTBlwvbi2bzIUmut2P/aJeWP+tnm5o5x3eViGgYxeveUB/e0somlzHMla0ixEpudt@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy10yYNJeODvhdUdhhjadR7oBJ34kXP7x97+eoZfA6fbHmLs84I
+	mX+06qteiYGopXVL1luDuDXDNjQIMaeZCOSE6ewO9vVIi8fF5R+j
+X-Google-Smtp-Source: AGHT+IHrBAiVKLRS4KoGLn29jcrvDCaH9tiNczdvEyGDQ3f2xMrWzjPHwmEcYRughboUp25HfOMSnw==
+X-Received: by 2002:a17:903:2341:b0:20c:950f:f45d with SMTP id d9443c01a7336-20e94b643d5mr48889235ad.61.1729614308602;
+        Tue, 22 Oct 2024 09:25:08 -0700 (PDT)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7eee6602sm44755205ad.1.2024.10.22.09.24.51
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7eee6602sm44755205ad.1.2024.10.22.09.25.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 09:24:59 -0700 (PDT)
+        Tue, 22 Oct 2024 09:25:07 -0700 (PDT)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -107,9 +107,9 @@ Cc: kory.maincent@bootlin.com,
 	willemb@google.com,
 	daniel.zahka@gmail.com,
 	ap420073@gmail.com
-Subject: [PATCH net-next v4 5/8] net: devmem: add ring parameter filtering
-Date: Tue, 22 Oct 2024 16:23:56 +0000
-Message-Id: <20241022162359.2713094-6-ap420073@gmail.com>
+Subject: [PATCH net-next v4 6/8] net: ethtool: add ring parameter filtering
+Date: Tue, 22 Oct 2024 16:23:57 +0000
+Message-Id: <20241022162359.2713094-7-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241022162359.2713094-1-ap420073@gmail.com>
 References: <20241022162359.2713094-1-ap420073@gmail.com>
@@ -121,69 +121,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If driver doesn't support ring parameter or tcp-data-split configuration
-is not sufficient, the devmem should not be set up.
-Before setup the devmem, tcp-data-split should be ON and
-header-data-split-thresh value should be 0.
+While the devmem is running, the tcp-data-split and
+header-data-split-thresh configuration should not be changed.
+If user tries to change tcp-data-split and threshold value while the
+devmem is running, it fails and shows extack message.
 
 Tested-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v4:
- - Check condition before __netif_get_rx_queue().
- - Separate condition check.
+ - Add netdev_devmem_enabled() helper.
  - Add Test tag from Stanislav.
 
 v3:
- - Patch added.
+ - Patch added
 
- net/core/devmem.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ include/net/netdev_rx_queue.h | 14 ++++++++++++++
+ net/ethtool/common.h          |  1 +
+ net/ethtool/rings.c           | 13 +++++++++++++
+ 3 files changed, 28 insertions(+)
 
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index 11b91c12ee11..3425e872e87a 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -8,6 +8,8 @@
-  */
+diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+index 596836abf7bf..7fbb64ce8d89 100644
+--- a/include/net/netdev_rx_queue.h
++++ b/include/net/netdev_rx_queue.h
+@@ -55,6 +55,20 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
+ 	return index;
+ }
  
- #include <linux/dma-buf.h>
-+#include <linux/ethtool.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/genalloc.h>
- #include <linux/mm.h>
++static inline bool netdev_devmem_enabled(struct net_device *dev)
++{
++	struct netdev_rx_queue *queue;
++	int i;
++
++	for (i = 0; i < dev->real_num_rx_queues; i++) {
++		queue = __netif_get_rx_queue(dev, i);
++		if (queue->mp_params.mp_priv)
++			return true;
++	}
++
++	return false;
++}
++
+ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
+ 
+ #endif
+diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+index 4a2de3ce7354..5b8e5847ba3c 100644
+--- a/net/ethtool/common.h
++++ b/net/ethtool/common.h
+@@ -5,6 +5,7 @@
+ 
  #include <linux/netdevice.h>
-@@ -131,6 +133,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
- 				    struct net_devmem_dmabuf_binding *binding,
- 				    struct netlink_ext_ack *extack)
- {
-+	struct kernel_ethtool_ringparam kernel_ringparam = {};
-+	struct ethtool_ringparam ringparam = {};
- 	struct netdev_rx_queue *rxq;
- 	u32 xa_idx;
- 	int err;
-@@ -140,6 +144,20 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+ #include <linux/ethtool.h>
++#include <net/netdev_rx_queue.h>
+ 
+ #define ETHTOOL_DEV_FEATURE_WORDS	DIV_ROUND_UP(NETDEV_FEATURE_COUNT, 32)
+ 
+diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+index e1fd82a91014..ca313c301081 100644
+--- a/net/ethtool/rings.c
++++ b/net/ethtool/rings.c
+@@ -258,6 +258,19 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
  		return -ERANGE;
  	}
  
-+	if (!dev->ethtool_ops->get_ringparam)
-+		return -EOPNOTSUPP;
-+
-+	dev->ethtool_ops->get_ringparam(dev, &ringparam, &kernel_ringparam,
-+					extack);
-+	if (kernel_ringparam.tcp_data_split != ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
-+		NL_SET_ERR_MSG(extack, "tcp-data-split is disabled");
-+		return -EINVAL;
++	if (netdev_devmem_enabled(dev)) {
++		if (kernel_ringparam.tcp_data_split !=
++		    ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
++			NL_SET_ERR_MSG(info->extack,
++				       "tcp-data-split should be enabled while devmem is running");
++			return -EINVAL;
++		} else if (kernel_ringparam.hds_thresh) {
++			NL_SET_ERR_MSG(info->extack,
++				       "header-data-split-thresh should be zero while devmem is running");
++			return -EINVAL;
++		}
 +	}
-+	if (kernel_ringparam.hds_thresh) {
-+		NL_SET_ERR_MSG(extack, "header-data-split-thresh is not zero");
-+		return -EINVAL;
-+	}
 +
- 	rxq = __netif_get_rx_queue(dev, rxq_idx);
- 	if (rxq->mp_params.mp_priv) {
- 		NL_SET_ERR_MSG(extack, "designated queue already memory provider bound");
+ 	/* ensure new ring parameters are within limits */
+ 	if (ringparam.rx_pending > ringparam.rx_max_pending)
+ 		err_attr = tb[ETHTOOL_A_RINGS_RX];
 -- 
 2.34.1
 
