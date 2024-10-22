@@ -1,185 +1,304 @@
-Return-Path: <netdev+bounces-137932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7411F9AB279
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:47:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97BB99AB2CD
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB4CEB23206
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:47:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B86241C22553
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C031AFB31;
-	Tue, 22 Oct 2024 15:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9894D1BD4FB;
+	Tue, 22 Oct 2024 15:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6pXHwsf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y6Nh4V1Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFF71A726D;
-	Tue, 22 Oct 2024 15:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729612007; cv=none; b=TYksCsO0zL+IVf4gjLQU++V19ObXZRrNy0oZqrF2Cfrzki3NJMW7MTssYEcAQkekRIP1Erq3rbnUPTyrE8pR1AlaRiayC5IH0d9SzB4mmBD2AUegxmaAIZMWrHMW0/gL06QqiwRGkY464ScSwxXtPnM1AWep1FUz54dHsv9offg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729612007; c=relaxed/simple;
-	bh=a8JILlK0rOgCUXdJdRQk58tiu5AIo4Ljw3l2ZVC7IPw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YYwyl0OEiXJOZskmizsiM2bJ3DB06w4+dMvkRv9Zp3jR3ovDVXGMtB17wleCi+ADjccdzitoetdQsRfZM6xLAJsbWzGU2G5lK+26Hkb0+Gs/1gKo+N/Y+DpeLzbyLpIno9A1rWsaTX+d7R5aF7T4+XM6ut/JprgvGIyoqyd9KX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b6pXHwsf; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3e600add5dcso2095068b6e.2;
-        Tue, 22 Oct 2024 08:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729612005; x=1730216805; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=boEXQ06yBkY9Qp9iJ/X9uFRqoqU4NRYtavinbBKuAWQ=;
-        b=b6pXHwsf8BdxgX8ajJt9KrjD88YfV36/JYCNKzAHU7kSqAKwD4WOI6y0xOObdNTwcH
-         l0bIheMB9z0EjJaS6lbfHXqsX7SV4V5yYmP/JuuVBGuSCAksnptbyyVRGBiIDg4//MJ/
-         0KD7zTEFu4zKv1WD9uy5gXp8pU2ijn0gTY8Hu+obmoHzS8k3rDbQy1AjQPvHOo2L4LlY
-         KA6KEKE0LMYGZFck2BTX2OqRm+lHp/iYo8WAfiY0NLqwytATFroxlUJiMHoGsaAyzLsA
-         oTj7hjYFweon6EdeqEkiUHVVKkSCCpnIPAkASsroY/MnU1xZHvXPkjWqJboww21nwowo
-         7Zbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729612005; x=1730216805;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=boEXQ06yBkY9Qp9iJ/X9uFRqoqU4NRYtavinbBKuAWQ=;
-        b=G+oA2Ere5YcMPj4NxKV9JMPt4rE61mxCgEcbZG9UIB+LXPnoYqgdrPjnQVPxLat2ki
-         tYr+0mEFrC1qEn/y630Fuogi9ZszGJ1aJI6ljlUFl+mDvsz+Ip3IygcCqP07FbKD+SEq
-         W6pbJG2f/dcHzuCXZHPTd2BZibjkcTlTbWsnpBqrApTdOihHhhiXynfzn10ab3KA15+7
-         iHGn9TmzP/iU31+eTgsP7uOBpgzPUlG3VkzR5Uz4ocw13X8XWM/eRO3XSuy3KHv0r9x3
-         GDdgTxYqeoZEGu/XoPJTdwdwgCOIB9iame9TlhCKunP4+v24Mj/6IZJqfipacBC4iusf
-         0jsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVB4eElqjNuDK6MQeEu3gOaDnQO3vB44jI0P3nWeADLcYIfXjEbq/A/MISOm03xOwLhi5S9BT/N929YIJNH@vger.kernel.org, AJvYcCWK6voFTSMKSN2lCsPqCro91by1eP0Jdo+N0dTi3pezfjgHOH202R9F2A6CJwcrRloKJmMgiJPFiCHZ4m+s@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD3QDt1gWv3XCxy6AvEbbi692B2QYB0H4j1VKuSnr6bMe9gQ+s
-	9NMv7UzK5H8HRwZrPrT32Qk8OZjeoTCRDXhP5xRAHTkxiVBu9t2Z
-X-Google-Smtp-Source: AGHT+IFS78GXKm9ydPcOT0NuOksdZ95JgUyXNLofYNCJmFs3e78RXhsbhuhJsknF7ESBvWpcDq0O0g==
-X-Received: by 2002:a05:6808:1486:b0:3e5:f766:3e35 with SMTP id 5614622812f47-3e602c7cc8bmr10852493b6e.18.1729612004789;
-        Tue, 22 Oct 2024 08:46:44 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3e61034f63bsm1315178b6e.43.2024.10.22.08.46.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 08:46:44 -0700 (PDT)
-Message-ID: <041ff396-c5b9-40e2-8028-2b3325a3f0e3@gmail.com>
-Date: Tue, 22 Oct 2024 10:46:43 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A36C1BD039;
+	Tue, 22 Oct 2024 15:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729612337; cv=fail; b=nYHme8nM9gJqZ259TYyDX+ZgXdbMkPwB8kNsrFQIzyCpFpY3AzHTiw0D3FpcxMlJs6gLCk+Yqepyezasco0+0PadIMuANBgvqZbnW2iRgIiF7bLnkkKNL8haU05LhywV27vRk1euOKpSUs3fTvTdux0KBvNo4g3iArEW+kGgkHM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729612337; c=relaxed/simple;
+	bh=UumOPAxKyDjWj83HASaMOP3EQHFalal4IzLap2ntAps=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mI1wftpSpAxWu8OplPYU/TbJZ1xXPxh7yQGlt1UeB7Z+TirNQhtC1xEjPX/DtvFHnPTPcBD+ofuoc4Iz9uGB1WBSyED26uKnSYbZv4ajBRH78+5s3YUYlkRsYSxZbkXY4o1oLZPCIcBhT45nMEQ+uPl60lIFEyQvLk6vMOF+iZg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y6Nh4V1Z; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729612336; x=1761148336;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UumOPAxKyDjWj83HASaMOP3EQHFalal4IzLap2ntAps=;
+  b=Y6Nh4V1Z5TWYln8S4YovI1+WpDcfverMbXbK1GpdzQ80ZqTChQZoWWwd
+   qhtjq5zi7VssM5l8wF+Vmag+0wkMWcbqiMfC8DUJ4n5EXk5Nf5GeWCx2Y
+   ItLM+1+LjTrCOruB3qBUyCnoC3FHM19uJD0oisZcdQvb/BTqmQRHfd07N
+   k9T2XCCLRPagflqM5C722olfpXw6eHpcCI9ej0LeLNkP7y1D3nPYnZQBT
+   E9N1GHZHJ3k7hSsQoHRQIU9NN2JNtS6jI00Tk9f71O2Bh2/u7BKIunXuz
+   CK3ZRjJw3YwQrB/8oz6V5LO7GusTfTvinSUqwUUxqclbXUi3cNPwzm917
+   A==;
+X-CSE-ConnectionGUID: CYeRfkgwRsSbmnNmtpuZXg==
+X-CSE-MsgGUID: A9E2ZNp8RAqJmCj3RO3HhQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29035054"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="29035054"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 08:52:14 -0700
+X-CSE-ConnectionGUID: gCJRYYXTSwqvGlENIVCQeQ==
+X-CSE-MsgGUID: Fg5yHJzXR/2bWddGZfRo1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="79485793"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Oct 2024 08:52:13 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 22 Oct 2024 08:52:12 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 22 Oct 2024 08:52:12 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 22 Oct 2024 08:52:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=a1/jrCAaKoQPNzt5W4z0VpP2JW6XG5mvLMFG88SMgurc5Rsdzagwj/YkRDL9scoaVkrFMheDkiW20K83eipJ5EsVMM6vMpgltNasyWVpkww6ntOljVOdtE9nV4eXU6UhqmbC7fnjxnBr7iFE5YxA1zH9dOTc7Jo3SKzj/EEoeG10SRjvK6zgCMKymoYRFM57kKoQ5QlIQgo6iuBKjN3gyoaQuYipoIwaSuUmMuk6/0TXRxrLoFozRWouLCBAwuyc6mQB8iVfni+HAItbEJIVab44nzsSwBAB8txb9W94ZaXLfBPXqfld50OZcGLGqBbBUbtpkVAqovRgz0cmLCD23w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j104zYiQ6ix77elpKKhepwAHlSbNZRkn3ZdFAaFkBfw=;
+ b=IioORdGlNxKGDfODoZQ2v55PK0NUaOvY8G2LQ1xwms4bj3wV+U06Ld0mPGAzsRd//ix7i47v1nvMpZzpN9KESljayw/j7MT/0fr/+ELa/Cq2pOQndgX5u1MoKhZv4BqmDVc7Jad4sSsCO1XxDpgi+wRJaI2vR8wdvbW98bAvES1Ya80P7PZGo4WzmqAYVpkuCb4ui+k8B6MlUFSyNzi2hbtbq06W8i92hIQBUJ61fS4hCR6TTXxhTnRi0Fjj5UufzSb1vFMlSXEIgsYo98r4K9xqb5deKAkpf+sg+0Jj5fGIZxoJp/IFq5s5R4Pz1ZQOgmkGRpGwPDE9hqbqlBeC7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CH3PR11MB7866.namprd11.prod.outlook.com (2603:10b6:610:124::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Tue, 22 Oct
+ 2024 15:52:05 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8069.027; Tue, 22 Oct 2024
+ 15:52:04 +0000
+Message-ID: <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
+Date: Tue, 22 Oct 2024 17:51:43 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+CC: Daniel Xu <dxu@dxuuu.xyz>, <bpf@vger.kernel.org>, <kuba@kernel.org>,
+	<ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
+	<john.fastabend@gmail.com>, <hawk@kernel.org>, <martin.lau@linux.dev>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <lorenzo.bianconi@redhat.com>
+References: <cover.1726480607.git.lorenzo@kernel.org>
+ <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
+ <ZwZe6Bg5ZrXLkDGW@lore-desk> <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
+ <ZwZ7fr_STZStsnln@lore-desk> <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
+Content-Language: en-US
+In-Reply-To: <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZRAP278CA0016.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::26) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 00/10] QRTR Multi-endpoint support
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241018181842.1368394-1-denkenz@gmail.com>
- <20241022153912.hoa2wbqtkvwjzuyo@thinkpad>
-Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <20241022153912.hoa2wbqtkvwjzuyo@thinkpad>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH3PR11MB7866:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49a2d33c-eda9-4907-e13f-08dcf2b179b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MWN6SUlUM2RiVDk0bmpHVXhSRm9RZk5wOU1TM3JBZmRQMWdLems5aW9lalhL?=
+ =?utf-8?B?Q093SU1KbUJNVzhsYXZDem5ROFQ5ZXhSdWdvcGlHeU0xRlZsTldxbERNMnRE?=
+ =?utf-8?B?UFBDcnBRMDc1aWJQdG91WWY0NTRIK1JZSm1HS0pKNVdQSmE4RExNUzZ1b1lQ?=
+ =?utf-8?B?L0ZVU09hMzloaVBKcjN4RjVGVHJJZTgrVHF6NjU0ODR2WkVzY2RtUjBHZjFm?=
+ =?utf-8?B?WHJ5aENSbjBDU0oyMU9KS21MTmljWkNFSHY0dVVpNHoyZnl3R09pTjR1TC83?=
+ =?utf-8?B?U0txMSthbHFaRmM0bnU3OFlXdWV4YWhCWm5zVVJvdkxDNno4QlZvRG5JbHBW?=
+ =?utf-8?B?cXc2Nmljd3ZkL1QrWGdmQzFMSnRiZnlkNlZpU21YalN5a1cvbjdsSEF6WHk1?=
+ =?utf-8?B?aGVoc0pCaGFueU1vK0tHQUJYbG55YXhxNStTT1lQZGRYelF3RHUyUzd1VE05?=
+ =?utf-8?B?ZjU2c2g3TndPNHFVVnJ5UFY2VkJDc3ZwNTRpNXJWTGZueFZWaDF4WWJZU2VC?=
+ =?utf-8?B?a0xHOVBaMHVnSE9PNkVhckNhN09udkVYWTkxeFg5WFlGZisvTVRIQVdjeGRD?=
+ =?utf-8?B?ay80SXhNMm83dnJ5R3pGM0t1QjMvN2pENDBmUUpyWCs4Wll2cGUzTnJNZDBn?=
+ =?utf-8?B?V2V4MUhhNlIwMG5hb3B4T3QzMm5KNlJuaUROZ0hsNWljeE1DZWQrS0VQRFJl?=
+ =?utf-8?B?WUZ3akxEZEFqVXd0L2dURGFIbHVCeENGd203enE2QnFCcDlkelFTMzBTVm5q?=
+ =?utf-8?B?SmF4UUJtRmQxS2M1WUZnRWJKTGQ3RmJuaUVpM2xFbFRnVzVuQjYrWlVkNG9D?=
+ =?utf-8?B?bjhGeHVNNXlJSG96YzRQemdpLzlFQTNsSG1NR09QUy9OcUtBcVh1Q0gzK1FZ?=
+ =?utf-8?B?WnR1Vk9mWXZlWFpxalNmZ3hLQTV0MmZnYVRJVEI3VGUzZlNzdHBVRVRaQ0tU?=
+ =?utf-8?B?VmlhenppMjFGakpOaW40M1ZuZ2tQU0ZnVkxkTFArSXFKeWlEUldQSXQ4cHJ1?=
+ =?utf-8?B?WHVKOFNwSExIeEk1S1NROXo0ZXlRY2Rxb0M5U3Q1UVNUclR1ZCtzTkVqNlFl?=
+ =?utf-8?B?TUFaajM0eXhPV2NZNTh0MmxNRmVNbGJwbUROclJPcndYREFhbDk3OExrTDhu?=
+ =?utf-8?B?Qk9ubTJCRUNmOWd1cUR2Wjc1ZTBYa2N0aytUQ1RRMmxsQzJjU0swYlV1MVVP?=
+ =?utf-8?B?RXo1N2RxWllzNXhRODhwU3kxZTgxUEg1WEROOE80Qzl3WDRoUGpDNnJFNjdL?=
+ =?utf-8?B?NlJncmZFSVRLaklFNHA2MFZDT1F1WDNHRWcwZERDTjZ6aEkwY2t3OXZ1MUts?=
+ =?utf-8?B?VEtzQUZ5ek9BWGF0OURUM3g0QUJLTmt3c0JzVWpNcmNUN1ZEQlZUU1FMSjFW?=
+ =?utf-8?B?Y1JucGZGem45MnNkaTZ1R2I3RDZNT2tBZ01OZ3I2R0F4VCt0RTNLWmJhdS9n?=
+ =?utf-8?B?dnZ1bVk4UXlSQU8ycDJHREdLRGpJTlB5cnEyczRBeTRZbVFlQnFUSWsxVm5z?=
+ =?utf-8?B?RUx5YzlNaEc5M0N3bWNoYVY3b2JUTFdySzFHRWYwNzVNc2REeEhzMTdrcGhH?=
+ =?utf-8?B?WGRWcTM3ZnpOQlRpSW1FZG9OWkZPSmxpQkxlSEpFRnRVelBxZkQ3d0NRMUxH?=
+ =?utf-8?B?ZXIrYWw3aUlpSjBJdEJTTkZpS2xUN0p4aFNHa2FyQmNJclZhS1Y0OEN6QS9K?=
+ =?utf-8?B?aUdYa0lNRFRRbnI2Z3NvWFp5VTBReGhzS3IzSUZhRncvWUtacGJ3Ylh6cWJF?=
+ =?utf-8?Q?l0DwrVjd+qhV9h9zaSVyzPlgyBbTQVEyEw3RYkK?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WkwwdWtaVWVBT3ZkYVYwdU41L0UyNnVVcHdCbFFybnRzVExqQlZUNEtUcytU?=
+ =?utf-8?B?TXV3eElvUHBrcW1hVjhWaitmTmpqcFdidU9pNjZDRStjVFFKV2JWQ0trZEtD?=
+ =?utf-8?B?K0RkNmFISEV1Rk1ucVZMMXFvUnAvYW9VaGxiNjJXUXdqTUhZc2JyNDNJOTdY?=
+ =?utf-8?B?MlRBc3h5Q1NoeTY0ZXROQWhaSTNIakpMZUEvK0hxN1RHOWZOQXA3dktsUHIx?=
+ =?utf-8?B?cXhUYzZFS3VqM3JKU2xXYzREaFIzNyszSnZaZEdpSUZwaXVJeS9McS9hVXVr?=
+ =?utf-8?B?WVpzTFc0clBhaXZDdnYrdHJLd1R5dVBUS0ZVd0pmd3BlRXNLcldQcm9PaVdi?=
+ =?utf-8?B?bjAwbUNobkNhY0gyMUxIY0tmeGdPMzgxSkZmZVJPQjhqUGtxOHU3cXBZcDZQ?=
+ =?utf-8?B?UmV1K2J6Y3hMOXhJMG9qQ0QxNTBLVzdsaCtsSjM5L1I2YXhxUkJwR2hCTEhk?=
+ =?utf-8?B?dzdheDdSZ1VudWZuSTQ4eUsvRkRieTJsV1JQRHFwYXQ4TTQ3emlFcWs2UnUv?=
+ =?utf-8?B?N2ZMbFFNeGpIODNkLzVZNk85SjBNYmNLRU1tVHQxQTVPRGRURHRxSlpGN1dR?=
+ =?utf-8?B?Y05lRFBHZG00Qk11cDQxeEF1dWovdXBBWHpna0JRM1hUUEF0WU9LVnNxbHF5?=
+ =?utf-8?B?eUVNZXpHMVY5MHRYM2o4aEc0UWFuSFZCVkVpKys1ajl1WUJyVStURXFiK3pp?=
+ =?utf-8?B?Mnh6cHlnMjhwUDM2eStEQ0xXdDk2WW9zTXBXSUtIa0JvVStJMHQzMTdFbTdt?=
+ =?utf-8?B?VFI3eGVpb1ZzbDFvRkFWUWZHVFYyQTZSNis1K0VjNFpnMndMbnQwWkQ0cTI4?=
+ =?utf-8?B?V0o0SVpoUW45Y3lFSzFCVnZtK0tZdmhldG5aa2N0NzNOeXp1TGV2QzNxTjlO?=
+ =?utf-8?B?TmRVV1RJSmFOMllQMGxPdWpiOU5BSk15d2YyNVAyVS8wYlNvOW8vZzZBWUpp?=
+ =?utf-8?B?bHdKb0tBREdPbEkyRDI5bXRpL3J2K0FhVUNCQmlTMTIycUdRR0RiakRoZjBP?=
+ =?utf-8?B?V1FibmZzTXhmM2dmNDJBclk3SnNWWWxON0xjN0xLTWEyT3RuQ011Rm5xOGJu?=
+ =?utf-8?B?QTgxWFd0TWRNc2ZPYmJvRjRKVXNTR1VYMnN1ZTJvSVd4am1LSjJTSk9MRlUz?=
+ =?utf-8?B?NzYraW9wTVZpVmhmYkRLOTdDL0VqbmQ0TXFsVVFMSVZMdndoSlNCNWNXS1o1?=
+ =?utf-8?B?VWdvQ0NuZFJRNDcySW01aXY3TGlzdHpBeFBDSlpxalU1UzJwVHlUOWRuay9V?=
+ =?utf-8?B?a0JGb0p2TGFYUWwyZ3JoZ0xrYjZtMzlid3diNXNlTndPY2t1WXhxQTd0U2t6?=
+ =?utf-8?B?Z0xXc3ZScVlVVlNzaU5NbDcwU3FianRRZjlrSElIVlM5aWs4N3NwWnA1T1Ur?=
+ =?utf-8?B?clNuc09wcGR3N3dTQjJLUko3aStNakdqaXM4ZGp4ZkVNb2dSS3d2bnRCQ01l?=
+ =?utf-8?B?QkR4SzRueHI3bmc0bCtBTWlMNkt0Ukx5aG8xWjVHd3ZHQXJjUW9tb3NFNGV2?=
+ =?utf-8?B?NXRVdll4UWhGSEREL20rVk9oUGg4S2o4b2sreHlCTCtKTjEyR0lnSVdrS2xo?=
+ =?utf-8?B?V20wdU11YXpaOFhrUHh4U1JEK0RWcWRBOUJVSmZybG1BbXc5YVo0UUlnK0ZU?=
+ =?utf-8?B?NzBONXhlQnVTVmFRR2tabnd2OGQ3NVBpOHhXeVZzVWhEbzZKQlF0WitLL3dk?=
+ =?utf-8?B?M09DelZtMElBYVdoT3o1QWNRQklzNmJCelZLTi9EWHNtLzhOVytCSVBWZU9x?=
+ =?utf-8?B?cG9OUDl6cDNnaW5ETHFxVW15SGhsaTQ1eWxwak1MYXpqTDU5eDZaczRlbkIy?=
+ =?utf-8?B?eWRKempVS1M5bm9SUmxrRVhMVkREZmxkdXY0a2R2R3FxME5SeVJnbUFOUFg5?=
+ =?utf-8?B?anlpc0FYWlRlQzFoYWVsOXZJVFg3dGtZaDdLZDNIQ2NoSUFtMWJuWlplbHlI?=
+ =?utf-8?B?UkVjcXlGS0Y2K2VUSk1jU014NDBUaldZdGMrbzJvZDAyZkY3NHVpdUpvSiti?=
+ =?utf-8?B?d1JlaUtRMXcwQmhwdnNBQlQrbkhIOGRiZWJsVU9nWVUwd2FQRmhDcCtvS003?=
+ =?utf-8?B?OEVOcjA2a1E0MWNjb3BORFRHQWtOQ3NsNFVNR2IyR3AxUVpJcmlIWmNtbHIy?=
+ =?utf-8?B?TG5FaXVMMEVwK3kxeXJQb29KTjhTZzJPVzI5WFk1MWw5VnRYdSs3K1FSamJs?=
+ =?utf-8?B?bWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49a2d33c-eda9-4907-e13f-08dcf2b179b8
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2024 15:52:04.6932
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dpBFzUdz+dDu0o2/0iwW2DHLUynYkb0VGPUqTNaTRUgdReaUPMwKdmTKEF6AtSLnHdaC3pxAmwsvtYkmR8znrSdJA/El1NGjyeFig+Nbc7c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7866
+X-OriginatorOrg: intel.com
 
-Hi Mani,
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Date: Wed, 9 Oct 2024 14:50:42 +0200
 
-On 10/22/24 10:39 AM, Manivannan Sadhasivam wrote:
-> On Fri, Oct 18, 2024 at 01:18:18PM -0500, Denis Kenzior wrote:
->> The current implementation of QRTR assumes that each entity on the QRTR
->> IPC bus is uniquely identifiable by its node/port combination, with
->> node/port combinations being used to route messages between entities.
->>
->> However, this assumption of uniqueness is problematic in scenarios
->> where multiple devices with the same node/port combinations are
->> connected to the system.  A practical example is a typical consumer PC
->> with multiple PCIe-based devices, such as WiFi cards or 5G modems, where
->> each device could potentially have the same node identifier set.  In
->> such cases, the current QRTR protocol implementation does not provide a
->> mechanism to differentiate between these devices, making it impossible
->> to support communication with multiple identical devices.
->>
->> This patch series addresses this limitation by introducing support for
->> a concept of an 'endpoint.' Multiple devices with conflicting node/port
->> combinations can be supported by assigning a unique endpoint identifier
->> to each one.  Such endpoint identifiers can then be used to distinguish
->> between devices while sending and receiving messages over QRTR sockets.
->>
+> From: Lorenzo Bianconi <lorenzo@kernel.org>
+> Date: Wed, 9 Oct 2024 14:47:58 +0200
 > 
-> Thanks for your work on this! I'm yet to look into the details but wondering how
-> all the patches have Reviewed-by tags provided that this series is 'RFC v1'.
-> Also, it is quite surprising to see the review tag from Andy Gross who quit Qcom
-> quite a while ago and I haven't seen him reviewing any Qcom patches for so long.
+>>> From: Lorenzo Bianconi <lorenzo@kernel.org>
+>>> Date: Wed, 9 Oct 2024 12:46:00 +0200
+>>>
+>>>>> Hi Lorenzo,
+>>>>>
+>>>>> On Mon, Sep 16, 2024 at 12:13:42PM GMT, Lorenzo Bianconi wrote:
+>>>>>> Add GRO support to cpumap codebase moving the cpu_map_entry kthread to a
+>>>>>> NAPI-kthread pinned on the selected cpu.
+>>>>>>
+>>>>>> Changes in rfc v2:
+>>>>>> - get rid of dummy netdev dependency
+>>>>>>
+>>>>>> Lorenzo Bianconi (3):
+>>>>>>   net: Add napi_init_for_gro routine
+>>>>>>   net: add napi_threaded_poll to netdevice.h
+>>>>>>   bpf: cpumap: Add gro support
+>>>>>>
+>>>>>>  include/linux/netdevice.h |   3 +
+>>>>>>  kernel/bpf/cpumap.c       | 123 ++++++++++++++++----------------------
+>>>>>>  net/core/dev.c            |  27 ++++++---
+>>>>>>  3 files changed, 73 insertions(+), 80 deletions(-)
+>>>>>>
+>>>>>> -- 
+>>>>>> 2.46.0
+>>>>>>
+>>>>>
+>>>>> Sorry about the long delay - finally caught up to everything after
+>>>>> conferences.
+>>>>>
+>>>>> I re-ran my synthetic tests (including baseline). v2 is somehow showing
+>>>>> 2x bigger gains than v1 (~30% vs ~14%) for tcp_stream. Again, the only
+>>>>> variable I changed is kernel version - steering prog is active for both.
+>>>>>
+>>>>>
+>>>>> Baseline (again)							
+>>>>>
+>>>>> ./tcp_rr -c -H $TASK_IP -p 50,90,99 -T4 -F8 -l30			        ./tcp_stream -c -H $TASK_IP -T8 -F16 -l30
+>>>>> 							
+>>>>> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+>>>>> Run 1	2560252	        0.00009087	0.00010495	0.00011647		Run 1	15479.31
+>>>>> Run 2	2665517	        0.00008575	0.00010239	0.00013311		Run 2	15162.48
+>>>>> Run 3	2755939	        0.00008191	0.00010367	0.00012287		Run 3	14709.04
+>>>>> Run 4	2595680	        0.00008575	0.00011263	0.00012671		Run 4	15373.06
+>>>>> Run 5	2841865	        0.00007999	0.00009471	0.00012799		Run 5	15234.91
+>>>>> Average	2683850.6	0.000084854	0.00010367	0.00012543		Average	15191.76
+>>>>> 							
+>>>>> cpumap NAPI patches v2							
+>>>>> 							
+>>>>> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+>>>>> Run 1	2577838	        0.00008575	0.00012031	0.00013695		Run 1	19914.56
+>>>>> Run 2	2729237	        0.00007551	0.00013311	0.00017663		Run 2	20140.92
+>>>>> Run 3	2689442	        0.00008319	0.00010495	0.00013311		Run 3	19887.48
+>>>>> Run 4	2862366	        0.00008127	0.00009471	0.00010623		Run 4	19374.49
+>>>>> Run 5	2700538	        0.00008319	0.00010367	0.00012799		Run 5	19784.49
+>>>>> Average	2711884.2	0.000081782	0.00011135	0.000136182		Average	19820.388
+>>>>> Delta	1.04%	        -3.62%	        7.41%	        8.57%			        30.47%
+>>>>>
+>>>>> Thanks,
+>>>>> Daniel
+>>>>
+>>>> Hi Daniel,
+>>>>
+>>>> cool, thx for testing it.
+>>>>
+>>>> @Olek: how do we want to proceed on it? Are you still working on it or do you want me
+>>>> to send a regular patch for it?
+>>>
+>>> Hi,
+>>>
+>>> I had a small vacation, sorry. I'm starting working on it again today.
+>>
+>> ack, no worries. Are you going to rebase the other patches on top of it
+>> or are you going to try a different approach?
 > 
+> I'll try the approach without NAPI as Kuba asks and let Daniel test it,
+> then we'll see.
 
-I have very limited experience in kernel development, so the first few 
-iterations were shared privately with a few folks to make sure I wasn't 
-completely off base.  Andy was one of them :)
+For now, I have the same results without NAPI as with your series, so
+I'll push it soon and let Daniel test.
 
-Regards,
--Denis
+(I simply decoupled GRO and NAPI and used the former in cpumap, but the
+ kthread logic didn't change)
 
-> - Mani
 > 
->> The patch series maintains backward compatibility with existing clients:
->> the endpoint concept is added using auxiliary data that can be added to
->> recvmsg and sendmsg system calls.  The QRTR socket interface is extended
->> as follows:
->>
->> - Adds QRTR_ENDPOINT auxiliary data element that reports which endpoint
->>    generated a particular message.  This auxiliary data is only reported
->>    if the socket was explicitly opted in using setsockopt, enabling the
->>    QRTR_REPORT_ENDPOINT socket option.  SOL_QRTR socket level was added
->>    to facilitate this.  This requires QRTR clients to be updated to use
->>    recvmsg instead of the more typical recvfrom() or recv() use.
->>
->> - Similarly, QRTR_ENDPOINT auxiliary data element can be included in
->>    sendmsg() requests.  This will allow clients to route QRTR messages
->>    to the desired endpoint, even in cases of node/port conflict between
->>    multiple endpoints.
->>
->> - Finally, QRTR_BIND_ENDPOINT socket option is introduced.  This allows
->>    clients to bind to a particular endpoint (such as a 5G PCIe modem) if
->>    they're only interested in receiving or sending messages to this
->>    device.
->>
->> NOTE: There is 32-bit unsafe use of radix_tree_insert in this patch set.
->> This follows the existing usage inside net/qrtr/af_qrtr.c in
->> qrtr_tx_wait(), qrtr_tx_resume() and qrtr_tx_flow_failed().  This was
->> done deliberately in order to keep the changes as minimal as possible
->> until it is known whether the approach outlined is generally acceptable.
->>
->> Denis Kenzior (10):
->>    net: qrtr: ns: validate msglen before ctrl_pkt use
->>    net: qrtr: allocate and track endpoint ids
->>    net: qrtr: support identical node ids
->>    net: qrtr: Report sender endpoint in aux data
->>    net: qrtr: Report endpoint for locally generated messages
->>    net: qrtr: Allow sendmsg to target an endpoint
->>    net: qrtr: allow socket endpoint binding
->>    net: qrtr: Drop remote {NEW|DEL}_LOOKUP messages
->>    net: qrtr: ns: support multiple endpoints
->>    net: qrtr: mhi: Report endpoint id in sysfs
->>
->>   include/linux/socket.h    |   1 +
->>   include/uapi/linux/qrtr.h |   7 +
->>   net/qrtr/af_qrtr.c        | 297 +++++++++++++++++++++++++++++++------
->>   net/qrtr/mhi.c            |  14 ++
->>   net/qrtr/ns.c             | 299 +++++++++++++++++++++++---------------
->>   net/qrtr/qrtr.h           |   4 +
->>   6 files changed, 459 insertions(+), 163 deletions(-)
->>
->> -- 
->> 2.45.2
->>
-> 
+> BTW I'm curious how he got this boost on v2, from what I see you didn't
+> change the implementation that much?
 
+Thanks,
+Olek
 
