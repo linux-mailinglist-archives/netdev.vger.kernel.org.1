@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-137819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765E39A9F19
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:48:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AACF9A9F1A
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22CCE1F22AF6
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:48:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062F3284373
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065A71993AF;
-	Tue, 22 Oct 2024 09:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB3619580A;
+	Tue, 22 Oct 2024 09:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZlNoM27"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRvqEIv6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E40194125
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2ED155330
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729590497; cv=none; b=V56lynBtE694JqSZ82UU6dcv08V/bhrJF7sF9z2840uLIiPM56q6+j08pkkMKsNCgmMTIftQBTihqP3hWPxED6I+rxATCvYlMEwaMQlnD2iezU7ait8yweKsDAHeZ12kEF6JSk91vdje2aZPfihR2q4v5mH+fL7oK9z7uocD9bc=
+	t=1729590503; cv=none; b=N6Ja5P4wnjvk6fi9n/q7h24wM3JcP87YkaTpM4swV4DatVZHygzNd6shNACVbqyQmVr0PUH+4BClquJ+eaEnHuX4usabip0TqJ6Ilmk8QPF5Vm5FWRFNw/joCMxPhuKVD0KZU537VHQBnjtaqtcw5cvmk9pW5GUyeDHiDYbA8ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729590497; c=relaxed/simple;
-	bh=XaUkaBK+hpUOhDIkRzlJiXdM8vvSHQhFMVP4rVVVKxE=;
+	s=arc-20240116; t=1729590503; c=relaxed/simple;
+	bh=ZRqmtFtpN6pL6xPgI7LsATitWXUIUBemhFkGzlCmPt4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhyQYHeSeQAWKNxxpNKiATeQ6vulHnRhvsb2Bb2AV+hKN5Y4cU4KQGvjLZZF7RuvXwPaNy5tbUJgbKG7IJtH5HLCLVIuheNJC5sGlClTiPqc4jx8jChOPhFB89vuHW0l9JQkjytKPntc81xnBxelFHWjgaM/4OyLY5oZ8VihF/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iZlNoM27; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0x38shtLeQXniZ/aKPaaIiArusUwaGy0VEfCrRaAsRQYTSe9WmxNoslGAza9Qs76aYw8PSAbOH9vPhuGRE18UzNPNreq57S/8nRHUisuQ4fEkEAHLNJ9viw0RMbpjwVd196PrcwotdnrvXhBa7L4vEynb867QpJt3zpFOaUOYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dRvqEIv6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729590495;
+	s=mimecast20190719; t=1729590501;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5RRFmx311mMt/tUUxO+VS5JQIohMmBJqc2TBlvbHmV0=;
-	b=iZlNoM27KMj78kVfoI0ZvoogOzngZ+taq0gTx+14q6sNoAfLC/4xzlgSDHVrYvDmw6A68X
-	fiv1dFpW5hUIOgpBUqmF67SG1TpsTEL2BEDGQYd8vG9z3I9inux0aEYA76TwqQWnJtD0if
-	GPybt3c/Nszut0vwPQz6S74HADCkn+I=
+	bh=XD9BsKkXKs/DyY017aAgEepYSP6HuYEsFB0I6eYqQg4=;
+	b=dRvqEIv6V7osPJaUA4VDGU6iqrLh/9+wGHc907vmGv/2cvf88+IW7S8YGKQ1WPLMrHDQzG
+	Y7L/rM955jBRy2O5FmZ7D9behoyZeDQXGgS1DcmuCLTxp70J4MVaA6zmobwzIcT75inrEr
+	fw6q7hDaLzHwPTkeTjBZwC2pBuqAKWI=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-QLMKZ41AMymZIpG06cZKIw-1; Tue, 22 Oct 2024 05:48:12 -0400
-X-MC-Unique: QLMKZ41AMymZIpG06cZKIw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315a0f25afso40505105e9.3
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:48:11 -0700 (PDT)
+ us-mta-14-No4CSRKOMRqUirXgIbOfPg-1; Tue, 22 Oct 2024 05:48:19 -0400
+X-MC-Unique: No4CSRKOMRqUirXgIbOfPg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso44226185e9.3
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:48:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729590491; x=1730195291;
+        d=1e100.net; s=20230601; t=1729590498; x=1730195298;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5RRFmx311mMt/tUUxO+VS5JQIohMmBJqc2TBlvbHmV0=;
-        b=bxQxL/7aSElSu1yhoGjYQRC8MQnmjq9+ziqtZGGAy75erGZcTmn4QqY0k7Y1iRo30B
-         R0eK7EIfBbbesFWwU7Z4oxRjlq3GQ5IjgMB+59yQ0XLT54R1IAB/rDns0jy6fBanhyiJ
-         cYVdvid2MymKYKtwYJoLcYOo21b500jqU4VZEI5V0M7+EwhUMHHnCMF1MzoiLxaB281C
-         ihcDO8nAdZwoz8TyPwZFbqmsHOVafCAhmI0cdCVnFHBHYMTSJDmJvSau22XVUDg7ExgD
-         ABkTVkbLfQ95URxPO/1vdl0oF1sH1+TagwYtVfI8TREXqHe60Vc8s8TzRSg+pgtGL8yk
-         kJLg==
-X-Gm-Message-State: AOJu0Yz1xSPtdFC6hRna6vNa3KF3/AXsEZQFUfysSppKYRm/lLoDKQMq
-	07CGvpNqpCCVCQ23/M68F/PEiY0H2V4z5DmeF03iBOJdN4FffqpE+hMiODOZChS2mjkhFoE/BsK
-	zgg0jALGuG0GcKQPQ2PggSALLB81j06i9KnWnX9kJX653k0hg94O3eA==
-X-Received: by 2002:a05:600c:3511:b0:42c:ba1f:5482 with SMTP id 5b1f17b1804b1-43161691c49mr89435555e9.35.1729590490891;
-        Tue, 22 Oct 2024 02:48:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF3HFc2Ycx3O98VJk7U1x4wnReHs1+f18GY8AglBDnWfBFY/0L61+Uw/Chfj+L3qrRMcF4N9A==
-X-Received: by 2002:a05:600c:3511:b0:42c:ba1f:5482 with SMTP id 5b1f17b1804b1-43161691c49mr89435315e9.35.1729590490426;
-        Tue, 22 Oct 2024 02:48:10 -0700 (PDT)
+        bh=XD9BsKkXKs/DyY017aAgEepYSP6HuYEsFB0I6eYqQg4=;
+        b=suCr4G08tSLR719POOMdmyoaLyg+IM+EZ86f4Af8Ir/PDlBukuAcyZezASaVAubw0e
+         +1OV7YMppoct8qDKCb1Hogt82eAC20buB6ovcI09noRQW6SGglnxn0T9ARNI67f+C/9d
+         2TyDgF7t7qNS73dF+XI8beEqDZqmjm/pHTtL2oI81BmL6vsP3Xh6e5Bp9xzDYorZvnPk
+         9HTwEEksvC9rw1WiQhfAJQ1ebGGVT+EV7McqD381AM3Iu9s0dBzx0+6kCzyVjEmaqMQu
+         rRljhpPNbywlpMhXoSGEQjpevhkJZ/PJypFPbG3XNqAKqkL4fvl5iAzr0qa91/FYFH8z
+         540A==
+X-Gm-Message-State: AOJu0Yw9WZ+Z76Oi9L3S40NLnz4DpqcLpurRc5Nhm/Xg3xZKVb91BqUG
+	rRAtublU7wX0JWN23rT2v8+QqZn/VTWTLCD+f8my8ZSTc0w8PUoJyD3yBcx237kVwYLFkgD4F6W
+	PvNcXit73WbtNXyesmmvvS3oxRvpf26fVaxJrzn9lz79PO72Se37x+g==
+X-Received: by 2002:a05:600c:3d9b:b0:431:40ca:ce6e with SMTP id 5b1f17b1804b1-431616a0986mr106060125e9.31.1729590498341;
+        Tue, 22 Oct 2024 02:48:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFMoXUcyBDBlvdUThYTiFcEuZ6XXmu6oF2dUWjDb8EvuYSPFlf1hesnX3+QkgfA3OyhEj8n4A==
+X-Received: by 2002:a05:600c:3d9b:b0:431:40ca:ce6e with SMTP id 5b1f17b1804b1-431616a0986mr106059865e9.31.1729590497959;
+        Tue, 22 Oct 2024 02:48:17 -0700 (PDT)
 Received: from debian (2a01cb058918ce00b54b8c7a11d7112d.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:b54b:8c7a:11d7:112d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9bb15sm6238565f8f.99.2024.10.22.02.48.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4317d03ea4asm9268305e9.0.2024.10.22.02.48.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 02:48:10 -0700 (PDT)
-Date: Tue, 22 Oct 2024 11:48:08 +0200
+        Tue, 22 Oct 2024 02:48:17 -0700 (PDT)
+Date: Tue, 22 Oct 2024 11:48:15 +0200
 From: Guillaume Nault <gnault@redhat.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
 	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 2/4] ipv4: Prepare icmp_reply() to future
+Subject: [PATCH net-next 3/4] ipv4: Prepare ipmr_rt_fib_lookup() to future
  .flowi4_tos conversion.
-Message-ID: <61b7563563f8b0a562b5b62032fe5260034d0aac.1729530028.git.gnault@redhat.com>
+Message-ID: <462402a097260357a7aba80228612305f230b6a9.1729530028.git.gnault@redhat.com>
 References: <cover.1729530028.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -99,22 +99,22 @@ the inet_dscp_to_dsfield() call.
 
 Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- net/ipv4/icmp.c | 2 +-
+ net/ipv4/ipmr.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 23664434922e..33eec844a5a0 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -445,7 +445,7 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
- 	fl4.saddr = saddr;
- 	fl4.flowi4_mark = mark;
- 	fl4.flowi4_uid = sock_net_uid(net, NULL);
--	fl4.flowi4_tos = ip_hdr(skb)->tos & INET_DSCP_MASK;
-+	fl4.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(ip_hdr(skb)));
- 	fl4.flowi4_proto = IPPROTO_ICMP;
- 	fl4.flowi4_oif = l3mdev_master_ifindex(skb->dev);
- 	security_skb_classify_flow(skb, flowi4_to_flowi_common(&fl4));
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index b4fc443481ce..99e7cd0531d9 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -2081,7 +2081,7 @@ static struct mr_table *ipmr_rt_fib_lookup(struct net *net, struct sk_buff *skb)
+ 	struct flowi4 fl4 = {
+ 		.daddr = iph->daddr,
+ 		.saddr = iph->saddr,
+-		.flowi4_tos = iph->tos & INET_DSCP_MASK,
++		.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(iph)),
+ 		.flowi4_oif = (rt_is_output_route(rt) ?
+ 			       skb->dev->ifindex : 0),
+ 		.flowi4_iif = (rt_is_output_route(rt) ?
 -- 
 2.39.2
 
