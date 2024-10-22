@@ -1,116 +1,132 @@
-Return-Path: <netdev+bounces-138004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25239AB711
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:42:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E45CD9AB739
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:55:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D16A284961
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:42:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D2E428683B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E411C9EC7;
-	Tue, 22 Oct 2024 19:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956711CB33A;
+	Tue, 22 Oct 2024 19:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nJerMDSQ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="IaivukWo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A871A2547
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 19:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BE814EC55
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 19:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729626132; cv=none; b=oqbCFIxSdJMWRAT08aLN2jRJcYN4On428+nQ/F8cDuzKXdauC6nkj2xZP3J3jPAN0vUlDI3TsDEhESulQHePlZTyUpb4RHUHByfhTWgIU3AxwTqWQ0dmqMORAwTqK6xGilvE+4WcJpY1uhBKs8FmqclrN5+Npqrf0xpCtP3iyfQ=
+	t=1729626904; cv=none; b=fVB/Dg+wIHPLRWPhIugdq+Vy+Rpu0/CTTVPSaj3+towBHZsBeV14ii0X4S5pdx+rHAqBcKxI1AyY9u2I3eW+a7ax6rSfOOfqRGufWTEeoFwKTAj1gvFbE2usY6gUAee9CCah6tfGSOhsBQ3aZhzhBGSW9+3hi31s8Vr6wA2zfcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729626132; c=relaxed/simple;
-	bh=8u2z9OcF3av1yAbmJfe0ka+WnSg+hzQarvChT9pKBVc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NBGEgE5LhqPd7AR5jyB2LdEyAt87olZLPQKB0eQTJV4yeoLcL+T4ACdioykCo5SsuHX4Z+HCy8i4I7eKdexvYd7fx6Wt8nz8IsLv9gjPCo6enTTj+bLMxKFs6wX5+OBzVXUx5Xm79FE81vupErhDFwEp+lrLeAU8TxL2GbeApuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nJerMDSQ; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1729626904; c=relaxed/simple;
+	bh=OwNBECyO8a4KyyWaokcQ5DrkDXHEf/AVG2cFGODOWbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oML1eF2MRjDF4EnPW8ToA4FvmX3c47HWQ9ttn3CO1l8H5C4r9WeOYEApFcfRecTxW+khM63pmQlO3Oe06OGpztN2jXaFccBG/95DTdbGUxrvD1JTpLUQHOkQ8auId1kDeCcA5+tYDL2zlSthmyZ87Ka67UEfzuTAFAcEylhgRxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=IaivukWo; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71e4244fdc6so4292868b3a.0
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 12:55:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729626132; x=1761162132;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wMXoWxWRs4qEIHgmI6235Rrtz3CT9SJfdegNc74reSo=;
-  b=nJerMDSQVTLSTSBdAKgh5xqvM6B/LCeW7bB5iImebduImUApiuqmxrz3
-   tUFijbV2UOaL3mnpCBcOWnLIssuiToLV8WVYoONRj3vgcySqes+sZQRGk
-   3DZy0XBLYG1gRJ/LU/ltseQFDFB/RvundZm8zLLuBmj+0jRLbZuHc6s9R
-   8=;
-X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
-   d="scan'208";a="668341557"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 19:42:09 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:19602]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.247:2525] with esmtp (Farcaster)
- id b7f1c655-edbf-40a4-beb8-f165c12a674e; Tue, 22 Oct 2024 19:42:07 +0000 (UTC)
-X-Farcaster-Flow-ID: b7f1c655-edbf-40a4-beb8-f165c12a674e
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 19:42:07 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.219.31) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 22 Oct 2024 19:42:03 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <horms@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<jk@codeconstruct.com.au>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <matt@codeconstruct.com.au>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <razor@blackwall.org>, <roopa@nvidia.com>
-Subject: Re: [PATCH v2 net-next 13/14] rtnetlink: Return int from rtnl_af_register().
-Date: Tue, 22 Oct 2024 12:42:01 -0700
-Message-ID: <20241022194201.70485-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241022085920.GS402847@kernel.org>
-References: <20241022085920.GS402847@kernel.org>
+        d=fastly.com; s=google; t=1729626902; x=1730231702; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GyiwtrdDNttqs/EmE5JLMsYdKcmXilzmJKF+u4QMJ3k=;
+        b=IaivukWoBQvm+COOLj8X/MyxG65oIZGqscCxUuhoxZdcVuSl+LueqG6NFnsBoLOk3k
+         J84085qjbv79KatZEA0bDPQX6QataLqxWcLIks99NQ4U4wBX/oKLO8ZcoekwaJdsvHfe
+         OmTepm22hNnq2+tz68B+ay4PWroUTM3bQxflE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729626902; x=1730231702;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GyiwtrdDNttqs/EmE5JLMsYdKcmXilzmJKF+u4QMJ3k=;
+        b=ezLS3m7AUv3cmgSBH76T6N00X6Vb+EWDesdNuuVyWd4G/L/6Zj/QQNDDMkCyS5kTzm
+         KrgvF2/hDnsuWIjhiCkwA/Js/l/BOJrnogpRPH1YbXecHfOAKMOtwnHTiDxTIj/CMpCP
+         vxnqXKfwKLcbNHiXCgeJ3qjQxg35qY+21D5Xibz0gTBbWKCZVUSdXlSsrLXOzsykv21E
+         uikpYOVENlQt+A4rea3BgaEC37R+YgfnqF/N9VfgiEHu84QkLT9FubEzGEQ1HOiL0ZVZ
+         ZbZw8JQS2/55lYJOw2kLDPcn6OAyp5hnfRIvMIww9SLFd1u7eB6WuWOOAFoaTGL9c+mL
+         rZhw==
+X-Gm-Message-State: AOJu0YwN9OGnLE2yI7s+2rHaeVdH6AeE6CYHRHEppgKqSPFlxdJIbzvb
+	yo62CYUme1Dz/U2cbk/GwqtStZ0Qk5m2CtOWh5ChBIDReWBDoRbmfHDYXn5yT9c=
+X-Google-Smtp-Source: AGHT+IHOS5ZW9hfqejqTSv0uUEcgV0zqvj28qCLjL54AXpj9P6o2oacvHMmutTEyUR5UBufxHBYjiw==
+X-Received: by 2002:a05:6a00:14cf:b0:71e:f4:dbc with SMTP id d2e1a72fcca58-72030cefe05mr409232b3a.25.1729626902274;
+        Tue, 22 Oct 2024 12:55:02 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec14159d4sm5085891b3a.210.2024.10.22.12.55.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2024 12:55:01 -0700 (PDT)
+Date: Tue, 22 Oct 2024 12:54:59 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, kurt@linutronix.de, vinicius.gomes@intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next v3 1/2] igc: Link IRQs to NAPI instances
+Message-ID: <ZxgDE96t2iWXlI8o@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
+	kurt@linutronix.de, vinicius.gomes@intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20241018171343.314835-1-jdamato@fastly.com>
+ <20241018171343.314835-2-jdamato@fastly.com>
+ <d4eccf1a-3346-4446-a7ef-67e6905be487@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4eccf1a-3346-4446-a7ef-67e6905be487@intel.com>
 
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 22 Oct 2024 09:59:20 +0100
-> On Tue, Oct 22, 2024 at 10:53:32AM +0200, Paolo Abeni wrote:
-> > On 10/16/24 20:53, Kuniyuki Iwashima wrote:
-> > > diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> > > index 445e6ffed75e..70b663aca209 100644
-> > > --- a/net/core/rtnetlink.c
-> > > +++ b/net/core/rtnetlink.c
-> > > @@ -686,11 +686,13 @@ static const struct rtnl_af_ops *rtnl_af_lookup(const int family)
-> > >   *
-> > >   * Returns 0 on success or a negative error code.
-> > >   */
-> > > -void rtnl_af_register(struct rtnl_af_ops *ops)
-> > > +int rtnl_af_register(struct rtnl_af_ops *ops)
-> > >  {
-> > >  	rtnl_lock();
-> > >  	list_add_tail_rcu(&ops->list, &rtnl_af_ops);
-> > >  	rtnl_unlock();
-> > > +
-> > > +	return 0;
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(rtnl_af_register);
-> > 
-> > kdoc complains about the missing description for the return value. You
-> > need to replace 'Returns' with '@return'.
-> > 
-> > Not blocking, but please follow-up.
+On Tue, Oct 22, 2024 at 11:50:15AM -0700, Jacob Keller wrote:
 > 
-> FWIIW, I think "Return: " or "Returns: " also works.
+> 
+> On 10/18/2024 10:13 AM, Joe Damato wrote:
+> > Link IRQs to NAPI instances via netdev-genl API so that users can query
+> > this information with netlink.
+> > 
+> > Compare the output of /proc/interrupts (noting that IRQ 144 is the
+> > "other" IRQ which does not appear to have a NAPI instance):
+> > 
+> 
+> Minor nit: 144 doesn't appear in either output, and it seems like this
+> intended to indicate 128?
+> 
+> We think its a typo as the 144 appears in the data from the second commit.
+> 
+> I can make a note here to fix this typo when sending after we finish
+> validation, if there's no other issues.
 
-Sure, will post a followup shortly.
+Yes, that's an error on my part. Sorry about that. I re-ran the
+patch after updating it and amended the commit message, but forgot
+to update '144' to be '128'.
 
-Thanks!
+Based on the e1000 bug report that came in [1], I'm going to take
+another look at the igc patches to make sure the paths where the
+queue mapping happens (in Patch 2) are all in paths where rtnl is
+held as I attempted to do for e1000 [2].
+
+[1]: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
+[2]: https://lore.kernel.org/netdev/20241022172153.217890-1-jdamato@fastly.com/T/#u
 
