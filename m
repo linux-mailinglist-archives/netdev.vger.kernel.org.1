@@ -1,155 +1,176 @@
-Return-Path: <netdev+bounces-138025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CFA29AB8F2
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:43:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D4639AB90D
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53D0A1C23096
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:43:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE65CB22DF0
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318991CCEED;
-	Tue, 22 Oct 2024 21:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E3E1CDA0B;
+	Tue, 22 Oct 2024 21:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlZ64WGH"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gIAHV0kJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630381CEAAB
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 21:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827491CB304
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 21:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729633363; cv=none; b=YeyyLEJlDPHoTvvz2LzkUIsw/KIW/aoazFDMzE620wS166xIRrENGGAD9YLYduzwa5Rp4vY7HaMt2cF50QJtrxF3QLUu1Wnt86kMAI2VXYlXXr++n+kFkQUny2nbcCf5hbC2HxYUSxtR0BQRb8Y9Bk51onatXI1LliyluN4lVMI=
+	t=1729633982; cv=none; b=nNUiVA3goXR5HqohlhAF/dL92kE+teNiIM+6YwvUfFOjaW9rjot5DSwahh5QkV+F37iqK0syuxOESbYff4lQRW7WVBPWZLzXZhhxJW4cNgKADyjaUhJWUxR9w97dHUUaWVAH3b6r06uGfBf/uptFY3LGVL1lwPVPeUiCHKVA10c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729633363; c=relaxed/simple;
-	bh=MT9tpPG2CccRkSzRIUUAWHfkSb0daMkpZu3gRy/28yk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IESeB7FQqAZKDARc/mLRQdGvItIhaSCpMlg/7SDhxQe8hQxljJlGeKzxwaQh7Zpt001t+fB5t0mCI/yJpDWGYST7Wx3LvFOKCRBkmqR6nHoOXneKjas2eG+geJrVQoqO8uaST3MqTYExc9BmGz75SedUR71KgMdcwui6AR0hm74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jlZ64WGH; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539f4d8ef84so6598138e87.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:42:41 -0700 (PDT)
+	s=arc-20240116; t=1729633982; c=relaxed/simple;
+	bh=mZHyRJsvYbJrA/bK0xUf3xOnp/PwB9vGkP9J9h6qzUI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FcroiociwpSt1yLL2pqOcoWfSrCCcos24NjrxDXiYcMFWxeFXy48EEFdrBqKSg9MZZY3dFe9boWRMPl5MsCDlOMz2cQSGyySNJbqO1Jg90FH1oRCjH748s967tgTcuQIqC7zwH9EBtjCUtZi6R/oOMFesrb2Ip6d0+zEHwbSkEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gIAHV0kJ; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7eb00dc77f1so979020a12.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:53:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729633360; x=1730238160; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rhU9Han7paZZ8BGAQedzEn2YTKVTz4ZqVBWQpFZWFRk=;
-        b=jlZ64WGH5y6d42OzmmjP851ogYA1ptTBZg6qBPrq280pJfmuKZwvjtMekMgqt5hzs9
-         5W36hRt3h4h0XiOKw0gSiwFGzKI2N304umf8SfmP7cb1jh+5J02p5Kp7TpMs1T2DrCRu
-         KuVP2xAv1XHLp6P1fESXgvS0k5Qturz9LOmETXZvrFI5+wtnRWEf+LcU6mPo3a/HIYV/
-         Qe0N1SxX7fX6qyqMxweN0zZ/jP1iIjEScQBSWoKS0/Ge/p/UBzG5YypnacB9NmRUTGAD
-         BToFdh3g+qTRy2KNtg1/dn34ZF/bxd4zGaGRyHT7agBpZlne9IzrrsHMWR+SXZlvMRo/
-         IhlA==
+        d=fastly.com; s=google; t=1729633979; x=1730238779; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=27PH9KJY9xP4iasns3riOle1zadFd8sn/XZWx1MVstg=;
+        b=gIAHV0kJx5I5RQv4FTOvL4HR3JG8MfVirQgpY8+/WGg1tV7uMFXdNIPJ46d/PNKya5
+         OVP1N5ZO14/xlZyg+IrN//+XvPjPnKoeN334Vwhgi3k5BhJWPlEJgo4gNmBM4IGIPrzg
+         HV1YGpyFqnV9omvUJYQa681WS/QsxNDRl04RQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729633360; x=1730238160;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rhU9Han7paZZ8BGAQedzEn2YTKVTz4ZqVBWQpFZWFRk=;
-        b=UZAMSfxJvbYuNf/jpvq+5mk+B6um9hHRAJ3sAHwIbYU8eNZX8eFIhFA7kVOylluPKb
-         68QF1sgCi8VrVrEigKT5Upx9HTtXo/o2WxxTzV9Ub2ol7VXVHzOAvKq1SFkdHS+feChT
-         dqLSQymVovOcxWRzwIZ1YWEEOfReju60af11/J6qCInXUbGYd3juEa41c7+9pfFQhCuC
-         UE6YWzXlrIwjORbD7yhm4FAAAvn91tvgrUsBBXRYzaBxKa396IbLtx4tHi/twDo1g7LZ
-         pREahW0XPBWVBruPdFxhZZFaXXeROKtVDpdf0cTtd024/IxbcJjQ1UGkrQzuVV5T7ZBB
-         mhdw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCTcOo8plCrLSS8g26oghTyGMYkszCpCPYgZl8vZLufcIvPxk4IjtA+4jsUWYFfZF4QybzAIQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/k/rct4fwzZftpyst76s3iLv2I+oFrmbDOZ45gEsK/F6fao8i
-	Ey0Z4YK6ejcAZF7ceX/5KQj33JJgtuaieTSo/yqWnqq+9In3UbfO
-X-Google-Smtp-Source: AGHT+IFYSB5qFHqkdFfAXrxKpQ9KmiyGPPhUbtHxFmyqNL3Vl1nEkBASgzGA3VJOgmiehgiQLptHKg==
-X-Received: by 2002:a05:6512:1050:b0:539:fb49:c48e with SMTP id 2adb3069b0e04-53b1a30c01amr133233e87.11.1729633359244;
-        Tue, 22 Oct 2024 14:42:39 -0700 (PDT)
-Received: from mobilestation ([85.249.18.76])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53a223e561dsm871380e87.22.2024.10.22.14.42.36
+        d=1e100.net; s=20230601; t=1729633979; x=1730238779;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=27PH9KJY9xP4iasns3riOle1zadFd8sn/XZWx1MVstg=;
+        b=sOxD51AyK8AWrSgUFQPWxknW/Xpe563B6gaRJDh24O8dYi7W4Iw3+VEoy30h8ijHQJ
+         c4lZAsSUv47YCgqmO3ywi9ueRyZbbInCQrQWdHo0/i7K8+q+9VwwxtYaVUdzAaQ3pZ6h
+         Vh9reOR6cie9XJv8k4/8adHhS+6ojhuNhTvWNkU1rLLbaEqJOVeAWVP4FURtEzbRNHOc
+         xrPsj0AqVU7/Kpg1dHs3tiYopZXd3Xj2BMfyYfiGnPRvxSXqXJ+VWcWsRNxva/Jf0AVI
+         x7a+uejRlupiUa7J4oz5BtqhC8mV/WbpuBAw3Ru2eAinGfj5EBndFCTlbqW28qph4cCK
+         nEFQ==
+X-Gm-Message-State: AOJu0YwGieY6WOeypUArG/NDOKKf9kT9/lz5Mrn8y958B5W3nsCiTMPV
+	w74etRQsRw/Kw249RCclIJcmIB3BAHzU/XUJt5LxEmfUaFD3egTik6mnWAP4Yf3A/AyLAklN50+
+	uUaCEL7NhXFOWu4BRagbwCHWvl2O/cJ5+umb9xP4bckgh7EqkY/5D0Rp7ns0gWDUydLNW+9m7LQ
+	S4c71kNJTDN6VTaFPWCV5hUszVa5pICqDOHog=
+X-Google-Smtp-Source: AGHT+IF+g37BAJ/gs+9A6578kVnZDjD+Y9MC0VzOxCi8OhwVz1VkHyQIRvT2Mam28b3hFk4yJnnKLw==
+X-Received: by 2002:a05:6a21:4581:b0:1d8:fdf8:973c with SMTP id adf61e73a8af0-1d978b3dd71mr507279637.29.1729633979041;
+        Tue, 22 Oct 2024 14:52:59 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13d75b9sm5194375b3a.131.2024.10.22.14.52.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 14:42:38 -0700 (PDT)
-Date: Wed, 23 Oct 2024 00:42:34 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
-	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Jose Abreu <Jose.Abreu@synopsys.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/7] net: pcs: xpcs: yet more cleanups
-Message-ID: <mixnwzyhuvu7tiablbrmukgtgjuzikldrmdh5rve4vpodpn44q@qqtt5dimcfvr>
-References: <ZxD6cVFajwBlC9eN@shell.armlinux.org.uk>
- <tnlp4m7antrcpbscpvdzpntyjudgs5mivw6cqvobyjph37u3la@okz5aoowa6bm>
+        Tue, 22 Oct 2024 14:52:58 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: jacob.e.keller@intel.com,
+	kurt@linutronix.de,
+	vinicius.gomes@intel.com,
+	Joe Damato <jdamato@fastly.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	bpf@vger.kernel.org (open list:XDP (eXpress Data Path)),
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-kernel@vger.kernel.org (open list),
+	Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [iwl-next v4 0/2] igc: Link IRQs and queues to NAPIs
+Date: Tue, 22 Oct 2024 21:52:43 +0000
+Message-Id: <20241022215246.307821-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tnlp4m7antrcpbscpvdzpntyjudgs5mivw6cqvobyjph37u3la@okz5aoowa6bm>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 21, 2024 at 02:09:02PM GMT, Serge Semin wrote:
-> Hi
-> 
-> On Thu, Oct 17, 2024 at 12:52:17PM GMT, Russell King (Oracle) wrote:
-> > Hi,
-> > 
-> > I've found yet more potential for cleanups in the XPCS driver.
-> > 
-> > The first patch switches to using generic register definitions.
-> > 
-> > Next, there's an overly complex bit of code in xpcs_link_up_1000basex()
-> > which can be simplified down to a simple if() statement.
-> > 
-> > Then, rearrange xpcs_link_up_1000basex() to separate out the warnings
-> > from the functional bit.
-> > 
-> > Next, realising that the functional bit is just the helper function we
-> > already have and are using in the SGMII version of this function,
-> > switch over to that.
-> > 
-> > We can now see that xpcs_link_up_1000basex() and xpcs_link_up_sgmii()
-> > are basically functionally identical except for the warnings, so merge
-> > the two functions.
-> > 
-> > Next, xpcs_config_usxgmii() seems misnamed, so rename it to follow the
-> > established pattern.
-> > 
-> > Lastly, "return foo();" where foo is a void function and the function
-> > being returned from is also void is a weird programming pattern.
-> > Replace this with something more conventional.
-> > 
-> > With these changes, we see yet another reduction in the amount of
-> > code in this driver.
-> 
-> If you wish this to be tested before merging in, I'll be able to do
-> that tomorrow or on Wednesday. In anyway I'll get back with the
-> results after testing the series out.
+Greetings:
 
-As I promised, the series has been tested on the hardware with the
-next setup:
+Welcome to v4.
 
-DW XGMAC <-(XGMII)-> DW XPCS <-(10Gbase-R)-> Marvell 88x2222
-<-(10gbase-R)->
-SFP+ JT-DAC-SFP-05 SFP+
-<-(10gbase-R)->
-Marvell 88x2222 <-(10gbase-R)-> DW XPCS <-(XGMII)-> DW XGMAC
+See changelog below and in each patch for changes from v3 [1].
 
-No problem has been spotted for both STMMAC and DW XPCS drivers:
+This revision was inspired by a bug report for e1000 [2] and analysis of
+the call paths for igc on the mailing list [3] to ensure that RTNL is
+held in all appropriate paths.
 
-Tested-by: Serge Semin <fancer.lancer@gmail.com>
+This series adds support for netdev-genl to igc so that userland apps
+can query IRQ, queue, and NAPI instance relationships. This is useful
+because developers who have igc NICs (for example, in their Intel NUCs)
+who are working on epoll-based busy polling apps and using
+SO_INCOMING_NAPI_ID, need access to this API to map NAPI IDs back to
+queues.
 
--Serge(y)
+See the commit messages of each patch for example output I got on my igc
+hardware.
 
-> 
-> -Serge(y)
-> 
-> > 
-> >  drivers/net/pcs/pcs-xpcs.c | 134 ++++++++++++++++++++++-----------------------
-> >  drivers/net/pcs/pcs-xpcs.h |  12 ----
-> >  2 files changed, 65 insertions(+), 81 deletions(-)
-> > 
-> > -- 
-> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> > 
+I've taken the feedback from both Kurt Kanzenbach and Vinicius Costa
+Gomes to simplify the code from the rfc v2.
+
+Thanks to reviewers and maintainers for their comments/feedback!
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20241018171343.314835-1-jdamato@fastly.com/
+[2]: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
+[3]: https://lore.kernel.org/netdev/ZxgK5jsCn5VmKKrH@LQ3V64L9R2/
+
+v4:
+  - Fixed a typo in Patch 1's commit message for the "other" IRQ number
+  - Based on a bug report for e1000, closer scrutiny of the code
+    revealed two paths where rtnl_lock / rtnl_unlock should be added in
+    Patch 2: igc_resume and igc_io_error_detected. The code added to
+    igc_io_error_detected is inspired by ixgbe's
+    ixgbe_io_error_detected
+
+v3: https://lore.kernel.org/netdev/20241018171343.314835-1-jdamato@fastly.com/
+  - No longer an RFC
+  - Patch 1: no changes
+  - Patch 2:
+      - Replace igc_unset_queue_napi with igc_set_queue_napi(..., NULL),
+        as suggested by Vinicius Costa Gomes
+      - Simplify implementation of igc_set_queue_napi as suggested by Kurt
+        Kanzenbach, with a minor change to use the ring->queue_index
+
+rfcv2: https://lore.kernel.org/netdev/20241014213012.187976-1-jdamato@fastly.com/
+  - Patch 1: update line wrapping to 80 chars
+  - Patch 2:
+    - Update commit message to include output for IGC_FLAG_QUEUE_PAIRS
+      enabled and disabled
+    - Significant refactor to move queue mapping code to helpers to be
+      called from multiple locations
+    - Adjusted code to handle IGC_FLAG_QUEUE_PAIRS disabled as suggested
+      by Kurt Kanzenbach
+    - Map / unmap queues in igc_xdp_disable_pool and
+      igc_xdp_enable_pool, respectively, as suggested by Vinicius Costa
+      Gomes to handle the XDP case
+
+rfcv1: https://lore.kernel.org/lkml/20241003233850.199495-1-jdamato@fastly.com/
+
+Joe Damato (2):
+  igc: Link IRQs to NAPI instances
+  igc: Link queues to NAPI instances
+
+ drivers/net/ethernet/intel/igc/igc.h      |  2 ++
+ drivers/net/ethernet/intel/igc/igc_main.c | 44 ++++++++++++++++++++---
+ drivers/net/ethernet/intel/igc/igc_xdp.c  |  2 ++
+ 3 files changed, 43 insertions(+), 5 deletions(-)
+
+
+base-commit: d811ac148f0afd2f3f7e1cd7f54de8da973ec5e3
+-- 
+2.25.1
+
 
