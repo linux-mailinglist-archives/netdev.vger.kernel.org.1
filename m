@@ -1,160 +1,147 @@
-Return-Path: <netdev+bounces-137971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0BE39AB4E6
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:22:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE5E9AB507
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:26:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D5111F24615
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:22:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98B59B24478
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F881BD017;
-	Tue, 22 Oct 2024 17:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189151A726D;
+	Tue, 22 Oct 2024 17:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="lYMHoZpt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNizuojj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD98256D
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 17:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5599D1AFB35
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 17:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729617727; cv=none; b=H6c7wbS2bMnxhvtYK1MH4cNLRb9KftXBjBP3EBSMH3XBhzkTJd+ubZs3lUQm3nYXsIyspr7OirG8+ilu6dIbsQ5NvnOIfUdGaiSopDWx2q5++J3/apMrXUGuzQJi/GHYKftfpZu200mIFThZOxgXQGys0nZ2fPNyyoMafO7AqF4=
+	t=1729617947; cv=none; b=Xve415Eyu10LD1SsEQICSfR+WPe9VAJ8TEXM+SeAFfh7McBcQHsvcy9SEQTpjz4ZgTYnA4CWhB4t8rlFi0Al5CsZNg6L9R7iuvBkM4Ahv/aHWaXEhab3CJY1zY9s9VkMqYZFFtTWV6J/5vTasBB/5eh3AVMQssbgTKgoUuHAWCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729617727; c=relaxed/simple;
-	bh=OiDDIHpT2Xdh0k+qmCrDwsd569OKflkV8nkSlrYvHiM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d2RwFl+4IiiRNjau8oR1bSAAwtXru7mXfwXqAuViYDtwAaEuhSNqtgw0jfTZiksjTVbaFFTCMOtA76ZBLRlcaNz3hOFWRB6lEV/fKETIdjTJVw87mHVJ8sC3G2H/QSNNDeYx39tSaXETTrM1KKpZ/yDRrR/nr7YpLFqHvFqM7VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=lYMHoZpt; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7ea7e250c54so4050690a12.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 10:22:05 -0700 (PDT)
+	s=arc-20240116; t=1729617947; c=relaxed/simple;
+	bh=7Nhx76gxc6F6eiHMaboNs7DBV9o2hRoYZzo0Ch79DfE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P3FpTS3RHerqKpLaxbkM3/B37O9gJQ5/ToH1wYY6dpNKHxY9/4CuqgC3JfQIo1+QcvExCqZZP13xzlm/bBHmb1wbmF2KPZsuABssyH5O/CWJmh4H0KBM8etLH0rkNNfJh3K9vZRH74mrW0SH9NYLfubkhukVSvxFXlkOftoAG84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GNizuojj; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37ed3bd6114so2890295f8f.2
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 10:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1729617725; x=1730222525; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=D/yu90JKxIvYVAES8/y9aMQqFtx/G5adkU7FKzvOKDI=;
-        b=lYMHoZptjaSB93GcW6nskzz/RcHPxSfVtN2rmUuQepcr3C3B5nJyZYkc3Nm5Jb7+H7
-         tqC6ikRs8pWGP54jJki/c0bFA5G8y06JM1hID4RsgBnDAL7+unDJjea6BBcU/3sEBvVg
-         uJDVHLjRVP3kHm4+j19KE/NUrifcBWpCMnp8A=
+        d=gmail.com; s=20230601; t=1729617943; x=1730222743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8hSaLvXn0yFSyVHQRsC6QU/aD2ssRpmAbQU7NlsTtv8=;
+        b=GNizuojjDavfvqlT4ISFrJa2aMMETZIbDm/jyE4/yEHzs0TLm2E1iN9RjwgcSRSIxp
+         PhGHrpb1gY0epRWrFVMYA18IixJ1lPl4WQ8o0CX93i11vzJ2A0C/qs9nLf6J//wWPe/A
+         BFwZcQB4b/cAIQxJ4SrKmZX2OhZhwJywTKoQ1x/EhnZ/nml53XBgx2EY2GLFCdg9J9po
+         xi1nSUCqDAOwDfX+RtB6MhdTugd2yCo2VUuTOfGU9xKzV7JS/GNqfePAZjsJ+vbDyElB
+         dInOuTr3NcDcnsDL8ngR6LMQldF2syIq+lAYyM2mYPAZKYM8K8AF3SpHBYEOXxmRUz2x
+         M7OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729617725; x=1730222525;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D/yu90JKxIvYVAES8/y9aMQqFtx/G5adkU7FKzvOKDI=;
-        b=gPsiy/ugZzZ4mWA16Nt07Kj+Qs70WC25fW0HESB2Kuei/FL2fRe1hViP61e4YrsOBC
-         PqLXTqpxTF9YCxNQHhgHP4OeBeSQ1deIS/2H3uHWOV+5AXUqJ60WpcPWgBgrEogmGZ2g
-         XQJcnvqicJAUmM2hoBY+gw5vivcovQzaUzSX82JxjelieoR40rFE8kqSKxUm2QDGv/Yl
-         VYh4+lUXBUtTVrLkVjVKdLoOXGSqlE2IQIgVqGxfscxTgT/LnChHItLN3ZVZu49c4rYV
-         Rfl8qkGCsB0HjQKOGbIVyl0yFbho/LIrOjDOaDK6P6d7Aj3qiXyfgI254hG9xJbbHguc
-         5OdQ==
-X-Gm-Message-State: AOJu0YxfJR+3PnetHuGxZ+nEHcPnCg68jKuV9XcuhIChgiCruAmOnFVC
-	hnhd6TvMdeBN8gT08MlUQ2zQ+9+d5qUEOpUmT9iWRCdRqn4HSENyr15WdJPMft5Siy5PReTwsFs
-	MZ4FGwEQxBZeNUVN27b5s7nR6bFn/qBhz0HrumhCzLAvWelk0uNvGE5lXfovvIz/ca/e8KhNnU9
-	HO3zykMab7TBYb7GLQ8c+rdhBwvHVxoVgwkRI=
-X-Google-Smtp-Source: AGHT+IFoscgRZXyWJoFNIakBUIwR0JZ7fFN+IsSWlUCwVl6IWGkO6L9ICGQVPDsONQX1Dqx4Xkvvlw==
-X-Received: by 2002:a05:6a20:e687:b0:1d9:1d2b:f1e with SMTP id adf61e73a8af0-1d9775d0a49mr343690637.14.1729617724690;
-        Tue, 22 Oct 2024 10:22:04 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13128c2sm5017974b3a.33.2024.10.22.10.22.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 10:22:04 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: dmantipov@yandex.ru,
-	Joe Damato <jdamato@fastly.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC iwl-net] e1000: Hold RTNL when e1000_down can be called
-Date: Tue, 22 Oct 2024 17:21:53 +0000
-Message-Id: <20241022172153.217890-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1729617943; x=1730222743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8hSaLvXn0yFSyVHQRsC6QU/aD2ssRpmAbQU7NlsTtv8=;
+        b=Aw8XW/HHPIKvPNJRx3uOzOv8Ns8QryM6eytnLBQiWjlJEiTgb8C0tt05IcFCgyVahQ
+         Jf+NVeQfqWOZQZw3ngtHYfw2P8b0qVevgpaPPKLFld577XB1jAMj1CtBgU9r0TW6W4O0
+         NAh2iNX2EDNOHk6W62qnpxct0CAFc10Fecx5+PSH+gX79Lb9nbjRLC7PvZhsX0vSO4S4
+         /DrUcGQso/f0EJPUjrEd9hW1ZoIQHq2JDBFmTgNTyvMaj1ynSNAufVuR+KcK27fN7cp6
+         cW5ERuqT2GHJ+K/Uv4beRdewydlBfaq6mcMUYy+RXrc0kMEA6W3CUfBJ4CwgFBHCGKBE
+         CBUw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/ColGhUMwjBkjBlRS3rPyLHGsMF4ZC6vLuN8qqroDqBeUdMcC8jX/yKk9lK3uU1ZTR1Gp2eY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuRQ5HidXUMkItAE9WiRw4wLNC+pIsKe1AijB9PtTyUk93dKAS
+	93DLgOHgKaVtmWwkeLtCXgMgKgrFuNUEVmb6Jfy9c2sQUu4EMIz6Wdcy6aMbC9NqmrTuzO4xC/J
+	oFkNp+kTBZ1viuNDIcXpAZxw4W74=
+X-Google-Smtp-Source: AGHT+IGxopSoSXyvwbJ6SKHOpDdmPOBrDcSJm2a7wqW79AZWdLvLfWKswYFr8bJMo2INs1l8UXbKTnIUlZkgiBLm3/w=
+X-Received: by 2002:adf:ab03:0:b0:37d:5103:8894 with SMTP id
+ ffacd0b85a97d-37efb7f7abemr186717f8f.42.1729617943335; Tue, 22 Oct 2024
+ 10:25:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241022063807.37561-1-yuancan@huawei.com> <20241022155630.GY402847@kernel.org>
+In-Reply-To: <20241022155630.GY402847@kernel.org>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 22 Oct 2024 10:25:05 -0700
+Message-ID: <CAKgT0UdvnjZo6pNtnZuDFuOQ9Hg=BCeJOAiToS_CFSwpKD8LWA@mail.gmail.com>
+Subject: Re: [PATCH] igb: Fix potential invalid memory access in igb_init_module()
+To: Simon Horman <horms@kernel.org>
+Cc: Yuan Can <yuancan@huawei.com>, anthony.l.nguyen@intel.com, 
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, cramerj@intel.com, 
+	shannon.nelson@amd.com, mitch.a.williams@intel.com, jgarzik@redhat.com, 
+	auke-jan.h.kok@intel.com, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-e1000_down calls netif_queue_set_napi, which assumes that RTNL is held.
+On Tue, Oct 22, 2024 at 8:56=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> + Alexander Duyck
+>
+> On Tue, Oct 22, 2024 at 02:38:07PM +0800, Yuan Can wrote:
+> > The pci_register_driver() can fail and when this happened, the dca_noti=
+fier
+> > needs to be unregistered, otherwise the dca_notifier can be called when
+> > igb fails to install, resulting to invalid memory access.
+> >
+> > Fixes: fe4506b6a2f9 ("igb: add DCA support")
+>
+> I don't think this problem was introduced by the commit cited above,
+> as it added the call to dca_unregister_notify() before
+> pci_register_driver(). But rather by the commit cited below which reverse=
+d
+> the order of these function calls.
+>
+> bbd98fe48a43 ("igb: Fix DCA errors and do not use context index for 82576=
+")
+>
+> I'm unsure if it is necessary to repost the patch to address that.
+> But if you do, and assuming we are treating this as a bug fix,
+> please target it for the net (or iwl-net) tree like this:
+>
+> Subject: [PATCH net v2] ...
+>
+> > Signed-off-by: Yuan Can <yuancan@huawei.com>
+> > ---
+> >  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/et=
+hernet/intel/igb/igb_main.c
+> > index f1d088168723..18284a838e24 100644
+> > --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> > +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> > @@ -637,6 +637,10 @@ static int __init igb_init_module(void)
+> >       dca_register_notify(&dca_notifier);
+> >  #endif
+> >       ret =3D pci_register_driver(&igb_driver);
+> > +#ifdef CONFIG_IGB_DCA
+> > +     if (ret)
+> > +             dca_unregister_notify(&dca_notifier);
+> > +#endif
+> >       return ret;
+> >  }
+> >
 
-There are a few paths for e1000_down to be called in e1000 where RTNL is
-not currently being held:
-  - e1000_shutdown (pci shutdown)
-  - e1000_suspend (power management)
-  - e1000_reinit_locked (via e1000_reset_task delayed work)
+Makes sense to me. I agree on the "Fix DCA errors" patch being the one
+that is being fixed. So essentially this is a notifier leak since we
+are registering it but not unregistering.
 
-Hold RTNL in two places to fix this issue:
-  - e1000_reset_task
-  - __e1000_shutdown (which is called from both e1000_shutdown and
-    e1000_suspend).
+Thanks,
 
-The other paths which call e1000_down seemingly hold RTNL and are OK:
-  - e1000_close (ndo_stop)
-  - e1000_change_mtu (ndo_change_mtu)
-
-I'm submitting this is as an RFC because:
-  - the e1000_reinit_locked issue appears very similar to commit
-    21f857f0321d ("e1000e: add rtnl_lock() to e1000_reset_task"), which
-    fixes a similar issue in e1000e
-
-however
-
-  - adding rtnl to e1000_reinit_locked seemingly conflicts with an
-    earlier e1000 commit b2f963bfaeba ("e1000: fix lockdep warning in
-    e1000_reset_task").
-
-Hopefully Intel can weigh in and shed some light on the correct way to
-go.
-
-Fixes: 8f7ff18a5ec7 ("e1000: Link NAPI instances to queues and IRQs")
-Reported-by: Dmitry Antipov <dmantipov@yandex.ru>
-Closes: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 4de9b156b2be..9ed99c75d59e 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -3509,7 +3509,9 @@ static void e1000_reset_task(struct work_struct *work)
- 		container_of(work, struct e1000_adapter, reset_task);
- 
- 	e_err(drv, "Reset adapter\n");
-+	rtnl_lock();
- 	e1000_reinit_locked(adapter);
-+	rtnl_unlock();
- }
- 
- /**
-@@ -5074,7 +5076,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 			usleep_range(10000, 20000);
- 
- 		WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
-+		rtnl_lock();
- 		e1000_down(adapter);
-+		rtnl_unlock();
- 	}
- 
- 	status = er32(STATUS);
-
-base-commit: d811ac148f0afd2f3f7e1cd7f54de8da973ec5e3
--- 
-2.25.1
-
+- Alex
 
