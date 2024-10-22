@@ -1,89 +1,91 @@
-Return-Path: <netdev+bounces-137751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B1F29A99EF
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:35:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334EA9A9A2B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BADFB21504
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 06:35:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BADDB2252F
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 06:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C00D142E9F;
-	Tue, 22 Oct 2024 06:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wEMifSCQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6216314B084;
+	Tue, 22 Oct 2024 06:42:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231C513E03E;
-	Tue, 22 Oct 2024 06:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F45514A08E
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 06:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729578901; cv=none; b=bnqTiL31d71V4RLv/QKg0BpgF3I+y4OTJgQ1iKSOAd6p0WJrv08XWnSNzp3VcJF43pa8wf4YRJQvf5xQUzekFYdSPrgndLqi/4ETF/+OaPN2lJbfWRzlH/GGGKGfPFETtsKgF91eNo/dvbNWYXxJYs1s+bPk918JFy8klIXKDoA=
+	t=1729579376; cv=none; b=muS3vgGQ1MET6LDlLILrT2+CR8ehRQQvp5FvjCmXDazCFBm+7GkZdJ/wonSeK3f93UAf/zKjjskuaSdcCcT9cYVAYP1Qk3eqe/jJyChB6YTIAdtkP8iposPzYIylwfqcNfebMUnmwNbMf9pb8VpiJlmUQA/he1ZdnoLX4T5k1eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729578901; c=relaxed/simple;
-	bh=8K/VATla1L1n8Z05aZvcxnm6SoF/Q5GPkeLFx03jPxU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o/9Ea952T7BYjwoTyNQ4vcLSQHdCmEKJgIEeMBcGXErRzV+gkvX1aamA/h8Ecr07jTsN7K6bvFtNCHGK9P0U3mLg+GwOLCyytl/BodJidravO3fh+xkt2/b441IYX+VlEGagj+ht+WmfxLUzh+tYWZFhmhA2H/h8KSGSePOdb4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wEMifSCQ; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729578895; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=+ZZPQAYmRXKxmJmQ4eJpW73d5G6LtgL0a+fwNFvJN9Q=;
-	b=wEMifSCQ2zAKL9U4jqcBK30U5Lz61BN2V7FyZXYAv+vsz3N2BweQv8wbmhX2RWmmAmI6fhv+83hMaXEkxGFr0aMdXinZmlp1xZGWQdLEJBtulUREUOUsfbjF0nsUmEc4QMzjpgPz8IeQEOd+HiWZXgSaPWOl1KC77cWFhXxEtTQ=
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0WHgplux_1729578894 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 22 Oct 2024 14:34:55 +0800
-From: Yang Li <yang.lee@linux.alibaba.com>
-To: vburru@marvell.com,
-	sedara@marvell.com,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yang Li <yang.lee@linux.alibaba.com>,
-	Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] octeon_ep: Remove unneeded semicolon
-Date: Tue, 22 Oct 2024 14:34:53 +0800
-Message-Id: <20241022063453.103751-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1729579376; c=relaxed/simple;
+	bh=uF6kMXHeHakdnS2DqGFe9XhoPGkZxk0CzUjAPWFdazU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Mi70NANR0lDt7zrW52QHLCyeEtsm7hkj3KKvHH2fuMmpXvOQYPgjaGDLIm3eK/RIuW+IZO27fQLO270KDAFiQAdYiXz69T0/bmBgY7j/FRb2oMWeEhoNB/CHlnK10bf3yeBRLQXVk1YtlcKzhRbtSvuyseKvQG5p85ucdE/Dl54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XXjHQ2LSqz1T94l;
+	Tue, 22 Oct 2024 14:40:50 +0800 (CST)
+Received: from dggpeml500024.china.huawei.com (unknown [7.185.36.10])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7623818007C;
+	Tue, 22 Oct 2024 14:42:50 +0800 (CST)
+Received: from huawei.com (10.175.112.208) by dggpeml500024.china.huawei.com
+ (7.185.36.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 22 Oct
+ 2024 14:42:49 +0800
+From: Yuan Can <yuancan@huawei.com>
+To: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <cramerj@intel.com>,
+	<shannon.nelson@amd.com>, <mitch.a.williams@intel.com>, <jgarzik@redhat.com>,
+	<auke-jan.h.kok@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>
+CC: <yuancan@huawei.com>
+Subject: [PATCH] igb: Fix potential invalid memory access in igb_init_module()
+Date: Tue, 22 Oct 2024 14:38:07 +0800
+Message-ID: <20241022063807.37561-1-yuancan@huawei.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500024.china.huawei.com (7.185.36.10)
 
-This patch removes an unneeded semicolon after a while statement.
+The pci_register_driver() can fail and when this happened, the dca_notifier
+needs to be unregistered, otherwise the dca_notifier can be called when
+igb fails to install, resulting to invalid memory access.
 
-./drivers/net/ethernet/marvell/octeon_ep/octep_rx.c:381:2-3: Unneeded semicolon
-
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=11430
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+Fixes: fe4506b6a2f9 ("igb: add DCA support")
+Signed-off-by: Yuan Can <yuancan@huawei.com>
 ---
- drivers/net/ethernet/marvell/octeon_ep/octep_rx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-index 8af75cb37c3e..d65d9572ffa6 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.c
-@@ -378,7 +378,7 @@ static void octep_oq_drop_rx(struct octep_oq *oq,
- 	while (data_len > 0) {
- 		octep_oq_next_pkt(oq, buff_info, read_idx, desc_used);
- 		data_len -= oq->buffer_size;
--	};
-+	}
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index f1d088168723..18284a838e24 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -637,6 +637,10 @@ static int __init igb_init_module(void)
+ 	dca_register_notify(&dca_notifier);
+ #endif
+ 	ret = pci_register_driver(&igb_driver);
++#ifdef CONFIG_IGB_DCA
++	if (ret)
++		dca_unregister_notify(&dca_notifier);
++#endif
+ 	return ret;
  }
  
- /**
 -- 
-2.32.0.3.g01195cf9f
+2.17.1
 
 
