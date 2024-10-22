@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-137749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49309A9972
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:13:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6F49A9979
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 08:14:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05E321C244CE
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 06:13:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2B61B214D6
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 06:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FA1142900;
-	Tue, 22 Oct 2024 06:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CA31465A1;
+	Tue, 22 Oct 2024 06:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jbo32d1Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knWuyIge"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA1C13DDA7;
-	Tue, 22 Oct 2024 06:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF08145B22;
+	Tue, 22 Oct 2024 06:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729577381; cv=none; b=Ny1oXGeJF2BaS5i6nAeSsFFqFNJW9kyJTZNL82RkiN7bi/sjp4K70sf5vGtaAAfwhhGNOyQqn3j86XmEnEXzSlZWipY56Q2gvdkiL/UrxGKjmgfhSW9MytFKr7WcYGthk4d/lCItJkmL/EbyTvZeZuPqQI7h3NzpX/8Z1W4zL14=
+	t=1729577482; cv=none; b=AaTzr+QB3KAklEN3A1aW4SoqMs2HYRK055b1QN3JbJrlwT9YKCB5xnhMxvnYulno8CzPKZ4d9nEb38PmTdCR6pBdfqgmP57vP9U9G2v+iSksrCfaGGFeIInfG+MMQg/uWyM/1phhRvRH2UXHLT3QdW+3L2VlB3Dw6l/9ZGhkw6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729577381; c=relaxed/simple;
-	bh=0bYs5KsWInCKhJPdKjxQ5yGyKQuFi/ibYTzYDSnrgxY=;
+	s=arc-20240116; t=1729577482; c=relaxed/simple;
+	bh=Hq39wXmQHj0QFMyzEC2o6VYawvHcgxFMF0A/YuiCvy8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eoE9CjJ2bb6m6S4FYlDmeztXcT3oVLIIB4kx2P3U9bNRjqMP6CmgusesljSORlC4aU2TtLA8h2Gc1ymTPqJ3Uq/dDnHJKlIlIW29p4z1M957ay9m3umFXrUsdLntn6hTmVQUvjSBvurBRa/e6bj1DjsMIRGGaOF2DisnRN/dPmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jbo32d1Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95659C4CEC3;
-	Tue, 22 Oct 2024 06:09:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FwdR5zkPTT7ODbPtqwOo6g+/paSLppdMDeNDQjtX7z19GKhSpyj6zKnT1fgjgQ1mnU/J/RIx36KhdrFM01vVpZPVg/z1JO4ALRFcPX0zdLkHJz3gGm9NJR/mjxGR5IGizRXKXgUR1VTSR3k08p9ljlQIAq0i17Anmdor8+ZH75A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=knWuyIge; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8779AC4CEC7;
+	Tue, 22 Oct 2024 06:11:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729577381;
-	bh=0bYs5KsWInCKhJPdKjxQ5yGyKQuFi/ibYTzYDSnrgxY=;
+	s=k20201202; t=1729577482;
+	bh=Hq39wXmQHj0QFMyzEC2o6VYawvHcgxFMF0A/YuiCvy8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Jbo32d1Q7udrMFsB9dZA20NVkykIOOabHEcgO8+ZP//vLHL7ZBLrRl6lvAV7VYYyk
-	 z6cjTsQ2kZzO5bm5Im91b40xdbLg0zVPL2qMhL6H45t3gtGGWV4Q3GDOqTw1CfYoVI
-	 08OFlLT/sgi+Ssy/yPkFDk2+ADIl0KFoaTpDB5EQTikt9J5TQkknpL2iaZl7rqWCX1
-	 58a/kg0IkffdpLv+FnzqVxNMIb4qZbAJjFsBAXXtfEi9q1qhyZv9WB8igGQFVNGW+c
-	 pht+oYQWI4UVrqEawdBU7v2Bnx16Ln/fQH3dEXkCil2mLwDcvwiY4j3S8miHTDsDMY
-	 i75lliBHs9BJQ==
-Date: Tue, 22 Oct 2024 08:09:37 +0200
+	b=knWuyIgeHM9njcagtlKNNdtgEVWVX38Eu1pnTu1zeN5hlCzoPGn0T+rEdKY1uoCKv
+	 SUs6KAQwPW+4g463Rkc88UfY4HvWbVOV8GIJ5Veyi9n/y0VFufPn8jz1ojo41WRy12
+	 JU6CBTfntfISgmBL3stbiCcnEGExAM27dFeSusULQ0ITUDlYBcrugKRes930KvyR4R
+	 5PoB+rMCN1xR7MRqwn5DllP5yEhl3TVcc40ogjK5xVujc1VnXW6h0LYLA8kpWm6AcN
+	 3PPEwh+/0M+re+Gt0Hvob25lsKagw5RUPzsxjRlsLeqh9gi0UC4P6WonfNRcPr934v
+	 QH6nBqmEwMShw==
+Date: Tue, 22 Oct 2024 08:11:19 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Daniel Machon <daniel.machon@microchip.com>
 Cc: "David S. Miller" <davem@davemloft.net>, 
@@ -54,11 +54,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com, 
 	ast@fiberby.net, maxime.chevallier@bootlin.com, netdev@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 14/15] net: sparx5: add compatible strings for
- lan969x and verify the target
-Message-ID: <dj6vmcezdfrrhdofhzt4gs42pzqyd5fntdy66z76oajxvc44p4@k7fd7dhtwqos>
+Subject: Re: [PATCH net-next 13/15] dt-bindings: net: add compatible strings
+ for lan969x SKU's
+Message-ID: <omfbhkikj6vthkssxcspdatoksifjp6khuxalvyhprijygm2ro@wa2zmixejjgw>
 References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
- <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
+ <20241021-sparx5-lan969x-switch-driver-2-v1-13-c8c49ef21e0f@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,47 +67,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
+In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-13-c8c49ef21e0f@microchip.com>
 
-On Mon, Oct 21, 2024 at 03:58:51PM +0200, Daniel Machon wrote:
-> @@ -227,6 +229,168 @@ bool is_sparx5(struct sparx5 *sparx5)
->  	}
->  }
->  
-> +/* Set the devicetree target based on the compatible string */
-> +static int sparx5_set_target_dt(struct sparx5 *sparx5)
-> +{
-> +	struct device_node *node = sparx5->pdev->dev.of_node;
-> +
-> +	if (is_sparx5(sparx5))
-> +		/* For Sparx5 the devicetree target is always the chip target */
-> +		sparx5->target_dt = sparx5->target_ct;
-> +	else if (of_device_is_compatible(node, "microchip,lan9691-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9691VAO;
-> +	else if (of_device_is_compatible(node, "microchip,lan9692-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9692VAO;
-> +	else if (of_device_is_compatible(node, "microchip,lan9693-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9693VAO;
-> +	else if (of_device_is_compatible(node, "microchip,lan9694-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9694;
-> +	else if (of_device_is_compatible(node, "microchip,lan9695-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9694TSN;
-> +	else if (of_device_is_compatible(node, "microchip,lan9696-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9696;
-> +	else if (of_device_is_compatible(node, "microchip,lan9697-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9696TSN;
-> +	else if (of_device_is_compatible(node, "microchip,lan9698-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9698;
-> +	else if (of_device_is_compatible(node, "microchip,lan9699-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9698TSN;
-> +	else if (of_device_is_compatible(node, "microchip,lan969a-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9694RED;
-> +	else if (of_device_is_compatible(node, "microchip,lan969b-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9696RED;
-> +	else if (of_device_is_compatible(node, "microchip,lan969c-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9698RED;
-
-Do not re-implement match data.
-
+On Mon, Oct 21, 2024 at 03:58:50PM +0200, Daniel Machon wrote:
+> Add compatible strings for the twelve different lan969x SKU's (Stock
+> Keeping Unit) that we need to support. We need to support all of them,
+> as we are going to use them in the driver, for deriving the devicetree
+> target in a subsequent patch.
 > 
+> Also, add myself as a maintainer.
+> 
+> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> ---
+>  .../bindings/net/microchip,sparx5-switch.yaml           | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
+> index fcafef8d5a33..c38f0bd9a481 100644
+> --- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
+> +++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
+> @@ -9,6 +9,7 @@ title: Microchip Sparx5 Ethernet switch controller
+>  maintainers:
+>    - Steen Hegelund <steen.hegelund@microchip.com>
+>    - Lars Povlsen <lars.povlsen@microchip.com>
+> +  - Daniel Machon <daniel.machon@microchip.com>
+>  
+>  description: |
+>    The SparX-5 Enterprise Ethernet switch family provides a rich set of
+> @@ -34,7 +35,21 @@ properties:
+>      pattern: "^switch@[0-9a-f]+$"
+>  
+>    compatible:
+> -    const: microchip,sparx5-switch
+> +    items:
+> +      - enum:
+> +          - microchip,sparx5-switch
+
+Keep alphabetical order.
+
+> +          - microchip,lan9691-switch
+> +          - microchip,lan9692-switch
+> +          - microchip,lan9693-switch
+> +          - microchip,lan9694-switch
+> +          - microchip,lan9695-switch
+> +          - microchip,lan9696-switch
+> +          - microchip,lan9697-switch
+> +          - microchip,lan9698-switch
+> +          - microchip,lan9699-switch
+> +          - microchip,lan969a-switch
+> +          - microchip,lan969b-switch
+> +          - microchip,lan969c-switch
+
+All of them use the same match data, so they are compatible? I have
+doubts this is necessary in the first place. Your commit description about
+driver does not help me. You need them because you are going to use
+them? Yeah, it would be surprising otherwise. :)
+
+Best regards,
+Krzysztof
+
 
