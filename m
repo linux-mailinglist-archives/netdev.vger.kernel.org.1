@@ -1,83 +1,73 @@
-Return-Path: <netdev+bounces-138002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F019AB704
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:37:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 418C69AB70C
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 21:40:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 006751C23394
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:37:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DCAAB2180D
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF4B1C9ED7;
-	Tue, 22 Oct 2024 19:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D239C1CB503;
+	Tue, 22 Oct 2024 19:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+2tdK6D"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jALndKjl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE51A2658;
-	Tue, 22 Oct 2024 19:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302131C9EC7
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 19:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729625861; cv=none; b=MLAGKmaRbtcNb6Alm2XHGw3GynbjgEATVxMUwFf0WEDRNfgaADBoaGb1HvAMIVEafgHTSwFY7R5/atPgNHXasodLQP/LQFSEj3Nikp8tK8SJ9exyUXFccM6kquRH0pvk2QTLaaPbdR2VpS6mLnnhS2F97323xsbWOh35KrZB3KI=
+	t=1729625999; cv=none; b=VgmC46bjWD4wqPIdyAJhCu3c3QPbiwl2SUbfHW8SzkfAxq1MU7QqzcdHjkiBrcljusy57UUTf93fMbe/ob5Ovpkgmar50AlrzBXAMdvt5OxY8SfrRcrJ2+BcJfHBNpJzo6gOWFkeCLZdN79ObeavtE0n+oKv+JGIaD4cSs6hKKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729625861; c=relaxed/simple;
-	bh=JTCSLuIKLprzhrsRvKPWUjhnAOpNJgiDkRyH3WefNHo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eKdW8UdML0mekyXAgoZup8K+0030i847h8G8qUcMdR2VLGhrvD9QiBRlZF7OMi4zT7TK2ebe4wYPkfXdRYAIVe4acBtliXxB+SHtZwdLZT1sqwzKB28B1/zkQae9jOoqTMjXHJ7iSPVC7Pk2CKZw6I3Qu5Y34Dpgq/Zt+U4TO3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I+2tdK6D; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20cd76c513cso50688615ad.3;
-        Tue, 22 Oct 2024 12:37:40 -0700 (PDT)
+	s=arc-20240116; t=1729625999; c=relaxed/simple;
+	bh=VLpqxjcSFPsEWeWcI21yYkpbIRnOlXEPXgKXrs5URKc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GlFkf8yw9ySp4Jeo0PUhVZrYAokzejaQGIaBiPymCI61osBN4r6yOBI3EBTjpZOwNS8/hzJ6NP40YL/jHn+mK6OG9d7uKoNR+Epj8EiI7lAWLtu1xPz/f5H6iyQwELIlZawlDPSWFaOpw1++ShnDvVescwDIGzfqbMsjdoddc7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jALndKjl; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729625859; x=1730230659; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FNePxcefUzwNW32H0eGg0y+1g6EWQpRSYvqdWLiAgLc=;
-        b=I+2tdK6DCsBPrMpRnoo4s7nnjCBrEogrp+wwGpezsCAF3NByJoM4IqSodaOLBXAUIt
-         UrN6t9m1cdZRAOXgiupiz+7DZvtXWCQP7K0dO6iHO0EX+K534gyudyRZr5hP7WrKRdRt
-         NhdcQt3Kjs1bC2oBZVgwnpPIH2bn1EhMtx7RIZ5VM39a3TVzf2IMZhHLkARYZ05nLHYw
-         PbDtAUABYCby3okX2J8ffOz4oEbtZXjRNZhGo3WreHx6TSgTICZnpgoD5HzicyjzDGcU
-         1fdkfprnzJc5CTJosuTSA6xfihzKIArGtZi5g1ej8Pgqud52zm3ZYswtThL2tUvhXAzX
-         Q3fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729625859; x=1730230659;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FNePxcefUzwNW32H0eGg0y+1g6EWQpRSYvqdWLiAgLc=;
-        b=IMx73OUB8hTjTt+F6jeCl9UfNWgJHWRVyC7eLkBaPq+t/XXbSuUuJRd48tdx/qaXH2
-         /5o3zpHK0XWGkB/KymuShNnVmXSDMsGST8292n3XtzG6+1Bjof+ochEEMs3I1ajBz/20
-         2Ho7NOuq5nVamp/V4oKJnkcfmqvKtWA5/eWjHIfqevWb/MEQZzJ5uZ9+tlHnNo4iG1Pa
-         tI6D7U8oovz9HKIsIhfmx8ZQ7XsgeGltk0PUBveI4YbEyekXiFjpwu1WiPUQpMc5lPTl
-         0OMqW2sVBb07L+btX0+R4l7jt58ok4XAzrW+iWPP++Gz16O1BuZWBskrUWy0vhD7nfTm
-         5yrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvz0REj5Pr3O1nJso+HY30NtY9wSgSw2AvyuFYy2nhV8jpC4wpZYmgO8PMjjj3L374MkZwDFEuuFIT7po=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyryJqvu4ZoQPz0oyZlUOjoTnmB7u9Pxi8LQkZdm9qQ3X4E0qGd
-	xGF2ndgbYcYUCA+iArWLMQ5f2b/f5rbfsf2HerD/+YFyCOa8vI7WTwcYHaCw
-X-Google-Smtp-Source: AGHT+IEjv7eNp60AKXMnH+R+lkwjTHbrLwa30UxvTOKwt1qqMsHhntWMz3ZxsaYPwKYc0SsvRjLptw==
-X-Received: by 2002:a17:902:f609:b0:20b:770b:ad3b with SMTP id d9443c01a7336-20fa706dd31mr2869095ad.0.1729625859497;
-        Tue, 22 Oct 2024 12:37:39 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0dd53esm46153575ad.222.2024.10.22.12.37.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 12:37:39 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2 net-next] net: bnxt: use ethtool string helpers
-Date: Tue, 22 Oct 2024 12:37:37 -0700
-Message-ID: <20241022193737.123079-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729625999; x=1761161999;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=DPnQaLMpRF9XStvqfpWCWCMSzkr69lWndF4fwhE9hds=;
+  b=jALndKjlKiGw6HM8x6vXTlSr+KpXXqkgwE34HD3z39mRxIqbKYM4+Ppw
+   gN+0SWKrMDScq3APKXPtbrciRkjbimsRokv7XBDGjVbu9kh+IkxH+zC9O
+   6fWWljWKBVszT6/fxsmEaonXsrtNXxKCem+yOb4btpdnxFOVrcw9nYO0X
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
+   d="scan'208";a="463663228"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 19:39:53 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:46551]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.58:2525] with esmtp (Farcaster)
+ id 99c5dfce-5dbb-43a6-92a8-0cfb8d2101e5; Tue, 22 Oct 2024 19:39:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 99c5dfce-5dbb-43a6-92a8-0cfb8d2101e5
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 22 Oct 2024 19:39:52 +0000
+Received: from 6c7e67c6786f.amazon.com (10.119.219.31) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 22 Oct 2024 19:39:49 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <ignat@cloudflare.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net-next] vsock: do not leave dangling sk pointer in vsock_create()
+Date: Tue, 22 Oct 2024 12:39:44 -0700
+Message-ID: <20241022193944.69966-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241022134819.1085254-1-edumazet@google.com>
+References: <20241022134819.1085254-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,187 +75,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Avoids having to use manual pointer manipulation.
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Oct 2024 13:48:19 +0000
+> syzbot was able to trigger the following warning after recent
+> core network cleanup.
+> 
+> On error vsock_create() frees the allocated sk object, but sock_init_data()
+> has already attached it to the provided sock object.
+> 
+> We must clear sock->sk to avoid possible use-after-free later.
+> 
+> WARNING: CPU: 0 PID: 5282 at net/socket.c:1581 __sock_create+0x897/0x950 net/socket.c:1581
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5282 Comm: syz.2.43 Not tainted 6.12.0-rc2-syzkaller-00667-g53bac8330865 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>  RIP: 0010:__sock_create+0x897/0x950 net/socket.c:1581
+> Code: 7f 06 01 65 48 8b 34 25 00 d8 03 00 48 81 c6 b0 08 00 00 48 c7 c7 60 0b 0d 8d e8 d4 9a 3c 02 e9 11 f8 ff ff e8 0a ab 0d f8 90 <0f> 0b 90 e9 82 fd ff ff 89 e9 80 e1 07 fe c1 38 c1 0f 8c c7 f8 ff
+> RSP: 0018:ffffc9000394fda8 EFLAGS: 00010293
+> RAX: ffffffff89873c46 RBX: ffff888079f3c818 RCX: ffff8880314b9e00
+> RDX: 0000000000000000 RSI: 00000000ffffffed RDI: 0000000000000000
+> RBP: ffffffff8d3337f0 R08: ffffffff8987384e R09: ffffffff8989473a
+> R10: dffffc0000000000 R11: fffffbfff203a276 R12: 00000000ffffffed
+> R13: ffff888079f3c8c0 R14: ffffffff898736e7 R15: dffffc0000000000
+> FS:  00005555680ab500(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f22b11196d0 CR3: 00000000308c0000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>   sock_create net/socket.c:1632 [inline]
+>   __sys_socket_create net/socket.c:1669 [inline]
+>   __sys_socket+0x150/0x3c0 net/socket.c:1716
+>   __do_sys_socket net/socket.c:1730 [inline]
+>   __se_sys_socket net/socket.c:1728 [inline]
+>   __x64_sys_socket+0x7a/0x90 net/socket.c:1728
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f22b117dff9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fff56aec0e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+> RAX: ffffffffffffffda RBX: 00007f22b1335f80 RCX: 00007f22b117dff9
+> RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000028
+> RBP: 00007f22b11f0296 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007f22b1335f80 R14: 00007f22b1335f80 R15: 00000000000012dd
+> 
+> Fixes: 48156296a08c ("net: warn, if pf->create does not clear sock->sk on error")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Ignat Korchagin <ignat@cloudflare.com>
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- v2: use extra variable to avoid line length issues
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 115 ++++++++----------
- 1 file changed, 54 insertions(+), 61 deletions(-)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index f71cc8188b4e..90c870c82398 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -705,112 +705,105 @@ static void bnxt_get_ethtool_stats(struct net_device *dev,
- static void bnxt_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
- {
- 	struct bnxt *bp = netdev_priv(dev);
--	static const char * const *str;
-+	const char *str;
- 	u32 i, j, num_str;
- 
- 	switch (stringset) {
- 	case ETH_SS_STATS:
- 		for (i = 0; i < bp->cp_nr_rings; i++) {
--			if (is_rx_ring(bp, i)) {
--				num_str = NUM_RING_RX_HW_STATS;
--				for (j = 0; j < num_str; j++) {
--					sprintf(buf, "[%d]: %s", i,
--						bnxt_ring_rx_stats_str[j]);
--					buf += ETH_GSTRING_LEN;
-+			if (is_rx_ring(bp, i))
-+				for (j = 0; j < NUM_RING_RX_HW_STATS; j++) {
-+					str = bnxt_ring_rx_stats_str[j];
-+					ethtool_sprintf(&buf, "[%d]: %s", i,
-+							str);
- 				}
--			}
--			if (is_tx_ring(bp, i)) {
--				num_str = NUM_RING_TX_HW_STATS;
--				for (j = 0; j < num_str; j++) {
--					sprintf(buf, "[%d]: %s", i,
--						bnxt_ring_tx_stats_str[j]);
--					buf += ETH_GSTRING_LEN;
-+			if (is_tx_ring(bp, i))
-+				for (j = 0; j < NUM_RING_TX_HW_STATS; j++) {
-+					str = bnxt_ring_tx_stats_str[j];
-+					ethtool_sprintf(&buf, "[%d]: %s", i,
-+							str);
- 				}
--			}
- 			num_str = bnxt_get_num_tpa_ring_stats(bp);
- 			if (!num_str || !is_rx_ring(bp, i))
- 				goto skip_tpa_stats;
- 
- 			if (bp->max_tpa_v2)
--				str = bnxt_ring_tpa2_stats_str;
-+				for (j = 0; j < num_str; j++) {
-+					str = bnxt_ring_tpa2_stats_str[j];
-+					ethtool_sprintf(&buf, "[%d]: %s", i,
-+							str);
-+				}
- 			else
--				str = bnxt_ring_tpa_stats_str;
--
--			for (j = 0; j < num_str; j++) {
--				sprintf(buf, "[%d]: %s", i, str[j]);
--				buf += ETH_GSTRING_LEN;
--			}
--skip_tpa_stats:
--			if (is_rx_ring(bp, i)) {
--				num_str = NUM_RING_RX_SW_STATS;
- 				for (j = 0; j < num_str; j++) {
--					sprintf(buf, "[%d]: %s", i,
--						bnxt_rx_sw_stats_str[j]);
--					buf += ETH_GSTRING_LEN;
-+					str = bnxt_ring_tpa_stats_str[j];
-+					ethtool_sprintf(&buf, "[%d]: %s", i,
-+							str);
- 				}
-+skip_tpa_stats:
-+			if (is_rx_ring(bp, i))
-+				for (j = 0; j < NUM_RING_RX_SW_STATS; j++) {
-+					str = bnxt_rx_sw_stats_str[j];
-+					ethtool_sprintf(&buf, "[%d]: %s", i,
-+							str);
-+				}
-+			for (j = 0; j < NUM_RING_CMN_SW_STATS; j++) {
-+				str = bnxt_cmn_sw_stats_str[j];
-+				ethtool_sprintf(&buf, "[%d]: %s", i, str);
- 			}
--			num_str = NUM_RING_CMN_SW_STATS;
--			for (j = 0; j < num_str; j++) {
--				sprintf(buf, "[%d]: %s", i,
--					bnxt_cmn_sw_stats_str[j]);
--				buf += ETH_GSTRING_LEN;
--			}
--		}
--		for (i = 0; i < BNXT_NUM_RING_ERR_STATS; i++) {
--			strscpy(buf, bnxt_ring_err_stats_arr[i], ETH_GSTRING_LEN);
--			buf += ETH_GSTRING_LEN;
- 		}
-+		for (i = 0; i < BNXT_NUM_RING_ERR_STATS; i++)
-+			ethtool_puts(&buf, bnxt_ring_err_stats_arr[i]);
- 
--		if (bp->flags & BNXT_FLAG_PORT_STATS) {
-+		if (bp->flags & BNXT_FLAG_PORT_STATS)
- 			for (i = 0; i < BNXT_NUM_PORT_STATS; i++) {
--				strcpy(buf, bnxt_port_stats_arr[i].string);
--				buf += ETH_GSTRING_LEN;
-+				str = bnxt_port_stats_arr[i].string;
-+				ethtool_puts(&buf, str);
- 			}
--		}
-+
- 		if (bp->flags & BNXT_FLAG_PORT_STATS_EXT) {
- 			u32 len;
- 
- 			len = min_t(u32, bp->fw_rx_stats_ext_size,
- 				    ARRAY_SIZE(bnxt_port_stats_ext_arr));
- 			for (i = 0; i < len; i++) {
--				strcpy(buf, bnxt_port_stats_ext_arr[i].string);
--				buf += ETH_GSTRING_LEN;
-+				str = bnxt_port_stats_ext_arr[i].string;
-+				ethtool_puts(&buf, str);
- 			}
-+
- 			len = min_t(u32, bp->fw_tx_stats_ext_size,
- 				    ARRAY_SIZE(bnxt_tx_port_stats_ext_arr));
- 			for (i = 0; i < len; i++) {
--				strcpy(buf,
--				       bnxt_tx_port_stats_ext_arr[i].string);
--				buf += ETH_GSTRING_LEN;
-+				str = bnxt_tx_port_stats_ext_arr[i].string;
-+				ethtool_puts(&buf, str);
- 			}
-+
- 			if (bp->pri2cos_valid) {
- 				for (i = 0; i < 8; i++) {
--					strcpy(buf,
--					       bnxt_rx_bytes_pri_arr[i].string);
--					buf += ETH_GSTRING_LEN;
-+					str = bnxt_rx_bytes_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
- 				}
-+
- 				for (i = 0; i < 8; i++) {
--					strcpy(buf,
--					       bnxt_rx_pkts_pri_arr[i].string);
--					buf += ETH_GSTRING_LEN;
-+					str = bnxt_rx_pkts_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
- 				}
-+
- 				for (i = 0; i < 8; i++) {
--					strcpy(buf,
--					       bnxt_tx_bytes_pri_arr[i].string);
--					buf += ETH_GSTRING_LEN;
-+					str = bnxt_tx_bytes_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
- 				}
-+
- 				for (i = 0; i < 8; i++) {
--					strcpy(buf,
--					       bnxt_tx_pkts_pri_arr[i].string);
--					buf += ETH_GSTRING_LEN;
-+					str = bnxt_tx_pkts_pri_arr[i].string;
-+					ethtool_puts(&buf, str);
- 				}
- 			}
- 		}
- 		break;
- 	case ETH_SS_TEST:
- 		if (bp->num_tests)
--			memcpy(buf, bp->test_info->string,
--			       bp->num_tests * ETH_GSTRING_LEN);
-+			for (i = 0; i < bp->num_tests; i++)
-+				ethtool_puts(&buf, bp->test_info->string[i]);
- 		break;
- 	default:
- 		netdev_err(bp->dev, "bnxt_get_strings invalid request %x\n",
--- 
-2.47.0
+Thanks!
 
+
+> ---
+>  net/vmw_vsock/af_vsock.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> index 35681adedd9aaec3565495158f5342b8aa76c9bc..109b7a0bd0714c9a2d5c9dd58421e7e9344a8474 100644
+> --- a/net/vmw_vsock/af_vsock.c
+> +++ b/net/vmw_vsock/af_vsock.c
+> @@ -2417,6 +2417,7 @@ static int vsock_create(struct net *net, struct socket *sock,
+>  	if (sock->type == SOCK_DGRAM) {
+>  		ret = vsock_assign_transport(vsk, NULL);
+>  		if (ret < 0) {
+> +			sock->sk = NULL;
+>  			sock_put(sk);
+>  			return ret;
+>  		}
+> -- 
+> 2.47.0.105.g07ac214952-goog
 
