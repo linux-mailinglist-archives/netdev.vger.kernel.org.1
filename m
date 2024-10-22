@@ -1,158 +1,182 @@
-Return-Path: <netdev+bounces-137825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840109A9F3F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:54:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 085339A9F42
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15ACE1F239DB
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 818F11F23A14
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E415199FB5;
-	Tue, 22 Oct 2024 09:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533C61993B2;
+	Tue, 22 Oct 2024 09:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lLuSga9d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjXhMvob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2A11993B9;
-	Tue, 22 Oct 2024 09:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21711991CC
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729590831; cv=none; b=j+LkuLBRbWZgWyHFabHIVjgWymglSkTcCSKEWapXtFl1C/IYaY4RjL4tYwJTCcqKBgNJ5MU9X7hj3AFPXfzAvkeASBjpUX0e/VktXw2s05UDbrsBFW0ILtPZHOp7KZpX4v5ZJbV9rJSyeNCpRTqj7JvfZHJmkE7TaQWK2wfxVAs=
+	t=1729590879; cv=none; b=oaO/G2HB41/GDBrsQge8iRbIKBAx4HVN/WCSIBABS7wl6j/PJcfIyN9mSpAhFDaBLc8PEbpHlStIORoKEnw+sdW+JecrD7wyrR6ARtmMhTdKVRjOWKkNTgSc+Kb2/eWJTzM5WBnhRdy+8C82GrhoK5jQbnWpzHUThise5nFX2gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729590831; c=relaxed/simple;
-	bh=scM++PRarp/aL6EIAnPspEEa4tB6O8OVUGdyT5ywHWg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wk6cWbqCOVDYExnTvAt3gx4sEaSOclPbQxBNbKjz3X6MB5Xl2GM849KPpk4gJ1luXw7H+B3jINHfClHpI+BKzG5iXZWdg9u9IOfp9prNXmv31IagDUOfQeTZF48vDjvp7udZy2Y+21OsiTND8vVgtw8iPGjuO72x5jnOMbAt6v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lLuSga9d; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729590830; x=1761126830;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=scM++PRarp/aL6EIAnPspEEa4tB6O8OVUGdyT5ywHWg=;
-  b=lLuSga9drB5qOM5feq6YfdeXJ5LXlqB0CETQAk5zlBeKPdyEXH0UOa2e
-   z8MblJcSuel2gwbA2lKbdW1Sxk1MeL4IQ0HyLu0PS7RJeh9H6DDTrSQdb
-   DHSjMXJGJxj2PgHbRP2nk9UgOTmez2fhLMNa5/ii5yt0x28TKwta9Z6XX
-   2jZWPhLy8LOibMH9SnjMwRgsPlHZQvIB4uS2Fb9P2MT/NqlMHJjqqdQFC
-   mbb9lZP1toaQR341tu4fLHtSm81VcfhP9Cn9QE2k0LLBswEh7BVCRk5FS
-   zYBPN7xgAGTTPHkZx7Li4m1/8d1s6igkYlW5EMYAww9diKxsPWyQGfFuy
-   A==;
-X-CSE-ConnectionGUID: WBOhAiRuTiCsY8cr96Pt4g==
-X-CSE-MsgGUID: XbeRHvjkRGOwzeSSlWD3Iw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11232"; a="29320777"
-X-IronPort-AV: E=Sophos;i="6.11,222,1725346800"; 
-   d="scan'208";a="29320777"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 02:52:34 -0700
-X-CSE-ConnectionGUID: dtMF4WWlS2enATM/z7NnNw==
-X-CSE-MsgGUID: V81PCzHpTli7AWTOne9nsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,222,1725346800"; 
-   d="scan'208";a="110635030"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 22 Oct 2024 02:52:31 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t3BYy-000TPr-0b;
-	Tue, 22 Oct 2024 09:52:28 +0000
-Date: Tue, 22 Oct 2024 17:52:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Matt Johnston <matt@codeconstruct.com.au>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Wolfram Sang <wsa-dev@sang-engineering.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Dung Cao <dung@os.amperecomputing.com>
-Subject: Re: [PATCH net v2] mctp i2c: handle NULL header address
-Message-ID: <202410221734.IWc5paM1-lkp@intel.com>
-References: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+	s=arc-20240116; t=1729590879; c=relaxed/simple;
+	bh=GAGDd9qAHbzHW+QycFdG+EuJQmh2dbWiYdu9oNWGvIk=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qFYPKYy66s4BNKjqygag1Tx+BRQGP8LOpvPgsdbo13hwWxCRELkewugO6h1nAV9S3zGzO+S1zAeyj28rV7wsLRwmFWzhDx8BxUFcel2hUJKeQriaPMnJbQN2ftLkgcpTlnPSlsJYEXbwNgn8TpeL8GjhFeuFWqBQVviYVJed/qE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UjXhMvob; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729590876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nI1J080gJIk57nqPokRMkIaqBAiA6XyP9b3WtLdFdmw=;
+	b=UjXhMvoboq94i/LBw9SAebGz3cR/Vgruwt6fjOgJpGWFldUt/lJ8DzlFAubVGoEbbR5L1I
+	SZcXNEdjOXx4QyirKmUKDGjrjUHB+ckk1WczOaZDJnbiKjSAA6MnLvn8BwXefv/QrRle5i
+	0xiQwXwuabxml4qHYnGJwwJjXlsD394=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-455-F2qhFe2qOcmRFwzun8l9mQ-1; Tue, 22 Oct 2024 05:54:35 -0400
+X-MC-Unique: F2qhFe2qOcmRFwzun8l9mQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso44268445e9.3
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:54:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729590874; x=1730195674;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nI1J080gJIk57nqPokRMkIaqBAiA6XyP9b3WtLdFdmw=;
+        b=DimrebFOgMM4B2ngEjipVz+JfFIvdsc3cBhWmAXBWbXVRusBVKIFUDKpKJMLSOo9IX
+         Qz8esY8+vTJbNFIgUS9RrlO3BAAOApVObfg4deqqhzPg0jfFyOxnDEnzbRQzZklEhhUx
+         grng8Emm2hyFfyX+khUhvkkydrey1EwlJIyEBYi9zcP6asuDW3dC0lhw85tuvCKU2jgd
+         ArbfiNCvJjZ5etwz7pednPb3K9e/v1RVj4OZKjp2qqlcnfOCsgy76s8CafUJX60fbO5K
+         9KZvAVlenER0C6O66UvAMmvJEieAlASwyRMsCPmVI285M/hAARztlUcQIaUr16ZC2qdA
+         xmDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKnpUtuOMdMeHgxez0O3xqCp9CBMSsXxC59PgXVW29gRhpGFTrB8EYjdHut6LFq901sR1pWLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3TJC2dK6kapTK3NxnsD6SIwEjPZ62YrR4xZzuCRjngXVDc+ho
+	I1ncwI/zTPlIusT84Qwk2bM7+qyfOxJe8Be1iCQ+7kUGJB6B8YQUNFFHQ15zXDyJPOkEpx88zlZ
+	u8NqzS2orWmgEKItbEI7GI5w3Veq2CGqj2ZpnznrhjPVNL+bJwDXGsw==
+X-Received: by 2002:a05:6000:1a52:b0:37d:53a7:a635 with SMTP id ffacd0b85a97d-37ebd3a30b4mr9041563f8f.51.1729590873984;
+        Tue, 22 Oct 2024 02:54:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH/MSC0f4a4ghBH8Njw0NZeddYxIlEatBvFumhTXQ8ieD1rzRQxbyN4pCWfCENi2prg9FrCzw==
+X-Received: by 2002:a05:6000:1a52:b0:37d:53a7:a635 with SMTP id ffacd0b85a97d-37ebd3a30b4mr9041534f8f.51.1729590873489;
+        Tue, 22 Oct 2024 02:54:33 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9bb66sm6197474f8f.95.2024.10.22.02.54.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2024 02:54:33 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 546B0160B2D1; Tue, 22 Oct 2024 11:54:32 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Puranjay Mohan <puranjay@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexei Starovoitov <ast@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>,
+ bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, "David S.
+ Miller" <davem@davemloft.net>, Eduard Zingerman <eddyz87@gmail.com>, Eric
+ Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, Helge Deller
+ <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>,
+ Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, Palmer Dabbelt
+ <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Puranjay Mohan <puranjay12@gmail.com>,
+ Puranjay Mohan <puranjay@kernel.org>, Shuah Khan <shuah@kernel.org>, Song
+ Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song
+ <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next 2/5] bpf: bpf_csum_diff: optimize and
+ homogenize for all archs
+In-Reply-To: <20241021122112.101513-3-puranjay@kernel.org>
+References: <20241021122112.101513-1-puranjay@kernel.org>
+ <20241021122112.101513-3-puranjay@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 22 Oct 2024 11:54:32 +0200
+Message-ID: <874j54iht3.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021-mctp-i2c-null-dest-v2-1-4503e478517c@codeconstruct.com.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Matt,
+Puranjay Mohan <puranjay@kernel.org> writes:
 
-kernel test robot noticed the following build warnings:
+> 1. Optimization
+>    ------------
+>
+> The current implementation copies the 'from' and 'to' buffers to a
+> scratchpad and it takes the bitwise NOT of 'from' buffer while copying.
+> In the next step csum_partial() is called with this scratchpad.
+>
+> so, mathematically, the current implementation is doing:
+>
+> 	result =3D csum(to - from)
+>
+> Here, 'to'  and '~ from' are copied in to the scratchpad buffer, we need
+> it in the scratchpad buffer because csum_partial() takes a single
+> contiguous buffer and not two disjoint buffers like 'to' and 'from'.
+>
+> We can re write this equation to:
+>
+> 	result =3D csum(to) - csum(from)
+>
+> using the distributive property of csum().
+>
+> this allows 'to' and 'from' to be at different locations and therefore
+> this scratchpad and copying is not needed.
+>
+> This in C code will look like:
+>
+> result =3D csum_sub(csum_partial(to, to_size, seed),
+>                   csum_partial(from, from_size, 0));
+>
+> 2. Homogenization
+>    --------------
+>
+> The bpf_csum_diff() helper calls csum_partial() which is implemented by
+> some architectures like arm and x86 but other architectures rely on the
+> generic implementation in lib/checksum.c
+>
+> The generic implementation in lib/checksum.c returns a 16 bit value but
+> the arch specific implementations can return more than 16 bits, this
+> works out in most places because before the result is used, it is passed
+> through csum_fold() that turns it into a 16-bit value.
+>
+> bpf_csum_diff() directly returns the value from csum_partial() and
+> therefore the returned values could be different on different
+> architectures. see discussion in [1]:
+>
+> for the int value 28 the calculated checksums are:
+>
+> x86                    :    -29 : 0xffffffe3
+> generic (arm64, riscv) :  65507 : 0x0000ffe3
+> arm                    : 131042 : 0x0001ffe2
+>
+> Pass the result of bpf_csum_diff() through from32to16() before returning
+> to homogenize this result for all architectures.
+>
+> NOTE: from32to16() is used instead of csum_fold() because csum_fold()
+> does from32to16() + bitwise NOT of the result, which is not what we want
+> to do here.
+>
+> [1] https://lore.kernel.org/bpf/CAJ+HfNiQbOcqCLxFUP2FMm5QrLXUUaj852Fxe3hn=
+_2JNiucn6g@mail.gmail.com/
+>
+> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
 
-[auto build test WARNING on cb560795c8c2ceca1d36a95f0d1b2eafc4074e37]
+Pretty neat simplification :)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Matt-Johnston/mctp-i2c-handle-NULL-header-address/20241021-123741
-base:   cb560795c8c2ceca1d36a95f0d1b2eafc4074e37
-patch link:    https://lore.kernel.org/r/20241021-mctp-i2c-null-dest-v2-1-4503e478517c%40codeconstruct.com.au
-patch subject: [PATCH net v2] mctp i2c: handle NULL header address
-config: alpha-randconfig-r122-20241022 (https://download.01.org/0day-ci/archive/20241022/202410221734.IWc5paM1-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20241022/202410221734.IWc5paM1-lkp@intel.com/reproduce)
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410221734.IWc5paM1-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/mctp/mctp-i2c.c:599:23: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned char [assigned] [usertype] llsrc @@     got unsigned char const *dev_addr @@
-   drivers/net/mctp/mctp-i2c.c:599:23: sparse:     expected unsigned char [assigned] [usertype] llsrc
-   drivers/net/mctp/mctp-i2c.c:599:23: sparse:     got unsigned char const *dev_addr
-   drivers/net/mctp/mctp-i2c.c: note: in included file (through include/linux/module.h):
-   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
-   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
-
-vim +599 drivers/net/mctp/mctp-i2c.c
-
-   579	
-   580	static int mctp_i2c_header_create(struct sk_buff *skb, struct net_device *dev,
-   581					  unsigned short type, const void *daddr,
-   582					  const void *saddr, unsigned int len)
-   583	{
-   584		struct mctp_i2c_hdr *hdr;
-   585		struct mctp_hdr *mhdr;
-   586		u8 lldst, llsrc;
-   587	
-   588		if (len > MCTP_I2C_MAXMTU)
-   589			return -EMSGSIZE;
-   590	
-   591		if (daddr)
-   592			lldst = *((u8 *)daddr);
-   593		else
-   594			return -EINVAL;
-   595	
-   596		if (saddr)
-   597			llsrc = *((u8 *)saddr);
-   598		else
- > 599			llsrc = dev->dev_addr;
-   600	
-   601		skb_push(skb, sizeof(struct mctp_i2c_hdr));
-   602		skb_reset_mac_header(skb);
-   603		hdr = (void *)skb_mac_header(skb);
-   604		mhdr = mctp_hdr(skb);
-   605		hdr->dest_slave = (lldst << 1) & 0xff;
-   606		hdr->command = MCTP_I2C_COMMANDCODE;
-   607		hdr->byte_count = len + 1;
-   608		hdr->source_slave = ((llsrc << 1) & 0xff) | 0x01;
-   609		mhdr->ver = 0x01;
-   610	
-   611		return sizeof(struct mctp_i2c_hdr);
-   612	}
-   613	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
