@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-137766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6909A9B1D
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:32:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 515219A9B23
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A32EFB25B3A
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:32:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09D9F1F236D3
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C938A14D2BD;
-	Tue, 22 Oct 2024 07:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9FC14D29D;
+	Tue, 22 Oct 2024 07:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rVfp3th2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L6A4EVkX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA3814B088;
-	Tue, 22 Oct 2024 07:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C4C1A269;
+	Tue, 22 Oct 2024 07:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729582352; cv=none; b=LQJHDFndNnGKghzJIY5rE3tORLO2v7ropSje38heTTAU1qaHh1I7vQv4djNgAjS6ndP2y8TFf8ya6bklNEs7GONkPGPGO1kI8mXCfXPJIy6uzSAOqMQm2/ZHPwjM7XNp8fV6RytX+TFSuvTDKHeq00CbVPIgknVc9chxjTFvyHo=
+	t=1729582447; cv=none; b=PDFGoVNVhAE5p4Zd6weRxHsxmUQ+yaSWvmliRhIw9+qsVU0Ji7xZDEkM0oToklTYa0iqiX6l1wnr6Hd/VHaJBf/11WOjTlxbfehKj4USDLm6PxxZg2L/psRDWcdA7zBXNAR2jedQukZkF++LX9+AO0sEtI2B623PKA2nyWcYU0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729582352; c=relaxed/simple;
-	bh=KPwac6l+2tUtMD2vs4OOQYjiSpu5Fyksb4QT8Letd7M=;
+	s=arc-20240116; t=1729582447; c=relaxed/simple;
+	bh=WX47FjWdIeFvEZK0bxNuqKxWrqQik5pNCeDee+e/CW4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rGhJ3YF14GAHxhh7u2+G+DYjCZz0Xf4Nf8O8C56PJ/jVi4N0xJBUIT1kDQBeMtKluiDa88Ns54wjv3EUeFmue678Kyj/RvEwzqvN+iZ2abwc2K48C/BvNEenzdWvy1wwyRayhbL2Mn4TJpimvTevBvm1Zuh0PwDYI0AvfrfcrQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rVfp3th2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B53C4CEE4;
-	Tue, 22 Oct 2024 07:32:27 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=C8jmgYY4TXNE+/XvC8qRPPsS3PdvBnJtf6B8AfysGFwGqTDngP/KehQwCFlPv3KXi61gV9lUALIR98VmClSFIXNM7/Z+Mr0FDZ8Q3K/YnY+aE45PNI6CHASjD56OSW3qt5RdZ0fvT+gXzf37CtCCIsJqwyqhCNSDmNsbUOPRcTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L6A4EVkX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA14AC4CEC3;
+	Tue, 22 Oct 2024 07:34:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729582352;
-	bh=KPwac6l+2tUtMD2vs4OOQYjiSpu5Fyksb4QT8Letd7M=;
+	s=k20201202; t=1729582447;
+	bh=WX47FjWdIeFvEZK0bxNuqKxWrqQik5pNCeDee+e/CW4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rVfp3th2asmEs1VDi+Jim8+lR++xFADU+Psocn9CuEgAduqY6GvxVNMmxO36SIfhZ
-	 UNs25XfBW7YVmeZV8sKvwMJ7XT6PeEkUF97iIdc3pvd//oqQ8O8k6qISB1y7gFHQFI
-	 nkubjcuMtn8Ip/NQG/8pGwZsPCZ+b8Vlbv6mB/cOzhN0uN7G+auRQ2eDOOzbp4xzMI
-	 kldfoB6SbR+QaKtCHEotTUzD0Ky6XyuTA/0KFpf2/txPy+3IOvfFh6Njxa5A6xb/0t
-	 t0qBLZ4ZMPE9k7c2ZjN5hIuLF5Blk3V5omeLCxzbjwFDIHcabo11m3/PWSXnVy3X1h
-	 0edHIR25rvMIQ==
-Date: Tue, 22 Oct 2024 08:32:25 +0100
+	b=L6A4EVkX8RcHfnzQTB0u4BzCHKwQ7jh6oU7r/geHWXMtwq0b+DcSDG0ANwO0+5V5I
+	 yMK3YhLf38GR/YgEkUzkrFwCH334tHBsw/hBAmJMXJDi7N6K01fwM0iBWOYP4Pd0Cv
+	 vx+P4BFr/0YhoS+knnj0aId75CEVP+lhY3dbhnOJkRt8SXROAjCEEOE9OA6tyeU3TB
+	 3N+STdu6aiXXtIzwYadCi544KzOaPP+ammawH0SS1wKzN4XnWF4uehh4LE/THywME+
+	 yumrLDgsMvsPVIceX5RuXG48V6kBrtYF4jNGBv1XkX1mUWaYDQq6ssSeY8vSY/EktG
+	 AWeGLn60TvULg==
+Date: Tue, 22 Oct 2024 08:34:03 +0100
 From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com,
-	maciej.fijalkowski@intel.com, vedang.patel@intel.com,
-	jithu.joseph@intel.com, andre.guedes@intel.com,
-	jacob.e.keller@intel.com, sven.auhagen@voleatech.de,
-	alexander.h.duyck@intel.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH v3 net 0/4] Fix passing 0 to ERR_PTR in intel ether
- drivers
-Message-ID: <20241022073225.GO402847@kernel.org>
-References: <20241022065623.1282224-1-yuehaibing@huawei.com>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: =?utf-8?B?5Zue6KaG?= =?utf-8?Q?=3A?= [net v2] net: ftgmac100:
+ refactor getting phy device handle
+Message-ID: <20241022073403.GP402847@kernel.org>
+References: <20241021023705.2953048-1-jacky_chou@aspeedtech.com>
+ <20241022065753.GN402847@kernel.org>
+ <SEYPR06MB5134C8206C6BA27BD1F761319D4C2@SEYPR06MB5134.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,24 +65,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241022065623.1282224-1-yuehaibing@huawei.com>
+In-Reply-To: <SEYPR06MB5134C8206C6BA27BD1F761319D4C2@SEYPR06MB5134.apcprd06.prod.outlook.com>
 
-On Tue, Oct 22, 2024 at 02:56:19PM +0800, Yue Haibing wrote:
-> Fixing sparse error in xdp run code by introducing new variable xdp_res
-> instead of overloading this into the skb pointer as i40e drivers done
-> in commit 12738ac4754e ("i40e: Fix sparse errors in i40e_txrx.c") and
-> commit ae4393dfd472 ("i40e: fix broken XDP support").
+On Tue, Oct 22, 2024 at 07:13:56AM +0000, Jacky Chou wrote:
+> Hi Simon
 > 
-> v3: Fix uninitialized 'xdp_res' in patch 3 and 4 which Reported-by
->     kernel test robot
-> v2: Fix this as i40e drivers done instead of return NULL in xdp run code
+> Thank you for your reply.
+> 
+> > > The ftgmac100 supports NC-SI mode, dedicated PHY and fixed-link PHY.
+> > > The dedicated PHY is using the phy_handle property to get phy device
+> > > handle and the fixed-link phy is using the fixed-link property to
+> > > register a fixed-link phy device.
+> > >
+> > > In of_phy_get_and_connect function, it help driver to get and register
+> > > these PHYs handle.
+> > > Therefore, here refactors this part by using of_phy_get_and_connect.
+> > 
+> > Hi Jacky,
+> > 
+> > I understand the aim of this patch, and I think it is nice that we can drop about
+> > 20 lines of code. But I did have some trouble understanding the paragraph
+> > above. I wonder if the following is clearer:
+> > 
+> >   Consolidate the handling of dedicated PHY and fixed-link phy by taking
+> >   advantage of logic in of_phy_get_and_connect() which handles both of
+> >   these cases, rather than open coding the same logic in ftgmac100_probe().
+> >
+> 
+> Agree. I will change the commit message.
+> Thank you for helping me fine-tune this message.
+> 
+> > >
+> > > Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> > > ---
+> > > v2:
+> > >   - enable mac asym pause support for fixed-link PHY
+> > >   - remove fixes information
+> > 
+> > I agree that this is not a fix. And should not have a Fixes tag and so on.
+> > But as such it should be targeted at net rather than net-next.
+> > 
+> >   Subject: [net-next vX] ...
+> > 
+> > The code themselves changes look good to me. But I think the two points above,
+> > in combination, warrant a v3.
+> 
+> I will send v3 patch to net-next tree.
 
-Hi Yue Haibing, all,
-
-I like these changes a lot. But I do wonder if it would
-be more appropriate to target them at net-next (or iwl-next)
-rather than net, without Fixes tags. This is because they
-don't seem to be fixing (user-visible) bugs. Am I missing something?
-
-...
+Great, thanks Jacky.
 
