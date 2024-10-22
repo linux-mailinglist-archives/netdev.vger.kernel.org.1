@@ -1,115 +1,116 @@
-Return-Path: <netdev+bounces-137902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922E49AB0D4
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:29:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0E79AB0E9
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B3C7B2180C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:29:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5123B1F240E0
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A751A08DB;
-	Tue, 22 Oct 2024 14:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E940C19E97F;
+	Tue, 22 Oct 2024 14:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Oxurvs7y"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qq34XOCz";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pKfWqgqh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180C519EED0
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4761A19D060;
+	Tue, 22 Oct 2024 14:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729607345; cv=none; b=TaGOpGGjIlom0yLn8N23Y2sUuc7dpIE67JUmC/AkRrJVrEMUm/mbYfVUxvFG0yvOaiZizjl5F0EYUPDT2dT9xbWBQxFnAjLvZ496dLlgRoNisOZOjD65cUftqHuXxAIE4pSy8Q3TG3CdyJ3/0VJZEYgiMJXnt8AfYbo+3Ps0bL8=
+	t=1729607497; cv=none; b=CmKLtD5i5CZUDXcAYBIv0Jp2Ax8eok7BzkWob+yb4HY7hdGwIAc6gXxIyUXuIMPaievkk83EeNSjTZAzQud0acIkDZSoT4doo2i1bAuEoMw7Ocs5APyvewQgwdj98ChvO13Y4GSvQAbQgVjHUT0VDfcjD3l2F2FitOEh13kwadc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729607345; c=relaxed/simple;
-	bh=FWIUzDJsMLIU8LmwxOdULgE14BEiPOqKtaJ7NvsJTKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gdp8jekCof/ts5yjH3l2Q0T1K6umSQGS2QvFsZALHEiPYLUj7T/s7CsKCHtQaLhzoqNvNKYH8z3NPKxbnY/++6lL4ZpUSLrTYigSGMs88+eLVtagbmZwJaa0IajKhH07fZfnB5VGhUvvV80RkWwEg60VLE+ivACLG18yIVj44gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Oxurvs7y; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b161fa1c7bso228981285a.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 07:29:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1729607343; x=1730212143; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBQs0VktZnZLMvhoI85WO8zPMaVfIDxzSx1BsoDRynk=;
-        b=Oxurvs7yXvalAKMsBc/nP+/D+5la6Rkxlhdm9Ddkq8teH7t+oHpH7ZPJ+mVwHFfk5W
-         wxpWq5N/4aRo4KVxiOisV/uySj5b8oJ3ynZNKVOd3clM1EmoUaX7yHLk8CnFODVP13eb
-         N7fht01EuJdQr+AIuw6NEB71zGLc/POVDDPOZHy4hK2fMwM9nr4wlySNrWHEkgUi9jlN
-         feWU3ztMlmnHFVnIRphfcFybCCaMbczHzYOoWoeL8mg9ryltTKNVU1a7VqZqb735OtLo
-         axITeO/szettRnvohX4iLo+FINW4Bm7Db00hnc4vdqlOpcuwYfRYjpIs1QFXXye7dlsC
-         /Qqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729607343; x=1730212143;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QBQs0VktZnZLMvhoI85WO8zPMaVfIDxzSx1BsoDRynk=;
-        b=tSWndgFc+7tDYiyUufvye1f1R0IqmmkKfCbNq5C25MVbefoIaiFfN5WTwm8iB+CTGD
-         ZOCH1sHGKllPv7zWubZHQ07oa3V9gmeB6bgdb2kl0NL6Cj6O8woCUYNOzEcZNERyw0Nz
-         8R5YKXCw6TYfElPIMB70LfV2FX9Q0gliAGb0hlWAOC4Xp+/mxh4UXVyCeLcpNBHaZ7zf
-         dHJrJoAegSvZd6UuYMRPrPjsC4roU2Wzg6TtqUMq1Kny74N3Wk8T4cytB1si7RVh9W9N
-         o70duxz91AC/31OgcDlydx4VGOkew9GkUc76ezP/xEgzSfcC+7ZK0SU0dm1Dv2NnvMwf
-         5uNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDCKFXRpC++xtm/aOmQ+KxtSAOd+tjyoQx8zqKmJXcXinwFIvhmSZjVUXXpeqYLI2brhF6cm0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yynn33mrB3YGsA7e1TkShiVzv3NsfRLUS+NU5xLlyhX3B/ADa/Y
-	6WYKvbNBybn5zbJoJnk81eOjk+TULvHPiJpp2jgEfOFVJIHzR1u4XeypnmiAUq8lIRoUxuSUxMs
-	i
-X-Google-Smtp-Source: AGHT+IH8N2eHg9nw+vHszANEXOFWLyJrLXfEthKl81Z7ZBHmwyuw+1iu3EyqKAdTOb/FJU0+FqZosQ==
-X-Received: by 2002:a05:620a:40c2:b0:7b1:47bb:5334 with SMTP id af79cd13be357-7b157be0c1fmr1774276585a.40.1729607342834;
-        Tue, 22 Oct 2024 07:29:02 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b165a037fbsm285619185a.60.2024.10.22.07.29.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 07:29:01 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t3Fsb-003rIb-1c;
-	Tue, 22 Oct 2024 11:29:01 -0300
-Date: Tue, 22 Oct 2024 11:29:01 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: syzbot <syzbot+6dee15fdb0606ef7b6ba@syzkaller.appspotmail.com>
-Cc: leon@kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [rdma?] INFO: task hung in add_one_compat_dev (3)
-Message-ID: <20241022142901.GA13306@ziepe.ca>
-References: <671756af.050a0220.10f4f4.010f.GAE@google.com>
+	s=arc-20240116; t=1729607497; c=relaxed/simple;
+	bh=LpgT8Yd7zrkaCPtkZnHUcp+Mj4CWRueHn/5O6SrjW3o=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:MIME-Version:
+	 Content-Type; b=BSKUcyN7TEGDqyfD1k+7hNBero27+A8plYknLgk2Otct4Jm4BlmXAowWr3fWmNZGRz3Yp/8wseHNL+Z/wYmD3J4wTytvF5syTGtICnqSHAP/LIJPMnk7iW1j8pt4IU99CwZ79W7iRPEWmoPZIrS/nIymsYhbZCgPj8+2Sduw0L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qq34XOCz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pKfWqgqh; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Anna-Maria Behnsen <anna-maria@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1729607494;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=I9+4TXaziuIvZZF1dq0RG29aOHytEa0AUdL0KSv7OOc=;
+	b=qq34XOCzWRsOQx80barfal50qwKN1CTLM7/miQyL+TNGjJNulre+RySeM0Jk9+n8s6thDq
+	h6ldicKpQp5TD/ccuYu4j88aqowb0flw/hifRKvYgMGKzpjvBMVyJDZ/vzDrL3tTLEibxf
+	h071JeV5T1lI7tZF6GwVTjGkNAKdU9REjZr1WBUIicYyKajXaA9KCInNn2rJ+u9ckl6kR6
+	O4HeyeeBGkN/n6Ux6FOpGOEC4HXUJPs9upf8MnFiOMwiTlFHB43UxKyTTIzzqTeosp4B9p
+	ZPfu2jeFEg59C9NVtpRvSVl5II2cudF8cTRPhHWKdBke0YbaFUUvlWxAjuG66A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1729607494;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=I9+4TXaziuIvZZF1dq0RG29aOHytEa0AUdL0KSv7OOc=;
+	b=pKfWqgqhtCfWd2p695IUzbtSyYIbddIxypBKi87GgP5I9Tc2arlh+KUBMdNXUrI/9l2PZH
+	fNO/zMVoeBsaIhCA==
+To: Pavel Machek <pavel@ucw.cz>, Thomas Gleixner <tglx@linutronix.de>, Greg
+ KH <greg@kroah.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jinjie Ruan <ruanjinjie@huawei.com>,
+ bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, frederic@kernel.org, richardcochran@gmail.com,
+ johnstul@us.ibm.com, UNGLinuxDriver@microchip.com, jstultz@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 RESEND 1/2] posix-clock: Fix missing timespec64 check
+ in pc_clock_settime()
+In-Reply-To: <ZxeLMu1Hy2VCqzJ6@duo.ucw.cz>
+Date: Tue, 22 Oct 2024 16:31:33 +0200
+Message-ID: <87ttd45hve.fsf@somnus>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <671756af.050a0220.10f4f4.010f.GAE@google.com>
+Content-Type: text/plain
 
-On Tue, Oct 22, 2024 at 12:39:27AM -0700, syzbot wrote:
+Pavel Machek <pavel@ucw.cz> writes:
 
-> 1 lock held by syz-executor/27959:
->  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
->  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: __rtnl_newlink net/core/rtnetlink.c:3749 [inline]
->  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_newlink+0xab7/0x20a0 net/core/rtnetlink.c:3772
+> Hi!
+>
+>> >> > I'm guessing we can push this into 6.12-rc and the other patch into
+>> >> > net-next. I'll toss it into net on Monday unless someone objects.  
+>> >> 
+>> >> Can you folks please at least wait until the maintainers of the code in
+>> >> question had a look ?
+>> >
+>> > You are literally quoting the text where I say I will wait 3 more days.
+>> > Unfortunately "until the maintainers respond" leads to waiting forever
+>> > 50% of the time, and even when we cap at 3 working days we have 300
+>> > patches in the queue (292 right now, and I already spent 2 hours
+>> > reviewing today). Hope you understand.
+>> 
+>> I understand very well, but _I_ spent the time to review the earlier
+>> variants of these patches and to debate with the submitter up to rev
+>> 5.
+>> 
+>> Now you go and apply a patch to a subsystem you do not even maintain just
+>> because I did not have the bandwidth to look at it within the time
+>> limit you defined? Seriously?
+>> 
+>> This problem is there for years, so a few days +/- are absolutely not
+>> relevant.
+>> 
+>> > Sorry if we applied too early, please review, I'll revert if it's no
+>> > good.
+>
+> It is no good :-( and it is now in stable.
+>
+> It needs to goto out in the error case, to permit cleanups.
 
-There is really something wrong with the new sykzaller reporting, can
-someone fix it?
+The check needs to be done before taking the lock. There is already a
+patch around which solves it:
 
-The kernel log that shows the programs:
+https://lore.kernel.org/r/20241018100748.706462-1-ruanjinjie@huawei.com/
 
-https://syzkaller.appspot.com/x/log.txt?x=10d72727980000
+Thanks,
 
-Doesn't have the word "newlink"/"new"/"link" etc, and yet there is an
-executor clearly sitting in a newlink netlink callback when we
-crashed.
+	Anna-Maria
 
-We need to see the syzkaller programs that are triggering these issues
-to get ideas, and for some reason they are missing now.
-
-Jason
 
