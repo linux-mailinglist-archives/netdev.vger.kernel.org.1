@@ -1,257 +1,156 @@
-Return-Path: <netdev+bounces-138009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390BC9AB79B
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:28:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F299AB7A4
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBD531F234AC
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:28:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E5C41F2376C
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428331CC16E;
-	Tue, 22 Oct 2024 20:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0121CBE94;
+	Tue, 22 Oct 2024 20:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Ocy/0BbV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgK3n1Ss"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1251CC156
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 20:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0162E1474A9;
+	Tue, 22 Oct 2024 20:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729628909; cv=none; b=Xb+PgbkqudOY4CxX/if/AWOqnowu3pmTBucxzL9I4pH9rlqBMRud7ZW1DHCBvYIfd9yckI+FtucpU5Km7YUlYzYJl6SFPlT4FKTucaoQIkbrGEoCmQ+SFVaKzEWPfSYGdm/GFcrGZ+YaJbrlWoN8rpOlvgHhBbaT5XF4MPywLD0=
+	t=1729629165; cv=none; b=o08NU+j70m3+SsCyllbetuileEjck4PIcp0oNIVpvTCS6rr3F+9o6IehIBhPZsK+0tIatAzVdQEplvsZreqVN5adqbvAW2TxU+Z5I3yxoOvzl1Z6oNx5innLr+gP9zX6ERQU1+LeH9kXbW8BcXtFqutJM3OGDC4tP2pSo7UhFuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729628909; c=relaxed/simple;
-	bh=bf/yd66V3kuF83bTxs0evHL8Paf59mxT72gHVvyI7IE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SdSQtr+SvJFIvE9PJvc1CclXSNCAjFU2DeTz8j06smm/YcpCsyVXVEEs+Y++dBAjTjxQGxYKm0XH+9nzq49JsUU0jf/e95QPWXhlqzVih5RkO7JOQFV0iFNshzF8LpfPYrR07rdhLr9ASAApLXV/nhpa3pCAhMWa/UzAn1VtzNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Ocy/0BbV; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20ce65c8e13so52055685ad.1
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 13:28:27 -0700 (PDT)
+	s=arc-20240116; t=1729629165; c=relaxed/simple;
+	bh=UeVT67coF+dsRLgWQ++/Sjd/zmllkbNnFB/WlVA+bKo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H+ffbn7qHxQ9zBUw7lXh9QA5RnBaK0NClxJtZDXbXb0lQCa4lMvUZo97rngegLcVjKZSUmwYYkgwihNieNu/M5T+yHhZijvIQEBKnETDxTVml1NSpjfQd7HbCR2df65p3TlnUDRN2xJKtHbKMZIGIXYYil80impx+98cJpmFIzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgK3n1Ss; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20c805a0753so52819045ad.0;
+        Tue, 22 Oct 2024 13:32:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1729628906; x=1730233706; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PJMWdLBxWmamd6hVKbJ1xLBNYdB6AKwK9i9T9Bn4rmA=;
-        b=Ocy/0BbVMmB40lTHv5RR0Kln1NTpZJpKeaCqOghSAC3dRywf0OWe/zcBjJFW+xYz7i
-         dxN9bvX9x2ZKm5a/1ufvEUAUnyekFR7IhWdWziFzHJeSS1zuz2XO9mFZK6f4a2OjlmiQ
-         zpawrfAESLtDnkniCA7p9wi6sedcafxgy+D0s=
+        d=gmail.com; s=20230601; t=1729629163; x=1730233963; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GZ+4PADPN2uTECD/Dh3GFRRtK+3UQEC1z/LtDuogd5I=;
+        b=QgK3n1SsJQsTLL53RLXW34D3mQo6915opstUdRkPMYT10Gld1SKKqVN2hTZKJ+WmMF
+         YtlmrOqANZa2Iddw6DAoMkJnyR7FqJCMx3AXIDeIg6qkYtEzkypg4v1Y0yKVAWxZSlD4
+         CfybZ034Rp1RuhJRWMevXskJJhWmQCv9xHBslV1K07QGV+r0CqM5QKeu3MHJHjH0vjvF
+         q5ZAD/THVkwed0bvQm4d1gfdEtTImcAwmNPVhdhx3Dst0bvuUDPs5icTxvcMT4zDRXL6
+         /UOHbFVMSGjAwE8V4XDt5/8tZ4WgqRqt596jUKENzyLkizWikOdXugFnQHThqKMgv6lL
+         j1+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729628906; x=1730233706;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJMWdLBxWmamd6hVKbJ1xLBNYdB6AKwK9i9T9Bn4rmA=;
-        b=Q3PYbDpC7DdYcWjI8cYITQ/ajmLwLJjlGYKmKgi3G9nUi5iLCIJJ6I+3P52B4jWskf
-         QaOZ/JbyGUeER7XidBg6tN6Nj3E5kMnVCaTi/k+54U79RFNMp/SnAGX7nbNY8T1gXrqh
-         hvNdpR0yvvei0QTUS7JUnpeifMQuiSEeROLVE8v6nfb1GCJOore0Vxs4FiJ4l5oZql8v
-         3Ke7SXDbn56NLrQwgfE5Yiek6gwpr6xRuD10dr9kKLQrmOpy/ziFRJVNydHZVxqUFklW
-         mwWwfa4Hbp9V82HrvDH78qZVecVRB5sfd1MxIbKIwKqrpuCz7PQnVo0NUDZzvzElcyaV
-         hiJw==
-X-Gm-Message-State: AOJu0Yy9ttnh88jQYT8X1jytSUvtbuGyi8wDiIsCBa7LCOtQribAfe37
-	/nLEOK1OtCjqK75jc5cX+bJXHs5WVDsNOezaKDI0QU69KszplNSby92L5BGn1j2L9onLcFMqpK1
-	/yfd7PY6qhZDIBBi3ZQmsdd1Vl1y4yulqQa9jx5RkkKU4l9J/n0ff42u6j7RREpbrDHMXUmXHkf
-	j8GhOgyCsOMGnNTUu7u85sxt2ZjU2QFqlWKUs=
-X-Google-Smtp-Source: AGHT+IF/ce2cH6YsKQwrxSrc+EOHV6a0+Ka22Y3Dqi0AhC2mugNz9U3DkGtcDFiVTs9rUCoC04Hcuw==
-X-Received: by 2002:a17:903:2344:b0:20c:d469:ba95 with SMTP id d9443c01a7336-20fa9e09f1bmr5229205ad.16.1729628906327;
-        Tue, 22 Oct 2024 13:28:26 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0c0bb7sm46730885ad.143.2024.10.22.13.28.24
+        d=1e100.net; s=20230601; t=1729629163; x=1730233963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GZ+4PADPN2uTECD/Dh3GFRRtK+3UQEC1z/LtDuogd5I=;
+        b=LAZBKwI0VaTMpeTuGaknkv2ebxyctp/CwA464E/jJcGYT1tZZ4qgL/69eNIOukD1A9
+         yV0awBLr02UmhbI+MAEk2paZ9igOVwXxsVU1C61ZRQ1Gz4NvltiNPQxZeD/R/B/JKBpU
+         86ywHY/4jkdXrCaT5/bkhIe2cIwHmOOVMLqf6UXFTORlVAue8mimPbJbVuLvsGhk3Dve
+         cvDGPTHy6tLAcNhhBRLWGMbv6YB7neKfTkB9tIvniEJjpl45DtfNUgIkQ27KBrJOr+DH
+         MsWlbtsBEyPrHJmIJWIX1ZqPR3myB5rM1ze9v+PFFVS6KR1YytILq37oiBoEjsqpmhER
+         +Lrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNp+K/uuyk7tkyf9InKZzOmMyCPeq6CsDuQhACNF8SoHQdHBIrlHP+jhqCLxhSL52qY7R/sTt4X2EtFZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywrda9Kh3+uQhKExxV1ubi50w3rHIzoFyFayNpHHymhVHxNux5W
+	D1VfWCLcQvC4pNrwCQSTo6ucl2qKWaF1JzsRdsWhNpa/OLZqWLMFoGglzdbY
+X-Google-Smtp-Source: AGHT+IGcDqy20KPoabg7ESPBAC5OmxPOAcjQtMj/wH5Mv0MFuAdhMh+A6qVzGB2rUcn/bbgjEQMb9A==
+X-Received: by 2002:a17:902:c945:b0:20c:da66:3875 with SMTP id d9443c01a7336-20fa9e5405cmr3800315ad.24.1729629163038;
+        Tue, 22 Oct 2024 13:32:43 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0dd53esm46521235ad.222.2024.10.22.13.32.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 13:28:25 -0700 (PDT)
-Date: Tue, 22 Oct 2024 13:28:22 -0700
-From: Joe Damato <jdamato@fastly.com>
+        Tue, 22 Oct 2024 13:32:42 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
-Cc: kurt@linutronix.de, vinicius.gomes@intel.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+Cc: Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Thomas Falcon <tlfalcon@linux.ibm.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-	jacob.e.keller@intel.com
-Subject: Re: [net-next v3 2/2] igc: Link queues to NAPI instances
-Message-ID: <ZxgK5jsCn5VmKKrH@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
-	kurt@linutronix.de, vinicius.gomes@intel.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-	jacob.e.keller@intel.com
-References: <20241018171343.314835-1-jdamato@fastly.com>
- <20241018171343.314835-3-jdamato@fastly.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linuxppc-dev@lists.ozlabs.org (open list:LINUX FOR POWERPC (32-BIT AND 64-BIT)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] ibmvnic: use ethtool string helpers
+Date: Tue, 22 Oct 2024 13:32:40 -0700
+Message-ID: <20241022203240.391648-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241018171343.314835-3-jdamato@fastly.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 18, 2024 at 05:13:43PM +0000, Joe Damato wrote:
-> Link queues to NAPI instances via netdev-genl API so that users can
-> query this information with netlink. Handle a few cases in the driver:
->   1. Link/unlink the NAPIs when XDP is enabled/disabled
->   2. Handle IGC_FLAG_QUEUE_PAIRS enabled and disabled
-> 
-> Example output when IGC_FLAG_QUEUE_PAIRS is enabled:
-> 
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json='{"ifindex": 2}'
-> 
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
-> 
-> Since IGC_FLAG_QUEUE_PAIRS is enabled, you'll note that the same NAPI ID
-> is present for both rx and tx queues at the same index, for example
-> index 0:
-> 
-> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
-> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
-> 
-> To test IGC_FLAG_QUEUE_PAIRS disabled, a test system was booted using
-> the grub command line option "maxcpus=2" to force
-> igc_set_interrupt_capability to disable IGC_FLAG_QUEUE_PAIRS.
-> 
-> Example output when IGC_FLAG_QUEUE_PAIRS is disabled:
-> 
-> $ lscpu | grep "On-line CPU"
-> On-line CPU(s) list:      0,2
-> 
-> $ ethtool -l enp86s0  | tail -5
-> Current hardware settings:
-> RX:		n/a
-> TX:		n/a
-> Other:		1
-> Combined:	2
-> 
-> $ cat /proc/interrupts  | grep enp
->  144: [...] enp86s0
->  145: [...] enp86s0-rx-0
->  146: [...] enp86s0-rx-1
->  147: [...] enp86s0-tx-0
->  148: [...] enp86s0-tx-1
-> 
-> 1 "other" IRQ, and 2 IRQs for each of RX and Tx, so we expect netlink to
-> report 4 IRQs with unique NAPI IDs:
-> 
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump napi-get --json='{"ifindex": 2}'
-> [{'id': 8196, 'ifindex': 2, 'irq': 148},
->  {'id': 8195, 'ifindex': 2, 'irq': 147},
->  {'id': 8194, 'ifindex': 2, 'irq': 146},
->  {'id': 8193, 'ifindex': 2, 'irq': 145}]
-> 
-> Now we examine which queues these NAPIs are associated with, expecting
-> that since IGC_FLAG_QUEUE_PAIRS is disabled each RX and TX queue will
-> have its own NAPI instance:
-> 
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json='{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  v3:
->    - Replace igc_unset_queue_napi with igc_set_queue_napi(adapater, i,
->      NULL), as suggested by Vinicius Costa Gomes
->    - Simplify implemention of igc_set_queue_napi as suggested by Kurt
->      Kanzenbach, with a tweak to use ring->queue_index
-> 
->  v2:
->    - Update commit message to include tests for IGC_FLAG_QUEUE_PAIRS
->      disabled
->    - Refactored code to move napi queue mapping and unmapping to helper
->      functions igc_set_queue_napi and igc_unset_queue_napi
->    - Adjust the code to handle IGC_FLAG_QUEUE_PAIRS disabled
->    - Call helpers to map/unmap queues to NAPIs in igc_up, __igc_open,
->      igc_xdp_enable_pool, and igc_xdp_disable_pool
-> 
->  drivers/net/ethernet/intel/igc/igc.h      |  2 ++
->  drivers/net/ethernet/intel/igc/igc_main.c | 33 ++++++++++++++++++++---
->  drivers/net/ethernet/intel/igc/igc_xdp.c  |  2 ++
->  3 files changed, 33 insertions(+), 4 deletions(-)
+They are the prefered way to copy ethtool strings.
 
-I took another look at this to make sure that RTNL is held when
-igc_set_queue_napi is called after the e1000 bug report came in [1],
-and there may be two locations I've missed:
+Avoids manually incrementing the data pointer.
 
-1. igc_resume, which calls __igc_open
-2. igc_io_error_detected, which calls igc_down
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/ibm/ibmvnic.c | 30 +++++++++---------------------
+ 1 file changed, 9 insertions(+), 21 deletions(-)
 
-In both cases, I think the code can be modified to hold rtnl around
-calls to __igc_open and igc_down.
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index cca2ed6ad289..e95ae0d39948 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -3808,32 +3808,20 @@ static void ibmvnic_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+ 	if (stringset != ETH_SS_STATS)
+ 		return;
+ 
+-	for (i = 0; i < ARRAY_SIZE(ibmvnic_stats); i++, data += ETH_GSTRING_LEN)
+-		memcpy(data, ibmvnic_stats[i].name, ETH_GSTRING_LEN);
++	for (i = 0; i < ARRAY_SIZE(ibmvnic_stats); i++)
++		ethtool_puts(&data, ibmvnic_stats[i].name);
+ 
+ 	for (i = 0; i < adapter->req_tx_queues; i++) {
+-		snprintf(data, ETH_GSTRING_LEN, "tx%d_batched_packets", i);
+-		data += ETH_GSTRING_LEN;
+-
+-		snprintf(data, ETH_GSTRING_LEN, "tx%d_direct_packets", i);
+-		data += ETH_GSTRING_LEN;
+-
+-		snprintf(data, ETH_GSTRING_LEN, "tx%d_bytes", i);
+-		data += ETH_GSTRING_LEN;
+-
+-		snprintf(data, ETH_GSTRING_LEN, "tx%d_dropped_packets", i);
+-		data += ETH_GSTRING_LEN;
++		ethtool_sprintf(&data, "tx%d_batched_packets", i);
++		ethtool_sprintf(&data, "tx%d_direct_packets", i);
++		ethtool_sprintf(&data, "tx%d_bytes", i);
++		ethtool_sprintf(&data, "tx%d_dropped_packets", i);
+ 	}
+ 
+ 	for (i = 0; i < adapter->req_rx_queues; i++) {
+-		snprintf(data, ETH_GSTRING_LEN, "rx%d_packets", i);
+-		data += ETH_GSTRING_LEN;
+-
+-		snprintf(data, ETH_GSTRING_LEN, "rx%d_bytes", i);
+-		data += ETH_GSTRING_LEN;
+-
+-		snprintf(data, ETH_GSTRING_LEN, "rx%d_interrupts", i);
+-		data += ETH_GSTRING_LEN;
++		ethtool_sprintf(&data, "rx%d_packets", i);
++		ethtool_sprintf(&data, "rx%d_bytes", i);
++		ethtool_sprintf(&data, "rx%d_interrupts", i);
+ 	}
+ }
+ 
+-- 
+2.47.0
 
-Let me know what you think ?
-
-If you agree that I should hold rtnl in both of those cases, what is
-the best way to proceed:
-  - send a v4, or
-  - wait for this to get merged (since I got the notification it was
-    pulled into intel-next) and send a fixes ?
-
-Here's the full analysis I came up with; I tried to be thorough, but
-it is certainly possible I missed a call site:
-
-For the up case:
-
-- igc_up:
-  - called from igc_reinit_locked, which is called via:
-    - igc_reset_task (rtnl is held)
-    - igc_set_features (ndo_set_features, which itself has an ASSERT_RTNL)
-    - various places in igc_ethtool (set_priv_flags, nway_reset,
-      ethtool_set_eee) all of which have RTNL held
-  - igc_change_mtu which also has RTNL held
-- __igc_open
-  - called from igc_resume, which may need an rtnl_lock ?
-  - igc_open
-    - called from igc_io_resume, rtnl is held
-    - called from igc_reinit_queues, only via ethool set_channels,
-      where rtnl is held
-    - ndo_open where rtnl is held
-
-For the down case:
-
-- igc_down:
-  - called from various ethtool locations (set_ringparam,
-    set_pauseparam, set_link_ksettings) all of which hold rtnl
-  - called from igc_io_error_detected, which may need an rtnl_lock
-  - igc_reinit_locked which is fine, as described above
-  - igc_change_mtu which is fine, as described above
-  - called from __igc_close
-    - called from __igc_shutdown which holds rtnl
-    - called from igc_reinit_queues which is fine as described above
-    - called from igc_close which is ndo_close
 
