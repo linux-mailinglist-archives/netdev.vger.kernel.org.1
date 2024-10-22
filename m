@@ -1,388 +1,257 @@
-Return-Path: <netdev+bounces-138008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F189AB78A
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:16:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 390BC9AB79B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB03C1F23344
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:16:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBD531F234AC
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117D41A0BF8;
-	Tue, 22 Oct 2024 20:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428331CC16E;
+	Tue, 22 Oct 2024 20:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7QPoJxN"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Ocy/0BbV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425C45A79B;
-	Tue, 22 Oct 2024 20:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1251CC156
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 20:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729628195; cv=none; b=bdzQ+vTfq9cvkqaKW7qK4Y2ajHD5Vd0smUHOTBpzNaA/oZM48FNXUpiO0fjX163VjtsP5frdMiGMwL+VdeEqN8MeuBNqxoxLQku+qq8g4M+WZIQ8Erv/qVuzE/ca7mcRypg1kt9HFQM9ijXiOruHvvA0GUmeuubmvf+qaiC0Mxo=
+	t=1729628909; cv=none; b=Xb+PgbkqudOY4CxX/if/AWOqnowu3pmTBucxzL9I4pH9rlqBMRud7ZW1DHCBvYIfd9yckI+FtucpU5Km7YUlYzYJl6SFPlT4FKTucaoQIkbrGEoCmQ+SFVaKzEWPfSYGdm/GFcrGZ+YaJbrlWoN8rpOlvgHhBbaT5XF4MPywLD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729628195; c=relaxed/simple;
-	bh=npKCql1gTkKQ8u0oyH23Y+Nb4Kb778MtDPkELasbbdk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PRdMffBanLuJ/7avFnW9RvdRpccfKHkRYNUpwXYkPiWM7DJWjgg9dO9yKUKycZgxfGayw25qyomlDIQqwOASp13Oq1NUC1DYGmcmCeUKcLGYaSzUqYvXoPRo0xYOEinT+vD3UBRZcIYpFSHYfBm2lg6fxsPjmECzmXEB/61c1WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7QPoJxN; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71e49ef3bb9so143866b3a.1;
-        Tue, 22 Oct 2024 13:16:33 -0700 (PDT)
+	s=arc-20240116; t=1729628909; c=relaxed/simple;
+	bh=bf/yd66V3kuF83bTxs0evHL8Paf59mxT72gHVvyI7IE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SdSQtr+SvJFIvE9PJvc1CclXSNCAjFU2DeTz8j06smm/YcpCsyVXVEEs+Y++dBAjTjxQGxYKm0XH+9nzq49JsUU0jf/e95QPWXhlqzVih5RkO7JOQFV0iFNshzF8LpfPYrR07rdhLr9ASAApLXV/nhpa3pCAhMWa/UzAn1VtzNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Ocy/0BbV; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20ce65c8e13so52055685ad.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 13:28:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729628192; x=1730232992; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gB14F/a1LUamFMOcc37piKTi2MrjcGPFagP7mGf27wU=;
-        b=E7QPoJxNR59I7LDEI4THy4ZXwfVtVxrrrD5hfLcI68GU6qa03ngPdRCxuTyZPSPxxP
-         EhTRAxFcIa9vI6Fpl/RqAK40BkHgMeUPOLpKiZIrfvf9dwNUwE4yrmQw19pQbJjN/inO
-         BmK/j7Py25b3EvhJZ3a9pg1oAPSEBN67UO2kRTPa+vHuRZxHgpLRIGl2AldIwyDzokE9
-         yWLjCRQT0IHrR5+agOhAhMpXTIT8ssXEVkPDVP2YD26P3YYSqy0ltzikGNT5JjsvK95W
-         EUKD2Aof3HQLTpie1hpDNZKgi4QPSZudsU6hrBTsICtjlMeBLsXMHrxIoAwijVm0yrUx
-         6Jcw==
+        d=fastly.com; s=google; t=1729628906; x=1730233706; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PJMWdLBxWmamd6hVKbJ1xLBNYdB6AKwK9i9T9Bn4rmA=;
+        b=Ocy/0BbVMmB40lTHv5RR0Kln1NTpZJpKeaCqOghSAC3dRywf0OWe/zcBjJFW+xYz7i
+         dxN9bvX9x2ZKm5a/1ufvEUAUnyekFR7IhWdWziFzHJeSS1zuz2XO9mFZK6f4a2OjlmiQ
+         zpawrfAESLtDnkniCA7p9wi6sedcafxgy+D0s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729628192; x=1730232992;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gB14F/a1LUamFMOcc37piKTi2MrjcGPFagP7mGf27wU=;
-        b=QyZtXQ81ptyOZi6QeyvVdA24WWAiuEVAiPG59iSUPafKcG/mjauylaHwOrzIGsIsFd
-         ajSppZvFt3dIJ9lkuz6Rk0AEJlJ+tqLJHPzDGe6wNInpCbGk6+XBPaanMsukej8M7br6
-         /0EyHrTk9sFzjBJ73YhIJhPunad5xvZ75X5L7qsUzyFriIRHiPov7CcdOWw0Bb/M33Ql
-         dzWLh+DU47m11zMDIXjW+LX0TTUAJC9VHq+v4GftJc2dr4qd0pSXtT0awzkl0J5o96cs
-         uBIcWW8SUmhfp/N3bA7UszH6EzWnQvB2vqj7Jr0xYszpEpYnwEE7UuzFk9FNbVFU8rCv
-         Swdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbRKp/iGUwCDvKRfN2T5b5uYmm7hg6LitKo9CV0zD2fDCYg+KkcmTFwpTG0ye3UUfnFQhvd6lgrsTAutg=@vger.kernel.org, AJvYcCVUaw7SeXrBNzDuazhZ2aoduN1I1Ao7XX1IjzFMMO/wU7P3qjXvLKVk9IrJFCS+EzyFJc0dmVsQCPW3pc//2uC5YZ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1xYSE51MkUKDUnohH3u5wrwECpgp9WgmjWPwxKbp83mt8Pn1C
-	WdTExyHIUrKCpZQ25WY66aGS5cyv/hEopYz/fLUxe436Fcw1I3CPGeerx0Fe
-X-Google-Smtp-Source: AGHT+IFK8UnuUY6S0dV6mpuDMHpwvUq8V9yzyDQ3B2tJZboD7ScbY8qp/lcbfPBTEG9DY63eIwWzSA==
-X-Received: by 2002:aa7:8003:0:b0:71e:427e:e679 with SMTP id d2e1a72fcca58-71edc146704mr6597496b3a.4.1729628192136;
-        Tue, 22 Oct 2024 13:16:32 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1312e7dsm5309557b3a.11.2024.10.22.13.16.30
+        d=1e100.net; s=20230601; t=1729628906; x=1730233706;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PJMWdLBxWmamd6hVKbJ1xLBNYdB6AKwK9i9T9Bn4rmA=;
+        b=Q3PYbDpC7DdYcWjI8cYITQ/ajmLwLJjlGYKmKgi3G9nUi5iLCIJJ6I+3P52B4jWskf
+         QaOZ/JbyGUeER7XidBg6tN6Nj3E5kMnVCaTi/k+54U79RFNMp/SnAGX7nbNY8T1gXrqh
+         hvNdpR0yvvei0QTUS7JUnpeifMQuiSEeROLVE8v6nfb1GCJOore0Vxs4FiJ4l5oZql8v
+         3Ke7SXDbn56NLrQwgfE5Yiek6gwpr6xRuD10dr9kKLQrmOpy/ziFRJVNydHZVxqUFklW
+         mwWwfa4Hbp9V82HrvDH78qZVecVRB5sfd1MxIbKIwKqrpuCz7PQnVo0NUDZzvzElcyaV
+         hiJw==
+X-Gm-Message-State: AOJu0Yy9ttnh88jQYT8X1jytSUvtbuGyi8wDiIsCBa7LCOtQribAfe37
+	/nLEOK1OtCjqK75jc5cX+bJXHs5WVDsNOezaKDI0QU69KszplNSby92L5BGn1j2L9onLcFMqpK1
+	/yfd7PY6qhZDIBBi3ZQmsdd1Vl1y4yulqQa9jx5RkkKU4l9J/n0ff42u6j7RREpbrDHMXUmXHkf
+	j8GhOgyCsOMGnNTUu7u85sxt2ZjU2QFqlWKUs=
+X-Google-Smtp-Source: AGHT+IF/ce2cH6YsKQwrxSrc+EOHV6a0+Ka22Y3Dqi0AhC2mugNz9U3DkGtcDFiVTs9rUCoC04Hcuw==
+X-Received: by 2002:a17:903:2344:b0:20c:d469:ba95 with SMTP id d9443c01a7336-20fa9e09f1bmr5229205ad.16.1729628906327;
+        Tue, 22 Oct 2024 13:28:26 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0c0bb7sm46730885ad.143.2024.10.22.13.28.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 13:16:31 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
+        Tue, 22 Oct 2024 13:28:25 -0700 (PDT)
+Date: Tue, 22 Oct 2024 13:28:22 -0700
+From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+Cc: kurt@linutronix.de, vinicius.gomes@intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com (maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER),
-	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	George McCollister <george.mccollister@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
-Subject: [PATCHv2 net-next] net: dsa: use ethtool string helpers
-Date: Tue, 22 Oct 2024 13:16:29 -0700
-Message-ID: <20241022201629.139244-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+	jacob.e.keller@intel.com
+Subject: Re: [net-next v3 2/2] igc: Link queues to NAPI instances
+Message-ID: <ZxgK5jsCn5VmKKrH@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
+	kurt@linutronix.de, vinicius.gomes@intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+	jacob.e.keller@intel.com
+References: <20241018171343.314835-1-jdamato@fastly.com>
+ <20241018171343.314835-3-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018171343.314835-3-jdamato@fastly.com>
 
-These are the prefered way to copy ethtool strings.
+On Fri, Oct 18, 2024 at 05:13:43PM +0000, Joe Damato wrote:
+> Link queues to NAPI instances via netdev-genl API so that users can
+> query this information with netlink. Handle a few cases in the driver:
+>   1. Link/unlink the NAPIs when XDP is enabled/disabled
+>   2. Handle IGC_FLAG_QUEUE_PAIRS enabled and disabled
+> 
+> Example output when IGC_FLAG_QUEUE_PAIRS is enabled:
+> 
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                          --dump queue-get --json='{"ifindex": 2}'
+> 
+> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+>  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
+>  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
+>  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
+>  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
+>  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+> 
+> Since IGC_FLAG_QUEUE_PAIRS is enabled, you'll note that the same NAPI ID
+> is present for both rx and tx queues at the same index, for example
+> index 0:
+> 
+> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+> 
+> To test IGC_FLAG_QUEUE_PAIRS disabled, a test system was booted using
+> the grub command line option "maxcpus=2" to force
+> igc_set_interrupt_capability to disable IGC_FLAG_QUEUE_PAIRS.
+> 
+> Example output when IGC_FLAG_QUEUE_PAIRS is disabled:
+> 
+> $ lscpu | grep "On-line CPU"
+> On-line CPU(s) list:      0,2
+> 
+> $ ethtool -l enp86s0  | tail -5
+> Current hardware settings:
+> RX:		n/a
+> TX:		n/a
+> Other:		1
+> Combined:	2
+> 
+> $ cat /proc/interrupts  | grep enp
+>  144: [...] enp86s0
+>  145: [...] enp86s0-rx-0
+>  146: [...] enp86s0-rx-1
+>  147: [...] enp86s0-tx-0
+>  148: [...] enp86s0-tx-1
+> 
+> 1 "other" IRQ, and 2 IRQs for each of RX and Tx, so we expect netlink to
+> report 4 IRQs with unique NAPI IDs:
+> 
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                          --dump napi-get --json='{"ifindex": 2}'
+> [{'id': 8196, 'ifindex': 2, 'irq': 148},
+>  {'id': 8195, 'ifindex': 2, 'irq': 147},
+>  {'id': 8194, 'ifindex': 2, 'irq': 146},
+>  {'id': 8193, 'ifindex': 2, 'irq': 145}]
+> 
+> Now we examine which queues these NAPIs are associated with, expecting
+> that since IGC_FLAG_QUEUE_PAIRS is disabled each RX and TX queue will
+> have its own NAPI instance:
+> 
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                          --dump queue-get --json='{"ifindex": 2}'
+> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+>  {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
+>  v3:
+>    - Replace igc_unset_queue_napi with igc_set_queue_napi(adapater, i,
+>      NULL), as suggested by Vinicius Costa Gomes
+>    - Simplify implemention of igc_set_queue_napi as suggested by Kurt
+>      Kanzenbach, with a tweak to use ring->queue_index
+> 
+>  v2:
+>    - Update commit message to include tests for IGC_FLAG_QUEUE_PAIRS
+>      disabled
+>    - Refactored code to move napi queue mapping and unmapping to helper
+>      functions igc_set_queue_napi and igc_unset_queue_napi
+>    - Adjust the code to handle IGC_FLAG_QUEUE_PAIRS disabled
+>    - Call helpers to map/unmap queues to NAPIs in igc_up, __igc_open,
+>      igc_xdp_enable_pool, and igc_xdp_disable_pool
+> 
+>  drivers/net/ethernet/intel/igc/igc.h      |  2 ++
+>  drivers/net/ethernet/intel/igc/igc_main.c | 33 ++++++++++++++++++++---
+>  drivers/net/ethernet/intel/igc/igc_xdp.c  |  2 ++
+>  3 files changed, 33 insertions(+), 4 deletions(-)
 
-Avoids incrementing pointers all over the place.
+I took another look at this to make sure that RTNL is held when
+igc_set_queue_napi is called after the e1000 bug report came in [1],
+and there may be two locations I've missed:
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
----
- v2: remove curly braces from rzn1_a5psw.c
- drivers/net/dsa/b53/b53_common.c          |  3 +--
- drivers/net/dsa/bcm_sf2.c                 |  5 +----
- drivers/net/dsa/bcm_sf2_cfp.c             | 18 +++++-------------
- drivers/net/dsa/dsa_loop.c                |  3 +--
- drivers/net/dsa/hirschmann/hellcreek.c    |  8 ++------
- drivers/net/dsa/microchip/ksz_common.c    |  3 +--
- drivers/net/dsa/mv88e6xxx/chip.c          | 17 ++---------------
- drivers/net/dsa/mv88e6xxx/serdes.c        |  6 ++----
- drivers/net/dsa/rzn1_a5psw.c              |  6 ++----
- drivers/net/dsa/sja1105/sja1105_ethtool.c |  7 ++-----
- drivers/net/dsa/xrs700x/xrs700x.c         |  6 ++----
- net/dsa/user.c                            | 13 +++++--------
- 12 files changed, 26 insertions(+), 69 deletions(-)
+1. igc_resume, which calls __igc_open
+2. igc_io_error_detected, which calls igc_down
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index c39cb119e760..285785c942b0 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -989,8 +989,7 @@ void b53_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- 
- 	if (stringset == ETH_SS_STATS) {
- 		for (i = 0; i < mib_size; i++)
--			strscpy(data + i * ETH_GSTRING_LEN,
--				mibs[i].name, ETH_GSTRING_LEN);
-+			ethtool_puts(&data, mibs[i].name);
- 	} else if (stringset == ETH_SS_PHY_STATS) {
- 		phydev = b53_get_phy_device(ds, port);
- 		if (!phydev)
-diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-index 9201f07839ad..2bb1832d21bc 100644
---- a/drivers/net/dsa/bcm_sf2.c
-+++ b/drivers/net/dsa/bcm_sf2.c
-@@ -1180,11 +1180,8 @@ static const struct b53_io_ops bcm_sf2_io_ops = {
- static void bcm_sf2_sw_get_strings(struct dsa_switch *ds, int port,
- 				   u32 stringset, uint8_t *data)
- {
--	int cnt = b53_get_sset_count(ds, port, stringset);
--
- 	b53_get_strings(ds, port, stringset, data);
--	bcm_sf2_cfp_get_strings(ds, port, stringset,
--				data + cnt * ETH_GSTRING_LEN);
-+	bcm_sf2_cfp_get_strings(ds, port, stringset, data);
- }
- 
- static void bcm_sf2_sw_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/bcm_sf2_cfp.c b/drivers/net/dsa/bcm_sf2_cfp.c
-index c88ee3dd4299..93cb43ed6e61 100644
---- a/drivers/net/dsa/bcm_sf2_cfp.c
-+++ b/drivers/net/dsa/bcm_sf2_cfp.c
-@@ -1283,23 +1283,15 @@ void bcm_sf2_cfp_get_strings(struct dsa_switch *ds, int port,
- 			     u32 stringset, uint8_t *data)
- {
- 	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
--	unsigned int s = ARRAY_SIZE(bcm_sf2_cfp_stats);
--	char buf[ETH_GSTRING_LEN];
--	unsigned int i, j, iter;
-+	unsigned int i, j;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (i = 1; i < priv->num_cfp_rules; i++) {
--		for (j = 0; j < s; j++) {
--			snprintf(buf, sizeof(buf),
--				 "CFP%03d_%sCntr",
--				 i, bcm_sf2_cfp_stats[j].name);
--			iter = (i - 1) * s + j;
--			strscpy(data + iter * ETH_GSTRING_LEN,
--				buf, ETH_GSTRING_LEN);
--		}
--	}
-+	for (i = 1; i < priv->num_cfp_rules; i++)
-+		for (j = 0; j < ARRAY_SIZE(bcm_sf2_cfp_stats); j++)
-+			ethtool_sprintf(&data, "CFP%03d_%sCntr", i,
-+					bcm_sf2_cfp_stats[j].name);
- }
- 
- void bcm_sf2_cfp_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
-index c70ed67cc188..adbab544c60f 100644
---- a/drivers/net/dsa/dsa_loop.c
-+++ b/drivers/net/dsa/dsa_loop.c
-@@ -121,8 +121,7 @@ static void dsa_loop_get_strings(struct dsa_switch *ds, int port,
- 		return;
- 
- 	for (i = 0; i < __DSA_LOOP_CNT_MAX; i++)
--		memcpy(data + i * ETH_GSTRING_LEN,
--		       ps->ports[port].mib[i].name, ETH_GSTRING_LEN);
-+		ethtool_puts(&data, ps->ports[port].mib[i].name);
- }
- 
- static void dsa_loop_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-index d798f17cf7ea..283ec5a6e23c 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek.c
-@@ -294,12 +294,8 @@ static void hellcreek_get_strings(struct dsa_switch *ds, int port,
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i) {
--		const struct hellcreek_counter *counter = &hellcreek_counter[i];
--
--		strscpy(data + i * ETH_GSTRING_LEN,
--			counter->name, ETH_GSTRING_LEN);
--	}
-+	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i)
-+		ethtool_puts(&data, hellcreek_counter[i].name);
- }
- 
- static int hellcreek_get_sset_count(struct dsa_switch *ds, int port, int sset)
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 4e8710c7cb7b..408ccb1f012e 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2113,8 +2113,7 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
- 		return;
- 
- 	for (i = 0; i < dev->info->mib_cnt; i++) {
--		memcpy(buf + i * ETH_GSTRING_LEN,
--		       dev->info->mib_names[i].string, ETH_GSTRING_LEN);
-+		ethtool_puts(&buf, dev->info->mib_names[i].string);
- 	}
- }
- 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 4f5193d86e65..1893fed00467 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -1162,8 +1162,7 @@ static int mv88e6xxx_stats_get_strings(struct mv88e6xxx_chip *chip,
- 	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
- 		stat = &mv88e6xxx_hw_stats[i];
- 		if (stat->type & types) {
--			memcpy(data + j * ETH_GSTRING_LEN, stat->string,
--			       ETH_GSTRING_LEN);
-+			ethtool_puts(&data, stat->string);
- 			j++;
- 		}
- 	}
-@@ -1204,31 +1203,19 @@ static void mv88e6xxx_atu_vtu_get_strings(uint8_t *data)
- 	unsigned int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(mv88e6xxx_atu_vtu_stats_strings); i++)
--		strscpy(data + i * ETH_GSTRING_LEN,
--			mv88e6xxx_atu_vtu_stats_strings[i],
--			ETH_GSTRING_LEN);
-+		ethtool_puts(&data, mv88e6xxx_atu_vtu_stats_strings[i]);
- }
- 
- static void mv88e6xxx_get_strings(struct dsa_switch *ds, int port,
- 				  u32 stringset, uint8_t *data)
- {
- 	struct mv88e6xxx_chip *chip = ds->priv;
--	int count = 0;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
- 	mv88e6xxx_reg_lock(chip);
- 
--	if (chip->info->ops->stats_get_strings)
--		count = chip->info->ops->stats_get_strings(chip, data);
--
--	if (chip->info->ops->serdes_get_strings) {
--		data += count * ETH_GSTRING_LEN;
--		count = chip->info->ops->serdes_get_strings(chip, port, data);
--	}
--
--	data += count * ETH_GSTRING_LEN;
- 	mv88e6xxx_atu_vtu_get_strings(data);
- 
- 	mv88e6xxx_reg_unlock(chip);
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-index 01ea53940786..327831d2b547 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.c
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-@@ -144,8 +144,7 @@ int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 
- 	for (i = 0; i < ARRAY_SIZE(mv88e6352_serdes_hw_stats); i++) {
- 		stat = &mv88e6352_serdes_hw_stats[i];
--		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
--		       ETH_GSTRING_LEN);
-+		ethtool_puts(&data, stat->string);
- 	}
- 	return ARRAY_SIZE(mv88e6352_serdes_hw_stats);
- }
-@@ -405,8 +404,7 @@ int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 
- 	for (i = 0; i < ARRAY_SIZE(mv88e6390_serdes_hw_stats); i++) {
- 		stat = &mv88e6390_serdes_hw_stats[i];
--		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
--		       ETH_GSTRING_LEN);
-+		ethtool_puts(&data, stat->string);
- 	}
- 	return ARRAY_SIZE(mv88e6390_serdes_hw_stats);
- }
-diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
-index 1135a32e4b7e..66974379334a 100644
---- a/drivers/net/dsa/rzn1_a5psw.c
-+++ b/drivers/net/dsa/rzn1_a5psw.c
-@@ -802,10 +802,8 @@ static void a5psw_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++) {
--		memcpy(data + u * ETH_GSTRING_LEN, a5psw_stats[u].name,
--		       ETH_GSTRING_LEN);
--	}
-+	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++)
-+		ethtool_puts(&data, a5psw_stats[u].name);
- }
- 
- static void a5psw_get_ethtool_stats(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/sja1105/sja1105_ethtool.c b/drivers/net/dsa/sja1105/sja1105_ethtool.c
-index decc6c931dc1..2ea64b1d026d 100644
---- a/drivers/net/dsa/sja1105/sja1105_ethtool.c
-+++ b/drivers/net/dsa/sja1105/sja1105_ethtool.c
-@@ -586,7 +586,6 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
- {
- 	struct sja1105_private *priv = ds->priv;
- 	enum sja1105_counter_index max_ctr, i;
--	char *p = data;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
-@@ -597,10 +596,8 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
- 	else
- 		max_ctr = __MAX_SJA1105PQRS_PORT_COUNTER;
- 
--	for (i = 0; i < max_ctr; i++) {
--		strscpy(p, sja1105_port_counters[i].name, ETH_GSTRING_LEN);
--		p += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < max_ctr; i++)
-+		ethtool_puts(&data, sja1105_port_counters[i].name);
- }
- 
- int sja1105_get_sset_count(struct dsa_switch *ds, int port, int sset)
-diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
-index de3b768f2ff9..4dbcc49a9e52 100644
---- a/drivers/net/dsa/xrs700x/xrs700x.c
-+++ b/drivers/net/dsa/xrs700x/xrs700x.c
-@@ -91,10 +91,8 @@ static void xrs700x_get_strings(struct dsa_switch *ds, int port,
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++) {
--		strscpy(data, xrs700x_mibs[i].name, ETH_GSTRING_LEN);
--		data += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++)
-+		ethtool_puts(&data, xrs700x_mibs[i].name);
- }
- 
- static int xrs700x_get_sset_count(struct dsa_switch *ds, int port, int sset)
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 64f660d2334b..697e73494175 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1042,15 +1042,12 @@ static void dsa_user_get_strings(struct net_device *dev,
- 	struct dsa_switch *ds = dp->ds;
- 
- 	if (stringset == ETH_SS_STATS) {
--		int len = ETH_GSTRING_LEN;
--
--		strscpy_pad(data, "tx_packets", len);
--		strscpy_pad(data + len, "tx_bytes", len);
--		strscpy_pad(data + 2 * len, "rx_packets", len);
--		strscpy_pad(data + 3 * len, "rx_bytes", len);
-+		ethtool_puts(&data, "tx_packets");
-+		ethtool_puts(&data, "tx_bytes");
-+		ethtool_puts(&data, "rx_packets");
-+		ethtool_puts(&data, "rx_bytes");
- 		if (ds->ops->get_strings)
--			ds->ops->get_strings(ds, dp->index, stringset,
--					     data + 4 * len);
-+			ds->ops->get_strings(ds, dp->index, stringset, data);
- 	} else if (stringset ==  ETH_SS_TEST) {
- 		net_selftest_get_strings(data);
- 	}
--- 
-2.47.0
+In both cases, I think the code can be modified to hold rtnl around
+calls to __igc_open and igc_down.
 
+Let me know what you think ?
+
+If you agree that I should hold rtnl in both of those cases, what is
+the best way to proceed:
+  - send a v4, or
+  - wait for this to get merged (since I got the notification it was
+    pulled into intel-next) and send a fixes ?
+
+Here's the full analysis I came up with; I tried to be thorough, but
+it is certainly possible I missed a call site:
+
+For the up case:
+
+- igc_up:
+  - called from igc_reinit_locked, which is called via:
+    - igc_reset_task (rtnl is held)
+    - igc_set_features (ndo_set_features, which itself has an ASSERT_RTNL)
+    - various places in igc_ethtool (set_priv_flags, nway_reset,
+      ethtool_set_eee) all of which have RTNL held
+  - igc_change_mtu which also has RTNL held
+- __igc_open
+  - called from igc_resume, which may need an rtnl_lock ?
+  - igc_open
+    - called from igc_io_resume, rtnl is held
+    - called from igc_reinit_queues, only via ethool set_channels,
+      where rtnl is held
+    - ndo_open where rtnl is held
+
+For the down case:
+
+- igc_down:
+  - called from various ethtool locations (set_ringparam,
+    set_pauseparam, set_link_ksettings) all of which hold rtnl
+  - called from igc_io_error_detected, which may need an rtnl_lock
+  - igc_reinit_locked which is fine, as described above
+  - igc_change_mtu which is fine, as described above
+  - called from __igc_close
+    - called from __igc_shutdown which holds rtnl
+    - called from igc_reinit_queues which is fine as described above
+    - called from igc_close which is ndo_close
 
