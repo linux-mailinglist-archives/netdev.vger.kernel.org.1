@@ -1,72 +1,78 @@
-Return-Path: <netdev+bounces-137871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D823B9AA340
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:35:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 407D09AA357
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125361C221A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 13:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60BA91C2247B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 13:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B49145B24;
-	Tue, 22 Oct 2024 13:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C139519F115;
+	Tue, 22 Oct 2024 13:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r85hpzFN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="k9sNs1yk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7221E481;
-	Tue, 22 Oct 2024 13:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D94019E99E;
+	Tue, 22 Oct 2024 13:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729604115; cv=none; b=mCMjvPRWNIXGmDXiLcYONPUTgYx4MleBm03LFcnrnORsQi9edXOLDnMFz8j1hzw9XZjLEXXCgLFuXoHHcbZKeecTcEKbQtqTeXkTwFGILgnvlnogU1UWS0cdkzEFIeCkDxlm0GNbXHsslwYv1UJ61zG5fOcv15UYztJlnWGgZF4=
+	t=1729604274; cv=none; b=m2RZV0BiVBqws681e9+dibY4ttY5lnrJ7c530NTY+ytWYHkK9vSS3bd8cnPj8rIcPpcatvieZ2I4PiMUg/2uXqtz1aDDw8NuZWJRHwiAjxorbAh6OFv2WOeKcC1vZqwo0GkL9ig7Xh25eRm4XyOJuQcILoKM1OxuCHRLUj64src=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729604115; c=relaxed/simple;
-	bh=qDbw4iQAOpQcGNeHy6beNAJP98MdOCI+be23tNCoFSk=;
+	s=arc-20240116; t=1729604274; c=relaxed/simple;
+	bh=9g88+vo+w3pHcZYFTHanutEy/cUSfaKP7KjUnZfdDCw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KnmO0dz+12J54f2Zm7uTzmapG7/22rrNPO4HSmAVJkMHxKDTHvJgHk7wvVP3sDpz9HjLt9cWIabTGk9MH4K90hi2D3tMENeyv/Y/M6BF7bTJjWfn+HuGQi1N9Cv9mPov1I3Xz39VQLNDiw3QqbtXTbeZrVMmeu+y8nFLAKYSkXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r85hpzFN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB5CAC4CEC3;
-	Tue, 22 Oct 2024 13:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729604115;
-	bh=qDbw4iQAOpQcGNeHy6beNAJP98MdOCI+be23tNCoFSk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r85hpzFNcYJqa8q/mviguSa8hDJYzLTzeJAPiQFXlUVRQO/iPeQySWCnb9POflz/I
-	 /uG/FD5LLBLcg2c7xme06K+s+xSuX+YpSeW1+WmxdQj4Z/aLFSSVAcpRY/UgXaBAJQ
-	 jrdA3vaFo8FRCm3ZmX++XCObdMhQyHNLis286B1sQ5IxPEec45N0kDO6d3bowNnwhq
-	 dsUfJWA3ILOSK3uvtlRQKByZskt5Bk0eLIe7VZnZb70lrV9dolnbeAMf7/hxWlwaih
-	 2QclJG/qTUnCO18VkLbg7kRGRyebQrH1L/eVXsF5QJJKZ4qo3TJknrvCManli0k+JE
-	 Yx9QtFmW02nWQ==
-Date: Tue, 22 Oct 2024 14:35:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=KRwlD1js5xFeVLTFOCqPM6TzFg6PbEPe0YXymw2hjhuS179Z9esNQMhrTmxCaAHfo06Oh4FzObK59MWjSC06t2HIzJUd+kHQ9hZNUeNHTBTUPngc022cTZCBhNBDDnE3rFMGmnMvmqqVDzc1U4EojI+MUuYLxVZpep2qzMiYcaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=k9sNs1yk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2lLWUy23eHb4MgFna+aBGyb7zbgEcHoFz1AAK36qYiQ=; b=k9sNs1ykHFkSe7oZVo7n1QwwwI
+	qkDWA7xTVJdC83jRqnoXHQGP2QQoeEL94aUL9RFKWalZtLdpEjqOLeg0PrHfvYkaivPJxzFfUCZSX
+	VJuRKHmdypK5r5oG5p26eCmTQ4lCCFdmCt1rQ+8JPGDNEZj/vj+O16+Ro/ESmMHWHVnw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t3F4q-00AqUR-33; Tue, 22 Oct 2024 15:37:36 +0200
+Date: Tue, 22 Oct 2024 15:37:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	andrew@lunn.ch, Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	horatiu.vultur@microchip.com,
-	jensemil.schulzostergaard@microchip.com,
-	Parthiban.Veerasooran@microchip.com, Raju.Lakkaraju@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com,
-	ast@fiberby.net, maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 14/15] net: sparx5: add compatible strings for
- lan969x and verify the target
-Message-ID: <20241022133508.GT402847@kernel.org>
-References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
- <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
- <20241022085050.GQ402847@kernel.org>
- <20241022120842.uf575qwaulufjyv6@DEN-DL-M70577>
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
+	arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com,
+	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>,
+	Pavithra R <quic_pavir@quicinc.com>,
+	"Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+Message-ID: <7b5227fc-0114-40be-ba5d-7616cebb4bf9@lunn.ch>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+ <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
+ <ba1bf2a6-76b7-4e82-b192-86de9a8b8012@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,93 +81,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241022120842.uf575qwaulufjyv6@DEN-DL-M70577>
+In-Reply-To: <ba1bf2a6-76b7-4e82-b192-86de9a8b8012@quicinc.com>
 
-On Tue, Oct 22, 2024 at 12:08:42PM +0000, Daniel Machon wrote:
-> Hi Simon,
+> Apologies for the delay in response. I understand that the PCS<->PHY
+> clocks may be out of the scope of PCS DT due to the reasons you mention.
+> However would like to clarify that the MII clocks referred to here, are
+> part of the connection between the MAC and PCS and not between PCS and PHY.
 > 
-> > > Add compatible strings for the twelve lan969x SKU's (Stock Keeping Unit)
-> > > that we support, and verify that the devicetree target is supported by
-> > > the chip target.
-> > >
-> > > Each SKU supports different bandwidths and features (see [1] for
-> > > details). We want to be able to run a SKU with a lower bandwidth and/or
-> > > feature set, than what is supported by the actual chip. In order to
-> > > accomplish this we:
-> > >
-> > >     - add new field sparx5->target_dt that reflects the target from the
-> > >       devicetree (compatible string).
-> > >
-> > >     - compare the devicetree target with the actual chip target. If the
-> > >       bandwidth and features provided by the devicetree target is
-> > >       supported by the chip, we approve - otherwise reject.
-> > >
-> > >     - set the core clock and features based on the devicetree target
-> > >
-> > > [1] https://www.microchip.com/en-us/product/lan9698
-> > >
-> > > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> > > ---
-> > >  drivers/net/ethernet/microchip/sparx5/Makefile     |   1 +
-> > >  .../net/ethernet/microchip/sparx5/sparx5_main.c    | 194 ++++++++++++++++++++-
-> > >  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   1 +
-> > >  3 files changed, 193 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/microchip/sparx5/Makefile b/drivers/net/ethernet/microchip/sparx5/Makefile
-> > > index 3435ca86dd70..8fe302415563 100644
-> > > --- a/drivers/net/ethernet/microchip/sparx5/Makefile
-> > > +++ b/drivers/net/ethernet/microchip/sparx5/Makefile
-> > > @@ -19,3 +19,4 @@ sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o
-> > >  # Provide include files
-> > >  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/vcap
-> > >  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
-> > > +ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/lan969x
-> > > diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> > > index 5c986c373b3e..edbe639d98c5 100644
-> > > --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> > > +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> > > @@ -24,6 +24,8 @@
-> > >  #include <linux/types.h>
-> > >  #include <linux/reset.h>
-> > >
-> > > +#include "lan969x.h" /* lan969x_desc */
-> > > +
-> > 
-> > Hi Daniel,
-> > 
-> > Perhaps this will change when Krzysztof's comment elsewhere in this thread
-> > is addressed. But as it stands the construction in the above two hunks
-> > appears to cause a build failure.
-> > 
-> >   CC      drivers/net/ethernet/microchip/sparx5/sparx5_main.o
-> > In file included from drivers/net/ethernet/microchip/sparx5/sparx5_main.c:27:
-> > ./drivers/net/ethernet/microchip/lan969x/lan969x.h:10:10: fatal error: sparx5_main.h: No such file or directory
-> >    10 | #include "sparx5_main.h"
-> >       |          ^~~~~~~~~~~~~~~
-> > 
-> > My preference would be to move away from adding -I directives and, rather,
-> > use relative includes as is common practice in Networking drivers (at least).
-> > 
-> > ...
-> > 
-> > --
-> > pw-bot: changes-requested
+> Below is a diagram that shows the sub-blocks inside the 'UNIPHY' block
+> of IPQ9574 which houses the PCS and the serdes, along with the clock
+> connectivity. The MII Rx/Tx clocks are supplied from the NSS CC, to the
+> GMII channels between PCS and MAC. So, it seemed appropriate to have
+> these clocks described as part of the PCS DT node.
 > 
-> I didn't see this build failure when I ran my tests, nor did the NIPA
-> tests reveal it. I can only reproduce it if I point to the microchip
-> subdir when building - but maybe that's what you did too?
+>               +-------+ +---------+  +-------------------------+
+>    -----------|CMN PLL| |  GCC    |  |   NSSCC (Divider)       |
+>    |25/50mhz  +----+--+ +----+----+  +--+-------+--------------+
+>    |clk            |         |          ^       |
+>    |       31.25M  |  SYS/AHB|clk  RX/TX|clk    +------------+
+>    |       ref clk |         |          |       |            |
+>    |               |         v          | MII RX|TX clk   MAC| RX/TX clk
+>    |            +--+---------+----------+-------+---+      +-+---------+
+>    |            |  |   +----------------+       |   |      | |     PPE |
+>    v            |  |   |     UNIPHY0            V   |      | V         |
+>   +-------+     |  v   |       +-----------+ (X)GMII|      |           |
+>   |       |     |  +---+---+   |           |--------|------|-- MAC0    |
+>   |       |     |  |       |   |           | (X)GMII|      |           |
+>   |  Quad |     |  |SerDes |   |  (X)PCS   |--------|------|-- MAC1    |
+>   |       +<----+  |       |   |           | (X)GMII|      |           |
+>   |(X)GPHY|     |  |       |   |           |--------|------|-- MAC2    |
+>   |       |     |  |       |   |           | (X)GMII|      |           |
+>   |       |     |  +-------+   |           |--------|------|-- MAC3    |
+>   +-------+     |              |           |        |      |           |
+>                 |              +-----------+        |      |           |
+>                 +-----------------------------------+      |           |
+
+Thanks for the detailed diagram. That always helps get things
+straight.
+
+Im i correct in says that MII RX|TX is identical to MAC RX|TX? These
+two clocks are used by the MAC and XPCS to clock data from one to the
+other? If they are the exact same clocks, i would suggest you use the
+same name, just to avoid confusion.
+
+Both XPCS and PPE are clock consumers, so both will have a phandle
+pointing to the NSSCC clock provider?
+
+> We had one other question on the approach used in the driver for PCS
+> clocks, could you please provide your comments.
 > 
-> Anyway, I will skip the -I includes and resort to relative includes, as
-> per your request. Thanks.
+> As we can see from the above diagram, each serdes in the UNIPHY block
+> provides the clocks to the NSSCC, and the PCS block consumes the MII
+> Rx/Tx clocks. In our current design, the PCS/UNIPHY driver registers a
+> provider driver for the clocks that the serdes supplies to the NSS CC.
 
-Thanks Daniel,
+That sounds reasonable.
 
-Yes I did see the problem when pointing to the subdir.
-But I was also able to see it without doing so when
-using a config based on tinyconfigi on x86_64.
+> It also enables the MII Rx/Tx clocks which are supplied to the PCS from
+> the NSS CC. Would this be an acceptable design to have the PCS driver
+> register the clock provider driver and also consume the MII Rx/Tx
+> clocks? It may be worth noting that the serdes and PCS are part of the
+> same UNIPHY block and also share same register region.
 
-I can dig further if you like, or provide that config.
-But I did see that relative includes (or an extra -I)
-resolved the problem.
+Does the SERDES consume the MII Rx/Tx? Your diagram indicates it does
+not. I'm just wondering if you have circular dependencies at runtime?
+
+Where you will need to be careful is probe time vs runtime. Since you
+have circular phandles you need to first create all the clock
+providers, and only then start the clock consumers. Otherwise you
+might get into an endless EPROBE_DEFER loop.
+
+	Andrew
 
