@@ -1,119 +1,75 @@
-Return-Path: <netdev+bounces-137930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D733E9AB259
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:44:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39FC79AB276
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:47:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A89BB215F6
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:44:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8CCC1F23439
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F79F19D082;
-	Tue, 22 Oct 2024 15:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FEA1A0BE5;
+	Tue, 22 Oct 2024 15:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTtejDMl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AbckUL6y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B11359B71
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 15:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D935513957E;
+	Tue, 22 Oct 2024 15:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729611846; cv=none; b=fyuyZCZJ/P9ms1JcwYfL/Oh39lURICk4V+qYUJ480jYdz6CfsW6X2CmxEI4i3LRoGymTQ9fM5AdxuyctHbekyJ84XbdVSRxdiKu0zbGe3xs2WNgSWK1wjg4yrVB9lQLg4Zf2FuRlnfTNuMZk4ajglqtNzM/3vypSSgpR75uCebk=
+	t=1729611999; cv=none; b=bMWidB6ercpzkaYwDh6ylRU4L11sA9wcUxYB2EXTn0359J6CsdyL462DmZf5cNhUk6PVE+eYNUqjNWBwcJF14mjpSq4Ns0jIZGERrnlIg7R3uOT69LueKhDhavinwWWr9UnJe78q5BM7O64vY8sepgR7I79K8uaXPZhfwgRsKDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729611846; c=relaxed/simple;
-	bh=2n0DwXyfQztO24SkX/DpDvIgRxJaMfVCH8AFQ25yZEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gwi1OuGFJhCzQRyVQONTAPf8+LY/bs9hYlr4c/q0JYaqxal9PquTkZOPHRFTq6uQgAxMJz3R4uZOICAaGnYFe/PKgrE/NxEc2JIsXsdv/JGMLp95rVa/q2UlP+P9mkbtTBy+1mA+brznS8vgGp6dQ3LBfvYPnV5fjSSaOUstRvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aTtejDMl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51E6BC4CEC3;
-	Tue, 22 Oct 2024 15:44:05 +0000 (UTC)
+	s=arc-20240116; t=1729611999; c=relaxed/simple;
+	bh=zyJZKVN0iTY7Nmr0uDseghesQFaJZNHnPVmnO4LCLQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CMTJubSnUahhdqW6e7UVLjcSUw9KrrXF2jaVH9UQzMuji0UOFwoVB/edvwEOuOeqa5kManWSlFAv0f81JthS5ahqBo5b17RGuv3d1IHqfbfaKOdrGL/IR2nYXfSvKA+oWMg5DNZp1nCjZecE9oz7q6r2iszfNv+Fgiq/TwsCWPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AbckUL6y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8891C4CEC3;
+	Tue, 22 Oct 2024 15:46:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729611845;
-	bh=2n0DwXyfQztO24SkX/DpDvIgRxJaMfVCH8AFQ25yZEs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aTtejDMl9IH5GqE/2GfEy1xvYR0fWXiXTYWZXCkv3AL6Ps+H04sAuJ2e1ck8dygLB
-	 dIYBZNPGeZQuIkkPkXAxMg95V8s7GMazus3Vlxk0vMrKMUrTc7KbFdgx0yAczYnIFA
-	 LY/iTi5rY+sisA38H8sQqFt2/8LVH+JT0lXGs1hDkhu6D3+QD/1tk0rtQp7IlBeIu/
-	 iXVAOpvQMvUGj1QEClsdEAPxwLwWvDzpaSmiVPIkOVJ5sF6Wm+ToSzsIbi2xt8iNyY
-	 ACZgkbB9+92t5tUHAN5SJ22MkpUOQYK9pRR5V4KfhduPGiGAh1lfxcDJl+8pbR9Lbc
-	 rDNCYMSPgNyqA==
-Message-ID: <529331cf-4791-4e6c-ab67-89d6dde66f90@kernel.org>
-Date: Tue, 22 Oct 2024 09:44:04 -0600
+	s=k20201202; t=1729611998;
+	bh=zyJZKVN0iTY7Nmr0uDseghesQFaJZNHnPVmnO4LCLQc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AbckUL6yH3TL8sSBHrMq2mrTreedy6KQH7aUKTX7nYtS3puoCPYWfHk3F2vLcJpW+
+	 ECJb3wxfKOqpxvCDM15w5tdwg/IBTw7v/flESoR2zWOk+r6zXZbtHlhmfewtGej6a/
+	 6VWyMAMqbOwK1MHsRuwgrZOzkoUebfdRnplMy8F9NGjHyhG8DudVVpWh4Ax0g1JHw3
+	 Njz4bWNKkrIDS6Uc+xpV2xOteCG/fqTg10R8hQ+onpjC75WE6jZbW+iphMvMlpHiLC
+	 z6my7HiL8yw1xGbRx61WP0gQUu010f7MAwGM1sf1RYIlh/ADkf/rz8YNrYni+m9LWc
+	 IlM3QyB1FPCSw==
+Date: Tue, 22 Oct 2024 16:46:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yunshui Jiang <jiangyunshui@kylinos.cn>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH] tests: hsr: Increase timeout to 10 minutes
+Message-ID: <20241022154634.GX402847@kernel.org>
+References: <20241022080223.718547-1-jiangyunshui@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv4: ip_tunnel: Fix suspicious RCU usage warning in
- ip_tunnel_init_flow()
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, horms@kernel.org
-References: <20241022063822.462057-1-idosch@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20241022063822.462057-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022080223.718547-1-jiangyunshui@kylinos.cn>
 
-On 10/22/24 12:38 AM, Ido Schimmel wrote:
-> There are code paths from which the function is called without holding
-> the RCU read lock, resulting in a suspicious RCU usage warning [1].
+On Tue, Oct 22, 2024 at 04:02:23PM +0800, Yunshui Jiang wrote:
+> The time-consuming HSR test, hsr_ping.sh, actually needs 7 min to run.
+> Around 375s to be exact, and even more on a debug kernel or kernel with
+> other network security limits. The timeout setting for the kselftest is
+> currently 45 seconds, which is way too short to integrate hsr tests to
+> run_kselftest infrastructure. So, HSR test needs an explicit setting.
+> And to leave us some slack, use 10 min as default timeout.
 > 
-> Fix by using l3mdev_master_upper_ifindex_by_index() which will acquire
-> the RCU read lock before calling
-> l3mdev_master_upper_ifindex_by_index_rcu().
-> 
-> [1]
-> WARNING: suspicious RCU usage
-> 6.12.0-rc3-custom-gac8f72681cf2 #141 Not tainted
-> -----------------------------
-> net/core/dev.c:876 RCU-list traversed in non-reader section!!
-> 
-> other info that might help us debug this:
-> 
-> rcu_scheduler_active = 2, debug_locks = 1
-> 1 lock held by ip/361:
->  #0: ffffffff86fc7cb0 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x377/0xf60
-> 
-> stack backtrace:
-> CPU: 3 UID: 0 PID: 361 Comm: ip Not tainted 6.12.0-rc3-custom-gac8f72681cf2 #141
-> Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0xba/0x110
->  lockdep_rcu_suspicious.cold+0x4f/0xd6
->  dev_get_by_index_rcu+0x1d3/0x210
->  l3mdev_master_upper_ifindex_by_index_rcu+0x2b/0xf0
->  ip_tunnel_bind_dev+0x72f/0xa00
->  ip_tunnel_newlink+0x368/0x7a0
->  ipgre_newlink+0x14c/0x170
->  __rtnl_newlink+0x1173/0x19c0
->  rtnl_newlink+0x6c/0xa0
->  rtnetlink_rcv_msg+0x3cc/0xf60
->  netlink_rcv_skb+0x171/0x450
->  netlink_unicast+0x539/0x7f0
->  netlink_sendmsg+0x8c1/0xd80
->  ____sys_sendmsg+0x8f9/0xc20
->  ___sys_sendmsg+0x197/0x1e0
->  __sys_sendmsg+0x122/0x1f0
->  do_syscall_64+0xbb/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: db53cd3d88dc ("net: Handle l3mdev in ip_tunnel_init_flow")
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  include/net/ip_tunnels.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+> Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
