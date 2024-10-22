@@ -1,110 +1,141 @@
-Return-Path: <netdev+bounces-137815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2309A9E84
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:30:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C419A9EA3
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:37:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 123F21F21DC1
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:30:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA6F9B241A3
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C27175D35;
-	Tue, 22 Oct 2024 09:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F443186E43;
+	Tue, 22 Oct 2024 09:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HA/wXe+2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwqyyogQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97AC1494CF
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2984112D75C
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729589422; cv=none; b=Jpv3wEHimxiI5s4TA3ENL5bJIBci/I+AZhYBQ2ZemQeHaKahvyUFFfnM6L1+xSofYvLIJCSK5CmlxL6c0rTdUP4XZaB7ersJI1xZocv7nIJSarvQMiVuCUSEongOc5I4mZQKCa9oSUBO8Lt4YOIxZkr04YcSZopg1lALOMNrO1E=
+	t=1729589835; cv=none; b=ihyuacKoWniF+/cgOn13Cp9vM9Rchl0HDEGSDZyeVYBb7UjW6Nl7zdvl3IJ8Z41qHLBVVYj7OGPQAHwB4wdeqsPacPNTN7qKY6I98OQ+h9gSsMZ/3j0CtzFGx4t8vKSWFfaTzRG3WjM1spbc4Q+JOhVex/6OBqXGz3F06PZFTIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729589422; c=relaxed/simple;
-	bh=lwWaIKUDLrASIs+YuQAsWWsBGuSYfndTaa6AQqKGnxc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YIr4wWd7gg6ksd72g7+ZrgzhPLjJQyao5RAJBdMTqg7PkaF3zAWahUmmfNyzMQyu4no8fYubrHX+J3nKa0Weqs9L5x3LVAgqEY13Cdb2FDJ0Yh/0KZrdl7b5kDMbdcy1vSpLtqJQWHzRF4omhCkWLQGmoy02iqBjrflNe3FBSXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HA/wXe+2; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nYelBhaN5oKAcdk01/RIcwHYXV4unuzMcDbElnc1alg=; b=HA/wXe+2FQMX08DdM0Of6psn48
-	nTKx1x+OaFg0kntwhaTwpUVBeZu8nBCVCZCz1i04sTwZS4LjK6g5x8HPJ1rJWSs4xCWWS7u04HmYw
-	PpJPdmq2TvYQo42IXYavq2xg1CUBff9pDXq3KwUdq9sqT0LXdFYDgKcLS6vzPIWSajOpcAvgfkaOF
-	Kx6WxIULs3m3kixpPvQmF0vgQ2gighnY1HzhJtquwcFbFL6cLAsx8QgHocv+61IVeyFUhjxEpU1jn
-	xCxTWcBGmrdCdVCKdMvHKC+S+V5g0xjQSddYjCbqKFtbOlt96zZMV1Qj3o7nKtvJNUDFwj1/10iys
-	5HaMEr3g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32972)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t3BDR-0004dX-0R;
-	Tue, 22 Oct 2024 10:30:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t3BDO-0002bd-39;
-	Tue, 22 Oct 2024 10:30:10 +0100
-Date: Tue, 22 Oct 2024 10:30:10 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/7] net: pcs: xpcs: yet more cleanups
-Message-ID: <ZxdwomfrljH6uSQz@shell.armlinux.org.uk>
-References: <ZxD6cVFajwBlC9eN@shell.armlinux.org.uk>
- <ZxdpicVgg8F3beow@shell.armlinux.org.uk>
- <e5aefe89-ef71-4e50-ab3a-ac0e72b99fa7@redhat.com>
+	s=arc-20240116; t=1729589835; c=relaxed/simple;
+	bh=gmg6Hll2n8lVXWSgQOtDgKvXuCqm8xmSTbTzUh8cbMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kJ/5SnAMpVn8mmglVTpv6uKOQco2/XoPc8K0yMU0xN3OMk9X6kcCzKT+ks3OQmKQ6/pgJlwYFuZ8a4IF8RcGhB7EVDhAocVdDa1PgT6ipXJbXm9PDfMMO5yl0Kqmn8w53WIR9wG98dW33JjvBnawXSaHVzOwh3Iro83+gHfWU7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IwqyyogQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729589832;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pB/b7s5i5wAAKinrSsA2emfYkpQpPUZUCI5/VTA0GYY=;
+	b=IwqyyogQkhUuNlE31f22sVjJeLzc6AJBWXkvlFCSl/Y4BGmKcvI0AN9Ou3PhwyqW8xuRSk
+	8dntoqNyODspt0TQcAYiGY55b5VqOqQmicc8EXRSXayfXNoCSbVJ7mjaYyYoWvT7BDzIu1
+	6n1X5J3XLue1go0Wx5QdiROZVJpfSxM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-686-ePWnp-sVMSqgm2Kt_BcvAQ-1; Tue, 22 Oct 2024 05:37:10 -0400
+X-MC-Unique: ePWnp-sVMSqgm2Kt_BcvAQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d4854fa0eso3198607f8f.2
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:37:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729589829; x=1730194629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pB/b7s5i5wAAKinrSsA2emfYkpQpPUZUCI5/VTA0GYY=;
+        b=FdwGnlJI/o2MHWt6tYMpwLmc7FLAvr50/lbOZidrHtTMde3v1W+phKS1ydcVvf/Bm9
+         AWIY0KKeJ4HO7FqLyvLq6ksnGZ6hquEoiIScEg2qAqB1EL6i9U/8Psua9DOUhrU5y0Pw
+         aROi34iuSVfP1OgGhefg+eabJ35wdbEuM7TkxFaFdFKflFRluHNAsy6It3MyniStsJvg
+         z57SGmonpieHGKyJU7JrqqPBRSzvn6EDer89Nh0YyUy7oIiM+xIuqSdn65SU+rxeQG7K
+         dfyQGMH5qgQ7PEsZriZ0VUJ8t2Sehs78jROvbIzEhbK5w2bRUnkNaeTSSNXhEckCSUR/
+         /8jA==
+X-Forwarded-Encrypted: i=1; AJvYcCVu54bWriMT7nmFAiJHQxbbWwtr25ScnsMcGCZM1voKgihPT2ya6zE6FCz3Ca0cMa8E5i0ZdJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq3S6T+9OH96UDDKdcifXPjEud5MeGSrs5WSyaEGEudBC7/Aro
+	iU4cuXs7qhsHZKGbur0dBaZpY+Ks2ORS3wNCKuI6+9yQNqsXl3KHUivC3quPIv0imIpmd9ucuDN
+	UokVvcTdqDtKG5E0oD31hVRINpYQ0MZI6zkNp9jiXlVKJjooOQI3cKQ==
+X-Received: by 2002:adf:a34e:0:b0:37d:4b73:24c0 with SMTP id ffacd0b85a97d-37eb4896bcemr8757050f8f.35.1729589829361;
+        Tue, 22 Oct 2024 02:37:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEoIHqnfu938gdAY0h3QmakAjtBGWP4PnYRliinr483YmlhYWXPL5NDovyVXnQ2JnjB4kE4lg==
+X-Received: by 2002:adf:a34e:0:b0:37d:4b73:24c0 with SMTP id ffacd0b85a97d-37eb4896bcemr8757027f8f.35.1729589828980;
+        Tue, 22 Oct 2024 02:37:08 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9bcc8sm6181269f8f.107.2024.10.22.02.37.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2024 02:37:08 -0700 (PDT)
+Message-ID: <5cfc763a-2d9a-4d87-8728-19db3f8e096d@redhat.com>
+Date: Tue, 22 Oct 2024 11:37:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5aefe89-ef71-4e50-ab3a-ac0e72b99fa7@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 03/12] selftests: ncdevmem: Unify error
+ handling
+To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ Mina Almasry <almasrymina@google.com>
+References: <20241016203422.1071021-1-sdf@fomichev.me>
+ <20241016203422.1071021-4-sdf@fomichev.me>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241016203422.1071021-4-sdf@fomichev.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 22, 2024 at 11:23:30AM +0200, Paolo Abeni wrote:
-> On 10/22/24 10:59, Russell King (Oracle) wrote:
-> > I see patchwork has failed again. It claims this series does not have a
-> > cover letter, but it does, and lore has it:
-> > 
-> > https://lore.kernel.org/all/ZxD6cVFajwBlC9eN@shell.armlinux.org.uk/
-> > 
-> > vs
-> > 
-> > https://patchwork.kernel.org/project/netdevbpf/patch/E1t1P3X-000EJx-ES@rmk-PC.armlinux.org.uk/
-> > 
-> > I guess the kernel.org infrastructure has failed in some way to deliver
-> > the cover message to patchwork.
+
+
+On 10/16/24 22:34, Stanislav Fomichev wrote:
+> There is a bunch of places where error() calls look out of place.
+> Use the same error(1, errno, ...) pattern everywhere.
 > 
-> Thanks for the head-up!
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  tools/testing/selftests/net/ncdevmem.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> I can't investigate the issue any deeper than you, lacking permissions
-> on the relevant hosts, but I verified that the merged script fetch the
-> cover letter correctly, so no need to repost just for that.
+> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
+> index 9b3ca6398a9d..57437c34fdd2 100644
+> --- a/tools/testing/selftests/net/ncdevmem.c
+> +++ b/tools/testing/selftests/net/ncdevmem.c
+> @@ -340,32 +340,32 @@ int do_server(struct memory_buffer *mem)
+>  
+>  	ret = inet_pton(server_sin.sin_family, server_ip, &server_sin.sin_addr);
+>  	if (socket < 0)
+> -		error(79, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+> +		error(1, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
 
-Thanks for checking. Johannes explained that the checks are done by
-Jakub's nipa bot and uploaded to patchwork.
+The above statements should probably be:
 
-https://github.com/linux-netdev/nipa/blob/main/tests/series/series_format/test.py
+	if (ret < 0)
+		error(1, errno, ...
 
-Seems nipa (or Jakub?) missed out on the cover message.
+>  
+>  	socket_fd = socket(server_sin.sin_family, SOCK_STREAM, 0);
+>  	if (socket < 0)
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The above statements should probably be:
+
+	if (socket_fd < 0)
+
+AFAICS 'socket' here is the syscall function pointer. I found it strange
+the compiler does not warn?!?
+
+Thanks,
+
+Paolo
+
 
