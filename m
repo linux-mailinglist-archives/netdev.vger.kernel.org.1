@@ -1,182 +1,198 @@
-Return-Path: <netdev+bounces-137979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4469AB53B
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:37:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 558029AB57F
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E0591F24625
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:37:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C7102822CE
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7661BCA12;
-	Tue, 22 Oct 2024 17:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98BC1C2DA3;
+	Tue, 22 Oct 2024 17:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="AEZbdoBQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HC33xv4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013067.outbound.protection.outlook.com [52.101.67.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36EA91BCA02;
-	Tue, 22 Oct 2024 17:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729618663; cv=fail; b=Q8x8RziV25YU8AX86ZavfhdA/Jz7mYZ750bfCAicn1caMJcG6V8TUPo0LmBn1JwZZszGH3Lll7SK0jytnLcvbLKzgK6PzgIF4fT8JWQlFOeR43e8RceJkPddwfa0TFY/ss0ybiGkC1+k3w2lzjWs5RhFdzhQ3/IlO6unUB3ORKU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729618663; c=relaxed/simple;
-	bh=dntbcLwKYShjqsp37LlsvD9XkxqnTMfuP5pHAqKVqeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=lkqbBaPqjK0XW5T5vYLpUwD0G2SsDcblV9+xU7su7B6FnU6w8OLH67t0TjydWOPmLGrAioIJ1vTy89jOxTTOIvnQ2Q3xXwARgOv7Ri8d9wXV82+wi4SmuCFEWtAB4d03T2dtaH23FmRfXr9X3znb85/4PvL/lDAAaTJS4jm0ahU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=AEZbdoBQ; arc=fail smtp.client-ip=52.101.67.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f4OFkIuqGUHQSJBWbXQnIN2SwT/RfYXMnNJtImqbEeG5t4hZfwkCsZMu84eYxdTm/q/BzYpDtKQXxmbaAbn+21kgCQC0Gst7FdldQXSQwTbg3eoNlswYP3I57nm5pRGmvgOEUYvreTwZ26En5fOpEHJObT6nIF8hOn3b5BmQtFRuuMrlXKaQMSJoqJPS2EPwvGnSXMmmnQJdfw1IqGOYJZGa3fhqIG9ZVw46jfZG3rwSalp0BApFa4PwGrNMLqnkYB3GJ9RB3C3XSmiUx/y96kXYw8fqdnq8MzfbfFr3++JpT0IFynqWK+n7/d6dys+cJH/h3Y1Q0IJ2t1t+4UOlaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GR++i4m4kt5vURDiAS5zKV5kAehpUTwK99/rOV8Ko6U=;
- b=ENF0WPb5W/JnTslTBQn7cn3LcNu8sKKKA+xksTgCkkNdy13hpNHjnL083MOAczBerhHNG91iMX1XjEANAaoiHCHEZ/AvOTSGDOJzH/0g/TYso/DPk550Jr0QnWu4arpZ1b4N2RKdFNTn4hha4IIc/RtF7P4ycGBcFXOrGvNOcpQauI3Da/ZGnCQbpoNYCv7KYsz7Rv/jtwHpSHoa8NTuwjfrZ8ThoebDJISTCUCi+LS+azT9+GtSAXcPpswce7ZF3OFJGWJG5riDb4wXONKvsBjotwa82GGOvWnHaUcur2kq8HRd6DM/00BxumsldxsRpsZmXihLIa8yNQ535+FHpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GR++i4m4kt5vURDiAS5zKV5kAehpUTwK99/rOV8Ko6U=;
- b=AEZbdoBQyYWQqIHm4yCTJQgIDL19rpEoiWbT7d/WSqPe95rAlv22XG8LfPacSfBhJ//zD66zw9EhRhJCAXiMy4GQysUJISX8A03i3tSd18ioyRQFSdi6W90cOkAiUEhTi91cZTE4tcZ+PjGfHmq+AhUgcehPfmBdFkyuv6seCIua32mfAhgoVyF6iHNEX9/QXUkCYXFp+QS/dsdB27jFkEQ5Ww8z+vpkwg/zbmxZ2mZ90p4pALITIGLLuTGkiDblHJUfqOSgidEXF9peRKD0KRaHCdVXCF9K+YoOWWltFV3uoSGqivGYJeYX+xIzHDALh8UxUzN6jQWAxVt5dEo+lg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AS8PR04MB8344.eurprd04.prod.outlook.com (2603:10a6:20b:3b3::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Tue, 22 Oct
- 2024 17:37:38 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8069.027; Tue, 22 Oct 2024
- 17:37:38 +0000
-Date: Tue, 22 Oct 2024 20:37:35 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 0/6] Mirroring to DSA CPU port
-Message-ID: <20241022173735.unun4qm4fmcrf25k@skbuf>
-References: <20241017165215.3709000-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241017165215.3709000-1-vladimir.oltean@nxp.com>
-X-ClientProxiedBy: VI1PR09CA0137.eurprd09.prod.outlook.com
- (2603:10a6:803:12c::21) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA313FE55;
+	Tue, 22 Oct 2024 17:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729619246; cv=none; b=jxCMvcDq2dYeece9/GrV1CSF4AJM4rLlte0lr/zGaWnD2gSLgWP4wn1VvU1nuX/6rsGt0iphGCBb6Edy11SzQ+7ydwInGseqeX4eGHs8zcgt09iJn/SSJ3LCExtAk3oJtojXiyfnIbyD2a3VtpYR2oMLuwUScBXChbCKlFkhv4k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729619246; c=relaxed/simple;
+	bh=raYP82xdEbL7nQYAeHkY+SkxWx7riZAwYtNgws8ZUiY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g6TuDHopDxb4HYyyrlTz72rziy+w3S7oHXMhFrnwynYzlHupZJoNoXbOWPUI2tu/u8yK1n9ZirjyAAomeMZdlRNKg6cO/YwiMmzZUBwXnzrR9xsKbtNWrmvoRqsIJVouVZdOX9b2lEJ/BRgcpzsIVGhd5oF+2ftFpi67+9SQYOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HC33xv4B; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71e625b00bcso4350851b3a.3;
+        Tue, 22 Oct 2024 10:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729619244; x=1730224044; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ddUMQ7YsPimbk4F7Nb5pyH2YBrKesDZgI8kYiDJ2Fc=;
+        b=HC33xv4BzmaatrvM7il8uEj0yCZSgMJCRolOU/vbvFla8mm+5BIeLqGOZRkUR0jWlt
+         EVc6dJOziRhipD464C7VTCpDKNVyCBJfqQ5J/U5b+K3iRF2iF8hDBUt1xvTK6Ng5GiAT
+         z/iDToj4ltDefyZJLfcGNO/OXwhqw8GGQCmxMIymEjHSzP+39BapW/72TZfwnhAleoWd
+         fsYZ3EOwb9tuJieNV0cqADNJL8rNQzSp3tXlaruH3JixKb/5cTsW6QZZtIyHONuCDGSN
+         tjIVCuYrFhxbR9K9dhDOgIzldjUknZjauvgnCTths+xPI5mT/sIuia8kfBFVvfLE6vYq
+         VsCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729619244; x=1730224044;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8ddUMQ7YsPimbk4F7Nb5pyH2YBrKesDZgI8kYiDJ2Fc=;
+        b=rWfbjTVR9AEC25yDLfH1PWaQJFULgbgqd8cOtiL++3ueNFKMozZtVvDYJ5fp13sID8
+         OgddFeRtTikIRZ3ZkMDbobFgmdFPmbt5hx6yC3/+soZGZcVAKNeaef1ZFZhexlwv4mVZ
+         8infYEI/8fI/v630gF4jm+xFYccZ1CXjrNCwVxN0L5eg6b1zrigjPGmj8yQDMhoATL2d
+         CPxuDZC109KKLJgh6WVF7b2cnzaT5VCxq4SvV9wbfNj9h3bMhy+rBmxQ5aapDNuW9VJu
+         Nq/p3CKReAg8Yy3DYCUgRpIHx/y8Qo78vPfV5WL77bDXtMCU70TwqIXE+mH+zNz4/vOr
+         b8dw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/F63HMePTwWSeTs2Muk+MBvN3ftyvEpfG+xvtEKomdBlMAJytkw9aMU2MJgG4Gua2JbM=@vger.kernel.org, AJvYcCU1WNjuN6ZH3czy+Fwqb1mDLbSzhi9Shrx9uagjaroTkypjRwwB/Ocncv8klLVExyCKlw54L1PFfaPVl2sK@vger.kernel.org, AJvYcCUKE6NRXkv8MrdaxLZC7U6AJYpov4JuI3LfxVWjoPR1ZxLIlcjbrVgO4e31pradMB/FQFcx91BX@vger.kernel.org, AJvYcCUXdpPZDlCkEM+e89GRhgcFw066CjAHG+G3mloYUB6FM0aZTpzDoUhqXSWk65xUYQunJttve9cZh9IuyGPu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeUNFzsBdTuk9JkXZJHKvrnU1rCu1NQrAMg9XLvxUPT/tlg1On
+	dJpww5XHjZVHfxFziYQhkPaKJnX2LuHTEkvHxOe5os5rudAmUxFb7Gyh3SGEIXsS/kujx3Nln6E
+	3m5fw7qPyG5c4RVl86s7UL1APrxM=
+X-Google-Smtp-Source: AGHT+IHYzZ1MPfouURSpXauQvjKpAqxHOZgCBInLj8fQ2B+q8L2j1IhoGXxHbfumGhFT2TP8+T2OX/YchRKQE6e2aiM=
+X-Received: by 2002:a05:6a20:d528:b0:1d8:a899:8899 with SMTP id
+ adf61e73a8af0-1d96dece18cmr3235223637.29.1729619244353; Tue, 22 Oct 2024
+ 10:47:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS8PR04MB8344:EE_
-X-MS-Office365-Filtering-Correlation-Id: c5a9bfa0-60ba-4ac6-572d-08dcf2c038fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?CaCwoTm1kmmCC+OtV5gGn5JZz6Wt6Mt7q3wQUnjd6A4cegK6f/wwqAn+KAWj?=
- =?us-ascii?Q?bS0h0RSpj5vQussVSBNTlvPgSWaQtK2fSiuo1Pmz0zcWK4TX0IxfawxQCTy1?=
- =?us-ascii?Q?5hak9qKnoZRoTtBQupJRt0rccYFf6bSo8p1Bw7HwMH9lBkey/csME7BQ3nFR?=
- =?us-ascii?Q?3xoWFwiInPHfREHVAol2LREB4yd9n74OnwYfO5O7gA1404ErK4RX/JKB4/jB?=
- =?us-ascii?Q?0ewWF2FesetTSX5GIVZjxwBCxbHnYcPkcjaLJKAArhFc+Uu+Nzy+rdhliJ64?=
- =?us-ascii?Q?jQYHXG37xOivNBPHjYNtjJxkYXe51s0Itv/9GdlwMU6UJoPoFw07nobGBaRZ?=
- =?us-ascii?Q?qWO/3+Hmb3OJDD16Wj2On4lkDuCt+zt72kjo+b9T4G9dwBYOwnRrfQpmAbNz?=
- =?us-ascii?Q?ixZq8SWR66cpMDpPhqOStncDMLgL41f6B6Umrw5yheMgVivKb71GPyi9WdPC?=
- =?us-ascii?Q?fSW5QfGE+KOT2R4ETgl2JpTR4MN1+DO65sNXTvoO6PmuLVZQuCJeJWXxuNN/?=
- =?us-ascii?Q?WZ1WlI7h9ZgHmcKMsyITe/mzw0eRfAWltUH2hc9u5f6rQscWp219u1WMF6g4?=
- =?us-ascii?Q?4k3L8HxLL+qnuOfWthtSXowpkQmP6reCYTFD+VhHvw4KctyVGJeAJonVyv+G?=
- =?us-ascii?Q?tYbQdTrsiRITSYM7NlI1TqajwQlVujPaICD4eCj3m7JTovyWN3IDV63k8HF8?=
- =?us-ascii?Q?vWE/vb4N0I540Afj+XVuW9HXTQrRG5yMR8Z7AnPtZXBtKTcbqFyH0TinNoob?=
- =?us-ascii?Q?C6ora6dM72yI4y9ZQQcIoX+zLNdzNi4BGXBwwHC7aRC5xX7ImaVYOuz8tYk7?=
- =?us-ascii?Q?GihCmMfCIEEPnraByci7jGzSv5jNFdyd+f/Vs5wnhunim5FKTTWdgZQB9W3A?=
- =?us-ascii?Q?LJxwrETr0Dg6liw78cAHjc/O+uVMLkhTveENZ8mOqNCFAvOqMddAfUvf651v?=
- =?us-ascii?Q?YDmCmT0DuNGxRCBpW5wMFMJSvrgM6hpVWvWXL0rxZRhljrv8NxjdUvGwFk9H?=
- =?us-ascii?Q?sZx9XAqO0BvdhIEQ7+5Eia+GwSbHGmqU8wnLhmyI69BzQMjujBmWmlTJny34?=
- =?us-ascii?Q?ctyMxaNtsMwaz5Cs+8SlSJIPXFrtpMc8onS1lDKm5sL1/ZIQP39a5VQ/h7qr?=
- =?us-ascii?Q?ZBIKo222Rz4LCt3DZZzg8g/0JkKF1AL6Ix4UdkbGZA0409PQ9pYDe8fm6sRg?=
- =?us-ascii?Q?SZ6eDaUgUkgNQbnB7cnDP9bwgN8UOocoFw9PODOkIvidp/D5gNmd7EPEhhu2?=
- =?us-ascii?Q?9PRhLYNwKHKY2zw4M9WfULc2YfJFMcdb25eS1CtYYZEZWllmIEWTA0JYQwg8?=
- =?us-ascii?Q?DZU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?wJBOwvczoDm2wRXJWjIhZTI1b9m2/N1J8RvglI0Sr1Ct5ZFSmorDpCYAarSj?=
- =?us-ascii?Q?FU6eayChqXoCStf34xF8TNl2butBAI9I08LtvFkZN9YJl4YN9F6aeRREX7y8?=
- =?us-ascii?Q?07OcPd0NmukWCOoMlec6Q3EzO+K7Qki6IdLjkzPybX3tIwIy/79z04Z1lqax?=
- =?us-ascii?Q?DN48HdO9qw43C4rxAPw9pSRdWAsRRh5ZLyGnALkG8bKTgWDw6e6yqg47PX15?=
- =?us-ascii?Q?qRn/Mgwq2jvuIVxW19DgiaU5HV+SYjhP7jaAG44w4pr47mnpbftBXgz/w+Mx?=
- =?us-ascii?Q?gEBRrtTHzzdQbiy6CehN1OEVQk8Kh/2jlFMYvZlmgD0g8IcikJRtJ3hxtrfd?=
- =?us-ascii?Q?Ir+9antQwDunBTNvobxcp+PcO4+sHbpDXT0pI0vT4AgC4kzS3KIxHzHNiKK+?=
- =?us-ascii?Q?gnLnTMgibTeIevdMjl7tflZChFd7q1Ra9o1gjzteWKSGYdPZ28pbESr58I8N?=
- =?us-ascii?Q?fhmpPPuzpbFgw4fOmST6KH49mVVqJu3gslbD4yr15cjVezTKWJGPoDZT7Yix?=
- =?us-ascii?Q?2uNKwVNV+dLyf8khX3GTENsomwkCgC/Ef+6MGFRFslN5dIIsR0BzD9zRNGYX?=
- =?us-ascii?Q?nMj3sdo/eX8PGUEQl/ZlQh1D/rN8p4mapvjr/Ana3MgC1uDLiAEsbeIPBVp9?=
- =?us-ascii?Q?ZnO06pd7F0PXvsAw6hOJjxwyhhq5cXWReIUlMPH0v7ixczcPSnQaBecozQHD?=
- =?us-ascii?Q?FJpddwPMaMLY+xJdgiGVZa0czx9Q+76GeBgYgSZ+JckKHsf6+mcN8YBTgK5w?=
- =?us-ascii?Q?vM7QtNiAJr5762pddkUnNjpDOyukQ5ijqphpj6XF3C6gXEEZw8+Kg0V8fI8j?=
- =?us-ascii?Q?+TFSlE4Typy5y4LZZLroghPSjYhRnpL7iR8/gx8ATKQPHl7qTo/4MEy8sKbj?=
- =?us-ascii?Q?//36yGt7BRjmz5gU57nfqHDANqNWhIkGVub8Lfek3IB4ChQ3SBMTVeqM+nas?=
- =?us-ascii?Q?UCbcSjT28/yJ2CFTMm67JJ7gTKpM2rHLSTt++jeZ4f5MUcKtSOMxJdH95IMt?=
- =?us-ascii?Q?BnYOBohoiLuWC38Hbw2iHSrxNl6c51QeYfrJxKnhR5JgM8s8jomv87R2lBDX?=
- =?us-ascii?Q?BGZ18Fsms67XLOlSG+MjJIGZdinetOhnFnfc1k5kHUmZ7njA2S3UxSbGGfnq?=
- =?us-ascii?Q?fj1iVz5SRjEFIPz9Ic/qlznhQeRQbc2mvctgOooPw5weJFa4+c6Y7chjg48f?=
- =?us-ascii?Q?SWRxrdJDsNzHaHjpGnVnb8DRSeBl4TXItksVuRS9BlTbvXh4ZXis5iX3Speh?=
- =?us-ascii?Q?1z1K0sS/kvxpC1I70jm/S07GRaIzAqZvXfRsVP8U5TQP4c5Npp3W4zgKcWei?=
- =?us-ascii?Q?/QEVJ4c5aJaNbC7jNVe9/GtP+FX3lATMhGkUz+4POqy43BirOH8cw5cIk62R?=
- =?us-ascii?Q?CjqLfNNvREM2atkzETpnO3pfEiXN/03/QaY6nG5ktM/qitbs95zPvNqHVL39?=
- =?us-ascii?Q?WQu4LYiB9SND7+OdD4uKutgEovO8UfWWrVRX4Fan4tDFytun3eU+SgrooF9y?=
- =?us-ascii?Q?VUxanvbE7CE2yyWMn/MQzGvj7rvX8ofgL28MpFSMQkZu2nfK3KAVS+qDSmsL?=
- =?us-ascii?Q?2uThPT3Ba35nqBA6DJbeVg86lE80xYTNSLcyIh+r1M8ciwCGNO5UzdoCWZYj?=
- =?us-ascii?Q?Qw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5a9bfa0-60ba-4ac6-572d-08dcf2c038fc
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2024 17:37:38.6112
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rFRu7OqyIS6jtskCcO6JaH2swCcPnFdo+Vop9TZ02/wAH8H4Ba7zxoC0+zwOQmjNDwilaOGbk90dd0l5U0owEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8344
+References: <20241021122112.101513-1-puranjay@kernel.org> <20241021122112.101513-5-puranjay@kernel.org>
+ <CAEf4BzY1LgCF1VOoAQkMdDTx87C0mfyftMvhvVU4GpsFc6fw5g@mail.gmail.com> <mb61pa5ewbfpk.fsf@kernel.org>
+In-Reply-To: <mb61pa5ewbfpk.fsf@kernel.org>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Tue, 22 Oct 2024 10:47:12 -0700
+Message-ID: <CAEf4BzZ-gfBqez-QJCSRVOPnvz-inaiVdNGOFRCdc2KQbnmeZQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 4/5] selftests/bpf: Add benchmark for
+ bpf_csum_diff() helper
+To: Puranjay Mohan <puranjay@kernel.org>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, 
+	Helge Deller <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song <yonghong.song@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 17, 2024 at 07:52:09PM +0300, Vladimir Oltean wrote:
-> Vladimir Oltean (6):
->   net: sched: propagate "skip_sw" flag to offload for flower and
->     matchall
->   net: dsa: clean up dsa_user_add_cls_matchall()
->   net: dsa: use "extack" as argument to
->     flow_action_basic_hw_stats_check()
->   net: dsa: add more extack messages in
->     dsa_user_add_cls_matchall_mirred()
->   net: dsa: allow matchall mirroring rules towards the CPU
->   net: mscc: ocelot: allow tc-flower mirred action towards foreign
->     interfaces
+On Tue, Oct 22, 2024 at 3:21=E2=80=AFAM Puranjay Mohan <puranjay@kernel.org=
+> wrote:
+>
+> Andrii Nakryiko <andrii.nakryiko@gmail.com> writes:
+>
+> > On Mon, Oct 21, 2024 at 5:22=E2=80=AFAM Puranjay Mohan <puranjay@kernel=
+.org> wrote:
+> >>
+> >> Add a microbenchmark for bpf_csum_diff() helper. This benchmark works =
+by
+> >> filling a 4KB buffer with random data and calculating the internet
+> >> checksum on different parts of this buffer using bpf_csum_diff().
+> >>
+> >> Example run using ./benchs/run_bench_csum_diff.sh on x86_64:
+> >>
+> >> [bpf]$ ./benchs/run_bench_csum_diff.sh
+> >> 4                    2.296 =C2=B1 0.066M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 8                    2.320 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 16                   2.315 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 20                   2.318 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 32                   2.308 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 40                   2.300 =C2=B1 0.029M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 64                   2.286 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 128                  2.250 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 256                  2.173 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >> 512                  2.023 =C2=B1 0.055M/s (drops 0.000 =C2=B1 0.000M/=
+s)
+> >
+> > you are not benchmarking bpf_csum_diff(), you are benchmarking how
+> > often you can call bpf_prog_test_run(). Add some batching on the BPF
+> > side, these numbers tell you that there is no difference between
+> > calculating checksum for 4 bytes and for 512, that didn't seem strange
+> > to you?
+>
+> This didn't seem strange to me because if you see the tables I added to
+> the cover letter, there is a clear improvement after optimizing the
+> helper and arm64 even shows a linear drop going from 4 bytes to 512
+> bytes, even after the optimization.
+>
 
-For this patch set:
+Regardless of optimization, it's strange that throughput barely
+differs when you vary the amount of work by more than 100x. This
+wouldn't be strange if this checksum calculation was some sort of
+cryptographic hash, where it's intentional to have the same timing
+regardless of amount of work, or something along those lines. But I
+don't think that's the case here.
 
-pw-bot: cr
+But as it is right now, this benchmark is benchmarking
+bpf_prog_test_run(), as I mentioned, which seems to be bottlenecking
+at about 2mln/s throughput for your machine. bpf_csum_diff()'s
+overhead is trivial compared to bpf_prog_test_run() overhead and
+syscall/context switch overhead.
+
+We shouldn't add the benchmark that doesn't benchmark the right thing.
+So just add a bpf_for(i, 0, 100) loop doing bpf_csum_diff(), and then
+do atomic increment *after* the loop (to minimize atomics overhead).
+
+> On x86 after the improvement, 4 bytes and 512 bytes show similar numbers
+> but there is still a small drop that can be seen going from 4 to 512
+> bytes.
+>
+> My thought was that because the bpf_csum_diff() calls csum_partial() on
+> x86 which is already optimised, most of the overhead was due to copying
+> the buffer which is now removed.
+>
+> I guess I can amplify the difference between 4B and 512B by calling
+> bpf_csum_diff() multiple times in a loop, or by calculating the csum by
+> dividing the buffer into more parts (currently the BPF code divides it
+> into 2 parts only).
+>
+> >>
+> >> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
+> >> ---
+> >>  tools/testing/selftests/bpf/Makefile          |   2 +
+> >>  tools/testing/selftests/bpf/bench.c           |   4 +
+> >>  .../selftests/bpf/benchs/bench_csum_diff.c    | 164 +++++++++++++++++=
++
+> >>  .../bpf/benchs/run_bench_csum_diff.sh         |  10 ++
+> >>  .../selftests/bpf/progs/csum_diff_bench.c     |  25 +++
+> >>  5 files changed, 205 insertions(+)
+> >>  create mode 100644 tools/testing/selftests/bpf/benchs/bench_csum_diff=
+.c
+> >>  create mode 100755 tools/testing/selftests/bpf/benchs/run_bench_csum_=
+diff.sh
+> >>  create mode 100644 tools/testing/selftests/bpf/progs/csum_diff_bench.=
+c
+> >>
+> >
+
+[...]
 
