@@ -1,164 +1,157 @@
-Return-Path: <netdev+bounces-137686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4A299A9521
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 02:49:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6699A9523
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 02:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 123621C228DF
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:49:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F66F1F23D16
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 00:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AFA2233B;
-	Tue, 22 Oct 2024 00:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AukP4SrM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEB182D66;
+	Tue, 22 Oct 2024 00:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from IND01-BMX-obe.outbound.protection.outlook.com (mail-bmxind01olkn2040.outbound.protection.outlook.com [40.92.103.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022D5768E7
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 00:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729558065; cv=none; b=Ri2nW1Nx3e/dftx8WKnkdyLdsi3W+fjb73AXIcEt+0bVquYpiVs//jjmae0mXGfddbZUDvwEGPWbAlIndpDkpZiSn5sIRvccD6RaWkIWfX++Zt8qDJWqbdCx57k9BgjX9oT2uk++tfUE49Qd6CM8ck37JSwjipO36RXE08XojGc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729558065; c=relaxed/simple;
-	bh=XHpdcNkcHT5hVImdqZd8CU2eOgVjukUMCcNWABhCtvA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B3CgFkzhrz26lmZni2NksWoUc3hJ3cJjwhGW1FHneVMzbK09abIc0xON6AHslLGwjxiOl9UIwsAyrsUD//pG4bQTKJblZmQKr9Ewt/Y5ri59IOnp8aOb/RB0LYJCATytf1KVDUY/KgVhjMmkLYUex3XXXIPjSySjN5QHQ2cXY+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AukP4SrM; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3a3b463e9b0so18396165ab.3
-        for <netdev@vger.kernel.org>; Mon, 21 Oct 2024 17:47:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729558063; x=1730162863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hJiVEeNIbhp/jZwrHTw90+4ZhCBhTq6usS49IE4DJlo=;
-        b=AukP4SrM8dsm82gQLfu70xuamb9qYPK7MQGbgpVLbm+YaHZu1Zo7HrglK9XVNPdl8N
-         dhxWecpC858a13eX5RE4LmjCJvEfN/SHxs6DpcYODBDWyv4tKMNHXS8gsw9Az/+h3BuT
-         yo5Au8ReHVv27BfAqmxqHrvNOI/gfnbWz4S3rcqHzMe8hJjB28BLDIGX8xRp33UyajqT
-         2coxBBipbXK/uPYbYEgZFGTw6hcG2B4qPsCNYcpLWMl9cixg2D2EATbPEdgSQiqhOVqC
-         1ht2uPeWdn3BUiLggtXpvc8DVW8V8ld8MkOBhf92d5ZLAot6MaBTNgRG0joGZeNAPwQ6
-         YNYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729558063; x=1730162863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hJiVEeNIbhp/jZwrHTw90+4ZhCBhTq6usS49IE4DJlo=;
-        b=Ss+iEY1AFCwPaYgBztdbdvp25f5gC8GTWTOhjo6TkEXHrGHcONSY7Pg2Vn1EIyhUav
-         qnVAGy/xcreUnD4WT/EPBoPuinRGJRfqmCuPN1jz6t0x8l0xToEDVltFZzhCanplzJYT
-         XMlwHTK9CyUSwvwXBlzIzafXxpSRC1/hqDnRsrm0hj5A3Jf2qYD/VpwkrFpgJdIXOA//
-         +NfPjWVvduiwPhGcHIkQBD4KFxp2Quup7i3tvUQWaXGkHkQi9cLT+zwpV6QZMtVJ2xc5
-         j+9tyU8aNIS1n0VYz0So/tOyNoOWCStgDanBWmtU9YjC3Gskg6XzYz8DExrm95sE7NN1
-         20GQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU52vVRwUT5iSTc9BXxyPgIcrVjXOjMP2AUIvIrWOPQ+wzmn76F21NJhW3ZC8JMh4bvFDznfxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhuPG+XEyGD2XpLFTIo4+sVOx9POx8pMYl2vpmWTP09pV4DKk4
-	qORS5b6kWzp0eLa/JCnLoFHUkQZ+DYl2BgcKWHUsiQWAALraj3P2E2FMqc8LRsQb0xJTrri8M1F
-	hs+rHSYalXcx2eOa0qcp787nkxdg=
-X-Google-Smtp-Source: AGHT+IGsNPE5xjQwne0nhyWHwRzJZG7KV9XS1pN+nBClPYQbby5F831LA2BgZyjoK0K6PLLAo631nz3C9ewByDkgLV4=
-X-Received: by 2002:a05:6e02:20cc:b0:3a0:9954:a6fa with SMTP id
- e9e14a558f8ab-3a3f405e51emr116409615ab.9.1729558063071; Mon, 21 Oct 2024
- 17:47:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40707A15A;
+	Tue, 22 Oct 2024 00:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.103.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729558067; cv=fail; b=ClvMpVklH6yuhyWBnwKzIzKtJ+6Xe5eDyJSADmTbjLeJm0aE+CXFWIg1tJHsXQl4VL6ToNmhq27sMBsf7+hUILxk1B1uqxqHNnvdgVMBBFxX+EPWJnL4iFWJ6Z/W0JNMyqREZsosq3amm/Yd8tYwZqZmNHBXGEH97jfvuiIWJng=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729558067; c=relaxed/simple;
+	bh=ktMpXPEN3cn0BlwAum8KPYSIBbwWZW99xOS9KEwXHtI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=eQXcXmvV9bGrtiLDOGiTv2whhElBr0TzWrOi8n32yhNLXx+VUaAImuScgdvIDSaXgevuIkjz/vJ5vpXs7kMkLA6r2ydLZ/JGZZt/cKNO1toVgvLP9OXpuuU8QnvuYm8mfLVz9pGYJVqflR3yEr1Ao4JjiZKvFnK9k0PevRQwPc4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; arc=fail smtp.client-ip=40.92.103.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lwNK0QG+9WD7tR59SDlKNlSvRrPI9lTr3QvkVuQ4ZFjbZIdV05f+Z3BnXaURjvnclw+3+ErFl1zWBBjDjUSRY/+nGtKUo410O7BA+GobipJYE2t//gLjQObUy34XK8tUt162GixT5LuoHhKHQy42wOe59uzj3iGbjOfowSR7m/uGjyJDDTJhQPCNucgEs0D47qwVCTmrO4XulCYp41CzB7SaO7ZMPQykxBAKJVggKKwQCnr7SXzRttHfIQs/vNjrDZJO+q+yv/6SQhUOV0oiwh6oUeaXOUH7A1eDLfeRfHU89Dkah0THztdfMQ1kfW/p1gZ2NOZiM61ZZOZvyEmaoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ktMpXPEN3cn0BlwAum8KPYSIBbwWZW99xOS9KEwXHtI=;
+ b=IFSfTj3GULCYVCDQRRTB2JCjRet1c+4uAnH27908CfLRw+4Z2eCI5l+lH/ZEd8c6ZAlO/2sfEmC/prCda/PyThWeF8JKenC/BYwVLO9liF00RjM0eVIvw0VBSePFl7anRAAkAPmAS1MpPqBhibO/Q//KPo3O0Dh7nGp07OWg/elRA2k0jembz5GrdwS/o8yB1KrKdu2PdyW8NG4B7rlLwOQcXmEnnB84AsDVrRa8Ms+auNANaaCw0+OvQKDBqUcsbMOMMzQeILLxzzkWyDPtYfb1mEJCZi5Gw2oNxZ0mN7RQC4JvDfcAo8f+JyHAoFDsnlpO4UvuJ2zuA/iKWYe5mA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from MA0P287MB2822.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:138::5)
+ by PN2PPF99355ADDE.INDP287.PROD.OUTLOOK.COM (2603:1096:c04:1::137) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.29; Tue, 22 Oct
+ 2024 00:47:33 +0000
+Received: from MA0P287MB2822.INDP287.PROD.OUTLOOK.COM
+ ([fe80::a94:ad0a:9071:806c]) by MA0P287MB2822.INDP287.PROD.OUTLOOK.COM
+ ([fe80::a94:ad0a:9071:806c%3]) with mapi id 15.20.8069.027; Tue, 22 Oct 2024
+ 00:47:33 +0000
+Message-ID:
+ <MA0P287MB2822C943624A02C54E9A62C9FE4C2@MA0P287MB2822.INDP287.PROD.OUTLOOK.COM>
+Date: Tue, 22 Oct 2024 08:47:28 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] net: stmmac: Add glue layer for Sophgo SG2044 SoC
+To: Inochi Amaoto <inochiama@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@outlook.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
+References: <20241021103617.653386-1-inochiama@gmail.com>
+ <20241021103617.653386-5-inochiama@gmail.com>
+From: Chen Wang <unicorn_wang@outlook.com>
+In-Reply-To: <20241021103617.653386-5-inochiama@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI1PR02CA0046.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::14) To MA0P287MB2822.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:138::5)
+X-Microsoft-Original-Message-ID:
+ <087c1882-3cdb-4518-bf5e-1654bca3def8@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021155245.83122-1-kerneljasonxing@gmail.com>
- <20241021155245.83122-3-kerneljasonxing@gmail.com> <7cc508a4-24d1-428c-bf63-ae5dbcc305bc@kernel.org>
-In-Reply-To: <7cc508a4-24d1-428c-bf63-ae5dbcc305bc@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 22 Oct 2024 08:47:06 +0800
-Message-ID: <CAL+tcoBJSxnwrh8GeLirKyHjHat1kkP1=uqY26bb-y=OBowyYA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] tcp: add more warn of socket in tcp_send_loss_probe()
-To: David Ahern <dsahern@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, ncardwell@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MA0P287MB2822:EE_|PN2PPF99355ADDE:EE_
+X-MS-Office365-Filtering-Correlation-Id: 30ce1516-4972-47f0-de33-08dcf2331dad
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|19110799003|461199028|5072599009|6090799003|8060799006|7092599003|15080799006|3412199025|440099028;
+X-Microsoft-Antispam-Message-Info:
+	mcP6pv9DMARQwpZIQu3wK55uU1NCVHvTdANbLRu0vr6g3Q8gXA/TMLdYiT87tj5tne2VmIbTa6cxkMF9mbbGmfgyqO1KXGwJfGpa1p8lMpAUwycaW4CpGks9WXUWzqGjRk81cwfXRSd17l2UjV6lO9IKEg+uQKrKq4h0HiwCMUj94+ZnTGg0Xuo+eJAozdbHqV3883/2uWwlzOFPNMW7p40ZTf/g1j7jTDmbJeiG0T93cMCXJVDalYuAgZPWHdqV+mOKC7siB9qWfVZDzo4Pwxt8Uum3FgAogjxvZpub5uV7IZYglCs4lxKlKLAu8/eCI8IB5ER71gOf38Icti+pSqM2rmjnRDxucJuw5mTsFTIGrB5bcBzsIXVtMpEEubVpDVzbcvfxsJRm1gNaYnYdV1agqU8LQzJYV2NpvOvqMEHG0HR1OTsNR0MoLGXx+6wa05SaBCGSMcCXe8Kjone9MHbKRPHgWvr70IVj6J46ucFxMaA/UkoF6lyH0x+wQiAX8utFOtCpAurIKgRndJzpS3WLEk9T5oy4LK6b7BkrRMTwjyqhkcr5u9bSlesTsGO3TgHbzcRm0qqRhOTI1bHaWUW/VDxBkmf4LU7VxeYpgDC0xXNk30yrzjWB07sppXnAdMwOtaTRigytKKgqC3gdscJGJ9r7il/ZSJREqRvVVfzD0dtDP1a7HjiESt+NItTXs/PJ5Ed/OonqCWisb8GRNpfESDlR1pnFgV1cWRVRhdsgDQEkBy8Xe8KKKsW1hMjxwW3cRXCojZwIQFFXaONe9Q==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VDk2WjVnRXZSdVRpUnhGMlY1UE14TGxiQ1ZqS01WVFR4dks3MWdCS2RNY3Zj?=
+ =?utf-8?B?dGZGMzlybmZBLy9iUjlXcVBWdTRtY0lkUjJQRmhlY04rU0xYMG9zMnFzZjlj?=
+ =?utf-8?B?VGlOU0xrN3hDM2FNWXRHcEpaeVhBSG9zQ2pEWGJoK1QvQlpVNndGcmhkTUdZ?=
+ =?utf-8?B?WGdQY3NuSjZRdXc5bkFENUhxSUZ3VG05VEx3T1ZVa1BlSGZZRUV2MDZUWURT?=
+ =?utf-8?B?VjMzYnE3TC96eVZOWjBkZ1phcVNyUWVDMVk3M3E5SWgva3NwZ1ZVSGppbXU0?=
+ =?utf-8?B?WnJ5MnpSSU9OVmpMQURUNlFvTnFtNnUyMkRaYitNSEt2UzhHc1FsYWNuOUpy?=
+ =?utf-8?B?SUlFa2NsRkNjbVlrQ0QxNnlUZlAxTmY0MEdCbWplSVp2NTlqeUtSaThMK0c3?=
+ =?utf-8?B?NEV5RjlQNlNKbWtRYXJhYVVUUVZNbDY4VjJVajNXdDBScDNaR3dhTWd4Vktq?=
+ =?utf-8?B?T1pBR2FXZEtoeWNpYnVzRjBsclM2K3hZZ2RveHl6MXc2czhyUVMrcVAwQXRj?=
+ =?utf-8?B?VHdDM2R0bWNjdzdMVDZaTEkxRlN6clBubnU5WEpCRE94czVaRWFsT2w5UjB0?=
+ =?utf-8?B?RVVSYUZpb2lKOGZvQWF5dHBCelJQN25ORm1DMVpoTGZLUytQVkVtSmMxZk1Y?=
+ =?utf-8?B?SHd0YzM1bEk4SVVsNWQ1OVJ1K2JhbnptbFAxazJWMkNIb0VYYVd1UklzUHVl?=
+ =?utf-8?B?bGk2TFowZ1hYWHAzWncycHFReWtRcTVBWExaRGhtb2RBbFJGK0ZvdmdmV3FT?=
+ =?utf-8?B?TTJvVCtGSnZiZG9vVERkcTlhZCs2b3d0WVBVQVBQNCtDOHROclM4SE00UnhR?=
+ =?utf-8?B?VFhBUkVqeHhCbkxMb3d0R3NReGd0WmlLbXpSejVvRFh1aXhzeVA0aU84dzIz?=
+ =?utf-8?B?ZkdzSkNmZFpZR0JXN3ZqUEttMnVjTnRHTzhhd2FlMU1qZjFYQWNJa3hoOGo0?=
+ =?utf-8?B?eXR0N2lGUFpwV2xiUCsxZFNGNG1KbXVjdTlBUzZQQ0FUdTFOUlVzT0txRGpk?=
+ =?utf-8?B?NWhxRklMTXVHS3diT2ZPTGN4RnNscU56aXZ4WU9zOVp3NWgzWVAzay9QbFRk?=
+ =?utf-8?B?TDhVb1FzQnY4NkE5V2ZtdlBSVmp2QWFsN0xiTE1vWUZsUmtNMXNabXNNN2hN?=
+ =?utf-8?B?aU1ZWTZhN1ZacUJCUkQyd2IvTytCTHZvTXFpMEZXQmxsNTVGbUVMMGFYR3hh?=
+ =?utf-8?B?WDZUaEt1ejdNQnFBbXZzWVp4ekNlZzZUUENOaFVQczVYdFNRNGRIWHNUTUhE?=
+ =?utf-8?B?KzhROVVkakU0R3JqQjQ5RERpMjAxWVlNdmhYYzZ0cTdNNTJFTzMyWk9XVmJr?=
+ =?utf-8?B?WS9NTEdxYkduUCtTTXJiUTR6ZXhyeWFCZXc4LzlPMWZVbk91ak54RyswdXV5?=
+ =?utf-8?B?eVljK3Jxbi9Jb0hjNlJVOUhuUjFxN3VoVkFVR3UyTmVQNk9EaFBraTBCK05o?=
+ =?utf-8?B?d2lhRDE4RGlOeCtxcU1XSTRjQWJsSlk4MjRLOVp5Y1hmQW9PZ2VOZVR4K3h6?=
+ =?utf-8?B?bExBSElVdFQveFhxa25FcldXd09WYldMMVBTTE1CN0M2aWJ5OSt1a1dWRk1Z?=
+ =?utf-8?B?OTBMZUtvRjh5MVJhUmZ2Q3B2UFh6aHBzMzNSc1UxOGVScVIvNlZLRitUa01E?=
+ =?utf-8?B?N3lYdzZtYXFLeGNoVHhXTVQrRERzTW04bUxqV0ZIRVdvdk9BL3d5V0YwcXlR?=
+ =?utf-8?Q?97vk2OP717J+MuF7Al+K?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30ce1516-4972-47f0-de33-08dcf2331dad
+X-MS-Exchange-CrossTenant-AuthSource: MA0P287MB2822.INDP287.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2024 00:47:33.6697
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PN2PPF99355ADDE
 
-On Tue, Oct 22, 2024 at 1:51=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 10/21/24 9:52 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Add two fields to print in the helper which here covers tcp_send_loss_p=
-robe().
-> >
-> > Link: https://lore.kernel.org/all/5632e043-bdba-4d75-bc7e-bf58014492fd@=
-redhat.com/
-> > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > Cc: Neal Cardwell <ncardwell@google.com>
-> > --
-> > v2
-> > Link:https://lore.kernel.org/all/CAL+tcoAr7RHhaZGV12wYDcPPPaubAqdxMCmy7=
-Jujtr8b3+bY=3Dw@mail.gmail.com/
-> > 1. use "" instead of NULL in tcp_send_loss_probe()
-> > ---
-> >  include/net/tcp.h     | 4 +++-
-> >  net/ipv4/tcp_output.c | 4 +---
-> >  2 files changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index 8b8d94bb1746..78158169e944 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -2433,12 +2433,14 @@ void tcp_plb_update_state_upon_rto(struct sock =
-*sk, struct tcp_plb_state *plb);
-> >  static inline void tcp_warn_once(const struct sock *sk, bool cond, con=
-st char *str)
-> >  {
-> >       WARN_ONCE(cond,
-> > -               "%sout:%u sacked:%u lost:%u retrans:%u tlp_high_seq:%u =
-sk_state:%u ca_state:%u advmss:%u mss_cache:%u pmtu:%u\n",
-> > +               "%scwn:%u out:%u sacked:%u lost:%u retrans:%u tlp_high_=
-seq:%u sk_state:%u ca_state:%u mss:%u advmss:%u mss_cache:%u pmtu:%u\n",
-> >                 str,
-> > +               tcp_snd_cwnd(tcp_sk(sk)),
-> >                 tcp_sk(sk)->packets_out, tcp_sk(sk)->sacked_out,
-> >                 tcp_sk(sk)->lost_out, tcp_sk(sk)->retrans_out,
-> >                 tcp_sk(sk)->tlp_high_seq, sk->sk_state,
-> >                 inet_csk(sk)->icsk_ca_state,
-> > +               tcp_current_mss((struct sock *)sk),
-> >                 tcp_sk(sk)->advmss, tcp_sk(sk)->mss_cache,
-> >                 inet_csk(sk)->icsk_pmtu_cookie);
-> >  }
-> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> > index 054244ce5117..36562b5fe290 100644
-> > --- a/net/ipv4/tcp_output.c
-> > +++ b/net/ipv4/tcp_output.c
-> > @@ -2954,9 +2954,7 @@ void tcp_send_loss_probe(struct sock *sk)
-> >       }
-> >       skb =3D skb_rb_last(&sk->tcp_rtx_queue);
-> >       if (unlikely(!skb)) {
-> > -             WARN_ONCE(tp->packets_out,
-> > -                       "invalid inflight: %u state %u cwnd %u mss %d\n=
-",
-> > -                       tp->packets_out, sk->sk_state, tcp_snd_cwnd(tp)=
-, mss);
-> > +             tcp_warn_once(sk, tp->packets_out, "");
->
-> you dropped the "invalid inflight: " string for context.
 
-Well, sorry, let me add it back.
+On 2024/10/21 18:36, Inochi Amaoto wrote:
+[......]
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> new file mode 100644
+> index 000000000000..83c67c061182
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> @@ -0,0 +1,132 @@
+[......]
+> +module_platform_driver(sophgo_dwmac_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Sophgo DWMAC platform driver");
 
->
-> >               smp_store_release(&inet_csk(sk)->icsk_pending, 0);
-> >               return;
-> >       }
->
-> Besides the nit:
-> Reviewed-by: David Ahern <dsahern@kernel.org>
+Missing MODULE_AUTHOR ......
 
-Thanks.
+
 
