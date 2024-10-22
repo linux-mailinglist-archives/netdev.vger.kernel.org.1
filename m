@@ -1,165 +1,189 @@
-Return-Path: <netdev+bounces-138016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F159AB807
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:54:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD499AB80F
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A525B22646
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:54:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1CA41F21FB0
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E40A1CC8BF;
-	Tue, 22 Oct 2024 20:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E16E1CCB39;
+	Tue, 22 Oct 2024 20:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8YON1NK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9UOO74p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBED126C05;
-	Tue, 22 Oct 2024 20:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6F7126C05;
+	Tue, 22 Oct 2024 20:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729630475; cv=none; b=uB3y0nx/dedqfkNgHRwHU8Dk4ihoU5H/t87oBC522dtx6HYnrB+0fpKrupNWN+p7GRV+fJGQnRwEJumDlM26uJMEXTEC7Pfr8OFhkHGbF9fWay89L7wt443czj3ZW3RdOU45Xbf0p8+c8UsmQUuX3U3BDA3XJ0eu5DNRGYzKzlQ=
+	t=1729630630; cv=none; b=oB7lLIMHAOMYEFs0LOnbYZozv49nkmMgw1mSOG1R9X/k8TTtdXB8XA63ajBZ1rvN/GNSl1/MeioeM4phJZWxYkEmESABYreehLEAmwIlNAAQcnTpupm9gKf/oJE+mHO13RBVswsq0lpFUfDNigAX8kfk3Hgq6VS9w6OhNsiW32Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729630475; c=relaxed/simple;
-	bh=l6GHfQgoq8Oc0vCDPJdkzBQlc70xqriIeqMYvHsXOHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=grMf89gqRBSQJEcG+iCbbICbLAUKcNLEXGsx/8yKKw5iiWa4RTVeEiphHWXqbCvqRsZ66+eBdLQ+Bbnlo+11zv1522WozWjT4nCDtAJtvL/MQP/hWsf/3RAyQ5mfv5mG98wzvq4JMLOYuvxyI8dqF5lkkC5Gx4FW2Fj3uBPpWIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l8YON1NK; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1729630630; c=relaxed/simple;
+	bh=Z7eCMTu/SeuW9q8xoa7TkU6mNr3MeA+Zi0ZPpXiT0io=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p1BCPywHV7IPDlNEFc8oYHmiLxCAhzQoxFyJpDKaIQhm3gW6kQYmVjXA0neBuT2p0hI9vM/9zud//6CXwn5D0bRBgtAfNDo4MY7T+AbhbGRbWfO3XLH6lgdyLxqOVQDIeZq1GO0ZsR/m1vWbBqEbEHkl3R0c7zWRoi8FMKAJp88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9UOO74p; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c8b557f91so61110805ad.2;
-        Tue, 22 Oct 2024 13:54:33 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6e59a9496f9so68965837b3.0;
+        Tue, 22 Oct 2024 13:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729630473; x=1730235273; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jTiwbCiry3kgT1d4J0cIU2GO8YwomJSZvPg0xKIsxQA=;
-        b=l8YON1NKqywJ6WJBpzIol56AscjU3UJkmnFnAsF/m4HHAPSu3+H129lFxzSR6O1wC0
-         9Z2NC1zVWCQcovDgYHTuwj/6/30xh/44TGuNNu75UuvDGhA6GywSJRMm9m26seG6U1dC
-         dw1XyZ/ADxa8QxmNX+8l68cufWLbKWz6bkiGm86K+hzqdO0YD79L2UCpY4FqdfeOsbWv
-         3Jkp0UPUX6hqn5Ojg4pqx5WPI94yiTKzNgEmvGCnGXnGqGExkWmgDq3+GLdbSMFg5HU3
-         2qr0UOy28OhDfBjSm8AmAvMUsN+J8KvKaTd+PauV5c8NOSknWNO5KONUMWnZv6iBJs72
-         n1Kg==
+        d=gmail.com; s=20230601; t=1729630628; x=1730235428; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=80QHgysMeY/f6ukz7QwpRl7TAlf0WHVhdn71+vzYCdU=;
+        b=k9UOO74pcMoEAcTxCc1EPAnOMBoZqOuwHEz1U2x7S5py5T1k1Kg1JsVS2nPabrFM6G
+         fDBeDlnoTtZNyzmhNYtCufGB8fgBf1ZhkTq9XWuC6yem1Qx7oBUhUQ3co7dtUg4/6PDT
+         WaCApAh9timZ106jLCKHSPBwKUBycaE+LbWa7WiX1mAUwj3OnQq+qMCGE6csi4oTXi+9
+         ehyiLirBnqc04pPwMRF6YW6Um0Fm680taiaQ398xRtBrN1SIy2uMS90zUses27+RJKOB
+         R7efJ8LRV/b8bG/R/V3rzGQXwCRZwJ9tPu0dyJZLyERV4mU4wzrJiUksa16spsHb6B06
+         LX4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729630473; x=1730235273;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jTiwbCiry3kgT1d4J0cIU2GO8YwomJSZvPg0xKIsxQA=;
-        b=bBHo/yj6e2dbOxMbhniMoD+zkhwGW1jyhy7l9BxJRnVHKnoLVV2wbxXOtPJMqr1Y1O
-         kH6cbtn08WxtyxWsjmy5pwdZmFN9lLJMhm7g7fQT3LpnnYCfZMaS5JITe9lddx5AKpT9
-         ofQbjCphwr4fiLF37X8M5Hy+AAkdR4/kJLrt8GXuxrT2jFWRsoTxMzp1XhIAXGq9ILCl
-         /8/ygJneo/sD9Avc3p4P8Epx9zaxiW9lyuBs88X+mVW5DfcTd0Bh9M1PmCHkv7nQ2+WX
-         +WGK9CmKgRdxkOzqYNu/2e2PfQzmAtnfbxdeKiUoO7s34X7CZHsPxwBe3bUWT38NnXO3
-         zIjA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTdv56w31Pz4/GFOIU7lLa1ZUQGDKWcvPzpPwN2784ZblCC6yWNHFzjBGZzDw48ja9giwXUxERobNrVT8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQt3NgeKZuWKT61bgLglW5h24JUj3ISTOzR5VknNL487LZUZyv
-	d+jzgA9UNMzct/SjDzfTdWVMddheVjhWZ5PsJbVD99X7pqCEXdiMDpr2FBYb
-X-Google-Smtp-Source: AGHT+IHk2LGyWlT6uWz8M7OK8YTuxaTcJ7VrJe63YuC6HMX7nCDN4autEdnW/oFCiHQyiN/Z8GdngA==
-X-Received: by 2002:a17:902:e851:b0:207:6ef:d983 with SMTP id d9443c01a7336-20fa9eb648fmr4592465ad.39.1729630473175;
-        Tue, 22 Oct 2024 13:54:33 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7ef13301sm46802095ad.118.2024.10.22.13.54.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 13:54:32 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rosen Penev <rosenp@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: fjes: use ethtool string helpers
-Date: Tue, 22 Oct 2024 13:54:31 -0700
-Message-ID: <20241022205431.511859-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        d=1e100.net; s=20230601; t=1729630628; x=1730235428;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=80QHgysMeY/f6ukz7QwpRl7TAlf0WHVhdn71+vzYCdU=;
+        b=RI60PUFDYwLkPnxCC40X8K66hW+x5hdsOXiXVHcj+VLU9J7FUPuJSHGbsTX4MEgL2t
+         nOWG+m93Jd2He906mns5yL3qfNtHjO5lpB325VvW2+26Zz6CREFXiL3RAdMOBPYn8zek
+         CquTX4BRWLAEm2IzXoaGucCgwCd7KN07OfDxl1oTaxuOWDD9Q/6SnWrlQt7OoJTpb5se
+         ryqWKe0i6NCiYB2WiJqm2Zb3lTU8DZh58tIC8y+zJpGApf0UyrpFhi3ImrWmmzoSw/dj
+         z1p0PwDntlVRwZQjMtfwRy84X8WgRtFjVaFl7+bbmtthPB63R2aL/94pwawDZmlKMRfo
+         bpcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmD6saTL903Dvqou58a4bQcJakJS0AzRRELjXKqeoWmfATtUCh2gYfV/OS0WJVwS/EidZU9TvGbdOxu7CF@vger.kernel.org, AJvYcCV4zfoh9WpNwKJrvnP+nJdhZ26TdglTo8euMVttEHLIVs+HWvk7V/dR9ucaEdBP1YdvyYI=@vger.kernel.org, AJvYcCVmwbRFzzkMSIxCIAEI6b7hCrggNEWNdblL4coFHRsooIwlY7oXjxo270n8koSVvHeOdltTsMy4OixvdE8t@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWq+zs1s827jTnsBq7AHHb2nekHpXh3KaPPcBmm9oewWpwe+sG
+	6E27vHiQr9I/uP6H0cuVoEm+0sqqhsHjyAPT96zTsZeXXjwMSV//G6cliDJ8GWvVnNuojPr2QTu
+	i4A9pgocwRPoxq6yYOU0FkFujnFpko72U
+X-Google-Smtp-Source: AGHT+IGiXrXinljDlaDVbafCVkh57A7ax5msziLAr4GotnEipHlk6LsDs9JIK3g82KoSJfY4uNtkjSERtDE4RxwvYSQ=
+X-Received: by 2002:a05:690c:c8c:b0:6e3:33af:6b64 with SMTP id
+ 00721157ae682-6e7f0defc01mr3962507b3.14.1729630627698; Tue, 22 Oct 2024
+ 13:57:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241022204908.511021-1-rosenp@gmail.com>
+In-Reply-To: <20241022204908.511021-1-rosenp@gmail.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Tue, 22 Oct 2024 13:56:56 -0700
+Message-ID: <CAKxU2N9nQFs_wDbe=S_ywfOFYeX+LWuN8f9y1y2iA5GV4tFDFg@mail.gmail.com>
+Subject: Re: [PATCH] net: mana: use ethtool string helpers
+To: netdev@vger.kernel.org
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Shradha Gupta <shradhagupta@linux.microsoft.com>, Simon Horman <horms@kernel.org>, 
+	Colin Ian King <colin.i.king@gmail.com>, Erni Sri Satya Vennela <ernis@linux.microsoft.com>, 
+	Ahmed Zaki <ahmed.zaki@intel.com>, 
+	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The latter is the preferred way to copy ethtool strings.
-
-Avoids manually incrementing the pointer.
-
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/fjes/fjes_ethtool.c | 50 +++++++++++----------------------
- 1 file changed, 17 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/net/fjes/fjes_ethtool.c b/drivers/net/fjes/fjes_ethtool.c
-index 19c99529566b..1dc7754e0f1f 100644
---- a/drivers/net/fjes/fjes_ethtool.c
-+++ b/drivers/net/fjes/fjes_ethtool.c
-@@ -92,42 +92,26 @@ static void fjes_get_strings(struct net_device *netdev,
- 
- 	switch (stringset) {
- 	case ETH_SS_STATS:
--		for (i = 0; i < ARRAY_SIZE(fjes_gstrings_stats); i++) {
--			memcpy(p, fjes_gstrings_stats[i].stat_string,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+		for (i = 0; i < ARRAY_SIZE(fjes_gstrings_stats); i++)
-+			ethtool_puts(&p, fjes_gstrings_stats[i].stat_string);
-+
- 		for (i = 0; i < hw->max_epid; i++) {
- 			if (i == hw->my_epid)
- 				continue;
--			sprintf(p, "ep%u_com_regist_buf_exec", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_com_unregist_buf_exec", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_send_intr_rx", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_send_intr_unshare", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_send_intr_zoneupdate", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_recv_intr_rx", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_recv_intr_unshare", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_recv_intr_stop", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_recv_intr_zoneupdate", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_tx_buffer_full", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_tx_dropped_not_shared", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_tx_dropped_ver_mismatch", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_tx_dropped_buf_size_mismatch", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "ep%u_tx_dropped_vlanid_mismatch", i);
--			p += ETH_GSTRING_LEN;
-+			ethtool_sprintf(&p, "ep%u_com_regist_buf_exec", i);
-+			ethtool_sprintf(&p, "ep%u_com_unregist_buf_exec", i);
-+			ethtool_sprintf(&p, "ep%u_send_intr_rx", i);
-+			ethtool_sprintf(&p, "ep%u_send_intr_unshare", i);
-+			ethtool_sprintf(&p, "ep%u_send_intr_zoneupdate", i);
-+			ethtool_sprintf(&p, "ep%u_recv_intr_rx", i);
-+			ethtool_sprintf(&p, "ep%u_recv_intr_unshare", i);
-+			ethtool_sprintf(&p, "ep%u_recv_intr_stop", i);
-+			ethtool_sprintf(&p, "ep%u_recv_intr_zoneupdate", i);
-+			ethtool_sprintf(&p, "ep%u_tx_buffer_full", i);
-+			ethtool_sprintf(&p, "ep%u_tx_dropped_not_shared", i);
-+			ethtool_sprintf(&p, "ep%u_tx_dropped_ver_mismatch", i);
-+			ethtool_sprintf(&p, "ep%u_tx_dropped_buf_size_mismatch", i);
-+			ethtool_sprintf(&p, "ep%u_tx_dropped_vlanid_mismatch", i);
- 		}
- 		break;
- 	}
--- 
-2.47.0
-
+On Tue, Oct 22, 2024 at 1:49=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wrot=
+e:
+>
+> The latter is the preferred way to copy ethtool strings.
+>
+> Avoids manually incrementing the data pointer.
+>
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+forgot to put net-next.
+> ---
+>  .../ethernet/microsoft/mana/mana_ethtool.c    | 55 ++++++-------------
+>  1 file changed, 18 insertions(+), 37 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers=
+/net/ethernet/microsoft/mana/mana_ethtool.c
+> index 349f11bf8e64..c419626073f5 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> @@ -91,53 +91,34 @@ static void mana_get_strings(struct net_device *ndev,=
+ u32 stringset, u8 *data)
+>  {
+>         struct mana_port_context *apc =3D netdev_priv(ndev);
+>         unsigned int num_queues =3D apc->num_queues;
+> -       u8 *p =3D data;
+>         int i;
+>
+>         if (stringset !=3D ETH_SS_STATS)
+>                 return;
+>
+> -       for (i =3D 0; i < ARRAY_SIZE(mana_eth_stats); i++) {
+> -               memcpy(p, mana_eth_stats[i].name, ETH_GSTRING_LEN);
+> -               p +=3D ETH_GSTRING_LEN;
+> -       }
+> +       for (i =3D 0; i < ARRAY_SIZE(mana_eth_stats); i++)
+> +               ethtool_puts(&data, mana_eth_stats[i].name);
+>
+>         for (i =3D 0; i < num_queues; i++) {
+> -               sprintf(p, "rx_%d_packets", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "rx_%d_bytes", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "rx_%d_xdp_drop", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "rx_%d_xdp_tx", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "rx_%d_xdp_redirect", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> +               ethtool_sprintf(&data, "rx_%d_packets", i);
+> +               ethtool_sprintf(&data, "rx_%d_bytes", i);
+> +               ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
+> +               ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
+> +               ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
+>         }
+>
+>         for (i =3D 0; i < num_queues; i++) {
+> -               sprintf(p, "tx_%d_packets", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_bytes", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_xdp_xmit", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_tso_packets", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_tso_bytes", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_tso_inner_packets", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_tso_inner_bytes", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_long_pkt_fmt", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_short_pkt_fmt", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_csum_partial", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> -               sprintf(p, "tx_%d_mana_map_err", i);
+> -               p +=3D ETH_GSTRING_LEN;
+> +               ethtool_sprintf(&data, "tx_%d_packets", i);
+> +               ethtool_sprintf(&data, "tx_%d_bytes", i);
+> +               ethtool_sprintf(&data, "tx_%d_xdp_xmit", i);
+> +               ethtool_sprintf(&data, "tx_%d_tso_packets", i);
+> +               ethtool_sprintf(&data, "tx_%d_tso_bytes", i);
+> +               ethtool_sprintf(&data, "tx_%d_tso_inner_packets", i);
+> +               ethtool_sprintf(&data, "tx_%d_tso_inner_bytes", i);
+> +               ethtool_sprintf(&data, "tx_%d_long_pkt_fmt", i);
+> +               ethtool_sprintf(&data, "tx_%d_short_pkt_fmt", i);
+> +               ethtool_sprintf(&data, "tx_%d_csum_partial", i);
+> +               ethtool_sprintf(&data, "tx_%d_mana_map_err", i);
+>         }
+>  }
+>
+> --
+> 2.47.0
+>
 
