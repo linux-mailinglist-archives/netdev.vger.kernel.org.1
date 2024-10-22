@@ -1,127 +1,126 @@
-Return-Path: <netdev+bounces-137822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C5879A9F1C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:49:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE229A9F2A
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B41281D49
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:48:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EFA01F22C28
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09FC5198A2F;
-	Tue, 22 Oct 2024 09:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE458199FC0;
+	Tue, 22 Oct 2024 09:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tv2dfv/G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0ccslYX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F34D22083
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578E41991C2
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729590536; cv=none; b=FBrB0bdDEkVmq0TeqIQ68VHkBlX0dnjDZlm1bCS0c38LrwCbPVnlJRJj7VMoidkRp02yiwihREm0iVye3HrktkUM/ZyCthHSuiBgDDsNsaPaS7NkCODJ8cZaJIcZ9fZa7erarWv6blNqLby4Z96+i2RWJdLoIIHYilZPT1o9gSo=
+	t=1729590596; cv=none; b=oTITtHMqiK8oEzDT/2nB6u/nYfvezSayzwXHiHZMiD/u7fyrwjiTBmUq+rrGW6XxxCUAHDKXpIzzRA1Wdm9kGiCkR6ay6MsIGP3ltgxFM3SkhosEFE+KiAGTeomndbUhNP/9o9KqFKB8R7LNjbnoXko/uEMQrNtYmRjSWT2HXJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729590536; c=relaxed/simple;
-	bh=np/oMiEleV3eiDfO38QHX5bBp+FCGGZ9axapg3vkJXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AL4ezv7N50IyStYQD6W4Se36ljHndvYReDIfmplGRFHc+NVEJqeC0FhgnISzaRjdu0CXhVEAJXL8zQDtb24Cz6jDG/AY8AB6O31fmUHe0cdA7dQq7nksI96KbOP46QzSJtBA2Mn2t6/3lwWYy2m95eQzCeMJmdz5AESjKj+fJMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tv2dfv/G; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1729590596; c=relaxed/simple;
+	bh=FHDMCQSj4bOSnFGm64uWhd8NfaqRwIffME40ECj3VBk=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Q9xaeFgeuFdHswSJAM2wZD4+LzkSYue7Hgr/xhTj4gUUPfBatc6jZS3JNLqDkO+JWxwIBl2eI1bgX8nru6SWHDGOm42RHQaxdVXFUt+3we2QLY0vBN5+zeN+IdgPlmVCL02e4XKrR+sy2vnWg+s10eDzPgdAYwQHYWNxMxJkJXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c0ccslYX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729590534;
+	s=mimecast20190719; t=1729590594;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Dh4JWQgDCy7f4hUaCVPSilGsVTg/1tlAM2ttQqHSmuQ=;
-	b=Tv2dfv/GnTJcC8bM/fxhr4bvHqVDZiqqke5t79IQuIrABnw8PEOdzbvJmIrOlhRoo64JB0
-	xD1kNjYkR0dOcESc56GLrEK1BTTNNJN73JmnoLKIsR0Jc86GOkwg/2CSsXU3WJU2GKJViN
-	oIn4bI/5ujTnSP024rnf/j41kgz3hvs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=FHDMCQSj4bOSnFGm64uWhd8NfaqRwIffME40ECj3VBk=;
+	b=c0ccslYXT1Jvr5bfvIpZnLGgoYJXQt8jyPMqYh/lOVn9mdHEp9iAR0diAnVPYqR+TNq+Nf
+	XyAhSrHk5BMwI9Mbkt0NMHTZyo/dX5j4AFfFM+L8igqIm2LwM3BR+iL9weRObJ4/05/Xi1
+	a5MwUBsH6c0QpY1qHdlhnYY4tPy+4Js=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-599-EbrKQD5gOESvh5E9Su9X1g-1; Tue, 22 Oct 2024 05:48:53 -0400
-X-MC-Unique: EbrKQD5gOESvh5E9Su9X1g-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d531a19a9so2721900f8f.1
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:48:52 -0700 (PDT)
+ us-mta-304-J8-EEBbXOnynvIYd4QbA7w-1; Tue, 22 Oct 2024 05:49:53 -0400
+X-MC-Unique: J8-EEBbXOnynvIYd4QbA7w-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d533a484aso3144250f8f.0
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:49:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729590532; x=1730195332;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dh4JWQgDCy7f4hUaCVPSilGsVTg/1tlAM2ttQqHSmuQ=;
-        b=hm88xU75IW6Hh01H+Vfrw67GynQ5Ry0qEJGqlllKM1IDpHyjxL9GumxeEhvKxxoYyb
-         w+4ybV/9Wldq0zW0S7CfyDWnsguVavgiUC0MWViI4HlTU9ycGqgmenIQBw1TpBB6RJKg
-         OZi3YIby9OURKizLu7/ktqe7bRnLjCaJRR1H5vjiu8ijjK1g/HMVBMOazuV1ypXEm8kG
-         3e3XSoiYyYaT0q6QVTorgQyb+jBUdBL4P4/VKovsQA1ae+mh64atxnSZo+JV/nzKZNVZ
-         ZoHFen77Da3y57srOqk6z920QeXdfHJX0h2iAx06AEqRZg1ucsGlYj6v1hJCZEy43sNO
-         Bnkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWXopAahpquV5b+9c2mJu+73P6xWZUVRlxnZO16tyLPJXAdrzwJCDaW6JzrB+2qJW60TwbAZPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBmzhTPOMdKbM+9KCo0TZCfEOue9MjZQ8Oei6RPCs4fRfaC+y4
-	Xlbb9cu8g90QFnCf3ef6B01XOIbLgHTlcfY4cHCeWgvLUMc19V/F2kQxZHBzZRtRhiqVuR5j5MI
-	y2pUWpAOQEwnYtS9vTOCkov18N7xV5tuV3/HunllEp/6lJb1B4o1Gig==
-X-Received: by 2002:a05:6000:124d:b0:37d:43e5:a013 with SMTP id ffacd0b85a97d-37ef21329e6mr1350922f8f.8.1729590531682;
-        Tue, 22 Oct 2024 02:48:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG4nJbgsS+oolp7+z293Shdqn+zOCHUUqXKuuAQbREypUB/3N+OmB5ozWRS+gZFiWSQ67Qcsg==
-X-Received: by 2002:a05:6000:124d:b0:37d:43e5:a013 with SMTP id ffacd0b85a97d-37ef21329e6mr1350911f8f.8.1729590531351;
-        Tue, 22 Oct 2024 02:48:51 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a4b26dsm6243789f8f.45.2024.10.22.02.48.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 02:48:50 -0700 (PDT)
-Message-ID: <278ca1d0-2a21-49a1-87b5-34b0f03bb9d3@redhat.com>
-Date: Tue, 22 Oct 2024 11:48:44 +0200
+        d=1e100.net; s=20230601; t=1729590592; x=1730195392;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FHDMCQSj4bOSnFGm64uWhd8NfaqRwIffME40ECj3VBk=;
+        b=RBxwdOHjeP5PnHLk/D/J9OXEEqb0z5dRtI864KOoMJA6wBeG1wtH4KlicxqjiKquBt
+         TfKEsrPihjlSq5mM/9yPLpyWPixiLdjURm2TzyTNi1yyP/e9bks2HkO9I2QAT1E6dpYj
+         f4nnpwfQjRNPcZBtF/pwzrPxZvzx/yb3fvV3Jl7BAXp8dTgK/sB2MIl9TOHiNMVGhAqD
+         LkWG1qNGrjaLPz5DqiIFlo6laHmJrlR0lRSOT+6b7Hh1oDbJ2kVTfInJNDjxLzq9FYtQ
+         A/G33Xtr0FJomLkGcaOVgaftq6uFzmfcqwAfT6nivTWnXs60XmxSlzzd1H2UV+1NweQD
+         hZZw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTSi0WsG/rh/SPOFCxYnqKnq6NN5ZHdkenhFecT/tZxioKHkMoTQCQyGFja/NPPjbLAOxpHhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTbDd6bcdQZzTfY8hnq/BhhG2zk6BLkK1uj3Kqdu/CjLPAGO8c
+	rsnVwpiC7iVZclOIEYY7BhW2ZPl6to6rmwVG3pVvVhznGXgBkg657IFkRwwzz61/wDjSMWQhVE0
+	y9Or63v9nlLXd0N2lfdiYD40AT2ZzvamWGRWrcLFGj2WxZP1iN5CGNA==
+X-Received: by 2002:adf:b186:0:b0:376:dbb5:10c2 with SMTP id ffacd0b85a97d-37ef13cd752mr1751560f8f.29.1729590592130;
+        Tue, 22 Oct 2024 02:49:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIEHKao3U/XFI7bzq9Kj6t6RyZxy0cnLw5nrYDT+Cbr6tQg8AZS6TySYFQBcdNzKRVWndUxQ==
+X-Received: by 2002:adf:b186:0:b0:376:dbb5:10c2 with SMTP id ffacd0b85a97d-37ef13cd752mr1751544f8f.29.1729590591777;
+        Tue, 22 Oct 2024 02:49:51 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9bcc8sm6205364f8f.107.2024.10.22.02.49.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2024 02:49:51 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 84B08160B2CF; Tue, 22 Oct 2024 11:49:50 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Puranjay Mohan <puranjay@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexei Starovoitov <ast@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>,
+ bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, "David S.
+ Miller" <davem@davemloft.net>, Eduard Zingerman <eddyz87@gmail.com>, Eric
+ Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, Helge Deller
+ <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>,
+ Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, Palmer Dabbelt
+ <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Puranjay Mohan <puranjay12@gmail.com>,
+ Puranjay Mohan <puranjay@kernel.org>, Shuah Khan <shuah@kernel.org>, Song
+ Liu <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song
+ <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next 1/5] net: checksum: move from32to16() to
+ generic header
+In-Reply-To: <20241021122112.101513-2-puranjay@kernel.org>
+References: <20241021122112.101513-1-puranjay@kernel.org>
+ <20241021122112.101513-2-puranjay@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 22 Oct 2024 11:49:50 +0200
+Message-ID: <877ca0ii0x.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 12/12] selftests: ncdevmem: Add automated test
-To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- Mina Almasry <almasrymina@google.com>
-References: <20241016203422.1071021-1-sdf@fomichev.me>
- <20241016203422.1071021-13-sdf@fomichev.me>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241016203422.1071021-13-sdf@fomichev.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 10/16/24 22:34, Stanislav Fomichev wrote:
-> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-> index 182348f4bd40..1c6a77480923 100644
-> --- a/tools/testing/selftests/drivers/net/hw/Makefile
-> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
-> @@ -3,6 +3,7 @@
->  TEST_PROGS = \
->  	csum.py \
->  	devlink_port_split.py \
-> +	devmem.py \
->  	ethtool.sh \
->  	ethtool_extended_state.sh \
->  	ethtool_mm.sh \
-> diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
-> new file mode 100755
-> index 000000000000..29085591616b
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-> @@ -0,0 +1,46 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import errno
+Puranjay Mohan <puranjay@kernel.org> writes:
 
-Possibly unneeded import?
+> from32to16() is used by lib/checksum.c and also by
+> arch/parisc/lib/checksum.c. The next patch will use it in the
+> bpf_csum_diff helper.
+>
+> Move from32to16() to the include/net/checksum.h as csum_from32to16() and
+> remove other implementations.
+>
+> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
 
-Thanks,
-
-Paolo
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
 
