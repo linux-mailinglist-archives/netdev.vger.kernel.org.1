@@ -1,175 +1,134 @@
-Return-Path: <netdev+bounces-137690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920479A9539
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:02:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FBE9A955F
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 03:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86A8C2839A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:02:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 571D3B212C2
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 01:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBAA332C8B;
-	Tue, 22 Oct 2024 01:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C8C84D0D;
+	Tue, 22 Oct 2024 01:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="nxhCEaAB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HgCOkLf+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C22A927;
-	Tue, 22 Oct 2024 01:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3893326281;
+	Tue, 22 Oct 2024 01:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729558940; cv=none; b=RxY0oaF407713pJm2HrjflqihXDU2Yj6QuhB0lPefrrrK+dp7NZMTGsTRrV3Jzj/e3vyrWV77n9ANzwaOK2CUXFuTyPpR9xfMU505c0lLAio55of3nMUO+PJSkbmRZvhQ35RybgbkaCRVFfuBPt6q/G90M0SkNuMkl7vRRj7yxQ=
+	t=1729559945; cv=none; b=GUlzbvCPh5BP6AJAOjjHtgM8F87ydgGI2be109B/Xx2pSMePQlqlNBr/kOZ8V3rLYBqKDR+BOefxJfozh2tdrcUCWG/g49+GfQdmqMRrVx8y+xDl65TKOApEnUpJLIHmgr/dvlkZMjesD/wdJH2X4htMMBrQy9MeiKk/y2P0gcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729558940; c=relaxed/simple;
-	bh=+uPsrAOcChIVguTREmIEfgaYRyyry6uMqgm7mCev93s=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=pSLdC8ids9PwiV+Ap3hSJKRxnkOIcKD19yqSQHR7/wU/YhgC/SBooRuj1oKFRTqYNOm6Ky6c0MJMq9k40PC2C0RII95Bu4h6yGJKl7uDf1yAcYjtODNJsUBsDVuB2lPPBx5+AdQAr0LTtGJxPDj54AQynjtuQN1GHNE26zw/B0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=nxhCEaAB; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1729558932;
-	bh=GZItvcYPlsFji1zxIwCTQdK4eNnugj/oYP/4HDVcadM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=nxhCEaABmJP5emfqXYqoWu7OmBRiPfZkpLDd06HaxY6259rLV9RCouXYiaCMiuSL/
-	 USSbWULhzFwq60XQNENm7rtXOMoIWze8EQFy+3/uIRabbozoXiUEXkGJt71Lv97Ke3
-	 UMV1WsmamA4ysI1W3fhq3rr8hlrhX2GPcjp9XzSct6kUd8AN1MAuLgZVYwtIzJl8HS
-	 0hAAU7g1hsSkvYmL7Lu1U2vFal7cMtlJAJKKNZeHgPDFuDMlGnTI2qh+cVwBrMj153
-	 0gD7JShRwB8PqQCAgjILCrIEzl2Q1E+iaSS8q+SInCgYnsUao8UIqEaCChh0r3WTJb
-	 0ABr3lnQ2+b3w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XXYmg2LSWz4wb7;
-	Tue, 22 Oct 2024 12:02:10 +1100 (AEDT)
-Date: Tue, 22 Oct 2024 12:02:11 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf
- <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>
-Cc: "Alexis =?UTF-8?B?TG90aG9yw6k=?= (eBPF Foundation)"
- <alexis.lothore@bootlin.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>,
- Simon Sundberg <simon.sundberg@kau.se>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4?=
- =?UTF-8?B?cmdlbnNlbg==?= <toke@redhat.com>
-Subject: linux-next: manual merge of the bpf-next tree with Linus' tree
-Message-ID: <20241022120211.2a5d41ed@canb.auug.org.au>
+	s=arc-20240116; t=1729559945; c=relaxed/simple;
+	bh=yEDPlRP4Zj2HkaRjjpu9urRnnUFC3BzEpEjII9ko2Y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bEJKwIi0+n2C5l16QQSG1eTlZfdGr8FAq6yuzmHB7VeLrxVqahK7kHDFrO+Y5Bxd/CJ4e1utxT+jrutnlaJkLmjSUw/3PVkk+qzru/vLeK3f7aAq+dxvS0WBgdEKojYAyAluiUZ+7PjVRoKMgoRMdUwa8lU1fMQ7LPUqzjSzooY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HgCOkLf+; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20cceb8d8b4so28817135ad.1;
+        Mon, 21 Oct 2024 18:19:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729559943; x=1730164743; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Udq7Pu1p+Owher5kcrl4GtXAZn/1l1iX1dmy+iMLMoM=;
+        b=HgCOkLf+wAarOjxWUE3NsBM57mfFZXBMDFmmS7RUqEmgblRLmUSdWRVs2a3bMM7eOI
+         HnCPFYZg9Bah1bYMxQ5ch3eQb20rE4bDnkNJMl4xu4JbO2qQPW/duVcIHMF5OnmdsPm9
+         bQhZTqkuVej3nYNgTMUIarbR/oTYMWmJht0sdOH8w+A8k6XxeWXuNv9aY00c4L0Xu3m/
+         zMrEz19PkABhBvQyjx1Rb0xHyL6iU4UQU4hb+V7wRTdljNMfLonWzz+uHKP0L33xLeUR
+         7liWitIML0pRBCzPHUGKF6B/IqIg15IpXuxe9bbT7SZkRzEZGXhynq91YjlOv7sU9WCp
+         8TWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729559943; x=1730164743;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Udq7Pu1p+Owher5kcrl4GtXAZn/1l1iX1dmy+iMLMoM=;
+        b=rGERJPQYkt8rvtDN/swlsCjnFRllcaEwYy+WxvYUnHqrLB8rPM4UujLkxrlZEULp5A
+         qHFmvIW8Z2RkJU3SnJGd3eMm2/bLdPSnwmxBccXTfBGhBHRrExTsFMADbfTsfqzSDHue
+         svaY8XMgngP2mAj2nXw8dX/JsdBM0cqSTgtb3YgWwzWqcOWLzkc7oVVLEGPPFA/m60iN
+         t3NHCglgdwPd9W3ATM80AHrsGgPFp6R4i6RhmDmVjpHGKUNydKsnVixYC6+9TE7lM4JD
+         rypB64R5d7ezlWkYpoKdRKhCxlBhcr4x/d9VjMiyJ1/zwMiGHnN2OST1dPkIpK4aKmnk
+         s3MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxxIBOYqqp1EDGbL3PrAfGH3UyKBiNNCd6Rpw3MVY/6nu9m8+BtUtIShn0tvvZN7n8MX50WmNKR6dFc60=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw/EfXmXF/rId7nt2uwrLpa3OoB7oBdEmnNpbRaVlLFTGAKK1/
+	0G2sda50JCqlZ7uyoeBl1vNTecINHfl2FCOhav090W2LSSiWumGy
+X-Google-Smtp-Source: AGHT+IGvblNQVsQOPVgmT1x2wm7zqYjNUuoqztt7cfO8OQ+0Fg+y5/stRxfdy1AblmI2Ld1bmpRAfQ==
+X-Received: by 2002:a17:902:d2d1:b0:205:5d71:561e with SMTP id d9443c01a7336-20e970d57e0mr22078415ad.26.1729559943396;
+        Mon, 21 Oct 2024 18:19:03 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f12ea2csm32077375ad.62.2024.10.21.18.18.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 18:19:02 -0700 (PDT)
+Date: Tue, 22 Oct 2024 01:18:56 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: add ns target multicast address to slave
+ device
+Message-ID: <Zxb9gD7bc9v4OPE1@fedora>
+References: <20241021083052.2865-1-liuhangbin@gmail.com>
+ <58777.1729526711@vermin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/zSLe_0kB=.oReJxYbu9mSw0";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <58777.1729526711@vermin>
 
---Sig_/zSLe_0kB=.oReJxYbu9mSw0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 21, 2024 at 06:05:11PM +0200, Jay Vosburgh wrote:
+> Hangbin Liu <liuhangbin@gmail.com> wrote:
+> 
+> >Commit 4598380f9c54 ("bonding: fix ns validation on backup slaves")
+> >tried to resolve the issue where backup slaves couldn't be brought up when
+> >receiving IPv6 Neighbor Solicitation (NS) messages. However, this fix only
+> >worked for drivers that receive all multicast messages, such as the veth
+> >interface.
+> >
+> >For standard drivers, the NS multicast message is silently dropped because
+> >the slave device is not a member of the NS target multicast group.
+> >
+> >To address this, we need to make the slave device join the NS target
+> >multicast group, ensuring it can receive these IPv6 NS messages to validate
+> >the slave’s status properly.
+> >
+> >Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> 
+> 	This seems fairly involved; would it be simpler to have
+> bond_hw_addr_swap() and/or bond_change_active_slave() insure that the
+> MAC multicast list is configured in the backup interface if arp_validate
+> is set appropriately and there's a NS target configured?  That will make
+> the MAC multicast list more inclusive than necessary, but I think the
+> implementation will be much less involved.
 
-Hi all,
+You are right. Limit the mcast list only on backup salve would be less
+involved.
 
-Today's linux-next merge of the bpf-next tree got a conflict in:
+So I will do:
 
-  tools/testing/selftests/bpf/Makefile
+1. Add mcast list to all backup salves when setting NS targets.
+2. Add mcast to new backup slave, remove the list on new active slave on
+   bond_hw_addr_swap()
+3. Remove all mcast list when release slave
+4. All the changed need to be with arp_validate and NS targets configured.
 
-between commit:
-
-  f91b256644ea ("selftests/bpf: Add test for kfunc module order")
-
-from Linus' tree and commit:
-
-  c3566ee6c66c ("selftests/bpf: remove test_tcp_check_syncookie")
-
-from the bpf-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/bpf/Makefile
-index 75016962f795,6d15355f1e62..000000000000
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@@ -154,11 -153,9 +153,10 @@@ TEST_PROGS_EXTENDED :=3D with_addr.sh=20
- =20
-  # Compile but not part of 'make run_tests'
-  TEST_GEN_PROGS_EXTENDED =3D \
-- 	flow_dissector_load test_flow_dissector test_tcp_check_syncookie_user \
-- 	test_lirc_mode2_user xdping test_cpp runqslower bench bpf_testmod.ko \
-- 	xskxceiver xdp_redirect_multi xdp_synproxy veristat xdp_hw_metadata \
-- 	xdp_features bpf_test_no_cfi.ko bpf_test_modorder_x.ko \
-- 	bpf_test_modorder_y.ko
-+ 	flow_dissector_load test_flow_dissector	test_lirc_mode2_user xdping \
-+ 	test_cpp runqslower bench bpf_testmod.ko xskxceiver xdp_redirect_multi \
- -	xdp_synproxy veristat xdp_hw_metadata xdp_features bpf_test_no_cfi.ko
-++	xdp_synproxy veristat xdp_hw_metadata xdp_features bpf_test_no_cfi.ko \
-++	bpf_test_modorder_x.ko bpf_test_modorder_y.ko
- =20
-  TEST_GEN_FILES +=3D liburandom_read.so urandom_read sign-file uprobe_multi
- =20
-@@@ -301,22 -302,11 +303,24 @@@ $(OUTPUT)/bpf_testmod.ko: $(VMLINUX_BTF
-  $(OUTPUT)/bpf_test_no_cfi.ko: $(VMLINUX_BTF) $(RESOLVE_BTFIDS) $(wildcard=
- bpf_test_no_cfi/Makefile bpf_test_no_cfi/*.[ch])
-  	$(call msg,MOD,,$@)
-  	$(Q)$(RM) bpf_test_no_cfi/bpf_test_no_cfi.ko # force re-compilation
-- 	$(Q)$(MAKE) $(submake_extras) RESOLVE_BTFIDS=3D$(RESOLVE_BTFIDS) -C bpf_=
-test_no_cfi
-+ 	$(Q)$(MAKE) $(submake_extras) -C bpf_test_no_cfi \
-+ 		RESOLVE_BTFIDS=3D$(RESOLVE_BTFIDS)	 \
-+ 		EXTRA_CFLAGS=3D'' EXTRA_LDFLAGS=3D''
-  	$(Q)cp bpf_test_no_cfi/bpf_test_no_cfi.ko $@
- =20
- +$(OUTPUT)/bpf_test_modorder_x.ko: $(VMLINUX_BTF) $(RESOLVE_BTFIDS) $(wild=
-card bpf_test_modorder_x/Makefile bpf_test_modorder_x/*.[ch])
- +	$(call msg,MOD,,$@)
- +	$(Q)$(RM) bpf_test_modorder_x/bpf_test_modorder_x.ko # force re-compilat=
-ion
- +	$(Q)$(MAKE) $(submake_extras) RESOLVE_BTFIDS=3D$(RESOLVE_BTFIDS) -C bpf_=
-test_modorder_x
- +	$(Q)cp bpf_test_modorder_x/bpf_test_modorder_x.ko $@
- +
- +$(OUTPUT)/bpf_test_modorder_y.ko: $(VMLINUX_BTF) $(RESOLVE_BTFIDS) $(wild=
-card bpf_test_modorder_y/Makefile bpf_test_modorder_y/*.[ch])
- +	$(call msg,MOD,,$@)
- +	$(Q)$(RM) bpf_test_modorder_y/bpf_test_modorder_y.ko # force re-compilat=
-ion
- +	$(Q)$(MAKE) $(submake_extras) RESOLVE_BTFIDS=3D$(RESOLVE_BTFIDS) -C bpf_=
-test_modorder_y
- +	$(Q)cp bpf_test_modorder_y/bpf_test_modorder_y.ko $@
- +
- +
-  DEFAULT_BPFTOOL :=3D $(HOST_SCRATCH_DIR)/sbin/bpftool
-  ifneq ($(CROSS_COMPILE),)
-  CROSS_BPFTOOL :=3D $(SCRATCH_DIR)/sbin/bpftool
-
---Sig_/zSLe_0kB=.oReJxYbu9mSw0
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcW+ZMACgkQAVBC80lX
-0GzFlQf+OxGNSa17pOr41tHcb3O5LScGrLIKKn0lkzNHEp8x6fOIgzPIgN9VvWoS
-JXe4xtAjJYD8hHco4Dsx4au7uEG+a0Q8GqjJ++IZu0fdWC9b8tcijGk0Ro63U/XA
-w84nY+l8CsNNHtqWvgOsmtpCRM2D0YS18zvREyYILndlsHDbUTw8ck5F8HCa/z9e
-4t3ba7U999V2RyDqYv3DOo0mLZ1fweU7kn1LgE67N6IIGIbaxoHNoUQA5U+3UqFZ
-DUUKtcHbqjtCh3VPrqCvvXUDQkpErgX3nED1NzWVQOESqOInqM4Cd9YnWpWfV0W5
-YQx3+kt5tzUlvgYd7C9csDeHC+wNfQ==
-=Apvx
------END PGP SIGNATURE-----
-
---Sig_/zSLe_0kB=.oReJxYbu9mSw0--
+Thanks
+Hangbin
 
