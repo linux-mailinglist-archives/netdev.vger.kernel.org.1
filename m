@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-137771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B2C9A9B6E
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:47:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3649A9B71
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:49:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C7DD283847
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:47:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8736B20D98
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 07:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7C7147C96;
-	Tue, 22 Oct 2024 07:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1148C146D68;
+	Tue, 22 Oct 2024 07:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XBOzerfe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CUGe7Z1+"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F6536124
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 07:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBD836124
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 07:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729583245; cv=none; b=gB3hF6JptcWlEKkTSWXVV3/J6Alm+nQCf74CIipGfYE9K5q8Vn8hP5fzmN2x8dvYztFcmYwR0vKZX42cJqTCBSvGo3Q9fxaS2bVzvi2wuaW5pgD7cnFfMCi8MiHyPfVfKG/ahzSu2l9m3FCyaJuoGNK+Kndd9PhKl9hBKfdnhKU=
+	t=1729583341; cv=none; b=V/Du4xAyVPbwssHYAeA5Zx9W75j75OTgQvD81jPZO13m7UlWO+zUoSRCHq+tAG5wdKjWTUv7DpjuPrNYFqVATGKplPI+s81MG0DlF9GqjaayWBsE2gkZmKmC44I7tGDYoSpMjk5b9rCZdLIeWIqLxzEDWGDNRMQSm3h0O7JgK0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729583245; c=relaxed/simple;
-	bh=OVRJxv9x90A9DJ03++ep8+DddHsSsCDKbvaSIuXn/iw=;
+	s=arc-20240116; t=1729583341; c=relaxed/simple;
+	bh=z0TFOz8qnWQgiFjOHpeyHIhiXC3wimd3qkk292JZeyk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fqYRxsI15c23FHrGSSHt5Ae9ggdExZ8NKiCCrIkTWO1agQVKrjaYrgiBj+CqT6irjgJ9xnDed0iiVqOeIbKN7bgwEiz9CMr+V+nDF9YRw88TFeWQJF8fd9Z6lO23t/MtKpXYSsGO92FinV7uVLrydajhv+y6CUdDCVxFvH0/Alw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XBOzerfe; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=QYmrAVN1hHIaFooiBrdqb/bQPserY91QhoyqnISwDAPH00K16liLL6DSvXUhCA6wi9ZYOJl0W/LG7WWdhgrysUK7d13m4R2ZrgvaV0D5gpwTFRlGs4K8cUnZt6QwnNszmk+9gmVdyZ2BFDfWCMbjmIZXjEUwpC2OJ+yyXvST2hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CUGe7Z1+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729583242;
+	s=mimecast20190719; t=1729583338;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OegxXw1Vw+pKDNjPxCG8pY0AoURUBOt/R207Qvp4Efw=;
-	b=XBOzerfemPIwgCEQeZorMWZqEKn3wbLvDSyeiM2nSLz01ftX778gHwyieZqmHw7gbFyll4
-	Nka70ossWzEE3ROso/LlnZ4QHJS8NVSnZyNDDbBQjhuiKynaPX2RQVv0IqZI/R3Fn+dwzZ
-	1HdTbPIlXuqjSk8dB1GuVP8c9/ftmn0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ftccds8EH7SC5Jyy8+I+ZK7tzNnlLXQBxvCZJjQtOYQ=;
+	b=CUGe7Z1+6XbLy/V4imE+cNy5rjxWLhsjU+1bqrHOXx5YAq0kPvab+S95tgTCIRtpQQFk3P
+	JlAMZTC03m0D/+utN6ulrRztilmSZRYPyQ7DmDWxFAsQAVou15osQFCXW67wMENymqgojc
+	56t+oFfo16vbGWnFqdjJRHmJ+bLkIFQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-mrhJwNyKOZKKOKyZcOQrCQ-1; Tue, 22 Oct 2024 03:47:20 -0400
-X-MC-Unique: mrhJwNyKOZKKOKyZcOQrCQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-431673032e6so24793985e9.0
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 00:47:20 -0700 (PDT)
+ us-mta-412-gku4UL90NO-u6UzZrZmRhg-1; Tue, 22 Oct 2024 03:48:56 -0400
+X-MC-Unique: gku4UL90NO-u6UzZrZmRhg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43157e3521dso38391465e9.1
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 00:48:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729583239; x=1730188039;
+        d=1e100.net; s=20230601; t=1729583335; x=1730188135;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OegxXw1Vw+pKDNjPxCG8pY0AoURUBOt/R207Qvp4Efw=;
-        b=D5MHQM93SIy4bSkdbenBakFREXNNzIdxlhZowqM1V3Np1++q6h3x7J6bkPm5PsUoJI
-         02mGFBXc7fmZdyjk0/vFs3s+Hp7GmWB+FSlATdIlrMTU2KqRj+TxgwP0eaOtjdVZBIdN
-         UEcMVo6LZlA4/yZl5kSHAlde/gvwc8U5OSiQI/nA3dkMk685zPOR3BB1VpGqY1l2LuwV
-         HF6oAFvXKx4eq72n8LJkySSwI8h/iP0lcuy6VAPuHIoC4ov9jqZjFI4Qjd6P5/x5Gq7c
-         keHIyhmsnsNuiLKhf2ePYZ1yG0uuZ/UTwVGSQUtSDIF4EwuWn9IstJMgsUDhdZKwstk4
-         0STg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5HfiSHTV3o9UirqIdSJgv5VMUa0MB102+di6pSyeGfFmnY+rZUIuSdukG3MDSZDP/ZJzhsEM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YximmlkREH74QWz1dTewC4mbAteKCZn2XepOz8ct/ikFEGVVXKN
-	CCDSbEatRaydLsSb+M2lB0F5Yewcr47i/eLjMR9zPjByXAvWgkmyGVxb3koMhRK+ii6W8mPRM1E
-	VMY3CV9NDR3xiv97LkQ11QFdrx+d93myJfyarDbdADKKh3MZAz/otnA==
-X-Received: by 2002:a05:600c:1e16:b0:42c:ba83:3f01 with SMTP id 5b1f17b1804b1-4317b8df1f6mr21182235e9.8.1729583239498;
-        Tue, 22 Oct 2024 00:47:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHXTXlisHjpV11RLP2z4bI0q7tAfIEYGag76YGytSTvWWKiZMTHumdO1S9rlWOXaO0I0LI7Uw==
-X-Received: by 2002:a05:600c:1e16:b0:42c:ba83:3f01 with SMTP id 5b1f17b1804b1-4317b8df1f6mr21182085e9.8.1729583239124;
-        Tue, 22 Oct 2024 00:47:19 -0700 (PDT)
+        bh=ftccds8EH7SC5Jyy8+I+ZK7tzNnlLXQBxvCZJjQtOYQ=;
+        b=vo181q026aYJ4P0zU6XDzG6OTVtPEY57uQ9faqKAPC6BIlFrdmmsG6vhZj1GmIfS5Z
+         ikhD6aoUhFM6AdIXKF+5N3JIMFmfswzpmWFmfiqD13lX8iOdmQY/WIrDSYeOFyxyDEXf
+         rtl/xEIzTzNu9+8uXXWBcuu1cxGlgyoHGS7TTxdsI8VOd5EPAHzz7hbxWT0r6qYkUeWk
+         uP/XU5Vy+CZ/uHktcWe8w5Of20TV6Ww3iWxwbr2oKebeF0JPYppcg8G6SxG47fXYivaE
+         OKwjf5IlIWrF/EmFUZZn0Nc6fEFy3xkpekIoEluU5mAsGYY89glQndyYEWVB7bXmeTfO
+         BeFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWC5Xg216j51yDC53TUjmKws3yZG6jHJCEQ5V713q3NveXfNxjrGF2eFepv37MhKIQXeP91hJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6nwm3/6YDgMfQSnmCXll/tQq1ZoIaPGO+ue85I00hvs4w7wZY
+	oW8pYZa5se/afeR/UrJmoKfAGMs4jXOq1x+IAoRVMK+qRT/mHgOlLkWSgObwCcqTDaoZwL7le7I
+	wwPS5QTHW7zNgaNuBpAHLVGCWxjA0P1Hx9xsQYkVKWKJ8epJ4oHX36w==
+X-Received: by 2002:a05:600c:354e:b0:42b:a7c7:5667 with SMTP id 5b1f17b1804b1-431616a3a15mr110087715e9.25.1729583335321;
+        Tue, 22 Oct 2024 00:48:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHuqlrJZe3z1cluxDCBu1kG7921j0DmfinfCppBqVQKzt/5Bfu3Vfr+sP95jBZDLtg0j2Ax7w==
+X-Received: by 2002:a05:600c:354e:b0:42b:a7c7:5667 with SMTP id 5b1f17b1804b1-431616a3a15mr110087415e9.25.1729583334818;
+        Tue, 22 Oct 2024 00:48:54 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f5cc4dfsm80659805e9.45.2024.10.22.00.47.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f57fbe8sm79095755e9.18.2024.10.22.00.48.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 00:47:18 -0700 (PDT)
-Message-ID: <be07ab23-6bc6-4c2c-8544-0a76c457bf08@redhat.com>
-Date: Tue, 22 Oct 2024 09:47:16 +0200
+        Tue, 22 Oct 2024 00:48:54 -0700 (PDT)
+Message-ID: <6c1e7d85-cfd3-4525-9f0b-5a88c3538286@redhat.com>
+Date: Tue, 22 Oct 2024 09:48:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,94 +82,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 08/15] net: add helper executing custom callback from
- napi
-To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>
-Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+Subject: Re: [PATCH v6 14/15] io_uring/zcrx: add copy fallback
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
  Mina Almasry <almasrymina@google.com>,
  Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
+ Pedro Tammela <pctammela@mojatatu.com>
 References: <20241016185252.3746190-1-dw@davidwei.uk>
- <20241016185252.3746190-9-dw@davidwei.uk>
- <cd9c2290-f874-49e6-bc99-5336a096cffb@redhat.com>
- <9d2c123d-9e1e-4365-a047-e4fe84444ab9@gmail.com>
+ <20241016185252.3746190-15-dw@davidwei.uk>
+ <4f61bdef-69d0-46df-abd7-581a62142986@redhat.com>
+ <32ca8ddf-2116-43b9-b434-d8393cdbdde1@davidwei.uk>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <9d2c123d-9e1e-4365-a047-e4fe84444ab9@gmail.com>
+In-Reply-To: <32ca8ddf-2116-43b9-b434-d8393cdbdde1@davidwei.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 10/21/24 19:16, Pavel Begunkov wrote:
-> On 10/21/24 15:25, Paolo Abeni wrote:
+On 10/21/24 20:31, David Wei wrote:
+> On 2024-10-21 07:40, Paolo Abeni wrote:
 >> On 10/16/24 20:52, David Wei wrote:
-
-[...]
->>> +	napi = napi_by_id(napi_id);
->>> +	if (!napi)
+>>> @@ -540,6 +562,34 @@ static const struct memory_provider_ops io_uring_pp_zc_ops = {
+>>>  	.scrub			= io_pp_zc_scrub,
+>>>  };
+>>>  
+>>> +static void io_napi_refill(void *data)
+>>> +{
+>>> +	struct io_zc_refill_data *rd = data;
+>>> +	struct io_zcrx_ifq *ifq = rd->ifq;
+>>> +	netmem_ref netmem;
+>>> +
+>>> +	if (WARN_ON_ONCE(!ifq->pp))
 >>> +		return;
 >>> +
->>> +	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
->>> +		preempt_disable();
+>>> +	netmem = page_pool_alloc_netmem(ifq->pp, GFP_ATOMIC | __GFP_NOWARN);
+>>> +	if (!netmem)
+>>> +		return;
+>>> +	if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+>>> +		return;
 >>> +
->>> +	for (;;) {
->>> +		local_bh_disable();
+>>> +	rd->niov = netmem_to_net_iov(netmem);
+>>> +}
 >>> +
->>> +		if (napi_state_start_busy_polling(napi, 0)) {
->>> +			have_poll_lock = netpoll_poll_lock(napi);
->>> +			cb(cb_arg);
->>> +			local_bh_enable();
->>> +			busy_poll_stop(napi, have_poll_lock, 0, 1);
->>> +			break;
->>> +		}
+>>> +static struct net_iov *io_zc_get_buf_task_safe(struct io_zcrx_ifq *ifq)
+>>> +{
+>>> +	struct io_zc_refill_data rd = {
+>>> +		.ifq = ifq,
+>>> +	};
 >>> +
->>> +		local_bh_enable();
->>> +		if (unlikely(need_resched()))
->>> +			break;
->>> +		cpu_relax();
+>>> +	napi_execute(ifq->napi_id, io_napi_refill, &rd);
 >>
->> Don't you need a 'loop_end' condition here?
+>> Under UDP flood the above has unbounded/unlimited execution time, unless
+>> you set NAPI_STATE_PREFER_BUSY_POLL. Is the allocation schema here
+>> somehow preventing such unlimited wait?
 > 
-> As you mentioned in 14/15, it can indeed spin for long and is bound only
-> by need_resched(). Do you think it's reasonable to wait for it without a
-> time limit with NAPI_STATE_PREFER_BUSY_POLL? softirq should yield napi
-> after it exhausts the budget, it should limit it well enough, what do
-> you think?
-> 
-> The only ugly part is that I don't want it to mess with the
-> NAPI_F_PREFER_BUSY_POLL in busy_poll_stop()
-> 
-> busy_poll_stop() {
-> 	...
-> 	clear_bit(NAPI_STATE_IN_BUSY_POLL, &napi->state);
-> 	if (flags & NAPI_F_PREFER_BUSY_POLL) {
-> 		napi->defer_hard_irqs_count = READ_ONCE(napi->dev->napi_defer_hard_irqs);
-> 		timeout = READ_ONCE(napi->dev->gro_flush_timeout);
-> 		if (napi->defer_hard_irqs_count && timeout) {
-> 			hrtimer_start(&napi->timer, ns_to_ktime(timeout), HRTIMER_MODE_REL_PINNED);
-> 			skip_schedule = true;
-> 		}
-> 	}
-> }
+> Hi Paolo. Do you mean that under UDP flood, napi_execute() will have
+> unbounded execution time because napi_state_start_busy_polling() and
+> need_resched() will always return false? My understanding is that
+> need_resched() will eventually kick the caller task out of
+> napi_execute().
 
-Why do you want to avoid such branch? It will do any action only when
-the user-space explicitly want to leverage the hrtimer to check for
-incoming packets. In such case, I think the kernel should try to respect
-the user configuration.
-
-> Is it fine to set PREFER_BUSY_POLL but do the stop call without? E.g.
-> 
-> set_bit(NAPI_STATE_PREFER_BUSY_POLL, &napi->state);
-> ...
-> busy_poll_stop(napi, flags=0);
-
-My preference is for using NAPI_STATE_PREFER_BUSY_POLL consistently. It
-should ensure a reasonably low latency for napi_execute() and consistent
-infra behavior. Unless I'm missing some dangerous side effect ;)
+Sorry for the short reply. Let's try to consolidate this discussion on
+patch 8, which is strictly related had has the relevant code more handy.
 
 Thanks,
 
