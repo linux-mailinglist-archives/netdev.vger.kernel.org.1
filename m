@@ -1,210 +1,118 @@
-Return-Path: <netdev+bounces-137984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF889AB5CB
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:11:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6447D9AB5D6
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABD6DB2353E
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:11:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7204C1C22CDC
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 18:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C7F1C9DE6;
-	Tue, 22 Oct 2024 18:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDC91C9DD5;
+	Tue, 22 Oct 2024 18:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dHkIGz66"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hmWLnRqa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8CA1BDA84
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 18:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823211C9DC5
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 18:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729620690; cv=none; b=pIGpNUQTJO4KEOoDfcoxG2m0Tbimyv/xKPygEa9z0wK2RpTKcpkQIwkDaPF+Ge7XgE3BLqB7HQuVQjq5CSxXLDK3OZlynFiadcDNmHLQIhCaIcJ7DihVN/UYaLkwzN6bQj4q3md/UOE4Lkh/UhVNRU+Z1eHJzOvKYN5YZjvGirw=
+	t=1729620857; cv=none; b=AaTP6HtPWp2qSUM6uxWzHQnKuLlgciZRTsVl+XC5aYc39Wp7qSI+ytMjL3uV8P5zpPvC1vV4tSRAxO3rm3RS8Xl8NMvHSq8s692U6DtgeQojtaBxtBhnts6Cq0bpHNLXEM/cMVBLpyBTtSc5hNR3v1oyVRrK9I72GZEBmXc2uq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729620690; c=relaxed/simple;
-	bh=4fUh/Y5Wu/2hZYMxBvSfyM0BJWo+IgP4cjxDEkuvIoU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JHGW8fI2yk9eA0U9bFrrNBuf3aFQ77+KTxACrVZ7zNoLgaitat1MKZGfh9skHBZGBgFPEbb7OByvK1i6Z6ECgsZ/QkI++pXESpeO/uG2VYTk2e5Soi1aMhQRwzh0ZSvvWrtS3W9+hxXJ5yS7voXkivEsUXdbm4sMsg0odWniYFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dHkIGz66; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so65488161fa.1
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 11:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1729620685; x=1730225485; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IxX9XE7Bu14uzEO7ETrCqQQOfswrKYUdi+DacsDonWk=;
-        b=dHkIGz66Sk5RVXqU9GtKEEbIkDoPNIcM1t4xOqc87L7BK9MrAgeNq5AhuRsQJYUrDq
-         /cjoROwOTrL1Wbx7rIEW9lUXLrdktqmDkcLLD2USfv3oJSKF5cGtHwK0yQOCjUJL7siR
-         NKs9XrWy6rw3x/CwIvo2UsOcrP10nexVX2vak=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729620685; x=1730225485;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IxX9XE7Bu14uzEO7ETrCqQQOfswrKYUdi+DacsDonWk=;
-        b=LIJAY2/3UZlH8trQv8SZlYwRPUW+AnV2wyeqmH8VsIDA/gZXR7jLsn0pN2+0YdNBxe
-         R28WskhTB+o+UXGpv9+fTfHWRM38oM8AmkzSgGDk12W9NjKVutu116sG5ITZ83IHT1gn
-         mOEOqFqviEbi8V1uEQZR6eDqEStCZUfZROFeRXi9q8eNwxSQQx1Vk1Yc5Ja0KB8ZE2ah
-         M0LuOwlusFyh1hob0XRvS96el96/u/aMwomFH6ogH5t20WQqOpuYZPeIfYuO+thlQDrj
-         i9qrNbKlQHsMHf3nW6lcuqGdFedHcT28oE98cjMQ+IJoqT090ianMaRkPdl3RTnfx+0g
-         Qo5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWIFhYZ/DOzkeNGVHHf2WKiUEHQ7crenyCz8PArYZUlfsZA9X3WDLJIRFpDSDel6yJYoiThyLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAZaL4mDx+QfMdpMZfZs37DIvO83FAFhTjBmAxG1h85XhZIi+g
-	eCwXNsfSnf6xeCmUd+I6KidsncfuB37SuWpiZ/eicsWPksGMUH0KLiA6mdyd53FzIEYWALLopt/
-	3pdL0+7W6uO0/3p4w2XaeTQZI6UkZwNDoONUW
-X-Google-Smtp-Source: AGHT+IF1lvYbetIHrryAdh+jmeC5rJO5rAiidyzmaALJvxxCwL4J2paIXfTnO/FOGo6ANr8RE57YXdoA+RN0fF/TxZw=
-X-Received: by 2002:a05:651c:2112:b0:2fb:6169:c42a with SMTP id
- 38308e7fff4ca-2fc93341785mr21602731fa.30.1729620684671; Tue, 22 Oct 2024
- 11:11:24 -0700 (PDT)
+	s=arc-20240116; t=1729620857; c=relaxed/simple;
+	bh=u4w8HXkqzKfsOIrMc4EK+VIMQPrTO97ibfWdvwYiz6I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MEkhAE4xIwswbg2/BZz6qGdOlK2k/ZocJGIJZwCAtGcgIV0vNHsHI6SAP50OhrIWMTaH2PQyu0klWt2XGT7KI6G/k4LA6uTSDZbi/XkJubqtsHHGpCznT71MOchgDjgjOcdONq2MLzne/IX6I3FgLvnzvL5WqcDEUvTGZvWTrGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hmWLnRqa; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5c8fb835-b0cb-428b-ab07-e20f905eb19f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729620853;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=igfEk9SJB5y0AGC7xhAPYYHSee2FiOr115Ym2mOgvQI=;
+	b=hmWLnRqaOUiaJjkXKVx5Z6mJ/tHcnkVDIIOfW8A8knPJ5olfECcBgkqn+qsVHjUcO8Svgs
+	bYDy/bPUAhvFSuKivQKVsKL1u9PPc/5dRHYtwFoD4w3av83jpAwXdFkeK6qIMsWZlLZ9G2
+	earKNNEQus/1kS/t5J3a5LT8RrZdGQg=
+Date: Tue, 22 Oct 2024 11:14:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021191233.1334897-1-dualli@chromium.org> <20241021191233.1334897-2-dualli@chromium.org>
- <20241022170625.GJ402847@kernel.org>
-In-Reply-To: <20241022170625.GJ402847@kernel.org>
-From: Li Li <dualli@chromium.org>
-Date: Tue, 22 Oct 2024 11:11:13 -0700
-Message-ID: <CANBPYPh97difTKrD=a6A-0sOVwZS28K=BvH37-62Z5FUO+kNUg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/1] binder: report txn errors via generic netlink (genl)
-To: Simon Horman <horms@kernel.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
-	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
-	brauner@kernel.org, cmllamas@google.com, surenb@google.com, arnd@arndb.de, 
-	masahiroy@kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, hridya@google.com, smoreland@google.com, 
-	kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net] Drop packets with invalid headers to prevent KMSAN
+ infoleak
+To: Daniel Yang <danielyangkang@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
+ <bpf@vger.kernel.org>,
+ "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
+ <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+References: <20241019071149.81696-1-danielyangkang@gmail.com>
+ <c7d0503b-e20d-4a6d-aecf-2bd7e1c7a450@linux.dev>
+ <CAGiJo8R2PhpOitTjdqZ-jbng0Yg=Lxu6L+6FkYuUC1M_d10U2Q@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAGiJo8R2PhpOitTjdqZ-jbng0Yg=Lxu6L+6FkYuUC1M_d10U2Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 22, 2024 at 10:06=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Mon, Oct 21, 2024 at 12:12:33PM -0700, Li Li wrote:
-> > + * @pid:     the target process
-> > + * @flags:   the flags to set
-> > + *
-> > + * If pid is 0, the flags are applied to the whole binder context.
-> > + * Otherwise, the flags are applied to the specific process only.
-> > + */
-> > +static int binder_genl_set_report(struct binder_context *context, u32 =
-pid, u32 flags)
->
-> ...
->
-> >  static int __init init_binder_device(const char *name)
-> >  {
-> >       int ret;
-> > @@ -6920,6 +7196,11 @@ static int __init init_binder_device(const char =
-*name)
->
-> The code above this hunk looks like this:
->
->
->         ret =3D misc_register(&binder_device->miscdev);
->         if (ret < 0) {
->                 kfree(binder_device);
->                 return ret;
->         }
->
-> >
-> >       hlist_add_head(&binder_device->hlist, &binder_devices);
-> >
-> > +     binder_device->context.report_seq =3D (atomic_t)ATOMIC_INIT(0);
-> > +     ret =3D binder_genl_init(&binder_device->context.genl_family, nam=
-e);
-> > +     if (ret < 0)
-> > +             kfree(binder_device);
->
-> So I think that binder_device->miscdev needs to be misc_deregister'ed
-> if we hit this error condition.
->
-> > +
-> >       return ret;
->
-> Probably adding an unwind ladder like this makes sense (completely untest=
-ed!):
->
->         ret =3D misc_register(&binder_device->miscdev);
->         if (ret < 0)
->                 goto err_misc_deregister;
->
->         hlist_add_head(&binder_device->hlist, &binder_devices);
->
->         binder_device->context.report_seq =3D (atomic_t)ATOMIC_INIT(0);
->         ret =3D binder_genl_init(&binder_device->context.genl_family, nam=
-e);
->         if (ret < 0);
->                 goto err_misc_deregister;
->
->         return 0;
->
-> err_misc_deregister:
->         misc_deregister(&binder_device->miscdev);
-> err_free_dev:
->         kfree(binder_device);
->         return ret;
->
+On 10/21/24 6:37 PM, Daniel Yang wrote:
+>> A test in selftests/bpf is needed to reproduce and better understand this.
+> I don't know much about self tests but I've just been using the syzbot
+> repro and #syz test at the link in the patch:
+> https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090. Testing
+> the patch showed that the uninitialized memory was not getting written
+> to memory.
+> 
+>> Only bpf_clone_redirect() is needed to reproduce or other bpf_skb_*() helpers calls
+>> are needed to reproduce?
 
-Good catch! Will fix it in the next revision.
+If only bpf_clone_redirect() is needed, it should be simple to write a selftest 
+to reproduce it. It also helps to catch future regression.
 
-> ...
->
-> > diff --git a/drivers/android/binder_genl.h b/drivers/android/binder_gen=
-l.h
->
-> Perhaps it is because of a different version of net-next,
-> but with this patch applied on top of the current head commit
-> 13feb6074a9f ("binder: report txn errors via generic netlink (genl)")
-> I see:
->
-> $ ./tools/net/ynl/ynl-regen.sh -f
-> $ git diff
->
-> diff --git a/include/uapi/linux/android/binder_genl.h b/include/uapi/linu=
-x/android/binder_genl.h
-> index ef5289133be5..93e58b370420 100644
-> --- a/include/uapi/linux/android/binder_genl.h
-> +++ b/include/uapi/linux/android/binder_genl.h
-> @@ -3,12 +3,17 @@
->  /*     Documentation/netlink/specs/binder_genl.yaml */
->  /* YNL-GEN uapi header */
->
-> -#ifndef _UAPI_LINUX_BINDER_GENL_H
-> -#define _UAPI_LINUX_BINDER_GENL_H
-> +#ifndef _UAPI_LINUX_ANDROID/BINDER_GENL_H
-> +#define _UAPI_LINUX_ANDROID/BINDER_GENL_H
->
->  #define BINDER_GENL_FAMILY_NAME                "binder_genl"
->  #define BINDER_GENL_FAMILY_VERSION     1
->
-> +/**
-> + * enum binder_genl_flag - Used with "set" and "reply" command below, de=
-fining
-> + *   what kind \ of binder transactions should be reported to the user s=
-pace \
-> + *   administration process.
-> + */
->  enum binder_genl_flag {
->         BINDER_GENL_FLAG_FAILED =3D 1,
->         BINDER_GENL_FLAG_DELAYED =3D 2,
-> @@ -34,4 +39,4 @@ enum {
->         BINDER_GENL_CMD_MAX =3D (__BINDER_GENL_CMD_MAX - 1)
->  };
->
-> -#endif /* _UAPI_LINUX_BINDER_GENL_H */
-> +#endif /* _UAPI_LINUX_ANDROID/BINDER_GENL_H */
+Please tag the next respin as "bpf" also.
 
-The patch was based on the top of Linus's tree instead of net-next.
-I'll investigate this difference.
+> 
+>  From what I can see in the crash report here:
+> https://syzkaller.appspot.com/text?tag=CrashReport&x=10ba3ca9980000,
+> only bpf_clone_redirect() is needed to trigger this issue. The issue
+> seems to be that bpf_try_make_head_writable clones the skb and creates
+> uninitialized memory but __bpf_tx_skb() gets called and the ethernet
+> header never got written, resulting in the skb having a data section
+> without a proper mac header. Current check:
+> 
+> if (unlikely(skb->mac_header >= skb->network_header || skb->len == 0))
+> {
+> **drop packet**
+> }
+> 
+> in __bpf_redirect_common() is insufficient since it only checks if the
+> mac header is misordered or if the data length is 0. So, any packet
+> with a malformed MAC header that is not 14 bytes but is not 0 doesn't
+> get dropped. Adding bounds checks for mac header size should fix this.
+> And from what I see in the syz test of this patch, it does.
+> 
+> Are there any possible unexpected issues that can be caused by this?
+
 
