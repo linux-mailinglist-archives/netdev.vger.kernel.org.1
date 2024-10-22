@@ -1,147 +1,296 @@
-Return-Path: <netdev+bounces-137972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE5E9AB507
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:26:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 368789AB50C
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 19:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98B59B24478
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:26:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B128A1F211B4
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189151A726D;
-	Tue, 22 Oct 2024 17:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290711BD01D;
+	Tue, 22 Oct 2024 17:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNizuojj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFArfh+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5599D1AFB35
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 17:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05351A4F01;
+	Tue, 22 Oct 2024 17:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729617947; cv=none; b=Xve415Eyu10LD1SsEQICSfR+WPe9VAJ8TEXM+SeAFfh7McBcQHsvcy9SEQTpjz4ZgTYnA4CWhB4t8rlFi0Al5CsZNg6L9R7iuvBkM4Ahv/aHWaXEhab3CJY1zY9s9VkMqYZFFtTWV6J/5vTasBB/5eh3AVMQssbgTKgoUuHAWCE=
+	t=1729618095; cv=none; b=uvZIgiEA7KfUN3MYnvBZZEBTCgqidW3pv7QaYrIQzShpDWet7KA3ylWRvDOuwp15KD6uTTGVF5vm+rsHQ46QkmhYwhHqQ1LjkqanffPXwdr2DgYMSBCd3mtnePZvl8eb0MdYYE6LNf1MoqmcJ0ki4ppEt1A5JP2ZTRId7xvrQKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729617947; c=relaxed/simple;
-	bh=7Nhx76gxc6F6eiHMaboNs7DBV9o2hRoYZzo0Ch79DfE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P3FpTS3RHerqKpLaxbkM3/B37O9gJQ5/ToH1wYY6dpNKHxY9/4CuqgC3JfQIo1+QcvExCqZZP13xzlm/bBHmb1wbmF2KPZsuABssyH5O/CWJmh4H0KBM8etLH0rkNNfJh3K9vZRH74mrW0SH9NYLfubkhukVSvxFXlkOftoAG84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GNizuojj; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37ed3bd6114so2890295f8f.2
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 10:25:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729617943; x=1730222743; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8hSaLvXn0yFSyVHQRsC6QU/aD2ssRpmAbQU7NlsTtv8=;
-        b=GNizuojjDavfvqlT4ISFrJa2aMMETZIbDm/jyE4/yEHzs0TLm2E1iN9RjwgcSRSIxp
-         PhGHrpb1gY0epRWrFVMYA18IixJ1lPl4WQ8o0CX93i11vzJ2A0C/qs9nLf6J//wWPe/A
-         BFwZcQB4b/cAIQxJ4SrKmZX2OhZhwJywTKoQ1x/EhnZ/nml53XBgx2EY2GLFCdg9J9po
-         xi1nSUCqDAOwDfX+RtB6MhdTugd2yCo2VUuTOfGU9xKzV7JS/GNqfePAZjsJ+vbDyElB
-         dInOuTr3NcDcnsDL8ngR6LMQldF2syIq+lAYyM2mYPAZKYM8K8AF3SpHBYEOXxmRUz2x
-         M7OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729617943; x=1730222743;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8hSaLvXn0yFSyVHQRsC6QU/aD2ssRpmAbQU7NlsTtv8=;
-        b=Aw8XW/HHPIKvPNJRx3uOzOv8Ns8QryM6eytnLBQiWjlJEiTgb8C0tt05IcFCgyVahQ
-         Jf+NVeQfqWOZQZw3ngtHYfw2P8b0qVevgpaPPKLFld577XB1jAMj1CtBgU9r0TW6W4O0
-         NAh2iNX2EDNOHk6W62qnpxct0CAFc10Fecx5+PSH+gX79Lb9nbjRLC7PvZhsX0vSO4S4
-         /DrUcGQso/f0EJPUjrEd9hW1ZoIQHq2JDBFmTgNTyvMaj1ynSNAufVuR+KcK27fN7cp6
-         cW5ERuqT2GHJ+K/Uv4beRdewydlBfaq6mcMUYy+RXrc0kMEA6W3CUfBJ4CwgFBHCGKBE
-         CBUw==
-X-Forwarded-Encrypted: i=1; AJvYcCW/ColGhUMwjBkjBlRS3rPyLHGsMF4ZC6vLuN8qqroDqBeUdMcC8jX/yKk9lK3uU1ZTR1Gp2eY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuRQ5HidXUMkItAE9WiRw4wLNC+pIsKe1AijB9PtTyUk93dKAS
-	93DLgOHgKaVtmWwkeLtCXgMgKgrFuNUEVmb6Jfy9c2sQUu4EMIz6Wdcy6aMbC9NqmrTuzO4xC/J
-	oFkNp+kTBZ1viuNDIcXpAZxw4W74=
-X-Google-Smtp-Source: AGHT+IGxopSoSXyvwbJ6SKHOpDdmPOBrDcSJm2a7wqW79AZWdLvLfWKswYFr8bJMo2INs1l8UXbKTnIUlZkgiBLm3/w=
-X-Received: by 2002:adf:ab03:0:b0:37d:5103:8894 with SMTP id
- ffacd0b85a97d-37efb7f7abemr186717f8f.42.1729617943335; Tue, 22 Oct 2024
- 10:25:43 -0700 (PDT)
+	s=arc-20240116; t=1729618095; c=relaxed/simple;
+	bh=Xh0Dg7YzHWWSX+FIkTVR8WeZ65RIdshONwrzkKLVIGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=spS8xRLPPhyV0YYiUseP9DlKV+MFIo4FqK7uXJ7J2lI8VutBGz35G2kdIXtKbaWPDtiPRaOqU0p59XSxfl8hyUfbx/2HjEqVc28gA4oCFHp7mg5piVPqyBNTDN31iRUHray++GXaCOx/2m2qqzc5BbLQSF1ht2ANDpxsI31j75o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFArfh+l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09D1C4CEC3;
+	Tue, 22 Oct 2024 17:28:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729618093;
+	bh=Xh0Dg7YzHWWSX+FIkTVR8WeZ65RIdshONwrzkKLVIGg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OFArfh+ljJoq9u/Aw17WBReW1fNR5Efru55WhTA7qiDbSHlKhBw4OLKU9YdWShIF1
+	 5ZUQFwoW2r6fQcM0r44gqy2wU3Yz6HbiMDaPucYcZrpK4RWtNL5f1JGXP+MUqUYM/y
+	 PRUtgcNNcc1DS5gInVNc4bvOp2x0vZC/om7OqIDSVjpaVpyF0p5WCrEcx0iVtjlG83
+	 r1G4hf9eOZTZcAeY5puk7U+DzQuJNrjlHSENbx7Dh3MP43FMerNTfOHbeeqqn7IW3x
+	 UO3UTJRuEaWuGHMLSCNibWbVnnhTYNdmTqvh8s/Z60aeiofQVbnCSt4sSzgik+LfFT
+	 t3xgiz77DurEg==
+Date: Tue, 22 Oct 2024 18:28:06 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Chen Wang <unicorn_wang@outlook.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Inochi Amaoto <inochiama@outlook.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: Add support for Sophgo SG2044 dwmac
+Message-ID: <20241022-crisply-brute-45f98632ef78@spud>
+References: <20241021103617.653386-1-inochiama@gmail.com>
+ <20241021103617.653386-3-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022063807.37561-1-yuancan@huawei.com> <20241022155630.GY402847@kernel.org>
-In-Reply-To: <20241022155630.GY402847@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 22 Oct 2024 10:25:05 -0700
-Message-ID: <CAKgT0UdvnjZo6pNtnZuDFuOQ9Hg=BCeJOAiToS_CFSwpKD8LWA@mail.gmail.com>
-Subject: Re: [PATCH] igb: Fix potential invalid memory access in igb_init_module()
-To: Simon Horman <horms@kernel.org>
-Cc: Yuan Can <yuancan@huawei.com>, anthony.l.nguyen@intel.com, 
-	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, cramerj@intel.com, 
-	shannon.nelson@amd.com, mitch.a.williams@intel.com, jgarzik@redhat.com, 
-	auke-jan.h.kok@intel.com, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6+sVcBOZQT1jcJu5"
+Content-Disposition: inline
+In-Reply-To: <20241021103617.653386-3-inochiama@gmail.com>
+
+
+--6+sVcBOZQT1jcJu5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 22, 2024 at 8:56=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> + Alexander Duyck
->
-> On Tue, Oct 22, 2024 at 02:38:07PM +0800, Yuan Can wrote:
-> > The pci_register_driver() can fail and when this happened, the dca_noti=
-fier
-> > needs to be unregistered, otherwise the dca_notifier can be called when
-> > igb fails to install, resulting to invalid memory access.
-> >
-> > Fixes: fe4506b6a2f9 ("igb: add DCA support")
->
-> I don't think this problem was introduced by the commit cited above,
-> as it added the call to dca_unregister_notify() before
-> pci_register_driver(). But rather by the commit cited below which reverse=
-d
-> the order of these function calls.
->
-> bbd98fe48a43 ("igb: Fix DCA errors and do not use context index for 82576=
-")
->
-> I'm unsure if it is necessary to repost the patch to address that.
-> But if you do, and assuming we are treating this as a bug fix,
-> please target it for the net (or iwl-net) tree like this:
->
-> Subject: [PATCH net v2] ...
->
-> > Signed-off-by: Yuan Can <yuancan@huawei.com>
-> > ---
-> >  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/et=
-hernet/intel/igb/igb_main.c
-> > index f1d088168723..18284a838e24 100644
-> > --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> > +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> > @@ -637,6 +637,10 @@ static int __init igb_init_module(void)
-> >       dca_register_notify(&dca_notifier);
-> >  #endif
-> >       ret =3D pci_register_driver(&igb_driver);
-> > +#ifdef CONFIG_IGB_DCA
-> > +     if (ret)
-> > +             dca_unregister_notify(&dca_notifier);
-> > +#endif
-> >       return ret;
-> >  }
-> >
+On Mon, Oct 21, 2024 at 06:36:15PM +0800, Inochi Amaoto wrote:
+> The GMAC IP on SG2044 is almost a standard Synopsys DesignWare MAC
+> with some extra clock.
+>=20
+> Add necessary compatible string for this device.
+>=20
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+>  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 145 ++++++++++++++++++
+>  2 files changed, 146 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-d=
+wmac.yaml
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Docu=
+mentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 3c4007cb65f8..69f6bb36970b 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -99,6 +99,7 @@ properties:
+>          - snps,dwmac-5.30a
+>          - snps,dwxgmac
+>          - snps,dwxgmac-2.10
+> +        - sophgo,sg2044-dwmac
+>          - starfive,jh7100-dwmac
+>          - starfive,jh7110-dwmac
+> =20
+> diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.ya=
+ml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+> new file mode 100644
+> index 000000000000..93c41550b0b6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+> @@ -0,0 +1,145 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/sophgo,sg2044-dwmac.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: StarFive JH7110 DWMAC glue layer
+> +
+> +maintainers:
+> +  - Inochi Amaoto <inochiama@gmail.com>
+> +
+> +select:
+> +  properties:
+> +    compatible:
+> +      contains:
+> +        enum:
+> +          - sophgo,sg2044-dwmac
+> +  required:
+> +    - compatible
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - const: sophgo,sg2044-dwmac
+> +      - const: snps,dwmac-5.30a
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: GMAC main clock
+> +      - description: PTP clock
+> +      - description: TX clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: stmmaceth
+> +      - const: ptp_ref
+> +      - const: tx
+> +
+> +  sophgo,syscon:
 
-Makes sense to me. I agree on the "Fix DCA errors" patch being the one
-that is being fixed. So essentially this is a notifier leak since we
-are registering it but not unregistering.
+How many dwmac instances does the sg2044 have?
 
-Thanks,
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    items:
+> +      - items:
+> +          - description: phandle to syscon that configures phy
+> +          - description: offset of phy mode register
+> +          - description: length of the phy mode register
+> +    description:
+> +      A phandle to syscon with two arguments that configure phy mode.
+> +      The argument one is the offset of phy mode register, the
+> +      argument two is the length of phy mode register.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - clock-names
+> +  - interrupts
+> +  - interrupt-names
+> +  - resets
+> +  - reset-names
+> +
+> +allOf:
+> +  - $ref: snps,dwmac.yaml#
+> +
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: sophgo,sg2044-dwmac
 
-- Alex
+Why does this have to be applied conditionally? There's only one
+compatible in the binding, can't you apply these unconditionally?
+
+
+Cheers,
+Conor.
+
+> +    then:
+> +      properties:
+> +        interrupts:
+> +          minItems: 1
+> +          maxItems: 1
+> +
+> +        interrupt-names:
+> +          minItems: 1
+> +          maxItems: 1
+> +
+> +        resets:
+> +          maxItems: 1
+> +
+> +        reset-names:
+> +          const: stmmaceth
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +
+> +    ethernet@30006000 {
+> +      compatible =3D "sophgo,sg2044-dwmac", "snps,dwmac-5.30a";
+> +      reg =3D <0x30006000 0x4000>;
+> +      clocks =3D <&clk 151>, <&clk 152>, <&clk 154>;
+> +      clock-names =3D "stmmaceth", "ptp_ref", "tx";
+> +      interrupt-parent =3D <&intc>;
+> +      interrupts =3D <296 IRQ_TYPE_LEVEL_HIGH>;
+> +      interrupt-names =3D "macirq";
+> +      resets =3D <&rst 30>;
+> +      reset-names =3D "stmmaceth";
+> +      snps,multicast-filter-bins =3D <0>;
+> +      snps,perfect-filter-entries =3D <1>;
+> +      snps,aal;
+> +      snps,tso;
+> +      snps,txpbl =3D <32>;
+> +      snps,rxpbl =3D <32>;
+> +      snps,mtl-rx-config =3D <&gmac0_mtl_rx_setup>;
+> +      snps,mtl-tx-config =3D <&gmac0_mtl_tx_setup>;
+> +      snps,axi-config =3D <&gmac0_stmmac_axi_setup>;
+> +      status =3D "disabled";
+> +
+> +      gmac0_mtl_rx_setup: rx-queues-config {
+> +        snps,rx-queues-to-use =3D <8>;
+> +        snps,rx-sched-wsp;
+> +        queue0 {};
+> +        queue1 {};
+> +        queue2 {};
+> +        queue3 {};
+> +        queue4 {};
+> +        queue5 {};
+> +        queue6 {};
+> +        queue7 {};
+> +      };
+> +
+> +      gmac0_mtl_tx_setup: tx-queues-config {
+> +        snps,tx-queues-to-use =3D <8>;
+> +        queue0 {};
+> +        queue1 {};
+> +        queue2 {};
+> +        queue3 {};
+> +        queue4 {};
+> +        queue5 {};
+> +        queue6 {};
+> +        queue7 {};
+> +      };
+> +
+> +      gmac0_stmmac_axi_setup: stmmac-axi-config {
+> +        snps,blen =3D <16 8 4 0 0 0 0>;
+> +        snps,wr_osr_lmt =3D <1>;
+> +        snps,rd_osr_lmt =3D <2>;
+> +      };
+> +    };
+> --=20
+> 2.47.0
+>=20
+
+--6+sVcBOZQT1jcJu5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZxfgpgAKCRB4tDGHoIJi
+0nAWAQDfeza6aA91cekxwcjXjesZrc3MIthUXQr3N1UZWnsSuQEAqCqjg9I1vB8t
+/o5NgrwsAo5vJH/ZFQPuCuEIDd5xYQU=
+=rpEJ
+-----END PGP SIGNATURE-----
+
+--6+sVcBOZQT1jcJu5--
 
