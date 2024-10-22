@@ -1,322 +1,293 @@
-Return-Path: <netdev+bounces-138036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE639ABA35
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 01:50:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B11849ABA48
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 01:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B3EB1F23015
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:50:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011731F2389B
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 23:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD27B1CEABC;
-	Tue, 22 Oct 2024 23:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3ED31CEE9F;
+	Tue, 22 Oct 2024 23:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GIgmsk0N"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="O8uqpfVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B52D126C05;
-	Tue, 22 Oct 2024 23:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208661BD50D;
+	Tue, 22 Oct 2024 23:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729641005; cv=none; b=RTuR7/xxlfUV8jN8SLN2gfY2SbDkD4e0vrNftCCeJ8c0FPXgse3RC/SeaZtt7YVuO95yoM+vIa+KDOppWTwJR20cHJareAQytF/0QUsWrB8hict88uDbMQUG731YeatR0kX+PVfv9cWSks1YpGUqjN0bfkAxZ7QwZSc698lWBCE=
+	t=1729641504; cv=none; b=YutaM1DLRHb0/BjlFxoNWzm8alowMwLrO75hSGviaW7fNlnjju+QYMGxzgLpe0vljTLJp7XIShMwHeIMTxg211dW1ejppKqa8a8qUa7e9CJk48+CdZAm3eBWbmanNK7h994CDnX6aUQ0yuh2MMmFCS0iAudfga2uBfhqpGr/huA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729641005; c=relaxed/simple;
-	bh=ypW6eo6v9zSPvnsnDFUfPO0qcx3b73uC7Hn+BH1BnWY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/T/jKE/JaXi4s7CSUwsc+6wE/EYhavFwR/AKjQidqezJ4IKdWTI24ocdNeoq1ypy1L1TVRI+kripNHl2uzpEDewOJGhYnW87U+W14Bd4jp6iwGkrTxvqjKY71GiREc14DX01g2bCC6DFEKZfzFIPKG4bu0EySO5QavvLI5oMKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GIgmsk0N; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-656d8b346d2so4081868a12.2;
-        Tue, 22 Oct 2024 16:50:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729641003; x=1730245803; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jnVOCfl+gfGOtLG2C7UJ+7hJAW/3c0dmYpMokl7m184=;
-        b=GIgmsk0NHgFK9eTJtm74fhfUCW1lfQmaJ/QDZJRzlDKf+AfCuE6XXVPFdUyrb9+De0
-         tLrCbOm8z9KrhuUAYi93jkWv5w0r93xAN4KJ0NukzhwZ7xGY0qJ5TQp7xb3ZTaIG/uyO
-         rHkaPwf3dlyWk/y1gbTjHaSWU9x/h+InEzmGZMYbkFsKDLA+7uXVoGmMUmLupICLQ4S7
-         xl0TuokRP6+W45jC6ph7X5h6Yxm80Gqq88uLWou0mZT/XPMkBYhUf6m0Qme3yyQg9vmJ
-         4DgUTkP2Y/FVYe0Fi5HAWwcYE896iZQxZnXl4uCZnhQYwgC2cMmj9DCx9ntqkbFhgUoL
-         m1dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729641003; x=1730245803;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jnVOCfl+gfGOtLG2C7UJ+7hJAW/3c0dmYpMokl7m184=;
-        b=TNY8YZFxI8SKB7+I6w4TZThsEBaQLIFEytxpK0oJmoOrC94tVnO+VVmH82/5jPrG4V
-         8n9m1F0B7HqTUYcsffgINNtsCPUpAuUWwaN/UNM+ovQSbsIpDxfNjJ8FHunMrJndLP4n
-         QtfSrlSwwQvKuSySb+2cAVNTCqZ9obvOyEZngo7l7XDFzfMp1LWi+8p4LnZp8tbqX4sW
-         vdxzWPSXokRuZiJSRWOciTFCO1RowjVUQtqMpJylMiPI/eGGecsCubzvM64d+FLt4oPL
-         Tom3PvWb1G+mFSJotrU5oy6gZ+5vcYFkqqjj+V+slsGRFgp0RpLYm3WoCyhtKGQpx8eW
-         wVWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs73XNvvKmuREHPwfApy24A2ox6PHKP8FMoMwOSzaWcFiETYbYm7+XiqykdqWf11cjG4XdXaMhyPxBMno=@vger.kernel.org, AJvYcCVz3j2YmgLy98fzxNLCx3HXoTm7KExa/+rUECLSm7Dchni/sbazRY8eZ9sVySiR0ppeE0MqV8AdRX7SBAGlhH0+@vger.kernel.org, AJvYcCXuiNf3fhgj4Ibd4ecMKfSo3KDJlrlbpnz34hi9bhu2PIUZMHJ/FbdUDLgeq0BSYUPBjx7byOpW@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSUDslaZQLkdkTSluwhwzdkGuAfao41OM/dXmlrFw/MZJStLmE
-	YtZbVJLNn+D+qBnJoC13MhmcgtqeJfFG0KMwrFnB+XNck+qV84U=
-X-Google-Smtp-Source: AGHT+IH6itqjLIYrOaOu3IIWCHqQoSAfN9wVXmte4rIKGDx9WFzm0DwT3pZN8MYKD+pG9JMuRfHrBA==
-X-Received: by 2002:a05:6a21:670f:b0:1d6:fd8c:fa16 with SMTP id adf61e73a8af0-1d978bd63aemr833578637.46.1729641003193;
-        Tue, 22 Oct 2024 16:50:03 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec132ff7fsm5268813b3a.71.2024.10.22.16.50.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 16:50:02 -0700 (PDT)
-Date: Tue, 22 Oct 2024 16:50:02 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	Liam Howlett <liam.howlett@oracle.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"peterz@infradead.org" <peterz@infradead.org>,
-	"juri.lelli@redhat.com" <juri.lelli@redhat.com>,
-	"vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
-	"dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
-	"rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"bsegall@google.com" <bsegall@google.com>,
-	"mgorman@suse.de" <mgorman@suse.de>,
-	"vschneid@redhat.com" <vschneid@redhat.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	Pei Li <peili.io@oracle.com>
-Subject: Re: [PATCH net-next v5 2/3] connector/cn_proc: Kunit tests for
- threads hash table
-Message-ID: <Zxg6KhhpCGc-5Mw0@mini-arch>
-References: <08EFFA25-7C8F-444A-B229-2A9F99B0C028@oracle.com>
+	s=arc-20240116; t=1729641504; c=relaxed/simple;
+	bh=hSGNsERuXpOnj5mD1JvsJFKgJ7F+L+49oiKUk4AO4fg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bwD46IQ1n5uKyXaw0H/aH7+MIQMhPOkauBOG8IDK9NamkE7zGf+Sk2JW5PnQEm4j0XaZW1lGzuB97MAEXZiSzf3TMnO3xD/MMDeYrOt/pFu+WsXc2+Jz6qjyI4qo0/1nh0nLM4Yt4nJaiiyJM30lxOI6JNL2xZGOxUmSwUGt/1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=O8uqpfVq; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49MLa3s6025442;
+	Tue, 22 Oct 2024 23:58:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8BhHv7AKGfqd/X1TNPoDzozZI272RDnDgnhCY3+4Qbg=; b=O8uqpfVqW19+2KBi
+	ZOMG1/bBKHGewzK+7wlCt5k+Y64imnErPqIU1CgW2FbV2VpdOpexvIzeXUWVK4mI
+	P0fyfI7069pZNLg/BaELCnI/OKKhFWGFWAqfPIvdf01v+SRulhMKFH9DAoT/2+Kg
+	k6SjwfNW550b9OLEZiLcg2QEwLpWcVVKJ+tssWg0CZPLGQq43Bq0yptjPcZ93NPC
+	oIyqFWNCRHmDV7JdnUxoEcLEL0ZgKxLnbBU5hJOMeYB31C1MkEVmCfE5zNen0vxY
+	gHk/V5qhr1/+N7A4QSWD+ErXURLBSGJWkgPo1WSPP7QQfy77PaxGbLp3tG6RVhac
+	6iCEnA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em4088xy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 23:58:09 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49MNw9Qe025711
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 22 Oct 2024 23:58:09 GMT
+Received: from [10.110.103.186] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 22 Oct
+ 2024 16:58:08 -0700
+Message-ID: <e4fe74c7-6c37-4bab-96bf-a62727dcd468@quicinc.com>
+Date: Tue, 22 Oct 2024 16:58:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <08EFFA25-7C8F-444A-B229-2A9F99B0C028@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 06/10] net: qrtr: Allow sendmsg to target an
+ endpoint
+To: Denis Kenzior <denkenz@gmail.com>, <netdev@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20241018181842.1368394-1-denkenz@gmail.com>
+ <20241018181842.1368394-7-denkenz@gmail.com>
+Content-Language: en-US
+From: Chris Lew <quic_clew@quicinc.com>
+In-Reply-To: <20241018181842.1368394-7-denkenz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: bJVsf1lranxjBNZVbI16qRrXMuOEVjWP
+X-Proofpoint-GUID: bJVsf1lranxjBNZVbI16qRrXMuOEVjWP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 bulkscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410220155
 
-On 10/22, Anjali Kulkarni wrote:
-> 
-> 
-> > On Oct 17, 2024, at 5:55 PM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> > 
-> > On 10/18, Anjali Kulkarni wrote:
-> >> 
-> >> 
-> >>> On Oct 17, 2024, at 5:13 PM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> >>> 
-> >>> On 10/17, Anjali Kulkarni wrote:
-> >>>> Kunit tests to test hash table add, delete, duplicate add and delete.
-> >>>> Add following configs and compile kernel code:
-> >>>> 
-> >>>> CONFIG_CONNECTOR=y
-> >>>> CONFIG_PROC_EVENTS=y
-> >>>> CONFIG_NET=y
-> >>>> CONFIG_KUNIT=m
-> >>>> CONFIG_CN_HASH_KUNIT_TEST=m
-> >>>> 
-> >>>> To run kunit tests:
-> >>>> sudo modprobe cn_hash_test
-> >>>> 
-> >>>> Output of kunit tests and hash table contents are displayed in
-> >>>> /var/log/messages (at KERN_DEBUG level).
-> >>>> 
-> >>>> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-> >>>> ---
-> >>>> drivers/connector/cn_hash.c   |  40 ++++++++
-> >>>> drivers/connector/connector.c |  12 +++
-> >>>> include/linux/connector.h     |   4 +
-> >>>> lib/Kconfig.debug             |  17 ++++
-> >>>> lib/Makefile                  |   1 +
-> >>>> lib/cn_hash_test.c            | 167 ++++++++++++++++++++++++++++++++++
-> >>>> lib/cn_hash_test.h            |  10 ++
-> >>>> 7 files changed, 251 insertions(+)
-> >>>> create mode 100644 lib/cn_hash_test.c
-> >>>> create mode 100644 lib/cn_hash_test.h
-> >>>> 
-> >>>> diff --git a/drivers/connector/cn_hash.c b/drivers/connector/cn_hash.c
-> >>>> index a079e9bcea6d..40099b5908ac 100644
-> >>>> --- a/drivers/connector/cn_hash.c
-> >>>> +++ b/drivers/connector/cn_hash.c
-> >>>> @@ -170,6 +170,46 @@ int cn_hash_get_exval(struct cn_hash_dev *hdev, pid_t pid)
-> >>>> return -EINVAL;
-> >>>> }
-> >>>> 
-> >>>> +int cn_hash_display_hlist(struct cn_hash_dev *hdev, pid_t pid, int max_len,
-> >>>> + int *hkey, int *key_display)
-> >>>> +{
-> >>>> + struct uexit_pid_hnode *hnode;
-> >>>> + int key, count = 0;
-> >>>> +
-> >>>> + mutex_lock(&hdev->uexit_hash_lock);
-> >>>> + key = hash_min(pid, HASH_BITS(hdev->uexit_pid_htable));
-> >>>> + pr_debug("Bucket: %d\n", key);
-> >>>> +
-> >>>> + hlist_for_each_entry(hnode,
-> >>>> + &hdev->uexit_pid_htable[key],
-> >>>> + uexit_pid_hlist) {
-> >>>> + if (key_display[key] != 1) {
-> >>>> + if (hnode->uexit_pid_hlist.next == NULL)
-> >>>> + pr_debug("pid %d ", hnode->pid);
-> >>>> + else
-> >>>> + pr_debug("pid %d --> ", hnode->pid);
-> >>>> + }
-> >>>> + count++;
-> >>>> + }
-> >>>> +
-> >>>> + mutex_unlock(&hdev->uexit_hash_lock);
-> >>>> +
-> >>>> + if ((key_display[key] != 1) && !count)
-> >>>> + pr_debug("(empty)\n");
-> >>>> +
-> >>>> + pr_debug("\n");
-> >>>> +
-> >>>> + *hkey = key;
-> >>>> +
-> >>>> + if (count > max_len) {
-> >>>> + pr_err("%d entries in hlist for key %d, expected %d\n",
-> >>>> + count, key, max_len);
-> >>>> + return -EINVAL;
-> >>>> + }
-> >>>> +
-> >>>> + return 0;
-> >>>> +}
-> >>>> +
-> >>>> bool cn_hash_table_empty(struct cn_hash_dev *hdev)
-> >>>> {
-> >>>> bool is_empty;
-> >>>> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
-> >>>> index c1c0dcec53c0..2be2fe1adc12 100644
-> >>>> --- a/drivers/connector/connector.c
-> >>>> +++ b/drivers/connector/connector.c
-> >>>> @@ -304,6 +304,18 @@ int cn_get_exval(pid_t pid)
-> >>>> }
-> >>>> EXPORT_SYMBOL_GPL(cn_get_exval);
-> >>>> 
-> >>>> +int cn_display_hlist(pid_t pid, int max_len, int *hkey, int *key_display)
-> >>>> +{
-> >>>> + struct cn_dev *dev = &cdev;
-> >>>> +
-> >>>> + if (!cn_already_initialized)
-> >>>> + return 0;
-> >>>> +
-> >>>> + return cn_hash_display_hlist(dev->hdev, pid, max_len,
-> >>>> + hkey, key_display);
-> >>>> +}
-> >>>> +EXPORT_SYMBOL_GPL(cn_display_hlist);
-> >>>> +
-> >>>> bool cn_table_empty(void)
-> >>>> {
-> >>>> struct cn_dev *dev = &cdev;
-> >>>> diff --git a/include/linux/connector.h b/include/linux/connector.h
-> >>>> index 5384e4bb98e8..a75c3fcf182a 100644
-> >>>> --- a/include/linux/connector.h
-> >>>> +++ b/include/linux/connector.h
-> >>>> @@ -168,4 +168,8 @@ int cn_get_exval(pid_t pid);
-> >>>> bool cn_table_empty(void);
-> >>>> bool cn_hash_table_empty(struct cn_hash_dev *hdev);
-> >>>> 
-> >>>> +int cn_display_hlist(pid_t pid, int max_len, int *hkey, int *key_display);
-> >>>> +int cn_hash_display_hlist(struct cn_hash_dev *hdev, pid_t pid, int max_len,
-> >>>> + int *hkey, int *key_display);
-> >>>> +
-> >>>> #endif /* __CONNECTOR_H */
-> >>>> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> >>>> index 7315f643817a..290cf0a6befa 100644
-> >>>> --- a/lib/Kconfig.debug
-> >>>> +++ b/lib/Kconfig.debug
-> >>>> @@ -2705,6 +2705,23 @@ config HASHTABLE_KUNIT_TEST
-> >>>> 
-> >>>> If unsure, say N.
-> >>>> 
-> >>>> +config CN_HASH_KUNIT_TEST
-> >>>> + tristate "KUnit Test for connector hashtable code" if !KUNIT_ALL_TESTS
-> >>>> + depends on KUNIT
-> >>>> + default KUNIT_ALL_TESTS
-> >>>> + help
-> >>>> +  This builds the hashtable KUnit test suite.
-> >>>> +  It tests the basic functionality of the API defined in
-> >>>> +  drivers/connector/cn_hash.c.
-> >>>> +  CONFIG_CONNECTOR=y, CONFIG_PROC_EVENTS=y and CONFIG_NET=y needs
-> >>>> +  to be enabled along with CONFIG_CN_HASH_KUNIT_TEST=m and
-> >>>> +  CONFIG_KUNIT=m in .config file to compile and then test as a kernel
-> >>>> +  module with "modprobe cn_hash_test".
-> >>>> +  For more information on KUnit and unit tests in general please
-> >>>> +  refer to the KUnit documentation in Documentation/dev-tools/kunit/.
-> >>>> +
-> >>>> +  If unsure, say N.
-> >>>> +
-> >>> 
-> >>> Looks like this needs to depend on CONFIG_CONNECTOR? Otherwise, the
-> >>> existing kunit tester complains about the missing symbols (see below).
-> >>> Please also hold off reposting for a couple of days to give people some
-> >>> time to review.
-> >>> 
-> >>> ERROR:root:ld: vmlinux.o: in function `cn_hash_test_dup_del':
-> >>> cn_hash_test.c:(.text+0x3e9dc3): undefined reference to `cn_del_get_exval'
-> >>> ld: cn_hash_test.c:(.text+0x3e9dee): undefined reference to `cn_del_get_exval'
-> >>> ld: cn_hash_test.c:(.text+0x3e9e22): undefined reference to `cn_table_empty'
-> >>> ld: vmlinux.o: in function `cn_display_htable':
-> >>> cn_hash_test.c:(.text+0x3e9f67): undefined reference to `cn_display_hlist'
-> >>> ld: vmlinux.o: in function `cn_hash_test_del_get_exval':
-> >>> cn_hash_test.c:(.text+0x3ea037): undefined reference to `cn_del_get_exval'
-> >>> ld: cn_hash_test.c:(.text+0x3ea088): undefined reference to `cn_table_empty'
-> >>> ld: vmlinux.o: in function `cn_hash_test_dup_add':
-> >>> cn_hash_test.c:(.text+0x3ea176): undefined reference to `cn_add_elem'
-> >>> ld: cn_hash_test.c:(.text+0x3ea19e): undefined reference to `cn_get_exval'
-> >>> ld: cn_hash_test.c:(.text+0x3ea1dc): undefined reference to `cn_add_elem'
-> >>> ld: cn_hash_test.c:(.text+0x3ea205): undefined reference to `cn_get_exval'
-> >>> ld: vmlinux.o: in function `cn_hash_test_del':
-> >>> cn_hash_test.c:(.text+0x3ea387): undefined reference to `cn_del_get_exval'
-> >>> ld: cn_hash_test.c:(.text+0x3ea3ab): undefined reference to `cn_get_exval'
-> >>> ld: cn_hash_test.c:(.text+0x3ea3fd): undefined reference to `cn_table_empty'
-> >>> ld: vmlinux.o: in function `cn_hash_test_add':
-> >>> cn_hash_test.c:(.text+0x3ea571): undefined reference to `cn_add_elem'
-> >>> ld: cn_hash_test.c:(.text+0x3ea591): undefined reference to `cn_get_exval'
-> >>> make[3]: *** [../scripts/Makefile.vmlinux:34: vmlinux] Error 1
-> >>> make[2]: *** [/home/kunit/testing/Makefile:1166: vmlinux] Error 2
-> >>> make[1]: *** [/home/kunit/testing/Makefile:224: __sub-make] Error 2
-> >>> make: *** [Makefile:224: __sub-make] Error 2
-> >> 
-> >> Yes, I have added in the comments for CN_HASH_KUNIT_TEST, it depends on:
-> >> CONFIG_CONNECTOR, CONFIG_PROC_EVENTS, CONFIG_NET. I didn’t realize
-> >> I could add these to the “depends” field.
-> >> So something like this: (let me know if you see any issues)
-> >> 
-> >>        tristate "KUnit Test for connector hashtable code" if !KUNIT_ALL_TESTS
-> >>        depends on KUNIT
-> >> +       depends on CONNECTOR && PROC_EVENTS
-> >> +       depends on NET
-> >>        default KUNIT_ALL_TESTS
-> >> 
-> >> These are the configs I add to my .config file and compile it as a module and then
-> >> do modprobe to test.
-> > 
-> > [..]
-> > 
-> >> Are you running the kunit tester with kunit.py?
-> > 
-> > Yes, make sure all required options are picked up by
-> > "./tools/testing/kunit/kunit.py run" instead of manually adding options
-> > and doing modprobe.
-> 
-> The environment issues are resolved and I am able to run kunit.py, but my tests
-> are not invoked without giving options via —kconfig-add. Other tests are also not
-> invoked. Running with the manual options runs 413 tests, and with just kunit.py
-> runs 389 tests. (I have added 6). Any idea how I can make it run my tests?
 
-The runner does: ./tools/testing/kunit/kunit.py run --alltests
-Is it not enough in your case? What options do you pass via
---kconfig-add? Is it because CONNECTOR stuff is disabled by default?
+
+On 10/18/2024 11:18 AM, Denis Kenzior wrote:
+> Allow QIPCRTR family sockets to include QRTR_ENDPOINT auxiliary data
+> as part of the sendmsg system call.  By including this parameter, the
+> client can ask the kernel to route the message to a given endpoint, in
+> situations where multiple endpoints with conflicting node identifier
+> sets exist in the system.
+> 
+> For legacy clients, or clients that do not include QRTR_ENDPOINT data,
+> the endpoint is looked up, as before, by only using the node identifier
+> of the destination qrtr socket address.
+> 
+> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
+> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> Reviewed-by: Andy Gross <agross@kernel.org>
+> ---
+>   net/qrtr/af_qrtr.c | 80 +++++++++++++++++++++++++++++++++-------------
+>   net/qrtr/qrtr.h    |  2 ++
+>   2 files changed, 60 insertions(+), 22 deletions(-)
+> 
+> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+> index 568ccb1d8574..23749a0b0c15 100644
+> --- a/net/qrtr/af_qrtr.c
+> +++ b/net/qrtr/af_qrtr.c
+> @@ -106,6 +106,36 @@ static inline struct qrtr_sock *qrtr_sk(struct sock *sk)
+>   	return container_of(sk, struct qrtr_sock, sk);
+>   }
+>   
+> +int qrtr_msg_get_endpoint(struct msghdr *msg, u32 *out_endpoint_id)
+> +{
+> +	struct cmsghdr *cmsg;
+> +	u32 endpoint_id = 0;
+> +
+> +	for_each_cmsghdr(cmsg, msg) {
+> +		if (!CMSG_OK(msg, cmsg))
+> +			return -EINVAL;
+> +
+> +		if (cmsg->cmsg_level != SOL_QRTR)
+> +			continue;
+> +
+> +		if (cmsg->cmsg_type != QRTR_ENDPOINT)
+> +			return -EINVAL;
+> +
+> +		if (cmsg->cmsg_len < CMSG_LEN(sizeof(u32)))
+> +			return -EINVAL;
+> +
+> +		/* Endpoint ids start at 1 */
+> +		endpoint_id = *(u32 *)CMSG_DATA(cmsg);
+> +		if (!endpoint_id)
+> +			return -EINVAL;
+> +	}
+> +
+> +	if (out_endpoint_id)
+> +		*out_endpoint_id = endpoint_id;
+
+In the case when there is no cmsg attached to the msg. Would it be safer 
+to assign out_endpoint_id to 0 before returning?
+
+I see that in qrtr_sendmsg() there is a risk of using msg_endpoint_id 
+without it being initialized or assigned a value in this function.
+
+> +
+> +	return 0;
+> +}
+> +
+>   static unsigned int qrtr_local_nid = 1;
+>   
+>   /* for node ids */
+> @@ -404,14 +434,16 @@ static int qrtr_node_enqueue(struct qrtr_node *node, struct sk_buff *skb,
+>    *
+>    * callers must release with qrtr_node_release()
+>    */
+> -static struct qrtr_node *qrtr_node_lookup(unsigned int nid)
+> +static struct qrtr_node *qrtr_node_lookup(unsigned int endpoint_id,
+> +					  unsigned int nid)
+>   {
+>   	struct qrtr_node *node;
+>   	unsigned long flags;
+> +	unsigned long key = (unsigned long)endpoint_id << 32 | nid;
+>   
+>   	mutex_lock(&qrtr_node_lock);
+>   	spin_lock_irqsave(&qrtr_nodes_lock, flags);
+> -	node = radix_tree_lookup(&qrtr_nodes, nid);
+> +	node = radix_tree_lookup(&qrtr_nodes, key);
+>   	node = qrtr_node_acquire(node);
+>   	spin_unlock_irqrestore(&qrtr_nodes_lock, flags);
+>   	mutex_unlock(&qrtr_node_lock);
+> @@ -953,6 +985,7 @@ static int qrtr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>   	struct qrtr_sock *ipc = qrtr_sk(sock->sk);
+>   	struct sock *sk = sock->sk;
+>   	struct qrtr_node *node;
+> +	u32 msg_endpoint_id;
+>   	u32 endpoint_id = qrtr_local_nid;
+>   	struct sk_buff *skb;
+>   	size_t plen;
+> @@ -965,46 +998,48 @@ static int qrtr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>   	if (len > 65535)
+>   		return -EMSGSIZE;
+>   
+> +	rc = qrtr_msg_get_endpoint(msg, &msg_endpoint_id);
+> +	if (rc < 0)
+> +		return rc;
+> +
+>   	lock_sock(sk);
+>   
+>   	if (addr) {
+> -		if (msg->msg_namelen < sizeof(*addr)) {
+> -			release_sock(sk);
+> -			return -EINVAL;
+> -		}
+> +		rc = -EINVAL;
+>   
+> -		if (addr->sq_family != AF_QIPCRTR) {
+> -			release_sock(sk);
+> -			return -EINVAL;
+> -		}
+> +		if (msg->msg_namelen < sizeof(*addr))
+> +			goto release_sock;
+> +
+> +		if (addr->sq_family != AF_QIPCRTR)
+> +			goto release_sock;
+>   
+>   		rc = qrtr_autobind(sock);
+> -		if (rc) {
+> -			release_sock(sk);
+> -			return rc;
+> -		}
+> +		if (rc)
+> +			goto release_sock;
+>   	} else if (sk->sk_state == TCP_ESTABLISHED) {
+>   		addr = &ipc->peer;
+>   	} else {
+> -		release_sock(sk);
+> -		return -ENOTCONN;
+> +		rc = -ENOTCONN;
+> +		goto release_sock;
+>   	}
+>   
+>   	node = NULL;
+>   	if (addr->sq_node == QRTR_NODE_BCAST) {
+>   		if (addr->sq_port != QRTR_PORT_CTRL &&
+>   		    qrtr_local_nid != QRTR_NODE_BCAST) {
+> -			release_sock(sk);
+> -			return -ENOTCONN;
+> +			rc = -ENOTCONN;
+> +			goto release_sock;
+>   		}
+>   		enqueue_fn = qrtr_bcast_enqueue;
+>   	} else if (addr->sq_node == ipc->us.sq_node) {
+>   		enqueue_fn = qrtr_local_enqueue;
+>   	} else {
+> -		node = qrtr_node_lookup(addr->sq_node);
+> +		endpoint_id = msg_endpoint_id;
+> +
+> +		node = qrtr_node_lookup(endpoint_id, addr->sq_node);
+>   		if (!node) {
+> -			release_sock(sk);
+> -			return -ECONNRESET;
+> +			rc = endpoint_id ? -ENXIO : -ECONNRESET;
+> +			goto release_sock;
+>   		}
+>   		enqueue_fn = qrtr_node_enqueue;
+>   	}
+> @@ -1043,6 +1078,7 @@ static int qrtr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>   
+>   out_node:
+>   	qrtr_node_release(node);
+> +release_sock:
+>   	release_sock(sk);
+>   
+>   	return rc;
+> @@ -1057,7 +1093,7 @@ static int qrtr_send_resume_tx(struct qrtr_cb *cb)
+>   	struct sk_buff *skb;
+>   	int ret;
+>   
+> -	node = qrtr_node_lookup(remote.sq_node);
+> +	node = qrtr_node_lookup(cb->endpoint_id, remote.sq_node);
+>   	if (!node)
+>   		return -EINVAL;
+>   
+> diff --git a/net/qrtr/qrtr.h b/net/qrtr/qrtr.h
+> index 11b897af05e6..22fcecbf8de2 100644
+> --- a/net/qrtr/qrtr.h
+> +++ b/net/qrtr/qrtr.h
+> @@ -34,4 +34,6 @@ int qrtr_ns_init(void);
+>   
+>   void qrtr_ns_remove(void);
+>   
+> +int qrtr_msg_get_endpoint(struct msghdr *msg, u32 *out_endpoint_id);
+> +
+>   #endif
 
