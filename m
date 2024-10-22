@@ -1,132 +1,171 @@
-Return-Path: <netdev+bounces-137925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD299AB220
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:30:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CBD99AB232
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C02621C22731
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:30:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACBA4B21ACD
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A70148314;
-	Tue, 22 Oct 2024 15:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FD5148314;
+	Tue, 22 Oct 2024 15:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsaYfPUm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMddI/nX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDCB13D899
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 15:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7EA139580;
+	Tue, 22 Oct 2024 15:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729611039; cv=none; b=LT2BM6PHvEoldPIEu9MQ7fCojoxsejbgC8z5bgpM0ZEW49SqU6LHogsVv7DiJFx+Ncm6xfue2XOkZqqzZzKfe4kl6kiuYq5iUyt/RFRwwaWgJCduDcZCfwuLduqM+OBN0rvPV+U2ilk1qojKcOISsWZNOUfvWdaL2zwctx5n5ic=
+	t=1729611212; cv=none; b=uFM6ixBhN91++tkjfEtCtL/E+sDb74naWN8p7TxgkWfcUb5sPevQl98uqVxgNwdLQKQhFnKfYxUv/Q8U6gt5w9JsKn4I1zQb6Nx6J459fO6OBoNTpmTGh5Gv3VwHNc6uy3VrWUoSa7g+iyHAybLDneTtvP4ja5zTtWJKqXtqtgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729611039; c=relaxed/simple;
-	bh=aeNB2y0zQoaicGC/OFWTx8R6AjoXO4apTD26syH9b1c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F7TZZhbBS3OwK7J+EC8WZScFEZqaezhPiC4JQbAWOw6yEE8w40IqttAIV+/6e7i0EJ5/ecsl26ZshqISyHUqKCx9pncc/i7GuXxJngBXiXdoWGMrAKgIATgqG15ejbUkzuEP2RhHypQdNHmJ/ggdmnfB7D+ZkgyJeP5cFj2CRRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VsaYfPUm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729611037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aeNB2y0zQoaicGC/OFWTx8R6AjoXO4apTD26syH9b1c=;
-	b=VsaYfPUmHV+kUK/5TNgha1YXjtBbmg7467SOY6ryRovBr8Ug/dFE8QSc8htusmdw/PgBw8
-	Y0Gvs3GbyP+UYvGCcIO8ZCUmveNP87ruotGIbnl+8f/meBJgyQf8nYM+xUtnw8lEhF8l5E
-	8UgYbr4FreqMBmPdnB5sUyEBB/X51Kg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-77-nEyi4yIkN1CT5lR6qjY2Ag-1; Tue, 22 Oct 2024 11:30:35 -0400
-X-MC-Unique: nEyi4yIkN1CT5lR6qjY2Ag-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d5a3afa84so3052100f8f.3
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 08:30:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729611034; x=1730215834;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aeNB2y0zQoaicGC/OFWTx8R6AjoXO4apTD26syH9b1c=;
-        b=wnHZDOSxIl/HEFlhywf/pGjSQrIvrJfJYnzjsEkl3CwFC6DjHC74w0Z/rWqMJA8U3a
-         3mSoLYnP+UECKE4kvNmJOrevA3YPiTBrnFfb+PkyWPie1+1begvdOEv2zG42OtBXcQ9G
-         4ZZ8x14weVnbbCj/oF4ns/Y5lJiPo63R1D1syW54wd0h/y1+3Z7+lxIDfpgplLyLzh1T
-         Fm8kZEMArTe2R6pAgmE7kFkohBEPaTiIRJDsDVJJHFmDxC1fMVFwNXaj32JbD4UeDEBj
-         obQu0C52mtUsr3nPK6H+DApiTz8hm26hvGb1WkPUVH6aqPFYXPY0+hLv/ypIzcsIISXy
-         Gotw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgHPB0OutkoHuYUeIt4l5MBteBhWtIYLvBIMgaKDUSG8Li3uKZxNqV5MJN/PXANouoZd+48nw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB7ohsW/mZxxUYWjxo9o9u945vUq5DAoJt2gWMKmLddlFsuHM6
-	jLgkKxjObhVmZrk2R+Rb5KLODgxpUEEjeKsYJalJaOC5Nt7wDUK5LF+gu0z/bPH52yhisYmQGtj
-	6g3XzhGXQOuv809xpAlD3SnVVO/nR+sq+Wr7QYBez+1c0CvtoQyKZgg==
-X-Received: by 2002:a5d:58d2:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-37ea21370eamr10229403f8f.9.1729611034099;
-        Tue, 22 Oct 2024 08:30:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0zz73eNEgDwtK6KpTgteNC4JY1ou4UN+CqrAjVjAKfCV29EIzHazgxXKj9Qr93aNf7MnbxA==
-X-Received: by 2002:a5d:58d2:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-37ea21370eamr10229386f8f.9.1729611033728;
-        Tue, 22 Oct 2024 08:30:33 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a488edsm6862221f8f.31.2024.10.22.08.30.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 08:30:33 -0700 (PDT)
-Message-ID: <0b779b4d-d2d3-499e-abf9-4eae4806316b@redhat.com>
-Date: Tue, 22 Oct 2024 17:30:28 +0200
+	s=arc-20240116; t=1729611212; c=relaxed/simple;
+	bh=JAcUXImlGaxQw1VcdDVM5id5Wu8GNV5AfGianwvJiz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LxPhCbNy5RH/MZG3Rgf5m2KuGy3BH0kSLNZmQBXBYSmy2mTU/E3lgvs+MPXkZWHPbtTBC3Tq2L4jC6JeywK6XQQ7T/GI4ETC/JUbSy/RXBI1UFAIVW9e2KL3SpkHsYIQGKl3kMIzYrpOtFb46cM8S+RLxLLcl0WqYuE/vDIeiQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMddI/nX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5E5EC4CEC3;
+	Tue, 22 Oct 2024 15:33:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729611212;
+	bh=JAcUXImlGaxQw1VcdDVM5id5Wu8GNV5AfGianwvJiz0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oMddI/nXQBS+kSD25XSrV9C9kQe2pfPAiUJ9y9JGejSkUpO1fE+YpNsQ7eyhad8vg
+	 TRhYCOR45ldF4pR5p380ozJNXGnfr+Eki6FAESbCmZU4rByH3446XyPzP3lIKa6ZYx
+	 PMXGbCLWfnE9qP1Lb/TQ/1UNDtk8Oqh5Xbe+aOX/SOsZYg6dffnLqZUpL2ysF+flF0
+	 ibvOTeU7Ibdio/xlT3qDiXeqquEJp6UubLp/7sCkgcnLngZ7abd89k0w50qRKCK1WE
+	 HGvrnSTMhdMM6DAQzjjszYCNnITocIE20Y2iZejumjoAhC2TBiGmj54EYuL3XonyXD
+	 2nJqMh3Nm1CAg==
+Date: Tue, 22 Oct 2024 16:33:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	fw@strlen.de, kuniyu@amazon.com, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org, yuehaibing@huawei.com
+Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
+Message-ID: <20241022153327.GW402847@kernel.org>
+References: <20241022085753.2069639-1-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Drop packets with invalid headers to prevent KMSAN
- infoleak
-To: Daniel Yang <danielyangkang@gmail.com>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
- <bpf@vger.kernel.org>,
- "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
- <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
- syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
-References: <20241019071149.81696-1-danielyangkang@gmail.com>
- <c7d0503b-e20d-4a6d-aecf-2bd7e1c7a450@linux.dev>
- <CAGiJo8R2PhpOitTjdqZ-jbng0Yg=Lxu6L+6FkYuUC1M_d10U2Q@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGiJo8R2PhpOitTjdqZ-jbng0Yg=Lxu6L+6FkYuUC1M_d10U2Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022085753.2069639-1-dongchenchen2@huawei.com>
 
-On 10/22/24 03:37, Daniel Yang wrote:
-> Are there any possible unexpected issues that can be caused by this?
+On Tue, Oct 22, 2024 at 04:57:53PM +0800, Dong Chenchen wrote:
+> ip6table_nat module unload has refcnt warning for UAF. call trace is:
+> 
+> WARNING: CPU: 1 PID: 379 at kernel/module/main.c:853 module_put+0x6f/0x80
+> Modules linked in: ip6table_nat(-)
+> CPU: 1 UID: 0 PID: 379 Comm: ip6tables Not tainted 6.12.0-rc4-00047-gc2ee9f594da8-dirty #205
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+> RIP: 0010:module_put+0x6f/0x80
+> Call Trace:
+>  <TASK>
+>  get_info+0x128/0x180
+>  do_ip6t_get_ctl+0x6a/0x430
+>  nf_getsockopt+0x46/0x80
+>  ipv6_getsockopt+0xb9/0x100
+>  rawv6_getsockopt+0x42/0x190
+>  do_sock_getsockopt+0xaa/0x180
+>  __sys_getsockopt+0x70/0xc0
+>  __x64_sys_getsockopt+0x20/0x30
+>  do_syscall_64+0xa2/0x1a0
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Concurrent execution of module unload and get_info() trigered the warning.
+> The root cause is as follows:
+> 
+> cpu0				      cpu1
+> module_exit
+> //mod->state = MODULE_STATE_GOING
+>   ip6table_nat_exit
+>     xt_unregister_template
+>     //remove table from templ list
+> 				      getinfo()
+> 					  t = xt_find_table_lock
+> 						list_for_each_entry(tmpl, &xt_templates[af]...)
+> 							if (strcmp(tmpl->name, name))
+> 								continue;  //table not found
+> 							try_module_get
+> 						list_for_each_entry(t, &xt_net->tables[af]...)
+> 							return t;  //not get refcnt
+> 					  module_put(t->me) //uaf
+>     unregister_pernet_subsys
+>     //remove table from xt_net list
+> 
+> While xt_table module was going away and has been removed from
+> xt_templates list, we couldnt get refcnt of xt_table->me. Skip
+> the re-traversal of xt_net->tables list to fix it.
+> 
+> Fixes: c22921df777d ("netfilter: iptables: Fix potential null-ptr-deref in ip6table_nat_table_init().")
+> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> ---
+>  net/netfilter/x_tables.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+> index da5d929c7c85..359c880ecb07 100644
+> --- a/net/netfilter/x_tables.c
+> +++ b/net/netfilter/x_tables.c
+> @@ -1239,6 +1239,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>  	struct module *owner = NULL;
+>  	struct xt_template *tmpl;
+>  	struct xt_table *t;
+> +	int err = -ENOENT;
+>  
+>  	mutex_lock(&xt[af].mutex);
+>  	list_for_each_entry(t, &xt_net->tables[af], list)
+> @@ -1247,8 +1248,6 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>  
+>  	/* Table doesn't exist in this netns, check larval list */
+>  	list_for_each_entry(tmpl, &xt_templates[af], list) {
+> -		int err;
+> -
+>  		if (strcmp(tmpl->name, name))
+>  			continue;
+>  		if (!try_module_get(tmpl->me))
+> @@ -1267,6 +1266,9 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>  		break;
+>  	}
+>  
+> +	if (err < 0)
+> +		goto out;
+> +
+>  	/* and once again: */
+>  	list_for_each_entry(t, &xt_net->tables[af], list)
+>  		if (strcmp(t->name, name) == 0)
+> @@ -1275,7 +1277,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>  	module_put(owner);
 
-This patch is apparently the cause of BPF self-tests failures:
+Hi Dong Chenchen,
 
-test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-[redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingress
-[redirect_ingress]: actual -34 != expected 0
-test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress
-[redirect_egress] 0 nsec
-test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-[redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
-[redirect_egress]: actual -34 != expected 1
+I'm unsure if this can happen in practice, although I guess so else the
+module_put() call above is never reached. In any case, previously if we got
+to this line then the function would return ERR_PTR(-ENOENT).  But now it
+will return ERR_PTR(0). Which although valid often indicates a bug.
 
-Before submitting an eventual next revision, please very that BPF
-self-tests are happy.
+Flagged by Smatch.
 
-Thanks,
-
-Paolo
-
+>   out:
+>  	mutex_unlock(&xt[af].mutex);
+> -	return ERR_PTR(-ENOENT);
+> +	return ERR_PTR(err);
+>  }
+>  EXPORT_SYMBOL_GPL(xt_find_table_lock);
+>  
+> -- 
+> 2.25.1
+> 
+> 
 
