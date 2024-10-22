@@ -1,331 +1,200 @@
-Return-Path: <netdev+bounces-137829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFCF89A9FC7
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 12:18:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93669A9FD4
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 12:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1598283D1E
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:18:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 698CD1F23E97
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 10:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5457B198E7E;
-	Tue, 22 Oct 2024 10:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B54199EB4;
+	Tue, 22 Oct 2024 10:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TB6eGUtm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0Dwv2E4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592291957FC
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 10:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F931171066;
+	Tue, 22 Oct 2024 10:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729592278; cv=none; b=L/QPnl0CaZipqr0S2ZSeROmF9esFR1d0abspaZPewy9D0BESr3LEAPkjeR7VZ0m5M0+1FqEPzV8g2e5H5xWR8NJdxcAu06+nYfKgkh0ems8r32+lziCHu9NHLPqm+hmSogkDqjAQ0adENEJlnyVM6e57o0kLiyQovGAHFr+OdHY=
+	t=1729592517; cv=none; b=Cx5HIkXlKDE5adr8xCB7H+VbtFeDd/zLxZGdBKzRsa0mz/9n/XS/nU3WxMou6u7IArG3cpHJzFz8nKZENTbVUgWerTcVVlo0X0Z+9HaAL8WEXWjQ4VvSz5mLf6VyNdOBZNrXk0MyRl6fY4kD0MEDdvgOBDNvDCBKZ0SEEsD+hkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729592278; c=relaxed/simple;
-	bh=F7fYLHf1F0ibUk3B9Dlg8qjLYPMjBGsNz+cA6zjGjew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rcFpTyGcNFvqJ+63PPn2xQIBK6ncfmFayDytKKWAFDfmt55rpHQABCVkpb7OoKyTmE21wkEgNd8UdLFq4EmQjGgYRD/gp5tLBc3jTbuAptwrh26jiIUmymrhIBMkwye0Z4DO/8n8FKfCN+sFM7KTADJAUISkzkyL+D6prBCqBhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TB6eGUtm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729592275;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=afEMX6hvhF+bEuSBXuy4vMwiJ/UEHN0+5JysSySMVE0=;
-	b=TB6eGUtm5LFNK5xLSTUB3IcQs5ReAtECdhUtsgbX1sLJmQVjWWPEeMA3p7wgRrwSjZLyVW
-	N6PoKH2qPXfZl6xeRaqVIN1cO0H+739TvE66ETS0Yle9CMiYngyXiJ8W6MW7pUV41T8Jpy
-	C0+EXid17eNHrRtnphYitZyz/U/HhO8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-452-ZrrGind9NJKA7TDT2VHzAQ-1; Tue, 22 Oct 2024 06:17:53 -0400
-X-MC-Unique: ZrrGind9NJKA7TDT2VHzAQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43157cff1d1so43664675e9.2
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 03:17:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729592272; x=1730197072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=afEMX6hvhF+bEuSBXuy4vMwiJ/UEHN0+5JysSySMVE0=;
-        b=oh/ZkOFA3kTDNukXYW+Tkd+L0+0iuEy4lOGghCka/wEw59TiuXtQcefPducLAImqH+
-         aFRfxrqGY9n9D10+NdNw6ctK8LWobQhSm+xDwhRjumjpU0nDzxz59HHr+cnQfgCQJioq
-         HEtJz2XwC0yJQOD0v143FRcWCA8hnhhcOcOkYOCNMvHlbOLfKMG8bV7tIHG+EdcpRdPw
-         pbisGaEVJSJ1/rg0sDwkt4rbRazoAvQCMmmqWm+f9sKO848R55LYrA1TESuxEjkLP3+d
-         DuhCzZ5wFwDWxK1+Ln3eiYAGhcz6LJniwViYDavW8exsuWM4pvM9hWQ89ZSzcdpja/ZP
-         UsFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiGqOPCIgFwiPOVCq+/K+F2SC2iaPuL/Ky0BEglWLyU250nl49qUvaWPB6x6pg3o1I/Dgr1Pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzROUzadl3GhDmIHs2WoK5MRTeG5YO8zzmH5ZpAfSbRi9fOgADA
-	CG7iK4m8p/vS5bbISlHbSpPmnbe4mrfSYrVvO3WUCjkSgT2bvcOpFzVbenajPbtZ6dSH73+6iSP
-	k7MsJM/keer/oazr2NbxIwDT0FBMQ6Ey+US6ZOg8czdKmkRZNRN72Uw==
-X-Received: by 2002:a05:600c:3b07:b0:426:61e8:fb3b with SMTP id 5b1f17b1804b1-4317caf6bd7mr14830585e9.27.1729592272375;
-        Tue, 22 Oct 2024 03:17:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFHPXMmPoqqnTUIWtOfsOzji8AphQjUnwdrJKcXlc99EyaDOrkLUeeqnDFzrVNdeOKdUaR+9g==
-X-Received: by 2002:a05:600c:3b07:b0:426:61e8:fb3b with SMTP id 5b1f17b1804b1-4317caf6bd7mr14830285e9.27.1729592271864;
-        Tue, 22 Oct 2024 03:17:51 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8? ([2a0d:3344:1b73:a910:d583:6ebb:eb80:7cd8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a47b74sm6268704f8f.27.2024.10.22.03.17.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 03:17:51 -0700 (PDT)
-Message-ID: <c1890a67-6cc5-4f37-bc33-5fd49b6839c5@redhat.com>
-Date: Tue, 22 Oct 2024 12:17:49 +0200
+	s=arc-20240116; t=1729592517; c=relaxed/simple;
+	bh=AV2qizbKg6OBYja0QTKSFQnNhoDGuy4QLCP1NAfZPuk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=R/fKLA2DBoqZdB8CCDO35o56DAloaGHYaMjGaAcjXAq5rGrbua/y9z2wpOxWH3YGjfEDdLhWDL/JakkyDQ/SlzmwUQgqhyiuIAG8RCUZt+gjR7s020ufaWhJUbVRr/ZtyWJot0+1irSct9HT5sRZVpcuGukrByibL5G3nOgDptU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0Dwv2E4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8D8CC4CEC3;
+	Tue, 22 Oct 2024 10:21:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729592517;
+	bh=AV2qizbKg6OBYja0QTKSFQnNhoDGuy4QLCP1NAfZPuk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=q0Dwv2E4cQ9aPHZAyd6T9O5nTw+cwk7rYh7yOVSiJzLLMGVxPKzzbarWuahcbHEDz
+	 kpyFs/kEdSzA7cD8chrCYxE8lyuDpgOiVUDgF4IRySbhcYGhxmyk3wzKrYEpoNbkCK
+	 uXW/uTjWgQCkFUbbOmDkvJES44yYCBDii+4ImiW8Mup/HQx9mpyUUINZfVdFIXt7Aw
+	 0QUQdMwzUQhkGtHZjur0RcR2le86yOAsbGiwfZCo+xXhFfBsAxxGkS6+uvTakgnWuZ
+	 M2YkLweov6J1Un7ac1n+DjCOepl5y2Ep3/5j0LiopQt5lSZKxtKNN2YuZT2GQfrKBp
+	 sfC1pRJkvbWLA==
+From: Puranjay Mohan <puranjay@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Andrii Nakryiko
+ <andrii@kernel.org>, bpf@vger.kernel.org, Daniel Borkmann
+ <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Eduard
+ Zingerman <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, Hao Luo
+ <haoluo@google.com>, Helge Deller <deller@gmx.de>, Jakub Kicinski
+ <kuba@kernel.org>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>,
+ Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, Palmer Dabbelt
+ <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Song Liu
+ <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song
+ <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next 4/5] selftests/bpf: Add benchmark for
+ bpf_csum_diff() helper
+In-Reply-To: <CAEf4BzY1LgCF1VOoAQkMdDTx87C0mfyftMvhvVU4GpsFc6fw5g@mail.gmail.com>
+References: <20241021122112.101513-1-puranjay@kernel.org>
+ <20241021122112.101513-5-puranjay@kernel.org>
+ <CAEf4BzY1LgCF1VOoAQkMdDTx87C0mfyftMvhvVU4GpsFc6fw5g@mail.gmail.com>
+Date: Tue, 22 Oct 2024 10:21:43 +0000
+Message-ID: <mb61pa5ewbfpk.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/3] selftests: nic_link_layer: Add link layer
- selftest for NIC driver
-To: Mohan Prasad J <mohan.prasad@microchip.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch
-Cc: edumazet@google.com, shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, horms@kernel.org, brett.creeley@amd.com,
- rosenp@gmail.com, UNGLinuxDriver@microchip.com, willemb@google.com,
- petrm@nvidia.com
-References: <20241016215014.401476-1-mohan.prasad@microchip.com>
- <20241016215014.401476-2-mohan.prasad@microchip.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241016215014.401476-2-mohan.prasad@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On 10/16/24 23:50, Mohan Prasad J wrote:
-> Add selftest file for the link layer tests of a NIC driver.
-> Test for auto-negotiation is added.
-> Add LinkConfig class for changing link layer configs.
-> Selftest makes use of ksft modules and ethtool.
-> Include selftest file in the Makefile.
-> 
-> Signed-off-by: Mohan Prasad J <mohan.prasad@microchip.com>
-> ---
->  .../testing/selftests/drivers/net/hw/Makefile |   1 +
->  .../drivers/net/hw/lib/py/__init__.py         |   1 +
->  .../drivers/net/hw/lib/py/linkconfig.py       | 220 ++++++++++++++++++
->  .../drivers/net/hw/nic_link_layer.py          |  84 +++++++
->  4 files changed, 306 insertions(+)
->  create mode 100644 tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
->  create mode 100644 tools/testing/selftests/drivers/net/hw/nic_link_layer.py
-> 
-> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-> index c9f2f48fc..0dac40c4e 100644
-> --- a/tools/testing/selftests/drivers/net/hw/Makefile
-> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
-> @@ -10,6 +10,7 @@ TEST_PROGS = \
->  	hw_stats_l3.sh \
->  	hw_stats_l3_gre.sh \
->  	loopback.sh \
-> +	nic_link_layer.py \
->  	pp_alloc_fail.py \
->  	rss_ctx.py \
->  	#
-> diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> index b58288578..399789a96 100644
-> --- a/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> +++ b/tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-> @@ -9,6 +9,7 @@ try:
->      sys.path.append(KSFT_DIR.as_posix())
->      from net.lib.py import *
->      from drivers.net.lib.py import *
-> +    from .linkconfig import LinkConfig
->  except ModuleNotFoundError as e:
->      ksft_pr("Failed importing `net` library from kernel sources")
->      ksft_pr(str(e))
-> diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py b/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
-> new file mode 100644
-> index 000000000..86cbf10a3
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
-> @@ -0,0 +1,220 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +from lib.py import cmd
-> +from lib.py import ethtool
-> +from lib.py import ksft_pr, ksft_eq
-> +import re
-> +import time
-> +import json
-> +
-> +#The LinkConfig class is implemented to handle the link layer configurations.
-> +#Required minimum ethtool version is 6.10
-> +#The ethtool and ip would require authentication to make changes, so better
-> +# to check them for sudo privileges for interruption free testing.
-> +
-> +class LinkConfig:
-> +    """Class for handling the link layer configurations"""
-> +    def __init__(self, cfg):
-> +        self.cfg = cfg
-> +        self.partner_netif = self.get_partner_netif_name()
-> +
-> +        """Get the initial link configuration of local interface"""
-> +        self.common_link_modes = self.get_common_link_modes()
-> +
-> +    def get_partner_netif_name(self):
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-You should use type hints for both the arguments and the return type.
+Andrii Nakryiko <andrii.nakryiko@gmail.com> writes:
 
-> +        partner_netif = None
-> +        try:
-> +            """Get partner interface name"""
-> +            partner_cmd = f"ip -o -f inet addr show | grep '{self.cfg.remote_addr}' " + "| awk '{print $2}'"
+> On Mon, Oct 21, 2024 at 5:22=E2=80=AFAM Puranjay Mohan <puranjay@kernel.o=
+rg> wrote:
+>>
+>> Add a microbenchmark for bpf_csum_diff() helper. This benchmark works by
+>> filling a 4KB buffer with random data and calculating the internet
+>> checksum on different parts of this buffer using bpf_csum_diff().
+>>
+>> Example run using ./benchs/run_bench_csum_diff.sh on x86_64:
+>>
+>> [bpf]$ ./benchs/run_bench_csum_diff.sh
+>> 4                    2.296 =C2=B1 0.066M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 8                    2.320 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 16                   2.315 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 20                   2.318 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 32                   2.308 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 40                   2.300 =C2=B1 0.029M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 64                   2.286 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 128                  2.250 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 256                  2.173 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000M/s)
+>> 512                  2.023 =C2=B1 0.055M/s (drops 0.000 =C2=B1 0.000M/s)
+>
+> you are not benchmarking bpf_csum_diff(), you are benchmarking how
+> often you can call bpf_prog_test_run(). Add some batching on the BPF
+> side, these numbers tell you that there is no difference between
+> calculating checksum for 4 bytes and for 512, that didn't seem strange
+> to you?
 
-It's better if you use json output even here
+This didn't seem strange to me because if you see the tables I added to
+the cover letter, there is a clear improvement after optimizing the
+helper and arm64 even shows a linear drop going from 4 bytes to 512
+bytes, even after the optimization.
 
-[...]
-> +    def reset_interface(self, local=True, remote=True):
-> +        ksft_pr("Resetting interfaces in local and remote")
-> +        if remote:
-> +            if self.partner_netif is not None:
-> +                ifname = self.partner_netif
-> +                link_up_cmd = f"sudo ip link set up {ifname}"
-> +                link_down_cmd = f"sudo ip link set down {ifname}"
-> +                reset_cmd = f"{link_down_cmd} && sleep 5 && {link_up_cmd}"
-> +                try:
-> +                    cmd(f"{reset_cmd}", host=self.cfg.remote)
-> +                except Exception as e:
-> +                    ksft_pr("Check sudo permission for ip command")
-> +                    ksft_pr(f"Unexpected error occurred: {e}")
+On x86 after the improvement, 4 bytes and 512 bytes show similar numbers
+but there is still a small drop that can be seen going from 4 to 512
+bytes.
 
-Please, don't use sudo, just run the command directly. The selftests
-should be executed only by privileged users.
+My thought was that because the bpf_csum_diff() calls csum_partial() on
+x86 which is already optimised, most of the overhead was due to copying
+the buffer which is now removed.
 
-[...]
-> +    def check_autoneg_supported(self, remote=False):
-> +        if remote==False:
-> +            local_autoneg = self.get_ethtool_field("supports-auto-negotiation")
-> +            if local_autoneg is None:
-> +                ksft_pr(f"Unable to fetch auto-negotiation status for interface {self.cfg.ifname}")
-> +            """Return autoneg status of the local interface"""
-> +            status = True if local_autoneg == True else False
-> +            return status
+I guess I can amplify the difference between 4B and 512B by calling
+bpf_csum_diff() multiple times in a loop, or by calculating the csum by
+dividing the buffer into more parts (currently the BPF code divides it
+into 2 parts only).
 
-Out of sheer ignorance, in't
+>>
+>> Signed-off-by: Puranjay Mohan <puranjay@kernel.org>
+>> ---
+>>  tools/testing/selftests/bpf/Makefile          |   2 +
+>>  tools/testing/selftests/bpf/bench.c           |   4 +
+>>  .../selftests/bpf/benchs/bench_csum_diff.c    | 164 ++++++++++++++++++
+>>  .../bpf/benchs/run_bench_csum_diff.sh         |  10 ++
+>>  .../selftests/bpf/progs/csum_diff_bench.c     |  25 +++
+>>  5 files changed, 205 insertions(+)
+>>  create mode 100644 tools/testing/selftests/bpf/benchs/bench_csum_diff.c
+>>  create mode 100755 tools/testing/selftests/bpf/benchs/run_bench_csum_di=
+ff.sh
+>>  create mode 100644 tools/testing/selftests/bpf/progs/csum_diff_bench.c
+>>
+>
+> [...]
+>
+>> +
+>> +static void csum_diff_setup(void)
+>> +{
+>> +       int err;
+>> +       char *buff;
+>> +       size_t i, sz;
+>> +
+>> +       sz =3D sizeof(ctx.skel->rodata->buff);
+>> +
+>> +       setup_libbpf();
+>> +
+>> +       ctx.skel =3D csum_diff_bench__open();
+>> +       if (!ctx.skel) {
+>> +               fprintf(stderr, "failed to open skeleton\n");
+>> +               exit(1);
+>> +       }
+>> +
+>> +       srandom(time(NULL));
+>> +       buff =3D ctx.skel->rodata->buff;
+>> +
+>> +       /*
+>> +        * Set first 8 bytes of buffer to 0xdeadbeefdeadbeef, this is la=
+ter used to verify the
+>> +        * correctness of the helper by comparing the checksum result fo=
+r 0xdeadbeefdeadbeef that
+>> +        * should be 0x3b3b
+>> +        */
+>> +
+>> +       *(u64 *)buff =3D 0xdeadbeefdeadbeef;
+>> +
+>> +       for (i =3D 8; i < sz; i++)
+>> +               buff[i] =3D '1' + random() % 9;
+>
+> so, you only generate 9 different values for bytes, why? Why not full
+> byte range?
 
-		return local_autoneg
-
-enough?
-
-
-> +        else:
-> +            """Check remote auto-negotiation support status"""
-> +            partner_autoneg = False
-> +            if self.partner_netif is not None:
-> +                partner_autoneg = self.get_ethtool_field("supports-auto-negotiation", remote=True)
-> +                if partner_autoneg is None:
-> +                    ksft_pr(f"Unable to fetch auto-negotiation status for interface {partner_netif}")
-> +            status = True if partner_autoneg is True else False
-> +            return status
-> +
-> +    def get_common_link_modes(self):
-> +        common_link_modes = None
-> +        """Populate common link modes"""
-> +        link_modes = self.get_ethtool_field("supported-link-modes")
-> +        partner_link_modes = self.get_ethtool_field("link-partner-advertised-link-modes")
-> +        if link_modes is None:
-> +            raise Exception(f"Link modes not available for {self.cfg.ifname}")
-> +        if partner_link_modes is None:
-> +            raise Exception(f"Partner link modes not available for {self.cfg.ifname}")
-> +        common_link_modes = set(link_modes) and set(partner_link_modes)
-> +        return common_link_modes
-> +
-> +    def get_speed_duplex_values(self, link_modes):
-> +        speed = []
-> +        duplex = []
-> +        """Check the link modes"""
-> +        for data in link_modes:
-> +            parts = data.split('/')
-> +            speed_value = re.match(r'\d+', parts[0])
-> +            if speed_value:
-> +                speed.append(speed_value.group())
-> +            else:
-> +                ksft_pr(f"No speed value found for interface {self.ifname}")
-> +                return None, None
-> +            duplex.append(parts[1].lower())
-> +        return speed, duplex
-> +
-> +    def get_ethtool_field(self, field: str, remote=False):
-> +        process = None
-> +        if remote == False:
-> +            """Get the ethtool field value for the local interface"""
-> +            ifname = self.cfg.ifname
-> +            try:
-> +                process = ethtool(f"--json {ifname}")
-> +            except Exception as e:
-> +                ksft_pr("Required minimum ethtool version is 6.10")
-> +                ksft_pr(f"Unexpected error occurred: {e}")
-> +        else:
-> +            """Get the ethtool field value for the remote interface"""
-> +            remote = True
-> +            ifname = self.partner_netif
-> +            self.cfg.require_cmd("ethtool", remote)
-> +            command = f"ethtool --json {ifname}"
-> +            try:
-> +                process = cmd(command, host=self.cfg.remote)
-> +            except Exception as e:
-> +                ksft_pr("Required minimum ethtool version is 6.10")
-> +                ksft_pr("Unexpected error occurred: {e}")
-> +        if process is None or process.ret != 0:
-> +            print(f"Error while getting the ethtool content for interface {ifname}. Required minimum ethtool version is 6.10")
-> +            return None
-> +        output = json.loads(process.stdout)
-> +        json_data = output[0]
-> +        """Check if the field exist in the json data"""
-> +        if field not in json_data:
-> +            raise Exception(f"Field {field} does not exist in the output of interface {json_data["ifname"]}")
-> +            return None
-> +        return json_data[field]
-> diff --git a/tools/testing/selftests/drivers/net/hw/nic_link_layer.py b/tools/testing/selftests/drivers/net/hw/nic_link_layer.py
-> new file mode 100644
-> index 000000000..fb046efbe
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/nic_link_layer.py
-> @@ -0,0 +1,84 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +#Introduction:
-> +#This file has basic link layer tests for generic NIC drivers.
-> +#The test comprises of auto-negotiation, speed and duplex checks.
-> +#
-> +#Setup:
-> +#Connect the DUT PC with NIC card to partner pc back via ethernet medium of your choice(RJ45, T1)
-> +#
-> +#        DUT PC                                              Partner PC
-> +#┌───────────────────────┐                         ┌──────────────────────────┐
-> +#│                       │                         │                          │
-> +#│                       │                         │                          │
-> +#│           ┌───────────┐                         │                          │
-> +#│           │DUT NIC    │         Eth             │                          │
-> +#│           │Interface ─┼─────────────────────────┼─    any eth Interface    │
-> +#│           └───────────┘                         │                          │
-> +#│                       │                         │                          │
-> +#│                       │                         │                          │
-> +#└───────────────────────┘                         └──────────────────────────┘
-> +#
-> +#Configurations:
-> +#To prevent interruptions, Add ethtool, ip to the sudoers list in remote PC and get the ssh key from remote.
-> +#Required minimum ethtool version is 6.10
-> +#Change the below configuration based on your hw needs.
-> +# """Default values"""
-> +time_delay = 8 #time taken to wait for transitions to happen, in seconds.
-> +test_duration = 10  #performance test duration for the throughput check, in seconds.
-
-It would be probably useful to allow the user overriding the above
-values via env variables and/or command line arguments.
-
-'test_duration' declaration should probably moved to a later patch,
-where it's used.
+Thanks for catching this, there is no reason for this to be [1,10] I
+will use the full byte range in the next version.
 
 Thanks,
+Puranjay
 
-Paolo
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iIoEARYKADIWIQQ3wHGvVs/5bdl78BKwwPkjG3B2nQUCZxd8uBQccHVyYW5qYXlA
+a2VybmVsLm9yZwAKCRCwwPkjG3B2naqLAP4gJRI2rNegFDPIetTizylOYrKkxJvb
+l6VHS1KEhetaqgEA2sTZjU7iKb6CxVDKnGjxvZfB+i7/KLqo8wHt7XSUDQU=
+=7l8n
+-----END PGP SIGNATURE-----
+--=-=-=--
 
