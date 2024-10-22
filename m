@@ -1,127 +1,108 @@
-Return-Path: <netdev+bounces-137897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49D19AB0B7
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:22:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C699AB0BD
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 16:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D37E71C20ABD
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:22:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91CD4B223A4
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 14:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6C719F424;
-	Tue, 22 Oct 2024 14:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBA41A08AF;
+	Tue, 22 Oct 2024 14:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UNFI7uZZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmGD1Ybx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4900B19DFB5
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 14:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845C619DFB5;
+	Tue, 22 Oct 2024 14:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729606970; cv=none; b=W40adloQlHxiDz9MNnP9Gnl+bBClRQb6lqxSaSSB/8i0iHuriLw3QXxNNaKef9YHmiq7Dc7z4ewJJs8udWL9e7VxFHpzpZkBdbxH3OzRvcf+dNEpOSeTzD7vsz/d4jlsWaXzoV7qEZzzOLchPWAVW8rQmSLDg13vttva+SqPVC0=
+	t=1729607019; cv=none; b=JMwQ9Hg4beu22jO0Fc+W21QdL8YCP4pn24dIONNz1BG5q5DaRSdLIAm432NjOwPGURt/v00MrDaEAB/lveAU7/njUQhA64us1WyzulOfwk3tygp8Aio4g37SiXGS4C9Yr8VwOERBW2XAh3/IX+cRERcjjcwlJmtxzxzJhDDY69M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729606970; c=relaxed/simple;
-	bh=WwoCZ5X1zwsoptZ1KZXHMR/BmT4oKY/vHDjW7LyRTKw=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=LEQEnUuJ5CcqPA/NM/QcKFxHLW9wkzAhm7mlxFz0vDkM/QYq6aWI8pK3u6t+kP3RpVJtR2b/1/pAwWpOPPT2kw5Ue9OrZLlbWI9HCZesSRTvTOv8hT5xGpc81bI4nCzlfBc6em5QCbFPCPSII6g9Cxt1P4Xqfrg54f+zT+LI/YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UNFI7uZZ; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1729607019; c=relaxed/simple;
+	bh=9izoLQvL9+XeDFGAZpzQi842u8VFnvbtKis5N4G1O44=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YeRo6mmTYoR9Jk+Mp0qDRqASqWOz3WnuOxGw0TKkWxWcQfrTNqx27klzfkw1OafHXi7UjzViGYzxOCg6tk/RaUlC4yhFcaU9qcygGsRENomakVB+Ob9D6FcgSYc27urSEhg50zUToWFBH80qt/omDa0evnbSr5Yrvplv+8U3q+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmGD1Ybx; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-288d74b3a91so3176757fac.0;
+        Tue, 22 Oct 2024 07:23:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729606969; x=1761142969;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=WwoCZ5X1zwsoptZ1KZXHMR/BmT4oKY/vHDjW7LyRTKw=;
-  b=UNFI7uZZvm3oEFIsyn/hrjI6h3MC2YBPtqd7oH+k5F6gUuJrZss2GQ+h
-   qYe0pvTa1OG3uKRMC+dm5suJ4k5bTQbcU+7U9Fe1v89EiTEOkICyJHpLb
-   G/Hv7AvDL9CvVf9PyYOrOUDiby5eMNIjLSbrUvzhqH8AJoWK+F66eBxh8
-   g=;
-X-IronPort-AV: E=Sophos;i="6.11,223,1725321600"; 
-   d="scan'208";a="442941800"
-Subject: RE: [PATCH v1 net-next 1/3] net: ena: Add PHC support in the ENA driver
-Thread-Topic: [PATCH v1 net-next 1/3] net: ena: Add PHC support in the ENA driver
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 14:22:43 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:62492]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.35.143:2525] with esmtp (Farcaster)
- id 6d516c9e-eaea-4b7b-8bfe-f14983496f48; Tue, 22 Oct 2024 14:22:31 +0000 (UTC)
-X-Farcaster-Flow-ID: 6d516c9e-eaea-4b7b-8bfe-f14983496f48
-Received: from EX19D010EUA004.ant.amazon.com (10.252.50.94) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:22:31 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D010EUA004.ant.amazon.com (10.252.50.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 22 Oct 2024 14:22:30 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 22 Oct 2024 14:22:30 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Simon Horman <horms@kernel.org>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David"
-	<dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky,
- Alexander" <matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson,
- Matt" <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara,
- Nafea" <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>
-Thread-Index: AQHbI3jyHzM+s43mz0CcBaQPZI77TrKRaMWAgAFrxkA=
-Date: Tue, 22 Oct 2024 14:22:30 +0000
-Message-ID: <cd78a56636034961997214e418747d77@amazon.com>
-References: <20241021052011.591-1-darinzon@amazon.com>
- <20241021052011.591-2-darinzon@amazon.com>
- <20241021163955.GL402847@kernel.org>
-In-Reply-To: <20241021163955.GL402847@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20230601; t=1729607017; x=1730211817; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vB05a1h1HYduhrKYbkuyyOCoaOP+I+DevYClOEMl/5Q=;
+        b=WmGD1Ybxg1/uWoA8Js0gyhwADknxAZnRyogC2edK6QdbYYR0w9m0x7peJZseDUjXJh
+         B2615QIdUxfW6vlFYS9XxOR6q0jGxJDjOnmZ0Z6xM9PkH4fdK7E31VMbkgxSsWB1Fs4Y
+         gywx7L9wPrWEUTOaRI08mqT8dYx5g0rFSfEJZeucoGYnc607/A2w19PhZfN0XLkOcegk
+         QB7elTuYUOqCQVSd7kwyEF43u+DFp1njjpZJ0Qf6BRn8vu6ueRcrH/yZhZheheWMwbIh
+         mhWm7svizeLsu4BYS3LQLvNIvq6BpDtFbx8s17A6Xtqss2vGMXFtiLeri+pykqXywqgT
+         1UYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729607017; x=1730211817;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vB05a1h1HYduhrKYbkuyyOCoaOP+I+DevYClOEMl/5Q=;
+        b=t4SixBkr2D4GuqTvMoQgBJWCrwtfxV8m+LtXdCvCY2HDK6kI8uQF3Qf98ZjwU8KlbW
+         NZmMlaiTP+m6rYbWbb6rwKCAPjNuXGMq3trDCOkT5hDtdU4rj2Lrd1rC2Ym12I8EzpmQ
+         xbboUVCntNVA1E1yJGcZPHEPMOe2SfOyhpqQOdre4rohVvEHO5sVzXHCXXupF5U3ASHU
+         sD3ur8LQGEFL8d+6GHRvzOK7kJaGgSNHytet7baZjqKjCMPhK4EUTGUreECIIAr7MIXx
+         Bs+3088E3d2j4L0YNUpQ0/PZvw+4LPhB3WgCznutqs8KzMRWdNyZfe0MZj7okrrG9nXw
+         QC9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVsFtVYUKNiS0qmtNcBdRfLsGSEhcIApnxssP7AalObJLSMFmRbUf7UpZ5Hzy/128rbER/WvnFyhRMkWqX8@vger.kernel.org, AJvYcCWGC/ePUphcxypgg//T4GskTpnmQ/d6WB0wL7qRB2xixbT5ad28SAbUDD3DL1sWBQgrnHsUBXo9EvlXcjVm@vger.kernel.org, AJvYcCXAAGKGKDagnil8vCaUeLqXC7ovwxCcmJlD8S0/TPCzneTET5+FFNsSyoZd0Ny/vrLexcSCgmuO@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBFWDJq5sHun1l9DhGukKEdtcNIDf3Fp02bNqw6Eth8O9Y0bQd
+	HvRoN7Y4c9fW6qY/fdKTaVVqhRbt+PKVoLiOl4jOo/Jy8kFQ0Eyh
+X-Google-Smtp-Source: AGHT+IF4WhscBrGUKTc6WqwPclP/DimY/FTSznyFF8tD0zUVANTbzOwj3pZ3UuRn+IRVfyA1U/ZQvg==
+X-Received: by 2002:a05:6870:9126:b0:268:9f88:18ef with SMTP id 586e51a60fabf-2892c2cb210mr12817941fac.13.1729607017583;
+        Tue, 22 Oct 2024 07:23:37 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-28c79257f45sm1783857fac.20.2024.10.22.07.23.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2024 07:23:37 -0700 (PDT)
+Message-ID: <85e7b4cb-58da-4277-b822-742179ee8cbd@gmail.com>
+Date: Tue, 22 Oct 2024 09:23:35 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 01/10] net: qrtr: ns: validate msglen before
+ ctrl_pkt use
+To: Chris Lew <quic_clew@quicinc.com>, netdev@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241018181842.1368394-1-denkenz@gmail.com>
+ <20241018181842.1368394-2-denkenz@gmail.com>
+ <82f296f8-9538-4c89-952f-ff8768c5a0b7@quicinc.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <82f296f8-9538-4c89-952f-ff8768c5a0b7@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> > The ENA driver will be extended to support the new PHC feature using
-> > ptp_clock interface [1]. this will provide timestamp reference for
-> > user space to allow measuring time offset between the PHC and the
-> > system clock in order to achieve nanosecond accuracy.
-> >
-> > [1] - https://www.kernel.org/doc/html/latest/driver-api/ptp.html
-> >
-> > Signed-off-by: Amit Bernstein <amitbern@amazon.com>
-> > Signed-off-by: David Arinzon <darinzon@amazon.com>
->=20
-> Hi David,
->=20
-> As it looks like there will be a v2 anyway, please consider running this =
-series,
-> and in particular this patch, through:
->=20
-> ./scripts/checkpatch.pl --strict --max-line-length=3D80 --codespell
->=20
-> And please fix warnings it emits where that can be done without reducing
-> readability and clarity. E.g. please don't split string literals across m=
-ore than
-> one line just to make lines short.
->=20
-> Thanks!
+Hi Chris,
 
-Thanks Simon,
-We'll resolve the issues in the next patchset.
+>> +        if ((size_t)msglen < sizeof(pkt))
+> 
+> sizeof(*pkt)?
+> 
+
+Indeed.  Thank you for catching that, will fix in the next version.
+
+Regards,
+-Denis
+
 
