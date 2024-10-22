@@ -1,153 +1,103 @@
-Return-Path: <netdev+bounces-137801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2BF9A9E13
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:14:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E2B9A9E42
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8C1CB21D8C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:14:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9A581F21179
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC8A1494AB;
-	Tue, 22 Oct 2024 09:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A54193417;
+	Tue, 22 Oct 2024 09:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gpfY2fNN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D7d04Cr2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEBA126BEF
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA25193427
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729588460; cv=none; b=eDuiqS4nvvdLN0nFqwwctUVFigc+kZPuTLY7W8GYFgRnVgnxi054MXXBeXHIlz8VyEVc6MgPfU7GAPBTRUuHKZ8Az3qiEOTJZHshR0AgEHEyou5/Wi+0njYCXLsncouQeR3pxnI4Co+H3P8DXFQYN/58E6nJATOqIGWIQVGtmPA=
+	t=1729588641; cv=none; b=RDokgMqZNsiIG5NBvPY9FSaXZsMUDhz9NZ6VVKlb1At7FiB7VrPw0K+jrg5S3SKF2HfoHuJSQQVj0TI+kky7n545VYexozCg+P9Eu1tXKFff9eKEen1U/P+A5xwUqXT7C53zWm58fL9ePEaHahts24hJhDgcnYIG05gsDMFIMRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729588460; c=relaxed/simple;
-	bh=2c+UCb4zLD+/Hnc7ocTcLx7elaG+FUU4zSO2q1VOxIs=;
+	s=arc-20240116; t=1729588641; c=relaxed/simple;
+	bh=iSYYRwFuX/hXOaJQUynx3QdWkJAQaKnubutbCjnu1Ps=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OdanEAe8tF8Eb37Inet2xToTK9usOpk/vfpcyvW312ExheP0lV9KQYdmmD78jn0Vi3GEB+FloPvUPzbBADwSF+p6Z7vPOZGjUwmgZ7S3Nvh/6aAiHEdnXROZdhT5I+FJ86xwHNnx0bbsQz3Zxe0JE42Cb4v2D+PZXkA1K/YyvOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gpfY2fNN; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a3a7b80447so19080435ab.1
-        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:14:18 -0700 (PDT)
+	 To:Cc:Content-Type; b=CxrYDSbse7SCKH7oanPgNw7SnJWUCgyquuh/jx6DOxLQ51PwcPiYbVceHpJUsvpRj/JEpY5TN88IQva88swzcxegG+Mt5cxX9KP7znU+BAATNYXZkPmDQ4fV7LS6l64o/TxxJbc3cqno3V6Fjd5Nzay5YYQrbaQabbmU2018jso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D7d04Cr2; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5cb6704ff6bso3017158a12.3
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 02:17:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729588457; x=1730193257; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1729588637; x=1730193437; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xgEs9UZU+lAFXrdoUzrRizB6AnJpdtL0uSKUGCirQck=;
-        b=gpfY2fNNeNDl74cPJ+LurFTfPh6C1IjLbEH2TQocYy5RgHXsnlvmGFp9Luorx7Caaq
-         XtgmrpZ3A52AbtvBHBEPA9LOB10/HhsK/zDGn9yt8cV84nKjYjI9pNxSWfte87AvsuBD
-         13IgKT0vPtvgpk6qpc+b5BKSByDgxMTyjzrs8GrEMCeqjpt6EesOis2Okb0c4NHzb+IP
-         mfhhe0Mv0IotG2IMTUl6iI5YkCNscfLMUdLyHfAG3SBZegA+M31f+/CTl3SGTlfN+1D9
-         rfgtzwz6+Vab8+j5LaLtzt7qmemU2ApPIElJXWclxv5OaiJQZAHulILZVhBgDIRdm7Zz
-         +RLw==
+        bh=iSYYRwFuX/hXOaJQUynx3QdWkJAQaKnubutbCjnu1Ps=;
+        b=D7d04Cr2vwDeqiWfpocglMNKO86XQ3i0dbckDeLm04AYmV0Zc/c99lVPisdocyQtc1
+         VDloQgfCEgz5rSl9MDQTyYtLbCzlBMzP5ySeYS5sjWvU5K9cMF4w8qrrDDbsXQIADdWH
+         gQ95vSrXLF9UwlH2bNewss+3ZPB2t+qyUe1HHoVvusZv4AUCqdB9TDOTwuavMw7xsGYy
+         9HqCd29A5A+7C6iTGZP/MDGz/XQRxMtXZa9bBV/Ln0Eh/uOzRnb7oLqBkHRBh02KYj6K
+         5ALDjRWodgy3vVgx2OxS/NsyKokr1luag0Vklqjye/PLes5gshKvgZkuqErJI7+qxnpc
+         xxAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729588457; x=1730193257;
+        d=1e100.net; s=20230601; t=1729588637; x=1730193437;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xgEs9UZU+lAFXrdoUzrRizB6AnJpdtL0uSKUGCirQck=;
-        b=sYV0K2p62oBDyZBVACXcIjQAo8GmoAZsp1HObFjnC0Rk09seBaRnfqsxCZfkDbrzCC
-         D6z7iHwKDgoP0tz7N4MJ6s3QUKuzqv4vohzQWLJb8n5RLXTd7k2OZtPd9sDlmGUwBC+C
-         M/LK9MJI3esN5EFx8S4+weUdIxCuUMnAKcNiILfjKsVWWnKUsV1+NsANwLnITx+5WXE4
-         B2bYyCObndnlAeHqkMzb1Nj1BbOd7DyDOju0koKYTBgmijtflZKFS+RRyddAXihUBiuG
-         L2XbRaIs5YgKzo3EKi1DbtabdXLBVxLUFZCH5rkHy2DUjpLlPH2ceLKxZWI39Qkl9QgE
-         iSbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVhN0ciVFn9YJHY1btD6AvKk9IfrlwvQKH39tjFqu+WxN8AgqvLj1ZC9KeBZaBx1XAjnilW3/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs/Qk1j6VTxrZ+iF8WO+emRFb2S4hgrEZTMLzJeF4RIMYFYYh6
-	KdMEGfj3jnFHc0qtGfZfJVhseAlKprYrcD5V8OdSSoDNRJdCsekms5Ncef74kVzOY1V19gAkBQY
-	xwTbTS0GtifETygCA3nATRba1gLEUX/dN3vU=
-X-Google-Smtp-Source: AGHT+IGMvoirik0O45T0ATwocixbTEAgxcuqa42aB/YzxFM2U/L0MBdsKRbIYJtYFjxYKsKHhIKD0VFxWL0uEo19Bqs=
-X-Received: by 2002:a05:6e02:198b:b0:3a3:4221:b0d3 with SMTP id
- e9e14a558f8ab-3a4cd2f8be0mr21057025ab.0.1729588457551; Tue, 22 Oct 2024
- 02:14:17 -0700 (PDT)
+        bh=iSYYRwFuX/hXOaJQUynx3QdWkJAQaKnubutbCjnu1Ps=;
+        b=rP2M+zP+hhYITJSJ96O/iWSIfA03xbyOsJshjgZ3G0m+r9MKjgV+iDu2aXe8e5J0Tm
+         gJp1dLLbXwWaLCK/BH9af4FijDveJ1hvXhXJb3zdQB+szpFZjWfLG6jJFwaaVm+ZwznH
+         hwL8jk/Mmx3T41X8btQEfS+FnJ8ys0fYAxvXr5CuRxJLX202CD/LiSQFfe2rnOwYhiOW
+         F/oyUvZZpEfKiph+RlsY7KTjUt/yMS3cuw8o9DUyLe0mCNph2b1/ctF7Q82aamRrI7++
+         X+6E2IZbJGahWhS6njCAEJV7uHanNGV56XLmpE9XSc9XLovJY35nbQfYlEiNG3nXmqA3
+         K9IA==
+X-Gm-Message-State: AOJu0Yy5MpxlriLdhUv6hLlJc3i3Y8JqTwPZmSiI92eiVwbpFcuZkVmb
+	8iiD3jNVn9+l9XU04udBvvR6Xy+tLY8UCfJ+Fi5N9XbO6u/G24IeoagSuHOt6Si4hJG9yNfgLgJ
+	uE7mRezhxmkco5VUp4QW3JOasakmr31z8ZsiL
+X-Google-Smtp-Source: AGHT+IE7qF/VThEozX2l3bRMvwUpUvpl9THxCsaO4qJ9HwBs4FMVmtzS58KuzUHTlg3JLO3qWTw7W/zU3W0K9l+WZCI=
+X-Received: by 2002:a05:6402:2681:b0:5c8:8626:e41 with SMTP id
+ 4fb4d7f45d1cf-5ca0ac445e7mr11805094a12.4.1729588636451; Tue, 22 Oct 2024
+ 02:17:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021155245.83122-1-kerneljasonxing@gmail.com>
- <20241021155245.83122-3-kerneljasonxing@gmail.com> <CANn89iLmyNnRn27mSy_fYacvacUoNh=fy2qzCP-1tcL5g_r3vg@mail.gmail.com>
-In-Reply-To: <CANn89iLmyNnRn27mSy_fYacvacUoNh=fy2qzCP-1tcL5g_r3vg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 22 Oct 2024 17:13:41 +0800
-Message-ID: <CAL+tcoDuogZy76ZtBQmdC5nD=Dbk9Om31s8-jekfUeNum04o1g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] tcp: add more warn of socket in tcp_send_loss_probe()
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <20241022070921.468895-1-idosch@nvidia.com> <CANn89iLHV5NqHPjRp6W77c1DFtOBDmBs1sWR5+W_405NvOBs7g@mail.gmail.com>
+ <ZxdoY8Uehc3qs89P@shredder.mtl.com>
+In-Reply-To: <ZxdoY8Uehc3qs89P@shredder.mtl.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 22 Oct 2024 11:17:02 +0200
+Message-ID: <CANn89iJr6dte1Eu40C9Z8KQ_gT2b2ETQdaTTrFtT0B8LjvP6vw@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: ip_tunnel: Fix suspicious RCU usage warning in ip_tunnel_find()
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, pshelar@nicira.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 22, 2024 at 4:00=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Tue, Oct 22, 2024 at 10:55=E2=80=AFAM Ido Schimmel <idosch@nvidia.com> w=
+rote:
 >
-> On Mon, Oct 21, 2024 at 5:53=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
+> On Tue, Oct 22, 2024 at 09:26:11AM +0200, Eric Dumazet wrote:
+> > I was looking at this recently, and my thinking is the following :
 > >
-> > From: Jason Xing <kernelxing@tencent.com>
+> > 1) ASSERT_RTNL() is adding code even on non debug kernels.
 > >
-> > Add two fields to print in the helper which here covers tcp_send_loss_p=
-robe().
+> > 2) It does not check if the current thread is owning the RTNL mutex,
+> > only that _some_ thread is owning it.
 > >
-> > Link: https://lore.kernel.org/all/5632e043-bdba-4d75-bc7e-bf58014492fd@=
-redhat.com/
-> > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > Cc: Neal Cardwell <ncardwell@google.com>
-> > --
-> > v2
-> > Link:https://lore.kernel.org/all/CAL+tcoAr7RHhaZGV12wYDcPPPaubAqdxMCmy7=
-Jujtr8b3+bY=3Dw@mail.gmail.com/
-> > 1. use "" instead of NULL in tcp_send_loss_probe()
-> > ---
-> >  include/net/tcp.h     | 4 +++-
-> >  net/ipv4/tcp_output.c | 4 +---
-> >  2 files changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index 8b8d94bb1746..78158169e944 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -2433,12 +2433,14 @@ void tcp_plb_update_state_upon_rto(struct sock =
-*sk, struct tcp_plb_state *plb);
-> >  static inline void tcp_warn_once(const struct sock *sk, bool cond, con=
-st char *str)
-> >  {
-> >         WARN_ONCE(cond,
-> > -                 "%sout:%u sacked:%u lost:%u retrans:%u tlp_high_seq:%=
-u sk_state:%u ca_state:%u advmss:%u mss_cache:%u pmtu:%u\n",
-> > +                 "%scwn:%u out:%u sacked:%u lost:%u retrans:%u tlp_hig=
-h_seq:%u sk_state:%u ca_state:%u mss:%u advmss:%u mss_cache:%u pmtu:%u\n",
-> >                   str,
-> > +                 tcp_snd_cwnd(tcp_sk(sk)),
-> >                   tcp_sk(sk)->packets_out, tcp_sk(sk)->sacked_out,
-> >                   tcp_sk(sk)->lost_out, tcp_sk(sk)->retrans_out,
-> >                   tcp_sk(sk)->tlp_high_seq, sk->sk_state,
-> >                   inet_csk(sk)->icsk_ca_state,
-> > +                 tcp_current_mss((struct sock *)sk),
+> > I would think that using lockdep_rtnl_is_held() would be better ?
 >
-> You can not promote to non const, because tcp_current_mss() might
-> change socket state.
->
-> If a debug helper changes the socket state, then it is no longer a debug =
-helper.
+> Yes, agree. I see I did the same thing in 7f6f32bb7d335. Will post v2
+> tomorrow unless you prefer to submit it yourself (I don't mind).
 
-It does make sense. Thanks.
-
->
-> >                   tcp_sk(sk)->advmss, tcp_sk(sk)->mss_cache,
->
-> This was already reported btw.
-
-So I'm going to remove this tcp_current_mss() line.
-
-Thanks,
-Jason
+Please send your v2, thanks Ido !
 
