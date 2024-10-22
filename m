@@ -1,156 +1,222 @@
-Return-Path: <netdev+bounces-138010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F299AB7A4
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:32:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC5F9AB7AB
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 22:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E5C41F2376C
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:32:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB2D51C230FA
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 20:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0121CBE94;
-	Tue, 22 Oct 2024 20:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E261CC156;
+	Tue, 22 Oct 2024 20:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgK3n1Ss"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dq+HCdt6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0162E1474A9;
-	Tue, 22 Oct 2024 20:32:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974371CBE96;
+	Tue, 22 Oct 2024 20:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729629165; cv=none; b=o08NU+j70m3+SsCyllbetuileEjck4PIcp0oNIVpvTCS6rr3F+9o6IehIBhPZsK+0tIatAzVdQEplvsZreqVN5adqbvAW2TxU+Z5I3yxoOvzl1Z6oNx5innLr+gP9zX6ERQU1+LeH9kXbW8BcXtFqutJM3OGDC4tP2pSo7UhFuU=
+	t=1729629250; cv=none; b=FLFibGdjeaGUYYaHzXr2ZbCTCyKXQTThV34MzTugngXzb7h60N6/xqt43aVtqOIXRAWzIArQmme4lLHYf7pI1ZhGPvWnYCLsqEJ9AZo3f09CvFBc6zngEFep2s9iMHMh/V1XCejTi+nRul9phpH1knp9m9lv5D7/ziX+wQu3yeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729629165; c=relaxed/simple;
-	bh=UeVT67coF+dsRLgWQ++/Sjd/zmllkbNnFB/WlVA+bKo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H+ffbn7qHxQ9zBUw7lXh9QA5RnBaK0NClxJtZDXbXb0lQCa4lMvUZo97rngegLcVjKZSUmwYYkgwihNieNu/M5T+yHhZijvIQEBKnETDxTVml1NSpjfQd7HbCR2df65p3TlnUDRN2xJKtHbKMZIGIXYYil80impx+98cJpmFIzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgK3n1Ss; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20c805a0753so52819045ad.0;
-        Tue, 22 Oct 2024 13:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729629163; x=1730233963; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GZ+4PADPN2uTECD/Dh3GFRRtK+3UQEC1z/LtDuogd5I=;
-        b=QgK3n1SsJQsTLL53RLXW34D3mQo6915opstUdRkPMYT10Gld1SKKqVN2hTZKJ+WmMF
-         YtlmrOqANZa2Iddw6DAoMkJnyR7FqJCMx3AXIDeIg6qkYtEzkypg4v1Y0yKVAWxZSlD4
-         CfybZ034Rp1RuhJRWMevXskJJhWmQCv9xHBslV1K07QGV+r0CqM5QKeu3MHJHjH0vjvF
-         q5ZAD/THVkwed0bvQm4d1gfdEtTImcAwmNPVhdhx3Dst0bvuUDPs5icTxvcMT4zDRXL6
-         /UOHbFVMSGjAwE8V4XDt5/8tZ4WgqRqt596jUKENzyLkizWikOdXugFnQHThqKMgv6lL
-         j1+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729629163; x=1730233963;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GZ+4PADPN2uTECD/Dh3GFRRtK+3UQEC1z/LtDuogd5I=;
-        b=LAZBKwI0VaTMpeTuGaknkv2ebxyctp/CwA464E/jJcGYT1tZZ4qgL/69eNIOukD1A9
-         yV0awBLr02UmhbI+MAEk2paZ9igOVwXxsVU1C61ZRQ1Gz4NvltiNPQxZeD/R/B/JKBpU
-         86ywHY/4jkdXrCaT5/bkhIe2cIwHmOOVMLqf6UXFTORlVAue8mimPbJbVuLvsGhk3Dve
-         cvDGPTHy6tLAcNhhBRLWGMbv6YB7neKfTkB9tIvniEJjpl45DtfNUgIkQ27KBrJOr+DH
-         MsWlbtsBEyPrHJmIJWIX1ZqPR3myB5rM1ze9v+PFFVS6KR1YytILq37oiBoEjsqpmhER
-         +Lrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNp+K/uuyk7tkyf9InKZzOmMyCPeq6CsDuQhACNF8SoHQdHBIrlHP+jhqCLxhSL52qY7R/sTt4X2EtFZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywrda9Kh3+uQhKExxV1ubi50w3rHIzoFyFayNpHHymhVHxNux5W
-	D1VfWCLcQvC4pNrwCQSTo6ucl2qKWaF1JzsRdsWhNpa/OLZqWLMFoGglzdbY
-X-Google-Smtp-Source: AGHT+IGcDqy20KPoabg7ESPBAC5OmxPOAcjQtMj/wH5Mv0MFuAdhMh+A6qVzGB2rUcn/bbgjEQMb9A==
-X-Received: by 2002:a17:902:c945:b0:20c:da66:3875 with SMTP id d9443c01a7336-20fa9e5405cmr3800315ad.24.1729629163038;
-        Tue, 22 Oct 2024 13:32:43 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0dd53esm46521235ad.222.2024.10.22.13.32.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 13:32:42 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1729629250; c=relaxed/simple;
+	bh=WgzrqH7Ou+v7onWU0ZHkjotFVPe78dy1lzEo/B5qjhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CBa+e09CLQoXN7jFtdmtqnhjcf5g07rFmXxZOO866ErK5FoaB2EQmKNxPKooR2fOMZjeiSsWHE8DpaOIwl79uZGJC5vjLW11gLO7cEx6zQm6AuECAm7+R6h4RXljcxThHB4FBJ4DJOHWh9PZBH61m/tQzHD1ykr/ulM/hVqkh70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dq+HCdt6; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729629247; x=1761165247;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WgzrqH7Ou+v7onWU0ZHkjotFVPe78dy1lzEo/B5qjhI=;
+  b=dq+HCdt630lFbrF60EFMsWIMfIS9Erzdhu0K0XZAfqZ6RQ8WjBbVLXOg
+   Jcx1Qahof4BPnZS/EfKzwTuFYV245HVE71ZnJ6ZcQqDm9i0vwxtAop4vf
+   4M7Tudqjqbqsdxr2sSdMh6nxJbNDmk5ivk7wJHp6GSltfq2RaWoZRRQZQ
+   u5yzHDO08djNh56Oed0mw5uRHHsdUvhOr/sNY9D7mBe39PJl/NbtUzYRN
+   ka/yIabDvnkoE786k3X4fDfx3v8ouPo14Dd/722z2qeqtJtZtPTq00QrF
+   FsFMW0M+WK3QX3jqTMPzin65GLXahOyYphjsAXxX3iFRSKHMTMIZSbb1T
+   g==;
+X-CSE-ConnectionGUID: G0Z8SYUDT0mIt7nVdoVYaA==
+X-CSE-MsgGUID: gl6e6zwGQFCL4VnAr7kTCA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="32047521"
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="32047521"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 13:34:06 -0700
+X-CSE-ConnectionGUID: BBP0oiVFQrWYxbZ7Qe6U2A==
+X-CSE-MsgGUID: iJAnuQEMRZy6YCDBld6ITA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="84801727"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 22 Oct 2024 13:34:02 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t3LZo-000U4K-1B;
+	Tue, 22 Oct 2024 20:34:00 +0000
+Date: Wed, 23 Oct 2024 04:33:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Marek Vasut <marex@denx.de>,
+	Adham Abozaeid <adham.abozaeid@microchip.com>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Conor Dooley <conor+dt@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org (open list:LINUX FOR POWERPC (32-BIT AND 64-BIT)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] ibmvnic: use ethtool string helpers
-Date: Tue, 22 Oct 2024 13:32:40 -0700
-Message-ID: <20241022203240.391648-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
+Message-ID: <202410230402.Cgu8obYR-lkp@intel.com>
+References: <20241022013855.284783-1-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022013855.284783-1-marex@denx.de>
 
-They are the prefered way to copy ethtool strings.
+Hi Marek,
 
-Avoids manually incrementing the data pointer.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/ibm/ibmvnic.c | 30 +++++++++---------------------
- 1 file changed, 9 insertions(+), 21 deletions(-)
+[auto build test ERROR on wireless-next/main]
+[also build test ERROR on next-20241022]
+[cannot apply to wireless/main linus/master v6.12-rc4]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index cca2ed6ad289..e95ae0d39948 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -3808,32 +3808,20 @@ static void ibmvnic_get_strings(struct net_device *dev, u32 stringset, u8 *data)
- 	if (stringset != ETH_SS_STATS)
- 		return;
- 
--	for (i = 0; i < ARRAY_SIZE(ibmvnic_stats); i++, data += ETH_GSTRING_LEN)
--		memcpy(data, ibmvnic_stats[i].name, ETH_GSTRING_LEN);
-+	for (i = 0; i < ARRAY_SIZE(ibmvnic_stats); i++)
-+		ethtool_puts(&data, ibmvnic_stats[i].name);
- 
- 	for (i = 0; i < adapter->req_tx_queues; i++) {
--		snprintf(data, ETH_GSTRING_LEN, "tx%d_batched_packets", i);
--		data += ETH_GSTRING_LEN;
--
--		snprintf(data, ETH_GSTRING_LEN, "tx%d_direct_packets", i);
--		data += ETH_GSTRING_LEN;
--
--		snprintf(data, ETH_GSTRING_LEN, "tx%d_bytes", i);
--		data += ETH_GSTRING_LEN;
--
--		snprintf(data, ETH_GSTRING_LEN, "tx%d_dropped_packets", i);
--		data += ETH_GSTRING_LEN;
-+		ethtool_sprintf(&data, "tx%d_batched_packets", i);
-+		ethtool_sprintf(&data, "tx%d_direct_packets", i);
-+		ethtool_sprintf(&data, "tx%d_bytes", i);
-+		ethtool_sprintf(&data, "tx%d_dropped_packets", i);
- 	}
- 
- 	for (i = 0; i < adapter->req_rx_queues; i++) {
--		snprintf(data, ETH_GSTRING_LEN, "rx%d_packets", i);
--		data += ETH_GSTRING_LEN;
--
--		snprintf(data, ETH_GSTRING_LEN, "rx%d_bytes", i);
--		data += ETH_GSTRING_LEN;
--
--		snprintf(data, ETH_GSTRING_LEN, "rx%d_interrupts", i);
--		data += ETH_GSTRING_LEN;
-+		ethtool_sprintf(&data, "rx%d_packets", i);
-+		ethtool_sprintf(&data, "rx%d_bytes", i);
-+		ethtool_sprintf(&data, "rx%d_interrupts", i);
- 	}
- }
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Marek-Vasut/wifi-wilc1000-Rework-bus-locking/20241022-093954
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
+patch link:    https://lore.kernel.org/r/20241022013855.284783-1-marex%40denx.de
+patch subject: [PATCH] wifi: wilc1000: Rework bus locking
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20241023/202410230402.Cgu8obYR-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241023/202410230402.Cgu8obYR-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410230402.Cgu8obYR-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/wireless/microchip/wilc1000/spi.c:1113:20: error: no member named 'hif_cs' in 'struct wilc'
+    1113 |         mutex_lock(&wilc->hif_cs);
+         |                     ~~~~  ^
+   include/linux/mutex.h:166:44: note: expanded from macro 'mutex_lock'
+     166 | #define mutex_lock(lock) mutex_lock_nested(lock, 0)
+         |                                            ^~~~
+   drivers/net/wireless/microchip/wilc1000/spi.c:1118:22: error: no member named 'hif_cs' in 'struct wilc'
+    1118 |         mutex_unlock(&wilc->hif_cs);
+         |                       ~~~~  ^
+   drivers/net/wireless/microchip/wilc1000/spi.c:1147:23: error: no member named 'hif_cs' in 'struct wilc'
+    1147 |         mutex_destroy(&wilc->hif_cs);
+         |                        ~~~~  ^
+>> drivers/net/wireless/microchip/wilc1000/spi.c:1156:14: error: use of undeclared identifier 'spi'
+    1156 |         mutex_init(&spi->hif_cs);
+         |                     ^
+>> drivers/net/wireless/microchip/wilc1000/spi.c:1156:14: error: use of undeclared identifier 'spi'
+   5 errors generated.
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for MODVERSIONS
+   Depends on [n]: MODULES [=y] && !COMPILE_TEST [=y]
+   Selected by [y]:
+   - RANDSTRUCT_FULL [=y] && (CC_HAS_RANDSTRUCT [=y] || GCC_PLUGINS [=n]) && MODULES [=y]
+
+
+vim +1113 drivers/net/wireless/microchip/wilc1000/spi.c
+
+  1105	
+  1106	/********************************************
+  1107	 *
+  1108	 *      Bus interfaces
+  1109	 *
+  1110	 ********************************************/
+  1111	static void wilc_spi_claim(struct wilc *wilc)
+  1112	{
+> 1113		mutex_lock(&wilc->hif_cs);
+  1114	}
+  1115	
+  1116	static void wilc_spi_release(struct wilc *wilc)
+  1117	{
+> 1118		mutex_unlock(&wilc->hif_cs);
+  1119	}
+  1120	
+  1121	static int wilc_spi_reset(struct wilc *wilc)
+  1122	{
+  1123		struct spi_device *spi = to_spi_device(wilc->dev);
+  1124		struct wilc_spi *spi_priv = wilc->bus_data;
+  1125		int result;
+  1126	
+  1127		result = wilc_spi_special_cmd(wilc, CMD_RESET);
+  1128		if (result && !spi_priv->probing_crc)
+  1129			dev_err(&spi->dev, "Failed cmd reset\n");
+  1130	
+  1131		return result;
+  1132	}
+  1133	
+  1134	static bool wilc_spi_is_init(struct wilc *wilc)
+  1135	{
+  1136		struct wilc_spi *spi_priv = wilc->bus_data;
+  1137	
+  1138		return spi_priv->isinit;
+  1139	}
+  1140	
+  1141	static int wilc_spi_deinit(struct wilc *wilc)
+  1142	{
+  1143		struct wilc_spi *spi_priv = wilc->bus_data;
+  1144	
+  1145		spi_priv->isinit = false;
+  1146		wilc_wlan_power(wilc, false);
+  1147		mutex_destroy(&wilc->hif_cs);
+  1148		return 0;
+  1149	}
+  1150	
+  1151	static int wilc_spi_init(struct wilc *wilc, bool resume)
+  1152	{
+  1153		struct wilc_spi *spi_priv = wilc->bus_data;
+  1154		int ret;
+  1155	
+> 1156		mutex_init(&spi->hif_cs);
+  1157	
+  1158		if (spi_priv->isinit) {
+  1159			/* Confirm we can read chipid register without error: */
+  1160			if (wilc_validate_chipid(wilc) == 0)
+  1161				return 0;
+  1162		}
+  1163	
+  1164		wilc_wlan_power(wilc, true);
+  1165	
+  1166		ret = wilc_spi_configure_bus_protocol(wilc);
+  1167		if (ret) {
+  1168			wilc_wlan_power(wilc, false);
+  1169			return ret;
+  1170		}
+  1171	
+  1172		spi_priv->isinit = true;
+  1173	
+  1174		return 0;
+  1175	}
+  1176	
+
 -- 
-2.47.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
