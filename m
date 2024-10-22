@@ -1,114 +1,118 @@
-Return-Path: <netdev+bounces-137937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31EB09AB2E2
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:57:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91BB09AB2E9
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 17:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61C731C221F3
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:57:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 351DB1F25039
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3201D1BBBFC;
-	Tue, 22 Oct 2024 15:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0102B1AD5DE;
+	Tue, 22 Oct 2024 15:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0BEtp0P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxIH6AOb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA5619B5B4
-	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 15:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8439419D06D
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 15:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729612596; cv=none; b=iNilx8QUUrFJ4Qxu5Gfu1DC95SUyo3tzg2sE7jruernVISAtuUXH+H9iX8zd5tsecsEnaGioXV7l6gcZGztQCaQRTu3EBUj5Ufz8FKgHHzxmWjYjjgEP4XR4jl2pDdYn8q4G/we/TtSL9UQ6G3d6Po7GiRw1x5lZqgo0Qa0AdtM=
+	t=1729612644; cv=none; b=bo3g2PnKYViSidZxWufBHeg+WAwRSRNm5BntZCZIBq5M3aJOn5qZMop4O1XN/QFdufflGcPsdo7uzLu9pZYTBvRDGLlUSUKdfxFn+q6ChWTuk7Klvd66N2WTl0f4EB0pD/onWk2pSezERYoRn2HOaPdHBOb3ZQfOinKzhMOk1E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729612596; c=relaxed/simple;
-	bh=uCVIk7/ccIig2DOQ2XAujMwrdm+K7nR+OtKc6cpV5f4=;
+	s=arc-20240116; t=1729612644; c=relaxed/simple;
+	bh=N7cAEMaf1mlFuzdL/FPzQ96w9eR4jhq5EWnwCbJpUtQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oMLpXUUyTP86eXuMQeceaekLpjI3PoYJjlGblgZBhHzVLHfrQix7goqc6GRnYDtckc70h8I77UXXWa/n4y4GGD9ou0SuOP+wrCjJ7qqs4pay4fQUMGD9Jmnu5t6GmooRe3GJeOFiq1uV0C6OcL+HU7ppNyE83OTkmEBI0FnBEDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0BEtp0P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA0EDC4CEC3;
-	Tue, 22 Oct 2024 15:56:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729612595;
-	bh=uCVIk7/ccIig2DOQ2XAujMwrdm+K7nR+OtKc6cpV5f4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I0BEtp0Pmnbl1mk0jjVZJ72/MvGmU271hvyxvJAWxKU9NbafEqaZxrgevHqJv32+w
-	 4Sv3tQ18yDv6DRKqMvjWgQD0+rUJ6LRuzMqUaYJCJOJfck2c9WBR0Sp1wrXyJzPeX9
-	 a3O4VU1uxlW6v1wUcs9khLhYahGWdNzl/ObqlOzKERZV24KLwdg1uQiTwgGaf69rpw
-	 3ytmQojljhlbyqxh75vUGXvYphABeU4+e9BgXioW8vD48WVUyWp8GJN+j7s6q2J3vU
-	 8W0J2ye7EX9pEE+4v2QOY2jgX12jqj7dlE/MFDdcNMa8/n8wVO4frVaGk9xHf4rz4z
-	 vK90WY+7ad6/A==
-Date: Tue, 22 Oct 2024 16:56:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yuan Can <yuancan@huawei.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, cramerj@intel.com,
-	shannon.nelson@amd.com, mitch.a.williams@intel.com,
-	jgarzik@redhat.com, auke-jan.h.kok@intel.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: [PATCH] igb: Fix potential invalid memory access in
- igb_init_module()
-Message-ID: <20241022155630.GY402847@kernel.org>
-References: <20241022063807.37561-1-yuancan@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Chpn+EyTdMz8diHhy8PUirvxw+VkjO20XEoTXf/GgwVlGKU37TWJrrvguP2YW80BGqRCnuLeHD7eJzYgIq/hU4YMuqNJp53TwESWpTiGRQQq1gzj2YQWYKNA3RkdWlH0rPfER+FcgFww09LITdD3e4u/CDS8iSOxGggPGDCtcIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JxIH6AOb; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20c6f492d2dso67203885ad.0
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 08:57:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729612643; x=1730217443; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8HKcVDh5jjKYY+erdOhr8V3ANrTCvvnSJSkoqusdWYs=;
+        b=JxIH6AObBEh2FMSBsdWL0kXZ/7mYP/1NpFL8bK1icVdVJ9+GYVP/SxERCiaDpD27Z5
+         RMOktf/RIdILIIb4vChjTfJh/Frg50AHoNPb2fLr1+V87jCcqvxoLJ62eYdc1Q0gjAj/
+         d6kHLmG1XXKiyHbxpIXyM5R3h6G2MGz9JxyEsnSABLfeshVMAlucyrf1BWWmGfY7bRCl
+         iH62HdzC79oSVESPE0AhFk+916KqyfjCZkJSo0JPiGYhvJh6nyz4TRMiGQ1OvmIek71o
+         VDFyYepug4HhM8VFAl0E9HM6HX5s1msxN1mpfhMuXAQG5Zail+slSTU5ONj+RtemGkxt
+         akYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729612643; x=1730217443;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8HKcVDh5jjKYY+erdOhr8V3ANrTCvvnSJSkoqusdWYs=;
+        b=doA8o7WsglB2U90Ag0IZOZkaQZUyxSELoFTqWIGoaF8YwgpYOUQr9PKBEshpwNfeXD
+         wBfRDUt9rIpxLGZXP3qy4bLdddSiAEkT18mZuL2ISWpIvLNXIUFH01wP3JWplfEKC3gb
+         rTDdY58wfDBJ15fzCIYO+eFMbJzxls+h/Zo6hOri/kUWp+CQuJyNAvf5ssK42x02SqnI
+         1TkFgb1riarp1pX5BEJHwFFpK39cHcjOoHLz0zm+bIu0kzA96IAJXutmlN9FtaiOCNbD
+         Gzi6vzJTMMqwQjAoqD2DzSq+oj4qTtP0VdCFEpXznzfS1FKuPW8kK56SRM3w62b+4Gm9
+         S5Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVlWmGuMIUGHhjQjFAR+jya9hsDmjssRuGFtmnWxaH0zd9ovKJmcftgo/1G/1kV9Bu+4fo9EKg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyDuJeHo5KgnUeV00w9gZX458PZiE8WbjZarCu11PriSduLkBP
+	8osb+Wl5oUC3B5QvuV4MxZku4KOW+1olvahMqsoC6SHB2C49n4c1mX0N
+X-Google-Smtp-Source: AGHT+IFaWH61RJx4/85t/1P9LrQPN0CfXMOc+ncoUKwuP+76Au2pXGPzG3SNgdYcoYJNyo976gDGaw==
+X-Received: by 2002:a17:902:f54d:b0:20c:aed1:812b with SMTP id d9443c01a7336-20e5a8a40d4mr187063645ad.29.1729612642708;
+        Tue, 22 Oct 2024 08:57:22 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7ef08d29sm44502165ad.64.2024.10.22.08.57.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2024 08:57:22 -0700 (PDT)
+Date: Tue, 22 Oct 2024 08:57:21 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	Mina Almasry <almasrymina@google.com>
+Subject: Re: [PATCH net-next v4 12/12] selftests: ncdevmem: Add automated test
+Message-ID: <ZxfLYUC5dk-CDCF5@mini-arch>
+References: <20241016203422.1071021-1-sdf@fomichev.me>
+ <20241016203422.1071021-13-sdf@fomichev.me>
+ <278ca1d0-2a21-49a1-87b5-34b0f03bb9d3@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241022063807.37561-1-yuancan@huawei.com>
+In-Reply-To: <278ca1d0-2a21-49a1-87b5-34b0f03bb9d3@redhat.com>
 
-+ Alexander Duyck
-
-On Tue, Oct 22, 2024 at 02:38:07PM +0800, Yuan Can wrote:
-> The pci_register_driver() can fail and when this happened, the dca_notifier
-> needs to be unregistered, otherwise the dca_notifier can be called when
-> igb fails to install, resulting to invalid memory access.
+On 10/22, Paolo Abeni wrote:
+> On 10/16/24 22:34, Stanislav Fomichev wrote:
+> > diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+> > index 182348f4bd40..1c6a77480923 100644
+> > --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> > +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> > @@ -3,6 +3,7 @@
+> >  TEST_PROGS = \
+> >  	csum.py \
+> >  	devlink_port_split.py \
+> > +	devmem.py \
+> >  	ethtool.sh \
+> >  	ethtool_extended_state.sh \
+> >  	ethtool_mm.sh \
+> > diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+> > new file mode 100755
+> > index 000000000000..29085591616b
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+> > @@ -0,0 +1,46 @@
+> > +#!/usr/bin/env python3
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +import errno
 > 
-> Fixes: fe4506b6a2f9 ("igb: add DCA support")
+> Possibly unneeded import?
 
-I don't think this problem was introduced by the commit cited above,
-as it added the call to dca_unregister_notify() before
-pci_register_driver(). But rather by the commit cited below which reversed
-the order of these function calls.
-
-bbd98fe48a43 ("igb: Fix DCA errors and do not use context index for 82576")
-
-I'm unsure if it is necessary to repost the patch to address that.
-But if you do, and assuming we are treating this as a bug fix,
-please target it for the net (or iwl-net) tree like this:
-
-Subject: [PATCH net v2] ...
-
-> Signed-off-by: Yuan Can <yuancan@huawei.com>
-> ---
->  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index f1d088168723..18284a838e24 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -637,6 +637,10 @@ static int __init igb_init_module(void)
->  	dca_register_notify(&dca_notifier);
->  #endif
->  	ret = pci_register_driver(&igb_driver);
-> +#ifdef CONFIG_IGB_DCA
-> +	if (ret)
-> +		dca_unregister_notify(&dca_notifier);
-> +#endif
->  	return ret;
->  }
->  
-> -- 
-> 2.17.1
-> 
-> 
+Will drop, thx!
 
