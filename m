@@ -1,96 +1,105 @@
-Return-Path: <netdev+bounces-137873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF069AA360
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:40:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B78F9AA375
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 15:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3D16283BC1
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 13:40:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A361C1C212A9
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 13:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB81A19DF8B;
-	Tue, 22 Oct 2024 13:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3558619DF8B;
+	Tue, 22 Oct 2024 13:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RloKJxnD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HB0hdF6l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4011E481;
-	Tue, 22 Oct 2024 13:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C411E481
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 13:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729604422; cv=none; b=U/L3TtfgdVYqOXC4YhCROK6GBAj4hzdOknBauES8uFPhWddJtCkvHZG9GACVCox+k/nDaHWN8MY4ysNiSruOXgscZL55P1M1fUIHvIaKwFlDnsZVCNwQGzZKUQbeinUGOUCP+fM5kNT5fyzgiVjw32zYw1qpwl+beKLmvsYtWks=
+	t=1729604524; cv=none; b=kOFw+noRsIlCAM7nTip0IrWM9TPpVfsaZuT12JcqWmmvvB7hky8qQ/5PsPtY93vovBMAA+UiavPFXQ3MHNwp2Km/lLxjBDGi9LjdHdQYisBQRQ3lI/Y+YDJ/PWVSmwoCyI1Ng0mAgaSk2J+CHRZm8ra6fZNeCQdEpbgyNHJ7SVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729604422; c=relaxed/simple;
-	bh=WQqmPsFzX948qO5n2uVgN03q+hIMvwWm4jLEtyM8bjA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Fofk1zCK1nqWOirvAeYBWH/c0nKV1OuG8Dii8x6SEO5R5ethBnzb1FAp+85+i8zBb0zfzGlue3/SXDVV8JRQCgRli2cqZRfrlkfwSsxqKtajLTzau/cccJReZ0lvl91ZhI5C1wZI/1NSSPhvP96bZE8jFQ95PkxaEDdC2sK1r38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RloKJxnD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CA8C4CEE6;
-	Tue, 22 Oct 2024 13:40:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729604422;
-	bh=WQqmPsFzX948qO5n2uVgN03q+hIMvwWm4jLEtyM8bjA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RloKJxnDOhAMi8QX77gftiaUJY5WRU00UyTFWoyz/iZaIOXa6hIm9bQkqQlVfKHlY
-	 LJZ+JAiKAIpGWRJMb4AU37nExOGbdlyheRzoiMVbJ+/EcYmmS77btTiUZSPuegEr18
-	 2Vu1ZbkWo7AuBXAT/SXzyqAFL0joPin0Kq7qhfZhdMwDOQE6QThOBPQTd2HdlrbucR
-	 nocWhQtNWURPyFarhKj2MnYRr/CZqIpSLcHZQGGRTw1X07IVyb6FapXqfc9O8IawPp
-	 nxMs053ykXIGxTNpzBOdbv1Jjz7nhtSr8pNuitJSej2CGfngscIXmPvhD9l1rZoMg8
-	 Vsgqx/zmALELA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE0F3822D22;
-	Tue, 22 Oct 2024 13:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729604524; c=relaxed/simple;
+	bh=8LAHlmvjCnVLI3R/XveM3jnZq8nkdvQkV6ZdRTfkY7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AeNhTXTMx5WLrjMXehHV+BRQhvCe+UAG7pLYZFpszJZf/qMX+65P8zotk6siG6H2IF1zliTkMDD8VSKACMcpOF3n2GyhVXyG02RoTgnQBiKr6q80WZsWWF3HA9Q8f0DP0v575UHkr5dtcQ++B9Og9sREV0fYts2cN1R9xXXWOMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HB0hdF6l; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bC9ouSOrTg2bSNVUD8GkLfHziRerJBFjvfJeszfjZbo=; b=HB0hdF6lnW2UfolSwb2Wvwuubf
+	rHo0Iw6CpyLeXIp/uFvLLW/KWJdfPevDc7bmgIf6f1EANpsNrSvVmR+e/tatTL/W5HTS60dqb9Zek
+	kjt1c2GkM03jZP/0vrasz+2Zws0Fq1d5IE6hAzPfz2DSPqueApf4POVdOy8LsZbdTb4g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t3F93-00AqXg-BD; Tue, 22 Oct 2024 15:41:57 +0200
+Date: Tue, 22 Oct 2024 15:41:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?5ZCz6YC86YC8?= <wojackbb@gmail.com>
+Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	angelogioacchino.delregno@collabora.com,
+	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
+Subject: Re: [PATCH] [net,v2] net: wwan: t7xx: add
+ PM_AUTOSUSPEND_MS_BY_DW5933E for Dell DW5933e
+Message-ID: <3b34817c-ea4f-484a-abb5-1e6619c6d0ca@lunn.ch>
+References: <20240930031624.2116592-1-wojackbb@gmail.com>
+ <e2f390c7-4d58-47fb-ba86-b1e5ccd6e546@lunn.ch>
+ <CAAQ7Y6Z2xkgxv36=WOxbUArCw3eBeY0nx_7nAH36+Wicjs_fPg@mail.gmail.com>
+ <562c8ee8-7ce3-4343-9d93-b01be1235954@lunn.ch>
+ <CAAQ7Y6aqLJoScfVD3NMyw_0r42qYS2BCCWa5iRDaM8h1EKwwkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] tools: ynl-gen: use big-endian netlink attribute
- types
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172960442851.967544.3510243712784820450.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Oct 2024 13:40:28 +0000
-References: <20241017094704.3222173-1-ast@fiberby.net>
-In-Reply-To: <20241017094704.3222173-1-ast@fiberby.net>
-To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, matttbe@kernel.org,
- martineau@kernel.org, geliang@kernel.org, donald.hunter@gmail.com,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAQ7Y6aqLJoScfVD3NMyw_0r42qYS2BCCWa5iRDaM8h1EKwwkg@mail.gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 17 Oct 2024 09:47:02 +0000 you wrote:
-> Change ynl-gen-c.py to use NLA_BE16 and NLA_BE32 types to represent
-> big-endian u16 and u32 ynl types.
+> Hi Andrew,
 > 
-> Doing this enables those attributes to have range checks applied, as
-> the validator will then convert to host endianness prior to validation.
+> The chip of Fibocom FM350 is MTK T7XX,
+> It is the same chip as our device.
 > 
-> The autogenerated kernel/uapi code have been regenerated by running:
->   ./tools/net/ynl/ynl-regen.sh -f
+> We tested the Fibocom FM350 and It had the same issue as our device.
+> The following tests use the same environment and steps:
+> a. Make data call to connect Internet
+> b. No data is transferred to the Internet and wait one minute.
+> c. use test script to capture and count power_state until one minute.
 > 
-> [...]
+> Result:
+> 1. When autosuspend_delay_ms is 20000,
+> Our device's d3_cold time is 0%
+> Fibocom FM350's d3_cold time 0%
+> 
+> 2. When autosuspend_delay_ms is 5000,
+> Our device's d3_cold time is 80%
+> Fibocom FM350's d3_cold time 60%
+> 
+> So this problem is a common problem.
+> Should I remove PM_AUTOSUSPEND_MS_BY_DW5933E,
+> and modify PM_AUTOSUSPEND_MS to 5000 at my patch?
 
-Here is the summary with links:
-  - [net-next,v2] tools: ynl-gen: use big-endian netlink attribute types
-    https://git.kernel.org/netdev/net-next/c/867d13a75488
+A sample of two is not great, but does suggest there is nothing
+special about the DW5933E, and all users can benefit from this change.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Please do change PM_AUTOSUSPEND_MS.
 
-
+       Andrew
 
