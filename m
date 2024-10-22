@@ -1,103 +1,141 @@
-Return-Path: <netdev+bounces-137803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-137805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31739A9E4F
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:19:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB629A9E64
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 11:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1911F22F5A
-	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:19:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F3DC281CED
+	for <lists+netdev@lfdr.de>; Tue, 22 Oct 2024 09:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510AB196C6C;
-	Tue, 22 Oct 2024 09:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB3A19885B;
+	Tue, 22 Oct 2024 09:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="eN26kzNp"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="eYcj3lFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E912D75C;
-	Tue, 22 Oct 2024 09:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43A01494CA
+	for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 09:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729588781; cv=none; b=ijdxIFNSnod3t8sdDROymUcS/Y6Y5pOBuQzSDnaMN9bZWJjYKKXZcT9c6sdJrTpJ3dVewd+6nsuYD8yHZY2GRLKAfY467R/5R1nsGJFVyAflwLw/AyfKGWxBmO7AU8aaKMQIObJhT6p0nACqKMSkLzEKvavIUV5dsJ3wBF6wQOc=
+	t=1729588990; cv=none; b=eLyPaXtspRQHS5WVid8BR6U60TihjyUil/tWTpd7DQY2LahN5I38Ty9qdUSczgIEokNWngLySGU2DPmDRMHXQMr+XWyKdNCX2tKH6VPWdYhfCZzOp7h8oI6aMB9l0TC6lLPj3FDP9FJLdWvjhE9ENVxJ7NJqK0eedNT70jGZOD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729588781; c=relaxed/simple;
-	bh=1wQKnHb4F4y1RVrRIF7g0Pf31juqwfn3EgZdq2eOGc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F4VuFF12L5MPiC2POh0zfGuhX0+2153ZjkxwrNlccmHQ/H9qCQqOXRYIh6feTnoA8iH65CEB+V0Ik3MdUOafDnhPa6ptrYy5D8IZpvruHAb9XAlMC5HCn0VqmS/EgDpT2Cbp4P4zWu41Z2xLJfNjaSCrLEdx2uX6mPis8CB0vWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=eN26kzNp; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1729588771;
-	bh=1wQKnHb4F4y1RVrRIF7g0Pf31juqwfn3EgZdq2eOGc0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eN26kzNpdfc25Jy/UzCLs4/5XKOePbwCcKMDBpWh9ssklSqmMzilnM/XtikdDqIBg
-	 SEaVq8tWlAoE62RkvytYS3/F6gdUpiWagTqGflu5F8mHqF35BD3wQsY9hjOFca9n2f
-	 PMBssXq16jFiLKbo1lAo6e02xZ3QVU3S9LWtu+Wh+Ev2Ag0/nEousOVgWqLC2J2h/t
-	 alSJHyP+zWb36KTeMRV9mJ6qbe58Ro4DXcNCL335L+87BgrBQffci86dM/nrpNIYNb
-	 i7QT4Ohu60po5tcestdayCijLBfHmxSwRQvJE8yHhdzw7xM6Ti3O8DoiCCDQdbgyrr
-	 A0716m8jATsKA==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1729588990; c=relaxed/simple;
+	bh=iQw3YGm6GSjRhjlvwQyiid7hdggoSRH2JXYVbt0ZQFg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E2K/8OkRev2ZqjmC/47u638+edaLlWq1rPYuc0b4ZXZ4rqiG+qSkF0/6ZqvmopWujuudlMerXDs6C3XROH9EA45udoLt0elg1nK6FRdB5wJ9XHCqj1pwxBDzTt0cdIp1SsfZsSq1Lm29RqOE0f/Wtr0KheKUAGhF96Kue3yqMR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=eYcj3lFu; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 613D52087D;
+	Tue, 22 Oct 2024 11:23:01 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id UZAIEnqHKqb2; Tue, 22 Oct 2024 11:23:00 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0EB8217E120B;
-	Tue, 22 Oct 2024 11:19:31 +0200 (CEST)
-Message-ID: <99acb58d-a49a-4ad0-a4ec-f2b7c4f846fb@collabora.com>
-Date: Tue, 22 Oct 2024 11:19:30 +0200
+	by a.mx.secunet.com (Postfix) with ESMTPS id DB7332083E;
+	Tue, 22 Oct 2024 11:22:59 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com DB7332083E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1729588979;
+	bh=T8JYjKQRvunTW/OMcEcY9HBmCVyz6p7UZEsaMK1sNH8=;
+	h=From:To:CC:Subject:Date:From;
+	b=eYcj3lFuwaAhOlWz3Q1Uy2N69kRV/tnltyuvuwAduDKmFEipguwQ2P2r6t/89pZnM
+	 n7G3WnZaHsBepd8xFgV2zgOSf6G22/x9XFzlJ7faTb7MY61H6bEgHu96JEwXlkqFih
+	 JKe5bgb9pIMcAm+cwiG5u4gbpvebIXyGcaB65vtSZLOF2blmX0a+0N04za0fbRjZU2
+	 HYpI89gjM1wk/4QrYWwQIYUvF1W3JtLH8toQNDIuOneTqZ4tNMozwsnNR1Cdu3w3qM
+	 BqBSr8YpPhd9v8ct9r0lDyFqngeeN4HecbDGRq/qM07SWST/+dnf0qQDrFN7ocOZVI
+	 wt3zjHpIgb3Yw==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 22 Oct 2024 11:22:29 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 22 Oct
+ 2024 11:22:29 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 08B4A3184BFB; Tue, 22 Oct 2024 11:22:29 +0200 (CEST)
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/5] pull request (net): ipsec 2024-10-22
+Date: Tue, 22 Oct 2024 11:22:21 +0200
+Message-ID: <20241022092226.654370-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/2] Enable Ethernet on the Genio 700 EVK board
-To: =?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, Richard Cochran <richardcochran@gmail.com>
-Cc: kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Jianguo Zhang <jianguo.zhang@mediatek.com>,
- Macpaul Lin <macpaul.lin@mediatek.com>,
- Hsuan-Yu Lin <shane.lin@canonical.com>, Pablo Sun <pablo.sun@mediatek.com>,
- fanyi zhang <fanyi.zhang@mediatek.com>
-References: <20241018-genio700-eth-v2-0-f3c73b85507b@collabora.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <20241018-genio700-eth-v2-0-f3c73b85507b@collabora.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Il 18/10/24 17:19, Nícolas F. R. A. Prado ha scritto:
-> The patches in this series add the ethernet node on mt8188 and enable it
-> on the Genio 700 EVK board.
-> 
-> The changes were picked up from the downstream branch at
-> https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-mtk/+git/jammy,
-> cleaned up and split into two commits.
-> 
-> Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
-> ---
-> Changes in v2:
-> - Moved mdio bus to mt8188.dtsi
-> - Changed phy-mode: rgmii-rxid -> rgmii-id
-> - Removed mediatek,tx-delay-ps
-> - style: Reordered vendor properties alphabetically
-> - style: Used fewer lines for clock-names
-> - Fixed typo in commit message: 1000 Gbps -> 1000 Mbps
-> - Link to v1: https://lore.kernel.org/r/20241015-genio700-eth-v1-0-16a1c9738cf4@collabora.com
-> 
-> [...]
-Applied to v6.12-next/dts64, thanks!
+1) Fix routing behavior that relies on L4 information
+   for xfrm encapsulated packets.
+   From Eyal Birger.
 
-Cheers,
-Angelo
+2) Remove leftovers of pernet policy_inexact lists.
+   From Florian Westphal.
+
+3) Validate new SA's prefixlen when the selector family is
+   not set from userspace.
+   From Sabrina Dubroca.
+
+4) Fix a kernel-infoleak when dumping an auth algorithm.
+   From Petr Vaganov.
+
+Please pull or let me know if there are problems.
+
+Thanks!
+
+The following changes since commit 7ebf44c910690a7097442d4dd68f12315569b2f4:
+
+  MAINTAINERS: adjust file entry of the oa_tc6 header (2024-09-22 19:55:04 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git tags/ipsec-2024-10-22
+
+for you to fetch changes up to 6889cd2a93e1e3606b3f6e958aa0924e836de4d2:
+
+  xfrm: fix one more kernel-infoleak in algo dumping (2024-10-11 09:00:03 +0200)
+
+----------------------------------------------------------------
+ipsec-2024-10-22
+
+----------------------------------------------------------------
+Eyal Birger (2):
+      xfrm: extract dst lookup parameters into a struct
+      xfrm: respect ip protocols rules criteria when performing dst lookups
+
+Florian Westphal (1):
+      xfrm: policy: remove last remnants of pernet inexact list
+
+Petr Vaganov (1):
+      xfrm: fix one more kernel-infoleak in algo dumping
+
+Sabrina Dubroca (1):
+      xfrm: validate new SA's prefixlen using SA family when sel.family is unset
+
+ include/net/netns/xfrm.h |  1 -
+ include/net/xfrm.h       | 28 +++++++++++++------------
+ net/ipv4/xfrm4_policy.c  | 40 ++++++++++++++++--------------------
+ net/ipv6/xfrm6_policy.c  | 31 ++++++++++++++--------------
+ net/xfrm/xfrm_device.c   | 11 +++++++---
+ net/xfrm/xfrm_policy.c   | 53 ++++++++++++++++++++++++++++++++++--------------
+ net/xfrm/xfrm_user.c     | 10 +++++++--
+ 7 files changed, 103 insertions(+), 71 deletions(-)
 
