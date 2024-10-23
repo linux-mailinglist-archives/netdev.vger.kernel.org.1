@@ -1,99 +1,180 @@
-Return-Path: <netdev+bounces-138311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8F19ACEE5
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:35:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A270C9ACEF6
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:37:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49AB61F21B6E
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:35:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 327B31F2131C
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFD41C174A;
-	Wed, 23 Oct 2024 15:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D7A1C68A6;
+	Wed, 23 Oct 2024 15:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E8V4rNZR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ima94U6J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDB71ACDE8
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 15:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66ADF1BFE0D;
+	Wed, 23 Oct 2024 15:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729697697; cv=none; b=avF/63p0uhWXu5oJ9HuKIgIUzf6hcEVOOdIOel8sMa2FipfBlrJUUc2JtdoBqcLy5gH4QrU7ts8uyg+LtT3huS0nL5MxjD1Q8VeTxoRalVqkT2uD+iqiVIUOJGwweH0Fxi4C+2WDMurIy5hHAL0aPUOU7ZaWX9bGugpL3YjUYIk=
+	t=1729697850; cv=none; b=M86eTUBuCw8pdPrqiFZDT9QUv/wkXJSOXXotKrbYEnQLIm9UxYHXskRL+n0SbaOS6g1DteltHnHY2DqKFTxMiC/CgbjVQStUd6qXH5CEKl43UIP9IDr+qb+IIaYFo8uuIiDqtcZynt8r2iv0qADhLjGujqjeUZgH/wuhE6c+9Vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729697697; c=relaxed/simple;
-	bh=/s9HW9dGv14NV4XVNza+0FX7UHSWaYuZts+yDTSVlcE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rjKXcR+dju6i1rVDEACXc7Nw7u1geomWJUODfZjbgxF+L5HLF6DD51bCG6d8al8GAz0onkfPgbY97kerQ9imv1UDjtJYbX6E6435VOgdKM75riZ6XdKRGxYbXUzggRXOGJQ2FuQ0B2R5MYIvrxVDdnyZ21PXcyVcKOa1uoNlYbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E8V4rNZR; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9acafdb745so64884366b.0
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:34:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729697695; x=1730302495; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/s9HW9dGv14NV4XVNza+0FX7UHSWaYuZts+yDTSVlcE=;
-        b=E8V4rNZRD1ztWIW2odM3gzEwiqbiLRR8CXa0rcSz6XyK618/4/miTXrpNhik8TWI3t
-         rVcAHCqmhYWt6UXb9ND68+RYFGavykG+MSW22OIgF4GxontKXxndr2YC2sfSJ/PlMprQ
-         dhY2br8t45wFqhkCDzpueAz8ofbetxKVYtgYVtz6GF4+mjNkzOOm+MgLlGFWQZExftn3
-         rgbLwv+QS980rJJrwUT4+aFPYmcOf0me+pUA7ZswWlPcetXVY/5664DVJjrqxAC14rba
-         yOldHWKKwrKk9S+QztvodtR98HduCiUtsCKscfSeUjSAiz21S4s7+4QOTcPQZioeFqjR
-         FTPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729697695; x=1730302495;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/s9HW9dGv14NV4XVNza+0FX7UHSWaYuZts+yDTSVlcE=;
-        b=tkjTYk3Wxz7PtiER4SG6B1WNcYyaxjODKDi88/xhFhm9HMhILlmWcJtCuJr1iF8a1Y
-         68RHMYJaEx+Q7vYBqHcpsFw9i9uHGm4bOCH6Zgc1Q+7d7UPGRT66PVwj9CEFBIWqkmf3
-         tCgeRJ0uJDHacjP5XUDEG/KLaUhZC+RQ8NquB3YCFUDjnqL0YOEJBbJ3gatS1R0+wfP8
-         YqfZqB9zuZBrgJg0DhCbU11y5CmcL/Bd2kts976LpOIsbi8JOuHz6FZvxjcKv7lOuBF/
-         WiR2hGv0Kz80YxYxcsnw28yAt+Ah4+mpBkFyNa4QJCNGNeMPPuLhlpIlJQ+bQdhTef8O
-         /Z0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUrdxL5Ov/Z1wUkxR85pzhmOZS2/pQXMSZDCA14Le4wAXCEwIgGsLjCaf/w0F6uY9Qu6Cwv4sc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB8OO6WRwtcEpZUZk1ELGWjof0mX5/bz2syddpK/x0cmUpu6MU
-	cknXpZl4FwUamQjaIt5XNEWRZ4DdXTyGtq8PUm+HnyHquU7flfK3fD+lvBQx2+TdFDBUdBqVhJY
-	z0N1mkhlsJp80Y6KTlrNlYKHfVaRfjuAxMEqN
-X-Google-Smtp-Source: AGHT+IGONfFqZHs6vUTcfzg66BfA92KmrTP5ZRAYQ5MqeNiXa4xTToaTGLnEBRiEXxIAj5+GUk7O1CtoAxcZ3kpRaZw=
-X-Received: by 2002:a17:906:da87:b0:a9a:130e:11fd with SMTP id
- a640c23a62f3a-a9aaa4f4be6mr833527166b.5.1729697694438; Wed, 23 Oct 2024
- 08:34:54 -0700 (PDT)
+	s=arc-20240116; t=1729697850; c=relaxed/simple;
+	bh=fS3eJ8P+ux9S0OqEOhIia1lXSwXNpwLliBMdv3pspAU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Kma7qhCNatFIFzEwltcKrJQHNFCfZTjbKXi/89Z2Xgs4IxRTGSiKTyEh+LJ5DGarAVZHNUdyzDI1CatACc4a7fjQbs2wdZVFi+EgGACoj4fkF/Ub2DVYP+PnmxYcxqm+02QjhaU88rQ2IKg3Ymc9eaUmhGlhRaSGg7IjQ1U+atE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ima94U6J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 994C9C4CEC6;
+	Wed, 23 Oct 2024 15:37:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729697850;
+	bh=fS3eJ8P+ux9S0OqEOhIia1lXSwXNpwLliBMdv3pspAU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Ima94U6JgLfMy6s+cI3f0gVuBeruARRjleGmf80bjUWfJlQ1ythLCxLloTRSwob5D
+	 aJhF4xCCVD1f92vdHfdtnqeSg3n+JvahF2Y4OWP37JTDwMk0mRp3tW9YkmKCZIozcH
+	 47ZOYU2xTqPI4VoY3aepCTe3TDZ/qKosjWwViJyxYqscWHUbiyAQNltp5CG9O0S0wz
+	 jMkcJWDR+XMOQegavNF9+HP7hUbCx/cp7hbh7TV2rge8nY4eyFBCfQyzo6NLhBPmgg
+	 XhTnNxs27VlEMgvU0ynXSbZXi3QvR4CiH1IlIhAa1mJSwE36n7XcazpUSKuANf2Sv4
+	 x8yldypMS3AJA==
+From: Puranjay Mohan <puranjay@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Andrii Nakryiko
+ <andrii@kernel.org>, bpf@vger.kernel.org, Daniel Borkmann
+ <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, Hao Luo
+ <haoluo@google.com>, Helge Deller <deller@gmx.de>, Jakub Kicinski
+ <kuba@kernel.org>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, Jiri Olsa <jolsa@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>,
+ Mykola Lysenko <mykolal@fb.com>, netdev@vger.kernel.org, Palmer Dabbelt
+ <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>, Song Liu
+ <song@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Yonghong Song
+ <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next 4/5] selftests/bpf: Add benchmark for
+ bpf_csum_diff() helper
+In-Reply-To: <mb61p8qugc955.fsf@kernel.org>
+References: <20241021122112.101513-1-puranjay@kernel.org>
+ <20241021122112.101513-5-puranjay@kernel.org>
+ <CAEf4BzY1LgCF1VOoAQkMdDTx87C0mfyftMvhvVU4GpsFc6fw5g@mail.gmail.com>
+ <mb61pa5ewbfpk.fsf@kernel.org>
+ <CAEf4BzZ-gfBqez-QJCSRVOPnvz-inaiVdNGOFRCdc2KQbnmeZQ@mail.gmail.com>
+ <mb61p8qugc955.fsf@kernel.org>
+Date: Wed, 23 Oct 2024 15:37:07 +0000
+Message-ID: <mb61pttd2bzks.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241017183140.43028-1-kuniyu@amazon.com> <20241017183140.43028-10-kuniyu@amazon.com>
-In-Reply-To: <20241017183140.43028-10-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 23 Oct 2024 17:34:42 +0200
-Message-ID: <CANn89i+vfRjHvz5eYmMpxz+qVZi7vquKRsWNQBufOVGCkxUM=A@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 9/9] phonet: Don't hold RTNL for route_doit().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Remi Denis-Courmont <courmisch@gmail.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 17, 2024 at 8:34=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> Now only __dev_get_by_index() depends on RTNL in route_doit().
->
-> Let's use dev_get_by_index_rcu() and register route_doit() with
-> RTNL_FLAG_DOIT_UNLOCKED.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
+Puranjay Mohan <puranjay@kernel.org> writes:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Andrii Nakryiko <andrii.nakryiko@gmail.com> writes:
+>
+>> On Tue, Oct 22, 2024 at 3:21=E2=80=AFAM Puranjay Mohan <puranjay@kernel.=
+org> wrote:
+>>>
+>>> Andrii Nakryiko <andrii.nakryiko@gmail.com> writes:
+>>>
+>>> > On Mon, Oct 21, 2024 at 5:22=E2=80=AFAM Puranjay Mohan <puranjay@kern=
+el.org> wrote:
+>>> >>
+>>> >> Add a microbenchmark for bpf_csum_diff() helper. This benchmark work=
+s by
+>>> >> filling a 4KB buffer with random data and calculating the internet
+>>> >> checksum on different parts of this buffer using bpf_csum_diff().
+>>> >>
+>>> >> Example run using ./benchs/run_bench_csum_diff.sh on x86_64:
+>>> >>
+>>> >> [bpf]$ ./benchs/run_bench_csum_diff.sh
+>>> >> 4                    2.296 =C2=B1 0.066M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 8                    2.320 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 16                   2.315 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 20                   2.318 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 32                   2.308 =C2=B1 0.003M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 40                   2.300 =C2=B1 0.029M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 64                   2.286 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 128                  2.250 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 256                  2.173 =C2=B1 0.001M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >> 512                  2.023 =C2=B1 0.055M/s (drops 0.000 =C2=B1 0.000=
+M/s)
+>>> >
+>>> > you are not benchmarking bpf_csum_diff(), you are benchmarking how
+>>> > often you can call bpf_prog_test_run(). Add some batching on the BPF
+>>> > side, these numbers tell you that there is no difference between
+>>> > calculating checksum for 4 bytes and for 512, that didn't seem strange
+>>> > to you?
+>>>
+>>> This didn't seem strange to me because if you see the tables I added to
+>>> the cover letter, there is a clear improvement after optimizing the
+>>> helper and arm64 even shows a linear drop going from 4 bytes to 512
+>>> bytes, even after the optimization.
+>>>
+>>
+>> Regardless of optimization, it's strange that throughput barely
+>> differs when you vary the amount of work by more than 100x. This
+>> wouldn't be strange if this checksum calculation was some sort of
+>> cryptographic hash, where it's intentional to have the same timing
+>> regardless of amount of work, or something along those lines. But I
+>> don't think that's the case here.
+>>
+>> But as it is right now, this benchmark is benchmarking
+>> bpf_prog_test_run(), as I mentioned, which seems to be bottlenecking
+>> at about 2mln/s throughput for your machine. bpf_csum_diff()'s
+>> overhead is trivial compared to bpf_prog_test_run() overhead and
+>> syscall/context switch overhead.
+>>
+>> We shouldn't add the benchmark that doesn't benchmark the right thing.
+>> So just add a bpf_for(i, 0, 100) loop doing bpf_csum_diff(), and then
+>> do atomic increment *after* the loop (to minimize atomics overhead).
+>
+> Thanks, now I undestand what you meant. Will add the bpf_for() in the
+> next version.
+
+I have decided to drop this patch as even after adding bpf_for() the
+difference between 4B and 512B is not that much. So, benchmarking
+bpf_csum_diff() using this triggering based framework is not useful.
+
+So, v2 will not have this patch but the cover letter will still have the
+tables to show the difference before/after the optimization.
+
+Thanks,
+Puranjay
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iIoEARYKADIWIQQ3wHGvVs/5bdl78BKwwPkjG3B2nQUCZxkYJBQccHVyYW5qYXlA
+a2VybmVsLm9yZwAKCRCwwPkjG3B2nZcNAP9LuNyLHGuE8urrunhTq/wpaMGlCwOS
+BXyQadJTABXgvgEAvD4mhW6uC3odQDgdGxBrVV/Q1eBzFf4WxzCGVME9lAw=
+=u12U
+-----END PGP SIGNATURE-----
+--=-=-=--
 
