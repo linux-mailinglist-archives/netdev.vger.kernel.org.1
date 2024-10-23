@@ -1,192 +1,185 @@
-Return-Path: <netdev+bounces-138402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060C29AD5C5
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:49:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 533939AD5CB
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 848C11F22CD7
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 20:49:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7434A1C21739
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 20:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B9F1CEE8A;
-	Wed, 23 Oct 2024 20:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E121D041B;
+	Wed, 23 Oct 2024 20:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbsmEFuB"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Z66+ohz6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937CC149013;
-	Wed, 23 Oct 2024 20:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8B213AA2B
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 20:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729716581; cv=none; b=eD1U0nnnRMYbVtPckwqsNU9pXIz11q8dEtReJGYfuLn1WpLnvhGEVF3q3o086uZP4OIbPwFNFavFoDF4MgrGOiN669sKQggmDaAG/ZnmLwiWjdPNxSywQxkd63KBTTrPA9qVHL8OcIT9dkarKMBEl1t9i3RbqP+0+RevazHb1xc=
+	t=1729716704; cv=none; b=ealeLWPFdqENHSKWqXs/jXiKl21+Rwz8mSncLo2hb17C9eJAr5GWj1KJ0v0yAKC9gpDZSGC2Fq1r5q4D6vtFdav59SeIjTP8D00cEqFPaXSX18wfgi8Qz1qgjhCVRhbx5Z9qFmsOgYYIjEam2RFWUfjYmZIWAWZ3okEsLl7G3ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729716581; c=relaxed/simple;
-	bh=D6rOAupw7nWaOfhbwJhOxY7u+4yNaJ1nMm3CkyxSZ4I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fvBqNmduASY6S8mSJoNeJAcpyIvjEAp38CV8X0G70jy69PDp0K9H9WmU/TFd2Wgd5hVF7oWH/XBTpxDhqLsisKvinXfj8X1dbrP8r0YnC7pSc6cLSLd55YSGqJchq+5UUuvJqo8Ik0P90atfphQc3wzIe9Kuy8im3gAPb2GN16w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SbsmEFuB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 612EEC4CEC6;
-	Wed, 23 Oct 2024 20:49:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729716581;
-	bh=D6rOAupw7nWaOfhbwJhOxY7u+4yNaJ1nMm3CkyxSZ4I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SbsmEFuBcYBJxfd9aKYJEJhvm5sOCBpuq3Gkw8XBVAgaBVAtodo4MzzFydgz9lmre
-	 lYFf+4Bc3gblOkDrHaTeXYplOKsx+ARhDq7I84evZ9AqNJW6sdl8mkvHTdvLRiNWq7
-	 HIxQV0FTIhIlXU1I0UWU0dYoCb4/La4ArGqqwj83V1yPu64TjVihcSJtg+Lv4hnx7j
-	 nsU4mql2Gn/IGBFQELdRYpyG77D96qEA7RspsiJJx3jVWn3y5NFarKPXPlN+Fhh4du
-	 ljtB6NwbDGGW5+zuy3s8XNOWGeFaUUoztmYHWjCyMnJg20bW3Ehuw32LgawaSV0yAA
-	 ne0ctkmBg3+FQ==
-Date: Wed, 23 Oct 2024 21:49:34 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Chen Wang <unicorn_wang@outlook.com>,
+	s=arc-20240116; t=1729716704; c=relaxed/simple;
+	bh=K44ATCiMDHxMTMJcyBAwfGkIfgGnFaUTSMZ5dOBioco=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tSmHk4a9lQnlN5I9T7iLxnnLxn0np5so/pWnRh2X+e1PCBSbBs27JSt55aEngTjZ9SYYv8EIAbrf4hOLxopW8bd9veYCqLe5BolCQojK82WBBt32BZ7idOFGskolOUDt6F23RBJwfH44lNcGm8WXV1qxLTXEt+3Ns2GU15xDruo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Z66+ohz6; arc=none smtp.client-ip=209.85.216.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-2e2a96b242cso39099a91.3
+        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 13:51:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1729716702; x=1730321502; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCyXfoKZLYIrM6bHNOmey4+JbsNLY/BGPRNE02WxQwo=;
+        b=Z66+ohz6/PuKBA4Cw1XCx8sMFctDfz66PzgpeffsEO3CzcUL9ZkvouWpft+AHyiX7F
+         WuLVkaGqWI+opb2qABPmJHWUwqIYam3XtOhZha+E9Bky+c89a+l7+ePXIW0iZx5sJ9hL
+         /LLEDDA5D5td8ppzDr4XLaJJeAq0P67HS/dJazSTASsQH6KN2Dp042ctaXgsHXGN1ioP
+         EMKrsZvzlPLwSmjqNA/aGtTFD0Z5mIfX6N5mmfJiwb9RCZyak4N5teZ5kOI6hj67hCb+
+         /oZEtVUV3kqej9ga7M5jki2LzyaSe1ai22s5PskBd0KmuXEjb8tt5lL+Za5m1eclkT3G
+         oL+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729716702; x=1730321502;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vCyXfoKZLYIrM6bHNOmey4+JbsNLY/BGPRNE02WxQwo=;
+        b=RWzNLjK7AWCndSvofhh91pX24G7zN6LcZkhqPuXJMmIkfvOqEB6Ebgn7LbcSigxiuk
+         RjBb048zJIN6f1B2YNwC097t3VK1MAbESloMTtZitfthnYhEDbQYJ8bj8qHxqaKOyhF3
+         gmA3OVGYIgb7TewvcDz5QIi3giWyZkA7m2/wIWBsaiO4OdQrIgg/fxu03TbMXM1RFVCZ
+         2xTBujnsZhbDHuQevQZi5v+3QkbRkRNSIxnh2wA0FNAa0WiJWUdGTbS0IeFFdhD5bO79
+         RVjiS3K8M79ozkdpbditmpoxTQygcPCylU1OnmHh5Th8SC3BYKuLzDzhXRaiJ4x64fAi
+         FApQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJRYuYUBksjApYUiaxFfEMigJ+fTIiwJaHl28bLytP2U7oXsyqDG2awCf6wGP3Uibg14cvRwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHP/k1dGnDgnl9Wb4FaY4O/9fn8UBn9FE6Ece/0GRnGT/tHrf4
+	gyRda3eMaw1h8VruFFe9s0jQL+cJrpL/lbiWLuOWwUeYPzbEt+uoJ/B6izbmDBXH9NHmabdDxrb
+	B8I0f6qFda00chmo0KH8xD4n14ECmTi9N4zTpJ33aItTw1lBu
+X-Google-Smtp-Source: AGHT+IG35rzOCpF6xzICIlXnd2xKWIdeRqdxmgfplqytKRI7gARk7EO/TkF1EVCs0mtdYwpJbkfTYQSa4jYI
+X-Received: by 2002:a17:903:32cc:b0:20c:85dc:6630 with SMTP id d9443c01a7336-20fa9deb651mr23890985ad.1.1729716701633;
+        Wed, 23 Oct 2024 13:51:41 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-20e7f0dd5c7sm2620325ad.54.2024.10.23.13.51.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 13:51:41 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 3B88D3400B6;
+	Wed, 23 Oct 2024 14:51:40 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 2D9E7E40BE0; Wed, 23 Oct 2024 14:51:40 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Inochi Amaoto <inochiama@outlook.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: Add support for Sophgo SG2044 dwmac
-Message-ID: <20241023-paper-crease-befa8239f7f0@spud>
-References: <20241021103617.653386-1-inochiama@gmail.com>
- <20241021103617.653386-3-inochiama@gmail.com>
- <20241022-crisply-brute-45f98632ef78@spud>
- <yt2idyivivcxctosec3lwkjbmr4tmctbs4viefxsuqlsvihdeh@alya6g27625l>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] mlx5: simplify EQ interrupt polling logic
+Date: Wed, 23 Oct 2024 14:51:12 -0600
+Message-ID: <20241023205113.255866-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HZ3OWjJABGOCrTlm"
-Content-Disposition: inline
-In-Reply-To: <yt2idyivivcxctosec3lwkjbmr4tmctbs4viefxsuqlsvihdeh@alya6g27625l>
+Content-Transfer-Encoding: 8bit
 
+Use a while loop in mlx5_eq_comp_int() and mlx5_eq_async_int() to
+clarify the EQE polling logic. This consolidates the next_eqe_sw() calls
+for the first and subequent iterations. It also avoids a goto. Turn the
+num_eqes < MLX5_EQ_POLLING_BUDGET check into a break condition.
 
---HZ3OWjJABGOCrTlm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 22 +++++++-------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-On Wed, Oct 23, 2024 at 08:31:24AM +0800, Inochi Amaoto wrote:
-> On Tue, Oct 22, 2024 at 06:28:06PM +0100, Conor Dooley wrote:
-> > On Mon, Oct 21, 2024 at 06:36:15PM +0800, Inochi Amaoto wrote:
-> > > The GMAC IP on SG2044 is almost a standard Synopsys DesignWare MAC
-> > > with some extra clock.
-> > >=20
-> > > Add necessary compatible string for this device.
-> > >=20
-> > > Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> > > ---
-> > >  .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
-> > >  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 145 ++++++++++++++++=
-++
-> > >  2 files changed, 146 insertions(+)
-> > >  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg20=
-44-dwmac.yaml
-> > >=20
-> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/=
-Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > index 3c4007cb65f8..69f6bb36970b 100644
-> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > @@ -99,6 +99,7 @@ properties:
-> > >          - snps,dwmac-5.30a
-> > >          - snps,dwxgmac
-> > >          - snps,dwxgmac-2.10
-> > > +        - sophgo,sg2044-dwmac
-> > >          - starfive,jh7100-dwmac
-> > >          - starfive,jh7110-dwmac
-> > > =20
-> > > diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwma=
-c.yaml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
-> > > new file mode 100644
-> > > index 000000000000..93c41550b0b6
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
-> > > @@ -0,0 +1,145 @@
-> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > > +%YAML 1.2
-> > > +---
-> > > +$id: http://devicetree.org/schemas/net/sophgo,sg2044-dwmac.yaml#
-> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > +
-> > > +title: StarFive JH7110 DWMAC glue layer
-> > > +
-> > > +maintainers:
-> > > +  - Inochi Amaoto <inochiama@gmail.com>
-> > > +
-> > > +select:
-> > > +  properties:
-> > > +    compatible:
-> > > +      contains:
-> > > +        enum:
-> > > +          - sophgo,sg2044-dwmac
-> > > +  required:
-> > > +    - compatible
-> > > +
-> > > +properties:
-> > > +  compatible:
-> > > +    items:
-> > > +      - const: sophgo,sg2044-dwmac
-> > > +      - const: snps,dwmac-5.30a
-> > > +
-> > > +  reg:
-> > > +    maxItems: 1
-> > > +
-> > > +  clocks:
-> > > +    items:
-> > > +      - description: GMAC main clock
-> > > +      - description: PTP clock
-> > > +      - description: TX clock
-> > > +
-> > > +  clock-names:
-> > > +    items:
-> > > +      - const: stmmaceth
-> > > +      - const: ptp_ref
-> > > +      - const: tx
-> > > +
-> > > +  sophgo,syscon:
-> >=20
-> > How many dwmac instances does the sg2044 have?
-> >=20
->=20
-> Only one, there is another 100G dwxgmac instance, but it does not
-> use this syscon.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index 68cb86b37e56..859dcf09b770 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -114,15 +114,11 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+ 	struct mlx5_eq *eq = &eq_comp->core;
+ 	struct mlx5_eqe *eqe;
+ 	int num_eqes = 0;
+ 	u32 cqn = -1;
+ 
+-	eqe = next_eqe_sw(eq);
+-	if (!eqe)
+-		goto out;
+-
+-	do {
++	while ((eqe = next_eqe_sw(eq))) {
+ 		struct mlx5_core_cq *cq;
+ 
+ 		/* Make sure we read EQ entry contents after we've
+ 		 * checked the ownership bit.
+ 		 */
+@@ -140,13 +136,14 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+ 					    "Completion event for bogus CQ 0x%x\n", cqn);
+ 		}
+ 
+ 		++eq->cons_index;
+ 
+-	} while ((++num_eqes < MLX5_EQ_POLLING_BUDGET) && (eqe = next_eqe_sw(eq)));
++		if (++num_eqes >= MLX5_EQ_POLLING_BUDGET)
++			break;
++	}
+ 
+-out:
+ 	eq_update_ci(eq, 1);
+ 
+ 	if (cqn != -1)
+ 		tasklet_schedule(&eq_comp->tasklet_ctx.task);
+ 
+@@ -213,15 +210,11 @@ static int mlx5_eq_async_int(struct notifier_block *nb,
+ 	eqt = dev->priv.eq_table;
+ 
+ 	recovery = action == ASYNC_EQ_RECOVER;
+ 	mlx5_eq_async_int_lock(eq_async, recovery, &flags);
+ 
+-	eqe = next_eqe_sw(eq);
+-	if (!eqe)
+-		goto out;
+-
+-	do {
++	while ((eqe = next_eqe_sw(eq))) {
+ 		/*
+ 		 * Make sure we read EQ entry contents after we've
+ 		 * checked the ownership bit.
+ 		 */
+ 		dma_rmb();
+@@ -229,13 +222,14 @@ static int mlx5_eq_async_int(struct notifier_block *nb,
+ 		atomic_notifier_call_chain(&eqt->nh[eqe->type], eqe->type, eqe);
+ 		atomic_notifier_call_chain(&eqt->nh[MLX5_EVENT_TYPE_NOTIFY_ANY], eqe->type, eqe);
+ 
+ 		++eq->cons_index;
+ 
+-	} while ((++num_eqes < MLX5_EQ_POLLING_BUDGET) && (eqe = next_eqe_sw(eq)));
++		if (++num_eqes >= MLX5_EQ_POLLING_BUDGET)
++			break;
++	}
+ 
+-out:
+ 	eq_update_ci(eq, 1);
+ 	mlx5_eq_async_int_unlock(eq_async, recovery, &flags);
+ 
+ 	return unlikely(recovery) ? num_eqes : 0;
+ }
+-- 
+2.45.2
 
-That dwxgmac is a different device, with a different compatible etc?
-
---HZ3OWjJABGOCrTlm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZxlhXgAKCRB4tDGHoIJi
-0pO0AQD5Swmhv1mfvz5DiD/5f5DGV3m+rvoUAhPp697EkSD9KgD/fnWAmf29z3yR
-O/N/hNkW71ULWbchz7jsFDwGdd6q4Ao=
-=k7np
------END PGP SIGNATURE-----
-
---HZ3OWjJABGOCrTlm--
 
