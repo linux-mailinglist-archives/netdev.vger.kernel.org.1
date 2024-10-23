@@ -1,127 +1,103 @@
-Return-Path: <netdev+bounces-138427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CEA69AD75E
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:11:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 265509AD79E
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 186281F233B8
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:11:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4396F1C21752
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACD71F80B8;
-	Wed, 23 Oct 2024 22:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7A21FE0EF;
+	Wed, 23 Oct 2024 22:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cx2hV6EW"
+	dkim=pass (2048-bit key) header.d=notyourfox.coffee header.i=@notyourfox.coffee header.b="Qzx5NnIV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail.notyourfox.coffee (mail.notyourfox.coffee [92.63.193.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1411E2836
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 22:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8717A156C6F;
+	Wed, 23 Oct 2024 22:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.63.193.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729721513; cv=none; b=Q6ZnBnZ7l4CYh032ud2QWLfHBEHHI4v/KOx00j386fbgO6dNfNh6TiEwgwi3zsGzU3EmvdYB8rncE7pdJnej+wHg44y0Bp3ngFHsykr6GySwRrJXLiQjtAjebVjcXrNs68JzJDUj9UT6KobDOWJ5ccfWgNcAA0Ehw2WKYZokYzc=
+	t=1729722716; cv=none; b=q3vuSn1p3c97UrS+1/8igS+d2zV4MGkUzQfYPYZIYixRDNsplNqK39LH+qM8YoPgUyVu5EwEmPDYFcd6+CatuaTVawmofLVbxFQxt9AqpvHP8+wTt46WdgEryR5bMgUOaISxgxIajJGTJC04h36+czba5ZlGhvJ627LfhA+TeH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729721513; c=relaxed/simple;
-	bh=2NPcfSh1uoL1PReEMYSQs0VLESRvMrGgT9kP5uaX6r8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bUh4aG7RO9qyqThbPy4MPzsItxEaaLRTpOeVjAnxLPYG0RRZY3chlj6+cEJuYFlSDXn94jDQFm7WAAm/kJ5Wuohjb83ZnPvKQxUbLpCKi3yl9ooHvZfqKvsWMq7O1Ok/DmpG6haFD07oVhU1gPqPDoe8izOYLVo/oNPaFFd2EPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cx2hV6EW; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7ed98536f95so171148a12.1
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 15:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729721511; x=1730326311; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0lwUmwsmnHWCMeHuWQPBpAmSfL8WSDh1Ybn7+Iij+s4=;
-        b=Cx2hV6EWgtLyvWGRWTmPry0zFzhiyiotlfrKHRthFbKcCEEkTy2LUd1IyrZ3rIdvlZ
-         ictv1zXTLDafmxe6sU9J0ty/A6l1tOPeGMzaaBx36BuqG0Xdg1gzU58A4ntiYUQX9UsH
-         O0gF+BKjJxymtPhuuXqtgSZkQl1QNKg5oJ8bAH9hrsARWMU6aXaXCkl9+x+AdsqmHtWV
-         95m7M6nqpAvMbYwk7eNqVHd4sv8KHcho7zyTLvVeQvCvxwp0PniHnvKo1YGnEX6qHfps
-         eWa44cg4cE4tO0GuE2g/Xuwwqd4PKnRmgIxwN0SjDH3hZoPwrgvKCL066+DJS6sPQr5S
-         V94w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729721511; x=1730326311;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0lwUmwsmnHWCMeHuWQPBpAmSfL8WSDh1Ybn7+Iij+s4=;
-        b=YGXksCYlHDcEHijmbDWHmOpqTgP8Jhkvzolw0hZg2THMMsuVGyPMbPSXrIn7UZRpzq
-         K0vckxmfPB5Zu536OBUooeP/wRoBfT7M6JTaoWcPjZ/6rU8cGXAGujG8uG1HeHsX8Slq
-         7J4c8wjHNPuubjuLeUWwnlI0Ec19tbcyLTVuTkSR+Cd9kzlDTUNNCNv1UMmajDO/UUur
-         B3jX/kjuMpx5eYM18aVs/rdPYVKtsOx30sdMb1QJ5Fwxt8Xw8emIuHo2ZYHQH5VVTzzG
-         yDdaZwJ82EdBpMTgBbxOHoGHQOnkwR1OOjzqZMNLOxr2crHfsP6FY0DDhjAF8tHFhOM/
-         ZcKw==
-X-Gm-Message-State: AOJu0Yxo9hC30AAEQWvnfpO10YQvH8QXTzoXyZUtNA3ogTkAXvGVT9Oh
-	7J2fWoK5tT71jZtr9jyq/iIlLeMR4vCk/BmiHZenogZxDdOrnsRpTLP/yUJrWR7rg1GII0b3xZP
-	yNTF8SEY1yoxdkAmAd37FiSL11CUipuHXctY6k13B1NUGweeC4LwGhv0NPjkJyeO6t/vWsJ2LxA
-	/xwjpPewr6C7TmtM2ohAA3adKjreHdlECvU81aZDimyiabFeNkGqDh6JcnioX5Jui4
-X-Google-Smtp-Source: AGHT+IGKFkxbjuGkfHDoeY0M1W0R2msA80ns7fcRBmil7r19YPvsmfbscEmxLo/nrj/p7DoESmKZaoh77vwiVsYlWkA=
-X-Received: from pkaligineedi.sea.corp.google.com ([2620:15c:11c:202:9db6:f9e7:4fd8:c827])
- (user=pkaligineedi job=sendgmr) by 2002:a05:6a02:4085:b0:7db:54a0:cf3b with
- SMTP id 41be03b00d2f7-7edb2230984mr3a12.0.1729721509074; Wed, 23 Oct 2024
- 15:11:49 -0700 (PDT)
-Date: Wed, 23 Oct 2024 15:11:41 -0700
+	s=arc-20240116; t=1729722716; c=relaxed/simple;
+	bh=lBqM5PBwzs7x9XceHQ9rfZgT7htaBeYa/E3GDqF9nXU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=WB337mOGkhic3fNsyKeUY7XtqugTyJsmFsSwSXo+scTxrZOwEvZkXdfnUsuqYjTgMwE155hCPJ2faWh84m5/LKqT2Mse7TfJMF8c0nWdTNaKuFnMlsxgqfQnWtG3m2G2BY63BNs6CnC016blMzFzw7YYwwhNgFw36Wc44zyzKX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=notyourfox.coffee; spf=pass smtp.mailfrom=notyourfox.coffee; dkim=pass (2048-bit key) header.d=notyourfox.coffee header.i=@notyourfox.coffee header.b=Qzx5NnIV; arc=none smtp.client-ip=92.63.193.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=notyourfox.coffee
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=notyourfox.coffee
+DKIM-Signature: a=rsa-sha256; bh=21ozGVKPYTmOqYBKOcOmOK+mSJIkuon14lUJ9oaW7vM=;
+ c=relaxed/relaxed; d=notyourfox.coffee;
+ h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:In-Reply-To:Message-Id:Message-Id:References:References:Autocrypt:Openpgp;
+ i=@notyourfox.coffee; s=mail; t=1729721693; v=1; x=1730153693;
+ b=Qzx5NnIVSz7GYrDq8cD6l5rVz4+yd3Yy0awiIXQ74n7AFlsPGnqrWQg6R6416QT+gDRK9zC8
+ 9xhmK/sXgtRFfrZuRTrJT44F2y0hvsfoeDKX+jvRt/xYJezg0GvKvAfTGTChJHSFh9G5Px8JJDQ
+ ItihhXdHyhCSdjbd56F+uiNFCT1zCuJG/Ri/sCwEuVj440Wyh1yTbfFA2uTKwQh8BGf1pSB7Ve+
+ G1ukignizWPp5P6QKWyCjWYu/mi/HkS83y71a1L99yqksWnODf1S+p7ekZij6dMqSGCUF0KoEae
+ Q6vlmTQmE/I5KlptBRFhJuu+uy+Wxrv/d/yn77tWE1ZEg==
+Received: by mail.notyourfox.coffee (envelope-sender
+ <contact@notyourfox.coffee>) with ESMTPS id 9d61df4a; Wed, 23 Oct 2024
+ 22:14:53 +0000
+Message-ID: <bd0c85d0-6941-4693-bae5-a3f6613f829c@notyourfox.coffee>
+Date: Thu, 24 Oct 2024 01:14:51 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
-Message-ID: <20241023221141.3008011-1-pkaligineedi@google.com>
-Subject: [PATCH net-next] gve: change to use page_pool_put_full_page when
- recycling pages
-From: Praveen Kaligineedi <pkaligineedi@google.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, willemb@google.com, 
-	jeroendb@google.com, shailend@google.com, hramamurthy@google.com, 
-	ziweixiao@google.com, linyunsheng@huawei.com, jacob.e.keller@intel.com, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: torvalds@linux-foundation.org
+Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
+ dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com,
+ geert@linux-m68k.org, gregkh@linuxfoundation.org,
+ hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru, jeffbai@aosc.io,
+ kexybiscuit@aosc.io, linux-alpha@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-spi@vger.kernel.org,
+ manivannan.sadhasivam@linaro.org, mattst88@gmail.com,
+ netdev@vger.kernel.org, nikita@trvn.ru, ntb@lists.linux.dev,
+ patches@lists.linux.dev, richard.henderson@linaro.org, s.shtylyov@omp.ru,
+ serjk@netup.ru, shc_work@mail.ru, torvic9@mailbox.org,
+ tsbogend@alpha.franken.de, v.georgiev@metrotek.ru, wangyuli@uniontech.com,
+ wsa+renesas@sang-engineering.com, xeb@mail.ru
+References: <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
+Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various
+ compliance requirements."
+Content-Language: en-US
+From: NotYourFox <contact@notyourfox.coffee>
+In-Reply-To: <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Harshitha Ramamurthy <hramamurthy@google.com>
+Dear Linus,
 
-The driver currently uses page_pool_put_page() to recycle
-page pool pages. Since gve uses split pages, if the fragment
-being recycled is not the last fragment in the page, there
-is no dma sync operation. When the last fragment is recycled,
-dma sync is performed by page pool infra according to the
-value passed as dma_sync_size which right now is set to the
-size of fragment.
+Yet another of probably a million "actual innocent Russian bystanders" 
+is here. For quite a reason. While I do not contribute to Linux kernel, 
+I am a long-time user of Linux and a big fan of FOSS. You may consider 
+it a spam, and it might as well be, but this just blew up our IT-related 
+media.
+I am, or, rather, many of us are disappointed in the way you put 
+politics over software freedom now.
+This move did nothing against Russian aggression, but rather 
+disappointed a lot of us, who don't support or have anything to do with 
+the ongoing war. The contributors you dropped for, as it seems, no 
+reason other than "compliance requirements" have done some actual work 
+to improve Linux, so kicking them for apparently just being from Russia 
+is... just plain discrimination.
+If that's the law you have to follow, go on. If it's your own actual 
+choice - you need to revisit what "free software" means.
 
-But the correct thing to do is to dma sync the entire page when
-the last fragment is recycled. Hence change to using
-page_pool_put_full_page().
+If I am blatantly wrong about all this, knowing it would only be a balm 
+for my soul.
 
-Link: https://lore.kernel.org/netdev/89d7ce83-cc1d-4791-87b5-6f7af29a031d@huawei.com/
-
-Suggested-by: Yunsheng Lin <linyunsheng@huawei.com>
-Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
----
- drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-index 05bf1f80a79c..403f0f335ba6 100644
---- a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-@@ -210,8 +210,7 @@ void gve_free_to_page_pool(struct gve_rx_ring *rx,
- 	if (!page)
- 		return;
- 
--	page_pool_put_page(page->pp, page, buf_state->page_info.buf_size,
--			   allow_direct);
-+	page_pool_put_full_page(page->pp, page, allow_direct);
- 	buf_state->page_info.page = NULL;
- }
- 
--- 
-2.47.0.105.g07ac214952-goog
 
 
