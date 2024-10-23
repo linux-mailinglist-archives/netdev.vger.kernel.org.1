@@ -1,116 +1,122 @@
-Return-Path: <netdev+bounces-138079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB03D9ABCA9
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:16:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84A4A9ABCE7
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40C7C1F2407A
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 04:16:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0271F23A62
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 04:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56A813D248;
-	Wed, 23 Oct 2024 04:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A91E13CABC;
+	Wed, 23 Oct 2024 04:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7vMeJHS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vqs7U3ZD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7139713C8F6;
-	Wed, 23 Oct 2024 04:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E437613C9A4
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 04:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729656972; cv=none; b=RlLlt1sCCbE5uUT7i1Rtk6JuR38SqjY12w0twso2YE9RRNiQs1lPPsynC3jHN2SFejJzQSlM8bePVr6AhIC2Ko/eehWiDDMWDxzFgCmKIaC8beAC1jvnS2LPbpXLEMBf1BW8tt+OcT7jgqvw6OJJZPD+yW8MaaKOkFRjNT/5Ehg=
+	t=1729657223; cv=none; b=ec0DQutumLB6uyRLUAPHqtjGT/yXSkwmu6YobqfXx/GDE2rsrwdXIGjXM9YWrV5+cVNx+guSXPae+gQdAgu4SjFiyO3SZaRaOkPSnFFSVBFPf4x+XQWCGr4FPlzSd2J4KUu8kMbU3PPXz6GUesk/oJs44DgWehlyvyTm6X0cm5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729656972; c=relaxed/simple;
-	bh=Ssryh/DeScctPPrI9kLBjogfgqMCqhs16Pkd5Nr7TBA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LMcs7P5/c8equVxtLkzJgAa4pPqhZoEev/ZrwTIbGYH15IleKz83iLv/y6YssGNp6ITJTww6XI3gnTi2kyzRIJxZPIrUQIIEyr25QuJ7mnBr0tMjcbya0ClcohY1vUVnTex1jn/I+/1Oq0NC/IDLm6+G3iG/Lv/IXSnt8wkZRwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7vMeJHS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6553C4CEE6;
-	Wed, 23 Oct 2024 04:16:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729656972;
-	bh=Ssryh/DeScctPPrI9kLBjogfgqMCqhs16Pkd5Nr7TBA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b7vMeJHST3VEyUf/HCoYwfOa6LyzIxDlyfbQrnhVhGMpZD3hkX+iWj8RR+LiGLrp5
-	 5E1NSMfagDJiRotNV80ljbcTSHIToTxxi1YdOJ8E1nMxp9cmvbdxJE5WCPP8hokSMz
-	 fro1zrCmom6LOsdpOe2nYCxKgOOASxm7TsP82nZFtflR4ArQ4VWnd5lD61BmX19Ne7
-	 eNcdGw/G3qPZcazLu4qKVScCwEHGj8WVTFRl/1Z9jLhLeNhIoAHU1J2xPDhJBMSXhw
-	 XhiTIuqRw5b8MZu+/O3GYihh4cMSj7aqi5CCvPIiGypjyBDdiw5fnM3Y8o82EvlxZa
-	 NNR3W4nUzirMw==
-From: Bjorn Andersson <andersson@kernel.org>
-To: robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	konradybcio@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kees@kernel.org,
-	tony.luck@intel.com,
-	gpiccoli@igalia.com,
-	quic_rjendra@quicinc.com,
-	andre.przywara@arm.com,
-	quic_sibis@quicinc.com,
-	igor.belwon@mentallysanemainliners.org,
-	davidwronek@gmail.com,
-	ivo.ivanov.ivanov1@gmail.com,
-	neil.armstrong@linaro.org,
-	heiko.stuebner@cherry.de,
-	rafal@milecki.pl,
-	lpieralisi@kernel.org,
-	Danila Tikhonov <danila@jiaxyga.com>
-Cc: devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	linux@mainlining.org
-Subject: Re: (subset) [PATCH v3 0/6] Add Nothing Phone (1) support
-Date: Tue, 22 Oct 2024 23:15:48 -0500
-Message-ID: <172965696396.224417.9698703565242558835.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241020205615.211256-1-danila@jiaxyga.com>
-References: <20241020205615.211256-1-danila@jiaxyga.com>
+	s=arc-20240116; t=1729657223; c=relaxed/simple;
+	bh=5AzT1taj0pA4sZfEiuj7XpnlaBsaPYjj+0LPDWH1faw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XqzbxhvhfTH/LMCbGfqzlHWl5jq0mPBDGJ3GjhFIhBeaDjM6uVzU2zAffuljn8Y0II28SMAQpsAtDYbLhge7xXkUOA2nRIvmMs+tlZH3jBp+dmvUdHsfAB7rJKcPDnwMn7heoM70n6UoKeMPP6s4/dgSgven9NOVBjnMdlj9IuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vqs7U3ZD; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4314c4cb752so67031185e9.2
+        for <netdev@vger.kernel.org>; Tue, 22 Oct 2024 21:20:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729657220; x=1730262020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=szWPc/FSyoKSqkBK5CzwbagFAjqRg4Nwm6Wd7urBYVg=;
+        b=Vqs7U3ZDQFmgzXyLWco/XCZMAsFAzedC1GSc5CuIJ95pkiswywVDIf9aOK57Jg3+ey
+         JbbgEHZN3vsCC2IxU9OWS9vV3qMPz7ucwalsXkK/JU1bsdLEoD17bsDn/CV4MhxO3kkI
+         uYOZbYs5lHQzzdRMXdyRNk6/eGoWwd0ehqYq+KYaLBVagZbHaRMSbRTpTDgfLh8jPfHE
+         gAhr5lLphwmotJX5kNVXRHwfHnJ0PXK3xs905o4GMX+kaiH2puCYiG4jmRIxvD/wneR4
+         b2ySvPODRvLTLoJCIbd3U24RsmOYIHxa/m4Bu3ujjzd7leDTX7iX/aywxG4V3Lkj/e66
+         58Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729657220; x=1730262020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=szWPc/FSyoKSqkBK5CzwbagFAjqRg4Nwm6Wd7urBYVg=;
+        b=tGOKLYB6AiftgcEoeHqOMOHSRbG4+iTuIo1IXOKZT5eMbE9wfolDD6OKUwnrBcU48D
+         aTvDSBj26e/ooy+G/EpdMHvJU5yRfVRjo/MXYdcPFBCw9kFmETuqWUHaSGMyN0aGNvPn
+         qTU1fgt/cpwPTBL1IdWOopXn08ovPcccqf79RcARJKGlbq+T18i9ViQPgrO5zzo12sAM
+         HnBi9UH5xxMY+v4uzKsnZwG91EKh8eJHiT8QcqLwGmhEPwvfoal+0Luw1OboWRsVe4fG
+         kajgx62QBae1EFlPRE5qhzm98nRn2qAPz8rvYq3xlBwef2ytj+5feLYW3rtlNxjlU7Jt
+         aqaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYK9RDe+K0A87PaFEVAScCyUumDBk6c9MavK6mEo1YEYpMO8HADUmPLPtmnXTeKiAuBueAcjo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8sGIbcqRGgcyWJgR/lbN92NyCVZK4bhhLo17yXmqfi8NaZf6z
+	A1cL8iLqLMjNtdYlNsQKOgfd8fgYV6wrZRbL+sVrugi4KVe+q5GLjMlhlRNLKS/291LoT4yZEpT
+	5+x47TcwbT06aKs4J1WMoLNWMsdo=
+X-Google-Smtp-Source: AGHT+IEaG/Dug1JIei2NJbyE8nW0LDHTj1b0yH3BdKIBw+1H4tGtCuHGLK1vYINjFHWXdd+e6FxmqdvyvKqCbIG9svg=
+X-Received: by 2002:a05:600c:3555:b0:42f:4f6:f8bc with SMTP id
+ 5b1f17b1804b1-431841441b9mr9745435e9.9.1729657219783; Tue, 22 Oct 2024
+ 21:20:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20241023023146.372653-2-shaw.leon@gmail.com> <20241023034916.26795-1-kuniyu@amazon.com>
+In-Reply-To: <20241023034916.26795-1-kuniyu@amazon.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Wed, 23 Oct 2024 12:19:43 +0800
+Message-ID: <CABAhCOR2v4HQecFvYuocNy3FDLoy9rKc3a0f1gVhg79dy+Ra9Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/5] rtnetlink: Lookup device in target netns
+ when creating link
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	idosch@nvidia.com, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Oct 23, 2024 at 11:49=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+>
+> > --- a/net/core/rtnetlink.c
+> > +++ b/net/core/rtnetlink.c
+> > @@ -3733,20 +3733,24 @@ static int __rtnl_newlink(struct sk_buff *skb, =
+struct nlmsghdr *nlh,
+> >  {
+> >       struct nlattr ** const tb =3D tbs->tb;
+> >       struct net *net =3D sock_net(skb->sk);
+> > +     struct net *device_net;
+> >       struct net_device *dev;
+> >       struct ifinfomsg *ifm;
+> >       bool link_specified;
+> >
+> > +     /* When creating, lookup for existing device in target net namesp=
+ace */
+> > +     device_net =3D nlh->nlmsg_flags & NLM_F_CREATE ? tgt_net : net;
+>
+> Technically, this changes uAPI behaviour.
+>
+> Let's say a user wants to
+>
+>   1) move the device X in the current netns to another if exists, otherwi=
+se
+>   2) create a new device X in the target netns
+>
+> This can be achieved by setting NLM_F_CREATE and IFLA_NET_NS_PID,
+> IFLA_NET_NS_FD, or IFLA_TARGET_NETNSID.
+>
+> But with this change, the device X in the current netns will not be moved=
+,
+> and a new device X is created in the target netns.
 
-On Sun, 20 Oct 2024 23:56:08 +0300, Danila Tikhonov wrote:
-> This series of patches adds support for the Nothing Phone (1), identified
-> as nothing,spacewar. The Nothing Phone (1) is built on the Qualcomm
-> Snapdragon 778G+ (SM7325-AE, also known as yupik).
-> 
-> SM7325 is identical to SC7280 just as SM7125 is identical to SC7180, so
-> SM7325 devicetree imports SC7280 devicetree as a base.
-> 
-> [...]
-
-Applied, thanks!
-
-[2/6] dt-bindings: arm: cpus: Add qcom kryo670 compatible
-      commit: 82ead233e01042fecdfdee5b05c377c2a9e551f4
-[3/6] arm64: dts: qcom: Add SM7325 device tree
-      commit: ba978ce20f8134ea9e0e8f1acb16552b5106281d
-[4/6] dt-bindings: vendor-prefixes: Add Nothing Technology Limited
-      commit: 7e20ecc8de9354c1e8742d37f06e152549f4c439
-[5/6] dt-bindings: arm: qcom: Add SM7325 Nothing Phone 1
-      commit: 389df37da15a14fa218e86676f6f9a5470d38dfa
-[6/6] arm64: dts: qcom: sm7325: Add device-tree for Nothing Phone 1
-      commit: 6b3d104e52893493964a5eefa50dd0fdb472515a
-
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+You're right, what about testing for NLM_F_EXCL aslo?
 
