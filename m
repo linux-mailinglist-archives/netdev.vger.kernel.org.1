@@ -1,188 +1,175 @@
-Return-Path: <netdev+bounces-138377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5A09AD309
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:39:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A719AD321
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98548284008
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:39:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 052B3285A50
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66A01CEE80;
-	Wed, 23 Oct 2024 17:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B4F1BCA07;
+	Wed, 23 Oct 2024 17:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="icEh2Mcg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fm1rTyzR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A1A4087C
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 17:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88481149E09;
+	Wed, 23 Oct 2024 17:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729705175; cv=none; b=XdbU6vwcbYmIjnGnbIXh9bnJHy3RHfkttP+yY0vp/eBhttQYuyNJMCo69VfF02Bh+ajyJG0HQCjKbNeZVRrwgrtctAV3gkYLf8EIEQkiu7Er69GaLr/O6KRKwJOYrLuVJaKwJWwBEzHQRibnsskVHavbvlsPsZcvp324XMoWhhU=
+	t=1729705547; cv=none; b=TofMef3WqMzaubtj2nm0SFQ2kJo5Ys7idECSdaYDlJltfNuMFfhrRMQRrboRVoM7HCoL4Y1kBnAbyQ5xRUwI9tmYiuQUXdoW6uWmIPRmtfUcIGPtrCER29z3iDxhyiNyQxDHI0g97q7hPEcubbsqUgm3zvP/L/FMysgiAi/NmbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729705175; c=relaxed/simple;
-	bh=Hi01OAOJDmxWrPbHj7eMTsvkCoVn1z+pxs6LbaghJlw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r9gcs+XqKfCf/KCe5nqZdLASlq8oFj92Q68XiZkq4DwFdk/dDP9ddn+k1w1ndo2k+EeMLMYn9m9I/laWcLwLTdFjylmv7A6iwuyg5dzSBby4aJOG55//GCR/Vl/vfy0bEgtwF3CX7RyqyC+72WP6JcCJw860xyx2LPLZRlzc10g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=icEh2Mcg; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1729705547; c=relaxed/simple;
+	bh=v0Z3QmhsLFML5Hvb/hT/FmA4RUl007es1W1tDpa4qt8=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G43L3O8fanUykzUKiCeAiy/1Mk/4yDMI0wVZaX+tmGI6MH5hfWxpe1JJLNxNwqJoFyH82jPfQ7OWQxYqC7wgsK0h0jovW/F9B6RfFKaPGL10iovElMA3/faJJB2FlNTFOUS7J5JFmzGQ8a6ENv1Tlk/a4n6dK2/bdTMbmrb+VjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fm1rTyzR; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d70df0b1aso5665351f8f.3;
+        Wed, 23 Oct 2024 10:45:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1729705174; x=1761241174;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=c+clLEDqhpVnAQ/9JllL5Jgk73yPmpsY2D2x4Lyyp2g=;
-  b=icEh2McgmpEuMaQ5CJ/UZKWfAA68NYR+1pRSVY2wJQJpGqEG2wJrXgym
-   D52Cex9fBsNuxRaGCWT09o+lMqEDr4kdtD37hnKXldpTWPSCuPPb9s4yp
-   8/a5TTRpssqUExPh1OpXRB6b5+PMO+6+zmcoI2r7ayL+G/U5XlhTtjZe9
-   g=;
-X-IronPort-AV: E=Sophos;i="6.11,226,1725321600"; 
-   d="scan'208";a="346063021"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 17:39:32 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:64515]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.162:2525] with esmtp (Farcaster)
- id bc0458b7-221d-4e04-ae32-84b104827060; Wed, 23 Oct 2024 17:39:31 +0000 (UTC)
-X-Farcaster-Flow-ID: bc0458b7-221d-4e04-ae32-84b104827060
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 23 Oct 2024 17:39:31 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.100.17) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 23 Oct 2024 17:39:28 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <oliver.sang@intel.com>
-CC: <edumazet@google.com>, <ignat@cloudflare.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <lkp@intel.com>, <netdev@vger.kernel.org>,
-	<oe-lkp@lists.linux.dev>
-Subject: Re: [linux-next:master] [net]  18429e6e0c: WARNING:at_net/socket.c:#__sock_create
-Date: Wed, 23 Oct 2024 10:39:25 -0700
-Message-ID: <20241023173925.34267-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <202410231427.633734b3-lkp@intel.com>
-References: <202410231427.633734b3-lkp@intel.com>
+        d=gmail.com; s=20230601; t=1729705544; x=1730310344; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q2VscTNdIlS5vsji2abiXF+8aeUy0jlwcvqlNVowB/g=;
+        b=Fm1rTyzRy2IXxTq3AvCaeWbnVhaHEypGtRSkg2J1jBrWXVfWzluVp3LUcmT81XrUTR
+         GImZps85nQpwRTiXkiwS+qlc/7x+VJpQUiwNrRODDl8omiTkQNARG3DzvcK09gtga+Yt
+         +LEzV2nmjp1E3cb82pJ9a6nB/yVSv94XMmOmE0ypJqqro5MYJS+dxCDsfZpt2myPFVGA
+         vyB5I6A9+FaXW3FkqtQFy73zKEAvCSCBGAbNZ1WKKIThVoRktpCITTldDZm6Br9Gi/Mr
+         uNNBD5hGiSgIalW1VgZjb76skJKbmYTvqdHCiKR+8rYv2i0a4TErG1C3mBz3nyELQmxB
+         DwiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729705544; x=1730310344;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q2VscTNdIlS5vsji2abiXF+8aeUy0jlwcvqlNVowB/g=;
+        b=LY2wmFAECApnYAIw4Es0ptx/AODisdepR6+Axv2Y1RLD/MpCY6IXsDG8+9PKvSzlM6
+         vz0EwN59wEyG8pJV/KbKHBva78kTjpakmxuBMzDLk52xJ/quLcKujuTTVYBI7sdCqyHr
+         1uDFdkSk/BAMcP5z8gEpXGaM+OkI5E8DWpkjKSxxzmRMyPAxjNRM6YhRsoqycf96yttv
+         ZAEYObHyns+TI0y6nk8ZrZOtHHMUXWoGWe9sXmYVB5hjV3SBjYQdQqAlmDLqY9QaV3UO
+         SYW/7rD3IP81r7v4sKNv6Dj+HQPyVJJVN9qhIUwTGQ6eKl5f+XgbtBBgQUywHM2+TnBp
+         HppQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUylFw3qZslKZ7AmUhonvk+BZArYGaGWffVVVqTSAGmVY5mEsbjPDAh2grCsOM30HNWPRJE1SRD@vger.kernel.org, AJvYcCVufVfx+/EPgwzLY4KVm1NQSPZIB6Efi+POiIqo2uRh1Qb+nFgMKPTH6u56OMHRUsr6EuRREd77rwzcMwu4@vger.kernel.org, AJvYcCXtHJk2RM+otnBFkwRtzZ1mcowatsKV6rT4c7wmm3tPx1sGu1NPZ+eq/l7eDW3QyTbvIrA8l8zFjoe5@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxGXNP95xIWf2pd/MR5P1WZ0neFMc4TpAjskH8bDfyQOJ4wsfs
+	3Ejas4Nd+Ii3C93hsPRLPhYXMrLGADmCOfik4zipzB2ZQeKbvMPh
+X-Google-Smtp-Source: AGHT+IEY8xxWoI65TbiESsWmXVoSDRzzgUk/ryShEl9kzMOLIChMg5LvevZzioCPurdVUr/AA453Kg==
+X-Received: by 2002:a5d:4704:0:b0:37d:5496:290c with SMTP id ffacd0b85a97d-37efcf051afmr2378914f8f.7.1729705543774;
+        Wed, 23 Oct 2024 10:45:43 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a37aecsm9431133f8f.8.2024.10.23.10.45.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 10:45:43 -0700 (PDT)
+Message-ID: <67193647.5d0a0220.1b234f.2b09@mx.google.com>
+X-Google-Original-Message-ID: <Zxk2Q35zMPUsC1RZ@Ansuel-XPS.>
+Date: Wed, 23 Oct 2024 19:45:39 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v2 1/3] dt-bindings: net: dsa: Add Airoha
+ AN8855 Gigabit Switch documentation
+References: <20241023161958.12056-1-ansuelsmth@gmail.com>
+ <20241023161958.12056-2-ansuelsmth@gmail.com>
+ <5761bdc3-7224-4de6-b0f5-bedc066c09f6@lunn.ch>
+ <67192f00.7b0a0220.343b2b.9836@mx.google.com>
+ <77e99052-a14e-4495-9197-06d98257c590@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77e99052-a14e-4495-9197-06d98257c590@lunn.ch>
 
-From: kernel test robot <oliver.sang@intel.com>
-Date: Wed, 23 Oct 2024 15:02:51 +0800
+On Wed, Oct 23, 2024 at 07:39:01PM +0200, Andrew Lunn wrote:
+> > Well the first case that comes to mind is multiple switch and conflict.
+> > I have no idea if there are hw strap to configure this so I assume if a
+> > SoC have 2 switch (maybe of the same type), this permits to configure
+> > them (with reset pin and deasserting them once the base address is
+> > correctly configured)
 > 
-> Hello,
-> 
-> kernel test robot noticed "WARNING:at_net/socket.c:#__sock_create" on:
-> 
-> commit: 18429e6e0c2ad26250862a786964d8c73400d9a0 ("Revert "net: do not leave a dangling sk pointer, when socket creation fails"")
-> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
-> 
-> [test failed on linux-next/master f2493655d2d3d5c6958ed996b043c821c23ae8d3]
-> 
-> in testcase: trinity
-> version: 
-> with following parameters:
-> 
-> 	runtime: 600s
-> 
-> 
-> 
-> config: x86_64-randconfig-072-20241019
-> compiler: gcc-12
-> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> +------------------------------------------------+------------+------------+
-> |                                                | 48156296a0 | 18429e6e0c |
-> +------------------------------------------------+------------+------------+
-> | WARNING:at_net/socket.c:#__sock_create         | 0          | 23         |
-> | RIP:__sock_create                              | 0          | 23         |
-> +------------------------------------------------+------------+------------+
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202410231427.633734b3-lkp@intel.com
-> 
-> 
-> [   81.874092][  T849] ------------[ cut here ]------------
-> [ 81.874427][ T849] WARNING: CPU: 0 PID: 849 at net/socket.c:1581 __sock_create (net/socket.c:1581 (discriminator 1)) 
-> [   81.874997][  T849] Modules linked in:
-> [   81.875214][  T849] CPU: 0 UID: 8192 PID: 849 Comm: trinity-c5 Not tainted 6.12.0-rc2-00650-g18429e6e0c2a #1
-> [ 81.875701][ T849] RIP: 0010:__sock_create (net/socket.c:1581 (discriminator 1)) 
-> [ 81.876000][ T849] Code: e9 19 fd ff ff e8 a3 16 d7 fd e9 4f f9 ff ff 41 bd 9f ff ff ff e9 b8 fa ff ff 41 bd ea ff ff ff e9 ad fa ff ff e8 83 95 9c fd <0f> 0b e9 72 ff ff ff e8 77 95 9c fd e8 62 72 12 00 31 ff 89 c3 89
-[...]
-> [   81.881295][  T849] Call Trace:
-> [   81.881474][  T849]  <TASK>
-> [ 81.881634][ T849] ? __sock_create (net/socket.c:1581 (discriminator 1)) 
-> [ 81.881908][ T849] ? __warn (kernel/panic.c:748) 
-> [ 81.882130][ T849] ? __sock_create (net/socket.c:1581 (discriminator 1)) 
-> [ 81.882395][ T849] ? report_bug (lib/bug.c:180 lib/bug.c:219) 
-> [ 81.882655][ T849] ? handle_bug (arch/x86/kernel/traps.c:285) 
-> [ 81.882910][ T849] ? exc_invalid_op (arch/x86/kernel/traps.c:309 (discriminator 1)) 
-> [ 81.883164][ T849] ? asm_exc_invalid_op (arch/x86/include/asm/idtentry.h:621) 
-> [ 81.883446][ T849] ? __sock_create (net/socket.c:1581 (discriminator 1)) 
-> [ 81.883725][ T849] __sys_socket (net/socket.c:1670 net/socket.c:1716) 
-> [ 81.883995][ T849] ? update_socket_protocol+0x20/0x20 
-> [ 81.884432][ T849] ? ftrace_likely_update (arch/x86/include/asm/smap.h:56 kernel/trace/trace_branch.c:229) 
-> [ 81.885031][ T849] ? tracer_hardirqs_on (kernel/trace/trace_irqsoff.c:57 kernel/trace/trace_irqsoff.c:613) 
-> [ 81.885310][ T849] __ia32_sys_socket (net/socket.c:1728) 
-> [ 81.885863][ T849] do_int80_emulation (arch/x86/entry/common.c:165 arch/x86/entry/common.c:253) 
-> [ 81.886413][ T849] asm_int80_emulation (arch/x86/include/asm/idtentry.h:626)
+> Is this switch internal on an internal MDIO bus, or external?
 
-I find this stack trace useless unless we have a strace log or
-repro as syzkaller provides.
+External so it can be mounted on any SoC given correct mdio/mdc.
 
-I should've suggested like below to make debugging easier.
+> 
+> Most PHYs and switches i've seen have strapping pins to set the base
+> address. It would be unusual if there was not strapping.
 
-This might be already fixed by Eric's vsock patch, but I'll post a
-patch later.
+Same feeling, but I didn't found anything in the documentation.
+(actually no mention of hw strap or pin)
 
----8<---
-diff --git a/include/net/net_debug.h b/include/net/net_debug.h
-index 1e74684cbbdb..5bcd9a18d00a 100644
---- a/include/net/net_debug.h
-+++ b/include/net/net_debug.h
-@@ -150,8 +150,10 @@ do {								\
- 
- #if defined(CONFIG_DEBUG_NET)
- #define DEBUG_NET_WARN_ON_ONCE(cond) (void)WARN_ON_ONCE(cond)
-+#define DEBUG_NET_WARN_ONCE(cond, format...) (void)WARN_ONCE(cond, format)
- #else
- #define DEBUG_NET_WARN_ON_ONCE(cond) BUILD_BUG_ON_INVALID(cond)
-+#define DEBUG_NET_WARN_ONCE(cond, format...) BUILD_BUG_ON_INVALID(cond)
- #endif
- 
- #endif	/* _LINUX_NET_DEBUG_H */
-diff --git a/net/socket.c b/net/socket.c
-index 9a8e4452b9b2..da00db3824e3 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1578,7 +1578,9 @@ int __sock_create(struct net *net, int family, int type, int protocol,
- 		/* ->create should release the allocated sock->sk object on error
- 		 * and make sure sock->sk is set to NULL to avoid use-after-free
- 		 */
--		DEBUG_NET_WARN_ON_ONCE(sock->sk);
-+		DEBUG_NET_WARN_ONCE(sock->sk,
-+				    "%pS must clear sock->sk on failure, family: %d, type: %d, protocol: %d\n",
-+				    pf->create, family, type, protocol);
- 		goto out_module_put;
- 	}
- 
----8<---
+> 
+> For the Marvell switches, the strapping moves all the MDIO
+> registers. This is why we have a reg at the top level in mv88e6xxx:
+> 
+>         ethernet-switch@0 {
+>             compatible = "marvell,mv88e6085";
+>             reg = <0>;
+> 
+> There is one family which use the values of 0 or 16, and each switch
+> uses 16 addresses. So you can put two on the bus.
+> 
+
+Yes this is what that property does. Everything is shifted.
+
+> > > > +  mdio:
+> > > > +    $ref: /schemas/net/mdio.yaml#
+> > > > +    unevaluatedProperties: false
+> > > > +    description:
+> > > > +      Define the relative address of the internal PHY for each port.
+> > > > +
+> > > > +      Each reg for the PHY is relative to the switch base PHY address.
+> > > 
+> > > Which is not the usual meaning of reg.
+> > > 
+> > > > +            mdio {
+> > > > +                #address-cells = <1>;
+> > > > +                #size-cells = <0>;
+> > > > +
+> > > > +                internal_phy0: phy@0 {
+> > > > +                    reg = <0>;
+> > > 
+> > > So given that airoha,base_smi_address defaults to 1, this is actually
+> > > address 1 on the MDIO bus?
+> > >
+> > 
+> > Yes correct. One problem I had was that moving this outside the swich
+> > cause panic as it does conflict with the switch PHY address...
+> 
+> I would make these addresses absolute, not relative. The example above
+> from the marvell switch, the device using addresses 16-31 has its PHYs
+> within that range, and we uses the absolute reg values.
+>
+
+They were relative with the base SMI implementation in mind (as we would
+then offset) If the path is to drop that option then yes, these address
+should be absolute.
+
+Or do you think even with that option, these address should be absolute?
+
+-- 
+	Ansuel
 
