@@ -1,90 +1,134 @@
-Return-Path: <netdev+bounces-138170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF059AC7C9
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:24:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12FE29AC7DA
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:26:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AEDA1F26E82
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:24:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C893D2881D4
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9B11AB6FA;
-	Wed, 23 Oct 2024 10:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C511AA7AB;
+	Wed, 23 Oct 2024 10:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b="t7k4LGPo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CHaqXIz8"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [178.154.239.149])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DA71A3BA1;
-	Wed, 23 Oct 2024 10:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B6A1A706A
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729678976; cv=none; b=pQYrBwjn5QnirAWMYmZePS+4qd1IDBmCr/xmamUKswKwAzp4QuJBJXXPHJzOhNiD4KB2YQDxP+TsIHgt8vbYH2kiFxhM5gxBbkSWIfUWxyT6q/L9vrSytOAD8KWQqyjFtocsv1mtEMlmN9eWXG9WZ+DwvI4UJR7Cos38hZ0xIVE=
+	t=1729679100; cv=none; b=TiA2cwvsOIFwm9/m5D24br0gt5cUDJMrfn8hOq5CecAR30fwaezKbMAEur64G2HaA5x33nLYKjPJnGPyZaM+WYNLfMAgqr3pGc5iD4vMBaCPBWxxkbXjUA868V114z7v33zKIqQpTPY3zrYMLsbO/gXhqyj5Uxy68+8tPpw2j/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729678976; c=relaxed/simple;
-	bh=tsV4mDXWEcA6DLH5KJpY3Kl/VfFbOy479A1uRTvdzKU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
-	 MIME-Version; b=NZfrvbfyerfSnruzQH0d1O0d0suVRfuNdpRqyHP0hH9HhrryFd7FtsmMJ9+1n4joWY9XZOhL/Am5MHlohfCSSaYS2bub/2unGLbHrf0ZtudN7e4GSmhVW+QkF9X4QIRW6MrqVYvF88t2iW0t5w2sJK0NzRTVCEnrN5GZYDl63p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me; spf=pass smtp.mailfrom=maquefel.me; dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b=t7k4LGPo; arc=none smtp.client-ip=178.154.239.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maquefel.me
-Received: from mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net [IPv6:2a02:6b8:c16:201c:0:640:301d:0])
-	by forward102b.mail.yandex.net (Yandex) with ESMTPS id 097A3608FA;
-	Wed, 23 Oct 2024 13:22:44 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id eMQs7b6EhOs0-jQPVzoFY;
-	Wed, 23 Oct 2024 13:22:42 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maquefel.me; s=mail;
-	t=1729678962; bh=tsV4mDXWEcA6DLH5KJpY3Kl/VfFbOy479A1uRTvdzKU=;
-	h=Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
-	b=t7k4LGPoi65xE+z+AyehS9q8r89CXR7Mahn1RgGwF5jkOr2zChOBX6LaMSc69iGGo
-	 c9wFIgt2Jz5KDz7InYlVuOcoIwtZU1PBJCnuMRos50Ek+XKT94BieQ2j2LqjBKOo/b
-	 BUaIjLBQDWdundy9pVqYWKTblnoIwciT/qShI9Dc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net; dkim=pass header.i=@maquefel.me
-Message-ID: <5605e699c215c86440972f7fe3e544816c699c15.camel@maquefel.me>
-Subject: Re: [PATCH] MAINTAINERS: Remove some entries due to various
- compliance requirements.
-From: Nikita Shubin <nikita.shubin@maquefel.me>
-To: gregkh@linuxfoundation.org
-Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru, 
- dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com, 
- geert@linux-m68k.org, gregkh@linuxfoundation.org,
- hoan@os.amperecomputing.com,  ink@jurassic.park.msu.ru,
- linux-alpha@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
- linux-fpga@vger.kernel.org,  linux-gpio@vger.kernel.org,
- linux-hwmon@vger.kernel.org,  linux-ide@vger.kernel.org,
- linux-iio@vger.kernel.org,  linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org,  linux-renesas-soc@vger.kernel.org,
- linux-spi@vger.kernel.org,  manivannan.sadhasivam@linaro.org, Matt Turner
- <mattst88@gmail.com>,  netdev@vger.kernel.org, nikita@trvn.ru,
- ntb@lists.linux.dev,  patches@lists.linux.dev,
- richard.henderson@linaro.org, s.shtylyov@omp.ru,  serjk@netup.ru,
- shc_work@mail.ru, tsbogend@alpha.franken.de,  v.georgiev@metrotek.ru,
- wangyuli@uniontech.com, wsa+renesas@sang-engineering.com,  xeb@mail.ru
-Date: Wed, 23 Oct 2024 13:22:45 +0300
-In-Reply-To: <2024101835-tiptop-blip-09ed@gregkh>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 
+	s=arc-20240116; t=1729679100; c=relaxed/simple;
+	bh=k49ZGlyiA0j3Fu5pMwMRotHhPcUNZDxTPm3L52UTwQI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g97h+yDg3IJebQ0oSAeGC7a42cAewcXeBlCpTyg7Xd3/XurO4OkYvRxgU3cG5jo6BHIN/naps6tNJePfwYTSbvA3fIROllXSdtik/nr0csGIMYWYEVXasCZl8vUSuaZ651+j6MBlDuCxQeupLJUfWd8VMBrWWRFqufDCUfqPzXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CHaqXIz8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729679098;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BZ0c2dEzDIk5QuFvom+oRBbExNqzHs5278qNaQBQGog=;
+	b=CHaqXIz8JaymhdvzABScJMuzw2d5VJ0s8L87D/yL9YT8BnUyLJdeNiLBTG3q9v93Oyt3X5
+	WILSHwJHenOQzjAldEtDhVTxQaTiNt9wBn2bCZ3IJwSEeuWMRTTfNCKGOmGvqaXHgr5b7w
+	dfy/Qj1X8P93tJFqr1hqORZeqAZlKu4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-116--1qZKjx_MaqyZ086TnqZ7A-1; Wed, 23 Oct 2024 06:24:57 -0400
+X-MC-Unique: -1qZKjx_MaqyZ086TnqZ7A-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso53467135e9.3
+        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 03:24:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729679096; x=1730283896;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BZ0c2dEzDIk5QuFvom+oRBbExNqzHs5278qNaQBQGog=;
+        b=uj/YoUno8HP3akDy+cfiYFFy/EtIb0DJQwziJUamve3DsLLLUgmrUx6/POdBa25MPC
+         lIjzsrsPB4kJ2B0HAAj1C3WhGIDZYKQw5DL8uXeSmb1vQI+MoH+AAESMDm5eS5l8GvtW
+         TXgW+WZiT/qgn1gfSp9wBkxw01qklAgMjfpoc6SVVLbPE12MsPoOF4gevQxQHEJZLcmf
+         OvD70IXR49/ObMsAvgR62tlID/kdzk9rLTYsp5uWp0NFI8zEykDIm8HVdQGUa+TN8SKq
+         QUGrfi2oMyOe6a+O2r4XZOtCAhOUL9wwVd3Ho4vAf+/xZITs8N2QXt6XxmPJVieeAPH3
+         nF5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVRtpeUjjSid94YjDnDVu2Oyp9awiCSVDZ9mJWHJV8Jx0j/H8SMOIoUk8rAULkDUQ4GX4avLOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf1/63G/UJxaJx8OH4YM2hRX3IWaiNuEt43vFSymjv771Pp4/p
+	dd+LLqMuEjZX4H0mdOtlKlWOmnWmsg072OWKTHesiq1FeUkQlsTKulsb8fycTUSpXgDEk7fRtCs
+	ySsOXloL506IIAozLojlc2ry+cCDYYswSFTBNY7XNY9b9kXwnl6Qm+w==
+X-Received: by 2002:a05:600c:45c3:b0:431:7ca6:57b1 with SMTP id 5b1f17b1804b1-431841a3bdamr20749905e9.32.1729679095877;
+        Wed, 23 Oct 2024 03:24:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgaddpV20+zq9AAgbOKbUJHO+Em/0bOu4SO+Vf7d2/Qgfstx4yc1QX/iLABUzFVmH2vFnk5w==
+X-Received: by 2002:a05:600c:45c3:b0:431:7ca6:57b1 with SMTP id 5b1f17b1804b1-431841a3bdamr20749725e9.32.1729679095527;
+        Wed, 23 Oct 2024 03:24:55 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186bdeb4asm12256925e9.15.2024.10.23.03.24.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Oct 2024 03:24:55 -0700 (PDT)
+Message-ID: <fc2fe2b6-34a6-42b2-a6de-a5db26edb44a@redhat.com>
+Date: Wed, 23 Oct 2024 12:24:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v6 07/10] ip6mr: Lock RCU before ip6mr_get_table()
+ call in ip6_mroute_setsockopt()
+To: Florian Westphal <fw@strlen.de>, Stefan Wiehler <stefan.wiehler@nokia.com>
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241017174109.85717-1-stefan.wiehler@nokia.com>
+ <20241017174109.85717-8-stefan.wiehler@nokia.com>
+ <20241017182843.GD25857@breakpoint.cc>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241017182843.GD25857@breakpoint.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->>Remove some entries due to various compliance requirements. They can
-come back in the future if sufficient documentation is provided.
+On 10/17/24 20:28, Florian Westphal wrote:
+> Stefan Wiehler <stefan.wiehler@nokia.com> wrote:
+>>  	case MRT6_ADD_MIF:
+>> -		if (optlen < sizeof(vif))
+>> -			return -EINVAL;
+>> -		if (copy_from_sockptr(&vif, optval, sizeof(vif)))
+>> -			return -EFAULT;
+>> -		if (vif.mif6c_mifi >= MAXMIFS)
+>> -			return -ENFILE;
+>> +		if (vif.mif6c_mifi >= MAXMIFS) {
+>> +			ret = -ENFILE;
+>> +			goto out;
+>> +		}
+>>  		rtnl_lock();
+> 
+> Same, sleeping function called in rcu read side section.
+> 
+> Maybe its time to add refcount_t to struct mr_table?
 
-Greg,
+FTR, I agree using a refcount could be a better approach (and would
+avoid keeping the RCU lock held across seq start/stop which sounds
+dangerous, too.
 
-Among the all possiblities you had, you've chosen the most disgusting
-and shady way of doing this, with no attempt at least moving them to
-CREDITS - the thing they rightfully deserve for their efforts.
+@Stefan: in any case before your next submission, please have test run
+with a debug build, so that the run-time checker could catch similar issue.
 
-As a person with M entries i deeply disrespect the removal and whe way
-it was done.
+Side minor nit: your  'Fixes' tag should come before your Sob in the tag
+area.
+
+Cheers,
+
+Paolo
+
 
