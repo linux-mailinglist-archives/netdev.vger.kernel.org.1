@@ -1,135 +1,110 @@
-Return-Path: <netdev+bounces-138293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ABC79ACDAF
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:58:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD869ACCA3
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8BF01C2581F
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:58:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47B0F1F223BE
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D081FF043;
-	Wed, 23 Oct 2024 14:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081D41D968D;
+	Wed, 23 Oct 2024 14:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Dr82H/qv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C6+S0XV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1EF1FF035;
-	Wed, 23 Oct 2024 14:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22281D9667;
+	Wed, 23 Oct 2024 14:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729694714; cv=none; b=Tgg65DtoZazfr6hBosyhe1hXGH/PvDHZidCpJOEb9xOLt9zqpXeLjPY/5EIbIjGHHjumjur1bbTOKgg+2y10L+Xtuxl8vB8XZ3IMa7mixocMlcnLl8a11ElryS+GMNLavvbbUsIbSZDy7aKbs1ChdO30r7OrswLWZlAe3Sm7mgI=
+	t=1729693861; cv=none; b=ZRAVLsB4weDwX7QJgC0809e9448GYyb3F4K/dYU7uCdoNI4/zu0FmKk0x+F5lWwkUJWxt9WzvoKaXKzZtiWWKUzWbSUsuif0FnWAZ1Eo8Mgw0p4tPAnY2y/1H2AlS+4MMPqtnLcoJslxIzpFxEUfAo7Hvc7GDN4ltrvLuq1hL7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729694714; c=relaxed/simple;
-	bh=gVRZmGDbSSe3eE9Wa/shHPOp5LGbVJEKYHUbkOttPNE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jV4HWD4iUtT7YnSoiZqXIjCDVSM3my3uj1wggCE722VZZcEDl03PyOQgr4g5pm3HLc5JeA0d592SX6NXFGxh72/DGthSRHNUR/Xazi5DPTxuYiY3OIE9kUWVRdEpyISuLszBd14qUSB4DiVKxPnmWbRpOupGzZLy9PDPoRI1XHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Dr82H/qv; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 2FE0F8926F;
-	Wed, 23 Oct 2024 16:45:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1729694711;
-	bh=gz9H38d2hsPWIqXhhStTpviHMUHd9U6Jhiq3f7k4l70=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Dr82H/qvBgqrQ9fq456Rh+c8cmgK1VSc/0OPUhlC4Ch5k+SasRbJRKfZ9kYAqxuFo
-	 +fknygzTdUyhJj5Zz8Z0XmIoSGCSUI1mM6wqvEY+xQI2GarF0ycfhKQMGYnIqqLa64
-	 ybzZVhGV2ahsqkYDk8KIfhUUK1BM1fVe7HGtMymCzQZfrBuJx/bWtqHt3mwZphDU95
-	 3F6SmHcY/S1qYXedvziK+zFFfyJt2maYGnjplA1rfStvLkNOdgHHf5hJ0GuQDdoJfh
-	 Qg6e8VAKVNkY/u9my4jpu2d6SzBdA/UZRm8chKvKQMM0IS830C0/EULyzIJUnRilLU
-	 znXKEs8xhX4fQ==
-Message-ID: <3b2e85a2-5dd2-4368-9f94-422b7766297a@denx.de>
-Date: Wed, 23 Oct 2024 16:26:54 +0200
+	s=arc-20240116; t=1729693861; c=relaxed/simple;
+	bh=TJDqKmWx8NFMqxvpICR8eEvMuQorJuWmsNwdKIDufc4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NNu9SsN+BGcADxSq/nUAHBcE4yVV2qHEG1g+TY+TrFeeT8iHwY6rxglVVkvIxTVQayVnFiGyIAijtbL3Z9F7lvL2F7RfkhwGxJISVaVz0qPRJK/khAOdmG8wrO2KodDZEhTIqu621v+hD2HOaDhLNR0EIkl+IaJYCaDa8lKYWtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C6+S0XV9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09B57C4CEE6;
+	Wed, 23 Oct 2024 14:30:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729693861;
+	bh=TJDqKmWx8NFMqxvpICR8eEvMuQorJuWmsNwdKIDufc4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=C6+S0XV90y4L3qG1gkwQ6Oypyk/YyaIkS2INgK5gWarYAh8jDf3K800YPs/JKDzs3
+	 dP25QqH4Vdum75Q6KcVNhTm/swv6VW9w2YRFF7/JKKULcIxeClL9jbIFrsoy9eX5Sy
+	 Kgt/VARXuXvxlZSJY6DwHDHBjqI14nCwwfX/SrQ/WUJnz6hRo1kt12DtFguvDfNsI+
+	 OBSOrIXrK3Nv9NYhLjkQbci1/bMhFsttA6X53obx/iSK5akBlHoKntqugMFiSN3czc
+	 KltLVirXuguMtxj0oF9OCK0+xL3EFbIEDxFVMG3b3RmD+FpbOuCDEwy4BUtmWVv+TC
+	 g1erKtq0WuowA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	opendmb@gmail.com,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 27/30] net: phy: mdio-bcm-unimac: Add BCM6846 support
+Date: Wed, 23 Oct 2024 10:29:52 -0400
+Message-ID: <20241023143012.2980728-27-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241023143012.2980728-1-sashal@kernel.org>
+References: <20241023143012.2980728-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- linux-wireless@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241022013855.284783-1-marex@denx.de>
- <c9e98811-15f5-427a-82f7-2e7fff4a9873@bootlin.com>
- <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
- <71c93145-f7ed-485a-99f2-fab9529e6bcb@bootlin.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <71c93145-f7ed-485a-99f2-fab9529e6bcb@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.11.5
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
-On 10/23/24 9:54 AM, Alexis Lothoré wrote:
+From: Linus Walleij <linus.walleij@linaro.org>
 
-Hello Alexis,
+[ Upstream commit 906b77ca91c7e9833b4e47bedb6bec76be71d497 ]
 
->>                                   ksdioirqd() { // option 2
->>                                     claim_bus
->>                                     CMD52 0x0f, lets read SDIO_CCCR_INTx
->>                                     release_bus
->>                                   }
->>
->> That's what this patch implements, to avoid the interference.
->>
->> Maybe I should include the infographics? Or reword this somehow?
-> 
-> What I may have misunderstood is your first sentence ("sdio_claim_host() cannot
-> be done per command, but has to be done per register/data IO which consists of
-> multiple commands", especially command VS reg/data io), but your graph clarified
-> it for me, thanks, so in the end we agree on this :) That may just be me having
-> poorly interpreted, so no need to add the graphs to the commit
+Add Unimac mdio compatible string for the special BCM6846
+variant.
 
-You're welcome. As long as we can understand each other with one extra 
-round trip, all is good :)
+This variant has a few extra registers compared to other
+versions.
 
-> [...]
-> 
->>>>    static int wilc_wlan_cfg_commit(struct wilc_vif *vif, int type,
->>>> diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.h b/drivers/net/
->>>> wireless/microchip/wilc1000/wlan.h
->>>> index b9e7f9222eadd..ade2db95e8a0f 100644
->>>> --- a/drivers/net/wireless/microchip/wilc1000/wlan.h
->>>> +++ b/drivers/net/wireless/microchip/wilc1000/wlan.h
->>>> @@ -403,6 +403,8 @@ struct wilc_hif_func {
->>>>        void (*disable_interrupt)(struct wilc *nic);
->>>>        int (*hif_reset)(struct wilc *wilc);
->>>>        bool (*hif_is_init)(struct wilc *wilc);
->>>> +    void (*hif_claim)(struct wilc *wilc);
->>>> +    void (*hif_release)(struct wilc *wilc);
->>>
->>> So IIUC, your series push the hif_cs lock into each bus layer of the driver,
->>> remove any explicit call to bus-specific locking mechanism from those layers,
->>> and makes the upper layer control the locking. As mentioned above, I don't
->>> understand why those layers can not manage the bus-specific locking by
->>> themselves (which would be a big win for the upper layer).
->>
->> Because of acquire_bus()/release_bus() which I think is an attempt to serialize
->> bus access across multiple complex operations (=commands sent to the card), see
->> above.
-> 
-> Taking a further look at some examples in the driver, I see that indeed the
-> "scope" of acquire_bus/release_bus is larger than simple bus operations. So I
-> withdraw my proposal which was wrong.
-All right.
+Suggested-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Link: https://lore.kernel.org/linux-devicetree/b542b2e8-115c-4234-a464-e73aa6bece5c@broadcom.com/
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Link: https://patch.msgid.link/20241012-bcm6846-mdio-v1-2-c703ca83e962@linaro.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/mdio/mdio-bcm-unimac.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
+index f40eb50bb978d..b7bc70586ee0a 100644
+--- a/drivers/net/mdio/mdio-bcm-unimac.c
++++ b/drivers/net/mdio/mdio-bcm-unimac.c
+@@ -337,6 +337,7 @@ static const struct of_device_id unimac_mdio_ids[] = {
+ 	{ .compatible = "brcm,asp-v2.2-mdio", },
+ 	{ .compatible = "brcm,asp-v2.1-mdio", },
+ 	{ .compatible = "brcm,asp-v2.0-mdio", },
++	{ .compatible = "brcm,bcm6846-mdio", },
+ 	{ .compatible = "brcm,genet-mdio-v5", },
+ 	{ .compatible = "brcm,genet-mdio-v4", },
+ 	{ .compatible = "brcm,genet-mdio-v3", },
+-- 
+2.43.0
+
 
