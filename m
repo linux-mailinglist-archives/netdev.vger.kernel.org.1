@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-138416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4CD9AD72F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 488689AD736
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7082847FB
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:02:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05BD32848D5
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A76200117;
-	Wed, 23 Oct 2024 22:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E702F1FEFDE;
+	Wed, 23 Oct 2024 22:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RJQEAorj"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="C9ACEB1i"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1711E1311;
-	Wed, 23 Oct 2024 22:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04801FBC80;
+	Wed, 23 Oct 2024 22:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729720929; cv=none; b=tlQCXshAQYAtMXP7Rn5RKFauzEHlO8ZZB2hvLCmrdyKpw5l2xlyPBJDfVq7m3vqtS0qiNbe2jJND5Essv3p0Kas+VGH6Hd24NG8OJnTa0OdwQysLME1BG6sbfPbezaEJLmqS64QdL6+CyrKYyGryPMlV3qGfP3saAXyQVNUNVEE=
+	t=1729720960; cv=none; b=rpr2XPE/+2d+KChq88TWXKr6mA0XixYD9+Uv15+pZBdTkgHJJ7N2kEg5RbCivCUrdpOueIXhiIf9WCwJvhbVlEEpdFaNwJf32Dd6N4X5oJKzwokN05J/LZPXI9lncc+0N104NpGqQ7DdgY+1NEkQWCNob9s8RkAkK+f3zhygNVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729720929; c=relaxed/simple;
-	bh=h7HNx+7+r2YLYEnNV5Pxpm3+fCQInXzD8LqlQEeCuoo=;
+	s=arc-20240116; t=1729720960; c=relaxed/simple;
+	bh=J8qCXnNG/OAP9j8DsIe5XLMigohB45RpGMYrjnzBjeQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=XE+05vbYRL3XjPyXcb/A87T8m9u0omiZjlsTS0IPTuchRgbw8vBIeDUwgIDisv6VvbxagzdULDItb7CiU0i9MZY/yYN7+VED8OIedfCIu040XYM6KcfDv76g6YUeR93c+LPeUWIwf9xof0dq88/mh7CYOyThbPYQz1fHizKJUNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RJQEAorj; arc=none smtp.client-ip=68.232.153.233
+	 In-Reply-To:To:CC; b=IZWp8NuMF4jo82McKhRyBq3S1ZJI8cRhJaYieRTliLl5jHQF6HJByadqGweE+uRAwRSqSMgrYCDnjolbjPQLjvGdMN5/G4ZKLpMO3ajNYOIhqIArs2L52IjItUiKYPIRiCXk5zIeSioRL/KO4ViMJbHbZN08D65pUuPxwFhv4kQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=C9ACEB1i; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729720927; x=1761256927;
+  t=1729720957; x=1761256957;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=h7HNx+7+r2YLYEnNV5Pxpm3+fCQInXzD8LqlQEeCuoo=;
-  b=RJQEAorjgvbnG7L1213Jr07Qb/uzOil1Dp8L02I5vhin1FuMYpqi31hg
-   P7fX6d3cq4B4KyDVodaa2Vq2KXxz20rzeAi0UHs/ZD870y3G02DVhp3an
-   CpheU6yBZKSZqu7fBISBVzWfBl3VKmWoh7qOxVYcIMtq+vpbh5SXaY6I2
-   4HHsiWCtnMiBn0O7Cc4EJcpUF4jP8Y5MlF5tmo57Iz6JdI3W15zx0m7dj
-   tPfvUziE0yRzRxyWuY61v7WJ4Rq2yF/AuettAbp8L2N/aKqweHX6vIcGp
-   zWv5dJSQ/5gVnJdWC6CIRCMTDPYTq5ZNnUfm202a8FMnrxZP1pISMkSkq
+  bh=J8qCXnNG/OAP9j8DsIe5XLMigohB45RpGMYrjnzBjeQ=;
+  b=C9ACEB1iXMnayAXvOnjJu/wDgZlpH9AMLSdgVKuMqZIMBz8ulb7ygbo2
+   yihLRG+CGZyIuuFnbcUVQ1F7uTWBIgQFP6VZSNUbDM4LyRBSTf3UuUFNk
+   mvYgmo3oUCP4hqpZ8VcQmnG6AGG+CrKhPIrDJQo25Hpm9+l/6MaV0xiAk
+   428ZBzopKNFcNEnZNKp/Wd23iyevy9qt0Sb5maDXHprZpizLQF+/DFIpx
+   aOQSt18yG8/5r2XY+xCq04Z5O0nbPjIMx/EHwSIUNwUbAk81mamNUIVb0
+   WyoQIC5usl/db61zMsk+A7rth0ZfyfpFpKwA4qRPKQRZ7enGiyNQRjbvk
    w==;
-X-CSE-ConnectionGUID: 1Xapdzk8QAqz3uJYdYtrIg==
-X-CSE-MsgGUID: sopeB3rDT5m4tF48pmQKWw==
+X-CSE-ConnectionGUID: wd8IJW4NTJ64cR86gqDN2Q==
+X-CSE-MsgGUID: pOvqRvkuSWyNcGFxl+BJxQ==
 X-IronPort-AV: E=Sophos;i="6.11,227,1725346800"; 
-   d="scan'208";a="33409632"
+   d="scan'208";a="200831268"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 15:02:05 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 15:02:36 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 23 Oct 2024 15:02:04 -0700
+ 15.1.2507.35; Wed, 23 Oct 2024 15:02:08 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 23 Oct 2024 15:02:00 -0700
+ 15.1.2507.35 via Frontend Transport; Wed, 23 Oct 2024 15:02:04 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Thu, 24 Oct 2024 00:01:25 +0200
-Subject: [PATCH net-next v2 06/15] net: lan969x: add match data for lan969x
+Date: Thu, 24 Oct 2024 00:01:26 +0200
+Subject: [PATCH net-next v2 07/15] net: lan969x: add register diffs to
+ match data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241024-sparx5-lan969x-switch-driver-2-v2-6-a0b5fae88a0f@microchip.com>
+Message-ID: <20241024-sparx5-lan969x-switch-driver-2-v2-7-a0b5fae88a0f@microchip.com>
 References: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
 In-Reply-To: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -87,229 +88,376 @@ CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<steen.hegelund@microchip.com>, <devicetree@vger.kernel.org>
 X-Mailer: b4 0.14-dev
 
-Add match data for lan969x, with initial fields for iomap, iomap_size
-and ioranges. Add new Kconfig symbol CONFIG_LAN969X_CONFIG for compiling
-the lan969x driver.
+Add new file lan969x_regs.c that defines all the register differences
+for lan969x, and add it to the lan969x match data.
 
-It has been decided to give lan969x its own Kconfig symbol, as a
-considerable amount of code is needed, beside the Sparx5 code, to add
-full chip support (and more will be added in future series). Also this
-makes it possible to compile Sparx5 without lan969x.
+GW_DEV2G5_PHASE_DETECTOR_CTRL, FP_DEV2G5_PHAD_CTRL_PHAD_ENA and
+FP_DEV2G5_PHAD_CTRL_PHAD_FAILED are required by the new register macros
+which was introduced earlier. Add these for Sparx5 also.
 
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- MAINTAINERS                                      |   7 ++
- drivers/net/ethernet/microchip/Kconfig           |   1 +
- drivers/net/ethernet/microchip/Makefile          |   1 +
- drivers/net/ethernet/microchip/lan969x/Kconfig   |   5 ++
- drivers/net/ethernet/microchip/lan969x/Makefile  |  12 +++
- drivers/net/ethernet/microchip/lan969x/lan969x.c | 104 +++++++++++++++++++++++
- drivers/net/ethernet/microchip/lan969x/lan969x.h |  15 ++++
- 7 files changed, 145 insertions(+)
+ drivers/net/ethernet/microchip/lan969x/Makefile    |   2 +-
+ drivers/net/ethernet/microchip/lan969x/lan969x.c   |  12 ++
+ drivers/net/ethernet/microchip/lan969x/lan969x.h   |  11 +
+ .../net/ethernet/microchip/lan969x/lan969x_regs.c  | 222 +++++++++++++++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_regs.c    |   5 +-
+ .../net/ethernet/microchip/sparx5/sparx5_regs.h    |   5 +-
+ 6 files changed, 254 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index aed1fa42cfd2..c6bc8f111cf0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15188,6 +15188,13 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/interrupt-controller/microchip,lan966x-oic.yaml
- F:	drivers/irqchip/irq-lan966x-oic.c
- 
-+MICROCHIP LAN969X ETHERNET DRIVER
-+M:	Daniel Machon <daniel.machon@microchip.com>
-+M:	UNGLinuxDriver@microchip.com
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/microchip/lan969x/*
-+
- MICROCHIP LCDFB DRIVER
- M:	Nicolas Ferre <nicolas.ferre@microchip.com>
- L:	linux-fbdev@vger.kernel.org
-diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
-index ee046468652c..73832fb2bc32 100644
---- a/drivers/net/ethernet/microchip/Kconfig
-+++ b/drivers/net/ethernet/microchip/Kconfig
-@@ -59,6 +59,7 @@ config LAN743X
- 
- source "drivers/net/ethernet/microchip/lan865x/Kconfig"
- source "drivers/net/ethernet/microchip/lan966x/Kconfig"
-+source "drivers/net/ethernet/microchip/lan969x/Kconfig"
- source "drivers/net/ethernet/microchip/sparx5/Kconfig"
- source "drivers/net/ethernet/microchip/vcap/Kconfig"
- source "drivers/net/ethernet/microchip/fdma/Kconfig"
-diff --git a/drivers/net/ethernet/microchip/Makefile b/drivers/net/ethernet/microchip/Makefile
-index 3c65baed9fd8..7770df82200f 100644
---- a/drivers/net/ethernet/microchip/Makefile
-+++ b/drivers/net/ethernet/microchip/Makefile
-@@ -11,6 +11,7 @@ lan743x-objs := lan743x_main.o lan743x_ethtool.o lan743x_ptp.o
- 
- obj-$(CONFIG_LAN865X) += lan865x/
- obj-$(CONFIG_LAN966X_SWITCH) += lan966x/
-+obj-$(CONFIG_LAN969X_SWITCH) += lan969x/
- obj-$(CONFIG_SPARX5_SWITCH) += sparx5/
- obj-$(CONFIG_VCAP) += vcap/
- obj-$(CONFIG_FDMA) += fdma/
-diff --git a/drivers/net/ethernet/microchip/lan969x/Kconfig b/drivers/net/ethernet/microchip/lan969x/Kconfig
-new file mode 100644
-index 000000000000..728180d3fa33
---- /dev/null
-+++ b/drivers/net/ethernet/microchip/lan969x/Kconfig
-@@ -0,0 +1,5 @@
-+config LAN969X_SWITCH
-+	tristate "Lan969x switch driver"
-+	depends on SPARX5_SWITCH
-+	help
-+	  This driver supports the lan969x family of network switch devices.
 diff --git a/drivers/net/ethernet/microchip/lan969x/Makefile b/drivers/net/ethernet/microchip/lan969x/Makefile
-new file mode 100644
-index 000000000000..f3d9dfcd8c30
---- /dev/null
+index f3d9dfcd8c30..ff40e7e5d420 100644
+--- a/drivers/net/ethernet/microchip/lan969x/Makefile
 +++ b/drivers/net/ethernet/microchip/lan969x/Makefile
-@@ -0,0 +1,12 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Makefile for the Microchip lan969x network device drivers.
-+#
-+
-+obj-$(CONFIG_LAN969X_SWITCH) += lan969x-switch.o
-+
-+lan969x-switch-y := lan969x.o
-+
-+# Provide include files
-+ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
-+ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/vcap
+@@ -5,7 +5,7 @@
+ 
+ obj-$(CONFIG_LAN969X_SWITCH) += lan969x-switch.o
+ 
+-lan969x-switch-y := lan969x.o
++lan969x-switch-y := lan969x_regs.o lan969x.o
+ 
+ # Provide include files
+ ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
 diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.c b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-new file mode 100644
-index 000000000000..488af2a8ee3c
---- /dev/null
+index 488af2a8ee3c..0b47e4e66058 100644
+--- a/drivers/net/ethernet/microchip/lan969x/lan969x.c
 +++ b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-@@ -0,0 +1,104 @@
+@@ -92,10 +92,22 @@ static const struct sparx5_main_io_resource lan969x_main_iomap[] =  {
+ 	{ TARGET_ASM,                 0x3200000, 1 }, /* 0xe3200000 */
+ };
+ 
++static const struct sparx5_regs lan969x_regs = {
++	.tsize = lan969x_tsize,
++	.gaddr = lan969x_gaddr,
++	.gcnt  = lan969x_gcnt,
++	.gsize = lan969x_gsize,
++	.raddr = lan969x_raddr,
++	.rcnt  = lan969x_rcnt,
++	.fpos  = lan969x_fpos,
++	.fsize = lan969x_fsize,
++};
++
+ const struct sparx5_match_data lan969x_desc = {
+ 	.iomap      = lan969x_main_iomap,
+ 	.iomap_size = ARRAY_SIZE(lan969x_main_iomap),
+ 	.ioranges   = 2,
++	.regs       = &lan969x_regs,
+ };
+ EXPORT_SYMBOL_GPL(lan969x_desc);
+ 
+diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.h b/drivers/net/ethernet/microchip/lan969x/lan969x.h
+index 0507046ab9af..3b4c9ea30071 100644
+--- a/drivers/net/ethernet/microchip/lan969x/lan969x.h
++++ b/drivers/net/ethernet/microchip/lan969x/lan969x.h
+@@ -8,8 +8,19 @@
+ #define __LAN969X_H__
+ 
+ #include "../sparx5/sparx5_main.h"
++#include "../sparx5/sparx5_regs.h"
+ 
+ /* lan969x.c */
+ extern const struct sparx5_match_data lan969x_desc;
+ 
++/* lan969x_regs.c */
++extern const unsigned int lan969x_tsize[TSIZE_LAST];
++extern const unsigned int lan969x_raddr[RADDR_LAST];
++extern const unsigned int lan969x_rcnt[RCNT_LAST];
++extern const unsigned int lan969x_gaddr[GADDR_LAST];
++extern const unsigned int lan969x_gcnt[GCNT_LAST];
++extern const unsigned int lan969x_gsize[GSIZE_LAST];
++extern const unsigned int lan969x_fpos[FPOS_LAST];
++extern const unsigned int lan969x_fsize[FSIZE_LAST];
++
+ #endif
+diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x_regs.c b/drivers/net/ethernet/microchip/lan969x/lan969x_regs.c
+new file mode 100644
+index 000000000000..ace4ba21eec4
+--- /dev/null
++++ b/drivers/net/ethernet/microchip/lan969x/lan969x_regs.c
+@@ -0,0 +1,222 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/* Microchip lan969x Switch driver
 + *
-+ * Copyright (c) 2024 Microchip Technology Inc. and its subsidiaries.
++ * Copyright (c) 2024 Microchip Technology Inc.
++ */
++
++/* This file is autogenerated by cml-utils 2024-09-30 11:48:29 +0200.
++ * Commit ID: 9d07b8d19363f3cd3590ddb3f7a2e2768e16524b
 + */
 +
 +#include "lan969x.h"
 +
-+static const struct sparx5_main_io_resource lan969x_main_iomap[] =  {
-+	{ TARGET_CPU,                   0xc0000, 0 }, /* 0xe00c0000 */
-+	{ TARGET_FDMA,                  0xc0400, 0 }, /* 0xe00c0400 */
-+	{ TARGET_GCB,                 0x2010000, 1 }, /* 0xe2010000 */
-+	{ TARGET_QS,                  0x2030000, 1 }, /* 0xe2030000 */
-+	{ TARGET_PTP,                 0x2040000, 1 }, /* 0xe2040000 */
-+	{ TARGET_ANA_ACL,             0x2050000, 1 }, /* 0xe2050000 */
-+	{ TARGET_LRN,                 0x2060000, 1 }, /* 0xe2060000 */
-+	{ TARGET_VCAP_SUPER,          0x2080000, 1 }, /* 0xe2080000 */
-+	{ TARGET_QSYS,                0x20a0000, 1 }, /* 0xe20a0000 */
-+	{ TARGET_QFWD,                0x20b0000, 1 }, /* 0xe20b0000 */
-+	{ TARGET_XQS,                 0x20c0000, 1 }, /* 0xe20c0000 */
-+	{ TARGET_VCAP_ES2,            0x20d0000, 1 }, /* 0xe20d0000 */
-+	{ TARGET_VCAP_ES0,            0x20e0000, 1 }, /* 0xe20e0000 */
-+	{ TARGET_ANA_AC_POL,          0x2200000, 1 }, /* 0xe2200000 */
-+	{ TARGET_QRES,                0x2280000, 1 }, /* 0xe2280000 */
-+	{ TARGET_EACL,                0x22c0000, 1 }, /* 0xe22c0000 */
-+	{ TARGET_ANA_CL,              0x2400000, 1 }, /* 0xe2400000 */
-+	{ TARGET_ANA_L3,              0x2480000, 1 }, /* 0xe2480000 */
-+	{ TARGET_ANA_AC_SDLB,         0x2500000, 1 }, /* 0xe2500000 */
-+	{ TARGET_HSCH,                0x2580000, 1 }, /* 0xe2580000 */
-+	{ TARGET_REW,                 0x2600000, 1 }, /* 0xe2600000 */
-+	{ TARGET_ANA_L2,              0x2800000, 1 }, /* 0xe2800000 */
-+	{ TARGET_ANA_AC,              0x2900000, 1 }, /* 0xe2900000 */
-+	{ TARGET_VOP,                 0x2a00000, 1 }, /* 0xe2a00000 */
-+	{ TARGET_DEV2G5,              0x3004000, 1 }, /* 0xe3004000 */
-+	{ TARGET_DEV10G,              0x3008000, 1 }, /* 0xe3008000 */
-+	{ TARGET_PCS10G_BR,           0x300c000, 1 }, /* 0xe300c000 */
-+	{ TARGET_DEV2G5 +  1,         0x3010000, 1 }, /* 0xe3010000 */
-+	{ TARGET_DEV2G5 +  2,         0x3014000, 1 }, /* 0xe3014000 */
-+	{ TARGET_DEV2G5 +  3,         0x3018000, 1 }, /* 0xe3018000 */
-+	{ TARGET_DEV2G5 +  4,         0x301c000, 1 }, /* 0xe301c000 */
-+	{ TARGET_DEV10G +  1,         0x3020000, 1 }, /* 0xe3020000 */
-+	{ TARGET_PCS10G_BR +  1,      0x3024000, 1 }, /* 0xe3024000 */
-+	{ TARGET_DEV2G5 +  5,         0x3028000, 1 }, /* 0xe3028000 */
-+	{ TARGET_DEV2G5 +  6,         0x302c000, 1 }, /* 0xe302c000 */
-+	{ TARGET_DEV2G5 +  7,         0x3030000, 1 }, /* 0xe3030000 */
-+	{ TARGET_DEV2G5 +  8,         0x3034000, 1 }, /* 0xe3034000 */
-+	{ TARGET_DEV10G +  2,         0x3038000, 1 }, /* 0xe3038000 */
-+	{ TARGET_PCS10G_BR +  2,      0x303c000, 1 }, /* 0xe303c000 */
-+	{ TARGET_DEV2G5 +  9,         0x3040000, 1 }, /* 0xe3040000 */
-+	{ TARGET_DEV5G,               0x3044000, 1 }, /* 0xe3044000 */
-+	{ TARGET_PCS5G_BR,            0x3048000, 1 }, /* 0xe3048000 */
-+	{ TARGET_DEV2G5 + 10,         0x304c000, 1 }, /* 0xe304c000 */
-+	{ TARGET_DEV2G5 + 11,         0x3050000, 1 }, /* 0xe3050000 */
-+	{ TARGET_DEV2G5 + 12,         0x3054000, 1 }, /* 0xe3054000 */
-+	{ TARGET_DEV10G +  3,         0x3058000, 1 }, /* 0xe3058000 */
-+	{ TARGET_PCS10G_BR +  3,      0x305c000, 1 }, /* 0xe305c000 */
-+	{ TARGET_DEV2G5 + 13,         0x3060000, 1 }, /* 0xe3060000 */
-+	{ TARGET_DEV5G +  1,          0x3064000, 1 }, /* 0xe3064000 */
-+	{ TARGET_PCS5G_BR +  1,       0x3068000, 1 }, /* 0xe3068000 */
-+	{ TARGET_DEV2G5 + 14,         0x306c000, 1 }, /* 0xe306c000 */
-+	{ TARGET_DEV2G5 + 15,         0x3070000, 1 }, /* 0xe3070000 */
-+	{ TARGET_DEV2G5 + 16,         0x3074000, 1 }, /* 0xe3074000 */
-+	{ TARGET_DEV10G +  4,         0x3078000, 1 }, /* 0xe3078000 */
-+	{ TARGET_PCS10G_BR +  4,      0x307c000, 1 }, /* 0xe307c000 */
-+	{ TARGET_DEV2G5 + 17,         0x3080000, 1 }, /* 0xe3080000 */
-+	{ TARGET_DEV5G +  2,          0x3084000, 1 }, /* 0xe3084000 */
-+	{ TARGET_PCS5G_BR +  2,       0x3088000, 1 }, /* 0xe3088000 */
-+	{ TARGET_DEV2G5 + 18,         0x308c000, 1 }, /* 0xe308c000 */
-+	{ TARGET_DEV2G5 + 19,         0x3090000, 1 }, /* 0xe3090000 */
-+	{ TARGET_DEV2G5 + 20,         0x3094000, 1 }, /* 0xe3094000 */
-+	{ TARGET_DEV10G +  5,         0x3098000, 1 }, /* 0xe3098000 */
-+	{ TARGET_PCS10G_BR +  5,      0x309c000, 1 }, /* 0xe309c000 */
-+	{ TARGET_DEV2G5 + 21,         0x30a0000, 1 }, /* 0xe30a0000 */
-+	{ TARGET_DEV5G +  3,          0x30a4000, 1 }, /* 0xe30a4000 */
-+	{ TARGET_PCS5G_BR +  3,       0x30a8000, 1 }, /* 0xe30a8000 */
-+	{ TARGET_DEV2G5 + 22,         0x30ac000, 1 }, /* 0xe30ac000 */
-+	{ TARGET_DEV2G5 + 23,         0x30b0000, 1 }, /* 0xe30b0000 */
-+	{ TARGET_DEV2G5 + 24,         0x30b4000, 1 }, /* 0xe30b4000 */
-+	{ TARGET_DEV10G +  6,         0x30b8000, 1 }, /* 0xe30b8000 */
-+	{ TARGET_PCS10G_BR +  6,      0x30bc000, 1 }, /* 0xe30bc000 */
-+	{ TARGET_DEV2G5 + 25,         0x30c0000, 1 }, /* 0xe30c0000 */
-+	{ TARGET_DEV10G +  7,         0x30c4000, 1 }, /* 0xe30c4000 */
-+	{ TARGET_PCS10G_BR +  7,      0x30c8000, 1 }, /* 0xe30c8000 */
-+	{ TARGET_DEV2G5 + 26,         0x30cc000, 1 }, /* 0xe30cc000 */
-+	{ TARGET_DEV10G +  8,         0x30d0000, 1 }, /* 0xe30d0000 */
-+	{ TARGET_PCS10G_BR +  8,      0x30d4000, 1 }, /* 0xe30d4000 */
-+	{ TARGET_DEV2G5 + 27,         0x30d8000, 1 }, /* 0xe30d8000 */
-+	{ TARGET_DEV10G +  9,         0x30dc000, 1 }, /* 0xe30dc000 */
-+	{ TARGET_PCS10G_BR +  9,      0x30e0000, 1 }, /* 0xe30e0000 */
-+	{ TARGET_DSM,                 0x30ec000, 1 }, /* 0xe30ec000 */
-+	{ TARGET_PORT_CONF,           0x30f0000, 1 }, /* 0xe30f0000 */
-+	{ TARGET_ASM,                 0x3200000, 1 }, /* 0xe3200000 */
++const unsigned int lan969x_tsize[TSIZE_LAST] = {
++	[TC_DEV10G] = 10,
++	[TC_DEV2G5] = 28,
++	[TC_DEV5G] = 4,
++	[TC_PCS10G_BR] = 10,
++	[TC_PCS5G_BR] = 4,
 +};
 +
-+const struct sparx5_match_data lan969x_desc = {
-+	.iomap      = lan969x_main_iomap,
-+	.iomap_size = ARRAY_SIZE(lan969x_main_iomap),
-+	.ioranges   = 2,
++const unsigned int lan969x_raddr[RADDR_LAST] = {
++	[RA_CPU_PROC_CTRL] = 160,
++	[RA_GCB_SOFT_RST] = 12,
++	[RA_GCB_HW_SGPIO_TO_SD_MAP_CFG] = 20,
 +};
-+EXPORT_SYMBOL_GPL(lan969x_desc);
 +
-+MODULE_DESCRIPTION("Microchip lan969x switch driver");
-+MODULE_AUTHOR("Daniel Machon <daniel.machon@microchip.com>");
-+MODULE_LICENSE("Dual MIT/GPL");
-diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.h b/drivers/net/ethernet/microchip/lan969x/lan969x.h
-new file mode 100644
-index 000000000000..0507046ab9af
---- /dev/null
-+++ b/drivers/net/ethernet/microchip/lan969x/lan969x.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/* Microchip lan969x Switch driver
-+ *
-+ * Copyright (c) 2024 Microchip Technology Inc. and its subsidiaries.
-+ */
++const unsigned int lan969x_rcnt[RCNT_LAST] = {
++	[RC_ANA_AC_OWN_UPSID] = 1,
++	[RC_ANA_ACL_VCAP_S2_CFG] = 35,
++	[RC_ANA_ACL_OWN_UPSID] = 1,
++	[RC_ANA_CL_OWN_UPSID] = 1,
++	[RC_ANA_L2_OWN_UPSID] = 1,
++	[RC_ASM_PORT_CFG] = 32,
++	[RC_DSM_BUF_CFG] = 32,
++	[RC_DSM_DEV_TX_STOP_WM_CFG] = 32,
++	[RC_DSM_RX_PAUSE_CFG] = 32,
++	[RC_DSM_MAC_CFG] = 32,
++	[RC_DSM_MAC_ADDR_BASE_HIGH_CFG] = 30,
++	[RC_DSM_MAC_ADDR_BASE_LOW_CFG] = 30,
++	[RC_DSM_TAXI_CAL_CFG] = 6,
++	[RC_GCB_HW_SGPIO_TO_SD_MAP_CFG] = 30,
++	[RC_HSCH_PORT_MODE] = 35,
++	[RC_QFWD_SWITCH_PORT_MODE] = 35,
++	[RC_QSYS_PAUSE_CFG] = 35,
++	[RC_QSYS_ATOP] = 35,
++	[RC_QSYS_FWD_PRESSURE] = 35,
++	[RC_QSYS_CAL_AUTO] = 4,
++	[RC_REW_OWN_UPSID] = 1,
++	[RC_REW_RTAG_ETAG_CTRL] = 35,
++};
 +
-+#ifndef __LAN969X_H__
-+#define __LAN969X_H__
++const unsigned int lan969x_gaddr[GADDR_LAST] = {
++	[GA_ANA_AC_RAM_CTRL] = 202000,
++	[GA_ANA_AC_PS_COMMON] = 202880,
++	[GA_ANA_AC_MIRROR_PROBE] = 203232,
++	[GA_ANA_AC_SRC] = 201728,
++	[GA_ANA_AC_PGID] = 131072,
++	[GA_ANA_AC_TSN_SF] = 202028,
++	[GA_ANA_AC_TSN_SF_CFG] = 148480,
++	[GA_ANA_AC_TSN_SF_STATUS] = 147936,
++	[GA_ANA_AC_SG_ACCESS] = 202032,
++	[GA_ANA_AC_SG_CONFIG] = 202752,
++	[GA_ANA_AC_SG_STATUS] = 147952,
++	[GA_ANA_AC_SG_STATUS_STICKY] = 202044,
++	[GA_ANA_AC_STAT_GLOBAL_CFG_PORT] = 202048,
++	[GA_ANA_AC_STAT_CNT_CFG_PORT] = 204800,
++	[GA_ANA_AC_STAT_GLOBAL_CFG_ACL] = 202068,
++	[GA_ANA_ACL_COMMON] = 8192,
++	[GA_ANA_ACL_KEY_SEL] = 9204,
++	[GA_ANA_ACL_CNT_B] = 4096,
++	[GA_ANA_ACL_STICKY] = 10852,
++	[GA_ANA_AC_POL_POL_ALL_CFG] = 17504,
++	[GA_ANA_AC_POL_COMMON_BDLB] = 19464,
++	[GA_ANA_AC_POL_COMMON_BUM_SLB] = 19472,
++	[GA_ANA_AC_SDLB_LBGRP_TBL] = 31788,
++	[GA_ANA_CL_PORT] = 65536,
++	[GA_ANA_CL_COMMON] = 87040,
++	[GA_ANA_L2_COMMON] = 561928,
++	[GA_ANA_L3_COMMON] = 370752,
++	[GA_ANA_L3_VLAN_ARP_L3MC_STICKY] = 368580,
++	[GA_ASM_CFG] = 18304,
++	[GA_ASM_PFC_TIMER_CFG] = 15568,
++	[GA_ASM_LBK_WM_CFG] = 15596,
++	[GA_ASM_LBK_MISC_CFG] = 15608,
++	[GA_ASM_RAM_CTRL] = 15684,
++	[GA_EACL_ES2_KEY_SELECT_PROFILE] = 36864,
++	[GA_EACL_CNT_TBL] = 30720,
++	[GA_EACL_POL_CFG] = 38400,
++	[GA_EACL_ES2_STICKY] = 29072,
++	[GA_EACL_RAM_CTRL] = 29112,
++	[GA_GCB_SIO_CTRL] = 560,
++	[GA_HSCH_HSCH_DWRR] = 36480,
++	[GA_HSCH_HSCH_MISC] = 36608,
++	[GA_HSCH_HSCH_LEAK_LISTS] = 37256,
++	[GA_HSCH_SYSTEM] = 37384,
++	[GA_HSCH_MMGT] = 36260,
++	[GA_HSCH_TAS_CONFIG] = 37696,
++	[GA_PTP_PTP_CFG] = 512,
++	[GA_PTP_PTP_TOD_DOMAINS] = 528,
++	[GA_PTP_PHASE_DETECTOR_CTRL] = 628,
++	[GA_QSYS_CALCFG] = 2164,
++	[GA_QSYS_RAM_CTRL] = 2204,
++	[GA_REW_COMMON] = 98304,
++	[GA_REW_PORT] = 49152,
++	[GA_REW_VOE_PORT_LM_CNT] = 90112,
++	[GA_REW_RAM_CTRL] = 93992,
++	[GA_VOP_RAM_CTRL] = 16368,
++	[GA_XQS_SYSTEM] = 5744,
++	[GA_XQS_QLIMIT_SHR] = 6912,
++};
 +
-+#include "../sparx5/sparx5_main.h"
++const unsigned int lan969x_gcnt[GCNT_LAST] = {
++	[GC_ANA_AC_SRC] = 67,
++	[GC_ANA_AC_PGID] = 1054,
++	[GC_ANA_AC_TSN_SF_CFG] = 256,
++	[GC_ANA_AC_STAT_CNT_CFG_PORT] = 35,
++	[GC_ANA_ACL_KEY_SEL] = 99,
++	[GC_ANA_ACL_CNT_A] = 1024,
++	[GC_ANA_ACL_CNT_B] = 1024,
++	[GC_ANA_AC_SDLB_LBGRP_TBL] = 5,
++	[GC_ANA_AC_SDLB_LBSET_TBL] = 496,
++	[GC_ANA_CL_PORT] = 35,
++	[GC_ANA_L2_ISDX_LIMIT] = 256,
++	[GC_ANA_L2_ISDX] = 1024,
++	[GC_ANA_L3_VLAN] = 4608,
++	[GC_ASM_DEV_STATISTICS] = 30,
++	[GC_EACL_ES2_KEY_SELECT_PROFILE] = 68,
++	[GC_EACL_CNT_TBL] = 512,
++	[GC_GCB_SIO_CTRL] = 1,
++	[GC_HSCH_HSCH_CFG] = 1120,
++	[GC_HSCH_HSCH_DWRR] = 32,
++	[GC_PTP_PTP_PINS] = 8,
++	[GC_PTP_PHASE_DETECTOR_CTRL] = 8,
++	[GC_REW_PORT] = 35,
++	[GC_REW_VOE_PORT_LM_CNT] = 240,
++};
 +
-+/* lan969x.c */
-+extern const struct sparx5_match_data lan969x_desc;
++const unsigned int lan969x_gsize[GSIZE_LAST] = {
++	[GW_ANA_AC_SRC] = 4,
++	[GW_ANA_L2_COMMON] = 712,
++	[GW_ASM_CFG] = 1092,
++	[GW_CPU_CPU_REGS] = 180,
++	[GW_DEV2G5_PHASE_DETECTOR_CTRL] = 12,
++	[GW_FDMA_FDMA] = 448,
++	[GW_GCB_CHIP_REGS] = 180,
++	[GW_HSCH_TAS_CONFIG] = 16,
++	[GW_PTP_PHASE_DETECTOR_CTRL] = 12,
++	[GW_QSYS_PAUSE_CFG] = 988,
++};
 +
-+#endif
++const unsigned int lan969x_fpos[FPOS_LAST] = {
++	[FP_CPU_PROC_CTRL_AARCH64_MODE_ENA] = 7,
++	[FP_CPU_PROC_CTRL_L2_RST_INVALIDATE_DIS] = 6,
++	[FP_CPU_PROC_CTRL_L1_RST_INVALIDATE_DIS] = 5,
++	[FP_CPU_PROC_CTRL_BE_EXCEP_MODE] = 4,
++	[FP_CPU_PROC_CTRL_VINITHI] = 3,
++	[FP_CPU_PROC_CTRL_CFGTE] = 2,
++	[FP_CPU_PROC_CTRL_CP15S_DISABLE] = 1,
++	[FP_CPU_PROC_CTRL_PROC_CRYPTO_DISABLE] = 0,
++	[FP_CPU_PROC_CTRL_L2_FLUSH_REQ] = 8,
++	[FP_DEV2G5_PHAD_CTRL_PHAD_ENA] = 5,
++	[FP_DEV2G5_PHAD_CTRL_PHAD_FAILED] = 3,
++	[FP_FDMA_CH_CFG_CH_XTR_STATUS_MODE] = 5,
++	[FP_FDMA_CH_CFG_CH_INTR_DB_EOF_ONLY] = 4,
++	[FP_FDMA_CH_CFG_CH_INJ_PORT] = 3,
++	[FP_PTP_PTP_PIN_CFG_PTP_PIN_ACTION] = 27,
++	[FP_PTP_PTP_PIN_CFG_PTP_PIN_SYNC] = 25,
++	[FP_PTP_PTP_PIN_CFG_PTP_PIN_INV_POL] = 24,
++	[FP_PTP_PHAD_CTRL_PHAD_ENA] = 5,
++	[FP_PTP_PHAD_CTRL_PHAD_FAILED] = 3,
++};
++
++const unsigned int lan969x_fsize[FSIZE_LAST] = {
++	[FW_ANA_AC_PROBE_PORT_CFG_PROBE_PORT_MASK] = 30,
++	[FW_ANA_AC_SRC_CFG_PORT_MASK] = 30,
++	[FW_ANA_AC_PGID_CFG_PORT_MASK] = 30,
++	[FW_ANA_AC_TSN_SF_PORT_NUM] = 7,
++	[FW_ANA_AC_TSN_SF_CFG_TSN_SGID] = 8,
++	[FW_ANA_AC_TSN_SF_STATUS_TSN_SFID] = 8,
++	[FW_ANA_AC_SG_ACCESS_CTRL_SGID] = 8,
++	[FW_ANA_AC_PORT_SGE_CFG_MASK] = 17,
++	[FW_ANA_AC_SDLB_XLB_START_LBSET_START] = 9,
++	[FW_ANA_AC_SDLB_LBGRP_MISC_THRES_SHIFT] = 3,
++	[FW_ANA_AC_SDLB_LBGRP_STATE_TBL_PUP_LBSET_NEXT] = 9,
++	[FW_ANA_AC_SDLB_XLB_NEXT_LBSET_NEXT] = 9,
++	[FW_ANA_AC_SDLB_XLB_NEXT_LBGRP] = 3,
++	[FW_ANA_AC_SDLB_INH_LBSET_ADDR_INH_LBSET_ADDR] = 9,
++	[FW_ANA_L2_AUTO_LRN_CFG_AUTO_LRN_ENA] = 30,
++	[FW_ANA_L2_DLB_CFG_DLB_IDX] = 9,
++	[FW_ANA_L2_TSN_CFG_TSN_SFID] = 8,
++	[FW_ANA_L3_VLAN_MASK_CFG_VLAN_PORT_MASK] = 30,
++	[FW_FDMA_CH_CFG_CH_DCB_DB_CNT] = 2,
++	[FW_GCB_HW_SGPIO_TO_SD_MAP_CFG_SGPIO_TO_SD_SEL] = 7,
++	[FW_HSCH_SE_CFG_SE_DWRR_CNT] = 5,
++	[FW_HSCH_SE_CONNECT_SE_LEAK_LINK] = 14,
++	[FW_HSCH_SE_DLB_SENSE_SE_DLB_DPORT] = 6,
++	[FW_HSCH_HSCH_CFG_CFG_CFG_SE_IDX] = 11,
++	[FW_HSCH_HSCH_LEAK_CFG_LEAK_FIRST] = 14,
++	[FW_HSCH_FLUSH_CTRL_FLUSH_PORT] = 6,
++	[FW_HSCH_FLUSH_CTRL_FLUSH_HIER] = 14,
++	[FW_LRN_COMMON_ACCESS_CTRL_CPU_ACCESS_DIRECT_ROW] = 13,
++	[FW_LRN_MAC_ACCESS_CFG_3_MAC_ENTRY_ISDX_LIMIT_IDX] = 8,
++	[FW_LRN_AUTOAGE_CFG_2_NEXT_ROW] = 13,
++	[FW_PTP_PTP_PIN_INTR_INTR_PTP] = 8,
++	[FW_PTP_PTP_PIN_INTR_ENA_INTR_PTP_ENA] = 8,
++	[FW_PTP_PTP_INTR_IDENT_INTR_PTP_IDENT] = 8,
++	[FW_PTP_PTP_PIN_CFG_PTP_PIN_SELECT] = 3,
++	[FW_QFWD_FRAME_COPY_CFG_FRMC_PORT_VAL] = 6,
++	[FW_QRES_RES_CFG_WM_HIGH] = 11,
++	[FW_QRES_RES_STAT_MAXUSE] = 19,
++	[FW_QRES_RES_STAT_CUR_INUSE] = 19,
++	[FW_QSYS_PAUSE_CFG_PAUSE_START] = 11,
++	[FW_QSYS_PAUSE_CFG_PAUSE_STOP] = 11,
++	[FW_QSYS_ATOP_ATOP] = 11,
++	[FW_QSYS_ATOP_TOT_CFG_ATOP_TOT] = 11,
++	[FW_REW_RTAG_ETAG_CTRL_IPE_TBL] = 6,
++	[FW_XQS_STAT_CFG_STAT_VIEW] = 10,
++	[FW_XQS_QLIMIT_SHR_TOP_CFG_QLIMIT_SHR_TOP] = 14,
++	[FW_XQS_QLIMIT_SHR_ATOP_CFG_QLIMIT_SHR_ATOP] = 14,
++	[FW_XQS_QLIMIT_SHR_CTOP_CFG_QLIMIT_SHR_CTOP] = 14,
++	[FW_XQS_QLIMIT_SHR_QLIM_CFG_QLIMIT_SHR_QLIM] = 14,
++};
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c
+index 1db212ce3df7..220e81b714d4 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.c
+@@ -4,7 +4,7 @@
+  * Copyright (c) 2024 Microchip Technology Inc.
+  */
+ 
+-/* This file is autogenerated by cml-utils 2024-09-24 14:02:24 +0200.
++/* This file is autogenerated by cml-utils 2024-09-30 11:48:29 +0200.
+  * Commit ID: 9d07b8d19363f3cd3590ddb3f7a2e2768e16524b
+  */
+ 
+@@ -140,6 +140,7 @@ const unsigned int sparx5_gsize[GSIZE_LAST] = {
+ 	[GW_ANA_L2_COMMON] = 700,
+ 	[GW_ASM_CFG] = 1088,
+ 	[GW_CPU_CPU_REGS] = 204,
++	[GW_DEV2G5_PHASE_DETECTOR_CTRL] = 8,
+ 	[GW_FDMA_FDMA] = 428,
+ 	[GW_GCB_CHIP_REGS] = 424,
+ 	[GW_HSCH_TAS_CONFIG] = 12,
+@@ -157,6 +158,8 @@ const unsigned int sparx5_fpos[FPOS_LAST] = {
+ 	[FP_CPU_PROC_CTRL_CP15S_DISABLE] = 6,
+ 	[FP_CPU_PROC_CTRL_PROC_CRYPTO_DISABLE] = 5,
+ 	[FP_CPU_PROC_CTRL_L2_FLUSH_REQ] = 1,
++	[FP_DEV2G5_PHAD_CTRL_PHAD_ENA] = 7,
++	[FP_DEV2G5_PHAD_CTRL_PHAD_FAILED] = 6,
+ 	[FP_FDMA_CH_CFG_CH_XTR_STATUS_MODE] = 7,
+ 	[FP_FDMA_CH_CFG_CH_INTR_DB_EOF_ONLY] = 6,
+ 	[FP_FDMA_CH_CFG_CH_INJ_PORT] = 5,
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h
+index c4e8b581c1f3..ea28130c2341 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_regs.h
+@@ -4,7 +4,7 @@
+  * Copyright (c) 2024 Microchip Technology Inc.
+  */
+ 
+-/* This file is autogenerated by cml-utils 2024-09-24 14:02:24 +0200.
++/* This file is autogenerated by cml-utils 2024-09-30 11:48:29 +0200.
+  * Commit ID: 9d07b8d19363f3cd3590ddb3f7a2e2768e16524b
+  */
+ 
+@@ -151,6 +151,7 @@ enum sparx5_gsize_enum {
+ 	GW_ANA_L2_COMMON,
+ 	GW_ASM_CFG,
+ 	GW_CPU_CPU_REGS,
++	GW_DEV2G5_PHASE_DETECTOR_CTRL,
+ 	GW_FDMA_FDMA,
+ 	GW_GCB_CHIP_REGS,
+ 	GW_HSCH_TAS_CONFIG,
+@@ -169,6 +170,8 @@ enum sparx5_fpos_enum {
+ 	FP_CPU_PROC_CTRL_CP15S_DISABLE,
+ 	FP_CPU_PROC_CTRL_PROC_CRYPTO_DISABLE,
+ 	FP_CPU_PROC_CTRL_L2_FLUSH_REQ,
++	FP_DEV2G5_PHAD_CTRL_PHAD_ENA,
++	FP_DEV2G5_PHAD_CTRL_PHAD_FAILED,
+ 	FP_FDMA_CH_CFG_CH_XTR_STATUS_MODE,
+ 	FP_FDMA_CH_CFG_CH_INTR_DB_EOF_ONLY,
+ 	FP_FDMA_CH_CFG_CH_INJ_PORT,
 
 -- 
 2.34.1
