@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-138149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A7E9AC6A6
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:32:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8BE9AC6AB
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6731284298
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:32:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68DFB1C20E0C
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4147F158D96;
-	Wed, 23 Oct 2024 09:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC87C15CD52;
+	Wed, 23 Oct 2024 09:33:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B817482;
-	Wed, 23 Oct 2024 09:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2E514F9ED;
+	Wed, 23 Oct 2024 09:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729675971; cv=none; b=vGOc8O0KiKSXiJynNtSD/79nQbb3IUaUkMXKEqEXrlevzDPre+3eIXDBFPWUAIPuKVSO43crqnEB0cAcVQayvbFzMcE3hDIrEWQIoBPCTfJQOadTrPP5NNqo/ghGsBIB/9U4roCbErW6gDOByogk+MKaB2NBl/A7dp8D8iJbB/s=
+	t=1729676009; cv=none; b=hwDtf6xWsKGzwxr6CkYvKUxJuD7LieFVjZPwle4+oNXJJzoxUCKpllHTZsba2YMSkwdPObOCOaYkVQ4hZYg9dmqKDoStpDil/RtRKsRoewUWzND8pHmQtN8O+7MX6VZOjU/IE0po3Q2niYYLO8U65poxPw8TbwZEslXx1InmcOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729675971; c=relaxed/simple;
-	bh=RDKp+cC6f0vBPc9Rs4zB1BXnjm0QsbXQpdHi78lhOeM=;
+	s=arc-20240116; t=1729676009; c=relaxed/simple;
+	bh=bfUBNWwFLKfTBGLkd2zfwZH7CNfkBV8lzbx++T641ek=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HXLzZselvziEjqIl4iO88j97yzdQIpCPY/laEyz3E92asLKhF0ICUycKpvDhk8UADa052YjRXZmjyWUGfK09A7TMgrGe1okGJUYyiRt9tbzenJii883d4+3fUzCewxuWKEuNy5RyG4xxtlqgK721FSSX4tIRvejtbNgrx8HHZMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=NH3kyR9lRiH73uAvf5rrY7rCzb/RyOKtVm0kbMqeWpTg3WoKzoyYpvSIl+HRvCSwoCfN0C9IKuCP9x0MDKTaaaqIl50/Q5aEh21I0q7gZJ4lVPSuha15EaOkEv+AUSuPxbZuMiE4F4NItKZWO6MAFC8wd5pTtmZ1dj22wvP44rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a9a1b71d7ffso1028637766b.1;
-        Wed, 23 Oct 2024 02:32:49 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c935d99dc5so7147427a12.1;
+        Wed, 23 Oct 2024 02:33:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729675968; x=1730280768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iA1aNRKIv9LKRf5h3iTBzQVuBp6KyD5eyeAtjUFN4yk=;
-        b=s+TIsprNZ+HO49moQtojbwjpd/Kw7DhJBWE12mdvhA94xiGon23Okv0pkwGlpA/t1q
-         dH2KaoC7rdR6vgZQHT9LvIu4AlbGuv3/Ug/FmITvVxnkBGZCeoj/OMnMCWrKLEb04K2V
-         Ikcegf0dawjcvhkaxpTu8OhH6950gXhmm0QKqFd+/lCFmOS7tSak+YKT4qTCn66OjHVg
-         TBN4zsFXJ7xGcEnL2iuDE/XG8rI+xhKd3fu2IRc/zdCE5u/G5zgCiKUhUsrAdoZILOa7
-         JOgwx7aaeIWifmuLUB0vXc7Dn5n02VTBM0eLqoVorjNUNzrqPw0s0sNt5Xd0ymgrxSyU
-         hTOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsb9QhrytKXFH0XyfxspNNMWqsra5szjqvcT7xybVP+NYie0Cgq+csB1S/v1ay44mPgau8hVn5r50=@vger.kernel.org, AJvYcCWfO10creutSoyZwbcKyT/4pNflr+66+HLcZbQlwUH/1LBqhS7o4I4KCneAyB03CBS7i2TBvc/D@vger.kernel.org, AJvYcCXEonkWRqwBG/qdAL/4hGdb8UYT5rKh2JIrCf7nRcXKFZL6B2lpS4DWy3nU+FHofxER0zSLkTw4dvKamL/B@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhlNN/7dQ8ITl3jyQZQfTzgIt0aIgBANCWe++uK3Xv2w0iw/Kf
-	pcooBSORWKnTW+tggbvH6VKQgwtp3OSITz2i772NxRuJjyQvBApY
-X-Google-Smtp-Source: AGHT+IE89Zd5uGE+DTW0CJ/Bm77xvlUsGAIrwG9wSA/yHi3JOelxCxGWF4hcaNLRvpcdXmWWlcpC+Q==
-X-Received: by 2002:a17:907:ea0:b0:a99:4162:4e42 with SMTP id a640c23a62f3a-a9abf8ac2acmr145284466b.37.1729675967704;
-        Wed, 23 Oct 2024 02:32:47 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a912d893csm454660066b.16.2024.10.23.02.32.46
+        d=1e100.net; s=20230601; t=1729676006; x=1730280806;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vn1kct+AaR7zOrbvjx4Kb6wixkI+c0ohNQAwCnY0kSk=;
+        b=ZLSS1ZVQMQbxAPRZ3SGVXdQBfvW+n1n4dZCxNy8dO2C9e408oLI7icIBAq42/HvVOq
+         EsDiStZ8/BoYcF9fo5Y/XSnPhjJt2fAt7ROl+hdAzBVnAL//QFvGjH4jcGdf6sD+plCN
+         TZFVu1DvnrVLgaDVXreDbhIEHIuKAIRSL4yWsubkmGo1yU02jKODjIDr3/C11a3jZqQn
+         atYB00+yPsGj+RX8zxBFBzGF6sl7oAs8YQe1Q1yj/Jh/tH2lhoU1Me5A6N7HfXWSKXR1
+         njo+xcR7SU/goVqnB/eR6gwvro/KzcWyVSi4bK1nGXKiM8f0LHci7NEYtpnJrNdyyb2f
+         359w==
+X-Forwarded-Encrypted: i=1; AJvYcCV+OFHf/hHRobs4kWfCzqvQm0Awn9VejeICJIsnMBJdT+9P8z+qDBa2B2FSKaLvEU3l/dTmlUgp@vger.kernel.org, AJvYcCX3Wni0eo4+TTo1Uf/X3TH8o3lvX5ha4TlWkOqzqFeYFWvrV3GHrQ12F04yCcYX9HEq6rVAq7l0QUFm/f08@vger.kernel.org, AJvYcCX6NI5aUBKtErguhe5Zw6klVvdAIv8KidW7xTb3GzilkzT5hdvQ9mp4EePoQJjJzEVbdAN5PmDUQDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEDzf3mMHxFDE4S7oA2zC/jg929EromZjn+ggKyy/lEyJf9Okd
+	D50CZr5zgWA6MQYfjQ09zr1jmKjmQaUxRkCEGQvMQ2xZJ+SgMv0K
+X-Google-Smtp-Source: AGHT+IEkMrop+R2IjYJDv8tG5ep0f9ZEr1Xi6TXRRd2QOzVVwjqUXkY189A9/iiJqxZbCfXfk1S8kQ==
+X-Received: by 2002:a05:6402:40d0:b0:5c9:4be9:7c4 with SMTP id 4fb4d7f45d1cf-5cb8b1ac8cdmr1216760a12.31.1729676006198;
+        Wed, 23 Oct 2024 02:33:26 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66a6547esm4194990a12.37.2024.10.23.02.33.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 02:32:47 -0700 (PDT)
-Date: Wed, 23 Oct 2024 02:32:42 -0700
+        Wed, 23 Oct 2024 02:33:25 -0700 (PDT)
+Date: Wed, 23 Oct 2024 02:33:22 -0700
 From: Breno Leitao <leitao@debian.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+To: Akinobu Mita <akinobu.mita@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -66,49 +66,42 @@ Cc: Akinobu Mita <akinobu.mita@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Subject: Re: [PATCH net-next v3] net: Implement fault injection forcing skb
  reallocation
-Message-ID: <20241023-refined-precious-seahorse-52e0d9@leitao>
+Message-ID: <20241023-precious-gorgeous-taipan-4e0ad1@leitao>
 References: <20241014135015.3506392-1-leitao@debian.org>
- <ZxZKkY8U4jndx8no@archie.me>
+ <CAC5umygsk3NyPB99kdKtyV0xdpXihq-VRfzgua_8b40DexQ_QQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZxZKkY8U4jndx8no@archie.me>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAC5umygsk3NyPB99kdKtyV0xdpXihq-VRfzgua_8b40DexQ_QQ@mail.gmail.com>
 
-Hello Bagas,
-
-On Mon, Oct 21, 2024 at 07:35:29PM +0700, Bagas Sanjaya wrote:
-> On Mon, Oct 14, 2024 at 06:50:00AM -0700, Breno Leitao wrote:
-> > +  To select the interface to act on, write the network name to the following file:
-> > +  `/sys/kernel/debug/fail_net_force_skb_realloc/devname`
-> "... write the network name to /sys/kernel/debug/fail_net_force_skb_realloc/devname."
-> > +  If this field is left empty (which is the default value), skb reallocation
-> > +  will be forced on all network interfaces.
-> > +
-> > <snipped>...
-> > +- /sys/kernel/debug/fail_net_force_skb_realloc/devname:
-> > +
-> > +        Specifies the network interface on which to force SKB reallocation.  If
-> > +        left empty, SKB reallocation will be applied to all network interfaces.
-> > +
-> > +        Example usage:
-> > +        # Force skb reallocation on eth0
-> > +        echo "eth0" > /sys/kernel/debug/fail_net_force_skb_realloc/devname
-> > +
-> > +        # Clear the selection and force skb reallocation on all interfaces
-> > +        echo "" > /sys/kernel/debug/fail_net_force_skb_realloc/devname
+On Sat, Oct 19, 2024 at 12:28:03AM +0900, Akinobu Mita wrote:
+> 2024年10月14日(月) 22:50 Breno Leitao <leitao@debian.org>:
+> > +static int __init skb_realloc_setup(char *str)
+> > +{
+> > +       return setup_fault_attr(&skb_realloc.attr, str);
+> > +}
+> > +__setup("skb_realloc=", skb_realloc_setup);
 > 
-> The examples rendered as normal paragraph instead (and look like long-running
-> sentences) so I wrap them in literal code blocks:
+> The documentation says "fail_net_force_skb_realloc=" boot option,
+> but this code seems to add "skb_realloc=" boot option.
+> 
+> I don't have a strong opinion about the naming, but I feel like
+> it's a bit long.  How about "fail_skb_realloc="?
+> 
+> The same goes for the debugfs directory name.
+> 
+> Reviewed-by: Akinobu Mita <akinobu.mita@gmail.com>
 
-Thanks. I will update it, and send a new version.
+Thanks. I will update and spin a new version.
 
