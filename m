@@ -1,147 +1,116 @@
-Return-Path: <netdev+bounces-138078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6FEE9ABC9C
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:13:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB03D9ABCA9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:16:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DC0D1F237D3
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 04:13:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40C7C1F2407A
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 04:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D18013AA2F;
-	Wed, 23 Oct 2024 04:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56A813D248;
+	Wed, 23 Oct 2024 04:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKln6K0x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7vMeJHS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EF0137745;
-	Wed, 23 Oct 2024 04:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7139713C8F6;
+	Wed, 23 Oct 2024 04:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729656776; cv=none; b=ZF9Bu71/gcSJqcyj+PVBazIoYiFr1LFu1R0PzhW6ixNSaOS4KIW+2aK4aOsN1EUR6/UGVh6ABKsXUXlS45hKoZG0JGWHV9uED7eKoQ+XZKfLWSAHauNYtYI4lTAZgs0+iqknwGawutXxE4MsJKsnYlPh4tKyDAvCK9nm9zJYC9I=
+	t=1729656972; cv=none; b=RlLlt1sCCbE5uUT7i1Rtk6JuR38SqjY12w0twso2YE9RRNiQs1lPPsynC3jHN2SFejJzQSlM8bePVr6AhIC2Ko/eehWiDDMWDxzFgCmKIaC8beAC1jvnS2LPbpXLEMBf1BW8tt+OcT7jgqvw6OJJZPD+yW8MaaKOkFRjNT/5Ehg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729656776; c=relaxed/simple;
-	bh=vlx4D2ZVQr3/aVRPCIzNqn7qHorwJIyHhTrV5a87oCA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bM5co1ghfFPdpst+tqsOaYCFVkiJD8xdeum9Ole2au76DhjgbsFGGX5A5l/Ebk7DgreQph2tb2p8NAetrvzSyHtRnqvw8ZRsNt21LpICZS46fEU07O/buzmAFFN1uxFJGjpJbLmRvDKsL3yazIu3nTAtzLNJqpBtOR1JJ6NgEXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKln6K0x; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-20cbca51687so62845885ad.1;
-        Tue, 22 Oct 2024 21:12:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729656774; x=1730261574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NZnSh96Iu69rIUG8kQQpn2s5k1xoVcGpHLQvnGG4PPI=;
-        b=TKln6K0xgHKuybq/HdgyDRUhijWVPrK45sBnjlIWcVQkJFos1PdnhTHvoaah3Y+PH6
-         g763+bvSXbq/0JK1w+1f1K7i1exRcQVo+r4wAtJD1Wo04lSYL99h4UAsZQ8aB3q6EZ/W
-         bbWSHldOWqjYbl2o9eptSZjLHtmJyLmzO/yqtuE77KmByQt+PAY1/5Bo5NCDOPRjH7Ac
-         aiO4aVtxOSby0e2CSKJ5UUbmJQP8t9UKLrJ//2X7nrantPLIcYAICYOlT+jx80vsTW2L
-         6L9dGjZLZRArWK2aqtBoZD/F/KYdFFLI/PgOWXjQCqIu0Ffcf1/sQQaDnI/63BcQN0BI
-         T2Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729656774; x=1730261574;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NZnSh96Iu69rIUG8kQQpn2s5k1xoVcGpHLQvnGG4PPI=;
-        b=RjKKjYoyrQ2W6Dx83TZpu/Gm5FoDxU02Jdc2OiOfFKTAmmhpKSAsVSizgHbQvXrLR+
-         wN+Np4TMC7Obqiz7MWiHJvPqWgLyzYEzq4Tt6jGwCMC6nk9OmRkuQ+OmDl/B1aYs1lrW
-         lfz/IZZZQIO8kXvJOcx5ch58q0E10kcfOf+E05mA+GdmY8f1eRrHbFuWi+PCDSjmoXwM
-         ON+3O+sA7JnbrZyk9333Ze6O3jTrGmAd5cQ2nm9M4mJuqu/ooz+FRv/vCEcBVFsAh1qy
-         oeT1XQypd0exEg1XCef5c97n6eM2KTBlh81Qp+J86q2Hxzw4H3wG60YBgjI8eaVT31Qo
-         bCqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAuacXw3+D4UCHuNxtjSJiyhuB6Xz8xvaR/69JYTNEJUMp2nrM3To8YdL+iY2CQ0+bGrE8ssBUDQMiCSq5@vger.kernel.org, AJvYcCUgMgz+O+RFc1QmYGeU9Ch0AdmtiHYNkuc4hrd6e95xJkQ3GzWs9UOiSLXS4wztij5QS8HlF0V45AhtCQ==@vger.kernel.org, AJvYcCVfVuZeqYx+QnE/i5b6N7+qzA9QZhfFH5knMAQ/P/4iN6YJSnrUbTj8wdx/f77xheEFAy6N/Qnk4Xs=@vger.kernel.org, AJvYcCW9qzkYWBJQZJF8K9J06HsKIj9FLKQglI9G98EoJmPw1QnYDXktlCZook9iI+6qZHh9UcxNlOS2@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOaGjesakXuHLsh6Uve4FklLeO2zKox52kVNj5haEWWU3EB8BI
-	5Z1rP2ZQXmgpzSdGeA45RTCOfMnyfZ/9kqUtttAhHuzccYvMUrdb
-X-Google-Smtp-Source: AGHT+IGFVDwK3sKSwg//qBWWkJaytMiJe6RPIuT2asWSGdf+7vKFuYWaitKI8a64jdiEFzrZhBOQeg==
-X-Received: by 2002:a17:902:f785:b0:1fb:57e7:5bb4 with SMTP id d9443c01a7336-20fa9e9f8c6mr13920565ad.37.1729656773187;
-        Tue, 22 Oct 2024 21:12:53 -0700 (PDT)
-Received: from tc.hsd1.or.comcast.net ([2601:1c2:c104:170:7ebc:c09d:6aea:1a0c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0f33basm49680215ad.257.2024.10.22.21.12.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 21:12:52 -0700 (PDT)
-From: Leo Stone <leocstone@gmail.com>
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
+	s=arc-20240116; t=1729656972; c=relaxed/simple;
+	bh=Ssryh/DeScctPPrI9kLBjogfgqMCqhs16Pkd5Nr7TBA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LMcs7P5/c8equVxtLkzJgAa4pPqhZoEev/ZrwTIbGYH15IleKz83iLv/y6YssGNp6ITJTww6XI3gnTi2kyzRIJxZPIrUQIIEyr25QuJ7mnBr0tMjcbya0ClcohY1vUVnTex1jn/I+/1Oq0NC/IDLm6+G3iG/Lv/IXSnt8wkZRwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7vMeJHS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6553C4CEE6;
+	Wed, 23 Oct 2024 04:16:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729656972;
+	bh=Ssryh/DeScctPPrI9kLBjogfgqMCqhs16Pkd5Nr7TBA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=b7vMeJHST3VEyUf/HCoYwfOa6LyzIxDlyfbQrnhVhGMpZD3hkX+iWj8RR+LiGLrp5
+	 5E1NSMfagDJiRotNV80ljbcTSHIToTxxi1YdOJ8E1nMxp9cmvbdxJE5WCPP8hokSMz
+	 fro1zrCmom6LOsdpOe2nYCxKgOOASxm7TsP82nZFtflR4ArQ4VWnd5lD61BmX19Ne7
+	 eNcdGw/G3qPZcazLu4qKVScCwEHGj8WVTFRl/1Z9jLhLeNhIoAHU1J2xPDhJBMSXhw
+	 XhiTIuqRw5b8MZu+/O3GYihh4cMSj7aqi5CCvPIiGypjyBDdiw5fnM3Y8o82EvlxZa
+	 NNR3W4nUzirMw==
+From: Bjorn Andersson <andersson@kernel.org>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	konradybcio@kernel.org,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	corbet@lwn.net
-Cc: Leo Stone <leocstone@gmail.com>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
+	kees@kernel.org,
+	tony.luck@intel.com,
+	gpiccoli@igalia.com,
+	quic_rjendra@quicinc.com,
+	andre.przywara@arm.com,
+	quic_sibis@quicinc.com,
+	igor.belwon@mentallysanemainliners.org,
+	davidwronek@gmail.com,
+	ivo.ivanov.ivanov1@gmail.com,
+	neil.armstrong@linaro.org,
+	heiko.stuebner@cherry.de,
+	rafal@milecki.pl,
+	lpieralisi@kernel.org,
+	Danila Tikhonov <danila@jiaxyga.com>
+Cc: devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	anupnewmail@gmail.com
-Subject: [PATCH net] Documentation: ieee802154: fix grammar
-Date: Tue, 22 Oct 2024 21:12:01 -0700
-Message-ID: <20241023041203.35313-1-leocstone@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	linux@mainlining.org
+Subject: Re: (subset) [PATCH v3 0/6] Add Nothing Phone (1) support
+Date: Tue, 22 Oct 2024 23:15:48 -0500
+Message-ID: <172965696396.224417.9698703565242558835.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241020205615.211256-1-danila@jiaxyga.com>
+References: <20241020205615.211256-1-danila@jiaxyga.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Fix grammar where it improves readability.
 
-Signed-off-by: Leo Stone <leocstone@gmail.com>
----
- Documentation/networking/ieee802154.rst | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+On Sun, 20 Oct 2024 23:56:08 +0300, Danila Tikhonov wrote:
+> This series of patches adds support for the Nothing Phone (1), identified
+> as nothing,spacewar. The Nothing Phone (1) is built on the Qualcomm
+> Snapdragon 778G+ (SM7325-AE, also known as yupik).
+> 
+> SM7325 is identical to SC7280 just as SM7125 is identical to SC7180, so
+> SM7325 devicetree imports SC7280 devicetree as a base.
+> 
+> [...]
 
-diff --git a/Documentation/networking/ieee802154.rst b/Documentation/networking/ieee802154.rst
-index c652d383fe10..743c0a80e309 100644
---- a/Documentation/networking/ieee802154.rst
-+++ b/Documentation/networking/ieee802154.rst
-@@ -72,7 +72,8 @@ exports a management (e.g. MLME) and data API.
- possibly with some kinds of acceleration like automatic CRC computation and
- comparison, automagic ACK handling, address matching, etc.
- 
--Those types of devices require different approach to be hooked into Linux kernel.
-+Each type of device requires a different approach to be hooked into the Linux
-+kernel.
- 
- HardMAC
- -------
-@@ -81,10 +82,10 @@ See the header include/net/ieee802154_netdev.h. You have to implement Linux
- net_device, with .type = ARPHRD_IEEE802154. Data is exchanged with socket family
- code via plain sk_buffs. On skb reception skb->cb must contain additional
- info as described in the struct ieee802154_mac_cb. During packet transmission
--the skb->cb is used to provide additional data to device's header_ops->create
--function. Be aware that this data can be overridden later (when socket code
--submits skb to qdisc), so if you need something from that cb later, you should
--store info in the skb->data on your own.
-+the skb->cb is used to provide additional data to the device's
-+header_ops->create function. Be aware that this data can be overridden later
-+(when socket code submits skb to qdisc), so if you need something from that cb
-+later, you should store info in the skb->data on your own.
- 
- To hook the MLME interface you have to populate the ml_priv field of your
- net_device with a pointer to struct ieee802154_mlme_ops instance. The fields
-@@ -94,8 +95,9 @@ All other fields are required.
- SoftMAC
- -------
- 
--The MAC is the middle layer in the IEEE 802.15.4 Linux stack. This moment it
--provides interface for drivers registration and management of slave interfaces.
-+The MAC is the middle layer in the IEEE 802.15.4 Linux stack. At the moment, it
-+provides an interface for driver registration and management of slave
-+interfaces.
- 
- NOTE: Currently the only monitor device type is supported - it's IEEE 802.15.4
- stack interface for network sniffers (e.g. WireShark).
+Applied, thanks!
+
+[2/6] dt-bindings: arm: cpus: Add qcom kryo670 compatible
+      commit: 82ead233e01042fecdfdee5b05c377c2a9e551f4
+[3/6] arm64: dts: qcom: Add SM7325 device tree
+      commit: ba978ce20f8134ea9e0e8f1acb16552b5106281d
+[4/6] dt-bindings: vendor-prefixes: Add Nothing Technology Limited
+      commit: 7e20ecc8de9354c1e8742d37f06e152549f4c439
+[5/6] dt-bindings: arm: qcom: Add SM7325 Nothing Phone 1
+      commit: 389df37da15a14fa218e86676f6f9a5470d38dfa
+[6/6] arm64: dts: qcom: sm7325: Add device-tree for Nothing Phone 1
+      commit: 6b3d104e52893493964a5eefa50dd0fdb472515a
+
+Best regards,
 -- 
-2.43.0
-
+Bjorn Andersson <andersson@kernel.org>
 
