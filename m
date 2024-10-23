@@ -1,128 +1,90 @@
-Return-Path: <netdev+bounces-138179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6AB9AC845
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:54:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E3E9AC850
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D6F11C21540
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:54:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42063281EAD
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4CE1A4AB3;
-	Wed, 23 Oct 2024 10:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9B51A7268;
+	Wed, 23 Oct 2024 10:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="M6qcBaUB"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="nU7UGMDK"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from mail-40140.protonmail.ch (mail-40140.protonmail.ch [185.70.40.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C287E1A2658
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226DC1A2C19;
+	Wed, 23 Oct 2024 10:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729680841; cv=none; b=Hb7ruBIu0JM4p0DHdS3ft5Z2l5XPssT7t8pDX2lhPU/cbDujcGJ57qgRuG77fUElI0GkxB9isFL0WvbhZTTP9orzIGA+7Bx07DBuuq+2YFsg1GgVNRhgnwWUu0rRfGKUffdXyTBNIH7GawYgRVzINYGhwPgl0rLx0RqToGx5eVQ=
+	t=1729680966; cv=none; b=gZc+S4v/eUzZpVeQGYXIjCk0wk75yPTEbomtKbRp/De7GOeserd7H/T4Fe2Le0QJN/n6ve2+hstzYcLn2TcM+zD9T8otlDVhKzK5EwLWpdLA6LCFIBGkw4ubr+rLaocAtDHmceaZl2A3qxlaUErrMS4/wAnxy4KESTsxIT01F00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729680841; c=relaxed/simple;
-	bh=eLd/sGRiS+pFCP6ne3bsworvj9oBXFUEGh4vG6Y3i0Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GcjFvsBZTsvpTSARpdjwu0nF+hEmyYA7x3tFKjHEmOHww12k+E4yta9ugXSuhUbvRs5WKHZLLFfn+47E5nx8yo1LPXno7/K2Zg5EjORsXOFNfijjBX47U76Lru8pkZuz3khsUla9CLSzM3fdmtV60BRgf1A9ivbZoJXoxbniE0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=M6qcBaUB; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id A34EB2085B;
-	Wed, 23 Oct 2024 12:53:52 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NbYJaY2a7lGi; Wed, 23 Oct 2024 12:53:52 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D20B420851;
-	Wed, 23 Oct 2024 12:53:51 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D20B420851
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1729680831;
-	bh=BCuSOqqZ/r5jqkFe+vBmbyLNl/+cRzHkmTdEJNVTVtc=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=M6qcBaUBEaRpEBqHbOIxAVw4kZJcLf1mStzaAFoO+iJ3+glprWf8/UfVqilu9unMS
-	 Yj530MknJ94E2uGajIfrsFbd1YgmZNxHnfAXm9c50oIggExOVgG045BeOIp66NVxGH
-	 qTqpZWdrwyrtPO0emAs/R+5Q9e1EPMp4iXA0DMiP2PxpoWqx8bEmZ8xGbho63VIIhl
-	 HkPNV0r73aaSMC1gDW74A3mImSOa7OgzmTRm3E6JhnnOAUxY2P5vfIS1BbTq5tuJ+q
-	 9PHwJye1PwfWQP0toPSVh9qX6eDHdznkBFZGC2N5CwjEI7oxud5ViRDnYoTR+AmTC0
-	 9QJSoha083mPA==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 23 Oct 2024 12:53:51 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 23 Oct
- 2024 12:53:51 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id CF7C63184DD3; Wed, 23 Oct 2024 12:53:50 +0200 (CEST)
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Tobias Brunner <tobias@strongswan.org>, Antony Antony
-	<antony.antony@secunet.com>, Daniel Xu <dxu@dxuuu.xyz>, Paul Wouters
-	<paul@nohats.ca>, Simon Horman <horms@kernel.org>, Sabrina Dubroca
-	<sd@queasysnail.net>
-CC: Steffen Klassert <steffen.klassert@secunet.com>, <netdev@vger.kernel.org>,
-	<devel@linux-ipsec.org>
-Subject: [PATCH v3 ipsec-next 4/4] xfrm: Restrict percpu SA attribute to specific netlink message types
-Date: Wed, 23 Oct 2024 12:53:45 +0200
-Message-ID: <20241023105345.1376856-5-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241023105345.1376856-1-steffen.klassert@secunet.com>
-References: <20241023105345.1376856-1-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1729680966; c=relaxed/simple;
+	bh=2uZmCdan2XO0Cl6IjNWW2Vbysd7BOfysAd/eGyKtjho=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=RYnzOOkL0B3xf6czTm9BcMBiSUvOzWvRLUvmrNSirSxgtrZBAHyqVndMmG/MuflA3BA+tRvupQpKgkfdR/I3ES4ZjZy/nRC/amGXwsuWTSv+gwQo9EQjt+gPFXT2QxTlvtfY5UBIqAHG81tFsZNL6ss5XHYBT+dAGLVdIksgp5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=nU7UGMDK; arc=none smtp.client-ip=185.70.40.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1729680956; x=1729940156;
+	bh=2uZmCdan2XO0Cl6IjNWW2Vbysd7BOfysAd/eGyKtjho=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=nU7UGMDK8WFIn/KVA5W9N1NEqSwT8UQE0fS8bECjDpD2ZiPAzyyljte+fEi4gpSeP
+	 MnGDOCFdknAj583jHSX7ECsALTfg66OszSBNofUJpIsZYnJleMB2UhPiz0fh/hN1Gg
+	 t9UQCpjJv+3WmXZTYUKzsNwZU++PSa/pdsuU92YQbbk+YNmprbZQ5ORoIl89u1y1Fv
+	 tA+09hbvn4vMvOsPCG+oDWCAxwiQ/fwwYYlrmQfFKs/7bbxnvek/Vo91SXoeMEkPuG
+	 xM1psDgryCSiA474uepaqdbzVyWeBaXpXhxEjg0SlqU14v/WvQHco5bRMaBHD/gEHJ
+	 Mjp/mmDmcMg2Q==
+Date: Wed, 23 Oct 2024 10:55:51 +0000
+To: "patches@lists.linux.dev" <patches@lists.linux.dev>
+From: jisralbasha <jisralbasha@proton.me>
+Cc: "linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-fpga@vger.kernel.org" <linux-fpga@vger.kernel.org>, "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>, "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>, "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>, "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, "linux-spi@vger.kernel.org" <linux-spi@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ntb@lists.linux.dev" <ntb@lists.linux.dev>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "wangyuli@uniontech.com" <wangyuli@uniontech.com>, "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] MAINTAINERS: Remove some entries due to various compliance requirements
+Message-ID: <CpPiTF0xZwq_zhrYVO2pCA9TxAmJi_zwVBmyl9Z1RHKCjgf332fcmsc86C_1CMaZPNLlIDcvqOIWa1vR2lr2qMaZpcyIisxLqL1IVvq9ZNQ=@proton.me>
+Feedback-ID: 94463129:user:proton
+X-Pm-Message-ID: 5a8ecfa1aba099d9d2341478826b3c35ab4c778b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reject the usage of XFRMA_SA_PCPU in xfrm netlink messages when
-it's not applicable.
+Dear Greg and other LF members,
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/xfrm/xfrm_user.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+I'm writing to express my serious concerns about the recent removal of entr=
+ies from the MAINTAINERS file without proper explanation. While I understan=
+d the statement cited "various compliance requirements," this vague justifi=
+cation is deeply troubling.
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index a9d071c93836..7bf7c870b851 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3276,6 +3276,20 @@ static int xfrm_reject_unused_attr(int type, struct nlattr **attrs,
- 		}
- 	}
- 
-+	if (attrs[XFRMA_SA_PCPU]) {
-+		switch (type) {
-+		case XFRM_MSG_NEWSA:
-+		case XFRM_MSG_UPDSA:
-+		case XFRM_MSG_ALLOCSPI:
-+		case XFRM_MSG_ACQUIRE:
-+
-+			break;
-+		default:
-+			NL_SET_ERR_MSG(extack, "Invalid attribute SA_PCPU");
-+			return -EINVAL;
-+		}
-+	}
-+
- 	return 0;
- }
- 
--- 
-2.34.1
+Blindly complying with demands for obscure changes sets a dangerous precede=
+nt. What happens next time? Will we see further removals, modifications, or=
+ even additions driven by external pressures rather than the best interests=
+ of the project and its community?
 
+This incident raises fundamental questions about the autonomy and integrity=
+ of our open-source project. =C2=A0Should we be at the mercy of unspecified=
+ "compliance requirements" that could potentially lead to harmful actions, =
+such as:
+
+"Update some entries due to various compliance requirements." (and explode =
+some Russian laptops like pagers in Lebanon, or disable all intel processor=
+s in sanctioned countries).
+
+I strongly urge the LF to reconsider this approach and prioritize transpare=
+ncy and community engagement in all decision-making processes. This include=
+s providing detailed explanations for any future changes to critical projec=
+t files like MAINTAINERS. Additionally, we should explore strategies to mit=
+igate external pressures and ensure the long-term health and independence o=
+f our project.
+
+P.S. Keep communications public
 
