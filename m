@@ -1,125 +1,192 @@
-Return-Path: <netdev+bounces-138401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66CC9AD551
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:07:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 060C29AD5C5
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFF722828D3
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 20:07:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 848C11F22CD7
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 20:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB961D90A5;
-	Wed, 23 Oct 2024 20:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B9F1CEE8A;
+	Wed, 23 Oct 2024 20:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Vo2MbbFb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbsmEFuB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DAB1E51D
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 20:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937CC149013;
+	Wed, 23 Oct 2024 20:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729714063; cv=none; b=OzMbFT0GHDviLcLsheNy1HTfLqzzpRqcFpTrNHEwMx7g1UiVgrk9PzxmZgVAqojbkeb8RMNchugsVA1eHQIRMcV/30PNd1hQmoV2BkaNmYYhIXIeZbv2wsG+XWopEdb7hsbRqceEak4dFtb39IHvFvU1yHn6MxrRrhIn+obqjNs=
+	t=1729716581; cv=none; b=eD1U0nnnRMYbVtPckwqsNU9pXIz11q8dEtReJGYfuLn1WpLnvhGEVF3q3o086uZP4OIbPwFNFavFoDF4MgrGOiN669sKQggmDaAG/ZnmLwiWjdPNxSywQxkd63KBTTrPA9qVHL8OcIT9dkarKMBEl1t9i3RbqP+0+RevazHb1xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729714063; c=relaxed/simple;
-	bh=Oc9T20sL9GzDJ9MXtms2CQ0BCWRW+F5FKpOhylFGpDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sWTvjUjMvI607Zed1CgKe226qfMDIs1opY7IQsAhPxJ08gSAh56EF8b1B98oTg/xKB6pjt7bVUekDb23UtAFxExX9tpQonQxg7aDPkfszKi6du00HoXkCwhASqrNjFffDZTe5us2JM23W24VaEvFOZmM4K4f3E/88Pk3o9B6CbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Vo2MbbFb; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-83aba65556cso6503739f.3
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 13:07:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1729714061; x=1730318861; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zQKCB6RcE9DVN+QliMh7NeyWWCz4zTZwRk5ZndcDook=;
-        b=Vo2MbbFbPn0ZCnv0gEXyhdVaNups0TZtS4zjZpm0XkI9OQYPrqCVd+UpXaLtSISliH
-         XEwOANiArFbRlz7jJq/6/vUcbjajD5GHhzifR/noYAQ/ZqyQ98cqqx1m3r1QtIL1QyYF
-         GfO9XYCnchMgh4D8KIxqJ9leAE5o+ejOymr18=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729714061; x=1730318861;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zQKCB6RcE9DVN+QliMh7NeyWWCz4zTZwRk5ZndcDook=;
-        b=xPTN8buVg5rhc5iItblLmS4kHgHmzPewO0B3NqLMKkr4PNRXY+9Nol8N6GJndD8Jgg
-         T/Vb1dPZq5x9jK6zeQ7GcxEZcPaYiAb/jmqGnogMY6YLpVNtJ5B+J4PTwHY+eJAu3sns
-         aJEYjdNrZ7k1bLnAwyppdBhAi4bkg+ToEJ5LL+SHQD3pEVVXGU2Gju3QEkV4o8HXsq6T
-         6weEyLHUWlXRTK7hhuItCBhSjlaaTpYABF0E46EPX4ylFXGUWQfOdTlqrvM8kCyf57i3
-         z6xx3MPKFKcQyFC1dcTs0pmDJhf4ou4jKjanMN4uu/bI7RhaNxh9DH4VxFcmZQhtUWOq
-         KtRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/ocKot08QC7MCAG4A9Ew1/Zu/YJgyOFp+1bv+MBaRHa5Ig3k6ifSH5N+shtDtDnr6YGQzamg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+a6sqTokSLio9bhgikW02ixEm7/C4YVt8G6x9ltJJ+DngyN3m
-	Azqs7WpFGye0NP4r/0sCVeaVRS4VB1WpyP18ZScH3KvtE85/ZyYI0VbjHmy8tQA=
-X-Google-Smtp-Source: AGHT+IGJAXZLXw8YfyNAKL+7k84dokIL7fMfI0LUJtlRPUYDDDSyMVeTAwledsk56TvI+yeEVlnQuw==
-X-Received: by 2002:a05:6602:641e:b0:83a:a82b:f856 with SMTP id ca18e2360f4ac-83af614d256mr368001339f.3.1729714060543;
-        Wed, 23 Oct 2024 13:07:40 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a5570fesm2242840173.51.2024.10.23.13.07.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2024 13:07:39 -0700 (PDT)
-Message-ID: <477cac2e-606d-4c78-ba5e-ce7e594bb6f5@linuxfoundation.org>
-Date: Wed, 23 Oct 2024 14:07:38 -0600
+	s=arc-20240116; t=1729716581; c=relaxed/simple;
+	bh=D6rOAupw7nWaOfhbwJhOxY7u+4yNaJ1nMm3CkyxSZ4I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fvBqNmduASY6S8mSJoNeJAcpyIvjEAp38CV8X0G70jy69PDp0K9H9WmU/TFd2Wgd5hVF7oWH/XBTpxDhqLsisKvinXfj8X1dbrP8r0YnC7pSc6cLSLd55YSGqJchq+5UUuvJqo8Ik0P90atfphQc3wzIe9Kuy8im3gAPb2GN16w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SbsmEFuB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 612EEC4CEC6;
+	Wed, 23 Oct 2024 20:49:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729716581;
+	bh=D6rOAupw7nWaOfhbwJhOxY7u+4yNaJ1nMm3CkyxSZ4I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SbsmEFuBcYBJxfd9aKYJEJhvm5sOCBpuq3Gkw8XBVAgaBVAtodo4MzzFydgz9lmre
+	 lYFf+4Bc3gblOkDrHaTeXYplOKsx+ARhDq7I84evZ9AqNJW6sdl8mkvHTdvLRiNWq7
+	 HIxQV0FTIhIlXU1I0UWU0dYoCb4/La4ArGqqwj83V1yPu64TjVihcSJtg+Lv4hnx7j
+	 nsU4mql2Gn/IGBFQELdRYpyG77D96qEA7RspsiJJx3jVWn3y5NFarKPXPlN+Fhh4du
+	 ljtB6NwbDGGW5+zuy3s8XNOWGeFaUUoztmYHWjCyMnJg20bW3Ehuw32LgawaSV0yAA
+	 ne0ctkmBg3+FQ==
+Date: Wed, 23 Oct 2024 21:49:34 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Chen Wang <unicorn_wang@outlook.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Inochi Amaoto <inochiama@outlook.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: Add support for Sophgo SG2044 dwmac
+Message-ID: <20241023-paper-crease-befa8239f7f0@spud>
+References: <20241021103617.653386-1-inochiama@gmail.com>
+ <20241021103617.653386-3-inochiama@gmail.com>
+ <20241022-crisply-brute-45f98632ef78@spud>
+ <yt2idyivivcxctosec3lwkjbmr4tmctbs4viefxsuqlsvihdeh@alya6g27625l>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/8] selftests: net: lib: Move logging from
- forwarding/lib.sh here
-To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, mlxsw@nvidia.com,
- Shuah Khan <shuah@kernel.org>, Benjamin Poirier <bpoirier@nvidia.com>,
- Hangbin Liu <liuhangbin@gmail.com>, linux-kselftest@vger.kernel.org,
- Jiri Pirko <jiri@resnulli.us>, Shuah Khan <skhan@linuxfoundation.org>
-References: <cover.1729607879.git.petrm@nvidia.com>
- <4421094dd36be3714eeea70d577ff761454de3b3.1729607879.git.petrm@nvidia.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <4421094dd36be3714eeea70d577ff761454de3b3.1729607879.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="HZ3OWjJABGOCrTlm"
+Content-Disposition: inline
+In-Reply-To: <yt2idyivivcxctosec3lwkjbmr4tmctbs4viefxsuqlsvihdeh@alya6g27625l>
 
-On 10/22/24 08:50, Petr Machata wrote:
-> Many net selftests invent their own logging helpers. These really should be
-> in a library sourced by these tests. Currently forwarding/lib.sh has a
-> suite of perfectly fine logging helpers, but sourcing a forwarding/ library
-> from a higher-level directory smells of layering violation. In this patch,
-> move the logging helpers to net/lib.sh so that every net test can use them.
-> 
-> Together with the logging helpers, it's also necessary to move
-> pause_on_fail(), and EXIT_STATUS and RET.
-> 
-> Existing lib.sh users might be using these same names for their functions
-> or variables. However lib.sh is always sourced near the top of the
-> file (checked), and whatever new definitions will simply override the ones
-> provided by lib.sh.
 
-I like the direction to leverage and make logging functions
-common. It make sense to use prefix to clearly indicate
-that they are common and to namespace conflicts in the future.
+--HZ3OWjJABGOCrTlm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Amit Cohen <amcohen@nvidia.com>
-> ---
-> CC: Shuah Khan <shuah@kernel.org>
+On Wed, Oct 23, 2024 at 08:31:24AM +0800, Inochi Amaoto wrote:
+> On Tue, Oct 22, 2024 at 06:28:06PM +0100, Conor Dooley wrote:
+> > On Mon, Oct 21, 2024 at 06:36:15PM +0800, Inochi Amaoto wrote:
+> > > The GMAC IP on SG2044 is almost a standard Synopsys DesignWare MAC
+> > > with some extra clock.
+> > >=20
+> > > Add necessary compatible string for this device.
+> > >=20
+> > > Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> > > ---
+> > >  .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+> > >  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 145 ++++++++++++++++=
+++
+> > >  2 files changed, 146 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg20=
+44-dwmac.yaml
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/=
+Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > index 3c4007cb65f8..69f6bb36970b 100644
+> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > @@ -99,6 +99,7 @@ properties:
+> > >          - snps,dwmac-5.30a
+> > >          - snps,dwxgmac
+> > >          - snps,dwxgmac-2.10
+> > > +        - sophgo,sg2044-dwmac
+> > >          - starfive,jh7100-dwmac
+> > >          - starfive,jh7110-dwmac
+> > > =20
+> > > diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwma=
+c.yaml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+> > > new file mode 100644
+> > > index 000000000000..93c41550b0b6
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+> > > @@ -0,0 +1,145 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/net/sophgo,sg2044-dwmac.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: StarFive JH7110 DWMAC glue layer
+> > > +
+> > > +maintainers:
+> > > +  - Inochi Amaoto <inochiama@gmail.com>
+> > > +
+> > > +select:
+> > > +  properties:
+> > > +    compatible:
+> > > +      contains:
+> > > +        enum:
+> > > +          - sophgo,sg2044-dwmac
+> > > +  required:
+> > > +    - compatible
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    items:
+> > > +      - const: sophgo,sg2044-dwmac
+> > > +      - const: snps,dwmac-5.30a
+> > > +
+> > > +  reg:
+> > > +    maxItems: 1
+> > > +
+> > > +  clocks:
+> > > +    items:
+> > > +      - description: GMAC main clock
+> > > +      - description: PTP clock
+> > > +      - description: TX clock
+> > > +
+> > > +  clock-names:
+> > > +    items:
+> > > +      - const: stmmaceth
+> > > +      - const: ptp_ref
+> > > +      - const: tx
+> > > +
+> > > +  sophgo,syscon:
+> >=20
+> > How many dwmac instances does the sg2044 have?
+> >=20
+>=20
+> Only one, there is another 100G dwxgmac instance, but it does not
+> use this syscon.
 
-Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+That dwxgmac is a different device, with a different compatible etc?
 
-for all patches 4/8 through 8/8 I have been cc'ed on.
+--HZ3OWjJABGOCrTlm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-thanks,
--- Shuah
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZxlhXgAKCRB4tDGHoIJi
+0pO0AQD5Swmhv1mfvz5DiD/5f5DGV3m+rvoUAhPp697EkSD9KgD/fnWAmf29z3yR
+O/N/hNkW71ULWbchz7jsFDwGdd6q4Ao=
+=k7np
+-----END PGP SIGNATURE-----
+
+--HZ3OWjJABGOCrTlm--
 
