@@ -1,212 +1,271 @@
-Return-Path: <netdev+bounces-138383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E009AD403
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 20:33:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0909C9AD408
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 20:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F9681C20C9E
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 18:33:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29CB01C203B7
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 18:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E89C1D0418;
-	Wed, 23 Oct 2024 18:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82321D041B;
+	Wed, 23 Oct 2024 18:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="X52IXmuc"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HY1t8cDH"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazolkn19012051.outbound.protection.outlook.com [52.103.20.51])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708101474D9;
-	Wed, 23 Oct 2024 18:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.20.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729708381; cv=fail; b=BennqmzSjn+JjAiTIHN9L7wLj1zco7k3bK5Vyb+jjt3ExFkmFn7GZjREzz500FrOCmwNoLHkqg8FrZEpTggUNmwjH+o1+OA8t3P89fdRm+banc/JaUhr/Z2L3TIxl/UI8Z7girTgIsG+Mo0q9ezytu9W0yn1IM5oEDjje1JtumA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729708381; c=relaxed/simple;
-	bh=whA2JyicEbUahsVBR6dZfHqBhbXai16Lju8waqdEdKw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GGmjnLQ4oQgh+YG/9M+9zKaea/5gfkll+iMrXCIBm3oaJnw8BG1O282xEORwUxzTZPP+UDigU4FRNUSC2Myy5JVx84QKzs14PySDBl0ykaS4Zp2mQU3oa4jygxA83czWUNBko8BUmhNuw3ux5Vyhh4h2JUKMqqOQRS84nApxYk8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=X52IXmuc; arc=fail smtp.client-ip=52.103.20.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o52zE4TwkHqKhbdtYSOJ/bh6XHJkfD4t3MfY04K2LLwKDgHOv9A93OFlimRr9Ezus5Q3mlDvrSxcpbqPMQ/X1sT1sEi5nqlb3V6nGuHr5bGBSsoM1ZVG8t6v5HIY/qE3FgLfiQ0M5Sbm2P+/o0yRadPPg8S5iSMQuvknS4S1PvKFtjp7v2zNDjmfwa3OaM0bQpGnD9Lyj8b5bvqXSTkyMASTeDdon5fcmpPMAc33yvD9SqnnlQBIkLWJ/BrAV8/Y+CkhY9gHAo8XbaTYhNImMJDhHNhBAHQpbKYkotUpFMWqNoBXgE5ZrAx98LaZmsDcsKStOiX6c6zhT+J3WqbwBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zJIGQUcepuYiINMQxiEXnCpZPvyrJxDKc4luqEkf6Q0=;
- b=oJTburLRFp4HwGQbvNzyOjztYMW9kv1VnsuLtrt4ZgLsSOLyRWIEx5vtcJ7JmOkYzKib4/Fvy3PIhdgehF4i54zl3yFZYneRu5pYmIMp8YL/iS5gaiDVhbnNfcNFkD/QqFR/h7RiYGe4JkIDUbXMA736zVt7GAlstLSSzEIEtL+me28Le1Uz8b5h+N/qnnWFZDSW4Dg0M1s1Vz8NKjGIrHCZ4yDj7FYG3XbXeCOBA9+tAnzy8/CUbhmsfX4SO/Ga7CDVRK10a9E+/GpWXQDK/CfVT696lzWjs5bDU8Heu+mCdZmYm373b3Sy3CxH/1cI3RPQC2zxnMLnn5DY5Ca2iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zJIGQUcepuYiINMQxiEXnCpZPvyrJxDKc4luqEkf6Q0=;
- b=X52IXmucWAtdWBNhrzoCbzpZeJWYPCQdTNHxjboZQqYcCMpm7haW+D3Qye351Spbsd1sRzLfP++fxHanoMCEALaYKSmwWBqanuOetcypHy7XfJxZU+5EAjlnJ8y26uopG23Zv/7i3GPCveohbDlmyw4xp6JHAkDRUZYbOPE6e0wLddXDonsb3onC6INcqbV7yhnqUqYTgIdQgqtqDdiGDCJfNs981zglw2CM9mnghyILc4KCEMv3Ffx4mXT+sN9l4WxlzYWedLOa8PkdujGq8Rq3imZ1KATG5I2N3K9OuKMxF0BEwweNfSz5ObQ2IrVscWys3hw0y7vXQKe7gSSNHw==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by SA2PR02MB7818.namprd02.prod.outlook.com (2603:10b6:806:135::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.17; Wed, 23 Oct
- 2024 18:32:55 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%3]) with mapi id 15.20.8069.016; Wed, 23 Oct 2024
- 18:32:55 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>, "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>
-CC: "kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com"
-	<haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
-	"luto@kernel.org" <luto@kernel.org>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
-	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>,
-	"daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>, "joro@8bytes.org"
-	<joro@8bytes.org>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "lpieralisi@kernel.org"
-	<lpieralisi@kernel.org>, "kw@linux.com" <kw@linux.com>, "robh@kernel.org"
-	<robh@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>,
-	"arnd@arndb.de" <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
-	"jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
-	"muminulrussell@gmail.com" <muminulrussell@gmail.com>,
-	"skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
-	"mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>
-Subject: RE: [PATCH 0/5] Add new headers for Hyper-V Dom0
-Thread-Topic: [PATCH 0/5] Add new headers for Hyper-V Dom0
-Thread-Index: AQHbFc3gheIHrTrmm0yVUene//yVY7J/bLBwgBQy+4CAASapQA==
-Date: Wed, 23 Oct 2024 18:32:55 +0000
-Message-ID:
- <SN6PR02MB4157A9D52A882A2109590708D44D2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References:
- <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
- <725bac7d-5758-44fd-82cc-29fb85d8c53f@linux.microsoft.com>
-In-Reply-To: <725bac7d-5758-44fd-82cc-29fb85d8c53f@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|SA2PR02MB7818:EE_
-x-ms-office365-filtering-correlation-id: d106ae6f-fe77-45b0-80a1-08dcf3911cad
-x-microsoft-antispam:
- BCL:0;ARA:14566002|461199028|19110799003|8062599003|8060799006|15080799006|440099028|3412199025|102099032|56899033;
-x-microsoft-antispam-message-info:
- VKljilNyhGh7Xncxzl/8iHWUY6fEqaKXLxD4wZfPoMKmG5ya9/Jm9w7Lspvjvd/OA+Zr349iNZ/bSy9xlR65RsfY7gvfdb4KaPWknZ7+96EUyMCJeFHvCK8khlPWzBx5jNluQ2/BWZtjhQHaT/FBMSE4SUXCNhuwEmBks3FBDbfuDoW0PhVydV3W3nySZOqI3CrQC3GaiiMIaDWoAPysHihcDPvkJx8kgyTNVqB5koAmkNrGkisa2HzdJD6h2rJUklCT7DsDtVR/DQVOuMFNlnC4M2mnfX1+msUVU9VmnNq7ih4jMOUdYMmJnadlbK426jwv2xY9Ov03i1cFEWQQjSAX5X4Bc4/pKkyFl9spoQBlGCTA+/N3677rw21LJXhuV7x1h1mxf2X9IYOSJ2Vcn/qgLJdKl6VPebruooYFWCtbWu+YqzBNgtaac6RFLI+XPe15Xxn9PZEGO0kd+F9fvmoe3Q+x0+mqtUSupR0k46W9UPqBo7kl8zWcBejYVVL3ZIQqK0ZQZOKoAgDAe42w87KEf31iURz19yOCPS/xUz8OqcOQbETQ1Wn5HKBGz2isQlmAcPx8OOG4TrP+5wiLX3hYyz6IRLMTgN+lEZkAtWGhQ+0YV2ZIOVef8oUkV8gxx23H+fcldkWkkzJtGNVhTl7py42f9ihN3FjsBRqzWdLzRdOO430iBQLR97xt/W1CX3teV9zUfNgdodwobnFOPQ==
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?AHQFqsehxhiVeP76Z+uAOVsL2Hilkjih1uCzMZ0NbkXN5or8SJ1PedLEyYPN?=
- =?us-ascii?Q?W/ch4t6JHdqabBk/+awlnSdkPeYx+sE2dPlI/jY/NBwovs01IoJy+idxAjS0?=
- =?us-ascii?Q?Msly8r/tfIh8zkFSvOIhQcvfzpm+LJABdHK4+pq2gIBV/DTMkiBFpViowM1L?=
- =?us-ascii?Q?RCPu/m3gLMN9WKjY1NoYwtVSu17IV5Kek/ef4HLn9CRMsOdc/rONLUIETqw2?=
- =?us-ascii?Q?Cv60Uo72l6YDXUVBXXX4z7Qt57b/m0PpCU9rmULVi1IHdz1dRLXJr5Vj/P24?=
- =?us-ascii?Q?gW/m15bruXuEK6C7J9c/KTAv6eEjlajWytmgT4g4jyD53fhVpF4RYaIjqG/p?=
- =?us-ascii?Q?EOF5xM3C5LEfp1m95bjJsGay75C9Zl6+OSOjrHJYcflEWlTO6nTR+6eJs9l8?=
- =?us-ascii?Q?Y5fmNwlgPTirZNTwOt7fY/+WI8UOGZcLnBxStz/t+lmOQlcMB21lmQ0JteIZ?=
- =?us-ascii?Q?c51omprzRl1DRLvWS3vsZu0WRBR3Wc9jfnTiXYtTIuMI/FCcMcrjVT18vnqn?=
- =?us-ascii?Q?nBYsmBlh85c11Rgo6r45acyPpW6EQnSCN3HWaz1kVvXK4fDEbA7Rs0pF7NN2?=
- =?us-ascii?Q?9jaNWXf9AY1gnLl6vvJSvL2BCQN9aW/OBTg4gpoCqdK+hDj6En4bIXH3I9uU?=
- =?us-ascii?Q?jkrStxuDINCOfa1Cr6DYDg64tu4pW6saWAphO5LUMioaoa2d3NXX/m9CQZRN?=
- =?us-ascii?Q?T6qRM1Kd260u6/XMokcnuyV9rPb5w9y0pSJyhFOzluc7InheXiRcTw6GIQy2?=
- =?us-ascii?Q?xpNA176qa7+7gjM7xpz4wdISxJ+izL0arosO7FC58WNWZJD0rrLKu98SqYnk?=
- =?us-ascii?Q?Zrzr6lGMU12ic5fIfCWnH01pRq13gyJETFJCDrL9QjcY4raG1AAcGJecCW/l?=
- =?us-ascii?Q?p5ScZygeajenK+j8J2FFcNO75060qdh2EQKqPFg98IWTCs1c6O7uz+tbEXyj?=
- =?us-ascii?Q?aD7UIgnA5UR2iUkIKxCCmG7Y+SmrxSww2k3mdwaXfW/VRiAg3y4y1usqQ9lc?=
- =?us-ascii?Q?saFosb2Spk6OJiU/1sGC5Uj5X5Yb2PR9DlRBxHAkZFYIZiihXbGrbKU7S0cN?=
- =?us-ascii?Q?1b97FZ8X2i5AKzliTjpyfha/RaHpc2pzCZT+rpRu4kH/l5NSkVqEpFibBaSc?=
- =?us-ascii?Q?oADidR7G1obKD0hc3gEocLAJneRHdrGflVQDDwvIW6/4p74sHL9Yyhg6m7m6?=
- =?us-ascii?Q?znekee52zubbjRGfs5p8lPJNiDz0mWR+838XrQnbG6UKBJ6C95dJcmr9P1c?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49ED154C0B;
+	Wed, 23 Oct 2024 18:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729708400; cv=none; b=AIU+TmLsUAQdtgBjzwLEJ/YVKDCW8GXKLzku6G0aqoe87OE6wSw1+2X1TFMRSbSaTPi1Fb3Eo5j0fn9UBJDoCR2d65zAObsexnc7dClKZv9YDU0XWbFEu8hxXTdhGIHeHlGUOPBZc6il9sxFRPb7PQbCInpSExbgSXamrAd3Cf0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729708400; c=relaxed/simple;
+	bh=jTmoWEA/AvudZiXAP5wmbx3SBQUJFGbhGS0+jYMgA9s=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HoKEW1T8bOcvdYuwcLjLLCZUm1rGUzkzP83OzFKK840P4O9PndZrzIkwVTOKGStBUo2kTMxW/HVlD67qmpTCiWgfcLd+TXyuV8TaP1gNPsUE7/144g0fsIAoT9NaHdcs6qpjUzU+qu/QVH41xMsITEr4WsA+bLXJd4XAR1LAHhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HY1t8cDH; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1729708399; x=1761244399;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jTmoWEA/AvudZiXAP5wmbx3SBQUJFGbhGS0+jYMgA9s=;
+  b=HY1t8cDHIZAR1ms0PILUxnS3UPW1teJyg1nR0Lf5gGmaTX6V1ontXqId
+   LMFvwHrIRreDx7mRWwEubInf6M8cHcyw8Ky02L9MjxJyqnuhq2cQDJRL9
+   yf3NbZhzTzcTypGaKWfvO+dPy23v6+ZZdSCy/nlMfE18NKWdyQ51PsMxr
+   xslV0lf5mOb6Vy2YLhV+HzgOLsKa8MGnSoYiordTXUIvy/1UGlG30fQCz
+   +VdJaEC29j9mfSW7zeiSLLW/sDksyIIEGzC+dXGFZs1htp26NjvSf6ARX
+   G2DMG61kchG85BcTpejtF4hhXtxi1naOJPOGjiiFrqk+PbyjYZQOm7kMc
+   Q==;
+X-CSE-ConnectionGUID: JDex8fWsSkymE6te52D0xA==
+X-CSE-MsgGUID: BgJUY6LtTXG7CdeXOxbaSQ==
+X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
+   d="scan'208";a="33404578"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 11:33:12 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 23 Oct 2024 11:33:06 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 23 Oct 2024 11:33:02 -0700
+Date: Wed, 23 Oct 2024 18:33:01 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <andrew@lunn.ch>, Lars Povlsen
+	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
+	<horatiu.vultur@microchip.com>, <jensemil.schulzostergaard@microchip.com>,
+	<Parthiban.Veerasooran@microchip.com>, <Raju.Lakkaraju@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, Richard Cochran <richardcochran@gmail.com>,
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, <jacob.e.keller@intel.com>,
+	<ast@fiberby.net>, <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<devicetree@vger.kernel.org>
+Subject: Re: [PATCH net-next 14/15] net: sparx5: add compatible strings for
+ lan969x and verify the target
+Message-ID: <20241023183301.5st3aa23ad6nl5xz@DEN-DL-M70577>
+References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
+ <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
+ <cetor3ohhg6rzf3w2cm6hqxsqukh52nm54mp7tizb2qc3x44j4@n53v6btq6t6r>
+ <20241023110034.jpwoblwrds3ln5nr@DEN-DL-M70577>
+ <24b18f9e-6fbd-48cc-96bd-e634d0af9824@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: d106ae6f-fe77-45b0-80a1-08dcf3911cad
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2024 18:32:55.6164
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR02MB7818
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <24b18f9e-6fbd-48cc-96bd-e634d0af9824@kernel.org>
 
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Tuesday, Octo=
-ber 22, 2024 5:51 PM
->=20
-> On 10/10/2024 11:21 AM, Michael Kelley wrote:
+> > Hi Krzysztof,
 > >
-
-[snip]
-
-> > Have you considered user space code that uses
-> > include/linux/hyperv.h? Which of the two schemes will it use? That code
-> > needs to compile correctly on x86 and ARM64 after your changes.
-> > User space code includes the separate DPDK project, and some of the
-> > tools in the kernel tree under tools/hv. Anything that uses the
-> > uio_hv_generic.c driver falls into this category.
+> >>> Add compatible strings for the twelve lan969x SKU's (Stock Keeping Unit)
+> >>> that we support, and verify that the devicetree target is supported by
+> >>> the chip target.
+> >>>
+> >>> Each SKU supports different bandwidths and features (see [1] for
+> >>> details). We want to be able to run a SKU with a lower bandwidth and/or
+> >>> feature set, than what is supported by the actual chip. In order to
+> >>> accomplish this we:
+> >>>
+> >>>     - add new field sparx5->target_dt that reflects the target from the
+> >>>       devicetree (compatible string).
+> >>>
+> >>>     - compare the devicetree target with the actual chip target. If the
+> >>>       bandwidth and features provided by the devicetree target is
+> >>>       supported by the chip, we approve - otherwise reject.
+> >>>
+> >>>     - set the core clock and features based on the devicetree target
+> >>>
+> >>> [1] https://www.microchip.com/en-us/product/lan9698
+> >>>
+> >>> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> >>> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> >>> ---
+> >>>  drivers/net/ethernet/microchip/sparx5/Makefile     |   1 +
+> >>>  .../net/ethernet/microchip/sparx5/sparx5_main.c    | 194 ++++++++++++++++++++-
+> >>>  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   1 +
+> >>>  3 files changed, 193 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/drivers/net/ethernet/microchip/sparx5/Makefile b/drivers/net/ethernet/microchip/sparx5/Makefile
+> >>> index 3435ca86dd70..8fe302415563 100644
+> >>> --- a/drivers/net/ethernet/microchip/sparx5/Makefile
+> >>> +++ b/drivers/net/ethernet/microchip/sparx5/Makefile
+> >>> @@ -19,3 +19,4 @@ sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o
+> >>>  # Provide include files
+> >>>  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/vcap
+> >>>  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
+> >>> +ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/lan969x
+> >>> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> >>> index 5c986c373b3e..edbe639d98c5 100644
+> >>> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> >>> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> >>> @@ -24,6 +24,8 @@
+> >>>  #include <linux/types.h>
+> >>>  #include <linux/reset.h>
+> >>>
+> >>> +#include "lan969x.h" /* lan969x_desc */
+> >>> +
+> >>>  #include "sparx5_main_regs.h"
+> >>>  #include "sparx5_main.h"
+> >>>  #include "sparx5_port.h"
+> >>> @@ -227,6 +229,168 @@ bool is_sparx5(struct sparx5 *sparx5)
+> >>>       }
+> >>>  }
+> >>>
+> >>> +/* Set the devicetree target based on the compatible string */
+> >>> +static int sparx5_set_target_dt(struct sparx5 *sparx5)
+> >>> +{
+> >>> +     struct device_node *node = sparx5->pdev->dev.of_node;
+> >>> +
+> >>> +     if (is_sparx5(sparx5))
+> >>> +             /* For Sparx5 the devicetree target is always the chip target */
+> >>> +             sparx5->target_dt = sparx5->target_ct;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9691-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9691VAO;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9692-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9692VAO;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9693-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9693VAO;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9694-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9694;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9695-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9694TSN;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9696-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9696;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9697-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9696TSN;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9698-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9698;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan9699-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9698TSN;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan969a-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9694RED;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan969b-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9696RED;
+> >>> +     else if (of_device_is_compatible(node, "microchip,lan969c-switch"))
+> >>> +             sparx5->target_dt = SPX5_TARGET_CT_LAN9698RED;
+> >>> +     else
+> >>> +             return -EINVAL;
+> >>> +
+> >>> +     return 0;
+> >>> +}
+> >>> +
+> >>> +/* Compare the devicetree target with the chip target.
+> >>> + * Make sure the chip target supports the features and bandwidth requested
+> >>> + * from the devicetree target.
+> >>> + */
+> >>> +static int sparx5_verify_target(struct sparx5 *sparx5)
+> >>> +{
+> >>> +     switch (sparx5->target_dt) {
+> >>> +     case SPX5_TARGET_CT_7546:
+> >>> +     case SPX5_TARGET_CT_7549:
+> >>> +     case SPX5_TARGET_CT_7552:
+> >>> +     case SPX5_TARGET_CT_7556:
+> >>> +     case SPX5_TARGET_CT_7558:
+> >>> +     case SPX5_TARGET_CT_7546TSN:
+> >>> +     case SPX5_TARGET_CT_7549TSN:
+> >>> +     case SPX5_TARGET_CT_7552TSN:
+> >>> +     case SPX5_TARGET_CT_7556TSN:
+> >>> +     case SPX5_TARGET_CT_7558TSN:
+> >>> +             return 0;
+> >>
+> >> All this is weird. Why would you verify? You were matched, it cannot be
+> >> mis-matching.
 > >
-> Unless I misunderstand something, the uapi code isn't affected at all
-> by this patch set. e.g. the code in tools/hv uses include/uapi/linux/hype=
-rv.h,
-> which doesn't include any other Hyper-V headers.
->=20
-> I'm not aware of how the DPDK project uses the Hyper-V definitions, but i=
-f it
-> is getting headers from uapi it should also be unaffected.
-
-You are right.  My mistake. User space code based on uio_hv_generic.c
-maps the VMBus ring buffers into user space, and I thought that code
-was pulling "struct hv_ring_buffer" from include/linux/hyperv.h file. But
-DPDK and the tools/hv code each have their own completely separate
-header file with the equivalent of "struct hv_ring_buffer". Duplicating
-the ring buffer structure in multiple places probably isn't ideal, but the
-decoupling helps in this case. ;-)
-
->=20
-> > I think there's also user space code that is built for vDSO that might =
-pull
-> > in the .h files you are modifying. There are in-progress patches dealin=
-g
-> > with vDSO include files, such as [1]. My general comment on vDSO
-> > is to be careful in making #include file changes that it uses, but I'm
-> > not knowledgeable enough on how vDSO is built to give specific
-> > guidance. :-(
+> > We are verifying that the match (target/compatible string) from the
+> > device tree is supported by the chip. Maybe I wasn't too clear about the
+> > intend in v1.
 > >
-> Hmm, interesting, looks like it does get used by userspace. The tsc page
-> is mapped into userspace in vdso.vma.c, and read in vdso/gettimeofday.h.
->=20
-> That is unexpected for me, since these things aren't in uapi. However I d=
-on't
-> anticipate a problem. The definitions used haven't changed, just the head=
-ers
-> they are included from.
->=20
+> > Each target supports different bandwidths and features. If you have a
+> > lan9698 chip, it must, obviously, be possible to run it as a lan9698
+> > target. However, some targets can be run on chip targets other than
+> > themselves, given that the chip supports the bandwidth and features of
+> > the provided target. In contrary, trying to run as a target with a
+> > feature not supported by the chip, or a bandwidth higher than what the
+> > chip supports, should be rejected.
+> 
+> But you are not supposed to compare DT with what you auto-detected.
+> Detect your hardware, test if it is supported and then bail out.
+> 
+> None of above explains the code.
+> 
+> >
+> > Without this logic, the chip id is read and a target is determined. That
+> > means on a lan9698 chip you will always match the lan9698 target.
+> 
+> That's not the job of kernel.
+> 
+> >
+> > With the new logic, it is possible to run as a different target than
+> > what is read from the chip id, given that the target you are trying to
+> > run as, is supported by the chip.
+> 
+> So just run on different target.
+> 
+> >
+> >>
+> >>> +     case SPX5_TARGET_CT_LAN9698RED:
+> >>> +             if (sparx5->target_ct == SPX5_TARGET_CT_LAN9698RED)
+> >>
+> >> What is "ct"? sorry, all this code is a big no.
+> >
+> > In this case we were matched as a SPX5_TARGET_CT_LAN9698RED target. We
+> > are verifying that the chip target (target_ct, which is read from the
+> > chip) supports the target we were matched as.
+> >
+> >> Krzysztof
+> >>
+> >
+> > This is a feature that we would like, as it gives the flexibility of
+> > running different targets on the same chip. Now if this is something
+> > that cannot be accepted, I will have to ditch this part.
+> 
+> I have no clue what the "target" is but so far it looks like you try to
+> validate DT against detected device. That's not how it should work.
 
-Fair enough. I don't know enough about vDSO user space to add anything
-helpful.
+I will get rid of the verification in v2.
 
-Michael
+Thanks.
+
+/Daniel
+
+> 
+> Best regards,
+> Krzysztof
+> 
 
