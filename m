@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-138268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E469ACBB5
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:54:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883BC9ACBB7
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22212285040
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:54:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC13FB22273
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500F61C578C;
-	Wed, 23 Oct 2024 13:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFC91C7B9C;
+	Wed, 23 Oct 2024 13:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Bi2jYCf9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="lNInH8wM"
 X-Original-To: netdev@vger.kernel.org
 Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2089.outbound.protection.outlook.com [40.107.22.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACB61C304A;
-	Wed, 23 Oct 2024 13:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1A81C57B2;
+	Wed, 23 Oct 2024 13:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.89
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729691598; cv=fail; b=KHSkVotNidLF5q2ZKKdy2Fq7OfSLA7RXaTZVpflBlV8xefe0IbjI0zJuuepTUL3wdvNmLgevyHDQfSnt5q+FvxF4yzAKOave3SRLKV0NluScxCRhNVMOSXuNOdSUMeYGEvfqdzQgyu9j+BrZBtjpJFUjZ1TzpwQm3c0473BWZe8=
+	t=1729691600; cv=fail; b=FA+3fD5L2F1UXgr6pvK94MK6l1JtF/MpyOEyZ3QkkLC+A0uwC2uft29KEyQQiU/lurxC/CjsyxDkY/8YX9SDeaH8ZWmaDkogAPvBo6N4NU6l6yvbwMnggGT65pO1dswRZ6Y+uTZa92ZBX8QlfFgt9U4NMqXa6MgoGpYUaumlf+c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729691598; c=relaxed/simple;
-	bh=J5nqIxJYCbjEiBLFDxqkgyhH2Xb70Yfh/m9zFeZCmec=;
+	s=arc-20240116; t=1729691600; c=relaxed/simple;
+	bh=lrGkvdsI6XLjEnZzrR73ZfsBLSRkvTMFWldVUxxDBjs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Fd0I8NaqWWDL7nbgJEa+1+QVDuoDc9KwSSQRH1uRbgES9nCgJzMDyOYZ4P0uJFM7CeXxgUcw5nOHTv8Jhdeu2Qky3EZg5YL7Du1CIsGBWX3LFL0dYFopXHZsgqDg8D3ZBcFD8q+F6pwCqLLkgbFIS4Pkip61ujhT1XuEnQpmggU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Bi2jYCf9; arc=fail smtp.client-ip=40.107.22.89
+	 Content-Type:MIME-Version; b=UWRbESiaRd+ww2XuvtU33/jqC/9+rbMilp77/HvfAEjUkFNhiEfp6RjvR3Ot7HLh8XaEK4YVEsa8lTFDC06U3IhoOd3FdxHiT5tp/WSzF3RzSm0tUv1qjmfAek5wAgsVkyH5jigroUnTkrHZ65HPeHHjAFV4qv9a72Z5oEr9MAw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=lNInH8wM; arc=fail smtp.client-ip=40.107.22.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LQRi+rV9oAa3HHvDmed5c4n4Hh94ZFAnVayeb/pIKmqjDUg724gzs/qZmmg7+tNVHSxUjB5FZdU3GN2fI1ilkCcwj8lKMaHRSDvAT+FSkD5VAFRr9LypE8olxYP2CDEMB1f09scQkJn9fAB8aecwnl9bPKcDHxziHob6IP0hDhkpOP35t56xo7HESmJ6mOgfoXEiQbRYxZOO4j7AuV96br9cJthXZNv16V/mrpuY6sCA4YCNtugSbc6KDKM/h29n7lrBsdq/whxLHe+eAbAE8h0QZZfDA9rz8j979Klf8wi64JCBj26lO5DrakHKOFbjGI2SpInVmxwycLW+rJabuA==
+ b=jEloULr0oWz26vQ1ggeFaDf8dlNTTckS6ZdDS4DsfT+1xfaBofBS5ch9O1ZLsWUo0hgdK4IwG+83fVlBwMTqk9IEjndi0KPtnACehkX+k7ggEXHWVEdyhTu3w/1K9ocG2Ssyg4PfT4DnkiA7Pe6ltsjUbT5L1UkOlAG39gEA3Uzm1jzBhRpSUyxhSPfG7kDSCQTQn5l9MUXFTIGVFfPsnrGgxGylioEseyAEH87vo7jGBzjdRVhReDsMytf+pQQDNvTYO5zIVfWVlTr3gKkscNeZXN65JkXBgSBKdq0G+5n5oCpCFUb/cvOv5DKMzdQC5CHI2+sA2/gq9AUTdw4Krw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LQTNKadeoYs6F3NyWhGH5i9TxE/78t/tgdfthC37ucA=;
- b=Ww8lHbB8PwLiGT2xG1sdI1D6Mi0O9YN1zDvX5+rA9YUE8jqiPkdPmQwwtM9KhUECupwMvINL4iJ3drG7L/wmpenUR+F6WKqn2lQMRxzpNBMMWDtofdZrDJu57uHTAhmWmVSV9pQEZJexGlef4faKItzgPxjLQGAzmVjnY12nfcg+z8ZLlCfeyOwmD1lvbYHsAjc729FQgfQeoKgI3Tya62CK/ebsYeb0ziN1Wg+wcroK0/s0wmZN2h/8VYDHLDqccavaL0yEBtVf0liuLHg0Pv3/O3v+ILd3tvNBq9Peqs9WFSZfNm7PO5vfu2RRSlaMjyy1VYpdfXuDX05wkI9P8A==
+ bh=Rxg9EYijX80sgLTTaQx7ElHE1MHgP92O8KU++Jqszbk=;
+ b=oBC2Ok08waQjLGFKYUY1lhoZUYlKcWuWqMcdp7jxYgTwN19AQLkNcVynnjjccjuMh9uMok1dsPLLocEuklp3I6+wYK40t+1OaBnmLxrn1cD13BHimEA4gQY+eOq6yNo07cRVLrsXX2zyBIp8tRf13XtmNvz8cAR22Xs0gbxNUdlBEVr3oCh5xPISidSGRjoH71tys7CYwGqxZnUQZKq144qY/kkP02kLGTa3hHR1zLrXm0Hon2FmrZBKIKhV9aQQZCB2E5lPtEa0RTPXNa/LzeKqehaNYBjYZeqhWiWWuSb6wBzYaxdlqwAQblS9UBeb1ymNTiqq1E3zixXIHOVe4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LQTNKadeoYs6F3NyWhGH5i9TxE/78t/tgdfthC37ucA=;
- b=Bi2jYCf9l+36wP8Lz34r1Yq+LdyBqjC0Leb5yzb+D/pJ7+wLYs6c8xwLDDtNFepUkjR0MrgN4bwEOUWcvJZaXuuszv3T4lK2je8YP3qFvz3mFTfpXZeOL6gzcPhPveEX2MW9ngNb7vDnmLSIJk4nXQ/K2CbHx6xv1Dph/gcaH/AsFypWzQU2Fvh3vEO7zHFyu+p6VGGnmTvQxWPPkIRhJZyOKeGzIMibQvnYEF8I5jPLqQ3a9JNQErq/IqjDTEUeC6+tA8V0kwEqlzN3K7DhIPrfUvWJxlggVqxpCWVS2O7Ne32kwFlq8yRCy56yqWU10Ou4Tz9Hg49D5/SRx4/X+w==
+ bh=Rxg9EYijX80sgLTTaQx7ElHE1MHgP92O8KU++Jqszbk=;
+ b=lNInH8wM+TzDrSVRQw09wJhrbseocEOkS5ZX45btIVUntEiGamASm68YR/nL5vgqzstrXsbnWLSN97g1ukE1Cx60tlar4V5IaTXNP010c1J8x8PZoT/0PZXC3qiqruAFGsinBWkBC0lHq7qGC37ajpunKKt0WUwTybiOSDeRec1w0wS4+OUubi0mfgv5KVov0d7uiiaS3ZbKv1Xs7YMOXOhmRjK7EgK9pkOuw8/en3EcM9yoFztOLHzAaICx4WGkyUiW7GyD7eTAGD37JM4N/Us7CuhZ5iy/TyzpECtR/rRs39WJ8WjLgQo2vMKuom8x9OEXwpYadTeNTVwmjCHSDw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by AS1PR04MB9683.eurprd04.prod.outlook.com (2603:10a6:20b:473::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18; Wed, 23 Oct
- 2024 13:53:07 +0000
+ 2024 13:53:09 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.014; Wed, 23 Oct 2024
- 13:53:07 +0000
+ 13:53:09 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -78,9 +78,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Arun Ramadoss <arun.ramadoss@microchip.com>,
 	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 net-next 4/6] net: dsa: add more extack messages in dsa_user_add_cls_matchall_mirred()
-Date: Wed, 23 Oct 2024 16:52:49 +0300
-Message-ID: <20241023135251.1752488-5-vladimir.oltean@nxp.com>
+Subject: [PATCH v3 net-next 5/6] net: dsa: allow matchall mirroring rules towards the CPU
+Date: Wed, 23 Oct 2024 16:52:50 +0300
+Message-ID: <20241023135251.1752488-6-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241023135251.1752488-1-vladimir.oltean@nxp.com>
 References: <20241023135251.1752488-1-vladimir.oltean@nxp.com>
@@ -97,137 +97,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS1PR04MB9683:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4638d73-ca06-4c10-5d35-08dcf36a0617
+X-MS-Office365-Filtering-Correlation-Id: 32c9522a-1acf-4874-f62d-08dcf36a06f3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|7416014|366016|52116014|376014|1800799024|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?A5aof6VUiVhzorqZfrhIKzS0Dqabq86VfvP34HeS4n0uO42gBtnj0lRwiURw?=
- =?us-ascii?Q?euJiH82nLDCybv/fbywb6Z5PmQNe4MrYwd+Ke47H6T3W/RkCFWIiRYUdUqrY?=
- =?us-ascii?Q?D0sOkxk9bFFiEvjmqRE/rJRY5kJCaJ+FYh663bNybbpIJbj4YweqYtCouu5v?=
- =?us-ascii?Q?qIkRdBifalCzoqluPlxIEz534vSa0F9B4cSc2UOvIDxEenXi+LqVZfKULnhM?=
- =?us-ascii?Q?7HwLXAoGzDrHk8pXtPL1mcWh2/0QlpQnDLAEfA1D6Mbcf98/B5mYygzFldz9?=
- =?us-ascii?Q?ROU9I5V5Wyctr1A3h3lAI2dKgQ30MU+OEuEIZ22nZ7K4QRZ9w4ZiOndInCTB?=
- =?us-ascii?Q?Llg7bqWe3d0OD3ykXU9Oa+QnrI6vTctJ0J4Y/SYiKIY8qiNnM0rF8vYNQKEX?=
- =?us-ascii?Q?ZKTp3klbXcEho3XpZoP0IA1M60iK0UAG1EQJ9cVlFZKxJt81KylXtZG5V17w?=
- =?us-ascii?Q?G5wkyqVu3T7VLkexGy+6bkgdolWrSf+T2tnbSSSLF2jax2gfUDjZlV+IYpi2?=
- =?us-ascii?Q?ZACLRB9Q1wNJDtAIGNGcP7D/tIddadTphZ5oPODqtz/RfUkobTXpt/K5qEHq?=
- =?us-ascii?Q?FENwulKcn2ao+jeAG89JB59wuOR5KglIqmTbuyFBpB/tFFcCElHZElpPTjB/?=
- =?us-ascii?Q?VVI6bGVZCHadcNcHYp6nv0ZPZBSyO7/0sH9sBeWk0O9Ck251CmT5KPK9uWxq?=
- =?us-ascii?Q?QRQkKmusriQ59esrL3TRSCrMSO2m8RUNGaUOpOELBmltB8y1YZVxSSVwoyAM?=
- =?us-ascii?Q?ZwxPiuOHP9BAFNAI6ld8oKVr8g5CNAdi1nKCJm35OwUdduSunohyPBtZiuSW?=
- =?us-ascii?Q?yz+fUStbz90SbyAjI8Ereg5HjwTHQ9ymFWWZiWsIaUgvmkFXd5jtRqujakxz?=
- =?us-ascii?Q?bo/GhTz1jaGjh92T1BAwTwffOeCwJGrw+3QNNMnQ23vtLhPld8dw4l6OZ2dd?=
- =?us-ascii?Q?lY8G+x1OkyiTsDzMZcUrlnHlQOoBgCHYHY15ZVo3xV9lj6UQIbdiaNbCS2Ko?=
- =?us-ascii?Q?dpNiDa7QM4scFkvAq5Qoh58TECiRZTYi4Zp3p0sTEVj+RFiq/oSkI/BQU5tN?=
- =?us-ascii?Q?v5poSmYTFcIdovazRzFqPFlabg69MLMXmTbmubp6TF7IXCn1nAIEeks1qUiN?=
- =?us-ascii?Q?TOJLiHxCKCj/UjxdOMCh0Hyj6QTQjAG0YCKU97Q7IyU5k94K5m0kPuzAShOR?=
- =?us-ascii?Q?+EctteVijwfNN/IPMy0sXvC0Obtg1EpAFWVJuL6RZ+MFw+FKCoVSyIHMnf2z?=
- =?us-ascii?Q?dmwJtIZZMQ0zOQCp43Bx5VPW1kKrI/2jWx2Ia4ZovIoJLpevUVqyyQSz8qeT?=
- =?us-ascii?Q?zPjlbsalT6XIm8XZgXIvV5keZ54IE/aRJz9sFQycwbA4IOou+cssuejklL5G?=
- =?us-ascii?Q?ONHN6LA=3D?=
+	=?us-ascii?Q?ZRsbP6jscWG7YU7cMPWM3EX4ncsCVWr/fajgn9a+4/RrKSQxvvxanCU2rdHy?=
+ =?us-ascii?Q?oA/tdq6+MC50lyTHWc5rRxC/HuAvABqDtygPfg8SkUaR7VX+bKjaopZSSxWO?=
+ =?us-ascii?Q?H2pvTMYiUG+xAlLjKuEvbcNxE2GA+MVUDvz6/z32pUfnRY0PhG+v2cLwMc44?=
+ =?us-ascii?Q?cu40HIBTiKTXxEx1KTXsK3w4B3QL8B2CGE+qCCk3DVfjBO2rgoGLo5CUO/OL?=
+ =?us-ascii?Q?BS2TeUDrMBqngwuvLWmZiA2G0nZnvbLfqUlWHiPg+0pUsP9vdwvHhuXIiJOh?=
+ =?us-ascii?Q?e7KpOzxgvhHEDlbKApBrkXfpPjoeOWx3MoRl402ZSWIh4THVdKbGLRZk/b8n?=
+ =?us-ascii?Q?zC64vBXBiQ0CpqmX3evUfMgWfnyxHNmxSj2dcFgjZxSBHDaBA72lui+uy9xT?=
+ =?us-ascii?Q?qMHmiLuv7HHLljAbMcBwAGeFOTVvzyYd2Huc9Zhh0cqA3PoTWoTU2653zzTK?=
+ =?us-ascii?Q?pfmaZEEYnDUFzNJK1Z4HNd/9zIcSQy6gRbDTTDNFE0UaXy1x0fYguIlXUzr9?=
+ =?us-ascii?Q?P7EoTP8CL7HilHkTV8vy8lVriaW1zjmXpaNvxHkLlp9LHMVsMlFvmwCcyYT1?=
+ =?us-ascii?Q?EWlEohr39Fr4dAy1eZUnbZYNZuqJawYKftcSucyiXkBRaEWe9N//hyjOm3c2?=
+ =?us-ascii?Q?1QDQS8d/gAiTPXzozmQPtS9ZU1l8DkbA703VDknW/SCIbw9IlAfkIE63NbzJ?=
+ =?us-ascii?Q?G1JuT4KHh1Mg0d8hEEtsPpj0UDxOdSdS65rXUy6PjlpCUeeDBIvMMBN1qxKG?=
+ =?us-ascii?Q?O6lciSHGF4p+WtuLMyPNhtrVYTrG0/KFwFxwJSQclSzQRVFQNXZ9cXX/ECDE?=
+ =?us-ascii?Q?XUWHpgW6YY0iKvqQrxHZm92WsgLsgVGbKRWchC5SXai3AwQO1mBV30gRyp3b?=
+ =?us-ascii?Q?SaO5vlPIF2WmTOitogporeFm1w0uYyoADlSbnFhIWNJjsHknB9tfOdpqSnHP?=
+ =?us-ascii?Q?I5h5IzaS8hxpy4KK3avXAY4wPXgt0svb3bzbdvalI93cwXIZWcEcvzblcbg1?=
+ =?us-ascii?Q?lvfvoARB0JtalsLmxDRrtVFkAChoGCx0VUE4Syp8gnapQDqxkZqBiqWAmg2c?=
+ =?us-ascii?Q?eINpu83AuyjvQqaGW2fcoFW7zfpPoSyKKYeyKAszUl7nmkv9eKpgNHxQvAvN?=
+ =?us-ascii?Q?7zUHglb8YIJLuCEMYaO8MK0rT1VEqT8o9M9Vn804nmyDhFZ80iIngfml4mAK?=
+ =?us-ascii?Q?eMXriK3XT1wPgQL5g86IuVwur/0yzOC1Ucioqo6eRd6mV0e/7Y6gfDzbviN5?=
+ =?us-ascii?Q?E1fYEmtTqDVziCRIpswit8U2MbW2g6mNbBs++l2dkUdIfZjR/MvjyR0EyKOi?=
+ =?us-ascii?Q?w0Jimea2TjRnFvr6KcqE80b6kFUejW5YcU7FhwYXC7xE/EBtAOsFTN8ecuQI?=
+ =?us-ascii?Q?kqHg6JqkJVELeVOJcE9/BFX7n87G?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(52116014)(376014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?64S2PlVIKRXIG64UjwsDWHgETSOSu/t1MXZWcSuJRf2V/GkouFRTpO/nLCXl?=
- =?us-ascii?Q?TIkwbTvYD8Eeo5S0HmTFuw0VvJOvTeHqPwzbbO7LuXVwPBYhB7KVhSrORxcv?=
- =?us-ascii?Q?ld/RPHf86JQtXq+f9/7tvv/Ad19N/+wazsvjniWVP9pnEHlFKOOaAXep3b7x?=
- =?us-ascii?Q?M2OTaIoQ0HBBp2kMgcBNrQf2Of+jrfNFookFARMe/QtyfB7Z8nQD7KZiy+es?=
- =?us-ascii?Q?QGbMxN8cqDvg52Jx2skfmDh98xwHhQUsfoaz+eqRjjEhmtFMtIEV8wcgVNyd?=
- =?us-ascii?Q?EN0JcOIQJdcH6p+YVkC2uQp6UxNEg0jBgBG5BMyGPuKRFKrz8QAa1h0A+3re?=
- =?us-ascii?Q?FUrPTn92DchTP6UNyxNsgdlgQQnYbYsWmYE6Vk71is/Wuv1e+9rayIu7CqbX?=
- =?us-ascii?Q?50Jj+ti/j0QRkWTDRwiTJ5PIsrgSgJwxVpcSUFz04Ssio1MvL8StiYAHsZCZ?=
- =?us-ascii?Q?F4U3JnD3QQUmGL+GYpfJKS0hNLe2wslP1jT7RgpizxyQYEGQz5m/BNgwncV8?=
- =?us-ascii?Q?lF3JR5/EUN6ByveWbuCTiy+vIgKuvcfwsXz+VqnNP0HFcSrhj6e0OglO23wg?=
- =?us-ascii?Q?lewJy/mUGKD2AYpIO3y8Mvf4OICriLh8c67URqo2H+VVZqHQ/FfKu5csRibu?=
- =?us-ascii?Q?RRmzpE6zJWxAiniQx0lrPIwho39GtrrzXAuB4/XAkDmhadu/5HgbnD7rrEgT?=
- =?us-ascii?Q?2UO9nxDj0cuk2yk5W0si4X1GF91zpas0ciZKhLvmVm/r/waRhwhj/I2kX3Ra?=
- =?us-ascii?Q?acgWtheeXreNraiO2xMzNoTS+Ht2MohRudlticaOE1sRfc4BpGW/p+ClMxx7?=
- =?us-ascii?Q?Mj2n6l95idYAFvMB5ORm8K+PuWC6F7EowJiht/wSPS/3iMyCQMQZnJDoedrt?=
- =?us-ascii?Q?qCtFqqSoftl5FPyHrB0GA0FHMaGC/DR1SNJ8JtCN8E0xwoJdS92CT8BvdFtr?=
- =?us-ascii?Q?0YgFMMifCwAl48WTLCuMuX3O4nccV7WFjtHmM8EhnKVG2JKqdVmAC534YtHX?=
- =?us-ascii?Q?ysyJi/wN72Owb77OYdKyCmISFPmQCmuaVHFIZomSFIkfFYEn+/66rONsIIX/?=
- =?us-ascii?Q?lfco1Q/po1c+zUh8m1eK0c5KkMSNXHkKjMEhjT7PdmHpHboToioaTqovvh1z?=
- =?us-ascii?Q?s+8f7QQlbEmCyBNzcqYW1+zhj6hz8IUoa1RqjAT2CwUXmxFoySgqK0uU67I1?=
- =?us-ascii?Q?VydsnDtzRrc0ejuqZblt0y+DTK+MeqXg4KYseF4gj+hrCLyxv67t7iHkXfHr?=
- =?us-ascii?Q?+EIOSfalUNISZzq9g68PsWQvueWpC5UtobMlkixEhmmyEuP+moQYRx2NNHsl?=
- =?us-ascii?Q?tlW4jzjgws4kEEEKZVb5HCgUEZ1D2O3ulqFPxC2M/tZuYNo1oIY8ra3lD9T5?=
- =?us-ascii?Q?LcY1/tHHD3L625tiIXsdkMcY2SR61aqQmppy31wS7qIxdC4G/RxtjEcwM651?=
- =?us-ascii?Q?Xa9tKLq/Ly3pqc63V7Qvu9bf6Iw19/MXozaQywz2hOY+DvFrJn7Rn2RG+POz?=
- =?us-ascii?Q?tiucU9kMKj/Ddr4BC47asEvmPNgQAanmsInP7q6gberQSHrIICJvGvs4BWz2?=
- =?us-ascii?Q?Xo+oAyxLbwktM31SFCVFraSTl0C1ZGDsMRm0fTpPDMnh0c+Tkamv+wGyfX58?=
- =?us-ascii?Q?Gw=3D=3D?=
+	=?us-ascii?Q?AQd5YbzBmLXHsMoPetK36PstV9NWMN2CW+HdLK9J/Zyh37wxz1LnkaepcxDE?=
+ =?us-ascii?Q?efokZeBD+3hEpg7w0Xq2C1oR8yw3LNFeSrdmDqFrmujdhmF3h2MqVNHhGB/6?=
+ =?us-ascii?Q?i/gyMEnwDcqCKonvfEeOg7gu5PdgFZr/L/PVvc/pQfk9daxpbWb3c4zCypBx?=
+ =?us-ascii?Q?P9nUDa4Uh5ub+gWuWjZt06XcsnHZ3v5nbjk3X9YsQUOX9arVw6Ll0ZoAzEz0?=
+ =?us-ascii?Q?AnOppZKZZiXdxYOBOeMgSaMjz/ACmbpLx5G9ezwOXXftxGI7iyrUgK3c0xCl?=
+ =?us-ascii?Q?9oLFcnQfHOEKZy3MBBAMmyRS8TuVJUpJNbYfo0D4Aa7+6hbRD5XIDDcfRIxa?=
+ =?us-ascii?Q?Ax12ty0F1ceLFIeeH2ojqvnY3wvG8IdxlRSiyn6cvSWi5AWxXRhL0qPJDnZC?=
+ =?us-ascii?Q?Ne84FlyExy9U5fCwhkEQA3xS+Bsul3RzRnwYhVrYWS/m4JzFzXx6E+xQmGvU?=
+ =?us-ascii?Q?PRLeTbquee5BvubSkSINT8K3YOHycjKGsOhBqbfSyaoxqpwbIjqG5jCpHuj3?=
+ =?us-ascii?Q?h9EYt7KSanj9VQHOSmtq3tg4tHDcQiJtDcODPEmF7ZD/UzAXmVuhUWS1dJ1W?=
+ =?us-ascii?Q?22OUwK00BiIeYexiMpgMJ3efy0dSkiRZFBTq84uwRnQkTG0wM6Xmcfwa96Em?=
+ =?us-ascii?Q?1JNQhjMjxMW4Ajwn2KO1Box/EczMMc+NteQopVNc/uhTaYcn5N3bspv7r1DC?=
+ =?us-ascii?Q?y6jgxfkA+ODgjNxzXmnBYNG20cMFpCoGEeVrOVg4+vlvhLdfnIiAUISR0Q6M?=
+ =?us-ascii?Q?m7KeMMAxrvznjGsiqdYsTf0Gg950POkr0qbyIb0cSxifPcl3bvGry+p001uz?=
+ =?us-ascii?Q?c+eO4pkDv35qs7u0S0sEwXU8JHcUqmkem7vwQYJUVRSJj2yxEcVTbBF7dlhS?=
+ =?us-ascii?Q?YZMYFj3xAjG2t4wJMnHzB/nw5plzoSBSIm1H7A479hrR6QuJ6FCU4ectHD3h?=
+ =?us-ascii?Q?JZCTxXaed+n4D/+qi1VsndcoYCkFTD0gD59zE+FMp/s7oJJ8gk3TQC2qfiKE?=
+ =?us-ascii?Q?itvVGmt5IMg0vO2RinPEly2sPLfpxqOJaFvDpZ6zlUhMPCWt0xcR2JKss8xy?=
+ =?us-ascii?Q?AubhLQ7DeX0GV59EVXKK3AS62xK3PszOcOSIKO44yWBYCzhRUr6+o23Es0xp?=
+ =?us-ascii?Q?7AWsJ00JDtzkOBRi2PjIZi0Qyp9oeLesunTeZ4vwMSaVGEjhoxQeUM7T3tNh?=
+ =?us-ascii?Q?DOfnemZY7XoACeu6R8BwwOxejWt7VaVqte2szFptXhA5YQe69QTsQcmLaLHI?=
+ =?us-ascii?Q?RfHl1sJFYPOPMK+4hOlcIZ78XPm2HBzVuv0Nck+oPUDwx3bpo2gaI/tfWZAW?=
+ =?us-ascii?Q?WUmEBAL+YR+tJ/V7NwvwWbxZCcNkEGOY+7jNEBSLiC9ZJg+0HdlEhPHy2Pgu?=
+ =?us-ascii?Q?Di0Sl1o0DiM+fi/S65uUvBw0Z6qmVuhBH7p1uzMatMDWn2m5R31QoA7N7pT8?=
+ =?us-ascii?Q?IncD05ls8CuA8NJsU61RcBTOyejVadUPc00MmfWRSeHD+XiwrBW4Ozh+Y8bH?=
+ =?us-ascii?Q?hv+8Q7EvNZuYZIt8YP4/2Gu+kBM1yrqC4ACvcJhVoaOGOuTUpfcbNzIqsHuV?=
+ =?us-ascii?Q?RFrcEdOvnL6AwTKwz6sKPY0Y3GTVsbOgrugJ2mlHdtWR3pwQWEmg8DmZc6Fk?=
+ =?us-ascii?Q?0w=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4638d73-ca06-4c10-5d35-08dcf36a0617
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32c9522a-1acf-4874-f62d-08dcf36a06f3
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 13:53:07.5854
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 13:53:08.9924
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QBdOwFkJ9yZ0zkbLF1WBFDSHXjRJnOeu/ntfFolzAbagDlImVcHHhFDam350usKGMkXJd0y4xwgri1EVr/wy1w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8dXe9QsUIaCOt8Mjxg3KuF/VGAJj9IW0R3KTEUAFrLWfkWxSaHEOjCu4prgeUu8p8DWeE2c4gRVEQQwG2XfNIQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9683
 
-Do not leave -EOPNOTSUPP errors without an explanation. It is confusing
-for the user to figure out what is wrong otherwise.
+If the CPU bandwidth capacity permits, it may be useful to mirror the
+entire ingress of a user port to software.
 
+This is in fact possible to express even if there is no net_device
+representation for the CPU port. In fact, that approach was already
+exhausted and that representation wouldn't have even helped [1].
+
+The idea behind implementing this is that currently, we refuse to
+offload any mirroring towards a non-DSA target net_device. But if we
+acknowledge the fact that to reach any foreign net_device, the switch
+must send the packet to the CPU anyway, then we can simply offload just
+that part, and let the software do the rest. There is only one condition
+we need to uphold: the filter needs to be present in the software data
+path as well (no skip_sw).
+
+There are 2 actions to consider: FLOW_ACTION_MIRRED (redirect to egress
+of target interface) and FLOW_ACTION_MIRRED_INGRESS (redirect to ingress
+of target interface). We don't have the ability/API to offload
+FLOW_ACTION_MIRRED_INGRESS when the target port is also a DSA user port,
+but we could also permit that through mirred to the CPU + software.
+
+Example:
+
+$ ip link add dummy0 type dummy; ip link set dummy0 up
+$ tc qdisc add dev swp0 clsact
+$ tc filter add dev swp0 ingress matchall action mirred ingress mirror dev dummy0
+
+Any DSA driver with a ds->ops->port_mirror_add() implementation can now
+make use of this with no additional change.
+
+[1] https://lore.kernel.org/netdev/20191002233750.13566-1-olteanv@gmail.com/
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
-v1->v3: none
+v2->v3: s/cls->skip_sw/cls->common.skip_sw/
+v1->v2: allow mirroring to the ingress of another DSA user port
+        (using software)
 
- net/dsa/user.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ net/dsa/user.c | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
 diff --git a/net/dsa/user.c b/net/dsa/user.c
-index c398a4479b36..2fead3a4fa84 100644
+index 2fead3a4fa84..6b718960f40d 100644
 --- a/net/dsa/user.c
 +++ b/net/dsa/user.c
-@@ -1377,11 +1377,17 @@ dsa_user_add_cls_matchall_mirred(struct net_device *dev,
- 	struct dsa_port *to_dp;
- 	int err;
- 
--	if (cls->common.protocol != htons(ETH_P_ALL))
-+	if (cls->common.protocol != htons(ETH_P_ALL)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Can only offload \"protocol all\" matchall filter");
- 		return -EOPNOTSUPP;
-+	}
- 
--	if (!ds->ops->port_mirror_add)
-+	if (!ds->ops->port_mirror_add) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Switch does not support mirroring operation");
- 		return -EOPNOTSUPP;
-+	}
- 
- 	if (!flow_action_basic_hw_stats_check(&cls->rule->action, extack))
- 		return -EOPNOTSUPP;
-@@ -1488,9 +1494,13 @@ static int dsa_user_add_cls_matchall(struct net_device *dev,
- 				     bool ingress)
+@@ -1365,7 +1365,7 @@ dsa_user_mall_tc_entry_find(struct net_device *dev, unsigned long cookie)
+ static int
+ dsa_user_add_cls_matchall_mirred(struct net_device *dev,
+ 				 struct tc_cls_matchall_offload *cls,
+-				 bool ingress)
++				 bool ingress, bool ingress_target)
  {
- 	const struct flow_action *action = &cls->rule->action;
-+	struct netlink_ext_ack *extack = cls->common.extack;
+ 	struct netlink_ext_ack *extack = cls->common.extack;
+ 	struct dsa_port *dp = dsa_user_to_port(dev);
+@@ -1397,10 +1397,30 @@ dsa_user_add_cls_matchall_mirred(struct net_device *dev,
+ 	if (!act->dev)
+ 		return -EINVAL;
  
--	if (!flow_offload_has_one_action(action))
-+	if (!flow_offload_has_one_action(action)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Cannot offload matchall filter with more than one action");
- 		return -EOPNOTSUPP;
+-	if (!dsa_user_dev_check(act->dev))
+-		return -EOPNOTSUPP;
+-
+-	to_dp = dsa_user_to_port(act->dev);
++	if (dsa_user_dev_check(act->dev)) {
++		if (ingress_target) {
++			/* We can only fulfill this using software assist */
++			if (cls->common.skip_sw) {
++				NL_SET_ERR_MSG_MOD(extack,
++						   "Can only mirred to ingress of DSA user port if filter also runs in software");
++				return -EOPNOTSUPP;
++			}
++			to_dp = dp->cpu_dp;
++		} else {
++			to_dp = dsa_user_to_port(act->dev);
++		}
++	} else {
++		/* Handle mirroring to foreign target ports as a mirror towards
++		 * the CPU. The software tc rule will take the packets from
++		 * there.
++		 */
++		if (cls->common.skip_sw) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "Can only mirred to CPU if filter also runs in software");
++			return -EOPNOTSUPP;
++		}
++		to_dp = dp->cpu_dp;
 +	}
+ 
+ 	if (dp->ds != to_dp->ds) {
+ 		NL_SET_ERR_MSG_MOD(extack,
+@@ -1504,7 +1524,11 @@ static int dsa_user_add_cls_matchall(struct net_device *dev,
  
  	switch (action->entries[0].id) {
  	case FLOW_ACTION_MIRRED:
-@@ -1498,6 +1508,7 @@ static int dsa_user_add_cls_matchall(struct net_device *dev,
+-		return dsa_user_add_cls_matchall_mirred(dev, cls, ingress);
++		return dsa_user_add_cls_matchall_mirred(dev, cls, ingress,
++							false);
++	case FLOW_ACTION_MIRRED_INGRESS:
++		return dsa_user_add_cls_matchall_mirred(dev, cls, ingress,
++							true);
  	case FLOW_ACTION_POLICE:
  		return dsa_user_add_cls_matchall_police(dev, cls, ingress);
  	default:
-+		NL_SET_ERR_MSG_MOD(extack, "Unknown action");
- 		break;
- 	}
- 
 -- 
 2.43.0
 
