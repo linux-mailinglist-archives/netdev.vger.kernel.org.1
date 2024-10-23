@@ -1,122 +1,184 @@
-Return-Path: <netdev+bounces-138072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D25519ABC15
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:21:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E13E9ABC6F
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D4D31C2114D
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 03:21:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDCB02831D7
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 03:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF8561FE9;
-	Wed, 23 Oct 2024 03:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E24130E58;
+	Wed, 23 Oct 2024 03:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fs6Oiiu1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLN9lFCH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7E1139E;
-	Wed, 23 Oct 2024 03:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD9F17741;
+	Wed, 23 Oct 2024 03:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729653693; cv=none; b=l0mOmGclbnPN5EdaINw2Eo2BM3eL3DRtaT5vk11F4hud+KHL3jywbKIx8qPjnvSgvsChVDQeD3vRswJue6Kxe5fSh9PIEo94TsgUbEKwIipxqoUMTK79R3QuUnWDkW90Y0A8n6JxKNSsOTwaeX+Pqk/svmzd37CXWZwUg1RYIf4=
+	t=1729655388; cv=none; b=VXWG0f1p1j+c8vxuiAhb98zMPXm94mQLLtqEy3pTvxACKAvXr+dTrZtt2pvmY7agoyZJ1Oe2ksZVyXk/0bVs5YY8wUfyrdJRvIQb06DNSHfH9annxD6+fW/bm+bTVYDkOy4hOnHku6mrb6gEVQQHoSwS3M3PjvjwoX0P1HhK/lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729653693; c=relaxed/simple;
-	bh=nt8rJBEuD0Q9sUA//jJUcUThgf2M4Ags7Y9vCxUhnuc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LtTi9Jut89jXigHzPq49WbO/Flq15q6vzGzohi1FSnvfElZKId5TO1IK1AIWJ1OiSG91pjokBiHd0jzA75E4ddSzuU/DBF3K2xMrJogyehpPy/9cMX+gT8xuxffsq5Iwozg0KUc8IviznyoQziG4KLCDzCO2MIIEwmUIKIKT0hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fs6Oiiu1; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1729655388; c=relaxed/simple;
+	bh=HAdf8JsIB3HzftQdJtOEv1fyrDd2Kusf5Vj0mWEiC3c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OedTtJ628DoGaYI7kAbWZWCls+pzN0qBzK2riOte9xWdWhVbLzPNeR5FK+UuSieHwkZEzlkl/QK0ffViSHCHtndCd2HptWatf6p2A3Ck4YKSkoMeDR549TsgMQGoZ+PL103SRb4uMIUY9/s79iFZepqLmmqQltL3rwymJGVa+EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLN9lFCH; arc=none smtp.client-ip=209.85.166.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20e6981ca77so47715595ad.2;
-        Tue, 22 Oct 2024 20:21:31 -0700 (PDT)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a3b98d8a7eso21725905ab.3;
+        Tue, 22 Oct 2024 20:49:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729653691; x=1730258491; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=29eHXV9bqIXK5xc3pmwxd96Tf3JMnOuCUVgc44dHjjo=;
-        b=fs6Oiiu1xs9O2PZ3JCO7H9s5/aLKzp1O1vcp0AUaDmAWjiqteq0zOK0fvxbok2Kbut
-         3EptgAtinjWASWbZCTJt6KcSXK3Nka+zsw2WV6kwi2fMIvBzKSoVMGKULtHey4wGANJM
-         8hZ10L+a/qMTNP9e+YkmD98iS1mQMPtVIw7zWVl07WKcDd4uvjMqeV0SeEoSJnSMoIJB
-         SxlZMVXR7IrD/eYlLjR6u8vpHrwdqyeAI9FnjhwQPQ1mnnx5IdyRvjLwE9DXle0M8huw
-         9K9RA1KiO2u3YnBTep+JkcSGAwUlM1UxL68L7EJ/FqQKoEptoLdrXy7o/BTDnhneGYDL
-         Yheg==
+        d=gmail.com; s=20230601; t=1729655386; x=1730260186; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yPsFlQSf+mV+7xr9JBn+I09DodkH5Zj2WR+9BAcZWOA=;
+        b=fLN9lFCHa7L7oErfOI9leVAAqhZrRL6IqkZ9kQyEEqX5f6GiGCJYXC0PRfFcVX2JX6
+         zqnu6tWWX9CI35u+zUXC9fw5QvulliWmj/3xo/YQMwcCfaszkxX3I2N+JyoX7zob+Plf
+         67SGVzoUStviSBSETxPWKpGwF7DHAGCZE5bmypjQVMsmEP5lWLSsiyOIAXJVEHpYq0Nu
+         svDy3/gvoW4+JnSfntRxUfsypH5HHZOhA3hZg+ME1AajL8ufI4Ggy78mhpjAyzfQTlWW
+         wEuQYOwu4QRhTAAxe5+XgG5PJuHw29uLOVKfzkSiA0fMKi92z0+xUN8/JFjpvXaIXqm5
+         Ps7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729653691; x=1730258491;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=29eHXV9bqIXK5xc3pmwxd96Tf3JMnOuCUVgc44dHjjo=;
-        b=mDxHcKoIrMr7wht4bjCUEexyJ7xx6OkFJKvZ0JkjetCu5WgYpgTDwLcp1Sh0c+hk7o
-         aAo849ZcdIDwlFnhe41TWN7b8jilL4VdEkYkwNjEvjjwxDq9F9faPcK3wRBzKAl89p0z
-         avTgo+OCYbiDxKuVnyzUr7nQSw2HKpN9BXOMptJIUrygd3OkZxivPdjXPXGaCy21kbCd
-         KXt4mU9zUeMGR4Niw1W7NcwKPKFAMPr61V/6C6LrEwYGeezx+5dL7HTY7amIULs/b0NC
-         d7WKwzOMgpRE251Jd9Db2zZBK8XqgJbfdx9U6oA8MjRb8BK1wOUlATN1K9ldpv+sLTGT
-         Fu4w==
-X-Forwarded-Encrypted: i=1; AJvYcCULUcnARC2kqf4vm4JGr7NQ4mKfosTMaUNbX6sgIJ6PQ1VLuFUQkuBwctOyVKy+7ZglrqrCcEOi6juRHkPVz+Q=@vger.kernel.org, AJvYcCWQMmHNQKaubeQirxDOYpeXLkDK/gky1UJVbLoyZGkNScSIQ/2bHdTIOhtjp4uGcjmQqQVvp1DY@vger.kernel.org, AJvYcCWgARCkjkEiIgMane1cL09Xj3OO1VE3pgQWVHGlDOb6GRv2PVQQGLMJ1qf2vYiPUfw5GLrI+5HOmmqP2OnN@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTDHtEhsqs4cczQ7FJsSUZjSdKgLopHdxBybTdCcO/iWpKYgly
-	AmxIDFaOndTjUjOCB/WQGzCoQFIAyuxKjMECmB6cOb5P4dz22C+N
-X-Google-Smtp-Source: AGHT+IHzluk/mO7QsiX7WblFK/SH2YN/WhRfpbiFtyyiimjV/181mnxEUMWR1GEWvL8QX5ADLxcu+g==
-X-Received: by 2002:a17:902:f64c:b0:20b:7a46:1071 with SMTP id d9443c01a7336-20fa9deb645mr19087025ad.4.1729653690929;
-        Tue, 22 Oct 2024 20:21:30 -0700 (PDT)
-Received: from Fantasy-Ubuntu ([2001:56a:7eb6:f700:b2d3:e25a:778e:1172])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7f0f65e1sm48994225ad.285.2024.10.22.20.21.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 20:21:30 -0700 (PDT)
-Date: Tue, 22 Oct 2024 21:21:28 -0600
-From: Johnny Park <pjohnny0508@gmail.com>
-To: horms@kernel.org
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew@lunn.ch, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] [net-next] igb: Fix spelling in igb_main.c
-Message-ID: <ZxhruNNXvQI-xUwE@Fantasy-Ubuntu>
+        d=1e100.net; s=20230601; t=1729655386; x=1730260186;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yPsFlQSf+mV+7xr9JBn+I09DodkH5Zj2WR+9BAcZWOA=;
+        b=a5TI4jORiUwfFkqCurDdqMmoY90PEh7OuHbcsqKouEexpi9nYDq+TRnsVDqe10dmPY
+         PiQeA5WZq5jlM/dT6xZlevd7D2/EfBFu8oqBT3Gwq34S0RW0A6BSrOmpsULZcDNMUmnU
+         3lJdYj1KH/yL9E4xU+Jw5G9A3Tr/rcSiO/XvuqoDk1pchvHNLUplTcHs3vptiQUM9i1d
+         sC1yqEogFXmQExsUJSWlpFXkIi13xPaMgJl7W6Ljr8lsf7r1/nEtU29vR6r1BBjLSHiz
+         UCCW2I3bdWSziO47WD5brH1ZwgN+XPekKLnCaCKQFEMXSaN3YAcWunNrXSoYjN4CRqNz
+         03qA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/OW0F6B2HnUUXjEvQnjyNdhIa011o/xxM2d91gk0saBDHhfRFF4xJ4eFjwW+15l85f71sE2oT@vger.kernel.org, AJvYcCX4nS20/S7Ds7YSLqnfruNluM3SyL13JIt05a13LSGc1vK3udsu1vrxYY5cgzH+utJ1ATc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY6HxOh8rVmasz8vcRfzsusyvU64IDbu6Cnb6g23GbY4qUh7E4
+	9T7IdP0U0452BMSInHWFRLMU1epfrcdZIEYJmRZDQEu+mic8rqT3Y625ZWyixP3cq7/oZDzMag8
+	A8KtPghrmVvkg9ThDBhdSqzVTdfc=
+X-Google-Smtp-Source: AGHT+IFFRseNoEHQLY9aqikuAqdqc/FnKXZgA0CkYAKSgWJY6aYQ/qJTFqjOw50oOCacmiOnHWTOPzc9dmHf1kMgh0s=
+X-Received: by 2002:a05:6e02:20e6:b0:3a3:a78a:b6cc with SMTP id
+ e9e14a558f8ab-3a4d59cf27bmr12653975ab.20.1729655386038; Tue, 22 Oct 2024
+ 20:49:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-3-kerneljasonxing@gmail.com> <cb96b56a-0c00-4f57-b4b5-8a7e00065cdc@linux.dev>
+ <670ee4efea023_322ac329445@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCBONnrP_YyE_0n_o4zQUNJfE8DY61f6XRQeeBdGNZMgQ@mail.gmail.com> <67183df34e8e3_1420e5294a2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67183df34e8e3_1420e5294a2@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 23 Oct 2024 11:49:09 +0800
+Message-ID: <CAL+tcoASCO5_N+cY0bJYBn8+6C7FzhQ2QtB=8q5zEnrYFNBa3w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 02/12] net-timestamp: open gate for bpf_setsockopt
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Simple patch that fix spelling mistakes in igb_main.c
+On Wed, Oct 23, 2024 at 8:06=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Wed, Oct 16, 2024 at 5:56=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Martin KaFai Lau wrote:
+> > > > On 10/11/24 9:06 PM, Jason Xing wrote:
+> > > > >   static int sol_socket_sockopt(struct sock *sk, int optname,
+> > > > >                           char *optval, int *optlen,
+> > > > >                           bool getopt)
+> > > > >   {
+> > > > > +   struct so_timestamping ts;
+> > > > > +   int ret =3D 0;
+> > > > > +
+> > > > >     switch (optname) {
+> > > > >     case SO_REUSEADDR:
+> > > > >     case SO_SNDBUF:
+> > > > > @@ -5225,6 +5245,13 @@ static int sol_socket_sockopt(struct sock =
+*sk, int optname,
+> > > > >             break;
+> > > > >     case SO_BINDTODEVICE:
+> > > > >             break;
+> > > > > +   case SO_TIMESTAMPING_NEW:
+> > > > > +   case SO_TIMESTAMPING_OLD:
+> > > >
+> > > > How about remove the "_OLD" support ?
+> > >
+> > > +1 I forgot to mention that yesterday.
+> >
+> > Hello Willem, Martin,
+> >
+> > I did a test on this and found that if we only use
+> > SO_TIMESTAMPING_NEW, we will never enter the real set sk_tsflags_bpf
+> > logic, unless there is "case SO_TIMESTAMPING_OLD".
+> >
+> > And I checked SO_TIMESTAMPING in include/uapi/asm-generic/socket.h:
+> > #if __BITS_PER_LONG =3D=3D 64 || (defined(__x86_64__) && defined(__ILP3=
+2__))
+> > /* on 64-bit and x32, avoid the ?: operator */
+> > ...
+> > #define SO_TIMESTAMPING         SO_TIMESTAMPING_OLD
+> > ...
+> > #else
+> > ...
+> > #define SO_TIMESTAMPING (sizeof(time_t) =3D=3D sizeof(__kernel_long_t) =
+?
+> > SO_TIMESTAMPING_OLD : SO_TIMESTAMPING_NEW)
+> > ...
+> > #endif
+> >
+> > The SO_TIMESTAMPING is defined as SO_TIMESTAMPING_OLD. I wonder if I
+> > missed something? Thanks in advance.
+>
+> The _NEW vs _OLD aim to deal with y2038 issues on 32-bit platforms.
+>
+> For new APIs, like BPF timestamping, we should always use the safe
+> structs, such as timespec64.
 
-Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
----
-Changes in v2:
-  - Fix spelling mor -> more
----
- drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks, I learned a lot.
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 1ef4cb871452..fc587304b3c0 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -1204,7 +1204,7 @@ static int igb_alloc_q_vector(struct igb_adapter *adapter,
- 	/* initialize pointer to rings */
- 	ring = q_vector->ring;
- 
--	/* intialize ITR */
-+	/* initialize ITR */
- 	if (rxr_count) {
- 		/* rx or rx/tx vector */
- 		if (!adapter->rx_itr_setting || adapter->rx_itr_setting > 3)
-@@ -3906,7 +3906,7 @@ static void igb_remove(struct pci_dev *pdev)
-  *
-  *  This function initializes the vf specific data storage and then attempts to
-  *  allocate the VFs.  The reason for ordering it this way is because it is much
-- *  mor expensive time wise to disable SR-IOV than it is to allocate and free
-+ *  more expensive time wise to disable SR-IOV than it is to allocate and free
-  *  the memory for the VFs.
-  **/
- static void igb_probe_vfs(struct igb_adapter *adapter)
--- 
-2.43.0
+>
+> Then we can just use SO_TIMESTAMPING without the NEW or OLD suffix.
 
+Weird thing is that the SO_TIMESTAMPING would be converted to
+SO_TIMESTAMPING_OLD in kernel if I use this :
+bpf_setsockopt(skops, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
+
+As I mentioned before, SO_TIMESTAMPING exists in
+include/uapi/asm-generic/socket.h:
+#if __BITS_PER_LONG =3D=3D 64 || (defined(__x86_64__) && defined(__ILP32__)=
+)
+/* on 64-bit and x32, avoid the ?: operator */
+...
+#define SO_TIMESTAMPING         SO_TIMESTAMPING_OLD
+...
+#else
+...
+#define SO_TIMESTAMPING (sizeof(time_t) =3D=3D sizeof(__kernel_long_t) ?
+SO_TIMESTAMPING_OLD : SO_TIMESTAMPING_NEW)
+...
+#endif
+
+So I wonder if there is something unexpected?
+
+BTW, I conducted the test on a VM with x86_64 cpu.
+
+Thanks,
+Jason
 
