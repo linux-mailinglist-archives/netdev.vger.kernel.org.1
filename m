@@ -1,95 +1,117 @@
-Return-Path: <netdev+bounces-138121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 499AB9AC0DC
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:00:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75CD29AC105
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BE422841A9
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:00:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1251B23BC9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2391547F3;
-	Wed, 23 Oct 2024 08:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhvUc0hV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7872F156F3F;
+	Wed, 23 Oct 2024 08:05:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A9D1448DF
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9A5152787;
+	Wed, 23 Oct 2024 08:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729670423; cv=none; b=BbfFLGpg8RBYSA8a6rznKXdkGUC7crQmvEG7DP9MczJJUnOvNHo/I2ATp3vjWVeKIbWzqKKrdMhr8fMOgAzlQY12Q709f4iJq5Su5V09VYHatFcVmzeX+qxifLUu3FwfleEW7wmuyofrAzcOUkCyIhlQrppVk5cptX00kST3r7I=
+	t=1729670735; cv=none; b=ivnYworC/RxEunQm7STaHHafUw3s08WEHE1fJLAbcoQ/sqZgDq2z0DFSz25Hf51p4WHJH89qmJOK/WkmIdpcoPw/K/spCB3Vb5rD/Lr66J2tMRhOmwpYVR6gSWLLA4J2K3pJVajYJXvDfqPgQZgBc4k4Rxaz8fR+LW31GgYGjDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729670423; c=relaxed/simple;
-	bh=QHVbKbqQdB2pS7YTQ48n2yF0+rNCoAHjKCU4pU53pZ0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=juf9GZrS6yIS46y/H+h6aBEMIQkQZ7e31M6AsPK1h8VYl3pEpRm4PJERpJarwpu838Uo06pPJFNaHA9mimJjaHO+MrJ4EXFXHK+nu1OLrbuvzXhbCDqDUSZ8bjbidlIWjQ5r1YBd9CFnjSdokVbSeIhk83PJtpkkUI9Zs1pqObQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BhvUc0hV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA73EC4CEC6;
-	Wed, 23 Oct 2024 08:00:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729670422;
-	bh=QHVbKbqQdB2pS7YTQ48n2yF0+rNCoAHjKCU4pU53pZ0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BhvUc0hVHmKVZBTTqEM8sg0Ns4wGS6uL2PxvF876+5eY4ui3ppiKFx5fcTZ4qd6Jr
-	 fymtUswB+PhlDw5z8eoJHjlrW6hrTk+9bQ0T4FP+8elUCqwz1TXCuSDWLoPrv4MroX
-	 huf8DfLUBGpcm5Gx3+sQ0GYFo8wtQnJc96QAQ5ChRXKyyo6y+o1gNbhmXtn3j5+JFh
-	 tGGm+nnOHXJvYV5Cc/lkKWkgTp5s23DRAwPrDWXsubEKhY9+TVYCkRsCICFYSDM5j6
-	 VXe7HZFz1PgSRZtZ+eBHTRerVmdeA1jFaInjzjl+N0p2/dLWV260N6Uk8Q40BgCMf6
-	 w12mUaZgCCBYw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710963809A8A;
-	Wed, 23 Oct 2024 08:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729670735; c=relaxed/simple;
+	bh=ezTVhyyhWtup+bc5fzujfyflKD8dHccc9qonD4HK7fs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AVhak6UJm42D3Hv+k/DwlVDcq0Vc68L2Ig9xGs3yn3HI5hfH92Bm7dsquQ24mdjpNvvXxSxBCY3d6kxzlwtqWvBX5xqUG9Cfpa6cQfBgLRZnayEWlPoGYYFWqm0bbU0iHUWXD1DjoR281BzSpAJH2DpAxT0VH9KQzA1vlyIKeKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aeec7.dynamic.kabel-deutschland.de [95.90.238.199])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id DADAF61E5FE05;
+	Wed, 23 Oct 2024 10:04:45 +0200 (CEST)
+Message-ID: <ba58bbcd-079e-42b9-8e66-52b2626936e2@molgen.mpg.de>
+Date: Wed, 23 Oct 2024 10:04:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] netdevsim: macsec: pad u64 to correct length in
- logs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172967042926.1509139.6764323624352044400.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Oct 2024 08:00:29 +0000
-References: <20241017131933.136971-1-anezbeda@redhat.com>
-In-Reply-To: <20241017131933.136971-1-anezbeda@redhat.com>
-To: Ales Nezbeda <anezbeda@redhat.com>
-Cc: netdev@vger.kernel.org, sd@queasysnail.net, kuba@kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2 1/1] [net-next] igb: Fix spelling in
+ igb_main.c
+To: Johnny Park <pjohnny0508@gmail.com>
+Cc: horms@kernel.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <ZxhruNNXvQI-xUwE@Fantasy-Ubuntu>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <ZxhruNNXvQI-xUwE@Fantasy-Ubuntu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Dear Johnny,
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 17 Oct 2024 15:19:33 +0200 you wrote:
-> Commit 02b34d03a24b ("netdevsim: add dummy macsec offload") pads u64
-> number to 8 characters using "%08llx" format specifier.
+Thank you for your patch. I recommend to put the information, that the 
+typos are only in comments, to the summary/title:
+
+igb: Fix 2 typos in comments in igb_main.c
+
+That way, skimming `git log --oneline` is more informative.
+
+Am 23.10.24 um 05:21 schrieb Johnny Park:
+> Simple patch that fix spelling mistakes in igb_main.c
+
+fix*es*, but better use imperative mood:
+
+Fix 2 spelling mistakes in comments `igb_main.c`.
+
+> Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
+> ---
+> Changes in v2:
+>    - Fix spelling mor -> more
+> ---
+>   drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Changing format specifier to "%016llx" ensures that no matter the value
-> the representation of number in log is always the same length.
-> 
-> Before this patch, entry in log for value '1' would say:
->     removing SecY with SCI 00000001 at index 2
-> After this patch is applied, entry in log will say:
->     removing SecY with SCI 0000000000000001 at index 2
-> 
-> [...]
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 1ef4cb871452..fc587304b3c0 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -1204,7 +1204,7 @@ static int igb_alloc_q_vector(struct igb_adapter *adapter,
+>   	/* initialize pointer to rings */
+>   	ring = q_vector->ring;
+>   
+> -	/* intialize ITR */
+> +	/* initialize ITR */
+>   	if (rxr_count) {
+>   		/* rx or rx/tx vector */
+>   		if (!adapter->rx_itr_setting || adapter->rx_itr_setting > 3)
+> @@ -3906,7 +3906,7 @@ static void igb_remove(struct pci_dev *pdev)
+>    *
+>    *  This function initializes the vf specific data storage and then attempts to
+>    *  allocate the VFs.  The reason for ordering it this way is because it is much
+> - *  mor expensive time wise to disable SR-IOV than it is to allocate and free
+> + *  more expensive time wise to disable SR-IOV than it is to allocate and free
+>    *  the memory for the VFs.
+>    **/
+>   static void igb_probe_vfs(struct igb_adapter *adapter)
 
-Here is the summary with links:
-  - [net-next,v2] netdevsim: macsec: pad u64 to correct length in logs
-    https://git.kernel.org/netdev/net-next/c/1a629afd590b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Rest looks good.
 
 
+Kind regards,
+
+Paul
 
