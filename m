@@ -1,192 +1,325 @@
-Return-Path: <netdev+bounces-138218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C0159ACA10
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:33:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1C69ACA0E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:32:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27CBF2835A6
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:33:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C511F2204D
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A751AA795;
-	Wed, 23 Oct 2024 12:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A6A1A76CC;
+	Wed, 23 Oct 2024 12:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcmc8zG+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kDF7Eh0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBA7153BED;
-	Wed, 23 Oct 2024 12:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F0C155C87;
+	Wed, 23 Oct 2024 12:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729686833; cv=none; b=hYIr2jqoNv55CpHxRsF+vs2dbI2b4CPMgmSwHD2hoG2ii8Eu4ckUzzElRc5a1kHoP6RfK9qFDNbhYPIuf9rq3cAqy2sIH0KR7d+mJ8SOlp7dZKQbda8X7vnwTg7e2MNWX+rZTolp5J3B71rO9xBVDzCKMCE8f9ZuFhbMd1qFkS0=
+	t=1729686749; cv=none; b=Zii4/e9KyvMWgzTolrjFxq2mES8VemHUh1SvUxZPVq7Hrojg1zwoCOQrnypf7eWNeuHYx5njFu1trG1mvh8hoVSaB9fYHthUFQtVMdkUi1t8FmgDbagKe24KYyHF+3H6BztYm43nhMGhOnOvmYLUW8ZpuHRqdchu7L0sKDOvWJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729686833; c=relaxed/simple;
-	bh=gKeqeVjhHUZh+ESzvZDJjMrqbNux/iGxBvsEukSEH4I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uFmdAVmAKPJHVDsXBGX4N6VmuUn9WwSdgcyK4FpKZ/hzSLupOYpnu1wOIUkNnQb5V5M+px9pb1E2VjpsxKYPeZ3KTm4UQjGtkgsw0YXbm4x+lXZEdkU00B2dBjKl+KgJeAvXU8NcqmHa4z/bmNAAyXPbittA6XJu5VS2TJrlBL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mcmc8zG+; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1729686749; c=relaxed/simple;
+	bh=0u61zPI6kPaYE6d7SUDMcg9KEvVtVS3BiNpZ5FQc7io=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GSirOC0YTYP1+xpvCN7iRatF4rIwzwTAwT00HubPI2A0DAT1swOSplsTpsNHN19Jw2XjItKkJP0Sp+OTHYm5DUa0CrNqMRdw9HAdRUV/5g/r8J7eloBwMvZD7eDOD9Dk5aZ+9kHtzjQFj8VPChXD3o699GTM6KVR1x+CHqArw9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kDF7Eh0B; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20e576dbc42so50167375ad.0;
-        Wed, 23 Oct 2024 05:33:52 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20c693b68f5so72352635ad.1;
+        Wed, 23 Oct 2024 05:32:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729686831; x=1730291631; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729686747; x=1730291547; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aFMUoRiKams8qBaX6W+JDQ3XrVb5ZlSwxg7abK4rGBY=;
-        b=mcmc8zG+v8MWmw7uH+fvAQdacoJrW3O7EZrSoYN1z6q1i9u1cCHxlQsxuRP4t80FX+
-         SLVYsBiXC+u96PBIx5UBEhrdTPqeh9BVvutnCcVqTnJTYjyWEl3ec7hsg9W/zMaQbQtr
-         VgaByzBIB8H6yKDxzQ0NYvJoC4l3jnw3MdafjrL7eC1RmGC/7QR3ZNzhJNKnMQiKcOvi
-         ern2AXNQCbBCKttuLuqzFrrm4x+Kh6H9Fk5pJPZkrzn5TIqUNRltYOHut3CulDdLcc2I
-         6yHCbP5crOuaV3CqJlKi2VBx3UH/wHaXKH69iV8KmazOfZZuDgsJnCm3FtH5al4QlrdH
-         BFQg==
+        bh=EyPlzhyIGQ6drEk3t/yWEdQeT6zpBSBiNYimm8vS+lA=;
+        b=kDF7Eh0BeOT2XTpgkTx/qmYbAj82DCIe28S1+4AQWIBKdFw2dO6fREegxnsL2cbI8J
+         NIBmOd7qKmGG3oOgNm/y0Jf7IqBuEvYNyDx6af+jxDCBEtA4Z8sEsMY5LxijC0cvt4X7
+         HCZ4KwNyzk7lrX7wJaJrd2ut0ikCJhVtpAqNpx7KgWFo73bRMqoEXyhI16eoQGLimcos
+         ZSnd1L1TPH2fyR8wp3ZXnsitXSDYdviB2gPLxulzpXIWCwmty5WfUxFxk8Y2rAmR98mu
+         vsPv5PTLiPmW7t4JGjEWoeiKC1qqlgk9V8FSSxpIDrfxN6MiIXV6/DhIvaDAbjqyPbwj
+         oGHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729686831; x=1730291631;
+        d=1e100.net; s=20230601; t=1729686747; x=1730291547;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aFMUoRiKams8qBaX6W+JDQ3XrVb5ZlSwxg7abK4rGBY=;
-        b=bNNMHzO2FYVceZd3UcQyTMAx+/c9uAGksMtc+RfCw4+1XFMVOclBhmspPo7Q53NgZf
-         fvOy3SOm+qN8hkBZY3qQXs9Mod5chwrrt0cglb7P9X34llZ97lj3nHQogkc56k8XZr5e
-         5vSWN7jSgvNFzg9+yclWunUeCWs9v85eJne7CqSC9qiJ3gktJIhMTFfJyJNUbG0ubhdb
-         LCiXxEitERip4Nvcnsij+XHESW+gzpxKB4jwirQjIEUA/GdcycW8hlaXLSMpWxU65iam
-         McFjJy18yEZmgKXQMGJpLOGN/lts2JQ9n6LbIFr+QK229KR+04zurjPKYtlHU6/8C2gF
-         8OGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXh8zZ+6m7Slx7E6YGI8Ip5lTHIh8doGGUAp0HNUL0lc87zHZc1OfbkIdWHnQlvnEF/pbw9uowFEvglZzwN9D+xjWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWsHuD/S8UzHJDqfIt8yd/7jdW2hkW9SJiiKtaBBdDnUwP8H7p
-	FC4oZOR3Hjr2BdwYG1Vs19F6e1m6ALIh6d62WYvqhxqt17SsECxI
-X-Google-Smtp-Source: AGHT+IEDRB2GOfj0ZvS2PC9NICvNP04PNbT/YtDTesmQlfun1kXwRk8EQ7rEtlg6auTSxxiGEu18bQ==
-X-Received: by 2002:a17:902:da8f:b0:20c:a175:b720 with SMTP id d9443c01a7336-20fa9deb65dmr28134295ad.1.1729686831550;
-        Wed, 23 Oct 2024 05:33:51 -0700 (PDT)
-Received: from localhost.localdomain ([39.144.105.201])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7ef1330csm56784335ad.86.2024.10.23.05.33.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Oct 2024 05:33:51 -0700 (PDT)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com
-Cc: netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Menglong Dong <menglong8.dong@gmail.com>
-Subject: [PATCH] net: Add tcp_drop_reason tracepoint
-Date: Wed, 23 Oct 2024 20:32:12 +0800
-Message-Id: <20241023123212.15908-1-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+        bh=EyPlzhyIGQ6drEk3t/yWEdQeT6zpBSBiNYimm8vS+lA=;
+        b=Xj1aYL5AUAECQiopGgIcU12s40TJCEQH1SdAu/G3dSdKuRhn0lw2/c9KDvdGT0t80e
+         vqIEGJMC5hYQGbsnunrSHXRBdeUW51ODcUuaac8nyEdAH5s2HRYngbEske9XFd2ctkYF
+         CYX0fp8Ytj9gMO9Yi3cEVf2FY8JxyPq6qCxpqW2rEYIcY+7oCv4CORuPMjTJB9Q8A/Eo
+         xtDIo95WKUK7H8SmCO6Lu3dpk9UHsbzGkNhYXPtIy/vjUCZMbEkVtaAs6wpX1bmIECiI
+         5ogr613i840otrkGuSYWtKQJFQVfWU151trz2SKdKP3ftzeV8BwXmzHZuGknPyfVVVL+
+         zjIg==
+X-Forwarded-Encrypted: i=1; AJvYcCU60O8QCWAgJ9wtYRuL0FI5Plg1z8UhXfcXpKSbLv1zQ7VmOJhzIPH5iijTeLeAiuRWpyYRs+NIOu4MkQc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6kMikM2aZ+xrNjvHNZr6dyAoRyp0qIwAhZ8QUAISTVms3xH+e
+	+KKiJ2Ib53xf9n6haAZVSZQfaOz9/p7O3BkniA2kFyffZ0YEhsksKRSJ9V0iJiY=
+X-Google-Smtp-Source: AGHT+IHhGyFnOA0JEuXypLbyS99ekRbpTMXNBF40qoDwdwUJeNtU9rp5IbYcGbvg0Rinr4nuUaNeuA==
+X-Received: by 2002:a05:6a20:cfa5:b0:1d9:22c1:1231 with SMTP id adf61e73a8af0-1d978b3ddc5mr2474719637.29.1729686746583;
+        Wed, 23 Oct 2024 05:32:26 -0700 (PDT)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13d7462sm6256722b3a.109.2024.10.23.05.32.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 05:32:25 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net] bonding: add ns target multicast address to slave device
+Date: Wed, 23 Oct 2024 12:32:15 +0000
+Message-ID: <20241023123215.5875-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-We previously hooked the tcp_drop_reason() function using BPF to monitor
-TCP drop reasons. However, after upgrading our compiler from GCC 9 to GCC
-11, tcp_drop_reason() is now inlined, preventing us from hooking into it.
-To address this, it would be beneficial to introduce a dedicated tracepoint
-for monitoring.
+Commit 4598380f9c54 ("bonding: fix ns validation on backup slaves")
+tried to resolve the issue where backup slaves couldn't be brought up when
+receiving IPv6 Neighbor Solicitation (NS) messages. However, this fix only
+worked for drivers that receive all multicast messages, such as the veth
+interface.
 
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>
+For standard drivers, the NS multicast message is silently dropped because
+the slave device is not a member of the NS target multicast group.
+
+To address this, we need to make the slave device join the NS target
+multicast group, ensuring it can receive these IPv6 NS messages to validate
+the slave’s status properly.
+
+There are three policies before joining the multicast group:
+1. All settings must be under active-backup mode (alb and tlb do not support
+   arp_validate), with backup slaves and slaves supporting multicast.
+2. We can add or remove multicast groups when arp_validate changes.
+3. Other operations, such as enslaving, releasing, or setting NS targets,
+   need to be guarded by arp_validate.
+
+Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- include/trace/events/tcp.h | 53 ++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_input.c       |  1 +
- 2 files changed, 54 insertions(+)
+v2: only add/del mcast group on backup slaves when arp_validate is set (Jay Vosburgh)
+    arp_validate doesn't support 3ad, tlb, alb. So let's only do it on ab mode.
+---
+ drivers/net/bonding/bond_main.c    | 18 +++++-
+ drivers/net/bonding/bond_options.c | 95 +++++++++++++++++++++++++++++-
+ include/net/bond_options.h         |  1 +
+ 3 files changed, 112 insertions(+), 2 deletions(-)
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index a27c4b619dff..056f7026224c 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -12,6 +12,7 @@
- #include <net/tcp.h>
- #include <linux/sock_diag.h>
- #include <net/rstreason.h>
-+#include <net/dropreason-core.h>
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index b1bffd8e9a95..d7c1016619f9 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1008,6 +1008,9 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
  
- /*
-  * tcp event with arguments sk and skb
-@@ -728,6 +729,58 @@ DEFINE_EVENT(tcp_ao_event_sne, tcp_ao_rcv_sne_update,
- 	TP_ARGS(sk, new_sne)
- );
+ 		if (bond->dev->flags & IFF_UP)
+ 			bond_hw_addr_flush(bond->dev, old_active->dev);
++
++		/* add target NS maddrs for backup slave */
++		slave_set_ns_maddrs(bond, old_active, true);
+ 	}
  
-+#undef FN
-+#undef FNe
-+#define FN(reason)	{ SKB_DROP_REASON_##reason, #reason },
-+#define FNe(reason)	{ SKB_DROP_REASON_##reason, #reason }
+ 	if (new_active) {
+@@ -1024,6 +1027,9 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
+ 			dev_mc_sync(new_active->dev, bond->dev);
+ 			netif_addr_unlock_bh(bond->dev);
+ 		}
 +
-+TRACE_EVENT(tcp_drop_reason,
-+
-+	TP_PROTO(const struct sock *sk, const struct sk_buff *skb,
-+		 const enum skb_drop_reason reason),
-+
-+	TP_ARGS(sk, skb, reason),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, skbaddr)
-+		__field(const void *, skaddr)
-+		__field(int, state)
-+		__field(enum skb_drop_reason, reason)
-+		__array(__u8, saddr, sizeof(struct sockaddr_in6))
-+		__array(__u8, daddr, sizeof(struct sockaddr_in6))
-+	),
-+
-+	TP_fast_assign(
-+		__entry->skbaddr = skb;
-+		__entry->skaddr = sk;
-+		/* Zero means unknown state. */
-+		__entry->state = sk ? sk->sk_state : 0;
-+
-+		memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
-+		memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
-+
-+		if (sk && sk_fullsock(sk)) {
-+			const struct inet_sock *inet = inet_sk(sk);
-+
-+			TP_STORE_ADDR_PORTS(__entry, inet, sk);
-+		} else {
-+			const struct tcphdr *th = (const struct tcphdr *)skb->data;
-+
-+			TP_STORE_ADDR_PORTS_SKB(skb, th, entry->saddr, entry->daddr);
-+		}
-+		__entry->reason = reason;
-+	),
-+
-+	TP_printk("skbaddr=%p skaddr=%p src=%pISpc dest=%pISpc state=%s reason=%s",
-+		  __entry->skbaddr, __entry->skaddr,
-+		  __entry->saddr, __entry->daddr,
-+		  __entry->state ? show_tcp_state_name(__entry->state) : "UNKNOWN",
-+		  __print_symbolic(__entry->reason, DEFINE_DROP_REASON(FN, FNe)))
-+);
-+
-+#undef FN
-+#undef FNe
-+
- #endif /* _TRACE_TCP_H */
- 
- /* This part must be outside protection */
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index cc05ec1faac8..44795555596a 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4897,6 +4897,7 @@ static bool tcp_ooo_try_coalesce(struct sock *sk,
- static void tcp_drop_reason(struct sock *sk, struct sk_buff *skb,
- 			    enum skb_drop_reason reason)
- {
-+	trace_tcp_drop_reason(sk, skb, reason);
- 	sk_drops_add(sk, skb);
- 	sk_skb_reason_drop(sk, skb, reason);
++		/* clear target NS maddrs for active slave */
++		slave_set_ns_maddrs(bond, new_active, false);
+ 	}
  }
+ 
+@@ -2341,6 +2347,12 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 	bond_compute_features(bond);
+ 	bond_set_carrier(bond);
+ 
++	/* set target NS maddrs for new slave, need to be called before
++	 * bond_select_active_slave(), which will remove the maddr if
++	 * the slave is selected as active slave
++	 */
++	slave_set_ns_maddrs(bond, new_slave, true);
++
+ 	if (bond_uses_primary(bond)) {
+ 		block_netpoll_tx();
+ 		bond_select_active_slave(bond);
+@@ -2350,7 +2362,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 	if (bond_mode_can_use_xmit_hash(bond))
+ 		bond_update_slave_arr(bond, NULL);
+ 
+-
+ 	if (!slave_dev->netdev_ops->ndo_bpf ||
+ 	    !slave_dev->netdev_ops->ndo_xdp_xmit) {
+ 		if (bond->xdp_prog) {
+@@ -2548,6 +2559,11 @@ static int __bond_release_one(struct net_device *bond_dev,
+ 	if (oldcurrent == slave)
+ 		bond_change_active_slave(bond, NULL);
+ 
++	/* clear target NS maddrs, must after bond_change_active_slave()
++	 * as we need to clear the maddrs on backup slave
++	 */
++	slave_set_ns_maddrs(bond, slave, false);
++
+ 	if (bond_is_lb(bond)) {
+ 		/* Must be called only after the slave has been
+ 		 * detached from the list and the curr_active_slave
+diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+index 95d59a18c022..2554ba70f092 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -1234,6 +1234,75 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
+ }
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
++/* convert IPv6 address to link-local solicited-node multicast mac address */
++static void ipv6_addr_to_solicited_mac(const struct in6_addr *addr,
++				       unsigned char mac[ETH_ALEN])
++{
++	mac[0] = 0x33;
++	mac[1] = 0x33;
++	mac[2] = 0xFF;
++	mac[3] = addr->s6_addr[13];
++	mac[4] = addr->s6_addr[14];
++	mac[5] = addr->s6_addr[15];
++}
++
++static bool slave_can_set_ns_maddr(struct bonding *bond, struct slave *slave)
++{
++	return BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
++	       !bond_is_active_slave(slave) &&
++	       slave->dev->flags & IFF_MULTICAST;
++}
++
++static void _slave_set_ns_maddrs(struct bonding *bond, struct slave *slave, bool add)
++{
++	struct in6_addr *targets = bond->params.ns_targets;
++	unsigned char slot_maddr[ETH_ALEN];
++	int i;
++
++	if (!slave_can_set_ns_maddr(bond, slave))
++		return;
++
++	for (i = 0; i < BOND_MAX_NS_TARGETS; i++) {
++		if (ipv6_addr_any(&targets[i]))
++			break;
++
++		ipv6_addr_to_solicited_mac(&targets[i], slot_maddr);
++		if (add)
++			dev_mc_add(slave->dev, slot_maddr);
++		else
++			dev_mc_del(slave->dev, slot_maddr);
++	}
++}
++
++void slave_set_ns_maddrs(struct bonding *bond, struct slave *slave, bool add)
++{
++	if (!bond->params.arp_validate)
++		return;
++
++	_slave_set_ns_maddrs(bond, slave, add);
++}
++
++static void slave_set_ns_maddr(struct bonding *bond, struct slave *slave,
++			       struct in6_addr *target, struct in6_addr *slot)
++{
++	unsigned char target_maddr[ETH_ALEN], slot_maddr[ETH_ALEN];
++
++	if (!bond->params.arp_validate || !slave_can_set_ns_maddr(bond, slave))
++		return;
++
++	/* remove the previous maddr on salve */
++	if (!ipv6_addr_any(slot)) {
++		ipv6_addr_to_solicited_mac(slot, slot_maddr);
++		dev_mc_del(slave->dev, slot_maddr);
++	}
++
++	/* add new maddr on slave if target is set */
++	if (!ipv6_addr_any(target)) {
++		ipv6_addr_to_solicited_mac(target, target_maddr);
++		dev_mc_add(slave->dev, target_maddr);
++	}
++}
++
+ static void _bond_options_ns_ip6_target_set(struct bonding *bond, int slot,
+ 					    struct in6_addr *target,
+ 					    unsigned long last_rx)
+@@ -1243,8 +1312,10 @@ static void _bond_options_ns_ip6_target_set(struct bonding *bond, int slot,
+ 	struct slave *slave;
+ 
+ 	if (slot >= 0 && slot < BOND_MAX_NS_TARGETS) {
+-		bond_for_each_slave(bond, slave, iter)
++		bond_for_each_slave(bond, slave, iter) {
+ 			slave->target_last_arp_rx[slot] = last_rx;
++			slave_set_ns_maddr(bond, slave, target, &targets[slot]);
++		}
+ 		targets[slot] = *target;
+ 	}
+ }
+@@ -1296,15 +1367,37 @@ static int bond_option_ns_ip6_targets_set(struct bonding *bond,
+ {
+ 	return -EPERM;
+ }
++
++static void _slave_set_ns_maddrs(struct bonding *bond, struct slave *slave, bool add)
++{
++}
++
++void slave_set_ns_maddrs(struct bonding *bond, struct slave *slave, bool add)
++{
++}
+ #endif
+ 
+ static int bond_option_arp_validate_set(struct bonding *bond,
+ 					const struct bond_opt_value *newval)
+ {
++	bool changed = (bond->params.arp_validate == 0 && newval->value != 0) ||
++		       (bond->params.arp_validate != 0 && newval->value == 0);
++	struct list_head *iter;
++	struct slave *slave;
++
+ 	netdev_dbg(bond->dev, "Setting arp_validate to %s (%llu)\n",
+ 		   newval->string, newval->value);
+ 	bond->params.arp_validate = newval->value;
+ 
++	if (changed) {
++		bond_for_each_slave(bond, slave, iter) {
++			if (bond->params.arp_validate)
++				_slave_set_ns_maddrs(bond, slave, true);
++			else
++				_slave_set_ns_maddrs(bond, slave, false);
++		}
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/include/net/bond_options.h b/include/net/bond_options.h
+index 473a0147769e..59a91d12cd57 100644
+--- a/include/net/bond_options.h
++++ b/include/net/bond_options.h
+@@ -161,5 +161,6 @@ void bond_option_arp_ip_targets_clear(struct bonding *bond);
+ #if IS_ENABLED(CONFIG_IPV6)
+ void bond_option_ns_ip6_targets_clear(struct bonding *bond);
+ #endif
++void slave_set_ns_maddrs(struct bonding *bond, struct slave *slave, bool add);
+ 
+ #endif /* _NET_BOND_OPTIONS_H */
 -- 
-2.43.5
+2.46.0
 
 
