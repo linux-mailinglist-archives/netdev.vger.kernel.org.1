@@ -1,115 +1,134 @@
-Return-Path: <netdev+bounces-138140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 557719AC215
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:47:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B26E9AC21E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:49:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1623C284431
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:47:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E38D1C26D3E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7226B157E82;
-	Wed, 23 Oct 2024 08:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CBE15B0EC;
+	Wed, 23 Oct 2024 08:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBA6G3qd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCa7dn6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B55156238
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7DA15886D;
+	Wed, 23 Oct 2024 08:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729673220; cv=none; b=YK6kCQvU+Dyevz+ORKBvuuC8lcIEncucdnYA6SbE5Win7HA1BtDNQWGmCO4/qrbMVny+PFsLfO7B47+4GU4Qzqk+OwrL0asveDbIXoQdN/p8RIrlpHS+ReZbcGAfbMdioAHB2Cuwg7eWw8as9n2jvZwhzreJEuH+Y/Czis+Qclw=
+	t=1729673355; cv=none; b=jCMG0QuXyXflRPRAiOUoP5Zt/jDWhE0tkmMi8l9pQshC75QRCpRAa5tC6Y6dQnSf6Flvvfp3qhvXRRIA65rhlz6TOxx2mnrMJ9pieQyMU+BxfKAqmWwLs24Qq3BdoHO2FyPlCXvpcfPuK+XTuX3KZ4rYrWMw+htA3c/WllJuhIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729673220; c=relaxed/simple;
-	bh=BfEx/DGTy+etwnx3QSf/LLwJ7pTvHjuchkhtlgk5UK4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EpHJlyR9CQrGesZv3f6uf1VDe0gU0rl2HjsRPubld5EoqvodTML+e+exnAdJgwt4h8QXY2IkeNrqgSAGjf/E96knOJZ84jBkIDVlSiXUjMgUFz/r/k+E5GwgSuTqXWhBqUY4d4NZoPFXNxlMFRCGbrpsITt3K/Eq0AbrtwSucV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eBA6G3qd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729673217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BfEx/DGTy+etwnx3QSf/LLwJ7pTvHjuchkhtlgk5UK4=;
-	b=eBA6G3qdAOMzrlAS4OqX6g9ZIRXDo+EjM6n4Z1chAqK/dpvlOrhK0x4AEDdFUinBZNM1FG
-	m3ldCA+jlaB3UrayepW5TWIkor2Tp7L2sE2UumkPMNhNe6YE8t2HIVGZEVKQ/HZ/LN/BKR
-	1C8sNj7yvszLsIP1aWzZ7yj6Ei57298=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-CcDxVh45NoGpiASVJ02Zpw-1; Wed, 23 Oct 2024 04:46:56 -0400
-X-MC-Unique: CcDxVh45NoGpiASVJ02Zpw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d67fe93c6so3266241f8f.0
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 01:46:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729673215; x=1730278015;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BfEx/DGTy+etwnx3QSf/LLwJ7pTvHjuchkhtlgk5UK4=;
-        b=W7IZgvi+ZZZRj8gLSVwbKfaqBMGt4m+89Yu54L+LrO8QM2xlgiolOM2AFM5K0kmGzB
-         aDT/b8fPM2lklvFefQWA776L8jEZNcKwNnFcWGr/2r8kqaX3lPatL5QQO/62qvLclKYC
-         wNiSqXj3B2BkmiXK7yU5SyGzlJfErBZ8y/L0mEelT3arKx6dbTrkJv73z5oTVoXHoeKB
-         8SwTlzM1VrNMdAw71bNgh8WD6gVfE/aX54lzYSb+E4ZVxE5DkZeSj6G1m3x8q7vcxG09
-         qM5gXr3Amqo4vzPeTTdryl5vY/eu2JGPE7kTf9hNeCWviiWGcMRpSp5k1SPYg+prSUkK
-         hCiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVY4yjuzsBQa19j8gA6Q8mFqXLvqucoc9itqN3BVzDGmn07mwfCPLsmtk00bBJQmrfm+f+99O0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyd7q2s72CVREocAYSHHpmdrweg6aGtR7HEI8GxG0KCwijagiNo
-	UprXKlghwnvglPI7mQcfcHOYxqzveL7wNrkrtbdXhOVpIkiX6eb9DkHd8T6aGjJWHC+R+Ir0zHR
-	yTh6nbboV6Ny9atzhceeU5C/sPOQkMVEg+swASOPggj9r3bnbyAN9RA==
-X-Received: by 2002:a05:6000:18a9:b0:374:b5fc:d31a with SMTP id ffacd0b85a97d-37efcf1fc01mr1135685f8f.25.1729673215093;
-        Wed, 23 Oct 2024 01:46:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF1SYY6CyLekUwxKlnFZKNXUKAAfEqXFWJcII0J+uNLboSCz2hbmrGghitkgxAUMr8DsnJ2jw==
-X-Received: by 2002:a05:6000:18a9:b0:374:b5fc:d31a with SMTP id ffacd0b85a97d-37efcf1fc01mr1135673f8f.25.1729673214688;
-        Wed, 23 Oct 2024 01:46:54 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b94363sm8455810f8f.73.2024.10.23.01.46.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2024 01:46:54 -0700 (PDT)
-Message-ID: <fb2d7565-b895-4109-b027-92275e086268@redhat.com>
-Date: Wed, 23 Oct 2024 10:46:52 +0200
+	s=arc-20240116; t=1729673355; c=relaxed/simple;
+	bh=7NhjULpJR19EvTFu6kukQjms/KFY1lUVI61YeGXteK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AQqB4kH020Bodtlbwdt5AlzX+9bRhPETERWQnYMv/WrhkUOlRQjKXASUEHd2Ns5urTu5/ESsRySYz4DnQYVRZ1E8c3AIL8eQw6B8y9N9hUjvyWDuDGrjbbJ9EilsdYH5FGWTB8WlJ4yO/u9qt+x9/I96RYDb44MtbYRqAgAaE+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCa7dn6p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CC8DC4CEC6;
+	Wed, 23 Oct 2024 08:49:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729673355;
+	bh=7NhjULpJR19EvTFu6kukQjms/KFY1lUVI61YeGXteK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mCa7dn6prblg2R6KnQjb+AXq101pO4zTQ6kdNO0cGMRoSxe4p8mcSY11kut/o4ARa
+	 VIb3+v0Ulxo4NjOxCI69dz3NnHfyMuLr5lUiqauOKBRGtmpjo85QQfoOkC/cvvbOq/
+	 nNafENibQaC0pa/HBqLQku9SGDNagfPnOFHMa28Dm+8nzXTSZQEwRZTdCnHMd7sfLx
+	 Vn04n7/iJ0IeP/lcMgNlGbsEUsvemJANyJVFPQrp5+D8yNtayXxm9X7ilTIqRotpLs
+	 bB1EuQxYmNO/KtQ9wtLYYD/uAmHQD5WePX+P/GW2Ogbm1QTbREYOVHB+XoPZWvhBWH
+	 oLU+MCJztxvCQ==
+Date: Wed, 23 Oct 2024 09:49:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: 2694439648@qq.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	hailong.fan@siengine.com
+Subject: Re: [PATCH v1] net: stmmac: enable MAC after MTL configuring
+Message-ID: <20241023084910.GL402847@kernel.org>
+References: <tencent_CCC29C4F562F2DEFE48289DB52F4D91BDE05@qq.com>
+ <20241021130554.00005cf5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/26] cxl: add Type2 device support
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com
-References: <20241017165225.21206-1-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241017165225.21206-1-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021130554.00005cf5@gmail.com>
 
-Hi,
+On Mon, Oct 21, 2024 at 01:05:54PM +0800, Furong Xu wrote:
+> On Mon, 21 Oct 2024 09:03:05 +0800, 2694439648@qq.com wrote:
+> 
+> > From: "hailong.fan" <hailong.fan@siengine.com>
+> > 
+> > DMA maybe block while ETH is opening,
+> > Adjust the enable sequence, put the MAC enable last
+> > 
+> > For example, ETH is directly connected to the switch,
+> > which never power down and sends broadcast packets at regular intervals.
+> > During the process of opening ETH, data may flow into the MTL FIFO,
+> > once MAC RX is enabled. and then, MTL will be set, such as FIFO size.
+> > Once enable DMA, There is a certain probability that DMA will read
+> > incorrect data from MTL FIFO, causing DMA to hang up.
+> > By read DMA_Debug_Status, you can be observed that the RPS remains at
+> > a certain value forever. The correct process should be to configure
+> > MAC/MTL/DMA before enabling DMA/MAC
+> > 
+> > Signed-off-by: hailong.fan <hailong.fan@siengine.com>
+> > 
+> 
+> A Fixes: tag should be added.
 
-10/17/24 18:51, alejandro.lucero-palau@amd.com wrote:
-> 2) The driver for using the added functionality is not a test driver but a real
-> one: the SFC ethernet network driver. It uses the CXL region mapped for PIO
-> buffers instead of regions inside PCIe BARs.
+Also, as this patch is a fix for net, that target should be noted in the
+subject.
 
-I'm sorry for the late feedback, but which is the merge plan here?
+  Subject: [PATCH v2 net] ...
 
-The series spawns across 2 different subsystems and could cause conflicts.
+Please address this and the issues raised by Furong Xu and post a v3.
 
-Could the network device change be separated and send (to netdev) after
-the clx ones land into Linus' tree?
+> >  static void dwxgmac2_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index e21404822..c19ca62a4 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -3437,9 +3437,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+> >  		priv->hw->rx_csum = 0;
+> >  	}
+> >  
+> > -	/* Enable the MAC Rx/Tx */
+> > -	stmmac_mac_set(priv, priv->ioaddr, true);
+> > -
+> >  	/* Set the HW DMA mode and the COE */
+> >  	stmmac_dma_operation_mode(priv);
+> >  
+> > @@ -3523,6 +3520,9 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+> >  	/* Start the ball rolling... */
+> >  	stmmac_start_all_dma(priv);
+> >  
+> > +	/* Enable the MAC Rx/Tx */
+> > +	stmmac_mac_set(priv, priv->ioaddr, true);
+> > +
+> 
+> This sequence fix should be applied to stmmac_xdp_open() too.
+> 
+> >  	stmmac_set_hw_vlan_mode(priv, priv->hw);
+> >  
+> >  	return 0;
+> 
+> It is better to split this patch into individual patches, since you are
+> trying to fix an issue related to several previous commits:
+> dwmac4, dwxgmac2, stmmac_hw_setup() and stmmac_xdp_open()
 
-Thanks,
+And each patch should have an appropriate Fixes tag.
 
-Paolo
-
+-- 
+pw-bot: changes-requested
 
