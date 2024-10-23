@@ -1,157 +1,109 @@
-Return-Path: <netdev+bounces-138203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6389AC980
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:58:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C89C9AC981
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677B61F21E25
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:58:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72E011C2116A
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED0A1AA794;
-	Wed, 23 Oct 2024 11:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92AE1AAE06;
+	Wed, 23 Oct 2024 11:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbVyUUsZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WqzsaLO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294EE1A00DF
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 11:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53551A08C1
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 11:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729684691; cv=none; b=QqREP0lCr8Bfw1oKu7YHKOzLW7uTq2n//PAZyDA8IIhg7vKo2tR0Tc6Vid73XUL06U6qUvBHkbHAHKQ2zDIYyaMp7aytCdiSOWV/1KvXSPlYiJOWr7uM/z2IMjZ5gaBxukWfNq3QpxkNKngprUmiDsrNQx3zmMNfqetoPqFWHKE=
+	t=1729684729; cv=none; b=Y4o6+vhGP+jG+BB5Rk84NATIZC77xo0dt7H5/N+G7sk7LQ/iyrDy7pJPGvb7TQYS7nqoNhqVMOJ3ypl7xatq1r7n2wap58oSHU+DNpEndYaDcShwRip8N01nbqLd8Oa8gx2tIJwuu41zPcMJyd/cdy/0jJuZoDh8TauDobMY7mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729684691; c=relaxed/simple;
-	bh=9H+jPSglMipvsynqWginBG5HmJmcxmiYKU9L/k96CUw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lcM32zMobE4GcbEMDsW8xXx/VgZ5f9PfBEotRStVMnCmKGG5m6salo2oFhUpJKxszn1vcAMdX8xO6Hx9E38N3NAfA0qqxlgf/qAgzlqGML4jDrh3CzLHlWVXqIXDLE9DM8oA0u2N15V8q1JJQgB+FHf7yBHl7w5UbOJVgEI+5Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MbVyUUsZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729684689;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0mssz8CvkYVIcBitKTu06kb0S/cJ3eajJtBwsyREgho=;
-	b=MbVyUUsZiKKzO5WrjF4hqjdV0eXG3tSxfCAmA8bjznrnGTiQ62ogKlO/OchS6tGNzyNG7K
-	ZRlr6tKRokSrGTJSis+eQXjTFHDnocMzcv/3V7WtQ6ttYI1t0zVfaVG1UBktX5NP2CV5XC
-	NeS/5MNAGt2PEdTjnelIt/ixoDVfCPQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-385-kx95MMuvNBy5r2Yn4VyIzw-1; Wed, 23 Oct 2024 07:58:07 -0400
-X-MC-Unique: kx95MMuvNBy5r2Yn4VyIzw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43163a40ee0so41571795e9.0
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 04:58:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729684686; x=1730289486;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0mssz8CvkYVIcBitKTu06kb0S/cJ3eajJtBwsyREgho=;
-        b=u2s6IxbOIHpgm5JuDE2NF1TkQhDnAiKBPQOBEvdsPxLHPPKI33swDBqDXGNlmkuFiL
-         AZs+E2Jrp5jAKRli2Toc73W5S2suyekErZLM1hy6jNQfPLkJkLnUmvn7IxVWThysHRuR
-         nBewAoOtARn2kL5Ha4JRzgXsPQiOZQQLvb4PeadoRp34rDg4e4NCG787Me/iD4YrTWku
-         gPCXqKY3CEaJYHjwZKHtgb9aaLEQRWy1nIyd1jT18RxanBLnJY0rytbZrPf7SF3ooxFn
-         qPlXlUILF/hJh3WE/gIBeQQt27YoVueTBf7ZdU/EfHYoeF6EQFgaRbYfGMkk6/Ran6ZZ
-         LhYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOdGpbQSONlCo8W+LXpk66ttXkxTNjdQv2H2211lQ39WVkWqqP7wWJZ0Pp0HRaQCk8Rg5fY2c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy50ZNfycwDDAg2vID3Z/9KKAbrakzKGYHVTuqY2PkbI/QPsoAy
-	/Ibboix3zv9N+n4LH9KQdFw7MOCiA5k1S3gf1P53YSfc73uwKE1IUXQmdScmqC3XQXo90CiIsLs
-	Sryy9GVxe05bWHHqP1Mh6L/zdXEj4TbFdEvrPH/WXGD0FUtDIDRSb72RkKUKMj+DE
-X-Received: by 2002:a05:600c:3d1b:b0:431:40ca:ce6e with SMTP id 5b1f17b1804b1-431841a2f84mr19194665e9.31.1729684686284;
-        Wed, 23 Oct 2024 04:58:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/YzzmLyxM0Rp1YakBuvBzJFtayHkt8cdDRcWUoxqHWb/cqw09w3v3wO7O/ehFLlL5CPp6uA==
-X-Received: by 2002:a05:600c:3d1b:b0:431:40ca:ce6e with SMTP id 5b1f17b1804b1-431841a2f84mr19194435e9.31.1729684685911;
-        Wed, 23 Oct 2024 04:58:05 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b73:a910::f71? ([2a0d:3344:1b73:a910::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186be531esm14211535e9.18.2024.10.23.04.58.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2024 04:58:05 -0700 (PDT)
-Message-ID: <fb17dd76-b2ac-465c-b6ff-6633ac5f732a@redhat.com>
-Date: Wed, 23 Oct 2024 13:58:03 +0200
+	s=arc-20240116; t=1729684729; c=relaxed/simple;
+	bh=jCbYZI9crB5D0allmijm0LcgjWiSBS4jJi4uT0FsbXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZZzjyZEP9gfj9RKRxfN8/DpbKmKdVhCmGznotMw5FPfXoDi2j/WAz9l7uz2juhN2OWcOVsrlSNeyDVv7yDlFPkQH/u0UiBjEpbOD79UJ61rfEMBz7LCiuzCxq4tWHkwsMjXlyFza9/8XSStMfzOqmPjASaRHDEYNhoIqTN4b01w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WqzsaLO+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99FEBC4CEC6;
+	Wed, 23 Oct 2024 11:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729684729;
+	bh=jCbYZI9crB5D0allmijm0LcgjWiSBS4jJi4uT0FsbXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WqzsaLO+P4p4phQM8ZZ9X/eyaIqSyC46f4ydZowKbEopKCOEt2cl/NgJpU6ESjU49
+	 IrQ43gF8MBeYAFyrAzzRlvCNrN8cFnC7Lc3xf/Y3+4nF3mzXVNtc0iq33GASvF0Ci5
+	 uBGiSdGNMSeCemURt44DDgeIYSa0xR+S2Z1AVIzeglBHgGqYuj8gMfgJnZyIa0EY6Q
+	 vB3kTRT/Q19jgsBL971XXyoSa7mCkxpbT8NCClzvDHK0ZuPoOqOTomOjyXkVlNMZoC
+	 PzGC9d+dCIrzxVrrP4bCOHm/bp8PdEpdsN8Rtn+QLVwG4bmTacOPjF6PDPx8G/P8k4
+	 IuqrU53BaAfzQ==
+Date: Wed, 23 Oct 2024 12:58:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Patrisious Haddad <phaddad@nvidia.com>, Chris Mi <cmi@nvidia.com>
+Subject: Re: [PATCH net V2] macsec: Fix use-after-free while sending the
+ offloading packet
+Message-ID: <20241023115844.GO402847@kernel.org>
+References: <20241021100309.234125-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/7] net: pcs: xpcs: yet more cleanups
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Jose Abreu <Jose.Abreu@synopsys.com>,
- netdev@vger.kernel.org
-References: <ZxD6cVFajwBlC9eN@shell.armlinux.org.uk>
- <ZxjbPkQEOr0FBTc6@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <ZxjbPkQEOr0FBTc6@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021100309.234125-1-tariqt@nvidia.com>
 
-On 10/23/24 13:17, Russell King (Oracle) wrote:
-> On Thu, Oct 17, 2024 at 12:52:17PM +0100, Russell King (Oracle) wrote:
->> I've found yet more potential for cleanups in the XPCS driver.
->>
->> The first patch switches to using generic register definitions.
->>
->> Next, there's an overly complex bit of code in xpcs_link_up_1000basex()
->> which can be simplified down to a simple if() statement.
->>
->> Then, rearrange xpcs_link_up_1000basex() to separate out the warnings
->> from the functional bit.
->>
->> Next, realising that the functional bit is just the helper function we
->> already have and are using in the SGMII version of this function,
->> switch over to that.
->>
->> We can now see that xpcs_link_up_1000basex() and xpcs_link_up_sgmii()
->> are basically functionally identical except for the warnings, so merge
->> the two functions.
->>
->> Next, xpcs_config_usxgmii() seems misnamed, so rename it to follow the
->> established pattern.
->>
->> Lastly, "return foo();" where foo is a void function and the function
->> being returned from is also void is a weird programming pattern.
->> Replace this with something more conventional.
->>
->> With these changes, we see yet another reduction in the amount of
->> code in this driver.
->>
->>  drivers/net/pcs/pcs-xpcs.c | 134 ++++++++++++++++++++++-----------------------
->>  drivers/net/pcs/pcs-xpcs.h |  12 ----
->>  2 files changed, 65 insertions(+), 81 deletions(-)
+On Mon, Oct 21, 2024 at 01:03:09PM +0300, Tariq Toukan wrote:
+> From: Jianbo Liu <jianbol@nvidia.com>
 > 
-> It's been almost a week, and this series has not been applied.
-
-Yep, we are lagging a little behind our PW queue due to limited capacity.
-
-> First,
-> Jakub's NIPA bot failed to spot the cover message that patchwork picked
-> up - not my problem.
+> KASAN reports the following UAF. The metadata_dst, which is used to
+> store the SCI value for macsec offload, is already freed by
+> metadata_dst_free() in macsec_free_netdev(), while driver still use it
+> for sending the packet.
 > 
-> Now, I find that patchwork says "changes requested". What changes? No
-> one has replied asking for any changes to this series. Serge did
-> reply saying he would test it, and he has now done so, and replied
-> with his tested-by.
+> To fix this issue, dst_release() is used instead to release
+> metadata_dst. So it is not freed instantly in macsec_free_netdev() if
+> still referenced by skb.
+> 
+>  BUG: KASAN: slab-use-after-free in mlx5e_xmit+0x1e8f/0x4190 [mlx5_core]
+>  Read of size 2 at addr ffff88813e42e038 by task kworker/7:2/714
+>  [...]
 
-I agree there is no reason for the 'changes requested' status, I guess
-such change happened due to some miscommunication between me and Andrew.
-Let me resurrect the series in PW.
+...
 
-I'll go over that soon.
+> Fixes: 0a28bfd4971f ("net/macsec: Add MACsec skb_metadata_dst Tx Data path support")
+> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+> Reviewed-by: Chris Mi <cmi@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  drivers/net/macsec.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> V2:
+> - Removed NULL check before call to dst_release().
 
-Thanks,
+Thanks Jianbo, all, for the update.
 
-Paolo
+Reviewed-by: Simon Horman <horms@kernel.org>
 
+Please do follow up on the unencrypted packet issue flagged
+by Sabrina in her review of v1 [1].
+
+https://lore.kernel.org/all/Zw6CntwUyqM6CivS@hog/
+
+...
 
