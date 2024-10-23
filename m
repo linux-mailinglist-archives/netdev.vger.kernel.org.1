@@ -1,169 +1,184 @@
-Return-Path: <netdev+bounces-138374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA829AD258
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:16:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9C29AD2E9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53DAF1F21711
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:16:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C059B1C21AF6
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0D51B85E2;
-	Wed, 23 Oct 2024 17:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EB71CF7DF;
+	Wed, 23 Oct 2024 17:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RDslFYwX"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZDVEYmIh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9252312DD88
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 17:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5FF1C9DF0
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 17:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729703791; cv=none; b=c6DCLZ0pj1TTGqhSb4niXVndV2ru/sd36itGmeXMZDD0FE7MCtD3nH5hROVaYXaMu+Xhu6D9qXRjR0IWhG/9w0uyDDvtlGFgLyRqYbF085XYrJY2DWUHQVANZYtGp/456xinxfOidJAuOiVyM6+G/BJIrLDMY2I2CpeQtiOnWKs=
+	t=1729704487; cv=none; b=L3h6cPVgdMI4s8HCUqGPAiSS/YxvailVwZmW+Pa9aks+yHUlSmsoi+He9sSECUwe6OPFabp17+Pl9aeANimbCt7vD6yjeYUFXkEJbRsj2WGek6NTNYFq8nhlo0P5T8N4QfgCHjr4yPwbQxQ4Mrqt+tnz0PWIK/3Qab/gFYPsUwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729703791; c=relaxed/simple;
-	bh=Uv3hkCr5Ps2yRPW2MYv7ATs5YRMkTHa0nqeF+L4acfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=YS5p5vPwdblLcy2ql3SyQR3hSZUkNpJqOA+D4gaPiC/pQvO4rWRsAocZGABEaP5AYsQgi7IAIrHRNPaJTOKxQSUHZuB3k/mer5IiuEQg/md8dg4YxDnmkoza8zCRXXS+QIHpfxQ4+OS6hMNw91xvt5CyBIpIt4wLjqtyA9M5UlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RDslFYwX; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43163667f0eso123675e9.0
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:16:29 -0700 (PDT)
+	s=arc-20240116; t=1729704487; c=relaxed/simple;
+	bh=GEYst81Ty/eex+e2+Hr0maNmWSAdXTnCbjRB00LJ29M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nFdAeLKepl+PSSSetVMTNOaEXZg0XC2ReRS5d7Y/fJJAKoggL7OwGRReb49cecQ+hgQ8i56NjJHUz0sbGutRebFkfA7/6q7yDYmwPC08XFHqHT2NihgNDhLEml98IyrF65XUpNrWcouq5jqBq6urnTuAiaPmhRsBJQKiFjK0r/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZDVEYmIh; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71e57d89ffaso59779b3a.1
+        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:28:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1729703788; x=1730308588; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OljP4PdWV2R3StPPy5+/cJKVw4Vph1NJkS5of3TSma0=;
-        b=RDslFYwXpLpysTPGDY8UayI6rpoyHJ3Nrt5ZTa+vBY0IUYn64ShjkpQ26BWxGCg+qj
-         EGeA8eOcGuP1yBaNgaZHhrHrNwI5Ho4V6/9g6BUljvyfHvL8/oxn2JiuZNRRkBJpcIAK
-         vcRd7Pi1X666BrPTJwF+r7EKbfWZd9Pw0aH/NB9H/nMjDA5WE7A11LtqTgCw35D/5+P8
-         dqljaRvwCwgIEgSb2PUU+M3MpLQ57oDm9uoIrXn1C15sNRvARF1UCsaqsm8vH3vs0dLc
-         jR/gRi6JwsVGygznrk+6lIylQ7gBW+TQZX2dEhtzCGWS6vBc7mydrL3BXqyBAdBF5HJV
-         astQ==
+        d=fastly.com; s=google; t=1729704484; x=1730309284; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XDXXNue6psjylQE85p9KLrQo9I2faybviN6SW/hT9xU=;
+        b=ZDVEYmIhDRp8SyoLyZtMEE7cPMzPEhFf6F4gi43POvJDRLe+EGhqRxDeZ5mltYXHxP
+         u+DpV9J4ncGABGz2ncAVQVNaXs4GAyACLRyiV6oNfU9Sr1A6lAulylCp820Ew975FNsK
+         4F+RO+zhtRet9jSL+J7OR0BT0qsrZM47t7y9A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729703788; x=1730308588;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1729704484; x=1730309284;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OljP4PdWV2R3StPPy5+/cJKVw4Vph1NJkS5of3TSma0=;
-        b=ibq/Wn1bpejXde4O+rKg6O7wr2SRmkovrXKuHuF+KEENuz0waa+LIQjGfW9r75jhlN
-         1nqhFnlelLzXPv4e4ONdolWbq1JiXcLr3BtLF3LR1PGL3cJ7Lzf8bmuyoOUUSH9QRKid
-         d5X8WV+iVv3O8ALMj4rgm8uhJ5tovGyXipO7+RNXDHQcS4/TG62hM5Wq4H0OhiklDWs6
-         j0qAE8C2wSjFE7ndSPo7GHJJ4JxgoXi/f2AAbodBATBo6IiReVSyPSgYN+Xiy4SXkpSP
-         M0W8gYuHyU0JDuYK7qv9YEtpLzSi/RhJZcrg/u23Srh0qR+a16OSIiOakgnkm295sf1b
-         drXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXAvGCXX8zinThs4HEiyK3ZS9vI1I99O9eyPlXYTLj+HtFC7Xo7RahsrPcv9A+PD5ij3DBX/RI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMH5JkjqttgXYklTjjB8/aP5vTyZp9nvPphdbTxBItcZEs+rlT
-	IG5TOJJ+fQG28W3tFFgwHUZLfJuNYb56O307o3Al5rG8de0/cbmyqpsgzxTdhFM=
-X-Google-Smtp-Source: AGHT+IHuawpuTA3FdkKB3grmiiT77MshEcjs2fsxx4eyqV28W03YuXYVz0wzAjnd/bp4vmWf9SSucg==
-X-Received: by 2002:a5d:6102:0:b0:37d:509e:8742 with SMTP id ffacd0b85a97d-37efceee7d5mr2251003f8f.1.1729703787648;
-        Wed, 23 Oct 2024 10:16:27 -0700 (PDT)
-Received: from localhost ([41.210.147.101])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9c6b0sm9307877f8f.109.2024.10.23.10.16.26
+        bh=XDXXNue6psjylQE85p9KLrQo9I2faybviN6SW/hT9xU=;
+        b=vlRF15BgZqRrsA34j1MackQ1xIcsh4Vxtfc3Vm4X9HX9O8AnNPvpGm9S7yvpIh081B
+         CBW8abjoSWEURfLbqKXCuw8sNT5rTqBvsjlCigiICdvOj1k/MzveLX/ci63DrtYydFri
+         gKBvF/PGOnApgutpvnsR8vSLqHIXrKBRRbRQZbGigVCoynkK1Tz4jjRSpzWk97Jz7Ug1
+         WonxUrJLa8lXnojmb9y5uctMOrecZSg38/RhGRcenr+DCG0nQuatPKoG6TP6H1C6IXnp
+         8ALYMG0mk9flNT9KfFqcTJJfQjBLqKPQ5YnrvE9lCtN8dvVjrLzufGlLr0wkIAi0auwv
+         39Yg==
+X-Gm-Message-State: AOJu0YwfgTVYc9ypnA2ixPM5hElZkChNkZCG6m0dizE89zNdnGqU6beA
+	7Yc2VsUGdeXjjmnClSnHnEGdhntxX4kEh2HNCjqt4eH0XFGbnTanzqejP+Oc/QKzdT9rLXi8LEJ
+	sy7izue6RD+AQLW4+MDsG9ZQG3/Pli08nTjDJ5Re4+VYk/BA0NzfbTrW040WZXStk7fsHM9ogbz
+	AZrI0EQGdMl44Nvyt6jk27Qp7Awt54pyqb6vY=
+X-Google-Smtp-Source: AGHT+IHXXArha9jNHjLZbUZOKXb2fAUQmfhtIzPjAskZgyUcPyxmLBYIsFCiKKKWKAuVsa/v95cbrA==
+X-Received: by 2002:a05:6a21:3942:b0:1d9:17fa:e5d8 with SMTP id adf61e73a8af0-1d978b3e396mr3930524637.26.1729704484409;
+        Wed, 23 Oct 2024 10:28:04 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13355casm6554748b3a.59.2024.10.23.10.28.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 10:16:27 -0700 (PDT)
-Date: Wed, 23 Oct 2024 20:16:21 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Dong Chenchen <dongchenchen2@huawei.com>,
-	pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	fw@strlen.de, kuniyu@amazon.com
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-	yuehaibing@huawei.com, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
-Message-ID: <01b2bdd1-39f4-43d1-a7e6-f8e8061175a4@stanley.mountain>
+        Wed, 23 Oct 2024 10:28:04 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: jacob.e.keller@intel.com,
+	Joe Damato <jdamato@fastly.com>,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [iwl-net v2] e1000: Hold RTNL when e1000_down can be called
+Date: Wed, 23 Oct 2024 17:27:45 +0000
+Message-Id: <20241023172745.181265-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241022085753.2069639-1-dongchenchen2@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Dong,
+e1000_down calls netif_queue_set_napi, which assumes that RTNL is held.
 
-kernel test robot noticed the following build warnings:
+There are a few paths for e1000_down to be called in e1000 where RTNL is
+not currently being held:
+  - e1000_shutdown (pci shutdown)
+  - e1000_suspend (power management)
+  - e1000_reinit_locked (via e1000_reset_task delayed work)
+  - e1000_io_error_detected (via pci error handler)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dong-Chenchen/net-netfilter-Fix-use-after-free-in-get_info/20241022-165936
-base:   net/main
-patch link:    https://lore.kernel.org/r/20241022085753.2069639-1-dongchenchen2%40huawei.com
-patch subject: [PATCH net] net: netfilter: Fix use-after-free in get_info()
-config: x86_64-randconfig-161-20241023 (https://download.01.org/0day-ci/archive/20241024/202410240020.Cqi2d68p-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+Hold RTNL in three places to fix this issue:
+  - e1000_reset_task: igc, igb, and e100e all hold rtnl in this path.
+  - e1000_io_error_detected (pci error handler): e1000e and ixgbe hold
+    rtnl in this path. A patch has been posted for igc to do the same
+    [1].
+  - __e1000_shutdown (which is called from both e1000_shutdown and
+    e1000_suspend): igb, ixgbe, and e1000e all hold rtnl in the same
+    path.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202410240020.Cqi2d68p-lkp@intel.com/
+The other paths which call e1000_down seemingly hold RTNL and are OK:
+  - e1000_close (ndo_stop)
+  - e1000_change_mtu (ndo_change_mtu)
 
-smatch warnings:
-net/netfilter/x_tables.c:1280 xt_find_table_lock() warn: passing zero to 'ERR_PTR'
+Based on the above analysis and mailing list discussion [2], I believe
+adding rtnl in the three places mentioned above is correct.
 
-vim +/ERR_PTR +1280 net/netfilter/x_tables.c
+Fixes: 8f7ff18a5ec7 ("e1000: Link NAPI instances to queues and IRQs")
+Reported-by: Dmitry Antipov <dmantipov@yandex.ru>
+Closes: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
+Link: https://lore.kernel.org/netdev/20241022215246.307821-3-jdamato@fastly.com/ [1]
+Link: https://lore.kernel.org/netdev/ZxgVRX7Ne-lTjwiJ@LQ3V64L9R2/ [2]
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ v2:
+   - No longer an RFC
+   - Include an rtnl_lock/rtnl_unlock in e1000_io_error_detected
+     inspired by ixgbe's implementation of the same
 
-03d13b6868a261 Florian Westphal  2017-12-08  1234  /* Find table by name, grabs mutex & ref.  Returns ERR_PTR on error. */
-76108cea065cda Jan Engelhardt    2008-10-08  1235  struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
-76108cea065cda Jan Engelhardt    2008-10-08  1236  				    const char *name)
-2e4e6a17af35be Harald Welte      2006-01-12  1237  {
-1d610d4d31a8ed Florian Westphal  2021-04-01  1238  	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
-fdacd57c79b79a Florian Westphal  2021-08-03  1239  	struct module *owner = NULL;
-fdacd57c79b79a Florian Westphal  2021-08-03  1240  	struct xt_template *tmpl;
-fdacd57c79b79a Florian Westphal  2021-08-03  1241  	struct xt_table *t;
-f4f502d5a8ea29 Dong Chenchen     2024-10-22  1242  	int err = -ENOENT;
-2e4e6a17af35be Harald Welte      2006-01-12  1243  
-7926dbfa4bc14e Pablo Neira Ayuso 2014-07-31  1244  	mutex_lock(&xt[af].mutex);
-1d610d4d31a8ed Florian Westphal  2021-04-01  1245  	list_for_each_entry(t, &xt_net->tables[af], list)
-2e4e6a17af35be Harald Welte      2006-01-12  1246  		if (strcmp(t->name, name) == 0 && try_module_get(t->me))
-2e4e6a17af35be Harald Welte      2006-01-12  1247  			return t;
-b9e69e12739718 Florian Westphal  2016-02-25  1248  
-fdacd57c79b79a Florian Westphal  2021-08-03  1249  	/* Table doesn't exist in this netns, check larval list */
-fdacd57c79b79a Florian Westphal  2021-08-03  1250  	list_for_each_entry(tmpl, &xt_templates[af], list) {
-fdacd57c79b79a Florian Westphal  2021-08-03  1251  		if (strcmp(tmpl->name, name))
-b9e69e12739718 Florian Westphal  2016-02-25  1252  			continue;
-fdacd57c79b79a Florian Westphal  2021-08-03  1253  		if (!try_module_get(tmpl->me))
-03d13b6868a261 Florian Westphal  2017-12-08  1254  			goto out;
-fdacd57c79b79a Florian Westphal  2021-08-03  1255  
-fdacd57c79b79a Florian Westphal  2021-08-03  1256  		owner = tmpl->me;
-fdacd57c79b79a Florian Westphal  2021-08-03  1257  
-b9e69e12739718 Florian Westphal  2016-02-25  1258  		mutex_unlock(&xt[af].mutex);
-fdacd57c79b79a Florian Westphal  2021-08-03  1259  		err = tmpl->table_init(net);
-03d13b6868a261 Florian Westphal  2017-12-08  1260  		if (err < 0) {
-fdacd57c79b79a Florian Westphal  2021-08-03  1261  			module_put(owner);
-03d13b6868a261 Florian Westphal  2017-12-08  1262  			return ERR_PTR(err);
-b9e69e12739718 Florian Westphal  2016-02-25  1263  		}
-b9e69e12739718 Florian Westphal  2016-02-25  1264  
-b9e69e12739718 Florian Westphal  2016-02-25  1265  		mutex_lock(&xt[af].mutex);
-b9e69e12739718 Florian Westphal  2016-02-25  1266  		break;
-b9e69e12739718 Florian Westphal  2016-02-25  1267  	}
-b9e69e12739718 Florian Westphal  2016-02-25  1268  
-f4f502d5a8ea29 Dong Chenchen     2024-10-22  1269  	if (err < 0)
-f4f502d5a8ea29 Dong Chenchen     2024-10-22  1270  		goto out;
-f4f502d5a8ea29 Dong Chenchen     2024-10-22  1271  
-b9e69e12739718 Florian Westphal  2016-02-25  1272  	/* and once again: */
-1d610d4d31a8ed Florian Westphal  2021-04-01  1273  	list_for_each_entry(t, &xt_net->tables[af], list)
-b9e69e12739718 Florian Westphal  2016-02-25  1274  		if (strcmp(t->name, name) == 0)
-b9e69e12739718 Florian Westphal  2016-02-25  1275  			return t;
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-ret it zero here, but if we fail to find the name then we should set ret =
--ENOENT;
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 4de9b156b2be..3f089c3d47b2 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -3509,7 +3509,9 @@ static void e1000_reset_task(struct work_struct *work)
+ 		container_of(work, struct e1000_adapter, reset_task);
+ 
+ 	e_err(drv, "Reset adapter\n");
++	rtnl_lock();
+ 	e1000_reinit_locked(adapter);
++	rtnl_unlock();
+ }
+ 
+ /**
+@@ -5074,7 +5076,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
+ 			usleep_range(10000, 20000);
+ 
+ 		WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
++		rtnl_lock();
+ 		e1000_down(adapter);
++		rtnl_unlock();
+ 	}
+ 
+ 	status = er32(STATUS);
+@@ -5235,16 +5239,20 @@ static pci_ers_result_t e1000_io_error_detected(struct pci_dev *pdev,
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+ 	struct e1000_adapter *adapter = netdev_priv(netdev);
+ 
++	rtnl_lock();
+ 	netif_device_detach(netdev);
+ 
+-	if (state == pci_channel_io_perm_failure)
++	if (state == pci_channel_io_perm_failure) {
++		rtnl_unlock();
+ 		return PCI_ERS_RESULT_DISCONNECT;
++	}
+ 
+ 	if (netif_running(netdev))
+ 		e1000_down(adapter);
+ 
+ 	if (!test_and_set_bit(__E1000_DISABLED, &adapter->flags))
+ 		pci_disable_device(pdev);
++	rtnl_unlock();
+ 
+ 	/* Request a slot reset. */
+ 	return PCI_ERS_RESULT_NEED_RESET;
 
-b9e69e12739718 Florian Westphal  2016-02-25  1276  
-fdacd57c79b79a Florian Westphal  2021-08-03  1277  	module_put(owner);
-b9e69e12739718 Florian Westphal  2016-02-25  1278   out:
-9e19bb6d7a0959 Ingo Molnar       2006-03-25  1279  	mutex_unlock(&xt[af].mutex);
-f4f502d5a8ea29 Dong Chenchen     2024-10-22 @1280  	return ERR_PTR(err);
-2e4e6a17af35be Harald Welte      2006-01-12  1281  }
-
+base-commit: d05596f248578be943015c1237120574a8d845dd
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
 
 
