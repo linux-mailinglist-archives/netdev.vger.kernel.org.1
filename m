@@ -1,214 +1,95 @@
-Return-Path: <netdev+bounces-138120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 417109AC0C0
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:54:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499AB9AC0DC
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 631A81C23472
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:54:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BE422841A9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF911155C87;
-	Wed, 23 Oct 2024 07:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2391547F3;
+	Wed, 23 Oct 2024 08:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cqHwpYAl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhvUc0hV"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A350155742;
-	Wed, 23 Oct 2024 07:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A9D1448DF
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729670054; cv=none; b=XbaeiNJ8d/oe4wY4QEZGtpgf7rjRvQHmAqMFearIbURwIDWwpZci00I1LLgpAl2ZvrDSE13rW2bWFjRT43ZCN4d9C2qL8DQHY6dfLua+iM4pMmwSePF4MqZfo4svxWFGP1BVabBkuxmz/VmjTcJmmjYpdnSFq8FFPiOCPr3ZxWg=
+	t=1729670423; cv=none; b=BbfFLGpg8RBYSA8a6rznKXdkGUC7crQmvEG7DP9MczJJUnOvNHo/I2ATp3vjWVeKIbWzqKKrdMhr8fMOgAzlQY12Q709f4iJq5Su5V09VYHatFcVmzeX+qxifLUu3FwfleEW7wmuyofrAzcOUkCyIhlQrppVk5cptX00kST3r7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729670054; c=relaxed/simple;
-	bh=HkNoZ5FCu3rF5J7aCvuNlnreJOKQyuHkkl7kviNxQik=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iMCWeq5dE/rHHgNxMWSfvCDOLtCE4OToJGbsboMraOXULJ8wyDrQVTbASjfzjfcIvJZOAI9Z1TRzseRnxol/7xVXXp2MUd6GB0JIm06TIZ8MZbEgozUpXsP55834v56beHBizf8FzbNpC6n86yRPlKBM2IoiUQ3AUO+fBmgrHoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cqHwpYAl; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AA4D5FF803;
-	Wed, 23 Oct 2024 07:54:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1729670049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TdvS4VbW0v8hQ6mg/PNYWge1aqhZUl5W/f00dp8iRAc=;
-	b=cqHwpYAluT7D6Tlq83Uamt7EsDHI32fcpyhgwQab56fp2y3T5qncv1UwZOrkJ9Iqb8QAcF
-	uaNJnUEfLZQZwlcW7sP98e3suvfthQ7kfTFbhLsrPHluV+/79kuhYfWcnQzdE3X+AEiGKD
-	IPGf+ewApaLcSH2tQWfuUJlvhnDrXVRV6wQuwV9vC4kACqSrTm44ln5WbDMfJ+T5CAnYPo
-	Ji7/2a1TP3btJeC2xFQpysNmLOm3ZCO0X14uZPj70/MlsqHmfjVYDssV7A03baBOlHYwDD
-	VnJ6R1yR4tvrAoFOZmzuYlmje8oFfoRiBGMA9vDz0AVgYJAB4wkk5UMg4mN88g==
-Message-ID: <71c93145-f7ed-485a-99f2-fab9529e6bcb@bootlin.com>
-Date: Wed, 23 Oct 2024 09:54:08 +0200
+	s=arc-20240116; t=1729670423; c=relaxed/simple;
+	bh=QHVbKbqQdB2pS7YTQ48n2yF0+rNCoAHjKCU4pU53pZ0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=juf9GZrS6yIS46y/H+h6aBEMIQkQZ7e31M6AsPK1h8VYl3pEpRm4PJERpJarwpu838Uo06pPJFNaHA9mimJjaHO+MrJ4EXFXHK+nu1OLrbuvzXhbCDqDUSZ8bjbidlIWjQ5r1YBd9CFnjSdokVbSeIhk83PJtpkkUI9Zs1pqObQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BhvUc0hV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA73EC4CEC6;
+	Wed, 23 Oct 2024 08:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729670422;
+	bh=QHVbKbqQdB2pS7YTQ48n2yF0+rNCoAHjKCU4pU53pZ0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BhvUc0hVHmKVZBTTqEM8sg0Ns4wGS6uL2PxvF876+5eY4ui3ppiKFx5fcTZ4qd6Jr
+	 fymtUswB+PhlDw5z8eoJHjlrW6hrTk+9bQ0T4FP+8elUCqwz1TXCuSDWLoPrv4MroX
+	 huf8DfLUBGpcm5Gx3+sQ0GYFo8wtQnJc96QAQ5ChRXKyyo6y+o1gNbhmXtn3j5+JFh
+	 tGGm+nnOHXJvYV5Cc/lkKWkgTp5s23DRAwPrDWXsubEKhY9+TVYCkRsCICFYSDM5j6
+	 VXe7HZFz1PgSRZtZ+eBHTRerVmdeA1jFaInjzjl+N0p2/dLWV260N6Uk8Q40BgCMf6
+	 w12mUaZgCCBYw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710963809A8A;
+	Wed, 23 Oct 2024 08:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
-To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241022013855.284783-1-marex@denx.de>
- <c9e98811-15f5-427a-82f7-2e7fff4a9873@bootlin.com>
- <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
-Content-Language: en-US
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-In-Reply-To: <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+Subject: Re: [PATCH net-next v2] netdevsim: macsec: pad u64 to correct length in
+ logs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172967042926.1509139.6764323624352044400.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Oct 2024 08:00:29 +0000
+References: <20241017131933.136971-1-anezbeda@redhat.com>
+In-Reply-To: <20241017131933.136971-1-anezbeda@redhat.com>
+To: Ales Nezbeda <anezbeda@redhat.com>
+Cc: netdev@vger.kernel.org, sd@queasysnail.net, kuba@kernel.org
 
-Hello Marek,
+Hello:
 
-On 10/22/24 15:19, Marek Vasut wrote:
-> On 10/22/24 12:43 PM, Alexis Lothoré wrote:
->> Hi Marek,
-> 
-> Hi,
-> 
->> On 10/22/24 03:38, Marek Vasut wrote:
->>> The bus locking in this driver is broken and produces subtle race
->>> condition with ksdioirqd and its mmc_claim_host()/mmc_release_host()
->>> usage in case of SDIO bus. Rework the locking to avoid this race
->>> condition.
->>>
->>> The problem is the hif_cs mutex used in acquire_bus()/release_bus(),
->>> which makes it look like calling acquire_bus() results in exclusive
->>> access to the bus, but that is not true for SDIO bus. For SDIO bus,
->>> to obtain exclusive access (any access, really), it is necessary to
->>> call sdio_claim_host(), which is a wrapper around mmc_claim_host(),
->>> which does its own locking. The acquire_bus() does not do that, but
->>> the SDIO interface implementation does call sdio_claim_host() and
->>> sdio_release_host() every single command, which is problematic. To
->>> make things worse, wilc_sdio_interrupt() implementation called from
->>> ksdioirqd first calls sdio_release_host(), then interrupt handling
->>> and finally sdio_claim_host().
->>>
->>> The core problem is that sdio_claim_host() cannot be done per command,
->>> but has to be done per register/data IO which consists of multiple
->>> commands.
->>
->> Is it really true ? What makes you say that we can not perform multiple
->> operations under the same exclusive sdio section ?
-> 
-> What I am trying to say is this:
-> 
-> With current code, this can happen, which is not good, because transfers from
-> multiple threads can be interleaved and interfere with each other:
-> 
-> thread 1                         thread2
-> do_some_higher_level_op() {
->  ...
->  read_register_0x3b0000() {
->   claim_bus
->   CMD52 0x00
->   release bus                    ksdioirqd() {
->                                    claim_bus
->                                    CMD52 0x0f, lets read SDIO_CCCR_INTx
->                                    release_bus
->   claim bus                      }
->   CMD52 0x00
->   release_bus
->   claim_bus
->   CMD52 0x3b
->   release_bus
->   claim_bus
->   CMD53 lets read data
->   release_bus
->  }
->  ...
-> }
-> 
-> What should happen is either:
-> 
-> thread 1                         thread2
->                                  ksdioirqd() { // option 1
->                                    claim_bus
->                                    CMD52 0x0f, lets read SDIO_CCCR_INTx
->                                    release_bus
->                                  }
-> do_some_higher_level_op() {
->  claim_bus
->  ...
->  read_register_0x3b0000 {
->   CMD52 0x00
->   CMD52 0x00
->   CMD52 0x3b
->   CMD53 lets read data
->  }
->  ...
->  read_another_register()
->  ...
->  release_bus
-> }
->                                  ksdioirqd() { // option 2
->                                    claim_bus
->                                    CMD52 0x0f, lets read SDIO_CCCR_INTx
->                                    release_bus
->                                  }
-> 
-> That's what this patch implements, to avoid the interference.
-> 
-> Maybe I should include the infographics? Or reword this somehow?
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-What I may have misunderstood is your first sentence ("sdio_claim_host() cannot
-be done per command, but has to be done per register/data IO which consists of
-multiple commands", especially command VS reg/data io), but your graph clarified
-it for me, thanks, so in the end we agree on this :) That may just be me having
-poorly interpreted, so no need to add the graphs to the commit
-
-[...]
-
->>>   static int wilc_wlan_cfg_commit(struct wilc_vif *vif, int type,
->>> diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.h b/drivers/net/
->>> wireless/microchip/wilc1000/wlan.h
->>> index b9e7f9222eadd..ade2db95e8a0f 100644
->>> --- a/drivers/net/wireless/microchip/wilc1000/wlan.h
->>> +++ b/drivers/net/wireless/microchip/wilc1000/wlan.h
->>> @@ -403,6 +403,8 @@ struct wilc_hif_func {
->>>       void (*disable_interrupt)(struct wilc *nic);
->>>       int (*hif_reset)(struct wilc *wilc);
->>>       bool (*hif_is_init)(struct wilc *wilc);
->>> +    void (*hif_claim)(struct wilc *wilc);
->>> +    void (*hif_release)(struct wilc *wilc);
->>
->> So IIUC, your series push the hif_cs lock into each bus layer of the driver,
->> remove any explicit call to bus-specific locking mechanism from those layers,
->> and makes the upper layer control the locking. As mentioned above, I don't
->> understand why those layers can not manage the bus-specific locking by
->> themselves (which would be a big win for the upper layer).
+On Thu, 17 Oct 2024 15:19:33 +0200 you wrote:
+> Commit 02b34d03a24b ("netdevsim: add dummy macsec offload") pads u64
+> number to 8 characters using "%08llx" format specifier.
 > 
-> Because of acquire_bus()/release_bus() which I think is an attempt to serialize
-> bus access across multiple complex operations (=commands sent to the card), see
-> above.
+> Changing format specifier to "%016llx" ensures that no matter the value
+> the representation of number in log is always the same length.
+> 
+> Before this patch, entry in log for value '1' would say:
+>     removing SecY with SCI 00000001 at index 2
+> After this patch is applied, entry in log will say:
+>     removing SecY with SCI 0000000000000001 at index 2
+> 
+> [...]
 
-Taking a further look at some examples in the driver, I see that indeed the
-"scope" of acquire_bus/release_bus is larger than simple bus operations. So I
-withdraw my proposal which was wrong.
+Here is the summary with links:
+  - [net-next,v2] netdevsim: macsec: pad u64 to correct length in logs
+    https://git.kernel.org/netdev/net-next/c/1a629afd590b
 
-Thanks,
-
-Alexis
-
+You are awesome, thank you!
 -- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
