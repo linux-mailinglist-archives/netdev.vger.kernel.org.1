@@ -1,222 +1,152 @@
-Return-Path: <netdev+bounces-138097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807A39ABF55
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:52:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E019ABF64
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:56:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3CF2870FB
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:52:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC5E71F24943
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:56:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A0414A615;
-	Wed, 23 Oct 2024 06:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C06B1514FB;
+	Wed, 23 Oct 2024 06:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SVr1xglj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728F16EB7C;
-	Wed, 23 Oct 2024 06:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9264B1509A0;
+	Wed, 23 Oct 2024 06:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729666334; cv=none; b=OPbGU/fiMY/b8KlRwDTAFc11zNE+qNaFNc3bCW2RTn4lgP3Q7FAhCb61xGpLN5mK+2Ic5fhkQDUlYoK157TsbdN5rOFAYmSKpt4zGciRQPWcjIKMTIUYM2VzIvA0F6E1wddbG47A3vCb/+wvjndYEjBPwhQDB2NIAuQY686Yd5A=
+	t=1729666593; cv=none; b=HJcnlHFMQPiK+wBZuav8Yx141rh2rYr+KxEKnNbeWwZJAPEbV2rGOX5ka0IjNi5VxCK+Uf8Um10N4gas5lx9tPQp1b0oBX/kFgIP33O28d5IsGtBNGzChKPS8oi6sPnEuAgkB3ec6eJJP1dyDS73mQ5725KXbmEAVrx5W8DVNl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729666334; c=relaxed/simple;
-	bh=EUdBVH5hXEGzvh0WpLYIKcsLNXNeWShyHlmv4gfs8wc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=lfhi84VLz8a87B6BS5NK0jpENF4G/3ch9vhR1f7AQJqra1D6Z/gPu8EVcwZNcIffuwTCQc/Diwm1IXM3pfbAfEZAtVvetEps5LrcZDE+0eNRaNY1OXaJPOVANpEXWHnfzmdueYaTJ9BD75S1oSa7B2CG3KGmIpA67GMcsKwL2X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XYKQz6CLBzfdRL;
-	Wed, 23 Oct 2024 14:49:31 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1A6EA1800D9;
-	Wed, 23 Oct 2024 14:52:02 +0800 (CST)
-Received: from [10.174.177.223] (10.174.177.223) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 23 Oct 2024 14:52:00 +0800
-Message-ID: <7492d260-0e17-4f60-81c2-861efe317ece@huawei.com>
-Date: Wed, 23 Oct 2024 14:52:00 +0800
+	s=arc-20240116; t=1729666593; c=relaxed/simple;
+	bh=FBdH48WS+IvGD8WYTKIx5RamtptdbVy8DoUvR1LlUls=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OI9QS4BXsSQYNU4Ei8utqvwD18/1hToV0i0USr9poRq9ge2hSwy+vqhezC+FjEa2SUe+MgtyshVmGiw5yJGyw7m8h0d2DK3sO9z4KY7bMxDLnfEnHAeUmHKzHlsgMycAeZInxKgrJ6w39I4P5fWaooVUrutSlYksPRZ9SXmJEq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SVr1xglj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49N0N2Qb014739;
+	Wed, 23 Oct 2024 06:56:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=YvwiCkNvSHTkSF26CAop+OGG4ER7uIdT4mf9Hw7W7
+	wg=; b=SVr1xgljcQ0AfBS7PhTzO7JRfyYHek15TcGw1+OXwmLEKOuupB4/AsMC3
+	mI0H1RKntBAu2wVVkRMuSaxh1bL4y2laE8666xbUmGk1sSe5GB4CVdon69Hobx02
+	U1SfGPBiu0vg91Egv7zTJr+xG/B+vHo/B66YS37wWneKLwWjxcS2owEiXU6lJnDz
+	thDjst9mn23HU3H5SbyH/GF9U8DEP/SVtm/XX7OnyMxQhRk26EVJHT4Pjj+/JYhp
+	NmLoYSaXWNUxrCvBLW2r3p2/A6rtQg8iCjsus5kZIm0IUY3wcNyvn917vBW3R3gW
+	BqW8IWAwh5RZwoV/ExFyW0UQsbEGQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emadspvv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 06:56:21 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49N6uK8J032083;
+	Wed, 23 Oct 2024 06:56:20 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emadspvq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 06:56:20 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49N2rh3h012615;
+	Wed, 23 Oct 2024 06:56:20 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42emhf9mgy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 06:56:19 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49N6uGSe52429098
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 06:56:16 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8C7202004D;
+	Wed, 23 Oct 2024 06:56:16 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7CB122004B;
+	Wed, 23 Oct 2024 06:56:16 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 23 Oct 2024 06:56:16 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55390)
+	id 400D8E04B3; Wed, 23 Oct 2024 08:56:16 +0200 (CEST)
+From: Sven Schnelle <svens@linux.ibm.com>
+To: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Ricardo B. Marliere" <ricardo@marliere.net>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH net-next v4 0/2] PtP driver for s390 clocks
+Date: Wed, 23 Oct 2024 08:55:59 +0200
+Message-ID: <20241023065601.449586-1-svens@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
-From: "dongchenchen (A)" <dongchenchen2@huawei.com>
-To: <dongchenchen2@huawei.com>
-CC: <pablo@netfilter.org>, <kadlec@netfilter.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<fw@strlen.de>, <kuniyu@amazon.com>, <netfilter-devel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <yuehaibing@huawei.com>, Simon Horman
-	<horms@kernel.org>
-References: <20241022085753.2069639-1-dongchenchen2@huawei.com>
- <20241022153327.GW402847@kernel.org>
- <1e9083bf-2297-443c-a703-4c54b6062886@huawei.com>
-In-Reply-To: <1e9083bf-2297-443c-a703-4c54b6062886@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: X0Vmp7ex288DEA4M4p9y0MzayYJUejOc
+X-Proofpoint-GUID: eYFR-xYEoYC28xUczqRz8kqDN0cs-Ryx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 phishscore=0 mlxlogscore=985 adultscore=0 spamscore=0
+ malwarescore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410230041
 
+Hi,
 
-On 2024/10/23 14:32, dongchenchen (A) wrote:
->
-> On 2024/10/22 23:33, Simon Horman wrote:
->> On Tue, Oct 22, 2024 at 04:57:53PM +0800, Dong Chenchen wrote:
->>> ip6table_nat module unload has refcnt warning for UAF. call trace is:
->>>
->>> WARNING: CPU: 1 PID: 379 at kernel/module/main.c:853 
->>> module_put+0x6f/0x80
->>> Modules linked in: ip6table_nat(-)
->>> CPU: 1 UID: 0 PID: 379 Comm: ip6tables Not tainted 
->>> 6.12.0-rc4-00047-gc2ee9f594da8-dirty #205
->>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
->>> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
->>> RIP: 0010:module_put+0x6f/0x80
->>> Call Trace:
->>>   <TASK>
->>>   get_info+0x128/0x180
->>>   do_ip6t_get_ctl+0x6a/0x430
->>>   nf_getsockopt+0x46/0x80
->>>   ipv6_getsockopt+0xb9/0x100
->>>   rawv6_getsockopt+0x42/0x190
->>>   do_sock_getsockopt+0xaa/0x180
->>>   __sys_getsockopt+0x70/0xc0
->>>   __x64_sys_getsockopt+0x20/0x30
->>>   do_syscall_64+0xa2/0x1a0
->>>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
->>>
->>> Concurrent execution of module unload and get_info() trigered the 
->>> warning.
->>> The root cause is as follows:
->>>
->>> cpu0                      cpu1
->>> module_exit
->>> //mod->state = MODULE_STATE_GOING
->>>    ip6table_nat_exit
->>>      xt_unregister_template
->>>      //remove table from templ list
->>>                       getinfo()
->>>                       t = xt_find_table_lock
->>>                         list_for_each_entry(tmpl, &xt_templates[af]...)
->>>                             if (strcmp(tmpl->name, name))
->>>                                 continue;  //table not found
->>>                             try_module_get
->>>                         list_for_each_entry(t, &xt_net->tables[af]...)
->>>                             return t;  //not get refcnt
->>>                       module_put(t->me) //uaf
->>>      unregister_pernet_subsys
->>>      //remove table from xt_net list
->>>
->>> While xt_table module was going away and has been removed from
->>> xt_templates list, we couldnt get refcnt of xt_table->me. Skip
->>> the re-traversal of xt_net->tables list to fix it.
->>>
->>> Fixes: c22921df777d ("netfilter: iptables: Fix potential 
->>> null-ptr-deref in ip6table_nat_table_init().")
->>> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
->>> ---
->>>   net/netfilter/x_tables.c | 8 +++++---
->>>   1 file changed, 5 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
->>> index da5d929c7c85..359c880ecb07 100644
->>> --- a/net/netfilter/x_tables.c
->>> +++ b/net/netfilter/x_tables.c
->>> @@ -1239,6 +1239,7 @@ struct xt_table *xt_find_table_lock(struct net 
->>> *net, u_int8_t af,
->>>       struct module *owner = NULL;
->>>       struct xt_template *tmpl;
->>>       struct xt_table *t;
->>> +    int err = -ENOENT;
->>>         mutex_lock(&xt[af].mutex);
->>>       list_for_each_entry(t, &xt_net->tables[af], list)
->>> @@ -1247,8 +1248,6 @@ struct xt_table *xt_find_table_lock(struct net 
->>> *net, u_int8_t af,
->>>         /* Table doesn't exist in this netns, check larval list */
->>>       list_for_each_entry(tmpl, &xt_templates[af], list) {
->>> -        int err;
->>> -
->>>           if (strcmp(tmpl->name, name))
->>>               continue;
->>>           if (!try_module_get(tmpl->me))
->>> @@ -1267,6 +1266,9 @@ struct xt_table *xt_find_table_lock(struct net 
->>> *net, u_int8_t af,
->>>           break;
->>>       }
->>>   +    if (err < 0)
->>> +        goto out;
->>> +
->>>       /* and once again: */
->>>       list_for_each_entry(t, &xt_net->tables[af], list)
->>>           if (strcmp(t->name, name) == 0)
->>> @@ -1275,7 +1277,7 @@ struct xt_table *xt_find_table_lock(struct net 
->>> *net, u_int8_t af,
->>>       module_put(owner);
->> Hi Dong Chenchen,
->>
->> I'm unsure if this can happen in practice, although I guess so else the
->> module_put() call above is never reached.
->
-> Hi, Simon. Thank you very much for your suggestions!
->
-> module_put(owner) will be never reached indeed. which wiil be executed 
-> in:
->
->
-sorry, there is a problem with the email format. resend:
+these patches add support for using the s390 physical and TOD clock as ptp
+clock. To do so, the first patch adds a clock id to the s390 TOD clock,
+while the second patch adds the PtP driver itself.
 
-module_put(owner) wiil be executed in:
-1. xt_table not found in tmpl list and xt_net list:
-   owner == NULL, no need to put
-2. xt_table found in tmpl list, table_init() fail to add table to xt_net 
-list but return 0
-this situation may be mutually exclusive
+Changes in v4:
+- Add Acked-by to patches
 
-So I thought it may not need to call module_puy(owner) here
+Changes in v3:
+- drop 'IBM' from clock names
+- use u128 as return type of eitod_to_ns()
+- fix calculation in eitod_to_timespec64()
 
-xt_find_table_lock
-     list_for_each_entry(tmpl, &xt_templates[af], list)
-         if (strcmp(tmpl->name, name))
-             continue;
-         err = tmpl->table_init(net); //add xtable to xt_net list
-         if (err < 0) {
-                 module_put(owner);
-                 return ERR_PTR(err);
-         }
-     list_for_each_entry(t, &xt_net->tables[af], list)
-         if (strcmp(t->name, name) == 0)
-             return t;  //err = 0, will return here
+Changes in v2:
+- add missing MODULE_DESCRIPTION()
+- drop udev event patch
+- simplify eitod_to_ns()
+- use store_tod_clock_ext() instead of store_tod_clock_ext_cc()
+- move stp_enabled() declaration to stp.h
+- use s390 instead of 'Z' in clock names
+- defconfig symbol should be default-n
 
-     module_put(owner); // put effectively while (err == 0) && (xtable 
-found in tmpl list) and add table xt_net list failed in table_init()
-  out:
-     mutex_unlock(&xt[af].mutex);
-     return ERR_PTR(-ENOENT);
->> In any case, previously if we got
->> to this line then the function would return ERR_PTR(-ENOENT). But now it
->> will return ERR_PTR(0). Which although valid often indicates a bug.
->>
->> Flagged by Smatch.
->
-> As described above, err = 0 will be return in xt_net table list re- 
-> traversal.
->
->>>    out:
->>>       mutex_unlock(&xt[af].mutex);
->>> -    return ERR_PTR(-ENOENT);
->>> +    return ERR_PTR(err);
->>>   }
->>>   EXPORT_SYMBOL_GPL(xt_find_table_lock);
->>>   --
->>> 2.25.1
->>>
->>>
+Sven Schnelle (2):
+  s390/time: Add clocksource id to TOD clock
+  s390/time: Add PtP driver
+
+ MAINTAINERS                     |   6 ++
+ arch/s390/include/asm/stp.h     |   1 +
+ arch/s390/include/asm/timex.h   |   6 ++
+ arch/s390/kernel/time.c         |   7 ++
+ drivers/ptp/Kconfig             |  11 +++
+ drivers/ptp/Makefile            |   1 +
+ drivers/ptp/ptp_s390.c          | 129 ++++++++++++++++++++++++++++++++
+ include/linux/clocksource_ids.h |   1 +
+ 8 files changed, 162 insertions(+)
+ create mode 100644 drivers/ptp/ptp_s390.c
+
+-- 
+2.45.2
+
 
