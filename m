@@ -1,184 +1,130 @@
-Return-Path: <netdev+bounces-138375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9C29AD2E9
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:28:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8DF9AD307
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C059B1C21AF6
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:28:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A47FB23291
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EB71CF7DF;
-	Wed, 23 Oct 2024 17:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DEF1D048D;
+	Wed, 23 Oct 2024 17:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZDVEYmIh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qS0cwOVI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5FF1C9DF0
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 17:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7D41D0175;
+	Wed, 23 Oct 2024 17:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729704487; cv=none; b=L3h6cPVgdMI4s8HCUqGPAiSS/YxvailVwZmW+Pa9aks+yHUlSmsoi+He9sSECUwe6OPFabp17+Pl9aeANimbCt7vD6yjeYUFXkEJbRsj2WGek6NTNYFq8nhlo0P5T8N4QfgCHjr4yPwbQxQ4Mrqt+tnz0PWIK/3Qab/gFYPsUwk=
+	t=1729705153; cv=none; b=fFxgJZ2xzoG436LNPkvkxXM17zCy/1dpgz14hXqf+c66G3RZZojWqPGQyoPPikcTvTi9xIPdPnY7FylVpInkYZRcY4iKFno7bTC8BcK0A7aJFeL+CRdPFrWsbPAbcpgB8b7R9eHv6q8ZXucxV5uARu4HaRzoIEnA58bFYvLdYj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729704487; c=relaxed/simple;
-	bh=GEYst81Ty/eex+e2+Hr0maNmWSAdXTnCbjRB00LJ29M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nFdAeLKepl+PSSSetVMTNOaEXZg0XC2ReRS5d7Y/fJJAKoggL7OwGRReb49cecQ+hgQ8i56NjJHUz0sbGutRebFkfA7/6q7yDYmwPC08XFHqHT2NihgNDhLEml98IyrF65XUpNrWcouq5jqBq6urnTuAiaPmhRsBJQKiFjK0r/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZDVEYmIh; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71e57d89ffaso59779b3a.1
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:28:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1729704484; x=1730309284; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XDXXNue6psjylQE85p9KLrQo9I2faybviN6SW/hT9xU=;
-        b=ZDVEYmIhDRp8SyoLyZtMEE7cPMzPEhFf6F4gi43POvJDRLe+EGhqRxDeZ5mltYXHxP
-         u+DpV9J4ncGABGz2ncAVQVNaXs4GAyACLRyiV6oNfU9Sr1A6lAulylCp820Ew975FNsK
-         4F+RO+zhtRet9jSL+J7OR0BT0qsrZM47t7y9A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729704484; x=1730309284;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XDXXNue6psjylQE85p9KLrQo9I2faybviN6SW/hT9xU=;
-        b=vlRF15BgZqRrsA34j1MackQ1xIcsh4Vxtfc3Vm4X9HX9O8AnNPvpGm9S7yvpIh081B
-         CBW8abjoSWEURfLbqKXCuw8sNT5rTqBvsjlCigiICdvOj1k/MzveLX/ci63DrtYydFri
-         gKBvF/PGOnApgutpvnsR8vSLqHIXrKBRRbRQZbGigVCoynkK1Tz4jjRSpzWk97Jz7Ug1
-         WonxUrJLa8lXnojmb9y5uctMOrecZSg38/RhGRcenr+DCG0nQuatPKoG6TP6H1C6IXnp
-         8ALYMG0mk9flNT9KfFqcTJJfQjBLqKPQ5YnrvE9lCtN8dvVjrLzufGlLr0wkIAi0auwv
-         39Yg==
-X-Gm-Message-State: AOJu0YwfgTVYc9ypnA2ixPM5hElZkChNkZCG6m0dizE89zNdnGqU6beA
-	7Yc2VsUGdeXjjmnClSnHnEGdhntxX4kEh2HNCjqt4eH0XFGbnTanzqejP+Oc/QKzdT9rLXi8LEJ
-	sy7izue6RD+AQLW4+MDsG9ZQG3/Pli08nTjDJ5Re4+VYk/BA0NzfbTrW040WZXStk7fsHM9ogbz
-	AZrI0EQGdMl44Nvyt6jk27Qp7Awt54pyqb6vY=
-X-Google-Smtp-Source: AGHT+IHXXArha9jNHjLZbUZOKXb2fAUQmfhtIzPjAskZgyUcPyxmLBYIsFCiKKKWKAuVsa/v95cbrA==
-X-Received: by 2002:a05:6a21:3942:b0:1d9:17fa:e5d8 with SMTP id adf61e73a8af0-1d978b3e396mr3930524637.26.1729704484409;
-        Wed, 23 Oct 2024 10:28:04 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13355casm6554748b3a.59.2024.10.23.10.28.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 10:28:04 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: jacob.e.keller@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1729705153; c=relaxed/simple;
+	bh=Rlzd5R8B46KQqrG91+nBi0IN92xnlfSYQyEbx0z2v+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OU8oeDzMO7FhMSwL5AvdXIOOfS/NE0tvy+BshXmSSSSaXRbIfTvzBOKlierw5ItBzgtKR1jgqU+ZYgiL6+ab7MDmmM+Bd72Uty7wn0qFRSpCqO8Cbdj0Bj8rTN010WDmZdEjo0xb2D1OjKqc7gKEaUKzM2hlV0CYxDP4SktNeM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qS0cwOVI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hCXcgtGPtEn2014ULSmg0P/AaZa90Zl7RHG/bEE0dtk=; b=qS0cwOVIg/cClPHaWZxurc/tnW
+	LGtkJjOm0+MOJ1UNf1vbNAFHq9PLuCpUAs420xpmvdEPR5yI0Teo3X+WkQVtRR+ickluYg7wmotKa
+	abCoX137Z4CcNo3mVF4Htvp1PwccARknsaQ2CVChwyp6IQaLcb450I7rFx0BBHqhlUvE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t3fK1-00Azxv-Lc; Wed, 23 Oct 2024 19:39:01 +0200
+Date: Wed, 23 Oct 2024 19:39:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [iwl-net v2] e1000: Hold RTNL when e1000_down can be called
-Date: Wed, 23 Oct 2024 17:27:45 +0000
-Message-Id: <20241023172745.181265-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v2 1/3] dt-bindings: net: dsa: Add Airoha
+ AN8855 Gigabit Switch documentation
+Message-ID: <77e99052-a14e-4495-9197-06d98257c590@lunn.ch>
+References: <20241023161958.12056-1-ansuelsmth@gmail.com>
+ <20241023161958.12056-2-ansuelsmth@gmail.com>
+ <5761bdc3-7224-4de6-b0f5-bedc066c09f6@lunn.ch>
+ <67192f00.7b0a0220.343b2b.9836@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67192f00.7b0a0220.343b2b.9836@mx.google.com>
 
-e1000_down calls netif_queue_set_napi, which assumes that RTNL is held.
+> Well the first case that comes to mind is multiple switch and conflict.
+> I have no idea if there are hw strap to configure this so I assume if a
+> SoC have 2 switch (maybe of the same type), this permits to configure
+> them (with reset pin and deasserting them once the base address is
+> correctly configured)
 
-There are a few paths for e1000_down to be called in e1000 where RTNL is
-not currently being held:
-  - e1000_shutdown (pci shutdown)
-  - e1000_suspend (power management)
-  - e1000_reinit_locked (via e1000_reset_task delayed work)
-  - e1000_io_error_detected (via pci error handler)
+Is this switch internal on an internal MDIO bus, or external?
 
-Hold RTNL in three places to fix this issue:
-  - e1000_reset_task: igc, igb, and e100e all hold rtnl in this path.
-  - e1000_io_error_detected (pci error handler): e1000e and ixgbe hold
-    rtnl in this path. A patch has been posted for igc to do the same
-    [1].
-  - __e1000_shutdown (which is called from both e1000_shutdown and
-    e1000_suspend): igb, ixgbe, and e1000e all hold rtnl in the same
-    path.
+Most PHYs and switches i've seen have strapping pins to set the base
+address. It would be unusual if there was not strapping.
 
-The other paths which call e1000_down seemingly hold RTNL and are OK:
-  - e1000_close (ndo_stop)
-  - e1000_change_mtu (ndo_change_mtu)
+For the Marvell switches, the strapping moves all the MDIO
+registers. This is why we have a reg at the top level in mv88e6xxx:
 
-Based on the above analysis and mailing list discussion [2], I believe
-adding rtnl in the three places mentioned above is correct.
+        ethernet-switch@0 {
+            compatible = "marvell,mv88e6085";
+            reg = <0>;
 
-Fixes: 8f7ff18a5ec7 ("e1000: Link NAPI instances to queues and IRQs")
-Reported-by: Dmitry Antipov <dmantipov@yandex.ru>
-Closes: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
-Link: https://lore.kernel.org/netdev/20241022215246.307821-3-jdamato@fastly.com/ [1]
-Link: https://lore.kernel.org/netdev/ZxgVRX7Ne-lTjwiJ@LQ3V64L9R2/ [2]
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- v2:
-   - No longer an RFC
-   - Include an rtnl_lock/rtnl_unlock in e1000_io_error_detected
-     inspired by ixgbe's implementation of the same
+There is one family which use the values of 0 or 16, and each switch
+uses 16 addresses. So you can put two on the bus.
 
- drivers/net/ethernet/intel/e1000/e1000_main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+> > > +  mdio:
+> > > +    $ref: /schemas/net/mdio.yaml#
+> > > +    unevaluatedProperties: false
+> > > +    description:
+> > > +      Define the relative address of the internal PHY for each port.
+> > > +
+> > > +      Each reg for the PHY is relative to the switch base PHY address.
+> > 
+> > Which is not the usual meaning of reg.
+> > 
+> > > +            mdio {
+> > > +                #address-cells = <1>;
+> > > +                #size-cells = <0>;
+> > > +
+> > > +                internal_phy0: phy@0 {
+> > > +                    reg = <0>;
+> > 
+> > So given that airoha,base_smi_address defaults to 1, this is actually
+> > address 1 on the MDIO bus?
+> >
+> 
+> Yes correct. One problem I had was that moving this outside the swich
+> cause panic as it does conflict with the switch PHY address...
 
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 4de9b156b2be..3f089c3d47b2 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -3509,7 +3509,9 @@ static void e1000_reset_task(struct work_struct *work)
- 		container_of(work, struct e1000_adapter, reset_task);
- 
- 	e_err(drv, "Reset adapter\n");
-+	rtnl_lock();
- 	e1000_reinit_locked(adapter);
-+	rtnl_unlock();
- }
- 
- /**
-@@ -5074,7 +5076,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 			usleep_range(10000, 20000);
- 
- 		WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
-+		rtnl_lock();
- 		e1000_down(adapter);
-+		rtnl_unlock();
- 	}
- 
- 	status = er32(STATUS);
-@@ -5235,16 +5239,20 @@ static pci_ers_result_t e1000_io_error_detected(struct pci_dev *pdev,
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
- 
-+	rtnl_lock();
- 	netif_device_detach(netdev);
- 
--	if (state == pci_channel_io_perm_failure)
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
- 		return PCI_ERS_RESULT_DISCONNECT;
-+	}
- 
- 	if (netif_running(netdev))
- 		e1000_down(adapter);
- 
- 	if (!test_and_set_bit(__E1000_DISABLED, &adapter->flags))
- 		pci_disable_device(pdev);
-+	rtnl_unlock();
- 
- 	/* Request a slot reset. */
- 	return PCI_ERS_RESULT_NEED_RESET;
+I would make these addresses absolute, not relative. The example above
+from the marvell switch, the device using addresses 16-31 has its PHYs
+within that range, and we uses the absolute reg values.
 
-base-commit: d05596f248578be943015c1237120574a8d845dd
--- 
-2.25.1
-
+	Andrew
 
