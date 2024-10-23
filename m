@@ -1,114 +1,85 @@
-Return-Path: <netdev+bounces-138208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257649AC9D2
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:15:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B5489AC9E1
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5356C1C23960
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:15:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49FC71C23E0C
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207851E489;
-	Wed, 23 Oct 2024 12:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB76F1AB6F8;
+	Wed, 23 Oct 2024 12:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QODBdm+u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aDCbbNn/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA103FD4;
-	Wed, 23 Oct 2024 12:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765619E99E;
+	Wed, 23 Oct 2024 12:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729685736; cv=none; b=Ohoe1lFMc27KARhyU9/G/h54O0qleHBpkd5VnfxV//RgnhqCksT4UY0FSnjgj1pr2UjI7PhGxDiCtSrrvmr3aful5kviT1N5jWACZ/bSnxWehuF0N4Sfvp2VL9JLsGEs4dJgPilnYKJUDpYBdVG2jSkrS1S6RWQGrHkOnuRLdc8=
+	t=1729685971; cv=none; b=V9yIdljXUQMdE30urXapaPZcwHCT99+ZqZ8+18YxyGt1vaAk+ZoL0gwqXv9aQy4RnAgorFhUChuOF7wXDN8NyCKJGZTHduT4nkyJ5+4Hz1+whGA4pbI9MJ6ubiXslJkAm2UAwgiJMwQqE3L7co3NvPswXnrxNe/jwRDourXI/Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729685736; c=relaxed/simple;
-	bh=zmEV7kzYjK4FvefIs+qoE3S15A9ktltXHDxx9f+lFC4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CN0vgTyKh57swy+GLHZIICsCt9iyl+9zSOOzVFWuguut80r6/rQndRrucow0UnwYeGtEqc5LaOUdsCIr1D6k9PN5/xJHVXpPP8Pv9VG8/D6dsZujDjLYxajDQqWsrRgHWSvGMku6iBnUCUHoebuFPynmPP9Kp21LjRTpaSviUxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QODBdm+u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC00AC4CEC6;
-	Wed, 23 Oct 2024 12:15:32 +0000 (UTC)
+	s=arc-20240116; t=1729685971; c=relaxed/simple;
+	bh=Nel0teWPYV2DMRNkXDa1Z7k3Fl+vQmZbSDgEzb3yCgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=awzo0ygOZ/sU85dmfoZbP+sOoTFDHdRx0ACXl1lunfysdf02picpbnHsDnbxBMd8DN79tRmg7y1LrVtdXUYH8hm2h5ZeAuI+fB4xzVb1EkXtlT9HSQT4obMR0EFAwc6MZzdEGwIabnVbPtFL+wnBIkgPV9pBzCd/DV6atghUw2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aDCbbNn/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 857D2C4CEC6;
+	Wed, 23 Oct 2024 12:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729685735;
-	bh=zmEV7kzYjK4FvefIs+qoE3S15A9ktltXHDxx9f+lFC4=;
-	h=From:Date:Subject:To:Cc:From;
-	b=QODBdm+uAODGHRZP2fHYKCDpUiFMbnIR8jUcCQmizxUAusYQc1tmjeYWYAsFzXOym
-	 ++m9Run639Zf6UKyq7evfoQ1MQauQWdwFpsjWDrFxMmcdxPvjg+gil/GPGJo74vhGW
-	 8gSIrdVkxxH04j6r79S823gNXDAC6md7VaJ6lAI/XN63szTW7SEbeALCdhppa/G4+9
-	 1WY4Fss7CwWgFG66jV7kM0MAPFHw0seW6Xhdknb4YdGaVVATMjhFPjz4WRrtYJlvq9
-	 q24NdUlH9vOaClg8cc5aWz8LEfZ6kp7cRj2r8KMofUsbsSWHsY1mrQyHIMDTU/Ptbi
-	 MfEgIYmVAWMcw==
+	s=k20201202; t=1729685971;
+	bh=Nel0teWPYV2DMRNkXDa1Z7k3Fl+vQmZbSDgEzb3yCgA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aDCbbNn/kjW1k/LhjKlIjA++Na4cYYO4NvKJNHR9kQyafDU00+2yvsKUEsgFpoFFS
+	 E/CFZW5Tsq/ZsfSgWqLYnOcdrF0iMbKvEhbZA1B0hERNF4q46xLkKd4+IUhtCiyQOq
+	 WjRwl2676HBq7eOCgQxVdlWBH1UXObsg1jkAuHt6fHLjPFUMU22DzZtAjR56x+0rmj
+	 QwTnHqSVZhbI86S2NQgBbUZUFL//Ha50SAcCW/y0GCAKExUVbzFIzOWHqYkS941Gp2
+	 DzjP8EwL8eP3eHgDlaj2cfFsVLTx3uLhRDleZ0lzdC1GcpwFmh2CvyoAH0b7rtoB97
+	 h9+3CYG8MwSWA==
+Date: Wed, 23 Oct 2024 13:19:26 +0100
 From: Simon Horman <horms@kernel.org>
-Date: Wed, 23 Oct 2024 13:15:28 +0100
-Subject: [PATCH net-next] wwan: core: Pass string literal as format
- argument of dev_set_name()
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Gregory Detal <gregory.detal@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 3/3] selftests: mptcp: list sysctl data
+Message-ID: <20241023121926.GR402847@kernel.org>
+References: <20241021-net-mptcp-sched-lock-v1-0-637759cf061c@kernel.org>
+ <20241021-net-mptcp-sched-lock-v1-3-637759cf061c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241023-wwan-fmt-v1-1-521b39968639@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAN/oGGcC/x3MwQpAQBCA4VfRnE2ZReJV5CBmmIOh3Q0l725z/
- OrvfyCwVw7QZQ94PjXobgmUZzCtoy2MOieDK1xFhSvxukZD2SK2ROLKphahBlJ+eBa9/1UPxhG
- N7wjD+36j/2/XZAAAAA==
-To: Loic Poulain <loic.poulain@linaro.org>, 
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
- Johannes Berg <johannes@sipsolutions.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- netdev@vger.kernel.org, llvm@lists.linux.dev
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021-net-mptcp-sched-lock-v1-3-637759cf061c@kernel.org>
 
-Both gcc-14 and clang-18 report that passing a non-string literal as the
-format argument of dev_set_name() is potentially insecure.
+On Mon, Oct 21, 2024 at 12:25:28PM +0200, Matthieu Baerts (NGI0) wrote:
+> Listing all the values linked to the MPTCP sysctl knobs was not
+> exercised in MPTCP test suite.
+> 
+> Let's do that to avoid any regressions, but also to have a kernel with a
+> debug kconfig verifying more assumptions. For the moment, we are not
+> interested by the output, only to avoid crashes and warnings.
+> 
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-E.g. clang-18 says:
+I am assuming that we are ok with expanding test coverage via net,
+which FWIIW, does seem reasonable to me.
 
-drivers/net/wwan/wwan_core.c:442:34: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
-  442 |         return dev_set_name(&port->dev, buf);
-      |                                         ^~~
-drivers/net/wwan/wwan_core.c:442:34: note: treat the string as an argument to avoid this
-  442 |         return dev_set_name(&port->dev, buf);
-      |                                         ^
-      |                                         "%s",
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-It is always the case where the contents of mod is safe to pass as the
-format argument. That is, in my understanding, it never contains any
-format escape sequences.
-
-But, it seems better to be safe than sorry. And, as a bonus, compiler
-output becomes less verbose by addressing this issue as suggested by
-clang-18.
-
-Compile tested only.
-No functional change intended.
-
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/wwan/wwan_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-index 17431f1b1a0c..465e2a0d57a3 100644
---- a/drivers/net/wwan/wwan_core.c
-+++ b/drivers/net/wwan/wwan_core.c
-@@ -431,7 +431,7 @@ static int __wwan_port_dev_assign_name(struct wwan_port *port, const char *fmt)
- 		return -ENFILE;
- 	}
- 
--	return dev_set_name(&port->dev, buf);
-+	return dev_set_name(&port->dev, "%s", buf);
- }
- 
- struct wwan_port *wwan_create_port(struct device *parent,
-
+...
 
