@@ -1,57 +1,50 @@
-Return-Path: <netdev+bounces-138125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A081B9AC119
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:11:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A32A9AC115
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:10:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BDCB1F221DD
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:11:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B12771F211F9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FD415687D;
-	Wed, 23 Oct 2024 08:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B63155A34;
+	Wed, 23 Oct 2024 08:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MjQfwkvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77FF158214
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494D214D430;
+	Wed, 23 Oct 2024 08:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729671041; cv=none; b=Qu4MY2PrIdviFxBCleAhffqXlBZPSvQtE02G76RSi0ey+NJbHZMlLyrQtY4fgwrOTLz+B04Gjx6y3BGi/CnHpvwbPi+XZU1bOAWtHpGy+n5kYn7Aw5D8ZDq6On2DVomdw+Mi+RzNgb95sS6cjnZxK/TkCibp1f870RB+v5lJ6Rg=
+	t=1729671022; cv=none; b=DRS4HhuM0n2x/WuGQIobyd4dSoA+15L68nDhtEyTaambQsVAgnYq2iqV32qXJWuwwNJvONI/RHRZmJIGslwus2V3QqMzwqWB8GdnGVBe64o31vnNtKoKbaq9BxKUSeenLAQxrpbOMi5ezRkv1ebUZf4hGkMU2E0zRS2OsNMLs4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729671041; c=relaxed/simple;
-	bh=UpOZOnv0+ZaaJXc7sUsIq1I47JTwQguJwGIp3tlQWzg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bLh9KRQxt6yuxcgbDGf55sMXn61kp4S9GeqWeA1V6peLxoWbaRmD4bo59DHbOJmx+4ZQNxtOuWuIxsitb5cgFo6W7b3cpXtCk/Do4nkkDfkAuMvoZ9D4LHbzz8OPMuHku94rLWqMT9CkcZr+Bb5CnjZcmGz3RIEn14/WmArWJFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XYMCY4Vdjz20qpP;
-	Wed, 23 Oct 2024 16:09:45 +0800 (CST)
-Received: from dggpemf100006.china.huawei.com (unknown [7.185.36.228])
-	by mail.maildlp.com (Postfix) with ESMTPS id 46ABB1A0188;
-	Wed, 23 Oct 2024 16:10:37 +0800 (CST)
-Received: from thunder-town.china.huawei.com (10.174.178.55) by
- dggpemf100006.china.huawei.com (7.185.36.228) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 23 Oct 2024 16:10:36 +0800
-From: Zhen Lei <thunder.leizhen@huawei.com>
-To: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
-	<GR-Linux-NIC-Dev@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-CC: Zhen Lei <thunder.leizhen@huawei.com>
-Subject: [PATCH 2/2] bna: Remove field bnad_dentry_files[] in struct bnad
-Date: Wed, 23 Oct 2024 16:09:21 +0800
-Message-ID: <20241023080921.326-3-thunder.leizhen@huawei.com>
-X-Mailer: git-send-email 2.37.3.windows.1
-In-Reply-To: <20241023080921.326-1-thunder.leizhen@huawei.com>
-References: <20241023080921.326-1-thunder.leizhen@huawei.com>
+	s=arc-20240116; t=1729671022; c=relaxed/simple;
+	bh=KEVapUmSHNAnKHpUbqWWY7HUKA/s/hQPC4oid7+P+4c=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QhWzGd4kj1ZAQMQTTqORxWBNaPniFHxrQJoYXLXzRq0tcHYjPNPNkEhx6rG6iWuPu/CC+jQI+c70vPIBjEX5yWb3R6WyyECvZKrluGxFuOUaNKkuSa/XbcCps8E4IWoSQHjmROTvkkUKsygjfpMGVNYP4q3glM5YPP9Jt06fuGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MjQfwkvT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2467BC4CEC6;
+	Wed, 23 Oct 2024 08:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729671022;
+	bh=KEVapUmSHNAnKHpUbqWWY7HUKA/s/hQPC4oid7+P+4c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MjQfwkvTLzps/JFjJs67ULTPscnSGnQaHYrAx0jJE4b1CAS0Q6esK576yhzQ9Crjs
+	 U8aXuDK66V7EOxYo5daH9+0muYtVxEJFqezbJX6x2TXO2qm3HFbzR3uinacSzV+2La
+	 cBv61MhLs/UeFpllE7crC+UsYQCNte5TO2abx3sPBS2MoItWhRUiQ6iu/BBWc6vCoH
+	 l0RiOIf8NapXhe8u/9EVLRs9TC9qFHN1e4MxmfxGgOniroW65KEECPYFEZE2OTlKj+
+	 1YBhiBcAPnb1mskiaUjPJ4MTAQdieCZjna4rPGNhKrd3qIk3JvFP2AaH9elZzi6KfC
+	 K2eNGWuWy/ycg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD2B3809A8A;
+	Wed, 23 Oct 2024 08:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,75 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf100006.china.huawei.com (7.185.36.228)
+Subject: Re: [PATCH net-next] net: use sock_valbool_flag() only in
+ __sock_set_timestamps()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172967102851.1512053.4625084732459579673.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Oct 2024 08:10:28 +0000
+References: <20241017133435.2552-1-yajun.deng@linux.dev>
+In-Reply-To: <20241017133435.2552-1-yajun.deng@linux.dev>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Function debugfs_remove() recursively removes a directory, include all
-files created by debugfs_create_file(). Therefore, there is no need to
-explicitly record each file with member ->bnad_dentry_files[] and
-explicitly delete them at the end. Delete field bnad_dentry_files[] and
-its related processing codes for optimization.
+Hello:
 
-Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
----
- drivers/net/ethernet/brocade/bna/bnad.h       |  1 -
- .../net/ethernet/brocade/bna/bnad_debugfs.c   | 22 +++++--------------
- 2 files changed, 6 insertions(+), 17 deletions(-)
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/brocade/bna/bnad.h b/drivers/net/ethernet/brocade/bna/bnad.h
-index 10b1e534030e628..4396997c59d041f 100644
---- a/drivers/net/ethernet/brocade/bna/bnad.h
-+++ b/drivers/net/ethernet/brocade/bna/bnad.h
-@@ -351,7 +351,6 @@ struct bnad {
- 	/* debugfs specific data */
- 	char	*regdata;
- 	u32	reglen;
--	struct dentry *bnad_dentry_files[5];
- 	struct dentry *port_debugfs_root;
- };
- 
-diff --git a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-index ad0b29391f990f3..317b5c3ffb10251 100644
---- a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-+++ b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-@@ -521,13 +521,12 @@ bnad_debugfs_init(struct bnad *bnad)
- 
- 		for (i = 0; i < ARRAY_SIZE(bnad_debugfs_files); i++) {
- 			file = &bnad_debugfs_files[i];
--			bnad->bnad_dentry_files[i] =
--					debugfs_create_file(file->name,
--							file->mode,
--							bnad->port_debugfs_root,
--							bnad,
--							file->fops);
--			if (IS_ERR(bnad->bnad_dentry_files[i])) {
-+			de = debugfs_create_file(file->name,
-+						 file->mode,
-+						 bnad->port_debugfs_root,
-+						 bnad,
-+						 file->fops);
-+			if (IS_ERR(de)) {
- 				netdev_warn(bnad->netdev,
- 					    "create %s entry failed\n",
- 					    file->name);
-@@ -541,15 +540,6 @@ bnad_debugfs_init(struct bnad *bnad)
- void
- bnad_debugfs_uninit(struct bnad *bnad)
- {
--	int i;
--
--	for (i = 0; i < ARRAY_SIZE(bnad_debugfs_files); i++) {
--		if (bnad->bnad_dentry_files[i]) {
--			debugfs_remove(bnad->bnad_dentry_files[i]);
--			bnad->bnad_dentry_files[i] = NULL;
--		}
--	}
--
- 	/* Remove the pci_dev debugfs directory for the port */
- 	if (bnad->port_debugfs_root) {
- 		debugfs_remove(bnad->port_debugfs_root);
+On Thu, 17 Oct 2024 21:34:35 +0800 you wrote:
+> sock_{,re}set_flag() are contained in sock_valbool_flag(),
+> it would be cleaner to just use sock_valbool_flag().
+> 
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> ---
+>  net/core/sock.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+
+Here is the summary with links:
+  - [net-next] net: use sock_valbool_flag() only in __sock_set_timestamps()
+    https://git.kernel.org/netdev/net-next/c/6886c14bdc30
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
