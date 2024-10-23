@@ -1,114 +1,124 @@
-Return-Path: <netdev+bounces-138286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB44B9ACD3C
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:49:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC7579ACD6B
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:53:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AEA6B21C71
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:49:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92A131F246FC
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBAE221501A;
-	Wed, 23 Oct 2024 14:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D251CF5F7;
+	Wed, 23 Oct 2024 14:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Q+FGRWxZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3lW8u3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0B42144C4
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 14:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729693973; cv=none; b=trtlK7AXfo/IBRu01+9feypaEg2ty7Z+0uFXchFQKRJFELlZWtBkJayA1i13rZOAelcK3JR9v/GzspEMZLjExlifouOgqqaZLVldAZZTgvPkcALsjkJgydcusppJnluoVOG4Nx148gZXq0ZJ81s/tD8jF6Hun6ekDBGj2WqaQBk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729693973; c=relaxed/simple;
-	bh=t4GnTV7+otrBNu5mgY5qMt1NJdQynMz2/YOu1uyy2H8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jU46cRZy1gWL+kTKPSY7IZf3j6kUQYlqoEr2WGLEly1xU6JHspAFn+jM6r25P506/OJ6GhCqjks7BHOLyRtc9oUZ/94HTl/0XaOY1dnaydl4/xoceoegBFx6EVcLmCQ+DIrfLhi8Kccabxa51jMFMiJrja/iNPaCXmYf948WmOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Q+FGRWxZ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E3D7520839;
-	Wed, 23 Oct 2024 16:32:48 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gwmT-1RkaPvl; Wed, 23 Oct 2024 16:32:48 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 51D4620764;
-	Wed, 23 Oct 2024 16:32:48 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 51D4620764
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1729693968;
-	bh=bYgny7EnLLG2fS4yC5gQnBtp7uFZypu3STLIBvmOuq4=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=Q+FGRWxZLEmOLoCY9qbL9+KP7Bnfl3t2U9IU1moK5X7IBDT7/C9SiRtnaTpv352dU
-	 5PLwhxfFNpNv/aUlySblF4RYpknzBKLSuglOHZVC9dLNjyDEmNLAjRe3o7zJmPSYDx
-	 bl9Ej0DDifOaJZI+tAfVkCrPS4QzpHqa9M4HGb9/x2xkZw90dHsMrd9P/uPcL9RDxe
-	 HzQYrl4VZ5PexK2hR+CjeLX8tIrkEslqQdAGyqTk3Ss0SUNczSHCqWmfa+XtT13feu
-	 RKACz9FemJo4hm1/tw2i5jMWnlR1RYzDMbNP89jWCbDZMeWFppvz4wXrgglXGnv6WB
-	 Mob/qO0gwhpxg==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 23 Oct 2024 16:32:48 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 23 Oct
- 2024 16:32:47 +0200
-Date: Wed, 23 Oct 2024 16:32:44 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Tobias Brunner <tobias@strongswan.org>, Antony Antony
-	<antony.antony@secunet.com>, Daniel Xu <dxu@dxuuu.xyz>, Paul Wouters
-	<paul@nohats.ca>, Simon Horman <horms@kernel.org>, Sabrina Dubroca
-	<sd@queasysnail.net>, <netdev@vger.kernel.org>, <devel@linux-ipsec.org>
-Subject: Re: [PATCH v3 ipsec-next 0/4] Add support for RFC 9611 per cpu xfrm
- states.
-Message-ID: <ZxkJDPwZ/Wk+WJXx@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <20241023105345.1376856-1-steffen.klassert@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F377D1C3041;
+	Wed, 23 Oct 2024 14:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729694034; cv=none; b=D2LNN6PM1B7tUcLzn6uHKhEesNDJ5T28zrtt3sLzhskBMCI43mmNV7tdt5iW5hYf2UTjNhmsXQbvag/L8YL7+wNh0bDSt1j4sZuQoj/Z6wzyFjRyl0uKD2zkHqJz4i8GXbKgr/X1rBvtZX4EO3rZvuEk0//rTG/0sdvn9AepjZM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729694034; c=relaxed/simple;
+	bh=HmRM3d08xFricdwnH3iJ+2OhdGpv1cRmYZdrZ1jjTLw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s+mJLxc9UlLoTLhPP+tNt+QFPUGuQ4GpXUIR3LkQokRQXQ3tYsqeKN48zxoEo/LRiUwg6/nhhW25yq87RLRxKZbINdodiSWDMgvciawJ/hEoqJ8IsMfw34QUXBEutiReffEQNRogBv1GAaHjD6px4hwk7csgAfbKFs3INfgTycI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3lW8u3g; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cbcc2bd800so8742706d6.0;
+        Wed, 23 Oct 2024 07:33:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729694032; x=1730298832; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HmRM3d08xFricdwnH3iJ+2OhdGpv1cRmYZdrZ1jjTLw=;
+        b=L3lW8u3g3xofsA6DmroFa3m6IZmgS/LFlmJbA4sfFVOuYbh50Yi1jO9PhOSvYuJzOD
+         7tRENbORY9VMVBycEjERMxZ3xWZ3Cte37UZZP2EnZ/josizVwHQr0W4oWMpE+zqgpfla
+         EVQzfP1nweQkgrldYeYbZu5XkJHIVYyfjXkjFsCrRCQuvoXt+GAnOB9yNNRixlFylcvj
+         cTPu5UoeMgM1HBmcC1lSHTD1pRMDJKQj1YiEjt/BBAayDkycG/PiUdtyZxbgWbSwNi3F
+         itAJuHVAcNmJ3NmZKb9vDcxsyE63iw8Vmw5ABgjw/GQL+YFfgOHJECXkpZYyiZeHtogj
+         9DFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729694032; x=1730298832;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HmRM3d08xFricdwnH3iJ+2OhdGpv1cRmYZdrZ1jjTLw=;
+        b=AQwa5w6v4peW7nGhg7YK61WfKpc+yAVASqiwHCUwXiixt/R16j5Y420FJd7IeXxq7W
+         ZOVBiR9CXddTeapNjO9irt8Kol6Bsxn+HkB5hhJw6APVKubCjRkItWRD7SZ+aJ40jopq
+         MwcQI7XJ+Hioz9pOGytB+182iMsi/bAi8r/ZIM/pLLNCmCw25nQjUpu91CXWC4ApX4ce
+         NW2xJ6t6+HUpZCT/uAvFAvHprVWm4+8r4jreUup4JJ+n6Dq395lRY6PgqJsvM4KPYV4g
+         wGK9vJUJ1graDAjPM0f0VXup+zVmHbPG1y0A/6q6NzQaVqlXkHwmX3t7FemywYnRgxtP
+         N4tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUnKlmD770kDVsWnRRuiwQ4a72YmC62RL3R1kziezrI018vUuc0WKkKezEo76VHGThJjoFJbi2d@vger.kernel.org, AJvYcCVI7pc55bwf52+ewZdmvqkMoD63RgNScyeetgsLOx+0h3l6MmNZsCUpmOkeheCKlK2f6aBzBKbPplT+JEVqNDBlpX0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNnecWXKoKAq1XikpGnzYXBJYB9DRyJzKHBn+wJ6M31NwNaIib
+	iXGXfV5NNQVk5n/CKU0OoO5Iz7grcaZVYtzuc8T12QxFop2s66uevAaDRzZdbpvIVhSVinQTirE
+	OGr0yjyeWbq/2gZUluVVFE9jTov0=
+X-Google-Smtp-Source: AGHT+IEfDzRf9dWHDfzyH+e6g66/bt8kDfUdo7MvudwA+PJEpStYO2WwPirLFJuaIHEe74QWWeKAeALP020qLXD8/yk=
+X-Received: by 2002:a05:6214:1d2b:b0:6cb:5ef6:93e9 with SMTP id
+ 6a1803df08f44-6ce219d5220mr112755706d6.9.1729694031866; Wed, 23 Oct 2024
+ 07:33:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241023105345.1376856-1-steffen.klassert@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+References: <20241023123212.15908-1-laoar.shao@gmail.com> <CADxym3YB4ywpSp92Zctmh_k1K5OL7vTUAadFOsFuV=RdEvvwgA@mail.gmail.com>
+In-Reply-To: <CADxym3YB4ywpSp92Zctmh_k1K5OL7vTUAadFOsFuV=RdEvvwgA@mail.gmail.com>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Wed, 23 Oct 2024 22:33:15 +0800
+Message-ID: <CALOAHbA9CDE0QCrp5TKJam5DejBzuw=AJsZZFqpWQeKxkaaHQg@mail.gmail.com>
+Subject: Re: [PATCH] net: Add tcp_drop_reason tracepoint
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, netdev@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Steffen,
+On Wed, Oct 23, 2024 at 8:59=E2=80=AFPM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> On Wed, Oct 23, 2024 at 8:33=E2=80=AFPM Yafang Shao <laoar.shao@gmail.com=
+> wrote:
+> >
+> > We previously hooked the tcp_drop_reason() function using BPF to monito=
+r
+> > TCP drop reasons. However, after upgrading our compiler from GCC 9 to G=
+CC
+> > 11, tcp_drop_reason() is now inlined, preventing us from hooking into i=
+t.
+> > To address this, it would be beneficial to introduce a dedicated tracep=
+oint
+> > for monitoring.
+>
+> Hello,
+>
+> Can the existing tracepoint kfree_skb do this work? AFAIK, you
+> can attach you BPF to the kfree_skb tracepoint and do some filter
+> according to the "protocol" field, or the information "sk" field. And
+> this works fine in my tool.
+>
+> I hope I'm not missing something :/
+>
+> BTW, I do such filter in probe_parse_skb_sk() in
+> https://github.com/OpenCloudOS/nettrace/blob/master/shared/bpf/skb_parse.=
+h
 
-On Wed, Oct 23, 2024 at 12:53:41 +0200, Steffen Klassert wrote:
-> This patchset implements the xfrm part of per cpu SAs as specified in
-> RFC 9611.
-> 
-> Patch 1 adds the cpu as a lookup key and config option to to generate
-> acquire messages for each cpu.
-> 
-> Patch 2 caches outbound states at the policy.
-> 
-> Patch 3 caches inbound states on a new percpu state cache.
-> 
-> Patch 4 restricts percpu SA attributes to specific netlink message types.
-> 
-> Please review and test.
+We prefer not to hook the kfree_skb tracepoint, as we want to avoid
+the overhead of parsing extensive information from @skb. Since we now
+have a function that can be easily hooked, why not hook it directly?
 
-Tested-by: Antony Antony <antony.antony@secunet.com>
- 
-Thanks,
--antony
+--
+Regards
+Yafang
 
