@@ -1,751 +1,219 @@
-Return-Path: <netdev+bounces-138408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A73D9AD693
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 23:22:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D32AA9AD6AE
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 23:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE9601F22508
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 21:22:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9027D2863F5
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 21:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF021FEFA4;
-	Wed, 23 Oct 2024 21:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94D31EC01E;
+	Wed, 23 Oct 2024 21:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="szqwokkl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fzSU22eK"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic314-22.consmr.mail.bf2.yahoo.com (sonic314-22.consmr.mail.bf2.yahoo.com [74.6.132.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38CA1FB3C9
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 21:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.132.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729718536; cv=none; b=JRp21DwhGFJjoe4+t1m4dkYvIrB4FMrhy2aqVv1uKcUNTPkrUOzeLdUJ6ILtDa0RJhJLMMeC+NRjQedNuY2jMt+FNa/PBYL99fRWJI5EXzLtL+WB/QH/R3UPy/M0K3Mz+mLH6tI0PwfIuEgCP6Gsq52WNsa3Qlp+gT7tfUTkDLc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729718536; c=relaxed/simple;
-	bh=P1bFdA8Imw/lI7Id+NXhq6gjKgzY8SZvX5qQ0U2pbe4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N1frPjjIFo7D+VLYDw0F1Pt/rsBbZRGMTFAiWDi/rJSRsAB7my1XuORtVA6gGtiTXZff8fuPJb0iMR7Nkvovglg8vesnmh6NJ4kIK1/HhYf6ofs2CTC3qsCmwIJ1ZgTS8O3Jq6q7y1/RsxNu/U+9JmQ9xKYbjfS7s7oecHJ6nr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=szqwokkl; arc=none smtp.client-ip=74.6.132.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1729718532; bh=eFiFw87gTeflI6YpF/f724PdslN2RkDib+9BWmN1JP0=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=szqwokklZEk24ijjmcZeEW1mGI3pN7XeuJQQDVmj3P+6Bp4z0nDu1b944t30ZqejML/8LdCXGEp2FqAzY1dpgvYBTvvUH0loT9FnSudd1jiRW5G6i4037DeZluNEaQz7V0qisH2N4OI/MhK9wBgOIzEe64pKaZELBkLSPhvScqQCqdy96eIjZllMQfm9P8AbN81h9CVtOGNvONEhKoeSSO3atKYRzFIZDqw74dAYynHcKv2f0caRH8WFktogFMLCD+eHHo9Qn0bfHubcYo7OsOhYfI9TppO7rNyQ1Rig2WL+x05+ugGZ2Un2dbTAtxJLou3PFwlWzJMMnvg2FKe+nw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1729718532; bh=8/9K3PSORsDxdHRPLThouSpURIwSuYqnKYNr55IHpya=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=Auk0I7NvmkC88A62HtUMBtzoeNeAwrb5Q1/Bi5zuGdM9m+Uo6TRYaNwbPj8pd2a0g4LlI7v7AUUla4hqfIwWrpAYFcTl95CITnHGi+bzd9QLUim63Egqzu3mII/fiUuPeatTz64iOc7ZbxqY41Af78GqWfQ6LyIWX3jJFvvEebB7Fe5yaQzJGCVvlJ8WLkHYqGcbYd5heXzx71erHzTgV7ioSEiyL4F+bpCtPWgvkgHBY7UtR8fpMSicgGd8S0tvW2pqM8xXzHbVwC0SNu4+RxAdgLX7b3v1lWGlEqKn97SxMSHNUeH6l6/BriD/ibdRidCo55rErkob3mbQU37y2w==
-X-YMail-OSG: 5iiIuloVM1nynEk2dFsU46nra93DqKMreTtL0tMCD_S9tIWA.LcuD.LkRvDHONC
- NtsX4CRlK2n94bBgZ9x4rgutYUVZ.uRBiP5vqWjdEjv8WnsJjiTbVEjmXszI5pBSPlQfsVu08Vgh
- t9YBPA1cCQ6oMvnKU56Nm7sZoRhol5P6CDbLsptHCcmDY3eIhWVgyRUhjzz1pvSA.8MOJ3rLLRsy
- iOcdn0COWEPGxHWEO9idaHELepRfujKflwOs_jvQD3fR3Y7yFTVnNqHbKzEK5wS9TNTIyaOr65V1
- t45sg3Sx6UV_ZtwNo0ipVaQbeQD1B6uH4Ikkja8NcL1rgg6YnWMqCtN4SYII7MdQ5m5bGuEKjU7I
- 0sstoY2YtXIS9rc8jHrtkkdxv8rPaEOtkJBTqUEcHxfFnEaaYufzlZ4szFh4qGxwantg9F4QWGQK
- mqjaDfhzg4tQRzxSYktXd.cbOdfg5jtqTHSn2tAYTZr8u._KrYhtKNG9li7.MZP1Nh4KMZFS.JnV
- HmDUyY7fpyhnaFoJsfLsJq73Kx2s75UKZ2IMV55AxXKZbqj1ktsSNcvBwbMIVac4JJEuJEBMV7_1
- JgUBU7hFWNK0zHlElsae9p3_k3d9CgOypb1eHY1Nq8TpEXhlVMCUYMX9OCT2AhauYF6tB9Jql8HD
- ndTKBUvWd43VBakUcQVScbCQ9FQ46utS5xTZGGfOlf9WCZlIS9v8jTvzNkuhvpxyNjIwykMUXSTT
- VCsws9ZFDoUGfb0bPI_gvZQADnv9PyMir8SXmEaY1bRVdeN554GVLbiSoZcOgafEiH60uapSe8ru
- L2RJheF7GD39KrHGwFlehXDQvNacZKUpL3NG62VSA.d9yHFfElxq.PZAmr3py.Dhuhg2J9gA9dP6
- fJTkY4u6z8_3iTPZ2hzWGnc9CQICZ.fLTTPOoVr7LsxMAzPCvnG3_JQnIkmo6xqH5hj33kYnqh9U
- ObcaeE5AB2ceGdZIq99uMDPmRyj3qgaZ3FAAyYMrXr07scbw0x_8Vmz5trwVIMdrjUk2Ux2XBKBv
- l3p6IMJ.WURuSJ9wVObKbLD8T8c4HWZaRq_3wbHkAg7okWvLYmqs6vbJjkDdtB0GAO2JXeH6NtHZ
- IkLY5BHGTGzFgaj4E6fIPgL87PwFynnl_Phe3dS.OBCW_xKkTJC1SaIFl4HJhhiqth3cw6Pkg0t0
- eL60QNFVgel6__dYEmEo3BKeNUxZWt82QOW_y.xNS3SJHUSdu8PePVFJZlK70v2X1xinDPgA6nBO
- zhBT4a7UX6bgHIt4UKGSpvBiMiFzB9GARIENh27Gx90EBikrIZnxmO19YB5xhtn_0iLDLFFef8iJ
- 1GqnydDRPh7FU.PjHKcX_pWWcew_9Nzfcll0SexCdhfmaa.MHBxgaXaHmwr9UtXas7_smff4S4x7
- E.jNLXl.zeIOduw8Jqptu6GTea0foS7RV_PAuxdrWH4bMJKcnsftM.nWY174CdQMssrigDSKyr_C
- MbmBKipG11iiI0YTtm0vAdv3wFaOdC5Y2ag0yRfRergJbB9b3ZniG5oRj9KypqAyT5JOTG00aIge
- RNB92d5MbzrTsRbKQ8R.U_7mHeWJ9MjhgV0EShB1F7d.k297TIInAiGaX_Ox9tKEkAX0KGyyr3M5
- 4PBl.UUxXFZCxWB1iAiojwW9fERHJqh9.GrQZIDDU.oj5Kn3gRDi0seG8dPanbBzAkn_TiRZxM2J
- HfONhP1usuFBjbMTwghuj7yCJXW4_2yXgi.1JLjXG2OQKdzSJbsWAs.tPpctka9R4aafXFqUAR3f
- lkQVzmQms1uqv.11xT53DWpz7Os9E7fXptbDeggLrxEpl6.ABxgkyj7kxZQaBh6ZnRBJiFkFnW3S
- O91z23p9OqXZnMvfnm8Wi11wRJ3_o3qPfxqixLZ.fHbcnt.vfW5quln6S6nasrunrd7Se1g3CcSW
- 5ggbzzVxKSrOWIXR.HP3mwDFFpRvZRRDxi8VRLsj9aCODsANOkRRt7_jG2cuCBFiZoHIPdYFTaXO
- d.TB71uf6fjSgUTtRWYbN4g9BRYeiNzBB0zjRAB_OcPQ0s5NvM9jj9I0LYwaaiGOMU1oJy0pvFjf
- nQn0Io.ynyS76kf59Qp8P2rytQGJrIAhX.q.8Kg4_1DumduoPIisnSHdNxrH9liB.LpC54yigUJi
- gIt_Iq792Hfc1TQDswCwjWpUlJHTSSO2V7vQQdfrHmbAB0nWJdQTD_NPJE_AwVDw7Z1LaciqNjJE
- pAC2tRJiEhJfcIQSF19.WAL6E4SdF9zI2EEo3OmHmEs2qBt6G7oZWU.WSKSA_KiW1UdRscLz6sLm
- W.SZRA_L07i87HZIskmiFZFFSFRs79nxo
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: e613aa9a-a350-41c5-a8e7-1586dc32c6bc
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.bf2.yahoo.com with HTTP; Wed, 23 Oct 2024 21:22:12 +0000
-Received: by hermes--production-gq1-5dd4b47f46-5xsmt (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 8a7972f72a0226c80fd86fd6bd5371c9;
-          Wed, 23 Oct 2024 21:22:05 +0000 (UTC)
-From: Casey Schaufler <casey@schaufler-ca.com>
-To: casey@schaufler-ca.com,
-	paul@paul-moore.com,
-	linux-security-module@vger.kernel.org
-Cc: jmorris@namei.org,
-	serge@hallyn.com,
-	keescook@chromium.org,
-	john.johansen@canonical.com,
-	penguin-kernel@i-love.sakura.ne.jp,
-	stephen.smalley.work@gmail.com,
-	linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org,
-	mic@digikod.net,
-	netdev@vger.kernel.org,
-	audit@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	Todd Kjos <tkjos@google.com>
-Subject: [PATCH v3 2/5] LSM: Replace context+len with lsm_context
-Date: Wed, 23 Oct 2024 14:21:55 -0700
-Message-ID: <20241023212158.18718-3-casey@schaufler-ca.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241023212158.18718-1-casey@schaufler-ca.com>
-References: <20241023212158.18718-1-casey@schaufler-ca.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A49619DF4B;
+	Wed, 23 Oct 2024 21:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729718817; cv=fail; b=h9xPCyxSXkchPKncGT5ZapTJUesqL8nz+9zYU6cn0JCE7gcekwWl3V3wreNEF9dU0L8fndsWb/13UxHwz6RiAjeJFBapdBsl0nUWrCI8elBlIY+HEGwQffM0jSNFS+0ZF06F2QhYs3r34XT5knV9ofPSn9J+TPfVYXfuMFKen/8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729718817; c=relaxed/simple;
+	bh=xA+Ss3IijtBLYg3N4IrrGipKZSK1XyjqpZQ3N/adAmM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PPD003BkxSoTXSvqxSTsADtDYWzP1qWRaJRA+LvlHi7qYyMyYU2RCnq670+Lg5uBK9mfUs2M6t7G9icC63SzQOjFMEzf/mIovnxc4gPOsvTUNH6HIug0wcks8TJyQviRdRFVeCaGmeLO3t9579dmviAvfwsnDL8DZLQvWW6BKyQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fzSU22eK; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729718815; x=1761254815;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xA+Ss3IijtBLYg3N4IrrGipKZSK1XyjqpZQ3N/adAmM=;
+  b=fzSU22eKkfr5IdNL2tmuvXpSjrdI28t9vQf9SB5TXGSfoVOlRD1XFAHz
+   lTK4g/7fegOT81XSAHGydM6rBluExqE8ylUx8Y93ctTKzztlf0vTTnYpb
+   L0zLdN5ZDXjo+uyss1C2ihHW2AK61zj0WAW1t8XDHkJxxrFr6wDE9AOeU
+   +cVjsxjYxByBZB5C6r4g0LJj2Uz/Nak9rUlvEi/0MjQ9uOb/Y20UnHHi6
+   YM+loh91Hp+bve5rVYWY21qR9xQ4aX+3V4q0ZC1Bb6D6pF6eBg8xhP9e0
+   FjxOfbu1hmEvJ8uQnjWbDx1JtswQ6zwBQeIQ3ex3JkrbS2by9IGxS48MJ
+   g==;
+X-CSE-ConnectionGUID: zOhP80tCRJmCeV+NGPyezA==
+X-CSE-MsgGUID: FUBE8UP1Q6+TsiPJwPKXDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="32184315"
+X-IronPort-AV: E=Sophos;i="6.11,227,1725346800"; 
+   d="scan'208";a="32184315"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 14:26:54 -0700
+X-CSE-ConnectionGUID: dQepxkr1RZGkDtNMQV4Nrg==
+X-CSE-MsgGUID: Ir/g9EmVS9GF0pbP13Azuw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,227,1725346800"; 
+   d="scan'208";a="85174530"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Oct 2024 14:26:55 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 23 Oct 2024 14:26:53 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 23 Oct 2024 14:26:53 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 23 Oct 2024 14:26:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uOooLSGGnrtbrYpy++BCTJps50MVqUJFZdInCNocQqC116bpDTU8q2j9NO3YhP/tD/NaCYAQnYGtkensTSJluZVbLO+MCjr8cEGqeqbsdUlRSC95jppn77J7kMWIdvnJcPL5CEoai89msjZgYNw0KYy9BFh/qK8sl5PKy+qSaudU6DxNvq/ODK+Xj1tEyxKkr5Zx+66/0OaxUvM18TayjU+5RIE2POdahzAqoRKj2IJdNT6vfzeYQY6p3XbOI0VY+l5imsLcbAUfcKxoAE35VTlHtiqy6S+jfBONfwCCePpUU97z3/INSZutkMJ0jI7D7MIkOr2eu65NweEDyvzoqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xA+Ss3IijtBLYg3N4IrrGipKZSK1XyjqpZQ3N/adAmM=;
+ b=m9Mri3DPDuOE1FRNUx3G/N4oa0i1PqilEA2CeWeLmLMhg05hpo92AR4mrBN6AsLbZoAo9NbCYfG7Af83hv9l4NU6ZxMBaQu7E8eDf3NqCikkNukY4+HPu20A36TLE2VuKWS9/wQXPQbIsfnc5gEey3mfMkWRoRnGQf4WN7/iBUeOLvGalYFad7dbyxRSzoUhE/oI+mde1ZYREhrsVVLCNOMBfY0eb2v9tzPdap1q1/GlTVZQ73Lrl2TWPdGxwcei8/2959NY+h1b0Q2ZujDoTwUpvKSWRhn6YZQ88j7/Y4C1mGiud8CyXaTg+XaDWnr8kG0Zrm9AkLIrA/OtfF2+Yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by CH0PR11MB5233.namprd11.prod.outlook.com (2603:10b6:610:e0::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18; Wed, 23 Oct
+ 2024 21:26:51 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8093.014; Wed, 23 Oct 2024
+ 21:26:51 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: "Knitter, Konrad" <konrad.knitter@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: RE: [PATCH iwl-next v1 1/3] pldmfw: selected component update
+Thread-Topic: [PATCH iwl-next v1 1/3] pldmfw: selected component update
+Thread-Index: AQHbJTGSlyZou3o1zkGprkwML0TanbKU2g7g
+Date: Wed, 23 Oct 2024 21:26:51 +0000
+Message-ID: <CO1PR11MB50891A93EB70DF0DAF36A953D64D2@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20241023100702.12606-1-konrad.knitter@intel.com>
+ <20241023100702.12606-2-konrad.knitter@intel.com>
+In-Reply-To: <20241023100702.12606-2-konrad.knitter@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|CH0PR11MB5233:EE_
+x-ms-office365-filtering-correlation-id: 7b000239-69b8-40ed-6853-08dcf3a968e6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?SbpTpTioB4+x9wDVG5bx6tCj01ZUyyYplad8nOgy7BiceU9k1Im9i/rfR9Da?=
+ =?us-ascii?Q?i+O6nWrC/lYeLPx3tDrqWc2WHcqs/uHmH5Csa5EFHFG4hNeY1TryZ8YDZRre?=
+ =?us-ascii?Q?t3a6iPGWK/NSi3Awf/nXvBlkKcqD8OaYrIXGbAYU1+PcG5iDC5mXkvJ41b2S?=
+ =?us-ascii?Q?EgSFZqiNNavrWF4Ik2TBCh8gMIKcAeQb2dGn6JkF1s5PWX+PCLsgRVDp+YM8?=
+ =?us-ascii?Q?vuWktmPUr03DjdPqfFZ8m5TqVeqj9FAz748l1mpvfUjbmkWjEVJQeFKJibxc?=
+ =?us-ascii?Q?MrSPmq+XwiEp9s3OKkNx4D2ysKa0c5RwYvt5OzzXVwZ+z0VmKRgDcFsj8kUA?=
+ =?us-ascii?Q?BzX5c5zWoeEDQb3HhONAUL3xBo/DvPzxPmrDn+GFXxQyhFgn6swSsUsUo97f?=
+ =?us-ascii?Q?A1nfUK1ZDmv9nslo3pfPGTU41xbmc8S78R1PoPSonF3E2zkzgN5oHZWfEmcB?=
+ =?us-ascii?Q?ienJBpShLz5YIEC3VgYzRpw58YJ91MiOf/gINExKamORy+S+1GVBpzxQzFwF?=
+ =?us-ascii?Q?7h55auD/RmiXbKjcgXobsjE99SLKZnGfhTKJ29Er2RQnfQPFY2g6nmS0at+u?=
+ =?us-ascii?Q?hdnLE6JhKWLpX33kGt+CRFtWt2e20jVG2IiCs6bvQ3dN53lYQuL1cbAQelG7?=
+ =?us-ascii?Q?59uiULKddpB+rOqGDk0LwB2wFIPJE+9ZflyM2kx2zfL7BpN4gUPJHIShdYis?=
+ =?us-ascii?Q?Nhj/CddnLNoMwzEgFhaVIofmQKY4E9X0GJgFYwUn+OwO6omFzHGW8jwi8Jlo?=
+ =?us-ascii?Q?SsbOOinEkd+Q7ApTjSjulbsuGvzZOMLMWLNfWBQWJc65ZXUXePScp6joK3uT?=
+ =?us-ascii?Q?9usL8LIxaVo9t//LFoLinRqdqcxt8rRsYgQlHPwogXvaO/sn8J6E9QyBZp53?=
+ =?us-ascii?Q?pvNvoL1Rxt6iZmqhtsuehj+Li/+RDEvTBXvIGogNXBPP6sqUDJQWPAAWO72H?=
+ =?us-ascii?Q?6OwMVtbbHMYeqcvvu73vcSvlXcEZ2ytrJeiGcmiXXJ15DHs3z+LCKJrK75ZA?=
+ =?us-ascii?Q?UrMwP5EVa4hC1wxzgeI0Fh57GvzbbpEhCHWeic8WcLRIgFGqmIduD9SjTPBt?=
+ =?us-ascii?Q?jvU0BSgypXy8gnHY/Hxb6AmWjnoLbCrEZUQwo/fDeX+8zTzxi17O1ZRgoVDg?=
+ =?us-ascii?Q?AngKeQILoUari2eQhdDJ/rd42ieL2YcxTUISoOJJpvxOPOPB/baZnsNCC2F4?=
+ =?us-ascii?Q?4HpIIHq8pRhrPtaSn4T4CSX6l2Aa+J7fUyEmVLZFs2x3W/IqBr5x0TAdE6Bb?=
+ =?us-ascii?Q?hI4LQqWAR7wEhDp7GK78m8JB8/1PpLE9CxJ3aSUXKpjuF/vopslnfuM5yCIN?=
+ =?us-ascii?Q?5ckkkk6GccvECLGZjpNi0Gtf6YC3q19YaVvuAYKJCxC+t9CHERNUu2+UqWzc?=
+ =?us-ascii?Q?FoYe0Fw=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8G3Da0JmDvgvYFAkwaHYpFuMs5C2r2XrutAkEfP+je2KXdw1+EdrHISJkYon?=
+ =?us-ascii?Q?UVi05VzxtdxU7/oKcwT6gar+6O2BvvHSMo3I4oOFH0ZQAAtzkw05tQcUQVvr?=
+ =?us-ascii?Q?euj2WiVxjdXWEEEXhyi+L6uA8mMAUoWmjsdihXZbbndgc7XI/IM57p0+pAwy?=
+ =?us-ascii?Q?+LdxtGyLlrWEi6b7eNNBG9iYTOWTWHvd4IMPYbHgCOpu7NmLiNXmKPwENsbs?=
+ =?us-ascii?Q?ClKxO8G4a3enQrWRYEShp092OfOl5+NVW5LcjkUE6aHLJLTe+JYD0ls8c77j?=
+ =?us-ascii?Q?GKDSyBqzdFZrfR0xbvNyaahwh5UjaN9BzrkmQJGrrJ02Y6nlSc8JzlxSMqn6?=
+ =?us-ascii?Q?Q3Z2jU1CkKcxlPvhGpoqRSh6+CYbjZVg1CJbJlzaERGPUJrmKzrhSKwFCT7Z?=
+ =?us-ascii?Q?6uF3iaVPsT0Rm9RcTeYF3ttw/8JDIM3b/6F3yjJH9H0kdPB8GsnSxLsJcXIZ?=
+ =?us-ascii?Q?HMkMAF3jG4wdI58/3r+xQyuJ49aVoM6e9YDTXnaGbgai/ut5Wpco1N05fB4r?=
+ =?us-ascii?Q?Nn5LSSCbaXrI/aiQqRe5BGsd0cMihIEhlEPCdL4TZykvcRqp3zxPbzGS3VMC?=
+ =?us-ascii?Q?gcVJX2E6gafdh72JjKJ0qi17J5F/4w/cyRA9/BAfvV+ydglAUOqEvvRJ6JLF?=
+ =?us-ascii?Q?giBn6L1Ti+M3FrlodZQzKMixE9lJY1uQTbNFRl+UeZIo8k+QgkidznxHXAIp?=
+ =?us-ascii?Q?dA2++CxWA0TcUcitFcClpGiHLn/ant6xnBMOvhgY4NcpDyG/U7GQ7zKVn/jO?=
+ =?us-ascii?Q?oU32RDkPDluPFofUuMbzS8KHRswuuDKMOB5M8D73BTaGwMvlIjihCfPd1p4z?=
+ =?us-ascii?Q?s2vQDwOEVPPdqsjlsjKWSfxurb2aeo715GoGvTcpIdVbrbAjavW7JRRMrfXo?=
+ =?us-ascii?Q?Tbg9BDjZYEh1rtaWdCBr67qOgLjz7gPwWXVVLYpuLkpyLVKV58iWcjiblBQO?=
+ =?us-ascii?Q?6xB2GdDSNfU9qsRfjaXFDFkyzjNmHM/sGGK7+V7XW7CVRtt8lZ30vKZyw6Bd?=
+ =?us-ascii?Q?uiX+Ki02XMcnwsG5CmedFlyZPPBzz67iTsM18ANYYVANvMVtBkve5S56hYWy?=
+ =?us-ascii?Q?JI+o52s5WnaHofE6H5GdiVGsEyd6Zb5VpqGYkEJHsGARejQwzoXTKU+JbqSh?=
+ =?us-ascii?Q?D/deg1aetb7HASI2IezqujqVwXU+DyANxuHY35mx98E/kcmMsyjY7Hz6+YOQ?=
+ =?us-ascii?Q?U3BneaGr27zJ5KgL+xqZj55SOoN4grVq09u9wQS5OfCGv46aal1W8dQQ98i+?=
+ =?us-ascii?Q?ivzptHeX5Ezl1iqYkh7ra2SjJamFAg3lt1FzJh1Ed0byez3RRX9mzoAFyhES?=
+ =?us-ascii?Q?zZSY7TYhM+jKjpvKblXKrP2OsIBQsub9m9StdS+YbnvACm2BzRqHchvcPOZU?=
+ =?us-ascii?Q?shqwZTE9f7MDrZdsHYcbteh8972JTUlADoi4LBAeQRSoOStiGC6v4vubRqcL?=
+ =?us-ascii?Q?pzaEo6oKY+bWCivm/3wbOujNfYWUgvygN/yS3VcHgIuAeLznFRD+W8ZfSss8?=
+ =?us-ascii?Q?p1kfJM3PysAyIoVt8tssOmn1bi4hImqlInCDGxJOMi2GbzGQeAwTtd1gcEk/?=
+ =?us-ascii?Q?gCOFUFGLgF13jXfcrkeCE0sgRPtl4lS00wbxHWBq?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b000239-69b8-40ed-6853-08dcf3a968e6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2024 21:26:51.4580
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6yS3QtVdLnKZR7ToXH3RLh7nEcviaa00dRm2OFSNT70AtqzK2b7qU9AN76HwtXTS1gjhRRRARb2h4mdWC+wnU0YToFj7erHiLdQz5R6eeRk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5233
+X-OriginatorOrg: intel.com
 
-Replace the (secctx,seclen) pointer pair with a single
-lsm_context pointer to allow return of the LSM identifier
-along with the context and context length. This allows
-security_release_secctx() to know how to release the
-context. Callers have been modified to use or save the
-returned data from the new structure.
 
-security_secid_to_secctx() and security_lsmproc_to_secctx()
-will now return the length value on success instead of 0.
 
-Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
-Cc: netdev@vger.kernel.org
-Cc: audit@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org
-Cc: Todd Kjos <tkjos@google.com>
----
- drivers/android/binder.c                |  5 ++-
- include/linux/lsm_hook_defs.h           |  5 ++-
- include/linux/security.h                |  9 +++---
- include/net/scm.h                       |  5 ++-
- kernel/audit.c                          |  9 +++---
- kernel/auditsc.c                        | 16 ++++------
- net/ipv4/ip_sockglue.c                  |  4 +--
- net/netfilter/nf_conntrack_netlink.c    |  8 ++---
- net/netfilter/nf_conntrack_standalone.c |  4 +--
- net/netfilter/nfnetlink_queue.c         | 27 +++++++---------
- net/netlabel/netlabel_unlabeled.c       | 14 +++------
- net/netlabel/netlabel_user.c            |  3 +-
- security/apparmor/include/secid.h       |  5 ++-
- security/apparmor/secid.c               | 26 +++++++--------
- security/security.c                     | 34 +++++++++-----------
- security/selinux/hooks.c                | 23 +++++++++++---
- security/smack/smack_lsm.c              | 42 +++++++++++++++----------
- 17 files changed, 118 insertions(+), 121 deletions(-)
+> -----Original Message-----
+> From: Knitter, Konrad <konrad.knitter@intel.com>
+> Sent: Wednesday, October 23, 2024 3:07 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Keller, Jacob E <jacob.e.keller@intel.com>; netdev@vger.kernel.org;
+> jiri@resnulli.us; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; linux-kernel@vger.kernel.org; Nguyen,
+> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Knitter, Konrad <konrad.knitter@intel.com=
+>;
+> Marcin Szycik <marcin.szycik@linux.intel.com>
+> Subject: [PATCH iwl-next v1 1/3] pldmfw: selected component update
+>=20
+> Enable update of a selected component.
+>=20
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
 
-diff --git a/drivers/android/binder.c b/drivers/android/binder.c
-index d4229bf6f789..5cec5b52bd4a 100644
---- a/drivers/android/binder.c
-+++ b/drivers/android/binder.c
-@@ -3290,9 +3290,8 @@ static void binder_transaction(struct binder_proc *proc,
- 		size_t added_size;
- 
- 		security_cred_getsecid(proc->cred, &secid);
--		ret = security_secid_to_secctx(secid, &lsmctx.context,
--					       &lsmctx.len);
--		if (ret) {
-+		ret = security_secid_to_secctx(secid, &lsmctx);
-+		if (ret < 0) {
- 			binder_txn_error("%d:%d failed to get security context\n",
- 				thread->pid, proc->pid);
- 			return_error = BR_FAILED_REPLY;
-diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-index c13df23132eb..01e5a8e09bba 100644
---- a/include/linux/lsm_hook_defs.h
-+++ b/include/linux/lsm_hook_defs.h
-@@ -295,10 +295,9 @@ LSM_HOOK(int, -EINVAL, getprocattr, struct task_struct *p, const char *name,
- 	 char **value)
- LSM_HOOK(int, -EINVAL, setprocattr, const char *name, void *value, size_t size)
- LSM_HOOK(int, 0, ismaclabel, const char *name)
--LSM_HOOK(int, -EOPNOTSUPP, secid_to_secctx, u32 secid, char **secdata,
--	 u32 *seclen)
-+LSM_HOOK(int, -EOPNOTSUPP, secid_to_secctx, u32 secid, struct lsm_context *cp)
- LSM_HOOK(int, -EOPNOTSUPP, lsmprop_to_secctx, struct lsm_prop *prop,
--	 char **secdata, u32 *seclen)
-+	 struct lsm_context *cp)
- LSM_HOOK(int, 0, secctx_to_secid, const char *secdata, u32 seclen, u32 *secid)
- LSM_HOOK(void, LSM_RET_VOID, release_secctx, struct lsm_context *cp)
- LSM_HOOK(void, LSM_RET_VOID, inode_invalidate_secctx, struct inode *inode)
-diff --git a/include/linux/security.h b/include/linux/security.h
-index 1a3ca02224e8..64e8b18e6ea5 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -584,8 +584,8 @@ int security_getprocattr(struct task_struct *p, int lsmid, const char *name,
- int security_setprocattr(int lsmid, const char *name, void *value, size_t size);
- int security_netlink_send(struct sock *sk, struct sk_buff *skb);
- int security_ismaclabel(const char *name);
--int security_secid_to_secctx(u32 secid, char **secdata, u32 *seclen);
--int security_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata, u32 *seclen);
-+int security_secid_to_secctx(u32 secid, struct lsm_context *cp);
-+int security_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp);
- int security_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid);
- void security_release_secctx(struct lsm_context *cp);
- void security_inode_invalidate_secctx(struct inode *inode);
-@@ -1557,14 +1557,13 @@ static inline int security_ismaclabel(const char *name)
- 	return 0;
- }
- 
--static inline int security_secid_to_secctx(u32 secid, char **secdata,
--					   u32 *seclen)
-+static inline int security_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
- 	return -EOPNOTSUPP;
- }
- 
- static inline int security_lsmprop_to_secctx(struct lsm_prop *prop,
--					     char **secdata, u32 *seclen)
-+					     struct lsm_context *cp)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/include/net/scm.h b/include/net/scm.h
-index f75449e1d876..22bb49589fde 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -109,10 +109,9 @@ static inline void scm_passec(struct socket *sock, struct msghdr *msg, struct sc
- 	int err;
- 
- 	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
--		err = security_secid_to_secctx(scm->secid, &ctx.context,
--					       &ctx.len);
-+		err = security_secid_to_secctx(scm->secid, &ctx);
- 
--		if (!err) {
-+		if (err >= 0) {
- 			put_cmsg(msg, SOL_SOCKET, SCM_SECURITY, ctx.len,
- 				 ctx.context);
- 			security_release_secctx(&ctx);
-diff --git a/kernel/audit.c b/kernel/audit.c
-index bafd8fd2b1f3..5cdd9aeeb9bc 100644
---- a/kernel/audit.c
-+++ b/kernel/audit.c
-@@ -1473,9 +1473,8 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	case AUDIT_SIGNAL_INFO:
- 		if (lsmprop_is_set(&audit_sig_lsm)) {
- 			err = security_lsmprop_to_secctx(&audit_sig_lsm,
--							 &lsmctx.context,
--							 &lsmctx.len);
--			if (err)
-+							 &lsmctx);
-+			if (err < 0)
- 				return err;
- 		}
- 		sig_data = kmalloc(struct_size(sig_data, ctx, lsmctx.len),
-@@ -2188,8 +2187,8 @@ int audit_log_task_context(struct audit_buffer *ab)
- 	if (!lsmprop_is_set(&prop))
- 		return 0;
- 
--	error = security_lsmprop_to_secctx(&prop, &ctx.context, &ctx.len);
--	if (error) {
-+	error = security_lsmprop_to_secctx(&prop, &ctx);
-+	if (error < 0) {
- 		if (error != -EINVAL)
- 			goto error_path;
- 		return 0;
-diff --git a/kernel/auditsc.c b/kernel/auditsc.c
-index c196dd4c9b54..4d3c22ba7149 100644
---- a/kernel/auditsc.c
-+++ b/kernel/auditsc.c
-@@ -1109,7 +1109,7 @@ static int audit_log_pid_context(struct audit_context *context, pid_t pid,
- 			 from_kuid(&init_user_ns, auid),
- 			 from_kuid(&init_user_ns, uid), sessionid);
- 	if (lsmprop_is_set(prop)) {
--		if (security_lsmprop_to_secctx(prop, &ctx.context, &ctx.len)) {
-+		if (security_lsmprop_to_secctx(prop, &ctx) < 0) {
- 			audit_log_format(ab, " obj=(none)");
- 			rc = 1;
- 		} else {
-@@ -1370,7 +1370,6 @@ static void audit_log_time(struct audit_context *context, struct audit_buffer **
- 
- static void show_special(struct audit_context *context, int *call_panic)
- {
--	struct lsm_context lsmcxt;
- 	struct audit_buffer *ab;
- 	int i;
- 
-@@ -1393,16 +1392,14 @@ static void show_special(struct audit_context *context, int *call_panic)
- 				 from_kgid(&init_user_ns, context->ipc.gid),
- 				 context->ipc.mode);
- 		if (lsmprop_is_set(&context->ipc.oprop)) {
--			char *ctx = NULL;
--			u32 len;
-+			struct lsm_context lsmctx;
- 
- 			if (security_lsmprop_to_secctx(&context->ipc.oprop,
--						       &ctx, &len)) {
-+						       &lsmctx) < 0) {
- 				*call_panic = 1;
- 			} else {
--				audit_log_format(ab, " obj=%s", ctx);
--				lsmcontext_init(&lsmcxt, ctx, len, 0);
--				security_release_secctx(&lsmcxt);
-+				audit_log_format(ab, " obj=%s", lsmctx.context);
-+				security_release_secctx(&lsmctx);
- 			}
- 		}
- 		if (context->ipc.has_perm) {
-@@ -1563,8 +1560,7 @@ static void audit_log_name(struct audit_context *context, struct audit_names *n,
- 	if (lsmprop_is_set(&n->oprop)) {
- 		struct lsm_context ctx;
- 
--		if (security_lsmprop_to_secctx(&n->oprop, &ctx.context,
--					       &ctx.len)) {
-+		if (security_lsmprop_to_secctx(&n->oprop, &ctx) < 0) {
- 			if (call_panic)
- 				*call_panic = 2;
- 		} else {
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index a8180dcc2a32..dadbf619b20f 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -136,8 +136,8 @@ static void ip_cmsg_recv_security(struct msghdr *msg, struct sk_buff *skb)
- 	if (err)
- 		return;
- 
--	err = security_secid_to_secctx(secid, &ctx.context, &ctx.len);
--	if (err)
-+	err = security_secid_to_secctx(secid, &ctx);
-+	if (err < 0)
- 		return;
- 
- 	put_cmsg(msg, SOL_IP, SCM_SECURITY, ctx.len, ctx.context);
-diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-index 86a57a3afdd6..dd74d4c67c69 100644
---- a/net/netfilter/nf_conntrack_netlink.c
-+++ b/net/netfilter/nf_conntrack_netlink.c
-@@ -360,8 +360,8 @@ static int ctnetlink_dump_secctx(struct sk_buff *skb, const struct nf_conn *ct)
- 	struct lsm_context ctx;
- 	int ret;
- 
--	ret = security_secid_to_secctx(ct->secmark, &ctx.context, &ctx.len);
--	if (ret)
-+	ret = security_secid_to_secctx(ct->secmark, &ctx);
-+	if (ret < 0)
- 		return 0;
- 
- 	ret = -1;
-@@ -665,8 +665,8 @@ static inline int ctnetlink_secctx_size(const struct nf_conn *ct)
- #ifdef CONFIG_NF_CONNTRACK_SECMARK
- 	int len, ret;
- 
--	ret = security_secid_to_secctx(ct->secmark, NULL, &len);
--	if (ret)
-+	ret = security_secid_to_secctx(ct->secmark, NULL);
-+	if (ret < 0)
- 		return 0;
- 
- 	return nla_total_size(0) /* CTA_SECCTX */
-diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-index 5f7fd23b7afe..502cf10aab41 100644
---- a/net/netfilter/nf_conntrack_standalone.c
-+++ b/net/netfilter/nf_conntrack_standalone.c
-@@ -175,8 +175,8 @@ static void ct_show_secctx(struct seq_file *s, const struct nf_conn *ct)
- 	struct lsm_context ctx;
- 	int ret;
- 
--	ret = security_secid_to_secctx(ct->secmark, &ctx.context, &ctx.len);
--	if (ret)
-+	ret = security_secid_to_secctx(ct->secmark, &ctx);
-+	if (ret < 0)
- 		return;
- 
- 	seq_printf(s, "secctx=%s ", ctx.context);
-diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-index 37757cd77cf1..5110f29b2f40 100644
---- a/net/netfilter/nfnetlink_queue.c
-+++ b/net/netfilter/nfnetlink_queue.c
-@@ -470,18 +470,18 @@ static int nfqnl_put_sk_classid(struct sk_buff *skb, struct sock *sk)
- 	return 0;
- }
- 
--static u32 nfqnl_get_sk_secctx(struct sk_buff *skb, char **secdata)
-+static u32 nfqnl_get_sk_secctx(struct sk_buff *skb, struct lsm_context *ctx)
- {
- 	u32 seclen = 0;
- #if IS_ENABLED(CONFIG_NETWORK_SECMARK)
-+
- 	if (!skb || !sk_fullsock(skb->sk))
- 		return 0;
- 
- 	read_lock_bh(&skb->sk->sk_callback_lock);
- 
- 	if (skb->secmark)
--		security_secid_to_secctx(skb->secmark, secdata, &seclen);
--
-+		seclen = security_secid_to_secctx(skb->secmark, ctx);
- 	read_unlock_bh(&skb->sk->sk_callback_lock);
- #endif
- 	return seclen;
-@@ -567,8 +567,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	enum ip_conntrack_info ctinfo = 0;
- 	const struct nfnl_ct_hook *nfnl_ct;
- 	bool csum_verify;
--	struct lsm_context scaff; /* scaffolding */
--	char *secdata = NULL;
-+	struct lsm_context ctx;
- 	u32 seclen = 0;
- 	ktime_t tstamp;
- 
-@@ -643,8 +642,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	}
- 
- 	if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
--		seclen = nfqnl_get_sk_secctx(entskb, &secdata);
--		if (seclen)
-+		seclen = nfqnl_get_sk_secctx(entskb, &ctx);
-+		if (seclen >= 0)
- 			size += nla_total_size(seclen);
- 	}
- 
-@@ -783,7 +782,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	if (nfqnl_put_sk_classid(skb, entskb->sk) < 0)
- 		goto nla_put_failure;
- 
--	if (seclen && nla_put(skb, NFQA_SECCTX, seclen, secdata))
-+	if (seclen && nla_put(skb, NFQA_SECCTX, ctx.len, ctx.context))
- 		goto nla_put_failure;
- 
- 	if (ct && nfnl_ct->build(skb, ct, ctinfo, NFQA_CT, NFQA_CT_INFO) < 0)
-@@ -811,10 +810,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	}
- 
- 	nlh->nlmsg_len = skb->len;
--	if (seclen) {
--		lsmcontext_init(&scaff, secdata, seclen, 0);
--		security_release_secctx(&scaff);
--	}
-+	if (seclen >= 0)
-+		security_release_secctx(&ctx);
- 	return skb;
- 
- nla_put_failure:
-@@ -822,10 +819,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	kfree_skb(skb);
- 	net_err_ratelimited("nf_queue: error creating packet message\n");
- nlmsg_failure:
--	if (seclen) {
--		lsmcontext_init(&scaff, secdata, seclen, 0);
--		security_release_secctx(&scaff);
--	}
-+	if (seclen >= 0)
-+		security_release_secctx(&ctx);
- 	return NULL;
- }
- 
-diff --git a/net/netlabel/netlabel_unlabeled.c b/net/netlabel/netlabel_unlabeled.c
-index 921fa8eeb451..bd7094f225d1 100644
---- a/net/netlabel/netlabel_unlabeled.c
-+++ b/net/netlabel/netlabel_unlabeled.c
-@@ -437,9 +437,7 @@ int netlbl_unlhsh_add(struct net *net,
- unlhsh_add_return:
- 	rcu_read_unlock();
- 	if (audit_buf != NULL) {
--		if (security_secid_to_secctx(secid,
--					     &ctx.context,
--					     &ctx.len) == 0) {
-+		if (security_secid_to_secctx(secid, &ctx) == 0) {
- 			audit_log_format(audit_buf, " sec_obj=%s", ctx.context);
- 			security_release_secctx(&ctx);
- 		}
-@@ -492,8 +490,7 @@ static int netlbl_unlhsh_remove_addr4(struct net *net,
- 					  addr->s_addr, mask->s_addr);
- 		dev_put(dev);
- 		if (entry != NULL &&
--		    security_secid_to_secctx(entry->secid,
--					     &ctx.context, &ctx.len) == 0) {
-+		    security_secid_to_secctx(entry->secid, &ctx) == 0) {
- 			audit_log_format(audit_buf, " sec_obj=%s", ctx.context);
- 			security_release_secctx(&ctx);
- 		}
-@@ -551,8 +548,7 @@ static int netlbl_unlhsh_remove_addr6(struct net *net,
- 					  addr, mask);
- 		dev_put(dev);
- 		if (entry != NULL &&
--		    security_secid_to_secctx(entry->secid,
--					     &ctx.context, &ctx.len) == 0) {
-+		    security_secid_to_secctx(entry->secid, &ctx) == 0) {
- 			audit_log_format(audit_buf, " sec_obj=%s", ctx.context);
- 			security_release_secctx(&ctx);
- 		}
-@@ -1123,8 +1119,8 @@ static int netlbl_unlabel_staticlist_gen(u32 cmd,
- 		secid = addr6->secid;
- 	}
- 
--	ret_val = security_secid_to_secctx(secid, &ctx.context, &ctx.len);
--	if (ret_val != 0)
-+	ret_val = security_secid_to_secctx(secid, &ctx);
-+	if (ret_val < 0)
- 		goto list_cb_failure;
- 	ret_val = nla_put(cb_arg->skb,
- 			  NLBL_UNLABEL_A_SECCTX,
-diff --git a/net/netlabel/netlabel_user.c b/net/netlabel/netlabel_user.c
-index f5e7a9919df1..0d04d23aafe7 100644
---- a/net/netlabel/netlabel_user.c
-+++ b/net/netlabel/netlabel_user.c
-@@ -98,8 +98,7 @@ struct audit_buffer *netlbl_audit_start_common(int type,
- 			 audit_info->sessionid);
- 
- 	if (lsmprop_is_set(&audit_info->prop) &&
--	    security_lsmprop_to_secctx(&audit_info->prop, &ctx.context,
--				       &ctx.len) == 0) {
-+	    security_lsmprop_to_secctx(&audit_info->prop, &ctx) > 0) {
- 		audit_log_format(audit_buf, " subj=%s", ctx.context);
- 		security_release_secctx(&ctx);
- 	}
-diff --git a/security/apparmor/include/secid.h b/security/apparmor/include/secid.h
-index 8b92f90b6921..550a8d3ed527 100644
---- a/security/apparmor/include/secid.h
-+++ b/security/apparmor/include/secid.h
-@@ -25,9 +25,8 @@ struct aa_label;
- extern int apparmor_display_secid_mode;
- 
- struct aa_label *aa_secid_to_label(u32 secid);
--int apparmor_secid_to_secctx(u32 secid, char **secdata, u32 *seclen);
--int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--			       u32 *seclen);
-+int apparmor_secid_to_secctx(u32 secid, struct lsm_context *cp);
-+int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp);
- int apparmor_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid);
- void apparmor_release_secctx(struct lsm_context *cp);
- 
-diff --git a/security/apparmor/secid.c b/security/apparmor/secid.c
-index 8d9ced8cdffd..5d92fc3ab8b4 100644
---- a/security/apparmor/secid.c
-+++ b/security/apparmor/secid.c
-@@ -61,23 +61,21 @@ struct aa_label *aa_secid_to_label(u32 secid)
- 	return xa_load(&aa_secids, secid);
- }
- 
--static int apparmor_label_to_secctx(struct aa_label *label, char **secdata,
--				    u32 *seclen)
-+static int apparmor_label_to_secctx(struct aa_label *label,
-+				    struct lsm_context *cp)
- {
- 	/* TODO: cache secctx and ref count so we don't have to recreate */
- 	int flags = FLAG_VIEW_SUBNS | FLAG_HIDDEN_UNCONFINED | FLAG_ABS_ROOT;
- 	int len;
- 
--	AA_BUG(!seclen);
--
- 	if (!label)
- 		return -EINVAL;
- 
- 	if (apparmor_display_secid_mode)
- 		flags |= FLAG_SHOW_MODE;
- 
--	if (secdata)
--		len = aa_label_asxprint(secdata, root_ns, label,
-+	if (cp)
-+		len = aa_label_asxprint(&cp->context, root_ns, label,
- 					flags, GFP_ATOMIC);
- 	else
- 		len = aa_label_snxprint(NULL, 0, root_ns, label, flags);
-@@ -85,26 +83,28 @@ static int apparmor_label_to_secctx(struct aa_label *label, char **secdata,
- 	if (len < 0)
- 		return -ENOMEM;
- 
--	*seclen = len;
-+	if (cp) {
-+		cp->len = len;
-+		cp->id = LSM_ID_APPARMOR;
-+	}
- 
--	return 0;
-+	return len;
- }
- 
--int apparmor_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+int apparmor_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
- 	struct aa_label *label = aa_secid_to_label(secid);
- 
--	return apparmor_label_to_secctx(label, secdata, seclen);
-+	return apparmor_label_to_secctx(label, cp);
- }
- 
--int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--			       u32 *seclen)
-+int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp)
- {
- 	struct aa_label *label;
- 
- 	label = prop->apparmor.label;
- 
--	return apparmor_label_to_secctx(label, secdata, seclen);
-+	return apparmor_label_to_secctx(label, cp);
- }
- 
- int apparmor_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid)
-diff --git a/security/security.c b/security/security.c
-index 0c9c3a02704b..914d8c8beea7 100644
---- a/security/security.c
-+++ b/security/security.c
-@@ -4309,40 +4309,36 @@ EXPORT_SYMBOL(security_ismaclabel);
- /**
-  * security_secid_to_secctx() - Convert a secid to a secctx
-  * @secid: secid
-- * @secdata: secctx
-- * @seclen: secctx length
-+ * @cp: the LSM context
-  *
-- * Convert secid to security context.  If @secdata is NULL the length of the
-- * result will be returned in @seclen, but no @secdata will be returned.  This
-+ * Convert secid to security context.  If @cp is NULL the length of the
-+ * result will be returned, but no data will be returned.  This
-  * does mean that the length could change between calls to check the length and
-- * the next call which actually allocates and returns the @secdata.
-+ * the next call which actually allocates and returns the data.
-  *
-- * Return: Return 0 on success, error on failure.
-+ * Return: Return length of data on success, error on failure.
-  */
--int security_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+int security_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
--	return call_int_hook(secid_to_secctx, secid, secdata, seclen);
-+	return call_int_hook(secid_to_secctx, secid, cp);
- }
- EXPORT_SYMBOL(security_secid_to_secctx);
- 
- /**
-  * security_lsmprop_to_secctx() - Convert a lsm_prop to a secctx
-  * @prop: lsm specific information
-- * @secdata: secctx
-- * @seclen: secctx length
-+ * @cp: the LSM context
-  *
-- * Convert a @prop entry to security context.  If @secdata is NULL the
-- * length of the result will be returned in @seclen, but no @secdata
-- * will be returned.  This does mean that the length could change between
-- * calls to check the length and the next call which actually allocates
-- * and returns the @secdata.
-+ * Convert a @prop entry to security context.  If @cp is NULL the
-+ * length of the result will be returned. This does mean that the
-+ * length could change between calls to check the length and the
-+ * next call which actually allocates and returns the @cp.
-  *
-- * Return: Return 0 on success, error on failure.
-+ * Return: Return length of data on success, error on failure.
-  */
--int security_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--			       u32 *seclen)
-+int security_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp)
- {
--	return call_int_hook(lsmprop_to_secctx, prop, secdata, seclen);
-+	return call_int_hook(lsmprop_to_secctx, prop, cp);
- }
- EXPORT_SYMBOL(security_lsmprop_to_secctx);
- 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 1503d398c87d..692735eb04aa 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -6607,15 +6607,28 @@ static int selinux_ismaclabel(const char *name)
- 	return (strcmp(name, XATTR_SELINUX_SUFFIX) == 0);
- }
- 
--static int selinux_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+static int selinux_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
--	return security_sid_to_context(secid, secdata, seclen);
-+	u32 seclen;
-+	u32 ret;
-+
-+	if (cp) {
-+		cp->id = LSM_ID_SELINUX;
-+		ret = security_sid_to_context(secid, &cp->context, &cp->len);
-+		if (ret < 0)
-+			return ret;
-+		return cp->len;
-+	}
-+	ret = security_sid_to_context(secid, NULL, &seclen);
-+	if (ret < 0)
-+		return ret;
-+	return seclen;
- }
- 
--static int selinux_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--				     u32 *seclen)
-+static int selinux_lsmprop_to_secctx(struct lsm_prop *prop,
-+				     struct lsm_context *cp)
- {
--	return selinux_secid_to_secctx(prop->selinux.secid, secdata, seclen);
-+	return selinux_secid_to_secctx(prop->selinux.secid, cp);
- }
- 
- static int selinux_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid)
-diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-index 0c476282e279..d52163d3dd64 100644
---- a/security/smack/smack_lsm.c
-+++ b/security/smack/smack_lsm.c
-@@ -4817,22 +4817,35 @@ static int smack_ismaclabel(const char *name)
- 	return (strcmp(name, XATTR_SMACK_SUFFIX) == 0);
- }
- 
-+/**
-+ * smack_to_secctx - fill a lsm_context
-+ * @skp: Smack label
-+ * @cp: destination
-+ *
-+ * Fill the passed @cp and return the length of the string
-+ */
-+static int smack_to_secctx(struct smack_known *skp, struct lsm_context *cp)
-+{
-+	int len = strlen(skp->smk_known);
-+
-+	if (cp) {
-+		cp->context = skp->smk_known;
-+		cp->len = len;
-+		cp->id = LSM_ID_SMACK;
-+	}
-+	return len;
-+}
-+
- /**
-  * smack_secid_to_secctx - return the smack label for a secid
-  * @secid: incoming integer
-- * @secdata: destination
-- * @seclen: how long it is
-+ * @cp: destination
-  *
-  * Exists for networking code.
-  */
--static int smack_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+static int smack_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
--	struct smack_known *skp = smack_from_secid(secid);
--
--	if (secdata)
--		*secdata = skp->smk_known;
--	*seclen = strlen(skp->smk_known);
--	return 0;
-+	return smack_to_secctx(smack_from_secid(secid), cp);
- }
- 
- /**
-@@ -4843,15 +4856,10 @@ static int smack_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-  *
-  * Exists for audit code.
-  */
--static int smack_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--				   u32 *seclen)
-+static int smack_lsmprop_to_secctx(struct lsm_prop *prop,
-+				   struct lsm_context *cp)
- {
--	struct smack_known *skp = prop->smack.skp;
--
--	if (secdata)
--		*secdata = skp->smk_known;
--	*seclen = strlen(skp->smk_known);
--	return 0;
-+	return smack_to_secctx(prop->smack.skp, cp);
- }
- 
- /**
--- 
-2.46.0
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
+Thanks for the PLDM improvement!
 
