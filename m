@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-138241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33EE49ACADC
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:14:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D73C9ACADE
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:14:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 635F01C20F2D
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:14:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD13B1C20EEA
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812911BFE03;
-	Wed, 23 Oct 2024 13:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B881C303A;
+	Wed, 23 Oct 2024 13:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bkghVTV8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X+990/1i"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0B31BD004;
-	Wed, 23 Oct 2024 13:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC491BFE0C;
+	Wed, 23 Oct 2024 13:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729689214; cv=none; b=gUajNyTh9a/BpAHjnpvApx862fbzy0EOelgEIUt0VpEKXK+SKiC8SkhyrjDic6j53Oq2BUZmh/v4JbIopgMqdG0CWFYySpvKxDTnPp75KhHt2+WiJBhKwvAJj7/2t63Vouhp+csnyZk9VGU+oKz2G/XOdee0zNhbzTxHpL2QsdY=
+	t=1729689216; cv=none; b=XWnLm+XLCTibMUzAr67eH6XXIMjJ2TQtu2DYzF7qG1lYvYekQ5fOdDvdBogdW2m2XGBK/Xo/b0AU9P+9xpOlh5Wimm2eNP4skLJwq/Ns7tJ27oCSg7KwKzmiVDGR8WhPcwy5aDFbEraOCvssg/lyTtnr0KqQ4KSYxCQU9G/4OuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729689214; c=relaxed/simple;
-	bh=unRzvrZVN7bDLtZgI9ZhS6/GXEaHrzbC4SBPnYwEXx4=;
+	s=arc-20240116; t=1729689216; c=relaxed/simple;
+	bh=+mPa/jPAUkkjBYJVCw5ckmn4CgLVWcvx8RKEOZEn7wY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EEu0rb39SKeZRqmhDkRY65PqDj4iT3GS7HcrWUcwsWg8bEuJoFyQr1DpcKO6GlzQXojavHuA0FJYSAmSzrk2/YlyjmcV1mj2m8QOeYqMoPzEvb3L+hH+c/4b/G22waeUWAuJHBoFd7a+LUEXvuoubIgTbj5UfdJv/+M3yvxMFQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bkghVTV8; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=KZrVy5cu1DiZqsoZYHR80icp4l6rCuj6Ahg2uc1vodCNHCKFU6aQoyM1oCWWkzX3c/YvQjkuwIvqn6H379GWuWdYuhQZbl+wwfvSFLN5Osd9LoMcvwS+iU/2wGa2G2Dy+0GG2izq9XRbnRnQ+3UGoJPyH4LDJ288dM+HLwSEpeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X+990/1i; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729689213; x=1761225213;
+  t=1729689214; x=1761225214;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=unRzvrZVN7bDLtZgI9ZhS6/GXEaHrzbC4SBPnYwEXx4=;
-  b=bkghVTV8RakkAQdOTuWfGlQVD2GV1PW/P4suowYQRGJ485Jy0AYYBkqD
-   NiBFfNjfe6+ClIw+eNPdAhcNbSpfKL2/avdl8Ui+Gvljnn+Svez2Enjw7
-   gIgILqZSkDQgC6ghvq0nHWIUkION64jeritXntxlmN5XtlHK8U80U9lcx
-   JRRSo+LfSl8pac1uzCKjLS1/uWKzQa+5RROBhvNpi/59DY//XTwJUY3gx
-   OJBB2twP94MCrFViv5T5Y6qEXYG/XR8zItw1cGw4vs2NsIfnbAc+pUxZ+
-   WV8JkQnWGz4Btig8+TUE+/sUTwSMlAelmag0ZpayL1z+1Ue5rpGLGsi+N
+  bh=+mPa/jPAUkkjBYJVCw5ckmn4CgLVWcvx8RKEOZEn7wY=;
+  b=X+990/1i2PzMwrBAyc54+w8EDrD5ukgN5ZU8j33NE/cDtr2voLkgxKW3
+   EOCQwRS+te2PBCD8EGiqwVMTBAr3Mslg4+TJHKdvTlz28debIYaVTrrQw
+   LdJqIrJmlDSyEBKmLKp2n+XC45s8gfM+cEmeIYnumbXGf/D9POUWbtEe3
+   AzuGab4Af+eYekoomDmhlaS8a3RfpVcI7HdBpxzB5UnhOUICMpLiXt4eY
+   6U/WLJJvUkXUGy9O3PTh/aY5O+ZX6gYQnIvTJVOzXqHzvRidOJy6gB9FV
+   4YKDSuZWeytRe00vMX5VY9vdaBV3XznWP0VJKTpg9aod0N9jaTus9Uh2P
    Q==;
-X-CSE-ConnectionGUID: RnD+v+yyT2a6wIN6Rzav0w==
-X-CSE-MsgGUID: ZeFcjIg4SXithTpmSWaWaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="46758583"
+X-CSE-ConnectionGUID: Z+Rl9n4YS32CW1A0yrtI3Q==
+X-CSE-MsgGUID: mC2icEmSTE2UDQlwa4S6sA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="46758594"
 X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="46758583"
+   d="scan'208";a="46758594"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:13:32 -0700
-X-CSE-ConnectionGUID: +HMFn9NdRLiv9YYZShutOg==
-X-CSE-MsgGUID: fWg2WaUtSbuNLBo3+yFOgA==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:13:34 -0700
+X-CSE-ConnectionGUID: yLB7w7/lTgu/d9N2m2QBwA==
+X-CSE-MsgGUID: /YHoKApITNClP71o8EAOSw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="84820121"
+   d="scan'208";a="84820125"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Oct 2024 06:13:29 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 23 Oct 2024 06:13:30 -0700
 Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.71])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 9883A2877D;
-	Wed, 23 Oct 2024 14:13:26 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8ABFE28780;
+	Wed, 23 Oct 2024 14:13:28 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: netdev@vger.kernel.org
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -79,9 +79,9 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Joe Damato <jdamato@fastly.com>
-Subject: [PATCH net-next v2 4/7] devlink: region: snapshot IDs: consolidate error values
-Date: Wed, 23 Oct 2024 15:09:04 +0200
-Message-ID: <20241023131248.27192-5-przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v2 5/7] net: dsa: replace devlink resource registration calls by devl_ variants
+Date: Wed, 23 Oct 2024 15:09:05 +0200
+Message-ID: <20241023131248.27192-6-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241023131248.27192-1-przemyslaw.kitszel@intel.com>
 References: <20241023131248.27192-1-przemyslaw.kitszel@intel.com>
@@ -93,42 +93,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Consolidate error codes for too big message size.
-
-Current code is written to return -EINVAL when tailroom in the skb msg
-would be exhausted precisely when it's time to nest, and return -EMSGSIZE
-in all other "not enough space" conditions.
+Replace devlink_resource_register(), devlink_resource_occ_get_register(),
+and devlink_resource_occ_get_unregister() calls by respective devl_*
+variants. Mentioned functions have no direct users in any drivers, and are
+going to be removed in subsequent patches.
 
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- net/devlink/region.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/dsa/devlink.c | 23 ++++++++++++++++-------
+ 1 file changed, 16 insertions(+), 7 deletions(-)
 
-diff --git a/net/devlink/region.c b/net/devlink/region.c
-index 0a75a2fbd4d7..63fb297f6d67 100644
---- a/net/devlink/region.c
-+++ b/net/devlink/region.c
-@@ -77,7 +77,7 @@ static int devlink_nl_region_snapshot_id_put(struct sk_buff *msg,
+diff --git a/net/dsa/devlink.c b/net/dsa/devlink.c
+index 0aac887d0098..f41f9fc2194e 100644
+--- a/net/dsa/devlink.c
++++ b/net/dsa/devlink.c
+@@ -229,10 +229,15 @@ int dsa_devlink_resource_register(struct dsa_switch *ds,
+ 				  u64 parent_resource_id,
+ 				  const struct devlink_resource_size_params *size_params)
+ {
+-	return devlink_resource_register(ds->devlink, resource_name,
+-					 resource_size, resource_id,
+-					 parent_resource_id,
+-					 size_params);
++	int ret;
++
++	devl_lock(ds->devlink);
++	ret = devl_resource_register(ds->devlink, resource_name, resource_size,
++				     resource_id, parent_resource_id,
++				     size_params);
++	devl_unlock(ds->devlink);
++
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(dsa_devlink_resource_register);
  
- 	snap_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_REGION_SNAPSHOT);
- 	if (!snap_attr)
--		return -EINVAL;
-+		return -EMSGSIZE;
+@@ -247,15 +252,19 @@ void dsa_devlink_resource_occ_get_register(struct dsa_switch *ds,
+ 					   devlink_resource_occ_get_t *occ_get,
+ 					   void *occ_get_priv)
+ {
+-	return devlink_resource_occ_get_register(ds->devlink, resource_id,
+-						 occ_get, occ_get_priv);
++	devl_lock(ds->devlink);
++	devl_resource_occ_get_register(ds->devlink, resource_id, occ_get,
++				       occ_get_priv);
++	devl_unlock(ds->devlink);
+ }
+ EXPORT_SYMBOL_GPL(dsa_devlink_resource_occ_get_register);
  
- 	err = nla_put_u32(msg, DEVLINK_ATTR_REGION_SNAPSHOT_ID, snapshot->id);
- 	if (err)
-@@ -102,7 +102,7 @@ static int devlink_nl_region_snapshots_id_put(struct sk_buff *msg,
- 	snapshots_attr = nla_nest_start_noflag(msg,
- 					       DEVLINK_ATTR_REGION_SNAPSHOTS);
- 	if (!snapshots_attr)
--		return -EINVAL;
-+		return -EMSGSIZE;
+ void dsa_devlink_resource_occ_get_unregister(struct dsa_switch *ds,
+ 					     u64 resource_id)
+ {
+-	devlink_resource_occ_get_unregister(ds->devlink, resource_id);
++	devl_lock(ds->devlink);
++	devl_resource_occ_get_unregister(ds->devlink, resource_id);
++	devl_unlock(ds->devlink);
+ }
+ EXPORT_SYMBOL_GPL(dsa_devlink_resource_occ_get_unregister);
  
- 	list_for_each_entry(snapshot, &region->snapshot_list, list) {
- 		err = devlink_nl_region_snapshot_id_put(msg, devlink, snapshot);
 -- 
 2.46.0
 
