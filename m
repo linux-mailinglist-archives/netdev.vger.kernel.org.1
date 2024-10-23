@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-138420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 095369AD73B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:04:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9127E9AD73F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:04:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA48F284B27
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:04:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F82EB22477
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2AF201024;
-	Wed, 23 Oct 2024 22:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD88202F7F;
+	Wed, 23 Oct 2024 22:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="q1ePmOIa"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="LoJFQDF7"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13101FE0E6;
-	Wed, 23 Oct 2024 22:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025441FF020;
+	Wed, 23 Oct 2024 22:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729720962; cv=none; b=QhCBkkSvtEJ7kqZX9PXocu9V+Xv0ZyFGkyyw4bXIeqbu9r9Fz3kFIybEYVki9vHOy/hl2QpeDF/YyrT/4jrjDHTBRf25zBd2Nrtf9rrJxAFb09QAX9wyA5O2BTS3hMjAQOEm6RMSXDXUfdsB4A9NGryeDkM+v6VhH8kJBMRDgIc=
+	t=1729720963; cv=none; b=S84TVr9TT8cMMijG+szWbWA8+TIgxGiPraVOh1PdkrTlovgGFWB5kwPdWhRrUGuqWFglU2dwx/STsBFZ+5qUWbxnCvn1YVYrKR9efKcieQ1N7WUVfb81hOTAklmTvA981xF4xDkzgUPPO2a57Lds4isWyTPaBDaRYJnIvsi3K3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729720962; c=relaxed/simple;
-	bh=vwMgBh8rF4YruDkEUaNvk44Eb8em21K29W9Ne4EAcnA=;
+	s=arc-20240116; t=1729720963; c=relaxed/simple;
+	bh=ZKiUv9DzB/srjyB0nOslYiyXDW2kxgFTeso+UmXKlj8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=jGtuC0PDwIYtEkKQ8h+/PpUQh2iVMSb4TAzOXh66CkjQnM7yDpCHDXjA3EcFPlykoFNdt2TGjAU6h+SL/GmSBqMNQ5Yi9QL++IdzRP/T82AVERPItAJ2xVQeSo3Q8Sm+H/YEEHCfDR8UZvbeS09BobMqnd0bPdtxM/ujsYgxYl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=q1ePmOIa; arc=none smtp.client-ip=68.232.154.123
+	 In-Reply-To:To:CC; b=Fu0JR5HNs0raAPLwdLmoyQkXZQ7SEBLJ4N6QsHiFvtk0t3vIuhgIbBQa99qw+vDR3ErCt4Q/bLHmEW8f6c8wT5uWtk8MdeDuOdVy7x+M+ezduP6c3PRX1lHrrRkyhQJ5bCcpUCKPwklTnGHV33+KvWoWHf4fUiekJvxpWiOmrMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=LoJFQDF7; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729720959; x=1761256959;
+  t=1729720960; x=1761256960;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=vwMgBh8rF4YruDkEUaNvk44Eb8em21K29W9Ne4EAcnA=;
-  b=q1ePmOIaEQZOlEimH/rsUKiFXR0ZDjTRNPfb06S8can5AiB6yB2gFxCJ
-   /A9zEhuF9VnRlsaIIBDNd0FHdCCDilt6df5c5DbyLaixEHsiAaR64ZaNo
-   4K2nICUFIuput/1NySeG5EhNkA//JymOFRXvmESdEDw6+0+iyHDgwXJA8
-   ITlN5rkM85WgOMpGM7zyN11lzktc2Y+yAyGvhMKCUPySiqrQb9AeZKsOH
-   z4BJQp2ovtDldD/VoD0cojTm7zy5zkIOrcbBJBNI+PSFCqa3Ur0jW/6LG
-   ugHRHPTSwJ9J07ZNAoyQnwkkxticnwiqZsCwW3ORYWoOdvFxYrNvSrC0t
-   A==;
+  bh=ZKiUv9DzB/srjyB0nOslYiyXDW2kxgFTeso+UmXKlj8=;
+  b=LoJFQDF7mTl2e9138jMztJaKgeN4S22O7CJ8/cql+sldHc+PALKm1PBv
+   bgBD6e44NBY0+1vh5VACM6Aj/zjtfu+TZvVOHTl4OLifiwnTr4Wr3HV0t
+   8cUUO6SUQt9FLW2bimjHmwAZ7ONnQQX0evh+7qnzg8wZSOTcQe9hkcN58
+   9QcsHd0R8gSn/OJR3IMsabsSmiA5rYqE4tAO0fN7GAPoCiDiZjVWYRpTA
+   zw8MzR5YJse2pY/5lgkaBg40F//rQpKDjQpQQ8s8JRLKXbyiYcLXDNswP
+   ymmzu3xBrovet0gjREHIIei9sUxVMFj8hkOmQeFMR54VobysxIburD5eh
+   g==;
 X-CSE-ConnectionGUID: wd8IJW4NTJ64cR86gqDN2Q==
-X-CSE-MsgGUID: uCehCdvbSU2XvHM8M6WRMA==
+X-CSE-MsgGUID: vbpVIdD/Q2+PXaOWlN1TYg==
 X-IronPort-AV: E=Sophos;i="6.11,227,1725346800"; 
-   d="scan'208";a="200831271"
+   d="scan'208";a="200831272"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 15:02:36 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 15:02:37 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 23 Oct 2024 15:02:16 -0700
+ 15.1.2507.35; Wed, 23 Oct 2024 15:02:21 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 23 Oct 2024 15:02:12 -0700
+ 15.1.2507.35 via Frontend Transport; Wed, 23 Oct 2024 15:02:17 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Thu, 24 Oct 2024 00:01:28 +0200
-Subject: [PATCH net-next v2 09/15] net: lan969x: add lan969x ops to match
- data
+Date: Thu, 24 Oct 2024 00:01:29 +0200
+Subject: [PATCH net-next v2 10/15] net: lan969x: add PTP handler function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241024-sparx5-lan969x-switch-driver-2-v2-9-a0b5fae88a0f@microchip.com>
+Message-ID: <20241024-sparx5-lan969x-switch-driver-2-v2-10-a0b5fae88a0f@microchip.com>
 References: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
 In-Reply-To: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -88,208 +87,185 @@ CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<steen.hegelund@microchip.com>, <devicetree@vger.kernel.org>
 X-Mailer: b4 0.14-dev
 
-Add a bunch of small lan969x ops in bulk. These ops are explained in
-detail in a previous series [1].
+Add PTP IRQ handler for lan969x. This is required, as the PTP registers
+are placed in two different targets on Sparx5 and lan969x. The
+implementation is otherwise the same as on Sparx5.
 
-[1] https://lore.kernel.org/netdev/20241004-b4-sparx5-lan969x-switch-driver-v2-8-d3290f581663@microchip.com/
+Also, expose sparx5_get_hwtimestamp() for use by lan969x.
 
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- drivers/net/ethernet/microchip/lan969x/lan969x.c | 122 +++++++++++++++++++++++
- drivers/net/ethernet/microchip/lan969x/lan969x.h |  28 ++++++
- 2 files changed, 150 insertions(+)
+ drivers/net/ethernet/microchip/lan969x/lan969x.c   | 90 ++++++++++++++++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    |  5 ++
+ drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |  9 +--
+ 3 files changed, 99 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.c b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-index 19f91e4a9f3e..2c2b86f9144e 100644
+index 2c2b86f9144e..a3b40e09b947 100644
 --- a/drivers/net/ethernet/microchip/lan969x/lan969x.c
 +++ b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-@@ -6,6 +6,9 @@
+@@ -201,6 +201,95 @@ static int lan969x_port_mux_set(struct sparx5 *sparx5, struct sparx5_port *port,
+ 	return 0;
+ }
  
- #include "lan969x.h"
- 
-+#define LAN969X_SDLB_GRP_CNT 5
-+#define LAN969X_HSCH_LEAK_GRP_CNT 4
-+
- static const struct sparx5_main_io_resource lan969x_main_iomap[] =  {
- 	{ TARGET_CPU,                   0xc0000, 0 }, /* 0xe00c0000 */
- 	{ TARGET_FDMA,                  0xc0400, 0 }, /* 0xe00c0400 */
-@@ -92,6 +95,112 @@ static const struct sparx5_main_io_resource lan969x_main_iomap[] =  {
- 	{ TARGET_ASM,                 0x3200000, 1 }, /* 0xe3200000 */
- };
- 
-+static struct sparx5_sdlb_group lan969x_sdlb_groups[LAN969X_SDLB_GRP_CNT] = {
-+	{ 1000000000,  8192 / 2, 64 }, /*    1 G */
-+	{  500000000,  8192 / 2, 64 }, /*  500 M */
-+	{  100000000,  8192 / 4, 64 }, /*  100 M */
-+	{   50000000,  8192 / 4, 64 }, /*   50 M */
-+	{    5000000,  8192 / 8, 64 }, /*   10 M */
-+};
-+
-+static u32 lan969x_hsch_max_group_rate[LAN969X_HSCH_LEAK_GRP_CNT] = {
-+	655355, 1048568, 6553550, 10485680
-+};
-+
-+static struct sparx5_sdlb_group *lan969x_get_sdlb_group(int idx)
++static irqreturn_t lan969x_ptp_irq_handler(int irq, void *args)
 +{
-+	return &lan969x_sdlb_groups[idx];
-+}
++	int budget = SPARX5_MAX_PTP_ID;
++	struct sparx5 *sparx5 = args;
 +
-+static u32 lan969x_get_hsch_max_group_rate(int grp)
-+{
-+	return lan969x_hsch_max_group_rate[grp];
-+}
++	while (budget--) {
++		struct sk_buff *skb, *skb_tmp, *skb_match = NULL;
++		struct skb_shared_hwtstamps shhwtstamps;
++		struct sparx5_port *port;
++		struct timespec64 ts;
++		unsigned long flags;
++		u32 val, id, txport;
++		u32 delay;
 +
-+static u32 lan969x_get_dev_mode_bit(struct sparx5 *sparx5, int port)
-+{
-+	if (lan969x_port_is_2g5(port) || lan969x_port_is_5g(port))
-+		return port;
++		val = spx5_rd(sparx5, PTP_TWOSTEP_CTRL);
 +
-+	/* 10G */
-+	switch (port) {
-+	case 0:
-+		return 12;
-+	case 4:
-+		return 13;
-+	case 8:
-+		return 14;
-+	case 12:
-+		return 0;
-+	default:
-+		return port;
-+	}
-+}
++		/* Check if a timestamp can be retrieved */
++		if (!(val & PTP_TWOSTEP_CTRL_PTP_VLD))
++			break;
 +
-+static u32 lan969x_port_dev_mapping(struct sparx5 *sparx5, int port)
-+{
-+	if (lan969x_port_is_5g(port)) {
-+		switch (port) {
-+		case 9:
-+			return 0;
-+		case 13:
-+			return 1;
-+		case 17:
-+			return 2;
-+		case 21:
-+			return 3;
++		WARN_ON(val & PTP_TWOSTEP_CTRL_PTP_OVFL);
++
++		if (!(val & PTP_TWOSTEP_CTRL_STAMP_TX))
++			continue;
++
++		/* Retrieve the ts Tx port */
++		txport = PTP_TWOSTEP_CTRL_STAMP_PORT_GET(val);
++
++		/* Retrieve its associated skb */
++		port = sparx5->ports[txport];
++
++		/* Retrieve the delay */
++		delay = spx5_rd(sparx5, PTP_TWOSTEP_STAMP_NSEC);
++		delay = PTP_TWOSTEP_STAMP_NSEC_NS_GET(delay);
++
++		/* Get next timestamp from fifo, which needs to be the
++		 * rx timestamp which represents the id of the frame
++		 */
++		spx5_rmw(PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
++			 PTP_TWOSTEP_CTRL_PTP_NXT,
++			 sparx5, PTP_TWOSTEP_CTRL);
++
++		val = spx5_rd(sparx5, PTP_TWOSTEP_CTRL);
++
++		/* Check if a timestamp can be retrieved */
++		if (!(val & PTP_TWOSTEP_CTRL_PTP_VLD))
++			break;
++
++		/* Read RX timestamping to get the ID */
++		id = spx5_rd(sparx5, PTP_TWOSTEP_STAMP_NSEC);
++		id <<= 8;
++		id |= spx5_rd(sparx5, PTP_TWOSTEP_STAMP_SUBNS);
++
++		spin_lock_irqsave(&port->tx_skbs.lock, flags);
++		skb_queue_walk_safe(&port->tx_skbs, skb, skb_tmp) {
++			if (SPARX5_SKB_CB(skb)->ts_id != id)
++				continue;
++
++			__skb_unlink(skb, &port->tx_skbs);
++			skb_match = skb;
++			break;
 +		}
++		spin_unlock_irqrestore(&port->tx_skbs.lock, flags);
++
++		/* Next ts */
++		spx5_rmw(PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
++			 PTP_TWOSTEP_CTRL_PTP_NXT,
++			 sparx5, PTP_TWOSTEP_CTRL);
++
++		if (WARN_ON(!skb_match))
++			continue;
++
++		spin_lock(&sparx5->ptp_ts_id_lock);
++		sparx5->ptp_skbs--;
++		spin_unlock(&sparx5->ptp_ts_id_lock);
++
++		/* Get the h/w timestamp */
++		sparx5_get_hwtimestamp(sparx5, &ts, delay);
++
++		/* Set the timestamp in the skb */
++		shhwtstamps.hwtstamp = ktime_set(ts.tv_sec, ts.tv_nsec);
++		skb_tstamp_tx(skb_match, &shhwtstamps);
++
++		dev_kfree_skb_any(skb_match);
 +	}
 +
-+	if (lan969x_port_is_10g(port)) {
-+		switch (port) {
-+		case 0:
-+			return 0;
-+		case 4:
-+			return 1;
-+		case 8:
-+			return 2;
-+		case 12:
-+			return 3;
-+		case 16:
-+			return 4;
-+		case 20:
-+			return 5;
-+		case 24:
-+			return 6;
-+		case 25:
-+			return 7;
-+		case 26:
-+			return 8;
-+		case 27:
-+			return 9;
-+		}
-+	}
-+
-+	/* 2g5 port */
-+	return port;
-+}
-+
-+static int lan969x_port_mux_set(struct sparx5 *sparx5, struct sparx5_port *port,
-+				struct sparx5_port_config *conf)
-+{
-+	u32 portno = port->portno;
-+	u32 inst;
-+
-+	if (port->conf.portmode == conf->portmode)
-+		return 0; /* Nothing to do */
-+
-+	switch (conf->portmode) {
-+	case PHY_INTERFACE_MODE_QSGMII: /* QSGMII: 4x2G5 devices. Mode Q'  */
-+		inst = (portno - portno % 4) / 4;
-+		spx5_rmw(BIT(inst), BIT(inst), sparx5, PORT_CONF_QSGMII_ENA);
-+		break;
-+	default:
-+		break;
-+	}
-+	return 0;
++	return IRQ_HANDLED;
 +}
 +
  static const struct sparx5_regs lan969x_regs = {
  	.tsize = lan969x_tsize,
  	.gaddr = lan969x_gaddr,
-@@ -123,12 +232,25 @@ static const struct sparx5_consts lan969x_consts = {
- 	.tod_pin             = 4,
+@@ -242,6 +331,7 @@ static const struct sparx5_ops lan969x_ops = {
+ 	.get_hsch_max_group_rate = &lan969x_get_hsch_max_group_rate,
+ 	.get_sdlb_group          = &lan969x_get_sdlb_group,
+ 	.set_port_mux            = &lan969x_port_mux_set,
++	.ptp_irq_handler         = &lan969x_ptp_irq_handler,
  };
  
-+static const struct sparx5_ops lan969x_ops = {
-+	.is_port_2g5             = &lan969x_port_is_2g5,
-+	.is_port_5g              = &lan969x_port_is_5g,
-+	.is_port_10g             = &lan969x_port_is_10g,
-+	.is_port_25g             = &lan969x_port_is_25g,
-+	.get_port_dev_index      = &lan969x_port_dev_mapping,
-+	.get_port_dev_bit        = &lan969x_get_dev_mode_bit,
-+	.get_hsch_max_group_rate = &lan969x_get_hsch_max_group_rate,
-+	.get_sdlb_group          = &lan969x_get_sdlb_group,
-+	.set_port_mux            = &lan969x_port_mux_set,
-+};
-+
  const struct sparx5_match_data lan969x_desc = {
- 	.iomap      = lan969x_main_iomap,
- 	.iomap_size = ARRAY_SIZE(lan969x_main_iomap),
- 	.ioranges   = 2,
- 	.regs       = &lan969x_regs,
- 	.consts     = &lan969x_consts,
-+	.ops        = &lan969x_ops,
- };
- EXPORT_SYMBOL_GPL(lan969x_desc);
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+index 15f5d38776c4..3f66045c57ef 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+@@ -114,6 +114,8 @@ enum sparx5_vlan_port_type {
+ #define SPX5_DSM_CAL_LEN               64
+ #define SPX5_DSM_CAL_MAX_DEVS_PER_TAXI 13
  
-diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.h b/drivers/net/ethernet/microchip/lan969x/lan969x.h
-index 3b4c9ea30071..ee890b26ea79 100644
---- a/drivers/net/ethernet/microchip/lan969x/lan969x.h
-+++ b/drivers/net/ethernet/microchip/lan969x/lan969x.h
-@@ -23,4 +23,32 @@ extern const unsigned int lan969x_gsize[GSIZE_LAST];
- extern const unsigned int lan969x_fpos[FPOS_LAST];
- extern const unsigned int lan969x_fsize[FSIZE_LAST];
++#define SPARX5_MAX_PTP_ID	512
++
+ struct sparx5;
  
-+static inline bool lan969x_port_is_2g5(int portno)
-+{
-+	return portno == 1  || portno == 2  || portno == 3  ||
-+	       portno == 5  || portno == 6  || portno == 7  ||
-+	       portno == 10 || portno == 11 || portno == 14 ||
-+	       portno == 15 || portno == 18 || portno == 19 ||
-+	       portno == 22 || portno == 23;
-+}
-+
-+static inline bool lan969x_port_is_5g(int portno)
-+{
-+	return portno == 9 || portno == 13 || portno == 17 ||
-+	       portno == 21;
-+}
-+
-+static inline bool lan969x_port_is_10g(int portno)
-+{
-+	return portno == 0  || portno == 4  || portno == 8  ||
-+	       portno == 12 || portno == 16 || portno == 20 ||
-+	       portno == 24 || portno == 25 || portno == 26 ||
-+	       portno == 27;
-+}
-+
-+static inline bool lan969x_port_is_25g(int portno)
-+{
-+	return false;
-+}
-+
- #endif
+ struct sparx5_calendar_data {
+@@ -499,6 +501,9 @@ void sparx5_ptp_txtstamp_release(struct sparx5_port *port,
+ 				 struct sk_buff *skb);
+ irqreturn_t sparx5_ptp_irq_handler(int irq, void *args);
+ int sparx5_ptp_gettime64(struct ptp_clock_info *ptp, struct timespec64 *ts);
++void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
++			    struct timespec64 *ts,
++			    u32 nsec);
+ 
+ /* sparx5_vcap_impl.c */
+ int sparx5_vcap_init(struct sparx5 *sparx5);
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c b/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c
+index a511f14312f1..1c2903700a9c 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c
+@@ -11,8 +11,6 @@
+ #include "sparx5_main_regs.h"
+ #include "sparx5_main.h"
+ 
+-#define SPARX5_MAX_PTP_ID	512
+-
+ #define TOD_ACC_PIN		0x4
+ 
+ enum {
+@@ -275,9 +273,9 @@ void sparx5_ptp_txtstamp_release(struct sparx5_port *port,
+ 	spin_unlock_irqrestore(&sparx5->ptp_ts_id_lock, flags);
+ }
+ 
+-static void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
+-				   struct timespec64 *ts,
+-				   u32 nsec)
++void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
++			    struct timespec64 *ts,
++			    u32 nsec)
+ {
+ 	/* Read current PTP time to get seconds */
+ 	const struct sparx5_consts *consts = sparx5->data->consts;
+@@ -305,6 +303,7 @@ static void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
+ 
+ 	spin_unlock_irqrestore(&sparx5->ptp_clock_lock, flags);
+ }
++EXPORT_SYMBOL_GPL(sparx5_get_hwtimestamp);
+ 
+ irqreturn_t sparx5_ptp_irq_handler(int irq, void *args)
+ {
 
 -- 
 2.34.1
