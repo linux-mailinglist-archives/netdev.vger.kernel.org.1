@@ -1,172 +1,107 @@
-Return-Path: <netdev+bounces-138244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E16EE9ACAE3
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:15:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC0C9ACAC1
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:09:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A771B216A0
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:15:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A1FCB20CB5
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D5B1C82F0;
-	Wed, 23 Oct 2024 13:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCCB1ADFE6;
+	Wed, 23 Oct 2024 13:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RPT05Tc3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQLj9tyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAAD1C727F;
-	Wed, 23 Oct 2024 13:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC12156C72;
+	Wed, 23 Oct 2024 13:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729689220; cv=none; b=mfTbj8EWDuQMHky9etfrytOCB4ZDGrAdPKoWnsEtkaD7LX+KZiW/Gu6c5UB1R4WhzEZ8tVlUYbQisSXt44kjMJL+bvEezvazrr/JbuhZyhS/pFLL67m/eN6Iz504wVM2w9SBJYXIO5bVcYOTYTuIl2XSz1AOmg0zdSMsY6zYsqQ=
+	t=1729688980; cv=none; b=ViD9NuSqsPtBq6fIpKqSwX9OfmT/3MehLG5XSrzkm5PhguTl5uAUB56j7hJiQ99NId0WA5T/tZHFt82LDcYkTgCcefzVPMu6FTzTHEOk5IGDVv88XFaqZS/tKNMKn++sn/6f3Wk9amL7DsRNxPnyZVXMoanG9aTcpX4rixThfLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729689220; c=relaxed/simple;
-	bh=jlr9PKPb+PVipw4Vu1aww5E0P8JdXjTuJjzC5cVxEh4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OByq+Cwkip6L8FV89FzN1TonRr1dPWQvBZ3TtgBVDzzeQwHQ+lYuKRUNxgYS9ht/fgfXUARSCTYWdi2pDKrEPU3iMBWoiu1cuS1EK9hqhK7z0XrmonsjUnARqBfDDO92zjtgP4nsF/71wNCBDczETf4X0/3EDua8uzaysY1Wr10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RPT05Tc3; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729689219; x=1761225219;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jlr9PKPb+PVipw4Vu1aww5E0P8JdXjTuJjzC5cVxEh4=;
-  b=RPT05Tc3lEuyYU0R+qVMr+S6xcw2bj0XhLo1PX22b4epGwHdcdjT8+0s
-   lj8Yr1e4io74JIhLeg5cZPtpRTkCwWYNQDrAC/Nm4+rsRebF37kw9OZIy
-   R1aPRWxxryH6DPwI4gZJ06ihqGS/TFXMToJeOg+60MecvyyCGKKxBflOL
-   zkzra/t93jUAjOvyHV+f0UFQ8LyaPpaNBLJu9s8aaNqM/JJh7F9fNFfLS
-   +iNlgBq3M4IZ1k4Fy9HFqwfNEwLPHnItjHXqc2tymNX4DBH+BEhldixVC
-   rxZjfdUeJ4g9IUiXVUrXimMWFQwiSTUC5rg+3NMkgwl3SrynzRZZbhUwg
-   Q==;
-X-CSE-ConnectionGUID: VBO0tRciTMWCnkfp85DJsw==
-X-CSE-MsgGUID: HEbQ+vDaQvmtAG4s5r+U2w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="46758617"
-X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="46758617"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:13:38 -0700
-X-CSE-ConnectionGUID: pyWXoMVJTZKZNLSotEYmxw==
-X-CSE-MsgGUID: WmZKZxVVRRmjdLMC1AZn7g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="84820134"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Oct 2024 06:13:35 -0700
-Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.71])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 63CA22877E;
-	Wed, 23 Oct 2024 14:13:32 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Joe Damato <jdamato@fastly.com>
-Subject: [PATCH net-next v2 7/7] devlink: remove unused devlink_resource_register()
-Date: Wed, 23 Oct 2024 15:09:07 +0200
-Message-ID: <20241023131248.27192-8-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241023131248.27192-1-przemyslaw.kitszel@intel.com>
-References: <20241023131248.27192-1-przemyslaw.kitszel@intel.com>
+	s=arc-20240116; t=1729688980; c=relaxed/simple;
+	bh=jQ9/9WH7ZrEsfOMIYmLQONL2CsFM8pn1Cwr67WOtQU4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FmbHDVeSvzj8Yzn4Yqaf8lEvBtoYAM82uxSqKP2bEwWxsCV3eRnAkitfJFmFfy/sM1WxYOMCTCfbN7bcS9JQs4+sHReB37djnXafVMlxIpyjSrYiGHDObb/G5uHYZx8a9aV8VHZu40tUIE+Se94CxXE9/eeGKwBGdcSBXOWVM9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQLj9tyb; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2e2a96b242cso874148a91.3;
+        Wed, 23 Oct 2024 06:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729688978; x=1730293778; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jQ9/9WH7ZrEsfOMIYmLQONL2CsFM8pn1Cwr67WOtQU4=;
+        b=FQLj9tyboy0LtEcVg/uuHl4TmZHzjEx5ITi0CA99ME0NqWOY5b82kUx/n5OKXp0N7v
+         dcUfiYgUHePeJn+hhz5AY0Zw7nc7RrYJHWp4sm+ncw64b7bw1RKwctQNFt3ER68u478D
+         YRRJwXsuVAZs1fa3rfY13whQ1demvmAhxqAwpGWsYqe1zXAoHxLTdZJ0Y2lHPAq6UZx6
+         Bf2w+wDvuoU8nfmEcnxZslDBfq9K1ffxAKfejkE00PH8TO3YjQZAGuGJAUPHtxOczXuf
+         xXFRjg62OImX7sZrCiZSy2DdQQiKodCEZwAxHLeoORRW9BrYCzhX7sG1a0RDsNa9Tpva
+         9kMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729688978; x=1730293778;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jQ9/9WH7ZrEsfOMIYmLQONL2CsFM8pn1Cwr67WOtQU4=;
+        b=VOgC6LdLXIKEW4yH5JjJqtdDQT1GpB1/CPnd1iomWCrMV8rrVZoQWq/rvcsUhfL1sk
+         ObaY2apN+x9SVpi1moe0ifhHOA39CTk3EScpVDk/rcdp700/Sl5ISdQrXB4a+uo0e3T5
+         VQK0v4wE1V3HvIs2zRVaA1jo+ml4dvoic8MXvwD36rG9hQ29dhKUoUaevnqTr8JYpMzk
+         dGYSW7rJw68ILB8iT4Kq7b5Jm/4g4IUpVXHUI31pZfGp0r7ppWc6+x3eHfngtFEuYMxl
+         Ak6wqWxKTp6t4IhiQPYok0U9bOGK/tCHrbPFE0kIte1n8aPPX2p922EYywc6iwI+E9pF
+         76gQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5y2Z+p8nVJMd3OUdf/k/sPsVfy/u6fxxA5xyGBRh858Sw6mcTJR9Y5BBTpi39lY/fc8XFvUz48sPFtRc=@vger.kernel.org, AJvYcCXE9OkiH1PEmL2K9pvCRTTGNZMVMXNsF2RDjsJdIUX9frv3lW1XBjJCbfHsrJ4F47H65WPJNV+p@vger.kernel.org, AJvYcCXcvucG06vGcP3IQunbJP0ZHgdZ75bkLLzWBVUhvVvR40JK9VeP4VnvZ8SWrSyrvUs2wBqaNP9llvPfAoHhcqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVDSHYk/WRfvluSN3NyjnoJygANlOcmgqMq3ArXXm2MRA/aFFb
+	VtuOBl0jWpy9GvyKHNrImuCaau5xQunx7qW8ar7UkgcEUNP5wLY0d8L0j9duy2wlU+ZqAM+LOaV
+	mhHBzBdmoEJ70nkFzj00SgXceOBc=
+X-Google-Smtp-Source: AGHT+IG7BBsy1SQ2iDld34NBmrRkFzKTk4ypPLV9Be2XK/RQ+YiKHayD4gm6vhh+LZZmCe2i/VOdGtkG6w3uPBw5QEU=
+X-Received: by 2002:a17:90a:fe85:b0:2db:60b:eec with SMTP id
+ 98e67ed59e1d1-2e76b7116e2mr1215907a91.7.1729688978503; Wed, 23 Oct 2024
+ 06:09:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <940d2002-650e-4e56-bc12-1aac2031e827@lunn.ch> <CANiq72nV2+9cWd1pjjpfr_oG_mQQuwkLaoya9p5uJ4qJ2wS_mw@mail.gmail.com>
+ <CANiq72=SDN89a8erzWdFG4nekGie3LomA73=OEM8W7DJPQFj0g@mail.gmail.com> <20241023.205310.480345328758576061.fujita.tomonori@gmail.com>
+In-Reply-To: <20241023.205310.480345328758576061.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 23 Oct 2024 15:09:25 +0200
+Message-ID: <CANiq72kk=c_KqXi_V9HgeiLQ7BV37iU+viCEoqs2qM3yoy3zQg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/8] rust: time: Introduce Delta type
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: andrew@lunn.ch, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com, 
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove unused devlink_resource_register(); all the drivers use
-devl_resource_register() variant instead.
+On Wed, Oct 23, 2024 at 1:53=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Should use &self for as_*() instead?
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Joe Damato <jdamato@fastly.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- include/net/devlink.h  |  6 ------
- net/devlink/resource.c | 33 ---------------------------------
- 2 files changed, 39 deletions(-)
+I don't think there is a hard rule, so taking `self` is fine even if uncomm=
+on.
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index fdd6a0f9891d..fbb9a2668e24 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1779,12 +1779,6 @@ int devl_resource_register(struct devlink *devlink,
- 			   u64 resource_id,
- 			   u64 parent_resource_id,
- 			   const struct devlink_resource_size_params *size_params);
--int devlink_resource_register(struct devlink *devlink,
--			      const char *resource_name,
--			      u64 resource_size,
--			      u64 resource_id,
--			      u64 parent_resource_id,
--			      const struct devlink_resource_size_params *size_params);
- void devl_resources_unregister(struct devlink *devlink);
- void devlink_resources_unregister(struct devlink *devlink);
- int devl_resource_size_get(struct devlink *devlink,
-diff --git a/net/devlink/resource.c b/net/devlink/resource.c
-index a923222bbde8..2d6324f3d91f 100644
---- a/net/devlink/resource.c
-+++ b/net/devlink/resource.c
-@@ -381,39 +381,6 @@ int devl_resource_register(struct devlink *devlink,
- }
- EXPORT_SYMBOL_GPL(devl_resource_register);
- 
--/**
-- *	devlink_resource_register - devlink resource register
-- *
-- *	@devlink: devlink
-- *	@resource_name: resource's name
-- *	@resource_size: resource's size
-- *	@resource_id: resource's id
-- *	@parent_resource_id: resource's parent id
-- *	@size_params: size parameters
-- *
-- *	Generic resources should reuse the same names across drivers.
-- *	Please see the generic resources list at:
-- *	Documentation/networking/devlink/devlink-resource.rst
-- *
-- *	Context: Takes and release devlink->lock <mutex>.
-- */
--int devlink_resource_register(struct devlink *devlink,
--			      const char *resource_name,
--			      u64 resource_size,
--			      u64 resource_id,
--			      u64 parent_resource_id,
--			      const struct devlink_resource_size_params *size_params)
--{
--	int err;
--
--	devl_lock(devlink);
--	err = devl_resource_register(devlink, resource_name, resource_size,
--				     resource_id, parent_resource_id, size_params);
--	devl_unlock(devlink);
--	return err;
--}
--EXPORT_SYMBOL_GPL(devlink_resource_register);
--
- static void devlink_resource_unregister(struct devlink *devlink,
- 					struct devlink_resource *resource)
- {
--- 
-2.46.0
+But probably we should discuss eventually if we want more concrete
+guidelines here (i.e. more concrete than Rust usual ones).
 
+Thanks!
+
+Cheers,
+Miguel
 
