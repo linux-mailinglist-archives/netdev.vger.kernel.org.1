@@ -1,90 +1,103 @@
-Return-Path: <netdev+bounces-138276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E949ACC0B
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:16:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C5309ACC0F
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA9ADB2101A
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:16:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D706A1F224B9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D3A1AD9F9;
-	Wed, 23 Oct 2024 14:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D461B85C5;
+	Wed, 23 Oct 2024 14:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PSwANbvV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IDRNyp98"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996A5DDAB;
-	Wed, 23 Oct 2024 14:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B571DDAB;
+	Wed, 23 Oct 2024 14:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729692966; cv=none; b=Mrzi8zDjEOaorYol3ObjIPTrFz2jah730Cfid8ELYbnhvZPBVqcfkS4VUBGyQFj9hRQwkKvyFtIgILagzADGwLNdS12xANbqJZe0NS1znRdfkldD+WEyMtbnnLHd8m2cmL4K/mK26hwELsL+cHs5Fn0LADdggu+Q+fxV8M9xpss=
+	t=1729692975; cv=none; b=eQwATFzcpEdBjKc86CwoKfbLcUoTSeRGvchN3MoZotk9ZrM09ioyO05ANYc3HqUjckI8LCPFKFaQ6yL7ZdO7vWT6GTr12DmGi62Fbrc2yp4LYnT+7LPL/tseQwaguyrvYcqoRbcFAImdEUa7nN3OU3ZEcXw2vUrIxr2DTcCswHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729692966; c=relaxed/simple;
-	bh=Gu2iN8gdFasYrnvcRt7YhP1qX4e9n5iQRV8z31HhiDI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OZfIKy97E8t+ieT5QerU78HPrJo2uhEcvVqcDQNXT9L9QxyAY6EKlSA+W6zOqBfqI+e9Zw3mnUf9+X0dfEOO7noN7/A253+9Ve0W97+dPQhG+Bao/R8Co5ASwtQpCtp7ayqciIOqUeEEVKShluHGCp+Ona2olDe4ezJ+yZvme78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PSwANbvV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=77p4+RdoNTXvi8evqnZRuTEwaSSlwz6pYfTAGdLu6jM=; b=PSwANbvV5dmlNtnxVfInoDutHp
-	dNcnr/T++ZW/GXMDFmwfeetNa+gjBzl94j/WQoN+uLxcHyB/qDKFbkEzvy5utTkpfdfFbU/2CA+lH
-	l+yu8JY4KN1j2UIzO68hbtqPVRs99yl8O7pB6WVPiPsu5FRZpFBuUANT707ct3MhLFws=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t3c9U-00AyPH-76; Wed, 23 Oct 2024 16:15:56 +0200
-Date: Wed, 23 Oct 2024 16:15:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	sudongming1@huawei.com, xujunsheng@huawei.com,
-	shiyongbang@huawei.com, libaihan@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	s=arc-20240116; t=1729692975; c=relaxed/simple;
+	bh=PYn0/G4zbkeddnkUt9zimJ5fgr19m6ni9SlxG7d9aoI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XZ9fNtQVGNeOfPZzmrHzQXl4T0SDgxowkDSvOTlFfD2ZtRplvWcZAuVkJealeFWuJ09PHAMGf2I41P8ATM4gzlfLxdpuzVZvCTd0qMT0DVDIyFDbHQlq3ksWypiOmOHZSXjmvha30Z6J1PqPaAKWlbnK4MUFWvUNLnE7X1qkaNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IDRNyp98; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2A9E31BF204;
+	Wed, 23 Oct 2024 14:16:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1729692965;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=82jccvIIGFuz0O4xWiEnBCoVG+FlKjZjshEnZFYt54E=;
+	b=IDRNyp98d7l1TShz2R8J5Zk2IvD7P87/mk2H0VTExHO79H3QotsVDiOz/SuCUdqyKP1dVx
+	7e3qPQHv1GkwF9zMGHluhCLxbdUtrPlJxlCoBon3t8OxzuroXPEf9tHQw5a2TNpP+0koXe
+	B7eCWcDl6PDwx6fCDRLPUpt48dWtXfw8cqRFDzVKiQgkbeiIcVXvtatL+/+meyx7Jx9jS1
+	C9ftgqESQQ0xOtiHNvI3tbWekuNWNvaf7pHn65GenOpu3Gf6rABZGx80meczGHsOitCLPD
+	Zw5H95YvHt42y8zEzqenHwUcFngjT/yv2f9YAb4Z3ypkVvVT5KuEMIDrxso6Eg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 5/7] net: hibmcge: Add pauseparam supported in
- this module
-Message-ID: <ea2caab1-1bf9-47b3-96a8-6c1c92fbc83b@lunn.ch>
-References: <20241023134213.3359092-1-shaojijie@huawei.com>
- <20241023134213.3359092-6-shaojijie@huawei.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	thomas.petazzoni@bootlin.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH net-next] Documentation: networking: Add missing PHY_GET command in the message list
+Date: Wed, 23 Oct 2024 16:15:58 +0200
+Message-Id: <20241023141559.100973-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241023134213.3359092-6-shaojijie@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-> +static int hbg_ethtool_set_pauseparam(struct net_device *net_dev,
-> +				      struct ethtool_pauseparam *param)
-> +{
-> +	struct hbg_priv *priv = netdev_priv(net_dev);
-> +
-> +	if (param->autoneg) {
-> +		netdev_err(net_dev, "autoneg unsupported\n");
-> +		return -EOPNOTSUPP;
-> +	}
+ETHTOOL_MSG_PHY_GET/GET_REPLY/NTF is missing in the ethtool message list.
+Add it to the ethool netlink documentation.
 
-Not being able to do it is not an error, so there is no need for the
-netdev_err().
-
-
-    Andrew
-
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
-pw-bot: cr
+ Documentation/networking/ethtool-netlink.rst | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index 295563e91082..70ecc3821007 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -236,6 +236,7 @@ Userspace to kernel:
+   ``ETHTOOL_MSG_MM_GET``                get MAC merge layer state
+   ``ETHTOOL_MSG_MM_SET``                set MAC merge layer parameters
+   ``ETHTOOL_MSG_MODULE_FW_FLASH_ACT``   flash transceiver module firmware
++  ``ETHTOOL_MSG_PHY_GET``               get Ethernet PHY information
+   ===================================== =================================
+ 
+ Kernel to userspace:
+@@ -283,6 +284,8 @@ Kernel to userspace:
+   ``ETHTOOL_MSG_PLCA_NTF``                 PLCA RS parameters
+   ``ETHTOOL_MSG_MM_GET_REPLY``             MAC merge layer status
+   ``ETHTOOL_MSG_MODULE_FW_FLASH_NTF``      transceiver module flash updates
++  ``ETHTOOL_MSG_PHY_GET_REPLY``            Ethernet PHY information
++  ``ETHTOOL_MSG_PHY_NTF``                  Ethernet PHY information
+   ======================================== =================================
+ 
+ ``GET`` requests are sent by userspace applications to retrieve device
+-- 
+2.34.1
+
 
