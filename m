@@ -1,118 +1,128 @@
-Return-Path: <netdev+bounces-138048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA18C9ABB03
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 03:28:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7572E9ABB0C
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 03:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9B4E1C220E4
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 01:28:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C99E1F2446E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 01:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199F91804E;
-	Wed, 23 Oct 2024 01:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D544D2B9A6;
+	Wed, 23 Oct 2024 01:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R+PCe2ow"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FA325761;
-	Wed, 23 Oct 2024 01:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC9E33991;
+	Wed, 23 Oct 2024 01:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729646930; cv=none; b=K2+2yf9IexVSNo/jOSRoHwCCjcv6/SkxSru1hJTt6nQgxhnxpIjcii3KnQBqfeQku3h9TVh65Cqq65HtpX8lj9Apq0Sqzs5BABYYQdR5AmcjKZ/acOYjCfvTRfFXGhmnpgW8aKBXKTRiFbLhFIWveeiuyiCyvtcPP5gbFCoSR30=
+	t=1729647204; cv=none; b=sqDIaeFfGUoNu7gyWV6cPKmVRjUQ91sJndbdt1PxC8+U0rUe6gqp3RltuR7occMj+zcONg0/BRbg72hKl1ZnZswLfQCi3Q8WwiaTLPfJl4oDg5pXjKCYVEYa2OKp5mMhCw3ZN473uIoZUHqY9RMGqOkhydUQiPl0rPqeWrt+5Nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729646930; c=relaxed/simple;
-	bh=d3jGBGEh/9F0VnRHDTLvZTfB5LzLrNGeYHvvS1xOx7E=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=bECVNmlCWYE9iuNxvrE47rsEyEkdLZSJCfTToHosrgOUs+5JJaIKo0V/S+RVfepS3e8HbGakDWTc1VjES19Se2fWisCQgfw/NrtGby18mRrvUUd1Oge/RM0ZErwCxzREGC76T5rjDmYhy0oQVUgAA9Gu0Nt+TogI8Kbp0u/J4N0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XYBHG44SFz1j9xJ;
-	Wed, 23 Oct 2024 09:27:22 +0800 (CST)
-Received: from dggpemf200002.china.huawei.com (unknown [7.185.36.244])
-	by mail.maildlp.com (Postfix) with ESMTPS id 136F7140392;
-	Wed, 23 Oct 2024 09:28:45 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (7.221.188.33) by
- dggpemf200002.china.huawei.com (7.185.36.244) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 23 Oct 2024 09:28:44 +0800
-Received: from kwepemd100023.china.huawei.com ([7.221.188.33]) by
- kwepemd100023.china.huawei.com ([7.221.188.33]) with mapi id 15.02.1544.011;
- Wed, 23 Oct 2024 09:28:44 +0800
-From: "dongchenchen (A)" <dongchenchen2@huawei.com>
-To: Florian Westphal <fw@strlen.de>
-CC: "pablo@netfilter.org" <pablo@netfilter.org>, "kadlec@netfilter.org"
-	<kadlec@netfilter.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>, "netfilter-devel@vger.kernel.org"
-	<netfilter-devel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, yuehaibing <yuehaibing@huawei.com>
-Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
-Thread-Topic: [PATCH net] net: netfilter: Fix use-after-free in get_info()
-Thread-Index: Adsk6sZPMNMF5ZGb10qFpGepfJJ/Fg==
-Date: Wed, 23 Oct 2024 01:28:44 +0000
-Message-ID: <8ca3f6271b0a4956b699e1444f7a06ad@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1729647204; c=relaxed/simple;
+	bh=XRoAf6X2HyEqZxmQMc4DBFsVl4VgzjUS4h7DQliqcC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FEuVMoOvDx67vHMpTTSDbFmYwdV2qepaZnwQulDn1Hb4hC/sQzeBC79gB5Meol6ekWF3UHQn/yAx5DhcrTLGkECbPIq5NLu5IDFSoQdqeI3ELU7sotsetXyj2xmsnTnpeDXR5qfXT4V2NpOmmWclPv1t4ohEMNfFIEsJ3xuQ2ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R+PCe2ow; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729647203; x=1761183203;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XRoAf6X2HyEqZxmQMc4DBFsVl4VgzjUS4h7DQliqcC8=;
+  b=R+PCe2owkva4+zSiSqRC3097pavFR9RFFkLg5mPw0B/2NWC46BIwsBSV
+   Ha/ZFxlARl/MLSREs0inhvNYXPSQyeuXConCINhkHjEnO7GZaTwgHNpYX
+   nlz//2uUKfNQSU9KxSafkRhJmWxxVrbFeRZfxnvno5thmeecMN/2WhITC
+   SXUyDar9IefOv2p/nqgZw5rvwtGr4hzWo4eBGct5X7g384UPCfRqkeYt1
+   CJbPDs/iS6SVCuRtb2LQkkoGO8rPmzJMHlntfMFK1GjapPaqVwCZnso6r
+   rGj+2D9NHcogg6QmFLA50l6eSZY9rG9yvly4/xngPKNzfu9SwYFkWqyDh
+   Q==;
+X-CSE-ConnectionGUID: Rz/qPEheRzW1UfVmnrl2vg==
+X-CSE-MsgGUID: fMT2PKuuSImfd6wdbCtx0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11233"; a="40586852"
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="40586852"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2024 18:33:22 -0700
+X-CSE-ConnectionGUID: CFYRJcb6TlSCw5Cngg1KKA==
+X-CSE-MsgGUID: aDemVyNTRCi/J/CTKuvRgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,223,1725346800"; 
+   d="scan'208";a="80233140"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 22 Oct 2024 18:33:16 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t3QFN-000UK6-39;
+	Wed, 23 Oct 2024 01:33:13 +0000
+Date: Wed, 23 Oct 2024 09:32:44 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	andrew@lunn.ch, Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	horatiu.vultur@microchip.com,
+	jensemil.schulzostergaard@microchip.com,
+	Parthiban.Veerasooran@microchip.com, Raju.Lakkaraju@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com,
+	ast@fiberby.net, maxime.chevallier@bootlin.com
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 06/15] net: lan969x: add match data for lan969x
+Message-ID: <202410230843.lGLDpveC-lkp@intel.com>
+References: <20241021-sparx5-lan969x-switch-driver-2-v1-6-c8c49ef21e0f@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-6-c8c49ef21e0f@microchip.com>
 
-> Dong Chenchen <dongchenchen2@huawei.com> wrote:
-> >  net/netfilter/x_tables.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c index
-> > da5d929c7c85..359c880ecb07 100644
-> > --- a/net/netfilter/x_tables.c
-> > +++ b/net/netfilter/x_tables.c
-> > @@ -1239,6 +1239,7 @@ struct xt_table *xt_find_table_lock(struct net *n=
-et,
-> u_int8_t af,
-> >  	struct module *owner =3D NULL;
-> >  	struct xt_template *tmpl;
-> >  	struct xt_table *t;
-> > +	int err =3D -ENOENT;
-> >
-> >  	mutex_lock(&xt[af].mutex);
-> >  	list_for_each_entry(t, &xt_net->tables[af], list) @@ -1247,8 +1248,6
-> > @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
-> >
-> >  	/* Table doesn't exist in this netns, check larval list */
-> >  	list_for_each_entry(tmpl, &xt_templates[af], list) {
-> > -		int err;
-> > -
-> >  		if (strcmp(tmpl->name, name))
-> >  			continue;
-> >  		if (!try_module_get(tmpl->me))
-> > @@ -1267,6 +1266,9 @@ struct xt_table *xt_find_table_lock(struct net *n=
-et,
-> u_int8_t af,
-> >  		break;
-> >  	}
-> >
-> > +	if (err < 0)
-> > +		goto out;
-> > +
-> >  	/* and once again: */
-> >  	list_for_each_entry(t, &xt_net->tables[af], list)
-> >  		if (strcmp(t->name, name) =3D=3D 0)
->=20
-> Proabably also:
->=20
-> -  		if (strcmp(t->name, name) =3D=3D 0)
-> +               if (strcmp(t->name, name) =3D=3D 0 && owner =3D=3D t->me)
->=20
-Thank you very much for your suggestions!
-V2 will be sent.
+Hi Daniel,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on 30d9d8f6a2d7e44a9f91737dd409dbc87ac6f6b7]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Machon/net-sparx5-add-support-for-lan969x-SKU-s-and-core-clock/20241021-220557
+base:   30d9d8f6a2d7e44a9f91737dd409dbc87ac6f6b7
+patch link:    https://lore.kernel.org/r/20241021-sparx5-lan969x-switch-driver-2-v1-6-c8c49ef21e0f%40microchip.com
+patch subject: [PATCH net-next 06/15] net: lan969x: add match data for lan969x
+config: nios2-kismet-CONFIG_SPARX5_SWITCH-CONFIG_LAN969X_SWITCH-0-0 (https://download.01.org/0day-ci/archive/20241023/202410230843.lGLDpveC-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20241023/202410230843.lGLDpveC-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410230843.lGLDpveC-lkp@intel.com/
+
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for SPARX5_SWITCH when selected by LAN969X_SWITCH
+   WARNING: unmet direct dependencies detected for SPARX5_SWITCH
+     Depends on [n]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && NET_SWITCHDEV [=n] && HAS_IOMEM [=y] && OF [=y] && (ARCH_SPARX5 || COMPILE_TEST [=n]) && PTP_1588_CLOCK_OPTIONAL [=y] && (BRIDGE [=n] || BRIDGE [=n]=n [=n])
+     Selected by [y]:
+     - LAN969X_SWITCH [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y]
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
