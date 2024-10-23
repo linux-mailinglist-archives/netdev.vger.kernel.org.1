@@ -1,130 +1,113 @@
-Return-Path: <netdev+bounces-138192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 272249AC8C7
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:20:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86E39AC8DB
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 568971C21109
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:20:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F18283A38
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ED41AA785;
-	Wed, 23 Oct 2024 11:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6676A1AAE16;
+	Wed, 23 Oct 2024 11:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbUWV9Cs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/l8SEgQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229AF1B813;
-	Wed, 23 Oct 2024 11:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043201AA7AF;
+	Wed, 23 Oct 2024 11:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729682411; cv=none; b=grUEj70Ph55ITN7oIhOSJ94AA5A87q9g83lWnt3STi7dPRsBmrPO6iVp63Ks5JsOd0nr+j7X8pa2cyfqXlIcdZtuRxOM7MkvDM5SHHSxvuZTiyGPtHtIo6MQlZTsdTgMTPOxj2iN/RBF+AUFNkttJ6T7Lsri/dVZW9QF4Am7bvM=
+	t=1729682687; cv=none; b=e84QcYUgWVY5TaH/Mztk/Tu6jntpMy18bD+E5/tm8RW5i1EtVVToULK0TnXG4o534h/6d63MQsmNJmUZFymgJ2Z0y/4d0qXgmaaibT95C/5SPiyCJxvnKIBOHglIezHuJvc+zE5wMKKR/XwrLEurvSJlyDlgcCdxXX2/c9r5QRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729682411; c=relaxed/simple;
-	bh=tc4l2Y6qujgXL1mb4ojYmiIMvOzve59JJSCmIJ+XW+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dCppZdfsLTr0uBIGjiMabmU4MEKhqL/htHN4UvYDcxfh5u0tYrk0NZRUMpBGUuzsoHtPxd7Vfr2sVdLpWpLcnT/D7Pya3wGTnZ48ZpSvkz2OMwsvffDp8ySVhsJNeVSzxFbAKMwZGp6G3AHJiyKDGeHzUqe3uFm/fgMWr7s7pe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbUWV9Cs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F02C4CEC6;
-	Wed, 23 Oct 2024 11:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729682410;
-	bh=tc4l2Y6qujgXL1mb4ojYmiIMvOzve59JJSCmIJ+XW+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UbUWV9CsjLgcLVxkjj6MbHCxwwkjEhim+kIbovtrZEWf/RUGeALso976xhda5BPbo
-	 9YxD+w5Fna8Y+/5of3YUc1eIASxnc+etA5geexLSOPIK5ITCDu0H0+oB+EMtal+vQ/
-	 OB5D4b9Sh5CCjtvjTw3e3KnPLScTdIq3bJp29i0lEopFZ1Ex9ZzacapD0+jRc6ESBH
-	 sx5wK3pIdOKTy6/QD6TTf/SHNWwlyWUHC/XMaDT0Oyg9qVmlDCcQKxMnuSM+ZlZY6v
-	 JskejtRimt+PMwEaUACIpfRke6ImGPuddUW9CB7oEkzGbqOI5bmO9vr6b37UvKt/5p
-	 atpLNMYG0qDQQ==
-Date: Wed, 23 Oct 2024 12:20:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ley Foon Tan <leyfoon.tan@starfivetech.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lftan.linux@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Maxime Coquelin <maxime.coquelin@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next, v1 0/3] net: stmmac: dwmac4: Fixes bugs in
- dwmac4
-Message-ID: <20241023112005.GN402847@kernel.org>
-References: <20241021054849.1801838-1-leyfoon.tan@starfivetech.com>
+	s=arc-20240116; t=1729682687; c=relaxed/simple;
+	bh=8lc3qOnfAmQPIDetgDZDO2TNymcIOP4HzuKcT1txCEA=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=mFdshwkFMlDvymE1LMHSTpo2TdgKDMslF1cEfeE07jnfYOoxdqzxYcwHxErP9ZH1TFUN7hpLXlApkefqPDRZ110fk+cj2xswp+NrElzKKmh/Y8Sz9uctzSWy93+zVxDg0puIYa0IhFutpW9r/AImsuqTWPBUAE3/JspaUmyBKbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z/l8SEgQ; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e953f4e7cso4579453b3a.3;
+        Wed, 23 Oct 2024 04:24:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729682684; x=1730287484; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8lc3qOnfAmQPIDetgDZDO2TNymcIOP4HzuKcT1txCEA=;
+        b=Z/l8SEgQqChRQBkCyN8YxwYDkFcU+2VwH+GsWbZKYNydmPTwd15wMpMvDhGFPJ+ZCU
+         GG52G4QM5/LqA4bXC1/juaLoNkEw1l3nbEgEqy8+yCSNYnfG0YFvS/6nEdHKlvaSoLwy
+         tgf/Cpvjh/nkc8nyG/zaeNbDC+7scl6Y52BgTElQfTFIk+g2AuJrrU8R28bLirdx7ynz
+         oFdVkpOcv4nBMO3iLAPPEmgbNBKyC5qJKhP4LXscg7InkzkTK5bTmZAe8kxGdm8ULGpc
+         Xwd8MnZGonEAqgfE/fCWKcuUgI0xMNAUfgfG84gs+uak0v6Ws6odqBkxy2Azn2Qeltk9
+         fdwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729682684; x=1730287484;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8lc3qOnfAmQPIDetgDZDO2TNymcIOP4HzuKcT1txCEA=;
+        b=UpA6Bmt4gzqLxUpxcuz/L61tdbs/wzQThdxrLr6f3Aq+71GUv3CwCi3Q9gbgyjmaKc
+         Z34BeB1Sbj8lu4XaD387z1yRvJR5utW4nfYvSDt4/8E6Pc92mgyhFZ/88DcWvClWeODw
+         1GXp6KEMANLZYRousaOgc+aQ/Xpj/4q4MaJIwT+85krAbzymGDrmx0mxKLs1S0LGdIaG
+         mHg0BEyqtQmV0/+VusxkpTkCJELdBQ6zr+yVNYZWoeyCPYSpnb1U94RacQOxFQScKGpu
+         XONQ119MmodcI/cNRRngXMQYsb2U3Lb+L9Mxzcb1VQcMwUTWEMKZ+YMF1ylOUqJAXqBs
+         QHPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkwn8y3tDjvKSE6CNE0ZEwG+GnoWTyCz5Z5c5QiUWvaItBCJAtLSgEhLXnNjVTwJ2jnrXwfZbu1vgxZew=@vger.kernel.org, AJvYcCUyy+ELz0Sf6uOnakCtPHlWdVQbhHVTrEDJUNjfPq2isxbJ2f5SWV+JJeHIfkVVkmc3n3WoJtgVl/DmEMK8vac=@vger.kernel.org, AJvYcCXUCULwfaIX/yVLGR1iduUra+HNBq61axcZrsoV5/yYI/+m9qTMGDNAApl+w0STAESu2NDTxbUx@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBA/LnlscdftzNsEh8/i/XNe7dp3QCS16xIrH+ySKn2MZtiUTp
+	Umb/YCPiD9680DT4L8uEeMm/UsQm6jp1+dWjN4jWVMzi5UJXGr7f
+X-Google-Smtp-Source: AGHT+IFuK64H3m+g+8n4ncgETi3hfCtnqx9Gw5KaUYfzRUtKkcv+yi+GRiPm4xW6m9v0q3Y8WhAijQ==
+X-Received: by 2002:a05:6a00:6607:b0:71e:1e8:8b7c with SMTP id d2e1a72fcca58-72030be7386mr2380147b3a.15.1729682684031;
+        Wed, 23 Oct 2024 04:24:44 -0700 (PDT)
+Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec132ffc3sm6159383b3a.62.2024.10.23.04.24.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 04:24:43 -0700 (PDT)
+Date: Wed, 23 Oct 2024 20:24:27 +0900 (JST)
+Message-Id: <20241023.202427.1480968709304688972.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: fujita.tomonori@gmail.com, boqun.feng@gmail.com,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com,
+ anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+ arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 4/8] rust: time: Implement addition of
+ Ktime and Delta
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72nvMAMff7Oar-UCvajZ-sP4XdE9vNGW49L9CMsRzSTwCQ@mail.gmail.com>
+References: <CANiq72mbWVVCA_EjV_7DtMYHH_RF9P9Br=sRdyLtPFkythST1w@mail.gmail.com>
+	<20241023.155102.880821493029416131.fujita.tomonori@gmail.com>
+	<CANiq72nvMAMff7Oar-UCvajZ-sP4XdE9vNGW49L9CMsRzSTwCQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021054849.1801838-1-leyfoon.tan@starfivetech.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-+ Andrew, Giuseppe, Maxime, linux-arm-kernel, linux-stm32
-
-On Mon, Oct 21, 2024 at 01:48:45PM +0800, Ley Foon Tan wrote:
-> This patch series fixes the bugs in the dwmac4 drivers.
-> 
-> Based on the feedback in [1], split the patch series into net and net-next,
-> and resubmit these three patches to net-next.
-> 
-> [1] https://patchwork.kernel.org/project/netdevbpf/cover/20241016031832.3701260-1-leyfoon.tan@starfivetech.com/
-> 
-> Ley Foon Tan (3):
->   net: stmmac: dwmac4: Fix MTL_OP_MODE_RTC mask and shift macros
->   net: stmmac: dwmac4: Fix the MTL_OP_MODE_*_MASK operation
->   net: stmmac: dwmac4: Receive Watchdog Timeout is not in abnormal
->     interrupt summary
-> 
->  drivers/net/ethernet/stmicro/stmmac/dwmac4.h     | 4 ++--
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c | 4 ++--
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c | 6 ++++--
->  3 files changed, 8 insertions(+), 6 deletions(-)
-
-Hi Ley Foon Tan,
-
-Thanks for the updates.
-
-A few more points on process. Sorry for not pointing these out earlier.
-
-* Please base the CC list on the output of get_maintainers.pl FILE.patch.
-  b4 can help with this.
-
-* Please do not include Fixes tags in patches for net-next
-  (while please do for patches for net).
-
-  If you wish to cite a patch you can use the following form,
-  which may be line-wrapped, in the commit message (above the
-  Signed-off-and other tags).
-
-    Some text describing things that relate to
-    commit 48863ce5940f ("stmmac: add DMA support for GMAC 4.xx")
-
-    Signed-off-by: ...
-
-* Please include some informative text in the cover letter.
-  It will form part of git history. E.g.:
-
-  - [PATCH net-next 0/3] net: sysctl: allow dump_cpumask to handle higher numbers of CPUs
-    https://lore.kernel.org/all/20241017152422.487406-1-atenart@kernel.org/
-
-  Which became:
-
-  - Merge branch 'net-sysctl-allow-dump_cpumask-to-handle-higher-numbers-of-cpus'
-    https://git.kernel.org/netdev/net-next/c/94fa523e20c3
-
-More information on process for Networking patches can be found here:
-https://docs.kernel.org/process/maintainer-netdev.html
-
--- 
-pw-bot: changes-requested
+T24gV2VkLCAyMyBPY3QgMjAyNCAxMjo1OTowMyArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
+b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBXZWQsIE9jdCAyMywgMjAy
+NCBhdCA4OjUx4oCvQU0gRlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwu
+Y29tPiB3cm90ZToNCj4+DQo+PiBDYW4gd2UgYWRkIHRoZSBhYm92ZSB0byBEb2N1bWVudGF0aW9u
+L3J1c3QvY29kaW5nLWd1aWRlbGluZXMucnN0Pw0KPiANCj4gU291bmRzIGdvb2QgdG8gbWUgLS0g
+SSB3aWxsIHNlbmQgYSBwYXRjaC4NCg0KR3JlYXQsIHRoYW5rcyENCg0KPiBKdXN0IHRvIGNvbmZp
+cm0sIGRvIHlvdSBtZWFuIHRoZSB3aG9sZSBvcGVyYXRvcnMgb3ZlcmxvYWRpbmcgZ3VpZGVsaW5l
+DQo+IHRoYXQgSSBtZW50aW9uZWQgZWxzZXdoZXJlIGFuZCB3aGF0IHNlbWFudGljcyB0aGUgYXJp
+dGhtZXRpYyBvcGVyYXRvcnMNCj4gc2hvdWxkIGhhdmUgKGkuZS50byBhdm9pZCBoYXZpbmcgdG8g
+cmVwZWF0ZWRseSBkb2N1bWVudCB3aHkgb3BlcmF0b3INCj4gZG8gIm5vdCBzdXBwb3NlZCB0byB3
+cmFwIiBhbmQgd2h5IHdlIHJlbGVnYXRlIHNhdHVyYXRpbmcvd3JhcHBpbmcvLi4uDQo+IHRvIG1l
+dGhvZHMpLCBvciBzb21ldGhpbmcgZWxzZT8NCg0KSSB3YXMgb25seSB0aGlua2luZyBhYm91dCB0
+aGUgZ3VpZGVsaW5lIGZvciBuYW1pbmcgKGF0IGxlYXN0IGFzIGENCnN0YXJ0ZXIpOyB5b3VyIG1h
+aWwgaW4gdGhpcyB0aHJlYWQ6DQoNCmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL25ldGRldi9DQU5p
+cTcybWJXVlZDQV9FalZfN0R0TVlISF9SRjlQOUJyPXNSZHlMdFBGa3l0aFNUMXdAbWFpbC5nbWFp
+bC5jb20vDQo=
 
