@@ -1,152 +1,229 @@
-Return-Path: <netdev+bounces-138115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D639AC01C
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:22:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385259AC04D
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AA821F21D3D
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:22:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDF2E285333
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F351537AC;
-	Wed, 23 Oct 2024 07:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898F6155391;
+	Wed, 23 Oct 2024 07:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aukyNOez"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wdMYAkeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29ED3A8D0;
-	Wed, 23 Oct 2024 07:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729668120; cv=none; b=ROSgIo2eyd4R7r3aK9YrOrbDNpGj4yPRPfpI6D/WZqJXx/jLy0lrdR90lNTiOGECM1uwmrtIEds4aTyFcwJpB7V1Vl5GlL/1vdIDJpZHx7RCdXOmCAl0XG9UbJSMq5guvxQR080XBN/o8Cc9JLyx/kJlmuUr/oCww/p8Fn/cQwI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729668120; c=relaxed/simple;
-	bh=50ezmcEJzxDJ24mowip9lHrIonLa3G33aAyWzqTY2C8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GpBU25QqYn8f8/8zwN5KCZ0AW/ad1C8CSaewJ12eQVBRbociayZvYpcN8GkRYafSmH92NSvE3QRXawpCiRQKHhVngwEefkcssYNW4BObkwX8ocOTxP0lsvIjW1w+F/812GyHuddkpWKcvpRAJK53Selg7cC7Ojgqc231Ly+Cgb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aukyNOez; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20c8c50fdd9so3948855ad.0;
-        Wed, 23 Oct 2024 00:21:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729668118; x=1730272918; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JpW5l4cHfObYzl7+2svJ3Qk3MetE1pLsV3fZ39aook=;
-        b=aukyNOezlMoyLLPOnobizcuoLXqApP5+SFgftgaMYrQjRAdreKkGefUiRwcKrgFh1U
-         vGXymT3blML9AdzJEp82I3rj/PjG2sF8I5xl8gvFlCkKMpeQC+ejulE6YEA2/XinL3vA
-         +QCW5EsZGT/0O9bGOEtohDS1Kk9idGqKBtdqjNSppbAsiZC96GzOOraPkv82KYPTESfA
-         mz3c5JMWgU4iT4XKn4+Acbf8Ygcp6npnEf97AmDT0UaqTWOGkFo+KkB5a2+4sWxdccz3
-         f+GEL7DJrKJOdhNUXTZ3vQaJ+061vV6E1UAj/04cMCw1zMlX3b0wUkdL4dUxOMMR8UYG
-         ltLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729668118; x=1730272918;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3JpW5l4cHfObYzl7+2svJ3Qk3MetE1pLsV3fZ39aook=;
-        b=Yayv2axVMXF7Hti/dUmaoOkLGQSLJCcCwqe4cLI8vYYF+hy/4QcKjE9Oe2nisrgMki
-         0NZAdHFqISEYe1VdEum2AtGMxSK2pTPKupb3+Sdgs1x+IrZ3y+X1Ebv4Kdm9sXIGRDJ5
-         +CYwjBhOHvJgFysK11E1J9AUUbkwPAUxx69MjKcGsl1TTi5mH5RXsRYkThqRClu2FdQO
-         G23TkTBDcjz46bEQK91/S4hDrI98A+CppOjMNg7Z0gkRwW7jYLVZ7z7ynMaC8PrreAPO
-         S5MEYRjGCCEtFBNRvI5HSwETP4fyWJ5g1kwKk7tBYuA4uXR+perEH8uqBM9qY2cpw+ri
-         aNSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Tzc5GX6BT1R+lAKCrJfejs7gu4A1ISfuDxTzj3K2/uQAjqh7aBOIUqTlRb4uc0fut2lGEYNb@vger.kernel.org, AJvYcCVHZPeLqCYjOQP3TPAHjN9OabwvAX3yjw0oKVKu2moXis40NlOJnDLPFkrnWYjXjBM9h5RiCUJl4E1U@vger.kernel.org, AJvYcCX6z5FOaaugTphGsLZR7YFT+aYaojDTW8pgHI+Aq55Nqe4x7Ko5loOW+/gXSxSHaLGymikn7v5lXNcjT7v7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx46+GZDEEvpBgdNr4qM/m7FYZ1zBvL/tbPxcGiK3fyjCEmTEkO
-	AQKf1POiv1CISXxl8kK11IbSUe4nAT5n2YWY/CCChVEjx8ojpuFv
-X-Google-Smtp-Source: AGHT+IFtrw0bTSDjOUHwOCouu0KJSU1+vA+nX8p6eBupMmcRvLXscxMVgLjlJ5OaperPpo2phGpacw==
-X-Received: by 2002:a17:903:244a:b0:205:8763:6c2d with SMTP id d9443c01a7336-20fa9ea22f1mr30676555ad.9.1729668117790;
-        Wed, 23 Oct 2024 00:21:57 -0700 (PDT)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e7eeef535sm52795975ad.44.2024.10.23.00.21.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 00:21:57 -0700 (PDT)
-Date: Wed, 23 Oct 2024 15:21:36 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Inochi Amaoto <inochiama@gmail.com>
-Cc: Chen Wang <unicorn_wang@outlook.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Inochi Amaoto <inochiama@outlook.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH 4/4] net: stmmac: Add glue layer for Sophgo SG2044 SoC
-Message-ID: <amg64lxjjetkzo5bpi7icmsfgmt5e7jmu2z2h3duqy2jcloj7s@nma2hjk4so5b>
-References: <20241021103617.653386-1-inochiama@gmail.com>
- <20241021103617.653386-5-inochiama@gmail.com>
- <227daa87-1924-4b0b-80db-77507fc20f19@lunn.ch>
- <gwtiuotmwj2x3d5rhfrploj7o763yjye4jj7vniomv77s7crqx@5jwrpwrlwn4s>
- <65720a16-d165-4379-a01f-54340fb907df@lunn.ch>
- <424erlm55tuorjvs2xgmanzpximvey22ufhzf3fli7trpimxih@st4yz53hpzzr>
- <66f35d1b-fd26-429b-bbf9-d03ed0c1edaf@lunn.ch>
- <zum7n3656qonk4sdfu76owfs4jk2mkjrzayd57uuoqeb6iiris@635pw3mqymqd>
- <d691a687-c0e2-48a9-bf76-d0a086aa7870@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF753155359;
+	Wed, 23 Oct 2024 07:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729668742; cv=fail; b=OEzwmvO5R41Fu4OAbr1AJzvELra+Wpiy/tAI50gLwtQpV97DB22iKPx0vdjsum4M21yrn/N7HirTrcn2FjWOYs6bjjxH+hmdK5dw3KnOkk27X0MEwt3C98qVJcXdZFqwg5zBzbt/B7g9Negi0lBiGTZqU7bCsusB8uNsmxK586Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729668742; c=relaxed/simple;
+	bh=ss6Bno/IJ52LVu7sRwQKMKO56qRoKTQH+GcFWdBlUwc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=R0rArNuYtLaMhXqdpkrv9dJbKavLX7l6SYPL7tUtkVqsVZl5F4RxWDebaaJVWox1nnoAyXLvk5xPf4JtA+5NjlvG64PnvM+VPrF124TYmUSIDJtDDDFySQ/i8rgJU50fgPEhZlQCHDcfxaM9wjfJouz4Bnybajk+R6Mqr9kwy6A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wdMYAkeZ; arc=fail smtp.client-ip=40.107.220.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PakeHZ9B4kRoGDWOPH1rEyBo4vqvUyu6ugVXdEa9x2z9VvJzH55tDMX+UdUHvt5/inAsu9HXv0nE0cv65BMAzD2PJdsguWUuBUkPEASX942TBuIr6G78G2ILp73ZUlySr0Rv38o8z+N5+1hbtp8AcUqI8vZlS3lp+TXa04Qtpn95X8TYGwqPGkg5oCC/YWOOHRM8YAabRbH7grmM+X/g8YGDHQK1KjqY9VQAprx4AEYYYjxWW9FVq4kan8KCcUbFJWqyj/MfeCR7XeF/wUNnj/out3Km5pVQD4p6I5HO18k4aNSfW+UPx1+X/8XlAS6I1F/fK9moxFX8Hsrap9Q29w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uN35MkpBzjq7wxXdvoEuSZTGleFTOglngtlyUK1Yq4I=;
+ b=DbiALl+bAsaI/RIMhjtHtcfWTZHYDnxjRBy1mH4HYs71QCSrsproXT+PnwkbBbs6O9taDQUV9gqx0dElJMZe8acycjT0LXclK9CWAJhjNs7SVZDfKg2RuxHvSV7N8Ev9j4OZ6vC9mvmEbaRQsGvjioJjFmCIGmrh/s6vwRPgw2fVdAAW6Bh5xbaJSG0KK+VriTmjWfBb7ObqIWNVwNAaOO4w3QGF21xvA34tOPYpTSvmZJYwfeV8WA6nf9gKIMyEDy3Zok77egi7PZ4uK1GQlIveDfigrJPQt183c70kUI5cjxsS3uKSpLJ9n9Z3WtUgRr2ylxBvyNNXOLebZdVmuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uN35MkpBzjq7wxXdvoEuSZTGleFTOglngtlyUK1Yq4I=;
+ b=wdMYAkeZBb31V3uYlhqF9FXqnkLKp8Hh7TO5SHsBgB4pqFxAEl8fGLI85YhC0CdN32kWfHjsmv7+EVhwso4MtoAq8+b5zsVLg4RG/69ybSiQPCoH4jCuSQMq/V2Mwk+MoU3zpwY8VgIKgv1JCNy3LanO2Lcyfk/wzQLMT655WI0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5176.namprd12.prod.outlook.com (2603:10b6:208:311::19)
+ by SJ2PR12MB8977.namprd12.prod.outlook.com (2603:10b6:a03:539::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.19; Wed, 23 Oct
+ 2024 07:32:18 +0000
+Received: from BL1PR12MB5176.namprd12.prod.outlook.com
+ ([fe80::ed5b:dd2f:995a:bcf4]) by BL1PR12MB5176.namprd12.prod.outlook.com
+ ([fe80::ed5b:dd2f:995a:bcf4%5]) with mapi id 15.20.8093.014; Wed, 23 Oct 2024
+ 07:32:16 +0000
+Message-ID: <73040aee-7584-4d7e-a3c1-edc12a85f5e1@amd.com>
+Date: Wed, 23 Oct 2024 13:02:08 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] amd-xgbe: use ethtool string helpers
+Content-Language: en-US
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20241022233203.9670-1-rosenp@gmail.com>
+From: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+In-Reply-To: <20241022233203.9670-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0167.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:de::11) To BL1PR12MB5176.namprd12.prod.outlook.com
+ (2603:10b6:208:311::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d691a687-c0e2-48a9-bf76-d0a086aa7870@lunn.ch>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5176:EE_|SJ2PR12MB8977:EE_
+X-MS-Office365-Filtering-Correlation-Id: 045ec45b-3985-42e4-0876-08dcf334d18b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VlNCV3dNRXNWamZuN3hvTWIvVmhrZE9Pcmw3RzQ4dE80WU9Edy8rRVlOaENZ?=
+ =?utf-8?B?OGdJb092YXZGNjlkTG5mQmVyTEFzSkpsdkQyMkRuQk1lQ01PL2VwZWR4V3Nt?=
+ =?utf-8?B?SnFKNWFNeXJPZjdmTkhNMG1WclEwQ2duaGRVcENOamJPRXpGbTFMcy90allq?=
+ =?utf-8?B?YkRLRXNsb1g1U01CRWhlYWxtRmg5alcwNVFVL1kxbnpIUjREU1lMcWRaV09t?=
+ =?utf-8?B?Wmd5cnpmcytqRHRURGh0NEtQeS9FeWc3UExpNTE2amxlVWY4TmI1MGJKVXZ0?=
+ =?utf-8?B?NG5oNGhVaFNSbWxDQ1lDNlB4VkgraVBwaU14MHhwSnUreEtXclF0UXdHNkpC?=
+ =?utf-8?B?eUJjMk9ZUVVwRjN1R1MyZ1Z3MUVueXBQbWpYRXZ6MThYSVo5N25SM3hSdUJO?=
+ =?utf-8?B?emN1OVU5QXAyRTRqRitkdEgrbTBPVzBvbkNhYjcrVkcvRmxyTHA2SitpZDUv?=
+ =?utf-8?B?UDFJQVNhWExKc2NlL00vREwvZXF0NWRHandWT0owMWQ1eThHdmVuYnEyckw1?=
+ =?utf-8?B?REg4eTFRQnl4d01IcmxFZG01R0FPT3phcXRTaU05MENmTWxxNmZDSDVPY3c2?=
+ =?utf-8?B?S0VyN3JuL0JxQVhtM1F3TXo3VGVuQUtKL0o0SDVoRkJLK1pDWENQb3dUanZi?=
+ =?utf-8?B?YTl1Y1dYWWJsWGlKbmMzMGI4YVpQUlBydlEwdVZsbk9JMm9CNVU2REN0TGpM?=
+ =?utf-8?B?aUhzaDZxK2diVG5HcmFsVVg1YVI3Z2NBV053NDFTS3FlWlYxL2RYS09oZFM2?=
+ =?utf-8?B?NzJhUlppbS84UG1qejBNTjYwUGF1L1dtMHc0d2JlMk1WUVJGaW9JU1Y2YXpW?=
+ =?utf-8?B?ZUE5MEVHUVB0V3dJZnA4RkhvU0hUNFFUcHAwb2ZsSXRnTU5OVWxCaTFIV3Np?=
+ =?utf-8?B?L05IVXI4bXhCaytpaGtrZmd5WS9KVkhFaWpIV25xV2lVS1JpeXhuS0wrTGhn?=
+ =?utf-8?B?QSsxQWJYd3VFUkRIcmJZRVdnck95Qis4Y3ZzeVgrVktuQTFoU1lQWHB2ek04?=
+ =?utf-8?B?cjZTQkpJZS85dE04WUMrdU1RQUZzOUNxMEdmaVVlc1IvdkRqaWRlVVp1L3Bz?=
+ =?utf-8?B?QWRUZXJkcDlrKzg2ZmMrYWkrRzE3ZmFPcFEvOVRFWHVaOWxoRFJ6WDE3N2I2?=
+ =?utf-8?B?eTBoQy8wNVZEc2xUWisyOEQyQWZhMlUydkNCdis5QWVzVEpUNVk3V2pVcFV4?=
+ =?utf-8?B?Ykx3NDI0VVh5bktlMGxtSjdqam94TXZySy9XYkV4c3VLZFV4NEZJSjRBK1Ez?=
+ =?utf-8?B?Q1hTOFYzZ2pnR2gvS1NyNVV3bU41NnFFdSsySElQdHo0OVlENHRtaVh0dFhX?=
+ =?utf-8?B?Ykxsb3pzNEg1MnFQNUlXcm1JdXRpbU5wOVNKSVlsY1Z0Zktvb2ovTTRlVEYw?=
+ =?utf-8?B?cmVqTHQrUVIySzdwbmR5dkRpRk4vZ1QvZzAzMURnT0pTY1kxeS9GOG8zK2JL?=
+ =?utf-8?B?WnBXTWZEd0hiUXRuVjlQU0JrZ0FIMHE0eC9GeHAvL3plV056UjlqMm9NTkhK?=
+ =?utf-8?B?QUM5c3hKK2g2MTFNT3Q2aVdFbzZjVzU0Z1hNcEZIdk5hODJNUjhmM2ZMYzA3?=
+ =?utf-8?B?UDhPZWYzaWZXK2JoaFNWRVFzemFMS1E0cEdJTjFoYzdnQ2RlMGRrckticms4?=
+ =?utf-8?B?NUpiVzVSaDF4YW1OVE1xUFM4WmZub2tKMjFvQSttZUMvcUVudE1IQlE5eGti?=
+ =?utf-8?B?SElsbDEvV2tUTE12SzNTVUxUekllaGdSa0xBVkVueklQWUQrVmpGODVtNXUv?=
+ =?utf-8?Q?2ZHcsLuUH8bjyTM346jxe9+5tPSFJYJcxzPQbAz?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZHE5Z3F1bTltTVhUaVFSRHdwOE1wMVBiWVVpcE5KbkpIWVhVazY4YVZCNnp2?=
+ =?utf-8?B?VTFOLytTYy9SWFk0Z0JEbUVxcDdZMjJseVFwT1RUVzIzU2NKWVB3KzkxcURk?=
+ =?utf-8?B?dUM3KzNLSS84UmpZR0tJU2xjTE5UQktLaGl5cmJKMXBRc3JCUGVmWHhFbzQ3?=
+ =?utf-8?B?djlIZkJlKzlUaW91QWJadXZnaFhiYjNjMHczdyttVVhFUkJFOWg1dlpPQzY3?=
+ =?utf-8?B?NVlEdTc1YTZzd201Q2JhekdWYmhmVDVyUXBsQkR2VG8yWnNDNy9xOG00OTlm?=
+ =?utf-8?B?cmdoOE5YMVZpRDkwT0dDYjZBM3VwNzJrKzdMa3JZVHdFL29WSWE5aWd0VFlo?=
+ =?utf-8?B?Z2lndlUxRjdiU05kOUt6M0xJdExBQ0xUVEFVSlA0UThjZ0ZKcE54WFVvU28z?=
+ =?utf-8?B?SWRxUldEMGVQVVNmY1doRkV6ZDFMNG5palZkRDE4c0pUaFVJTWhac0JMV3Ax?=
+ =?utf-8?B?SjlXK3psUGhaWjBSYVgrdWFQL1RhRkYyY2hFbHVuM1VPUml1cHgvY3ZYclI0?=
+ =?utf-8?B?dTNIdWc1cVZoTzVqTTYwLzBaRm44TVZzWmZEMGlhZE5VS1YxL0hQak5zakRt?=
+ =?utf-8?B?ZjFmVFZUZzlXUUdzMUE2SG13LzV5WW5rT1Y2aWZIbFU0eWpTV1Rnd0Z0c2hO?=
+ =?utf-8?B?R2JtcmZGRnFEcWM0OGtXVUV3UkZpRkJLeFFucWpFaTBydi9JcjlUNFY0b0Yv?=
+ =?utf-8?B?NSsvU3Z1UjlPeVBORVZtKytEb0xCY2FqR3JQOHVWVitaSnBrRTlHdTgveFZp?=
+ =?utf-8?B?WTQrWU9NK2lobWk2aisyWTcrSlRQRFE3VC84QmJYOVoreFZhOTZNRjd0Wkh0?=
+ =?utf-8?B?cGRQMkJVMEtSMXNiR3BNaEtoM05lUVQyK04rVDlmR1ZGZkQ2RVlTalJlZWF4?=
+ =?utf-8?B?MUtUYTQ3bkd1c1QwekJDcjMwaE5NVkpBVEI4OU5BekdEYlg5YzNrUFNublla?=
+ =?utf-8?B?SmIwYUc4NDlEcWlSUnVKMExaWFlXbmt0ZC9PanJNV1V1VzFadmgvVUVmQUhx?=
+ =?utf-8?B?cDhuWVYvODNoVzBVVGRHK1BRczRvRHhhLzVacDZjYmJvelQ0V205TUkwbUhS?=
+ =?utf-8?B?K2M0aGh5TGZ5Y092L3VlV1V3eTRFN1FZZEJHSndGSU8vSjN1UTF4U0M4WFo3?=
+ =?utf-8?B?NXpvamxrdFpMYmJoWlhJaGZWc2FGL0JkSXpkZVZYWTYvUm9ON1RJcjFPa1Jv?=
+ =?utf-8?B?ckVZQ0lTUThFNXkrVkhpY0RSSHEyRWcza1hSWU04NTlGMWdXZkdER29ENW1T?=
+ =?utf-8?B?TS93VnprcURnRkVTQkljc3p1ZlF4RmdDdVY2NUtUdlFHZWp1OFdTTVhzOGgy?=
+ =?utf-8?B?ejkzN29INUN2eG5nQkFPbE9nckNNTjZya0J4U1Z4T1ovWFJoNkpCL3BzdFp2?=
+ =?utf-8?B?ZHVwNFh5K25WZnlrdi9tVjhFUEJNdXlweHJxaGFXVVhpbXk0Q1ovbXFFMDlM?=
+ =?utf-8?B?VlVXNWRZSlh3OG93UHBhNmpROWp3RmxMdlU4YlBTbTNmUTBxQkt3TEF4dlpM?=
+ =?utf-8?B?cVFkOC8vTWNGaUZWbXhwM3czVEo1S0FGa1NWTG1ycEVSRkpuaXBQL2NWYm9v?=
+ =?utf-8?B?eU5WekpKTWVhcFViYjNIcm04UmthcVpiWVkweHBtZGc1aVNDdGwwKzZscVNw?=
+ =?utf-8?B?TGtRSHE1em11Z2M5dmlaTkEwZVhyUUVxTU45MmxZdnFFb200bXFmdEx4aStK?=
+ =?utf-8?B?ZlB2cDduODJlTUxVNDZUV2wzUGZJakd6bmFDTkthZkczcXEwbW5SQ3BvWEdH?=
+ =?utf-8?B?TmdyeXZ3d2ZPQkZmWTNuREM4d3pCQWhxUzQyRXhiRWJZK0JNcmpmSTBmWHhR?=
+ =?utf-8?B?cUNVT0s4QTd0cCtrcDVvZUQxTkhmQjhBVnU0bnhOMGJpYzR2Y3dVbXlSNHh5?=
+ =?utf-8?B?SnhIbnE3Rkp5bWZ1QVpqQzN5Mk1KRVBkZGlMeGxJdnRPMy85YXlGdHJEdlVy?=
+ =?utf-8?B?bG9VV1Y0UHdOZFFtTFBSM0Q5SGw1UWp2SVBZWWxibTBXNEh0aWtHNlpaS3pP?=
+ =?utf-8?B?dHBBNGhhc2Y1b1JKenhLcjIwaHBaWTNKMGlvZmIxeTNQQUlSeWJLd2Z4ZjZl?=
+ =?utf-8?B?NVpYbEV0NVd5aVNyWVlNYS9qcTRnSVRKN2dvKzFqMDlDM0RXNTFsYkk5RzY5?=
+ =?utf-8?Q?a/zygIIlA7p8/FpTRIGzbJ/ux?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 045ec45b-3985-42e4-0876-08dcf334d18b
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5176.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 07:32:16.2164
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hn/mlm49oQ4CXbT5VN4+JaaKE19wI4tGtKNWeJQYKdjdXyEQSCHd32aDhD85uApvjZCSW9K0JJJ/fSQgwJ0kRA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8977
 
-On Wed, Oct 23, 2024 at 03:08:52AM +0200, Andrew Lunn wrote:
-> On Wed, Oct 23, 2024 at 08:41:36AM +0800, Inochi Amaoto wrote:
-> > On Tue, Oct 22, 2024 at 03:51:08PM +0200, Andrew Lunn wrote:
-> > > On Tue, Oct 22, 2024 at 06:21:49PM +0800, Inochi Amaoto wrote:
-> > > > On Mon, Oct 21, 2024 at 03:27:18PM +0200, Andrew Lunn wrote:
-> > > > > > It is related to the RGMII delay. On sg2044, when the phy 
-> > > > > > sets rx-delay, the interal mac is not set the same delay, 
-> > > > > > so this is needed to be set.
-> > > > > 
-> > > > > This is the wrong way to do it. Please look at how phy-mode should be
-> > > > > used, the four different "rgmii" values. Nearly everybody gets this
-> > > > > wrong, so there are plenty of emails from me in the netdev list about
-> > > > > how it should be done.
-> > > > > 
-> > > > 
-> > > > The phy-mode is alreay set to the "rgmii-id" and a rx delay is already
-> > > > set (a default tx delay is set by the phy driver). In the scenario 
-> > > > the extra bit is used to fix 2ns difference between the sampling clock
-> > > > and data. It is more like an extra setting and the kernel can not handle
-> > > > it by only setting the phy-mode.
-> > > 
-> > > This sounds wrong.
-> > > 
-> > > So in DT you have rgmii-id? You say the PHY is doing TX delay. So you
-> > > pass PHY_INTERFACE_MODE_RGMII_TXID to the PHY? It is not clear from
-> > > this patch, i don't see any code mentioning
-> > > PHY_INTERFACE_MODE_RGMII_TXID. Could you point me at that code.
-> > > 
-> > > 	Andrew
-> > 
-> > The phy on the board I have is YT8531, The config code is here:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/phy/motorcomm.c#n868
+
+
+On 10/23/2024 05:02, Rosen Penev wrote:
+> The latter is the preferred way to copy ethtool strings.
 > 
-> This PHY should be able to do rgmii-id, so there is no need for the
-> MAC to add delays. We encourage that setup in linux, so all RGMII
-> MAC/PHY pairs are the same, the PHY add the delays.
+> Avoids manually incrementing the pointer.
 > 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 
-Yes, this is what I have done at the beginning. At first I only
-set up the phy setting and not set the config in the syscon. 
-But I got a weird thing: the phy lookback test is timeout. 
-Although the datasheet told it just adds a internal delay for 
-the phy, I suspect sophgo does something more to set this delay.
+Looks good to me.
 
-Regards,
-Inochi
+Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+
+Thanks,
+Shyam
+
+> ---
+>  drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 22 ++++++++------------
+>  1 file changed, 9 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+> index 5fc94c2f638e..4431ab1c18b3 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+> @@ -195,23 +195,19 @@ static void xgbe_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+>  
+>  	switch (stringset) {
+>  	case ETH_SS_STATS:
+> -		for (i = 0; i < XGBE_STATS_COUNT; i++) {
+> -			memcpy(data, xgbe_gstring_stats[i].stat_string,
+> -			       ETH_GSTRING_LEN);
+> -			data += ETH_GSTRING_LEN;
+> -		}
+> +		for (i = 0; i < XGBE_STATS_COUNT; i++)
+> +			ethtool_puts(&data, xgbe_gstring_stats[i].stat_string);
+> +
+>  		for (i = 0; i < pdata->tx_ring_count; i++) {
+> -			sprintf(data, "txq_%u_packets", i);
+> -			data += ETH_GSTRING_LEN;
+> -			sprintf(data, "txq_%u_bytes", i);
+> -			data += ETH_GSTRING_LEN;
+> +			ethtool_sprintf(&data, "txq_%u_packets", i);
+> +			ethtool_sprintf(&data, "txq_%u_bytes", i);
+>  		}
+> +
+>  		for (i = 0; i < pdata->rx_ring_count; i++) {
+> -			sprintf(data, "rxq_%u_packets", i);
+> -			data += ETH_GSTRING_LEN;
+> -			sprintf(data, "rxq_%u_bytes", i);
+> -			data += ETH_GSTRING_LEN;
+> +			ethtool_sprintf(&data, "rxq_%u_packets", i);
+> +			ethtool_sprintf(&data, "rxq_%u_bytes", i);
+>  		}
+> +
+>  		break;
+>  	}
+>  }
 
