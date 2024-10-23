@@ -1,96 +1,82 @@
-Return-Path: <netdev+bounces-138373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB93F9AD253
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:15:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA829AD258
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 510301F23B02
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:15:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53DAF1F21711
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC421CF7C5;
-	Wed, 23 Oct 2024 17:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0D51B85E2;
+	Wed, 23 Oct 2024 17:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUgUUQrC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RDslFYwX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5071CEEAD;
-	Wed, 23 Oct 2024 17:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9252312DD88
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 17:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729703685; cv=none; b=qKotbod5Ac0Qm+WNaZWKlsHlrrJ7pqjsLvYtZbnhwMxICQnGWH+mTFkJFqo0dodKmdz12DjKcXtxmEd337IqFQrXV6bNR5leZkxHxmNKEv5k80XGoLNCxL29V/3r40fB14HClvrvFkqn0vl4SBGWzgjrtl8CXxJQqTsJlFaRPno=
+	t=1729703791; cv=none; b=c6DCLZ0pj1TTGqhSb4niXVndV2ru/sd36itGmeXMZDD0FE7MCtD3nH5hROVaYXaMu+Xhu6D9qXRjR0IWhG/9w0uyDDvtlGFgLyRqYbF085XYrJY2DWUHQVANZYtGp/456xinxfOidJAuOiVyM6+G/BJIrLDMY2I2CpeQtiOnWKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729703685; c=relaxed/simple;
-	bh=03rvAucDFVViHgLY7FYrkzqH16K8nKRKNMJsJ6AgZZw=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZVfWNvSop/bej241ZEOEYSHz1a0AjhWWfQkdK9V1QP9rPmPCVKSkmX9tR2qQqEpZqT/JgCxOb24v+Jf6snTQLNPztsFrFYqEZzMFjaLjJ3KiGvYm++D+wd9WZp6H1CKDIQakiT5Yj2l/UV/n5DnLLE2OErq22RznGjndAn1NHII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUgUUQrC; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43152b79d25so24035e9.1;
-        Wed, 23 Oct 2024 10:14:43 -0700 (PDT)
+	s=arc-20240116; t=1729703791; c=relaxed/simple;
+	bh=Uv3hkCr5Ps2yRPW2MYv7ATs5YRMkTHa0nqeF+L4acfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=YS5p5vPwdblLcy2ql3SyQR3hSZUkNpJqOA+D4gaPiC/pQvO4rWRsAocZGABEaP5AYsQgi7IAIrHRNPaJTOKxQSUHZuB3k/mer5IiuEQg/md8dg4YxDnmkoza8zCRXXS+QIHpfxQ4+OS6hMNw91xvt5CyBIpIt4wLjqtyA9M5UlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RDslFYwX; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43163667f0eso123675e9.0
+        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:16:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729703682; x=1730308482; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=24JSccvs0HSbNmxvOVItJ4JQKqdo53s7Emj+lH9aPyw=;
-        b=JUgUUQrCxIs8x29jkbhE9aQZErYlAdb17jBcYs1JgJkub0nvl+AGNwQYqQtxdJ+aDK
-         JwlTv4O34i3xsm5MYANtXge3LLVJ051QBdvGa3HMCB6Jz22VeM650Bur86Nfit8rHI1d
-         nrZoqFrFLA6OvuDvWbu6nqzL4upL/5O95YCrhP2FDC4j2xBo++zrFEWoEnSpJS87BGEp
-         HBvBeqNjqF/8rQnst+P+c8ykTdsJyOs5m4SL3rAGtiHRWmqKb/zoIs1vLl1+Vdql2Pw6
-         9Y+qaSpr/ODykSU4etOnmNfAOBcWVof6o3X51ISxO/T9BmNY2W9tyKKybSGydmEqC387
-         GVDw==
+        d=linaro.org; s=google; t=1729703788; x=1730308588; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OljP4PdWV2R3StPPy5+/cJKVw4Vph1NJkS5of3TSma0=;
+        b=RDslFYwXpLpysTPGDY8UayI6rpoyHJ3Nrt5ZTa+vBY0IUYn64ShjkpQ26BWxGCg+qj
+         EGeA8eOcGuP1yBaNgaZHhrHrNwI5Ho4V6/9g6BUljvyfHvL8/oxn2JiuZNRRkBJpcIAK
+         vcRd7Pi1X666BrPTJwF+r7EKbfWZd9Pw0aH/NB9H/nMjDA5WE7A11LtqTgCw35D/5+P8
+         dqljaRvwCwgIEgSb2PUU+M3MpLQ57oDm9uoIrXn1C15sNRvARF1UCsaqsm8vH3vs0dLc
+         jR/gRi6JwsVGygznrk+6lIylQ7gBW+TQZX2dEhtzCGWS6vBc7mydrL3BXqyBAdBF5HJV
+         astQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729703682; x=1730308482;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=24JSccvs0HSbNmxvOVItJ4JQKqdo53s7Emj+lH9aPyw=;
-        b=FIXx+h6t2v/pNJJmdOciVnUOx/jjIry06VPrdgXeZsUSWuufxeN7DAWbSmggrAGH37
-         4+O/VYLY6iYiEIlmNpqv4K0sZiDod+cSR2d6eSeZUJZP6zuz72j3e9dl/cuINP4gYYh1
-         02GzFugeF92sk1ES9rP/wFI+CYrFP8AamaKEpLvK5iOdyx5RZUA6sVe0fr8yu/6ZHMw1
-         VUQ2AoHunlsePNvro4BtoRUHZhhUhumDqpX5rg6P/lB+dAaxD3yRqDtdu83woyVAr6VV
-         3hp3Bg/LDi2MvHeTwf88BO2J+zNE+3pW9OmgMcugrgqURssIuGopehgSEyZZHAAKOXk+
-         AI5g==
-X-Forwarded-Encrypted: i=1; AJvYcCU1SKveE0VVy1wM49zh12MrF0tC0nm+jyzjmfiNe77KyvcWO4gLw00rZWHgVFJKeRJgABAfPh4JRJyAFgRg@vger.kernel.org, AJvYcCVKUQ8R2CDGCok0Z7YYsTmSTVoByvpC23zHRNsBpOJLDmb0X+qCElXVh73fqMekD90MKF9SrTyS@vger.kernel.org, AJvYcCVn4Iu+OEsRLq5yqavWh2c6hOAS91+rwFaYHag8kXskSPb2jud1vIhZqapmFrBp6yWsqT064XrL4NI+@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvGGYjzxk7qqqWG6ZZxQUrScW9UpSBtuJPwlFaV+0WGfyBqvM8
-	m6Id0XW5kDhxfKqngbMPyqJKn5eInOhpVYDsoiDnlGUDE79EaVXl
-X-Google-Smtp-Source: AGHT+IFyL3faonwfZbopJADep8Fb7q5nglJ4asw2OSvMdOVlChDa7XsFH3HgPggJz4T2SeNw/my3rA==
-X-Received: by 2002:a05:600c:1c95:b0:42c:bd4d:e8ba with SMTP id 5b1f17b1804b1-4318413e532mr24981595e9.8.1729703681340;
-        Wed, 23 Oct 2024 10:14:41 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186c3a44asm21554805e9.36.2024.10.23.10.14.40
+        d=1e100.net; s=20230601; t=1729703788; x=1730308588;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OljP4PdWV2R3StPPy5+/cJKVw4Vph1NJkS5of3TSma0=;
+        b=ibq/Wn1bpejXde4O+rKg6O7wr2SRmkovrXKuHuF+KEENuz0waa+LIQjGfW9r75jhlN
+         1nqhFnlelLzXPv4e4ONdolWbq1JiXcLr3BtLF3LR1PGL3cJ7Lzf8bmuyoOUUSH9QRKid
+         d5X8WV+iVv3O8ALMj4rgm8uhJ5tovGyXipO7+RNXDHQcS4/TG62hM5Wq4H0OhiklDWs6
+         j0qAE8C2wSjFE7ndSPo7GHJJ4JxgoXi/f2AAbodBATBo6IiReVSyPSgYN+Xiy4SXkpSP
+         M0W8gYuHyU0JDuYK7qv9YEtpLzSi/RhJZcrg/u23Srh0qR+a16OSIiOakgnkm295sf1b
+         drXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXAvGCXX8zinThs4HEiyK3ZS9vI1I99O9eyPlXYTLj+HtFC7Xo7RahsrPcv9A+PD5ij3DBX/RI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMH5JkjqttgXYklTjjB8/aP5vTyZp9nvPphdbTxBItcZEs+rlT
+	IG5TOJJ+fQG28W3tFFgwHUZLfJuNYb56O307o3Al5rG8de0/cbmyqpsgzxTdhFM=
+X-Google-Smtp-Source: AGHT+IHuawpuTA3FdkKB3grmiiT77MshEcjs2fsxx4eyqV28W03YuXYVz0wzAjnd/bp4vmWf9SSucg==
+X-Received: by 2002:a5d:6102:0:b0:37d:509e:8742 with SMTP id ffacd0b85a97d-37efceee7d5mr2251003f8f.1.1729703787648;
+        Wed, 23 Oct 2024 10:16:27 -0700 (PDT)
+Received: from localhost ([41.210.147.101])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0b9c6b0sm9307877f8f.109.2024.10.23.10.16.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 10:14:40 -0700 (PDT)
-Message-ID: <67192f00.7b0a0220.343b2b.9836@mx.google.com>
-X-Google-Original-Message-ID: <Zxku_anuVj64p9nq@Ansuel-XPS.>
-Date: Wed, 23 Oct 2024 19:14:37 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v2 1/3] dt-bindings: net: dsa: Add Airoha
- AN8855 Gigabit Switch documentation
-References: <20241023161958.12056-1-ansuelsmth@gmail.com>
- <20241023161958.12056-2-ansuelsmth@gmail.com>
- <5761bdc3-7224-4de6-b0f5-bedc066c09f6@lunn.ch>
+        Wed, 23 Oct 2024 10:16:27 -0700 (PDT)
+Date: Wed, 23 Oct 2024 20:16:21 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Dong Chenchen <dongchenchen2@huawei.com>,
+	pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	fw@strlen.de, kuniyu@amazon.com
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	yuehaibing@huawei.com, Dong Chenchen <dongchenchen2@huawei.com>
+Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
+Message-ID: <01b2bdd1-39f4-43d1-a7e6-f8e8061175a4@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,64 +85,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5761bdc3-7224-4de6-b0f5-bedc066c09f6@lunn.ch>
+In-Reply-To: <20241022085753.2069639-1-dongchenchen2@huawei.com>
 
-On Wed, Oct 23, 2024 at 07:08:57PM +0200, Andrew Lunn wrote:
-> > +  airoha,base_smi_address:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description:
-> > +      Configure and change the base switch PHY address to a new address on
-> > +      the bus.
-> > +      On reset, the switch PHY address is ALWAYS 1.
-> > +    default: 1
-> > +    maximum: 31
-> 
-> Given that this is a 5 port switch, what happens if i pick a value
-> greater than 31 - 5 ?
+Hi Dong,
 
-The PHY at those address won't be reachable, I didn't think of this, you
-are right.
+kernel test robot noticed the following build warnings:
 
-> 
-> Do you have a real use case for this? A board which requires the PHYs
-> get shifted from the default of 1? Vendors have all sorts of bells and
-> whistles which we never use. If its not needed, i would not add it,
-> until it is actually needed, if ever.
+url:    https://github.com/intel-lab-lkp/linux/commits/Dong-Chenchen/net-netfilter-Fix-use-after-free-in-get_info/20241022-165936
+base:   net/main
+patch link:    https://lore.kernel.org/r/20241022085753.2069639-1-dongchenchen2%40huawei.com
+patch subject: [PATCH net] net: netfilter: Fix use-after-free in get_info()
+config: x86_64-randconfig-161-20241023 (https://download.01.org/0day-ci/archive/20241024/202410240020.Cqi2d68p-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
 
-Well the first case that comes to mind is multiple switch and conflict.
-I have no idea if there are hw strap to configure this so I assume if a
-SoC have 2 switch (maybe of the same type), this permits to configure
-them (with reset pin and deasserting them once the base address is
-correctly configured)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202410240020.Cqi2d68p-lkp@intel.com/
 
-But yes totally ok to drop this if too strange... I assume it's problematic
-that PHY change at runtime.
+smatch warnings:
+net/netfilter/x_tables.c:1280 xt_find_table_lock() warn: passing zero to 'ERR_PTR'
 
-> 
-> > +  mdio:
-> > +    $ref: /schemas/net/mdio.yaml#
-> > +    unevaluatedProperties: false
-> > +    description:
-> > +      Define the relative address of the internal PHY for each port.
-> > +
-> > +      Each reg for the PHY is relative to the switch base PHY address.
-> 
-> Which is not the usual meaning of reg.
-> 
-> > +            mdio {
-> > +                #address-cells = <1>;
-> > +                #size-cells = <0>;
-> > +
-> > +                internal_phy0: phy@0 {
-> > +                    reg = <0>;
-> 
-> So given that airoha,base_smi_address defaults to 1, this is actually
-> address 1 on the MDIO bus?
->
+vim +/ERR_PTR +1280 net/netfilter/x_tables.c
 
-Yes correct. One problem I had was that moving this outside the swich
-cause panic as it does conflict with the switch PHY address...
+03d13b6868a261 Florian Westphal  2017-12-08  1234  /* Find table by name, grabs mutex & ref.  Returns ERR_PTR on error. */
+76108cea065cda Jan Engelhardt    2008-10-08  1235  struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+76108cea065cda Jan Engelhardt    2008-10-08  1236  				    const char *name)
+2e4e6a17af35be Harald Welte      2006-01-12  1237  {
+1d610d4d31a8ed Florian Westphal  2021-04-01  1238  	struct xt_pernet *xt_net = net_generic(net, xt_pernet_id);
+fdacd57c79b79a Florian Westphal  2021-08-03  1239  	struct module *owner = NULL;
+fdacd57c79b79a Florian Westphal  2021-08-03  1240  	struct xt_template *tmpl;
+fdacd57c79b79a Florian Westphal  2021-08-03  1241  	struct xt_table *t;
+f4f502d5a8ea29 Dong Chenchen     2024-10-22  1242  	int err = -ENOENT;
+2e4e6a17af35be Harald Welte      2006-01-12  1243  
+7926dbfa4bc14e Pablo Neira Ayuso 2014-07-31  1244  	mutex_lock(&xt[af].mutex);
+1d610d4d31a8ed Florian Westphal  2021-04-01  1245  	list_for_each_entry(t, &xt_net->tables[af], list)
+2e4e6a17af35be Harald Welte      2006-01-12  1246  		if (strcmp(t->name, name) == 0 && try_module_get(t->me))
+2e4e6a17af35be Harald Welte      2006-01-12  1247  			return t;
+b9e69e12739718 Florian Westphal  2016-02-25  1248  
+fdacd57c79b79a Florian Westphal  2021-08-03  1249  	/* Table doesn't exist in this netns, check larval list */
+fdacd57c79b79a Florian Westphal  2021-08-03  1250  	list_for_each_entry(tmpl, &xt_templates[af], list) {
+fdacd57c79b79a Florian Westphal  2021-08-03  1251  		if (strcmp(tmpl->name, name))
+b9e69e12739718 Florian Westphal  2016-02-25  1252  			continue;
+fdacd57c79b79a Florian Westphal  2021-08-03  1253  		if (!try_module_get(tmpl->me))
+03d13b6868a261 Florian Westphal  2017-12-08  1254  			goto out;
+fdacd57c79b79a Florian Westphal  2021-08-03  1255  
+fdacd57c79b79a Florian Westphal  2021-08-03  1256  		owner = tmpl->me;
+fdacd57c79b79a Florian Westphal  2021-08-03  1257  
+b9e69e12739718 Florian Westphal  2016-02-25  1258  		mutex_unlock(&xt[af].mutex);
+fdacd57c79b79a Florian Westphal  2021-08-03  1259  		err = tmpl->table_init(net);
+03d13b6868a261 Florian Westphal  2017-12-08  1260  		if (err < 0) {
+fdacd57c79b79a Florian Westphal  2021-08-03  1261  			module_put(owner);
+03d13b6868a261 Florian Westphal  2017-12-08  1262  			return ERR_PTR(err);
+b9e69e12739718 Florian Westphal  2016-02-25  1263  		}
+b9e69e12739718 Florian Westphal  2016-02-25  1264  
+b9e69e12739718 Florian Westphal  2016-02-25  1265  		mutex_lock(&xt[af].mutex);
+b9e69e12739718 Florian Westphal  2016-02-25  1266  		break;
+b9e69e12739718 Florian Westphal  2016-02-25  1267  	}
+b9e69e12739718 Florian Westphal  2016-02-25  1268  
+f4f502d5a8ea29 Dong Chenchen     2024-10-22  1269  	if (err < 0)
+f4f502d5a8ea29 Dong Chenchen     2024-10-22  1270  		goto out;
+f4f502d5a8ea29 Dong Chenchen     2024-10-22  1271  
+b9e69e12739718 Florian Westphal  2016-02-25  1272  	/* and once again: */
+1d610d4d31a8ed Florian Westphal  2021-04-01  1273  	list_for_each_entry(t, &xt_net->tables[af], list)
+b9e69e12739718 Florian Westphal  2016-02-25  1274  		if (strcmp(t->name, name) == 0)
+b9e69e12739718 Florian Westphal  2016-02-25  1275  			return t;
+
+ret it zero here, but if we fail to find the name then we should set ret =
+-ENOENT;
+
+b9e69e12739718 Florian Westphal  2016-02-25  1276  
+fdacd57c79b79a Florian Westphal  2021-08-03  1277  	module_put(owner);
+b9e69e12739718 Florian Westphal  2016-02-25  1278   out:
+9e19bb6d7a0959 Ingo Molnar       2006-03-25  1279  	mutex_unlock(&xt[af].mutex);
+f4f502d5a8ea29 Dong Chenchen     2024-10-22 @1280  	return ERR_PTR(err);
+2e4e6a17af35be Harald Welte      2006-01-12  1281  }
 
 -- 
-	Ansuel
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
