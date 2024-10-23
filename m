@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-138243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821139ACAE1
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:15:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E16EE9ACAE3
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 393ED1F20CAC
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:15:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A771B216A0
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E550B1C726D;
-	Wed, 23 Oct 2024 13:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D5B1C82F0;
+	Wed, 23 Oct 2024 13:13:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MJuuHUia"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RPT05Tc3"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392F21C3F26;
-	Wed, 23 Oct 2024 13:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAAD1C727F;
+	Wed, 23 Oct 2024 13:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729689218; cv=none; b=CYncUuMhXd9g4hZ+oLe68E3h7hVu/gpnoh+RFUlS3PwGcgC+j+j2+6J/oZXA0LyR1hi7DpwREkM3TR/FsFP64GMobNVoQ+tHd99jbSyQCXNPizcnbncpGrUh85iUc9pqVxyyvbpP+dxbARkkszOnLTs4MGGOQ7Stxc0jh0Vequ4=
+	t=1729689220; cv=none; b=mfTbj8EWDuQMHky9etfrytOCB4ZDGrAdPKoWnsEtkaD7LX+KZiW/Gu6c5UB1R4WhzEZ8tVlUYbQisSXt44kjMJL+bvEezvazrr/JbuhZyhS/pFLL67m/eN6Iz504wVM2w9SBJYXIO5bVcYOTYTuIl2XSz1AOmg0zdSMsY6zYsqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729689218; c=relaxed/simple;
-	bh=lD1NtL7Hk81JQJLAmJRDC3Ndm3BotD4JGmSHT1DrU0M=;
+	s=arc-20240116; t=1729689220; c=relaxed/simple;
+	bh=jlr9PKPb+PVipw4Vu1aww5E0P8JdXjTuJjzC5cVxEh4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uDfNhvdpAJDZm87c6N4KPxLcpQiX9ixjYL82zgtbLxlybf13ugN2CT1JYVD17jYwpWt3/RtMSrDzIt0nHS1ruVaal54PeZdHIiKLt+1gXUmFtUeevXx4ZiKdIDrc6bgSwS5YXO9iQ8FIj5WrnXy8w+PZdJ3w5d9H0srUtqzl7sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MJuuHUia; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=OByq+Cwkip6L8FV89FzN1TonRr1dPWQvBZ3TtgBVDzzeQwHQ+lYuKRUNxgYS9ht/fgfXUARSCTYWdi2pDKrEPU3iMBWoiu1cuS1EK9hqhK7z0XrmonsjUnARqBfDDO92zjtgP4nsF/71wNCBDczETf4X0/3EDua8uzaysY1Wr10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RPT05Tc3; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729689217; x=1761225217;
+  t=1729689219; x=1761225219;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lD1NtL7Hk81JQJLAmJRDC3Ndm3BotD4JGmSHT1DrU0M=;
-  b=MJuuHUiasi0WaYAGperzECkBPAYbzmjAzQxLUqK9C/NPJPdoJ5IeovxT
-   osnj0n6TtuuT7sYb9T9bM9UyQt3siQTZDr+BZA1+MRi9noJZqudbJdJfE
-   a5gNThDoXA4Qh+PgDLHfdB2eJSi6jnl+1w2LEege1AK+xGJm1KlXdXYm9
-   fv0hFgF8yip1MgOW0PSN6ui0NdHeQ9lnJusMqA+CiJn8tsSMfLZWHUUMl
-   DHiMIT3b3E9dUSzum+WIATPdMJ5zXzRa3tz0/7Nog7FxnPMqgtdAqiI+a
-   p81qdZankqtUUuxU0Wq+SRJNp9GsBk9C4eXif6H2mMbswxx0tZoGVX5Bt
+  bh=jlr9PKPb+PVipw4Vu1aww5E0P8JdXjTuJjzC5cVxEh4=;
+  b=RPT05Tc3lEuyYU0R+qVMr+S6xcw2bj0XhLo1PX22b4epGwHdcdjT8+0s
+   lj8Yr1e4io74JIhLeg5cZPtpRTkCwWYNQDrAC/Nm4+rsRebF37kw9OZIy
+   R1aPRWxxryH6DPwI4gZJ06ihqGS/TFXMToJeOg+60MecvyyCGKKxBflOL
+   zkzra/t93jUAjOvyHV+f0UFQ8LyaPpaNBLJu9s8aaNqM/JJh7F9fNFfLS
+   +iNlgBq3M4IZ1k4Fy9HFqwfNEwLPHnItjHXqc2tymNX4DBH+BEhldixVC
+   rxZjfdUeJ4g9IUiXVUrXimMWFQwiSTUC5rg+3NMkgwl3SrynzRZZbhUwg
    Q==;
-X-CSE-ConnectionGUID: F5QPXEsZQBuBCyoNsWh9+A==
-X-CSE-MsgGUID: bdN9+DjYS1ikGHa9gFp88w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="46758605"
+X-CSE-ConnectionGUID: VBO0tRciTMWCnkfp85DJsw==
+X-CSE-MsgGUID: HEbQ+vDaQvmtAG4s5r+U2w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="46758617"
 X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="46758605"
+   d="scan'208";a="46758617"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:13:36 -0700
-X-CSE-ConnectionGUID: 8FZMuWqUQdSDJhtoiuGoJg==
-X-CSE-MsgGUID: 533S3WnjT8CdmTnpRZ3oLQ==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:13:38 -0700
+X-CSE-ConnectionGUID: pyWXoMVJTZKZNLSotEYmxw==
+X-CSE-MsgGUID: WmZKZxVVRRmjdLMC1AZn7g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="84820130"
+   d="scan'208";a="84820134"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Oct 2024 06:13:33 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 23 Oct 2024 06:13:35 -0700
 Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.71])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6D15C2877A;
-	Wed, 23 Oct 2024 14:13:30 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 63CA22877E;
+	Wed, 23 Oct 2024 14:13:32 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: netdev@vger.kernel.org
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -79,9 +79,9 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Joe Damato <jdamato@fastly.com>
-Subject: [PATCH net-next v2 6/7] devlink: remove unused devlink_resource_occ_get_register() and _unregister()
-Date: Wed, 23 Oct 2024 15:09:06 +0200
-Message-ID: <20241023131248.27192-7-przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v2 7/7] devlink: remove unused devlink_resource_register()
+Date: Wed, 23 Oct 2024 15:09:07 +0200
+Message-ID: <20241023131248.27192-8-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241023131248.27192-1-przemyslaw.kitszel@intel.com>
 References: <20241023131248.27192-1-przemyslaw.kitszel@intel.com>
@@ -93,93 +93,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove not used devlink_resource_occ_get_register() and
-devlink_resource_occ_get_unregister() functions; current devlink resource
-users are fine with devl_ variants of the two.
+Remove unused devlink_resource_register(); all the drivers use
+devl_resource_register() variant instead.
 
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- include/net/devlink.h  |  7 -------
- net/devlink/resource.c | 39 ---------------------------------------
- 2 files changed, 46 deletions(-)
+ include/net/devlink.h  |  6 ------
+ net/devlink/resource.c | 33 ---------------------------------
+ 2 files changed, 39 deletions(-)
 
 diff --git a/include/net/devlink.h b/include/net/devlink.h
-index db5eff6cb60f..fdd6a0f9891d 100644
+index fdd6a0f9891d..fbb9a2668e24 100644
 --- a/include/net/devlink.h
 +++ b/include/net/devlink.h
-@@ -1797,15 +1797,8 @@ void devl_resource_occ_get_register(struct devlink *devlink,
- 				    u64 resource_id,
- 				    devlink_resource_occ_get_t *occ_get,
- 				    void *occ_get_priv);
--void devlink_resource_occ_get_register(struct devlink *devlink,
--				       u64 resource_id,
--				       devlink_resource_occ_get_t *occ_get,
--				       void *occ_get_priv);
- void devl_resource_occ_get_unregister(struct devlink *devlink,
- 				      u64 resource_id);
--
--void devlink_resource_occ_get_unregister(struct devlink *devlink,
--					 u64 resource_id);
- int devl_params_register(struct devlink *devlink,
- 			 const struct devlink_param *params,
- 			 size_t params_count);
+@@ -1779,12 +1779,6 @@ int devl_resource_register(struct devlink *devlink,
+ 			   u64 resource_id,
+ 			   u64 parent_resource_id,
+ 			   const struct devlink_resource_size_params *size_params);
+-int devlink_resource_register(struct devlink *devlink,
+-			      const char *resource_name,
+-			      u64 resource_size,
+-			      u64 resource_id,
+-			      u64 parent_resource_id,
+-			      const struct devlink_resource_size_params *size_params);
+ void devl_resources_unregister(struct devlink *devlink);
+ void devlink_resources_unregister(struct devlink *devlink);
+ int devl_resource_size_get(struct devlink *devlink,
 diff --git a/net/devlink/resource.c b/net/devlink/resource.c
-index 96c0ff24b65a..a923222bbde8 100644
+index a923222bbde8..2d6324f3d91f 100644
 --- a/net/devlink/resource.c
 +++ b/net/devlink/resource.c
-@@ -513,28 +513,6 @@ void devl_resource_occ_get_register(struct devlink *devlink,
+@@ -381,39 +381,6 @@ int devl_resource_register(struct devlink *devlink,
  }
- EXPORT_SYMBOL_GPL(devl_resource_occ_get_register);
+ EXPORT_SYMBOL_GPL(devl_resource_register);
  
 -/**
-- *	devlink_resource_occ_get_register - register occupancy getter
+- *	devlink_resource_register - devlink resource register
 - *
 - *	@devlink: devlink
-- *	@resource_id: resource id
-- *	@occ_get: occupancy getter callback
-- *	@occ_get_priv: occupancy getter callback priv
+- *	@resource_name: resource's name
+- *	@resource_size: resource's size
+- *	@resource_id: resource's id
+- *	@parent_resource_id: resource's parent id
+- *	@size_params: size parameters
+- *
+- *	Generic resources should reuse the same names across drivers.
+- *	Please see the generic resources list at:
+- *	Documentation/networking/devlink/devlink-resource.rst
 - *
 - *	Context: Takes and release devlink->lock <mutex>.
 - */
--void devlink_resource_occ_get_register(struct devlink *devlink,
--				       u64 resource_id,
--				       devlink_resource_occ_get_t *occ_get,
--				       void *occ_get_priv)
+-int devlink_resource_register(struct devlink *devlink,
+-			      const char *resource_name,
+-			      u64 resource_size,
+-			      u64 resource_id,
+-			      u64 parent_resource_id,
+-			      const struct devlink_resource_size_params *size_params)
 -{
--	devl_lock(devlink);
--	devl_resource_occ_get_register(devlink, resource_id,
--				       occ_get, occ_get_priv);
--	devl_unlock(devlink);
--}
--EXPORT_SYMBOL_GPL(devlink_resource_occ_get_register);
+-	int err;
 -
- /**
-  * devl_resource_occ_get_unregister - unregister occupancy getter
-  *
-@@ -557,20 +535,3 @@ void devl_resource_occ_get_unregister(struct devlink *devlink,
- 	resource->occ_get_priv = NULL;
- }
- EXPORT_SYMBOL_GPL(devl_resource_occ_get_unregister);
--
--/**
-- *	devlink_resource_occ_get_unregister - unregister occupancy getter
-- *
-- *	@devlink: devlink
-- *	@resource_id: resource id
-- *
-- *	Context: Takes and release devlink->lock <mutex>.
-- */
--void devlink_resource_occ_get_unregister(struct devlink *devlink,
--					 u64 resource_id)
--{
 -	devl_lock(devlink);
--	devl_resource_occ_get_unregister(devlink, resource_id);
+-	err = devl_resource_register(devlink, resource_name, resource_size,
+-				     resource_id, parent_resource_id, size_params);
 -	devl_unlock(devlink);
+-	return err;
 -}
--EXPORT_SYMBOL_GPL(devlink_resource_occ_get_unregister);
+-EXPORT_SYMBOL_GPL(devlink_resource_register);
+-
+ static void devlink_resource_unregister(struct devlink *devlink,
+ 					struct devlink_resource *resource)
+ {
 -- 
 2.46.0
 
