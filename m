@@ -1,114 +1,114 @@
-Return-Path: <netdev+bounces-138220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E2E29ACA16
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:34:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D7229ACA37
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4609BB22EC9
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:34:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2C81283BDB
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B14F1AB539;
-	Wed, 23 Oct 2024 12:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97471ABEA7;
+	Wed, 23 Oct 2024 12:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mlWvPL3D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G01LHK/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6B91AB51D
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 12:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F60A1AAE31;
+	Wed, 23 Oct 2024 12:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729686854; cv=none; b=S4YVxNNvDPqe2+VClBZ6JLGvJH4trKMGH6m5MyN/IN15Tok0O2c/QOS33zmwYhi1bDYcd/PH/jlimbBo1+OM+KwvpJJsWLgu0era5zEeYR5bZB6lwduPpQ4cfw+dU8gwXnTEbCJFGKzpnr0Ni5e8yNOKcA4RaGTx8FQ9Pay4WDo=
+	t=1729687221; cv=none; b=Gu+MZFZenNyQIeghc03STYeAxSQfxAxHpoTUtFy+ZawkAO0bretMCw0NBMVSEg+gK0W702TLe1irJEppEihRxjsHYnkPXKv/5ZjygCAo1PLUp+oFDXHssAej06o6z99ASbilUkBCAhjH84cJ9ppXqVARDDBGm22EZ0bRIjFghQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729686854; c=relaxed/simple;
-	bh=deCFwGg/9lxaABG8sXNUu3EC6Nlc4Qbqov6VgZhGjOg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EcLIlNzY5kAEa6SOsw9FUcA2VkL423x30xMRUs7w/Lacw8PzZzhFvzRJtREE3I93McYPiOW79rFtw4D7fH083/BDfMWTyqW52rwipChPyPANaFSuWKZM0AqAC4i9Y7J1jZ3ngg9AO8YaZ9W1wMkx5l4hCdDNMVeacb0rzX6bwZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mlWvPL3D; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c9150f9ed4so8431130a12.0
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 05:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729686851; x=1730291651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=deCFwGg/9lxaABG8sXNUu3EC6Nlc4Qbqov6VgZhGjOg=;
-        b=mlWvPL3DjYKbfNlMzjXn5YIFO1EUsQ+AmJQ6Ir9sCD2gB3PPg9NfcZfH66DEO8+Up5
-         FeB/8DeRWwDAfFPHreQV8uyyCehfNrktswBVm4MoYRh4tpOqRAG49VWhfoWdypHXUulC
-         1rNc0WlNTMvgIc6wSAGjzPMO3ijlLJ32JDY4k2O1FdUpXOTXZsr/xnzfvbMTdDvw5y3K
-         uB4Lkq/wfe50zBQBPiqjKW29Gnf4xZD8jO6Kirr0WZ0Ve43l43xvDLyAi/WLpqLSK2En
-         EkG6P0eeHdBdtbwXvG08JjoD3J9EUNriRgzEnkaZk436Fjxxn0g+efvVouy5Vnn8l98s
-         vaYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729686851; x=1730291651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=deCFwGg/9lxaABG8sXNUu3EC6Nlc4Qbqov6VgZhGjOg=;
-        b=fJpD9Y4UC+WjwM4S6YfQDZ7udayXeZohtjGpj9IgRLcIEhgsbhJwnk4qYa/ycAiRaa
-         xk2LB+vmFNO8Tkk8r07a4ooYaEIJUFrJUi8Vi5Akbok8Zr6QpCLYnp+QrhZ37Rw+VFl/
-         kBlyXh1LnTZr4f7dLkpVFOlH3+X/DokBw2GWpqi6Cc5A906i58Z8Zu8jjBjBZiPvEDCn
-         CeIeYgyrDlwQH00S7k8fCSQkEZZynTBjr5xSzk/UkR4pbycgLUqsU6b5Mi6oL7G1iU34
-         UdJfzfTHeReiNBMKbOm3WhI0ECgDBkwsWKb/OTRJTOc2BwXU4LRQ6G2vuD+pRWAYnsGs
-         u8gg==
-X-Gm-Message-State: AOJu0YznFLVatJ4s2jrdtpTcDEfqro2yvmozg25Ub2DROb3nFyqSYUv+
-	Sz6+lvkOiWkKYCAWzuaOk1IdP4lcbsOzvvnjAaoCFcDXEtkjp/PSzTNCOJo5nvzqGVMDQON4SmQ
-	Dr5GgwOpoXDalNtYTr2MYiLQHtKQsX7XRzAqm
-X-Google-Smtp-Source: AGHT+IGJE65dowE1y2FqdYjpITPp7HgqrSh+DyeNIT/eTRZZa5k1iFlvxoCR8Mg8xmuD0y7QzyIfMYmY2aiW7nuEcSo=
-X-Received: by 2002:a05:6402:2356:b0:5c8:9f81:43e4 with SMTP id
- 4fb4d7f45d1cf-5cb8ac499efmr2031876a12.7.1729686850363; Wed, 23 Oct 2024
- 05:34:10 -0700 (PDT)
+	s=arc-20240116; t=1729687221; c=relaxed/simple;
+	bh=dzqN+awO8TcOkYgyl6lEgGX9CYpgV1GK+LsfppVV8w4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=djBe6b4PTWLYljMAIotYtNv4C/DzsSyx1swKzXyM/AePC8niy+5O+ML9+mU51pwD/g8qNOA8OeHGQvXNS8z6qb7zbJwKZUPxEqzF8lNzPom9O924Zl5PsL53L/KjugXWJzK+9c7edGx75mGtdd0Yqz3o1DA/tc6h2Uf8oyEFO8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G01LHK/v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 957E3C4CEC6;
+	Wed, 23 Oct 2024 12:40:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729687221;
+	bh=dzqN+awO8TcOkYgyl6lEgGX9CYpgV1GK+LsfppVV8w4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G01LHK/vpGe0lTSOwUHtuMKExgS4os+O+zy89jYCbdgWExVshtObrm0N6Icqhkl+H
+	 TdoU04T7Yi5eo5p6jdcc7emXRa4zVPv4vMBnvBwKdedNuusHFYl0x5EgLDBZUsMjve
+	 I05pBGjEj2ueFiMMKKHrSOY5cJrY4cfp+/tRBCIjpg7NOIYEKqQI9sk9aLLIzov5w7
+	 1zgrlF7BCFFU8ZgKMLKXNwiNZA2MWMs1xZk2WX4ILgR0Olb2gnfo0ladgTk0Idv2sx
+	 Xleqrvsv2wXC6dp71tv5sbiEBgtpqy9QhFfybS6J36EmJxQUKTf253zMIuVlmAXXUK
+	 KgqSETdRR9clg==
+Date: Wed, 23 Oct 2024 13:40:14 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jinjian Song <jinjian.song@fibocom.com>
+Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	angelogioacchino.delregno@collabora.com,
+	linux-arm-kernel@lists.infradead.org, matthias.bgg@gmail.com,
+	corbet@lwn.net, linux-mediatek@lists.infradead.org,
+	helgaas@kernel.org, danielwinkler@google.com, korneld@google.com,
+	Jinjian Song <songjinjian@hotmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [net-next,RESEND v6 2/2] net: wwan: t7xx: Add debug port
+Message-ID: <20241023124014.GU402847@kernel.org>
+References: <20241021121934.16317-1-jinjian.song@fibocom.com>
+ <20241021121934.16317-3-jinjian.song@fibocom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241023123009.749764-1-idosch@nvidia.com>
-In-Reply-To: <20241023123009.749764-1-idosch@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 23 Oct 2024 14:33:55 +0200
-Message-ID: <CANn89iLOPZ3DuaZJR6=v=3BFkq8dcy-M3HxXY22y4LS4LhZzhQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] ipv4: ip_tunnel: Fix suspicious RCU usage warning
- in ip_tunnel_find()
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, pshelar@nicira.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241021121934.16317-3-jinjian.song@fibocom.com>
 
-On Wed, Oct 23, 2024 at 2:31=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> The per-netns IP tunnel hash table is protected by the RTNL mutex and
-> ip_tunnel_find() is only called from the control path where the mutex is
-> taken.
->
-> Add a lockdep expression to hlist_for_each_entry_rcu() in
-> ip_tunnel_find() in order to validate that the mutex is held and to
-> silence the suspicious RCU usage warning [1].
->
-> [1]
-> WARNING: suspicious RCU usage
-> 6.12.0-rc3-custom-gd95d9a31aceb #139 Not tainted
-> -----------------------------
-> net/ipv4/ip_tunnel.c:221 RCU-list traversed in non-reader section!!
->
-> other info that might help us debug this:
->
++ Jiri
 
-> Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
+On Mon, Oct 21, 2024 at 08:19:34PM +0800, Jinjian Song wrote:
+> From: Jinjian Song <songjinjian@hotmail.com>
+> 
+> Add support for userspace to switch on the debug port(ADB,MIPC).
+>  - ADB port: /dev/wwan0adb0
+>  - MIPC port: /dev/wwan0mipc0
+> 
+> Application can use ADB (Android Debg Bridge) port to implement
+> functions (shell, pull, push ...) by ADB protocol commands.
+> E.g., ADB commands:
+>  - A_OPEN: OPEN(local-id, 0, "destination")
+>  - A_WRTE: WRITE(local-id, remote-id, "data")
+>  - A_OKEY: READY(local-id, remote-id, "")
+>  - A_CLSE: CLOSE(local-id, remote-id, "")
+> 
+> Link: https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/README.md
+> 
+> Application can use MIPC (Modem Information Process Center) port
+> to debug antenna tunner or noise profiling through this MTK modem
+> diagnostic interface.
+> 
+> By default, debug ports are not exposed, so using the command
+> to enable or disable debug ports.
+> 
+> Switch on debug port:
+>  - debug: 'echo debug > /sys/bus/pci/devices/${bdf}/t7xx_mode
+> 
+> Switch off debug port:
+>  - normal: 'echo normal > /sys/bus/pci/devices/${bdf}/t7xx_mode
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Hi,
 
-Thanks.
+I am somewhat surprised to see vendor-specific sysfs controls being added.
+And I am wondering if another mechanism was considered. It seems to
+me that devlink would be appropriate. Jiri (CCed) may have an opinion on
+that.
+
+...
 
