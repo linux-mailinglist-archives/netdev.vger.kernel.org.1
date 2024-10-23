@@ -1,181 +1,180 @@
-Return-Path: <netdev+bounces-138084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 506AA9ABDA3
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:08:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64D969ABDB5
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70C6E1C211A2
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 858AF1C22B1F
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990B713D276;
-	Wed, 23 Oct 2024 05:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F066053E23;
+	Wed, 23 Oct 2024 05:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TH3SB30E"
+	dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b="VSWOU/Vd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.183.29.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192704A3E
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 05:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.29.34
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729660596; cv=fail; b=OrM7sse5CgwMZcHP9bTq4KRj+BRb0NZF3Hp4V46dX+HvsYWNzmOhPtmLsqqz1co2y03I3NenI/BDS59jqFtXCCjZCYeftSBcKGt/ndANzbqki2dbU57+E6Vkjsgdsh/Van8N67/BKbJovBoieDiqjJtF4tzuvWqcaHDEyuYMgl8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729660596; c=relaxed/simple;
+	bh=jAJ77AuWeFjC2DM4GszpBQCKcGfKSbJ6Q/Q1jxQamcY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DkP7qSU+BL1iyAMsL4jWUD/Abgs7g5jFpopPUI/d/UMjb/cch4Z0vLFWWGtI1Yvo0AWbNQAHE5tAa56R5FxN3g7OtDMP68w6j4tbjPEzb4xM8FBgk+SxoK3ab3ifjg0luV8xSYcNgDhQDcfw8njvvMWTOd66RREq8vn91jQQA8g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com; spf=pass smtp.mailfrom=drivenets.com; dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b=VSWOU/Vd; arc=fail smtp.client-ip=185.183.29.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=drivenets.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02lp2235.outbound.protection.outlook.com [104.47.11.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01AD39ACC;
-	Wed, 23 Oct 2024 05:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729660083; cv=none; b=nu+1apWeHri496FV0R+JcfnrCPyF0VzdVtO3wu7rmpLofRTaGrIfEp1V2I5/CRedPYXidKG8OT+X+JsJlbap6uszPjgBCGelhW0Dm2iXu/NdlacpeR8hwPKPuumSdfHRYEJCGXtmYCIkl5YuT7kB77O/AlC8lXvJRaTGxqKOyA4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729660083; c=relaxed/simple;
-	bh=ht2IcqUIibZPtSYBwMnMl0wko1zLpajabqDsNjShT9E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=aauWoD91hHwvItDatplpNqaA3EXRMkLKILtqB41HU2BmWjOS3mUUpPUISwLjGo8Iq3fpuSlMB2wCfe0JH4kurqqelmgGFIf1wxf4GodP+2bARMK8Ui0SNVQwwnWwxrCHipIzm9WxaN+5wYrHWTGqZ1ZA5LIqCIKB04iQOGrTNdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=TH3SB30E; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49MLaBlp025161;
-	Wed, 23 Oct 2024 05:07:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	kqEsxGFiFNaU+Lg3MVVwP9PI42H4MdV/UcLW2KSfP5Q=; b=TH3SB30ELR1jbbIH
-	udlZ9d58mrtgmBuHrnDrPBgCrePOF57RH2X1cDHIjHJK1az9NcvV1uE9rWRCpqLx
-	lLEdXfH5EbD/sGF/n77Y8w1wuRNgEVnB0jaClu9yBbMGfOI4rsIeuHwaSYi+h4gz
-	wfFhd55tWTxSF6C46ayVxw8xmB1D4upkRlwwmK7FkO1UQae6tYbVSDHUVZOl4xmr
-	9ReB+OMufpUmSC3gIShJJKdLfVSsGY7WfrPj+JeYb7+5jcHkzh6iU/BSO4yNKBS/
-	vYioH6MDfHLPRdXb5Vk/Ea77llhOMNN2k4k2OaAai5ApNgLatnuRtfCnlmVe/Wni
-	4qJj+A==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em41rvvp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Oct 2024 05:07:41 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49N57eOm011484
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 23 Oct 2024 05:07:40 GMT
-Received: from [10.110.103.186] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 22 Oct
- 2024 22:07:39 -0700
-Message-ID: <0275bd96-ce6a-454a-a407-b2d8fc60e156@quicinc.com>
-Date: Tue, 22 Oct 2024 22:07:38 -0700
+	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 4EEB21C0064;
+	Wed, 23 Oct 2024 05:16:32 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hmjRp0pUcCoOafADrl77ddVXTh7EgSx3IGLm3UCcntkH5MJWFfm5SdtcLfafZlVyKnE5QAMSOAvpFpOxorB2I99nuTno/rGAYoeL2wO5nF0Cte4dGwKDvZ6YmarmlqXcKdgkG5+zJt3sXV3CaCbC5RQfDiR4DsT92JEXWJtZK+7JC0ETvN+AvRw35PRnMKt7CJLZYbC+URWf9+kd5hEf42f+X/S0Bub7cP/MqGKrMYcQIW602YIYJc8fDqrmrz7MogKLY3tAt/xPOz43qYC3MAxzHS8NrztjppxyYSncwJptYyhbQGFCo645NqmN8MGofBfth0jUSOtwtS/TY7w/lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jAJ77AuWeFjC2DM4GszpBQCKcGfKSbJ6Q/Q1jxQamcY=;
+ b=Dl6OHbMzqJc9D5a53uEeUsb7ZD7M82WrtRpKEYW2Ip886onkQJYCh2QViqAcy6Os4RwAP/BrGLnUBrObA3sfcwE9DCV8gEylC1uDKCVpYhzuQgFdXuLEnQ06EG9F+VKQC03Kadw9HQRdrC8n3iDDqaH/AGvDQz1h+68rwrIxKsrdv+p6lLcCbuewh3YR9rC18I6JTLAScPotf5epvTGSYxxVsKGH9Fw1MIjZ0heGMydcGmAb6E+lV4Wg1qCl+rpUhztv7Cl27YmDEtzLqBcVE1L0hxuU6mdErzp3Vu77IFcTbsirev96uSUsD8+nPRDuYLt6sfpbOE61ZJXSU4zFkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=drivenets.com; dmarc=pass action=none
+ header.from=drivenets.com; dkim=pass header.d=drivenets.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=drivenets.onmicrosoft.com; s=selector2-drivenets-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jAJ77AuWeFjC2DM4GszpBQCKcGfKSbJ6Q/Q1jxQamcY=;
+ b=VSWOU/VdGSfeAkxjplAf9AYnguV6U+SBZGsewfJkEYIbV2BcWhXH/twUXsJJYAhc9Pxw3/1rLZ0kFSM0Bb3Y1TMDkFuB5Ju0waaA8Ajy/OI75Fp7+BdT4Cz+T5vzGkcUA/KE5KlZXb+Yr3a002ig1WegzdZOzRUhk9hDew1pAGI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=drivenets.com;
+Received: from DB8PR08MB5388.eurprd08.prod.outlook.com (2603:10a6:10:11c::7)
+ by DB9PR08MB7721.eurprd08.prod.outlook.com (2603:10a6:10:390::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.16; Wed, 23 Oct
+ 2024 05:16:30 +0000
+Received: from DB8PR08MB5388.eurprd08.prod.outlook.com
+ ([fe80::29dd:6773:4977:dc4e]) by DB8PR08MB5388.eurprd08.prod.outlook.com
+ ([fe80::29dd:6773:4977:dc4e%5]) with mapi id 15.20.8069.027; Wed, 23 Oct 2024
+ 05:16:30 +0000
+From: Gilad Naaman <gnaaman@drivenets.com>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	gnaaman@drivenets.com,
+	kuba@kernel.org,
+	kuniyu@amazon.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v7 1/6] neighbour: Add hlist_node to struct neighbour
+Date: Wed, 23 Oct 2024 05:16:23 +0000
+Message-ID: <20241023051623.3514732-1-gnaaman@drivenets.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <CANn89iKGa9TWnGZJJZAL-B-onmJ7gRXQsWxy=7FvwJr+Y2DuCg@mail.gmail.com>
+References: <CANn89iKGa9TWnGZJJZAL-B-onmJ7gRXQsWxy=7FvwJr+Y2DuCg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO4P123CA0684.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:351::17) To DB8PR08MB5388.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 00/10] QRTR Multi-endpoint support
-To: Denis Kenzior <denkenz@gmail.com>, <netdev@vger.kernel.org>
-CC: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20241018181842.1368394-1-denkenz@gmail.com>
-Content-Language: en-US
-From: Chris Lew <quic_clew@quicinc.com>
-In-Reply-To: <20241018181842.1368394-1-denkenz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: hQxSGMe9pQh4lA7EJBEnGyC0a3KrDg4g
-X-Proofpoint-ORIG-GUID: hQxSGMe9pQh4lA7EJBEnGyC0a3KrDg4g
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 clxscore=1015 mlxscore=0 suspectscore=0 phishscore=0
- mlxlogscore=924 bulkscore=0 adultscore=0 lowpriorityscore=0 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410230028
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB8PR08MB5388:EE_|DB9PR08MB7721:EE_
+X-MS-Office365-Filtering-Correlation-Id: 449e470e-750c-47d3-8196-08dcf321da56
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|52116014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?mbIGmpIUnZaGYPSS5Jq0Rol+5ZMPqhbENHIrGsmz6IPMpMpoWHTFNZ7MLVcO?=
+ =?us-ascii?Q?Fe06i8MhLyxDMIAuFrYW+XUnXbOUiZsxN7TXsoDslO8WUkDp6atCgbNKR8Ro?=
+ =?us-ascii?Q?LaxNQuiKlOcqym2CCj1DxwuiCCY5Nm/E9INw6K+GdQT1auTm2wIKkSwTladJ?=
+ =?us-ascii?Q?oR1Lt23PSReaKSdCkw+f5aMSyDTr8cm5JSasm8x4O1kpSkerIrc+sq18i8mj?=
+ =?us-ascii?Q?Sq4vwAkXRqngHm2HQxroscJMwI7n91Pq7Qx4K2HM43nDxzE1tB6WWiuVmrVW?=
+ =?us-ascii?Q?T7PquhNXnyW6jDp6V9dkzXUaRmrBlNztxirpNGvLfhc63FKcs7e+lsXQ5cOP?=
+ =?us-ascii?Q?o4WxWv0HxGFrFFMj9f8Q2niFprcefTaFOoIiWkda/nNgS0eCstasG8kYdszk?=
+ =?us-ascii?Q?vnk/JGEehiiwiNk7lKUspmLQcmjKdfHoC6hua9hHWi3PLVeEb85WgRsfeXel?=
+ =?us-ascii?Q?LxWw3QlZH9+H9scNRQaJbPe1JJx4d0/AnD6FKcCqgN3NHulFmCWgVKbhjX39?=
+ =?us-ascii?Q?ynzkcARCRM3P1+e0FOXUHiGhEbd41R4hjqwTf8mH55niQk5+izAl3Jsotem7?=
+ =?us-ascii?Q?Crse4s01Uw4e+XMrF16iFbBcdIxw/Xi0eQYiHHkDqhnyPu+PnYmDbVtsaJ1P?=
+ =?us-ascii?Q?k6DkGjozJxP5u1frYHYj9sN9gjJB64rBvj9a3PjcJ+ZjPyinRjc1w38n3njT?=
+ =?us-ascii?Q?JasOyxSNi046VRuZk12Q+hLLT4sTL0LxMMzzdMpMOTYWjz7/9L41hF5yurTJ?=
+ =?us-ascii?Q?FMTxb66AGlvmIoTelAvTKeeLH5haMC1Snvl9wwXddRSW1KU6mPornNrctUkd?=
+ =?us-ascii?Q?S8hm0SFGexYai4aY+HarRQuX4DXRaIk2ZuV4s49daNkyg/psAXUMZ9PKmd3e?=
+ =?us-ascii?Q?3Ub1FoLdmNovS10Xehe5Fr1c8YMOpr2IFUcsXx1JdWfkjVskKNuVy8IeSL5b?=
+ =?us-ascii?Q?gMLDhb2Sslsr78xNEZfocxGiyM9cB/HXazRINJv/eptCvFUt2vKIxAMCifhs?=
+ =?us-ascii?Q?v9pCtB0qDL1IrQKrVjF90Yv9adFfPIsI59jbjF2Dpp1PdI87iyT7eNzmGOJD?=
+ =?us-ascii?Q?7hAED+IgX2kDhuZav1rBPQulA50L2CYdoSovwFHdsEI70RnchQPtH2NVENIf?=
+ =?us-ascii?Q?zvfIjSZvYdzAaa+miUl46avZxzOR4sl6k8tH3Kv6sbFhfpzDds/BANxj3sB+?=
+ =?us-ascii?Q?ZB2cG0AKxnHIVCBryds6qTKdqFkFXcXPOr+5G6gFF+cgckmZtieCqVbrLCIn?=
+ =?us-ascii?Q?7BbEEA0zQv6iqPA5jy3kGzDDUbBZum6lImZ9QFL69qlCCqgEIrZmr3ezeiWY?=
+ =?us-ascii?Q?nUfR7vRLJKAvMA10FywLL42Z5x/+pyia174lPWXr0Dh0l5G/qb+OQU6EZMKy?=
+ =?us-ascii?Q?vebNstc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR08MB5388.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(52116014)(366016)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?E7DkvEPuAg+bwYptcyVS+Grw6Am6Znr4i3ta9Ceut0VlX89M55uZU1exZopA?=
+ =?us-ascii?Q?A1wVfK/WQR01/mpyiMf+LLraeiFtzyPJdPT1RdLq84rlh54T9mogTMxme5lb?=
+ =?us-ascii?Q?/N+YV+1MefutIEEgDcVWlRLdxAx+1e9LsEpM3n+B5DgzetWpt9bfMC0xwn3e?=
+ =?us-ascii?Q?yC/B211LU8ZElzSiwSOubA9NFsXt1KlTQ2T68kdhsT56fqJnhkn4+3gi0IRt?=
+ =?us-ascii?Q?6c/0YrSkaPG5EFETOpEr/AIy3UB46JbFan20zfptKNl0IPx9YPb0/i+DOEC8?=
+ =?us-ascii?Q?q9y6CX0bLCCHJtzT1C+VFep8QxYQlC/IjOI56g4T7rr5QP+xFI+mvCO2b8XE?=
+ =?us-ascii?Q?qEp10a2tS0r/wlmaqmFJBqTzG0Kq64tU0nqXJU81p5oRYhCcSBOiXMWjr/iv?=
+ =?us-ascii?Q?gHugt0TDxrFqx9pd9ALvTAIglt24uJpJPRNFtUYvp2diY1vWQlksS5Kb1HvJ?=
+ =?us-ascii?Q?odWkqguV8ctZ8XamQ9Qk5E+cv8BX8GcexSdpXuk11KKBGVYRzyky2PVYC3fp?=
+ =?us-ascii?Q?knWCsQXeOEYsdNvLsd5uTXrvO7zk3xJKUcjaSYVpRZKOuS15J1bNiJWokI8u?=
+ =?us-ascii?Q?qClpqDiL6SFc81mXmr+VEMmrs+U/AgWsJwjgAZy6+qmevI8lFMk88+5kNxkS?=
+ =?us-ascii?Q?WXE1bZjSFRK2EcaSOd/NrxJZ65q77Lf+JFpwdxLEPEcF5A7nOHVdaucDCyRK?=
+ =?us-ascii?Q?DUQpDSFKglDbNQErWLn3fYjTjcPkBQDQWhtIP475DNBxZzQEVDFdV73YlF61?=
+ =?us-ascii?Q?7IJXmt3HjwkFMpZuKHEaR0A+y3D+fRP9dXWsRottEiPZC8MxzeUcyH8WC5eF?=
+ =?us-ascii?Q?3p2jySffHQwMLhBcAgbt+UFMpt5fvWsczvfW4Nb6lDnhayQ6ihYz4Ur01Eik?=
+ =?us-ascii?Q?rpIc6PcmjuBveWpCkD2yorhrM7WmSSgRBRYT0FosQMkLxwJQUGul4Z8F9KhJ?=
+ =?us-ascii?Q?a3fsRTr+jqE90/S2M6GV1MzM6+GR0RKQIqrr01IRvdByiDKsUp/uqc3uH2wV?=
+ =?us-ascii?Q?yePG6gga1rr3KnNfchZyeDmRCIenkrIt6BvUTeY113OqYFecsNqbCSoaYqMZ?=
+ =?us-ascii?Q?NSDZJUsvjddJNnTYyPisvhgjrCOYEE3E4ma400RKdaQq2d2/BdQlnMWkD2cK?=
+ =?us-ascii?Q?cA4ust3hk4IDBpbbj4p4XfE/MQsgyrdtgxBs2/kHnGaqWLk0gpHy/aJidNbd?=
+ =?us-ascii?Q?umcrRzSRA8Fym1mYXSlvyGJjfYIkyVPpHNSoTX9EDbwx8ewuzT+5BX98o1/h?=
+ =?us-ascii?Q?m4J053ExqDw8Stu4Tg3/vaerDzM8/uQnuZD8UkeN0SbO28fabwxWZc+YquMH?=
+ =?us-ascii?Q?BZDTuzJHURvL3DVTIKkL5K6H0FZ52402Mu4tYDq6HutmSABMzCbZ0KV6qYNL?=
+ =?us-ascii?Q?0RZL++Ej9GtQAueugMLHxuO3hb97wEAs7h0Xz3bLWn5ItdepbCsWQYpcNzaC?=
+ =?us-ascii?Q?ZrIw+UlD1TfX1GnepVHGHvyPSMUgmroiNZD7Ju0lyKQ8OSuFE3a22ivqQ3kr?=
+ =?us-ascii?Q?i5uqrSzRijeOy2SRGoTTJsjb2Fs8PSqC8rWQ+W6Op0T4ZYOLalRdWVFFmf2A?=
+ =?us-ascii?Q?I068RcOlhLUAJJEObRRhm8hJ6L252uIsECFOrVrHEea0wxm7QhJN01pXgT3B?=
+ =?us-ascii?Q?lg=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	fwkMp/nIiF1RoamBMNmFuAcPle39glrfOGhWMbHuIJIGddAbL3zYX3sIaxskFgD79UBiDWBFQa3omUIR6fmVbHo42jzdSdNFtiFg/QvN+nRp1Fo9av9SYT8dED4vr44PnJHlO2mlFPcKtae+UiOu2iqBf4nTsqdU+MTtn81HAjoz0bRFwjAfgGdZ7H5+lYdNwMfvQTO2oWLEQsg2PnVEmvkQk9u3JLrbTXhCusWPuDan0JRI2fn9WwyctZmeIA09ULhqtMz+PQFZdj8aa/v87P/OzASybf2xyJIHYEiqyIXlCjXlrBe5sudcMGXBHiAb46D/26zxqt9Dpdn7iM6Ebj6CVebSKn2hVMbJxOrb58PQwoW9sDjziaGmVXMq1DJyD9EOi2PpSFMYYRgFjj+jUhfCvaUMSeb6/l3qzthG4KrMkfofXjiAqnaL5wCD8CbNYSfk7bpABdlKPjz55XrLk8bLkqjpj9xTxx56m24dWYQkt8/8PgLAtjsj3rRKRiGnqDORG9V7/2VOjIBeFcHs3cgQua+vGbvlAB1WMjKF9gHUGyGy38P9xG4qVSPI1IUuiuiuB5rAP2Gyw4rNVKFH5134VgXnE0hj1CICitoE6OMzVyU8YAgDlHM9vpkleJgb
+X-OriginatorOrg: drivenets.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 449e470e-750c-47d3-8196-08dcf321da56
+X-MS-Exchange-CrossTenant-AuthSource: DB8PR08MB5388.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 05:16:30.5008
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 662f82da-cf45-4bdf-b295-33b083f5d229
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ms1QzjoLwfonIvV4Kzj4ikXRAQmiXCZQadmv+3T5h9FR3D4Luufc7kWIvhkdtnIjpWo/xOBauurQfkepVN+PIg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB7721
+X-MDID: 1729660593-olTLF5huz2ao
+X-MDID-O:
+ eu1;ams;1729660593;olTLF5huz2ao;<gnaaman@drivenets.com>;495c1e7a27a6c3e35a5fabc922783896
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
 
+> Oh well, I strongly suggest we first switch to kvzalloc() and
+> kvfree(), instead of copy/pasting old work arounds...
 
-On 10/18/2024 11:18 AM, Denis Kenzior wrote:
-> The current implementation of QRTR assumes that each entity on the QRTR
-> IPC bus is uniquely identifiable by its node/port combination, with
-> node/port combinations being used to route messages between entities.
-> 
-> However, this assumption of uniqueness is problematic in scenarios
-> where multiple devices with the same node/port combinations are
-> connected to the system.  A practical example is a typical consumer PC
-> with multiple PCIe-based devices, such as WiFi cards or 5G modems, where
-> each device could potentially have the same node identifier set.  In
-> such cases, the current QRTR protocol implementation does not provide a
-> mechanism to differentiate between these devices, making it impossible
-> to support communication with multiple identical devices.
-> 
-> This patch series addresses this limitation by introducing support for
-> a concept of an 'endpoint.' Multiple devices with conflicting node/port
-> combinations can be supported by assigning a unique endpoint identifier
-> to each one.  Such endpoint identifiers can then be used to distinguish
-> between devices while sending and receiving messages over QRTR sockets.
-> 
-> The patch series maintains backward compatibility with existing clients:
-> the endpoint concept is added using auxiliary data that can be added to
-> recvmsg and sendmsg system calls.  The QRTR socket interface is extended
-> as follows:
-> 
-> - Adds QRTR_ENDPOINT auxiliary data element that reports which endpoint
->    generated a particular message.  This auxiliary data is only reported
->    if the socket was explicitly opted in using setsockopt, enabling the
->    QRTR_REPORT_ENDPOINT socket option.  SOL_QRTR socket level was added
->    to facilitate this.  This requires QRTR clients to be updated to use
->    recvmsg instead of the more typical recvfrom() or recv() use.
-> 
-> - Similarly, QRTR_ENDPOINT auxiliary data element can be included in
->    sendmsg() requests.  This will allow clients to route QRTR messages
->    to the desired endpoint, even in cases of node/port conflict between
->    multiple endpoints.
-> 
-> - Finally, QRTR_BIND_ENDPOINT socket option is introduced.  This allows
->    clients to bind to a particular endpoint (such as a 5G PCIe modem) if
->    they're only interested in receiving or sending messages to this
->    device.
-> 
-> NOTE: There is 32-bit unsafe use of radix_tree_insert in this patch set.
-> This follows the existing usage inside net/qrtr/af_qrtr.c in
-> qrtr_tx_wait(), qrtr_tx_resume() and qrtr_tx_flow_failed().  This was
-> done deliberately in order to keep the changes as minimal as possible
-> until it is known whether the approach outlined is generally acceptable.
-> 
-
-Hi Denis,
-
-Thank you for taking a stab at this long standing problem. We've been 
-going back and forth on how to solve this but haven't had anyone 
-dedicated to working out a solution. From a first pass I think this 
-looks very reasonable and I only have a few nitpicks here and there. 
-Hopefully Bjorn and Mani will provide more feedback.
-
-Thanks!
-Chris
-
-
-> Denis Kenzior (10):
->    net: qrtr: ns: validate msglen before ctrl_pkt use
->    net: qrtr: allocate and track endpoint ids
->    net: qrtr: support identical node ids
->    net: qrtr: Report sender endpoint in aux data
->    net: qrtr: Report endpoint for locally generated messages
->    net: qrtr: Allow sendmsg to target an endpoint
->    net: qrtr: allow socket endpoint binding
->    net: qrtr: Drop remote {NEW|DEL}_LOOKUP messages
->    net: qrtr: ns: support multiple endpoints
->    net: qrtr: mhi: Report endpoint id in sysfs
-> 
->   include/linux/socket.h    |   1 +
->   include/uapi/linux/qrtr.h |   7 +
->   net/qrtr/af_qrtr.c        | 297 +++++++++++++++++++++++++++++++------
->   net/qrtr/mhi.c            |  14 ++
->   net/qrtr/ns.c             | 299 +++++++++++++++++++++++---------------
->   net/qrtr/qrtr.h           |   4 +
->   6 files changed, 459 insertions(+), 163 deletions(-)
-> 
+Hey, thank you for going over this.
+I see you've posted a patch that changes this, I'll rebase and absorb it.
 
