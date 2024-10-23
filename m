@@ -1,162 +1,176 @@
-Return-Path: <netdev+bounces-138038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7239ABA50
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 02:04:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C70E59ABA59
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 02:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E8431F23E54
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 00:04:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 776B71F24097
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 00:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DF2211C;
-	Wed, 23 Oct 2024 00:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D72380;
+	Wed, 23 Oct 2024 00:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="W7B9glwO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWxC+8Aa"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60016182;
-	Wed, 23 Oct 2024 00:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455F2196;
+	Wed, 23 Oct 2024 00:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729641845; cv=none; b=qQH4xvIHowR2uzKybLkLdTpT3tPnF+yZiGxgGw9K52Bqi/9KYoHUX3YIwO2ztVY8iENqFUlPwZ8lfA8pUmt+chTM49VkHBhTLw2kHsR64Ni0DK+oqu/0GNt7Fd/hrK9XaU/aMJ47mZsPNdg6dKY1KPm0f7AKnlDh/1eWT/9pKYw=
+	t=1729641975; cv=none; b=cQHTQ3YFQWIOQYucQ6I1QmP6l7oYPpQk9KqGLceOH6mBaKIOvwf20uOTUcLLDEANCmTZQtUPfkNwP8ZjKwjWEXX7IRe6d95ycX5Iex9etwHST/78Kc2AK5JBt9t/Bc9Hna7/oXRMLmugFJV88FsZMyxfSn8tEikcRAmvKEHa5Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729641845; c=relaxed/simple;
-	bh=BS3twbZ5C6CqufKtgBl7yFiz4Th4SXUn3z0s0DmuctI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iPa/f40MGfrflY5XrApMSKJs8UR1rKg4vzZRYgBu/3s0yyohR1Y3fkd4ufYxTPecsC/CnHJ/o5aAqvWkXbX/jjPLBAMsFFoMjUlEyiGAjeAebN9ISRMdEoPAirl8/AGD/Ogz+k5jUDF5X9mFscEpDy9yFmZZnQ3wV3CoHCn/xQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=W7B9glwO; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 0604621112FB;
-	Tue, 22 Oct 2024 17:04:02 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0604621112FB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1729641843;
-	bh=BSb0pSoDio3rfbTxA/Zn5HqyVgKFFvAwXvG36oPMm5A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=W7B9glwOso1LY6SeJ5JgRjNbXl8nw9FwsuxxkoDI1KlFSFB//2dXCNi0FWwhuCyFE
-	 IOZ6i+ipbig3SDZ2Bz92iF0LOgqTgQxeWjJTR8AQbWPoSVm0ApXkTXAN9h1/uZLuu/
-	 7kzQtW5Iw3AXshGs3dfUWNkGEtI/O2obLyU5wd28=
-Message-ID: <c426d122-4ba3-4193-80d5-a40d7554d324@linux.microsoft.com>
-Date: Tue, 22 Oct 2024 17:04:01 -0700
+	s=arc-20240116; t=1729641975; c=relaxed/simple;
+	bh=ZV86+OPN4zJI02u88jEs4H/PJ4cF9CFOZqdC6JlySjw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=m7CGqdxAsDXpzYgi8s2vbw9DPROAWagE5hF9q/V/EypC4DSQn/xkuqr9YT8LPhB6JvqQ5C8rrfPCe3S0+ysywKXi+qeBbX0k2RPpgghidfYWRrFxXGgoYQxgc2NfeQAogYpq/GLdh4qS4Ql2F0Q3oLEvu/as6akkrRBgy69IlH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWxC+8Aa; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7b149ef910eso498395985a.3;
+        Tue, 22 Oct 2024 17:06:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729641973; x=1730246773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2E1y0zXz0FAjgbstvMGXHQS2tqPf8pF30lCKWcGHyaw=;
+        b=hWxC+8AaDzCoke3xemoXZi5qIQ/SLyaiMeZA+awSIZLgUgW7AnIy3c4zpXf3GbKhLb
+         xzrRjK9FWKa524GnVRAj1KBtXKIq49oxd91BZNQpFKM0Yu31dWZt1BHIB5nddSrZCTAL
+         CLtN7ahjt7e0wD2m08B9qyD6kL0JMzUekqRpDUogNm3k6wHqqGDJO+xB88sulFX4f7dN
+         Y62kiWU6CkgTkqMQ5NGmOWZz0/J4BcfH2WEvyQCKJjYO8iO6m1yHAaX9ENf6EgH0pqlA
+         3+m0m5uyRCyxivAYF4GgDnERrsoRl+KIT0WwxbpWN7tZC3lYRk3y1rONPpwprAF0PrCZ
+         N/Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729641973; x=1730246773;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2E1y0zXz0FAjgbstvMGXHQS2tqPf8pF30lCKWcGHyaw=;
+        b=kxInik9uUzMNYtvmRjceaLidwIOECUOKr6WZ/E7pFjrZ6pNw9n9BKL9SqamOdiVvZA
+         ZZjKQLgFDaYjb1LCpcT33ljc0LntBxnLbmsXXAuxlmAeMb1nYhEZVtmLXBPgA/RViB+y
+         V1Od0G+TG4CkYcstBAxdQNN+qjSFQ5BtMDOvgdJbo6i0LieZO4oqQA4h0KwHhrOb/fD8
+         Ixj9A9tLRdT9YmY5ZRyrmGUytVlPRpxWVyoYgdiaOz/j6tk6ebyduP4HXKAeMFxpU4uk
+         GRZDgwmEmeIS2X6P8GKg+ZCF0EQ7GYJ7rw6hdEiceK+/9UqoNACsghJG9xBRfnYkRGzB
+         IaRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXy/MZYtSudtXJgZ1da5KJdSlMqFA6i+KiZFBR65o5VgLkK+CX+RJVmc8UOSKvkCYHFy4=@vger.kernel.org, AJvYcCXTkMx3Bzp3HKP0er+3SVH58u//DkfPqLk5WvcDV8+c0h93jvwZLhUuYlOVK2kQvDsR5rMhzSSM@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGdndL/pKtBL485/TSn3VKWayZLW4Pp6bZhgHkkgKlAxB3n1lN
+	FvbYBlZdpgjUDhJe2296dh9HG19x9TFjVJP9c2gBVXaloD8nQppC
+X-Google-Smtp-Source: AGHT+IHfptJqp/QF/XIdias5Hsqh4fJZTPF+NRTGdR3IVT0BYEJk0V11bp4jlqsTUCSieYrnn4sQgA==
+X-Received: by 2002:a05:620a:24d3:b0:7b1:4f21:39de with SMTP id af79cd13be357-7b17e4afbcfmr115973785a.0.1729641973039;
+        Tue, 22 Oct 2024 17:06:13 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b165a89c96sm330948185a.131.2024.10.22.17.06.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2024 17:06:11 -0700 (PDT)
+Date: Tue, 22 Oct 2024 20:06:11 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemb@google.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <67183df34e8e3_1420e5294a2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoCBONnrP_YyE_0n_o4zQUNJfE8DY61f6XRQeeBdGNZMgQ@mail.gmail.com>
+References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
+ <20241012040651.95616-3-kerneljasonxing@gmail.com>
+ <cb96b56a-0c00-4f57-b4b5-8a7e00065cdc@linux.dev>
+ <670ee4efea023_322ac329445@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCBONnrP_YyE_0n_o4zQUNJfE8DY61f6XRQeeBdGNZMgQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 02/12] net-timestamp: open gate for
+ bpf_setsockopt
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] RE: [PATCH 0/5] Add new headers for Hyper-V Dom0
-To: MUKESH RATHOR <mukeshrathor@microsoft.com>,
- Michael Kelley <mhklinux@outlook.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-Cc: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
- <haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
- <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
- "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
- "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
- "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
- <d70bbad7-bcad-2031-a4e1-755b502422a4@microsoft.com>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <d70bbad7-bcad-2031-a4e1-755b502422a4@microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Michael - sorry for the delay, I just got back from vacation.
+Jason Xing wrote:
+> On Wed, Oct 16, 2024 at 5:56=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Martin KaFai Lau wrote:
+> > > On 10/11/24 9:06 PM, Jason Xing wrote:
+> > > >   static int sol_socket_sockopt(struct sock *sk, int optname,
+> > > >                           char *optval, int *optlen,
+> > > >                           bool getopt)
+> > > >   {
+> > > > +   struct so_timestamping ts;
+> > > > +   int ret =3D 0;
+> > > > +
+> > > >     switch (optname) {
+> > > >     case SO_REUSEADDR:
+> > > >     case SO_SNDBUF:
+> > > > @@ -5225,6 +5245,13 @@ static int sol_socket_sockopt(struct sock =
+*sk, int optname,
+> > > >             break;
+> > > >     case SO_BINDTODEVICE:
+> > > >             break;
+> > > > +   case SO_TIMESTAMPING_NEW:
+> > > > +   case SO_TIMESTAMPING_OLD:
+> > >
+> > > How about remove the "_OLD" support ?
+> >
+> > +1 I forgot to mention that yesterday.
+> =
 
-On 10/10/2024 6:34 PM, MUKESH RATHOR wrote:
-> 
-> 
-> On 10/10/24 11:21, Michael Kelley wrote:
->  > From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: 
-> Thursday, October 3, 2024 12:51 PM
->  >>
->  >> To support Hyper-V Dom0 (aka Linux as root partition), many new
->  >> definitions are required.
->  >>
->  >> The plan going forward is to directly import headers from
->  >> Hyper-V. This is a more maintainable way to import definitions
->  >> rather than via the TLFS doc. This patch series introduces
->  >> new headers (hvhdk.h, hvgdk.h, etc, see patch #3) directly
->  >> derived from Hyper-V code.
->  >>
->  >> This patch series replaces hyperv-tlfs.h with hvhdk.h, but only
->  >> in Microsoft-maintained Hyper-V code where they are needed. This
->  >> leaves the existing hyperv-tlfs.h in use elsewhere - notably for
->  >> Hyper-V enlightenments on KVM guests.
->  >
->  > Could you elaborate on why the bifurcation is necessary? Is it an
->  > interim step until the KVM code can use the new scheme as well?
+> Hello Willem, Martin,
+> =
 
-It's not strictly necessary. We chose this approach in order to
-minimize any potential impact on KVM and other non-Microsoft-
-maintained code that uses hyperv-tlfs.h. As Mukesh mentioned below,
-eventually it will be better if everyone uses the new headers.
+> I did a test on this and found that if we only use
+> SO_TIMESTAMPING_NEW, we will never enter the real set sk_tsflags_bpf
+> logic, unless there is "case SO_TIMESTAMPING_OLD".
+> =
 
->  > Also, does "Hyper-V enlightenments on KVM guests" refer to
->  > nested KVM running at L1 on an L0 Hyper-V, and supporting L2 guests?
->  > Or is it the more general KVM support for mimicking Hyper-V for
->  > the purposes of running Windows guests? From these patches, it
->  > looks like your intention is for all KVM support for Hyper-V
->  > functionality to continue to use the existing hyperv-tlfs.h file.
+> And I checked SO_TIMESTAMPING in include/uapi/asm-generic/socket.h:
+> #if __BITS_PER_LONG =3D=3D 64 || (defined(__x86_64__) && defined(__ILP3=
+2__))
+> /* on 64-bit and x32, avoid the ?: operator */
+> ...
+> #define SO_TIMESTAMPING         SO_TIMESTAMPING_OLD
+> ...
+> #else
+> ...
+> #define SO_TIMESTAMPING (sizeof(time_t) =3D=3D sizeof(__kernel_long_t) =
+?
+> SO_TIMESTAMPING_OLD : SO_TIMESTAMPING_NEW)
+> ...
+> #endif
+> =
 
-You're correct - "all KVM support for Hyper-V" is really what I meant.
-> 
-> Like it says above, we are creating new dom0 (root/host) support
-> that requires many new defs only available to dom0 and not any
-> guest. Hypervisor makes them publicly available via hv*dk files.
-> 
-> Ideally, someday everybody will use those, I hope we can move in
-> that direction, but I guess one step at a time. For now, KVM can
-> continue to use the tlfs file, and if there is no resistance, we
-> can move them to hv*dk files also as next step and obsolete the
-> single tlfs file.
-> 
-> Since headers are the ultimate source of truth, this will allow
-> better maintenance, better debug/support experience, and a more
-> stable stack. It also enforces non-leaking of data structs from
-> private header files (unfortunately has happened).
-> 
-> Thanks
-> -Mukesh
-> 
+> The SO_TIMESTAMPING is defined as SO_TIMESTAMPING_OLD. I wonder if I
+> missed something? Thanks in advance.
 
-Thanks for providing the additional context, Mukesh.
+The _NEW vs _OLD aim to deal with y2038 issues on 32-bit platforms.
 
-Nuno
+For new APIs, like BPF timestamping, we should always use the safe
+structs, such as timespec64.
 
+Then we can just use SO_TIMESTAMPING without the NEW or OLD suffix.=
 
