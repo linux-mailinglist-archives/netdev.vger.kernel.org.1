@@ -1,205 +1,95 @@
-Return-Path: <netdev+bounces-138262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45939ACB9F
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:51:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A0A09ACBA7
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:52:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B7D1C221A8
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:51:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 387741C2237F
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC41D1BFE01;
-	Wed, 23 Oct 2024 13:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8344F1C3042;
+	Wed, 23 Oct 2024 13:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d95We1WZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jbyLCrQ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF7F1BDA8F
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 13:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2D01C3030
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 13:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729691417; cv=none; b=ckNE7ZS0NerZyXsfMoKFhsM+DCxRuhkMwC+j8XYH8/JzlXUypzv+gXS1dfb81eiYTCVRSDDV6Pr8T7EWlY/z801jnbnOc4FmQ/C7beOQi29pjSHpEFP0ODYHogA/iFmdhaJqgzBT+zgIeQsVCUMFVAFmibBD4vHlJ286WDjo49I=
+	t=1729691420; cv=none; b=UjnBdIX7FTATzerBJJrzGKZRwkaqwJKdyQY4UR41g/3LqctT8tt9LmMcCJqnOrnc4G/IPSkFy0JxhADFL+rmnKH+HJLprsK9lk4unURPhg3zujvIDfFQYEKot11cMghOxXbFkj5slwSQgfZMtAaIGTXmT9npU26ew5rduPnMSh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729691417; c=relaxed/simple;
-	bh=1CTS0Ugnf9jJBC1ruM/WIiADBY5GmrMIo6GSJ3E70PI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DwPZryUnKpCQOLK7hSpSAdqEMMjS6rYkPmSoXn1jX5kKH+ruLHhd5rzgqrHJY44dl41HmrDAPsrpuPJopWRyuCSRbMHFxpygedba6+0B18ZmT92qxbn3OT8Nul+cApbLvvnv6E/FGyi3VUOWzt0sPBqT3aWVYMUTuxjf9cUgdYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d95We1WZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729691414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oO7/c3KxFQ4pCLrpHRIQyFFVX9SeNU/L27HBNV7OVps=;
-	b=d95We1WZBbUdVyDSFgIvU8zgDceWjJa5cmeHp624v+Z/g5Sry4W1+LvpqC2UquTYy5le6z
-	mdUq1Pb78mNpYhkiILLaP+xU0ZrMPnMfdNJYt1NIS+rJJggkOUWu7ePkh25BDCEA92vkLI
-	LWEOXfgFl9WSkjphcdhRbUxfXpf3ORg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-WwO5vAUXNQW8oC9OwfZyBg-1; Wed, 23 Oct 2024 09:50:13 -0400
-X-MC-Unique: WwO5vAUXNQW8oC9OwfZyBg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315e8e9b1cso5513175e9.1
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 06:50:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729691412; x=1730296212;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oO7/c3KxFQ4pCLrpHRIQyFFVX9SeNU/L27HBNV7OVps=;
-        b=RKM7yODPz31W6D61xrgV76NE2pmvpPuArAps0Vwoc4mzSV6VZQcGK6ojSAv7uUkTlk
-         Bd9c5PDy0XEoSEJSuCkt2+XL/8QdU9gBr8Fr3ZvH+RdN69HOIn6ibbCSl4/4Y2BV7tlO
-         TRc3w+ia7MDjoN/APoLyXxMvA6RnmzWZiGVi4iaQBCxRTFUC1kChZGt4vAJkrmD8h5Qg
-         9Aa+7ZaQq1oEpLKfTzM1V3NljyO0hYuNfZrNpj9K03MMIxYEmoQHzI/vnvZsZoe+Nh1r
-         iIAQGzLHK7cUJDkJCyjH1r+qA+ueBiVhbP+0z0QsPTRvVMmwpcp3vmGZgDNROd3QPjpZ
-         CAZA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8mxG3FyBPyoyJhzJ9smQ8VlHWqbjrKbiQ5tPU0DwNtXKKq2mFQTsZ7sTtnTlNfVc0PC/DfkQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyhr9KEKo6pyx6LjVB1LpqwTGiM8yo8v1pM3UD6vOqz4qOBqhBl
-	bOVK5WRKoiBJalBjzBJsw7yIWPWhv24E/uYE3aTW4yNDUvxtMUx1+DFieViCNc50FG4DL4f2x5S
-	SZP4fQKJ7Udg5MNxjCagEhY46HFwg57cVQ675ip3kaOMply5tDDS0Xw==
-X-Received: by 2002:a05:600c:4f43:b0:42f:84ec:3e0 with SMTP id 5b1f17b1804b1-4317bd88469mr48316385e9.9.1729691412200;
-        Wed, 23 Oct 2024 06:50:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHVbS2v+nb51IE57ofZXQEpzrUukFuey0NWkF8DOXs6/K2mGsAvF2UpvyCTTgP3Onw94z3R5g==
-X-Received: by 2002:a05:600c:4f43:b0:42f:84ec:3e0 with SMTP id 5b1f17b1804b1-4317bd88469mr48316115e9.9.1729691411741;
-        Wed, 23 Oct 2024 06:50:11 -0700 (PDT)
-Received: from eisenberg.fritz.box ([2001:16b8:3dac:2f00:8834:dd3a:39b8:e43b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186be7605sm16955265e9.19.2024.10.23.06.50.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 06:50:11 -0700 (PDT)
-Message-ID: <6f3db65fe9a5dcd1a7a8d9bd5352ecb248ef57b1.camel@redhat.com>
-Subject: Re: [PATCH 02/13] ALSA: hda_intel: Use always-managed version of
- pcim_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Takashi Iwai <tiwai@suse.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
- <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
- <yi.l.liu@intel.com>,  Christian Brauner <brauner@kernel.org>, Ankit
- Agrawal <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette
- Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Wed, 23 Oct 2024 15:50:09 +0200
-In-Reply-To: <87v7xk2ps5.wl-tiwai@suse.de>
-References: <20241015185124.64726-1-pstanner@redhat.com>
-	 <20241015185124.64726-3-pstanner@redhat.com> <87v7xk2ps5.wl-tiwai@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1729691420; c=relaxed/simple;
+	bh=bZxQ2R7b3aRIojaoqJk3orxm14+59bsNw4zOBf9WlIU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=S5K4qgFfrF3KE9nC+pKYbjjue5X+v400v9k0iFAEYFY0qur/dhGzSlrjCQPuDmqxjGYOZ9iaHLgD3FA7Tpw+heY9l34fNeTT+XQNxE0wYNREzY9d5jX/h6Ry4apHkbV2yBXjaCVSTWGNo2Sstk87IegBfQY9qliW5+5FW9ccqWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jbyLCrQ6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D62C4CEC6;
+	Wed, 23 Oct 2024 13:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729691419;
+	bh=bZxQ2R7b3aRIojaoqJk3orxm14+59bsNw4zOBf9WlIU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jbyLCrQ64L6aWtgbTc6PhUQe1GULPrpmRPNqGo3MqK9g6/APltVj/sNKDBvMUQalN
+	 IwzAJAaVF2FfMlOgYYWLvbbrscidj2+4uV1mtMpDdHgM2npWJtHcyuPA2EUQHJJmHW
+	 krwbWkaZcC5GqXSOkxa878Es0oijB9Yq+VluFY8v/SG2MqBGlMR8zUxtUURKB800n+
+	 HfpnMlYE4PXmW5+vLYFfUnth2by8OrrWOEKj3XA5QWnSJtdBBoZz3XJNWPcJDPyuFH
+	 qi9NzmxtU8wcBWQRUDMxebHHT37+DT3mbLNjBcTcds/gdfbCmjp9liK3Lq3QScfWVk
+	 BLXb9hUpXYMQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DAD3809A8A;
+	Wed, 23 Oct 2024 13:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] r8169: avoid unsolicited interrupts
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172969142626.1602801.8477515665974007178.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Oct 2024 13:50:26 +0000
+References: <78e2f535-438f-4212-ad94-a77637ac6c9c@gmail.com>
+In-Reply-To: <78e2f535-438f-4212-ad94-a77637ac6c9c@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ netdev@vger.kernel.org, romieu@fr.zoreil.com
 
-On Tue, 2024-10-22 at 16:08 +0200, Takashi Iwai wrote:
-> On Tue, 15 Oct 2024 20:51:12 +0200,
-> Philipp Stanner wrote:
-> >=20
-> > pci_intx() is a hybrid function which can sometimes be managed
-> > through
-> > devres. To remove this hybrid nature from pci_intx(), it is
-> > necessary to
-> > port users to either an always-managed or a never-managed version.
-> >=20
-> > hda_intel enables its PCI-Device with pcim_enable_device(). Thus,
-> > it needs
-> > the always-managed version.
-> >=20
-> > Replace pci_intx() with pcim_intx().
-> >=20
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > ---
-> > =C2=A0sound/pci/hda/hda_intel.c | 2 +-
-> > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/sound/pci/hda/hda_intel.c b/sound/pci/hda/hda_intel.c
-> > index b4540c5cd2a6..b44ca7b6e54f 100644
-> > --- a/sound/pci/hda/hda_intel.c
-> > +++ b/sound/pci/hda/hda_intel.c
-> > @@ -786,7 +786,7 @@ static int azx_acquire_irq(struct azx *chip,
-> > int do_disconnect)
-> > =C2=A0	}
-> > =C2=A0	bus->irq =3D chip->pci->irq;
-> > =C2=A0	chip->card->sync_irq =3D bus->irq;
-> > -	pci_intx(chip->pci, !chip->msi);
-> > +	pcim_intx(chip->pci, !chip->msi);
-> > =C2=A0	return 0;
-> > =C2=A0}
-> > =C2=A0
->=20
-> Hm, it's OK-ish to do this as it's practically same as what
-> pci_intx()
-> currently does.=C2=A0 But, the current code can be a bit inconsistent
-> about
-> the original intx value.=C2=A0 pcim_intx() always stores !enable to
-> res->orig_intx unconditionally, and it means that the orig_intx value
-> gets overridden at each time pcim_intx() gets called.
+Hello:
 
-Yes.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
->=20
-> Meanwhile, HD-audio driver does release and re-acquire the interrupt
-> after disabling MSI when something goes wrong, and pci_intx() call
-> above is a part of that procedure.=C2=A0 So, it can rewrite the
-> res->orig_intx to another value by retry without MSI.=C2=A0 And after the
-> driver removal, it'll lead to another state.
+On Fri, 18 Oct 2024 11:08:16 +0200 you wrote:
+> It was reported that after resume from suspend a PCI error is logged
+> and connectivity is broken. Error message is:
+> PCI error (cmd = 0x0407, status_errs = 0x0000)
+> The message seems to be a red herring as none of the error bits is set,
+> and the PCI command register value also is normal. Exception handling
+> for a PCI error includes a chip reset what apparently brakes connectivity
+> here. The interrupt status bit triggering the PCI error handling isn't
+> actually used on PCIe chip versions, so it's not clear why this bit is
+> set by the chip. Fix this by ignoring this bit on PCIe chip versions.
+> 
+> [...]
 
-I'm not sure that I understand this paragraph completely. Still, could
-a solution for the driver on the long-term just be to use pci_intx()?
+Here is the summary with links:
+  - [net,v2] r8169: avoid unsolicited interrupts
+    https://git.kernel.org/netdev/net/c/10ce0db78700
 
->=20
-> In anyway, as it doesn't change the current behavior, feel free to
-> take my ack for now:
->=20
-> Acked-by: Takashi Iwai <tiwai@suse.de>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thank you,
-P.
-
->=20
->=20
-> thanks,
->=20
-> Takashi
->=20
 
 
