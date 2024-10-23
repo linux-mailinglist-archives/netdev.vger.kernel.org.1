@@ -1,248 +1,176 @@
-Return-Path: <netdev+bounces-138185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504D69AC86B
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:01:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2C99AC879
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:05:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70CF91C21298
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:01:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97C56282410
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 11:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC8519DF45;
-	Wed, 23 Oct 2024 11:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C691AAE00;
+	Wed, 23 Oct 2024 11:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="sF2Rp3kn"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="aDzu4rGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2076.outbound.protection.outlook.com [40.107.22.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711DF15C13F;
-	Wed, 23 Oct 2024 11:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729681259; cv=none; b=L54wcpL+hNr+mEJUUVwo+3Y22MdpMi4A5tpgsZ2xayLisfr9HIBRDe+6yqstKoJT5Xf8kOZh5TQ8w9Xr4fwZZTx+vqnQDwvxhfUq57SdoDlJz9A2VLh8JmtSRrSmrqjO+OIRvwkK1QPT5vfu2Ea2Y3aniZvNO1ieIJeuwm8JQZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729681259; c=relaxed/simple;
-	bh=gNTtwUARn5PRS9rR2cWgZZqKEgR1+SjxqQ6LRsIxNTg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RxfC7KkNt33dWiSRKEZDfZSIqqqw/7ZQalVeI1+Qkl5x7b0G5Rq8l+DSfRB2jTony+JWH3+7VQlLJiUJHsOiD7IvdcU616nnHSoUxnRtHN3eZOpLsP6IiYLUrVuoQbXlEVx63NwluUNCrP5/i0EzKWhPkEVWgCRBKVCqpTdiYbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=sF2Rp3kn; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729681257; x=1761217257;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gNTtwUARn5PRS9rR2cWgZZqKEgR1+SjxqQ6LRsIxNTg=;
-  b=sF2Rp3kn2CmlrFDh/gC34wS5WkuBgijOr9E7JngVRvuU+ic5JwJQ2CvI
-   LsqDO8N9VlXatGxVXTIp7GacXblRndE/1iZUqlRothyYTZOIB27XwqIWE
-   6HTAmDcCfYav0AIKXTfLc4WnaSt9m8Xud9MfGhnAaTYlLRzgFsVMs5tQj
-   Z95XsKgL1gfzBFuEDyzuXxGZEX5BwzwX7QGBoU1ovUkLIGTRN2gG2aF71
-   MY7mAfHoZrYa2oR0fvTR5vA7b9NI4w7gD6HkR55n581QpmyWUpHWYj/tp
-   OOUs0pYRRFiyVsdEnqTK53eo++HjiOWGpAtyry/m6I/Gh2b9rUiljtH2n
-   Q==;
-X-CSE-ConnectionGUID: xFJ1gZBCTEelQDgk0yaFAw==
-X-CSE-MsgGUID: O8SN6ZFJQXyTkpqIH5dq8Q==
-X-IronPort-AV: E=Sophos;i="6.11,225,1725346800"; 
-   d="scan'208";a="33153951"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 04:00:46 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 23 Oct 2024 04:00:38 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 23 Oct 2024 04:00:34 -0700
-Date: Wed, 23 Oct 2024 11:00:34 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <andrew@lunn.ch>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<horatiu.vultur@microchip.com>, <jensemil.schulzostergaard@microchip.com>,
-	<Parthiban.Veerasooran@microchip.com>, <Raju.Lakkaraju@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, <jacob.e.keller@intel.com>,
-	<ast@fiberby.net>, <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<devicetree@vger.kernel.org>
-Subject: Re: [PATCH net-next 14/15] net: sparx5: add compatible strings for
- lan969x and verify the target
-Message-ID: <20241023110034.jpwoblwrds3ln5nr@DEN-DL-M70577>
-References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
- <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
- <cetor3ohhg6rzf3w2cm6hqxsqukh52nm54mp7tizb2qc3x44j4@n53v6btq6t6r>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A871AA794
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 11:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729681492; cv=fail; b=m9zl7O9x0Amt1WXoQ4gz9zSXxxPwYIGsAsF+y9+0Yw2kby+TnpHK/UepPHA9mJ8IxnWuSck/H2dBijwXhEsXL/ObgV+u6JUcXNgGkKP7x3NryIWLNlRemXWSnGS9ejsxsXvif2lJ79Tv02Cf/11AFPkssV4KLrRW+R3zvReJ28Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729681492; c=relaxed/simple;
+	bh=Nupfzg1xlhTBeYXKEyt5yknZU37YU1Vqg0oSw/hdv1Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dSxs6eiHaOwbQaJXoj8dTK25CLeitOs/yV+pLWcpkq/VGPC+nLs19o0AAL2yGq1Ar5nqStoi4kKlVsP6ytDh1YtAGWfjvAcAFR/ez/O5YqwkR0fVDbd2tkKiD5DStTA7lHpjen8Lf4YEjEN5M1knSUbrDNHbOk5dZ6DKxr1L7AM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=aDzu4rGV; arc=fail smtp.client-ip=40.107.22.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Jjbni38PGILM3RT34qy4oO/1k51LYh1bhwPprPjWL2akt4QAaO7kz8TyYnykHKBcArB8KhLUtDRP9ocdoe0tL8pcul5VMPMVICgJwz33QjisG8UOWaBilIx7qp0lro9TeZ3THSvYyLGRPetyMOQ6dd4ycfLoiv4/X4Tshg5IYcaaWPLlf4iTlLBlz9fAZUtNv1lE9QQVd5z15ImmHmAj7G4scohXO1CfRuDTX+wrZ/PbHibhcQACS680v28/0+5sd73aw4dHgKrCQy26V/W9uSApaHU6+LPWtDZvIoy24Ie9KetzyfT6VGuzxd00CtsJQNElGou5cS3Br3BU7XhQeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+LPst1EGYbswi/Rl3FUdvVAlmyasdW0EPRh6UPHkEhM=;
+ b=F7578OnyJT9iv3g5pNHcTW4LX2NxJl+8o6586fr2fysuCLtwuLSRYdChryz047/EVtqn5XUvIJYXXUGe989WgRVzBuCfj56cBqhbq5qsVpkxI7qQL/UvC/XeOs391wrU/6ao9yEDGUBiAyxPNhl4SiUGEqnbe0IS7vIeFNw3674066W6Us6RW4ji/Xx4LdQ/vAdiXfX1gmWf1cLPPuOAPsAJtMixCCkMML5v+xkZDtG19z82uW5Gz4C5oTkNIgJ22Lr1ui1+2//RXIpMrLCjP9SHknwBw5d9sboogXv8nuv5s9oKUr5tw62SU9K6XDNBDaYtHCbqaMTkAhJC7azH6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 131.228.6.100) smtp.rcpttodomain=nokia-bell-labs.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+LPst1EGYbswi/Rl3FUdvVAlmyasdW0EPRh6UPHkEhM=;
+ b=aDzu4rGVJRKWU7vSTmgcdWUxmf99zpDLdMXX4ZlDI/kXSxrszMCdXtvb1aSD/kieVV7uAipuGP8zN9Ko/GfdeKhSaWBbhRgeVHBXyyM7iQWpNzWJg4zyBsxMJg1k2RZPKvHHU5+AlWVcnObOzYdW76QCT1tjf8ch+K8N1QeiBiuZaU+Ho0aXgl32lSZes9jO5IgLJLlL6qJ6jhpSurPFydapfx45FWpWLBGVTtMi2hKHskAn0ChHaAWOOmRr0bw78Z+R9k3DQBOwA++CIYhDrHOfvXurIw8PrbcNKFhl4TOHXxMhTfWUv/qI4prVMyLxLjEOmCLd7RCufNZzKa01Cg==
+Received: from DUZPR01CA0131.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4bc::16) by PR3PR07MB8290.eurprd07.prod.outlook.com
+ (2603:10a6:102:17d::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18; Wed, 23 Oct
+ 2024 11:04:46 +0000
+Received: from DB1PEPF000509EB.eurprd03.prod.outlook.com
+ (2603:10a6:10:4bc:cafe::6c) by DUZPR01CA0131.outlook.office365.com
+ (2603:10a6:10:4bc::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18 via Frontend
+ Transport; Wed, 23 Oct 2024 11:04:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.100)
+ smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
+Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
+ designates 131.228.6.100 as permitted sender)
+ receiver=protection.outlook.com; client-ip=131.228.6.100;
+ helo=fr711usmtp2.zeu.alcatel-lucent.com; pr=C
+Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
+ DB1PEPF000509EB.mail.protection.outlook.com (10.167.242.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8069.17 via Frontend Transport; Wed, 23 Oct 2024 11:04:45 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr711usmtp2.zeu.alcatel-lucent.com (GMO) with ESMTP id 49NB4aRM021451;
+	Wed, 23 Oct 2024 11:04:36 GMT
+From: chia-yu.chang@nokia-bell-labs.com
+To: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net,
+        stephen@networkplumber.org, jhs@mojatatu.com, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, ij@kernel.org,
+        ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+        g.white@CableLabs.com, ingemar.s.johansson@ericsson.com,
+        mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+        Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v2 iproute2-next 0/1] DualPI2 iproute2 patch
+Date: Wed, 23 Oct 2024 13:04:33 +0200
+Message-Id: <20241023110434.65194-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cetor3ohhg6rzf3w2cm6hqxsqukh52nm54mp7tizb2qc3x44j4@n53v6btq6t6r>
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509EB:EE_|PR3PR07MB8290:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 40468390-6be4-43ed-a255-08dcf35280d8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|7416014|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uL5Yh2eYH3nRN6xxwog6ct7WdjbqrgFWr2Qvgb+UvQVusOFYysMExGeUKLea?=
+ =?us-ascii?Q?ATkcF/JAZ9xAJI/JYWt7ULcxHQCEGb6Ri0L3KkSDYt4hzNfh2WvHPhKFZ8d+?=
+ =?us-ascii?Q?o9W9pMXMVx+mgKPMDCwtaxoUkZ6AL9gZYhQSytDpl3YARcyOwUBlkZCUfh4x?=
+ =?us-ascii?Q?/Uu9i6crQd8cpy4k4On3S5s+/vqCQTO77jrtThuezzL36oeKPTWZLJDHS72b?=
+ =?us-ascii?Q?9DiwrhUBpGswGYTsFeOigGbtgRaW9zS8yetJU8vJrM5dr0VgIL1GFG6BmOiV?=
+ =?us-ascii?Q?EXk6LknfdnsVdkUDITTWHNjrfn7e6HgbAJHCLbtHbKMSRZe7XAIe34s1snJr?=
+ =?us-ascii?Q?PKXdlwNRRyJRBTobZhASxK9GM5EegUMjRkJ9c/yRf9gRGVVxWyi3SsOjrR9a?=
+ =?us-ascii?Q?8Ftb/OmqnUl7R+G+K1OymOl+HupZYCW2Pq84iCSTd/HTH7OzRjY/s0gl+fUb?=
+ =?us-ascii?Q?TklCf7yBZPG3Rs++2FirlfRwTGKq4dAS1gTLg6+yg4npC/Iy9n5YiioMfzwV?=
+ =?us-ascii?Q?jhT1xard1rf1/xXMa/lSmLKDOyeEAZZS8kumsdR2tk5qAEt1vhlABt5ZmEa5?=
+ =?us-ascii?Q?z3X80/SrwKXqyQ9h9Ubywll9kUwkEmqIoRMPHkC5vl9xKYtWJmQnmmpseCxA?=
+ =?us-ascii?Q?Ql+YZzJmcpLNti5tLB1NxROoKDUv+WqaEIwAsEtkw5BSczxkeEAwq3AYzVKx?=
+ =?us-ascii?Q?lU98WKH/EyVlr2+7GGC+8DPJQtZ+ablNL54sd0KO5oQ5dq7Zb8y+7WDj/Y4+?=
+ =?us-ascii?Q?7GnVGFf1E1QXoFJy4UlYa5gp4BOBk47Is8tmlGMD+8xAIX+nnKS43ZuCXbZV?=
+ =?us-ascii?Q?GdGBtR8vlobaixbHufnqjw+rNhDuBo5ffXVkFRK3t0KWyrmFE/kZjePtWCWC?=
+ =?us-ascii?Q?5S4aUOc5HPqrogw0qWZbi2Ataf28DnMYLf3aM2Z9LE3tYJmBl44C/IPH9NUa?=
+ =?us-ascii?Q?H2H7rqpHgeVYzJV20ECkb7hoFvJEuJ1TL/kB/Zcq73iTm8+Gwd1y43nt6V+B?=
+ =?us-ascii?Q?TksIqihBDV1/gewTpayERdS5hyDzQSAEqF5yULIzJjvqdFKs/NxvyW6k6ObZ?=
+ =?us-ascii?Q?VROr2y+FzIXhDVf7XiZGgLDGwID9a+tnRvzZn2Gu19BosZWfeaLlLGRXAJaE?=
+ =?us-ascii?Q?mjvCz/ggScLqwIWtLJaVrg27jS3fL39/JY+4JI0NNwQeZszCkvIiO0Tx1uO0?=
+ =?us-ascii?Q?Ebv3l2I+ZB95QVS9BH6TZ6nsurrH3FQgl7fqiMmimuLu9cyi/IyTjcOau1In?=
+ =?us-ascii?Q?K2WM8VvBK+NHKBWYaKVugCvK4iFayDcJnfRL9sS1snOqF958JxWLwMuPAWox?=
+ =?us-ascii?Q?eNA+vW+TChqe0xTldlIkd0+WBLQTyHWjBBNiWrDkdTyqHIt2rZFbulDeNnEk?=
+ =?us-ascii?Q?ZKd6k6LSmF2yrq61uZ9didlqsZjij7vuwBiObt99XceLtI/Wewz/dcIgC3Yb?=
+ =?us-ascii?Q?7Yepuah5Edg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(7416014)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 11:04:45.2754
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40468390-6be4-43ed-a255-08dcf35280d8
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509EB.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR07MB8290
 
-Hi Krzysztof,
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-> > Add compatible strings for the twelve lan969x SKU's (Stock Keeping Unit)
-> > that we support, and verify that the devicetree target is supported by
-> > the chip target.
-> >
-> > Each SKU supports different bandwidths and features (see [1] for
-> > details). We want to be able to run a SKU with a lower bandwidth and/or
-> > feature set, than what is supported by the actual chip. In order to
-> > accomplish this we:
-> >
-> >     - add new field sparx5->target_dt that reflects the target from the
-> >       devicetree (compatible string).
-> >
-> >     - compare the devicetree target with the actual chip target. If the
-> >       bandwidth and features provided by the devicetree target is
-> >       supported by the chip, we approve - otherwise reject.
-> >
-> >     - set the core clock and features based on the devicetree target
-> >
-> > [1] https://www.microchip.com/en-us/product/lan9698
-> >
-> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> > ---
-> >  drivers/net/ethernet/microchip/sparx5/Makefile     |   1 +
-> >  .../net/ethernet/microchip/sparx5/sparx5_main.c    | 194 ++++++++++++++++++++-
-> >  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   1 +
-> >  3 files changed, 193 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/microchip/sparx5/Makefile b/drivers/net/ethernet/microchip/sparx5/Makefile
-> > index 3435ca86dd70..8fe302415563 100644
-> > --- a/drivers/net/ethernet/microchip/sparx5/Makefile
-> > +++ b/drivers/net/ethernet/microchip/sparx5/Makefile
-> > @@ -19,3 +19,4 @@ sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o
-> >  # Provide include files
-> >  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/vcap
-> >  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
-> > +ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/lan969x
-> > diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> > index 5c986c373b3e..edbe639d98c5 100644
-> > --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> > +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> > @@ -24,6 +24,8 @@
-> >  #include <linux/types.h>
-> >  #include <linux/reset.h>
-> >
-> > +#include "lan969x.h" /* lan969x_desc */
-> > +
-> >  #include "sparx5_main_regs.h"
-> >  #include "sparx5_main.h"
-> >  #include "sparx5_port.h"
-> > @@ -227,6 +229,168 @@ bool is_sparx5(struct sparx5 *sparx5)
-> >       }
-> >  }
-> >
-> > +/* Set the devicetree target based on the compatible string */
-> > +static int sparx5_set_target_dt(struct sparx5 *sparx5)
-> > +{
-> > +     struct device_node *node = sparx5->pdev->dev.of_node;
-> > +
-> > +     if (is_sparx5(sparx5))
-> > +             /* For Sparx5 the devicetree target is always the chip target */
-> > +             sparx5->target_dt = sparx5->target_ct;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9691-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9691VAO;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9692-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9692VAO;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9693-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9693VAO;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9694-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9694;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9695-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9694TSN;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9696-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9696;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9697-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9696TSN;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9698-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9698;
-> > +     else if (of_device_is_compatible(node, "microchip,lan9699-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9698TSN;
-> > +     else if (of_device_is_compatible(node, "microchip,lan969a-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9694RED;
-> > +     else if (of_device_is_compatible(node, "microchip,lan969b-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9696RED;
-> > +     else if (of_device_is_compatible(node, "microchip,lan969c-switch"))
-> > +             sparx5->target_dt = SPX5_TARGET_CT_LAN9698RED;
-> > +     else
-> > +             return -EINVAL;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +/* Compare the devicetree target with the chip target.
-> > + * Make sure the chip target supports the features and bandwidth requested
-> > + * from the devicetree target.
-> > + */
-> > +static int sparx5_verify_target(struct sparx5 *sparx5)
-> > +{
-> > +     switch (sparx5->target_dt) {
-> > +     case SPX5_TARGET_CT_7546:
-> > +     case SPX5_TARGET_CT_7549:
-> > +     case SPX5_TARGET_CT_7552:
-> > +     case SPX5_TARGET_CT_7556:
-> > +     case SPX5_TARGET_CT_7558:
-> > +     case SPX5_TARGET_CT_7546TSN:
-> > +     case SPX5_TARGET_CT_7549TSN:
-> > +     case SPX5_TARGET_CT_7552TSN:
-> > +     case SPX5_TARGET_CT_7556TSN:
-> > +     case SPX5_TARGET_CT_7558TSN:
-> > +             return 0;
-> 
-> All this is weird. Why would you verify? You were matched, it cannot be
-> mis-matching.
+Hello,
 
-We are verifying that the match (target/compatible string) from the
-device tree is supported by the chip. Maybe I wasn't too clear about the
-intend in v1.
+Specific changes in this version
+- Rename get_float in dualpi2 to get_float_min_max in utils.c 
+- Move get_float from iplink_can.c in utils.c
+- Add print function for JSON of dualpi2
 
-Each target supports different bandwidths and features. If you have a
-lan9698 chip, it must, obviously, be possible to run it as a lan9698
-target. However, some targets can be run on chip targets other than
-themselves, given that the chip supports the bandwidth and features of
-the provided target. In contrary, trying to run as a target with a
-feature not supported by the chip, or a bandwidth higher than what the
-chip supports, should be rejected.
+Please find the updated patch for DualPI2 for iproute2
+(IETF RFC9332 https://datatracker.ietf.org/doc/html/rfc9332).
 
-Without this logic, the chip id is read and a target is determined. That
-means on a lan9698 chip you will always match the lan9698 target.
+--
+Chia-Yu
 
-With the new logic, it is possible to run as a different target than
-what is read from the chip id, given that the target you are trying to
-run as, is supported by the chip.
+Olga Albisser (1):
+  tc: add dualpi2 scheduler module
 
-> 
-> > +     case SPX5_TARGET_CT_LAN9698RED:
-> > +             if (sparx5->target_ct == SPX5_TARGET_CT_LAN9698RED)
-> 
-> What is "ct"? sorry, all this code is a big no.
+ bash-completion/tc             |   9 +-
+ include/uapi/linux/pkt_sched.h |  34 +++
+ include/utils.h                |   2 +
+ ip/iplink_can.c                |  14 -
+ lib/utils.c                    |  30 +++
+ man/man8/tc-dualpi2.8          | 237 +++++++++++++++++
+ tc/Makefile                    |   1 +
+ tc/q_dualpi2.c                 | 473 +++++++++++++++++++++++++++++++++
+ 8 files changed, 785 insertions(+), 15 deletions(-)
+ create mode 100644 man/man8/tc-dualpi2.8
+ create mode 100644 tc/q_dualpi2.c
 
-In this case we were matched as a SPX5_TARGET_CT_LAN9698RED target. We
-are verifying that the chip target (target_ct, which is read from the
-chip) supports the target we were matched as.
-
-> Krzysztof
->
-
-This is a feature that we would like, as it gives the flexibility of
-running different targets on the same chip. Now if this is something
-that cannot be accepted, I will have to ditch this part.
-
-Let me know.
-
-/Daniel
+-- 
+2.34.1
 
 
