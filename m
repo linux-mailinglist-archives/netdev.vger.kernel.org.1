@@ -1,339 +1,110 @@
-Return-Path: <netdev+bounces-138342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FAB89ACF85
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:55:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10789ACF79
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1638B2A57A
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9756328251E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD0E1D0799;
-	Wed, 23 Oct 2024 15:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C420D1C9DFE;
+	Wed, 23 Oct 2024 15:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hDxh8RIm"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="IFy5RIRN"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACC31D0411;
-	Wed, 23 Oct 2024 15:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149F5211C
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 15:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729698597; cv=none; b=LwTE0yc8MCum04ReACssJC195xL4j7MGXMJjYIytrpDzdEicxAfK8f82+kIwPx4zvgNOzbxhaOXduqsiwaFCgiZ6xfkeeQqe3lrQHUSeiQwoZGXP085IDDsoRi8JtvxJkpMYE3te1/0DnTvSdQq1RqzYPdh/hf2iPh55GB0bhIY=
+	t=1729698741; cv=none; b=acrXlfYOyMktMzR2itTTA9RdCHEK90f9i6kmRbiWFt/3Nx+K/TuPG/nBkV1t+1x+QMz9vas6UJzNhFFJSz/ohj2qsSBhV2VaQfCmTPOsCsXkMIDv5R9FQY07vXpRDlWkX4CtkyldBCDCtpy2IgGSZijQ8qEMkbLCDLpVTqzXi+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729698597; c=relaxed/simple;
-	bh=LrsGh3qmzchnmqG2MM3YOk05oabiM6pDWIcBkA50Nxc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RoMrdTcwmEedXejcv8Sj7tEWFTeT0fnzF9lfC6YPLsS/VOmcSK71G1qirpm5Gt8Ii7/QaqsgP4+Ea7QnJwQN0Sp2kIs0aCCUBaHY0ca/sVSF1WF0KcDRijyxcXXVyJG6XEPs0ygiE4SNauVrKMs+W6lYz7zqCOl259AM/jbfOa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hDxh8RIm; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7FA0C60009;
-	Wed, 23 Oct 2024 15:49:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1729698593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U981dne136mJZRxylVkDHEeRlMRiiF/+nXZbj0TIeeA=;
-	b=hDxh8RImEVnV3cQWPJGzq0FhOiwarKGOfSybqucEUAJ8FfcAWWvB0n7kBTNT7iSrtY/bsi
-	6VwB/f1IkYX2RGqUPrllSxS8MdJBR+HT3B+2Qu50zpSIWmrCthhleZQVMl3SfNrPtTpQmR
-	lnUD57UQZQvmjoupYqvYVvytCQtpp0YWlLcrSwQbWtxn+tBzO8FYEwHcEvKTOzQ9jEIagC
-	veLxceP0IxYtnRKCW66rg9BTlvedUbtCQhpAKIB/FVPfATcp0lcoEMdKDQlD3VVqiMRlre
-	kJX9jDdBFg8ibXI2632rpM7IcJPg4asmyD+IwI3k9fdenwpCj+saeQLxZd6pCg==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Wed, 23 Oct 2024 17:49:20 +0200
-Subject: [PATCH net-next v18 10/10] netlink: specs: Enhance tsinfo netlink
- attributes and add a tsconfig set command
+	s=arc-20240116; t=1729698741; c=relaxed/simple;
+	bh=Q0HhChkuAOMiGqgLCi9k3qQRT4GVsbq/WrGe5iCLxYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lwYT+fpkyK0SazowkNsCgH9sle6Frx7Pq71v8UQanE+RE2Fwg9s04ljMrxaAAUtfNJCwwTgN9bKLiemMXTvJSnNj/DLRhQeAOJf2qtpNamUFd9LbJyjULGsxzaAu2mbrjzismjtQLEv2TcckQnA+gCeu5thXwRjpOXSdKY8JJKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=IFy5RIRN; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7eda47b7343so481926a12.0
+        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1729698739; x=1730303539; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cGZRq6HNdePI3aKDMXBC35e4DvlTylB9a1aT7ju9Ds8=;
+        b=IFy5RIRN0GmDl7EcoeJ/iMzku7P58tOP9FznSFQGCNouvHJEc/Zt77SU9sud0e19ZJ
+         ZDGWiC/7srAgUr92ytElOTy5csZXAvvccRVT0hyXz01HVv6cp+/rCGLRZqQ5p6PuUwT7
+         oWmZJ4lDidUdFrPSq3jxxZeXuavQD+Kg1ekKjP8HTP+/HCaPHuYQVp68bf9qbWNLnVj9
+         0OJdajE+ioz6YnIF591JrJhWiTU1slzqtWT8Tau8fp7gKi+40bDEeWO8Yjir1IAjoGEr
+         RkHG3jyzgTKTO+tYthRb7ceeO2WKMC/ipkNOf4ABmatFOF6i7gLQPlvodPgeDQAVoL+3
+         EmQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729698739; x=1730303539;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cGZRq6HNdePI3aKDMXBC35e4DvlTylB9a1aT7ju9Ds8=;
+        b=MNqYPeZWlZmt1QwW66ocASUM/4+PpE4xkgU1xaiM3yN59TW6OPLALDn60fU4imQ256
+         tUX6Darg6zKQ8r51g8yrF01iEZueRufrJ02zf1OnAMysXwKrNK0brT29cBljbfWCyEON
+         608hXpx6V0sKp96Tcb/mjVkqBVu/zAYf7g28zeY8SOO7WXgDIjEozIOvAGBaU5o62PWm
+         RIo5u9aijTuxzBO/yGKUq8xdu2XCw6s11LQ9I3h9wCe0/91yz2a9BH1Ixx3Cuo7mT+KO
+         Y3yULg42Aa67lG30u4+RDTmwCHIuxoqwUai08DYpFaC+0uw/JePVdv25WpENJfT/vCIA
+         JOHg==
+X-Gm-Message-State: AOJu0Yw6PxuoIStW80Zyvq3XBMXR7lm8CaBCVqpUfiD1N90geHluJpv/
+	Bz99eNGaRcbTCWpoEXcuRdMlk9rPxB6BxHjbjw/kK+gb+HAtP7brPeVzst8eBz0=
+X-Google-Smtp-Source: AGHT+IG2E1iFIynQ1I/9rLqJ2VipTrcoQGOg1lDnBa++bxJWKSEWaR3OZDmNcVoB9V9klWC2BVmuDA==
+X-Received: by 2002:a05:6a21:1191:b0:1d8:d3b4:7a73 with SMTP id adf61e73a8af0-1d978aebeacmr3511111637.4.1729698739276;
+        Wed, 23 Oct 2024 08:52:19 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabbca78sm7047364a12.58.2024.10.23.08.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 08:52:19 -0700 (PDT)
+Date: Wed, 23 Oct 2024 08:52:17 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net,
+ jhs@mojatatu.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com, Olga Albisser <olga@albisser.org>, Oliver Tilmans
+ <olivier.tilmans@nokia.com>, Bob Briscoe <research@bobbriscoe.net>, Henrik
+ Steen <henrist@henrist.net>
+Subject: Re: [PATCH v2 iproute2-next 1/1] tc: add dualpi2 scheduler module
+Message-ID: <20241023085217.5ae0ea40@hermes.local>
+In-Reply-To: <20241023110434.65194-2-chia-yu.chang@nokia-bell-labs.com>
+References: <20241023110434.65194-1-chia-yu.chang@nokia-bell-labs.com>
+	<20241023110434.65194-2-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241023-feature_ptp_netnext-v18-10-ed948f3b6887@bootlin.com>
-References: <20241023-feature_ptp_netnext-v18-0-ed948f3b6887@bootlin.com>
-In-Reply-To: <20241023-feature_ptp_netnext-v18-0-ed948f3b6887@bootlin.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
- Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
- donald.hunter@gmail.com, danieller@nvidia.com, ecree.xilinx@gmail.com, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Shannon Nelson <shannon.nelson@amd.com>, 
- Alexandra Winter <wintera@linux.ibm.com>, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- Jacob Keller <jacob.e.keller@intel.com>
-X-Mailer: b4 0.14.1
-X-GND-Sasl: kory.maincent@bootlin.com
 
-Add new attributed to tsinfo allowing to get the tsinfo from a phc provider
-(composed by a phc index and a phc qualifier) on a netdevice's link.
-Add simultaneously a tsconfig command to be able to get and set hwtstamp
-configuration for a specified phc provider.
+On Wed, 23 Oct 2024 13:04:34 +0200
+chia-yu.chang@nokia-bell-labs.com wrote:
 
-Here is few examples:
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema
-             --dump tsinfo-get
-             --json '{"header":{"dev-name":"eth0"}}'
-[{'header': {'dev-index': 3, 'dev-name': 'eth0'},
-  'hwtst-provider': {'index': 0, 'qualifier': 0},
-  'phc-index': 0,
-  'rx-filters': {'bits': {'bit': [{'index': 0, 'name': 'none'},
-                                  {'index': 2, 'name': 'some'}]},
-                 'nomask': True,
-                 'size': 16},
-  'timestamping': {'bits': {'bit': [{'index': 0, 'name': 'hardware-transmit'},
-                                    {'index': 2, 'name': 'hardware-receive'},
-                                    {'index': 6,
-                                     'name': 'hardware-raw-clock'}]},
-                   'nomask': True,
-                   'size': 17},
-  'tx-types': {'bits': {'bit': [{'index': 0, 'name': 'off'},
-                                {'index': 1, 'name': 'on'}]},
-               'nomask': True,
-               'size': 4}},
- {'header': {'dev-index': 3, 'dev-name': 'eth0'},
-  'hwtst-provider': {'index': 2, 'qualifier': 0},
-  'phc-index': 2,
-  'rx-filters': {'bits': {'bit': [{'index': 0, 'name': 'none'},
-                                  {'index': 1, 'name': 'all'}]},
-                 'nomask': True,
-                 'size': 16},
-  'timestamping': {'bits': {'bit': [{'index': 0, 'name': 'hardware-transmit'},
-                                    {'index': 1, 'name': 'software-transmit'},
-                                    {'index': 2, 'name': 'hardware-receive'},
-                                    {'index': 3, 'name': 'software-receive'},
-                                    {'index': 4,
-                                     'name': 'software-system-clock'},
-                                    {'index': 6,
-                                     'name': 'hardware-raw-clock'}]},
-                   'nomask': True,
-                   'size': 17},
-  'tx-types': {'bits': {'bit': [{'index': 0, 'name': 'off'},
-                                {'index': 1, 'name': 'on'},
-                                {'index': 2, 'name': 'onestep-sync'}]},
-               'nomask': True,
-               'size': 4}}]
+> + * DualPI Improved with a Square (dualpi2):
+> + * - Supports congestion controls that comply with the Prague requirements
+> + *   in RFC9331 (e.g. TCP-Prague)
+> + * - Supports coupled dual-queue with PI2 as defined in RFC9332
+> + * -
 
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do tsinfo-get
-             --json '{"header":{"dev-name":"eth0"},
-                      "hwtst-provider":{"index":0, "qualifier":0 }
-}'
-{'header': {'dev-index': 3, 'dev-name': 'eth0'},
- 'hwtst-provider': {'index': 0, 'qualifier': 0},
- 'phc-index': 0,
- 'rx-filters': {'bits': {'bit': [{'index': 0, 'name': 'none'},
-                                 {'index': 2, 'name': 'some'}]},
-                'nomask': True,
-                'size': 16},
- 'timestamping': {'bits': {'bit': [{'index': 0, 'name': 'hardware-transmit'},
-                                   {'index': 2, 'name': 'hardware-receive'},
-                                   {'index': 6, 'name': 'hardware-raw-clock'}]},
-                  'nomask': True,
-                  'size': 17},
- 'tx-types': {'bits': {'bit': [{'index': 0, 'name': 'off'},
-                               {'index': 1, 'name': 'on'}]},
-              'nomask': True,
-              'size': 4}}
+It is awkward that dualPI is referencing a variant of TCP congestion
+control that is not supported by Linux. Why has Nokia not upstreamed
+TCP Prague?
 
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do tsinfo-set
-             --json '{"header":{"dev-name":"eth0"},
-                      "hwtst-provider":{"index":2, "qualifier":0}}'
-None
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do tsconfig-get
-	     --json '{"header":{"dev-name":"eth0"}}'
-{'header': {'dev-index': 3, 'dev-name': 'eth0'},
- 'hwtstamp-flags': 1,
- 'hwtstamp-provider': {'index': 1, 'qualifier': 0},
- 'rx-filters': {'bits': {'bit': [{'index': 12, 'name': 'ptpv2-event'}]},
-                'nomask': True,
-                'size': 16},
- 'tx-types': {'bits': {'bit': [{'index': 1, 'name': 'on'}]},
-              'nomask': True,
-              'size': 4}}
-
- ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do tsconfig-set
-	      --json '{"header":{"dev-name":"eth0"},
-		       "hwtstamp-provider":{"index":1, "qualifier":0 },
-		       "rx-filters":{"bits": {"bit": {"name":"ptpv2-l4-event"}},
-				     "nomask": 1},
-		       "tx-types":{"bits": {"bit": {"name":"on"}},
-				   "nomask": 1}}'
-{'header': {'dev-index': 3, 'dev-name': 'eth0'},
- 'hwtstamp-flags': 1,
- 'hwtstamp-provider': {'index': 1, 'qualifier': 0},
- 'rx-filters': {'bits': {'bit': [{'index': 12, 'name': 'ptpv2-event'}]},
-                'nomask': True,
-                'size': 16},
- 'tx-types': {'bits': {'bit': [{'index': 1, 'name': 'on'}]},
-              'nomask': True,
-              'size': 4}}
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
-Changes in v8:
-- New patch
-
-Changes in v10:
-- Add ghwtstamp attributes
-- Add tsinfo ntf command
-
-Changes in v11:
-- Add examples in the commit message.
-
-Changes in v13:
-- Replace shorter name by real name.
-- Fix an issue reported by "make -C tools/net/ynl" on the namings.
-
-Changes in v16:
-- Move to tsconfig command to get and set hwtstamp configuration.
-
-Changes in v18:
-- Add a tsconfig-set reply command description
----
- Documentation/netlink/specs/ethtool.yaml | 70 ++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
-
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 93369f0eb816..8bd04ff89122 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -637,6 +637,15 @@ attribute-sets:
-       -
-         name: tx-err
-         type: uint
-+  -
-+    name: ts-hwtstamp-provider
-+    attributes:
-+      -
-+        name: index
-+        type: u32
-+      -
-+        name: qualifier
-+        type: u32
-   -
-     name: tsinfo
-     attributes:
-@@ -663,6 +672,10 @@ attribute-sets:
-         name: stats
-         type: nest
-         nested-attributes: ts-stat
-+      -
-+        name: hwtstamp-provider
-+        type: nest
-+        nested-attributes: ts-hwtstamp-provider
-   -
-     name: cable-result
-     attributes:
-@@ -1137,6 +1150,28 @@ attribute-sets:
-       -
-         name: downstream-sfp-name
-         type: string
-+  -
-+    name: tsconfig
-+    attributes:
-+      -
-+        name: header
-+        type: nest
-+        nested-attributes: header
-+      -
-+        name: hwtstamp-provider
-+        type: nest
-+        nested-attributes: ts-hwtstamp-provider
-+      -
-+        name: tx-types
-+        type: nest
-+        nested-attributes: bitset
-+      -
-+        name: rx-filters
-+        type: nest
-+        nested-attributes: bitset
-+      -
-+        name: hwtstamp-flags
-+        type: u32
- 
- operations:
-   enum-model: directional
-@@ -1578,6 +1613,7 @@ operations:
-         request:
-           attributes:
-             - header
-+            - hwtstamp-provider
-         reply:
-           attributes:
-             - header
-@@ -1586,6 +1622,7 @@ operations:
-             - rx-filters
-             - phc-index
-             - stats
-+            - hwtstamp-provider
-       dump: *tsinfo-get-op
-     -
-       name: cable-test-act
-@@ -1960,3 +1997,36 @@ operations:
-       name: phy-ntf
-       doc: Notification for change in PHY devices.
-       notify: phy-get
-+    -
-+      name: tsconfig-get
-+      doc: Get hwtstamp config.
-+
-+      attribute-set: tsconfig
-+
-+      do: &tsconfig-get-op
-+        request:
-+          attributes:
-+            - header
-+        reply:
-+          attributes: &tsconfig
-+            - header
-+            - hwtstamp-provider
-+            - tx-types
-+            - rx-filters
-+            - hwtstamp-flags
-+      dump: *tsconfig-get-op
-+    -
-+      name: tsconfig-set
-+      doc: Set hwtstamp config.
-+
-+      attribute-set: tsconfig
-+
-+      do:
-+        request:
-+          attributes: *tsconfig
-+        reply:
-+          attributes: *tsconfig
-+    -
-+      name: tsconfig-ntf
-+      doc: Notification for change in tsconfig configuration.
-+      notify: tsconfig-get
-
--- 
-2.34.1
-
+I would say if dualpi2 only makes sense with TCP Prague then the congestion
+control must be upstreamed first?
 
