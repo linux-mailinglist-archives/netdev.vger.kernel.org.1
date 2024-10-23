@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-138413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4591A9AD726
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:02:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889339AD729
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94B0F28339F
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:02:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1628284829
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 22:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B561FDF83;
-	Wed, 23 Oct 2024 22:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6037B1FEFD9;
+	Wed, 23 Oct 2024 22:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Sf77NbXK"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="DmTHR4gT"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C441E2604;
-	Wed, 23 Oct 2024 22:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5242A1D041B;
+	Wed, 23 Oct 2024 22:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729720927; cv=none; b=NP+KlglwgGuEizNKuayCLLxdWlY756AdteLf6Agca/FqWxhbgiFNQMavjLH6bkKZ9dbP1Ekn+qiCfoRDmFu94UNc8HFanvrjLFQd7HTd+/U1H0p/zOMrE9MOrJyQonw+DK2AGXVzmmVHfAaZQ6xAw8OBfq5y7bkL4SmGgSMBEPU=
+	t=1729720928; cv=none; b=f+dqQ2rZ83SmzyMXRUKjU6Q6IxzoBwdlMt6TS2kF3rsGWLWwCLKpjGLRkc0DHdCeH4kwvdKEPZr2r6cB/MPX6xqD6JP5Ibx7tRbN+ZZq2KXStmcbwPmrI33FWOgS3yj8EU68fD1fBWEqPdfM4bNfpwvTFOE4Iitznw7hCVx4xi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729720927; c=relaxed/simple;
-	bh=D+pngnpKeWqkazA+ixceYniwTUm1eq9HUVMG96pBj/o=;
+	s=arc-20240116; t=1729720928; c=relaxed/simple;
+	bh=Db4mo36NIk5280MwSTl+F0lyO0vOeJdT0JiFPqacJdE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=nkr8Him7OnB0IptY0ysSJwv//HmDyjAITgryccpTTsOwiNR73H68ey/2wJPEF/d6yABdtUkEYffXJwwYjgaLNhVH0uVaLYfRrqKiuuEj9p/KMz/vHD2cG+a8AeVTsbDrKKa19AKVbEaNBtKeCGzoEA6V0aRFu1EvxRFnOMuxIJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Sf77NbXK; arc=none smtp.client-ip=68.232.153.233
+	 In-Reply-To:To:CC; b=nj+t7gP8gdDCqLCpAlFKrQngxrrn+8/HowbIPfpKtWr32sNveWRWi/tSUyV0q61bOeZSx40QctVB5uRo7ePeSFhH9uluMP1d7v0rRyg3yXsuCOFiXkKVmQ0hZa3L+7MB6w41/WsMczvNxTPvHL0PO5KTOH6lJzeF4jR/0cR6LrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=DmTHR4gT; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729720925; x=1761256925;
+  t=1729720926; x=1761256926;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=D+pngnpKeWqkazA+ixceYniwTUm1eq9HUVMG96pBj/o=;
-  b=Sf77NbXKKBQMCWbgcEO7Wjw9ln+jmJRY5igvDLU9tNPKKZj71+2gmEoN
-   NUutp7kAmTip07N1Ei0i8JL97ma6S0GfbzNhXCAyvWroaajf+N9MI3LfE
-   OOc1JkPQD9guvDjCfuaXucuO96PcpznN1eUfN0rCODrR0++E/8AxXGeVy
-   5mkEqzowi1P5VSeQnwN1VlujYHl4xAEVbfLByclF9BCEhtwvHZV/cInuC
-   0L8ck7DZadsV7UOEflHsT3KrPIiEp61d8B2JtpYueA1DFsvlgqR5x8KvA
-   fE4LmhSLKU9SBKwwVcsD3dxUwH7SuOTf4XPgb/v4IcTuSCBk/Z2tuleP9
+  bh=Db4mo36NIk5280MwSTl+F0lyO0vOeJdT0JiFPqacJdE=;
+  b=DmTHR4gTEi1vljWZ2vITIUpKBRlzyrD3wK+0B1JbLDoNDvGJDIgKsZNp
+   WdOkFratLt0OCjZ6VRZsLBvMWpZ4S3aam7ImY6EKi2qu8hhfPdZvxH8IY
+   XStT0iR//kiGrdFf8k0Vxj33haUcX7bIjpFnbziRRPBgGLI/Hxe5BOhLh
+   yF+uboxOjXCA7PZwesO3ZzqPreBRx5/EpSIlseyRsdO0GWf6PwWmiL7mN
+   ijel9/XIoeSB/hBArRUusIrezHoRzMh+LAVJTDn2rF1/AFS0DKoT1q8QB
+   KJHbPlpeEJUfhxpibR6rcCGUFkF1hv0gu3CC0qu70NIpEofb176s8Qv7B
    A==;
 X-CSE-ConnectionGUID: 1Xapdzk8QAqz3uJYdYtrIg==
-X-CSE-MsgGUID: XHMw/OD/RVyqCjWt6K85VA==
+X-CSE-MsgGUID: wZ/VQMLxRG6JieyzTeqSLA==
 X-IronPort-AV: E=Sophos;i="6.11,227,1725346800"; 
-   d="scan'208";a="33409629"
+   d="scan'208";a="33409630"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 15:02:03 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2024 15:02:04 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 23 Oct 2024 15:01:47 -0700
+ 15.1.2507.35; Wed, 23 Oct 2024 15:01:51 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 23 Oct 2024 15:01:43 -0700
+ 15.1.2507.35 via Frontend Transport; Wed, 23 Oct 2024 15:01:47 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Thu, 24 Oct 2024 00:01:21 +0200
-Subject: [PATCH net-next v2 02/15] net: sparx5: change spx5_wr to spx5_rmw
- in cal update()
+Date: Thu, 24 Oct 2024 00:01:22 +0200
+Subject: [PATCH net-next v2 03/15] net: sparx5: change frequency
+ calculation for SDLB's
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241024-sparx5-lan969x-switch-driver-2-v2-2-a0b5fae88a0f@microchip.com>
+Message-ID: <20241024-sparx5-lan969x-switch-driver-2-v2-3-a0b5fae88a0f@microchip.com>
 References: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
 In-Reply-To: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -88,49 +88,58 @@ CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<steen.hegelund@microchip.com>, <devicetree@vger.kernel.org>
 X-Mailer: b4 0.14-dev
 
-In preparation for lan969x, use spx5_rmw() for enabling the update of
-the calendar. This is required to not overwrite the DSM_TAXI_CAL_CFG
-register, as an additional write will be added before this one, in a
-subsequent patch.
+In preparation for lan969x, rework the function that calculates the SDLB
+(Service Dual Leacky Bucket) clock. This is required, as the
+HSCH_SYS_CLK_PER register is Sparx5-exclusive. Instead derive the clock
+from the core clock, using the sparx5_clk_period() function. The clock
+stays the same before and after this patch, only now,
+sparx5_sdlb_clk_hz_get() can be used for lan969x too.
 
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.h |  2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c | 10 +++-------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c b/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
-index 1ae56194637f..edc03b6ebf34 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
-@@ -546,9 +546,10 @@ static int sparx5_dsm_calendar_update(struct sparx5 *sparx5, u32 taxi,
- 	u32 idx;
- 	u32 cal_len = sparx5_dsm_cal_len(data->schedule), len;
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+index f117cf65cf8c..2a3b4e855590 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+@@ -552,7 +552,7 @@ struct sparx5_sdlb_group *sparx5_get_sdlb_group(int idx);
+ int sparx5_sdlb_pup_token_get(struct sparx5 *sparx5, u32 pup_interval,
+ 			      u64 rate);
  
--	spx5_wr(DSM_TAXI_CAL_CFG_CAL_PGM_ENA_SET(1),
--		sparx5,
--		DSM_TAXI_CAL_CFG(taxi));
-+	spx5_rmw(DSM_TAXI_CAL_CFG_CAL_PGM_ENA_SET(1),
-+		 DSM_TAXI_CAL_CFG_CAL_PGM_ENA,
-+		 sparx5,
-+		 DSM_TAXI_CAL_CFG(taxi));
- 	for (idx = 0; idx < cal_len; idx++) {
- 		spx5_rmw(DSM_TAXI_CAL_CFG_CAL_IDX_SET(idx),
- 			 DSM_TAXI_CAL_CFG_CAL_IDX,
-@@ -559,9 +560,10 @@ static int sparx5_dsm_calendar_update(struct sparx5 *sparx5, u32 taxi,
- 			 sparx5,
- 			 DSM_TAXI_CAL_CFG(taxi));
- 	}
--	spx5_wr(DSM_TAXI_CAL_CFG_CAL_PGM_ENA_SET(0),
--		sparx5,
--		DSM_TAXI_CAL_CFG(taxi));
-+	spx5_rmw(DSM_TAXI_CAL_CFG_CAL_PGM_ENA_SET(0),
-+		 DSM_TAXI_CAL_CFG_CAL_PGM_ENA,
-+		 sparx5,
-+		 DSM_TAXI_CAL_CFG(taxi));
- 	len = DSM_TAXI_CAL_CFG_CAL_CUR_LEN_GET(spx5_rd(sparx5,
- 						       DSM_TAXI_CAL_CFG(taxi)));
- 	if (len != cal_len - 1)
+-int sparx5_sdlb_clk_hz_get(struct sparx5 *sparx5);
++u64 sparx5_sdlb_clk_hz_get(struct sparx5 *sparx5);
+ int sparx5_sdlb_group_get_by_rate(struct sparx5 *sparx5, u32 rate, u32 burst);
+ int sparx5_sdlb_group_get_by_index(struct sparx5 *sparx5, u32 idx, u32 *group);
+ 
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c b/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c
+index df1d15600aad..98a3f44c569c 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c
+@@ -25,17 +25,13 @@ struct sparx5_sdlb_group *sparx5_get_sdlb_group(int idx)
+ 	return &sdlb_groups[idx];
+ }
+ 
+-int sparx5_sdlb_clk_hz_get(struct sparx5 *sparx5)
++u64 sparx5_sdlb_clk_hz_get(struct sparx5 *sparx5)
+ {
+-	u32 clk_per_100ps;
+ 	u64 clk_hz;
+ 
+-	clk_per_100ps = HSCH_SYS_CLK_PER_100PS_GET(spx5_rd(sparx5,
+-							   HSCH_SYS_CLK_PER));
+-	if (!clk_per_100ps)
+-		clk_per_100ps = SPX5_CLK_PER_100PS_DEFAULT;
++	clk_hz = (10 * 1000 * 1000) /
++		 (sparx5_clk_period(sparx5->coreclock) / 100);
+ 
+-	clk_hz = (10 * 1000 * 1000) / clk_per_100ps;
+ 	return clk_hz *= 1000;
+ }
+ 
 
 -- 
 2.34.1
