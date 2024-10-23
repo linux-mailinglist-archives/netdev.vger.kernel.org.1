@@ -1,139 +1,488 @@
-Return-Path: <netdev+bounces-138346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEB129ACFA2
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 18:02:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A53DC9ACF67
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:51:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 771CBB28BBD
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF79A1C20432
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6281C304B;
-	Wed, 23 Oct 2024 15:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5478C1CEEA5;
+	Wed, 23 Oct 2024 15:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="Ju6RwDnC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VLqq51CU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698A81CACE8
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 15:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458B01CB334;
+	Wed, 23 Oct 2024 15:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729699067; cv=none; b=fn/T7dJD60MpNRMTCXDv5SsWogQq3aIULDD+yjSY1G6Yqn1+EMaXYhClpP4Z+Hzl3BCu0tyO85gq2LEPmsmLyggEUaJgmNBygYiXxD80BH6/akDF8YFIhCp5Ypc+62UOKEvohszM8qxlw7HyXWzAfCFvrIZO0mByjZuxgFDWKXo=
+	t=1729698591; cv=none; b=u//10vMirrIiSRujy4Co4fYnbU8852sNta3YVck6F/odatBwHY4JUucYu5HI4SNeY0M5UDJdiVRKHNmpm+859CfPJl9qM1kM6PwA6Ou8ahHOu3+TyStqjIHLzmCd1nY+L+XCWAH2QPRUevW9RnSTTQRezoCGRmMsnmqGqp0O53U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729699067; c=relaxed/simple;
-	bh=AuStIkcKjDDnuNnh7W0Ic2QFUcBuPQzsR2xLUEyzr1o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z7H0RxoiwVO69pidqqJfGHRHvpTcU1jUWeChqrAUx1/KQ3peyIJ445WvQ/S7lReY7vFJl1uTMpudYPD+ZSz/0TLDo0YBTOUp4CPCvpJw8m/JxAWjC9efcn4Az+t/dEJVxc6EnD61MtipwM7r18j4PLJzwM1DBgO8HnNYoWPd5Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=Ju6RwDnC; arc=none smtp.client-ip=109.202.192.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
-Received: from localhost (localhost [127.0.0.1])
-	by mail.codelabs.ch (Postfix) with ESMTP id EFDBD5A0002;
-	Wed, 23 Oct 2024 17:49:14 +0200 (CEST)
-Received: from mail.codelabs.ch ([127.0.0.1])
- by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
- id GsMDx6UpwuX7; Wed, 23 Oct 2024 17:49:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
-	s=default; t=1729698554;
-	bh=AuStIkcKjDDnuNnh7W0Ic2QFUcBuPQzsR2xLUEyzr1o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ju6RwDnCsOmR5ABx/IjfIarm/JxrMaxtlD2d7VUalVj9YSp3ax9FnMmKCVyhRdecF
-	 fsi7EJwaJTmkRrJue0B94+HLfWqFJd4vQt+r5BN6TKp/Ddb1ouPoubMqGSYqhJfR/y
-	 0YwwIJi19idfwWtaXb+GmqQ3nU4SOOz0Zd/3A+40zVWdsGFhof679WqgaFrCys47gs
-	 3SVkvPCRjRkgzqbZtVtJ8zj7/1BiGYbGtyz404vwmx1M3UWrfrjqwVDfk72M6yTyX0
-	 ZnJFcqwigE9fETXoLkwakCM6OSNypCqEjVKKeoRoW2H0+KaV2616VMSoCfzlFmFi3/
-	 1dEcMjdpY93OQ==
-Received: from [IPV6:2a01:8b81:5400:f500:1d4a:4606:c56c:c6f4] (unknown [IPv6:2a01:8b81:5400:f500:1d4a:4606:c56c:c6f4])
-	by mail.codelabs.ch (Postfix) with ESMTPSA id D0A0D5A0001;
-	Wed, 23 Oct 2024 17:49:13 +0200 (CEST)
-Message-ID: <31e0da00-3972-43a1-ab2c-1220f65fa3d3@strongswan.org>
+	s=arc-20240116; t=1729698591; c=relaxed/simple;
+	bh=+gUUvlaA57OsDeRZq9krqWQP2oYDSQKZWKViDsTiE6I=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=arYU5e/55dwKLABxnD/4QSLcpaRZpMQfgmWodd/iVj6b7CcAt1r0YFNMcuTkLQrnG3r/x2DPfxnzyK8phw7Ryo4LhxnKAoq12C5xNDWVChv14+a99sNtEicp7W7TayFtqlbh3LLpQ+BQhVLuNFElKGgAJCTr0miDn93E8qD4LeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VLqq51CU; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6B02F6000A;
+	Wed, 23 Oct 2024 15:49:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1729698580;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=USR+Fzw0NXq+MVkAGU4k4vAzfDhl2SPQnxVoSwYhqsY=;
+	b=VLqq51CUDD0fyx+Y7VY6ZMkMLDOBLt4/ldd6S05kO/8kRPSRvmeoSEfdaR/RZtPE41RqTn
+	/vrtsm2goub7bBjKttvs5p+x0lN7iiBSKD0Jwm3WDzJIPGj1T5vyUW/1L6764EWkQq6PjI
+	O4C6raaz+Ur/8YEUGu17WXinoxWcDUDNdYzlSURK0CnN3Ho7ibeKUz1JyLkbnC6BXRu9ec
+	PtJYR/VHy3OOgeSh3wHgB06sqx7y75ltEGKavEUyKigDDhWxNb3O4LVPIwEXms13OuXXJW
+	cweUWIA9r/r21r8gvMZl1U9Nxydc2PHkJGfdI1az52tkhXiEyNRWh3ns9gEOiw==
+From: Kory Maincent <kory.maincent@bootlin.com>
 Date: Wed, 23 Oct 2024 17:49:13 +0200
+Subject: [PATCH net-next v18 03/10] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 ipsec-next 0/4] Add support for RFC 9611 per cpu xfrm
- states.
-To: Steffen Klassert <steffen.klassert@secunet.com>,
- Antony Antony <antony.antony@secunet.com>, Daniel Xu <dxu@dxuuu.xyz>,
- Paul Wouters <paul@nohats.ca>, Simon Horman <horms@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, devel@linux-ipsec.org
-References: <20241023105345.1376856-1-steffen.klassert@secunet.com>
-From: Tobias Brunner <tobias@strongswan.org>
-Content-Language: de-CH, en-US
-Autocrypt: addr=tobias@strongswan.org; keydata=
- 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
- tvkh7XWO2ycrW1UlzUzM4KV3SDLIhfOU
-In-Reply-To: <20241023105345.1376856-1-steffen.klassert@secunet.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20241023-feature_ptp_netnext-v18-3-ed948f3b6887@bootlin.com>
+References: <20241023-feature_ptp_netnext-v18-0-ed948f3b6887@bootlin.com>
+In-Reply-To: <20241023-feature_ptp_netnext-v18-0-ed948f3b6887@bootlin.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ donald.hunter@gmail.com, danieller@nvidia.com, ecree.xilinx@gmail.com, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Shannon Nelson <shannon.nelson@amd.com>, 
+ Alexandra Winter <wintera@linux.ibm.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.14.1
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 23.10.24 12:53, Steffen Klassert wrote:
-> This patchset implements the xfrm part of per cpu SAs as specified in
-> RFC 9611.
-> 
-> Patch 1 adds the cpu as a lookup key and config option to to generate
-> acquire messages for each cpu.
-> 
-> Patch 2 caches outbound states at the policy.
-> 
-> Patch 3 caches inbound states on a new percpu state cache.
-> 
-> Patch 4 restricts percpu SA attributes to specific netlink message types.
-> 
-> Please review and test.
+Prepare for future hardware timestamp selection by adding source and
+corresponding pointers to ptp_clock structure.
+Additionally, introduce helpers for registering specific phydev or netdev
+PTP clocks, retrieving PTP clock information such as hwtstamp source or
+phydev/netdev pointers, and obtaining the ptp_clock structure from the
+phc index.
+These helpers are added to a new ptp_clock_consumer.c file, built as
+builtin. This is necessary because these helpers will be called by
+ethtool or net timestamping, which are builtin code.
 
-Tested-by: Tobias Brunner <tobias@strongswan.org>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
 
-Regards,
-Tobias
+Change in v8:
+- New patch.
+
+Change in v10:
+- Add get and put function to avoid unregistering a ptp clock object used.
+- Fix kdoc issues.
+
+Change in v11:
+- Remove useless extern.
+
+Change in v12:
+- Add missing return description in the kdoc.
+
+Change in v13:
+- Remove a semicolon which bring errors while not building PTP driver.
+- Remove few useless EXPORT_SYMBOL().
+- Separate PTP consumer symbole which are builtin from PTP provider.
+
+Change in v14:
+- Add back missing EXPORT_SYMBOL().
+---
+ drivers/ptp/Makefile             |   5 ++
+ drivers/ptp/ptp_clock.c          |  33 ++++++++++-
+ drivers/ptp/ptp_clock_consumer.c | 100 +++++++++++++++++++++++++++++++
+ drivers/ptp/ptp_private.h        |   7 +++
+ include/linux/ptp_clock_kernel.h | 125 +++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 269 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
+index 01b5cd91eb61..ab4990f56e5e 100644
+--- a/drivers/ptp/Makefile
++++ b/drivers/ptp/Makefile
+@@ -3,6 +3,11 @@
+ # Makefile for PTP 1588 clock support.
+ #
+ 
++ifdef CONFIG_PTP_1588_CLOCK
++# The ptp_clock consumer is built-in whenever PTP_1588_CLOCK is built-in
++# or module
++obj-y					:= ptp_clock_consumer.o
++endif
+ ptp-y					:= ptp_clock.o ptp_chardev.o ptp_sysfs.o ptp_vclock.o
+ ptp_kvm-$(CONFIG_X86)			:= ptp_kvm_x86.o ptp_kvm_common.o
+ ptp_kvm-$(CONFIG_HAVE_ARM_SMCCC)	:= ptp_kvm_arm.o ptp_kvm_common.o
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index c56cd0f63909..593b5c906314 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -34,7 +34,6 @@ const struct class ptp_class = {
+ 
+ static dev_t ptp_devt;
+ 
+-static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
+ 
+ /* time stamp event queue operations */
+ 
+@@ -512,6 +511,38 @@ void ptp_cancel_worker_sync(struct ptp_clock *ptp)
+ }
+ EXPORT_SYMBOL(ptp_cancel_worker_sync);
+ 
++struct ptp_clock *netdev_ptp_clock_register(struct ptp_clock_info *info,
++					    struct net_device *dev)
++{
++	struct ptp_clock *ptp;
++
++	ptp = ptp_clock_register(info, &dev->dev);
++	if (IS_ERR(ptp))
++		return ptp;
++
++	ptp->phc_source = HWTSTAMP_SOURCE_NETDEV;
++	ptp->netdev = dev;
++
++	return ptp;
++}
++EXPORT_SYMBOL(netdev_ptp_clock_register);
++
++struct ptp_clock *phydev_ptp_clock_register(struct ptp_clock_info *info,
++					    struct phy_device *phydev)
++{
++	struct ptp_clock *ptp;
++
++	ptp = ptp_clock_register(info, &phydev->mdio.dev);
++	if (IS_ERR(ptp))
++		return ptp;
++
++	ptp->phc_source = HWTSTAMP_SOURCE_PHYLIB;
++	ptp->phydev = phydev;
++
++	return ptp;
++}
++EXPORT_SYMBOL(phydev_ptp_clock_register);
++
+ /* module operations */
+ 
+ static void __exit ptp_exit(void)
+diff --git a/drivers/ptp/ptp_clock_consumer.c b/drivers/ptp/ptp_clock_consumer.c
+new file mode 100644
+index 000000000000..58b0c8948fc8
+--- /dev/null
++++ b/drivers/ptp/ptp_clock_consumer.c
+@@ -0,0 +1,100 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * PTP 1588 clock support
++ *
++ * Copyright (C) 2010 OMICRON electronics GmbH
++ */
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/posix-clock.h>
++#include <linux/pps_kernel.h>
++#include <linux/slab.h>
++#include <linux/syscalls.h>
++#include <linux/uaccess.h>
++#include <linux/debugfs.h>
++#include <linux/xarray.h>
++#include <uapi/linux/sched/types.h>
++
++#include "ptp_private.h"
++
++DEFINE_XARRAY_ALLOC(ptp_clocks_map);
++EXPORT_SYMBOL(ptp_clocks_map);
++
++bool ptp_clock_from_phylib(struct ptp_clock *ptp)
++{
++	return ptp->phc_source == HWTSTAMP_SOURCE_PHYLIB;
++}
++
++bool ptp_clock_from_netdev(struct ptp_clock *ptp)
++{
++	return ptp->phc_source == HWTSTAMP_SOURCE_NETDEV;
++}
++
++struct net_device *ptp_clock_netdev(struct ptp_clock *ptp)
++{
++	if (ptp->phc_source != HWTSTAMP_SOURCE_NETDEV)
++		return NULL;
++
++	return ptp->netdev;
++}
++
++struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp)
++{
++	if (ptp->phc_source != HWTSTAMP_SOURCE_PHYLIB)
++		return NULL;
++
++	return ptp->phydev;
++}
++EXPORT_SYMBOL(ptp_clock_phydev);
++
++int ptp_clock_get(struct device *dev, struct ptp_clock *ptp)
++{
++	struct device_link *link;
++
++	if (!ptp)
++		return 0;
++
++	if (!try_module_get(ptp->info->owner))
++		return -EPROBE_DEFER;
++
++	get_device(&ptp->dev);
++
++	link = device_link_add(dev, &ptp->dev, DL_FLAG_STATELESS);
++	if (!link)
++		dev_warn(dev, "failed to create device link to %s\n",
++			 dev_name(&ptp->dev));
++
++	return 0;
++}
++
++struct ptp_clock *ptp_clock_get_by_index(struct device *dev, int index)
++{
++	struct ptp_clock *ptp;
++	int ret;
++
++	if (index < 0)
++		return NULL;
++
++	ptp = xa_load(&ptp_clocks_map, (unsigned long)index);
++	if (IS_ERR_OR_NULL(ptp))
++		return ptp;
++
++	ret = ptp_clock_get(dev, ptp);
++	if (ret)
++		return ERR_PTR(ret);
++
++	return ptp;
++}
++
++void ptp_clock_put(struct device *dev, struct ptp_clock *ptp)
++{
++	if (!ptp)
++		return;
++
++	device_link_remove(dev, &ptp->dev);
++	put_device(&ptp->dev);
++	module_put(ptp->info->owner);
++}
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 18934e28469e..6a306e6e34c2 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -24,6 +24,8 @@
+ #define PTP_DEFAULT_MAX_VCLOCKS 20
+ #define PTP_MAX_CHANNELS 2048
+ 
++extern struct xarray ptp_clocks_map;
++
+ struct timestamp_event_queue {
+ 	struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
+ 	int head;
+@@ -41,6 +43,11 @@ struct ptp_clock {
+ 	struct ptp_clock_info *info;
+ 	dev_t devid;
+ 	int index; /* index into clocks.map */
++	enum hwtstamp_source phc_source;
++	union { /* Pointer of the phc_source device */
++		struct net_device *netdev;
++		struct phy_device *phydev;
++	};
+ 	struct pps_device *pps_source;
+ 	long dialed_frequency; /* remembers the frequency adjustment */
+ 	struct list_head tsevqs; /* timestamp fifo list */
+diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+index c892d22ce0a7..87d8f42b2cc1 100644
+--- a/include/linux/ptp_clock_kernel.h
++++ b/include/linux/ptp_clock_kernel.h
+@@ -9,7 +9,9 @@
+ #define _PTP_CLOCK_KERNEL_H_
+ 
+ #include <linux/device.h>
++#include <linux/netdevice.h>
+ #include <linux/pps_kernel.h>
++#include <linux/phy.h>
+ #include <linux/ptp_clock.h>
+ #include <linux/timecounter.h>
+ #include <linux/skbuff.h>
+@@ -342,6 +344,106 @@ extern void ptp_clock_event(struct ptp_clock *ptp,
+ 
+ extern int ptp_clock_index(struct ptp_clock *ptp);
+ 
++/**
++ * netdev_ptp_clock_register() - Register a PTP hardware clock driver for
++ *				 a net device
++ *
++ * @info: Structure describing the new clock.
++ * @dev:  Pointer of the net device.
++ *
++ * Return: Pointer of the PTP clock, error pointer otherwise.
++ */
++
++struct ptp_clock *
++netdev_ptp_clock_register(struct ptp_clock_info *info,
++			  struct net_device *dev);
++
++/**
++ * phydev_ptp_clock_register() - Register a PTP hardware clock driver for
++ *				 a phy device
++ *
++ * @info:   Structure describing the new clock.
++ * @phydev:  Pointer of the phy device.
++ *
++ * Return: Pointer of the PTP clock, error pointer otherwise.
++ */
++
++struct ptp_clock *
++phydev_ptp_clock_register(struct ptp_clock_info *info,
++			  struct phy_device *phydev);
++
++/**
++ * ptp_clock_from_phylib() - Does the PTP clock comes from phylib
++ *
++ * @ptp:  The clock obtained from net/phy_ptp_clock_register().
++ *
++ * Return: True if the PTP clock comes from phylib, false otherwise.
++ */
++
++bool ptp_clock_from_phylib(struct ptp_clock *ptp);
++
++/**
++ * ptp_clock_from_netdev() - Does the PTP clock comes from netdev
++ *
++ * @ptp:  The clock obtained from net/phy_ptp_clock_register().
++ *
++ * Return: True if the PTP clock comes from netdev, false otherwise.
++ */
++
++bool ptp_clock_from_netdev(struct ptp_clock *ptp);
++
++/**
++ * ptp_clock_netdev() - Obtain the net_device reference of PTP clock
++ *
++ * @ptp:  The clock obtained from netdev_ptp_clock_register().
++ *
++ * Return: Pointer of the net device, NULL otherwise.
++ */
++
++struct net_device *ptp_clock_netdev(struct ptp_clock *ptp);
++
++/**
++ * ptp_clock_phydev() - Obtain the phy_device reference of a PTP clock
++ *
++ * @ptp:  The clock obtained from phydev_ptp_clock_register().
++ *
++ * Return: Pointer of the phy device, NULL otherwise.
++ */
++
++struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp);
++
++/**
++ * ptp_clock_get() - Increment refcount of the PTP clock
++ *
++ * @dev:  The device which get the PTP clock.
++ * @ptp:  Pointer of a PTP clock.
++ *
++ * Return: 0 in case of success, error otherwise.
++ */
++
++int ptp_clock_get(struct device *dev, struct ptp_clock *ptp);
++
++/**
++ * ptp_clock_get_by_index() - Obtain the PTP clock reference from a given
++ *			      PHC index
++ *
++ * @dev:  The device which get the PTP clock.
++ * @index:  The device index of a PTP clock.
++ *
++ * Return: Pointer of the PTP clock, error pointer otherwise.
++ */
++
++struct ptp_clock *ptp_clock_get_by_index(struct device *dev, int index);
++
++/**
++ * ptp_clock_put() - decrement refcount of the PTP clock
++ *
++ * @dev:  The device which get the PTP clock.
++ * @ptp:  Pointer of a PTP clock.
++ */
++
++void ptp_clock_put(struct device *dev, struct ptp_clock *ptp);
++
+ /**
+  * ptp_find_pin() - obtain the pin index of a given auxiliary function
+  *
+@@ -407,6 +509,29 @@ static inline void ptp_clock_event(struct ptp_clock *ptp,
+ { }
+ static inline int ptp_clock_index(struct ptp_clock *ptp)
+ { return -1; }
++static inline struct ptp_clock *
++netdev_ptp_clock_register(struct ptp_clock_info *info,
++			  struct net_device *dev)
++{ return NULL; }
++static inline struct ptp_clock *
++phydev_ptp_clock_register(struct ptp_clock_info *info,
++			  struct phy_device *phydev)
++{ return NULL; }
++static inline bool ptp_clock_from_phylib(struct ptp_clock *ptp)
++{ return false; }
++static inline bool ptp_clock_from_netdev(struct ptp_clock *ptp)
++{ return false; }
++static inline struct net_device *ptp_clock_netdev(struct ptp_clock *ptp)
++{ return NULL; }
++static inline struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp)
++{ return NULL; }
++static inline int ptp_clock_get(struct device *dev, struct ptp_clock *ptp)
++{ return -ENODEV; }
++static inline void ptp_clock_put(struct device *dev, struct ptp_clock *ptp)
++{ }
++static inline struct ptp_clock *ptp_clock_get_by_index(struct device *dev,
++						       int index)
++{ return NULL; }
+ static inline int ptp_find_pin(struct ptp_clock *ptp,
+ 			       enum ptp_pin_function func, unsigned int chan)
+ { return -1; }
+
+-- 
+2.34.1
 
 
