@@ -1,195 +1,153 @@
-Return-Path: <netdev+bounces-138129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37079AC139
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:15:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0C39AC171
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:25:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 207071C2113C
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:15:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C112CB227FB
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1D31581F0;
-	Wed, 23 Oct 2024 08:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF34158D87;
+	Wed, 23 Oct 2024 08:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YctDnfDm"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="VV0LO198"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward501d.mail.yandex.net (forward501d.mail.yandex.net [178.154.239.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D6315746F;
-	Wed, 23 Oct 2024 08:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4905C487BE
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 08:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729671297; cv=none; b=Ha/Rn5f2Yb33FhfEUMghiRutXMEFLQLdqVdt83eaGmZSGZAkU1+2cMO71pVvBzLDaepL7pZtX0grvNBYpshrbFb/EuZE/bRIHGwBjIr9Ii/4xeOjRfhsgNKIkZap4+YqBV5cVIbZMOGaq5INQKDcDtBmSfsbEVczsBbsgtN7tic=
+	t=1729671891; cv=none; b=rQB0vJSJbtOWZwcjGv3eYbD1iHbkdD3mWtZShY7c6zH/MudWR2PV0qrQH/DFa/nTMd+yDC7QezqxaBpx/q9ShmaN62eTRZwoe/FvjiKzfASb8etO5cDC/jO/Ff3BWHNXxiDWiUFkkvCDTVgGN1TjHSd7tyhLj8+AACDzSSORl5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729671297; c=relaxed/simple;
-	bh=PCYN10kLm7y5N3zh5gY4Cdbwis2bzdQoq+BQVvVyqK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cpro9dyQhkhoQBQXu2MBDEtwkyBswtwHRCo43yPItzw4W8Ru/Mb2s3MXG+y+Gi0Jc6uEgPy7BmfcTmKz0meMijI9R3lT2emh6NVLcN1+rAH4s1XShhtpyDENkto+kndZ8NUqZgIn8yPqlEASPs7oMC+AUIrZYZHiQY1Wks8DnEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YctDnfDm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A63F5C4CEC6;
-	Wed, 23 Oct 2024 08:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729671297;
-	bh=PCYN10kLm7y5N3zh5gY4Cdbwis2bzdQoq+BQVvVyqK0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YctDnfDmwr3IK2pisJqLuLBy6/gCIerF7wUKqqa1CfH2RjXTxnFqmPHa97AiuVFd3
-	 +ddngVuWmLFnZp1uToHCHMBNAWffgj71hZDa9YBrkfFEPbBFdQBV2cmtU+3464Kg1n
-	 Upg4n+S8N+j/dGA33zrClI+TpwJ2BkRWNHKOfdYuUyU+9yjTqpySd44d9Jv5tkFTEt
-	 CMWg5e6ir7KfkDF1J+yByJQVXs2Im8O+b800ZScK77zjYghIqrKXzNzOvblPVUIVAq
-	 oflJ+JpOVdUmdzQU+kN4xLRyPmk6DDB7EeHT1MoRHDHHm7RVXK2xwny0n3MxFCvF6r
-	 ZxtgVoE9nqRrg==
-Date: Wed, 23 Oct 2024 10:14:54 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew@lunn.ch, Lars Povlsen <lars.povlsen@microchip.com>, 
-	Steen Hegelund <Steen.Hegelund@microchip.com>, horatiu.vultur@microchip.com, 
-	jensemil.schulzostergaard@microchip.com, Parthiban.Veerasooran@microchip.com, 
-	Raju.Lakkaraju@microchip.com, UNGLinuxDriver@microchip.com, 
-	Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com, 
-	ast@fiberby.net, maxime.chevallier@bootlin.com, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 14/15] net: sparx5: add compatible strings for
- lan969x and verify the target
-Message-ID: <cetor3ohhg6rzf3w2cm6hqxsqukh52nm54mp7tizb2qc3x44j4@n53v6btq6t6r>
-References: <20241021-sparx5-lan969x-switch-driver-2-v1-0-c8c49ef21e0f@microchip.com>
- <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
+	s=arc-20240116; t=1729671891; c=relaxed/simple;
+	bh=eQvFEoxoprbAR1mw+V5fFlL2XFa0vBgG14fS/7BFopY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=aNGRSvG1mYDQ/R4OFVXodu14/eF6rUU3980MMPPrArBq01Qwl+JPzR8rAlyEHLU6L7NsIDp2iaiQEyj8WY1GAzrIjK9WvVSUF5HDWM1dT8b8Uw062RShhNPf3IwelR5szVL5f+GgOoZEiIayONiOshvYHRyFRmv+bqrj/A/VyAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=VV0LO198; arc=none smtp.client-ip=178.154.239.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-39.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-39.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:96c7:0:640:6549:0])
+	by forward501d.mail.yandex.net (Yandex) with ESMTPS id C37AA61263;
+	Wed, 23 Oct 2024 11:18:14 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-39.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id BIOTSP7oISw0-3awu1jnT;
+	Wed, 23 Oct 2024 11:18:13 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1729671494; bh=9Rab33vo+0+GxIxz7NyxCnVeZihF9agVXxx9izSyxlY=;
+	h=In-Reply-To:To:From:Cc:Date:References:Subject:Message-ID;
+	b=VV0LO198OOCnE71EuwCSt8L0SO73OmULZxegM5Jy2C3gaY/XIhZ7CbimiNzDL1obd
+	 2aTfxdXav8zetnxVmgpEJHbyqQVdgS9wEgzSsORKAdkyltRqXFLFSZ7e2HNlbUH8KD
+	 o+2hIrlvoFvAfvMRk5x5u9sHPDk+0eQEWPY8jCvU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-39.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <c91441ec-11d3-4580-b51d-8b1bbdb58172@yandex.ru>
+Date: Wed, 23 Oct 2024 11:18:10 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-14-c8c49ef21e0f@microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: RTNL: assertion failed at net/core/dev.c
+To: Joe Damato <jdamato@fastly.com>, Simon Horman <horms@kernel.org>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru>
+ <ZxgDaBPGQrwEo0RR@LQ3V64L9R2>
+Content-Language: en-US
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ A/UwwXBRuvydGV0=
+In-Reply-To: <ZxgDaBPGQrwEo0RR@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 21, 2024 at 03:58:51PM +0200, Daniel Machon wrote:
-> Add compatible strings for the twelve lan969x SKU's (Stock Keeping Unit)
-> that we support, and verify that the devicetree target is supported by
-> the chip target.
-> 
-> Each SKU supports different bandwidths and features (see [1] for
-> details). We want to be able to run a SKU with a lower bandwidth and/or
-> feature set, than what is supported by the actual chip. In order to
-> accomplish this we:
-> 
->     - add new field sparx5->target_dt that reflects the target from the
->       devicetree (compatible string).
-> 
->     - compare the devicetree target with the actual chip target. If the
->       bandwidth and features provided by the devicetree target is
->       supported by the chip, we approve - otherwise reject.
-> 
->     - set the core clock and features based on the devicetree target
-> 
-> [1] https://www.microchip.com/en-us/product/lan9698
-> 
-> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> ---
->  drivers/net/ethernet/microchip/sparx5/Makefile     |   1 +
->  .../net/ethernet/microchip/sparx5/sparx5_main.c    | 194 ++++++++++++++++++++-
->  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   1 +
->  3 files changed, 193 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/sparx5/Makefile b/drivers/net/ethernet/microchip/sparx5/Makefile
-> index 3435ca86dd70..8fe302415563 100644
-> --- a/drivers/net/ethernet/microchip/sparx5/Makefile
-> +++ b/drivers/net/ethernet/microchip/sparx5/Makefile
-> @@ -19,3 +19,4 @@ sparx5-switch-$(CONFIG_DEBUG_FS) += sparx5_vcap_debugfs.o
->  # Provide include files
->  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/vcap
->  ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
-> +ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/lan969x
-> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> index 5c986c373b3e..edbe639d98c5 100644
-> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-> @@ -24,6 +24,8 @@
->  #include <linux/types.h>
->  #include <linux/reset.h>
->  
-> +#include "lan969x.h" /* lan969x_desc */
-> +
->  #include "sparx5_main_regs.h"
->  #include "sparx5_main.h"
->  #include "sparx5_port.h"
-> @@ -227,6 +229,168 @@ bool is_sparx5(struct sparx5 *sparx5)
->  	}
->  }
->  
-> +/* Set the devicetree target based on the compatible string */
-> +static int sparx5_set_target_dt(struct sparx5 *sparx5)
-> +{
-> +	struct device_node *node = sparx5->pdev->dev.of_node;
-> +
-> +	if (is_sparx5(sparx5))
-> +		/* For Sparx5 the devicetree target is always the chip target */
-> +		sparx5->target_dt = sparx5->target_ct;
-> +	else if (of_device_is_compatible(node, "microchip,lan9691-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9691VAO;
-> +	else if (of_device_is_compatible(node, "microchip,lan9692-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9692VAO;
-> +	else if (of_device_is_compatible(node, "microchip,lan9693-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9693VAO;
-> +	else if (of_device_is_compatible(node, "microchip,lan9694-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9694;
-> +	else if (of_device_is_compatible(node, "microchip,lan9695-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9694TSN;
-> +	else if (of_device_is_compatible(node, "microchip,lan9696-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9696;
-> +	else if (of_device_is_compatible(node, "microchip,lan9697-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9696TSN;
-> +	else if (of_device_is_compatible(node, "microchip,lan9698-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9698;
-> +	else if (of_device_is_compatible(node, "microchip,lan9699-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9698TSN;
-> +	else if (of_device_is_compatible(node, "microchip,lan969a-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9694RED;
-> +	else if (of_device_is_compatible(node, "microchip,lan969b-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9696RED;
-> +	else if (of_device_is_compatible(node, "microchip,lan969c-switch"))
-> +		sparx5->target_dt = SPX5_TARGET_CT_LAN9698RED;
-> +	else
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +/* Compare the devicetree target with the chip target.
-> + * Make sure the chip target supports the features and bandwidth requested
-> + * from the devicetree target.
-> + */
-> +static int sparx5_verify_target(struct sparx5 *sparx5)
-> +{
-> +	switch (sparx5->target_dt) {
-> +	case SPX5_TARGET_CT_7546:
-> +	case SPX5_TARGET_CT_7549:
-> +	case SPX5_TARGET_CT_7552:
-> +	case SPX5_TARGET_CT_7556:
-> +	case SPX5_TARGET_CT_7558:
-> +	case SPX5_TARGET_CT_7546TSN:
-> +	case SPX5_TARGET_CT_7549TSN:
-> +	case SPX5_TARGET_CT_7552TSN:
-> +	case SPX5_TARGET_CT_7556TSN:
-> +	case SPX5_TARGET_CT_7558TSN:
-> +		return 0;
+On 10/22/24 10:56 PM, Joe Damato wrote:
 
-All this is weird. Why would you verify? You were matched, it cannot be
-mis-matching.
+> Intends to fix the bug you hit. If you do test this patch and it
+> works for you, please let me know.
 
-> +	case SPX5_TARGET_CT_LAN9698RED:
-> +		if (sparx5->target_ct == SPX5_TARGET_CT_LAN9698RED)
+Well, the following patch (over net-next at least) fixes the reboot issue for me:
 
-What is "ct"? sorry, all this code is a big no.
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 4de9b156b2be..1cae92f136e5 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -3509,7 +3509,9 @@ static void e1000_reset_task(struct work_struct *work)
+  		container_of(work, struct e1000_adapter, reset_task);
 
-Best regards,
-Krzysztof
+  	e_err(drv, "Reset adapter\n");
++	rtnl_lock();
+  	e1000_reinit_locked(adapter);
++	rtnl_unlock();
+  }
 
+  /**
+@@ -5074,7 +5076,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
+  			usleep_range(10000, 20000);
+
+  		WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
++		rtnl_lock();
+  		e1000_down(adapter);
++		rtnl_unlock();
+  	}
+
+  	status = er32(STATUS);
+@@ -5240,8 +5244,11 @@ static pci_ers_result_t e1000_io_error_detected(struct pci_dev *pdev,
+  	if (state == pci_channel_io_perm_failure)
+  		return PCI_ERS_RESULT_DISCONNECT;
+
+-	if (netif_running(netdev))
++	if (netif_running(netdev)) {
++		rtnl_lock();
+  		e1000_down(adapter);
++		rtnl_unlock();
++	}
+
+  	if (!test_and_set_bit(__E1000_DISABLED, &adapter->flags))
+  		pci_disable_device(pdev);
+
+OTOH I would refrain from Tested-by: just because I'm running an emulated environment
+generated by syzbot, and this thing is definitely better to be tested by more people
+with real e1000 hardware.
+
+Thanks,
+Dmitry
 
