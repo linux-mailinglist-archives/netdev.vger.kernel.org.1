@@ -1,144 +1,90 @@
-Return-Path: <netdev+bounces-138169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0609AC7BE
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:24:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF059AC7C9
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 12:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 187781F26B04
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:24:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AEDA1F26E82
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 10:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3784E1AB515;
-	Wed, 23 Oct 2024 10:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9B11AB6FA;
+	Wed, 23 Oct 2024 10:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="POCLNRf+"
+	dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b="t7k4LGPo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [178.154.239.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EF01AB530
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 10:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DA71A3BA1;
+	Wed, 23 Oct 2024 10:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729678965; cv=none; b=gQ4TbYzZbcQWCazOqhZwJHBUwRPfheMBupfs0epV4VrcXsH2l+KfZjDU/ssMSVtU2PuvWTWe/fyc7J7DntFs7eVlPnmLlpCPAAbQi2HvssKnNgGsQJjLN1ODDLCIMPOPlsU1Sx0CUvu+tQaAVYMxn/ssw3f+JxvnH/UR93wZxbo=
+	t=1729678976; cv=none; b=pQYrBwjn5QnirAWMYmZePS+4qd1IDBmCr/xmamUKswKwAzp4QuJBJXXPHJzOhNiD4KB2YQDxP+TsIHgt8vbYH2kiFxhM5gxBbkSWIfUWxyT6q/L9vrSytOAD8KWQqyjFtocsv1mtEMlmN9eWXG9WZ+DwvI4UJR7Cos38hZ0xIVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729678965; c=relaxed/simple;
-	bh=2mcs0IKbxNJT5BlNCYB0HknWRyTSmQEZnBQOkwEAxu0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QZFQzIBC3yNZeH4Uno9dtGMbUHuUG+m8bktrEfrTtzo083knzK92BI4eJupPAauLecKLGsBrb8x/+EhwJaiuPWw3+kPpx6GrQoAAY8sU0W+8ufBHfmBW3Li/k/xw6K1lp+aC0Er2TxOwf6k8crj61xYOetOwDSOKUEnXvPZozqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=POCLNRf+; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3fe8183a-08d3-47d3-b1a1-0d84f7bf58b7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729678960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bn+zF09KPNYa3iXtf4zTqB+9MiKB/XGy0KKTzUMaa8M=;
-	b=POCLNRf+fxsROF6+a4fgY3UQqUVnbn0P73g/39VpVcNVfPXWKpOaFFgJbCJ09td4dWQujb
-	1PdGR2v7QmYvwFOr+jhWtpG/o+n8q38oyakHvAQJUX3J/piYXxeKL2HnIcsVpBCMIzaf53
-	PGo1gPjySqNn8jxyt79IeprT7Vhs5AI=
-Date: Wed, 23 Oct 2024 11:22:36 +0100
+	s=arc-20240116; t=1729678976; c=relaxed/simple;
+	bh=tsV4mDXWEcA6DLH5KJpY3Kl/VfFbOy479A1uRTvdzKU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=NZfrvbfyerfSnruzQH0d1O0d0suVRfuNdpRqyHP0hH9HhrryFd7FtsmMJ9+1n4joWY9XZOhL/Am5MHlohfCSSaYS2bub/2unGLbHrf0ZtudN7e4GSmhVW+QkF9X4QIRW6MrqVYvF88t2iW0t5w2sJK0NzRTVCEnrN5GZYDl63p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me; spf=pass smtp.mailfrom=maquefel.me; dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b=t7k4LGPo; arc=none smtp.client-ip=178.154.239.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maquefel.me
+Received: from mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net [IPv6:2a02:6b8:c16:201c:0:640:301d:0])
+	by forward102b.mail.yandex.net (Yandex) with ESMTPS id 097A3608FA;
+	Wed, 23 Oct 2024 13:22:44 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id eMQs7b6EhOs0-jQPVzoFY;
+	Wed, 23 Oct 2024 13:22:42 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maquefel.me; s=mail;
+	t=1729678962; bh=tsV4mDXWEcA6DLH5KJpY3Kl/VfFbOy479A1uRTvdzKU=;
+	h=Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
+	b=t7k4LGPoi65xE+z+AyehS9q8r89CXR7Mahn1RgGwF5jkOr2zChOBX6LaMSc69iGGo
+	 c9wFIgt2Jz5KDz7InYlVuOcoIwtZU1PBJCnuMRos50Ek+XKT94BieQ2j2LqjBKOo/b
+	 BUaIjLBQDWdundy9pVqYWKTblnoIwciT/qShI9Dc=
+Authentication-Results: mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net; dkim=pass header.i=@maquefel.me
+Message-ID: <5605e699c215c86440972f7fe3e544816c699c15.camel@maquefel.me>
+Subject: Re: [PATCH] MAINTAINERS: Remove some entries due to various
+ compliance requirements.
+From: Nikita Shubin <nikita.shubin@maquefel.me>
+To: gregkh@linuxfoundation.org
+Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru, 
+ dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com, 
+ geert@linux-m68k.org, gregkh@linuxfoundation.org,
+ hoan@os.amperecomputing.com,  ink@jurassic.park.msu.ru,
+ linux-alpha@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+ linux-fpga@vger.kernel.org,  linux-gpio@vger.kernel.org,
+ linux-hwmon@vger.kernel.org,  linux-ide@vger.kernel.org,
+ linux-iio@vger.kernel.org,  linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org,  linux-renesas-soc@vger.kernel.org,
+ linux-spi@vger.kernel.org,  manivannan.sadhasivam@linaro.org, Matt Turner
+ <mattst88@gmail.com>,  netdev@vger.kernel.org, nikita@trvn.ru,
+ ntb@lists.linux.dev,  patches@lists.linux.dev,
+ richard.henderson@linaro.org, s.shtylyov@omp.ru,  serjk@netup.ru,
+ shc_work@mail.ru, tsbogend@alpha.franken.de,  v.georgiev@metrotek.ru,
+ wangyuli@uniontech.com, wsa+renesas@sang-engineering.com,  xeb@mail.ru
+Date: Wed, 23 Oct 2024 13:22:45 +0300
+In-Reply-To: <2024101835-tiptop-blip-09ed@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: ti: iccsg-prueth: Fix 1 PPS sync
-To: Meghana Malladi <m-malladi@ti.com>, vigneshr@ti.com, horms@kernel.org,
- jan.kiszka@siemens.com, diogo.ivo@siemens.com, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-References: <20241023091213.593351-1-m-malladi@ti.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241023091213.593351-1-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 23/10/2024 10:12, Meghana Malladi wrote:
-> The first PPS latch time needs to be calculated by the driver
-> (in rounded off seconds) and configured as the start time
-> offset for the cycle. After synchronizing two PTP clocks
-> running as master/slave, missing this would cause master
-> and slave to start immediately with some milliseconds
-> drift which causes the PPS signal to never synchronize with
-> the PTP master.
-> 
-> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
->   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 12 ++++++++++--
->   drivers/net/ethernet/ti/icssg/icssg_prueth.h | 11 +++++++++++
->   2 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 0556910938fa..6b2cd7c898d0 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -411,6 +411,8 @@ static int prueth_perout_enable(void *clockops_data,
->   	struct prueth_emac *emac = clockops_data;
->   	u32 reduction_factor = 0, offset = 0;
->   	struct timespec64 ts;
-> +	u64 current_cycle;
-> +	u64 start_offset;
->   	u64 ns_period;
->   
->   	if (!on)
-> @@ -449,8 +451,14 @@ static int prueth_perout_enable(void *clockops_data,
->   	writel(reduction_factor, emac->prueth->shram.va +
->   		TIMESYNC_FW_WC_SYNCOUT_REDUCTION_FACTOR_OFFSET);
->   
-> -	writel(0, emac->prueth->shram.va +
-> -		TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
-> +	current_cycle = icssg_readq(emac->prueth->shram.va +
-> +				    TIMESYNC_FW_WC_CYCLECOUNT_OFFSET);
-> +
-> +	/* Rounding of current_cycle count to next second */
-> +	start_offset = ((current_cycle / MSEC_PER_SEC) + 1) * MSEC_PER_SEC;
+>>Remove some entries due to various compliance requirements. They can
+come back in the future if sufficient documentation is provided.
 
-This looks more like roundup(current_cycle, MSEC_PER_SEC), let's use it
-instead of open coding.
+Greg,
 
-> +
-> +	icssg_writeq(start_offset, emac->prueth->shram.va +
-> +		     TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
->   
->   	return 0;
->   }
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index 8722bb4a268a..a4af2dbcca31 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -330,6 +330,17 @@ static inline int prueth_emac_slice(struct prueth_emac *emac)
->   extern const struct ethtool_ops icssg_ethtool_ops;
->   extern const struct dev_pm_ops prueth_dev_pm_ops;
->   
-> +static inline u64 icssg_readq(const void __iomem *addr)
-> +{
-> +	return readl(addr) + ((u64)readl(addr + 4) << 32);
-> +}
-> +
-> +static inline void icssg_writeq(u64 val, void __iomem *addr)
-> +{
-> +	writel(lower_32_bits(val), addr);
-> +	writel(upper_32_bits(val), addr + 4);
-> +}
-> +
->   /* Classifier helpers */
->   void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac);
->   void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac);
-> 
-> base-commit: 73840ca5ef361f143b89edd5368a1aa8c2979241
+Among the all possiblities you had, you've chosen the most disgusting
+and shady way of doing this, with no attempt at least moving them to
+CREDITS - the thing they rightfully deserve for their efforts.
 
+As a person with M entries i deeply disrespect the removal and whe way
+it was done.
 
