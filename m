@@ -1,131 +1,151 @@
-Return-Path: <netdev+bounces-138299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDCE89ACE3B
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:09:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7DA9ACE78
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 17:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 715D6282357
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:09:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DBD7B2A9EE
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E99B1CF5DE;
-	Wed, 23 Oct 2024 15:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140551D5CFD;
+	Wed, 23 Oct 2024 15:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WW9uF7V8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyxQfkZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC6C1CF286;
-	Wed, 23 Oct 2024 15:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982051D278A;
+	Wed, 23 Oct 2024 15:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729695902; cv=none; b=bbsVxNWxVeuI4nUIejsaHY25ZorvJ5+jl+sRMmP5l/YnkAh2IHEPuq/WFAqiqWNHrwN2GV1KjENSiEfab5ioa8nl+oDq/GGi+uBbUNsuRrMN2RSEbX4oIqWy96qCTMpTbLP/bHcXEXW18In8ooOnYmcTZqNnbuziKLV2V7MXsGA=
+	t=1729695937; cv=none; b=YtmkANdfx2vaoFCMNaRWC7ZcXeQEFzZV/vHkn5RoTlkubh/1qTblGsMPlkFNF8eORkBiyGi3flPTB5y7I25Ffc7XY9ONwksiGFlZarjy1WSAovGSVJtYZUYBFiOXfDwfBE/z+d8apAII3peP6D5kUPmRcO7SVYu8Ux1tUBWGw6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729695902; c=relaxed/simple;
-	bh=zwm0YdUlkRPFpLJprNcgJfyNzN4ksSJVM/GonbtuotI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4nKH951SOgw2LxHV9nUZLe/y3fCjeGQb30eAyo+Y6hN7tma6l5zj/M0CXIRtXZw+GgcLTXjUT3sLwKQPMxTpnQ11mno6WXeT9/7m25Oy3Hfl0T11WZhIG/9L2HdyIz6pTwwQ1RwHzFIKwv4/gH0+nyMjjY3DZHi0KiC/+nzwU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WW9uF7V8; arc=none smtp.client-ip=209.85.161.48
+	s=arc-20240116; t=1729695937; c=relaxed/simple;
+	bh=6dqizTZi3MjLkY7UZ5URJEGE70fGc1UGn/v55vian+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hj3Nzx1gioR/p6U2cHOD1VPSQ6kp8oH1pQ4hu/ZUTxdQg3ySU8a3hnjOIlQ7dUlb2DAKeiK0sQXAA8ElQfVflGp2WYU25ff58aCesgYCGpScyOZCW4eR0nh8xjEpOUox0C2S7xvkL1ZYWhtY8TsgcbRxB1Bmv5cTRFlHFaBEC+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyxQfkZQ; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5ebbfcab9f4so2041685eaf.2;
-        Wed, 23 Oct 2024 08:05:00 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7163489149eso5291821a12.1;
+        Wed, 23 Oct 2024 08:05:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729695899; x=1730300699; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9tuzyAe8JQhERe3dQ6ji28tLfp5niGHH7P19VuAauSs=;
-        b=WW9uF7V8tmXesaCGZnesnoi8sJxpCYv8w7Rs+nL+0kh6VN5IrpuWKgDLeK51Swisex
-         P9DKU7ybKTwQ09+N7GQlaLzTMxxCnXmBh0Sz2KgoiQ0Uk7//DFNETZ344ojsxdJUW1B3
-         yMx1xSQTP5pLLaFX3WzFESE5OSUpLvmtNW4kBw+NmbIWWmGLXiY8kPbA0nqrba9WhZtg
-         gIBbsEbGnbrW4mdrb0fZWzjILcJbqR9doLDatJoWf7iKlj7SoSkkHAGCih/NrBqFycvT
-         jXgqMVU8Yrll9xzhigueU9n3hKEJ6G8nP2RjhXPkSaEaSxqeap1+Y5k+K3Tb8ykFFuDU
-         jUZw==
+        d=gmail.com; s=20230601; t=1729695935; x=1730300735; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7/xr6R6L67/bTFViqslA7RLr8Ha+9B35qwhr0RZOMhQ=;
+        b=JyxQfkZQTe3JuuY9fJlgT2WTAs5FJBx7noGfvXQcjLIXKLVKLwvvu7dsEbB5DQIkpG
+         HbiGUeZMNAfEvDCCuuAxhk4OrWxJscyEUbBiwzvBCl0g9WaSwG90yuS+9kS/KtpB+BIz
+         /BpZd8YH1/E7C57qxvfX+tuh2UQ/YyQxiSfA/B8AF1aPM+qhPowaluYjHN149i9Rj9uP
+         JQWKvBJs/I0obN68ET9frEdMQd1WiGUsxVtUYlt9jI9KA1LvoYtGUmPkoSM1TwY57X8R
+         0a2eZatHwNlDdlubJQVozrbEQtitXvqaDVs9/Utr3m9rjp99tQv0qvVxQWAhcpL6pB5T
+         ZAOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729695899; x=1730300699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9tuzyAe8JQhERe3dQ6ji28tLfp5niGHH7P19VuAauSs=;
-        b=oqvLKG+vZUOcmTSO6ROEogwrYNBJHZ5vS8f/9jYNAxXGrkEI8g6ktBZJ5e4spYZSSV
-         vfqe4SmOVzkm+SF4n/VUAPOflBkFwS4fo6oLgyLFSUyZLDsczYKArXI40yIBWZZRcfyh
-         DMf/LBBuWX2IMdq7YooaH15d4KzzA0g3qjMgrK2V+tONfKzj+QFktrKZ/cEcTg8OCbxX
-         jS0kB92QMT9G97v4OPDmx9pdHGnNirvu+o1aPcxCAHS3jwus83BZcAS2CsCjVZcuDawc
-         H3IYKH0cOw7yiL8huNNQlxXvCdOx56GQdYM6ZGl/oVWl38ewfq+Ab/jE6KSyYPUKVpVY
-         pl0A==
-X-Forwarded-Encrypted: i=1; AJvYcCU3x7oKjlrcKFjlyrNE1aXvVo4GArJW+5gaeDKWtG7V3cIXzoMEpp0HnFTyLE3/z1mYThf0n0zfy4W/95A8DCva/5c=@vger.kernel.org, AJvYcCU8vQKboALyPkskm2GDSb01J1psM8WyASfn4EzWhDpfZypsNFgw3UFBMblZ27ADvujpFIKfn92Fgb/0aQ==@vger.kernel.org, AJvYcCUDK+6AkgaDbeRT9mtDeU3gtnqvfMOEYH3XxYtNevqns1Gdji3yqkM2SLCSk6/p+6MyVna4pbXO@vger.kernel.org, AJvYcCUDfgZwTJsVuxbPEu4gX1z/O2uhWRVYKHnoIlIvyi1yOUqW53jvQc2euSEwPxVtJDGJI71BoZFijZhnV2Q=@vger.kernel.org, AJvYcCUEE4/soKyMGv/IF4TszPMBbP5Vd0qqotohWn+595wgIaQzGRFFOrTx+1HtOUtvlxfm+jB2bFL/Z9fP@vger.kernel.org, AJvYcCUfMnfTypX5M9n3/gVEyTNOeMFdlXw7IfMSlF/JiMqtpthpUAnRvxVX1YZ/myezMYqR9abtKa5GknHQ7gY=@vger.kernel.org, AJvYcCVXRHfOabrIemErhB6K8fzyrd/NqoA+7JR0LrrlTN8JBsLUISBi53i3Hwrfo5UzVZjUklqLzpoNFAc=@vger.kernel.org, AJvYcCVcGu4lIuNPT1/b2yN0WCslhl2Vw4OeHiObsagZMxVVBtwBv+LTeBjhq26UUIsUTC0a3rm7APyPnf61h9o=@vger.kernel.org, AJvYcCVu35EKlp7t1qt9Jg6wee1ld0bsYYO+uKKreS7bl87S8bBM++3eNLQxCi7K5XUGN8sL/ZaHyz5lEQurtg==@vger.kernel.org, AJvYcCWMsq0QDUEPml/6lpFk
- fZNfhcGPXvuTmoMF+KdGS9zclsML5Vz6SwKOboYRjyHCPVxnQvwGBbe0J7Af8g==@vger.kernel.org, AJvYcCWY2GnqWstdNQRz9d4XWc0/xDewkHEa7K5f2h1uUHV1D4FrWha5Xz4js9H9bFw+2inwrcMQN88WrmBZ@vger.kernel.org, AJvYcCWuyWuk73ol2+eNM28lWk88ailytiSZKRVJBwWdnr/IgSevo+DJElh3P+VSqy7S8oeab/TRFWEMdL/j@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkSuq5m82TioeBpLIbH4EU7QldioEUdBwoi8kTSbY2mutnhVgs
-	H7dtkkc9DtRIC6voGWO85uTRuWlzHVyTbqBvQXnqNW1TcZ9xCJRhophqWcZzvUZMmMeQQBkLZVD
-	EiQlUeaM3la3rjbHmey2w/fhch20=
-X-Google-Smtp-Source: AGHT+IELnyS+e/TN/dMdHzvAA3dedAZFpyyaBekY76IOdFg+Te4WZUxhJCCdMsqShzs8WjVE+pUlBhArE6QTMefHWi4=
-X-Received: by 2002:a05:6820:1c9a:b0:5e5:7086:ebe8 with SMTP id
- 006d021491bc7-5ebee308838mr2092425eaf.0.1729695899332; Wed, 23 Oct 2024
- 08:04:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729695935; x=1730300735;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7/xr6R6L67/bTFViqslA7RLr8Ha+9B35qwhr0RZOMhQ=;
+        b=YFe1+9E7ndrs5EE/3NhSJ7JdbB5tILCvKuMr92SKe+8heeV2XQ0uiwfBWdIopHoaC7
+         og8HIkLKe0aZIt87vLAYHP2vc+25IdZZ+Do2aJ8TUFt9ozutlG4vQJpGA1bgucCigzL1
+         OfJn5cgxqBUj2VsqO/inETQWzbUiyYI/wwYwWlsRiDHDvlINeCp1mT9pxHyWiGfKwGAh
+         hP0w5MODVmpgBXbOVvSyyzah16xGKjrv8+I/apuE8bH84NuOrsiazP1HJjUz39UoeaUe
+         N8lub/ZGi3YMs7EEdYACAlOAH7v7viBDQdyF6aMhtlfdJ04WzZKh7pKhIJIoh9kXAcAZ
+         PM0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUZV3/+Fg54OOCD1qCj6UwW9A3bZSDMuk1SZNNrmH/qX8dO+6kiOM5WL4c+08FiNBltLkssy+Oz@vger.kernel.org, AJvYcCUj6NXP5UKoA8ihyglBjVXnqIcLJ6/R4qX7BU2CGZkqs4x+iXHljNlItft39B3iThphxPyIfnaQUrI9z8Y=@vger.kernel.org, AJvYcCVOFIyqAdgmdraP+SxjMQaSbMpIYzYI9H5e745KdrX5SmpniFH8M5lvO6VMbrt5Y2n7X4kSOiVnRhhLBREitzmp@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqWPPzJkXKd8B8as06Hi/yXnLX0WZuu+BaRvN5acfeleSU+KGq
+	oY+1FVFf2+/hxObNc36bFS90cXoRTRx+N7ItPU4nKArn1EcxxEM=
+X-Google-Smtp-Source: AGHT+IFWJ753ImcFrdZjWX9Z2JRm17SUYFzy1gfZEpI0eTGGy7td2Fby4f8HOsgJOYX31jMSxkuQRQ==
+X-Received: by 2002:a05:6a21:e8f:b0:1cf:6d20:4d6 with SMTP id adf61e73a8af0-1d978b0a072mr3128784637.16.1729695934731;
+        Wed, 23 Oct 2024 08:05:34 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1312d05sm6418000b3a.35.2024.10.23.08.05.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 08:05:34 -0700 (PDT)
+Date: Wed, 23 Oct 2024 08:05:33 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	Liam Howlett <liam.howlett@oracle.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"juri.lelli@redhat.com" <juri.lelli@redhat.com>,
+	"vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
+	"dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
+	"rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"bsegall@google.com" <bsegall@google.com>,
+	"mgorman@suse.de" <mgorman@suse.de>,
+	"vschneid@redhat.com" <vschneid@redhat.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	Pei Li <peili.io@oracle.com>
+Subject: Re: [PATCH net-next v5 2/3] connector/cn_proc: Kunit tests for
+ threads hash table
+Message-ID: <ZxkQvYNVGA90srE7@mini-arch>
+References: <08EFFA25-7C8F-444A-B229-2A9F99B0C028@oracle.com>
+ <Zxg6KhhpCGc-5Mw0@mini-arch>
+ <39B736F3-F7E1-420C-9567-0447464A95BA@oracle.com>
+ <CDE1D110-A3F5-4BB7-A8DF-4D24E2AC98B0@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <a08dc31ab773604d8f206ba005dc4c7a@aosc.io> <20241023080935.2945-2-kexybiscuit@aosc.io>
-In-Reply-To: <20241023080935.2945-2-kexybiscuit@aosc.io>
-From: Sergio Paracuellos <sergio.paracuellos@gmail.com>
-Date: Wed, 23 Oct 2024 17:04:47 +0200
-Message-ID: <CAMhs-H_2tnpeynm2m9KNGL1GVU9m+odSnTk6F-WKLruMfEjXUg@mail.gmail.com>
-Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various
- compliance requirements."
-To: Kexy Biscuit <kexybiscuit@aosc.io>
-Cc: jeffbai@aosc.io, gregkh@linuxfoundation.org, wangyuli@uniontech.com, 
-	torvalds@linux-foundation.org, aospan@netup.ru, conor.dooley@microchip.com, 
-	ddrokosov@sberdevices.ru, dmaengine@vger.kernel.org, dushistov@mail.ru, 
-	fancer.lancer@gmail.com, geert@linux-m68k.org, hoan@os.amperecomputing.com, 
-	ink@jurassic.park.msu.ru, linux-alpha@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-ide@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-spi@vger.kernel.org, 
-	manivannan.sadhasivam@linaro.org, mattst88@gmail.com, netdev@vger.kernel.org, 
-	nikita@trvn.ru, ntb@lists.linux.dev, patches@lists.linux.dev, 
-	richard.henderson@linaro.org, s.shtylyov@omp.ru, serjk@netup.ru, 
-	shc_work@mail.ru, tsbogend@alpha.franken.de, v.georgiev@metrotek.ru, 
-	wsa+renesas@sang-engineering.com, xeb@mail.ru
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CDE1D110-A3F5-4BB7-A8DF-4D24E2AC98B0@oracle.com>
 
-On Wed, Oct 23, 2024 at 10:20=E2=80=AFAM Kexy Biscuit <kexybiscuit@aosc.io>=
- wrote:
->
-> This reverts commit 6e90b675cf942e50c70e8394dfb5862975c3b3b2.
->
-> An absolutely no-one-ever-reviewed patch, not even by the maintainers who
-> got removed themselves - at least not on the mailing list. Then the patch
-> just got slipped into an unrelated subsystem pull request, and got pulled
-> by Torvalds with not even a comment.
->
-> What about the next time? Who next would be removed from the MAINTAINERS
-> file, the kernel.org infrastructure? What if the compliance requires
-> another XZ backdoor to be developed without further explanation? Is the
-> kernel development process still done in public?
->
-> Are the "compliance requirements" documented on docs.kernel.org? Who are
-> responsible for them? Are all that are responsible employees of
-> The Linux Foundation, which is regulated by the U.S. legislature?
->
-> Fixes: 6e90b675cf94 ("MAINTAINERS: Remove some entries due to various com=
-pliance requirements.")
-> Signed-off-by: Kexy Biscuit <kexybiscuit@aosc.io>
-> ---
+On 10/23, Anjali Kulkarni wrote:
+> […snip…]
+> 
+> >>>> 
+> >>>> Yes, make sure all required options are picked up by
+> >>>> "./tools/testing/kunit/kunit.py run" instead of manually adding options
+> >>>> and doing modprobe.
+> >>> 
+> >>> The environment issues are resolved and I am able to run kunit.py, but my tests
+> >>> are not invoked without giving options via —kconfig-add. Other tests are also not
+> >>> invoked. Running with the manual options runs 413 tests, and with just kunit.py
+> >>> runs 389 tests. (I have added 6). Any idea how I can make it run my tests?
+> >> 
+> >> The runner does: ./tools/testing/kunit/kunit.py run --alltests
+> >> Is it not enough in your case? What options do you pass via
+> >> --kconfig-add? Is it because CONNECTOR stuff is disabled by default?
+> > 
+> > No, it still does not run.
+> > However, I added to tools/testing/kunit/configs/all_tests.config:
+> > 
+> > CONFIG_CONNECTOR=y
+> > CONFIG_PROC_EVENTS=y
+> > CONFIG_NET=y
+> > CONFIG_CN_HASH_KUNIT_TEST=y
+> > 
+> > And now it does run.
+> > Should I make the change above? I will also check with the kunit guys.
+> > But I do not understand how it ran for you(and run into the error), or did
+> > it just try to compile?
+> 
+> I see this in comments on top of all_tests.config.
+> 
+> # The config is manually maintained, though it uses KUNIT_ALL_TESTS=y to enable
+> # any tests whose dependencies are already satisfied. Please feel free to add
+> # more options if they any new tests.
+> 
+> So I suppose if a test needs more dependencies, it needs to be added here.
 
-Unbelievable...
-
-Acked-by: Sergio Paracuellos <sergio.paracuellos@gmail.com>
-
-Thanks,
-    Sergio Paracuellos
+Let's try and CC a bunch of kunit people to confirm :-)
 
