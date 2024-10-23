@@ -1,200 +1,108 @@
-Return-Path: <netdev+bounces-138059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7381A9ABB90
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 04:32:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A0D19ABBF5
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93DCB1C213B1
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 02:32:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E67CB284BCB
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 03:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3054087C;
-	Wed, 23 Oct 2024 02:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A492D80027;
+	Wed, 23 Oct 2024 03:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVX/U84R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwZGoD6R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841AA1C28E;
-	Wed, 23 Oct 2024 02:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A545A48;
+	Wed, 23 Oct 2024 03:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729650713; cv=none; b=PX4Nh03REWWHKEKPp4xa07HYBucZH+8adKOMAO6XPPS2pmXvDPBYBrCY80ZunyqtpGiSawxH6jRQz6asOsZv+M9tzosWGZ1/Q5mZdU+IMgDAIjNNIKM03UCdkxyHhnUi7KcDxdQ0VT1L+rEffNN8vkNTyIO0POyJ/oxvoy1Zdg8=
+	t=1729652725; cv=none; b=SwKlDN/ReYU7vmO0hTWFwHxKEq/PSFmPPANfymQLW/uaqTmVo+RUaC969b+FJwNhXCXO46Sb2SBUe1J7ZDju/zwxoUqwAmRNlpC5NArbKeOuvWiDx3DenE1fn8kJNW/+fo5cC29cdYZDHq0v/QQi4o0Sv4kOe6P7bWKnQMOKmn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729650713; c=relaxed/simple;
-	bh=+uWmf7l/5xKUeRvYWQFvXEiE6OCTPRne6VeNsLyv/wU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=tDl1/kg+0Dq3Bdq7kXmgiH3i59NcBgecDiGmh/GhsCuih4B0/KJ56lFVqon7yUgUGNz68yS7Ihtk8AWn8ZQSRB37tw5mSvsk9xc8nyYkjvyWxPhTaapqA5fqE+F/zyUJAzvBTs82jQDCY9KvME90tf1QwP4HasDsbHQ3mwnwedw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVX/U84R; arc=none smtp.client-ip=209.85.160.181
+	s=arc-20240116; t=1729652725; c=relaxed/simple;
+	bh=bOzHRlqzme7Gk8wj104vkcRGuZynpK1QLzUDGGuNWhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AC1QLVMvFi4f8FERLqDsvRnUcpwnh6hMCMLQY8RdprMC6HOY2oJTiLLnqzZBwE2MTXuo0UuTscnzfIGHkge7g/nInCYz62m9vFwFALeklUKxj1zO+8gQdZbGmoDi5SYmjm0QNZTC9PNBJdQOn0egpqcS/A6KMfnOlK8b8ZdRDP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwZGoD6R; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-460a415633fso36818781cf.2;
-        Tue, 22 Oct 2024 19:31:51 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20cb89a4e4cso44762265ad.3;
+        Tue, 22 Oct 2024 20:05:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729650710; x=1730255510; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7+5pkazMR0lQTRePEVE/aggfzwATQGf4HDQ3Fx/SKKI=;
-        b=EVX/U84RQ/DfODkt3Hb8FHlluJk7T14l2b2zHCcqCt2iV07x7PoPJpaJNUWUIrQMc9
-         J7QezMA5wShvrHbbS7iYR3q5v0gxJv2f/kr5OTDjLejhL3yW6xW2kDNmYt1awUf/GXny
-         Smg50APAqbi15m9scuY8w54dUeyit4Vl1LIRjHj7EEeKgkgQFGLivAPVQw4IRnxmqDCm
-         u5SNI+cVYxIoxZ1M3hMoAaN5nWEbx2CERVkLNScihLInaudF/ow4/Gq3+LCj7KQofzv9
-         PejLHMkcAyv5L9w0q1LSSnxZi9iFAzJ+eNbGNy226PEvTzEC2skDKB/4PWKd08KZxoWh
-         auYA==
+        d=gmail.com; s=20230601; t=1729652723; x=1730257523; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QSo+aUkA2L09wnQi5t2l0lbWR/1059zX0K6vucStlzg=;
+        b=fwZGoD6Rm0AjroDQR8tRaIHNH4WdfyzXCET8kDwVwD2ijoSXu5h4TwztJrMtNzTEBO
+         7xvz65sip5WBSzyPLqZ9q3XsuTRl63xeO305vbHJhC2BhIUafzOnUWVLJBk21wJk3z1r
+         AKWODavF2cX0iUPHK1uCTJTOb6t0iA59S5KF6g0iWn7mh/NRxaqzdMIfrvFp8OEgzqcW
+         efqfIDhl6cTZtkweD5B+YRvRlaP3xErul9X+ebOdy2LtHnPBWr9ODO8ywG1+Nuq0hvvU
+         FwcRh1xXmiE6g5M/3a4DTtKOWQQmGc22d1dEa524p4PU6YaBpBXPQOMuK/v/5cDd12pQ
+         r0dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729650710; x=1730255510;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7+5pkazMR0lQTRePEVE/aggfzwATQGf4HDQ3Fx/SKKI=;
-        b=WKuSBvIkZKkpfCbPdbEYBdGFOzwy9EIxgR5O2y+x05/lqs3xqtt5Smnh3idvtsf3pH
-         IvfBqJmSnHizPSR/YxRfCykVScKJmLMQK67MbKA1ZC1QEbT42wcaKO0gR0dSxYbyu3U9
-         RPA/nKstW7yTvMcSac7tPpL+V7q5umkpJcKn2lijycQuMarnahhBQh/ber5I5sjxmKGu
-         TmTY9czJRNEfPn0bUKo4uAPJ8k6784NQK94NCrTjp1UGJ9P63JZ9gS/kjQFPsFGxVqJh
-         nsuBdowylAGREPZBmbFEzzPJ+tZP9ziXxaMbhd3tAUU8Oge82p8KRtLLgrnNkF5OLJKm
-         cCGw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/Yh6KEKIFxP4Z5osY624pjXyVEnhrBDgUAXl6+Lb9PM977fbx0BYrSeKfurzlmdpQ634g5rIs@vger.kernel.org, AJvYcCWRVCG9NbYEiTNauRVdFrTrq3vwxm+Iy7NE2fik0wfiYHqFyg5abgnGg4hkKG9+p3HZUCs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu3T/nxTLAr8w/JPvV3RiqISznRuAVraPhaLWlFkh1n7bQz2qs
-	VM9cnFewkYhf5JnqoonJV3cSZeTsbBuRKSMXB5euJXAAFPuh+SiGUn5h0w==
-X-Google-Smtp-Source: AGHT+IFh35NWrOofzBUjEaLuvmJz8b+y9ol3/4ghe6+Ajlm+lJnjbVS0QbMJt7ZQvL7d/zm/GqfV5w==
-X-Received: by 2002:ac8:57d5:0:b0:45f:6ed:40c0 with SMTP id d75a77b69052e-4611471f4camr12777561cf.40.1729650710220;
-        Tue, 22 Oct 2024 19:31:50 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3dc5facsm35752001cf.96.2024.10.22.19.31.49
+        d=1e100.net; s=20230601; t=1729652723; x=1730257523;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QSo+aUkA2L09wnQi5t2l0lbWR/1059zX0K6vucStlzg=;
+        b=MIEz9keE5Ph6fDIADBNcFq2TAcIcI6jFnpWSCdWCSrYMjew3AWAcm5BuQ/aR8KqCjz
+         UtBHyKKLvpYlhdqx34OixJ0ginhB2gSfeUUop7npTvU4DAfCIE8b1c7lL/NVKz+S5Iup
+         VRcQk3ERa1bWwkhH8sjFHHPMCf0zVVsxotyOV4Pm5nbzTXIOnK3hpErEWzAA8m3HrL97
+         ja7h8fhWko5fAdNslAHHWcVB6SFLU+K141ml6vMVKeOX7Cdx8BbC/MtW5JxbY8/3ns6a
+         bpdSKb6E8PblrxaSZyC2RRqkkv+oZGUO4C+swLJdAz+wxrujBT/IgDXk9NRGOdYWU1jH
+         9sxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUhc3GivwxJATzejSM+Dfk6jeiFZteWU7rg/GV6JNe6lOtpKocLgKvf6+sAiw0t2qjcnpDJtWuv@vger.kernel.org, AJvYcCUleU5VTH241E/wLbszxCueaT8Rc8yQMuSEK1rb1yrR2cRyXgCOqm7fqSNxen6EgNjIieX9gCTItI5QNLbs@vger.kernel.org, AJvYcCWGVmb79WzRCcbvXmzW258fKrQbt0gEO/kq0OrCElNUv9zK90E/3qpNzXhB5QoQGSFu/uL3vRJS1kddjSnrZZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1/+/j6vhLHr+x/yaLrfhEF26rempnDDW4YZ8ZIty4+/E03Gud
+	ke1sVcnYXs7Ng2nlwh9pds7q+a3mHJKSxDlhm2FgZM0XX5H4ypH+
+X-Google-Smtp-Source: AGHT+IGNCd6pswnFVJbP69j1MMou7cXV+SSVwZfX4y88ppmSoNsF/1akW0qlPsxclP17PP3VS2uVgw==
+X-Received: by 2002:a17:903:2287:b0:20c:bcd8:5ccb with SMTP id d9443c01a7336-20fa9e61d41mr16004915ad.30.1729652723384;
+        Tue, 22 Oct 2024 20:05:23 -0700 (PDT)
+Received: from Fantasy-Ubuntu ([2001:56a:7eb6:f700:b2d3:e25a:778e:1172])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabb8418sm4914142a12.67.2024.10.22.20.05.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 19:31:49 -0700 (PDT)
-Date: Tue, 22 Oct 2024 22:31:49 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <6718601526686_15cbc9294ef@willemb.c.googlers.com.notmuch>
-In-Reply-To: <671840a23227e_1420e529466@willemb.c.googlers.com.notmuch>
-References: <20241012040651.95616-1-kerneljasonxing@gmail.com>
- <20241012040651.95616-5-kerneljasonxing@gmail.com>
- <67157b7ec615_14e1829490@willemb.c.googlers.com.notmuch>
- <8a5f7f86-0784-4da3-a1b0-c2d88f3572d0@linux.dev>
- <671840a23227e_1420e529466@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net-next v2 04/12] net-timestamp: add static key to
- control the whole bpf extension
+        Tue, 22 Oct 2024 20:05:22 -0700 (PDT)
+Date: Tue, 22 Oct 2024 21:05:20 -0600
+From: Johnny Park <pjohnny0508@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [net-next] igb: Fix spelling "intialize"->"initialize"
+Message-ID: <Zxhn8AfRBNzY8XEO@Fantasy-Ubuntu>
+References: <Zxc0HP27kcMwGyaa@Fantasy-Ubuntu>
+ <20241022160933.GB402847@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022160933.GB402847@kernel.org>
 
-Willem de Bruijn wrote:
-> Martin KaFai Lau wrote:
-> > On 10/20/24 2:51 PM, Willem de Bruijn wrote:
-> > > Jason Xing wrote:
-> > >> From: Jason Xing <kernelxing@tencent.com>
-> > >>
-> > >> Willem suggested that we use a static key to control. The advantage
-> > >> is that we will not affect the existing applications at all if we
-> > >> don't load BPF program.
-> > >>
-> > >> In this patch, except the static key, I also add one logic that is
-> > >> used to test if the socket has enabled its tsflags in order to
-> > >> support bpf logic to allow both cases to happen at the same time.
-> > >> Or else, the skb carring related timestamp flag doesn't know which
-> > >> way of printing is desirable.
-> > >>
-> > >> One thing important is this patch allows print from both applications
-> > >> and bpf program at the same time. Now we have three kinds of print:
-> > >> 1) only BPF program prints
-> > >> 2) only application program prints
-> > >> 3) both can print without side effect
-> > >>
-> > >> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > 
-> > > Getting back to this thread. It is long, instead of responding to
-> > > multiple messages, let me combine them in a single response.
-> > > 
-> > > 
-> > > * On future extensions:
-> > > 
-> > > +1 that the UDP case, and datagrams more broadly, must have a clear
-> > > development path, before we can merge TCP.
-> > > 
-> > > Similarly, hardware timestamps need not be supported from the start,
-> > > but must clearly be supportable.
-> > > 
-> > > 
-> > > * On queueing packets to userspace:
-> > > 
-> > >>> the current behavior is to just queue to the sk_error_queue as long
-> > >>> as there is "SOF_TIMESTAMPING_TX_*" set in the skb's tx_flags and it
-> > >>> is regardless of the sk_tsflags. "
-> > > 
-> > >> Totally correct. SOF_TIMESTAMPING_SOFTWARE is a report flag while
-> > >> SOF_TIMESTAMPING_TX_* are generation flags. Without former, users can
-> > >> read the skb from the errqueue but are not able to parse the
-> > >> timestamps
-> > > 
-> > > Before queuing a packet to userspace on the error queue, the relevant
-> > > reporting flag is always tested. sock_recv_timestamp has:
-> > > 
-> > >          /*
-> > >           * generate control messages if
-> > >           * - receive time stamping in software requested
-> > >           * - software time stamp available and wanted
-> > >           * - hardware time stamps available and wanted
-> > >           */
-> > >          if (sock_flag(sk, SOCK_RCVTSTAMP) ||
-> > >              (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE) ||
-> > >              (kt && tsflags & SOF_TIMESTAMPING_SOFTWARE) ||
-> > >              (hwtstamps->hwtstamp &&
-> > >               (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)))
-> > >                  __sock_recv_timestamp(msg, sk, skb);
-> > > 
-> > > Otherwise applications could get error messages queued, and
-> > > epoll/poll/select would unexpectedly behave differently.
+On Tue, Oct 22, 2024 at 05:09:33PM +0100, Simon Horman wrote:
+> On Mon, Oct 21, 2024 at 11:11:56PM -0600, Johnny Park wrote:
+> > Simple patch that fixes the spelling mistake "intialize" in igb_main.c
 > > 
-> > I just tried the following diff to remove setsockopt from txtimestamp.c and run 
-> > "./txtimestamp -6 -c 1 -C -N -L ::1". It is getting the skb from the error queue 
-> > with only cmsg flag.
+> > Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
 > 
-> That it surprising and against the API intent as I understand it.
-> Let me reproduce and take a closer look.
-
-Interesting. I guess my interpretation was wrong.
-
-The reporting flags prevent reporting of the timestamp, but not
-queuing of the skb on the error queue. Even if the only purpose is to
-report a timestamp.
-
-It goes back until well before all the API extensions. At least v3.6.
-
-It still does suppress the timestamp itself if the relevant reporting
-flag, SOF_TIMESTAMPING_SOFTWARE or SOF_TIMESTAMPING_RAW_HARDWARE, is
-not set. So BPF should really still match that, I guess.
+> Thanks Johnny,
+> 
+> I agree this is correct. But I am wondering if you could also fix the
+> following around 3909. It seems to be the only other non false-positive
+> flagged by codespell in this file.
+> 
+> mor -> more
+> 
+> -- 
+> pw-bot: changes-requested
+Sounds good, I'll make a new patch shortly.
 
