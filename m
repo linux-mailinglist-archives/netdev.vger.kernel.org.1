@@ -1,125 +1,227 @@
-Return-Path: <netdev+bounces-138090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70ADF9ABEC9
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:32:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADEBA9ABECD
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 08:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BE501F246EC
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:32:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF69B1C20ACF
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 06:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BB7149C42;
-	Wed, 23 Oct 2024 06:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="iGpQUzuf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61753148317;
+	Wed, 23 Oct 2024 06:32:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080D127452;
-	Wed, 23 Oct 2024 06:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAA313A3F3;
+	Wed, 23 Oct 2024 06:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729665127; cv=none; b=iRmJP98DvFpzXIGQhWg0NpXU3niUiael3tSz/rC/Jgw7LEMlKG+Xy2jjaa4gk08XKQCxtUVKiVTaNkr5BPayyraA8SNKdM+De4M1n9BaRmY7kvXy4QH0Z3QKGwgq83dLU382UXuNnilQAQ9KdIyl1sowy+Lddq47lJlLUs8sj90=
+	t=1729665148; cv=none; b=T3jBl9AkIu14C+x7k6oEDZb4HaiIoDl6eK3cRqqReL7uf2RXe8g8YRvcvS0dp1g7RarYchlLLJ5UDT/8DlG6wQlX9htz6RUtZ+3Mp4t8BF8UqrIEtlv/P1jDKG6z78/G01Os+WTpFA7xO2Utlb4mVoEqywpITWBoj5d4TcFGTx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729665127; c=relaxed/simple;
-	bh=ngQUyspk0u5tmnuw4tF5HJKltqCiL9AJbZfUWTdGVNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QqAljj8fmHdDyFdoVmA1FP288LYiMEy1EbIUQAuSzRrGeRBwRLefGLz8QHoNqUUN2KkWDn4bV5rAdxrFl8S63elr2rGMiw6h9lX0HAblHnU62os6fTA66AY86N6vLgUNq7gAiU3LpBWqouLvZgw8313F7JRYiBsPd8b+Mo4lemU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=iGpQUzuf; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1729665067;
-	bh=ngQUyspk0u5tmnuw4tF5HJKltqCiL9AJbZfUWTdGVNU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=iGpQUzufGKagQD2p8OJ9+o1rv05GO3s0irkkzl+B/jVQzK62CKg8qVz67X69ysnlY
-	 guTCSgPYkdN689aKc9jSkAv2q1YkVkLU9aW1hyxIu8y95ubUmp7oLbbBrYPzSuQtxk
-	 b6AP1aH471/Gf/Mf0lCx04AOx9Z8n7u1eTbhDMCE=
-X-QQ-mid: bizesmtp85t1729665063t7rgkpzf
-X-QQ-Originating-IP: /Pu5B/BFVMh1l61DmVeOAJ9BOb/PIqdl2onMEJbSJ3s=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 23 Oct 2024 14:30:59 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 5490330265754036757
-From: WangYuli <wangyuli@uniontech.com>
-To: gregkh@linuxfoundation.org
-Cc: patches@lists.linux.dev,
-	nikita@trvn.ru,
-	ink@jurassic.park.msu.ru,
-	shc_work@mail.ru,
-	richard.henderson@linaro.org,
-	mattst88@gmail.com,
-	linux-alpha@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	fancer.lancer@gmail.com,
-	linux-hwmon@vger.kernel.org,
-	dmaengine@vger.kernel.org,
-	xeb@mail.ru,
-	netdev@vger.kernel.org,
-	s.shtylyov@omp.ru,
-	linux-ide@vger.kernel.org,
-	serjk@netup.ru,
-	aospan@netup.ru,
-	linux-media@vger.kernel.org,
-	ddrokosov@sberdevices.ru,
-	linux-iio@vger.kernel.org,
-	v.georgiev@metrotek.ru,
-	linux-mips@vger.kernel.org,
-	ntb@lists.linux.dev,
-	linux-renesas-soc@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	dushistov@mail.ru,
-	manivannan.sadhasivam@linaro.org,
-	conor.dooley@microchip.com,
-	linux-fpga@vger.kernel.org,
-	tsbogend@alpha.franken.de,
-	hoan@os.amperecomputing.com,
-	geert@linux-m68k.org,
-	wsa+renesas@sang-engineering.com
-Subject: Re: [PATCH] MAINTAINERS: Remove some entries due to various compliance requirements.
-Date: Wed, 23 Oct 2024 14:30:58 +0800
-Message-ID: <A74519B4332040FA+20241023063058.223139-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <2024101835-tiptop-blip-09ed@gregkh>
-References: <2024101835-tiptop-blip-09ed@gregkh>
+	s=arc-20240116; t=1729665148; c=relaxed/simple;
+	bh=utT3/fYILvmlZVZgyIaYvXWZkUdF0npNYEpfOmw5rDA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PshDmpsqPE9vkSTn4qQ3vt4QfYOyezXhEE+SR4a+Ln/ZuFuyfuYeR8aNLZZi1DjabvjsZI1PE89jMho2KWdl8gKAzc4ORYycYYVHjgMFwdyTxBgymqIT537assnMLx8jc1k/hxX9P7y4ajJF0DfIG+bOShdfWt1Yri0kjjvwS1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XYK1N2wcQzyTj7;
+	Wed, 23 Oct 2024 14:30:48 +0800 (CST)
+Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id B46EB140360;
+	Wed, 23 Oct 2024 14:32:19 +0800 (CST)
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 23 Oct 2024 14:32:18 +0800
+Message-ID: <1e9083bf-2297-443c-a703-4c54b6062886@huawei.com>
+Date: Wed, 23 Oct 2024 14:32:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: netfilter: Fix use-after-free in get_info()
+To: Simon Horman <horms@kernel.org>
+CC: <pablo@netfilter.org>, <kadlec@netfilter.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<fw@strlen.de>, <kuniyu@amazon.com>, <netfilter-devel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <yuehaibing@huawei.com>
+References: <20241022085753.2069639-1-dongchenchen2@huawei.com>
+ <20241022153327.GW402847@kernel.org>
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+In-Reply-To: <20241022153327.GW402847@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Ns4o82esMDegcnRCWZU/vtwwA13F4B7+hQiq+gV4rNIZds3XaHCyoQOa
-	p1fmo6vINY/HzKP8exUDEUoT8GO1mhMuqj8+qpo5UC+JwPE3OWM7p2tc37xsKL0Rflb2gvg
-	3g+rXbHOOHjoc7udEIyiRilr8qSndIj44+lmU2xp1cmI4vs85wz+CmAay/MLBHgTu8VSDav
-	18VxAAE8Yd2BXdS4DJgxvsIF4uLWcfuKQ18bZt6QN4PuMS8nErrVaThJbYmG6ZlX+Zs5jdj
-	hp3T2WOqIhf8Xorib4KNQwU3I00j3FEZmlokVC/zrWW9NeSBwAuw1H/FtCbuQFejMKMxKcF
-	C1ko/yI73fKK2fAloS9N1DbwAUL0de2oXLE/HRPaPNLjnIZ0c/O1Mwm0JeiYTCVjPpiRaO1
-	WaRrYhmIGp76sLTGrJeyQ2xDXW9TP+H11ZhkS+PWc2xc6HCivXkBXtOcQJHn4uh3Llh17Ps
-	dOnQZUopL9EgRdav9yavseoCFrTqbujsKPRWmiQNx+be6xlFi/GPWpHdT6opgiBhDECxI9o
-	CHJjdm3dxDPTTXGOq4UlF8henUED315eWa/m7+YiU6j4HTd/mEtyKf8XhHcF/PjZFoRKkFb
-	3i3G6X2XmnG5ko/AkhJ5GTUnLEKf5Ex4xqNVJJFUno+YAzzh+q0vy4NMoPzAoqrkoNf+y+G
-	E71LDKQsbTd61QEDPqjfp0TDuF7UHoiJoewWDckjzR/X7LHJ5L5a6wNLtsPt66laf3rmGST
-	Jp4DiW65HQUeS3wsDAiDAqm30JuVGYGCcRZzjdcaNJnZOF0ur8qUZI9WqxiAMYXhF+EeQOS
-	+3bSV7qiBCvev2SyMI1xcUevIwqfQoO7WfTH0Xi8u/a98aKNBMKOvefCOOsOYFbhbY38S8M
-	8FMeZiYtkAp3ngJsZfKMB6mfHqlo2IfaoyvmPXJyuJ1dsEgra9VXPsTwai42iQ1ykdky6Uw
-	gTs6Rdc5VI7x7lU95r9nZDyPv
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd100023.china.huawei.com (7.221.188.33)
 
-Although this commit has been merged, it's still important to know the specific reason (or even an example) that triggered this change for everyone here, right?
 
-And those maintainers who have been removed should be notified.
+On 2024/10/22 23:33, Simon Horman wrote:
+> On Tue, Oct 22, 2024 at 04:57:53PM +0800, Dong Chenchen wrote:
+>> ip6table_nat module unload has refcnt warning for UAF. call trace is:
+>>
+>> WARNING: CPU: 1 PID: 379 at kernel/module/main.c:853 module_put+0x6f/0x80
+>> Modules linked in: ip6table_nat(-)
+>> CPU: 1 UID: 0 PID: 379 Comm: ip6tables Not tainted 6.12.0-rc4-00047-gc2ee9f594da8-dirty #205
+>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+>> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+>> RIP: 0010:module_put+0x6f/0x80
+>> Call Trace:
+>>   <TASK>
+>>   get_info+0x128/0x180
+>>   do_ip6t_get_ctl+0x6a/0x430
+>>   nf_getsockopt+0x46/0x80
+>>   ipv6_getsockopt+0xb9/0x100
+>>   rawv6_getsockopt+0x42/0x190
+>>   do_sock_getsockopt+0xaa/0x180
+>>   __sys_getsockopt+0x70/0xc0
+>>   __x64_sys_getsockopt+0x20/0x30
+>>   do_syscall_64+0xa2/0x1a0
+>>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>
+>> Concurrent execution of module unload and get_info() trigered the warning.
+>> The root cause is as follows:
+>>
+>> cpu0				      cpu1
+>> module_exit
+>> //mod->state = MODULE_STATE_GOING
+>>    ip6table_nat_exit
+>>      xt_unregister_template
+>>      //remove table from templ list
+>> 				      getinfo()
+>> 					  t = xt_find_table_lock
+>> 						list_for_each_entry(tmpl, &xt_templates[af]...)
+>> 							if (strcmp(tmpl->name, name))
+>> 								continue;  //table not found
+>> 							try_module_get
+>> 						list_for_each_entry(t, &xt_net->tables[af]...)
+>> 							return t;  //not get refcnt
+>> 					  module_put(t->me) //uaf
+>>      unregister_pernet_subsys
+>>      //remove table from xt_net list
+>>
+>> While xt_table module was going away and has been removed from
+>> xt_templates list, we couldnt get refcnt of xt_table->me. Skip
+>> the re-traversal of xt_net->tables list to fix it.
+>>
+>> Fixes: c22921df777d ("netfilter: iptables: Fix potential null-ptr-deref in ip6table_nat_table_init().")
+>> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+>> ---
+>>   net/netfilter/x_tables.c | 8 +++++---
+>>   1 file changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+>> index da5d929c7c85..359c880ecb07 100644
+>> --- a/net/netfilter/x_tables.c
+>> +++ b/net/netfilter/x_tables.c
+>> @@ -1239,6 +1239,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>>   	struct module *owner = NULL;
+>>   	struct xt_template *tmpl;
+>>   	struct xt_table *t;
+>> +	int err = -ENOENT;
+>>   
+>>   	mutex_lock(&xt[af].mutex);
+>>   	list_for_each_entry(t, &xt_net->tables[af], list)
+>> @@ -1247,8 +1248,6 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>>   
+>>   	/* Table doesn't exist in this netns, check larval list */
+>>   	list_for_each_entry(tmpl, &xt_templates[af], list) {
+>> -		int err;
+>> -
+>>   		if (strcmp(tmpl->name, name))
+>>   			continue;
+>>   		if (!try_module_get(tmpl->me))
+>> @@ -1267,6 +1266,9 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>>   		break;
+>>   	}
+>>   
+>> +	if (err < 0)
+>> +		goto out;
+>> +
+>>   	/* and once again: */
+>>   	list_for_each_entry(t, &xt_net->tables[af], list)
+>>   		if (strcmp(t->name, name) == 0)
+>> @@ -1275,7 +1277,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>>   	module_put(owner);
+> Hi Dong Chenchen,
+>
+> I'm unsure if this can happen in practice, although I guess so else the
+> module_put() call above is never reached.
 
-It should be CC'd everyone who might need to be aware of this change, including the removed maintainers, other maintainers on the subsystem, and the subsystem's mailing list.
+Hi, Simon. Thank you very much for your suggestions!
 
-To ensure transparency.
+module_put(owner) will be never reached indeed. which wiil be executed in:
+
+1. xt_table not found in tmpl list and xt_net list:
+
+Owner == NULL, no need to put
+
+2. xt_table found in tmpl list;  table_init() fail to add table to 
+xt_net list but return 0
+
+this situation may be mutually exclusive
+
+So I thought it may not need to call module_puy(owner) here
+
+xt_find_table_lock
+
+list_for_each_entry(tmpl, &xt_templates[af], list)
+
+if (strcmp(tmpl->name, name))
+
+continue;
+
+err = tmpl->table_init(net); //add xtable to xt_net list
+
+if (err < 0) {
+
+module_put(owner);
+
+return ERR_PTR(err);
+
+}
+
+list_for_each_entry(t, &xt_net->tables[af], list)
+
+if (strcmp(t->name, name) == 0)
+
+return t;//err = 0, will return here
+
+module_put(owner); // put effectively while (err == 0) && (xtable found 
+in tmpl list) and add table xt_net list failed in table_init()
+
+out:
+
+mutex_unlock(&xt[af].mutex);
+
+return ERR_PTR(-ENOENT);
+
+> In any case, previously if we got
+> to this line then the function would return ERR_PTR(-ENOENT).  But now it
+> will return ERR_PTR(0). Which although valid often indicates a bug.
+>
+> Flagged by Smatch.
+
+As described above, err = 0 will be return in xt_net table list re- 
+traversal.
+
+>>    out:
+>>   	mutex_unlock(&xt[af].mutex);
+>> -	return ERR_PTR(-ENOENT);
+>> +	return ERR_PTR(err);
+>>   }
+>>   EXPORT_SYMBOL_GPL(xt_find_table_lock);
+>>   
+>> -- 
+>> 2.25.1
+>>
+>>
 
