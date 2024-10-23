@@ -1,92 +1,97 @@
-Return-Path: <netdev+bounces-138279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C21179ACC1D
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:19:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF4039ACC1E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:19:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 606BDB21FE6
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:19:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BF531F22E7F
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 14:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7844D1AE01B;
-	Wed, 23 Oct 2024 14:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E501BD017;
+	Wed, 23 Oct 2024 14:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="c9Gp2nyx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DED1A76AC
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 14:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661051A76AC;
+	Wed, 23 Oct 2024 14:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729693162; cv=none; b=L1HOt8zCsqY+7bgufKPq4m2jDyVS7SEC6OV4CeM0eau+b6CXXOu9HLKbgDhOGaaTcJ2aGyCuG4Auo9k+TwcBca0Hf5tMWM3OrvwmtXqT6En6DqZh3KVgukUgMv0rzztPMZsC0CfGFCwvOE0MElhlU2xmup7F2fY1dvIn2QdrN2g=
+	t=1729693167; cv=none; b=uIIUKJqaJPOptgA1nsNNfXH3Na0Ve1fSbvinlynx3aUKJ0UmnbGJGCLYCZZn/a4R7mZcIgGYR7U8GoXxLhqYrTZ8A1+1najuVPuLylszUh82gJz8ctLnb7rG7bdLbCVdWABeYuIw9ugFLZpL0pXrhGJSDh4UyEWg4MOOyjHn77I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729693162; c=relaxed/simple;
-	bh=YwOTXEnEQRIRKywPabGQVIRG37zNAsYxfbQJp1BiABs=;
+	s=arc-20240116; t=1729693167; c=relaxed/simple;
+	bh=FoHxH+9wsfGKFGD0k6kjbUJBPw85bHnZowT36nmDODs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=DyPFHs3zF/QP8wUzzpJImYd1DfkCHNmxq7VfEa9jGGMqdQ/8Z/PDo1j6nrdsH7BPnojTRYZ4lgnzmw7qd6K4YXxacgtGxD8bwrfYn+LEZF1IhHd/JN0UqJrIRmUoOaqVfqiNfMMqEFlmc65MddOXFkWYR2MCBruefZAV6MRpfmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=fail smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-16-b65TnEkLNbSI8cPzgSW3Fg-1; Wed,
- 23 Oct 2024 10:19:08 -0400
-X-MC-Unique: b65TnEkLNbSI8cPzgSW3Fg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E24041955D44;
-	Wed, 23 Oct 2024 14:19:06 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA667300018D;
-	Wed, 23 Oct 2024 14:19:02 +0000 (UTC)
-Date: Wed, 23 Oct 2024 16:19:00 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Patrisious Haddad <phaddad@nvidia.com>, Chris Mi <cmi@nvidia.com>
-Subject: Re: [PATCH net V2] macsec: Fix use-after-free while sending the
- offloading packet
-Message-ID: <Zxj7Xjz36bNTvz9k@hog>
-References: <20241021100309.234125-1-tariqt@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MRGqkonCrUQXwN5VZ93XiV+gRwnKLZe05EpuxrajYmhSkEcJFJPdIPK6IlS9A9gGelzy9w/AR3+x3rAxCU9g48MHibBBrgPCZM+023Mw3SgDED8F9fK4XbmjNoiDHfu4YLcfi5ipptjxJKcYWaKhD3fUjRTkoqvNtWd9KNhVFqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=c9Gp2nyx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IwqvHuF1Zy2iPtyM1A1kEGzLN9h3efIwk8pyQq8z64s=; b=c9Gp2nyxrDaOrnIuxb/874no1C
+	R2K5+vo/eeM5KMtNcxndGqB+lgK/OUacWE8ZenJljwmZ411n0qwBWIgSg7U2nDndbLFVZMymWDHwp
+	LTZJG8v51kmKFDkMoO3RVVoGlrA9O2BwoRdK7S79drYrOJiOxfX0Q6MV/7Euurk85ZvQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t3cCk-00AyRj-VI; Wed, 23 Oct 2024 16:19:18 +0200
+Date: Wed, 23 Oct 2024 16:19:18 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	sudongming1@huawei.com, xujunsheng@huawei.com,
+	shiyongbang@huawei.com, libaihan@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 6/7] net: hibmcge: Add nway_reset supported in
+ this module
+Message-ID: <b4a1a293-f35b-4338-bd7c-9f1e550854b2@lunn.ch>
+References: <20241023134213.3359092-1-shaojijie@huawei.com>
+ <20241023134213.3359092-7-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241021100309.234125-1-tariqt@nvidia.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241023134213.3359092-7-shaojijie@huawei.com>
 
-2024-10-21, 13:03:09 +0300, Tariq Toukan wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
->=20
-> KASAN reports the following UAF. The metadata_dst, which is used to
-> store the SCI value for macsec offload, is already freed by
-> metadata_dst_free() in macsec_free_netdev(), while driver still use it
-> for sending the packet.
->=20
-> To fix this issue, dst_release() is used instead to release
-> metadata_dst. So it is not freed instantly in macsec_free_netdev() if
-> still referenced by skb.
+On Wed, Oct 23, 2024 at 09:42:12PM +0800, Jijie Shao wrote:
+> Add nway_reset supported in this module
+> 
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>  drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+> index 1e93d1dcf7a0..2fef3d161c21 100644
+> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+> @@ -367,6 +367,7 @@ static const struct ethtool_ops hbg_ethtool_ops = {
+>  	.get_link		= ethtool_op_get_link,
+>  	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+>  	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
+> +	.nway_reset		= phy_ethtool_nway_reset,
+>  	.get_sset_count		= hbg_ethtool_get_sset_count,
+>  	.get_strings		= hbg_ethtool_get_strings,
+>  	.get_ethtool_stats	= hbg_ethtool_get_stats,
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+It is odd that you have phy_ethtool_get_link_ksettings etc, so have
+phylib integration, yet don't support pause autoneg?
 
---=20
-Sabrina
-
+	Andrew
 
