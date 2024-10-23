@@ -1,99 +1,81 @@
-Return-Path: <netdev+bounces-138356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6E59AD002
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 18:21:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5CE79AD00F
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 18:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C41C91C2187A
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:21:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A00E8282D61
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 16:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17AB21CDA3A;
-	Wed, 23 Oct 2024 16:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5961CF5F8;
+	Wed, 23 Oct 2024 16:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RjZOHPZk"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cWf/+PiU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F166E1CACDD;
-	Wed, 23 Oct 2024 16:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7911CEAD6;
+	Wed, 23 Oct 2024 16:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729700446; cv=none; b=obxT5oYL/5dXvkor5ShCljk05/gHI3eEgFF9aL+zx5l/06c64hSpf6fvpLGVpFzj9Ze/+zdWkLgDrhKdfV63sgQ06niQwBuTSOs8IVzNXzvGSkRPDU0JQMUlGqpiTAaXFepSZnC7DivG2vnJ/RECs+/HLlNsSM8c1xKlOHnKgeE=
+	t=1729700449; cv=none; b=M8A7Wb3gjkbwFJOQhBGbFV/a9K+Kwo5eSrdjmIHj6Xv14cfuyA63Xn2tlAw4xdT1CZxhYaFMwfdYBMo1ZsM3QklIscX3WUxkFhns6BhpBef7T1nS8aP0/rYTWyobphi+2G3swImvr0OHFI7YSwKZtbRlEkfIXhMGmwbNxcrjYpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729700446; c=relaxed/simple;
-	bh=yEZDDdRfKvZQvqSeOCYMGOt128dlUQgyrQEu9xCypIU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BHb7yt+a/Z3DuvuLbdMDkDsh0n9wC44eLP2KA4UrnU2/fKcmfgwUSkyZszjIBlh/bFog48hygvPY8RoH26f90a5NBIKuAnbaFeEwJQPmYWCYNjp/Z//M1RG+c/rOnnX75uBSn2JXz7b2BoOEkDZrTBHw1fHwuusrDZ9cvG3DrvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RjZOHPZk; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37d808ae924so4896900f8f.0;
-        Wed, 23 Oct 2024 09:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729700442; x=1730305242; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BnXmGzBtfa7kC1qzpg2xEmOEHLK960MKCFFUQoyIJF0=;
-        b=RjZOHPZkLwDg1Br5SEycWLBew+A0w/KLgrO9veVpxSR+Qh3NtMv81lUfMKcVnh84Jh
-         5VAS1oZr+lg1cwvTpTdkIQdpdiPTWbIeOQYXYrG2oD3dfYM6RBV5C2Q9FU/fqhD3RtxL
-         qI3PO4xaWKsjx5INxqVKndKDdEleHCdEtlhTuJnercA3UIpeJhH9YVgmNYLA3hBQ3cGI
-         qYWuLn0khnBPprrY7mHF83c8ZFFkhFDu8afj4epi0Sl1yGO86g5DWZwkk5rb+YlRro6F
-         Z0WfEbYbb7CTSJqBXdmfGVE2hK2uCSrPjtTnhv0GG7pRGZx3iolUcLeVDdv1ieQ3HwoD
-         /sww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729700442; x=1730305242;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BnXmGzBtfa7kC1qzpg2xEmOEHLK960MKCFFUQoyIJF0=;
-        b=Hfd0e04zv/1II1fwmXt7gOQTiU9XUGDVv1zJvQNYrF7bfE0/LCzs8BDAJ8jKo0l4ne
-         splOxbc1pzpjmY53lCs2BEWAMt2J8tU0a2BbSVIODGTcBOwAHOencDhWvOrnHHep1SMu
-         dc1gAuSYx3VltOWgBHBSBIJCFBvYpMCtgVSx8HnkBimQs69Wvb1Fokpk7Qf/ITPmOBds
-         1IjPfERrLKxSwvEmuLSCsimKNuyNOQjV9KwtMn9VX3jvakZ4zAlxUM3hyBlwoZihiUbS
-         h+YZ/+L1ChLG6F8vdcHftmv2FHshGkNt9FX3LdOP059E/qLkI274jGQH7gIK60jequ5c
-         vFlw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfYQPRmtXdE69WBEZc15G2NjgFzpZTRdwWDvZA+8w8c1VvavakkYip0uAsw0AsB5fI0MD0chMYPjmJ@vger.kernel.org, AJvYcCWG+ukvaAuEvVnCwuIZfnopao4LFJ9A32GChDIKPNjHAqmUTXDDbf9UPUv+NuwtI+V4h/N70RdhRkTPfHGF@vger.kernel.org, AJvYcCXJ6ON4oXRwo45c9cS7cXN5+6JzpCl1QPGD7mRZY8NbnMbIA1QMWDXHXU7iZN+xUEvTFUIWrHnx@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBccG1rcPmSvqhd2zFBNpvDzOHbGDPuYWuu6pmOzLniqNzP7F5
-	v/Mzki9csy3JIrj9sstV5S+qjJMq5flbQiSMnMwnnAZQ5SWaPJpM
-X-Google-Smtp-Source: AGHT+IGp8he+nOmx6pOtzShCTzm3JVZc/I0S6JDbj6P5LRnLn+aiBz1tuBucLUhrFfjLDnJmb0novQ==
-X-Received: by 2002:a05:6000:1f86:b0:37d:50e1:b3e1 with SMTP id ffacd0b85a97d-37efcf0615cmr2722552f8f.16.1729700442055;
-        Wed, 23 Oct 2024 09:20:42 -0700 (PDT)
-Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37ee0ba7dffsm9249993f8f.116.2024.10.23.09.20.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 09:20:41 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next RFC PATCH v2 3/3] net: phy: Add Airoha AN8855 Internal Switch Gigabit PHY
-Date: Wed, 23 Oct 2024 18:19:52 +0200
-Message-ID: <20241023161958.12056-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241023161958.12056-1-ansuelsmth@gmail.com>
-References: <20241023161958.12056-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1729700449; c=relaxed/simple;
+	bh=Pn3rJmBLq1HGpNcrl+o3sbHFF1B6dvkI9lDvNfA6M0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tDYRer9jZAiYcspXIWZCv0QmUwa+b3Y+PgbxeEAs8V9DcaDDsv3+z5D4SOeFRXbTrwZAwDAe8m3JnxTorifT4Bw1bMa3VHcdmecQTe/M39GNvOX3Xc10ma3BTiXf/lTwDkriRUiRtaKEoysPNYQQ6iDjcqQUqXZkc/V6rD8HiJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cWf/+PiU; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49NFfgcp026687;
+	Wed, 23 Oct 2024 16:20:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=H9Zg5eI/Dt021rWIPx2FQaeuIAOFM
+	/5+rL6MVlkWz2g=; b=cWf/+PiU0hBpaJdp2n1YAFBW+53HQwH05HrqTsx2Er9Gg
+	ToRjjHA2iEz0YaMHkdD2i9l0z1RDgL2PAnFgIhZ6LAO0W1nJfnp4+ZXYkoBHDruA
+	jqxcbHu0WZ9b7ESjJOadej3up6juTag01PfBwbymCaKiP2yNviPKmB1gZyUMpynl
+	Xmlm3koC8J7AaZgtms+Q8UrqH4YyWPIm3YGdHJAbPIRbo/rbsC5/r6Ji20Y3k9LA
+	EX35/3cHft6hiHqDNs67GjRIZO3Z1HzTugpoAiBzUEIVaZgi7kI0henCb7Yl7cRT
+	IZVfpPQtTXlL7w0wI9vmdS63IQQtM/MxmCv9tqsZw==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42c55egesd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 16:20:10 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49NFikaP025386;
+	Wed, 23 Oct 2024 16:20:09 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42emh9r60r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 16:20:09 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 49NGK806012043;
+	Wed, 23 Oct 2024 16:20:08 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 42emh9r5x9-1;
+	Wed, 23 Oct 2024 16:20:08 +0000
+From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+To: davem@davemloft.net, Liam.Howlett@Oracle.com
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mingo@redhat.com,
+        peterz@infradead.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+        vschneid@redhat.com, jiri@resnulli.us, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, akpm@linux-foundation.org,
+        brendan.higgins@linux.dev, davidgow@google.com, rmoar@google.com,
+        johannes.berg@intel.com, mic@digikod.net, gnoack@google.com,
+        jk@codeconstruct.com.au, kunit-dev@googlegroups.com, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, anjali.k.kulkarni@oracle.com,
+        peili.io@oracle.com
+Subject: [PATCH net-next v6 0/3] Threads support in proc connector
+Date: Wed, 23 Oct 2024 09:20:03 -0700
+Message-ID: <20241023162006.1725309-1-anjali.k.kulkarni@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,333 +83,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-23_13,2024-10-23_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 adultscore=0
+ suspectscore=0 mlxscore=0 bulkscore=0 mlxlogscore=966 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
+ definitions=main-2410230095
+X-Proofpoint-ORIG-GUID: H_SQJyJHY3MEIhHQAjdQtvXUt8LmyYpS
+X-Proofpoint-GUID: H_SQJyJHY3MEIhHQAjdQtvXUt8LmyYpS
 
-Add support for Airoha AN8855 Internal Switch Gigabit PHY.
+Recently we committed a fix to allow processes to receive notifications for
+non-zero exits via the process connector module. Commit is a4c9a56e6a2c.
 
-This is a simple PHY driver to configure and calibrate the PHY for the
-AN8855 Switch with the use of NVMEM cells.
+However, for threads, when it does a pthread_exit(&exit_status) call, the
+kernel is not aware of the exit status with which pthread_exit is called.
+It is sent by child thread to the parent process, if it is waiting in
+pthread_join(). Hence, for a thread exiting abnormally, kernel cannot
+send notifications to any listening processes.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- MAINTAINERS                  |   1 +
- drivers/net/phy/Kconfig      |   5 +
- drivers/net/phy/Makefile     |   1 +
- drivers/net/phy/air_an8855.c | 265 +++++++++++++++++++++++++++++++++++
- 4 files changed, 272 insertions(+)
- create mode 100644 drivers/net/phy/air_an8855.c
+The exception to this is if the thread is sent a signal which it has not
+handled, and dies along with it's process as a result; for eg. SIGSEGV or
+SIGKILL. In this case, kernel is aware of the non-zero exit and sends a
+notification for it.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e3077d9feee2..cf34add2a0bb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -726,6 +726,7 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/dsa/airoha,an8855.yaml
- F:	drivers/net/dsa/an8855.c
- F:	drivers/net/dsa/an8855.h
-+F:	drivers/net/phy/air_an8855.c
- 
- AIROHA ETHERNET DRIVER
- M:	Lorenzo Bianconi <lorenzo@kernel.org>
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index ee3ea0b56d48..1d474038ea7f 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -79,6 +79,11 @@ config SFP
- 
- comment "MII PHY device drivers"
- 
-+config AIR_AN8855_PHY
-+	tristate "Airoha AN8855 Internal Gigabit PHY"
-+	help
-+	  Currently supports the internal Airoha AN8855 Switch PHY.
-+
- config AIR_EN8811H_PHY
- 	tristate "Airoha EN8811H 2.5 Gigabit PHY"
- 	help
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 90f886844381..baba7894785b 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -35,6 +35,7 @@ obj-y				+= $(sfp-obj-y) $(sfp-obj-m)
- 
- obj-$(CONFIG_ADIN_PHY)		+= adin.o
- obj-$(CONFIG_ADIN1100_PHY)	+= adin1100.o
-+obj-$(CONFIG_AIR_AN8855_PHY)   += air_an8855.o
- obj-$(CONFIG_AIR_EN8811H_PHY)   += air_en8811h.o
- obj-$(CONFIG_AMD_PHY)		+= amd.o
- obj-$(CONFIG_AMCC_QT2025_PHY)	+= qt2025.o
-diff --git a/drivers/net/phy/air_an8855.c b/drivers/net/phy/air_an8855.c
-new file mode 100644
-index 000000000000..c43ae7b76177
---- /dev/null
-+++ b/drivers/net/phy/air_an8855.c
-@@ -0,0 +1,265 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+
-+#include <linux/phy.h>
-+#include <linux/module.h>
-+#include <linux/bitfield.h>
-+#include <linux/nvmem-consumer.h>
-+
-+#define AN8855_PHY_PAGE_CTRL			0x1f
-+#define   AN8855_PHY_NORMAL_PAGE		0x0
-+#define   AN8855_PHY_EXT_PAGE			0x1
-+
-+#define AN8855_PHY_EXT_REG_14			0x14
-+#define   AN8855_PHY_EN_DOWN_SHFIT		BIT(4)
-+
-+/* R50 Calibration regs in MDIO_MMD_VEND1 */
-+#define AN8855_PHY_R500HM_RSEL_TX_AB		0x174
-+#define AN8855_PHY_R50OHM_RSEL_TX_A_EN		BIT(15)
-+#define AN8855_PHY_R50OHM_RSEL_TX_A		GENMASK(14, 8)
-+#define AN8855_PHY_R50OHM_RSEL_TX_B_EN		BIT(7)
-+#define AN8855_PHY_R50OHM_RSEL_TX_B		GENMASK(6, 0)
-+#define AN8855_PHY_R500HM_RSEL_TX_CD		0x175
-+#define AN8855_PHY_R50OHM_RSEL_TX_C_EN		BIT(15)
-+#define AN8855_PHY_R50OHM_RSEL_TX_C		GENMASK(14, 8)
-+#define AN8855_PHY_R50OHM_RSEL_TX_D_EN		BIT(7)
-+#define AN8855_PHY_R50OHM_RSEL_TX_D		GENMASK(6, 0)
-+
-+#define AN8855_SWITCH_EFUSE_R50O		GENMASK(30, 24)
-+
-+/* PHY TX PAIR DELAY SELECT Register */
-+#define PHY_TX_PAIR_DLY_SEL_GBE			0x013
-+/* PHY ADC Register */
-+#define PHY_RXADC_CTRL				0x0d8
-+#define PHY_RXADC_REV_0				0x0d9
-+#define PHY_RXADC_REV_1				0x0da
-+
-+#define AN8855_PHY_ID			0xc0ff0410
-+
-+struct air_an8855_priv {
-+	u8 calibration_data[4];
-+};
-+
-+static const u8 dsa_r50ohm_table[] = {
-+	127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
-+	127, 127, 127, 127, 127, 127, 127, 126, 122, 117,
-+	112, 109, 104, 101,  97,  94,  90,  88,  84,  80,
-+	78,  74,  72,  68,  66,  64,  61,  58,  56,  53,
-+	51,  48,  47,  44,  42,  40,  38,  36,  34,  32,
-+	31,  28,  27,  24,  24,  22,  20,  18,  16,  16,
-+	14,  12,  11,   9
-+};
-+
-+static int en8855_get_r50ohm_val(struct device *dev, const char *calib_name,
-+				 u8 *dest)
-+{
-+	u32 shift_sel, val;
-+	int ret;
-+	int i;
-+
-+	ret = nvmem_cell_read_u32(dev, calib_name, &val);
-+	if (ret)
-+		return ret;
-+
-+	shift_sel = FIELD_GET(AN8855_SWITCH_EFUSE_R50O, val);
-+	for (i = 0; i < ARRAY_SIZE(dsa_r50ohm_table); i++)
-+		if (dsa_r50ohm_table[i] == shift_sel)
-+			break;
-+
-+	if (i < 8 || i >= ARRAY_SIZE(dsa_r50ohm_table))
-+		*dest = dsa_r50ohm_table[25];
-+	else
-+		*dest = dsa_r50ohm_table[i - 8];
-+
-+	return 0;
-+}
-+
-+static int an8855_probe(struct phy_device *phydev)
-+{
-+	struct device *dev = &phydev->mdio.dev;
-+	struct device_node *node = dev->of_node;
-+	struct air_an8855_priv *priv;
-+	int ret;
-+
-+	/* If we don't have a node, skip get calib */
-+	if (!node)
-+		return 0;
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	ret = en8855_get_r50ohm_val(dev, "tx_a", &priv->calibration_data[0]);
-+	if (ret)
-+		return ret;
-+
-+	ret = en8855_get_r50ohm_val(dev, "tx_b", &priv->calibration_data[1]);
-+	if (ret)
-+		return ret;
-+
-+	ret = en8855_get_r50ohm_val(dev, "tx_c", &priv->calibration_data[2]);
-+	if (ret)
-+		return ret;
-+
-+	ret = en8855_get_r50ohm_val(dev, "tx_d", &priv->calibration_data[3]);
-+	if (ret)
-+		return ret;
-+
-+	phydev->priv = priv;
-+
-+	return 0;
-+}
-+
-+static int an8855_config_init(struct phy_device *phydev)
-+{
-+	struct air_an8855_priv *priv = phydev->priv;
-+	int ret;
-+
-+	/* Enable HW auto downshift */
-+	ret = phy_write(phydev, AN8855_PHY_PAGE_CTRL, AN8855_PHY_EXT_PAGE);
-+	if (ret)
-+		return ret;
-+	ret = phy_set_bits(phydev, AN8855_PHY_EXT_REG_14,
-+			   AN8855_PHY_EN_DOWN_SHFIT);
-+	if (ret)
-+		return ret;
-+	ret = phy_write(phydev, AN8855_PHY_PAGE_CTRL, AN8855_PHY_NORMAL_PAGE);
-+	if (ret)
-+		return ret;
-+
-+	/* Enable Asymmetric Pause Capability */
-+	ret = phy_set_bits(phydev, MII_ADVERTISE, ADVERTISE_PAUSE_ASYM);
-+	if (ret)
-+		return ret;
-+
-+	/* Disable EEE */
-+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_EEE_ADV, 0);
-+	if (ret)
-+		return ret;
-+
-+	/* Apply calibration values, if needed. BIT(0) signal this */
-+	if (phydev->dev_flags & BIT(0)) {
-+		u8 *calibration_data = priv->calibration_data;
-+
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND1, AN8855_PHY_R500HM_RSEL_TX_AB,
-+				     AN8855_PHY_R50OHM_RSEL_TX_A | AN8855_PHY_R50OHM_RSEL_TX_B,
-+				     FIELD_PREP(AN8855_PHY_R50OHM_RSEL_TX_A, calibration_data[0]) |
-+				     FIELD_PREP(AN8855_PHY_R50OHM_RSEL_TX_B, calibration_data[1]));
-+		if (ret)
-+			return ret;
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND1, AN8855_PHY_R500HM_RSEL_TX_CD,
-+				     AN8855_PHY_R50OHM_RSEL_TX_C | AN8855_PHY_R50OHM_RSEL_TX_D,
-+				     FIELD_PREP(AN8855_PHY_R50OHM_RSEL_TX_C, calibration_data[2]) |
-+				     FIELD_PREP(AN8855_PHY_R50OHM_RSEL_TX_D, calibration_data[3]));
-+		if (ret)
-+			return ret;
-+	}
-+
-+	/* Apply values to decude signal noise */
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, PHY_TX_PAIR_DLY_SEL_GBE, 0x4040);
-+	if (ret)
-+		return ret;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, PHY_RXADC_CTRL, 0x1010);
-+	if (ret)
-+		return ret;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, PHY_RXADC_REV_0, 0x100);
-+	if (ret)
-+		return ret;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, PHY_RXADC_REV_1, 0x100);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static int an8855_get_downshift(struct phy_device *phydev, u8 *data)
-+{
-+	int val;
-+	int ret;
-+
-+	ret = phy_write(phydev, AN8855_PHY_PAGE_CTRL, AN8855_PHY_EXT_PAGE);
-+	if (ret)
-+		return ret;
-+
-+	val = phy_read(phydev, AN8855_PHY_EXT_REG_14);
-+	*data = val & AN8855_PHY_EXT_REG_14 ? DOWNSHIFT_DEV_DEFAULT_COUNT :
-+					      DOWNSHIFT_DEV_DISABLE;
-+
-+	ret = phy_write(phydev, AN8855_PHY_PAGE_CTRL, AN8855_PHY_NORMAL_PAGE);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static int an8855_set_downshift(struct phy_device *phydev, u8 cnt)
-+{
-+	int ret;
-+
-+	ret = phy_write(phydev, AN8855_PHY_PAGE_CTRL, AN8855_PHY_EXT_PAGE);
-+	if (ret)
-+		return ret;
-+
-+	if (cnt != DOWNSHIFT_DEV_DISABLE) {
-+		ret = phy_set_bits(phydev, AN8855_PHY_EXT_REG_14,
-+				   AN8855_PHY_EN_DOWN_SHFIT);
-+		if (ret)
-+			return ret;
-+	} else {
-+		ret = phy_clear_bits(phydev, AN8855_PHY_EXT_REG_14,
-+				     AN8855_PHY_EN_DOWN_SHFIT);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return phy_write(phydev, AN8855_PHY_PAGE_CTRL, AN8855_PHY_NORMAL_PAGE);
-+}
-+
-+static int an8855_get_tunable(struct phy_device *phydev,
-+			      struct ethtool_tunable *tuna, void *data)
-+{
-+	switch (tuna->id) {
-+	case ETHTOOL_PHY_DOWNSHIFT:
-+		return an8855_get_downshift(phydev, data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int an8855_set_tunable(struct phy_device *phydev,
-+			      struct ethtool_tunable *tuna, const void *data)
-+{
-+	switch (tuna->id) {
-+	case ETHTOOL_PHY_DOWNSHIFT:
-+		return an8855_set_downshift(phydev, *(const u8 *)data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static struct phy_driver an8855_driver[] = {
-+{
-+	PHY_ID_MATCH_EXACT(AN8855_PHY_ID),
-+	.name			= "Airoha AN8855 internal PHY",
-+	/* PHY_GBIT_FEATURES */
-+	.flags			= PHY_IS_INTERNAL,
-+	.probe			= an8855_probe,
-+	.config_init		= an8855_config_init,
-+	.soft_reset		= genphy_soft_reset,
-+	.get_tunable		= an8855_get_tunable,
-+	.set_tunable		= an8855_set_tunable,
-+	.suspend		= genphy_suspend,
-+	.resume			= genphy_resume,
-+}, };
-+
-+module_phy_driver(an8855_driver);
-+
-+static struct mdio_device_id __maybe_unused an8855_tbl[] = {
-+	{ PHY_ID_MATCH_EXACT(AN8855_PHY_ID) },
-+	{ }
-+};
-+
-+MODULE_DEVICE_TABLE(mdio, an8855_tbl);
-+
-+MODULE_DESCRIPTION("Airoha AN8855 PHY driver");
-+MODULE_AUTHOR("Christian Marangi <ansuelsmth@gmail.com>");
-+MODULE_LICENSE("GPL");
+For our use case, we cannot have parent wait in pthread_join, one of the
+main reasons for this being that we do not want to track normal
+pthread_exit(), which could be a very large number. We only want to be
+notified of any abnormal exits. Hence, threads are created with
+pthread_attr_t set to PTHREAD_CREATE_DETACHED.
+
+To fix this problem, we add a new type PROC_CN_MCAST_NOTIFY to proc connector
+API, which allows a thread to send it's exit status to kernel either when
+it needs to call pthread_exit() with non-zero value to indicate some
+error or from signal handler before pthread_exit().
+
+v5->v6 changes:
+- As suggested by Simon Horman, fixed style issues (some old) by running
+  ./scripts/checkpatch.pl --strict --max-line-length=80
+- Removed inline functions as suggested by Simon Horman
+- Added "depends on" in Kconfig.debug as suggested by Stanislav Fomichev
+- Removed warning while compilation with kernel space headers as
+  suggested by Simon Horman
+- Removed "comm" field, will send separate patch for this.
+- Added kunit configs in tools/testing/kunit/configs/all_tests.config
+  with it's dependencies.
+
+v4->v5 changes:
+- Handled comment by Stanislav Fomichev to fix a print format error.
+- Made thread.c completely automated by starting proc_filter program
+  from within threads.c.
+- Changed name CONFIG_CN_HASH_KUNIT_TEST to CN_HASH_KUNIT_TEST in
+  Kconfig.debug and changed display text.
+
+v3->v4 changes:
+- Reduce size of exit.log by removing unnecessary text.
+
+v2->v3 changes:
+- Handled comment by Liam Howlett to set hdev to NULL and add comment on
+  it.
+- Handled comment by Liam Howlett to combine functions for deleting+get
+  and deleting into one in cn_hash.c
+- Handled comment by Liam Howlett to remove extern in the functions
+  defined in cn_hash_test.h
+- Some nits by Liam Howlett fixed.
+- Handled comment by Liam Howlett to make threads test automated.
+  proc_filter.c creates exit.log, which is read by thread.c and checks
+  the values reported.
+- Added "comm" field to struct proc_event, to copy the task's name to
+  the packet to allow further filtering by packets.
+
+v1->v2 changes:
+- Handled comment by Peter Zijlstra to remove locking for PF_EXIT_NOTIFY
+  task->flags.
+- Added error handling in thread.c
+
+v->v1 changes:
+- Handled comment by Simon Horman to remove unused err in cn_proc.c
+- Handled comment by Simon Horman to make adata and key_display static
+  in cn_hash_test.c
+
+Anjali Kulkarni (3):
+  connector/cn_proc: Add hash table for threads
+  connector/cn_proc: Kunit tests for threads hash table
+  connector/cn_proc: Selftest for threads
+
+ drivers/connector/Makefile                    |   2 +-
+ drivers/connector/cn_hash.c                   | 216 ++++++++++++++++
+ drivers/connector/cn_proc.c                   |  81 ++++--
+ drivers/connector/connector.c                 |  88 ++++++-
+ include/linux/connector.h                     |  62 ++++-
+ include/linux/sched.h                         |   2 +-
+ include/uapi/linux/cn_proc.h                  |   4 +-
+ lib/Kconfig.debug                             |  19 ++
+ lib/Makefile                                  |   1 +
+ lib/cn_hash_test.c                            | 169 +++++++++++++
+ lib/cn_hash_test.h                            |  10 +
+ tools/testing/kunit/configs/all_tests.config  |   5 +
+ tools/testing/selftests/connector/Makefile    |  25 ++
+ .../testing/selftests/connector/proc_filter.c |  63 +++--
+ tools/testing/selftests/connector/thread.c    | 238 ++++++++++++++++++
+ .../selftests/connector/thread_filter.c       |  96 +++++++
+ 16 files changed, 1027 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/connector/cn_hash.c
+ create mode 100644 lib/cn_hash_test.c
+ create mode 100644 lib/cn_hash_test.h
+ create mode 100644 tools/testing/selftests/connector/thread.c
+ create mode 100644 tools/testing/selftests/connector/thread_filter.c
+
 -- 
-2.45.2
+2.46.0
 
 
