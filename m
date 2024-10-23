@@ -1,143 +1,154 @@
-Return-Path: <netdev+bounces-138249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C1F9ACB77
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:42:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D77B9ACB75
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 15:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05071286990
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:42:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F1C3286B0C
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 13:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4F31B6CF2;
-	Wed, 23 Oct 2024 13:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4A41AF4EF;
+	Wed, 23 Oct 2024 13:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGPuHhC+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ovBqo3Dj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FFD1AE850
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 13:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1768D12B71
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 13:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729690913; cv=none; b=Esy9mFCILJedRO7CJAr+bv+7KOANfpPVnuTx0FrVI5BL8N1LX4HmoJzmXxt4N4PK3OLPeJMYTJ283JoZamIyIZm4mcpzvRiUDB3BJHJxddLFGO87pbHE44hyNdq04aqBHFt6CI3VhHMPtOZElCgWtj0CBX7h28NVGkWC/50NlzE=
+	t=1729690912; cv=none; b=Zg6a9OotwnIubnN4+ESsySWuFEmTSR7jADm1UImTbIIaP3Bx0Q/Cq5mGKCi6spMfYFhoXkhtIt5OQKCmezo/XfUvdeDm+bj5MFOVKCDsJld0i/i4qxVAXnxFwNrLxR72HEsR2niE+8WWS80zBAQrNSfg2l27E8WTrslct7RfXCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729690913; c=relaxed/simple;
-	bh=u9FF3WzzoqNp4eLryQOSowGgpuAPFK0vwL3y9Yg8ZNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P5tzO/KnofrIcRgzWSmoOLxcz0TbBiqvF6QGhMdhrqkLztByp60LK3MMNJdMYc2BrCQbSCScK6lyICLS1AGIeMqzYWmjNpug7iygEMwxEEH4XkSC47a+RkzIin54WtpAM3Nhkz7jC7774pKgTZCQgw4ISJ9PQZhPjv+MwOkqIp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGPuHhC+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729690911;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZAM8ZRvTda+LEs/8ya4sgurWTTiohnnijyfOuyfhNxo=;
-	b=QGPuHhC+o8n1N4VS2NxdbkoX92jXhTAyWtrYDg24i706jDkvx0Dxk2249U5NY+wx/NNFRV
-	PYDeyoIomc6kSV1fo7NzZfN49NGYpag4AbmLsbkQ9dQU1XwKcyLMNEThGB2ncm3KKXTuq4
-	2BpGZ/89cNqs9jw3CDG9+ataP9EMl8I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-530-u5I4w3B7PuaaCu4uG0nf8A-1; Wed, 23 Oct 2024 09:41:50 -0400
-X-MC-Unique: u5I4w3B7PuaaCu4uG0nf8A-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d52ccc50eso3435462f8f.3
-        for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 06:41:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729690908; x=1730295708;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZAM8ZRvTda+LEs/8ya4sgurWTTiohnnijyfOuyfhNxo=;
-        b=SPjmx7zDoAEFZOSPY5xZ6g4nkWQVvnf2JZ4zGn1l6B/0OBu9ogdUvOoepSWPeD7+bs
-         F2BmQBLEj5GmfhbZSOOv4gaGojUHj4RxC3AX7pe/GB4oGKavrXeumlpbVgpdX2cKbhWK
-         jBFOxHcRKeousSln3VDoE14svdg2YfMRmFtR9c1VopC47IJi4aS8EjUOmdI8/DAXdzdk
-         GYt7jxSOBkOg1rMEBxLlEYposj+3A3eRjtqOS9wdR/O3FkJ0jze2LAgs6KICALaQBhaT
-         fE21eX+jgWpGs4tlDmu3dmPDqTa7mcG3XbJRc+lZYh9EHadS9j1FUXS9XUCHXh6pCbSC
-         HPRg==
-X-Gm-Message-State: AOJu0Yy/jyOS3G0hH/lbzgqrTlhe2xA8B6Hq8ZHGCT8pIDxWqKohO5sC
-	1wAiUy8XhOGQSnflM+c/ceNdJwXp12zm8vofKuMfn+jvxdL/pTQC+QV724NEiACxFiH4BrLR4xa
-	usHK8GDXl78RhNazXp6lZ0Q6t1ZXRJzlEJKyxjwMNJ3KarPEr1XXQeEtUz1f7toNWV/qmk0gfXz
-	g327OmUkmMoORauJNOH11kvH3IM7sIrLnLic9J0g==
-X-Received: by 2002:a5d:44c2:0:b0:374:cd3e:7d98 with SMTP id ffacd0b85a97d-37efcf106ddmr2013612f8f.19.1729690908087;
-        Wed, 23 Oct 2024 06:41:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFXPXXPAYcibfIzDBRMTHs9hPWdPNDz3Eha+UK8URGkuRSuFekIz7fNUsSwd5AIqn2zOU7BLQ==
-X-Received: by 2002:a5d:44c2:0:b0:374:cd3e:7d98 with SMTP id ffacd0b85a97d-37efcf106ddmr2013576f8f.19.1729690907619;
-        Wed, 23 Oct 2024 06:41:47 -0700 (PDT)
-Received: from rh.fritz.box (p200300f6af01c000f92aec4042337510.dip0.t-ipconnect.de. [2003:f6:af01:c000:f92a:ec40:4233:7510])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a5882dsm8898858f8f.50.2024.10.23.06.41.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 06:41:47 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1729690912; c=relaxed/simple;
+	bh=zhXbwc6+5a6D+d0ZJwM6/6i7r6QoT7snvA4cetQsRkE=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=bPqDUjTeIEkVEvVX3BBKzLXivW69damxNFfsiZel9/wWbcMPRFiIfJIKSNnedyjxgQZXd2wKpj/zV+DnvjEl69ZI+LOjequeCZwpYE4KIiAdTlx3sr08RJaS7g695OK8vIFxww+p6zA8YVPMCCPLJuGiSMh0TOH3Qa/RXrZUlTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ovBqo3Dj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7bAdTUSeeIalnLMyPNPUyOo+d01Hp0PeG3yJSslBkJ0=; b=ovBqo3DjU+Q76ljatBHUCq+F+m
+	plvpQ8pLNiZq5FGz1obj2QGL7QH8hQLI260bBo9zAdKqmfquLiRL6G2iunB4KlG80WZMq+u3psqFY
+	mpEMeT7r8MxqCm+Hrs+BDgaH0Iz9bOolIrufiHjrwXitBM6E1TrvFPRWjqX3jy/g5OkeGMgz5fX7j
+	lXR3P2ScIySFg6Yg5K4isHLnSQGdC8LFHxWxiHD9LO2d5mC8JSBYttrzJaB+SbTL2CFLVfObyMCGY
+	DXWUNMCXinJxja1w1FBFAkIHT1Fvb7HBD2tqeaXjO/XTUFNc4Kv/XMjLbKm1dcxCazdN/57K8oGzI
+	3vuwQ/2A==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33780 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1t3bcQ-0006Ul-2A;
+	Wed, 23 Oct 2024 14:41:47 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1t3bcQ-000c85-S4; Wed, 23 Oct 2024 14:41:46 +0100
+In-Reply-To: <Zxj8_clRmDA_G7uH@shell.armlinux.org.uk>
+References: <Zxj8_clRmDA_G7uH@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Parav Pandit <parav@nvidia.com>,
-	Breno Leitao <leitao@debian.org>
-Subject: [PATCH v2 RESEND] net/mlx5: unique names for per device caches
-Date: Wed, 23 Oct 2024 15:41:46 +0200
-Message-ID: <20241023134146.28448-1-sebott@redhat.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20240920181129.37156-1-sebott@redhat.com>
-References: <20240920181129.37156-1-sebott@redhat.com>
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2 1/3] net: phylink: add common validation for
+ sfp_select_interface()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1t3bcQ-000c85-S4@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 23 Oct 2024 14:41:46 +0100
 
-Add the device name to the per device kmem_cache names to
-ensure their uniqueness. This fixes warnings like this:
-"kmem_cache of name 'mlx5_fs_fgs' already exists".
+Whenever we call sfp_select_interface(), we check the returned value
+and print an error. There are two cases where this happens with the
+same message. Provide a common function to do this.
 
-Reviwed-by: Breno Leitao <leitao@debian.org>
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/net/phy/phylink.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index 8505d5e241e1..c2db0a1c132b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -3689,6 +3689,7 @@ void mlx5_fs_core_free(struct mlx5_core_dev *dev)
- int mlx5_fs_core_alloc(struct mlx5_core_dev *dev)
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index b5870f8666ac..62d347d1112c 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -2415,6 +2415,21 @@ int phylink_ethtool_set_wol(struct phylink *pl, struct ethtool_wolinfo *wol)
+ }
+ EXPORT_SYMBOL_GPL(phylink_ethtool_set_wol);
+ 
++static phy_interface_t phylink_sfp_select_interface(struct phylink *pl,
++						const unsigned long *link_modes)
++{
++	phy_interface_t interface;
++
++	interface = sfp_select_interface(pl->sfp_bus, link_modes);
++	if (interface == PHY_INTERFACE_MODE_NA)
++		phylink_err(pl,
++			    "selection of interface failed, advertisement %*pb\n",
++			    __ETHTOOL_LINK_MODE_MASK_NBITS,
++			    link_modes);
++
++	return interface;
++}
++
+ static void phylink_merge_link_mode(unsigned long *dst, const unsigned long *b)
  {
- 	struct mlx5_flow_steering *steering;
-+	char name[80];
- 	int err = 0;
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask);
+@@ -2597,15 +2612,10 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
+ 	 * link can be configured correctly.
+ 	 */
+ 	if (pl->sfp_bus) {
+-		config.interface = sfp_select_interface(pl->sfp_bus,
++		config.interface = phylink_sfp_select_interface(pl,
+ 							config.advertising);
+-		if (config.interface == PHY_INTERFACE_MODE_NA) {
+-			phylink_err(pl,
+-				    "selection of interface failed, advertisement %*pb\n",
+-				    __ETHTOOL_LINK_MODE_MASK_NBITS,
+-				    config.advertising);
++		if (config.interface == PHY_INTERFACE_MODE_NA)
+ 			return -EINVAL;
+-		}
  
- 	err = mlx5_init_fc_stats(dev);
-@@ -3713,10 +3714,12 @@ int mlx5_fs_core_alloc(struct mlx5_core_dev *dev)
- 	else
- 		steering->mode = MLX5_FLOW_STEERING_MODE_DMFS;
+ 		/* Revalidate with the selected interface */
+ 		linkmode_copy(support, pl->supported);
+@@ -3234,13 +3244,9 @@ static int phylink_sfp_config_phy(struct phylink *pl, u8 mode,
+ 		return ret;
+ 	}
  
--	steering->fgs_cache = kmem_cache_create("mlx5_fs_fgs",
-+	snprintf(name, sizeof(name), "%s-mlx5_fs_fgs", dev_name(dev->device));
-+	steering->fgs_cache = kmem_cache_create(name,
- 						sizeof(struct mlx5_flow_group), 0,
- 						0, NULL);
--	steering->ftes_cache = kmem_cache_create("mlx5_fs_ftes", sizeof(struct fs_fte), 0,
-+	snprintf(name, sizeof(name), "%s-mlx5_fs_ftes", dev_name(dev->device));
-+	steering->ftes_cache = kmem_cache_create(name, sizeof(struct fs_fte), 0,
- 						 0, NULL);
- 	if (!steering->ftes_cache || !steering->fgs_cache) {
- 		err = -ENOMEM;
+-	iface = sfp_select_interface(pl->sfp_bus, config.advertising);
+-	if (iface == PHY_INTERFACE_MODE_NA) {
+-		phylink_err(pl,
+-			    "selection of interface failed, advertisement %*pb\n",
+-			    __ETHTOOL_LINK_MODE_MASK_NBITS, config.advertising);
++	iface = phylink_sfp_select_interface(pl, config.advertising);
++	if (iface == PHY_INTERFACE_MODE_NA)
+ 		return -EINVAL;
+-	}
+ 
+ 	config.interface = iface;
+ 	linkmode_copy(support1, support);
 -- 
-2.42.0
+2.30.2
 
 
