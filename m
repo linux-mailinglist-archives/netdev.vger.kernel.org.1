@@ -1,162 +1,138 @@
-Return-Path: <netdev+bounces-138394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC819AD4B0
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 21:25:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B4399AD499
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 21:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 913001F233FD
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:25:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A3171C21FC6
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7FC1D967E;
-	Wed, 23 Oct 2024 19:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83C81D0153;
+	Wed, 23 Oct 2024 19:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=typeblog.net header.i=@typeblog.net header.b="kCijJnm0"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pJ7rRN9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.typeblog.net (mail.typeblog.net [88.151.33.170])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EBE1D0E18;
-	Wed, 23 Oct 2024 19:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.151.33.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE41713CABC
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 19:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729711544; cv=none; b=RJbcZXlHzcb3PT3CgNE0PIK2az2ryP3YOAjXjwA5/AaICN1OevQcpxyxUkh1lr6hpse89tFQHi80+1k5yK9ZKyZkEQ18XfU3XiHs/1POmnbDje1P7+p8asVUKDl75LI21vWTuZciMv4V1ETlFvAji9Z3cLuUHyx0s+tSOILekxE=
+	t=1729711095; cv=none; b=PdIZQsW75Z9Bu+5aOLr1BQnOxosbehyj2E8qwYUuea56KQxI75wOLu4v/D9rHTDrDzQQaWrTer2B7cmZ3LJbjKLyKHpJmmVAAL4BloKDA+8jMQcPIl1CbyHGbF7YIUNX8epRGnXkMGmaXGJ7fTC6kXWedFdjJLZLNQjuWHcwATM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729711544; c=relaxed/simple;
-	bh=xiF1qogbUg+X2NJMpfllNRC+/jZmqlzJGUZxsFsceP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r5zlxA+RWiY5VCy5xpln5/cOstBjMbAZeNkOmGtGe1NB7WsHGPwFo/W6CfHoULQArOR+3luYu9p4w73OSNiDirHcocdorSAN+9Wx2Na10nrA0vlS1cG2psS+XJzOkzrldksh4P4Q2odShfyvBK+8gD+RcmXVeO5heG1fGzDglgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=typeblog.net; spf=pass smtp.mailfrom=typeblog.net; dkim=pass (2048-bit key) header.d=typeblog.net header.i=@typeblog.net header.b=kCijJnm0; arc=none smtp.client-ip=88.151.33.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=typeblog.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=typeblog.net
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9B5D5CFB3CF;
-	Wed, 23 Oct 2024 21:15:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=typeblog.net;
-	s=mailcow; t=1729710935;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=AZ3gyldhS8joMJJp8RQYoZtzaPSJsdJPE2HaJSDoW4E=;
-	b=kCijJnm08z9C55C1OhSt2FDysBPg1YmlgNXc/2YZ0FlY+o4LpPhyVh+A6Z4xKATicIabnV
-	bjOmKV8EeUqsvTwommg0zwOPI8h5oL8stKnjWpYa/Y9vjZOkLBSbC75ZnmuJzab3LLFkV+
-	NxQZ542GYTjTixcGInRplXXhTedUBKUxFHnyaDNzyh3n7srV9ueRkUbJaBjvi/3+wS3xtd
-	yTtWzqgjv/IHq+jH9l/j/ot3YZfV6f8qVVFRrAgA7eKa0iaxH2UOklM9omy/KNe4d9se4T
-	ZrHtzu6J58ko+Ki3zKtJMRnMpiLty2UMLVoEv10mo7x74bsRMHlpc8UyW85UzQ==
-Message-ID: <e25fb178-39fa-4b75-bdc8-a2ec5a7a1bf6@typeblog.net>
-Date: Wed, 23 Oct 2024 15:15:17 -0400
+	s=arc-20240116; t=1729711095; c=relaxed/simple;
+	bh=A6pRpQ6UnnjV3xo4oGg+YwOLdPbi/0ZLsZ/QtYUx3Vs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ocNDM1frutJznPduvw78DqtFzXPuFsro1W++uH9uQ4iCAo4pjEkQIYqm3cNClIpsxKS4ALa+QkDmtrGiBJiXQIqeo1tucsTBkFvCo1hlIparpT8MWtWFVzpKXjFKEbIfRgCD3rApSJoASOfe+And1ihu4Fhdn5oGp+hM2iT7BYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pJ7rRN9o; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729711094; x=1761247094;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9Wkk87gvwEw6IN8G8tnRdJmkssG5udKBWB/LehgUbKo=;
+  b=pJ7rRN9oOJal2AQFA4ulCbINU7HC0X6xkrrC6ISbLRDbXd0XTGIKgb7L
+   i75M3nbDMZS48mCNxU/SvtNuluIcjnNOtu3NWBNFpAgKpC/9/EdC63NOi
+   aLaaWSWllv4d/w3Ce8bYxZe/7sOAZH9aftrVaH7iqyp7tAOcK19pbBaIt
+   c=;
+X-IronPort-AV: E=Sophos;i="6.11,226,1725321600"; 
+   d="scan'208";a="241840032"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 19:18:10 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:56473]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.247:2525] with esmtp (Farcaster)
+ id cae78f5b-d1aa-409c-88ab-884e9d436157; Wed, 23 Oct 2024 19:18:09 +0000 (UTC)
+X-Farcaster-Flow-ID: cae78f5b-d1aa-409c-88ab-884e9d436157
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 23 Oct 2024 19:18:09 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 23 Oct 2024 19:18:06 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Ignat Korchagin <ignat@cloudflare.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next] socket: Print pf->create() when it does not clear sock->sk on failure.
+Date: Wed, 23 Oct 2024 12:17:57 -0700
+Message-ID: <20241023191757.56735-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various
- compliance requirements."
-To: Linus Torvalds <torvalds@linux-foundation.org>,
- Tor Vic <torvic9@mailbox.org>
-Cc: Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
- gregkh@linuxfoundation.org, wangyuli@uniontech.com, aospan@netup.ru,
- conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
- dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com,
- geert@linux-m68k.org, hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru,
- linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-spi@vger.kernel.org, manivannan.sadhasivam@linaro.org,
- mattst88@gmail.com, netdev@vger.kernel.org, nikita@trvn.ru,
- ntb@lists.linux.dev, patches@lists.linux.dev, richard.henderson@linaro.org,
- s.shtylyov@omp.ru, serjk@netup.ru, shc_work@mail.ru,
- tsbogend@alpha.franken.de, v.georgiev@metrotek.ru,
- wsa+renesas@sang-engineering.com, xeb@mail.ru
-References: <a08dc31ab773604d8f206ba005dc4c7a@aosc.io>
- <20241023080935.2945-2-kexybiscuit@aosc.io>
- <124c1b03-24c9-4f19-99a9-6eb2241406c2@mailbox.org>
- <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
-Content-Language: en-US
-From: Peter Cai <peter@typeblog.net>
-In-Reply-To: <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi there,
+I suggested to put DEBUG_NET_WARN_ON_ONCE() in __sock_create() to
+catch possible use-after-free.
 
-Not a maintainer, but I have made several bug reports using this email 
-address. At least 1 reasonably-sized patch is also currently under 
-review in the networking mailing list, along with people from several 
-American corporations, so hopefully you won't automatically assume this 
-email came from a "Russian troll" account.
+But the warning itself was not useful because our interest is in
+the callee than the caller.
 
-Ok. With that out of the way, if you still want to bother reading, 
-here's why, in the most un-provocative tone possible, why your comments 
-_completely_ miss the point why people are upset:
+Let's define DEBUG_NET_WARN_ONCE() and print the name of pf->create()
+and the socket identifier.
 
-On 10/23/24 1:45 PM, Linus Torvalds wrote:
-> Ok, lots of Russian trolls out and about. >
-> It's entirely clear why the change was done, it's not getting
-> reverted, and using multiple random anonymous accounts to try to
-> "grass root" it by Russian troll factories isn't going to change
-> anything.
+While at it, we enclose DEBUG_NET_WARN_ON_ONCE() in parentheses too
+to avoid a checkpatch error.
 
-Yes. Everybody who has more than 1 brain cell knows, in general, "why". 
-The point was never to ask for the obvious response.
+Note that %pf or %pF were obsoleted and later removed as per comment
+in lib/vsprintf.c.
 
-People are upset because no reference to _exactly which compliance 
-requirement_ resulted in the removal of these maintainers. No 
-open-source project can live outside of a political entity, but that is 
-not the reason why "obviously" can be used to write off such a change.
+Link: https://lore.kernel.org/netdev/202410231427.633734b3-lkp@intel.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/net_debug.h | 4 +++-
+ net/socket.c            | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-Even just stating "we were contacted by <...> but details are under NDA" 
-is a **much** better response than "due to various compliance 
-requirements". No one is saying the LF or the Linux kernel should be 
-outside of politics. That's impossible. But it _is_ possible to run the 
-project based on _transparency_ and _honesty_ instead of "why can't you 
-see the obvious".
+diff --git a/include/net/net_debug.h b/include/net/net_debug.h
+index 1e74684cbbdb..9fecb1496be3 100644
+--- a/include/net/net_debug.h
++++ b/include/net/net_debug.h
+@@ -149,9 +149,11 @@ do {								\
+ 
+ 
+ #if defined(CONFIG_DEBUG_NET)
+-#define DEBUG_NET_WARN_ON_ONCE(cond) (void)WARN_ON_ONCE(cond)
++#define DEBUG_NET_WARN_ON_ONCE(cond) ((void)WARN_ON_ONCE(cond))
++#define DEBUG_NET_WARN_ONCE(cond, format...) ((void)WARN_ONCE(cond, format))
+ #else
+ #define DEBUG_NET_WARN_ON_ONCE(cond) BUILD_BUG_ON_INVALID(cond)
++#define DEBUG_NET_WARN_ONCE(cond, format...) BUILD_BUG_ON_INVALID(cond)
+ #endif
+ 
+ #endif	/* _LINUX_NET_DEBUG_H */
+diff --git a/net/socket.c b/net/socket.c
+index 9a8e4452b9b2..da00db3824e3 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -1578,7 +1578,9 @@ int __sock_create(struct net *net, int family, int type, int protocol,
+ 		/* ->create should release the allocated sock->sk object on error
+ 		 * and make sure sock->sk is set to NULL to avoid use-after-free
+ 		 */
+-		DEBUG_NET_WARN_ON_ONCE(sock->sk);
++		DEBUG_NET_WARN_ONCE(sock->sk,
++				    "%pS must clear sock->sk on failure, family: %d, type: %d, protocol: %d\n",
++				    pf->create, family, type, protocol);
+ 		goto out_module_put;
+ 	}
+ 
+-- 
+2.39.5 (Apple Git-154)
 
-> And FYI for the actual innocent bystanders who aren't troll farm
-> accounts - the "various compliance requirements" are not just a US
-> thing.
-
-Again -- are you under any sort of NDA not to even refer to a list of 
-these countries?
-
-> If you haven't heard of Russian sanctions yet, you should try to read
-> the news some day.  And by "news", I don't mean Russian
-> state-sponsored spam.
-
-Before calling out community members who raised legit concerns about 
-procedural transparency, maybe it is worth doing a quick fact-check. 
-There are a lot of suspicious looking `.ru` emails in this thread, but 
-they are not who first raised the concern. The revert patch was sent out 
-by someone at aosc.io. Look up who they actually are -- and before you 
-assume "state-sponsored spam" just because of the language of the 
-website, maybe you can also spend more than 1 second to check where the 
-website is even actually located.
-
-> As to sending me a revert patch - please use whatever mush you call
-> brains. I'm Finnish. Did you think I'd be *supporting* Russian
-> aggression? Apparently it's not just lack of real news, it's lack of
-> history knowledge too.
-
-I hope that either this comment wasn't written by the real Linus 
-Torvalds, or that Linus was not under his best judgement when this email 
-was sent. Because just like anyone who reads the news would know about 
-Russian aggression, anyone who knows anything about politics should also 
-be able to understand that individuals and their states are different 
-concepts.
-
-If these maintainers are associated with the Russian state, this should 
-be cited as the reason for their removal. And you know what? Most people 
-wouldn't have any problem with it. And then you can say "we are not 
-supporting Russian aggression" with confidence. But this is **not** what 
-was done.
-
-I seriously hope that Linus Torvalds would have known better.
-
-Thanks,
-Peter.
 
