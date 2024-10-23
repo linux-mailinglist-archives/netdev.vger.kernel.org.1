@@ -1,187 +1,157 @@
-Return-Path: <netdev+bounces-138082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF399ABD96
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:01:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 865179ABD9E
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B98771F22C85
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:01:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CF2FB234F8
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 05:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E581369BB;
-	Wed, 23 Oct 2024 05:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AB213BC18;
+	Wed, 23 Oct 2024 05:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b="WY97jCyK"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KLYqmYHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.183.29.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C372837A
-	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 05:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.29.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729659684; cv=fail; b=laibBGd9/6MTvnB611Qrtq3pk+upp7TkgTW1exnilo5y/sebU9Vh1wCOZA4Zkt3C5xN1fVt4yThiAbBLXd78Js8N8KtDpaN1EhkIawBFWFc3RrxzT1NfrPX1/UZG9EcR4D80a4A14vXGrQyD1HPnNdwhm5jG4MvrdhMyo9DA/4M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729659684; c=relaxed/simple;
-	bh=aorJ1Ahh9LpxXXHG2CVvAPp/KXW9ELRWbMv4vWlyUlo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nRNDxCSaCrXivzsp5UDq6um8gl6DSAxZkrWwE408wMD+eG8pJuZknZ4qq9js0K45jTswD7dIE1Dxs9SMZGNIYgYQHUSQODlNkkUSVzAN0VCi0jdZuUlzyqAUWJQj02bUXNDejkAuvCfUzPjVQdm2xhCHrLMPyqDtKSec6atI+ho=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com; spf=pass smtp.mailfrom=drivenets.com; dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b=WY97jCyK; arc=fail smtp.client-ip=185.183.29.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=drivenets.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03lp2174.outbound.protection.outlook.com [104.47.51.174])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 44A52340051;
-	Wed, 23 Oct 2024 05:01:20 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rNz+la++IDlcYcvASP24j1aG9U8rD7gkr0FOA8VOz56ZlL3ifGefxEgCZGR2IpkA9SenGw448i4jhLL3y7I7Ki6ggrhwkOWXRalunTptl8/pjUA2mh8cfqLT2Ohi6/HK90NS1wE8iiT2EEqEeafKrFkv2PcOnWdyi8XiUdJqtaA8xOgoeQ37jFJgAcieMbTT7HS5pOBXTO1eWaFmIZq85IAZqK52L4j5RYtjAkS3BBP3BDP83a1PAyBXZFZLdA+VT4hDc0LphIyzk8J94lyXilnwRIVgkNPlROJS0LDzq7JtLWYEVoej58pO80jz9rNvSjt/bvdJdAVKMuSfe6n/Mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5NmIWOs8r7UBcMQzU2uphKWLnCY+02aVo1cw9kk+snk=;
- b=ATXOEyVjMPVfdXyte5CT19xMX/P2j9lXwb7ngYb7p6Ew9AQsZ+RQwUu5k4TBC0BoR0PoRM7u1Y1K8b4h05jGV+QLO0/sUCF87Y4fIb+Fhew9LtYT/x0nn7tNUnSWdngcqfsauEvyxAIoIYpAAst5H1z46wVVz8CtICLwPgrKHInqHpgGiY+w5yxzvup3x4B/VtQeObyRvg6NleXWJX8bnHPxWeDrbcIvXG1bGbFm1CB4cNiYzfma3YN+ihLdPWNYK/iVXLIGL1CD4KcZjC0qwNYTnAoviHtnlpRua53GGuNVH3WrO5PWiO+NKlk8lIovmriVCtT1Wj84SnONxmjp/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=drivenets.com; dmarc=pass action=none
- header.from=drivenets.com; dkim=pass header.d=drivenets.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=drivenets.onmicrosoft.com; s=selector2-drivenets-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5NmIWOs8r7UBcMQzU2uphKWLnCY+02aVo1cw9kk+snk=;
- b=WY97jCyK0riwOfpOmP21Ae1MPZiTzOBoVH+I9FJZqz9RXn9lnKKc2q/CB8LB40ujkVhL795QFAakxswpzyrROzIRX6CzmnV5BR6dxKynJrSa+fOqbYuqbHLGqwvvzUgJJABhCjGlSb49BKAOOpHeNfQsSf6Sm9B6ZkoikE6IbuE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=drivenets.com;
-Received: from DB8PR08MB5388.eurprd08.prod.outlook.com (2603:10a6:10:11c::7)
- by PAVPR08MB8990.eurprd08.prod.outlook.com (2603:10a6:102:326::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.27; Wed, 23 Oct
- 2024 05:01:18 +0000
-Received: from DB8PR08MB5388.eurprd08.prod.outlook.com
- ([fe80::29dd:6773:4977:dc4e]) by DB8PR08MB5388.eurprd08.prod.outlook.com
- ([fe80::29dd:6773:4977:dc4e%5]) with mapi id 15.20.8069.027; Wed, 23 Oct 2024
- 05:01:17 +0000
-From: Gilad Naaman <gnaaman@drivenets.com>
-To: stfomichev@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	gnaaman@drivenets.com,
-	kuba@kernel.org,
-	kuniyu@amazon.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v7 0/6] neighbour: Improve neigh_flush_dev performance
-Date: Wed, 23 Oct 2024 05:01:10 +0000
-Message-ID: <20241023050110.3509553-1-gnaaman@drivenets.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <Zxg52Ccb8FF8MCt0@mini-arch>
-References: <Zxg52Ccb8FF8MCt0@mini-arch>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P123CA0419.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18b::10) To DB8PR08MB5388.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D97139ACC;
+	Wed, 23 Oct 2024 05:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729660037; cv=none; b=ZQf2fCDTW2/6mBI2/0dmNCENTgmKhBKx/DRpQcmqpStM+jkELsZoubS+TvQ3RVM1Dr25a99JDO69kPWSH2d5/YljnaeVn1tLtXNz2FJ0LK4lM3Yrkflr27jaJ7ds3/jSVn2zbOAgWJoUfklasAUmwCaBZFotdo/+UR7cfUOEcXE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729660037; c=relaxed/simple;
+	bh=N6MxOPXvN52A4SK9gugDg/T6rNauUkgKclmm9CuZaDA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=R8G51sq393nk4iNd+sGZrdVBEd5LFPXfdj+YZOA0IJbDPx1d93XJIwzPUDTz6oM05GDIkqWD8YxJiQb9jvLf0PzolbwZzrTciNG42T/JuUqj7fNIQNLchivke2+V3EVhZjlyMkpo18L1srms00CXUW9Y1oSBq+UeaGht0ZSny5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KLYqmYHL; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49MLf5Cd019749;
+	Wed, 23 Oct 2024 05:06:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	s2d81+GccxoEkMZskmmKrL4R7qnewBTmtKDHTfqxm1I=; b=KLYqmYHL1MbiPlh1
+	djAAuki0kNLH3ARDnUMXsNbR1wMZ42oHoXIRkKqW0TfdzVAONFCOJYo3T9O+fgvn
+	tfCjkGuLk3b504qJ7gyjA+QpileKrw3K2NJsLw8qifmOnjn17EDSji8i67bILqX2
+	YW+KaGFM7HVFwcKkBLahlwZ5lBfbuWTjVfyJ8sNfNquZmZA/7JNgQ0iBXTLf3M1S
+	+KQW1pZ3myO9ACkbPUsHnd8o1Nv+TKmXvFBsP5RL36MeeHKQIkiS5JG6FrL9LEHE
+	A2qECuism6jYVKyDcIWa4nW//E6pQfDk8sSQu16LBrkfV25ptZ58JyhqVoAwLV9Z
+	Ag3KHg==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em668vr9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 05:06:57 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49N56u24025278
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 23 Oct 2024 05:06:56 GMT
+Received: from [10.110.103.186] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 22 Oct
+ 2024 22:06:55 -0700
+Message-ID: <64cc6a55-fa3f-42c3-b6b2-cd0da18cdeeb@quicinc.com>
+Date: Tue, 22 Oct 2024 22:06:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB8PR08MB5388:EE_|PAVPR08MB8990:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee374028-2ccf-4c1e-f329-08dcf31fba5f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gSfg7eMwWbXyQ6AbXD5NhqzzHRFCuWpylp9Cvfno8eq/yE4fZllNXGNXQfMO?=
- =?us-ascii?Q?GjGQC17HJGYm6WMBEyq8MYN8UOaH8hx2GL3xrzNAqtlVMViekEVc1gkVgvnc?=
- =?us-ascii?Q?KwAyzzK/gQE/ZNO6w6QTJKG2euNp6Ua6JVF7YF68rizNseORDrkClNNiHIh0?=
- =?us-ascii?Q?1VsK4JxSQs7Xa0rPIco4k1z/ZgwOeILMokd3r+t7zJym/gyX3UjivzYItLGg?=
- =?us-ascii?Q?8NfjvZnkxR1cHfNFXVI9YRFamtb1v+P5XuzYTs2zKWquD+HOP7kjDA2fiUCb?=
- =?us-ascii?Q?aBmYLxWrNEPEu+hyAx8dzfc6kmQMOYH1sf3wDFmjAPr85HXnnqcGVFSmT09N?=
- =?us-ascii?Q?qU83DuOQM9Vw18xVmyouR3PPfA0K0EBCIBr9wHdxDSx38XzPgd2cnKffppVl?=
- =?us-ascii?Q?WHu5rN41jIA/DSh5WbFt2oB7ofQ/7THwsSZoYV3H0wGo1immiOkKfFwbS81O?=
- =?us-ascii?Q?EwAlRJ0Tau8sk+XqFngkylwlYiNI1ikV31DHSNigQuyuRyWjb/pThIww+GSp?=
- =?us-ascii?Q?dLcpNguObI/sgEMDdwvPqCllkWAtKmtJq2CivLzWQCkcRjmfkKE0eYKOFR7J?=
- =?us-ascii?Q?0lQMw9ZYM/gy85uxJwLUhLdpQf5h06i03uEsq7t02p4FfOFV+O8sGAQwBRWY?=
- =?us-ascii?Q?isWSdi2xXJXh5zZzTRGTPu/Nn+tQ6BjfLDBhkss7L09NS93pN5VKOJKMUrmn?=
- =?us-ascii?Q?jVIFikUn08stad5ZjzrLkxFz5AT26I9yu++66ktmNn/rUjYmiDqw18lhOLG2?=
- =?us-ascii?Q?JKB6rrY8XXzO7trYIS+y+ERJS4rquSqJp5kG6wHSAooskbIyU6f+3NS2nF5r?=
- =?us-ascii?Q?9xiYWI8SaFnX1MOETbGN5yM//588H/3Mzoh2OUjBmh32g0vw6HzERS/xr/gY?=
- =?us-ascii?Q?II0YpZvbIYG2zFchLodus1urB/6H5dulYuq4hmmJp4JVPiRYA4kJzfMCAdkM?=
- =?us-ascii?Q?PAlE6EjDN2FHKr/D9eFwiGPBqTAKgnF5BRSpRorZ0KXXYE1R4e8Nk0St/Y2k?=
- =?us-ascii?Q?jkfywEDe5SYAw8qez5VA5kGIUHEOsQiiEj3VYmgfBij6ZmyD8OKHhbylt0w/?=
- =?us-ascii?Q?Hrgd616+1lvZWG06lKY4VzsHEfllOb+wwOu2BUHWye4O9IcFpZvim9YL3djz?=
- =?us-ascii?Q?62CbjA0CGA2nBVaW21bRDfhvnG37vA2O2GctzaqtXJH04hfQC3B10/p6VJ9u?=
- =?us-ascii?Q?8Pw6vAEWBo3kMJsRy5oopislJ/nY0LbjOC9Rq7SJrv6g7Jp05f2e9RqJ9mNO?=
- =?us-ascii?Q?QY8gmX8PJnU7lSOjYVbDWnphwo6eXjRg9ZviNbZwRpF35qyFimFeH9I2+7sA?=
- =?us-ascii?Q?s99N5pnPwTXWHjR2KGUtudz4ZWgzU1v2+GggG+1cWeSK8RDNb/bzonxaZ8zc?=
- =?us-ascii?Q?em508co=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR08MB5388.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?b9cH1/k4tEplU+6a3ZeJ7/b172gWUtgzew2bn/Oucsmi6Z9B9IGhQvlN7NVE?=
- =?us-ascii?Q?VR8NtDi0s9OLya6ncfRrdXzragTXRVNIjBmvz8I8BdZpj47h98nFA3Z/lZDT?=
- =?us-ascii?Q?225MFPbEsMRBc58gZi2zXgG4YWyC3Vd41zqPSEH+3be5oyyQgs5bjv6FfMyw?=
- =?us-ascii?Q?TuN2ZG4l0+ycq+qy4OSXccrlMatchpfQh1D095HT3DXeyC7wfYIReaqy+ShT?=
- =?us-ascii?Q?5TjLsl6rvojbip66X2D8n1R5qjgZ0DURKck6OvkqtX+flSk2aWi6MGNyIyho?=
- =?us-ascii?Q?79De4Cfv5VQT7V3Ru5Le26CPQWR+TrkFODT5MkU21sWqoDXen+ZUvZAqJ5PA?=
- =?us-ascii?Q?mDXPaE6SL8Iw/aPZvfBI2Gg37Wf+M7vSizZhg08uqZnusUxos85Ru0W2OGYE?=
- =?us-ascii?Q?yDtFXkAStKv7fd9ZIE2gKyyq/oSboF8Jvd1xHUjV4K4/Z0ieFO1JiiKTvCg2?=
- =?us-ascii?Q?vWaRsEpl6XODn2v+/UIXMAftCXBa+GP0EEwKKukylKv5EM39BNuFp98lU/g5?=
- =?us-ascii?Q?rii9H+HJseW1sbYnTkVwpnKJ7qrDR0PcgEfOa8HiCNJY1LwasCjapDhlxk6S?=
- =?us-ascii?Q?KhmoPlb3bClqK24j1z9M/1SJphMclzuFdh+/fKoHSAuu39aVQoc+LkAGTWuF?=
- =?us-ascii?Q?cAGI6uA6wEK3lDjdYlq0cpk83M6MsmncDE01WLvvYCvqF+dBF4NVqVwCZ37r?=
- =?us-ascii?Q?uRe8QqzP/YpNghzb88I/n+cUvFJh3hWsiynMhLEioFYVK95Ql6PLr6TPBZAt?=
- =?us-ascii?Q?4/zqMrqsAEpIGxvgJSQkiezXY2iJsx2ULDlKLQBVYo9pMksWNIt2ayYs+Kzp?=
- =?us-ascii?Q?6k0NeUeCrk9B0QMrrR5nzNBVies/gPqPAdFKGdS6ziQIyiL96F9HdcLlrTMK?=
- =?us-ascii?Q?sQDLmsZDtyaqfhIZl2mfH5jNgKV1795PmnVoxddBpLOxa+VnMS2U2hRp8MIy?=
- =?us-ascii?Q?ZH1sIhrpaDbjHmNYf704c3nySsa1aa+ta7m5n/sf/jHvey5bpO6B1jmMeBlI?=
- =?us-ascii?Q?QFCZ68RDo5jDulORRtZTPD3sxkRAmUichfXbKnVgB6Rv8rNGA94Y9LOjSwk3?=
- =?us-ascii?Q?3Tiqr6yTll2ZInRBaDHaIDkEUGoKjSfhw0jFrpatkoPHo+dFIQlqHu39weOy?=
- =?us-ascii?Q?ztSlb8QWU2VsIN5Xo7Kp7kZv4Tz/5C9KMQ1MhBwQ8EvYCIOH5r5duwQ+/wxm?=
- =?us-ascii?Q?OcsOTCtH93qdRhwe9Rummqi57cA92WBky7uc6IE5xLU5tRaXTY4dVQHZaMgA?=
- =?us-ascii?Q?l/MFd1Tqs4dLnYIGlTkx0L72lm0QXRQkCMmOSWXs96Nc5VwOZ4jnL627RO9y?=
- =?us-ascii?Q?nGbTGI7Ey9GPjtIq9Z644OENQSwydEMFWmOrZsoVkV58xJQkOFRY3bldwsAr?=
- =?us-ascii?Q?94vWWFGkjOvBVM5em3ejkLtQwvIkOms5kFY4zwy+w8W2jBpXDP6VqWT4ymxa?=
- =?us-ascii?Q?OUklSL6fK8HIWwqVGZw+wB0ruIRnVsLpz4xex7EJrH6k0Bu/KK8K4Crv/W1J?=
- =?us-ascii?Q?2ZyLODGR0EtQqdCTe1WAEfl2YS3vrnSnr+xtKn+c9ADYqm0Rmiiks1PZFsSe?=
- =?us-ascii?Q?uXY5WYahgfQw1d0Bly/Aw+4xLnI/gFDz1BXxWHCR?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	5aiaBd4p4L4BoHKyU0PRKKw74E8e1fxGhDXbjkqf55uMAxz368Fp8wPSsUI7pTdtqrlVjHTPpo8eX4RqIdKODn2LeXX8rS95P8vkXBWS3CEQ/3A1+7ZmnZGfDd4IECPhussE9D5Da9avMlgZyPnCi3aEwn0gAc3A9S1EQCMV25a4IJu5mGBin25YrJ5ukn3FFfVBUf5MovCVoz/Zkallu8V7Xcpsn+uVZpAcSu4kr/kuWZOq09ZKRBDQk5ERUaAnsxG6Jfp3nKxiq5Vw3Xk8SAzhH6FAjdjg5i7HpI7hCbaTx65rK9OS4pU7dbAXB3OXTmnrMfQPWCzhEPDZmL02DXpzhSYPYcIV6YNQikNTwP6RXj0sWtqlSSOQRCN969GwferIgHWen1NwiLo7yyhL6lUcTbg/STvePFcnXR6lklD6GWNIGHM60FLp4u/1lacbizZ8Q3hyL8E5kbBCSdLy8jl8masf9dvaT1R+7V6zp6s/FgR06dNRdZ6UH3sb6oB4/AeRElgdiYwrTHd1JFca05IHWVa92DfiXoqWMow/dMyHz0e5MMPDibj7kk2cUh+pqJcSMlzIQV2Hl1Aco+IL42dZbImEWo9vxVPoo+6rnxrIZ22Asmm7mhP68Tuih5EB
-X-OriginatorOrg: drivenets.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee374028-2ccf-4c1e-f329-08dcf31fba5f
-X-MS-Exchange-CrossTenant-AuthSource: DB8PR08MB5388.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 05:01:17.8516
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 662f82da-cf45-4bdf-b295-33b083f5d229
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PniZZjF+wAy63ONdE1LsOiOSbBKQlfq9UcTghCYSntIJNf12tdaS6g0Qa04b2dTYimTPjfYOv2UJ9N0wZ8QO0A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR08MB8990
-X-MDID: 1729659681-GwrTgMigY9LD
-X-MDID-O:
- eu1;ams;1729659681;GwrTgMigY9LD;<gnaaman@drivenets.com>;7d4d5839adf16a847fd5f829897ca436
-X-PPE-TRUSTED: V=1;DIR=OUT;
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 07/10] net: qrtr: allow socket endpoint binding
+To: Denis Kenzior <denkenz@gmail.com>, <netdev@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20241018181842.1368394-1-denkenz@gmail.com>
+ <20241018181842.1368394-8-denkenz@gmail.com>
+Content-Language: en-US
+From: Chris Lew <quic_clew@quicinc.com>
+In-Reply-To: <20241018181842.1368394-8-denkenz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: QWirRFbA7YNojLn2Bx1r280c1iUmF81T
+X-Proofpoint-GUID: QWirRFbA7YNojLn2Bx1r280c1iUmF81T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 phishscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999
+ suspectscore=0 clxscore=1015 mlxscore=0 bulkscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410230028
 
-> Looks like the test is still unhappy. Can you try to run it on your side
-> before reposting? Or does it look good?
 
-Hey,
 
-Apologies if I missed anything.
+On 10/18/2024 11:18 AM, Denis Kenzior wrote:
+> Introduce the ability to bind a QIPCRTR family socket to a specific
+> endpoint.  When a socket is bound, only messages from the bound
+> endpoint can be received, and any messages sent from the socket are
+> by default directed to the bound endpoint.  Clients can bind a socket
+> by using the setsockopt system call with the QRTR_BIND_ENDPOINT option
+> set to the desired endpoint binding.
+> 
+> A previously set binding can be reset by setting QRTR_BIND_ENDPOINT
+> option to zero.  This behavior matches that of SO_BINDTOIFINDEX.
+> 
+> This functionality is useful for clients that need to communicate
+> with a specific device (i.e. endpoint), such as a PCIe-based 5G modem,
+> and are not interested in messages from other endpoints / nodes.
+> 
+> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
+> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> Reviewed-by: Andy Gross <agross@kernel.org>
+> ---
+>   include/uapi/linux/qrtr.h |  1 +
+>   net/qrtr/af_qrtr.c        | 54 ++++++++++++++++++++++++++++-----------
+>   2 files changed, 40 insertions(+), 15 deletions(-)
+> 
+...
+> @@ -1313,6 +1331,9 @@ static int qrtr_setsockopt(struct socket *sock, int level, int optname,
+>   	case QRTR_REPORT_ENDPOINT:
+>   		assign_bit(QRTR_F_REPORT_ENDPOINT, &ipc->flags, val);
+>   		break;
+> +	case QRTR_BIND_ENDPOINT:
+> +		ipc->bound_endpoint = val;
+> +		break;
+>   	default:
+>   		rc = -ENOPROTOOPT;
+>   	}
+> @@ -1346,6 +1367,9 @@ static int qrtr_getsockopt(struct socket *sock, int level, int optname,
+>   	case QRTR_REPORT_ENDPOINT:
+>   		val = test_bit(QRTR_F_REPORT_ENDPOINT, &ipc->flags);
+>   		break;
+> +	case QRTR_BIND_ENDPOINT:
+> +		val = ipc->bound_endpoint;
+> +		break;
 
-I ran this before posting, after applying the entire series, and found no crashes:
+In the case where an endpoint goes away and a client has bound their 
+socket to an endpoint, would there be any notification to unbind the socket?
 
-    sudo make -C tools/testing/selftests run_tests TARGETS=net
+Is the expectation that the client would get notified through ECONNRESET 
+on the next sendmsg() or receive the BYE/DEL_CLIENT/DEL_SERVER control 
+message.
 
-Is there more info about this run?
-Was this ran on an intermediate patch in the series or all of it?
+On that cleanup, I guess the client would either re-bind the socket back 
+to 0 or wait for the mhi sysfs to come back and get the new endpoint id?
+
+>   	default:
+>   		rc = -ENOPROTOOPT;
+>   	}
 
