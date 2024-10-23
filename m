@@ -1,125 +1,147 @@
-Return-Path: <netdev+bounces-138399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 408E99AD535
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 21:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BECCF9AD53D
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 21:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688391C20F59
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:50:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF2651C20ACD
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 19:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA37D1DE4F7;
-	Wed, 23 Oct 2024 19:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADCE1D9A61;
+	Wed, 23 Oct 2024 19:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="r2hHWu/g"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EYGB+MgC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9328F78C9C;
-	Wed, 23 Oct 2024 19:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B961D9667
+	for <netdev@vger.kernel.org>; Wed, 23 Oct 2024 19:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729713050; cv=none; b=Yp7JUeQ4JMkdNmb2cc82x/RPouWKyyi6ylKldPxnRHLSGzko+PkZUx03oOsOcCdxyhLglWQyCh9KLoRzMraNFOmYbg05QXx+HUruj2dYJlxHFx1L71xCXoPXvUlCPV1HHA8OiYf54gNhwr/4ZI0tAXpLxn/UpagFbRNaBQ7FuFk=
+	t=1729713117; cv=none; b=SWbX4uvvipxYJpLpTc9Qezd4btyPTG8ITKH8JMdJ2zTMHdckIcUaHJr6WYLhWer/eId9XNsbinqCAgiEFpzXMvLn7vPmlv53RJqV/7UOvpDj/WzIz01e2M1twjTKdQmpemwcP/QLPMXu2cY2pJvdQYtArlDw7UFqRoifauJwNPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729713050; c=relaxed/simple;
-	bh=2ghk0RCQfrEQ5PI5QuMxPEnNHhK1nZSzgig7gukZ/Mo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ONOf2+5ev3jBzRqUo7KHjsJJy0JaFOcoB8+D9RJBo1+8jMWEjEIrLHDVzHvTX5Fg+egAZljoot3BfzxXObVqZWcWFD4E0ZSq3xwL54nZi4UPs88LxYkbH+CXGs7FTlWNiykR3cmu8cb0ASZwLqS1sFufJ4nuOr8br99GnKoLgiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=r2hHWu/g; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4XYfmH2B6Bz9t06;
-	Wed, 23 Oct 2024 21:50:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1729713039;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+DiBGY7JXTau9/+lExprJsgF423QWQvTINVO37mbHBA=;
-	b=r2hHWu/gsNMva0I9QpfanG6ib8PMatoREIpS03GQI99J5qN8kYcgZDEQ1a0TaReloWibzZ
-	bZ54lvnJek1CXI+BYnY6aZtMSl7X/R5Yv3b6pe0jO21XelmY+QWq7vXPmtSQn9PFTImpvi
-	kvfSOWFc5LEQE3wGn9L8a8wSgSiBfBklT5Y40nj43eWhnILCGp2qEQYbGWfHlsIFZSTy4y
-	hWQalszvnBs3MQa3UbqvIgfi+l7k6QgwiLPkmsDRA9hmJ+JSMhMpGX/Kd2Q514C4QPGfbP
-	3APh6xRPvSFN0/6mnVNau4AeuVXQUkWF6fTS4udK9eWIaW9K9+22sY/0nm7Fsw==
-Message-ID: <dc3df94f-7281-4a42-8db1-ee4f556b3d6f@mailbox.org>
-Date: Wed, 23 Oct 2024 21:50:27 +0200
+	s=arc-20240116; t=1729713117; c=relaxed/simple;
+	bh=BwmpP8pJYe+gJRkKW0sZ8HvTA8xcFJe9KtJTO796xcs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gj1Kt3iF+xRiuZyzEQn7k+XPMFqLZnPk3mpdZDr+qGUcPVnwoV3s60y2hJ55y0VbqAK9dnobN2YMdYsXFDXfqWdZm5N7j51eNborI7JOvOWUssXJK7rIlJHug7SQtIltFHFUhlJzfzf8OEtJ4nWY/9CHbakehowlHHr4Ps6LAQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EYGB+MgC; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729713116; x=1761249116;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KDtl5cL6xeEdRYnbT3DONURZo/i5NXov44FGquxroZs=;
+  b=EYGB+MgCvxYQjSIdpBevbA68oEhttgDvgc6IJBwZw5pr+wPF/2RtqPIu
+   UgU1poWXnVRULwOmfvaLoIoJDwti6xw/SLYwTVkH/1eJRcgBJEa1t/b5u
+   KhJD5mVDHdH9Panlljo9O4Lq3c/9XYxy061knHzS3wpLdZaO+jnjIdBgE
+   A=;
+X-IronPort-AV: E=Sophos;i="6.11,227,1725321600"; 
+   d="scan'208";a="434071578"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 19:51:51 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:64785]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.226:2525] with esmtp (Farcaster)
+ id 1f7577bd-d61b-41a8-850a-8fbd97c88e10; Wed, 23 Oct 2024 19:51:50 +0000 (UTC)
+X-Farcaster-Flow-ID: 1f7577bd-d61b-41a8-850a-8fbd97c88e10
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 23 Oct 2024 19:51:50 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 23 Oct 2024 19:51:47 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <ignat@cloudflare.com>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next] socket: Print pf->create() when it does not clear sock->sk on failure.
+Date: Wed, 23 Oct 2024 12:51:44 -0700
+Message-ID: <20241023195144.60048-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <CANn89iLEvu-bkrDWZnzG66vcbQbb2NS=U0XqH-iwa=ONE3tiQA@mail.gmail.com>
+References: <CANn89iLEvu-bkrDWZnzG66vcbQbb2NS=U0XqH-iwa=ONE3tiQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various
- compliance requirements."
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
- gregkh@linuxfoundation.org, wangyuli@uniontech.com, aospan@netup.ru,
- conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
- dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com,
- geert@linux-m68k.org, hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru,
- linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-spi@vger.kernel.org, manivannan.sadhasivam@linaro.org,
- mattst88@gmail.com, netdev@vger.kernel.org, nikita@trvn.ru,
- ntb@lists.linux.dev, patches@lists.linux.dev, richard.henderson@linaro.org,
- s.shtylyov@omp.ru, serjk@netup.ru, shc_work@mail.ru,
- tsbogend@alpha.franken.de, v.georgiev@metrotek.ru,
- wsa+renesas@sang-engineering.com, xeb@mail.ru
-References: <a08dc31ab773604d8f206ba005dc4c7a@aosc.io>
- <20241023080935.2945-2-kexybiscuit@aosc.io>
- <124c1b03-24c9-4f19-99a9-6eb2241406c2@mailbox.org>
- <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
-From: Tor Vic <torvic9@mailbox.org>
-In-Reply-To: <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: wwofu5okm3posc3pe5gem39bz8ctt5wq
-X-MBO-RS-ID: e798e6f1cba1393a8e6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-
-
-On 10/23/24 19:45, Linus Torvalds wrote:
-> Ok, lots of Russian trolls out and about.
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 23 Oct 2024 21:45:26 +0200
+> On Wed, Oct 23, 2024 at 9:18 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > I suggested to put DEBUG_NET_WARN_ON_ONCE() in __sock_create() to
+> > catch possible use-after-free.
+> >
+> > But the warning itself was not useful because our interest is in
+> > the callee than the caller.
+> >
+> > Let's define DEBUG_NET_WARN_ONCE() and print the name of pf->create()
+> > and the socket identifier.
+> >
+> > While at it, we enclose DEBUG_NET_WARN_ON_ONCE() in parentheses too
+> > to avoid a checkpatch error.
+> >
+> > Note that %pf or %pF were obsoleted and later removed as per comment
+> > in lib/vsprintf.c.
+> >
+> > Link: https://lore.kernel.org/netdev/202410231427.633734b3-lkp@intel.com/
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  include/net/net_debug.h | 4 +++-
+> >  net/socket.c            | 4 +++-
+> >  2 files changed, 6 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/include/net/net_debug.h b/include/net/net_debug.h
+> > index 1e74684cbbdb..9fecb1496be3 100644
+> > --- a/include/net/net_debug.h
+> > +++ b/include/net/net_debug.h
+> > @@ -149,9 +149,11 @@ do {                                                               \
+> >
+> >
+> >  #if defined(CONFIG_DEBUG_NET)
+> > -#define DEBUG_NET_WARN_ON_ONCE(cond) (void)WARN_ON_ONCE(cond)
+> > +#define DEBUG_NET_WARN_ON_ONCE(cond) ((void)WARN_ON_ONCE(cond))
+> > +#define DEBUG_NET_WARN_ONCE(cond, format...) ((void)WARN_ONCE(cond, format))
+> >  #else
+> >  #define DEBUG_NET_WARN_ON_ONCE(cond) BUILD_BUG_ON_INVALID(cond)
+> > +#define DEBUG_NET_WARN_ONCE(cond, format...) BUILD_BUG_ON_INVALID(cond)
+> >  #endif
+> >
+> >  #endif /* _LINUX_NET_DEBUG_H */
+> > diff --git a/net/socket.c b/net/socket.c
+> > index 9a8e4452b9b2..da00db3824e3 100644
+> > --- a/net/socket.c
+> > +++ b/net/socket.c
+> > @@ -1578,7 +1578,9 @@ int __sock_create(struct net *net, int family, int type, int protocol,
+> >                 /* ->create should release the allocated sock->sk object on error
+> >                  * and make sure sock->sk is set to NULL to avoid use-after-free
+> >                  */
+> > -               DEBUG_NET_WARN_ON_ONCE(sock->sk);
+> > +               DEBUG_NET_WARN_ONCE(sock->sk,
+> > +                                   "%pS must clear sock->sk on failure, family: %d, type: %d, protocol: %d\n",
 > 
-> It's entirely clear why the change was done, it's not getting
-> reverted, and using multiple random anonymous accounts to try to
-> "grass root" it by Russian troll factories isn't going to change
-> anything.
-> 
+> %ps would be more appropriate, the offset should be zero, no need to
+> display a full 'symbol+0x0/0x<size>'
 
-I'm getting tired of reading this type of accusations.
+Ah, exactly!
+Will use %ps in v2.
 
-It's true that I'm just a random unimportant Linux user following the 
-mailing list, but this account is not a "multiple" account emanating 
-from a troll factory.
+Thanks!
 
-'git log' gives you more info.
-
-> And FYI for the actual innocent bystanders who aren't troll farm
-> accounts - the "various compliance requirements" are not just a US
-> thing.
-> 
-> If you haven't heard of Russian sanctions yet, you should try to read
-> the news some day.  And by "news", I don't mean Russian
-> state-sponsored spam.
-> 
-> As to sending me a revert patch - please use whatever mush you call
-> brains. I'm Finnish. Did you think I'd be *supporting* Russian
-> aggression? Apparently it's not just lack of real news, it's lack of
-> history knowledge too.
-> 
->                        Linus
-
+---
+pw-bot: cr
 
