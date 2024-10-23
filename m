@@ -1,108 +1,94 @@
-Return-Path: <netdev+bounces-138112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D609AC000
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:18:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 208759AC015
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 09:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3329A28131D
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:18:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F2751C20D56
+	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 07:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D96150980;
-	Wed, 23 Oct 2024 07:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67BF1531F0;
+	Wed, 23 Oct 2024 07:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sg/k6Sfu"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2464487BE;
-	Wed, 23 Oct 2024 07:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E9213DB9F;
+	Wed, 23 Oct 2024 07:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729667925; cv=none; b=hfhZ9McT3m0E/jUdZWvxp8N8w1wdfWbLeCm4Uumdi5VYCllCQH39WXEQLFwBLAHR5MhSaQXR+Vo72mU6As8KqOInDcvk2Eiu7Jmgy0CZ9yoSnw3Sc4qdjO2S4MwhCZ3AjF9L1ebLAO1IaO70a7VfqaTUoWYimGt2+KiaYQoXJEU=
+	t=1729668040; cv=none; b=SFBOTjF0rpzgZHK9bx8EY7IUGVOz7exmz9H8AbzNOUWR0B1LRdW2rAosBKVrb6MUjtlX5arWUjy/Maq+9m1kSLa9MDvAeG9bXno1WX91UJff58QNhUP6WywwKPbanYu20Lc/VzJE64tRYzORpPpvzkm+xhxEHLgKsjYLn7uW9GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729667925; c=relaxed/simple;
-	bh=UpZL2aAYHgU3lIDNh+bWgrhIqQYbxf7LboRZyyhSAzQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ufWHRvzIh6pO9OAwOdYP8VrI5AOruTbgpm5bbVOmHc3asag+rby8p+FZwCx5Y3hZUKz2aNltzYLoWrk1y6CLZJMN7AF01w4Xu5FtgNrOuFvLFeGmbM63OwMRVpM8tOuWIuKHUq3s9iZZBpRPWs7sl5HUprJaeLU99CGFXNUPcxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XYL4c29V1z1ynTm;
-	Wed, 23 Oct 2024 15:18:40 +0800 (CST)
-Received: from dggpemf100002.china.huawei.com (unknown [7.185.36.19])
-	by mail.maildlp.com (Postfix) with ESMTPS id 13F9D1A0188;
-	Wed, 23 Oct 2024 15:18:33 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (7.202.181.32) by
- dggpemf100002.china.huawei.com (7.185.36.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 23 Oct 2024 15:18:32 +0800
-Received: from kwepemg200005.china.huawei.com ([7.202.181.32]) by
- kwepemg200005.china.huawei.com ([7.202.181.32]) with mapi id 15.02.1544.011;
- Wed, 23 Oct 2024 15:18:32 +0800
-From: "wangliang (CI)" <wangliang74@huawei.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"idosch@nvidia.com" <idosch@nvidia.com>, "kuniyu@amazon.com"
-	<kuniyu@amazon.com>, "stephen@networkplumber.org"
-	<stephen@networkplumber.org>, "dsahern@kernel.org" <dsahern@kernel.org>,
-	"lucien.xin@gmail.com" <lucien.xin@gmail.com>, yuehaibing
-	<yuehaibing@huawei.com>, zhangchangzhong <zhangchangzhong@huawei.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: =?utf-8?B?5Zue5aSNOiBbUEFUQ0ggbmV0IHYyXSBuZXQ6IGZpeCBjcmFzaCB3aGVuIGNv?=
- =?utf-8?B?bmZpZyBzbWFsbCBnc29fbWF4X3NpemUvZ3NvX2lwdjRfbWF4X3NpemU=?=
-Thread-Topic: [PATCH net v2] net: fix crash when config small
- gso_max_size/gso_ipv4_max_size
-Thread-Index: AQHbJPx7zpqsHF8R1U2HOQKbqj44u7KTXbAAgACPsaA=
-Date: Wed, 23 Oct 2024 07:18:32 +0000
-Message-ID: <c9abbcbe45e845a59869d01253db6dd0@huawei.com>
-References: <20241023035213.517386-1-wangliang74@huawei.com>
- <CANn89iLpMv8E0=VR=nEBB_AJqR74=GbMvZs4NdESpCjBv7x7iA@mail.gmail.com>
-In-Reply-To: <CANn89iLpMv8E0=VR=nEBB_AJqR74=GbMvZs4NdESpCjBv7x7iA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1729668040; c=relaxed/simple;
+	bh=EYSCT3GpLwpgWQjmPjVqWCwYz6V61945ajYy0Xe+6iI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZcUbm3iZJetno49wTtBX+PCYUK+0tdN6ywaVZWfWpoS2cmvDkpMGw42YXFLDsZMFGjCJKxjIV54qr2D36VnILIT6V/OJRVdOhjaIu9Gvo0W+RJIpDfiE0+KKv7+T4DIjAnZo+XjL2qh9IlH6ZqYLmq/aVlVRaOj1FQ7T7R4FISM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sg/k6Sfu; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=w+90h7H5AVOlUGCT6jpiVo75HoG20ZQ36MbBIWzDKCk=; b=sg/k6Sfu33Iw5/CiNpoYqkyf4X
+	ElBBSIB+U1NJ6KBwX7CC1QLsj5/W7jRqgkVLS/Q1t55vyPeXoDDFWS8o6/u7JhoeDWfyv34O0lhQj
+	NtSUWkELXMp3MDvKLwNwpQtsB85FtrY2ZsBiXxWGnjvrddxbNyryGmNOy5H3tYl3+U4EkspGvnqe9
+	+ukocsux5Q+eNjr3i0AEtuBcufLP0hheAujRayp+4/YL9wtVn+h05KQ3rYQsvBnRkSJJCchy8W8Gs
+	mRgTASenNL3AI7px863NvEkEOGfQgoYHm4P+ArsmPt1xZ+0/48UzWn1h2Ek//qM33/l7ceMPCS37s
+	vllZB6xw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t3Vfa-0000000DMaT-0Hry;
+	Wed, 23 Oct 2024 07:20:38 +0000
+Date: Wed, 23 Oct 2024 00:20:38 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org
+Subject: Re: [PATCH v6 02/15] net: generalise net_iov chunk owners
+Message-ID: <ZxijxiqNGONin3IY@infradead.org>
+References: <20241016185252.3746190-1-dw@davidwei.uk>
+ <20241016185252.3746190-3-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241016185252.3746190-3-dw@davidwei.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-VGhhbmsgeW91IHZlcnkgbXVjaCBmb3IgeW91ciBzdWdnZXN0aW9ucyENCg0KLS0tLS3pgq7ku7bl
-jp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6OiBFcmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+
-IA0K5Y+R6YCB5pe26Ze0OiAyMDI05bm0MTDmnIgyM+aXpSAxNDo0NA0K5pS25Lu25Lq6OiB3YW5n
-bGlhbmcgKENJKSA8d2FuZ2xpYW5nNzRAaHVhd2VpLmNvbT4NCuaKhOmAgTogZGF2ZW1AZGF2ZW1s
-b2Z0Lm5ldDsga3ViYUBrZXJuZWwub3JnOyBwYWJlbmlAcmVkaGF0LmNvbTsgaWRvc2NoQG52aWRp
-YS5jb207IGt1bml5dUBhbWF6b24uY29tOyBzdGVwaGVuQG5ldHdvcmtwbHVtYmVyLm9yZzsgZHNh
-aGVybkBrZXJuZWwub3JnOyBsdWNpZW4ueGluQGdtYWlsLmNvbTsgeXVlaGFpYmluZyA8eXVlaGFp
-YmluZ0BodWF3ZWkuY29tPjsgemhhbmdjaGFuZ3pob25nIDx6aGFuZ2NoYW5nemhvbmdAaHVhd2Vp
-LmNvbT47IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
-cmcNCuS4u+mimDogUmU6IFtQQVRDSCBuZXQgdjJdIG5ldDogZml4IGNyYXNoIHdoZW4gY29uZmln
-IHNtYWxsIGdzb19tYXhfc2l6ZS9nc29faXB2NF9tYXhfc2l6ZQ0KDQpPbiBXZWQsIE9jdCAyMywg
-MjAyNCBhdCA1OjM04oCvQU0gV2FuZyBMaWFuZyA8d2FuZ2xpYW5nNzRAaHVhd2VpLmNvbT4gd3Jv
-dGU6DQo+DQo+IENvbmZpZyBhIHNtYWxsIGdzb19tYXhfc2l6ZS9nc29faXB2NF9tYXhfc2l6ZSB3
-aWxsIGxlYWQgdG8gYW4gDQo+IHVuZGVyZmxvdyBpbiBza19kc3RfZ3NvX21heF9zaXplKCksIHdo
-aWNoIG1heSB0cmlnZ2VyIGEgQlVHX09OIGNyYXNoLCANCj4gYmVjYXVzZSBzay0+c2tfZ3NvX21h
-eF9zaXplIHdvdWxkIGJlIG11Y2ggYmlnZ2VyIHRoYW4gZGV2aWNlIGxpbWl0cy4NCj4gQ2FsbCBU
-cmFjZToNCj4gdGNwX3dyaXRlX3htaXQNCj4gICAgIHRzb19zZWdzID0gdGNwX2luaXRfdHNvX3Nl
-Z3Moc2tiLCBtc3Nfbm93KTsNCj4gICAgICAgICB0Y3Bfc2V0X3NrYl90c29fc2Vncw0KPiAgICAg
-ICAgICAgICB0Y3Bfc2tiX3Bjb3VudF9zZXQNCj4gICAgICAgICAgICAgICAgIC8vIHNrYi0+bGVu
-ID0gNTI0Mjg4LCBtc3Nfbm93ID0gOA0KPiAgICAgICAgICAgICAgICAgLy8gdTE2IHRzb19zZWdz
-ID0gNTI0Mjg4LzggPSA2NTUzNSAtPiAwDQo+ICAgICAgICAgICAgICAgICB0c29fc2VncyA9IERJ
-Vl9ST1VORF9VUChza2ItPmxlbiwgbXNzX25vdykNCj4gICAgIEJVR19PTighdHNvX3NlZ3MpDQo+
-IEFkZCBjaGVjayBmb3IgdGhlIG1pbmltdW0gdmFsdWUgb2YgZ3NvX21heF9zaXplIGFuZCBnc29f
-aXB2NF9tYXhfc2l6ZS4NCj4NCj4gRml4ZXM6IDQ2ZTZiOTkyYzI1MCAoInJ0bmV0bGluazogYWxs
-b3cgR1NPIG1heGltdW1zIHRvIGJlIHNldCBvbiANCj4gZGV2aWNlIGNyZWF0aW9uIikNCj4gRml4
-ZXM6IDllZWZlZGQ1OGFlMSAoIm5ldDogYWRkIGdzb19pcHY0X21heF9zaXplIGFuZCBncm9faXB2
-NF9tYXhfc2l6ZSANCj4gcGVyIGRldmljZSIpDQo+IFNpZ25lZC1vZmYtYnk6IFdhbmcgTGlhbmcg
-PHdhbmdsaWFuZzc0QGh1YXdlaS5jb20+DQo+IC0tLQ0KDQpUaGFua3MgZm9yIHRoaXMgZml4ICEN
-Cg0KUmV2aWV3ZWQtYnk6IEVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT4NCg0K
+On Wed, Oct 16, 2024 at 11:52:39AM -0700, David Wei wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
+> 
+> Currently net_iov stores a pointer to struct dmabuf_genpool_chunk_owner,
+> which serves as a useful abstraction to share data and provide a
+> context. However, it's too devmem specific, and we want to reuse it for
+> other memory providers, and for that we need to decouple net_iov from
+> devmem. Make net_iov to point to a new base structure called
+> net_iov_area, which dmabuf_genpool_chunk_owner extends.
+
+We've been there before.  Instead of reinventing your own memory
+provider please enhance dmabufs for your use case.  We don't really
+need to build memory buffer abstraction over memory buffer abstraction.
 
