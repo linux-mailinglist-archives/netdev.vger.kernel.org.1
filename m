@@ -1,114 +1,109 @@
-Return-Path: <netdev+bounces-138432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149C79AD8D8
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 01:57:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3FF69AD8E9
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 02:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43D991C21731
-	for <lists+netdev@lfdr.de>; Wed, 23 Oct 2024 23:57:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F45E1F23384
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB54E200136;
-	Wed, 23 Oct 2024 23:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FB4749A;
+	Thu, 24 Oct 2024 00:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xXaPPxsW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpvfHnRl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E031E0087;
-	Wed, 23 Oct 2024 23:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0B848C;
+	Thu, 24 Oct 2024 00:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729727814; cv=none; b=q2dIoNFHnM5coGuwUsH7yuUUhRRNtT0I0G6CsRspZ9j2LKwZ5B81f2OzFoSsH6JT5qjNiVoA5UKyr8F0CxHmX8NszBvj+VSXqyYyREImEaUsuixn3RHtesy7yNdxJ4HLzV/9PzA+QkyNbnj0mwLHjeKgeYMqwliwgV3WRSPZCYk=
+	t=1729729377; cv=none; b=T7Gcc1oaU2WX3p8/o7KMtcYtm4+XmCaaVVs6X6G2NAWQT2O/UuUlzbpWdSM3btL+CnNE7ymFYRzd5HXIfq1Pdl5HKkt4gIgdjEdbvhNCTqWCDVqcAQktUI+ZtXO4kF+X7feOqmnHg2F7CpU0hK/ufFodZ/Jt1VEcWTBfNa7kFb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729727814; c=relaxed/simple;
-	bh=ER3FknFXrHM3OX+lTqkJggiQuTe6Auk+uTi2E4vUyzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j8Tyy6i7zM9QFj3Yq2Hc69D47S3E3j0iwGRhG0UTQxH3tOIhU8FOw/M4N3IprCP5HP6Px8fKczoXU/eXacFB2KH/y+HHutDAMNLg9ItYbw5XfiLtjI+EDXKEic1gzCNewtEWutUkfEYCPgzPw1l3niJ9BzeGa/z9RAh8sqgv4Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xXaPPxsW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RoRcRsT4dhnXehgIrOkavzDeXndrmIy2Jhqon6Rlw04=; b=xXaPPxsWzvAbAQuddJCjS9yg5d
-	2/VF7BtvdVpWAbUQBX7qUUcBsszBfqG67ZBz0MoKXGrjtUWuGGs6saIWYGdTn8TV4PvEJkmh0Y136
-	u6FUSMwVJaXCsPav2KWXtqSUkpKEBVRtn/vlgfd4QeXco3meEX/lWhBFZXMyMqHmxtOI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t3lDL-00B1qp-9U; Thu, 24 Oct 2024 01:56:31 +0200
-Date: Thu, 24 Oct 2024 01:56:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Chen Wang <unicorn_wang@outlook.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Inochi Amaoto <inochiama@outlook.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Yixun Lan <dlan@gentoo.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH 4/4] net: stmmac: Add glue layer for Sophgo SG2044 SoC
-Message-ID: <6f0e1c34-d5d3-4ee5-9374-768e67a0c067@lunn.ch>
-References: <227daa87-1924-4b0b-80db-77507fc20f19@lunn.ch>
- <gwtiuotmwj2x3d5rhfrploj7o763yjye4jj7vniomv77s7crqx@5jwrpwrlwn4s>
- <65720a16-d165-4379-a01f-54340fb907df@lunn.ch>
- <424erlm55tuorjvs2xgmanzpximvey22ufhzf3fli7trpimxih@st4yz53hpzzr>
- <66f35d1b-fd26-429b-bbf9-d03ed0c1edaf@lunn.ch>
- <zum7n3656qonk4sdfu76owfs4jk2mkjrzayd57uuoqeb6iiris@635pw3mqymqd>
- <d691a687-c0e2-48a9-bf76-d0a086aa7870@lunn.ch>
- <amg64lxjjetkzo5bpi7icmsfgmt5e7jmu2z2h3duqy2jcloj7s@nma2hjk4so5b>
- <79f9b971-8b3f-4f31-ab42-42a31d505607@lunn.ch>
- <uzlmckuziavq5qeybvfm7htycprzogvkfdqj2pxrjmdkuovfut@5euc5nou7aly>
+	s=arc-20240116; t=1729729377; c=relaxed/simple;
+	bh=o/i0czh18H01Bh++/viBvqJsWZfb8X++LjTv5T5KwxA=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=tcUB9kZ/sLgCp05nKwriO/AzEFG0Lagf3/mAvp9maBmXf0VsTMiGstjDOiu4IYVQTq2alIrzdzkOIbH4jIO/reXKdkpxDrE8u0KjGqDj8MJIzfs3ncHFPJHtz65ZPcoOsNl8eyx1mK5iLEYkjhV8O0qWFZUxwy036uP0ySw5WoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GpvfHnRl; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71e681bc315so274598b3a.0;
+        Wed, 23 Oct 2024 17:22:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729729375; x=1730334175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o/i0czh18H01Bh++/viBvqJsWZfb8X++LjTv5T5KwxA=;
+        b=GpvfHnRlhc1pM6pbQuRmmu7p09OKJEO2QkTym+S48Nr9jUNL99bN7/neCIPhbdyXDI
+         fBuhJzvpX9RoVZ9G1CiXFz03D4psfEWb0MgNQmdA7akZ3lAqa7S++VOhhYnWS+bJtN2o
+         7Yy3Vk7bvRtlqwBXmdNfCjDh/tZm0dgtFRBgABwzR/7/je+mVW0aWN9DQYz2IkHPE5kM
+         HdtAc5D6jbJsPkuUQUX5PP0MvbVB09ovo8plKrRy8zyJ2lQ9985roHBlyzV7Wm4Y6A5Q
+         wIAhOnC0wvJDExKjzXe53mql/t9e4qRS7tqv1lwc/x6byQuKejPvIPx6XqI8v5fqEtDb
+         E37w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729729375; x=1730334175;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o/i0czh18H01Bh++/viBvqJsWZfb8X++LjTv5T5KwxA=;
+        b=KEjvwUuyX7fIb6E2gMfFn3rO3xFXavVlX6nl3BRFxcMCsY+wCO58VoZOivt1zIpIl8
+         0BQSMlkfX3+7aIg6szG0rtJFc0dS1c8JxV2KbLVvWlHcGRfGeNeY6TFDKdNaoEi9hJpy
+         KLerByIXR9ZRYnieHWGGMMwXhFIsVnS/S1NC7dPsQVV6Yr9JrzNDFRx0IxoNGtw49lnB
+         PBa74hALyvefnT1zeAHn9Ypwh2fR6Lo4lo3FmxHFnTvF/xf4WfsVHP5FZdkYOfeT+FmI
+         MygRNHCcak97RXdMcNTX3IAPsEfXwVBfrq95ht1ZtmVHuJAAV11lRNCAwDMhg3H9dp+B
+         rveA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDqCvX4VwL7suxb4fgQXXpKuqNfs/4qTN2s9v7ookBMzCGkjdv/CZti7lnEksVNSHCsDUGp0O6PswwdEo=@vger.kernel.org, AJvYcCVLEWRIxE+aaAk3CaEt9uxYEYIhNr5ua+ex0UOhvZE+0uvJgow/BuIaGIIXg9wRYM5CIRjGyrqWs4FpTrsa+nY=@vger.kernel.org, AJvYcCWRX98HMTgjz/ICcpC8RNqQ2/pg464jfUtrur6NOHorEVVS/divntD7MaaaZ1/jAVFL/11lg9ye@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBgVvSZaF4+sJdF/hIY/ipaugr4LK/HIWFW9s4fRKo0f6WXj2I
+	iYx9EP+Txu5huvwMabqQMA10mk1za/T0kH1E8svj2cox96T08EyK
+X-Google-Smtp-Source: AGHT+IHsiev09pNB8pqeGsewSHkIKAVMQz7zVum35IyU1VaOqBZ4LK4Z85lBsnr7xV6CC5bpnegQpg==
+X-Received: by 2002:a05:6a00:22d4:b0:71e:5709:2330 with SMTP id d2e1a72fcca58-720452cf756mr560400b3a.7.1729729375113;
+        Wed, 23 Oct 2024 17:22:55 -0700 (PDT)
+Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1312e7dsm7156595b3a.11.2024.10.23.17.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 17:22:54 -0700 (PDT)
+Date: Thu, 24 Oct 2024 09:22:48 +0900 (JST)
+Message-Id: <20241024.092248.1743299714523375638.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: aliceryhl@google.com, fujita.tomonori@gmail.com,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 5/8] rust: time: Add wrapper for fsleep
+ function
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72mKJuCdB2kCwBj5M04bw2O+7L9=yPiGJQeyMjWEsCxAMA@mail.gmail.com>
+References: <20241016035214.2229-6-fujita.tomonori@gmail.com>
+	<CAH5fLgjTGmD0=9wJRP+aNtHC2ab7e9tuRwnPZZt8RN3wpmZHBg@mail.gmail.com>
+	<CANiq72mKJuCdB2kCwBj5M04bw2O+7L9=yPiGJQeyMjWEsCxAMA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <uzlmckuziavq5qeybvfm7htycprzogvkfdqj2pxrjmdkuovfut@5euc5nou7aly>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-On Thu, Oct 24, 2024 at 06:36:06AM +0800, Inochi Amaoto wrote:
-> On Wed, Oct 23, 2024 at 02:42:16PM +0200, Andrew Lunn wrote:
-> > > Yes, this is what I have done at the beginning. At first I only
-> > > set up the phy setting and not set the config in the syscon. 
-> > > But I got a weird thing: the phy lookback test is timeout. 
-> > > Although the datasheet told it just adds a internal delay for 
-> > > the phy, I suspect sophgo does something more to set this delay.
-> > 
-> > You need to understand what is going on here. Just because it works
-> > does not mean it is correct.
-> > 
-> 
-> It seems like there is a missing info in the SG2044 doc: setting the
-> syscon internal delay bit is not enabling the internal mac delay, but
-> disable it. Now everything seems like normal: the mac adds no delay,
-> and the phy adds its delay. 
-
-That makes a lot more sense.
-
-Thanks for digging into the details.
-
-	Andrew
+T24gV2VkLCAxNiBPY3QgMjAyNCAxMTo0MjowNyArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
+b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBXZWQsIE9jdCAxNiwgMjAy
+NCBhdCAxMDoyOeKAr0FNIEFsaWNlIFJ5aGwgPGFsaWNlcnlobEBnb29nbGUuY29tPiB3cm90ZToN
+Cj4+DQo+PiBZb3UgcHJvYmFibHkgd2FudCB0aGlzOg0KPj4NCj4+IGRlbHRhLmFzX25hbm9zKCku
+c2F0dXJhdGluZ19hZGQodGltZTo6TlNFQ19QRVJfVVNFQyAtIDEpIC8gdGltZTo6TlNFQ19QRVJf
+VVNFQw0KPj4NCj4+IFRoaXMgd291bGQgYXZvaWQgYSBjcmFzaCBpZiBzb21lb25lIHBhc3NlcyBp
+NjQ6Ok1BWCBuYW5vc2Vjb25kcyBhbmQNCj4+IENPTkZJR19SVVNUX09WRVJGTE9XX0NIRUNLUyBp
+cyBlbmFibGVkLg0KPiANCj4gSSB0aGluayB3ZSBzaG91bGQgZG9jdW1lbnQgd2hldGhlciBgZnNs
+ZWVwYCBpcyBleHBlY3RlZCB0byBiZSB1c2FibGUNCj4gZm9yICJmb3JldmVyIiB2YWx1ZXMuDQo+
+IA0KPiBJdCBzb3VuZHMgbGlrZSB0aGF0LCBnaXZlbiAidG9vIGxhcmdlIiB2YWx1ZXMgaW4gYG1z
+ZWNzX3RvX2ppZmZpZXNgDQo+IG1lYW4gImluZmluaXRlIHRpbWVvdXQiLg0KDQpEbyB5b3UgbWVh
+biBtc2Vjc190b19qaWZmaWVzKCkgcmV0dXJucyBNQVhfSklGRllfT0ZGU0VUICgoTE9OR19NQVgg
+Pj4NCjEpLTEpIHdpdGggYSB2YWx1ZSBleGNlZWRpbmcgaTMyOjpNQVggbWlsbGlzZWNvbmRzPw0K
 
