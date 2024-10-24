@@ -1,109 +1,204 @@
-Return-Path: <netdev+bounces-138433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3FF69AD8E9
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 02:23:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 783929AD906
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 02:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F45E1F23384
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:23:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97AC61C218B2
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 00:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2FB4749A;
-	Thu, 24 Oct 2024 00:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7CC250F8;
+	Thu, 24 Oct 2024 00:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpvfHnRl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o4K/xXRx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0B848C;
-	Thu, 24 Oct 2024 00:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927331CAAC
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 00:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729729377; cv=none; b=T7Gcc1oaU2WX3p8/o7KMtcYtm4+XmCaaVVs6X6G2NAWQT2O/UuUlzbpWdSM3btL+CnNE7ymFYRzd5HXIfq1Pdl5HKkt4gIgdjEdbvhNCTqWCDVqcAQktUI+ZtXO4kF+X7feOqmnHg2F7CpU0hK/ufFodZ/Jt1VEcWTBfNa7kFb0=
+	t=1729731264; cv=none; b=cHMrZUM/GnwhUOzXoxGztdWONeG20l4aEWSdYAc2fAMb7SnWBErrq6PEphY2HyGtxMoE9vMlHJf5X0X0cWSzUra21ZV6rCcmHSB9/9eUJDmgDrgHKQ17hYybpeCwA3XQnBRUM+PGLQ9usUzY6THfg/AYdmOS+AYVOMLFxWXCo3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729729377; c=relaxed/simple;
-	bh=o/i0czh18H01Bh++/viBvqJsWZfb8X++LjTv5T5KwxA=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=tcUB9kZ/sLgCp05nKwriO/AzEFG0Lagf3/mAvp9maBmXf0VsTMiGstjDOiu4IYVQTq2alIrzdzkOIbH4jIO/reXKdkpxDrE8u0KjGqDj8MJIzfs3ncHFPJHtz65ZPcoOsNl8eyx1mK5iLEYkjhV8O0qWFZUxwy036uP0ySw5WoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GpvfHnRl; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71e681bc315so274598b3a.0;
-        Wed, 23 Oct 2024 17:22:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729729375; x=1730334175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o/i0czh18H01Bh++/viBvqJsWZfb8X++LjTv5T5KwxA=;
-        b=GpvfHnRlhc1pM6pbQuRmmu7p09OKJEO2QkTym+S48Nr9jUNL99bN7/neCIPhbdyXDI
-         fBuhJzvpX9RoVZ9G1CiXFz03D4psfEWb0MgNQmdA7akZ3lAqa7S++VOhhYnWS+bJtN2o
-         7Yy3Vk7bvRtlqwBXmdNfCjDh/tZm0dgtFRBgABwzR/7/je+mVW0aWN9DQYz2IkHPE5kM
-         HdtAc5D6jbJsPkuUQUX5PP0MvbVB09ovo8plKrRy8zyJ2lQ9985roHBlyzV7Wm4Y6A5Q
-         wIAhOnC0wvJDExKjzXe53mql/t9e4qRS7tqv1lwc/x6byQuKejPvIPx6XqI8v5fqEtDb
-         E37w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729729375; x=1730334175;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=o/i0czh18H01Bh++/viBvqJsWZfb8X++LjTv5T5KwxA=;
-        b=KEjvwUuyX7fIb6E2gMfFn3rO3xFXavVlX6nl3BRFxcMCsY+wCO58VoZOivt1zIpIl8
-         0BQSMlkfX3+7aIg6szG0rtJFc0dS1c8JxV2KbLVvWlHcGRfGeNeY6TFDKdNaoEi9hJpy
-         KLerByIXR9ZRYnieHWGGMMwXhFIsVnS/S1NC7dPsQVV6Yr9JrzNDFRx0IxoNGtw49lnB
-         PBa74hALyvefnT1zeAHn9Ypwh2fR6Lo4lo3FmxHFnTvF/xf4WfsVHP5FZdkYOfeT+FmI
-         MygRNHCcak97RXdMcNTX3IAPsEfXwVBfrq95ht1ZtmVHuJAAV11lRNCAwDMhg3H9dp+B
-         rveA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDqCvX4VwL7suxb4fgQXXpKuqNfs/4qTN2s9v7ookBMzCGkjdv/CZti7lnEksVNSHCsDUGp0O6PswwdEo=@vger.kernel.org, AJvYcCVLEWRIxE+aaAk3CaEt9uxYEYIhNr5ua+ex0UOhvZE+0uvJgow/BuIaGIIXg9wRYM5CIRjGyrqWs4FpTrsa+nY=@vger.kernel.org, AJvYcCWRX98HMTgjz/ICcpC8RNqQ2/pg464jfUtrur6NOHorEVVS/divntD7MaaaZ1/jAVFL/11lg9ye@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBgVvSZaF4+sJdF/hIY/ipaugr4LK/HIWFW9s4fRKo0f6WXj2I
-	iYx9EP+Txu5huvwMabqQMA10mk1za/T0kH1E8svj2cox96T08EyK
-X-Google-Smtp-Source: AGHT+IHsiev09pNB8pqeGsewSHkIKAVMQz7zVum35IyU1VaOqBZ4LK4Z85lBsnr7xV6CC5bpnegQpg==
-X-Received: by 2002:a05:6a00:22d4:b0:71e:5709:2330 with SMTP id d2e1a72fcca58-720452cf756mr560400b3a.7.1729729375113;
-        Wed, 23 Oct 2024 17:22:55 -0700 (PDT)
-Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1312e7dsm7156595b3a.11.2024.10.23.17.22.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 17:22:54 -0700 (PDT)
-Date: Thu, 24 Oct 2024 09:22:48 +0900 (JST)
-Message-Id: <20241024.092248.1743299714523375638.fujita.tomonori@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: aliceryhl@google.com, fujita.tomonori@gmail.com,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
- jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/8] rust: time: Add wrapper for fsleep
- function
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CANiq72mKJuCdB2kCwBj5M04bw2O+7L9=yPiGJQeyMjWEsCxAMA@mail.gmail.com>
-References: <20241016035214.2229-6-fujita.tomonori@gmail.com>
-	<CAH5fLgjTGmD0=9wJRP+aNtHC2ab7e9tuRwnPZZt8RN3wpmZHBg@mail.gmail.com>
-	<CANiq72mKJuCdB2kCwBj5M04bw2O+7L9=yPiGJQeyMjWEsCxAMA@mail.gmail.com>
+	s=arc-20240116; t=1729731264; c=relaxed/simple;
+	bh=w2E3F9KPincj5xXYDy/XBpkry1Zk9hO+S2Or2DOjkGI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i78O8sqkxGKo7KKdMbpZMYY3j80uKPCy5rb6qaF5cjg7jT7R6dJAhGDZjaf9CEjRyp0FVUybZ66uzDX1cdx/n5h86Oph+l4ADahmG0x7bWTSsL9Xh+G32LQfgXBLSNvSFmi0VbQGFUjrdU69XCqr5HgKTF7XyuyD1wAnvcTtGJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o4K/xXRx; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <24147551-b639-4f9f-be5e-def2570a863d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729731254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JVgoIaDu3a4uA7dKxjkeP2UOxgCvLj7AFtqJcyyqZug=;
+	b=o4K/xXRxT7AUFPwBCSjwf44lTQOHULpN9EbY4czS5zwWDveZVONFNXcb/9na/RgypdxIph
+	M9TrJanBk1TnRVtHOnyIFZn475xpRdqBWaSEMV1XTB4oZ4DnH77RdDhs8KCfUTVXORbfeA
+	3oEgq4Z96J+6r5TMClGOLTyFSz5LWp8=
+Date: Thu, 24 Oct 2024 01:54:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [PATCH net-next v2 10/15] net: lan969x: add PTP handler function
+To: Daniel Machon <daniel.machon@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>, horatiu.vultur@microchip.com,
+ jensemil.schulzostergaard@microchip.com,
+ Parthiban.Veerasooran@microchip.com, Raju.Lakkaraju@microchip.com,
+ UNGLinuxDriver@microchip.com, Richard Cochran <richardcochran@gmail.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com,
+ ast@fiberby.net, maxime.chevallier@bootlin.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+References: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
+ <20241024-sparx5-lan969x-switch-driver-2-v2-10-a0b5fae88a0f@microchip.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241024-sparx5-lan969x-switch-driver-2-v2-10-a0b5fae88a0f@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-T24gV2VkLCAxNiBPY3QgMjAyNCAxMTo0MjowNyArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
-b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBXZWQsIE9jdCAxNiwgMjAy
-NCBhdCAxMDoyOeKAr0FNIEFsaWNlIFJ5aGwgPGFsaWNlcnlobEBnb29nbGUuY29tPiB3cm90ZToN
-Cj4+DQo+PiBZb3UgcHJvYmFibHkgd2FudCB0aGlzOg0KPj4NCj4+IGRlbHRhLmFzX25hbm9zKCku
-c2F0dXJhdGluZ19hZGQodGltZTo6TlNFQ19QRVJfVVNFQyAtIDEpIC8gdGltZTo6TlNFQ19QRVJf
-VVNFQw0KPj4NCj4+IFRoaXMgd291bGQgYXZvaWQgYSBjcmFzaCBpZiBzb21lb25lIHBhc3NlcyBp
-NjQ6Ok1BWCBuYW5vc2Vjb25kcyBhbmQNCj4+IENPTkZJR19SVVNUX09WRVJGTE9XX0NIRUNLUyBp
-cyBlbmFibGVkLg0KPiANCj4gSSB0aGluayB3ZSBzaG91bGQgZG9jdW1lbnQgd2hldGhlciBgZnNs
-ZWVwYCBpcyBleHBlY3RlZCB0byBiZSB1c2FibGUNCj4gZm9yICJmb3JldmVyIiB2YWx1ZXMuDQo+
-IA0KPiBJdCBzb3VuZHMgbGlrZSB0aGF0LCBnaXZlbiAidG9vIGxhcmdlIiB2YWx1ZXMgaW4gYG1z
-ZWNzX3RvX2ppZmZpZXNgDQo+IG1lYW4gImluZmluaXRlIHRpbWVvdXQiLg0KDQpEbyB5b3UgbWVh
-biBtc2Vjc190b19qaWZmaWVzKCkgcmV0dXJucyBNQVhfSklGRllfT0ZGU0VUICgoTE9OR19NQVgg
-Pj4NCjEpLTEpIHdpdGggYSB2YWx1ZSBleGNlZWRpbmcgaTMyOjpNQVggbWlsbGlzZWNvbmRzPw0K
+On 23/10/2024 23:01, Daniel Machon wrote:
+> Add PTP IRQ handler for lan969x. This is required, as the PTP registers
+> are placed in two different targets on Sparx5 and lan969x. The
+> implementation is otherwise the same as on Sparx5.
+> 
+> Also, expose sparx5_get_hwtimestamp() for use by lan969x.
+> 
+> Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> ---
+>   drivers/net/ethernet/microchip/lan969x/lan969x.c   | 90 ++++++++++++++++++++++
+>   .../net/ethernet/microchip/sparx5/sparx5_main.h    |  5 ++
+>   drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |  9 +--
+>   3 files changed, 99 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.c b/drivers/net/ethernet/microchip/lan969x/lan969x.c
+> index 2c2b86f9144e..a3b40e09b947 100644
+> --- a/drivers/net/ethernet/microchip/lan969x/lan969x.c
+> +++ b/drivers/net/ethernet/microchip/lan969x/lan969x.c
+> @@ -201,6 +201,95 @@ static int lan969x_port_mux_set(struct sparx5 *sparx5, struct sparx5_port *port,
+>   	return 0;
+>   }
+>   
+> +static irqreturn_t lan969x_ptp_irq_handler(int irq, void *args)
+> +{
+> +	int budget = SPARX5_MAX_PTP_ID;
+> +	struct sparx5 *sparx5 = args;
+> +
+> +	while (budget--) {
+> +		struct sk_buff *skb, *skb_tmp, *skb_match = NULL;
+> +		struct skb_shared_hwtstamps shhwtstamps;
+> +		struct sparx5_port *port;
+> +		struct timespec64 ts;
+> +		unsigned long flags;
+> +		u32 val, id, txport;
+> +		u32 delay;
+> +
+> +		val = spx5_rd(sparx5, PTP_TWOSTEP_CTRL);
+> +
+> +		/* Check if a timestamp can be retrieved */
+> +		if (!(val & PTP_TWOSTEP_CTRL_PTP_VLD))
+> +			break;
+> +
+> +		WARN_ON(val & PTP_TWOSTEP_CTRL_PTP_OVFL);
+> +
+> +		if (!(val & PTP_TWOSTEP_CTRL_STAMP_TX))
+> +			continue;
+> +
+> +		/* Retrieve the ts Tx port */
+> +		txport = PTP_TWOSTEP_CTRL_STAMP_PORT_GET(val);
+> +
+> +		/* Retrieve its associated skb */
+> +		port = sparx5->ports[txport];
+> +
+> +		/* Retrieve the delay */
+> +		delay = spx5_rd(sparx5, PTP_TWOSTEP_STAMP_NSEC);
+> +		delay = PTP_TWOSTEP_STAMP_NSEC_NS_GET(delay);
+> +
+> +		/* Get next timestamp from fifo, which needs to be the
+> +		 * rx timestamp which represents the id of the frame
+> +		 */
+> +		spx5_rmw(PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
+> +			 PTP_TWOSTEP_CTRL_PTP_NXT,
+> +			 sparx5, PTP_TWOSTEP_CTRL);
+> +
+> +		val = spx5_rd(sparx5, PTP_TWOSTEP_CTRL);
+> +
+> +		/* Check if a timestamp can be retrieved */
+> +		if (!(val & PTP_TWOSTEP_CTRL_PTP_VLD))
+> +			break;
+> +
+> +		/* Read RX timestamping to get the ID */
+> +		id = spx5_rd(sparx5, PTP_TWOSTEP_STAMP_NSEC);
+> +		id <<= 8;
+> +		id |= spx5_rd(sparx5, PTP_TWOSTEP_STAMP_SUBNS);
+> +
+> +		spin_lock_irqsave(&port->tx_skbs.lock, flags);
+> +		skb_queue_walk_safe(&port->tx_skbs, skb, skb_tmp) {
+> +			if (SPARX5_SKB_CB(skb)->ts_id != id)
+> +				continue;
+> +
+> +			__skb_unlink(skb, &port->tx_skbs);
+> +			skb_match = skb;
+> +			break;
+> +		}
+> +		spin_unlock_irqrestore(&port->tx_skbs.lock, flags);
+> +
+> +		/* Next ts */
+> +		spx5_rmw(PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
+> +			 PTP_TWOSTEP_CTRL_PTP_NXT,
+> +			 sparx5, PTP_TWOSTEP_CTRL);
+> +
+> +		if (WARN_ON(!skb_match))
+> +			continue;
+> +
+> +		spin_lock(&sparx5->ptp_ts_id_lock);
+> +		sparx5->ptp_skbs--;
+> +		spin_unlock(&sparx5->ptp_ts_id_lock);
+> +
+> +		/* Get the h/w timestamp */
+> +		sparx5_get_hwtimestamp(sparx5, &ts, delay);
+> +
+> +		/* Set the timestamp in the skb */
+> +		shhwtstamps.hwtstamp = ktime_set(ts.tv_sec, ts.tv_nsec);
+> +		skb_tstamp_tx(skb_match, &shhwtstamps);
+> +
+> +		dev_kfree_skb_any(skb_match);
+> +	}
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+
+This handler looks like an absolute copy of sparx5_ptp_irq_handler()
+with the difference in registers only. Did you consider keep one
+function but substitute ptp register sets?
+
+>   static const struct sparx5_regs lan969x_regs = {
+>   	.tsize = lan969x_tsize,
+>   	.gaddr = lan969x_gaddr,
+> @@ -242,6 +331,7 @@ static const struct sparx5_ops lan969x_ops = {
+>   	.get_hsch_max_group_rate = &lan969x_get_hsch_max_group_rate,
+>   	.get_sdlb_group          = &lan969x_get_sdlb_group,
+>   	.set_port_mux            = &lan969x_port_mux_set,
+> +	.ptp_irq_handler         = &lan969x_ptp_irq_handler,
+>   };
+>   
 
