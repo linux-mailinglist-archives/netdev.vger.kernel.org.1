@@ -1,109 +1,91 @@
-Return-Path: <netdev+bounces-138587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C68F9AE36F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:06:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 495859AE38E
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2B28B22A8C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:06:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7730E1C2254F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0D21CACD3;
-	Thu, 24 Oct 2024 11:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="eCPMjtmH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA1C1CB9F4;
+	Thu, 24 Oct 2024 11:17:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22AA1C4A31;
-	Thu, 24 Oct 2024 11:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D811B6D0A;
+	Thu, 24 Oct 2024 11:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729767996; cv=none; b=OZffgcsNape1CyYeJEfJpNneTexVLjwa+CVOXWwXoI7H9z0G3SsiBHL8QB4feOfAJqZ/3u6LQbYDmhUF8RyW0cJzGYgxmTkwhWgrkqGrwQ1vxF6TtJPYuKgfJuqdZ6mqBfZiM761THcfgWXNMw1bnnFeK1HYHTKDV9Mt1lOKyXs=
+	t=1729768641; cv=none; b=dMYj07k/4J2KIwyEnM07xfQsGSdxU8dpGKWm44qII7jSayaOXKzo8UWUY3UPAPKvEYy3hwgOMHeqxTttm3ZGH6TnIZKVBp31ikIdD77fSggd4Pz5SVKWzlx8ybHQETFiR2tIWgmGVMa8lHPt9iOCX8Jw5s9EuB1HjBQ8RHMJ+gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729767996; c=relaxed/simple;
-	bh=BtbVbKTSOo2sG4MBMHZUhIzlD4JURdmwYcDfyJvEtqE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GZTsdL/m6mCcIu3gRZzZnYW9wQOeFnO+xS6626vShg/wPT/NkOLpEsFOxhVtTJFcvPhV3dOidnQPYQjIc72m0TIrYeZGTf4FFEmt4r/X55zInqtCoDrNuOYMLJjUj+sbXiEtb5ziAaTXC1WcVu/0RvHqzQ0No0Z/iAK1f490oNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=eCPMjtmH; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729767991; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=VvJTI601DIOzBox3X95ACOvJLSHb8asIvG0P9I23aQ0=;
-	b=eCPMjtmHqZGXkD9x1HQAf5uIfyPZ5Fzuz8+faQV7CbeLGpfkY/zjDD52rqrP0zEmcu3K9AcXNDK9BawwhSLjp4QtXsOmYsMUULWBWbpuFOGv0sM4KcX0lSc/tpaxM5CsSWYNwPhlTiyOMKF/GlBqFQpPpnhi3w1NZ40mqdVu0lM=
-Received: from 30.221.129.46(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WHowPg-_1729767982 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 24 Oct 2024 19:06:30 +0800
-Message-ID: <ec3a2232-7787-4e0d-a0bd-a75280c3982f@linux.alibaba.com>
-Date: Thu, 24 Oct 2024 19:06:20 +0800
+	s=arc-20240116; t=1729768641; c=relaxed/simple;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=h2MPjCF5ul0ReA18/SKdQVd/gVlC/5NdMq75520rztDyBzIfc14ywq+ITFYfi2TFQmIK4R4UhC69sLkrFEAmR82+7rYHsgi9FY3y2s1sFCjCi7LczNRzJN2HUpKLDdiORp7puNfDpg+aFq3aZfR06kmldLyPv1nEqKCKznQ4uVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.10])
+	by gateway (Coremail) with SMTP id _____8AxquG4LBpncpoKAA--.24865S3;
+	Thu, 24 Oct 2024 19:17:12 +0800 (CST)
+Received: from localhost (unknown [10.20.42.10])
+	by front1 (Coremail) with SMTP id qMiowMDx2OK3LBpnOWUPAA--.19906S2;
+	Thu, 24 Oct 2024 19:17:11 +0800 (CST)
+Date: Thu, 24 Oct 2024 19:17:34 +0800
+From: Wanglei <wanglei@loongson.cn>
+To: mike@altlinux.ru
+Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
+	dmaengine@vger.kernel.org, dushistov@mail.ru,
+	fancer.lancer@gmail.com, geert@linux-m68k.org,
+	gregkh@linuxfoundation.org, hoan@os.amperecomputing.com,
+	ink@jurassic.park.msu.ru, jeffbai@aosc.io, kexybiscuit@aosc.io,
+	linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-spi@vger.kernel.org, manivannan.sadhasivam@linaro.org,
+	mattst88@gmail.com, netdev@vger.kernel.org, nikita@trvn.ru,
+	ntb@lists.linux.dev, patches@lists.linux.dev,
+	richard.henderson@linaro.org, s.shtylyov@omp.ru, serjk@netup.ru,
+	shc_work@mail.ru, torvalds@linux-foundation.org,
+	torvic9@mailbox.org, tsbogend@alpha.franken.de,
+	v.georgiev@metrotek.ru, wangyuli@uniontech.com,
+	wsa+renesas@sang-engineering.com, xeb@mail.ru
+Subject: Re: what about CoC? (was: [PATCH] Revert "MAINTAINERS: Remove some
+ entries due to various compliance requirements.")
+Message-ID: <20241024111734.GA22436@loongson-pc>
+Reply-To: Wanglei <wanglei@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: use new helper to get the netdev
- associated to an ibdev
-To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241024054456.37124-1-guwen@linux.alibaba.com>
- <61cf578f-020e-4e0d-a551-98df5367ee27@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <61cf578f-020e-4e0d-a551-98df5367ee27@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241024095339.GA32487@imap.altlinux.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-CM-TRANSID:qMiowMDx2OK3LBpnOWUPAA--.19906S2
+X-CM-SenderInfo: pzdqwzthl6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
+	BjDU0xBIdaVrnRJUUUPKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26c
+	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
+	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x02
+	67AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21le4C262xC7I0v67AEwI8IwI
+	1l57IF6xkI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv2
+	0xvE14v26r1q6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7
+	xvr2IY64vIr41lFIxGxcIEc7CjxVCFY4xvr7I5M4kE6I8I3I0E14AKx2xKxVC2ax8xMxAI
+	w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r4a6rW5MI
+	8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr0_Jr4lx4CE17CEb7AF67AK
+	xVWrXVW8Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW5JVW7JwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07j0E__UUUUU=
 
 
-
-On 2024/10/24 18:00, Wenjia Zhang wrote:
-> 
-> 
-> On 24.10.24 07:44, Wen Gu wrote:
->> Patch [1] provides common interfaces to store and get net devices
->> associated to an IB device port and removes the ops->get_netdev()
->> callback of mlx5 driver. So use the new interface in smc.
->>
->> [1]: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
->>
->> Reported-by: D. Wythe <alibuda@linux.alibaba.com>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
-> [...]
-> 
-> We detected the problem as well, and I already sent a patch with the same code change in our team internally these. Because some agreement issues on the commit message, it is still not sent out externally. Now we (our team) have almost an agreement, I'd like to attach it here. Please have a look if 
-> it is also for you to use:
-> 
-> "
-> [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
-> 
-> Since/Although commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an alternative to get_netdev") introduced an API ib_device_get_netdev, the SMC-R variant of the SMC protocol continued to use the old API ib_device_ops.get_netdev() to lookup netdev. As commit 8d159eb2117b ("RDMA/mlx5: 
-> Use IB set_netdev and get_netdev functions") removed the get_netdev callback from mlx5_ib_dev_common_roce_ops, calling ib_device_ops.get_netdev didn't work any more at least by using a mlx5 device driver. Thus, using ib_device_set_netdev() now became mandatory.
-> 
-> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
-> 
-> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
-> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
-> "
-> My main points are:
-> - This patch should go to net, not net-next. Because it can result in malfunction. e.g. if the RoCE devices are used as both handshake device and RDMA device without any PNET_ID, it would be failed to find SMC-R device, then fallback.
-> - We need the both fixes, which would help us for the backport
-> 
-> 
-> Thanks,
-> Wenjia
-
-Hi, Wenjia. I see. Since you're ready to post a patch, and this one has some problems,
-I think you can supersede this one with yours. It is totally OK for me.
-
-Thanks!
-Wen Gu
 
