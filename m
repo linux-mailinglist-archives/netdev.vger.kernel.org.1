@@ -1,128 +1,157 @@
-Return-Path: <netdev+bounces-138689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1C59AE8E0
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:32:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDA39AE8E2
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE163B276FC
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:30:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8FFF1F22FDF
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074381F5831;
-	Thu, 24 Oct 2024 14:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214D11EABAE;
+	Thu, 24 Oct 2024 14:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ft92kQfV"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Z8MJbTNg";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YUVbWo21"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA3A1F5837;
-	Thu, 24 Oct 2024 14:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6A41E8833;
+	Thu, 24 Oct 2024 14:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729780085; cv=none; b=ssF0h7WQiF813v/GEqe6UldCJNle+jTQuyzbfjQWIelMNHsRlDpqexT0FvcZ/58lTmIQ78zneZPx65Fr3R4up0v3xYhsZ/+Sg3titGV+eFKe7p77+p1qr6tEdi3NmCZ9FjHEC3sYWKqv30kT0GjmLvritCTtEzEoJEXZfl4uCrw=
+	t=1729780144; cv=none; b=Np7ZfZQTKepoPjQgfU8kF+Cax1k741PRDqzId/0uWnoB1v4on+r+gmIDu4y6dNkGG9MJTLg5j3+SHUQ984luUkctZ3WoxAmjbSb2Bjoaq7Z1tsEMh5zkkDDvi1H1eU2IwY7XUvuUgEl3FoKUp/2LyWH5vmvP/FBSVvJgux7CEvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729780085; c=relaxed/simple;
-	bh=0kRGC0VMT8PExSwlsH5fR6XLTGLcI9KDWObMnFj6wz0=;
+	s=arc-20240116; t=1729780144; c=relaxed/simple;
+	bh=BPpxuoNwHXM2Tm/0eyS/Gx6V03nALdwM7MFD3gwcZe4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SRIUM04j4T3kko3z9Ox10KgNY6wI08yozxxYqubanR1FYbyVJsPaeE/W1SzBeahD1SHOWGb24JJ2nd0mrVVAw2VGgcWB7Kr/YWVFUA3xSyZXGxJhYPW09de3Un0Td8RxewHmFt2rspYYctNcl5MH5FMG2TloiNEuCIBM5GluMGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ft92kQfV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F2EDC4CEE3;
-	Thu, 24 Oct 2024 14:28:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729780085;
-	bh=0kRGC0VMT8PExSwlsH5fR6XLTGLcI9KDWObMnFj6wz0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ft92kQfVqLRg9/dwH3WJ4uqFDupkRlaeyBaTa/WeY+vszDQjwH4NYOLnTTnMj8dbo
-	 0bt5QUKZxrzjEYGys1h+2/H/gZiw36OXKE8phv1ccC04YRBp7m8ByXrtkgkJ4j03jS
-	 2ckJcZgYPKc9ejakqf70KgRWyp1zOMiyF1ZS8NHjWSZV4a4hIIyJi7B7aoN/jwOUP0
-	 MBrYxMSOUajnWJBZGrBTBLhjDSenhLTHDjevlB/J6BkA0Ya3y2ys/aKNJN1/I/B/k5
-	 A5fEzCaBmAAsLSvhrqaJoj77rB0tLCijd/pvgHUZ+Jwi4SYP3opqxFxxdKhJPvTkem
-	 ujfalPiQhYlwQ==
-Date: Thu, 24 Oct 2024 10:28:03 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, pabeni@redhat.com, kees@kernel.org,
-	mpe@ellerman.id.au, broonie@kernel.org
-Subject: Re: [GIT PULL] Networking for v6.12-rc5
-Message-ID: <ZxpZcz3jZv2wokh8@sashalap>
-References: <20241024140101.24610-1-pabeni@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n4VtHEPJ3eKJKCtM7HGbkWSDQkOYOdfbPBQJDQ6EAJDXH0psr+gDksAO3j2YAZ9VNYqXJlEQWMwnVfExezeD422nkpy9+YWrsGVTMw6Vm3tzvmlET48Aq2f/hGYkFvRyq2GtOevG69eeK0SQ0TrBWjfVr6YloI53Ju8bZw1DaH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Z8MJbTNg; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YUVbWo21; arc=none smtp.client-ip=103.168.172.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailflow.phl.internal (Postfix) with ESMTP id DCF7A200757;
+	Thu, 24 Oct 2024 10:28:58 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 24 Oct 2024 10:28:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1729780138; x=
+	1729783738; bh=h17D4dfNAl6deuLvvZJCZ62MfBhuYPFZyV7DGFHlp8c=; b=Z
+	8MJbTNg9E5CzkYTB5br+ui0T7U8D/LjN/AuwkW9TArABrik6dyBlThM1yzIS4I71
+	tppbW4ESzIsWT3S6n620aW0VYpO+FWcvvtFv3wIHkH4QNMwXv0yF+m5Tuf86EbUu
+	LANEPOQQUoA26CYjMiXof4Kuewg2di3zOz+p46bl8/v3aaFf0SHcsmuYFdDqiSVL
+	VwMsFazGWJJW6dxSbQWK8sHCgnDwG2fnQZ/51JNB5/TO1AnYCHu8lSSwm1XOyAXW
+	09q7pwUEi/q9kXRJHRYoyEdS+bEnnszpsQGkus0Qsi0EVKi9I6K8g/wSJ54C3tru
+	+KeCdZUA1WQVqTk6N+yuA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	i934648bf.fm3; t=1729780138; x=1729783738; bh=h17D4dfNAl6deuLvvZ
+	JCZ62MfBhuYPFZyV7DGFHlp8c=; b=YUVbWo21mYFUYghqjI9GuieUwuJLSGzzx6
+	jTts+sOmrdAuv7HDnvnOOYQznXGb2phQW7Ggea90eo12RBlNxt5Kpgbi0a/ddgAT
+	acazFYI6tv5Cz16p0ma9qiBqbuGEgEfyFXhjQNSCAejlS56KvcQNwreupSkP4YxJ
+	iabIOJQmG9gHChLOgKqcNCsAWL6fT3JtgMnyFbOZyL/fOGWLdUJ8Zix7wXLbsdMd
+	lXgMeMZIcGnSicJhRpdSc73cR7b5EQXPpOOc7Gu68Paxsp9+NLQUXsGewI18IheV
+	e88vWScj4xeh27XVIaJQM84zS/tU4UGcgqJL0v9dVoEYCltmRqyw==
+X-ME-Sender: <xms:qlkaZymHB9ZP88rqhOMWZTJVLrfDORQGLsR0Y2EklquYcQEBm2jKjQ>
+    <xme:qlkaZ51-ZVQemNOiBK0ZMT-wksn-0dsDqNU-q5KA7m41NB6jH16tAS4910kUPitnr
+    Q93n59Q6JmY2v5wTr4>
+X-ME-Received: <xmr:qlkaZwpPFPWQPByVA4Hz7iWgXdxVURowXX9oezVs3cuEHNRrndCNj39C0UMZ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejtddgheduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehjohhhrghnnh
+    gvshesshhiphhsohhluhhtihhonhhsrdhnvghtpdhrtghpthhtoheplhhinhhugidqfihi
+    rhgvlhgvshhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvg
+    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:qlkaZ2kPxGaRvAiWOh6vDZl5q_UjlbIo_TKvQEKcKuN7JTmp80akiA>
+    <xmx:qlkaZw2qYmZYZF3-f7Uwtd5Oz0ypdzeJww9XKnTG7pTDm0YzaWTg3A>
+    <xmx:qlkaZ9uxrMf_3bGXDhsTpeNdrAS2pRq_WT4KV4bnlJNO02OK170XsQ>
+    <xmx:qlkaZ8UN1H5o76Z4FhL1gfUS6gY4PkRuIaVSZe3XnYfr55gJPL0ifg>
+    <xmx:qlkaZ1-DdP9U17H-Sm33lOlgTWKa4RlIExXXfBxPkKgT_IPcBZzpqduu>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 24 Oct 2024 10:28:58 -0400 (EDT)
+Date: Thu, 24 Oct 2024 16:28:55 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: convert to nla_get_*_default()
+Message-ID: <ZxpZp5KYN_VofWZ0@hog>
+References: <20241024131807.0a6c07355832.I3df6aac71d38a5baa1c0a03d0c7e82d4395c030e@changeid>
+ <20241024131807.d5b9f6e57ede.I740beeaa2f70ebfc19bfca1045a24d6151992790@changeid>
+ <6461c18e0be520b4f7ecefc910af5d8dd205bce9.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241024140101.24610-1-pabeni@redhat.com>
+In-Reply-To: <6461c18e0be520b4f7ecefc910af5d8dd205bce9.camel@sipsolutions.net>
 
-Sorry for the spam below, this is another attempt to solicit feedback to
-the -next analysis tools that a few of us were working on.
+2024-10-24, 14:11:05 +0200, Johannes Berg wrote:
+> On Thu, 2024-10-24 at 13:18 +0200, Johannes Berg wrote:
+> > From: Johannes Berg <johannes.berg@intel.com>
+> > 
+> > This is mostly to illustrate, done with the following spatch:
+> > 
+> 
+> And we can extend that and get bunch more:
+> 
+> @@
+> expression attr, def;
+> expression val;
+> identifier fn =~ "^nla_get_.*";
+> fresh identifier dfn = fn ## "_default";
+> @@
+> (
+> -if (attr)
+> -  val = fn(attr);
+> -else
+> -  val = def;
+> +val = dfn(attr, def);
+> |
+> -if (!attr)
+> -  val = def;
+> -else
+> -  val = fn(attr);
+> +val = dfn(attr, def);
+> |
+> -val = def;
+> ... where != val;
+> -if (attr)
+> -  val = fn(attr);
+> +val = dfn(attr, def);
+> |
+> -if (!attr)
+> -  return def;
+> -return fn(attr);
+> +return dfn(attr, def);
+> )
 
-Bigger changes since the last attempt:
+Not really familiar with spatch, but I'm guessing this won't cover:
+    val = attr ? getter(attr) : default;
 
-   - Count calendar days rather than number of tags for the histogram.  
-   - Make histogram more concise when possible (the below is *not* a good
-     example of the new functionality).
-   - Add more statistics to the report.
-
-On Thu, Oct 24, 2024 at 04:01:01PM +0200, Paolo Abeni wrote:
->Hi Linus!
->
->Oddily this includes a fix for posix clock regression; in our previous PR
->we included a change there as a pre-requisite for networking one.
->Such fix proved to be buggy and requires the follow-up included here.
->Thomas suggested we should send it, given we sent the buggy patch.
->
->The following changes since commit 07d6bf634bc8f93caf8920c9d61df761645336e2:
->
->  Merge tag 'net-6.12-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-10-17 09:31:18 -0700)
->
->are available in the Git repository at:
->
->  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.12-rc5
-
-Days in linux-next:
-----------------------------------------
-  0 | █████████████████████████████████████████████████ (14)
-  1 | ███████ (2)
-  2 | █████████████████████ (6)
-  3 | ██████████████████████████████████████████ (12)
-  4 |
-  5 |
-  6 | ███ (1)
-  7 |
-  8 | ███ (1)
-  9 |
-10 |
-11 |
-12 |
-13 |
-14+| ██████████████ (4)
-
-Commits with 0 days in linux-next (14 of 40: 35.0%):
---------------------------------
-3e65ede526cf4 net: dsa: mv88e6xxx: support 4000ps cycle counter period
-7e3c18097a709 net: dsa: mv88e6xxx: read cycle counter period from hardware
-67af86afff74c net: dsa: mv88e6xxx: group cycle counter coefficients
-64761c980cbf7 net: usb: qmi_wwan: add Fibocom FG132 0x0112 composition
-4c262801ea60c hv_netvsc: Fix VF namespace also in synthetic NIC NETDEV_REGISTER event
-ee76eb24343bd net: dsa: microchip: disable EEE for KSZ879x/KSZ877x/KSZ876x
-246b435ad6685 Bluetooth: ISO: Fix UAF on iso_sock_timeout
-1bf4470a3939c Bluetooth: SCO: Fix UAF on sco_sock_timeout
-989fa5171f005 Bluetooth: hci_core: Disable works on hci_unregister_dev
-6e62807c7fbb3 posix-clock: posix-clock: Fix unbalanced locking in pc_clock_settime()
-10ce0db787004 r8169: avoid unsolicited interrupts
-b22db8b8befe9 net: sched: use RCU read-side critical section in taprio_dump()
-f504465970aeb net: sched: fix use-after-free in taprio_change()
-34d35b4edbbe8 net/sched: act_api: deny mismatched skip_sw/skip_hw flags for actions created by classifiers
+See macsec_validate_attr in drivers/net/macsec.c for some
+examples. There are also some cases where we have "if (data &&
+data[IFLA_MACSEC_*])" guarding the attribute fetch
+(drivers/net/macvlan.c does that too), but I guess you can't really
+cover that without adding some kind of "default_with_cond" helpers.
 
 -- 
-Thanks,
-Sasha
+Sabrina
 
