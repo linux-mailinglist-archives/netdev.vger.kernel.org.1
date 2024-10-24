@@ -1,133 +1,142 @@
-Return-Path: <netdev+bounces-138794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D1559AEEF6
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:59:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FEEF9AEF06
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F3F51C22659
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:59:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 037BFB222C1
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E931FC7D7;
-	Thu, 24 Oct 2024 17:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y/HaK+Jg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4521FF7B7;
+	Thu, 24 Oct 2024 17:59:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F31C1EC01B
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 17:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D1B1FE0F0;
+	Thu, 24 Oct 2024 17:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729792746; cv=none; b=KKm7kVrknJXycHy+C3OvNg+p+JpwojsGOarZLVcLYbcc+qQzE7KchESh07wuD9F7ZvIII6znsRKwjliPt24z13q3H5WSOB8jnnZIVvV/6Gjz8PLUCFjx167NI/V6t24Vg9iCIGI9b6AdOzdXMafWfz1iobPxAX8+YBhJ6iXdHSc=
+	t=1729792773; cv=none; b=Mps5RilUfHU/UGcyMYIvC1JlvUtXUEhYOpyyahWCsgM4ELjdvsVVhRzB8uE2AZowwqm3q2dCzXQg87VDewKToh3tTGHWyEi6fvlRwGigM99ytdyt5I7l00PD2iKdCvvVFMw1XqOYVf65yzZoay2gcvNhrFxKHD1aPY3olSLKCwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729792746; c=relaxed/simple;
-	bh=pQjFAvvn6bVK7BM32ZPVGDi2RnMjfz1p2iYtoEn+KJo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q9ZueQ05BCKS8DV5thmG4ZTue2/yvb6vF22/JmuakytbaweDnZaeEfnsyJYjMNK2QY0O2gtpW8GdVjFysg7KqhiNoGFqWPgPvCEAoAGhqvTyOyNAa0WiNxdFFIlWenUZZQx1r8IUOopv0Y8OJvB0wRyZQFrJbktkt/amB5q1OtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y/HaK+Jg; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4315ee633dcso25935e9.1
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 10:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729792742; x=1730397542; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pQjFAvvn6bVK7BM32ZPVGDi2RnMjfz1p2iYtoEn+KJo=;
-        b=y/HaK+JgPgrxlp5SC7jMRp+0lzoVTEPnyE4oK5P9hyUGWgqGyA3GRNFKQ5YcTNAtmZ
-         ot6s7tMSBPxhcH0PoSUOTyNXoaECLbljPASvrMi4okzN6QNVDilYArh90HtnKkaQCNo6
-         2lPZNboEY5E99dmoz665CAJU2ecC2zkxfEdRPNOKK2kXny1+qUuifpldAW6Yv+twmWLs
-         NZnVKycyt8K/eX+R4LXWPmTzh3TyWdA5lJ0l7fQTJ84zGooot77B3LQ8/K1bfoMJsKL9
-         5Z6fPC01macRpYEuIT/r44X+JpUbPTtTJzR0dhgi8ztwMWW1bjCnCAdLuUmp2AtUq7oc
-         EFPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729792742; x=1730397542;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pQjFAvvn6bVK7BM32ZPVGDi2RnMjfz1p2iYtoEn+KJo=;
-        b=vNwgXaokWpgqc7SGVevk6f3gsxWGefooU1jGHaqttZBIbYh3OY+SDxsZDeZaFdeOl9
-         UaB8SMU7rSsR0mSF7x3nfHBhnnNWHuMw5I/HNd4FrEqqlBZVJW2AgFDvbJ4N0K2RCz4V
-         qgKkbJrFi+EF0sX6WzgC9ubQTapcxNrEDAMGGim6sHklZKTRekM4PnH2Ixxv4O9JvJqB
-         v6St8sGoFj6yLROl4b+VOeh5qE1adQhQm8UZGmEvAofVfHHhaS2g1xrolfXYZgolu8DW
-         KylIsb8k8VvHk9AHn43GD3p1OWmhI1/di7mZhs2HEWjqVFkzOfl/fgpZUP18deLwTaBM
-         hGmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPTSkkFVCfNRuZ7/bqo6TT+wap+ZTO/BWYJCkkIQI35Rjbk9LIeb+yWQr/gKsDWJHhDUGnFPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFQpS7AGd+mQ5nRBOeLEIUalBBI9hUHxdxT5rJtAiyKlmopw1V
-	i1ZIBWrSUtknBwMY1nYFKS18ne7IovvVreF0CbHCuVoEKO8SELyN5js2WCbw6KQJ0mHNe4ezEgZ
-	L4gFd4wV1rLsZTLw7bu52mX7nazFaL+zLh6S4
-X-Google-Smtp-Source: AGHT+IFtv5WcFgY9fz9cRZmRt9GgBS1262FRdBJjUhN7Bf6Ml5TYlnA/SYfZCKi91dZ4Vtcr/YyL4NnwesIPozQ/iyg=
-X-Received: by 2002:a05:600c:1e0b:b0:431:43a1:4cac with SMTP id
- 5b1f17b1804b1-43192393867mr89915e9.3.1729792742276; Thu, 24 Oct 2024 10:59:02
- -0700 (PDT)
+	s=arc-20240116; t=1729792773; c=relaxed/simple;
+	bh=nZK/l2NFALltgIH16YZ6CD039zLJ+VUoW+Nr5OBFtqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGaYmngxjLPzek8gNNe1vJ4xxHCv+wPofrVKsHlxuyyfZIRChiHXWKx+vNyx7+3VnYgjBQ8bZt1xjgcqiVzbXlyDpfnmkkYzgSl1AidcItPBZv24IhZVeHl3rOOgXhdKMQOAjKo+sz1yV0OK8eTbJs4T7qnchpmMQ8CT06A7cd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: VOFkFWyoTwaCYGfdKL7JEw==
+X-CSE-MsgGUID: bfXAWgSxQviWxIQyJszGhw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="51984583"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="51984583"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 10:59:30 -0700
+X-CSE-ConnectionGUID: J491kRSNRJGEh7umAvXlxA==
+X-CSE-MsgGUID: +tejJ4QXQL6sWl0drDP36w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,229,1725346800"; 
+   d="scan'208";a="80578314"
+Received: from smile.fi.intel.com ([10.237.72.154])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 10:59:17 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1t4275-00000006evJ-40FC;
+	Thu, 24 Oct 2024 20:59:11 +0300
+Date: Thu, 24 Oct 2024 20:59:11 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Dragan =?utf-8?Q?Milivojevi=C4=87?= <d.milivojevic@gmail.com>
+Cc: Peter Cai <peter@typeblog.net>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+	ntb@lists.linux.dev, Kory Maincent <kory.maincent@bootlin.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
+	Paul Burton <paulburton@kernel.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>, linux-mips@vger.kernel.org,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	Yanteng Si <siyanteng@loongson.cn>, netdev@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>, linux-hwmon@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>, linux-edac@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-serial@vger.kernel.org, Andrew Halaney <ajhalaney@gmail.com>,
+	Nikita Travkin <nikita@trvn.ru>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Evgeniy Dushistov <dushistov@mail.ru>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+	Nikita Shubin <nikita.shubin@maquefel.me>,
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: linux: Goodbye from a Linux community volunteer
+Message-ID: <ZxqK75WdFBod0rZ9@smile.fi.intel.com>
+References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+ <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
+ <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241023221141.3008011-1-pkaligineedi@google.com>
- <cf13ffde-2a5f-4845-a27d-d4789a384891@huawei.com> <20241024154503.GB1202098@kernel.org>
-In-Reply-To: <20241024154503.GB1202098@kernel.org>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Thu, 24 Oct 2024 10:58:47 -0700
-Message-ID: <CAEAWyHewCMmWmA16jdPiT6pQvwFX88JOtAyzKJHXzRBFogdyPg@mail.gmail.com>
-Subject: Re: [PATCH net-next] gve: change to use page_pool_put_full_page when
- recycling pages
-To: Simon Horman <horms@kernel.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, willemb@google.com, 
-	jeroendb@google.com, shailend@google.com, ziweixiao@google.com, 
-	jacob.e.keller@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Thu, Oct 24, 2024 at 8:45=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Thu, Oct 24, 2024 at 10:36:02AM +0800, Yunsheng Lin wrote:
-> > On 2024/10/24 6:11, Praveen Kaligineedi wrote:
-> > > From: Harshitha Ramamurthy <hramamurthy@google.com>
-> > >
-> > > The driver currently uses page_pool_put_page() to recycle
-> > > page pool pages. Since gve uses split pages, if the fragment
-> > > being recycled is not the last fragment in the page, there
-> > > is no dma sync operation. When the last fragment is recycled,
-> > > dma sync is performed by page pool infra according to the
-> > > value passed as dma_sync_size which right now is set to the
-> > > size of fragment.
-> > >
-> > > But the correct thing to do is to dma sync the entire page when
-> > > the last fragment is recycled. Hence change to using
-> > > page_pool_put_full_page().
-> >
-> > I am not sure if Fixes tag is needed if the blamed commit is only
-> > in the net-next tree. Otherwise, LGTM.
->
-> I think it would be best to provide a fixes tag in this case.
-> It can be done by supplying it in a response to this email thread.
-> (I think it needs to start at the beginning of a line.)
+On Thu, Oct 24, 2024 at 07:18:44PM +0200, Dragan Milivojević wrote:
+> On Thu, 24 Oct 2024 at 18:31, Peter Cai <peter@typeblog.net> wrote:
 
-Thanks Yunsheng and Simon. I wasn't sure since this patch was targeted
-for net-next. I have provided a Fixes tag below.
->
-> > Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >
-> > >
-> > > Link: https://lore.kernel.org/netdev/89d7ce83-cc1d-4791-87b5-6f7af29a=
-031d@huawei.com/
-> > >
-Fixes: ebdfae0d377b ("gve: adopt page pool for DQ RDA mode")
-> > > Suggested-by: Yunsheng Lin <linyunsheng@huawei.com>
-> > > Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> > > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > > Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
->
-> ...
+...
+
+> He has exposed his lack of morals and inability of self reflection
+> with the trolls comment.
+> He has exposed his ignorance, coming from his state media
+> brainwashing, with the media comment.
+> He has exposed his ignorance, arrogance and blatant Russophobia with
+> his "I'm Finish" comment, as if
+> Finland has any high moral ground when it comes to WWII (for the
+> historically ignorant: Finnish "concentration camps").
+
+Yeah, with my hat of the person whose home town is under (Russian) attack for
+the 10+ years (don't be surprised, please, the war lasts more than a decade
+already) on I am fully understand Linus' arguments about history and being not
+very friendly about Russians.
+
+As you showed above seems like you also will benefit from digging to the
+history a bit. The nice questions to be answered (but not limited to) are:
+1) What had happened to Finland in 1939?
+2) Has Finland territory been changed (occupied by another country) in time?
+2a) (bonus Q) How many times and by which countries / empires?
+3) (speaking of WW II) How many Jews were killed by Finland?
+
+May be this helps changing a bit your understanding of Linus and other Finns.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
