@@ -1,215 +1,114 @@
-Return-Path: <netdev+bounces-138522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D3B29ADFCB
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:01:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B539AE005
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:04:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36D02282947
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:01:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B03C1F23548
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F91E1C4A23;
-	Thu, 24 Oct 2024 09:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="PKWcctag"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548551B219E;
+	Thu, 24 Oct 2024 09:01:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A311C2301;
-	Thu, 24 Oct 2024 09:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFB323CB;
+	Thu, 24 Oct 2024 09:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729760409; cv=none; b=LbXOmGK/XaDzaP5Wp1LjKetDNCtw/trsTIs4/pICLYXt9LuPMJ+D3Eioga1eUeT50n/2ity35S3VSosDauv7AdvGquyUqRGXi3mKUEXro8n7g5L0xQ4kiA7Z4j1ar3bOS/kBk3urXOf6GFbbuRhXJzmnhh5wj81ybnmYFSUmW5Y=
+	t=1729760498; cv=none; b=jTFotaIA819Q3So53cP/aSsoVJWnTHnWAgAWf5onLhyyAiJurWvgDqroGd570zE9AlvgfxGtuoJD+smKAQL4ek5mNYK+HBFWGK6fjEeKXFGixI4+NMsTkX4Z629SiFmCbez56a9P+sqvUsB+NIwuObovhIjhiJabRbwgSq7HHFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729760409; c=relaxed/simple;
-	bh=5ohQDOoW3mIzHXRtqUK6vuWfWTSWfm/8yu4VqsKy41w=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=HMrzvhzYQRXB8n06+feDYBrI8MNMS+xGcHyl9Z8O3ip896gkkabPD6f7p/EjrTI2IiM+ekjF0n6d34+WlBaxxkkpD7uUasHYkaRWB3vnJA2hUqIN8KV8V4NRgiDp847cXivlW55lXC7OHReukpaBBdMEsFcq8MH5fAnNZOjkBuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=PKWcctag; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20241024090002euoutp018a0108ce9bcef735dfc2001bcd9eb563~BV_v9kCks2844428444euoutp01c;
-	Thu, 24 Oct 2024 09:00:02 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20241024090002euoutp018a0108ce9bcef735dfc2001bcd9eb563~BV_v9kCks2844428444euoutp01c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1729760403;
-	bh=h4aMns0vuxoj2DGKLLnGNiIIfjWEYlc98f5DfBMf9BA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=PKWcctagUKqph0utZfFpZKN3KY/qjUavkEMXcM5jAgjkTBCJp4r2ARpnEC7BANlm7
-	 JkrukntINZ7KkZXYQxfxUDlegETw9QtlYjv92KU4Phx0kwXFVK8Cb6ddt5KslCN2Ql
-	 qnONcceyEgshb3vORqGH8/vgxFhRkUXBlqYCjLiE=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20241024090002eucas1p29b6425c21e9270f2caf6bc3f05b4341f~BV_vl5fpu2350923509eucas1p2R;
-	Thu, 24 Oct 2024 09:00:02 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id BA.A8.20397.29C0A176; Thu, 24
-	Oct 2024 10:00:02 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20241024090001eucas1p143fc38cbcaa9538710040c2d957e9f6f~BV_u8PgHB0678306783eucas1p1j;
-	Thu, 24 Oct 2024 09:00:01 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241024090001eusmtrp2dcdd7d123acd3c24d819eddc1fef8d71~BV_u1ZF280636006360eusmtrp2P;
-	Thu, 24 Oct 2024 09:00:01 +0000 (GMT)
-X-AuditID: cbfec7f5-ed1d670000004fad-a5-671a0c92f203
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id D9.E9.19654.19C0A176; Thu, 24
-	Oct 2024 10:00:01 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20241024090001eusmtip1faaa6f50c4bd058871f85094590722b6~BV_ujLojm1676816768eusmtip1x;
-	Thu, 24 Oct 2024 09:00:01 +0000 (GMT)
-Received: from localhost (106.110.32.107) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Thu, 24 Oct 2024 10:00:00 +0100
-Date: Thu, 24 Oct 2024 10:59:58 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: yukaixiong <yukaixiong@huawei.com>
-CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>, <ysato@users.osdn.me>,
-	<dalias@libc.org>, <glaubitz@physik.fu-berlin.de>, <luto@kernel.org>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <viro@zeniv.linux.org.uk>,
-	<brauner@kernel.org>, <jack@suse.cz>, <kees@kernel.org>,
-	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
-	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
-	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
-	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
-	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
-	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
-	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
-	<wangkefeng.wang@huawei.com>, <sunnanyong@huawei.com>,
-	<joel.granados@kernel.org>
-Subject: Re: [PATCH v3 -next 00/15] sysctl: move sysctls from vm_table into
- its own files
-Message-ID: <wk7dqsx42rxjt76dowrydumhinwwdltw7e5ptp7fh4rc4c4sji@jrtopui4fpwb>
+	s=arc-20240116; t=1729760498; c=relaxed/simple;
+	bh=86RwdYNnZhoVzz9f/soUGnWuGwDz+UOZt81K5y2tbd0=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=KIHFM6M4e6KRmRSI28Yvxhr1pNQl4gGNre+CqirRDYF2YKKZhG+kaCGV16+WWnhlz7hs9K7ojR1lYhTKZDjvxdP22XcJe2KPrz1/r2GAaaJ/UgMZ7SEWcCsVnI5i1CRsWJNekzr0TzTGjFiFRVXjgCKSNkjcSecVbYs+xnFhNO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XZ0Fq0BKVzdkS3;
+	Thu, 24 Oct 2024 16:58:55 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id C2C2A140135;
+	Thu, 24 Oct 2024 17:01:25 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Oct 2024 17:01:24 +0800
+Message-ID: <5a2786ab-1c7c-4641-a3f6-3c3722f2ac14@huawei.com>
+Date: Thu, 24 Oct 2024 17:01:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <79b33640-fc81-b4c1-4967-30189d9a4b23@huawei.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHd+69vfcCVsoj9ghL3GC6SRBksvlLnG4ak91tmmxZ9lC3jEZu
-	ihnUppWhBGfrA6bII1WE0SpVnDyKAoWhiAQFBgNGyxScgqBjdBusvFpBAYG1XN387/N7fM/5
-	fk9yWNLXygSwuxR7eJVCFhtEe1JVTVOWVbpFAfLVpW1SMJSW0HCkep6C+domBCPORHCWzdHw
-	T4MDwXzvXwTknaug4ezUtAj+LktBYLAepmCidJqE9qHTDIwcnKHA1tTPgH40GOyVRSSYzFvh
-	VLkU9NmHCJi6UMzApdJ8An7Jv0fBpWGrCDqq0kVwWfOAgWu1LRTcumqgoa9k3jW43iaCseP9
-	NBienCShJbeIAuvViyK4k2lDcPO6kYDaPA0FTcYloPvTwcBkmx1B61QS9OiyKUg+X07A8Zos
-	BNYOCwOj6dcI0JakknDXOkBDhTmLhNbpVgIcp+dEoNemI2g/WCIC62yzCLTO+whmHrucpJ1v
-	YVxXn3C9SN0jGkzzlSR02jqod9Zzj46kU1zJmRLEGXs+4BrsoyRXWXSX4IzmeO52zTbucOOw
-	iHtYnYG4isIQLv/aIMGZi4/SnNmhYziLfoziRiwWhvs5Z4b68OXtnm9F87G7vuFV4RuiPGNO
-	3rhAK9u995ZnnkMalOJ1DHmwWBKJG09YKDf7SgoRnjTsPIY8XfwQ4e4/xhmhcCLcXt9OP1Ok
-	duUTwqAAYXv5FeK/rdmseiQUlQg35Y8jt4SSLMfmjAzGzbQkFFvt90g3+0tW4CHbNO0WkJK7
-	Xtg2bFpw4ifZgW/dNiywWLIVz5T/RArsg1u+H1jok66DjDUOl5h1cSAumGPdbQ/JBmxq7BYJ
-	VoNwV2YvJfB+3FrZTQisW4R/PPqFwJtxW8ZZRmA/PNRc+ZRfxPPVeQvJsOQEwnVzY4xQmBC+
-	oJ14etI6fLhz4KliI249lIbchrBkMb4z7CP4XIx1Vdmk0Bbj75J9he0V2NRnpzJRcO5zyXKf
-	S5b7fzIjIouRlI9Xx8l59RoFnxCmlsWp4xXysJ2748zI9efa5ponrqDCofGwekSwqB5hlgzy
-	F/8as1TuK46W7UvkVbu/UsXH8up6FMhSQVLx8uhlvK9ELtvDf83zSl71bEqwHgEaQnVAHil7
-	7zPzFvXuvtWppM2RNbxW42jI0a9P6vG2+EzYGqiIqi/ftPxeRT0OaY7LexKQ2L93i3ZdgXpa
-	4ancuKwtMzrqwJJVCfTaG5P3V+aYZuv2J+nlQ46bBZeH76i9Ix1J4Yn2QK3nvqhc6Rsfn2Rb
-	lL2NsqVdFYnv1z3enBC1aQP/Svds/wy70kOsOSW/qA+u9gpXp/Rs32i1TTlDz5z71L/20J4H
-	fm+nvdTyw0dKHRu/bVzTgGp+G8x5obcsJHlz56D086vfdnzCOiLyGl8T3/RJGkhLKPNI1Y4o
-	X9+R/apJYVCo3l2+yeosapTK5aGp3JBVOeg847Fm4qh3O86UBlHqGFlECKlSy/4FvpOZEOIE
-	AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te1CUZRTGe7/bLgixAcUXgmPbCMLYcl04MIiOTuNHDTOVAw1a4YorkNzc
-	BUzUCUwyEQEJpLjEJsR1A3dBChdEYcUWgkVuBogJgdxBLqawwrawNfnf877Pc37nzJn3ZeOm
-	M5QlOzQiWiiKEIRxKUOide3u4DuXjSyDHSVqW8itlFKQWKslQFvfjGB2MQ4Wr61RMNW0gEA7
-	OIZB/tUqCn5cXiFh/Np5BLnqcwQ8rVzBoW0yjwWzZzUEjDYPsyBn7m2Yri7FoVzuC1dkFpCT
-	9RUGy0VlLKioLMDg94IHBFTMqEnoqEkh4Zf4Ryyoq1cR0HUjl4KHUq3OuNVKwpPkYQpyX2Tg
-	oMouJUB942cS/kgbRdB5S4JBfX48Ac2SNyD98QIL/m6dRtCyfBoG0rMI+LpQhkGyIhOBuqOd
-	BXMpdRgkSC/i0KceoaBKnolDy0oLBgt5ayTkJKQgaDsrJUG9epeEhMU/EWie6ya5VKhi6Vp/
-	q9tIwzMKyrXVOHSPdhC7dzLPElMIRvqDFDGSgfeZpuk5nKku7cMYiTyG6VUEMOeUMySzVJuK
-	mKoSe6agbgJj5GUXKEa+kM5i2nOeEMxsezuL+e07DfHBWwd4XqLImGjh1pBIcfRO7kEncOY5
-	eQDP2dWD5+Ti/qmnM5/r4O11RBgWGisUOXgf4oVk3C6iotpMvpClXUXx6PymJGTApjmu9MWe
-	AiwJGbJNOT8hurNmFNMbVrRsqYfUazP6RW8SpQ/NI1rTOETqD9WInijo30gRnG20PDWVta4p
-	zg5aPf0AX9fmHBt6cnRloxrn9G2iR2fKiXXDjHOQ7urN3dDGHF9aI7uD66nfYPRqUSWpN16j
-	Vd+PbIRwHVWiWNCR2Dq9mS5eY69fG3C86XJl/7+jcumetEFCr8/Qi6uPURoyy36JlP0SKft/
-	kgThZchcGCMODw4XO/PEgnBxTEQwLygyXI50776mebn6V1Q6Oc9rRBgbNSKajXPNje+FvBls
-	anxEcDJOKIoMFMWECcWNiK/bxWXc8vWgSN3HiYgOdHJz5Du5unk48j3cXLgWxlS3+qgpJ1gQ
-	LTwmFEYJRf/VYWwDy3jsw6a8iTxVY6Jdgq1Xi1duRWixjbtH0Hv2DSc+bvsrrhKL5Z+yGrqv
-	8LSS3tTu1UbJS1TMnJ2ryGqLC1dCLfJLAiKatjGG96/vKyCLB6NsZqwbmrp2qwWmJYeVg75j
-	pwzbfDL80QC5fUdC31rjkML2uMjv0P7rn3ymqUX3LJ8aLWmclzXbfeqPdRbZBlaY+NitjvQa
-	+B8/yW+dV/jJRB8VB5i479ozPPjo3TMWNbEPP9dmKlUXshRT+fF7OrdeqT8c/rwvJJm5bTR+
-	YK9G+cppyYmKffVThRVfWu23HtD2bPHJ7LZWOrzabHFns/Jmh7+LzC87ubWtv2fXoudRF5OB
-	sYZxLiEOETjZ4yKx4B/VplmkgAQAAA==
-X-CMS-MailID: 20241024090001eucas1p143fc38cbcaa9538710040c2d957e9f6f
-X-Msg-Generator: CA
-X-RootMTR: 20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd
-References: <CGME20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd@eucas1p1.samsung.com>
-	<20241010152215.3025842-1-yukaixiong@huawei.com>
-	<ngknhtecptqk56gtiikvb5mdujhtxdyngzndiaz7ifslzrki7q@4wcykosdnsna>
-	<79b33640-fc81-b4c1-4967-30189d9a4b23@huawei.com>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <liuyonglong@huawei.com>,
+	<wangpeiyang1@huawei.com>, <lanhao@huawei.com>, <chenhao418@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 net 2/9] net: hns3: add sync command to sync io-pgtable
+To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <shenjian15@huawei.com>,
+	<salil.mehta@huawei.com>
+References: <20241018101059.1718375-1-shaojijie@huawei.com>
+ <20241018101059.1718375-3-shaojijie@huawei.com>
+ <214d37cc-96c0-4d47-bea0-3985e920d88c@redhat.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <214d37cc-96c0-4d47-bea0-3985e920d88c@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-On Thu, Oct 24, 2024 at 04:07:10PM +0800, yukaixiong wrote:
-...
-> 
-> 
-> >>   mm/swap.c                          |  16 ++-
-> >>   mm/swap.h                          |   1 +
-> >>   mm/util.c                          |  67 +++++++--
-> >>   mm/vmscan.c                        |  23 +++
-> >>   mm/vmstat.c                        |  44 +++++-
-> >>   net/sunrpc/auth.c                  |   2 +-
-> >>   security/min_addr.c                |  11 ++
-> >>   23 files changed, 330 insertions(+), 312 deletions(-)
-> >>
-> >> -- 
-> >> 2.34.1
-> >>
-> > General comment for the patchset in general. I would consider making the
-> > new sysctl tables const. There is an effort for doing this and it has
-> > already lanted in linux-next. So if you base your patch from a recent
-> > next release, then it should just work. If you *do* decide to add a
-> > const qualifier, then note that you will create a dependency with the
-> > sysctl patchset currently in next and that will have to go in before.
-> >
-> > Best
-> >
-> 
-> Sorry,  I don't understand what is the meaning of "create a dependency 
-> with the sysctl patchset".
-The patches in the sysctl subsys that allow you to qualify the ctl_table
-as const are not in mainline yet. They are in linux-next. This means
-that if these patches go into the next kernel release before the
-sysctl-next branch, it will have compilation errors. Therefore the
-sysctl-next branch needs to be pulled in to the new kernel release
-before this patchest. This also means that for this to build properly it
-has to be based on a linux-next release.
 
-> 
-> Do you just want me to change all "static struct ctl_table" type table 
-> into "static const struct ctl_table" type in my patchset?
-You should const qualify them if the maintainer that is pulling in these
-patches is ok with it. You should *not* const qualify them if the
-maintainer prefers otherwise.
+on 2024/10/24 16:36, Paolo Abeni wrote:
+> On 10/18/24 12:10, Jijie Shao wrote:
+>> From: Jian Shen <shenjian15@huawei.com>
+>>
+>> To avoid errors in pgtable prefectch, add a sync command to sync
+>> io-pagtable.
+>>
+>> In the case of large traffic, the TX bounce buffer may be used up.
+> It's unclear to me what do you mean for large traffic. Is that large
+> packets instead?
+>
+> Skimming over the previous patch, it looks like the for the bugger H/W
+> driver will use the bounce buffer for all packets with len < 64K. As
+> this driver does not support big tcp, such condition means all packets.
+>
+> So its not clear to me the 'may' part - it looks like the critical path
+> will always happen on the bugged H/W
 
-Please get back to me if I did not address your questions.
+Sorry, actually not, I mean with tools like iperf3, we can hit the speed limit.
+In this case, many packets are sent within a short period of time.
+Therefore, the TX bounce buffer may be used up.
+In this case, mapping/unmapping is used for packets that cannot use the TX bounce buffer.
 
-Best
+Thanks,
+Jijie Shao
 
--- 
-
-Joel Granados
+>
+>> At this point, we go to mapping/unmapping on TX path again.
+>> So we added the sync command in driver to avoid hardware issue.
+> I thought the goal of the previous patch was to avoid such sync-up.
+>
+> So I don't understand why it's there.
+>
+> A more verbose explanation will help.
+>
+>> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+>> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Also we need a fixes tag.
+>
+> Thanks,
+>
+> Paolo
+>
+>
 
