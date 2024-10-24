@@ -1,142 +1,235 @@
-Return-Path: <netdev+bounces-138860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBA19AF33C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:02:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD7779AF366
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9868D1F22846
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:01:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 296DDB212D5
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0664B2010FA;
-	Thu, 24 Oct 2024 20:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF0B200BB6;
+	Thu, 24 Oct 2024 20:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKJe2Uvo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aNUHelSo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B043B7A2;
-	Thu, 24 Oct 2024 20:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729800110; cv=none; b=XXLELWQXtbbDWZoKXNJ2kt/F8Zfd0aNGYMqxetz/RuE+9oJ1Rh6Gd0Yr8qFobt+YvSk2bg1O2DumRLRzqZxmoRaSDeb3TH4j+n39jQ114T1T7Qmhk8jfevHxLyk+VJnWI2akHRcyrGNtJQlNByEozJiVnwROwXRxtCpSWG+XNOk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729800110; c=relaxed/simple;
-	bh=eBIPSKxTj4L55q8JXEMDBFoYpoOyhZ0BDvxuOtJ2jWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cv5K4dejdNqNz3+mEJJzV9AQcI09aHZqBgUAJF8FAmWNQvE+sd37LKYCyWNka5csQTj5T0E4PQA8rYB3EAm+RpZus5GgcvYqHZjboe5+HcPonUWQ0t3JWj/bP097LWXDSEobSFZq9Jdlx0aIf6jmmCPXKTzK6uRfCRDiURKojck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CKJe2Uvo; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e2da8529e1so187872a91.1;
-        Thu, 24 Oct 2024 13:01:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729800108; x=1730404908; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YIraNitrENzrz97ijmN+xBP2tly+1JEciLY9B2SGV94=;
-        b=CKJe2UvoD5WIAKDBqQuXHp/3b5oBD7ZlYnyPMx6D/cL237E3UXfMptRpGK85gVJnk6
-         sGM1013RG1C4L4yEyorclFKFn1lCbVDmWYjYRixakbNBl3ERwtctwgw/a5VBJkljKCca
-         fBNtLiaBtMfsuHEud9CJKzQps8wzFIliYkQ64mNIx0xMwdsUAeHidWpoP/aKhc0HvE/2
-         /IdDyc5VyGSh4x599RyrCCoGETwQUUlzLsaDvMC+R9Pt1ZaEc3l5dmAh7IR9fcyL8IYQ
-         /0mF5V/quy/l/fhD9Hmrqr8saCj4vSH+/99s5VgB5fpEy4pHbES5uewo/ZxQOgULxPbz
-         6PQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729800108; x=1730404908;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YIraNitrENzrz97ijmN+xBP2tly+1JEciLY9B2SGV94=;
-        b=AGw+7H3yG0rM+02G99WnvVyWz20kkv1Sv6s2Q5C7K1/cMhRqmlHutGLyuQk1u8K8Bj
-         jpCIgMH4jkCgUVHGVkWB9lX7YQUhELlaUIFz6Zw5p7AWLHuca1jJZ6xgFfBwhXbE0+rC
-         I0imEWF9mrSdGYIk5BBPd7NmDFCI+IHwcjLciNr0YKQCpMiMYz56P+PA0gSfvogW6QSo
-         lbpR+Oh132E8WXhWtOyBusbfpZqUijNp+49J7FaokxmoSRFD5YWRgNdjJRGG6qZ/hL1z
-         bAMVggMW99yDHWGENnwotnvT2knkfgyO0iwQt5nk4WdL7O7xrRex0wT+wyf3LHx6004Z
-         P49Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhs3v9LLj3NG+G35DLDmg4nNJkv2S+LonVVGIHCAFTyR7v0oQ/PBV1G2qLwVHiMLXIGJbPaFH3sqpy/JWK@vger.kernel.org, AJvYcCUug8oofFdTxR/EIKfDNlN6BQcRtsLtQSYeHcJh+iVwNrxNqO+hgmvZCIJ3uSciP5M/0UaxuBzhyZLf@vger.kernel.org, AJvYcCV+bACuuxgKGtWejSFXDLvCquw1xLBX1fODpKR6SU1FuZ+19Iikfl7Se76Cz8JB1JhIYp3AKyjQN0XR31OtQfCJD0s=@vger.kernel.org, AJvYcCVQjfPdUCdX09j62SDj5Iez6PpktM4O2YzUn2Xg6pJ5p4NyVJjWXeiQAnVbyT2n4EnxlTQqRD8n@vger.kernel.org, AJvYcCVYLWLio1Mfuo6UaiURPaS4D8b6DBRNNDwMx7xXhGwH13jjx32xOQz3s15AxSe9nPgqlnvKl4/4ctkq@vger.kernel.org, AJvYcCVyHiETJICF/vCTUnDChbPMFXbmryV6v8QQpGs2uEC/xSpJWiMB7EF8hUTMx4QXhR+XmZKuk6k0VILuBILg@vger.kernel.org, AJvYcCWWyIbNLfejB66072EaXA7C1gZZv0F2W8zRM5XTNCO4Xdkl3Vp6Nr+jLHlbKDLP3Z8/HofO8tTv3sle@vger.kernel.org, AJvYcCWX3XQM7ZVoj5oP6WiSWXqI5Rp3ZiDTb6xtHVOsg2FNnXSpmNW/iVs4j71fOrFlTkPfGkEyNCi0/JWq8w==@vger.kernel.org, AJvYcCWYE44szBnI03siX30LKQDN9nxVni9eZ5LJre7kPd9GdY/AYrCsH96iDr8TslTBGH1Y9iFL+7HG0xyK2A==@vger.kernel.org, AJvYcCWpMk4bSEDhLWGhCEMiZBJU
- WLPj6rUcWU/dpS6tQ/BIiBbnmFreN2lCaC5V23yDnuN+chmYsLVU3DJA2/M=@vger.kernel.org, AJvYcCXtSWRNywFwXxT//IOyBQtoUg+ohqIx7ADpz/s8oZStPZI0pCGGs1C+Hj2wkOLVjfbuMOV2k3/xAu4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKj2pMNYDAPHrH0Ede4G/EsyUYngj+DKJHH04CurO615FiIGep
-	99H1PDVjnU7Z14lpl3YhWM2nJPvSh0opie08jD9Bx46XnA45XlviWadhFupK+v7tu0apIHRY4CG
-	rywDqhd6r00wJRY0l1Xyb/fM0lNc=
-X-Google-Smtp-Source: AGHT+IEnjgfg/aT6yQAgrTdR83/TW/L0fkHcUWiZIccgc7uZM+RpEvNTF7mOftbuDo5SWQyG+GHyEYQwLQJDF3dcyr8=
-X-Received: by 2002:a17:90a:6286:b0:2e2:b20b:59de with SMTP id
- 98e67ed59e1d1-2e76b5e039bmr3727816a91.3.1729800108009; Thu, 24 Oct 2024
- 13:01:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92BD2003C3;
+	Thu, 24 Oct 2024 20:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729800870; cv=fail; b=Jqg36rZL2eW0a5W+R1CmQPnuclKilySeSO+Ozy8TFVM4EuapMjSZuwT6uo8x3QKaUNfNR4IVm2ytnWiYyq91nxH/+MuCsQnUP4PyxTTlomXsAKi4Uz097UtFcdDP8GcgT65rWS1eNajhPD2H++Nq/WHnq36ouN++0hRcvn3XpN8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729800870; c=relaxed/simple;
+	bh=hbmwwF9KYMaJLCSoJ2NSQ30xXnnafhVgqfgEZoFTknM=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Yhm/2v8snBaRWEX0wHKNYVn3URO4emIIYJ9lDGw+0clLq2wk95eKsrKi+iY2hsU6IysCvymD36MVaPt8CwfizFSEzeAFP2psB4muNWGeJEGBBL7ajEoEBR++sqRLo2VxNvK+R0PO2zi3/FFqBcft8y32ZGSBYYsXajaTdaGoVWA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aNUHelSo; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729800869; x=1761336869;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=hbmwwF9KYMaJLCSoJ2NSQ30xXnnafhVgqfgEZoFTknM=;
+  b=aNUHelSoADKYifu/WBZwOej2usrL7nm85IDDzWhDH2fpTtDeIBMhy3DJ
+   7t6D0tlPlcDkdyOz7HyZZW/gea0ore+iXRoNVhL8yVe/Yb7ucq6Mwmaax
+   WgSTl8DBVhrRr5B+eOBN/FnfR46m0z3ICmDwGpVYiJxOtGr0izTY3fI1/
+   jRsuQKno668irqqZ4cDCPtHwrT5qHUEslSuu6n7kuIldBoCb7i+hrP0wH
+   bl+uL9vnDCBv9hyX1WWLzV95vjNzFKyIEIkDqLJj5XA44TGzucGN20we8
+   V4Er3pOYTkvwD7hrMLGt80mmLDuuVJ29CNHFTJVuaKtQVGZqIRHz/EgGS
+   Q==;
+X-CSE-ConnectionGUID: rz5goQvvS9+uSZvLdSIJ4Q==
+X-CSE-MsgGUID: NpPnYlgGRd+PkM/QCBhBPQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="46919283"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="46919283"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 13:14:26 -0700
+X-CSE-ConnectionGUID: xeFhavaQQpC4U3HJJV+DZw==
+X-CSE-MsgGUID: qetd+CkGRY2xvkXcxKSPHg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,230,1725346800"; 
+   d="scan'208";a="80810391"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Oct 2024 13:14:25 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 24 Oct 2024 13:14:24 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 24 Oct 2024 13:14:24 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.46) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Oct 2024 13:14:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jphe2kv/2BeSW6YYXPtbefOD75oayWQisVZkHHU79AI3ijSg6iw3Wjn94IPoArV2aBNN9qtk6WlWtnHZLAwPFeCsCdR8T2nah49Ftgw5sVLVLtTWu3h2ERpqQrOLG1l681r6Dlrtn6wy2/OTX7bB6NCCZ8A0nbMP50SyKdJpd+hi4CGbsYzaczlCv7htgXPieySrRPS3M90kX4zo9S/PODiAYCnDCar6QnhhC1VnGg0rDIY97BBs48PlsPB4wtErVhBV/QuVVxSTMdmh/eSw7viEZnZTqMmqt17pjOOco52oePdRmbmrSqKMfzjdAXy5HN0UJiyCwPvQWNQo0xzWAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0DQSBbJX9X95bk59ILjzCTBknRM832EixhNfP2R2s7g=;
+ b=AmQNaR3NM0cUn9mcxxKrSX+cbY56qx4+7n9lMugEpLVgOb7bzenuMRmK9Qtab0uPW8A01bFxzbVgLViuWh0QhUtqv0VDdcvZ39doWwM80E8OMIyp1cMcUVxH4DiqxyfN+wc4Vuzk+dBzA+AUCoCLleSKPaPJgW86owg6M5ENUe58PmEKMQdEOFZPSs+qjJTrJ5yVz7K3XUr25aSq9QVYidFVUsK3jHIqHkkB1JyxrsKpZmP0n8E21HXKgcNQbsywPhe5fGdTi5dfLyZmAZ+UMFNRvc4Mx46BYoHgymhkPV1kkzL5obMAM4z/JuuPoJHGd8EKj8baXGOCW+l3cPEgsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SN7PR11MB6774.namprd11.prod.outlook.com (2603:10b6:806:265::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18; Thu, 24 Oct
+ 2024 20:14:22 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8093.018; Thu, 24 Oct 2024
+ 20:14:22 +0000
+Message-ID: <80c591f0-ce17-4a58-9749-ed66f14ecc6c@intel.com>
+Date: Thu, 24 Oct 2024 13:14:21 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/8] lib: packing: add pack_fields() and
+ unpack_fields()
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Vladimir Oltean <olteanv@gmail.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com>
+ <20241011-packing-pack-fields-and-ice-implementation-v1-3-d9b1f7500740@intel.com>
+ <601668d5-2ed2-4471-9c4f-c16912dd59a5@intel.com>
+ <20241016134030.mzglrc245gh257mg@skbuf>
+ <CO1PR11MB5089220BBAF882B14F4B70DBD6462@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <e961b5f2-74fe-497b-9472-f1cdda232f3b@intel.com>
+ <20241019122018.rvlqgf2ri6q4znlr@skbuf>
+ <7492148c-6edd-4400-8fa8-e30209cca168@intel.com>
+ <20241024134902.xe7kd4t7yoy2i4xj@skbuf>
+ <38f27382-3c6d-4677-9d59-4d08104f1131@intel.com>
+Content-Language: en-US
+In-Reply-To: <38f27382-3c6d-4677-9d59-4d08104f1131@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0021.namprd03.prod.outlook.com
+ (2603:10b6:303:8f::26) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024173504.GN3204734@mit.edu> <20241024181917.1119-1-cxwdyx620@gmail.com>
- <20241024193729.GP3204734@mit.edu>
-In-Reply-To: <20241024193729.GP3204734@mit.edu>
-From: =?UTF-8?Q?Dragan_Milivojevi=C4=87?= <d.milivojevic@gmail.com>
-Date: Thu, 24 Oct 2024 22:01:36 +0200
-Message-ID: <CALtW_aiicDv89h-m0h4dO-QKjoopittMc5ZvF3wd2dg8Wc_WVA@mail.gmail.com>
-Subject: Re: linux: Goodbye from a Linux community volunteer
-To: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Hantong Chen <cxwdyx620@gmail.com>, ajhalaney@gmail.com, allenbh@gmail.com, 
-	andrew@lunn.ch, andriy.shevchenko@linux.intel.com, andy@kernel.org, 
-	arnd@arndb.de, bhelgaas@google.com, bp@alien8.de, broonie@kernel.org, 
-	cai.huoqing@linux.dev, dave.jiang@intel.com, davem@davemloft.net, 
-	dlemoal@kernel.org, dmaengine@vger.kernel.org, dushistov@mail.ru, 
-	fancer.lancer@gmail.com, geert@linux-m68k.org, gregkh@linuxfoundation.org, 
-	ink@jurassic.park.msu.ru, james.bottomley@hansenpartnership.com, 
-	jdmason@kudzu.us, jiaxun.yang@flygoat.com, keguang.zhang@gmail.com, 
-	kory.maincent@bootlin.com, krzk@kernel.org, kuba@kernel.org, 
-	linux-edac@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux@armlinux.org.uk, linux@roeck-us.net, 
-	manivannan.sadhasivam@linaro.org, netdev@vger.kernel.org, 
-	nikita.shubin@maquefel.me, nikita@trvn.ru, ntb@lists.linux.dev, 
-	olteanv@gmail.com, pabeni@redhat.com, paulburton@kernel.org, robh@kernel.org, 
-	s.shtylyov@omp.ru, sergio.paracuellos@gmail.com, shc_work@mail.ru, 
-	siyanteng@loongson.cn, tsbogend@alpha.franken.de, xeb@mail.ru, 
-	yoshihiro.shimoda.uh@renesas.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SN7PR11MB6774:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec859ad9-028c-46d2-046b-08dcf46872f2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TUc4cjB2bFVVUXoxMGllZXlMR2N6OE5jOVJ3QkZ2RlhQS1RpQU9BZ21DVG1l?=
+ =?utf-8?B?TnRRZjVOemlOdWFlVUlRVFhUWTRsNHF5WWlSSzlLVE9EWUtZdTAwNFpKQTBm?=
+ =?utf-8?B?WGhHWXZWcTVTT29vREduaFNJQWFDMVlad0F6bmY1aTFvaFY5RWJNd2Y0YVI2?=
+ =?utf-8?B?cDBHMS9DcnAwVGFpS0xkYTJvWTdObWNZYVVpemdPT0hhYjhoemRVUFU1cHlM?=
+ =?utf-8?B?b3U0eFpLKzVielh1OEZOdGVVWUNDUkZ1YkZYWGVPWEpPQzQ0eHNGdXBzZjZU?=
+ =?utf-8?B?ZTNTZWVtMDlDbFNybFkzRzNFOTZqNDZNbllHNkt0MTFON1RvQWVXb0RZOFF1?=
+ =?utf-8?B?WVFWWnVUelJZdnFpbExra0ViQ2FlVTJCamgyKzdIRUtrRnVMSzkwRHFRZjJP?=
+ =?utf-8?B?WUdRK3Z2TTJ5TFgrcDI0b1FDc1JWVVdOUERSbkVXWmNMSktjUEliZlhUTjY3?=
+ =?utf-8?B?MTFFQ3djdHdWK2FTcDFkTTlFYlhhWkt1QnJ1R2Q2dnR4UXVPVVQ3Y2VTYmNF?=
+ =?utf-8?B?U0dkUjU4MUpGYmN1M3FTd0VRcGpHcllEZXVTeE05UkZxbnFpWlBpbzVJY1Z0?=
+ =?utf-8?B?YnFwWlIzblovK1l0Vk5nSVZiQlpFL2dtZDlJK0krQ1IvbGZkcHphR2tBOEM2?=
+ =?utf-8?B?YnoxbExxMENkdDhqZzB2L2Vzc0JHYUJ1ditHTjhwK0pMdEl1TytGN1kxQUU4?=
+ =?utf-8?B?TERUVEV0T25WdVYxR1lhT2hHV0E4SzR4NEhKdFRuNWNtbStBaW9LSXVmVUxs?=
+ =?utf-8?B?UTV0aHljS1Zxa0JKSlhjcnpBVWRBT29xbmZoWi9NY25YUW1Pejh6MnIxOVJw?=
+ =?utf-8?B?UTd1ZENaYkNrZ1BzQWwvSDVEYmJDMUhWdFlMVmdyMnZIenV4Uy9GNHdqYWRp?=
+ =?utf-8?B?Z3hQZVlWbGUzOXFPTFdDa2UzSjRnRnNxWXp5aE9oa2MxSkdjNGl3eHRLSDk5?=
+ =?utf-8?B?cUw2Sm9LZTJBaTZ6QjJ5U3J2V1pJWk5ZRlhkR0dNT0NzS0w1by9sMjdzVUVU?=
+ =?utf-8?B?ZUsraVFYQ05jcnhWVmEzUmxYZ2NqYm1SMk9KWVVXTlJuTDFFTXBMTUEwejhP?=
+ =?utf-8?B?T0ZCeGdhVVBlT05FNUpDZit3ZTczQkFGMHV6V25qZ0FkRTh1S1JURkhBZzBP?=
+ =?utf-8?B?WnZ2K2pqZ01oRFZpMEhkem8vbjEwN3Y4Yk1meGdrZ3ZaQnBnVXBjZHRNemU5?=
+ =?utf-8?B?SGJRUzN2cG5JOWF3WUhrQW8vZGJ4VEFWejZOdk45Ym9Gb2lpcVVYekYxdm1W?=
+ =?utf-8?B?ZitYTlhXMXZCZTlMU09DRDFMRWZiOTZjZXRsa2hWV1JnbHRrNkx2KzBSRUU4?=
+ =?utf-8?B?RXgwU1JOMWxpejByZ3ZrWGpWZU4zcFdMSzNVRUwyaHRWb0lZY21Qak93Vk90?=
+ =?utf-8?B?RGhkSUhhL1l5SThDMTFtK0tpSVZTNkNvRU1lR0xUd3A0UmxYaDJ3Nk10dTJi?=
+ =?utf-8?B?ZzNFTS8zWHh6cVJvamlaQjRjcHVPMXNmRjZnYUx0YlozV2hZeWRFbHdCUEdt?=
+ =?utf-8?B?aWN4d1Y0bWgwRllXT3ZyWFZ4TnR0bmRpVkRVNXNyRCtRcW5qMmtTTUdqNXVJ?=
+ =?utf-8?B?bzJhU0cvNUw1T200ZzZKL1I5eFlITndzckdOb1N3RDBZMVlSTHpZS1FobVpM?=
+ =?utf-8?B?MC83ZUR6T0RLUFh6NTl1VFlHYXFWT1JPS3FTSkp1cjgvdFpKRFozTkxUTXhp?=
+ =?utf-8?B?VTQ0M0h5QkJQazlLcVlmZkQra3lsMUs3SVJZZGkzWU5mMUdmRmk1azZIRDNB?=
+ =?utf-8?Q?RgrWy1gRIautPQ49qPAY5ING4dbcg/N1/yhw6re?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cmxqeDV1QnVjbmh6ZTdibG1vTktwYjVNb0M3dUM5cFVSaHRKTGNBdXBOY0FT?=
+ =?utf-8?B?T0JES0xLVUpMSXVEU2tWZWFJUlZpUzFsZC8yd2dtNU0vWjRsK2VNTFlwQllw?=
+ =?utf-8?B?VG1YWmtMVWV0eDNQOVd1U0g3azBpWU10WThwMzk3UnNKaVNsOWlHME9RVWZB?=
+ =?utf-8?B?cE0yUUtnUjhkNkVQZXREZlFtL3YveXhIZURyWGdrV3VGQkMrcWlxeFdLbmh6?=
+ =?utf-8?B?OTYwdXhGZkswWmFhb2ZjTFpWaC9Tb0U2alMrcGV0K0R1cSsyWHhOZlF0RGNs?=
+ =?utf-8?B?MnZUMEczWjdrWmZBb2NRaFhHNldvQU8vVStKeGlSb0ZuczB5NWRjRHJWVzdt?=
+ =?utf-8?B?WnVWMWw2R1kzSUlXQ0doSG9UNnN5NnhkRjVtUXRuRGR1bjNoK2xNZ2FMcHJ0?=
+ =?utf-8?B?dXYxQmo1V1Voa1NDWkJlQ0QzbEFDUGRPRXcrc2RhRkxwQU5XS2F3UHpUdm5D?=
+ =?utf-8?B?MWlxNUErSVZ5aDhiaWVGUWdzWlpYYk5LZFBKMHkrRkltUm5RbUtYUXcrZHhz?=
+ =?utf-8?B?and5cXNYSXlENHJ0NkJJK3JReXRZNFVWNXorTUR0S0MxcjVRVE5LdVBNRldC?=
+ =?utf-8?B?dFJuSkx0SmY0MUh6MDlhS1hYWFludGN2cE44SDQ2dFRuVDQ3UFQwQVVMVEFW?=
+ =?utf-8?B?aVdwWm14L1pnSnlEei91YXQxR0IwamhMR0NhdldFV2ZkSG95Z3gvMWlqcXVx?=
+ =?utf-8?B?WjR0TzRUNmFCYksyTit5aHNwMlViZTJxeXhzaTltN2VKV3F4ZHluUEtkY2p0?=
+ =?utf-8?B?aXpDTElCbXQ4TGcvT0VEZVM2UzN2ZE55OWNRaGRXRG5kbmFLbFYwRTFwNDBD?=
+ =?utf-8?B?bDY2dGVVanU2Mzh2K0VCcmw1OE1SQllEdEtjd0g4cS85UWN1bGlPU1Y2Ukhr?=
+ =?utf-8?B?aXJtZjhHbnYxbllMMUdCektlUjl6VXBkL2dUWVZHVmxnU3U5eHpIOHJKZDNi?=
+ =?utf-8?B?b1M3Mmkrb2NIWGthaVZscEQrKzY3aGlZb1YwT2NRSXRTeEkzOW9xQnNsclhk?=
+ =?utf-8?B?TEpJUk5VdThtTDlub0lweDBGRVVEdkZRaGVETWFVcjk2MkliTnBDenFMRFdL?=
+ =?utf-8?B?Nm9mUjNIL25qN2VsbmFqcFZsTFg2SkE5V3NFMTFaYWl3bFFlemZodXdHTFdF?=
+ =?utf-8?B?QkNMZ1JWK3FGNlBEZDc2a2ZCMmZHOVFrZ21QNjRGYW9uMzJhK3Z5aUN6NEtT?=
+ =?utf-8?B?SU1IbVdFVFhXWEI3c0FmUG5rdVJ0ZGgyd2VXWThCNWM5ZzFpZTdUcnBjSXda?=
+ =?utf-8?B?eS9mcUhGTUIvWGsvSy9lZVhUcnp0VUlOMTRha0luSUxXcnFva3ZWOVJnRXNn?=
+ =?utf-8?B?czE1UTA3dFV6d0drM3JZSUJLR2E0aFl4RzlRVjR4bjI3cE5sZVZxUEQzTmJq?=
+ =?utf-8?B?aXNQN2lMT0JJWVFMczlGTkJubnlGQ0tqdllJVG8vMm5zREhPMjJhSU9SUi9Y?=
+ =?utf-8?B?YnFVNjIwTGluajVsOVF5cXVUL2tIWGgyVmRoZDYyTVBMVm9vQVVWdjlMeFNF?=
+ =?utf-8?B?QnpSRXhxUEk4MWhiS3N6c1ozZXhTTXNNZkJtVTljOVNranZCd0kySHRrZDI1?=
+ =?utf-8?B?MW5zRWlGUE43VmtJOVlIMDkwK2pta29qQ21jbnQ1eVptSmk2REl6NDhaUW0r?=
+ =?utf-8?B?bmNsVE0wckdPeWtxR0NpR1o3OHpRblZqY0cvYVZUVXBLYnA3Und2Ym1XemtJ?=
+ =?utf-8?B?T1pkdjl2ZVhwNERzdHBOYjhSaHVlSEh3Nk11WE1FSWsxeVphRHRBNll6UjBv?=
+ =?utf-8?B?aXd6RnNwcXhwUWZBVE5YZUdsWnJ0aEtsV1pwOXJ6SkpmcGpNVEtyOHRBMGxG?=
+ =?utf-8?B?UEJEVHJxT2RodkNvUy85bGJkZEpMUHMzN0M5cFdqclgrNlVQZ2VtSUpSTHI4?=
+ =?utf-8?B?RjVlWkVXUWpWYlQrYjZTWkJ1N3prdXdzWkgvQ0JOR2k5L1Y0eS9SNUVySDlk?=
+ =?utf-8?B?dG95aEZidHY4ejNPOVJuamYycHgxQ2ZrbDc3OGdEK1ZlRlh6VmVta0F5TnRa?=
+ =?utf-8?B?V0pkUDNrQnJDZ01nS0h0WXpIc2VqVkhma2tHZHNBTkd2S2dQeGUxamJtSG1C?=
+ =?utf-8?B?WDY3RXEwT0pkbzZncy84V3N2eDlhUktFM29uVXVZWGJIS1hhRFlZQVdJK0d0?=
+ =?utf-8?B?TEE3MFNMQitEQmtYaXNGdzJMRzUrOWdaclNlY21OclpLd2ZZM3FXR0pzZ01a?=
+ =?utf-8?B?emc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec859ad9-028c-46d2-046b-08dcf46872f2
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 20:14:22.3626
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LYCjqDgk8p4p6PW6H73zG2ERWHTMETqdGX8yJHrt/bfuHqCtdsv5HXUQ71NH9Bro7IzY1GjwxHECqEuIPFp34CPFhpfWEt5gJwXc4BdOXCM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6774
+X-OriginatorOrg: intel.com
 
-> Hypothetically, if someone was a Russian Citizen, and there was a
-> Russian Law forbidding them to provide technical assistance to US
-> entities, then that person would be obliged to respect that law, and
-> not send any patches to US-based open source projects.  Depending on
-> how that law was worded, a Russian-based open source project might not
-> be allowed to accept changes from US entities, and again, if you were
-> a Russian open source project maintainer, you would be obliged to
-> follow that law --- or maybe you would be thrown into a Russian jail.
-> Whether you are a Russian patriot and are 100% behind the Russian law,
-> or think that perhaps it's not the best policy, doesn't really matter;
-> you are still obliged to follow the law one way or another.
 
-But they are not, neither is China and I only see blatant approved racism on
-the western side.
 
-> In the ideal world, one country would't be invading another conutry,
-> and we wouldn't have these sanctions regimes.  But they were not
-> *caused* by the decisions of the LF and Linus.  The sanctions regimes
-> were enacted by multiple countries' legal governmnts, and now the
-> question is how can we best protect the Linux development comunity,
-> the operators of web and git servers that are redistributing Linux
-> kernel sources. etc.
+On 10/24/2024 9:38 AM, Jacob Keller wrote:
+> I also have some thought about trying to catch this in a coccinelle
+> script. That has the trade-off that its only caught by running the
+> spatch/coccinelle scripts, but it would completely eliminate the need to
+> modify Kbuild at all.
+> 
+> I'm going to try and experiment with that direction and see if its feasible.
+> 
 
-In an ideal world the USA would not be a hegemon that invades, bombs
-and overthrows foreign governments, threatens the security of other nuclear
-powers, expands its hostile alliance and sanctions half of the world.
+Coccinelle can't handle all of the relevant checks, since it does not
+parse the macros, and can only look at the uncompiled code.
 
-Anyway you fail to understand that is not the topic. The rage comes
-from LF actions
-and Linus words. All they had to do was to say: Thank you people for
-your contribution
-but we have no other choice, this is the law.
+I'll have a v2 out soon with Vladimir's suggested approach.
 
-But they did quite the opposite and Linus showed his true ugly
-white western supremacy face for all to see.
-That is the cause of the rage.
-The real danger is the split in the open source community and the
-"software Iron Curtain" erected by the USA.
+Thanks,
+Jake
 
