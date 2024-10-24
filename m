@@ -1,72 +1,74 @@
-Return-Path: <netdev+bounces-138865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FEF9AF410
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:49:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E859AF411
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A705528702F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:49:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 507172870D3
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1BE1F8184;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AAE215025;
 	Thu, 24 Oct 2024 20:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTn8t1j6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPUI+SQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBAD18A6DF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729D2174EDB
 	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 20:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729802944; cv=none; b=T3EPvQAniT3hrsulcNzGyp8HnrNIrE6XHRwDoDbjA8SSRDYyXc192t1hDH4YGFoFNe2pgrSLJwFmt7ECpX4jKMURTN/L3DMB0EEUprnHNSrlvlVMydxck4kliKUq0cO2u1HRHZf1Sdd7NkHlMO9P0dBVzj1d3Ul/GYlCLruBBKM=
+	t=1729802944; cv=none; b=kvX+8Dd+GBlRlxde93ydQnOCcoy1ZTKZK1wh0P9Ed78kmxXfHruee56QCgOu8AEwEigRekVhQQgNP+gHvjulZqMXaVRrcWlsc1a0JDxgXUAI0k0BmVsKf9rTmf25CNunjecBLrqKVOvgWHdT+5cPHp9mZP1LirpyxP4HFEEUBLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729802944; c=relaxed/simple;
-	bh=UG9IJmO1GDDsSsaLkOWa0Ozhofg9D5VI+uEjJM2i26A=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=BUtJ4hrHYjsAdpHY6l7zZxo4NhVW2riNF29jBGadDTD05LVsbGCBfyrDuEM5XojC3HBNv0c6fQcbi6A7CvqK/W0fzURpWIfx4BkXYnAMhfOCTwqWABNLXExfgwNq9ZzhPxEiC5EnjXVaC9pSl57Smn9WfTdpLoV8mvPDOP9YKb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTn8t1j6; arc=none smtp.client-ip=209.85.218.53
+	bh=ZAUQ19u6JPutuNoQlSUWmMCq3XVIJW31KqjukiyFV34=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=XIQpHylSGGoy1qVhyUhU2UEfM+Fq1FM3I3Usdklt7N3BkL1EMtrteMR3DLRn6YVglky+V7PpEWeBpL+6V8LHF076nVsztCN7fWJ4et4KKTsIaV6l4vucB18Yvi4bWxpSNnTqKz97I9oNpBSqk9oO6FYY0H2hB+chIRuaegjBob0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QPUI+SQq; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9acafdb745so270677766b.0
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4315baec69eso13889375e9.2
         for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 13:49:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1729802941; x=1730407741; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fwvTjpJuzQ+RVwQv8UVyiNxISUnYrNkVGKslq35A8hM=;
-        b=TTn8t1j6agad68VNb+DDKulBePQFVAQqUWstEdr8p6GY9Jvp/58v35fQXxDOTdgruJ
-         sCY+rp43laa/sZt0jHE9nTgShmjTvuMDqr175yCNAPPKHuLymL97eaObIV8lM/fbgFN6
-         U57AwhLTuGG0ScgdQzR6QyR7D9kAqxvW0p3xZDgQwLEH6Zsf32nxRbFzXdpPuew/+LSm
-         cohDaXRYSDTvPjvsQC70TiM54iqyk6wi5OYcpYnBqqd14tJZSaq7gFP38TNHKf+b0YXE
-         gtpKYJKWloJdRvrpDgeDxAWb8iH0g5R6ZWkYWd25uPHdfMAUCS0UOXOhatuDyZg5MfOY
-         /yag==
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=biv3pkIlLBuHm/xvNsHFLjitkwOHL4E9/BZq1CwD4Og=;
+        b=QPUI+SQqJjWIDXcIr9DimMY+OSuK7UixDntgJ/pQMEDg3984kBic5e+vP3Jfikoe3j
+         033UJlOV01YjP/MYRWAcXaUicmtsCxlzRp9EebWNyeRXqh3GpcMsf+bMknaZ5ngYoca+
+         L1mRSxaIOsbnyxJabpRGM7iQNQZNNMd95JJDHIUY/fHGSqg3qT5ubXyl2zEfusOsKrcU
+         FgthoZLE9a+Jq7IBAwSbVa3axr1KVGGpnRgJom9zZbHqaL3+ZNNn0ELI0M5a+IYMG6CQ
+         uUykWJafZ3h106+PvFxp2NWyK9cZRA7kJQWISmMjm5042kvQ8534zFJVczGvv2QMJYqQ
+         +FVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1729802941; x=1730407741;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fwvTjpJuzQ+RVwQv8UVyiNxISUnYrNkVGKslq35A8hM=;
-        b=NUEEHbI+n9W3XLEMWt+zprrxZemIszsO/kBAROFg1lYOSJEY5GFi/vwR4ZVVz3eDHI
-         uQyWYOt7V87zCfaHgNDs1BDibJwFd+2vlV0WZAkZQzwQRafolZBP8azdkXZZqMeQK6gd
-         BH+gk1D3ZwGxuqhMCE+hJ/TUTeafb64OKPXXEq/hLb41HRuMn3QwVwWkvNiePylC9eP3
-         ml6Nasl3ZGYOATMZRKJsg/j35gKQkDrfwufs8yhXcbx6MIHWcmJS6FQyxJE16XgG3BPl
-         cuZjSo2jQP1uZzUnLY8b9qXBQnMpiVInd/NU8HDBiif8GwISRJKfJr5pOFBuYFdv7J+0
-         di0w==
-X-Gm-Message-State: AOJu0Yz3PkhoTPWGtU9qP4yPPPs+b7IY/RScZhIRPJAVFrP0Y7VwjaVw
-	TYI9oN1XRQOVwYZ3J/E534GHbzq6MO2FAWdeHZliTz8gau3+xva9
-X-Google-Smtp-Source: AGHT+IGS+zVgQmh4Pu12swtJHRjR4cT6jA+KrygdZ1NTGRd0S9tir8R9DzMqLiDvPl16OuISwnpDHw==
-X-Received: by 2002:a17:907:3e9e:b0:a9a:c651:e7c7 with SMTP id a640c23a62f3a-a9ad19a8cd6mr333466966b.12.1729802940578;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=biv3pkIlLBuHm/xvNsHFLjitkwOHL4E9/BZq1CwD4Og=;
+        b=g5UJHcYW77+D3Yb5PAWf6rS1pZt75quaNwuCvxPc0B7f8lLqCUMVGmUt3HlC5lolIx
+         iCR3X6Q/Jhf72qCJxnAv/9IfvzulSswqN0S3RK79fRxSRIC3VepTIeKm8OPLA9NKi8cD
+         mTCtdETqrYzRX8iYTNEfgYdSgLmXtCAD+pVPSZUcFMIT4XmjWzIS9mHzWdTwzrN6blaK
+         XQxcagG0UQYJsQjC7lwAOGATo1GIt37Tt0tBbe9F9NDklgn79AjzmoWTiXKTlqry4Fl8
+         Qsrxtmt9WpBdCh1hUKMbVBz+8VUNOmG1dSB1vSHsdu5SktgfHGHyo3zeIemOhI2/EqIT
+         Z4Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXa1dMdFGGJte0eV6agZv2km2n1bc0JTXmtogeDjHpOPqaV9BWo3+7FIEcsc6UUcd1cqpav8A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVtBhD4ZKEPihHGM5NlhMHRtcel/6f5jX2+bgbgZJLrWkVszPZ
+	T3sYN9hkHajmtH8CVzUiGfDgLGEHFx3JXBc7DXAC7pkzp/n4/L6l
+X-Google-Smtp-Source: AGHT+IFn5pX3JQiTObiIyXNYZVPp7Fjb5sYcy+wxiIwwNeuWtyeoMznEFYic9bk6Fzl34WGWbMEBUw==
+X-Received: by 2002:a05:600c:1d1c:b0:431:47d4:19c7 with SMTP id 5b1f17b1804b1-43186222f94mr65817335e9.3.1729802940356;
         Thu, 24 Oct 2024 13:49:00 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:9c7c:7300:4169:9367:99a0:d46c? (dynamic-2a02-3100-9c7c-7300-4169-9367-99a0-d46c.310.pool.telefonica.de. [2a02:3100:9c7c:7300:4169:9367:99a0:d46c])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9acbee153fsm194229266b.207.2024.10.24.13.48.59
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43186c1db2csm56166365e9.40.2024.10.24.13.48.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 13:49:00 -0700 (PDT)
-Message-ID: <20fd6f39-3c1b-4af0-9adc-7d1f49728fad@gmail.com>
-Date: Thu, 24 Oct 2024 22:48:59 +0200
+        Thu, 24 Oct 2024 13:48:59 -0700 (PDT)
+Message-ID: <51744a97-92d1-4d4f-b0b2-147f44321fc3@gmail.com>
+Date: Thu, 24 Oct 2024 23:49:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,86 +76,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: fix inconsistent indenting in
- rtl8169_get_eth_mac_stats
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net v1] net: wwan: fix global oob in wwan_rtnl_policy
+To: Lin Ma <linma@zju.edu.cn>
+References: <20241015131621.47503-1-linma@zju.edu.cn>
 Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
+Cc: loic.poulain@linaro.org, johannes@sipsolutions.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20241015131621.47503-1-linma@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This fixes an inconsistent indenting introduced with e3fc5139bd8f
-("r8169: implement additional ethtool stats ops").
+On 15.10.2024 16:16, Lin Ma wrote:
+> The variable wwan_rtnl_link_ops assign a *bigger* maxtype which leads to
+> a global out-of-bounds read when parsing the netlink attributes. Exactly
+> same bug cause as the oob fixed in commit b33fb5b801c6 ("net: qualcomm:
+> rmnet: fix global oob in rmnet_policy").
+> 
+> ==================================================================
+> BUG: KASAN: global-out-of-bounds in validate_nla lib/nlattr.c:388 [inline]
+> BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+> Read of size 1 at addr ffffffff8b09cb60 by task syz.1.66276/323862
+> 
+> CPU: 0 PID: 323862 Comm: syz.1.66276 Not tainted 6.1.70 #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+> Call Trace:
+>   <TASK>
+>   __dump_stack lib/dump_stack.c:88 [inline]
+>   dump_stack_lvl+0x177/0x231 lib/dump_stack.c:106
+>   print_address_description mm/kasan/report.c:284 [inline]
+>   print_report+0x14f/0x750 mm/kasan/report.c:395
+>   kasan_report+0x139/0x170 mm/kasan/report.c:495
+>   validate_nla lib/nlattr.c:388 [inline]
+>   __nla_validate_parse+0x19d7/0x29a0 lib/nlattr.c:603
+>   __nla_parse+0x3c/0x50 lib/nlattr.c:700
+>   nla_parse_nested_deprecated include/net/netlink.h:1269 [inline]
+>   __rtnl_newlink net/core/rtnetlink.c:3514 [inline]
+>   rtnl_newlink+0x7bc/0x1fd0 net/core/rtnetlink.c:3623
+>   rtnetlink_rcv_msg+0x794/0xef0 net/core/rtnetlink.c:6122
+>   netlink_rcv_skb+0x1de/0x420 net/netlink/af_netlink.c:2508
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1326 [inline]
+>   netlink_unicast+0x74b/0x8c0 net/netlink/af_netlink.c:1352
+>   netlink_sendmsg+0x882/0xb90 net/netlink/af_netlink.c:1874
+>   sock_sendmsg_nosec net/socket.c:716 [inline]
+>   __sock_sendmsg net/socket.c:728 [inline]
+>   ____sys_sendmsg+0x5cc/0x8f0 net/socket.c:2499
+>   ___sys_sendmsg+0x21c/0x290 net/socket.c:2553
+>   __sys_sendmsg net/socket.c:2582 [inline]
+>   __do_sys_sendmsg net/socket.c:2591 [inline]
+>   __se_sys_sendmsg+0x19e/0x270 net/socket.c:2589
+>   do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>   do_syscall_64+0x45/0x90 arch/x86/entry/common.c:81
+>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7f67b19a24ad
+> RSP: 002b:00007f67b17febb8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f67b1b45f80 RCX: 00007f67b19a24ad
+> RDX: 0000000000000000 RSI: 0000000020005e40 RDI: 0000000000000004
+> RBP: 00007f67b1a1e01d R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007ffd2513764f R14: 00007ffd251376e0 R15: 00007f67b17fed40
+>   </TASK>
+> 
+> The buggy address belongs to the variable:
+>   wwan_rtnl_policy+0x20/0x40
+> 
+> The buggy address belongs to the physical page:
+> page:ffffea00002c2700 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xb09c
+> flags: 0xfff00000001000(reserved|node=0|zone=1|lastcpupid=0x7ff)
+> raw: 00fff00000001000 ffffea00002c2708 ffffea00002c2708 0000000000000000
+> raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> page_owner info is not present (never set?)
+> 
+> Memory state around the buggy address:
+>   ffffffff8b09ca00: 05 f9 f9 f9 05 f9 f9 f9 00 01 f9 f9 00 01 f9 f9
+>   ffffffff8b09ca80: 00 00 00 05 f9 f9 f9 f9 00 00 03 f9 f9 f9 f9 f9
+>> ffffffff8b09cb00: 00 00 00 00 05 f9 f9 f9 00 00 00 00 f9 f9 f9 f9
+>                                                         ^
+>   ffffffff8b09cb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> ==================================================================
+> 
+> According to the comment of `nla_parse_nested_deprecated`, use correct size
+> `IFLA_WWAN_MAX` here to fix this issue.
+> 
+> Fixes: 88b710532e53 ("wwan: add interface creation support")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202410220413.1gAxIJ4t-lkp@intel.com/
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+A bit late, but still: nice catch!
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 3da0f6be7..b84587841 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2225,7 +2225,7 @@ static void rtl8169_get_eth_mac_stats(struct net_device *dev,
- 		le64_to_cpu(tp->counters->tx_broadcast64);
- 	mac_stats->MulticastFramesReceivedOK =
- 		le64_to_cpu(tp->counters->rx_multicast64);
--	 mac_stats->FrameTooLongErrors =
-+	mac_stats->FrameTooLongErrors =
- 		le32_to_cpu(tp->counters->rx_frame_too_long);
- }
- 
--- 
-2.47.0
-
+Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
 
