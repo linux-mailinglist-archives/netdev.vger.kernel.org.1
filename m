@@ -1,180 +1,125 @@
-Return-Path: <netdev+bounces-138451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0154D9ADA1A
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 04:48:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C57919ADA3F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 05:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 812471F22B72
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 02:48:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88199283402
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 03:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2744015383A;
-	Thu, 24 Oct 2024 02:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wm7uSVrh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B04A153BF7;
+	Thu, 24 Oct 2024 03:09:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868311E51D;
-	Thu, 24 Oct 2024 02:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8613774068;
+	Thu, 24 Oct 2024 03:09:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729738112; cv=none; b=tCNqxjsY4cfcRM9sEEJ6W+EadvwSLhp5lFjeOTX9yfkVSMznzzLyiCH93q+zpJxgSXBX7zC0RF6kaPxCe+xcYuLcSWQI3vQQHYib62c9MDf6epk1yCefB9IL5R4nXFd5eEjE22TF3/Mavb5bJoHCsS/NTchAVbkmvitr34xTUCQ=
+	t=1729739371; cv=none; b=Dzn9RL/FEJ8uybJXhh0KqltrND6qnotMUbvNWncXX6L5vIiZCXRfjJM4Eg76XNsL++3zYkgDRX/brRO6nQWV4nt1rT8udQrE/QNx/FQ3CFK/WYbcMvt8j/pn1dZ++CJnCYklW4eDHYYCXcjWjxxR/KnU6HP/x0E2gxorDncgx3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729738112; c=relaxed/simple;
-	bh=pDBnVwV4TrSz9x6jHbsxWa5WmwTlfzb/lAVwo0dzrhc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=DlAhQyBOSw0PuVxwCB4S6q7D6xDr/4Ba033lcMf5VsZ+SR5NXDHn93/4ASc2mryPwdct3zvkFqBJUmp9PYk0fb06Np8yhB93WDD5uO4EhJuejivC7/jrnRx1hRILoM/ul0QzXx0ShcCwYM5PLNhGTWU+AINw5VU4iEH3XhEXdbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wm7uSVrh; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729738100; h=From:To:Subject:Date:Message-Id;
-	bh=9jvqQZLq79EKmM2QtBsiWqAED1EfuumssWsjxKW9xfc=;
-	b=wm7uSVrhEyHL4EtJ5yrE0EfuyL++xuqviL4PenWQstX0vlOfzhCrQjQxCZLUk7ryPA2PcynL5khZckwkX6vOJSj8B8My/0QjdqWawAKNoa9PYH8dh0eyJ1AaW3Xhn4m3cxSclU0Q6xGX6kSaf8r6cVEmzvYltOyTs3j6gfbxTKI=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WHnU0H6_1729737776 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 24 Oct 2024 10:42:57 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	pabeni@redhat.com,
-	song@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	yhs@fb.com,
-	edumazet@google.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	jolsa@kernel.org,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org,
-	dtcccc@linux.alibaba.com
-Subject: [PATCH bpf-next 4/4] bpf/selftests: add simple selftest for bpf_smc_ops
-Date: Thu, 24 Oct 2024 10:42:48 +0800
-Message-Id: <1729737768-124596-5-git-send-email-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
-References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1729739371; c=relaxed/simple;
+	bh=bqGMO8gfXtzyHFpj1RRhYhjDD06u4grA5x3HgcM4/0Y=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PHExxT+WH1AEaEnlqz3offoKDG+AwwKrhZpCiJlyyK+4SwuwM27CRucuYFYNqmN0L1Bo/wq/XOH8fGhRsaPlJsRo0PaHP/6MFwsbH3FG9BkYekcpMRPApNbbDyH57kS000LeWuwopjjcB08lmdz7oEWwCFUAZtgGfytooTSIYi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XYrSw5t9gz1jvqk;
+	Thu, 24 Oct 2024 11:08:00 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id A848F1A0171;
+	Thu, 24 Oct 2024 11:09:24 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Oct 2024 11:09:23 +0800
+Message-ID: <c4d40afe-b48a-43da-be88-f7ee38dd720c@huawei.com>
+Date: Thu, 24 Oct 2024 11:09:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add unicast frame filter
+ supported in this module
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20241023134213.3359092-1-shaojijie@huawei.com>
+ <20241023134213.3359092-4-shaojijie@huawei.com>
+ <d66c277b-ea1c-4c33-ab2e-8bd1a0400543@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <d66c277b-ea1c-4c33-ab2e-8bd1a0400543@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-This PATCH adds a tiny selftest for bpf_smc_ops, to verify the ability
-to attach and write access.
+on 2024/10/23 22:05, Andrew Lunn wrote:
+>> +static int hbg_add_mac_to_filter(struct hbg_priv *priv, const u8 *addr)
+>> +{
+>> +	u32 index;
+>> +
+>> +	/* already exists */
+>> +	if (!hbg_get_index_from_mac_table(priv, addr, &index))
+>> +		return 0;
+>> +
+>> +	for (index = 0; index < priv->filter.table_max_len; index++)
+>> +		if (is_zero_ether_addr(priv->filter.mac_table[index].addr)) {
+>> +			hbg_set_mac_to_mac_table(priv, index, addr);
+>> +			return 0;
+>> +		}
+>> +
+>> +	if (!priv->filter.table_overflow) {
+>> +		priv->filter.table_overflow = true;
+>> +		hbg_update_promisc_mode(priv->netdev);
+>> +		dev_info(&priv->pdev->dev, "mac table is overflow\n");
+>> +	}
+>> +
+>> +	return -ENOSPC;
+> I _think_ this is wrong. If you run out of hardware resources, you
+> should change the interface to promiscuous mode and let the stack do
+> the filtering. Offloading it to hardware is just an acceleration,
+> nothing more.
+>
+> 	Andrew
 
-Follow the steps below to run this test.
+In hbg_update_promisc_mode():
+priv->filter.enabled = !(priv->filter.table_overflow || (netdev->flags & IFF_PROMISC));
+hbg_hw_set_mac_filter_enable(priv, priv->filter.enabled);
 
-make -C tools/testing/selftests/bpf
-cd tools/testing/selftests/bpf
-sudo ./test_progs -t smc
+if table_overflow， and netdev->flags not set IFF_PROMISC，
+the priv->filter.enabled will set to false， Then， The MAC filter will be closed.
+I think it's probably the same thing you said
 
-Results shows:
-Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+In this:
++	if (!priv->filter.table_overflow) {
++		priv->filter.table_overflow = true;
++		hbg_update_promisc_mode(priv->netdev);
++		dev_info(&priv->pdev->dev, "mac table is overflow\n");
++	}
++
++	return -ENOSPC;
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
----
- .../selftests/bpf/prog_tests/test_bpf_smc.c        | 21 +++++++++++
- tools/testing/selftests/bpf/progs/bpf_smc.c        | 44 ++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
- create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+When the first overflow occurs, a log is printed, the MAC filter will be disabled, and -ENOSPC is returned.
+If continue to add MAC addresses, -ENOSPC is returned only.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
-new file mode 100644
-index 00000000..2299853
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+
-+#include "bpf_smc.skel.h"
-+
-+static void load(void)
-+{
-+	struct bpf_smc *skel;
-+
-+	skel = bpf_smc__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "bpf_smc__open_and_load"))
-+		return;
-+
-+	bpf_smc__destroy(skel);
-+}
-+
-+void test_bpf_smc(void)
-+{
-+	if (test__start_subtest("load"))
-+		load();
-+}
-diff --git a/tools/testing/selftests/bpf/progs/bpf_smc.c b/tools/testing/selftests/bpf/progs/bpf_smc.c
-new file mode 100644
-index 00000000..ebff477
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/bpf_smc.c
-@@ -0,0 +1,44 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+char _license[] SEC("license") = "GPL";
-+
-+struct smc_bpf_ops_ctx {
-+	struct {
-+		struct tcp_sock *tp;
-+	} set_option;
-+	struct {
-+		const struct tcp_sock *tp;
-+		struct inet_request_sock *ireq;
-+		int smc_ok;
-+	} set_option_cond;
-+};
-+
-+struct smc_bpf_ops {
-+	void (*set_option)(struct smc_bpf_ops_ctx *ctx);
-+	void (*set_option_cond)(struct smc_bpf_ops_ctx *ctx);
-+};
-+
-+SEC("struct_ops/bpf_smc_set_tcp_option_cond")
-+void BPF_PROG(bpf_smc_set_tcp_option_cond, struct smc_bpf_ops_ctx *arg)
-+{
-+	arg->set_option_cond.smc_ok = 1;
-+}
-+
-+SEC("struct_ops/bpf_smc_set_tcp_option")
-+void BPF_PROG(bpf_smc_set_tcp_option, struct smc_bpf_ops_ctx *arg)
-+{
-+	struct tcp_sock *tp = arg->set_option.tp;
-+
-+	tp->syn_smc = 1;
-+}
-+
-+SEC(".struct_ops.link")
-+struct smc_bpf_ops sample_smc_bpf_ops = {
-+	.set_option         = (void *) bpf_smc_set_tcp_option,
-+	.set_option_cond    = (void *) bpf_smc_set_tcp_option_cond,
-+};
--- 
-1.8.3.1
+Thanks，
+Jijie Shao
 
 
