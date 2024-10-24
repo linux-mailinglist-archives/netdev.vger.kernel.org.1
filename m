@@ -1,179 +1,187 @@
-Return-Path: <netdev+bounces-138630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DDD9AE682
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:32:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E60239AE68B
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55785B2536B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:32:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10FBA1C25484
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147FC1F76A1;
-	Thu, 24 Oct 2024 13:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7A51F8183;
+	Thu, 24 Oct 2024 13:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nBSmSVKX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e09i9gPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37A81DE3A7;
-	Thu, 24 Oct 2024 13:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49DC1DD9D1;
+	Thu, 24 Oct 2024 13:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729776405; cv=none; b=KObNf0y6tpwPBMAGlLH1DsHPaP4Om5s+KqCQ8ArXq4S+UYrZHkkKBhnmhxNVGaj7wNSvXEn1dTUvuCsJUYqA8Qhh8L+eryTlobFAGEOTdTqL99yARiekGAXEQISKt21tnGtvm3cQREDs4iofhtDy/LDP4PSa15FGGTEmMxpCrOk=
+	t=1729776449; cv=none; b=QsBfqORfchAolwuq3YlB+0SOws8n166fdV2SeI1+GenmccDf4WCTapOed+q33U6PxyWif9wTkFdRvuc3uoRGoJoQglTQ4Gb/aMPOm0Uz0IVjYZ0x5UsB2kvTpwdShtDeH0W3JTG5K1x63lEhRpHy5843GbXIv4E+e7Qw3M79ml4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729776405; c=relaxed/simple;
-	bh=N02KLalnFfK2sBXLQ/nfUr62rghqvQamE1VIJktqfRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TpfawIY2EyrKEqTcJuZOlA+vN+JMvaN4cWm16XkO+wX+szpFsMEdHFfOVkkXc2Qw3D9wPqMiDAXl8galMN1s45I9+7XxtduXFL/qlQk/6YwErgrQ3O9iwqldUQ/ZNO71Oy9LG6lNBINWDdJoe2bvlgaLwOVwiswsoYFwFh0VafI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nBSmSVKX; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e52582cf8so663823b3a.2;
-        Thu, 24 Oct 2024 06:26:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729776403; x=1730381203; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rjjBzzaMsD7ekSq9QbaIBqsDXujNK7HZAFR9ub3RTXY=;
-        b=nBSmSVKXihhxypOohN3Y/idJM+8DqUbR0Z2wkwfc+bMOPoD2mtbJ79pQA+A+0x39VW
-         sD5cKPQ/3vqU2mW7AQ/XwfA64PqV1cc7OfxLsUcjUlfg7VIEIlWkmOoPwfCw7pZQATO1
-         JQM/iyXfyZNXeVErXP1b4suN3lhmwC40XS5WD5o8QGgeMw7ZpYXY4mQ/mWtc0Cd59bKi
-         WvRk0W1aGRw4Yw03OLo6TLEGEy/uHLEzaDlfk9QqPYneW3bJIMBZ3GMO9GSHtACn074a
-         m5InubJwDftX52HBcePUbSXlG/lkjQfHN0S9F7Y3xkqJY1RaFrskP2xfMRA9JCiX0EpS
-         47BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729776403; x=1730381203;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rjjBzzaMsD7ekSq9QbaIBqsDXujNK7HZAFR9ub3RTXY=;
-        b=SxqptElB/QlC8pp6PZ77bxPGT5QGHwsRgDwZxQcnQzlCMgcH0S/5q+cxx3XfTYiE7W
-         ukRRh027XJxmOZGj34rqUmgfdBnCYDixyXdtt8bukVZxVibih6v9B/NDt3LyLERYM76+
-         kV2hf8WFG8eVoq5AnXoOVq+TWs06kNecR6x3ZnhjhYZ5qJUku+5eRS3FnVeIrHQIPUjQ
-         iHoO0X5zwr+tpmn1CkeodEVOD+WupreYP2zy5hcpIxJuiW+NyXczIfUO11+39KWnSlNA
-         sLVBTsRszOEswbJO2KadhC/3lNeJ+HJd54O7jMareEKSO/Lp6jwnXir6NPjnjKxbj3hk
-         idGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVl0twZWULdRA5V1W+o/EX5PPLXYqQeMH6cC7NEEtOhIsJEAmEHneEqV0gZbXpFUxegz0+m5g60@vger.kernel.org, AJvYcCWKuMbSmMvere4oxQ5qEyLdvNr1Tn/j9QJthYJ0FgNgFXMqyhkwjeA9IfoouKUL4tGrk721ffVH9uc=@vger.kernel.org, AJvYcCX06OjLxQka0lcVTSMR1BvxHqmqvEPtbMJVrA+O8krVM0r6rFSS/m754uN9F5y0vZ+JSKvvAtzOMjbnS4tH@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaDGi7tqeAmatNAh6w81izQv09BTEhEXjKBGkLUzlxZ7BWIunI
-	+sAhkC3cqn1RPxFe4Oj+xjAozNt6Ae9m7bP0ChnVWHVnzGTvzRit
-X-Google-Smtp-Source: AGHT+IGMpqU4C7guMpwzMgTNyv0OP9IkXjIzxG+eKhzbsqqfYfm1VefGOOKSHC3CW5cb28iw9Kjucw==
-X-Received: by 2002:a05:6a00:1892:b0:71d:f423:e6cc with SMTP id d2e1a72fcca58-72030b9b77emr8940005b3a.8.1729776402953;
-        Thu, 24 Oct 2024 06:26:42 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabb8423sm8622500a12.71.2024.10.24.06.26.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 06:26:42 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id AA3ED4416BFE; Thu, 24 Oct 2024 20:26:39 +0700 (WIB)
-Date: Thu, 24 Oct 2024 20:26:39 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Leo Stone <leocstone@gmail.com>, alex.aring@gmail.com,
-	stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org, anupnewmail@gmail.com
-Subject: Re: [PATCH net] Documentation: ieee802154: fix grammar
-Message-ID: <ZxpLD3_oXlO1Ucb7@archie.me>
-References: <20241023041203.35313-1-leocstone@gmail.com>
+	s=arc-20240116; t=1729776449; c=relaxed/simple;
+	bh=37vPV7z3GHny87sgA9pvUW5mM1Cy15dDQ648OmpjBCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y94wUfhUbsH2kCiWa/XwzecQPLGd8ty3iHhuy2AhPZLM4fVujVKpkvIVMosa+HtqevSdnWjhlwQPHF/GfOYILNBGaMA9EWnbvmdlT/kDuMnFl2oBpmK2mCQRRjOIBiaSn+LYiVL5Ow+fNUv3t0p1IIwlRQCxBZxQ1AVioD/qsI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e09i9gPP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90653C4CECC;
+	Thu, 24 Oct 2024 13:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729776449;
+	bh=37vPV7z3GHny87sgA9pvUW5mM1Cy15dDQ648OmpjBCk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e09i9gPPGGBv4VFvDk58dg3uNhL/EiQkVOMA3VkjWksThWr7w07lpIzymzNUVrwuk
+	 8cd/cTTy+TSHfNZpH5MIH4ynTrXFS/tPzGJIKiLN/eRIJ1ZxTqy/4/Iv84NxyeWNoi
+	 Ngah0VA4C8zhiCi0FZOZRSi4R2ovzZ9Bwl5v9jeIcWbRkG3ox6lIMPcJyaZws6gRvx
+	 FoTqLypRGwjhaBDxqe/3qAWM/8BighYF42fdSDPLoH/yvoSNRwoEjuzMiVdrhxaW0j
+	 A7OyRN6kuO0OhDALIzSVsCH/O+tbPEnCV6yiM3LPRLemZwKMcXgJcVlyYJnjKvdF/F
+	 hU0uLMLub8xHg==
+Message-ID: <a1528ced-930c-4e5d-91e6-6be5f5363e8d@kernel.org>
+Date: Thu, 24 Oct 2024 15:27:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="64dUHzb4GG9D5Dkz"
-Content-Disposition: inline
-In-Reply-To: <20241023041203.35313-1-leocstone@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 03/13] dt-bindings: net: add bindings for NETC
+ blocks control
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+ "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ Frank Li <frank.li@nxp.com>,
+ "christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+ "bhelgaas@google.com" <bhelgaas@google.com>,
+ "horms@kernel.org" <horms@kernel.org>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "alexander.stein@ew.tq-group.com" <alexander.stein@ew.tq-group.com>
+References: <20241022055223.382277-1-wei.fang@nxp.com>
+ <20241022055223.382277-4-wei.fang@nxp.com>
+ <xx4l4bs4iqmtgafs63ly2labvqzul2a7wkpyvxkbde257hfgs2@xgfs57rcdsk6>
+ <PAXPR04MB851034FDAC4E63F1866356B4884D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <f7064783-983a-44bd-a9db-fd20f4e50e33@kernel.org>
+ <PAXPR04MB85101A3DFF08F8C8DD7513F8884D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <PAXPR04MB85101A3DFF08F8C8DD7513F8884D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 23/10/2024 12:03, Wei Fang wrote:
+>> -----Original Message-----
+>> From: Krzysztof Kozlowski <krzk@kernel.org>
+>> Sent: 2024年10月23日 16:56
+>> To: Wei Fang <wei.fang@nxp.com>
+>> Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+>> pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org;
+>> conor+dt@kernel.org; Vladimir Oltean <vladimir.oltean@nxp.com>; Claudiu
+>> Manoil <claudiu.manoil@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>;
+>> Frank Li <frank.li@nxp.com>; christophe.leroy@csgroup.eu;
+>> linux@armlinux.org.uk; bhelgaas@google.com; horms@kernel.org;
+>> imx@lists.linux.dev; netdev@vger.kernel.org; devicetree@vger.kernel.org;
+>> linux-kernel@vger.kernel.org; linux-pci@vger.kernel.org;
+>> alexander.stein@ew.tq-group.com
+>> Subject: Re: [PATCH v4 net-next 03/13] dt-bindings: net: add bindings for NETC
+>> blocks control
+>>
+>> On 23/10/2024 10:18, Wei Fang wrote:
+>>>>> +maintainers:
+>>>>> +  - Wei Fang <wei.fang@nxp.com>
+>>>>> +  - Clark Wang <xiaoning.wang@nxp.com>
+>>>>> +
+>>>>> +properties:
+>>>>> +  compatible:
+>>>>> +    enum:
+>>>>> +      - nxp,imx95-netc-blk-ctrl
+>>>>> +
+>>>>> +  reg:
+>>>>> +    minItems: 2
+>>>>> +    maxItems: 3
+>>>>
+>>>> You have one device, why this is flexible? Device either has exactly
+>>>> 2 or exactly 3 IO spaces, not both depending on the context.
+>>>>
+>>>
+>>> There are three register blocks, IERB and PRB are inside NETC IP, but
+>>> NETCMIX is outside NETC. There are dependencies between these three
+>>> blocks, so it is better to configure them in one driver. But for other
+>>> platforms like S32, it does not have NETCMIX, so NETCMIX is optional.
+>>
+>> But how s32 is related here? That's a different device.
+>>
+> 
+> The S32 SoC also uses the NETC IP, so this YAML should be compatible with
+> S32 SoC.
 
---64dUHzb4GG9D5Dkz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+What? How? Where is this compatible documented?
 
-On Tue, Oct 22, 2024 at 09:12:01PM -0700, Leo Stone wrote:
-> diff --git a/Documentation/networking/ieee802154.rst b/Documentation/netw=
-orking/ieee802154.rst
-> index c652d383fe10..743c0a80e309 100644
-> --- a/Documentation/networking/ieee802154.rst
-> +++ b/Documentation/networking/ieee802154.rst
-> @@ -72,7 +72,8 @@ exports a management (e.g. MLME) and data API.
->  possibly with some kinds of acceleration like automatic CRC computation =
-and
->  comparison, automagic ACK handling, address matching, etc.
-> =20
-> -Those types of devices require different approach to be hooked into Linu=
-x kernel.
-> +Each type of device requires a different approach to be hooked into the =
-Linux
-> +kernel.
-> =20
->  HardMAC
->  -------
-> @@ -81,10 +82,10 @@ See the header include/net/ieee802154_netdev.h. You h=
-ave to implement Linux
->  net_device, with .type =3D ARPHRD_IEEE802154. Data is exchanged with soc=
-ket family
->  code via plain sk_buffs. On skb reception skb->cb must contain additional
->  info as described in the struct ieee802154_mac_cb. During packet transmi=
-ssion
-> -the skb->cb is used to provide additional data to device's header_ops->c=
-reate
-> -function. Be aware that this data can be overridden later (when socket c=
-ode
-> -submits skb to qdisc), so if you need something from that cb later, you =
-should
-> -store info in the skb->data on your own.
-> +the skb->cb is used to provide additional data to the device's
-> +header_ops->create function. Be aware that this data can be overridden l=
-ater
-> +(when socket code submits skb to qdisc), so if you need something from t=
-hat cb
-> +later, you should store info in the skb->data on your own.
-> =20
->  To hook the MLME interface you have to populate the ml_priv field of your
->  net_device with a pointer to struct ieee802154_mlme_ops instance. The fi=
-elds
-> @@ -94,8 +95,9 @@ All other fields are required.
->  SoftMAC
->  -------
-> =20
-> -The MAC is the middle layer in the IEEE 802.15.4 Linux stack. This momen=
-t it
-> -provides interface for drivers registration and management of slave inte=
-rfaces.
-> +The MAC is the middle layer in the IEEE 802.15.4 Linux stack. At the mom=
-ent, it
-> +provides an interface for driver registration and management of slave
-> +interfaces.
-> =20
->  NOTE: Currently the only monitor device type is supported - it's IEEE 80=
-2.15.4
->  stack interface for network sniffers (e.g. WireShark).
+> Or do you mean when S32 NETC is supported, we then add restrictions
+> to the reg property for S32?
 
-Looks good, thanks!
+I don't know what you are creating here. That's a binding for one
+specific device (see writing bindings guideline).
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+Best regards,
+Krzysztof
 
---=20
-An old man doll... just what I always wanted! - Clara
-
---64dUHzb4GG9D5Dkz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZxpLDwAKCRD2uYlJVVFO
-o1vFAQDnS0KV+5nUy5e7/Rdht7dETYJjXfDQpb6+ahzJab1nigEA0BOTsZo43ARS
-SwdGkpmbt0o19oU+WpNnk+e5iDgIkww=
-=/eWu
------END PGP SIGNATURE-----
-
---64dUHzb4GG9D5Dkz--
 
