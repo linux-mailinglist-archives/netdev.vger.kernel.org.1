@@ -1,222 +1,132 @@
-Return-Path: <netdev+bounces-138677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9879AE83B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:20:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548B99AE7CA
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2823428C6F8
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:20:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8635B1C213F4
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE25621019C;
-	Thu, 24 Oct 2024 14:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RlzVxLe5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6201FC7D7;
+	Thu, 24 Oct 2024 14:07:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4531F76A1
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79191FBF7C;
+	Thu, 24 Oct 2024 14:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729778967; cv=none; b=o52+JT/d4oUSuvwceAOaNF5mJTFIhWDEYAOX6Ij57/pkv/hNejECIIfrMabp70L6R+aczIv1QM1iaRrv7VpUkRaV8QMTvi4SzxDxoOe8qXImmKh40/vV800yCvVfsTjrpMv035fi6tKzgvCfqugk3TDKX19NWpjsvOgXJAA6MFc=
+	t=1729778834; cv=none; b=ZSuckltTAFj/8wUvg3xKJRl0Yf+f9yz8Ov6LGuQpIN+H/9mTorFcv48fXYjHAy9vbEvfeCye1QUfdUzl7pq9nGrsY2TVZq87hwEhRuF1j1cfYscrnrcnzy14JlVsT6coM/SXRuDDKJgjuIRA7ODNZK46J6ZYcAWBKgnxOF/GTr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729778967; c=relaxed/simple;
-	bh=N+5YMzhjte34sJ2ZxHb5KMVqJR+Nt220OsohG9E7/eU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i3eX26xRBse64zCyNZzKVhNreurLYY1YLVq6h1YGe++9Ptx/8Ts/Patut8LHPQ/HO73u1zPJNdVUq9QH/HoghMFQLVa9mizfOWuIwULEWP4jLxKmLm+EFqGkCYVBr7VkCBnJ5qXmEMxSyJO6EeuEZy3/fsyk7+XYsokjvY1nAck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RlzVxLe5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729778964;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iqdCYyLxV3eZI7xKPYjIcc90QP7ii8Dvz5lSTfzAmmU=;
-	b=RlzVxLe5QoXssqlpmk10xz8fRtsee58fm2UhWZ3whdfB516+cz7QdZvBHf+yvmh7NNmRbN
-	fqgSTab93srIy25rWkDF6VVvzVCxszsh5Jya1ofIeSfSJhnn14iU4s+K/kCjUR4sq34QJE
-	uoKRIgVA9fHX+sfE+FurhNtJu6hjTdg=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-608-RR6a9pwMNua986kgppA9xQ-1; Thu,
- 24 Oct 2024 10:09:19 -0400
-X-MC-Unique: RR6a9pwMNua986kgppA9xQ-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 032451955F3F;
-	Thu, 24 Oct 2024 14:09:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.231])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6260D195607C;
-	Thu, 24 Oct 2024 14:09:10 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 27/27] afs: Make afs_mkdir() locally initialise a new directory's content
-Date: Thu, 24 Oct 2024 15:05:25 +0100
-Message-ID: <20241024140539.3828093-28-dhowells@redhat.com>
-In-Reply-To: <20241024140539.3828093-1-dhowells@redhat.com>
-References: <20241024140539.3828093-1-dhowells@redhat.com>
+	s=arc-20240116; t=1729778834; c=relaxed/simple;
+	bh=5oWYLx/0d5NYFF42DuAHF/AodoqpP22D1jgieW8UBwY=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=s/ayykvfR/r1vvWyhnRBZT21fq+QA6h0tjV7J0Tbq0/tQsRege2IYZwYbrwsk6uwOMX+IytjcZzfanuLGZAOgwOWtm0zWI7fgLQmbpSHDUISs3uqCJxTzMRHDoDbwl6Gq90cKT3FLQtW86UiaLD586blRACfL4/wzjTO9L2p+DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XZ74R033tzQrhF;
+	Thu, 24 Oct 2024 22:06:15 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3471E1402E1;
+	Thu, 24 Oct 2024 22:07:08 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Oct 2024 22:07:06 +0800
+Message-ID: <b0f662b0-938e-43bd-a429-1da15e5a7361@huawei.com>
+Date: Thu, 24 Oct 2024 22:07:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/7] net: hibmcge: Add unicast frame filter
+ supported in this module
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20241023134213.3359092-1-shaojijie@huawei.com>
+ <20241023134213.3359092-4-shaojijie@huawei.com>
+ <d66c277b-ea1c-4c33-ab2e-8bd1a0400543@lunn.ch>
+ <c4d40afe-b48a-43da-be88-f7ee38dd720c@huawei.com>
+ <a7f38f53-848f-42c5-ad20-a453474a835a@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <a7f38f53-848f-42c5-ad20-a453474a835a@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-Initialise a new directory's content when it is created by mkdir locally
-rather than downloading the content from the server as we can predict what
-it's going to look like.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: linux-afs@lists.infradead.org
----
- fs/afs/dir.c               |  3 +++
- fs/afs/dir_edit.c          | 48 ++++++++++++++++++++++++++++++++++++++
- fs/afs/internal.h          |  1 +
- include/trace/events/afs.h |  2 ++
- 4 files changed, 54 insertions(+)
+on 2024/10/24 20:07, Andrew Lunn wrote:
+> On Thu, Oct 24, 2024 at 11:09:22AM +0800, Jijie Shao wrote:
+>> on 2024/10/23 22:05, Andrew Lunn wrote:
+>>>> +static int hbg_add_mac_to_filter(struct hbg_priv *priv, const u8 *addr)
+>>>> +{
+>>>> +	u32 index;
+>>>> +
+>>>> +	/* already exists */
+>>>> +	if (!hbg_get_index_from_mac_table(priv, addr, &index))
+>>>> +		return 0;
+>>>> +
+>>>> +	for (index = 0; index < priv->filter.table_max_len; index++)
+>>>> +		if (is_zero_ether_addr(priv->filter.mac_table[index].addr)) {
+>>>> +			hbg_set_mac_to_mac_table(priv, index, addr);
+>>>> +			return 0;
+>>>> +		}
+>>>> +
+>>>> +	if (!priv->filter.table_overflow) {
+>>>> +		priv->filter.table_overflow = true;
+>>>> +		hbg_update_promisc_mode(priv->netdev);
+>>>> +		dev_info(&priv->pdev->dev, "mac table is overflow\n");
+>>>> +	}
+>>>> +
+>>>> +	return -ENOSPC;
+>>> I _think_ this is wrong. If you run out of hardware resources, you
+>>> should change the interface to promiscuous mode and let the stack do
+>>> the filtering. Offloading it to hardware is just an acceleration,
+>>> nothing more.
+>>>
+>>> 	Andrew
+>> In hbg_update_promisc_mode():
+>> priv->filter.enabled = !(priv->filter.table_overflow || (netdev->flags & IFF_PROMISC));
+>> hbg_hw_set_mac_filter_enable(priv, priv->filter.enabled);
+>>
+>> if table_overflow， and netdev->flags not set IFF_PROMISC，
+>> the priv->filter.enabled will set to false， Then， The MAC filter will be closed.
+>> I think it's probably the same thing you said
+>>
+>> In this:
+>> +	if (!priv->filter.table_overflow) {
+>> +		priv->filter.table_overflow = true;
+>> +		hbg_update_promisc_mode(priv->netdev);
+>> +		dev_info(&priv->pdev->dev, "mac table is overflow\n");
+>> +	}
+>> +
+>> +	return -ENOSPC;
+>>
+>> When the first overflow occurs, a log is printed, the MAC filter will be disabled, and -ENOSPC is returned.
+>> If continue to add MAC addresses, -ENOSPC is returned only.
+> This is not obvious from a quick look at the code. Maybe a comment
+> would be good.
+>
+> 	Andrew
 
-diff --git a/fs/afs/dir.c b/fs/afs/dir.c
-index 87c5fb982e5b..c5b1008b302b 100644
---- a/fs/afs/dir.c
-+++ b/fs/afs/dir.c
-@@ -1270,6 +1270,7 @@ void afs_check_for_remote_deletion(struct afs_operation *op)
-  */
- static void afs_vnode_new_inode(struct afs_operation *op)
- {
-+	struct afs_vnode_param *dvp = &op->file[0];
- 	struct afs_vnode_param *vp = &op->file[1];
- 	struct afs_vnode *vnode;
- 	struct inode *inode;
-@@ -1289,6 +1290,8 @@ static void afs_vnode_new_inode(struct afs_operation *op)
- 
- 	vnode = AFS_FS_I(inode);
- 	set_bit(AFS_VNODE_NEW_CONTENT, &vnode->flags);
-+	if (S_ISDIR(inode->i_mode))
-+		afs_mkdir_init_dir(vnode, dvp->vnode);
- 	if (!afs_op_error(op))
- 		afs_cache_permit(vnode, op->key, vnode->cb_break, &vp->scb);
- 	d_instantiate(op->dentry, inode);
-diff --git a/fs/afs/dir_edit.c b/fs/afs/dir_edit.c
-index 28a966d2612d..c823497b9e25 100644
---- a/fs/afs/dir_edit.c
-+++ b/fs/afs/dir_edit.c
-@@ -556,3 +556,51 @@ void afs_edit_dir_update_dotdot(struct afs_vnode *vnode, struct afs_vnode *new_d
- 			   0, 0, 0, 0, "..");
- 	goto out;
- }
-+
-+/*
-+ * Initialise a new directory.  We need to fill in the "." and ".." entries.
-+ */
-+void afs_mkdir_init_dir(struct afs_vnode *dvnode, struct afs_vnode *parent_dvnode)
-+{
-+	union afs_xdr_dir_block *meta;
-+	struct afs_dir_iter iter = { .dvnode = dvnode };
-+	union afs_xdr_dirent *de;
-+	unsigned int slot = AFS_DIR_RESV_BLOCKS0;
-+	loff_t i_size;
-+
-+	i_size = i_size_read(&dvnode->netfs.inode);
-+	if (i_size != AFS_DIR_BLOCK_SIZE) {
-+		afs_invalidate_dir(dvnode, afs_dir_invalid_edit_add_bad_size);
-+		return;
-+	}
-+
-+	meta = afs_dir_get_block(&iter, 0);
-+	if (!meta)
-+		return;
-+
-+	afs_edit_init_block(meta, meta, 0);
-+
-+	de = &meta->dirents[slot];
-+	de->u.valid  = 1;
-+	de->u.vnode  = htonl(dvnode->fid.vnode);
-+	de->u.unique = htonl(dvnode->fid.unique);
-+	memcpy(de->u.name, ".", 2);
-+	trace_afs_edit_dir(dvnode, afs_edit_dir_for_mkdir, afs_edit_dir_mkdir, 0, slot,
-+			   dvnode->fid.vnode, dvnode->fid.unique, ".");
-+	slot++;
-+
-+	de = &meta->dirents[slot];
-+	de->u.valid  = 1;
-+	de->u.vnode  = htonl(parent_dvnode->fid.vnode);
-+	de->u.unique = htonl(parent_dvnode->fid.unique);
-+	memcpy(de->u.name, "..", 3);
-+	trace_afs_edit_dir(dvnode, afs_edit_dir_for_mkdir, afs_edit_dir_mkdir, 0, slot,
-+			   parent_dvnode->fid.vnode, parent_dvnode->fid.unique, "..");
-+
-+	afs_set_contig_bits(meta, AFS_DIR_RESV_BLOCKS0, 2);
-+	meta->meta.alloc_ctrs[0] -= 2;
-+	kunmap_local(meta);
-+
-+	netfs_single_mark_inode_dirty(&dvnode->netfs.inode);
-+	set_bit(AFS_VNODE_DIR_VALID, &dvnode->flags);
-+}
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index c7f0d75eab7f..3acf1445e444 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -1074,6 +1074,7 @@ extern void afs_edit_dir_add(struct afs_vnode *, struct qstr *, struct afs_fid *
- extern void afs_edit_dir_remove(struct afs_vnode *, struct qstr *, enum afs_edit_dir_reason);
- void afs_edit_dir_update_dotdot(struct afs_vnode *vnode, struct afs_vnode *new_dvnode,
- 				enum afs_edit_dir_reason why);
-+void afs_mkdir_init_dir(struct afs_vnode *dvnode, struct afs_vnode *parent_vnode);
- 
- /*
-  * dir_silly.c
-diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index 49a749672e38..020ab7302a6b 100644
---- a/include/trace/events/afs.h
-+++ b/include/trace/events/afs.h
-@@ -348,6 +348,7 @@ enum yfs_cm_operation {
- 	EM(afs_dir_invalid_edit_add_no_slots,	"edit-add-no-slots") \
- 	EM(afs_dir_invalid_edit_add_too_many_blocks, "edit-add-too-many-blocks") \
- 	EM(afs_dir_invalid_edit_get_block,	"edit-get-block") \
-+	EM(afs_dir_invalid_edit_mkdir,		"edit-mkdir") \
- 	EM(afs_dir_invalid_edit_rem_bad_size,	"edit-rem-bad-size") \
- 	EM(afs_dir_invalid_edit_rem_wrong_name,	"edit-rem-wrong_name") \
- 	EM(afs_dir_invalid_edit_upd_bad_size,	"edit-upd-bad-size") \
-@@ -369,6 +370,7 @@ enum yfs_cm_operation {
- 	EM(afs_edit_dir_delete_error,		"d_err ") \
- 	EM(afs_edit_dir_delete_inval,		"d_invl") \
- 	EM(afs_edit_dir_delete_noent,		"d_nent") \
-+	EM(afs_edit_dir_mkdir,			"mk_ent") \
- 	EM(afs_edit_dir_update_dd,		"u_ddot") \
- 	EM(afs_edit_dir_update_error,		"u_fail") \
- 	EM(afs_edit_dir_update_inval,		"u_invl") \
+ok, Thanks!
+
 
 
