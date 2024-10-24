@@ -1,105 +1,128 @@
-Return-Path: <netdev+bounces-138688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515AB9AE8FE
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:34:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1C59AE8E0
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:32:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A773B27946
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:30:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE163B276FC
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2E01E765B;
-	Thu, 24 Oct 2024 14:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074381F5831;
+	Thu, 24 Oct 2024 14:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E4MTcwgh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ft92kQfV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40371B393E;
-	Thu, 24 Oct 2024 14:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA3A1F5837;
+	Thu, 24 Oct 2024 14:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729780068; cv=none; b=YlaV8x1qpnzrOWN/g5JgO7moXdlHUoT4eEW2ZQYxd5koVIhYGyk6Nn5LMFhtXzfd9jcSsJ8hQ6JmgwyZLBLRHsjVie5EPG49OjslfvwfQKk2WBPEEPwSSgMAtlSKbbKS1g4zOAm1hUqdeLHL9f2fPbTyMgkoCIGi3lfu1MyFAdM=
+	t=1729780085; cv=none; b=ssF0h7WQiF813v/GEqe6UldCJNle+jTQuyzbfjQWIelMNHsRlDpqexT0FvcZ/58lTmIQ78zneZPx65Fr3R4up0v3xYhsZ/+Sg3titGV+eFKe7p77+p1qr6tEdi3NmCZ9FjHEC3sYWKqv30kT0GjmLvritCTtEzEoJEXZfl4uCrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729780068; c=relaxed/simple;
-	bh=J2+aXeLl5DWdt6WEQwAIXdlYTgr0+J1Z9HBQ4zDYOf4=;
+	s=arc-20240116; t=1729780085; c=relaxed/simple;
+	bh=0kRGC0VMT8PExSwlsH5fR6XLTGLcI9KDWObMnFj6wz0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tPu9viEeSVEXsY2yFRYr908QUgPfoAExE0YTgiBCm9+Id/+rFmS4d3gWfug6zNxF5y6IMsuhs/gYQcdgMESWFJZtCe/movGgHGmTsvVz59xe9fKu38Ewn18ELVP7JjcAYqY3DtH01wiMmHXC3FmeUou699KyCJ5fLUA9XrzX2nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E4MTcwgh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UPDtZCWQSXIyqEMMrOFW3RSbg7kYcGlFgSFOZvcOZkQ=; b=E4MTcwgh3meIWxKHk8/zFQAyRy
-	0/AG0XD2Q+OitRy3tLK8anp/ixmgrLDDV08JWDCJJek0VEe7Nx8aov4ejrvKXiJk1Ebg2nIWSanZn
-	DCiYbyqyZs0AU2itOf4K4tzh7u/uwGYw/26falcJ7g0+sPgL+aLOKJLlo0UcxXqOnLTQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t3yoF-00B8MN-RV; Thu, 24 Oct 2024 16:27:31 +0200
-Date: Thu, 24 Oct 2024 16:27:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
-	arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com,
-	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	"Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
-	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
-Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
-Message-ID: <28409cbc-09c8-4c88-b11e-2c46457c9e8e@lunn.ch>
-References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
- <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
- <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
- <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
- <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
- <ba1bf2a6-76b7-4e82-b192-86de9a8b8012@quicinc.com>
- <7b5227fc-0114-40be-ba5d-7616cebb4bf9@lunn.ch>
- <641f830e-8d21-4bc0-abe2-59e2c4d29b92@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SRIUM04j4T3kko3z9Ox10KgNY6wI08yozxxYqubanR1FYbyVJsPaeE/W1SzBeahD1SHOWGb24JJ2nd0mrVVAw2VGgcWB7Kr/YWVFUA3xSyZXGxJhYPW09de3Un0Td8RxewHmFt2rspYYctNcl5MH5FMG2TloiNEuCIBM5GluMGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ft92kQfV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F2EDC4CEE3;
+	Thu, 24 Oct 2024 14:28:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729780085;
+	bh=0kRGC0VMT8PExSwlsH5fR6XLTGLcI9KDWObMnFj6wz0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ft92kQfVqLRg9/dwH3WJ4uqFDupkRlaeyBaTa/WeY+vszDQjwH4NYOLnTTnMj8dbo
+	 0bt5QUKZxrzjEYGys1h+2/H/gZiw36OXKE8phv1ccC04YRBp7m8ByXrtkgkJ4j03jS
+	 2ckJcZgYPKc9ejakqf70KgRWyp1zOMiyF1ZS8NHjWSZV4a4hIIyJi7B7aoN/jwOUP0
+	 MBrYxMSOUajnWJBZGrBTBLhjDSenhLTHDjevlB/J6BkA0Ya3y2ys/aKNJN1/I/B/k5
+	 A5fEzCaBmAAsLSvhrqaJoj77rB0tLCijd/pvgHUZ+Jwi4SYP3opqxFxxdKhJPvTkem
+	 ujfalPiQhYlwQ==
+Date: Thu, 24 Oct 2024 10:28:03 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com, kees@kernel.org,
+	mpe@ellerman.id.au, broonie@kernel.org
+Subject: Re: [GIT PULL] Networking for v6.12-rc5
+Message-ID: <ZxpZcz3jZv2wokh8@sashalap>
+References: <20241024140101.24610-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <641f830e-8d21-4bc0-abe2-59e2c4d29b92@quicinc.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241024140101.24610-1-pabeni@redhat.com>
 
-> > I'm just wondering if you have circular dependencies at runtime?
-> > 
-> > Where you will need to be careful is probe time vs runtime. Since you
-> > have circular phandles you need to first create all the clock
-> > providers, and only then start the clock consumers. Otherwise you
-> > might get into an endless EPROBE_DEFER loop.
-> > 
-> 
-> The Rx/Tx clocks sourced from the SERDES are registered as provider
-> clocks by the UNIPHY/PCS driver during probe time. There is no runtime
-> operation needed for these clocks after this.
+Sorry for the spam below, this is another attempt to solicit feedback to
+the -next analysis tools that a few of us were working on.
 
-So they are always ticking. You cannot turn them on/off? It is nice to
-model them a fixed-clocks, since it describes the architecture, but i
-have to question if it is worth the effort.
+Bigger changes since the last attempt:
 
-	Andrew
+   - Count calendar days rather than number of tags for the histogram.  
+   - Make histogram more concise when possible (the below is *not* a good
+     example of the new functionality).
+   - Add more statistics to the report.
+
+On Thu, Oct 24, 2024 at 04:01:01PM +0200, Paolo Abeni wrote:
+>Hi Linus!
+>
+>Oddily this includes a fix for posix clock regression; in our previous PR
+>we included a change there as a pre-requisite for networking one.
+>Such fix proved to be buggy and requires the follow-up included here.
+>Thomas suggested we should send it, given we sent the buggy patch.
+>
+>The following changes since commit 07d6bf634bc8f93caf8920c9d61df761645336e2:
+>
+>  Merge tag 'net-6.12-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-10-17 09:31:18 -0700)
+>
+>are available in the Git repository at:
+>
+>  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.12-rc5
+
+Days in linux-next:
+----------------------------------------
+  0 | █████████████████████████████████████████████████ (14)
+  1 | ███████ (2)
+  2 | █████████████████████ (6)
+  3 | ██████████████████████████████████████████ (12)
+  4 |
+  5 |
+  6 | ███ (1)
+  7 |
+  8 | ███ (1)
+  9 |
+10 |
+11 |
+12 |
+13 |
+14+| ██████████████ (4)
+
+Commits with 0 days in linux-next (14 of 40: 35.0%):
+--------------------------------
+3e65ede526cf4 net: dsa: mv88e6xxx: support 4000ps cycle counter period
+7e3c18097a709 net: dsa: mv88e6xxx: read cycle counter period from hardware
+67af86afff74c net: dsa: mv88e6xxx: group cycle counter coefficients
+64761c980cbf7 net: usb: qmi_wwan: add Fibocom FG132 0x0112 composition
+4c262801ea60c hv_netvsc: Fix VF namespace also in synthetic NIC NETDEV_REGISTER event
+ee76eb24343bd net: dsa: microchip: disable EEE for KSZ879x/KSZ877x/KSZ876x
+246b435ad6685 Bluetooth: ISO: Fix UAF on iso_sock_timeout
+1bf4470a3939c Bluetooth: SCO: Fix UAF on sco_sock_timeout
+989fa5171f005 Bluetooth: hci_core: Disable works on hci_unregister_dev
+6e62807c7fbb3 posix-clock: posix-clock: Fix unbalanced locking in pc_clock_settime()
+10ce0db787004 r8169: avoid unsolicited interrupts
+b22db8b8befe9 net: sched: use RCU read-side critical section in taprio_dump()
+f504465970aeb net: sched: fix use-after-free in taprio_change()
+34d35b4edbbe8 net/sched: act_api: deny mismatched skip_sw/skip_hw flags for actions created by classifiers
+
+-- 
+Thanks,
+Sasha
 
