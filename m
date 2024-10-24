@@ -1,201 +1,184 @@
-Return-Path: <netdev+bounces-138773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937909AECED
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:59:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D7529AED00
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:00:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A4B21F24A12
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:59:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D38931F21F51
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4A81FAEE9;
-	Thu, 24 Oct 2024 16:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABED1F9EB5;
+	Thu, 24 Oct 2024 16:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="cxBTxKea";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cbGlugOU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cr3i/Xle"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E8A1F8195;
-	Thu, 24 Oct 2024 16:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899BD1F76BF;
+	Thu, 24 Oct 2024 16:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729789150; cv=none; b=VdMEWgS5pqpRWunJyPmNpFJC1sjbmN6NyH5uEhTY9ZfhvKmZOQ2S3TSCe/agoDyR6t+sYqBNwC5vIlydTI0RnKv+rjdqCFhT0Wq73D1ncmcR7B9/QkzZCh2zgkmzEJvSQFpYeyk7vQ1vwbyVyEhghfQhcvB0YRCJnNsPFMdkdSY=
+	t=1729789182; cv=none; b=fNkiwc7KWqTnZSSNR2qZPN9QTZF+68RAwYUKuggca1Q0JSDN67sTafIlgkg0Frav3uAlHAkhntGpdzPD5Dd2Kx2snUdQIkHdns9LaLeOtea6wh44C1ZELD4zr20zGn2ncdity/ac4w6h30rl18kIAH/FvYNOUS7pW6o8Pdq+Ir0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729789150; c=relaxed/simple;
-	bh=1D9MXsAVWcNpk072yB1qs3fINFV1pE9hhttXGeJgq0w=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=YBSaORGyiCSSumVHQY7wiwSHfqHY8DjcdJdf5V4yK7HEcit4lYHcCrwpbQVCKk/l5A9RyklPChTPoMyjTDiFmto1cLvgqlLL0GmL7B1PxERARj7EmhS+TbN5L8JdgKXAUlZHDjQzMzAXqAF+eS90plni0/yL0a1XX6LVr+HEmnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=cxBTxKea; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cbGlugOU; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 783C61140198;
-	Thu, 24 Oct 2024 12:59:06 -0400 (EDT)
-Received: from phl-imap-12 ([10.202.2.86])
-  by phl-compute-09.internal (MEProxy); Thu, 24 Oct 2024 12:59:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1729789146;
-	 x=1729875546; bh=SG3wwx+g/r6vJORvVjNOrsa8CYeWjsvioBIcUqvZ0Gc=; b=
-	cxBTxKea8RPf2jlrM1D6wxexXn5vE6Xj//laaXmXFjCGxWbPu6xANhQbzZ5QoL0E
-	ixToHxmhkxEGpzLv7BjCXUn2OTgnKH04lfOnY2B+CD2PW9vQgfkA8WtsI3UP62E9
-	8RcBwxeTXFHzDv+LJvsG8fhJyLCU6YD2ejjfKB++MLgPCFBfN2DqWq9ZvyKIiv8p
-	F1uJDciPNrkuiWKgYFtEJSKTgf67Nr7aScnqXE47Hi0Et0olBmdZSBlC6gaGeLpD
-	JTR8/WStnKExjJD826l+H/IxpkHEdgNadk+OJ26bZyVlYZCPsYsWsv2WU/803W4X
-	C3OjUor3j17hDFuxKVdTVg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1729789146; x=
-	1729875546; bh=SG3wwx+g/r6vJORvVjNOrsa8CYeWjsvioBIcUqvZ0Gc=; b=c
-	bGlugOUXH5ZBeyeaY5Oezi+nuczo7orALTFLPa/uZ7myChfORdcCuRMKjj1Cn2dS
-	YuEGubMQ+5eApaNSjFIRU9XGJ2zNWQFM4xtb4SnXLC+PtVHnVthS8J4/5+o0w9hO
-	WuQtY9VrzR212nLOfd2C2GRf31hDEILaQZXUoPSRt1BXNAWsMSfP4LSPfsBWaTVv
-	7phmzfDkz4I3eKvm4fNgbdP5HpjL8MM27fUq2IzfSoi52Anb0l/IQRZK90cDvIjm
-	+2FKZt2z43RNyk1qK0FKEu3W0MD/pUkHGzEi/uXIOz58qlYNpdPMPOTMoWWnWAG4
-	cIaiojrVQzfcLvHGesJ8A==
-X-ME-Sender: <xms:2nwaZ9di9pcf1ltxSDIdzKw-YZloXhGxo1-8dJROD8pMbiUkMruhuA>
-    <xme:2nwaZ7Nb3-hStk1NEJEIEYiNuG0yt11T1Y2hK1Z6h-QJaGJ6LPVgoU2g9JBzsmNYh
-    P6OqMhV3UakBUkgPVM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejtddgkeduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedflfhirgiguhhnucgjrghnghdfuceojhhirgiguhhnrdihrghnghesfh
-    hlhihgohgrthdrtghomheqnecuggftrfgrthhtvghrnhepjeehfeduvddtgffgvdffkeet
-    hefhlefgvdevvdekuefffeekheehgeevhfevteejnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgr
-    thdrtghomhdpnhgspghrtghpthhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpth
-    htoheplhhinhhugidqshhpihesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:2nwaZ2g14Y01JmG-33WPQCjxC3JPyDQnpJ43p21zYZSOdaLsUaXOPw>
-    <xmx:2nwaZ2-Zom9-ZlISL8yiAminBt1FT0kNBPP5bnKWzLZtQxZAU9B-NA>
-    <xmx:2nwaZ5vSrI7WdW3RUNEFaMHpwUODsoQQaB6drPUgSmDNacOqpMnF9A>
-    <xmx:2nwaZ1GKlxbdiEQ_UKAIUG_Pp5B2CkL1lzP1gTK7ypoYoD77w-KUNg>
-    <xmx:2nwaZ6XDo5rKPgHgtwIoNTBEoGd_7cON6yTSVNLZ5qlZMpakkq3Qj5x2>
-Feedback-ID: ifd894703:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 37E8F1C20066; Thu, 24 Oct 2024 12:59:06 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1729789182; c=relaxed/simple;
+	bh=hijoaAkA0Q1vuwuxsDMLMH0T3wTBuF66RCAzz/8HohY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nj9nYXaIhWGCawFt7Ku2HZPl5ReamFlDdg64yMM3cPzCAIgNeJMq183i86vKhXI+rjl5euOJ+eZtCQheOck3533R3ERSQHejC9flLIYTMvAd9X7Sg3si2JHMfQS82tiTNLwqPKGnxCyNRDCfbalQlOhxtqtIjJzNS6VjQp8pSxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cr3i/Xle; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-37d4c482844so762391f8f.0;
+        Thu, 24 Oct 2024 09:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729789179; x=1730393979; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Gu2G2lobjatrPbeH6vXaNXTLwzS6HsUqu9OMwxk35RI=;
+        b=cr3i/XleggF7hadYk/4UABFruZr4xWeuY61LG04ECjJlf4MAnkmxgqBgnllm1ts9nZ
+         CKu7sa5ZNOqigJSq1Ju/OBDC3kiVG+3gDKF/bp+w2I8/zMvxJyKT5WJAlpLvFjf8ThDO
+         uvo2rnFe8Tzf7HWWdWRAoGCGSLkE46shQ91xzrzursAsswFfkOWSG/fjOe3pdGTtu66/
+         akq7g6jJYRixREmSAAL2/x80Lm6iKmm7XdikNtG3FxzqTIaw/8hF9D4/4QkmLacYhh4T
+         6NhySPFLgEJN0pdTWdEqcIhJW2SVbOnilHjmGUGklkkM2cwDmpPyeaAkUH+M8eFNH+8j
+         J54Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729789179; x=1730393979;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gu2G2lobjatrPbeH6vXaNXTLwzS6HsUqu9OMwxk35RI=;
+        b=IQk82q+FxvG6qGC8NRmw1+zxZD2MokQK53m9AT3RGXv3auxITR9yb3G9lDt/XDYs3K
+         9HqCnpDjPBYSJiTk+XvaKnvsZ4+rMSrX7SWYBgx1nkWBJleMRNgVev0hWVMoNIEyvxKD
+         Uo29hYeuS1wyTcs3l8IaewrRPLHD9jRILczGOMTgJEd6+cG1bkQUcmIPdgzpeRUiJMkn
+         HZnkSh04UDWVpzn5yZ2okZKme5dt/6FOjIWW8atoXOP3bnCgoZULWEfMSmYxWsKmD1Ld
+         2li3XShUbGaEcObvhTf2ZDpLq4GAMroZQp//Nbf3zHwa/aDbAaVlqKBnd6BBcoRtkji0
+         Pkmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTs3qeA9lpcwrzXmkT/52cgKq0FpWQHwD3afoeoCH6FGwj7gGyV7szTUKOxIl0sd/v7SFoqTkLrYXH0Q==@vger.kernel.org, AJvYcCVW1hMDXCQp746iARew0lvNnD7g7sGHxy/iLA5Z0dFfuKlDC8xSZAvPVAcggeURgTXWeD1tum6loHxHTP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0Xc7fRge65iTDus0aqaktZtNK9cSXHhgi4Z7hxg4dhNDl131e
+	EYOAW/9yAt7EoOJXDv27CjZ7kXIQ/KEdIhSHcIhngQzBCKw44KcZ
+X-Google-Smtp-Source: AGHT+IFB2OdRP4GkB6KDaGovcRDbtaEcBs0vVOwofPqhFV1VR5HWfkL9vlgZb/5+swBXv7WdGH4XYQ==
+X-Received: by 2002:adf:cd0a:0:b0:37d:5436:4a1 with SMTP id ffacd0b85a97d-3803ac84467mr1940093f8f.3.1729789178251;
+        Thu, 24 Oct 2024 09:59:38 -0700 (PDT)
+Received: from [172.27.21.144] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a5b7afsm11753362f8f.59.2024.10.24.09.59.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2024 09:59:37 -0700 (PDT)
+Message-ID: <469dfbf5-4b5f-4457-8f88-f180b2c3a8ae@gmail.com>
+Date: Thu, 24 Oct 2024 19:59:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 24 Oct 2024 17:58:45 +0100
-From: "Jiaxun Yang" <jiaxun.yang@flygoat.com>
-To: "James Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Serge Semin" <fancer.lancer@gmail.com>, "Jon Mason" <jdmason@kudzu.us>,
- "Dave Jiang" <dave.jiang@intel.com>, "Allen Hubbe" <allenbh@gmail.com>,
- ntb@lists.linux.dev, "Andy Shevchenko" <andy@kernel.org>,
- "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
- "Kory Maincent" <kory.maincent@bootlin.com>,
- "Cai Huoqing" <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
- "Mark Brown" <broonie@kernel.org>, linux-spi@vger.kernel.org,
- "Damien Le Moal" <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
- "paulburton@kernel.org" <paulburton@kernel.org>,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
- "Arnd Bergmann" <arnd@arndb.de>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Manivannan Sadhasivam" <manivannan.sadhasivam@linaro.org>,
- "Yoshihiro Shimoda" <yoshihiro.shimoda.uh@renesas.com>,
- linux-pci <linux-pci@vger.kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Andrew Lunn" <andrew@lunn.ch>, "Russell King" <linux@armlinux.org.uk>,
- "Vladimir Oltean" <olteanv@gmail.com>,
- "Kelvin Cheung" <keguang.zhang@gmail.com>,
- "Yanteng Si" <siyanteng@loongson.cn>, netdev@vger.kernel.org,
- "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk@kernel.org>,
- "Guenter Roeck" <linux@roeck-us.net>, linux-hwmon@vger.kernel.org,
- "Borislav Petkov" <bp@alien8.de>, linux-edac@vger.kernel.org,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- linux-serial@vger.kernel.org
-Cc: "Andrew Halaney" <ajhalaney@gmail.com>, "Nikita Travkin" <nikita@trvn.ru>,
- "Ivan Kokshaysky" <ink@jurassic.park.msu.ru>,
- "Alexander Shiyan" <shc_work@mail.ru>, "Dmitry Kozlov" <xeb@mail.ru>,
- "Sergey Shtylyov" <s.shtylyov@omp.ru>,
- "Evgeniy Dushistov" <dushistov@mail.ru>,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Sergio Paracuellos" <sergio.paracuellos@gmail.com>,
- "Nikita Shubin" <nikita.shubin@maquefel.me>,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <2f203b14-be13-4eef-bcb1-743dd9e9e9bd@app.fastmail.com>
-In-Reply-To: 
- <f90bba20e86dac698472d686be7ec565736adca0.camel@HansenPartnership.com>
-References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
- <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
- <753d203a-a008-4cd3-b053-38b5ce31281b@app.fastmail.com>
- <f90bba20e86dac698472d686be7ec565736adca0.camel@HansenPartnership.com>
-Subject: Re: linux: Goodbye from a Linux community volunteer
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mlx5: simplify EQ interrupt polling logic
+To: Caleb Sander Mateos <csander@purestorage.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241023205113.255866-1-csander@purestorage.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20241023205113.255866-1-csander@purestorage.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-=E5=9C=A82024=E5=B9=B410=E6=9C=8824=E6=97=A5=E5=8D=81=E6=9C=88 =E4=B8=8B=
-=E5=8D=885:27=EF=BC=8CJames Bottomley=E5=86=99=E9=81=93=EF=BC=9A
-> On Thu, 2024-10-24 at 16:59 +0100, Jiaxun Yang wrote:
-[...]
+On 23/10/2024 23:51, Caleb Sander Mateos wrote:
+> Use a while loop in mlx5_eq_comp_int() and mlx5_eq_async_int() to
+> clarify the EQE polling logic. This consolidates the next_eqe_sw() calls
+> for the first and subequent iterations. It also avoids a goto. Turn the
+> num_eqes < MLX5_EQ_POLLING_BUDGET check into a break condition.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/eq.c | 22 +++++++-------------
+>   1 file changed, 8 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> index 68cb86b37e56..859dcf09b770 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> @@ -114,15 +114,11 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+>   	struct mlx5_eq *eq = &eq_comp->core;
+>   	struct mlx5_eqe *eqe;
+>   	int num_eqes = 0;
+>   	u32 cqn = -1;
+>   
+> -	eqe = next_eqe_sw(eq);
+> -	if (!eqe)
+> -		goto out;
+> -
+> -	do {
+> +	while ((eqe = next_eqe_sw(eq))) {
+>   		struct mlx5_core_cq *cq;
+>   
+>   		/* Make sure we read EQ entry contents after we've
+>   		 * checked the ownership bit.
+>   		 */
+> @@ -140,13 +136,14 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+>   					    "Completion event for bogus CQ 0x%x\n", cqn);
+>   		}
+>   
+>   		++eq->cons_index;
+>   
+> -	} while ((++num_eqes < MLX5_EQ_POLLING_BUDGET) && (eqe = next_eqe_sw(eq)));
+> +		if (++num_eqes >= MLX5_EQ_POLLING_BUDGET)
+> +			break;
+> +	}
+>   
+> -out:
+>   	eq_update_ci(eq, 1);
+>   
+>   	if (cqn != -1)
+>   		tasklet_schedule(&eq_comp->tasklet_ctx.task);
+>   
+> @@ -213,15 +210,11 @@ static int mlx5_eq_async_int(struct notifier_block *nb,
+>   	eqt = dev->priv.eq_table;
+>   
+>   	recovery = action == ASYNC_EQ_RECOVER;
+>   	mlx5_eq_async_int_lock(eq_async, recovery, &flags);
+>   
+> -	eqe = next_eqe_sw(eq);
+> -	if (!eqe)
+> -		goto out;
+> -
+> -	do {
+> +	while ((eqe = next_eqe_sw(eq))) {
+>   		/*
+>   		 * Make sure we read EQ entry contents after we've
+>   		 * checked the ownership bit.
+>   		 */
+>   		dma_rmb();
+> @@ -229,13 +222,14 @@ static int mlx5_eq_async_int(struct notifier_block *nb,
+>   		atomic_notifier_call_chain(&eqt->nh[eqe->type], eqe->type, eqe);
+>   		atomic_notifier_call_chain(&eqt->nh[MLX5_EVENT_TYPE_NOTIFY_ANY], eqe->type, eqe);
+>   
+>   		++eq->cons_index;
+>   
+> -	} while ((++num_eqes < MLX5_EQ_POLLING_BUDGET) && (eqe = next_eqe_sw(eq)));
+> +		if (++num_eqes >= MLX5_EQ_POLLING_BUDGET)
+> +			break;
+> +	}
+>   
+> -out:
+>   	eq_update_ci(eq, 1);
+>   	mlx5_eq_async_int_unlock(eq_async, recovery, &flags);
+>   
+>   	return unlikely(recovery) ? num_eqes : 0;
+>   }
 
-Hi James,
+LGTM.
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
->
-> It's Linux, so no official capacity at all.  However, I am expressing
-> the views of a number of people I talked to but it's not fair of me to
-> name them.
-
-Fair enough, I was hoping that it's from Linux Foundation but it's still
-good news to me that it do represent some respectful individuals.
-
->
-[...]
->> How should we handle it?
->
-> A big chunk of the reason it's taken so long just to get the above is
-> that the Lawyers (of which I'm not one) are still discussing the
-> specifics and will produce a much longer policy document later, so they
-> don't want to be drawn into questions like this.  However, my non-
-> legal-advice rule of thumb that I'm applying until I hear otherwise is
-> not on the SDN list, not a problem.
-
-Thank you for sharing your insights. I'm looking forward to the document.
-
-While I remain quite upset about how things were handled, your message h=
-as
-helped restore some of my confidence in the community.
-
-I agree with Peter Cai's earlier comment that steps should be taken to a=
-ddress
-the harm caused by the initial reckless actions, particularly to those w=
-ho were
-humiliated.
-
-It is also important to put measures in place to prevent such drama from=
- recurring.
-A formal procedure for handling urgent compliance requests may be a sens=
-ible step
-forward.
-
-I hold our community in high regard and would be heartbreaking to see th=
-e reputation
-of the Linux Kernel undermined in such an unfortunate manner. I would ap=
-preciate it
-if you could convey those thoughts to the relevant individuals.
-
-Thanks
->
-> James
-
---=20
-- Jiaxun
+Thanks.
 
