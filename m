@@ -1,239 +1,145 @@
-Return-Path: <netdev+bounces-138715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC489AE9FA
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:11:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 727A99AE9FD
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFE141C24F31
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:11:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 924FAB25B25
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AD71E766C;
-	Thu, 24 Oct 2024 15:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7981EF927;
+	Thu, 24 Oct 2024 15:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="R6UGdaQO"
+	dkim=pass (2048-bit key) header.d=gmx.fr header.i=benoit.monin@gmx.fr header.b="goYxWV3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7967B1D86C0;
-	Thu, 24 Oct 2024 15:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C391EC01D;
+	Thu, 24 Oct 2024 15:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729782691; cv=none; b=VTyGXv0OwzhC7yZ3RZriAZR8Ig4cMqmMu1ncenijld7pfNMV9eX54mXZra2mKbMMZtRgeAhvncdHBoBO5U4Ry6Y9gPFPEEHejLmtuaSOtPyDZblML/PUF5bjtr7esQQnNnwjWI9buPErYT74tq/6CUo1JvjLXVBevVJ1vM0DYaU=
+	t=1729782697; cv=none; b=KDYHqNRKy4YeODSxCOz12kN9MEWZmIyr3mKsTetB6CguQclGtVxLjVKFuXM8Sd/GGiuQBseeYRqr9uuzpGMaPx3JPkTCHhcB9VeN7WipJI8s3qmhQbUp3kP+56i/ncCHfx53/MIC/hyBmhShN9Vkjmmq/JOnCUXJjUBB0RtIPcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729782691; c=relaxed/simple;
-	bh=a3TyFKV8bQ2C8AsfpldZwdswGP6i35LA5XbAJ7NzHjs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kO8PTsRzBw2bdWpXeeFXSIl/018obda0tu+nBW49qw0M0e3KU2Y+2xWU5X50VsJXMk3NQJlNuRZtYWbV2BEB88p5vrZfOtdvMRWFtzULc3Mz4TPQc2+LA1lJ8jJFyL+CQozSH888DTZbnCq14zxa3acayqGy2asjyJq/SM6e0hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=R6UGdaQO; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49OFAcd0051743;
-	Thu, 24 Oct 2024 10:10:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1729782638;
-	bh=Lx0RGIhvjGwcm6FPAAxd+CivzPqBmE5HANWs11llh7w=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=R6UGdaQO9DZCB7vWxWzLoZ+4H0Dy5Q55in+6fHw3vssJT7047rifKDXQsey2V2pTN
-	 vQKh8/aFREz8Pw5Vrwg+VmzVHq9o7CCAdPZLNybMrbsuoINi0XaFiRlS5vVjn97eir
-	 uy051Mx5xEtV4iVqoStmBVuXpOl8QDA4c0dVPU6M=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49OFAcfW032095
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 24 Oct 2024 10:10:38 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 24
- Oct 2024 10:10:38 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 24 Oct 2024 10:10:38 -0500
-Received: from [10.249.129.69] ([10.249.129.69])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49OFATsf028284;
-	Thu, 24 Oct 2024 10:10:30 -0500
-Message-ID: <d8cf61e5-2c56-4c48-9cf3-fd54754c3816@ti.com>
-Date: Thu, 24 Oct 2024 20:40:28 +0530
+	s=arc-20240116; t=1729782697; c=relaxed/simple;
+	bh=kupkq+e0iXwoyEx+Mu/kldwf8T6QO/wDfPkuWUHdpWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b38tGRfpejwHPQcBDz4ejvl9cyMp0A7uX0I8RiXEHGf75sSP8rzcYlKB98R97qT0XMSYGMVPz+tK9UmXwHlCxQvW9tzgKCCdOkmHCL8yvBoCaqpjcYmvnwoe1v4wXfjr7mb1+GepooGeQArOR8chzrp3l5gPPb1Na973BBd5c6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.fr; spf=pass smtp.mailfrom=gmx.fr; dkim=pass (2048-bit key) header.d=gmx.fr header.i=benoit.monin@gmx.fr header.b=goYxWV3v; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.fr;
+	s=s31663417; t=1729782676; x=1730387476; i=benoit.monin@gmx.fr;
+	bh=h5r7XlNzCKWUXlhx2b6D+ImaHyu9K2mtKbQlo6p47pE=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=goYxWV3v8zKbox0ZhWAeFTAV9qcOnLTw1PAK2ymprishR43fnggh86ry0ddK+v1e
+	 /KdheEkm4PZUOtRlMaEpkjeBmsPmEKLKJe5udqTbpl+BFVPc3PSEUT7fbQ1u9O4vC
+	 bgBnOTzXydiAiGg6C1hA9cvxQbwOGDS0ib/vpQ3YJpzBIdcUuBwX9/Fc6kwJjOD2l
+	 SdhEZHC7JXtRugEx3fXfa9ZEMFJRznqWW7u5rbojiEeEhnh3XE+1d/8onErtoQjzK
+	 7aNBvh7Jb1cq3nLFKuOaZVJ4nJkZISOsFO9uwVEiNWZKzUUTty7qGvA+OxCs4Bz3b
+	 WDxkR8ttXXlbewBexg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from pianobar.pianonet ([176.145.30.241]) by mail.gmx.net (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MXXyJ-1tOXSG3Yw3-00PNjA; Thu, 24
+ Oct 2024 17:11:15 +0200
+From: =?UTF-8?q?Beno=C3=AEt=20Monin?= <benoit.monin@gmx.fr>
+To: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?Beno=C3=AEt=20Monin?= <benoit.monin@gmx.fr>
+Subject: [PATCH] net: usb: qmi_wwan: add Quectel RG650V
+Date: Thu, 24 Oct 2024 17:11:13 +0200
+Message-ID: <20241024151113.53203-1-benoit.monin@gmx.fr>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/4] net: hsr: Add VLAN CTAG filter support
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        MD Danish Anwar
-	<danishanwar@ti.com>, <geliang@kernel.org>,
-        <liuhangbin@gmail.com>, <dan.carpenter@linaro.org>, <jiri@resnulli.us>,
-        <n.zhandarovich@fintech.ru>, <aleksander.lobakin@intel.com>,
-        <lukma@denx.de>, <horms@kernel.org>, <jan.kiszka@siemens.com>,
-        <diogo.ivo@siemens.com>, <shuah@kernel.org>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>
-CC: <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <m-malladi@ti.com>
-References: <20241024103056.3201071-1-danishanwar@ti.com>
- <20241024103056.3201071-3-danishanwar@ti.com>
- <6cd4d59d-b635-47a3-8207-c07a18603037@linux.dev>
-Content-Language: en-US
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <6cd4d59d-b635-47a3-8207-c07a18603037@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:SoRCAwhh/gT1I0eJpud+LzerQvoUSVq4SKYdpFyeNZ2ddxstT4h
+ M8yJitFp95yViOgHaYoeaLHaqY+Q+e4XO2isOLss+pcf1kPH4n6stvv6gx8mIMeKxcQ2J1o
+ SBfKf20Y/n9HilZ99PE+lkMScGXMu8UDUcOz5QKILeqEzK6L+6IlokLAhFTq7JwunS52e+M
+ QnQvCJ1L2XTR35jVsAVXQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:aS/qKiG/jn4=;ju14ffzvFIklat2khKgaHYdA3Vd
+ r74zdrPbaVrSVfu4uiESo6gppmha/+cCknsEBZtymEWPl8Y0ndOshGDe/ccXdkQRgeE86HWZ6
+ n/ETtorimTCUnowh2zSxvMZGT6tHUlj5uGgxqMapEU+q45Xai8NRqCSgunSKfGjE7f1IVfq4H
+ 2WWPVIWWE54sv54H32tBsXRPQI3O4ejBe0tpr3k5k0+iGMAudlK7r5BlVxUtMH3EdCQOXtYcH
+ A30dA3EAnN6nkBaltKt1oHHrq/lRrwYZ6u+nJ2sGpLcv+iRLhDntHLB5D7Rmbjn3jJl67scz6
+ t+eG+0voClLrYMZcKkhKObZZxXbE5vdPQtad3K96gm3vSHNdoEhLbQwr50vxtJkG65/aBspU9
+ XKOz7RedNJOY84uNVWNy+TE/3EN2Hm1I6NQ+KefiH5s21oS+KafrCZu1ptqYsInbSBMiYk0cF
+ tLqnYPn4Pv8e5eJCU8ZYFXtLtmJ6eC3I4uvLpt7e5BtcFVyrTEBtKPVhrxQ0JArv/mlDMTNRm
+ DR3FQzX7XRagywLG9XuDumORwkhRfDzNsVrr8e4bszWFjNOiHUUMu7viUhYpAz4C00Fl0SUQp
+ g8pYcrsCK2RjlQVRmav3YjgvlLUkx5oJvILUoiOuU57su1ANoD2WMCIBQ9hqZR+irTdrr2BEo
+ MMLtdPkILWq+qOoLnJuyuVFIX6cHdvpIl8nYILKSILVINYgEceeH7W75xrBk/fbD8oRTBkF6R
+ o5LIB+FHfJn2LwPo5umuD6Row4hGg5haHdR0e0o7SdIG/52JZjrUk5wxhftFA/Vmeo7f0+EXX
+ dr5rf3bbv5Ml0Mc/glzl3vZD67n002hTG3YpPR0EkQW68=
 
-Hi Vadim,
+Add support for Quectel RG650V which is based on Qualcomm SDX65 chip.
+The composition is DIAG / NMEA / AT / AT / QMI.
 
-On 10/24/2024 7:06 PM, Vadim Fedorenko wrote:
-> On 24/10/2024 11:30, MD Danish Anwar wrote:
->> From: Murali Karicheri <m-karicheri2@ti.com>
->>
->> This patch adds support for VLAN ctag based filtering at slave devices.
->> The slave ethernet device may be capable of filtering ethernet packets
->> based on VLAN ID. This requires that when the VLAN interface is created
->> over an HSR/PRP interface, it passes the VID information to the
->> associated slave ethernet devices so that it updates the hardware
->> filters to filter ethernet frames based on VID. This patch adds the
->> required functions to propagate the vid information to the slave
->> devices.
->>
->> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->>   net/hsr/hsr_device.c | 71 +++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 70 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
->> index 0ca47ebb01d3..ff586bdc2bde 100644
->> --- a/net/hsr/hsr_device.c
->> +++ b/net/hsr/hsr_device.c
->> @@ -515,6 +515,68 @@ static void hsr_change_rx_flags(struct net_device
->> *dev, int change)
->>       }
->>   }
->>   +static int hsr_ndo_vlan_rx_add_vid(struct net_device *dev,
->> +                   __be16 proto, u16 vid)
->> +{
->> +    struct hsr_port *port;
->> +    struct hsr_priv *hsr;
->> +    int ret = 0;
->> +
->> +    hsr = netdev_priv(dev);
->> +
->> +    hsr_for_each_port(hsr, port) {
->> +        if (port->type == HSR_PT_MASTER)
->> +            continue;
->> +
->> +        ret = vlan_vid_add(port->dev, proto, vid);
->> +        switch (port->type) {
->> +        case HSR_PT_SLAVE_A:
->> +            if (ret) {
->> +                netdev_err(dev, "add vid failed for Slave-A\n");
->> +                return ret;
->> +            }
->> +            break;
->> +
->> +        case HSR_PT_SLAVE_B:
->> +            if (ret) {
->> +                /* clean up Slave-A */
->> +                netdev_err(dev, "add vid failed for Slave-B\n");
->> +                vlan_vid_del(port->dev, proto, vid);
->> +                return ret;
->> +            }
->> +            break;
->> +        default:
->> +            break;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
-> 
-> This function doesn't match with hsr_ndo_vlan_rx_kill_vid().
-> vlan_vid_add() can potentially be executed for port->type
-> equals to HSR_PT_INTERLINK, but the result will be ignored. And
-> the vlan_vid_del() will never happen in this case. Is it desired
-> behavior? Maybe it's better to synchronize add/del code and refactor
-> error path to avoid coping the code?
-> 
+T:  Bus=3D02 Lev=3D01 Prnt=3D01 Port=3D03 Cnt=3D01 Dev#=3D  4 Spd=3D5000 M=
+xCh=3D 0
+D:  Ver=3D 3.20 Cls=3D00(>ifc ) Sub=3D00 Prot=3D00 MxPS=3D 9 #Cfgs=3D  1
+P:  Vendor=3D2c7c ProdID=3D0122 Rev=3D05.15
+S:  Manufacturer=3DQuectel
+S:  Product=3DRG650V-EU
+S:  SerialNumber=3Dxxxxxxx
+C:  #Ifs=3D 5 Cfg#=3D 1 Atr=3Da0 MxPwr=3D896mA
+I:  If#=3D 0 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3Dff Prot=3D30 Driver=
+=3Doption
+E:  Ad=3D01(O) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D81(I) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3D00 Prot=3D00 Driver=
+=3Doption
+E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+I:  If#=3D 2 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3D00 Prot=3D00 Driver=
+=3Doption
+E:  Ad=3D03(O) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D83(I) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D84(I) Atr=3D03(Int.) MxPS=3D  10 Ivl=3D9ms
+I:  If#=3D 3 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3D00 Prot=3D00 Driver=
+=3Doption
+E:  Ad=3D04(O) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D85(I) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D86(I) Atr=3D03(Int.) MxPS=3D  10 Ivl=3D9ms
+I:  If#=3D 4 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff Driver=
+=3Dqmi_wwan
+E:  Ad=3D05(O) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D87(I) Atr=3D02(Bulk) MxPS=3D1024 Ivl=3D0ms
+E:  Ad=3D88(I) Atr=3D03(Int.) MxPS=3D   8 Ivl=3D9ms
+Signed-off-by: Beno=C3=AEt Monin <benoit.monin@gmx.fr>
+=2D--
+ drivers/net/usb/qmi_wwan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The kill_vid / add_vid is not similar because during add_vid, if
-vlan_vid_add() succeeds for one port but fails for other, we need to
-delete it for the earlier port. We can only continue if vlan_vid_add()
-succeeds for both ports. That's the reason the switch case handling of
-add_vid can not match the same for kill_vid. Since cleanup of port is
-needed, it's not possible to synchronize add/kill code
-
-We only care about HSR_PT_SLAVE_A and HSR_PT_SLAVE_B here. So it's okay
-to ignore HSR_PT_INTERLINK. It's a desired behaviour here.
-
->> +
->> +static int hsr_ndo_vlan_rx_kill_vid(struct net_device *dev,
->> +                    __be16 proto, u16 vid)
->> +{
->> +    struct hsr_port *port;
->> +    struct hsr_priv *hsr;
->> +
->> +    hsr = netdev_priv(dev);
->> +
->> +    hsr_for_each_port(hsr, port) {
->> +        if (port->type == HSR_PT_MASTER)
->> +            continue;
->> +        switch (port->type) {
->> +        case HSR_PT_SLAVE_A:
->> +        case HSR_PT_SLAVE_B:
->> +            vlan_vid_del(port->dev, proto, vid);
->> +            break;
->> +        default:
->> +            break;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   static const struct net_device_ops hsr_device_ops = {
->>       .ndo_change_mtu = hsr_dev_change_mtu,
->>       .ndo_open = hsr_dev_open,
->> @@ -523,6 +585,8 @@ static const struct net_device_ops hsr_device_ops = {
->>       .ndo_change_rx_flags = hsr_change_rx_flags,
->>       .ndo_fix_features = hsr_fix_features,
->>       .ndo_set_rx_mode = hsr_set_rx_mode,
->> +    .ndo_vlan_rx_add_vid = hsr_ndo_vlan_rx_add_vid,
->> +    .ndo_vlan_rx_kill_vid = hsr_ndo_vlan_rx_kill_vid,
->>   };
->>     static const struct device_type hsr_type = {
->> @@ -569,7 +633,8 @@ void hsr_dev_setup(struct net_device *dev)
->>         dev->hw_features = NETIF_F_SG | NETIF_F_FRAGLIST |
->> NETIF_F_HIGHDMA |
->>                  NETIF_F_GSO_MASK | NETIF_F_HW_CSUM |
->> -               NETIF_F_HW_VLAN_CTAG_TX;
->> +               NETIF_F_HW_VLAN_CTAG_TX |
->> +               NETIF_F_HW_VLAN_CTAG_FILTER;
->>         dev->features = dev->hw_features;
->>   }
->> @@ -647,6 +712,10 @@ int hsr_dev_finalize(struct net_device *hsr_dev,
->> struct net_device *slave[2],
->>           (slave[1]->features & NETIF_F_HW_HSR_FWD))
->>           hsr->fwd_offloaded = true;
->>   +    if ((slave[0]->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
->> +        (slave[1]->features & NETIF_F_HW_VLAN_CTAG_FILTER))
->> +        hsr_dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
->> +
->>       res = register_netdevice(hsr_dev);
->>       if (res)
->>           goto err_unregister;
-> 
-
--- 
-Thanks and Regards,
-Md Danish Anwar
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 4823dbdf5465..2b84d7211b13 100644
+=2D-- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1076,6 +1076,7 @@ static const struct usb_device_id products[] =3D {
+ 		USB_DEVICE_AND_INTERFACE_INFO(0x03f0, 0x581d, USB_CLASS_VENDOR_SPEC, 1,=
+ 7),
+ 		.driver_info =3D (unsigned long)&qmi_wwan_info,
+ 	},
++	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0122)},	/* Quectel RG650V */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0125)},	/* Quectel EC25, EC20 R2.0  Mini P=
+CIe */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0306)},	/* Quectel EP06/EG06/EM06 */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
 
