@@ -1,74 +1,40 @@
-Return-Path: <netdev+bounces-138789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDEB99AEE65
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:40:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71789AEE79
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:46:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 957D61F25B1E
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:40:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA18282D86
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F198A1FC7F2;
-	Thu, 24 Oct 2024 17:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgBBcvma"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0361FE0FC;
+	Thu, 24 Oct 2024 17:46:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058B51FC7EB;
-	Thu, 24 Oct 2024 17:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB411F76A3;
+	Thu, 24 Oct 2024 17:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729791647; cv=none; b=WKaNRehe+KUB3JEX72OqNY58b2/oUZ+FjsJmAf+VHQ/nRSijPPFUHVqyICXsP545KSxWwcOuhRqsM4roG/7JZa0OJLAU82polgm4zyTgMgOG7No369u8j+JNrc9XR/tCxb60LfiMxIEZQ68q2QMh4P92kbSLkPf9ZYM3sdKvpNw=
+	t=1729791968; cv=none; b=Cjb6STv6dXmPbCcrhgtaIlxM49genq/hh843eUlnSTxHJT5cucQZRwu4k2TRPuqCgFqqq43/UFxa5lVgWkiGca6MVEw5mOQou1rb0yGWIBkRQZc3l2nYNX6KA8N3GDql3DAyGm+ZNUho27+mYJG+lZ3cEcF+AukbGqwa2T9Q+O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729791647; c=relaxed/simple;
-	bh=z61wZmORZ8Y8YGjj3BjTQrqxc6rssIHZiu8ehtMQ2fU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R/M8b2RmgztUWfoDfV6GUGX+izoYGpIH3qHOCEOrg6gy360ZXXfkJoi+ATrAzZrffovz8gKqwvGBwF2+kVlAq9hJjOVKlzlzkpgn+hzqKnko5/2FyD2Cw886q9FLLjp6RrwFqdEc7+HzBgQpIK7S3V4nJd/4m/oy1TvSjYGD3yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FgBBcvma; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-288d74b3a91so806597fac.0;
-        Thu, 24 Oct 2024 10:40:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729791645; x=1730396445; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7Zjv17dU8tomirllFdrleqaUh20JvDrMiKVCU2jx1Mw=;
-        b=FgBBcvmaSw3+KUZHtxfAWf4dVn0aDkj3ey3rQQp4NOtVw6cIdPR9wsoGN6g0Jvrog9
-         /gKHWpFlT/ufduYOC2rY6DoZq3QCS/oLKPmb2ki5j1OXMi/eHxfDUsIwqb9sibFM+fSV
-         0+3jhGwvjvyh0vyN0HuSLbQciqdHI9VX+2bPTMkQrLLKhYOIBR4tImvbN6APpnF+ANGf
-         DWsatXkrMr/g9T7Z2r7CcIBzXoItoU57sXWDw2G9PDtt31vlmxtW/Y72u/EDIo1KVHwE
-         qraYBbvwv9/Qeg0iULOjXnMgThielaY99Zj7YNoDoBYm4mE6B5uUucuh5Ta+5HDvC6bL
-         pdJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729791645; x=1730396445;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Zjv17dU8tomirllFdrleqaUh20JvDrMiKVCU2jx1Mw=;
-        b=rgWh1Dw+CK9EyyJAPJookb+eCoMSHsmzjjAS20ZAGtR8TDNx41Xe7BUrIIk3RwQbAT
-         dpZOBfCutTG38+xFKW7VvmZ9QEJgRo+Q0L+iIn6kzHkm7BrdJMzd7HlGb7MWx97IO96p
-         zFpAaaNTSTRwOyXPkhTDGPor5hyJRDiiKJxTtzVlVvl3Jv7s/00Xu/4eUWa8lp3EDrNl
-         CYY8l98r01CPa3DdbSaijLXMW9/qeo8kWSiVWFn/ufX2Rfmlv4nqZOmULKBHewAJmrCz
-         KzjBE9SffLwehnvJv2HNSvciCkLiBRxmwYJfP0ptqvKYqYl1mmyVoy+1Q+VG7/nZs74H
-         G1Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+Qug5zO8ooqKPPLyZCLEOxRJ6n+CvGIoCdG0sIFSPodjLDn7X3H4xi7Qyzaqrd526dl8hk5cEr6l1Q0Ec@vger.kernel.org, AJvYcCWHTF9UiBeCTFWWskmwVG6GOIOgNc8/NX0z1gyETffXKpWYT4cbfhdocefc2ZGeaujFoZEv9Z97@vger.kernel.org, AJvYcCWbdQKTeuclyPYVZ4LgPaPSfEb6epfh69X61JMQa9j6Jao/8u7RMq/b4gglbyE7jZSCDevOvPywlmsuxmMd@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqnCNVfXEhS6FkU2RMf64xCAUI68eZfPEfWJhWjgN/HvkjuULd
-	eAC4fjzpmi5IreYhtfuXfgGRrGno0A4P8hNign2QgssTmJ62/Z4xoDQu0A==
-X-Google-Smtp-Source: AGHT+IGSJ6qgqpeMJRK11qx1SIP451P6iwQsNeQsOzCtkpg5iVsmKfyd+oDf+9ZIT5jNRbu2JguyOA==
-X-Received: by 2002:a05:6870:8a0a:b0:277:fdce:675c with SMTP id 586e51a60fabf-28ced27ba32mr3054949fac.15.1729791644741;
-        Thu, 24 Oct 2024 10:40:44 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-28c79250b6dsm3150030fac.15.2024.10.24.10.40.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 10:40:44 -0700 (PDT)
-Message-ID: <2c027bc3-6cab-4892-9544-10a0a23db871@gmail.com>
-Date: Thu, 24 Oct 2024 12:40:43 -0500
+	s=arc-20240116; t=1729791968; c=relaxed/simple;
+	bh=I9Q4P1XK4E+Wu/v/AH+WHEDOhWLlmc7Q+i47sR0qHAE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=csFIvibFHb/161y3uufrFVmG/8fcDNCokzCvoN7M3SIUyy631T004XCbTDpyw45/PA2mQXQsF4Tzu1xPTXRfoi71I78Bkn1ENSxE0LL8x60sPVleQXcqGbKDXy2Cc7xT3b7Ws+72smUQzMDGCIEqMFGe9KEMxHYNtBd5ScW+QsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.90.120) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 24 Oct
+ 2024 20:45:45 +0300
+Message-ID: <884de5fe-9f3b-4720-8be6-88972d8fc897@omp.ru>
+Date: Thu, 24 Oct 2024 20:45:44 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,69 +42,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 06/10] net: qrtr: Allow sendmsg to target an
- endpoint
-To: Chris Lew <quic_clew@quicinc.com>, netdev@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241018181842.1368394-1-denkenz@gmail.com>
- <20241018181842.1368394-7-denkenz@gmail.com>
- <e4fe74c7-6c37-4bab-96bf-a62727dcd468@quicinc.com>
+Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various
+ compliance requirements."
+To: Ivan Epifanov <isage.dna@gmail.com>, <andriy.shevchenko@intel.com>
+CC: <aospan@netup.ru>, <conor.dooley@microchip.com>,
+	<ddrokosov@sberdevices.ru>, <dmaengine@vger.kernel.org>, <dushistov@mail.ru>,
+	<fancer.lancer@gmail.com>, <geert@linux-m68k.org>,
+	<gregkh@linuxfoundation.org>, <hoan@os.amperecomputing.com>,
+	<ink@jurassic.park.msu.ru>, <jeffbai@aosc.io>, <kexybiscuit@aosc.io>,
+	<linux-alpha@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-fpga@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
+	<linux-hwmon@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+	<linux-iio@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<linux-mips@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, <manivannan.sadhasivam@linaro.org>,
+	<mattst88@gmail.com>, <netdev@vger.kernel.org>, <nikita@trvn.ru>,
+	<ntb@lists.linux.dev>, <patches@lists.linux.dev>,
+	<richard.henderson@linaro.org>, <serjk@netup.ru>, <shc_work@mail.ru>,
+	<torvalds@linux-foundation.org>, <torvic9@mailbox.org>,
+	<tsbogend@alpha.franken.de>, <v.georgiev@metrotek.ru>,
+	<wangyuli@uniontech.com>, <wsa+renesas@sang-engineering.com>, <xeb@mail.ru>
+References: <Zxpqnf1M8rPTB4DN@black.fi.intel.com>
+ <20241024170743.241144-1-isage.dna@gmail.com>
 Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <e4fe74c7-6c37-4bab-96bf-a62727dcd468@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20241024170743.241144-1-isage.dna@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 10/24/2024 17:32:48
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188703 [Oct 24 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 40 0.3.40
+ cefee68357d12c80cb9cf2bdcf92256b1d238d22
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_arrow_text}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.90.120 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.90.120 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.90.120
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/24/2024 17:35:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/24/2024 2:57:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Chris,
+On 10/24/24 8:07 PM, Ivan Epifanov wrote:
+[...]
 
->> @@ -106,6 +106,36 @@ static inline struct qrtr_sock *qrtr_sk(struct sock *sk)
->>       return container_of(sk, struct qrtr_sock, sk);
->>   }
->> +int qrtr_msg_get_endpoint(struct msghdr *msg, u32 *out_endpoint_id)
->> +{
->> +    struct cmsghdr *cmsg;
->> +    u32 endpoint_id = 0;
->> +
->> +    for_each_cmsghdr(cmsg, msg) {
->> +        if (!CMSG_OK(msg, cmsg))
->> +            return -EINVAL;
->> +
->> +        if (cmsg->cmsg_level != SOL_QRTR)
->> +            continue;
->> +
->> +        if (cmsg->cmsg_type != QRTR_ENDPOINT)
->> +            return -EINVAL;
->> +
->> +        if (cmsg->cmsg_len < CMSG_LEN(sizeof(u32)))
->> +            return -EINVAL;
->> +
->> +        /* Endpoint ids start at 1 */
->> +        endpoint_id = *(u32 *)CMSG_DATA(cmsg);
->> +        if (!endpoint_id)
->> +            return -EINVAL;
->> +    }
->> +
->> +    if (out_endpoint_id)
->> +        *out_endpoint_id = endpoint_id;
+>> $ git log --author="andriy.shevchenko@intel.com"
+>> $ 
 > 
-> In the case when there is no cmsg attached to the msg. Would it be safer to 
-> assign out_endpoint_id to 0 before returning?
+> Look who's talking
 
-Hmm, isn't that what happens?  endpoint_id is initialized to 0 in the 
-declaration block, so if no cmsg headers are present, out_endpoint_id will get a 
-0 assigned.
+$ git shortlog | grep "Andy Shevchenko"
+Andy Shevchenko (5564):
+[...]
 
-> 
-> I see that in qrtr_sendmsg() there is a risk of using msg_endpoint_id without it 
-> being initialized or assigned a value in this function.
+   Even I was surprised!
 
-Calling this function in qrtr_sendmsg() should always assign msg_endpoint_id 
-unless an error occurred.
+MBR, Sergey
 
-Regards,
--Denis
 
