@@ -1,133 +1,179 @@
-Return-Path: <netdev+bounces-138629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B5D9AE67F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:32:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DDD9AE682
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24B7B1C236AB
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:32:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55785B2536B
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3541EC012;
-	Thu, 24 Oct 2024 13:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147FC1F76A1;
+	Thu, 24 Oct 2024 13:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nBSmSVKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F7C1DD524
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 13:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37A81DE3A7;
+	Thu, 24 Oct 2024 13:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729776401; cv=none; b=BUwTxXclSxBi+mFefNG3f4eJocpUWrdiCmbdwT4YiHrwom7+NaVP7ysaYf5sj6tv74nyLDc4zyMD6skwCO3C2nJFcglfJH6zCScdlosklG+iReXCebrwFGZuUTlaR3lQ++zhJuKdrM5krbtSn4nH2gt6x8Xs24gXNje4LRJfGwI=
+	t=1729776405; cv=none; b=KObNf0y6tpwPBMAGlLH1DsHPaP4Om5s+KqCQ8ArXq4S+UYrZHkkKBhnmhxNVGaj7wNSvXEn1dTUvuCsJUYqA8Qhh8L+eryTlobFAGEOTdTqL99yARiekGAXEQISKt21tnGtvm3cQREDs4iofhtDy/LDP4PSa15FGGTEmMxpCrOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729776401; c=relaxed/simple;
-	bh=Coajt4Owld0LwUpNn37brlQV6tDRBW0waM8Z9leyTQs=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Rr/4UewQwL9CGt5bizxNaIrkaWCcrhfdPaxZ7eecvF+FkDYNIp+lkJIRaDz+IZXlZbki6My6lRZUBkCc23XWXrzsJsWv+aD0oHSQgxIBdSp9MTjSy4yevoKW71GHHcywLBLucbJX6aLW7UD17pqCedBuuKYQ4K7n2Iy0uHs+rtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XZ68y4nrNz2FbMF;
-	Thu, 24 Oct 2024 21:25:06 +0800 (CST)
-Received: from dggpemf100006.china.huawei.com (unknown [7.185.36.228])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4696B14037C;
-	Thu, 24 Oct 2024 21:26:31 +0800 (CST)
-Received: from [10.174.178.55] (10.174.178.55) by
- dggpemf100006.china.huawei.com (7.185.36.228) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 24 Oct 2024 21:26:30 +0800
-Subject: Re: [PATCH 1/2] bna: Fix return value check for debugfs create APIs
-To: Simon Horman <horms@kernel.org>
-CC: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
-	<GR-Linux-NIC-Dev@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-References: <20241023080921.326-1-thunder.leizhen@huawei.com>
- <20241023080921.326-2-thunder.leizhen@huawei.com>
- <20241024121325.GJ1202098@kernel.org>
-From: "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
-Message-ID: <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
-Date: Thu, 24 Oct 2024 21:26:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+	s=arc-20240116; t=1729776405; c=relaxed/simple;
+	bh=N02KLalnFfK2sBXLQ/nfUr62rghqvQamE1VIJktqfRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TpfawIY2EyrKEqTcJuZOlA+vN+JMvaN4cWm16XkO+wX+szpFsMEdHFfOVkkXc2Qw3D9wPqMiDAXl8galMN1s45I9+7XxtduXFL/qlQk/6YwErgrQ3O9iwqldUQ/ZNO71Oy9LG6lNBINWDdJoe2bvlgaLwOVwiswsoYFwFh0VafI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nBSmSVKX; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e52582cf8so663823b3a.2;
+        Thu, 24 Oct 2024 06:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729776403; x=1730381203; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rjjBzzaMsD7ekSq9QbaIBqsDXujNK7HZAFR9ub3RTXY=;
+        b=nBSmSVKXihhxypOohN3Y/idJM+8DqUbR0Z2wkwfc+bMOPoD2mtbJ79pQA+A+0x39VW
+         sD5cKPQ/3vqU2mW7AQ/XwfA64PqV1cc7OfxLsUcjUlfg7VIEIlWkmOoPwfCw7pZQATO1
+         JQM/iyXfyZNXeVErXP1b4suN3lhmwC40XS5WD5o8QGgeMw7ZpYXY4mQ/mWtc0Cd59bKi
+         WvRk0W1aGRw4Yw03OLo6TLEGEy/uHLEzaDlfk9QqPYneW3bJIMBZ3GMO9GSHtACn074a
+         m5InubJwDftX52HBcePUbSXlG/lkjQfHN0S9F7Y3xkqJY1RaFrskP2xfMRA9JCiX0EpS
+         47BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729776403; x=1730381203;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rjjBzzaMsD7ekSq9QbaIBqsDXujNK7HZAFR9ub3RTXY=;
+        b=SxqptElB/QlC8pp6PZ77bxPGT5QGHwsRgDwZxQcnQzlCMgcH0S/5q+cxx3XfTYiE7W
+         ukRRh027XJxmOZGj34rqUmgfdBnCYDixyXdtt8bukVZxVibih6v9B/NDt3LyLERYM76+
+         kV2hf8WFG8eVoq5AnXoOVq+TWs06kNecR6x3ZnhjhYZ5qJUku+5eRS3FnVeIrHQIPUjQ
+         iHoO0X5zwr+tpmn1CkeodEVOD+WupreYP2zy5hcpIxJuiW+NyXczIfUO11+39KWnSlNA
+         sLVBTsRszOEswbJO2KadhC/3lNeJ+HJd54O7jMareEKSO/Lp6jwnXir6NPjnjKxbj3hk
+         idGw==
+X-Forwarded-Encrypted: i=1; AJvYcCVl0twZWULdRA5V1W+o/EX5PPLXYqQeMH6cC7NEEtOhIsJEAmEHneEqV0gZbXpFUxegz0+m5g60@vger.kernel.org, AJvYcCWKuMbSmMvere4oxQ5qEyLdvNr1Tn/j9QJthYJ0FgNgFXMqyhkwjeA9IfoouKUL4tGrk721ffVH9uc=@vger.kernel.org, AJvYcCX06OjLxQka0lcVTSMR1BvxHqmqvEPtbMJVrA+O8krVM0r6rFSS/m754uN9F5y0vZ+JSKvvAtzOMjbnS4tH@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaDGi7tqeAmatNAh6w81izQv09BTEhEXjKBGkLUzlxZ7BWIunI
+	+sAhkC3cqn1RPxFe4Oj+xjAozNt6Ae9m7bP0ChnVWHVnzGTvzRit
+X-Google-Smtp-Source: AGHT+IGMpqU4C7guMpwzMgTNyv0OP9IkXjIzxG+eKhzbsqqfYfm1VefGOOKSHC3CW5cb28iw9Kjucw==
+X-Received: by 2002:a05:6a00:1892:b0:71d:f423:e6cc with SMTP id d2e1a72fcca58-72030b9b77emr8940005b3a.8.1729776402953;
+        Thu, 24 Oct 2024 06:26:42 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7eaeabb8423sm8622500a12.71.2024.10.24.06.26.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2024 06:26:42 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id AA3ED4416BFE; Thu, 24 Oct 2024 20:26:39 +0700 (WIB)
+Date: Thu, 24 Oct 2024 20:26:39 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Leo Stone <leocstone@gmail.com>, alex.aring@gmail.com,
+	stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org, anupnewmail@gmail.com
+Subject: Re: [PATCH net] Documentation: ieee802154: fix grammar
+Message-ID: <ZxpLD3_oXlO1Ucb7@archie.me>
+References: <20241023041203.35313-1-leocstone@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241024121325.GJ1202098@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemf100006.china.huawei.com (7.185.36.228)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="64dUHzb4GG9D5Dkz"
+Content-Disposition: inline
+In-Reply-To: <20241023041203.35313-1-leocstone@gmail.com>
 
 
+--64dUHzb4GG9D5Dkz
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/10/24 20:13, Simon Horman wrote:
-> On Wed, Oct 23, 2024 at 04:09:20PM +0800, Zhen Lei wrote:
->> Fix the incorrect return value check for debugfs_create_dir() and
->> debugfs_create_file(), which returns ERR_PTR(-ERROR) instead of NULL
->> when it fails.
->>
->> Commit 4ad23d2368cc ("bna: Remove error checking for
->> debugfs_create_dir()") allows the program to continue execution if the
->> creation of bnad->port_debugfs_root fails, which causes the atomic count
->> bna_debugfs_port_count to be unbalanced. The corresponding error check
->> need to be added back.
-> 
-> Hi Zhen Lei,
-> 
-> The documentation for debugfs_create_dir states:
-> 
->  * NOTE: it's expected that most callers should _ignore_ the errors returned
->  * by this function. Other debugfs functions handle the fact that the "dentry"
->  * passed to them could be an error and they don't crash in that case.
->  * Drivers should generally work fine even if debugfs fails to init anyway.
-> 
-> Which makes me wonder why we are checking the return value of
-> debugfs_create_dir() at all. Can't we just take advantage of
-> it not mattering, to debugfs functions, if the return value
-> is an error or not?
+On Tue, Oct 22, 2024 at 09:12:01PM -0700, Leo Stone wrote:
+> diff --git a/Documentation/networking/ieee802154.rst b/Documentation/netw=
+orking/ieee802154.rst
+> index c652d383fe10..743c0a80e309 100644
+> --- a/Documentation/networking/ieee802154.rst
+> +++ b/Documentation/networking/ieee802154.rst
+> @@ -72,7 +72,8 @@ exports a management (e.g. MLME) and data API.
+>  possibly with some kinds of acceleration like automatic CRC computation =
+and
+>  comparison, automagic ACK handling, address matching, etc.
+> =20
+> -Those types of devices require different approach to be hooked into Linu=
+x kernel.
+> +Each type of device requires a different approach to be hooked into the =
+Linux
+> +kernel.
+> =20
+>  HardMAC
+>  -------
+> @@ -81,10 +82,10 @@ See the header include/net/ieee802154_netdev.h. You h=
+ave to implement Linux
+>  net_device, with .type =3D ARPHRD_IEEE802154. Data is exchanged with soc=
+ket family
+>  code via plain sk_buffs. On skb reception skb->cb must contain additional
+>  info as described in the struct ieee802154_mac_cb. During packet transmi=
+ssion
+> -the skb->cb is used to provide additional data to device's header_ops->c=
+reate
+> -function. Be aware that this data can be overridden later (when socket c=
+ode
+> -submits skb to qdisc), so if you need something from that cb later, you =
+should
+> -store info in the skb->data on your own.
+> +the skb->cb is used to provide additional data to the device's
+> +header_ops->create function. Be aware that this data can be overridden l=
+ater
+> +(when socket code submits skb to qdisc), so if you need something from t=
+hat cb
+> +later, you should store info in the skb->data on your own.
+> =20
+>  To hook the MLME interface you have to populate the ml_priv field of your
+>  net_device with a pointer to struct ieee802154_mlme_ops instance. The fi=
+elds
+> @@ -94,8 +95,9 @@ All other fields are required.
+>  SoftMAC
+>  -------
+> =20
+> -The MAC is the middle layer in the IEEE 802.15.4 Linux stack. This momen=
+t it
+> -provides interface for drivers registration and management of slave inte=
+rfaces.
+> +The MAC is the middle layer in the IEEE 802.15.4 Linux stack. At the mom=
+ent, it
+> +provides an interface for driver registration and management of slave
+> +interfaces.
+> =20
+>  NOTE: Currently the only monitor device type is supported - it's IEEE 80=
+2.15.4
+>  stack interface for network sniffers (e.g. WireShark).
 
-Do you want to ignore all the return values of debugfs_create_dir() and debugfs_create_file()?
-"bna_debugfs_root = debugfs_create_dir("bna", NULL);" and debugfs_create_file() is OK.
-I've carefully analyzed the current code, and "bnad->port_debugfs_root = debugfs_create_dir(...);"
-is also OK for now.
+Looks good, thanks!
 
-bnad_debugfs_init():
-	bnad->port_debugfs_root = debugfs_create_dir(name, bna_debugfs_root);	//IS_ERR() if fails
-(1)
-	atomic_inc(&bna_debugfs_port_count);
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-bnad_debugfs_uninit():
-(2)	if (bnad->port_debugfs_root)						//It still works when it's IS_ERR()
-		atomic_dec(&bna_debugfs_port_count);
+--=20
+An old man doll... just what I always wanted! - Clara
 
-	if (atomic_read(&bna_debugfs_port_count) == 0)
-		debugfs_remove(bna_debugfs_root);
+--64dUHzb4GG9D5Dkz
+Content-Type: application/pgp-signature; name="signature.asc"
 
-If we want the code to be more robust or easier to understand, it is better
-to modify (1) and (2) above as follows:
-(1) if (IS_ERR(bnad->port_debugfs_root))
-	return;
-(2) if (!IS_ERR_OR_NULL(bnad->port_debugfs_root))
+-----BEGIN PGP SIGNATURE-----
 
-> 
->> Fixes: 4ad23d2368cc ("bna: Remove error checking for debugfs_create_dir()")
->> Fixes: 7afc5dbde091 ("bna: Add debugfs interface.")
->> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
-> 
-> ...
-> .
-> 
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZxpLDwAKCRD2uYlJVVFO
+o1vFAQDnS0KV+5nUy5e7/Rdht7dETYJjXfDQpb6+ahzJab1nigEA0BOTsZo43ARS
+SwdGkpmbt0o19oU+WpNnk+e5iDgIkww=
+=/eWu
+-----END PGP SIGNATURE-----
 
--- 
-Regards,
-  Zhen Lei
+--64dUHzb4GG9D5Dkz--
 
