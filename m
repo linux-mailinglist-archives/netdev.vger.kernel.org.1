@@ -1,222 +1,145 @@
-Return-Path: <netdev+bounces-138744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A939AEB87
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:10:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 289119AEB8A
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:11:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5EF51F22EF6
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:10:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D2AAB23977
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA151EB9F1;
-	Thu, 24 Oct 2024 16:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6BBE1F76AB;
+	Thu, 24 Oct 2024 16:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IEL8GPA+"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73931B0F26;
-	Thu, 24 Oct 2024 16:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1581F76A7;
+	Thu, 24 Oct 2024 16:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729786234; cv=none; b=AD5TU1poxsq6nDSu6eDWoq39P5SMkeg0UDZdVgn5ENGUagXZUsRKpo3p8X8eTa6GFeX2VXqkkm7KsaztsTVYCZWRB9YwEmoRho68dKU2aWYeHyVVt78EgR6AsRDuWKuQBiHUdaaH6cXb3ux+c4B53oEEY8qKcemP99Ews7CKszU=
+	t=1729786309; cv=none; b=hoS7kwNLwhbclxoiFFgUzdGJLRqsddLAXk/8Jgcbjn2det4CSuSEM9TX4QL1bP2Ic4zVti7RncpQEUnUO5iCpjfMUMMXi4iOWCamwf5SjPUZJtjD7X5tfv0yDQf+/s1zaRlQe+GEhPAXQzxwtC2aqKuHXcmBDz7UH9egx8o/ljs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729786234; c=relaxed/simple;
-	bh=OpjoVF0VuGF5sKCt7TDKYW928JWMZOf7mNiX1LT8/8Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jKU/zZG7BSxEXz+MCHQMOSra2Kgf0VeIkwfEtSqcwCvt0mzvvcz9rfg7kAFKaY9dZ9vt8tDBRnI+wx1FNW2vXUxG830jJSG1KWYkqsHt5UlrAjRYlajrSC59iqhjV4REvB9Aq+65dhKjTH1qvIQK9UMrc3MbWg9wKFKqLxJiBEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=60766 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1t40Pf-004H0p-NK; Thu, 24 Oct 2024 18:10:17 +0200
-Date: Thu, 24 Oct 2024 18:10:14 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Casey Schaufler <casey@schaufler-ca.com>
-Cc: paul@paul-moore.com, linux-security-module@vger.kernel.org,
-	jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
-	john.johansen@canonical.com, penguin-kernel@i-love.sakura.ne.jp,
-	stephen.smalley.work@gmail.com, linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org, mic@digikod.net, netdev@vger.kernel.org,
-	audit@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	Todd Kjos <tkjos@google.com>
-Subject: Re: [PATCH v3 2/5] LSM: Replace context+len with lsm_context
-Message-ID: <ZxpxZuErvXSLApsf@calendula>
-References: <20241023212158.18718-1-casey@schaufler-ca.com>
- <20241023212158.18718-3-casey@schaufler-ca.com>
+	s=arc-20240116; t=1729786309; c=relaxed/simple;
+	bh=NKpEWZqAF/Dy/vUCLRqDWShtGWbDcafcntb+ACzuvIE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WFXnIphBskKvCPkIxu4XdI7v7AviDlU2m9voUllS+UaHE+oZQaNtFBxK+m8cHhBHRKgYHfaAG3t1UjNXdS7tASlPipUaHrUqnETAVQKjm9xM7a6jRPE3854H5D3Gez1V4t6b/9YEhrwxxfPg0iUbmgO9QdCMQkN/xmwigEfesyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IEL8GPA+; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49OElnNL016718;
+	Thu, 24 Oct 2024 16:11:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=cjShAnZwpuDy1jrqifitN/jWZ/9nldAQHa2uMuir6
+	uk=; b=IEL8GPA+GJejxMEDQj7xFZSqyDKvdIV++Nxu7VORzaoyJJ5SFlWJVgbdW
+	uwTX7i4cfAtC2k9G6RfcA6UZXB3BXhwlsdu23HC9RguClM6qQKXE3rjoQ7ZaalcC
+	rMt4pTGdxGgf/WbpzZwW2etg4M96FhFT9RlE4sCwbiBu/MKlK+xdrvExgEMOT3Jh
+	Q8P4IY5EquwtQIdSY6zB/N65Ziehwih8XdnwMJL8OtGTojpcxebu7KdLyJVXg6pX
+	OMh1eEcBTFLuF+GYCRt1SEvgwFQQ5JTmIOaKeEsrXbwpKvl1s93fEQ8zGAlR+Lqi
+	nxLfCfokw0O+MfFc6PAv+rseVez8w==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42emajshkd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Oct 2024 16:11:42 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49OEWTYW008796;
+	Thu, 24 Oct 2024 16:11:22 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 42emkas89u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Oct 2024 16:11:22 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49OGBLqu15794782
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 24 Oct 2024 16:11:21 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 14FA65805A;
+	Thu, 24 Oct 2024 16:11:21 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D0EE458063;
+	Thu, 24 Oct 2024 16:11:20 +0000 (GMT)
+Received: from WIN-DU0DFC9G5VV.austin.ibm.com (unknown [9.41.105.143])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 24 Oct 2024 16:11:20 +0000 (GMT)
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+To: sgarzare@redhat.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: [PATCH v2] vsock/test: fix failures due to wrong SO_RCVLOWAT parameter
+Date: Thu, 24 Oct 2024 11:10:58 -0500
+Message-Id: <20241024161058.435469-1-kshk@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241023212158.18718-3-casey@schaufler-ca.com>
-X-Spam-Score: -1.6 (-)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: o4xWv7fO9kP9QVrkwJLQ6NMNRSaMhM4K
+X-Proofpoint-GUID: o4xWv7fO9kP9QVrkwJLQ6NMNRSaMhM4K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ mlxscore=0 phishscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410240133
 
-Hi Casey,
+This happens on 64-bit big-endian machines.
+SO_RCVLOWAT requires an int parameter. However, instead of int, the test
+uses unsigned long in one place and size_t in another. Both are 8 bytes
+long on 64-bit machines. The kernel, having received the 8 bytes, doesn't
+test for the exact size of the parameter, it only cares that it's >=
+sizeof(int), and casts the 4 lower-addressed bytes to an int, which, on
+a big-endian machine, contains 0. 0 doesn't trigger an error, SO_RCVLOWAT
+returns with success and the socket stays with the default SO_RCVLOWAT = 1,
+which results in test failures.
 
-This is a review of the netfilter chunk.
+Fixes: b1346338fbae ("vsock_test: POLLIN + SO_RCVLOWAT test")
+Fixes: 542e893fbadc ("vsock/test: two tests to check credit update logic")
+Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+---
 
-On Wed, Oct 23, 2024 at 02:21:55PM -0700, Casey Schaufler wrote:
-> diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-> index 86a57a3afdd6..dd74d4c67c69 100644
-> --- a/net/netfilter/nf_conntrack_netlink.c
-> +++ b/net/netfilter/nf_conntrack_netlink.c
-> @@ -360,8 +360,8 @@ static int ctnetlink_dump_secctx(struct sk_buff *skb, const struct nf_conn *ct)
->  	struct lsm_context ctx;
->  	int ret;
->  
-> -	ret = security_secid_to_secctx(ct->secmark, &ctx.context, &ctx.len);
-> -	if (ret)
-> +	ret = security_secid_to_secctx(ct->secmark, &ctx);
-> +	if (ret < 0)
->  		return 0;
->  
->  	ret = -1;
-> @@ -665,8 +665,8 @@ static inline int ctnetlink_secctx_size(const struct nf_conn *ct)
->  #ifdef CONFIG_NF_CONNTRACK_SECMARK
->  	int len, ret;
->  
-> -	ret = security_secid_to_secctx(ct->secmark, NULL, &len);
-> -	if (ret)
-> +	ret = security_secid_to_secctx(ct->secmark, NULL);
+Notes:
+    The problem was found on s390 (big endian), while x86-64 didn't show it. After this fix, all tests pass on s390.
+Changes for v2:
+- add "Fixes:" lines to the commit message
 
-This breaks here.
+ tools/testing/vsock/vsock_test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-len is really used, this should be instead:
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index 8d38dbf8f41f..7fd25b814b4b 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -835,7 +835,7 @@ static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
+ 
+ static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
+ {
+-	unsigned long lowat_val = RCVLOWAT_BUF_SIZE;
++	int lowat_val = RCVLOWAT_BUF_SIZE;
+ 	char buf[RCVLOWAT_BUF_SIZE];
+ 	struct pollfd fds;
+ 	short poll_flags;
+@@ -1357,7 +1357,7 @@ static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opt
+ static void test_stream_credit_update_test(const struct test_opts *opts,
+ 					   bool low_rx_bytes_test)
+ {
+-	size_t recv_buf_size;
++	int recv_buf_size;
+ 	struct pollfd fds;
+ 	size_t buf_size;
+ 	void *buf;
+-- 
+2.34.1
 
-	ret = security_secid_to_secctx(ct->secmark, &ctx);
-
-[...]
-        return nla_total_size(0) /* CTA_SECCTX */
-               + nla_total_size(sizeof(char) * ctx.len); /* CTA_SECCTX_NAME */
-#else
-        return 0;
-#endif
-}
-
-> +	if (ret < 0)
->  		return 0;
->  
->  	return nla_total_size(0) /* CTA_SECCTX */
-> diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-> index 5f7fd23b7afe..502cf10aab41 100644
-> --- a/net/netfilter/nf_conntrack_standalone.c
-> +++ b/net/netfilter/nf_conntrack_standalone.c
-> @@ -175,8 +175,8 @@ static void ct_show_secctx(struct seq_file *s, const struct nf_conn *ct)
->  	struct lsm_context ctx;
->  	int ret;
->  
-> -	ret = security_secid_to_secctx(ct->secmark, &ctx.context, &ctx.len);
-> -	if (ret)
-> +	ret = security_secid_to_secctx(ct->secmark, &ctx);
-> +	if (ret < 0)
->  		return;
->  
->  	seq_printf(s, "secctx=%s ", ctx.context);
-> diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-> index 37757cd77cf1..5110f29b2f40 100644
-> --- a/net/netfilter/nfnetlink_queue.c
-> +++ b/net/netfilter/nfnetlink_queue.c
-> @@ -470,18 +470,18 @@ static int nfqnl_put_sk_classid(struct sk_buff *skb, struct sock *sk)
->  	return 0;
->  }
->  
-> -static u32 nfqnl_get_sk_secctx(struct sk_buff *skb, char **secdata)
-> +static u32 nfqnl_get_sk_secctx(struct sk_buff *skb, struct lsm_context *ctx)
->  {
->  	u32 seclen = 0;
->  #if IS_ENABLED(CONFIG_NETWORK_SECMARK)
-> +
-
-remove unneeded line.
-
->  	if (!skb || !sk_fullsock(skb->sk))
->  		return 0;
->  
->  	read_lock_bh(&skb->sk->sk_callback_lock);
->  
->  	if (skb->secmark)
-> -		security_secid_to_secctx(skb->secmark, secdata, &seclen);
-> -
-> +		seclen = security_secid_to_secctx(skb->secmark, ctx);
->  	read_unlock_bh(&skb->sk->sk_callback_lock);
->  #endif
->  	return seclen;
-> @@ -567,8 +567,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
->  	enum ip_conntrack_info ctinfo = 0;
->  	const struct nfnl_ct_hook *nfnl_ct;
->  	bool csum_verify;
-> -	struct lsm_context scaff; /* scaffolding */
-> -	char *secdata = NULL;
-> +	struct lsm_context ctx;
-
-Help us make this get closer to revert xmas tree:
-
-  	enum ip_conntrack_info ctinfo = 0;
-  	const struct nfnl_ct_hook *nfnl_ct;
-+	struct lsm_context ctx;
-  	bool csum_verify;
--	struct lsm_context scaff; /* scaffolding */
--	char *secdata = NULL;
-
->  	bool csum_verify;
-> -	struct lsm_context scaff; /* scaffolding */
-> -	char *secdata = NULL;
-
->  	u32 seclen = 0;
->  	ktime_t tstamp;
->  
-> @@ -643,8 +642,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
->  	}
->  
->  	if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
-> -		seclen = nfqnl_get_sk_secctx(entskb, &secdata);
-> -		if (seclen)
-> +		seclen = nfqnl_get_sk_secctx(entskb, &ctx);
-> +		if (seclen >= 0)
->  			size += nla_total_size(seclen);
->  	}
->  
-> @@ -783,7 +782,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
->  	if (nfqnl_put_sk_classid(skb, entskb->sk) < 0)
->  		goto nla_put_failure;
->  
-> -	if (seclen && nla_put(skb, NFQA_SECCTX, seclen, secdata))
-> +	if (seclen && nla_put(skb, NFQA_SECCTX, ctx.len, ctx.context))
->  		goto nla_put_failure;
->  
->  	if (ct && nfnl_ct->build(skb, ct, ctinfo, NFQA_CT, NFQA_CT_INFO) < 0)
-> @@ -811,10 +810,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
->  	}
->  
->  	nlh->nlmsg_len = skb->len;
-> -	if (seclen) {
-> -		lsmcontext_init(&scaff, secdata, seclen, 0);
-> -		security_release_secctx(&scaff);
-> -	}
-> +	if (seclen >= 0)
-> +		security_release_secctx(&ctx);
->  	return skb;
->  
->  nla_put_failure:
-> @@ -822,10 +819,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
->  	kfree_skb(skb);
->  	net_err_ratelimited("nf_queue: error creating packet message\n");
->  nlmsg_failure:
-> -	if (seclen) {
-> -		lsmcontext_init(&scaff, secdata, seclen, 0);
-> -		security_release_secctx(&scaff);
-> -	}
-> +	if (seclen >= 0)
-> +		security_release_secctx(&ctx);
->  	return NULL;
->  }
->  
 
