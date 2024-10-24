@@ -1,95 +1,109 @@
-Return-Path: <netdev+bounces-138586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F489AE368
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:06:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C68F9AE36F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8511F1F22036
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:06:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2B28B22A8C
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CE61CACCC;
-	Thu, 24 Oct 2024 11:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0D21CACD3;
+	Thu, 24 Oct 2024 11:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDRRYJiM"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="eCPMjtmH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3671B6CF1;
-	Thu, 24 Oct 2024 11:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22AA1C4A31;
+	Thu, 24 Oct 2024 11:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729767958; cv=none; b=LtBVZ6V4pEix7MQkh9ZUjBhtBnI7Zkn0XCzDmTFbUY2CHVmUoCkZKn8f7mNUaFeU0fNgy2KFCttlvb9nmrrAX6G5SDVXVoeARQB3EHEflxPbHx5uFWQeUaPoRZXYX+PWciGVbFMSBOkvZHravDRsbxxIufSqRuRktrhxOGhTCX8=
+	t=1729767996; cv=none; b=OZffgcsNape1CyYeJEfJpNneTexVLjwa+CVOXWwXoI7H9z0G3SsiBHL8QB4feOfAJqZ/3u6LQbYDmhUF8RyW0cJzGYgxmTkwhWgrkqGrwQ1vxF6TtJPYuKgfJuqdZ6mqBfZiM761THcfgWXNMw1bnnFeK1HYHTKDV9Mt1lOKyXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729767958; c=relaxed/simple;
-	bh=gLh242x7zfZsbQK/+qxlTv2wxnqju0Sw4AuaFDzi1hc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cLfsbBojMjmB/kka4rtf3YwOFqoQQpK4k41WOL5Isp4HmFIAx4eLpM3sHL73lSNr69749n7XBpTItQZDjtdjdEvfTdsXjr5x8Dt+CngmbhDM5sQy0qptHwB7NlYWd3JQbMnaLOZcn0apfKzYruRv8jyqqFXFaErUqFFWEjMWHvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDRRYJiM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E465C4CEC7;
-	Thu, 24 Oct 2024 11:05:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729767957;
-	bh=gLh242x7zfZsbQK/+qxlTv2wxnqju0Sw4AuaFDzi1hc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DDRRYJiMatmii3PYXsFtihJD+hqfCsnJARX7+VEWij/xoNeRuV2vtJaMq+zruQ9DN
-	 8DMrmKGeTeZLrrAxcFT6nxRgV8+dWnI/sdhALOzniGeSlA54jcHlsLcPLTClODWA/M
-	 6cqox/RVQQ9kPThFZwlDM8j/OiejiU+fDguVscOY+2El4eTJ3LqRHkeMMXFdqgIHea
-	 irHsHQyD6sLQk40gUNKk1MxYRHwLEgAdzehGnNL0MyU6zO0Y1TfBl93S1yzeit+aQE
-	 KPRRS5Kp9M/HFm6cAGSJttsL+z+mgO1rL+9bxcbrfg6MTtNPFAz7vOCx8QOWTLMTBn
-	 mQsMJe9wI6PHw==
-Date: Thu, 24 Oct 2024 12:05:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Colin Ian King <colin.i.king@gmail.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Subject: Re: [PATCH] net: mana: use ethtool string helpers
-Message-ID: <20241024110551.GE1202098@kernel.org>
-References: <20241022204908.511021-1-rosenp@gmail.com>
- <CAKxU2N9nQFs_wDbe=S_ywfOFYeX+LWuN8f9y1y2iA5GV4tFDFg@mail.gmail.com>
+	s=arc-20240116; t=1729767996; c=relaxed/simple;
+	bh=BtbVbKTSOo2sG4MBMHZUhIzlD4JURdmwYcDfyJvEtqE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GZTsdL/m6mCcIu3gRZzZnYW9wQOeFnO+xS6626vShg/wPT/NkOLpEsFOxhVtTJFcvPhV3dOidnQPYQjIc72m0TIrYeZGTf4FFEmt4r/X55zInqtCoDrNuOYMLJjUj+sbXiEtb5ziAaTXC1WcVu/0RvHqzQ0No0Z/iAK1f490oNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=eCPMjtmH; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1729767991; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=VvJTI601DIOzBox3X95ACOvJLSHb8asIvG0P9I23aQ0=;
+	b=eCPMjtmHqZGXkD9x1HQAf5uIfyPZ5Fzuz8+faQV7CbeLGpfkY/zjDD52rqrP0zEmcu3K9AcXNDK9BawwhSLjp4QtXsOmYsMUULWBWbpuFOGv0sM4KcX0lSc/tpaxM5CsSWYNwPhlTiyOMKF/GlBqFQpPpnhi3w1NZ40mqdVu0lM=
+Received: from 30.221.129.46(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WHowPg-_1729767982 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 24 Oct 2024 19:06:30 +0800
+Message-ID: <ec3a2232-7787-4e0d-a0bd-a75280c3982f@linux.alibaba.com>
+Date: Thu, 24 Oct 2024 19:06:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N9nQFs_wDbe=S_ywfOFYeX+LWuN8f9y1y2iA5GV4tFDFg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: use new helper to get the netdev
+ associated to an ibdev
+To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241024054456.37124-1-guwen@linux.alibaba.com>
+ <61cf578f-020e-4e0d-a551-98df5367ee27@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <61cf578f-020e-4e0d-a551-98df5367ee27@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 22, 2024 at 01:56:56PM -0700, Rosen Penev wrote:
-> On Tue, Oct 22, 2024 at 1:49 PM Rosen Penev <rosenp@gmail.com> wrote:
-> >
-> > The latter is the preferred way to copy ethtool strings.
-> >
-> > Avoids manually incrementing the data pointer.
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> forgot to put net-next.
 
-Hi Rosen,
 
-The CI guessed correctly, so I don't think you need to repost just for that.
+On 2024/10/24 18:00, Wenjia Zhang wrote:
+> 
+> 
+> On 24.10.24 07:44, Wen Gu wrote:
+>> Patch [1] provides common interfaces to store and get net devices
+>> associated to an IB device port and removes the ops->get_netdev()
+>> callback of mlx5 driver. So use the new interface in smc.
+>>
+>> [1]: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
+>>
+>> Reported-by: D. Wythe <alibuda@linux.alibaba.com>
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+> [...]
+> 
+> We detected the problem as well, and I already sent a patch with the same code change in our team internally these. Because some agreement issues on the commit message, it is still not sent out externally. Now we (our team) have almost an agreement, I'd like to attach it here. Please have a look if 
+> it is also for you to use:
+> 
+> "
+> [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+> 
+> Since/Although commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an alternative to get_netdev") introduced an API ib_device_get_netdev, the SMC-R variant of the SMC protocol continued to use the old API ib_device_ops.get_netdev() to lookup netdev. As commit 8d159eb2117b ("RDMA/mlx5: 
+> Use IB set_netdev and get_netdev functions") removed the get_netdev callback from mlx5_ib_dev_common_roce_ops, calling ib_device_ops.get_netdev didn't work any more at least by using a mlx5 device driver. Thus, using ib_device_set_netdev() now became mandatory.
+> 
+> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
+> 
+> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
+> "
+> My main points are:
+> - This patch should go to net, not net-next. Because it can result in malfunction. e.g. if the RoCE devices are used as both handshake device and RDMA device without any PNET_ID, it would be failed to find SMC-R device, then fallback.
+> - We need the both fixes, which would help us for the backport
+> 
+> 
+> Thanks,
+> Wenjia
 
-...
+Hi, Wenjia. I see. Since you're ready to post a patch, and this one has some problems,
+I think you can supersede this one with yours. It is totally OK for me.
+
+Thanks!
+Wen Gu
 
