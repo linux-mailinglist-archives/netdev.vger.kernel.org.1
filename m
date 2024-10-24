@@ -1,112 +1,100 @@
-Return-Path: <netdev+bounces-138579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FBC9AE324
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:55:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F3469AE335
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 651721C2220F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:55:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F0901C224CF
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6962D1C07C3;
-	Thu, 24 Oct 2024 10:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBEC1C9B81;
+	Thu, 24 Oct 2024 11:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvpS2dnz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aN4FpdJ1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DE414831C
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 10:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0F81C4A33
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 11:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729767313; cv=none; b=R1QmbS//zMXhng+o4y3/KBiCTU4MRE1fFNijmz4V/NJ+OxwcupIGyNFTDyvIvj0BjMJj+gJhuOyWuqzIEA4QesLzmHILAIK6BBXW2SDbvc14YdgrgNocc7HDZgCWBO1CJycvbb7HJevaniEEsjkW29JKOsfEWimLDy1IFavLLTQ=
+	t=1729767627; cv=none; b=Rw/EkE5rpI0eUaXponcelX4qMeJr2stxgaqGhdd2CgprLa+0hGIeSqniaAOWrK81zqiQulWpZToFLaSznKMoiVa0svN1BUBcarKwZLbFVv7Vwrq17hTEWTe6Daj9TZxGC73a5yon0wu4NlLN+GrPmZ/gu7jronnWUCKYrLeGv4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729767313; c=relaxed/simple;
-	bh=hDTvFDbEBfD6VwZVlMN8QpXpqPX/ZzCaQXlWMbV77PM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NCUgovf58uRoHjwvEyBEkvSOMAWttCYrgvBs3d+BRSUmjIut726qYqvIfzzFoctUXmlxPbaYu8ZhMD0/4kRR8rgQ0q5vToZGXEkCD6q7y+94kE+OazJBjm7H92fcHsyFmUZ6h9tm2GxqG4mg7FpY54cXx6eB38Yf7AMZ+vapGy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvpS2dnz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F04C4CEC7;
-	Thu, 24 Oct 2024 10:55:10 +0000 (UTC)
+	s=arc-20240116; t=1729767627; c=relaxed/simple;
+	bh=+l1e5LKa8wZ48pc/d+g8uQUZI92XnFFYeaCgQRHP+qM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=G6LIlu/LeOlBOzpmakkR865qVTeVUspulnXzz1Wpi4Kz2HIWQ1NdRHtZ3zloBoA/N5/ym4JyNUe40LRn+Q8bQjPe9rwhHRGu6nnAnSBe5RseaS9vBl/4bf4lPZgpvmiOVqf3+GKzUbrkDhVVnYq6r+c65mv4CoOxIKyz7DB2h/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aN4FpdJ1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF29AC4CEC7;
+	Thu, 24 Oct 2024 11:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729767312;
-	bh=hDTvFDbEBfD6VwZVlMN8QpXpqPX/ZzCaQXlWMbV77PM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mvpS2dnzg5Q12Oz015qUoIl6fcOni6EigpoSMIYMGBiTHBVwl3ILpmliVOihN7szn
-	 4jPK/Qqyh1RrMmIEXGh4QzztAg6b7YBGd4I6aSwcsaBtdwq0LZonCf/t+5p6GSPZlq
-	 Vh8YumQYwfH57XJAApJFbe+dvr8kt9pfSHzdW6U7MlVxannU9GXMWETVQ+88zKmxta
-	 p1vG6fZGd4f6r8xz8a9CKWM+T9y1hOtr5Wxk0DztuaxA1L4C68kTtwq/LrML8dHKYx
-	 iahwkVxAr7YA/yu0L3gh6dKFr8B7ntUdNqMLeTrG1d/cyf7Dup7EMUjPwgJnXssPpV
-	 NDFY5/FhtnMkQ==
-Date: Thu, 24 Oct 2024 11:55:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gax-c <zichenxie0106@gmail.com>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, petrm@nvidia.com,
-	idosch@nvidia.com, netdev@vger.kernel.org, zzjas98@gmail.com,
-	chenyuan0y@gmail.com
-Subject: Re: [PATCH v2] netdevsim: Add trailing zero to terminate the string
- in nsim_nexthop_bucket_activity_write()
-Message-ID: <20241024105508.GA1202098@kernel.org>
-References: <20241022171907.8606-1-zichenxie0106@gmail.com>
+	s=k20201202; t=1729767626;
+	bh=+l1e5LKa8wZ48pc/d+g8uQUZI92XnFFYeaCgQRHP+qM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aN4FpdJ1/BkX55FwMtgzfmbBwiTcpnuHsO2LevdDZHIXDVyUo6tPXs06Vozd5fv0R
+	 s1EzLkb3oNdYuG9kgMMejo1qA8JB3c91tfyVFXVzCbuVMHheQHYhI9MHxKT8RfkdO2
+	 lraZ+deBdFaBVcHK0+sQXEdjZlBTAXXNOPI0jMeiw61l85S0FmzAOLHX805ah7BPDd
+	 fOloF/S4prCwWpYNgsZK/sWLK8xTrq+oMhJxWavCo4MbYaOERdk8WaJqCyIyaEauNQ
+	 1+c+Ctu9uACMGULKiTxO7jJFhV+V22BPjchtubMHfKWd9L3lWZ/fPEtbODBq6uV2+E
+	 EHGyPE8WqE9kA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD68380DBDC;
+	Thu, 24 Oct 2024 11:00:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241022171907.8606-1-zichenxie0106@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/3] net: dsa: mv88e6xxx: fix MV88E6393X PHC frequency
+ on internal clock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172976763352.2198052.11564087146899333434.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Oct 2024 11:00:33 +0000
+References: <20241020063833.5425-1-me@shenghaoyang.info>
+In-Reply-To: <20241020063833.5425-1-me@shenghaoyang.info>
+To: Shenghao Yang <me@shenghaoyang.info>
+Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
+ pavana.sharma@digi.com, ashkan.boldaji@digi.com, kabel@kernel.org,
+ andrew@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ richardcochran@gmail.com, kuba@kernel.org
 
-On Tue, Oct 22, 2024 at 12:19:08PM -0500, Gax-c wrote:
-> From: Zichen Xie <zichenxie0106@gmail.com>
-> 
-> This was found by a static analyzer.
-> We should not forget the trailing zero after copy_from_user()
-> if we will further do some string operations, sscanf() in this
-> case. Adding a trailing zero will ensure that the function
-> performs properly.
-> 
-> Fixes: c6385c0b67c5 ("netdevsim: Allow reporting activity on nexthop buckets")
-> Signed-off-by: Zichen Xie <zichenxie0106@gmail.com>
-> ---
-> v2: adjust code format.
-> ---
->  drivers/net/netdevsim/fib.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/netdevsim/fib.c b/drivers/net/netdevsim/fib.c
-> index 41e80f78b316..16c382c42227 100644
-> --- a/drivers/net/netdevsim/fib.c
-> +++ b/drivers/net/netdevsim/fib.c
-> @@ -1377,10 +1377,12 @@ static ssize_t nsim_nexthop_bucket_activity_write(struct file *file,
->  
->  	if (pos != 0)
->  		return -EINVAL;
-> -	if (size > sizeof(buf))
-> +	if (size > sizeof(buf) - 1)
+Hello:
 
-I don't think this change for the best.
-If the input data is well formatted it will end with a '\0'.
-Which may be copied into the last byte of buf.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-With this change the maximum size of the input data is
-unnecessarily reduced by one.
+On Sun, 20 Oct 2024 14:38:27 +0800 you wrote:
+> The MV88E6393X family of switches can additionally run their cycle
+> counters using a 250MHz internal clock instead of the usual 125MHz
+> external clock [1].
+> 
+> The driver currently assumes all designs utilize that external clock,
+> but MikroTik's RB5009 uses the internal source - causing the PHC to be
+> seen running at 2x real time in userspace, making synchronization
+> with ptp4l impossible.
+> 
+> [...]
 
->  		return -EINVAL;
->  	if (copy_from_user(buf, user_buf, size))
->  		return -EFAULT;
-> +	buf[size] = 0;
-> +
->  	if (sscanf(buf, "%u %hu", &nhid, &bucket_index) != 2)
->  		return -EINVAL;
->  
-> -- 
-> 2.34.1
-> 
-> 
+Here is the summary with links:
+  - [net,v3,1/3] net: dsa: mv88e6xxx: group cycle counter coefficients
+    https://git.kernel.org/netdev/net/c/67af86afff74
+  - [net,v3,2/3] net: dsa: mv88e6xxx: read cycle counter period from hardware
+    https://git.kernel.org/netdev/net/c/7e3c18097a70
+  - [net,v3,3/3] net: dsa: mv88e6xxx: support 4000ps cycle counter period
+    https://git.kernel.org/netdev/net/c/3e65ede526cf
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
