@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-138667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74799AE800
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:16:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 866EB9AE7FB
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:16:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F8011F21FC5
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:16:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA40B1C22A8D
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB9BB207202;
-	Thu, 24 Oct 2024 14:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B77205AD1;
+	Thu, 24 Oct 2024 14:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FxeCZg0b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqSlU8bc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977EA206957
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8091EBFE3
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729778896; cv=none; b=CDRDNLPq90KLJdZAOqZKm3TBv1HV8cNhha0vBWCtJJf1cl5cDvU4tw2AnjZ2Epc9W4I4zxYQZOTBJ+57aqRA5/S6ZxvHCF6yxG1ISKL91/J8sGME1+QoIobDD8+IU3bVbwFcft2W33Z/s4smQlQly09LJdxd34jEUf87xokjylc=
+	t=1729778893; cv=none; b=dPnWeFjpyLO7imauU+7UHAFa5vqe2pMULCH/Rp3LCCEb0h5D6yQeKPrD561jSwZLfLoM9nd+iyIaMIG+U44JVtHbyxYJaagjE7bonSqbqT23aqgjyYo3y4y07hFbU1G6nGDxSFkQBk0YtM7fR3KOBlqfgavcjUJIK5tQuQqU4w0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729778896; c=relaxed/simple;
-	bh=LOURsnIZQDl9tWN/DtXMyLu3vMcnBJb7H0S0wNAcQls=;
+	s=arc-20240116; t=1729778893; c=relaxed/simple;
+	bh=Iu5W7GQDrF6wAgpzj6wnYkl7V7v8hp++3GNg/ZYfmXg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y7602BSKixVAOIwqJaleCTpWDVsdh4Oy32vTLo+4AeJpn25HyEh5UgVdZTPkIgm6C89hd44FjziWufGKcM8tufpr/6ouvEZ2BQdXXYyqfJu/93xb2w2fLnQV/br3CwcZvAXdRVxfTqd/bolcORo6tSwXsEJEOJSMZAng3kMnFqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FxeCZg0b; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=f1bbiJCVL4zW4/ZV0XF7W3Ii8TO0uXQOoGKKMMPnvfsTR/RFNbYfVYq0W5M6ytUo3KXlIdKkHOur50GiehBZecSCSYGx/KxHlQECTpsT808NVGeb9WWOppIVGHUufEnzNNUYgVG7CeImlvuu+G7xt/t6smyRptscbp/WN6/gjiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TqSlU8bc; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729778893;
+	s=mimecast20190719; t=1729778889;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3kDl7vtgTz4UJLk1NBKECBmgzlrlbYChuV4j2ks8Pq0=;
-	b=FxeCZg0bPk5uTOiI8zCzYxxaHdYPcDVBrvCpOJ+zLJ5m2FoiyVXsmMDNxJOCGROZmG4uX6
-	p5IzX9k7KY1qhGbJrJZ668k5KNpeuMHZ5M2O4T4hEBMbGSFuP2oAWFObd+Dj4YS+4lNLcd
-	O8jI3wVPBXo1SeM8W+STutQAHlNTBnA=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=aZQE6Gk2pDLRsrGirLF3LOxjqtk3JDWUrBtiyK47AD0=;
+	b=TqSlU8bcQV59xHTTmVPdkVEthkTtOuLSbmNwUDemhAbnlcySAwl4g85n0nBEf+Lh8B9E6n
+	iWpEAA1qT5hY92IVXBZw88do/d1tL2mqbS0vfgtYktn/+ZOwCQSXcFcMka2egmyAfwkvBa
+	pptPaGNKo7v3vey5h/ODy7Cv3A3Lne8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-eWp8axh7PCKxtyFvvhMAIQ-1; Thu,
- 24 Oct 2024 10:07:59 -0400
-X-MC-Unique: eWp8axh7PCKxtyFvvhMAIQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-336-LJzRLwyPP5e6Mlw0i1E05Q-1; Thu,
+ 24 Oct 2024 10:08:06 -0400
+X-MC-Unique: LJzRLwyPP5e6Mlw0i1E05Q-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 66D6A1955F69;
-	Thu, 24 Oct 2024 14:07:56 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7271A1955D52;
+	Thu, 24 Oct 2024 14:08:03 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.231])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CAADE300018D;
-	Thu, 24 Oct 2024 14:07:50 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E72E61956088;
+	Thu, 24 Oct 2024 14:07:57 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <smfrench@gmail.com>,
@@ -81,9 +81,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 16/27] cachefiles: Add some subrequest tracepoints
-Date: Thu, 24 Oct 2024 15:05:14 +0100
-Message-ID: <20241024140539.3828093-17-dhowells@redhat.com>
+Subject: [PATCH 17/27] cachefiles: Add auxiliary data trace
+Date: Thu, 24 Oct 2024 15:05:15 +0100
+Message-ID: <20241024140539.3828093-18-dhowells@redhat.com>
 In-Reply-To: <20241024140539.3828093-1-dhowells@redhat.com>
 References: <20241024140539.3828093-1-dhowells@redhat.com>
 Precedence: bulk
@@ -93,66 +93,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Add some tracepoints into the cachefiles write paths.
+Add a display of the first 8 bytes of the downloaded auxiliary data and of
+the on-disk stored auxiliary data as these are used in coherency
+management.  In the case of afs, this holds the data version number.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
 cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
 ---
- fs/cachefiles/io.c           | 4 ++++
- include/trace/events/netfs.h | 3 +++
- 2 files changed, 7 insertions(+)
+ fs/cachefiles/xattr.c             |  9 ++++++++-
+ include/trace/events/cachefiles.h | 13 ++++++++++---
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-index 6a821a959b59..92058ae43488 100644
---- a/fs/cachefiles/io.c
-+++ b/fs/cachefiles/io.c
-@@ -13,6 +13,7 @@
- #include <linux/falloc.h>
- #include <linux/sched/mm.h>
- #include <trace/events/fscache.h>
-+#include <trace/events/netfs.h>
- #include "internal.h"
- 
- struct cachefiles_kiocb {
-@@ -366,6 +367,7 @@ static int cachefiles_write(struct netfs_cache_resources *cres,
- 	if (!fscache_wait_for_operation(cres, FSCACHE_WANT_WRITE)) {
- 		if (term_func)
- 			term_func(term_func_priv, -ENOBUFS, false);
-+		trace_netfs_sreq(term_func_priv, netfs_sreq_trace_cache_nowrite);
- 		return -ENOBUFS;
+diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
+index 7c6f260a3be5..52383b1d0ba6 100644
+--- a/fs/cachefiles/xattr.c
++++ b/fs/cachefiles/xattr.c
+@@ -77,6 +77,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
+ 		trace_cachefiles_vfs_error(object, file_inode(file), ret,
+ 					   cachefiles_trace_setxattr_error);
+ 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
++					   be64_to_cpup((__be64 *)buf->data),
+ 					   buf->content,
+ 					   cachefiles_coherency_set_fail);
+ 		if (ret != -ENOMEM)
+@@ -85,6 +86,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
+ 				"Failed to set xattr with error %d", ret);
+ 	} else {
+ 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
++					   be64_to_cpup((__be64 *)buf->data),
+ 					   buf->content,
+ 					   cachefiles_coherency_set_ok);
+ 	}
+@@ -126,7 +128,10 @@ int cachefiles_check_auxdata(struct cachefiles_object *object, struct file *file
+ 				object,
+ 				"Failed to read aux with error %zd", xlen);
+ 		why = cachefiles_coherency_check_xattr;
+-	} else if (buf->type != CACHEFILES_COOKIE_TYPE_DATA) {
++		goto out;
++	}
++
++	if (buf->type != CACHEFILES_COOKIE_TYPE_DATA) {
+ 		why = cachefiles_coherency_check_type;
+ 	} else if (memcmp(buf->data, p, len) != 0) {
+ 		why = cachefiles_coherency_check_aux;
+@@ -141,7 +146,9 @@ int cachefiles_check_auxdata(struct cachefiles_object *object, struct file *file
+ 		ret = 0;
  	}
  
-@@ -695,6 +697,7 @@ static void cachefiles_issue_write(struct netfs_io_subrequest *subreq)
- 		iov_iter_truncate(&subreq->io_iter, len);
- 	}
++out:
+ 	trace_cachefiles_coherency(object, file_inode(file)->i_ino,
++				   be64_to_cpup((__be64 *)buf->data),
+ 				   buf->content, why);
+ 	kfree(buf);
+ 	return ret;
+diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
+index 7d931db02b93..775a72e6adc6 100644
+--- a/include/trace/events/cachefiles.h
++++ b/include/trace/events/cachefiles.h
+@@ -380,10 +380,11 @@ TRACE_EVENT(cachefiles_rename,
+ TRACE_EVENT(cachefiles_coherency,
+ 	    TP_PROTO(struct cachefiles_object *obj,
+ 		     ino_t ino,
++		     u64 disk_aux,
+ 		     enum cachefiles_content content,
+ 		     enum cachefiles_coherency_trace why),
  
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_cache_prepare);
- 	cachefiles_begin_secure(cache, &saved_cred);
- 	ret = __cachefiles_prepare_write(object, cachefiles_cres_file(cres),
- 					 &start, &len, len, true);
-@@ -704,6 +707,7 @@ static void cachefiles_issue_write(struct netfs_io_subrequest *subreq)
- 		return;
- 	}
+-	    TP_ARGS(obj, ino, content, why),
++	    TP_ARGS(obj, ino, disk_aux, content, why),
  
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_cache_write);
- 	cachefiles_write(&subreq->rreq->cache_resources,
- 			 subreq->start, &subreq->io_iter,
- 			 netfs_write_subrequest_terminated, subreq);
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index a0f5b13aab86..7c3c866ae183 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -74,6 +74,9 @@
- #define netfs_sreq_traces					\
- 	EM(netfs_sreq_trace_add_donations,	"+DON ")	\
- 	EM(netfs_sreq_trace_added,		"ADD  ")	\
-+	EM(netfs_sreq_trace_cache_nowrite,	"CA-NW")	\
-+	EM(netfs_sreq_trace_cache_prepare,	"CA-PR")	\
-+	EM(netfs_sreq_trace_cache_write,	"CA-WR")	\
- 	EM(netfs_sreq_trace_clear,		"CLEAR")	\
- 	EM(netfs_sreq_trace_discard,		"DSCRD")	\
- 	EM(netfs_sreq_trace_donate_to_prev,	"DON-P")	\
+ 	    /* Note that obj may be NULL */
+ 	    TP_STRUCT__entry(
+@@ -391,6 +392,8 @@ TRACE_EVENT(cachefiles_coherency,
+ 		    __field(enum cachefiles_coherency_trace,	why	)
+ 		    __field(enum cachefiles_content,		content	)
+ 		    __field(u64,				ino	)
++		    __field(u64,				aux	)
++		    __field(u64,				disk_aux)
+ 			     ),
+ 
+ 	    TP_fast_assign(
+@@ -398,13 +401,17 @@ TRACE_EVENT(cachefiles_coherency,
+ 		    __entry->why	= why;
+ 		    __entry->content	= content;
+ 		    __entry->ino	= ino;
++		    __entry->aux	= be64_to_cpup((__be64 *)obj->cookie->inline_aux);
++		    __entry->disk_aux	= disk_aux;
+ 			   ),
+ 
+-	    TP_printk("o=%08x %s B=%llx c=%u",
++	    TP_printk("o=%08x %s B=%llx c=%u aux=%llx dsk=%llx",
+ 		      __entry->obj,
+ 		      __print_symbolic(__entry->why, cachefiles_coherency_traces),
+ 		      __entry->ino,
+-		      __entry->content)
++		      __entry->content,
++		      __entry->aux,
++		      __entry->disk_aux)
+ 	    );
+ 
+ TRACE_EVENT(cachefiles_vol_coherency,
 
 
