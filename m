@@ -1,83 +1,329 @@
-Return-Path: <netdev+bounces-138646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF41F9AE768
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:06:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 759CB9AE76F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 890BCB26360
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:06:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3613028A6C5
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D131EB9E9;
-	Thu, 24 Oct 2024 14:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3631E633B;
+	Thu, 24 Oct 2024 14:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fVLk852m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6dtO7D/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC881E32AF
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FF41E412E
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729778696; cv=none; b=Mb2Vg3jOBwWte0PRpIX0vlq800Wp9ugsZ4gOYgQi7oX5RHmwcOaTbogPCIrw1CSDAABfcT/nWJZxxkGf25c8GqzM6wpRZMftydtZ5a4zfNSpzUAy0Mla2is6MTWqIQUdECOcLwUcBsb+N9AUX7T4f9LlL26tix0CSUVlXI27cmI=
+	t=1729778765; cv=none; b=sOCVQtQi/w5Jw3apI0P3brppJQ42j7ww+GGS20mSuDWSeLcFjqcEmoV76NOpZyn/UAp4IRk7DMxo4lWCEIa/3unw8b5rzO/t4o4FuCZJtgZ8EhhuuHreH9n7cqCGjo2r14uHlBVyljbBCxm2BGnQ5X9/xeX95BWy53kIUtaixyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729778696; c=relaxed/simple;
-	bh=d6uVdVofXZGEjZTXu9CRg8oJq4dyLU0txV0kKW3ZHKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mqJaZU2pBI28XdhySnnFG8Nwt0xSPSCmtqBC39X14rhYljzqLbJC1tcE9ILNIUXQkVg5Pl++hQbexUD/4VArUxiYbaT7ZHfkKf9K+/j+MxqR5DlQEAb6SqzJj5HfMyu89EWCKr6YGyOLrOnYcjoNFLPZM4JVZvMtcjY/mksGoPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fVLk852m; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kZ6YqHlJ5NtESw2CvqdAom2NnpjGNWB2B0KtXyRLQyI=; b=fVLk852mxB1cyeiDtKimVk9gKN
-	ahm7BDgKMGVUesRrueBOU4kIGERyYJxEn22bVvpHwhKkVMECSozWz1vLC2HyGsQE3KvvqC+S/vSVT
-	BA8vuC900tV5/IR4Nh9zyUHXEUKjf3KNlyoAiiCdg5sMWB4FerX2Qr3THr3WeaE8c/5Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t3yS3-00B83U-2j; Thu, 24 Oct 2024 16:04:35 +0200
-Date: Thu, 24 Oct 2024 16:04:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
-Cc: Simon Horman <horms@kernel.org>, Rasesh Mody <rmody@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] bna: Fix return value check for debugfs create APIs
-Message-ID: <d7d04629-941b-4efb-84ee-92fbd0f42f9c@lunn.ch>
-References: <20241023080921.326-1-thunder.leizhen@huawei.com>
- <20241023080921.326-2-thunder.leizhen@huawei.com>
- <20241024121325.GJ1202098@kernel.org>
- <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
+	s=arc-20240116; t=1729778765; c=relaxed/simple;
+	bh=iCXu0kdmkDCPfTarrWhzzb+ssLpDK7QDMuI+v1DkZL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OEBy0pDxdsMGm2NQxTaUyDsarXrBc6LR3ExN/SOs/Sq2KX7+rPadsWCXK1S1u6D1S030cMw2sRRsVGSFgAsPWRvpws5Ghd/pdq/WxiJ/wIIH4bIxc5H121wJNoQsP3uroa7qOlb+I6IEVtSKhWPS6Vn47ksd+CfpMqOlgaEartw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O6dtO7D/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729778761;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ev9kJ9rlV3vqxDuSiIe2EjcyS0bQJKHDy9szPwe6evI=;
+	b=O6dtO7D/QYkDZIxr1JoA3QzgIy3M8ihmRxIXPWc+Ybv6D9SyNq0IhkRKoSeYuWQkzPYSby
+	DNrFsgDp3Okm5NiMsxWs27l74/9gmKjY+3HD/wry9t6hoFARhnDc4imN8lbTyx3L9VmP3H
+	JPRfUFfCbt8rig+eeNkZ+idJeBs8G9M=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-345-DDRJR6TRMWaIDdipoI9l1Q-1; Thu,
+ 24 Oct 2024 10:05:57 -0400
+X-MC-Unique: DDRJR6TRMWaIDdipoI9l1Q-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 358ED1954B11;
+	Thu, 24 Oct 2024 14:05:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.42.28.231])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2DA351955F42;
+	Thu, 24 Oct 2024 14:05:46 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/27] netfs: Read performance improvements and "single-blob" support
+Date: Thu, 24 Oct 2024 15:04:58 +0100
+Message-ID: <20241024140539.3828093-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-> Do you want to ignore all the return values of debugfs_create_dir() and debugfs_create_file()?
+Hi Christian, Steve, Willy,
 
-All return values from all debugfs_foo() calls.
+This set of patches is primarily about two things: improving read
+performance and supporting monolithic single-blob objects that have to be
+read/written as such (e.g. AFS directory contents).  The implementation of
+the two parts is interwoven as each makes the other possible.
 
-debugfs has been designed so that it should be robust if any previous
-call to debugfs failed. It will not crash, it will just keep going.
+READ PERFORMANCE
+================
 
-It does not matter if the contents of debugfs are messed up as a
-result, it is not an ABI, you cannot trust it to contain anything
-useful, and it might be missing all together, since it is optional.
+The read performance improvements are intended to speed up some loss of
+performance detected in cifs and to a lesser extend in afs.  The problem is
+that we queue too many work items during the collection of read results:
+each individual subrequest is collected by its own work item, and then they
+have to interact with each other when a series of subrequests don't exactly
+align with the pattern of folios that are being read by the overall
+request.
 
-	Andrew
+Whilst the processing of the pages covered by individual subrequests as
+they complete potentially allows folios to be woken in parallel and with
+minimum delay, it can shuffle wakeups for sequential reads out of order -
+and that is the most common I/O pattern.
+
+The final assessment and cleanup of an operation is then held up until the
+last I/O completes - and for a synchronous sequential operation, this means
+the bouncing around of work items just adds latency.
+
+Two changes have been made to make this work:
+
+ (1) All collection is now done in a single "work item" that works
+     progressively through the subrequests as they complete (and also
+     dispatches retries as necessary).
+
+ (2) For readahead and AIO, this work item be done on a workqueue and can
+     run in parallel with the ultimate consumer of the data; for
+     synchronous direct or unbuffered reads, the collection is run in the
+     application thread and not offloaded.
+
+Functions such as smb2_readv_callback() then just tell netfslib that the
+subrequest has terminated; netfslib does a minimal bit of processing on the
+spot - stat counting and tracing mostly - and then queues/wakes up the
+worker.  This simplifies the logic as the collector just walks sequentially
+through the subrequests as they complete and walks through the folios, if
+buffered, unlocking them as it goes.  It also keeps to a minimum the amount
+of latency injected into the filesystem's low-level I/O handling
+
+
+SINGLE-BLOB OBJECT SUPPORT
+==========================
+
+Single-blob objects are files for which the content of the file must be
+read from or written to the server in a single operation because reading
+them in parts may yield inconsistent results.  AFS directories are an
+example of this as there exists the possibility that the contents are
+generated on the fly and would differ between reads or might change due to
+third party interference.
+
+Such objects will be written to and retrieved from the cache if one is
+present, though we allow/may need to propose multiple subrequests to do so.
+The important part is that read from/write to the *server* is monolithic.
+
+Single blob reading is, for the moment, fully synchronous and does result
+collection in the application thread and, also for the moment, the API is
+supplied the buffer in the form of a folio_queue chain rather than using
+the pagecache.
+
+
+AFS CHANGES
+===========
+
+This series makes a number of changes to the kafs filesystem, primarily in
+the area of directory handling:
+
+ (1) AFS's FetchData RPC reply processing is made partially asynchronous
+     which allows the netfs_io_request's outstanding operation counter to
+     be removed as part of reducing the collection to a single work item.
+
+ (2) Directory and symlink reading are plumbed through netfslib using the
+     single-blob object API and are now cacheable with fscache.  This also
+     allows the afs_read struct to be eliminated and netfs_io_subrequest to
+     be used directly instead.
+
+ (3) Directory and symlink content are now stored in a folio_queue buffer
+     rather than in the pagecache.  This means we don't require the RCU
+     read lock and xarray iteration to access it, and folios won't randomly
+     disappear under us because the VM wants them back.
+
+     There are some downsides to this, though: the storage folios are no
+     longer known to the VM, drop_caches can't flush them, the folios are
+     not migrateable.  The inode must also be marked dirty manually to get
+     the data written to the cache in the background.
+
+ (4) The vnode operation lock is changed from a mutex struct to a private
+     lock implementation.  The problem is that the lock now needs to be
+     dropped in a separate thread and mutexes don't permit that.
+
+ (5) When a new directory is created, we now initialise it locally and mark
+     it valid rather than downloading it (we know what it's likely to look
+     like).
+
+
+SUPPORTING CHANGES
+==================
+
+To support the above some other changes are also made:
+
+ (1) A "rolling buffer" implementation is created to abstract out the two
+     separate folio_queue chaining implementations I had (one for read and
+     one for write).
+
+ (2) Functions are provided to create/extend a buffer in a folio_queue
+     chain and tear it down again.  This is used to handle AFS directories,
+     but could also be used to create bounce buffers for content crypto and
+     transport crypto.
+
+ (3) The was_async argument is dropped from netfs_read_subreq_terminated().
+     Instead we wake the read collection work item by either queuing it or
+     waking up the app thread.
+
+ (4) We don't need to use BH-excluding locks when communicating between the
+     issuing thread and the collection thread as neither of them now run in
+     BH context.
+
+
+MISCELLANY
+==========
+
+Also included are some fixes from Matthew Wilcox that need to be applied
+first; a number of new tracepoints; a split of the netfslib write
+collection code to put retrying into its own file (it gets more complicated
+with content encryption).
+
+There are also some minor fixes AFS included, including fixing the AFS
+directory format struct layout, reducing some directory over-invalidation
+and making afs_mkdir() translate EEXIST to ENOTEMPY (which is not available
+on all systems the servers support).
+
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-writeback
+
+Thanks,
+David
+
+David Howells (24):
+  netfs: Use a folio_queue allocation and free functions
+  netfs: Add a tracepoint to log the lifespan of folio_queue structs
+  netfs: Abstract out a rolling folio buffer implementation
+  netfs: Make netfs_advance_write() return size_t
+  netfs: Split retry code out of fs/netfs/write_collect.c
+  netfs: Drop the error arg from netfs_read_subreq_terminated()
+  netfs: Drop the was_async arg from netfs_read_subreq_terminated()
+  netfs: Don't use bh spinlock
+  afs: Don't use mutex for I/O operation lock
+  afs: Fix EEXIST error returned from afs_rmdir() to be ENOTEMPTY
+  afs: Fix directory format encoding struct
+  netfs: Remove some extraneous directory invalidations
+  cachefiles: Add some subrequest tracepoints
+  cachefiles: Add auxiliary data trace
+  afs: Add more tracepoints to do with tracking validity
+  netfs: Add functions to build/clean a buffer in a folio_queue
+  netfs: Add support for caching single monolithic objects such as AFS
+    dirs
+  afs: Make afs_init_request() get a key if not given a file
+  afs: Use netfslib for directories
+  afs: Use netfslib for symlinks, allowing them to be cached
+  afs: Eliminate afs_read
+  afs: Make {Y,}FS.FetchData an asynchronous operation
+  netfs: Change the read result collector to only use one work item
+  afs: Make afs_mkdir() locally initialise a new directory's content
+
+Matthew Wilcox (Oracle) (3):
+  netfs: Remove call to folio_index()
+  netfs: Fix a few minor bugs in netfs_page_mkwrite()
+  netfs: Remove unnecessary references to pages
+
+ fs/9p/vfs_addr.c                  |   8 +-
+ fs/afs/callback.c                 |   4 +-
+ fs/afs/dir.c                      | 743 ++++++++++++++++--------------
+ fs/afs/dir_edit.c                 | 265 ++++++-----
+ fs/afs/file.c                     | 244 +++++-----
+ fs/afs/fs_operation.c             | 113 ++++-
+ fs/afs/fsclient.c                 |  59 +--
+ fs/afs/inode.c                    | 104 ++++-
+ fs/afs/internal.h                 |  97 ++--
+ fs/afs/main.c                     |   2 +-
+ fs/afs/mntpt.c                    |  22 +-
+ fs/afs/rotate.c                   |   4 +-
+ fs/afs/rxrpc.c                    |   8 +-
+ fs/afs/super.c                    |   4 +-
+ fs/afs/validation.c               |  31 +-
+ fs/afs/write.c                    |  16 +-
+ fs/afs/xdr_fs.h                   |   2 +-
+ fs/afs/yfsclient.c                |  48 +-
+ fs/cachefiles/io.c                |   4 +
+ fs/cachefiles/xattr.c             |   9 +-
+ fs/ceph/addr.c                    |  13 +-
+ fs/netfs/Makefile                 |   5 +-
+ fs/netfs/buffered_read.c          | 274 ++++-------
+ fs/netfs/buffered_write.c         |  41 +-
+ fs/netfs/direct_read.c            |  80 ++--
+ fs/netfs/direct_write.c           |  10 +-
+ fs/netfs/internal.h               |  36 +-
+ fs/netfs/main.c                   |   6 +-
+ fs/netfs/misc.c                   | 163 +++----
+ fs/netfs/objects.c                |  21 +-
+ fs/netfs/read_collect.c           | 703 ++++++++++++++++------------
+ fs/netfs/read_pgpriv2.c           |  35 +-
+ fs/netfs/read_retry.c             | 209 +++++----
+ fs/netfs/read_single.c            | 195 ++++++++
+ fs/netfs/rolling_buffer.c         | 225 +++++++++
+ fs/netfs/stats.c                  |   4 +-
+ fs/netfs/write_collect.c          | 244 +---------
+ fs/netfs/write_issue.c            | 239 +++++++++-
+ fs/netfs/write_retry.c            | 233 ++++++++++
+ fs/nfs/fscache.c                  |   6 +-
+ fs/nfs/fscache.h                  |   3 +-
+ fs/smb/client/cifssmb.c           |  12 +-
+ fs/smb/client/file.c              |   3 +-
+ fs/smb/client/smb2ops.c           |   2 +-
+ fs/smb/client/smb2pdu.c           |  14 +-
+ include/linux/folio_queue.h       |  12 +-
+ include/linux/netfs.h             |  55 ++-
+ include/linux/rolling_buffer.h    |  61 +++
+ include/trace/events/afs.h        | 178 ++++++-
+ include/trace/events/cachefiles.h |  13 +-
+ include/trace/events/netfs.h      |  97 ++--
+ lib/kunit_iov_iter.c              |   4 +-
+ 52 files changed, 3147 insertions(+), 1836 deletions(-)
+ create mode 100644 fs/netfs/read_single.c
+ create mode 100644 fs/netfs/rolling_buffer.c
+ create mode 100644 fs/netfs/write_retry.c
+ create mode 100644 include/linux/rolling_buffer.h
+
 
