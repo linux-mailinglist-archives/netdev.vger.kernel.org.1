@@ -1,217 +1,223 @@
-Return-Path: <netdev+bounces-138769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FA139AECE5
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:58:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DBAE9AECD0
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F078DB22D69
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:58:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C49B285639
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4D91F9ECE;
-	Thu, 24 Oct 2024 16:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E221F8EE5;
+	Thu, 24 Oct 2024 16:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdRrAud4"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HsY91AWM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D95A1F8920;
-	Thu, 24 Oct 2024 16:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729789125; cv=none; b=uwRDB8gQIlo3x5D8qDL1jFQWoRbNGG60NJsft5H0823WzbcKZdB6wNN5vxVeww6Hxkl/1Pg+CdAdh3yyCyGoairGo7wHyhu5EAer7fDvOt3J+/m/INkY1lXGQaNG3J6dFhDgDqVD5MkmAHsAfQIZW32z67FMq/ZfCF329mEZsUo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729789125; c=relaxed/simple;
-	bh=LQUqq41rKKi2DZ6ziCnRzGqwgHnRtqlW6CGDMmHRRV0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KGQrBwInP+7O6ZC04BeGBenD9agI/00MRmAD/858NYwn1Hw6qefFKkwusvioK745UQTx0fmpW5jjHJd4PIkx1W8WXFfilymkgzcZNXohV+SnXQ25Kmp1brADGXlsRCBZ3DT4Tim+iieHtM4u2qyZ8zG5vfb9vzWgqEYuhVr6bHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdRrAud4; arc=none smtp.client-ip=209.85.215.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-7ed9c16f687so789336a12.0;
-        Thu, 24 Oct 2024 09:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729789122; x=1730393922; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xfJ8p+8q2+xxwuBNnMevVX62Z8jej5Rz7JLXYkmoeTk=;
-        b=GdRrAud4sBuMip099zZ1gjZUCAcpFpVaf6tUQmzZiB+fqLRR9sWZcb3ta3oMj2CiwY
-         TV4qbu6vYPrZsCnoSTsTV2RmTrBAG1uZ0TP4ioCKkF+Z6KYlIsGQH5UuZCQ1L/TASDEh
-         eUKVB927Xn5mzBkRVawsCap+F2hQ5UhaVPOYhdt0mulXUclspSdwlLLNP3LHQxmHiLQe
-         YFG7mc54BLSYfJtcWt1HrhKUHyn+Krz7HOXtSXiACkumDZ0EXQ/lo601sIOIj9EzNWv8
-         3d2e6LoC/BiHj1Vi0J3FyTJ7+8m++t2/++JKtONXHcmN0LgiRKOGHikuV30EjZyOePvy
-         0r/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729789122; x=1730393922;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xfJ8p+8q2+xxwuBNnMevVX62Z8jej5Rz7JLXYkmoeTk=;
-        b=hOQ2ukPUNmh8YIr7LBkmwc3CYEdxpSn7WAO2Nc8riIteEgG3KbGVNWoyR3AduwjvGk
-         8S4YusAzwX4Lp7kvLgF0E8l04Xg50flTChmwoSe5CxeHVh8qCg6RtFHMZiEmhyKrefeN
-         aIuodW9ON2FIrIa5gCdk4vk3Gk8A6ZCw1TEWSlQ5XfqaFcxd4x1iz7ps7tnaHDTaZkUi
-         s3SwQF3Vbk4F3fSsfhPwZR6/ZLOfAtXe0vq/wuLCZZMatBAQib0+nwBGyvMGANLZxhky
-         H1fUPG7KhSP/7SQAhLp4J3hIK7on2ly0cE4d5jACehwEt95Bn++DtJ92l9XeGPOwsWOC
-         giCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKiGZ96egjcbAUQDKpmXa1AYRQMsthzWB9PC/aB01BBG04BlU8t30QkntRKGsZ1TP3vxP3daZD@vger.kernel.org, AJvYcCUhAdcCLRe9ev1/BvD4IfTM3Ul+Od0QLT7yQCPph/VyTxiohVv2d9Mz5pJPr/NAsLP7IzbVDSqOYOc=@vger.kernel.org, AJvYcCUk05f0jIdFIIWoZWALXr9PcPuS4JHc+28ZX2XF2YO8b5hxOhjxsNwT/JRbZ2QwF7COSNkROuVg1+9m@vger.kernel.org, AJvYcCVgHb6MZvwJoATLBipaEwXFZ3URjzSF4uijAPp+uu7grjwgKHHnN1pVLDP5tVAkLTHtQupt2XaNrRkVvA==@vger.kernel.org, AJvYcCVyJ6SpKy0/TJ9UIc59nEKSohkryFOqxKbPMM6mvROBq8etqKm44z/TG4Z+fX2sScpm0cUs1PiaupqBFg==@vger.kernel.org, AJvYcCW2MpX+vmo3YYA+4ROsl/lMtdQhdc1ZQURUTFvZkYiNP64aGN90cMavBIGYrgm4bG0420o6GQ+P+VLE3DM=@vger.kernel.org, AJvYcCW5ZMrGyK3ezS8lW7OVIjCkco+PZONEiuMwmivG68imGzXYuY+bNIg0mg6LCzik51YMjCSgn9W6pf2n@vger.kernel.org, AJvYcCWALFz59CqB35Em6cM1//ZoXwoBEbS1PIVHzCKXCtfZhh9Q0MckZrN2b4DDDIPHeTAYFXCqGQdxknL+@vger.kernel.org, AJvYcCWdZUvCC2B4wYBkPn6VBXFMm/MdT67uw85l3/TUFiJ8Ge2GAB+sPl0I2FIQLtYYtXRrPKDLfqyNSMhuSFo4@vger.kernel.org, AJvYcCX6uhRMM17fI/xEG4SElr8UaGwjyiFExqNa
- vztQvB+4Q9GoIC+FC2f1T/f42V2Mgw9qy0ii9VI5u2xDh/pb@vger.kernel.org, AJvYcCX9t8XQzPxCVjCEtf6Nkj6k2+tpWqLtnUgCnO8GqX0d6mFQevHJomF4dpeP26AJt6LMEQ8HQz7GJj//IPqiTkHVPvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQQxMY3x2L2mkXje97qUq2p4abElq9M8zu4r1Y3ViuQWHAMKsb
-	mE3Vg/KbinLNlppjmmWm6mTFBiE/gvcY44DozzKCUVktPo1HPBeQ
-X-Google-Smtp-Source: AGHT+IHkRrL+646WJX5jMNiRVOq7St1d5iL/wDNXUA9UQNOX6Gcj9xqgJzmbGWgDaCdtnMTv+h1KbQ==
-X-Received: by 2002:a05:6a21:4a4c:b0:1d9:175a:c2ba with SMTP id adf61e73a8af0-1d978b0245fmr8971311637.20.1729789122186;
-        Thu, 24 Oct 2024 09:58:42 -0700 (PDT)
-Received: from localhost.localdomain ([240b:4001:20c:6000::1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec132ffdcsm8203615b3a.46.2024.10.24.09.58.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 09:58:41 -0700 (PDT)
-From: Hantong Chen <cxwdyx620@gmail.com>
-To: james.bottomley@hansenpartnership.com
-Cc: ajhalaney@gmail.com,
-	allenbh@gmail.com,
-	andrew@lunn.ch,
-	andriy.shevchenko@linux.intel.com,
-	andy@kernel.org,
-	arnd@arndb.de,
-	bhelgaas@google.com,
-	bp@alien8.de,
-	broonie@kernel.org,
-	cai.huoqing@linux.dev,
-	dave.jiang@intel.com,
-	davem@davemloft.net,
-	dlemoal@kernel.org,
-	dmaengine@vger.kernel.org,
-	dushistov@mail.ru,
-	fancer.lancer@gmail.com,
-	geert@linux-m68k.org,
-	gregkh@linuxfoundation.org,
-	ink@jurassic.park.msu.ru,
-	jdmason@kudzu.us,
-	jiaxun.yang@flygoat.com,
-	keguang.zhang@gmail.com,
-	kory.maincent@bootlin.com,
-	krzk@kernel.org,
-	kuba@kernel.org,
-	linux-edac@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	linux@armlinux.org.uk,
-	linux@roeck-us.net,
-	manivannan.sadhasivam@linaro.org,
-	netdev@vger.kernel.org,
-	nikita.shubin@maquefel.me,
-	nikita@trvn.ru,
-	ntb@lists.linux.dev,
-	olteanv@gmail.com,
-	pabeni@redhat.com,
-	paulburton@kernel.org,
-	robh@kernel.org,
-	s.shtylyov@omp.ru,
-	sergio.paracuellos@gmail.com,
-	shc_work@mail.ru,
-	siyanteng@loongson.cn,
-	tsbogend@alpha.franken.de,
-	xeb@mail.ru,
-	yoshihiro.shimoda.uh@renesas.com
-Subject: Re: linux: Goodbye from a Linux community volunteer
-Date: Thu, 24 Oct 2024 16:56:50 +0000
-Message-ID: <20241024165650.174-1-cxwdyx620@gmail.com>
-X-Mailer: git-send-email 2.47.0.windows.1
-In-Reply-To: <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
-References: <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945111F81B9
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 16:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729789102; cv=fail; b=RN0VCyf9bnNsef4lTtspdIYDuGuA2ug0hoYtB7qmxwdUiUeLgLOed8NuYUTvKxm1jB/gNMgdGA8kLf8iVTgPTS0Qg/mrH9iTNny8fH2F5fJniFl/Q/P5lIL3HY86h2Lj24P2k5WPiZ0ByoUgTwfr04ttlJ2cliySUARgyUd5JjI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729789102; c=relaxed/simple;
+	bh=/TxRBAsLwiTvKwl7yqogfik72flC9PmV/g7Qm0U6650=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qGw/tpy/0YtAGqxheTUQrW1lNoEB4cT1grEb3ktfMcvy+FyFoDv5S9CE9IErLhYLfwTmHSrB4eH2d0reJZxlNPDDKHSlzwtFvlAE5w2ZHx1ujLVjcWqZEXRrAPlcKITaUEvjz1641yIJGRzmAs/VSdKaaUzwkMTlIw9nNh7cz7k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HsY91AWM; arc=fail smtp.client-ip=40.107.244.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Yz8naYSNV4K8D1xICC+Q4eMtpe/YfC7Fi6LO+FqZCdfLn53+sG86J1HFPBxvrgF6t5513o2Yo+XuGCAEBLLtX/Mpz5Qmhj8rnDoVrtPoOwtcYXBJQ9zYUZSOKnP7/QFGefeKMxOs6nSP7wh8ed5hf+oZqby0se9UHnG4o0Rhlc3ssQLHiGwUo1Rk/z+s/AFn6ZUGWLcmR5nBEIsozbfs2kOce5dx1y/e53HfTZulDgPlljPfu3Rb1IfL++7zlY/hGhxJ031IFOGaJSmcVyGum67WjkAAJ0/V/eExJ3XFuuZpZkz5Pc+5K1CE/7gGiDU8M+T1rp2Z52T8RfZUxyoD0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xu5eqNmBCF6JcOsRUvKCX/YhUPBqx3+/5jRrA0PS0AQ=;
+ b=N94qWUyrbXiH357DEzbfW6M8m/Qx3+Weg6Xo4i2xrjW4H2y/YcizfYQPuFE1n2TELxQlo+mi2AUA6ZLAUv/DbVqKAg4EJ+3OJP4M96h3yIYXUPySBjfN7v+BWwJhyEBcdbjqWD87dT0JDAlypXfE6UN1kjohjK1Xxavvmz0ivyWVf0UtNR0r1hpHKaetKjKFp8pMiu3nyPaxXGC3efOnwHVi3KINLzsaTtQGujH3h2K14m8gbu/QQwlTQEIzv6EVOzzR1PPn6mcjNfdO6N/kqaBZDUir1gMDeZ6xc3iV06DiFJc0yAmWufCY4Qmn8aWpbc4njus5KexVmz4eKXDm5w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xu5eqNmBCF6JcOsRUvKCX/YhUPBqx3+/5jRrA0PS0AQ=;
+ b=HsY91AWMgysJ9bDMZ11e+DuDa12TZRNe5x3A1vM4CNwTc25N9IaW+kVdhrDFNYs22uc6dntXLudCi/rguL6a5RMy8v9jJT3vm406nRpg9F5Eu+lhtbC5TvYAoG5SmjoGTu87IRBDnB2P6fuuAtmjRBGqF3um0x7sKf+O5zWwac2H3meWgFgUheCEvWchK9AyZD9bOVZrq3WxgHFuAxXK6uck55eedTAOjKw2RwB2Af6k+CMaCMwRNo3DkRsbOjxzpKEeZr83KSN8uIcbXiitL8IL2KY9uxcvByIjZS9ks09Rc0qPQOvb7sFOTFfj+BKTcdGKVYuPGGRqSbJOyV3m8w==
+Received: from MW4PR04CA0129.namprd04.prod.outlook.com (2603:10b6:303:84::14)
+ by IA1PR12MB6410.namprd12.prod.outlook.com (2603:10b6:208:38a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.30; Thu, 24 Oct
+ 2024 16:58:15 +0000
+Received: from SJ1PEPF00002310.namprd03.prod.outlook.com
+ (2603:10b6:303:84:cafe::d9) by MW4PR04CA0129.outlook.office365.com
+ (2603:10b6:303:84::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.20 via Frontend
+ Transport; Thu, 24 Oct 2024 16:58:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00002310.mail.protection.outlook.com (10.167.242.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8093.14 via Frontend Transport; Thu, 24 Oct 2024 16:58:14 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 24 Oct
+ 2024 09:57:59 -0700
+Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 24 Oct
+ 2024 09:57:54 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
+ Cohen" <amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, "Andy
+ Roulin" <aroulin@nvidia.com>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next v2 0/8] net: Shift responsibility for FDB notifications to drivers
+Date: Thu, 24 Oct 2024 18:57:35 +0200
+Message-ID: <cover.1729786087.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002310:EE_|IA1PR12MB6410:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47b659f3-8cbc-42d3-9ffb-08dcf44d0cd2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xCO7EHxNhR8QzeyACJP7sfKicPYfnPlbf5lpf31TIgbW6TKbBp3TK0/+xYf9?=
+ =?us-ascii?Q?xG31e5QnBbzFZJFsJh2draOdoROiGzgRvYnBrnD+LBT4sUt5GZ6f9owe1CRJ?=
+ =?us-ascii?Q?JiUoGSNrO6ZLSEGrJQudyCjonX0pxdOsV+4lNdRF/QVCNZEKa0SRZ687Ui8G?=
+ =?us-ascii?Q?Kw+VA0TAEs5RcLJ9biv7TXX+eKg4waYM8Qeef0HIBVAv4V6VWkXPc2rY+11g?=
+ =?us-ascii?Q?HpisDfcRlLk083NveY9ag3EQkd2HdsWVLlaAP5iix/VtNGt0PAKxntOFQpFY?=
+ =?us-ascii?Q?5cETfF1enLz07EJdjadvpKXPmIkEXmyksVCSsz15X9OPN8gnq2grYMcDKfD/?=
+ =?us-ascii?Q?uVN7Q+a6CRlWHbT7inu34XHO7c0Zh5eX/iKZ44qI1gtgIHJ9vprRwqKQWiuL?=
+ =?us-ascii?Q?CtpCVg8jkK/pgByWMrQQw9v7ByF9cS4bjnw3LpicaIDLkWZeU6P5a80bDPBU?=
+ =?us-ascii?Q?dIzpQPN6jbCiGHr19AhY58ayObyqQqRz3FGSSR86B3VtRQ39tHViQ79j5PNS?=
+ =?us-ascii?Q?zneGtSnAxL+0pLF+ZYl7MnDZHmNctGdnV+kRCP/mqWfSyv+FSdbR9Hw7YtRO?=
+ =?us-ascii?Q?OfYaukPukzrIDyAzwxuS8ISJs0Sxjv5Xq48j8/CyiE6B0oLGhh49FIFQLi4U?=
+ =?us-ascii?Q?dCbrxC1JinlXqOL2vWsoXS5ufRolC3d/LNMP2USgX0p5gRDocNEMcL9QjBqE?=
+ =?us-ascii?Q?zzyeG5wMeojxrgdTg4LHHJpRWvN85NoDZ9NGvk+WwuBLoR4QHi5wZuhR0w7d?=
+ =?us-ascii?Q?q/kO/zY8OlnIbIUF653caoH51peKh77Wf1vu14pTSBGVMaOAPECu7rfSu8N9?=
+ =?us-ascii?Q?Oxq8wTSNb17pJAShJeMYpZrrAiJtv3pffUEjzz4NrW6bsSDtQf6pgYE5KytK?=
+ =?us-ascii?Q?ZXO39+zV+3/WwCaCItEvEQ6miE5ZN9p/hBSsvXoP1zRKALwlLe8HlNMDMStu?=
+ =?us-ascii?Q?JPp6dTrHDiYX5m7Max1KheRpSRKn+MT9RwzaEN0r9iP2/2m43RPB3Q74YiPZ?=
+ =?us-ascii?Q?i74Cda8PgxM8lZahWSJqYgei7U+T1AN6D9zQ1I50K0MMy1tKlwRyjhK1YlEc?=
+ =?us-ascii?Q?d9ayCYFCs9IKw9W2jM4xXCx4BimwpXCRwNRtxoLmKOmH6jzVP7aH85/XSVN4?=
+ =?us-ascii?Q?OujCh+pdcedmFlWgliVsjL24NVYhUcCl5OsPgkj7WA8rAnH8F7+tQxOxixeD?=
+ =?us-ascii?Q?QzN0qCaO6Gp/G/Lj4fNlJ8IX0JLPoYYtRYV32tqA6vOPq/l7r65IoGksaSCb?=
+ =?us-ascii?Q?/6yDhTo9oqqtmP0JW11jWikgRoyn61q/5lz6BVgx1BfMikPclOKX3e8L2ptw?=
+ =?us-ascii?Q?w+Eq/P25M1+26yDPPAqLm2lN8Z7A9NwCyfuhnf2N3FOUPNo0gtr1tHbcXKpo?=
+ =?us-ascii?Q?gzAelRwhRHlcKp9XZeEaWOQ4PqPrfGYWnBp/VtfTkKuZdUAQBA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 16:58:14.4244
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47b659f3-8cbc-42d3-9ffb-08dcf44d0cd2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002310.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6410
 
-> If you haven't heard of Russian sanctions yet, you should try to read=0D
-> the news some day.  And by "news", I don't mean Russian=0D
-> state-sponsored spam.=0D
-=0D
-> As to sending me a revert patch - please use whatever mush you call=0D
-> brains. I'm Finnish. Did you think I'd be *supporting* Russian=0D
-> aggression? Apparently it's not just lack of real news, it's lack of=0D
-> history knowledge too.=0D
-=0D
-Hi James,=0D
-=0D
-Here's what Linus has said, and it's more than just "sanction."=0D
-=0D
-Moreover, we have to remove any maintainers who come from the following cou=
-ntries or regions, as they are listed in *Countries of Particular Concern* =
-and are subject to impending sanctions:=0D
-=0D
-- Burma, People=E2=80=99s Republic of China, Cuba, Eritrea, Iran, the Democ=
-ratic People=E2=80=99s Republic of Korea, Nicaragua, Pakistan, Russia, Saud=
-i Arabia, Tajikistan, and Turkmenistan.=0D
-- Algeria, Azerbaijan, the Central African Republic, Comoros, and Vietnam.=
-=0D
-=0D
-For People=E2=80=99s Republic of China, there are about 500 entities that a=
-re on the U.S. OFAC SDN / non-SDN lists, especially HUAWEI, which is one of=
- the most active employers from versions 5.16 through 6.1, according to sta=
-tistics. This is unacceptable, and we must take immediate action to address=
- it, with the **same** reason.=0D
-=0D
-On 10/24/24 10:50 AM, James Bottomley wrote:=0D
-> On Thu, 2024-10-24 at 07:27 +0300, Serge Semin wrote:=0D
->> Hello Linux-kernel community,=0D
->>=0D
->> I am sure you have already heard the news caused by the recent Greg'=0D
->> commit 6e90b675cf942e ("MAINTAINERS: Remove some entries due to=0D
->> various compliance requirements."). As you may have noticed the=0D
->> change concerned some of the Ru-related developers removal from the=0D
->> list of the official kernel maintainers, including me.=0D
->>=0D
->> The community members rightly noted that the _quite_ short commit log=0D
->> contained very vague terms with no explicit change justification. No=0D
->> matter how hard I tried to get more details about the reason, alas=0D
->> the senior maintainer I was discussing the matter with haven't given=0D
->> an explanation to what compliance requirements that was.=0D
-> =0D
-> Please accept all of our apologies for the way this was handled.  A=0D
-> summary of the legal advice the kernel is operating under is=0D
-> =0D
->     If your company is on the U.S. OFAC SDN lists, subject to an OFAC=0D
->     sanctions program, or owned/controlled by a company on the list, our=
-=0D
->     ability to collaborate with you will be subject to restrictions, and=
-=0D
->     you cannot be in the MAINTAINERS file.=0D
-> =0D
-> Anyone who wishes to can query the list here:=0D
-> =0D
-> https://sanctionssearch.ofac.treas.gov/=0D
-> =0D
-> In your specific case, the problem is your employer is on that list.=0D
-> If there's been a mistake and your employer isn't on the list, that's=0D
-> the documentation Greg is looking for.=0D
-> =0D
-> I would also like to thank you for all your past contributions and if=0D
-> you (or anyone else) would like an entry in the credit file, I'm happy=0D
-> to shepherd it for you if you send me what you'd like.=0D
-> =0D
-> Again, we're really sorry it's come to this, but all of the Linux=0D
-> infrastructure and a lot of its maintainers are in the US and we can't=0D
-> ignore the requirements of US law.  We are hoping that this action=0D
-> alone will be sufficient to satisfy the US Treasury department in=0D
-> charge of sanctions and we won't also have to remove any existing=0D
-> patches.=0D
-> =0D
-> Regards,=0D
-> =0D
-> James Bottomley=0D
-> =0D
+Currently when FDB entries are added to or deleted from a VXLAN netdevice,
+the VXLAN driver emits one notification, including the VXLAN-specific
+attributes. The core however always sends a notification as well, a generic
+one. Thus two notifications are unnecessarily sent for these operations. A
+similar situation comes up with bridge driver, which also emits
+notifications on its own.
+
+ # ip link add name vx type vxlan id 1000 dstport 4789
+ # bridge monitor fdb &
+ [1] 1981693
+ # bridge fdb add de:ad:be:ef:13:37 dev vx self dst 192.0.2.1
+ de:ad:be:ef:13:37 dev vx dst 192.0.2.1 self permanent
+ de:ad:be:ef:13:37 dev vx self permanent
+
+In order to prevent this duplicity, shift the responsibility to send the
+notification always to the drivers. Only where the default FDB add / del
+operations are used does the core emit notifications. If fdb_add and
+fdb_del are overridden, the driver should do that instead.
+
+To facilitate upholding this new responsibility, export rtnl_fdb_notify()
+for drivers to use.
+
+Besides this approach, we considered just passing a boolean back from the
+driver, which would indicate whether the notification was done. But the
+approach presented here seems cleaner.
+
+Patches #1 to #3 are concerned with the above.
+
+In the remaining patches, #4 to #8, add a selftest. This takes place across
+several patches. Many of the helpers we would like to use for the test are
+in forwarding/lib.sh, whereas net/ is a more suitable place for the test,
+so the libraries need to be massaged a bit first.
+
+v2:
+- Patches #2, #3:
+    - Fix qlcnic build
+
+Petr Machata (8):
+  net: rtnetlink: Publish rtnl_fdb_notify()
+  ndo_fdb_add: Shift responsibility for notifying to drivers
+  ndo_fdb_del: Shift responsibility for notifying to drivers
+  selftests: net: lib: Move logging from forwarding/lib.sh here
+  selftests: net: lib: Move tests_run from forwarding/lib.sh here
+  selftests: net: lib: Move checks from forwarding/lib.sh here
+  selftests: net: lib: Add kill_process
+  selftests: net: fdb_notify: Add a test for FDB notifications
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   3 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   6 +
+ drivers/net/ethernet/mscc/ocelot_net.c        |  16 +-
+ .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |  12 +-
+ drivers/net/macvlan.c                         |   6 +
+ include/linux/netdevice.h                     |   5 +
+ include/linux/rtnetlink.h                     |   2 +
+ net/core/rtnetlink.c                          |  24 +-
+ .../drivers/net/mlxsw/devlink_trap.sh         |   2 +-
+ .../net/mlxsw/devlink_trap_l3_drops.sh        |   4 +-
+ .../net/mlxsw/devlink_trap_l3_exceptions.sh   |  12 +-
+ .../net/mlxsw/devlink_trap_tunnel_ipip.sh     |   4 +-
+ .../net/mlxsw/devlink_trap_tunnel_ipip6.sh    |   4 +-
+ .../net/mlxsw/devlink_trap_tunnel_vxlan.sh    |   4 +-
+ .../mlxsw/devlink_trap_tunnel_vxlan_ipv6.sh   |   4 +-
+ .../selftests/drivers/net/mlxsw/tc_sample.sh  |   4 +-
+ .../net/netdevsim/fib_notifications.sh        |   6 +-
+ tools/testing/selftests/net/Makefile          |   2 +-
+ .../selftests/net/drop_monitor_tests.sh       |   2 +-
+ tools/testing/selftests/net/fdb_notify.sh     |  95 ++++++++
+ tools/testing/selftests/net/fib_tests.sh      |   8 +-
+ .../selftests/net/forwarding/devlink_lib.sh   |   2 +-
+ tools/testing/selftests/net/forwarding/lib.sh | 199 +---------------
+ .../selftests/net/forwarding/tc_police.sh     |   8 +-
+ tools/testing/selftests/net/lib.sh            | 223 ++++++++++++++++++
+ 25 files changed, 411 insertions(+), 246 deletions(-)
+ create mode 100755 tools/testing/selftests/net/fdb_notify.sh
+
+-- 
+2.45.0
+
 
