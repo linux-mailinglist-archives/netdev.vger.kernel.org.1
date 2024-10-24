@@ -1,134 +1,144 @@
-Return-Path: <netdev+bounces-138788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 854F39AEE5A
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:39:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDEB99AEE65
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43CFA2821A2
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:39:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 957D61F25B1E
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA901FE0ED;
-	Thu, 24 Oct 2024 17:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F198A1FC7F2;
+	Thu, 24 Oct 2024 17:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1JjMb11"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgBBcvma"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DA91FBF78;
-	Thu, 24 Oct 2024 17:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058B51FC7EB;
+	Thu, 24 Oct 2024 17:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729791540; cv=none; b=lclqTSuzRHzdlgT2BfolYubQx2mE9K2jODuUjKaHXXtR2VjH2MQ33s+2IEOZZLtDz8IiCP8+Ux78iA4yIlx8JMX/2TiFypp6TgMufa8LzQcxVpo+dJUvs8AcxI6kGs6pWCCjMLxLMJWDmthZD73Pshgj0JYNnQ9tXfwygaIHsz4=
+	t=1729791647; cv=none; b=WKaNRehe+KUB3JEX72OqNY58b2/oUZ+FjsJmAf+VHQ/nRSijPPFUHVqyICXsP545KSxWwcOuhRqsM4roG/7JZa0OJLAU82polgm4zyTgMgOG7No369u8j+JNrc9XR/tCxb60LfiMxIEZQ68q2QMh4P92kbSLkPf9ZYM3sdKvpNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729791540; c=relaxed/simple;
-	bh=8WJnbrt2+eyPMiVYG09me24q/mcBtJcn+Lsz0IxKsZc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n+xQA5VwtxQ16haexufUJxFmQldaea3HHsZFoxV1hAOvJzhW0ejIKw2ZWzh6jdavG0V5ud/JzhbCBR0iC/7APQYzffZ9Q+PhnibebJxMo/TbPYcjW2s9wCGu2hHwSCD9MPxLxlCT1QVATTPoP8gPyWJZOV4QFHq3wCly5Cis8ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1JjMb11; arc=none smtp.client-ip=209.85.167.50
+	s=arc-20240116; t=1729791647; c=relaxed/simple;
+	bh=z61wZmORZ8Y8YGjj3BjTQrqxc6rssIHZiu8ehtMQ2fU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R/M8b2RmgztUWfoDfV6GUGX+izoYGpIH3qHOCEOrg6gy360ZXXfkJoi+ATrAzZrffovz8gKqwvGBwF2+kVlAq9hJjOVKlzlzkpgn+hzqKnko5/2FyD2Cw886q9FLLjp6RrwFqdEc7+HzBgQpIK7S3V4nJd/4m/oy1TvSjYGD3yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FgBBcvma; arc=none smtp.client-ip=209.85.160.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539fe76e802so1554599e87.1;
-        Thu, 24 Oct 2024 10:38:58 -0700 (PDT)
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-288d74b3a91so806597fac.0;
+        Thu, 24 Oct 2024 10:40:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729791536; x=1730396336; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8WJnbrt2+eyPMiVYG09me24q/mcBtJcn+Lsz0IxKsZc=;
-        b=k1JjMb118dsFYjCSHYW1Fg9ZdL907l9C96EF23tPLwnAxAvxoWbFaofuNdtkgHT6rH
-         +RuW3jBfmcTnutdnyFpnYfXft34ewD1c2YDnbdm/aIP96hSIeuuypc/LOESQKNQMhd1u
-         TW0uAwi1BslA2qzA3y39ZiRK4mDUTrScBO1IWLjfs4/6fgOpwx12Iz+A08W2pbHehLr+
-         TgpilJWN2ct1+P7oJNYukBubxiSJM/Y+Eco3DJwH7CtH2rur5BPiUAmWMlGoRYikeDM/
-         0R59CSTYMd7EGmR2vC/DtSjIh1bxzefZUKZsi30dYvRjwbRIFSnpmwoj+NZu3aWGPSlZ
-         AxoQ==
+        d=gmail.com; s=20230601; t=1729791645; x=1730396445; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Zjv17dU8tomirllFdrleqaUh20JvDrMiKVCU2jx1Mw=;
+        b=FgBBcvmaSw3+KUZHtxfAWf4dVn0aDkj3ey3rQQp4NOtVw6cIdPR9wsoGN6g0Jvrog9
+         /gKHWpFlT/ufduYOC2rY6DoZq3QCS/oLKPmb2ki5j1OXMi/eHxfDUsIwqb9sibFM+fSV
+         0+3jhGwvjvyh0vyN0HuSLbQciqdHI9VX+2bPTMkQrLLKhYOIBR4tImvbN6APpnF+ANGf
+         DWsatXkrMr/g9T7Z2r7CcIBzXoItoU57sXWDw2G9PDtt31vlmxtW/Y72u/EDIo1KVHwE
+         qraYBbvwv9/Qeg0iULOjXnMgThielaY99Zj7YNoDoBYm4mE6B5uUucuh5Ta+5HDvC6bL
+         pdJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729791536; x=1730396336;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8WJnbrt2+eyPMiVYG09me24q/mcBtJcn+Lsz0IxKsZc=;
-        b=B2IyLFeSncWyqr1A3NDVnxzWruqQcFqF0MFY6At6bOMYzA1ERCOPxeEZXS+YGTe7A8
-         j2271in/dhQydDjPYC96AfYoSipQem+tbEALRTKBGxCaO9YwtTqw2ZhjyzMaiwf7vP91
-         WDZmAwWFUuDLqpl7p+AsUYODtPzjlPMG69a5lqHck2Wi60uRaGS79Q2/H2OcnjWdfyEe
-         NgVV/lPz0P5kLfjNqy84GNsfamRsGe8sRnwx3laRfp1JjqzTRetoZIE/bGtHf/5jJRd/
-         xV/UV+SlYq+hudR67hXVXywYMvSoBDU8DPGMbTsTbmWi3WSN5Chdh7t4eX/5RVg9aU1K
-         HseQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUA1AdS/G2JBISRT3KBqDIDlqDJE9cXCpAhQdHNBw0gcOt8X97tVGRnVFj1TfiRO2NnACSxK5cEMwNj@vger.kernel.org, AJvYcCUeNQZZpmZZwQMecf5ZnroHh3AUUWy3AK/wqIvIlD5AigpMKxP3NwPQbTGPG2PxDRn7tYWluEfFreYi@vger.kernel.org, AJvYcCVwrKESK4zCd2CdCoNxtOyisOGJmV2+8bsVI0akfZtl/fqUtSiyX7YuUJoQJnyIP/GKljCXUYwxI9pykbg=@vger.kernel.org, AJvYcCWHCqLpedMcQl4n/V8bcuqAOG49dBslE+QIMulsCQERI6kT0bgy0JB7FXp2qoO2d6z+CSvS5eoGVrY=@vger.kernel.org, AJvYcCWQOs8fYGeZUe13aeLMFm5AUz1JJbrhEOazB1yp9FPbTgGfZjNYhRV2KQI9/3PtwAqFYU4W2Yq26YW1MA==@vger.kernel.org, AJvYcCWemBXmukxrYULt7bO+2RMPf8IBDSiBuwcM8wISB2rg290HTciXM7vQh0aNhazOyWfvSII6pGz5nta77A==@vger.kernel.org, AJvYcCWksYbsq2UNmsu7fl79lxstci1EFdcpp7hj4V0c4plqWnLow7ejLhflG+exmJpt2VSGy1rlCDTd6kQS1ks=@vger.kernel.org, AJvYcCWtUTsGWp5BcPWot+Ku51O7D0b4KQBxHFbs7GqZkPepA0K/Qyvt5JKPupG1jzF2UnOsfqVbDdTp@vger.kernel.org, AJvYcCWv0Mp/vpy5OZu0vhNeUKeWfO9UdfDd1iB8R+/bbDnuSB1/lYEi8V+Wo+6GqpJMfysYrQG2l+8y+jgk4vAQ/9FaSCI=@vger.kernel.org, AJvYcCX7Fdoi7Z4q4hfebhnDW5gc
- 5FKHneNGzVBBKqt9BpYdUQxUzrL4JxYl8xUc5ySiGY1xI6tDad/zd7cOFq0=@vger.kernel.org, AJvYcCXJ54+VAKpODHwyPtNeDkfFD/SsInh1CCdK4LsvQ0qdGV117h+7xXY+xzSCbIIZpoE8NpS/IJyIu7Pq@vger.kernel.org, AJvYcCXaxuJyzAFQHMq9Y+IlmNFgqSEMMufavZ7ZF5SHe26QJDtUernuPxXp9NobsmN4LKq5znxkEb6CKTXfSQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywgi09+v6a2tY4vJmCwjwA/9oIgXi9fCCjc/0671BJGBmwYt+6p
-	JKic5CHlzIEE8zvHJ2vWYGrj24Ij9x8CRr3TWAI8M00D+1JmiRJj
-X-Google-Smtp-Source: AGHT+IHBgp08+X7VDah7A1PXK+oh2J53hxr+ZwxrWtWH2iwrLcyRGNg7D7RBAUjcie/LivvlgLDo6g==
-X-Received: by 2002:a05:6512:3a96:b0:539:e436:f1cd with SMTP id 2adb3069b0e04-53b1a306993mr4517544e87.16.1729791536088;
-        Thu, 24 Oct 2024 10:38:56 -0700 (PDT)
-Received: from seven-swords.. ([2a03:d000:2:9006:4eed:fbff:fe72:e806])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53a2242024csm1417428e87.121.2024.10.24.10.38.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 10:38:55 -0700 (PDT)
-From: Ivan Epifanov <isage.dna@gmail.com>
-To: linux@roeck-us.net
-Cc: andriy.shevchenko@intel.com,
-	aospan@netup.ru,
-	conor.dooley@microchip.com,
-	ddrokosov@sberdevices.ru,
-	dmaengine@vger.kernel.org,
-	dushistov@mail.ru,
-	fancer.lancer@gmail.com,
-	geert@linux-m68k.org,
-	gregkh@linuxfoundation.org,
-	hoan@os.amperecomputing.com,
-	ink@jurassic.park.msu.ru,
-	isage.dna@gmail.com,
-	jeffbai@aosc.io,
-	kexybiscuit@aosc.io,
-	linux-alpha@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-iio@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	manivannan.sadhasivam@linaro.org,
-	mattst88@gmail.com,
-	netdev@vger.kernel.org,
-	nikita@trvn.ru,
-	ntb@lists.linux.dev,
-	patches@lists.linux.dev,
-	richard.henderson@linaro.org,
-	s.shtylyov@omp.ru,
-	serjk@netup.ru,
-	shc_work@mail.ru,
-	torvalds@linux-foundation.org,
-	torvic9@mailbox.org,
-	tsbogend@alpha.franken.de,
-	v.georgiev@metrotek.ru,
-	wangyuli@uniontech.com,
-	wsa+renesas@sang-engineering.com,
-	xeb@mail.ru
-Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various compliance requirements."
-Date: Thu, 24 Oct 2024 20:38:51 +0300
-Message-ID: <20241024173851.245260-1-isage.dna@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <68e35542-d360-4a37-9ff1-16fe76594b6f@roeck-us.net>
-References: <68e35542-d360-4a37-9ff1-16fe76594b6f@roeck-us.net>
+        d=1e100.net; s=20230601; t=1729791645; x=1730396445;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Zjv17dU8tomirllFdrleqaUh20JvDrMiKVCU2jx1Mw=;
+        b=rgWh1Dw+CK9EyyJAPJookb+eCoMSHsmzjjAS20ZAGtR8TDNx41Xe7BUrIIk3RwQbAT
+         dpZOBfCutTG38+xFKW7VvmZ9QEJgRo+Q0L+iIn6kzHkm7BrdJMzd7HlGb7MWx97IO96p
+         zFpAaaNTSTRwOyXPkhTDGPor5hyJRDiiKJxTtzVlVvl3Jv7s/00Xu/4eUWa8lp3EDrNl
+         CYY8l98r01CPa3DdbSaijLXMW9/qeo8kWSiVWFn/ufX2Rfmlv4nqZOmULKBHewAJmrCz
+         KzjBE9SffLwehnvJv2HNSvciCkLiBRxmwYJfP0ptqvKYqYl1mmyVoy+1Q+VG7/nZs74H
+         G1Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+Qug5zO8ooqKPPLyZCLEOxRJ6n+CvGIoCdG0sIFSPodjLDn7X3H4xi7Qyzaqrd526dl8hk5cEr6l1Q0Ec@vger.kernel.org, AJvYcCWHTF9UiBeCTFWWskmwVG6GOIOgNc8/NX0z1gyETffXKpWYT4cbfhdocefc2ZGeaujFoZEv9Z97@vger.kernel.org, AJvYcCWbdQKTeuclyPYVZ4LgPaPSfEb6epfh69X61JMQa9j6Jao/8u7RMq/b4gglbyE7jZSCDevOvPywlmsuxmMd@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqnCNVfXEhS6FkU2RMf64xCAUI68eZfPEfWJhWjgN/HvkjuULd
+	eAC4fjzpmi5IreYhtfuXfgGRrGno0A4P8hNign2QgssTmJ62/Z4xoDQu0A==
+X-Google-Smtp-Source: AGHT+IGSJ6qgqpeMJRK11qx1SIP451P6iwQsNeQsOzCtkpg5iVsmKfyd+oDf+9ZIT5jNRbu2JguyOA==
+X-Received: by 2002:a05:6870:8a0a:b0:277:fdce:675c with SMTP id 586e51a60fabf-28ced27ba32mr3054949fac.15.1729791644741;
+        Thu, 24 Oct 2024 10:40:44 -0700 (PDT)
+Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id 586e51a60fabf-28c79250b6dsm3150030fac.15.2024.10.24.10.40.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2024 10:40:44 -0700 (PDT)
+Message-ID: <2c027bc3-6cab-4892-9544-10a0a23db871@gmail.com>
+Date: Thu, 24 Oct 2024 12:40:43 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 06/10] net: qrtr: Allow sendmsg to target an
+ endpoint
+To: Chris Lew <quic_clew@quicinc.com>, netdev@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241018181842.1368394-1-denkenz@gmail.com>
+ <20241018181842.1368394-7-denkenz@gmail.com>
+ <e4fe74c7-6c37-4bab-96bf-a62727dcd468@quicinc.com>
+Content-Language: en-US
+From: Denis Kenzior <denkenz@gmail.com>
+In-Reply-To: <e4fe74c7-6c37-4bab-96bf-a62727dcd468@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-> Yes, everyone should do that, and I did.
+Hi Chris,
 
-If you did, you'd knew that their defence ended in 1940 with peace treaty.
+>> @@ -106,6 +106,36 @@ static inline struct qrtr_sock *qrtr_sk(struct sock *sk)
+>>       return container_of(sk, struct qrtr_sock, sk);
+>>   }
+>> +int qrtr_msg_get_endpoint(struct msghdr *msg, u32 *out_endpoint_id)
+>> +{
+>> +    struct cmsghdr *cmsg;
+>> +    u32 endpoint_id = 0;
+>> +
+>> +    for_each_cmsghdr(cmsg, msg) {
+>> +        if (!CMSG_OK(msg, cmsg))
+>> +            return -EINVAL;
+>> +
+>> +        if (cmsg->cmsg_level != SOL_QRTR)
+>> +            continue;
+>> +
+>> +        if (cmsg->cmsg_type != QRTR_ENDPOINT)
+>> +            return -EINVAL;
+>> +
+>> +        if (cmsg->cmsg_len < CMSG_LEN(sizeof(u32)))
+>> +            return -EINVAL;
+>> +
+>> +        /* Endpoint ids start at 1 */
+>> +        endpoint_id = *(u32 *)CMSG_DATA(cmsg);
+>> +        if (!endpoint_id)
+>> +            return -EINVAL;
+>> +    }
+>> +
+>> +    if (out_endpoint_id)
+>> +        *out_endpoint_id = endpoint_id;
+> 
+> In the case when there is no cmsg attached to the msg. Would it be safer to 
+> assign out_endpoint_id to 0 before returning?
 
-Surely, Great Britain, Canada, Australia, New-Zealand and Union of South Africa delcared war on Finland in 1941, because Finland was "defending", right?
+Hmm, isn't that what happens?  endpoint_id is initialized to 0 in the 
+declaration block, so if no cmsg headers are present, out_endpoint_id will get a 
+0 assigned.
+
+> 
+> I see that in qrtr_sendmsg() there is a risk of using msg_endpoint_id without it 
+> being initialized or assigned a value in this function.
+
+Calling this function in qrtr_sendmsg() should always assign msg_endpoint_id 
+unless an error occurred.
+
+Regards,
+-Denis
 
