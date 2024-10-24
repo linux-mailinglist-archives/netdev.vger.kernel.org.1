@@ -1,310 +1,177 @@
-Return-Path: <netdev+bounces-138495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51AB79ADE60
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:03:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0BD9ADE75
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92AFAB2119D
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 08:03:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26C811F23217
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 08:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89B21AF0A7;
-	Thu, 24 Oct 2024 08:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAWh/hQk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674A31AF0C4;
+	Thu, 24 Oct 2024 08:07:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529F71AD3F6
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 08:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560D819F104;
+	Thu, 24 Oct 2024 08:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729756995; cv=none; b=gLtH+sczUfGo3i2paScLbDkD1DNFWZlUsD6PHVmgZxtRmi8539rWb8/WDW9bXhiHCbWAYNLvypnbjrfYO2GThi/L2wWXxf8IXBmnumMJelF/1pBhUN+LzqEXrgx6zIXTITO4AtmZVc0qdUoiUYCRnBKiSBfrtdlYru7sbahEdAs=
+	t=1729757242; cv=none; b=lXBx968ig4F+2uTpSjEKET9iVZ0Yfc1FZ2htkZNNNMzTF+yOFD4OavpGFkBemlmbvHXsypc8ZDtFvtPQH8go6A/Hrut5bCA545nrWtwD7tNdPsz5Skv3Pqce65CwfEcC3IkPdKvebRruX5kMBru9RrccwzVaqGw6ko8phiCByEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729756995; c=relaxed/simple;
-	bh=Q1kfe1t0sp4jY5sNXXPh9kCYnsSIp6kXPNBXZwj0GiI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Tr+GjElJDQi14sekVn+DZAdr4wHqKl65lA5uDlAMzA+BnFV4rz9HVVI4evg5j0UJY6bf+B4LcDXYneOr9Gbkq7i8LVRmzcIorhGw7s6Dis2UmDNHZgntGsDRO8HgSGWG+LG/OeaAE4+29uh7/twC5hZJRpDb/EChnrNKuBOYaVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAWh/hQk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729756992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eCHAxEtiIjB9/eMXdwm4L84xFlQFaCf3ZNV6cwdqU9g=;
-	b=DAWh/hQkLYixjlBwgOo+dDn6feqML1opewPtY1waQA8RUq83yylOsXcVRdFamezniO0URN
-	buGBpXnRRE+YFr7ykvuorxO8v3Y94XJNfTNeKDeu+63pUW3yuAI50vszQg4rpYtoRN+Egk
-	pxLJQPGIBGkv9vYd1HzjKJRKd7gIvgM=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-RatGIfPPNGSwCMt0QRlCMw-1; Thu, 24 Oct 2024 04:03:10 -0400
-X-MC-Unique: RatGIfPPNGSwCMt0QRlCMw-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-71817451e83so682942a34.0
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 01:03:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729756989; x=1730361789;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eCHAxEtiIjB9/eMXdwm4L84xFlQFaCf3ZNV6cwdqU9g=;
-        b=nBnTek2E4LIOX5VK0SMnoGkY/mvPzRUwifWsX1CEcX1zwDFNG7Q3UT696jQUWt6uaV
-         2n+Rc/RnMKbvmoj6jnUhqnMYF8y0aXzTDC5cl7f9/GhQn4Nrp5q9nB3S/5sO/o2fXnbn
-         indxrIehuJvEBguCVLokazRmdld4VtXFEjQzNfBMm7h2zqVRkjZMKF1xHquwxPuSjE19
-         H4+pdbkm9dMwkNuWQnG9ERgLqRl7+GXZrACKvYvu4LQUy3b6CExEnDm/Q6PNihDTAn1u
-         f7QtZcv6dSI1fRIUS7Fl0xQDQLBuf+2XG6ynt4n7mAW82MxH7CuHs3zOrA0paiVyji4i
-         n2TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKQeN2BgXFvMfd4sMQQD4fXSMQsq6/UHk43gOSKoMkWPHbmUifgwaZEMFNwn7HnOrE3REaOI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3zLBXTB8a5aidu4ZKcj3bBUiuzAS7UubLZHMNPhIt77VaoFge
-	Wd+lgdXyvNplAV4F7ZqTWUMWnOtpvyQS+8vhhsVtLQj6JLc4AFrOLI6QRp5oh+ZRVnLdJlxOXNS
-	tDJU07m8Zn/5lXlG9ylGNlSRbSBM72YMMwES9F1uxkbPd1MPxXN8lwQ==
-X-Received: by 2002:a05:6830:6dc7:b0:718:c0d:6bdb with SMTP id 46e09a7af769-718598599b9mr736366a34.20.1729756989544;
-        Thu, 24 Oct 2024 01:03:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHVwKg5C+Tp+G04yjB73N1UyaDqsdgqmmyDICp7Nqm80mYC6tnNIzWvedx2PALg7dJ9abA7Jw==
-X-Received: by 2002:a05:6830:6dc7:b0:718:c0d:6bdb with SMTP id 46e09a7af769-718598599b9mr736305a34.20.1729756989132;
-        Thu, 24 Oct 2024 01:03:09 -0700 (PDT)
-Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce0099a79fsm47100376d6.90.2024.10.24.01.03.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 01:03:08 -0700 (PDT)
-Message-ID: <aec23bb79b9ff7dd7f13eb67460e0605eac22912.camel@redhat.com>
-Subject: Re: [PATCH 02/13] ALSA: hda_intel: Use always-managed version of
- pcim_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Takashi Iwai <tiwai@suse.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
- <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
- <yi.l.liu@intel.com>,  Christian Brauner <brauner@kernel.org>, Ankit
- Agrawal <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette
- Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Thu, 24 Oct 2024 10:02:59 +0200
-In-Reply-To: <87ttd2276j.wl-tiwai@suse.de>
-References: <20241015185124.64726-1-pstanner@redhat.com>
-	 <20241015185124.64726-3-pstanner@redhat.com> <87v7xk2ps5.wl-tiwai@suse.de>
-	 <6f3db65fe9a5dcd1a7a8d9bd5352ecb248ef57b1.camel@redhat.com>
-	 <87ttd2276j.wl-tiwai@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1729757242; c=relaxed/simple;
+	bh=KBY3Xq32mH8OhQWVjBV/Bq8SdNGCd36z6O+Nh0qKmDQ=;
+	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ehn7treRhPiyNJlmiSIwgNY/U9Ipmih4TKg45PfBUMHDQOQVHU+OpEoz9TBIVht/X8JJ8Zynu0aJd/03LXAE+z3ScDJNd06v3LUrwhsnl/ZCqWyzBzapn6m30dMSojcIqvqEVZ/9UxujjbXVhzFT6Xpd69BL31AK1iN3q88wIwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XYz193blfz1HLRk;
+	Thu, 24 Oct 2024 16:02:53 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id 603111A016C;
+	Thu, 24 Oct 2024 16:07:15 +0800 (CST)
+Received: from [10.174.179.93] (10.174.179.93) by
+ kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 24 Oct 2024 16:07:11 +0800
+Subject: Re: [PATCH v3 -next 00/15] sysctl: move sysctls from vm_table into
+ its own files
+To: Joel Granados <j.granados@samsung.com>
+References: <CGME20241010141133eucas1p1999f17c74198d3880cbd345276bcd3bd@eucas1p1.samsung.com>
+ <20241010152215.3025842-1-yukaixiong@huawei.com>
+ <ngknhtecptqk56gtiikvb5mdujhtxdyngzndiaz7ifslzrki7q@4wcykosdnsna>
+CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>, <ysato@users.osdn.me>,
+	<dalias@libc.org>, <glaubitz@physik.fu-berlin.de>, <luto@kernel.org>,
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <hpa@zytor.com>, <viro@zeniv.linux.org.uk>,
+	<brauner@kernel.org>, <jack@suse.cz>, <kees@kernel.org>,
+	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
+	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
+	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
+	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
+	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
+	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
+	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
+	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
+	<wangkefeng.wang@huawei.com>, <sunnanyong@huawei.com>
+From: yukaixiong <yukaixiong@huawei.com>
+Message-ID: <79b33640-fc81-b4c1-4967-30189d9a4b23@huawei.com>
+Date: Thu, 24 Oct 2024 16:07:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <ngknhtecptqk56gtiikvb5mdujhtxdyngzndiaz7ifslzrki7q@4wcykosdnsna>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggpeml500026.china.huawei.com (7.185.36.106) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
-On Wed, 2024-10-23 at 17:03 +0200, Takashi Iwai wrote:
-> On Wed, 23 Oct 2024 15:50:09 +0200,
-> Philipp Stanner wrote:
-> >=20
-> > On Tue, 2024-10-22 at 16:08 +0200, Takashi Iwai wrote:
-> > > On Tue, 15 Oct 2024 20:51:12 +0200,
-> > > Philipp Stanner wrote:
-> > > >=20
-> > > > pci_intx() is a hybrid function which can sometimes be managed
-> > > > through
-> > > > devres. To remove this hybrid nature from pci_intx(), it is
-> > > > necessary to
-> > > > port users to either an always-managed or a never-managed
-> > > > version.
-> > > >=20
-> > > > hda_intel enables its PCI-Device with pcim_enable_device().
-> > > > Thus,
-> > > > it needs
-> > > > the always-managed version.
-> > > >=20
-> > > > Replace pci_intx() with pcim_intx().
-> > > >=20
-> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > > > ---
-> > > > =C2=A0sound/pci/hda/hda_intel.c | 2 +-
-> > > > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/sound/pci/hda/hda_intel.c
-> > > > b/sound/pci/hda/hda_intel.c
-> > > > index b4540c5cd2a6..b44ca7b6e54f 100644
-> > > > --- a/sound/pci/hda/hda_intel.c
-> > > > +++ b/sound/pci/hda/hda_intel.c
-> > > > @@ -786,7 +786,7 @@ static int azx_acquire_irq(struct azx
-> > > > *chip,
-> > > > int do_disconnect)
-> > > > =C2=A0	}
-> > > > =C2=A0	bus->irq =3D chip->pci->irq;
-> > > > =C2=A0	chip->card->sync_irq =3D bus->irq;
-> > > > -	pci_intx(chip->pci, !chip->msi);
-> > > > +	pcim_intx(chip->pci, !chip->msi);
-> > > > =C2=A0	return 0;
-> > > > =C2=A0}
-> > > > =C2=A0
-> > >=20
-> > > Hm, it's OK-ish to do this as it's practically same as what
-> > > pci_intx()
-> > > currently does.=C2=A0 But, the current code can be a bit inconsistent
-> > > about
-> > > the original intx value.=C2=A0 pcim_intx() always stores !enable to
-> > > res->orig_intx unconditionally, and it means that the orig_intx
-> > > value
-> > > gets overridden at each time pcim_intx() gets called.
-> >=20
-> > Yes.
-> >=20
-> > >=20
-> > > Meanwhile, HD-audio driver does release and re-acquire the
-> > > interrupt
-> > > after disabling MSI when something goes wrong, and pci_intx()
-> > > call
-> > > above is a part of that procedure.=C2=A0 So, it can rewrite the
-> > > res->orig_intx to another value by retry without MSI.=C2=A0 And after
-> > > the
-> > > driver removal, it'll lead to another state.
-> >=20
-> > I'm not sure that I understand this paragraph completely. Still,
-> > could
-> > a solution for the driver on the long-term just be to use
-> > pci_intx()?
->=20
-> pci_intx() misses the restore of the original value, so it's no
-> long-term solution, either.
 
-Sure that is missing =E2=80=93 I was basically asking whether the driver co=
-uld
-live without that feature.
 
-Consider that point obsolete, see below
+On 2024/10/21 15:22, Joel Granados wrote:
+> On Thu, Oct 10, 2024 at 11:22:00PM +0800, Kaixiong Yu wrote:
+>> This patch series moves sysctls of vm_table in kernel/sysctl.c to
+>> places where they actually belong, and do some related code clean-ups.
+>> After this patch series, all sysctls in vm_table have been moved into its
+>> own files, meanwhile, delete vm_table.
+>>
+>> All the modifications of this patch series base on
+>> linux-next(tags/next-20241010). To test this patch series, the code was
+>> compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
+>> x86_64 architectures. After this patch series is applied, all files
+>> under /proc/sys/vm can be read or written normally.
+>>
+>> Changes in v3:
+>>   - change patch1~10, patch14 title suggested by Joel Granados
+>>   - change sysctl_stat_interval to static type in patch1
+>>   - add acked-by from Paul Moore in patch7
+>>   - change dirtytime_expire_interval to static type in patch9
+>>   - add acked-by from Anna Schumaker in patch11
+>>
+>> Changes in v2:
+>>   - fix sysctl_max_map_count undeclared issue in mm/nommu.c for patch6
+>>   - update changelog for patch7/12, suggested by Kees/Paul
+>>   - fix patch8, sorry for wrong changes and forget to built with NOMMU
+>>   - add reviewed-by from Kees except patch8 since patch8 is wrong in v1
+>>   - add reviewed-by from Jan Kara, Christian Brauner in patch12
+>>
+>> Kaixiong Yu (15):
+>>    mm: vmstat: move sysctls to mm/vmstat.c
+>>    mm: filemap: move sysctl to mm/filemap.c
+>>    mm: swap: move sysctl to mm/swap.c
+>>    mm: vmscan: move vmscan sysctls to mm/vmscan.c
+>>    mm: util: move sysctls to mm/util.c
+>>    mm: mmap: move sysctl to mm/mmap.c
+>>    security: min_addr: move sysctl to security/min_addr.c
+>>    mm: nommu: move sysctl to mm/nommu.c
+>>    fs: fs-writeback: move sysctl to fs/fs-writeback.c
+>>    fs: drop_caches: move sysctl to fs/drop_caches.c
+>>    sunrpc: use vfs_pressure_ratio() helper
+>>    fs: dcache: move the sysctl to fs/dcache.c
+>>    x86: vdso: move the sysctl to arch/x86/entry/vdso/vdso32-setup.c
+>>    sh: vdso: move the sysctl to arch/sh/kernel/vsyscall/vsyscall.c
+>>    sysctl: remove unneeded include
+>>
+>>   arch/sh/kernel/vsyscall/vsyscall.c |  14 ++
+>>   arch/x86/entry/vdso/vdso32-setup.c |  16 ++-
+>>   fs/dcache.c                        |  21 ++-
+>>   fs/drop_caches.c                   |  23 ++-
+>>   fs/fs-writeback.c                  |  30 ++--
+>>   include/linux/dcache.h             |   7 +-
+>>   include/linux/mm.h                 |  23 ---
+>>   include/linux/mman.h               |   2 -
+>>   include/linux/swap.h               |   9 --
+>>   include/linux/vmstat.h             |  11 --
+>>   include/linux/writeback.h          |   4 -
+>>   kernel/sysctl.c                    | 221 -----------------------------
+>>   mm/filemap.c                       |  18 ++-
+>>   mm/internal.h                      |  10 ++
+>>   mm/mmap.c                          |  54 +++++++
+>>   mm/nommu.c                         |  15 +-
+>>   mm/swap.c                          |  16 ++-
+>>   mm/swap.h                          |   1 +
+>>   mm/util.c                          |  67 +++++++--
+>>   mm/vmscan.c                        |  23 +++
+>>   mm/vmstat.c                        |  44 +++++-
+>>   net/sunrpc/auth.c                  |   2 +-
+>>   security/min_addr.c                |  11 ++
+>>   23 files changed, 330 insertions(+), 312 deletions(-)
+>>
+>> -- 
+>> 2.34.1
+>>
+> General comment for the patchset in general. I would consider making the
+> new sysctl tables const. There is an effort for doing this and it has
+> already lanted in linux-next. So if you base your patch from a recent
+> next release, then it should just work. If you *do* decide to add a
+> const qualifier, then note that you will create a dependency with the
+> sysctl patchset currently in next and that will have to go in before.
+>
+> Best
+>
 
->=20
-> What I meant is that pcim_intx() blindly assumes the negative of the
-> passed argument as the original state, which isn't always true.=C2=A0 e.g=
-.
-> when the driver calls it twice with different values, a wrong value
-> may be remembered.
+Sorry,  I don't understand what is the meaning of "create a dependency 
+with the sysctl patchset".
 
-Ah, I see =E2=80=93 thoguh the issue is when it's called several times with=
- the
-*same* value, isn't it?
-
-E.g.
-
-pcim_intx(pdev, 1); // 0 is remembered as the old value
-pcim_intx(pdev, 1); // 0 is falsely remembered as the old value
-
-Also, it would seem that calling the function for the first time like
-that:
-
-pcim_intx(pdev, 0); // old value: 1
-
-is at least incorrect, because INTx should be 0 per default, shouldn't
-it? Could then even be a 1st class bug, because INTx would end up being
-enabled despite having been disabled all the time.
-
->=20
-> That said, I thought of something like below.
-
-At first glance that looks like a good idea to me, thanks for working
-this out!
-
-IMO you can submit that as a patch so we can discuss it separately.
-
-Greetings,
-Philipp
-
->=20
->=20
-> thanks,
->=20
-> Takashi
->=20
-> -- 8< --
-> --- a/drivers/pci/devres.c
-> +++ b/drivers/pci/devres.c
-> @@ -438,8 +438,17 @@ static void pcim_intx_restore(struct device
-> *dev, void *data)
-> =C2=A0	__pcim_intx(pdev, res->orig_intx);
-> =C2=A0}
-> =C2=A0
-> -static struct pcim_intx_devres *get_or_create_intx_devres(struct
-> device *dev)
-> +static void save_orig_intx(struct pci_dev *pdev)
-> =C2=A0{
-> +	u16 pci_command;
-> +
-> +	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
-> +	res->orig_intx =3D !(pci_command & PCI_COMMAND_INTX_DISABLE);
-> +}
-> +
-> +static struct pcim_intx_devres *get_or_create_intx_devres(struct
-> pci_dev *pdev)
-> +{
-> +	struct device *dev =3D &pdev->dev;
-> =C2=A0	struct pcim_intx_devres *res;
-> =C2=A0
-> =C2=A0	res =3D devres_find(dev, pcim_intx_restore, NULL, NULL);
-> @@ -447,8 +456,10 @@ static struct pcim_intx_devres
-> *get_or_create_intx_devres(struct device *dev)
-> =C2=A0		return res;
-> =C2=A0
-> =C2=A0	res =3D devres_alloc(pcim_intx_restore, sizeof(*res),
-> GFP_KERNEL);
-> -	if (res)
-> +	if (res) {
-> +		save_orig_intx(pdev);
-> =C2=A0		devres_add(dev, res);
-> +	}
-> =C2=A0
-> =C2=A0	return res;
-> =C2=A0}
-> @@ -467,11 +478,10 @@ int pcim_intx(struct pci_dev *pdev, int enable)
-> =C2=A0{
-> =C2=A0	struct pcim_intx_devres *res;
-> =C2=A0
-> -	res =3D get_or_create_intx_devres(&pdev->dev);
-> +	res =3D get_or_create_intx_devres(pdev);
-> =C2=A0	if (!res)
-> =C2=A0		return -ENOMEM;
-> =C2=A0
-> -	res->orig_intx =3D !enable;
-> =C2=A0	__pcim_intx(pdev, enable);
-> =C2=A0
-> =C2=A0	return 0;
->=20
+Do you just want me to change all "static struct ctl_table" type table 
+into "static const struct ctl_table" type in my patchset?
 
 
