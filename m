@@ -1,250 +1,310 @@
-Return-Path: <netdev+bounces-138494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D30A9ADE50
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:54:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51AB79ADE60
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D83DE2820C4
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 07:54:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92AFAB2119D
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 08:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AFC18B460;
-	Thu, 24 Oct 2024 07:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89B21AF0A7;
+	Thu, 24 Oct 2024 08:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i0kkB6YR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAWh/hQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E325A18B477
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 07:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729756486; cv=fail; b=LXhn4GxeKw/52rCOvQIHlN750taBn4VgrKMMghjFXJ9PR1eVGfVaaO4IHPKXzAp8T2ssORCxE6kLRnuBqRgqIQyTscj9wAwGU6/xguWhteXJKOoWK78VIh+m5dSzGtwd8w2/U3NoTNUqLfLPktCX/VXyUD47M65d8ovuk+RDiB8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729756486; c=relaxed/simple;
-	bh=xAmxhyOxQe8l5ksUSSWHRVKtfkoOSPA0OZ+eCvGVSvY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pZjHZro9KEmdW2v2jG/Yzwzgkelzfii+iy4s5RYEKAUTAYSrhWseFDJuWqPXzvFraL74zr6FDzbdL4OEhFSQVb2tRnyxqJ5Xb2RhL8fHxW/hC5fz1CcQkJL5uILWMwky4dYISjosa4t+BJ8BGXIi1MDib1bg5lwhDFwaSTC2efQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i0kkB6YR; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729756485; x=1761292485;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xAmxhyOxQe8l5ksUSSWHRVKtfkoOSPA0OZ+eCvGVSvY=;
-  b=i0kkB6YRlgsBu8gMP+DaA6CeksJ2zH9Dc58/qYwEsNv1qMBdSk69ftk6
-   AAXOR2J0aPuQ7MVl1ElaAfxzSIiG2fxgTFn9+/ZX5NKW8fmfz5VmT2Rzp
-   uaikPoKRUA+H/yPIZ8ikQ4kti5jQA2LQcXzbg9y057jQwTs9S31R+PZS5
-   aBXLCU75Vwu8puj6yUQXvhkBzI4sskmq5GJn0PJ1JSxg0yzLQ3SJhqW2E
-   H0bCjKT1G60818oEjwkFYhv6/bAUMfeo+91bxyYYwbiyqe9MHfo4SQGq0
-   vxjQVUw1R4B1f4u/vI5m46Nw4Ls7LW3oySFZdBW/96o+/zA+QronZxvCQ
-   Q==;
-X-CSE-ConnectionGUID: 2acNg9+kR8WovhszildeNA==
-X-CSE-MsgGUID: dyvnpfUGQNSWi5l+koG4jQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="40763997"
-X-IronPort-AV: E=Sophos;i="6.11,228,1725346800"; 
-   d="scan'208";a="40763997"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 00:54:44 -0700
-X-CSE-ConnectionGUID: Id8I2yh6QuKyG0uzPrQ6OA==
-X-CSE-MsgGUID: 9Kbkm7BeQW6WAd5nPTWPdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,228,1725346800"; 
-   d="scan'208";a="103833817"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Oct 2024 00:54:44 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 24 Oct 2024 00:54:43 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 24 Oct 2024 00:54:43 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 24 Oct 2024 00:54:43 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KBRxIpd10bgoKVuBaUL2LjNzD4OO8VRVKaBZd7KtTp0l0pjsGqbTnOG7zyeAJBkmU/fJ0IuNuOa7kNIYQZTP9qyKfzlOJZWvpkmuRlRIQogOjD2f9fW19IHKdvY/gUQ+3cc3+F7mQTJzqZcf6H6YDb6mZfOvSAnjeuEo86bxmRNZyOlVMCBnFA6Ighm3IQMrERhMvhI48vsPuW4VQZGqnOkXqG92uGDA3aOBiH2ZYtVgyuO/JFGFSO1W2s//yRDMq6EmXWAQ/cNXZqQqvMNYf6KSVzRty6IYTaAByifHT39rnPMQA6tFgDKqQqMp0DxDJt0kY8sOJcTjR21D3fKk4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m0D+tLE4VRnCNCPD/ehbZXgLycGO/nAfl3JpWZm/FR4=;
- b=Oosv7AgLAM9+9+F7PMCt5TDLLsbTXMu4vDNYWU5qOQKRcRFazRMUkx5FrqSBU4qcMcDg1AHkr7E8mV1cf+0y3LyZxQ8ZfKs7VYPt9A+MuHXUwHegk+WCEshpSaN/fRAARONePuH0bos2n0swp+d2ChLhPfqND3S4cZi1FOufQ+WHNS4nhb8NyRJa/rTAmh1gfcTqGDLBm4JL83j/0ZDjbfKQaR3GANio52qQhHG/fkl9PRdIduWbcm5x5xTPyIJrcuXXOmL0EWzHwe/F63rl7aSRfE/1ro04RKTO2RsDGX75Qe8PsVUBkMnUQfMdxLBuIHPX73ZCvkJj9U51EgGCpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
- by CO1PR11MB4819.namprd11.prod.outlook.com (2603:10b6:303:91::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.20; Thu, 24 Oct
- 2024 07:54:41 +0000
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::1c54:1589:8882:d22b%3]) with mapi id 15.20.8093.014; Thu, 24 Oct 2024
- 07:54:39 +0000
-From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Szycik, Marcin"
-	<marcin.szycik@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [iwl-next v1] ice: add recipe priority check in
- search
-Thread-Topic: [Intel-wired-lan] [iwl-next v1] ice: add recipe priority check
- in search
-Thread-Index: AQHbG6vBWTR5GFs8z0a5mDQFNHTxQLKVjvFw
-Date: Thu, 24 Oct 2024 07:54:39 +0000
-Message-ID: <PH0PR11MB50132ACC6DC931D072512C31964E2@PH0PR11MB5013.namprd11.prod.outlook.com>
-References: <20241011070328.45874-1-michal.swiatkowski@linux.intel.com>
-In-Reply-To: <20241011070328.45874-1-michal.swiatkowski@linux.intel.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|CO1PR11MB4819:EE_
-x-ms-office365-filtering-correlation-id: 05043745-ab18-4846-17ab-08dcf4011d01
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?CuiUFAinUAsDNlIvKdVUfwptIoGFVD1SLJPpA7H8fdM5NiS1hHK5THR6WHgH?=
- =?us-ascii?Q?+n6lWd3cASOHcw1rEMLxngNpca4Hvggf7dlWjaBfQxyrzXaiCnL7zndUDSQh?=
- =?us-ascii?Q?O3Up2TLILxlxwb5KqiOIWCeZXgqpR6HNeXZTxHkESd97kRrIBDuqXohIA/Yw?=
- =?us-ascii?Q?4sXJgOQPlMXiNBC7hBDacxYVqxlRG8muYDAG5sr/TRoIn367CcI4HZZyu+Qc?=
- =?us-ascii?Q?r73UyyU1s2CfsmrhyGQVci5X8l5YJ3WF0Io7WJlEF+Lu7H9SSSETDUskrpnm?=
- =?us-ascii?Q?unBhLrRRO3fienbcfhsRVwGhHo8ehzaWUD7U0CI8P7qb7BShJwxVvwabZI5W?=
- =?us-ascii?Q?b90iRcoxwwKHyvO8GRpbS2Tu+m0IwrvmgrRqCravaklzcfMss/GEBVOcGfu2?=
- =?us-ascii?Q?GPOD9Z13avw1Ftsl18EMe7Xmzk6wbmLUblEFuGzdJ6DJ/Hw/d2NHbFn0Imrg?=
- =?us-ascii?Q?7OmKayEDLpMEUBpfFzcNB4cMtacwINfvpBUZhbbt7cwSlxs+dKh2sXgZqLnB?=
- =?us-ascii?Q?EJQQBH8gzNshVyiZyHy5U5Qxoi0T3+H55uyqCIP+13oIxHBlt/yyktIpMS1q?=
- =?us-ascii?Q?k5SaXbEHxvr1PwyjLbYVzrmoonMfQLI1Qxb5gWOxtt9Gc35SMaC8cSJqGNU/?=
- =?us-ascii?Q?bdqPKIjvba+CHgxXy9guQXr6R0JBBuNjE4f92X0Ch+Evu4cFReHwzcuKOsiz?=
- =?us-ascii?Q?8YrsGERVxz5nCMcRwM1796UGp7tT0hgZ9iV0PVWBkbgOVxjO0VX7iZcEuLPB?=
- =?us-ascii?Q?Wpvy8hdUEAB3qGJf4+ZQLSlr6RUfyxw8GIcd7CM1Z+2234kYD0pnBMBKfvr2?=
- =?us-ascii?Q?qQmeuKOd2VIIXnPaigK0ZAPe410SeH65yQmvA6MJH2uqFIzC5le/3/MKjpKc?=
- =?us-ascii?Q?fBfK5szCbdf8HBLWxiHqNB/Pv8vixyD/eYMuC4X7c/W3Zbw3XYl7sJ3DMRwO?=
- =?us-ascii?Q?J0/QjHDz7at5zzy+5WtIEYsx/In1NOuh9JRB5a4HdDDpNKOCQMCe1ukGRslZ?=
- =?us-ascii?Q?m6/UT/pv0Y8y+LA9XYK7DhDN45mY3pfsnYbAPmiNbG9Y4o36n5AmEa2isFGX?=
- =?us-ascii?Q?7CLAA6UktIoE4CkWKlsAb6DGnPdmvW2A74wvszW28PupshAd2aTFniHpDNPD?=
- =?us-ascii?Q?ZUbiHQOqQypw6ZV+pKxmERV+Xu31cI4U4OU1vrNKgiMcvqQ1TtJuINqvusGO?=
- =?us-ascii?Q?TFJaHuW8fVWRk/Cr7N+oU7qapnIDwh5BJfcShTjRc2v0FWomGM8FbuYcDUBS?=
- =?us-ascii?Q?co2pnua1+XB5DQnr/g3obmO/EroDV5BExDIGkZxcAQZOs4uwgoC1hriQF/Hr?=
- =?us-ascii?Q?3JLh8ivk2WX6XjF9IhdEb+MQFUVYvettAhgKNY6GxtAlfDUvm58UzkUBH+57?=
- =?us-ascii?Q?t0Ic8m8=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9vmat8FjjjoS0xxQ+wCfsxpEOr74qXUdZWmXN0DzJUgsMcF3Oj9g3QNtf4Lv?=
- =?us-ascii?Q?ZgH/W1KsawH0J6krBIf0IBHHjyOV3WgNASoZ0PzAt8vaSt9L3Dfyce3n9QGQ?=
- =?us-ascii?Q?P7uWDa7KTwbVsP2+vJJOKDC4mwDmTEnQyuNggqs2BJMQ4juM3wV8HuI0M6z2?=
- =?us-ascii?Q?o3FF5QDfU5rKkuVOjucQX0hkatgUX6m9A7bzc6A9I5yOFJGOClVXn9lSy2Qn?=
- =?us-ascii?Q?Vydzo9bWdaO0BhZ98TnnQCJbaD6boyCPc+aaKXMrg0qCGhshkrNoWBbw2mSS?=
- =?us-ascii?Q?YL9aJNhG107mMAGZRbfEauRpcJZkkilb2O4AvNG74L4CgxpGYAJUgEDd6eVf?=
- =?us-ascii?Q?lEL2U3YsBIr4bn5t4GiypzIFMMhaptFN7VFPCVzcMnzsyX+DQ7r6Gj/UMimH?=
- =?us-ascii?Q?8p16vhUAiUXpqzLvzJSBHcqZ+t3WUT3mAdW9kFjSJPvNFirWoay2+rO1dBFu?=
- =?us-ascii?Q?Fsasv0GfAm+7f/Cw+F6oPtqa04gByQcLvyj5cZB9si3ibd+DVGwtlwiNofKS?=
- =?us-ascii?Q?e8RW4kTqY69raT5ch6kZDz/bVYPUd+Zxmi9CqXPwzRW1h5I5a/0arH2JqK0D?=
- =?us-ascii?Q?MJqyhnK80rjU8H/OBsM99f27pe8fA7ceJcDKYLZo3pjRYx1AhBXEoyRfZbxJ?=
- =?us-ascii?Q?dh8AMLqRdIhBVIqRle8xhQfXNZ/djQQpEgujLFq86BwiocYjQzPosnOzSFcE?=
- =?us-ascii?Q?DHY1plKuJldghVbjn/VX3Vs1tX7udrF5y1xQaxmFqbk30qeSM3yLz7NNBGDy?=
- =?us-ascii?Q?ERtYivC9jmOwYzGOr7FrEhAbNK/T1ZltxyDoHFcC+TruXTh64uzWJHX/IfjI?=
- =?us-ascii?Q?9XkCHqciHGXWxkxkdBzlQTlRbL6o1wHoQQOf9fWldNbCqGLAsb/7o2GOC+Hu?=
- =?us-ascii?Q?6nklxfQPveMeYvUV2fDRh+e7OgBXhhlnRiZbW/mh9BO1AYaqtKUZBSFxtZ3T?=
- =?us-ascii?Q?knSivTgkugG0VFYkPmLMQfNuua38PeQc06pXjO7+sHIjqlxlx1tO6J5uGZdO?=
- =?us-ascii?Q?BO+atBnfyQl1cD/K4On3CPWavgfW4Lu2aM+k0ob/Mk3knqQ0gW7YmHRC5U4C?=
- =?us-ascii?Q?s9iG8414nbzxJlg15EmFu266SdoSyt2HB1EEjlQNFpx2aGwcqKnDM4qplMZr?=
- =?us-ascii?Q?o581+wgu3iYwb7IUSf09IU/RIQmaAGNYXaUgdEXxrN7pt0XoN0v2j/UF4kOS?=
- =?us-ascii?Q?XWc0xOCqW5eWxs/E2pdIFNymK/XzHaeHLZg45qrJAA9O9pj23TMSHCGWHm/F?=
- =?us-ascii?Q?HpGZBEB2Q0UiW+S6VtxWoWwaOU33ySFRg9XZbWYzL6UXq8jcmbJHQ2Ru7iCb?=
- =?us-ascii?Q?Sp0PkbAliBtSvoYvB4zT/6D5eMTgGqEQvoKhorCxzwEvUMV7LWMjGxAlQazB?=
- =?us-ascii?Q?OvOYJZL8J2h8Dw/CUUC5R1b09zmWnjPeIFMFsJ+VruMMJXVMgTZxiS7ribWK?=
- =?us-ascii?Q?G/ABPh51BJ2dpYsa5JmqJEg93M1GEiPVgsieMPWrNwzSzldgsBadbZ9zCIAM?=
- =?us-ascii?Q?+b19w/UqBh+9OMOkMhStebJVVAY9yIPy73H3t7x+fAHzw47/bJT1gbqE/z1g?=
- =?us-ascii?Q?0U7ZD+h5NrJyfMmRNPzVQVDet57NRPUMRle8MoOVn+fnHnx0Td/1y1DbW9vb?=
- =?us-ascii?Q?Tg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529F71AD3F6
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 08:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729756995; cv=none; b=gLtH+sczUfGo3i2paScLbDkD1DNFWZlUsD6PHVmgZxtRmi8539rWb8/WDW9bXhiHCbWAYNLvypnbjrfYO2GThi/L2wWXxf8IXBmnumMJelF/1pBhUN+LzqEXrgx6zIXTITO4AtmZVc0qdUoiUYCRnBKiSBfrtdlYru7sbahEdAs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729756995; c=relaxed/simple;
+	bh=Q1kfe1t0sp4jY5sNXXPh9kCYnsSIp6kXPNBXZwj0GiI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Tr+GjElJDQi14sekVn+DZAdr4wHqKl65lA5uDlAMzA+BnFV4rz9HVVI4evg5j0UJY6bf+B4LcDXYneOr9Gbkq7i8LVRmzcIorhGw7s6Dis2UmDNHZgntGsDRO8HgSGWG+LG/OeaAE4+29uh7/twC5hZJRpDb/EChnrNKuBOYaVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAWh/hQk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729756992;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eCHAxEtiIjB9/eMXdwm4L84xFlQFaCf3ZNV6cwdqU9g=;
+	b=DAWh/hQkLYixjlBwgOo+dDn6feqML1opewPtY1waQA8RUq83yylOsXcVRdFamezniO0URN
+	buGBpXnRRE+YFr7ykvuorxO8v3Y94XJNfTNeKDeu+63pUW3yuAI50vszQg4rpYtoRN+Egk
+	pxLJQPGIBGkv9vYd1HzjKJRKd7gIvgM=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-634-RatGIfPPNGSwCMt0QRlCMw-1; Thu, 24 Oct 2024 04:03:10 -0400
+X-MC-Unique: RatGIfPPNGSwCMt0QRlCMw-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-71817451e83so682942a34.0
+        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 01:03:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729756989; x=1730361789;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eCHAxEtiIjB9/eMXdwm4L84xFlQFaCf3ZNV6cwdqU9g=;
+        b=nBnTek2E4LIOX5VK0SMnoGkY/mvPzRUwifWsX1CEcX1zwDFNG7Q3UT696jQUWt6uaV
+         2n+Rc/RnMKbvmoj6jnUhqnMYF8y0aXzTDC5cl7f9/GhQn4Nrp5q9nB3S/5sO/o2fXnbn
+         indxrIehuJvEBguCVLokazRmdld4VtXFEjQzNfBMm7h2zqVRkjZMKF1xHquwxPuSjE19
+         H4+pdbkm9dMwkNuWQnG9ERgLqRl7+GXZrACKvYvu4LQUy3b6CExEnDm/Q6PNihDTAn1u
+         f7QtZcv6dSI1fRIUS7Fl0xQDQLBuf+2XG6ynt4n7mAW82MxH7CuHs3zOrA0paiVyji4i
+         n2TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKQeN2BgXFvMfd4sMQQD4fXSMQsq6/UHk43gOSKoMkWPHbmUifgwaZEMFNwn7HnOrE3REaOI4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3zLBXTB8a5aidu4ZKcj3bBUiuzAS7UubLZHMNPhIt77VaoFge
+	Wd+lgdXyvNplAV4F7ZqTWUMWnOtpvyQS+8vhhsVtLQj6JLc4AFrOLI6QRp5oh+ZRVnLdJlxOXNS
+	tDJU07m8Zn/5lXlG9ylGNlSRbSBM72YMMwES9F1uxkbPd1MPxXN8lwQ==
+X-Received: by 2002:a05:6830:6dc7:b0:718:c0d:6bdb with SMTP id 46e09a7af769-718598599b9mr736366a34.20.1729756989544;
+        Thu, 24 Oct 2024 01:03:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVwKg5C+Tp+G04yjB73N1UyaDqsdgqmmyDICp7Nqm80mYC6tnNIzWvedx2PALg7dJ9abA7Jw==
+X-Received: by 2002:a05:6830:6dc7:b0:718:c0d:6bdb with SMTP id 46e09a7af769-718598599b9mr736305a34.20.1729756989132;
+        Thu, 24 Oct 2024 01:03:09 -0700 (PDT)
+Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce0099a79fsm47100376d6.90.2024.10.24.01.03.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2024 01:03:08 -0700 (PDT)
+Message-ID: <aec23bb79b9ff7dd7f13eb67460e0605eac22912.camel@redhat.com>
+Subject: Re: [PATCH 02/13] ALSA: hda_intel: Use always-managed version of
+ pcim_intx()
+From: Philipp Stanner <pstanner@redhat.com>
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
+ <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
+ <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
+ <yi.l.liu@intel.com>,  Christian Brauner <brauner@kernel.org>, Ankit
+ Agrawal <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette
+ Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-input@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Date: Thu, 24 Oct 2024 10:02:59 +0200
+In-Reply-To: <87ttd2276j.wl-tiwai@suse.de>
+References: <20241015185124.64726-1-pstanner@redhat.com>
+	 <20241015185124.64726-3-pstanner@redhat.com> <87v7xk2ps5.wl-tiwai@suse.de>
+	 <6f3db65fe9a5dcd1a7a8d9bd5352ecb248ef57b1.camel@redhat.com>
+	 <87ttd2276j.wl-tiwai@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05043745-ab18-4846-17ab-08dcf4011d01
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2024 07:54:39.8275
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lZm06mFBneopafD1Xx6uMzmdGFSIY+eIxa0unaxyiylm9iRU9zYsPGTWuZm+H7xlNxIkpQGGLm2HARWNGbYWoYLj6uW4Osuv60c8L73QZMI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4819
-X-OriginatorOrg: intel.com
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Michal Swiatkowski
-> Sent: Friday, October 11, 2024 12:33 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Szycik, Marcin <marcin.szycik@intel.com>;
-> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> Subject: [Intel-wired-lan] [iwl-next v1] ice: add recipe priority check i=
-n search
+On Wed, 2024-10-23 at 17:03 +0200, Takashi Iwai wrote:
+> On Wed, 23 Oct 2024 15:50:09 +0200,
+> Philipp Stanner wrote:
+> >=20
+> > On Tue, 2024-10-22 at 16:08 +0200, Takashi Iwai wrote:
+> > > On Tue, 15 Oct 2024 20:51:12 +0200,
+> > > Philipp Stanner wrote:
+> > > >=20
+> > > > pci_intx() is a hybrid function which can sometimes be managed
+> > > > through
+> > > > devres. To remove this hybrid nature from pci_intx(), it is
+> > > > necessary to
+> > > > port users to either an always-managed or a never-managed
+> > > > version.
+> > > >=20
+> > > > hda_intel enables its PCI-Device with pcim_enable_device().
+> > > > Thus,
+> > > > it needs
+> > > > the always-managed version.
+> > > >=20
+> > > > Replace pci_intx() with pcim_intx().
+> > > >=20
+> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > > > ---
+> > > > =C2=A0sound/pci/hda/hda_intel.c | 2 +-
+> > > > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+> > > >=20
+> > > > diff --git a/sound/pci/hda/hda_intel.c
+> > > > b/sound/pci/hda/hda_intel.c
+> > > > index b4540c5cd2a6..b44ca7b6e54f 100644
+> > > > --- a/sound/pci/hda/hda_intel.c
+> > > > +++ b/sound/pci/hda/hda_intel.c
+> > > > @@ -786,7 +786,7 @@ static int azx_acquire_irq(struct azx
+> > > > *chip,
+> > > > int do_disconnect)
+> > > > =C2=A0	}
+> > > > =C2=A0	bus->irq =3D chip->pci->irq;
+> > > > =C2=A0	chip->card->sync_irq =3D bus->irq;
+> > > > -	pci_intx(chip->pci, !chip->msi);
+> > > > +	pcim_intx(chip->pci, !chip->msi);
+> > > > =C2=A0	return 0;
+> > > > =C2=A0}
+> > > > =C2=A0
+> > >=20
+> > > Hm, it's OK-ish to do this as it's practically same as what
+> > > pci_intx()
+> > > currently does.=C2=A0 But, the current code can be a bit inconsistent
+> > > about
+> > > the original intx value.=C2=A0 pcim_intx() always stores !enable to
+> > > res->orig_intx unconditionally, and it means that the orig_intx
+> > > value
+> > > gets overridden at each time pcim_intx() gets called.
+> >=20
+> > Yes.
+> >=20
+> > >=20
+> > > Meanwhile, HD-audio driver does release and re-acquire the
+> > > interrupt
+> > > after disabling MSI when something goes wrong, and pci_intx()
+> > > call
+> > > above is a part of that procedure.=C2=A0 So, it can rewrite the
+> > > res->orig_intx to another value by retry without MSI.=C2=A0 And after
+> > > the
+> > > driver removal, it'll lead to another state.
+> >=20
+> > I'm not sure that I understand this paragraph completely. Still,
+> > could
+> > a solution for the driver on the long-term just be to use
+> > pci_intx()?
 >=20
-> The new recipe should be added even if exactly the same recipe already
-> exists with different priority.
->=20
-> Example use case is when the rule is being added from TC tool context.
-> It should has the highest priority, but if the recipe already exists the =
-rule will
-> inherit it priority. It can lead to the situation when the rule added fro=
-m TC
-> tool has lower priority than expected.
->=20
-> The solution is to check the recipe priority when trying to find existing=
- one.
->=20
-> Previous recipe is still useful. Example:
-> RID 8 -> priority 4
-> RID 10 -> priority 7
->=20
-> The difference is only in priority rest is let's say eth + mac + directio=
-n.
->=20
-> Adding ARP + MAC_A + RX on RID 8, forward to VF0_VSI After that IP +
-> MAC_B + RX on RID 10 (from TC tool), forward to PF0
->=20
-> Both will work.
->=20
-> In case of adding ARP + MAC_A + RX on RID 8, forward to VF0_VSI ARP +
-> MAC_A + RX on RID 10, forward to PF0.
->=20
-> Only second one will match, but this is expected.
->=20
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_switch.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
+> pci_intx() misses the restore of the original value, so it's no
+> long-term solution, either.
 
-Hi,
+Sure that is missing =E2=80=93 I was basically asking whether the driver co=
+uld
+live without that feature.
 
-System hang is observed when creating the VFs in Switchdev mode with the la=
-test next-queue kernel. Need to powercycle the server to recover the system=
+Consider that point obsolete, see below
+
+>=20
+> What I meant is that pcim_intx() blindly assumes the negative of the
+> passed argument as the original state, which isn't always true.=C2=A0 e.g=
 .
-This issue is blocking the validation of this patch.
+> when the driver calls it twice with different values, a wrong value
+> may be remembered.
 
-Thanks,
-Sujai B
+Ah, I see =E2=80=93 thoguh the issue is when it's called several times with=
+ the
+*same* value, isn't it?
+
+E.g.
+
+pcim_intx(pdev, 1); // 0 is remembered as the old value
+pcim_intx(pdev, 1); // 0 is falsely remembered as the old value
+
+Also, it would seem that calling the function for the first time like
+that:
+
+pcim_intx(pdev, 0); // old value: 1
+
+is at least incorrect, because INTx should be 0 per default, shouldn't
+it? Could then even be a 1st class bug, because INTx would end up being
+enabled despite having been disabled all the time.
+
+>=20
+> That said, I thought of something like below.
+
+At first glance that looks like a good idea to me, thanks for working
+this out!
+
+IMO you can submit that as a patch so we can discuss it separately.
+
+Greetings,
+Philipp
+
+>=20
+>=20
+> thanks,
+>=20
+> Takashi
+>=20
+> -- 8< --
+> --- a/drivers/pci/devres.c
+> +++ b/drivers/pci/devres.c
+> @@ -438,8 +438,17 @@ static void pcim_intx_restore(struct device
+> *dev, void *data)
+> =C2=A0	__pcim_intx(pdev, res->orig_intx);
+> =C2=A0}
+> =C2=A0
+> -static struct pcim_intx_devres *get_or_create_intx_devres(struct
+> device *dev)
+> +static void save_orig_intx(struct pci_dev *pdev)
+> =C2=A0{
+> +	u16 pci_command;
+> +
+> +	pci_read_config_word(pdev, PCI_COMMAND, &pci_command);
+> +	res->orig_intx =3D !(pci_command & PCI_COMMAND_INTX_DISABLE);
+> +}
+> +
+> +static struct pcim_intx_devres *get_or_create_intx_devres(struct
+> pci_dev *pdev)
+> +{
+> +	struct device *dev =3D &pdev->dev;
+> =C2=A0	struct pcim_intx_devres *res;
+> =C2=A0
+> =C2=A0	res =3D devres_find(dev, pcim_intx_restore, NULL, NULL);
+> @@ -447,8 +456,10 @@ static struct pcim_intx_devres
+> *get_or_create_intx_devres(struct device *dev)
+> =C2=A0		return res;
+> =C2=A0
+> =C2=A0	res =3D devres_alloc(pcim_intx_restore, sizeof(*res),
+> GFP_KERNEL);
+> -	if (res)
+> +	if (res) {
+> +		save_orig_intx(pdev);
+> =C2=A0		devres_add(dev, res);
+> +	}
+> =C2=A0
+> =C2=A0	return res;
+> =C2=A0}
+> @@ -467,11 +478,10 @@ int pcim_intx(struct pci_dev *pdev, int enable)
+> =C2=A0{
+> =C2=A0	struct pcim_intx_devres *res;
+> =C2=A0
+> -	res =3D get_or_create_intx_devres(&pdev->dev);
+> +	res =3D get_or_create_intx_devres(pdev);
+> =C2=A0	if (!res)
+> =C2=A0		return -ENOMEM;
+> =C2=A0
+> -	res->orig_intx =3D !enable;
+> =C2=A0	__pcim_intx(pdev, enable);
+> =C2=A0
+> =C2=A0	return 0;
+>=20
+
 
