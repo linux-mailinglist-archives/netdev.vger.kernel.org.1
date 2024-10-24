@@ -1,130 +1,176 @@
-Return-Path: <netdev+bounces-138870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C32B9AF424
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:57:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB06A9AF483
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 23:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A7A91C20C94
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:57:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4081F21873
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 21:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BA219E975;
-	Thu, 24 Oct 2024 20:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E74219C9F;
+	Thu, 24 Oct 2024 21:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="JIuU5GPv";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EMabJBi6"
+	dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b="JvCI2bpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from mail.rosalinux.ru (mail.rosalinux.ru [195.19.76.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2C122B64E
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 20:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C862178E9;
+	Thu, 24 Oct 2024 21:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.19.76.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729803465; cv=none; b=hm2dZpbqQtslEUpA1Dbf+Jiw4f3pD1qaRfcXRgRZ7KFjiZ2eXYqejEA8cIbkovCl3azTM1lNnZmgMAn1ZL0I1yVvSIq+AszqunRDZEBbde3ocevbluyjHZ6nz0Az4qedEbeUhD7o9MOnEJpFXUOYyA/50iMgK7YJ6EQVOjL7N80=
+	t=1729804341; cv=none; b=NEzwkx2PCM7PmjcwXpipaKAsF2AMXLCCFacgKSWbJ2JBA+KC2Af/0n+ZpYjlFBzH0TVwuNvBXTH9bEqVSG4CAfgpFFXZVEcpZ2ofL2Y3P8J9yqlVWQR5zz7FZcH1Hm6KyQ8LCkulDwxZt21/CdAsS3REHMBJhxY/ElGK9T4TrJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729803465; c=relaxed/simple;
-	bh=p5sJzZEyDqSRG1Fs9NjbAB7cR1K1VcW3bQvLFNs9H6w=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=tH84s1oO1UWsSKWsY9OIBfrkNm5UxBajy19DLOxUyqxIbpWekDcBMzvkGMRkgDa7a8MrU3zqERmyy6ZNmCr5wTKGloXONTdREU7UBZM7QZfMVX8QCegMfhH5OfqRmMvfUTCiTrWdGfvw2XWTXqY6y0hNBrIM6BDABPHu8jDGZks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=JIuU5GPv; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EMabJBi6; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 0CFCC25400DF;
-	Thu, 24 Oct 2024 16:57:42 -0400 (EDT)
-Received: from phl-imap-08 ([10.202.2.84])
-  by phl-compute-03.internal (MEProxy); Thu, 24 Oct 2024 16:57:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1729803461;
-	 x=1729889861; bh=p5sJzZEyDqSRG1Fs9NjbAB7cR1K1VcW3bQvLFNs9H6w=; b=
-	JIuU5GPvxDRpUiZpzOvGXsKFyVXsBu1FHy8i5MqheFWsGMboQ2HxO/rcNR9l9zQD
-	dptLlRCIq+MHmfWscBBEKD1aFuLNHRRTxLMXMB/t7bAJBfhNpKrEZ4bKZh/qGUlU
-	hLiTHmp9LpMu+USMEaaSUF3AGnTAhhzUzMULtyygymsgksPS732qo1z38+Ftst9D
-	3gzHQtPxU1P3vtWnvdgxuG991ZzveNezl3ZMRPJXFKsp0aovl7qGJdJ1P0AaoMIZ
-	UPKChUFJyyGOqVfNMSPHcLiY4oe19R+CiFOOGfJYTyyQkVoP8o5m2TxbLvg4si1U
-	wscN4irEmwzPxXhhTo4VkA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1729803461; x=
-	1729889861; bh=p5sJzZEyDqSRG1Fs9NjbAB7cR1K1VcW3bQvLFNs9H6w=; b=E
-	MabJBi6dbjv3cJ6DzAOKDxOPYv91+ANRRu6d+nk3c7ySsuo9ZE48YHxIRKmXaaGo
-	1L32TbaC3hAcqFQHkFbkBmq7bGxJUe+Yhtjzx46pwewtGeHf81aqcwjOUrKhcj8d
-	xCUWo0Mk6xvWKNnopz0KJ2tjxz05+hMPfPHuVOz9wcOtTe4U0tJvhOGvC27iGD9J
-	j0bBrPrDHj6Rb96rqfcfDiLptEbNe+GRK06u/Wao5p2qGgGCMDIKDPhD/hrmkXtJ
-	pyiWg6aAQH36n/X+lYTn8Hsp/eW5oB4aOwX+gZo0z1jeaHq5WyAMwUwa7bJEuBSl
-	qveOCxqRjYVjiYszA398A==
-X-ME-Sender: <xms:xbQaZ96VoRYKYFRs7VBrJ8a62pOjT9-3Zlu66d6DxFj2GN1iH7Nliw>
-    <xme:xbQaZ65fEMQB3FLCeDKXGgJFnbrwmsE4ZqJD1mbFstwFWMERIBNQxiXq6n1ROoCQx
-    J0UUiD04sB0kV1lHg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejtddgudeftdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenfghrlhcuvffnffculdefhedmnecujfgurhepofggfffhvfev
-    kfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfffgrnhhivghlucgiuhdfuceoug
-    iguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgeelieffhfduudeukefh
-    ieefgfffgeduleevjeefffeukefgtdelvddvfeefiedunecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgs
-    pghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlrghorghrrdhshhgrohesghhm
-    rghilhdrtghomhdprhgtphhtthhopehmvghnghhlohhnghekrdguohhnghesghhmrghilh
-    drtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
-    thhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-    pdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:xbQaZ0dpt0CN3xOdR6hgL1wsmX7XMVDBr10N5H-sO8zZxF_zl1L7DA>
-    <xmx:xbQaZ2IJBTvf6NuXAkts-vfUBhCot_VjclKZWcyPu6AhHCyLKMY_iw>
-    <xmx:xbQaZxLPLoYHXTHSjItRxlh5Gs859eeZn0Zf9wKaMUYBoYOx4TKIUw>
-    <xmx:xbQaZ_zydjHSSmTa-aMV-M4HZtd3SIUev5m7Pxw7yTR9oyJQmBb96g>
-    <xmx:xbQaZ2oxKXZdTlZdFgjir51FxUXLLzLjhFVc2sgLjnDQQbLIhoDQv_AD>
-Feedback-ID: i6a694271:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 47EF118A0065; Thu, 24 Oct 2024 16:57:41 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1729804341; c=relaxed/simple;
+	bh=YFSCR7IfY9tTJHnomR8IWpjA3ksgmVsEmuV7YWqhDac=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UAz074Jej2xpDozq+lxHweZgbI/KAwMmgJ7+9U1eeZdBLDu8ICdqG2b65PEs2nqNFcH40vxrbCg/I1XX/pAaFG5OMjesHHaUn7qTjsD5GdHhjucjCZ6fNeDgC9pshnAnS5ijijDsVy6ZLcFlA4v4O+2sVTRxeeSwEEmSvyleSgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru; spf=pass smtp.mailfrom=rosalinux.ru; dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b=JvCI2bpf; arc=none smtp.client-ip=195.19.76.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosalinux.ru
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rosalinux.ru (Postfix) with ESMTP id 7D26B1CE86E68;
+	Fri, 25 Oct 2024 00:01:25 +0300 (MSK)
+Received: from mail.rosalinux.ru ([127.0.0.1])
+	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id 9oq4DAnOWm9h; Fri, 25 Oct 2024 00:01:25 +0300 (MSK)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rosalinux.ru (Postfix) with ESMTP id 291291CEA7786;
+	Fri, 25 Oct 2024 00:01:25 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rosalinux.ru 291291CEA7786
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosalinux.ru;
+	s=1D4BB666-A0F1-11EB-A1A2-F53579C7F503; t=1729803685;
+	bh=YFSCR7IfY9tTJHnomR8IWpjA3ksgmVsEmuV7YWqhDac=;
+	h=From:To:Date:Message-Id:MIME-Version;
+	b=JvCI2bpfYn6dddRZiFpXBEzWeMaIIIutw82nrEpFKELoHPE6QGlusc8ot6Pz2qsRl
+	 xgHZlg0ZN4qSjNTvX61QWUAB7GUVXTPMjDh1akMWR7Bv4mMuo14u26B5xrIwAhP7XR
+	 Zhx7eK353znte05A8c+mxDcOLCydBtTG2ls2w5c9/Mo4C87hbpDNzyXbRsAchC7Ks5
+	 XLwSg/4N1t2FVpz/nBcGXLz3qFrQp8PdasmrTypM0817oCh9kImIJI7nLBMD++8mIh
+	 k/jBTljV5jxoD21CpoJ1X8V5EyMSn2YqMYMoH55SN7eGLDRMqD3tW7zwRTBXHwT4Xf
+	 C3mBvJUzpSmNA==
+X-Virus-Scanned: amavisd-new at rosalinux.ru
+Received: from mail.rosalinux.ru ([127.0.0.1])
+	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id DcLkSC7j36Ww; Fri, 25 Oct 2024 00:01:25 +0300 (MSK)
+Received: from hp-xfce (unknown [89.189.111.209])
+	by mail.rosalinux.ru (Postfix) with ESMTPSA id 21D671CE86E68;
+	Fri, 25 Oct 2024 00:01:24 +0300 (MSK)
+Received: from localhost (hp-xfce [local])
+	by hp-xfce (OpenSMTPD) with ESMTPA id eeebd703;
+	Thu, 24 Oct 2024 21:01:23 +0000 (UTC)
+From: Mikhail Novosyolov <m.novosyolov@rosalinux.ru>
+To: torvalds@linux-foundation.org
+Cc: aospan@netup.ru,
+	conor.dooley@microchip.com,
+	ddrokosov@sberdevices.ru,
+	dmaengine@vger.kernel.org,
+	dushistov@mail.ru,
+	fancer.lancer@gmail.com,
+	geert@linux-m68k.org,
+	gregkh@linuxfoundation.org,
+	hoan@os.amperecomputing.com,
+	ink@jurassic.park.msu.ru,
+	jeffbai@aosc.io,
+	kexybiscuit@aosc.io,
+	linux-alpha@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-iio@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	manivannan.sadhasivam@linaro.org,
+	mattst88@gmail.com,
+	netdev@vger.kernel.org,
+	nikita@trvn.ru,
+	ntb@lists.linux.dev,
+	patches@lists.linux.dev,
+	peter@typeblog.net,
+	richard.henderson@linaro.org,
+	s.shtylyov@omp.ru,
+	serjk@netup.ru,
+	shc_work@mail.ru,
+	torvic9@mailbox.org,
+	tsbogend@alpha.franken.de,
+	v.georgiev@metrotek.ru,
+	wangyuli@uniontech.com,
+	wsa+renesas@sang-engineering.com,
+	xeb@mail.ru,
+	m.novosyolov@rosalinux.ru
+Subject: Re: [PATCH] Revert "MAINTAINERS: Remove some entries due to various compliance requirements."
+Date: Fri, 25 Oct 2024 00:01:20 +0300
+Message-Id: <20241024210120.4126-1-m.novosyolov@rosalinux.ru>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <CAHk-=wjw0i-95S_3Wgk+rGu0TUs8r1jVyBv0L8qfsz+TJR8XTQ@mail.gmail.com>
+References: <CAHk-=wjw0i-95S_3Wgk+rGu0TUs8r1jVyBv0L8qfsz+TJR8XTQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 24 Oct 2024 13:57:17 -0700
-From: "Daniel Xu" <dxu@dxuuu.xyz>
-To: "Yafang Shao" <laoar.shao@gmail.com>,
- "Eric Dumazet" <edumazet@google.com>, "David Miller" <davem@davemloft.net>,
- dsahern@kernel.org, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "Menglong Dong" <menglong8.dong@gmail.com>
-Message-Id: <a4797bfc-73c3-44ca-bda2-8ad232d63d7e@app.fastmail.com>
-In-Reply-To: <20241024093742.87681-3-laoar.shao@gmail.com>
-References: <20241024093742.87681-1-laoar.shao@gmail.com>
- <20241024093742.87681-3-laoar.shao@gmail.com>
-Subject: Re: [PATCH 2/2] net: tcp: Add noinline_for_tracing annotation for
- tcp_drop_reason()
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: quoted-printable
 
-Hi Yafang,
+Linus, Greg,
 
-On Thu, Oct 24, 2024, at 2:37 AM, Yafang Shao wrote:
-> We previously hooked the tcp_drop_reason() function using BPF to monitor
-> TCP drop reasons. However, after upgrading our compiler from GCC 9 to GCC
-> 11, tcp_drop_reason() is now inlined, preventing us from hooking into it.
-> To address this, it would be beneficial to make noinline explicitly for
-> tracing.
+First of all thanks to you for taking by far not the most harmful actions=
+ to achieve what your lawyers very kindly asked you to do.
 
-It looks like kfree_skb() tracepoint has rx_sk field now. Added in
-c53795d48ee8 ("net: add rx_sk to trace_kfree_skb").
+Unfortunately, already a lot of highly qualified people have started thin=
+king that you acted very badly. Of course, there are questions like why r=
+emoved maintainers were not properly notified and did not receive any add=
+itional explanations, but, to my mind, it is useless to try to find 100% =
+justice -- it is not possible. Overton windows has been opened a bit more=
+.
 
-Between sk and skb, is there enough information to monitor TCP drops?
-Or do you need something particular about tcp_drop_reason()?
+Usually the first contribution is much harder to make then the following =
+ones. A big problem here is that now many people even will not try to con=
+tribute to the Linux kernel and other open source projects: their pride f=
+or themselves, their homeland, their colleagues has been severely hurt (w=
+e are ready to fight for all that).
 
-Thanks,
-Daniel
+It is not clear what to do with this problem. Any ideas?
+
+I am sure that people from any country and of any nationality will have s=
+imilar feelings if you act with them or their colleagues in a similar way=
+.
+
+Thanks to people who were not afraid to say something against this action=
+. Chinese, Latin American, African and other people probably understand t=
+hat they may be the next ones to be dropped from maintainers. Hope that w=
+e will not have to form another Linux kernel upstream one day...
+
+I am sorry that you have to read a lot of text from people who you call t=
+rolls -- it is hard to keep calm.
+
+You know, you have really made it much harder to motivate people to contr=
+ibute into the kernel. There is such problem among developers of hardware=
+ that they do not feel comfortable enough to show their code, for example=
+ because they think that it is not perfect. Let=E2=80=99s take Baikal Ele=
+ctronics. They do publish their kernel code, but in a form of tarballs wi=
+thout git. They slowly, but constantly worked on contributing support of =
+their hardware into the upstream kernel, fixing not Baikal-related bugs b=
+y the way. One day someone told them that =E2=80=9Cwe are not comfortable=
+ with accepting your patches=E2=80=9D. And they stopped their work on ups=
+tream. Now that man has been removed from maintainers of previously contr=
+ibuted code (code for not Russian hardware, by the way).
+
+What do I suggest to do? Well, I don=E2=80=99t know, but I do not see dir=
+ect legal reasons why doing this was required and why patches from Baikal=
+ could not be accepted (the fact that I do not see does not mean that the=
+y do not exist, but please show them). Politicians and activists can be s=
+hown a finger in some places, by both developers and lawyers, at least to=
+ prevent them from being too ambitious, when they decide to break somethi=
+ng working next time... But maybe I do not know something about truly dem=
+ocratic regimes :-)
+
+Thanks for reading.
 
