@@ -1,180 +1,200 @@
-Return-Path: <netdev+bounces-138751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A699AEC23
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:31:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FBA59AEC27
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33819282FB3
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:31:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2E83282E84
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9963C1F76CE;
-	Thu, 24 Oct 2024 16:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366D31F80C0;
+	Thu, 24 Oct 2024 16:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=typeblog.net header.i=@typeblog.net header.b="idHoZKpO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WXreoYPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.typeblog.net (mail.typeblog.net [88.151.33.170])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2075.outbound.protection.outlook.com [40.107.243.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ABB16F910;
-	Thu, 24 Oct 2024 16:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.151.33.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729787487; cv=none; b=fe07fEj3Yq1K6J5cyE5J3QPaqPJWFJAjwehuPDWiV8rV1Fz2W0406Z2L2j5cCt/0l4bVw/AKeQ3CCG6WViGw4FwAZuv3ZGjzpveZabN2DOjcHqy4c4/ftdLh8e4T3g1gBo46nAt4NcFKpWdJVmGYYe/6ufb6rENgxi7WvnGeF88=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729787487; c=relaxed/simple;
-	bh=krlFgLM5X1BjmsbFwpT05sBfUJhQUHemV0lI+b/qrjA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d1DZ63Mmrftipj2UaHCfd1SFGJZSxSpHovRrFoaVJbuqRjziNDKNH7PPnzrfpN1vrEeCzUguG6unKt/FlqivVUel8Oy0HAvk6lt6ONKIQOpK+WdMN6kehwWfueP25f3gAYgjwqWXHgHisE9QYvuqs6fTiekUzQbeQFjovV9swLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=typeblog.net; spf=pass smtp.mailfrom=typeblog.net; dkim=pass (2048-bit key) header.d=typeblog.net header.i=@typeblog.net header.b=idHoZKpO; arc=none smtp.client-ip=88.151.33.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=typeblog.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=typeblog.net
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 94CFCD05CE1;
-	Thu, 24 Oct 2024 18:31:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=typeblog.net;
-	s=mailcow; t=1729787480;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=kMTah/UXmnPbON83Ojlj5WVOo5L4UfCvnmalZ3LtOOs=;
-	b=idHoZKpOWIq6BPcZ1jKvD+DCsA+fRuNlkXab1lpqPLW8AY+uSzO9pT9e1otWet0Cb5SXdO
-	JPAW91Q4kK/T/DLwbPUYx0r9YaaivsCbfUlNLoOK2AbxLAB1u3HkayLvstcEmmS/uiStEn
-	oHNGKBvFNUlPbF/5zkc913SQrZudAqpfcQpXLtAXNdFi0LsUS1CdKgi11yMuXNH2wgoCl6
-	c+OfuWSVAlY0xL5cPxoxxgaCiu50Jjof5J2hij9PPSRKL/JIAeRp7XR41H2P8URFa9ivGw
-	CKO4NoZ72zhQbsN9ECCPm3tANcCHiVq7uqz8VmxM2gYt21mwOnVGOon/u2jjcg==
-Message-ID: <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
-Date: Thu, 24 Oct 2024 12:30:59 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A9D5FEED
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 16:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729787533; cv=fail; b=czPwM3yV+lwp+IKUt5vh6uDpGcBhjWjPK4nkINYELOz/wl3vN/pS2ujV4S0WAAy+Qo5xlnVEbigCd/+RDq91DzVp7XLVUf4HtEQMnwniS2Bs/0qWttCW6Wx21xvuKHb1EbehUq29N9fBMZB8IPht8Gs0zcp1O3ce3fWbnsV8ngc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729787533; c=relaxed/simple;
+	bh=cmn0EZ+urgpMJdbiZ4p9/hDzKzuk5fz0jWRBw88EioE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ujBz/fJMj9mKCQ5dAY0eX50wST2EI+TzK8Z6y6+/virhHcX4/OmsDZ2f4GTmL7GJildUGJt7iK5EzhgaYwb7+PP61GBiux5WybZ8hVVt8dDHb/hH9tdOtDtzvC9ToDM6HT7azZ/+8JfjSOp056nj2a+achDC8i4pbYxaoa4NfUE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WXreoYPa; arc=fail smtp.client-ip=40.107.243.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bAQMq8oByZPg/2uHxo+mRCGHlBJFMGDx9E8aBK6IYu08+xf26KSe6qZzsxaiF4mS04rVsZ8i2ma0aVE2YkxvupRrpc49VJptmnyt1IwLK6MpnASss++kTN5YFisgdvrPhrN09UvGfbVVgzZa1izzTE5g6uSyqN/ZwLl3c9vkGj4LJ3yphs6mInM54koo9QYPe7TpcA9D6IaRjPj9pTGA7mzzukIfiUQ+fEgCPHrtAHsLyFEWyv9ux5kfsGLzv6mQq2NGbVkWtSUZmET0eK6j5IPRyQeHdviXYRxCHtxURBLLHfhFmZIevjlytViFOHPvsyprT+AnFQg8B6OPO82gHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H9SFoHUeEPECJTNXuuANMIHtq4Lta0fTMSUuztI0vng=;
+ b=sr2tY/TgfFpdrQ1sNiEDOi9PFPyQyyvll2djL1oeYwwCE5ngzDxn7X0hKfGeVrkHSB9zVJkRGyOEFmyPj2q0lMAqzZ8JsC1ZdyH39pRuJXAtim9EgH57MiHNN3v/mCHSZHbKdh3JloZpkUPJqTCjU36OztU1SrlMPRaGTwJl6/yLUMLtWse1/t+vwsg4k6RTZxP6JM3rynpNCglk3Qum7e5m7M9t/kf06RJf5ZqJKrAafjIweGg+4iP9Ktz1jcBUnHAyfF8N4g5rWm4APpR3lMCtXhjbd14/4e5tAQ0i4a13zjNftoQkbE4CQJlDVWAcECjJvfEbI5MZT0auz0pniw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H9SFoHUeEPECJTNXuuANMIHtq4Lta0fTMSUuztI0vng=;
+ b=WXreoYPaFpCgEsaJusQjCZZj8w/jNAdzWAkSAeXCnoWph9XR/vuSYrP3BHIoI2ygP7UCc0RTGQkk5Hgzc1pgfcHu4SKlYTCcgzeWRNY4TYZxBHaxCGzA7DMGNVdA/nO5cmz9m0K7Rdh/MYHacEXSHTkWobE24x16B1jGrgzl0l+jwf384gk6GMoGCYxsTMVuAqx45KX7t4vyQdI2CjItOaWZp3Obupeh9GYIpAWpXD7HpTMRi5Z5LGOtvr6CjBmBv5SQI0GhnGQfzkRweApcPqdX3dbt8W6mnOQitNH1R1OYa7Ip/kQlE3/5lOw7850eW1DnD27Xtz3g5NbRx6KVWA==
+Received: from DM6PR02CA0107.namprd02.prod.outlook.com (2603:10b6:5:1f4::48)
+ by SJ0PR12MB6710.namprd12.prod.outlook.com (2603:10b6:a03:44c::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Thu, 24 Oct
+ 2024 16:32:04 +0000
+Received: from DS1PEPF00017092.namprd03.prod.outlook.com
+ (2603:10b6:5:1f4:cafe::13) by DM6PR02CA0107.outlook.office365.com
+ (2603:10b6:5:1f4::48) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18 via Frontend
+ Transport; Thu, 24 Oct 2024 16:32:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8093.14 via Frontend Transport; Thu, 24 Oct 2024 16:32:03 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 24 Oct
+ 2024 09:31:49 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 24 Oct
+ 2024 09:31:49 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 24 Oct
+ 2024 09:31:45 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Jay Vosburgh <jv@jvosburgh.net>, "Andy
+ Gospodarek" <andy@greyhouse.net>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jianbo Liu
+	<jianbol@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next] bonding: add ESP offload features when slaves support
+Date: Thu, 24 Oct 2024 19:31:12 +0300
+Message-ID: <20241024163112.298865-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: linux: Goodbye from a Linux community volunteer
-To: James Bottomley <James.Bottomley@HansenPartnership.com>,
- Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
- Paul Burton <paulburton@kernel.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Arnd Bergmann <arnd@arndb.de>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- linux-mips@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
- <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>,
- netdev@vger.kernel.org, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>,
- linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
- linux-edac@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-serial@vger.kernel.org
-Cc: Andrew Halaney <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
- Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
- Sergey Shtylyov <s.shtylyov@omp.ru>, Evgeniy Dushistov <dushistov@mail.ru>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Sergio Paracuellos <sergio.paracuellos@gmail.com>,
- Nikita Shubin <nikita.shubin@maquefel.me>,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
- Linus Torvalds <torvalds@linux-foundation.org>
-References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
- <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
-Content-Language: en-US
-From: Peter Cai <peter@typeblog.net>
-In-Reply-To: <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|SJ0PR12MB6710:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac927122-5b42-4437-c954-08dcf4496481
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?NUlPq0L6Vj7R2CPlrioqrUZkZuB8NYJHv8DUJvy4D0trwjxWkT1fKTd/fFBQ?=
+ =?us-ascii?Q?vJwmtoxhfzvaZDxKqe/uUh2fuQ+PfmU+/mVFPWDg79J55D10yjPny7wr5DT7?=
+ =?us-ascii?Q?zWhdakvuPOlXQEUm3O89lLak9LkFpBV3DaOooy9EaozfDqYUHaAp1Z7gp/nx?=
+ =?us-ascii?Q?zM3TRa7dkXN1gasdGwX+TyfVDaxdzf2V3WdfbetKxTLI4Pim3B+Z7rLXzRSY?=
+ =?us-ascii?Q?9NIZ3QZ0uyW3lWDhZn0xdH288ZLyx6PURar0v/6Y6CuAc9u8vOYY5Vi/H1Uw?=
+ =?us-ascii?Q?kEaq5NZe5Zu5cQiTwIPftQR2B12gklaEqdMvA37mi9qDCL25h2p45OxG4YfZ?=
+ =?us-ascii?Q?A5Nfoq7uknXR5a+W/TfpQ6Wpe0rG3+3tkob1Ympm+WETM13ukHf0Ev9E51yG?=
+ =?us-ascii?Q?lDWZA9UdBNrqOJ6sLB8bdYy3CaTIPDIz34jmu+Qb0W2BdlUP0gkzmxZEBx9A?=
+ =?us-ascii?Q?Foh0NAokw055vmp2mcmZng4y1cAStHjea42uTSp2FhfvGR+29Jxjee43eSpo?=
+ =?us-ascii?Q?5MO9hDBUQAfPxMZpjW/WdDN5dwekdlAlRuLv3ermUSigJloUIBKDrJxhgDs1?=
+ =?us-ascii?Q?+MyVFBGezWSimj7ztCZ7oxZFAC9ZA72ap1N7tRyg09CGIYtGT7NH4DNUr5bz?=
+ =?us-ascii?Q?3laHRksli4q1z/erWp0UpKTQ6cfW8P8QYnZIJkKFZhHKh+VfK3ITrZx/7U1D?=
+ =?us-ascii?Q?Y+L0eaekwc5kQuD+5ShAq1NKFSH4NBgAb5DDN38z4Ym1zAYefdtiqWKypkZt?=
+ =?us-ascii?Q?79xDdKsbE2qDVga6NNHVh6iMCwqVr6tXatzlXdvaq1DN3XirnxQqa6LVDNIM?=
+ =?us-ascii?Q?2sLIw2jQW56qLTo1j71SC8eFpMICoHgh5AU2KTpkMCDnvlHqdNskFOUT7Ph0?=
+ =?us-ascii?Q?lmyFTWwBgDo4aZ54w7bJd+3Lh6A3qSZzi3wo4sQnaLWrDR37bGoJ6c4rDdyH?=
+ =?us-ascii?Q?kyzxgdRLEZ6ApRGiD923w7clZyhHv7s69NNngSgSNB6dYJ8ZMRDeUqLMjzUA?=
+ =?us-ascii?Q?InGsn21rMNbo0vIuPkUkqcshkWC+5Isqiun3o7owsX9UsMFcTDHaONRK9CLQ?=
+ =?us-ascii?Q?KV4OkbNhFfPWNgfzKVOu+5afYio6ccAUBWPD8bPB0Q4aZIwmMCSweq6//kHv?=
+ =?us-ascii?Q?o/UeADJTN6a7LkODPsdwFDg6lpg64flIy6NLYmnQTp0hzjtXpzg13MmAVWJI?=
+ =?us-ascii?Q?9ORHNvG/M60pqCJAyPWlovFbBpwlrDHrqAPguUy56rlq6HH4J4lw3uWyvGsC?=
+ =?us-ascii?Q?2lKnQ9Y6GegFLa7QQLcK5yE0GHru00Si6wZBeO44X3SPyBr8VYywlu1RL8qk?=
+ =?us-ascii?Q?0SE7Zn6IEQ2/elZ7V5w9XDNyTHJvEzeMZRDYskx2KbWxzFZJPloR9Ag+ypPj?=
+ =?us-ascii?Q?xZGQyNM3huUgxLAtNBzvMSzswx+6AAb5iSt4lhhrnuB62oZrJw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 16:32:03.4222
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac927122-5b42-4437-c954-08dcf4496481
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017092.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6710
 
-Hi James,
+From: Jianbo Liu <jianbol@nvidia.com>
 
-Thanks for your clarification. This sort of non-provocative 
-clarifications of the regulations you need to comply to has always been 
-what the community wants to see. _This_ should have been the first 
-official statement when anyone raised the concern, instead of Greg's 
-attempt to "defuse" the situation over private correspondence, or Linus 
-Torvald's outright defamation and accusing anyone who dares to disagree 
-of being a "Russian troll". This is not even to mention the _complete 
-ignorance_ and arrogance shown by his statement on what sending a revert 
-patch means.
+Add NETIF_F_GSO_ESP bit to bond's gso_partial_features if all slaves
+support it, such that ESP segmentation is handled by hardware if possible.
 
-With sanctions in place, there is no reasonable person who will demand 
-the LF or the Linux Kernel maintainers to do otherwise. However, as 
-someone who does rely on Linux for daily work, and as someone who has 
-contributed to the Linux project and its community, I think seeing the 
-following should be the minimum:
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Reviewed-by: Boris Pismenny <borisp@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ drivers/net/bonding/bond_main.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-1. Linus Torvalds (+Cc) send an apology letter to **everyone** who he 
-accused of being a Russian troll;
-2. Linus Torvalds need to **unconditionally retract** his personal 
-attack on Kexy Biscuit, the person who sent the revert patch in protest 
-(+Cc), and acknowledge that people who work with AOSC.io aren't 
-"state-sponsored paid actors";
-3. This type of statement should be included somewhere public as soon as 
-practically possible should sanction compliance affect kernel 
-development again in the future;
-4. No personal attacks should be allowed based on tinfoil-hat reasoning.
-
-Thanks,
-Peter.
-
-On 10/24/24 10:50 AM, James Bottomley wrote:
-> On Thu, 2024-10-24 at 07:27 +0300, Serge Semin wrote:
->> Hello Linux-kernel community,
->>
->> I am sure you have already heard the news caused by the recent Greg'
->> commit 6e90b675cf942e ("MAINTAINERS: Remove some entries due to
->> various compliance requirements."). As you may have noticed the
->> change concerned some of the Ru-related developers removal from the
->> list of the official kernel maintainers, including me.
->>
->> The community members rightly noted that the _quite_ short commit log
->> contained very vague terms with no explicit change justification. No
->> matter how hard I tried to get more details about the reason, alas
->> the senior maintainer I was discussing the matter with haven't given
->> an explanation to what compliance requirements that was.
-> 
-> Please accept all of our apologies for the way this was handled.  A
-> summary of the legal advice the kernel is operating under is
-> 
->     If your company is on the U.S. OFAC SDN lists, subject to an OFAC
->     sanctions program, or owned/controlled by a company on the list, our
->     ability to collaborate with you will be subject to restrictions, and
->     you cannot be in the MAINTAINERS file.
-> 
-> Anyone who wishes to can query the list here:
-> 
-> https://sanctionssearch.ofac.treas.gov/
-> 
-> In your specific case, the problem is your employer is on that list.
-> If there's been a mistake and your employer isn't on the list, that's
-> the documentation Greg is looking for.
-> 
-> I would also like to thank you for all your past contributions and if
-> you (or anyone else) would like an entry in the credit file, I'm happy
-> to shepherd it for you if you send me what you'd like.
-> 
-> Again, we're really sorry it's come to this, but all of the Linux
-> infrastructure and a lot of its maintainers are in the US and we can't
-> ignore the requirements of US law.  We are hoping that this action
-> alone will be sufficient to satisfy the US Treasury department in
-> charge of sanctions and we won't also have to remove any existing
-> patches.
-> 
-> Regards,
-> 
-> James Bottomley
-> 
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 3928287f5865..f7c734cfb917 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1548,6 +1548,7 @@ static void bond_compute_features(struct bonding *bond)
+ 	netdev_features_t vlan_features = BOND_VLAN_FEATURES;
+ 	netdev_features_t enc_features  = BOND_ENC_FEATURES;
+ #ifdef CONFIG_XFRM_OFFLOAD
++	netdev_features_t gso_partial_features = NETIF_F_GSO_ESP;
+ 	netdev_features_t xfrm_features  = BOND_XFRM_FEATURES;
+ #endif /* CONFIG_XFRM_OFFLOAD */
+ 	netdev_features_t mpls_features  = BOND_MPLS_FEATURES;
+@@ -1575,6 +1576,9 @@ static void bond_compute_features(struct bonding *bond)
+ 		xfrm_features = netdev_increment_features(xfrm_features,
+ 							  slave->dev->hw_enc_features,
+ 							  BOND_XFRM_FEATURES);
++
++		if (slave->dev->hw_enc_features & NETIF_F_GSO_PARTIAL)
++			gso_partial_features &= slave->dev->gso_partial_features;
+ #endif /* CONFIG_XFRM_OFFLOAD */
+ 
+ 		mpls_features = netdev_increment_features(mpls_features,
+@@ -1590,6 +1594,13 @@ static void bond_compute_features(struct bonding *bond)
+ 	}
+ 	bond_dev->hard_header_len = max_hard_header_len;
+ 
++#ifdef CONFIG_XFRM_OFFLOAD
++	if (gso_partial_features & NETIF_F_GSO_ESP)
++		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
++	else
++		bond_dev->gso_partial_features &= ~NETIF_F_GSO_ESP;
++#endif /* CONFIG_XFRM_OFFLOAD */
++
+ done:
+ 	bond_dev->vlan_features = vlan_features;
+ 	bond_dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
+-- 
+2.44.0
 
 
