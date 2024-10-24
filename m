@@ -1,283 +1,216 @@
-Return-Path: <netdev+bounces-138739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF6C9AEB1A
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9632A9AEB3D
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6D69282BAD
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ADCD285694
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6A01E9096;
-	Thu, 24 Oct 2024 15:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5FC150990;
+	Thu, 24 Oct 2024 16:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VauM04US"
+	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="aXOTD4Oe";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IWZoFGWX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2651DE4F7;
-	Thu, 24 Oct 2024 15:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB568614E;
+	Thu, 24 Oct 2024 16:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729785191; cv=none; b=aU5DEDKmU9r+U6FZCP9TXYrDgMWPDH9/g7IDyWuZ5xOZZ7D9esS5es9rSBQ9gCX1idjeWYO8/5CYt58oUzlRyjJS7cLKwmsuI+0LKxdEosl8Ln78+AdwpbnNYeC1pB1FX2y+0mYIkqesx8j2c8F8V3d+mTBdnlN2hKfHZaIKJcg=
+	t=1729785675; cv=none; b=KVpyp89Rju7SUsqTznDzMFfbSD4QVfAb5+aTo5CXGDdbNyY1r4UlILxqXi63Rq9wPyfsFCY2WxIZ1AM4sCfLkV7R4Q694z7d71Rmw4/bP43Ez75eSbBcpp/nl9TmKVUkG7Q1dQN6UwTvz/Z+P7uzj/QkzKH7dcsfFQBUyup8q7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729785191; c=relaxed/simple;
-	bh=2qnd2i2UONcjZVkzIcTSxS7pJORJ7ofkM+P7wpTWR88=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHvi1gP+Wdj1LcgXIGTbg9H0FWxLc9kMHJZuSqn48MJqJ6aZbrf2AwdCVyujILo66pxyHmUa2M+jLQMPQv3JUG9NagKMUuOq7gcp0XXZzjX4BBtZ71n1/I5/jylv5vsKXhNdG9Pdx1sBeRgr7Jkhec2XrakCIDLKvOfPebuux6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VauM04US; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729785188; x=1761321188;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2qnd2i2UONcjZVkzIcTSxS7pJORJ7ofkM+P7wpTWR88=;
-  b=VauM04USf7Z99vrrqkdTMPEI4kPPLEchHn/QNqjUB9HFnhhzQYX0XXPw
-   StSvx/ao8G1qlVZ0+uN6kEYTJtiBmiEkgbCrfLnReTOoFNPiPCrkHi8E3
-   CClyjsgK/R0udlJKSRH+tWebZXiRDU3jdFzApoGFfhuETp9XGvzT2Voeh
-   nWkqCP9K/eH+FtfY6lwV0+lxYFuYym96wLS3rUs/BujflDfu5JWLuh7+Q
-   ABL7P3HqEvQXtXm6c6Pn1gGlx+NHIpsh+Cw7cN5si6rmQHhZvYo7xpU8B
-   CPArfdEhnp90ceHjpDo+ZziJxf1Ccrp7hr3RTBgEm/zJKNM3AKQxwA0yn
-   w==;
-X-CSE-ConnectionGUID: /Dv/OAaeQ5qwOYERp5IUOw==
-X-CSE-MsgGUID: 4xro7paDRKWfxMARYBwH9g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11235"; a="33329777"
-X-IronPort-AV: E=Sophos;i="6.11,229,1725346800"; 
-   d="scan'208";a="33329777"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 08:53:08 -0700
-X-CSE-ConnectionGUID: tcjiEK13RmWtiqkxiu2aew==
-X-CSE-MsgGUID: VGYhRvXaRAeqcW9zowBLGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,229,1725346800"; 
-   d="scan'208";a="85243352"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 24 Oct 2024 08:53:02 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t408y-000Wck-10;
-	Thu, 24 Oct 2024 15:53:00 +0000
-Date: Thu, 24 Oct 2024 23:52:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	andrew@lunn.ch, Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	horatiu.vultur@microchip.com,
-	jensemil.schulzostergaard@microchip.com,
-	Parthiban.Veerasooran@microchip.com, Raju.Lakkaraju@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, jacob.e.keller@intel.com,
-	ast@fiberby.net, maxime.chevallier@bootlin.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 06/15] net: lan969x: add match data for lan969x
-Message-ID: <202410242319.ShJiPqSp-lkp@intel.com>
-References: <20241021-sparx5-lan969x-switch-driver-2-v1-6-c8c49ef21e0f@microchip.com>
+	s=arc-20240116; t=1729785675; c=relaxed/simple;
+	bh=ZnN092/uqHw1eYzx7adrt8EsAcrScv3pParyGaS6g9o=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=hJy9ANecoCHZQtL0sc4Lybp+dpUMzhn7DBfrQj9ZEywokSv2/ck3jo3pLVqU9mv5Ha2JJHyR/X/ggUtMu00sHzTAs+l/HKmpIH4awg4EbfVNggyvL6kMUFGHo/lIbdtVv1Y31ELvBlY1xNKEXchPzRIVfj7UOWDk8Sa2Y3DqZx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=aXOTD4Oe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IWZoFGWX; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id B15CF13803A7;
+	Thu, 24 Oct 2024 12:01:11 -0400 (EDT)
+Received: from phl-imap-12 ([10.202.2.86])
+  by phl-compute-09.internal (MEProxy); Thu, 24 Oct 2024 12:01:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1729785671;
+	 x=1729872071; bh=TMl54/iBi871VKim9IIS4u83CKXUQJ/FyOD1Xg77P7w=; b=
+	aXOTD4OekjsjgFCj+/giQqkUrJAHcrxA7NfodWHRuc18tp4u0CusZsPaOd31nzJ5
+	OC4MdbNEc/zb5AcgQbJxfYIHy2Ao/d+61mcTqFJhly29noDbeO4wmmdJxE+NUQ2+
+	isqoOh6zH+Pca8kJgQ45OEK1sWZYu+FC11avGLdTjeBbaSxkon9qHJBB2j1oGfQK
+	+nSp6+O5nRzu0gQ893UPvmTMNbdbDUJ+KLXJ4WPg+Y58a1bBxAYudejrjPbPOs+N
+	wxqqyFgexfUumOaXRVPsmJwWxtl+Y7AWDM6zHn70GY+vkDQOg5qyX3SLn/FfeWqA
+	smKg0fk5TQltzqCIXZ7uHQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1729785671; x=
+	1729872071; bh=TMl54/iBi871VKim9IIS4u83CKXUQJ/FyOD1Xg77P7w=; b=I
+	WZoFGWXyH7KRT1xsSzXSo2wFJ8jbh/BcfWZj08qNrhlFXUdsFJ4/ZXsydTb9rgEK
+	p5mr0xmQ6miU/NZByDL+0+gQtj4vDNv102f4lSa//6sfwDxR2sk9jI8G7HEap9gp
+	tSiglYdCAExA5lkCfEAmjBMQFYUXzhWXrUI+x9qZgxtPA3HVhIZTh4CNFjfshi+s
+	3TRNJPsem10pA6QVZ8+pOdOx0M1qhQXxGiL0GE2bZPATG2ZHyToyW0k/SJB22mdm
+	LkiBCoTtcyirZeVS/S9zG744NZDoHOodmrMGsRBfI1FUkx8bSgMnfL1Lxx9gN07e
+	ueOEHsuoyxelrTqFnGfDQ==
+X-ME-Sender: <xms:R28aZyOuRBKINyVfUESATLEyMoQxt0QVBkLgmHBepXt8dIyd9UfrKw>
+    <xme:R28aZw-z66VSoQKBZOqQA504ThlgNiF9UX8twlW600tz_w2-YHr4xvIJGI0rRQXXX
+    Ei_egaFLqydEg343-U>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejtddgieelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnegfrhhlucfvnfffucdlqddutddmnecujfgurhepofggfffhvfev
+    kfgjfhfutgfgsehtqhertdertdejnecuhfhrohhmpedflfhirgiguhhnucgjrghnghdfuc
+    eojhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomheqnecuggftrfgrthhtvghr
+    nhepheelkeetgfeftdekgfevieegfeehleeihedvffefgfefgfeihfdtkeekjeefkeehne
+    cuffhomhgrihhnpehtrhgvrghsrdhgohhvnecuvehluhhsthgvrhfuihiivgeptdenucfr
+    rghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtg
+    homhdpnhgspghrtghpthhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
+    lhhinhhugidqshhpihesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvg
+    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:R28aZ5QPb3P6cydM06UlSPhz7gHQT2V-ffrWAqpBWkagS3jls8ZUng>
+    <xmx:R28aZysGnOcq-bmzG5ticPI0qDEvlXX_-6owiJbR7oXECGcDrn6ynQ>
+    <xmx:R28aZ6cG4QDwJsU39of7DuJggxyN2QpxE5GUgOAbHoOtNUAxCXILWw>
+    <xmx:R28aZ217pABpKlfuKeN6NwZO6kTihaZhYtC2guoqVqQNLVOa1_tQkw>
+    <xmx:R28aZ-GLf3fSOcvHKoaHJl7RN3_h8BhydO-eKMMjY7nzaWtmlsLZU-pO>
+Feedback-ID: ifd894703:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 5F2561C20067; Thu, 24 Oct 2024 12:01:11 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021-sparx5-lan969x-switch-driver-2-v1-6-c8c49ef21e0f@microchip.com>
+Date: Thu, 24 Oct 2024 16:59:36 +0100
+From: "Jiaxun Yang" <jiaxun.yang@flygoat.com>
+To: "James Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Serge Semin" <fancer.lancer@gmail.com>, "Jon Mason" <jdmason@kudzu.us>,
+ "Dave Jiang" <dave.jiang@intel.com>, "Allen Hubbe" <allenbh@gmail.com>,
+ ntb@lists.linux.dev, "Andy Shevchenko" <andy@kernel.org>,
+ "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+ "Kory Maincent" <kory.maincent@bootlin.com>,
+ "Cai Huoqing" <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
+ "Mark Brown" <broonie@kernel.org>, linux-spi@vger.kernel.org,
+ "Damien Le Moal" <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
+ "paulburton@kernel.org" <paulburton@kernel.org>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Arnd Bergmann" <arnd@arndb.de>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Manivannan Sadhasivam" <manivannan.sadhasivam@linaro.org>,
+ "Yoshihiro Shimoda" <yoshihiro.shimoda.uh@renesas.com>,
+ linux-pci <linux-pci@vger.kernel.org>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, "Russell King" <linux@armlinux.org.uk>,
+ "Vladimir Oltean" <olteanv@gmail.com>,
+ "Kelvin Cheung" <keguang.zhang@gmail.com>,
+ "Yanteng Si" <siyanteng@loongson.cn>, netdev@vger.kernel.org,
+ "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk@kernel.org>,
+ "Guenter Roeck" <linux@roeck-us.net>, linux-hwmon@vger.kernel.org,
+ "Borislav Petkov" <bp@alien8.de>, linux-edac@vger.kernel.org,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ linux-serial@vger.kernel.org
+Cc: "Andrew Halaney" <ajhalaney@gmail.com>, "Nikita Travkin" <nikita@trvn.ru>,
+ "Ivan Kokshaysky" <ink@jurassic.park.msu.ru>,
+ "Alexander Shiyan" <shc_work@mail.ru>, "Dmitry Kozlov" <xeb@mail.ru>,
+ "Sergey Shtylyov" <s.shtylyov@omp.ru>,
+ "Evgeniy Dushistov" <dushistov@mail.ru>,
+ "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Sergio Paracuellos" <sergio.paracuellos@gmail.com>,
+ "Nikita Shubin" <nikita.shubin@maquefel.me>,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <753d203a-a008-4cd3-b053-38b5ce31281b@app.fastmail.com>
+In-Reply-To: 
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+Subject: Re: linux: Goodbye from a Linux community volunteer
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Daniel,
 
-kernel test robot noticed the following build errors:
 
-[auto build test ERROR on 30d9d8f6a2d7e44a9f91737dd409dbc87ac6f6b7]
+=E5=9C=A82024=E5=B9=B410=E6=9C=8824=E6=97=A5=E5=8D=81=E6=9C=88 =E4=B8=8B=
+=E5=8D=883:50=EF=BC=8CJames Bottomley=E5=86=99=E9=81=93=EF=BC=9A
+> On Thu, 2024-10-24 at 07:27 +0300, Serge Semin wrote:
+>> Hello Linux-kernel community,
+[...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Machon/net-sparx5-add-support-for-lan969x-SKU-s-and-core-clock/20241021-220557
-base:   30d9d8f6a2d7e44a9f91737dd409dbc87ac6f6b7
-patch link:    https://lore.kernel.org/r/20241021-sparx5-lan969x-switch-driver-2-v1-6-c8c49ef21e0f%40microchip.com
-patch subject: [PATCH net-next 06/15] net: lan969x: add match data for lan969x
-config: m68k-randconfig-r121-20241024 (https://download.01.org/0day-ci/archive/20241024/202410242319.ShJiPqSp-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.1.0
-reproduce: (https://download.01.org/0day-ci/archive/20241024/202410242319.ShJiPqSp-lkp@intel.com/reproduce)
+Hi James,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410242319.ShJiPqSp-lkp@intel.com/
+Sorry to chime in here, and thanks for making things clear.
 
-All errors (new ones prefixed by >>):
+However, I have some questions regarding this statement, please see belo=
+w:
 
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_init':
->> sparx5_vcap_impl.c:(.text+0x4632): undefined reference to `vcap_port_debugfs'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_destroy':
->> sparx5_vcap_impl.c:(.text+0x4d24): undefined reference to `vcap_del_rules'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_es2_get_port_ipv4_keysets':
->> sparx5_vcap_impl.c:(.text+0x38): undefined reference to `vcap_keyset_list_add'
->> m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x50): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x68): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x80): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x98): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_ingress_add_default_fields':
->> sparx5_vcap_impl.c:(.text+0x114): undefined reference to `vcap_lookup_keyfield'
->> m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x142): undefined reference to `vcap_rule_add_key_u32'
->> m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x1a6): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x1d2): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x21e): undefined reference to `vcap_rule_add_key_bit'
->> m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x268): undefined reference to `vcap_rule_add_key_u72'
->> m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x288): undefined reference to `vcap_keyset_name'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_add_default_fields':
->> sparx5_vcap_impl.c:(.text+0x31e): undefined reference to `vcap_rule_add_key_u32'
->> m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x358): undefined reference to `vcap_lookup_keyfield'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x368): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x3b6): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0x3d4): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_es0_get_port_keysets.isra.0':
-   sparx5_vcap_impl.c:(.text+0x704): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_es2_get_port_keysets.isra.0':
-   sparx5_vcap_impl.c:(.text+0xadc): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0xb3c): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0xb98): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: sparx5_vcap_impl.c:(.text+0xbc2): undefined reference to `vcap_keyset_list_add'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o:sparx5_vcap_impl.c:(.text+0xc42): more undefined references to `vcap_keyset_list_add' follow
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_validate_keyset':
->> sparx5_vcap_impl.c:(.text+0x214e): undefined reference to `vcap_keyset_name'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.o: in function `sparx5_vcap_init':
->> sparx5_vcap_impl.c:(.text+0x464a): undefined reference to `vcap_debugfs'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_select_protocol_keyset':
->> sparx5_tc_flower.c:(.text+0x2b8): undefined reference to `vcap_keyfieldset'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_replace':
->> sparx5_tc_flower.c:(.text+0x1c58): undefined reference to `vcap_rule_add_action_u32'
->> m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1ffc): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_handler_basic_usage':
->> sparx5_tc_flower.c:(.text+0x5a): undefined reference to `vcap_rule_add_key_u32'
->> m68k-linux-ld: sparx5_tc_flower.c:(.text+0xd2): undefined reference to `vcap_rule_add_key_u32'
->> m68k-linux-ld: sparx5_tc_flower.c:(.text+0x11e): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x168): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x190): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1b4): undefined reference to `vcap_rule_add_key_bit'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_select_protocol_keyset':
->> sparx5_tc_flower.c:(.text+0x264): undefined reference to `vcap_rule_find_keysets'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x3ca): undefined reference to `vcap_set_rule_set_keyset'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x402): undefined reference to `vcap_rule_mod_key_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_handler_vlan_usage':
-   sparx5_tc_flower.c:(.text+0x476): undefined reference to `vcap_tc_flower_handler_vlan_usage'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x4ec): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x50e): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_handler_control_usage':
-   sparx5_tc_flower.c:(.text+0x5a2): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_handler_cvlan_usage':
-   sparx5_tc_flower.c:(.text+0x842): undefined reference to `vcap_tc_flower_handler_cvlan_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_destroy.isra.0':
-   sparx5_tc_flower.c:(.text+0x8a6): undefined reference to `vcap_lookup_rule_by_cookie'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x8c0): undefined reference to `vcap_get_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x8da): undefined reference to `vcap_find_actionfield'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x94c): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x95a): undefined reference to `vcap_del_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xa4a): undefined reference to `vcap_del_rule'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_simplify_rule.isra.0':
-   sparx5_tc_flower.c:(.text+0xace): undefined reference to `vcap_rule_rem_key'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xb0e): undefined reference to `vcap_rule_rem_key'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xb2a): undefined reference to `vcap_rule_rem_key'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xb68): undefined reference to `vcap_rule_rem_key'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_action_vlan_modify.isra.0':
-   sparx5_tc_flower.c:(.text+0xbb8): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_add_rule_link.isra.0':
-   sparx5_tc_flower.c:(.text+0xce2): undefined reference to `vcap_find_admin'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xcfa): undefined reference to `vcap_chain_offset'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xd5a): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xd74): undefined reference to `vcap_rule_add_action_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xd92): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xdc8): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_set_actionset.isra.0':
-   sparx5_tc_flower.c:(.text+0xe4e): undefined reference to `vcap_set_rule_set_actionset'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_add_rule_counter.isra.0':
-   sparx5_tc_flower.c:(.text+0xeba): undefined reference to `vcap_rule_mod_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xed2): undefined reference to `vcap_rule_set_counter_id'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xef6): undefined reference to `vcap_rule_mod_action_u32'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_add_rule_copy':
-   sparx5_tc_flower.c:(.text+0xf64): undefined reference to `vcap_copy_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xf96): undefined reference to `vcap_filter_rule_keys'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xfa2): undefined reference to `vcap_set_rule_set_keyset'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xfc8): undefined reference to `vcap_rule_mod_key_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xfd4): undefined reference to `vcap_set_rule_set_actionset'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0xfe6): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1016): undefined reference to `vcap_val_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1026): undefined reference to `vcap_add_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1054): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x106a): undefined reference to `vcap_keyset_name'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1090): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x10bc): undefined reference to `vcap_set_tc_exterr'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x10c8): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_action_check.isra.0':
-   sparx5_tc_flower.c:(.text+0x122c): undefined reference to `vcap_is_last_chain'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x12fc): undefined reference to `vcap_is_next_lookup'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_template_create':
-   sparx5_tc_flower.c:(.text+0x14f0): undefined reference to `vcap_admin_rule_count'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1570): undefined reference to `vcap_alloc_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x15cc): undefined reference to `vcap_rule_find_keysets'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x15e4): undefined reference to `vcap_select_min_rule_keyset'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1648): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x169c): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1736): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1766): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower_replace':
-   sparx5_tc_flower.c:(.text+0x183c): undefined reference to `vcap_alloc_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1890): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x18da): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x18ec): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1990): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x19a8): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1ad8): undefined reference to `vcap_rule_add_action_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1af4): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1b56): undefined reference to `vcap_val_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1b68): undefined reference to `vcap_add_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1bb8): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1bf2): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1cbc): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1cf6): undefined reference to `vcap_rule_add_action_u72'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1ee4): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1f32): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1f94): undefined reference to `vcap_rule_add_key_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1fcc): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x1fea): undefined reference to `vcap_rule_add_action_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x203c): undefined reference to `vcap_rule_add_action_bit'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x2054): undefined reference to `vcap_rule_add_action_u32'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x2092): undefined reference to `vcap_set_rule_set_keyset'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x2110): undefined reference to `vcap_set_tc_exterr'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x211a): undefined reference to `vcap_free_rule'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o: in function `sparx5_tc_flower':
-   sparx5_tc_flower.c:(.text+0x224e): undefined reference to `vcap_find_admin'
-   m68k-linux-ld: sparx5_tc_flower.c:(.text+0x2378): undefined reference to `vcap_get_rule_count_by_cookie'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x986): undefined reference to `vcap_tc_flower_handler_ipv4_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x98a): undefined reference to `vcap_tc_flower_handler_ipv6_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x98e): undefined reference to `vcap_tc_flower_handler_portnum_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x99a): undefined reference to `vcap_tc_flower_handler_ethaddr_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x9a2): undefined reference to `vcap_tc_flower_handler_arp_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x9ce): undefined reference to `vcap_tc_flower_handler_tcp_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_flower.o:(.rodata+0x9d2): undefined reference to `vcap_tc_flower_handler_ip_usage'
-   m68k-linux-ld: drivers/net/ethernet/microchip/sparx5/sparx5_tc_matchall.o: in function `sparx5_tc_matchall_replace':
-   sparx5_tc_matchall.c:(.text+0x13e): undefined reference to `vcap_enable_lookups'
+> Please accept all of our apologies for the way this was handled.  A
+> summary of the legal advice the kernel is operating under is
 
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for SPARX5_SWITCH
-   Depends on [n]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && NET_SWITCHDEV [=y] && HAS_IOMEM [=y] && OF [=n] && (ARCH_SPARX5 || COMPILE_TEST [=y]) && PTP_1588_CLOCK_OPTIONAL [=y] && (BRIDGE [=y] || BRIDGE [=y]=n [=n])
-   Selected by [y]:
-   - LAN969X_SWITCH [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y]
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [y]:
-   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
+In what capacity this statement was made, i.e, who is "our" here and "we"
+below? Are you representing any formal group in this case?
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+>    If your company is on the U.S. OFAC SDN lists, subject to an OFAC
+>    sanctions program, or owned/controlled by a company on the list, our
+>    ability to collaborate with you will be subject to restrictions, and
+>    you cannot be in the MAINTAINERS file.
+>
+> Anyone who wishes to can query the list here:
+>
+> https://sanctionssearch.ofac.treas.gov/
+
+I did a quick search and found the following entry:
+
+HUAWEI TECHNOLOGIES CO., LTD. Under CMIC-EO13959 sanction program.
+
+Although it's a Non-SDN sanction, it can still be interpreted as
+"subject to an OFAC sanctions program".
+
+How should we handle it?
+
+>
+[...]
+>
+> Again, we're really sorry it's come to this, but all of the Linux
+> infrastructure and a lot of its maintainers are in the US and we can't
+> ignore the requirements of US law.  We are hoping that this action
+> alone will be sufficient to satisfy the US Treasury department in
+> charge of sanctions and we won't also have to remove any existing
+> patches.
+
+I truly appreciate that someone has finally addressed the underlying iss=
+ue.
+I understand the importance of protecting infrastructure and maintainers=
+ from
+potential legal threats by ensuring compliance. My intent in asking these
+questions is not to place anyone in a difficult position, but simply to =
+gain a
+better understanding of the situation, so I can take appropriate action =
+to
+keep everyone safe.
+
+Disclaimer: I have no connection to any sanctioned body, and I'm a resid=
+ent
+of UK.
+
+Thanks
+
+>
+> Regards,
+>
+> James Bottomley
+
+--=20
+- Jiaxun
 
