@@ -1,91 +1,107 @@
-Return-Path: <netdev+bounces-138703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ABBE9AE95C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:52:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E34AA9AE95F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:52:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DE662831B6
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:52:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 656ADB22669
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092761D1E94;
-	Thu, 24 Oct 2024 14:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A241E2009;
+	Thu, 24 Oct 2024 14:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="O5FupnhY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQS/ojVN"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E101B6CE2;
-	Thu, 24 Oct 2024 14:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C729D8614E;
+	Thu, 24 Oct 2024 14:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729781525; cv=none; b=nftpjOJ5O846/ZXhROwrV8vqS0v+nGw/hLuOL3C9a95Ge/3YFFK+nClqSen2VvuOdkzusAfbSjFqZ9dPuAK1Q5DxI/LmMHzrc4UZIGyLzE+lEqzXo6UjOSBkm7R6IbpDF9h+8i+OC6IbiRfhheB/ELMjVNpteCSuEtCRNeV2wjE=
+	t=1729781547; cv=none; b=V5JiWDy7OgfU1R+d6sMA/1yMMxYz+u9gdopGNtWseemGGCMTYLmKW0i3i/iTV+E+gGGBrtRP6M6lzxHcsaItk0ZAXAkt76wsgUr0HD0him1y+yZX0x0iuG2Cpi0p3aaPZE/MUVLCjDbR7ziibTZNRaMf68sbG+Om9DtGzuuMIaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729781525; c=relaxed/simple;
-	bh=3SlR/dxAnj6bdMujLTwkkc9jweGNW26YP4jnX30v1xo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jlj/ROf6u/zuseMPAdDXGtbEjN9jgmTfOQ0t6WKmC3mhZzFMRoMSqPu3lXifsSJNLOvfMyoN0pF1Zm/ZjaEAd6oxGH6Go35p2xYgz58BxqyOpR89DLUYzLPIVzTg7XTfzBJGcrr/hxh2dkpwuy7fGgB4mwqBTD1HVQJl0qkijTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=O5FupnhY; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=3SlR/dxAnj6bdMujLTwkkc9jweGNW26YP4jnX30v1xo=;
-	t=1729781524; x=1730991124; b=O5FupnhYOwjkEnsbCLac3wVVuo9989HaUuDt4vMp9wrQHkv
-	Y7Kjx+QyIU33JJyi12B0EU15H72j8BeP0K5ikLZdtJ84l4cHfz470060iawsRAD6Yd2AmLCTTVi/0
-	Oe8MhE1sR7qgz2jqD7/OgUCBhRXXHMKV79eYjl98IT+3LCDpyU6FX39wJzyhbrHKiRyRVf68XENVM
-	ZIonAzhQdjZ1PtT/4kliuBuqXYoRPg6MKUq4XxUXb9ciIX5r/WSk+ETdBgVCN1R2qHtdBcfd6blgf
-	0P9Pt5EpaUa55EKsvtOD5/LKcW39Yxusf5feT/kzKrN7S2z/ZW04e96AiZmxxHzQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1t3zBw-00000003h72-3h6E;
-	Thu, 24 Oct 2024 16:52:01 +0200
-Message-ID: <2e3b106585cebbb579c0d5cca33737623765ded7.camel@sipsolutions.net>
-Subject: Re: [RFC PATCH 2/2] net: convert to nla_get_*_default()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Date: Thu, 24 Oct 2024 16:52:00 +0200
-In-Reply-To: <ZxpeL7S2GZeJOiQw@hog>
-References: 
-	<20241024131807.0a6c07355832.I3df6aac71d38a5baa1c0a03d0c7e82d4395c030e@changeid>
-	 <20241024131807.d5b9f6e57ede.I740beeaa2f70ebfc19bfca1045a24d6151992790@changeid>
-	 <8fabb6e5a2eda8c3bd7ca0bccc3e7804ad27bbad.camel@sipsolutions.net>
-	 <ZxpeL7S2GZeJOiQw@hog>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1729781547; c=relaxed/simple;
+	bh=qD7+gao6cTEv2ink4Tsu6QHfw9nuzASJ9nrEHatmtLQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YachJJTrNVXHOVus5IlFGu0kGOP1ZA4YpOrSesnc5q2lOgAQZ54iwe/Qd0+8LcfN3IzeRth64vygURYtcJoWXLraLhYmZm/fYpiHbojIgtOde6Ab68DCnIOlRtV1Cp0GfA+goXZDrlsU00nD7osVjoN8BRNR/pWUjvD7Aoc2GQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XQS/ojVN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41CBCC4CEC7;
+	Thu, 24 Oct 2024 14:52:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729781547;
+	bh=qD7+gao6cTEv2ink4Tsu6QHfw9nuzASJ9nrEHatmtLQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XQS/ojVNjvQysCvhsmbOYimUCpIdTf8g7S1pqeL4V7U2YdTB6a2RyEJ8qJt5+PrHz
+	 +g7VZn3018EYj0UrGIMQDBviAyKi+I3v8k3UjjgQ6sbtuA7tDQMQkBMRPNlZ6+plbC
+	 SJVsd2BLNuLpr4lnvGmqIhIeKlf/DBHPRH7CQwu9+UJgUl4LcJzCltsRA2eKTKPCEj
+	 AruweojLY22iteSBFwkEmindThXL/ruRyhr7gSPRsO+KffD2l8BfT8dzvXEiy2y4Vz
+	 wBRBst/UmGYwxQ3R2V6x2QwubaAgGxbcxh85uZ5Ai04eyDFtgR88BKJYeh4twIEdsk
+	 ZPJFfW15wpwfQ==
+Date: Thu, 24 Oct 2024 15:52:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	thomas.petazzoni@bootlin.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next] Documentation: networking: Add missing PHY_GET
+ command in the message list
+Message-ID: <20241024145223.GR1202098@kernel.org>
+References: <20241023141559.100973-1-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023141559.100973-1-kory.maincent@bootlin.com>
 
-On Thu, 2024-10-24 at 16:48 +0200, Sabrina Dubroca wrote:
->=20
-> If nla_get_*_default was a macro (generating an "attr ? getter :
-> default" expression) you wouldn't have that problem I think,=C2=A0
+On Wed, Oct 23, 2024 at 04:15:58PM +0200, Kory Maincent wrote:
+> ETHTOOL_MSG_PHY_GET/GET_REPLY/NTF is missing in the ethtool message list.
+> Add it to the ethool netlink documentation.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+>  Documentation/networking/ethtool-netlink.rst | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> index 295563e91082..70ecc3821007 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -236,6 +236,7 @@ Userspace to kernel:
+>    ``ETHTOOL_MSG_MM_GET``                get MAC merge layer state
+>    ``ETHTOOL_MSG_MM_SET``                set MAC merge layer parameters
+>    ``ETHTOOL_MSG_MODULE_FW_FLASH_ACT``   flash transceiver module firmware
+> +  ``ETHTOOL_MSG_PHY_GET``               get Ethernet PHY information
+>    ===================================== =================================
+>  
+>  Kernel to userspace:
+> @@ -283,6 +284,8 @@ Kernel to userspace:
+>    ``ETHTOOL_MSG_PLCA_NTF``                 PLCA RS parameters
+>    ``ETHTOOL_MSG_MM_GET_REPLY``             MAC merge layer status
+>    ``ETHTOOL_MSG_MODULE_FW_FLASH_NTF``      transceiver module flash updates
+> +  ``ETHTOOL_MSG_PHY_GET_REPLY``            Ethernet PHY information
+> +  ``ETHTOOL_MSG_PHY_NTF``                  Ethernet PHY information
 
-Hmm. Perhaps. In the conditional operator (?:) they're subject to
-integer promotion though, I wonder if that could cause some subtle issue
-too especially if nla_get_u*() is used with signed variables?
+I wonder if ETHTOOL_MSG_PHY_NTF should be removed.
+It doesn't seem to be used anywhere.
 
-> but you
-> couldn't nicely generate all the helpers with MAKE_NLA_GET_DEFAULT
-> anymore.
-
-Right, that too.
-
-I think it's probably better to just review them, and only commit the
-obvious ones originally?
-
-johannes
+>    ======================================== =================================
+>  
+>  ``GET`` requests are sent by userspace applications to retrieve device
+> -- 
+> 2.34.1
+> 
+> 
 
