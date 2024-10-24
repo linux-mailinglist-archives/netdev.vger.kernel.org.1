@@ -1,106 +1,154 @@
-Return-Path: <netdev+bounces-138624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09AD9AE5CE
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:16:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 712BC9AE5DB
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCC61C2165F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:16:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E4FA2877E8
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A57B1D220E;
-	Thu, 24 Oct 2024 13:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA3B1DE88A;
+	Thu, 24 Oct 2024 13:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IJI5zCBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C341AF0BC;
-	Thu, 24 Oct 2024 13:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE45A1DD0DF;
+	Thu, 24 Oct 2024 13:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729775757; cv=none; b=P8MERIY7TrLJDMDygi78mXc83xG7TTY+hVp3itJKoa0afZeDgZ3mZDHHcE1FKiqjitmOihxIjnSBVS5SMviJtue5cDUZgGKivXZafEiPe8QfbPBQCtzXFNh+vBIKfEcBOexOxclSc9GMrsYbSoIF5c8bnRXnDi4CxxzDDr+IR6Q=
+	t=1729775800; cv=none; b=qthENILp5SkhvYl//kDx66zOFj1gJlipWK6QYRpt7GRf3V4x3X6vq0Jlux7lZsb+iGHDW3PMK6WJhrNdiIt5A1KdTRJByqMzmuKIqwVBoryPa3dimjKzmSlg6G+9FkXhQRY6gkCzGcznhsfbNAM84/4pJzGchxZnRMJ5DM7VENs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729775757; c=relaxed/simple;
-	bh=8+zYBhUVLK61D2TwrFLMSrE5LXGFSS00+qrwplAWp/E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fml2xHdvKzghkTW9lAPSKh6nF+zb3LC5veEgtTdQAFJ15bkVPgQzwGVplQkgZYBhAPffnciHLIe0+8kEYw3kGiMsosRM9p0t9UEU6Y5Og5RbCwcmelQErPIabJ1jTJn/S2GAOtzHpTUhEsZo+B0A24R7pOrGyUfidx2uz/nFz1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A06BC4CEC7;
-	Thu, 24 Oct 2024 13:15:53 +0000 (UTC)
-From: Chuck Lever <chuck.lever@oracle.com>
-To: trondmy@kernel.org,
-	anna@kernel.org,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	joel.granados@kernel.org,
-	linux@weissschuh.net,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Ye Bin <yebin@huaweicloud.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	yebin10@huawei.com,
-	zhangxiaoxu5@huawei.com
-Subject: Re: [PATCH] svcrdma: fix miss destroy percpu_counter in svc_rdma_proc_init()
-Date: Thu, 24 Oct 2024 09:15:32 -0400
-Message-ID: <172977515008.2386.365430128275371946.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241024015520.1448198-1-yebin@huaweicloud.com>
-References: <20241024015520.1448198-1-yebin@huaweicloud.com>
+	s=arc-20240116; t=1729775800; c=relaxed/simple;
+	bh=q9uxznKnQY4XK6iA2VnlvWjgWTCmgLuEF/MdAC17O88=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jTuza0EGhgQsHkNpM124Rto7bh47eYO5FNToKqmuMMDVgKmAe/DMfxaKjTiKp9L4k20bmPXX3sc5YbiR7OgCApCV2id9Dzq9jjuTUSjed4D1ycwc5Ti6N4ffrgJ9HfccxPJXPMRBdEgrTEEz5f5cbOMWPXOFfpjBPS9U/VpKrs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IJI5zCBm; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ff454a9b-5e60-49cb-8590-a2535f851057@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729775795;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nYx7LAyRV3Ucr0XiBCFOAYtv8t2YgLt+/TvO8hjpNtU=;
+	b=IJI5zCBmkMWuSlAC6vNeUKZ/x0HqRyeKkaCRuPkB1OLmXKmyDkre5tUfruHXq1gNMlp7sa
+	wAdbkUxXhNgkeBwbbk+ggdjpGjJOe2qPZyFLhIyXnkhY27YXJQ7do5bCWB6f2s/fnsAEEL
+	1qpWsIUKTCgqoyPDfwoaovUS3LL604M=
+Date: Thu, 24 Oct 2024 14:16:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1158; i=chuck.lever@oracle.com; h=from:subject:message-id; bh=8+zYBhUVLK61D2TwrFLMSrE5LXGFSS00+qrwplAWp/E=; b=owEBbQKS/ZANAwAIATNqszNvZn+XAcsmYgBnGkh8Ima3PUwfMfNTvXEaT9jPh5sVzQaLcYUtg DGNTEVPRJGJAjMEAAEIAB0WIQQosuWwEobfJDzyPv4zarMzb2Z/lwUCZxpIfAAKCRAzarMzb2Z/ l+FCD/0SMwcfLpqSmCnGlK+MfSuVl/i8a8yJxDfystE2x55TH1wiAnh9cmle04upLxLcYtGWvi+ LEd7KEz0ao/axl0Xr31dB/lGjSzrnRDepEqr61NmHTwfTpsnZcfChQrKayRH72kcNYAV5+YOh5Y HAFJmHnEg650+AwRzKQlyhJpmrFV5p75rmeZxcE905TBBxkFckxupgK4uoPHtH+tpEVRVHBXCMu Eyjif2wXCdgncQoYdsORXtEjPc+EwiqEmMs4EE+EwbqVMW3gDlsUnytfexksqjHITCPD36x/1k8 6DmT+WK12znI4DRGxWzv7NKr4uUl/3twleS8jnyqt4ytXIMG+FnvnOfyo+XkDpeRuBD0EUunnRi qjt4LBUk+wdsIebmLCRsOsfvHLbWk3YJ8lClIWMJfGEfu3DWGeyVnq+FLy85mM3A02iUkfUk1mi x6k0JdPF/kL4m3sUlCKO5KzDufu5lVr5ETIZ+Zt2xEaerZYmphr+ttm8HhPm0ZvPde5dO3s4hDo 2BydIBW7mHD8kszb9tdb3DCkgBUJGMeKgNNO8vtw9DeCBbjCl/7VmsjNRI51vygSMGI00yhOAkR 4N0/dK9O8aUuUryLQgc34voru/EbPvV2YNN+rBkiaOYElwgxuZ/HcfBIDJxpAOKLw7RusDAilSe hihiQw
- pnjTjWhqQ==
-X-Developer-Key: i=chuck.lever@oracle.com; a=openpgp; fpr=28B2E5B01286DF243CF23EFE336AB3336F667F97
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix 1 PPS sync
+To: Meghana Malladi <m-malladi@ti.com>, vigneshr@ti.com, horms@kernel.org,
+ jan.kiszka@siemens.com, diogo.ivo@siemens.com, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com,
+ Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+References: <20241024113140.973928-1-m-malladi@ti.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241024113140.973928-1-m-malladi@ti.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 24 Oct 2024 09:55:20 +0800, Ye Bin wrote:
-> There's issue as follows:
-> RPC: Registered rdma transport module.
-> RPC: Registered rdma backchannel transport module.
-> RPC: Unregistered rdma transport module.
-> RPC: Unregistered rdma backchannel transport module.
-> BUG: unable to handle page fault for address: fffffbfff80c609a
-> PGD 123fee067 P4D 123fee067 PUD 123fea067 PMD 10c624067 PTE 0
-> Oops: Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> RIP: 0010:percpu_counter_destroy_many+0xf7/0x2a0
-> Call Trace:
->  <TASK>
->  __die+0x1f/0x70
->  page_fault_oops+0x2cd/0x860
->  spurious_kernel_fault+0x36/0x450
->  do_kern_addr_fault+0xca/0x100
->  exc_page_fault+0x128/0x150
->  asm_exc_page_fault+0x26/0x30
->  percpu_counter_destroy_many+0xf7/0x2a0
->  mmdrop+0x209/0x350
->  finish_task_switch.isra.0+0x481/0x840
->  schedule_tail+0xe/0xd0
->  ret_from_fork+0x23/0x80
->  ret_from_fork_asm+0x1a/0x30
->  </TASK>
+On 24/10/2024 12:31, Meghana Malladi wrote:
+> The first PPS latch time needs to be calculated by the driver
+> (in rounded off seconds) and configured as the start time
+> offset for the cycle. After synchronizing two PTP clocks
+> running as master/slave, missing this would cause master
+> and slave to start immediately with some milliseconds
+> drift which causes the PPS signal to never synchronize with
+> the PTP master.
 > 
-> [...]
+> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> ---
+> 
+> Hello,
+> 
+> This patch is based on net-next tagged next-20241023.
+> v1:https://lore.kernel.org/all/20241023091213.593351-1-m-malladi@ti.com/
+> Changes since v1 (v2-v1):
+> - Use roundup() instead of open coding as suggested by Vadim Fedorenko
+> 
+> Regards,
+> Meghana.
+> 
+>   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 12 ++++++++++--
+>   drivers/net/ethernet/ti/icssg/icssg_prueth.h | 11 +++++++++++
+>   2 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 0556910938fa..6876e8181066 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -411,6 +411,8 @@ static int prueth_perout_enable(void *clockops_data,
+>   	struct prueth_emac *emac = clockops_data;
+>   	u32 reduction_factor = 0, offset = 0;
+>   	struct timespec64 ts;
+> +	u64 current_cycle;
+> +	u64 start_offset;
+>   	u64 ns_period;
+>   
+>   	if (!on)
+> @@ -449,8 +451,14 @@ static int prueth_perout_enable(void *clockops_data,
+>   	writel(reduction_factor, emac->prueth->shram.va +
+>   		TIMESYNC_FW_WC_SYNCOUT_REDUCTION_FACTOR_OFFSET);
+>   
+> -	writel(0, emac->prueth->shram.va +
+> -		TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
+> +	current_cycle = icssg_readq(emac->prueth->shram.va +
+> +				    TIMESYNC_FW_WC_CYCLECOUNT_OFFSET);
+> +
+> +	/* Rounding of current_cycle count to next second */
+> +	start_offset = roundup(current_cycle, MSEC_PER_SEC);
+> +
+> +	icssg_writeq(start_offset, emac->prueth->shram.va +
+> +		     TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
+>   
+>   	return 0;
+>   }
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> index 8722bb4a268a..a4af2dbcca31 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> @@ -330,6 +330,17 @@ static inline int prueth_emac_slice(struct prueth_emac *emac)
+>   extern const struct ethtool_ops icssg_ethtool_ops;
+>   extern const struct dev_pm_ops prueth_dev_pm_ops;
+>   
+> +static inline u64 icssg_readq(const void __iomem *addr)
+> +{
+> +	return readl(addr) + ((u64)readl(addr + 4) << 32);
+> +}
+> +
+> +static inline void icssg_writeq(u64 val, void __iomem *addr)
+> +{
+> +	writel(lower_32_bits(val), addr);
+> +	writel(upper_32_bits(val), addr + 4);
+> +}
+> +
+>   /* Classifier helpers */
+>   void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac);
+>   void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac);
+> 
+> base-commit: 73840ca5ef361f143b89edd5368a1aa8c2979241
 
-Applied to nfsd-next for v6.13, thanks!
+Thanks,
 
-[1/1] svcrdma: fix miss destroy percpu_counter in svc_rdma_proc_init()
-      commit: cd0f8809d24b55390eab29a02a595641531e4390
-
---
-Chuck Lever <chuck.lever@oracle.com>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
