@@ -1,156 +1,209 @@
-Return-Path: <netdev+bounces-138902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 623969AF588
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 00:43:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 778269AF599
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 00:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85BDF1F2238C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:43:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B30F1C214E3
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 22:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2E221859E;
-	Thu, 24 Oct 2024 22:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DB62178EF;
+	Thu, 24 Oct 2024 22:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nFJirtoH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E311B6D18
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 22:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB132170C5
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 22:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729809810; cv=none; b=LFmlB87XzVt3jBcxX6IoboGQJC1gA7ENkeqf1kRJFQ4wxCNulkwEFFd2Fkw/+lAqWZ5u4TcUjnEzUsZdBh+q1M2eO8O7mXZcLMAEn+0QE5NR8X8Du54JMQq9lAuyrA4juOU/RhADWU0yzvnjhvt199a8w2SVb6VdVPFP2O9Ax/4=
+	t=1729810324; cv=none; b=b8VK6Cbt6VVhRoIw1cnhJLkmnr7iXPliMECAXzoa1BNYdni259EWjuuO+Mx9EqkRMn52rz0ohvvlCZdHSZdXZT+wgE2dVFH26MTjECGMc3sDwQ5h1GouKLozRC058U7CQmIBE0qfaegPufLkPEwaF1aEbenCe0JCMnmZF2Rvryo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729809810; c=relaxed/simple;
-	bh=/5ZYiZzp0GCwEHzhlO4n5c7xBYQikJ94R0K09EPhww4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EldxyRri1woeigZSyQX0bd2S+gFploZjBOzQzc0xy1/zztmcRX1R0N6Kd6eJDd1pz0RC7oszBqW00u/Tio1vHeWBdBu7J3Ih6qmLAaiJwc9cI4xC/humy6JXDeCzNn7wv1Ur/V3XMDCPQzQxp8WLHKdb9DhI4C/negBotEldXv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a3cb771556so12702755ab.3
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 15:43:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729809806; x=1730414606;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oYhwuTsK8ErK8pqCznBjVR9j914DxkP9wNsyhF8XfNE=;
-        b=cQTA8/qTIRdg6KB1xH6mkOz0dBWUY4Bjy4KgCK59ltMZr+q3jxcgbAVLwH4+mBRMk/
-         XfP5uQYYuRne+J+DVFtTDZ7LclEEjyIWsZyh2mwvX5Ef6MD8hH49MUCSVKQgiM695vNn
-         iJXxIwsQSGi7dbekBdJgRml073vK6PWuB8b8iAXJKWVZaZzr8iupHvCmR3WlonFaGcpd
-         5w4ubg6xg1WA9T1Td3lNOv8x/3+lbv4jRMnr8Nso3MAqiQvnsTco4zZo/Z538+l6rVY9
-         +RFjhLsNGpF3UmANL9+6oVYthNIqqOP3tD+fe5RF9ZK/5Uld8l4rD7QQyR4Q7w8T4AQt
-         32fA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBcA6ifGJBSRbX5bYuMnS91KmYTATpDAQ0/BxP/DL8vPDqkojUy+Dp8q2lqJheWq4lD6v+qmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPpQ2mcN9kCNNmAFoNTj2MHYQloknLQ/HGvB1FIHIB+aGOE/gg
-	hNFMSfCc2TYCP0ehwvNw6YVP/2sDOFnaoEgzwEu42acEFu4PQWj2Sw8OrlksE9msngkHc5FoJ0k
-	FCHNnVw8NT3iirycGySZiSwFwYo+w3U5iYryQ9RGwpbPyNRG7jAuXDTs=
-X-Google-Smtp-Source: AGHT+IHYrJDXK6aFf17ulAjn+yC+63HeE3NGSQGIClDwD8lYhcUEcg0knjLbI0x9uvE/qx2paCHgOGrAMeLJEIGuG1oRFJWpNaW8
+	s=arc-20240116; t=1729810324; c=relaxed/simple;
+	bh=5zn7t3EDngUMhrwGvGKvEwTzOjuB1P6KOBU6ew0/KPE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=UT1xTRi2Jmlv1eIO+7HyvsQP5ZWzEJVu//SWKyoBY/sPWCt7CIwk56mcIsPFjIRtz9+LyjF1nMaR+90xdZ4HpOlwvvooN+7w6nfqFsC+5oorNQsVt0/hUx4/kzTzlub+72kit8gZlFfwrDE0Gw1ijSrsFZ9Xt5p97NFc61zTN68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nFJirtoH; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49OLnDGJ018730;
+	Thu, 24 Oct 2024 22:51:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	5NCSjsSy1TaH+MT3HKNIAXCN5C9DoIWK8z+7vrfrX1c=; b=nFJirtoHBznmHVRY
+	DP3K3mU5NG5rGH5TwS2PPPMzfRk9vVMYgWmItfYGNPL2tojYQkUK9aQSPb7eaB8M
+	3PeO9xvDZHRah/wn+r2by6KZ5/jXIjRH02hEfjUL0E3yr9B1+87CCQsjisbssR1Y
+	Un4zgaG82d7R9KP5Ht2OiwmFzl7x53q0F5R78QU5izu1diIzexqzQxOSsEoIkQHs
+	UyZtXXvQWAYxH/AIAG2nDNE6zyhMl95DNfGO5KPROwIBFbEaQqwwQrcKw88FlhBA
+	MxDcW+BywF8l0QbqgXWf2s5P5iV4neV52N+0NTRNbgIuTXsf+guNGfJEJ2peHjbD
+	6KL6bg==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em66f5y8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Oct 2024 22:51:30 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49OMpTc8022353
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 24 Oct 2024 22:51:29 GMT
+Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 24 Oct
+ 2024 15:51:25 -0700
+Message-ID: <5e5783f0-6949-4d04-a887-e6b873ae42ff@quicinc.com>
+Date: Thu, 24 Oct 2024 15:51:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1564:b0:3a3:aff3:a02b with SMTP id
- e9e14a558f8ab-3a4d596356amr89928775ab.6.1729809806558; Thu, 24 Oct 2024
- 15:43:26 -0700 (PDT)
-Date: Thu, 24 Oct 2024 15:43:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <671acd8e.050a0220.381c35.0004.GAE@google.com>
-Subject: [syzbot] [afs?] [net?] KMSAN: uninit-value in rxrpc_lookup_peer_rcu
-From: syzbot <syzbot+14c04e62ca58315571d1@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dhowells@redhat.com, edumazet@google.com, 
-	kuba@kernel.org, linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	marc.dionne@auristor.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] net: stmmac: Disable PCS Link and AN interrupt
+ when PCS AN is disabled
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn
+	<andrew@lunn.ch>, Serge Semin <fancer.lancer@gmail.com>
+CC: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>,
+        Jon Hunter <jonathanh@nvidia.com>, <kernel@quicinc.com>
+References: <20241018222407.1139697-1-quic_abchauha@quicinc.com>
+ <60119fa1-e7b1-4074-94ee-7e6100390444@lunn.ch>
+ <ZxYc2I9vgVL8i4Dz@shell.armlinux.org.uk>
+ <ZxYfmtPYd0yL51C5@shell.armlinux.org.uk>
+ <89f188d2-2d4e-43bf-98f3-aae7e9d68cab@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <89f188d2-2d4e-43bf-98f3-aae7e9d68cab@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    db87114dcf13 Merge tag 'x86_urgent_for_v6.12_rc4' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12cf2a40580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7a0aee472a2b5f0a
-dashboard link: https://syzkaller.appspot.com/bug?extid=14c04e62ca58315571d1
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/140719cfa0c4/disk-db87114d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/fb8a264c89a8/vmlinux-db87114d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4de63179d231/bzImage-db87114d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+14c04e62ca58315571d1@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in rxrpc_lookup_peer_rcu+0x2f8/0x300 net/rxrpc/peer_object.c:142
- rxrpc_lookup_peer_rcu+0x2f8/0x300 net/rxrpc/peer_object.c:142
- rxrpc_lookup_peer_local_rcu net/rxrpc/peer_event.c:97 [inline]
- rxrpc_input_error+0x756/0x16e0 net/rxrpc/peer_event.c:148
- rxrpc_io_thread+0x13aa/0x5190 net/rxrpc/io_thread.c:498
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was stored to memory at:
- rxrpc_input_error+0x499/0x16e0 net/rxrpc/peer_event.c:148
- rxrpc_io_thread+0x13aa/0x5190 net/rxrpc/io_thread.c:498
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4091 [inline]
- slab_alloc_node mm/slub.c:4134 [inline]
- kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
- __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
- alloc_skb include/linux/skbuff.h:1322 [inline]
- ipv6_local_error+0xd0/0xa10 net/ipv6/datagram.c:354
- __ip6_append_data+0x6f3/0x68e0 net/ipv6/ip6_output.c:1491
- ip6_make_skb+0x5bd/0xd60 net/ipv6/ip6_output.c:2048
- udpv6_sendmsg+0x3b5e/0x40c0 net/ipv6/udp.c:1584
- do_udp_sendmsg net/rxrpc/output.c:32 [inline]
- rxrpc_send_data_packet net/rxrpc/output.c:488 [inline]
- rxrpc_transmit_one+0xf68/0x2f20 net/rxrpc/output.c:713
- rxrpc_decant_prepared_tx net/rxrpc/call_event.c:271 [inline]
- rxrpc_transmit_some_data net/rxrpc/call_event.c:295 [inline]
- rxrpc_input_call_event+0x18ba/0x2c10 net/rxrpc/call_event.c:401
- rxrpc_io_thread+0xa5c/0x5190 net/rxrpc/io_thread.c:478
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-CPU: 0 UID: 0 PID: 12896 Comm: krxrpcio/0 Tainted: G        W          6.12.0-rc3-syzkaller-00454-gdb87114dcf13 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-=====================================================
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: boiC3QICZ-oCiTXlNddqXcolGFMiD_b3
+X-Proofpoint-GUID: boiC3QICZ-oCiTXlNddqXcolGFMiD_b3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 phishscore=0 impostorscore=0 malwarescore=0 mlxlogscore=553
+ suspectscore=0 clxscore=1015 mlxscore=0 bulkscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410240186
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 10/21/2024 8:09 AM, Abhishek Chauhan (ABC) wrote:
+> 
+> 
+> On 10/21/2024 2:32 AM, Russell King (Oracle) wrote:
+>> On Mon, Oct 21, 2024 at 10:20:24AM +0100, Russell King (Oracle) wrote:
+>>> On Sat, Oct 19, 2024 at 04:45:16AM +0200, Andrew Lunn wrote:
+>>>> On Fri, Oct 18, 2024 at 03:24:07PM -0700, Abhishek Chauhan wrote:
+>>>>> Currently we disable PCS ANE when the link speed is 2.5Gbps.
+>>>>> mac_link_up callback internally calls the fix_mac_speed which internally
+>>>>> calls stmmac_pcs_ctrl_ane to disable the ANE for 2.5Gbps.
+>>>>>
+>>>>> We observed that the CPU utilization is pretty high. That is because
+>>>>> we saw that the PCS interrupt status line for Link and AN always remain
+>>>>> asserted. Since we are disabling the PCS ANE for 2.5Gbps it makes sense
+>>>>> to also disable the PCS link status and AN complete in the interrupt
+>>>>> enable register.
+>>>>>
+>>>>> Interrupt storm Issue:-
+>>>>> [   25.465754][    C2] stmmac_pcs: Link Down
+>>>>> [   25.469888][    C2] stmmac_pcs: Link Down
+>>>>> [   25.474030][    C2] stmmac_pcs: Link Down
+>>>>> [   25.478164][    C2] stmmac_pcs: Link Down
+>>>>> [   25.482305][    C2] stmmac_pcs: Link Down
+>>>>
+>>>> I don't know this code, so i cannot really comment if not enabling the
+>>>> interrupt is the correct fix or not. But generally an interrupt storm
+>>>> like this is cause because you are not acknowledging the interrupt
+>>>> correctly to clear its status. So rather than not enabling it, maybe
+>>>> you should check what is the correct way to clear the interrupt once
+>>>> it happens?
+>>>
+>>> stmmac PCS support is total crap and shouldn't be used, or stmmac
+>>> should not be using phylink. It's one or the other. Blame Serge for
+>>> this mess.
+>>
+>> Seriously, we could've had this fixed had the patch set I was working
+>> on that fixed stmmac's _bad_ _conversion_ to phylink progressed to the
+>> point of being merged.
+>>
+>> The whole stmmac PCS support is broken, bypassing phylink.
+>>
+>> This series also contained bug fixes for stuff like this interrupt
+>> storm after Serge tested it. However, Serge wanted to turn my series
+>> into his maze of indirect function pointers approach that I disagreed
+>> with, and he wouldn't change his mind on that, so I deleted the series.
+>>
+>> As I keep saying - either stmmac uses phylink *properly* and gets its
+>> PCS hacks sorted out, or it does not use phylink *at* *all*. It's one
+>> or the other.
+>>
+>> I am not going to patch stmmac for any future phylink changes, and if
+>> it breaks, then I'll just say "oh that's a shame, not my problem."
+>> Blame Serge for that. I've had it with the pile of crap that is
+>> stmmac.
+>>
+> Thanks Andrew and Russell for you review comments. 
+> 
+> Adding Serge here. 
+> 
+> Lets take a step back and see how i can help here to make sure 
+> we can get things merged and the discussion proceeds. 
+> 
+> Serge please help if can here. Thanks! 
+> 
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Andrew, I had a detailed discussion with hardware team internally. 
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Section 1:-
+----------------------------------------------------------------------
+Here are the updates from my side on the same. 
+1. ANE feature is disabled for 2.5 Gbps integrated PCS in the stmmac 
+for the PCS link to be up.
+Experiment was done to turn on ANE bit in the MAC register and i clearly 
+saw pcs link went down when 2.5Gbps link speed was selected 
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+2. if ANE feature is not supported the corresponding PCS interrupts such
+as ANE and Link status has to be disabled in the MAC block according to 
+hardware team. 
 
-If you want to undo deduplication, reply with:
-#syz undup
+Note:- today stmmac driver is reading the PCS interrupt status to clear the 
+interrupt. so interrupt handling is done correctly. 
+
+Section 2:-
+---------------------------------------------------------------------
+Serge can you please respond on the PCS support in stmmac ?
+
+We can work together with Russell and see how can we join hands and take 
+things forward. 
+
+I feel PCS has to communicate to Phylink and phylink has to post the final 
+notification to MAC stating the link is up or not. 
+
+
+> 
+> 
+> 
 
