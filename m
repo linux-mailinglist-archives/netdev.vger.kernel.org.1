@@ -1,114 +1,147 @@
-Return-Path: <netdev+bounces-138726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBE029AEA64
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:28:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAD689AEA7C
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:29:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26DB11C2264E
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:28:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 285141C22E2C
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6E61EF0BB;
-	Thu, 24 Oct 2024 15:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09B1EC012;
+	Thu, 24 Oct 2024 15:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFlSlW3f"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="JkmA6aU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDC91EC00F;
-	Thu, 24 Oct 2024 15:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A4C1D8A1E;
+	Thu, 24 Oct 2024 15:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729783701; cv=none; b=WO6GgwP0GT+TKQ6GL1Ekc6anE4olMA/+PXTyMu0IxuOsWqoVXC14tyhve5+RJ8EAbFz10SwgSrQU8vc8UsrYC/sBxJ50nKyQeMImxmt0mgPPfjE+ernaRJHvu4Yk39r403UjbitxhFU09Pij61lANAG/DuHJ+2SKZXc29kV0Ubc=
+	t=1729783795; cv=none; b=HN0SmW8ySDqZ/1Okepi/piO7i5MtES5AJr+/OceF+BWVlvtu9dQyqzrNXfwZcmZqBkPbz/adSvECad8FfryCjA/TR+9HsEM7yP+7+EZoUv/Xb+Cz+W+l4+LzL/UPkfw67uowzwwpOoyCfKW3+Nk0K6+j/pfiHMi2KSFPj6q0tXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729783701; c=relaxed/simple;
-	bh=A3+WFvu5Hl8t2/BhdPAsefVmYLEp9do9rPFLS0+ariQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a33QpGGTmW/FFAU11dROv0cu/cZbOn2bHxQNdccWObmHyHRJKjgKNhN6IgVj/CwAC7Y9LQesP/wi153g7TZ9G/SYU3116h0lHJPIQ+Wbvxl6Vf3VWpmyJMG0pk9uc9t5wJ3ELgFkP5RAKfIOwGZhynQuwdNmjLnZ6+l/01vQJ9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFlSlW3f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AC48C4CEC7;
-	Thu, 24 Oct 2024 15:28:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729783700;
-	bh=A3+WFvu5Hl8t2/BhdPAsefVmYLEp9do9rPFLS0+ariQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZFlSlW3f8oB626HmiKkyLOJu5+l42JXKVnmoUyWYKkhsdnxMNRC6ziN8Dnvhj82+X
-	 Dt93tXjeQISjgAFxG58PgmzBzNQDFAvv2jT+/h/vvwmdfF0v5+2pQomOpR84n+g/1n
-	 BJlvm9VovVkudzla+NNkE11u0SEIWHWWW/giX7mezrOHTDL13odSH5ehhPIhKrN1nd
-	 FToP+cc93aWSMwkZJrEA2ZKKpM2gDz+pJ5cZLgFnQTMRy1rCpzWl4Ie2r5lYAQn3J4
-	 zOWQsxm2qtmiOTXNB6xCEAQUMlKRWUYf2arQ1ehMX0l9O6GSoEzJ5qmaLTpGMambej
-	 qFtjF+59xfdsw==
-Date: Thu, 24 Oct 2024 16:28:16 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	thomas.petazzoni@bootlin.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next] Documentation: networking: Add missing PHY_GET
- command in the message list
-Message-ID: <20241024152816.GA1202098@kernel.org>
-References: <20241023141559.100973-1-kory.maincent@bootlin.com>
- <20241024145223.GR1202098@kernel.org>
- <20241024171802.4e0f0110@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1729783795; c=relaxed/simple;
+	bh=/c3nPV0FlFBZC3KSq4T9BU0smS+lIYhUyC2Quk6Z91M=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=c2MkxT0WY4LQYSmlsbrF50tuxeFEp+Pj4Zqb5skk3WpBZ654ZLzIzy9U5snNEfswYXdW6knrrJiBo2PMjusZLURLcFVh1vKUdWUjH91gSf6sdazqk8GlRYfa9lHotZbQmKn4mWnnD9cQpXC7msacel5cH7icwVm8qx2nKniQ2OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=JkmA6aU+; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=1xiupaF61lfS6z4Pq8dSc4R0ENSuX2KdNUITbPAYRRM=;
+	t=1729783793; x=1730993393; b=JkmA6aU+xDkflpCKFxNi+2p7k5hXG8/0udrO6D/wvzk0bAk
+	okL6v/nw4fUrixwEDCvsL1Olt1a9e5kwVa+tZp/Oj7HiSJosZvG6S9ZWXYyI8xrrFjWKTBaynmqsx
+	y2sQCmLqTWOzWtpDZkoTSIO1uh2K1QlVqaKG6i5ozJKHUorIALc7m/kzpwFMOSQ73YHJdbljLNZGu
+	01DOOyA5y/QN3ikSFOY4kYWOCVC/DzDJvdm3fJdNiJsiybpzYssrgC0mbp66tQnNJLWysD1Hruag8
+	GZjD4sWjnl/AF5mPSBKvIT5KlWXi5Onacih5DkV7EMA923M1bOWmRzJrSAcQovxQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1t3zmT-00000003hnS-2GLn;
+	Thu, 24 Oct 2024 17:29:45 +0200
+Message-ID: <4c9b5027a70f7d9039ffb5579a1e7a08c7fa5ddb.camel@sipsolutions.net>
+Subject: Re: [RFC PATCH 2/2] net: convert to nla_get_*_default()
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Date: Thu, 24 Oct 2024 17:29:44 +0200
+In-Reply-To: <ZxplEne_oHXQycnc@hog>
+References: 
+	<20241024131807.0a6c07355832.I3df6aac71d38a5baa1c0a03d0c7e82d4395c030e@changeid>
+	 <20241024131807.d5b9f6e57ede.I740beeaa2f70ebfc19bfca1045a24d6151992790@changeid>
+	 <8fabb6e5a2eda8c3bd7ca0bccc3e7804ad27bbad.camel@sipsolutions.net>
+	 <ZxpeL7S2GZeJOiQw@hog>
+	 <2e3b106585cebbb579c0d5cca33737623765ded7.camel@sipsolutions.net>
+	 <ZxplEne_oHXQycnc@hog>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241024171802.4e0f0110@kmaincent-XPS-13-7390>
+X-malware-bazaar: not-scanned
 
-On Thu, Oct 24, 2024 at 05:18:02PM +0200, Kory Maincent wrote:
-> On Thu, 24 Oct 2024 15:52:23 +0100
-> Simon Horman <horms@kernel.org> wrote:
-> 
-> > On Wed, Oct 23, 2024 at 04:15:58PM +0200, Kory Maincent wrote:
-> > > ETHTOOL_MSG_PHY_GET/GET_REPLY/NTF is missing in the ethtool message list.
-> > > Add it to the ethool netlink documentation.
-> > > 
-> > > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > > ---
-> > >  Documentation/networking/ethtool-netlink.rst | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/Documentation/networking/ethtool-netlink.rst
-> > > b/Documentation/networking/ethtool-netlink.rst index
-> > > 295563e91082..70ecc3821007 100644 ---
-> > > a/Documentation/networking/ethtool-netlink.rst +++
-> > > b/Documentation/networking/ethtool-netlink.rst @@ -236,6 +236,7 @@
-> > > Userspace to kernel: ``ETHTOOL_MSG_MM_GET``                get MAC merge
-> > > layer state ``ETHTOOL_MSG_MM_SET``                set MAC merge layer
-> > > parameters ``ETHTOOL_MSG_MODULE_FW_FLASH_ACT``   flash transceiver module
-> > > firmware
-> > > +  ``ETHTOOL_MSG_PHY_GET``               get Ethernet PHY information
-> > >    ===================================== =================================
-> > >  
-> > >  Kernel to userspace:
-> > > @@ -283,6 +284,8 @@ Kernel to userspace:
-> > >    ``ETHTOOL_MSG_PLCA_NTF``                 PLCA RS parameters
-> > >    ``ETHTOOL_MSG_MM_GET_REPLY``             MAC merge layer status
-> > >    ``ETHTOOL_MSG_MODULE_FW_FLASH_NTF``      transceiver module flash updates
-> > > +  ``ETHTOOL_MSG_PHY_GET_REPLY``            Ethernet PHY information
-> > > +  ``ETHTOOL_MSG_PHY_NTF``                  Ethernet PHY information  
-> > 
-> > I wonder if ETHTOOL_MSG_PHY_NTF should be removed.
-> > It doesn't seem to be used anywhere.
-> 
-> We can't, as it is in the ethtool UAPI. Also I believe Maxime will use it on
-> later patch series. Maxime, you confirm?
+On Thu, 2024-10-24 at 17:17 +0200, Sabrina Dubroca wrote:
+> 2024-10-24, 16:52:00 +0200, Johannes Berg wrote:
+> > On Thu, 2024-10-24 at 16:48 +0200, Sabrina Dubroca wrote:
+> > >=20
+> > > If nla_get_*_default was a macro (generating an "attr ? getter :
+> > > default" expression) you wouldn't have that problem I think,=C2=A0
+> >=20
+> > Hmm. Perhaps. In the conditional operator (?:) they're subject to
+> > integer promotion though
+>=20
+> Is it?
+>=20
+>     #define nla_get_u16_default(attr, d) (attr ? nla_get_u16(attr) : d)
+>     int v =3D nla_get_u16_default(NULL, -1);
+>=20
+> seems to put the correct value into v.
+> (but -ENOFOOD and -ELOWCOFFEE here, so I don't trust this quick test
+> much :))
 
-Ok, if it's in the UAPI then I suppose it needs to stay.
+I'm probably -ELOWBLOODSUGAR right now ;-)
 
-But could we differentiate in the documentation between
-ETHTOOL_MSG_PHY_GET_REPLY and ETHTOOL_MSG_PHY_NTF?
+But yeah, I couldn't yet construct a scenario where it mattered, but I'
+also couldn't convince myself that there isn't one. Maybe too much
+inspired by the enum compare warnings:
+
+https://lore.kernel.org/linux-wireless/20241018151841.3821671-1-arnd@kernel=
+.org/
+
+
+> > , I wonder if that could cause some subtle issue
+> > too especially if nla_get_u*() is used with signed variables?
+>=20
+> The issue in that example is pretty subtle and I'm fairly sure people
+> are going to mess up :/
+
+I didn't think it was that bad, but it's well possible that my
+calibration for "subtle" is way off ;-)
+
+> But I'm not attached to that macro I just suggested, it's just a
+> thought.
+
+Sure.
+
+> > > but you
+> > > couldn't nicely generate all the helpers with MAKE_NLA_GET_DEFAULT
+> > > anymore.
+> >=20
+> > Right, that too.
+> >=20
+> > I think it's probably better to just review them, and only commit the
+> > obvious ones originally?
+>=20
+> Well, this one looked reasonable too. I'm not convinced reviewers are
+> going to catch those problems. Or authors of new code using those
+> _default helpers from the start.
+
+Fair point. I didn't think it was that bad, in fact there were some I
+was far less sure about, say
+
+> +	request->page =3D nla_get_u8_default(info->attrs[NL802154_ATTR_PAGE],
+> +					   wpan_phy->current_page);
+
+which really depends on the types of 'page' and 'current_page'...
+
+
+I think for most cases it's probably still worth doing, and I wouldn't
+be _too_ concerned about the type issues here, most places are just
+using zero or a small constant as the default anyway.
+
+Even nla_get_XX_or_zero() would be a win, but that seemed too special
+...
+
+johannes
 
