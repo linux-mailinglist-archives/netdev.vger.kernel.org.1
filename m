@@ -1,420 +1,345 @@
-Return-Path: <netdev+bounces-138489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48AA9ADDBC
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A4A9ADDCD
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5447D1F2266A
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 07:33:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98B361F224EF
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 07:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10DF1AAE19;
-	Thu, 24 Oct 2024 07:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625181A76DD;
+	Thu, 24 Oct 2024 07:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPYBlPus"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="s846w+XQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2051.outbound.protection.outlook.com [40.107.92.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837811AB511
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 07:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729755181; cv=none; b=srh788AqCAJj7qhZIAHBtnMPyHRxC2SWsk7mBNSJJ7d+SpD1lNrFaGRyn0pJtPfRy55UdQ017S1nHZsUcgMlR0cHdY3eyxUqUDp0qMR0Ri5EUJTPHo8Jle+mswUTqWgQdYtlbSpN6ytzwV7J2BNGQdMSAfv7v1obuj84RBubNjc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729755181; c=relaxed/simple;
-	bh=xJk9DEO+3X/GcCNVC4idOyP3Q8DzjJsvWHkQBNNuUiI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FxyATZYeyeaEBn5pJ8Axo2MVElU8R108xut13Y6cx1dZkSnv3czi8uCxVfRgF/czd4dRQuk3f4fNVLj3/YuDxWz63GvDYP/RdBtqAMIINpj8Fnmi8q2dyQGulv/eDTgCCAdxBOSsRrSBsxZ0Y0hgQKC9n/ldJw8xmbeuw1agI0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NPYBlPus; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729755177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6QtnlkYe/1PnWLS5Ii6raZ83O0JHoz7C7QG5MqJpjr0=;
-	b=NPYBlPus2ErWhnfc5pjFKNkzb04Mij/NUKYpingANTTyjfd8F2sZtyToBjKi4+VCoCUcOn
-	D97Ffl5OhPC8DCSLkZvtg42uPcner62C5jIUEhYrpjuRx/63sDT1vj06tGhrt+F1dTpG6p
-	M6+2Ot0UMofKiqq/CVqPK7OgHDS3fGA=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-e32acExnPGGAUr23O7W1bg-1; Thu, 24 Oct 2024 03:32:55 -0400
-X-MC-Unique: e32acExnPGGAUr23O7W1bg-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-6e5bdb9244eso10424917b3.2
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 00:32:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729755174; x=1730359974;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6QtnlkYe/1PnWLS5Ii6raZ83O0JHoz7C7QG5MqJpjr0=;
-        b=DXb7FNBnU3db7ErFOWwsmW0637jtDkAokJ70FlNMkqphegChtZw3HfUMipejWyz2xx
-         Xt62s9jkP8lMHyJZm+fy2M7H2YOttJtykQgrmBq/ehz1pZkrLhyaHDewYgQAHmWpryIo
-         uu87Z7L2DjD6bkjlhJmD9Xxyc9f6f+dAKdLn6d77ConG+vZ8WUeqmFssHvmKnAlJg/WB
-         QTsf9WssLydEGoIxWJz4WkL58S8mEH45nsoRsKAcTSh70uJnuqT1sZhCirk4rGVKTZ/E
-         G7xSVXaanx1b6OGy1UFr0+LFPoKI+NRzFtiC1G5eQjzDQF9FZDCSkSkZxBDED59mleAt
-         hHDA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+v6/z6zIdiZhngsUEVWTNmPgPu3XUJ2xfW303ctZZY/jkBzHrx4mBdR9DQag8x9u9ZqPuh2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztpMQmJTM+2H0GAovxPU/ZPm2FGcxBAbuWC2AiuIOk5wAyiGTV
-	yQcs0rBzoYV4oNt+9tz5NdAUwTgmbYCK949L4NyXuVuQm5VuiyO9nGeHmgmmq9/6Ja+vn8n0efw
-	xgOOqyxe7fSOCokYmDpLJYNbczhdonodpgOfqcnAZKFWhjbjbLN6zyg==
-X-Received: by 2002:a05:690c:6e03:b0:6db:cf6c:a7c4 with SMTP id 00721157ae682-6e866331c20mr10690437b3.45.1729755174523;
-        Thu, 24 Oct 2024 00:32:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFwjzENxysw+j7YRfDKeQxYY43g6inqzMz9Yd8c7a5bPrsRFqYGaOrxa6Un2MKjvPM7S1dLyw==
-X-Received: by 2002:a05:690c:6e03:b0:6db:cf6c:a7c4 with SMTP id 00721157ae682-6e866331c20mr10690047b3.45.1729755174061;
-        Thu, 24 Oct 2024 00:32:54 -0700 (PDT)
-Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce008ac8f1sm47141046d6.26.2024.10.24.00.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 00:32:53 -0700 (PDT)
-Message-ID: <7be870fc2b2fa01b89708208c78cc041029252aa.camel@redhat.com>
-Subject: Re: linux: Goodbye from a Linux community volunteer
-From: Philipp Stanner <pstanner@redhat.com>
-To: Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>, 
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Kory Maincent
- <kory.maincent@bootlin.com>, Cai Huoqing <cai.huoqing@linux.dev>, 
- dmaengine@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
- linux-spi@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>, 
- linux-ide@vger.kernel.org, Paul Burton <paulburton@kernel.org>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, Arnd Bergmann <arnd@arndb.de>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,  linux-mips@vger.kernel.org, Bjorn
- Helgaas <bhelgaas@google.com>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Yoshihiro Shimoda
- <yoshihiro.shimoda.uh@renesas.com>,  linux-pci@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Russell King
- <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
- <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>, 
- netdev@vger.kernel.org, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>, 
- linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>, 
- linux-edac@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,  linux-serial@vger.kernel.org
-Cc: Andrew Halaney <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>, 
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Alexander Shiyan
- <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,  Sergey Shtylyov
- <s.shtylyov@omp.ru>, Evgeniy Dushistov <dushistov@mail.ru>, Geert
- Uytterhoeven <geert@linux-m68k.org>, Sergio Paracuellos
- <sergio.paracuellos@gmail.com>,  Nikita Shubin <nikita.shubin@maquefel.me>,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Thu, 24 Oct 2024 09:32:46 +0200
-In-Reply-To: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
-References: 
-	<2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C3719CD16;
+	Thu, 24 Oct 2024 07:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729755271; cv=fail; b=Z/d5ng8KR5KZ9jfxR4CsBgEzMIftT2q8XCs+QUu5BkRqsHPmkM3KR9Ul/WEPf2C9fZXrrICwAMW0a2PnjfwZMfRp8g4Se9CnHGWny6JD+BINd8tK+dLstN1AacYuJDGePEM+L7F6b86Xsof8f7Fh1ouWB9s9C/PAcbI/HEExUig=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729755271; c=relaxed/simple;
+	bh=qC7GwAwUPaDIZfz1c4GXVC6K+Tph06KF7yIJn9BGHSA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=O/LhccQQYsK1JgwJ6RX/1zwUbZ7Fg3IOci6dktzYfOGtqK3AregaxnY9GCwFcgzbldKfrIeI1zyu5bjadZpVnDfJcUWF3O+18ehUTlhuJ7Ewe7Q5ZHoJJkLzPf/UZ2WGUX2KY4J3u/lx7sq7ftuRXSjIYx4RrviqX/eYsahMEQw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=s846w+XQ; arc=fail smtp.client-ip=40.107.92.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c+uTHc3FBZaR9hYWAL9DVrv6TdAA4ZByM7SellDmeMKS+MQ3UF5YzLXTMeG3UtFhDc2ewe76BrfYEqAf527O2ch5UFWf+8moF/uPmIKQ895dm0lB5p+4eAiL3iWDP1w2O4I2bc5HY8PKXVH6q7hLY1Cb/BluZsNlYhKgH+4narTxaB+TmDSh9iURL40BuNoolr5mHCN59iadZAyoqiBXnyRkFHWGemNnHYktL2wrOzb62BMNoZgCj/XjlS3PZ1TBB/S0l/zPUam4SRI0cExevDHN/iurOPOLOQ15Gt+YpcycrD4FHW/M8wxZxDsaeksjwrtEGtuIbRh6y4sD3pwiUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qC7GwAwUPaDIZfz1c4GXVC6K+Tph06KF7yIJn9BGHSA=;
+ b=Iho55qIhsgSqVgzPGriU/VFd8hzg+FRHIYZcDSrtm2L7QZSF49nEOU53El1YQqWqT39E4+vuzK5rQL4cSYqJRRFYRgI5s0Mzs9dZ3dTA3kV/1CcDhrLmIkeIp90HJk6zNnlQnxqO5KqOpVuFcQwmCrx5MykFkWMdF7Duj/WS317x28tgDUNLWksPmfz2PRNP9z5nIVrO3s+d7HaHviMaQpKbUUjDcHh1my8mRnNNCghfArA3dB23kivOjKt6d+HDQ/tAMZgSd8aowxMlmHoG7swPqRXfG0GJIwrwsVxyc97ErJBmFhWGReVtHWsDtbbo+Et6mS5HY56kZ4m6zJTcHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qC7GwAwUPaDIZfz1c4GXVC6K+Tph06KF7yIJn9BGHSA=;
+ b=s846w+XQNPoM7fRCK02t5woyUoKD3pvNZfMdlzqEtHalIdmjgDBanJP6tfiSvbOnQDQ2ptzUfQtFqVO8nGLLiZfs2GiPf2d5pYnIGiMTQg1/hNjzrfa9jp3nJBzsr3CvaBAMR7xCz/HNn1SA1rYrLkoAsqxl5KhbhSR24ntSrXx9LDxrvyMpNX6S/Y1eT9X4vvVmhh9ou/X9IKB9aF9GJsVAWEoKBGrHZ7yIavCzYMHD8JCAAG7RHqf3Qn4VaxPcrwZTNnxGRYVCxlb3UrzSGexkNuzwQmkQXotAmg5ZdO6tb3MlwBQmS3B9LhbuYZfW0DZBDxGEgxMV0Z7Eh31EYA==
+Received: from DS0PR11MB8050.namprd11.prod.outlook.com (2603:10b6:8:117::5) by
+ LV1PR11MB8792.namprd11.prod.outlook.com (2603:10b6:408:2b5::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Thu, 24 Oct
+ 2024 07:34:25 +0000
+Received: from DS0PR11MB8050.namprd11.prod.outlook.com
+ ([fe80::bcc7:4a98:f4cb:b3bb]) by DS0PR11MB8050.namprd11.prod.outlook.com
+ ([fe80::bcc7:4a98:f4cb:b3bb%6]) with mapi id 15.20.8093.018; Thu, 24 Oct 2024
+ 07:34:25 +0000
+From: <Mohan.Prasad@microchip.com>
+To: <pabeni@redhat.com>, <netdev@vger.kernel.org>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <andrew@lunn.ch>
+CC: <edumazet@google.com>, <shuah@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <horms@kernel.org>,
+	<brett.creeley@amd.com>, <rosenp@gmail.com>, <UNGLinuxDriver@microchip.com>,
+	<willemb@google.com>, <petrm@nvidia.com>
+Subject: RE: [PATCH net-next v3 3/3] selftests: nic_performance: Add selftest
+ for performance of NIC driver
+Thread-Topic: [PATCH net-next v3 3/3] selftests: nic_performance: Add selftest
+ for performance of NIC driver
+Thread-Index: AQHbIE+3P3YhKb/nu0myeIy9TjMIhbKSnPAAgALuhHA=
+Date: Thu, 24 Oct 2024 07:34:25 +0000
+Message-ID:
+ <DS0PR11MB80501F73B82384761D57AB01834E2@DS0PR11MB8050.namprd11.prod.outlook.com>
+References: <20241016215014.401476-1-mohan.prasad@microchip.com>
+ <20241016215014.401476-4-mohan.prasad@microchip.com>
+ <af9bf6e1-f6fa-4683-a3bd-82cebcce6fb8@redhat.com>
+In-Reply-To: <af9bf6e1-f6fa-4683-a3bd-82cebcce6fb8@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB8050:EE_|LV1PR11MB8792:EE_
+x-ms-office365-filtering-correlation-id: 5913de6e-55d3-497b-d071-08dcf3fe48f0
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8050.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?UXgyYVg5OUc2elFGcjVRY3pUUGI3NmxyYWw3d1dXN0JsNE14QTZMREovT1hZ?=
+ =?utf-8?B?YU0rVkdFNyt0UGFlK0ZMZGdnM1dQd0EwOERLYlVoMXdodkw5eGUwTlZadkhY?=
+ =?utf-8?B?b0l4VVRPRWxmVHV3cklOMXBhM3A2QXFBY1BrVzVRbXRwcHhHVzV1Q1J3cDRY?=
+ =?utf-8?B?NE1hT0gvRXIrUkhReDc5RjhPQUlVQ1A3NEg3TDAyVHBCQnhvOHVQa05PcE0v?=
+ =?utf-8?B?RkRRR3FPU0hZQURyWFEvZVVGbWkwS0o1ZnVTWXJaY0p2UGVsWVltVkFNK1pq?=
+ =?utf-8?B?SHNOZEE3ViszTVNCOCtaQTZTNHl4Q1Nvc1kremVMc3I5MkJBSWhYU0pFNldU?=
+ =?utf-8?B?K3d6SS9WR25yNnFZR1ZDajZOYm13NmRMVTMrVHNOUDE5Z3h1RVVmQk5HY0Fu?=
+ =?utf-8?B?eXRkL1ovS3FLTlZncFZiZ1R2VGRSSjkvK1hndFI0L0VTQjczakFiSlA0TjlQ?=
+ =?utf-8?B?bnlqYUhNNUw1U2Ezc2dYR0FydnBOczBsRy8vb2VpZlErenBLWEFsNVNTb2V1?=
+ =?utf-8?B?TnJrQWlGMzdrZWoyam9aMDMrRm5tc2JSN1BOYU9kZVJuUWhwS3krLzNTY1Y2?=
+ =?utf-8?B?L0srbEQrOWtMSDBoY0o3T09FYVB1OTZuMHNuV0N1RzYrZ0xyZzlMeXYvS1FU?=
+ =?utf-8?B?VENZLzBIcDV2WFZudkxKVjJtNGJWOFhDUDhLamZ4Sks1UVBzVktkUGZoQ0Y5?=
+ =?utf-8?B?R1lEcmpUUDg2VVppSm1lQWViS24vaU1qSHJIME1vMTlIcUFoeHFJakRPSEw1?=
+ =?utf-8?B?V0lENFV1alFXNi9XYjBSYk9SeTdnSUlRQndzeGJkcVd0ckhYaTQ3TWFtTXB6?=
+ =?utf-8?B?aWo4ZFRJZ0JGcVpzdjl3QUhpcHQrTmZNT0o4K0JJanl3VmJrUWNlbXdzNjhr?=
+ =?utf-8?B?MUFmSEhJZmw2Y3JVSTdlWC9WM3ROY2lOajZwOWdCeWVzRjl3M1Vvcjh4ODE3?=
+ =?utf-8?B?ZTg0UXhVZ1U3RDZoTzNQbUNYYWwzWitsRi80U3ZTQTFoTUQ2WVVqZlNUdEF6?=
+ =?utf-8?B?SDJvQXNIc3ArTFNHN0JwRkZReUhQTHQrZURJdjJtb0N3cnJvalY5Y3d4U2ZK?=
+ =?utf-8?B?QTVvRW9NdFVqWjBxZFc4eGU1cnJBRzFlVzNHWTlhbVBuMUlKRGQ2MkJWbGpB?=
+ =?utf-8?B?OHlQOWZzdFY2SEs3eGxIa0h4NWh2V3c4Zm1OLzAvK0U0OVRCWWxoUjdnWjlE?=
+ =?utf-8?B?VUdpMkpRYWlyb2tMdjFDc0xKRm51Q3U2UWtKaUdva1VUS21yM05aeUkwK0NL?=
+ =?utf-8?B?d1VoaXVJSzNkQ0cva1QwV08vNFJNOWIzdmhMdE12UjFZcDZ2a0RwaCtob3pu?=
+ =?utf-8?B?YzViNG9xYy8vcEpQL3JyaFZKdGhwK05JSmtRTGc5dEQ1QWxFYUlNcFZHbWVn?=
+ =?utf-8?B?M3gxNzI1RFRBUVllNk5QV2U3STBNQ0V5bE5Uc1lkSWs0QWg0Vmx0dmg2dUJt?=
+ =?utf-8?B?WWIzbkxDeDNFc1pucGoxVnhHS1JUcVZXUjhLMkhQTEJUc2NMVnY3aERES0hr?=
+ =?utf-8?B?TXpZMTNSU2t5S0d2d2IzQUROeitlWkczUENyS3dPalB1VWYwVS9jS2wweDFi?=
+ =?utf-8?B?dllLakNJcXROVWtmL2Nva1JCdVd2M1NqWGcvdWd4WlVmU01IcTNETndIekpJ?=
+ =?utf-8?B?WkN1VlZwK0xjM1AvUHc5SkVVUlA2aXZrN3FmUnNaWGFQamcxV2lXRjQ4QzJI?=
+ =?utf-8?B?bGJhY0dad0p2UlpEVlhNblBiQkwrblFtalYwVjB5cE55Q2ZzelFJVDd3QUZt?=
+ =?utf-8?B?MGt1L3hBK3Y4QmZpd040YmVOb0NscHZqanh4R0NkMXNpTEcrUXVJYUtTTDFL?=
+ =?utf-8?Q?Ins8MVhwxIB0e7ltGumzILBmT+B+stVGRDH50=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ajVrcTRRWXV2dm52MDlsZEpNeXJ6Rm9sWndnd1dKbFpjZzRBWHBPa3dTQ0lQ?=
+ =?utf-8?B?bnZ5bHY3QkEzNnJUeHRxMU1EN1lHZXJhNTExVTdRN2M4WEhlKzVIdDEzUHM5?=
+ =?utf-8?B?bHI2L2xCdW9qanFnVkxTWkNjd3VtNktIQ2RvbEpodHFMRi9wSWxibEl4WE5E?=
+ =?utf-8?B?dkg1TEdMTFBURDVzUHJGNWdVU25FZUgwbDdtM3hnajZRcG5aOFptUHJhUWh2?=
+ =?utf-8?B?QjRFSHdTRVZWdFUwS2xjdStuMndBSWxFcklBRlg2bEliY0dlb2QzdUxhWkd6?=
+ =?utf-8?B?UEZMaGNkcHdwN2xjTVczZGJXS0hEdGdwaDhLUTZVeDRPWW1SNUlKSURNTWJJ?=
+ =?utf-8?B?MDVLTXdaNm5GcHd2NE9PYzRXSDNhQUNtRGlpeDVHdU5TSlI4K1hIUFpjSVNa?=
+ =?utf-8?B?TVNEVXRLTkNMTEJhRW1Md0J1dy9CaERtR2Z0ekM1d1NiNDVPSW5ObGhZVEhy?=
+ =?utf-8?B?N0dSbXoxK1ZmK1dZOWo3TWV0TkhOVnB2cmpvSHZDMGJ6aUR3S3JZQlpYdURE?=
+ =?utf-8?B?cHUzNklsMXVHeXpuVHBUS2V3MGpqUnVuWVZHQWdwYUNOTWg5aVpCeVJtY3Vk?=
+ =?utf-8?B?R1VsdUdHK0d6eXhadHNiN3lkejVlcGd4enlETjhaOUM1NkZBRmNTTTI3NW5J?=
+ =?utf-8?B?VmIzbmJ4OSszMXZrejlWcUsxWnRFMXRyOG1pYXRNSWlGbUpia2xMQnJMcXNU?=
+ =?utf-8?B?VnlYOFMrWnYxTjUvdHZxTUVmNGJ1Vmg2ZHRVUUw2WWZicGVnNmJMYWdUOUJt?=
+ =?utf-8?B?TUJaK1BXSTlsQzRDQXBmZnY3MEpjcDRIeng1b2dQN0hZSXJLdTRKbFYzSW03?=
+ =?utf-8?B?WWF0bWtUUytjWEphZnBmSjlTOE5kZGxFWjZ6RWRLUXRjL1YybUxwZUlJL1Zx?=
+ =?utf-8?B?eXRNTWpIN2c3OTNjenE5WEVnU3pMU0ROVE1wU0FOdEhOQVlDT0M5RHV1U1Zz?=
+ =?utf-8?B?aGJiRzIweGcrY1UvUzNXUmh3MGxzOFlEa1A0NDFSdG5vbGg2QTZjVEVNdERj?=
+ =?utf-8?B?MEFsVmY5ZkxGam9qZnJZZ05mdm1yM3ZWK0JrWmN0T1N4WTNEaEpwVko1Uzh4?=
+ =?utf-8?B?Tk9yNk81SDk3OHJZNzZIUEtwU1pnRXFhRGtVWlZKdm1QOWxTVUhHWHhuVDFE?=
+ =?utf-8?B?SDBNUittK1dzR01iOHorMzJDUjBEYTZMTnV2STlPM1d6WTdaNlp4cEpPeWo4?=
+ =?utf-8?B?TVJpdWxCQklMRnN0MVk2U0x0RC9zWDhjbjBUbXl0R25BK3ltSUxCWEY5ZFc5?=
+ =?utf-8?B?QUFMV25GUDJteDNHaU5DcE8rSkwzeTFRLzhNdVhxeG1nSGwxQTcxQzY5RnJG?=
+ =?utf-8?B?MkNEYjl2Y2cyc29kYy9BQ2NmZG12T2hsVjhiNlJDM2tnc2tWQjRXeUpNRlRJ?=
+ =?utf-8?B?bHNURHpZdGtwb3FzU0hUNkZpUzYzbzh2R1IrZEwrbEh2cjF3d0hhd0xGUjdR?=
+ =?utf-8?B?NFR6Ujh0ZXdEdjdzWnBETFRTQjNjK3I2YkxiYy92eFlpUUNrZ2wvWmQ4RnNP?=
+ =?utf-8?B?dkVVMER6bUhEUFRWVUFXOE1JN20zZW9JdytXS0JKNW8ya3pLdCtSMndUUktF?=
+ =?utf-8?B?VVhnWm80N0RxVi9CdkJhZk9zbGxpdzlnWVlKWG9aemR0bEFDZzRRMDZKVnJr?=
+ =?utf-8?B?YkxnZWw1RUFXdjdHQy9JU3kxRFd2RCtabTBnZHJBZGhHVEtxb3JUWXdDMGUw?=
+ =?utf-8?B?c09SNnE1cTBYNG9oZi83VmhVVXZQNmVaMVNTdWxTd0Z3MG9MQnhuVHZQSzA0?=
+ =?utf-8?B?ai9qcE0wODdFdXlUOWxkckxyblZIcGtiUFBraU1ZWXU4VENsM3pOR3RDOUQ2?=
+ =?utf-8?B?N0dWQUtuWlV3RG5SRVNPZFY3ZmFjUzkyZUlwYVNPOWhHWUh5bTJwcG1FYlBF?=
+ =?utf-8?B?cmU4ei9Ya2V6YVdmRjM5QVQ5V05UTVkyQ3lvUy9iMTdIL3FsaVRzMXU4UDZq?=
+ =?utf-8?B?elNpUzVkWW9OUVM5Z3VKckJJMTlXTHJodEJ6VWF0YkVCVmVvRS81S3QvUThU?=
+ =?utf-8?B?QW9MZmhJamNCYWUvUXlzb1prNlZFSnlpNUdTWFduYTBUYjUwWW5zVGE0Qkl2?=
+ =?utf-8?B?NGhGOCtkOG5MclVkUyt0VURWY1VnWitLUUI4Smtua3J6MHQxYiszZFpSWDBK?=
+ =?utf-8?Q?sv/lfCsFLR7UYo91P8NJTNgTb?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8050.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5913de6e-55d3-497b-d071-08dcf3fe48f0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2024 07:34:25.0295
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: e7loxBI3n3AecToixkU9FO23Ih1drPFknzqfI674rXnchtFOy99hfzyIoreTZhBWe9A2p4+s4C2+jyonbL0kiDBW1N6TkZdZyq61pocATwg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV1PR11MB8792
 
-On Thu, 2024-10-24 at 07:27 +0300, Serge Semin wrote:
-> Hello Linux-kernel community,
->=20
-> I am sure you have already heard the news caused by the recent Greg'
-> commit
-> 6e90b675cf942e ("MAINTAINERS: Remove some entries due to various
-> compliance
-> requirements."). As you may have noticed the change concerned some of
-> the
-> Ru-related developers removal from the list of the official kernel
-> maintainers,
-> including me.
->=20
-> The community members rightly noted that the _quite_ short commit log
-> contained
-> very vague terms with no explicit change justification. No matter how
-> hard I
-> tried to get more details about the reason, alas the senior
-> maintainer I was
-> discussing the matter with haven't given an explanation to what
-> compliance
-> requirements that was. I won't cite the exact emails text since it
-> was a private
-> messaging, but the key words are "sanctions", "sorry", "nothing I can
-> do", "talk
-> to your (company) lawyer"... I can't say for all the guys affected by
-> the
-> change, but my work for the community has been purely _volunteer_ for
-> more than
-> a year now (and less than half of it had been payable before that).
-> For that
-> reason I have no any (company) lawyer to talk to, and honestly after
-> the way the
-> patch has been merged in I don't really want to now. Silently, behind
-> everyone's
-> back, _bypassing_ the standard patch-review process, with no affected
-> developers/subsystem notified - it's indeed the worse way to do what
-> has been
-> done. No gratitude, no credits to the developers for all these years
-> of the
-> devoted work for the community. No matter the reason of the situation
-> but
-> haven't we deserved more than that? Adding to the GREDITS file at
-> least, no?..
->=20
-> I can't believe the kernel senior maintainers didn't consider that
-> the patch
-> wouldn't go unnoticed, and the situation might get out of control
-> with
-> unpredictable results for the community, if not straight away then in
-> the middle
-> or long term perspective. I am sure there have been plenty ways to
-> solve the
-> problem less harmfully, but they decided to take the easiest path.
-> Alas what's
-> done is done. A bifurcation point slightly initiated a year ago has
-> just been
-> fully implemented. The reason of the situation is obviously in the
-> political
-> ground which in this case surely shatters a basement the community
-> has been built
-> on in the first place. If so then God knows what might be next (who
-> else might
-> be sanctioned...), but the implemented move clearly sends a bad
-> signal to the
-> Linux community new comers, to the already working volunteers and
-> hobbyists like
-> me.
-
-I'm also quite shocked and even baffled about how this has been
-handled. This is not how leaders should communicate difficult or big
-decisions. It's the most disappointing event I have witnessed in the
-project.
-
-There is the form and there is the content =E2=80=93 about the content one
-cannot do much, when the state he or his organization resides in gives
-an order.
-
-But about the form one can indeed do much. No "Thank you!", no "I hope
-we can work together again once the world has become sane(r)"... srsly,
-what the hell.
-
-No idea why they felt the need to do it that way, but it certainly is
-not the open source way, neither is it decent or honorable.
-
-
-That said, thank you for all your work, Serge!
-
-I believe that nothing that has been accomplished with a candid mindset
-and decent intentions is ever done for nothing, although it often pays
-off way differently than expected.
-So I hope this will be the case for you, too.
-
-Take care,
-Philipp
-
-
->=20
-> Thus even if it was still possible for me to send patches or perform
-> some
-> reviews, after what has been done my motivation to do that as a
-> volunteer has
-> simply vanished. (I might be doing a commercial upstreaming in future
-> though).
-> But before saying goodbye I'd like to express my gratitude to all the
-> community
-> members I have been lucky to work with during all these years.
-> Specifically:
->=20
-> NTB-folks, Jon, Dave, Allen. NTB was my starting point in the kernel
-> upstream
-> work. Thanks for the initial advices and despite of very-very-very
-> tough reviews
-> with several complete patchset refactorings, I learned a lot back
-> then. That
-> experience helped me afterwards. Thanks a lot for that. BTW since
-> then I've got
-> several thank-you letters for the IDT NTB and IDT EEPROM drivers. If
-> not for you
-> it wouldn't have been possible.
->=20
-> Andy, it's hard to remember who else would have given me more on my
-> Linux kernel
-> journey as you have. We first met in the I2C subsystem review of my
-> DW I2C
-> driver patches. Afterwards we've got to be frequently meeting here
-> and there -
-> GPIO, SPI, TTY, DMA, NET, etc, clean/fixes/features patch(set)s.
-> Quite heat
-> discussions in your first reviews drove me crazy really. But all the
-> time we
-> managed to come up with some consensus somehow. And you never quit
-> the
-> discussions calmly explaining your point over and over. You never
-> refused to
-> provide more detailed justification to your requests/comments even
-> though you
-> didn't have to. Thanks to that I learned how to be patient to
-> reviewers
-> and reviewees. And of course thank you for the Linux-kernel
-> knowledges and all
-> the tips and tricks you shared.
->=20
-> * Andy, please note due to the situation I am not going to work on my
-> DW DMAC
-> fixes patchset anymore. So if you ever wish to have DW UART stably
-> working with the
-> DW DMA-engine driver, then feel free to pick the series up:
-> Link:
-> https://lore.kernel.org/dmaengine/20240911184710.4207-1-fancer.lancer@gma=
-il.com/
->=20
-> Linus (Walleij), after you merged one of my pretty much heavy
-> patchset in you
-> suggested to me to continue the DW APB GPIO driver maintaining. It
-> was a first
-> time I was asked to maintain a not-my driver. Thank you for the
-> trust. I'll
-> never forget that.
->=20
-> Mark, thank you very much for entrusting the DW APB SSI driver
-> maintenance to
-> me. I've put a lot of efforts into making it more generic and less
-> errors-prune,
-> especially when it comes working under a DMA-engine control or
-> working in the
-> mem-ops mode. I am sure the results have been beneficial to a lot of
-> DW
-> SPI-controller users since then.
->=20
-> Damien, our first and last meeting was at my generic AHCI-platform
-> and DW AHCI
-> SATA driver patches review. You didn't make it a quick and easy path.
-> But still
-> all the reviews comments were purely on the technical basis, and the
-> patches
-> were eventually merged in. Thank you for your time and experience
-> I've got from
-> the reviews.
->=20
-> Paul, Thomas, Arnd, Jiaxun, we met several times in the mailing list
-> during my
-> MIPS P5600 patches and just generic MIPS patches review. It was
-> always a
-> pleasure to discuss the matters with such brilliant experts in the
-> field. Alas
-> I've spent too much time working on the patches for another
-> subsystems and
-> failed to submit all the MIPS-related bits. Sorry I didn't keep my
-> promise, but
-> as you can see the circumstances have suddenly drawn its own
-> deadline.
->=20
-> Bjorn, Mani, we were working quite a lot with you in the framework of
-> the DW
-> PCIe RC drivers. You reviewed my patches. I helped you to review
-> another patches
-> for some time. Despite of some arguing it was always a pleasure to
-> work with
-> you.=C2=A0 Mani, special thanks for the cooperative DW eDMA driver
-> maintenance. I
-> think we were doing a great work together.
->=20
-> Paolo, Jakub, David, Andrew, Vladimir, Russell. The network subsystem
-> and
-> particularly the STMMAC driver (no doubt the driver sucks) have
-> turned to be a
-> kind of obstacle on which my current Linux-kernel activity has
-> stopped. I really
-> hope that at least in some way my help with the incoming STMMAC and
-> DW XPCS
-> patches reviews lightened up your maintainance duty. I know Russell
-> might
-> disagree, but I honestly think that all our discussions were useful
-> after all,
-> at least for me. I also think we did a great work working together
-> with Russell
-> on the DW GMAC/QoS ETH PCS patches. Hopefully you'll find a time to
-> finish it up
-> after all.=20
->=20
-> Rob, Krzysztof, from your reviews I've learned a lot about the most
-> hardwary part
-> of the kernel - DT sources and DT-bindings. All your comments have
-> been laconic
-> and straight to the point. That made reviews quick and easy. Thank
-> you very
-> much for that.
->=20
-> Guenter, special thanks for reviewing and accepting my patches to the
-> hwmon and
-> watchdog subsystems. It was pleasure to be working with you.
->=20
-> Borislav, we disagreed and argued a lot. So my DW uMCTL2 DDRC EDAC
-> patches even
-> got stuck in limbo for quite a long time. Anyway thank you for the
-> time
-> you spent reviewing my patches and trying to explain your point.
->=20
-> * Borislav, it looks like I won't be able to work on my Synopsys EDAC
-> patchsets
-> anymore. If you or somebody else could pick them up and finish up the
-> work it
-> would be great (you can find it in the lore archive). The patches
-> convert the
-> mainly Zynq(MP)-specific Synopsys EDAC driver to supporting the
-> generic DW
-> uMCTL2 DDRC. It would be very beneficial for each platform based on
-> that
-> controller.
->=20
-> Greg, we met several times in the mailing lists. You reviewed my
-> patches sent
-> for the USB and TTY subsystems, and all the time the process was
-> straight,
-> highly professional, and simpler than in the most of my other case.
-> Thank you very much for that.
->=20
-> Yoshihiro, Keguang, Yanteng, Kory, Cai and everybody I was lucky to
-> meet in the
-> kernel mailing lists, but forgot to mention here. Thank you for the
-> time spent
-> for our cooperative work on making the Linux kernel better. It was a
-> pleasure to
-> meet you here.
->=20
-> I also wish to say huge thanks to the community members trying to
-> defend the kicked off maintainers and for support you expressed in
-> these days. It means a lot.
->=20
-> A little bit statics of my kernel-work at the end:
->=20
-> Signed-off patches:		518
-> Reviewed and Acked patches:	253
-> Tested patches:			80
->=20
-> You might say not the greatest achievement for seven years comparing
-> to some
-> other developers. Perhaps. But I meant each of these tags, be sure.
->=20
-> I guess that's it. If you ever need some info or consultation
-> regarding the
-> drivers I used to maintain or the respective hardware or the Synopsys
-> IP-cores
-> (about which I've got quite comprehensive knowledge by this time),
-> feel free to
-> reach me out via this email. I am always willing to help to the
-> community
-> members.
->=20
-> Hope we'll meet someday in more pleasant circumstances and drink a
-> couple or more beers together. But now it's time to say good bye.
-> Sorry for a long-read text. I wish good luck on your Linux-way.
->=20
-> Best Regards,
-> -Serge(y)
->=20
-
+SGVsbG8gUGFvbG8sDQoNClRoYW5rIHlvdSBmb3IgdGhlIHJldmlldyBjb21tZW50cy4NCg0KPiA+
+IEFkZCBzZWxmdGVzdCBjYXNlIHRvIGNoZWNrIHRoZSBzZW5kIGFuZCByZWNlaXZlIHRocm91Z2hw
+dXQuDQo+ID4gU3VwcG9ydGVkIGxpbmsgbW9kZXMgYmV0d2VlbiBsb2NhbCBOSUMgZHJpdmVyIGFu
+ZCBwYXJ0bmVyIGFyZSB2YXJpZWQuDQo+ID4gVGhlbiBzZW5kIGFuZCByZWNlaXZlIHRocm91Z2hw
+dXQgaXMgY2FwdHVyZWQgYW5kIHZlcmlmaWVkLiBUZXN0IHVzZXMNCj4gPiBpcGVyZjMgdG9vbC4N
+Cj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IE1vaGFuIFByYXNhZCBKIDxtb2hhbi5wcmFzYWRAbWlj
+cm9jaGlwLmNvbT4NCj4gPiAtLS0NCj4gPiAgLi4uL3Rlc3Rpbmcvc2VsZnRlc3RzL2RyaXZlcnMv
+bmV0L2h3L01ha2VmaWxlIHwgICAxICsNCj4gPiAgLi4uL2RyaXZlcnMvbmV0L2h3L25pY19wZXJm
+b3JtYW5jZS5weSAgICAgICAgIHwgMTIxICsrKysrKysrKysrKysrKysrKw0KPiA+ICAyIGZpbGVz
+IGNoYW5nZWQsIDEyMiBpbnNlcnRpb25zKCspDQo+ID4gIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+
+IHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2RyaXZlcnMvbmV0L2h3L25pY19wZXJmb3JtYW5jZS5w
+eQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2RyaXZlcnMv
+bmV0L2h3L01ha2VmaWxlDQo+ID4gYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9kcml2ZXJzL25l
+dC9ody9NYWtlZmlsZQ0KPiA+IGluZGV4IDBkYWM0MGM0ZS4uMjg5NTEyMDkyIDEwMDY0NA0KPiA+
+IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2RyaXZlcnMvbmV0L2h3L01ha2VmaWxlDQo+
+ID4gKysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvZHJpdmVycy9uZXQvaHcvTWFrZWZpbGUN
+Cj4gPiBAQCAtMTEsNiArMTEsNyBAQCBURVNUX1BST0dTID0gXA0KPiA+ICAgICAgIGh3X3N0YXRz
+X2wzX2dyZS5zaCBcDQo+ID4gICAgICAgbG9vcGJhY2suc2ggXA0KPiA+ICAgICAgIG5pY19saW5r
+X2xheWVyLnB5IFwNCj4gPiArICAgICBuaWNfcGVyZm9ybWFuY2UucHkgXA0KPiA+ICAgICAgIHBw
+X2FsbG9jX2ZhaWwucHkgXA0KPiA+ICAgICAgIHJzc19jdHgucHkgXA0KPiA+ICAgICAgICMNCj4g
+PiBkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvZHJpdmVycy9uZXQvaHcvbmlj
+X3BlcmZvcm1hbmNlLnB5DQo+ID4gYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9kcml2ZXJzL25l
+dC9ody9uaWNfcGVyZm9ybWFuY2UucHkNCj4gPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiA+IGlu
+ZGV4IDAwMDAwMDAwMC4uMTUyYzYyNTExDQo+ID4gLS0tIC9kZXYvbnVsbA0KPiA+ICsrKyBiL3Rv
+b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2RyaXZlcnMvbmV0L2h3L25pY19wZXJmb3JtYW5jZS5weQ0K
+PiA+IEBAIC0wLDAgKzEsMTIxIEBADQo+ID4gKyMhL3Vzci9iaW4vZW52IHB5dGhvbjMNCj4gPiAr
+IyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMA0KPiA+ICsNCj4gPiArI0ludHJvZHVj
+dGlvbjoNCj4gPiArI1RoaXMgZmlsZSBoYXMgYmFzaWMgcGVyZm9ybWFuY2UgdGVzdCBmb3IgZ2Vu
+ZXJpYyBOSUMgZHJpdmVycy4NCj4gPiArI1RoZSB0ZXN0IGNvbXByaXNlcyBvZiB0aHJvdWdocHV0
+IGNoZWNrIGZvciBUQ1AgYW5kIFVEUCBzdHJlYW1zLg0KPiA+ICsjDQo+ID4gKyNTZXR1cDoNCj4g
+PiArI0Nvbm5lY3QgdGhlIERVVCBQQyB3aXRoIE5JQyBjYXJkIHRvIHBhcnRuZXIgcGMgYmFjayB2
+aWEgZXRoZXJuZXQNCj4gPiArbWVkaXVtIG9mIHlvdXIgY2hvaWNlKFJKNDUsIFQxKSAjDQo+ID4g
+KyMgICAgICAgIERVVCBQQyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBQYXJ0bmVyIFBDDQo+ID4gKyPilIzilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
+lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilJANCj4g4pSM4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSQDQo+ID4gKyPilIIgICAgICAgICAgICAgICAgICAgICAgIOKUgiAgICAg
+ICAgICAgICAgICAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAgIOKUgg0KPiA+
+ICsj4pSCICAgICAgICAgICAgICAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAg
+4pSCICAgICAgICAgICAgICAgICAgICAgICAgICDilIINCj4gPiArI+KUgiAgICAgICAgICAg4pSM
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSQICAgICAgICAgICAgICAgICAgICAg
+ICAgIOKUgiAgICAgICAgICAgICAgICAgICAgICAgICAg4pSCDQo+ID4gKyPilIIgICAgICAgICAg
+IOKUgkRVVCBOSUMgICAg4pSCICAgICAgICAgRXRoICAgICAgICAgICAgIOKUgiAgICAgICAgICAg
+ICAgICAgICAgICAgICAg4pSCDQo+ID4gKyPilIIgICAgICAgICAgIOKUgkludGVyZmFjZSDilIDi
+lLzilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
+lIDilIDilIDilIDilIDilIDilIDilLzilIAgICAgYW55IGV0aCBJbnRlcmZhY2UNCj4g4pSCDQo+
+ID4gKyPilIIgICAgICAgICAgIOKUlOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
+mCAgICAgICAgICAgICAgICAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAgIOKU
+gg0KPiA+ICsj4pSCICAgICAgICAgICAgICAgICAgICAgICDilIIgICAgICAgICAgICAgICAgICAg
+ICAgICAg4pSCICAgICAgICAgICAgICAgICAgICAgICAgICDilIINCj4gPiArI+KUgiAgICAgICAg
+ICAgICAgICAgICAgICAg4pSCICAgICAgICAgICAgICAgICAgICAgICAgIOKUgiAgICAgICAgICAg
+ICAgICAgICAgICAgICAg4pSCDQo+ID4gKyPilJTilIDilIDilIDilIDilIDilIDilIDilIDilIDi
+lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilJgNCj4g4pSU4pSA4pSA
+4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
+4pSA4pSA4pSA4pSA4pSA4pSYDQo+ID4gKyMNCj4gPiArI0NvbmZpZ3VyYXRpb25zOg0KPiA+ICsj
+VG8gcHJldmVudCBpbnRlcnJ1cHRpb25zLCBBZGQgZXRodG9vbCwgaXAgdG8gdGhlIHN1ZG9lcnMg
+bGlzdCBpbiByZW1vdGUgUEMNCj4gYW5kIGdldCB0aGUgc3NoIGtleSBmcm9tIHJlbW90ZS4NCj4g
+PiArI1JlcXVpcmVkIG1pbmltdW0gZXRodG9vbCB2ZXJzaW9uIGlzIDYuMTAgI0NoYW5nZSB0aGUg
+YmVsb3cNCj4gPiArY29uZmlndXJhdGlvbiBiYXNlZCBvbiB5b3VyIGh3IG5lZWRzLg0KPiA+ICsj
+ICIiIkRlZmF1bHQgdmFsdWVzIiIiDQo+ID4gK3RpbWVfZGVsYXkgPSA4ICN0aW1lIHRha2VuIHRv
+IHdhaXQgZm9yIHRyYW5zaXRpb25zIHRvIGhhcHBlbiwgaW4gc2Vjb25kcy4NCj4gPiArdGVzdF9k
+dXJhdGlvbiA9IDEwICAjcGVyZm9ybWFuY2UgdGVzdCBkdXJhdGlvbiBmb3IgdGhlIHRocm91Z2hw
+dXQgY2hlY2ssDQo+IGluIHNlY29uZHMuDQo+ID4gK3NlbmRfdGhyb3VnaHB1dF90aHJlc2hvbGQg
+PSA4MCAjcGVyY2VudGFnZSBvZiBzZW5kIHRocm91Z2hwdXQNCj4gPiArcmVxdWlyZWQgdG8gcGFz
+cyB0aGUgY2hlY2sgcmVjZWl2ZV90aHJvdWdocHV0X3RocmVzaG9sZCA9IDUwDQo+ID4gKyNwZXJj
+ZW50YWdlIG9mIHJlY2VpdmUgdGhyb3VnaHB1dCByZXF1aXJlZCB0byBwYXNzIHRoZSBjaGVjaw0K
+PiANCj4gUGxlYXNlIGFsbG93IHRoZSB1c2VyIHRvIG92ZXJyaWRlIHRoaXMgcGFyYW1ldGVycyB3
+aXRoIGVudiB2YXJpYWJsZSBhbmQvb3INCj4gd2l0aCB0aGUgY29tbWFuZCBsaW5lLg0KDQpJIHdp
+bGwgdXBkYXRlIGl0IHRvIHRha2UgdGhlc2UgcGFyYW1ldGVycyBmcm9tIGVudiB2YXJpYWJsZSBh
+bmQvb3IgY29tbWFuZCBsaW5lLg0KDQo+IA0KPiA+ICsNCj4gPiAraW1wb3J0IHRpbWUNCj4gPiAr
+aW1wb3J0IGpzb24NCj4gPiArZnJvbSBsaWIucHkgaW1wb3J0IGtzZnRfcnVuLCBrc2Z0X2V4aXQs
+IGtzZnRfcHIsIGtzZnRfdHJ1ZSBmcm9tDQo+ID4gK2xpYi5weSBpbXBvcnQgS3NmdEZhaWxFeCwg
+S3NmdFNraXBFeCBmcm9tIGxpYi5weSBpbXBvcnQgTmV0RHJ2RXBFbnYNCj4gPiArZnJvbSBsaWIu
+cHkgaW1wb3J0IGNtZCBmcm9tIGxpYi5weSBpbXBvcnQgTGlua0NvbmZpZw0KPiA+ICsNCj4gPiAr
+ZGVmIHZlcmlmeV90aHJvdWdocHV0KGNmZywgbGlua19jb25maWcpIC0+IE5vbmU6DQo+ID4gKyAg
+ICBwcm90b2NvbHMgPSBbIlRDUCIsICJVRFAiXQ0KPiA+ICsgICAgY29tbW9uX2xpbmtfbW9kZXMg
+PSBsaW5rX2NvbmZpZy5jb21tb25fbGlua19tb2Rlcw0KPiA+ICsgICAgc3BlZWRzLCBkdXBsZXhf
+bW9kZXMgPQ0KPiBsaW5rX2NvbmZpZy5nZXRfc3BlZWRfZHVwbGV4X3ZhbHVlcyhjb21tb25fbGlu
+a19tb2RlcykNCj4gPiArICAgICIiIlRlc3QgZHVyYXRpb24gaW4gc2Vjb25kcyIiIg0KPiA+ICsg
+ICAgZHVyYXRpb24gPSB0ZXN0X2R1cmF0aW9uDQo+ID4gKyAgICB0YXJnZXRfaXAgPSBjZmcucmVt
+b3RlX2FkZHINCj4gPiArDQo+ID4gKyAgICBmb3IgcHJvdG9jb2wgaW4gcHJvdG9jb2xzOg0KPiA+
+ICsgICAgICAgIGtzZnRfcHIoZiJ7cHJvdG9jb2x9IHRlc3QiKQ0KPiA+ICsgICAgICAgIHRlc3Rf
+dHlwZSA9ICItdSIgaWYgcHJvdG9jb2wgPT0gIlVEUCIgZWxzZSAiIg0KPiA+ICsgICAgICAgIHNl
+bmRfdGhyb3VnaHB1dCA9IFtdDQo+ID4gKyAgICAgICAgcmVjZWl2ZV90aHJvdWdocHV0ID0gW10N
+Cj4gPiArICAgICAgICBmb3IgaWR4IGluIHJhbmdlKDAsIGxlbihzcGVlZHMpKToNCj4gPiArICAg
+ICAgICAgICAgYml0X3JhdGUgPSBmIi1iIHtzcGVlZHNbaWR4XX1NIiBpZiBwcm90b2NvbCA9PSAi
+VURQIiBlbHNlICIiDQo+IA0KPiBBbHdheXMgdXNlICctYiAwJy4gV2lsbCB3b3JrIHdpdGggYm90
+aCBUQ1AgYW5kIFVEUCBhbmQgaXMgdXN1YWxseSBtb3JlDQo+IGVmZmljaWVudCB0aGFuIGZvcmNp
+bmcgYSBzcGVjaWZpYyBzcGVlZC4NCg0KQXMgc3VnZ2VzdGVkLCB0aGlzIHdpbGwgYmUgdXBkYXRl
+ZCB0byB1c2UgJy1iIDAnLiBZb3UgY2FuIGZpbmQgaXQgaW4gbmV4dCByZXZpc2lvbi4NCg0KPiAN
+Cj4gPiArICAgICAgICAgICAgaWYgbGlua19jb25maWcuc2V0X3NwZWVkX2FuZF9kdXBsZXgoc3Bl
+ZWRzW2lkeF0sDQo+IGR1cGxleF9tb2Rlc1tpZHhdKSA9PSBGYWxzZToNCj4gPiArICAgICAgICAg
+ICAgICAgIHJhaXNlIEtzZnRGYWlsRXgoZiJOb3QgYWJsZSB0byBzZXQgc3BlZWQgYW5kIGR1cGxl
+eCBwYXJhbWV0ZXJzIGZvcg0KPiB7Y2ZnLmlmbmFtZX0iKQ0KPiA+ICsgICAgICAgICAgICB0aW1l
+LnNsZWVwKHRpbWVfZGVsYXkpDQo+ID4gKyAgICAgICAgICAgIGlmIGxpbmtfY29uZmlnLnZlcmlm
+eV9saW5rX3VwKCkgPT0gRmFsc2U6DQo+ID4gKyAgICAgICAgICAgICAgICByYWlzZSBLc2Z0U2tp
+cEV4KGYiTGluayBzdGF0ZSBvZiBpbnRlcmZhY2Uge2NmZy5pZm5hbWV9IGlzIERPV04iKQ0KPiA+
+ICsgICAgICAgICAgICBzZW5kX2NvbW1hbmQ9ZiJpcGVyZjMge3Rlc3RfdHlwZX0gLWMge3Rhcmdl
+dF9pcH0ge2JpdF9yYXRlfSAtdA0KPiB7ZHVyYXRpb259IC0tanNvbiINCj4gPiArICAgICAgICAg
+ICAgcmVjZWl2ZV9jb21tYW5kPWYiaXBlcmYzIHt0ZXN0X3R5cGV9IC1jIHt0YXJnZXRfaXB9IHti
+aXRfcmF0ZX0gLXQNCj4ge2R1cmF0aW9ufSAtLXJldmVyc2UgLS1qc29uIg0KPiA+ICsgICAgICAg
+ICAgICBzZW5kX3Jlc3VsdCA9IGNtZChzZW5kX2NvbW1hbmQpDQo+ID4gKyAgICAgICAgICAgIHJl
+Y2VpdmVfcmVzdWx0ID0gY21kKHJlY2VpdmVfY29tbWFuZCkNCj4gPiArICAgICAgICAgICAgaWYg
+c2VuZF9yZXN1bHQucmV0ICE9IDAgb3IgcmVjZWl2ZV9yZXN1bHQucmV0ICE9IDA6DQo+ID4gKyAg
+ICAgICAgICAgICAgICByYWlzZSBLc2Z0U2tpcEV4KCJVbmV4cGVjdGVkIGVycm9yIG9jY3VycmVk
+IGR1cmluZw0KPiA+ICsgdHJhbnNtaXQvcmVjZWl2ZSIpDQo+ID4gKw0KPiA+ICsgICAgICAgICAg
+ICBzZW5kX291dHB1dCA9IHNlbmRfcmVzdWx0LnN0ZG91dA0KPiA+ICsgICAgICAgICAgICByZWNl
+aXZlX291dHB1dCA9IHJlY2VpdmVfcmVzdWx0LnN0ZG91dA0KPiA+ICsNCj4gPiArICAgICAgICAg
+ICAgc2VuZF9kYXRhID0ganNvbi5sb2FkcyhzZW5kX291dHB1dCkNCj4gPiArICAgICAgICAgICAg
+cmVjZWl2ZV9kYXRhID0ganNvbi5sb2FkcyhyZWNlaXZlX291dHB1dCkNCj4gPiArICAgICAgICAg
+ICAgIiIiQ29udmVydCB0aHJvdWdocHV0IHRvIE1icHMiIiINCj4gPiArDQo+IHNlbmRfdGhyb3Vn
+aHB1dC5hcHBlbmQocm91bmQoc2VuZF9kYXRhWydlbmQnXVsnc3VtX3NlbnQnXVsnYml0c19wZXJf
+c2VjDQo+IG9uZCddIC8gMWU2LCAyKSkNCj4gPiArDQo+ID4gKyByZWNlaXZlX3Rocm91Z2hwdXQu
+YXBwZW5kKHJvdW5kKHJlY2VpdmVfZGF0YVsnZW5kJ11bJ3N1bV9yZWNlaXZlZCddWw0KPiA+ICsg
+J2JpdHNfcGVyX3NlY29uZCddIC8gMWU2LCAyKSkNCj4gPiArDQo+ID4gKyAgICAgICAgICAgIGtz
+ZnRfcHIoZiJ7cHJvdG9jb2x9OiBTZW5kIHRocm91Z2hwdXQ6DQo+ID4gKyB7c2VuZF90aHJvdWdo
+cHV0W2lkeF19IE1icHMsIFJlY2VpdmUgdGhyb3VnaHB1dDoNCj4gPiArIHtyZWNlaXZlX3Rocm91
+Z2hwdXRbaWR4XX0gTWJwcyIpDQo+ID4gKw0KPiA+ICsgICAgICAgICIiIkNoZWNrIHdoZXRoZXIg
+dGhyb3VnaHB1dCBpcyBub3QgYmVsb3cgdGhlIHRocmVzaG9sZCAoZGVmYXVsdA0KPiB2YWx1ZXMg
+c2V0IGF0IHN0YXJ0KSIiIg0KPiA+ICsgICAgICAgIGZvciBpZHggaW4gcmFuZ2UoMCwgbGVuKHNw
+ZWVkcykpOg0KPiA+ICsgICAgICAgICAgICBzZW5kX3RocmVzaG9sZCA9IGZsb2F0KHNwZWVkc1tp
+ZHhdKSAqDQo+IGZsb2F0KHNlbmRfdGhyb3VnaHB1dF90aHJlc2hvbGQgLyAxMDApDQo+ID4gKyAg
+ICAgICAgICAgIHJlY2VpdmVfdGhyZXNob2xkID0gZmxvYXQoc3BlZWRzW2lkeF0pICoNCj4gZmxv
+YXQocmVjZWl2ZV90aHJvdWdocHV0X3RocmVzaG9sZCAvIDEwMCkNCj4gPiArICAgICAgICAgICAg
+a3NmdF90cnVlKHNlbmRfdGhyb3VnaHB1dFtpZHhdID49IHNlbmRfdGhyZXNob2xkLCBmIntwcm90
+b2NvbH06DQo+IFNlbmQgdGhyb3VnaHB1dCBpcyBiZWxvdyB0aHJlc2hvbGQgZm9yIHtzcGVlZHNb
+aWR4XX0gTWJwcyBpbg0KPiB7ZHVwbGV4X21vZGVzW2lkeF19IGR1cGxleCIpDQo+ID4gKyAgICAg
+ICAgICAgIGtzZnRfdHJ1ZShyZWNlaXZlX3Rocm91Z2hwdXRbaWR4XSA+PSByZWNlaXZlX3RocmVz
+aG9sZCwNCj4gPiArIGYie3Byb3RvY29sfTogUmVjZWl2ZSB0aHJvdWdocHV0IGlzIGJlbG93IHRo
+cmVzaG9sZCBmb3INCj4gPiArIHtzcGVlZHNbaWR4XX0gTWJwcyBpbiB7ZHVwbGV4X21vZGVzW2lk
+eF19IGR1cGxleCIpDQo+ID4gKw0KPiA+ICtkZWYgdGVzdF90aHJvdWdocHV0KGNmZywgbGlua19j
+b25maWcpIC0+IE5vbmU6DQo+ID4gKyAgICBjb21tb25fbGlua19tb2RlcyA9IGxpbmtfY29uZmln
+LmNvbW1vbl9saW5rX21vZGVzDQo+ID4gKyAgICBpZiBub3QgY29tbW9uX2xpbmtfbW9kZXM6DQo+
+ID4gKyAgICAgICAgS3NmdFNraXBFeCgiTm8gY29tbW9uIGxpbmsgbW9kZXMgZm91bmQiKQ0KPiA+
+ICsgICAgaWYgbGlua19jb25maWcucGFydG5lcl9uZXRpZiA9PSBOb25lOg0KPiA+ICsgICAgICAg
+IEtzZnRTa2lwRXgoIlBhcnRuZXIgaW50ZXJmYWNlIG5hbWUgbm90IGF2YWlsYWJsZSIpDQo+ID4g
+KyAgICBpZiBsaW5rX2NvbmZpZy5jaGVja19hdXRvbmVnX3N1cHBvcnRlZCgpIGFuZA0KPiBsaW5r
+X2NvbmZpZy5jaGVja19hdXRvbmVnX3N1cHBvcnRlZChyZW1vdGU9VHJ1ZSk6DQo+ID4gKyAgICAg
+ICAgS3NmdFNraXBFeCgiQXV0by1uZWdvdGlhdGlvbiBub3Qgc3VwcG9ydGVkIGJ5IGxvY2FsIG9y
+IHJlbW90ZSIpDQo+ID4gKyAgICBjZmcucmVxdWlyZV9jbWQoImlwZXJmMyIsIHJlbW90ZT1UcnVl
+KQ0KPiA+ICsgICAgdHJ5Og0KPiA+ICsgICAgICAgICIiImlwZXJmMyBzZXJ2ZXIgdG8gYmUgcnVu
+IGluIHRoZSByZW1vdGUgcGMiIiINCj4gPiArICAgICAgICBjb21tYW5kID0gImlwZXJmMyAtcyAt
+RCINCj4gPiArICAgICAgICBwcm9jZXNzID0gY21kKGNvbW1hbmQsIGhvc3Q9Y2ZnLnJlbW90ZSkN
+Cj4gDQo+IEl0J3MgcHJvYmFibHkgYmV0dGVyIHVzZSAnLS1vbmUtb2ZmJyBhbmQgcnVuIHRoZSBj
+b21tYW5kIGluIGJhY2tncm91bmQuDQo+IA0KPiBZb3Ugc2hvdWxkIHdhaXQgZm9yIHRoZSBsaXN0
+ZW5lciB0byBiZSBhdmFpbGFibGUgd2l0aCB3YWl0X3BvcnRfbGlzdGVuKCkNCj4gDQo+IEFsc28g
+eW91IGNhbiBjb25zaWRlciBleHRlbmRpbmcgdGhlIGV4aXN0aW5nIEdlbmVyYXRlVHJhZmZpYygp
+IGNsYXNzIGluDQo+IA0KPiB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9kcml2ZXJzL25ldC9saWIv
+cHkvbG9hZC5weQ0KDQpBcyBzdWdnZXN0ZWQsIEkgd2lsbCB1cGRhdGUgdGhlIGNvbW1hbmQgdG8g
+cnVuIGluIGJhY2tncm91bmQgd2l0aCAnLS1vbmUtb2ZmJyBhbmQgd2FpdCBmb3IgdGhlIGxpc3Rl
+bmVyLg0KRXh0ZW5kaW5nIGV4aXN0aW5nIEdlbmVyYXRlVHJhZmZpYygpIGNsYXNzIHdvdWxkIGJl
+IGJlbmVmaWNpYWwuIEkgd2lsbCB1cGRhdGUgaXQgYWNjb3JkaW5nbHkuDQoNCj4gDQo+IFsuLi5d
+DQo+ID4gK2RlZiBtYWluKCkgLT4gTm9uZToNCj4gPiArICAgIHdpdGggTmV0RHJ2RXBFbnYoX19m
+aWxlX18sIG5zaW1fdGVzdD1GYWxzZSkgYXMgY2ZnOg0KPiA+ICsgICAgICAgIGxpbmtfY29uZmln
+ID0gTGlua0NvbmZpZyhjZmcpDQo+ID4gKyAgICAgICAga3NmdF9ydW4oZ2xvYnM9Z2xvYmFscygp
+LCBjYXNlX3BmeD17InRlc3RfIn0sIGFyZ3M9KGNmZywNCj4gPiArbGlua19jb25maWcsKSkNCj4g
+DQo+IEluc3RlYWQgb2YgaGF2aW5nIGEgc2luZ2xlIHRlc3Qgd2l0aCBhbGwgcHJvdG8gYW5kIHNw
+ZWVkcywgd2hhdCBhYm91dCB1c2luZyBhDQo+IHRlc3RzIGxpc3QsIGVhY2ggb2YgdGhlbSB1c2lu
+ZyBhIGdpdmVuIHByb3RvY29sIGFuZCBzcGVlZCwgc28gdGhhdCB0aGUgdXNlciBzZWUNCj4gbW9y
+ZSBmaW5lIGdyYWluIHJlc3VsdHM/DQoNCkFzIHN1Z2dlc3RlZCwgdGVzdCB3aWxsIGJlIHVwZGF0
+ZWQgdG8gdXNlIHRlc3QgbGlzdCBmb3IgdGVzdGluZyB0aGUgcHJvdG9jb2xzIHdpdGggc3BlZWRz
+IHNlcGFyYXRlbHkuDQoNCllvdSBjYW4gZmluZCBhbGwgdGhlIGNoYW5nZXMgaW4gdGhlIG5leHQg
+cmV2aXNpb24uDQoNClRoYW5rcywNCk1vaGFuIFByYXNhZCBKDQo=
 
