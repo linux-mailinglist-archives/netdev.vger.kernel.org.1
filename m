@@ -1,182 +1,169 @@
-Return-Path: <netdev+bounces-138757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4989AEC5F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:39:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F0C49AEC69
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:42:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2C671F21562
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:39:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A5792835B0
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3843D16F910;
-	Thu, 24 Oct 2024 16:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E59F1F80D3;
+	Thu, 24 Oct 2024 16:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqb2EFEG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="db2VoXm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2045.outbound.protection.outlook.com [40.107.223.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA30C15A87C;
-	Thu, 24 Oct 2024 16:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729787973; cv=none; b=Ev92wJV3edpNDry8PviHM+muqfojmG7O+znkASGXLbKRPmMRcnRPSMmNDnsexkvAW7lw2mMwGNVA8xZq5ki8DvN66YGvl2KiFSDUBf+phxD5zk40rsfsg2ck+Wyux4bjoYC+Fy5boPBCCtOwHeWXxiQi4NrJSxJ8qb3dbbry9aA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729787973; c=relaxed/simple;
-	bh=6ry637uavt5WOAjtjyuH5D5Vgw17qL4+QLHAwx2063g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r6scwuV17lkeZxpvBA/tOFylAKo2B/AYLNN7QTuZ67/EmgZhQzUyaTjFZL3jY19eoN82AFZjCXfcDHn/dwULtSf50psmoC1z1AHSvngOMpkcMlNjSHet13UGHh788lvD0j9CcGchLD92N2RQEqN0eQFB3R8iY7b7gBYQv85b0SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cqb2EFEG; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539f1292a9bso1474969e87.2;
-        Thu, 24 Oct 2024 09:39:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729787969; x=1730392769; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZaWT76KQAhb/SdvegV291/fD/GVxdusDKkbeX6aAyw=;
-        b=cqb2EFEG8AeUPc3LxFMYXT4XpM2DnxLDQzT6PwcDxBrRwJdFltHmSXL5g8rvbuhndS
-         xzHFlVnxfpk2ALREHeFnfMAB94Iuer0PHN9+BxnjEllAh/gRxsoij0gH5EuPA5QoMIM0
-         6jh1j47oLgpveJFh3zgrLpV2H3RrCPQcQCYGaQwke8ciuWPhJzdetOtWXIQKppyXOxpg
-         kUCD1z8Ais48Fkz+I87Sn/Xp2XFfqQwDL3eOGe6FFcmsZsLIC/Pn8NH6Sp7AXtawy2r8
-         2nLOP5yOY9C+lUOz7zz/4oJqJ9xgXG4sZ02uGJYfikJ2r8t1EQi9+/iCC+g2w3SoGZ2h
-         yI0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729787969; x=1730392769;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZaWT76KQAhb/SdvegV291/fD/GVxdusDKkbeX6aAyw=;
-        b=KuVZGevo1RMLiW6Reg+/0dgfhptx1VC+ODQISJpJXFW6Sci22Y7v3Onarx6R/XFv5H
-         4zDCdoD//T7tBhALEpZMq6wvPxXFWrsuCf1E2df2Uoz8ogluG771K4WkXhQTfHQdMfku
-         HR0HT5VlMMPs2MsUenpqtQwN6E68b/L5bcbh3NoRAmu5Qm/25yaUAqHWXnrLXJLIc7kM
-         p0AxIxsyFhnjfgaJqGavTiw+KyOJ+slJVWYhuJJuvPCJJwIFRZuER50FKctI9YNHuoFk
-         RJ+9wZ4YR962G/6stEgWg48gx5yQmg4PiCSwe9JZAq26dXb5eLEXDhRtMR3w7w7C8wWJ
-         f5cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwKvG67lWj6s2CEdAsLCSg9FYD7NUrg1hTJovCI/FZE5qTN4UinWHjrzKAh+oU1NhgwaBE8F8DlFArFcs=@vger.kernel.org, AJvYcCXbjZ5symdonmTrWeIL/0NwEhVqIIRLC0kFi32zgkxJ//AVCGSsGMJPakM+elVLMWVEJoGENKzcvw==@vger.kernel.org, AJvYcCXpp1reyxNPsU1JWMAeEAL+TJhbLuqwuCHCi/Tq+hHO7VWAiLNjqXu1QCmglNybdnQn+HarRTDA@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfpcozhqTO2ifEPM/4BjyjrIcPLvlswcZByH05R7N+TYrezjLP
-	XDWmJdQtFICkofCOzj90mxwFj3lyBvb//+mzEDJYKhAGPTZXC6ym
-X-Google-Smtp-Source: AGHT+IGM2QIH1fkpvyL5zXwnzN1P9Fzl21jQNKRhYToOjYGnjYn96eDsd7Ox+gI2AzCZSLVIBZlJbw==
-X-Received: by 2002:a05:6512:281b:b0:539:dca9:19a2 with SMTP id 2adb3069b0e04-53b23e69518mr1724653e87.39.1729787968611;
-        Thu, 24 Oct 2024 09:39:28 -0700 (PDT)
-Received: from [192.168.42.27] ([85.255.233.224])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a912d638fsm645929366b.18.2024.10.24.09.39.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 09:39:28 -0700 (PDT)
-Message-ID: <de9ae678-258d-4f68-86e1-59d5eb4b70a4@gmail.com>
-Date: Thu, 24 Oct 2024 17:40:02 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DEB1DD0D9
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 16:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729788143; cv=fail; b=CASnvkoXTf3Kx7dpEGs7vMB/I8KLQ+RIl9Q/gOxt786rG0vQ8ifJJy+fUZwbf5Z8KB3phGivu8hRCBTo4/XrydVlEuKOZqOMLmVol1fGRXM0LD1NrzPfcAH/so8lF5j2ItDTqxbfpRZqK+glJg7sUo55x3VuquNwxCLK8j61kx4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729788143; c=relaxed/simple;
+	bh=WFz+DOlVNWfMS6cybg7w2POSEJ3IrMQBJRnZOAzo9zQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IUbvbuaWpfezEf2AQ31rwJCjjGffifFMFVNhHuJbUn3Mb3tSD3CET10PNo26KDQcyycu6zGpGJH8ILT9q14QdiMp6Y/AAziwOOY//XZUmoZrd7Iq+fa830ig1PDNaUAyMxj/RM3AtBrIvHCBCIz7j0A0Vh+cpqsQkT651eTgwqk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=db2VoXm7; arc=fail smtp.client-ip=40.107.223.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=H8ykTG/7ohUlkmlM/uHJ8MixuSfNvd0NCEpe+FbkWEgar8gsP9KMYyML8dR5W2zAOM3W8UjxacECd/pvHcQlTJGxMc5MspSeJfoKT3QepvAGZn81QKSuSmlF2nMz4pNK7Tg3QfTKq9widaRwsmgB1+IZsI5aCOi/aRCTbI4HU1ZdHDzq4ZZHfqOz1ESMf/vK4ff1bLK1pkYi7Q6mC+9YR0/nHY8JWaGpDzCJA/+/hOULRLJC1GMppMUw9TvYn2eGybV/BbA+RrU0WdK4gU8/+hJ1+Mx9CTED9yG4dLZgFiyz8e+PuYJvPFXN3ckdUGQ5Muns203/CLBVoJ7jzvMCCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T5NWLWtzth9cFZSwAeYtjQK3IqFDNr0vEOt5vUqWrPM=;
+ b=iQymItfZPCy+SYvqnH+sc+bTc7ef5iy05vn6aJIM0ypTooqpv8zmyU6PWiG/vmgkub7mXnKkNh0bSmWpJgttgnhKviC6GtPAGMX569mxcIktaRQ1oVVUIz/knw8tMfDt3Dt5iW9OFXVDOE22HPKy8dyrkhFLjAh+K0SJAjpAE65NMXs8Q2KkfIMCHJuMJIiHv5V7mnm+VvxuaJGM9H81L+XyBUfGqMdMszepYS9wgnnYuaq0auhJ/+HAHkTCbWtcoJYUSt1ubJzzrxk39UasaqSZvn2FdGFPqm/retafxq6X4+KQpC4k6SS9B8VBV7k6HGHrUxDgIgbL6pvBNYu8IA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T5NWLWtzth9cFZSwAeYtjQK3IqFDNr0vEOt5vUqWrPM=;
+ b=db2VoXm7nGGO34s8KgwiatVU7eIqAlfkqDQVw+rWCZImtaZIdnkQrwBWuHuyrHDW/WTwLpJZMBUVmZXvAmvXv0n5VuYoZiSS3PWOZCbLA8BXwTZLqZmStxcVozpfb0RGRSR6kkRTaVfu8rCUMbuCFnp0dtnPnyb9ExEHi+qEEpZDeTf3AX8ygzOqo+881jbMNCM9BESMCTCYaKpMbBk+T5S+2OAS1FAYYGZd6rsJZ+nPy3I+yNSQ5uwdZ+fdBIdLbufsdCRXF816usE5v+FU44yb5cVTyN1wdh1DZ9wwLgA0Fg9mBvR6i6+cnHpeQlsVf4tJW5Laj3E/mHOUdqv/yQ==
+Received: from PH7PR13CA0007.namprd13.prod.outlook.com (2603:10b6:510:174::17)
+ by IA1PR12MB7736.namprd12.prod.outlook.com (2603:10b6:208:420::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.17; Thu, 24 Oct
+ 2024 16:42:17 +0000
+Received: from SA2PEPF000015C7.namprd03.prod.outlook.com
+ (2603:10b6:510:174:cafe::31) by PH7PR13CA0007.outlook.office365.com
+ (2603:10b6:510:174::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.7 via Frontend
+ Transport; Thu, 24 Oct 2024 16:42:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SA2PEPF000015C7.mail.protection.outlook.com (10.167.241.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8093.14 via Frontend Transport; Thu, 24 Oct 2024 16:42:16 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 24 Oct
+ 2024 09:42:06 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 24 Oct 2024 09:42:05 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 24 Oct 2024 09:42:03 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next 0/2] mlx5e update features on config changes
+Date: Thu, 24 Oct 2024 19:41:31 +0300
+Message-ID: <20241024164134.299646-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 02/15] net: generalise net_iov chunk owners
-To: Christoph Hellwig <hch@infradead.org>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-References: <20241016185252.3746190-1-dw@davidwei.uk>
- <20241016185252.3746190-3-dw@davidwei.uk> <ZxijxiqNGONin3IY@infradead.org>
- <264c8f95-2a69-4d49-8af6-d035fa890ef1@gmail.com>
- <ZxoSBhC6sMEbXQi8@infradead.org>
- <a6864bf1-dd88-4ae0-bc67-b88bb4c17b44@gmail.com>
- <ZxpwgLRNsrTBmJEr@infradead.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZxpwgLRNsrTBmJEr@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C7:EE_|IA1PR12MB7736:EE_
+X-MS-Office365-Filtering-Correlation-Id: edc75e31-55b5-4e77-9c7e-08dcf44ad1d7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?4coRjFqeHSV7akemW0UnqvM527Rly1RJuFhINZk7fXrStX0tfMVIvdkr1Lo/?=
+ =?us-ascii?Q?/9SiGq5Uw8Q9ddITxwNQbTM17C1sWo92R8HbMusrDRoIvr5pZOX3KZR3Qz7p?=
+ =?us-ascii?Q?dSMIew8Xg8KlhR5r5VFIPeMHCB/pcUAzZEIjSfCOb5Z0Q51+RTY6zMBUI3Bp?=
+ =?us-ascii?Q?Pd0mHKdwcR41RZOZAPmD615AqqqyenBys0CQTPSvjGpcaUJiDhXmB5XJEQd7?=
+ =?us-ascii?Q?f0JjF9FhZAhGFPAGoUyLLd/eOABF6SF4Rum6H01iWrxl/9Hpav+F4M8ZzF83?=
+ =?us-ascii?Q?Mlb+UHZCEygSudLS28T7/5Mw3xxqv+Sq20j5PgbsCCGITqIUXij+vg0ltYNM?=
+ =?us-ascii?Q?oQYGXgw4pUfb5Eg9KQzdJ6OAr5iASrihZQ5a6ctt6VVqdvIHKX5+l0RRvgO7?=
+ =?us-ascii?Q?WtdHrPvoLdbxUZdhjfQelxMItOhZjjRcL5Xfe2w0w5NJgrccGHrYnAq6btLg?=
+ =?us-ascii?Q?8mtR6luQ9H1JG+q84cX0XLFRYInVYq9wLfZdcVCzuSxnkeSAws4u5RDtwUi8?=
+ =?us-ascii?Q?dGkg5VNYe4EyXDSiFixdbiNcA6bFs51jY3NiB/daax35R/JWi9Pig5zb2uM5?=
+ =?us-ascii?Q?pfb96wcqXwcNSMjJS+AdN3ltH9Ap/3Y7Gix9Eq0/4wdbgbm0hPn+knCfbi2o?=
+ =?us-ascii?Q?nnOkNVwPAW/NfLJhcA/uDhMlWVy+ci7DXqmFmolKqw3aiVUBghu2IwglMVYw?=
+ =?us-ascii?Q?OE+7yHFiye8Nnk4oqLn36Tcc0Y4S4l/T4hj5ZAGlry2aTS4PI14AsUrJbGdI?=
+ =?us-ascii?Q?8lZ/X6zeSsXFpljUqYoFgIiiLFFrrXJR1JjxWsZr8NAY6+HvutQwPEC68E0e?=
+ =?us-ascii?Q?WCvZfBXLIU8obwOS2CFmETKkf2qkhtmXFdN5NsQQjpH4VXdAtkOTH0nY/16I?=
+ =?us-ascii?Q?+vP+JdJ4z5VDfKNyCUa0oDcWmyYFaYWk/Gt5nJZPP2lsoCxXctJsqjMri10V?=
+ =?us-ascii?Q?aElxwIUjq7WCjbxiJjfgmUdZF6u312HfLPxpj1DB78toDmZQvYhUeugqUKgQ?=
+ =?us-ascii?Q?vuGDMQX0PyL25J37/rPpl8WNlQNsbmdzmYpZ5d5FnyaPzjOMipDc1jjzJ4nl?=
+ =?us-ascii?Q?uWVBnVwIckbug9Xo8ITJHiilikY/Ia3VBbzIPTB6+Ghj0NTg5tCGwec7nA6h?=
+ =?us-ascii?Q?WXubiW48Dl8wuIYPPOEy+lZV3K74gF5My4CT2wh/pxRCZ28uzuIvORz65zlh?=
+ =?us-ascii?Q?TsYPnVhi47be3PgkLdYnULgOdKEbLigc7SDsx0axalUnQnOTeApvQDmPHKep?=
+ =?us-ascii?Q?i4U/dfc6wOh68ogBsEKShTicTTSjeURqtK3L06EOZF2x5K1QwakDcz88YFzE?=
+ =?us-ascii?Q?7ngSU+50nTaRXKp20b5y41iXFHttFDoKYDuQSK/kmzGLpeuWRlA4+pZO615j?=
+ =?us-ascii?Q?bvNYNzbcpD4UenyPsq03On8m1FLyrNupQvinHcJh6AsZyTwzvA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 16:42:16.3843
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: edc75e31-55b5-4e77-9c7e-08dcf44ad1d7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015C7.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7736
 
-On 10/24/24 17:06, Christoph Hellwig wrote:
-> On Thu, Oct 24, 2024 at 03:23:06PM +0100, Pavel Begunkov wrote:
->>> That's not what this series does.  It adds the new memory_provider_ops
->>> set of hooks, with once implementation for dmabufs, and one for
->>> io_uring zero copy.
->>
->> First, it's not a _new_ abstraction over a buffer as you called it
->> before, the abstraction (net_iov) is already merged.
-> 
-> Umm, it is a new ops vector.
+Hi,
 
-I don't understand what you mean. Callback?
+This small patchset by Dragos adds a call to netdev_update_features()
+in configuration changes that could impact the features status.
 
->> Second, you mention devmem TCP, and it's not just a page pool with
->> "dmabufs", it's a user API to use it and other memory agnostic
->> allocation logic. And yes, dmabufs there is the least technically
->> important part. Just having a dmabuf handle solves absolutely nothing.
-> 
-> It solves a lot, becaue it provides a proper abstraction.
+Series generated against:
+commit 81bc949f640f ("selftests: tls: add a selftest for wrapping rec_seq")
 
-Then please go ahead and take a look at the patchset in question
-and see how much of dmabuf handling is there comparing to pure
-networking changes. The point that it's a new set of API and lots
-of changes not related directly to dmabufs stand. dmabufs is useful
-there as an abstraction there, but it's a very long stretch saying
-that the series is all about it.
+Thanks,
+Tariq
 
-> 
->>> So you are precluding zero copy RX into anything but your magic
->>> io_uring buffers, and using an odd abstraction for that.
->>
->> Right io_uring zero copy RX API expects transfer to happen into io_uring
->> controlled buffers, and that's the entire idea. Buffers that are based
->> on an existing network specific abstraction, which are not restricted to
->> pages or anything specific in the long run, but the flow of which from
->> net stack to user and back is controlled by io_uring. If you worry about
->> abuse, io_uring can't even sanely initialise those buffers itself and
->> therefore asking the page pool code to do that.
-> 
-> No, I worry about trying to io_uring for not good reason. This
+Dragos Tatulea (2):
+  net/mlx5e: Update features on MTU change
+  net/mlx5e: Update features on ring size change
 
-It sounds that the argument is that you just don't want any
-io_uring APIs, I don't think you'd be able to help you with
-that.
-
-> pre-cludes in-kernel uses which would be extremly useful for
-
-Uses of what? devmem TCP is merged, I'm not removing it,
-and the net_iov abstraction is in there, which can be potentially
-be reused by other in-kernel users if that'd even make sense.
-
-> network storage drivers, and it precludes device memory of all
-> kinds.
-
-You can't use page pools to allocate for a storage device, it's
-a network specific allocator. You can get a dmabuf around that
-device's memory and zero copy into it, but there is no problem
-with that. Either use devmem TCP or wait until io_uring adds
-support for dmabufs, which is, again, trivial.
-
->> I'm even more confused how that would help. The user API has to
->> be implemented and adding a new dmabuf gives nothing, not even
->> mentioning it's not clear what semantics of that beast is
->> supposed to be.
->>
-> 
-> The dma-buf maintainers already explained to you last time
-> that there is absolutely no need to use the dmabuf UAPI, you
-> can use dma-bufs through in-kernel interfaces just fine.
-
-You can, even though it's not needed and I don't see how
-it'd be useful, but you're missing the point. A new dmabuf
-implementation doesn't implement the uapi we need nor it
-helps to talk to the net layer.
+ drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 3 +++
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c    | 4 ++++
+ 2 files changed, 7 insertions(+)
 
 -- 
-Pavel Begunkov
+2.44.0
+
 
