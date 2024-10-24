@@ -1,571 +1,121 @@
-Return-Path: <netdev+bounces-138722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651C09AEA4E
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:22:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861299AEA3C
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5C51F23BA2
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:22:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C6F81F23149
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8297A1EBA0D;
-	Thu, 24 Oct 2024 15:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B4C1E379C;
+	Thu, 24 Oct 2024 15:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBJi7pJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7EC1E25FA
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 15:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5081E32CF
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 15:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729783328; cv=none; b=boqAtog4xIoU1n0VGW55OR8GNAkNjqiIydXbc1E7yHa5MfSLHs3LxCD8Zh9mjny/fSVXq5hfW/UcWsaEBo/1LRxRaFu2Cbw7L2JtVI7NLG3FLKARmCpyGn/bnAHcjg4CQwTpaI6Mg/jXeJSJye5rIHHIoU8a/fwlw9aW0tQ0rgo=
+	t=1729783296; cv=none; b=Ak7RxGtkirVn2ItyYjQSez3yIjZf/cQNhNUU03zXbAkDovdwiJ4qKzuNEvqZpGvFXIbTTDwdJ1l5s6wFp59Nx/8aavSbSUbr5tGv/KcppCgE/Up+Wo6FA+5/5UR3JyLVi2gelpK1bQeqxc0veRoTWFYOdBcrGyNCWjFH4bWnEWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729783328; c=relaxed/simple;
-	bh=xmURvGsSQUZFxfZ+RAjNnOSjIMdY2fZuT7tiMlghng8=;
+	s=arc-20240116; t=1729783296; c=relaxed/simple;
+	bh=nW0TWG7Fc0VNjERMXMTr1agpaawOY2IgT9uj4bNwY54=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V3XRti/dZ5wBfV1dNtEhri7ZHWCkSvnHWUxRBHb0/J8FjC53CtGt3PF2TOjStKTje5cvBb3ZeaFi3glk7B0WrWGE7WBvrAGzoJVO6kE4aGYgoR46zKc8m/wtKbpTDSG+fZ2G/6So4fckGVznMaD513S7PnpfS773SxOR/xZwmd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t3ze0-0004OZ-Mt; Thu, 24 Oct 2024 17:21:00 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t3zdy-000Dj9-12;
-	Thu, 24 Oct 2024 17:20:58 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id D3F2235DE43;
-	Thu, 24 Oct 2024 15:20:57 +0000 (UTC)
-Date: Thu, 24 Oct 2024 17:20:57 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
-References: <20241024085922.133071-1-tmyu0@nuvoton.com>
- <20241024085922.133071-2-tmyu0@nuvoton.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=josHQeMzVB6sqa/RoGZxztO1sh2xcz7nuw5Q+yKwqU7EQYtrI6UEicICc6wqmddEdjmZg5/7DqY9oLD6gZ3eV65sLnk/omxl3P4A+IYeBZtdKX0jcYZBy0bpScdhFlpwHwAoVid9ZW2ntBk18a2VU9kU7jOj0rD6/8qY7VoWFzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EBJi7pJ2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729783293;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qrw2RqXMP78nGKg8Lpv1jq5anNPyVA6VfKNmhQikqx0=;
+	b=EBJi7pJ2gPJY+vR2c0iNk8BHJrvcfmHo4kyKtk9H3KnTa7NVEio+tdnRFGA0JIJC906O1g
+	ASpv+AVUKt35EuN/4Es2MNF0yZ/7rJYCHWp5I6dfOU3w0U+A4ggE8cuu3Ju4sYy4AfWpci
+	gc8IeRRf88cw2I3Bhq8yf3GdwAP0yKg=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-225-DRts1yO_MO-Dk7zP9-DwZQ-1; Thu, 24 Oct 2024 11:21:32 -0400
+X-MC-Unique: DRts1yO_MO-Dk7zP9-DwZQ-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-460d8f8f5d4so16631801cf.1
+        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 08:21:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729783291; x=1730388091;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qrw2RqXMP78nGKg8Lpv1jq5anNPyVA6VfKNmhQikqx0=;
+        b=cZHw66H2QMSdT27AsRx5Yf+FHE6WZ9HJj+X4z6OPnDdIXLgLvlPHp0tmoAFbiYz+DD
+         Y1Kf+Jz3XNZD7afdyDJ9roSF9LCkh4DtFOm4XmsxHQU6VhvBZUOrOeU7ah/5BBt3Rj/C
+         eRCaUYzprvNj4mv4szw3JIEaZx4z+vr/LnFt7kuffglydbaSSD9b2g23ZgD/Q7du5dGQ
+         E4Fjebmlc444KxvEp0cL3qH5clIYcn6cQw2a/iJ2B9bGDFVJzJBbSD08i8ArQ3ZxnUJd
+         kzkOXW0LL8xVIaJXdJlfQfr2+HskvAFshMra2cm3JUkAmuUFL57QTx/TtJLzM2JON4zT
+         DGRA==
+X-Forwarded-Encrypted: i=1; AJvYcCV29MVnNADWlhWzWLwGL81CJtuKD/oyTBpSN/3JEFhvcBqcoTE544rLSejiDRp1fvbvZR6Rz/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymgcJA9VC0widldpyWrH3pIPiGaJyNdXEt4WAMEfTclP/9Khwp
+	+jHkBH8Kp0ziFSl4Se5ZHDqZzdtWhFlPyzxLfnocwmoY+fb1LX937gukMUj/zWQa4BiYwNq3c2O
+	NnznDtXwUzE/yYLPgwRWjOYYLteSwSYT99VZUipdLFvZ4Vi9+s48lYw==
+X-Received: by 2002:ac8:498c:0:b0:461:2bbd:f96c with SMTP id d75a77b69052e-4612bbdfa90mr11593101cf.6.1729783291629;
+        Thu, 24 Oct 2024 08:21:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENeP1TLULS4yPvQaHG4+jzlT08mwB6uRKJpkFnJDnX+eZo+AoJiFHON/m2ibWFVUzxSQuMdg==
+X-Received: by 2002:ac8:498c:0:b0:461:2bbd:f96c with SMTP id d75a77b69052e-4612bbdfa90mr11592771cf.6.1729783291124;
+        Thu, 24 Oct 2024 08:21:31 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3dab83fsm52808871cf.88.2024.10.24.08.21.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2024 08:21:30 -0700 (PDT)
+Date: Thu, 24 Oct 2024 17:21:24 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+Subject: Re: [PATCH] vsock/test: fix failures due to wrong SO_RCVLOWAT
+ parameter
+Message-ID: <4xfrphsdl7p2aqu6w7diow5shsnjq263lhfudi4yiqxvkvcmkq@ti2hcdbkthok>
+References: <20241023210031.274017-1-kshk@linux.ibm.com>
+ <k5otzhemrqeau7iilr6j42ytasddatbx53godcm2fm6zckevti@nqnetgj6odmb>
+ <ca6702e0-bdd9-4ab7-8fbc-e8b0404c9ed5@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bc6t2hauttfjlfk7"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20241024085922.133071-2-tmyu0@nuvoton.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <ca6702e0-bdd9-4ab7-8fbc-e8b0404c9ed5@linux.ibm.com>
 
+On Thu, Oct 24, 2024 at 10:00:47AM -0500, Konstantin Shkolnyy wrote:
+>On 10/24/2024 03:43, Stefano Garzarella wrote:
+>>Other setsockopt() in the tests where we use unsigned long are
+>>SO_VM_SOCKETS_* but they are expected to be unsigned, so we should be
+>>fine.
+>
+>It's actually not "signed vs unsigned", but a "size + endianess" problem.
 
---bc6t2hauttfjlfk7
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-MIME-Version: 1.0
+I see, thanks!
 
-On 24.10.2024 16:59:14, Ming Yu wrote:
-> The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
-> 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
-> PWM, and RTC.
->=20
-> This driver implements USB device functionality and shares the
-> chip's peripherals as a child device.
->=20
-> Each child device can use the USB functions nct6694_read_msg()
-> and nct6694_write_msg() to issue a command. They can also register
-> a handler function that will be called when the USB device receives
-> its interrupt pipe.
+>
+>Also, looking at SO_VM_SOCKETS_* code in the test, it uses unsigned 
+>long and size_t which (I believe) will both shrink to 4 bytes on 32-bit 
+>machines, while the corresponding kernel code in af_vsock.c uses u64.  
+>It looks to me that this kernel code will be unhappy to receive just 4 
+>bytes when it expects 8.
+>
 
-[...]
+In include/uapi/linux/vm_sockets.h we talk about unsigned long long for 
+SO_VM_SOCKETS_*, that IIUC also on 32-bit machines should be on 64bit, 
+so the kernel code looks okay, but the tests should be improved, right?
 
-> diff --git a/drivers/mfd/nct6694.c b/drivers/mfd/nct6694.c
-> new file mode 100644
-> index 000000000000..9838c7be0b98
-> --- /dev/null
-> +++ b/drivers/mfd/nct6694.c
+Thanks,
+Stefano
 
-[...]
-
-> +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offset, u16 le=
-ngth,
-> +		     u8 rd_idx, u8 rd_len, unsigned char *buf)
-
-why not make buf a void *?
-
-> +{
-> +	struct usb_device *udev =3D nct6694->udev;
-> +	unsigned char err_status;
-> +	int len, packet_len, tx_len, rx_len;
-> +	int i, ret;
-> +
-> +	mutex_lock(&nct6694->access_lock);
-> +
-> +	/* Send command packet to USB device */
-> +	nct6694->cmd_buffer[REQUEST_MOD_IDX] =3D mod;
-> +	nct6694->cmd_buffer[REQUEST_CMD_IDX] =3D offset & 0xFF;
-> +	nct6694->cmd_buffer[REQUEST_SEL_IDX] =3D (offset >> 8) & 0xFF;
-> +	nct6694->cmd_buffer[REQUEST_HCTRL_IDX] =3D HCTRL_GET;
-> +	nct6694->cmd_buffer[REQUEST_LEN_L_IDX] =3D length & 0xFF;
-> +	nct6694->cmd_buffer[REQUEST_LEN_H_IDX] =3D (length >> 8) & 0xFF;
-> +
-> +	ret =3D usb_bulk_msg(udev, usb_sndbulkpipe(udev, BULK_OUT_ENDPOINT),
-> +			   nct6694->cmd_buffer, CMD_PACKET_SZ, &tx_len,
-> +			   nct6694->timeout);
-> +	if (ret)
-> +		goto err;
-> +
-> +	/* Receive response packet from USB device */
-> +	ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK_IN_ENDPOINT),
-> +			   nct6694->rx_buffer, CMD_PACKET_SZ, &rx_len,
-> +			   nct6694->timeout);
-> +	if (ret)
-> +		goto err;
-> +
-> +	err_status =3D nct6694->rx_buffer[RESPONSE_STS_IDX];
-> +
-> +	/*
-> +	 * Segmented reception of messages that exceed the size of USB bulk
-> +	 * pipe packets.
-> +	 */
-
-The Linux USB stack can receive bulk messages longer than the max packet si=
-ze.
-
-> +	for (i =3D 0, len =3D length; len > 0; i++, len -=3D packet_len) {
-> +		if (len > nct6694->maxp)
-> +			packet_len =3D nct6694->maxp;
-> +		else
-> +			packet_len =3D len;
-> +
-> +		ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK_IN_ENDPOINT),
-> +				   nct6694->rx_buffer + nct6694->maxp * i,
-> +				   packet_len, &rx_len, nct6694->timeout);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	for (i =3D 0; i < rd_len; i++)
-> +		buf[i] =3D nct6694->rx_buffer[i + rd_idx];
-
-memcpy()?
-
-Or why don't you directly receive data into the provided buffer? Copying
-of the data doesn't make it faster.
-
-On the other hand, receiving directly into the target buffer means the
-target buffer must not live on the stack.
-
-> +
-> +	if (err_status) {
-> +		pr_debug("%s: MSG CH status =3D %2Xh\n", __func__, err_status);
-> +		ret =3D -EIO;
-> +	}
-> +
-> +err:
-> +	mutex_unlock(&nct6694->access_lock);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(nct6694_read_msg);
-> +
-> +int nct6694_write_msg(struct nct6694 *nct6694, u8 mod, u16 offset,
-> +		      u16 length, unsigned char *buf)
-> +{
-> +	struct usb_device *udev =3D nct6694->udev;
-> +	unsigned char err_status;
-> +	int len, packet_len, tx_len, rx_len;
-> +	int i, ret;
-> +
-> +	mutex_lock(&nct6694->access_lock);
-> +
-> +	/* Send command packet to USB device  */
-> +	nct6694->cmd_buffer[REQUEST_MOD_IDX] =3D mod;
-> +	nct6694->cmd_buffer[REQUEST_CMD_IDX] =3D offset & 0xFF;
-> +	nct6694->cmd_buffer[REQUEST_SEL_IDX] =3D (offset >> 8) & 0xFF;
-> +	nct6694->cmd_buffer[REQUEST_HCTRL_IDX] =3D HCTRL_SET;
-> +	nct6694->cmd_buffer[REQUEST_LEN_L_IDX] =3D length & 0xFF;
-> +	nct6694->cmd_buffer[REQUEST_LEN_H_IDX] =3D (length >> 8) & 0xFF;
-
-What about creating a struct that describes the cmd_buffer layout?
-
-> +
-> +	ret =3D usb_bulk_msg(udev, usb_sndbulkpipe(udev, BULK_OUT_ENDPOINT),
-> +			   nct6694->cmd_buffer, CMD_PACKET_SZ, &tx_len,
-> +			   nct6694->timeout);
-> +	if (ret)
-> +		goto err;
-> +
-> +	/*
-> +	 * Segmented transmission of messages that exceed the size of USB bulk
-> +	 * pipe packets.
-> +	 */
-
-same as above
-
-> +	for (i =3D 0, len =3D length; len > 0; i++, len -=3D packet_len) {
-> +		if (len > nct6694->maxp)
-> +			packet_len =3D nct6694->maxp;
-> +		else
-> +			packet_len =3D len;
-> +
-> +		memcpy(nct6694->tx_buffer + nct6694->maxp * i,
-> +		       buf + nct6694->maxp * i, packet_len);
-> +
-> +		ret =3D usb_bulk_msg(udev, usb_sndbulkpipe(udev, BULK_OUT_ENDPOINT),
-> +				   nct6694->tx_buffer + nct6694->maxp * i,
-> +				   packet_len, &tx_len, nct6694->timeout);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	/* Receive response packet from USB device */
-> +	ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK_IN_ENDPOINT),
-> +			   nct6694->rx_buffer, CMD_PACKET_SZ, &rx_len,
-> +			   nct6694->timeout);
-> +	if (ret)
-> +		goto err;
-> +
-> +	err_status =3D nct6694->rx_buffer[RESPONSE_STS_IDX];
-> +
-> +	/*
-> +	 * Segmented reception of messages that exceed the size of USB bulk
-> +	 * pipe packets.
-> +	 */
-
-same as above
-
-> +	for (i =3D 0, len =3D length; len > 0; i++, len -=3D packet_len) {
-> +		if (len > nct6694->maxp)
-> +			packet_len =3D nct6694->maxp;
-> +		else
-> +			packet_len =3D len;
-> +
-> +		ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK_IN_ENDPOINT),
-> +				   nct6694->rx_buffer + nct6694->maxp * i,
-> +				   packet_len, &rx_len, nct6694->timeout);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	memcpy(buf, nct6694->rx_buffer, length);
-
-why not rx into the destination buffer directly?
-
-> +
-> +	if (err_status) {
-> +		pr_debug("%s: MSG CH status =3D %2Xh\n", __func__, err_status);
-> +		ret =3D -EIO;
-> +	}
-> +
-> +err:
-> +	mutex_unlock(&nct6694->access_lock);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(nct6694_write_msg);
-
-[...]
-
-> +static int nct6694_usb_probe(struct usb_interface *iface,
-> +			     const struct usb_device_id *id)
-> +{
-> +	struct usb_device *udev =3D interface_to_usbdev(iface);
-> +	struct device *dev =3D &udev->dev;
-> +	struct usb_host_interface *interface;
-> +	struct usb_endpoint_descriptor *int_endpoint;
-> +	struct nct6694 *nct6694;
-> +	int pipe, maxp, bulk_pipe;
-> +	int ret =3D EINVAL;
-> +
-> +	interface =3D iface->cur_altsetting;
-> +	/* Binding interface class : 0xFF */
-> +	if (interface->desc.bInterfaceClass !=3D USB_CLASS_VENDOR_SPEC ||
-> +	    interface->desc.bInterfaceSubClass !=3D 0x00 ||
-> +	    interface->desc.bInterfaceProtocol !=3D 0x00)
-> +		return -ENODEV;
-> +
-> +	int_endpoint =3D &interface->endpoint[0].desc;
-> +	if (!usb_endpoint_is_int_in(int_endpoint))
-> +		return -ENODEV;
-> +
-> +	nct6694 =3D devm_kzalloc(&udev->dev, sizeof(*nct6694), GFP_KERNEL);
-> +	if (!nct6694)
-> +		return -ENOMEM;
-> +
-> +	pipe =3D usb_rcvintpipe(udev, INT_IN_ENDPOINT);
-> +	maxp =3D usb_maxpacket(udev, pipe);
-
-better move these 2 down to the usb_fill_int_urb().
-
-> +
-> +	nct6694->cmd_buffer =3D devm_kcalloc(dev, CMD_PACKET_SZ,
-> +					   sizeof(unsigned char), GFP_KERNEL);
-> +	if (!nct6694->cmd_buffer)
-> +		return -ENOMEM;
-> +	nct6694->rx_buffer =3D devm_kcalloc(dev, MAX_PACKET_SZ,
-> +					  sizeof(unsigned char), GFP_KERNEL);
-> +	if (!nct6694->rx_buffer)
-> +		return -ENOMEM;
-> +	nct6694->tx_buffer =3D devm_kcalloc(dev, MAX_PACKET_SZ,
-> +					  sizeof(unsigned char), GFP_KERNEL);
-> +	if (!nct6694->tx_buffer)
-> +		return -ENOMEM;
-> +	nct6694->int_buffer =3D devm_kcalloc(dev, MAX_PACKET_SZ,
-> +					   sizeof(unsigned char), GFP_KERNEL);
-> +	if (!nct6694->int_buffer)
-> +		return -ENOMEM;
-> +
-> +	nct6694->int_in_urb =3D usb_alloc_urb(0, GFP_KERNEL);
-> +	if (!nct6694->int_in_urb) {
-> +		dev_err(&udev->dev, "Failed to allocate INT-in urb!\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	/* Bulk pipe maximum packet for each transaction */
-> +	bulk_pipe =3D usb_sndbulkpipe(udev, BULK_OUT_ENDPOINT);
-> +	nct6694->maxp =3D usb_maxpacket(udev, bulk_pipe);
-> +
-> +	mutex_init(&nct6694->access_lock);
-> +	nct6694->udev =3D udev;
-> +	nct6694->timeout =3D URB_TIMEOUT;	/* Wait until urb complete */
-> +
-> +	INIT_LIST_HEAD(&nct6694->handler_list);
-> +	spin_lock_init(&nct6694->lock);
-> +
-> +	usb_fill_int_urb(nct6694->int_in_urb, udev, pipe,
-> +			 nct6694->int_buffer, maxp, usb_int_callback,
-> +			 nct6694, int_endpoint->bInterval);
-> +	ret =3D usb_submit_urb(nct6694->int_in_urb, GFP_KERNEL);
-> +	if (ret)
-> +		goto err_urb;
-> +
-> +	dev_set_drvdata(&udev->dev, nct6694);
-> +	usb_set_intfdata(iface, nct6694);
-> +
-> +	ret =3D mfd_add_hotplug_devices(&udev->dev, nct6694_dev,
-> +				      ARRAY_SIZE(nct6694_dev));
-> +	if (ret) {
-> +		dev_err(&udev->dev, "Failed to add mfd's child device\n");
-> +		goto err_mfd;
-> +	}
-> +
-> +	nct6694->async_workqueue =3D alloc_ordered_workqueue("asyn_workqueue", =
-0);
-
-Where is the async_workqueue used?
-
-> +
-> +	dev_info(&udev->dev, "Probed device: (%04X:%04X)\n",
-> +		 id->idVendor, id->idProduct);
-> +	return 0;
-> +
-> +err_mfd:
-> +	usb_kill_urb(nct6694->int_in_urb);
-> +err_urb:
-> +	usb_free_urb(nct6694->int_in_urb);
-> +	return ret;
-> +}
-> +
-> +static void nct6694_usb_disconnect(struct usb_interface *iface)
-> +{
-> +	struct usb_device *udev =3D interface_to_usbdev(iface);
-> +	struct nct6694 *nct6694 =3D usb_get_intfdata(iface);
-> +
-> +	mfd_remove_devices(&udev->dev);
-> +	flush_workqueue(nct6694->async_workqueue);
-> +	destroy_workqueue(nct6694->async_workqueue);
-> +	usb_set_intfdata(iface, NULL);
-
-I think this is not needed.
-
-> +	usb_kill_urb(nct6694->int_in_urb);
-> +	usb_free_urb(nct6694->int_in_urb);
-> +}
-> +
-> +static const struct usb_device_id nct6694_ids[] =3D {
-> +	{ USB_DEVICE(NCT6694_VENDOR_ID, NCT6694_PRODUCT_ID)},
-> +	{},
-> +};
-> +MODULE_DEVICE_TABLE(usb, nct6694_ids);
-> +
-> +static struct usb_driver nct6694_usb_driver =3D {
-> +	.name	=3D DRVNAME,
-> +	.id_table =3D nct6694_ids,
-> +	.probe =3D nct6694_usb_probe,
-> +	.disconnect =3D nct6694_usb_disconnect,
-> +};
-> +
-> +module_usb_driver(nct6694_usb_driver);
-> +
-> +MODULE_DESCRIPTION("USB-MFD driver for NCT6694");
-> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-> +MODULE_LICENSE("GPL");
-> diff --git a/include/linux/mfd/nct6694.h b/include/linux/mfd/nct6694.h
-> new file mode 100644
-> index 000000000000..0797564363be
-> --- /dev/null
-> +++ b/include/linux/mfd/nct6694.h
-> @@ -0,0 +1,168 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Nuvoton NCT6694 USB transaction and data structure.
-> + *
-> + * Copyright (C) 2024 Nuvoton Technology Corp.
-> + */
-> +
-> +#ifndef __MFD_NCT6694_H
-> +#define __MFD_NCT6694_H
-> +
-> +#define NCT6694_DEV_GPIO		"nct6694-gpio"
-> +#define NCT6694_DEV_I2C			"nct6694-i2c"
-> +#define NCT6694_DEV_CAN			"nct6694-can"
-> +#define NCT6694_DEV_WDT			"nct6694-wdt"
-> +#define NCT6694_DEV_IIO			"nct6694-iio"
-> +#define NCT6694_DEV_HWMON		"nct6694-hwmon"
-> +#define NCT6694_DEV_PWM			"nct6694-pwm"
-> +#define NCT6694_DEV_RTC			"nct6694-rtc"
-> +
-> +#define NCT6694_VENDOR_ID		0x0416
-> +#define NCT6694_PRODUCT_ID		0x200B
-> +#define INT_IN_ENDPOINT			0x81
-> +#define BULK_IN_ENDPOINT		0x82
-
-In Linux we don't add the 0x80 for IN endpoint, the framework does this
-for you.
-
-> +#define BULK_OUT_ENDPOINT		0x03
-> +#define MAX_PACKET_SZ			0x100
-> +
-> +#define CMD_PACKET_SZ			0x8
-> +#define HCTRL_SET			0x40
-> +#define HCTRL_GET			0x80
-> +
-> +#define REQUEST_MOD_IDX			0x01
-> +#define REQUEST_CMD_IDX			0x02
-> +#define REQUEST_SEL_IDX			0x03
-> +#define REQUEST_HCTRL_IDX		0x04
-> +#define REQUEST_LEN_L_IDX		0x06
-> +#define REQUEST_LEN_H_IDX		0x07
-> +
-> +#define RESPONSE_STS_IDX		0x01
-> +
-> +#define INT_IN_IRQ_IDX			0x00
-> +#define GPIO_IRQ_STATUS			BIT(0)
-> +#define CAN_IRQ_STATUS			BIT(2)
-> +#define RTC_IRQ_STATUS			BIT(3)
-> +
-> +#define URB_TIMEOUT			1000
-> +
-> +/*
-> + * struct nct6694 - Nuvoton NCT6694 structure
-> + *
-> + * @udev: Pointer to the USB device
-> + * @int_in_urb: Interrupt pipe urb
-> + * @access_lock: USB transaction lock
-> + * @handler_list: List of registered handlers
-> + * @async_workqueue: Workqueue of processing asynchronous work
-> + * @tx_buffer: USB write message buffer
-> + * @rx_buffer: USB read message buffer
-> + * @cmd_buffer: USB send command message buffer
-> + * @int_buffer: USB receive interrupt message buffer
-> + * @lock: Handlers lock
-> + * @timeout: URB timeout
-> + * @maxp: Maximum packet of bulk pipe
-> + */
-> +struct nct6694 {
-> +	struct usb_device *udev;
-> +	struct urb *int_in_urb;
-> +	struct list_head handler_list;
-> +	struct workqueue_struct *async_workqueue;
-> +
-> +	/* Make sure that every USB transaction is not interrupted */
-> +	struct mutex access_lock;
-> +
-> +	unsigned char *tx_buffer;
-> +	unsigned char *rx_buffer;
-> +	unsigned char *cmd_buffer;
-> +	unsigned char *int_buffer;
-> +
-> +	/* Prevent races within handlers */
-> +	spinlock_t lock;
-> +
-> +	/* time in msec to wait for the urb to the complete */
-> +	long timeout;
-> +
-> +	/* Bulk pipe maximum packet for each transaction */
-> +	int maxp;
-> +};
-> +
-> +/*
-> + * struct nct6694_handler_entry - Stores the interrupt handling informat=
-ion
-> + * for each registered peripheral
-> + *
-> + * @irq_bit: The bit in irq_status[INT_IN_IRQ_IDX] representing interrupt
-                    ^^^
-
-I think this comment could be more precise, you can emphasize, that it's
-not the bit number but the bit mask.=20
-
-> + * @handler: Function pointer to the interrupt handler of the peripheral
-> + * @private_data: Private data specific to the peripheral driver
-> + * @list: Node used to link to the handler_list
-> + */
-> +struct nct6694_handler_entry {
-> +	int irq_bit;
-
-the int_status you compare against in the IRQ callback ist a unsigned
-char. Better make all a u8.
-
-> +	void (*handler)(void *private_data);
-> +	void *private_data;
-> +	struct list_head list;
-> +};
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---bc6t2hauttfjlfk7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcaZdYACgkQKDiiPnot
-vG8hTQf9GGzEvj1IT8hi7Dc2LklLz1DRfZZtySo3heWjBKwZGfg8OeS8aD4Xamc+
-UZ+Nv9UCpXYl9wnt0c8VBzKNz1Y495JYia9N3BcKurHsqhKHVxXcg2MlTkIT6b95
-+gZDXceiP2tOtc7nPhC+h625Qcpiz92AZvChQzmxMuJqqEvlYx95yZ/+xXbeWRdy
-8Kad8joA0KJ2wNWS9DgGRJFiOKbTzw0KqSeCE8xH0k1kSWQJ3QRk5qqvcEuz/v9z
-QVBYRhqVCudi6Kyt2baqPuHUTSL/Qgqyxr52VjwzppW5kWJsVXHXb88xkYBiormM
-RqiOLe/MKN0fDDG2vvLZTB9ERYqXyw==
-=f7L1
------END PGP SIGNATURE-----
-
---bc6t2hauttfjlfk7--
 
