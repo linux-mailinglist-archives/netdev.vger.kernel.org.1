@@ -1,151 +1,123 @@
-Return-Path: <netdev+bounces-138719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802109AEA2B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:17:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D8E9AEA2C
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25C081F22BE5
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:17:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 590582813DC
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CEC1C8788;
-	Thu, 24 Oct 2024 15:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3175D1C8788;
+	Thu, 24 Oct 2024 15:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="XT8CZztd";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eZLxLzo4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aaC+z8Bx"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a6-smtp.messagingengine.com (flow-a6-smtp.messagingengine.com [103.168.172.141])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C645B15C128;
-	Thu, 24 Oct 2024 15:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF95158A31;
+	Thu, 24 Oct 2024 15:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729783065; cv=none; b=PFAHMNeLTbN9kW4LtOwSAjTCLIXriYe1j3xvl2tAlwp9N0I9ogl6rBjOdw7K6Uf+QaMpoIjD49wERZY4Klagy4cFqSsYxiMgOsbOGTy5OXZBeg0UNWDmJM2HrtrsPXbnpVu5QT5llZx2lSg/gM8i8JqS+cSsf+3ObWEXAtp5VIQ=
+	t=1729783090; cv=none; b=Gi5sVlykeQt2f8Ev1oPBwH3ygFwHOecFoRISTMujfzKfyaMRBN8kDvYP5pS2y9O983luXJBdhezwMxD/cdefvaOe0zlD12Fcx6FO4DBC4aB2x0ZExITSfSNEJuFBUdyrwLsPyFDeIYW2HS26efSnATtj3MoUsG81S+UtefyMa+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729783065; c=relaxed/simple;
-	bh=mn8rv5H6V6i6dIVV5+82E/q+te6TZMiEXrbsvUxukPg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=haUeDAUgWLyro1kYWYjk2cmvQvD6u2+XODE2Wzb5xORafxAK0/WwYoiuc410hCEzJRTg+pcIEpCsZTKgCmRUPrYMvjDkaNkj+dEWQaZIGHz/Q8nNWDIsuJ+O3eknZy0RTlmG3puBqhxUcebTildfae/7AiTDie5a3llj7HF4oQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=XT8CZztd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eZLxLzo4; arc=none smtp.client-ip=103.168.172.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailflow.phl.internal (Postfix) with ESMTP id A5B0220046C;
-	Thu, 24 Oct 2024 11:17:40 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Thu, 24 Oct 2024 11:17:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1729783060; x=1729786660; bh=3mTh/jC95PAKP3GIfBnLn3LeLI7GjRF8
-	ZhSGr3+52GQ=; b=XT8CZztdUM2sTLLcPUom3kV4mtZqo47i7TShMous2kv1VX/I
-	UQFKOg8Vh+8EvYmuWCFmmbbBt9GFKvf1py/FkSGrLDuAWPIBLW6kK4smcpoNNUww
-	Mm1oYbe7PyhCJotX73PWGBqiaNBqH+Qnb1lTnr8Zz3/rlz4ycSRjn6O22U0XB7n5
-	VK1m7FqNbXoS/z/tI7MDFfRtNSH0L2G43eIG+pXwcTarSQP7FOzCPiPCxMbV8YQ5
-	Ptm6MevU0RHilmFDtyjQimdnKzLtG0FryN2ipDX8BYAAyVsetaPr7aZy2XJ5CiDD
-	YUHh7gs9YYXiXXkOSjHLzsdmTYZSz0fy+FkTLQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=i934648bf.fm3; t=
-	1729783060; x=1729786660; bh=3mTh/jC95PAKP3GIfBnLn3LeLI7GjRF8ZhS
-	Gr3+52GQ=; b=eZLxLzo4YcnZJmpx5VlsnFx/mj9hOuUdxhSmwgjtkZWX1htDQPh
-	4X2pqC+bPYGGej1wKDFFrDQa/sKBCCW9X6ujX98fbjBquYh5aE6H0tKvEk/Wt4cA
-	w8LrnEJsGOWKivsz9ru7zVVIAtVqDuCq4BQ/vk6MWHL4PpX9S1GinLyJX3/nih+P
-	JTYIR+ZzvL7jQRoLMJiKYqemv1r9GQt3hZYaWIjB176WEL+Dra+Q6btpVou9VBcj
-	pGNkp+QO9j5HeA1leiK/+0zsYRbDhJYgwPzRPk5joArspHtNFD0Oe3DxZ3WpQogR
-	nP/JeIjLo2Ps/8v98ZZkGixN35fVyEoZkxA==
-X-ME-Sender: <xms:FGUaZ1V2OmlajPHLCm1BU-V3gN0ehHQYXoMl6m5Nr5s6dqfH9NOH-A>
-    <xme:FGUaZ1nchmi8p9gWT11bN8Y6hl2PwYhqedZ8eUjks83EDPUXPN2WQbUASO2RfHLPE
-    q-mjotXt_YvNYXq_E0>
-X-ME-Received: <xmr:FGUaZxYg0PKmab5v5f0Abifp0XnfeHxH4xYhazS4XtYDNNnxClPIyHuckLqt>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejtddgieduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
-    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefh
-    geeuheetveevgeevjeduleefffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
-    pghrtghpthhtohepfedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjhhohhgrnh
-    hnvghssehsihhpshholhhuthhiohhnshdrnhgvthdprhgtphhtthhopehlihhnuhigqdif
-    ihhrvghlvghsshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtug
-    gvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:FGUaZ4XZnEyrSV7pfPx09R0ubG7XPpHXT94DvCPPHcgu10uApHfn0g>
-    <xmx:FGUaZ_nfFaO6c_MVX60r_ST34oFPLOmV42iB5fFD0-VRfnKQV4hJtw>
-    <xmx:FGUaZ1ev_P8tg9Hnqc-IVl5jScnon-6FBht39-hI0UBYio48CxEpfA>
-    <xmx:FGUaZ5Fj8IywP3YiW9JR2mDHbjzzVdId0C8ibiLZ9F_rlxAE1i12Ww>
-    <xmx:FGUaZ-vpPAZtXShPdmMEmu6CKN2zsrAQuVAPxMk5PzPFK72K4WbPx0Vz>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 24 Oct 2024 11:17:39 -0400 (EDT)
-Date: Thu, 24 Oct 2024 17:17:38 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: convert to nla_get_*_default()
-Message-ID: <ZxplEne_oHXQycnc@hog>
-References: <20241024131807.0a6c07355832.I3df6aac71d38a5baa1c0a03d0c7e82d4395c030e@changeid>
- <20241024131807.d5b9f6e57ede.I740beeaa2f70ebfc19bfca1045a24d6151992790@changeid>
- <8fabb6e5a2eda8c3bd7ca0bccc3e7804ad27bbad.camel@sipsolutions.net>
- <ZxpeL7S2GZeJOiQw@hog>
- <2e3b106585cebbb579c0d5cca33737623765ded7.camel@sipsolutions.net>
+	s=arc-20240116; t=1729783090; c=relaxed/simple;
+	bh=vfBgRDZICdBX7vrh3gWNdMs2YSr3+0qAdG2MPGNRhNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bca8sPa7Eu5vUuqZva/HJPtQCMIpS9Y4Atl1/9naNY3XmKcMRuz+JTBB8VBVV/1lI1Hr38eVI+7LmQVlg/afDuh5H8506f0KTRH8jOtCnJqt1Ix6RPuDhqbpr1q+whnWgBqdT1GHOCPLGVxcGO19wJ4LLcueiu1AD3ULJAkYt00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aaC+z8Bx; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DB6B740006;
+	Thu, 24 Oct 2024 15:18:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1729783085;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fxtvD6UgMPlmvoiFhQH9u7TUGjdN67dBAYP00fGP+aY=;
+	b=aaC+z8BxF4avkFVKeWLMEbY0mgSv+vWVLkuZQ9sliwVNLYISTUW0OmtyRpwspLo3lbllKO
+	B6bJHNeO4MA0oFuX2xQb3se/97J8iqv4Kc4Mf6G1lsucixXPrkK43FiV4gbnXyIPVV35tb
+	mUtgOuBgWonKp+GvSsOoyAAqEXK3IwWjcsRJ6TfOz4yXoQUXt92F4TlJBZQTqPcgCT3M8C
+	gemG9wAbBcSVRZ79o3EshmhODXkpsc/mmNulfTxQXQWb8pQiBLqr7eOrz653FaJce9cuGV
+	9I/A9uHDc16ZoAW+V3Pu6hTcIeb9FifcDkpwQ25Mv+s0EE7F0HxLkaX+BVefNQ==
+Date: Thu, 24 Oct 2024 17:18:02 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, thomas.petazzoni@bootlin.com, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next] Documentation: networking: Add missing PHY_GET
+ command in the message list
+Message-ID: <20241024171802.4e0f0110@kmaincent-XPS-13-7390>
+In-Reply-To: <20241024145223.GR1202098@kernel.org>
+References: <20241023141559.100973-1-kory.maincent@bootlin.com>
+	<20241024145223.GR1202098@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2e3b106585cebbb579c0d5cca33737623765ded7.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-2024-10-24, 16:52:00 +0200, Johannes Berg wrote:
-> On Thu, 2024-10-24 at 16:48 +0200, Sabrina Dubroca wrote:
-> > 
-> > If nla_get_*_default was a macro (generating an "attr ? getter :
-> > default" expression) you wouldn't have that problem I think, 
-> 
-> Hmm. Perhaps. In the conditional operator (?:) they're subject to
-> integer promotion though
+On Thu, 24 Oct 2024 15:52:23 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-Is it?
+> On Wed, Oct 23, 2024 at 04:15:58PM +0200, Kory Maincent wrote:
+> > ETHTOOL_MSG_PHY_GET/GET_REPLY/NTF is missing in the ethtool message lis=
+t.
+> > Add it to the ethool netlink documentation.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > ---
+> >  Documentation/networking/ethtool-netlink.rst | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/Documentation/networking/ethtool-netlink.rst
+> > b/Documentation/networking/ethtool-netlink.rst index
+> > 295563e91082..70ecc3821007 100644 ---
+> > a/Documentation/networking/ethtool-netlink.rst +++
+> > b/Documentation/networking/ethtool-netlink.rst @@ -236,6 +236,7 @@
+> > Userspace to kernel: ``ETHTOOL_MSG_MM_GET``                get MAC merge
+> > layer state ``ETHTOOL_MSG_MM_SET``                set MAC merge layer
+> > parameters ``ETHTOOL_MSG_MODULE_FW_FLASH_ACT``   flash transceiver modu=
+le
+> > firmware
+> > +  ``ETHTOOL_MSG_PHY_GET``               get Ethernet PHY information
+> >    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > =20
+> >  Kernel to userspace:
+> > @@ -283,6 +284,8 @@ Kernel to userspace:
+> >    ``ETHTOOL_MSG_PLCA_NTF``                 PLCA RS parameters
+> >    ``ETHTOOL_MSG_MM_GET_REPLY``             MAC merge layer status
+> >    ``ETHTOOL_MSG_MODULE_FW_FLASH_NTF``      transceiver module flash up=
+dates
+> > +  ``ETHTOOL_MSG_PHY_GET_REPLY``            Ethernet PHY information
+> > +  ``ETHTOOL_MSG_PHY_NTF``                  Ethernet PHY information =20
+>=20
+> I wonder if ETHTOOL_MSG_PHY_NTF should be removed.
+> It doesn't seem to be used anywhere.
 
-    #define nla_get_u16_default(attr, d) (attr ? nla_get_u16(attr) : d)
-    int v = nla_get_u16_default(NULL, -1);
+We can't, as it is in the ethtool UAPI. Also I believe Maxime will use it on
+later patch series. Maxime, you confirm?
 
-seems to put the correct value into v.
-(but -ENOFOOD and -ELOWCOFFEE here, so I don't trust this quick test
-much :))
-
->, I wonder if that could cause some subtle issue
-> too especially if nla_get_u*() is used with signed variables?
-
-The issue in that example is pretty subtle and I'm fairly sure people
-are going to mess up :/
-But I'm not attached to that macro I just suggested, it's just a
-thought.
-
-> > but you
-> > couldn't nicely generate all the helpers with MAKE_NLA_GET_DEFAULT
-> > anymore.
-> 
-> Right, that too.
-> 
-> I think it's probably better to just review them, and only commit the
-> obvious ones originally?
-
-Well, this one looked reasonable too. I'm not convinced reviewers are
-going to catch those problems. Or authors of new code using those
-_default helpers from the start.
-
--- 
-Sabrina
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
