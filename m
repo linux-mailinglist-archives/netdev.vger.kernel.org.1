@@ -1,254 +1,161 @@
-Return-Path: <netdev+bounces-138511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE589ADF5B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:41:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30E359ADF62
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16628B23176
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 08:41:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60370B228C0
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 08:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7E01B0F27;
-	Thu, 24 Oct 2024 08:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198201B0F26;
+	Thu, 24 Oct 2024 08:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QMGkdPQG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qvorgh1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAB61AF0BB;
-	Thu, 24 Oct 2024 08:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729759301; cv=fail; b=L/FOH28gyaXcIP2Z/Q1+VEP2m7eH4Wn+UKibTcKZAxbJWtWXJA9SbfBwPc1H3X+vgr4wc4xhQu+Zm8M8xGEl08jGxs2d8oUKvu77hH3zgB8BJK66HshxfrY85ubCgGgN4Xq10lsABDjjpzdCvPDjxwfjvPkkN2NJ1Oj6Kcadjb4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729759301; c=relaxed/simple;
-	bh=rJKXPBooodT326pT/ES8y9qesyFtIHrJ6sIRwinUfwY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=jMRdncvxPxSRkATwqpHL76t2SW9BgwL+3B6G6DV2ywyp2gZreake72df2ejC01jPRCDs9sxWhU4Yl3kjLd00QXsnHNsH66DnbaB+1SM/sAzqhjjOnBAR0jym3XHMSXlAt9Y1qGW+OOoJJVIa1tXWqxWx2Wtxx0RpbP82Cqc51T4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QMGkdPQG; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729759297; x=1761295297;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rJKXPBooodT326pT/ES8y9qesyFtIHrJ6sIRwinUfwY=;
-  b=QMGkdPQGLxxCl4U/XF5I0Q0Ct102xlfYSzzc5okC1nzQADeFGYrXAkN6
-   TWzacGrIycbswPLYyFlnsDI41EmcoI+NiIYuBTS2CRYTYCheJ9Z6Ou+ol
-   +e0tzEvu1aWT3WPWVOyNCUPegzPIRGeQSdPDZLQncvTQ4GBksYQYZ0uHw
-   8qutMvKphysHM2CfVbePu/6eaWOsgkuUYHT8MMvvStkQBhqkDo50aCTXM
-   2d0RWswikcxxONmUCuEPWRRrdzEHc38U+JCdxVnkTLGMb5ylQGAQjIyk+
-   +DPe1lUTwUwiHjUXrJeh/AfokGcWfTroJhbTVzFkbx6BQPXcjhYug3cLU
-   g==;
-X-CSE-ConnectionGUID: HTTYMtPgQ/CcmepaMSTAiw==
-X-CSE-MsgGUID: ll2+6YjrTFyAIj9cVnl//A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="32238556"
-X-IronPort-AV: E=Sophos;i="6.11,228,1725346800"; 
-   d="scan'208";a="32238556"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 01:41:35 -0700
-X-CSE-ConnectionGUID: 1GDXl7teSRqoVGO+g/9g4w==
-X-CSE-MsgGUID: U81GgLaxTBCqpalOCjJ+8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,228,1725346800"; 
-   d="scan'208";a="84497774"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Oct 2024 01:41:35 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 24 Oct 2024 01:41:34 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 24 Oct 2024 01:41:34 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.43) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 24 Oct 2024 01:41:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dOyUrnPQ8n+GrQNXkGDzTIXJl2milpX5YHgClzRW0+ipP7VWM+SrkZYjqvT8ONzNck4U9v9JF5/KfFL8NIVMsh+K5y4QQXcM/d0Ga7I3gqyKvUvXXO0h8naAVYmX01vopKKtjWpY3qb4AqfFGcMQeIYRhEusQ9g6fR/7qCityOq5lcL9gF+E8I4d2hrgirloaJeiTOxTjcxd3xjTfnMp0o26XB5uTbcdGo6R6fvP+NB2f2UVjNNEtcHj19THhGCm+BU6YHwI6TiRtpjs+bSOuvBgly5PJwqMNj8w4Grun/xRmdEQRgsBJdaijrgEcQYfFZM10FB3T3+7h1nsxcjbug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gf8EBTsxLqLLm1BLFmaife01rDvINRr+QASuhP108ZU=;
- b=qNGvoHuyiT3EUZ8EJ0R7dzUo5RWIruir+uXp+tkIsuvs2O4dkcbegoRE96cEFZTdKwSx1AKp/v8efTQz3Bui/S8Aj+nMVNnoNrPEWBs5GWnYaSATkkYSzzbtsMSfZtZoSF6jNrDgysg7FsixMnZJ8W+ipY3EbdPSvHYpZ+GrxUs4pZ5s2cGrQUw2+StmfVXG4wTSqjuQwDfRaDh6q+fsOmPHDL/Rojw0tp7rzhKrLiirJfdGxgYbr4ybm+Ev5zPkEcBw+fJ44aGAPuEE1r3FPT6OxRRItwJcHZtvp3vZHa2S31abTFei12xG6TSqMKXTlzz/HFfJXgoXlCchbSXYyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by MW3PR11MB4604.namprd11.prod.outlook.com (2603:10b6:303:2f::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.18; Thu, 24 Oct
- 2024 08:41:31 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8093.018; Thu, 24 Oct 2024
- 08:41:31 +0000
-Message-ID: <91005d18-37c7-483b-bda5-2fa57a884a17@intel.com>
-Date: Thu, 24 Oct 2024 10:41:25 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] [net-next] igb: Fix 2 typos in comments in igb_main.c
-To: Johnny Park <pjohnny0508@gmail.com>, <horms@kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<kernel-janitors@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<pmenzel@molgen.mpg.de>
-References: <Zxne9hBl5E5VhKGm@Fantasy-Ubuntu>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <Zxne9hBl5E5VhKGm@Fantasy-Ubuntu>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0170.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:45::12) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23E41ABEC7
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 08:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729759437; cv=none; b=JUkxuAS9JCMoYmos3SC+c1G91k7etC2HcIRZ4BYjN6eo/0BCTvCK+yfBN/0s0R8+pq23WfW5OydTJWLKifdRlptYM6QCfyYUZTqi8h3UaB5qqg88JRwQZNkVjKfwRPriP+aZ9m3QHb8yNHYksjGv+X01UmRCrspmSWowXct/3Js=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729759437; c=relaxed/simple;
+	bh=UCi5ELepQZZwWFe9oCjZrBvOZ/qfebT40DeKQbBbNjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FOWGPS4sXtaJ/xxfbw4lvMcU9RDiR9gBWp2H2fZqcNhSNgJmgvEMDTUI6ceroEYGeP6j3lh5E1lHp9+J4J06ur6QCPqfKXCVbr5SEb+xgy4dLgjOAf7pC8uS7+9cltpbTZBnYWS1yird+fEl7yhJ+Gdwn2RqwI380h4Txk5UOE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qvorgh1P; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729759433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iR9AjakJn4hoJuTZIbyhybHiqFDkYJYpjuoN4hxDG2w=;
+	b=Qvorgh1Pq+uLYH7Aq/4BCgZCV2o+R7LppxPnn6Tek4Ko5TmWFhipVRmBPo4qYdSnjBdAXT
+	E9olfwFtKb4LsgnTBlOBEqFSpkmg6BZKqEPWzM/seou/pwzZ/ifGuLtHUGXybTNWflA0af
+	/04dPWZSmM9oimolyYlsKMBbtreV5O8=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-32-KvrORL5vNEGPRK6az6wSgg-1; Thu, 24 Oct 2024 04:43:52 -0400
+X-MC-Unique: KvrORL5vNEGPRK6az6wSgg-1
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-84ff4a09958so299273241.1
+        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 01:43:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729759431; x=1730364231;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iR9AjakJn4hoJuTZIbyhybHiqFDkYJYpjuoN4hxDG2w=;
+        b=DY4BQlbqMNhcrZydBoekumfyAzFeotgj8zDS+x5vJpGJ/rZaod2wmk0Ponxsx2y+lH
+         BTbnfbcPCrq/xvXFbAw2WxLKzL7yjU7tAzdZivTM0D1kavWNkhMp118GMTanidfS4EuU
+         6bBueTGmBQ3ouY0LcYmee0B7xLr2RQXqXVCDYC4lWEBE3z6W5eTQg7234i1HacWzzimO
+         xfmxQOnQdS2bkdBrFnaMBmT5CEkjgQ2e1yIqZkyKi8mD85J/ZZmXzbO/2nrM+T6Qbs4D
+         O7BqMSVcJiCIZJZWE7VZEPcX4pl2Xp/OtlXNHa0CVgHjuJu1KXC2JhJZE+waC5vkPj+W
+         D+1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWSsH63436gGV/7eDKdUc8sQjn6tETFu+QXm4+91npjDnrkWWboknwoiowF3lNH2zxK7lpueG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk5LHRbqpkc7KUrogDpwHDVpYI1TYMk9BTA1OKFn0EcAtHlwBR
+	27Knqwsn2tfzssbYffeKP6hHBFpdKQqNX9TsLx2YCarekIy8J9l7LM3ku7FZVIOP1qLTUymOvgG
+	9FrhgV8RLSHsa+4UyDNUtHVrBwhiNJKe/C+Fm0/+lQ0JEQ4OB1aMpyBduWmqL/g==
+X-Received: by 2002:a05:6102:3f4e:b0:4a5:ba70:1c6e with SMTP id ada2fe7eead31-4a751cf131amr7794004137.29.1729759431422;
+        Thu, 24 Oct 2024 01:43:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGHiPWrknWvL/ANNpfbc0GJfbqV2BdD/Y2S5/yeKMxfEgmbao0nwYIWy04QhKvvoS4AizptAw==
+X-Received: by 2002:a05:6102:3f4e:b0:4a5:ba70:1c6e with SMTP id ada2fe7eead31-4a751cf131amr7793972137.29.1729759430966;
+        Thu, 24 Oct 2024 01:43:50 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3cbb043sm49052421cf.50.2024.10.24.01.43.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2024 01:43:50 -0700 (PDT)
+Date: Thu, 24 Oct 2024 10:43:45 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+Subject: Re: [PATCH] vsock/test: fix failures due to wrong SO_RCVLOWAT
+ parameter
+Message-ID: <k5otzhemrqeau7iilr6j42ytasddatbx53godcm2fm6zckevti@nqnetgj6odmb>
+References: <20241023210031.274017-1-kshk@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|MW3PR11MB4604:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f8e6ad4-692f-427f-b61c-08dcf407a8c3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?STRCTU5iVy9vdEZDelpSR0JjTGtjQzVTZ0M2MTc1anJsS2p5dnpsRXFFOElF?=
- =?utf-8?B?SS9TNkUrWGN3cHRyMWlvaENtWFRibDNNTVRXbWMvNDU2SzR6N2ZaSGxFZ21T?=
- =?utf-8?B?NS9LNEhEUi84bUFsbUpWZ2RZM0JNQ2gxUEZaTGpFdVEyMXRqUlk4YXRtNHZt?=
- =?utf-8?B?enpodlRJTGZEd1Y1QWtkc2haUHIrbk9OUjBOcHE5djZYbTJnbWlNR0pEYnRZ?=
- =?utf-8?B?T1RwYXBERWgzUUNnOXJYNUplRTZSdC80cWdrUzJidno2TmlLK21SNGZLYkFB?=
- =?utf-8?B?SFFkNkRYWmpxUmZZbGM0cisxYk9sb0lWYlo2YW1sNmZ5aGNHYUVrSmdOcUpr?=
- =?utf-8?B?alBEUG9vQnZSTlVkWk0veTRnZ3k3eHBSVnZzTm95QlJxZXNDZHFnZ0hoUUor?=
- =?utf-8?B?dWFURXMzSnVXZVFIUFhUT1VXYTRzbkRyRHJnNElhQnM5TUJkWVNvNTZqcnIr?=
- =?utf-8?B?TExlOFordHJ0RHYzVGsxeDFhZXZHNmFMWEFoTDZnUG82dFhMeU5RT3BhdDNy?=
- =?utf-8?B?blJQY0NnTU0xSG4rRzRRbWIwNFFSWEVQbEp0SXRGTS9JOUZFL29ySjJZWXNu?=
- =?utf-8?B?bDFZUW50ZnY1R1RKUHUrRnRJN2VCb2FBZjBOalE4MnFkbmN6Q0FRVExuTTZC?=
- =?utf-8?B?S255RVRsZzhwcUFhZGNOcnpJZ3Q0a0p2TWg1cXRHMFR6ZU50N1kxMjR2M2c2?=
- =?utf-8?B?L1JxOUw0QUpIdTdrM3BNZnBLaUM1ODVWTUZKNGFUNmRYZE1BWS83cGxva1Zx?=
- =?utf-8?B?Y3Rrdzl0Y3dMbnI1dG5tRHcwbVY1SVIreXJua01FTnA5R3o4QURaNFBXMkxU?=
- =?utf-8?B?SWR1Sy9yYWt3c1RtZEQ0QU05azdQYTJER2U1MzdpalAzMjExWlZZMEQ0WW1Z?=
- =?utf-8?B?ZS9iZUpUaUpPc0NPdko2SitUazNjNEJwUCtNcThCY0Iya29wSnMxNDVGblFD?=
- =?utf-8?B?SnA5VG1STXFlYk5NY1Nwblo0VnRob1Y5WFlrNGxXZjhQaDRndTNPUi91bkp6?=
- =?utf-8?B?NkJXanlxZnNpRjYrbnZqMEVJbENtSkJZaHBRWGNERVM5UVprU1crTEEwS25l?=
- =?utf-8?B?RHdrOC9EYmlWS0I0aTBnczdjTW4ycTJBa3RsMTBVaVFJaVZsWmNocllCY00z?=
- =?utf-8?B?cCt1ZnVYNkNVMHAzWXJLY2Q1SkhpRms2MEZSNExGYmxEOWIyYTMvVG1rcXFH?=
- =?utf-8?B?cHdYb0t5cWRSb3F6RmkvYXVHRmp4bU52U1FFT1QzK2hsMFJRVENIQXZWdHBR?=
- =?utf-8?B?akVlTzM1SC9CN25JREJGcjZNQlkvMHBkU093R2xJWHFRSzlmRjJmOUJUdHV5?=
- =?utf-8?B?eU5OMGx4Z1prQytZK01ocnA2Y1A3dUJHa0FicXlHMllzSEk4eHBUdWVWTm9B?=
- =?utf-8?B?aFlEN2tqVkdpUjNCRVN2T3dOemRQOG1tNDJxOUhqV0hwNndBTllwd1Raa0cx?=
- =?utf-8?B?eDZwL1grenN0Wmx0eER5dGJKTndrR0RXanhNeHZiN09yOHhQaEhzOVVDbisr?=
- =?utf-8?B?Y2N1cS9nMTk5SkI0RDk5VUFwclhvL2M5ZjZ3NUp4UXdUckxOaHZPUEJBTklt?=
- =?utf-8?B?cERXb3AwbDdDTGJyOXBOYWRTbVU5NVIvb3RGOHNPdU5EY2RkZ1hqQ0RNRkFp?=
- =?utf-8?B?M2dOSElIYzBsR0FKLy9jMWVpRVEyQ2o4YW1HQnpUOVh6eXMwZDZkSmtlcytn?=
- =?utf-8?B?OThkTkdPank2RWxGNC9kbVFwMkdQMzdhVURQdmozdnY1Wm82MEE0YTkrNkQz?=
- =?utf-8?Q?v3Oq53ayiXMcO3xp5+tlnnNwOTsOS+2acqQ6RqK?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aEVTSTFRTE9peVozc0F3d3NFMGVDMkFaZnFZV3FJejVtNVBRZXNYcjUzSS82?=
- =?utf-8?B?aGoxVG14cFBIYmd1a1ljSWVtTmlRZWJwaTEzRUl6QklaWWlBWEt3UzFudzAv?=
- =?utf-8?B?U1JtUnpPdmgxRkxubDdydkM3Q2FFTWJwWTU3TGhSTEx1Q0ZoRzVhakVaMDB0?=
- =?utf-8?B?N2NNaFNvVysvQkFhUWVyTnh5UTJiY2ltakNSc05MbGJTcUlHYmJZQXorR0pt?=
- =?utf-8?B?NjlGbzMyaGkrQnpwVnVKT213dGlMdE5MTDdyMFV2L1BCUjFsUHdXZnZ2T3Vp?=
- =?utf-8?B?WUFUSWQ3cUMxZVQ1SjM4S29vYVdtUkk0NFZZeGtxQ3BRSjhkQldacVZxSmRt?=
- =?utf-8?B?NldaU25Ba1JVTGZadG13ZlJRV25oVmE0RjNVK0pqZ2YxLzhOMjV1QVBZRm1s?=
- =?utf-8?B?R1poU2k2OFk2ekFydjhBOWVPdkZYOUlaNGFmTUhQVTZiSHF3YTZUbUtmRDIx?=
- =?utf-8?B?WE1abEY1dXdXTUFNSFQzd250ZFBkR2kyOWVVR09aNEtYeGswOCtSZ0ZVY0hE?=
- =?utf-8?B?QW5ZcHJzRjZFNlRYUVh5N0dzdzBrTkRwS3ByczkydkZCWkRwTkhGS1g5TEtI?=
- =?utf-8?B?OEQzZjF1Q3pkRjN0aGJINm11TTArcWlZM1pYTFZCczRCQmJyMGY2ZVpVZDFv?=
- =?utf-8?B?ampTY2hGdlhBUkZzT0hCTnJUWFp1WmV0a1h6QWJtMStUdW9BbU5MYmpZemFT?=
- =?utf-8?B?UGVYOU1DV243am94NjB3QnhuVHYvSzhRUUZtTUdEYmttY3lTZHNpK1ltSlM3?=
- =?utf-8?B?TllTbmRJUGJOWXBXZlp3NkJwM0N5SmF2QmlvTmdmeDVGYnM5cWs5L2JFMkQw?=
- =?utf-8?B?dE5rQ3l6eEpXZW14dGI2Zml6b3ZVWUVQVkUzY1lDUWtHVkZMTnYxRXZEaTN3?=
- =?utf-8?B?SnhVMk0rbDljWi9BVThnY3l3ZTZVYlZpVFQ0emNvWTFkbGE2eHBRNlBuV05D?=
- =?utf-8?B?Z1VudDVvamg2a1F1VmdPTjI5QXFtcWRjWFl5VTRZU2ZDZDhQa1A3NE1IUk1u?=
- =?utf-8?B?R2I4YTc1NlB0b085Zk1Xb0lQRkwrM3Q1Wnhpa1ZNWnhMdFhPVW5HQWg3bldD?=
- =?utf-8?B?VW1VaU1BaVRKd3krNzBpWDFxMHhSTTB5UGkwa0RzdE53L0xVQ0V3VHAvVFd4?=
- =?utf-8?B?U2F5SlhUOUd2Zk5JNE1KTDNKU2RsNHk2d2Rxd3kwT1Y1Yk5SWGRRZVBvTW8z?=
- =?utf-8?B?M0dIL3R4enBrWThpMUtmU3lSSFB6b25OdVlYQisyMmc0d00vV0ZSRDMwVjU0?=
- =?utf-8?B?MDBKd2JiSFpaQVlKUlhxYU10VzhOT21ZdmhleDdxQzl5dzRKamJiMERwL05R?=
- =?utf-8?B?ZGMxKzRKRk44TE1PbEQ2VzBkRzVBWXFaWTFKZ3V6MU40VCtUc2ExblZZbml1?=
- =?utf-8?B?Z2llRzdiTUs2ZFBCd2RoYStVUmNxZTkzU3hJYUt5SDRjT0QvbDdVdDRyZ1k1?=
- =?utf-8?B?MGkwMjdsdUVnbWo4bnovOWVlOUVvRWY5bDgvMGlYdFNHQVliZ3ovcHNxNGQx?=
- =?utf-8?B?OExkL082cDJUS1hTU0F6OEVPcm42S2VjYnlBcjVvanJlUWJsV2doRjNzNS9Q?=
- =?utf-8?B?aXJhS0lFK3d2Vm5XTXNERnVIUmdmWWh4SkQ1SUJ6QUh4Y0UvY3daT3ZxbURw?=
- =?utf-8?B?dEFZV0xHa3Z5dDNjeE80V2VkVzBSOGx1Z1IreG9GSFpza2o3cDBMZEhaMFgy?=
- =?utf-8?B?cytVZVB2b0pYOEdndUlFa3F2WXpna2RudVpyN1l5ZHBNSVRnU0Q2bzVSZnhR?=
- =?utf-8?B?K0RkTVRkU3dQSmZ3ZEtYaTBVVkd6ZW5nSFZIYnNIYmxzWkIvdWdFeFB5QnBU?=
- =?utf-8?B?OEc2bWM0MTdTcVExT24vTkNMWUFvYkFTQmFjemQ3UzJPV2I3V3lKQndTNGxj?=
- =?utf-8?B?R3BoTGMzcUVXMFdhdjV4a0JnRUhhdU1Ha0RuNlNJT1U5YTlqRFJaVXc2QW9O?=
- =?utf-8?B?WHFVbDJobnNoUk1JdkxocDB5TlRaNzBNSFNsTDNsQ2t0dFhJVGtFUmRKcEZk?=
- =?utf-8?B?bjFhbW1hQUpsRGc2Z21oS1liUmg5eTRVNWptdG8yUFpPS0ltOSt4U081S3ln?=
- =?utf-8?B?eVZGdjZlaDJhUG5MaHRWYk56M1ZUSGc2S0tZNmdqTVJTN2hnbWZsdzRmTVJL?=
- =?utf-8?B?NGpmbkZoZmZkaU8xbFA3TjVmQmtOSDRoR1pYWEJyWm5iQXloOE9RR082OEJ5?=
- =?utf-8?B?WlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f8e6ad4-692f-427f-b61c-08dcf407a8c3
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 08:41:31.4097
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5H5mLw/zGbnMGWEfM6ycWMVbJUQpaY8I/qtdsakESmRblLT7IO61aBeddOyYbN23HmQTDENl/UAsXn70Fb1Q0MEwPLEy7lNSe4LtzsJnCgo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4604
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241023210031.274017-1-kshk@linux.ibm.com>
 
-On 10/24/24 07:45, Johnny Park wrote:
-> Fix 2 spelling mistakes in comments in `igb_main.c`.
-> 
-> Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
+On Wed, Oct 23, 2024 at 04:00:31PM -0500, Konstantin Shkolnyy wrote:
+>This happens on 64-bit big-endian machines.
+>SO_RCVLOWAT requires an int parameter. However, instead of int, the test
+>uses unsigned long in one place and size_t in another. Both are 8 bytes
+>long on 64-bit machines. The kernel, having received the 8 bytes, doesn't
+>test for the exact size of the parameter, it only cares that it's >=
+>sizeof(int), and casts the 4 lower-addressed bytes to an int, which, on
+>a big-endian machine, contains 0. 0 doesn't trigger an error, SO_RCVLOWAT
+>returns with success and the socket stays with the default SO_RCVLOWAT = 1,
+>which results in test failures.
+>
+>Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+>---
+>
+>Notes:
+>    The problem was found on s390 (big endian), while x86-64 didn't show it. After this fix, all tests pass on s390.
 
-you should collect Reviewed-by tags, as the one from Simon on v2.
-for future Intel Ethernet drivers series, please target them to IWL
-(net-next in the Subject becomes iwl-next)
+Thanks for the fix!
 
-> ---
-> Changes in v3:
->    - Adjust commit message
-> 
-> Changes in v2:
->    - Fix spelling mor -> more
-> ---
->   drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index 1ef4cb871452..fc587304b3c0 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -1204,7 +1204,7 @@ static int igb_alloc_q_vector(struct igb_adapter *adapter,
->   	/* initialize pointer to rings */
->   	ring = q_vector->ring;
->   
-> -	/* intialize ITR */
-> +	/* initialize ITR */
->   	if (rxr_count) {
->   		/* rx or rx/tx vector */
+Other setsockopt() in the tests where we use unsigned long are
+SO_VM_SOCKETS_* but they are expected to be unsigned, so we should be
+fine.
 
-Would be great to have capitalization errors fixed too, Rx, Tx, VF, not
-necessarily in this patch.
+Not for this patch, but do you think adding a getsockopt() for each
+setsockopt in the test to check that kind of issue can help?
 
->   		if (!adapter->rx_itr_setting || adapter->rx_itr_setting > 3)
-> @@ -3906,7 +3906,7 @@ static void igb_remove(struct pci_dev *pdev)
->    *
->    *  This function initializes the vf specific data storage and then attempts to
->    *  allocate the VFs.  The reason for ordering it this way is because it is much
-> - *  mor expensive time wise to disable SR-IOV than it is to allocate and free
-> + *  more expensive time wise to disable SR-IOV than it is to allocate and free
->    *  the memory for the VFs.
->    **/
->   static void igb_probe_vfs(struct igb_adapter *adapter)
+BTW, this patch LGTM:
 
-to reduce traffic, I'm fine with this, to go via any tree:
-Acked-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+
+Not sure if we want this with net tree since are just tests,
+in that case I think you should add:
+
+Fixes: b1346338fbae ("vsock_test: POLLIN + SO_RCVLOWAT test")
+Fixes: 542e893fbadc ("vsock/test: two tests to check credit update logic")
+
+>
+> tools/testing/vsock/vsock_test.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 8d38dbf8f41f..7fd25b814b4b 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -835,7 +835,7 @@ static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
+>
+> static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
+> {
+>-	unsigned long lowat_val = RCVLOWAT_BUF_SIZE;
+>+	int lowat_val = RCVLOWAT_BUF_SIZE;
+> 	char buf[RCVLOWAT_BUF_SIZE];
+> 	struct pollfd fds;
+> 	short poll_flags;
+>@@ -1357,7 +1357,7 @@ static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opt
+> static void test_stream_credit_update_test(const struct test_opts *opts,
+> 					   bool low_rx_bytes_test)
+> {
+>-	size_t recv_buf_size;
+>+	int recv_buf_size;
+> 	struct pollfd fds;
+> 	size_t buf_size;
+> 	void *buf;
+>-- 
+>2.34.1
+>
+
 
