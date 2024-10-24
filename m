@@ -1,99 +1,128 @@
-Return-Path: <netdev+bounces-138800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 913739AEF45
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:11:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C7E9AEF8A
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 486A11F215C7
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:11:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EEF7B2205F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94912003B3;
-	Thu, 24 Oct 2024 18:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E924200BA0;
+	Thu, 24 Oct 2024 18:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=notyourfox.coffee header.i=@notyourfox.coffee header.b="JHSUzjKl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vh6jwWlf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.notyourfox.coffee (mail.notyourfox.coffee [92.63.193.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68331FC7F6;
-	Thu, 24 Oct 2024 18:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.63.193.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D921ABEC5;
+	Thu, 24 Oct 2024 18:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729793454; cv=none; b=jvbsQZLXfGJUShLlZpRBJplMyAnli7Pn1xPZzLSddIz9qtwwAFVv5/5jXyCeH7WCWcp8GsYv0sG4VQCIvyo/LKiAcG5ikNKThq2ypSf0UmC5gh2CWQ9W+wmzujJgbvD8NLtyWx3oN44nBJlayLB7muNC0KlzFFOxuePzDOFKRfo=
+	t=1729793793; cv=none; b=SnkoL9zkFHr8XFIS/SZ9Uj7avKWZlTVHBE9JWHX6/zYEaeNX0yvVv7zNnN3RsyMxI5nNZKpxNzQ0CuwSKPd/U9WU5nSTvkaS/+RSIenzq0odn6NAUOfb5+A/lkRsQSHQiy4XGVVhAU+BFKEcVMGxZeja9LGV8ySIymzhWZugAnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729793454; c=relaxed/simple;
-	bh=4HaM2tprLpARFSOFiAD1IewWveAq50xA4izcD+Ol1hg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=F/19doZ4IYXXulnHQ4taEYkLYGFE63YNrEi2RX0OKR72gmYEnSQVs+p2GJ8QkwGLlYRR0C2iF02XxpMyqge8fU+SkvG7afPqCQTm94mrIGc1+forNCtUer098veSHlzfPHEZlbtNZyJvQb61kjdbFKiHO8hTuZm4xQzhtgT9dxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=notyourfox.coffee; spf=pass smtp.mailfrom=notyourfox.coffee; dkim=pass (2048-bit key) header.d=notyourfox.coffee header.i=@notyourfox.coffee header.b=JHSUzjKl; arc=none smtp.client-ip=92.63.193.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=notyourfox.coffee
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=notyourfox.coffee
-DKIM-Signature: a=rsa-sha256; bh=zD/MvoTUjjchDlHO31PqaPi5FVCTTnWec43Dr2sc5uE=;
- c=relaxed/relaxed; d=notyourfox.coffee;
- h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:In-Reply-To:Message-Id:Message-Id:References:References:Autocrypt:Openpgp;
- i=@notyourfox.coffee; s=mail; t=1729793394; v=1; x=1730225394;
- b=JHSUzjKls5Wm839qvhA6nxJdgjfFHYyuIMcFJC4py2Th5/lRpBJL87itZiTg0D7g72byla2/
- RGt9j0YQZcrrSnTMUigTkonLFjKQ1wty2LN+88I2MCPC3PFacLmQ6qZhW6CFbZFxlrquYkL2uWA
- 8n/E59Ut+LmSKvFcVYkl9wkkdRh8MLTO73De9KCAPILQIWuDQToZmui76W//DdF1v3lfmvIwrLC
- 00BhABRp1gebdHeZoI70ehEYTqlEw8KiEoYc1vSAp1tKTck0QShQZ9gBb/1Ia55r4kKsUVkpN30
- gJICGzIIOhLel8x+rFvTjeBr9jYMQEnr6fmrnHA+6Rz6Q==
-Received: by mail.notyourfox.coffee (envelope-sender
- <contact@notyourfox.coffee>) with ESMTPS id 1345da47; Thu, 24 Oct 2024
- 18:09:54 +0000
-Message-ID: <c58172db-e3cc-488d-baa6-f095588a8771@notyourfox.coffee>
-Date: Thu, 24 Oct 2024 21:09:52 +0300
+	s=arc-20240116; t=1729793793; c=relaxed/simple;
+	bh=wLQMy1fODAkR42k9k6/+Wm4LDF7pthKYgpT1trqgyOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=f7f+AsqWmGpl50Ub80pl3SKNVLQrhgsSKMJxINv9OD6zjBV8fSk3JUDhwtupTytrJ88mghNuA1sur1rU9hZNxg4A7OPUkq6aNsMW3F5JZTqVuxQt7sXqiDJkC4vZWk216IucN7xxIxJz0Yc4NbYOAg1L5SlX66W3cJYecJTU5/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vh6jwWlf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FBD6C4CEC7;
+	Thu, 24 Oct 2024 18:16:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729793792;
+	bh=wLQMy1fODAkR42k9k6/+Wm4LDF7pthKYgpT1trqgyOw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Vh6jwWlfQPZQfjGlftsi17vLLxsL5zZfNiCQJA2ugdrSPwdnao4cYzJyH0fJ6SOtW
+	 EF4BpJJSaW/azYChmUCGPgtF60kJ5Ga+F4UOY8t7jAnOrlLrMyGn4oouunBZzHCT1M
+	 fvE8QLJsWMtwAf8CzmBC9u+E5eiOfJXEK1ooBb+gyXZpVlB5b8noHv+zXIw2wVG1Fu
+	 XrKE3eaAMgLNmhlgI+83nsVQldtJ8ATNVcV1uV+zZQgJ4B4p/0iP//CxA9VKOft6Q7
+	 moGu1Ut3ybCF+ODoRccN/cyOjJDWUAM3zQPUSl1hfdEOGZ0XB0t7lJ2ZVYWaUK8Knr
+	 YtTARepCr42mQ==
+Date: Thu, 24 Oct 2024 13:16:30 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, vladimir.oltean@nxp.com,
+	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
+	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+	bhelgaas@google.com, horms@kernel.org, imx@lists.linux.dev,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	alexander.stein@ew.tq-group.com
+Subject: Re: [PATCH v5 net-next 08/13] PCI: Add NXP NETC vendor ID and device
+ IDs
+Message-ID: <20241024181630.GA966301@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: vladimir_putin_rus@kremlin.ru
-Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
- dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com,
- geert@linux-m68k.org, gregkh@linuxfoundation.org,
- hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru, jeffbai@aosc.io,
- kexybiscuit@aosc.io, linux-alpha@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-spi@vger.kernel.org, manivannan.sadhasivam@linaro.org,
- mattst88@gmail.com, netdev@vger.kernel.org, nikita@trvn.ru,
- ntb@lists.linux.dev, patches@lists.linux.dev, richard.henderson@linaro.org,
- s.shtylyov@omp.ru, serjk@netup.ru, shc_work@mail.ru,
- torvalds@linux-foundation.org, torvic9@mailbox.org,
- tsbogend@alpha.franken.de, v.georgiev@metrotek.ru, wangyuli@uniontech.com,
- wsa+renesas@sang-engineering.com, xeb@mail.ru
-References: <20241024140353.384881-1-vladimir_putin_rus@kremlin.ru>
-Subject: Re: [PATCH 0/2] MAINTAINERS: Remove few Chinese Entries
-Content-Language: en-US
-From: NotYourFox <contact@notyourfox.coffee>
-In-Reply-To: <20241024140353.384881-1-vladimir_putin_rus@kremlin.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241024065328.521518-9-wei.fang@nxp.com>
 
-And what were you trying to accomplish?
+On Thu, Oct 24, 2024 at 02:53:23PM +0800, Wei Fang wrote:
+> NXP NETC is a multi-function RCiEP and it contains multiple functions,
+> such as EMDIO, PTP Timer, ENETC PF and VF. Therefore, add these device
+> IDs to pci_ids.h.
+> 
+> Below are the device IDs and corresponding drivers.
+> PCI_DEVICE_ID_NXP2_ENETC_PF: nxp-enetc4
+> PCI_DEVICE_ID_NXP2_NETC_EMDIO: fsl-enetc-mdio
+> PCI_DEVICE_ID_NXP2_NETC_TIMER: ptp_netc
+> PCI_DEVICE_ID_NXP2_ENETC_VF: fsl-enetc-vf
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-On 10/23/24 1:45 PM, Linus Torvalds wrote:
- > Ok, lots of Russian trolls out and about.
+Please drop my ack.  I don't think these meet the spirit of the
+guidance in pci_ids.h, which is there to minimize churn in that file
+and make backports easier:
 
-You just made his statement valid by showing yourself off. Thanks for no 
-help at all.
+ *      Do not add new entries to this file unless the definitions
+ *      are shared between multiple drivers.
 
----
+PCI_DEVICE_ID_NXP2_NETC_TIMER and PCI_DEVICE_ID_NXP2_ENETC_VF aren't
+used at all by this series, so they shouldn't be added to pci_ids.h.
 
-И что вы пытались этим сделать?
+PCI_DEVICE_ID_NXP2_NETC_EMDIO is used only by
+drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c, so it should be
+defined there, not in pci_ids.h.
 
-On 10/23/24 1:45 PM, Linus Torvalds wrote:
- > Ok, lots of Russian trolls out and about.
+PCI_DEVICE_ID_NXP2_ENETC_PF is used by enetc.c and enetc4_pf.c, but
+it looks like those are basically part of the same driver, and it
+could be defined in enetc4_hw.h or similar.
 
-Вы только сделали его высказывание верным, решив выставить это напоказ. 
-Спасибо за абсолютный ноль помощи.
-
+> ---
+> v5: no changes
+> ---
+>  include/linux/pci_ids.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index 4cf6aaed5f35..acd7ae774913 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -1556,6 +1556,13 @@
+>  #define PCI_DEVICE_ID_PHILIPS_SAA7146	0x7146
+>  #define PCI_DEVICE_ID_PHILIPS_SAA9730	0x9730
+>  
+> +/* NXP has two vendor IDs, the other one is 0x1957 */
+> +#define PCI_VENDOR_ID_NXP2		PCI_VENDOR_ID_PHILIPS
+> +#define PCI_DEVICE_ID_NXP2_ENETC_PF	0xe101
+> +#define PCI_DEVICE_ID_NXP2_NETC_EMDIO	0xee00
+> +#define PCI_DEVICE_ID_NXP2_NETC_TIMER	0xee02
+> +#define PCI_DEVICE_ID_NXP2_ENETC_VF	0xef00
+> +
+>  #define PCI_VENDOR_ID_EICON		0x1133
+>  #define PCI_DEVICE_ID_EICON_DIVA20	0xe002
+>  #define PCI_DEVICE_ID_EICON_DIVA20_U	0xe004
+> -- 
+> 2.34.1
+> 
 
