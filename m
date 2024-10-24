@@ -1,137 +1,218 @@
-Return-Path: <netdev+bounces-138614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDBA09AE487
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:13:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0CE9AE495
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:14:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE501C225D9
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:13:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 605BE1C225A5
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73F51D5CD9;
-	Thu, 24 Oct 2024 12:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gnYcg52U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABC11D6DA1;
+	Thu, 24 Oct 2024 12:13:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124431D5151
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 12:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE511D3195
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 12:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729771985; cv=none; b=pP0ooZ+MLMRy2ChNqsPD9WPHBccYtI//TURg6vFpzzp1/5lI/4WR+e9fP4Tpu4RBB6QFSVS5HJndHs7fKVjUWAT/6wfrRkZmetvxJsr/aD/6Ss5NoTBo9xx5NgmY34co55d+sgGPUxdJrNnIj3oWvgrZiwtdIHKxXlkMkqqH85w=
+	t=1729772011; cv=none; b=Nz17Zce+WDvSmb0QlXpYZiLNl4vaQR5nFzUiucL/GrqIoNDbNniUzbRTaA83LUE7nLtINFBf02Kyh7R9Kp3/kqtOYH6/1DOfwa7+vLb+39y9s6fn6ys0614HQ4oXbzlwerlm7Yp2KzSToxQ0+fKzqKBm0KBN/8Ip6aU1Qs+XoEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729771985; c=relaxed/simple;
-	bh=bNMiaOO8wUNylIk9gISuKsnF9jJ0waLC+cK5MBdQs1o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kLIcbOEN2e+6xFzP3Em5Le7NUy6iGSf1bdSYx5vmYlicIRJH7gDhT4p0ZGrD0QCNlVH/lv/NHWF8mqfwWsTK3VFOkmSt4amq06pswREIcgQSlUxzxTtnU5a3wPD3Z81LPlWC++LYPkFyVz3m8YUl52PIjcowBYPA0cF6LCtkYuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gnYcg52U; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729771984; x=1761307984;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bNMiaOO8wUNylIk9gISuKsnF9jJ0waLC+cK5MBdQs1o=;
-  b=gnYcg52UbVtsJRbQ8DTkMNRJIPBDpbCjYrvg5ORvYxsWtd45D5YzdT4L
-   KRKzpCgbsmCsNu+COePOySS04MhRgcdw9dprskF5fivj4cMBJMQ93+aaG
-   fdqE9L0gJuJj01Ok4/etdPyLbU88Yo+OJieHep3Ulp+OrIl2X4gcUD0PR
-   bHzv7OQvrNL/HamRxcnhW1w6p+GJ+pWfEKpOQaa+ALM9tELIP4kWGG2mb
-   7DT3W+RLmbHM6TgYk5a8blTu/Oz0GdQdQwejF3cSt3+75kHoYohGYLldG
-   gxjaplQCpxu5Cr8BmN6BcalEatf7L06aProCaLBKMed64qbdojO4fXYON
-   Q==;
-X-CSE-ConnectionGUID: E/sYBT9TQrODA1zj31PKvg==
-X-CSE-MsgGUID: 8ZdgZlkeSdCpTNqjpJAdnQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11235"; a="40008340"
-X-IronPort-AV: E=Sophos;i="6.11,229,1725346800"; 
-   d="scan'208";a="40008340"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 05:13:04 -0700
-X-CSE-ConnectionGUID: Sw7L44ZHQcmrDxWdgfUTGg==
-X-CSE-MsgGUID: Z8CvajSmSHeDasj/KKYMaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,229,1725346800"; 
-   d="scan'208";a="85184537"
-Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by fmviesa004.fm.intel.com with ESMTP; 24 Oct 2024 05:13:01 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	pawel.chmielewski@intel.com,
-	sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com,
-	pio.raczynski@gmail.com,
-	konrad.knitter@intel.com,
-	marcin.szycik@intel.com,
-	wojciech.drewek@intel.com,
-	nex.sw.ncis.nat.hpm.dev@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jiri@resnulli.us,
-	horms@kernel.org,
-	David.Laight@ACULAB.COM
-Subject: [iwl-next v5 9/9] ice: init flow director before RDMA
-Date: Thu, 24 Oct 2024 14:12:30 +0200
-Message-ID: <20241024121230.5861-10-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20241024121230.5861-1-michal.swiatkowski@linux.intel.com>
-References: <20241024121230.5861-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1729772011; c=relaxed/simple;
+	bh=757xfs4lzj57ukyiAsyKVVfqB5Ggr6DUtawVPHyIcbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bkJc4rvfCi5zt5GU03o3HeWaIxrFBRk+UI1GOUBtuknCetCsd09F4rWMMFmYI6VnxAFDl9hYOJyE5kiHKxr5gvU7St5krfqLIF3Qnk8r/x0Hx1cVricv8RqYYtjnSe7fwz8p5YNYlxwfyzO3DdoLJIERwg12YXXT1cZfcnp51OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t3whs-0006NN-0Q; Thu, 24 Oct 2024 14:12:48 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t3whp-000CBK-1a;
+	Thu, 24 Oct 2024 14:12:45 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 043E635DB21;
+	Thu, 24 Oct 2024 12:12:45 +0000 (UTC)
+Date: Thu, 24 Oct 2024 14:12:44 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
+Message-ID: <20241024-majestic-chowchow-from-wonderland-096eb4-mkl@pengutronix.de>
+References: <20241024085922.133071-1-tmyu0@nuvoton.com>
+ <20241024085922.133071-5-tmyu0@nuvoton.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6cwye7pcrjvlm26t"
+Content-Disposition: inline
+In-Reply-To: <20241024085922.133071-5-tmyu0@nuvoton.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Flow director needs only one MSI-X. Load it before RDMA to save MSI-X
-for it.
 
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+--6cwye7pcrjvlm26t
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
+MIME-Version: 1.0
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index f3dd300a7dad..b819e7f9d97d 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5168,11 +5168,12 @@ int ice_load(struct ice_pf *pf)
- 
- 	ice_napi_add(vsi);
- 
-+	ice_init_features(pf);
-+
- 	err = ice_init_rdma(pf);
- 	if (err)
- 		goto err_init_rdma;
- 
--	ice_init_features(pf);
- 	ice_service_task_restart(pf);
- 
- 	clear_bit(ICE_DOWN, pf->state);
-@@ -5180,6 +5181,7 @@ int ice_load(struct ice_pf *pf)
- 	return 0;
- 
- err_init_rdma:
-+	ice_deinit_features(pf);
- 	ice_tc_indir_block_unregister(vsi);
- err_tc_indir_block_register:
- 	ice_unregister_netdev(vsi);
-@@ -5203,8 +5205,8 @@ void ice_unload(struct ice_pf *pf)
- 
- 	devl_assert_locked(priv_to_devlink(pf));
- 
--	ice_deinit_features(pf);
- 	ice_deinit_rdma(pf);
-+	ice_deinit_features(pf);
- 	ice_tc_indir_block_unregister(vsi);
- 	ice_unregister_netdev(vsi);
- 	ice_devlink_destroy_pf_port(pf);
--- 
-2.42.0
+Hello,
 
+thanks for your contribution. It seems to me that there is no proper
+TX-flow control and I have some questions.
+
+On 24.10.2024 16:59:17, Ming Yu wrote:
+
+[...]
+
+> +static netdev_tx_t nct6694_canfd_start_xmit(struct sk_buff *skb,
+> +					    struct net_device *ndev)
+> +{
+> +	struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> +	struct nct6694 *nct6694 =3D priv->nct6694;
+> +	struct canfd_frame *cf =3D (struct canfd_frame *)skb->data;
+> +	struct net_device_stats *stats =3D &ndev->stats;
+> +	int can_idx =3D priv->can_idx;
+> +	u32 txid =3D 0;
+> +	int i;
+> +	unsigned int echo_byte;
+> +	u8 data_buf[REQUEST_CAN_CMD10_LEN] =3D {0};
+> +
+> +	if (can_dropped_invalid_skb(ndev, skb))
+> +		return NETDEV_TX_OK;
+> +
+> +	/*
+> +	 * No check for NCT66794 because the TX bit is read-clear
+> +	 * and may be read-cleared by other function
+> +	 * Just check the result of tx command.
+> +	 */
+
+Where do you check the result of the TX command?
+
+> +	/* Check if the TX buffer is full */
+
+Where's the check if the TX buffer is full?
+
+> +	netif_stop_queue(ndev);
+> +
+> +	if (can_idx =3D=3D 0)
+> +		data_buf[CAN_TAG_IDX] =3D CAN_TAG_CAN0;
+> +	else
+> +		data_buf[CAN_TAG_IDX] =3D CAN_TAG_CAN1;
+> +
+> +	if (cf->can_id & CAN_EFF_FLAG) {
+> +		txid =3D cf->can_id & CAN_EFF_MASK;
+> +		/*
+> +		 * In case the Extended ID frame is transmitted, the
+> +		 * standard and extended part of the ID are swapped
+> +		 * in the register, so swap them back to send the
+> +		 * correct ID.
+> +		 */
+> +		data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_EFF;
+> +	} else {
+> +		txid =3D cf->can_id & CAN_SFF_MASK;
+> +	}
+> +
+> +	set_buf32(&data_buf[CAN_ID_IDX], txid);
+> +
+> +	data_buf[CAN_DLC_IDX] =3D cf->len;
+> +
+> +	if ((priv->can.ctrlmode & CAN_CTRLMODE_FD) && can_is_canfd_skb(skb)) {
+> +		data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_FD;
+> +		if (cf->flags & CANFD_BRS)
+> +			data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_BRS;
+> +	}
+> +
+> +	if (cf->can_id & CAN_RTR_FLAG)
+> +		data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_RTR;
+> +
+> +	/* set data to buf */
+> +	for (i =3D 0; i < cf->len; i++)
+> +		data_buf[CAN_DATA_IDX + i] =3D *(u8 *)(cf->data + i);
+> +
+> +	can_put_echo_skb(skb, ndev, 0, 0);
+> +
+> +	memcpy(priv->data_buf, data_buf, REQUEST_CAN_CMD10_LEN);
+> +	queue_work(nct6694->async_workqueue, &priv->tx_work);
+> +
+> +	stats->tx_bytes +=3D cf->len;
+> +	stats->tx_packets++;
+> +	echo_byte =3D can_get_echo_skb(ndev, 0, NULL);
+> +
+> +	netif_wake_queue(ndev);
+
+How do you make sure that the tx_work has finished?
+Once you wake the queue, the xmit function can be called again. If your
+tx_work has not finished, you'll overwrite the priv->data_buf.
+
+> +
+> +	return NETDEV_TX_OK;
+> +}
+> +
+> +static void nct6694_canfd_tx_work(struct work_struct *work)
+> +{
+> +	struct nct6694_canfd_priv *priv;
+> +
+> +	priv =3D container_of(work, struct nct6694_canfd_priv, tx_work);
+> +
+> +	nct6694_write_msg(priv->nct6694, REQUEST_CAN_MOD,
+> +			  REQUEST_CAN_CMD10_OFFSET(1),
+> +			  REQUEST_CAN_CMD10_LEN,
+> +			  priv->data_buf);
+> +}
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--6cwye7pcrjvlm26t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcaObkACgkQKDiiPnot
+vG+LQAgAhoMTmPVPW2b961itbbB9oiqWyTkhSh4BodeXFxnDPmkZXIOwf2jfKTkg
+U1rUoJ3PrsRcFjX7xP11xXV0jtNa/CKHpinjDL1P1ftYZEL3Sb3fGAEzT5tWA8ui
+d2AgBRmaEPXfJ4ru5nURHrt8t8XvQw2aVBMVWXQeOkYCGzjXKr1Zc1QMawCRzdCY
+FYppixW1eYbUkR4GC13th38n1p5eM5+AgUJqMipnj1ufTesWAiY1eAw3KFq+h8AW
+uiOqN5+4uRstPyaNzS/e0r8bfKk8s/KxNny0b14ACrO6aBWp9we9wSvC/SLxPJE7
+BgbbQ1zBu5RQVdURF4mPlfvt9z9NKA==
+=amjj
+-----END PGP SIGNATURE-----
+
+--6cwye7pcrjvlm26t--
 
