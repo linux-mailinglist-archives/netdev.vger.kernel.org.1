@@ -1,141 +1,207 @@
-Return-Path: <netdev+bounces-138725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8489B9AEA5C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:27:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8033A9AEA7A
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 17:29:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5B0C1C22AD2
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:27:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 117F01F23ED9
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967A81EC006;
-	Thu, 24 Oct 2024 15:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KcHnmH29"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F631F76A0;
+	Thu, 24 Oct 2024 15:28:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703261EABDF
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 15:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E071F668C
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 15:28:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729783628; cv=none; b=dNfqP+iArx1Syvdn1Ucf5sYRd4Fj8248bUgswYOnAlYLIwibeAE0ulYzBuC3C22wUh2lW/eZsatq6sCuJcVygf3aVXSpk3smlvCp5ZTe+Ckp1rSf909Hv9qddrQcAhIDRfmLI1tT2musI/QTSKoEjGbobOPxT+o2GQp1Hqb0USo=
+	t=1729783738; cv=none; b=uVWwobJvat1/PEwXycaNzICSg5Td8UitUkj9GL0fDlQXSrllRw9qQSIacvwH3lm3Ct+ucgx7MWVFDQw08pA+i26AX6fKKNJZdLEzPFGVO0QcxfbtwLanYrVuJerC4m99FTP1pahVF5nzyhLlZX+61tYG8pVnJcyfvhBhtJczJhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729783628; c=relaxed/simple;
-	bh=104Vhor7ZYpfQ65jwmwwWPHwxqkG4KJ8b/4ibDgqmM0=;
+	s=arc-20240116; t=1729783738; c=relaxed/simple;
+	bh=LKBaP9w6Uf0ZW0ufuHdlIFhtJcqlyUWbO2EgFOCBNPQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f2n74qvARhgzUXJIyqOSlaVnmjMnZh/D4CbL3svvo+1/mOh6FnXfBZxGTQdQAmPMiHr4YN9HCmaTg3o4suybFAeyz0jpGXfGt77K2jvNszZwOrEW+8iO0eL9ycm2HNfyXxBDFHGMDjpTQ7hshUJ2rb/MJC4fl/iv5kmZUCY0bzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KcHnmH29; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59788C4CEC7;
-	Thu, 24 Oct 2024 15:27:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729783628;
-	bh=104Vhor7ZYpfQ65jwmwwWPHwxqkG4KJ8b/4ibDgqmM0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KcHnmH29ZwqO/tsiWi67RZTNIzk/6UgPnOxILrBDZPSVBXsUeA7SRLKCTjkQ/EgtN
-	 2SwQXUpD2Yx/U504tfuKu7weMeGoAHGPY5C+HpugVeAstpwtX2dOZE1P3spRQD3Y6E
-	 RLcP2fV5on74oD3xxeQomaW3LFlKHOZOMwREPbRYGTrLHAq6dVtOq/1jk8waouwBbx
-	 oJHpJgiCb/PnI3adhng74gzHFu06Bbb1vbSdO/GfydjkSthW+FvcBbhfQ8INuaNbBs
-	 zqEumK4N2QY5zeITtuWmLhuaIy0DF0lMvBwAkeNyC7LQxSmP0YjXxubmzxEJme9Bwu
-	 d7xPRsFAQ4TzA==
-Date: Thu, 24 Oct 2024 16:27:04 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
-Cc: Rasesh Mody <rmody@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] bna: Fix return value check for debugfs create APIs
-Message-ID: <20241024152704.GZ1202098@kernel.org>
-References: <20241023080921.326-1-thunder.leizhen@huawei.com>
- <20241023080921.326-2-thunder.leizhen@huawei.com>
- <20241024121325.GJ1202098@kernel.org>
- <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=K7S9jVyX03lTfqxkCQaUwPh6E7IOwXu/NFh9KsxuiFMz8+/OOmuS9lXyCUJGjSbZdYcAl9CT1y0okY89N3gwrTr3NmBJhsKkftzLyuURjOyiZDZvrAsovknfwPRbc8tH6MfO9lcYplWaSJG+AXif1FKpUHdGVSlzwxVEkvZK8A4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t3zl3-0005Dr-DK; Thu, 24 Oct 2024 17:28:17 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t3zl2-000Djr-2N;
+	Thu, 24 Oct 2024 17:28:16 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 488FC35DE79;
+	Thu, 24 Oct 2024 15:28:16 +0000 (UTC)
+Date: Thu, 24 Oct 2024 17:28:15 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
+Message-ID: <20241024-marvellous-brainy-anteater-f61302-mkl@pengutronix.de>
+References: <20241024085922.133071-1-tmyu0@nuvoton.com>
+ <20241024085922.133071-5-tmyu0@nuvoton.com>
+ <20241024-majestic-chowchow-from-wonderland-096eb4-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="h6dfqpkeuoasgop3"
 Content-Disposition: inline
-In-Reply-To: <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
+In-Reply-To: <20241024-majestic-chowchow-from-wonderland-096eb4-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Oct 24, 2024 at 09:26:30PM +0800, Leizhen (ThunderTown) wrote:
-> 
-> 
-> On 2024/10/24 20:13, Simon Horman wrote:
-> > On Wed, Oct 23, 2024 at 04:09:20PM +0800, Zhen Lei wrote:
-> >> Fix the incorrect return value check for debugfs_create_dir() and
-> >> debugfs_create_file(), which returns ERR_PTR(-ERROR) instead of NULL
-> >> when it fails.
-> >>
-> >> Commit 4ad23d2368cc ("bna: Remove error checking for
-> >> debugfs_create_dir()") allows the program to continue execution if the
-> >> creation of bnad->port_debugfs_root fails, which causes the atomic count
-> >> bna_debugfs_port_count to be unbalanced. The corresponding error check
-> >> need to be added back.
-> > 
-> > Hi Zhen Lei,
-> > 
-> > The documentation for debugfs_create_dir states:
-> > 
-> >  * NOTE: it's expected that most callers should _ignore_ the errors returned
-> >  * by this function. Other debugfs functions handle the fact that the "dentry"
-> >  * passed to them could be an error and they don't crash in that case.
-> >  * Drivers should generally work fine even if debugfs fails to init anyway.
-> > 
-> > Which makes me wonder why we are checking the return value of
-> > debugfs_create_dir() at all. Can't we just take advantage of
-> > it not mattering, to debugfs functions, if the return value
-> > is an error or not?
-> 
-> Do you want to ignore all the return values of debugfs_create_dir() and debugfs_create_file()?
-> "bna_debugfs_root = debugfs_create_dir("bna", NULL);" and debugfs_create_file() is OK.
-> I've carefully analyzed the current code, and "bnad->port_debugfs_root = debugfs_create_dir(...);"
-> is also OK for now.
 
-What I'm saying is that it is unusual to depend on the return value of
-debugfs_create_dir() for anything. And it would be best to avoid doing so.
+--h6dfqpkeuoasgop3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
+MIME-Version: 1.0
 
-But perhaps that isn't possible for some reason?
+On 24.10.2024 14:12:44, Marc Kleine-Budde wrote:
+> Hello,
+>=20
+> thanks for your contribution. It seems to me that there is no proper
+> TX-flow control and I have some questions.
+>=20
+> On 24.10.2024 16:59:17, Ming Yu wrote:
+>=20
+> [...]
+>=20
+> > +static netdev_tx_t nct6694_canfd_start_xmit(struct sk_buff *skb,
+> > +					    struct net_device *ndev)
+> > +{
+> > +	struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > +	struct nct6694 *nct6694 =3D priv->nct6694;
+> > +	struct canfd_frame *cf =3D (struct canfd_frame *)skb->data;
+> > +	struct net_device_stats *stats =3D &ndev->stats;
+> > +	int can_idx =3D priv->can_idx;
+> > +	u32 txid =3D 0;
+> > +	int i;
+> > +	unsigned int echo_byte;
+> > +	u8 data_buf[REQUEST_CAN_CMD10_LEN] =3D {0};
+> > +
+> > +	if (can_dropped_invalid_skb(ndev, skb))
+> > +		return NETDEV_TX_OK;
+> > +
+> > +	/*
+> > +	 * No check for NCT66794 because the TX bit is read-clear
+> > +	 * and may be read-cleared by other function
+> > +	 * Just check the result of tx command.
+> > +	 */
+>=20
+> Where do you check the result of the TX command?
+>=20
+> > +	/* Check if the TX buffer is full */
+>=20
+> Where's the check if the TX buffer is full?
+>=20
+> > +	netif_stop_queue(ndev);
+> > +
+> > +	if (can_idx =3D=3D 0)
+> > +		data_buf[CAN_TAG_IDX] =3D CAN_TAG_CAN0;
+> > +	else
+> > +		data_buf[CAN_TAG_IDX] =3D CAN_TAG_CAN1;
+> > +
+> > +	if (cf->can_id & CAN_EFF_FLAG) {
+> > +		txid =3D cf->can_id & CAN_EFF_MASK;
+> > +		/*
+> > +		 * In case the Extended ID frame is transmitted, the
+> > +		 * standard and extended part of the ID are swapped
+> > +		 * in the register, so swap them back to send the
+> > +		 * correct ID.
+> > +		 */
+> > +		data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_EFF;
+> > +	} else {
+> > +		txid =3D cf->can_id & CAN_SFF_MASK;
+> > +	}
+> > +
+> > +	set_buf32(&data_buf[CAN_ID_IDX], txid);
+> > +
+> > +	data_buf[CAN_DLC_IDX] =3D cf->len;
+> > +
+> > +	if ((priv->can.ctrlmode & CAN_CTRLMODE_FD) && can_is_canfd_skb(skb)) {
+> > +		data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_FD;
+> > +		if (cf->flags & CANFD_BRS)
+> > +			data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_BRS;
+> > +	}
+> > +
+> > +	if (cf->can_id & CAN_RTR_FLAG)
+> > +		data_buf[CAN_FLAG_IDX] |=3D CAN_FLAG_RTR;
+> > +
+> > +	/* set data to buf */
+> > +	for (i =3D 0; i < cf->len; i++)
+> > +		data_buf[CAN_DATA_IDX + i] =3D *(u8 *)(cf->data + i);
+> > +
+> > +	can_put_echo_skb(skb, ndev, 0, 0);
+> > +
+> > +	memcpy(priv->data_buf, data_buf, REQUEST_CAN_CMD10_LEN);
+> > +	queue_work(nct6694->async_workqueue, &priv->tx_work);
+> > +
+> > +	stats->tx_bytes +=3D cf->len;
+> > +	stats->tx_packets++;
+> > +	echo_byte =3D can_get_echo_skb(ndev, 0, NULL);
+> > +
+> > +	netif_wake_queue(ndev);
+>=20
+> How do you make sure that the tx_work has finished?
+> Once you wake the queue, the xmit function can be called again. If your
+> tx_work has not finished, you'll overwrite the priv->data_buf.
 
-> 
-> bnad_debugfs_init():
-> 	bnad->port_debugfs_root = debugfs_create_dir(name, bna_debugfs_root);	//IS_ERR() if fails
-> (1)
-> 	atomic_inc(&bna_debugfs_port_count);
-> 
-> bnad_debugfs_uninit():
-> (2)	if (bnad->port_debugfs_root)						//It still works when it's IS_ERR()
-> 		atomic_dec(&bna_debugfs_port_count);
-> 
-> 	if (atomic_read(&bna_debugfs_port_count) == 0)
-> 		debugfs_remove(bna_debugfs_root);
-> 
-> If we want the code to be more robust or easier to understand, it is better
-> to modify (1) and (2) above as follows:
-> (1) if (IS_ERR(bnad->port_debugfs_root))
-> 	return;
-> (2) if (!IS_ERR_OR_NULL(bnad->port_debugfs_root))
-> 
-> > 
-> >> Fixes: 4ad23d2368cc ("bna: Remove error checking for debugfs_create_dir()")
-> >> Fixes: 7afc5dbde091 ("bna: Add debugfs interface.")
-> >> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
-> > 
-> > ...
-> > .
-> > 
-> 
-> -- 
-> Regards,
->   Zhen Lei
-> 
+Do you get a CAN TX complete message/IRQ from your device?
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--h6dfqpkeuoasgop3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcaZ4kACgkQKDiiPnot
+vG974Qf+LEKGXgXPxMXrYiiOQHJWjs4Mt5jzVCCkFhLgwCl8AQstWmg8VVtGrhlR
+8MQ//KYGUjpOgf2HMBzm8tVduk1AlHw4qUpDfn94AzF2bs+r16LSuUK6Kr1xYM6Q
+P+XQuSaK3J7/zuPGu9z0zk2i77GN88LCBecdUKHVEbNAIa0LlYHKng/ixeIYFdGY
+mpOHQYFkT9kJIzHxFmjd8IqfFWsVUStEvamVz7/ilHigCKo2SseU674xN2MDKIFE
++2YwADjK1B4X4Mjpga9S5Ckf/t6h3kgh5m8K4zGGYjX7jxNcbgMeD0FD0jyIar9l
+moJeeldIOCwdGU3wR1vGneNUjJEhlg==
+=Ce8N
+-----END PGP SIGNATURE-----
+
+--h6dfqpkeuoasgop3--
 
