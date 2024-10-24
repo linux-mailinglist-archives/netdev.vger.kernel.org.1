@@ -1,113 +1,156 @@
-Return-Path: <netdev+bounces-138873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF869AF476
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 23:12:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5195F9AF478
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 23:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF9631F2238C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 21:12:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42C691C2188B
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 21:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C431321790E;
-	Thu, 24 Oct 2024 21:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6FE218D73;
+	Thu, 24 Oct 2024 21:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pgCQwu2k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eF5NObvb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A815F2178EA
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 21:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BE8218D6B;
+	Thu, 24 Oct 2024 21:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729804286; cv=none; b=ezKcjiiFrkRxNDublCsx/JWDKEnMpm/wJOeuPPsx6WfoyrKlJzLqJ99jFDcGKYWKDQ9+IHYCLPXjUCKidIIup0Rq5u2d33REXUFlrhpAh+taJrtbLlUDgBJ3yrfYIeQ8YKk/5qQ/pbjoQNtUtC1A3Me/1uUKLb7TQsU3LnNhT1I=
+	t=1729804288; cv=none; b=pY3CW80W/CFVFoki58eZF77x/8uW0/A+VTWhrV1tq80DiwWR636d8QbcmddrENGPjTlIijsHY19oHLrnnMYg0dvPrPH3X0HJhT/Nc4VD3qU1mlZaLUanW//egbEiyjZlDvwGs9uujszVRhmY2676fgJTYAfOxPaKnpSPbpR2zYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729804286; c=relaxed/simple;
-	bh=yMbiVa6MxBi8SIH7Jh+s9NpwcvOveX//Z97Dk2oQt94=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NLyCCdDqt/+85JpkZlzEZ9EN7tl6g+XXxax7AmNg8tPSotICUjQ+9TkuExMoc/a71K6Qp/JYlduJtkTJwCtvSfOX0u4YMOTpnNiangaKoCpOOBXNW7aWMiwg/ibMtUxGNEJ1iOiMGHZ9NYeSKOUjDtbAuvCSVRGrmlx3CPB5csY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pgCQwu2k; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a93c1cc74fdso179556966b.3
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729804283; x=1730409083; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yMbiVa6MxBi8SIH7Jh+s9NpwcvOveX//Z97Dk2oQt94=;
-        b=pgCQwu2kDGw4WFELaWum4uv+I3HzCnJXRAsnEhWvQpDMMWmCLrglv3ieNEpWKQLUTr
-         miH6qiFYrQed/npUZ5VG+y5iO7lrvAQ+m2LiA0PFbt+yGGdPo2KB9LlE47KBJ6lJWaA2
-         ZHXp0Xazs0kko0E1peauc9LbKWvttnpS2CvmquwMsO1jvT9XbId3j9ZAkwPs1M7AvSsI
-         rrW0fQfKISpnCX87nE5ZqhU17j62JyY36Yg9jlGJHDnW3EcQRyn0I+y1lV9CQfPRK4OW
-         Mx8k+EwU0bZr1wcpuWUJxM77NtXOWBo+jteosqVXV/Xwrp0A1znfzwIR7T2ZcES/yXKF
-         B1BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729804283; x=1730409083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yMbiVa6MxBi8SIH7Jh+s9NpwcvOveX//Z97Dk2oQt94=;
-        b=rJXjtNtBDyQBtzMQdK2Qa6jLnx/4otewII1CrjMVdFBLcNUw10Y1rKzfwfduKrCJmc
-         knoXdOIUdG018m4QvbWiC9Ob4ouE6v4gEO9BfVz5Mx2fAo8MWBuu5JSb18Jhwp++JS35
-         7h5HsCjpK2hk9Mii85wgkWS75eWVHreWPKHAEbmLIT8/4tCFgthODnoHB/k9ZnlkxWiL
-         mUbR2YDppvrEKcmDlHjAfbVZKv/d41GQ7xNWpWy9AXs7yVCsXsIHdDQXwG3RR3zs5LDu
-         uZVYfGgtCaCRZXlwChmGA/ye4G0oJqDpURrpUAb1wrXKyLHmAuJH5s8QyZpELKSg0a/t
-         uOxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWK+s12XpWT3kH6WRWkMN2SsytMu901Niu34TaF6Gc8J6QjYAec6nu6C4QGnNTm7JQpvxGx/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZIeFzl/aX6miiSXqm/LNaJyD9unWx5vnh88pbYAmAPAHeQOz8
-	RNgvrf3z1H4uS2zJ0EwbJeOfDGykVlDfAIXbuq5u14vjlEhJEPtOY7asIG1vUNtidSE/GBR1gs7
-	EvxV97Hs7Wzcs+mlWopuyHAaHWZGpmkpiNMs=
-X-Google-Smtp-Source: AGHT+IF36IipaF0Apyziua1nDu2qSOpHLIz9jwkRDHpQ2hX3c3T/iEQCcyCPryciyreYm9HN3Sj5EFy2jfOVqmuqi+8=
-X-Received: by 2002:a17:907:9805:b0:a9a:673f:4dcc with SMTP id
- a640c23a62f3a-a9abf889e9cmr717378666b.22.1729804282544; Thu, 24 Oct 2024
- 14:11:22 -0700 (PDT)
+	s=arc-20240116; t=1729804288; c=relaxed/simple;
+	bh=qQQ2lofL8ErXlVJyVkxMF6DjGz27PDYgLr96a3mHVqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dkeBkPOQJN9LgpsrRHZ8D9/1oM/jBiNFlRsxf3KIJA7/+LOxS6tsSmMCOCeY5VpP5Dc2MM47/qtSOmUrh2cMuLXvIocpgojNIkAGceLcjYH4MBzbJ4enEWQzDbhY3E/wpAyHIkXJvQOVgUEAkVmdB+DgDirPOFIo2ZiVOJB8dZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eF5NObvb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CEBC4CEC7;
+	Thu, 24 Oct 2024 21:11:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729804287;
+	bh=qQQ2lofL8ErXlVJyVkxMF6DjGz27PDYgLr96a3mHVqk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eF5NObvb9HPWXTjcRLoFpLFIt5A+QC7aR2J38Fv2syMcG37GGMnuMeESXCA38OzZD
+	 dmd5zKmxAdCSrFnEZTg/h606f8Z1npc3j4ge5zegnJk+mJ3K7RCXu9R5DVjPWUyVbV
+	 oY9S2jBZONtEysjgFimkout5CZsoynsjcPypKI9xWlHdeUwO5eHZZK/7keahDamOst
+	 IQdWAo9VeIDeMeqMZa/HpfGcswefDUdZ3uwMnyNgULOscgKZsXOH9V+VRH9pRhHS4C
+	 7qMrc1ImxYvaCGmvUch5EEQbDfHuaQXc1P4prvfTbpblNGJSAQz4UPPMZt7xf8feF1
+	 162hsDKT79PvA==
+Date: Thu, 24 Oct 2024 15:11:24 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH v2 1/4][next] uapi: socket: Introduce struct sockaddr_legacy
+Message-ID: <23bd38a4bf024d4a92a8a634ddf4d5689cd3a67e.1729802213.git.gustavoars@kernel.org>
+References: <cover.1729802213.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-0-554456a44a15@linutronix.de>
- <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-7-554456a44a15@linutronix.de>
-In-Reply-To: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-7-554456a44a15@linutronix.de>
-From: John Stultz <jstultz@google.com>
-Date: Thu, 24 Oct 2024 14:11:11 -0700
-Message-ID: <CANDhNCrpOGnNXg0Q5QtWi3EzoyB=nO4BNqSk=oL5P-Qqy+301w@mail.gmail.com>
-Subject: Re: [PATCH v2 07/25] timekeeping: Move shadow_timekeeper into tk_core
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Miroslav Lichvar <mlichvar@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Christopher S Hall <christopher.s.hall@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1729802213.git.gustavoars@kernel.org>
 
-On Wed, Oct 9, 2024 at 1:29=E2=80=AFAM Anna-Maria Behnsen
-<anna-maria@linutronix.de> wrote:
->
-> From: Thomas Gleixner <tglx@linutronix.de>
->
-> From: Thomas Gleixner <tglx@linutronix.de>
->
-> tk_core requires shadow_timekeeper to allow timekeeping_advance() updatin=
-g
-> without holding the timekeeper sequence count write locked. This allows t=
-he
-> readers to make progress up to the actual update where the shadow
-> timekeeper is copied over to the real timekeeper.
->
-> As long as there is only a single timekeeper, having them separate is
-> fine. But when the timekeeper infrastructure will be reused for per ptp
-> clock timekeepers, shadow_timekeeper needs to be part of tk_core.
->
-> No functional change.
->
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+We are currently working on enabling the -Wflex-array-member-not-at-end
+compiler option. This option has helped us detect several objects of
+the type `struct sockaddr` that appear in the middle of composite
+structures like `struct rtentry`, `struct compat_rtentry`, and others:
 
-Acked-by: John Stultz <jstultz@google.com>
+include/uapi/linux/wireless.h:751:33: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/wireless.h:776:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/wireless.h:833:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/wireless.h:857:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/wireless.h:864:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/route.h:33:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/route.h:34:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/route.h:35:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/if_arp.h:118:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/if_arp.h:119:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/if_arp.h:121:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/if_arp.h:126:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/uapi/linux/if_arp.h:127:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/net/compat.h:34:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+include/net/compat.h:35:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+In order to fix the warnings above, we introduce `struct sockaddr_legacy`.
+The intention is to use it to replace the type of several struct members
+in the middle of composite structures, currently of type `struct sockaddr`.
+
+These middle struct members are currently causing thousands of warnings
+because `struct sockaddr` contains a flexible-array member, introduced
+by commit b5f0de6df6dce ("net: dev: Convert sa_data to flexible array in
+struct sockaddr").
+
+The new `struct sockaddr_legacy` doesn't include a flexible-array
+member, making it suitable for use as the type of middle members
+in composite structs that don't really require the flexible-array
+member in `struct sockaddr`, thus avoiding -Wflex-array-member-not-at-end
+warnings.
+
+As this new struct will live in UAPI, to avoid breaking user-space code
+that expects `struct sockaddr`, the `__kernel_sockaddr_legacy` macro is
+introduced. This macro allows us to use either `struct sockaddr` or
+`struct sockaddr_legacy` depending on the context in which the code is
+used: kernel-space or user-space.
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ include/uapi/linux/socket.h | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/include/uapi/linux/socket.h b/include/uapi/linux/socket.h
+index d3fcd3b5ec53..2e179706bec4 100644
+--- a/include/uapi/linux/socket.h
++++ b/include/uapi/linux/socket.h
+@@ -35,4 +35,32 @@ struct __kernel_sockaddr_storage {
+ #define SOCK_TXREHASH_DISABLED	0
+ #define SOCK_TXREHASH_ENABLED	1
+ 
++typedef __kernel_sa_family_t    sa_family_t;
++
++/*
++ * This is the legacy form of `struct sockaddr`. The original `struct sockaddr`
++ * was modified in commit b5f0de6df6dce ("net: dev: Convert sa_data to flexible
++ * array in struct sockaddr") due to the fact that "One of the worst offenders
++ * of "fake flexible arrays" is struct sockaddr". This means that the original
++ * `char sa_data[14]` behaved as a flexible array at runtime, so a proper
++ * flexible-array member was introduced.
++ *
++ * This caused several flexible-array-in-the-middle issues:
++ * https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wflex-array-member-not-at-end
++ *
++ * `struct sockaddr_legacy` replaces `struct sockaddr` in all instances where
++ * objects of this type do not appear at the end of composite structures.
++ */
++struct sockaddr_legacy {
++        sa_family_t     sa_family;      /* address family, AF_xxx       */
++        char            sa_data[14];    /* 14 bytes of protocol address */
++};
++
++#ifdef __KERNEL__
++#	define __kernel_sockaddr_legacy		sockaddr_legacy
++#else
++#	define __kernel_sockaddr_legacy		sockaddr
++#endif
++
++
+ #endif /* _UAPI_LINUX_SOCKET_H */
+-- 
+2.34.1
+
 
