@@ -1,74 +1,50 @@
-Return-Path: <netdev+bounces-138799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 320E79AEF2C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:06:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 913739AEF45
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 20:11:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF97A1F22BDE
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:06:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 486A11F215C7
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0562003BD;
-	Thu, 24 Oct 2024 18:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94912003B3;
+	Thu, 24 Oct 2024 18:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R5og7cI2"
+	dkim=pass (2048-bit key) header.d=notyourfox.coffee header.i=@notyourfox.coffee header.b="JHSUzjKl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail.notyourfox.coffee (mail.notyourfox.coffee [92.63.193.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9593E1FF05E;
-	Thu, 24 Oct 2024 18:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68331FC7F6;
+	Thu, 24 Oct 2024 18:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.63.193.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729793187; cv=none; b=bizJ/p/gR75mDprGjVqhGDbNdHQ2n8mBBJLMwiiQCk8ivPI67YwX631UQp7cE5S5VVN6ugbdN+h+rdCfoQD3ZatNSCJEIs+MRee9pzekM3k5CN90VpZhDScipWhF+vkJh6SPOmRD36QcyiGTjcly6aEoI7wlc5XRTIdn+OEQGns=
+	t=1729793454; cv=none; b=jvbsQZLXfGJUShLlZpRBJplMyAnli7Pn1xPZzLSddIz9qtwwAFVv5/5jXyCeH7WCWcp8GsYv0sG4VQCIvyo/LKiAcG5ikNKThq2ypSf0UmC5gh2CWQ9W+wmzujJgbvD8NLtyWx3oN44nBJlayLB7muNC0KlzFFOxuePzDOFKRfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729793187; c=relaxed/simple;
-	bh=vOtfYpYAZcfPD3kzNtXenwXoxBDyVzXhYwbQuTZbIVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iv2QAoWLdfIfJQrhd6GQuoPOn8cj18AExPOrXUXA0SxDRgCZxDvf6P/oa8aLHNBTOHfUuVDsNCj4n7fvoofBlSoBAtpYwvzjuV1loFbgXeDJ3TgzfqhhI30XVkZZ2eCCFT20nDpEuqh8ZMY2F4Eo4BFXbPH/0PeXz1TTAlI2/JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R5og7cI2; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3e5fcf464ecso862799b6e.0;
-        Thu, 24 Oct 2024 11:06:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729793184; x=1730397984; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9UaViCTVHeE4554625O7z0qmjZeB3yLuwP4tPJC9Occ=;
-        b=R5og7cI26bYgfLuadV0w8l8jC7IFnNnBKGGhaR+WClt7Izm/VSv7Kv9apjwPJYxmFH
-         bPrLJJa8TJC1/hFitV3ILfzvLGxH70Q/G0OxDzT3ia/QBwt0tRQdlT2XXtp1EpHaxyIr
-         T9saigkZKekDoXAch9kzVjNduDP+57PrritC8BNo5oc8pgPZoOqvo9ySTIlAT7gTVcjf
-         H46vTtfsdbGPNqW2F+WdnN/SZLP/KooCPLIoQslAmbBRY7DSg6dZSUjOYyBWJhFdWoOj
-         aBmFlAXV6ncfhcdPCyorkU47yB6GH+3VaPKWNs9r8I8GM8pzGFmfgC9ERScQ5oBPBPUV
-         5efg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729793184; x=1730397984;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9UaViCTVHeE4554625O7z0qmjZeB3yLuwP4tPJC9Occ=;
-        b=gBWX+gkEE1SmdFUOXfTbHzQnD9EdkwRHMp92UYEt7Ee/NkJUQz1IaH5LMFYECpOdCc
-         4cghK/axlH+A94ZkbpFJqkc/70+guyuNtNmdTOA4/LtH7Y2wkQQw+E2O0U8o5XIkVXQX
-         tQ0n03Yd67knVxomMO67ryDdQKiDaKoAuiFyDLRppqdVp2Sq9xswuYSL5EHXmKSNwME6
-         FHzCt7AQBz1ItuMmWAkEzRBK1AsAfmtpas2A5RvuHuVEHwVwEPdPPwFDe0nadWWfvh5D
-         R+/cbDLtprxDcWEaVtyd/iLHWqZI4mAp66rh9ESR1p9ij3DbjLmtkFfkUYXd0lEzT3ym
-         NH9g==
-X-Forwarded-Encrypted: i=1; AJvYcCVfaurzhHAWjlyQ96EX/pspJLfYP45DcAkosGuPQqpN8mNFEIlS2oHi4T3ok9qghEOKReFTl/DA@vger.kernel.org, AJvYcCWLT7pKkQRYm9GyFvOhCmWIPUHeFA/g6sNsbHUtmkCslD6dUPYP9RL1Jj7hbGU6miH0LgYQjz5LIFVm91tI@vger.kernel.org, AJvYcCXkDrz1/nzp5HOAT+zBRuCMOu9NInMbK/C54J4kCtZhm7t/H9Ie0FVKNOgGrWiOG/4C4UxK2TpTvyvrXI2J@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1z/H/lkjpilBFDTewSPyN8C5ndl95xZg2ymJKeIS92cSI+xl8
-	uMArussDy7NFvpMvc4RlnrACnRhnb8NCA784bgbx0FGOkJkg9lLs
-X-Google-Smtp-Source: AGHT+IGRgDjaOVRo4RzC8Gl7ibseB03w21ZI0dmvnwrOI7OKAXZTah2SVc2E7tRapN9D+omZhczv6A==
-X-Received: by 2002:a05:6808:1309:b0:3e6:1dcc:e1fa with SMTP id 5614622812f47-3e62cbfd427mr2713134b6e.47.1729793184598;
-        Thu, 24 Oct 2024 11:06:24 -0700 (PDT)
-Received: from [192.168.1.22] (syn-070-114-247-242.res.spectrum.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3e61035f185sm2319032b6e.48.2024.10.24.11.06.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2024 11:06:24 -0700 (PDT)
-Message-ID: <e178ef4d-3234-4c11-84f5-0a454d198f15@gmail.com>
-Date: Thu, 24 Oct 2024 13:06:22 -0500
+	s=arc-20240116; t=1729793454; c=relaxed/simple;
+	bh=4HaM2tprLpARFSOFiAD1IewWveAq50xA4izcD+Ol1hg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=F/19doZ4IYXXulnHQ4taEYkLYGFE63YNrEi2RX0OKR72gmYEnSQVs+p2GJ8QkwGLlYRR0C2iF02XxpMyqge8fU+SkvG7afPqCQTm94mrIGc1+forNCtUer098veSHlzfPHEZlbtNZyJvQb61kjdbFKiHO8hTuZm4xQzhtgT9dxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=notyourfox.coffee; spf=pass smtp.mailfrom=notyourfox.coffee; dkim=pass (2048-bit key) header.d=notyourfox.coffee header.i=@notyourfox.coffee header.b=JHSUzjKl; arc=none smtp.client-ip=92.63.193.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=notyourfox.coffee
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=notyourfox.coffee
+DKIM-Signature: a=rsa-sha256; bh=zD/MvoTUjjchDlHO31PqaPi5FVCTTnWec43Dr2sc5uE=;
+ c=relaxed/relaxed; d=notyourfox.coffee;
+ h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:In-Reply-To:Message-Id:Message-Id:References:References:Autocrypt:Openpgp;
+ i=@notyourfox.coffee; s=mail; t=1729793394; v=1; x=1730225394;
+ b=JHSUzjKls5Wm839qvhA6nxJdgjfFHYyuIMcFJC4py2Th5/lRpBJL87itZiTg0D7g72byla2/
+ RGt9j0YQZcrrSnTMUigTkonLFjKQ1wty2LN+88I2MCPC3PFacLmQ6qZhW6CFbZFxlrquYkL2uWA
+ 8n/E59Ut+LmSKvFcVYkl9wkkdRh8MLTO73De9KCAPILQIWuDQToZmui76W//DdF1v3lfmvIwrLC
+ 00BhABRp1gebdHeZoI70ehEYTqlEw8KiEoYc1vSAp1tKTck0QShQZ9gBb/1Ia55r4kKsUVkpN30
+ gJICGzIIOhLel8x+rFvTjeBr9jYMQEnr6fmrnHA+6Rz6Q==
+Received: by mail.notyourfox.coffee (envelope-sender
+ <contact@notyourfox.coffee>) with ESMTPS id 1345da47; Thu, 24 Oct 2024
+ 18:09:54 +0000
+Message-ID: <c58172db-e3cc-488d-baa6-f095588a8771@notyourfox.coffee>
+Date: Thu, 24 Oct 2024 21:09:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,39 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 10/10] net: qrtr: mhi: Report endpoint id in sysfs
-To: Chris Lew <quic_clew@quicinc.com>, netdev@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, Andy Gross <agross@kernel.org>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241018181842.1368394-1-denkenz@gmail.com>
- <20241018181842.1368394-11-denkenz@gmail.com>
- <479ef16f-1711-4b16-8cad-c06fc5b42da0@quicinc.com>
+To: vladimir_putin_rus@kremlin.ru
+Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
+ dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com,
+ geert@linux-m68k.org, gregkh@linuxfoundation.org,
+ hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru, jeffbai@aosc.io,
+ kexybiscuit@aosc.io, linux-alpha@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-spi@vger.kernel.org, manivannan.sadhasivam@linaro.org,
+ mattst88@gmail.com, netdev@vger.kernel.org, nikita@trvn.ru,
+ ntb@lists.linux.dev, patches@lists.linux.dev, richard.henderson@linaro.org,
+ s.shtylyov@omp.ru, serjk@netup.ru, shc_work@mail.ru,
+ torvalds@linux-foundation.org, torvic9@mailbox.org,
+ tsbogend@alpha.franken.de, v.georgiev@metrotek.ru, wangyuli@uniontech.com,
+ wsa+renesas@sang-engineering.com, xeb@mail.ru
+References: <20241024140353.384881-1-vladimir_putin_rus@kremlin.ru>
+Subject: Re: [PATCH 0/2] MAINTAINERS: Remove few Chinese Entries
 Content-Language: en-US
-From: Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <479ef16f-1711-4b16-8cad-c06fc5b42da0@quicinc.com>
+From: NotYourFox <contact@notyourfox.coffee>
+In-Reply-To: <20241024140353.384881-1-vladimir_putin_rus@kremlin.ru>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Chris,
+And what were you trying to accomplish?
 
->> @@ -72,6 +72,16 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, 
->> struct sk_buff *skb)
->>       return rc;
->>   }
->> +static ssize_t endpoint_show(struct device *dev,
->> +                 struct device_attribute *attr, char *buf)
->> +{
->> +    struct qrtr_mhi_dev *qdev = dev_get_drvdata(dev);
->> +
->> +    return sprintf(buf, "%d\n", qdev->ep.id);
-> 
-> %u might be more appropriate because the endpoint id is stored as a u32
+On 10/23/24 1:45 PM, Linus Torvalds wrote:
+ > Ok, lots of Russian trolls out and about.
 
-Nice catch.  I'll fix it for the next version.
+You just made his statement valid by showing yourself off. Thanks for no 
+help at all.
 
-Regards,
--Denis
+---
+
+И что вы пытались этим сделать?
+
+On 10/23/24 1:45 PM, Linus Torvalds wrote:
+ > Ok, lots of Russian trolls out and about.
+
+Вы только сделали его высказывание верным, решив выставить это напоказ. 
+Спасибо за абсолютный ноль помощи.
+
 
