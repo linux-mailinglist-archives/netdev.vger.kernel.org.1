@@ -1,136 +1,217 @@
-Return-Path: <netdev+bounces-138764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C8E9AECC1
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:56:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FA139AECE5
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A81041C2326F
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:56:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F078DB22D69
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60751F81B3;
-	Thu, 24 Oct 2024 16:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4D91F9ECE;
+	Thu, 24 Oct 2024 16:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="NvI2LNsb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdRrAud4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4BE1F80C3
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 16:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D95A1F8920;
+	Thu, 24 Oct 2024 16:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729788971; cv=none; b=jYLZeCSFyOcVn17P5l9oZ4Sbp79obGjW4gLUp/1SpBA/mvfWjefRl4rwj1HfGOKdSNuyJheGsSga2a4SMBvSh26UbolQVYSFVYBEuYZBFIOYeSRphXP4q/RbvB76j5bmPu/0S9SvXaPMFHq7UM3q82OqKDy4D867g0P0nNS2RCI=
+	t=1729789125; cv=none; b=uwRDB8gQIlo3x5D8qDL1jFQWoRbNGG60NJsft5H0823WzbcKZdB6wNN5vxVeww6Hxkl/1Pg+CdAdh3yyCyGoairGo7wHyhu5EAer7fDvOt3J+/m/INkY1lXGQaNG3J6dFhDgDqVD5MkmAHsAfQIZW32z67FMq/ZfCF329mEZsUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729788971; c=relaxed/simple;
-	bh=qKqkMGsYmpuy5PSCkQ4EF3lEVszQwWbtNFYJK9p8kao=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r0jAfWC1mAR2910vPxRD82f7d43ZII/zhVPJ6XRY84xcpru8cZoUJlC0HS/1wRQx/wKl9yOkIilDyf/H74QyxmwJ053KZTe3f5qXuz+sivbfhFDw90LO5hmc9ILi8XiXZ0aj435L3GbmSDG3SCg5WIz5AQSi7gXyZZ1ABIys1Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=NvI2LNsb; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b1474b1377so79510585a.2
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 09:56:08 -0700 (PDT)
+	s=arc-20240116; t=1729789125; c=relaxed/simple;
+	bh=LQUqq41rKKi2DZ6ziCnRzGqwgHnRtqlW6CGDMmHRRV0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KGQrBwInP+7O6ZC04BeGBenD9agI/00MRmAD/858NYwn1Hw6qefFKkwusvioK745UQTx0fmpW5jjHJd4PIkx1W8WXFfilymkgzcZNXohV+SnXQ25Kmp1brADGXlsRCBZ3DT4Tim+iieHtM4u2qyZ8zG5vfb9vzWgqEYuhVr6bHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdRrAud4; arc=none smtp.client-ip=209.85.215.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-7ed9c16f687so789336a12.0;
+        Thu, 24 Oct 2024 09:58:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1729788968; x=1730393768; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dPSh3Z+ZTMZDlTdUsv3BdKV7k7VjnJt8nSE7oQ/GPbc=;
-        b=NvI2LNsbV0iUgegw5KTNIJ3+g8i0g7N0g8L3Yyw9fOjZRFoPzfeCKu+DDLX00ykkC3
-         PMXd5vtAAt4rWnV6YadJT/i/8ymM+7m0pXSvocIXNkYrq0eI3rv5UpepRpmPb6Kptj1E
-         SbHkoOqJVgZF7QSGOEn1Zs6Ahal3GAFnqb+PMQPLQ+X5O63hAVwZuwFfWuNAPpkFyglL
-         jwd+Ny+9306zmGMgPRqkhqn6KdEukNKsykAZWAhhHIlqFp3AvZr6qe79lmKy0dWTWH77
-         n9aMMtLL16XB25e2exzTNjCsTXJ/OXJU4Fv/4hVAm/cMJp7ebOvbhAiQrgb6p0z5CVvo
-         m5RQ==
+        d=gmail.com; s=20230601; t=1729789122; x=1730393922; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xfJ8p+8q2+xxwuBNnMevVX62Z8jej5Rz7JLXYkmoeTk=;
+        b=GdRrAud4sBuMip099zZ1gjZUCAcpFpVaf6tUQmzZiB+fqLRR9sWZcb3ta3oMj2CiwY
+         TV4qbu6vYPrZsCnoSTsTV2RmTrBAG1uZ0TP4ioCKkF+Z6KYlIsGQH5UuZCQ1L/TASDEh
+         eUKVB927Xn5mzBkRVawsCap+F2hQ5UhaVPOYhdt0mulXUclspSdwlLLNP3LHQxmHiLQe
+         YFG7mc54BLSYfJtcWt1HrhKUHyn+Krz7HOXtSXiACkumDZ0EXQ/lo601sIOIj9EzNWv8
+         3d2e6LoC/BiHj1Vi0J3FyTJ7+8m++t2/++JKtONXHcmN0LgiRKOGHikuV30EjZyOePvy
+         0r/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729788968; x=1730393768;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dPSh3Z+ZTMZDlTdUsv3BdKV7k7VjnJt8nSE7oQ/GPbc=;
-        b=R1hy1dN6OnkTq+J+HdC4c9RxB8cJYggCDo0I26Zmi0cP74emBVMOlRze18WnBG2V2R
-         YGutHuEjPj+NbHtzdwbaRnFrZauBECKXKjGriHvAkr6sVuRjPPOZM+v8aIcGoRXKYcSL
-         TPjwEM/J0aE/CWFsQKwYkS1vRstlH+ZP1ISv/4z27MorlEj3hJz5TBTsCL35lWgdqJDL
-         zMILjCuPXLpPiy6Q93Il2owm3xiMdaYvsL4K5VSJZ1Q5ynug36kbj2pAUtk6mpEclmhx
-         /ZoRSgudR2rBlt4iA4IZ7Xp2iv6GAK+dddZpSnIsBECPAUHmuF30ywyv7qc+KL6GQDDG
-         +iSA==
-X-Gm-Message-State: AOJu0Yz3tsT7IRvsfxcCkLGTPrLKRXErVfXY8ZU1VhKgz6VHZLa0Jm1f
-	qQqj28I50zLcZqoM+a5iMe3eBBvA6TY0gCteXmeaH/xRHbVHZ+6xOSMS92U5iYEuSxAKSxODTQU
-	=
-X-Google-Smtp-Source: AGHT+IF7eQYrMtAVUppKAeLDMrz3SD35N6qXJSJopnuYFAQi1SBTEN+L8NFbYV0OXaJSZJHIZc2z3A==
-X-Received: by 2002:a05:620a:4691:b0:7b1:4480:5d77 with SMTP id af79cd13be357-7b17e5b41ffmr863779685a.49.1729788967685;
-        Thu, 24 Oct 2024 09:56:07 -0700 (PDT)
-Received: from majuu.waya ([184.146.41.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b165a7624csm504849785a.108.2024.10.24.09.56.06
+        d=1e100.net; s=20230601; t=1729789122; x=1730393922;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xfJ8p+8q2+xxwuBNnMevVX62Z8jej5Rz7JLXYkmoeTk=;
+        b=hOQ2ukPUNmh8YIr7LBkmwc3CYEdxpSn7WAO2Nc8riIteEgG3KbGVNWoyR3AduwjvGk
+         8S4YusAzwX4Lp7kvLgF0E8l04Xg50flTChmwoSe5CxeHVh8qCg6RtFHMZiEmhyKrefeN
+         aIuodW9ON2FIrIa5gCdk4vk3Gk8A6ZCw1TEWSlQ5XfqaFcxd4x1iz7ps7tnaHDTaZkUi
+         s3SwQF3Vbk4F3fSsfhPwZR6/ZLOfAtXe0vq/wuLCZZMatBAQib0+nwBGyvMGANLZxhky
+         H1fUPG7KhSP/7SQAhLp4J3hIK7on2ly0cE4d5jACehwEt95Bn++DtJ92l9XeGPOwsWOC
+         giCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKiGZ96egjcbAUQDKpmXa1AYRQMsthzWB9PC/aB01BBG04BlU8t30QkntRKGsZ1TP3vxP3daZD@vger.kernel.org, AJvYcCUhAdcCLRe9ev1/BvD4IfTM3Ul+Od0QLT7yQCPph/VyTxiohVv2d9Mz5pJPr/NAsLP7IzbVDSqOYOc=@vger.kernel.org, AJvYcCUk05f0jIdFIIWoZWALXr9PcPuS4JHc+28ZX2XF2YO8b5hxOhjxsNwT/JRbZ2QwF7COSNkROuVg1+9m@vger.kernel.org, AJvYcCVgHb6MZvwJoATLBipaEwXFZ3URjzSF4uijAPp+uu7grjwgKHHnN1pVLDP5tVAkLTHtQupt2XaNrRkVvA==@vger.kernel.org, AJvYcCVyJ6SpKy0/TJ9UIc59nEKSohkryFOqxKbPMM6mvROBq8etqKm44z/TG4Z+fX2sScpm0cUs1PiaupqBFg==@vger.kernel.org, AJvYcCW2MpX+vmo3YYA+4ROsl/lMtdQhdc1ZQURUTFvZkYiNP64aGN90cMavBIGYrgm4bG0420o6GQ+P+VLE3DM=@vger.kernel.org, AJvYcCW5ZMrGyK3ezS8lW7OVIjCkco+PZONEiuMwmivG68imGzXYuY+bNIg0mg6LCzik51YMjCSgn9W6pf2n@vger.kernel.org, AJvYcCWALFz59CqB35Em6cM1//ZoXwoBEbS1PIVHzCKXCtfZhh9Q0MckZrN2b4DDDIPHeTAYFXCqGQdxknL+@vger.kernel.org, AJvYcCWdZUvCC2B4wYBkPn6VBXFMm/MdT67uw85l3/TUFiJ8Ge2GAB+sPl0I2FIQLtYYtXRrPKDLfqyNSMhuSFo4@vger.kernel.org, AJvYcCX6uhRMM17fI/xEG4SElr8UaGwjyiFExqNa
+ vztQvB+4Q9GoIC+FC2f1T/f42V2Mgw9qy0ii9VI5u2xDh/pb@vger.kernel.org, AJvYcCX9t8XQzPxCVjCEtf6Nkj6k2+tpWqLtnUgCnO8GqX0d6mFQevHJomF4dpeP26AJt6LMEQ8HQz7GJj//IPqiTkHVPvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQQxMY3x2L2mkXje97qUq2p4abElq9M8zu4r1Y3ViuQWHAMKsb
+	mE3Vg/KbinLNlppjmmWm6mTFBiE/gvcY44DozzKCUVktPo1HPBeQ
+X-Google-Smtp-Source: AGHT+IHkRrL+646WJX5jMNiRVOq7St1d5iL/wDNXUA9UQNOX6Gcj9xqgJzmbGWgDaCdtnMTv+h1KbQ==
+X-Received: by 2002:a05:6a21:4a4c:b0:1d9:175a:c2ba with SMTP id adf61e73a8af0-1d978b0245fmr8971311637.20.1729789122186;
+        Thu, 24 Oct 2024 09:58:42 -0700 (PDT)
+Received: from localhost.localdomain ([240b:4001:20c:6000::1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec132ffdcsm8203615b3a.46.2024.10.24.09.58.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 09:56:07 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: markovicbudimir@gmail.com,
-	victor@mojatatu.com,
-	pctammela@mojatatu.com,
+        Thu, 24 Oct 2024 09:58:41 -0700 (PDT)
+From: Hantong Chen <cxwdyx620@gmail.com>
+To: james.bottomley@hansenpartnership.com
+Cc: ajhalaney@gmail.com,
+	allenbh@gmail.com,
+	andrew@lunn.ch,
+	andriy.shevchenko@linux.intel.com,
+	andy@kernel.org,
+	arnd@arndb.de,
+	bhelgaas@google.com,
+	bp@alien8.de,
+	broonie@kernel.org,
+	cai.huoqing@linux.dev,
+	dave.jiang@intel.com,
 	davem@davemloft.net,
-	edumazet@google.com,
+	dlemoal@kernel.org,
+	dmaengine@vger.kernel.org,
+	dushistov@mail.ru,
+	fancer.lancer@gmail.com,
+	geert@linux-m68k.org,
+	gregkh@linuxfoundation.org,
+	ink@jurassic.park.msu.ru,
+	jdmason@kudzu.us,
+	jiaxun.yang@flygoat.com,
+	keguang.zhang@gmail.com,
+	kory.maincent@bootlin.com,
+	krzk@kernel.org,
 	kuba@kernel.org,
+	linux-edac@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	linux@armlinux.org.uk,
+	linux@roeck-us.net,
+	manivannan.sadhasivam@linaro.org,
+	netdev@vger.kernel.org,
+	nikita.shubin@maquefel.me,
+	nikita@trvn.ru,
+	ntb@lists.linux.dev,
+	olteanv@gmail.com,
 	pabeni@redhat.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net-n] net/sched: stop qdisc_tree_reduce_backlog on TC_H_ROOT
-Date: Thu, 24 Oct 2024 12:55:47 -0400
-Message-Id: <20241024165547.418570-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+	paulburton@kernel.org,
+	robh@kernel.org,
+	s.shtylyov@omp.ru,
+	sergio.paracuellos@gmail.com,
+	shc_work@mail.ru,
+	siyanteng@loongson.cn,
+	tsbogend@alpha.franken.de,
+	xeb@mail.ru,
+	yoshihiro.shimoda.uh@renesas.com
+Subject: Re: linux: Goodbye from a Linux community volunteer
+Date: Thu, 24 Oct 2024 16:56:50 +0000
+Message-ID: <20241024165650.174-1-cxwdyx620@gmail.com>
+X-Mailer: git-send-email 2.47.0.windows.1
+In-Reply-To: <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+References: <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-From: Pedro Tammela <pctammela@mojatatu.com>
-
-In qdisc_tree_reduce_backlog, Qdiscs with major handle ffff: are assumed
-to be either root or ingress. This assumption is bogus since it's valid
-to create egress qdiscs with major handle ffff:
-Budimir Markovic found that for qdiscs like DRR that maintain an active
-class list, it will cause a UAF with a dangling class pointer.
-
-In 066a3b5b2346, the concern was to avoid iterating over the ingress
-qdisc since its parent is itself. The proper fix is to stop when parent
-TC_H_ROOT is reached because the only way to retrieve ingress is when a
-hierarchy which does not contain a ffff: major handle call into
-qdisc_lookup with TC_H_MAJ(TC_H_ROOT).
-
-In the scenario where major ffff: is an egress qdisc in any of the tree
-levels, the updates will also propagate to TC_H_ROOT, which then the
-iteration must stop.
-
-Fixes: 066a3b5b2346 ("[NET_SCHED] sch_api: fix qdisc_tree_decrease_qlen() loop")
-Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
-Suggested-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Tested-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-
- net/sched/sch_api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 2eefa4783879..a1d27bc039a3 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -791,7 +791,7 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
- 	drops = max_t(int, n, 0);
- 	rcu_read_lock();
- 	while ((parentid = sch->parent)) {
--		if (TC_H_MAJ(parentid) == TC_H_MAJ(TC_H_INGRESS))
-+		if (parentid == TC_H_ROOT)
- 			break;
- 
- 		if (sch->flags & TCQ_F_NOPARENT)
--- 
-2.34.1
-
+> If you haven't heard of Russian sanctions yet, you should try to read=0D
+> the news some day.  And by "news", I don't mean Russian=0D
+> state-sponsored spam.=0D
+=0D
+> As to sending me a revert patch - please use whatever mush you call=0D
+> brains. I'm Finnish. Did you think I'd be *supporting* Russian=0D
+> aggression? Apparently it's not just lack of real news, it's lack of=0D
+> history knowledge too.=0D
+=0D
+Hi James,=0D
+=0D
+Here's what Linus has said, and it's more than just "sanction."=0D
+=0D
+Moreover, we have to remove any maintainers who come from the following cou=
+ntries or regions, as they are listed in *Countries of Particular Concern* =
+and are subject to impending sanctions:=0D
+=0D
+- Burma, People=E2=80=99s Republic of China, Cuba, Eritrea, Iran, the Democ=
+ratic People=E2=80=99s Republic of Korea, Nicaragua, Pakistan, Russia, Saud=
+i Arabia, Tajikistan, and Turkmenistan.=0D
+- Algeria, Azerbaijan, the Central African Republic, Comoros, and Vietnam.=
+=0D
+=0D
+For People=E2=80=99s Republic of China, there are about 500 entities that a=
+re on the U.S. OFAC SDN / non-SDN lists, especially HUAWEI, which is one of=
+ the most active employers from versions 5.16 through 6.1, according to sta=
+tistics. This is unacceptable, and we must take immediate action to address=
+ it, with the **same** reason.=0D
+=0D
+On 10/24/24 10:50 AM, James Bottomley wrote:=0D
+> On Thu, 2024-10-24 at 07:27 +0300, Serge Semin wrote:=0D
+>> Hello Linux-kernel community,=0D
+>>=0D
+>> I am sure you have already heard the news caused by the recent Greg'=0D
+>> commit 6e90b675cf942e ("MAINTAINERS: Remove some entries due to=0D
+>> various compliance requirements."). As you may have noticed the=0D
+>> change concerned some of the Ru-related developers removal from the=0D
+>> list of the official kernel maintainers, including me.=0D
+>>=0D
+>> The community members rightly noted that the _quite_ short commit log=0D
+>> contained very vague terms with no explicit change justification. No=0D
+>> matter how hard I tried to get more details about the reason, alas=0D
+>> the senior maintainer I was discussing the matter with haven't given=0D
+>> an explanation to what compliance requirements that was.=0D
+> =0D
+> Please accept all of our apologies for the way this was handled.  A=0D
+> summary of the legal advice the kernel is operating under is=0D
+> =0D
+>     If your company is on the U.S. OFAC SDN lists, subject to an OFAC=0D
+>     sanctions program, or owned/controlled by a company on the list, our=
+=0D
+>     ability to collaborate with you will be subject to restrictions, and=
+=0D
+>     you cannot be in the MAINTAINERS file.=0D
+> =0D
+> Anyone who wishes to can query the list here:=0D
+> =0D
+> https://sanctionssearch.ofac.treas.gov/=0D
+> =0D
+> In your specific case, the problem is your employer is on that list.=0D
+> If there's been a mistake and your employer isn't on the list, that's=0D
+> the documentation Greg is looking for.=0D
+> =0D
+> I would also like to thank you for all your past contributions and if=0D
+> you (or anyone else) would like an entry in the credit file, I'm happy=0D
+> to shepherd it for you if you send me what you'd like.=0D
+> =0D
+> Again, we're really sorry it's come to this, but all of the Linux=0D
+> infrastructure and a lot of its maintainers are in the US and we can't=0D
+> ignore the requirements of US law.  We are hoping that this action=0D
+> alone will be sufficient to satisfy the US Treasury department in=0D
+> charge of sanctions and we won't also have to remove any existing=0D
+> patches.=0D
+> =0D
+> Regards,=0D
+> =0D
+> James Bottomley=0D
+> =0D
 
