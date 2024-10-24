@@ -1,61 +1,76 @@
-Return-Path: <netdev+bounces-138741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D139AEB5C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:04:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A87FC9AEB68
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA77428589B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:04:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42AEE2838FB
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A3B1F7083;
-	Thu, 24 Oct 2024 16:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5001F76B9;
+	Thu, 24 Oct 2024 16:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEu7Igyh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fkgo90sr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22BF1F7084;
-	Thu, 24 Oct 2024 16:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156A01E1311;
+	Thu, 24 Oct 2024 16:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729785849; cv=none; b=YOL3UJ3Ow/++4ZlzPcsfyF0HeYZh/CdvSCIhPXjX4vhMAwtsM4Hp3g+RY5npcsyIuhzH7ZtkeLzr759Ley1cuc9Tx4UTYNImbEUg1GjhHa/M4fO2Vi2/KyagJcq7ojKjG5B9KlSGmi+ZDJvSLPKAOnlK5maJR2ZK532s5J0v1Fs=
+	t=1729785989; cv=none; b=edAAL6hfSBWxrt7tc2VeyvkfNNnvKFwjvi9QPgOFpvwDKpKQisfRO3KgF6jJlserbpGtYRzeggetB5mr1wbgHBFtAJpF0+WtUEBbKR8LFyBnFMurnoQ3oFOaO8VH0UM+4EoViecQFU7v4PTsfqvGx3/n+SQ3l5NQBOxO4m8k074=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729785849; c=relaxed/simple;
-	bh=Myjz9JYsX77B7JYfT/JXdIOgce90SWSzlxORYDjC8oA=;
+	s=arc-20240116; t=1729785989; c=relaxed/simple;
+	bh=0KowH7y85XE2y6KJuU7Ce+c+Q3jHPqfm80LQl3MvVKI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JaylMTbmXbH0AuBk9vixVcbEZTq70umKGoSZjr9yYvDTuMsf1rXJEvFLID4EEYJBnDWjWelAox6WZhD+TpPafBnE93vsmC0o6MjYZx6K0t6Pl7Z5Up9B8pzD1/gbh76V1HjxYQ7Fyrgz9ivWa65NR5r/hkXH1pYnbhiHCaU+QU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEu7Igyh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16525C4CEC7;
-	Thu, 24 Oct 2024 16:04:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729785848;
-	bh=Myjz9JYsX77B7JYfT/JXdIOgce90SWSzlxORYDjC8oA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HEu7Igyh7nj3naMU5ewRp2bwWjflOn8o/POIpUa6Oe75xASEzF8dGSuvc9eWQZGUV
-	 TOk4L6DZZzpz2gDhvEGhev8TEsz7Nw3kQIglKNgLuMkVFHstd+K5JcTvK8qjthcQ0R
-	 FC80nS1GtXxZi5KcmRo2iVv8loA/2lSy8PMhxh0NDWfzuo3cz0D3xT7sAiqN30knWo
-	 UjcCScpsimQjYig5mMr4oEtp4aTnNK+ANCn0f6A7iiOLnxcP/GcOFvqSVPMXSONXL5
-	 1l8Vli5eqfO7nloEi7YtxL2eBC8mF+oVBe/JInQVkAAf08KmLrD2BoH+mCAiBrKlfC
-	 B4zl8KA9Wmv0g==
-Date: Thu, 24 Oct 2024 17:04:04 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, shenjian15@huawei.com,
-	salil.mehta@huawei.com, liuyonglong@huawei.com,
-	wangpeiyang1@huawei.com, lanhao@huawei.com, chenhao418@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 net 1/9] net: hns3: default enable tx bounce buffer
- when smmu enabled
-Message-ID: <20241024160404.GC1202098@kernel.org>
-References: <20241018101059.1718375-1-shaojijie@huawei.com>
- <20241018101059.1718375-2-shaojijie@huawei.com>
- <50874428-b4ef-4e65-b60b-1bd917f1933c@redhat.com>
- <d68ad0c3-3d53-406b-ad98-5686512fa48e@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FD/j8djBV5ML7SdmWPOXfF0QgjyWpI6LYx8kGN58XUab6RWLjPeZYfEc6oUjjoyxV5ULFfIrc2TucVJUIwxjKkl4MxMfkKosCZ3QDstPIuKu4W19Ndri05fgnJLb09jBzljKl6JNDRD80+FjwPCVZaFbXHmWP8N0EbhSmcr4lGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fkgo90sr; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=pz4GWBtGnvEHYFjo2q7F/eFxvtdN8k9+uNnzymMDFd4=; b=fkgo90sryavSyc6EEDHCRt3vCP
+	QaskRnxELYWmWYn3cM3/SS2VCOX7oSf8r7Udb/Y5LB2gAdfGBIXJFjCFBjguoFr0ocrcsMkh9Kv5q
+	HLmes+C0NbTOKtgSbCPvQUcM64Frr5aE/Xvt4nxsSMP6B4b0hoFxVBI2fW1/fWHSGCb2l/yZjblAK
+	TIkFSvccNqfp8z45xyMOLBBViW0mQsvfvTC5j5T0UFM8sxLoLogTDW/b8xS4bGboTNamNlTHp55ls
+	TU08yt8CLrWP6a2jNcKm4q3yp2KfLxHZEFhQVMFS9HqOG3WqZRsjeAQrd+S6xbn+I6FqsBRYHbupT
+	FrPm947w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t40Lx-000000012DI-005E;
+	Thu, 24 Oct 2024 16:06:25 +0000
+Date: Thu, 24 Oct 2024 09:06:24 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, David Wei <dw@davidwei.uk>,
+	io-uring@vger.kernel.org, netdev@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org
+Subject: Re: [PATCH v6 02/15] net: generalise net_iov chunk owners
+Message-ID: <ZxpwgLRNsrTBmJEr@infradead.org>
+References: <20241016185252.3746190-1-dw@davidwei.uk>
+ <20241016185252.3746190-3-dw@davidwei.uk>
+ <ZxijxiqNGONin3IY@infradead.org>
+ <264c8f95-2a69-4d49-8af6-d035fa890ef1@gmail.com>
+ <ZxoSBhC6sMEbXQi8@infradead.org>
+ <a6864bf1-dd88-4ae0-bc67-b88bb4c17b44@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,43 +79,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d68ad0c3-3d53-406b-ad98-5686512fa48e@huawei.com>
+In-Reply-To: <a6864bf1-dd88-4ae0-bc67-b88bb4c17b44@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Oct 24, 2024 at 04:31:46PM +0800, Jijie Shao wrote:
+On Thu, Oct 24, 2024 at 03:23:06PM +0100, Pavel Begunkov wrote:
+> > That's not what this series does.  It adds the new memory_provider_ops
+> > set of hooks, with once implementation for dmabufs, and one for
+> > io_uring zero copy.
 > 
-> on 2024/10/24 16:26, Paolo Abeni wrote:
-> > On 10/18/24 12:10, Jijie Shao wrote:
-> > > From: Peiyang Wang <wangpeiyang1@huawei.com>
-> > > 
-> > > The SMMU engine on HIP09 chip has a hardware issue.
-> > > SMMU pagetable prefetch features may prefetch and use a invalid PTE
-> > > even the PTE is valid at that time. This will cause the device trigger
-> > > fake pagefaults. The solution is to avoid prefetching by adding a
-> > > SYNC command when smmu mapping a iova. But the performance of nic has a
-> > > sharp drop. Then we do this workaround, always enable tx bounce buffer,
-> > > avoid mapping/unmapping on TX path.
-> > > 
-> > > This issue only affects HNS3, so we always enable
-> > > tx bounce buffer when smmu enabled to improve performance.
-> > > 
-> > > Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-> > > Signed-off-by: Jian Shen <shenjian15@huawei.com>
-> > > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> > I'm sorry to nick pick on somewhat small details, but we really need a
-> > fixes tag here to make 110% clear is a bugfix. I guess it could be the
-> > commit introducing the support for the buggy H/W.
-> > 
-> > Thanks,
-> > 
-> > Paolo
+> First, it's not a _new_ abstraction over a buffer as you called it
+> before, the abstraction (net_iov) is already merged.
+
+Umm, it is a new ops vector.
+
+> Second, you mention devmem TCP, and it's not just a page pool with
+> "dmabufs", it's a user API to use it and other memory agnostic
+> allocation logic. And yes, dmabufs there is the least technically
+> important part. Just having a dmabuf handle solves absolutely nothing.
+
+It solves a lot, becaue it provides a proper abstraction.
+
+> > So you are precluding zero copy RX into anything but your magic
+> > io_uring buffers, and using an odd abstraction for that.
 > 
-> I have a little doubt that this patch is about H/W problem,
-> so how can we write the the fixes tag?
+> Right io_uring zero copy RX API expects transfer to happen into io_uring
+> controlled buffers, and that's the entire idea. Buffers that are based
+> on an existing network specific abstraction, which are not restricted to
+> pages or anything specific in the long run, but the flow of which from
+> net stack to user and back is controlled by io_uring. If you worry about
+> abuse, io_uring can't even sanely initialise those buffers itself and
+> therefore asking the page pool code to do that.
 
-Hi Jijie,
+No, I worry about trying to io_uring for not good reason. This
+pre-cludes in-kernel uses which would be extremly useful for
+network storage drivers, and it precludes device memory of all
+kinds.
 
-That is a good point. But the much point of the Fixes tag is to indicate how
-far back the fix should be backported. So I would say the ID of the patch
-where the user would have first seen this problem - possibly the patch that
-added the driver.
+> I'm even more confused how that would help. The user API has to
+> be implemented and adding a new dmabuf gives nothing, not even
+> mentioning it's not clear what semantics of that beast is
+> supposed to be.
+>
+
+The dma-buf maintainers already explained to you last time
+that there is absolutely no need to use the dmabuf UAPI, you
+can use dma-bufs through in-kernel interfaces just fine.
+
 
