@@ -1,154 +1,124 @@
-Return-Path: <netdev+bounces-138625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712BC9AE5DB
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:17:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 097A59AE5EE
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E4FA2877E8
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:17:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EED3B21128
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA3B1DE88A;
-	Thu, 24 Oct 2024 13:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057DF1D89E3;
+	Thu, 24 Oct 2024 13:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IJI5zCBm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q7VX5Woi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE45A1DD0DF;
-	Thu, 24 Oct 2024 13:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09D91D5158;
+	Thu, 24 Oct 2024 13:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729775800; cv=none; b=qthENILp5SkhvYl//kDx66zOFj1gJlipWK6QYRpt7GRf3V4x3X6vq0Jlux7lZsb+iGHDW3PMK6WJhrNdiIt5A1KdTRJByqMzmuKIqwVBoryPa3dimjKzmSlg6G+9FkXhQRY6gkCzGcznhsfbNAM84/4pJzGchxZnRMJ5DM7VENs=
+	t=1729776015; cv=none; b=FSaM47y8as/MUWP6wQ6fv3cDdwlXLmCCPWjPca8GiYQ1SSZAViR6+Ah3edVEKqG+8gEGc9tbdsB3rY0bY8GQBziSJIfGvSJ2sJnlL6YmacqE8I3egQRUXLhHU5L7H0XtJlyXHRZCXTj4ir8H54FhsG6w87Dpd6jwty1MO8Jq2gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729775800; c=relaxed/simple;
-	bh=q9uxznKnQY4XK6iA2VnlvWjgWTCmgLuEF/MdAC17O88=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTuza0EGhgQsHkNpM124Rto7bh47eYO5FNToKqmuMMDVgKmAe/DMfxaKjTiKp9L4k20bmPXX3sc5YbiR7OgCApCV2id9Dzq9jjuTUSjed4D1ycwc5Ti6N4ffrgJ9HfccxPJXPMRBdEgrTEEz5f5cbOMWPXOFfpjBPS9U/VpKrs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IJI5zCBm; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ff454a9b-5e60-49cb-8590-a2535f851057@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729775795;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nYx7LAyRV3Ucr0XiBCFOAYtv8t2YgLt+/TvO8hjpNtU=;
-	b=IJI5zCBmkMWuSlAC6vNeUKZ/x0HqRyeKkaCRuPkB1OLmXKmyDkre5tUfruHXq1gNMlp7sa
-	wAdbkUxXhNgkeBwbbk+ggdjpGjJOe2qPZyFLhIyXnkhY27YXJQ7do5bCWB6f2s/fnsAEEL
-	1qpWsIUKTCgqoyPDfwoaovUS3LL604M=
-Date: Thu, 24 Oct 2024 14:16:30 +0100
+	s=arc-20240116; t=1729776015; c=relaxed/simple;
+	bh=/m4HPPraDyo/dwN16U6sOcMlkv1ByR/voIQNhTClxPc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gFmdMzWsaUAYfnt6OEI9iD+DHo8ACDDtdL9EKmdZ0eozDylueAhgXbu3knF0Zv2FFkWVI8P7UPDViYmkVS8YIg2ZZPKSYbPCCnNxNb+1akWExhjck8N8dbn6LyROp35oyvbfo0ZlAmbukjVl8Ujk5NpPDli/OW2Mlyk5q7Fg42E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q7VX5Woi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E76C4CEC7;
+	Thu, 24 Oct 2024 13:20:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729776015;
+	bh=/m4HPPraDyo/dwN16U6sOcMlkv1ByR/voIQNhTClxPc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q7VX5WoiN3Kz9cypyFgmwEFDq9/4EsQo82RnEKc3Tu2sk3ZULlovo0vFmX37JaQSw
+	 TGYOCpnAnCh34E0g7IGq6evurzkfXHaFDjxNnZkaGDHsGHKbT//cdM25I5Ww00pR9J
+	 t8nV0rPE17YY0fMYVRpUlTT7plbQ+t58AJ2SmblqNTWtbyT7sJYJPS1ds/u55AUnis
+	 riKXTWM+cGyQ0zxy74Yn9xMqH1AEz4z0I27oLLXLhFIpnnOVi5ofv6i/vOyDb3EEzV
+	 /VOSXYdaW3HBi1uB4CTBF6dhL4UVRjW19QhA9HnjJoOYZ3Cd2rY7oLBiHbD1dLuKjb
+	 HyPEGdLjz4l/g==
+Date: Thu, 24 Oct 2024 14:20:11 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net/sched: sch_api: fix xa_insert() error path in
+ tcf_block_get_ext()
+Message-ID: <20241024132011.GM1202098@kernel.org>
+References: <20241023100541.974362-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix 1 PPS sync
-To: Meghana Malladi <m-malladi@ti.com>, vigneshr@ti.com, horms@kernel.org,
- jan.kiszka@siemens.com, diogo.ivo@siemens.com, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-References: <20241024113140.973928-1-m-malladi@ti.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241024113140.973928-1-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023100541.974362-1-vladimir.oltean@nxp.com>
 
-On 24/10/2024 12:31, Meghana Malladi wrote:
-> The first PPS latch time needs to be calculated by the driver
-> (in rounded off seconds) and configured as the start time
-> offset for the cycle. After synchronizing two PTP clocks
-> running as master/slave, missing this would cause master
-> and slave to start immediately with some milliseconds
-> drift which causes the PPS signal to never synchronize with
-> the PTP master.
+On Wed, Oct 23, 2024 at 01:05:41PM +0300, Vladimir Oltean wrote:
+> This command:
 > 
-> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
+> $ tc qdisc replace dev eth0 ingress_block 1 egress_block 1 clsact
+> Error: block dev insert failed: -EBUSY.
 > 
-> Hello,
+> fails because user space requests the same block index to be set for
+> both ingress and egress.
 > 
-> This patch is based on net-next tagged next-20241023.
-> v1:https://lore.kernel.org/all/20241023091213.593351-1-m-malladi@ti.com/
-> Changes since v1 (v2-v1):
-> - Use roundup() instead of open coding as suggested by Vadim Fedorenko
+> [ side note, I don't think it even failed prior to commit 913b47d3424e
+>   ("net/sched: Introduce tc block netdev tracking infra"), because this
+>   is a command from an old set of notes of mine which used to work, but
+>   alas, I did not scientifically bisect this ]
 > 
-> Regards,
-> Meghana.
+> The problem is not that it fails, but rather, that the second time
+> around, it fails differently (and irrecoverably):
 > 
->   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 12 ++++++++++--
->   drivers/net/ethernet/ti/icssg/icssg_prueth.h | 11 +++++++++++
->   2 files changed, 21 insertions(+), 2 deletions(-)
+> $ tc qdisc replace dev eth0 ingress_block 1 egress_block 1 clsact
+> Error: dsa_core: Flow block cb is busy.
 > 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 0556910938fa..6876e8181066 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -411,6 +411,8 @@ static int prueth_perout_enable(void *clockops_data,
->   	struct prueth_emac *emac = clockops_data;
->   	u32 reduction_factor = 0, offset = 0;
->   	struct timespec64 ts;
-> +	u64 current_cycle;
-> +	u64 start_offset;
->   	u64 ns_period;
->   
->   	if (!on)
-> @@ -449,8 +451,14 @@ static int prueth_perout_enable(void *clockops_data,
->   	writel(reduction_factor, emac->prueth->shram.va +
->   		TIMESYNC_FW_WC_SYNCOUT_REDUCTION_FACTOR_OFFSET);
->   
-> -	writel(0, emac->prueth->shram.va +
-> -		TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
-> +	current_cycle = icssg_readq(emac->prueth->shram.va +
-> +				    TIMESYNC_FW_WC_CYCLECOUNT_OFFSET);
-> +
-> +	/* Rounding of current_cycle count to next second */
-> +	start_offset = roundup(current_cycle, MSEC_PER_SEC);
-> +
-> +	icssg_writeq(start_offset, emac->prueth->shram.va +
-> +		     TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
->   
->   	return 0;
->   }
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index 8722bb4a268a..a4af2dbcca31 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -330,6 +330,17 @@ static inline int prueth_emac_slice(struct prueth_emac *emac)
->   extern const struct ethtool_ops icssg_ethtool_ops;
->   extern const struct dev_pm_ops prueth_dev_pm_ops;
->   
-> +static inline u64 icssg_readq(const void __iomem *addr)
-> +{
-> +	return readl(addr) + ((u64)readl(addr + 4) << 32);
-> +}
-> +
-> +static inline void icssg_writeq(u64 val, void __iomem *addr)
-> +{
-> +	writel(lower_32_bits(val), addr);
-> +	writel(upper_32_bits(val), addr + 4);
-> +}
-> +
->   /* Classifier helpers */
->   void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac);
->   void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac);
+> [ another note: the extack is added by me for illustration purposes.
+>   the context of the problem is that clsact_init() obtains the same
+>   &q->ingress_block pointer as &q->egress_block, and since we call
+>   tcf_block_get_ext() on both of them, "dev" will be added to the
+>   block->ports xarray twice, thus failing the operation: once through
+>   the ingress block pointer, and once again through the egress block
+>   pointer. the problem itself is that when xa_insert() fails, we have
+>   emitted a FLOW_BLOCK_BIND command through ndo_setup_tc(), but the
+>   offload never sees a corresponding FLOW_BLOCK_UNBIND. ]
 > 
-> base-commit: 73840ca5ef361f143b89edd5368a1aa8c2979241
+> Even correcting the bad user input, we still cannot recover:
+> 
+> $ tc qdisc replace dev swp3 ingress_block 1 egress_block 2 clsact
+> Error: dsa_core: Flow block cb is busy.
+> 
+> Basically the only way to recover is to reboot the system, or unbind and
+> rebind the net device driver.
+> 
+> To fix the bug, we need to fill the correct error teardown path which
+> was missed during code movement, and call tcf_block_offload_unbind()
+> when xa_insert() fails.
+> 
+> [ last note, fundamentally I blame the label naming convention in
+>   tcf_block_get_ext() for the bug. The labels should be named after what
+>   they do, not after the error path that jumps to them. This way, it is
+>   obviously wrong that two labels pointing to the same code mean
+>   something is wrong, and checking the code correctness at the goto site
+>   is also easier ]
 
-Thanks,
+Yes, a text book case of why that practice is discouraged.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Fixes: 94e2557d086a ("net: sched: move block device tracking into tcf_block_get/put_ext()")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
