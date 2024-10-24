@@ -1,81 +1,56 @@
-Return-Path: <netdev+bounces-138850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30DDE9AF2A8
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 21:38:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 271BC9AF2B8
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 21:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA8E928180C
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:37:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFFB7287480
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 19:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEBF18A946;
-	Thu, 24 Oct 2024 19:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7741FE0F6;
+	Thu, 24 Oct 2024 19:42:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="jFaEHkbV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HHzABib3"
 X-Original-To: netdev@vger.kernel.org
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128301EF931
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 19:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CE017623F;
+	Thu, 24 Oct 2024 19:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729798676; cv=none; b=soFKcjSXpuXTBW5w8ES5uuy7OuOYAGX4q15W4aLHEckQhF1Jsq6QmR7Ul0KNM84Y9UwWgA/o7W9hjTdGGzb2hLpzspy8xnZ1zaKFziwJjt+3DuzjY8FBCSy4qQTQg1R3YtX4l4nDPz4U4jCqeWE/P7c56ch8Ktq28arZ97TFh50=
+	t=1729798946; cv=none; b=JwaNQM9Ve+sDhhsM6YnVd4r80Lzn9UJYVZu4F8PGXzRZRcxbuuuDu8i8v3ki/aTL4THn8JM+ZwB025oHoAkPORIktUdKWWRw4GP8euhj7ppElLzz66SVDIoIK/RWcOpPIi98N7f4OIvc4eMpSXGHG9jzh0NDDS6hBLyuhZkuJcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729798676; c=relaxed/simple;
-	bh=O1dcXIyUjlAbIPr9ZrfWvPFBrJ1WmrTHcLovVsabp0Y=;
+	s=arc-20240116; t=1729798946; c=relaxed/simple;
+	bh=U6QvMDEsCbBxXoOMNUVPUVN1fBFMj89ipAdq5Id5ANQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/Rgh6ryRvuen2LZ8B2/04nlSmK6s++rwomPB24cdIPDsFyhdG/HpOlGwBtp36TPHuEt1cfFVrVMKxGp7hEx61zoyhZbvkR2xtlERJ2NdCQWYB7AoieyLswWzc/pdN5y/6SZ6g1KbYwS5oxZVNSovozvtR9sj5DkUxzDMUriDXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=jFaEHkbV; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Received: from cwcc.thunk.org (pool-173-48-115-113.bstnma.fios.verizon.net [173.48.115.113])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 49OJbTv9001701
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 15:37:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1729798651; bh=okMMcBGH5/TsuAYsZMeQd9odZhnIVG8nrgmmktEZgjE=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=jFaEHkbVoxD8Hm+ERB2kRfe8Bjra9+IZSn1fiXXL7eY/ouSBBGnWX8UxRoNT/KdI5
-	 JdBO/zAB4Um1jty9+cpcTkgiZomAwEdnUob33oSAR2cCJr1315yDzuo5kZyJ4Zrrlf
-	 apRG/0RVm1cwePG3e2AuDn1OPHtedCCI9iaGEvqWOoH9j1TyoWWmjho9xIsSgZf4J2
-	 Yw+OPmaTTqqUXBUYBFS4Eyd1IFqsKzugLL6o20HOUngAtIg4U7ou1szplOu+O3Mism
-	 Q46u/7zEvE2Mc1bFgr4ysmFlEHnxew8OfZbZpMgZSsEjMmWmiJZeWkM1uQdq0VjhMJ
-	 ulk2zLaNDw+3w==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-	id 3A2FE15C0329; Thu, 24 Oct 2024 15:37:29 -0400 (EDT)
-Date: Thu, 24 Oct 2024 15:37:29 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Hantong Chen <cxwdyx620@gmail.com>
-Cc: ajhalaney@gmail.com, allenbh@gmail.com, andrew@lunn.ch,
-        andriy.shevchenko@linux.intel.com, andy@kernel.org, arnd@arndb.de,
-        bhelgaas@google.com, bp@alien8.de, broonie@kernel.org,
-        cai.huoqing@linux.dev, dave.jiang@intel.com, davem@davemloft.net,
-        dlemoal@kernel.org, dmaengine@vger.kernel.org, dushistov@mail.ru,
-        fancer.lancer@gmail.com, geert@linux-m68k.org,
-        gregkh@linuxfoundation.org, ink@jurassic.park.msu.ru,
-        james.bottomley@hansenpartnership.com, jdmason@kudzu.us,
-        jiaxun.yang@flygoat.com, keguang.zhang@gmail.com,
-        kory.maincent@bootlin.com, krzk@kernel.org, kuba@kernel.org,
-        linux-edac@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux@armlinux.org.uk, linux@roeck-us.net,
-        manivannan.sadhasivam@linaro.org, netdev@vger.kernel.org,
-        nikita.shubin@maquefel.me, nikita@trvn.ru, ntb@lists.linux.dev,
-        olteanv@gmail.com, pabeni@redhat.com, paulburton@kernel.org,
-        robh@kernel.org, s.shtylyov@omp.ru, sergio.paracuellos@gmail.com,
-        shc_work@mail.ru, siyanteng@loongson.cn, tsbogend@alpha.franken.de,
-        xeb@mail.ru, yoshihiro.shimoda.uh@renesas.com
-Subject: Re: linux: Goodbye from a Linux community volunteer
-Message-ID: <20241024193729.GP3204734@mit.edu>
-References: <20241024173504.GN3204734@mit.edu>
- <20241024181917.1119-1-cxwdyx620@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NsDAFiI29uacPHmmGmUgiqV8aafO+HP6Nnd/zifJUET1dmvVDpByn5zBsJyxF8FJJt6sLfzfp2yc/cpUIHGOkT8tQQ1ilLvrc/dB+uLBj4Nhy0V02CPiVuW0lCA+2Lr4D/iyNvr2L4EUQEL+zi6lT+6B7wwnqwd3TJ/s/c4muHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HHzABib3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jLBpKC7zcJBqXTj7emAV29KYNBXdV6l3x1/fVs4h7m0=; b=HHzABib37F1LYKeSHWLrg0gp8C
+	Ox6VTjVRU9uX+2h1O0JjgMRHLoH9EeU8/GvHyagB+AKv6Dhl9z3T5XRAGMJqV/QxZKww5G2phVJ+L
+	RzADsBG9YodsoevaTstESgcpI8LqjLIjAccAirBJVOTRpLXTqWT5AAbmF4vxU0OuCJuQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t43ib-00BAaJ-2l; Thu, 24 Oct 2024 21:42:01 +0200
+Date: Thu, 24 Oct 2024 21:42:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, u.kleine-koenig@baylibre.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next v3] net: ftgmac100: refactor getting phy device handle
+Message-ID: <fa1ff3ab-b5c0-4efb-9fd4-81815ba4dd2b@lunn.ch>
+References: <20241022084214.1261174-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,68 +59,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241024181917.1119-1-cxwdyx620@gmail.com>
+In-Reply-To: <20241022084214.1261174-1-jacky_chou@aspeedtech.com>
 
-On Thu, Oct 24, 2024 at 06:19:16PM +0000, Hantong Chen wrote:
+On Tue, Oct 22, 2024 at 04:42:14PM +0800, Jacky Chou wrote:
+> Consolidate the handling of dedicated PHY and fixed-link phy by taking
+> advantage of logic in of_phy_get_and_connect() which handles both of
+> these cases, rather than open coding the same logic in ftgmac100_probe().
 > 
-> I wonder some of Ukrainian misiles and drones might also be using
-> the embedded Linux controllers, and why aren't there any sanctions.
-> This cannot be used as an excuse.
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> ---
+> v2:
+>   - enable mac asym pause support for fixed-link PHY
+>   - remove fixes information
+> v3:
+>   - Adjust the commit message
 
-The question of whether there are any sanctions is up to governments
-and legislatures of those countries that have enacted the relevant
-laws and regulations.  This is not up to the Linux development
-community.  But given that we are citizes of our respective countries,
-we are obliged to follow the laws of our countries --- and if we
-don't, we can be subject to enforcement actions of our countries'
-governments.  For someone who is a Chinese citizen, the same would
-apply to any rules and regulations promulgated by the Chinese
-government, no?
+It takes a bit of effort to see it is correct, but it looks O.K. to
+me.
 
-The question of why a particular country has decided to sanction
-Russia and not Ukraine, and why a country has decided to support one
-country versus another, whether it's Germany, France, and Poland
-sending tanks and armored vehicles to Ukraine, or North Korea sending
-artillary shells to Russia, is not up to the Linux development
-commuity.  As individuals we may have our own opinions of the
-appropriatness one one versus another, but the fact remains that there
-are sanctions imposed on one set of countries, but not the against the
-other set.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Hypothetically, if someone was a Russian Citizen, and there was a
-Russian Law forbidding them to provide technical assistance to US
-entities, then that person would be obliged to respect that law, and
-not send any patches to US-based open source projects.  Depending on
-how that law was worded, a Russian-based open source project might not
-be allowed to accept changes from US entities, and again, if you were
-a Russian open source project maintainer, you would be obliged to
-follow that law --- or maybe you would be thrown into a Russian jail.
-Whether you are a Russian patriot and are 100% behind the Russian law,
-or think that perhaps it's not the best policy, doesn't really matter;
-you are still obliged to follow the law one way or another.
-
-(Personally, my sympathies are entirely with Ukraine, but my opinions
-really don't matter for the purposes of this discussion, because I
-don't make my country's foreign policy.)
-
-> What LF and Linus done will inevitably create a climate of fear where
-> contributors and maintainers from the *Countries of Particular Concern*
-> feels endangered.
-
-In the ideal world, one country would't be invading another conutry,
-and we wouldn't have these sanctions regimes.  But they were not
-*caused* by the decisions of the LF and Linus.  The sanctions regimes
-were enacted by multiple countries' legal governmnts, and now the
-question is how can we best protect the Linux development comunity,
-the operators of web and git servers that are redistributing Linux
-kernel sources. etc.
-
-The Linux community may be an international open source project.  But
-it is composed of individuals who have to respect the rule of law of
-their individual country; and many countries have spoken quite clearly
-on this subject.
-
-Cheers,
-
-					- Ted
+    Andrew
 
