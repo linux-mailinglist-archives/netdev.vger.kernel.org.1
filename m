@@ -1,110 +1,82 @@
-Return-Path: <netdev+bounces-138468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D1C9ADBA4
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 07:49:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D44B9ADC25
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 08:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 606A21C21866
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 05:49:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84CE1F21088
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 06:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D9B172BDF;
-	Thu, 24 Oct 2024 05:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tByxvxZS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BE217B4F6;
+	Thu, 24 Oct 2024 06:25:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD95D43ACB;
-	Thu, 24 Oct 2024 05:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9348178362;
+	Thu, 24 Oct 2024 06:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729748985; cv=none; b=U31hYVUM2RWJOLPn8Lp1feBSRmXcQpA10zSQYz7i3H49TPg1+yQqM4h90X8ofI97VtQyUgqWsLh9XDAOP4He2WIZ/AbhwVkctIyhuTqAZE8n1MmY9feFElo2UxAq1w6LbXz09/4YWBAAFAppKKhxUxQ7Re8Mm7FIUrqWK2Dx5B4=
+	t=1729751141; cv=none; b=gVcVpvqThbH+p7xOEAz3EKU5EwcxPlvlMdQ9+p9tBfu9x1WYmcB1G1JxCH1BX7sOD1kOBUMeY+kmeeSMuYVbkOU96M4yS4kNOek4TQeHnAEjFicYfLzNJtvk0ekgr/AoExJUtr9CIFTgfNZ3SCZEaGZAPvFYcga0fwk2WCDWCvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729748985; c=relaxed/simple;
-	bh=PfaPHb6N84Ggiq/7uzRDzg1B90UbdHecRky5BAIKIzM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UBAflJ+Dg3qDm1G6CKOB/mW64pdVgsX0IDdmf+TxJRyuMuGbmU49170AW8B2ecV/T5I0xwQfxXhjA8d9NGDxl8On6OUk8dlvtkaCBExGlw5PRWpLllI/JPNJr8ggYZO7sEgSlDedLc2+l3L7jaGyrvCiVV2muq2QxwXFcXzSp2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tByxvxZS; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729748979; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=qI2X3JNmf4ad1kTgTPuG2xPBcGK0wWOZXmUAGVTv79M=;
-	b=tByxvxZS5xPS9E3UPZt7mgThLOj7FF6Z7Q4wGU/pc0UgGMn7ulJPUU7Q0SPzg0kcxDaiyjimAEIPQb10lvwUanOnNfbYgvNwU2jiViVVWx5VoVx4actwK+n/xUTSe0TrLlxnZk2U7VFNARmftkZU8UIH+UOLnuSihTGR6nzhn9s=
-Received: from 30.221.147.97(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WHo.a3s_1729748976 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 24 Oct 2024 13:49:37 +0800
-Message-ID: <a5843fac-c6d3-40f2-b2cb-7bbfde93365e@linux.alibaba.com>
-Date: Thu, 24 Oct 2024 13:49:35 +0800
+	s=arc-20240116; t=1729751141; c=relaxed/simple;
+	bh=vw5EOB+V79k3EVt1ygjQA5pfUV9Bl0HJg7IrCO9ef5o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RePs9bmen59oeuJCLN9YrXI5G0GE/KYxTOxnkzBU6l2Mzb7qXNGBTQ1BMxSHDWNkQG41fNBzKjtI4/8/X+paMHJvuBpeO0xXdN0lShfstoVCDGmZcZtMY1pmIwXee/qQwdKgF27zIlHhEA7QmsyEpw19GD6rn3airvK6uoV2tQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1t3rHb-0004Mv-4t; Thu, 24 Oct 2024 08:25:19 +0200
+Date: Thu, 24 Oct 2024 08:25:19 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	fw@strlen.de, kuniyu@amazon.com, netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org, yuehaibing@huawei.com
+Subject: Re: [PATCH net v2] net: netfilter: Fix use-after-free in get_info()
+Message-ID: <20241024062519.GA16685@breakpoint.cc>
+References: <20241024014701.2086286-1-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 4/4] bpf/selftests: add simple selftest for
- bpf_smc_ops
-To: Tianchen Ding <dtcccc@linux.alibaba.com>
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, pabeni@redhat.com, song@kernel.org, sdf@google.com,
- haoluo@google.com, yhs@fb.com, edumazet@google.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
- guwen@linux.alibaba.com
-References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
- <1729737768-124596-5-git-send-email-alibuda@linux.alibaba.com>
- <2006b84c-e83a-431b-ac35-bb357459fa96@linux.alibaba.com>
- <284e3cb9-9f27-413c-9c05-f017171fa40e@linux.alibaba.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <284e3cb9-9f27-413c-9c05-f017171fa40e@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241024014701.2086286-1-dongchenchen2@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-
-
-On 10/24/24 12:49 PM, Tianchen Ding wrote:
-> On 2024/10/24 12:04, D. Wythe wrote:
->>
->>
->> On 10/24/24 10:42 AM, D. Wythe wrote:
->>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>
->>> This PATCH adds a tiny selftest for bpf_smc_ops, to verify the ability
->>> to attach and write access.
->>>
->>> Follow the steps below to run this test.
->>>
->>> make -C tools/testing/selftests/bpf
->>> cd tools/testing/selftests/bpf
->>> sudo ./test_progs -t smc
->>>
->>> Results shows:
->>> Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
->>
->>
->> Sorry for just found an issue with vary config. I will fix this issues
->> in the next version.
->>
->> D. Wythe
+Dong Chenchen <dongchenchen2@huawei.com> wrote:
+> While xt_table module was going away and has been removed from
+> xt_templates list, we couldnt get refcnt of xt_table->me. Check
+> module in xt_net->tables list re-traversal to fix it.
 > 
-> This doesn't build with !CONFIG_SMC.
+> Fixes: fdacd57c79b7 ("netfilter: x_tables: never register tables by default")
+> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> ---
+>  net/netfilter/x_tables.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Maybe you should create an individual dir. (like what sched_ext does)
+> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+> index da5d929c7c85..709840612f0d 100644
+> --- a/net/netfilter/x_tables.c
+> +++ b/net/netfilter/x_tables.c
+> @@ -1269,7 +1269,7 @@ struct xt_table *xt_find_table_lock(struct net *net, u_int8_t af,
+>  
+>  	/* and once again: */
+>  	list_for_each_entry(t, &xt_net->tables[af], list)
+> -		if (strcmp(t->name, name) == 0)
+> +		if (strcmp(t->name, name) == 0 && owner == t->me)
+>  			return t;
 
-It's true, I do intend to create an individual dir, and send the patches for
-BPF and SMC separately. Thanks for your advises.
+LGTM, thanks.
 
-Best wishes,
-D. Wythe
-
-
+Reviewed-by: Florian Westphal <fw@strlen.de>
 
