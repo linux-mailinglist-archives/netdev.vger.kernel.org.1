@@ -1,109 +1,104 @@
-Return-Path: <netdev+bounces-138678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134009AE841
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:21:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A7439AE85C
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C361C21736
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:21:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7CD1F21F8A
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266521E571A;
-	Thu, 24 Oct 2024 14:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8271FAEE3;
+	Thu, 24 Oct 2024 14:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UX7tGNCp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1xtXZrg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B051D9A72
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C89A1EABAB
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 14:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729779034; cv=none; b=INcPVa9OEg0ajChxKH0bugJSvtsnmN+j6jwl01+31BVrHjJLkzOFZFhbkzjLAoE+rGuB8Ll2AgMvnNtfuEMqkTUqIy+xghOvmnWp1yRhgvxvCKdok/DgyUlEs+eQ7pCQCg6vPGxizOHfS14XLQBEznJ8Jl5mCVVbrFCPFv46sRY=
+	t=1729779286; cv=none; b=itf/gEe1xQGHkN1cz6cZjoJbd80LvRAVZgZhCoKvY1H4B+Uz5ru6ZXc6+GqM4KwXi4a+1ioS5NCHdfWI3ocrqhxwJpQqkelTQI1WKr3rL+qfzBOgGsyOx654kqctEoFbOD3JhvCgKP+QVCvYJdr/ze09UdzVvtbg7J4JleIXS8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729779034; c=relaxed/simple;
-	bh=oTiSbdW9t2wbHJIAVe7e9J2CwdSmtdmDbiSLafFCb60=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZUcqrWlvjNeb8Sik7muRmDUOuCccLURHH33kKZwFUB+pD/6yOC/E/FHTZyimaddxETSwSxYPEfcP/vYS8foxqU0918R/CcpnRhmhV9TyLXT9LOcubgs7gOGfxoylljKAVdaFlC+8bWqyskVj3ASPlTcIhQYaTevdUB649irjMK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UX7tGNCp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F7BCC4CEC7;
-	Thu, 24 Oct 2024 14:10:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729779033;
-	bh=oTiSbdW9t2wbHJIAVe7e9J2CwdSmtdmDbiSLafFCb60=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UX7tGNCpPoHejOnSoEfnTc0nFaq8WPzHefdX+sIhn2UKGDbsmxaATVTadGtp/5JIP
-	 3NOBpftKwJPSQfMYWtpcrjxe6OmU/zx+iwRAFCyWYc7NhoO85G9oW+IqlysU1t4bzg
-	 IL+osXLKfJ0z3BOUt6jJAsj9Zm6kizH0lQfeaxmsvXZEe960l3rQOP0ij1XGRDLXWS
-	 lkBR1RsT2tbvOoej6QN9TYTOx4SUXW1VqehTP4SwD65PvUAtusl+0/bErIjiBqV9Yc
-	 pFT3wJfhv1lAMkjrwe3aa/a00TP0FqBpejYeiKogoTAK6l3MCj6bq9f45+IP/116yS
-	 YMBVSdcfpjT+w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB176380DBDC;
-	Thu, 24 Oct 2024 14:10:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729779286; c=relaxed/simple;
+	bh=4E96ONiFu6oPVrd9FVp4DMR3A5juKrgtl5Xg/EU1kU0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Gu70n0zlqyF4YlctWRVp95LeNtpBUZVX8GtZ/0IzjyPQqzLWV05QzzuZZp0qB9G0SYDWEhuDO4Q/gsch4akAnrOnfWVd8N4D/q3EMk7KNFp2GTFcV/8Y6UfsZIfrRq1H3iamYBJMi5ZucrDA00HnbCfVKCs8zF84cCF/yYypVvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f1xtXZrg; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6e38fc62b9fso9422437b3.2
+        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 07:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729779280; x=1730384080; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8MQUgZ/BbPDPdqyq38gojGKFlT7p4FSzsLrZhyCwmLc=;
+        b=f1xtXZrg8ZJ39HYRncDc7u/N6l7vn2FwTn0cFb95X0GFCG3Hd+HM/U/b1zYPD8Z5rx
+         c+i5673/OZ+fD7AgRynDI56JGHFnzXSE05usY/Ah5B/WjxcFeme+uTWI3vuMUX4ndbFd
+         amnaZWJD7NdezMKds7fVEmsp3uLiIpjwpDU14z7vzVJufQzFeXAsUjasTBDsRpDlDt5M
+         0ebtQLtws+oiE83aQTpz0ZbBcn/rC2Qo2bnU3zVLn0ghfLFTsQEXdohBaLnywt0mUqRy
+         42PVDIIBt9ZtSHebbWt71PbqfvctzTORYIW1wzszlx0mnCPf1EyZPiPP7JlbhRday4w+
+         8K5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729779280; x=1730384080;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8MQUgZ/BbPDPdqyq38gojGKFlT7p4FSzsLrZhyCwmLc=;
+        b=uvsUbCGMvzhl+5/FIMDSNccbQZSzbDecYFADul5FtnekVlrpZn4KxBnhB1Lph/+p8i
+         VIDEldyrpPPuz1oSJjBjU0vGB8YhjURn8prZHjIzRMOMviBM/v5EZAIidLB1tk4Xa99w
+         9WIPArXCRI8/mVJPt0kTVRjmNedGl66U2aFun9YqRWjSeR2F3PGgsWDOqBrVkph/8Pv1
+         Q77e0PTAVkBiRyYI/SmKvpobK/KiISISAD5mCcSOAyfix/cz2KH93zEyhPCG4nzrUBdG
+         a96smOFID3MwNRf+bXsenV9WhxT031moD9x3pGkZJrlpQHdof5VllvAuPZ/me/CWUkVx
+         rHdQ==
+X-Gm-Message-State: AOJu0Yy5QMU8rec1K1hz0m2ncRKk2CWQ1WNhJ+jGgWj+LaOo7inGh2ot
+	xkmleA07653CpV/QrQ9PJ3EsNAjHj6FlTYnAoE6SY9IVPVDcQ5qq7TeBbrd62pQKPlAPIbD8Wdb
+	WOm3zjzxNQHWc4P85LmdrhrZa1o3xPiu/
+X-Google-Smtp-Source: AGHT+IEpZlVp3vgT5W5NtnOSSmMp+e5aC/0QE/en0gajdrf/d/3CmbNZYzOR/hQVlGiall8R1jqW8a7T80mm7I9ce0o=
+X-Received: by 2002:a05:690c:681:b0:6dd:d709:6f18 with SMTP id
+ 00721157ae682-6e7f0fc17bcmr79241047b3.39.1729779280632; Thu, 24 Oct 2024
+ 07:14:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next 0/9] phonet: Convert all doit() and dumpit() to
- RCU.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172977903980.2249854.11365353002595095728.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Oct 2024 14:10:39 +0000
-References: <20241017183140.43028-1-kuniyu@amazon.com>
-In-Reply-To: <20241017183140.43028-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, courmisch@gmail.com, kuni1840@gmail.com,
- netdev@vger.kernel.org
+From: SIMON BABY <simonkbaby@gmail.com>
+Date: Thu, 24 Oct 2024 07:14:28 -0700
+Message-ID: <CAEFUPH2npsz4XKna0KYjOeU_MfYN-bVTw25jn6m2dS+f32RuxQ@mail.gmail.com>
+Subject: query on VLAN with linux DSA ports
+To: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hello Team,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Can I know what is the best way of  implementing VLAN on linux DSA user ports ?
 
-On Thu, 17 Oct 2024 11:31:31 -0700 you wrote:
-> addr_doit() and route_doit() access only phonet_device_list(dev_net(dev))
-> and phonet_pernet(dev_net(dev))->routes, respectively.
-> 
-> Each per-netns struct has its dedicated mutex, and RTNL also protects
-> the structs.  __dev_change_net_namespace() has synchronize_net(), so
-> we have two options to convert addr_doit() and route_doit().
-> 
-> [...]
+I would like to know if I can go with VLAN interface or VLAN filtering
+on bridge interface. I am using Marvel DSA  (88E6390) running on Linux
+6.1 kernel.
 
-Here is the summary with links:
-  - [v1,net-next,1/9] phonet: Pass ifindex to fill_addr().
-    https://git.kernel.org/netdev/net-next/c/08a9572be368
-  - [v1,net-next,2/9] phonet: Pass net and ifindex to phonet_address_notify().
-    https://git.kernel.org/netdev/net-next/c/68ed5c38b512
-  - [v1,net-next,3/9] phonet: Convert phonet_device_list.lock to spinlock_t.
-    https://git.kernel.org/netdev/net-next/c/42f5fe1dc4ba
-  - [v1,net-next,4/9] phonet: Don't hold RTNL for addr_doit().
-    https://git.kernel.org/netdev/net-next/c/8786e98dd0eb
-  - [v1,net-next,5/9] phonet: Don't hold RTNL for getaddr_dumpit().
-    https://git.kernel.org/netdev/net-next/c/b7d2fc9ad7fe
-  - [v1,net-next,6/9] phonet: Pass ifindex to fill_route().
-    https://git.kernel.org/netdev/net-next/c/302fc6bbcba4
-  - [v1,net-next,7/9] phonet: Pass net and ifindex to rtm_phonet_notify().
-    https://git.kernel.org/netdev/net-next/c/de51ad08b117
-  - [v1,net-next,8/9] phonet: Convert phonet_routes.lock to spinlock_t.
-    https://git.kernel.org/netdev/net-next/c/3deec3b4afb4
-  - [v1,net-next,9/9] phonet: Don't hold RTNL for route_doit().
-    https://git.kernel.org/netdev/net-next/c/17a1ac0018ae
+Below is my requirement.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+eth0 (conduit interface)
+
+lan1 ----VLAN 10    192.168.1.1/24
+lan2 ----VLAN 10
+
+lan3 -----VLAN 20   192.168.2.1/24
+
+lan4------VLAN 30    192.168.3.1/24
+
+Do I need to create a separate bridge interface for each port which
+belongs to different subnets?
+
+Is it better to use a VLAN aware bridge (with vlan_filitering = 1) or
+create multiple vlan interfaces ?
 
 
+Thanks, Simon
 
