@@ -1,153 +1,121 @@
-Return-Path: <netdev+bounces-138566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED3C9AE22B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:11:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A95C9AE297
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:32:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C24852824E2
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:11:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C930528249B
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 10:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279061C07DF;
-	Thu, 24 Oct 2024 10:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6551CACD0;
+	Thu, 24 Oct 2024 10:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Iegj9JI8"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114591B6CED
-	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 10:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891DA1C879E;
+	Thu, 24 Oct 2024 10:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729764707; cv=none; b=aKModdiWuHgMr9Sj2WcooLzY8xaUw0hZbo4dxe+QBFbFUB0S/odGXyBy8/S/x/cMSB5lwYjMV1QEXnf2SFojPHr4VVerRqXFO1hLawGgtQzyv4OPcXhP/116q3mihRFr86WoMFt9JJUncJGs8O5Mf//hgW8KVJphXv08L7gD+y0=
+	t=1729765896; cv=none; b=HqnmXSlmzTpFNAhYSlXV7cLiq/y34b6cerM5Nqc5fllBTWjZjMxCq0SqcVsNu+2d4hJuyuZyQF99NKly3ORFL7vqd4Z2UAMWjsLJ+7VvjRMcMyOLG9o8aqJ90AhTHPQPRSyhBjmcverSw7gVNPSPd8cwZ6hyWe0pkKp595+ZeYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729764707; c=relaxed/simple;
-	bh=/GnD+djndyd2q7+yLzPImvqEhz8rpds0vzJGIgv3eUk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m1l+jvzQZjYdoLhGDij3auXlLQmr0b4wgNIydku3FA4o5SBviL/If116g7MdQqb+wTrQ4ZXR5tnN1vzgMkiqMY5em1cN0vkckRK+jCWNPzhlBNAk8A1j+ICl0CqeSTlWQEZugnLQYFwUAPBRqRi5oOWvMUCizmAjQdGXUA0LSg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[IPV6:::1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1t3uoS-00027H-Me; Thu, 24 Oct 2024 12:11:28 +0200
-Message-ID: <6af8035f-ae5e-48a2-a3d2-a640ff7fb999@pengutronix.de>
-Date: Thu, 24 Oct 2024 12:11:26 +0200
+	s=arc-20240116; t=1729765896; c=relaxed/simple;
+	bh=1Pl3seaKsVqvUTf35IOyS4yaL/7Irx/Z/G25+DDIeC8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qst0UWhX+UpkIxe6VHm+uk8WVtcjK7v8VJflys5ahJdWDOQ2Y1UYEFhFPV/jLeO9NfyPIFe9Mukc36zVjt358sb3sHMSl2h48Vz1gAzZpButMDawyzi6JUxNw2QkO7QEzws94D0OilMNVeL5VX4lijdp3HSdyqH0T6YtVx2k5V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Iegj9JI8; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49OAUweq053976;
+	Thu, 24 Oct 2024 05:30:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1729765858;
+	bh=XpNsdjNUKmyHDq4lKpIhAEJl7hPe0UBSX8YCXzbXgEI=;
+	h=From:To:CC:Subject:Date;
+	b=Iegj9JI8GV7cVUgkk8VK6oEFNEWjg9qLG1uSjo6cKhbOE8QwkX3hLRyd3GCP4Mtb9
+	 emv7tp6kVTVy+dYbOIUtHIOr4tZAFf8lK9XnJhF4kj9N4dKSgZBEPlrAb6OrHojIBA
+	 h6lwEWVO5IVhHfW1Ok18OOO7JEUmKVFn115qcL7s=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49OAUw47002389
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 24 Oct 2024 05:30:58 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 24
+ Oct 2024 05:30:57 -0500
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 24 Oct 2024 05:30:57 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49OAUv5N082154;
+	Thu, 24 Oct 2024 05:30:57 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 49OAUuPf024586;
+	Thu, 24 Oct 2024 05:30:57 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: <geliang@kernel.org>, <liuhangbin@gmail.com>, <dan.carpenter@linaro.org>,
+        <jiri@resnulli.us>, <n.zhandarovich@fintech.ru>,
+        <aleksander.lobakin@intel.com>, <lukma@denx.de>, <horms@kernel.org>,
+        <jan.kiszka@siemens.com>, <diogo.ivo@siemens.com>, <shuah@kernel.org>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>,
+        <m-malladi@ti.com>
+Subject: [PATCH net-next v2 0/4] Introduce VLAN support in HSR
+Date: Thu, 24 Oct 2024 16:00:52 +0530
+Message-ID: <20241024103056.3201071-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] arm: dts: socfpga: use reset-name "stmmaceth-ocp" instead
- of "ahb"
-To: Mamta Shukla <mamta.shukla@leica-geosystems.com>, dinguyen@kernel.org,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: bsp-development.geo@leica-geosystems.com,
- Pengutronix Kernel Team <kernel@pengutronix.de>
-References: <20241016074159.2723256-1-mamta.shukla@leica-geosystems.com>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20241016074159.2723256-1-mamta.shukla@leica-geosystems.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hello Mamta,
+This series adds VLAN support to HSR framework.
+This series also adds VLAN support to HSR mode of ICSSG Ethernet driver.
 
-Thanks for your fix.
+Changes from v1 to v2:
+*) Added patch 4/4 to add test script related to VLAN in HSR as asked by
+Lukasz Majewski <lukma@denx.de>
 
-On 16.10.24 09:41, Mamta Shukla wrote:
-> The "stmmaceth-ocp" reset line in dwmac-socfpga driver is required
-> to get EMAC controller out of reset on Arria10[1].
-> Changed in Upstream to "ahb"(331085a423b  arm64: dts: socfpga: change the
-> reset-name of "stmmaceth-ocp" to "ahb" ).
+v1 https://lore.kernel.org/all/20241004074715.791191-1-danishanwar@ti.com/
 
-To ease automatic backporting, please add:
+MD Danish Anwar (1):
+  selftests: hsr: Add test for VLAN
 
-Fixes: 331085a423b ("arm64: dts: socfpga: change the reset-name of "stmmaceth-ocp" to "ahb")
+Murali Karicheri (1):
+  net: hsr: Add VLAN CTAG filter support
 
-before your S-o-b.
+Ravi Gunasekaran (1):
+  net: ti: icssg-prueth: Add VLAN support for HSR mode
 
-It's probably worth pointing out in the commit message that according
-to the commit message title, the change was predominantly meant for ARM64
-SoCFPGA and that at least for the Arria10, it's not applicable.
+WingMan Kwok (1):
+  net: hsr: Add VLAN support
 
-> If "ahb" reset-line is used, connection via ssh is found to be slow and significant
-> packet loss observed with ping.
-
-Nitpick: In the end it's the same underlying reset line, they are just toggled for
-different purposes. The ahb reset is deasserted in probe before first register access,
-while crucially the stmmacheth-ocp reset needs to be asserted every time during
-PHY mode reconfiguration.
-
-> This prominently happens with Real Time Kernel
-> (PREEMPT_RT enabled). Further with STMMAC-SELFTEST Driver enabled, ethtool test
-> also FAILS.
-
-FTR: I observed the same regression on v6.6.57.
-
-> Link:[1] https://www.intel.com/content/www/us/en/docs/programmable/683711/21-2/functional-description-of-the-emac.html
-> Signed-off-by: Mamta Shukla <mamta.shukla@leica-geosystems.com>
-
-Tested-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-
-With commit message reworded as described above (and --subject-prefix="PATCH net"):
-
-Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-
-Cheers,
-Ahmad
-
-> ---
->  arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-> index f36063c57c7f..72c55e5187ca 100644
-> --- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-> +++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-> @@ -440,7 +440,7 @@ gmac0: ethernet@ff800000 {
->  			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
->  			clock-names = "stmmaceth", "ptp_ref";
->  			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
-> -			reset-names = "stmmaceth", "ahb";
-> +			reset-names = "stmmaceth", "stmmaceth-ocp";
->  			snps,axi-config = <&socfpga_axi_setup>;
->  			status = "disabled";
->  		};
-> @@ -460,7 +460,7 @@ gmac1: ethernet@ff802000 {
->  			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
->  			clock-names = "stmmaceth", "ptp_ref";
->  			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
-> -			reset-names = "stmmaceth", "ahb";
-> +			reset-names = "stmmaceth", "stmmaceth-ocp";
->  			snps,axi-config = <&socfpga_axi_setup>;
->  			status = "disabled";
->  		};
-> @@ -480,7 +480,7 @@ gmac2: ethernet@ff804000 {
->  			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
->  			clock-names = "stmmaceth", "ptp_ref";
->  			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
-> -			reset-names = "stmmaceth", "ahb";
-> +			reset-names = "stmmaceth", "stmmaceth-ocp";
->  			snps,axi-config = <&socfpga_axi_setup>;
->  			status = "disabled";
->  		};
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 45 +++++++++++-
+ net/hsr/hsr_device.c                         | 76 ++++++++++++++++++--
+ net/hsr/hsr_forward.c                        | 19 +++--
+ tools/testing/selftests/net/hsr/config       |  1 +
+ tools/testing/selftests/net/hsr/hsr_ping.sh  | 63 +++++++++++++++-
+ 5 files changed, 191 insertions(+), 13 deletions(-)
 
 
+base-commit: 1bf70e6c3a5346966c25e0a1ff492945b25d3f80
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.34.1
+
 
