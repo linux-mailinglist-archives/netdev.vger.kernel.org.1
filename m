@@ -1,191 +1,205 @@
-Return-Path: <netdev+bounces-138754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A813D9AEC55
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:38:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCFF19AEC59
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 18:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68DE8280A6D
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:38:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A291D2807DD
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 16:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8A61F8188;
-	Thu, 24 Oct 2024 16:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE22315A87C;
+	Thu, 24 Oct 2024 16:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="MFFPb93i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OR1MWIFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2056.outbound.protection.outlook.com [40.107.103.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C608D1F8192;
-	Thu, 24 Oct 2024 16:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729787893; cv=fail; b=ardLR+xCvY+nLNb4xyRE3DaqGjgkgBgMhUH5gxQ8RwiZxVa8kC9yfwjVEZfHGwPv8lIrZi4wVk5gM19HIf427qy6nh1f46paVCjOG9h9bG6eprNXpC7Ei37V1ddQfU/c7SJMZbpzW08EmP/LA6YmvSgjOH1H8s0gxg7N4J3BGDY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729787893; c=relaxed/simple;
-	bh=0wQsfuZsVwOP56RZ1b3IJEYBVAA5eNj35MyS8niOUgc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Uaqq0+96EC8wiU4Peg9+L3kj/7IZwkpuhngIUHiv7B/ObwOlUeNpJDNiByVQZysZBB2h/IC2P1h/UoZDqtT8vInmxSGn1ZFfYiPgnpT57n+jTovX/ai7ju+IDU073z0EUxeHtEW+8eAy47s8jcOIHXos+lMF8Ar/gLv02PlTak0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=MFFPb93i; arc=fail smtp.client-ip=40.107.103.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lM5yhtyHYFYUa0eFHNbCbP/nt2jr5jO8KNtUMiqoTfLrFyp5rutZuODpAJx3O1ZT4akYuc+l4dIieqE+ViDOQO6N+HvlNvzg2Ast3zxcg4W6xlPw6aJ59SpsCNdZO7RyZZ0iecxbFoGY6dByYH/NZTq8w1mk3tKvNiPQXI5oCrTDLQiGkvyxfBDjuPcSqGch704i/FMDOuek8ikOH1whHHi/UKHVdKn1HqlY3ndL60DrYuEVswkGcKplbZzI7H2UVoZeWd4ZFSdRWC7RUOW6iKPbrULvpYo78ILbRlmgyPN5f93YhmSH84vTMUzQtXaiLjDk7Vmpy3ZkOCyGivU98w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cE8SnGz81uDh21LDwzHRufScS+n9BTWze2vXBtR00t4=;
- b=ZtBF+y2ZX/7bD8LRcGYFRoCogmXfy5STK76Z6kjvCYXerw6Kqu5Pu+NhBCodsap5zMwmqM1ozsfmlgDQRsE5eSBq4jOAAMxZjF35R6ctU0z0uqxzUPYSoFyj85Ye2hcFii9wXgc6wZ/q6nI/JNqelRkfex/TkqQO8Q09Hr+h4x5Z2ue0quwaqexsSHrorf/TBGVefabmRKGBDTJ74qyqmWdD9TA4y3zYS43JqpKhSoDKjqQstDTztk6ytCG50agRUxC9BAhKNJv9zk/goMJ+pwLcu4zI1QxTWUZcU/6TF7AMRMoFyQgO/l+bOS6ADaJeuhgGliGDMfkXCmvNVQC/hQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cE8SnGz81uDh21LDwzHRufScS+n9BTWze2vXBtR00t4=;
- b=MFFPb93it4meKf4qS9MpVhB8Eiz15jjqOzyo4SBZLPFfuG8rhujf+jpl2Jj4q6hW9Ml3yI9LQh/TRLN5uFXj+PocMuVACyQt2l/oQVRWU6zM1XMVdZUOGuVbfEXJsP82pOhR4+lyqdK8WKGlnf1f657aXp4TvwbMjzG5epeibaGCxyT3U/CMYUjAj4cPg9Fakjqa7BMXv8fI7Rxzs5+b3HBEmVQI7sUtHVPRMVpf5GyJk4ijeotkjaERW/2jaxu3oM0tdCOTB3qL8CjtBgAuahiHrzcoDLfG4LHgYN6hzQp/UFBKDmJeR753rM9KbIXVrbVDqr0KxjiCO12pEFJ+tg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
- by PA4PR04MB9663.eurprd04.prod.outlook.com (2603:10a6:102:261::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.16; Thu, 24 Oct
- 2024 16:38:07 +0000
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc%6]) with mapi id 15.20.8093.018; Thu, 24 Oct 2024
- 16:38:07 +0000
-Date: Thu, 24 Oct 2024 19:38:03 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, claudiu.manoil@nxp.com, xiaoning.wang@nxp.com,
-	Frank.Li@nxp.com, christophe.leroy@csgroup.eu,
-	linux@armlinux.org.uk, bhelgaas@google.com, horms@kernel.org,
-	imx@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, alexander.stein@ew.tq-group.com
-Subject: Re: [PATCH v5 net-next 05/13] net: enetc: extract common ENETC PF
- parts for LS1028A and i.MX95 platforms
-Message-ID: <20241024163803.2oinbux5l5tw5fy5@skbuf>
-References: <20241024065328.521518-1-wei.fang@nxp.com>
- <20241024065328.521518-6-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241024065328.521518-6-wei.fang@nxp.com>
-X-ClientProxiedBy: VI1PR09CA0186.eurprd09.prod.outlook.com
- (2603:10a6:800:120::40) To PA4PR04MB7790.eurprd04.prod.outlook.com
- (2603:10a6:102:cc::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5174F1F8188;
+	Thu, 24 Oct 2024 16:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729787911; cv=none; b=aIfVs5TtvbYFrn3bocWXpyNli1WVEwxHAPgXjfH975FR9TKz/Imydp3AVwpXZ4OiU8uG5V4Cl9+diMwpCNxMWChPh3DAtZ6HWAsd1L0rK3dQjnycirpCMi3RKIkLVp8Hoe+++G5OzpYZBAszg8dR7ElOLRDN8eJGNeLrjd50dUE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729787911; c=relaxed/simple;
+	bh=tkSNE6x8L3EpPPEaen1uj79Yl7nRKcfUt0+3bu2yz+o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X0mx69RSRRafK16MYZClPktC9HEj4FOagWlXpT3Fg2g5ROOx3GiwMGPkFiwaQmugbwgcvtNl6f+8FlSHkMGuKnUxnuHDe8Dqe89k4PdXlyy6B0Shcc/9C0C9cjPwblwHTzuDKHVHeMkb3G43suU1tOLXkAi5Yje2zpJdagAMLro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OR1MWIFA; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c9362c26d8so4005386a12.1;
+        Thu, 24 Oct 2024 09:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729787907; x=1730392707; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E6OrnFlL53k5PbeOSCXvYwOxfZaO+J0U5NvlTNJMMDU=;
+        b=OR1MWIFA0qFw6LgGSiUekYev6WHb+WK8etNhJD5Vxladt6rT0Z0fG2I2GTQTKoVKqq
+         lXANP/T9YonWHhJZyVkO2hwCc34NG669a8Yd0eNX9ALMgR261mzsyx8sBMw5fupyfLCw
+         s8YdSzFRV7II/oNoAjvX7zsjzkK6BCs9H4kGtwbQ+jv9Dlip9qiC33CZdClmOp+wFJJ5
+         +9UGETtopif6ZvGblF0xr2YYHCl1Ihak6h9inMie1c7NkErBS0G71cBHKeBDIaf4Y3cp
+         j2cQEpSXOX4a8P6r7jYbq1L/Ot/nVovf7V10x/MjWwf6jLH+qi/iUvIpPJ1nNvgDIqGc
+         Xvyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729787907; x=1730392707;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E6OrnFlL53k5PbeOSCXvYwOxfZaO+J0U5NvlTNJMMDU=;
+        b=DFZYHGzBGUvbs9qoNINRMDKSfTod6UqmUi+isDh85gHzx6YviRLmxBu2SDb5C3uT9I
+         7iuoAoisBigNZ8w6vs179UmSK4ojwiPEbh5n/ll1xb9HnfYrhc9hOxdnWuEj6TiBwQt1
+         GRVZuAHJw8+dh36PYy8k3O3hp5DlnLaXfgF5eOYSLBaAh0Y/aq1fZIzh4JynrAAcgGlP
+         vNLrpYKk42ML1h2jE3DyIE6GTwmFqVs1+We7UAi21JN48tRsYsAP6uiniB/8REaO4oZc
+         pgBUCadvZEJoGt1K22cvhMb1ex2nSNGb0/tJ48h0HmLEhN3MOxkH80PTssKT+J1OTBMV
+         TlcA==
+X-Forwarded-Encrypted: i=1; AJvYcCVV960dRgZyylr7RQpkhlmOzQB9Urpr+Ixf5oFUoy/l43oQVZf5seT5NOTfUYAac4AhLgk3MJgyD90=@vger.kernel.org, AJvYcCWSz8LUf7awRNs0QcbF334xFG3zYEilmDVzzmsAiqiFR7CS4pZp5OLW5zydyA2PE+S/GA2mMzs0@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnhvdjjgFYJ+ROlNyRVsLyO1KwGsFWyZxTX4S6wnOtbFUu4gHC
+	ZyFMEdv9Pf66E9qRGJNmKHAIYRPLsehZktOlpP/kIls+Zbia+Dj6+ZreOTqDeuBFDfzDPTV1i50
+	ryGC0k9exiNJrKo/rIpi3oe2wCpo=
+X-Google-Smtp-Source: AGHT+IEzhPtdiCdhY65VTMNrpBco+30HzckOjVn5NCTaiNhCZTvT9mWvdNjc32SVqYLsqE1nRyhxG2OVMKSGZtV5OLk=
+X-Received: by 2002:a05:6402:358c:b0:5c9:3070:701e with SMTP id
+ 4fb4d7f45d1cf-5cba2037cc9mr3252493a12.9.1729787907328; Thu, 24 Oct 2024
+ 09:38:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|PA4PR04MB9663:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f7d3b5b-bcb9-4d99-9f17-08dcf44a3d30
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?NjuJ8mvAyJbCCcyUFrlk6r3p4TPz79zPWJZIp8LKwQV0F9zVw+upI2xEPhTE?=
- =?us-ascii?Q?kWBiwMWzEr8J2tuX1NxmMOAfm+bVr81MzjCaYmIZdLNlaoL4EUy2Tvuf60Yg?=
- =?us-ascii?Q?0StFHgV7EX5PIta1Zxl3jFTEGlFl8YynicTbdnmaj6PAcDpGV/PbBnJL2Dpn?=
- =?us-ascii?Q?IEWPmbFyImwhfMmMap0oU5NlijDHDR3Ez5mho6wB5BMOfj2sJ38Azf4PV+A6?=
- =?us-ascii?Q?ZMbRQdaa6lm6g+XMoocBrmAthSA00WBd+EkpZbmjf2NJwnCJ4L2/WeU7+J9q?=
- =?us-ascii?Q?sh99zNajLKw5OqGSjNvbRSdaCC1gQADnVDoWnp4FAnCpUkIGB6vGlUJfXbrD?=
- =?us-ascii?Q?Sgi6FCCOA5KQO+/eQRwVLPk6Hp5/zXI/8Vn1cwVXT7AYopUqQk5SVrPZEjcI?=
- =?us-ascii?Q?0Stf9i2QDMJjUVfVneXTZWLOF8f1G340NxYN8I3IjdnZ8vZToKRznFSYjjsI?=
- =?us-ascii?Q?hyjGwgxiwvDahQ4BwnDs/sTxdX8IAflXQNpDMZqFwHObysN1cXS1mkSMo75F?=
- =?us-ascii?Q?3bUjAYZ4350B3HHSudw90Bg3r3VdCnlgQQysBJemoiWCP21nfFIsi3qAI1uB?=
- =?us-ascii?Q?jJGVlv7Jwxj9i3bYDDSRwQvLbtbgvKarfu1E8fulzDjg00UDlTByOhxZXIm8?=
- =?us-ascii?Q?68+Ncsj3kDErYmka0c0mxt4U6YYIug3W/ZlKRp1k1zKoKSyhuE2wOzZ2qnFT?=
- =?us-ascii?Q?FR6kFO/WfBoTV+BatkLnRJhukMerlbovFPwfbD0jxKpftb03SQm3ZqGfpOSh?=
- =?us-ascii?Q?PCkABUgclkQeYRvx9j/R9yYlGLeW8P4grq5D/tU9SkI0iBTf9cZzTNPO+doL?=
- =?us-ascii?Q?zLba3Acokbg/ySlkibgIGJyfmyXi/Lc/VIx0Nmsg0AmMNDEMGgvKsZEZz8/q?=
- =?us-ascii?Q?UpNdU17wTewBLo9idRogKww5/ueYPVymVajmdeCKS8918hEKfXvxUZbC0loJ?=
- =?us-ascii?Q?+QQ4aLXzVGCkpcay8ZCXHcEqRaZX9LlgWejKRLOAXCUdg7fsOhQ7MQG7vU7h?=
- =?us-ascii?Q?yI6Im7M99iQeP7WSWRu4v52PTxGheRObNF6tMNOuiRYX6BHEAVdxwub8i2WE?=
- =?us-ascii?Q?SCfYj4BBNqBTQl1lkP5t+3nIVY6oFATBzmRj9L6Yw0iFTZW+9NH1kxVPMXz6?=
- =?us-ascii?Q?1DRjvvmAn8YwmLv2kuWt2yoH0J+1yQWoj4Q5WxcUmkfnZU0/0fQ6OSg+mSZs?=
- =?us-ascii?Q?ryAmZbT9XuVnZLmjv9lMzwTSPsUeWtcmByJAh2VDotB+ZMECWRMV7pTEO9my?=
- =?us-ascii?Q?JWJN/RUnYvzTT7trgfROFclgg68NASyod12zGusJa6fkbQVNzyPULUHZNcBT?=
- =?us-ascii?Q?GA4DWza1e2UYWhqCYvotcHxM?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2aTABhzdZERMIkZC26NsnoOV/uVOLENTCSl8UFgYpmy8TQNGdNpcj+rsJdZ5?=
- =?us-ascii?Q?BQKBK6R/RFWHWwO07abyRwOsLkv2wMEXZ2edetvB5+1rvMkLItmsga7y4SuG?=
- =?us-ascii?Q?RrsazZjluBS72Vke2iSSKBGPNg01XWh8Lrhll+u9ItSXMJBKunE7/koa0NZU?=
- =?us-ascii?Q?4yiPxWg1koaxevr04KpjLeV6dsc2Yh+4dH69CIeY6Z7fO5szNXvMfLKVitrt?=
- =?us-ascii?Q?858ixRc6tw1BY4O2W+rUnoRjPSiwYD0pP1iz/uhE80iDruaz96xxW2ChpMV1?=
- =?us-ascii?Q?nUizNON2760jvyTpokC8qIlCsmAvo93BccvBZhLjHFvdgdnewzjBFiNdASlT?=
- =?us-ascii?Q?d2crRq+TWWMfXTwKmEoGGHkN88apV1vFNj8f9c7BcpubxVCvhKDxeW6Hl+/+?=
- =?us-ascii?Q?XVmAAZjJX9xj2G3hGBSApI+5GzCEInVisbNjs1f82PYr+uD2oBLZxxRmTgpl?=
- =?us-ascii?Q?rhfOdrpFvYDrThwGUc5eGCzHF/E7r4vhlgCqQPIbNZozMVNVdj/FtYASyViP?=
- =?us-ascii?Q?yj3VTQYnZTEzT+OWpsnanovLqrQavRSJvOjJjxXaJwD2OywLu/nd0uoGIQfW?=
- =?us-ascii?Q?rIWGfak5wXUDYTnAEx9K4l+O7IWs/wFG5Ly1tvV/XUamxsqOfZqckQtbmZY6?=
- =?us-ascii?Q?IBtY3IL3aEojJ/CZhubdmm8QpsyI3bxLJ2QRiQOyIZIpETJFII1CGWyn6oxz?=
- =?us-ascii?Q?jyoMBUK6XphPpzbFF+xY01/qvLgQ2Lr/SRpKmJqGQWU7NrDP2ro63c+v/QY+?=
- =?us-ascii?Q?ao7lbVovOFKv3+HXuRJM250e+46RXKh/HWpxhWXgWU7sbrDmyzBeByTVU7Gl?=
- =?us-ascii?Q?kWeyVq5efmG3dVXz/Qhvuk10Y5a31ZxRE5C93Gu0fl6zGx1BL24BjaXQH3Tm?=
- =?us-ascii?Q?zwCR6lDytMhQxM7f7dFBDiOl/shp5el1WEbbAH/lvb2OG+5mJKqz+rS5B07k?=
- =?us-ascii?Q?4DOxLTc1nqQcGOwrYttyq4WK37JoetadxU3K+1uAxM4cGcSHRt2b4Dlzqt07?=
- =?us-ascii?Q?XnHvrqf6fbNkKX6m25W8+sS22naYNrzY+8fw+H/ucfDAqe82d0kqItdvhpBx?=
- =?us-ascii?Q?dLAnK8offwLM6P7h9Hg1wMQ3TfxVQZ/fKeyiRi3lkGXsVPaIP65Rj0Dm8Toq?=
- =?us-ascii?Q?6pPpt1EqWHPF9MXtim5dP3Resr5Vg9OslG2/yD5R4DSoEa/6QGcDXq91JQuw?=
- =?us-ascii?Q?0+fid2WtbEensnG1CnfFA4IGf5yNEsWeFq0hwGyRWBmFoP1oGUvM+z5Af/pM?=
- =?us-ascii?Q?n6/rpwup0xWvowGRwcmE0GffgJfpw3ObioNpWAmB+GE5AK4kQMR4YJ7A/zKc?=
- =?us-ascii?Q?seRt9Nm8iJoczzl25aXbDGmBJJgigTxafp96h+GuEqwp0kByINO6nDjXvekC?=
- =?us-ascii?Q?GrJI18LySVW0ppxmLgXZxRkh+8pE3cTp9Rd295l5jtM/crkbNMTyqqXK7lgn?=
- =?us-ascii?Q?MrnueKi6pTsQgcLyn4r8Xdrf38DpLeMhNVniGn2YuEeL2XP6mfgXg54IEuzA?=
- =?us-ascii?Q?hy2yrhhL3miu0Y01KhJ2ucE2Aei77ju8J/U+Dd+NJa3CN0GppidFODjLFYvy?=
- =?us-ascii?Q?M9/PJom/208+v5ygXLD99ItNP1q2cLQ67vxD3PUharJYPUrtHRLjgoxL6hfN?=
- =?us-ascii?Q?HQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f7d3b5b-bcb9-4d99-9f17-08dcf44a3d30
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 16:38:07.2215
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Z/IjlY17OhdcPCGPMjXVXVnkqgVLrSBJ3xSVf3oOFvzKi8xup1tbEkeWPa/JiQDYh5pBEFbZ5Sct0f6uhY1IuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9663
+References: <20241022162359.2713094-1-ap420073@gmail.com> <20241022162359.2713094-2-ap420073@gmail.com>
+ <CACKFLikH-8fdqpvFouoNaFGq011+XvR0+C-8ryq-SutAs=RdsQ@mail.gmail.com>
+In-Reply-To: <CACKFLikH-8fdqpvFouoNaFGq011+XvR0+C-8ryq-SutAs=RdsQ@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 25 Oct 2024 01:38:15 +0900
+Message-ID: <CAMArcTV3U62Rz+FPCJWVOqqNJOZBLnBvb+yRcjJ+drspm5nxbw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/8] bnxt_en: add support for rx-copybreak
+ ethtool command
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, almasrymina@google.com, donald.hunter@gmail.com, 
+	corbet@lwn.net, andrew+netdev@lunn.ch, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2024 at 02:53:20PM +0800, Wei Fang wrote:
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-> index c26bd66e4597..92a26b09cf57 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-> @@ -58,3 +58,16 @@ struct enetc_pf {
->  int enetc_msg_psi_init(struct enetc_pf *pf);
->  void enetc_msg_psi_free(struct enetc_pf *pf);
->  void enetc_msg_handle_rxmsg(struct enetc_pf *pf, int mbox_id, u16 *status);
-> +
-> +void enetc_pf_get_primary_mac_addr(struct enetc_hw *hw, int si, u8 *addr);
-> +void enetc_pf_set_primary_mac_addr(struct enetc_hw *hw, int si,
-> +				   const u8 *addr);
-> +int enetc_pf_set_mac_addr(struct net_device *ndev, void *addr);
-> +int enetc_setup_mac_addresses(struct device_node *np, struct enetc_pf *pf);
-> +void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
-> +			   const struct net_device_ops *ndev_ops);
-> +int enetc_mdiobus_create(struct enetc_pf *pf, struct device_node *node);
-> +void enetc_mdiobus_destroy(struct enetc_pf *pf);
-> +int enetc_phylink_create(struct enetc_ndev_priv *priv, struct device_node *node,
-> +			 const struct phylink_mac_ops *ops);
-> +void enetc_phylink_destroy(struct enetc_ndev_priv *priv);
+On Thu, Oct 24, 2024 at 3:41=E2=80=AFPM Michael Chan
 
-Could you put the prototypes of functions exported by enetc_pf_common.c
-into a header named enetc_pf_common.h? It should be self-contained, i.e.
-a dummy C file with just #include "enetc_pf_common.h" in it should compile
-fine.
+Hi Michael,
+Thank you so much for the review!
 
-I know the enetc driver isn't there yet when it comes to thoroughly
-respecting that, but for code we touch now, we should try to follow it.
+<michael.chan@broadcom.com> wrote:
+>
+> On Tue, Oct 22, 2024 at 9:24=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+> >
+> > The bnxt_en driver supports rx-copybreak, but it couldn't be set by
+> > userspace. Only the default value(256) has worked.
+> > This patch makes the bnxt_en driver support following command.
+> > `ethtool --set-tunable <devname> rx-copybreak <value> ` and
+> > `ethtool --get-tunable <devname> rx-copybreak`.
+> >
+> > Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >
+> > v4:
+> >  - Remove min rx-copybreak value.
+> >  - Add Review tag from Brett.
+> >  - Add Test tag from Stanislav.
+> >
+> > v3:
+> >  - Update copybreak value after closing nic and before opening nic when
+> >    the device is running.
+> >
+> > v2:
+> >  - Define max/vim rx_copybreak value.
+> >
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 23 +++++----
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  5 +-
+> >  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 48 ++++++++++++++++++-
+> >  3 files changed, 65 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.c
+> > index bda3742d4e32..0f5fe9ba691d 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>
+> > @@ -4510,7 +4513,8 @@ void bnxt_set_ring_params(struct bnxt *bp)
+> >                                   ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEA=
+DROOM), 8) -
+> >                                   SKB_DATA_ALIGN(sizeof(struct skb_shar=
+ed_info));
+> >                 } else {
+> > -                       rx_size =3D SKB_DATA_ALIGN(BNXT_RX_COPY_THRESH =
++ NET_IP_ALIGN);
+> > +                       rx_size =3D SKB_DATA_ALIGN(bp->rx_copybreak +
+> > +                                                NET_IP_ALIGN);
+>
+> When rx_copybreak is 0 or very small, rx_size will be very small and
+> will be a problem.  We need rx_size to be big enough to contain the
+> packet header, so rx_size cannot be below some minimum (256?).
+>
+> >                         rx_space =3D rx_size + NET_SKB_PAD +
+> >                                 SKB_DATA_ALIGN(sizeof(struct skb_shared=
+_info));
+> >                 }
+> > @@ -6424,8 +6428,8 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp=
+, struct bnxt_vnic_info *vnic)
+> >                                           VNIC_PLCMODES_CFG_REQ_FLAGS_H=
+DS_IPV6);
+> >                 req->enables |=3D
+> >                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_T=
+HRESHOLD_VALID);
+> > -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_copy_thresh);
+> > -               req->hds_threshold =3D cpu_to_le16(bp->rx_copy_thresh);
+> > +               req->jumbo_thresh =3D cpu_to_le16(bp->rx_copybreak);
+> > +               req->hds_threshold =3D cpu_to_le16(bp->rx_copybreak);
+>
+> Similarly, these thresholds should not go to 0 when rx_copybreak becomes =
+small.
+>
+> >         }
+> >         req->vnic_id =3D cpu_to_le32(vnic->fw_vnic_id);
+> >         return hwrm_req_send(bp, req);
+>
+> > @@ -4769,7 +4813,7 @@ static int bnxt_run_loopback(struct bnxt *bp)
+> >         cpr =3D &rxr->bnapi->cp_ring;
+> >         if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
+> >                 cpr =3D rxr->rx_cpr;
+> > -       pkt_size =3D min(bp->dev->mtu + ETH_HLEN, bp->rx_copy_thresh);
+> > +       pkt_size =3D min(bp->dev->mtu + ETH_HLEN, bp->rx_copybreak);
+>
+> The loopback test will also not work if rx_copybreak is very small.  I
+> think we should always use 256 bytes for the loopback test packet
+> size.  Thanks.
+>
+> >         skb =3D netdev_alloc_skb(bp->dev, pkt_size);
+> >         if (!skb)
+> >                 return -ENOMEM;
+
+I tested `ethtool -t eth0` and I checked it fails if rx-copybreak is too
+small. Sorry for missing that.
+I think we can use max(BNXT_DEFAULT_RX_COPYBREAK,
+bp->rx_copybreak) for both cases.
+I tested it, it works well.
+So I will use that if you are okay!
+
+Thank you so much,
+Tahee Yoo
 
