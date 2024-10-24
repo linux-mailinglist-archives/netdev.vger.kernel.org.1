@@ -1,183 +1,166 @@
-Return-Path: <netdev+bounces-138593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C849AE3DE
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B2149AE3E3
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64C2B1C220F9
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:31:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AB002840B7
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8291B4F2B;
-	Thu, 24 Oct 2024 11:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010E61D0942;
+	Thu, 24 Oct 2024 11:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CxjxkFRg"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZJU367tW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89356CDBA;
-	Thu, 24 Oct 2024 11:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7A96CDBA;
+	Thu, 24 Oct 2024 11:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729769491; cv=none; b=rhqA3Me9CxWejF8IPrp0AaDfCFPBObdR5GJSQM1yPRBJD5LsDunpc7uHEDefbMh+doqAs2I3sqiOTwsQWH1mO3b/HpFC9sdEwEp2WSMeiEplz63a3EVc7wVrZDqE4mO47KrqSp8OCGw+bb0gPXBMGcvqs7MC1WtizWfekBFsx4w=
+	t=1729769556; cv=none; b=hgciveZW5dse1XYltyRgVmzr+QoMGIUWg3koSl7Xj/b8Oho9WUQF6BO/KtXMMlhT85/awhHmtjqD8dl6CPo3N2RKhBtIbk8ra6pSTym5BBKDbzjD44Jqv3vztDHeqMjVIRzKSEPsJmr7QkqDpt7OrCx2Q+g3Elpjl1jz0snmgX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729769491; c=relaxed/simple;
-	bh=EzG65p/3mG90J13jANzUL0uJE9ckeo99l3zD9kP4JbY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nP3CtPwZtX2NVaSHJAws0Hh0k7mZWk4zL5/RRvp2dtjY8mCyKZ93GQvkva1oC3pC4g9e/DRAvD9jSY+Ho0CD3j4ryQ/3+8kGS7mKos4W7/QZlmFAWScFa/TT0iF+kEeu5rBcfTMGNmCYAjWRGFVqDZxgVHXRAJV00bG1qaCkw6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CxjxkFRg; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49O6RLN9002694;
-	Thu, 24 Oct 2024 11:31:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OQjayV
-	YYXot5uUkMNP0kQpMjfxCNsi209ZgK94ElUbs=; b=CxjxkFRgiyQW1TvBzgMKce
-	vNDmVqjkDc2nLWmKKrENNOofwNzvIyLjmfBpSLy+aXgz7sESwrR1Yx+5jj+r+gIb
-	yCok34ySnNO8ZU33GKa7RFeLLmbJ1vgsKP+nA4dSG8AQTL0CAybkwMPlQsDuaDra
-	7s8qeeqjt4hXewLkDpkfSKNdMywF9CJ1iGU56nOGdC9rmriY1Zyox20m+uiMuiFJ
-	tdlRB/W/M4P3fiCdfpNNby5r8S+RrQJZH5rXylUL5a6XjafoUjPunnkRQ1jOa7RH
-	m8wvj5LKAau2vlgx6HzZa3n0FTGRNUhmX704lAzXj0pLdGLBi3Ii+jErm9d3JpTw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42fgyusda5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 11:31:22 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49OBVE5O024065;
-	Thu, 24 Oct 2024 11:31:21 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42fgyusda3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 11:31:21 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49OANwFv014286;
-	Thu, 24 Oct 2024 11:31:20 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42emhfr5b9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 11:31:20 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49OBVKUp3277418
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Oct 2024 11:31:20 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0BB585805A;
-	Thu, 24 Oct 2024 11:31:20 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ECED858054;
-	Thu, 24 Oct 2024 11:31:17 +0000 (GMT)
-Received: from [9.171.35.241] (unknown [9.171.35.241])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 24 Oct 2024 11:31:17 +0000 (GMT)
-Message-ID: <067ca6f7-a5c0-48ce-a3f9-81de115f19f0@linux.ibm.com>
-Date: Thu, 24 Oct 2024 13:31:16 +0200
+	s=arc-20240116; t=1729769556; c=relaxed/simple;
+	bh=lDea2FMjqGZ9k9qRL6S/dGNvhzc3tfHV/cof20gJ+mk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZrgQI/r9IU7fwVenu2gOBxAbUJgIiODtsp8iM4k3c1Q8sW2YNlF6BQOmuGmMS76oRBGtnn+ELbJMf9Moe2cJUa5od2zM2i99Z7mZcEScsIEKYoc6wBcA7btinnnplJEtPp17o0Jn+7K+McOHMhkN68w1D0q7WAZNCW4VZY0/QLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZJU367tW; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49OBW7LM116527;
+	Thu, 24 Oct 2024 06:32:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1729769527;
+	bh=aMLsOpWO/pYNkEAk0fPsDrgjjgnzlpp9C0m/g9waCuE=;
+	h=From:To:CC:Subject:Date;
+	b=ZJU367tW0yBQ3ojql4Noam33G+/lcMIbRFioV8ISAsq7Qyhevfv+jXYdJdeuaLAPT
+	 zsKrqv+vu71oIZZ7yY6wQ9334E/oQvfXWUEWNY3S/vYl+RDkjPxsoUiEDGasf/8U0v
+	 titvqwvfkkNXg2uFGZA4bsR972oHBmfKyN//043Y=
+Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49OBW7Bt026893
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 24 Oct 2024 06:32:07 -0500
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 24
+ Oct 2024 06:32:07 -0500
+Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 24 Oct 2024 06:32:06 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49OBW61O044845;
+	Thu, 24 Oct 2024 06:32:06 -0500
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 49OBW5Ug002932;
+	Thu, 24 Oct 2024 06:32:05 -0500
+From: Meghana Malladi <m-malladi@ti.com>
+To: <vigneshr@ti.com>, <horms@kernel.org>, <m-malladi@ti.com>,
+        <jan.kiszka@siemens.com>, <diogo.ivo@siemens.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <vadim.fedorenko@linux.dev>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net v2] net: ti: icssg-prueth: Fix 1 PPS sync
+Date: Thu, 24 Oct 2024 17:01:40 +0530
+Message-ID: <20241024113140.973928-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: use new helper to get the netdev
- associated to an ibdev
-To: Wen Gu <guwen@linux.alibaba.com>, jaka@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20241024054456.37124-1-guwen@linux.alibaba.com>
- <61cf578f-020e-4e0d-a551-98df5367ee27@linux.ibm.com>
- <ec3a2232-7787-4e0d-a0bd-a75280c3982f@linux.alibaba.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <ec3a2232-7787-4e0d-a0bd-a75280c3982f@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 0AFiR2aQqgCnk10om8Ip1O6D4JeLAmm_
-X-Proofpoint-GUID: Ys0FXCP4IUSAaZbHoYsrfEJGae1ndhpR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 mlxlogscore=655 spamscore=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 phishscore=0 impostorscore=0 adultscore=0
- suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410240092
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
+The first PPS latch time needs to be calculated by the driver
+(in rounded off seconds) and configured as the start time
+offset for the cycle. After synchronizing two PTP clocks
+running as master/slave, missing this would cause master
+and slave to start immediately with some milliseconds
+drift which causes the PPS signal to never synchronize with
+the PTP master.
 
+Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+---
 
-On 24.10.24 13:06, Wen Gu wrote:
-> 
-> 
-> On 2024/10/24 18:00, Wenjia Zhang wrote:
->>
->>
->> On 24.10.24 07:44, Wen Gu wrote:
->>> Patch [1] provides common interfaces to store and get net devices
->>> associated to an IB device port and removes the ops->get_netdev()
->>> callback of mlx5 driver. So use the new interface in smc.
->>>
->>> [1]: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev 
->>> functions")
->>>
->>> Reported-by: D. Wythe <alibuda@linux.alibaba.com>
->>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->>> ---
->> [...]
->>
->> We detected the problem as well, and I already sent a patch with the 
->> same code change in our team internally these. Because some agreement 
->> issues on the commit message, it is still not sent out externally. Now 
->> we (our team) have almost an agreement, I'd like to attach it here. 
->> Please have a look if it is also for you to use:
->>
->> "
->> [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
->>
->> Since/Although commit c2261dd76b54 ("RDMA/device: Add 
->> ib_device_set_netdev() as an alternative to get_netdev") introduced an 
->> API ib_device_get_netdev, the SMC-R variant of the SMC protocol 
->> continued to use the old API ib_device_ops.get_netdev() to lookup 
->> netdev. As commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and 
->> get_netdev functions") removed the get_netdev callback from 
->> mlx5_ib_dev_common_roce_ops, calling ib_device_ops.get_netdev didn't 
->> work any more at least by using a mlx5 device driver. Thus, using 
->> ib_device_set_netdev() now became mandatory.
->>
->> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
->>
->> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
->> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev 
->> functions")
->> "
->> My main points are:
->> - This patch should go to net, not net-next. Because it can result in 
->> malfunction. e.g. if the RoCE devices are used as both handshake 
->> device and RDMA device without any PNET_ID, it would be failed to find 
->> SMC-R device, then fallback.
->> - We need the both fixes, which would help us for the backport
->>
->>
->> Thanks,
->> Wenjia
-> 
-> Hi, Wenjia. I see. Since you're ready to post a patch, and this one has 
-> some problems,
-> I think you can supersede this one with yours. It is totally OK for me.
-> 
-> Thanks!
-> Wen Gu
-> 
-Thank you, Wen!
-I'll send some fixes this days.
+Hello,
 
-Thanks,
-Wenjia
+This patch is based on net-next tagged next-20241023.
+v1:https://lore.kernel.org/all/20241023091213.593351-1-m-malladi@ti.com/
+Changes since v1 (v2-v1):
+- Use roundup() instead of open coding as suggested by Vadim Fedorenko
+
+Regards,
+Meghana.
+
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 12 ++++++++++--
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h | 11 +++++++++++
+ 2 files changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 0556910938fa..6876e8181066 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -411,6 +411,8 @@ static int prueth_perout_enable(void *clockops_data,
+ 	struct prueth_emac *emac = clockops_data;
+ 	u32 reduction_factor = 0, offset = 0;
+ 	struct timespec64 ts;
++	u64 current_cycle;
++	u64 start_offset;
+ 	u64 ns_period;
+ 
+ 	if (!on)
+@@ -449,8 +451,14 @@ static int prueth_perout_enable(void *clockops_data,
+ 	writel(reduction_factor, emac->prueth->shram.va +
+ 		TIMESYNC_FW_WC_SYNCOUT_REDUCTION_FACTOR_OFFSET);
+ 
+-	writel(0, emac->prueth->shram.va +
+-		TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
++	current_cycle = icssg_readq(emac->prueth->shram.va +
++				    TIMESYNC_FW_WC_CYCLECOUNT_OFFSET);
++
++	/* Rounding of current_cycle count to next second */
++	start_offset = roundup(current_cycle, MSEC_PER_SEC);
++
++	icssg_writeq(start_offset, emac->prueth->shram.va +
++		     TIMESYNC_FW_WC_SYNCOUT_START_TIME_CYCLECOUNT_OFFSET);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index 8722bb4a268a..a4af2dbcca31 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -330,6 +330,17 @@ static inline int prueth_emac_slice(struct prueth_emac *emac)
+ extern const struct ethtool_ops icssg_ethtool_ops;
+ extern const struct dev_pm_ops prueth_dev_pm_ops;
+ 
++static inline u64 icssg_readq(const void __iomem *addr)
++{
++	return readl(addr) + ((u64)readl(addr + 4) << 32);
++}
++
++static inline void icssg_writeq(u64 val, void __iomem *addr)
++{
++	writel(lower_32_bits(val), addr);
++	writel(upper_32_bits(val), addr + 4);
++}
++
+ /* Classifier helpers */
+ void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac);
+ void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac);
+
+base-commit: 73840ca5ef361f143b89edd5368a1aa8c2979241
+-- 
+2.25.1
+
 
