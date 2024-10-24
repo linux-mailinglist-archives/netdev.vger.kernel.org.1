@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-138530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95D99AE02A
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:10:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2F59AE058
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 11:15:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F205C283A62
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:10:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24A5CB240D3
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 09:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276D81B0F3A;
-	Thu, 24 Oct 2024 09:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A378F16DC36;
+	Thu, 24 Oct 2024 09:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZeSZPda"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjatKlAA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2591B0F13;
-	Thu, 24 Oct 2024 09:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7EE1B3930
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 09:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729761038; cv=none; b=hhzIKDcyH8DGCbAwYM7lvijd+uKnnIMe9eWMFI4qRi4IfLdcN5OsZfNoW2yHFPoNxeL8N5v039f0PxAV01S3j7A8GzCc9pqmR/B83z+7OiL6O9pybJe3C79w5aeppfDdHMqOIS8Iv8mVH9N9HmA5glaOVariP8Bj+J7hcG73IVE=
+	t=1729761274; cv=none; b=I7z5cGF4OCB/vhIZvGnURdqAJGRCT2b+NhDz0u+KSGg3jmUV/XecumEhqqL40Gdl1rfrP6ADtIZiDAFLtyyeCve9ie07ywH26NFEvq19YmufJsyKv2JKBk/c86ongtHy1MLl0tMDDbKA0jaiQj+pMXCeeDQjP0nqA4QalBd3nRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729761038; c=relaxed/simple;
-	bh=+tAuPuS4qDYyylOvplCLRUauYVB2Q0dEDLIfuASAXaw=;
+	s=arc-20240116; t=1729761274; c=relaxed/simple;
+	bh=yBfz3EgduySwTFpnNerIzVboNzwmg/ifnCAQdO1XLss=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qPu8uTVyuctG7e0z1ogHKqBulWCQQlcXGmSSecqV1bCwJ++PvazO0R/M01C1sEN1yaJHYZjoaiyRCry4+8Si3xdIupi1XVu90A6wMEaDApMjOOzDsP8q6hER1PGyuDMGSN9POqHKHsQ0AHz5ysiol+KrOFN4ERz0WS98EOFHDPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZeSZPda; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 869FCC4CEC7;
-	Thu, 24 Oct 2024 09:10:34 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=H6zpzQgAcAb4ipCVezrbnAzcnwaHFdfj/s0Aj1EF6raFnnKs7ar4R5EY5/iPq4wETcWkqFSFU3O6bushVf5CpHkch9bEdPqSeSOexBKaX836zWeHMUmgVT7EtI0WaoiITh76W2a/LbpAljDApxB67m1Tx32W3Gu9ehrodi7X2/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjatKlAA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60CADC4CEC7;
+	Thu, 24 Oct 2024 09:14:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729761037;
-	bh=+tAuPuS4qDYyylOvplCLRUauYVB2Q0dEDLIfuASAXaw=;
+	s=k20201202; t=1729761274;
+	bh=yBfz3EgduySwTFpnNerIzVboNzwmg/ifnCAQdO1XLss=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GZeSZPdaL4yerk2j30+PVcGBLiQZAgkoyuopojm123vfC5hY2FYEbRF/tUj6RY1eP
-	 ZbsQXGt+uGQCvbd43GfNRLlzEenM6+5fCEYAV+P0bjB9FviTIy0SgzEfgVMNrT7Z2P
-	 d37OyOOY++81k6XYVijhanHE5t0IUe0XRZ4xb8s1FMJwGzlRLhci+thp8fWW40Apa7
-	 bv4/CCnj7iDLCRvWwNKTpiCwmN0zyAeB2g+H8IxfMdLNcVi7xtGUFK3qtomRUTpltu
-	 g4UA5dxeQ3SwoppiWBdnbmdnzplMhsDH9s8DCIP2TSPmS5Bx1+4BB3Nf51JuP75PGI
-	 Eq9+Sov8jKj/w==
-Date: Thu, 24 Oct 2024 10:10:32 +0100
+	b=SjatKlAAQB5wpHOvzrPK6ZOaeTy0VRbfrL1byjzZs/GFachwAuGCUiXgyWf5sFeVE
+	 0t3p5e2W5WdC9JAroBGACK6+4LNTTjJkQAYkwiVIYNcP/6sZHVgClxyayfoda9qdiH
+	 GrzvR6JOD8TGpzjrsjzL/R+z4VGDwHsHfJ6ckdVVByJlAgCSpl/0L7UAOi/x1lYyfp
+	 Rw48qnksZEpYNFNWn80ogZ0qoVMCkcdXYBVVthquVy0NsGHBd99SWP+z/9blfqti9c
+	 zGDZ8ajSIK+p+XOeX1xqMQqLrjgn75e8n7buUC1dBa0LpECn90YBm5WP8fL6p4FvCF
+	 sfDvdPj3tNpYA==
+Date: Thu, 24 Oct 2024 10:14:30 +0100
 From: Simon Horman <horms@kernel.org>
-To: Lee Trager <lee@trager.us>
-Cc: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Sanman Pradhan <sanmanpradhan@meta.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] eth: fbnic: Add devlink dev flash support
-Message-ID: <20241024091032.GI402847@kernel.org>
-References: <20241012023646.3124717-1-lee@trager.us>
- <20241022014319.3791797-1-lee@trager.us>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phylink: simplify phylink_parse_fixedlink()
+Message-ID: <20241024091430.GJ402847@kernel.org>
+References: <E1t3Fh5-000aQi-Nk@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,99 +60,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241022014319.3791797-1-lee@trager.us>
+In-Reply-To: <E1t3Fh5-000aQi-Nk@rmk-PC.armlinux.org.uk>
 
-On Mon, Oct 21, 2024 at 06:42:24PM -0700, Lee Trager wrote:
-> fbnic supports updating firmware using a PLDM image signed and distributed
-> by Meta. PLDM images are written into stored flashed. Flashing does not
-> interrupt operation.
+On Tue, Oct 22, 2024 at 03:17:07PM +0100, Russell King (Oracle) wrote:
+> phylink_parse_fixedlink() wants to preserve the pause, asym_pause and
+> autoneg bits in pl->supported. Rather than reading the bits into
+> separate bools, zeroing pl->supported, and then setting them if they
+> were previously set, use a mask and linkmode_and() to achieve the same
+> result.
 > 
-> On host reboot the newly flashed UEFI driver will be used. To run new
-> control or cmrt firmware the NIC must be power cycled.
-> 
-> Signed-off-by: Lee Trager <lee@trager.us>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-...
-
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-
-...
-
-> @@ -109,8 +110,274 @@ static int fbnic_devlink_info_get(struct devlink *devlink,
->  	return 0;
->  }
-> 
-> +/**
-> + * fbnic_send_package_data - Send record package data to firmware
-> + * @context: PLDM FW update structure
-> + * @data: pointer to the package data
-> + * @length: length of the package data
-> + *
-> + * Send a copy of the package data associated with the PLDM record matching
-> + * this device to the firmware.
-> + *
-> + * Return: zero on success
-> + *	    negative error code on failure
-> + */
-> +static int fbnic_send_package_data(struct pldmfw *context, const u8 *data,
-> +				   u16 length)
-> +{
-> +	struct device *dev = context->dev;
-> +
-> +	/* Temp placeholder required by devlink */
-> +	dev_info(dev,
-> +		 "Sending %u bytes of PLDM record package data to firmware\n",
-> +		 length);
-
-Could you clarify what is meant by "Temp placeholder" here and in
-fbnic_send_component_table(). And what plans there might be for
-a non-temporary solution.
-
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * fbnic_send_component_table - Send PLDM component table to the firmware
-> + * @context: PLDM FW update structure
-> + * @component: The component to send
-> + * @transfer_flag: Flag indication location in component tables
-> + *
-> + * Read relevant data from component table and forward it to the firmware.
-> + * Check response to verify if the firmware indicates that it wishes to
-> + * proceed with the update.
-> + *
-> + * Return: zero on success
-> + *	    negative error code on failure
-> + */
-> +static int fbnic_send_component_table(struct pldmfw *context,
-> +				      struct pldmfw_component *component,
-> +				      u8 transfer_flag)
-> +{
-> +	struct device *dev = context->dev;
-> +	u16 id = component->identifier;
-> +	u8 test_string[80];
-> +
-> +	switch (id) {
-> +	case QSPI_SECTION_CMRT:
-> +	case QSPI_SECTION_CONTROL_FW:
-> +	case QSPI_SECTION_OPTION_ROM:
-> +		break;
-> +	default:
-> +		dev_err(dev, "Unknown component ID %u\n", id);
-> +		return -EINVAL;
-> +	}
-> +
-> +	dev_dbg(dev, "Sending PLDM component table to firmware\n");
-> +
-> +	/* Temp placeholder */
-> +	strscpy(test_string, component->version_string,
-> +		min_t(u8, component->version_len, 79));
-> +	dev_info(dev, "PLDMFW: Component ID: %u version %s\n",
-> +		 id, test_string);
-> +
-> +	return 0;
-> +}
-
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
