@@ -1,58 +1,65 @@
-Return-Path: <netdev+bounces-138600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E3819AE454
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:02:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED739AE456
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 14:04:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1839284807
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:02:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF5251C21B0E
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 12:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364321C8797;
-	Thu, 24 Oct 2024 12:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E27F1CACFC;
+	Thu, 24 Oct 2024 12:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvKDt0Un"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gM67LttW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7F914B08E;
-	Thu, 24 Oct 2024 12:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E710A14B08E;
+	Thu, 24 Oct 2024 12:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729771350; cv=none; b=X/4oOJftYtQwkxptoJcS1P5HIwT9RDCsjbGLg1g/sGRqfVpFHx5NwrjM1ZDff1YxmRqeZkirhjPXefGY72gMImIYKRek0Woq5qPE5Z5We4bmLdkuS+coBPGbTmxN2ugUDzCXEShgQolitJp8/j/U+MRpvvw2EgoQ9zo2KJaYDO0=
+	t=1729771489; cv=none; b=biBiB8pwJj4e1I4UzDGdXl1ucAVza79FuNtI53ON/0kKFWs/MAHS6jr/rQfIeWADangIUVyWIYsOkxrhMcumDrihyphBiSlx3bR3bvnQSUe+UaMG/nqC1FyrmIrkJcLBlshx0WSWYAoajUAkDbhqDlHOvn2ah6KOUa8QXbZOCQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729771350; c=relaxed/simple;
-	bh=iHUIDKe3kskteOV95KX7xvooXvXUy+WtU3HlqQrJnJE=;
+	s=arc-20240116; t=1729771489; c=relaxed/simple;
+	bh=FcMCiaFRo3kGba187T7zojUyGGnsDRGiyR/wfrL8rQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DGUAmRP4+8bDjrK72U2NJBVEU3zRU/nM1M1ok0AlIB5YSI+a80GFiohnwTmPgtP+k5ItXRtUaQjHAGHiUX4uqBd+bHy74Ls6ysbaU/oKt2/PzLpCKFdXinxcyMLm7gNHQ7QN6AINj+yXvEpkG0U8Denb5IeT80wkygLm3V/FZrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvKDt0Un; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCD1DC4CEC7;
-	Thu, 24 Oct 2024 12:02:26 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQKds04nzPAaOcezxhXT8taA8vAiSMKmJBLMspO/f8I0HiS8+naLCp75Mho9DMNWpPiZEINQGwnmINFT9gDItCzDoHY9gbY74j5nh3BlUc94rHS+ASjkE257lPd+O1j8PkA15UairlepXZB9a52Tlmmg321bI2l/VdEVMHt4nmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gM67LttW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 612F8C4CEC7;
+	Thu, 24 Oct 2024 12:04:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729771348;
-	bh=iHUIDKe3kskteOV95KX7xvooXvXUy+WtU3HlqQrJnJE=;
+	s=k20201202; t=1729771488;
+	bh=FcMCiaFRo3kGba187T7zojUyGGnsDRGiyR/wfrL8rQc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WvKDt0Un0J8x6icLo1AoJsRhY8abAydWi6DlM5/PfV9LSyMdYUTzDwkzs2CTY7o9k
-	 Fk74ZixGCrTEmiW/4zyeClOeXFLqGthg9PXypimN7FzF3qEnG37yzUCOJ7qvlLGPRO
-	 WAGrBWADtEtbOtOHjLvDIukP+WHFxyEZ3F3e6Bbx83q9tv4PphP/GXD4p2txGxcFkv
-	 WXqlEkzlVWyQK7r3URwSXhvmQe2klyTxu4n0p2J3p9jjWXsg4HT8eXfDz7Plc1WuXH
-	 Jx27vLlyGuAXt3oZZAQcBy2txHdpCqRvQIJHUIgQ56zuZz3F9hh6Bw3gu5eVEl4o9z
-	 M5APbwJy0fDFA==
-Date: Thu, 24 Oct 2024 13:02:24 +0100
+	b=gM67LttWJEQYE6fh7e1zWGzK4TBOPLNh1MNYpoAY3pVgzeDCXqysQv6ANOia7vGu0
+	 3oc6jDoWGUTPh5H9FfO8dti8QbFgMYmqru7PlR+RdCCeh/DQ+pIuKhenHzkZbylX+f
+	 y64/MtahT4QZB/Tuu2ZCXPeQTPC19RBxL+68JA1WyhIynRxN8Ce3okxdtcFEvPuHyO
+	 I239lqzH6tGuUFrgssWS/8KGM86i9m6b7QgBphVl5oOa9xQkAWYqud2X6py6K8XqxK
+	 WiI2TtsUC4QExCW8zh1fdwvn7AzyF3uuhq4GoLQwD6Wo5U3/5gP4sKbijwjsYm/wBq
+	 2b6NNush6atMw==
+Date: Thu, 24 Oct 2024 13:04:43 +0100
 From: Simon Horman <horms@kernel.org>
 To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: netdev@vger.kernel.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] amd-xgbe: use ethtool string helpers
-Message-ID: <20241024120224.GH1202098@kernel.org>
-References: <20241022233203.9670-1-rosenp@gmail.com>
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	George McCollister <george.mccollister@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCHv2 net-next] net: dsa: use ethtool string helpers
+Message-ID: <20241024120443.GI1202098@kernel.org>
+References: <20241022201629.139244-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,15 +68,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241022233203.9670-1-rosenp@gmail.com>
+In-Reply-To: <20241022201629.139244-1-rosenp@gmail.com>
 
-On Tue, Oct 22, 2024 at 04:32:03PM -0700, Rosen Penev wrote:
-> The latter is the preferred way to copy ethtool strings.
-> 
-> Avoids manually incrementing the pointer.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+On Tue, Oct 22, 2024 at 01:16:29PM -0700, Rosen Penev wrote:
+> These are the prefered way to copy ethtool strings.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Rosen,
 
+As it looks like there will be a v2 to address Geert's review:
+
+prefered -> preferred
+
+...
+
+-- 
+pw-bot: changes-requested
 
