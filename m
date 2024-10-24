@@ -1,232 +1,133 @@
-Return-Path: <netdev+bounces-138628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC319AE67B
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:32:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B5D9AE67F
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 15:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE1A028AFF8
-	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:32:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24B7B1C236AB
+	for <lists+netdev@lfdr.de>; Thu, 24 Oct 2024 13:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B871F6676;
-	Thu, 24 Oct 2024 13:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mqNEzRNA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3541EC012;
+	Thu, 24 Oct 2024 13:26:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAF71EC012;
-	Thu, 24 Oct 2024 13:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F7C1DD524
+	for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 13:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729776381; cv=none; b=sHP9IzEofRaJNkrUTwAjXBZbegYt/RgOU4iw9X44Ptn6HqJu3AQCS7bxwEq47w+9CZr9BVutw0UmX8vo7iz74QaLcs9nsvYwxUzTSjB1CwxPWvQtA5DstTHmMMo/nBHVS3z9z4tD3E4ppTcTorFQ0Dn6azsfZ+7egaOhlp85j4I=
+	t=1729776401; cv=none; b=BUwTxXclSxBi+mFefNG3f4eJocpUWrdiCmbdwT4YiHrwom7+NaVP7ysaYf5sj6tv74nyLDc4zyMD6skwCO3C2nJFcglfJH6zCScdlosklG+iReXCebrwFGZuUTlaR3lQ++zhJuKdrM5krbtSn4nH2gt6x8Xs24gXNje4LRJfGwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729776381; c=relaxed/simple;
-	bh=0tls3eGOr1d6ACH2zu/yvzcAsZUIwQyO8rlVmljl+5U=;
-	h=Message-ID:Date:MIME-Version:Subject:References:From:To:CC:
-	 In-Reply-To:Content-Type; b=Zp+BOubpFAkJOFD2SxmoA26/zOYq4j6WSizDSM9+jIi3z1wHhifVnUyHksgQhMIqfN1KccXxglcRXi2CZGMrQ/w0FlV/vJXcwod1j7NVmIFLEmfF3hyu1uwRVc6JTP8YDeHs0p3EsuV/l6VhdbRinj4YZBhsRltmr4w76RXr6sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mqNEzRNA; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49OAFMvf027445;
-	Thu, 24 Oct 2024 13:25:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	I7RK5WYlfvj4gbXTMQ+TD923FalvRwp02PWzUc+gprs=; b=mqNEzRNAbT4TvVYy
-	d/roNlhOLQFBcON9Z0JKJy9qb0or9Yc7aWOWS+f9ftsC+7v6htletI15/cIRr2uj
-	s8EpEy6b7uZ6bvI7oYVU42059OngWWQiO6KnbMaJ6yqIp6Oh01iHDJxb0Bo3vrW7
-	W+vAEuz4UqF3ynaNSmr78d5zN/tpQe/mXMZonVc5+zIXvh2gn0vPRwbEC46gubcx
-	ZnNu9MWrY4bdosHAtxRHSDYSVGpGq5p8giBHzXRsB17kC3C4KmapvU7ZrRgO4fh9
-	Ot+zqvfaxCW7H4VKzUYdtWWiiXiorsR/bo7M6HWIcKUBWfPsCGcAuvQF8Iv+dXaM
-	95p9QA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em41wqhw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 13:25:53 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49ODPqXD010676
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 13:25:52 GMT
-Received: from [10.50.41.186] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 24 Oct
- 2024 06:25:45 -0700
-Message-ID: <641f830e-8d21-4bc0-abe2-59e2c4d29b92@quicinc.com>
-Date: Thu, 24 Oct 2024 18:55:42 +0530
+	s=arc-20240116; t=1729776401; c=relaxed/simple;
+	bh=Coajt4Owld0LwUpNn37brlQV6tDRBW0waM8Z9leyTQs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Rr/4UewQwL9CGt5bizxNaIrkaWCcrhfdPaxZ7eecvF+FkDYNIp+lkJIRaDz+IZXlZbki6My6lRZUBkCc23XWXrzsJsWv+aD0oHSQgxIBdSp9MTjSy4yevoKW71GHHcywLBLucbJX6aLW7UD17pqCedBuuKYQ4K7n2Iy0uHs+rtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XZ68y4nrNz2FbMF;
+	Thu, 24 Oct 2024 21:25:06 +0800 (CST)
+Received: from dggpemf100006.china.huawei.com (unknown [7.185.36.228])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4696B14037C;
+	Thu, 24 Oct 2024 21:26:31 +0800 (CST)
+Received: from [10.174.178.55] (10.174.178.55) by
+ dggpemf100006.china.huawei.com (7.185.36.228) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 24 Oct 2024 21:26:30 +0800
+Subject: Re: [PATCH 1/2] bna: Fix return value check for debugfs create APIs
+To: Simon Horman <horms@kernel.org>
+CC: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+	<GR-Linux-NIC-Dev@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>
+References: <20241023080921.326-1-thunder.leizhen@huawei.com>
+ <20241023080921.326-2-thunder.leizhen@huawei.com>
+ <20241024121325.GJ1202098@kernel.org>
+From: "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
+Date: Thu, 24 Oct 2024 21:26:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
-References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
- <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
- <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
- <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
- <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
- <ba1bf2a6-76b7-4e82-b192-86de9a8b8012@quicinc.com>
- <7b5227fc-0114-40be-ba5d-7616cebb4bf9@lunn.ch>
+In-Reply-To: <20241024121325.GJ1202098@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "Russell King (Oracle)" <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
-        Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Jacob Keller
-	<jacob.e.keller@intel.com>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
-        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
-        <john@phrozen.org>, Luo Jie <quic_luoj@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
-        "Lei Wei (QUIC)"
-	<quic_leiwei@quicinc.com>
-In-Reply-To: <7b5227fc-0114-40be-ba5d-7616cebb4bf9@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: MPx0gafbH9Rl4DwypXNRnvMgvRnCsQDT
-X-Proofpoint-ORIG-GUID: MPx0gafbH9Rl4DwypXNRnvMgvRnCsQDT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- adultscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410240110
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf100006.china.huawei.com (7.185.36.228)
 
-On 10/22/2024 7:07 PM, Andrew Lunn wrote:
->> Apologies for the delay in response. I understand that the PCS<->PHY
->> clocks may be out of the scope of PCS DT due to the reasons you mention.
->> However would like to clarify that the MII clocks referred to here, are
->> part of the connection between the MAC and PCS and not between PCS and PHY.
+
+
+On 2024/10/24 20:13, Simon Horman wrote:
+> On Wed, Oct 23, 2024 at 04:09:20PM +0800, Zhen Lei wrote:
+>> Fix the incorrect return value check for debugfs_create_dir() and
+>> debugfs_create_file(), which returns ERR_PTR(-ERROR) instead of NULL
+>> when it fails.
 >>
->> Below is a diagram that shows the sub-blocks inside the 'UNIPHY' block
->> of IPQ9574 which houses the PCS and the serdes, along with the clock
->> connectivity. The MII Rx/Tx clocks are supplied from the NSS CC, to the
->> GMII channels between PCS and MAC. So, it seemed appropriate to have
->> these clocks described as part of the PCS DT node.
->>
->>               +-------+ +---------+  +-------------------------+
->>    -----------|CMN PLL| |  GCC    |  |   NSSCC (Divider)       |
->>    |25/50mhz  +----+--+ +----+----+  +--+-------+--------------+
->>    |clk            |         |          ^       |
->>    |       31.25M  |  SYS/AHB|clk  RX/TX|clk    +------------+
->>    |       ref clk |         |          |       |            |
->>    |               |         v          | MII RX|TX clk   MAC| RX/TX clk
->>    |            +--+---------+----------+-------+---+      +-+---------+
->>    |            |  |   +----------------+       |   |      | |     PPE |
->>    v            |  |   |     UNIPHY0            V   |      | V         |
->>   +-------+     |  v   |       +-----------+ (X)GMII|      |           |
->>   |       |     |  +---+---+   |           |--------|------|-- MAC0    |
->>   |       |     |  |       |   |           | (X)GMII|      |           |
->>   |  Quad |     |  |SerDes |   |  (X)PCS   |--------|------|-- MAC1    |
->>   |       +<----+  |       |   |           | (X)GMII|      |           |
->>   |(X)GPHY|     |  |       |   |           |--------|------|-- MAC2    |
->>   |       |     |  |       |   |           | (X)GMII|      |           |
->>   |       |     |  +-------+   |           |--------|------|-- MAC3    |
->>   +-------+     |              |           |        |      |           |
->>                 |              +-----------+        |      |           |
->>                 +-----------------------------------+      |           |
+>> Commit 4ad23d2368cc ("bna: Remove error checking for
+>> debugfs_create_dir()") allows the program to continue execution if the
+>> creation of bnad->port_debugfs_root fails, which causes the atomic count
+>> bna_debugfs_port_count to be unbalanced. The corresponding error check
+>> need to be added back.
 > 
-> Thanks for the detailed diagram. That always helps get things
-> straight.
+> Hi Zhen Lei,
 > 
-> Im i correct in says that MII RX|TX is identical to MAC RX|TX? These
-> two clocks are used by the MAC and XPCS to clock data from one to the
-> other? If they are the exact same clocks, i would suggest you use the
-> same name, just to avoid confusion.
+> The documentation for debugfs_create_dir states:
 > 
+>  * NOTE: it's expected that most callers should _ignore_ the errors returned
+>  * by this function. Other debugfs functions handle the fact that the "dentry"
+>  * passed to them could be an error and they don't crash in that case.
+>  * Drivers should generally work fine even if debugfs fails to init anyway.
+> 
+> Which makes me wonder why we are checking the return value of
+> debugfs_create_dir() at all. Can't we just take advantage of
+> it not mattering, to debugfs functions, if the return value
+> is an error or not?
 
-Yes, these two clocks are used by MAC and PCS to clock data to one
-another. The MAC Rx/Tx clocks and MII Rx/Tx clocks are different clocks
-and can be enabled/disabled independently. However their parent clock is
-the same and hence their rate is same at all times. For example, the
-phylink ops will set the rate of MAC Rx/Tx during a link speed change,
-and this same rate is effected for the MII Rx/Tx clock.
+Do you want to ignore all the return values of debugfs_create_dir() and debugfs_create_file()?
+"bna_debugfs_root = debugfs_create_dir("bna", NULL);" and debugfs_create_file() is OK.
+I've carefully analyzed the current code, and "bnad->port_debugfs_root = debugfs_create_dir(...);"
+is also OK for now.
 
-Sure for the purpose of rest of this discussion, we can refer to them as
-MII Rx/Tx clocks.
+bnad_debugfs_init():
+	bnad->port_debugfs_root = debugfs_create_dir(name, bna_debugfs_root);	//IS_ERR() if fails
+(1)
+	atomic_inc(&bna_debugfs_port_count);
 
-I would also like to clarify that each of the '(X)PCS' blocks shown in
-the diagram, includes two PCS types, a 'PCS' type that supports 1Gbps
-PCS modes, and another 'XPCS' block (Synopsys) that supports 10Gbps PCS
-modes. The MII Rx/Tx clocks from the NSS CC, are supplied to the xGMII
-channels of both these PCS.
+bnad_debugfs_uninit():
+(2)	if (bnad->port_debugfs_root)						//It still works when it's IS_ERR()
+		atomic_dec(&bna_debugfs_port_count);
 
-> Both XPCS and PPE are clock consumers, so both will have a phandle
-> pointing to the NSSCC clock provider?
+	if (atomic_read(&bna_debugfs_port_count) == 0)
+		debugfs_remove(bna_debugfs_root);
+
+If we want the code to be more robust or easier to understand, it is better
+to modify (1) and (2) above as follows:
+(1) if (IS_ERR(bnad->port_debugfs_root))
+	return;
+(2) if (!IS_ERR_OR_NULL(bnad->port_debugfs_root))
+
+> 
+>> Fixes: 4ad23d2368cc ("bna: Remove error checking for debugfs_create_dir()")
+>> Fixes: 7afc5dbde091 ("bna: Add debugfs interface.")
+>> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+> 
+> ...
+> .
 > 
 
-Yes, this is correct.
-
->> We had one other question on the approach used in the driver for PCS
->> clocks, could you please provide your comments.
->>
->> As we can see from the above diagram, each serdes in the UNIPHY block
->> provides the clocks to the NSSCC, and the PCS block consumes the MII
->> Rx/Tx clocks. In our current design, the PCS/UNIPHY driver registers a
->> provider driver for the clocks that the serdes supplies to the NSS CC.
-> 
-> That sounds reasonable>
->> It also enables the MII Rx/Tx clocks which are supplied to the PCS from
->> the NSS CC. Would this be an acceptable design to have the PCS driver
->> register the clock provider driver and also consume the MII Rx/Tx
->> clocks? It may be worth noting that the serdes and PCS are part of the
->> same UNIPHY block and also share same register region.
-> 
-> Does the SERDES consume the MII Rx/Tx? Your diagram indicates it does
-> not. 
-
-The SERDES in the UNIPHY does not consume the MII Rx/Tx clocks. The
-consumer of these clocks is the PCS block within the UNIPHY.
-
-The SERDES only provides the source Rx/tx clocks to the NSS CC, and the
-NSS CC divides this clock and supplies the per-channel MII Rx/Tx clocks
-to the PCS.
-
-> I'm just wondering if you have circular dependencies at runtime?
-> 
-> Where you will need to be careful is probe time vs runtime. Since you
-> have circular phandles you need to first create all the clock
-> providers, and only then start the clock consumers. Otherwise you
-> might get into an endless EPROBE_DEFER loop.
-> 
-
-The Rx/Tx clocks sourced from the SERDES are registered as provider
-clocks by the UNIPHY/PCS driver during probe time. There is no runtime
-operation needed for these clocks after this.
-
-The MII Rx/Tx clocks are enabled later when the MAC is initialized by
-the network driver. The network driver calls an API exported by the PCS
-driver, which creates the PCS instance and enables the MII Rx/Tx clocks.
-Ideally, the PCS driver probe should have completed and provider clocks
-registered, by the time the MAC is initialized (we handle the error case
-in case the probe is still not complete).
-
-> 	Andrew
-> 
+-- 
+Regards,
+  Zhen Lei
 
