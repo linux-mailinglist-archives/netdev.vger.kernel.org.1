@@ -1,86 +1,88 @@
-Return-Path: <netdev+bounces-139188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43A119B0D34
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 20:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9685D9B0D51
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 20:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E605E1F22D11
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 18:28:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B1751F250B1
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 18:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B042220D4E8;
-	Fri, 25 Oct 2024 18:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BA518C930;
+	Fri, 25 Oct 2024 18:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="APKtVjV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay162.nicmail.ru (relay162.nicmail.ru [91.189.117.6])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC52206505;
-	Fri, 25 Oct 2024 18:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.189.117.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC85E1465A0
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 18:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729880727; cv=none; b=elPlRCRJl/uGlrVfYBTp3BN//08wlGCQyGP9TIHVxIvGyx8f+cSrD3DLinzmmCvmK/594dnGuG1TcSTPuIJSOTnC30vEVSIOpvpWwPXMA5OfDbbi87U25FVrbKxpUyEXBYp4eEGQVj/JD5ZPw4qXYRWaJp+Hp0DulPs9mTnk3xo=
+	t=1729881028; cv=none; b=AplJhAODX/C6ekzyQWcuqylro8Dd8ieR7qXL6nXJtKMwQNpS8Zh+t9CmA3qiixYzTgze2Rd7hEW1C8fBgF2OdWlrlDXnYR2hLPa+y4lLltWeZGXH3PCkO8kTtaDCL5q1OfVkV1mDlT3+Q35C6Rst66MAEjdQVyGPpAcIVXBNRls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729880727; c=relaxed/simple;
-	bh=ZRJFlXRAQRMnzFiGaRaE2Lz34/gU+03KlRhqUxDVI7Q=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=aPVY0vSZbq36vdw0ovVIGbaYnNtjrRH9f0EvryYkiIDqS9n7IOsIaCQKMQv0wD9PCDkcRSpjLoK3f8p0KQ9Smh16HkN5f0+nza8V2nrET1Ej66H2Q35ohZDzaqDk6euB8OlzZNKzydtM+ECHLovwNoRyzxqD7h26FcqX5GgPAeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru; spf=pass smtp.mailfrom=ancud.ru; arc=none smtp.client-ip=91.189.117.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ancud.ru
-Received: from [10.28.138.148] (port=5944 helo=[192.168.95.111])
-	by relay.hosting.mail.nic.ru with esmtp (Exim 5.55)
-	(envelope-from <kiryushin@ancud.ru>)
-	id 1t4Opz-0000000088U-5tJ7;
-	Fri, 25 Oct 2024 21:15:04 +0300
-Received: from [87.245.155.195] (account kiryushin@ancud.ru HELO [192.168.95.111])
-	by incarp1101.mail.hosting.nic.ru (Exim 5.55)
-	with id 1t4Opz-0097Vn-1f;
-	Fri, 25 Oct 2024 21:15:03 +0300
-Message-ID: <fa1c5922-ddbc-4765-a209-9c9477868635@ancud.ru>
-Date: Fri, 25 Oct 2024 21:15:01 +0300
+	s=arc-20240116; t=1729881028; c=relaxed/simple;
+	bh=SGH5Cu6HV7pUTJgcAU4WLzMiYOro4pkaoyi7srPIk/Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qUtwAsMIyUc7gjIsRsYEsK7nG+l6NRWhcT1eA1yDCtgEsVz4O8d7yJD6irGpOB6m8JvSUgxj4CkcMv/KZ2ZOktewGD/2h+nMpSdaBOXnClcwpaBQPjMKv/flNugNS+khtLpcIknqKIr8iboEm+B/6laazRLpV7NpD6z+zFSCWIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=APKtVjV4; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0e5712f2-7ecc-457a-afb7-4b304eb1bffa@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729881023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s7yCOcsQE5SG3SKhQzIbuLb+nPE7HmrNk95DllndTqw=;
+	b=APKtVjV4P2oY506YW/GWr1A7Cs9ornse0u4aqBRAS4b+prR1D4+Y1VEuwwg6/Mdk1cX3Sa
+	BXv7c+QPi+n4c5vPCL3zuKXNaD9xilz0e4j7i6aLlvLoV9lPusMTn0xT0jZ9K0fFa58FdB
+	qlik7mXt20xc8YXaQKPdNvyWLxQ2pBw=
+Date: Fri, 25 Oct 2024 11:30:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] bnx2x: turn off FCoE if storage MAC-address
- setup failed
-From: Nikita Kiryushin <kiryushin@ancud.ru>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
-References: <20240712132915.54710-1-kiryushin@ancud.ru>
- <c9e7ab8a-9ccf-4fea-9711-11cc89e12fc4@lunn.ch>
- <faed05e5-f276-4445-85d0-bfa3d515539a@ancud.ru>
+Subject: Re: [PATCH net-next 3/4] net/smc: Introduce smc_bpf_ops
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+ song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+ edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, dtcccc@linux.alibaba.com
+References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+ <1729737768-124596-4-git-send-email-alibuda@linux.alibaba.com>
+ <74c06b43-095f-414a-b4aa-2addbe610336@linux.dev>
+ <e398770a-1ab5-478b-820d-16c6060e0008@linux.alibaba.com>
 Content-Language: en-US
-In-Reply-To: <faed05e5-f276-4445-85d0-bfa3d515539a@ancud.ru>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <e398770a-1ab5-478b-820d-16c6060e0008@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-MS-Exchange-Organization-SCL: -1
+X-Migadu-Flow: FLOW_OUT
 
-On 7/15/24 17:10, Nikita Kiryushin wrote:
->> How broken is it when this happens?
-> I can not say what would happen exactly, if the address is not assigned
-> the way it should. But there would be at least an attempt to free unallocated
-> address (in __bnx2x_remove).
->
->> This is called from .probe. So
->> returning the error code will fail the probe and the device will not
->> be created. Is that a better solution?
-> To me, it does not seem fatal, that is why I am not returning error,
-> just print it and disable FCoE. The "rc" set will not be returned (unless
-> jumped to error handlers, which we are not doing). Would it be better, if
-> I used some other result variable other than "rc"? The check could be the call,
-> but than handling would be inside a lock, which I think is a bad idea.
+On 10/25/24 4:05 AM, D. Wythe wrote:
+> Our main concern is to avoid introducing kfuncs as much as possible. For our 
+> subsystem, we might need to maintain it in a way that maintains a uapi, as we 
+> certainly have user applications depending on it.
 
-The patch is marked as "Changes Requested" at the Patchwork,
-but I am not sure, what has to be done with it.
+The smc_bpf_ops can read/write the tp and ireq. In patch 4, there is 
+'tp->syn_smc = 1'. I assume the real bpf prog will read something from the tp to 
+make the decision also. Note that tp/ireq is also not in the uapi but the CO-RE 
+can help in case the tp->syn_smc bool is moved around.
+
+ From looking at the selftest in patch 4 again, I think all it needs is for the 
+bpf prog (i.e. the ops) to return a bool instead of allowing the bpf prog to 
+write or call a kfunc to change the tp/ireq.
+
+
 
