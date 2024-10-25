@@ -1,105 +1,132 @@
-Return-Path: <netdev+bounces-139124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B39F9B0521
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 16:08:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AB19B0542
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 16:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B65BF1F22AE1
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 14:08:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 444BE280D03
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 14:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A741BA89C;
-	Fri, 25 Oct 2024 14:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKqFICCZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66B01FB894;
+	Fri, 25 Oct 2024 14:14:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEE270815;
-	Fri, 25 Oct 2024 14:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F4C21219F;
+	Fri, 25 Oct 2024 14:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729865323; cv=none; b=Qf+B5saP1dmcLCq4U0CxoxXAPGvUwGhm2HiLNY4xfME+isl/X5kPE3J/Y+a/i8/WeGhDWw7i338V4NoBl5QjAmYCUZmnLbw6HlHAB1wybII9x5mrPKClqDymza8sBC6+Lb6hsRZczM8PuRIxZll8surw0BgPprL1MMDxBUmSEZ8=
+	t=1729865651; cv=none; b=T8hv53c5L42HGmR5A00R+3YpN8Ix9GVofGV+BJK91zMr4Ul0psZ4bd0m2twGPdj+ARSrOxUPRnxN7QvMM+gJ1z4gbmdy88NCXSMuNeAv0RFoXeXHJcCQjUkZNPA079VK/cnnWSN8ji/HLwZ0AIq+roz0SQ8OT6hcr/TO+jabfGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729865323; c=relaxed/simple;
-	bh=UAhvGKQMZlcxZYweANcgZFVrALev3+1WlKHnBYS7k3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fKK9Ot8shgA7qQIwnBQj8VAGW81kCREOGT/HwjFbdBW80Cuhy6VD7nSfjwh51TLFBPYCLUVLWq4VPIelAQ+uIzKxwUJcw8NHhBuV32k0engfiCXGg5LHw29xTTO3eFqrBynqX8IwG7+kXE6/oj8M8yN62pmQkJ6mJZbkTHLi3v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKqFICCZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7019C4CEC3;
-	Fri, 25 Oct 2024 14:08:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729865323;
-	bh=UAhvGKQMZlcxZYweANcgZFVrALev3+1WlKHnBYS7k3I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YKqFICCZWx0mw2CpNzBm/oM2WUJc8PCl2UjDMwHyPEqMpWTZUJ2Z00LirgG8CG+FI
-	 cPI11i31kiYQDevCurmv7OZNVbbl+dg+PJoGBUpGYpKR3bQRcCXrcKYUpZgbb+RrJt
-	 9EzI3vZkNgT2MtcvdDAaG9+uInxui892/SgYoWjyYyWFKvHevuv3CLdpkvzchrIN0L
-	 hpH+l6zP+i06phfviIXiCp2RS4hoxFzmZ95oxFZXLMWoob3rSvQkdivXR6gLCuwcmS
-	 QN6JPVYSDrIy5leqdIN4KZMVojLOfYKw5ClTCC3lZrNeitoAuRrvG+zr2EElhMq6gf
-	 XARMdTJLZ4W0A==
-Date: Fri, 25 Oct 2024 09:08:42 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: linux-kernel@vger.kernel.org, edumazet@google.com,
-	xiaoning.wang@nxp.com, imx@lists.linux.dev,
-	christophe.leroy@csgroup.eu, linux-pci@vger.kernel.org,
-	bhelgaas@google.com, alexander.stein@ew.tq-group.com,
-	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
-	devicetree@vger.kernel.org, davem@davemloft.net,
-	vladimir.oltean@nxp.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, Frank.Li@nxp.com, claudiu.manoil@nxp.com,
-	conor+dt@kernel.org
-Subject: Re: [PATCH v5 net-next 03/13] dt-bindings: net: add bindings for
- NETC blocks control
-Message-ID: <172986532146.2064042.10356681291273456543.robh@kernel.org>
-References: <20241024065328.521518-1-wei.fang@nxp.com>
- <20241024065328.521518-4-wei.fang@nxp.com>
+	s=arc-20240116; t=1729865651; c=relaxed/simple;
+	bh=VIu37v08bCXoHf9y1D7PIwgF3PSYVh85dxUpuADw1so=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DtnWf4f9u9oHbaX6LFcN7+1uAwSE8nRyDpSIBiEIxgssTMc2CX7cZgnQ6aR3t1UPi6ymQlNp7SOqBkxOaLIfH/oyi+xpwv5bkjdts7P4u1StsRpZkKMKAxMGZgmaUmXBEKZNPLxpHzzAED9vJhEUURO0re+ErvSjZuWXC8kSuj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XZl8W2PvBz67GZ3;
+	Fri, 25 Oct 2024 22:11:55 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0D0521408F9;
+	Fri, 25 Oct 2024 22:14:05 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 25 Oct
+ 2024 16:14:04 +0200
+Date: Fri, 25 Oct 2024 15:14:02 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
+	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, Alejandro Lucero
+	<alucerop@amd.com>
+Subject: Re: [PATCH v4 03/26] cxl: add capabilities field to cxl_dev_state
+ and cxl_port
+Message-ID: <20241025151402.00002e12@Huawei.com>
+In-Reply-To: <20241017165225.21206-4-alejandro.lucero-palau@amd.com>
+References: <20241017165225.21206-1-alejandro.lucero-palau@amd.com>
+	<20241017165225.21206-4-alejandro.lucero-palau@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241024065328.521518-4-wei.fang@nxp.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
+On Thu, 17 Oct 2024 17:52:02 +0100
+alejandro.lucero-palau@amd.com wrote:
 
-On Thu, 24 Oct 2024 14:53:18 +0800, Wei Fang wrote:
-> Add bindings for NXP NETC blocks control. Usually, NETC has 2 blocks of
-> 64KB registers, integrated endpoint register block (IERB) and privileged
-> register block (PRB). IERB is used for pre-boot initialization for all
-> NETC devices, such as ENETC, Timer, EMDIO and so on. And PRB controls
-> global reset and global error handling for NETC. Moreover, for the i.MX
-> platform, there is also a NETCMIX block for link configuration, such as
-> MII protocol, PCS protocol, etc.
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
-> v2 changes:
-> 1. Rephrase the commit message.
-> 2. Change unevaluatedProperties to additionalProperties.
-> 3. Remove the useless lables from examples.
-> v3 changes:
-> 1. Remove the items from clocks and clock-names, add maxItems to clocks
-> and rename the clock.
-> v4 changes:
-> 1. Reorder the required properties.
-> 2. Add assigned-clocks, assigned-clock-parents and assigned-clock-rates.
-> v5 changes:
-> 1. Remove assigned-clocks, assigned-clock-parents and assigned-clock-rates
-> 2. Remove minItems from reg and reg-names
-> 3. Rename the node in the examples to be more general
-> ---
->  .../bindings/net/nxp,netc-blk-ctrl.yaml       | 104 ++++++++++++++++++
->  1 file changed, 104 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/nxp,netc-blk-ctrl.yaml
+> Type2 devices have some Type3 functionalities as optional like an mbox
+> or an hdm decoder, and CXL core needs a way to know what an CXL accelerator
+> implements.
 > 
+> Add a new field to cxl_dev_state for keeping device capabilities as
+> discovered during initialization. Add same field to cxl_port as registers
+> discovery is also used during port initialization.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+Just a trivial wrong spec reference.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> diff --git a/include/linux/cxl/cxl.h b/include/linux/cxl/cxl.h
+> index c06ca750168f..4a4f75a86018 100644
+> --- a/include/linux/cxl/cxl.h
+> +++ b/include/linux/cxl/cxl.h
+> @@ -12,6 +12,37 @@ enum cxl_resource {
+>  	CXL_RES_PMEM,
+>  };
+>  
+> +/* Capabilities as defined for:
+> + *
+> + *	Component Registers (Table 8-22 CXL 3.0 specification)
+> + *	Device Registers (8.2.8.2.1 CXL 3.0 specification)
+> + */
+> +
+> +enum cxl_dev_cap {
+> +	/* capabilities from Component Registers */
+> +	CXL_DEV_CAP_RAS,
+> +	CXL_DEV_CAP_SEC,
+> +	CXL_DEV_CAP_LINK,
+> +	CXL_DEV_CAP_HDM,
+> +	CXL_DEV_CAP_SEC_EXT,
+> +	CXL_DEV_CAP_IDE,
+> +	CXL_DEV_CAP_SNOOP_FILTER,
+> +	CXL_DEV_CAP_TIMEOUT_AND_ISOLATION,
+> +	CXL_DEV_CAP_CACHEMEM_EXT,
+> +	CXL_DEV_CAP_BI_ROUTE_TABLE,
+> +	CXL_DEV_CAP_BI_DECODER,
+> +	CXL_DEV_CAP_CACHEID_ROUTE_TABLE,
+> +	CXL_DEV_CAP_CACHEID_DECODER,
+> +	CXL_DEV_CAP_HDM_EXT,
+> +	CXL_DEV_CAP_METADATA_EXT,
+This is the 3.1 version of the table as metadata cap wasn't
+added until then.  I'd just update the reference.
+
+> +	/* capabilities from Device Registers */
+> +	CXL_DEV_CAP_DEV_STATUS,
+> +	CXL_DEV_CAP_MAILBOX_PRIMARY,
+> +	CXL_DEV_CAP_MAILBOX_SECONDARY,
+> +	CXL_DEV_CAP_MEMDEV,
+> +	CXL_MAX_CAPS,
+I'd drop that trailing comma. Don't want anything to be accidentally added after this.
+> +};
+> +
+>  struct cxl_dev_state *cxl_accel_state_create(struct device *dev);
+>  
+>  void cxl_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec);
 
 
