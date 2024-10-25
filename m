@@ -1,346 +1,250 @@
-Return-Path: <netdev+bounces-139080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9105E9B00DC
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:05:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4201B9B00FC
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 227181F23A21
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:05:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05F85284220
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111191DD0C7;
-	Fri, 25 Oct 2024 11:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9F320263B;
+	Fri, 25 Oct 2024 11:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Zh80ygba"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eE911DP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DC41CFEB5;
-	Fri, 25 Oct 2024 11:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745F41D8DF8
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 11:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729854325; cv=none; b=L4j1dLrQI9jwRUNOhOoTre0rD2fUaAelncbPNF56NA1IT0BmqNlTxl8iYdgfkSTGHrq/yDJSPpL/gF6o37OHCobJY+FhzidcauED/q8TxvVip7ME5ZtmUIwaqaofZXb926iLwll4FIz96FkvtdBVyMp8GoehrcdUYP2Jqe7u25I=
+	t=1729854985; cv=none; b=gAG0VkpNt3oIWhoVOnJCoQ5x/GGy53EEhj7Qy6BwjuQZyyql/dnL7V9QnHmX+tqP8x7aJ+IdQ3QY/HZLjTBpOGOYDSCB+M5T4cnajac8lTLiQt5Z72pSOySvk3/ctReHUCXpCNGY4joxpgGheePKPQN54qzsdjZBGmeOpg+5hps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729854325; c=relaxed/simple;
-	bh=OP+n9Lo5uVkyQ7KeuPyqUB9xxC4Afjg2YnkSGz18hQk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YH6tnBMZtIE36RfOdAHE/fQmB2grYC52e2udBBZweHekdvrtwJlGiwKcqJAhK//0v9/A/+7/netIa6LcRdM4uxXzMPVKvY++vkjf7JRcP9NpsmNUqQ5R9G2tAP9V3avYASbZE7evcpYDIvLkmqeBysV+VezgDpSI+f/6WOT6lwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Zh80ygba; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729854312; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=e0wxpLKhPBNVP2EQdPTAgZRzESsbupoxr0lzsi/G1MQ=;
-	b=Zh80ygbakZ7j31wdWsOIENN6uv31RoPA+afgz1mOqkA7EAlCIDZGV0/J5R0UIKFnRtCW8deeF1vwmfz8Jtf1cUip8qDWlO8Dho1hj5ZWb8BhBsQWmdibZuCdhaVLO6ej5QhEsYK5djEGJqF5xmkZ9g+zblQhE3GV+phgL+l1Om0=
-Received: from 30.221.147.209(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WHsEbQx_1729854309 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 25 Oct 2024 19:05:10 +0800
-Message-ID: <e398770a-1ab5-478b-820d-16c6060e0008@linux.alibaba.com>
-Date: Fri, 25 Oct 2024 19:05:08 +0800
+	s=arc-20240116; t=1729854985; c=relaxed/simple;
+	bh=uU8yUKIr/0j8b9J4H6I4QyFe/CulTbsdrs+x0+3Eug0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=OHdFT/fuilE1y/iMSWejiIGd0LXMK8nMIWq5WaGpFAb4dQYcFoMsVk+nP1dI7fcX0ryhJsCArt9IgpEQm4fejB2SywtIehDY0xhlwaujUEsXFvihq0ZM4rY+3aHAkU4PsCw1NeoUVUptjcNYadwW9VmYZBHOZFwOFmG6LD8p2ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eE911DP+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729854981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l0qPBrRNSLkb3KGkLhlgiZrNu9jD/XhF/NDSopp9rNg=;
+	b=eE911DP+CO+3WEqp+UTvUHXYEitZEWXvPlPRs4FutgtFqpezo8/kzImGbmpVWVHs1nGKFx
+	mZgf6aeyDVBSX18ETwmH8CwqNoZk/X2g1Bv2NEBqugRpgh1y31nrLQPRcydLCavYZjgq/q
+	aNu2bqjP2v1Q7t3wEZQM7JdolJBdjjM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-214-pavzV1Q6PD6RqkxQSGcygQ-1; Fri, 25 Oct 2024 07:16:19 -0400
+X-MC-Unique: pavzV1Q6PD6RqkxQSGcygQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4316e350d6aso13887445e9.3
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 04:16:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729854978; x=1730459778;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l0qPBrRNSLkb3KGkLhlgiZrNu9jD/XhF/NDSopp9rNg=;
+        b=TE9PCR3/jy7d5eXxRQbT4zAah36I8D4N98bi+feTNd0hYumMehFwOoIlTKizcClO5D
+         lTsNXHiwKATSBFgrn8hymzJKOkuETLhTxQCL3ZrWUB5NY+QQTjsd1QnS9wu5B+fYuraf
+         ebRWnWBjj4MOnjKWlRgnkEP/boPvGda6BAlJEL27gXDqMGTL2q0ytoM463+QRie0DFnE
+         BQsHSP6jCMDCxwuMX8l3nC0my9VAT+ZZJ2Z5cRnnJwukxxfMSepCW0q1rQfwEKGMWAiB
+         6QZy6u3dsgla+qeWSXxWe1TYPntpazy1Z9vE+QEViviq8xGFvqnNIEc1HzeayjEzdK6T
+         L6MA==
+X-Forwarded-Encrypted: i=1; AJvYcCUShISk8JS+KUjkzQXwD79XSBtZ5aVJkl2Q1BHxxWHIJtgDFpkDg/cOM9E+tbEBmDw7dTWMusM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjS8CvkXHwpqONCBHYFADMa2Ef+TsJFHKnFjKskSl4HKvie4dw
+	VZuQLgAsXgMpql0Hw9RCOz8DwzqRYK0lOaT0fRu341Jw93oXz3K5eCe56DkOBmAR2E48D0UDou6
+	aokrk5AaXGr9FDMIM9koz0BnpNGiHbcTKlShrjuot5U2eEk1/LHEm3Q==
+X-Received: by 2002:a05:600c:4509:b0:42f:8fcd:486c with SMTP id 5b1f17b1804b1-43184246f16mr69382215e9.33.1729854977941;
+        Fri, 25 Oct 2024 04:16:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHz/TKf3cyp29H5EI56yHsa6P9AJDFSiMIPoxYVeexqi7wh6wrfOKtvYZ15vyaqaeliDwSAJQ==
+X-Received: by 2002:a05:600c:4509:b0:42f:8fcd:486c with SMTP id 5b1f17b1804b1-43184246f16mr69381965e9.33.1729854977523;
+        Fri, 25 Oct 2024 04:16:17 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431934be328sm15153085e9.0.2024.10.25.04.16.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 04:16:16 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id DC671160B56C; Fri, 25 Oct 2024 13:16:15 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc: zhangkun09@huawei.com, fanghaiqing@huawei.com, liuyonglong@huawei.com,
+ Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
+ <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Andrew Morton
+ <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel-team
+ <kernel-team@cloudflare.com>
+Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
+ has already unbound
+In-Reply-To: <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com>
+References: <20241022032214.3915232-1-linyunsheng@huawei.com>
+ <20241022032214.3915232-4-linyunsheng@huawei.com>
+ <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
+ <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
+ <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 25 Oct 2024 13:16:15 +0200
+Message-ID: <87r084e8lc.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/4] net/smc: Introduce smc_bpf_ops
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
- song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
- edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, dtcccc@linux.alibaba.com
-References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
- <1729737768-124596-4-git-send-email-alibuda@linux.alibaba.com>
- <74c06b43-095f-414a-b4aa-2addbe610336@linux.dev>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <74c06b43-095f-414a-b4aa-2addbe610336@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+Yunsheng Lin <linyunsheng@huawei.com> writes:
 
+> On 2024/10/24 22:40, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>
+> ...
+>
+>>>>
+>>>> I really really dislike this approach!
+>>>>
+>>>> Nacked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>
+>>>> Having to keep an array to record all the pages including the ones
+>>>> which are handed over to network stack, goes against the very principle
+>>>> behind page_pool. We added members to struct page, such that pages cou=
+ld
+>>>> be "outstanding".
+>>>
+>>> Before and after this patch both support "outstanding", the difference =
+is
+>>> how many "outstanding" pages do they support.
+>>>
+>>> The question seems to be do we really need unlimited inflight page for
+>>> page_pool to work as mentioned in [1]?
+>>>
+>>> 1. https://lore.kernel.org/all/5d9ea7bd-67bb-4a9d-a120-c8f290c31a47@hua=
+wei.com/
+>>=20
+>> Well, yes? Imposing an arbitrary limit on the number of in-flight
+>> packets (especially such a low one as in this series) is a complete
+>> non-starter. Servers have hundreds of gigs of memory these days, and if
+>> someone wants to use that for storing in-flight packets, the kernel
+>> definitely shouldn't impose some (hard-coded!) limit on that.
+>
+> You and Jesper seems to be mentioning a possible fact that there might
+> be 'hundreds of gigs of memory' needed for inflight pages, it would be ni=
+ce
+> to provide more info or reasoning above why 'hundreds of gigs of memory' =
+is
+> needed here so that we don't do a over-designed thing to support recording
+> unlimited in-flight pages if the driver unbound stalling turns out imposs=
+ible
+> and the inflight pages do need to be recorded.
 
-On 10/25/24 8:26 AM, Martin KaFai Lau wrote:
-> On 10/23/24 7:42 PM, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> The introduction of IPPROTO_SMC enables eBPF programs to determine
->> whether to use SMC based on the context of socket creation, such as
->> network namespaces, PID and comm name, etc.
->>
->> As a subsequent enhancement, this patch introduces a new hook for eBPF
->> programs that allows decisions on whether to use SMC or not at runtime,
->> including but not limited to local/remote IP address or ports. In
->> simpler words, this feature allows modifications to syn_smc through eBPF
->> programs before the TCP three-way handshake got established.
->>
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->>   include/linux/tcp.h   |   2 +-
->>   include/net/smc.h     |  47 +++++++++++
->>   include/net/tcp.h     |   6 ++
->>   net/ipv4/tcp_input.c  |   3 +-
->>   net/ipv4/tcp_output.c |  14 +++-
->>   net/smc/Kconfig       |  12 +++
->>   net/smc/Makefile      |   1 +
->>   net/smc/af_smc.c      |  38 ++++++---
->>   net/smc/smc.h         |   4 +
->>   net/smc/smc_bpf.c     | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>   net/smc/smc_bpf.h     |  34 ++++++++
->>   11 files changed, 357 insertions(+), 16 deletions(-)
->>   create mode 100644 net/smc/smc_bpf.c
->>   create mode 100644 net/smc/smc_bpf.h
->>
->> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
->> index 6a5e08b..4ef160a 100644
->> --- a/include/linux/tcp.h
->> +++ b/include/linux/tcp.h
->> @@ -478,7 +478,7 @@ struct tcp_sock {
->>   #endif
->>   #if IS_ENABLED(CONFIG_SMC)
->>       bool    syn_smc;    /* SYN includes SMC */
->> -    bool    (*smc_hs_congested)(const struct sock *sk);
->> +    struct tcpsmc_ctx *smc;
->>   #endif
->>   #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
->> diff --git a/include/net/smc.h b/include/net/smc.h
->> index db84e4e..34ab2c6 100644
->> --- a/include/net/smc.h
->> +++ b/include/net/smc.h
->> @@ -18,6 +18,8 @@
->>   #include "linux/ism.h"
->>   struct sock;
->> +struct tcp_sock;
->> +struct inet_request_sock;
->>   #define SMC_MAX_PNETID_LEN    16    /* Max. length of PNET id */
->> @@ -97,4 +99,49 @@ struct smcd_dev {
->>       u8 going_away : 1;
->>   };
->> +/*
->> + * This structure is used to store the parameters passed to the member of struct_ops.
->> + * Due to the BPF verifier cannot restrict the writing of bit fields, such as limiting
->> + * it to only write ireq->smc_ok. Using kfunc can solve this issue, but we don't want
->> + * to introduce a kfunc with such a narrow function.
-> 
-> imo, adding kfunc is fine.
-> 
->> + *
->> + * Moreover, using this structure for unified parameters also addresses another
->> + * potential issue. Currently, kfunc cannot recognize the calling context
->> + * through BPF's existing structure. In the future, we can solve this problem
->> + * by passing this ctx to kfunc.
-> 
-> This part I don't understand. How is it different from the "tcp_cubic_kfunc_set" allowed in 
-> tcp_congestion_ops?
+I don't have a concrete example of a use that will blow the limit you
+are setting (but maybe Jesper does), I am simply objecting to the
+arbitrary imposing of any limit at all. It smells a lot of "640k ought
+to be enough for anyone".
 
-Hi Martin,
+> I guess it is common sense to start with easy one until someone complains
+> with some testcase and detailed reasoning if we need to go the hard way as
+> you and Jesper are also prefering waiting over having to record the infli=
+ght
+> pages.
 
-Yes, creating an independent kfunc for each callback and filtering via expected_attach_type can 
-indeed solve the problem.
+AFAIU Jakub's comment on his RFC patch for waiting, he was suggesting
+exactly this: Add the wait, and see if the cases where it can stall turn
+out to be problems in practice.
 
-Our main concern is to avoid introducing kfuncs as much as possible. For our subsystem, we might 
-need to maintain it in a way that maintains a uapi, as we certainly have user applications depending 
-on it.
+> More detailed about why we might need to go the hard way of having to rec=
+ord
+> the inflight pages as below.
+>
+>>=20
+>>>>
+>>>> The page_pool already have a system for waiting for these outstanding /
+>>>> inflight packets to get returned.=C2=A0 As I suggested before, the pag=
+e_pool
+>>>> should simply take over the responsability (from net_device) to free t=
+he
+>>>> struct device (after inflight reach zero), where AFAIK the DMA device =
+is
+>>>> connected via.
+>>>
+>>> It seems you mentioned some similar suggestion in previous version,
+>>> it would be good to show some code about the idea in your mind, I am su=
+re
+>>> that Yonglong Liu Cc'ed will be happy to test it if there some code like
+>>> POC/RFC is provided.
+>>=20
+>> I believe Jesper is basically referring to Jakub's RFC that you
+>> mentioned below.
+>>=20
+>>> I should mention that it seems that DMA device is not longer vaild when
+>>> remove() function of the device driver returns, as mentioned in [2], wh=
+ich
+>>> means dma API is not allowed to called after remove() function of the d=
+evice
+>>> driver returns.
+>>>
+>>> 2. https://www.spinics.net/lists/netdev/msg1030641.html
+>>>
+>>>>
+>>>> The alternative is what Kuba suggested (and proposed an RFC for),=C2=
+=A0 that
+>>>> the net_device teardown waits for the page_pool inflight packets.
+>>>
+>>> As above, the question is how long does the waiting take here?
+>>> Yonglong tested Kuba's RFC, see [3], the waiting took forever due to
+>>> reason as mentioned in commit log:
+>>> "skb_defer_free_flush(): this may cause infinite delay if there is no
+>>> triggering for net_rx_action()."
+>>=20
+>> Honestly, this just seems like a bug (the "no triggering of
+>> net_rx_action()") that should be root caused and fixed; not a reason
+>> that waiting can't work.
+>
+> I would prefer the waiting too if simple waiting fixed the test cases that
+> Youglong and Haiqing were reporting and I did not look into the rabbit ho=
+le
+> of possible caching in networking.
+>
+> As mentioned in commit log and [1]:
+> 1. ipv4 packet defragmentation timeout: this seems to cause delay up to 30
+>    secs, which was reported by Haiqing.
+> 2. skb_defer_free_flush(): this may cause infinite delay if there is no
+>    triggering for net_rx_action(), which was reported by Yonglong.
+>
+> For case 1, is it really ok to stall the driver unbound up to 30 secs for=
+ the
+> default setting of defragmentation timeout?
+>
+> For case 2, it is possible to add timeout for those kind of caching like =
+the
+> defragmentation timeout too, but as mentioned in [2], it seems to be a no=
+rmal
+> thing for this kind of caching in networking:
 
-This is also why we need to create a separate ctx, as there’s no way to restrict bit writes, so we 
-created a ctx->smc_ok that is allowed to write.
+Both 1 and 2 seem to be cases where the netdev teardown code can just
+make sure to kick the respective queues and make sure there's nothing
+outstanding (for (1), walk the defrag cache and clear out anything
+related to the netdev going away, for (2) make sure to kick
+net_rx_action() as part of the teardown).
 
-This is also why we had to create a separate structure, tcpsmc_ctx ...
+> "Eric pointed out/predicted there's no guarantee that applications will
+> read / close their sockets so a page pool page may be stuck in a socket
+> (but not leaked) forever."
 
-However, I now realize that compromising to avoid introducing kfuncs has gone too far, affecting the 
-readability of the code. I will try to use kfuncs in the next version to solve those issues.
+As for this one, I would put that in the "well, let's see if this
+becomes a problem in practice" bucket.
 
-
-> 
->> + */
->> +struct smc_bpf_ops_ctx {
->> +    struct {
->> +        struct tcp_sock *tp;
->> +    } set_option;
->> +    struct {
->> +        const struct tcp_sock *tp;
->> +        struct inet_request_sock *ireq;
->> +        int smc_ok;
->> +    } set_option_cond;
->> +};
-> 
-> There is no need to create one single ctx for struct_ops prog. struct_ops prog can take >1 args and 
-> different ops can take different args.
-> 
-
-Same reason with concern on kfunc. I'll change it in next version.
-
-
->> +
->> +struct smc_bpf_ops {
->> +    /* priavte */
->> +
->> +    struct list_head    list;
->> +
->> +    /* public */
->> +
->> +    /* Invoked before computing SMC option for SYN packets.
->> +     * We can control whether to set SMC options by modifying
->> +     * ctx->set_option->tp->syn_smc.
->> +     * This's also the only member that can be modified now.
->> +     * Only member in ctx->set_option is valid for this callback.
->> +     */
->> +    void (*set_option)(struct smc_bpf_ops_ctx *ctx);
->> +
->> +    /* Invoked before Set up SMC options for SYN-ACK packets
->> +     * We can control whether to respond SMC options by modifying
->> +     * ctx->set_option_cond.smc_ok.
->> +     * Only member in ctx->set_option_cond is valid for this callback.
->> +     */
->> +    void (*set_option_cond)(struct smc_bpf_ops_ctx *ctx);
-> 
-> The struct smc_bpf_ops already has set_option and set_option_cnd, but...
-> 
->> +};
->> +
->>   #endif    /* _SMC_H */
->> diff --git a/include/net/tcp.h b/include/net/tcp.h
->> index 739a9fb..c322443 100644
->> --- a/include/net/tcp.h
->> +++ b/include/net/tcp.h
->> @@ -2730,6 +2730,12 @@ static inline void tcp_bpf_rtt(struct sock *sk, long mrtt, u32 srtt)
->>   #if IS_ENABLED(CONFIG_SMC)
->>   extern struct static_key_false tcp_have_smc;
->> +struct tcpsmc_ctx {
->> +    /* Invoked before computing SMC option for SYN packets. */
->> +    void (*set_option)(struct tcp_sock *tp);
->> +    /* Invoked before Set up SMC options for SYN-ACK packets */
->> +    void (*set_option_cond)(const struct tcp_sock *tp, struct inet_request_sock *ireq);
->> +};
-> 
-> another new struct tcpsmc_ctx has exactly the same functions (at least the same name) but different 
-> arguments. I don't understand why this duplicate, is it because the need to prepare the "struct 
-> smc_bpf_ops_ctx"?
-
-Yes, same reason with concern on kfunc. I'll change it in next version.
-
-> 
-> The "struct tcpsmc_ctx" should be the "struct smc_bpf_ops" itself.
-> 
-> [ ... ]
-> 
->> +static int smc_bpf_ops_btf_struct_access(struct bpf_verifier_log *log,
->> +                     const struct bpf_reg_state *reg,
->> +                     const struct bpf_prog *prog,
->> +                     int off, int size)
->> +{
->> +    const struct btf_member *member;
->> +    const char *mname;
->> +    int member_idx;
->> +
->> +    member_idx = prog->expected_attach_type;
->> +    if (member_idx >= btf_type_vlen(smc_bpf_ops_type))
->> +        goto out_err;
->> +
->> +    member = &btf_type_member(smc_bpf_ops_type)[member_idx];
->> +    mname = btf_str_by_offset(saved_btf, member->name_off);
->> +
->> +    if (!strcmp(mname, "set_option")) {
-> 
-> btf_member_bit_offset can be used instead of strcmp. Take a look at bpf_tcp_ca.c and kernel/sched/ext.c
-> 
-
-Got it, thanks for that.
-
-Besides, it seems that we don't need the export btf_str_by_offset anymore in that way.
-I'll remove it in the next version.
-
-
->> +        /* only support to modify tcp_sock->syn_smc */
->> +        if (reg->btf_id == tcp_sock_id &&
->> +            off == offsetof(struct tcp_sock, syn_smc) &&
->> +            off + size == offsetofend(struct tcp_sock, syn_smc))
->> +            return 0;
->> +    } else if (!strcmp(mname, "set_option_cond")) {
->> +        /* only support to modify smc_bpf_ops_ctx->smc_ok */
->> +        if (reg->btf_id == smc_bpf_ops_ctx_id &&
->> +            off == offsetof(struct smc_bpf_ops_ctx, set_option_cond.smc_ok) &&
->> +            off + size == offsetofend(struct smc_bpf_ops_ctx, set_option_cond.smc_ok))
->> +            return 0;
->> +    }
->> +
->> +out_err:
->> +    return -EACCES;
->> +}
->> +
->> +static const struct bpf_verifier_ops smc_bpf_verifier_ops = {
->> +    .get_func_proto = bpf_base_func_proto,
->> +    .is_valid_access = bpf_tracing_btf_ctx_access,
->> +    .btf_struct_access = smc_bpf_ops_btf_struct_access,
->> +};
->> +
->> +static struct bpf_struct_ops bpf_smc_bpf_ops = {
->> +    .init = smc_bpf_ops_init,
->> +    .name = "smc_bpf_ops",
->> +    .reg = smc_bpf_ops_reg,
->> +    .unreg = smc_bpf_ops_unreg,
->> +    .cfi_stubs = &__bpf_smc_bpf_ops,
->> +    .verifier_ops = &smc_bpf_verifier_ops,
->> +    .init_member = smc_bpf_ops_init_member,
->> +    .check_member = smc_bpf_ops_check_member,
->> +    .owner = THIS_MODULE,
->> +};
->> +
->> +int smc_bpf_struct_ops_init(void)
->> +{
->> +    return register_bpf_struct_ops(&bpf_smc_bpf_ops, smc_bpf_ops);
->> +}
->> +
->> +void bpf_smc_set_tcp_option(struct tcp_sock *tp)
->> +{
->> +    struct smc_bpf_ops_ctx ops_ctx = {};
->> +    struct smc_bpf_ops *ops;
->> +
->> +    ops_ctx.set_option.tp = tp;
-> 
-> All this initialization should be unnecessary. Directly pass tp instead.
-> 
-
-Same reason with kfunc concern. I'll change it in next version.
-
->> +
->> +    rcu_read_lock();
->> +    list_for_each_entry_rcu(ops, &smc_bpf_ops_list, list) {
-> 
-> Does it need to have a list (meaning >1) of smc_bpf_ops to act on a sock? The ordering expectation 
-> is hard to manage.
-> 
-
-Considering that the SMC modules also has its own ops that needs to be registered on it (the logic 
-of smc_limit_fs), and need to be all executed, perhaps a list is a more suitable choice.
-
-
->> +        ops->set_option(&ops_ctx);
-> 
-> A dumb question. This will only affect AF_SMC (or AF_INET[6]/IPPROTO_SMC) socket but not the 
-> AF_INET[6]/IPPROTO_{TCP,UDP} socket?
-> 
-
-Yes, it only affects AF_SMC, AF_SMC6, or IPPROTO_SMC sockets. Due to only SMC sockets will set 
-tp->syn_smc, and we will check it before calling the very ops.
-
-Best wishes,
-D.
-
-> pw-bot: cr
-> 
->> +    }
->> +    rcu_read_unlock();
->> +}
-
-
+-Toke
 
 
