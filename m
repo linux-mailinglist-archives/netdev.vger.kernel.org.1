@@ -1,382 +1,502 @@
-Return-Path: <netdev+bounces-139258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E569B134F
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:35:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EFDC9B1356
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B8CB1C20D82
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:35:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1042FB222CF
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA738200C91;
-	Fri, 25 Oct 2024 23:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1569C215C45;
+	Fri, 25 Oct 2024 23:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nigauri-org.20230601.gappssmtp.com header.i=@nigauri-org.20230601.gappssmtp.com header.b="N/nMTUxU"
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E77157E99;
-	Fri, 25 Oct 2024 23:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBB71DD0C9
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 23:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729899302; cv=none; b=DBJUuyL/cyTSQPn04Ldvh5NiGqf9fDPPnmNyaPdtJeqztKA4QJADiKv6FIajD3lSlCyEGEkqKtH8HxWmnu5EqpLBLlV4bZhnr1noZSY1bPwyPtk5DD3yGVG+SaSM+MK4Y44jE0GWYQvNfgfYDr20DtbMEFzBzEjHpC89XhL1CM8=
+	t=1729899324; cv=none; b=uaz6GZzJi7cWWyha71wkJaCDpT1Tl9299UO+TET9kZ2/dfniZrMA4W3CD3L5s1ualE7aaiUbtnXpYJzQt29NygTUms2t7imlU/VSLeBGb55UHOqR7cDx5x3i9kYYoBhyzxU0XcuOE+tEKRKWhhqewJcuVgiAIqk151S4XU6nYIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729899302; c=relaxed/simple;
-	bh=3JW+04Citxx0VhZE3Fw01lz/nVOh0BZ7V5GYOOzp7eQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KDWChvxvjv26LiloH1XjnEUVrK2D0+9SMzV+6VMjzH35OBTWpIuBdoX+gE9F7gezvjXMcA7DXIn5Mj0w8Iv2qNuXRUbC5AT6Ukokffp6ALUq37NPCkJLpNFNVmT3jLwTO+W74rlyjzD6CwOb0DoabJGJj/j1dFmSC7QjX/naXuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
-Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=[192.168.1.226])
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_128_GCM_SHA256:128)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1t4Tpa-0002Gi-Q3; Fri, 25 Oct 2024 23:34:58 +0000
-Message-ID: <fcc0ff8c-85c6-4ba6-8c1f-541451fca409@trager.us>
-Date: Fri, 25 Oct 2024 16:34:50 -0700
+	s=arc-20240116; t=1729899324; c=relaxed/simple;
+	bh=LPWv1YL8LZhjJyCa94yNkGcaFDXgT802n8p2nUfUHM8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WPSofBZd7NRDvrlXYYrrjTtzCXz1b0pkvD3fmoYGm/qC52lck+0CRy+KELt6DpFYRJzIf7pMBGD3urVYYwT2IBwlOsxYRGC6MAaDyZx82Pm+FHrP3zvarZwrhvunPbkaRJHAPJkdbCMKxAzOWfosJ2+q2wXqWSdI3RUYnC/QJW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nigauri.org; spf=none smtp.mailfrom=nigauri.org; dkim=pass (2048-bit key) header.d=nigauri-org.20230601.gappssmtp.com header.i=@nigauri-org.20230601.gappssmtp.com header.b=N/nMTUxU; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nigauri.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nigauri.org
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9a0c7abaa6so294427566b.2
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 16:35:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=nigauri-org.20230601.gappssmtp.com; s=20230601; t=1729899319; x=1730504119; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VcMODTrY2Fh1Wj5kQwWRgkJkHDzaAAgzP2RqgEkLJ7g=;
+        b=N/nMTUxUA6sy/0tiZMgwlfzlH+Agd0iw6BeyYbf8ViNHX3ziBwTtKoIXoX0knuXQ0P
+         iQIaguV2+LoO4nVt9uP1luULCiqdDhN6aAAMOG5q6a/Zwxwj3FhcZjB3FjZeZaPEqFQs
+         z21EzFXnP3fhnGrSg5mLMgbo8IriUrHbRFBnhPUxIFu5Z/Jdr4EqWkImLNX+zhcdtlEc
+         VspYd+kpRAZqhbzPQYM4J6gZAGtXtG6AubcftUuysVw32bNvAe0Zyo+xZITCmbGkIVTp
+         27SuaebDigQP0EQTH/swbAsuek9k/639JCxMkWDtfRY2YKygVLIG9vTjlLVd1evDjAXK
+         JSlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729899319; x=1730504119;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VcMODTrY2Fh1Wj5kQwWRgkJkHDzaAAgzP2RqgEkLJ7g=;
+        b=Og9+sg1BbxCl0GQFg2RBFGrI1SEOF/tHXR8Vsx1ljSNUW1RFn3KmqIuqJcSImscpL/
+         jP8FDu+W5ftGjrR7OCNhlFncAvRXrSXkJXCslfxclIjHI2Qn1s9hfJ5TwcOq2kfmIhJN
+         NoC8LqffF1/SHlJ+S/9NyaSbcEqt4ApGbCP7NSTpnJMj5RmJsGNWkSN7IKBHo3HfK1Or
+         0ZKzx0SCi/KWLAwXC9L9z9iqK4GAXc9Z3D7aPPI0J8F2F70SEhKUb6NwY+kFPj0Bcq1G
+         D6p4e7I3b7G+qm7B6Ldu3cgwXeQLSqEx//iB8Umhitly124hhq4av+jbXUHrylYSv5tG
+         T9eg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7v5EIBLVsaI7aDNDZt/lPt8r0ogG18bWoQ5MP/JdxKX2LXPebHz2tZBCfcXPMSnqeA6z/OVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYfDckPPOm2w/riqdFCUPvJkaV/wv34yTRLLN3EXBgg1s3Jg9+
+	SFJ/X8zOEmifi123w3/NtIeD3mc63zC8uBWt1IIpvnbR5Wu3lzfQa5P+Jlq9RDJ31cVHe+ioI0A
+	WrP56mRyDuNJM7O1uqBeFbnEHt49YhzPs5SM=
+X-Google-Smtp-Source: AGHT+IGY1VatODJqlKJR3+SWbDzOmxrvjRMJU3tojP5aYY8C8vwclEjq4PprGfjdy+elzgN8FWbSTRMZkth0ZGCHlhk=
+X-Received: by 2002:a17:907:7215:b0:a9a:1778:7024 with SMTP id
+ a640c23a62f3a-a9de5cea694mr62084266b.20.1729899318699; Fri, 25 Oct 2024
+ 16:35:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv4 net-next] net: dsa: use ethtool string helpers
-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Kurt Kanzenbach <kurt@linutronix.de>, Woojung Huh
- <woojung.huh@microchip.com>,
- "maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER"
- <UNGLinuxDriver@microchip.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
- <clement.leger@bootlin.com>,
- George McCollister <george.mccollister@gmail.com>,
- Simon Horman <horms@kernel.org>, open list <linux-kernel@vger.kernel.org>,
- "open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER"
- <linux-renesas-soc@vger.kernel.org>
-References: <20241025200807.189223-1-rosenp@gmail.com>
-Content-Language: en-US
-From: Lee Trager <lee@trager.us>
-In-Reply-To: <20241025200807.189223-1-rosenp@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-10-tmyu0@nuvoton.com>
+In-Reply-To: <20241024085922.133071-10-tmyu0@nuvoton.com>
+From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
+Date: Sat, 26 Oct 2024 08:34:51 +0900
+Message-ID: <CABMQnVK5_gq2+ftMDdJuzdGY131==OEsxuF9hCqT=KmQw-fYoA@mail.gmail.com>
+Subject: Re: [PATCH v1 9/9] rtc: Add Nuvoton NCT6694 RTC support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org, lars@metafoo.de, 
+	ukleinek@kernel.org, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Lee Trager <lee@trager.us>
+Hello,
 
-On 10/25/24 1:08 PM, Rosen Penev wrote:
-> These are the preferred way to copy ethtool strings.
+2024=E5=B9=B410=E6=9C=8824=E6=97=A5(=E6=9C=A8) 18:04 Ming Yu <a0282524688@g=
+mail.com>:
 >
-> Avoids incrementing pointers all over the place.
+> This driver supports RTC functionality for NCT6694 MFD device
+> based on USB interface.
 >
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> (for hellcreek driver)
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
 > ---
->   v4: add back pointer math for b53_get_strings. Needed as prototype
->   can't be change to double pointer.
->   v3: remove curly braces from ksz_common.c
->   v2: remove curly braces from rzn1_a5psw.c
->   drivers/net/dsa/b53/b53_common.c          |  3 +--
->   drivers/net/dsa/bcm_sf2.c                 |  4 ++--
->   drivers/net/dsa/bcm_sf2.h                 |  2 +-
->   drivers/net/dsa/bcm_sf2_cfp.c             | 20 ++++++--------------
->   drivers/net/dsa/dsa_loop.c                |  3 +--
->   drivers/net/dsa/hirschmann/hellcreek.c    |  8 ++------
->   drivers/net/dsa/microchip/ksz_common.c    |  6 ++----
->   drivers/net/dsa/mv88e6xxx/chip.c          | 17 ++---------------
->   drivers/net/dsa/mv88e6xxx/serdes.c        |  6 ++----
->   drivers/net/dsa/rzn1_a5psw.c              |  6 ++----
->   drivers/net/dsa/sja1105/sja1105_ethtool.c |  7 ++-----
->   drivers/net/dsa/xrs700x/xrs700x.c         |  6 ++----
->   net/dsa/user.c                            | 13 +++++--------
->   13 files changed, 30 insertions(+), 71 deletions(-)
+>  MAINTAINERS               |   1 +
+>  drivers/rtc/Kconfig       |  10 ++
+>  drivers/rtc/Makefile      |   1 +
+>  drivers/rtc/rtc-nct6694.c | 276 ++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 288 insertions(+)
+>  create mode 100644 drivers/rtc/rtc-nct6694.c
 >
-> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-> index c39cb119e760..285785c942b0 100644
-> --- a/drivers/net/dsa/b53/b53_common.c
-> +++ b/drivers/net/dsa/b53/b53_common.c
-> @@ -989,8 +989,7 @@ void b53_get_strings(struct dsa_switch *ds, int port, u32 stringset,
->   
->   	if (stringset == ETH_SS_STATS) {
->   		for (i = 0; i < mib_size; i++)
-> -			strscpy(data + i * ETH_GSTRING_LEN,
-> -				mibs[i].name, ETH_GSTRING_LEN);
-> +			ethtool_puts(&data, mibs[i].name);
->   	} else if (stringset == ETH_SS_PHY_STATS) {
->   		phydev = b53_get_phy_device(ds, port);
->   		if (!phydev)
-> diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-> index 9201f07839ad..43bde1f583ff 100644
-> --- a/drivers/net/dsa/bcm_sf2.c
-> +++ b/drivers/net/dsa/bcm_sf2.c
-> @@ -1183,8 +1183,8 @@ static void bcm_sf2_sw_get_strings(struct dsa_switch *ds, int port,
->   	int cnt = b53_get_sset_count(ds, port, stringset);
->   
->   	b53_get_strings(ds, port, stringset, data);
-> -	bcm_sf2_cfp_get_strings(ds, port, stringset,
-> -				data + cnt * ETH_GSTRING_LEN);
-> +	data += cnt * ETH_GSTRING_LEN;
-> +	bcm_sf2_cfp_get_strings(ds, port, stringset, &data);
->   }
->   
->   static void bcm_sf2_sw_get_ethtool_stats(struct dsa_switch *ds, int port,
-> diff --git a/drivers/net/dsa/bcm_sf2.h b/drivers/net/dsa/bcm_sf2.h
-> index 4fda075a3449..e61e3bf688ff 100644
-> --- a/drivers/net/dsa/bcm_sf2.h
-> +++ b/drivers/net/dsa/bcm_sf2.h
-> @@ -229,7 +229,7 @@ int bcm_sf2_cfp_rst(struct bcm_sf2_priv *priv);
->   void bcm_sf2_cfp_exit(struct dsa_switch *ds);
->   int bcm_sf2_cfp_resume(struct dsa_switch *ds);
->   void bcm_sf2_cfp_get_strings(struct dsa_switch *ds, int port,
-> -			     u32 stringset, uint8_t *data);
-> +			     u32 stringset, uint8_t **data);
->   void bcm_sf2_cfp_get_ethtool_stats(struct dsa_switch *ds, int port,
->   				   uint64_t *data);
->   int bcm_sf2_cfp_get_sset_count(struct dsa_switch *ds, int port, int sset);
-> diff --git a/drivers/net/dsa/bcm_sf2_cfp.c b/drivers/net/dsa/bcm_sf2_cfp.c
-> index c88ee3dd4299..95991334561e 100644
-> --- a/drivers/net/dsa/bcm_sf2_cfp.c
-> +++ b/drivers/net/dsa/bcm_sf2_cfp.c
-> @@ -1280,26 +1280,18 @@ static const struct bcm_sf2_cfp_stat {
->   };
->   
->   void bcm_sf2_cfp_get_strings(struct dsa_switch *ds, int port,
-> -			     u32 stringset, uint8_t *data)
-> +			     u32 stringset, uint8_t **data)
->   {
->   	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
-> -	unsigned int s = ARRAY_SIZE(bcm_sf2_cfp_stats);
-> -	char buf[ETH_GSTRING_LEN];
-> -	unsigned int i, j, iter;
-> +	unsigned int i, j;
->   
->   	if (stringset != ETH_SS_STATS)
->   		return;
->   
-> -	for (i = 1; i < priv->num_cfp_rules; i++) {
-> -		for (j = 0; j < s; j++) {
-> -			snprintf(buf, sizeof(buf),
-> -				 "CFP%03d_%sCntr",
-> -				 i, bcm_sf2_cfp_stats[j].name);
-> -			iter = (i - 1) * s + j;
-> -			strscpy(data + iter * ETH_GSTRING_LEN,
-> -				buf, ETH_GSTRING_LEN);
-> -		}
-> -	}
-> +	for (i = 1; i < priv->num_cfp_rules; i++)
-> +		for (j = 0; j < ARRAY_SIZE(bcm_sf2_cfp_stats); j++)
-> +			ethtool_sprintf(data, "CFP%03d_%sCntr", i,
-> +					bcm_sf2_cfp_stats[j].name);
->   }
->   
->   void bcm_sf2_cfp_get_ethtool_stats(struct dsa_switch *ds, int port,
-> diff --git a/drivers/net/dsa/dsa_loop.c b/drivers/net/dsa/dsa_loop.c
-> index c70ed67cc188..adbab544c60f 100644
-> --- a/drivers/net/dsa/dsa_loop.c
-> +++ b/drivers/net/dsa/dsa_loop.c
-> @@ -121,8 +121,7 @@ static void dsa_loop_get_strings(struct dsa_switch *ds, int port,
->   		return;
->   
->   	for (i = 0; i < __DSA_LOOP_CNT_MAX; i++)
-> -		memcpy(data + i * ETH_GSTRING_LEN,
-> -		       ps->ports[port].mib[i].name, ETH_GSTRING_LEN);
-> +		ethtool_puts(&data, ps->ports[port].mib[i].name);
->   }
->   
->   static void dsa_loop_get_ethtool_stats(struct dsa_switch *ds, int port,
-> diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-> index d798f17cf7ea..283ec5a6e23c 100644
-> --- a/drivers/net/dsa/hirschmann/hellcreek.c
-> +++ b/drivers/net/dsa/hirschmann/hellcreek.c
-> @@ -294,12 +294,8 @@ static void hellcreek_get_strings(struct dsa_switch *ds, int port,
->   {
->   	int i;
->   
-> -	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i) {
-> -		const struct hellcreek_counter *counter = &hellcreek_counter[i];
-> -
-> -		strscpy(data + i * ETH_GSTRING_LEN,
-> -			counter->name, ETH_GSTRING_LEN);
-> -	}
-> +	for (i = 0; i < ARRAY_SIZE(hellcreek_counter); ++i)
-> +		ethtool_puts(&data, hellcreek_counter[i].name);
->   }
->   
->   static int hellcreek_get_sset_count(struct dsa_switch *ds, int port, int sset)
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 5290f5ad98f3..f73833e24622 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -2112,10 +2112,8 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
->   	if (stringset != ETH_SS_STATS)
->   		return;
->   
-> -	for (i = 0; i < dev->info->mib_cnt; i++) {
-> -		memcpy(buf + i * ETH_GSTRING_LEN,
-> -		       dev->info->mib_names[i].string, ETH_GSTRING_LEN);
-> -	}
-> +	for (i = 0; i < dev->info->mib_cnt; i++)
-> +		ethtool_puts(&buf, dev->info->mib_names[i].string);
->   }
->   
->   /**
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 4f5193d86e65..1893fed00467 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -1162,8 +1162,7 @@ static int mv88e6xxx_stats_get_strings(struct mv88e6xxx_chip *chip,
->   	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
->   		stat = &mv88e6xxx_hw_stats[i];
->   		if (stat->type & types) {
-> -			memcpy(data + j * ETH_GSTRING_LEN, stat->string,
-> -			       ETH_GSTRING_LEN);
-> +			ethtool_puts(&data, stat->string);
->   			j++;
->   		}
->   	}
-> @@ -1204,31 +1203,19 @@ static void mv88e6xxx_atu_vtu_get_strings(uint8_t *data)
->   	unsigned int i;
->   
->   	for (i = 0; i < ARRAY_SIZE(mv88e6xxx_atu_vtu_stats_strings); i++)
-> -		strscpy(data + i * ETH_GSTRING_LEN,
-> -			mv88e6xxx_atu_vtu_stats_strings[i],
-> -			ETH_GSTRING_LEN);
-> +		ethtool_puts(&data, mv88e6xxx_atu_vtu_stats_strings[i]);
->   }
->   
->   static void mv88e6xxx_get_strings(struct dsa_switch *ds, int port,
->   				  u32 stringset, uint8_t *data)
->   {
->   	struct mv88e6xxx_chip *chip = ds->priv;
-> -	int count = 0;
->   
->   	if (stringset != ETH_SS_STATS)
->   		return;
->   
->   	mv88e6xxx_reg_lock(chip);
->   
-> -	if (chip->info->ops->stats_get_strings)
-> -		count = chip->info->ops->stats_get_strings(chip, data);
-> -
-> -	if (chip->info->ops->serdes_get_strings) {
-> -		data += count * ETH_GSTRING_LEN;
-> -		count = chip->info->ops->serdes_get_strings(chip, port, data);
-> -	}
-> -
-> -	data += count * ETH_GSTRING_LEN;
->   	mv88e6xxx_atu_vtu_get_strings(data);
->   
->   	mv88e6xxx_reg_unlock(chip);
-> diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-> index 01ea53940786..327831d2b547 100644
-> --- a/drivers/net/dsa/mv88e6xxx/serdes.c
-> +++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-> @@ -144,8 +144,7 @@ int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
->   
->   	for (i = 0; i < ARRAY_SIZE(mv88e6352_serdes_hw_stats); i++) {
->   		stat = &mv88e6352_serdes_hw_stats[i];
-> -		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
-> -		       ETH_GSTRING_LEN);
-> +		ethtool_puts(&data, stat->string);
->   	}
->   	return ARRAY_SIZE(mv88e6352_serdes_hw_stats);
->   }
-> @@ -405,8 +404,7 @@ int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
->   
->   	for (i = 0; i < ARRAY_SIZE(mv88e6390_serdes_hw_stats); i++) {
->   		stat = &mv88e6390_serdes_hw_stats[i];
-> -		memcpy(data + i * ETH_GSTRING_LEN, stat->string,
-> -		       ETH_GSTRING_LEN);
-> +		ethtool_puts(&data, stat->string);
->   	}
->   	return ARRAY_SIZE(mv88e6390_serdes_hw_stats);
->   }
-> diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
-> index 1135a32e4b7e..66974379334a 100644
-> --- a/drivers/net/dsa/rzn1_a5psw.c
-> +++ b/drivers/net/dsa/rzn1_a5psw.c
-> @@ -802,10 +802,8 @@ static void a5psw_get_strings(struct dsa_switch *ds, int port, u32 stringset,
->   	if (stringset != ETH_SS_STATS)
->   		return;
->   
-> -	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++) {
-> -		memcpy(data + u * ETH_GSTRING_LEN, a5psw_stats[u].name,
-> -		       ETH_GSTRING_LEN);
-> -	}
-> +	for (u = 0; u < ARRAY_SIZE(a5psw_stats); u++)
-> +		ethtool_puts(&data, a5psw_stats[u].name);
->   }
->   
->   static void a5psw_get_ethtool_stats(struct dsa_switch *ds, int port,
-> diff --git a/drivers/net/dsa/sja1105/sja1105_ethtool.c b/drivers/net/dsa/sja1105/sja1105_ethtool.c
-> index decc6c931dc1..2ea64b1d026d 100644
-> --- a/drivers/net/dsa/sja1105/sja1105_ethtool.c
-> +++ b/drivers/net/dsa/sja1105/sja1105_ethtool.c
-> @@ -586,7 +586,6 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
->   {
->   	struct sja1105_private *priv = ds->priv;
->   	enum sja1105_counter_index max_ctr, i;
-> -	char *p = data;
->   
->   	if (stringset != ETH_SS_STATS)
->   		return;
-> @@ -597,10 +596,8 @@ void sja1105_get_strings(struct dsa_switch *ds, int port,
->   	else
->   		max_ctr = __MAX_SJA1105PQRS_PORT_COUNTER;
->   
-> -	for (i = 0; i < max_ctr; i++) {
-> -		strscpy(p, sja1105_port_counters[i].name, ETH_GSTRING_LEN);
-> -		p += ETH_GSTRING_LEN;
-> -	}
-> +	for (i = 0; i < max_ctr; i++)
-> +		ethtool_puts(&data, sja1105_port_counters[i].name);
->   }
->   
->   int sja1105_get_sset_count(struct dsa_switch *ds, int port, int sset)
-> diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
-> index de3b768f2ff9..4dbcc49a9e52 100644
-> --- a/drivers/net/dsa/xrs700x/xrs700x.c
-> +++ b/drivers/net/dsa/xrs700x/xrs700x.c
-> @@ -91,10 +91,8 @@ static void xrs700x_get_strings(struct dsa_switch *ds, int port,
->   	if (stringset != ETH_SS_STATS)
->   		return;
->   
-> -	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++) {
-> -		strscpy(data, xrs700x_mibs[i].name, ETH_GSTRING_LEN);
-> -		data += ETH_GSTRING_LEN;
-> -	}
-> +	for (i = 0; i < ARRAY_SIZE(xrs700x_mibs); i++)
-> +		ethtool_puts(&data, xrs700x_mibs[i].name);
->   }
->   
->   static int xrs700x_get_sset_count(struct dsa_switch *ds, int port, int sset)
-> diff --git a/net/dsa/user.c b/net/dsa/user.c
-> index 91a1fa5f8ab0..f7b0630dd2b6 100644
-> --- a/net/dsa/user.c
-> +++ b/net/dsa/user.c
-> @@ -1042,15 +1042,12 @@ static void dsa_user_get_strings(struct net_device *dev,
->   	struct dsa_switch *ds = dp->ds;
->   
->   	if (stringset == ETH_SS_STATS) {
-> -		int len = ETH_GSTRING_LEN;
-> -
-> -		strscpy_pad(data, "tx_packets", len);
-> -		strscpy_pad(data + len, "tx_bytes", len);
-> -		strscpy_pad(data + 2 * len, "rx_packets", len);
-> -		strscpy_pad(data + 3 * len, "rx_bytes", len);
-> +		ethtool_puts(&data, "tx_packets");
-> +		ethtool_puts(&data, "tx_bytes");
-> +		ethtool_puts(&data, "rx_packets");
-> +		ethtool_puts(&data, "rx_bytes");
->   		if (ds->ops->get_strings)
-> -			ds->ops->get_strings(ds, dp->index, stringset,
-> -					     data + 4 * len);
-> +			ds->ops->get_strings(ds, dp->index, stringset, data);
->   	} else if (stringset ==  ETH_SS_TEST) {
->   		net_selftest_get_strings(data);
->   	}
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 4d5a5eded3b9..8de90bda8b5e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16445,6 +16445,7 @@ F:      drivers/i2c/busses/i2c-nct6694.c
+>  F:     drivers/mfd/nct6694.c
+>  F:     drivers/net/can/nct6694_canfd.c
+>  F:     drivers/pwm/pwm-nct6694.c
+> +F:     drivers/rtc/rtc-nct6694.c
+>  F:     drivers/watchdog/nct6694_wdt.c
+>  F:     include/linux/mfd/nct6694.h
+>
+> diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+> index 66eb1122248b..240c496d95f7 100644
+> --- a/drivers/rtc/Kconfig
+> +++ b/drivers/rtc/Kconfig
+> @@ -406,6 +406,16 @@ config RTC_DRV_NCT3018Y
+>            This driver can also be built as a module, if so, the module w=
+ill be
+>            called "rtc-nct3018y".
+>
+> +config RTC_DRV_NCT6694
+> +       tristate "Nuvoton NCT6694 RTC support"
+> +       depends on MFD_NCT6694
+> +       help
+> +       If you say yes to this option, support will be included for Nuvot=
+on
+> +       NCT6694, a USB device to RTC.
+> +
+> +       This driver can also be built as a module. If so, the module
+> +       will be called rtc-nct6694.
+> +
+>  config RTC_DRV_RK808
+>         tristate "Rockchip RK805/RK808/RK809/RK817/RK818 RTC"
+>         depends on MFD_RK8XX
+> diff --git a/drivers/rtc/Makefile b/drivers/rtc/Makefile
+> index f62340ecc534..64443d26bb5b 100644
+> --- a/drivers/rtc/Makefile
+> +++ b/drivers/rtc/Makefile
+> @@ -116,6 +116,7 @@ obj-$(CONFIG_RTC_DRV_MXC)   +=3D rtc-mxc.o
+>  obj-$(CONFIG_RTC_DRV_MXC_V2)   +=3D rtc-mxc_v2.o
+>  obj-$(CONFIG_RTC_DRV_GAMECUBE) +=3D rtc-gamecube.o
+>  obj-$(CONFIG_RTC_DRV_NCT3018Y) +=3D rtc-nct3018y.o
+> +obj-$(CONFIG_RTC_DRV_NCT6694)  +=3D rtc-nct6694.o
+>  obj-$(CONFIG_RTC_DRV_NTXEC)    +=3D rtc-ntxec.o
+>  obj-$(CONFIG_RTC_DRV_OMAP)     +=3D rtc-omap.o
+>  obj-$(CONFIG_RTC_DRV_OPAL)     +=3D rtc-opal.o
+> diff --git a/drivers/rtc/rtc-nct6694.c b/drivers/rtc/rtc-nct6694.c
+> new file mode 100644
+> index 000000000000..622bb9fbe6f6
+> --- /dev/null
+> +++ b/drivers/rtc/rtc-nct6694.c
+> @@ -0,0 +1,276 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Nuvoton NCT6694 RTC driver based on USB interface.
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + */
+> +
+> +#include <linux/slab.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/rtc.h>
+> +#include <linux/bcd.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/mfd/nct6694.h>
+
+Please sort header files alphabetically.
+
+> +
+> +#define DRVNAME "nct6694-rtc"
+> +
+> +/* Host interface */
+> +#define REQUEST_RTC_MOD                0x08
+> +
+> +/* Message Channel */
+> +/* Command 00h */
+> +#define REQUEST_RTC_CMD0_LEN   0x07
+> +#define REQUEST_RTC_CMD0_OFFSET        0x0000  /* OFFSET =3D SEL|CMD */
+> +#define RTC_SEC_IDX            0x00
+> +#define RTC_MIN_IDX            0x01
+> +#define RTC_HOUR_IDX           0x02
+> +#define RTC_WEEK_IDX           0x03
+> +#define RTC_DAY_IDX            0x04
+> +#define RTC_MONTH_IDX          0x05
+> +#define RTC_YEAR_IDX           0x06
+> +/* Command 01h */
+> +#define REQUEST_RTC_CMD1_LEN   0x05
+> +#define REQUEST_RTC_CMD1_OFFSET        0x0001  /* OFFSET =3D SEL|CMD */
+> +#define RTC_ALRM_EN_IDX                0x03
+> +#define RTC_ALRM_PEND_IDX      0x04
+> +/* Command 02h */
+> +#define REQUEST_RTC_CMD2_LEN   0x02
+> +#define REQUEST_RTC_CMD2_OFFSET        0x0002  /* OFFSET =3D SEL|CMD */
+> +#define RTC_IRQ_EN_IDX         0x00
+> +#define RTC_IRQ_PEND_IDX       0x01
+> +
+> +#define RTC_IRQ_EN             (BIT(0) | BIT(5))
+
+RTC_IRQ_INT_EN | RTC_IRQ_GPO_EN ?
+
+> +#define RTC_IRQ_INT_EN         BIT(0)  /* Transmit a USB INT-in when RTC=
+ alarm */
+> +#define RTC_IRQ_GPO_EN         BIT(5)  /* Trigger a GPO Low Pulse when R=
+TC alarm */
+> +#define RTC_IRQ_STS            BIT(0)  /* Write 1 clear IRQ status */
+> +
+> +struct nct6694_rtc_data {
+> +       struct nct6694 *nct6694;
+> +       struct rtc_device *rtc;
+> +       struct work_struct alarm_work;
+> +};
+> +
+> +static int nct6694_rtc_read_time(struct device *dev, struct rtc_time *tm=
+)
+> +{
+> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
+> +       unsigned char buf[REQUEST_RTC_CMD0_LEN];
+> +       int ret;
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, REQUEST_RTC_MOD,
+> +                              REQUEST_RTC_CMD0_OFFSET, REQUEST_RTC_CMD0_=
+LEN,
+> +                              0, REQUEST_RTC_CMD0_LEN, buf);
+> +       if (ret) {
+> +               pr_err("%s: Failed to get rtc device!\n", __func__);
+> +               return -EIO;
+> +       }
+> +
+> +       tm->tm_sec =3D bcd2bin(buf[RTC_SEC_IDX]);         /* tm_sec expec=
+t 0 ~ 59 */
+> +       tm->tm_min =3D bcd2bin(buf[RTC_MIN_IDX]);         /* tm_min expec=
+t 0 ~ 59 */
+> +       tm->tm_hour =3D bcd2bin(buf[RTC_HOUR_IDX]);       /* tm_hour expe=
+ct 0 ~ 23 */
+> +       tm->tm_wday =3D bcd2bin(buf[RTC_WEEK_IDX]) - 1;   /* tm_wday expe=
+ct 0 ~ 6 */
+> +       tm->tm_mday =3D bcd2bin(buf[RTC_DAY_IDX]);        /* tm_mday expe=
+ct 1 ~ 31 */
+> +       tm->tm_mon =3D bcd2bin(buf[RTC_MONTH_IDX]) - 1;   /* tm_month exp=
+ect 0 ~ 11 */
+> +       tm->tm_year =3D bcd2bin(buf[RTC_YEAR_IDX]) + 100; /* tm_year expe=
+ct since 1900 */
+> +
+> +       return ret;
+> +}
+> +
+> +static int nct6694_rtc_set_time(struct device *dev, struct rtc_time *tm)
+> +{
+> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
+> +       unsigned char buf[REQUEST_RTC_CMD0_LEN];
+> +       int ret;
+> +
+> +       buf[RTC_SEC_IDX] =3D bin2bcd(tm->tm_sec);
+> +       buf[RTC_MIN_IDX] =3D bin2bcd(tm->tm_min);
+> +       buf[RTC_HOUR_IDX] =3D bin2bcd(tm->tm_hour);
+> +       buf[RTC_WEEK_IDX] =3D bin2bcd(tm->tm_wday + 1);
+> +       buf[RTC_DAY_IDX] =3D bin2bcd(tm->tm_mday);
+> +       buf[RTC_MONTH_IDX] =3D bin2bcd(tm->tm_mon + 1);
+> +       buf[RTC_YEAR_IDX] =3D bin2bcd(tm->tm_year - 100);
+> +
+> +       ret =3D nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
+> +                               REQUEST_RTC_CMD0_OFFSET, REQUEST_RTC_CMD0=
+_LEN,
+> +                               buf);
+> +       if (ret) {
+> +               pr_err("%s: Failed to set rtc device!\n", __func__);
+> +               return -EIO;
+
+Why do you return -EIO? Please do not overwrite error codes.
+
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static int nct6694_rtc_read_alarm(struct device *dev, struct rtc_wkalrm =
+*alrm)
+> +{
+> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
+> +       unsigned char buf[REQUEST_RTC_CMD1_LEN];
+> +       int ret;
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, REQUEST_RTC_MOD,
+> +                              REQUEST_RTC_CMD1_OFFSET, REQUEST_RTC_CMD1_=
+LEN,
+> +                              0, REQUEST_RTC_CMD1_LEN, buf);
+> +       if (ret) {
+> +               pr_err("%s: Failed to get rtc device!\n", __func__);
+> +               return -EIO;
+
+same as above.
+
+> +       }
+> +
+> +       alrm->time.tm_sec =3D bcd2bin(buf[RTC_SEC_IDX]);
+> +       alrm->time.tm_min =3D bcd2bin(buf[RTC_MIN_IDX]);
+> +       alrm->time.tm_hour =3D bcd2bin(buf[RTC_HOUR_IDX]);
+> +
+> +       alrm->enabled =3D buf[RTC_ALRM_EN_IDX];
+> +       alrm->pending =3D buf[RTC_ALRM_PEND_IDX];
+> +
+> +       return ret;
+> +}
+> +
+> +static int nct6694_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *=
+alrm)
+> +{
+> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
+> +       unsigned char buf[REQUEST_RTC_CMD1_LEN];
+> +       int ret;
+> +
+> +       buf[RTC_SEC_IDX] =3D bin2bcd(alrm->time.tm_sec);
+> +       buf[RTC_MIN_IDX] =3D bin2bcd(alrm->time.tm_min);
+> +       buf[RTC_HOUR_IDX] =3D bin2bcd(alrm->time.tm_hour);
+> +       buf[RTC_ALRM_EN_IDX] =3D alrm->enabled ? RTC_IRQ_EN : 0;
+> +       buf[RTC_ALRM_PEND_IDX] =3D 0;
+> +
+> +       ret =3D nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
+> +                               REQUEST_RTC_CMD1_OFFSET, REQUEST_RTC_CMD1=
+_LEN,
+> +                               buf);
+> +       if (ret) {
+> +               pr_err("%s: Failed to set rtc device!\n", __func__);
+> +               return -EIO;
+
+same as above.
+
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static int nct6694_rtc_alarm_irq_enable(struct device *dev, unsigned int=
+ enabled)
+> +{
+> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
+> +       unsigned char buf[REQUEST_RTC_CMD2_LEN] =3D {0};
+> +       int ret;
+> +
+> +       if (enabled)
+> +               buf[RTC_IRQ_EN_IDX] |=3D RTC_IRQ_EN;
+> +       else
+> +               buf[RTC_IRQ_EN_IDX] &=3D ~RTC_IRQ_EN;
+> +
+> +       ret =3D nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
+> +                               REQUEST_RTC_CMD2_OFFSET, REQUEST_RTC_CMD2=
+_LEN,
+> +                               buf);
+> +       if (ret) {
+> +               pr_err("%s: Failed to set rtc device!\n", __func__);
+> +               return -EIO;
+
+same as above.
+
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static const struct rtc_class_ops nct6694_rtc_ops =3D {
+> +       .read_time =3D nct6694_rtc_read_time,
+> +       .set_time =3D nct6694_rtc_set_time,
+> +       .read_alarm =3D nct6694_rtc_read_alarm,
+> +       .set_alarm =3D nct6694_rtc_set_alarm,
+> +       .alarm_irq_enable =3D nct6694_rtc_alarm_irq_enable,
+> +};
+> +
+> +static void nct6694_rtc_alarm(struct work_struct *work)
+> +{
+> +       struct nct6694_rtc_data *data;
+> +       unsigned char buf[REQUEST_RTC_CMD2_LEN] =3D {0};
+> +
+> +       data =3D container_of(work, struct nct6694_rtc_data, alarm_work);
+> +
+> +       pr_info("%s: Got RTC alarm!\n", __func__);
+> +       buf[RTC_IRQ_EN_IDX] =3D RTC_IRQ_EN;
+> +       buf[RTC_IRQ_PEND_IDX] =3D RTC_IRQ_STS;
+> +       nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
+> +                         REQUEST_RTC_CMD2_OFFSET,
+> +                         REQUEST_RTC_CMD2_LEN, buf);
+> +}
+> +
+> +static void nct6694_rtc_handler(void *private_data)
+> +{
+> +       struct nct6694_rtc_data *data =3D private_data;
+> +       struct nct6694 *nct6694 =3D data->nct6694;
+> +
+> +       queue_work(nct6694->async_workqueue, &data->alarm_work);
+> +}
+> +
+> +static int nct6694_rtc_probe(struct platform_device *pdev)
+> +{
+> +       struct nct6694_rtc_data *data;
+> +       struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
+> +       int ret;
+> +
+> +       data =3D devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
+> +       if (!data)
+> +               return -ENOMEM;
+> +
+> +       data->rtc =3D devm_rtc_allocate_device(&pdev->dev);
+> +       if (IS_ERR(data->rtc))
+> +               return PTR_ERR(data->rtc);
+
+Please use dev_err_probe.
+
+> +
+> +       data->nct6694 =3D nct6694;
+> +       data->rtc->ops =3D &nct6694_rtc_ops;
+> +       data->rtc->range_min =3D RTC_TIMESTAMP_BEGIN_2000;
+> +       data->rtc->range_max =3D RTC_TIMESTAMP_END_2099;
+> +
+> +       INIT_WORK(&data->alarm_work, nct6694_rtc_alarm);
+> +
+> +       ret =3D nct6694_register_handler(nct6694, RTC_IRQ_STATUS,
+> +                                      nct6694_rtc_handler, data);
+> +       if (ret) {
+> +               dev_err(&pdev->dev, "%s:  Failed to register handler: %pe=
+\n",
+> +                       __func__, ERR_PTR(ret));
+
+Please use dev_err_probe.
+
+> +               return ret;
+> +       }
+> +
+> +       device_set_wakeup_capable(&pdev->dev, 1);
+> +
+> +       platform_set_drvdata(pdev, data);
+> +
+> +       /* Register rtc device to RTC framework */
+> +       ret =3D devm_rtc_register_device(data->rtc);
+> +       if (ret) {
+> +               dev_err(&pdev->dev, "Failed to register rtc device!\n");
+> +               return ret;
+> +       }
+
+You can simplify return devm_rtc_register_device.
+
+> +
+> +       return 0;
+> +}
+> +
+> +static struct platform_driver nct6694_rtc_driver =3D {
+> +       .driver =3D {
+> +               .name   =3D DRVNAME,
+> +       },
+> +       .probe          =3D nct6694_rtc_probe,
+> +};
+> +
+> +static int __init nct6694_init(void)
+> +{
+> +       int err;
+> +
+> +       err =3D platform_driver_register(&nct6694_rtc_driver);
+> +       if (!err) {
+> +               if (err)
+
+This looks strange. You can simplify return platform_driver_register.
+
+> +                       platform_driver_unregister(&nct6694_rtc_driver);
+> +       }
+> +
+> +       return err;
+> +}
+> +subsys_initcall(nct6694_init);
+> +
+> +static void __exit nct6694_exit(void)
+> +{
+> +       platform_driver_unregister(&nct6694_rtc_driver);
+> +}
+> +module_exit(nct6694_exit);
+> +
+> +MODULE_DESCRIPTION("USB-RTC driver for NCT6694");
+> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> +MODULE_LICENSE("GPL");
+> --
+> 2.34.1
+>
+>
+
+Best regards,
+  Nobuhiro
+
+--=20
+Nobuhiro Iwamatsu
+   iwamatsu at {nigauri.org / debian.org / kernel.org}
+   GPG ID: 32247FBB40AD1FA6
 
