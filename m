@@ -1,234 +1,346 @@
-Return-Path: <netdev+bounces-139079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E33289B00CD
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:04:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9105E9B00DC
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:05:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EEB1283AD3
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:04:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 227181F23A21
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8301F9431;
-	Fri, 25 Oct 2024 11:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111191DD0C7;
+	Fri, 25 Oct 2024 11:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FnBbxL9Z"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Zh80ygba"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF44D18F2F7;
-	Fri, 25 Oct 2024 11:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DC41CFEB5;
+	Fri, 25 Oct 2024 11:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729854250; cv=none; b=lqFeSKjkDh9P2PWVFsPRHVht4/jXrgg1gIgkQNU15zjC6E+AJM6QRzLdnleHK2X7CUXWSA4UzE+XeX7/91mr7fwGCNoE4SNtiSLy8k+U2/sYK5VMh86nj7PwYwZ/927hl1rOQ/QEAD8ck0Ist7jq6XzaJoQHMD3YvsIoW1+WPKk=
+	t=1729854325; cv=none; b=L4j1dLrQI9jwRUNOhOoTre0rD2fUaAelncbPNF56NA1IT0BmqNlTxl8iYdgfkSTGHrq/yDJSPpL/gF6o37OHCobJY+FhzidcauED/q8TxvVip7ME5ZtmUIwaqaofZXb926iLwll4FIz96FkvtdBVyMp8GoehrcdUYP2Jqe7u25I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729854250; c=relaxed/simple;
-	bh=l8EQXAQI7ujXOwIFT3aw6gviWUbOrsdN5NE8KtC1dys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HWWeRoMtpgpLA+54AlERQSuVbxuNYh860WbOAoM8oEmfQXescQWXFYdVN3jlyXPSb464VL5eSAEAibeoJYel5wvJmScMeG0uM/685XDdKDv6/rSHBIMjhAKohtedyMRrSRVLBZVQgPDaoOtEXkUndl56FiZ8ddQRCp2cxjqUpak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FnBbxL9Z; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e2918664a3fso1772768276.0;
-        Fri, 25 Oct 2024 04:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729854246; x=1730459046; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1V50wE1iFCHdbnj6unCESWwvx04Dw56wN4cPix727VI=;
-        b=FnBbxL9ZU6r60Doomh7ZJeXNUysTK+4LvylY/IXIgKGduQqvd4PgwZ93AXB/mc1MLX
-         EeaGOS2AjSkvtYkMOO/5QIkf6JBFuCz5eKyapbprwzlMfwnJ1iS35OEK+gocLmmpJu7V
-         LbpFvOxrb4mJ1UmIOguf2ZEOmiLDpTtwBlxr8n1Qfyk6b/gZ5j59l1OBJha1g2pgylfO
-         Oe4yZt6ewREls5EXOBfNQCSvyDe/CG2/s23jwGF5DCVc7djdUtJwrswO999bhLSdUSce
-         m+ETfJoIanf6Zr6X8QkdnY7vQAbrrA4qYHVLLpx5ASasA4risOMMxvAT+HkNWHScKKec
-         fRYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729854246; x=1730459046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1V50wE1iFCHdbnj6unCESWwvx04Dw56wN4cPix727VI=;
-        b=i96P7LfjWLVDtUhvr5m1GopCWW+cLjityeX8DuJAAygJGc01xlqXkB2qgQzvsN0pnV
-         ZkfKKwalB2eh7nBBqTn9YaylnuSjcDCoFmWEmBj1KcTs5Uf4sPgkr5VeJ5fnAx+lofgL
-         6SZQOLrM7L/O5rWrA64PjrdThwlQolYvvUBExNhqXPrg0VDH8YaziZ2cu6NQj3mZ3JTL
-         RT/4MmvBjMqL6uZA7r+D8nlr/bP4cKlqmL+1m97Uy1UKmq5CluNoAflFRlNsGwFUvwXc
-         kaVyMDhex5NA3elbSK5lgrdSCQkGkt7JWM/821BByghPFBwUUNfvX3GSEW92Tyva8I6l
-         M+Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+st3GLH1rsXwL6dArRBxnGifT9KrxICQC1k/N36YRZ2uT889OWVB0PvNbinC2DqjkQQPJmM6kTTA=@vger.kernel.org, AJvYcCVC8JDU3a/OKplQ6f5mK1NOLSw63PcCERtsn4LevHjlX2TRGqyZecpz4oZFrUMdpM2S5OKDV28U1WLziw==@vger.kernel.org, AJvYcCWFvdkWHvVsOR6MXMxEemRCYomIwki3EPcwY0yLGpVwGsXkKJ5GQkzItdkJskhGcJIfWzWG8XinB2OV4jk=@vger.kernel.org, AJvYcCWL93t+D2jBDT9RmAvP1zvy4bbe9Qk9YkDBPJuuy/GwlPYwXPY+nR9hhn1XigqAc32Z/jeveGCqHLyD@vger.kernel.org, AJvYcCWNfql0vBD5NwOII2o7/qD97w7HE71CI6klGMd9IWheJharpGr6jJMB4TpQZjc4a1StbsdxUVeMYzUn@vger.kernel.org, AJvYcCWk5Lzbn0+jWn8abITO9lJ1UucARq2KuyPkmV0bcYct5dXNAQumdU2OzRcyizaUefHO+mSCIIRfyEJY@vger.kernel.org, AJvYcCWkxTaRFgaNQrevjVawqKDfFBXxWKrXxJlldonmzkVS8OWCvrzJSzuoQ8v7ji3Z1vOd+OJoN5Y1@vger.kernel.org, AJvYcCWmvyFJa+8sA3QsRJFfuc+dlhiqRqNJa9AsQ57VwliZKkBxewI83AKT5aMMrIjnTJzCVfqoOGRd67Q+FQK7Wr0=@vger.kernel.org, AJvYcCWpNrmejnt2GmJrF2XwCcIpoKvaWCZSQzlH2pbUGforkjyGE2J64Aaq9pD4ozc/lKZnNPgpevYUOfim@vger.kernel.org, AJvYcCX48nT0/CueBnJOCCqupc2xzev60sPIAJOS
- A278XPvrZNB1XulnYUWYJjsT32lzAMd/N9vJVGt/1qEXDfUL@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRCoP8RbYkwFCy7LNQWVhcsdBRZNsCAVLj9QsTAxBxlO/JKxyt
-	HRgC6zstKeBww8RSdwL4wq2Le4BEZLMYyXKPB9KHzrGpdylKjxI80TBBF6mqZclNsgs+24GjFkC
-	J2I0hRh0oz4SaE4Ge4Qvcja5L3q4=
-X-Google-Smtp-Source: AGHT+IGxowdXgRZQzyf3hYzU1GeD5gWw/fSr+Lc/V+x36oSGKW+Vz5bn+lGvWuDmcvJCJdT/8o+ftWwey9LmoAKe3Qc=
-X-Received: by 2002:a05:6902:2493:b0:e29:2560:914c with SMTP id
- 3f1490d57ef6-e2ea8a41c3emr3487379276.9.1729854246550; Fri, 25 Oct 2024
- 04:04:06 -0700 (PDT)
+	s=arc-20240116; t=1729854325; c=relaxed/simple;
+	bh=OP+n9Lo5uVkyQ7KeuPyqUB9xxC4Afjg2YnkSGz18hQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YH6tnBMZtIE36RfOdAHE/fQmB2grYC52e2udBBZweHekdvrtwJlGiwKcqJAhK//0v9/A/+7/netIa6LcRdM4uxXzMPVKvY++vkjf7JRcP9NpsmNUqQ5R9G2tAP9V3avYASbZE7evcpYDIvLkmqeBysV+VezgDpSI+f/6WOT6lwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Zh80ygba; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1729854312; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=e0wxpLKhPBNVP2EQdPTAgZRzESsbupoxr0lzsi/G1MQ=;
+	b=Zh80ygbakZ7j31wdWsOIENN6uv31RoPA+afgz1mOqkA7EAlCIDZGV0/J5R0UIKFnRtCW8deeF1vwmfz8Jtf1cUip8qDWlO8Dho1hj5ZWb8BhBsQWmdibZuCdhaVLO6ej5QhEsYK5djEGJqF5xmkZ9g+zblQhE3GV+phgL+l1Om0=
+Received: from 30.221.147.209(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WHsEbQx_1729854309 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 25 Oct 2024 19:05:10 +0800
+Message-ID: <e398770a-1ab5-478b-820d-16c6060e0008@linux.alibaba.com>
+Date: Fri, 25 Oct 2024 19:05:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-2-tmyu0@nuvoton.com>
- <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
- <CAOoeyxUhnyYG3p+DQJG-tvU5vc5WYQZLLqCXW=uPcXTjq2gVfw@mail.gmail.com> <20241025-truthful-honest-newt-c371c8-mkl@pengutronix.de>
-In-Reply-To: <20241025-truthful-honest-newt-c371c8-mkl@pengutronix.de>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 25 Oct 2024 19:03:55 +0800
-Message-ID: <CAOoeyxUEf5vjqL67WjR-DbrhE0==2hqHLEyZ5XEBhEfMfQ5pag@mail.gmail.com>
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/4] net/smc: Introduce smc_bpf_ops
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+ song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+ edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, dtcccc@linux.alibaba.com
+References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+ <1729737768-124596-4-git-send-email-alibuda@linux.alibaba.com>
+ <74c06b43-095f-414a-b4aa-2addbe610336@linux.dev>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <74c06b43-095f-414a-b4aa-2addbe610336@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Oh! I'm sorry about that I confused the packet size.
-The NCT6694 bulk maximum packet size is 256 bytes,
-and USB High speed bulk maximum packet size is 512 bytes.
 
-Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=8825=
-=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=886:08=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> On 25.10.2024 16:08:10, Ming Yu wrote:
-> > > > +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offset, =
-u16 length,
-> > > > +                  u8 rd_idx, u8 rd_len, unsigned char *buf)
-> > >
-> > > why not make buf a void *?
-> >
-> > [Ming] I'll change the type in the next patch.
-> >
-> > >
-> > > > +{
-> > > > +     struct usb_device *udev =3D nct6694->udev;
-> > > > +     unsigned char err_status;
-> > > > +     int len, packet_len, tx_len, rx_len;
-> > > > +     int i, ret;
-> > > > +
-> > > > +     mutex_lock(&nct6694->access_lock);
-> > > > +
-> > > > +     /* Send command packet to USB device */
-> > > > +     nct6694->cmd_buffer[REQUEST_MOD_IDX] =3D mod;
-> > > > +     nct6694->cmd_buffer[REQUEST_CMD_IDX] =3D offset & 0xFF;
-> > > > +     nct6694->cmd_buffer[REQUEST_SEL_IDX] =3D (offset >> 8) & 0xFF=
-;
-> > > > +     nct6694->cmd_buffer[REQUEST_HCTRL_IDX] =3D HCTRL_GET;
-> > > > +     nct6694->cmd_buffer[REQUEST_LEN_L_IDX] =3D length & 0xFF;
-> > > > +     nct6694->cmd_buffer[REQUEST_LEN_H_IDX] =3D (length >> 8) & 0x=
-FF;
-> > > > +
-> > > > +     ret =3D usb_bulk_msg(udev, usb_sndbulkpipe(udev, BULK_OUT_END=
-POINT),
-> > > > +                        nct6694->cmd_buffer, CMD_PACKET_SZ, &tx_le=
-n,
-> > > > +                        nct6694->timeout);
-> > > > +     if (ret)
-> > > > +             goto err;
-> > > > +
-> > > > +     /* Receive response packet from USB device */
-> > > > +     ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK_IN_ENDP=
-OINT),
-> > > > +                        nct6694->rx_buffer, CMD_PACKET_SZ, &rx_len=
-,
-> > > > +                        nct6694->timeout);
-> > > > +     if (ret)
-> > > > +             goto err;
-> > > > +
-> > > > +     err_status =3D nct6694->rx_buffer[RESPONSE_STS_IDX];
-> > > > +
-> > > > +     /*
-> > > > +      * Segmented reception of messages that exceed the size of US=
-B bulk
-> > > > +      * pipe packets.
-> > > > +      */
-> > >
-> > > The Linux USB stack can receive bulk messages longer than the max pac=
-ket size.
-> >
-> > [Ming] Since NCT6694's bulk pipe endpoint size is 128 bytes for this MF=
-D device.
-> > The core will divide packet 256 bytes for high speed USB device, but
-> > it is exceeds
-> > the hardware limitation, so I am dividing it manually.
->
-> You say the endpoint descriptor is correctly reporting it's max packet
-> size of 128, but the Linux USB will send packets of 256 bytes?
 
-[Ming] The endpoint descriptor is correctly reporting it's max packet
-size of 256, but the Linux USB may send more than 256 (max is 512)
-https://elixir.bootlin.com/linux/v6.11.5/source/drivers/usb/host/xhci-mem.c=
-#L1446
+On 10/25/24 8:26 AM, Martin KaFai Lau wrote:
+> On 10/23/24 7:42 PM, D. Wythe wrote:
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>
+>> The introduction of IPPROTO_SMC enables eBPF programs to determine
+>> whether to use SMC based on the context of socket creation, such as
+>> network namespaces, PID and comm name, etc.
+>>
+>> As a subsequent enhancement, this patch introduces a new hook for eBPF
+>> programs that allows decisions on whether to use SMC or not at runtime,
+>> including but not limited to local/remote IP address or ports. In
+>> simpler words, this feature allows modifications to syn_smc through eBPF
+>> programs before the TCP three-way handshake got established.
+>>
+>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>> ---
+>>   include/linux/tcp.h   |   2 +-
+>>   include/net/smc.h     |  47 +++++++++++
+>>   include/net/tcp.h     |   6 ++
+>>   net/ipv4/tcp_input.c  |   3 +-
+>>   net/ipv4/tcp_output.c |  14 +++-
+>>   net/smc/Kconfig       |  12 +++
+>>   net/smc/Makefile      |   1 +
+>>   net/smc/af_smc.c      |  38 ++++++---
+>>   net/smc/smc.h         |   4 +
+>>   net/smc/smc_bpf.c     | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   net/smc/smc_bpf.h     |  34 ++++++++
+>>   11 files changed, 357 insertions(+), 16 deletions(-)
+>>   create mode 100644 net/smc/smc_bpf.c
+>>   create mode 100644 net/smc/smc_bpf.h
+>>
+>> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+>> index 6a5e08b..4ef160a 100644
+>> --- a/include/linux/tcp.h
+>> +++ b/include/linux/tcp.h
+>> @@ -478,7 +478,7 @@ struct tcp_sock {
+>>   #endif
+>>   #if IS_ENABLED(CONFIG_SMC)
+>>       bool    syn_smc;    /* SYN includes SMC */
+>> -    bool    (*smc_hs_congested)(const struct sock *sk);
+>> +    struct tcpsmc_ctx *smc;
+>>   #endif
+>>   #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+>> diff --git a/include/net/smc.h b/include/net/smc.h
+>> index db84e4e..34ab2c6 100644
+>> --- a/include/net/smc.h
+>> +++ b/include/net/smc.h
+>> @@ -18,6 +18,8 @@
+>>   #include "linux/ism.h"
+>>   struct sock;
+>> +struct tcp_sock;
+>> +struct inet_request_sock;
+>>   #define SMC_MAX_PNETID_LEN    16    /* Max. length of PNET id */
+>> @@ -97,4 +99,49 @@ struct smcd_dev {
+>>       u8 going_away : 1;
+>>   };
+>> +/*
+>> + * This structure is used to store the parameters passed to the member of struct_ops.
+>> + * Due to the BPF verifier cannot restrict the writing of bit fields, such as limiting
+>> + * it to only write ireq->smc_ok. Using kfunc can solve this issue, but we don't want
+>> + * to introduce a kfunc with such a narrow function.
+> 
+> imo, adding kfunc is fine.
+> 
+>> + *
+>> + * Moreover, using this structure for unified parameters also addresses another
+>> + * potential issue. Currently, kfunc cannot recognize the calling context
+>> + * through BPF's existing structure. In the future, we can solve this problem
+>> + * by passing this ctx to kfunc.
+> 
+> This part I don't understand. How is it different from the "tcp_cubic_kfunc_set" allowed in 
+> tcp_congestion_ops?
 
->
-> >
-> > >
-> > > > +     for (i =3D 0, len =3D length; len > 0; i++, len -=3D packet_l=
-en) {
-> > > > +             if (len > nct6694->maxp)
-> > > > +                     packet_len =3D nct6694->maxp;
-> > > > +             else
-> > > > +                     packet_len =3D len;
-> > > > +
-> > > > +             ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK=
-_IN_ENDPOINT),
-> > > > +                                nct6694->rx_buffer + nct6694->maxp=
- * i,
-> > > > +                                packet_len, &rx_len, nct6694->time=
-out);
-> > > > +             if (ret)
-> > > > +                     goto err;
-> > > > +     }
-> > > > +
-> > > > +     for (i =3D 0; i < rd_len; i++)
-> > > > +             buf[i] =3D nct6694->rx_buffer[i + rd_idx];
-> > >
-> > > memcpy()?
-> > >
-> > > Or why don't you directly receive data into the provided buffer? Copy=
-ing
-> > > of the data doesn't make it faster.
-> > >
-> > > On the other hand, receiving directly into the target buffer means th=
-e
-> > > target buffer must not live on the stack.
-> >
-> > [Ming] Okay! I'll change it to memcpy().
->
-> fine!
->
-> > This is my perspective: the data is uniformly received by the rx_bffer =
-held
-> > by the MFD device. does it need to be changed?
->
-> My question is: Why do you first receive into the nct6694->rx_buffer and
-> then memcpy() to the buffer provided by the caller, why don't you
-> directly receive into the memory provided by the caller?
+Hi Martin,
 
-[Ming] Due to the bulk pipe maximum packet size limitation, I think consist=
-ently
-using the MFD'd dynamically allocated buffer to submit URBs will better
-manage USB-related operations
+Yes, creating an independent kfunc for each callback and filtering via expected_attach_type can 
+indeed solve the problem.
 
->
-> Marc
->
-> --
-> Pengutronix e.K.                 | Marc Kleine-Budde          |
-> Embedded Linux                   | https://www.pengutronix.de |
-> Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Our main concern is to avoid introducing kfuncs as much as possible. For our subsystem, we might 
+need to maintain it in a way that maintains a uapi, as we certainly have user applications depending 
+on it.
+
+This is also why we need to create a separate ctx, as there’s no way to restrict bit writes, so we 
+created a ctx->smc_ok that is allowed to write.
+
+This is also why we had to create a separate structure, tcpsmc_ctx ...
+
+However, I now realize that compromising to avoid introducing kfuncs has gone too far, affecting the 
+readability of the code. I will try to use kfuncs in the next version to solve those issues.
+
+
+> 
+>> + */
+>> +struct smc_bpf_ops_ctx {
+>> +    struct {
+>> +        struct tcp_sock *tp;
+>> +    } set_option;
+>> +    struct {
+>> +        const struct tcp_sock *tp;
+>> +        struct inet_request_sock *ireq;
+>> +        int smc_ok;
+>> +    } set_option_cond;
+>> +};
+> 
+> There is no need to create one single ctx for struct_ops prog. struct_ops prog can take >1 args and 
+> different ops can take different args.
+> 
+
+Same reason with concern on kfunc. I'll change it in next version.
+
+
+>> +
+>> +struct smc_bpf_ops {
+>> +    /* priavte */
+>> +
+>> +    struct list_head    list;
+>> +
+>> +    /* public */
+>> +
+>> +    /* Invoked before computing SMC option for SYN packets.
+>> +     * We can control whether to set SMC options by modifying
+>> +     * ctx->set_option->tp->syn_smc.
+>> +     * This's also the only member that can be modified now.
+>> +     * Only member in ctx->set_option is valid for this callback.
+>> +     */
+>> +    void (*set_option)(struct smc_bpf_ops_ctx *ctx);
+>> +
+>> +    /* Invoked before Set up SMC options for SYN-ACK packets
+>> +     * We can control whether to respond SMC options by modifying
+>> +     * ctx->set_option_cond.smc_ok.
+>> +     * Only member in ctx->set_option_cond is valid for this callback.
+>> +     */
+>> +    void (*set_option_cond)(struct smc_bpf_ops_ctx *ctx);
+> 
+> The struct smc_bpf_ops already has set_option and set_option_cnd, but...
+> 
+>> +};
+>> +
+>>   #endif    /* _SMC_H */
+>> diff --git a/include/net/tcp.h b/include/net/tcp.h
+>> index 739a9fb..c322443 100644
+>> --- a/include/net/tcp.h
+>> +++ b/include/net/tcp.h
+>> @@ -2730,6 +2730,12 @@ static inline void tcp_bpf_rtt(struct sock *sk, long mrtt, u32 srtt)
+>>   #if IS_ENABLED(CONFIG_SMC)
+>>   extern struct static_key_false tcp_have_smc;
+>> +struct tcpsmc_ctx {
+>> +    /* Invoked before computing SMC option for SYN packets. */
+>> +    void (*set_option)(struct tcp_sock *tp);
+>> +    /* Invoked before Set up SMC options for SYN-ACK packets */
+>> +    void (*set_option_cond)(const struct tcp_sock *tp, struct inet_request_sock *ireq);
+>> +};
+> 
+> another new struct tcpsmc_ctx has exactly the same functions (at least the same name) but different 
+> arguments. I don't understand why this duplicate, is it because the need to prepare the "struct 
+> smc_bpf_ops_ctx"?
+
+Yes, same reason with concern on kfunc. I'll change it in next version.
+
+> 
+> The "struct tcpsmc_ctx" should be the "struct smc_bpf_ops" itself.
+> 
+> [ ... ]
+> 
+>> +static int smc_bpf_ops_btf_struct_access(struct bpf_verifier_log *log,
+>> +                     const struct bpf_reg_state *reg,
+>> +                     const struct bpf_prog *prog,
+>> +                     int off, int size)
+>> +{
+>> +    const struct btf_member *member;
+>> +    const char *mname;
+>> +    int member_idx;
+>> +
+>> +    member_idx = prog->expected_attach_type;
+>> +    if (member_idx >= btf_type_vlen(smc_bpf_ops_type))
+>> +        goto out_err;
+>> +
+>> +    member = &btf_type_member(smc_bpf_ops_type)[member_idx];
+>> +    mname = btf_str_by_offset(saved_btf, member->name_off);
+>> +
+>> +    if (!strcmp(mname, "set_option")) {
+> 
+> btf_member_bit_offset can be used instead of strcmp. Take a look at bpf_tcp_ca.c and kernel/sched/ext.c
+> 
+
+Got it, thanks for that.
+
+Besides, it seems that we don't need the export btf_str_by_offset anymore in that way.
+I'll remove it in the next version.
+
+
+>> +        /* only support to modify tcp_sock->syn_smc */
+>> +        if (reg->btf_id == tcp_sock_id &&
+>> +            off == offsetof(struct tcp_sock, syn_smc) &&
+>> +            off + size == offsetofend(struct tcp_sock, syn_smc))
+>> +            return 0;
+>> +    } else if (!strcmp(mname, "set_option_cond")) {
+>> +        /* only support to modify smc_bpf_ops_ctx->smc_ok */
+>> +        if (reg->btf_id == smc_bpf_ops_ctx_id &&
+>> +            off == offsetof(struct smc_bpf_ops_ctx, set_option_cond.smc_ok) &&
+>> +            off + size == offsetofend(struct smc_bpf_ops_ctx, set_option_cond.smc_ok))
+>> +            return 0;
+>> +    }
+>> +
+>> +out_err:
+>> +    return -EACCES;
+>> +}
+>> +
+>> +static const struct bpf_verifier_ops smc_bpf_verifier_ops = {
+>> +    .get_func_proto = bpf_base_func_proto,
+>> +    .is_valid_access = bpf_tracing_btf_ctx_access,
+>> +    .btf_struct_access = smc_bpf_ops_btf_struct_access,
+>> +};
+>> +
+>> +static struct bpf_struct_ops bpf_smc_bpf_ops = {
+>> +    .init = smc_bpf_ops_init,
+>> +    .name = "smc_bpf_ops",
+>> +    .reg = smc_bpf_ops_reg,
+>> +    .unreg = smc_bpf_ops_unreg,
+>> +    .cfi_stubs = &__bpf_smc_bpf_ops,
+>> +    .verifier_ops = &smc_bpf_verifier_ops,
+>> +    .init_member = smc_bpf_ops_init_member,
+>> +    .check_member = smc_bpf_ops_check_member,
+>> +    .owner = THIS_MODULE,
+>> +};
+>> +
+>> +int smc_bpf_struct_ops_init(void)
+>> +{
+>> +    return register_bpf_struct_ops(&bpf_smc_bpf_ops, smc_bpf_ops);
+>> +}
+>> +
+>> +void bpf_smc_set_tcp_option(struct tcp_sock *tp)
+>> +{
+>> +    struct smc_bpf_ops_ctx ops_ctx = {};
+>> +    struct smc_bpf_ops *ops;
+>> +
+>> +    ops_ctx.set_option.tp = tp;
+> 
+> All this initialization should be unnecessary. Directly pass tp instead.
+> 
+
+Same reason with kfunc concern. I'll change it in next version.
+
+>> +
+>> +    rcu_read_lock();
+>> +    list_for_each_entry_rcu(ops, &smc_bpf_ops_list, list) {
+> 
+> Does it need to have a list (meaning >1) of smc_bpf_ops to act on a sock? The ordering expectation 
+> is hard to manage.
+> 
+
+Considering that the SMC modules also has its own ops that needs to be registered on it (the logic 
+of smc_limit_fs), and need to be all executed, perhaps a list is a more suitable choice.
+
+
+>> +        ops->set_option(&ops_ctx);
+> 
+> A dumb question. This will only affect AF_SMC (or AF_INET[6]/IPPROTO_SMC) socket but not the 
+> AF_INET[6]/IPPROTO_{TCP,UDP} socket?
+> 
+
+Yes, it only affects AF_SMC, AF_SMC6, or IPPROTO_SMC sockets. Due to only SMC sockets will set 
+tp->syn_smc, and we will check it before calling the very ops.
+
+Best wishes,
+D.
+
+> pw-bot: cr
+> 
+>> +    }
+>> +    rcu_read_unlock();
+>> +}
+
+
+
 
