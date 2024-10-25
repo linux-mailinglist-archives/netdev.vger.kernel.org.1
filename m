@@ -1,270 +1,303 @@
-Return-Path: <netdev+bounces-139074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B177F9AFFC9
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 12:13:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D749AFFD9
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 12:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 709D5287DB5
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:13:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0A21F220F0
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874D81DAC96;
-	Fri, 25 Oct 2024 10:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4381D90DD;
+	Fri, 25 Oct 2024 10:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GoXxPioY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tzCLzj4G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2075.outbound.protection.outlook.com [40.107.243.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C5B1D5ABF;
-	Fri, 25 Oct 2024 10:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729851104; cv=none; b=r0ehM5U9JvBboOJmKkMTS+F4e6W48t9RNXMjm/6jTXmLL3RAUmypFGAQZe0DQA8naNxXA0pFW64Xsfebko/rR1zCZAePVL4InDcWoaw4vua6tHTk4SJXM6wgrF6roDdKySlM0klMG4Ukr1aoa/SVcPhvmBd4A7uyE9SdktKTGgc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729851104; c=relaxed/simple;
-	bh=6Ti/rPa9VPGsl7W96k8PIOoxkRU8dllSjyzxVDqDHSk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=onZ++9Dyor/vP4t9LULQu0G4KoMAsFkLCJpoRyi50yqg0fOlzZZULlq5EwGJ70L7NFV7nGHkMkrNwKjYrbDMJswld4cVVYQF3l7XMInCaGENWoJ5xhKbvgSS896q/ku+ZOXxZEPOE7eFSm30ocmd9nOE48/cJZHz/uOF18HtZFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GoXxPioY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76075C4CEC3;
-	Fri, 25 Oct 2024 10:11:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729851103;
-	bh=6Ti/rPa9VPGsl7W96k8PIOoxkRU8dllSjyzxVDqDHSk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=GoXxPioYzk31+wt+0+IRRRxkQF6KQCb9P4pFGaCK5JWftl0Tm7oqWs72+onb32YiF
-	 v3UQ4dcsXWsw0Z/TSgyBCMKwdaOdpCAhJuVWXhsu3bwE7BOonosEF5HqKCX3lr7EHI
-	 G/baMwPa7KAL6mqSjxnwXmb4XhUpmKawhwBRilU8YEmbLT2t+sMIymb9pkSWyhZcOY
-	 J+4hqY7Wu8dz/H6sttVzKqaE6IuYatcMCSb+H7OAtC2wUckWwBbBEMUK4+ticQRVpu
-	 QuLuYRl97UR9RmBq98gd9QAAtKk1VzwzCaXyZjeoiYSkG6CRSLRo+VzpCYsTHXakWs
-	 p50HS9LD45TyA==
-From: Puranjay Mohan <puranjay@kernel.org>
-To: kernel test robot <lkp@intel.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexei Starovoitov <ast@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Andrii Nakryiko <andrii@kernel.org>,
- bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, "David S.
- Miller" <davem@davemloft.net>, Eduard Zingerman <eddyz87@gmail.com>, Eric
- Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, Helge Deller
- <deller@gmx.de>, Jakub Kicinski <kuba@kernel.org>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, Jiri Olsa <jolsa@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org,
- linux-riscv@lists.infradead.org, Martin KaFai Lau <martin.lau@linux.dev>,
- Mykola Lysenko <mykolal@fb.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Abeni <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Shuah Khan <skhan@linuxfoundation.org>, Song Liu <song@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: oe-kbuild-all@lists.linux.dev, Linux Memory Management List
- <linux-mm@kvack.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 2/4] bpf: bpf_csum_diff: optimize and
- homogenize for all archs
-In-Reply-To: <202410251552.LR73LP4V-lkp@intel.com>
-References: <20241023153922.86909-3-puranjay@kernel.org>
- <202410251552.LR73LP4V-lkp@intel.com>
-Date: Fri, 25 Oct 2024 10:11:11 +0000
-Message-ID: <mb61po738bigw.fsf@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4791622B672;
+	Fri, 25 Oct 2024 10:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729851425; cv=fail; b=MTks578u6VZe4B38GYDf+HExTSdWUzb9eMonmcUkeD/i6SzwzbIExvIVeQsLs/eaf6Yh9U7749Kc59wVsoBEWRrpFWrVTgP3bWDTEEJyFsk0kuGGmswpdIYhSFftkB6ixllWvsHq0pKfvQo1FBqhx5po7RwhNoIfyWC7OkeYHVo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729851425; c=relaxed/simple;
+	bh=xe3bXwsWK8e5WEOVqTuTt6cDBvciygkTxdaLpavXqO0=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jwdc8Doo7cjciqV9WrgtoZWb/MV1ecO5y+nHkH7UbTKSDChepS64nRQhGklpnWBmxIMJ9IHaKfs5e2OBr8qSPZxjyYwNNh7HuTCPEwWfe49q8j+emcPnyDFtjSYLOIhmLf9CTq7kwczj+Y1R28xY0N01law29bTpcCCAFIpcMLQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tzCLzj4G; arc=fail smtp.client-ip=40.107.243.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hxiiwoNFOkQPsTTTVasw2Lua4qc5DQ6cAp6rYZVouYX/8b3FLc4zZWr88lN4yWaJU6x+j3HazAhwvVZKotnjOu9GUHKCDpKFMsXwzIJI0ME9wgT+PDc9PN/oPtOGEO4mW5lRPPYzPYmFUYJrOv0Ss9aYPuy7VjkCC4WsAW2nYVKpPRj8mFVLRXjgVmzQZz3aF22kiXKlr7EaIHuqW9L6hVUqF6e3WaZylEQkBTamB6yITU2RyewnS09snQYUXagBKYu+sC94+rYUwyo3nx8rMGdwWO150QIdfibxfA9o93UVYXjKhfO1ccWTulybhXzpg8TbjtH82gnwb3CyzVxx9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e0LYrgroElEkl+PSBV1ACyz00NJm4JyDbRyq6a08AOw=;
+ b=TaIf3t9DTnTb+uqijJrpO3lmQt2EkDw1KdOKU/ZdL9Nv3pLym2ENK0yuWAdeYC3b0JjwZjNC68gZuy0O1QKzqtuczQRqjx3uVUXxASUroCnKB9Fn+qOXDYffXNwIHDGvcUlqJkyZs7RjDLRtZe0LsqLBcD4B1HLUvS55zl7UpwYsmstrjkjig8bmmY7vpPgWTmXq/P47xk3Bia7wC2+hdgg9n/ujb5NmrK8ZCdB6itxfznKFWIIwGCGasw/elDMsXicrxzqELsukZcZNc1hAg+2YxsYzgXeiBVji93dxlDOsu1aEgoH82TgPaDbWctdNe76K7f+fmWOm4mAnsFVMzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e0LYrgroElEkl+PSBV1ACyz00NJm4JyDbRyq6a08AOw=;
+ b=tzCLzj4GijDXoUgHDQAIvkYu8D/XoR613w3gFrYP4ylOA73kbpYn9cAL4MmLe/iSf+JpCLFGhxqjLZppbdhiegUSC7NJgMeDGNyd1zCS5Mc0pRuPNDM4iSXZq2SfuKMajy2KcwmniyNPRTP+Gw6P+9Rg9ov2buB2j/N+/I+ULsk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by DM4PR12MB6662.namprd12.prod.outlook.com (2603:10b6:8:b5::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.22; Fri, 25 Oct
+ 2024 10:17:00 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8093.021; Fri, 25 Oct 2024
+ 10:17:00 +0000
+Message-ID: <9dba2210-5488-25d8-c065-f6a2c4fa2d82@amd.com>
+Date: Fri, 25 Oct 2024 11:16:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v4 04/26] cxl/pci: add check for validating capabilities
+Content-Language: en-US
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+References: <20241017165225.21206-1-alejandro.lucero-palau@amd.com>
+ <20241017165225.21206-5-alejandro.lucero-palau@amd.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20241017165225.21206-5-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0306.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:391::11) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM4PR12MB6662:EE_
+X-MS-Office365-Filtering-Correlation-Id: 808406b6-ef07-421d-eb09-08dcf4de29b2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Sk5ScTU0Q2VwcEtLaW5SWnBsS00rWmdwVXRWZHRnclJxNWlGckxhTVRYUUE0?=
+ =?utf-8?B?bDZtYXFWa2hiY2h4SlBQU1VXZ0VITmF6dHlrdldQdWVpMjFER2hWU1JRTG45?=
+ =?utf-8?B?TWEyNXJ3bE9RQjNtUThJWFlldlgrTzFyNWdEWU5KTGJsUk1XSkpGb1U1MEto?=
+ =?utf-8?B?TTk3ekt4SHpPZWh6ZDdhUkRDZ3BwTGRlYzFORitYaHk5NG5mQ0VTd2F2V0VV?=
+ =?utf-8?B?UHdyNVdlaFVyNXB5U0dZN0Jkc0gzdHdjbTUrSVp1QjNLSWFPMThnOVdXTDhS?=
+ =?utf-8?B?NGRLa2dqTUpZdVFsbEx2NzQ4ejdOckw2eXFJak9HM2tiVmJZUUNrNVZLMjl0?=
+ =?utf-8?B?QUpoNUJMR084dVNwUVRNd2hDRHVYdDBjU1VEb2NaRGJVZGdzdWllZVlCNGg0?=
+ =?utf-8?B?aEJlZEczUUsvWHh3L0NVeVFUM1ByNVZFcHR4MTl3VjdiZEdxWmpvL3pWSlAy?=
+ =?utf-8?B?YUswOUt6c2pGVjduZzErTDU2dzA3R2tkd085T3g2UXUzWFJkWlRXV3g0Z0RE?=
+ =?utf-8?B?bHgwam9obUFFQnNOcFNrc3RQNi95L0o0amIveGlndDJ0N21pTytnUlh3T1ky?=
+ =?utf-8?B?Z3NYbnloUkcrSHZEMncvUExkMGJFOXRuWnpKZVJkb2IxVFVSK0F4RnJHRnVN?=
+ =?utf-8?B?Z0JpNzJwTlZYdHRjK3dhcTFDbUNtbEQ2dnNnR1c0QThjaW0zK3ZDdTZxcVJJ?=
+ =?utf-8?B?ajcrT2lEWklCbEJDVGNuRk41UDZLYXpYd3RtOVZ6S3VXdUZHS2dqU0lqMy9l?=
+ =?utf-8?B?cWpoZnk1dTl5UytMUGYySFZtWlk4Q0lzcS9VUmh5aUVwb0ttcXloMlFhU0lX?=
+ =?utf-8?B?L0tWSUJSZTVoV0ZlRnJQaDNzL2xyV2VGVDJIWVZLSVNvT29helN3a0luY29J?=
+ =?utf-8?B?OXVNc1Y1VDE0YlZrNUVJNG9lWGJFYTJoSnUzMWJEdDFxcXpCMUFMNWhBNlpl?=
+ =?utf-8?B?enpDQXBLbThRbXRmRFB4T21hL3ZRdHNXYlBoaUxGSTkyeGFweDlNbHRJVTlx?=
+ =?utf-8?B?emowTUdnNWFHNjNjRk1uL21xSmVMSmJmZjBKY2hqek15TndJVkp6ZWVIU1dH?=
+ =?utf-8?B?VDhVdVhveGlLTUcvdS9nakVnVjBqdUR4U2hHZWZIb0JUMUNKclcrNGZxUk1u?=
+ =?utf-8?B?bTRjbXBOOWk0bU4rTXBLVFM0bWQvdU90Vld3SVpTU3JOQ2tzWHhoS1NTanVz?=
+ =?utf-8?B?Ym1jb3NLbDlraFM4dmxEcHh1V2ZiUDIwVEMxa1Avd2x6T0NCV0w0NFc0ZEY1?=
+ =?utf-8?B?SjZrMEEzYWlYWEJRM0tkbVptbXZjSUVkOFBGWDhObHpUNjJoZVg1Ri9JenBm?=
+ =?utf-8?B?bTRaOUZFbDBOeS9xUVUzaCtCRUhzdit5U0FJcUM5QXczWlFINjdzU2ZwazB6?=
+ =?utf-8?B?K29jKytlTWQvR1hlZ0pQTDRDQWJBQjYrbzB1T1QxMEwyY0pOK2NaNzBiaEla?=
+ =?utf-8?B?bzAzby82eVJjeUxDV05RZDJsaVJxR2JOSi9nZjVBeTBXYXU1ZlhpY25FSkJL?=
+ =?utf-8?B?dTM3cDdYUnl6UjZiakQvNEsyMi9ZVEJTODk0eGVCS1dGZVdsb0plT25qaWps?=
+ =?utf-8?B?VVY5V1JSSExOSGlvZGJORG1mS3A0TXRGTGlHV0UyMS9RZWZxbmY4SU5FaVRv?=
+ =?utf-8?B?Lyt6ZE5jSTRmWnZxTm01em1ROUlidFhlK2k1NVk0SEtNMzNybUhtNytaanBy?=
+ =?utf-8?B?TkNkRjlkVTlRaDd2aldCQWRINUJ2cm1JWE50Q3BRejN3T2YyZG1FTzN3Z3lH?=
+ =?utf-8?B?eWwzN3JRUFlFU3p4WC9DVHJtNWFaNmlYbFZ4bUZ0NERUR3ZBTlZ6czNxTFMz?=
+ =?utf-8?Q?ZRfbqx8TSg5ljfSJMuM9s+jB2v/5Xc5R46SgI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YmxzWng3a21LRjliTjFxeHhYWXRLRjg1aUozOGNGUTY3QkNvSWdjcTdCbEk1?=
+ =?utf-8?B?LzljSUdwdXVjL3RCaXVlemhyQlFZUzNyZ2VheVUvQTNyOGt1WHlYQ1BLK2o3?=
+ =?utf-8?B?Z01XM1BiY3c0WTQ4QmhoVjdhdXNKZHB2TlY0aUpaSzFSSTlOVWw1bFpiR1o1?=
+ =?utf-8?B?b29hYUl6cWJvNnJtWWl5MU1NVXdpOVYxekl6MVNYKzZHalIxaFNkeGVOdmVs?=
+ =?utf-8?B?bXJkQndVU1cyekZ4WGlyL0Y5REZxQm05dUExeVpxcm1sNkV6Y3N2Q202dDB3?=
+ =?utf-8?B?YUltNXBldDVlY240bXBTWDZPLzBrdHdZSlh2cGZDNjBuS0dqckVOUXh4ZVBn?=
+ =?utf-8?B?U2FoVW9IMHdmbEsremc3M2RtaTdURnJVOVFibE1EakNMZlAyaGo5cGMrMzR5?=
+ =?utf-8?B?dElOZmFpQXZnZVlHSVgzR0d4aGsxelFnZm5ZRnNHS3E4M05vTXdsUlBiNXp2?=
+ =?utf-8?B?S29SL0hhL2JWZlZDY3ZrbEpRY3BGbEtSOUV0T3NqZUF2NFM2aUFYU2pQQmZk?=
+ =?utf-8?B?MkZUekNDT0h5SzhBZytralZoeEJQM0tqSjlGMmk5UzRRSDhneFRzS0RSa1hp?=
+ =?utf-8?B?Vk43d3VKclgwTldZanlFbUNYUmxiMHpjbjlsaEd3WTlaVUJCcWFzZCtsK3RJ?=
+ =?utf-8?B?eTJ3bk5oczRSVEg2azhLb2VJaVQxOGZZMkJ4Q2o0UytFWk9ySnV3ZGVoOVNE?=
+ =?utf-8?B?Ykc3MCtMNEVVQnRoU0VYZXNnNU9lR3hhV1l4amd2RDVmVVkwdFdSclNMcVYx?=
+ =?utf-8?B?djNZbjNMaGRwSHFYa1Q3QndqTmpFTTJZa1BZZXRHdUUvendNQjlMWnJ5RzBp?=
+ =?utf-8?B?YnNFWjRPSE9waSt6RVMvNlFmUE1QcWlCdGtmdjczcnpFWXBiTjZycGxCZlY0?=
+ =?utf-8?B?SmNxSzd2dU1MYTV1NDZvU21ibDFFdnUrcE1KZHZrMFdiOTk5TWNlRGpKMlFs?=
+ =?utf-8?B?K2RyYVoyWEtyYS9IcDZodlVSZXJHdVNDM0g2Nno2UXM1NE00c3FidlhvMlJN?=
+ =?utf-8?B?Z05la0hRdFAwYWt2c1ZQcjF1TWE5djdqbmpONTFqTGlmUENzcnFobnl5dHJp?=
+ =?utf-8?B?Tm5GUGJ6c2Y3QUtFeGt2VkkyVGJVS24rRThCdGRGLytLcDZ0eTVXOEZ3YUcy?=
+ =?utf-8?B?d1VKZUs2R0lrbm5oRGlPcGI4UDJMdnV6akhrcGVJZk1qTGVnNisyNnZEZVBZ?=
+ =?utf-8?B?eEdZTTA0WEJpTFprYURONjhSWWRQZlRYcjBiL1JZNUw2WTB4a3A3dDArMXZC?=
+ =?utf-8?B?eW5UMlRjL0dybHdxblJFeWU5U0cwb0tDbyt3djBhTmZ2TXZmUlp3U0NleVVL?=
+ =?utf-8?B?bnljbWtyK050U2poRjg0RGNybU5sdGZrNXJrTkpmcTNhbkJJam52N2Vlblhu?=
+ =?utf-8?B?UEpLbmdPVHFOS1VzckJKSExFOUZOMGFtYUtXc3E5T0xvK1B0eGJzWFhvL3NJ?=
+ =?utf-8?B?V3cxRzdIeW1tdUMvZzZDRG5LLzJ1aXo3UExqek1KNnJhRHFqT1E3QTFRZUt4?=
+ =?utf-8?B?VkZEeTRYNlV5QUdJQlRtMWI5ZldKOUswSFlmSXM1d3lid0U4OTVlS3JZdjZM?=
+ =?utf-8?B?djhXZytDM01CbTArTEEyOXBHVXJtaDFDZmtmWjFYaVcvYVp2czNyU0JrRXBH?=
+ =?utf-8?B?dUZrMDg1cGNxdEpqZS9GelN1NG9ySUowZkd4YmR3Q0xMWkFjQUhiR0NmN1VH?=
+ =?utf-8?B?MlRPNWQvYllLbk1BdGtVc2FTSDhPLzRCUTVXTFE4S3ZYc09nM2srQThKU1Rn?=
+ =?utf-8?B?VTNHTjhtTDdaS3hSMk5Hc3piY3ZYUGp3S213dldKeHdwa05UeUg0UnJtaUJP?=
+ =?utf-8?B?TkVQRG1ONzdYSmU1ZmFBV1Z3bkwza2hxL3M5YUU1SG0vRE9LMjZUVmNrcUI2?=
+ =?utf-8?B?d3U1U204L1lSNStWQ24vRnpHZGVHdVVnVldkekJWL2NuVW9BazJhYWh4L0RZ?=
+ =?utf-8?B?eGRxVDF6L0daM0RIMEl1U1Q2NTUwYklsTVRKOUVMc012TXhKV0NqUUxWMENt?=
+ =?utf-8?B?SGFsTTRJMWFSZUNkNzBFK05pR2VGRXp6U1RWRENMODhDTzczM2tUVVYreTE3?=
+ =?utf-8?B?NzVieFJBbU53VC9XZitSZ2JMcFRWbGtHekVMQk45b0V4RTZLRkZyMVRJbEFz?=
+ =?utf-8?Q?BSsj8pMGGs8J1B1/Gsq31y0Xo?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 808406b6-ef07-421d-eb09-08dcf4de29b2
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2024 10:17:00.1700
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zFzvtQrD/RIsqaoXOmAmX5B+uBvve4+pil5XtWmgt5A5NaT7MhZXippSkMqeK9ykRh4T02G+hAbYwmrLuj/EyA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6662
 
---=-=-=
-Content-Type: text/plain
 
-kernel test robot <lkp@intel.com> writes:
-
-> Hi Puranjay,
+On 10/17/24 17:52, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 >
-> kernel test robot noticed the following build warnings:
+> During CXL device initialization supported capabilities by the device
+> are discovered. Type3 and Type2 devices have different mandatory
+> capabilities and a Type2 expects a specific set including optional
+> capabilities.
 >
-> [auto build test WARNING on bpf-next/master]
+> Add a function for checking expected capabilities against those found
+> during initialization.
 >
-> url:    https://github.com/intel-lab-lkp/linux/commits/Puranjay-Mohan/net-checksum-move-from32to16-to-generic-header/20241023-234347
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-> patch link:    https://lore.kernel.org/r/20241023153922.86909-3-puranjay%40kernel.org
-> patch subject: [PATCH bpf-next v2 2/4] bpf: bpf_csum_diff: optimize and homogenize for all archs
-> config: i386-randconfig-061-20241025 (https://download.01.org/0day-ci/archive/20241025/202410251552.LR73LP4V-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241025/202410251552.LR73LP4V-lkp@intel.com/reproduce)
+> Rely on this function for validating capabilities instead of when CXL
+> regs are probed.
 >
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202410251552.LR73LP4V-lkp@intel.com/
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>   drivers/cxl/core/pci.c  | 14 ++++++++++++++
+>   drivers/cxl/core/regs.c |  9 ---------
+>   drivers/cxl/pci.c       | 17 +++++++++++++++++
+>   include/linux/cxl/cxl.h |  3 +++
+>   4 files changed, 34 insertions(+), 9 deletions(-)
 >
-> sparse warnings: (new ones prefixed by >>)
->    net/core/filter.c:1423:39: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sock_filter const *filter @@     got struct sock_filter [noderef] __user *filter @@
->    net/core/filter.c:1423:39: sparse:     expected struct sock_filter const *filter
->    net/core/filter.c:1423:39: sparse:     got struct sock_filter [noderef] __user *filter
->    net/core/filter.c:1501:39: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sock_filter const *filter @@     got struct sock_filter [noderef] __user *filter @@
->    net/core/filter.c:1501:39: sparse:     expected struct sock_filter const *filter
->    net/core/filter.c:1501:39: sparse:     got struct sock_filter [noderef] __user *filter
->    net/core/filter.c:2321:45: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] daddr @@     got unsigned int [usertype] ipv4_nh @@
->    net/core/filter.c:2321:45: sparse:     expected restricted __be32 [usertype] daddr
->    net/core/filter.c:2321:45: sparse:     got unsigned int [usertype] ipv4_nh
->    net/core/filter.c:10993:31: sparse: sparse: symbol 'sk_filter_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11000:27: sparse: sparse: symbol 'sk_filter_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11004:31: sparse: sparse: symbol 'tc_cls_act_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11013:27: sparse: sparse: symbol 'tc_cls_act_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11017:31: sparse: sparse: symbol 'xdp_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11029:31: sparse: sparse: symbol 'cg_skb_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11035:27: sparse: sparse: symbol 'cg_skb_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11039:31: sparse: sparse: symbol 'lwt_in_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11045:27: sparse: sparse: symbol 'lwt_in_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11049:31: sparse: sparse: symbol 'lwt_out_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11055:27: sparse: sparse: symbol 'lwt_out_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11059:31: sparse: sparse: symbol 'lwt_xmit_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11066:27: sparse: sparse: symbol 'lwt_xmit_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11070:31: sparse: sparse: symbol 'lwt_seg6local_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11076:27: sparse: sparse: symbol 'lwt_seg6local_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11079:31: sparse: sparse: symbol 'cg_sock_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11085:27: sparse: sparse: symbol 'cg_sock_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11088:31: sparse: sparse: symbol 'cg_sock_addr_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11094:27: sparse: sparse: symbol 'cg_sock_addr_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11097:31: sparse: sparse: symbol 'sock_ops_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11103:27: sparse: sparse: symbol 'sock_ops_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11106:31: sparse: sparse: symbol 'sk_skb_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11113:27: sparse: sparse: symbol 'sk_skb_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11116:31: sparse: sparse: symbol 'sk_msg_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11123:27: sparse: sparse: symbol 'sk_msg_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11126:31: sparse: sparse: symbol 'flow_dissector_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11132:27: sparse: sparse: symbol 'flow_dissector_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11460:31: sparse: sparse: symbol 'sk_reuseport_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:11466:27: sparse: sparse: symbol 'sk_reuseport_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11668:27: sparse: sparse: symbol 'sk_lookup_prog_ops' was not declared. Should it be static?
->    net/core/filter.c:11672:31: sparse: sparse: symbol 'sk_lookup_verifier_ops' was not declared. Should it be static?
->    net/core/filter.c:1931:43: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __wsum [usertype] diff @@     got unsigned long long [usertype] to @@
->    net/core/filter.c:1931:43: sparse:     expected restricted __wsum [usertype] diff
->    net/core/filter.c:1931:43: sparse:     got unsigned long long [usertype] to
->    net/core/filter.c:1934:36: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be16 [usertype] old @@     got unsigned long long [usertype] from @@
->    net/core/filter.c:1934:36: sparse:     expected restricted __be16 [usertype] old
->    net/core/filter.c:1934:36: sparse:     got unsigned long long [usertype] from
->    net/core/filter.c:1934:42: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be16 [usertype] new @@     got unsigned long long [usertype] to @@
->    net/core/filter.c:1934:42: sparse:     expected restricted __be16 [usertype] new
->    net/core/filter.c:1934:42: sparse:     got unsigned long long [usertype] to
->    net/core/filter.c:1937:36: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] from @@     got unsigned long long [usertype] from @@
->    net/core/filter.c:1937:36: sparse:     expected restricted __be32 [usertype] from
->    net/core/filter.c:1937:36: sparse:     got unsigned long long [usertype] from
->    net/core/filter.c:1937:42: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] to @@     got unsigned long long [usertype] to @@
->    net/core/filter.c:1937:42: sparse:     expected restricted __be32 [usertype] to
->    net/core/filter.c:1937:42: sparse:     got unsigned long long [usertype] to
->    net/core/filter.c:1982:59: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __wsum [usertype] diff @@     got unsigned long long [usertype] to @@
->    net/core/filter.c:1982:59: sparse:     expected restricted __wsum [usertype] diff
->    net/core/filter.c:1982:59: sparse:     got unsigned long long [usertype] to
->    net/core/filter.c:1985:52: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be16 [usertype] from @@     got unsigned long long [usertype] from @@
->    net/core/filter.c:1985:52: sparse:     expected restricted __be16 [usertype] from
->    net/core/filter.c:1985:52: sparse:     got unsigned long long [usertype] from
->    net/core/filter.c:1985:58: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted __be16 [usertype] to @@     got unsigned long long [usertype] to @@
->    net/core/filter.c:1985:58: sparse:     expected restricted __be16 [usertype] to
->    net/core/filter.c:1985:58: sparse:     got unsigned long long [usertype] to
->    net/core/filter.c:1988:52: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] from @@     got unsigned long long [usertype] from @@
->    net/core/filter.c:1988:52: sparse:     expected restricted __be32 [usertype] from
->    net/core/filter.c:1988:52: sparse:     got unsigned long long [usertype] from
->    net/core/filter.c:1988:58: sparse: sparse: incorrect type in argument 4 (different base types) @@     expected restricted __be32 [usertype] to @@     got unsigned long long [usertype] to @@
->    net/core/filter.c:1988:58: sparse:     expected restricted __be32 [usertype] to
->    net/core/filter.c:1988:58: sparse:     got unsigned long long [usertype] to
->>> net/core/filter.c:2023:48: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int sum @@     got restricted __wsum @@
->    net/core/filter.c:2023:48: sparse:     expected unsigned int sum
->    net/core/filter.c:2023:48: sparse:     got restricted __wsum
->    net/core/filter.c:2026:52: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int sum @@     got restricted __wsum @@
->    net/core/filter.c:2026:52: sparse:     expected unsigned int sum
->    net/core/filter.c:2026:52: sparse:     got restricted __wsum
->    net/core/filter.c:2029:40: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int sum @@     got restricted __wsum @@
->    net/core/filter.c:2029:40: sparse:     expected unsigned int sum
->    net/core/filter.c:2029:40: sparse:     got restricted __wsum
->    net/core/filter.c:2031:16: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __wsum [usertype] seed @@
->    net/core/filter.c:2031:16: sparse:     expected unsigned long long
->    net/core/filter.c:2031:16: sparse:     got restricted __wsum [usertype] seed
->    net/core/filter.c:2053:35: sparse: sparse: incorrect type in return expression (different base types) @@     expected unsigned long long @@     got restricted __wsum [usertype] csum @@
->    net/core/filter.c:2053:35: sparse:     expected unsigned long long
->    net/core/filter.c:2053:35: sparse:     got restricted __wsum [usertype] csum
->
-> vim +2023 net/core/filter.c
->
->   2009	
->   2010	BPF_CALL_5(bpf_csum_diff, __be32 *, from, u32, from_size,
->   2011		   __be32 *, to, u32, to_size, __wsum, seed)
->   2012	{
->   2013		/* This is quite flexible, some examples:
->   2014		 *
->   2015		 * from_size == 0, to_size > 0,  seed := csum --> pushing data
->   2016		 * from_size > 0,  to_size == 0, seed := csum --> pulling data
->   2017		 * from_size > 0,  to_size > 0,  seed := 0    --> diffing data
->   2018		 *
->   2019		 * Even for diffing, from_size and to_size don't need to be equal.
->   2020		 */
->   2021	
->   2022		if (from_size && to_size)
->> 2023			return csum_from32to16(csum_sub(csum_partial(to, to_size, seed),
->   2024							csum_partial(from, from_size, 0)));
->   2025		if (to_size)
->   2026			return csum_from32to16(csum_partial(to, to_size, seed));
->   2027	
->   2028		if (from_size)
->   2029			return csum_from32to16(~csum_partial(from, from_size, ~seed));
->   2030	
->   2031		return seed;
->   2032	}
->   2033	
-
-This file has a lot of such sparse warnings. Specifically, to fix the
-warning introduced by me, I can apply the following diff:
-
---- >8 ---
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index e00bec7de9ed..b94037f29b2a 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2019,16 +2019,18 @@ BPF_CALL_5(bpf_csum_diff, __be32 *, from, u32, from_size,
-         * Even for diffing, from_size and to_size don't need to be equal.
-         */
-
-+       __wsum ret = seed;
-+
-        if (from_size && to_size)
--               return csum_from32to16(csum_sub(csum_partial(to, to_size, seed),
--                                               csum_partial(from, from_size, 0)));
-+               ret = csum_sub(csum_partial(to, to_size, seed), csum_partial(from, from_size, 0));
-+
-        if (to_size)
--               return csum_from32to16(csum_partial(to, to_size, seed));
-+               ret =  csum_partial(to, to_size, seed);
-
-        if (from_size)
--               return csum_from32to16(~csum_partial(from, from_size, ~seed));
-+               ret = ~csum_partial(from, from_size, ~seed);
-
--       return seed;
-+       return csum_from32to16((__force unsigned int)ret);
- }
-
---- 8< ---
-
-If others feel that fixing these warnings is useful, I can send another
-version with above diff. I will then also send a separate patch to fix
-all other such warnings in this file.
+> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+> index 3d6564dbda57..fa2a5e216dc3 100644
+> --- a/drivers/cxl/core/pci.c
+> +++ b/drivers/cxl/core/pci.c
+> @@ -8,6 +8,7 @@
+>   #include <linux/pci-doe.h>
+>   #include <linux/aer.h>
+>   #include <linux/cxl/pci.h>
+> +#include <linux/cxl/cxl.h>
+>   #include <cxlpci.h>
+>   #include <cxlmem.h>
+>   #include <cxl.h>
+> @@ -1077,3 +1078,16 @@ bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port)
+>   				     __cxl_endpoint_decoder_reset_detected);
+>   }
+>   EXPORT_SYMBOL_NS_GPL(cxl_endpoint_decoder_reset_detected, CXL);
+> +
+> +bool cxl_pci_check_caps(struct cxl_dev_state *cxlds, unsigned long *expected_caps,
+> +			unsigned long *current_caps)
+> +{
+> +	if (current_caps)
+> +		bitmap_copy(current_caps, cxlds->capabilities, CXL_MAX_CAPS);
+> +
+> +	dev_dbg(cxlds->dev, "Checking cxlds caps 0x%08lx vs expected caps 0x%08lx\n",
+> +		*cxlds->capabilities, *expected_caps);
+> +
+> +	return bitmap_equal(cxlds->capabilities, expected_caps, CXL_MAX_CAPS);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_pci_check_caps, CXL);
+> diff --git a/drivers/cxl/core/regs.c b/drivers/cxl/core/regs.c
+> index 9d63a2adfd42..6fbc5c57149e 100644
+> --- a/drivers/cxl/core/regs.c
+> +++ b/drivers/cxl/core/regs.c
+> @@ -444,15 +444,6 @@ static int cxl_probe_regs(struct cxl_register_map *map, unsigned long *caps)
+>   	case CXL_REGLOC_RBI_MEMDEV:
+>   		dev_map = &map->device_map;
+>   		cxl_probe_device_regs(host, base, dev_map, caps);
+> -		if (!dev_map->status.valid || !dev_map->mbox.valid ||
+> -		    !dev_map->memdev.valid) {
+> -			dev_err(host, "registers not found: %s%s%s\n",
+> -				!dev_map->status.valid ? "status " : "",
+> -				!dev_map->mbox.valid ? "mbox " : "",
+> -				!dev_map->memdev.valid ? "memdev " : "");
+> -			return -ENXIO;
+> -		}
+> -
+>   		dev_dbg(host, "Probing device registers...\n");
+>   		break;
+>   	default:
+> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
+> index 6cd7ab117f80..89c8ac1a61fd 100644
+> --- a/drivers/cxl/pci.c
+> +++ b/drivers/cxl/pci.c
+> @@ -792,6 +792,8 @@ static int cxl_event_config(struct pci_host_bridge *host_bridge,
+>   static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   {
+>   	struct pci_host_bridge *host_bridge = pci_find_host_bridge(pdev->bus);
+> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
+> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
+>   	struct cxl_memdev_state *mds;
+>   	struct cxl_dev_state *cxlds;
+>   	struct cxl_register_map map;
+> @@ -853,6 +855,21 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   	if (rc)
+>   		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
+>   
+> +	bitmap_clear(expected, 0, BITS_PER_TYPE(unsigned long));
+> +
+> +	/* These are the mandatory capabilities for a Type3 device */
+> +	bitmap_set(expected, CXL_DEV_CAP_HDM, 1);
+> +	bitmap_set(expected, CXL_DEV_CAP_DEV_STATUS, 1);
+> +	bitmap_set(expected, CXL_DEV_CAP_MAILBOX_PRIMARY, 1);
+> +	bitmap_set(expected, CXL_DEV_CAP_DEV_STATUS, 1);
+> +
+> +	if (!cxl_pci_check_caps(cxlds, expected, found)) {
+> +		dev_err(&pdev->dev,
+> +			"Expected capabilities not matching with found capabilities: (%08lx - %08lx)\n",
+> +			*expected, *found);
+> +		return -ENXIO;
+> +	}
+> +
 
 
-Thanks,
-Puranjay
+This is wrong since a Type3 could have more caps than the mandatory 
+ones. I will change the check for at least the mandatory ones being 
+there, and do not fail if they are.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+I guess a dev_dbg showing always the found versus the expected ones 
+would not harm, so adding that as well in v5.
 
------BEGIN PGP SIGNATURE-----
 
-iIoEARYKADIWIQQ3wHGvVs/5bdl78BKwwPkjG3B2nQUCZxtuwBQccHVyYW5qYXlA
-a2VybmVsLm9yZwAKCRCwwPkjG3B2nfkyAP4imd310ZR1kDuVxB4CsHRlzISGXk8D
-YIv2XeoC6q7YkQEAr854TBZtq4tB7ZjChtXhWWuntX12z/pN6VJ2Jpru1gA=
-=CR+Q
------END PGP SIGNATURE-----
---=-=-=--
+>   	rc = cxl_await_media_ready(cxlds);
+>   	if (rc == 0)
+>   		cxlds->media_ready = true;
+> diff --git a/include/linux/cxl/cxl.h b/include/linux/cxl/cxl.h
+> index 4a4f75a86018..78653fa4daa0 100644
+> --- a/include/linux/cxl/cxl.h
+> +++ b/include/linux/cxl/cxl.h
+> @@ -49,4 +49,7 @@ void cxl_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec);
+>   void cxl_set_serial(struct cxl_dev_state *cxlds, u64 serial);
+>   int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>   		     enum cxl_resource);
+> +bool cxl_pci_check_caps(struct cxl_dev_state *cxlds,
+> +			unsigned long *expected_caps,
+> +			unsigned long *current_caps);
+>   #endif
 
