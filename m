@@ -1,298 +1,280 @@
-Return-Path: <netdev+bounces-139245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B609B122E
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:00:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF879B124A
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17E1AB212FB
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 22:00:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18741F22690
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 22:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE56A1C174E;
-	Fri, 25 Oct 2024 22:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAC71CEE98;
+	Fri, 25 Oct 2024 22:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gghHNV0u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsfHVAf7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEBD217F57
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 22:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C830217F2C;
+	Fri, 25 Oct 2024 22:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729893627; cv=none; b=OxIbluRTJy+bOn62sM1j6+57axDD1pCMQsFrjqEdkX0/hgPrG+Qgsz/u6F3V+X8IbH7Xf9/k4FE5riMYoV+cXibn++QrhxwL52cSOM5fvmEXCYT+P8IVRnXCETnJP9bAUX9eQMkW2DYxW0ZoR6PnvB8G8LQ7klgpXBebEykYGLI=
+	t=1729893824; cv=none; b=a3YSjQ2+sOQRGP1rvHPrP/zE85O9L5baKWvUOnT576HxjXAkg4F5SjeHlUORtEDJ+ipDyR0nn+A4hesrhBu861pvqaceRiyLvIH7oL0jwWgoX/IQwECL+8yJwnFNUkOMP6k8jxKbDZhfStqIK1KwHsV4hU8YQfFgOWO4Pz3kPhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729893627; c=relaxed/simple;
-	bh=AS65C4KKH3Fa1/54w8ZwTLY6Vhl0+/yeeRBYENWU8lk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kOnmAmC4woRt3/oSHbYvJaFqwWlqV55xugXGlDu2jcI1gRZHXeeAAqj7S1H0aSFmndiqdjEwguD2gfr4iawEVpDGfn8Y2+USU5BLK65ODw3SKIAu9dvSI2FmXBpNN/l7jOk80QbIrRjvv9iWWihEUKydshe6C5QJ5VwPqnRNIsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gghHNV0u; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4314c4cb752so24350225e9.2
-        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 15:00:24 -0700 (PDT)
+	s=arc-20240116; t=1729893824; c=relaxed/simple;
+	bh=FOTLbL7gbW7YTtHMiRM1I70X/lPdVT4Cyr/dpLlXWgs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H8hQ4FiyY4FDnCYqPmwXgK2pXhzKyfi+GBBSMi/IW0Ka9/0sC3i3QA9Ko3oaoYyMoK4iFjwQbglo8bIOJFyd7A11E/oYVERVG8nI99yusk4oA0i4kjntn4fjYEyEdTbw0juWxsKbCvbIaNEM5of09EHcZ7Dp/CSlDDOKJRmaycc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LsfHVAf7; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-460b16d4534so12649111cf.3;
+        Fri, 25 Oct 2024 15:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1729893623; x=1730498423; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KHPJGTegLCCzyoC+zW/C6THQlanbJazcpZkIyGpilpc=;
-        b=gghHNV0uK5CC9EZPYS4Y5bYsbuoW9NZqO1EViZzIwE5q9hIawZ6u0L3SIbCwbUjiTc
-         qVJwOL2N7XXxWEMiF86uOxGMvUfhqHab14+GyXtiq9EwrbkITN74xoE0gGwh9P5CGt3z
-         ujo7n4xK2zZH5orjdKxlAvg2rS/fSBQVr18as=
+        d=gmail.com; s=20230601; t=1729893821; x=1730498621; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JT5COGsxViqKRAdujVI1CBo0jutDQ8MfmHu6RZKf300=;
+        b=LsfHVAf7yCd5k5G3EEDwXi4uyVvkSUFCyVcflnuaqgHoWICMqNwb9bh+b+VgPFDdwR
+         2ysYGZC+RfYz7CUJqx/h9RPOB4id3KZ2HJn/KS7/RpeRUPJvnafTiFT40Vh9+46zGaQI
+         Bc38WRUcYf1/lxGLsRXSPqrXiMvLvM8X8pSYBWfHtp0VuHKQ7wWSqBb6IyEHpfvns6uf
+         zvE0ceWW24fLshjThhaMzqvSq7Hd7P1UWOm+lT/xP0gNfTADIybJ6v2CJtgOTkhdp/xN
+         l3X87svaE3gyObKR+8ca1r+2j54N4xVThI5k1dlcGx6oGEf5iwJBourzPOtCOnqYKWx0
+         w6oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729893623; x=1730498423;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KHPJGTegLCCzyoC+zW/C6THQlanbJazcpZkIyGpilpc=;
-        b=bRA6b6QLVV9DP1a7fu93a+Fh9oqbtDfGGHwSY0oXKW0g+vBcZT8oGOhXPJH+Ze4H7L
-         MTrEgNONcaWlaxzwaaa2PT2dHLGn7VMhSnPyS/0kixjYMKcMpmTFMBbdNs/i4lo8/v5B
-         RKISBcgHU/xgvZ2KMgkVINd1MBR9b/p8wW9mTF0T95tGs2O+nPTwFIFm+6+TDDhXroKF
-         C1qM6oKNGLR281XMfoLHJrOn/aQKfz0NAoxDWjcK4itJHiBfPV9Tnu+K/4hOZE/CNGIF
-         0uU2WRZbnKXO+oYpchftUfyQFDqJe5/lETaXs6LlHD4IhyuPwxKJs9yUV5SRdTpwv33+
-         HXyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdM4z8uQaa/XcWvq5Udr146+QoDrBk+yv9PP2jEaXWttahZxZ+lhuSqIHXDKK/DFPuiVaOhcw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFjWtT8mfx23qnKBn5wH7YvyADzezOnSND6kjvxus/upCDxknq
-	A+GQn22WOasCNrBYkVrfRyutb7qJ3u8V/4g7RT5DHcJBEFJCCAARH/Xr9/DtfLrYhgA4/ggFGqy
-	wz5gTlRW5oFNcejTq2+bGNhV5paX6R637BcXM
-X-Google-Smtp-Source: AGHT+IFzITeU8qyhbB4d9w/5cfBuhuszxu8tUWx8+nlxG28DwvV0d4xdtjrBddEBAtKT8lDNSO/mBcU7sMLrX0tRDDI=
-X-Received: by 2002:a5d:4084:0:b0:37d:37b8:3778 with SMTP id
- ffacd0b85a97d-380611eec34mr612129f8f.45.1729893623254; Fri, 25 Oct 2024
- 15:00:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729893821; x=1730498621;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JT5COGsxViqKRAdujVI1CBo0jutDQ8MfmHu6RZKf300=;
+        b=DFr5kFV2jmlMcc7bihPeSnqYBTMqUNDiSFLikHrPO6ZSts9Mh18CqoMeoW1XPEXW+K
+         yVAiyLtfEk9OgSMHggD+1IbJeDUpZTGUf4LZt5EHMyodck5SHSHw4pfLL+VzKbSa2Vm4
+         p4NKqBiHiCeF6wk3dcdaZqT/Ru8bI1q6cfu6X8LyMvJP5lqWteHscLH2X9TIy+bBk4i2
+         04QKKYCe25yYPG/U6apK4VfLsvHBLUSM2rAT+rajaIDQ8zBh3/FAq0ApiHMs51mDH1H9
+         Zxz2dRgCcJYcUhddR77vdjuvYs1xeUmaAEdGQZXWjaR0LFNwlemPA9qsSEBzx5eTXrOt
+         rQTw==
+X-Forwarded-Encrypted: i=1; AJvYcCW8ISeT5MzORLG1jeB3kgh+7VxhXA31nj6xMZFB6dvSxAkIUX7MehnBYEqbu/Y7Vkiz9ojux4i3@vger.kernel.org, AJvYcCWTxGsLUcYibedImUD/U9opTiWxIO8eM4n1UFiLV2WwXp8adkjdnAYx9RN7erpF6Y/frUZUUDstz8sFf3E=@vger.kernel.org, AJvYcCXCgQUI0WwLfCXHpEfrd5nc5ptl/Oqg2JMvJB0dj3Ptbgbcle6IgaUDbmF60eO+kUmvgcHtwlTTVHAvDsVydDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5r4PiFr9Oet4nrbH9dvXxlep2tpzZHEplwiUiRL4AJ5Go3ujq
+	doGo3WLD/VQbG69km2fZTbK/+S97P3AUHuTmIfao/+d3mZKt0GBBpaLK7g==
+X-Google-Smtp-Source: AGHT+IFfvSEpk8tbWKhiexx3cSY8b2ZjrPMrXV0fEahdYXPYpGoYpmPb5mOS2mmhspGWWMBQJFIz/g==
+X-Received: by 2002:a05:622a:54d:b0:460:b2ce:ce96 with SMTP id d75a77b69052e-4613c177337mr9454031cf.41.1729893820827;
+        Fri, 25 Oct 2024 15:03:40 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4613237f394sm10110511cf.65.2024.10.25.15.03.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 15:03:40 -0700 (PDT)
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 82AEF1200068;
+	Fri, 25 Oct 2024 18:03:39 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 25 Oct 2024 18:03:39 -0400
+X-ME-Sender: <xms:uxUcZzYxhY7zfrSCndYL7pFXUJX3f5URE3g4Ltc-HQC3V54qxmlP3g>
+    <xme:uxUcZyaUqtKwMFwlx1JWOD9IYOHPvcVoeFU2-rKOMoPX8KuO53crmL0gNbiR7FrLh
+    1vxYiE2eua3II_vhA>
+X-ME-Received: <xmr:uxUcZ1-QI3IfrtnWaGvuSKQl1IbpBpABd1Rr4Qmb_iLL1RwcnT-Ft5CNUAE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejfedgtdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpeevuefgjeeugfeuveeifeegjeetleffleegteek
+    ueethfdvgfekgeffuefghfejffenucffohhmrghinheprhhushhtqdhfohhrqdhlihhnuh
+    igrdgtohhmpdhkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgr
+    rhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonh
+    grlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghnghep
+    pehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepvddupd
+    hmohguvgepshhmthhpohhuthdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhi
+    sehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnnhgrqdhmrghrihgrsehlihhnuhhtrh
+    honhhigidruggvpdhrtghpthhtohepfhhrvgguvghrihgtsehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehtghhlgieslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhopehjsh
+    htuhhlthiisehgohhoghhlvgdrtghomhdprhgtphhtthhopehssghohigusehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehruhhsthdqfhhorhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlh
+    drohhrgh
+X-ME-Proxy: <xmx:uxUcZ5o-UUs0Pe01KdXEw3y_1xWpIUaaYsd_x5_YWJ2NJZDrxd6mcg>
+    <xmx:uxUcZ-rHEY4nYpTu-5sXpLU9S1tv_cosR8sjlxDwmy3nNZZI4o7bAQ>
+    <xmx:uxUcZ_T2zC9gvKM31wpKJ0XgRAVOyjZ0y-p5HDIqDvMaHZ-pmrqAcA>
+    <xmx:uxUcZ2rvsTNO_PXsqPrKGvbw_QFbyyGRJEa1Jh5IqqYEQfaUXdJa_w>
+    <xmx:uxUcZ_74RIpdOOfPuT4syf-7MFTCfOvM29GPdr45ky6VxFZLn5odLHqZ>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 25 Oct 2024 18:03:38 -0400 (EDT)
+Date: Fri, 25 Oct 2024 15:03:37 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
+	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
+Subject: Re: [PATCH v4 4/7] rust: time: Add wrapper for fsleep function
+Message-ID: <ZxwVuceNORRAI7FV@Boquns-Mac-mini.local>
+References: <20241025033118.44452-1-fujita.tomonori@gmail.com>
+ <20241025033118.44452-5-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022162359.2713094-1-ap420073@gmail.com> <20241022162359.2713094-3-ap420073@gmail.com>
- <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com> <ZxvwZmJsdFOStYcV@JRM7P7Q02P.dhcp.broadcom.net>
-In-Reply-To: <ZxvwZmJsdFOStYcV@JRM7P7Q02P.dhcp.broadcom.net>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 25 Oct 2024 15:00:11 -0700
-Message-ID: <CACKFLinbsMQE1jb0G-7iMKAo4ZMKp42xiSCZ0XznBV9pDAs3-g@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/8] bnxt_en: add support for tcp-data-split
- ethtool command
-To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com, 
-	donald.hunter@gmail.com, corbet@lwn.net, andrew+netdev@lunn.ch, 
-	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
-	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f206ba0625543e91"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025033118.44452-5-fujita.tomonori@gmail.com>
 
---000000000000f206ba0625543e91
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Oct 25, 2024 at 12:31:15PM +0900, FUJITA Tomonori wrote:
+> Add a wrapper for fsleep, flexible sleep functions in
+> `include/linux/delay.h` which typically deals with hardware delays.
+> 
+> The kernel supports several `sleep` functions to handle various
+> lengths of delay. This adds fsleep, automatically chooses the best
+> sleep method based on a duration.
+> 
+> `sleep` functions including `fsleep` belongs to TIMERS, not
+> TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
+> abstraction for TIMEKEEPING. To make Rust abstractions match the C
+> side, add rust/kernel/time/delay.rs for this wrapper.
+> 
+> fsleep() can only be used in a nonatomic context. This requirement is
+> not checked by these abstractions, but it is intended that klint [1]
+> or a similar tool will be used to check it in the future.
+> 
+> Link: https://rust-for-linux.com/klint [1]
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/helpers/helpers.c    |  1 +
+>  rust/helpers/time.c       |  8 ++++++++
+>  rust/kernel/time.rs       |  4 +++-
+>  rust/kernel/time/delay.rs | 30 ++++++++++++++++++++++++++++++
+>  4 files changed, 42 insertions(+), 1 deletion(-)
+>  create mode 100644 rust/helpers/time.c
+>  create mode 100644 rust/kernel/time/delay.rs
+> 
+> diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+> index 30f40149f3a9..c274546bcf78 100644
+> --- a/rust/helpers/helpers.c
+> +++ b/rust/helpers/helpers.c
+> @@ -21,6 +21,7 @@
+>  #include "slab.c"
+>  #include "spinlock.c"
+>  #include "task.c"
+> +#include "time.c"
+>  #include "uaccess.c"
+>  #include "wait.c"
+>  #include "workqueue.c"
+> diff --git a/rust/helpers/time.c b/rust/helpers/time.c
+> new file mode 100644
+> index 000000000000..7ae64ad8141d
+> --- /dev/null
+> +++ b/rust/helpers/time.c
+> @@ -0,0 +1,8 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/delay.h>
+> +
+> +void rust_helper_fsleep(unsigned long usecs)
+> +{
+> +	fsleep(usecs);
+> +}
+> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
+> index 3cc1a8a76777..cfc31f908710 100644
+> --- a/rust/kernel/time.rs
+> +++ b/rust/kernel/time.rs
+> @@ -2,12 +2,14 @@
+>  
+>  //! Time related primitives.
+>  //!
+> -//! This module contains the kernel APIs related to time and timers that
+> +//! This module contains the kernel APIs related to time that
+>  //! have been ported or wrapped for usage by Rust code in the kernel.
+>  //!
+>  //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
+>  //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
+>  
+> +pub mod delay;
+> +
+>  /// The number of nanoseconds per microsecond.
+>  pub const NSEC_PER_USEC: i64 = bindings::NSEC_PER_USEC as i64;
+>  
+> diff --git a/rust/kernel/time/delay.rs b/rust/kernel/time/delay.rs
+> new file mode 100644
+> index 000000000000..f80f35f50949
+> --- /dev/null
+> +++ b/rust/kernel/time/delay.rs
+> @@ -0,0 +1,30 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +//! Delay and sleep primitives.
+> +//!
+> +//! This module contains the kernel APIs related to delay and sleep that
+> +//! have been ported or wrapped for usage by Rust code in the kernel.
+> +//!
+> +//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h).
+> +
+> +use crate::time;
+> +use core::ffi::c_ulong;
+> +
+> +/// Sleeps for a given duration at least.
+> +///
+> +/// Equivalent to the kernel's [`fsleep`], flexible sleep function,
+> +/// which automatically chooses the best sleep method based on a duration.
+> +///
+> +/// The function sleeps infinitely (MAX_JIFFY_OFFSET) if `Delta` is negative
+> +/// or exceedes i32::MAX milliseconds.
+> +///
 
-On Fri, Oct 25, 2024 at 12:24=E2=80=AFPM Andy Gospodarek
-<andrew.gospodarek@broadcom.com> wrote:
->
-> On Thu, Oct 24, 2024 at 10:02:30PM -0700, Michael Chan wrote:
-> > On Tue, Oct 22, 2024 at 9:24=E2=80=AFAM Taehee Yoo <ap420073@gmail.com>=
- wrote:
-> > >
-> > > NICs that uses bnxt_en driver supports tcp-data-split feature by the
-> > > name of HDS(header-data-split).
-> > > But there is no implementation for the HDS to enable or disable by
-> > > ethtool.
-> > > Only getting the current HDS status is implemented and The HDS is jus=
-t
-> > > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabl=
-ed.
-> > > The hds_threshold follows rx-copybreak value. and it was unchangeable=
-.
-> > >
-> > > This implements `ethtool -G <interface name> tcp-data-split <value>`
-> > > command option.
-> > > The value can be <on>, <off>, and <auto> but the <auto> will be
-> > > automatically changed to <on>.
-> > >
-> > > HDS feature relies on the aggregation ring.
-> > > So, if HDS is enabled, the bnxt_en driver initializes the aggregation
-> > > ring.
-> > > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
-> > >
-> > > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> > > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > > ---
-> > >
-> > > v4:
-> > >  - Do not support disable tcp-data-split.
-> > >  - Add Test tag from Stanislav.
-> > >
-> > > v3:
-> > >  - No changes.
-> > >
-> > > v2:
-> > >  - Do not set hds_threshold to 0.
-> > >
-> > >  drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  8 +++-----
-> > >  drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  5 +++--
-> > >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++++++++
-> > >  3 files changed, 19 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt.c
-> > > index 0f5fe9ba691d..91ea42ff9b17 100644
-> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> >
-> > > @@ -6420,15 +6420,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt=
- *bp, struct bnxt_vnic_info *vnic)
-> > >
-> > >         req->flags =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_=
-PLACEMENT);
-> > >         req->enables =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JU=
-MBO_THRESH_VALID);
-> > > +       req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
-> > >
-> > > -       if (BNXT_RX_PAGE_MODE(bp)) {
-> > > -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size=
-);
-> >
-> > Please explain why this "if" condition is removed.
-> > BNXT_RX_PAGE_MODE() means that we are in XDP mode and we currently
-> > don't support HDS in XDP mode.  Added Andy Gospo to CC so he can also
-> > comment.
-> >
->
-> In bnxt_set_rx_skb_mode we set BNXT_FLAG_RX_PAGE_MODE and clear
-> BNXT_FLAG_AGG_RINGS
+I know Miguel has made his suggestion:
 
-The BNXT_FLAG_AGG_RINGS flag is true if the JUMBO, GRO, or LRO flag is
-set.  So even though it is initially cleared in
-bnxt_set_rx_skb_mode(), we'll set the JUMBO flag if we are in
-multi-buffer XDP mode.  Again, we don't enable HDS in any XDP mode so
-I think we need to keep the original logic here to skip setting the
-HDS threshold if BNXT_FLAG_RX_PAGE_MODE is set.
+	https://lore.kernel.org/rust-for-linux/CANiq72kWqSCSkUk1efZyAi+0ScNTtfALn+wiJY_aoQefu2TNvg@mail.gmail.com/
 
-> , so this should work.  The only issue is that we
-> have spots in the driver where we check BNXT_RX_PAGE_MODE(bp) to
-> indicate that XDP single-buffer mode is enabled on the device.
->
-> If you need to respin this series I would prefer that the change is like
-> below to key off the page mode being disabled and BNXT_FLAG_AGG_RINGS
-> being enabled to setup HDS.  This will serve as a reminder that this is
-> for XDP.
->
-> @@ -6418,15 +6418,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp=
-, struct bnxt_vnic_info *vnic)
->
->         req->flags =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLAC=
-EMENT);
->         req->enables =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_=
-THRESH_VALID);
-> +       req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
->
-> -       if (BNXT_RX_PAGE_MODE(bp)) {
-> -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
-> -       } else {
-> +       if (!BNXT_RX_PAGE_MODE(bp) && (bp->flags & BNXT_FLAG_AGG_RINGS)) =
-{
->                 req->flags |=3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_H=
-DS_IPV4 |
->                                           VNIC_PLCMODES_CFG_REQ_FLAGS_HDS=
-_IPV6);
->                 req->enables |=3D
->                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THR=
-ESHOLD_VALID);
-> -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_copy_thresh);
->                 req->hds_threshold =3D cpu_to_le16(bp->rx_copy_thresh);
->         }
->         req->vnic_id =3D cpu_to_le32(vnic->fw_vnic_id);
->
+, but I think what we should really do here is just panic if `Delta` is
+negative or exceedes i32::MAX milliseconds, and document clearly that
+this function expects `Delta` to be in a certain range, i.e. it's the
+user's responsibility to check. Because:
 
---000000000000f206ba0625543e91
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+*	You can simply call schedule() with task state set properly to
+	"sleep infinitely".
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIL/KrRYacg5SUEwm++sozU03tvddGrAC
-eO7emsJ9iZM3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAy
-NTIyMDAyM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAeqGMDwcfSOAB9wYwWJuMyEssaW6vEKKqBYZOFIOhPVb19qeHF
-oDB+al83LG6ru/tHUhrmONqN1BMYeaUhTg9xSeDblvFGTF+7Bsr9P8Qc9DpZ8K0JJUQhfxiZ9/tQ
-rGwS3xKfv+bRP8O/AtB94G79WR+QHm/+/EID2REt1TnXNbwBCVKDeNtzHbb2Wf1AwekD2e3a+KZr
-xcpgsUTRHZyg6Dtb8n8sxbv29ibRmLtRZaztZW+bLJA63I/fWl6TqHMX2hVTWi96ZybKssbPjGRw
-Gjm1G0oDU4b084/1ZwV7twcAT54RpWKo/y5yDiIEoeaPhUpqPHTA4/uupPaeJ4e2
---000000000000f206ba0625543e91--
+*	Most of the users of fsleep() don't need this "sleep infinitely"
+	functionality. Instead, they want to sleep with a reasonable
+	short time.
+
+> +/// This function can only be used in a nonatomic context.
+> +pub fn fsleep(delta: time::Delta) {
+> +    // SAFETY: FFI call.
+> +    unsafe {
+> +        // Convert the duration to microseconds and round up to preserve
+> +        // the guarantee; fsleep sleeps for at least the provided duration,
+> +        // but that it may sleep for longer under some circumstances.
+> +        bindings::fsleep(delta.as_micros_ceil() as c_ulong)
+
+If delta is 0x10000_0000i64 * 1000_000 (=0xf424000000000i64), which
+exceeds i32::MAX milliseconds, the result of `delta.as_micros_ceil() as
+c_ulong` is:
+
+*	0 on 32bit
+*	0x3e800000000 on 64bit
+
+, if I got my math right. The first is obviously not "sleeps
+infinitely".
+
+Continue on 64bit case, in C's fsleep(), 0x3e800000000 will be cast to
+"int" (to call msleep()), which results as 0, still not "sleep
+infinitely"?
+
+Regards,
+Boqun
+
+> +    }
+> +}
+> -- 
+> 2.43.0
+> 
+> 
 
