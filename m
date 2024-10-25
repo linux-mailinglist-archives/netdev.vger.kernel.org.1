@@ -1,233 +1,179 @@
-Return-Path: <netdev+bounces-138989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCD69AFAD8
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:17:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF259AFAE3
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5FA31F21F9A
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 07:17:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E904C1F222B8
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 07:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834A5199221;
-	Fri, 25 Oct 2024 07:17:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71661B21A7;
+	Fri, 25 Oct 2024 07:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EhZOQ85w"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s42weJCq"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCD51A4AAA;
-	Fri, 25 Oct 2024 07:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9493E18DF7F;
+	Fri, 25 Oct 2024 07:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729840672; cv=none; b=XR5GCqLQiZaI1vi8vbr8dqS8/wQsuvBCj/CZf0k/PPJNOWN8KS/jsOzPODNnPq9DI9j1A+oW7uuSbIAnoKchtgUboKw2gv8a2twia92cLaE/TDIjYv68MqQpilD/ha8roYpdhj8TXjNPE1wLQN/hhyTolBvZ98hWo/awezGrd6w=
+	t=1729841052; cv=none; b=ExWGmoE7MbHL3+XEl50rxVz1+rDLczFf85TP65MBNfxIjJDnXPBxa0KHRXm2N5PkbP+js+lUFFfKZXuv9ybRQcKU7BlSglnPIOMcUZuJrj4y4HGA0nxNm8Sr6ggbUNnyjO28gBhVCkw4XAUbOucteoDXRi/iijAf1UmlzTJXTv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729840672; c=relaxed/simple;
-	bh=dqqqvJ8g3AVzb03zYJsih0JTQPOidvJI2QvhRqV7u9g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VsKvhkwKgYbu0AFXjVORYYEbIhss8LIYmLVsLo5+Cn6iUwYP7NxDtbqEAHyQhrhg52MaC4xzALy5zz2+jcbL2vZ2ceDPb4szFW5BgVIHoFdn/PGBkuP4zgzQCw4jCtNNWyRwG+WPchyuq2fJJebeVFvvPQWkdJkqb3+PVOtq/kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EhZOQ85w; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1729840670; x=1761376670;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dqqqvJ8g3AVzb03zYJsih0JTQPOidvJI2QvhRqV7u9g=;
-  b=EhZOQ85wbLoZtFFwqDB6sefaJpc9Qt4Pbx938s+5/nFJViQNwZibbQOU
-   lumbd2tiJQGhMpunJxLwfFREGobKhGE83vKUpQ2qYR71re2wMnU4gU/XL
-   ZVNINGOLopgT4eR0N6qG19/QsaO/yogHsTSuEUKXs+UMhdOvpXhEo4zGF
-   aDDtZK+svgtFNltGrj0uyzsHIhxBaBR7U/a3cYGSCKfb5ZJB0uNFXGHT6
-   4Egv+DeoESiwgTxxLYQ4xwp3kWbTOe6bBch/S+rTV31l1YvN02B5XM8h/
-   U5TaVVXJGEsfr3KbcdIEds1aZW1MKFfJ7b5JH2P80CHdKNcj6atYKPf6r
-   Q==;
-X-CSE-ConnectionGUID: Hp/0/euNT4aWmfDdVqjxpQ==
-X-CSE-MsgGUID: TdR5MXcUTliy1kkXe/9EYA==
-X-IronPort-AV: E=Sophos;i="6.11,231,1725346800"; 
-   d="scan'208";a="34008259"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Oct 2024 00:17:42 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 25 Oct 2024 00:17:22 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Fri, 25 Oct 2024 00:17:18 -0700
-Date: Fri, 25 Oct 2024 07:17:17 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<horatiu.vultur@microchip.com>, <jensemil.schulzostergaard@microchip.com>,
-	<Parthiban.Veerasooran@microchip.com>, <Raju.Lakkaraju@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, <jacob.e.keller@intel.com>,
-	<ast@fiberby.net>, <maxime.chevallier@bootlin.com>, <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 10/15] net: lan969x: add PTP handler function
-Message-ID: <20241025071717.rz3zqppplu52cdpc@DEN-DL-M70577>
-References: <20241024-sparx5-lan969x-switch-driver-2-v2-0-a0b5fae88a0f@microchip.com>
- <20241024-sparx5-lan969x-switch-driver-2-v2-10-a0b5fae88a0f@microchip.com>
- <24147551-b639-4f9f-be5e-def2570a863d@linux.dev>
+	s=arc-20240116; t=1729841052; c=relaxed/simple;
+	bh=rGdMudwJl1RcLtNxkMzfUbwAfbCOQ17rU0daHqxFbjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s0hLXY/c/CH1F6xxw9U9QnPgpVgkRH/LvCJyHES0dUUTEIVsP2dkfuRHBvbMBmjynculD8QAc1gsj79tqp+QlzlFc/X8yB27pH8OYPSUyp8243IkAW48fOrGCjb0Twq7PO2xU3QMF5xQIYFmfFYtkHw+bFm132PBIjEljofk+7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=s42weJCq; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49P5tQ5Z003086;
+	Fri, 25 Oct 2024 07:24:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=CTSkejew1mbESZ6z5fD+xQoUgFiZoV/aiJrEWj5Jq
+	cU=; b=s42weJCqX7voseEVEBcNQma0iFA/BLUax86nztNm5EO/1XqIKLQdbfPcf
+	7reJBDLnJ2UFrSpZhWsBMpOlux+cy9p0s/Vsxq7Hu5Wtv7yqtSY8YVW4K+xGOer9
+	h2Vt0EcRfNCzxuqa3VOU/8/3w9arWh/wrc/SQ84NxL/U6wuH7pFbb/7Vr54gMKZd
+	7tMmdGTEUENQuvzNa1W9IuFPxeWrWwU0Niqt69A5uNnXfQbvxSBArSB6i8rcB9dn
+	MwQK9BLY0MDvZKob8aCdnsR/KjX4u57mjevTPCzcNTkdqHQvicSsQz0FgrAYW3kr
+	ivSF2bsvhSc5v/+sJ0XF1HfAWh/iw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42g5kxgayv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 07:24:05 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49P7O4js019811;
+	Fri, 25 Oct 2024 07:24:04 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42g5kxgayr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 07:24:04 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49P6PAYT001777;
+	Fri, 25 Oct 2024 07:24:03 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 42emk9mh7y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 07:24:03 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49P7O03k41746900
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Oct 2024 07:24:00 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 175D120043;
+	Fri, 25 Oct 2024 07:24:00 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0A03D20040;
+	Fri, 25 Oct 2024 07:23:59 +0000 (GMT)
+Received: from MacBook-Pro-von-Wenjia.fritz.box.com (unknown [9.171.42.103])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 25 Oct 2024 07:23:58 +0000 (GMT)
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>,
+        Niklas Schnell <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Stefan Raspl <raspl@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
+Subject: [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+Date: Fri, 25 Oct 2024 09:23:55 +0200
+Message-ID: <20241025072356.56093-1-wenjia@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <24147551-b639-4f9f-be5e-def2570a863d@linux.dev>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZjED-xRAXRX2C8HLC7WV5QbRbA2h2JcS
+X-Proofpoint-GUID: epVEHzlf6S_W2um1v5Ad1WMu_av3QNGX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410250054
 
-Hi Vadim,
+Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
+alternative to get_netdev") introduced an API ib_device_get_netdev.
+The SMC-R variant of the SMC protocol continued to use the old API
+ib_device_ops.get_netdev() to lookup netdev. As this commit 8d159eb2117b
+("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
+get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
+ib_device_ops.get_netdev didn't work any more at least by using a mlx5
+device driver. Thus, using ib_device_set_netdev() now became mandatory.
 
-Thanks for reviewing.
+Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
 
-> On 23/10/2024 23:01, Daniel Machon wrote:
-> > Add PTP IRQ handler for lan969x. This is required, as the PTP registers
-> > are placed in two different targets on Sparx5 and lan969x. The
-> > implementation is otherwise the same as on Sparx5.
-> > 
-> > Also, expose sparx5_get_hwtimestamp() for use by lan969x.
-> > 
-> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> > ---
-> >   drivers/net/ethernet/microchip/lan969x/lan969x.c   | 90 ++++++++++++++++++++++
-> >   .../net/ethernet/microchip/sparx5/sparx5_main.h    |  5 ++
-> >   drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |  9 +--
-> >   3 files changed, 99 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.c b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-> > index 2c2b86f9144e..a3b40e09b947 100644
-> > --- a/drivers/net/ethernet/microchip/lan969x/lan969x.c
-> > +++ b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-> > @@ -201,6 +201,95 @@ static int lan969x_port_mux_set(struct sparx5 *sparx5, struct sparx5_port *port,
-> >       return 0;
-> >   }
-> > 
-> > +static irqreturn_t lan969x_ptp_irq_handler(int irq, void *args)
-> > +{
-> > +     int budget = SPARX5_MAX_PTP_ID;
-> > +     struct sparx5 *sparx5 = args;
-> > +
-> > +     while (budget--) {
-> > +             struct sk_buff *skb, *skb_tmp, *skb_match = NULL;
-> > +             struct skb_shared_hwtstamps shhwtstamps;
-> > +             struct sparx5_port *port;
-> > +             struct timespec64 ts;
-> > +             unsigned long flags;
-> > +             u32 val, id, txport;
-> > +             u32 delay;
-> > +
-> > +             val = spx5_rd(sparx5, PTP_TWOSTEP_CTRL);
-> > +
-> > +             /* Check if a timestamp can be retrieved */
-> > +             if (!(val & PTP_TWOSTEP_CTRL_PTP_VLD))
-> > +                     break;
-> > +
-> > +             WARN_ON(val & PTP_TWOSTEP_CTRL_PTP_OVFL);
-> > +
-> > +             if (!(val & PTP_TWOSTEP_CTRL_STAMP_TX))
-> > +                     continue;
-> > +
-> > +             /* Retrieve the ts Tx port */
-> > +             txport = PTP_TWOSTEP_CTRL_STAMP_PORT_GET(val);
-> > +
-> > +             /* Retrieve its associated skb */
-> > +             port = sparx5->ports[txport];
-> > +
-> > +             /* Retrieve the delay */
-> > +             delay = spx5_rd(sparx5, PTP_TWOSTEP_STAMP_NSEC);
-> > +             delay = PTP_TWOSTEP_STAMP_NSEC_NS_GET(delay);
-> > +
-> > +             /* Get next timestamp from fifo, which needs to be the
-> > +              * rx timestamp which represents the id of the frame
-> > +              */
-> > +             spx5_rmw(PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
-> > +                      PTP_TWOSTEP_CTRL_PTP_NXT,
-> > +                      sparx5, PTP_TWOSTEP_CTRL);
-> > +
-> > +             val = spx5_rd(sparx5, PTP_TWOSTEP_CTRL);
-> > +
-> > +             /* Check if a timestamp can be retrieved */
-> > +             if (!(val & PTP_TWOSTEP_CTRL_PTP_VLD))
-> > +                     break;
-> > +
-> > +             /* Read RX timestamping to get the ID */
-> > +             id = spx5_rd(sparx5, PTP_TWOSTEP_STAMP_NSEC);
-> > +             id <<= 8;
-> > +             id |= spx5_rd(sparx5, PTP_TWOSTEP_STAMP_SUBNS);
-> > +
-> > +             spin_lock_irqsave(&port->tx_skbs.lock, flags);
-> > +             skb_queue_walk_safe(&port->tx_skbs, skb, skb_tmp) {
-> > +                     if (SPARX5_SKB_CB(skb)->ts_id != id)
-> > +                             continue;
-> > +
-> > +                     __skb_unlink(skb, &port->tx_skbs);
-> > +                     skb_match = skb;
-> > +                     break;
-> > +             }
-> > +             spin_unlock_irqrestore(&port->tx_skbs.lock, flags);
-> > +
-> > +             /* Next ts */
-> > +             spx5_rmw(PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
-> > +                      PTP_TWOSTEP_CTRL_PTP_NXT,
-> > +                      sparx5, PTP_TWOSTEP_CTRL);
-> > +
-> > +             if (WARN_ON(!skb_match))
-> > +                     continue;
-> > +
-> > +             spin_lock(&sparx5->ptp_ts_id_lock);
-> > +             sparx5->ptp_skbs--;
-> > +             spin_unlock(&sparx5->ptp_ts_id_lock);
-> > +
-> > +             /* Get the h/w timestamp */
-> > +             sparx5_get_hwtimestamp(sparx5, &ts, delay);
-> > +
-> > +             /* Set the timestamp in the skb */
-> > +             shhwtstamps.hwtstamp = ktime_set(ts.tv_sec, ts.tv_nsec);
-> > +             skb_tstamp_tx(skb_match, &shhwtstamps);
-> > +
-> > +             dev_kfree_skb_any(skb_match);
-> > +     }
-> > +
-> > +     return IRQ_HANDLED;
-> > +}
-> > +
-> 
-> This handler looks like an absolute copy of sparx5_ptp_irq_handler()
-> with the difference in registers only. Did you consider keep one
-> function but substitute ptp register sets?
->
+Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
+Reported-by: Aswin K <aswin@linux.ibm.com>
+Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
+Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+---
+ net/smc/smc_ib.c   | 8 ++------
+ net/smc/smc_pnet.c | 4 +---
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
-Yes, I did consider that. But since this is the only case where a group
-of registers are moved to a different register target in hw, I chose to
-instead copy the function.
+diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+index 9297dc20bfe2..9c563cdbea90 100644
+--- a/net/smc/smc_ib.c
++++ b/net/smc/smc_ib.c
+@@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
+ 	struct ib_device *ibdev = smcibdev->ibdev;
+ 	struct net_device *ndev;
+ 
+-	if (!ibdev->ops.get_netdev)
+-		return;
+-	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
++	ndev = ib_device_get_netdev(ibdev, port + 1);
+ 	if (ndev) {
+ 		smcibdev->ndev_ifidx[port] = ndev->ifindex;
+ 		dev_put(ndev);
+@@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
+ 		port_cnt = smcibdev->ibdev->phys_port_cnt;
+ 		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
+ 			libdev = smcibdev->ibdev;
+-			if (!libdev->ops.get_netdev)
+-				continue;
+-			lndev = libdev->ops.get_netdev(libdev, i + 1);
++			lndev = ib_device_get_netdev(libdev, i + 1);
+ 			dev_put(lndev);
+ 			if (lndev != ndev)
+ 				continue;
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index 1dd362326c0a..8566937c8903 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
+ 		for (i = 1; i <= SMC_MAX_PORTS; i++) {
+ 			if (!rdma_is_port_valid(ibdev->ibdev, i))
+ 				continue;
+-			if (!ibdev->ibdev->ops.get_netdev)
+-				continue;
+-			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
++			ndev = ib_device_get_netdev(ibdev->ibdev, i);
+ 			if (!ndev)
+ 				continue;
+ 			dev_put(ndev);
+-- 
+2.43.0
 
-The indirection layer introduced in the previous series does not handle
-differences in register targets - maybe something to be added later if we
-have more cases (hopefully not).
-
-/Daniel
-
-> >   static const struct sparx5_regs lan969x_regs = {
-> >       .tsize = lan969x_tsize,
-> >       .gaddr = lan969x_gaddr,
-> > @@ -242,6 +331,7 @@ static const struct sparx5_ops lan969x_ops = {
-> >       .get_hsch_max_group_rate = &lan969x_get_hsch_max_group_rate,
-> >       .get_sdlb_group          = &lan969x_get_sdlb_group,
-> >       .set_port_mux            = &lan969x_port_mux_set,
-> > +     .ptp_irq_handler         = &lan969x_ptp_irq_handler,
-> >   };
-> > 
 
