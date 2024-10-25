@@ -1,195 +1,256 @@
-Return-Path: <netdev+bounces-139148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF4A9B0703
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 17:06:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9B29B070E
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 17:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64DD11F23D85
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:06:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D056B287D5
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E2721B875;
-	Fri, 25 Oct 2024 15:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0095F185B46;
+	Fri, 25 Oct 2024 15:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="F0f8uzvT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HRSYtDyK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFF870838
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 15:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729868487; cv=none; b=SHqYYzWJKjCnmf/Nyb3XVE3AYKGvBVWGKq68SZXqHcWH4Wl9zSFD/FwBb57ginRpTKvlogJD39UKBqihdBMJCp96qoU6PSDqQCX4WZXqJ0hg9ylefYI+8XNlOOwPBP76jQwjV/xG3yFlgmOS//KKC4D6vV8QGTz7TNcTj56wEMY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729868487; c=relaxed/simple;
-	bh=5zExvWG43h03bpMHJnWNBhVEBuw/E64PFzRDCBa3r4k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=A21cucy4KUFjFgDVUYjQvhD7xdo9A6bJ81QSwj15P6f5lS/Pb8cxaul2RRMy2RUvBOETzrWBc9Og6nR7I73Ven6ce92G/lT7J4NrM9CzC+aQOq3cXKh+7ga93OhcgFNJbYd6E/DZmlMX36NnPlXFAc1fmeD0E12ZL+QqGbl83sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=F0f8uzvT; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539ee1acb86so2394642e87.0
-        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 08:01:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1729868482; x=1730473282; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VqBlcn31y0XmBP6O2eLDkvXms4gyOzAKu9fGbPWi2Io=;
-        b=F0f8uzvTTd4nIoxE78PchiedYZ6BS3ch4Wpzl2tIK3ds4O+/gejr7oHxavM6lhRsMy
-         b/eBzNAno33ewAJitlBE/SxxMl7AMK6Ew3yHE1+qaYWMTwrlaRZdxa5iF5zjJA3rCNnP
-         7keAu6Dx91/q2FqwuwcWYNdakraYRSK8hL0EOGVn8tDoLQDumjTEaH3ekTaNe38PNHlQ
-         z+ZWMcoj+/zeEaPxVx0cmsEJdZXsy3UezHMeyPN7suf2d6Cq/KiMXJmihhXuqu0PiQSf
-         LH6cWqgtGkHzDwXfn+0Kp5auo1RrHURqmv83y6pG7vWcowEm+jp110btKIbzyDdidGw3
-         5qHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729868482; x=1730473282;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VqBlcn31y0XmBP6O2eLDkvXms4gyOzAKu9fGbPWi2Io=;
-        b=EJ5Mcx8ojwLmzTOqUHAb39/VOJ1DNC0NhZgZc7hA3FNtKN52L3IQqDHCJ7ZeSRQR0n
-         GqFMcOn90KnpadCJotHFgvLbnhLhi8yammBmbspIz0VSTwrvAMAudukuanAODV0eTpvU
-         Kq51ojUr8edbxpf9nBriqOPcDqtKEKBzRFnrdqx+Lag3iHXN0Wd/a2R+AnbEZEaE7CgO
-         B+eV6+YfpiuygJJQkQes5EiPlhIcCA0khwvMR+jSSYHYOVIhcfyyFV7H3elHxzB9qx/7
-         Vc93BTkoSY+xzftmqGwz4t6jHoi88Fe5oGuFnpT/P0Ot1dnn6s2F7jOZpk4B/oo4G3Lv
-         lKvw==
-X-Gm-Message-State: AOJu0Yw3PnmkvTUeew3+KuI9n7Aw0d+ClSGKK3UwaejEKxtqTtAmFBaB
-	sdArGILhpoXd2MMVrlmAanj41wPunRsfhajR4aNwz9Zfioj8up7StX04cu2p6lI=
-X-Google-Smtp-Source: AGHT+IHV0ynp73tyX5tVescAMeICzOzAykSvRIk6SZ7XkRfLdFZbjMXBzQLNmDLUOe9RcO1NDxU7tQ==
-X-Received: by 2002:a05:6512:3d0c:b0:537:a824:7e5 with SMTP id 2adb3069b0e04-53b1a30203amr5413552e87.18.1729868481794;
-        Fri, 25 Oct 2024 08:01:21 -0700 (PDT)
-Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53b2e1429ecsm210499e87.117.2024.10.25.08.01.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 08:01:19 -0700 (PDT)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: =?utf-8?Q?Herv=C3=A9?= Gourmelon <herve.gourmelon@ekinops.com>, Andrew
- Lunn
- <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vivien Didelot
- <vivien.didelot@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Vladimir Oltean
- <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH 1/1] net: dsa: fix tag_dsa.c for untagged VLANs
-In-Reply-To: <MR1P264MB3681CCB3C20AD95E1B20C878F84F2@MR1P264MB3681.FRAP264.PROD.OUTLOOK.COM>
-References: <MR1P264MB3681CCB3C20AD95E1B20C878F84F2@MR1P264MB3681.FRAP264.PROD.OUTLOOK.COM>
-Date: Fri, 25 Oct 2024 17:01:17 +0200
-Message-ID: <87msis9qgy.fsf@waldekranz.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1C81547D4
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 15:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729868603; cv=fail; b=IlNDuJJ2Pyu6L05zKzXx7UrwGDe4/82U9/GssYVEF44JoEfUU8LlK3yF7WCDDfbUL8rFPJEWvLwoDyMXJQJkz8s9mGdgH5gq2cJ3USM3TLtfCGcyOyiATUHPyVNGJPWa03qgbR+zzJVtm43KkcDlX6EDDGXMNZpEuWy0CzS0UrI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729868603; c=relaxed/simple;
+	bh=OtzNa44m9SAyLHbZibvd0WqH0qrlBp/qeNLdNfHgxPA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=M4Qa9vh28i2JcdyS1BuB09E0c2BentKwdV/gFu4VuH1LgFpLfcxofmgrqw8hF2cFWifIQ01/Nuu+Ca5LHnyLTAyvG12CaqLEf1sdcPWe5MNjJtNbB3/2oMoW5xeETkmG8KeqXFwXX2vccw2FbHYR6Tivpvfbmfs13Z3SuhtQ3f4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HRSYtDyK; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729868602; x=1761404602;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=OtzNa44m9SAyLHbZibvd0WqH0qrlBp/qeNLdNfHgxPA=;
+  b=HRSYtDyKfsZyZ1YhywmF3VQDjUR0nDEFvOvddTdvTLjpQhwxo20GKLQ+
+   yHknAbSzIEjaiyrmz2twh5EW7Vr+gz/dWxBo93BhYGSfICd7wNbhKR2YI
+   MVRF2r/T35Iib+Eg+1MmR8JyrIkKeI04f7NaYVpZkH/1yf+Ce2pAyk4qU
+   bnSkApv3CQV8dast1WKThyzNozFLwpIej8skAB5hl3XrmIJJlTXfRiUj1
+   YDJ6/f8mLp6K6f078NLbPSWe/YAgU7UlFnJvVYBjQtc5LKJliRTYPgPf4
+   XNCtEJ0nxUCsXE4uILVFvfGWEWIEpoNq0rRs1YPeQWB8R4qBqgE1VMCM0
+   Q==;
+X-CSE-ConnectionGUID: z9edj/mZSrqshpVJSshBpg==
+X-CSE-MsgGUID: smZYJfnlRQ6s0pIxwfK4cA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11236"; a="29657812"
+X-IronPort-AV: E=Sophos;i="6.11,232,1725346800"; 
+   d="scan'208";a="29657812"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 08:03:21 -0700
+X-CSE-ConnectionGUID: hTddNjvPTgObFOT++JEbZw==
+X-CSE-MsgGUID: YxQJOnHrROOJ7T0D0mBQsA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,232,1725346800"; 
+   d="scan'208";a="111767718"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2024 08:03:21 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 25 Oct 2024 08:03:20 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 25 Oct 2024 08:03:20 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.42) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 25 Oct 2024 08:03:18 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Y4NptxY9iNW8afGm20ska3rOMqpCuV/YTN7fz9IIWA/9L5G30qYRGxJSzir8aOOj0TAsWEn11fNdB0xxc5KOF3fnXE8J9WvtJ3faYuUq28a4LQF45pdXPDfJh20KXa1ai2NjyHRde5lmUxClqc8/S9o0TUveyz/GEOu3UCP8F1wiG94u5DaiRaV6+hnMKroUyAjomAtYn6K4chuEWbDGs7TbAKvjUoINGuV4cC4oo9NNzVSEXXWHWOU1BaqmhMFhD+pEYsU4mGldLYn2J/ApisEf2zdzSSMgpJ+UXGrQhMqRZFPK05o31t+/kda+9LZC7tRyTubLUgEoaD9ybmXIWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RuZCj9c7OGH+aYNcM6QHBivTcJnXt76pHkTVOXFy+VQ=;
+ b=pN95GYmPBgbAfhegjM+mD71IWptSnuE56yfpsGfOo1AfmnN/mM78hYXYl0qZiMSMHA3wGiQ28gI4E5xUtxQWMFZaI7toMfYM1YTDw8TylG+BV9N8QoYWY/yELtmbpsyRLHHdgDHNS0IDd6PAuP6iIhDBjd4+R2EhoQ/6Ld0Ha+KhfY7xuW07tFjgawZBi7LZf3UpNu2DlC56BELsNaH//HRK5jw63ngsxye/Lt9vX1hDZMl/7lTSGpPeYeqKEmzU6+HndjiGw2Yb5U7RogyPpxbCJ6rqlnMi1rCv0qqJolOrcoezGUMNUr2FNVIXYNgsJWruT4EQDxbLIVTeWY7wdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by SJ1PR11MB6298.namprd11.prod.outlook.com (2603:10b6:a03:457::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.16; Fri, 25 Oct
+ 2024 15:03:08 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8093.018; Fri, 25 Oct 2024
+ 15:03:08 +0000
+Message-ID: <a68cedfb-cd9e-4b93-a99e-ae30b9c837eb@intel.com>
+Date: Fri, 25 Oct 2024 17:02:44 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/5] mlxsw: pci: Sync Rx buffers for device
+To: Petr Machata <petrm@nvidia.com>, Amit Cohen <amcohen@nvidia.com>
+CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>, <mlxsw@nvidia.com>, Jiri Pirko <jiri@resnulli.us>
+References: <cover.1729866134.git.petrm@nvidia.com>
+ <92e01f05c4f506a4f0a9b39c10175dcc01994910.1729866134.git.petrm@nvidia.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <92e01f05c4f506a4f0a9b39c10175dcc01994910.1729866134.git.petrm@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0058.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:469::12) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SJ1PR11MB6298:EE_
+X-MS-Office365-Filtering-Correlation-Id: b0a58432-7370-43e0-dd4d-08dcf506227f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?b3hmQVRCMUZONWlNRmhNVWFRRC82UUM0Y0ZKUHFnMWhlV1JVVVpMTE5kTm0w?=
+ =?utf-8?B?WFB6VjBrbGp1QnMrS0ZEdXFoSUppWEdsUlRnL0g4RUcyZFNIalZpOXFJVnhu?=
+ =?utf-8?B?YjZVVitLWmV3dE9aNlRvZG5pU0RkUlpFdnkvVVFhOExRRnh0S1BSM3Z3OUYw?=
+ =?utf-8?B?Z0dxTklNNnRiYzdjMkk1M204VnZhd203NWttZnYvK2ZKVzFKa1B4dkpLNWxz?=
+ =?utf-8?B?WVZ3ckY1Ti9nUUk3dDRTVzJjem9Pd09PalRZTEg3SFZNMUVMMldQd3hBVCsr?=
+ =?utf-8?B?bmtSdkZRQ2lmcTRGNTVGbEppeG9icS9qeVp1cHJHRk93WjF4d3FzRWRCcC9q?=
+ =?utf-8?B?czlWSHQ2aXJKWFgwazVoTGFZd3ZCbUFYc0grWmFwdlU5TlZRNUdFcWJTcWF4?=
+ =?utf-8?B?cElnRm90VXduQzdCUTVRZWg0RnBJQXVYbFcwa1loWld5Z1QxT1dQNk1MTlVV?=
+ =?utf-8?B?M2w4RC9tS0FxWkM3NFhISktrVmtraGp6MzFHYmc0Z2IvUy91bnJRNm9XUFda?=
+ =?utf-8?B?MDROUjZMelE0RnBONzdoeDVUZ3lyQmxHeWxlVUJyOEpRTTBMUVBjYUZyK0pB?=
+ =?utf-8?B?VzFOYmd6aHBYK1QyYWRNRmxpMWU5YS82RzZwcXlvR1hoOFNYaEczY09LTCtQ?=
+ =?utf-8?B?UXlKT25xUWFaUUI5T3JreEZwQVRxYm1qVGtoMStXWVdmbE83TlZzWVBZR3Nw?=
+ =?utf-8?B?K05jSkNUbWNOOE83b2pJSURJWVNPbUFiZFcvaWFkSFJEQzVOZVNLNlRibEh6?=
+ =?utf-8?B?clVUc1lNWlpRSDdDZGdNSFhRVm5FbGVCbEVSV2R1V2txd3ljMGF0RkxtdUtQ?=
+ =?utf-8?B?TWdnbnJka1ZlNlNXY1I5ZSs5dzB1Qkl2NXpacWFLa1RuUERzYWZMcUtYR3RO?=
+ =?utf-8?B?TXk3WkxzZEtSTCtDSDdvdUloVnBmSjc0MUhWTnlTbURnd2hJQmNmZk5Pajkx?=
+ =?utf-8?B?Wit2cFliSVhSdTBYSVJ5cUxyVHU5QVpJRlFWRnRjcnJGNGVJTTJSMWFFZlFh?=
+ =?utf-8?B?U0Vab2V2b1I2cmVpZG96TFAvODhEQ2k5Rmh1TksyV24xOFgzRW5SdnplUlBa?=
+ =?utf-8?B?SjhmdU1wcUNpOXBVNWszdE5HcTBGMzJseHJDRkt2TC9QSjZxUzlDQW5PY25G?=
+ =?utf-8?B?Z0phVzExMCswQ2pVckY5RFNnMTdmVU5pNkx1bnJJNjVBaTY0cTJ1T1VpWjNy?=
+ =?utf-8?B?UnFod3dpbER0bHlGUXFDYXdhVDlORDZoL2YxVjExRm4vSXdpbHJGblNWRCtH?=
+ =?utf-8?B?VXBqZXNaSFRWcFFSQk5STjNpNUQvSmRaalBrdjNNMzVpbE5HbStBbkRmSmYy?=
+ =?utf-8?B?cUlLSVlLaHFmTzJYMnNyWVVPdDNWL1J6QngvRXd0THVRaWtlRmFXNFlYSUtt?=
+ =?utf-8?B?bFZvOElpdEtzeW9vSXBhRlVrK0w5ZHNoNmJWM1p2Q1A4cDBnM2VmaWtIdmIz?=
+ =?utf-8?B?eXRUQk9waEVsVko2ODBWK2IxTXBpSzM1dXZPckMwSndweXVxTURML1pmWVBs?=
+ =?utf-8?B?ZW45Y3p5Tks2blBWbzVSSXZsNEliVERPN0RsdmhzaWN4dzFRNmNBVTNmRmNH?=
+ =?utf-8?B?QXFid3FtdXBOZGJKTzZPb0JGNWZMamlVc0dJZkxhVWtuZmptU3RvUHhpSmh0?=
+ =?utf-8?B?UC96bGVuMU5JQnJMQ1R6bGJlenVtMnlESEpRMVhLL3NpWnVPend3T2xva3pn?=
+ =?utf-8?B?dGJLaFMwOXdyVkRSZmlLSzd1T21TdnNuaDdPZVdIbGhMUnFQbTBNbSthc0dP?=
+ =?utf-8?Q?QCpvs6uxzn/eud4EO1fdkSh4sA6WqJ0zYdlO45h?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q0IrdElSSTMvL1ExaUkvMEg4S2p1c3RkRTZQUnk1dzlrS2xXNklGbUt0dU9o?=
+ =?utf-8?B?VFJpYUp5U0l3K1NPLzdITUg3bU9pd3lwaEdUcXROQ2FVanNmejdRZlRBano2?=
+ =?utf-8?B?ZVlKOGN2emlOQTNIQUlOejFmUXJ6N0VZL1V6ZzVaOFJFRklTQXdjM1RWTXVB?=
+ =?utf-8?B?THhkRGFLTDRhdG11NUxxQ2J6bG9kYVZIeDlSNGIrV1NNQjdPeG9laEtpVFhi?=
+ =?utf-8?B?OWZFZm1vUmdrQ2FEai9VUVg1NENMNmlVbUNtR29qRVFVcldjZU93THhJSDR3?=
+ =?utf-8?B?Y2xzazdsemI5M2hVay9kaGgxMnhVakxJNjBGMjNOVWkzQWg4eGU3dFR6YjZx?=
+ =?utf-8?B?ZGxYREszRzNpRzBvajJXam8vTis2bzNFdEd6SjIrcEpSbTRoTDVSOU5SZDRP?=
+ =?utf-8?B?NWJiUnREZlhRdk96SVlWUVBXbWlScnF3dzlvdm5HbWw5QUVJd2pnblA4SUZV?=
+ =?utf-8?B?MnpLbVRrR2RSeWtNOGZXY05ORHVMWFFESE13NjBLRGVxY2Z5ekxiU1VTYWky?=
+ =?utf-8?B?U2pWRit1RzB3bTVCdEtlamxwZVp0alZNTng2VjhSMVBHYW91alZZVnBRTEEy?=
+ =?utf-8?B?TnVEakcrdmQ2MmNBcWNtUytORS92LyswOXZrQTNEejFFZ0l1Z1pvNzhXeDQ5?=
+ =?utf-8?B?TVFpVVAyQ2RNUWsrRERoZjE4YUFkald5VURBaEt1RUZzY3JOMDliNngwNE02?=
+ =?utf-8?B?MlA3RTJJRDhqOTN2dDBEbldPVjZxUzdQUTdxNVZ3c0pNWW1Gc1plTXRTdG4z?=
+ =?utf-8?B?bmZ6ZHlqcnBRaU5jdVpicExpZnhzM1FyTHNueHFzT2QrOTExcDRtTW5lMTdD?=
+ =?utf-8?B?YTNZY2ZBWTU5dU9aVGgydGZKTkI2ekpHZ2ZOREhkWVJobkZqVDk5dUlhbHpM?=
+ =?utf-8?B?TTU3NEZTSGpkeG56U3NrZTdTZmN0d21YODJJc0xMUEdSUFVGVFZmZ1ExNERG?=
+ =?utf-8?B?Mk9QRDg2UExBU2o2TWYvcnNVZkI4YnVQWFRFN0tTT2hsUkpPanZxcXNGTHZ1?=
+ =?utf-8?B?OEkyN0V4UEZKWS9kN20yNHhQVkVrSlFJNlp6MWtZQVNQS3JIcjdyQytEYkN6?=
+ =?utf-8?B?OHdBaTZUNm54bVB0Yi9iOUkrNHpkVG1MS2VYKzRyc0xBQVlCMjBHSG9Zaitl?=
+ =?utf-8?B?NkxzUDNsbGQzRlp6c25mWU16SUFLSVU4eTBFVjNnaVJlTXFBNlVJYmo5SjlT?=
+ =?utf-8?B?QVJOczNUU0VQSmk5ZEN6ZTU1OEwrM3JCMUhFSHB1bWJ5bUVvQmJ5Q0FGNlJ1?=
+ =?utf-8?B?bFRTMzF5dTJLYitXZm0wdU9ieWNyK3o1VytIRHVqeW1ZK01pQ1JMbm0xUkM2?=
+ =?utf-8?B?eG0vbDVjb3A5UVlzWkNpbWJCb0ZHYmtMbUxyZWdGY1hkTFplYWJ4WVorMHRi?=
+ =?utf-8?B?SFZuWG91U0NjNVJaOEhOYnZoTnBCRWhCbVliM1lpOUVMclRzbjFzeTR4dFFW?=
+ =?utf-8?B?eS9BeVdWK3RzTHpnWHJIdmJCbmJBZENTbldWdnFwOGdDVlZwY1pTdis4K2xC?=
+ =?utf-8?B?YmtHU2RXVHFOMUpNNkhUMUhxdHBQclhuUkJKZFo3bkZLcVZLYjgwT0paK1d6?=
+ =?utf-8?B?VlhMd0JYZHdSWFZjVDhjWHFMelFDV3dtMWpHTFdPQzBDV0F4NHVtcjZaUXl4?=
+ =?utf-8?B?U3V4WnllMEF6ZzE2THpTZmZUREdOdi84WENhMktKSURLL3RVS0tBZ3AyME5H?=
+ =?utf-8?B?dmVjbjd2Q29wQzAwMTFFazhybWF2dHBCVWptN0ExRjRaWmZGVmJEWGRNVHVt?=
+ =?utf-8?B?VkJrNlllb0dZY3MyRWhiNFRHSHVPZTFDdjFYUHBkTkl2QUFVWlY2VEZUNk1y?=
+ =?utf-8?B?Y2tZNDZmVDQrTTV1Q0VITjhaYjV0K2JNNVpnRkFtTVFaaHRZeFpGeEJWS0Vn?=
+ =?utf-8?B?UW8rTFBUMC9rRjN5aDZNQ3ROTTBsVHY4eFovWU5hdVhlZVhCZ1I2cVpCc1ho?=
+ =?utf-8?B?V0tCQzFrTldHRjJaTEJkT0VNVjFqdGNSVDBFWGF4UGxXT2o5TjA0SkppVlBC?=
+ =?utf-8?B?K2o1TnRNK3FKdDJvRGgvNklCM3kwVVdwbUx4R1U4dkVHUmxIRHFiemM4eExy?=
+ =?utf-8?B?ejYxZHJ0T2NiaFk3TzJnZWdGeVZyVEpweEJpeWhiQXhCclhKZjkycTBoTks3?=
+ =?utf-8?B?TWNkRVZIUHNybUJVR0htK2t2d0V5QnQ0akh4Tkl5NGwzMmlhVDlmSU1rQ0lo?=
+ =?utf-8?B?dXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0a58432-7370-43e0-dd4d-08dcf506227f
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2024 15:03:08.0184
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: um81QFtK2/8ycgrlwVTbLvp+uYMdp1kGOQxloABzFreDZZVN+VKEbFgtXE1qbi8VmqmcUDXyLKOI28cFJQuldznbpw3FW2nOFXdZ2dR7Oyk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6298
+X-OriginatorOrg: intel.com
 
-On fre, okt 25, 2024 at 13:46, Herv=C3=A9 Gourmelon <herve.gourmelon@ekinop=
-s.com> wrote:
-> Hello,
+From: Petr Machata <petrm@nvidia.com>
+Date: Fri, 25 Oct 2024 16:26:27 +0200
 
-Hi,
-
->
-> Trying to set up an untagged VLAN bridge on a DSA architecture of=20
-> mv88e6xxx switches, I realized that whenever I tried to emit a=20
-> 'From_CPU' or 'Forward' DSA packet, it would always egress with an=20
-> unwanted 802.1Q header on the bridge port.
-
-Could you provide the iproute2/bridge commands used to create this
-bridge?
-
-As Vladimir pointed out: the bridge will leave the .1Q-tag in the packet
-when sending it down to the port netdev, to handle all offloading
-scenarios (multiple untagged memberships can not be supported without
-this information). tcpdump does not tell you how the packet will look
-when it egresses the physical port in this case.
-
-> Taking a closer look at the code, I saw that the Src_Tagged bit of the
-> DSA header (1st octet, bit 5) was always set to '1' due to the
-> following line:
->
-> 	dsa_header[0] =3D (cmd << 6) | 0x20 | tag_dev;
->
-> which is wrong: Src_Tagged should be reset if we need the frame to
-> egress untagged from the bridge port.
-
-This only matters for FROM_CPU tags, which contain _destination_
-information.
-
-FORWARD tags contain information about how a packet was originally
-_received_. When receiving a FORWARD, the switch uses VTU membership
-data to determine whether to egress tagged or untagged, per port.
-
-> So I added a few lines to check whether the port is a member of a VLAN
-> bridge, and whether the VLAN is set to egress untagged from the port,
-> before setting or resetting the Src_Tagged bit as needed.
->
-> Signed-off-by: Herv=C3=83=C2=A9 Gourmelon <herve.gourmelon@ekinops.com>
+> From: Amit Cohen <amcohen@nvidia.com>
+> 
+> Non-coherent architectures, like ARM, may require invalidating caches
+> before the device can use the DMA mapped memory, which means that before
+> posting pages to device, drivers should sync the memory for device.
+> 
+> Sync for device can be configured as page pool responsibility. Set the
+> relevant flag and define max_len for sync.
+> 
+> Cc: Jiri Pirko <jiri@resnulli.us>
+> Fixes: b5b60bb491b2 ("mlxsw: pci: Use page pool for Rx buffers allocation")
+> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
 > ---
->  net/dsa/tag_dsa.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
->
-> diff --git a/net/dsa/tag_dsa.c b/net/dsa/tag_dsa.c
-> index 2a2c4fb61a65..14b4d8c3dc8a 100644
-> --- a/net/dsa/tag_dsa.c
-> +++ b/net/dsa/tag_dsa.c
-> @@ -163,6 +163,21 @@ static struct sk_buff *dsa_xmit_ll(struct sk_buff *s=
-kb, struct net_device *dev,
->  	 */
->  	if (skb->protocol =3D=3D htons(ETH_P_8021Q) &&
->  	    (!br_dev || br_vlan_enabled(br_dev))) {
+>  drivers/net/ethernet/mellanox/mlxsw/pci.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+> index 2320a5f323b4..d6f37456fb31 100644
+> --- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
+> +++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
+> @@ -996,12 +996,13 @@ static int mlxsw_pci_cq_page_pool_init(struct mlxsw_pci_queue *q,
+>  	if (cq_type != MLXSW_PCI_CQ_RDQ)
+>  		return 0;
+>  
+> -	pp_params.flags = PP_FLAG_DMA_MAP;
+> +	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+>  	pp_params.pool_size = MLXSW_PCI_WQE_COUNT * mlxsw_pci->num_sg_entries;
+>  	pp_params.nid = dev_to_node(&mlxsw_pci->pdev->dev);
+>  	pp_params.dev = &mlxsw_pci->pdev->dev;
+>  	pp_params.napi = &q->u.cq.napi;
+>  	pp_params.dma_dir = DMA_FROM_DEVICE;
+> +	pp_params.max_len = PAGE_SIZE;
 
-The only way past this guard is (1) that the packet has a .1Q-tag, and
-that either (2a) it is a standalone port, or (2b) it is a port in a VLAN
-filtering bridge.
+max_len is the maximum HW-writable area of a buffer. Headroom and
+tailroom must be excluded. In your case
 
-In case 1+2a: We will generate a FROM_CPU, so the tagged bit has
-meaning. But since the port is standalone, the tag in the packet is
-"real" (not coming from bridge offloading) and should be in the packet
-when it hits the wire.
+	pp_params.max_len = PAGE_SIZE - MLXSW_PCI_RX_BUF_SW_OVERHEAD;
 
-In case 1+2b: (Your case) We will generate a FORWARD, so the tagged bit
-does not matter at all.
+>  
+>  	page_pool = page_pool_create(&pp_params);
+>  	if (IS_ERR(page_pool))
 
-Does that make sense?
-
-> +		struct bridge_vlan_info br_info;
-> +		u16 vid =3D 0;
-> +		u16 src_tagged =3D 1;
-> +		u8 *vid_ptr;
-> +		int err =3D 0;
-> +
-> +		/* Read VID from VLAN 802.1Q tag */
-> +		vid_ptr =3D dsa_etype_header_pos_tx(skb);
-> +		vid =3D ((vid_ptr[2] & 0x0F) << 8 | vid_ptr[3]);
-> +		/* Get VLAN info for vid on net_device *dev (dsa slave) */
-> +		err =3D br_vlan_get_info_rcu(dev, vid, &br_info);
-> +		if (err =3D=3D 0 && (br_info.flags & BRIDGE_VLAN_INFO_UNTAGGED)) {
-> +			src_tagged =3D 0;
-> +		}
-> +
->  		if (extra) {
->  			skb_push(skb, extra);
->  			dsa_alloc_etype_header(skb, extra);
-> @@ -170,11 +185,11 @@ static struct sk_buff *dsa_xmit_ll(struct sk_buff *=
-skb, struct net_device *dev,
->=20=20
->  		/* Construct tagged DSA tag from 802.1Q tag. */
->  		dsa_header =3D dsa_etype_header_pos_tx(skb) + extra;
-> -		dsa_header[0] =3D (cmd << 6) | 0x20 | tag_dev;
-> +		dsa_header[0] =3D (cmd << 6) | (src_tagged << 5) | tag_dev;
->  		dsa_header[1] =3D tag_port << 3;
->=20=20
->  		/* Move CFI field from byte 2 to byte 1. */
-> -		if (dsa_header[2] & 0x10) {
-> +		if (src_tagged =3D=3D 1 && dsa_header[2] & 0x10) {
->  			dsa_header[1] |=3D 0x01;
->  			dsa_header[2] &=3D ~0x10;
->  		}
-> --=20
-> 2.34.1
+Thanks,
+Olek
 
