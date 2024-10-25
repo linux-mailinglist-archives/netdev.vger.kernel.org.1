@@ -1,234 +1,117 @@
-Return-Path: <netdev+bounces-139114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D9A9B0470
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:46:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A0C9B0454
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C718B1F23FD4
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:46:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B16B1F21BF5
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2332A1FAF17;
-	Fri, 25 Oct 2024 13:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248F21632DE;
+	Fri, 25 Oct 2024 13:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="R9VWmsMk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkSX5Y0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9DB1DFF5;
-	Fri, 25 Oct 2024 13:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36E9212178;
+	Fri, 25 Oct 2024 13:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729863988; cv=none; b=CPU9Y9rfcZFgMQf9IwLqX4r4FKG48SnqpEIC/hAsoEQvhlMjemZrydCeXsCVTQhmsm0MNwgcOjm8+F1W3IfQZ5BzdTBA+S3HGRMDJaBtezmivuTwg+64+nLVMb5DQ1vZfSZV34YDf0DbAsCFzNgvi4yuCCns6HqDAzA32c4dxys=
+	t=1729863633; cv=none; b=IhIxfhwZk6Sa6CNt92N6NdhZeca2A05J77fVrUg6cYzlUTPiqUPjZv4M1PlC+i9xgoEwQu77FUZo90W6yCVQs11ubMGL4Jl81iFz39oYY2kTKYc/sjig4qjtv1AOGohc+SZjzKMul7z+oYR2WxWDIzCb+BqDU78xaiGTNUai8PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729863988; c=relaxed/simple;
-	bh=Xn/iAWW87UHsfh2vqmaJ638Sc5zPdn891175iWHYZQg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G37O6ZjENxl2Jpx2ObQpjYv2UjT6HSBp0pYjHiSAUwP6PXJhHtn87/LsTLjismryHKD9N1iNpj1UqLquGM4HYlOfGaROs+Cs3LSrhw7cVG3M1rd9hoFH+tBV4W3DhQSBtAtiY4TD+IOwMqF/ssDsldBHYQfAH0U/IqUOrKFKC4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=R9VWmsMk; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 1FA39200EECA;
-	Fri, 25 Oct 2024 15:37:50 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 1FA39200EECA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1729863470;
-	bh=M2cIWafnBBKhhrEbmEIY+ACXf3R2haiNwub60/8/wiU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R9VWmsMkgk4eo20BmI3r6eqsulFVIry7dOitICEQl9ktxHjEhN3iHURcsi39tHfDG
-	 sF1nqSwkiuedl05UlCecS5FbQabXFLawDARpTXgercAtx8CN/zHXYs0bI/yi0zsIli
-	 JK1U2J753RuyMRBZVrRi53C8iArlvZ48fJOCjNxnZ9KE+NC5VdK4ZE1nU9OkT5oO9O
-	 M6lJKkAWvxRhGyTzQImEZN12n5Hv7RwC7izFP7QAmgzPTUwYLcuZfxrDfbj52FqZDg
-	 KWFKX72O+URj+vc1nw7zRatpxRpWUG3bOnYqTGBoEYeZA3lJeeYnYVCWkFmHR9n9tC
-	 GHSaHrQuYfaLQ==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net-next 3/3] net: ipv6: rpl_iptunnel: mitigate 2-realloc issue
-Date: Fri, 25 Oct 2024 15:37:27 +0200
-Message-Id: <20241025133727.27742-4-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241025133727.27742-1-justin.iurman@uliege.be>
-References: <20241025133727.27742-1-justin.iurman@uliege.be>
+	s=arc-20240116; t=1729863633; c=relaxed/simple;
+	bh=pVBN/pYnecKbodkMkBrlE2AMRkbGJn4StYxxRVqPtJM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrZ/yhawpJJVKel00QxeEbAewRx+eWBzV2qb1Dt+e7jOSjH9zJv70kvoFFv8aT+xAFERhJdGv+SXtX6Ha2ZYqFuR6UvlFRoDIw0JJrSCzOzGRzkr5CUdC2RgG2NHaQp1dfJracmtf4UdtByybh5h82K2ufF1X5qb73JN3/oaBRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkSX5Y0O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73F69C4CEC3;
+	Fri, 25 Oct 2024 13:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729863632;
+	bh=pVBN/pYnecKbodkMkBrlE2AMRkbGJn4StYxxRVqPtJM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LkSX5Y0O06lKZVBTf+07pj6MacCDHVfYJaJ13wd5+BzO/6MXW+9rw2vIfr7mlrbZM
+	 lhfMC9SjIEpl25Lfjdnd17pr4d5IjDpGwExR80cNnRMP0ITR3KG+E8E0hJXRLz7ggr
+	 TWjyrZtC6laDDr2bVPF1plmgEx3ER78I5KwOTxx+FsH9i1910qMsW6qqkiCugLjbe0
+	 5BQ1GZACH8UE6g4MY19zXhAlPyby+WdE794/je0UWdmG5iUY8dlztfVv1+B8yRk7Z8
+	 dDS+kOseJ3cpZspqcynW4Bz9e++wzZ9qQWeCGH2Q5u8AFieiQAj0rdZKFI4kF8dRAp
+	 73rJPZgsNaBEA==
+Date: Fri, 25 Oct 2024 14:40:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: George Guo <dongtai.guo@linux.dev>
+Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+	guodongtai@kylinos.cn, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org, paul@paul-moore.com
+Subject: Re: [PATCH 1/1] add comment for doi_remove in struct
+ netlbl_lsm_secattr
+Message-ID: <20241025134028.GW1202098@kernel.org>
+References: <0667f18b-2228-4201-9da7-0e3536bae321@redhat.com>
+ <20241025064031.994215-1-dongtai.guo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025064031.994215-1-dongtai.guo@linux.dev>
 
-This patch mitigates the two-reallocations issue with rpl_iptunnel by
-providing the dst_entry (in the cache) to the first call to
-skb_cow_head(). As a result, the very first iteration would still
-trigger two reallocations (i.e., empty cache), while next iterations
-would only trigger a single reallocation.
+On Fri, Oct 25, 2024 at 02:40:31PM +0800, George Guo wrote:
+> From: George Guo <guodongtai@kylinos.cn>
 
-Performance tests before/after applying this patch, which clearly shows
-there is no impact (it even shows improvement):
-- before: https://ibb.co/nQJhqwc
-- after: https://ibb.co/4ZvW6wV
+Hi George,
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
- net/ipv6/rpl_iptunnel.c | 60 +++++++++++++++++++++--------------------
- 1 file changed, 31 insertions(+), 29 deletions(-)
+Thanks for your patch. I agree that is is correct and a good change
+to make. But there are some process issues to be addressed before this
+patch can be accepted.
 
-diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
-index db3c19a42e1c..ce722d9ec711 100644
---- a/net/ipv6/rpl_iptunnel.c
-+++ b/net/ipv6/rpl_iptunnel.c
-@@ -125,7 +125,8 @@ static void rpl_destroy_state(struct lwtunnel_state *lwt)
- }
- 
- static int rpl_do_srh_inline(struct sk_buff *skb, const struct rpl_lwt *rlwt,
--			     const struct ipv6_rpl_sr_hdr *srh)
-+			     const struct ipv6_rpl_sr_hdr *srh,
-+			     struct dst_entry *dst)
- {
- 	struct ipv6_rpl_sr_hdr *isrh, *csrh;
- 	const struct ipv6hdr *oldhdr;
-@@ -153,7 +154,8 @@ static int rpl_do_srh_inline(struct sk_buff *skb, const struct rpl_lwt *rlwt,
- 
- 	hdrlen = ((csrh->hdrlen + 1) << 3);
- 
--	err = skb_cow_head(skb, hdrlen + skb->mac_len);
-+	err = skb_cow_head(skb, hdrlen + (!dst ? skb->mac_len
-+					       : LL_RESERVED_SPACE(dst->dev)));
- 	if (unlikely(err)) {
- 		kfree(buf);
- 		return err;
-@@ -186,36 +188,35 @@ static int rpl_do_srh_inline(struct sk_buff *skb, const struct rpl_lwt *rlwt,
- 	return 0;
- }
- 
--static int rpl_do_srh(struct sk_buff *skb, const struct rpl_lwt *rlwt)
-+static int rpl_do_srh(struct sk_buff *skb, const struct rpl_lwt *rlwt,
-+		      struct dst_entry *dst)
- {
--	struct dst_entry *dst = skb_dst(skb);
- 	struct rpl_iptunnel_encap *tinfo;
- 
- 	if (skb->protocol != htons(ETH_P_IPV6))
- 		return -EINVAL;
- 
--	tinfo = rpl_encap_lwtunnel(dst->lwtstate);
-+	tinfo = rpl_encap_lwtunnel(skb_dst(skb)->lwtstate);
- 
--	return rpl_do_srh_inline(skb, rlwt, tinfo->srh);
-+	return rpl_do_srh_inline(skb, rlwt, tinfo->srh, dst);
- }
- 
- static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
--	struct dst_entry *orig_dst = skb_dst(skb);
--	struct dst_entry *dst = NULL;
-+	struct dst_entry *dst;
- 	struct rpl_lwt *rlwt;
- 	int err;
- 
--	rlwt = rpl_lwt_lwtunnel(orig_dst->lwtstate);
--
--	err = rpl_do_srh(skb, rlwt);
--	if (unlikely(err))
--		goto drop;
-+	rlwt = rpl_lwt_lwtunnel(skb_dst(skb)->lwtstate);
- 
- 	local_bh_disable();
- 	dst = dst_cache_get(&rlwt->cache);
- 	local_bh_enable();
- 
-+	err = rpl_do_srh(skb, rlwt, dst);
-+	if (unlikely(err))
-+		goto drop;
-+
- 	if (unlikely(!dst)) {
- 		struct ipv6hdr *hdr = ipv6_hdr(skb);
- 		struct flowi6 fl6;
-@@ -237,15 +238,15 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 		local_bh_disable();
- 		dst_cache_set_ip6(&rlwt->cache, dst, &fl6.saddr);
- 		local_bh_enable();
-+
-+		err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
-+		if (unlikely(err))
-+			goto drop;
- 	}
- 
- 	skb_dst_drop(skb);
- 	skb_dst_set(skb, dst);
- 
--	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
--	if (unlikely(err))
--		goto drop;
--
- 	return dst_output(net, sk, skb);
- 
- drop:
-@@ -255,36 +256,37 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- static int rpl_input(struct sk_buff *skb)
- {
--	struct dst_entry *orig_dst = skb_dst(skb);
--	struct dst_entry *dst = NULL;
-+	struct dst_entry *dst;
- 	struct rpl_lwt *rlwt;
- 	int err;
- 
--	rlwt = rpl_lwt_lwtunnel(orig_dst->lwtstate);
--
--	err = rpl_do_srh(skb, rlwt);
--	if (unlikely(err))
--		goto drop;
-+	rlwt = rpl_lwt_lwtunnel(skb_dst(skb)->lwtstate);
- 
- 	local_bh_disable();
- 	dst = dst_cache_get(&rlwt->cache);
-+	local_bh_enable();
-+
-+	err = rpl_do_srh(skb, rlwt, dst);
-+	if (unlikely(err))
-+		goto drop;
- 
- 	if (!dst) {
- 		ip6_route_input(skb);
- 		dst = skb_dst(skb);
- 		if (!dst->error) {
-+			local_bh_disable();
- 			dst_cache_set_ip6(&rlwt->cache, dst,
- 					  &ipv6_hdr(skb)->saddr);
-+			local_bh_enable();
- 		}
-+
-+		err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
-+		if (unlikely(err))
-+			goto drop;
- 	} else {
- 		skb_dst_drop(skb);
- 		skb_dst_set(skb, dst);
- 	}
--	local_bh_enable();
--
--	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
--	if (unlikely(err))
--		goto drop;
- 
- 	return dst_input(skb);
- 
+Firstly, as this is presumably a non-bug fix for networking code,
+it should be targeted at the net-next tree. That it should
+be based on that tree (it seems to be) and explicitly targeted
+at that tree in the Subject.
+
+  Subject: [PATCH net-next v2] ...
+
+Secondly, the subject should include a prefix.
+Looking at git log include/net/netlabel.h it
+seems that should be 'netlabel:'
+
+  Subject: [PATCH net-next v2] netlabel: ...
+
+And it might be best to make the subject a bit more descriptive.
+
+  Subject: [PATCH net-next v2] netlabel: document doi_remove field of struct netlbl_calipso_ops
+
+
+Next, a commit message is required. It should explain why the change is
+being made. And, ideally how you found this problem. It should
+also include a Signed-off-by line [1]. e.g.
+
+  Add documentation of do_remove field to Kernel doc for struct
+  netlbl_calipso_ops.
+
+  Found using W=1 build.
+
+  Signed-off-by: ...
+
+[1] https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign-your-work-the-developer-s-certificate-of-origin
+
+Lastly, please do wait 24h before posting a new version.
+Please include information about what has changed below the scissors ('---').
+And please send the new patch as a new thread.
+
+More information on development processes for Networking can be found here:
+https://docs.kernel.org/process/maintainer-netdev.html
+
+...
+
 -- 
-2.34.1
-
+pw-bot: changes-requested
 
