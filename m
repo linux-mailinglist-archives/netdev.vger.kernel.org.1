@@ -1,91 +1,110 @@
-Return-Path: <netdev+bounces-138927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B79759AF72A
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:50:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB55C9AF740
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 04:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40060B212D9
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 01:50:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCAC91C217AE
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 02:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869341DFF7;
-	Fri, 25 Oct 2024 01:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB6054727;
+	Fri, 25 Oct 2024 02:09:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s4Kug1+4"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YiE8lvu8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3B64C8C;
-	Fri, 25 Oct 2024 01:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2BB4409;
+	Fri, 25 Oct 2024 02:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729821042; cv=none; b=DBouBFyec/9yPeIR2lpYT00k0UaZu3T6472s7ITwXokGHqPaZWS21XbbZF2thAnY33NOdzotvVz6fgyhpcoTAlKnTYq03AWcCYmm+en4wqnNklq2sL1UfAsOb64Aj6pp/YjE2JZWAYtOIKiJZYqi6nOSJ81ctC/2mMsKMmO5x4o=
+	t=1729822154; cv=none; b=LM5IMUefit6x66v5euSuhj7QLk0HUnpG6sM6r7mVlTq31XOjkQXpQaJ+ptv+fhR0UKnseh3b8Ok9ig0QfX/8saOs3/qi3ftvndMRSyo8TFFl5Jmk8/OK37032iHRXJ5dv1ZWPXuRw7I7fZKbnqeD7FPkE4o4ffuK95Y/09pq65I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729821042; c=relaxed/simple;
-	bh=RwJI6eSZUGGBcNo2fLcmRIdAXn7/yZO/iBQPT87j1Yg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dQNcy1y5UMmZ2u9HKgws1QJxqSpzFVNZe1cvokDiS8N0Z0tG3Rz8tbV//kYck0/7W+aZKqNlWKnrvnde5sVSHXj7lOfMPMFy1vwafjvLvF9Frm9j9YUAtgZjHlOE9+ZQpDONMVwRyvwLY1AkW397rNypFDNXE2QCv+ypiQPrpmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s4Kug1+4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A74C4CEC7;
-	Fri, 25 Oct 2024 01:50:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729821040;
-	bh=RwJI6eSZUGGBcNo2fLcmRIdAXn7/yZO/iBQPT87j1Yg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s4Kug1+46Ei7tiCmG6SlYm1LbZ1cz8tAmIaj0TdWlgOD9XizdGuMW1fQ14J4ianAS
-	 0f1ME+ppWCchlEB5R4CoKrU7h2OUsePmDOw9WzA2ba0p63gOcfJ+8r2VlHnu/oRrqt
-	 4t+tAdySHqngGNhB6nNpXFP666eg31HIDUQ78vpaHURO1/P9KdDrBpoNMSrfgsEu2T
-	 qZLLWI/xs4Q7D1T4ZP+DKO4KXBHHIueVP5Fa0X0zUZODkEOjJ5ay62oZyfjTRBLUa5
-	 jr1kG3f0zpA1hfsf7LbBT50ruvDbXlc5ugRKT4S2Ch5iX/ipK/SX5ZH5X+Cr0/BKrl
-	 g11rzI+F5IGGg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCA4380DBDC;
-	Fri, 25 Oct 2024 01:50:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1729822154; c=relaxed/simple;
+	bh=owZQFjRKSrFscUTMzgy9f3qj0DPeqx31XBXz7yOfruQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=XLsgNmN9gFnV00upCYu2InyPK3StJY/F7qOqmf5Nnm2gtCAMeyu2SF7inMPpxscc4eH40MzPXe0eBMqkDx8CSFbkY9QgJBYyvEq087i1w+aSNqwz0WtW0Q0fGI31rc689w8mWp9socHRxKCmROve3oZs7EsmB5a/f6QkRUH0PtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=YiE8lvu8; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1729822146;
+	bh=gQgSV610ILSoL/cGnp5h07TqziRXCjCy1JOVwfPy+4g=;
+	h=Date:From:To:Cc:Subject:From;
+	b=YiE8lvu8jxLB8dmO8gNBrcDv6F7mIVbHfVD6kmhyG7QR7A+t0cZWR1C1MQPse4fkG
+	 el2ijzH4va3r9hLpqpsoX3xJgKs62ez6oeIntsiWj/lq1wDnsDWU4UO+5VlJ8TlHu/
+	 1ivnw4G0nYUKDGbRtD6zsEDEoU18AsFNzSdhyd8YzN8XWzsUH8jba1aw7puEAdl2pn
+	 QFS9nlr9JMSG9vL1XQIvuFMw0hiOMhZOZfzmxMXVjoyO7H09S5VAksM8WZPyKTq2gg
+	 6GnPq0GhzqogdHVe/Tb/vLsQFhuIQQMTy/A4wVkX7ZeFxmxyyu0i7wsYy80RSauGPP
+	 Yb9krmgDEFcug==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XZR6T6Y5sz4wbr;
+	Fri, 25 Oct 2024 13:09:05 +1100 (AEDT)
+Date: Fri, 25 Oct 2024 13:09:06 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patches in the bluetooth tree
+Message-ID: <20241025130906.3ad6329e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] Networking for v6.12-rc5
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172982104752.2439163.457544303766936897.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Oct 2024 01:50:47 +0000
-References: <20241024140101.24610-1-pabeni@redhat.com>
-In-Reply-To: <20241024140101.24610-1-pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/eG+lchctPBHezqo1T6aNxH0";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/eG+lchctPBHezqo1T6aNxH0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This pull request was applied to bpf/bpf.git (master)
-by Linus Torvalds <torvalds@linux-foundation.org>:
+Hi all,
 
-On Thu, 24 Oct 2024 16:01:01 +0200 you wrote:
-> Hi Linus!
-> 
-> Oddily this includes a fix for posix clock regression; in our previous PR
-> we included a change there as a pre-requisite for networking one.
-> Such fix proved to be buggy and requires the follow-up included here.
-> Thomas suggested we should send it, given we sent the buggy patch.
-> 
-> [...]
+The following commits are also in the net tree as different commits
+(but the same patches):
 
-Here is the summary with links:
-  - [GIT,PULL] Networking for v6.12-rc5
-    https://git.kernel.org/bpf/bpf/c/d44cd8226449
+  fb4560832d4c ("Bluetooth: ISO: Fix UAF on iso_sock_timeout")
+  300b75192c4d ("Bluetooth: SCO: Fix UAF on sco_sock_timeout")
+  92e242adc4ac ("Bluetooth: hci_core: Disable works on hci_unregister_dev")
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+These are commits
 
+  246b435ad668 ("Bluetooth: ISO: Fix UAF on iso_sock_timeout")
+  1bf4470a3939 ("Bluetooth: SCO: Fix UAF on sco_sock_timeout")
+  989fa5171f00 ("Bluetooth: hci_core: Disable works on hci_unregister_dev")
 
+in the net tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/eG+lchctPBHezqo1T6aNxH0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmca/cIACgkQAVBC80lX
+0GwtYggAo3z04zeo14tOPc/xnmxsNhqIHHDczLDJcdFFXoLMzV3CECRZaOKzowLg
+XRJtguCud99kVh9UJQWHry/TWXcghJUPGJSfSkPmKzl/WLAsMt/xoypYoYMkqiWS
+3/DquPxqvbS4pApGCYCf3FolG+9fL1l89r8wb5/m9zNUuRib3fsmlXbUDb42IK6O
+U4M6OI3c33PI6TtWtvWNt70+1zOiEwTaJ/41UHNCg0jssNcg7Ut2T299dXGtzb5T
+rAHNcmw73mQztWrVlDEyM7QKRd5yaU1EeErQ4C3weSyhlTWj2NKnJaXDXBseblFR
+8e5AMDKC01h8wI08re4Vicys6ze1mA==
+=buQe
+-----END PGP SIGNATURE-----
+
+--Sig_/eG+lchctPBHezqo1T6aNxH0--
 
