@@ -1,239 +1,290 @@
-Return-Path: <netdev+bounces-139000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86679AFBB6
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:00:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B7B9AFBCA
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683952844D4
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:00:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78FE81C2284A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846B41C1741;
-	Fri, 25 Oct 2024 08:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7A11C6F55;
+	Fri, 25 Oct 2024 08:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q3bpuJkx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iSm5PcWT";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q3bpuJkx";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iSm5PcWT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDKWiJ+g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340181C4622;
-	Fri, 25 Oct 2024 08:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B59199948;
+	Fri, 25 Oct 2024 08:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729843206; cv=none; b=Z0/HCLoboPmDTFXc4UYOP9EtiJl+NxxJNwJpFcJjQFjDxsq5ozrZElkXqj0QlLzinMo8TAYKos5LwoSotfvqls1TQAxViqXOU+LpFVBC8EZFmNDPmTHLkhh52qZK3zgiYyLC0CVm5ZVGP0JPjsTsOxf+oRAWYVJBbiFaJ2bQyms=
+	t=1729843249; cv=none; b=R5CjXxag+9aHRG+gQNz9sJg7YfNN3NoxxEubR+domSaEYIMGI+h6KDVaMPXUImaKdAG0kSWGWFBSaynu7pU2aQihKYpyfNRQXO+WXID0vMXnFVzzhKHKtIQy3i3WzRA45CSag6ZqfHNum37AkvX0/8K//2Dz6ulpMEKgtCfj7vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729843206; c=relaxed/simple;
-	bh=pDKoYNWc5esSfmM2VKEvc47EU0gOkj8FOL8qQDFJZYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M3yUSWnigy60bFbw7c6IRgfHlXshTyd+aONOTTjV3D1AbMfwNKn0aQb2NHlMtGeQctlI7kpE9ubJuzrLZF7HqKOHOhkHuLUw03rkIrlWFsAIiBC0c5ZS+2bng8wJeEfmMvrE9x1td4JrOkqiFV6t8pqJWbe/GUXp8AG3qhP0VLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q3bpuJkx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iSm5PcWT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q3bpuJkx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iSm5PcWT; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6EB8221E14;
-	Fri, 25 Oct 2024 08:00:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729843202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
-	b=Q3bpuJkxSkOVve5uvDfli9jz2KlAsWAiPZucR6NpoGrjTSqrlZ9/qm3XU/eT9vQVnbET3I
-	TTAAXXZP+7z0PHH0dA3MZuiTGQ2TFSNvfRJuCAYA+pc5kGIbuwT5wE/GSeonj4dnHxaqqc
-	Fg6YV45j4Ieg70gSybwep693JDKmHFw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729843202;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
-	b=iSm5PcWTohwwYs+NwSceqzvMUzvEepB2n1+Qq0val4EWG9nqyrd/iHlwKVqznKHhda8xxm
-	Jc1ZYwjEHHsRlQDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729843202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
-	b=Q3bpuJkxSkOVve5uvDfli9jz2KlAsWAiPZucR6NpoGrjTSqrlZ9/qm3XU/eT9vQVnbET3I
-	TTAAXXZP+7z0PHH0dA3MZuiTGQ2TFSNvfRJuCAYA+pc5kGIbuwT5wE/GSeonj4dnHxaqqc
-	Fg6YV45j4Ieg70gSybwep693JDKmHFw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729843202;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
-	b=iSm5PcWTohwwYs+NwSceqzvMUzvEepB2n1+Qq0val4EWG9nqyrd/iHlwKVqznKHhda8xxm
-	Jc1ZYwjEHHsRlQDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C94FB132D3;
-	Fri, 25 Oct 2024 07:59:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 1OmFJ/9PG2coWQAAD6G6ig
-	(envelope-from <aherrmann@suse.de>); Fri, 25 Oct 2024 07:59:59 +0000
-Date: Fri, 25 Oct 2024 09:59:53 +0200
-From: Andreas Herrmann <aherrmann@suse.de>
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
-	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
-	ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
-	Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
-	Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
-	"paulburton@kernel.org" <paulburton@kernel.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	linux-pci <linux-pci@vger.kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Kelvin Cheung <keguang.zhang@gmail.com>,
-	Yanteng Si <siyanteng@loongson.cn>, netdev@vger.kernel.org,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Guenter Roeck <linux@roeck-us.net>, linux-hwmon@vger.kernel.org,
-	Borislav Petkov <bp@alien8.de>, linux-edac@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-serial@vger.kernel.org, Andrew Halaney <ajhalaney@gmail.com>,
-	Nikita Travkin <nikita@trvn.ru>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Evgeniy Dushistov <dushistov@mail.ru>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Sergio Paracuellos <sergio.paracuellos@gmail.com>,
-	Nikita Shubin <nikita.shubin@maquefel.me>,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: linux: Goodbye from a Linux community volunteer
-Message-ID: <20241025075953.GA3559@alberich>
-References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
- <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
- <753d203a-a008-4cd3-b053-38b5ce31281b@app.fastmail.com>
- <f90bba20e86dac698472d686be7ec565736adca0.camel@HansenPartnership.com>
- <2f203b14-be13-4eef-bcb1-743dd9e9e9bd@app.fastmail.com>
+	s=arc-20240116; t=1729843249; c=relaxed/simple;
+	bh=UzJ4JA6wYnNE2e2wAE1cqDvIoHwljC0uMyvbhZV8y8I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OPBDdy+XQFHSyqnx8ct613ZCRgR2A+UU9kwXqxtyKNrk7H4n2DY48HUYhwR/ZCVl/Z1i+PYPSmshHcajlwiEnzbC3qAVwg1Deukq24+YZnGbuVFWOSqwVU+grlKRzST/7k4iUlNqPMDKQOuX6Ab1+puw+dLi9TEv1yv0+86B3U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bDKWiJ+g; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e2e32bc454fso1889454276.2;
+        Fri, 25 Oct 2024 01:00:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729843246; x=1730448046; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8xP4wphIWdaPagX33UsZlMJ6YTfEiL6bGlCgAvrq+ew=;
+        b=bDKWiJ+gn0XBW9ZyEEOtUQFNMKVGeGPArKhwbuX8z6nFEn4AabdJzu55Sa70dVdk85
+         ZR2QQpHwLj0XiaoH2B/YgPoYGe0MzuZcJ+9QhparEUbqrC1p+lsgpXmXHdmP5d5ho+S8
+         WrY+eisf178xRxiksIEBdrm87LEdh5mcGFNLYPqiocuTCmO9BNyv9nGiyvaj9XxzGPu1
+         9Iqx2Iuk5H1ApgOO97nsTgqTYJYJ+ReSuziHilzbnzDQ7Yh9z8G/CQVhzyIWZ33rryy3
+         baViqGtSbE+IxCMwpVjoTdAd84pyR17lK/xYxugv1mi4pVHSvi7NPL3csKqcTQJPu0/w
+         g0gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729843246; x=1730448046;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8xP4wphIWdaPagX33UsZlMJ6YTfEiL6bGlCgAvrq+ew=;
+        b=fN7dkGo6tgwEQCnxJhdEN+NqckdHAWkLo083SKD1cK+Hoxsb7nxd0DuirnNUNdBjOp
+         RqH39Me5+WJT9srT9Iv6YG+JMxMtZ4zI7MTUaIqsbEESzuPc50NRrplnqZho2WARRSbi
+         +z7+N7uvk5ERzaOTc8UrppxoKOeFxqG+/tB0Jn6Mmngm8rID6eP0WG0CBtYLqHLYk0nw
+         TdbB61/8n6BNuaEWyfx6d3FqYEi9msr+gcQB825ZqcTDcGbn68OXpbWE5tfV9HiilWXq
+         ZSAxR0Um6z+aIrru4WoLiGBMdCp4+HZ5S9aZxZHcf/1KcIMzpgc46fAwohKBozbWBNFQ
+         r0vA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+TljSeFm6VwdTQVZc4fww12s77wjQnxtD7xgJ5ApWrsArNR0sRBLpf1LzT4p6LxHMHKtDwjgG7TXfF5eEqFk=@vger.kernel.org, AJvYcCV6uIPh/cfEljaaOsCsVkV3DeIRgZnmjk1hjzsxf0DaeHjsNBkfT4rc1Gl9XVikPwNfmcF2xwqDFxVO@vger.kernel.org, AJvYcCVIOXji2tXMJn3N/JeJ+4CopoqwFs5/YAPm3wvsf+O22qHq+RUUO26GJZci+PN22EeCUs25ubobMoaZhYZO@vger.kernel.org, AJvYcCVn0P4wbeXoUa2nGZYTECtJWQzDvO6M+xrslq+W/s+Xe8sYODz36BqJLfHtvVE5F/07KP96bY9V@vger.kernel.org, AJvYcCW1pbkoQkoRfdk44cOFhyyqXz1bGgJsyZaKHPeOCpatePmZw/fw9PfFFbJFpd0ausQGN/HzChlcNxE=@vger.kernel.org, AJvYcCWBTWwDY3pp0Cf9dCG1+iNIBR2u+AQzUf4Ir2FjKPpgeuKll+FKK8CSTnsvDvqB7Nxt6Ty64kulI4j+@vger.kernel.org, AJvYcCWK271WI3ivJddnPpFweeFWcUQUJlhhqkgeD++V5LjmM2jV05PR6p+tnwpjIB+P1r0r8PClycdxcHbs@vger.kernel.org, AJvYcCXYSOL404PiLC5EDNW6aMGDr4IO8wG1zu14MtbCOIzGjdi0r3+K6G3nhs74WqbXaInDAni81gP3yaVnEA==@vger.kernel.org, AJvYcCXaYcvQERB5ZEpQkQ6RSo74ZKlezJuuNP8UB+gAaqunEe3n3XVPcaSTpbgy5o4BJjej3zUzo2SYdHRI@vger.kernel.org, AJvYcCXnT3LCn03FlBu4BrF4qnBvZw7u1VmXEq/I
+ Pmqz0dkjTrXw+X33YIW/C23BMC+Bg7VeONR/5HvulrIPLyc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzFoRjLyFjh/AiDT3cmsSulAsZDb0IamZuunb5O2T1hdPgN2qi
+	qJkyCom20k2VScNfaZdVCmm1Mnf1Q2my4V8wvWMR3JBr0nNHrnaxIG+fVoUD44eVphYP3RHBppo
+	skzKpnBPByOGiaip238Ft4KKFiuk=
+X-Google-Smtp-Source: AGHT+IG135JrFzLujlfWufoz+Ipikom2TQ/YmGc5fQPhpTafBBZL0I0pzwrO2u4tm5krGs+xLbPkdWLxc4PyFOnUZKc=
+X-Received: by 2002:a05:6902:2505:b0:e29:68db:ccc2 with SMTP id
+ 3f1490d57ef6-e2f2fbc0c20mr4885350276.38.1729843246281; Fri, 25 Oct 2024
+ 01:00:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2f203b14-be13-4eef-bcb1-743dd9e9e9bd@app.fastmail.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[hansenpartnership.com,gmail.com,kudzu.us,intel.com,lists.linux.dev,kernel.org,linux.intel.com,bootlin.com,linux.dev,vger.kernel.org,alpha.franken.de,arndb.de,google.com,linaro.org,renesas.com,davemloft.net,redhat.com,lunn.ch,armlinux.org.uk,loongson.cn,roeck-us.net,alien8.de,linuxfoundation.org,trvn.ru,jurassic.park.msu.ru,mail.ru,omp.ru,linux-m68k.org,maquefel.me];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[53];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Score: -2.30
-X-Spam-Flag: NO
+References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-2-tmyu0@nuvoton.com>
+ <20241024-daffodil-raccoon-of-champagne-6f6f04-mkl@pengutronix.de>
+In-Reply-To: <20241024-daffodil-raccoon-of-champagne-6f6f04-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Fri, 25 Oct 2024 16:00:35 +0800
+Message-ID: <CAOoeyxV+xFE2wjSFEdBAzV9mcUn7wf-kCJTA=FgW2thsDmwmyQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2024 at 05:58:45PM +0100, Jiaxun Yang wrote:
-> 
-> 
-> 在2024年10月24日十月 下午5:27，James Bottomley写道：
-> > On Thu, 2024-10-24 at 16:59 +0100, Jiaxun Yang wrote:
-> [...]
-> 
-> Hi James,
-> 
+Sorry, resending this email in plain text format.
+
+Dear Marc,
+
+Thank you for your comments.
+I'll add the nct6694_free_handler() function in the next patch.
+
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=8824=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=885:12=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> On 24.10.2024 16:59:14, Ming Yu wrote:
+> > The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> > 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> > PWM, and RTC.
 > >
-> > It's Linux, so no official capacity at all.  However, I am expressing
-> > the views of a number of people I talked to but it's not fair of me to
-> > name them.
-> 
-> Fair enough, I was hoping that it's from Linux Foundation but it's still
-> good news to me that it do represent some respectful individuals.
-> 
+> > This driver implements USB device functionality and shares the
+> > chip's peripherals as a child device.
 > >
-> [...]
-> >> How should we handle it?
+> > Each child device can use the USB functions nct6694_read_msg()
+> > and nct6694_write_msg() to issue a command. They can also register
+> > a handler function that will be called when the USB device receives
+> > its interrupt pipe.
 > >
-> > A big chunk of the reason it's taken so long just to get the above is
-> > that the Lawyers (of which I'm not one) are still discussing the
-> > specifics and will produce a much longer policy document later, so they
-> > don't want to be drawn into questions like this.  However, my non-
-> > legal-advice rule of thumb that I'm applying until I hear otherwise is
-> > not on the SDN list, not a problem.
-> 
-> Thank you for sharing your insights. I'm looking forward to the document.
-
-+1
-
-> While I remain quite upset about how things were handled, your message has
-> helped restore some of my confidence in the community.
-
-+1
-
-> I agree with Peter Cai's earlier comment that steps should be taken to address
-> the harm caused by the initial reckless actions, particularly to those who were
-> humiliated.
-
-+1
-
-> It is also important to put measures in place to prevent such drama from recurring.
-> A formal procedure for handling urgent compliance requests may be a sensible step
-> forward.
-
-+1
-
-> I hold our community in high regard and would be heartbreaking to see the reputation
-> of the Linux Kernel undermined in such an unfortunate manner. I would appreciate it
-> if you could convey those thoughts to the relevant individuals.
-
-+1
-
--- 
-Regards,
-Andreas
-
-PS: What people also tend to forget. No matter how worse it gets in
-world affairs there always will come a time after a conflict. And
-people with brains should look forward to such times and how they can
-continue to work together then.
+> > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+> > ---
+> >  MAINTAINERS                 |   7 +
+> >  drivers/mfd/Kconfig         |  10 +
+> >  drivers/mfd/Makefile        |   2 +
+> >  drivers/mfd/nct6694.c       | 394 ++++++++++++++++++++++++++++++++++++
+> >  include/linux/mfd/nct6694.h | 168 +++++++++++++++
+> >  5 files changed, 581 insertions(+)
+> >  create mode 100644 drivers/mfd/nct6694.c
+> >  create mode 100644 include/linux/mfd/nct6694.h
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index e9659a5a7fb3..30157ca95cf3 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -16434,6 +16434,13 @@ F:   drivers/nubus/
+> >  F:   include/linux/nubus.h
+> >  F:   include/uapi/linux/nubus.h
+> >
+> > +NUVOTON NCT6694 MFD DRIVER
+> > +M:   Ming Yu <tmyu0@nuvoton.com>
+> > +L:   linux-kernel@vger.kernel.org
+> > +S:   Supported
+> > +F:   drivers/mfd/nct6694.c
+> > +F:   include/linux/mfd/nct6694.h
+> > +
+> >  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
+> >  M:   Antonino Daplas <adaplas@gmail.com>
+> >  L:   linux-fbdev@vger.kernel.org
+> > diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+> > index f9325bcce1b9..da2600958697 100644
+> > --- a/drivers/mfd/Kconfig
+> > +++ b/drivers/mfd/Kconfig
+> > @@ -546,6 +546,16 @@ config MFD_MX25_TSADC
+> >         i.MX25 processors. They consist of a conversion queue for gener=
+al
+> >         purpose ADC and a queue for Touchscreens.
+> >
+> > +config MFD_NCT6694
+> > +     tristate "Nuvoton NCT6694 support"
+> > +     select MFD_CORE
+> > +     depends on USB
+> > +     help
+> > +       This adds support for Nuvoton USB device NCT6694 sharing periph=
+erals
+> > +       This includes the USB devcie driver and core APIs.
+> > +       Additional drivers must be enabled in order to use the function=
+ality
+> > +       of the device.
+> > +
+> >  config MFD_HI6421_PMIC
+> >       tristate "HiSilicon Hi6421 PMU/Codec IC"
+> >       depends on OF
+> > diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+> > index 2a9f91e81af8..2cf816d67d03 100644
+> > --- a/drivers/mfd/Makefile
+> > +++ b/drivers/mfd/Makefile
+> > @@ -116,6 +116,8 @@ obj-$(CONFIG_TWL6040_CORE)        +=3D twl6040.o
+> >
+> >  obj-$(CONFIG_MFD_MX25_TSADC) +=3D fsl-imx25-tsadc.o
+> >
+> > +obj-$(CONFIG_MFD_NCT6694)    +=3D nct6694.o
+> > +
+> >  obj-$(CONFIG_MFD_MC13XXX)    +=3D mc13xxx-core.o
+> >  obj-$(CONFIG_MFD_MC13XXX_SPI)        +=3D mc13xxx-spi.o
+> >  obj-$(CONFIG_MFD_MC13XXX_I2C)        +=3D mc13xxx-i2c.o
+> > diff --git a/drivers/mfd/nct6694.c b/drivers/mfd/nct6694.c
+> > new file mode 100644
+> > index 000000000000..9838c7be0b98
+> > --- /dev/null
+> > +++ b/drivers/mfd/nct6694.c
+> > @@ -0,0 +1,394 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Nuvoton NCT6694 MFD driver based on USB interface.
+> > + *
+> > + * Copyright (C) 2024 Nuvoton Technology Corp.
+> > + */
+> > +
+> > +#include <linux/io.h>
+> > +#include <linux/usb.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mfd/core.h>
+> > +#include <linux/mfd/nct6694.h>
+> > +
+> > +#define DRVNAME "nct6694-usb_mfd"
+> > +
+> > +#define MFD_DEV_SIMPLE(_name)                \
+> > +{                                    \
+> > +     .name =3D NCT6694_DEV_##_name,    \
+> > +}                                    \
+> > +
+> > +#define MFD_DEV_WITH_ID(_name, _id)  \
+> > +{                                    \
+> > +     .name =3D NCT6694_DEV_##_name,    \
+> > +     .id =3D _id,                      \
+> > +}
+> > +
+> > +/* MFD device resources */
+> > +static const struct mfd_cell nct6694_dev[] =3D {
+> > +     MFD_DEV_WITH_ID(GPIO, 0x0),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x1),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x2),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x3),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x4),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x5),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x6),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x7),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x8),
+> > +     MFD_DEV_WITH_ID(GPIO, 0x9),
+> > +     MFD_DEV_WITH_ID(GPIO, 0xA),
+> > +     MFD_DEV_WITH_ID(GPIO, 0xB),
+> > +     MFD_DEV_WITH_ID(GPIO, 0xC),
+> > +     MFD_DEV_WITH_ID(GPIO, 0xD),
+> > +     MFD_DEV_WITH_ID(GPIO, 0xE),
+> > +     MFD_DEV_WITH_ID(GPIO, 0xF),
+> > +
+> > +     MFD_DEV_WITH_ID(I2C, 0x0),
+> > +     MFD_DEV_WITH_ID(I2C, 0x1),
+> > +     MFD_DEV_WITH_ID(I2C, 0x2),
+> > +     MFD_DEV_WITH_ID(I2C, 0x3),
+> > +     MFD_DEV_WITH_ID(I2C, 0x4),
+> > +     MFD_DEV_WITH_ID(I2C, 0x5),
+> > +
+> > +     MFD_DEV_WITH_ID(CAN, 0x0),
+> > +     MFD_DEV_WITH_ID(CAN, 0x1),
+> > +
+> > +     MFD_DEV_WITH_ID(WDT, 0x0),
+> > +     MFD_DEV_WITH_ID(WDT, 0x1),
+> > +
+> > +     MFD_DEV_SIMPLE(IIO),
+> > +     MFD_DEV_SIMPLE(HWMON),
+> > +     MFD_DEV_SIMPLE(PWM),
+> > +     MFD_DEV_SIMPLE(RTC),
+> > +};
+> > +
+> > +int nct6694_register_handler(struct nct6694 *nct6694, int irq_bit,
+> > +                          void (*handler)(void *), void *private_data)
+> > +{
+> > +     struct nct6694_handler_entry *entry;
+> > +     unsigned long flags;
+> > +
+> > +     entry =3D kmalloc(sizeof(*entry), GFP_KERNEL);
+> > +     if (!entry)
+> > +             return -ENOMEM;
+> > +
+> > +     entry->irq_bit =3D irq_bit;
+> > +     entry->handler =3D handler;
+> > +     entry->private_data =3D private_data;
+> > +
+> > +     spin_lock_irqsave(&nct6694->lock, flags);
+> > +     list_add_tail(&entry->list, &nct6694->handler_list);
+> > +     spin_unlock_irqrestore(&nct6694->lock, flags);
+> > +
+> > +     return 0;
+> > +}
+> > +EXPORT_SYMBOL(nct6694_register_handler);
+>
+> Where's the corresponding nct6694_free_handler() function?
+>
+> Marc
+>
+> --
+> Pengutronix e.K.                 | Marc Kleine-Budde          |
+> Embedded Linux                   | https://www.pengutronix.de |
+> Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
