@@ -1,166 +1,91 @@
-Return-Path: <netdev+bounces-138980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE87A9AF991
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:08:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93C9E9AFA30
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 637561F231F6
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 06:08:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5CC41C22485
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 06:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E626191F6E;
-	Fri, 25 Oct 2024 06:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503C8199948;
+	Fri, 25 Oct 2024 06:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Q5EopU4x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X5tHcEWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7342618CBFF;
-	Fri, 25 Oct 2024 06:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E138218C935
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 06:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729836528; cv=none; b=OMELQ+TxtaJpkYwMeIadKel2UOUhZluAGFcMof3hKs17yfuK0+kUtVztRLyQqZirA4NNWN02q1CJr7QeBUTFMqiYzRiIn4zM5h4hc4QHsBbUopZrdUcxrAQDFATl/wvP78sPz1yv8fPdDHrSoIeLRKs1KTtlJmmILUHcQnDkzTM=
+	t=1729838449; cv=none; b=CJhF/mdYFU98IADx1/GV9ENLT7R8hEprk+y6X7FYEnBX+lHXxyHWGoWyATghGwgJaKQj+iaRwSqYtDNYY2HmF93ZsvDYwdBAAYZDbcOfeLbVBe74ubRr83uV8jIjFEZV1+TupdqAosUc4U3QMuKFhHq80Hl6lpZPvUxPsOl2QOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729836528; c=relaxed/simple;
-	bh=X7LTNv42hr0cLBwcmc9BjZV3R9sxwA54LnIt1zXGcEs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rZ3+2pV1fMD8vNAJIswVAd9NEcK7t4KVqyphPK8WyU7AF4AboRmTaQF8DXjQaSavdr9FQuA2s7DPR3T6JcbruFhoTAKILQdI7zwVUda60hkwwMYb3zm8eLF1sMcZEeEPtB7xw7wodavXpCpy3e6xj1MrWsbXwBMFmGV5bFPHZiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Q5EopU4x; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 05861211A53B; Thu, 24 Oct 2024 23:08:46 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 05861211A53B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1729836526;
-	bh=UwQh0e2Jag6AWyM6LY3ePC0H4CPiaFhzl+Wf/xOw+zM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q5EopU4xpJLUiV8m7P0B8nZgDpWShoRWLGaBOgN6PopUH+7i7ejktOS07jgpLkm/V
-	 2U+CO9vTPjPq0En6Fkv58+WT0pO0p7uFBDzWHCnfJ6xT4BOP/9RPZETbY12eLuyfJo
-	 0+NDYErchzDUsw8o9+2il6erhzGK/4tRLOAGjakQ=
-Date: Thu, 24 Oct 2024 23:08:45 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Colin Ian King <colin.i.king@gmail.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Subject: Re: [PATCH] net: mana: use ethtool string helpers
-Message-ID: <20241025060845.GA9741@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20241022204908.511021-1-rosenp@gmail.com>
+	s=arc-20240116; t=1729838449; c=relaxed/simple;
+	bh=tux+kVXoxeqatZsSvhUcOundmYXP9bd2WCJpZ0y15bQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=g14/kBdF+/GQKbpto89z7DQ5HemixB/i8/SNjN5skJfJ15gQA7tcm7vH3z+6+9PbQCrGbKS9RD4WpXnpL1LucJgVM4p0H7GOsoKOeBQIiG/XxvcDc2GI3dHZjMyBgEszRi6I2GFKOwWSKvvDaYqcNJ1gHWxv1PhMpwabXjn1GR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X5tHcEWB; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729838443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=utWPae6JOH6Gfwt6/OMxC57uOc92cN39G9Jp3wctaGM=;
+	b=X5tHcEWB8OdWSIIyQT+3QxldtX7NRuHMzh+qXnCQ9ncWmoejFFWDWhAXbsNW2Ar2F68uVp
+	9Itqwi9IJs8ODBkR9ziKTO11Gfa+I6ya2kVPkcIhzasoHxgWMnakw/TO2cp467Ho0h55Yn
+	+sCAcKwHPCQA47e4imk7BAXHiNS+U5w=
+From: George Guo <dongtai.guo@linux.dev>
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	dongtai.guo@linux.dev,
+	edumazet@google.com,
+	guodongtai@kylinos.cn,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org,
+	paul@paul-moore.com
+Subject: [PATCH 1/1] add comment for doi_remove in struct netlbl_lsm_secattr
+Date: Fri, 25 Oct 2024 14:40:31 +0800
+Message-Id: <20241025064031.994215-1-dongtai.guo@linux.dev>
+In-Reply-To: <0667f18b-2228-4201-9da7-0e3536bae321@redhat.com>
+References: <0667f18b-2228-4201-9da7-0e3536bae321@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241022204908.511021-1-rosenp@gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 22, 2024 at 01:49:08PM -0700, Rosen Penev wrote:
-> The latter is the preferred way to copy ethtool strings.
-> 
-> Avoids manually incrementing the data pointer.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  .../ethernet/microsoft/mana/mana_ethtool.c    | 55 ++++++-------------
->  1 file changed, 18 insertions(+), 37 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index 349f11bf8e64..c419626073f5 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -91,53 +91,34 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
->  {
->  	struct mana_port_context *apc = netdev_priv(ndev);
->  	unsigned int num_queues = apc->num_queues;
-> -	u8 *p = data;
->  	int i;
->  
->  	if (stringset != ETH_SS_STATS)
->  		return;
->  
-> -	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++) {
-> -		memcpy(p, mana_eth_stats[i].name, ETH_GSTRING_LEN);
-> -		p += ETH_GSTRING_LEN;
-> -	}
-> +	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++)
-> +		ethtool_puts(&data, mana_eth_stats[i].name);
->  
->  	for (i = 0; i < num_queues; i++) {
-> -		sprintf(p, "rx_%d_packets", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "rx_%d_bytes", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "rx_%d_xdp_drop", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "rx_%d_xdp_tx", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "rx_%d_xdp_redirect", i);
-> -		p += ETH_GSTRING_LEN;
-> +		ethtool_sprintf(&data, "rx_%d_packets", i);
-> +		ethtool_sprintf(&data, "rx_%d_bytes", i);
-> +		ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
-> +		ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
-> +		ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
->  	}
->  
->  	for (i = 0; i < num_queues; i++) {
-> -		sprintf(p, "tx_%d_packets", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_bytes", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_xdp_xmit", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_tso_packets", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_tso_bytes", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_tso_inner_packets", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_tso_inner_bytes", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_long_pkt_fmt", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_short_pkt_fmt", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_csum_partial", i);
-> -		p += ETH_GSTRING_LEN;
-> -		sprintf(p, "tx_%d_mana_map_err", i);
-> -		p += ETH_GSTRING_LEN;
-> +		ethtool_sprintf(&data, "tx_%d_packets", i);
-> +		ethtool_sprintf(&data, "tx_%d_bytes", i);
-> +		ethtool_sprintf(&data, "tx_%d_xdp_xmit", i);
-> +		ethtool_sprintf(&data, "tx_%d_tso_packets", i);
-> +		ethtool_sprintf(&data, "tx_%d_tso_bytes", i);
-> +		ethtool_sprintf(&data, "tx_%d_tso_inner_packets", i);
-> +		ethtool_sprintf(&data, "tx_%d_tso_inner_bytes", i);
-> +		ethtool_sprintf(&data, "tx_%d_long_pkt_fmt", i);
-> +		ethtool_sprintf(&data, "tx_%d_short_pkt_fmt", i);
-> +		ethtool_sprintf(&data, "tx_%d_csum_partial", i);
-> +		ethtool_sprintf(&data, "tx_%d_mana_map_err", i);
->  	}
->  }
-Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
->  
-> -- 
-> 2.47.0
+From: George Guo <guodongtai@kylinos.cn>
+
+---
+ include/net/netlabel.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/net/netlabel.h b/include/net/netlabel.h
+index 48106f910139..7091c8552fa1 100644
+--- a/include/net/netlabel.h
++++ b/include/net/netlabel.h
+@@ -209,6 +209,7 @@ struct netlbl_lsm_secattr {
+  * struct netlbl_calipso_ops - NetLabel CALIPSO operations
+  * @doi_add: add a CALIPSO DOI
+  * @doi_free: free a CALIPSO DOI
++ * @doi_remove: remove a CALIPSO DOI
+  * @doi_getdef: returns a reference to a DOI
+  * @doi_putdef: releases a reference of a DOI
+  * @doi_walk: enumerate the DOI list
+-- 
+2.34.1
+
 
