@@ -1,224 +1,130 @@
-Return-Path: <netdev+bounces-139251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7DA9B1311
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:13:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 984FB9B1325
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:24:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02C0C283681
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6067A28367E
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5C81D90A1;
-	Fri, 25 Oct 2024 23:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376ED20F3F6;
+	Fri, 25 Oct 2024 23:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="hXx7Xg2S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DaEw19Yy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-rz-1.rrze.uni-erlangen.de (mx-rz-1.rrze.uni-erlangen.de [131.188.11.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D06217F53;
-	Fri, 25 Oct 2024 23:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C451DACBB;
+	Fri, 25 Oct 2024 23:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729897979; cv=none; b=ibYfuMFHhlHO73OMDEls+Bz93FHpBOCxn73DMqgGoB1X1nSWhTylY2/QWOLk/Pr0+trZr9a56TPK8frQUytIfcUl9ab32MFizVe7a2JAoBypRXCW06vcyhq16zUH082+ED70MQXfq99gUDKofgUtqG/jcJacsHMc0pDISELLffM=
+	t=1729898692; cv=none; b=SKCfvKgK7tt8n9syrecmOgyjb237pcbQCO4nXleLEqo8n49DyepnEtz8qyDzYDQMRw9YfCBQ7dlFFeLPoNkWh+SuyusH3Ko8mFNC0doOAbJy0zj5gvhMqmrM1x35tA8p/lU6Y59ZBNNcvn0guzcZp87Acz5pJNHvCzJZbHm+1W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729897979; c=relaxed/simple;
-	bh=V5BgB/r2NWm/nRIMMT0paD5PyV+Ttw9lQg6UbPlIh+w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tLkMo9Z3pwpLxv/LP8rc7tUYE2a4ceDzC1OMZFZqldOz8gZ+LTKIzGGX+cyTjyFnvNg9/w8KN2Z1ejpB72dBBfFhfIBEHdB+VySpBKWEQ43c7arr4HRMf40SiwzWtNL0dNzJfpkESj/e/gcYb0V1U9MxQCGZ7E5SOV7gGwiMGSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=hXx7Xg2S; arc=none smtp.client-ip=131.188.11.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
-Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-rz-1.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4XZz0r0c3Lz8tcR;
-	Sat, 26 Oct 2024 01:06:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
-	t=1729897564; bh=uv/dHHEplnuod4eD6WXimpOAVYIqzfMnMIhzCRMMjKo=;
-	h=From:To:Cc:Subject:Date:From:To:CC:Subject;
-	b=hXx7Xg2S0qkR4Cemg4a6KW/CF6M8NZCCNI0US5pOQT3xn8DaSP/qtJK101RkMgJWE
-	 PuuNzNyZqAlEmR/+aLcQCTXIUJNFSY+ZDSBPb1YfJvkT6EP7MK0N+xgjpJk+L08+xM
-	 kQlHWohcroe3yZMS44Aqg5DbSlIhrPe/KDPGyoMfbm5hfeTvdvDLUpA/8v7etWHK24
-	 9XE7YEkvd3/4ZHN+7IATOAr/ld8pcyxPA0y3EJc0TXWowmmpOixSUNlBODrVXQvJFk
-	 KVKSY+biPXdDO2pEEmgJ7+H4Tb3A4Uv4NYizNfu7W/yKeevivlKJvtkjG0nck6dyI6
-	 /XSyPJCdDjTGA==
-X-Virus-Scanned: amavisd-new at boeck1.rrze.uni-erlangen.de (RRZE)
-X-RRZE-Flag: Not-Spam
-X-RRZE-Submit-IP: 2a02:3102:6d92:10:58e4:fd1e:ffbc:d487
-Received: from Fabians-MBP.fritz.box (dynamic-2a02-3102-6d92-0010-58e4-fd1e-ffbc-d487.310.pool.telefonica.de [IPv6:2a02:3102:6d92:10:58e4:fd1e:ffbc:d487])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: U2FsdGVkX1/30HNJXyOxPlEwinYNmtC/cS44/HpnJW0=)
-	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4XZz0n2wJ6z8tV6;
-	Sat, 26 Oct 2024 01:06:01 +0200 (CEST)
-From: Fabian Benschuh <Fabi.Benschuh@fau.de>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: Fabian Benschuh <Fabi.Benschuh@fau.de>
-Subject: [PATCH] Add LAN78XX OTP_ACCESS flag support
-Date: Sat, 26 Oct 2024 01:05:46 +0200
-Message-ID: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1729898692; c=relaxed/simple;
+	bh=65IMsR5VySxwtLmsMkEkJMmjIPCoMXefrAgbCGTGbsk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fr8rC5uxyv4lqoCjr9lEjH42pW+9bNnAg/RxDTm9xxWLnaXCxwQSfBo7Gtic5TV8GhBxRx3kTLe3Z5Q0P4pZLZKpPAOXr1MkLskuXvBafVvTFhnToaoAOgsZPunLr/TmNkFzbVjtJR8qrdH2X2RMPnyre5vQ14wwlL8kD9GjgjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DaEw19Yy; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20c9978a221so26025285ad.1;
+        Fri, 25 Oct 2024 16:24:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729898690; x=1730503490; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AUOx9g9Hd29aDPaPnY4OSJGlF1FDFTub05boTsaeB/8=;
+        b=DaEw19YyHoLlYNgp23/vfOSXGnXhNY23G17wZCECWECdzLjpmYjj/CdpaOfsCg3jAI
+         IUmjm7620C8XCv8jK7+k2gyAWnX/QXR8rm/smwjh4UzJNUVoMlroaDoTpAsShLoTk89v
+         XQxOmbbd8PITt68jSXktIi+sb1bkayFptlx8hYf+aTON48RDN8RvZqdOHlN68MrjVNxb
+         vBZp85tKzcl0fcRMmZC4DN6cpXUU6vmAa2mbm0CVzA5WV2nCAv2D5AhsmLRfjKNDQgy9
+         jbYrGxF2eQgJHOEIJ5jsOYmw6uDmlZvYfJB/d7cLyUlPrfZby/6lcLlM6/UqmNhrlbbZ
+         wz3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729898690; x=1730503490;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AUOx9g9Hd29aDPaPnY4OSJGlF1FDFTub05boTsaeB/8=;
+        b=Vwqoq7ojZOGeHEWM7+tYM0bwg/Bd+HvBvMkAVqBAjjaikVYpSWHfYE38zgf1Sl6Fv8
+         6zSytYdazVdzNVxt36tD4NYACxvmqaTQi8YUfa7+EQDMNvcklwKPs0Yu3GQMAkRcpOoo
+         oLFsc1lKfJOC0lV75eMrOarWoK1B6xXIyvB1jVvsYLXb5s2SSLLGqCtgaTcB0/cGqaUA
+         lzlRa+KwwbTMGSc+7u5YK2Z9i8KdEBPmAjZT7But2RJpoXtJJB33CcFKJCtEHAAkTHUQ
+         fI0Ala/UUFhYANoNvhwb5Yw/p5SaZUQNHIVvCdA5Yv+akpqL8lYYCo2i2GqVGk05WmWz
+         Scvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrFQ82xvHMGdCT4af8IWC2Jnwd2XtiXrZLb86BY+kzBaEogA9lbrQRv2wZKSc4qMA34Sf6dSNgPFF3nEPI@vger.kernel.org, AJvYcCWISeTl66hK203qNiZFspWtBsN/YIp30jlhBUzLWAtTOhTzjLmfDvTlqSTa+4M4JsPxxCtLBVOx@vger.kernel.org, AJvYcCXdBrLCFlnxIRsqqLJq1ZTiS7aStKTII+IRuzvF0VbgP2s7ppP6qX3A3PMt4Zrh7bznG2AaWTkLhMlY@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAl1h2XvGoegxDqS3yAgX6sRn/8BvJwK7G9vcokPgL0HIS3RgA
+	6zSiH/lBL/0Q4atTYIYMtNa3+zAQFq7fb1UKhMS7PiczeVDEa7Dn2ptSBQ==
+X-Google-Smtp-Source: AGHT+IFWUkTXqhX/x2uKnWo19NThA/0At3qPgoz/DFagDTJ6IoWaouVLt4TY0P6cRpHC9jOKRPrbGQ==
+X-Received: by 2002:a17:902:c94e:b0:20c:af07:a816 with SMTP id d9443c01a7336-210c6c0dcfcmr9231285ad.31.1729898689603;
+        Fri, 25 Oct 2024 16:24:49 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf6d311sm14429325ad.81.2024.10.25.16.24.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 16:24:49 -0700 (PDT)
+Date: Sat, 26 Oct 2024 07:24:27 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Simon Horman <horms@kernel.org>, Inochi Amaoto <inochiama@gmail.com>
+Cc: Chen Wang <unicorn_wang@outlook.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Inochi Amaoto <inochiama@outlook.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 0/4] riscv: sophgo: Add ethernet support for SG2044
+Message-ID: <vslmecginak75lrgudcoltoarvi7pcge7qw4rljyo6bctx7flc@xpasjaasdkas>
+References: <20241025011000.244350-1-inochiama@gmail.com>
+ <20241025130817.GU1202098@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025130817.GU1202098@kernel.org>
 
-With this flag we can now use ethtool to access the OTP:
-ethtool --set-priv-flags eth0 OTP_ACCESS on
-ethtool -e eth0  # this will read OTP if OTP_ACCESS is on, else EEPROM
+On Fri, Oct 25, 2024 at 02:08:17PM +0100, Simon Horman wrote:
+> On Fri, Oct 25, 2024 at 09:09:56AM +0800, Inochi Amaoto wrote:
+> > The ethernet controller of SG2044 is Synopsys DesignWare IP with
+> > custom clock. Add glue layer for it.
+> > 
+> > Since v2, these patch depends on that following patch that provides
+> > helper function to compute rgmii clock:
+> > https://lore.kernel.org/netdev/20241013-upstream_s32cc_gmac-v3-4-d84b5a67b930@oss.nxp.com/
+> 
+> For future reference: patchsets for Networking, which have
+> not-yet-in-tree dependancies should be marked as an RFC.
+> Our CI doesn't know how to handle these and we don't have
+> a mechanism to re-run it once the dependencies are present:
+> the patchset needs to be sent again.
+> 
+> Also, I'm assuming this patch-set is targeted at net-next.
+> If so, that should be included in the subject like this:
+> 
+>   [PATCH net-next vX] ...
+> 
+> I would wait for review before posting any updated patchset.
+> 
+> Thanks!
+> 
 
-When writing to OTP we need to set OTP_ACCESS on and write with the correct magic 0x7873 for OTP
----
- drivers/net/usb/lan78xx.c | 55 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 45 insertions(+), 10 deletions(-)
+Thanks for your explanation. I apologize for missing these
+rules. I will change it to the right title when sumbiting the
+next patch.
 
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 8adf77e3557e..2fc9b9b138b0 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -85,6 +85,7 @@
- #define EEPROM_INDICATOR		(0xA5)
- #define EEPROM_MAC_OFFSET		(0x01)
- #define MAX_EEPROM_SIZE			512
-+#define MAX_OTP_SIZE			512
- #define OTP_INDICATOR_1			(0xF3)
- #define OTP_INDICATOR_2			(0xF7)
- 
-@@ -172,6 +173,7 @@
- #define INT_EP_GPIO_2			(2)
- #define INT_EP_GPIO_1			(1)
- #define INT_EP_GPIO_0			(0)
-+#define LAN78XX_NET_FLAG_OTP		BIT(0)
- 
- static const char lan78xx_gstrings[][ETH_GSTRING_LEN] = {
- 	"RX FCS Errors",
-@@ -446,6 +448,7 @@ struct lan78xx_net {
- 	unsigned int		burst_cap;
- 
- 	unsigned long		flags;
-+	u32			priv_flags;
- 
- 	wait_queue_head_t	*wait;
- 	unsigned char		suspend_count;
-@@ -1542,6 +1545,10 @@ static void lan78xx_status(struct lan78xx_net *dev, struct urb *urb)
- 
- static int lan78xx_ethtool_get_eeprom_len(struct net_device *netdev)
- {
-+	struct lan78xx_net *dev = netdev_priv(netdev);
-+
-+	if (dev->priv_flags & LAN78XX_NET_FLAG_OTP)
-+		return MAX_OTP_SIZE;
- 	return MAX_EEPROM_SIZE;
- }
- 
-@@ -1555,9 +1562,10 @@ static int lan78xx_ethtool_get_eeprom(struct net_device *netdev,
- 	if (ret)
- 		return ret;
- 
--	ee->magic = LAN78XX_EEPROM_MAGIC;
--
--	ret = lan78xx_read_raw_eeprom(dev, ee->offset, ee->len, data);
-+	if (dev->priv_flags & LAN78XX_NET_FLAG_OTP)
-+		ret = lan78xx_read_raw_otp(dev, ee->offset, ee->len, data);
-+	else
-+		ret = lan78xx_read_raw_eeprom(dev, ee->offset, ee->len, data);
- 
- 	usb_autopm_put_interface(dev->intf);
- 
-@@ -1577,30 +1585,39 @@ static int lan78xx_ethtool_set_eeprom(struct net_device *netdev,
- 	/* Invalid EEPROM_INDICATOR at offset zero will result in a failure
- 	 * to load data from EEPROM
- 	 */
--	if (ee->magic == LAN78XX_EEPROM_MAGIC)
--		ret = lan78xx_write_raw_eeprom(dev, ee->offset, ee->len, data);
--	else if ((ee->magic == LAN78XX_OTP_MAGIC) &&
--		 (ee->offset == 0) &&
--		 (ee->len == 512) &&
--		 (data[0] == OTP_INDICATOR_1))
--		ret = lan78xx_write_raw_otp(dev, ee->offset, ee->len, data);
-+	if (dev->priv_flags & LAN78XX_NET_FLAG_OTP) {
-+		/* Beware!  OTP is One Time Programming ONLY! */
-+		if (ee->magic == LAN78XX_OTP_MAGIC)
-+		    ret = lan78xx_write_raw_otp(dev, ee->offset, ee->len, data);
-+	} else {
-+		if (ee->magic == LAN78XX_EEPROM_MAGIC)
-+		    ret = lan78xx_write_raw_eeprom(dev, ee->offset, ee->len, data);
-+	}
- 
- 	usb_autopm_put_interface(dev->intf);
- 
- 	return ret;
- }
- 
-+static const char lan78xx_priv_flags_strings[][ETH_GSTRING_LEN] = {
-+	"OTP_ACCESS",
-+};
-+
- static void lan78xx_get_strings(struct net_device *netdev, u32 stringset,
- 				u8 *data)
- {
- 	if (stringset == ETH_SS_STATS)
- 		memcpy(data, lan78xx_gstrings, sizeof(lan78xx_gstrings));
-+	else if (stringset == ETH_SS_PRIV_FLAGS)
-+		memcpy(data, lan78xx_priv_flags_strings, sizeof(lan78xx_priv_flags_strings));
- }
- 
- static int lan78xx_get_sset_count(struct net_device *netdev, int sset)
- {
- 	if (sset == ETH_SS_STATS)
- 		return ARRAY_SIZE(lan78xx_gstrings);
-+	else if (sset == ETH_SS_PRIV_FLAGS)
-+		return ARRAY_SIZE(lan78xx_priv_flags_strings);
- 	else
- 		return -EOPNOTSUPP;
- }
-@@ -1617,6 +1634,22 @@ static void lan78xx_get_stats(struct net_device *netdev,
- 	mutex_unlock(&dev->stats.access_lock);
- }
- 
-+static u32 lan78xx_ethtool_get_priv_flags(struct net_device *netdev)
-+{
-+	struct lan78xx_net *dev = netdev_priv(netdev);
-+
-+	return dev->priv_flags;
-+}
-+
-+static int lan78xx_ethtool_set_priv_flags(struct net_device *netdev, u32 flags)
-+{
-+	struct lan78xx_net *dev = netdev_priv(netdev);
-+
-+	dev->priv_flags = flags;
-+
-+	return 0;
-+}
-+
- static void lan78xx_get_wol(struct net_device *netdev,
- 			    struct ethtool_wolinfo *wol)
- {
-@@ -1905,6 +1938,8 @@ static const struct ethtool_ops lan78xx_ethtool_ops = {
- 	.get_eeprom	= lan78xx_ethtool_get_eeprom,
- 	.set_eeprom	= lan78xx_ethtool_set_eeprom,
- 	.get_ethtool_stats = lan78xx_get_stats,
-+	.get_priv_flags = lan78xx_ethtool_get_priv_flags,
-+	.set_priv_flags = lan78xx_ethtool_set_priv_flags,
- 	.get_sset_count = lan78xx_get_sset_count,
- 	.get_strings	= lan78xx_get_strings,
- 	.get_wol	= lan78xx_get_wol,
--- 
-2.43.0
-
+Regards,
+Inochi
 
