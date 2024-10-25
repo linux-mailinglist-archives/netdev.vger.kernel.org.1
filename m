@@ -1,85 +1,58 @@
-Return-Path: <netdev+bounces-139082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3AF9B010F
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:19:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FDB89B014B
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34EBFB2287A
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:19:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBE7AB23E27
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032A91FCC7E;
-	Fri, 25 Oct 2024 11:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7461206971;
+	Fri, 25 Oct 2024 11:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WEcU7ct/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zz6rKB7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100191C0DF0;
-	Fri, 25 Oct 2024 11:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24C9201019
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 11:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729855156; cv=none; b=s8TcqKkio1Z9JEXLS4x8hHxMj93axLIx2V/h1nayGM54SRNtGqG1kqKaCAkcxuOHQFBkYEiybp4OfD6+KnCFBrXX6s8QZYMeRy9EybzBdiUq9DC4E6/o1Smg13qQ0KVqOMOTfu8OB2CXKGswyiLQ9VcvuFFXBQ57/UE8nvPsbXE=
+	t=1729855528; cv=none; b=csXbFTPeJMxOZYkaAgSaubTeYBBp90IF7BsA0TTBioPLTMVnlbqIcdNEq09H5uS7F5yCo7cFDQdI7oh83PbQBsA8RlRSsIMPDAX5BSG6v++gaXWqr1LiEQcI6on2vDl57oqR/J97XGqU9aOekCMj1oVEcxB+DGJ3p82ipVn4yWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729855156; c=relaxed/simple;
-	bh=vCGAignBD2aACKDs7S5GJuHf9mCuUXHCpGJFImU69cA=;
+	s=arc-20240116; t=1729855528; c=relaxed/simple;
+	bh=kKl4uyoJyO8HF7Pp2IPqDXA6zmsTZxpHVg68f+2r084=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gd58L8PE2MbBanuUSwUat+OcxQmBQK4bKN7BhI0oCDey796XUmldK7D1lRE0x0zqarfQniCfiPssEJTi8Cd0c972SP5EltS/pO0pIFK0flJvLE4sWZfFzED4AJn0bEJOJLQ5JbYrtdJlLIrybDvd7HnnERkd+s5wJo4whLISlcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WEcU7ct/; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729855154; x=1761391154;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vCGAignBD2aACKDs7S5GJuHf9mCuUXHCpGJFImU69cA=;
-  b=WEcU7ct/FIg9kA2Y7FyQYiVPdqMiOqfozi+oge87XYMl0zhUUXzOvUy6
-   a0Clyod5Ig+C+c3prbNPG+ldJ/jz+76GBUEhaFjRjCIUl1y8wCbSB+H3j
-   t8RV4E5saBsFSdWvBc1z9kmj9rblSMxDGqr0G9wy2it1AErvsRMWziBOe
-   SFIm7hTD77dKzB9GNN0Bn36485+T4/tE1YKdGKesXa0L/p8JYJdvBX7NF
-   GeN8ALVG6PGI+OzoFV32BaegtD3eQ4kRZox5XO6VEVOLmZaHjowx1IZxg
-   vz3M623lPehupCJdSxkHNpoKiv5tKzThIHH6UhIDvKOQIhpw92A5BRDdE
-   A==;
-X-CSE-ConnectionGUID: GUgupysyTuyekhI78fhiHA==
-X-CSE-MsgGUID: +AmmUj8eQYCNdsrkaBy4lw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29381352"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="29381352"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 04:19:12 -0700
-X-CSE-ConnectionGUID: Nq9Fh6YPQYKn0TJAHVXvOg==
-X-CSE-MsgGUID: 8G3UHRYvS4SIIxB3oCH72Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,231,1725346800"; 
-   d="scan'208";a="80803511"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 25 Oct 2024 04:19:00 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t4ILJ-000Y8A-2O;
-	Fri, 25 Oct 2024 11:18:57 +0000
-Date: Fri, 25 Oct 2024 19:18:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org,
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
-	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org,
-	lars@metafoo.de, ukleinek@kernel.org, alexandre.belloni@bootlin.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
-Message-ID: <202410251825.ZVzMFUSc-lkp@intel.com>
-References: <20241024085922.133071-5-tmyu0@nuvoton.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=icuSMhEginEPZ8ixRwiFknBu38w/IfVtV1WXHElVzDysEvpiEuE3ybDei/TyhKUyvsjEh7Rs0MUDgjwguheCidupiVgc4XaHD+JIFXox+9Vy5sunP4TmkQTLLqgXNBWMhSmQa5Z5IfzbKWKXJyd36wXtFMSerApj7wkKMwEtO9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zz6rKB7H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80ED4C4CEE7;
+	Fri, 25 Oct 2024 11:25:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729855527;
+	bh=kKl4uyoJyO8HF7Pp2IPqDXA6zmsTZxpHVg68f+2r084=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zz6rKB7Hquug7HmZsm2q4xGnCqSkPpUSqTYYui4K+iMJ7QzmMZ0vihvreCHhKickr
+	 1gkAW8ftVpayUT9X0eQg6U8E1G+CESxfvLCdEWqHBoy/ANTdNwiWk02374o8nM7EQB
+	 QWm1S1vXkFGjrxw7NW2u/EGaAMqDZlQhxOwCXYaghBLXMf7hF74kbM6NTln2LTitKP
+	 Al2uH+wQg3RUmDrampR6c+GZZWirjAh1Dyr0vATGBcoh9dAh6dXmjDtAmKhobCfG2f
+	 Ux3+8Z5yVgGBWBkPIUno7tykbSaQxzz9fwGHHsdInj/0LsBCuOJKe4IEF8YYRRGbDk
+	 5rflShsRZVIRA==
+Date: Fri, 25 Oct 2024 12:25:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] r8169: add support for RTL8125D
+Message-ID: <20241025112523.GO1202098@kernel.org>
+References: <d0306912-e88e-4c25-8b5d-545ae8834c0c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,37 +61,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241024085922.133071-5-tmyu0@nuvoton.com>
+In-Reply-To: <d0306912-e88e-4c25-8b5d-545ae8834c0c@gmail.com>
 
-Hi Ming,
+On Thu, Oct 24, 2024 at 10:42:33PM +0200, Heiner Kallweit wrote:
+> This adds support for new chip version RTL8125D, which can be found on
+> boards like Gigabyte X870E AORUS ELITE WIFI7. Firmware rtl8125d-1.fw
+> for this chip version is available in linux-firmware already.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-kernel test robot noticed the following build errors:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-[auto build test ERROR on lee-mfd/for-mfd-next]
-[also build test ERROR on brgl/gpio/for-next andi-shyti/i2c/i2c-host mkl-can-next/testing groeck-staging/hwmon-next jic23-iio/togreg abelloni/rtc-next linus/master lee-mfd/for-mfd-fixes v6.12-rc4 next-20241024]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+...
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Yu/mfd-Add-core-driver-for-Nuvoton-NCT6694/20241024-170528
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git for-mfd-next
-patch link:    https://lore.kernel.org/r/20241024085922.133071-5-tmyu0%40nuvoton.com
-patch subject: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
-config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20241025/202410251825.ZVzMFUSc-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241025/202410251825.ZVzMFUSc-lkp@intel.com/reproduce)
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410251825.ZVzMFUSc-lkp@intel.com/
+...
 
-All errors (new ones prefixed by >>):
+> @@ -3872,6 +3873,12 @@ static void rtl_hw_start_8125b(struct rtl8169_private *tp)
+>  	rtl_hw_start_8125_common(tp);
+>  }
+>  
+> +static void rtl_hw_start_8125d(struct rtl8169_private *tp)
+> +{
+> +	rtl_set_def_aspm_entry_latency(tp);
+> +	rtl_hw_start_8125_common(tp);
+> +}
+> +
+>  static void rtl_hw_start_8126a(struct rtl8169_private *tp)
 
->> make[6]: *** No rule to make target 'drivers/net/can/nct6604_canfd.o', needed by 'drivers/net/can/built-in.a'.
-   make[6]: Target 'drivers/net/can/' not remade because of errors.
+Maybe as a follow-up, rtl_hw_start_8125d and rtl_hw_start_8126a could
+be consolidated. They seem to be the same.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+...
 
