@@ -1,201 +1,149 @@
-Return-Path: <netdev+bounces-139010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00A99AFCB5
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:36:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 096669AFCBF
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:38:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FC761C20F20
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:36:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368CA1C210F9
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF3A1D2215;
-	Fri, 25 Oct 2024 08:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3231A1D27A4;
+	Fri, 25 Oct 2024 08:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGYJQPBg"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC5E18C029
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 08:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2CA1D1E92
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 08:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729845380; cv=none; b=C5Rc5O6Ox5HYpczmQfAIWZlqvblRg153M8UTYdB6vYGj+Sch1pwyR9PUbLcOX28cdFI/kXxmnRDzwaCl/ICgTzG7w+6SvGZuNykj3MEIKORlcL6TiX8E+WrbeLR4mZY0ZDl72rxWoQjbHNB7jCEQDQMPHcN9qWSWMw8ap/0HaJQ=
+	t=1729845483; cv=none; b=WhIJKkwp244R3tF7gIZEXkdRtujil1G+mRht6TIyuwAGbBVcbXv/niOtra6X69GrJAXuqO+JffZVqht6XByblNycsRkiMuFkn1Ee1ACeuUK3klBoRdoMjMtCDJa+HCfW7JRikobvH+6q7hP+BGRejOwZ86nH2to080P+GlCkNa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729845380; c=relaxed/simple;
-	bh=rDNzoAVAQ7d9KvhiOmytKGL5nTR62o+4UNsL3k6X9+c=;
+	s=arc-20240116; t=1729845483; c=relaxed/simple;
+	bh=nVtFuA3MUXFT6qe5Nc+wclnoMmIuimggNWMscKvWImo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IkOj7URAu9IHcvsL19drjoXpOaMhuofbeyjDIeAgyEfDOZjUHO0Q/TrV1WuFUjY68i3axWC6Na+sdKoVDWyz+MO2LgaCEidS0jy2KPzLKUefSl47qL6B7En8cRscwoo9Dq8PoKv2wLq6/uY1RoZv0rTtDBo1x8HI/prbcHqRwj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t4FnF-0007rX-1Y; Fri, 25 Oct 2024 10:35:37 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t4FnE-000Kpw-1k;
-	Fri, 25 Oct 2024 10:35:36 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 1313335E80B;
-	Fri, 25 Oct 2024 08:35:36 +0000 (UTC)
-Date: Fri, 25 Oct 2024 10:35:35 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20241025-sexy-fanatic-snail-a1d2e7-mkl@pengutronix.de>
-References: <20241024085922.133071-1-tmyu0@nuvoton.com>
- <20241024085922.133071-2-tmyu0@nuvoton.com>
- <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
- <20241024-pumpkin-parrot-of-excellence-299c57-mkl@pengutronix.de>
- <CAOoeyxXX2fpHVJ8urLmy+pBjH1aRdYu6qrtwOmwUxTUyQq30DA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oARKJ4Mg2At7G+GkRt1Jtu0aGAXlSJe7FB5zYGXJ/KHIzeN+fu5YtFvOtRU4H2kPmTjXUKmgQkFwMgJpH6zYDu4jyyUpG9rH1sL5M8vywGB6zjU62LX85TuayaF34xsSbJYyFdOd3Hnqqje/+ijhusC3bYOVdF+JN8zGoPcv6Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGYJQPBg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729845478;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CfG+ldbRT2DRgi42SLD4cz1ZUxMhmfDg3K241hmjPrM=;
+	b=YGYJQPBgSea4wTDCfDPiddN9wWnUhya7tMEO2oBv0TSNCXXh7gBf+SxHcDmnZa2sUX7lNv
+	bQxmluH1NcBu7nvBROTApQo9CLiqypwSIwSd22ir4rOf1Vl4m4Ee50FzKuMsZeIxhpbsMI
+	bqo/O2UMvAMBiarnzPCzYNPh35lu70c=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-620-GeFN8YJcPu6dLbjSUO50hg-1; Fri, 25 Oct 2024 04:37:57 -0400
+X-MC-Unique: GeFN8YJcPu6dLbjSUO50hg-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b15c3ad7ceso223196585a.2
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 01:37:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729845477; x=1730450277;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CfG+ldbRT2DRgi42SLD4cz1ZUxMhmfDg3K241hmjPrM=;
+        b=pBHDt02ceYeDPorFzxj+mcFWAJQaKFkAeIgU9pI/ynb/T1QkO0O+t4NTYmotOP0K8C
+         FbPb3zAGkqgFFj9iJhieEW+P2MEFXcr4FA27mvqZ9gwr1qdOVkVf7lxalEvG6dAJ0mPh
+         hRGVwOmjInvNSIjt856TMNcRySx2fGQgcvU0CcDdIVBeAjEWWRafD7QBU8EUxBmXAUv3
+         lpIxv/98tRpAYqVV5PRZD4MHQqWm+BRxI3HsksjSPMGeaoe66jhC/gPONiRNWp3n0bmO
+         vPVPap+hte7aEUVhwSEWXntrJu9fgX1CrfCKapXfUjR+nOvg0WIGr6imy5t3oqfQMH3N
+         NLSg==
+X-Forwarded-Encrypted: i=1; AJvYcCVzip/3SpYvJK63Qygiht+RlwaDiy4zEJundtU0qWVaoE2bH842Zj++qpFc9Ie7HdrMEmw8vaM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxaSBa/HnHiqg4sZCOTbaOm2ZaPNXnAu17iEtc8zfnd1T+L/CS
+	wP7UtVVuF47bHzfuaH7Mvh7kfcyo9naTlQurG988MR5P21/TFdg0c+RO25ojdhbUxl5r08TUjo4
+	5/NbbJ03Wn+yNyjAD7QzH0V3A8tiEzFexHPhxHsgfwiGRzCDFTocdaA==
+X-Received: by 2002:a05:620a:1aa8:b0:79f:148:d834 with SMTP id af79cd13be357-7b186d0b94cmr614541485a.59.1729845476847;
+        Fri, 25 Oct 2024 01:37:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEuQEjcQhlSNMj30aQpJXJBOGKeqEjdKKGecMohH0UZa9AyzJnLZNXjh+x9iFwZinN8LX18HA==
+X-Received: by 2002:a05:620a:1aa8:b0:79f:148:d834 with SMTP id af79cd13be357-7b186d0b94cmr614539785a.59.1729845476495;
+        Fri, 25 Oct 2024 01:37:56 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d179a57d4csm3713716d6.132.2024.10.25.01.37.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 01:37:55 -0700 (PDT)
+Date: Fri, 25 Oct 2024 10:37:49 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+Subject: Re: [PATCH v2] vsock/test: fix failures due to wrong SO_RCVLOWAT
+ parameter
+Message-ID: <pdgrhpta6qqwa7r6zexqikcybkllootq7qwbe36i5uf3fpbavb@v4vyiclg2cis>
+References: <20241024161058.435469-1-kshk@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7vgtm2p2hvbpfjse"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <CAOoeyxXX2fpHVJ8urLmy+pBjH1aRdYu6qrtwOmwUxTUyQq30DA@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241024161058.435469-1-kshk@linux.ibm.com>
 
+On Thu, Oct 24, 2024 at 11:10:58AM -0500, Konstantin Shkolnyy wrote:
+>This happens on 64-bit big-endian machines.
+>SO_RCVLOWAT requires an int parameter. However, instead of int, the test
+>uses unsigned long in one place and size_t in another. Both are 8 bytes
+>long on 64-bit machines. The kernel, having received the 8 bytes, doesn't
+>test for the exact size of the parameter, it only cares that it's >=
+>sizeof(int), and casts the 4 lower-addressed bytes to an int, which, on
+>a big-endian machine, contains 0. 0 doesn't trigger an error, SO_RCVLOWAT
+>returns with success and the socket stays with the default SO_RCVLOWAT = 1,
+>which results in test failures.
+>
+>Fixes: b1346338fbae ("vsock_test: POLLIN + SO_RCVLOWAT test")
+>Fixes: 542e893fbadc ("vsock/test: two tests to check credit update logic")
+>Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+>---
+>
+>Notes:
+>    The problem was found on s390 (big endian), while x86-64 didn't show it. After this fix, all tests pass on s390.
+>Changes for v2:
+>- add "Fixes:" lines to the commit message
 
---7vgtm2p2hvbpfjse
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-MIME-Version: 1.0
+LGTM!
 
-On 25.10.2024 16:14:03, Ming Yu wrote:
-> Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=88=
-24=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:34=E5=AF=AB=E9=81=93=EF=
-=BC=9A
-> >
-> > On 24.10.2024 17:20:57, Marc Kleine-Budde wrote:
-> >
-> > [...]
-> >
-> > > > +   nct6694->cmd_buffer =3D devm_kcalloc(dev, CMD_PACKET_SZ,
-> > > > +                                      sizeof(unsigned char), GFP_K=
-ERNEL);
-> > > > +   if (!nct6694->cmd_buffer)
-> > > > +           return -ENOMEM;
-> > > > +   nct6694->rx_buffer =3D devm_kcalloc(dev, MAX_PACKET_SZ,
-> > > > +                                     sizeof(unsigned char), GFP_KE=
-RNEL);
-> > > > +   if (!nct6694->rx_buffer)
-> > > > +           return -ENOMEM;
-> > > > +   nct6694->tx_buffer =3D devm_kcalloc(dev, MAX_PACKET_SZ,
-> > > > +                                     sizeof(unsigned char), GFP_KE=
-RNEL);
-> > > > +   if (!nct6694->tx_buffer)
-> > > > +           return -ENOMEM;
-> > > > +   nct6694->int_buffer =3D devm_kcalloc(dev, MAX_PACKET_SZ,
-> > > > +                                      sizeof(unsigned char), GFP_K=
-ERNEL);
-> > > > +   if (!nct6694->int_buffer)
-> > > > +           return -ENOMEM;
-> > > > +
-> > > > +   nct6694->int_in_urb =3D usb_alloc_urb(0, GFP_KERNEL);
-> > > > +   if (!nct6694->int_in_urb) {
-> > > > +           dev_err(&udev->dev, "Failed to allocate INT-in urb!\n");
-> > > > +           return -ENOMEM;
-> > > > +   }
-> > > > +
-> > > > +   /* Bulk pipe maximum packet for each transaction */
-> > > > +   bulk_pipe =3D usb_sndbulkpipe(udev, BULK_OUT_ENDPOINT);
-> > > > +   nct6694->maxp =3D usb_maxpacket(udev, bulk_pipe);
-> > > > +
-> > > > +   mutex_init(&nct6694->access_lock);
-> > > > +   nct6694->udev =3D udev;
-> > > > +   nct6694->timeout =3D URB_TIMEOUT; /* Wait until urb complete */
-> > > > +
-> > > > +   INIT_LIST_HEAD(&nct6694->handler_list);
-> > > > +   spin_lock_init(&nct6694->lock);
-> > > > +
-> > > > +   usb_fill_int_urb(nct6694->int_in_urb, udev, pipe,
-> > > > +                    nct6694->int_buffer, maxp, usb_int_callback,
-> > > > +                    nct6694, int_endpoint->bInterval);
-> > > > +   ret =3D usb_submit_urb(nct6694->int_in_urb, GFP_KERNEL);
-> > > > +   if (ret)
-> > > > +           goto err_urb;
-> > > > +
-> > > > +   dev_set_drvdata(&udev->dev, nct6694);
-> > > > +   usb_set_intfdata(iface, nct6694);
-> > > > +
-> > > > +   ret =3D mfd_add_hotplug_devices(&udev->dev, nct6694_dev,
-> > > > +                                 ARRAY_SIZE(nct6694_dev));
-> > > > +   if (ret) {
-> > > > +           dev_err(&udev->dev, "Failed to add mfd's child device\n=
-");
-> > > > +           goto err_mfd;
-> > > > +   }
-> > > > +
-> > > > +   nct6694->async_workqueue =3D alloc_ordered_workqueue("asyn_work=
-queue", 0);
-> > >
-> > > Where is the async_workqueue used?
-> >
-> > Sorry - it's used in the driver, which live in separate directories -
-> > you can ignore this comment.
-> >
-> > But then the question comes up, it looks racy to _first_ add the devices
-> > and _then_ the workqueue.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-> Excuse me, I'm a bit confused. Is there anything I need to
-> improve on?
+>
+> tools/testing/vsock/vsock_test.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 8d38dbf8f41f..7fd25b814b4b 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -835,7 +835,7 @@ static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
+>
+> static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
+> {
+>-	unsigned long lowat_val = RCVLOWAT_BUF_SIZE;
+>+	int lowat_val = RCVLOWAT_BUF_SIZE;
+> 	char buf[RCVLOWAT_BUF_SIZE];
+> 	struct pollfd fds;
+> 	short poll_flags;
+>@@ -1357,7 +1357,7 @@ static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opt
+> static void test_stream_credit_update_test(const struct test_opts *opts,
+> 					   bool low_rx_bytes_test)
+> {
+>-	size_t recv_buf_size;
+>+	int recv_buf_size;
+> 	struct pollfd fds;
+> 	size_t buf_size;
+> 	void *buf;
+>-- 
+>2.34.1
+>
 
-It looks racy to _first_ add the devices and _then_ the workqueue.
-
-So the obvious solution is to allocate the worklist first and then add
-the devices.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---7vgtm2p2hvbpfjse
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcbWFQACgkQKDiiPnot
-vG8m/Qf+LrYDKh2wc2OiqqbICoYJhzy3dfrepHuhn4A2ce4XC6Go2FCD3qi85XhM
-j4ekvJKYU8XLtLWOHSxPp0nmsWXXHZnIc5sYSon9aTFaAdwmhxtUhsF32XYK71iz
-OlLLWNUHqPXhjzU5SBvALysRP7Hmz1wIe+mqTDX3wHS/P51Xxr4h/hEbHs0OeBUa
-EttXTFIg9Lkn69Jg9EReMhgXZOhotZ5GpBx/ZXVt89nDUKczGH8ywHy3wX6a4TFD
-fHTDr0qHcO/2x9ZzMKwGo8M4vxtp7yoTY9zlD4X+sMBXcYb7/OL7Hdpz/wCBzP+r
-GrgqFlm+xuN9eH3oha9j8maht2HgDg==
-=1/zE
------END PGP SIGNATURE-----
-
---7vgtm2p2hvbpfjse--
 
