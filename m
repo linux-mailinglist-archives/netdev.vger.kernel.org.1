@@ -1,114 +1,205 @@
-Return-Path: <netdev+bounces-139194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 227D09B0E07
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:10:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7A19B0EEC
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE48F1F25B66
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 19:10:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01BFDB2839A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 19:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1596720EA3E;
-	Fri, 25 Oct 2024 19:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DFF20EA4F;
+	Fri, 25 Oct 2024 19:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBX+aYAx"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="epMUddw4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C1D18D62A;
-	Fri, 25 Oct 2024 19:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B8520EA42
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 19:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729883436; cv=none; b=tlRm3AcQKpmL+2H4nUAuu9Olx0FymS9I3vVV+vuwFpNOC4+arrUKYtAazl81yNaAWmeJFYqNIEEKp2U8d1Mp96pdAo3i9NJ36hOtySEUFSYMK/1hRoX06AH8HljBNSvO0xUbYET+JZ8CQtnE/ylbDz6TZm/zHUat6BUpmXm4TvU=
+	t=1729884278; cv=none; b=LBrxS1OycClcVLU4JC4D8H9c2BkYK+eV+cMHAK7IQpC0qDSPfg60hkZR9vijvh+TelvlIjjc2LhIDdjjwAP543zwEcJP6Ju4puRGgNcY1SCZ0uQnQVVj+27WkBtMskTgx+FEyacl9NqhdJ29zFn9w5Tj/NG7Zrkam8FiJoP74Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729883436; c=relaxed/simple;
-	bh=ZBt5OhE51PYgb5zT1r6cA5t4S9z8syCutBGZSs4TQsY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dwsp6RJN0jc5NFG9jrzhPHwnRaUuRoS1UvaWvDLCzm4tUNM2uefjU/F8cmu2kDM6TpAE55QtqQ7zrFAJuTC9349IshHrUJ3/q5uUd/GVnwn6FF25ghk7Z+XAGrUh6TqaF5+dna9BgWz//UiqLzp9QM93af+pgT5+M3B8CIim3OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBX+aYAx; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539eb97f26aso2560574e87.2;
-        Fri, 25 Oct 2024 12:10:33 -0700 (PDT)
+	s=arc-20240116; t=1729884278; c=relaxed/simple;
+	bh=bebSZsoN40PwcYn49PXuYyxLVWUXlVwMcDX1wxDufWI=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZHH5nckBbhqJl8zTeWE73LLu8Kv5hdkjwr+pwLCnV3j3m+o2rhm6IVcav9SZ15oC34602ZNZcgJLXXajJser3XbqsLK/8FHpYpVnaKcLSI2hMyTdvgDyalLLURNUSzb1b4BgtUmZRHVddwh3qRES6K13lfZD3CmAorALPm/1EiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=epMUddw4; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20ce65c8e13so19314075ad.1
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 12:24:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729883432; x=1730488232; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VESagVfD3e5GDgh2PnVD1fegOORhBmcVPa9A/q/1cMU=;
-        b=IBX+aYAxRtSpiB5CJ+V+JlOfaAXwFT89i9KrxRDUTIGnBc16M1sfxCptqCq435Ds/f
-         4vJflyh0aeLe1/dffKPPPZFFJwr6Ylx83wLUHZInXbFMtbPF6STsJ5BbXXl0YZsUfj21
-         IH9ekrwe7WPYAwK7UgraTIGlPb61dQdPDwSRGwdRnItlg+fnxQB9Tti0wF32pSZkzxBi
-         gHMskB90lxQVYncO9FhMzcxBpN5AMnOMWaTp9rL32qwhjgbZ/iQR7sI1s4knidkiSlv/
-         wVXigG3GhFR+UCIe67mHTQbit0NdkxNomR6p+9gMg+WBSz2N70jbqDtfEMcES0AhSuT3
-         Ci8g==
+        d=broadcom.com; s=google; t=1729884275; x=1730489075; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Cz47o9yzNW0KvGOU6xsQutyz7avw4CsPNbkPxVqTrbU=;
+        b=epMUddw4jB4RHdz1r0hDB40zAHeMh4dP8UqZdOP6aBXiDDrlZB0mEqNUhaNZVDeLbv
+         Vw5fzK/Is8VbgpVAnIcPjN+h4vPW5ULBYisrkpIVqSuVLznNaEUSacsMo6v7WxyBvnGn
+         JYP6NXOYrTAar+ZR8dbLNAnYnma6wKTx2pVV4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729883432; x=1730488232;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1729884275; x=1730489075;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VESagVfD3e5GDgh2PnVD1fegOORhBmcVPa9A/q/1cMU=;
-        b=bR+FLmovm1/1Qk9tkqjT1GIxy4ordgmjZ8MjtI8oBZ8WbX9/mYNhaYHDhkklNGmccs
-         H/zLKWAXSxT82Xz3wPzNcVinXrZz1dGG8cU7Mydb2JHYX/SqY3tHCLXCgl/ZmeW/le+S
-         ayVsAFf8qgghIaWOa+HHoIQuQB/cqmwZjOsB9gcDMDU9kKGXkQiSHEkrtztShiKxJ/iI
-         vRVIzUZL+Zw5WP3xVdMKZ5i680xrkxuzn4ovmfpUdvDZlugQgOPkJk9WEyh1WLJ2/+/O
-         MtEBNtNwg/DGGwdJBN+6jZWd2g50U21fLyP8+ONMmSto7vzpqur4gEpGDlviyxTdTynx
-         h5HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNSdcwSXPJX5yPUBtEI/2FbI2sNFDcCYLJgYtd+c+N6CV4KkCuzTEh5eH4t9TcUIvFaDapjEf7+PbxrwBTGYcw1d8=@vger.kernel.org, AJvYcCXtdzaIs8i9vgV3PDLMdPEJFoDFKy5U3qi0AzI9aXBOB/3SO3az0PBpuhzKFqn8hdWKc8v/o2IRgq/R@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOFJaq2n33E94m0Zumn3UqglqA0mcM/vn+QDBKjSYfq+760NEF
-	zb++WW9x39ur/8M0NtnMpeeRsCPwkVNeyuq4LNUjBTR9SgRA2jWQ
-X-Google-Smtp-Source: AGHT+IHap190jsggvy1J+9MTsqxB5rsoXSP5ESWXdf9T85K+rXQG2pkpj+TJ/2oeNxF4olOlZ6yCuQ==
-X-Received: by 2002:a05:6512:308d:b0:539:f8cb:f5e3 with SMTP id 2adb3069b0e04-53b34a31bf7mr151438e87.48.1729883431775;
-        Fri, 25 Oct 2024 12:10:31 -0700 (PDT)
-Received: from ?IPV6:2a00:1fa0:421a:f26e:c952:2dc6:8a58:f996? ([2a00:1fa0:421a:f26e:c952:2dc6:8a58:f996])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53b2e10c0casm276122e87.51.2024.10.25.12.10.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2024 12:10:31 -0700 (PDT)
-Message-ID: <b4cf024a-43e4-4c9a-b645-b07137add0d4@gmail.com>
-Date: Fri, 25 Oct 2024 22:10:27 +0300
+        bh=Cz47o9yzNW0KvGOU6xsQutyz7avw4CsPNbkPxVqTrbU=;
+        b=LV9ncqyB1fb2GUZ5Rwig9FnG712pdRnkwI19cSBQZoy3ZWq64E/srJjdZDMSS9zNtb
+         9V4t0MsDQG6GggfJjg/XVdlgh8DkkihGgKOrGrkfCsf8VXROniOWfODR4ro1CMzeK/9V
+         OK25tRNJXWhH5cgjAnYoJ6j1clO18JPFFKepcM5Ur/+K1qFnm+TCAVc9U+pLRRyMkRQd
+         YnolkxE08+eYaR1IBJU6a42Fqc9UlY/su2DdIz++YSxqoHyKrlPYLeSwzAAqFINVbl/F
+         bviWpvDHaUQUqHzYwwOMgXsOKCLYSLdQ1hCVc3lq1XtpVr/6vDzUaINE4ZYSK07ZWQf4
+         rmtA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTUG2VmavO4T2EgIsU2loE30M2DGvzMlhVkkEWiRP7wDg+8rWsxpcOU2GDuN8UxIFC1Hew0jY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPesFh9H8Im681xd0M3iICH2Y5ts8sLkLcM7uvnKe61SymqeNG
+	S5t+D7TgBbhzcdeTOvvvsBxtcjeDSsR3V4jkXDHMd9PN9D2obWzw2T71oxssJQ==
+X-Google-Smtp-Source: AGHT+IF/pmHhfEwM1uFHYfAiRvfzD/X8MP05OgiVn+yw7RgVB/ZPqi/aoEMZjtwkKW/IJ57B7SH7Yg==
+X-Received: by 2002:a17:903:2b06:b0:20c:5ba1:e8e5 with SMTP id d9443c01a7336-210c6c16f09mr2760435ad.19.1729884275414;
+        Fri, 25 Oct 2024 12:24:35 -0700 (PDT)
+Received: from JRM7P7Q02P.dhcp.broadcom.net ([192.19.144.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf6df8csm12785615ad.99.2024.10.25.12.24.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 12:24:34 -0700 (PDT)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+Date: Fri, 25 Oct 2024 15:24:22 -0400
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com,
+	donald.hunter@gmail.com, corbet@lwn.net, andrew+netdev@lunn.ch,
+	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org,
+	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk,
+	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
+	danieller@nvidia.com, hengqi@linux.alibaba.com,
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
+	hkallweit1@gmail.com, ahmed.zaki@intel.com, rrameshbabu@nvidia.com,
+	idosch@nvidia.com, jiri@resnulli.us, bigeasy@linutronix.de,
+	lorenzo@kernel.org, jdamato@fastly.com,
+	aleksander.lobakin@intel.com, kaiyuanz@google.com,
+	willemb@google.com, daniel.zahka@gmail.com,
+	Andrew Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next v4 2/8] bnxt_en: add support for tcp-data-split
+ ethtool command
+Message-ID: <ZxvwZmJsdFOStYcV@JRM7P7Q02P.dhcp.broadcom.net>
+References: <20241022162359.2713094-1-ap420073@gmail.com>
+ <20241022162359.2713094-3-ap420073@gmail.com>
+ <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: renesas,ether: Add iommus property
-To: Geert Uytterhoeven <geert+renesas@glider.be>,
- Paul Barker <paul.barker.ct@bp.renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <2ca890323477a21c22e13f6a1328288f4ee816f9.1729868894.git.geert+renesas@glider.be>
-Content-Language: en-US
-From: Sergei Shtylyov <sergei.shtylyov@gmail.com>
-In-Reply-To: <2ca890323477a21c22e13f6a1328288f4ee816f9.1729868894.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
 
-On 10/25/24 6:12 PM, Geert Uytterhoeven wrote:
-
-> make dtbs_check:
+On Thu, Oct 24, 2024 at 10:02:30PM -0700, Michael Chan wrote:
+> On Tue, Oct 22, 2024 at 9:24 AM Taehee Yoo <ap420073@gmail.com> wrote:
+> >
+> > NICs that uses bnxt_en driver supports tcp-data-split feature by the
+> > name of HDS(header-data-split).
+> > But there is no implementation for the HDS to enable or disable by
+> > ethtool.
+> > Only getting the current HDS status is implemented and The HDS is just
+> > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled.
+> > The hds_threshold follows rx-copybreak value. and it was unchangeable.
+> >
+> > This implements `ethtool -G <interface name> tcp-data-split <value>`
+> > command option.
+> > The value can be <on>, <off>, and <auto> but the <auto> will be
+> > automatically changed to <on>.
+> >
+> > HDS feature relies on the aggregation ring.
+> > So, if HDS is enabled, the bnxt_en driver initializes the aggregation
+> > ring.
+> > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
+> >
+> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >
+> > v4:
+> >  - Do not support disable tcp-data-split.
+> >  - Add Test tag from Stanislav.
+> >
+> > v3:
+> >  - No changes.
+> >
+> > v2:
+> >  - Do not set hds_threshold to 0.
+> >
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  8 +++-----
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  5 +++--
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++++++++
+> >  3 files changed, 19 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > index 0f5fe9ba691d..91ea42ff9b17 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 > 
->     arch/arm64/boot/dts/renesas/r8a77980-condor.dtb: ethernet@e7400000: 'iommus' does not match any of the regexes: '@[0-9a-f]$', 'pinctrl-[0-9]+'
-> 	    from schema $id: http://devicetree.org/schemas/net/renesas,ether.yaml#
+> > @@ -6420,15 +6420,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
+> >
+> >         req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
+> >         req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
+> > +       req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
+> >
+> > -       if (BNXT_RX_PAGE_MODE(bp)) {
+> > -               req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
 > 
-> Ethernet Controllers on R-Car Gen2/Gen3 SoCs can make use of the IOMMU,
-> so add the missing iommus property.
+> Please explain why this "if" condition is removed.
+> BNXT_RX_PAGE_MODE() means that we are in XDP mode and we currently
+> don't support HDS in XDP mode.  Added Andy Gospo to CC so he can also
+> comment.
 > 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Reviewed-by: Sergei Shtylyov <sergei.shtylyov@gmail.com>
+In bnxt_set_rx_skb_mode we set BNXT_FLAG_RX_PAGE_MODE and clear
+BNXT_FLAG_AGG_RINGS, so this should work.  The only issue is that we
+have spots in the driver where we check BNXT_RX_PAGE_MODE(bp) to
+indicate that XDP single-buffer mode is enabled on the device.
 
-[...]
+If you need to respin this series I would prefer that the change is like
+below to key off the page mode being disabled and BNXT_FLAG_AGG_RINGS
+being enabled to setup HDS.  This will serve as a reminder that this is
+for XDP.
 
-MBR, Sergey
+@@ -6418,15 +6418,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
+ 
+        req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
+        req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
++       req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
+ 
+-       if (BNXT_RX_PAGE_MODE(bp)) {
+-               req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
+-       } else {
++       if (!BNXT_RX_PAGE_MODE(bp) && (bp->flags & BNXT_FLAG_AGG_RINGS)) {
+                req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
+                                          VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
+                req->enables |=
+                        cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
+-               req->jumbo_thresh = cpu_to_le16(bp->rx_copy_thresh);
+                req->hds_threshold = cpu_to_le16(bp->rx_copy_thresh);
+        }
+        req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
+
+> > -       } else {
+> > +       if (bp->flags & BNXT_FLAG_AGG_RINGS) {
+> >                 req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
+> >                                           VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
+> >                 req->enables |=
+> >                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
+> > -               req->jumbo_thresh = cpu_to_le16(bp->rx_copybreak);
+> >                 req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
+> >         }
+> >         req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
+
 
 
