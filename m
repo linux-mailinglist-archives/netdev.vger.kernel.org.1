@@ -1,60 +1,75 @@
-Return-Path: <netdev+bounces-139084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72BEA9B0161
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:33:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 755529B018A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C5AF28407D
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:33:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F1651C2177A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1DE1FBF56;
-	Fri, 25 Oct 2024 11:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB332003BC;
+	Fri, 25 Oct 2024 11:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="gEf/7YW1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWLGquna"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A161B6CF8;
-	Fri, 25 Oct 2024 11:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8741D63D9
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 11:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729855975; cv=none; b=Hau5IKd4sPl3FEhGasU/nm8h9r2sFRk8cZQ2MDpSTZCp6P/uyrSYughLfD7Z3bZTf9DnoH/w6bcpzOjeHYJ4QFlyNqoCd5nO1N1h4BgmIDTKjDeknouSgNPI+4qF12BpXJ1+VR1vGloWMvUP2J/+g5KeDPsUjSu8IwnhrECirp4=
+	t=1729856693; cv=none; b=kE8YDxF6vrmCp56ij0SEWrAcg0qGwom70w+pCIf1cNWp51ukTHXixyG8sSfHjFxM/mSHOHhxnK9SJsXnvlExGr4jNZwebbUuEkII2vQ0YT4DsOcLOcZ6ahnWc6A3zFcaJ8tcmvyd2M5Qu3RaF24sP86OyQqS8tn87IWDGvQiFlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729855975; c=relaxed/simple;
-	bh=VtPLEbtgon+H4BAIG6FO0Ip2f0PyVl5P55NY3NhKkm8=;
+	s=arc-20240116; t=1729856693; c=relaxed/simple;
+	bh=srgs50XnqZYWWUNRfL26dBWpda4HZdTN4BLsbObLcX0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eGyFgb36frvC1/ufJHgGkVSLn/FUdJlDsn0F+pOu//JhqRZa703XLmgIYzAhlqV6Oh90hoGMvzf/g637mQDtV1CWYLjt/lNqKDL0d8Fwuvz0kpjJw6z5Q5F+VlrkBUw1pCZgJ1mXFFLOkd726dxcotEL+scCJ87hck7SJHFJRrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=gEf/7YW1; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=Ou8Xa/I0YBpA5T56l1O7WY5r2Zh0QPkuOkUMaRnLN1o=; b=gEf/7YW1rhhxsG10DvPAbrRuty
-	FPjfpgB/vTcJHUncG8OQJRctjeiOkD4n5+j4I0t9RazVZgBt65/Wd7FI2+qzxePkbaamQd/AVOjL9
-	NYX6GZSip3akvpYROQGi0U62jFkLfh3WMqAmE0PtEaVvlFRyrHHkWkcqQqodpR8+BqAZpsIneDI52
-	L5WsluJnCpcz7MweTb5mWO6ybw2wIi44aheoPq9g4RnZUGY6QqQtKnW52iV+wUFjRAIXs4D0x+f30
-	9WveP7ZklrblRRMas3RGofwtonmxg7EUQsrYiuoxzsnwSQGsY67aSQQd2s/2yNfSa7rGfugh5FvBc
-	lK99fQZQ==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1t4IYW-0001FB-AX; Fri, 25 Oct 2024 13:32:36 +0200
-Received: from [85.1.206.226] (helo=[192.168.1.114])
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1t4IYU-000HsF-1h;
-	Fri, 25 Oct 2024 13:32:34 +0200
-Message-ID: <b9cdfee5-0df3-45c1-ac83-123c7b6c2955@iogearbox.net>
-Date: Fri, 25 Oct 2024 13:32:33 +0200
+	 In-Reply-To:Content-Type; b=Gke37WXXPqrWHgYtMNZBVsRAFoInP9bmpTfXuMKJ4rXbx0WXEDWhgtq0hyYhKmAF22GZtyc43QnaSaY5nHXVcJPoOS/zNhVPcvnNsBeoZ0WsFHPzSekyto529og+8sHzBXcVCIFLJwNinu3+FsQwvo+zKhKhopWCyprykH59wrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWLGquna; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c9634c9160so2135384a12.2
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 04:44:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729856690; x=1730461490; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1WUJzfvBrno81gBu1O0r584+CRLMwbBR7QqJCfZBJm8=;
+        b=OWLGqunaAHizR9e+iUEsDtotdps8xgu+2zLOpA4qrtYgmWFILj2NpTm9pBCg20bB5J
+         QLfASAnJCYXO9w1AAeZ8h5/hdqH5VyoNhKoTtTYc8vZas7U31KsbaaLPCS6YiGUBdeqE
+         dmePJw4or/FAwHhMpVusbVJvS+RpjsznQ70qaS3dQlrtHm1sKVEAFmLCnGF/OR/kUGqO
+         ru+SpXUGuPgWVKajZfDDJ1b2gzUKeywBtE0fwg1yFjDKwo5r9BJrb5QQp7zyed2Cordm
+         eFI6evUWx6ylDZY56/BZ77ogmgvAZEOyECumedsr8YXxB7O6v2I/BuakI364+2XRmpQb
+         vwLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729856690; x=1730461490;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1WUJzfvBrno81gBu1O0r584+CRLMwbBR7QqJCfZBJm8=;
+        b=riNBB3/K4o80L2oHphjcxc4RYEe4q62pl52hIzH0tVKXv8rmhM7JyMwjdYBGGtY/bX
+         h1/1y/AynsFFnYLfA/+PcJLgS8jALr5eKfoOUk/T/p20ISF0RU7wD6dZuW4QInhpIgtQ
+         Zx8Tt0eYlgQSQt5/gc3/b8MzI7RbJ1eT1GZ6rXJU5MfFdFrFsFdSfDYoLkk5mAwEU7ir
+         i6J6TMUl3Dp5xk620uq0T7phOtXWg2LXGNjADIp8y5ULTXf62lUF5hXPMSGuVHoIwXDS
+         a7ptaO4L6BWlbd7KKSupFpStGZvQI73x7H2q5bmmBsdDMPeEF2y8xAwOau6ZIxN2DJcV
+         Od1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUxiXC3BJ0Pw0Bbg2Pe11ZJlsNzix9tgCgzCGyBijZ0o0qil112+5TfcSVWYHB0Tf98CwzlW5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxmqu10fQgTss29KIEsY4whGV/ANgUUYzqKb6I9z5CoDTznxknD
+	P3xZt4UfuqkNOFVpAeiV90zq07vzoCtpdF1MrgtUiL3rUvGcZNxc
+X-Google-Smtp-Source: AGHT+IHsDqQbZXxZTwKfNZ0bHe1TO6kbV+eZDO9JqbwNtGjgOeUGZqqNy8VWvMcHEhsyhtyp6pEIPQ==
+X-Received: by 2002:a05:6402:34d3:b0:5c9:3026:cf85 with SMTP id 4fb4d7f45d1cf-5cba2492e8emr5412704a12.22.1729856689914;
+        Fri, 25 Oct 2024 04:44:49 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:ae16:8800:adb6:8043:f935:3540? (dynamic-2a02-3100-ae16-8800-adb6-8043-f935-3540.310.pool.telefonica.de. [2a02:3100:ae16:8800:adb6:8043:f935:3540])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb6349806sm538476a12.95.2024.10.25.04.44.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Oct 2024 04:44:49 -0700 (PDT)
+Message-ID: <9fece96e-9a38-4b97-93d9-885a5d8800cc@gmail.com>
+Date: Fri, 25 Oct 2024 13:44:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,126 +77,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 2/4] bpf: bpf_csum_diff: optimize and
- homogenize for all archs
-To: Puranjay Mohan <puranjay@kernel.org>, kernel test robot <lkp@intel.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexei Starovoitov <ast@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eduard Zingerman
- <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Hao Luo <haoluo@google.com>, Helge Deller <deller@gmx.de>,
- Jakub Kicinski <kuba@kernel.org>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, linux-kernel@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
- Martin KaFai Lau <martin.lau@linux.dev>, Mykola Lysenko <mykolal@fb.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Shuah Khan <skhan@linuxfoundation.org>, Song Liu <song@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>
-Cc: oe-kbuild-all@lists.linux.dev,
- Linux Memory Management List <linux-mm@kvack.org>, netdev@vger.kernel.org
-References: <20241023153922.86909-3-puranjay@kernel.org>
- <202410251552.LR73LP4V-lkp@intel.com> <mb61po738bigw.fsf@kernel.org>
+Subject: Re: [PATCH net-next] r8169: add support for RTL8125D
+To: Simon Horman <horms@kernel.org>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <d0306912-e88e-4c25-8b5d-545ae8834c0c@gmail.com>
+ <20241025112523.GO1202098@kernel.org>
 Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <mb61po738bigw.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20241025112523.GO1202098@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27438/Fri Oct 25 10:32:52 2024)
 
-On 10/25/24 12:11 PM, Puranjay Mohan wrote:
-[...]
-> This file has a lot of such sparse warnings. Specifically, to fix the
-> warning introduced by me, I can apply the following diff:
+On 25.10.2024 13:25, Simon Horman wrote:
+> On Thu, Oct 24, 2024 at 10:42:33PM +0200, Heiner Kallweit wrote:
+>> This adds support for new chip version RTL8125D, which can be found on
+>> boards like Gigabyte X870E AORUS ELITE WIFI7. Firmware rtl8125d-1.fw
+>> for this chip version is available in linux-firmware already.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
-> --- >8 ---
+> Reviewed-by: Simon Horman <horms@kernel.org>
 > 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index e00bec7de9ed..b94037f29b2a 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -2019,16 +2019,18 @@ BPF_CALL_5(bpf_csum_diff, __be32 *, from, u32, from_size,
->           * Even for diffing, from_size and to_size don't need to be equal.
->           */
+> ...
 > 
-> +       __wsum ret = seed;
-> +
->          if (from_size && to_size)
-> -               return csum_from32to16(csum_sub(csum_partial(to, to_size, seed),
-> -                                               csum_partial(from, from_size, 0)));
-> +               ret = csum_sub(csum_partial(to, to_size, seed), csum_partial(from, from_size, 0));
+>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> 
+> ...
+> 
+>> @@ -3872,6 +3873,12 @@ static void rtl_hw_start_8125b(struct rtl8169_private *tp)
+>>  	rtl_hw_start_8125_common(tp);
+>>  }
+>>  
+>> +static void rtl_hw_start_8125d(struct rtl8169_private *tp)
+>> +{
+>> +	rtl_set_def_aspm_entry_latency(tp);
+>> +	rtl_hw_start_8125_common(tp);
+>> +}
+>> +
+>>  static void rtl_hw_start_8126a(struct rtl8169_private *tp)
+> 
+> Maybe as a follow-up, rtl_hw_start_8125d and rtl_hw_start_8126a could
+> be consolidated. They seem to be the same.
+> 
+Thanks for the review. Yes, for now they are the same. Both chip versions are new
+and once there are enough users, I wouldn't be surprised if we need version-specific
+tweaks to work around compatibility issues on certain systems.
+Therefore the separate versions for the time being.
 
-Lets also pass ret into csum_partial() instead of seed given the arg
-is of type __wsum there too, otherwise lgtm and yes lets fix these.
+> ...
 
-> +
->          if (to_size)
-> -               return csum_from32to16(csum_partial(to, to_size, seed));
-> +               ret =  csum_partial(to, to_size, seed);
-> 
->          if (from_size)
-> -               return csum_from32to16(~csum_partial(from, from_size, ~seed));
-> +               ret = ~csum_partial(from, from_size, ~seed);
-> 
-> -       return seed;
-> +       return csum_from32to16((__force unsigned int)ret);
->   }
-> 
-> --- 8< ---
-> 
-> If others feel that fixing these warnings is useful, I can send another
-> version with above diff. I will then also send a separate patch to fix
-> all other such warnings in this file.
-
-That would be great, as separate patch, agree.
-
-Thanks,
-Daniel
 
