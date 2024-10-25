@@ -1,124 +1,166 @@
-Return-Path: <netdev+bounces-138979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED929AF96B
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 07:59:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE87A9AF991
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:08:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45061B2114F
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:59:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 637561F231F6
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 06:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7058318F2F0;
-	Fri, 25 Oct 2024 05:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E626191F6E;
+	Fri, 25 Oct 2024 06:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/I9yhYr"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Q5EopU4x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEBC18E76C
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 05:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7342618CBFF;
+	Fri, 25 Oct 2024 06:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729835952; cv=none; b=a/Lm6Ufe0CF+7SQsgV2CGdEGH7JboRytWM8HminGbX8r/LbMeK5SfcGfhafplWmVosB36j9ZVxdWA3lFWUf4cliziCI5DbRTbs3e5c+GwCWu0Or6kRiWzZdCSvnel/WluVb6loIL0mHhcflLrGMDDFbrfhZiO+C7BWcPJ6A1keA=
+	t=1729836528; cv=none; b=OMELQ+TxtaJpkYwMeIadKel2UOUhZluAGFcMof3hKs17yfuK0+kUtVztRLyQqZirA4NNWN02q1CJr7QeBUTFMqiYzRiIn4zM5h4hc4QHsBbUopZrdUcxrAQDFATl/wvP78sPz1yv8fPdDHrSoIeLRKs1KTtlJmmILUHcQnDkzTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729835952; c=relaxed/simple;
-	bh=889DekKwPg3I7tZY2hm5fT+TKCkq/RTzOXQTBLUMCHI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bMe5LmjICXpDxHi+6/P9w8NgbZDDLMvehI4PoH0ZK596KDlZkxCD/JJZTKIYKjEuUlhZo2KoEHj/CQuCbHtOsnPT8XV6QtnKIkSmN4XYAZdPcp3IVlOKIiwQBtDJPkitlJR0Xv4i2W91GVHNWaF4aH+jbvnFDLYfl0U/vaktG8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/I9yhYr; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7b1507c42faso213468085a.0
-        for <netdev@vger.kernel.org>; Thu, 24 Oct 2024 22:59:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729835949; x=1730440749; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=889DekKwPg3I7tZY2hm5fT+TKCkq/RTzOXQTBLUMCHI=;
-        b=Q/I9yhYruZleyjB8V/sY7Kwe96laxfIluEN4SOL/Up13yD8EAiLkSrrEc7QKL+b2KT
-         91LnJhoxz3eZd6NuGmCg+w8XHnvBw95MW1pDfWsaUVQL+/y+HOvmThU8mbxgf9rSLUf4
-         HfHBq+SYpI7VZT+WLicoeouhw3Jq8q8LMbKc2SPhc0SJgwQ2XAyVCNGBAX12hTs15MMF
-         ffZooQmZZIrWCnzwZZbdVqHPEwei01+zY7isV3bQ9jsbIhpQ71XI6WsqaMDBQSjVJ/eE
-         cCJLgTsD6UZyAdHYX3S/Jam2F7ZjYBBsMHMsFKvEuQpjbpTV6H7KDTpFn76lX4DgMy2t
-         kBLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729835949; x=1730440749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=889DekKwPg3I7tZY2hm5fT+TKCkq/RTzOXQTBLUMCHI=;
-        b=WrynoRyS1rtYeDbd9fQgc9cen0IDyxmEmCQu0NOsi4r3uNMFbiXrSGk9OWvZBbUUbr
-         Mz92PH7d1jRRet4drweII4GFrNGRqWA0TeIDnbgkLP93Zd3I0spq543dyvw0b/OW3klY
-         MscaZCBZtZT0J7ZJqSRCaoe+R/zbC103GFj0DTIXJgm7D1q7mXtwJnC6C5LX6VSksePJ
-         emMGAxuZJIXTKvmW5R+LqWDr/pmBApg8/Y41nyBD0ktTdmemdLYmsqh6RDYYUJVgOlaL
-         0fT9A1VTjfHyLUC6XzbQRiPVr3xS8999uHiad6qxclz9d172XUlZ7V7sInqXCZyxYC6c
-         rg+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUwE1GW394+N7rYDmmACZjSvrHtPScp0T2DaOdLY4Jo8ud0OmwJO4AVN9GFmHR5AuMAGa+sjoE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFHMHXtPl+yFBbFD90nFmblL348g+JDIhI1Y3esOTK68t8brkD
-	3w70rFu290z9GhsepNV3CQZGtJw8MrGvOOsAdIstxy2EYarp3B6ao78LE+pfY9xrHveIL+LmqRP
-	MaA8dQ7nxWxcvDKeoCJESYU6KM5KZvnw1qo1AZg==
-X-Google-Smtp-Source: AGHT+IHoJyJzl4rVKPt+oVP4Sgnh1bOW+cCK8+cIUu2E1P83B2Aafre712u5UmakrkK1XsAw9Zgsx/8GlrWt9Frgzd0=
-X-Received: by 2002:a05:620a:454c:b0:7b1:4762:8a with SMTP id
- af79cd13be357-7b1865aec1bmr768212385a.3.1729835949385; Thu, 24 Oct 2024
- 22:59:09 -0700 (PDT)
+	s=arc-20240116; t=1729836528; c=relaxed/simple;
+	bh=X7LTNv42hr0cLBwcmc9BjZV3R9sxwA54LnIt1zXGcEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rZ3+2pV1fMD8vNAJIswVAd9NEcK7t4KVqyphPK8WyU7AF4AboRmTaQF8DXjQaSavdr9FQuA2s7DPR3T6JcbruFhoTAKILQdI7zwVUda60hkwwMYb3zm8eLF1sMcZEeEPtB7xw7wodavXpCpy3e6xj1MrWsbXwBMFmGV5bFPHZiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Q5EopU4x; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 05861211A53B; Thu, 24 Oct 2024 23:08:46 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 05861211A53B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1729836526;
+	bh=UwQh0e2Jag6AWyM6LY3ePC0H4CPiaFhzl+Wf/xOw+zM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q5EopU4xpJLUiV8m7P0B8nZgDpWShoRWLGaBOgN6PopUH+7i7ejktOS07jgpLkm/V
+	 2U+CO9vTPjPq0En6Fkv58+WT0pO0p7uFBDzWHCnfJ6xT4BOP/9RPZETbY12eLuyfJo
+	 0+NDYErchzDUsw8o9+2il6erhzGK/4tRLOAGjakQ=
+Date: Thu, 24 Oct 2024 23:08:45 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Colin Ian King <colin.i.king@gmail.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH] net: mana: use ethtool string helpers
+Message-ID: <20241025060845.GA9741@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20241022204908.511021-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024093742.87681-1-laoar.shao@gmail.com> <20241024093742.87681-3-laoar.shao@gmail.com>
- <a4797bfc-73c3-44ca-bda2-8ad232d63d7e@app.fastmail.com>
-In-Reply-To: <a4797bfc-73c3-44ca-bda2-8ad232d63d7e@app.fastmail.com>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Fri, 25 Oct 2024 13:58:33 +0800
-Message-ID: <CALOAHbDgfcc9XPmsw=2KkBQs4EUOQHH4dFVC=zGMfxfFDAEa-Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] net: tcp: Add noinline_for_tracing annotation for tcp_drop_reason()
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>, dsahern@kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Menglong Dong <menglong8.dong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022204908.511021-1-rosenp@gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Fri, Oct 25, 2024 at 4:57=E2=80=AFAM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
-> Hi Yafang,
->
-> On Thu, Oct 24, 2024, at 2:37 AM, Yafang Shao wrote:
-> > We previously hooked the tcp_drop_reason() function using BPF to monito=
-r
-> > TCP drop reasons. However, after upgrading our compiler from GCC 9 to G=
-CC
-> > 11, tcp_drop_reason() is now inlined, preventing us from hooking into i=
-t.
-> > To address this, it would be beneficial to make noinline explicitly for
-> > tracing.
->
-> It looks like kfree_skb() tracepoint has rx_sk field now. Added in
-> c53795d48ee8 ("net: add rx_sk to trace_kfree_skb").
-
-This commit is helpful. Thank you for providing the information. I
-plan to backport it to our local kernel.
-
->
-> Between sk and skb, is there enough information to monitor TCP drops?
-> Or do you need something particular about tcp_drop_reason()?
-
-There's nothing else specific to mention. The @rx_sk introduced in the
-commit you referred to will be beneficial to us.
-
-BTW, it would be fantastic if we could trace inline functions.
-Additionally, can your feature[0] also allow for live patching of
-inline functions?
-
-[0] https://x.com/__dxu/status/1849271647989068107
-
---=20
-Regards
-Yafang
+On Tue, Oct 22, 2024 at 01:49:08PM -0700, Rosen Penev wrote:
+> The latter is the preferred way to copy ethtool strings.
+> 
+> Avoids manually incrementing the data pointer.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  .../ethernet/microsoft/mana/mana_ethtool.c    | 55 ++++++-------------
+>  1 file changed, 18 insertions(+), 37 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> index 349f11bf8e64..c419626073f5 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> @@ -91,53 +91,34 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
+>  {
+>  	struct mana_port_context *apc = netdev_priv(ndev);
+>  	unsigned int num_queues = apc->num_queues;
+> -	u8 *p = data;
+>  	int i;
+>  
+>  	if (stringset != ETH_SS_STATS)
+>  		return;
+>  
+> -	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++) {
+> -		memcpy(p, mana_eth_stats[i].name, ETH_GSTRING_LEN);
+> -		p += ETH_GSTRING_LEN;
+> -	}
+> +	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++)
+> +		ethtool_puts(&data, mana_eth_stats[i].name);
+>  
+>  	for (i = 0; i < num_queues; i++) {
+> -		sprintf(p, "rx_%d_packets", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "rx_%d_bytes", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "rx_%d_xdp_drop", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "rx_%d_xdp_tx", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "rx_%d_xdp_redirect", i);
+> -		p += ETH_GSTRING_LEN;
+> +		ethtool_sprintf(&data, "rx_%d_packets", i);
+> +		ethtool_sprintf(&data, "rx_%d_bytes", i);
+> +		ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
+> +		ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
+> +		ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
+>  	}
+>  
+>  	for (i = 0; i < num_queues; i++) {
+> -		sprintf(p, "tx_%d_packets", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_bytes", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_xdp_xmit", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_tso_packets", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_tso_bytes", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_tso_inner_packets", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_tso_inner_bytes", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_long_pkt_fmt", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_short_pkt_fmt", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_csum_partial", i);
+> -		p += ETH_GSTRING_LEN;
+> -		sprintf(p, "tx_%d_mana_map_err", i);
+> -		p += ETH_GSTRING_LEN;
+> +		ethtool_sprintf(&data, "tx_%d_packets", i);
+> +		ethtool_sprintf(&data, "tx_%d_bytes", i);
+> +		ethtool_sprintf(&data, "tx_%d_xdp_xmit", i);
+> +		ethtool_sprintf(&data, "tx_%d_tso_packets", i);
+> +		ethtool_sprintf(&data, "tx_%d_tso_bytes", i);
+> +		ethtool_sprintf(&data, "tx_%d_tso_inner_packets", i);
+> +		ethtool_sprintf(&data, "tx_%d_tso_inner_bytes", i);
+> +		ethtool_sprintf(&data, "tx_%d_long_pkt_fmt", i);
+> +		ethtool_sprintf(&data, "tx_%d_short_pkt_fmt", i);
+> +		ethtool_sprintf(&data, "tx_%d_csum_partial", i);
+> +		ethtool_sprintf(&data, "tx_%d_mana_map_err", i);
+>  	}
+>  }
+Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+>  
+> -- 
+> 2.47.0
 
