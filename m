@@ -1,110 +1,138 @@
-Return-Path: <netdev+bounces-139102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9CFC9B0362
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:08:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91F829B0385
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:13:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E4591F228CB
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:08:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3CD71C2124A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C8E1632E7;
-	Fri, 25 Oct 2024 13:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLuVuWRI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609901F7569;
+	Fri, 25 Oct 2024 13:12:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5793A1632D6;
-	Fri, 25 Oct 2024 13:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473291E7660;
+	Fri, 25 Oct 2024 13:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729861704; cv=none; b=hD6DDLgmlti1xnQhoruV8D+ybcUF6e0I+A5QvJUmrSjxi0uoVj1nYcu2j2TguCRTCPJXZE3vfYTJ3x/95dpm/09F5mtsfHoQ45D0U2AjWjK9VCKsv3obEcPMTMjzNIFasDUZifq66LGflCAgYaRrDRg06fxrJ8NYlp9GeQAzyeQ=
+	t=1729861949; cv=none; b=Ffk2EfF+aBWfD1t8jNRigw6xRLySGBFZobA4pB5fW9y3jtQmETZT94jzOKHmXDdFjMr/7J2K8+gfRtlZDJZhQGRs3dBdv5sqV2rbUFlsbGkaT/pR7qrO1RDi91goSPZgRF0ktJIaSjQrfwRUSP7kRtBROeeLrl1ugLZNoAeSSoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729861704; c=relaxed/simple;
-	bh=MNxUl9WMfTQw3iIJsYXFRVHGk0K9abiM55dYNFiK5e0=;
+	s=arc-20240116; t=1729861949; c=relaxed/simple;
+	bh=DyZekcekX3RtD9pX7NDF9lTJOHreJBPcOIWwl++T12A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V8KIKWRthIu+kWX9eadOAywmHWAeMDfm1oAMErNdpkvAApXVnMuYD1eFYpLCVG5At24tqYBuCb2Boo3/VuyujVYqgXb48LubJ3DPr0wXyqYi9zjMiXXFRJXV8DCTRe6zW+CAupGXw0ykEtBouuDTEZEV2cJ8RUvmT2Vai8H4sp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLuVuWRI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ABB4C4CEC3;
-	Fri, 25 Oct 2024 13:08:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729861704;
-	bh=MNxUl9WMfTQw3iIJsYXFRVHGk0K9abiM55dYNFiK5e0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PLuVuWRItR+u7EjCXA0r2R1yl+hrN7eOVg2JORS94Y04yKk+Ixm+Vqh096eL8VhvJ
-	 fP81fSfZTeqaQKaJEqTCl/5xxvCTN1wGqura+LhwxR+o1TJMH9P2DO7iqEGgYwfWFD
-	 kWvsXEHLQg9axqXHm9GLXlHi/1hwmAbte+wpH7UQNzxu6tkchcpWJPivy3PdyFoeda
-	 k8NnKNuPvOclEXju8nDiTV2ZqpL/qRrvj/+pv3hWZy1jtziKnLgZwsMttvRy9rc/xO
-	 3VujCfFxoOy+tC/rwSEjJw7sg52VASkFvNdGwGyMwQrq9aqRzR8HkXDTdfiTS9NWjQ
-	 tF9ocPkWMKh/w==
-Date: Fri, 25 Oct 2024 14:08:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Chen Wang <unicorn_wang@outlook.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=pvf/bJ3wygRBqbWdvTMehUBMFoREG4pRNgX762FD/uylbyWIGk1XIVlOxuKXi0NOl8UkV1j5qj3H3YqF7ZhSWGcKhP7dSF531Dg9T3aVT2o99XIOPnQX3G4w8Y+Bqe1eyN1eqfIpNaUC0vWf/B4Wd89+hwegrUMUAbi5/S+Bvw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: +MippmjcS7GiCHxfKD/FPQ==
+X-CSE-MsgGUID: YqiQFwgNQ2urN4bdSLfTEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29474401"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="29474401"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 06:12:27 -0700
+X-CSE-ConnectionGUID: YBODLHiKRmKI4N2x3UePrA==
+X-CSE-MsgGUID: ORNpoHttQRiMH14+J3yUxg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,231,1725346800"; 
+   d="scan'208";a="81073104"
+Received: from smile.fi.intel.com ([10.237.72.154])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 06:12:15 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1t4K6r-00000006v8Q-1Pfa;
+	Fri, 25 Oct 2024 16:12:09 +0300
+Date: Fri, 25 Oct 2024 16:12:09 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Dragan =?utf-8?Q?Milivojevi=C4=87?= <d.milivojevic@gmail.com>
+Cc: Peter Cai <peter@typeblog.net>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+	ntb@lists.linux.dev, Kory Maincent <kory.maincent@bootlin.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
+	Paul Burton <paulburton@kernel.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>, linux-mips@vger.kernel.org,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	Yanteng Si <siyanteng@loongson.cn>, netdev@vger.kernel.org,
 	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Inochi Amaoto <inochiama@outlook.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 0/4] riscv: sophgo: Add ethernet support for SG2044
-Message-ID: <20241025130817.GU1202098@kernel.org>
-References: <20241025011000.244350-1-inochiama@gmail.com>
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>, linux-hwmon@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>, linux-edac@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-serial@vger.kernel.org, Andrew Halaney <ajhalaney@gmail.com>,
+	Nikita Travkin <nikita@trvn.ru>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Evgeniy Dushistov <dushistov@mail.ru>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+	Nikita Shubin <nikita.shubin@maquefel.me>,
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: linux: Goodbye from a Linux community volunteer
+Message-ID: <ZxuZKcTafSVXLcIe@smile.fi.intel.com>
+References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+ <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
+ <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
+ <ZxqK75WdFBod0rZ9@smile.fi.intel.com>
+ <CALtW_ajKAYYwYVGnEArPWz_XaCkEiMFwpoCtzeiO1OLbAk77Sw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241025011000.244350-1-inochiama@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALtW_ajKAYYwYVGnEArPWz_XaCkEiMFwpoCtzeiO1OLbAk77Sw@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Fri, Oct 25, 2024 at 09:09:56AM +0800, Inochi Amaoto wrote:
-> The ethernet controller of SG2044 is Synopsys DesignWare IP with
-> custom clock. Add glue layer for it.
+On Thu, Oct 24, 2024 at 09:46:58PM +0200, Dragan Milivojević wrote:
+> > Yeah, with my hat of the person whose home town is under (Russian) attack for
+> > the 10+ years (don't be surprised, please, the war lasts more than a decade
+> > already) on I am fully understand Linus' arguments about history and being not
+> > very friendly about Russians.
 > 
-> Since v2, these patch depends on that following patch that provides
-> helper function to compute rgmii clock:
-> https://lore.kernel.org/netdev/20241013-upstream_s32cc_gmac-v3-4-d84b5a67b930@oss.nxp.com/
+> How about your hat off to the people in the Donbas,
+> ~12K of them that had died from Ukrainian artillery fire,
+> that were under imminent threat of being overrun by
+> the Ukrainian forces in February 2022? Are you going
+> to scream about Russian propaganda when I link
+> the OSCE reports about a 10 fold increase in attacks
+> at that same time?
 
-For future reference: patchsets for Networking, which have
-not-yet-in-tree dependancies should be marked as an RFC.
-Our CI doesn't know how to handle these and we don't have
-a mechanism to re-run it once the dependencies are present:
-the patchset needs to be sent again.
+Yeah, yeah, no point to discuss with you "Russian state-sponsored spam".
+Btw, are you from Serbia?
 
-Also, I'm assuming this patch-set is targeted at net-next.
-If so, that should be included in the subject like this:
+> BTW can I be racist towards Germans and Croats since
+> their ancestors exterminated my kin in their death camps?
 
-  [PATCH net-next vX] ...
-
-I would wait for review before posting any updated patchset.
-
-Thanks!
-
-...
+You should answer your question yourself.
 
 -- 
-pw-bot: changes-requested
+With Best Regards,
+Andy Shevchenko
+
+
 
