@@ -1,205 +1,174 @@
-Return-Path: <netdev+bounces-139195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7A19B0EEC
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:26:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA1839B0F18
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:33:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01BFDB2839A
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 19:26:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD16F1C22E7C
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 19:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DFF20EA4F;
-	Fri, 25 Oct 2024 19:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212992064F1;
+	Fri, 25 Oct 2024 19:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="epMUddw4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YSZbYVmG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B8520EA42
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 19:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010C320D4FE;
+	Fri, 25 Oct 2024 19:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729884278; cv=none; b=LBrxS1OycClcVLU4JC4D8H9c2BkYK+eV+cMHAK7IQpC0qDSPfg60hkZR9vijvh+TelvlIjjc2LhIDdjjwAP543zwEcJP6Ju4puRGgNcY1SCZ0uQnQVVj+27WkBtMskTgx+FEyacl9NqhdJ29zFn9w5Tj/NG7Zrkam8FiJoP74Ro=
+	t=1729884761; cv=none; b=r1xGDL9id+kdTCDrNH32Oa0eCs6uSkyAKvN1y1FZobCW3j1CV2betb2wusY2m87B83RsP9ufzBOOUOycXUXYmxvZdVWWLXSyUrUp1GjRPoEMH6zfQSRtue+E71yULwlF20F0oBj5UM902Iii1kDb/9tny8tuVE8G9Z/i2nsqH2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729884278; c=relaxed/simple;
-	bh=bebSZsoN40PwcYn49PXuYyxLVWUXlVwMcDX1wxDufWI=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZHH5nckBbhqJl8zTeWE73LLu8Kv5hdkjwr+pwLCnV3j3m+o2rhm6IVcav9SZ15oC34602ZNZcgJLXXajJser3XbqsLK/8FHpYpVnaKcLSI2hMyTdvgDyalLLURNUSzb1b4BgtUmZRHVddwh3qRES6K13lfZD3CmAorALPm/1EiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=epMUddw4; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20ce65c8e13so19314075ad.1
-        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 12:24:36 -0700 (PDT)
+	s=arc-20240116; t=1729884761; c=relaxed/simple;
+	bh=kXhHGNzdBLhRAY+KvWRM4xAk5QcUUIMZUhqGa36zOj8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PnAjz+CTHQAB4+HBQMqfWJ4X3IkUyKoAP8wUbZv7uVrLel4+6oXPWwlnQgZRPeNUcQgT+NCQ50eWxPZNPqmrL2jgAux59XBZu25xg0k7bNcmuLaFDIeDhIYlhsGeN4LFqfZvs4ZFMbtZ2ULiZdL3zWRZZ+yTY0T/z0PVnJNj8mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YSZbYVmG; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6e2e41bd08bso31184057b3.2;
+        Fri, 25 Oct 2024 12:32:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1729884275; x=1730489075; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Cz47o9yzNW0KvGOU6xsQutyz7avw4CsPNbkPxVqTrbU=;
-        b=epMUddw4jB4RHdz1r0hDB40zAHeMh4dP8UqZdOP6aBXiDDrlZB0mEqNUhaNZVDeLbv
-         Vw5fzK/Is8VbgpVAnIcPjN+h4vPW5ULBYisrkpIVqSuVLznNaEUSacsMo6v7WxyBvnGn
-         JYP6NXOYrTAar+ZR8dbLNAnYnma6wKTx2pVV4=
+        d=gmail.com; s=20230601; t=1729884758; x=1730489558; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+OGTc1IGelQzRo6VF+xJwWEt+U6+tTV8KOTqMA95NRQ=;
+        b=YSZbYVmGb3Js1CquiHQEOeeNLpBmq1lWkaidt5i6/rdVovr8NOOmZkMBEz6b2VXTdA
+         Yj/oNwD7QhonNyVKh5Ml7UdYrFEu+v3Zc3Vf2O4FyvqLkUkQ5r6nqoDpTzVG4DUKPT2r
+         DATCNGR72QrgQYsTlqzVeiQJHdyWLdAgXssa18Z+7rgG8p5TrOj8e89idc+xuFpD9dq7
+         YGizYWgimkLxkkA8nsZs/R3Z3uHedwR5DG+8K53exrZrlkYVCjaKmCtv+VWnQnr74ifs
+         Rvh4rOTIj0GeU4B5AWIk3omGbUs1enCy6k9MwO/i+/hmRSjOgRg0rCxKMFmOSt6DKn8Q
+         VKRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729884275; x=1730489075;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cz47o9yzNW0KvGOU6xsQutyz7avw4CsPNbkPxVqTrbU=;
-        b=LV9ncqyB1fb2GUZ5Rwig9FnG712pdRnkwI19cSBQZoy3ZWq64E/srJjdZDMSS9zNtb
-         9V4t0MsDQG6GggfJjg/XVdlgh8DkkihGgKOrGrkfCsf8VXROniOWfODR4ro1CMzeK/9V
-         OK25tRNJXWhH5cgjAnYoJ6j1clO18JPFFKepcM5Ur/+K1qFnm+TCAVc9U+pLRRyMkRQd
-         YnolkxE08+eYaR1IBJU6a42Fqc9UlY/su2DdIz++YSxqoHyKrlPYLeSwzAAqFINVbl/F
-         bviWpvDHaUQUqHzYwwOMgXsOKCLYSLdQ1hCVc3lq1XtpVr/6vDzUaINE4ZYSK07ZWQf4
-         rmtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTUG2VmavO4T2EgIsU2loE30M2DGvzMlhVkkEWiRP7wDg+8rWsxpcOU2GDuN8UxIFC1Hew0jY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPesFh9H8Im681xd0M3iICH2Y5ts8sLkLcM7uvnKe61SymqeNG
-	S5t+D7TgBbhzcdeTOvvvsBxtcjeDSsR3V4jkXDHMd9PN9D2obWzw2T71oxssJQ==
-X-Google-Smtp-Source: AGHT+IF/pmHhfEwM1uFHYfAiRvfzD/X8MP05OgiVn+yw7RgVB/ZPqi/aoEMZjtwkKW/IJ57B7SH7Yg==
-X-Received: by 2002:a17:903:2b06:b0:20c:5ba1:e8e5 with SMTP id d9443c01a7336-210c6c16f09mr2760435ad.19.1729884275414;
-        Fri, 25 Oct 2024 12:24:35 -0700 (PDT)
-Received: from JRM7P7Q02P.dhcp.broadcom.net ([192.19.144.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf6df8csm12785615ad.99.2024.10.25.12.24.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 12:24:34 -0700 (PDT)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-Date: Fri, 25 Oct 2024 15:24:22 -0400
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com,
-	donald.hunter@gmail.com, corbet@lwn.net, andrew+netdev@lunn.ch,
-	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org,
-	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk,
-	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
-	danieller@nvidia.com, hengqi@linux.alibaba.com,
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	hkallweit1@gmail.com, ahmed.zaki@intel.com, rrameshbabu@nvidia.com,
-	idosch@nvidia.com, jiri@resnulli.us, bigeasy@linutronix.de,
-	lorenzo@kernel.org, jdamato@fastly.com,
-	aleksander.lobakin@intel.com, kaiyuanz@google.com,
-	willemb@google.com, daniel.zahka@gmail.com,
-	Andrew Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: Re: [PATCH net-next v4 2/8] bnxt_en: add support for tcp-data-split
- ethtool command
-Message-ID: <ZxvwZmJsdFOStYcV@JRM7P7Q02P.dhcp.broadcom.net>
-References: <20241022162359.2713094-1-ap420073@gmail.com>
- <20241022162359.2713094-3-ap420073@gmail.com>
- <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1729884758; x=1730489558;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+OGTc1IGelQzRo6VF+xJwWEt+U6+tTV8KOTqMA95NRQ=;
+        b=GL+OnNfirTBPiMaF+lNBJ4yBgSvLFWREwoTk4QBYSM7yhMgRugdYyHqFG3afjH9xn4
+         EVGxtFODy4+dHipyVYC2KR7HI+hfaMFXlYcZZ5Q/Z4+wvc68pKTPcQhvNX2/85gSGD7W
+         beGHDmmg0gx2Pv7oHG5VUNU9gh2lc3BWCYINdRQRS8x6aufXnO4lfuTC/eWAD6e9A5mU
+         rxNLtUhCshGl5G2ab5VszeK8YdkH12VzP++TftSaURqNZHJX9GHLnBTn0Xuk8MJUiudm
+         UU2Q3NiIPhl3oFu+vX34karH1Rv7DI/x69hwMfEYcYMrdWK2GdgacXgMurpDzVSII2A+
+         9exQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfAq8cI20v2uuCqRIxDfuX3JmU9xRkhvImRQT6HM/urj9t/YBhknCKY3VRKZ6J8s+FMfeLj6zJbxurd9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbR3BGLL+wlxSNyD+Q6dpWLAgEzcwSZ6v/4L/OyZJ5+pB5I9z4
+	NPVWvEIcv2sWvAqC1emMSQid+JF/im4ilu6Qi/eqtGzI9h7HQ34fK7SYr30J5HtaFuvYAJNVI7T
+	rld8huV3TmJfed6v7AcAzW21puzU=
+X-Google-Smtp-Source: AGHT+IEWqdzDAn21/R+IgfqiZgRRkeQqv49phY3X9Pmz4EABFQegbOOIeDadzmC/8Cxmk1V/kug1B0w3dmfkJldOmUE=
+X-Received: by 2002:a05:690c:2a8e:b0:6e6:1018:64c7 with SMTP id
+ 00721157ae682-6e9d8b8dbadmr6557887b3.41.1729884758060; Fri, 25 Oct 2024
+ 12:32:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
+References: <20241024205257.574836-1-rosenp@gmail.com> <20241025125704.GT1202098@kernel.org>
+In-Reply-To: <20241025125704.GT1202098@kernel.org>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Fri, 25 Oct 2024 12:32:27 -0700
+Message-ID: <CAKxU2N98hnVAE9WF72HhxzVEfhnRAgMykVgBErL9b3gupqqrxQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: freescale: use ethtool string helpers
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Madalin Bucur <madalin.bucur@nxp.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Ioana Ciornei <ioana.ciornei@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:FREESCALE QUICC ENGINE UCC ETHERNET DRIVER" <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2024 at 10:02:30PM -0700, Michael Chan wrote:
-> On Tue, Oct 22, 2024 at 9:24 AM Taehee Yoo <ap420073@gmail.com> wrote:
+On Fri, Oct 25, 2024 at 5:57=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Thu, Oct 24, 2024 at 01:52:57PM -0700, Rosen Penev wrote:
+> > The latter is the preferred way to copy ethtool strings.
 > >
-> > NICs that uses bnxt_en driver supports tcp-data-split feature by the
-> > name of HDS(header-data-split).
-> > But there is no implementation for the HDS to enable or disable by
-> > ethtool.
-> > Only getting the current HDS status is implemented and The HDS is just
-> > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled.
-> > The hds_threshold follows rx-copybreak value. and it was unchangeable.
+> > Avoids manually incrementing the pointer. Cleans up the code quite well=
+.
 > >
-> > This implements `ethtool -G <interface name> tcp-data-split <value>`
-> > command option.
-> > The value can be <on>, <off>, and <auto> but the <auto> will be
-> > automatically changed to <on>.
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+>
+> ...
+>
+> > diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c b/drive=
+rs/net/ethernet/freescale/dpaa/dpaa_ethtool.c
+> > index b0060cf96090..10c5fa4d23d2 100644
+> > --- a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
+> > +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
+> > @@ -243,38 +243,24 @@ static void dpaa_get_ethtool_stats(struct net_dev=
+ice *net_dev,
+> >  static void dpaa_get_strings(struct net_device *net_dev, u32 stringset=
+,
+> >                            u8 *data)
+> >  {
+> > -     unsigned int i, j, num_cpus, size;
+> > -     char string_cpu[ETH_GSTRING_LEN];
+> > -     u8 *strings;
+> > +     unsigned int i, j, num_cpus;
 > >
-> > HDS feature relies on the aggregation ring.
-> > So, if HDS is enabled, the bnxt_en driver initializes the aggregation
-> > ring.
-> > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
+> > -     memset(string_cpu, 0, sizeof(string_cpu));
+> > -     strings   =3D data;
+> > -     num_cpus  =3D num_online_cpus();
+> > -     size      =3D DPAA_STATS_GLOBAL_LEN * ETH_GSTRING_LEN;
+> > +     num_cpus =3D num_online_cpus();
 > >
-> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
+> >       for (i =3D 0; i < DPAA_STATS_PERCPU_LEN; i++) {
+> > -             for (j =3D 0; j < num_cpus; j++) {
+> > -                     snprintf(string_cpu, ETH_GSTRING_LEN, "%s [CPU %d=
+]",
+> > -                              dpaa_stats_percpu[i], j);
+> > -                     memcpy(strings, string_cpu, ETH_GSTRING_LEN);
+> > -                     strings +=3D ETH_GSTRING_LEN;
+> > -             }
+> > -             snprintf(string_cpu, ETH_GSTRING_LEN, "%s [TOTAL]",
+> > -                      dpaa_stats_percpu[i]);
+> > -             memcpy(strings, string_cpu, ETH_GSTRING_LEN);
+> > -             strings +=3D ETH_GSTRING_LEN;
+> > -     }
+> > -     for (j =3D 0; j < num_cpus; j++) {
+> > -             snprintf(string_cpu, ETH_GSTRING_LEN,
+> > -                      "bpool [CPU %d]", j);
+> > -             memcpy(strings, string_cpu, ETH_GSTRING_LEN);
+> > -             strings +=3D ETH_GSTRING_LEN;
+> > +             for (j =3D 0; j < num_cpus; j++)
+> > +                     ethtool_sprintf(&data, "%s [CPU %d]",
+> > +                                     dpaa_stats_percpu[i], j);
+> > +
+> > +             ethtool_sprintf(&data, "%s [TOTAL]", dpaa_stats_percpu[i]=
+);
+> >       }
+> > -     snprintf(string_cpu, ETH_GSTRING_LEN, "bpool [TOTAL]");
+> > -     memcpy(strings, string_cpu, ETH_GSTRING_LEN);
+> > -     strings +=3D ETH_GSTRING_LEN;
+> > +     for (i =3D 0; j < num_cpus; i++)
+>
+> Perhaps this should consistently use i, rather than i and j:
+>
+>         for (i =3D 0; i < num_cpus; i++)
+>
+> Flagged by W=3D1 builds with clang-18.
+I really need to compile test this on a PPC system.
+>
+> > +             ethtool_sprintf(&data, "bpool [CPU %d]", i);
+> > +
+> > +     ethtool_puts(&data, "bpool [TOTAL]");
 > >
-> > v4:
-> >  - Do not support disable tcp-data-split.
-> >  - Add Test tag from Stanislav.
+> > -     memcpy(strings, dpaa_stats_global, size);
+> > +     for (i =3D 0; i < DPAA_STATS_GLOBAL_LEN; i++)
+> > +             ethtool_puts(&data, dpaa_stats_global[i]);
+> >  }
 > >
-> > v3:
-> >  - No changes.
-> >
-> > v2:
-> >  - Do not set hds_threshold to 0.
-> >
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  8 +++-----
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  5 +++--
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++++++++
-> >  3 files changed, 19 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > index 0f5fe9ba691d..91ea42ff9b17 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> 
-> > @@ -6420,15 +6420,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
-> >
-> >         req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
-> >         req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
-> > +       req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
-> >
-> > -       if (BNXT_RX_PAGE_MODE(bp)) {
-> > -               req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
-> 
-> Please explain why this "if" condition is removed.
-> BNXT_RX_PAGE_MODE() means that we are in XDP mode and we currently
-> don't support HDS in XDP mode.  Added Andy Gospo to CC so he can also
-> comment.
-> 
-
-In bnxt_set_rx_skb_mode we set BNXT_FLAG_RX_PAGE_MODE and clear
-BNXT_FLAG_AGG_RINGS, so this should work.  The only issue is that we
-have spots in the driver where we check BNXT_RX_PAGE_MODE(bp) to
-indicate that XDP single-buffer mode is enabled on the device.
-
-If you need to respin this series I would prefer that the change is like
-below to key off the page mode being disabled and BNXT_FLAG_AGG_RINGS
-being enabled to setup HDS.  This will serve as a reminder that this is
-for XDP.
-
-@@ -6418,15 +6418,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- 
-        req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
-        req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
-+       req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
- 
--       if (BNXT_RX_PAGE_MODE(bp)) {
--               req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
--       } else {
-+       if (!BNXT_RX_PAGE_MODE(bp) && (bp->flags & BNXT_FLAG_AGG_RINGS)) {
-                req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
-                                          VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
-                req->enables |=
-                        cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
--               req->jumbo_thresh = cpu_to_le16(bp->rx_copy_thresh);
-                req->hds_threshold = cpu_to_le16(bp->rx_copy_thresh);
-        }
-        req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-
-> > -       } else {
-> > +       if (bp->flags & BNXT_FLAG_AGG_RINGS) {
-> >                 req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
-> >                                           VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
-> >                 req->enables |=
-> >                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
-> > -               req->jumbo_thresh = cpu_to_le16(bp->rx_copybreak);
-> >                 req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
-> >         }
-> >         req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-
-
+> >  static int dpaa_get_hash_opts(struct net_device *dev,
+>
+> ...
 
