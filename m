@@ -1,162 +1,181 @@
-Return-Path: <netdev+bounces-139162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841349B0889
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 17:40:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF569B08AB
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 17:43:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 159941F241EC
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:40:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCAFBB253D6
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5880166F23;
-	Fri, 25 Oct 2024 15:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E302D1607B2;
+	Fri, 25 Oct 2024 15:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="QVRCqaio";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cd3sSaQz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s88mfr5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DC115E5CA;
-	Fri, 25 Oct 2024 15:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10A221A4AA;
+	Fri, 25 Oct 2024 15:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729870788; cv=none; b=Ss4WQm6fARJzKz7siTsxZxXEV4t8LX2ZIMZ3BS/JxR2/rrId9YyBwU7MpoPXzeGCJgXs9sotC9TzwmkDV8UnzTJbVOii6zZnx79Ghuz+6HP3EzkFscVux2kXGfDG3SbSOkGsvUFy4kyQ6nb20unZzYaWVw8SyUNfB/aJwz2xAdU=
+	t=1729870915; cv=none; b=S+4v+4fRalwqdLKHEHgyDkh3jmYen1dmHsLENr+puFZIwz5UH+DsLPj7o0iRfVge4nuUey/ENqkJntBZK+ZPLVfhTH7cWv53c5XwRatRSwqnoTy49dxv//HBY4QD4JLWoPvlmr5eiecvidq0TL50GcxEhIt6JzFVUDI/TygIIKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729870788; c=relaxed/simple;
-	bh=K2X2TKQnsT18GORezUXHpdD6bbTTA924bUv+E2baR+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tgOCPTtpwd2Z1QOYscoZt04dchtZ14InXIcnclf81sAUvH6gpNMLVgwFhHbpBmuMt8pmR+HmANc5jeRWyAbjd0OieuLdeAdmhQnJvjKNB7gT1qQKJRR+Dyq9nHlG/3oS99ZcOn/mQAxrAa2Z5cf3qS/LiV3HxXBbP2qQSoIn0Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=QVRCqaio; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cd3sSaQz; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id D6F2A13801B9;
-	Fri, 25 Oct 2024 11:39:44 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Fri, 25 Oct 2024 11:39:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1729870784;
-	 x=1729957184; bh=lw5fu38WNLcRdf3hLGVXc1U5uuw+MxciiYMc567xIhc=; b=
-	QVRCqaioHq2X/X9Msi5OfSqjucNvq7xa1+o3RcGiOij70hQl0O8bXhdcpPn+9cGP
-	/xxVYKEm1w84RYcfN23OGmViARbBJ7lg3ZmKFo6vdwGVm9dyiE/TTMVkodmYEyFc
-	keDUevOnMDkJIehQJYo+XOuAt6BCq6qWWNNzEaDfqMjYOS6XAXw0bk4idqbigYU+
-	gMs/c71W8HxRZrzn8hjycEQgOlKpOUMtptcwaOI/jMGxCSlqzBOrmz+kHoPyLFvf
-	vBvlIQB9VKe5dvgT0+lZryycYgFuU1jKRe4lk7celIn5gKIW1wg3IaMlAVhIN/QP
-	tQlVlwc7w6+HkC5DLncn3Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1729870784; x=
-	1729957184; bh=lw5fu38WNLcRdf3hLGVXc1U5uuw+MxciiYMc567xIhc=; b=c
-	d3sSaQz1MKyZHw2zs+eJ8j5JySWGMjwjgOkijWOxpw6Z1hz/oVH20goVSjXAx/SX
-	IegsXby+9ZfjF9cUlu1DSUuWs4Sd2WW7F3IhoxsSRbkC27WCKHMTHgCgtfGOsgnL
-	uLHEaDlMTvAnVmGAh53ArXDnRFNqJLXQPe1D6VT7RHJgFajUsTB4D6UCbHJyvqXY
-	cw6aFBnth6GVAkug/fSJQ21N0i1/oq9pqz9kMyZJIMX8UD4kZm3A7/ak1M1spItH
-	pzO2gxHhVH0QJh5qRj9wPsRS+VDUleTzUkp8bJlvPDeBZwI3xdmj2HQ+X1gmLR8y
-	ayHriXXBqQWHlgsKN45nA==
-X-ME-Sender: <xms:wLsbZ9XsaVTGkbtwrQJ-olZYQHRMJJCtVtsiG_8O9OShmgJ2ikq2kQ>
-    <xme:wLsbZ9lQM24ovilKzde1LTBpeYqU8Is9s0_GfxDyxkyOIJKTrwSWjoDUrMbxEGyt_
-    Ab7QZI0a_zjy0qpQ1U>
-X-ME-Received: <xmr:wLsbZ5a66LNJW20cWpTnJZkqDvSK3k7MpF2-cV6F5NtcvuASi1FcFdGgZrU08X_uz04u4Bm78wUA3ZgEp6txHTwU9dns1ZFYog>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejvddgleduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
-    gvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrght
-    thgvrhhnpeefieejfffhvefhtefftdffieefveevtdevieeiffdttedttdefffegtdefte
-    fhhfenucffohhmrghinhepuggvvhhitggvthhrvggvrdhorhhgnecuvehluhhsthgvrhfu
-    ihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlh
-    hunhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohep
-    udefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehgvggvrhhtodhrvghnvghsrg
-    hssehglhhiuggvrhdrsggvpdhrtghpthhtohepshgvrhhgvghirdhshhhthihlhihovhes
-    ghhmrghilhdrtghomhdprhgtphhtthhopehprghulhdrsggrrhhkvghrrdgtthessghprd
-    hrvghnvghsrghsrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgv
-    ughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:wLsbZwWi5QwwlxjmtYIi_xfEbMWjLg2Xh-r3nnP_B74e_wxkMKUOUg>
-    <xmx:wLsbZ3k-NryqSV52Equ5vl-E6QdLqhHxLDEbdk-IU8MIpKNkhla5MQ>
-    <xmx:wLsbZ9frq-WgY1LbO_f8aZLtfrBicU2JaGDUwykSoQRQNVLdBCuFwg>
-    <xmx:wLsbZxEm6I7CcdCfEb1yTupkyRA7llb1iEmGh2x_JhdIU10DIISo3A>
-    <xmx:wLsbZxncylnKrAdjqI0rGGdwlQABMT_7NHV4dFhTmVUwnhTiEycwl7jZ>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 25 Oct 2024 11:39:43 -0400 (EDT)
-Date: Fri, 25 Oct 2024 17:39:40 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Sergei Shtylyov <sergei.shtylyov@gmail.com>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: renesas,ether: Add iommus property
-Message-ID: <20241025153940.GB2223028@ragnatech.se>
-References: <2ca890323477a21c22e13f6a1328288f4ee816f9.1729868894.git.geert+renesas@glider.be>
+	s=arc-20240116; t=1729870915; c=relaxed/simple;
+	bh=NQrucM9x+saoFF0bKhfOtTTsmlsmJGDQESQbN+cJ5T8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MAcSWtJCC773eE0f2l1W/Cxnz5QKdnV4/vXhnh4oPUs0d4q+hNtEA03IP3ekeexECDGFDtEPrjUvkwHDC2olNFQETfDF+tf7duBeeaTC/EEtenyVMSd4/hR8y8uX/TNZBJIArq6U+jRb5eVEcflobZh228mCtFSbKDQfx7Y5KFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=s88mfr5N; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49PDpA4b021561;
+	Fri, 25 Oct 2024 15:41:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=5LJ+VKt8Wb3JvYVN3+XmhS5GVyUE5yneVa6dfImU/
+	6Q=; b=s88mfr5NqxxZLp2ghjviqDWcV4e7B7+RkZ9hCrVxF1rkJle8jAXdvYrFq
+	5WkbRV6UQ/o9sv/Ne5SPD19QfoUUveP3X4BfuSVYgkoh+q0S7xAObhVXgvYefKff
+	hTft4M9xuR9dbOnqINJm4CHzhHfmq3Va2jrvRQzIM7vP0bvK9WrpPnrU/JNlr0DV
+	gPZAur1aBtDiV7RT5ctIir4fgLS0tfxCl9d2fnGFxe2wG5HQ07iWIF0IxGOTT+/G
+	vL9KQAzS3jMwdHfu0z7ilNs5WeciMS6OOKdah7s5B+bVGSUDEGjBFBQm8SdBjvgN
+	sIvYvhHYnOuyZdEeWD47ZDwGifQjw==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42fbw494td-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 15:41:48 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49PEDICt014571;
+	Fri, 25 Oct 2024 15:41:48 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42emk86cj4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 15:41:48 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49PFfkUM64946464
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Oct 2024 15:41:47 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A4CCA58056;
+	Fri, 25 Oct 2024 15:41:46 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6ED6258052;
+	Fri, 25 Oct 2024 15:41:46 +0000 (GMT)
+Received: from WIN-DU0DFC9G5VV.ibm.com (unknown [9.61.242.95])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 25 Oct 2024 15:41:46 +0000 (GMT)
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+To: sgarzare@redhat.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: [PATCH v3] vsock/test: fix failures due to wrong SO_RCVLOWAT parameter
+Date: Fri, 25 Oct 2024 10:41:24 -0500
+Message-Id: <20241025154124.732008-1-kshk@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2ca890323477a21c22e13f6a1328288f4ee816f9.1729868894.git.geert+renesas@glider.be>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PJJO1tMEtrrwJ16oFZKthF54PSAHqkis
+X-Proofpoint-GUID: PJJO1tMEtrrwJ16oFZKthF54PSAHqkis
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ bulkscore=0 suspectscore=0 spamscore=0 phishscore=0 adultscore=0
+ priorityscore=1501 clxscore=1015 lowpriorityscore=0 malwarescore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410250122
 
-Hi Geert,
+This happens on 64-bit big-endian machines.
+SO_RCVLOWAT requires an int parameter. However, instead of int, the test
+uses unsigned long in one place and size_t in another. Both are 8 bytes
+long on 64-bit machines. The kernel, having received the 8 bytes, doesn't
+test for the exact size of the parameter, it only cares that it's >=
+sizeof(int), and casts the 4 lower-addressed bytes to an int, which, on
+a big-endian machine, contains 0. 0 doesn't trigger an error, SO_RCVLOWAT
+returns with success and the socket stays with the default SO_RCVLOWAT = 1,
+which results in vsock_test failures, while vsock_perf doesn't even notice
+that it's failed to change it.
 
-Thanks for your work.
+Fixes: b1346338fbae ("vsock_test: POLLIN + SO_RCVLOWAT test")
+Fixes: 542e893fbadc ("vsock/test: two tests to check credit update logic")
+Fixes: 8abbffd27ced ("test/vsock: vsock_perf utility")
+Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+---
 
-On 2024-10-25 17:12:24 +0200, Geert Uytterhoeven wrote:
-> make dtbs_check:
-> 
->     arch/arm64/boot/dts/renesas/r8a77980-condor.dtb: ethernet@e7400000: 'iommus' does not match any of the regexes: '@[0-9a-f]$', 'pinctrl-[0-9]+'
-> 	    from schema $id: http://devicetree.org/schemas/net/renesas,ether.yaml#
-> 
-> Ethernet Controllers on R-Car Gen2/Gen3 SoCs can make use of the IOMMU,
-> so add the missing iommus property.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Notes:
+    The problem was found on s390 (big endian), while x86-64 didn't show it. After this fix, all tests pass on s390.
+Changes for v3:
+- fix the same problem in vsock_perf and update commit message
+Changes for v2:
+- add "Fixes:" lines to the commit message
 
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+ tools/testing/vsock/vsock_perf.c | 6 +++---
+ tools/testing/vsock/vsock_test.c | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-> ---
->  Documentation/devicetree/bindings/net/renesas,ether.yaml | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/renesas,ether.yaml b/Documentation/devicetree/bindings/net/renesas,ether.yaml
-> index 29355ab98569daf6..d6c5983499b87d64 100644
-> --- a/Documentation/devicetree/bindings/net/renesas,ether.yaml
-> +++ b/Documentation/devicetree/bindings/net/renesas,ether.yaml
-> @@ -59,6 +59,9 @@ properties:
->    clocks:
->      maxItems: 1
->  
-> +  iommus:
-> +    maxItems: 1
-> +
->    power-domains:
->      maxItems: 1
->  
-> -- 
-> 2.34.1
-> 
-
+diff --git a/tools/testing/vsock/vsock_perf.c b/tools/testing/vsock/vsock_perf.c
+index 4e8578f815e0..22633c2848cc 100644
+--- a/tools/testing/vsock/vsock_perf.c
++++ b/tools/testing/vsock/vsock_perf.c
+@@ -133,7 +133,7 @@ static float get_gbps(unsigned long bits, time_t ns_delta)
+ 	       ((float)ns_delta / NSEC_PER_SEC);
+ }
+ 
+-static void run_receiver(unsigned long rcvlowat_bytes)
++static void run_receiver(int rcvlowat_bytes)
+ {
+ 	unsigned int read_cnt;
+ 	time_t rx_begin_ns;
+@@ -163,7 +163,7 @@ static void run_receiver(unsigned long rcvlowat_bytes)
+ 	printf("Listen port %u\n", port);
+ 	printf("RX buffer %lu bytes\n", buf_size_bytes);
+ 	printf("vsock buffer %lu bytes\n", vsock_buf_bytes);
+-	printf("SO_RCVLOWAT %lu bytes\n", rcvlowat_bytes);
++	printf("SO_RCVLOWAT %d bytes\n", rcvlowat_bytes);
+ 
+ 	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
+ 
+@@ -439,7 +439,7 @@ static long strtolx(const char *arg)
+ int main(int argc, char **argv)
+ {
+ 	unsigned long to_send_bytes = DEFAULT_TO_SEND_BYTES;
+-	unsigned long rcvlowat_bytes = DEFAULT_RCVLOWAT_BYTES;
++	int rcvlowat_bytes = DEFAULT_RCVLOWAT_BYTES;
+ 	int peer_cid = -1;
+ 	bool sender = false;
+ 
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index f851f8961247..30857dd4ca97 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -833,7 +833,7 @@ static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
+ 
+ static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
+ {
+-	unsigned long lowat_val = RCVLOWAT_BUF_SIZE;
++	int lowat_val = RCVLOWAT_BUF_SIZE;
+ 	char buf[RCVLOWAT_BUF_SIZE];
+ 	struct pollfd fds;
+ 	short poll_flags;
+@@ -1282,7 +1282,7 @@ static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opt
+ static void test_stream_credit_update_test(const struct test_opts *opts,
+ 					   bool low_rx_bytes_test)
+ {
+-	size_t recv_buf_size;
++	int recv_buf_size;
+ 	struct pollfd fds;
+ 	size_t buf_size;
+ 	void *buf;
 -- 
-Kind Regards,
-Niklas Söderlund
+2.34.1
+
 
