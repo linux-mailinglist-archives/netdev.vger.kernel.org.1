@@ -1,207 +1,158 @@
-Return-Path: <netdev+bounces-138958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46FF09AF879
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:50:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43179AF88B
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98743B216EA
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:50:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE3DE1C21A56
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715E0502BE;
-	Fri, 25 Oct 2024 03:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2546918C034;
+	Fri, 25 Oct 2024 03:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TmGZTsw6"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mdVmIkoh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE3C23B0;
-	Fri, 25 Oct 2024 03:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EAF23B0;
+	Fri, 25 Oct 2024 03:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729828251; cv=none; b=UHLgA+3N9I9USAaKES5MHLqVggEtFe0ux5P792IZvl4RC1GA4PQkH9SwsCLehtseAgJk/JkVu5DDCOup4ibQGP2G/oQpqoFsu4XP4UN6l0k1WSpJTle5UAvM2xKMbDL7u3U63Juso7GirTvATlBjv32Q1HXxeKoZPbBXm/yssP0=
+	t=1729828568; cv=none; b=AgbpVegUQ4ZstdldQ7HtkcwAK5L9bRXSG5tD0iXfihX5Pz0BWtlS2SQDQrbRIAuRdpMVSXm3bR9UVZTXngH7txgH3JTyEhCjc8G5Lw6R1G+icxOedv5q10iJzHvzQr2MOWoXaTrzAfIrOvd94HO6p7CNdRZMNOSAh0FBQRZX7Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729828251; c=relaxed/simple;
-	bh=BAfCx1BUhJEiTvQh+lxJIaEH29wG0UZqb0XAr0QgVMU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BAdYoVXRN0d6bTRscuKcIIo303oR6dXrw+L1wxm0e85xFtmzLO/r4cRk26AftHZYnhqbzBeRoHTTMsDLqRYyBOTA6KVwmZmwQQ7SlXGvpAN5VhSOEikHGkUtUXklEdSxussKAwwOvpcE1P3maOB5Elrk9dzljmItJSDEHHeTkbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TmGZTsw6; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729828244; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=csXrtLmLvSSe1liKlQmsgcqYt2pEi6/QWS4TVjAn6dI=;
-	b=TmGZTsw6sbPcd36rUFfg7zARhHdA+UJHiaVEFLnzO0a4k6k3jGOC54Xit+5jDN5qeJmQ1aSCsiSsHRBbtviyGv4XMPZmK6c9hiiOAasUqEq+qvTDalrxlF8bgdgyM+PbePttvfQNGo995duSeckbwzXExv7NzkkYw3xRKu2dcTQ=
-Received: from 30.221.128.174(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WHqz3cK_1729828242 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 25 Oct 2024 11:50:43 +0800
-Message-ID: <80fbd73f-ce75-44bf-a444-116217a50c91@linux.alibaba.com>
-Date: Fri, 25 Oct 2024 11:50:42 +0800
+	s=arc-20240116; t=1729828568; c=relaxed/simple;
+	bh=m7ZlUoB3WzOSQ0A1z/Y4hDN8MNufzEV1KFTivOtiPqQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g5wTeLrvKGIdA2CUYpQYThqhWDgXRK3dY7/Q77CQ5EGp/QrkrOvNai73kV2bJ0DBUBQ1KpIrUQss+Yj6+HDGyr0mkUQReCHoHsNPgav0LcLbXgWG2cPhfxJC89d3e2sdzGE3ll8YDvX7SJ/VuMVhLQiliGDGtIUqqj1kme0YZsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mdVmIkoh; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49P1Z3M9026346;
+	Fri, 25 Oct 2024 03:55:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=/6qecbCnIScJm5hggRYAgf
+	otRPEIP7HT2guiX2Y+zUs=; b=mdVmIkohA8ypyY6CUXR7JSm9T7kACPyuKH+XsL
+	MCtcRRhIjXuBOpjf4mt0NtOr7H70LeOPXMFi3aQRjZNrjaRd+bko7WA/+sT33SGM
+	X0RGkhpap7Pijq7d/R4yqFYOWDF4BBQu5pf1pb9zNx8ycF+DozYsfXAvbTKqzgtS
+	J6aGglJKGK9di/pY8xD6xGyfqbqN+Wb/NBvotVY4NnlyD2wXeofFuMJ/kMITtAH0
+	FrEk+j8ohTX76PcOe1m4P/H+khHUJDsu2l7gLmnYzNJHSGOtJWQ+dwEyaD9mlOOa
+	VsOlt3B2TIdzkpJXKz3GLoqRRcTD63EeoQ8bOeb1wH2XguHg==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em3wqmd7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 03:55:44 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49P3tgbU000348
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Oct 2024 03:55:42 GMT
+Received: from hu-mmanikan-blr.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 24 Oct 2024 20:55:35 -0700
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+To: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <dmitry.baryshkov@linaro.org>,
+        <angelogioacchino.delregno@collabora.com>, <neil.armstrong@linaro.org>,
+        <arnd@arndb.de>, <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
+        <quic_mmanikan@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <netdev@vger.kernel.org>
+CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
+Subject: [PATCH v8 0/7] Add NSS clock controller support for IPQ9574
+Date: Fri, 25 Oct 2024 09:25:13 +0530
+Message-ID: <20241025035520.1841792-1-quic_mmanikan@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 3/3] ipv4/udp: Add 4-tuple hash for connected
- socket
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
- antony.antony@secunet.com, steffen.klassert@secunet.com,
- linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
- jakub@cloudflare.com, fred.cc@alibaba-inc.com,
- yubing.qiuyubing@alibaba-inc.com
-References: <20241018114535.35712-1-lulie@linux.alibaba.com>
- <20241018114535.35712-4-lulie@linux.alibaba.com>
- <b232a642-2f0d-4bac-9bcf-50d653ea875d@redhat.com>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <b232a642-2f0d-4bac-9bcf-50d653ea875d@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 0Ok25_2AZmw5vwc5OiluW9AMDddlNee9
+X-Proofpoint-ORIG-GUID: 0Ok25_2AZmw5vwc5OiluW9AMDddlNee9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ mlxlogscore=877 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ spamscore=0 mlxscore=0 impostorscore=0 clxscore=1011 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410250026
 
+Add bindings, driver and devicetree node for networking sub system clock
+controller on IPQ9574. Also add support for gpll0_out_aux clock
+which serves as the parent for some nss clocks.
 
+Depends upon [1]
 
-On 2024/10/24 23:01, Paolo Abeni wrote:
-> On 10/18/24 13:45, Philo Lu wrote:
-> [...]
->> +/* In hash4, rehash can also happen in connect(), where hash4_cnt keeps unchanged. */
->> +static void udp4_rehash4(struct udp_table *udptable, struct sock *sk, u16 newhash4)
->> +{
->> +	struct udp_hslot *hslot4, *nhslot4;
->> +
->> +	hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
->> +	nhslot4 = udp_hashslot4(udptable, newhash4);
->> +	udp_sk(sk)->udp_lrpa_hash = newhash4;
->> +
->> +	if (hslot4 != nhslot4) {
->> +		spin_lock_bh(&hslot4->lock);
->> +		hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
->> +		hslot4->count--;
->> +		spin_unlock_bh(&hslot4->lock);
->> +
->> +		synchronize_rcu();
-> 
-> This deserve a comment explaining why it's needed. I had to dig in past
-> revision to understand it.
-> 
+[1] https://lore.kernel.org/linux-arm-msm/20241015-qcom_ipq_cmnpll-v4-0-27817fbe3505@quicinc.com/
 
-Got it. And a short explanation here (see [1] for detail):
+Changes in V8:
+	- Include NSS Huayra alpha pll patch to resolve the error's reported here
+	https://lore.kernel.org/oe-kbuild-all/202410101431.tjpSRNTY-lkp@intel.com/
+	- Detailed change logs are added to the respective patches
 
-Here, we move a node from a hlist to another new one, i.e., update 
-node->next from the old hlist to the new hlist. For readers traversing 
-the old hlist, if we update node->next just when readers move onto the 
-moved node, then the readers also move to the new hlist. This is unexpected.
+V7 can be found at:
+https://lore.kernel.org/linux-arm-msm/20241009074125.794997-1-quic_mmanikan@quicinc.com/	
 
-     Reader(lookup)     Writer(rehash)
-     -----------------  ---------------
-1. rcu_read_lock()
-2. pos = sk;
-3.                     hlist_del_init_rcu(sk, old_slot)
-4.                     hlist_add_head_rcu(sk, new_slot)
-5. pos = pos->next; <=
-6. rcu_read_unlock()
+V6 can be found at:
+https://lore.kernel.org/linux-arm-msm/20241004080332.853503-1-quic_mmanikan@quicinc.com/
 
-[1]
-https://lore.kernel.org/all/0fb425e0-5482-4cdf-9dc1-3906751f8f81@linux.alibaba.com/
+V5 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240626143302.810632-1-quic_devipriy@quicinc.com/
 
->> +
->> +		spin_lock_bh(&nhslot4->lock);
->> +		hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &nhslot4->head);
->> +		nhslot4->count++;
->> +		spin_unlock_bh(&nhslot4->lock);
->> +	}
->> +}
->> +
->> +static void udp4_unhash4(struct udp_table *udptable, struct sock *sk)
->> +{
->> +	struct udp_hslot *hslot2, *hslot4;
->> +
->> +	if (udp_hashed4(sk)) {
->> +		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
->> +		hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
->> +
->> +		spin_lock(&hslot4->lock);
->> +		hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
->> +		hslot4->count--;
->> +		spin_unlock(&hslot4->lock);
->> +
->> +		spin_lock(&hslot2->lock);
->> +		udp_hash4_dec(hslot2);
->> +		spin_unlock(&hslot2->lock);
->> +	}
->> +}
->> +
->> +/* call with sock lock */
->> +static void udp4_hash4(struct sock *sk)
->> +{
->> +	struct udp_hslot *hslot, *hslot2, *hslot4;
->> +	struct net *net = sock_net(sk);
->> +	struct udp_table *udptable;
->> +	unsigned int hash;
->> +
->> +	if (sk_unhashed(sk) || inet_sk(sk)->inet_rcv_saddr == htonl(INADDR_ANY))
->> +		return;
->> +
->> +	hash = udp_ehashfn(net, inet_sk(sk)->inet_rcv_saddr, inet_sk(sk)->inet_num,
->> +			   inet_sk(sk)->inet_daddr, inet_sk(sk)->inet_dport);
->> +
->> +	udptable = net->ipv4.udp_table;
->> +	if (udp_hashed4(sk)) {
->> +		udp4_rehash4(udptable, sk, hash);
-> 
-> It's unclear to me how we can enter this branch. Also it's unclear why
-> here you don't need to call udp_hash4_inc()udp_hash4_dec, too. Why such
-> accounting can't be placed in udp4_rehash4()?
-> 
+V4 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240625070536.3043630-1-quic_devipriy@quicinc.com/
 
-It's possible that a connected udp socket _re-connect_ to another remote 
-address. Then, because the local address is not changed, hash2 and its 
-hash4_cnt keep unchanged. But rehash4 need to be done.
+V3 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240129051104.1855487-1-quic_devipriy@quicinc.com/
 
-I'll also add a comment here.
+V2 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
 
-> [...]
->> @@ -2031,6 +2180,19 @@ void udp_lib_rehash(struct sock *sk, u16 newhash)
->>   				spin_unlock(&nhslot2->lock);
->>   			}
->>   
->> +			if (udp_hashed4(sk)) {
->> +				udp4_rehash4(udptable, sk, newhash4);
->> +
->> +				if (hslot2 != nhslot2) {
->> +					spin_lock(&hslot2->lock);
->> +					udp_hash4_dec(hslot2);
->> +					spin_unlock(&hslot2->lock);
->> +
->> +					spin_lock(&nhslot2->lock);
->> +					udp_hash4_inc(nhslot2);
->> +					spin_unlock(&nhslot2->lock);
->> +				}
->> +			}
->>   			spin_unlock_bh(&hslot->lock);
-> 
-> The udp4_rehash4() call above is in atomic context and could end-up
-> calling synchronize_rcu() which is a blocking function. You must avoid that.
-> 
+Devi Priya (7):
+  clk: qcom: clk-alpha-pll: Add NSS HUAYRA ALPHA PLL support for ipq9574
+  dt-bindings: clock: gcc-ipq9574: Add definition for GPLL0_OUT_AUX
+  clk: qcom: gcc-ipq9574: Add support for gpll0_out_aux clock
+  dt-bindings: clock: Add ipq9574 NSSCC clock and reset definitions
+  clk: qcom: Add NSS clock Controller driver for IPQ9574
+  arm64: dts: qcom: ipq9574: Add nsscc node
+  arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
 
-I see, synchronize_rcu() cannot be used with spinlock. However, I don't 
-have a good idea to solve it by now. Do you have any thoughts or 
-suggestions?
-
-> Cheers,
-> 
-> Paolo
-
-Thanks for your reviewing, Paolo. I'll address all your concerns in the 
-next version.
+ .../bindings/clock/qcom,ipq9574-nsscc.yaml    |   73 +
+ arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   22 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/clk/qcom/Kconfig                      |    7 +
+ drivers/clk/qcom/Makefile                     |    1 +
+ drivers/clk/qcom/clk-alpha-pll.c              |   11 +
+ drivers/clk/qcom/clk-alpha-pll.h              |    1 +
+ drivers/clk/qcom/gcc-ipq9574.c                |   15 +
+ drivers/clk/qcom/nsscc-ipq9574.c              | 3080 +++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
+ .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
+ .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
+ 12 files changed, 3498 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+ create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+ create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+ create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
 
 -- 
-Philo
+2.34.1
 
 
