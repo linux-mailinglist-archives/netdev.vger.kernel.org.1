@@ -1,128 +1,221 @@
-Return-Path: <netdev+bounces-139239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 722CA9B117C
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:11:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069929B1190
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3719B225BB
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:11:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B94282829A9
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A839213124;
-	Fri, 25 Oct 2024 21:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F75C18FC7C;
+	Fri, 25 Oct 2024 21:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="vV9hKXVF"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LvFV05bh"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1706213120;
-	Fri, 25 Oct 2024 21:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6776217F26;
+	Fri, 25 Oct 2024 21:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729890402; cv=none; b=nlwHH0rdFA2Y4YC3Dnwi0OmCBbck19C4AcRx6VUb8woZ28kuxhFop5FdKzrC8OnW4jy5S7bimnfu6PB2p4v+3VC4Ime4XhVwKrHIpHtNPYEHg9m3VfQEFDVVsyKQ8EMdTij63fGH/EZ3yQHAL8LAqyelksqwmrQxg/vAmxvFYYY=
+	t=1729891259; cv=none; b=oyJJPxONKdZd4/kRk7gr9iFNAhyETUFrprUMDGR/igmD7MqK0FYCB1cJJAPojN96Kui8x1V1RxN6mj3+1HzfzGXOF44j+1k3GcUTDmsUVWWCvsRI3oFC5XPR/P2cNLN0Wolksf2hF/RO0Nv+1DALuooD2LrIyjkkQuFkYHf4FEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729890402; c=relaxed/simple;
-	bh=pqNdeGqpS3ELJrftLu6CbADN4Yt/eviDgPqQ891h5Fs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tHKo9xuQ3rHETKj9DLmeBkpwoo0ritle7dKzCacXZ7jBe7nM4fhtB14qjTj/Mi5QKS6crL3G2WpAdz8ItDTNXfbxnctr0OPUSAHzemH9wWB0FD1AMpKWRDuMAtxHs/W13zDy4Z7wyPvmjlMAeztZuHpk1iypI0cCN2N+gh0LBP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=vV9hKXVF; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id E5CAF200F487;
-	Fri, 25 Oct 2024 23:06:36 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be E5CAF200F487
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1729890397;
-	bh=o9yNod9FcRqEk/LV8Ey+bAHerVAR7xSMn0rxDJz6Na0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vV9hKXVFz9ut42jGdcVedjr1G3AAGvkvIm4b8q4izH8/0p76RfijBnuCutNvIsgZ4
-	 4NhqBpOG6USBege9j6n8hQPIEfgPrUqETQfVVKMc391k8meW1+/7QznQBElFzayQNO
-	 xemuzEITNXY6qV+T92Tz0AILaoNS6r7A/Mbm9WTCKuDVuBwl9R+R11nLsLpMa18yHZ
-	 KFUspj43xIomAK+2DBnL1vXLgpmLduB4Sv99L8TuzXeMolyLYYTXTJiNsk4SUxToNk
-	 Y7Ehlbd4o3h6wvzjwc6sSll6zBc2v6sAMlFV0z1INe5x0UE4Th7abxHLzdlsz/0r8u
-	 RR3M1mVD3D1pw==
-Message-ID: <d3bce110-4b1b-44ed-8c1d-a9736a02f1dd@uliege.be>
-Date: Fri, 25 Oct 2024 23:06:36 +0200
+	s=arc-20240116; t=1729891259; c=relaxed/simple;
+	bh=57vOctAD49NrQhDt8l1YUqfvpP3ziCUAVIMrtEA3ITs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H5G/hk2aomggqEneVTE7iB0V7VNtWpdtUDWBmTc4tFlsUnzmXCvzfJ6zB7D/w5JcCxBt/7+1uB2/5YIwagFSUriLayoSOs+Eng4ZfQRsXEL4JFv6FmdYCT5iomVHf8JnjS5u8Ejx6F5iMIXUs7FhTeL/HczouVJaSvnEIGREqow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LvFV05bh; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729891257; x=1761427257;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xJucfPW8gqHovBbo1lxqZGoM9KaBpI/dnGHVCNGQC/4=;
+  b=LvFV05bhi3bGFq3ndil5rgPVZym2MWuDAoGfyBfNd0TxU7F7IPcH7eQH
+   eBF2YkQgqaBg7IF3i9L0QN41fDIfk2xMBBvnVfgtHTzTyU2+plNYytF3n
+   NLzUK4/LyQfNsRml+dNriT7Ptyn0ppZHtlckfHHo+JoWHL1huFheuD3Oj
+   4=;
+X-IronPort-AV: E=Sophos;i="6.11,233,1725321600"; 
+   d="scan'208";a="242466256"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 21:20:52 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:36367]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.37:2525] with esmtp (Farcaster)
+ id dc60af94-3e76-4c67-b1bf-1a0cea511b81; Fri, 25 Oct 2024 21:20:51 +0000 (UTC)
+X-Farcaster-Flow-ID: dc60af94-3e76-4c67-b1bf-1a0cea511b81
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 25 Oct 2024 21:20:51 +0000
+Received: from 6c7e67c6786f.amazon.com (10.143.64.59) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 25 Oct 2024 21:20:43 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <liujian56@huawei.com>
+CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
+	<jlayton@kernel.org>, <kuba@kernel.org>, <linux-nfs@vger.kernel.org>,
+	<neilb@suse.de>, <netdev@vger.kernel.org>, <okorniev@redhat.com>,
+	<pabeni@redhat.com>, <tom@talpey.com>, <trondmy@hammerspace.com>,
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH net] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
+Date: Fri, 25 Oct 2024 14:20:38 -0700
+Message-ID: <20241025212038.31584-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <d340cd68-f08b-41e6-9202-a13225c744a9@huawei.com>
+References: <d340cd68-f08b-41e6-9202-a13225c744a9@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: ipv6: ioam6_iptunnel: mitigate
- 2-realloc issue
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241025133727.27742-1-justin.iurman@uliege.be>
- <20241025133727.27742-2-justin.iurman@uliege.be>
- <59a875a9-2072-467d-8989-f01525ecd08c@intel.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <59a875a9-2072-467d-8989-f01525ecd08c@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 10/25/24 17:12, Alexander Lobakin wrote:
-> From: Justin Iurman <justin.iurman@uliege.be>
-> Date: Fri, 25 Oct 2024 15:37:25 +0200
-> 
->> This patch mitigates the two-reallocations issue with ioam6_iptunnel by
->> providing the dst_entry (in the cache) to the first call to
->> skb_cow_head(). As a result, the very first iteration would still
->> trigger two reallocations (i.e., empty cache), while next iterations
->> would only trigger a single reallocation.
-> 
-> [...]
-> 
->>   static int ioam6_do_inline(struct net *net, struct sk_buff *skb,
->> -			   struct ioam6_lwt_encap *tuninfo)
->> +			   struct ioam6_lwt_encap *tuninfo,
->> +			   struct dst_entry *dst)
->>   {
->>   	struct ipv6hdr *oldhdr, *hdr;
->>   	int hdrlen, err;
->>   
->>   	hdrlen = (tuninfo->eh.hdrlen + 1) << 3;
->>   
->> -	err = skb_cow_head(skb, hdrlen + skb->mac_len);
->> +	err = skb_cow_head(skb, hdrlen + (!dst ? skb->mac_len
->> +					       : LL_RESERVED_SPACE(dst->dev)));
-> 
-> You use this pattern a lot throughout the series. I believe you should
-> make a static inline or a macro from it.
-> 
-> static inline u32 some_name(const *dst, const *skb)
-> {
-> 	return dst ? LL_RESERVED_SPACE(dst->dev) : skb->mac_len;
-> }
-> 
-> BTW why do you check for `!dst`, not `dst`? Does changing this affects
-> performance?
+From: "liujian (CE)" <liujian56@huawei.com>
+Date: Fri, 25 Oct 2024 11:32:52 +0800
+> >>> If not, then what prevents it from happening?
+> >> The socket created by the userspace program obtains the reference
+> >> counting of the namespace, but the kernel socket does not.
+> >>
+> >> There's some discussion here:
+> >> https://lore.kernel.org/all/CANn89iJE5anTbyLJ0TdGAqGsE+GichY3YzQECjNUVMz=G3bcQg@mail.gmail.com/
+> > OK... So then it looks to me as if NFS, SMB, AFS, and any other
+> > networked filesystem that can be started from inside a container is
+> > going to need to do the same thing that rds appears to be doing.
 
-Not at all, you're right... even the opposite actually. Regarding the 
-static inline suggestion, it could be a good idea and may even look like 
-this as an optimization:
+FWIW, recently we saw a similar UAF on CIFS.
 
-static inline u32 dev_overhead(struct dst_entry *dst, struct sk_buff *skb)
-{
-	if (likely(dst))
-		return LL_RESERVED_SPACE(dst->dev);
 
-	return skb->mac_len;
-}
+> >
+> > Should there perhaps be a helper function in the networking layer for
+> > this?
+> 
+> There should be no such helper function at present, right?.
+> 
+> If get net's reference to fix this problem, the following test is 
+> performed. There's nothing wrong with this case. I don't know if there's 
+> anything else to consider.
+> 
+> I don't have any other ideas other than these two methods. Do you have 
+> any suggestions on this problem? @Eric @Jakub ... @All
 
-The question is... where should it go then? A static inline function per 
-file (i.e., ioam6_iptunnel.c, seg6_iptunnel.c, and rpl_iptunnel.c)? In 
-that case, it would still be repeated 3 times. Or in a header file 
-somewhere, to have it defined only once? If so, what location do you 
-think would be best?
+The netns lifetime should be managed by the upper layer rather than
+the networking layer.  If the netns is already dead, the upper layer
+must discard the net pointer anyway.
+
+I suggest checking maybe_get_net() in NFS, CIFS, etc and then calling
+__sock_create() with kern 0.
+
+
+> 
+> diff --git a/include/linux/net.h b/include/linux/net.h
+> index b75bc534c1b3..58216da3b62c 100644
+> --- a/include/linux/net.h
+> +++ b/include/linux/net.h
+> @@ -255,6 +255,7 @@ int __sock_create(struct net *net, int family, int 
+> type, int proto,
+>                    struct socket **res, int kern);
+>   int sock_create(int family, int type, int proto, struct socket **res);
+>   int sock_create_kern(struct net *net, int family, int type, int proto, 
+> struct socket **res);
+> +int sock_create_kern_getnet(struct net *net, int family, int type, int 
+> proto, struct socket **res);
+>   int sock_create_lite(int family, int type, int proto, struct socket 
+> **res);
+>   struct socket *sock_alloc(void);
+>   void sock_release(struct socket *sock);
+> diff --git a/net/socket.c b/net/socket.c
+> index 042451f01c65..e64a02445b1a 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -1651,6 +1651,34 @@ int sock_create_kern(struct net *net, int family, 
+> int type, int protocol, struct
+>   }
+>   EXPORT_SYMBOL(sock_create_kern);
+> 
+> +int sock_create_kern_getnet(struct net *net, int family, int type, int 
+> proto, struct socket **res)
+> +{
+> +       struct sock *sk;
+> +       int ret;
+> +
+> +       if (!maybe_get_net(net))
+> +               return -EINVAL;
+> +
+> +       ret = sock_create_kern(net, family, type, proto, res);
+> +       if (ret < 0) {
+> +               put_net(net);
+> +               return ret;
+> +       }
+> +
+> +       sk = (*res)->sk;
+> +       lock_sock(sk);
+> +       /* Update ns_tracker to current stack trace and refcounted 
+> tracker */
+> +       __netns_tracker_free(net, &sk->ns_tracker, false);
+> +
+> +       sk->sk_net_refcnt = 1;
+> +       netns_tracker_alloc(net, &sk->ns_tracker, GFP_KERNEL);
+> +       sock_inuse_add(net, 1);
+> +       release_sock(sk);
+> +
+> +       return ret;
+> +}
+> +EXPORT_SYMBOL(sock_create_kern_getnet);
+> +
+>   static struct socket *__sys_socket_create(int family, int type, int 
+> protocol)
+>   {
+>          struct socket *sock;
+> diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+> index 825ec5357691..31dc291446fb 100644
+> --- a/net/sunrpc/svcsock.c
+> +++ b/net/sunrpc/svcsock.c
+> @@ -1526,7 +1526,10 @@ static struct svc_xprt *svc_create_socket(struct 
+> svc_serv *serv,
+>                  return ERR_PTR(-EINVAL);
+>          }
+> 
+> -       error = __sock_create(net, family, type, protocol, &sock, 1);
+> +       if (protocol == IPPROTO_TCP)
+> +               error = sock_create_kern_getnet(net, family, type, 
+> protocol, &sock);
+> +       else
+> +               error = sock_create_kern(net, family, type, protocol, 
+> &sock);
+>          if (error < 0)
+>                  return ERR_PTR(error);
+> 
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index 0e1691316f42..d2304010daeb 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -1922,7 +1922,10 @@ static struct socket *xs_create_sock(struct 
+> rpc_xprt *xprt,
+>          struct socket *sock;
+>          int err;
+> 
+> -       err = __sock_create(xprt->xprt_net, family, type, protocol, 
+> &sock, 1);
+> +       if (protocol == IPPROTO_TCP)
+> +               err = sock_create_kern_getnet(xprt->xprt_net, family, 
+> type, protocol, &sock);
+> +       else
+> +               err = sock_create_kern(xprt->xprt_net, family, type, 
+> protocol, &sock);
+>          if (err < 0) {
+>                  dprintk("RPC:       can't create %d transport socket 
+> (%d).\n",
+>                                  protocol, -err);
 
