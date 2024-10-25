@@ -1,203 +1,239 @@
-Return-Path: <netdev+bounces-138999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8259AFBB3
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:59:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86679AFBB6
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2C48B20F1A
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 07:59:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683952844D4
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329511C07F7;
-	Fri, 25 Oct 2024 07:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846B41C1741;
+	Fri, 25 Oct 2024 08:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VbYJlMYx"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q3bpuJkx";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iSm5PcWT";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q3bpuJkx";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="iSm5PcWT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDDBD1BA89C;
-	Fri, 25 Oct 2024 07:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340181C4622;
+	Fri, 25 Oct 2024 08:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729843188; cv=none; b=jNbO2oGy0YWg+NkODqAoBgyk1Cr3pN4oInfLAPeCnwZgr1lV//QEUn4l0SVxF7Xxip4di784bf728fZR5zsOdSzsBN/eO3or/b5h+MT+nkhDh4cfZpGFGqA94/O4vd7f8lxaAEZ+viRJAEyEehVgDTj6AcOjvkQu0qgle+2lJPY=
+	t=1729843206; cv=none; b=Z0/HCLoboPmDTFXc4UYOP9EtiJl+NxxJNwJpFcJjQFjDxsq5ozrZElkXqj0QlLzinMo8TAYKos5LwoSotfvqls1TQAxViqXOU+LpFVBC8EZFmNDPmTHLkhh52qZK3zgiYyLC0CVm5ZVGP0JPjsTsOxf+oRAWYVJBbiFaJ2bQyms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729843188; c=relaxed/simple;
-	bh=ZwXF6dhZ8iT7Eodpg52WajA5XEG61/ova2qtmBug/w4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EpuLnp6ae3rcu1HhsevJ3iglL8fLntqTT5bD/6LpaQtqtWBIwOHfVzmokX+PXUapMHKm3xih0QTmOKwBdUesIBEO6ewvXNxpq6fo0zZcKt+e4HDPeGcBRZdDYn/jC2B6TBOhIGQdaodJ64jY5R1Au+w7bFTU2o7RPBrJo+hnXS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VbYJlMYx; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c9150f9ed4so2234805a12.0;
-        Fri, 25 Oct 2024 00:59:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729843184; x=1730447984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hd6AcB17C3pU3euiSeTb3e11OEHc2Kd+f7cjf+IstcU=;
-        b=VbYJlMYx2OA0V/6uBhMfQRx8iuoErkpF1BTFzifQ0Lf+C1e9f1Ts7LTh+sEk+QkZlr
-         npiED1S+PSO2q26kJlexx7s7mhJ1OG0eBn8eVQoJjzaNCi3CoGp0sLsAXjouLgVC3rjy
-         JKIzmmdCH2JsPaw3+AwyMgTYa/O7hm/YnsjqDxORbVAZJdwCFDdTDboKqjtVITa7Kfrl
-         n/qd2c+DB+5/cO7pxFbbehUkTSqP576MlZX8AM9ptzJaByPNGzjFm0d/EuJbPO6lSSnt
-         bt004U7EAvkqEmMbTrvsD5Z4zwkUyLoxfR4KTkL3PDOpP5R63mQ9O/UymjIofXiP7sVX
-         B9ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729843184; x=1730447984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hd6AcB17C3pU3euiSeTb3e11OEHc2Kd+f7cjf+IstcU=;
-        b=DT8R3lqFeEtpwa8CzNqvVj86uVAf+PloCMxiepvyGtKqTwDKCJRsfYz6+hkMEajItO
-         DfSe8ElnEm7Pv1Bz6oudMTkVT6t7dTvzuRmFUrcAk/O4CfVOVAW6xHW5WU37OsEOf4w0
-         jzaBSOFwr3cQfQMnnOWQ9Jr8ls/d6F7E0DoW6i4v8YJluegElOKvYgnn32G3m59Z8k/P
-         1/k3w5QAuQyGW/tUPbqC52HJRm9rUFbvtaDJMUf3L9DVRBXd8KDLhdeoBpczm0ObtAif
-         C4qDDCMgOsdTXqk/jOp0AzaiwP1+0wK4iSk0cCAI1+KiDQkQ0UCoJgfR0Aikt/uu/Qku
-         MUVA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/x16OlxPnar1PtYTa8K8/863coIV4McZl2ooLrlKp23sNyXf7MvREetKiVpqaFFk/oG3gCMb8Q/0=@vger.kernel.org, AJvYcCX383ex/PBKmhIWCiNCfEmyQV0Qnlr9XB1ko16TWcNXD98BHuRbf8qeDFbdEl3rrjwcZcvou702@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuA4KjjL42b+Dk/Lwa9z/dYTks1wWGYVZ9qByGQtGuLtkDDBLI
-	mExdnBNLmqM2eJnX2Y3YGUYgiI0kJsS8/33Hygffg5cVhvY9aUU6BepghjvLMW1ZCUIXnJC1IQC
-	gSl2EttoFsyZr/xXcFhMYqPKO6B8=
-X-Google-Smtp-Source: AGHT+IHHIaNSd16mI/bK14sTWeCMGJAPpmnRGnYyr02HQfUbTxyukdwWKammtzt8sMhXILaF42N8WwEsFij6DuS7Qsk=
-X-Received: by 2002:a05:6402:2792:b0:5c9:893e:30d2 with SMTP id
- 4fb4d7f45d1cf-5cba244dce8mr3451100a12.8.1729843183843; Fri, 25 Oct 2024
- 00:59:43 -0700 (PDT)
+	s=arc-20240116; t=1729843206; c=relaxed/simple;
+	bh=pDKoYNWc5esSfmM2VKEvc47EU0gOkj8FOL8qQDFJZYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3yUSWnigy60bFbw7c6IRgfHlXshTyd+aONOTTjV3D1AbMfwNKn0aQb2NHlMtGeQctlI7kpE9ubJuzrLZF7HqKOHOhkHuLUw03rkIrlWFsAIiBC0c5ZS+2bng8wJeEfmMvrE9x1td4JrOkqiFV6t8pqJWbe/GUXp8AG3qhP0VLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q3bpuJkx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iSm5PcWT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q3bpuJkx; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=iSm5PcWT; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6EB8221E14;
+	Fri, 25 Oct 2024 08:00:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729843202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
+	b=Q3bpuJkxSkOVve5uvDfli9jz2KlAsWAiPZucR6NpoGrjTSqrlZ9/qm3XU/eT9vQVnbET3I
+	TTAAXXZP+7z0PHH0dA3MZuiTGQ2TFSNvfRJuCAYA+pc5kGIbuwT5wE/GSeonj4dnHxaqqc
+	Fg6YV45j4Ieg70gSybwep693JDKmHFw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729843202;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
+	b=iSm5PcWTohwwYs+NwSceqzvMUzvEepB2n1+Qq0val4EWG9nqyrd/iHlwKVqznKHhda8xxm
+	Jc1ZYwjEHHsRlQDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729843202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
+	b=Q3bpuJkxSkOVve5uvDfli9jz2KlAsWAiPZucR6NpoGrjTSqrlZ9/qm3XU/eT9vQVnbET3I
+	TTAAXXZP+7z0PHH0dA3MZuiTGQ2TFSNvfRJuCAYA+pc5kGIbuwT5wE/GSeonj4dnHxaqqc
+	Fg6YV45j4Ieg70gSybwep693JDKmHFw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729843202;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gt4eKGHTaDKGDIpEe7BbcCU3OPOhB5+NbtQhvob/2u0=;
+	b=iSm5PcWTohwwYs+NwSceqzvMUzvEepB2n1+Qq0val4EWG9nqyrd/iHlwKVqznKHhda8xxm
+	Jc1ZYwjEHHsRlQDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C94FB132D3;
+	Fri, 25 Oct 2024 07:59:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 1OmFJ/9PG2coWQAAD6G6ig
+	(envelope-from <aherrmann@suse.de>); Fri, 25 Oct 2024 07:59:59 +0000
+Date: Fri, 25 Oct 2024 09:59:53 +0200
+From: Andreas Herrmann <aherrmann@suse.de>
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+	ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
+	"paulburton@kernel.org" <paulburton@kernel.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	linux-pci <linux-pci@vger.kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Kelvin Cheung <keguang.zhang@gmail.com>,
+	Yanteng Si <siyanteng@loongson.cn>, netdev@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>, linux-hwmon@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>, linux-edac@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-serial@vger.kernel.org, Andrew Halaney <ajhalaney@gmail.com>,
+	Nikita Travkin <nikita@trvn.ru>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Evgeniy Dushistov <dushistov@mail.ru>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+	Nikita Shubin <nikita.shubin@maquefel.me>,
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: linux: Goodbye from a Linux community volunteer
+Message-ID: <20241025075953.GA3559@alberich>
+References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+ <753d203a-a008-4cd3-b053-38b5ce31281b@app.fastmail.com>
+ <f90bba20e86dac698472d686be7ec565736adca0.camel@HansenPartnership.com>
+ <2f203b14-be13-4eef-bcb1-743dd9e9e9bd@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022162359.2713094-1-ap420073@gmail.com> <20241022162359.2713094-3-ap420073@gmail.com>
- <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
-In-Reply-To: <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 25 Oct 2024 16:59:31 +0900
-Message-ID: <CAMArcTWEDmw5o6uVOWS_JdPueqX+rfr1NS=ynAAjtOnhcFF+sA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/8] bnxt_en: add support for tcp-data-split
- ethtool command
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, almasrymina@google.com, donald.hunter@gmail.com, 
-	corbet@lwn.net, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com, 
-	Andrew Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2f203b14-be13-4eef-bcb1-743dd9e9e9bd@app.fastmail.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[hansenpartnership.com,gmail.com,kudzu.us,intel.com,lists.linux.dev,kernel.org,linux.intel.com,bootlin.com,linux.dev,vger.kernel.org,alpha.franken.de,arndb.de,google.com,linaro.org,renesas.com,davemloft.net,redhat.com,lunn.ch,armlinux.org.uk,loongson.cn,roeck-us.net,alien8.de,linuxfoundation.org,trvn.ru,jurassic.park.msu.ru,mail.ru,omp.ru,linux-m68k.org,maquefel.me];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[53];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -2.30
+X-Spam-Flag: NO
 
-On Fri, Oct 25, 2024 at 2:02=E2=80=AFPM Michael Chan
+On Thu, Oct 24, 2024 at 05:58:45PM +0100, Jiaxun Yang wrote:
+> 
+> 
+> 在2024年10月24日十月 下午5:27，James Bottomley写道：
+> > On Thu, 2024-10-24 at 16:59 +0100, Jiaxun Yang wrote:
+> [...]
+> 
+> Hi James,
+> 
+> >
+> > It's Linux, so no official capacity at all.  However, I am expressing
+> > the views of a number of people I talked to but it's not fair of me to
+> > name them.
+> 
+> Fair enough, I was hoping that it's from Linux Foundation but it's still
+> good news to me that it do represent some respectful individuals.
+> 
+> >
+> [...]
+> >> How should we handle it?
+> >
+> > A big chunk of the reason it's taken so long just to get the above is
+> > that the Lawyers (of which I'm not one) are still discussing the
+> > specifics and will produce a much longer policy document later, so they
+> > don't want to be drawn into questions like this.  However, my non-
+> > legal-advice rule of thumb that I'm applying until I hear otherwise is
+> > not on the SDN list, not a problem.
+> 
+> Thank you for sharing your insights. I'm looking forward to the document.
 
-Hi Michael,
-Thank you so much for the review!
++1
 
-<michael.chan@broadcom.com> wrote:
->
-> On Tue, Oct 22, 2024 at 9:24=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
-rote:
-> >
-> > NICs that uses bnxt_en driver supports tcp-data-split feature by the
-> > name of HDS(header-data-split).
-> > But there is no implementation for the HDS to enable or disable by
-> > ethtool.
-> > Only getting the current HDS status is implemented and The HDS is just
-> > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled=
-.
-> > The hds_threshold follows rx-copybreak value. and it was unchangeable.
-> >
-> > This implements `ethtool -G <interface name> tcp-data-split <value>`
-> > command option.
-> > The value can be <on>, <off>, and <auto> but the <auto> will be
-> > automatically changed to <on>.
-> >
-> > HDS feature relies on the aggregation ring.
-> > So, if HDS is enabled, the bnxt_en driver initializes the aggregation
-> > ring.
-> > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
-> >
-> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v4:
-> >  - Do not support disable tcp-data-split.
-> >  - Add Test tag from Stanislav.
-> >
-> > v3:
-> >  - No changes.
-> >
-> > v2:
-> >  - Do not set hds_threshold to 0.
-> >
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  8 +++-----
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  5 +++--
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++++++++
-> >  3 files changed, 19 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
-hernet/broadcom/bnxt/bnxt.c
-> > index 0f5fe9ba691d..91ea42ff9b17 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->
-> > @@ -6420,15 +6420,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *=
-bp, struct bnxt_vnic_info *vnic)
-> >
-> >         req->flags =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PL=
-ACEMENT);
-> >         req->enables =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMB=
-O_THRESH_VALID);
-> > +       req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
-> >
-> > -       if (BNXT_RX_PAGE_MODE(bp)) {
-> > -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
->
-> Please explain why this "if" condition is removed.
-> BNXT_RX_PAGE_MODE() means that we are in XDP mode and we currently
-> don't support HDS in XDP mode.  Added Andy Gospo to CC so he can also
-> comment.
+> While I remain quite upset about how things were handled, your message has
+> helped restore some of my confidence in the community.
 
-Yes,
-The reason why the "if" condition is removed is to make rx-copybreak
-a pure software feature.
++1
 
-The current jumbo_thresh follows the rx-copybreak value, however,
-I thought the rx-copybreak value should not affect any hardware function.
-So, I thought following rx_buf_use_size instead of rx_copybreak is okay.
-By this change, jumbo_thresh always follows rx_buf_use_size,
-so I removed the "if" condition.
-Oh, on second thought, it changes a default behavior, it's not my intention=
-.
-What value would be good for jumbo_thresh following?
-What do you think?
+> I agree with Peter Cai's earlier comment that steps should be taken to address
+> the harm caused by the initial reckless actions, particularly to those who were
+> humiliated.
 
++1
 
->
-> > -       } else {
-> > +       if (bp->flags & BNXT_FLAG_AGG_RINGS) {
-> >                 req->flags |=3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS=
-_HDS_IPV4 |
-> >                                           VNIC_PLCMODES_CFG_REQ_FLAGS_H=
-DS_IPV6);
-> >                 req->enables |=3D
-> >                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_T=
-HRESHOLD_VALID);
-> > -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_copybreak);
-> >                 req->hds_threshold =3D cpu_to_le16(bp->rx_copybreak);
-> >         }
-> >         req->vnic_id =3D cpu_to_le32(vnic->fw_vnic_id);
+> It is also important to put measures in place to prevent such drama from recurring.
+> A formal procedure for handling urgent compliance requests may be a sensible step
+> forward.
 
-Thank you so much for the review!
-Taehee Yoo
++1
+
+> I hold our community in high regard and would be heartbreaking to see the reputation
+> of the Linux Kernel undermined in such an unfortunate manner. I would appreciate it
+> if you could convey those thoughts to the relevant individuals.
+
++1
+
+-- 
+Regards,
+Andreas
+
+PS: What people also tend to forget. No matter how worse it gets in
+world affairs there always will come a time after a conflict. And
+people with brains should look forward to such times and how they can
+continue to work together then.
 
