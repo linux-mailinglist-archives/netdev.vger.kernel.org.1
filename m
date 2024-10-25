@@ -1,621 +1,180 @@
-Return-Path: <netdev+bounces-139202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1A39B0FA6
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 22:17:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 443E79B0FB0
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 22:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8D0BB237BB
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 20:17:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07023285F0A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 20:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4171E1FB8BF;
-	Fri, 25 Oct 2024 20:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C2820F3F1;
+	Fri, 25 Oct 2024 20:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fiGerNMo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXOv6ozT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1420D17C9E8;
-	Fri, 25 Oct 2024 20:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5924620C319;
+	Fri, 25 Oct 2024 20:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729887440; cv=none; b=b5UI2YWIYC4/nWKKIUmcTZ1ri3cFSYRaL+9+enEOCAXatn8bzC975i8bBeMduXtnCVIupZKrE68mtwK0B/Y+SRFcm3I0m4clCV4WfD1+i0bCoXE7xbaQkqx1S5cO8ljEvUdB1OZV0jBP5QdDFsJrfK2TMr+ELix8iDtGsG5Fi7A=
+	t=1729887609; cv=none; b=FHtTta951jIy9C7RrrWrUohno2I6UFqNZBUUwt6YqP7evSUJTLVHPKMAMiO3VCLEAuRMVvvSFnVh2TATACOHozWfknsFM2CdyZKgTwTAhTz61VBYNBjy2+DevPHvSlpP6Az24pKf+I+FSGefTDKrDUqVykOF6+q9Fnunfb2uEaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729887440; c=relaxed/simple;
-	bh=WmqRJIOGnsDY3+h02QvcZgWVYRk7bISPfyVcMIuO20c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QQ8QxmIbkrwXl/0WJWgRn0c+FXYeHnWis5wVpfZk81BCpG3sMTYO4W1Dzb9bAc11L16YHTOB033Sj3lsnGiquqmSh8SDLnwZgMVb+nBqeGR50MvIL0w+DXlZOpw8Hzc2UC6NYj6/4eUkj0/D9y/RiDS5tcO6MF3xLOjz4dZJ+Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fiGerNMo; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1729887609; c=relaxed/simple;
+	bh=naweq0+G9RQVr6kbHD6RZtaMs1brq8HVOycmjlxV7oU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uUbMwxvh0JPKaZqAT9ADMglvO50fJGQD777RUQRrM9u5QlNK4Wl0PFyc99n+0AqbI4pS7kvihAi/5nE9ZZ+SWK6NSmunN7U+cTAvr1SKbO+H+h2m9/DzhQnnB51/WzTmSbHvL9+eRXuDzZqQLy4gL/Go3Z8eMFlQb/VmB9fMOrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BXOv6ozT; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71e79f73aaeso1692677b3a.3;
-        Fri, 25 Oct 2024 13:17:16 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6e38fc62b9fso23145797b3.2;
+        Fri, 25 Oct 2024 13:20:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729887436; x=1730492236; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1wc/QZe1hiCCq5FlwaTTiitAUZHpvboWKLlfnwXki6s=;
-        b=fiGerNMoT9bnPPM0ZWbDQ4AjFNWJMqKN4Ea2UcNfv0KQb3Vr1ZWaXZUR318/BLzOYT
-         XO6HhigSyTe3ipruX794tdeZWcjrba29AlgdSc93iJLMpD82VziV9NJe/P97T+UtrbFT
-         lV71oRjiPoRBh1qRUxQlJ7zKvHiY28OUOk0hamyQVEJDplpxqi4aLtBRE/38yOQgIASg
-         iXVlVhmFmxZ0mDfVc9Raj8sRJQxaAlirxZCI39Rx729CapVReMg/Teb4HJE2xxPm1J8r
-         IoJ0UtJBtNqX1hSGG+RK4bCj6wSQqevB5bgZY4ZmtpPCVGXs+ZDcA6lU+1F8Nyc8a14Z
-         I4hg==
+        d=gmail.com; s=20230601; t=1729887606; x=1730492406; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SXyMgVJ8SMoPT6DVm8ucQxYlv2RUv92E4LD4kUVHd0k=;
+        b=BXOv6ozTUfjJCtwkoSrNoK8wiv6OpInoRQSoiyYJmrLivf/3yiHovIRG6ZyOhoI+Cj
+         guYAcTZ7NPRCE9jB3HyTURO+F93262rtdSscU5ifbgUBPK5hIcsTh+HeOChr5kqTxuhF
+         j0SDmcD6oVM56+Lb4Ey0zPmhQdwxR7Bza7ybSuds2Kd2eEdRBGiWphxOsQ3TefClFI1/
+         AQbivxmFymStZ6bcyF2+UEsAdB2lXpcAI6U7t7CV6QW2yEw2HGgMEqzutNwKmbyFJzQm
+         hJTdvav5glOEzHFz233vSwX9DFs3+PRpFSKI4liP+rgjaaE9fPlzm2HyylpFPAz3l1vv
+         ICug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729887436; x=1730492236;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1wc/QZe1hiCCq5FlwaTTiitAUZHpvboWKLlfnwXki6s=;
-        b=TkyE5NyR8AES27nnBQuaroUH0OWKSf0oEfBzI2QhTg+JHDNYr9HWgpz9aM4gBTqAfj
-         a/czJrkI/6lfj4B3eTz8z1/nGTJGZ8cs3jBMgQIXqMQdqAugRKJSS7TkOIN/W9t98TlW
-         dAA8V94UTtmpRJa31HJC3SFMkMtYVA6lHgAVeQncKDP4GxWYzyQ3DSMT329kOWpQfBPa
-         xSh0c+9ZR/GuQ+amB1XKgK7Bnm4vzMo24S3qnUdKxjoI6QT5LymOAa8+OlSSLdsp1hTk
-         Ov72qF4Op2smDrJEqDZX4i5KKiwGxYNg/YPva+/JGuezy39JifHutTiqHsMGkW1Yb+5d
-         fIxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUb6AD81HNb1JDcED7bfzgHH8IUlfAkrCjLadWqBjFwlDQZm31ZrbfosTGgjN1OwiqA7oMt6MHrERBC2wYJ@vger.kernel.org, AJvYcCXyIKtOuqL9jh4C0xm5qkMpzVx+GIaEb+vV2rnSPgeQuDci214GvvN3PYFXWaZA+Jjubm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4JHBXtPvmUMYs56bwKL/jifdZOSbc34cAia86+YLpJhLfCPmE
-	/7YM8PYnRuPtkk0oyZSXGRNGhROM2xGPCiciNX1op4hUV3eeVcZ5RGO+KaaX
-X-Google-Smtp-Source: AGHT+IFy/XpPK5XHbCp3ZcMUxcmsqjAA3atraI3Q40V3KVXnSL7m4jzYB5iT5tJHNZvoUDUcDGUpZw==
-X-Received: by 2002:a05:6a00:2e08:b0:71e:6f63:f076 with SMTP id d2e1a72fcca58-72062f4e5c7mr902990b3a.5.1729887436038;
-        Fri, 25 Oct 2024 13:17:16 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a3c228sm1478335b3a.187.2024.10.25.13.17.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 13:17:15 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: [PATCHv2 net-next iwl-next] net: intel: use ethtool string helpers
-Date: Fri, 25 Oct 2024 13:17:13 -0700
-Message-ID: <20241025201713.286074-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        d=1e100.net; s=20230601; t=1729887606; x=1730492406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SXyMgVJ8SMoPT6DVm8ucQxYlv2RUv92E4LD4kUVHd0k=;
+        b=i0SyFege4oKLmWpKe/dj3M21GbWXsIlQRot4UYMiBqI+XVJkgkRKufXfG/Tlwmy61o
+         GVukL7fGQRmjYHJx45514uyVwVtGDGmFgBGIkoNqSZcs3JbImXxj8kcx4gs6Ip8yvEc6
+         16Y2QcQJ0KnSL+M8E5tR8uk2Xpv3wcfa0dcJ35T5JexKZdrzv/zcy72XTGqZDn/oq1BJ
+         yk8/J6LONdnp4TCIgLQKSoDI54QQL95zru+UTiQhBXRuLTSK2rqq1lhF7g44w+erKeDO
+         Jb59QT0rRtWf4l3kNkJWLfplyrnkauuIIFmk4xekIs5MSKEpBOkx4iLhL9RkTmrPuRd0
+         FxKg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9y6JkrVyTOegShZ2iK9LrqO26bM0FF7pyjvB4v6RH6GkQ35+/OIcdZJ+7AQ3FFEIhReM=@vger.kernel.org, AJvYcCWVHo39V93pdWX6OpXwn2yi1Coe1YmFtTq786UZEngaAWsb4qXMYQfNhjBGxiteLG5jCwds/h7vPRTsbQrs@vger.kernel.org, AJvYcCWYr5HwgFUT/8iQPQp11EvTHB7MRC9WoH52e4qNYT6IEvaanF82Z07uND3b34cxT6FAUrL5899e@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyse57qXfIfeDAz6xeAJWK/wQEvDcx6/j3+rlTeIXiYvotMrQXR
+	T3n0+izWhQvrWDXT48Vvv+03ZhuzFTepvNK4+4msm/YUCc7e/PkOAn4Nkn4q0/YZ/U7H1zbxrNS
+	IQdK7tPnC58ErIzuiwkfMmv26Wp0=
+X-Google-Smtp-Source: AGHT+IGgiZYXtL3ricAvXQWhc+ZCKVLRQRJgfz0rnJTfYaOfNAHNm7L+BtWFsi1GYEBC7DJW0AhKJQ1P3kF/zVyi/Eo=
+X-Received: by 2002:a05:690c:2c01:b0:6e2:7dd:af61 with SMTP id
+ 00721157ae682-6e9d89768c1mr9213617b3.17.1729887606276; Fri, 25 Oct 2024
+ 13:20:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241024195647.176614-1-rosenp@gmail.com> <1c9afb23-fcf8-4401-af06-4a0b2dcbb135@intel.com>
+In-Reply-To: <1c9afb23-fcf8-4401-af06-4a0b2dcbb135@intel.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Fri, 25 Oct 2024 13:19:55 -0700
+Message-ID: <CAKxU2N9XKEsr+c-Kwi+T08DqN8jt8Gdf0tH8Fy2M0Nb4fCjddA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: intel: use ethtool string helpers
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The latter is the preferred way to copy ethtool strings.
-
-Avoids manually incrementing the pointer. Cleans up the code quite well.
-
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- v2: add iwl-next tag. use inline int in for loops.
- .../net/ethernet/intel/e1000/e1000_ethtool.c  | 10 ++---
- drivers/net/ethernet/intel/e1000e/ethtool.c   | 14 +++----
- .../net/ethernet/intel/fm10k/fm10k_ethtool.c  | 10 ++---
- .../net/ethernet/intel/i40e/i40e_ethtool.c    |  6 +--
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 37 +++++++++++--------
- drivers/net/ethernet/intel/igb/igb_ethtool.c  | 35 ++++++++++--------
- drivers/net/ethernet/intel/igbvf/ethtool.c    | 10 ++---
- drivers/net/ethernet/intel/igc/igc_ethtool.c  | 36 +++++++++---------
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 32 ++++++++--------
- drivers/net/ethernet/intel/ixgbevf/ethtool.c  | 36 +++++++-----------
- 10 files changed, 115 insertions(+), 111 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-index d06d29c6c037..33222fadb3b9 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-@@ -1839,18 +1839,18 @@ static void e1000_get_ethtool_stats(struct net_device *netdev,
- static void e1000_get_strings(struct net_device *netdev, u32 stringset,
- 			      u8 *data)
- {
--	u8 *p = data;
-+	const char *str;
- 	int i;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, e1000_gstrings_test, sizeof(e1000_gstrings_test));
-+		for (i = 0; i < E1000_TEST_LEN; i++)
-+			ethtool_puts(&data, e1000_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < E1000_GLOBAL_STATS_LEN; i++) {
--			memcpy(p, e1000_gstrings_stats[i].stat_string,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
-+			str = e1000_gstrings_stats[i].stat_string;
-+			ethtool_puts(&data, str);
- 		}
- 		/* BUG_ON(p - data != E1000_STATS_LEN * ETH_GSTRING_LEN); */
- 		break;
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index 9364bc2b4eb1..ab590b69c14f 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -2075,23 +2075,23 @@ static void e1000_get_ethtool_stats(struct net_device *netdev,
- static void e1000_get_strings(struct net_device __always_unused *netdev,
- 			      u32 stringset, u8 *data)
- {
--	u8 *p = data;
-+	const char *str;
- 	int i;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, e1000_gstrings_test, sizeof(e1000_gstrings_test));
-+		for (i = 0; i < E1000_TEST_LEN; i++)
-+			ethtool_puts(&data, e1000_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < E1000_GLOBAL_STATS_LEN; i++) {
--			memcpy(p, e1000_gstrings_stats[i].stat_string,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
-+			str = e1000_gstrings_stats[i].stat_string;
-+			ethtool_puts(&data, str);
- 		}
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(data, e1000e_priv_flags_strings,
--		       E1000E_PRIV_FLAGS_STR_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < E1000E_PRIV_FLAGS_STR_LEN; i++)
-+			ethtool_puts(&data, e1000e_priv_flags_strings[i]);
- 		break;
- 	}
- }
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-index 1bc5b6c0b897..fb03bb30154a 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-@@ -122,7 +122,7 @@ static const char fm10k_gstrings_test[][ETH_GSTRING_LEN] = {
- 	"Mailbox test (on/offline)"
- };
- 
--#define FM10K_TEST_LEN (sizeof(fm10k_gstrings_test) / ETH_GSTRING_LEN)
-+#define FM10K_TEST_LEN ARRAY_SIZE(fm10k_gstrings_test)
- 
- enum fm10k_self_test_types {
- 	FM10K_TEST_MBX,
-@@ -182,15 +182,15 @@ static void fm10k_get_strings(struct net_device *dev,
- {
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, fm10k_gstrings_test,
--		       FM10K_TEST_LEN * ETH_GSTRING_LEN);
-+		for (int i = 0; i < FM10K_TEST_LEN; i++)
-+			ethtool_puts(&data, fm10k_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		fm10k_get_stat_strings(dev, data);
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(data, fm10k_prv_flags,
--		       FM10K_PRV_FLAG_LEN * ETH_GSTRING_LEN);
-+		for (int i = 0; i < FM10K_PRV_FLAG_LEN; i++)
-+			ethtool_puts(&data, fm10k_prv_flags[i]);
- 		break;
- 	}
- }
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index f2506511bbff..90fc0c29fbd6 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -426,7 +426,7 @@ static const char i40e_gstrings_test[][ETH_GSTRING_LEN] = {
- 	"Link test   (on/offline)"
- };
- 
--#define I40E_TEST_LEN (sizeof(i40e_gstrings_test) / ETH_GSTRING_LEN)
-+#define I40E_TEST_LEN ARRAY_SIZE(i40e_gstrings_test)
- 
- struct i40e_priv_flags {
- 	char flag_string[ETH_GSTRING_LEN];
-@@ -2531,8 +2531,8 @@ static void i40e_get_strings(struct net_device *netdev, u32 stringset,
- {
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, i40e_gstrings_test,
--		       I40E_TEST_LEN * ETH_GSTRING_LEN);
-+		for (int i = 0; i < I40E_TEST_LEN; i++)
-+			ethtool_puts(&data, i40e_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		i40e_get_stat_strings(netdev, data);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 2924ac61300d..62a152be8180 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -83,7 +83,7 @@ static const char ice_gstrings_test[][ETH_GSTRING_LEN] = {
- 	"Link test   (on/offline)",
- };
- 
--#define ICE_TEST_LEN (sizeof(ice_gstrings_test) / ETH_GSTRING_LEN)
-+#define ICE_TEST_LEN ARRAY_SIZE(ice_gstrings_test)
- 
- /* These PF_STATs might look like duplicates of some NETDEV_STATs,
-  * but they aren't. This device is capable of supporting multiple
-@@ -1481,48 +1481,53 @@ static void
- __ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data,
- 		  struct ice_vsi *vsi)
- {
-+	const char *str;
- 	unsigned int i;
--	u8 *p = data;
- 
- 	switch (stringset) {
- 	case ETH_SS_STATS:
--		for (i = 0; i < ICE_VSI_STATS_LEN; i++)
--			ethtool_puts(&p, ice_gstrings_vsi_stats[i].stat_string);
-+		for (i = 0; i < ICE_VSI_STATS_LEN; i++) {
-+			str = ice_gstrings_vsi_stats[i].stat_string;
-+			ethtool_puts(&data, str);
-+		}
- 
- 		if (ice_is_port_repr_netdev(netdev))
- 			return;
- 
- 		ice_for_each_alloc_txq(vsi, i) {
--			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_bytes", i);
- 		}
- 
- 		ice_for_each_alloc_rxq(vsi, i) {
--			ethtool_sprintf(&p, "rx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_bytes", i);
- 		}
- 
- 		if (vsi->type != ICE_VSI_PF)
- 			return;
- 
--		for (i = 0; i < ICE_PF_STATS_LEN; i++)
--			ethtool_puts(&p, ice_gstrings_pf_stats[i].stat_string);
-+		for (i = 0; i < ICE_PF_STATS_LEN; i++) {
-+			str = ice_gstrings_pf_stats[i].stat_string;
-+			ethtool_puts(&data, str);
-+		}
- 
- 		for (i = 0; i < ICE_MAX_USER_PRIORITY; i++) {
--			ethtool_sprintf(&p, "tx_priority_%u_xon.nic", i);
--			ethtool_sprintf(&p, "tx_priority_%u_xoff.nic", i);
-+			ethtool_sprintf(&data, "tx_priority_%u_xon.nic", i);
-+			ethtool_sprintf(&data, "tx_priority_%u_xoff.nic", i);
- 		}
- 		for (i = 0; i < ICE_MAX_USER_PRIORITY; i++) {
--			ethtool_sprintf(&p, "rx_priority_%u_xon.nic", i);
--			ethtool_sprintf(&p, "rx_priority_%u_xoff.nic", i);
-+			ethtool_sprintf(&data, "rx_priority_%u_xon.nic", i);
-+			ethtool_sprintf(&data, "rx_priority_%u_xoff.nic", i);
- 		}
- 		break;
- 	case ETH_SS_TEST:
--		memcpy(data, ice_gstrings_test, ICE_TEST_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < ICE_TEST_LEN; i++)
-+			ethtool_puts(&data, ice_gstrings_test[i]);
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
- 		for (i = 0; i < ICE_PRIV_FLAG_ARRAY_SIZE; i++)
--			ethtool_puts(&p, ice_gstrings_priv_flags[i].name);
-+			ethtool_puts(&data, ice_gstrings_priv_flags[i].name);
- 		break;
- 	default:
- 		break;
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index ca6ccbc13954..c4a8712389af 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -123,7 +123,7 @@ static const char igb_gstrings_test[][ETH_GSTRING_LEN] = {
- 	[TEST_LOOP] = "Loopback test  (offline)",
- 	[TEST_LINK] = "Link test   (on/offline)"
- };
--#define IGB_TEST_LEN (sizeof(igb_gstrings_test) / ETH_GSTRING_LEN)
-+#define IGB_TEST_LEN ARRAY_SIZE(igb_gstrings_test)
- 
- static const char igb_priv_flags_strings[][ETH_GSTRING_LEN] = {
- #define IGB_PRIV_FLAGS_LEGACY_RX	BIT(0)
-@@ -2347,35 +2347,38 @@ static void igb_get_ethtool_stats(struct net_device *netdev,
- static void igb_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- {
- 	struct igb_adapter *adapter = netdev_priv(netdev);
--	u8 *p = data;
-+	const char *str;
- 	int i;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, igb_gstrings_test, sizeof(igb_gstrings_test));
-+		for (i = 0; i < IGB_TEST_LEN; i++)
-+			ethtool_puts(&data, igb_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < IGB_GLOBAL_STATS_LEN; i++)
--			ethtool_puts(&p, igb_gstrings_stats[i].stat_string);
--		for (i = 0; i < IGB_NETDEV_STATS_LEN; i++)
--			ethtool_puts(&p, igb_gstrings_net_stats[i].stat_string);
-+			ethtool_puts(&data, igb_gstrings_stats[i].stat_string);
-+		for (i = 0; i < IGB_NETDEV_STATS_LEN; i++) {
-+			str = igb_gstrings_net_stats[i].stat_string;
-+			ethtool_puts(&data, str);
-+		}
- 		for (i = 0; i < adapter->num_tx_queues; i++) {
--			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
--			ethtool_sprintf(&p, "tx_queue_%u_restart", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_restart", i);
- 		}
- 		for (i = 0; i < adapter->num_rx_queues; i++) {
--			ethtool_sprintf(&p, "rx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
--			ethtool_sprintf(&p, "rx_queue_%u_drops", i);
--			ethtool_sprintf(&p, "rx_queue_%u_csum_err", i);
--			ethtool_sprintf(&p, "rx_queue_%u_alloc_failed", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_drops", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_csum_err", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_alloc_failed", i);
- 		}
- 		/* BUG_ON(p - data != IGB_STATS_LEN * ETH_GSTRING_LEN); */
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(data, igb_priv_flags_strings,
--		       IGB_PRIV_FLAGS_STR_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < IGB_PRIV_FLAGS_STR_LEN; i++)
-+			ethtool_puts(&data, igb_priv_flags_strings[i]);
- 		break;
- 	}
- }
-diff --git a/drivers/net/ethernet/intel/igbvf/ethtool.c b/drivers/net/ethernet/intel/igbvf/ethtool.c
-index 83b97989a6bd..2da95ea66718 100644
---- a/drivers/net/ethernet/intel/igbvf/ethtool.c
-+++ b/drivers/net/ethernet/intel/igbvf/ethtool.c
-@@ -412,18 +412,18 @@ static int igbvf_get_sset_count(struct net_device *dev, int stringset)
- static void igbvf_get_strings(struct net_device *netdev, u32 stringset,
- 			      u8 *data)
- {
--	u8 *p = data;
-+	const char *str;
- 	int i;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, *igbvf_gstrings_test, sizeof(igbvf_gstrings_test));
-+		for (i = 0; i < IGBVF_TEST_LEN; i++)
-+			ethtool_puts(&data, igbvf_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < IGBVF_GLOBAL_STATS_LEN; i++) {
--			memcpy(p, igbvf_gstrings_stats[i].stat_string,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
-+			str = igbvf_gstrings_stats[i].stat_string;
-+			ethtool_puts(&data, str);
- 		}
- 		break;
- 	}
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index 5b0c6f433767..7b118fb7097b 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -104,7 +104,7 @@ static const char igc_gstrings_test[][ETH_GSTRING_LEN] = {
- 	[TEST_LINK] = "Link test   (on/offline)"
- };
- 
--#define IGC_TEST_LEN (sizeof(igc_gstrings_test) / ETH_GSTRING_LEN)
-+#define IGC_TEST_LEN ARRAY_SIZE(igc_gstrings_test)
- 
- #define IGC_GLOBAL_STATS_LEN	\
- 	(sizeof(igc_gstrings_stats) / sizeof(struct igc_stats))
-@@ -763,36 +763,38 @@ static void igc_ethtool_get_strings(struct net_device *netdev, u32 stringset,
- 				    u8 *data)
- {
- 	struct igc_adapter *adapter = netdev_priv(netdev);
--	u8 *p = data;
-+	const char *str;
- 	int i;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, *igc_gstrings_test,
--		       IGC_TEST_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < IGC_TEST_LEN; i++)
-+			ethtool_puts(&data, igc_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < IGC_GLOBAL_STATS_LEN; i++)
--			ethtool_puts(&p, igc_gstrings_stats[i].stat_string);
--		for (i = 0; i < IGC_NETDEV_STATS_LEN; i++)
--			ethtool_puts(&p, igc_gstrings_net_stats[i].stat_string);
-+			ethtool_puts(&data, igc_gstrings_stats[i].stat_string);
-+		for (i = 0; i < IGC_NETDEV_STATS_LEN; i++) {
-+			str = igc_gstrings_net_stats[i].stat_string;
-+			ethtool_puts(&data, str);
-+		}
- 		for (i = 0; i < adapter->num_tx_queues; i++) {
--			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
--			ethtool_sprintf(&p, "tx_queue_%u_restart", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_restart", i);
- 		}
- 		for (i = 0; i < adapter->num_rx_queues; i++) {
--			ethtool_sprintf(&p, "rx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
--			ethtool_sprintf(&p, "rx_queue_%u_drops", i);
--			ethtool_sprintf(&p, "rx_queue_%u_csum_err", i);
--			ethtool_sprintf(&p, "rx_queue_%u_alloc_failed", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_drops", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_csum_err", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_alloc_failed", i);
- 		}
- 		/* BUG_ON(p - data != IGC_STATS_LEN * ETH_GSTRING_LEN); */
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(data, igc_priv_flags_strings,
--		       IGC_PRIV_FLAGS_STR_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < IGC_PRIV_FLAGS_STR_LEN; i++)
-+			ethtool_puts(&data, igc_priv_flags_strings[i]);
- 		break;
- 	}
- }
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 9482e0cca8b7..b3b2e38c2ae6 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -129,7 +129,7 @@ static const char ixgbe_gstrings_test[][ETH_GSTRING_LEN] = {
- 	"Interrupt test (offline)", "Loopback test  (offline)",
- 	"Link test   (on/offline)"
- };
--#define IXGBE_TEST_LEN sizeof(ixgbe_gstrings_test) / ETH_GSTRING_LEN
-+#define IXGBE_TEST_LEN ARRAY_SIZE(ixgbe_gstrings_test)
- 
- static const char ixgbe_priv_flags_strings[][ETH_GSTRING_LEN] = {
- #define IXGBE_PRIV_FLAGS_LEGACY_RX	BIT(0)
-@@ -1409,38 +1409,40 @@ static void ixgbe_get_ethtool_stats(struct net_device *netdev,
- static void ixgbe_get_strings(struct net_device *netdev, u32 stringset,
- 			      u8 *data)
- {
-+	const char *str;
- 	unsigned int i;
--	u8 *p = data;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
- 		for (i = 0; i < IXGBE_TEST_LEN; i++)
--			ethtool_puts(&p, ixgbe_gstrings_test[i]);
-+			ethtool_puts(&data, ixgbe_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
--		for (i = 0; i < IXGBE_GLOBAL_STATS_LEN; i++)
--			ethtool_puts(&p, ixgbe_gstrings_stats[i].stat_string);
-+		for (i = 0; i < IXGBE_GLOBAL_STATS_LEN; i++) {
-+			str = ixgbe_gstrings_stats[i].stat_string;
-+			ethtool_puts(&data, str);
-+		}
- 		for (i = 0; i < netdev->num_tx_queues; i++) {
--			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_bytes", i);
- 		}
- 		for (i = 0; i < IXGBE_NUM_RX_QUEUES; i++) {
--			ethtool_sprintf(&p, "rx_queue_%u_packets", i);
--			ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_bytes", i);
- 		}
- 		for (i = 0; i < IXGBE_MAX_PACKET_BUFFERS; i++) {
--			ethtool_sprintf(&p, "tx_pb_%u_pxon", i);
--			ethtool_sprintf(&p, "tx_pb_%u_pxoff", i);
-+			ethtool_sprintf(&data, "tx_pb_%u_pxon", i);
-+			ethtool_sprintf(&data, "tx_pb_%u_pxoff", i);
- 		}
- 		for (i = 0; i < IXGBE_MAX_PACKET_BUFFERS; i++) {
--			ethtool_sprintf(&p, "rx_pb_%u_pxon", i);
--			ethtool_sprintf(&p, "rx_pb_%u_pxoff", i);
-+			ethtool_sprintf(&data, "rx_pb_%u_pxon", i);
-+			ethtool_sprintf(&data, "rx_pb_%u_pxoff", i);
- 		}
- 		/* BUG_ON(p - data != IXGBE_STATS_LEN * ETH_GSTRING_LEN); */
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(data, ixgbe_priv_flags_strings,
--		       IXGBE_PRIV_FLAGS_STR_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < IXGBE_PRIV_FLAGS_STR_LEN; i++)
-+			ethtool_puts(&data, ixgbe_priv_flags_strings[i]);
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ethtool.c b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-index 7ac53171b041..f63a9f683e20 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-@@ -70,7 +70,7 @@ static const char ixgbe_gstrings_test[][ETH_GSTRING_LEN] = {
- 	"Link test   (on/offline)"
- };
- 
--#define IXGBEVF_TEST_LEN (sizeof(ixgbe_gstrings_test) / ETH_GSTRING_LEN)
-+#define IXGBEVF_TEST_LEN ARRAY_SIZE(ixgbe_gstrings_test)
- 
- static const char ixgbevf_priv_flags_strings[][ETH_GSTRING_LEN] = {
- #define IXGBEVF_PRIV_FLAGS_LEGACY_RX	BIT(0)
-@@ -504,43 +504,35 @@ static void ixgbevf_get_strings(struct net_device *netdev, u32 stringset,
- 				u8 *data)
- {
- 	struct ixgbevf_adapter *adapter = netdev_priv(netdev);
--	char *p = (char *)data;
-+	const char *str;
- 	int i;
- 
- 	switch (stringset) {
- 	case ETH_SS_TEST:
--		memcpy(data, *ixgbe_gstrings_test,
--		       IXGBEVF_TEST_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < IXGBEVF_TEST_LEN; i++)
-+			ethtool_puts(&data, ixgbe_gstrings_test[i]);
- 		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < IXGBEVF_GLOBAL_STATS_LEN; i++) {
--			memcpy(p, ixgbevf_gstrings_stats[i].stat_string,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
-+			str = ixgbevf_gstrings_stats[i].stat_string;
-+			ethtool_puts(&data, str);
- 		}
+On Thu, Oct 24, 2024 at 9:06=E2=80=AFPM Przemek Kitszel
+<przemyslaw.kitszel@intel.com> wrote:
+>
+> On 10/24/24 21:56, Rosen Penev wrote:
+> > The latter is the preferred way to copy ethtool strings.
+> >
+> > Avoids manually incrementing the pointer. Cleans up the code quite well=
+.
+>
+> Indeed, thanks a lot!
+>
+> Could you please tag next version as [iwl-next], so it will be easier to
+> via Tony's tree first?
+message awaits moderator approval.
+>
+> Codewise it's good, just one nitpick from me.
+>
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > ---
+> >   .../net/ethernet/intel/e1000/e1000_ethtool.c  | 10 ++---
+> >   drivers/net/ethernet/intel/e1000e/ethtool.c   | 14 +++----
+> >   .../net/ethernet/intel/fm10k/fm10k_ethtool.c  | 12 +++---
+> >   .../net/ethernet/intel/i40e/i40e_ethtool.c    |  8 ++--
+> >   drivers/net/ethernet/intel/ice/ice_ethtool.c  | 37 +++++++++++-------=
 -
- 		for (i = 0; i < adapter->num_tx_queues; i++) {
--			sprintf(p, "tx_queue_%u_packets", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "tx_queue_%u_bytes", i);
--			p += ETH_GSTRING_LEN;
-+			ethtool_sprintf(&data, "tx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "tx_queue_%u_bytes", i);
- 		}
- 		for (i = 0; i < adapter->num_xdp_queues; i++) {
--			sprintf(p, "xdp_queue_%u_packets", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "xdp_queue_%u_bytes", i);
--			p += ETH_GSTRING_LEN;
-+			ethtool_sprintf(&data, "xdp_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "xdp_queue_%u_bytes", i);
- 		}
- 		for (i = 0; i < adapter->num_rx_queues; i++) {
--			sprintf(p, "rx_queue_%u_packets", i);
--			p += ETH_GSTRING_LEN;
--			sprintf(p, "rx_queue_%u_bytes", i);
--			p += ETH_GSTRING_LEN;
-+			ethtool_sprintf(&data, "rx_queue_%u_packets", i);
-+			ethtool_sprintf(&data, "rx_queue_%u_bytes", i);
- 		}
- 		break;
- 	case ETH_SS_PRIV_FLAGS:
--		memcpy(data, ixgbevf_priv_flags_strings,
--		       IXGBEVF_PRIV_FLAGS_STR_LEN * ETH_GSTRING_LEN);
-+		for (i = 0; i < IXGBEVF_PRIV_FLAGS_STR_LEN; i++)
-+			ethtool_puts(&data, ixgbevf_priv_flags_strings[i]);
- 		break;
- 	}
- }
--- 
-2.47.0
+> >   drivers/net/ethernet/intel/igb/igb_ethtool.c  | 35 ++++++++++--------
+> >   drivers/net/ethernet/intel/igbvf/ethtool.c    | 10 ++---
+> >   drivers/net/ethernet/intel/igc/igc_ethtool.c  | 36 +++++++++---------
+> >   .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 32 ++++++++--------
+> >   drivers/net/ethernet/intel/ixgbevf/ethtool.c  | 36 +++++++-----------
+> >   10 files changed, 119 insertions(+), 111 deletions(-)
+> >
+>
+> [..]
+>
+> > --- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
+> > +++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
+> > @@ -122,7 +122,7 @@ static const char fm10k_gstrings_test[][ETH_GSTRING=
+_LEN] =3D {
+> >       "Mailbox test (on/offline)"
+> >   };
+> >
+> > -#define FM10K_TEST_LEN (sizeof(fm10k_gstrings_test) / ETH_GSTRING_LEN)
+> > +#define FM10K_TEST_LEN ARRAY_SIZE(fm10k_gstrings_test)
+>
+> this line is not strictly related to the stated goal of the commit,
+> fine anyway for me
+I use grep ETH_GSTRING_LEN to find opportunities for these changes,
+hence why I changed.
+>
+> >
+> >   enum fm10k_self_test_types {
+> >       FM10K_TEST_MBX,
+> > @@ -180,17 +180,19 @@ static void fm10k_get_stat_strings(struct net_dev=
+ice *dev, u8 *data)
+> >   static void fm10k_get_strings(struct net_device *dev,
+> >                             u32 stringset, u8 *data)
+> >   {
+> > +     int i;
+> > +
+> >       switch (stringset) {
+> >       case ETH_SS_TEST:
+> > -             memcpy(data, fm10k_gstrings_test,
+> > -                    FM10K_TEST_LEN * ETH_GSTRING_LEN);
+> > +             for (i =3D 0; i < FM10K_TEST_LEN; i++)
+>
+> for new code we put the iterator declaration into the loop, do:
+>                 for (int i =3D 0; ...
+>
+> ditto other places/drivers
+I changed the places where I had + int i;
 
+I kept every other place as is.
+>
+> > +                     ethtool_puts(&data, fm10k_gstrings_test[i]);
+> >               break;
+> >       case ETH_SS_STATS:
+> >               fm10k_get_stat_strings(dev, data);
+> >               break;
+> >       case ETH_SS_PRIV_FLAGS:
+> > -             memcpy(data, fm10k_prv_flags,
+> > -                    FM10K_PRV_FLAG_LEN * ETH_GSTRING_LEN);
+> > +             for (i =3D 0; i < FM10K_PRV_FLAG_LEN; i++)
+> > +                     ethtool_puts(&data, fm10k_prv_flags[i]);
+> >               break;
+> >       }
+> >   }
+>
 
