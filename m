@@ -1,290 +1,206 @@
-Return-Path: <netdev+bounces-139001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B7B9AFBCA
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:01:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E937B9AFBDE
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 10:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78FE81C2284A
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:01:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 790181F243C1
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 08:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7A11C6F55;
-	Fri, 25 Oct 2024 08:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8C51CDA1C;
+	Fri, 25 Oct 2024 08:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDKWiJ+g"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gm+WULye"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B59199948;
-	Fri, 25 Oct 2024 08:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CD01CC159
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 08:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729843249; cv=none; b=R5CjXxag+9aHRG+gQNz9sJg7YfNN3NoxxEubR+domSaEYIMGI+h6KDVaMPXUImaKdAG0kSWGWFBSaynu7pU2aQihKYpyfNRQXO+WXID0vMXnFVzzhKHKtIQy3i3WzRA45CSag6ZqfHNum37AkvX0/8K//2Dz6ulpMEKgtCfj7vk=
+	t=1729843354; cv=none; b=ZyNhMkUwEWZIEZYynOEjvyMdwOYiZt96Fh9FY0zC7qdPmrvpSZw+LwSfGi4zTBXnC4SbBvSSKdmgdwBZfhbT3PML9vDurb9e8xAKfI6jry3khQ9h5T6HRxZhDlnRtV494UDZ5r5fryXKcBKGKnjCUioehZE+LoJqiVaRy8tX2YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729843249; c=relaxed/simple;
-	bh=UzJ4JA6wYnNE2e2wAE1cqDvIoHwljC0uMyvbhZV8y8I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OPBDdy+XQFHSyqnx8ct613ZCRgR2A+UU9kwXqxtyKNrk7H4n2DY48HUYhwR/ZCVl/Z1i+PYPSmshHcajlwiEnzbC3qAVwg1Deukq24+YZnGbuVFWOSqwVU+grlKRzST/7k4iUlNqPMDKQOuX6Ab1+puw+dLi9TEv1yv0+86B3U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bDKWiJ+g; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e2e32bc454fso1889454276.2;
-        Fri, 25 Oct 2024 01:00:47 -0700 (PDT)
+	s=arc-20240116; t=1729843354; c=relaxed/simple;
+	bh=hYUCKWI7qURBfI46qL5QO8ldpOYRmVFg+1vqdBL3WlU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LW201D3JYOKj0Sc+fctiGNnn/RoaU/Fh1KSzHQbeQBd6z2Z+hDmUe8dNiTPNJBO9NBNHnnq9Zg6UaIrVwWG9JSTWSQDF89f07mpWRMbHYWnjlkjWg0X7UUGosP72X9o/M6NrhnCtraCphGQPVu70dyPifAHQLPWHrG0u9ckpC9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gm+WULye; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e0082c1dd0so37705067b3.3
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 01:02:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729843246; x=1730448046; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8xP4wphIWdaPagX33UsZlMJ6YTfEiL6bGlCgAvrq+ew=;
-        b=bDKWiJ+gn0XBW9ZyEEOtUQFNMKVGeGPArKhwbuX8z6nFEn4AabdJzu55Sa70dVdk85
-         ZR2QQpHwLj0XiaoH2B/YgPoYGe0MzuZcJ+9QhparEUbqrC1p+lsgpXmXHdmP5d5ho+S8
-         WrY+eisf178xRxiksIEBdrm87LEdh5mcGFNLYPqiocuTCmO9BNyv9nGiyvaj9XxzGPu1
-         9Iqx2Iuk5H1ApgOO97nsTgqTYJYJ+ReSuziHilzbnzDQ7Yh9z8G/CQVhzyIWZ33rryy3
-         baViqGtSbE+IxCMwpVjoTdAd84pyR17lK/xYxugv1mi4pVHSvi7NPL3csKqcTQJPu0/w
-         g0gw==
+        d=google.com; s=20230601; t=1729843351; x=1730448151; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Dl/naZSHZOHu+i8dRY7E5rtnHdEcbtG/n8v3s5W581w=;
+        b=gm+WULye0Er/w/pU9YoM0277JGG/ApGoF2MSwWT0oZY3YSjRELxHxave3CVM5hMMJ+
+         MsT2NKv8t1l2zd2NEGvG1FX3aNcNuN++C0tNHNTpS3Bz2d8HJ2vXWZKqkCzkQmAAP4mS
+         TjjsORIjguRCukJis9JVjIe8SFqr9DYGmdZqktFAP5z/0iPNp6q2RQJRZZfajcZu3Kxu
+         QOwUKfDPwyHXJOawCVqG58VUHZlU3UhFynwLhJ3P2ye9zarw+LDaA+21T4tcipAtEjAc
+         mvsCLv3CtDmQDpn1nmJmee83m1Xd9ooq79LMrZlNJ6UOleuwD+wk+vNMn31d4tL54aLb
+         JlSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729843246; x=1730448046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8xP4wphIWdaPagX33UsZlMJ6YTfEiL6bGlCgAvrq+ew=;
-        b=fN7dkGo6tgwEQCnxJhdEN+NqckdHAWkLo083SKD1cK+Hoxsb7nxd0DuirnNUNdBjOp
-         RqH39Me5+WJT9srT9Iv6YG+JMxMtZ4zI7MTUaIqsbEESzuPc50NRrplnqZho2WARRSbi
-         +z7+N7uvk5ERzaOTc8UrppxoKOeFxqG+/tB0Jn6Mmngm8rID6eP0WG0CBtYLqHLYk0nw
-         TdbB61/8n6BNuaEWyfx6d3FqYEi9msr+gcQB825ZqcTDcGbn68OXpbWE5tfV9HiilWXq
-         ZSAxR0Um6z+aIrru4WoLiGBMdCp4+HZ5S9aZxZHcf/1KcIMzpgc46fAwohKBozbWBNFQ
-         r0vA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+TljSeFm6VwdTQVZc4fww12s77wjQnxtD7xgJ5ApWrsArNR0sRBLpf1LzT4p6LxHMHKtDwjgG7TXfF5eEqFk=@vger.kernel.org, AJvYcCV6uIPh/cfEljaaOsCsVkV3DeIRgZnmjk1hjzsxf0DaeHjsNBkfT4rc1Gl9XVikPwNfmcF2xwqDFxVO@vger.kernel.org, AJvYcCVIOXji2tXMJn3N/JeJ+4CopoqwFs5/YAPm3wvsf+O22qHq+RUUO26GJZci+PN22EeCUs25ubobMoaZhYZO@vger.kernel.org, AJvYcCVn0P4wbeXoUa2nGZYTECtJWQzDvO6M+xrslq+W/s+Xe8sYODz36BqJLfHtvVE5F/07KP96bY9V@vger.kernel.org, AJvYcCW1pbkoQkoRfdk44cOFhyyqXz1bGgJsyZaKHPeOCpatePmZw/fw9PfFFbJFpd0ausQGN/HzChlcNxE=@vger.kernel.org, AJvYcCWBTWwDY3pp0Cf9dCG1+iNIBR2u+AQzUf4Ir2FjKPpgeuKll+FKK8CSTnsvDvqB7Nxt6Ty64kulI4j+@vger.kernel.org, AJvYcCWK271WI3ivJddnPpFweeFWcUQUJlhhqkgeD++V5LjmM2jV05PR6p+tnwpjIB+P1r0r8PClycdxcHbs@vger.kernel.org, AJvYcCXYSOL404PiLC5EDNW6aMGDr4IO8wG1zu14MtbCOIzGjdi0r3+K6G3nhs74WqbXaInDAni81gP3yaVnEA==@vger.kernel.org, AJvYcCXaYcvQERB5ZEpQkQ6RSo74ZKlezJuuNP8UB+gAaqunEe3n3XVPcaSTpbgy5o4BJjej3zUzo2SYdHRI@vger.kernel.org, AJvYcCXnT3LCn03FlBu4BrF4qnBvZw7u1VmXEq/I
- Pmqz0dkjTrXw+X33YIW/C23BMC+Bg7VeONR/5HvulrIPLyc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzFoRjLyFjh/AiDT3cmsSulAsZDb0IamZuunb5O2T1hdPgN2qi
-	qJkyCom20k2VScNfaZdVCmm1Mnf1Q2my4V8wvWMR3JBr0nNHrnaxIG+fVoUD44eVphYP3RHBppo
-	skzKpnBPByOGiaip238Ft4KKFiuk=
-X-Google-Smtp-Source: AGHT+IG135JrFzLujlfWufoz+Ipikom2TQ/YmGc5fQPhpTafBBZL0I0pzwrO2u4tm5krGs+xLbPkdWLxc4PyFOnUZKc=
-X-Received: by 2002:a05:6902:2505:b0:e29:68db:ccc2 with SMTP id
- 3f1490d57ef6-e2f2fbc0c20mr4885350276.38.1729843246281; Fri, 25 Oct 2024
- 01:00:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729843351; x=1730448151;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dl/naZSHZOHu+i8dRY7E5rtnHdEcbtG/n8v3s5W581w=;
+        b=KCkNcYULJ09D8l+S1ITQFy8TIt2u3iJZkqAlQseBDqTNDGXrsjAgdvt2yOB/JWHglN
+         SvnuKsVJu2xS2mSDtntLNsfbiYO0oDPpNib/FIsyUeV4I8guqV+BZUsKSlvwTLvQspdm
+         4tjMl+h8JrJQtkg2WKnJbUVqcz3WzYB2f00r2zY+EEHwECR4r6C/CMb/AtbvIzyZNRkw
+         NQDnnDsMAIxubwzkGRb4ZpQfIchzt9XrRO/DGdVr7bfjn3qibi7qDNwvZdpJJ5T5k+Gt
+         WtP7Rbs6OKEa0Lmtsbuc2PnSjIIq5tfb3LyFaCJ4QJZ2nDTIZYUKgzgszxA+mLDysOJz
+         arEQ==
+X-Gm-Message-State: AOJu0YwdSE9vnDfAXw3vkKHzx1D0YDjJ+5cWAXFDX7cIf0Yw70lPtxtx
+	SS+mv/7skNOc7o7c33s9++rubqC78AOx7Tfj6CX6j+YVgv0mF4oExsQVuDCjKS7xpxpJBEUv1R1
+	RiUMJvJLF7A==
+X-Google-Smtp-Source: AGHT+IHDRKjcFE1E8WE4N+cBddKPWcrMbtV+vtV3f0rf7xM259C4zJu+M2fpsXm22gpi7NfozKEcWAvz2Rox5A==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:f12:b0:e28:fdfc:b788 with SMTP
+ id 3f1490d57ef6-e2f2fc49f82mr2548276.9.1729843351141; Fri, 25 Oct 2024
+ 01:02:31 -0700 (PDT)
+Date: Fri, 25 Oct 2024 08:02:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-2-tmyu0@nuvoton.com>
- <20241024-daffodil-raccoon-of-champagne-6f6f04-mkl@pengutronix.de>
-In-Reply-To: <20241024-daffodil-raccoon-of-champagne-6f6f04-mkl@pengutronix.de>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 25 Oct 2024 16:00:35 +0800
-Message-ID: <CAOoeyxV+xFE2wjSFEdBAzV9mcUn7wf-kCJTA=FgW2thsDmwmyQ@mail.gmail.com>
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
+Message-ID: <20241025080229.184676-1-edumazet@google.com>
+Subject: [PATCH nf] netfilter: nf_reject_ipv6: fix potential crash in nf_send_reset6()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Sorry, resending this email in plain text format.
+I got a syzbot report without a repro [1] crashing in nf_send_reset6()
 
-Dear Marc,
+I think the issue is that dev->hard_header_len is zero, and we attempt
+later to push an Ethernet header.
 
-Thank you for your comments.
-I'll add the nct6694_free_handler() function in the next patch.
+Use LL_MAX_HEADER, as other functions in net/ipv6/netfilter/nf_reject_ipv6.c.
 
-Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=8824=
-=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=885:12=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> On 24.10.2024 16:59:14, Ming Yu wrote:
-> > The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
-> > 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
-> > PWM, and RTC.
-> >
-> > This driver implements USB device functionality and shares the
-> > chip's peripherals as a child device.
-> >
-> > Each child device can use the USB functions nct6694_read_msg()
-> > and nct6694_write_msg() to issue a command. They can also register
-> > a handler function that will be called when the USB device receives
-> > its interrupt pipe.
-> >
-> > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
-> > ---
-> >  MAINTAINERS                 |   7 +
-> >  drivers/mfd/Kconfig         |  10 +
-> >  drivers/mfd/Makefile        |   2 +
-> >  drivers/mfd/nct6694.c       | 394 ++++++++++++++++++++++++++++++++++++
-> >  include/linux/mfd/nct6694.h | 168 +++++++++++++++
-> >  5 files changed, 581 insertions(+)
-> >  create mode 100644 drivers/mfd/nct6694.c
-> >  create mode 100644 include/linux/mfd/nct6694.h
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index e9659a5a7fb3..30157ca95cf3 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -16434,6 +16434,13 @@ F:   drivers/nubus/
-> >  F:   include/linux/nubus.h
-> >  F:   include/uapi/linux/nubus.h
-> >
-> > +NUVOTON NCT6694 MFD DRIVER
-> > +M:   Ming Yu <tmyu0@nuvoton.com>
-> > +L:   linux-kernel@vger.kernel.org
-> > +S:   Supported
-> > +F:   drivers/mfd/nct6694.c
-> > +F:   include/linux/mfd/nct6694.h
-> > +
-> >  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
-> >  M:   Antonino Daplas <adaplas@gmail.com>
-> >  L:   linux-fbdev@vger.kernel.org
-> > diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
-> > index f9325bcce1b9..da2600958697 100644
-> > --- a/drivers/mfd/Kconfig
-> > +++ b/drivers/mfd/Kconfig
-> > @@ -546,6 +546,16 @@ config MFD_MX25_TSADC
-> >         i.MX25 processors. They consist of a conversion queue for gener=
-al
-> >         purpose ADC and a queue for Touchscreens.
-> >
-> > +config MFD_NCT6694
-> > +     tristate "Nuvoton NCT6694 support"
-> > +     select MFD_CORE
-> > +     depends on USB
-> > +     help
-> > +       This adds support for Nuvoton USB device NCT6694 sharing periph=
-erals
-> > +       This includes the USB devcie driver and core APIs.
-> > +       Additional drivers must be enabled in order to use the function=
-ality
-> > +       of the device.
-> > +
-> >  config MFD_HI6421_PMIC
-> >       tristate "HiSilicon Hi6421 PMU/Codec IC"
-> >       depends on OF
-> > diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
-> > index 2a9f91e81af8..2cf816d67d03 100644
-> > --- a/drivers/mfd/Makefile
-> > +++ b/drivers/mfd/Makefile
-> > @@ -116,6 +116,8 @@ obj-$(CONFIG_TWL6040_CORE)        +=3D twl6040.o
-> >
-> >  obj-$(CONFIG_MFD_MX25_TSADC) +=3D fsl-imx25-tsadc.o
-> >
-> > +obj-$(CONFIG_MFD_NCT6694)    +=3D nct6694.o
-> > +
-> >  obj-$(CONFIG_MFD_MC13XXX)    +=3D mc13xxx-core.o
-> >  obj-$(CONFIG_MFD_MC13XXX_SPI)        +=3D mc13xxx-spi.o
-> >  obj-$(CONFIG_MFD_MC13XXX_I2C)        +=3D mc13xxx-i2c.o
-> > diff --git a/drivers/mfd/nct6694.c b/drivers/mfd/nct6694.c
-> > new file mode 100644
-> > index 000000000000..9838c7be0b98
-> > --- /dev/null
-> > +++ b/drivers/mfd/nct6694.c
-> > @@ -0,0 +1,394 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Nuvoton NCT6694 MFD driver based on USB interface.
-> > + *
-> > + * Copyright (C) 2024 Nuvoton Technology Corp.
-> > + */
-> > +
-> > +#include <linux/io.h>
-> > +#include <linux/usb.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/module.h>
-> > +#include <linux/mfd/core.h>
-> > +#include <linux/mfd/nct6694.h>
-> > +
-> > +#define DRVNAME "nct6694-usb_mfd"
-> > +
-> > +#define MFD_DEV_SIMPLE(_name)                \
-> > +{                                    \
-> > +     .name =3D NCT6694_DEV_##_name,    \
-> > +}                                    \
-> > +
-> > +#define MFD_DEV_WITH_ID(_name, _id)  \
-> > +{                                    \
-> > +     .name =3D NCT6694_DEV_##_name,    \
-> > +     .id =3D _id,                      \
-> > +}
-> > +
-> > +/* MFD device resources */
-> > +static const struct mfd_cell nct6694_dev[] =3D {
-> > +     MFD_DEV_WITH_ID(GPIO, 0x0),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x1),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x2),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x3),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x4),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x5),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x6),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x7),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x8),
-> > +     MFD_DEV_WITH_ID(GPIO, 0x9),
-> > +     MFD_DEV_WITH_ID(GPIO, 0xA),
-> > +     MFD_DEV_WITH_ID(GPIO, 0xB),
-> > +     MFD_DEV_WITH_ID(GPIO, 0xC),
-> > +     MFD_DEV_WITH_ID(GPIO, 0xD),
-> > +     MFD_DEV_WITH_ID(GPIO, 0xE),
-> > +     MFD_DEV_WITH_ID(GPIO, 0xF),
-> > +
-> > +     MFD_DEV_WITH_ID(I2C, 0x0),
-> > +     MFD_DEV_WITH_ID(I2C, 0x1),
-> > +     MFD_DEV_WITH_ID(I2C, 0x2),
-> > +     MFD_DEV_WITH_ID(I2C, 0x3),
-> > +     MFD_DEV_WITH_ID(I2C, 0x4),
-> > +     MFD_DEV_WITH_ID(I2C, 0x5),
-> > +
-> > +     MFD_DEV_WITH_ID(CAN, 0x0),
-> > +     MFD_DEV_WITH_ID(CAN, 0x1),
-> > +
-> > +     MFD_DEV_WITH_ID(WDT, 0x0),
-> > +     MFD_DEV_WITH_ID(WDT, 0x1),
-> > +
-> > +     MFD_DEV_SIMPLE(IIO),
-> > +     MFD_DEV_SIMPLE(HWMON),
-> > +     MFD_DEV_SIMPLE(PWM),
-> > +     MFD_DEV_SIMPLE(RTC),
-> > +};
-> > +
-> > +int nct6694_register_handler(struct nct6694 *nct6694, int irq_bit,
-> > +                          void (*handler)(void *), void *private_data)
-> > +{
-> > +     struct nct6694_handler_entry *entry;
-> > +     unsigned long flags;
-> > +
-> > +     entry =3D kmalloc(sizeof(*entry), GFP_KERNEL);
-> > +     if (!entry)
-> > +             return -ENOMEM;
-> > +
-> > +     entry->irq_bit =3D irq_bit;
-> > +     entry->handler =3D handler;
-> > +     entry->private_data =3D private_data;
-> > +
-> > +     spin_lock_irqsave(&nct6694->lock, flags);
-> > +     list_add_tail(&entry->list, &nct6694->handler_list);
-> > +     spin_unlock_irqrestore(&nct6694->lock, flags);
-> > +
-> > +     return 0;
-> > +}
-> > +EXPORT_SYMBOL(nct6694_register_handler);
->
-> Where's the corresponding nct6694_free_handler() function?
->
-> Marc
->
-> --
-> Pengutronix e.K.                 | Marc Kleine-Budde          |
-> Embedded Linux                   | https://www.pengutronix.de |
-> Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+[1]
+
+skbuff: skb_under_panic: text:ffffffff89b1d008 len:74 put:14 head:ffff88803123aa00 data:ffff88803123a9f2 tail:0x3c end:0x140 dev:syz_tun
+ kernel BUG at net/core/skbuff.c:206 !
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 UID: 0 PID: 7373 Comm: syz.1.568 Not tainted 6.12.0-rc2-syzkaller-00631-g6d858708d465 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+ RIP: 0010:skb_panic net/core/skbuff.c:206 [inline]
+ RIP: 0010:skb_under_panic+0x14b/0x150 net/core/skbuff.c:216
+Code: 0d 8d 48 c7 c6 60 a6 29 8e 48 8b 54 24 08 8b 0c 24 44 8b 44 24 04 4d 89 e9 50 41 54 41 57 41 56 e8 ba 30 38 02 48 83 c4 20 90 <0f> 0b 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3
+RSP: 0018:ffffc900045269b0 EFLAGS: 00010282
+RAX: 0000000000000088 RBX: dffffc0000000000 RCX: cd66dacdc5d8e800
+RDX: 0000000000000000 RSI: 0000000000000200 RDI: 0000000000000000
+RBP: ffff88802d39a3d0 R08: ffffffff8174afec R09: 1ffff920008a4ccc
+R10: dffffc0000000000 R11: fffff520008a4ccd R12: 0000000000000140
+R13: ffff88803123aa00 R14: ffff88803123a9f2 R15: 000000000000003c
+FS:  00007fdbee5ff6c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000005d322000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+  skb_push+0xe5/0x100 net/core/skbuff.c:2636
+  eth_header+0x38/0x1f0 net/ethernet/eth.c:83
+  dev_hard_header include/linux/netdevice.h:3208 [inline]
+  nf_send_reset6+0xce6/0x1270 net/ipv6/netfilter/nf_reject_ipv6.c:358
+  nft_reject_inet_eval+0x3b9/0x690 net/netfilter/nft_reject_inet.c:48
+  expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
+  nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
+  nft_do_chain_inet+0x418/0x6b0 net/netfilter/nft_chain_filter.c:161
+  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+  nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
+  nf_hook include/linux/netfilter.h:269 [inline]
+  NF_HOOK include/linux/netfilter.h:312 [inline]
+  br_nf_pre_routing_ipv6+0x63e/0x770 net/bridge/br_netfilter_ipv6.c:184
+  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+  nf_hook_bridge_pre net/bridge/br_input.c:277 [inline]
+  br_handle_frame+0x9fd/0x1530 net/bridge/br_input.c:424
+  __netif_receive_skb_core+0x13e8/0x4570 net/core/dev.c:5562
+  __netif_receive_skb_one_core net/core/dev.c:5666 [inline]
+  __netif_receive_skb+0x12f/0x650 net/core/dev.c:5781
+  netif_receive_skb_internal net/core/dev.c:5867 [inline]
+  netif_receive_skb+0x1e8/0x890 net/core/dev.c:5926
+  tun_rx_batched+0x1b7/0x8f0 drivers/net/tun.c:1550
+  tun_get_user+0x3056/0x47e0 drivers/net/tun.c:2007
+  tun_chr_write_iter+0x10d/0x1f0 drivers/net/tun.c:2053
+  new_sync_write fs/read_write.c:590 [inline]
+  vfs_write+0xa6d/0xc90 fs/read_write.c:683
+  ksys_write+0x183/0x2b0 fs/read_write.c:736
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fdbeeb7d1ff
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 c9 8d 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 1c 8e 02 00 48
+RSP: 002b:00007fdbee5ff000 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007fdbeed36058 RCX: 00007fdbeeb7d1ff
+RDX: 000000000000008e RSI: 0000000020000040 RDI: 00000000000000c8
+RBP: 00007fdbeebf12be R08: 0000000000000000 R09: 0000000000000000
+R10: 000000000000008e R11: 0000000000000293 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fdbeed36058 R15: 00007ffc38de06e8
+ </TASK>
+
+Fixes: c8d7b98bec43 ("netfilter: move nf_send_resetX() code to nf_reject_ipvX modules")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv6/netfilter/nf_reject_ipv6.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
+index 7db0437140bf22390e2f40f3b892978379e08a15..9ae2b2725bf99ab0c6057032996b7f249fb6f45c 100644
+--- a/net/ipv6/netfilter/nf_reject_ipv6.c
++++ b/net/ipv6/netfilter/nf_reject_ipv6.c
+@@ -268,12 +268,12 @@ static int nf_reject6_fill_skb_dst(struct sk_buff *skb_in)
+ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 		    int hook)
+ {
+-	struct sk_buff *nskb;
+-	struct tcphdr _otcph;
+-	const struct tcphdr *otcph;
+-	unsigned int otcplen, hh_len;
+ 	const struct ipv6hdr *oip6h = ipv6_hdr(oldskb);
+ 	struct dst_entry *dst = NULL;
++	const struct tcphdr *otcph;
++	struct sk_buff *nskb;
++	struct tcphdr _otcph;
++	unsigned int otcplen;
+ 	struct flowi6 fl6;
+ 
+ 	if ((!(ipv6_addr_type(&oip6h->saddr) & IPV6_ADDR_UNICAST)) ||
+@@ -312,9 +312,8 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	if (IS_ERR(dst))
+ 		return;
+ 
+-	hh_len = (dst->dev->hard_header_len + 15)&~15;
+-	nskb = alloc_skb(hh_len + 15 + dst->header_len + sizeof(struct ipv6hdr)
+-			 + sizeof(struct tcphdr) + dst->trailer_len,
++	nskb = alloc_skb(LL_MAX_HEADER + sizeof(struct ipv6hdr) +
++			 sizeof(struct tcphdr) + dst->trailer_len,
+ 			 GFP_ATOMIC);
+ 
+ 	if (!nskb) {
+@@ -327,7 +326,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 
+ 	nskb->mark = fl6.flowi6_mark;
+ 
+-	skb_reserve(nskb, hh_len + dst->header_len);
++	skb_reserve(nskb, LL_MAX_HEADER);
+ 	nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP, ip6_dst_hoplimit(dst));
+ 	nf_reject_ip6_tcphdr_put(nskb, oldskb, otcph, otcplen);
+ 
+-- 
+2.47.0.163.g1226f6d8fa-goog
+
 
