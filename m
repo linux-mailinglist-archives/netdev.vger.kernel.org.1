@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-139059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51879AFE4B
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:36:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C629AFE4A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A2801F231BA
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:36:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 753741C22303
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988E91D5AB5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEB61D45FC;
 	Fri, 25 Oct 2024 09:36:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58AA81D27A4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0B11D2F5F;
 	Fri, 25 Oct 2024 09:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729848987; cv=none; b=jY72zUIiXkqRGT0hoHn7gmD0n58JgrlSJk0fd53Ei93++cFQz0IJIn+VVYxBYjjvUVloB3Ad/6q6h2ZDWOLoBJ8IaR8F/ujpOEm1+N5puTZuXiESA0HkvifjI4pBZq7zfcuetUvJzJnVCbh2qrp/jGhW/MdhK9crXg6CXGa/O9k=
+	t=1729848987; cv=none; b=inpVQfvtQ3H2NSJcpIWWtyMuY1o1WjT2+zk8c568mpZ5WtIoP1iY1oDsln+LEMNzI51P//SUMTk68yLSh49ttDTL3qRLjlAj5Bb2l7geq4WsQ9nk1HniLTSi5GHARfOq/OSGCNlgSZLo7khTKMFfV7J2/2dQsTch09gkO5ctYs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729848987; c=relaxed/simple;
-	bh=vqyAYGKGo1O3by185swqyg05OnYozT8QSJOu/jtU96Y=;
+	bh=35cOsTT1YYRA+to1SFi0U9iscvlef3bF9fV2AKVrJ9s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bxb6qjQ+712407jS/lQTCrpPDg275xNT24K0cku/AEdoRb3dWG7lsDWXmz0Q5U/XktCdj5aW1G7Aq1LCPkLcrsmoTvpvlvNggdwHsC8zGdp82aUNho77kfTC9AxcUVpB6TWQCVRqmoUA6geBk+YEdRUuVLArBsz2pi6BZEcwrEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 MIME-Version:Content-Type; b=ZRuo1DY161CetAtcI/1lM03toW/ERqPzCZzNOMljEL6BpHkvEbwjhg26dsmBUsLJ5kfUymf+W0CYfeN89XliNrKPl8f2S0iYxVIpeu9RzY8aIEkkKzUItsIlY4TrGIEOelNjJInYh3yYR3w80+XL0r99ukFuF+V0vKBXi1pg5xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XZd0v4Rg9z1jvr4;
-	Fri, 25 Oct 2024 17:34:55 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XZd2j2P6kz1ynfM;
+	Fri, 25 Oct 2024 17:36:29 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1B3E81A0188;
+	by mail.maildlp.com (Postfix) with ESMTPS id A35B8140361;
 	Fri, 25 Oct 2024 17:36:21 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
@@ -46,9 +46,9 @@ CC: <shenjian15@huawei.com>, <salil.mehta@huawei.com>,
 	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <shaojijie@huawei.com>,
 	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V3 net 1/9] net: hns3: default enable tx bounce buffer when smmu enabled
-Date: Fri, 25 Oct 2024 17:29:30 +0800
-Message-ID: <20241025092938.2912958-2-shaojijie@huawei.com>
+Subject: [PATCH V3 net 2/9] net: hns3: add sync command to sync io-pgtable
+Date: Fri, 25 Oct 2024 17:29:31 +0800
+Message-ID: <20241025092938.2912958-3-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241025092938.2912958-1-shaojijie@huawei.com>
 References: <20241025092938.2912958-1-shaojijie@huawei.com>
@@ -63,177 +63,83 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-From: Peiyang Wang <wangpeiyang1@huawei.com>
+From: Jian Shen <shenjian15@huawei.com>
 
-The SMMU engine on HIP09 chip has a hardware issue.
-SMMU pagetable prefetch features may prefetch and use a invalid PTE
-even the PTE is valid at that time. This will cause the device trigger
-fake pagefaults. The solution is to avoid prefetching by adding a
-SYNC command when smmu mapping a iova. But the performance of nic has a
-sharp drop. Then we do this workaround, always enable tx bounce buffer,
-avoid mapping/unmapping on TX path.
+To avoid errors in pgtable prefectch, add a sync command to sync
+io-pagtable.
 
-This issue only affects HNS3, so we always enable
-tx bounce buffer when smmu enabled to improve performance.
+This is a supplement for the previous patch.
+We want all the tx packet can be handled with tx bounce buffer path.
+But it depends on the remain space of the spare buffer, checked by the
+hns3_can_use_tx_bounce(). In most cases, maybe 99.99%, it returns true.
+But once it return false by no available space, the packet will be handled
+with the former path, which will map/unmap the skb buffer.
+Then the driver will face the smmu prefetch risk again.
+
+So add a sync command in this case to avoid smmu prefectch,
+just protects corner scenes.
 
 Fixes: 295ba232a8c3 ("net: hns3: add device version to replace pci revision")
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
 Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 31 +++++++++++++++++
- .../net/ethernet/hisilicon/hns3/hns3_enet.h   |  2 ++
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    | 33 +++++++++++++++++++
- 3 files changed, 66 insertions(+)
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 27 +++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 4cbc4d069a1f..ac88e301f221 100644
+index ac88e301f221..8760b4e9ade6 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -11,6 +11,7 @@
- #include <linux/irq.h>
- #include <linux/ip.h>
- #include <linux/ipv6.h>
-+#include <linux/iommu.h>
- #include <linux/module.h>
- #include <linux/pci.h>
- #include <linux/skbuff.h>
-@@ -1032,6 +1033,8 @@ static bool hns3_can_use_tx_sgl(struct hns3_enet_ring *ring,
- static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
+@@ -381,6 +381,24 @@ static const struct hns3_rx_ptype hns3_rx_ptype_tbl[] = {
+ #define HNS3_INVALID_PTYPE \
+ 		ARRAY_SIZE(hns3_rx_ptype_tbl)
+ 
++static void hns3_dma_map_sync(struct device *dev, unsigned long iova)
++{
++	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
++	struct iommu_iotlb_gather iotlb_gather;
++	size_t granule;
++
++	if (!domain || !iommu_is_dma_domain(domain))
++		return;
++
++	granule = 1 << __ffs(domain->pgsize_bitmap);
++	iova = ALIGN_DOWN(iova, granule);
++	iotlb_gather.start = iova;
++	iotlb_gather.end = iova + granule - 1;
++	iotlb_gather.pgsize = granule;
++
++	iommu_iotlb_sync(domain, &iotlb_gather);
++}
++
+ static irqreturn_t hns3_irq_handle(int irq, void *vector)
  {
- 	u32 alloc_size = ring->tqp->handle->kinfo.tx_spare_buf_size;
-+	struct net_device *netdev = ring_to_netdev(ring);
-+	struct hns3_nic_priv *priv = netdev_priv(netdev);
- 	struct hns3_tx_spare *tx_spare;
- 	struct page *page;
+ 	struct hns3_enet_tqp_vector *tqp_vector = vector;
+@@ -1728,7 +1746,9 @@ static int hns3_map_and_fill_desc(struct hns3_enet_ring *ring, void *priv,
+ 				  unsigned int type)
+ {
+ 	struct hns3_desc_cb *desc_cb = &ring->desc_cb[ring->next_to_use];
++	struct hnae3_handle *handle = ring->tqp->handle;
+ 	struct device *dev = ring_to_dev(ring);
++	struct hnae3_ae_dev *ae_dev;
+ 	unsigned int size;
  	dma_addr_t dma;
-@@ -1073,6 +1076,7 @@ static void hns3_init_tx_spare_buffer(struct hns3_enet_ring *ring)
- 	tx_spare->buf = page_address(page);
- 	tx_spare->len = PAGE_SIZE << order;
- 	ring->tx_spare = tx_spare;
-+	ring->tx_copybreak = priv->tx_copybreak;
- 	return;
  
- dma_mapping_error:
-@@ -4868,6 +4872,30 @@ static void hns3_nic_dealloc_vector_data(struct hns3_nic_priv *priv)
- 	devm_kfree(&pdev->dev, priv->tqp_vector);
- }
+@@ -1760,6 +1780,13 @@ static int hns3_map_and_fill_desc(struct hns3_enet_ring *ring, void *priv,
+ 		return -ENOMEM;
+ 	}
  
-+static void hns3_update_tx_spare_buf_config(struct hns3_nic_priv *priv)
-+{
-+#define HNS3_MIN_SPARE_BUF_SIZE (2 * 1024 * 1024)
-+#define HNS3_MAX_PACKET_SIZE (64 * 1024)
++	/* Add a SYNC command to sync io-pgtale to avoid errors in pgtable
++	 * prefetch
++	 */
++	ae_dev = hns3_get_ae_dev(handle);
++	if (ae_dev->dev_version >= HNAE3_DEVICE_VERSION_V3)
++		hns3_dma_map_sync(dev, dma);
 +
-+	struct iommu_domain *domain = iommu_get_domain_for_dev(priv->dev);
-+	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(priv->ae_handle);
-+	struct hnae3_handle *handle = priv->ae_handle;
-+
-+	if (ae_dev->dev_version < HNAE3_DEVICE_VERSION_V3)
-+		return;
-+
-+	if (!(domain && iommu_is_dma_domain(domain)))
-+		return;
-+
-+	priv->min_tx_copybreak = HNS3_MAX_PACKET_SIZE;
-+	priv->min_tx_spare_buf_size = HNS3_MIN_SPARE_BUF_SIZE;
-+
-+	if (priv->tx_copybreak < priv->min_tx_copybreak)
-+		priv->tx_copybreak = priv->min_tx_copybreak;
-+	if (handle->kinfo.tx_spare_buf_size < priv->min_tx_spare_buf_size)
-+		handle->kinfo.tx_spare_buf_size = priv->min_tx_spare_buf_size;
-+}
-+
- static void hns3_ring_get_cfg(struct hnae3_queue *q, struct hns3_nic_priv *priv,
- 			      unsigned int ring_type)
- {
-@@ -5101,6 +5129,7 @@ int hns3_init_all_ring(struct hns3_nic_priv *priv)
- 	int i, j;
- 	int ret;
- 
-+	hns3_update_tx_spare_buf_config(priv);
- 	for (i = 0; i < ring_num; i++) {
- 		ret = hns3_alloc_ring_memory(&priv->ring[i]);
- 		if (ret) {
-@@ -5305,6 +5334,8 @@ static int hns3_client_init(struct hnae3_handle *handle)
- 	priv->ae_handle = handle;
- 	priv->tx_timeout_count = 0;
- 	priv->max_non_tso_bd_num = ae_dev->dev_specs.max_non_tso_bd_num;
-+	priv->min_tx_copybreak = 0;
-+	priv->min_tx_spare_buf_size = 0;
- 	set_bit(HNS3_NIC_STATE_DOWN, &priv->state);
- 
- 	handle->msg_enable = netif_msg_init(debug, DEFAULT_MSG_LEVEL);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-index d36c4ed16d8d..caf7a4df8585 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.h
-@@ -596,6 +596,8 @@ struct hns3_nic_priv {
- 	struct hns3_enet_coalesce rx_coal;
- 	u32 tx_copybreak;
- 	u32 rx_copybreak;
-+	u32 min_tx_copybreak;
-+	u32 min_tx_spare_buf_size;
- };
- 
- union l3_hdr_info {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index b1e988347347..97eaeec1952b 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -1933,6 +1933,31 @@ static int hns3_set_tx_spare_buf_size(struct net_device *netdev,
- 	return ret;
- }
- 
-+static int hns3_check_tx_copybreak(struct net_device *netdev, u32 copybreak)
-+{
-+	struct hns3_nic_priv *priv = netdev_priv(netdev);
-+
-+	if (copybreak < priv->min_tx_copybreak) {
-+		netdev_err(netdev, "tx copybreak %u should be no less than %u!\n",
-+			   copybreak, priv->min_tx_copybreak);
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
-+static int hns3_check_tx_spare_buf_size(struct net_device *netdev, u32 buf_size)
-+{
-+	struct hns3_nic_priv *priv = netdev_priv(netdev);
-+
-+	if (buf_size < priv->min_tx_spare_buf_size) {
-+		netdev_err(netdev,
-+			   "tx spare buf size %u should be no less than %u!\n",
-+			   buf_size, priv->min_tx_spare_buf_size);
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
- static int hns3_set_tunable(struct net_device *netdev,
- 			    const struct ethtool_tunable *tuna,
- 			    const void *data)
-@@ -1949,6 +1974,10 @@ static int hns3_set_tunable(struct net_device *netdev,
- 
- 	switch (tuna->id) {
- 	case ETHTOOL_TX_COPYBREAK:
-+		ret = hns3_check_tx_copybreak(netdev, *(u32 *)data);
-+		if (ret)
-+			return ret;
-+
- 		priv->tx_copybreak = *(u32 *)data;
- 
- 		for (i = 0; i < h->kinfo.num_tqps; i++)
-@@ -1963,6 +1992,10 @@ static int hns3_set_tunable(struct net_device *netdev,
- 
- 		break;
- 	case ETHTOOL_TX_COPYBREAK_BUF_SIZE:
-+		ret = hns3_check_tx_spare_buf_size(netdev, *(u32 *)data);
-+		if (ret)
-+			return ret;
-+
- 		old_tx_spare_buf_size = h->kinfo.tx_spare_buf_size;
- 		new_tx_spare_buf_size = *(u32 *)data;
- 		netdev_info(netdev, "request to set tx spare buf size from %u to %u\n",
+ 	desc_cb->priv = priv;
+ 	desc_cb->length = size;
+ 	desc_cb->dma = dma;
 -- 
 2.33.0
 
