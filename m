@@ -1,244 +1,128 @@
-Return-Path: <netdev+bounces-139238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614559B1116
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:00:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722CA9B117C
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C4511C22162
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:00:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3719B225BB
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 21:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6051213159;
-	Fri, 25 Oct 2024 20:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A839213124;
+	Fri, 25 Oct 2024 21:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ek51nUKm"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="vV9hKXVF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1706213120;
+	Fri, 25 Oct 2024 21:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729890402; cv=none; b=nlwHH0rdFA2Y4YC3Dnwi0OmCBbck19C4AcRx6VUb8woZ28kuxhFop5FdKzrC8OnW4jy5S7bimnfu6PB2p4v+3VC4Ime4XhVwKrHIpHtNPYEHg9m3VfQEFDVVsyKQ8EMdTij63fGH/EZ3yQHAL8LAqyelksqwmrQxg/vAmxvFYYY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729890402; c=relaxed/simple;
+	bh=pqNdeGqpS3ELJrftLu6CbADN4Yt/eviDgPqQ891h5Fs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tHKo9xuQ3rHETKj9DLmeBkpwoo0ritle7dKzCacXZ7jBe7nM4fhtB14qjTj/Mi5QKS6crL3G2WpAdz8ItDTNXfbxnctr0OPUSAHzemH9wWB0FD1AMpKWRDuMAtxHs/W13zDy4Z7wyPvmjlMAeztZuHpk1iypI0cCN2N+gh0LBP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=vV9hKXVF; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B77021315B;
-	Fri, 25 Oct 2024 20:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729889744; cv=none; b=R3ItzZNnTOhBUNcMoxbtYxK4nf5IF4u3fQKx9/Xdi+YstByPXRlPx8oPVrl7JasEHoN1hJq0uBTnj3clMJNPoiIDntTWh3sH0Ksdb0H2jwzgH0WamsJRFjiS2KXGIqifwOK86+68l6LOP+IYWIsprNTkQ5cYGr/HwSBewcIKWvs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729889744; c=relaxed/simple;
-	bh=X0TZiLDky0GG3x8/CIBJH27urTQk5NE/O4qW5A1hzjQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WyboCYL10WcQa6LUk80x/4MYyxACF5/EKUE5F1KShmoKB1uZlq9XKO0/S2gcYC0ms/j9YffdcNDxt4nC65x/2XT85u8+BCYX4DdKwcIj07DQKiyWLVSXGtAyMS9XFbRLsPFGby83gslN5JT/2m6CnkyHbicfewJ6y2wgrnGanPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ek51nUKm; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b1434b00a2so174103685a.0;
-        Fri, 25 Oct 2024 13:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729889741; x=1730494541; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a7mEpXeFEW3xGftukSJ1AQ1XFvzrLG0415ygSe3eXAw=;
-        b=Ek51nUKmLmkAZl/1jRRY3v8MVhhwS2CMgnkfdnf++BQc5EGVhg8JI3xdeh5ta473TG
-         DV/GroHbzH4nEtfKqRPW1CMGHgcjl0Er7HIooKsKBRUExEnSjYNoiD5roGvUXnjkc2DT
-         I43PggSE2Sw3xtldIWgw8EoRIAyUfPJwr/clLh8QOb9qb4bb3ZIIzXh+abJmXwwGeQl5
-         aToWzJhOKOO6BMMOAYum5UAVVSp4azu4hHqotJ8NxnfV1tyG9aQ0oRE6r42WCxQ4vsls
-         0LXZ1Bnp/R6WOqjBxZ66kBElJEmGrcnBaJBV1bSJc2JZAlKadEw1VM5ffCVe5olJlA7J
-         9CGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729889741; x=1730494541;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a7mEpXeFEW3xGftukSJ1AQ1XFvzrLG0415ygSe3eXAw=;
-        b=KAgBiZGnMX3IMc940iKu7YIaVBZcFFIhjZBW/sxNYINjtEGJVFriAdQsmVx7JdDpkV
-         gV0LfctEKFIVWEoYhKr8F9KlqLXIdUFKNQMKZsmGRzQ/QFECl+/nsQcTCs7FZ/2aVa2p
-         NE+RYoyrQUC5V0Q0JjdTr0rlbA5O4GYbC2MOMsHW4bQOSFR+Ww+xWwefknGg+XZpuZyX
-         nFRCpgXUWKaTu5FsE+L1NqjxZ0XUOiKaPsCKbzRTJTdQBSZtoI/VXCIZoPBO/Qz3rPp/
-         /7rrz2KzevhNpy5zdxP2n5+qeG+5uutbjNKX6fDh8o/26fMpsgBumbfJuxkwWRppX8Ia
-         hhEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUc+RQ5p1iK4gkbtBcYfEtCZNjLqjSauttzRnojEOO0Sw6Hjrz+LR4/Nk2WYTJAKm4U4KZh9PpNlbtjduV2IMw=@vger.kernel.org, AJvYcCV4dD9pB94qvi2p7k4zAYBjl0xmEqYQFkgPCt8WuCRlTqeV+jGRfdzoqeDqAsE6lbK701MXxSORYJknuwA=@vger.kernel.org, AJvYcCXFZYb2BSIc+XQaRGGQc6+LYhEfQ6YHX6EM29BTWzTSazotCW7uUrlJGE+0bGCEtAEtkXklK4pm@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG4b7ro2SkYrwl2Ieu202k+ZpXuGC2Y3HfoEZ3PPleTlHk5PjG
-	0RVHWrNKVRlPUnuyMuocVKx36517KvcLGWAFgrTCH2UQYjlL4INk
-X-Google-Smtp-Source: AGHT+IEqQhKau5pPRGGlLuxWimNh2z4GtMCD8DH2lIJXQASpwX0eyAheXM/Votkbex8rG7D399vjoQ==
-X-Received: by 2002:a05:620a:1a95:b0:7b1:45ac:86bd with SMTP id af79cd13be357-7b193eeda1dmr95709185a.18.1729889741159;
-        Fri, 25 Oct 2024 13:55:41 -0700 (PDT)
-Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b18d278276sm90108685a.10.2024.10.25.13.55.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 13:55:40 -0700 (PDT)
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 2C0211200043;
-	Fri, 25 Oct 2024 16:55:40 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Fri, 25 Oct 2024 16:55:40 -0400
-X-ME-Sender: <xms:zAUcZ4Xp0nlS9-mdCZRDU6sq7p_cNJyEUMJ43fYQrDGTeSWKSc9_rg>
-    <xme:zAUcZ8kHLUHvVMI3bvMdmnY0cZwg_bicXZrYls2lFC89qsy_29D7EKiphKgJTshmL
-    6Wdj7jAuKZnMiwTIA>
-X-ME-Received: <xmr:zAUcZ8Y-16fStVU3MERCcmZTXaA-FcEzaMa4Mpk2D-eYixSPhoMf_k9sKTg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejvddgudehgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilh
-    drtghomheqnecuggftrfgrthhtvghrnhephedugfduffffteeutddvheeuveelvdfhleel
-    ieevtdeguefhgeeuveeiudffiedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghl
-    ihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepgh
-    hmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopedvuddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepfhhujhhithgrrdhtohhmohhnohhrihesgh
-    hmrghilhdrtghomhdprhgtphhtthhopegrnhhnrgdqmhgrrhhirgeslhhinhhuthhrohhn
-    ihigrdguvgdprhgtphhtthhopehfrhgvuggvrhhitgeskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepthhglhigsehlihhnuhhtrhhonhhigidruggvpdhrtghpthhtohepjhhsthhu
-    lhhtiiesghhoohhglhgvrdgtohhmpdhrtghpthhtohepshgsohihugeskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgvrhhnvghlrdho
-    rhhg
-X-ME-Proxy: <xmx:zAUcZ3UKd7ADpjA5EONVWzudijOw9jZaS7zqBC1zfXU3Q-UHpFG-vQ>
-    <xmx:zAUcZylWNGw_ZP00060z8nlk0qBsXohld85XF3trE2NxdqmvwXfJ3w>
-    <xmx:zAUcZ8chZJSurud8yQxN8WAPT8PKBilMD9rKLgh5XEasPpDShf1szw>
-    <xmx:zAUcZ0G9DE2lFLuFRWubeyv78yZf3TRnI87mRWhC9cWr62upmxJx6g>
-    <xmx:zAUcZ4nHER8e6i3AnVj4jrtr2Ptb0PaSva2M9t_O8jbpw63EQMFVpRvR>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 25 Oct 2024 16:55:39 -0400 (EDT)
-Date: Fri, 25 Oct 2024 13:55:38 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
-	jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
-Subject: Re: [PATCH v4 3/7] rust: time: Introduce Instant type
-Message-ID: <ZxwFyl0xIje5gv7J@Boquns-Mac-mini.local>
-References: <20241025033118.44452-1-fujita.tomonori@gmail.com>
- <20241025033118.44452-4-fujita.tomonori@gmail.com>
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id E5CAF200F487;
+	Fri, 25 Oct 2024 23:06:36 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be E5CAF200F487
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1729890397;
+	bh=o9yNod9FcRqEk/LV8Ey+bAHerVAR7xSMn0rxDJz6Na0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vV9hKXVFz9ut42jGdcVedjr1G3AAGvkvIm4b8q4izH8/0p76RfijBnuCutNvIsgZ4
+	 4NhqBpOG6USBege9j6n8hQPIEfgPrUqETQfVVKMc391k8meW1+/7QznQBElFzayQNO
+	 xemuzEITNXY6qV+T92Tz0AILaoNS6r7A/Mbm9WTCKuDVuBwl9R+R11nLsLpMa18yHZ
+	 KFUspj43xIomAK+2DBnL1vXLgpmLduB4Sv99L8TuzXeMolyLYYTXTJiNsk4SUxToNk
+	 Y7Ehlbd4o3h6wvzjwc6sSll6zBc2v6sAMlFV0z1INe5x0UE4Th7abxHLzdlsz/0r8u
+	 RR3M1mVD3D1pw==
+Message-ID: <d3bce110-4b1b-44ed-8c1d-a9736a02f1dd@uliege.be>
+Date: Fri, 25 Oct 2024 23:06:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025033118.44452-4-fujita.tomonori@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: ipv6: ioam6_iptunnel: mitigate
+ 2-realloc issue
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241025133727.27742-1-justin.iurman@uliege.be>
+ <20241025133727.27742-2-justin.iurman@uliege.be>
+ <59a875a9-2072-467d-8989-f01525ecd08c@intel.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <59a875a9-2072-467d-8989-f01525ecd08c@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 25, 2024 at 12:31:14PM +0900, FUJITA Tomonori wrote:
-> Introduce a type representing a specific point in time. We could use
-> the Ktime type but C's ktime_t is used for both timestamp and
-> timedelta. To avoid confusion, introduce a new Instant type for
-> timestamp.
+On 10/25/24 17:12, Alexander Lobakin wrote:
+> From: Justin Iurman <justin.iurman@uliege.be>
+> Date: Fri, 25 Oct 2024 15:37:25 +0200
 > 
-> Rename Ktime to Instant and modify their methods for timestamp.
+>> This patch mitigates the two-reallocations issue with ioam6_iptunnel by
+>> providing the dst_entry (in the cache) to the first call to
+>> skb_cow_head(). As a result, the very first iteration would still
+>> trigger two reallocations (i.e., empty cache), while next iterations
+>> would only trigger a single reallocation.
 > 
-> Implement the subtraction operator for Instant:
+> [...]
 > 
-> Delta = Instant A - Instant B
+>>   static int ioam6_do_inline(struct net *net, struct sk_buff *skb,
+>> -			   struct ioam6_lwt_encap *tuninfo)
+>> +			   struct ioam6_lwt_encap *tuninfo,
+>> +			   struct dst_entry *dst)
+>>   {
+>>   	struct ipv6hdr *oldhdr, *hdr;
+>>   	int hdrlen, err;
+>>   
+>>   	hdrlen = (tuninfo->eh.hdrlen + 1) << 3;
+>>   
+>> -	err = skb_cow_head(skb, hdrlen + skb->mac_len);
+>> +	err = skb_cow_head(skb, hdrlen + (!dst ? skb->mac_len
+>> +					       : LL_RESERVED_SPACE(dst->dev)));
 > 
-> The operation never overflows (Instant ranges from 0 to
-> `KTIME_MAX`).
+> You use this pattern a lot throughout the series. I believe you should
+> make a static inline or a macro from it.
 > 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/kernel/time.rs | 48 +++++++++++++++------------------------------
->  1 file changed, 16 insertions(+), 32 deletions(-)
+> static inline u32 some_name(const *dst, const *skb)
+> {
+> 	return dst ? LL_RESERVED_SPACE(dst->dev) : skb->mac_len;
+> }
 > 
-> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-> index 574e72d3956b..3cc1a8a76777 100644
-> --- a/rust/kernel/time.rs
-> +++ b/rust/kernel/time.rs
-> @@ -31,59 +31,43 @@ pub fn msecs_to_jiffies(msecs: Msecs) -> Jiffies {
->      unsafe { bindings::__msecs_to_jiffies(msecs) }
->  }
->  
-> -/// A Rust wrapper around a `ktime_t`.
-> +/// A specific point in time.
->  #[repr(transparent)]
->  #[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
-> -pub struct Ktime {
-> +pub struct Instant {
-> +    // Range from 0 to `KTIME_MAX`.
->      inner: bindings::ktime_t,
->  }
->  
-> -impl Ktime {
-> -    /// Create a `Ktime` from a raw `ktime_t`.
-> +impl Instant {
-> +    /// Create a `Instant` from a raw `ktime_t`.
->      #[inline]
-> -    pub fn from_raw(inner: bindings::ktime_t) -> Self {
-> +    fn from_raw(inner: bindings::ktime_t) -> Self {
->          Self { inner }
->      }
->  
->      /// Get the current time using `CLOCK_MONOTONIC`.
+> BTW why do you check for `!dst`, not `dst`? Does changing this affects
+> performance?
 
-I think eventually we want to have the `Instant` generic over
-clocksource, i.e. an `Instant<MONOTOMIC>` cannot substract an
-`Instant<BOOTTIME>`, but that's something we can do later.
+Not at all, you're right... even the opposite actually. Regarding the 
+static inline suggestion, it could be a good idea and may even look like 
+this as an optimization:
 
-Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+static inline u32 dev_overhead(struct dst_entry *dst, struct sk_buff *skb)
+{
+	if (likely(dst))
+		return LL_RESERVED_SPACE(dst->dev);
 
-Regards,
-Boqun
+	return skb->mac_len;
+}
 
->      #[inline]
-> -    pub fn ktime_get() -> Self {
-> +    pub fn now() -> Self {
->          // SAFETY: It is always safe to call `ktime_get` outside of NMI context.
->          Self::from_raw(unsafe { bindings::ktime_get() })
->      }
->  
-> -    /// Divide the number of nanoseconds by a compile-time constant.
->      #[inline]
-> -    fn divns_constant<const DIV: i64>(self) -> i64 {
-> -        self.to_ns() / DIV
-> -    }
-> -
-> -    /// Returns the number of nanoseconds.
-> -    #[inline]
-> -    pub fn to_ns(self) -> i64 {
-> -        self.inner
-> -    }
-> -
-> -    /// Returns the number of milliseconds.
-> -    #[inline]
-> -    pub fn to_ms(self) -> i64 {
-> -        self.divns_constant::<NSEC_PER_MSEC>()
-> +    /// Return the amount of time elapsed since the `Instant`.
-> +    pub fn elapsed(&self) -> Delta {
-> +        Self::now() - *self
->      }
->  }
->  
-> -/// Returns the number of milliseconds between two ktimes.
-> -#[inline]
-> -pub fn ktime_ms_delta(later: Ktime, earlier: Ktime) -> i64 {
-> -    (later - earlier).to_ms()
-> -}
-> -
-> -impl core::ops::Sub for Ktime {
-> -    type Output = Ktime;
-> +impl core::ops::Sub for Instant {
-> +    type Output = Delta;
->  
-> +    // never overflows
->      #[inline]
-> -    fn sub(self, other: Ktime) -> Ktime {
-> -        Self {
-> -            inner: self.inner - other.inner,
-> +    fn sub(self, other: Instant) -> Delta {
-> +        Delta {
-> +            nanos: self.inner - other.inner,
->          }
->      }
->  }
-> -- 
-> 2.43.0
-> 
-> 
+The question is... where should it go then? A static inline function per 
+file (i.e., ioam6_iptunnel.c, seg6_iptunnel.c, and rpl_iptunnel.c)? In 
+that case, it would still be repeated 3 times. Or in a header file 
+somewhere, to have it defined only once? If so, what location do you 
+think would be best?
 
