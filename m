@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-138956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF8B9AF842
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:36:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C289AF844
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2EC1C2159B
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:36:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66885B21FBF
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387361AA7A2;
-	Fri, 25 Oct 2024 03:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49991B0F31;
+	Fri, 25 Oct 2024 03:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nz7XP32d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbgCZRqK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68A31ACDF0;
-	Fri, 25 Oct 2024 03:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D339D1B0F1C;
+	Fri, 25 Oct 2024 03:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729827276; cv=none; b=FqMSCJRWcY9H5ELAbuIqWJIdGN/beYt1rPvEx2Hegle9dTCHkc/4XWW+v49odj/sLbPRPFVffA/m/FsdJz6N/OSlQI3uKlE2haDBzk3D778HB6kcizq6xv9Aj5RD5qtnODI/EGyhF/HkYmAX7PSQJzHOZLXbQ9WJf/5SJBmbgj4=
+	t=1729827279; cv=none; b=gortbliKT+8oii0tTPaIbs39tdBiIiBJ/VjTXJTZcddFAKprLQdRjlXKlddyxIHXVNUGSraitcl8F8pHugGqC0FtH4Go9gjvt1yQsXO3KnJa4J2qMfqWIZivRUl2Xfvvd7r3hVUgtgm74uXKDPY22AJdVCM++SQP1niMnio+BkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729827276; c=relaxed/simple;
-	bh=pZsVeffyezjeq+ZCP4S1Z1TvMIkWwVO0ML0qhzsHTg8=;
+	s=arc-20240116; t=1729827279; c=relaxed/simple;
+	bh=jB92JpeDW2yhP2VRKGudKbbfDREsNE6Gpy5FBMVK5aM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bf4hxavTUwKjbNnJTt543Xm1MA/p0XXuXpp4qt0zSbXVz8u/EAAmYEEoxVotTsqhmCG24qrUzaSdy24QREeecv2yqRQx0F7SepWvg0za2kt2Z3EuwiV0DPACcxZGmmaA0BUPFzCeDQiRwDGBvaYl7b4E6CjuqQPV8tf6i860HsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nz7XP32d; arc=none smtp.client-ip=209.85.215.181
+	 MIME-Version; b=tckyOhPpPKUS6sI3a5I23tv2nzvWtHdH53BW13lNmVqc0vdOYExH9l3a6uF+0tH6APXKUg02GPe+Ez3/IfNVPmlt+qicFHE9cf6inmAGVIGqPTFpgRBRvJfW4QgF2dyVvNm9RA48m1vwsRI056fkn6jP2/727sF2xjmOk8WsnUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QbgCZRqK; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7e9e38dd5f1so1152372a12.0;
-        Thu, 24 Oct 2024 20:34:33 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7ea8de14848so877201a12.2;
+        Thu, 24 Oct 2024 20:34:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729827273; x=1730432073; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729827277; x=1730432077; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z1q9ggByLgvF29xNghA+oLeekFn/dFvbYSRczZS/Rr0=;
-        b=Nz7XP32dmmFSFZ4i2h7KnfPiYY7l8Z/T5F0YDuXnedc4VFICoBSOdW1gxw/Hbgvgl3
-         gDC/sX7P5cbaa1YlgVsP1qpmwlDi4YBI1rjHlJ1GpMbQZ+1HoDQIhxjBCNM3vxA7WhLd
-         ze/V0JyI3OfS20D776J6rxhm8AU+qwBU2rydDX8QEvY67CI+uSWC3euJ1v9KAmwpNpEy
-         B1BRM72YHmniMvimCuoioSxMSZPFSeNh7GY1eRZaQZmji3kQg3ooxnlspFe8PC1OlfqC
-         w6crVx+Z45OeyXnYZUSJK9SyKNz434pjWRZDWkbp/keSbFCXZaWHLAw/HteKFDP8uaF4
-         s7fQ==
+        bh=mK2RJ1Xug5oMAzwhSCqVHPpqDu7p/3YqJqaxy25r6IM=;
+        b=QbgCZRqKte0cIj2PmXXi1/D/AM/ld59kHK+Rz4IHb6EA8ztM1vEPQUVtD7yK7KuZA+
+         F7DG9W5aWUimm0B8GAstODa5WstGSp7FZe5NKffesTEeSqE9dVK+jQ6vLs+K6GHnrHQg
+         sbRSzh2r8zqrZe9eP6vGmj7AtQMnIE4HY7Adtz3lgvZkNfe3lok0WxH8VWjCTy4rZnN7
+         uG9M9yv1rNzbPiMqv6m1h3f8Lo960m2oJsPBvcoivqEs6RuCxzruDgNPydY7MiJ1t8LZ
+         0xOh6pZgPzMbvy3iut2zeheiUcwaf3LegSaNxMchAhaK2t773jSy1/E2ooyl2oeZ7RKf
+         WkOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729827273; x=1730432073;
+        d=1e100.net; s=20230601; t=1729827277; x=1730432077;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z1q9ggByLgvF29xNghA+oLeekFn/dFvbYSRczZS/Rr0=;
-        b=mrBJ1CiEYGoV40J5RIgFNdArzGO4rrJPGr8TRz0qVGDLOJi256ADV40WpFvxBYkocu
-         sYclpVzUDZ5R+PVHp1OeqLEQ1BnniBZrmAZPj2kVx10LQvLf6mXEOyAEUmqTQOafi82E
-         qbfbOQ1WEuDnRPZNCkHZgj5Z69TSJ1tehJyBcdgXs1A7+t1B32A+gOfodLp8iiXm/zER
-         qwtBGn201f+EmYc5b67oIVFT1sshz1jBXdn3QWqD/ykHgUxqy+ogipHR/bVckTmZMHW4
-         NyCxzIJAUEOixBmL+F9hIvuktA4m4COonSIaU4jjQg68SR4H5GBNUZ5xEL5Dlxn/r8Sk
-         qIlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXMrlhgkxlVSOZsz5ojhDm5MMIC9uYmfNKbEDo63KSjlJB0AR8uKMSghluNRN8PxSMsKSXTWZNaY9j5KQ=@vger.kernel.org, AJvYcCWNZsYu7PX7TAhlbD7ykn6B8gg0vn/f4einP+smBAu1Cf/ORK1mXe5xLiLqlhc6Nga06U9B7r3dBjmWrvCtkYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPSWObFYKFYv/LDwjrRk3tpGygJHJbc+S/Myk/90/wvKLOIL9+
-	u1swub5IbrBUFXaRjKoGZbm5PBiRv6Jp34n1yAy1anyOe6XujQif
-X-Google-Smtp-Source: AGHT+IGIUPkN+OqnxUUcmRWusqknbhO05BPVVFPbEuKkJIMkAd+D/2fn/uzB7S5maSTcz6zJeA8RPA==
-X-Received: by 2002:a05:6a20:db0a:b0:1d9:a9b:28f0 with SMTP id adf61e73a8af0-1d989cc8f66mr5807282637.34.1729827272976;
-        Thu, 24 Oct 2024 20:34:32 -0700 (PDT)
+        bh=mK2RJ1Xug5oMAzwhSCqVHPpqDu7p/3YqJqaxy25r6IM=;
+        b=U/Y357W9qT5FkuuQDeg0fhuTt/KbOeGd97/FsppLnIsYOaejuq/Gv41hGpwFNSxkNt
+         XvGscEj4FnIDqnVSjnYh5Z7dfg6yNwp8lZjnUnFgxB4WN87PKJZs+aXVTE8w6YceAxHi
+         GaQQZvvfnU9FdwdIXo9uuM3YIR4IfAG0BQhkLg4VV23oCVkhzGdz7SyoMAE5UWSd/J2g
+         HP2Q1YnCNRc5iBiVx+IWoVB8Qy5v2OMndhwZKKw7O2oFObPjScIaYxx3g7jsCLIOHZ1F
+         wzwQ+MCFkLDiLAu7xhU/txQc/iEtZomQ+3eaKESt0vq5AWcCPdtP4S3UMq2UHu67Kitc
+         rF+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUi7L3vrYX9zAdCZnAzS8T6ItuWrAETnSY4496dDfr/BUK43+ebj5XIWCoDocioksmmfTS42CIbh5PyVTRthN8=@vger.kernel.org, AJvYcCWwYw1SPPqMgEZVSfVIkvWUPBvp5b0LtcqksQjbFqKSBQdgQVuBN2i1j0z9DtPCs7ocNhlcwOsRjf1ZyUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv85pUFpkYjQMA8eBSHoT1yjRdeMiiYJyL1CfGZTrzvpL8hb7Z
+	c0hgmBw2qFKkc9/k82kxg4/VlqUXYB+WFiEHFxTy3FTb6xsy6l2KeC83iCVj
+X-Google-Smtp-Source: AGHT+IEH7dK1McuvR7hzSWJAMJ7WGlTHb2AlplhCtkFMzCX87+IiwGmqetTU9HQS3ZVTMuAz2d+mnw==
+X-Received: by 2002:a05:6a20:1d98:b0:1d9:4837:ada2 with SMTP id adf61e73a8af0-1d978bad18emr10579527637.35.1729827276975;
+        Thu, 24 Oct 2024 20:34:36 -0700 (PDT)
 Received: from mew.. (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7205791db5fsm180188b3a.11.2024.10.24.20.34.29
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7205791db5fsm180188b3a.11.2024.10.24.20.34.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2024 20:34:32 -0700 (PDT)
+        Thu, 24 Oct 2024 20:34:36 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: anna-maria@linutronix.de,
 	frederic@kernel.org,
@@ -87,9 +87,9 @@ Cc: netdev@vger.kernel.org,
 	a.hindborg@samsung.com,
 	aliceryhl@google.com,
 	arnd@arndb.de
-Subject: [PATCH v4 6/7] rust: Add read_poll_timeout functions
-Date: Fri, 25 Oct 2024 12:31:17 +0900
-Message-ID: <20241025033118.44452-7-fujita.tomonori@gmail.com>
+Subject: [PATCH v4 7/7] net: phy: qt2025: Wait until PHY becomes ready
+Date: Fri, 25 Oct 2024 12:31:18 +0900
+Message-ID: <20241025033118.44452-8-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241025033118.44452-1-fujita.tomonori@gmail.com>
 References: <20241025033118.44452-1-fujita.tomonori@gmail.com>
@@ -101,243 +101,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add read_poll_timeout functions which poll periodically until a
-condition is met or a timeout is reached.
+Wait until a PHY becomes ready in the probe callback by
+using readx_poll_timeout function.
 
-C's read_poll_timeout (include/linux/iopoll.h) is a complicated macro
-and a simple wrapper for Rust doesn't work. So this implements the
-same functionality in Rust.
-
-The C version uses usleep_range() while the Rust version uses
-fsleep(), which uses the best sleep method so it works with spans that
-usleep_range() doesn't work nicely with.
-
-Unlike the C version, __might_sleep() is used instead of might_sleep()
-to show proper debug info; the file name and line
-number. might_resched() could be added to match what the C version
-does but this function works without it.
-
-The sleep_before_read argument isn't supported since there is no user
-for now. It's rarely used in the C version.
-
-For the proper debug info, readx_poll_timeout() and __might_sleep()
-are implemented as a macro. We could implement them as a normal
-function if there is a clean way to get a null-terminated string
-without allocation from core::panic::Location::file().
-
-readx_poll_timeout() can only be used in a nonatomic context. This
-requirement is not checked by these abstractions, but it is
-intended that klint [1] or a similar tool will be used to check it
-in the future.
-
-Link: https://rust-for-linux.com/klint [1]
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- rust/helpers/helpers.c   |  1 +
- rust/helpers/kernel.c    | 13 ++++++
- rust/kernel/error.rs     |  1 +
- rust/kernel/io.rs        |  5 +++
- rust/kernel/io/poll.rs   | 93 ++++++++++++++++++++++++++++++++++++++++
- rust/kernel/lib.rs       |  2 +
- rust/kernel/processor.rs | 13 ++++++
- 7 files changed, 128 insertions(+)
- create mode 100644 rust/helpers/kernel.c
- create mode 100644 rust/kernel/io.rs
- create mode 100644 rust/kernel/io/poll.rs
- create mode 100644 rust/kernel/processor.rs
+ drivers/net/phy/qt2025.rs | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-index c274546bcf78..f9569ff1717e 100644
---- a/rust/helpers/helpers.c
-+++ b/rust/helpers/helpers.c
-@@ -12,6 +12,7 @@
- #include "build_assert.c"
- #include "build_bug.c"
- #include "err.c"
-+#include "kernel.c"
- #include "kunit.c"
- #include "mutex.c"
- #include "page.c"
-diff --git a/rust/helpers/kernel.c b/rust/helpers/kernel.c
-new file mode 100644
-index 000000000000..da847059260b
---- /dev/null
-+++ b/rust/helpers/kernel.c
-@@ -0,0 +1,13 @@
-+// SPDX-License-Identifier: GPL-2.0
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 28d8981f410b..f7480c19d4cc 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -18,7 +18,9 @@
+     DeviceId, Driver,
+ };
+ use kernel::prelude::*;
++use kernel::readx_poll_timeout;
+ use kernel::sizes::{SZ_16K, SZ_8K};
++use kernel::time::Delta;
+ 
+ kernel::module_phy_driver! {
+     drivers: [PhyQT2025],
+@@ -93,7 +95,13 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+         // The micro-controller will start running from SRAM.
+         dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
+ 
+-        // TODO: sleep here until the hw becomes ready.
++        readx_poll_timeout!(
++            || dev.read(C45::new(Mmd::PCS, 0xd7fd)),
++            |val| val != 0x00 && val != 0x10,
++            Delta::from_millis(50),
++            Delta::from_secs(3)
++        )?;
 +
-+#include <linux/kernel.h>
-+
-+void rust_helper_cpu_relax(void)
-+{
-+	cpu_relax();
-+}
-+
-+void rust_helper___might_sleep(const char *file, int line)
-+{
-+	__might_sleep(file, line);
-+}
-diff --git a/rust/kernel/error.rs b/rust/kernel/error.rs
-index 6f1587a2524e..d571b9587ed6 100644
---- a/rust/kernel/error.rs
-+++ b/rust/kernel/error.rs
-@@ -58,6 +58,7 @@ macro_rules! declare_err {
-     declare_err!(EPIPE, "Broken pipe.");
-     declare_err!(EDOM, "Math argument out of domain of func.");
-     declare_err!(ERANGE, "Math result not representable.");
-+    declare_err!(ETIMEDOUT, "Connection timed out.");
-     declare_err!(ERESTARTSYS, "Restart the system call.");
-     declare_err!(ERESTARTNOINTR, "System call was interrupted by a signal and will be restarted.");
-     declare_err!(ERESTARTNOHAND, "Restart if no handler.");
-diff --git a/rust/kernel/io.rs b/rust/kernel/io.rs
-new file mode 100644
-index 000000000000..033f3c4e4adf
---- /dev/null
-+++ b/rust/kernel/io.rs
-@@ -0,0 +1,5 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Input and Output.
-+
-+pub mod poll;
-diff --git a/rust/kernel/io/poll.rs b/rust/kernel/io/poll.rs
-new file mode 100644
-index 000000000000..ef1f38b59fda
---- /dev/null
-+++ b/rust/kernel/io/poll.rs
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! IO polling.
-+//!
-+//! C header: [`include/linux/iopoll.h`](srctree/include/linux/iopoll.h).
-+
-+use crate::{
-+    error::{code::*, Result},
-+    processor::cpu_relax,
-+    time::{delay::fsleep, Delta, Instant},
-+};
-+
-+/// Polls periodically until a condition is met or a timeout is reached.
-+///
-+/// Public but hidden since it should only be used from public macros.
-+#[doc(hidden)]
-+pub fn read_poll_timeout<Op, Cond, T: Copy>(
-+    mut op: Op,
-+    cond: Cond,
-+    sleep_delta: Delta,
-+    timeout_delta: Delta,
-+) -> Result<T>
-+where
-+    Op: FnMut() -> Result<T>,
-+    Cond: Fn(T) -> bool,
-+{
-+    let start = Instant::now();
-+    let sleep = !sleep_delta.is_zero();
-+    let timeout = !timeout_delta.is_zero();
-+
-+    let val = loop {
-+        let val = op()?;
-+        if cond(val) {
-+            // Unlike the C version, we immediately return.
-+            // We know a condition is met so we don't need to check again.
-+            return Ok(val);
-+        }
-+        if timeout && start.elapsed() > timeout_delta {
-+            // Should we return Err(ETIMEDOUT) here instead of call op() again
-+            // wihout a sleep between? But we follow the C version. op() could
-+            // take some time so might be worth checking again.
-+            break op()?;
-+        }
-+        if sleep {
-+            fsleep(sleep_delta);
-+        }
-+        // fsleep() could be busy-wait loop so we always call cpu_relax().
-+        cpu_relax();
-+    };
-+
-+    if cond(val) {
-+        Ok(val)
-+    } else {
-+        Err(ETIMEDOUT)
-+    }
-+}
-+
-+/// Print debug information if it's called inside atomic sections.
-+#[macro_export]
-+macro_rules! __might_sleep {
-+    () => {
-+        #[cfg(CONFIG_DEBUG_ATOMIC_SLEEP)]
-+        // SAFETY: FFI call.
-+        unsafe {
-+            $crate::bindings::__might_sleep(
-+                c_str!(::core::file!()).as_char_ptr(),
-+                ::core::line!() as i32,
-+            )
-+        }
-+    };
-+}
-+
-+/// Polls periodically until a condition is met or a timeout is reached.
-+///
-+/// `op` is called repeatedly until `cond` returns `true` or the timeout is
-+///  reached. The return value of `op` is passed to `cond`.
-+///
-+/// `sleep_delta` is the duration to sleep between calls to `op`.
-+/// If `sleep_delta` is less than one microsecond, the function will busy-wait.
-+///
-+/// `timeout_delta` is the maximum time to wait for `cond` to return `true`.
-+///
-+/// This macro can only be used in a nonatomic context.
-+#[macro_export]
-+macro_rules! readx_poll_timeout {
-+    ($op:expr, $cond:expr, $sleep_delta:expr, $timeout_delta:expr) => {{
-+        if !$sleep_delta.is_zero() {
-+            $crate::__might_sleep!();
-+        }
-+
-+        $crate::io::poll::read_poll_timeout($op, $cond, $sleep_delta, $timeout_delta)
-+    }};
-+}
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index 22a3bfa5a9e9..b775fd1c9be0 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -35,6 +35,7 @@
- #[cfg(CONFIG_RUST_FW_LOADER_ABSTRACTIONS)]
- pub mod firmware;
- pub mod init;
-+pub mod io;
- pub mod ioctl;
- #[cfg(CONFIG_KUNIT)]
- pub mod kunit;
-@@ -44,6 +45,7 @@
- pub mod page;
- pub mod prelude;
- pub mod print;
-+pub mod processor;
- pub mod sizes;
- pub mod rbtree;
- mod static_assert;
-diff --git a/rust/kernel/processor.rs b/rust/kernel/processor.rs
-new file mode 100644
-index 000000000000..eeeff4be84fa
---- /dev/null
-+++ b/rust/kernel/processor.rs
-@@ -0,0 +1,13 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Processor related primitives.
-+//!
-+//! C header: [`include/linux/processor.h`](srctree/include/linux/processor.h).
-+
-+/// Lower CPU power consumption or yield to a hyperthreaded twin processor.
-+///
-+/// It also happens to serve as a compiler barrier.
-+pub fn cpu_relax() {
-+    // SAFETY: FFI call.
-+    unsafe { bindings::cpu_relax() }
-+}
+         Ok(())
+     }
+ 
 -- 
 2.43.0
 
