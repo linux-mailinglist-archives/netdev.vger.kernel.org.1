@@ -1,502 +1,143 @@
-Return-Path: <netdev+bounces-139259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFDC9B1356
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:35:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E68609B13A4
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:58:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1042FB222CF
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:35:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B7CA1C217D0
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1569C215C45;
-	Fri, 25 Oct 2024 23:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90167214402;
+	Fri, 25 Oct 2024 23:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nigauri-org.20230601.gappssmtp.com header.i=@nigauri-org.20230601.gappssmtp.com header.b="N/nMTUxU"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CPP2fJCB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBB71DD0C9
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 23:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71E71537C8;
+	Fri, 25 Oct 2024 23:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729899324; cv=none; b=uaz6GZzJi7cWWyha71wkJaCDpT1Tl9299UO+TET9kZ2/dfniZrMA4W3CD3L5s1ualE7aaiUbtnXpYJzQt29NygTUms2t7imlU/VSLeBGb55UHOqR7cDx5x3i9kYYoBhyzxU0XcuOE+tEKRKWhhqewJcuVgiAIqk151S4XU6nYIk=
+	t=1729900732; cv=none; b=iamO02CskZHljw+THSIogUb9tXn47h2IcssmDkCxMU1O+QiUNwGWMcqeSiHFNhtXcjFNLiMoogHliKgFemAdbSYqVF5DRoKsEGhYgQsNQ3T16bVKg1yh8aG24uBr6KA/4zoyzvW5B3VGDbrpklsg2MTLagOqS8hC8pn9tyWgf2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729899324; c=relaxed/simple;
-	bh=LPWv1YL8LZhjJyCa94yNkGcaFDXgT802n8p2nUfUHM8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WPSofBZd7NRDvrlXYYrrjTtzCXz1b0pkvD3fmoYGm/qC52lck+0CRy+KELt6DpFYRJzIf7pMBGD3urVYYwT2IBwlOsxYRGC6MAaDyZx82Pm+FHrP3zvarZwrhvunPbkaRJHAPJkdbCMKxAzOWfosJ2+q2wXqWSdI3RUYnC/QJW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nigauri.org; spf=none smtp.mailfrom=nigauri.org; dkim=pass (2048-bit key) header.d=nigauri-org.20230601.gappssmtp.com header.i=@nigauri-org.20230601.gappssmtp.com header.b=N/nMTUxU; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nigauri.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nigauri.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9a0c7abaa6so294427566b.2
-        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 16:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nigauri-org.20230601.gappssmtp.com; s=20230601; t=1729899319; x=1730504119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VcMODTrY2Fh1Wj5kQwWRgkJkHDzaAAgzP2RqgEkLJ7g=;
-        b=N/nMTUxUA6sy/0tiZMgwlfzlH+Agd0iw6BeyYbf8ViNHX3ziBwTtKoIXoX0knuXQ0P
-         iQIaguV2+LoO4nVt9uP1luULCiqdDhN6aAAMOG5q6a/Zwxwj3FhcZjB3FjZeZaPEqFQs
-         z21EzFXnP3fhnGrSg5mLMgbo8IriUrHbRFBnhPUxIFu5Z/Jdr4EqWkImLNX+zhcdtlEc
-         VspYd+kpRAZqhbzPQYM4J6gZAGtXtG6AubcftUuysVw32bNvAe0Zyo+xZITCmbGkIVTp
-         27SuaebDigQP0EQTH/swbAsuek9k/639JCxMkWDtfRY2YKygVLIG9vTjlLVd1evDjAXK
-         JSlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729899319; x=1730504119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VcMODTrY2Fh1Wj5kQwWRgkJkHDzaAAgzP2RqgEkLJ7g=;
-        b=Og9+sg1BbxCl0GQFg2RBFGrI1SEOF/tHXR8Vsx1ljSNUW1RFn3KmqIuqJcSImscpL/
-         jP8FDu+W5ftGjrR7OCNhlFncAvRXrSXkJXCslfxclIjHI2Qn1s9hfJ5TwcOq2kfmIhJN
-         NoC8LqffF1/SHlJ+S/9NyaSbcEqt4ApGbCP7NSTpnJMj5RmJsGNWkSN7IKBHo3HfK1Or
-         0ZKzx0SCi/KWLAwXC9L9z9iqK4GAXc9Z3D7aPPI0J8F2F70SEhKUb6NwY+kFPj0Bcq1G
-         D6p4e7I3b7G+qm7B6Ldu3cgwXeQLSqEx//iB8Umhitly124hhq4av+jbXUHrylYSv5tG
-         T9eg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7v5EIBLVsaI7aDNDZt/lPt8r0ogG18bWoQ5MP/JdxKX2LXPebHz2tZBCfcXPMSnqeA6z/OVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYfDckPPOm2w/riqdFCUPvJkaV/wv34yTRLLN3EXBgg1s3Jg9+
-	SFJ/X8zOEmifi123w3/NtIeD3mc63zC8uBWt1IIpvnbR5Wu3lzfQa5P+Jlq9RDJ31cVHe+ioI0A
-	WrP56mRyDuNJM7O1uqBeFbnEHt49YhzPs5SM=
-X-Google-Smtp-Source: AGHT+IGY1VatODJqlKJR3+SWbDzOmxrvjRMJU3tojP5aYY8C8vwclEjq4PprGfjdy+elzgN8FWbSTRMZkth0ZGCHlhk=
-X-Received: by 2002:a17:907:7215:b0:a9a:1778:7024 with SMTP id
- a640c23a62f3a-a9de5cea694mr62084266b.20.1729899318699; Fri, 25 Oct 2024
- 16:35:18 -0700 (PDT)
+	s=arc-20240116; t=1729900732; c=relaxed/simple;
+	bh=TJA7CaWkwOT+Vx6n6pk7LQk4Ahrza9r536kiM47xLBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OybpqJqVuHLr/5sAH56hG+0N/tzRkDSZIUupNxjRxQ294yV/Oi1QSqigbndA6dY+5TR6UfrJdJ+d9EhxEEJ02SORceE0HFPngTsfDkjW5cfRDeJcJANnNM5nMn5AjyBSr2Xto466/GCaFGSH6Hchrr0J4fBT0AJCR4WCP6ARa/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CPP2fJCB; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1729900721; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=qIXA6xds0tAHTYAKOJGCDVvDv46NuYZSlAdVmvtJsSg=;
+	b=CPP2fJCBzoYG+kEzpdvJX/Ew4k8pNsMkyxYyJpOUz7DHFwaoBYJ51/h0Az7rv3EY/MQBymjhylL3RNkUY2r4JR3qx4fRxvKh7zURpqpVJQ7pqDGDxedy1663jtUBOYhTx63MAunEK7a99SrQmCTg2j3MmeQgXggZGXffULNsFs0=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WHtY9Br_1729900720 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sat, 26 Oct 2024 07:58:40 +0800
+Date: Sat, 26 Oct 2024 07:58:39 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Nils Hoppmann <niho@linux.ibm.com>,
+	Niklas Schnell <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Stefan Raspl <raspl@linux.ibm.com>
+Subject: Re: [PATCH net-next] net/smc: increase SMC_WR_BUF_CNT
+Message-ID: <20241025235839.GD36583@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20241025074619.59864-1-wenjia@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-10-tmyu0@nuvoton.com>
-In-Reply-To: <20241024085922.133071-10-tmyu0@nuvoton.com>
-From: Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
-Date: Sat, 26 Oct 2024 08:34:51 +0900
-Message-ID: <CABMQnVK5_gq2+ftMDdJuzdGY131==OEsxuF9hCqT=KmQw-fYoA@mail.gmail.com>
-Subject: Re: [PATCH v1 9/9] rtc: Add Nuvoton NCT6694 RTC support
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org, lars@metafoo.de, 
-	ukleinek@kernel.org, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025074619.59864-1-wenjia@linux.ibm.com>
 
-Hello,
-
-2024=E5=B9=B410=E6=9C=8824=E6=97=A5(=E6=9C=A8) 18:04 Ming Yu <a0282524688@g=
-mail.com>:
+On 2024-10-25 09:46:19, Wenjia Zhang wrote:
+>From: Halil Pasic <pasic@linux.ibm.com>
 >
-> This driver supports RTC functionality for NCT6694 MFD device
-> based on USB interface.
+>The current value of SMC_WR_BUF_CNT is 16 which leads to heavy
+>contention on the wr_tx_wait workqueue of the SMC-R linkgroup and its
+>spinlock when many connections are  competing for the buffer. Currently
+>up to 256 connections per linkgroup are supported.
 >
-> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
-> ---
->  MAINTAINERS               |   1 +
->  drivers/rtc/Kconfig       |  10 ++
->  drivers/rtc/Makefile      |   1 +
->  drivers/rtc/rtc-nct6694.c | 276 ++++++++++++++++++++++++++++++++++++++
->  4 files changed, 288 insertions(+)
->  create mode 100644 drivers/rtc/rtc-nct6694.c
+>To make things worse when finally a buffer becomes available and
+>smc_wr_tx_put_slot() signals the linkgroup's wr_tx_wait wq, because
+>WQ_FLAG_EXCLUSIVE is not used all the waiters get woken up, most of the
+>time a single one can proceed, and the rest is contending on the
+>spinlock of the wq to go to sleep again.
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4d5a5eded3b9..8de90bda8b5e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16445,6 +16445,7 @@ F:      drivers/i2c/busses/i2c-nct6694.c
->  F:     drivers/mfd/nct6694.c
->  F:     drivers/net/can/nct6694_canfd.c
->  F:     drivers/pwm/pwm-nct6694.c
-> +F:     drivers/rtc/rtc-nct6694.c
->  F:     drivers/watchdog/nct6694_wdt.c
->  F:     include/linux/mfd/nct6694.h
+>For some reason include/linux/wait.h does not offer a top level wrapper
+>macro for wait_event with interruptible, exclusive and timeout. I did
+>not spend too many cycles on thinking if that is even a combination that
+>makes sense (on the quick I don't see why not) and conversely I
+>refrained from making an attempt to accomplish the interruptible,
+>exclusive and timeout combo by using the abstraction-wise lower
+>level __wait_event interface.
 >
-> diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
-> index 66eb1122248b..240c496d95f7 100644
-> --- a/drivers/rtc/Kconfig
-> +++ b/drivers/rtc/Kconfig
-> @@ -406,6 +406,16 @@ config RTC_DRV_NCT3018Y
->            This driver can also be built as a module, if so, the module w=
-ill be
->            called "rtc-nct3018y".
->
-> +config RTC_DRV_NCT6694
-> +       tristate "Nuvoton NCT6694 RTC support"
-> +       depends on MFD_NCT6694
-> +       help
-> +       If you say yes to this option, support will be included for Nuvot=
-on
-> +       NCT6694, a USB device to RTC.
-> +
-> +       This driver can also be built as a module. If so, the module
-> +       will be called rtc-nct6694.
-> +
->  config RTC_DRV_RK808
->         tristate "Rockchip RK805/RK808/RK809/RK817/RK818 RTC"
->         depends on MFD_RK8XX
-> diff --git a/drivers/rtc/Makefile b/drivers/rtc/Makefile
-> index f62340ecc534..64443d26bb5b 100644
-> --- a/drivers/rtc/Makefile
-> +++ b/drivers/rtc/Makefile
-> @@ -116,6 +116,7 @@ obj-$(CONFIG_RTC_DRV_MXC)   +=3D rtc-mxc.o
->  obj-$(CONFIG_RTC_DRV_MXC_V2)   +=3D rtc-mxc_v2.o
->  obj-$(CONFIG_RTC_DRV_GAMECUBE) +=3D rtc-gamecube.o
->  obj-$(CONFIG_RTC_DRV_NCT3018Y) +=3D rtc-nct3018y.o
-> +obj-$(CONFIG_RTC_DRV_NCT6694)  +=3D rtc-nct6694.o
->  obj-$(CONFIG_RTC_DRV_NTXEC)    +=3D rtc-ntxec.o
->  obj-$(CONFIG_RTC_DRV_OMAP)     +=3D rtc-omap.o
->  obj-$(CONFIG_RTC_DRV_OPAL)     +=3D rtc-opal.o
-> diff --git a/drivers/rtc/rtc-nct6694.c b/drivers/rtc/rtc-nct6694.c
-> new file mode 100644
-> index 000000000000..622bb9fbe6f6
-> --- /dev/null
-> +++ b/drivers/rtc/rtc-nct6694.c
-> @@ -0,0 +1,276 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Nuvoton NCT6694 RTC driver based on USB interface.
-> + *
-> + * Copyright (C) 2024 Nuvoton Technology Corp.
-> + */
-> +
-> +#include <linux/slab.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/rtc.h>
-> +#include <linux/bcd.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/mfd/nct6694.h>
+>To alleviate the tx performance bottleneck and the CPU overhead due to
+>the spinlock contention, let us increase SMC_WR_BUF_CNT to 256.
 
-Please sort header files alphabetically.
+Hi,
 
-> +
-> +#define DRVNAME "nct6694-rtc"
-> +
-> +/* Host interface */
-> +#define REQUEST_RTC_MOD                0x08
-> +
-> +/* Message Channel */
-> +/* Command 00h */
-> +#define REQUEST_RTC_CMD0_LEN   0x07
-> +#define REQUEST_RTC_CMD0_OFFSET        0x0000  /* OFFSET =3D SEL|CMD */
-> +#define RTC_SEC_IDX            0x00
-> +#define RTC_MIN_IDX            0x01
-> +#define RTC_HOUR_IDX           0x02
-> +#define RTC_WEEK_IDX           0x03
-> +#define RTC_DAY_IDX            0x04
-> +#define RTC_MONTH_IDX          0x05
-> +#define RTC_YEAR_IDX           0x06
-> +/* Command 01h */
-> +#define REQUEST_RTC_CMD1_LEN   0x05
-> +#define REQUEST_RTC_CMD1_OFFSET        0x0001  /* OFFSET =3D SEL|CMD */
-> +#define RTC_ALRM_EN_IDX                0x03
-> +#define RTC_ALRM_PEND_IDX      0x04
-> +/* Command 02h */
-> +#define REQUEST_RTC_CMD2_LEN   0x02
-> +#define REQUEST_RTC_CMD2_OFFSET        0x0002  /* OFFSET =3D SEL|CMD */
-> +#define RTC_IRQ_EN_IDX         0x00
-> +#define RTC_IRQ_PEND_IDX       0x01
-> +
-> +#define RTC_IRQ_EN             (BIT(0) | BIT(5))
+Have you tested other values, such as 64? In our internal version, we
+have used 64 for some time.
 
-RTC_IRQ_INT_EN | RTC_IRQ_GPO_EN ?
+Increasing this to 256 will require a 36K continuous physical memory
+allocation in smc_wr_alloc_link_mem(). Based on my experience, this may
+fail on servers that have been running for a long time and have
+fragmented memory.
 
-> +#define RTC_IRQ_INT_EN         BIT(0)  /* Transmit a USB INT-in when RTC=
- alarm */
-> +#define RTC_IRQ_GPO_EN         BIT(5)  /* Trigger a GPO Low Pulse when R=
-TC alarm */
-> +#define RTC_IRQ_STS            BIT(0)  /* Write 1 clear IRQ status */
-> +
-> +struct nct6694_rtc_data {
-> +       struct nct6694 *nct6694;
-> +       struct rtc_device *rtc;
-> +       struct work_struct alarm_work;
-> +};
-> +
-> +static int nct6694_rtc_read_time(struct device *dev, struct rtc_time *tm=
-)
-> +{
-> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
-> +       unsigned char buf[REQUEST_RTC_CMD0_LEN];
-> +       int ret;
-> +
-> +       ret =3D nct6694_read_msg(data->nct6694, REQUEST_RTC_MOD,
-> +                              REQUEST_RTC_CMD0_OFFSET, REQUEST_RTC_CMD0_=
-LEN,
-> +                              0, REQUEST_RTC_CMD0_LEN, buf);
-> +       if (ret) {
-> +               pr_err("%s: Failed to get rtc device!\n", __func__);
-> +               return -EIO;
-> +       }
-> +
-> +       tm->tm_sec =3D bcd2bin(buf[RTC_SEC_IDX]);         /* tm_sec expec=
-t 0 ~ 59 */
-> +       tm->tm_min =3D bcd2bin(buf[RTC_MIN_IDX]);         /* tm_min expec=
-t 0 ~ 59 */
-> +       tm->tm_hour =3D bcd2bin(buf[RTC_HOUR_IDX]);       /* tm_hour expe=
-ct 0 ~ 23 */
-> +       tm->tm_wday =3D bcd2bin(buf[RTC_WEEK_IDX]) - 1;   /* tm_wday expe=
-ct 0 ~ 6 */
-> +       tm->tm_mday =3D bcd2bin(buf[RTC_DAY_IDX]);        /* tm_mday expe=
-ct 1 ~ 31 */
-> +       tm->tm_mon =3D bcd2bin(buf[RTC_MONTH_IDX]) - 1;   /* tm_month exp=
-ect 0 ~ 11 */
-> +       tm->tm_year =3D bcd2bin(buf[RTC_YEAR_IDX]) + 100; /* tm_year expe=
-ct since 1900 */
-> +
-> +       return ret;
-> +}
-> +
-> +static int nct6694_rtc_set_time(struct device *dev, struct rtc_time *tm)
-> +{
-> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
-> +       unsigned char buf[REQUEST_RTC_CMD0_LEN];
-> +       int ret;
-> +
-> +       buf[RTC_SEC_IDX] =3D bin2bcd(tm->tm_sec);
-> +       buf[RTC_MIN_IDX] =3D bin2bcd(tm->tm_min);
-> +       buf[RTC_HOUR_IDX] =3D bin2bcd(tm->tm_hour);
-> +       buf[RTC_WEEK_IDX] =3D bin2bcd(tm->tm_wday + 1);
-> +       buf[RTC_DAY_IDX] =3D bin2bcd(tm->tm_mday);
-> +       buf[RTC_MONTH_IDX] =3D bin2bcd(tm->tm_mon + 1);
-> +       buf[RTC_YEAR_IDX] =3D bin2bcd(tm->tm_year - 100);
-> +
-> +       ret =3D nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
-> +                               REQUEST_RTC_CMD0_OFFSET, REQUEST_RTC_CMD0=
-_LEN,
-> +                               buf);
-> +       if (ret) {
-> +               pr_err("%s: Failed to set rtc device!\n", __func__);
-> +               return -EIO;
+    link->wr_rx_bufs = kcalloc(SMC_WR_BUF_CNT * 3, SMC_WR_BUF_SIZE,
+                               GFP_KERNEL);
 
-Why do you return -EIO? Please do not overwrite error codes.
-
-> +       }
-> +
-> +       return ret;
-> +}
-> +
-> +static int nct6694_rtc_read_alarm(struct device *dev, struct rtc_wkalrm =
-*alrm)
-> +{
-> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
-> +       unsigned char buf[REQUEST_RTC_CMD1_LEN];
-> +       int ret;
-> +
-> +       ret =3D nct6694_read_msg(data->nct6694, REQUEST_RTC_MOD,
-> +                              REQUEST_RTC_CMD1_OFFSET, REQUEST_RTC_CMD1_=
-LEN,
-> +                              0, REQUEST_RTC_CMD1_LEN, buf);
-> +       if (ret) {
-> +               pr_err("%s: Failed to get rtc device!\n", __func__);
-> +               return -EIO;
-
-same as above.
-
-> +       }
-> +
-> +       alrm->time.tm_sec =3D bcd2bin(buf[RTC_SEC_IDX]);
-> +       alrm->time.tm_min =3D bcd2bin(buf[RTC_MIN_IDX]);
-> +       alrm->time.tm_hour =3D bcd2bin(buf[RTC_HOUR_IDX]);
-> +
-> +       alrm->enabled =3D buf[RTC_ALRM_EN_IDX];
-> +       alrm->pending =3D buf[RTC_ALRM_PEND_IDX];
-> +
-> +       return ret;
-> +}
-> +
-> +static int nct6694_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *=
-alrm)
-> +{
-> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
-> +       unsigned char buf[REQUEST_RTC_CMD1_LEN];
-> +       int ret;
-> +
-> +       buf[RTC_SEC_IDX] =3D bin2bcd(alrm->time.tm_sec);
-> +       buf[RTC_MIN_IDX] =3D bin2bcd(alrm->time.tm_min);
-> +       buf[RTC_HOUR_IDX] =3D bin2bcd(alrm->time.tm_hour);
-> +       buf[RTC_ALRM_EN_IDX] =3D alrm->enabled ? RTC_IRQ_EN : 0;
-> +       buf[RTC_ALRM_PEND_IDX] =3D 0;
-> +
-> +       ret =3D nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
-> +                               REQUEST_RTC_CMD1_OFFSET, REQUEST_RTC_CMD1=
-_LEN,
-> +                               buf);
-> +       if (ret) {
-> +               pr_err("%s: Failed to set rtc device!\n", __func__);
-> +               return -EIO;
-
-same as above.
-
-> +       }
-> +
-> +       return ret;
-> +}
-> +
-> +static int nct6694_rtc_alarm_irq_enable(struct device *dev, unsigned int=
- enabled)
-> +{
-> +       struct nct6694_rtc_data *data =3D dev_get_drvdata(dev);
-> +       unsigned char buf[REQUEST_RTC_CMD2_LEN] =3D {0};
-> +       int ret;
-> +
-> +       if (enabled)
-> +               buf[RTC_IRQ_EN_IDX] |=3D RTC_IRQ_EN;
-> +       else
-> +               buf[RTC_IRQ_EN_IDX] &=3D ~RTC_IRQ_EN;
-> +
-> +       ret =3D nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
-> +                               REQUEST_RTC_CMD2_OFFSET, REQUEST_RTC_CMD2=
-_LEN,
-> +                               buf);
-> +       if (ret) {
-> +               pr_err("%s: Failed to set rtc device!\n", __func__);
-> +               return -EIO;
-
-same as above.
-
-> +       }
-> +
-> +       return ret;
-> +}
-> +
-> +static const struct rtc_class_ops nct6694_rtc_ops =3D {
-> +       .read_time =3D nct6694_rtc_read_time,
-> +       .set_time =3D nct6694_rtc_set_time,
-> +       .read_alarm =3D nct6694_rtc_read_alarm,
-> +       .set_alarm =3D nct6694_rtc_set_alarm,
-> +       .alarm_irq_enable =3D nct6694_rtc_alarm_irq_enable,
-> +};
-> +
-> +static void nct6694_rtc_alarm(struct work_struct *work)
-> +{
-> +       struct nct6694_rtc_data *data;
-> +       unsigned char buf[REQUEST_RTC_CMD2_LEN] =3D {0};
-> +
-> +       data =3D container_of(work, struct nct6694_rtc_data, alarm_work);
-> +
-> +       pr_info("%s: Got RTC alarm!\n", __func__);
-> +       buf[RTC_IRQ_EN_IDX] =3D RTC_IRQ_EN;
-> +       buf[RTC_IRQ_PEND_IDX] =3D RTC_IRQ_STS;
-> +       nct6694_write_msg(data->nct6694, REQUEST_RTC_MOD,
-> +                         REQUEST_RTC_CMD2_OFFSET,
-> +                         REQUEST_RTC_CMD2_LEN, buf);
-> +}
-> +
-> +static void nct6694_rtc_handler(void *private_data)
-> +{
-> +       struct nct6694_rtc_data *data =3D private_data;
-> +       struct nct6694 *nct6694 =3D data->nct6694;
-> +
-> +       queue_work(nct6694->async_workqueue, &data->alarm_work);
-> +}
-> +
-> +static int nct6694_rtc_probe(struct platform_device *pdev)
-> +{
-> +       struct nct6694_rtc_data *data;
-> +       struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
-> +       int ret;
-> +
-> +       data =3D devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-> +       if (!data)
-> +               return -ENOMEM;
-> +
-> +       data->rtc =3D devm_rtc_allocate_device(&pdev->dev);
-> +       if (IS_ERR(data->rtc))
-> +               return PTR_ERR(data->rtc);
-
-Please use dev_err_probe.
-
-> +
-> +       data->nct6694 =3D nct6694;
-> +       data->rtc->ops =3D &nct6694_rtc_ops;
-> +       data->rtc->range_min =3D RTC_TIMESTAMP_BEGIN_2000;
-> +       data->rtc->range_max =3D RTC_TIMESTAMP_END_2099;
-> +
-> +       INIT_WORK(&data->alarm_work, nct6694_rtc_alarm);
-> +
-> +       ret =3D nct6694_register_handler(nct6694, RTC_IRQ_STATUS,
-> +                                      nct6694_rtc_handler, data);
-> +       if (ret) {
-> +               dev_err(&pdev->dev, "%s:  Failed to register handler: %pe=
-\n",
-> +                       __func__, ERR_PTR(ret));
-
-Please use dev_err_probe.
-
-> +               return ret;
-> +       }
-> +
-> +       device_set_wakeup_capable(&pdev->dev, 1);
-> +
-> +       platform_set_drvdata(pdev, data);
-> +
-> +       /* Register rtc device to RTC framework */
-> +       ret =3D devm_rtc_register_device(data->rtc);
-> +       if (ret) {
-> +               dev_err(&pdev->dev, "Failed to register rtc device!\n");
-> +               return ret;
-> +       }
-
-You can simplify return devm_rtc_register_device.
-
-> +
-> +       return 0;
-> +}
-> +
-> +static struct platform_driver nct6694_rtc_driver =3D {
-> +       .driver =3D {
-> +               .name   =3D DRVNAME,
-> +       },
-> +       .probe          =3D nct6694_rtc_probe,
-> +};
-> +
-> +static int __init nct6694_init(void)
-> +{
-> +       int err;
-> +
-> +       err =3D platform_driver_register(&nct6694_rtc_driver);
-> +       if (!err) {
-> +               if (err)
-
-This looks strange. You can simplify return platform_driver_register.
-
-> +                       platform_driver_unregister(&nct6694_rtc_driver);
-> +       }
-> +
-> +       return err;
-> +}
-> +subsys_initcall(nct6694_init);
-> +
-> +static void __exit nct6694_exit(void)
-> +{
-> +       platform_driver_unregister(&nct6694_rtc_driver);
-> +}
-> +module_exit(nct6694_exit);
-> +
-> +MODULE_DESCRIPTION("USB-RTC driver for NCT6694");
-> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-> +MODULE_LICENSE("GPL");
-> --
-> 2.34.1
->
->
+As we can see, the link->wr_rx_bufs will increase from 16*3*48 = 2,304
+to 256*3*48=36,864 (1 page to 9 pages).
 
 Best regards,
-  Nobuhiro
+Dust
 
---=20
-Nobuhiro Iwamatsu
-   iwamatsu at {nigauri.org / debian.org / kernel.org}
-   GPG ID: 32247FBB40AD1FA6
+>
+>Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>Reported-by: Nils Hoppmann <niho@linux.ibm.com>
+>Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+>Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+>---
+> net/smc/smc_wr.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/net/smc/smc_wr.h b/net/smc/smc_wr.h
+>index f3008dda222a..81e772e241f3 100644
+>--- a/net/smc/smc_wr.h
+>+++ b/net/smc/smc_wr.h
+>@@ -19,7 +19,7 @@
+> #include "smc.h"
+> #include "smc_core.h"
+> 
+>-#define SMC_WR_BUF_CNT 16	/* # of ctrl buffers per link */
+>+#define SMC_WR_BUF_CNT 256	/* # of ctrl buffers per link */
+> 
+> #define SMC_WR_TX_WAIT_FREE_SLOT_TIME	(10 * HZ)
+> 
+>-- 
+>2.43.0
+>
 
