@@ -1,127 +1,78 @@
-Return-Path: <netdev+bounces-139024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E789AFD91
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:04:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA309AFD8D
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:03:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CED2B21465
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:04:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 963C11C24C01
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D2E1D8E10;
-	Fri, 25 Oct 2024 09:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118E21D5CE8;
+	Fri, 25 Oct 2024 09:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uRo5tg5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29EB1D4354
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 09:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66C21D460E;
+	Fri, 25 Oct 2024 09:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729846990; cv=none; b=r/uZ4A00h2r7Buuishesgmjfkv2XQTXdho2kFr9A+mSi+8IRyS0Sxz6uwfRq80EWxsBHJPP2QE9Hjf7mG9I8UxjvogtHD4qiXYR2niKjSTpzCkq74eW+IyXaghrWHZOrTMHAIIS9Jwjn2m9G0ETyouSrX2l2r7l/JAUs88YjdLA=
+	t=1729846988; cv=none; b=IqsxDt8UbAnEeQ3hZbBqYSWRZOFgNExfEe67GJc/HVr3QP4iEqtzWKjs6jTSS0Tc4UBBT1IOLUo2RH9CGSbKmrWbR3qjsw7j4FNDvRrNVa/Lu5g5grPs9JpH8bXlpZALHid0F6DJLdwL6fNAFIsN4smzGYK5YVRxFkq1k8BUe2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729846990; c=relaxed/simple;
-	bh=MSNa8VidgGFndoM5D+stANMch+8+eFrp9sAOIyBpKWE=;
+	s=arc-20240116; t=1729846988; c=relaxed/simple;
+	bh=WKmMTBfANmCacReoFHTW1X38nivdbJdP+FhsmVt6+cs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sQSmaNXW3zejJxbIIxXGX13BahM4eQQHQA1ah07cJ0XM0pVmTn6oeyzT81tq7jk5kVMayEbnynI+NlwT/bieS3iyBRvLXQ9Wk5miOV6vQZBsVsOTKMpuuXon7J9kWyxfIhk2hI3nD7bu1B+MBzXtXQpR+AhB1YpLKMmyG4+Nj1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t4GDF-0002Vw-3H; Fri, 25 Oct 2024 11:02:29 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t4GDD-000KtQ-1v;
-	Fri, 25 Oct 2024 11:02:27 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 163F235E85E;
-	Fri, 25 Oct 2024 09:02:27 +0000 (UTC)
-Date: Fri, 25 Oct 2024 11:02:26 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20241025-dark-efficient-bird-6b09b9-mkl@pengutronix.de>
-References: <20241024085922.133071-1-tmyu0@nuvoton.com>
- <20241024085922.133071-2-tmyu0@nuvoton.com>
- <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
- <20241024-pumpkin-parrot-of-excellence-299c57-mkl@pengutronix.de>
- <CAOoeyxXX2fpHVJ8urLmy+pBjH1aRdYu6qrtwOmwUxTUyQq30DA@mail.gmail.com>
- <20241025-sexy-fanatic-snail-a1d2e7-mkl@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p/RqUWbKwd/jj0vrs9vh+DCKd+KNIzbiid8t5SvkY7FNpseswdndHGGFEIho4gjJtdE8kR77KbG1k0ZgZiqNn9pMtTz4MQOY2AfwcGVSS3G0MMpdSvjduUweOztVkn2ZuCltF1lcWXuCVxoZo/VNikumn4V1ATD+catyBZ3R0Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uRo5tg5j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2C9C4CEE4;
+	Fri, 25 Oct 2024 09:03:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729846987;
+	bh=WKmMTBfANmCacReoFHTW1X38nivdbJdP+FhsmVt6+cs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uRo5tg5jwjJ9hS2Rxaf2myofD4rZLjLuf7Az9NZHlnFuygjFBvOg4aU1v0v+xJWWP
+	 Xb+9u0TjbAKdGOkBBjMmRzlbDNXM/nISxcgUtOt/vXu78EbhUyetI9I+yb4x36qrHt
+	 4WXRZPmxhXwqq3okgaAYSckDQjwVvh+Od9Grawzzb5LDWyfGn37seg+cCM6L1gSy9G
+	 s3IEpEsw0s3ZYd+saXzlJ4RM9atdnOHBfMm517FGR9Q+//tHK1hu+hRHgXjW/xT/aT
+	 RhxvzXEi53psdKxdtxzef9XEC5lr/Uq5FuxYzFWlGoXL33n2R/rSaog7Im4QPQFDRX
+	 v1GZgV2ASepVg==
+Date: Fri, 25 Oct 2024 10:03:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mlx5: simplify EQ interrupt polling logic
+Message-ID: <20241025090303.GH1202098@kernel.org>
+References: <20241023205113.255866-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hvvsexv3tqputmip"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241025-sexy-fanatic-snail-a1d2e7-mkl@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241023205113.255866-1-csander@purestorage.com>
 
+On Wed, Oct 23, 2024 at 02:51:12PM -0600, Caleb Sander Mateos wrote:
+> Use a while loop in mlx5_eq_comp_int() and mlx5_eq_async_int() to
+> clarify the EQE polling logic. This consolidates the next_eqe_sw() calls
+> for the first and subequent iterations. It also avoids a goto. Turn the
+> num_eqes < MLX5_EQ_POLLING_BUDGET check into a break condition.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
---hvvsexv3tqputmip
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-MIME-Version: 1.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-On 25.10.2024 10:35:35, Marc Kleine-Budde wrote:
-> > Excuse me, I'm a bit confused. Is there anything I need to
-> > improve on?
->=20
-> It looks racy to _first_ add the devices and _then_ the workqueue.
->=20
-> So the obvious solution is to allocate the worklist first and then add
-                                             workqueue
-> the devices.
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---hvvsexv3tqputmip
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcbXqAACgkQKDiiPnot
-vG/v8gf/ZnYZ8UX7isWhAOloRjzqHr1tCeRD0dNOcVRIA2O5jDm1vOg1oHVf4tCm
-Y+crw/DQeALVVHoLDLru8STjvEbqTt2x/b88OletCJHckvwLapQaQsRUhX1RHJtp
-W3PaKTZPAFpjFdATjCEhrPPX73bJzok9lExwap2uF0R7dzv/XCz5tnVsVqKCp4lu
-MhhEesF7ssLrmU5lvCmRj3iw8yssq1sGuPjYRyfL81VameNbcXdzpl//GGx3XBOC
-pCYZ1iaK/KuzfSaDtR18JzOiG8o68WkIRDAJUDWRt+OoSg04EcPkma4MONH+uHqt
-Ddg9vZTO2m/TN/IbNekjrp0BdO6nqw==
-=BAyk
------END PGP SIGNATURE-----
-
---hvvsexv3tqputmip--
 
