@@ -1,158 +1,110 @@
-Return-Path: <netdev+bounces-138960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43179AF88B
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:56:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20C6D9AF887
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:55:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE3DE1C21A56
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:56:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B673B2192A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2546918C034;
-	Fri, 25 Oct 2024 03:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mdVmIkoh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B30E18BC2C;
+	Fri, 25 Oct 2024 03:55:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EAF23B0;
-	Fri, 25 Oct 2024 03:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BB618A6D8
+	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 03:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729828568; cv=none; b=AgbpVegUQ4ZstdldQ7HtkcwAK5L9bRXSG5tD0iXfihX5Pz0BWtlS2SQDQrbRIAuRdpMVSXm3bR9UVZTXngH7txgH3JTyEhCjc8G5Lw6R1G+icxOedv5q10iJzHvzQr2MOWoXaTrzAfIrOvd94HO6p7CNdRZMNOSAh0FBQRZX7Xs=
+	t=1729828520; cv=none; b=oDBqw+173ltDvNQj3Q2ZoVvJLcR4tp9u+LVWFGW+nnUCup+qKCMDtnj6TYGndylcCA6116fki7Cces0b+lWKY7BNqJldWIWwLvgGGirUCs/mJTmn46Zt+U2L1O1Lrn/OeEMFMdkVHNxFxQG+g1WYHH3/Hd9yj9goIrpdlTBn3Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729828568; c=relaxed/simple;
-	bh=m7ZlUoB3WzOSQ0A1z/Y4hDN8MNufzEV1KFTivOtiPqQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g5wTeLrvKGIdA2CUYpQYThqhWDgXRK3dY7/Q77CQ5EGp/QrkrOvNai73kV2bJ0DBUBQ1KpIrUQss+Yj6+HDGyr0mkUQReCHoHsNPgav0LcLbXgWG2cPhfxJC89d3e2sdzGE3ll8YDvX7SJ/VuMVhLQiliGDGtIUqqj1kme0YZsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mdVmIkoh; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49P1Z3M9026346;
-	Fri, 25 Oct 2024 03:55:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=/6qecbCnIScJm5hggRYAgf
-	otRPEIP7HT2guiX2Y+zUs=; b=mdVmIkohA8ypyY6CUXR7JSm9T7kACPyuKH+XsL
-	MCtcRRhIjXuBOpjf4mt0NtOr7H70LeOPXMFi3aQRjZNrjaRd+bko7WA/+sT33SGM
-	X0RGkhpap7Pijq7d/R4yqFYOWDF4BBQu5pf1pb9zNx8ycF+DozYsfXAvbTKqzgtS
-	J6aGglJKGK9di/pY8xD6xGyfqbqN+Wb/NBvotVY4NnlyD2wXeofFuMJ/kMITtAH0
-	FrEk+j8ohTX76PcOe1m4P/H+khHUJDsu2l7gLmnYzNJHSGOtJWQ+dwEyaD9mlOOa
-	VsOlt3B2TIdzkpJXKz3GLoqRRcTD63EeoQ8bOeb1wH2XguHg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42em3wqmd7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Oct 2024 03:55:44 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49P3tgbU000348
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 25 Oct 2024 03:55:42 GMT
-Received: from hu-mmanikan-blr.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+	s=arc-20240116; t=1729828520; c=relaxed/simple;
+	bh=2/gB0WF/dPjAmSqvdkhrXBddibqioOwExG/N94Xu0bU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=p5cRw5FFipibtwIU/fj/TvafoZXgN2xj2Dj5v1A77i/Yu1A1OdrAM1nhuIrkbVKfukqgbAx7grbzdrGyeAyw8sZ7ktEr2lwhUxci9+KFtnf56plj6HswHGKz5WsICRqh4O2rmpsO20NOCl49lQ7Q1tDfHxokJTR/G21crIrzo1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XZTT60kdfz1ynGM;
+	Fri, 25 Oct 2024 11:55:22 +0800 (CST)
+Received: from dggpemf100006.china.huawei.com (unknown [7.185.36.228])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7B1B51400DC;
+	Fri, 25 Oct 2024 11:55:14 +0800 (CST)
+Received: from [10.174.178.55] (10.174.178.55) by
+ dggpemf100006.china.huawei.com (7.185.36.228) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 24 Oct 2024 20:55:35 -0700
-From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-To: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
-        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
-        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
-        <geert+renesas@glider.be>, <dmitry.baryshkov@linaro.org>,
-        <angelogioacchino.delregno@collabora.com>, <neil.armstrong@linaro.org>,
-        <arnd@arndb.de>, <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
-        <quic_mmanikan@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <netdev@vger.kernel.org>
-CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
-Subject: [PATCH v8 0/7] Add NSS clock controller support for IPQ9574
-Date: Fri, 25 Oct 2024 09:25:13 +0530
-Message-ID: <20241025035520.1841792-1-quic_mmanikan@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+ 15.2.1544.11; Fri, 25 Oct 2024 11:55:13 +0800
+Subject: Re: [PATCH 1/2] bna: Fix return value check for debugfs create APIs
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Simon Horman <horms@kernel.org>, Rasesh Mody <rmody@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>, <GR-Linux-NIC-Dev@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>
+References: <20241023080921.326-1-thunder.leizhen@huawei.com>
+ <20241023080921.326-2-thunder.leizhen@huawei.com>
+ <20241024121325.GJ1202098@kernel.org>
+ <19322579-a24b-679a-051b-c202eb3750f7@huawei.com>
+ <d7d04629-941b-4efb-84ee-92fbd0f42f9c@lunn.ch>
+From: "Leizhen (ThunderTown)" <thunder.leizhen@huawei.com>
+Message-ID: <0ac107c9-ff97-46bf-fce0-712e5bb9d24f@huawei.com>
+Date: Fri, 25 Oct 2024 11:55:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 0Ok25_2AZmw5vwc5OiluW9AMDddlNee9
-X-Proofpoint-ORIG-GUID: 0Ok25_2AZmw5vwc5OiluW9AMDddlNee9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- mlxlogscore=877 lowpriorityscore=0 malwarescore=0 suspectscore=0
- spamscore=0 mlxscore=0 impostorscore=0 clxscore=1011 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410250026
+In-Reply-To: <d7d04629-941b-4efb-84ee-92fbd0f42f9c@lunn.ch>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf100006.china.huawei.com (7.185.36.228)
 
-Add bindings, driver and devicetree node for networking sub system clock
-controller on IPQ9574. Also add support for gpll0_out_aux clock
-which serves as the parent for some nss clocks.
 
-Depends upon [1]
 
-[1] https://lore.kernel.org/linux-arm-msm/20241015-qcom_ipq_cmnpll-v4-0-27817fbe3505@quicinc.com/
+On 2024/10/24 22:04, Andrew Lunn wrote:
+>> Do you want to ignore all the return values of debugfs_create_dir() and debugfs_create_file()?
+> 
+> All return values from all debugfs_foo() calls.
 
-Changes in V8:
-	- Include NSS Huayra alpha pll patch to resolve the error's reported here
-	https://lore.kernel.org/oe-kbuild-all/202410101431.tjpSRNTY-lkp@intel.com/
-	- Detailed change logs are added to the respective patches
+I searched. Currently, bna only involves functions debugfs_create_dir() and
+debugfs_create_file(). debugfs_remove() has no return value.
 
-V7 can be found at:
-https://lore.kernel.org/linux-arm-msm/20241009074125.794997-1-quic_mmanikan@quicinc.com/	
 
-V6 can be found at:
-https://lore.kernel.org/linux-arm-msm/20241004080332.853503-1-quic_mmanikan@quicinc.com/
+git grep -n "\bdebugfs_" drivers/net/ethernet/brocade/bna/
+drivers/net/ethernet/brocade/bna/bnad_debugfs.c:501:            bna_debugfs_root = debugfs_create_dir("bna", NULL);
+drivers/net/ethernet/brocade/bna/bnad_debugfs.c:514:                    debugfs_create_dir(name, bna_debugfs_root);
+drivers/net/ethernet/brocade/bna/bnad_debugfs.c:521:                                    debugfs_create_file(file->name,
+drivers/net/ethernet/brocade/bna/bnad_debugfs.c:544:                    debugfs_remove(bnad->bnad_dentry_files[i]);
+drivers/net/ethernet/brocade/bna/bnad_debugfs.c:551:            debugfs_remove(bnad->port_debugfs_root);
+drivers/net/ethernet/brocade/bna/bnad_debugfs.c:558:            debugfs_remove(bna_debugfs_root);
 
-V5 can be found at:
-https://lore.kernel.org/linux-arm-msm/20240626143302.810632-1-quic_devipriy@quicinc.com/
 
-V4 can be found at:
-https://lore.kernel.org/linux-arm-msm/20240625070536.3043630-1-quic_devipriy@quicinc.com/
+> 
+> debugfs has been designed so that it should be robust if any previous
+> call to debugfs failed. It will not crash, it will just keep going.
+> 
+> It does not matter if the contents of debugfs are messed up as a
+> result, it is not an ABI, you cannot trust it to contain anything
+> useful, and it might be missing all together, since it is optional.
 
-V3 can be found at:
-https://lore.kernel.org/linux-arm-msm/20240129051104.1855487-1-quic_devipriy@quicinc.com/
+Okay, thank you for your detailed explanation.
 
-V2 can be found at:
-https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
-
-Devi Priya (7):
-  clk: qcom: clk-alpha-pll: Add NSS HUAYRA ALPHA PLL support for ipq9574
-  dt-bindings: clock: gcc-ipq9574: Add definition for GPLL0_OUT_AUX
-  clk: qcom: gcc-ipq9574: Add support for gpll0_out_aux clock
-  dt-bindings: clock: Add ipq9574 NSSCC clock and reset definitions
-  clk: qcom: Add NSS clock Controller driver for IPQ9574
-  arm64: dts: qcom: ipq9574: Add nsscc node
-  arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
-
- .../bindings/clock/qcom,ipq9574-nsscc.yaml    |   73 +
- arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   22 +
- arch/arm64/configs/defconfig                  |    1 +
- drivers/clk/qcom/Kconfig                      |    7 +
- drivers/clk/qcom/Makefile                     |    1 +
- drivers/clk/qcom/clk-alpha-pll.c              |   11 +
- drivers/clk/qcom/clk-alpha-pll.h              |    1 +
- drivers/clk/qcom/gcc-ipq9574.c                |   15 +
- drivers/clk/qcom/nsscc-ipq9574.c              | 3080 +++++++++++++++++
- include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
- .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
- .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
- 12 files changed, 3498 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
- create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
- create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
- create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+> 
+> 	Andrew
+> .
+> 
 
 -- 
-2.34.1
-
+Regards,
+  Zhen Lei
 
