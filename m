@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-139060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBB09AFE4D
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44ED49AFE4E
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D97D1C22546
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:36:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 756B51C22400
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51761D88D4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16F91D8DFE;
 	Fri, 25 Oct 2024 09:36:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46611D4149;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDE31D4144;
 	Fri, 25 Oct 2024 09:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729848987; cv=none; b=pD3qRLNC1lLKo1yB12VaG5AactngjkSdDhALf8bHMljv7zyG+fkCQeL5smNf4X+E7IdGruBQlwyfMaWPgrtANgvTPvQdC19R/d8ph2aB5FR4fpuJHM5cIrm5kdF/+aHyChNpiBh++H3R/2e2HFzzzvuk0mniD7JIeUu7mYyoXto=
+	t=1729848987; cv=none; b=D5eEENYHkWkzk0bRH0bxE3oFtCScHeQMdxQY55wm7pBKEh+IhnWJEp+jAQSVdBcnCatwEicmfWxuO0UOoJIoG2JfL8tyw9MMNa0sC7eLnH+MWQZUO5ymVJCyFfe590UEM3c+Q1CBWhUWMmnPMEZu6k9bY/h1xmOAuCwESEYs2Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729848987; c=relaxed/simple;
-	bh=rDii2SmUfHZSedVWxQAoqFqlT2Nfi1duerE1AAZ9FM8=;
+	bh=OduBsRI+5brxvfecv14Oqo66NEhumOkOaeJWxOctJmc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kwguua/E7KE0PcYVvoxH2lwqC2labcq464hPjlad10VaUZb5Vjw/vnczp8PyQYAJUhrrcAHLNkCn7LQFVw3w8svDrLoqfqKuMl0xS9rQs1QR4mzy74j7VV2fX2j37PiGIgZ4ih8aiKw98CrCO70dliDXoesFx874X0AVzgyy+pI=
+	 MIME-Version:Content-Type; b=UWHK34fzSRtbKqlKw+uWwCWjQftbP6VXv7zUVBVwiPFcR1Fiq8AQFdMe3JzWyR/xbxg9JC8BKI6PVR/B+SYnbwDKpJOxeHrGjjZZl5AbmI4sQ3/lIOKYFj1OFba5LbMuct3aYjijf83/N/p+fqRG8sCuNISJR8vp2gB0vTKxwbQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XZd0B3xZsz1T8yD;
-	Fri, 25 Oct 2024 17:34:18 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XZd0C0fx4z1T7xV;
+	Fri, 25 Oct 2024 17:34:19 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id BDAE4140257;
-	Fri, 25 Oct 2024 17:36:22 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4CA1218006C;
+	Fri, 25 Oct 2024 17:36:23 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -46,9 +46,9 @@ CC: <shenjian15@huawei.com>, <salil.mehta@huawei.com>,
 	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <shaojijie@huawei.com>,
 	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V3 net 4/9] net: hns3: fix missing features due to dev->features configuration too early
-Date: Fri, 25 Oct 2024 17:29:33 +0800
-Message-ID: <20241025092938.2912958-5-shaojijie@huawei.com>
+Subject: [PATCH V3 net 5/9] net: hns3: Resolved the issue that the debugfs query result is inconsistent.
+Date: Fri, 25 Oct 2024 17:29:34 +0800
+Message-ID: <20241025092938.2912958-6-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241025092938.2912958-1-shaojijie@huawei.com>
 References: <20241025092938.2912958-1-shaojijie@huawei.com>
@@ -65,30 +65,38 @@ X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
 
 From: Hao Lan <lanhao@huawei.com>
 
-Currently, the netdev->features is configured in hns3_nic_set_features.
-As a result, __netdev_update_features considers that there is no feature
-difference, and the procedures of the real features are missing.
+This patch modifies the implementation of debugfs:
+When the user process stops unexpectedly, not all data of the file system
+is read. In this case, the save_buf pointer is not released. When the user
+process is called next time, save_buf is used to copy the cached data
+to the user space. As a result, the queried data is inconsistent. To solve
+this problem, determine whether the function is invoked for the first time
+based on the value of *ppos. If *ppos is 0, obtain the actual data.
 
-Fixes: 2a7556bb2b73 ("net: hns3: implement ndo_features_check ops for hns3 driver")
+Fixes: 5e69ea7ee2a6 ("net: hns3: refactor the debugfs process")
 Signed-off-by: Hao Lan <lanhao@huawei.com>
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Guangwei Zhang <zhangwangwei6@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 8760b4e9ade6..b09f0cca34dc 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -2483,7 +2483,6 @@ static int hns3_nic_set_features(struct net_device *netdev,
- 			return ret;
- 	}
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 807eb3bbb11c..841e5af7b2be 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -1293,8 +1293,10 @@ static ssize_t hns3_dbg_read(struct file *filp, char __user *buffer,
  
--	netdev->features = features;
- 	return 0;
- }
+ 		/* save the buffer addr until the last read operation */
+ 		*save_buf = read_buf;
++	}
  
+-		/* get data ready for the first time to read */
++	/* get data ready for the first time to read */
++	if (!*ppos) {
+ 		ret = hns3_dbg_read_cmd(dbg_data, hns3_dbg_cmd[index].cmd,
+ 					read_buf, hns3_dbg_cmd[index].buf_len);
+ 		if (ret)
 -- 
 2.33.0
 
