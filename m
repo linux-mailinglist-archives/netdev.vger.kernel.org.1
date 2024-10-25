@@ -1,65 +1,61 @@
-Return-Path: <netdev+bounces-139052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB109AFE0E
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:22:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8F49AFE16
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 11:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C84BB255C8
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:22:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB69B1F241FC
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70D61D9669;
-	Fri, 25 Oct 2024 09:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEFC1D5AA2;
+	Fri, 25 Oct 2024 09:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9fQybTm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpBXfALn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3532076B3;
-	Fri, 25 Oct 2024 09:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147D1189F32;
+	Fri, 25 Oct 2024 09:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729847752; cv=none; b=DR3ptLL9WBI8c9hmDjy2jr+mtmQV6HdZh5FwoBhDkhjo+4cLtSsoSm+yzB/Yz7bwfrIMC2Mwo/SMGZOB+b05zkR+wAa5ilRaZqM7CAYYF17SgFc0JSOUY9DfpgLxznC+/qUEuiwI/k3ikg+12Hrg6AUatUxri3CWUlwmJEGdKCk=
+	t=1729848090; cv=none; b=iNxJUM0AezVeOqMJCYmB1PIuIET5vkVhGRe8oml0lOyVFQ/NoZ7BZqV7Ny6hxymLRB54tx67TYMprHqtPRe1Zb7k1Ilp2zv8YcXSSeGB7fXhfSRIazBp1HatfNMWpiOSXRR8n02IwiaadTVMVONEDkuHOFhbbfU5QToinfgOAMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729847752; c=relaxed/simple;
-	bh=cxmhOhqQP0gKwEV9A9rSoyyT63ke9PLb36fVG9fnGUA=;
+	s=arc-20240116; t=1729848090; c=relaxed/simple;
+	bh=Kjy+AdUAhMvp/ILbNHUhzlJpnYJeglFdr6e7jo9fkOs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9wi0btz7OhRVqqvD3jAJYijOmXkfBuHjggzcmTsyxG6z9zpMItyURKeKbQLxBhjQGN2M0ELf8DigcS7IYiObzy4rbiavOC6mLSGla1I6nXpgHnb0v3rTd8nbtGPOg7P1jdrR3Y1Y5P6MTCB3MHQGPoajpd88vqLCV1yAF4NM9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9fQybTm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CFE9C4CEC3;
-	Fri, 25 Oct 2024 09:15:48 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ykwr2N0uHWH15akSDFoqclXbghsuAJSkrOY6l1qHF6TpTdFhBr3OSHapS2LW5J0AjYe3nPDY5aw2D43cACbTO7mcFz+YaKsOwvu0tkV/B8NfdIqMwJcEtdW0QeLcoUMeWjykzieGqo0nf54klUs4/SadVnma5WJj0Y7l+3YEtio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpBXfALn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37012C4CEC3;
+	Fri, 25 Oct 2024 09:21:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729847752;
-	bh=cxmhOhqQP0gKwEV9A9rSoyyT63ke9PLb36fVG9fnGUA=;
+	s=k20201202; t=1729848089;
+	bh=Kjy+AdUAhMvp/ILbNHUhzlJpnYJeglFdr6e7jo9fkOs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M9fQybTmeIlMkIkczNrQcjTrnymkrSW67F7YlGxVCt8epF/gVAMc9mU7PQ0+mRsrk
-	 6FEVhrwcmKpRaWLmcawygWkSViStEBldCFlLjRLCEzAGboqMm9Z3qEDImDgYpap46q
-	 lGta/GBsTQN/CANBJLpKLG8VPEl6wy72R/YcI67i5dtAaCw8Ki78vjicbfJb4JLiJZ
-	 kchWU+HsaM5J7y+KukIRiLfrqenoamhhlZcnJ/Zu+s5FTjB7/E+Po1R+cXfQriKUul
-	 QTdmsdeTxjG80FRaFS5k3Ek3b2QLGQqKvybykOkNFJu56bKTMTyZzCl2BJluw40T0g
-	 YKQhucTcEcnMA==
-Date: Fri, 25 Oct 2024 10:15:47 +0100
+	b=qpBXfALnkkcbFsXFAXrUtEQD/1ekPtzMCha5yXvJhU5dFaJs+Y3F9lJ6X28hLKhkt
+	 IOWql/yRJSZxSSMG3GEc90SxPu573cdunElyvvR1XAlnqbSl7Y12CJs9ltnrSxbeLm
+	 dOZXwQKcBO6s6iCw/8y/qOxeTT6fnkE+SsbI8euY0QRDy8/EnkFYEapp6+DHJQZtpS
+	 Kc81JApB3zu6OixSMJ4TJGq2a58nNczySUoKDn4HPXsBSPvOt5EMgaIk/z9dQsn6qL
+	 Wp9D3Xg7XHjOfB4xN2u0DGaCL+y8Hi0XKOc0MuugfbVBDHD2/aNa4cMX83QKRmTHq5
+	 k+mNj6gkjE3Eg==
+Date: Fri, 25 Oct 2024 10:21:25 +0100
 From: Simon Horman <horms@kernel.org>
 To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+Cc: netdev@vger.kernel.org, Manish Chopra <manishc@marvell.com>,
+	Rahul Verma <rahulv@marvell.com>,
+	"supporter:NETXEN (1/10) GbE SUPPORT" <GR-Linux-NIC-Dev@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>,
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	George McCollister <george.mccollister@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCHv3 net-next] net: dsa: use ethtool string helpers
-Message-ID: <20241025091547.GJ1202098@kernel.org>
-References: <20241024195238.176131-1-rosenp@gmail.com>
+	Shahed Shaikh <shshaikh@marvell.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: qlogic: use ethtool string helpers
+Message-ID: <20241025092125.GK1202098@kernel.org>
+References: <20241024195534.176410-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,42 +64,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241024195238.176131-1-rosenp@gmail.com>
+In-Reply-To: <20241024195534.176410-1-rosenp@gmail.com>
 
-On Thu, Oct 24, 2024 at 12:52:38PM -0700, Rosen Penev wrote:
-> These are the preferred way to copy ethtool strings.
+On Thu, Oct 24, 2024 at 12:55:34PM -0700, Rosen Penev wrote:
+> The latter is the preferred way to copy ethtool strings.
 > 
-> Avoids incrementing pointers all over the place.
+> Avoids manually incrementing the pointer. Cleans up the code quite well.
 > 
 > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
 > ---
->  v3: remove curly braces from ksz_common.c
->  v2: remove curly braces from rzn1_a5psw.c
+>  .../qlogic/netxen/netxen_nic_ethtool.c        | 14 ++---
+>  .../net/ethernet/qlogic/qede/qede_ethtool.c   | 34 +++++------
+>  .../ethernet/qlogic/qlcnic/qlcnic_ethtool.c   | 60 +++++++++----------
 
-...
+I do suspect some of these drivers are quite old, and
+we would be better off restricting changes to bug fixes
+and updates for API changes, rather than cleaning them up.
 
-> diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-> index 9201f07839ad..2bb1832d21bc 100644
-> --- a/drivers/net/dsa/bcm_sf2.c
-> +++ b/drivers/net/dsa/bcm_sf2.c
-> @@ -1180,11 +1180,8 @@ static const struct b53_io_ops bcm_sf2_io_ops = {
->  static void bcm_sf2_sw_get_strings(struct dsa_switch *ds, int port,
->  				   u32 stringset, uint8_t *data)
->  {
-> -	int cnt = b53_get_sset_count(ds, port, stringset);
-> -
->  	b53_get_strings(ds, port, stringset, data);
+That said, these changes do seem correct to me.
 
-Do you need to update b53_get_strings() so that you pass &data
-rather than data? Otherwise, doesn't the call to bcm_sf2_cfp_get_strings()
-overwrite what has been written by bcm_sf2_cfp_get_strings() ?
-
-> -	bcm_sf2_cfp_get_strings(ds, port, stringset,
-> -				data + cnt * ETH_GSTRING_LEN);
-> +	bcm_sf2_cfp_get_strings(ds, port, stringset, data);
->  }
->  
-
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
