@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-139107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEAFB9B03E1
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:22:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 083D89B03DF
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 15:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74B771F22704
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:22:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1900281C21
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 13:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A2F21219E;
-	Fri, 25 Oct 2024 13:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E35721216E;
+	Fri, 25 Oct 2024 13:22:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5YTw7mIN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Plagur32"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6DA70804;
-	Fri, 25 Oct 2024 13:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D8C70805;
+	Fri, 25 Oct 2024 13:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729862531; cv=none; b=dP4qrdFOycGE7fID3DuchIgdogHdKnPd/BGnSgh6ooXQuVmPq0JkbzQpNWnU+WLuWtQ/tBwqHJ944iO+qwtW7n8miOTVdkGYpOZx5naDQiaEJY1VFnvvQh+IGf6JElEak96Ad2I7bbsdv7lAG1SlBFQO6+ZtvNoU3tJnd1ukA4E=
+	t=1729862530; cv=none; b=NDNuzqbgRRULG89keWOrQYd1fVP7UQKoxHDkJEOYv5qVowqtzfXtLiCAfDBx/BbMMM+n/VJc9JpHaJqRyc69Vr8Q/8ctLIsMFQqnIpiEK0MbiNI0fNk5T/SSl2epfUz4mUFzjRHUmfvUJaQ2o/FhCwH/Z6SzzFXdqAJ2mtpPMAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729862531; c=relaxed/simple;
-	bh=97xec6Itfp79eJ9V8LHzJNYUNNNLIaje9kzkQHPz3P8=;
+	s=arc-20240116; t=1729862530; c=relaxed/simple;
+	bh=QPqqSjrdF74cbCCgzunNlradUj1JeN6blhSF2wB3w18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IdXAovAw/YYaDRPu5A2T1/i7t/oX245xEIeJCRiO25OwlFoxETFo5IOSGnEZZNtTCtplZle04fx5NwCo1Myzykh5Pk+dadetTa+JPFXg4eaPLI2EUb076buuydIVdBIMpbXOsvuhd5AWHI2kP7N2dQ6lczS2h4sSUpGs7sivLag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5YTw7mIN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dbDacs+phZXwUZfEmiSz/UQ0arF9t20M+M+9HrSqDHs=; b=5YTw7mINuAK2FjNLppS5ZX1TEu
-	wA7kxuyX0b4aVDS0I5chb9XbMsSEgxdPDM9QWZBhTMG0EI4NF16Qn73OzYILoGRDGwLo+Mgz8fxjH
-	XyEomNde5QB1IVSoQRG9X7xuYpm29P2go4s9mqYVtDGCv+aWJPzlUtTsdV61mOIfzyHE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t4KGO-00BFR4-A5; Fri, 25 Oct 2024 15:22:00 +0200
-Date: Fri, 25 Oct 2024 15:22:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: vigneshr@ti.com, horms@kernel.org, jan.kiszka@siemens.com,
-	diogo.ivo@siemens.com, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, vadim.fedorenko@linux.dev,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	srk@ti.com, Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix 1 PPS sync
-Message-ID: <2288a9a9-f9d0-4414-80a2-e11ba66fad50@lunn.ch>
-References: <20241024113140.973928-1-m-malladi@ti.com>
- <1a0a632e-0b3c-4192-8d00-51d23c15c97e@lunn.ch>
- <060c298c-5961-467a-80dd-947c85207eea@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GB9hfFOrsVNxGEOpQDGq0lFM/+eMzlMgfJmiXtSJEejkRzh7n2WPwU93eh5mVb06dq9h3tVYYPH+el0DhgSGWIwPpRNAXG7t3rEmtamkIjpcPe3M3tMr/esMOUn1lQ8NRlYWcUlz0+57ZMEyxF5ENJsi7JZ2+5iIQeHTqDLXA8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Plagur32; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B37C4CEC3;
+	Fri, 25 Oct 2024 13:22:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729862530;
+	bh=QPqqSjrdF74cbCCgzunNlradUj1JeN6blhSF2wB3w18=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Plagur326hve2OtUBnqZI0FuD6Rf24ndozohanzuGWG27qh5ChrknZI18FVYwsPrT
+	 xqNIzkKD5VqPsgBp1GkbqnowL4tEj148HXRY6zraG5fyrwY4JDqtlSzQsr+R4i4jE2
+	 97SHI98JvbjFjlM/KEbwCULPQ0EXafHT55//T+ddGeGVzjuG49iGUCTbratXzVLnpX
+	 g3m4UTQp1o51OAyDL94Tn73kmW0hA/0Y5o8PLArmAIPU3zAEM6pX5JSQr2/RuyzhH+
+	 4Y2vuFmQTpor2PM0icKBLyrhyeW42/JJhnOCJIDirUHLlZOBFyJVzfxCJkF0+NjaPb
+	 pdS5Y/MbDJZxA==
+Date: Fri, 25 Oct 2024 14:22:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+	Si-Wei Liu <si-wei.liu@oracle.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/5] virtio-net: fix overflow inside virtnet_rq_alloc
+Message-ID: <20241025132205.GV1202098@kernel.org>
+References: <20241014031234.7659-1-xuanzhuo@linux.alibaba.com>
+ <20241014031234.7659-2-xuanzhuo@linux.alibaba.com>
+ <6aaee824-a5df-42a4-b35e-e89756471084@redhat.com>
+ <1729823753.4548287-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,34 +65,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <060c298c-5961-467a-80dd-947c85207eea@ti.com>
+In-Reply-To: <1729823753.4548287-2-xuanzhuo@linux.alibaba.com>
 
-On Fri, Oct 25, 2024 at 11:17:44AM +0530, Meghana Malladi wrote:
+On Fri, Oct 25, 2024 at 10:35:53AM +0800, Xuan Zhuo wrote:
+> On Thu, 17 Oct 2024 15:42:59 +0200, Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> >
+> > On 10/14/24 05:12, Xuan Zhuo wrote:
+> > > When the frag just got a page, then may lead to regression on VM.
+> > > Specially if the sysctl net.core.high_order_alloc_disable value is 1,
+> > > then the frag always get a page when do refill.
+> > >
+> > > Which could see reliable crashes or scp failure (scp a file 100M in size
+> > > to VM):
+> > >
+> > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> > > of a new frag. When the frag size is larger than PAGE_SIZE,
+> > > everything is fine. However, if the frag is only one page and the
+> > > total size of the buffer and virtnet_rq_dma is larger than one page, an
+> > > overflow may occur.
+> > >
+> > > Here, when the frag size is not enough, we reduce the buffer len to fix
+> > > this problem.
+> > >
+> > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> >
+> > This looks like a fix that should target the net tree, but the following
+> > patches looks like net-next material. Any special reason to bundle them
+> > together?
 > 
+> Sorry, I forgot to add net-next as a target tree.
 > 
-> On 25/10/24 01:25, Andrew Lunn wrote:
-> > > +static inline u64 icssg_readq(const void __iomem *addr)
-> > > +{
-> > > +	return readl(addr) + ((u64)readl(addr + 4) << 32);
-> > > +}
-> > > +
-> > > +static inline void icssg_writeq(u64 val, void __iomem *addr)
-> > > +{
-> > > +	writel(lower_32_bits(val), addr);
-> > > +	writel(upper_32_bits(val), addr + 4);
-> > > +}
-> > 
-> > Could readq() and writeq() be used, rather than your own helpers?
-> > 
-> > 	Andrew
-> > 
-> The addresses we are trying to read here are not 64-bit aligned, hence using
-> our own helpers to read the 64-bit value.
+> This may look like a fix. But the feature was disabled in the last Linux
+> version. So the bug cannot be triggered, so we don't need to push to the net
+> tree.
 
-Ah, you should document this, because somebody might do a drive by
-patch converting this to readq()/write(q).
+I think it would be useful to be clear in the commit message, use of tags,
+and target tree regarding fixes and non-fixes.
 
-Alternatively, i think hi_lo_writeq() would work.
+Please describe in the commit message why this is not fixing a bug, as you
+have described above. And please do not include Fixes tags in patches that
+are not bug fixes, which seems to be the case here.
 
-	Andrew
+If you want to refer to the patch that introduced the problem, you can use
+the following syntax, in the commit message, before the tags. Unlike Fixes
+tags, this may be line wrapped.
+
+  This problem is not a bug fix for net because... It was was introduced by
+  commit f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api").
+
+  Reported-by: ...
+  ...
 
