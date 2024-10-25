@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-138942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C539AF7DC
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:04:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B4DA9AF7E1
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 05:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DA4FB2172D
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:04:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F93E1C2138F
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 03:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C12B18A95D;
-	Fri, 25 Oct 2024 03:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CBCVeHlg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44B718B473;
+	Fri, 25 Oct 2024 03:05:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2059.outbound.protection.outlook.com [40.107.20.59])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2130.outbound.protection.partner.outlook.cn [139.219.17.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DD617C210;
-	Fri, 25 Oct 2024 03:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3383F6F30C;
+	Fri, 25 Oct 2024 03:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.130
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729825487; cv=fail; b=mdcXtYm4hS9hp+DwBWwQ90OILxEZY061nBNI9QsY8KKb5Vhxohonf4hciHymXKrSHqTcm+1rFRJJb6FFUtF0xEIpYpHhpKsogRUwmFE3LkH6Yk8VeVBJngm1SzVSI5PFQfrFVvfMBwcfoRf8awU1r5iv8DiLhgmw+8cQ5dRFsLk=
+	t=1729825524; cv=fail; b=HLbS23I0y9otD5VFF07re9cKKfkVL8qFVxQfNzfjyiba8DtrUR7uF7MrA2fVLrXSl4bIGMA4zcDTE5si/F50j3g0TUd8YRSdKLjr6fnNqAilBt3KG77z3E8SGTXnDV+dqydm48qCpwJIwPF7QRY8vj1wX8Sxwqiq+9+bd5JfIqY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729825487; c=relaxed/simple;
-	bh=zaO3XbfAj9Qn/FOxbAbk2GC5GzRb+GUR5XzaU8b9np4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HdiljxhVYXk4IPi1G6S06ismTMaNwu0lOlZMCmNbGM2SQqiqdqvXgyNCmbRaxQ7WwhlIw6tm/TL8FVFSylILfA3vD2oCW4lqhZw0pahDM5YBJsrB5WApJRMhHiKNMoQ3/zr/VG+eP72r7dQyeMcsoKsday1jKYdmKu/v4Jys2x8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CBCVeHlg; arc=fail smtp.client-ip=40.107.20.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rTC6OcPMmAovIgagdI88KCuVLP2GGAnz8pxdymPGet5/CQSquTOwD0ZY/OqcLOnyjeJSHfiKZUc3gUCHbv6b/fgDrGoZ8qfE9V0gQ16lwNes09BVhAEXbioE26j/9L0vckn+o367b2WyQw7ed3voe0WwEkYnddXE3Q3Z2xXdl01Zv+8PFvC5CMdHPPFhMRfODx6xKnf+qjuu0E3ZPdkj1k85Vzto4Z0CR39ExIBzBZitGoPnoloEXgxvmfYxtzUxyt9onnq2DQSRyQlKtMGuJ8rln/diNYhYMrOb40kd0AgKdI8MNpRITTvQQJPd9uvAbIuDtMJIJKdXuqGNLoqT7w==
+	s=arc-20240116; t=1729825524; c=relaxed/simple;
+	bh=MksFvwuEmUiIPX42iTiEFJf4yY5iIAibXaEIEjM4Lrg=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=BwuDaoG6IJSOGR9tK0CKENHONNWE0Mn/OQUTeIhSzxdogF4YlId/r8OLhy6SJy91HeF2s5cGc1WAFQZhBi9OvbLxMhnsJkjemK3DD95B7uKuOb0jrQP/7tn/fCjngHh+FbhHv+9h7Hx30jUwk45goADJCGCZfz5ySzIXd8ptp4I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rp4H9IpFXBykD67kRBY2iNjmuJRZWYagUXwZ5vYk8O5lTGniCCqj5GKs4cVOPF1ng2pSAyCLwrZ/EOBRcLRkSdyO1u9Ng06JCnp5wT9IqUysoax1i4KpjwlrSPG7p2BDY9TQAceNGT/TJiNErTbDhWvAlz5e4QpFFm3XmoFcfx7rW/0mwHMkKCMZUKbvaiJ8THEox4C1YO8fzHM4eKcIAePCY3EVKXjTQTr9gok9Ah2sKIxC0H93hf/ztZCZvDYF/R8DUzvQadDnhiGKPsHGBKakBNW5CL4ZNMhwoof+XdGL1ci/t1+GqzpofRCskfVYDAXex6diIvFS+TyPqmg3wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
+ s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F1UWQ2qcYY7pwU84bjvNwRLycJtX1+kmhQ9oUIF6Zbw=;
- b=KmArkoeXiiPfPsMJMhrl/9oHEmd+xgfrYFb3Awi/YZ2iXlcCuluO6Ek+JWATuLLoCoEUaLXK1S09L2NerPkq2IUFzOFh+N9cHl1OxRI9qYWHBfNCUs07fFanhASWhiZRi6+2sN5Ofx9mPngs+mQroJGzB+ut+rR6WVloIQxmVb6sH95VGaTikD3DvBVt/1m+4b/ar2T36imxP6zYSwxDwEYnAK27XJBW0BY7KbCz+IGnfx1eZfAQ4dFx7K6aFZI7inmk9zjA277UM2QR5elHM9B9NWtK8WAiBjq+mMGNfVLC/Nujo9uABEvF6Z+dmVQy0HT8BLLDtKCERC7iNrfoxQ==
+ bh=g/vEHRxD93rRF7qjE4b4pNIJ6Izn3vWf9kfsaFHcIwI=;
+ b=gRotO5f9oZ00BgiD0eTJ7KrT6siglEQ3ge6vgnO4MHOBJrrHQE7ghnSMq5EO7stvZHpUFrlgC8KJRdS4m1yJRBn1WR8jtYdkm+7A7NKt9gT2AbXKMjx0BxfPAJPrP+9oOnDIGEHQmbMJzLpbiKnfaLa/33QyrSFi4/ZeeVlMAwuH0VwmSNheQKBHNfl0QtnAAEcYHI7zuGbXlTff+8mMJ8A1mMMRnhMAqyrjTQ5kEG8Xbjjx9z4QnH5ocABCN32U+jEhhPm93JNoc/o7gVUSTpTXOt5h50euHe5FW/4cRnIylN6nzPLVm9pCPs0XkzgBCD5SoX/gCYH1pb0C2EhhVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F1UWQ2qcYY7pwU84bjvNwRLycJtX1+kmhQ9oUIF6Zbw=;
- b=CBCVeHlgCxs5NLqc25hl9vmQZYQK/Ut5yLa4Mt2gLEvhUZjlC/xtkwl6stN0zh4J3x9id5Mnlm+ghr9fsi+NRfe7t81L6a4rrqIMdqY31cusKQX2DF2uJNRtjR9Ed9sT3F+1iFcqO4Zu91JWtMLRk11BV+zOcwFH6h/68DTtnc11HVgwPr7Ji1r5YYwVi3gEzf1GwjBjg4kjDvtUYy/6AjrWjjElZDXfOS9lzRZRC/0Te3+13nVxI41bHl9j6wTuZ59hcuHc3dvFLuvWCg1JfpfoGr+kEcyvf8dph56wLg30g5hKgVNL90bwCclrfOzgJnGTPuD+O4aWWdrfkZDOFA==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by VI1PR04MB6813.eurprd04.prod.outlook.com (2603:10a6:803:13c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.20; Fri, 25 Oct
- 2024 03:04:41 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8069.027; Fri, 25 Oct 2024
- 03:04:41 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Frank Li <frank.li@nxp.com>,
-	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "bhelgaas@google.com"
-	<bhelgaas@google.com>, "horms@kernel.org" <horms@kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "alexander.stein@ew.tq-group.com"
-	<alexander.stein@ew.tq-group.com>
-Subject: RE: [PATCH v5 net-next 07/13] net: enetc: remove ERR050089 workaround
- for i.MX95
-Thread-Topic: [PATCH v5 net-next 07/13] net: enetc: remove ERR050089
- workaround for i.MX95
-Thread-Index: AQHbJeOmRwlBtQxjbEeI4tZF9GsDsrKWLvVsgACaSAA=
-Date: Fri, 25 Oct 2024 03:04:41 +0000
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:7::14) by ZQ2PR01MB1290.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:11::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.33; Fri, 25 Oct
+ 2024 03:05:23 +0000
+Received: from ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn
+ ([fe80::2595:ef4d:fae:37d7]) by ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn
+ ([fe80::2595:ef4d:fae:37d7%4]) with mapi id 15.20.8069.031; Fri, 25 Oct 2024
+ 03:05:23 +0000
+From: Hal Feng <hal.feng@starfivetech.com>
+To: Rob Herring <robh@kernel.org>
+CC: Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
+ Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Philipp Zabel
+	<p.zabel@pengutronix.de>, Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley
+	<paul.walmsley@sifive.com>, Albert Ou <aou@eecs.berkeley.edu>, Emil Renner
+ Berthing <emil.renner.berthing@canonical.com>, William Qiu
+	<william.qiu@starfivetech.com>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "linux-can@vger.kernel.org"
+	<linux-can@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v2 2/4] dt-bindings: can: Add CAST CAN Bus Controller
+Thread-Index: AQHbDP77AOdoHkNgsEibhjh7mfCIQLJnX44AgC+YfWA=
+Date: Fri, 25 Oct 2024 03:05:23 +0000
 Message-ID:
- <PAXPR04MB8510D12DF8886A5ACA865867884F2@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20241024065328.521518-1-wei.fang@nxp.com>
- <20241024065328.521518-1-wei.fang@nxp.com>
- <20241024065328.521518-8-wei.fang@nxp.com>
- <20241024065328.521518-8-wei.fang@nxp.com>
- <20241024175128.7pdwpqr4mlok43cb@skbuf>
-In-Reply-To: <20241024175128.7pdwpqr4mlok43cb@skbuf>
-Accept-Language: en-US
+ <ZQ2PR01MB1307FBED11492760312357D1E64F2@ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn>
+Accept-Language: zh-CN, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|VI1PR04MB6813:EE_
-x-ms-office365-filtering-correlation-id: c5c889bb-0bb9-497b-cf7d-08dcf4a1c4f3
+x-ms-traffictypediagnostic: ZQ2PR01MB1307:EE_|ZQ2PR01MB1290:EE_
+x-ms-office365-filtering-correlation-id: 6a7ec8ca-00b3-407f-833c-08dcf4a1de2e
 x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|7416014|1800799024|38070700018;
+ BCL:0;ARA:13230040|7416014|41320700013|366016|1800799024|38070700018;
 x-microsoft-antispam-message-info:
- =?us-ascii?Q?B4S0Yhm37bTbGEceUtyuUzq+vBPvRhzBxl6D7Kz6E63owdhok4egAS/z3d/s?=
- =?us-ascii?Q?KF8wgBQ4lbytg3f2BaCmgi4bTjSEuwgrfCti0A1OdGsyklamc6QhPCCD0D8Z?=
- =?us-ascii?Q?hd0tNkTXqhPljGyP8F14kZiXt9o/bdtn6im8DhVK5AIssptJXph0PhVCz4bP?=
- =?us-ascii?Q?Ho1l9t9MUWVY466tZZSaJ6gsQrBEhTR+NKIkwd0pJxx7c1bDxfp/J44Gn1di?=
- =?us-ascii?Q?Kj0FYeHWVh0lEAJY6I+hLlL1MfVlDMevyCUc7Kf3WlRjjW7Q+Y2PyNzmoq4m?=
- =?us-ascii?Q?j+opiaMaKN4lheOWGbUANFuJQax2eWRIsRFUrnI1wG4RwjzqDcim74TZe2z8?=
- =?us-ascii?Q?k/+wjA2HwEjPanj2CUdry6Xk//cMaKdp+TEFoIEJo9dm0hsixQzEGlsg8yJ0?=
- =?us-ascii?Q?n1cIFt2ylQhoWKXjVsD3Q3KRQXqQZTktwfqnKUTBB9H49SlBlKLlbjsuXEGF?=
- =?us-ascii?Q?StouOJTGXLAp5B88I7cjy2hLbdzbiVhacwM659rAnUw4je/nmufZtrAzvFYV?=
- =?us-ascii?Q?PthMlW13OnbwFhKV3N6cqbAfhk4JLwyR7KLB/4VjNdaQWmujb0T28O6osGDD?=
- =?us-ascii?Q?tbvU+iUO2K+HmNTPOc2gC3L/R+kiPr5fWO3RfLpwwNfJtmpfUvZRy+VujLO1?=
- =?us-ascii?Q?GB62yDnTjI6GkOSiEQG9O9mqeob8LPPzETG4orjgKPg81iIl29odtRVhdyfr?=
- =?us-ascii?Q?16jQc0Z+OEAzYjWcdhJw+pqBeoaYw92r51WBXVBu7qPK08VR3TZQNsziPeXD?=
- =?us-ascii?Q?nrty/2FWKzszddvY/CBAPW181kkn/+O1M9iUQw/7z6aAaHN+MxlQ9o8DM+aC?=
- =?us-ascii?Q?S0OClBYC0GLgD1OG3zfeXR+dSNg2tbRBv/nqwKoD55QQwHxeEsMDOLVmHhcO?=
- =?us-ascii?Q?Jm8SmEia00L2HgExhQg8MP8zwNh1ErngWDtZlNgE0/j2uKTmivCqpUsHTHYj?=
- =?us-ascii?Q?x35U+hzvr6HQ1gzsLdz86lf1BHPSx5mpfDi9xPlcXVodHWMFc/31xzQ3xWnv?=
- =?us-ascii?Q?YzpUAHHWiQTYIe/um0AItAKOAT8LF9Z06fjOBMDvjpqYrILh67U/gqByMhmM?=
- =?us-ascii?Q?DlzCTFgUuv6tNC/gLoqzF4JJEtpiScIsPTHovahHIaSkF3QG2vk4BsLVdVi6?=
- =?us-ascii?Q?LwSRG+P+achpBBBhPOQcML9nx3Yq0qKALaRjdL39pPBn873CdB9UN2SIe1ih?=
- =?us-ascii?Q?V/Sww62VgS+oqBa6YHQgiEag8nUGO8mh3iikhM+hDJAqsLKX2jhgx16WQvza?=
- =?us-ascii?Q?YFNlUvzXNGiDghEoM42mjvZ/NpsMUCWTjhgvF+zXcC69PL5U/cdaIIKY6wu4?=
- =?us-ascii?Q?1I8NxYtTvLGvMpAI/jFJfLniHXuYgFSM1JbhrHHPumpVGktzXI47Xt+Y4pgf?=
- =?us-ascii?Q?CgMSfJc=3D?=
+ BiIDDLdqw3aEovNbsF+Fxj79ziYNy1MDudDSVegEFmgUKqy6tFXEJCdaGkbnvoTUwA/LIaJ4TGLednmW4hafO51p99MLup4WdjVaUzi0sT+tboawODrcSdMIjg5CxhOEHfwaFjqft9dPVXzUCSXhl915vh0chB0Pe6gy8h2LhIcskCClKwrQeAYij3TMs145l7OZyAlr6lqMhQNk+KChWuPz0QhDQ+QLu2qIQjn55/BHx9VlbRHlcNipZ0qAAsbQwbVN0XLvfqveMz1v5RNRXFQnG7T+hzgij9nK5oifLFAXJPwuK9hKywwZ6ZCQjQwPkiCYnAhztpNmMLQKUBNQC7pacfric6hJn0cRNg4BqaGIUaGLW/sbwG/BK02dJGHkK5E0RHuXK8GvUa9B/+AAi/tx93KrizCYPAfoGvcdQza+sKmBlshQlrjhwQk+2rhygiDxxN0/ZYN4iV2Q9tNZXFeVf5PsUNFoVzrABmf8q660GS2Ts0yOvqnWAonZFk68TyVYRHYnrgxNLjgDHP83RRtY1InPluBYtuxpTXM/vQHD8I0IAtedCvMD9+yi/hbCzdVIHKyHNbkKBwn+OrqhkjOhVhp40ElBK2Tq2n8GjFISSplM9e2E9BCdrilREO6T
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(7416014)(41320700013)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?PU899h4KgnBKdYArIJY8NiYpw9Rk69Fk1mZ74RQizReu2MNtfz/PZL5imIhg?=
- =?us-ascii?Q?VCvRbRsNxtc7bfMpYgRJNNF2IyCmLIkHcFE89OQ/YtThHsJS5KMeEI0uF2iL?=
- =?us-ascii?Q?YWQriHIT60HvOUqiYmebWwAUSgXTMSSGY65p37rKo3S8JduD5Go54i2sHZHO?=
- =?us-ascii?Q?0xzL/N2cU6S9i5ja14FogBmsjcQqTZeUY1kJymi4gqD03FMRn8M9dCPFKURk?=
- =?us-ascii?Q?9C8YJQgtIaf6lQXtGdqBFCJ8ZFwtdnt4bJp30Hhl/KtSs6N3CJ71X0QX4JR8?=
- =?us-ascii?Q?B3Jmp7TbXzDjl6pZgAwgiduVJtqfuIckeACOWhQC3QMpkvZSIWGVrYwSn2M7?=
- =?us-ascii?Q?W1aGMIBLg9y7SWPz4i0oqzcSBbhZwUXEvANIhnfW13GVOPfyMiPdvno1z2zT?=
- =?us-ascii?Q?siupum2ZCvsUu25BnieV30dbjL+EGgX5oixwwUgRYLwAd5tjU+twOTEghmhD?=
- =?us-ascii?Q?p2NuDvdaaP8brDHws3PCpHxbZFG1hqo0DInWUBjaHdPilbb12EoLEki9sf58?=
- =?us-ascii?Q?vrRUI2s7O3+VWQHAo7Gn/2FeJvguETIsVS5wmPAIToYHC3xSVkix1l7EJIEE?=
- =?us-ascii?Q?iSVE/G7YY+O+/5YbbSQoi6qUFYkIkH5X+v/8dXsCcoRQK9rWERErkcTxJdvK?=
- =?us-ascii?Q?PYsayc2AmcAPSCsY7XJtsaPpWZ4jh+SHU24qhTj8v/oFx0pBQ+ayTsJYcSCC?=
- =?us-ascii?Q?SCMt4ksEZUuL291k2JkMxuHcWoXz5bZvORvL69bI0DfjMwN6jWJvxMaJ0Yg9?=
- =?us-ascii?Q?9ZFacDKI2i/XHkNLm0uiy7EzFSFKWZF5Il04b4681YqX97QbjiwjyHPvOKAK?=
- =?us-ascii?Q?mo6PqEUlWJnG0Znr+XCW05VASnI+6cUlsL/00Cl2rMrRIIkKy4JGCy6ltQ9G?=
- =?us-ascii?Q?/klkC7GlzdUK+P4vDxoEJFQe1OVB804LjKcCB6Mydn702k8N2PksGyLkAeW1?=
- =?us-ascii?Q?AkYNgO12tF3yJ6oq2Fuj2oVQ0DPq1Ja0WKdPWC/r8arF95FSbBvRb6ijowDq?=
- =?us-ascii?Q?37dSSmNBNo4PFI8XICxGmf2Bj8ufCqdWnrVweRG+8r5R2Lkak8bY5F3tDUA2?=
- =?us-ascii?Q?vCDaRBm1Y78kDo2afX+phsVCQW5oarhJGg/Tribk4PNjOHrb1bSc/GH7okqR?=
- =?us-ascii?Q?q0gTlG/omuyreongp7GY/SqsbpY13S4nxbsHFqSFyyrPF0+/pKRBJZYkNq6O?=
- =?us-ascii?Q?T0AA5WX1SCoRySqU8NgP+gH1uG5mZ0l7Yj1ggoHIXt7Eshe/zc1lx5oT+7QF?=
- =?us-ascii?Q?HcCL8OAL1PNMD0a0O14EEfeRSRdpp/bsoDS04AHtdNyYTp7lFM0ySGfqLw8C?=
- =?us-ascii?Q?4gQAqIhZcOsGjhbZJ3+qjzHW6paq6+HdZf+MjqAUWfTpMvTfCA+T4Wj0pWmu?=
- =?us-ascii?Q?1MnSrP7sbaASAIYvcjuvDIKJaZbpTR2aEKYnIMDkIcpKwRWSkCgmlVNK/Qfv?=
- =?us-ascii?Q?gCw/sxio4KfiFypvRZCTsKjJnuPdfhvAgwofyNIxWEWAX/iPacfw1+LwbU7A?=
- =?us-ascii?Q?fkcBBFgeO5jK0B8ovqp8mf9NdRKzAp4ta0nJEB0sJ7OznS9oAlbNP1Q8Kh/l?=
- =?us-ascii?Q?JGC0fwHxddbcB/n+7mc=3D?=
+ =?us-ascii?Q?kwTu5pwUF3GWKoER9bfrJvJXKOYY0kfF5/E8qW8n/jnTn1zimBCSXvc3Xp8V?=
+ =?us-ascii?Q?RgP9iO0hO7KX2hfTxQqfuIGeqI9HbFbgLU+w8ZG9q9zSgmp1OnMvWCNeBTyo?=
+ =?us-ascii?Q?3ntloATSGi18RZKNJPPLF3mWOwauBzYykFuu6/u3o3M4U+DUnjVP3js6HkWO?=
+ =?us-ascii?Q?YM6CJK5vhUufS5A4hTfJxpzQJ9ZAIfu/QCGSBtfD++wHeUKjYUiClY+v2jlK?=
+ =?us-ascii?Q?G8E47ubLZvh+tmZiZAvIedKVyQCYp2FHVH8b51OFdRGeXoiaTDr4oajquNDT?=
+ =?us-ascii?Q?LXBDQ2fsGJeXD/vq7ksS17wl8El4JNQElbHZhXyTRAz2EM0RtvR+xBlO5wWc?=
+ =?us-ascii?Q?KsRgxISA4yjB3ERqQuW/h/v6AIjfFJ+dF70vrWVn1pBK2hv2D5BumW/k1I2W?=
+ =?us-ascii?Q?Q2lyRfKA981yXspFdY/wyKpYYTMj4E81VxfXZIn1aUPWpLL/GU3KIeTh6A5m?=
+ =?us-ascii?Q?nnR1UW+Yu34MFMAF4DYRqcPPLgZRCgxnOa/aCUPRBTW1Jgh2IrV1LsTJxJ5g?=
+ =?us-ascii?Q?6xSTFX3V1lMXw8BNSFoqnBNu2Ftw1GiNjW0QtrNzLtHjooK/VGcLgJtkMzMG?=
+ =?us-ascii?Q?ydYh/flZtyJzZesA8Se+ij7IqPyanMbsudwMUUcO3NpgGtx7kirbo1j1E3Uy?=
+ =?us-ascii?Q?ovjLWZ80O/YuO3hdhTx5GDtsmPbG0C2Jc44dvKyyP+6N196616POiYM9tPRJ?=
+ =?us-ascii?Q?zcXSurzURii6qOchiGaF8kBIg07HRrDSAqOHy747AICuArg0cGN/GfUEfUx2?=
+ =?us-ascii?Q?mTUligki7LF2zZ18ZbTpPtNI1Q0jF71Fpp9Rxkj8B/4WQN9P4JKThk22UEl6?=
+ =?us-ascii?Q?b4NPv5zXSORImKDfLysr/Sv1MUzjjHK0ILd0n7c/iI9fkLRM2WDFl2DTPUXa?=
+ =?us-ascii?Q?DMuLrg8eVTmBcioJWnb9Q7kbbU5Xm0eSDlIKEkRySCZ9/WXQvfyCukwizmJr?=
+ =?us-ascii?Q?Ea5VoRI6EZtelE+4oAL6KLldF5SjrRnwjvjLykwDp0ac67hsxT72luzolbqf?=
+ =?us-ascii?Q?DmPsSb5gFK5WWYCGm7dPowgP6VqVU3U1txP+8yHzechLr/VuHWp1eumSuA3H?=
+ =?us-ascii?Q?G9QeydLNVB7nC13eCgt8iK1HQDJ8BBrWUHoMjBUiUNlCohhLlBqQwJzD0dJa?=
+ =?us-ascii?Q?GpDhi7+tvu3eQyBvg02OzDkqy+HuJyQxEZUrvyJjYvGJWJtCVwHh1LzIkn+Q?=
+ =?us-ascii?Q?m1gzcmsqablpfHaTvPpeRpYCQ9W2P3CxeWSoalFHBQJMdkyxnEWmUv4RqVLc?=
+ =?us-ascii?Q?SLJUAcLpgXyG18LnbfomAH838jkZTTIh7WfphhwisIhLTbPzQAeS41cg3eNf?=
+ =?us-ascii?Q?b/V/j9ND8QpVJpDDDKPCeVyl6KlJnatYCGY6jxw10l/xagNU/pmFkVqjI39f?=
+ =?us-ascii?Q?ophBvGOm2I1j8BmdtYEH8dM5vFXa/6+YYlMDZ0xtwKynWrUihYNJtbFbnCie?=
+ =?us-ascii?Q?PDyt4bI0GyllMyZOgg/+WC8wqsmFw5O9M0jeJnoo1jQUwaSiaE2qM3/qjYPM?=
+ =?us-ascii?Q?BTPOQ2uoCkU1V3n+I1cK5VdZCc34uXWQC4+Cw40ZrQjkcmaqv6hOWjnjRCGe?=
+ =?us-ascii?Q?w2f4fefkEjPl6Ldg9gzjfHZN36+z0jp/RwbmiknJ?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -162,40 +121,126 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
+X-OriginatorOrg: starfivetech.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5c889bb-0bb9-497b-cf7d-08dcf4a1c4f3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2024 03:04:41.0841
+X-MS-Exchange-CrossTenant-AuthSource: ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a7ec8ca-00b3-407f-833c-08dcf4a1de2e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2024 03:05:23.3789
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3vpGK/MDo3UBfijl0wVYVpfRsAmFz03QG0Ju3cuY/tTAIpTQroSSz1tzGrxcxOVqVY7nNi69msJdu0zAAA2dug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6813
+X-MS-Exchange-CrossTenant-userprincipalname: 3SdSh72naatA2Zhq911dXylsorjQYoBQEFtcR6k60qyJSMIZych13g3BTttz0B5zNWzXeU5myRpSRQHGVoGk0DM5g9XRX9BJoMibmL5L3K4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ2PR01MB1290
 
-> On Thu, Oct 24, 2024 at 02:53:22PM +0800, Wei Fang wrote:
-> > @@ -62,6 +65,12 @@ static int enetc_pci_mdio_probe(struct pci_dev *pdev=
-,
-> >  		goto err_pci_mem_reg;
-> >  	}
+> On 25.9.24 04:03, Rob Herring wrote:
+> On Sun, Sep 22, 2024 at 10:51:48PM +0800, Hal Feng wrote:
+> > From: William Qiu <william.qiu@starfivetech.com>
 > >
-> > +	if (pdev->vendor =3D=3D PCI_VENDOR_ID_FREESCALE &&
-> > +	    pdev->device =3D=3D ENETC_MDIO_DEV_ID) {
-> > +		static_branch_inc(&enetc_has_err050089);
-> > +		dev_info(&pdev->dev, "Enabled ERR050089 workaround\n");
-> > +	}
+> > Add bindings for CAST CAN Bus Controller.
+> >
+> > Signed-off-by: William Qiu <william.qiu@starfivetech.com>
+> > Signed-off-by: Hal Feng <hal.feng@starfivetech.com>
+> > ---
+> >  .../bindings/net/can/cast,can-ctrl.yaml       | 106 ++++++++++++++++++
+> >  1 file changed, 106 insertions(+)
+> >  create mode 100644
+> > Documentation/devicetree/bindings/net/can/cast,can-ctrl.yaml
+> >
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/can/cast,can-ctrl.yaml
+> > b/Documentation/devicetree/bindings/net/can/cast,can-ctrl.yaml
+> > new file mode 100644
+> > index 000000000000..2870cff80164
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/can/cast,can-ctrl.yaml
+> > @@ -0,0 +1,106 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) %YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/can/cast,can-ctrl.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
 > > +
-> >  	err =3D of_mdiobus_register(bus, dev->of_node);
-> >  	if (err)
-> >  		goto err_mdiobus_reg;
+> > +title: CAST CAN Bus Controller
+> > +
+> > +description:
+> > +  This CAN Bus Controller, also called CAN-CTRL, implements a highly
+> > +  featured and reliable CAN bus controller that performs serial
+> > +  communication according to the CAN protocol.
+> > +
+> > +  The CAN-CTRL comes in three variants, they are CC, FD, and XL.
+> > +  The CC variant supports only Classical CAN, the FD variant adds
+> > + support  for CAN FD, and the XL variant supports the Classical CAN,
+> > + CAN FD, and  CAN XL standards.
+> > +
+> > +maintainers:
+> > +  - William Qiu <william.qiu@starfivetech.com>
+> > +  - Hal Feng <hal.feng@starfivetech.com>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    items:
+> > +      - enum:
+> > +        - starfive,jh7110-can
+> > +      - const: cast,can-ctrl-fd-7x10N00S00
 >=20
-> If of_mdiobus_register() fails, we should disable the static key.
+> What's the 7x10...? Perhaps some explanation on it.
+
+7x10N00S00 is the CAN IP product version.
 
 >=20
-> Perhaps the snippets to enable and disable the static key should be in
-> helper functions to more easily insert the error teardown logic.
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    minItems: 3
+> > +
+> > +  clock-names:
+> > +    items:
+> > +      - const: apb
+> > +      - const: timer
+> > +      - const: core
+> > +
+> > +  resets:
+> > +    minItems: 3
+> > +
+> > +  reset-names:
+> > +    items:
+> > +      - const: apb
+> > +      - const: timer
+> > +      - const: core
+> > +
+> > +  starfive,syscon:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> > +    items:
+> > +      - items:
+> > +          - description: phandle to System Register Controller syscon =
+node
+> > +          - description: offset of SYS_SYSCONSAIF__SYSCFG register for=
+ CAN
+> controller
+> > +          - description: shift of SYS_SYSCONSAIF__SYSCFG register for =
+CAN
+> controller
+> > +          - description: mask of SYS_SYSCONSAIF__SYSCFG register for C=
+AN
+> controller
+> > +    description:
+> > +      Should be four parameters, the phandle to System Register Contro=
+ller
+> > +      syscon node and the offset/shift/mask of SYS_SYSCONSAIF__SYSCFG
+> register
+> > +      for CAN controller.
+>=20
+> This just repeats what the schema says. More useful would be what you nee=
+d
+> to access/control in this register.
 
-Okay, I will refine it
+OK, will improve the description here. Thanks.
 
+Best regards,
+Hal
 
