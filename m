@@ -1,85 +1,94 @@
-Return-Path: <netdev+bounces-139255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8639B133E
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:32:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6E89B1345
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21C0B1F22BA1
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:32:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AA55B21920
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A75221440C;
-	Fri, 25 Oct 2024 23:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155191EF943;
+	Fri, 25 Oct 2024 23:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d623BiNv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X32EbKVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0DA1C4A14;
-	Fri, 25 Oct 2024 23:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22005157E99;
+	Fri, 25 Oct 2024 23:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729899106; cv=none; b=QZCy6dL4larA0XIZfM8mCG74LQrNrh4yKnNUAiczt8ADoZ9UrhS0vO0DEiIQTyGsyS8UxkruFuS7kSR9/hTykULJ942ZrR+cqq5oh+cRs1jrJFEy7bGtPRqCn92S1a1imoCAP7McFHs3uLQmJfii7SFu4u6haiC6r7K7WyVVrK0=
+	t=1729899156; cv=none; b=AoD/l51SkUt16dNWaOhVrdBmapoCx+uTSdTyfcAZVl2L1lhkEdfElqr8yfPqP9Ud6uE/W6fQiq74L7/O5d5idIQXJtpevQk+R2NLVQLu7ZOlcHQQt4/7rw3F2QxBd3FBHRdlFFhpT255rKZXilMwvKUJu/g7cChWp3vPIJuMuoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729899106; c=relaxed/simple;
-	bh=u4xiOrgzFrMQGY1E5QjpVZEvO5RqKSATtrfHUuQma7Q=;
+	s=arc-20240116; t=1729899156; c=relaxed/simple;
+	bh=HQ24BCw0Yd+wMuNuCr+vHzj1uSpA024X5gNetuoRnac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c0JfLyFSCVgIXtQQnPR2oQx9oouAcnGf24zQL8TdXqWooTKb7cqx3ffKCeCzzAaetUDNLVve0KFPyzoi+Id5+sokvHrE1TEP3+QY71IEACvaTPCV538mmjulNULXbNQYNZWm7ybo/XpWypfOfbvaQec3o/UKFLMPmMUOA4j4nns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d623BiNv; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729899104; x=1761435104;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=u4xiOrgzFrMQGY1E5QjpVZEvO5RqKSATtrfHUuQma7Q=;
-  b=d623BiNviPxMGSSc69bBZHGjHgq3hKfJTYNzNfOYuYarsGgP9Pa/8t5s
-   6E7vF3fVp+dJrECYWr+lqKjKUHn/8jg0MG/9LJ8onTEsaseJtyaA4kpD5
-   o5jv78sCxaf87dQBEcWyb11ScuQ1t/VTfxXgzVjxVAJ7AHgKkU2I3+GPA
-   2VuA146yvxD4ZQbu1Wpe3Ibi3El0dRX+SIKfZLp38LM3Kr+kNwZ2vKQM/
-   kE9XkrtbnDBF/7CoH7NjMue83CE3orBYJrrQKfaOj77k+cQWgcB0U4KfF
-   eJ0OU1JKg/EQCj8AQ5IRCf51n9AyMjAw0VmCD/Pf4ulcNM7z/iuBe4oCb
-   w==;
-X-CSE-ConnectionGUID: gx6/qcNLSy+8FU2x+dmRNw==
-X-CSE-MsgGUID: K0ki1pl3Q+2ZtEyfhSAQmg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47041246"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="47041246"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 16:31:43 -0700
-X-CSE-ConnectionGUID: bxTqJhq4TWC3gPnARMzMzA==
-X-CSE-MsgGUID: bcWwe4LAR9eUK2EAfOP44g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,233,1725346800"; 
-   d="scan'208";a="80989606"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 25 Oct 2024 16:31:37 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t4TmI-000Z1i-0o;
-	Fri, 25 Oct 2024 23:31:34 +0000
-Date: Sat, 26 Oct 2024 07:31:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org,
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
-	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org,
-	lars@metafoo.de, ukleinek@kernel.org, alexandre.belloni@bootlin.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
-Message-ID: <202410260755.TBWkI6Jh-lkp@intel.com>
-References: <20241024085922.133071-5-tmyu0@nuvoton.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k7+lLBZCVE4flhxYIbbg46jsx2K1QY7oOQg8ycOfLDRE65X2aezElQaYGXXJIWtoOo1ZM3ESB5tJL5Fcc6dYqwhmNJtVucbh42hNGBYa/76AQpWABu+y6d42g6SsMIEM96vZU5/67tkXfRIvvfx3SrMcjlXfIkeOnhd74JWxoi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X32EbKVA; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7206304f93aso296688b3a.0;
+        Fri, 25 Oct 2024 16:32:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729899153; x=1730503953; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wp1HPOnz6KaDGaKZ01AnsiVak0lO4QvTbnFD63srZug=;
+        b=X32EbKVA/dH5LRxkiIYvr7iZJCA5FZih0wjKL1XFXezfEBjT0VYpZTaV55Zabyu1al
+         T6sgAoaghZOVrlg7nu2vAujBG6oXIwG4KoLJnwYhVJLloBogZQFWFLD65FL3q8Oskpk/
+         REoG0kPR59gHOYcM9jXHqxOtkEgSr0XXsG9FCQb1YiNa4FbpJOedU2S3ACB/k2UrbP54
+         QzNdij+7UhjNiS2BpahZ32Aw+Smw760RiQTSX6Y0lRSzz9m33A2qRjMfh8w8prK9Y8ba
+         E7TBhyI4i6xLOeN6HRLmspEUJSJNbCnCnSUZapO5m1dRYBGcTpuDiuYf9drPS5ycRsnN
+         //Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729899153; x=1730503953;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wp1HPOnz6KaDGaKZ01AnsiVak0lO4QvTbnFD63srZug=;
+        b=Jroias6Zvcb9lUj7VuH2sg5uJHbaxewwF4yVxbDAvyDljgD3RC3nmZZIXd6ocJdooS
+         ns8DsfKjHwR44gvb/HEdQdNp9+PWIUFQYHgT+9niyd6E4urRANda78saHjfs91eEUdYM
+         v8Lml6zi5DPm+qeOiYSelYRuqXCp1iEeStFBL/Y9qRwluPbCboZmUIaeibk37VK5plSl
+         9uGcuxJqbl73PqRq2+kdettcOuDpOgni4zI8w4N+0EZusD61CxozlZyYEfPY1A20Jaub
+         2fafwFJnNPBcOf1HXf31uF6/XUieTnCxV2mldU4dhuRU95HknWlQ9dNVsMiX7FGT75Vo
+         1T8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVNz9DtbIKY7znZoV/D6xiMXXZjEnqyj3dePpvBbXkocYpXyle8DV5kkdC/Fhg03/S2gvzt+OYnf5Hs@vger.kernel.org, AJvYcCVS9zDy5ENV9tbXEO6q4JrbdAUOROFUVwG+MEp2RTwkedF8zN/Fskm/X5IGgJCwqRTqnSr3RLdf@vger.kernel.org, AJvYcCX3359VlmN93hxgKAPu2FZ55Nzp6u/Lappa/qKzyvzshgvQhijvP/4QHe8K2LS1KZG61MKIEkACWSCyaxwA@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuHbjiuDZd5vu0VcyWxFvjFpKRJ+TcDOHHstUPGF6C2NMrudrW
+	T0+WyDy2UeviL0g7hRwHZ+FmZtLj5FVA5XrMVoxyxDbgiDeE4Xim
+X-Google-Smtp-Source: AGHT+IFEMrLhc1Bg4iRCP4q4hozIJt6Sp7huOuGxcV+yJK49RmRzhj24Vshw5AfU6IcH7rJlxKNWYA==
+X-Received: by 2002:a05:6a00:b54:b0:71d:fb29:9f07 with SMTP id d2e1a72fcca58-72062fc7c5dmr1589435b3a.15.1729899153356;
+        Fri, 25 Oct 2024 16:32:33 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057931e2csm1641781b3a.63.2024.10.25.16.32.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 16:32:33 -0700 (PDT)
+Date: Sat, 26 Oct 2024 07:32:12 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Inochi Amaoto <inochiama@gmail.com>
+Cc: Chen Wang <unicorn_wang@outlook.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Inochi Amaoto <inochiama@outlook.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 3/4] net: stmmac: platform: Add snps,dwmac-5.30a IP
+ compatible string
+Message-ID: <lsy4wjdce3bhnqgpnu6ysby6ghlzro2ghp6z3jzmwu6vuisr5m@dbljy7b3dhgs>
+References: <20241025011000.244350-1-inochiama@gmail.com>
+ <20241025011000.244350-4-inochiama@gmail.com>
+ <2b691bea-3b2a-469b-bf5f-5e80b9b9b9a8@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,37 +97,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241024085922.133071-5-tmyu0@nuvoton.com>
+In-Reply-To: <2b691bea-3b2a-469b-bf5f-5e80b9b9b9a8@intel.com>
 
-Hi Ming,
+On Fri, Oct 25, 2024 at 04:44:55PM +0200, Alexander Lobakin wrote:
+> From: Inochi Amaoto <inochiama@gmail.com>
+> Date: Fri, 25 Oct 2024 09:09:59 +0800
+> 
+> > Add "snps,dwmac-5.30a" compatible string for 5.30a version that can avoid
+> > to define some platform data in the glue layer.
+> > 
+> > Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > index ad868e8d195d..3c4e78b10dd6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > @@ -555,7 +555,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+> >  	    of_device_is_compatible(np, "snps,dwmac-4.10a") ||
+> >  	    of_device_is_compatible(np, "snps,dwmac-4.20a") ||
+> >  	    of_device_is_compatible(np, "snps,dwmac-5.10a") ||
+> > -	    of_device_is_compatible(np, "snps,dwmac-5.20")) {
+> > +	    of_device_is_compatible(np, "snps,dwmac-5.20") ||
+> > +	    of_device_is_compatible(np, "snps,dwmac-5.30a")) {
+> 
+> Please convert this to a const char * const [] table with all these
+> strings + one of_device_compatible_match().
+> 
 
-kernel test robot noticed the following build errors:
+I will, this make the check more clear, thanks.
 
-[auto build test ERROR on lee-mfd/for-mfd-next]
-[also build test ERROR on brgl/gpio/for-next andi-shyti/i2c/i2c-host mkl-can-next/testing groeck-staging/hwmon-next jic23-iio/togreg abelloni/rtc-next linus/master lee-mfd/for-mfd-fixes v6.12-rc4 next-20241025]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Yu/mfd-Add-core-driver-for-Nuvoton-NCT6694/20241024-170528
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git for-mfd-next
-patch link:    https://lore.kernel.org/r/20241024085922.133071-5-tmyu0%40nuvoton.com
-patch subject: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20241026/202410260755.TBWkI6Jh-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241026/202410260755.TBWkI6Jh-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410260755.TBWkI6Jh-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> make[6]: *** No rule to make target 'drivers/net/can/nct6604_canfd.o', needed by 'drivers/net/can/'.
-   make[6]: Target 'drivers/net/can/' not remade because of errors.
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Regards,
+Inochi
 
