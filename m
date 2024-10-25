@@ -1,700 +1,403 @@
-Return-Path: <netdev+bounces-138991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-138992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45AA69AFB1E
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:31:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D33F59AFB3A
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 09:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB6C81F23751
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 07:31:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56B1B1F23D6F
+	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 07:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832601BB6A0;
-	Fri, 25 Oct 2024 07:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF021B6CE9;
+	Fri, 25 Oct 2024 07:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=menlosecurity.com header.i=@menlosecurity.com header.b="FpwppJ0S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lfjfruEt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f98.google.com (mail-oo1-f98.google.com [209.85.161.98])
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E0F19993D
-	for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 07:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248211714B8;
+	Fri, 25 Oct 2024 07:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729841456; cv=none; b=UaNz9w/FeroZCrPtxOp0BZyNHfOGmbWXxMAAwSnT9GKNtxQ4q09LQelMmIjguROeUN7w10G1kzO3Mi47O7Q04pkCd7D3auQuytnBWge59fzeHoLst7VSGfdHVZ8SS66dAZE/mHqpG8Yu9qvRSCDUZlmOHlkLBa3dxpI9pI5z5Z8=
+	t=1729841945; cv=none; b=b5o3a8t8MuQTo2jhoHhkPLnblEpTMLEXYNlfgKfwWAw0wXoRVTWKMAAwksKiSQ4wcaGjyqqOmJ+3igUeJXcEM4iapUpPXJBOr/jHlNqa4PXnLQXq3geb08GnGbocvVLjrSD3ighJ9mrRzT3AZsb60vifFarlYZy44+plpBLsmYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729841456; c=relaxed/simple;
-	bh=y7K5tvVsxX963FEHh62X8tjJkmK39Tjw8w+pdgr8d0o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Z0RGRutvsyKwL0+xS3/y8gknpQRA16pFx/uILs0rRu7jWwgSkDTvzjHPxCxcm6dcxC1+1X5TqVVwtYGqzDdMZz+pBG5Tera/GKl7VnD0rpcNADmE/GeYLSrEdFuFtgqKu+poejbwi7LM7aO/xp3AojmcRNfYKGk03kPmfaWtqaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=menlosecurity.com; spf=pass smtp.mailfrom=menlosecurity.com; dkim=pass (1024-bit key) header.d=menlosecurity.com header.i=@menlosecurity.com header.b=FpwppJ0S; arc=none smtp.client-ip=209.85.161.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=menlosecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=menlosecurity.com
-Received: by mail-oo1-f98.google.com with SMTP id 006d021491bc7-5ebc1af8e91so861080eaf.1
-        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 00:30:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729841451; x=1730446251;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KNw/anDqTy0x1e0T/4RKLbEWjr0xDdH8TIxntDgTe/A=;
-        b=a2SM4hApd+G1SRJ70NrAzSTwZ5TXCkeGijfv9nD3p3xdVnFo77WnpeWZfvPItxsju7
-         fg6l3JXnHYFc3stsfl7+xklFdCqUTVaCEhrkyqJoF7c9sezDLlTkRE6wSJc7pyQ2+xWg
-         ZWwMy4iEgQb2n5r1t3tFtiV9xdSnHDC7lmswEdsrKNycnSQz1h2ABRzuKYT/EQboJMYq
-         3vWcmwixIWmqWeTYzYH4ct95r9OAr7dMcvEOjmGka2eofrOT/tyd6a3oJL7+fAMDY7KZ
-         5vhGBmaO+blPDXOGycXTE5E4G0qXK3LnAJhxoKvY653ehDqgVqf4I3l4yy2uv41DwQgg
-         8/zg==
-X-Gm-Message-State: AOJu0Yz5y3bB30f6KNgluXGMNSLan0yC2eyF/yyshgit15Erkm8AJEyN
-	APYQNS3K9qBbVYVQt6GfkTu762hoylKNUfNH/Pn9RMl+nM254BgfGw6TZvNB9CiwV5z6YV8CEIb
-	rlNatGkDSP/z2S+LxZjTrAeg9+8Hda5+/YM/IppkXCoQ=
-X-Google-Smtp-Source: AGHT+IEHlK8sH2Xw+16e+46apDTG4SsR2RfPE4b8AHsshMstrIrysZxoC2M7k175DKAHb7B0mp7c3taK8iwN
-X-Received: by 2002:a05:6870:1ce:b0:254:7f9f:3f21 with SMTP id 586e51a60fabf-28ced305a1cmr4946927fac.27.1729841451680;
-        Fri, 25 Oct 2024 00:30:51 -0700 (PDT)
-Received: from restore.menlosecurity.com ([34.202.62.177])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-29035d1dcedsm19478fac.10.2024.10.25.00.30.50
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Oct 2024 00:30:51 -0700 (PDT)
-X-Relaying-Domain: menlosecurity.com
-Received: from safemail-prod-029060369cr-re.menlosecurity.com (34.202.62.178)
-    by restore.menlosecurity.com (34.202.62.177)
-    with SMTP id 0f3a2c90-92a3-11ef-8799-dd11e1c4dd06;
-    Fri, 25 Oct 2024 07:30:51 GMT
-Received: from mail-pl1-f200.google.com (209.85.214.200)
-    by safemail-prod-029060369cr-re.menlosecurity.com (34.202.62.178)
-    with SMTP id 0f3a2c90-92a3-11ef-8799-dd11e1c4dd06;
-    Fri, 25 Oct 2024 07:30:51 GMT
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-20e6dc85472so17486745ad.3
-        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 00:30:50 -0700 (PDT)
+	s=arc-20240116; t=1729841945; c=relaxed/simple;
+	bh=cBQxL/2Rq3Fob1hcXBLk0wujh2/MV+AyC0ao+S/xQek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UFoRF7oxB0zFMewchM4DfNR6Fo/95dzvNUUBZ7PI55YNVmE+ARKlxAT7AW/LI0ttY/Xh0sUq+jCX/Fy8ByV8wqGXwWYoMCI07XoC6gYadwYZ1VK+dGakvCL9oBsBw2NgvQM6j89e5CAO5WjOcIziFZaSPcSmFh71+CJbJnqJea8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lfjfruEt; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e291f1d659aso2084895276.3;
+        Fri, 25 Oct 2024 00:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=menlosecurity.com; s=google; t=1729841449; x=1730446249; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KNw/anDqTy0x1e0T/4RKLbEWjr0xDdH8TIxntDgTe/A=;
-        b=FpwppJ0S4DEzGi/MD/5Il93Ul2zlzDamT4PPuse8gWmUWByUiBUNMok77JDm7sD+LF
-         eUidSg5ifwMHQJVBHhZ2OtzvtZDNLhpi9/2zxsFhrLUdn2P567vj2n7YT3KLJRT8DRMf
-         Yp4S+7x5zMHernKfkUuXHXa1UUtAgVwFPG2Wc=
-X-Received: by 2002:a17:903:41c3:b0:20c:cccd:17a3 with SMTP id d9443c01a7336-20fb9aa1f44mr54714225ad.46.1729841448722;
-        Fri, 25 Oct 2024 00:30:48 -0700 (PDT)
-X-Received: by 2002:a17:903:41c3:b0:20c:cccd:17a3 with SMTP id d9443c01a7336-20fb9aa1f44mr54713875ad.46.1729841448207;
-        Fri, 25 Oct 2024 00:30:48 -0700 (PDT)
-Received: from localhost.localdomain ([108.63.133.160])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc02e941sm4546105ad.204.2024.10.25.00.30.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 00:30:47 -0700 (PDT)
-From: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
-To: netdev@vger.kernel.org
-Cc: adrian.oliver@menlosecurity.com,
-	Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
-	Adrian Oliver <kernel@aoliver.ca>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Ido Schimmel <idosch@idosch.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v6] ipv6: Fix soft lockups in fib6_select_path under high next hop churn
-Date: Fri, 25 Oct 2024 00:30:03 -0700
-Message-Id: <20241025073003.2079945-1-omid.ehtemamhaghighi@menlosecurity.com>
-X-Mailer: git-send-email 2.25.1
+        d=gmail.com; s=20230601; t=1729841942; x=1730446742; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y4pZDfebFFkVewdLIhSt4ZSKyPCjkQIctMcGbulG07o=;
+        b=lfjfruEtt3p3EU3r4zYjSDMcJlGLChIUplUVffko6SgY+NDkF6z9+9bbPoKceZOYue
+         cpW4k4ZcSeXzKp2TG53FBrWSGYMoTn3nWd+j/n1Jasni/w/nErGeM9QG7F3/quCwIsB+
+         eDAbtHpF40yPYyJMiUpwJPpAkgqNFMMJHv7oTu/m9MZiSqlvQ98qCHeG3s+OkK0L8ver
+         xxlB++f31Hi1QvDvPxBg7jg+l71IwGTiF34oDiqrIlNSxGaim/qzm2Z6UDKIJnFyWgg7
+         6/hK4V1xpabBauiNKguUoRNfrh8VjQsFSdhuomh3giQ1mFFg12lZkgf36TBWw4gLUeVf
+         5XJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729841942; x=1730446742;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y4pZDfebFFkVewdLIhSt4ZSKyPCjkQIctMcGbulG07o=;
+        b=w6zeSIc8XHpdBTarzJcgfCN6cxmJ/wsVFae89i3I5BP3DXUhWSREg7UGem3ofEMjpb
+         Q4s2GQz+KRHCNlYOrOCCwuTwHtHUdc9+Uz7sIcPk4P9ybB5Rza14a86xBd1i8NfHUkvP
+         10tdTy7mXuJhgCE5l2A/L5DulmyAq8AyFoLzO50u1NfVqpKIEfvxHblkb+xhOlrgLqEU
+         vHdqOY2iRyJt/+PfVYiWyceQwaRKaLQAL1OCTJaSAjnTW6u0Cc5pUTpn5q6O3UI7bI3w
+         +lOFpDyuJfc2dDIpWxekkxbCTzitQUxZW8TlTd67GV22jz63hbj8Ei26Jja3Nj6vR0V4
+         kQ8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUc4Ndx8ucxI8dXtYsIx7gzsTH8uB/qhPuCGkYU7sgpC75d+3v0tpyCIPClpRwGAZDHrc01adfEwCtD@vger.kernel.org, AJvYcCUjxBsFhPUCzhVTYU8ZfUVYrTL95u5Wp6n0qw41GzcjqEjHI8Ize7fcMa9umuSk1q28YlAqPgXkpf3M@vger.kernel.org, AJvYcCUrsOL9nTiVW/qG/Sn6hBB8xCvtQ0In9eDf7ysZb+1VYJDJPTAOg7KR9qmTbwnObCkBDuddS+kAdYcf/L9T@vger.kernel.org, AJvYcCUwoCDux/zVulRJhzWlnA9v7VWtHKf0uO4m1xjv0cDsqdbA9U3vGPkBm3rM7LdFZTUmh90y8CIXckRb8Y0=@vger.kernel.org, AJvYcCVC71exD/69WWZKx42R1RGOuCZ8Q4gYj1MHjKKYj77j+ZGbUMFsGpVfa60Mqyb9hqiAE9FcLUbZYTE=@vger.kernel.org, AJvYcCW+e5jlk1cGAEhsNcuA3yWEPiav0ScnnP1WTgRauMhBdSxxb3WFDa8j0j1SxIxN659TnRJxlIcs@vger.kernel.org, AJvYcCWGJh0/72S59HmVahn7rpUMW0pdOn719EbN/ERATb8/9DCFJuKcqVFjCGrQIKOkUGAJIOW9WyOb40RvYQ==@vger.kernel.org, AJvYcCXR+AdpDQto4XFv6F3MtrLRWoEUaRhRRLT6kDjpncenDGQ6RF4QIhTkOS6t1rRQ+LWYX2ZtYTrGZegApm+YB8Y=@vger.kernel.org, AJvYcCXkD8f3HD4SDY1twDbYb2onuixzPz+ZHvyBgQ6eqKe9iPmE09rknLzsNRz4QbCK31wiVJZHNPyGMRA6@vger.kernel.org, AJvYcCXrgnbUEARireivYR0+nZraf5CIBOjT
+ XrBRLH7tpzLX9M06GOA/cUszPmuD5dnHJXO8w0Wr4cTShhmU@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM96LIOPjGPtsdp7taIzdiVGI5xWEr1Mg2bRQbCKAzeG++PBef
+	G1l/x3YuZTKb5MBQWYmGZrA30LlfY/JhnHIuxntmIhmd1g+3kzGz2+VvduikoGuBiJTQfbECCig
+	jQMvhX0wMXDkhDN6ekl5CZnRICp8=
+X-Google-Smtp-Source: AGHT+IHtWHvmcHrPJZlJuCBSGAWADRoEGByk6bKfJXEb1aOavubnGUftZvjMl5apmpl8NLLh/2FYrDvOm/NTiNWjylE=
+X-Received: by 2002:a05:6902:1085:b0:e28:eb16:dd5e with SMTP id
+ 3f1490d57ef6-e2e3a6dd1a5mr8539029276.52.1729841942048; Fri, 25 Oct 2024
+ 00:39:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-3-tmyu0@nuvoton.com>
+ <CAMRc=Mc+SZN=EytxY=qA-qBEAY_F17GP-7FRE9oLojLbdUoPaQ@mail.gmail.com>
+In-Reply-To: <CAMRc=Mc+SZN=EytxY=qA-qBEAY_F17GP-7FRE9oLojLbdUoPaQ@mail.gmail.com>
+From: =?UTF-8?B?5ri45a2Q5rCR?= <a0282524688@gmail.com>
+Date: Fri, 25 Oct 2024 15:38:51 +0800
+Message-ID: <CAOoeyxW4=+5-QMcd_wgncFC9jgx_1Zf1Tq8RTnBvVqZ1JcUBQg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/9] gpio: Add Nuvoton NCT6694 GPIO support
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org, lars@metafoo.de, 
+	ukleinek@kernel.org, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Soft lockups have been observed on a cluster of Linux-based edge routers
-located in a highly dynamic environment. Using the `bird` service, these
-routers continuously update BGP-advertised routes due to frequently
-changing nexthop destinations, while also managing significant IPv6
-traffic. The lockups occur during the traversal of the multipath
-circular linked-list in the `fib6_select_path` function, particularly
-while iterating through the siblings in the list. The issue typically
-arises when the nodes of the linked list are unexpectedly deleted
-concurrently on a different core—indicated by their 'next' and
-'previous' elements pointing back to the node itself and their reference
-count dropping to zero. This results in an infinite loop, leading to a
-soft lockup that triggers a system panic via the watchdog timer.
+Sorry, resending this email in plain text format.
 
-Apply RCU primitives in the problematic code sections to resolve the
-issue. Where necessary, update the references to fib6_siblings to
-annotate or use the RCU APIs.
+Dear Bart,
 
-Include a test script that reproduces the issue. The script
-periodically updates the routing table while generating a heavy load
-of outgoing IPv6 traffic through multiple iperf3 clients. It
-consistently induces infinite soft lockups within a couple of minutes.
+Thank you for your comments.
 
-Kernel log:
+Bartosz Golaszewski <brgl@bgdev.pl> =E6=96=BC 2024=E5=B9=B410=E6=9C=8824=E6=
+=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=885:47=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Thu, Oct 24, 2024 at 10:59=E2=80=AFAM Ming Yu <a0282524688@gmail.com> =
+wrote:
+> >
+> > This driver supports GPIO and IRQ functionality for NCT6694 MFD
+> > device based on USB interface.
+> >
+> > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+> > ---
+> >  MAINTAINERS                 |   1 +
+> >  drivers/gpio/Kconfig        |  12 +
+> >  drivers/gpio/Makefile       |   1 +
+> >  drivers/gpio/gpio-nct6694.c | 489 ++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 503 insertions(+)
+> >  create mode 100644 drivers/gpio/gpio-nct6694.c
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 30157ca95cf3..2c86d5dab3f1 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -16438,6 +16438,7 @@ NUVOTON NCT6694 MFD DRIVER
+> >  M:     Ming Yu <tmyu0@nuvoton.com>
+> >  L:     linux-kernel@vger.kernel.org
+> >  S:     Supported
+> > +F:     drivers/gpio/gpio-nct6694.c
+> >  F:     drivers/mfd/nct6694.c
+> >  F:     include/linux/mfd/nct6694.h
+> >
+> > diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+> > index d93cd4f722b4..aa78ad9ff4ac 100644
+> > --- a/drivers/gpio/Kconfig
+> > +++ b/drivers/gpio/Kconfig
+> > @@ -1450,6 +1450,18 @@ config GPIO_MAX77650
+> >           GPIO driver for MAX77650/77651 PMIC from Maxim Semiconductor.
+> >           These chips have a single pin that can be configured as GPIO.
+> >
+> > +config GPIO_NCT6694
+> > +       tristate "Nuvoton NCT6694 GPIO controller support"
+> > +       depends on MFD_NCT6694
+> > +       select GENERIC_IRQ_CHIP
+> > +       select GPIOLIB_IRQCHIP
+> > +       help
+> > +         This driver supports 8 GPIO pins per bank that can all be int=
+errupt
+> > +         sources.
+> > +
+> > +         This driver can also be built as a module. If so, the module =
+will be
+> > +         called gpio-nct6694.
+> > +
+> >  config GPIO_PALMAS
+> >         bool "TI PALMAS series PMICs GPIO"
+> >         depends on MFD_PALMAS
+> > diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
+> > index 1429e8c0229b..02c94aa28017 100644
+> > --- a/drivers/gpio/Makefile
+> > +++ b/drivers/gpio/Makefile
+> > @@ -121,6 +121,7 @@ obj-$(CONFIG_GPIO_MXC)                      +=3D gp=
+io-mxc.o
+> >  obj-$(CONFIG_GPIO_MXS)                 +=3D gpio-mxs.o
+> >  obj-$(CONFIG_GPIO_NOMADIK)             +=3D gpio-nomadik.o
+> >  obj-$(CONFIG_GPIO_NPCM_SGPIO)          +=3D gpio-npcm-sgpio.o
+> > +obj-$(CONFIG_GPIO_NCT6694)             +=3D gpio-nct6694.o
+> >  obj-$(CONFIG_GPIO_OCTEON)              +=3D gpio-octeon.o
+> >  obj-$(CONFIG_GPIO_OMAP)                        +=3D gpio-omap.o
+> >  obj-$(CONFIG_GPIO_PALMAS)              +=3D gpio-palmas.o
+> > diff --git a/drivers/gpio/gpio-nct6694.c b/drivers/gpio/gpio-nct6694.c
+> > new file mode 100644
+> > index 000000000000..42c0e6e76730
+> > --- /dev/null
+> > +++ b/drivers/gpio/gpio-nct6694.c
+> > @@ -0,0 +1,489 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Nuvoton NCT6694 GPIO controller driver based on USB interface.
+> > + *
+> > + * Copyright (C) 2024 Nuvoton Technology Corp.
+> > + */
+> > +
+> > +#include <linux/gpio.h>
+>
+> Don't include this header. It's documented as obsolete.
 
- 0 [ffffbd13003e8d30] machine_kexec at ffffffff8ceaf3eb
- 1 [ffffbd13003e8d90] __crash_kexec at ffffffff8d0120e3
- 2 [ffffbd13003e8e58] panic at ffffffff8cef65d4
- 3 [ffffbd13003e8ed8] watchdog_timer_fn at ffffffff8d05cb03
- 4 [ffffbd13003e8f08] __hrtimer_run_queues at ffffffff8cfec62f
- 5 [ffffbd13003e8f70] hrtimer_interrupt at ffffffff8cfed756
- 6 [ffffbd13003e8fd0] __sysvec_apic_timer_interrupt at ffffffff8cea01af
- 7 [ffffbd13003e8ff0] sysvec_apic_timer_interrupt at ffffffff8df1b83d
--- <IRQ stack> --
- 8 [ffffbd13003d3708] asm_sysvec_apic_timer_interrupt at ffffffff8e000ecb
-    [exception RIP: fib6_select_path+299]
-    RIP: ffffffff8ddafe7b  RSP: ffffbd13003d37b8  RFLAGS: 00000287
-    RAX: ffff975850b43600  RBX: ffff975850b40200  RCX: 0000000000000000
-    RDX: 000000003fffffff  RSI: 0000000051d383e4  RDI: ffff975850b43618
-    RBP: ffffbd13003d3800   R8: 0000000000000000   R9: ffff975850b40200
-    R10: 0000000000000000  R11: 0000000000000000  R12: ffffbd13003d3830
-    R13: ffff975850b436a8  R14: ffff975850b43600  R15: 0000000000000007
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- 9 [ffffbd13003d3808] ip6_pol_route at ffffffff8ddb030c
-10 [ffffbd13003d3888] ip6_pol_route_input at ffffffff8ddb068c
-11 [ffffbd13003d3898] fib6_rule_lookup at ffffffff8ddf02b5
-12 [ffffbd13003d3928] ip6_route_input at ffffffff8ddb0f47
-13 [ffffbd13003d3a18] ip6_rcv_finish_core.constprop.0 at ffffffff8dd950d0
-14 [ffffbd13003d3a30] ip6_list_rcv_finish.constprop.0 at ffffffff8dd96274
-15 [ffffbd13003d3a98] ip6_sublist_rcv at ffffffff8dd96474
-16 [ffffbd13003d3af8] ipv6_list_rcv at ffffffff8dd96615
-17 [ffffbd13003d3b60] __netif_receive_skb_list_core at ffffffff8dc16fec
-18 [ffffbd13003d3be0] netif_receive_skb_list_internal at ffffffff8dc176b3
-19 [ffffbd13003d3c50] napi_gro_receive at ffffffff8dc565b9
-20 [ffffbd13003d3c80] ice_receive_skb at ffffffffc087e4f5 [ice]
-21 [ffffbd13003d3c90] ice_clean_rx_irq at ffffffffc0881b80 [ice]
-22 [ffffbd13003d3d20] ice_napi_poll at ffffffffc088232f [ice]
-23 [ffffbd13003d3d80] __napi_poll at ffffffff8dc18000
-24 [ffffbd13003d3db8] net_rx_action at ffffffff8dc18581
-25 [ffffbd13003d3e40] __do_softirq at ffffffff8df352e9
-26 [ffffbd13003d3eb0] run_ksoftirqd at ffffffff8ceffe47
-27 [ffffbd13003d3ec0] smpboot_thread_fn at ffffffff8cf36a30
-28 [ffffbd13003d3ee8] kthread at ffffffff8cf2b39f
-29 [ffffbd13003d3f28] ret_from_fork at ffffffff8ce5fa64
-30 [ffffbd13003d3f50] ret_from_fork_asm at ffffffff8ce03cbb
+[Ming] Okay! I'll drop it in the next patch.
 
-Fixes: 66f5d6ce53e6 ("ipv6: replace rwlock with rcu and spinlock in fib6_table")
-Reported-by: Adrian Oliver <kernel@aoliver.ca>
-Signed-off-by: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: David Ahern <dsahern@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Ido Schimmel <idosch@idosch.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
-v5 -> v6:
-	* Adjust the comment line lengths in the test script to a maximum of
-	  80 characters
-	* Change memory allocation in inet6_rt_notify from gfp_any() to GFP_ATOMIC for
-	  atomic allocation in non-blocking contexts, as suggested by Ido Schimmel
-	* NOTE: I have executed the test script on both bare-metal servers and
-	  virtualized environments such as QEMU and vng. In the case of bare-metal, it
-	  consistently triggers a soft lockup in under a minute on unpatched kernels.
-	  For the virtualized environments, an unpatched kernel compiled with the
-	  Ubuntu 24.04 configuration also triggers a soft lockup, though it takes
-	  longer; however, it did not trigger a soft lockup on kernels compiled with
-	  configurations provided in:
+>
+> > +#include <linux/gpio/driver.h>
+> > +#include <linux/module.h>
+> > +#include <linux/interrupt.h>
+> > +#include <linux/platform_device.h>
+> > +#include <linux/mfd/core.h>
+> > +#include <linux/mfd/nct6694.h>
+> > +
+>
+> You only use it once, drop it.
 
-	  https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+[Ming] That line is blank, did you mean #include <linux/gpio.h>?
 
-	  leading to potential false negatives in the test results.
+>
+> > +#define DRVNAME "nct6694-gpio"
+> > +
+> > +/* Host interface */
+> > +#define REQUEST_GPIO_MOD               0xFF
+> > +#define REQUEST_GPIO_LEN               0x01
+> > +
+> > +/* Report Channel */
+> > +#define GPIO_VER_REG                   0x90
+> > +#define GPIO_VALID_REG                 0x110
+> > +#define GPI_DATA_REG                   0x120
+> > +#define GPO_DIR_REG                    0x170
+> > +#define GPO_TYPE_REG                   0x180
+> > +#define GPO_DATA_REG                   0x190
+> > +
+> > +#define GPI_STS_REG                    0x130
+> > +#define GPI_CLR_REG                    0x140
+> > +#define GPI_FALLING_REG                        0x150
+> > +#define GPI_RISING_REG                 0x160
+> > +
+>
+> Please use the NCT6694 prefix for these defines, otherwise it's not
+> clear whether they come from the driver or from GPIO core.
+>
+> []
 
-	  I am curious if this test can be executed on a bare-metal machine within a
-	  CI system, if such a setup exists, rather than in a virtualized environment.
-	  If that’s not possible, how can I apply a different kernel configuration,
-	  such as the one used in Ubuntu 24.04, for this test? Please advise.
+[Ming] Okay! I'll add the prefix to the defines in the next patch.
 
-v4 -> v5:
-	* Addressed review comments from Paolo Abeni.
-	* Added additional clarifying comments in the test script.
-	* Minor cleanup performed in the test script.
+>
+> > +
+> > +static const char * const nct6694_gpio_name[] =3D {
+> > +       "NCT6694-GPIO0",
+> > +       "NCT6694-GPIO1",
+> > +       "NCT6694-GPIO2",
+> > +       "NCT6694-GPIO3",
+> > +       "NCT6694-GPIO4",
+> > +       "NCT6694-GPIO5",
+> > +       "NCT6694-GPIO6",
+> > +       "NCT6694-GPIO7",
+> > +       "NCT6694-GPIO8",
+> > +       "NCT6694-GPIO9",
+> > +       "NCT6694-GPIOA",
+> > +       "NCT6694-GPIOB",
+> > +       "NCT6694-GPIOC",
+> > +       "NCT6694-GPIOD",
+> > +       "NCT6694-GPIOE",
+> > +       "NCT6694-GPIOF",
+> > +};
+>
+> This looks like it corresponds with the MFD cells and makes me wonder:
+> am I getting that wrong or do you want to register 0xf GPIO chips? Or
+> a single GPIO chip with 0xf lines? What is the topology?
 
-v3 -> v4:
-	* Added RCU primitives to rt6_fill_node(). I found that this function is typically
-	  called either with a table lock held or within rcu_read_lock/rcu_read_unlock
-	  pairs, except in the following call chain, where the protection is unclear:
+[Ming] Yes, it corresponds to the MFD cells.
+I would like to register 16 GPIO chips, each with 8 lines.
+The chip has 128 pins totally, the core can check if the pin is valid throu=
+gh
+the init_valid_mask() callback.
 
-		rt_fill_node()
-		fib6_info_hw_flags_set()
-		mlxsw_sp_fib6_offload_failed_flag_set()
-		mlxsw_sp_router_fib6_event_work()
+>
+> > +
+> > +static int nct6694_gpio_probe(struct platform_device *pdev)
+> > +{
+> > +       const struct mfd_cell *cell =3D mfd_get_cell(pdev);
+> > +       struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
+> > +       struct nct6694_gpio_data *data;
+> > +       struct gpio_irq_chip *girq;
+> > +       int ret;
+> > +
+> > +       data =3D devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
+> > +       if (!data)
+> > +               return -ENOMEM;
+> > +
+> > +       data->nct6694 =3D nct6694;
+> > +       data->group =3D cell->id;
+> > +
+> > +       data->gpio.label                =3D nct6694_gpio_name[cell->id]=
+;
+> > +       data->gpio.direction_input      =3D nct6694_direction_input;
+> > +       data->gpio.get                  =3D nct6694_get_value;
+> > +       data->gpio.direction_output     =3D nct6694_direction_output;
+> > +       data->gpio.set                  =3D nct6694_set_value;
+> > +       data->gpio.get_direction        =3D nct6694_get_direction;
+> > +       data->gpio.set_config           =3D nct6694_set_config;
+> > +       data->gpio.init_valid_mask      =3D nct6694_init_valid_mask;
+> > +       data->gpio.base                 =3D -1;
+> > +       data->gpio.can_sleep            =3D false;
+> > +       data->gpio.owner                =3D THIS_MODULE;
+> > +       data->gpio.ngpio                =3D 8;
+> > +
+> > +       INIT_WORK(&data->irq_work, nct6694_irq);
+> > +       INIT_WORK(&data->irq_trig_work, nct6694_irq_trig);
+> > +       mutex_init(&data->irq_lock);
+> > +
+> > +       ret =3D nct6694_register_handler(nct6694, GPIO_IRQ_STATUS,
+> > +                                      nct6694_gpio_handler, data);
+> > +       if (ret) {
+> > +               dev_err(&pdev->dev, "%s:  Failed to register handler: %=
+pe\n",
+> > +                       __func__, ERR_PTR(ret));
+> > +               return ret;
+> > +       }
+> > +
+> > +       platform_set_drvdata(pdev, data);
+> > +
+> > +       ret =3D nct6694_get_irq_trig(data);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       /* Register gpio chip to GPIO framework */
+> > +       girq =3D &data->gpio.irq;
+> > +       gpio_irq_chip_set_chip(girq, &nct6694_irq_chip);
+> > +       girq->parent_handler =3D NULL;
+> > +       girq->num_parents =3D 0;
+> > +       girq->parents =3D NULL;
+> > +       girq->default_type =3D IRQ_TYPE_NONE;
+> > +       girq->handler =3D handle_level_irq;
+> > +       girq->threaded =3D true;
+> > +
+> > +       ret =3D gpiochip_add_data(&data->gpio, data);
+> > +       if (ret) {
+> > +               dev_err(&pdev->dev, "%s: Failed to register GPIO chip: =
+%pe",
+> > +                       __func__, ERR_PTR(ret));
+> > +               return ret;
+> > +       }
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +static void nct6694_gpio_remove(struct platform_device *pdev)
+> > +{
+> > +       struct nct6694_gpio_data *data =3D platform_get_drvdata(pdev);
+> > +
+> > +       gpiochip_remove(&data->gpio);
+>
+> This should be dropped in favor of using devm_gpiochip_add_data().
+> Especially since you probably want to cancel the irq_work before
+> removing the chip.
 
-	  The last function is initialized as a work item in mlxsw_sp_router_fib_event()
-	  and scheduled for deferred execution. I am unsure if the execution context of
-	  this work item is protected by any table lock or rcu_read_lock/rcu_read_unlock
-	  pair, so I have added the protection. Please let me know if this is redundant.
+[Ming] Okay! I'll change it in the next patch.
 
-	* Other review comments addressed
+>
+> > +       cancel_work(&data->irq_work);
+> > +       cancel_work(&data->irq_trig_work);
+> > +}
+> > +
+> > +static struct platform_driver nct6694_gpio_driver =3D {
+> > +       .driver =3D {
+> > +               .name   =3D DRVNAME,
+> > +       },
+> > +       .probe          =3D nct6694_gpio_probe,
+> > +       .remove         =3D nct6694_gpio_remove,
+> > +};
+> > +
+> > +static int __init nct6694_init(void)
+> > +{
+> > +       int err;
+> > +
+> > +       err =3D platform_driver_register(&nct6694_gpio_driver);
+> > +       if (!err) {
+> > +               if (err)
+>
+> If err is equal to 0, check if it's not equal to zero?
+>
+> > +                       platform_driver_unregister(&nct6694_gpio_driver=
+);
+>
+> If platform_driver_register() failed, then the device was never registere=
+d.
+>
+> > +       }
+> > +
+> > +       return err;
+> > +}
+> > +subsys_initcall(nct6694_init);
+>
+> Any reason why this must be initialized earlier? It's a USB driver after =
+all.
 
-v2 -> v3:
-	* Removed redundant rcu_read_lock()/rcu_read_unlock() pairs
-	* Revised the test script based on Ido Schimmel's feedback
-	* Updated the test script to ensure compatibility with the latest iperf3 version
-	* Fixed new warnings generated with 'C=2' in the previous version
-	* Other review comments addressed
+[Ming] For platform driver registration, I'll change it to
+module_platform_driver()
+in the next patch.
 
-v1 -> v2:
-	* list_del_rcu() is applied exclusively to legacy multipath code
-	* All occurrences of fib6_siblings have been modified to utilize RCU
-	  APIs for annotation and usage.
-	* Additionally, a test script for reproducing the reported
-	  issue is included
----
- net/ipv6/ip6_fib.c                            |   8 +-
- net/ipv6/route.c                              |  45 ++-
- tools/testing/selftests/net/Makefile          |   1 +
- .../net/ipv6_route_update_soft_lockup.sh      | 262 ++++++++++++++++++
- 4 files changed, 297 insertions(+), 19 deletions(-)
- create mode 100755 tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh
-
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index eb111d20615c..9a1c59275a10 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1190,8 +1190,8 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 		while (sibling) {
- 			if (sibling->fib6_metric == rt->fib6_metric &&
- 			    rt6_qualify_for_ecmp(sibling)) {
--				list_add_tail(&rt->fib6_siblings,
--					      &sibling->fib6_siblings);
-+				list_add_tail_rcu(&rt->fib6_siblings,
-+						  &sibling->fib6_siblings);
- 				break;
- 			}
- 			sibling = rcu_dereference_protected(sibling->fib6_next,
-@@ -1252,7 +1252,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 							 fib6_siblings)
- 					sibling->fib6_nsiblings--;
- 				rt->fib6_nsiblings = 0;
--				list_del_init(&rt->fib6_siblings);
-+				list_del_rcu(&rt->fib6_siblings);
- 				rt6_multipath_rebalance(next_sibling);
- 				return err;
- 			}
-@@ -1970,7 +1970,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
- 					 &rt->fib6_siblings, fib6_siblings)
- 			sibling->fib6_nsiblings--;
- 		rt->fib6_nsiblings = 0;
--		list_del_init(&rt->fib6_siblings);
-+		list_del_rcu(&rt->fib6_siblings);
- 		rt6_multipath_rebalance(next_sibling);
- 	}
- 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b4251915585f..b9b986bda943 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -413,8 +413,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
- 		      struct flowi6 *fl6, int oif, bool have_oif_match,
- 		      const struct sk_buff *skb, int strict)
- {
--	struct fib6_info *sibling, *next_sibling;
- 	struct fib6_info *match = res->f6i;
-+	struct fib6_info *sibling;
- 
- 	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
- 		goto out;
-@@ -440,8 +440,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
- 	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
- 		goto out;
- 
--	list_for_each_entry_safe(sibling, next_sibling, &match->fib6_siblings,
--				 fib6_siblings) {
-+	list_for_each_entry_rcu(sibling, &match->fib6_siblings,
-+				fib6_siblings) {
- 		const struct fib6_nh *nh = sibling->fib6_nh;
- 		int nh_upper_bound;
- 
-@@ -5195,14 +5195,18 @@ static void ip6_route_mpath_notify(struct fib6_info *rt,
- 	 * nexthop. Since sibling routes are always added at the end of
- 	 * the list, find the first sibling of the last route appended
- 	 */
-+	rcu_read_lock();
-+
- 	if ((nlflags & NLM_F_APPEND) && rt_last && rt_last->fib6_nsiblings) {
--		rt = list_first_entry(&rt_last->fib6_siblings,
--				      struct fib6_info,
--				      fib6_siblings);
-+		rt = list_first_or_null_rcu(&rt_last->fib6_siblings,
-+					    struct fib6_info,
-+					    fib6_siblings);
- 	}
- 
- 	if (rt)
- 		inet6_rt_notify(RTM_NEWROUTE, rt, info, nlflags);
-+
-+	rcu_read_unlock();
- }
- 
- static bool ip6_route_mpath_should_notify(const struct fib6_info *rt)
-@@ -5547,17 +5551,21 @@ static size_t rt6_nlmsg_size(struct fib6_info *f6i)
- 		nexthop_for_each_fib6_nh(f6i->nh, rt6_nh_nlmsg_size,
- 					 &nexthop_len);
- 	} else {
--		struct fib6_info *sibling, *next_sibling;
- 		struct fib6_nh *nh = f6i->fib6_nh;
-+		struct fib6_info *sibling;
- 
- 		nexthop_len = 0;
- 		if (f6i->fib6_nsiblings) {
- 			rt6_nh_nlmsg_size(nh, &nexthop_len);
- 
--			list_for_each_entry_safe(sibling, next_sibling,
--						 &f6i->fib6_siblings, fib6_siblings) {
-+			rcu_read_lock();
-+
-+			list_for_each_entry_rcu(sibling, &f6i->fib6_siblings,
-+						fib6_siblings) {
- 				rt6_nh_nlmsg_size(sibling->fib6_nh, &nexthop_len);
- 			}
-+
-+			rcu_read_unlock();
- 		}
- 		nexthop_len += lwtunnel_get_encap_size(nh->fib_nh_lws);
- 	}
-@@ -5721,7 +5729,7 @@ static int rt6_fill_node(struct net *net, struct sk_buff *skb,
- 		    lwtunnel_fill_encap(skb, dst->lwtstate, RTA_ENCAP, RTA_ENCAP_TYPE) < 0)
- 			goto nla_put_failure;
- 	} else if (rt->fib6_nsiblings) {
--		struct fib6_info *sibling, *next_sibling;
-+		struct fib6_info *sibling;
- 		struct nlattr *mp;
- 
- 		mp = nla_nest_start_noflag(skb, RTA_MULTIPATH);
-@@ -5733,14 +5741,21 @@ static int rt6_fill_node(struct net *net, struct sk_buff *skb,
- 				    0) < 0)
- 			goto nla_put_failure;
- 
--		list_for_each_entry_safe(sibling, next_sibling,
--					 &rt->fib6_siblings, fib6_siblings) {
-+		rcu_read_lock();
-+
-+		list_for_each_entry_rcu(sibling, &rt->fib6_siblings,
-+					fib6_siblings) {
- 			if (fib_add_nexthop(skb, &sibling->fib6_nh->nh_common,
- 					    sibling->fib6_nh->fib_nh_weight,
--					    AF_INET6, 0) < 0)
-+					    AF_INET6, 0) < 0) {
-+				rcu_read_unlock();
-+
- 				goto nla_put_failure;
-+			}
- 		}
- 
-+		rcu_read_unlock();
-+
- 		nla_nest_end(skb, mp);
- 	} else if (rt->nh) {
- 		if (nla_put_u32(skb, RTA_NH_ID, rt->nh->id))
-@@ -6177,7 +6192,7 @@ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
- 	err = -ENOBUFS;
- 	seq = info->nlh ? info->nlh->nlmsg_seq : 0;
- 
--	skb = nlmsg_new(rt6_nlmsg_size(rt), gfp_any());
-+	skb = nlmsg_new(rt6_nlmsg_size(rt), GFP_ATOMIC);
- 	if (!skb)
- 		goto errout;
- 
-@@ -6190,7 +6205,7 @@ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
- 		goto errout;
- 	}
- 	rtnl_notify(skb, net, info->portid, RTNLGRP_IPV6_ROUTE,
--		    info->nlh, gfp_any());
-+		    info->nlh, GFP_ATOMIC);
- 	return;
- errout:
- 	rtnl_set_sk_err(net, RTNLGRP_IPV6_ROUTE, err);
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 649f1fe0dc46..88cbac27aa10 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -96,6 +96,7 @@ TEST_PROGS += fdb_flush.sh
- TEST_PROGS += fq_band_pktlimit.sh
- TEST_PROGS += vlan_hw_filter.sh
- TEST_PROGS += bpf_offload.py
-+TEST_PROGS += ipv6_route_update_soft_lockup.sh
- 
- # YNL files, must be before "include ..lib.mk"
- EXTRA_CLEAN += $(OUTPUT)/libynl.a
-diff --git a/tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh b/tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh
-new file mode 100755
-index 000000000000..c61a7a8352cf
---- /dev/null
-+++ b/tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh
-@@ -0,0 +1,262 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Testing for potential kernel soft lockup during IPv6 routing table
-+# refresh under heavy outgoing IPv6 traffic. If a kernel soft lockup
-+# occurs, a kernel panic will be triggered to prevent associated issues.
-+#
-+#
-+#                            Test Environment Layout
-+#
-+# ┌----------------┐                                         ┌----------------┐
-+# |     SOURCE_NS  |                                         |     SINK_NS    |
-+# |    NAMESPACE   |                                         |    NAMESPACE   |
-+# |(iperf3 clients)|                                         |(iperf3 servers)|
-+# |                |                                         |                |
-+# |                |                                         |                |
-+# |    ┌-----------|                             nexthops    |---------┐      |
-+# |    |veth_source|<--------------------------------------->|veth_sink|<┐    |
-+# |    └-----------|2001:0DB8:1::0:1/96  2001:0DB8:1::1:1/96 |---------┘ |    |
-+# |                |         ^           2001:0DB8:1::1:2/96 |           |    |
-+# |                |         .                   .           |       fwd |    |
-+# |  ┌---------┐   |         .                   .           |           |    |
-+# |  |   IPv6  |   |         .                   .           |           V    |
-+# |  | routing |   |         .           2001:0DB8:1::1:80/96|        ┌-----┐ |
-+# |  |  table  |   |         .                               |        | lo  | |
-+# |  | nexthop |   |         .                               └--------┴-----┴-┘
-+# |  | update  |   |         ............................> 2001:0DB8:2::1:1/128
-+# |  └-------- ┘   |
-+# └----------------┘
-+#
-+# The test script sets up two network namespaces, source_ns and sink_ns,
-+# connected via a veth link. Within source_ns, it continuously updates the
-+# IPv6 routing table by flushing and inserting IPV6_NEXTHOP_ADDR_COUNT nexthop
-+# IPs destined for SINK_LOOPBACK_IP_ADDR in sink_ns. This refresh occurs at a
-+# rate of 1/ROUTING_TABLE_REFRESH_PERIOD per second for TEST_DURATION seconds.
-+#
-+# Simultaneously, multiple iperf3 clients within source_ns generate heavy
-+# outgoing IPv6 traffic. Each client is assigned a unique port number starting
-+# at 5000 and incrementing sequentially. Each client targets a unique iperf3
-+# server running in sink_ns, connected to the SINK_LOOPBACK_IFACE interface
-+# using the same port number.
-+#
-+# The number of iperf3 servers and clients is set to half of the total
-+# available cores on each machine.
-+#
-+# NOTE: We have tested this script on machines with various CPU specifications,
-+# ranging from lower to higher performance as listed below. The test script
-+# effectively triggered a kernel soft lockup on machines running an unpatched
-+# kernel in under a minute:
-+#
-+# - 1x Intel Xeon E-2278G 8-Core Processor @ 3.40GHz
-+# - 1x Intel Xeon E-2378G Processor 8-Core @ 2.80GHz
-+# - 1x AMD EPYC 7401P 24-Core Processor @ 2.00GHz
-+# - 1x AMD EPYC 7402P 24-Core Processor @ 2.80GHz
-+# - 2x Intel Xeon Gold 5120 14-Core Processor @ 2.20GHz
-+# - 1x Ampere Altra Q80-30 80-Core Processor @ 3.00GHz
-+# - 2x Intel Xeon Gold 5120 14-Core Processor @ 2.20GHz
-+# - 2x Intel Xeon Silver 4214 24-Core Processor @ 2.20GHz
-+# - 1x AMD EPYC 7502P 32-Core @ 2.50GHz
-+# - 1x Intel Xeon Gold 6314U 32-Core Processor @ 2.30GHz
-+# - 2x Intel Xeon Gold 6338 32-Core Processor @ 2.00GHz
-+#
-+# On less performant machines, you may need to increase the TEST_DURATION
-+# parameter to enhance the likelihood of encountering a race condition leading
-+# to a kernel soft lockup and avoid a false negative result.
-+#
-+# NOTE: The test may not produce the expected result in virtualized
-+# environments (e.g., qemu) due to differences in timing and CPU handling,
-+# which can affect the conditions needed to trigger a soft lockup.
-+
-+source lib.sh
-+source net_helper.sh
-+
-+TEST_DURATION=300
-+ROUTING_TABLE_REFRESH_PERIOD=0.01
-+
-+IPERF3_BITRATE="300m"
-+
-+
-+IPV6_NEXTHOP_ADDR_COUNT="128"
-+IPV6_NEXTHOP_ADDR_MASK="96"
-+IPV6_NEXTHOP_PREFIX="2001:0DB8:1"
-+
-+
-+SOURCE_TEST_IFACE="veth_source"
-+SOURCE_TEST_IP_ADDR="2001:0DB8:1::0:1/96"
-+
-+SINK_TEST_IFACE="veth_sink"
-+# ${SINK_TEST_IFACE} is populated with the following range of IPv6 addresses:
-+# 2001:0DB8:1::1:1  to 2001:0DB8:1::1:${IPV6_NEXTHOP_ADDR_COUNT}
-+SINK_LOOPBACK_IFACE="lo"
-+SINK_LOOPBACK_IP_MASK="128"
-+SINK_LOOPBACK_IP_ADDR="2001:0DB8:2::1:1"
-+
-+nexthop_ip_list=""
-+termination_signal=""
-+kernel_softlokup_panic_prev_val=""
-+
-+terminate_ns_processes_by_pattern() {
-+	local ns=$1
-+	local pattern=$2
-+
-+	for pid in $(ip netns pids ${ns}); do
-+		[ -e /proc/$pid/cmdline ] && grep -qe "${pattern}" /proc/$pid/cmdline && kill -9 $pid
-+	done
-+}
-+
-+cleanup() {
-+	echo "info: cleaning up namespaces and terminating all processes within them..."
-+
-+
-+	# Terminate iperf3 instances running in the source_ns. To avoid race
-+	# conditions, first iterate over the PIDs and terminate those
-+	# associated with the bash shells running the
-+	# `while true; do iperf3 -c ...; done` loops. In a second iteration,
-+	# terminate the individual `iperf3 -c ...` instances.
-+	terminate_ns_processes_by_pattern ${source_ns} while
-+	terminate_ns_processes_by_pattern ${source_ns} iperf3
-+
-+	# Repeat the same process for sink_ns
-+	terminate_ns_processes_by_pattern ${sink_ns} while
-+	terminate_ns_processes_by_pattern ${sink_ns} iperf3
-+
-+	# Check if any iperf3 instances are still running. This could happen
-+	# if a core has entered an infinite loop and the timeout for detecting
-+	# the soft lockup has not expired, but either the test interval has
-+	# already elapsed or the test was terminated manually (e.g., with ^C)
-+	for pid in $(ip netns pids ${source_ns}); do
-+		if [ -e /proc/$pid/cmdline ] && grep -qe 'iperf3' /proc/$pid/cmdline; then
-+			echo "FAIL: unable to terminate some iperf3 instances. Soft lockup is underway. A kernel panic is on the way!"
-+			exit ${ksft_fail}
-+		fi
-+	done
-+
-+	if [ "$termination_signal" == "SIGINT" ]; then
-+		echo "SKIP: Termination due to ^C (SIGINT)"
-+	elif [ "$termination_signal" == "SIGALRM" ]; then
-+		echo "PASS: No kernel soft lockup occurred during this ${TEST_DURATION} second test"
-+	fi
-+
-+	cleanup_ns ${source_ns} ${sink_ns}
-+
-+	sysctl -qw kernel.softlockup_panic=${kernel_softlokup_panic_prev_val}
-+}
-+
-+setup_prepare() {
-+	setup_ns source_ns sink_ns
-+
-+	ip -n ${source_ns} link add name ${SOURCE_TEST_IFACE} type veth peer name ${SINK_TEST_IFACE} netns ${sink_ns}
-+
-+	# Setting up the Source namespace
-+	ip -n ${source_ns} addr add ${SOURCE_TEST_IP_ADDR} dev ${SOURCE_TEST_IFACE}
-+	ip -n ${source_ns} link set dev ${SOURCE_TEST_IFACE} qlen 10000
-+	ip -n ${source_ns} link set dev ${SOURCE_TEST_IFACE} up
-+	ip netns exec ${source_ns} sysctl -qw net.ipv6.fib_multipath_hash_policy=1
-+
-+	# Setting up the Sink namespace
-+	ip -n ${sink_ns} addr add ${SINK_LOOPBACK_IP_ADDR}/${SINK_LOOPBACK_IP_MASK} dev ${SINK_LOOPBACK_IFACE}
-+	ip -n ${sink_ns} link set dev ${SINK_LOOPBACK_IFACE} up
-+	ip netns exec ${sink_ns} sysctl -qw net.ipv6.conf.${SINK_LOOPBACK_IFACE}.forwarding=1
-+
-+	ip -n ${sink_ns} link set ${SINK_TEST_IFACE} up
-+	ip netns exec ${sink_ns} sysctl -qw net.ipv6.conf.${SINK_TEST_IFACE}.forwarding=1
-+
-+
-+	# Populate nexthop IPv6 addresses on the test interface in the sink_ns
-+	echo "info: populating ${IPV6_NEXTHOP_ADDR_COUNT} IPv6 addresses on the ${SINK_TEST_IFACE} interface ..."
-+	for IP in $(seq 1 ${IPV6_NEXTHOP_ADDR_COUNT}); do
-+		ip -n ${sink_ns} addr add ${IPV6_NEXTHOP_PREFIX}::$(printf "1:%x" "${IP}")/${IPV6_NEXTHOP_ADDR_MASK} dev ${SINK_TEST_IFACE};
-+	done
-+
-+	# Preparing list of nexthops
-+	for IP in $(seq 1 ${IPV6_NEXTHOP_ADDR_COUNT}); do
-+		nexthop_ip_list=$nexthop_ip_list" nexthop via ${IPV6_NEXTHOP_PREFIX}::$(printf "1:%x" $IP) dev ${SOURCE_TEST_IFACE} weight 1"
-+	done
-+}
-+
-+
-+test_soft_lockup_during_routing_table_refresh() {
-+	# Start num_of_iperf_servers iperf3 servers in the sink_ns namespace,
-+	# each listening on ports starting at 5001 and incrementing
-+	# sequentially. Since iperf3 instances may terminate unexpectedly, a
-+	# while loop is used to automatically restart them in such cases.
-+	echo "info: starting ${num_of_iperf_servers} iperf3 servers in the sink_ns namespace ..."
-+	for i in $(seq 1 ${num_of_iperf_servers}); do
-+		cmd="iperf3 --bind ${SINK_LOOPBACK_IP_ADDR} -s -p $(printf '5%03d' ${i}) --rcv-timeout 200 &>/dev/null"
-+		ip netns exec ${sink_ns} bash -c "while true; do ${cmd}; done &" &>/dev/null
-+	done
-+
-+	# Wait for the iperf3 servers to be ready
-+	for i in $(seq ${num_of_iperf_servers}); do
-+		port=$(printf '5%03d' ${i});
-+		wait_local_port_listen ${sink_ns} ${port} tcp
-+	done
-+
-+	# Continuously refresh the routing table in the background within
-+	# the source_ns namespace
-+	ip netns exec ${source_ns} bash -c "
-+		while \$(ip netns list | grep -q ${source_ns}); do
-+			ip -6 route add ${SINK_LOOPBACK_IP_ADDR}/${SINK_LOOPBACK_IP_MASK} ${nexthop_ip_list};
-+			sleep ${ROUTING_TABLE_REFRESH_PERIOD};
-+			ip -6 route delete ${SINK_LOOPBACK_IP_ADDR}/${SINK_LOOPBACK_IP_MASK};
-+		done &"
-+
-+	# Start num_of_iperf_servers iperf3 clients in the source_ns namespace,
-+	# each sending TCP traffic on sequential ports starting at 5001.
-+	# Since iperf3 instances may terminate unexpectedly (e.g., if the route
-+	# to the server is deleted in the background during a route refresh), a
-+	# while loop is used to automatically restart them in such cases.
-+	echo "info: starting ${num_of_iperf_servers} iperf3 clients in the source_ns namespace ..."
-+	for i in $(seq 1 ${num_of_iperf_servers}); do
-+		cmd="iperf3 -c ${SINK_LOOPBACK_IP_ADDR} -p $(printf '5%03d' ${i}) --length 64 --bitrate ${IPERF3_BITRATE} -t 0 --connect-timeout 150 &>/dev/null"
-+		ip netns exec ${source_ns} bash -c "while true; do ${cmd}; done &" &>/dev/null
-+	done
-+
-+	echo "info: IPv6 routing table is being updated at the rate of $(echo "1/${ROUTING_TABLE_REFRESH_PERIOD}" | bc)/s for ${TEST_DURATION} seconds ..."
-+	echo "info: A kernel soft lockup, if detected, results in a kernel panic!"
-+
-+	wait
-+}
-+
-+# Make sure 'iperf3' is installed, skip the test otherwise
-+if [ ! -x "$(command -v "iperf3")" ]; then
-+	echo "SKIP: 'iperf3' is not installed. Skipping the test."
-+	exit ${ksft_skip}
-+fi
-+
-+# Determine the number of cores on the machine
-+num_of_iperf_servers=$(( $(nproc)/2 ))
-+
-+# Check if we are running on a multi-core machine, skip the test otherwise
-+if [ "${num_of_iperf_servers}" -eq 0 ]; then
-+	echo "SKIP: This test is not valid on a single core machine!"
-+	exit ${ksft_skip}
-+fi
-+
-+# Since the kernel soft lockup we're testing causes at least one core to enter
-+# an infinite loop, destabilizing the host and likely affecting subsequent
-+# tests, we trigger a kernel panic instead of reporting a failure and
-+# continuing
-+kernel_softlokup_panic_prev_val=$(sysctl -n kernel.softlockup_panic)
-+sysctl -qw kernel.softlockup_panic=1
-+
-+handle_sigint() {
-+	termination_signal="SIGINT"
-+	cleanup
-+	exit ${ksft_skip}
-+}
-+
-+handle_sigalrm() {
-+	termination_signal="SIGALRM"
-+	cleanup
-+	exit ${ksft_pass}
-+}
-+
-+trap handle_sigint SIGINT
-+trap handle_sigalrm SIGALRM
-+
-+(sleep ${TEST_DURATION} && kill -s SIGALRM $$)&
-+
-+setup_prepare
-+test_soft_lockup_during_routing_table_refresh
--- 
-2.43.0
-
+>
+> > +
+> > +static void __exit nct6694_exit(void)
+> > +{
+> > +       platform_driver_unregister(&nct6694_gpio_driver);
+> > +}
+> > +module_exit(nct6694_exit);
+> > +
+> > +MODULE_DESCRIPTION("USB-GPIO controller driver for NCT6694");
+> > +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> > +MODULE_LICENSE("GPL");
+> > --
+> > 2.34.1
+> >
+>
+> Bart
 
