@@ -1,111 +1,180 @@
-Return-Path: <netdev+bounces-139327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6152F9B182B
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 14:43:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D309B1836
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 14:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8497282DB9
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 12:43:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CA451F219F5
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 12:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724581D5178;
-	Sat, 26 Oct 2024 12:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20CE1D516A;
+	Sat, 26 Oct 2024 12:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvMdppCQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJzMvpUw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F8338DD3;
-	Sat, 26 Oct 2024 12:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CF718800D;
+	Sat, 26 Oct 2024 12:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729946609; cv=none; b=t18D0cXO+jCIV4sES+yLbpoLYTnfagM/R4qgq7F5gpAAJsh35vEHx07tLhb/aHqys04faSjqTAqvxXAAahk8oDAioT9c5MC1bmab7re2FeYAo9lp1+AXOJCvd3tM0eoM9vCtH0KMNXFfURz7+Qu+xHmuTJuKEbYuKVTEDEej+jU=
+	t=1729947244; cv=none; b=M+WYCKdvXd5L+fHAZ9tebllKTmyfX5O9scMqVja8sL+kO7Y9nhiFA8J27FBBzToHS9h3QKn7uj1lxPjdkZYQg14FzwDswYqjzMP/yHoIw+Y7loc9bpyNZx8hjASB0ox+ontHr2F5AGZCaof41InqPUZv2OniRSbQMeZ1dBIyFWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729946609; c=relaxed/simple;
-	bh=AA+ZyvaduaES7kbYYENkucmRIN9PvxOGb9wVrFewfrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kul3tVO1LeFdc/R1LZd3Bc6YtoxRfX54bYn61ZQfiW25FAI9/SZjfyuAhT0ZwrWQnCGGNsDVtv/AZJBPmB1x19yO3p/23JITICYTjduFW32qmwrqEWUH//c3nc8NaJvy/5+b5rwUkcPifdSRST0FdMkTntiK/i8CRfXH+ax823k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VvMdppCQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D20C4CEC6;
-	Sat, 26 Oct 2024 12:43:25 +0000 (UTC)
+	s=arc-20240116; t=1729947244; c=relaxed/simple;
+	bh=EXe3LG6/pgVGkYVneepsqC/jPnGrbyEGJMRy6FLBnrg=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Hjhtv+q1UKZ4ZuJ1m7vX/Ey1mfcZ1xqz8OBVUFGDkWG6FcNVUhapGQN1LMkaPBGQa5E7zu0ztn5qv4Ph/JMZLvdVnQs6LZ3s5hipiJfqDInA0PDqP9idkR5sK2KkOdNgfEekvnNaLot/L88X1+9qouDUckZrFuvCASX/avV69uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJzMvpUw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF472C4CEC7;
+	Sat, 26 Oct 2024 12:54:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729946607;
-	bh=AA+ZyvaduaES7kbYYENkucmRIN9PvxOGb9wVrFewfrU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VvMdppCQ0SiUXA3BlPhVjCSWtNU5jQ6EsOb0+AQnLRA141tW4v+wYz1Z4IqXGDunW
-	 o/zXW/roEegF7Nkh5Al+/VU2B580uAY5hpMlkktoDHEspNoOfsxCW7QMSm/SvnYKzR
-	 jp5PyVJ96bg55a+nbAiad+v0ufcfGbJf7HC6e1WTPfTn10oQBNN4R4X8he6qQ2qqSn
-	 LzUqtWZpLSPRJ1rTe/BUTtySxK1mEfUL3q1GcCYz2Lwil9Vn4Omzag7WwCvWpSh6me
-	 ZSSxUiLh0ZJYzPUeGHufrLfsKq0CWHr0mZY2bcQ3DRpL4mCmV474Uy/EF/4QZOXcaq
-	 /+aLtK0TiQ0rw==
-Date: Sat, 26 Oct 2024 13:43:22 +0100
-From: Simon Horman <horms@kernel.org>
-To: Charles Han <hanchunchao@inspur.com>
-Cc: rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jpanis@baylibre.com, dan.carpenter@linaro.org,
-	grygorii.strashko@ti.com, u.kleine-koenig@baylibre.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw: fix NULL deref check in
- am65_cpsw_nuss_probe
-Message-ID: <20241026124322.GC1507976@kernel.org>
-References: <20241025091139.230117-1-hanchunchao@inspur.com>
+	s=k20201202; t=1729947244;
+	bh=EXe3LG6/pgVGkYVneepsqC/jPnGrbyEGJMRy6FLBnrg=;
+	h=From:To:Subject:Date:From;
+	b=VJzMvpUw5p+Pfk6FZTcwH4s21IH3U/tn2NwTHKD57f3knaSyZJgDLe5xebknPFpkr
+	 iDECD+oLZSfgLJfqFeIVo2z5K7czic1golEJ9JxidaHdZT9Awn6rLPMzwccR2QFgcK
+	 d26Ml5B5b+389Tuff1BQwDSw9tMZi2iJ2O8jegeNrl8P5Gd/0GYCVs/ngPcLpKW6sH
+	 xjrUB+F2KhjFdeR8rDGQgi882G4NIrlIrAe17WDwtHVc7vLlL3digfoQxAfNKc2dee
+	 kIOI2WqnuNS+Mzxe1T5/geKKG1oq3XfefVNjw3dp8Cn8+IZz1EhCLfz7YwJV96ND50
+	 /oj6385dkkz3w==
+From: Puranjay Mohan <puranjay@kernel.org>
+To: Albert Ou <aou@eecs.berkeley.edu>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Helge Deller <deller@gmx.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Mykola Lysenko <mykolal@fb.com>,
+	netdev@vger.kernel.org,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Yonghong Song <yonghong.song@linux.dev>
+Subject: [PATCH bpf-next v3 0/4] Optimize bpf_csum_diff() and homogenize for all archs
+Date: Sat, 26 Oct 2024 12:53:35 +0000
+Message-Id: <20241026125339.26459-1-puranjay@kernel.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025091139.230117-1-hanchunchao@inspur.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 25, 2024 at 05:11:39PM +0800, Charles Han wrote:
-> In am65_cpsw_nuss_probe() devm_kzalloc() may return NULL but this
-> returned value is not checked.
-> 
-> Fixes: 1af3cb3702d0 ("net: ethernet: ti: am65-cpsw: Fix hardware switch mode on suspend/resume")
-> Signed-off-by: Charles Han <hanchunchao@inspur.com>
+Changes in v3:
+v2: https://lore.kernel.org/all/20241023153922.86909-1-puranjay@kernel.org/
+- Fix sparse warning in patch 2
 
-Hi Charles,
+Changes in v2:
+v1: https://lore.kernel.org/all/20241021122112.101513-1-puranjay@kernel.org/
+- Remove the patch that adds the benchmark as it is not useful enough to be
+  added to the tree.
+- Fixed a sparse warning in patch 1.
+- Add reviewed-by and acked-by tags.
 
-As this is a fix for Networking code it should be explicitly targeted
-at the net tree like this:
+NOTE: There are some sparse warning in net/core/filter.c but those are not
+worth fixing because bpf helpers take and return u64 values and using them
+in csum related functions that take and return __sum16 / __wsum would need
+a lot of casts everywhere.
 
-	Subject: [PATCH net v2] ...
+The bpf_csum_diff() helper currently returns different values on different
+architectures because it calls csum_partial() that is either implemented by
+the architecture like x86_64, arm, etc or uses the generic implementation
+in lib/checksum.c like arm64, riscv, etc.
 
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 6201a09fa5f0..7af7542093e8 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -3528,6 +3528,9 @@ static int am65_cpsw_nuss_probe(struct platform_device *pdev)
->  	common->ale_context = devm_kzalloc(dev,
->  					   ale_entries * ALE_ENTRY_WORDS * sizeof(u32),
->  					   GFP_KERNEL);
-> +	if (!common->ale_context)
-> +		return -ENOMEM;
-> +
+The implementation in lib/checksum.c returns the folded result that is
+16-bit long, but the architecture specific implementation can return an
+unfolded value that is larger than 16-bits.
 
-While I agree this error should be checked, I don't think this error
-handling is correct and will lead to leaked resources. Looking
-over this function I think you want (completely untested!):
+The helper uses a per-cpu scratchpad buffer for copying the data and then
+computing the csum on this buffer. This can be optimised by utilising some
+mathematical properties of csum.
 
-	if (!common->ale_context) {
-		ret = -ENOMEM;
-		goto err_of_clear;
-	}
+The patch 1 in this series does preparatory work for homogenizing the
+helper. patch 2 does the changes to the helper itself. The performance gain
+can be seen in the tables below that are generated using the benchmark
+built in patch 4 of v1 of this series:
 
->  	ret = am65_cpsw_init_cpts(common);
->  	if (ret)
->  		goto err_of_clear;
+  x86-64:
+  +-------------+------------------+------------------+-------------+
+  | Buffer Size |      Before      |      After       | Improvement |
+  +-------------+------------------+------------------+-------------+
+  |      4      | 2.296 ± 0.066M/s | 3.415 ± 0.001M/s |   48.73  %  |
+  |      8      | 2.320 ± 0.003M/s | 3.409 ± 0.003M/s |   46.93  %  |
+  |      16     | 2.315 ± 0.001M/s | 3.414 ± 0.003M/s |   47.47  %  |
+  |      20     | 2.318 ± 0.001M/s | 3.416 ± 0.001M/s |   47.36  %  |
+  |      32     | 2.308 ± 0.003M/s | 3.413 ± 0.003M/s |   47.87  %  |
+  |      40     | 2.300 ± 0.029M/s | 3.413 ± 0.003M/s |   48.39  %  |
+  |      64     | 2.286 ± 0.001M/s | 3.410 ± 0.001M/s |   49.16  %  |
+  |      128    | 2.250 ± 0.001M/s | 3.404 ± 0.001M/s |   51.28  %  |
+  |      256    | 2.173 ± 0.001M/s | 3.383 ± 0.001M/s |   55.68  %  |
+  |      512    | 2.023 ± 0.055M/s | 3.340 ± 0.001M/s |   65.10  %  |
+  +-------------+------------------+------------------+-------------+
+
+  ARM64:
+  +-------------+------------------+------------------+-------------+
+  | Buffer Size |      Before      |      After       | Improvement |
+  +-------------+------------------+------------------+-------------+
+  |      4      | 1.397 ± 0.005M/s | 1.493 ± 0.005M/s |    6.87  %  |
+  |      8      | 1.402 ± 0.002M/s | 1.489 ± 0.002M/s |    6.20  %  |
+  |      16     | 1.391 ± 0.001M/s | 1.481 ± 0.001M/s |    6.47  %  |
+  |      20     | 1.379 ± 0.001M/s | 1.477 ± 0.001M/s |    7.10  %  |
+  |      32     | 1.358 ± 0.001M/s | 1.469 ± 0.002M/s |    8.17  %  |
+  |      40     | 1.339 ± 0.001M/s | 1.462 ± 0.002M/s |    9.18  %  |
+  |      64     | 1.302 ± 0.002M/s | 1.449 ± 0.003M/s |    11.29 %  |
+  |      128    | 1.214 ± 0.001M/s | 1.443 ± 0.003M/s |    18.86 %  |
+  |      256    | 1.080 ± 0.001M/s | 1.423 ± 0.001M/s |    31.75 %  |
+  |      512    | 0.887 ± 0.001M/s | 1.411 ± 0.002M/s |    59.07 %  |
+  +-------------+------------------+------------------+-------------+
+
+Patch 3 reverts a hack that was done to make the selftest pass on all
+architectures.
+
+Patch 4 adds a selftest for this helper to verify the results produced by
+this helper in multiple modes and edge cases.
+
+Puranjay Mohan (4):
+  net: checksum: move from32to16() to generic header
+  bpf: bpf_csum_diff: optimize and homogenize for all archs
+  selftests/bpf: don't mask result of bpf_csum_diff() in test_verifier
+  selftests/bpf: Add a selftest for bpf_csum_diff()
+
+ arch/parisc/lib/checksum.c                    |  13 +-
+ include/net/checksum.h                        |   6 +
+ lib/checksum.c                                |  11 +-
+ net/core/filter.c                             |  39 +-
+ .../selftests/bpf/prog_tests/test_csum_diff.c | 408 ++++++++++++++++++
+ .../selftests/bpf/progs/csum_diff_test.c      |  42 ++
+ .../bpf/progs/verifier_array_access.c         |   3 +-
+ 7 files changed, 471 insertions(+), 51 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_csum_diff.c
+ create mode 100644 tools/testing/selftests/bpf/progs/csum_diff_test.c
 
 -- 
-pw-bot: changes-requested
+2.40.1
+
 
