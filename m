@@ -1,201 +1,205 @@
-Return-Path: <netdev+bounces-139306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66239B1652
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 10:39:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 817109B166E
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 11:10:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5DCC1C20FDA
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 08:39:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C769BB21A15
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 09:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8068F1C5793;
-	Sat, 26 Oct 2024 08:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD79B1CF7A2;
+	Sat, 26 Oct 2024 09:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lpy20pHh"
+	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="uoY8lkYQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sg2apc01on2129.outbound.protection.outlook.com [40.107.215.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A55B217F27;
-	Sat, 26 Oct 2024 08:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729931939; cv=none; b=ZBy+RwzezlrOKdjCgKmeJYlzUDyW4UfvzbTjx/gr2dV3c/m/KzT1agd4U0CwjhvLAKQ/aSuC93ZYGrxZDQxKL7vXPCUBqbPCT6yPj3XyIG0a5lDU7u9A7hxer4TTgbX2XYLeIOrKO6PZESshex/k4YFyE77cAGiapxAPGho9KDQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729931939; c=relaxed/simple;
-	bh=mR1Pe8yt+v+w7zNW/aUeOjuoEFziwbo0p077UFbOUjk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GBXkUkHvFJaZMqSSJEaBkv4G2+dcGjzK9BBHAx8MGGKehlTOH6XhkIOsaPl/VTD/Lb5SI15ssVE3CoHGLOz6u5nLMtyyp1zmbA7u0xt7BUhwiO6DvAFaHL3Fa0O90XYcoSEKpOapiCt++BnRFcWvMoydSrhkLf22TntefqyV8Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lpy20pHh; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729931937; x=1761467937;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mR1Pe8yt+v+w7zNW/aUeOjuoEFziwbo0p077UFbOUjk=;
-  b=lpy20pHhUonioPhKhsDu8bzLJkU6CkoxJgNsCldZxzC84pJJEBJobyxl
-   YZUYDVHbDMoNJmvsXx+Ei/rcH92xBms8VDmY0UGDBHqj8z4xQ0BMPbIzx
-   xjed6e315g5vFPT/EVmWB+SF2sLao3++QBZD76g02dFKBBS9MgKtsL9ot
-   runP9npfAaBUgI2uR9goRdFDfFT/Ke34U2G36F1UmdE9mvwJ7iU4dNWn2
-   v3tC4Wn/m0f/vlV4GkWrjgJeHtMigF3/2r1zVb++s51pADZMn0Pbh0+vo
-   8nvOFG27741qgR7yrH8xWyaScSoswbZvffyqafwV1IE0BmumfHCRPdZbo
-   A==;
-X-CSE-ConnectionGUID: DMVbx5ssR1SM/qwJDBBLPg==
-X-CSE-MsgGUID: ntnqysrUTiiwqYLlvwIpqw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11236"; a="40180029"
-X-IronPort-AV: E=Sophos;i="6.11,234,1725346800"; 
-   d="scan'208";a="40180029"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2024 01:38:57 -0700
-X-CSE-ConnectionGUID: f6tmldosRFSxtWJoCpg8Lw==
-X-CSE-MsgGUID: p4QyqgnwQwy8/SiNtIG4vw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,234,1725346800"; 
-   d="scan'208";a="81069942"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 26 Oct 2024 01:38:54 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t4cJv-000ZRM-2R;
-	Sat, 26 Oct 2024 08:38:51 +0000
-Date: Sat, 26 Oct 2024 16:38:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, linux-kernel@vger.kernel.org,
-	justin.iurman@uliege.be
-Subject: Re: [PATCH net-next 2/3] net: ipv6: seg6_iptunnel: mitigate
- 2-realloc issue
-Message-ID: <202410261651.MiKpheOT-lkp@intel.com>
-References: <20241025133727.27742-3-justin.iurman@uliege.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702B91C2309;
+	Sat, 26 Oct 2024 09:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.129
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729933793; cv=fail; b=Xt23fduCWyuH71lbkfbJHnCtPbhqIQpgWD0az/yh7F/dGMBRjIhGYVxpg46xjy5NW1dLUqJmq2uqaphHP9c1tlcGlGlqSZ3bb0u0gNU1wMHGlq4NfNXsCH10JvleBE2Ae2iL9ZAso/RWqkcGYbMNkTzA6+QkuVPNl5mdpUjnDHc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729933793; c=relaxed/simple;
+	bh=WcwIZGiM3sZTIBd5QeH+u5XtDhrnFximja7csjqJaMg=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=dgWGAXvhn1p9OewK47T7ragHqhDYuI+zZfLwMZ93Jka6wbn3xsykFODEvDKZPMHF0iklMw3vC9Km2xpmCbGvuZ1A81hI0sbImqpw+4j81VJo8UY1FRcPzOvnM8upUraelB2pg+M6G28h9KlX3XuD+/gGxsyBt33ZswWCIHCzLiY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=uoY8lkYQ; arc=fail smtp.client-ip=40.107.215.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jF7kd59iZKLFlkPVt1VWmk2x1pxKlsQ6is2GizSQLRTlvF6yfQYz/aGllfHtpcySz9H8YtS9C+is0PeQoeLGLy+q7c+yaLdaaRDIWA9ElCSsNS6t+neGYiYo0EXMn/Xo4wErFFJC43tpV867yBjXTXDZXtnO7tDxZiLN+n2TgdA/TOQJ2Yn/MeZ0qUkvGJZp6rUTuH7r5XLLfJ6UOgMxy9BovaEbdg0tMBDueh9vJay76vAA+Kd/YV1KptWUBjh+1RAZyjRH/xkV24yxXmiGLxBf+8bCG6F3R2F9Dfrw1i+cgYgceSp5SLGi530pqeyxs7e+RyWIz3Cn+lQM0LLUjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lC3Prtefwqu3GALnMyzAl6bT9nFE4z17kD9iHSr/b7U=;
+ b=BmGI8oJFCuz2Sj9DGr70njwd5Yyji6AsLoSuey40WisBYD1QqDy5W19bv6eySgW/SZj30xDB52Z0v0hE2ORSQM3fxP0ieDNM4cDHOEC1Z6O2QCcMRqRUv0KTIsQqTOPsC2POPrzvuIx5o1exda9BD8wNQcmEa8S8DrUxKrTpDO9EDrx9Ee0GYEuz8UCbuWnIE0U+9uZ6Skiy4GBRgguddB+raqqpF+tmp0zu6PBLlLVnqCjQtnYaN/eCb3bwqzvktRLqooNWgGAC/4fbEzoQIZ9fLE2A8VEzh3n80HFCVUaEKbeR6WkUKZaZFnCu7qnAn3R8kN1GLMgcYmy1MDOo1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
+ dkim=pass header.d=fibocom.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lC3Prtefwqu3GALnMyzAl6bT9nFE4z17kD9iHSr/b7U=;
+ b=uoY8lkYQVK6rCkznLj4pZPX5X9BnFnUMQISMJuWNOlO+lggbqpWieXDaLx9mbVXW5stIxTUvYkBCOunr8mnc6Arj+nNgNdnvpTDrCMHS+mGASnEXdn2+Si76jDufXeGS2AegQJHPivBu/Pswp0vaZ81dNrz3Aep8AXHMMg7woPw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fibocom.com;
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
+ by SEZPR02MB5864.apcprd02.prod.outlook.com (2603:1096:101:73::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.16; Sat, 26 Oct
+ 2024 09:09:42 +0000
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b%4]) with mapi id 15.20.8093.018; Sat, 26 Oct 2024
+ 09:09:42 +0000
+From: Jinjian Song <jinjian.song@fibocom.com>
+To: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	angelogioacchino.delregno@collabora.com,
+	linux-arm-kernel@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	corbet@lwn.net,
+	linux-mediatek@lists.infradead.org,
+	helgaas@kernel.org,
+	danielwinkler@google.com,
+	korneld@google.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jinjian Song <jinjian.song@fibocom.com>
+Subject: [net-next v7 0/2] net: wwan: t7xx: Add t7xx debug port
+Date: Sat, 26 Oct 2024 17:09:19 +0800
+Message-Id: <20241026090921.8008-1-jinjian.song@fibocom.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR04CA0186.apcprd04.prod.outlook.com
+ (2603:1096:4:14::24) To TY0PR02MB5766.apcprd02.prod.outlook.com
+ (2603:1096:400:1b5::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025133727.27742-3-justin.iurman@uliege.be>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|SEZPR02MB5864:EE_
+X-MS-Office365-Filtering-Correlation-Id: bcbf2b85-6f80-4753-9975-08dcf59ded2d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|52116014|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EfusXeaHVghQQw6S2YIx1cZwnS94B4txKqThuGmZpv9f+1PmpdKQG04d+s+z?=
+ =?us-ascii?Q?VO3KM5xE4eH6LPxcMCMPpodNTvxdf5k1ZC6Fz17kX2LhR1qGF6phhdQ9kLTG?=
+ =?us-ascii?Q?z6kP/urRzkVhpCcuRiupglZwfQ3ncF2NfQ1P4P9V/eNrqdhynkC2+ckZOHZP?=
+ =?us-ascii?Q?aCqFQiohAhQYZs7kW+/r1lzlz/O3a73ofsexZEEvgkU59lV/q6WZukFGXJmc?=
+ =?us-ascii?Q?N2eKnttKdFHZOi/DGhxUf8DDypIZP2sYpwgd2G65Jdc3yOmrLxGHV3pbfUjq?=
+ =?us-ascii?Q?uUxtQUJ1A6vBWgwAfIKcNjXnlALKRgSkromhEJwSZKwTRZ1LSiT8zrKuNFTV?=
+ =?us-ascii?Q?7cmfkf+hIJ2NcMbV596LPZCineNU4jrxyWdpHDgdBtN5Ore3mPTLWYRqUB3A?=
+ =?us-ascii?Q?CNgzsIrUWzl3c/A6Da24Mgexzn5vGdCb+q0dGsV8SepNZ5foNolYBAjz8fxC?=
+ =?us-ascii?Q?OY7JzdTvJ9l+BKggsISEOotyFMxRhBN/VZKkcb019bs6szwt9SF3l8Iztk0n?=
+ =?us-ascii?Q?VgLAmOA8OP+FyCW2dqVMpYFaGwIjw0wXnxTZNAbVAdJDAKTqP0q5nF9jGhVH?=
+ =?us-ascii?Q?qTyay3eJTnGixCwPPsHlW8DtjMlSFtOHoqPeyoDsoi6HEGFLARE2oxMaQsOm?=
+ =?us-ascii?Q?vc6x6WONZ9ia9Tgo2Er9uGNzBgOAaqQOSDBsam2xCzrtEG9IuRZw/o7KhuEX?=
+ =?us-ascii?Q?az0THLxrhJRlHo5AlMMAlj7PjCZCmGhhfMj9xD5Zh9b3HyPFgRdZor0NlFQD?=
+ =?us-ascii?Q?lUaIjfqAJrfjwhbl4cgqiR8BDyFzN3depTWyvRccjE+7Qgeu527Qx/IUHbjh?=
+ =?us-ascii?Q?Bhtb0os8cCnBwDaUJDkJiyjSOauVEooL1d3SYtphKKJ7cv20Me9QMALw//jM?=
+ =?us-ascii?Q?dWfv/eBdRl+q3YGiyUhdy48ADeXJHQgIPjfqMadE7bnhQwmjCPa6BTxlzqAF?=
+ =?us-ascii?Q?tZE7mvm3PwUX9o/rAS/t4xOx0v7y3V9l3beUIENjItjxP4Y22u23MTDcKElR?=
+ =?us-ascii?Q?JlDl4TktEhGV5bVrLg3qNEEwRq0E11le3PsX9jU/1OYOT3xcBTU1ZCRE3j0C?=
+ =?us-ascii?Q?vgUFJHWOBygdM99JtNXj3i+nhfN8a1YLqgl4JI4iQRtE17Mp5GgXOLJbPO4s?=
+ =?us-ascii?Q?wDQFePvlRrqIjI5Z6Qm5W6BlZVFB8ODLmkI3pZ4KEBmg+CT1PHnjnpM5C6Sg?=
+ =?us-ascii?Q?Sb+PisrM3z7gR6r9eiiJ+KsUhLxM2OKCoeZ5Y4ZknnBDeRPMjXeoygwyy9Es?=
+ =?us-ascii?Q?ZUt2vnIklv3fP8ZoYGFeS4Ce45NSkMqajLA8QshVILOy+snV8PAYDDnJCXQm?=
+ =?us-ascii?Q?X27/PGJaMZAYF5JixO9XcQwH/5/jyuByj1iJtg28fnpONpW5TbDuYpTWxlXt?=
+ =?us-ascii?Q?l9Nycj35eAQgu5KEz/l8bSKoiTRT?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(52116014)(38350700014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?BbUDO8WDyzWQ7dlc5O3EgMo3xH4GoqtoeyyU1u603SBbY1VCoQMD8UNgrf4j?=
+ =?us-ascii?Q?1bwOJR7uoDaQJ1DivCs8iHstUfcEPCIZttYhQR1HqWi/MBDw09G+qDCJmDiq?=
+ =?us-ascii?Q?ptkzuMElwm9HHk2zdJk3jO6ICzrxfpNZAEBplAjGrkT4jhK02QUkWPDvykq1?=
+ =?us-ascii?Q?umie8kiAwtwyEG3RxTdli7zMSbqv4qH/Ng4Tls2Z/cz6wdNLZwNGHRcjcpiF?=
+ =?us-ascii?Q?10ob6kMEDVej+RVFPjCsWDukLVdDHOIWVzz5oW4U2p7ZkGnxpPsPokf/ere1?=
+ =?us-ascii?Q?9wGJnWC7vS4JAsoIuiZHcZgvDzAlmFKb2Go9w0SzeaOcpaG7QgzTDlHb81K4?=
+ =?us-ascii?Q?LIVY3pDvxMRM8cXRvaP4W4PCEsJGns4zFbWkVDdPbh2wAKmHqu0K8CUqzaDD?=
+ =?us-ascii?Q?Ufat31Wg6LM5PkIK8WaVzQu0UYmiS1aEvMUmoDJideS0FcpNBLKoaz6Ay7b+?=
+ =?us-ascii?Q?LBInMPdmDrUwMkeRmXjMEn9URGwCu6srsJz394FVbZ3poFZRORyKX/GlnFyQ?=
+ =?us-ascii?Q?lcmOH7iYa+4njqdVxu1P4N/UAH/G0iS1r9H4Eu0xr72wWoOI06PuQgx9JLqw?=
+ =?us-ascii?Q?H+89P5Xo1OgfG9qXhegtzwylqJBTaBXQLHDj6eADpqcZ+CtWBJWkEFKDjll0?=
+ =?us-ascii?Q?XhgkvuiULW0zGlMZf2F1OGo3ddsib7KdA1afJSIT+k6tXNKohOjSXQ977p7J?=
+ =?us-ascii?Q?l+jkRQ+CuGg17eneifrJjkq7aomxZmMRYYHgds9OKBZ9At+QETvGbGpR5r3q?=
+ =?us-ascii?Q?zL98GO2pv3e4pVGTEfeaFEJ9ICG9xf4sIVHGU/qWtwO5mr6E8R8qPwVA3uPI?=
+ =?us-ascii?Q?jkTc3ojJQIIsZu6xN0pYxU4PhtNhGDWZjRUiPCDGfm+SXhN9yheftgn1vEec?=
+ =?us-ascii?Q?Q98z7N3oolya8nbWeCv4vL6QTG6EmyzAKpZ8/GORetYT6V7wGJRqv+xgTiap?=
+ =?us-ascii?Q?DMETnv2iHpuKG2N3xHCr6Fx8nkqScd25vAKfeS/K/4E072b+zdKRHBOZKcIX?=
+ =?us-ascii?Q?fVsBj6T8yVbsV2c0rxmSjU6jXMx/XrzrEpwzAcYdNyvBL1FJ9ij/Ti0GQyN/?=
+ =?us-ascii?Q?JX1qqjL4wj6vGe5x0FILGcwDRnFBZ0yq6em3PkSVigpr7+WsAace4issmxwP?=
+ =?us-ascii?Q?wxIExWIqtIaWP/dKdCKNdaOyQPpoE3XRaK8ec9B+O0g7o+P8oT2xAfwG4pNt?=
+ =?us-ascii?Q?QXGu5J7GlC+Ywxvwi5ijtVb8ixuXdxoAvomkwyjh7TGJNzet2V+pf10Psqgs?=
+ =?us-ascii?Q?5wvvZPNOxdx96wN4EKRJ8sBxI+93h9kgaypdKOuMhltigHXitc7td+/it1JU?=
+ =?us-ascii?Q?PjldHyfAbb4+KjRWa5CMQjkghTJtKOWsqGWYxlIKwoOS/nTXx9VMf8PGT5xE?=
+ =?us-ascii?Q?ATU7Y2u+8YCqcmOBmAnTK+A+yKTeVToXhUxJlHZ6peItNaq6saSkFji1yPYG?=
+ =?us-ascii?Q?jYUxkHHrBmYqkPCMQbtpW0nyHPZtAWLq4PWwH5lnhwpCSeMWBuRJcCgryWvJ?=
+ =?us-ascii?Q?yUyKgJ2ytzJ5DzCggzzokDt9Fc+fz/kfDawlQZnXhd/bYtLRziTh1Loh34JG?=
+ =?us-ascii?Q?dHrz5tikbKqDqB/cvaptcg1EoQdrpQChBUhw/vHMREo8Wvzc/vCNlk61Op/B?=
+ =?us-ascii?Q?5A=3D=3D?=
+X-OriginatorOrg: fibocom.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcbf2b85-6f80-4753-9975-08dcf59ded2d
+X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2024 09:09:42.1947
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7EP5ZlgWDoFWX2vWMmWVjjblGLTFn5qy6ZOyWgyOj1IcBEo+giJdmlhTzrotOysYJCgfaxB9otYjmGM+Sf10FPURW3b3gmhcF5Du7XXc9Wk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR02MB5864
 
-Hi Justin,
+Add support for t7xx WWAN device to debug by ADB (Android Debug Bridge)
+port and MTK MIPCi (Modem Information Process Center) port.
 
-kernel test robot noticed the following build errors:
+Application can use ADB (Android Debug Bridge) port to implement
+functions (shell, pull, push ...) by ADB protocol commands.
 
-[auto build test ERROR on net-next/main]
+Application can use MIPC (Modem Information Process Center) port
+to debug antenna tuner or noise profiling through this MTK modem
+diagnostic interface.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Iurman/net-ipv6-ioam6_iptunnel-mitigate-2-realloc-issue/20241025-214849
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241025133727.27742-3-justin.iurman%40uliege.be
-patch subject: [PATCH net-next 2/3] net: ipv6: seg6_iptunnel: mitigate 2-realloc issue
-config: arc-randconfig-001-20241026 (https://download.01.org/0day-ci/archive/20241026/202410261651.MiKpheOT-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241026/202410261651.MiKpheOT-lkp@intel.com/reproduce)
+Jinjian Song (2):
+  wwan: core: Add WWAN ADB and MIPC port type
+  net: wwan: t7xx: Add debug port
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410261651.MiKpheOT-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   net/ipv6/seg6_iptunnel.c: In function 'seg6_do_srh_encap':
->> net/ipv6/seg6_iptunnel.c:130:16: error: implicit declaration of function '__seg6_do_srh_encap'; did you mean 'seg6_do_srh_encap'? [-Werror=implicit-function-declaration]
-     130 |         return __seg6_do_srh_encap(skb, osrh, proto, NULL);
-         |                ^~~~~~~~~~~~~~~~~~~
-         |                seg6_do_srh_encap
-   net/ipv6/seg6_iptunnel.c: At top level:
->> net/ipv6/seg6_iptunnel.c:134:5: warning: no previous prototype for '__seg6_do_srh_encap' [-Wmissing-prototypes]
-     134 | int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-         |     ^~~~~~~~~~~~~~~~~~~
-   net/ipv6/seg6_iptunnel.c: In function 'seg6_do_srh_inline':
->> net/ipv6/seg6_iptunnel.c:330:16: error: implicit declaration of function '__seg6_do_srh_inline'; did you mean 'seg6_do_srh_inline'? [-Werror=implicit-function-declaration]
-     330 |         return __seg6_do_srh_inline(skb, osrh, NULL);
-         |                ^~~~~~~~~~~~~~~~~~~~
-         |                seg6_do_srh_inline
-   net/ipv6/seg6_iptunnel.c: At top level:
->> net/ipv6/seg6_iptunnel.c:334:5: warning: no previous prototype for '__seg6_do_srh_inline' [-Wmissing-prototypes]
-     334 | int __seg6_do_srh_inline(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-         |     ^~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +130 net/ipv6/seg6_iptunnel.c
-
-   126	
-   127	/* encapsulate an IPv6 packet within an outer IPv6 header with a given SRH */
-   128	int seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh, int proto)
-   129	{
- > 130		return __seg6_do_srh_encap(skb, osrh, proto, NULL);
-   131	}
-   132	EXPORT_SYMBOL_GPL(seg6_do_srh_encap);
-   133	
- > 134	int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-   135				int proto, struct dst_entry *dst)
-   136	{
-   137		struct net *net = dev_net(skb_dst(skb)->dev);
-   138		struct ipv6hdr *hdr, *inner_hdr;
-   139		struct ipv6_sr_hdr *isrh;
-   140		int hdrlen, tot_len, err;
-   141		__be32 flowlabel;
-   142	
-   143		hdrlen = (osrh->hdrlen + 1) << 3;
-   144		tot_len = hdrlen + sizeof(*hdr);
-   145	
-   146		err = skb_cow_head(skb, tot_len + (!dst ? skb->mac_len
-   147							: LL_RESERVED_SPACE(dst->dev)));
-   148		if (unlikely(err))
-   149			return err;
-   150	
-   151		inner_hdr = ipv6_hdr(skb);
-   152		flowlabel = seg6_make_flowlabel(net, skb, inner_hdr);
-   153	
-   154		skb_push(skb, tot_len);
-   155		skb_reset_network_header(skb);
-   156		skb_mac_header_rebuild(skb);
-   157		hdr = ipv6_hdr(skb);
-   158	
-   159		/* inherit tc, flowlabel and hlim
-   160		 * hlim will be decremented in ip6_forward() afterwards and
-   161		 * decapsulation will overwrite inner hlim with outer hlim
-   162		 */
-   163	
-   164		if (skb->protocol == htons(ETH_P_IPV6)) {
-   165			ip6_flow_hdr(hdr, ip6_tclass(ip6_flowinfo(inner_hdr)),
-   166				     flowlabel);
-   167			hdr->hop_limit = inner_hdr->hop_limit;
-   168		} else {
-   169			ip6_flow_hdr(hdr, 0, flowlabel);
-   170			hdr->hop_limit = ip6_dst_hoplimit(skb_dst(skb));
-   171	
-   172			memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
-   173	
-   174			/* the control block has been erased, so we have to set the
-   175			 * iif once again.
-   176			 * We read the receiving interface index directly from the
-   177			 * skb->skb_iif as it is done in the IPv4 receiving path (i.e.:
-   178			 * ip_rcv_core(...)).
-   179			 */
-   180			IP6CB(skb)->iif = skb->skb_iif;
-   181		}
-   182	
-   183		hdr->nexthdr = NEXTHDR_ROUTING;
-   184	
-   185		isrh = (void *)hdr + sizeof(*hdr);
-   186		memcpy(isrh, osrh, hdrlen);
-   187	
-   188		isrh->nexthdr = proto;
-   189	
-   190		hdr->daddr = isrh->segments[isrh->first_segment];
-   191		set_tun_src(net, skb_dst(skb)->dev, &hdr->daddr, &hdr->saddr);
-   192	
+ .../networking/device_drivers/wwan/t7xx.rst   | 64 +++++++++++++++---
+ drivers/net/wwan/t7xx/t7xx_pci.c              | 67 +++++++++++++++++--
+ drivers/net/wwan/t7xx/t7xx_pci.h              |  7 ++
+ drivers/net/wwan/t7xx/t7xx_port.h             |  3 +
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c       | 44 +++++++++++-
+ drivers/net/wwan/t7xx/t7xx_port_proxy.h       |  1 +
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c        |  8 ++-
+ drivers/net/wwan/wwan_core.c                  |  8 +++
+ include/linux/wwan.h                          |  4 ++
+ 9 files changed, 188 insertions(+), 18 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
