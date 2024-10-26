@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-139287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5954D9B145D
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 05:49:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45BBF9B1464
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 05:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B0E21C21119
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 03:49:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77D3B1C212F1
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 03:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BF71531D8;
-	Sat, 26 Oct 2024 03:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF3813D2B2;
+	Sat, 26 Oct 2024 03:57:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9F913A268
-	for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 03:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379F01DFD8;
+	Sat, 26 Oct 2024 03:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729914547; cv=none; b=skt6Y/w8KNajlq3CAiANpBcLMYfnKoZNXdDMgODTe9/zZWis0IG32QdbusNhsD8BBBoz6kFhFNqsZW7vnQfi6FMp17ik/OSLEGGD4FZlvygM9iffYU2wMxTfGx6afkD92tJ0/nc3eGmMaKCgiQ58HcCqETcBQhFoyIC4Lswf4Ko=
+	t=1729915066; cv=none; b=l8GJykl5/FUwxAtWOmvDi5qf31GxTwF6eaaNZH4m3yphtqfnAFpSN0kvIy4oFJJm/EsbdByvpxSPjPr6AuSXLWBM7i/bGx/lqGuPcSumE9f/mBHCfA+hhL89PFOJFAK3r2iJ+SViTO5YzRbxwVwGTelg1cP7K9krdnooG3tL7GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729914547; c=relaxed/simple;
-	bh=bV58mEwio2XO0wvHvMEcSvakJ3jtR6CiMs6yTMAbukA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+7FDl7aJUf/d9om57BmgjqCLlP1iL6GBy+6J1UJpFLvK1DwoPhBid9gGudM4CQF6uXDAVoiNFvZ3SYMMeQWAul8PnYLefw2p4y71CHuQoNQFAkgYxRPLdq2bfvqx4bEUFMUyH+asJqMttk9Mtf9IPwm8L7Ds45zQH8aOotOAPA=
+	s=arc-20240116; t=1729915066; c=relaxed/simple;
+	bh=MfjRLEEH73Bx7axO85yFCiYfX5F+trhTGwga2ALtTK4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=U2+kerVxGq20lzRdai9G3/i4IkwttCH8/0L/4ZKL1VPUSLPbFkgJZsVBxWESyR9Q9TSVGfnuuGEU7ny/wf0fgh3bwE9MyRbceg/0HsCx6uxdocw5H4nzZ2KUQ+wYHWuNSot6CqpKI2VQiZRNqc5MfpMHav207fpikuIEc8gZ+So=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Xb5Fg6JlMz2Dc85;
-	Sat, 26 Oct 2024 11:47:35 +0800 (CST)
-Received: from dggpemf100006.china.huawei.com (unknown [7.185.36.228])
-	by mail.maildlp.com (Postfix) with ESMTPS id 85B2018001B;
-	Sat, 26 Oct 2024 11:49:02 +0800 (CST)
-Received: from thunder-town.china.huawei.com (10.174.178.55) by
- dggpemf100006.china.huawei.com (7.185.36.228) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 26 Oct 2024 11:49:01 +0800
-From: Zhen Lei <thunder.leizhen@huawei.com>
-To: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
-	<GR-Linux-NIC-Dev@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <netdev@vger.kernel.org>
-CC: Zhen Lei <thunder.leizhen@huawei.com>
-Subject: [PATCH v2 2/2] bna: Remove field bnad_dentry_files[] in struct bnad
-Date: Sat, 26 Oct 2024 11:48:00 +0800
-Message-ID: <20241026034800.450-3-thunder.leizhen@huawei.com>
-X-Mailer: git-send-email 2.37.3.windows.1
-In-Reply-To: <20241026034800.450-1-thunder.leizhen@huawei.com>
-References: <20241026034800.450-1-thunder.leizhen@huawei.com>
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Xb5SH2D2wz20qjm;
+	Sat, 26 Oct 2024 11:56:47 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 066D51A0188;
+	Sat, 26 Oct 2024 11:57:42 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 26 Oct
+ 2024 11:57:40 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<maciej.fijalkowski@intel.com>, <vedang.patel@intel.com>,
+	<jithu.joseph@intel.com>, <andre.guedes@intel.com>, <horms@kernel.org>,
+	<jacob.e.keller@intel.com>, <sven.auhagen@voleatech.de>,
+	<alexander.h.duyck@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH v4 net-next 0/4] Fix passing 0 to ERR_PTR in intel ether drivers
+Date: Sat, 26 Oct 2024 12:12:45 +0800
+Message-ID: <20241026041249.1267664-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,67 +63,31 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf100006.china.huawei.com (7.185.36.228)
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-Function debugfs_remove() recursively removes a directory, include all
-files created by debugfs_create_file(). Therefore, there is no need to
-explicitly record each file with member ->bnad_dentry_files[] and
-explicitly delete them at the end. Remove field bnad_dentry_files[] and
-its related processing codes for simplification.
+Fixing sparse error in xdp run code by introducing new variable xdp_res
+instead of overloading this into the skb pointer as i40e drivers done
+in commit 12738ac4754e ("i40e: Fix sparse errors in i40e_txrx.c") and
+commit ae4393dfd472 ("i40e: fix broken XDP support").
 
-Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
----
- drivers/net/ethernet/brocade/bna/bnad.h         |  1 -
- drivers/net/ethernet/brocade/bna/bnad_debugfs.c | 17 ++---------------
- 2 files changed, 2 insertions(+), 16 deletions(-)
+v4: Target to net-next
+v3: https://lore.kernel.org/bpf/20241022065623.1282224-3-yuehaibing@huawei.com/T/
+    Fix uninitialized 'xdp_res' in patch 3 and 4 which Reported-by
+    kernel test robot
+v2: Fix this as i40e drivers done instead of return NULL in xdp run code
 
-diff --git a/drivers/net/ethernet/brocade/bna/bnad.h b/drivers/net/ethernet/brocade/bna/bnad.h
-index 10b1e534030e628..4396997c59d041f 100644
---- a/drivers/net/ethernet/brocade/bna/bnad.h
-+++ b/drivers/net/ethernet/brocade/bna/bnad.h
-@@ -351,7 +351,6 @@ struct bnad {
- 	/* debugfs specific data */
- 	char	*regdata;
- 	u32	reglen;
--	struct dentry *bnad_dentry_files[5];
- 	struct dentry *port_debugfs_root;
- };
- 
-diff --git a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-index 220d20a829c8a84..7a27f9d1443bff2 100644
---- a/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-+++ b/drivers/net/ethernet/brocade/bna/bnad_debugfs.c
-@@ -510,12 +510,8 @@ bnad_debugfs_init(struct bnad *bnad)
- 
- 		for (i = 0; i < ARRAY_SIZE(bnad_debugfs_files); i++) {
- 			file = &bnad_debugfs_files[i];
--			bnad->bnad_dentry_files[i] =
--					debugfs_create_file(file->name,
--							file->mode,
--							bnad->port_debugfs_root,
--							bnad,
--							file->fops);
-+			debugfs_create_file(file->name,	file->mode,
-+					    bnad->port_debugfs_root, bnad, file->fops);
- 		}
- 	}
- }
-@@ -524,15 +520,6 @@ bnad_debugfs_init(struct bnad *bnad)
- void
- bnad_debugfs_uninit(struct bnad *bnad)
- {
--	int i;
--
--	for (i = 0; i < ARRAY_SIZE(bnad_debugfs_files); i++) {
--		if (bnad->bnad_dentry_files[i]) {
--			debugfs_remove(bnad->bnad_dentry_files[i]);
--			bnad->bnad_dentry_files[i] = NULL;
--		}
--	}
--
- 	/* Remove the pci_dev debugfs directory for the port */
- 	if (bnad->port_debugfs_root) {
- 		debugfs_remove(bnad->port_debugfs_root);
+Yue Haibing (4):
+  igc: Fix passing 0 to ERR_PTR in igc_xdp_run_prog()
+  igb: Fix passing 0 to ERR_PTR in igb_run_xdp()
+  ixgbe: Fix passing 0 to ERR_PTR in ixgbe_run_xdp()
+  ixgbevf: Fix passing 0 to ERR_PTR in ixgbevf_run_xdp()
+
+ drivers/net/ethernet/intel/igb/igb_main.c     | 22 +++++++-----------
+ drivers/net/ethernet/intel/igc/igc_main.c     | 20 ++++++----------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 23 ++++++++-----------
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c | 23 ++++++++-----------
+ 4 files changed, 34 insertions(+), 54 deletions(-)
+
 -- 
 2.34.1
 
