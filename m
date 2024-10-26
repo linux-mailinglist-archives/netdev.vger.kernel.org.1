@@ -1,172 +1,186 @@
-Return-Path: <netdev+bounces-139277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0EF9B1408
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 03:34:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D95C9B1415
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 03:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F42C2837F5
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:34:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD801C21528
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A424A29CE5;
-	Sat, 26 Oct 2024 01:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E54B2AE69;
+	Sat, 26 Oct 2024 01:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Wq7WzRrR"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZiFl9pXG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32944B665;
-	Sat, 26 Oct 2024 01:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48C5217F38;
+	Sat, 26 Oct 2024 01:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729906489; cv=none; b=h3NViOV2PfXhRuwlkSNRyd8R/ACDrRDVN5QKgCnqE8XX9ZpflVE6X0HrBUYKWORZIg+0b5Ik7P567nEhWKtybYOrwrO5LK9KXsR0GtLSCOmU8hWpkZJpLaL3pbYunZAtUd3Zj9/BnE2vAn3utgSyfJ5WWtr7pWudz1GLNP5G13g=
+	t=1729907129; cv=none; b=DaDa+4Nx9IpNOd2uOnk2RpAs5IX3OZPklBUAK/ou+0DNSz3rwTxP96hKhjGkTtnkam94BXcyfcJLKIy06bclsH8c7OI71JF8uuAsF2oKUzGrsAlsvsGhWccC9CzDsey69rBvT6c51t2hcllm76EwIFA1PkMBMtBwi4zjXpifEc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729906489; c=relaxed/simple;
-	bh=AvdnhwNRiXKf7G4bRAt5xJWxJrdRaqp5+mhlW0iRbJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hNbIf4HP2RchtvP6YmDJn1SVKYYRVZcTCNaP1bcXenvpEgJYZFEi+vzmP4VHurnQ9b9hxOu7iT39DkuC7wde5HmNMTD/SlXs2ixwFh1hTbLSJxKhaemezKJnvjBSA/pMO9XeRpa5qVAX5vyVwL4oBmUQFcOMP0yVfaV/1h1Etjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Wq7WzRrR; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729906487; x=1761442487;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AvdnhwNRiXKf7G4bRAt5xJWxJrdRaqp5+mhlW0iRbJo=;
-  b=Wq7WzRrRZOXME271vy48jIpUUW/IrhcI+rjbnGTGmnm4NnBJhZYkZCum
-   1RZlAGvZRCFn3MeLh9wjPWFXPQjSp9sQQXLHMmLOaxSGSkoBd/qyAD08a
-   fNnuwq0UTbDwimFLlCvk/16xXnbjd9ZLu6/BeARopus98t53DuBd6rO0R
-   TKAakvo319Hl6i6Qnvx5Mj8bcDEuk+LHaseyXhsoBcWaQq1do9rTe1AI6
-   AZtG0NjtbACdFlA84UVhq36pq7r2Mv67cs8UGsNWalUaNJekNEWmEt6OC
-   d0nnNRJZGbdynOAx9+auYYA0ID7sou98NZIhW/cqtj/RF0l80WJcnWVmd
-   Q==;
-X-CSE-ConnectionGUID: FaefWCtwROqymHOsvIrMDQ==
-X-CSE-MsgGUID: OjnkeOHSShGIQxvQ0UYmHA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29536586"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="29536586"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 18:34:46 -0700
-X-CSE-ConnectionGUID: 70ikL1t/Sde4q68jIS/rvg==
-X-CSE-MsgGUID: SbfZrTSgSn69iYeE81rvuA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,233,1725346800"; 
-   d="scan'208";a="111925452"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 25 Oct 2024 18:34:41 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t4VhO-000Z8C-1i;
-	Sat, 26 Oct 2024 01:34:38 +0000
-Date: Sat, 26 Oct 2024 09:34:36 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wei Fang <wei.fang@nxp.com>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, vladimir.oltean@nxp.com,
-	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
-	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
-	bhelgaas@google.com, horms@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	imx@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, alexander.stein@ew.tq-group.com
-Subject: Re: [PATCH v5 net-next 05/13] net: enetc: extract common ENETC PF
- parts for LS1028A and i.MX95 platforms
-Message-ID: <202410260911.fvWnX8cx-lkp@intel.com>
-References: <20241024065328.521518-6-wei.fang@nxp.com>
+	s=arc-20240116; t=1729907129; c=relaxed/simple;
+	bh=C5rlSrSq+PgamV78k5HVwdelHn3s+iACPNFmVLodQSU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tei3pb6gZUjXnwOl818WQU0xRPXicyNmBxXcb4XJ2QtDvvQjmVWVCnaZfRY1n0KzKFYZcOgswv9dp2tmtcIj16rPBO29vkW8agYw5Dtvus+CjKV1EgX1NMDBNfhc/gn8Z2TQJwqw06KzRMgkjajkrzd3BNCGlNUlddTOoIOx5sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZiFl9pXG; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1729907118; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=0l3yIwgoWoL0tCyh89mUAlT7tbkPIvMt+0P/7Vp3Nwg=;
+	b=ZiFl9pXG77ZzDBKCBvPTzoi+xVSW/G0aPJxtGHOzmFFAl397GHT0zDOzKBTmeXuBXak0Wqx9WO10OR9KoGm4dB1PLE9oX4UMMCZbHTkDhOV5LDrglXgWeQEf7a97birRTrN9+OhfIYPHvnEaHQDgA4C0N/HT8UtMEVO8DT1AlF8=
+Received: from 30.170.3.10(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WHtjziJ_1729906797 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sat, 26 Oct 2024 09:39:58 +0800
+Message-ID: <c1eca766-d5e7-4fd8-8ffa-9301f060d6c9@linux.alibaba.com>
+Date: Sat, 26 Oct 2024 09:39:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241024065328.521518-6-wei.fang@nxp.com>
-
-Hi Wei,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Fang/dt-bindings-net-add-compatible-string-for-i-MX95-EMDIO/20241024-151502
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241024065328.521518-6-wei.fang%40nxp.com
-patch subject: [PATCH v5 net-next 05/13] net: enetc: extract common ENETC PF parts for LS1028A and i.MX95 platforms
-config: x86_64-buildonly-randconfig-001-20241026 (https://download.01.org/0day-ci/archive/20241026/202410260911.fvWnX8cx-lkp@intel.com/config)
-compiler: clang version 19.1.2 (https://github.com/llvm/llvm-project 7ba7d8e2f7b6445b60679da826210cdde29eaf8b)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241026/202410260911.fvWnX8cx-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410260911.fvWnX8cx-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/freescale/enetc/enetc_pf.c:7:
-   In file included from include/linux/of_net.h:9:
-   In file included from include/linux/phy.h:16:
-   In file included from include/linux/ethtool.h:18:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/net/ethernet/freescale/enetc/enetc_pf.c:906:14: error: call to undeclared function 'of_find_compatible_node'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     906 |         ierb_node = of_find_compatible_node(NULL, NULL,
-         |                     ^
->> drivers/net/ethernet/freescale/enetc/enetc_pf.c:906:12: error: incompatible integer to pointer conversion assigning to 'struct device_node *' from 'int' [-Wint-conversion]
-     906 |         ierb_node = of_find_compatible_node(NULL, NULL,
-         |                   ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     907 |                                             "fsl,ls1028a-enetc-ierb");
-         |                                             ~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/freescale/enetc/enetc_pf.c:908:21: error: call to undeclared function 'of_device_is_available'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     908 |         if (!ierb_node || !of_device_is_available(ierb_node))
-         |                            ^
->> drivers/net/ethernet/freescale/enetc/enetc_pf.c:912:2: error: call to undeclared function 'of_node_put'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     912 |         of_node_put(ierb_node);
-         |         ^
-   drivers/net/ethernet/freescale/enetc/enetc_pf.c:1115:14: error: call to undeclared function 'of_device_is_available'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    1115 |         if (node && of_device_is_available(node))
-         |                     ^
-   1 warning and 5 errors generated.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 3/3] ipv4/udp: Add 4-tuple hash for connected
+ socket
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
+ antony.antony@secunet.com, steffen.klassert@secunet.com,
+ linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
+ jakub@cloudflare.com, fred.cc@alibaba-inc.com,
+ yubing.qiuyubing@alibaba-inc.com
+References: <20241018114535.35712-1-lulie@linux.alibaba.com>
+ <20241018114535.35712-4-lulie@linux.alibaba.com>
+ <b232a642-2f0d-4bac-9bcf-50d653ea875d@redhat.com>
+ <80fbd73f-ce75-44bf-a444-116217a50c91@linux.alibaba.com>
+ <ad78a2bb-9dc4-4f80-9011-b49fd721a425@redhat.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <ad78a2bb-9dc4-4f80-9011-b49fd721a425@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-vim +/of_find_compatible_node +906 drivers/net/ethernet/freescale/enetc/enetc_pf.c
 
-07bf34a50e3279 Vladimir Oltean 2021-02-04  900  
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  901  static int enetc_pf_register_with_ierb(struct pci_dev *pdev)
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  902  {
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  903  	struct platform_device *ierb_pdev;
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  904  	struct device_node *ierb_node;
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  905  
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17 @906  	ierb_node = of_find_compatible_node(NULL, NULL,
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  907  					    "fsl,ls1028a-enetc-ierb");
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17 @908  	if (!ierb_node || !of_device_is_available(ierb_node))
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  909  		return -ENODEV;
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  910  
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  911  	ierb_pdev = of_find_device_by_node(ierb_node);
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17 @912  	of_node_put(ierb_node);
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  913  
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  914  	if (!ierb_pdev)
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  915  		return -EPROBE_DEFER;
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  916  
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  917  	return enetc_ierb_register_pf(ierb_pdev, pdev);
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  918  }
-e7d48e5fbf30f8 Vladimir Oltean 2021-04-17  919  
+On 2024/10/25 17:02, Paolo Abeni wrote:
+> On 10/25/24 05:50, Philo Lu wrote:
+>> On 2024/10/24 23:01, Paolo Abeni wrote:
+>>> On 10/18/24 13:45, Philo Lu wrote:
+>>> [...]
+>>>> +/* In hash4, rehash can also happen in connect(), where hash4_cnt keeps unchanged. */
+>>>> +static void udp4_rehash4(struct udp_table *udptable, struct sock *sk, u16 newhash4)
+>>>> +{
+>>>> +	struct udp_hslot *hslot4, *nhslot4;
+>>>> +
+>>>> +	hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
+>>>> +	nhslot4 = udp_hashslot4(udptable, newhash4);
+>>>> +	udp_sk(sk)->udp_lrpa_hash = newhash4;
+>>>> +
+>>>> +	if (hslot4 != nhslot4) {
+>>>> +		spin_lock_bh(&hslot4->lock);
+>>>> +		hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
+>>>> +		hslot4->count--;
+>>>> +		spin_unlock_bh(&hslot4->lock);
+>>>> +
+>>>> +		synchronize_rcu();
+>>>
+>>> This deserve a comment explaining why it's needed. I had to dig in past
+>>> revision to understand it.
+>>>
+>>
+>> Got it. And a short explanation here (see [1] for detail):
+>>
+>> Here, we move a node from a hlist to another new one, i.e., update
+>> node->next from the old hlist to the new hlist. For readers traversing
+>> the old hlist, if we update node->next just when readers move onto the
+>> moved node, then the readers also move to the new hlist. This is unexpected.
+>>
+>>       Reader(lookup)     Writer(rehash)
+>>       -----------------  ---------------
+>> 1. rcu_read_lock()
+>> 2. pos = sk;
+>> 3.                     hlist_del_init_rcu(sk, old_slot)
+>> 4.                     hlist_add_head_rcu(sk, new_slot)
+>> 5. pos = pos->next; <=
+>> 6. rcu_read_unlock()
+>>
+>> [1]
+>> https://lore.kernel.org/all/0fb425e0-5482-4cdf-9dc1-3906751f8f81@linux.alibaba.com/
+> 
+> Thanks. AFAICS the problem that such thing could cause is a lookup
+> failure for a socket positioned later in the same chain when a previous
+> entry is moved on a different slot during a concurrent lookup.
+> 
 
+Yes, you're right.
+
+> I think that could be solved the same way TCP is handling such scenario:
+> using hlist_null RCU list for the hash4 bucket, checking that a failed
+> lookup ends in the same bucket where it started and eventually
+> reiterating from the original bucket.
+> 
+> Have a look at __inet_lookup_established() for a more descriptive
+> reference, especially:
+> 
+> https://elixir.bootlin.com/linux/v6.12-rc4/source/net/ipv4/inet_hashtables.c#L528
+> 
+
+Thank you! I'll try it in the next version.
+
+>>>> +
+...
+>>>> +
+>>>> +/* call with sock lock */
+>>>> +static void udp4_hash4(struct sock *sk)
+>>>> +{
+>>>> +	struct udp_hslot *hslot, *hslot2, *hslot4;
+>>>> +	struct net *net = sock_net(sk);
+>>>> +	struct udp_table *udptable;
+>>>> +	unsigned int hash;
+>>>> +
+>>>> +	if (sk_unhashed(sk) || inet_sk(sk)->inet_rcv_saddr == htonl(INADDR_ANY))
+>>>> +		return;
+>>>> +
+>>>> +	hash = udp_ehashfn(net, inet_sk(sk)->inet_rcv_saddr, inet_sk(sk)->inet_num,
+>>>> +			   inet_sk(sk)->inet_daddr, inet_sk(sk)->inet_dport);
+>>>> +
+>>>> +	udptable = net->ipv4.udp_table;
+>>>> +	if (udp_hashed4(sk)) {
+>>>> +		udp4_rehash4(udptable, sk, hash);
+>>>
+>>> It's unclear to me how we can enter this branch. Also it's unclear why
+>>> here you don't need to call udp_hash4_inc()udp_hash4_dec, too. Why such
+>>> accounting can't be placed in udp4_rehash4()?
+>>>
+>>
+>> It's possible that a connected udp socket _re-connect_ to another remote
+>> address. Then, because the local address is not changed, hash2 and its
+>> hash4_cnt keep unchanged. But rehash4 need to be done.
+>> I'll also add a comment here.
+> 
+> Right, UDP socket could actually connect() successfully twice in a row
+> without a disconnect in between...
+> 
+> I almost missed the point that the ipv6 implementation is planned to
+> land afterwards.
+> 
+> I'm sorry, but I think that would be problematic - i.e. if ipv4 support
+> will land in 6.13, but ipv6 will not make it - due to time constraints -
+> we will have (at least a release with inconsistent behavior between ipv4
+> and ipv6. I think it will be better bundle such changes together.
+> 
+
+No problem. I can add ipv6 support in the next version too.
+
+Thanks.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Philo
+
 
