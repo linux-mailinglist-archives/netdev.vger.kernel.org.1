@@ -1,229 +1,152 @@
-Return-Path: <netdev+bounces-139312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A8D9B16C6
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 12:01:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E0CB9B16D0
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 12:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AF481C20E2E
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 10:01:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DED89B216B5
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 10:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6681CFEAE;
-	Sat, 26 Oct 2024 10:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F491D0F60;
+	Sat, 26 Oct 2024 10:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hAsw+Fq+"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="iRvFE9Sy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92C52BAEC;
-	Sat, 26 Oct 2024 10:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8650E1CBE8A
+	for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 10:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729936863; cv=none; b=Zl1cvjjKiTZ1B5f2AvJLxpfaWLkJb4qwTFKYtFFohl4hUWbxn3J4NAPNQ3oxmZogZIbaenj7GuqTzZnoO9si2VIechCUKC9LsERBTamXVf9GxtGQkk2avG1X5VgdC6aR1hvpt+zT0Jo9NnFHq14TRWPCr91y6HKcoDwSpsO2r8w=
+	t=1729937134; cv=none; b=goFbW5VotE2NkDUWydNcZPRYNZYHh7s1U/xds9uncqZfIjw5H5x0QH9bmfA1/B+lwh5F89nY2gFmi5aBGG0WTODACKPrupY/+lTqY4ara8hcjtPch2HzLhOwKWrRhjNIMlDm9yl0QHMT0FCJE4E1d/ddHniGrHif93ypfW69WAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729936863; c=relaxed/simple;
-	bh=MBEUluzwNl+8pJbFyxJ5uvx7Dtm3uc4YLf+WUTqJ1Fw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mMQX/jcJdpa+Id3VQI1R1nOTnHMOQJtIaeWJgwx0MH/znJr7a42aFOH3P8WsxDSfimeQ7eP92+GriJzxgIGT1fHPpyVauuhC8/LRwv93apfWUgvuLnH3OhIArsi6buJ2WyZxy0XYCFX4gX0033rlts1zP9Q4H0787F39/e+/tUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hAsw+Fq+; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729936859; x=1761472859;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MBEUluzwNl+8pJbFyxJ5uvx7Dtm3uc4YLf+WUTqJ1Fw=;
-  b=hAsw+Fq+BreraYOnQckkUCqUxwNcYBNvUZA6j8+BhAJ1DcN0YCtS/4zq
-   oZassY4pvforlBWd9doUnKajok7ozUdNo7EEhRSLoFaEY0ONIo00077ko
-   R4FKU/HR2tL4RWYcL75UOglNddiIHbNGo51fjJAtE8/gx6Slx17GBx57j
-   SGUu49C1p+zh4NHid6ZnqO7YDJbPvRWzp5ZzCXGQtie1xUc7jmOE4Xi+7
-   AVyOuXDSK72eEBiZnYCEJJUhQ5EQoWPpZGqQtc75X9iUMXbSN11aELDBH
-   KafxvC7D9PRnUpr/FuFxjnqfnkuQpxoq0B2eojN/QQbqyoSG6TQUXbRtM
-   w==;
-X-CSE-ConnectionGUID: 1SIoqtJfS3i6zwUGVAF4/Q==
-X-CSE-MsgGUID: AwmhOZ58SDukXpe7oW4KHw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40703389"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40703389"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2024 03:00:59 -0700
-X-CSE-ConnectionGUID: YdIs7TC+R7OJP5dJsfe0mw==
-X-CSE-MsgGUID: hIe7ERXcQPCIWP/niYjG7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,234,1725346800"; 
-   d="scan'208";a="81314649"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 26 Oct 2024 03:00:56 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t4dbJ-000ZUc-2q;
-	Sat, 26 Oct 2024 10:00:53 +0000
-Date: Sat, 26 Oct 2024 18:00:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	linux-kernel@vger.kernel.org, justin.iurman@uliege.be
-Subject: Re: [PATCH net-next 2/3] net: ipv6: seg6_iptunnel: mitigate
- 2-realloc issue
-Message-ID: <202410261713.GIaQEsJC-lkp@intel.com>
-References: <20241025133727.27742-3-justin.iurman@uliege.be>
+	s=arc-20240116; t=1729937134; c=relaxed/simple;
+	bh=JRDq1eouqRQ6dVU3EFp5yS+KoReTI1aJZRgZao2+yYk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CitBDJSTI1UIDPPo7FPqohlUloFUAPBfMRnUfg333RmUBSKa2w0XxHKBGfN23qBYKNkdG7POb85zbeDyHRAFvLTk6Yg5Bm9z+uopRqe+xxq463g3F86R9NW0GwoL7EJraSQGkmqq8PxxbNezcDi2ERU4GLoCX4tV1pA6sJizmQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=fail smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=iRvFE9Sy; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49Q4dxXW022389
+	for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 10:05:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	HmnLmB7Z58PVjAcP88scYZXyrOOFTxtAMnjFZSQFAfc=; b=iRvFE9Syyhxp53Jb
+	uovXq/qGC49O65tQ43cSVpkm/EfgNtQ0tfzcLevyK9sngwYGzi6oh8x1R+ze27eD
+	ADUSEq893IjDyMM3u5q6zd340pDoBU6pYzTvvC9wesEj/DYVpe/0QITVDf/6tt84
+	aqFU95EQiTPdYem566SoGf/YZyqY7MvTZ0GeOZl0eBOazQKemKcOO6OYYL68io6S
+	z3x5ZcwqE2nVHglNlMCssFQ8TOqaOh/Uszl4qrtDZlzv4MxwX2VheSVBEtAT8m3f
+	Zs2uc1B6/+NqNBTF8P1uyFfLA9L6+XHYhuFUSBGsirAbuDaE/gCuVEKFw62gja8L
+	96h+4A==
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com [209.85.219.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gskjrmcs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 10:05:25 +0000 (GMT)
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6cbf4770c18so8663556d6.2
+        for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 03:05:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729937124; x=1730541924;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HmnLmB7Z58PVjAcP88scYZXyrOOFTxtAMnjFZSQFAfc=;
+        b=ubifhFVksTnJcMHRo3uxZWqCa+6A0OCiw8mxc3h49GEDw8sZe9bfKz3x5Ko4W+x4go
+         YsxpRDxL/AmWAtfqWIPJZ0Yabg/9qw2euttXDCeTCqcTiz5a5u7OXoSiAcxQFdpYIe7K
+         1RTD5GzWNsa9dK4nxtFARSDJY6WHyTwCaduBSzP911b6IT54uO8qVVGJxWA+kEEX8nPl
+         3see0uvn7IDOZYVemJY4cgl8ZXZck3gtWACpYbTqHmKiZ5YfU9z9/gceA/3uO9eAG0Ii
+         36STuwGeHkm5VIbSlHQp5kK2309QXUC6NRylt1/Ndo5IQfLfxw4tr/sPIF6K1bD+uKu4
+         NkrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqlMcDEaRikY/3iX6y9xJGMKwP4U8IEqDTEUUj+adeklFGVf1gqTcwKtJw4acZHy9U7UQ75pM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW4lXK98DOExLKCv13Gv/r9McmDW5AbixRbQy8IfGqWeO18o+w
+	R3Al1yLEDNkgZeGkxN2hRj71HfnvbqcAOYf4p6IxQwYO92QZ9EeUmBU9YkFR+6j8mBQdhp+4Fp8
+	SfccKxobXoDWriApLD4V3KoyrQ6j5wMyl9ediDGICp5iuo/Osr7o8hss=
+X-Received: by 2002:a05:6214:19c1:b0:6cb:e7e8:9e88 with SMTP id 6a1803df08f44-6d185885e9fmr16414536d6.10.1729937124668;
+        Sat, 26 Oct 2024 03:05:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEapbGj3Sfdlc6h7mBBc6DRy9QbRrJtdmLohS8bgyDq5d6FfQeVz9TdD9OYLquQ7Ttuo89WlA==
+X-Received: by 2002:a05:6214:19c1:b0:6cb:e7e8:9e88 with SMTP id 6a1803df08f44-6d185885e9fmr16414176d6.10.1729937124194;
+        Sat, 26 Oct 2024 03:05:24 -0700 (PDT)
+Received: from [192.168.212.120] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b307b5375sm158967966b.155.2024.10.26.03.05.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Oct 2024 03:05:23 -0700 (PDT)
+Message-ID: <ca0137a6-3ffa-46ad-a970-7420520f09ae@oss.qualcomm.com>
+Date: Sat, 26 Oct 2024 12:05:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025133727.27742-3-justin.iurman@uliege.be>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 6/7] arm64: dts: qcom: ipq9574: Add nsscc node
+To: kernel test robot <lkp@intel.com>,
+        Manikanta Mylavarapu <quic_mmanikan@quicinc.com>, andersson@kernel.org,
+        mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
+        krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org,
+        catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
+        richardcochran@gmail.com, geert+renesas@glider.be,
+        dmitry.baryshkov@linaro.org, angelogioacchino.delregno@collabora.com,
+        neil.armstrong@linaro.org, arnd@arndb.de, nfraprado@collabora.com,
+        quic_anusha@quicinc.com, linux-arm-msm@vger.kernel.org,
+        linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, quic_srichara@quicinc.com,
+        quic_varada@quicinc.com
+References: <20241025035520.1841792-7-quic_mmanikan@quicinc.com>
+ <202410260742.a9vvkaEz-lkp@intel.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <202410260742.a9vvkaEz-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: HWkF5e4vCftciTTe-IZOcblZ71rjMYDd
+X-Proofpoint-ORIG-GUID: HWkF5e4vCftciTTe-IZOcblZ71rjMYDd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ impostorscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410260084
 
-Hi Justin,
+On 26.10.2024 1:31 AM, kernel test robot wrote:
+> Hi Manikanta,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on clk/clk-next]
+> [also build test ERROR on robh/for-next arm64/for-next/core linus/master v6.12-rc4 next-20241025]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Manikanta-Mylavarapu/clk-qcom-clk-alpha-pll-Add-NSS-HUAYRA-ALPHA-PLL-support-for-ipq9574/20241025-121244
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
+> patch link:    https://lore.kernel.org/r/20241025035520.1841792-7-quic_mmanikan%40quicinc.com
+> patch subject: [PATCH v8 6/7] arm64: dts: qcom: ipq9574: Add nsscc node
+> config: arm64-randconfig-001-20241026 (https://download.01.org/0day-ci/archive/20241026/202410260742.a9vvkaEz-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 14.1.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241026/202410260742.a9vvkaEz-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202410260742.a9vvkaEz-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>>> Error: arch/arm64/boot/dts/qcom/ipq9574.dtsi:766.16-17 syntax error
+>    FATAL ERROR: Unable to parse input tree
 
-kernel test robot noticed the following build errors:
+I believe you also need to include <dt-bindings/clock/qcom,ipq-cmn-pll.h>
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Iurman/net-ipv6-ioam6_iptunnel-mitigate-2-realloc-issue/20241025-214849
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241025133727.27742-3-justin.iurman%40uliege.be
-patch subject: [PATCH net-next 2/3] net: ipv6: seg6_iptunnel: mitigate 2-realloc issue
-config: i386-buildonly-randconfig-004-20241026 (https://download.01.org/0day-ci/archive/20241026/202410261713.GIaQEsJC-lkp@intel.com/config)
-compiler: clang version 19.1.2 (https://github.com/llvm/llvm-project 7ba7d8e2f7b6445b60679da826210cdde29eaf8b)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241026/202410261713.GIaQEsJC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410261713.GIaQEsJC-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   In file included from net/ipv6/seg6_iptunnel.c:10:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> net/ipv6/seg6_iptunnel.c:130:9: error: call to undeclared function '__seg6_do_srh_encap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     130 |         return __seg6_do_srh_encap(skb, osrh, proto, NULL);
-         |                ^
-   net/ipv6/seg6_iptunnel.c:130:9: note: did you mean 'seg6_do_srh_encap'?
-   net/ipv6/seg6_iptunnel.c:128:5: note: 'seg6_do_srh_encap' declared here
-     128 | int seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh, int proto)
-         |     ^
-     129 | {
-     130 |         return __seg6_do_srh_encap(skb, osrh, proto, NULL);
-         |                ~~~~~~~~~~~~~~~~~~~
-         |                seg6_do_srh_encap
->> net/ipv6/seg6_iptunnel.c:134:5: warning: no previous prototype for function '__seg6_do_srh_encap' [-Wmissing-prototypes]
-     134 | int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-         |     ^
-   net/ipv6/seg6_iptunnel.c:134:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     134 | int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-         | ^
-         | static 
->> net/ipv6/seg6_iptunnel.c:330:9: error: call to undeclared function '__seg6_do_srh_inline'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     330 |         return __seg6_do_srh_inline(skb, osrh, NULL);
-         |                ^
-   net/ipv6/seg6_iptunnel.c:330:9: note: did you mean 'seg6_do_srh_inline'?
-   net/ipv6/seg6_iptunnel.c:328:5: note: 'seg6_do_srh_inline' declared here
-     328 | int seg6_do_srh_inline(struct sk_buff *skb, struct ipv6_sr_hdr *osrh)
-         |     ^
-     329 | {
-     330 |         return __seg6_do_srh_inline(skb, osrh, NULL);
-         |                ~~~~~~~~~~~~~~~~~~~~
-         |                seg6_do_srh_inline
->> net/ipv6/seg6_iptunnel.c:334:5: warning: no previous prototype for function '__seg6_do_srh_inline' [-Wmissing-prototypes]
-     334 | int __seg6_do_srh_inline(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-         |     ^
-   net/ipv6/seg6_iptunnel.c:334:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     334 | int __seg6_do_srh_inline(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-         | ^
-         | static 
-   3 warnings and 2 errors generated.
-
-
-vim +/__seg6_do_srh_encap +130 net/ipv6/seg6_iptunnel.c
-
-   126	
-   127	/* encapsulate an IPv6 packet within an outer IPv6 header with a given SRH */
-   128	int seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh, int proto)
-   129	{
- > 130		return __seg6_do_srh_encap(skb, osrh, proto, NULL);
-   131	}
-   132	EXPORT_SYMBOL_GPL(seg6_do_srh_encap);
-   133	
- > 134	int __seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh,
-   135				int proto, struct dst_entry *dst)
-   136	{
-   137		struct net *net = dev_net(skb_dst(skb)->dev);
-   138		struct ipv6hdr *hdr, *inner_hdr;
-   139		struct ipv6_sr_hdr *isrh;
-   140		int hdrlen, tot_len, err;
-   141		__be32 flowlabel;
-   142	
-   143		hdrlen = (osrh->hdrlen + 1) << 3;
-   144		tot_len = hdrlen + sizeof(*hdr);
-   145	
-   146		err = skb_cow_head(skb, tot_len + (!dst ? skb->mac_len
-   147							: LL_RESERVED_SPACE(dst->dev)));
-   148		if (unlikely(err))
-   149			return err;
-   150	
-   151		inner_hdr = ipv6_hdr(skb);
-   152		flowlabel = seg6_make_flowlabel(net, skb, inner_hdr);
-   153	
-   154		skb_push(skb, tot_len);
-   155		skb_reset_network_header(skb);
-   156		skb_mac_header_rebuild(skb);
-   157		hdr = ipv6_hdr(skb);
-   158	
-   159		/* inherit tc, flowlabel and hlim
-   160		 * hlim will be decremented in ip6_forward() afterwards and
-   161		 * decapsulation will overwrite inner hlim with outer hlim
-   162		 */
-   163	
-   164		if (skb->protocol == htons(ETH_P_IPV6)) {
-   165			ip6_flow_hdr(hdr, ip6_tclass(ip6_flowinfo(inner_hdr)),
-   166				     flowlabel);
-   167			hdr->hop_limit = inner_hdr->hop_limit;
-   168		} else {
-   169			ip6_flow_hdr(hdr, 0, flowlabel);
-   170			hdr->hop_limit = ip6_dst_hoplimit(skb_dst(skb));
-   171	
-   172			memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
-   173	
-   174			/* the control block has been erased, so we have to set the
-   175			 * iif once again.
-   176			 * We read the receiving interface index directly from the
-   177			 * skb->skb_iif as it is done in the IPv4 receiving path (i.e.:
-   178			 * ip_rcv_core(...)).
-   179			 */
-   180			IP6CB(skb)->iif = skb->skb_iif;
-   181		}
-   182	
-   183		hdr->nexthdr = NEXTHDR_ROUTING;
-   184	
-   185		isrh = (void *)hdr + sizeof(*hdr);
-   186		memcpy(isrh, osrh, hdrlen);
-   187	
-   188		isrh->nexthdr = proto;
-   189	
-   190		hdr->daddr = isrh->segments[isrh->first_segment];
-   191		set_tun_src(net, skb_dst(skb)->dev, &hdr->daddr, &hdr->saddr);
-   192	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Konrad
 
