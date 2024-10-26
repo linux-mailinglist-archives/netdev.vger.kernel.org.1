@@ -1,109 +1,110 @@
-Return-Path: <netdev+bounces-139372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCFDF9B1AEF
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 22:37:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4279B1B44
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 00:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F4EC28133F
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 20:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4886281C2A
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 22:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A443C1C3F27;
-	Sat, 26 Oct 2024 20:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A4F1D07B0;
+	Sat, 26 Oct 2024 22:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIXAMrj1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jZ0JBTvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8521534E9;
-	Sat, 26 Oct 2024 20:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13B910E5
+	for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 22:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729975034; cv=none; b=QHXHrA5DC2VpgDZfPbZW4ib0xZ+cmS1lsOfjcT0knCXvfvwZ4fsuBw3r2OSYw2UsabmkrfMMXVh7PbDKxqnd+OdY1GXl+OoL5m2s/2hSYZHvenZbRdOykpq0WGAGTrHUKYMjmuh50osCriINlJmhDdtyc1jvQ6f6xaDsl4I0+qg=
+	t=1729981228; cv=none; b=d1pD4tslIMgLy2XxUDdT4dVL06IPpejKo16o926eiqcjo5XIPf2jrGX4qyeGoayB72FgzEGOwnHX9R3DBV7OBzuAG15go8u6MFt9ynSBOStNQhvG4mvv2rGa0JNVochAKVQrqJACTMQDxNRaI9G/qKLswxDTQ1YrKJgvDmEqoms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729975034; c=relaxed/simple;
-	bh=HI7ity/oa/ka9cv3V8FDOAD5p0QTO9Jgh7DeocJ5Glk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V4u3lpfUQoDX8ERe5Y863jZDKJpTI+M2o/pmdlcmcEoEwCH8imi6rK8rdVgM+LcOMlHQybRATvf/HMu2eNy/YVHDaZmTGTj5klW0VurPmCMJz8d+1cH00BZylnLKTf2vJIbEt2FPMpEUet4ElkwUHd0Gs59jrukoh6SCALZ7l/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIXAMrj1; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7205b6f51f3so1164701b3a.1;
-        Sat, 26 Oct 2024 13:37:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729975032; x=1730579832; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aR5yj1+V/MTixDnxfXpOMwrRd/ZzgiDUoeYFWdOL+aM=;
-        b=SIXAMrj1sQpCqkMGlDnswd4uF3JXatn+rR6IxO4uXFDQyjUhTeMWncJnfcwNeZ/lkT
-         RymxhSwUnFqbgZ3o1vqZDlUDbysdW4KXS0+kUM/1lfT6q0lQN+OIJ3d7kp2Emnf0lfzW
-         lnC/ZobFaLJmWSO6hp21xVQr7FRJ/aeMN4SDDc05bg/0+BD/HPZvvYiUTSWSQIO5pCnf
-         7ghX27bERknkjywCgT1KUlQCXbUQc2nLGU75MPWJsEN2CHz3PFZwuGu6y+OvJXN9VEPN
-         JfRPMN5M6P9xO8MNFbSfnY+Uu2fOo4FF/4719xVe5iOwD+zERRjacPf8fYdcNlaXgBWz
-         b3GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729975032; x=1730579832;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aR5yj1+V/MTixDnxfXpOMwrRd/ZzgiDUoeYFWdOL+aM=;
-        b=Ur3AmjRFfdERdjSRTPgsp9eDxg4/pQA50IfksG4bk9il1I6qXMgL6janjUROtTFS2h
-         W6jj+3t5e+R7xKetAi8nTNMkYXnF5Sl4dOdiiK1RJGshSPAFvL8X5FdY6sn7H6JwCNQh
-         IOOFnwwfP9fWPi6jJozQ5oEWHpvg3ciGiLyaiaDSL7vac/aZTw6iGvwoT9sBXQhpELHr
-         ZbEFkBho0OKr45eIar3FeOlPKlSfp7z2C7K+Ex7/LuGsQPOaP051wJ/ekt1JmPgqNpvP
-         KMpBexsvyUHIUMB534AE5sDYCcfSwSypRKyXumqUigKEksavQwSIMOv9R63ymCNmy9Kv
-         0q+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUZr04eTubZVTebMQjXQHxbGLql5EMZhyN7SQQcXUlU25Qcs6Idf3CBx+dd7IcNImBNI/AhFFnVZQi5dAA/@vger.kernel.org, AJvYcCWrxwZnoMLqwKqqo/g0lrSMR01LKYRMbMH6K84b9I9m6laYK0sol7PhOGvaNOaCUIq6b+2qF4lJ@vger.kernel.org, AJvYcCXedIN9tD4lDL2pBsdcC3/jtKShjOT14DMJcjY7JraS+ZrprZz04qk9My6Zk2N6q4Vin+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZSc9St0xlQW6NIVQEMHQw5YfgweDql6IrklIfb9daXLBJY0yc
-	OXDZCdQaoldRrRqn868nlHVClnA6lgoF7jyN4oCRq3cmH/dvciYt
-X-Google-Smtp-Source: AGHT+IHPKiSQ1tUBn1Eiegpqfrg4lY2oC+XAepMwaiU3T/MqZRANFXm+bERVSZtum3QIvf/HkTf2RQ==
-X-Received: by 2002:a05:6a00:2350:b0:71e:4ba:f389 with SMTP id d2e1a72fcca58-72062f83c5amr6073389b3a.10.1729975032160;
-        Sat, 26 Oct 2024 13:37:12 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:6bce:bc57:7561:fc9c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1fb1esm3090123b3a.155.2024.10.26.13.37.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Oct 2024 13:37:11 -0700 (PDT)
-Date: Sat, 26 Oct 2024 13:37:10 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: mrpre <mrpre@163.com>
-Cc: edumazet@google.com, jakub@cloudflare.com, davem@davemloft.net,
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] bpf: fix filed access without lock
-Message-ID: <Zx1S9vf2i7O+BNE+@pop-os.localdomain>
-References: <20241021013705.14105-1-mrpre@163.com>
+	s=arc-20240116; t=1729981228; c=relaxed/simple;
+	bh=SCAW8HJBFDci8GA/0OLt0jOazrv+ejehqdynjR8jfyQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fgl2skga8/H4v1z8RZbRMt8oonsPaf5BT9iyX9bo6gHXKH4wxg/yem6+VIbymXDtOpwdkhNcJDiKpcN/3hpPheE1v4IrinQ+tXLxFXjCvexBJolQa1twwmiZtZseDSD2zGFvyBz2RjzYT1lOcI+Q5IXnUETcU0TbNS3u/AOrN/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jZ0JBTvU; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2707c8e1-a939-4bad-9a4d-a446c7c89795@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1729981221;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=URCR9XL7o5Q69EMxBDVjy4NSd/rD3uA1Cfy/GXsRhCY=;
+	b=jZ0JBTvUikXM/revSfTtEcoIo1rRnLZNN/nJq8vmuHY16M+M+KE1vZVswQae8sUYURXIZf
+	7iLied3eV8nSQyYuyWwXvkYerKOIKGZjzFsgi/Xi5wMQ9jgaT/tR34WfDBaEL/dcym6+kT
+	a+Ea0Xg+0yeFek54w02Y1iJkaP4sQvc=
+Date: Sat, 26 Oct 2024 23:20:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021013705.14105-1-mrpre@163.com>
+Subject: Re: [PATCH net-next v2 1/2] bnxt_en: cache only 24 bits of hw counter
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski
+ <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
+References: <20241025194753.3070604-1-vadfed@meta.com>
+ <CACKFLikgQxsYQxkMZdXDusS=0=rZi8g9Fn6-nEnVw+g-hgzf4g@mail.gmail.com>
+ <e89385ae-7d77-4890-8c80-b5904ac394b4@linux.dev>
+ <CACKFLinHAXcXF45NTJueBg8JDbJfPTrPZiwHzR71K4LtvHxLVw@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CACKFLinHAXcXF45NTJueBg8JDbJfPTrPZiwHzR71K4LtvHxLVw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Oct 21, 2024 at 09:37:05AM +0800, mrpre wrote:
-> The tcp_bpf_recvmsg_parser() function, running in user context,
-> retrieves seq_copied from tcp_sk without holding the socket lock, and
-> stores it in a local variable seq. However, the softirq context can
-> modify tcp_sk->seq_copied concurrently, for example, n tcp_read_sock().
+On 25/10/2024 23:13, Michael Chan wrote:
+> On Fri, Oct 25, 2024 at 2:53 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 25/10/2024 22:31, Michael Chan wrote:
+>>> On Fri, Oct 25, 2024 at 12:48 PM Vadim Fedorenko <vadfed@meta.com> wrote:
+>>>>
+>>>> This hardware can provide only 48 bits of cycle counter. We can leave
+>>>> only 24 bits in the cache to extend RX timestamps from 32 bits to 48
+>>>> bits. This make cache writes atomic even on 32 bit platforms and we can
+>>>> simply use READ_ONCE()/WRITE_ONCE() pair and remove spinlock. The
+>>>> configuration structure will be also reduced by 4 bytes.
+>>>
+>>> ptp->old_time serves 2 purposes: to cache the upper 16 bits of the HW
+>>> counter and for rollover check.  With this patch reducing
+>>> ptp->old_time to 24 bits, we now use the upper 16 bits for the cache
+>>> and the next 8 bits for the rollover check.  I think this will work.
+>>> But since the field is now 32-bit, why not use the full 32 bits
+>>> instead of 24 bits?  Thanks.
+>>
+>> As you confirmed that the HW has 48 bits of cycle counter, we have to
+>> cache 16 bits only. The other 8 bits are used for the rollover check. We
+>> can even use less bits for it. What is the use for another 8 bits? With
+>> this patch the rollover will happen every ~16 ms, but will be caught
+>> even till ~4s. If we will cache upper 32 bits, the rollover will happen
+>> every 64us and we will have to update cache value more often. But at the
+>> same time it will not bring any value, because the upper limit will
+>> still be ~4s. That's why I don't see any benefits of using all 32 bits.
 > 
-> As a result, the seq value is stale when it is assigned back to
-> tcp_sk->copied_seq at the end of tcp_bpf_recvmsg_parser(), leading to
-> incorrect behavior.
+> I agree the extra bits have no value other than to fill the 32-bit
+> field.  But it should not affect the frequency of caching
+> ptp->old_time.  It should be updated in bnxt_ptp_ts_aux_work() at a
+> fixed interval (1 second).
 
-Good catch! This makes sense to me. Mind to be more specific on the
-"incorrect behavior" here? What error or misbehavior did you see?
-
-> 
-> Signed-off-by: mrpre <mrpre@163.com>
-
-
-Please use your real name for SoB, see https://docs.kernel.org/process/submitting-patches.html
-
-Thanks.
+Ok, BNXT_LO_TIMER_MASK/BNXT_HI_TIMER_MASK use 24 bits only. I don't see
+any reason to keep more bits out of 48 bit of counter and I tried to be
+consistent across the code. It doesn't matter in terms of performance
+should we shift 16 or 24 bits. But because there will be another version
+(I forgot to remove one variable), I can change the code to fill 32-bit
+field if you insist.
 
