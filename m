@@ -1,66 +1,87 @@
-Return-Path: <netdev+bounces-139260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68609B13A4
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 01:58:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3699B13AA
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 02:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B7CA1C217D0
-	for <lists+netdev@lfdr.de>; Fri, 25 Oct 2024 23:58:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1CD1F21BF7
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90167214402;
-	Fri, 25 Oct 2024 23:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA4317C;
+	Sat, 26 Oct 2024 00:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CPP2fJCB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IT/fz7BY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71E71537C8;
-	Fri, 25 Oct 2024 23:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C43847C
+	for <netdev@vger.kernel.org>; Sat, 26 Oct 2024 00:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729900732; cv=none; b=iamO02CskZHljw+THSIogUb9tXn47h2IcssmDkCxMU1O+QiUNwGWMcqeSiHFNhtXcjFNLiMoogHliKgFemAdbSYqVF5DRoKsEGhYgQsNQ3T16bVKg1yh8aG24uBr6KA/4zoyzvW5B3VGDbrpklsg2MTLagOqS8hC8pn9tyWgf2M=
+	t=1729901086; cv=none; b=aBMCMRz3x8us+e69QttjTydsPyf3uKuC+OAF3KOJE7MtgVZ3BvDvl1RIhHIDB4UkoftyuBPejVcjs7xz2SRLdZDOv07hPCRX+951uro21g+e2Jluuw1emtmSObMcf3itJ9RhuTNOKZWuHkew78eBP7gUDyXAZMqCRhyCUMwD16g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729900732; c=relaxed/simple;
-	bh=TJA7CaWkwOT+Vx6n6pk7LQk4Ahrza9r536kiM47xLBs=;
+	s=arc-20240116; t=1729901086; c=relaxed/simple;
+	bh=MjnMJIfvHdcgXn2sAI9ZN6oghS5uL7+ZmlJFLwCcHlM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OybpqJqVuHLr/5sAH56hG+0N/tzRkDSZIUupNxjRxQ294yV/Oi1QSqigbndA6dY+5TR6UfrJdJ+d9EhxEEJ02SORceE0HFPngTsfDkjW5cfRDeJcJANnNM5nMn5AjyBSr2Xto466/GCaFGSH6Hchrr0J4fBT0AJCR4WCP6ARa/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CPP2fJCB; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729900721; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=qIXA6xds0tAHTYAKOJGCDVvDv46NuYZSlAdVmvtJsSg=;
-	b=CPP2fJCBzoYG+kEzpdvJX/Ew4k8pNsMkyxYyJpOUz7DHFwaoBYJ51/h0Az7rv3EY/MQBymjhylL3RNkUY2r4JR3qx4fRxvKh7zURpqpVJQ7pqDGDxedy1663jtUBOYhTx63MAunEK7a99SrQmCTg2j3MmeQgXggZGXffULNsFs0=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WHtY9Br_1729900720 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 26 Oct 2024 07:58:40 +0800
-Date: Sat, 26 Oct 2024 07:58:39 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Nils Hoppmann <niho@linux.ibm.com>,
-	Niklas Schnell <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Stefan Raspl <raspl@linux.ibm.com>
-Subject: Re: [PATCH net-next] net/smc: increase SMC_WR_BUF_CNT
-Message-ID: <20241025235839.GD36583@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20241025074619.59864-1-wenjia@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nE6ob/P9nK6CFpIQ3prvnGGViWgJwZNWACJBmYExlMeJxCTGGvngQNuhkbH2/9mHO4fijtLeafFQvjmkP/yi7zv5OOdr6un6xeOhiejLTf9CZg7t9btAICc3S4Nw8zX+B+0GAyFGjj+/LOkz0FYkoyetm/EH9P/zJOETmpvnUqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IT/fz7BY; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20ca7fc4484so18268145ad.3
+        for <netdev@vger.kernel.org>; Fri, 25 Oct 2024 17:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729901084; x=1730505884; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VTM9w9hTkIzlQo2IYQ5Z7G4O9imELZg7QgVt5hYyXvE=;
+        b=IT/fz7BYhw+Ifxnb8JXH8m9YBC5/HvCws96rQnFVpHufAOXlDAnjAAMSNRTOpTEhLm
+         oBk1K/Id+rtDKSIfVJkbe8o8f/6pDSA6SZkrtVprDK19DN3kL+7TWyW+xYy7K0nXGaUM
+         7kfhmeaNadw9ffrKnw/6vxkwL26bdI26230tsqcwg+VfilAssREuTMPwvonTKA11ly3k
+         yUzzxl2yymgpBjbh1zU+z8Zt6FjyIvMUNqW/NwlhbIPbVQcy1FelVM/zS+s0Y2Copk17
+         Dk6sni7REGVQ5QY7ND3Wslz2aE2g4Kl1ptpxm51LBHo4cYpFzSv6QKjDdJjZY8Mvy4T2
+         laTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729901084; x=1730505884;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VTM9w9hTkIzlQo2IYQ5Z7G4O9imELZg7QgVt5hYyXvE=;
+        b=SZG7YSdQ9TyMYd6adgVZ/xn3p/+pYqTRSTo7gYeWotXV1gX60auY51InOSIo01MtNA
+         Qou/5Szx1FrAycE03YqUKZXn873gtw4VLTmObeBGS3fh8E0cKgW4uUg9sBjiM0KRd9ES
+         AX9RqoA8J4pzH/QFRuEVnIX5NY0Rkvs2VVXWBJBzp6hLv7ltscNb6JQTfUOTbioZsyi+
+         SM5D9hrnUwzuoWcitgWmqYWOC+knZo6Tewk1HEGTA06rZ73QkML8+2KvZq1q0njcTaMA
+         S7cfIjvB6VfjpuIFc8HxnISfs8k5ZLCca/TfBD7WzTwTyvTzX/bwQ0y28ljAy5mdH21j
+         txHg==
+X-Gm-Message-State: AOJu0YzVW1qCrvzJBEjRLdBR/DXIcoJ+mhZkzjk1p/jjh4YGDjo1TLWT
+	wwAbACVa4uVqHr+4+4GLP5XY/WEomCzuC/9ESEDwWFCjo7mbED0U
+X-Google-Smtp-Source: AGHT+IFTkbQf22BzI8qckE3D2gtUgVIjcMqaDP9K9hM3BZ669pmV/qd4CB1R/pyklbMVfxJ1AigHmQ==
+X-Received: by 2002:a17:903:2345:b0:20c:7be3:2832 with SMTP id d9443c01a7336-210c6ae34d3mr11939825ad.31.1729901084126;
+        Fri, 25 Oct 2024 17:04:44 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:879f:f366:fb0:247c])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf84597sm14754585ad.111.2024.10.25.17.04.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 17:04:43 -0700 (PDT)
+Date: Fri, 25 Oct 2024 17:04:42 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+	ij@kernel.org, ncardwell@google.com,
+	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+	vidhi_goel@apple.com, Olga Albisser <olga@albisser.org>,
+	Olivier Tilmans <olivier.tilmans@nokia.com>,
+	Henrik Steen <henrist@henrist.net>,
+	Bob Briscoe <research@bobbriscoe.net>
+Subject: Re: [PATCH net-next 1/1] sched: Add dualpi2 qdisc
+Message-ID: <ZxwyGtt2V6w3WIIp@pop-os.localdomain>
+References: <20241018021004.39258-1-chia-yu.chang@nokia-bell-labs.com>
+ <20241018021004.39258-2-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,75 +90,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241025074619.59864-1-wenjia@linux.ibm.com>
+In-Reply-To: <20241018021004.39258-2-chia-yu.chang@nokia-bell-labs.com>
 
-On 2024-10-25 09:46:19, Wenjia Zhang wrote:
->From: Halil Pasic <pasic@linux.ibm.com>
->
->The current value of SMC_WR_BUF_CNT is 16 which leads to heavy
->contention on the wr_tx_wait workqueue of the SMC-R linkgroup and its
->spinlock when many connections are  competing for the buffer. Currently
->up to 256 connections per linkgroup are supported.
->
->To make things worse when finally a buffer becomes available and
->smc_wr_tx_put_slot() signals the linkgroup's wr_tx_wait wq, because
->WQ_FLAG_EXCLUSIVE is not used all the waiters get woken up, most of the
->time a single one can proceed, and the rest is contending on the
->spinlock of the wq to go to sleep again.
->
->For some reason include/linux/wait.h does not offer a top level wrapper
->macro for wait_event with interruptible, exclusive and timeout. I did
->not spend too many cycles on thinking if that is even a combination that
->makes sense (on the quick I don't see why not) and conversely I
->refrained from making an attempt to accomplish the interruptible,
->exclusive and timeout combo by using the abstraction-wise lower
->level __wait_event interface.
->
->To alleviate the tx performance bottleneck and the CPU overhead due to
->the spinlock contention, let us increase SMC_WR_BUF_CNT to 256.
+On Fri, Oct 18, 2024 at 04:10:04AM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
+>  Documentation/netlink/specs/tc.yaml |  108 +++
+>  include/linux/netdevice.h           |    1 +
+>  include/uapi/linux/pkt_sched.h      |   34 +
+>  net/sched/Kconfig                   |   20 +
+>  net/sched/Makefile                  |    1 +
+>  net/sched/sch_dualpi2.c             | 1045 +++++++++++++++++++++++++++
 
-Hi,
+Please also add selftests under tools/testing/selftests/tc-testing/ while you are on it.
 
-Have you tested other values, such as 64? In our internal version, we
-have used 64 for some time.
+BTW, could it be implemented with eBPF Qdisc?
 
-Increasing this to 256 will require a 36K continuous physical memory
-allocation in smc_wr_alloc_link_mem(). Based on my experience, this may
-fail on servers that have been running for a long time and have
-fragmented memory.
-
-    link->wr_rx_bufs = kcalloc(SMC_WR_BUF_CNT * 3, SMC_WR_BUF_SIZE,
-                               GFP_KERNEL);
-
-As we can see, the link->wr_rx_bufs will increase from 16*3*48 = 2,304
-to 256*3*48=36,864 (1 page to 9 pages).
-
-Best regards,
-Dust
-
->
->Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->Reported-by: Nils Hoppmann <niho@linux.ibm.com>
->Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
->Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
->---
-> net/smc/smc_wr.h | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/smc/smc_wr.h b/net/smc/smc_wr.h
->index f3008dda222a..81e772e241f3 100644
->--- a/net/smc/smc_wr.h
->+++ b/net/smc/smc_wr.h
->@@ -19,7 +19,7 @@
-> #include "smc.h"
-> #include "smc_core.h"
-> 
->-#define SMC_WR_BUF_CNT 16	/* # of ctrl buffers per link */
->+#define SMC_WR_BUF_CNT 256	/* # of ctrl buffers per link */
-> 
-> #define SMC_WR_TX_WAIT_FREE_SLOT_TIME	(10 * HZ)
-> 
->-- 
->2.43.0
->
+Thanks.
 
