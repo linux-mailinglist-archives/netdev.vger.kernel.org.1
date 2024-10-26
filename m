@@ -1,144 +1,144 @@
-Return-Path: <netdev+bounces-139274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40AB39B13DB
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 02:42:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF0799B13F1
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 02:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C9C3B21C97
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:42:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 962B61F210E5
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500B18460;
-	Sat, 26 Oct 2024 00:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4F4217F39;
+	Sat, 26 Oct 2024 00:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="oiuZBBsv"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CVnXw1Uk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE30F1388;
-	Sat, 26 Oct 2024 00:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8478488;
+	Sat, 26 Oct 2024 00:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729903370; cv=none; b=tasToYiGkRoBA+VWnnf8FirVbP3Luvv1RdQx6F6rkmbrIcPxi0OigzOWlgc/fBZVTPV99Yl5x5QjLm8HuHHVpTjxWVgS5BnQZ6nK/R4dI8oWf1tbM5K+kQ/qyHa+Vw3h7we9vAEXHs09u89LAO4JLnRUnJzTe3lX+wILjrsShno=
+	t=1729903728; cv=none; b=SiOe9s+ouIK7HrZzvMVw7vtyrtJGbPJFGZy2Gu0dbIgAosy0z3ukA96rwPIkUZ2TqC/ewyK9cXPPiggsrwu0sp7bKCjpk8ebmQwQBBtcEtm/DISXAb2gtXv8E9d+p/eP0o7/89aYrnHGLLcHIXkqbLFwFoG1inlhlvTyQexnsP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729903370; c=relaxed/simple;
-	bh=+b2sWTz3hwtYXk3pZLvRyO5rNRS4CtQFgRu3RPzx9lM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mCzd2vCN9fzzhzVYq8D3ornUW6ktW8eKUIFzgGmW/l2UBCZE2EH8jj6UTTzaekGbSuGEdv2oiIAJE30zHFciqvVKvbm3b/gsGpVM9kZT5eVF7Di3KDy+PmPH3EPScwkU3455NaFYOCaqBDRgssRAYojxrQNMrNiYC2oz83/bREE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=oiuZBBsv; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1729903359; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=dAhdbugx+wh7RVvcf9zYMWRkick2x+Y7+PPYR5b5v9U=;
-	b=oiuZBBsv55Rs26mQRTY3ABLr7RmN7q2JOXJn/Am7CPG3wqNBP/q7PA/o9B8ZP5t+pZwe8rkkHp49XG56YQWUZjb9wSoHOt74MMhc/9YR+KFJM7PiCr42h8f37aG+RdWfnByn182iNQfYZo/6kBA6+7or/HD2BTsslAHORMwkhf4=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WHtcm5f_1729903357 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 26 Oct 2024 08:42:38 +0800
-Date: Sat, 26 Oct 2024 08:42:37 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Nils Hoppmann <niho@linux.ibm.com>,
-	Niklas Schnell <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-Message-ID: <20241026004237.GE36583@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+	s=arc-20240116; t=1729903728; c=relaxed/simple;
+	bh=YHZWdnLzTJs2zyTVS+j8wsunjMlgh1rlHUwh8i5eM0A=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dCc3XUeyoTsUCjl+xKfRgi6j/WslsTzatGyFMKMQegJ1wuOwzVlQK3fy57GHNfaLDOo21YiQWVMBRZUBsY1NYpS18PpB70qSNeIVOci4zsBZXg/CblhLvCSX8kTH70dju6WC6dgQurHTT+qjTLzA+qk6oIvlJCx4z18q45Ep5po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CVnXw1Uk; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729903726; x=1761439726;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=wlZDM7vIkk3uEbiZukBxgSNywFRcVq+UXcbpdaUZ3rw=;
+  b=CVnXw1UkdCf2CIFxX0l93qy8urA40mL1XOxdqPNhEAFg6M7RZVVMBGxV
+   pv5vxSZOMrQ4WoI/GmE3VqKyL6EoZLHEmUqfsKwLqk0U1Ej/EZo59zrcX
+   wG0qP//60Q1p80gQ1j4qqF2P6xZpSD2oiqYsucXQfztj3lpTlg+LJ6PZn
+   M=;
+X-IronPort-AV: E=Sophos;i="6.11,233,1725321600"; 
+   d="scan'208";a="140846331"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2024 00:48:44 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:62787]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.158:2525] with esmtp (Farcaster)
+ id 625cb3ba-6dc7-45ad-83ab-85cd53695419; Sat, 26 Oct 2024 00:48:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 625cb3ba-6dc7-45ad-83ab-85cd53695419
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sat, 26 Oct 2024 00:48:44 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.100.6) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Sat, 26 Oct 2024 00:48:40 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <trondmy@hammerspace.com>
+CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
+	<jlayton@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-nfs@vger.kernel.org>, <liujian56@huawei.com>, <neilb@suse.de>,
+	<netdev@vger.kernel.org>, <okorniev@redhat.com>, <pabeni@redhat.com>,
+	<tom@talpey.com>
+Subject: Re: [PATCH net] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
+Date: Fri, 25 Oct 2024 17:48:37 -0700
+Message-ID: <20241026004837.57278-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <0e434c61120b5b4a530731260c0f2c72ad02fa6f.camel@hammerspace.com>
+References: <0e434c61120b5b4a530731260c0f2c72ad02fa6f.camel@hammerspace.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025072356.56093-1-wenjia@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB004.ant.amazon.com (10.13.138.104) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 2024-10-25 09:23:55, Wenjia Zhang wrote:
->Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
->alternative to get_netdev") introduced an API ib_device_get_netdev.
->The SMC-R variant of the SMC protocol continued to use the old API
->ib_device_ops.get_netdev() to lookup netdev. As this commit 8d159eb2117b
->("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
->get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
->ib_device_ops.get_netdev didn't work any more at least by using a mlx5
->device driver. Thus, using ib_device_set_netdev() now became mandatory.
->
->Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
->
->Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
->Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
->Reported-by: Aswin K <aswin@linux.ibm.com>
->Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
->Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
-
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
->---
-> net/smc/smc_ib.c   | 8 ++------
-> net/smc/smc_pnet.c | 4 +---
-> 2 files changed, 3 insertions(+), 9 deletions(-)
->
->diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
->index 9297dc20bfe2..9c563cdbea90 100644
->--- a/net/smc/smc_ib.c
->+++ b/net/smc/smc_ib.c
->@@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
-> 	struct ib_device *ibdev = smcibdev->ibdev;
-> 	struct net_device *ndev;
+From: Trond Myklebust <trondmy@hammerspace.com>
+Date: Sat, 26 Oct 2024 00:35:30 +0000
+> On Fri, 2024-10-25 at 14:20 -0700, Kuniyuki Iwashima wrote:
+> > From: "liujian (CE)" <liujian56@huawei.com>
+> > Date: Fri, 25 Oct 2024 11:32:52 +0800
+> > > > > > If not, then what prevents it from happening?
+> > > > > The socket created by the userspace program obtains the
+> > > > > reference
+> > > > > counting of the namespace, but the kernel socket does not.
+> > > > > 
+> > > > > There's some discussion here:
+> > > > > https://lore.kernel.org/all/CANn89iJE5anTbyLJ0TdGAqGsE+GichY3YzQECjNUVMz=G3bcQg@mail.gmail.com/
+> > > > OK... So then it looks to me as if NFS, SMB, AFS, and any other
+> > > > networked filesystem that can be started from inside a container
+> > > > is
+> > > > going to need to do the same thing that rds appears to be doing.
+> > 
+> > FWIW, recently we saw a similar UAF on CIFS.
+> > 
+> > 
+> > > > 
+> > > > Should there perhaps be a helper function in the networking layer
+> > > > for
+> > > > this?
+> > > 
+> > > There should be no such helper function at present, right?.
+> > > 
+> > > If get net's reference to fix this problem, the following test is 
+> > > performed. There's nothing wrong with this case. I don't know if
+> > > there's 
+> > > anything else to consider.
+> > > 
+> > > I don't have any other ideas other than these two methods. Do you
+> > > have 
+> > > any suggestions on this problem? @Eric @Jakub ... @All
+> > 
+> > The netns lifetime should be managed by the upper layer rather than
+> > the networking layer.  If the netns is already dead, the upper layer
+> > must discard the net pointer anyway.
+> > 
+> > I suggest checking maybe_get_net() in NFS, CIFS, etc and then calling
+> > __sock_create() with kern 0.
+> > 
 > 
->-	if (!ibdev->ops.get_netdev)
->-		return;
->-	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
->+	ndev = ib_device_get_netdev(ibdev, port + 1);
-> 	if (ndev) {
-> 		smcibdev->ndev_ifidx[port] = ndev->ifindex;
-> 		dev_put(ndev);
->@@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
-> 		port_cnt = smcibdev->ibdev->phys_port_cnt;
-> 		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
-> 			libdev = smcibdev->ibdev;
->-			if (!libdev->ops.get_netdev)
->-				continue;
->-			lndev = libdev->ops.get_netdev(libdev, i + 1);
->+			lndev = ib_device_get_netdev(libdev, i + 1);
-> 			dev_put(lndev);
-> 			if (lndev != ndev)
-> 				continue;
->diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
->index 1dd362326c0a..8566937c8903 100644
->--- a/net/smc/smc_pnet.c
->+++ b/net/smc/smc_pnet.c
->@@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
-> 		for (i = 1; i <= SMC_MAX_PORTS; i++) {
-> 			if (!rdma_is_port_valid(ibdev->ibdev, i))
-> 				continue;
->-			if (!ibdev->ibdev->ops.get_netdev)
->-				continue;
->-			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
->+			ndev = ib_device_get_netdev(ibdev->ibdev, i);
-> 			if (!ndev)
-> 				continue;
-> 			dev_put(ndev);
->-- 
->2.43.0
->
+> Thanks for the suggestion, but we already manage the netns lifetime in
+> the RPC layer. A reference is taken when the filesystem is being
+> mounted. It is dropped when the filesystem is being unmounted.
+> 
+> The problem is the TCP timer races on shutdown. There is no interest in
+> having to manage that in the RPC layer.
+
+Does that mean netns is always alive when the socket is created
+in svc_create_socket() or xs_create_sock() ?  If so, you can just
+use __sock_create(kern=0) there to prevent net from being freed
+before the socket.
+
+sock_create_kern() and kern@ are confusing, and we had similar issues
+in other kernel TCP socket users SMC/RDS, so I'll rename them to
+sock_create_noref() and no_net_ref@ or something.
 
