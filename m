@@ -1,204 +1,159 @@
-Return-Path: <netdev+bounces-139270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16189B13BB
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 02:08:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411599B13CA
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 02:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 188101F21D29
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 801131C21667
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 00:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECEC042056;
-	Sat, 26 Oct 2024 00:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345113C00;
+	Sat, 26 Oct 2024 00:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iu6hgcB3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bg3LDsEA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F49429CE5;
-	Sat, 26 Oct 2024 00:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC43101C8;
+	Sat, 26 Oct 2024 00:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729901163; cv=none; b=Lv5wGfE64ZsZZ74CEdC39ZDJvHcFLYUOh9JukfzdFfnRUTPIYY/hOLqepdAl8OGjXR3YdPLvvaQWRdHPGHQEgEBTmkzpCyymsREW6jvkncgA/tGTtwbu8GHdSgf90MqobxCpQct7VG9r5c4exczNrg2DNnnf6wT8r37Mx+2PxcM=
+	t=1729901785; cv=none; b=VicN7njwNi0ubvymDzWRhQbg9ntlfLp4k82j8LFNRRftpONqjumdc646CjWfaH7RhJnnvNCkHFAjMbg2EbNoh/bp09Oqr2pwaGiAkUcIsKTWh4dZJGBtf8C7pa6k/iN0pStScUuchJkYPu0oTpUdPgFPuKwOIOecqA2akT0Pm/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729901163; c=relaxed/simple;
-	bh=ZwPg6ckOodnhLL6Qa5LKRiqPs1eFLPv7yR0MzR4z+Gg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YXxth0O7bbhqEnsMegoPvAiBL+6fIR4YmZDAt+Vye8HZaUwXYdpGSwUoqioeLJGRVTrrnzxQousR7ijLoMB2ox4r+uRWldN4cPZSpHdnoG4PCS96XidIGESSi6E6Llo/2zyeK8ZvNlvPJjELGUMFXkv+wzxRjSfNuZf4S5Nh5CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iu6hgcB3; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729901161; x=1761437161;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=ZwPg6ckOodnhLL6Qa5LKRiqPs1eFLPv7yR0MzR4z+Gg=;
-  b=iu6hgcB3z0ZNfbDSbfG+UIg+5pJWo/DHaNpmEDCBw46218uNxcdMqCSP
-   xZGG3//z18TJ8j9LQNSBU16pHUk1+TW2Uwx7t1jdritiri6+tnFvFGIad
-   G6NQR9nkmQfGOU5kK1fwY7ekQpVU9/yheTdx1wsa8VGZ60h+WVx85mntB
-   tPJ5XwGriWiL28a5ROAhykY7QClAKlQeVFaDitAnAG1yL3P8DOQMdMwKp
-   3HRJzSUWsXkW3WQUfO97XkP0HAT0XBEljnX5VNEYW3z20Yir3mMxDBu0/
-   tXz53jvZ/BMUBabwgTP2h33gdqXYaMxQM+AUbZpgabISemFB3k6gHYs9x
-   A==;
-X-CSE-ConnectionGUID: z85Pb6fJShC/Se66hAUt9Q==
-X-CSE-MsgGUID: fVDEP/USRPGg3me3hDKG7Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11236"; a="40959167"
-X-IronPort-AV: E=Sophos;i="6.11,233,1725346800"; 
-   d="scan'208";a="40959167"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 17:05:55 -0700
-X-CSE-ConnectionGUID: 7UjH2T7/T5m/7dfj43b5fQ==
-X-CSE-MsgGUID: Ts7PdoDtRGmcJzXXf0zdEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,233,1725346800"; 
-   d="scan'208";a="104386866"
-Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 17:05:55 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Fri, 25 Oct 2024 17:05:01 -0700
-Subject: [PATCH net-next v2 9/9] ice: cleanup Rx queue context programming
- functions
+	s=arc-20240116; t=1729901785; c=relaxed/simple;
+	bh=0YYjZlKKZjGTGx3E55nLceGD1IiO11vZqYeLy1CKweg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=awnIC03ouFVtKM3Uh+JgKU+/KqQrGXS4ny9E1qhBo2iTQBDTsb66Ijd+/SGrEf3vb/Hwbh6npaVugS5TgZDHBr1alhCo1H4nVOxS964hrlWZaC7ZQVBAPlJp/kdxzcuOQjzYQ1AN4kcbQSt7aVJeg/6C3NshoYaZ3/POb8hASd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bg3LDsEA; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7b14443a71eso220764185a.1;
+        Fri, 25 Oct 2024 17:16:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729901782; x=1730506582; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L5jqDWioJcT+CdB0kHptEaZz9lMvMRlEfl3ufrxlt44=;
+        b=Bg3LDsEAgQSjKxjYpQwXP+oS3xgUsys1RZhJUFTbvdmhL+DXvnsq/mDg3ylokRMo/N
+         uWbES//TdTz+TnottoOWNF4qTNtHxyAaJzMctTrNOigKo23nNL7cytcJ5szUpslXigk8
+         4Yl1Bwzbtxsf38MmO413OMI5N+zIz++7KqWmY1Yq4HS9AFcT4nAQkAQFBfQWMWMSbhJT
+         cQRU1hfZdFh5i8p8BEd88SGMPqyn+TRQx5gH04tAv6mXQW8R0tW8HD8Yisgqa7Xkp/8n
+         6OJS4TdOaVA5gWyo+StZGBLGkO5PlcSakZxZ/Mkz6giBligonLDzgA+niDL4cVGKNlyu
+         8DaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729901782; x=1730506582;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L5jqDWioJcT+CdB0kHptEaZz9lMvMRlEfl3ufrxlt44=;
+        b=YzLmoeetboH0yeLdY5DMETscIKsw0TPaFhnNZhDDscT7nhJkCqYA/EMX+2mfdxuNKx
+         r/hg6kFPCwf9nrRiuEEwkm//R45xvpS/wt4Q57A4hMJitbXLPCSSm4K5t/E2RStTw2nt
+         VDQ30lBIrXYEvCvwiOsRhpXFobwqlOlIB0E1ZLqAx34oh2oA4Gu2kIhKK858xXRSavgF
+         Tmh2b9K1HGuqw4F9b5q2KS4cmACid5Z/fLs36kENgTDfDnEXXSsMURAFMvVoHAKWyCOk
+         BxEBVBfuagppGJaD1Tg8m+ycpnSy0AYrtIXjG8dnDNKVtYW3I8gt7H9xeTLycE2DJXbc
+         jRgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVL/uK7B3Ga5e5VtqMQrglW6lrReia6HqcVjkYse/ve2zvPxn1ILSLndKHeKYCzbfOR+CyEdHPl@vger.kernel.org, AJvYcCW/ikLmB+OLMPB1A6OssPEwENrSBM334a73ax5KVxLeCS9pPr/YZtZ3GLjzIWZyUoGVuvmwDqd4Vp/hGm2awtg=@vger.kernel.org, AJvYcCXfam/KYlYiYXNNlwJUPW3TF8d6MUZteBr5oEf8OXacSHzLDfjk7TAPb1sELcfUYRy7L1z7rQYpifpjJ/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGvs7wzLUUw4CFCvDmkkDUXHBvHCEFa6K8OF1serAWbaYdkEee
+	oNIQeXsgVQ8Sap6AipANJ1O3R4u2UCgKORbIobuB70xbruAndcyF
+X-Google-Smtp-Source: AGHT+IHeFiJYbh8uDr/nqTI5DKY86Djkss7BSBhLVNy6u+0DDiXXbOseFc/cDm79528UbnvSJQMX6A==
+X-Received: by 2002:a05:620a:4443:b0:7ae:5c67:e1b8 with SMTP id af79cd13be357-7b193eeaa8emr159896685a.20.1729901782072;
+        Fri, 25 Oct 2024 17:16:22 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b18d32bae9sm102098185a.87.2024.10.25.17.16.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 17:16:21 -0700 (PDT)
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfauth.phl.internal (Postfix) with ESMTP id B75F01200043;
+	Fri, 25 Oct 2024 20:16:20 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Fri, 25 Oct 2024 20:16:20 -0400
+X-ME-Sender: <xms:1DQcZ5Iupl80qTQh3bQDweuLXoqR-o_dlCmvGOh7iARGFnqHK7NfyQ>
+    <xme:1DQcZ1IcJ9p48JbRSiDFFgM667fAnqCm3h42avr0PgpnPnZxfzHtJO_8eQlfXbsEV
+    rpxYq4UhMA3SDqQVQ>
+X-ME-Received: <xmr:1DQcZxsTETW--ieoDa2buViIstze0kSYUQxdy-VAkuS2GCtLvUqvv1vG6TE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdejfedgfedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteeh
+    uddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
+    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
+    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
+    mhgvpdhnsggprhgtphhtthhopedvuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    epfhhujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopegr
+    nhhnrgdqmhgrrhhirgeslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhopehfrhgvug
+    gvrhhitgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhho
+    nhhigidruggvpdhrtghpthhtohepjhhsthhulhhtiiesghhoohhglhgvrdgtohhmpdhrtg
+    hpthhtohepshgsohihugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidq
+    khgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvg
+    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhrqdhl
+    ihhnuhigsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:1DQcZ6bQNjs1hphH1tCCMyuXyb3Ke6YnlYMdggN7xBtvUdaFGgLxMg>
+    <xmx:1DQcZwa_F_9WEyGQTEQZ9OqGYVzKUAEcKkJitrIRnpUmVcEY7ItfJw>
+    <xmx:1DQcZ-BVKsGWQbPb-fRtw1M0mgrvLv208IQDU1wFUx3qrawVlM0f2Q>
+    <xmx:1DQcZ-ZhSyXKWAWDpiuHgmXz5yJfSR8n1o_1LXhdzqYzWzNLi3S3tA>
+    <xmx:1DQcZ8ofxlcNZnlqJAlT-6m5rpyVNZ_xgRz3Hnlq8wDNyRy21huxqRf3>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 25 Oct 2024 20:16:20 -0400 (EDT)
+Date: Fri, 25 Oct 2024 17:16:19 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
+	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
+Subject: Re: [PATCH v4 4/7] rust: time: Add wrapper for fsleep function
+Message-ID: <Zxw00wQAj4LpeU_t@Boquns-Mac-mini.local>
+References: <20241025033118.44452-1-fujita.tomonori@gmail.com>
+ <20241025033118.44452-5-fujita.tomonori@gmail.com>
+ <ZxwVuceNORRAI7FV@Boquns-Mac-mini.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241025-packing-pack-fields-and-ice-implementation-v2-9-734776c88e40@intel.com>
-References: <20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com>
-In-Reply-To: <20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com>
-To: Vladimir Oltean <olteanv@gmail.com>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Masahiro Yamada <masahiroy@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Jacob Keller <jacob.e.keller@intel.com>
-X-Mailer: b4 0.14.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZxwVuceNORRAI7FV@Boquns-Mac-mini.local>
 
-The ice_copy_rxq_ctx_to_hw() and ice_write_rxq_ctx() functions perform some
-defensive checks which are typically frowned upon by kernel style
-guidelines.
+On Fri, Oct 25, 2024 at 03:03:37PM -0700, Boqun Feng wrote:
+[...]
+> > +/// Sleeps for a given duration at least.
+> > +///
+> > +/// Equivalent to the kernel's [`fsleep`], flexible sleep function,
+> > +/// which automatically chooses the best sleep method based on a duration.
+> > +///
+> > +/// The function sleeps infinitely (MAX_JIFFY_OFFSET) if `Delta` is negative
+> > +/// or exceedes i32::MAX milliseconds.
+> > +///
+> 
+> I know Miguel has made his suggestion:
+> 
+> 	https://lore.kernel.org/rust-for-linux/CANiq72kWqSCSkUk1efZyAi+0ScNTtfALn+wiJY_aoQefu2TNvg@mail.gmail.com/
+> 
 
-In particular, NULL checks on buffers which point to the stack are
-discouraged, especially when the functions are static and only called once.
-Checks of this sort only serve to hide potential programming error, as we
-will not produce the normal crash dump on a NULL access.
+"made his suggestion" is probably a wrong statement from me, looking
+back the emails, Miguel was simply talking about we should document this
+and his assumption that `fsleep()` should inherit the behavior/semantics
+of msecs_to_jiffies().
 
-In addition, ice_copy_rxq_ctx_to_hw() cannot fail in another way, so could
-be made void.
+But yeah, I still suggest doing it differently, i.e. panic on negative
+or exceeding i32::MAX milliseconds.
 
-Future support for VF Live Migration will need to introduce an inverse
-function for reading Rx queue context from HW registers to unpack it, as
-well as functions to pack and unpack Tx queue context from HW.
+Regards,
+Boqun
 
-Rather than copying these style issues into the new functions, lets first
-cleanup the existing code.
-
-For the ice_copy_rxq_ctx_to_hw() function:
-
- * Move the Rx queue index check out of this function.
- * Convert the function to a void return.
- * Use a simple int variable instead of a u8 for the for loop index, and
-   initialize it inside the for loop.
- * Update the function description to better align with kernel doc style.
-
-For the ice_write_rxq_ctx() function:
-
- * Move the Rx queue index check into this function.
- * Update the function description with a Returns: to align with kernel doc
-   style.
-
-These changes align the existing write functions to current kernel
-style, and will align with the style of the new functions added when we
-implement live migration in a future series.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_common.c | 28 +++++++++++-----------------
- 1 file changed, 11 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 3cc56b85a480..54ebd2969203 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1358,32 +1358,23 @@ int ice_reset(struct ice_hw *hw, enum ice_reset_req req)
- }
- 
- /**
-- * ice_copy_rxq_ctx_to_hw
-+ * ice_copy_rxq_ctx_to_hw - Copy packed Rx queue context to HW registers
-  * @hw: pointer to the hardware structure
-  * @rxq_ctx: pointer to the packed Rx queue context
-  * @rxq_index: the index of the Rx queue
-- *
-- * Copies rxq context from dense structure to HW register space
-  */
--static int ice_copy_rxq_ctx_to_hw(struct ice_hw *hw,
--				  const ice_rxq_ctx_buf_t *rxq_ctx,
--				  u32 rxq_index)
-+static void ice_copy_rxq_ctx_to_hw(struct ice_hw *hw,
-+				   const ice_rxq_ctx_buf_t *rxq_ctx,
-+				   u32 rxq_index)
- {
--	u8 i;
--
--	if (rxq_index > QRX_CTRL_MAX_INDEX)
--		return -EINVAL;
--
- 	/* Copy each dword separately to HW */
--	for (i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++) {
-+	for (int i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++) {
- 		u32 ctx = ((const u32 *)rxq_ctx)[i];
- 
- 		wr32(hw, QRX_CONTEXT(i, rxq_index), ctx);
- 
- 		ice_debug(hw, ICE_DBG_QCTX, "qrxdata[%d]: %08X\n", i, ctx);
- 	}
--
--	return 0;
- }
- 
- #define ICE_CTX_STORE(struct_name, struct_field, width, lsb) \
-@@ -1435,23 +1426,26 @@ static void ice_pack_rxq_ctx(const struct ice_rlan_ctx *ctx,
- /**
-  * ice_write_rxq_ctx - Write Rx Queue context to hardware
-  * @hw: pointer to the hardware structure
-- * @rlan_ctx: pointer to the rxq context
-+ * @rlan_ctx: pointer to the unpacked Rx queue context
-  * @rxq_index: the index of the Rx queue
-  *
-  * Pack the sparse Rx Queue context into dense hardware format and write it
-  * into the HW register space.
-+ *
-+ * Return: 0 on success, or -EINVAL if the Rx queue index is invalid.
-  */
- int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
- 		      u32 rxq_index)
- {
- 	ice_rxq_ctx_buf_t buf = {};
- 
--	if (!rlan_ctx)
-+	if (rxq_index > QRX_CTRL_MAX_INDEX)
- 		return -EINVAL;
- 
- 	ice_pack_rxq_ctx(rlan_ctx, &buf);
-+	ice_copy_rxq_ctx_to_hw(hw, &buf, rxq_index);
- 
--	return ice_copy_rxq_ctx_to_hw(hw, &buf, rxq_index);
-+	return 0;
- }
- 
- /* LAN Tx Queue Context */
-
--- 
-2.47.0.265.g4ca455297942
-
+[...]
 
