@@ -1,195 +1,110 @@
-Return-Path: <netdev+bounces-139310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B90499B167C
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 11:20:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D219B168E
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 11:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480D01F223FB
-	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 09:20:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15705B214F9
+	for <lists+netdev@lfdr.de>; Sat, 26 Oct 2024 09:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4251CFED8;
-	Sat, 26 Oct 2024 09:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q714rRt/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB00192D99;
+	Sat, 26 Oct 2024 09:36:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from kylie.crudebyte.com (kylie.crudebyte.com [5.189.157.229])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680A718C023;
-	Sat, 26 Oct 2024 09:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA73913B294;
+	Sat, 26 Oct 2024 09:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.189.157.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729934406; cv=none; b=fDB6RfvfzqFMTRrwwJxqoeLd32mF2YvJ4hCtEG4RamiI/P0HxMx5NOvaAvz8Uy1zhYsoC1acMhExAimJsguXg+TrV8pg9dKfUMvsj4K/lD5AlcoTv3/TbuY9oY8NUxf7X3SgIpUMQcgULh0C8PiMHCGRBXyCi9zlWPJL7CXO7r0=
+	t=1729935385; cv=none; b=q3em2m3Gh43G3JCN62PubzevuAfuERrOXMyneLDp25tD/LEBdzv5YhXOXqrr+POIvN2TgTA+fmKuvSvXGdfz8YeKsg7fsZzQ0sfqnpGwms4NIPkxl2WT+msWkambVFo5kGTUuBcJtQV4xgTb93GH5Q00Jr7KVDMoxDOHPZlwfIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729934406; c=relaxed/simple;
-	bh=10Q0HTxapRuroNftzlAwfnnmV8FtywyCht+84Buc/bo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXwxFv7SZIwP0cJd6F2G/ajoL+TQrnSVUtyZ60EvzVcQsZkIAc7uXpIHmq0MCTMyIys6mNCDKtJfjs5wHpSJl4iBC5zvX4mKJY/9vehkBl77NiGPiRoEikGfpaVXcsAK3yHMKBtchhXwSFOJG7tZexO5XsoIbJNJLXNwFNczwik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q714rRt/; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729934404; x=1761470404;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=10Q0HTxapRuroNftzlAwfnnmV8FtywyCht+84Buc/bo=;
-  b=Q714rRt/34DyKrnM5vRl5o+qehTqQoCyrhFvNaOmWl+u5XpqNzUcshI0
-   RPyEeFORW8ItMuHELdzkG4Q03XBHRZnRKjtqGfkUOOOBuUU4mkNMp3nRi
-   Se0I5YzbvhlMKNC/3QOaBSHDw21dYFBn5U4aU3+DFpdlEDxWXzEcGMY/I
-   Ry8U2zfJoc3vNt1dLvREfLBq5fJ18JuvtatnopYlz5KRdq8NF3iLqeC76
-   0NXfVlTvHCeo5IoUHjUiiVWcfhgaLgnVjBUWvgQXiDnSVwcJiFUjVWsyt
-   77UfJDJ2SIA/zSvbtDfe1YiA1E6QtlQG8H5ssd8iwaMI4doEN8LeLzQSN
-   g==;
-X-CSE-ConnectionGUID: VhVXWAfoTsypcQgOYIxwdA==
-X-CSE-MsgGUID: x0ms3nWOT+qsQhXaW/oVwA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11236"; a="40181199"
-X-IronPort-AV: E=Sophos;i="6.11,234,1725346800"; 
-   d="scan'208";a="40181199"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2024 02:20:02 -0700
-X-CSE-ConnectionGUID: UUYp0zKATxul9nb+G/K1XQ==
-X-CSE-MsgGUID: 8WPtDW1qQ6uodo7Tr5GRxg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,234,1725346800"; 
-   d="scan'208";a="85920356"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 26 Oct 2024 02:19:56 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t4cxc-000ZT6-2l;
-	Sat, 26 Oct 2024 09:19:52 +0000
-Date: Sat, 26 Oct 2024 17:19:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org,
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
-	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org,
-	lars@metafoo.de, ukleinek@kernel.org, alexandre.belloni@bootlin.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 5/9] watchdog: Add Nuvoton NCT6694 WDT support
-Message-ID: <202410261752.lUVTJO2Y-lkp@intel.com>
-References: <20241024085922.133071-6-tmyu0@nuvoton.com>
+	s=arc-20240116; t=1729935385; c=relaxed/simple;
+	bh=dcVjBam2fHs2lKOgcenKcOJLmrq3Cvq3zkWUfikon2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hex2aelnTD6C2ig+CN+28vgoZyUAh7E5kZPBAdurtrFuStxQn1YktgUuSzcrpbiJ37dCKTfPUf+bu29C3VjiEF/D+4EeMRlXMH7XScAMZD7qga9qHm+zzBE4Mv74I3Uxa9x1ee04yD1SFuJ5AzJpTk9zC2BlxMyphTBIeJzsunQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crudebyte.com; spf=pass smtp.mailfrom=crudebyte.com; arc=none smtp.client-ip=5.189.157.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crudebyte.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crudebyte.com
+From: Christian Schoenebeck <linux_oss@crudebyte.com>
+To: Guan Xin <guanx.bac@gmail.com>,
+ Dominique Martinet <asmadeus@codewreck.org>
+Cc: v9fs@lists.linux.dev,
+ Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ linux-fsdevel@vger.kernel.org, Eric Van Hensbergen <ericvh@kernel.org>
+Subject:
+ Re: Calculate VIRTQUEUE_NUM in "net/9p/trans_virtio.c" from stack size
+Date: Sat, 26 Oct 2024 11:36:13 +0200
+Message-ID: <1921500.ue69UQ14vC@silver>
+In-Reply-To: <ZxwTOB5ENi66C_kq@codewreck.org>
+References:
+ <CANeMGR6CBxC8HtqbGamgpLGM+M1Ndng_WJ-RxFXXJnc9O3cVwQ@mail.gmail.com>
+ <ZxwTOB5ENi66C_kq@codewreck.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241024085922.133071-6-tmyu0@nuvoton.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Ming,
+On Friday, October 25, 2024 11:52:56 PM CEST Dominique Martinet wrote:
+> Christian,
+> 
+> this is more up your alley, letting you comment as well as you weren't
+> even sent a copy in Ccs
+[...]
+> > Signed-off-by: GUAN Xin <guanx.bac@gmail.com>
+> > cc: Eric Van Hensbergen <ericvh@kernel.org>
+> > cc: v9fs@lists.linux.dev
+> > cc: netdev@vger.kernel.org
+> > cc: linux-fsdevel@vger.kernel.org
+> > 
+> > --- net/9p/trans_virtio.c.orig  2024-10-25 10:25:09.390922517 +0800
+> > +++ net/9p/trans_virtio.c       2024-10-25 16:48:40.451680192 +0800
+> > @@ -31,11 +31,12 @@
+> > #include <net/9p/transport.h>
+> > #include <linux/scatterlist.h>
+> > #include <linux/swap.h>
+> > +#include <linux/thread_info.h>
+> > #include <linux/virtio.h>
+> > #include <linux/virtio_9p.h>
+> > #include "trans_common.h"
+> > 
+> > -#define VIRTQUEUE_NUM  128
+> > +#define VIRTQUEUE_NUM  (1 << (THREAD_SIZE_ORDER + PAGE_SHIFT - 6))
+> 
+> (FWIW that turned out to be 256 on my system)
 
-kernel test robot noticed the following build warnings:
+Guan,
 
-[auto build test WARNING on lee-mfd/for-mfd-next]
-[also build test WARNING on brgl/gpio/for-next andi-shyti/i2c/i2c-host mkl-can-next/testing groeck-staging/hwmon-next jic23-iio/togreg abelloni/rtc-next linus/master lee-mfd/for-mfd-fixes v6.12-rc4 next-20241025]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+it took me a bit to understand why you would change this constant depending on
+maximum stack size, as it is not obvious. Looks like you made this because of
+this comment (net/9p/trans_virtio.c):
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Yu/mfd-Add-core-driver-for-Nuvoton-NCT6694/20241024-170528
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git for-mfd-next
-patch link:    https://lore.kernel.org/r/20241024085922.133071-6-tmyu0%40nuvoton.com
-patch subject: [PATCH v1 5/9] watchdog: Add Nuvoton NCT6694 WDT support
-config: arc-randconfig-r132-20241026 (https://download.01.org/0day-ci/archive/20241026/202410261752.lUVTJO2Y-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20241026/202410261752.lUVTJO2Y-lkp@intel.com/reproduce)
+struct virtio_chan {
+    ...
+	/* Scatterlist: can be too big for stack. */
+	struct scatterlist sg[VIRTQUEUE_NUM];
+    ...
+};
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410261752.lUVTJO2Y-lkp@intel.com/
+However the stack size is not the limiting factor. It's a bit more complicated
+than that:
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/watchdog/nct6694_wdt.c:133:42: sparse: sparse: cast to restricted __le32
->> drivers/watchdog/nct6694_wdt.c:133:42: sparse: sparse: cast to restricted __le32
->> drivers/watchdog/nct6694_wdt.c:133:42: sparse: sparse: cast to restricted __le32
->> drivers/watchdog/nct6694_wdt.c:133:42: sparse: sparse: cast to restricted __le32
->> drivers/watchdog/nct6694_wdt.c:133:42: sparse: sparse: cast to restricted __le32
->> drivers/watchdog/nct6694_wdt.c:133:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:134:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:134:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:134:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:134:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:134:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:134:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:166:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:166:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:166:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:166:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:166:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:166:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:167:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:167:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:167:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:167:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:167:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:167:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:220:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:220:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:220:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:220:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:220:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:220:42: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:221:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:221:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:221:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:221:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:221:45: sparse: sparse: cast to restricted __le32
-   drivers/watchdog/nct6694_wdt.c:221:45: sparse: sparse: cast to restricted __le32
+I have also been working on increasing performance by allowing larger 9p
+message size and made it user-configurable at runtime. Here is the latest
+version of my patch set:
 
-vim +133 drivers/watchdog/nct6694_wdt.c
+https://lore.kernel.org/all/cover.1657636554.git.linux_oss@crudebyte.com/
 
-   115	
-   116	static int nct6694_wdt_set_timeout(struct watchdog_device *wdev,
-   117					   unsigned int timeout)
-   118	{
-   119		struct nct6694_wdt_data *data = watchdog_get_drvdata(wdev);
-   120		struct nct6694 *nct6694 = data->nct6694;
-   121		unsigned int timeout_fmt, pretimeout_fmt;
-   122		unsigned char buf[REQUEST_WDT_CMD0_LEN];
-   123		int ret;
-   124	
-   125		if (timeout < wdev->pretimeout) {
-   126			pr_err("%s: 'timeout' must be greater than 'pre timeout'!\n",
-   127			       __func__);
-   128			return -EINVAL;
-   129		}
-   130	
-   131		timeout_fmt = timeout * 1000 | (WDT_TIMEOUT_ACT << 24);
-   132		pretimeout_fmt = wdev->pretimeout * 1000 | (WDT_PRETIMEOUT_ACT << 24);
- > 133		set_buf32(&buf[WDT_TIMEOUT_IDX], le32_to_cpu(timeout_fmt));
-   134		set_buf32(&buf[WDT_PRETIMEOUT_IDX], le32_to_cpu(pretimeout_fmt));
-   135	
-   136		ret = nct6694_write_msg(nct6694, REQUEST_WDT_MOD,
-   137					REQUEST_WDT_CMD0_OFFSET(data->wdev_idx),
-   138					REQUEST_WDT_CMD0_LEN, buf);
-   139		if (ret) {
-   140			pr_err("%s: Don't write the setup command in Start stage!\n",
-   141			       __func__);
-   142			return ret;
-   143		}
-   144	
-   145		wdev->timeout = timeout;
-   146	
-   147		return 0;
-   148	}
-   149	
+Patches 8..11 have already been merged. Patches 1..7 are still to be merged.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+/Christian
+
+
 
