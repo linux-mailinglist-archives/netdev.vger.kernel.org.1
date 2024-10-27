@@ -1,112 +1,123 @@
-Return-Path: <netdev+bounces-139397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A569B2057
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:27:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70F29B205D
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 051E21C210E2
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:27:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD2D12813D7
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C8B17CA0B;
-	Sun, 27 Oct 2024 20:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AB3762E0;
+	Sun, 27 Oct 2024 20:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bUzf7gsX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmCZo5iF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F0115885E;
-	Sun, 27 Oct 2024 20:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43578538A;
+	Sun, 27 Oct 2024 20:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730060844; cv=none; b=XvRW8vsI/aHxcV6JfDlq37V6YP9k/rR5RyUF/99M6E1jMidH+SGKVoZP6+jdjiNHHscM6acdt6AECTMdaBYs5yGttEB/D5CDvT6TlGxpqmGsqxlg+5zhI3/G8rzD5Md20v4jbXH29oB3a9wU+TKERaLqLDDW7IaKDqwbSepp6B8=
+	t=1730061061; cv=none; b=j0tko1hJPeYlmYhAhGSrwBC1KGr6A+KzDDf8DYZpbUMjMd5jCFHvu0kLLMfq6GKE4eM3zKfTfZj4KkCRKkmiw5bUsjwgWnWWMtYC7b4m23SmqyHWBWQiFXV1DdeFGBGaj+Ubu5C5cciFzPjKUt1nNHNOlWyW5hPS9moC3Zg7jao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730060844; c=relaxed/simple;
-	bh=JpXCiKC2ct+IT2kSHw/v+QOTATgFdJ18Z/JSLY8FTvQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q2U9QYpYQHE21yu8Rd0ZYScjca0C997YLj+GU/4KXkonTAO6PbRunk95RrcQj5BxZec3SklPyTwhBbsC142FpsEQzqubjsNyCXqDhOh7FhV+Ztn87+4FWLWqw6BfATWUijZhv5RCTDmab7SOGxloB5iaAA7KToD8nEv1dcDkpMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bUzf7gsX; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43163667f0eso35864845e9.0;
-        Sun, 27 Oct 2024 13:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730060840; x=1730665640; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pRQHOJ1yYQQJLj2MH1qHa8MZFRBtwB0M1hjRbBCmZ8w=;
-        b=bUzf7gsX3VfiiAR079SEGNRXO5BAOWhtVC7Nvc2qPmZsB9y0jZAnSe3DwC9Sx0But8
-         l0zol6MEWMmcRDaLoW7NpovyovPkybI3l8UBT6vGoBkyfBCrh8IBOpdWkCai2ag2ajLh
-         rtXM6iEqH8lsPy9Ml2cMAiLteOIoF+bCtddrPsShJ6LbQAr+o9cYb23+A3xRiBUjCi/5
-         hfEt6bxqYBwRhVlrjKr7LLWQ9+NUkY/5WnY9C5oWjErOoOcr4IOeRWytpOXi15eVVQF7
-         pyrrNz/c10hhk3DoNkbEiolTO3XZjdoL1c2+qydf5ndDmG2i3MhgXkJAO9h/UJR22/dp
-         V2lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730060840; x=1730665640;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pRQHOJ1yYQQJLj2MH1qHa8MZFRBtwB0M1hjRbBCmZ8w=;
-        b=bj25oJNNik7i75ad9BkYpFvX42n+mb4PA0xtU8e2T6w9cKPuCsh+ztxFe6LzhAH4qJ
-         GzzndzL4iNpIozV6xygmcPXea5sFNtZRJ7b/V1xJ8Ktll5azD5KSA64/wQmGqPnR3qkT
-         FEpG0Da2OPocX8fu346aFE3CcXO6/P71VyOXAX757uIZ8/714QImHLdoEmAq91LohCEC
-         9hXN1XdG/Ti4ybAZihVxzv/Qnb9oENL1+cSG97ZKlCUSWZBDToQUCjsPOObcXHxkuVC8
-         M5bxiFOWuWgFLepovxokd6sAjfCFRDYZvX6jaY3V1nR26n8Nj5OjxtquLBYL0S55fGgJ
-         Vz5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWhq2Vkfij7VVw/HbvIrUGuTcLFCactakHTIK/lWSXN7G7FbwJ/nB3t+NfSzU91SdV/oSCLmgA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvAHH8fuylV9htJ6nsy7Y6NLLnTldiDPgvZ+SUMWy6zUMBpaBw
-	SBNn6vhTz+AGiuGvUUHyf3CuB2PcI5h32VvevB5UAuAcmSvDVaX1pyHvKw==
-X-Google-Smtp-Source: AGHT+IGfZlFtFiOmu6yt4/YDXSdaWRDmabBDLowk75VcOEYzt8Gz3JYTjL8M6596GWqRfATTt9b9rg==
-X-Received: by 2002:a05:600c:1c82:b0:431:5503:43ca with SMTP id 5b1f17b1804b1-4319ad16173mr47913515e9.28.1730060840214;
-        Sun, 27 Oct 2024 13:27:20 -0700 (PDT)
-Received: from localhost.localdomain (ip-94-112-167-15.bb.vodafone.cz. [94.112.167.15])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4318b5430edsm116260535e9.2.2024.10.27.13.27.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Oct 2024 13:27:19 -0700 (PDT)
-From: Ilya Dryomov <idryomov@gmail.com>
-To: ceph-devel@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] MAINTAINERS: exclude net/ceph from networking
-Date: Sun, 27 Oct 2024 21:25:55 +0100
-Message-ID: <20241027202556.1621268-1-idryomov@gmail.com>
-X-Mailer: git-send-email 2.46.1
+	s=arc-20240116; t=1730061061; c=relaxed/simple;
+	bh=g0qOuu9oBMe1flwJbOj0ETqlrVdC6doUvyj6Y4MWIJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KxR9T6Cf8NhMXSKTuByRYZOOTsn1KL8RtmT80REs88fBd8vAVByGtg5OlBD0jGimrgCdpw0aOmOt8FCDi44Bh4hweS1D1kW2FdJUzNW0Vjaa6StGv4MsRhNnaASnZZQE4ZVBa00f7e5jNxR2ooSBlVW/hvL4koAdtX36eSmAWHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmCZo5iF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA11C4CEC3;
+	Sun, 27 Oct 2024 20:30:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730061059;
+	bh=g0qOuu9oBMe1flwJbOj0ETqlrVdC6doUvyj6Y4MWIJU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NmCZo5iFGA1y+uL3wW/0bcrnhx1UBxEVoEJpLLcF6HTtG2VUBSjSbG3NzcEqzMKA0
+	 k8chJH5+oGGqHo+I7nZNxn1dud9nhRvQqo+jqsU/Zh4FxAWWbJfLc1wyTiuyaTNcVb
+	 PD+tXn3iIzdRyQJ/QmHMGIsShKIMA6k9wJatpXHVeBJmFjTpyk0VITjmsfp7GKuuED
+	 l9HaDBCa8SjI0qty5uX7/ykAVZA4JQDcUrWnO3E3jNE9/5FnP6R+kF7OTGkkaqkpwC
+	 i5j0wkoefJKYLi8ZrexHXbW5uGiKfILdA8ttSdF65bzOLVVc76CYIfx/gJiiP4kzWA
+	 8Y7WOBQDlzHNw==
+Date: Sun, 27 Oct 2024 22:30:54 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Wen Gu <guwen@linux.alibaba.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Nils Hoppmann <niho@linux.ibm.com>,
+	Niklas Schnell <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
+ ib_device_get_netdev()
+Message-ID: <20241027203054.GB1615717@unreal>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+ <20241027201857.GA1615717@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241027201857.GA1615717@unreal>
 
-net/ceph (libceph) patches have always gone through the Ceph tree.
-Avoid CCing netdev in addition to ceph-devel list.
+On Sun, Oct 27, 2024 at 10:18:57PM +0200, Leon Romanovsky wrote:
+> On Fri, Oct 25, 2024 at 09:23:55AM +0200, Wenjia Zhang wrote:
+> > Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
+> > alternative to get_netdev") introduced an API ib_device_get_netdev.
+> > The SMC-R variant of the SMC protocol continued to use the old API
+> > ib_device_ops.get_netdev() to lookup netdev. 
+> 
+> I would say that calls to ibdev ops from ULPs was never been right
+> thing to do. The ib_device_set_netdev() was introduced for the drivers.
+> 
+> So the whole commit message is not accurate and better to be rewritten.
+> 
+> > As this commit 8d159eb2117b
+> > ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
+> > get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
+> > ib_device_ops.get_netdev didn't work any more at least by using a mlx5
+> > device driver.
+> 
+> It is not a correct statement too. All modern drivers (for last 5 years)
+> don't have that .get_netdev() ops, so it is not mlx5 specific, but another
+> justification to say that SMC-R was doing it wrong.
+> 
+> > Thus, using ib_device_set_netdev() now became mandatory.
+> 
+> ib_device_set_netdev() is mandatory for the drivers, it is nothing to do
+> with ULPs.
+> 
+> > 
+> > Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
+> 
+> It is too late for me to do proper review for today, but I would say
+> that it is worth to pay attention to multiple dev_put() calls in the
+> functions around the ib_device_get_netdev().
+> 
+> > 
+> > Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
 
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Honestly, this patch in Fixes line doesn't look right to me. It pokes inside
+of ib_device to get netdev index. For example call to smc_ib_ndev_change()
+will return completely unpredictable results, due to races.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e9659a5a7fb3..94077e2de510 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16096,6 +16096,7 @@ X:	include/net/mac80211.h
- X:	include/net/wext.h
- X:	net/9p/
- X:	net/bluetooth/
-+X:	net/ceph/
- X:	net/mac80211/
- X:	net/rfkill/
- X:	net/wireless/
--- 
-2.46.1
+It is bad that RDMA ML wasn't even CCed back then, we would say NAK to
+this patch.
+https://lore.kernel.org/netdev/20201201192049.53517-6-kgraul@linux.ibm.com/
 
+Thanks
 
