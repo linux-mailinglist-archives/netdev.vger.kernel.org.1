@@ -1,227 +1,153 @@
-Return-Path: <netdev+bounces-139392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DCC49B1FDD
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:28:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 257899B2019
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:01:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E1181C20AE0
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 19:28:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C67161F213DD
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B02D17B50A;
-	Sun, 27 Oct 2024 19:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33621822E5;
+	Sun, 27 Oct 2024 20:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H90EGbWT"
+	dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b="oEDRhVzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCA31BF37
-	for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 19:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F2317BB24
+	for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 20:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730057329; cv=none; b=lAzN2CeTAVsRXLt0wlaS2ogGZwg/jFNq4UCLANDonzwWqJEkAFi8Rd4FTslXTa0f4EkR1ASu3qG0rG14IEnrupqVrnXvYjBGxalWZ3Pj2bALCuEJ7nqVO8lrpdSewq33K4ae1f5CFkmN2v7MuLUvfQZrRsyN7wtBtjXXFkrbd1c=
+	t=1730059238; cv=none; b=c7d7+uFfmWk0YMRaSm0C58CwuUYhQE2gOf7Po4Xgae6eLbyUal3eqifo3JpBIGgxMXRhZ2KDC7xPRmrcFMx0dETwNztlgEM3QdtBGSLWhYnE+EpvmJj+8h53JALfj8fF/lU558MhtDJHoZ4Tn9oOXn+L3QFhL4X5gJk6THA5+6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730057329; c=relaxed/simple;
-	bh=na5RqGkEZnfKl/taVAsW55k5aIMm/HhhoP69JHNVo4w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZBU0z59/NrvZ4q7q4me1jkTkyuiuWQIfzhomFnBTqYu24mzOSRnqUlzsUHoE267fQTpHs3Lj88P6X2eE3jnarIPx7xuVdDcSLoYEDd6FwkeHlN+PsEvC1TFg3jHcHxYbljbbXV684PIKoeFYjUkoR5YGyYSUB/9ShH0qLzfZ8Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H90EGbWT; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2a7dca47-4107-4bd9-b539-aacdf733f3d4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730057320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DdZnJKOedTRWsKA+yx0HzasB5LXG8yplTAt8DgncFdU=;
-	b=H90EGbWT8vyu3mmQdhIE9QE94gB2tyisxF8QP1UqGSfgy0MeZ6ipltvC8V1+RCDybZwpaq
-	ELSfA3gNVfzNx51ZEWBJI4c9btqWcSLNI1XRtt5wEpHC3Vg0mP7tAcfHtZsQ0Ufg/LdQtM
-	x+m+1T/xdu1cFRcXpDbSZ4IJfxIht20=
-Date: Sun, 27 Oct 2024 20:28:32 +0100
+	s=arc-20240116; t=1730059238; c=relaxed/simple;
+	bh=HnC/YPSHeNYM8IsGJsmyJAFQYRswBMe+vOP4b93Fgr8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lq2yoVcftGAGONzhYJ4yvdp0Mb92Cm6ejaBZFuo65YuVyFLWy3lhO+p/TShUhlaFHWxnsd1AXsTMecbpCmuOS9IJ4EXg3FJWV034i/02BW5oF9u1DJcf862FloiYfHNVR+/Bf8gd3qS2BWHQoeeRf2jaFA+8igpVeiXOiih39qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com; spf=none smtp.mailfrom=kutsevol.com; dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b=oEDRhVzo; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kutsevol.com
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3e60e57a322so2154894b6e.3
+        for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 13:00:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kutsevol-com.20230601.gappssmtp.com; s=20230601; t=1730059235; x=1730664035; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hoy0+G1B62y4A0aPMtVHcQS+DKaSVd+7u5DUTQklBRA=;
+        b=oEDRhVzocnC+AMmA35nACpiaVpcC71E6YZ8PPuzck9YNOBbuKMX3/dsvsFzKRZqlA7
+         JFpvEfAqDtuRdySsZvqml7Zmyeo8tessGQp0TdbVleUBggfODENUsPI0K7KbA1Oi1yW+
+         gpA1CHh26+YnHCW+G9aVIARQtSnVkTP5xPD2U+b2qX6mrQq2ztM8/4GWnWiACzKz6rsa
+         yVBx07StjYG1Ct3Wbhum87pOgbAtWbdJp49WtjAZtEaFyLhWVlClGx3J4QV58AmXJwa0
+         viNOXHxSbsnxUEGZv2wGIEaycpD6TGOVrs+I8DYFDJx5kn0hk4VLzMWf+3iOUWJ+iok2
+         GHWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730059235; x=1730664035;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hoy0+G1B62y4A0aPMtVHcQS+DKaSVd+7u5DUTQklBRA=;
+        b=qTYdV/hTfh7ydgEr2Vr1+qef5qOechC5ZW+Dcl5wImiLC68cTWyxm6abyep2KK7W5g
+         dwk75KdC+VHmPho0WHiWYotPyPaCzuWPsyCm2/CB1k1OlVUy29Di8wW2DMRYJvfJaSRM
+         MLCYGllNxRZ1EZIz5PjshZHsRBq1Mllp/f33wZUP3Qc73K1myYCU74N2o8JvwrZV6gDx
+         LY2H75dhA4cwyDA3KoRZ6kULPmIBScAYfPAs43rADKkhGYx31DmkPczndGApdqKBdXK7
+         wVDwfIHaEj2S2mY+a2bN9xY3jGHZHarB6qCPYIFnVZeIMGvlhzGaKfEN9LVxfyE/mGHD
+         wYig==
+X-Gm-Message-State: AOJu0YwppAyToayNXPG4nAzC37ynLMUQt4oBN91ZBPuCXvf/x6+IjhmN
+	NwZo00GDsMCTJhJuT8Chvo8/kvO7QJP2xJiOCnkOrhJUfQ8wszejqnLk8pcF47g=
+X-Google-Smtp-Source: AGHT+IFbKUZ7FnBC2Wao6JUPJhNSJps9AKvrtUtqDnBgQVi+QfoNxo39LrQXX2TIC3JIc1aepdLG0g==
+X-Received: by 2002:a05:6808:2dc6:b0:3e6:40b3:e525 with SMTP id 5614622812f47-3e640b3e88amr1601921b6e.41.1730059235127;
+        Sun, 27 Oct 2024 13:00:35 -0700 (PDT)
+Received: from localhost.localdomain (fwdproxy-ash-017.fbsv.net. [2a03:2880:20ff:11::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-461321431a1sm27946241cf.25.2024.10.27.13.00.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Oct 2024 13:00:34 -0700 (PDT)
+From: Maksym Kutsevol <max@kutsevol.com>
+Subject: [PATCH net-next v4 0/2] netcons: Add udp send fail statistics to
+ netconsole
+Date: Sun, 27 Oct 2024 12:59:40 -0700
+Message-Id: <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-0-a8065a43c897@kutsevol.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
- Nils Hoppmann <niho@linux.ibm.com>, Niklas Schnell <schnelle@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>,
- Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>,
- Aswin K <aswin@linux.ibm.com>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20241025072356.56093-1-wenjia@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKybHmcC/zXN0QrCMAyF4VcZuTaw1YnUVxEvQpNqYLSjiTIYe
+ 3eL4OUPH+fsYNJUDG7DDk0+alpLj/k0QHpReQoq94YwhnkawxWLeKrFkJjxzSuaFMZMuqA5uZp
+ rMvT6d3UR5BTpQjHH6RyhD69Nsm6/0zt01+3m8DiOL+5Js9uOAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Breno Leitao <leitao@debian.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Maksym Kutsevol <max@kutsevol.com>
+X-Mailer: b4 0.13.0
 
-在 2024/10/25 9:23, Wenjia Zhang 写道:
-> Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
-> alternative to get_netdev") introduced an API ib_device_get_netdev.
-> The SMC-R variant of the SMC protocol continued to use the old API
-> ib_device_ops.get_netdev() to lookup netdev. As this commit 8d159eb2117b
-> ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
-> get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
+Enhance observability of netconsole. Packet sends can fail.
+Start tracking at least two failure possibilities: ENOMEM and
+NET_XMIT_DROP for every target. Stats are exposed via an additional
+attribute in CONFIGFS.
 
-Thanks a lot.
+The exposed statistics allows easier debugging of cases when netconsole
+messages were not seen by receivers, eliminating the guesswork if the
+sender thinks that messages in question were sent out.
 
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Stats are not reset on enable/disable/change remote ip/etc, they
+belong to the netcons target itself.
 
-Because the commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and 
-get_netdev functions") removes the get_netdev callback from 
-mlx5_ib_dev_common_roce_ops, in mlx4, get_netdev is still in 
-mlx4_ib_dev_ops. So the following commit will follow mlx5 to remove 
-get_netdev from mlx4 driver.
-
- From a59f2e01428640a332a51b8d910ec166704aa441 Mon Sep 17 00:00:00 2001
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-Date: Sun, 27 Oct 2024 20:21:27 +0100
-Subject: [PATCH 1/1] RDMA/mlx4: Use IB get_netdev functions and remove
-  get_netdev callback
-
-In the commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev
-functions") removed the get_netdev callback from
-mlx5_ib_dev_common_roce_ops, in mlx4, get_netdev callback should also
-be removed.
-
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Reported-by: Breno Leitao <leitao@debian.org>
+Closes: https://lore.kernel.org/all/ZsWoUzyK5du9Ffl+@gmail.com/
+Signed-off-by: Maksym Kutsevol <max@kutsevol.com>
 ---
-compile successfully only
+Changelog:
+v4:
+ * Rebased after
+   https://lore.kernel.org/netdev/20241017095028.3131508-1-leitao@debian.org/
+   was merged
+ * cc doc maintainers.
+ * adhere to 80 columns. Learn that checkpatch defaults to 100. Okay :)
+
+v3:
+ * https://lore.kernel.org/netdev/20240912173608.1821083-2-max@kutsevol.com/
+ * cleanup the accidental slip of debugging addons.
+ * use IS_ENABLED() instead of #ifdef. Always have stats field.
+
+v2:
+ * https://lore.kernel.org/netdev/20240828214524.1867954-2-max@kutsevol.com/
+ * fixed commit message wording and reported-by reference.
+ * not hiding netconsole_target_stats when CONFIG_NETCONSOLE_DYNAMIC
+   is not enabled.
+ * rename stats attribute in configfs to transmit_errors and make it
+   a single u64 value, which is a sum of errors that occured.
+ * make a wrapper function to count errors instead of a return result
+   classifier one.
+ * use u64_stats_sync.h to manage stats.
+
+v1:
+ * https://lore.kernel.org/netdev/20240824215130.2134153-2-max@kutsevol.com/
+
 ---
-  drivers/infiniband/hw/mlx4/main.c | 35 -------------------------------
-  1 file changed, 35 deletions(-)
+Maksym Kutsevol (2):
+      netpoll: Make netpoll_send_udp return status instead of void
+      netcons: Add udp send fail statistics to netconsole
 
-diff --git a/drivers/infiniband/hw/mlx4/main.c 
-b/drivers/infiniband/hw/mlx4/main.c
-index 529db874d67c..cf34d92de7b1 100644
---- a/drivers/infiniband/hw/mlx4/main.c
-+++ b/drivers/infiniband/hw/mlx4/main.c
-@@ -123,40 +123,6 @@ static int num_ib_ports(struct mlx4_dev *dev)
-         return ib_ports;
-  }
+ Documentation/networking/netconsole.rst |  5 +--
+ drivers/net/netconsole.c                | 61 +++++++++++++++++++++++++++++++--
+ include/linux/netpoll.h                 |  2 +-
+ net/core/netpoll.c                      |  6 ++--
+ 4 files changed, 65 insertions(+), 9 deletions(-)
+---
+base-commit: 03fc07a24735e0be8646563913abf5f5cb71ad19
+change-id: 20241027-netcons-add-udp-send-fail-statistics-to-netconsole-dc9a5a9f9139
 
--static struct net_device *mlx4_ib_get_netdev(struct ib_device *device,
--                                            u32 port_num)
--{
--       struct mlx4_ib_dev *ibdev = to_mdev(device);
--       struct net_device *dev, *ret = NULL;
--
--       rcu_read_lock();
--       for_each_netdev_rcu(&init_net, dev) {
--               if (dev->dev.parent != ibdev->ib_dev.dev.parent ||
--                   dev->dev_port + 1 != port_num)
--                       continue;
--
--               if (mlx4_is_bonded(ibdev->dev)) {
--                       struct net_device *upper;
--
--                       upper = netdev_master_upper_dev_get_rcu(dev);
--                       if (upper) {
--                               struct net_device *active;
--
--                               active = 
-bond_option_active_slave_get_rcu(netdev_priv(upper));
--                               if (active)
--                                       dev = active;
--                       }
--               }
--
--               dev_hold(dev);
--               ret = dev;
--               break;
--       }
--
--       rcu_read_unlock();
--       return ret;
--}
--
-  static int mlx4_ib_update_gids_v1(struct gid_entry *gids,
-                                   struct mlx4_ib_dev *ibdev,
-                                   u32 port_num)
-@@ -2544,7 +2510,6 @@ static const struct ib_device_ops mlx4_ib_dev_ops = {
-         .get_dev_fw_str = get_fw_ver_str,
-         .get_dma_mr = mlx4_ib_get_dma_mr,
-         .get_link_layer = mlx4_ib_port_link_layer,
--       .get_netdev = mlx4_ib_get_netdev,
-         .get_port_immutable = mlx4_port_immutable,
-         .map_mr_sg = mlx4_ib_map_mr_sg,
-         .mmap = mlx4_ib_mmap,
---
-2.34.1
-
-Zhu Yanjun
-
-> ib_device_ops.get_netdev didn't work any more at least by using a mlx5
-> device driver. Thus, using ib_device_set_netdev() now became mandatory.
-> 
-> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
-> 
-> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
-> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
-> Reported-by: Aswin K <aswin@linux.ibm.com>
-> Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
-> Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> ---
->   net/smc/smc_ib.c   | 8 ++------
->   net/smc/smc_pnet.c | 4 +---
->   2 files changed, 3 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 9297dc20bfe2..9c563cdbea90 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
->   	struct ib_device *ibdev = smcibdev->ibdev;
->   	struct net_device *ndev;
->   
-> -	if (!ibdev->ops.get_netdev)
-> -		return;
-> -	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
-> +	ndev = ib_device_get_netdev(ibdev, port + 1);
->   	if (ndev) {
->   		smcibdev->ndev_ifidx[port] = ndev->ifindex;
->   		dev_put(ndev);
-> @@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
->   		port_cnt = smcibdev->ibdev->phys_port_cnt;
->   		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
->   			libdev = smcibdev->ibdev;
-> -			if (!libdev->ops.get_netdev)
-> -				continue;
-> -			lndev = libdev->ops.get_netdev(libdev, i + 1);
-> +			lndev = ib_device_get_netdev(libdev, i + 1);
->   			dev_put(lndev);
->   			if (lndev != ndev)
->   				continue;
-> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-> index 1dd362326c0a..8566937c8903 100644
-> --- a/net/smc/smc_pnet.c
-> +++ b/net/smc/smc_pnet.c
-> @@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
->   		for (i = 1; i <= SMC_MAX_PORTS; i++) {
->   			if (!rdma_is_port_valid(ibdev->ibdev, i))
->   				continue;
-> -			if (!ibdev->ibdev->ops.get_netdev)
-> -				continue;
-> -			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
-> +			ndev = ib_device_get_netdev(ibdev->ibdev, i);
->   			if (!ndev)
->   				continue;
->   			dev_put(ndev);
+Best regards,
+-- 
+Maksym Kutsevol <max@kutsevol.com>
 
 
